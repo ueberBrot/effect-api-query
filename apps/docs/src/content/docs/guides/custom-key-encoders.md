@@ -55,8 +55,6 @@ const http = createHttpApiQueryUtils(contract, {
 })
 ```
 
-This projection is exercised by the
-[semantic-key tests](https://github.com/ueberBrot/effect-rpc-query/blob/main/tests/http-semantic-keys.test.ts).
 Multiple buffered alternatives require an encoder even when they share a content type. For buffered
 binary input, return a JSON-safe representation such as `{ bytes: Array.from(payload) }`; the ready
 client still receives the original `Uint8Array`.
@@ -69,9 +67,7 @@ unknown, omitted, or inputless endpoints fail synchronously during factory const
 Keep ordinary authentication in client middleware. Partition the cache with safe tenant and user
 identifiers in `keyPrefix`, for example `['tenant', 'north', 'user', 'ada']`. The factory cannot infer
 identity from a client, base URL, or middleware. Retain every safe value that distinguishes results
-when excluding a secret. The
-[packed HTTP consumer](https://github.com/ueberBrot/effect-rpc-query/blob/main/tests/packed-consumer/http-runtime.mts)
-executes authenticated clients with separate user and tenant prefixes in one QueryClient.
+when excluding a secret.
 
 Return strict `JsonValue` synchronously. The factory copies and freezes the result; it rejects
 undefined object members, undefined or sparse array entries, non-finite numbers, cycles, and

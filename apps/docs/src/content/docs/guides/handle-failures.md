@@ -48,6 +48,4 @@ become `EffectHttpApiQueryError` instead. Runner rejections and user or TanStack
 pass through unchanged when they produce no failed Exit.
 
 See the [HTTP factory reference](/effect-rpc-query/reference/http-factory/#cache-identity-and-failures)
-for key-error codes and the
-[execution tests](https://github.com/ueberBrot/effect-rpc-query/blob/main/tests/http-execution.test.ts)
-for real-client failure inspection.
+for key-error codes.

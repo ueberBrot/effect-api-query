@@ -25,6 +25,7 @@ Query keys have this flat shape:
 ```ts
 ;[
   ...keyPrefix,
+  'rpc',
   ...rpcTagSegments,
   'query',
   canonicalPayload, // payload-bearing queries only

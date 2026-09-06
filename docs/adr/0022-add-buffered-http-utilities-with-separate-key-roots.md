@@ -22,5 +22,5 @@ caller prefix. Operation and canonical query input follow. Factory `key()` inclu
 root, preventing cross-adapter collisions while retaining prefix invalidation. Applications own
 safe client-identity partitions and deliberate cross-adapter invalidation through the caller prefix.
 
-See the [pinned HTTP proof](../research/http-technical-spine.md) for upstream assumptions, executable
-evidence, and the remaining scope in #64–#66.
+See the [HTTP technical reference](../research/http-technical-spine.md) for upstream assumptions and
+executable evidence.

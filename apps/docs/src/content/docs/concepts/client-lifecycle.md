@@ -43,6 +43,4 @@ request-source header or streaming buffer size. The `context` value is local to 
 processing; it is not a serialized server Context and does not replace the supplied Effect runner.
 
 Keep ordinary authentication, middleware, transport setup, runtime services, and Scope ownership
-in the application-owned client and runtime. Both executable examples retain their authorization
-header in the shared client runner and add `x-request-source: diagnostics-panel` only to the
-failure diagnostic's generated mutation options.
+in the application-owned client and runtime.

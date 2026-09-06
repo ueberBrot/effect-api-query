@@ -73,7 +73,4 @@ vp run tanstack-start-build
 ## Browser playground status
 
 The examples do not currently run in StackBlitz WebContainers. Vite+ requires a native binding
-that is unavailable there. [Issue #33](https://github.com/ueberBrot/effect-rpc-query/issues/33)
-records the decision, and the
-[minimal reproduction](https://github.com/ueberBrot/vite-plus-webcontainer-repro) tracks the
-upstream limitation. Run either example locally or in the Dev Container.
+that is unavailable there. Run either example locally or in the Dev Container.

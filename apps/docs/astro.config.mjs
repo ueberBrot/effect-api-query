@@ -96,7 +96,10 @@ export default defineConfig({
         },
         {
           label: 'Contributing',
-          items: [{ label: 'Dev Container', slug: 'contributing/dev-container' }],
+          items: [
+            { label: 'Dev Container', slug: 'contributing/dev-container' },
+            { label: 'Update Query Core Support', slug: 'contributing/query-core-compatibility' },
+          ],
         },
       ],
       social: [{ icon: 'github', label: 'GitHub', href: repositoryUrl }],

@@ -9,11 +9,11 @@ Query Core options. Applications continue to configure TanStack Query and manage
 ## Status definitions
 
 - **Generated**: the package creates the key, function, or option object.
-- **Tested**: repository fixtures or executable applications verify that generated output works
-  with the listed native TanStack API.
+- **Tested**: generated options work with the listed native TanStack API without a package-specific
+  wrapper.
 - **Application-owned**: use the upstream Effect, TanStack, or framework API directly.
 - **Impossible**: the upstream TanStack contract provides no seam for this capability.
-- **Deferred**: the package may add or certify this capability after `0.1.0`.
+- **Uncertified**: the package does not guarantee compatibility with this integration.
 
 ## Capability matrix
 
@@ -31,7 +31,7 @@ Query Core options. Applications continue to configure TanStack Query and manage
 | Mutation callbacks                                      | Tested            | Applicable mutation options pass through. Build native optimistic updates with the application's `QueryClient`.                                         |
 | Cache reads, writes, prefetching, invalidation, and SSR | Tested            | Native `QueryClient` methods accept generated options and keys. Completed data dehydrates normally; open server streams use a cancelled first snapshot. |
 | React Query                                             | Tested            | Generated options work with ordinary, infinite, suspense, prefetch, mutation, accumulated-stream, and live hooks.                                       |
-| TanStack Router and Start                               | Tested            | Packed fixtures and the executable Start application cover loaders, server rendering, hydration, streams, and client navigation.                        |
+| TanStack Router and Start                               | Tested            | Generated options work in loaders, server rendering, hydration, streams, and client navigation.                                                         |
 | RPC transport, middleware, and client lifecycle         | Application-owned | Supply a ready flat RPC client and keep its `Scope` alive. The package does not construct a transport or add interceptors.                              |
 | Providers, Devtools, persistence, broadcast, and policy | Application-owned | Configure these through TanStack Query. The package provides no wrapper or default policy.                                                              |
 | Query-versus-mutation classification                    | Application-owned | Every unary leaf offers both builders because Effect RPC definitions do not label reads and writes.                                                     |
@@ -40,7 +40,7 @@ Query Core options. Applications continue to configure TanStack Query and manage
 | SSR error and Effect Cause serialization                | Application-owned | Failed queries are omitted from example dehydration and refetched in the browser. Applications choose any cross-realm error format.                     |
 | Mutation cancellation                                   | Impossible        | TanStack mutation functions provide no query-style abort signal.                                                                                        |
 | Asynchronous or Effect-returning key encoders           | Impossible        | TanStack requires cache identity synchronously when options are built.                                                                                  |
-| Non-React framework certification                       | Deferred          | The package remains framework-neutral, but the repository certifies React Query only for `0.1.0`.                                                       |
+| Non-React framework integrations                        | Uncertified       | The options are framework-neutral; applications must check compatibility with their framework's Query adapter.                                          |
 
 Read [Compatibility and Limits](/effect-rpc-query/reference/compatibility-and-limits/) for version,
 module-format, payload, key-safety, and error-boundary details.

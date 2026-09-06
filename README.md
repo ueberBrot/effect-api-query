@@ -30,7 +30,7 @@ const options = rpcQuery.users.get.queryOptions({ input: { id: 1 } })
 ```
 
 Read the [documentation](https://ueberbrot.github.io/effect-rpc-query/) for setup, React Query,
-TanStack Start, cache keys, cancellation, failures, and the curated API reference.
+TanStack Start, cache keys, cancellation, failures, and the API reference.
 
 ## Feature support
 

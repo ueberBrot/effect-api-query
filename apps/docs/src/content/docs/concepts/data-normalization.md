@@ -21,5 +21,3 @@ that rule.
 
 Mutations keep the original RPC success type. A mutation that succeeds with `undefined` still
 resolves to `undefined`.
-
-These guarantees apply at runtime and in the generated TypeScript types.

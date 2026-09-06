@@ -45,12 +45,6 @@ that server work stopped, and it does not undo a completed write. Durable server
 an explicit application operation identified before work begins; compensation remains separate.
 HTTP mutations receive no query abort signal and keep TanStack's normal mutation lifecycle.
 
-The [transport tests](https://github.com/ueberBrot/effect-rpc-query/blob/main/tests/http-transport-cancellation.test.ts)
-observe Effect interruption and a real server connection closing after native QueryClient
-cancellation. They also exercise a later page through native Query Core pagination and generated
-HTTP query functions; generated HTTP infinite builders are tracked separately in
-[#66](https://github.com/ueberBrot/effect-rpc-query/issues/66).
-
 ## Cancel a command while its mutation is pending
 
 Use an explicit cancel RPC for long-running commands. The Vite React example provides

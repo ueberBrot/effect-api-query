@@ -97,10 +97,3 @@ method, and operation, and preserves its complete Cause. The package adds no con
 values to that metadata; upstream Causes can still contain requests, responses, or Schema issue
 values. `isEffectHttpApiQueryError` narrows execution errors. Configuration and key preparation
 failures use `EffectHttpApiQueryConfigError` and `EffectHttpApiQueryKeyError` respectively.
-
-The [packed HTTP consumer](https://github.com/ueberBrot/effect-rpc-query/blob/main/tests/packed-consumer/http-runtime.mts)
-exercises the real HTTP encoding, routing, and decoding pipeline. The
-[type contract](https://github.com/ueberBrot/effect-rpc-query/blob/main/tests/types/http-contract.ts)
-checks request input, result inference, services, and endpoint omission.
-The [semantic-key tests](https://github.com/ueberBrot/effect-rpc-query/blob/main/tests/http-semantic-keys.test.ts)
-exercise request formats, alternative payload identity, normalization, and cache reuse.
