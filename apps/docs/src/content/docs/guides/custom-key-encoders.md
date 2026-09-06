@@ -63,8 +63,8 @@ client still receives the original `Uint8Array`.
 
 Encoding services or explicit `Redacted` values in any request part also require an encoder.
 Opaque encoding middleware is treated conservatively at runtime. An encoder supplies identity only;
-provide an execution runner independently when the ready client needs services. Unknown, omitted,
-and inputless encoder entries fail synchronously during factory construction.
+provide an execution runner independently when the ready client needs services. Encoder entries for
+unknown, omitted, or inputless endpoints fail synchronously during factory construction.
 
 Keep ordinary authentication in client middleware. Partition the cache with safe tenant and user
 identifiers in `keyPrefix`, for example `['tenant', 'north', 'user', 'ada']`. The factory cannot infer
