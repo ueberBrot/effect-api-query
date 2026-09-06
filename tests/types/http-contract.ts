@@ -394,3 +394,131 @@ createHttpApiQueryUtils(headerApi, {
 const configCode: EffectHttpApiQueryConfigErrorCode = 'UnsupportedEndpointMetadata'
 const keyCode: EffectHttpApiQueryKeyErrorCode = 'RequestEncodingFailed'
 void [configCode, keyCode]
+
+const RequestParts = HttpApiEndpoint.post('request.parts', '/parts/:id', {
+  params: { id: Schema.FiniteFromString },
+  query: { filter: Schema.optional(Schema.String) },
+  headers: { 'x-locale': Schema.String },
+  payload: Schema.Struct({ page: Schema.FiniteFromString }),
+})
+const SecretParts = HttpApiEndpoint.post('secrets', '/secrets/:id', {
+  params: { id: Schema.Redacted(Schema.String) },
+  query: { query: Schema.Redacted(Schema.String) },
+  headers: { 'x-secret': Schema.Redacted(Schema.String) },
+  payload: Schema.Struct({ token: Schema.Redacted(Schema.String) }),
+})
+const TextOrJson = HttpApiEndpoint.post('textOrJson', '/alternatives', {
+  payload: [Schema.FiniteFromString.pipe(HttpApiSchema.asText()), Schema.String],
+})
+const keysApi = HttpApi.make('keys').add(
+  HttpApiGroup.make('forms.v1', { topLevel: true }).add(
+    RequestParts,
+    SecretParts,
+    TextOrJson,
+    Ping,
+    Multipart,
+  ),
+)
+declare const keysClient: HttpApiClient.ForApi<typeof keysApi>
+const keyOptions = {
+  client: keysClient,
+  keyPrefix: ['tenant', 'north', 'user', 'ada'] as const,
+  keyEncoders: {
+    'forms.v1': {
+      secrets: (request) => {
+        const typed: (typeof SecretParts)['~Params']['Type'] = request.params
+        void typed
+        return { secretId: 'public-id' }
+      },
+      textOrJson: ({ payload }) => ({
+        format: typeof payload === 'number' ? 'text' : 'json',
+        value: String(payload),
+      }),
+    },
+  },
+} satisfies CreateHttpApiQueryUtilsOptions<
+  typeof keysApi,
+  readonly ['tenant', 'north', 'user', 'ada']
+>
+const keyUtils = createHttpApiQueryUtils(keysApi, keyOptions)
+const completeRequest = {
+  params: { id: 1 },
+  query: {},
+  headers: { 'x-locale': 'en' },
+  payload: { page: 2 },
+}
+keyUtils['request.parts'].queryKey(completeRequest)
+keyUtils['request.parts'].mutationOptions().mutationFn(completeRequest)
+// @ts-expect-error A declared optional-only query container stays required.
+keyUtils['request.parts'].queryKey({
+  params: { id: 1 },
+  headers: { 'x-locale': 'en' },
+  payload: { page: 2 },
+})
+// @ts-expect-error HTTP payloads use decoded fields.
+keyUtils['request.parts'].queryKey({ ...completeRequest, payload: { page: '2' } })
+// @ts-expect-error Mutations retain all request containers.
+keyUtils['request.parts'].mutationOptions().mutationFn({ payload: { page: 2 } })
+const rawMutationRequest = { ...completeRequest, responseMode: 'response-only' as const }
+// @ts-expect-error Mutation variables reserve response controls, including predeclared objects.
+keyUtils['request.parts'].mutationOptions().mutationFn(rawMutationRequest)
+// @ts-expect-error Encoders use declaration groups even when endpoints project to the root.
+createHttpApiQueryUtils(keysApi, { ...keyOptions, keyEncoders: { secrets: () => null } })
+// @ts-expect-error Dotted identifiers are literal map keys.
+createHttpApiQueryUtils(keysApi, { ...keyOptions, keyEncoders: { 'forms.v1.secrets': () => null } })
+createHttpApiQueryUtils(keysApi, {
+  ...keyOptions,
+  // @ts-expect-error Inputless endpoints have no encoder entry.
+  keyEncoders: { 'forms.v1': { ...keyOptions.keyEncoders['forms.v1'], ping: () => null } },
+})
+createHttpApiQueryUtils(keysApi, {
+  ...keyOptions,
+  // @ts-expect-error Omitted endpoints have no encoder entry.
+  keyEncoders: { 'forms.v1': { ...keyOptions.keyEncoders['forms.v1'], upload: () => null } },
+})
+createHttpApiQueryUtils(keysApi, {
+  ...keyOptions,
+  // @ts-expect-error Redacted requests require an encoder independently of alternatives.
+  keyEncoders: { 'forms.v1': { textOrJson: () => null } },
+})
+createHttpApiQueryUtils(keysApi, {
+  ...keyOptions,
+  // @ts-expect-error Distinct retained payload schemas require an encoder.
+  keyEncoders: { 'forms.v1': { secrets: () => null } },
+})
+
+const ServicefulString = Schema.String.pipe(
+  Schema.middlewareEncoding<typeof Schema.String, EncodeRequest>((encoding) =>
+    Effect.flatMap(EncodeRequest, () => encoding),
+  ),
+)
+const ServiceParts = HttpApiEndpoint.get('serviceParts', '/service-parts/:value', {
+  params: { value: ServicefulString },
+  query: { value: ServicefulString },
+  headers: { value: ServicefulString },
+})
+const servicePartsApi = HttpApi.make('service-parts').add(
+  HttpApiGroup.make('parts').add(ServiceParts),
+)
+declare const servicePartsClient: HttpApiClient.ForApi<typeof servicePartsApi>
+declare const encodingRunner: RunPromiseExit<EncodeRequest>
+// @ts-expect-error Encoding services in non-payload request parts require a key encoder.
+createHttpApiQueryUtils(servicePartsApi, {
+  client: servicePartsClient,
+  keyPrefix: ['app'],
+  runPromiseExit: encodingRunner,
+})
+createHttpApiQueryUtils(servicePartsApi, {
+  client: servicePartsClient,
+  keyPrefix: ['app'],
+  runPromiseExit: encodingRunner,
+  keyEncoders: {
+    parts: {
+      serviceParts: (request) => ({
+        params: request.params.value,
+        query: request.query.value,
+        headers: request.headers.value,
+      }),
+    },
+  },
+})

@@ -1,86 +1,13 @@
-import { Predicate, Schema } from 'effect'
 import type { Effect } from 'effect'
-import { HttpApiSchema } from 'effect/unstable/httpapi'
-import type { HttpApi, HttpApiEndpoint } from 'effect/unstable/httpapi'
+import type { HttpApi } from 'effect/unstable/httpapi'
 
-import type { RuntimeKeyEncoder, TreeErrors, UnaryOperation } from '../core/operation'
-import { containsUnsafeKeyEncoding } from '../core/schema-key'
-import {
-  EffectHttpApiQueryConfigError,
-  EffectHttpApiQueryError,
-  EffectHttpApiQueryKeyError,
-} from './errors'
+import type { TreeErrors, UnaryOperation } from '../core/operation'
+import { EffectHttpApiQueryConfigError, EffectHttpApiQueryError } from './errors'
 import type { HttpApiEndpointIdentity } from './errors'
+import { createHttpRequestInput } from './request'
 
 export interface HttpOperation extends UnaryOperation {
   readonly identity: HttpApiEndpointIdentity
-}
-
-const isSupported = (endpoint: HttpApiEndpoint.Top, identity: HttpApiEndpointIdentity): boolean => {
-  let multipart = false
-  for (const { encoding, schemas } of endpoint.payload.values()) {
-    for (const schema of schemas) {
-      const brands = (schema.ast.annotations?.['brands'] as readonly string[] | undefined) ?? []
-      const buffered = brands.includes(HttpApiSchema.MultipartTypeId)
-      const streamed = brands.includes(HttpApiSchema.MultipartStreamTypeId)
-      const metadataAgrees =
-        encoding._tag === 'Multipart'
-          ? encoding.mode === 'buffered'
-            ? buffered && !streamed
-            : streamed && !buffered
-          : !buffered && !streamed
-      if (!metadataAgrees) {
-        throw new EffectHttpApiQueryConfigError(
-          'UnsupportedEndpointMetadata',
-          `HTTP endpoint ${identity.groupId}/${identity.endpoint} has contradictory multipart metadata`,
-          identity,
-        )
-      }
-      multipart ||= encoding._tag === 'Multipart'
-    }
-  }
-  return (
-    !multipart &&
-    !Array.from(endpoint.success).some((schema) =>
-      Predicate.hasProperty(
-        HttpApiSchema.isWithHeaders(schema) ? schema.schema : schema,
-        '~effect/httpapi/HttpApiSchema/Stream',
-      ),
-    )
-  )
-}
-
-const requestSchema = (endpoint: HttpApiEndpoint.Top): Schema.Top | undefined => {
-  const fields: Record<string, Schema.Top> = {}
-  if (endpoint.params !== undefined) fields['params'] = endpoint.params
-  if (endpoint.query !== undefined) fields['query'] = endpoint.query
-  if (endpoint.headers !== undefined) fields['headers'] = endpoint.headers
-  const payloads = Array.from(endpoint.payload.values()).flatMap(({ schemas }) => schemas)
-  if (payloads.length > 0) fields['payload'] = Schema.Union(payloads)
-  return Object.keys(fields).length === 0 ? undefined : Schema.Struct(fields)
-}
-
-const prepareRequest = (
-  identity: HttpApiEndpointIdentity,
-  schema: Schema.Top,
-  input: unknown,
-  encoder: RuntimeKeyEncoder | undefined,
-) => {
-  try {
-    const keyValue = encoder
-      ? encoder(input)
-      : Schema.encodeUnknownSync(schema as unknown as Schema.ConstraintEncoder<unknown, never>)(
-          input,
-        )
-    return { input, keyValue }
-  } catch (cause) {
-    throw new EffectHttpApiQueryKeyError(
-      encoder ? 'KeyEncoderFailed' : 'RequestEncodingFailed',
-      identity,
-      `Could not encode the HTTP key for ${identity.groupId}/${identity.endpoint}`,
-      cause,
-    )
-  }
 }
 
 export const extractHttpEndpoints = (
@@ -96,8 +23,8 @@ export const extractHttpEndpoints = (
         endpoint: endpoint.identifier,
         method: endpoint.method,
       }
-      if (!isSupported(endpoint, identity)) continue
-      const schema = requestSchema(endpoint)
+      const input = createHttpRequestInput(endpoint, identity)
+      if (input === undefined) continue
       const target = (
         group.topLevel ? client : (client as Record<string, unknown>)[group.identifier]
       ) as Record<string, (request: unknown) => Effect.Effect<unknown, unknown, unknown>>
@@ -106,25 +33,7 @@ export const extractHttpEndpoints = (
         id: JSON.stringify([group.identifier, endpoint.identifier]),
         path: group.topLevel ? [endpoint.identifier] : [group.identifier, endpoint.identifier],
         kind: 'Unary',
-        input:
-          schema === undefined
-            ? { _tag: 'Inputless' }
-            : {
-                _tag: 'Input',
-                requiresEncoder:
-                  Array.from(endpoint.payload.values()).reduce(
-                    (count, entry) => count + entry.schemas.length,
-                    0,
-                  ) > 1 || containsUnsafeKeyEncoding(schema.ast),
-                prepare: (input, encoder) => prepareRequest(identity, schema, input, encoder),
-                invalidKey: (cause) =>
-                  new EffectHttpApiQueryKeyError(
-                    'InvalidKeyValue',
-                    identity,
-                    `The HTTP key for ${group.identifier}/${endpoint.identifier} is not JSON-safe`,
-                    cause,
-                  ),
-              },
+        input,
         takeOptions: () => undefined,
         invoke: (input) =>
           target[endpoint.identifier]!({
