@@ -11,7 +11,49 @@ For a step-by-step example, see [HTTP Queries and Mutations](/effect-rpc-query/g
 Ordinary groups appear as `utils[groupIdentifier][endpointIdentifier]`. Top-level groups place
 their endpoints at `utils[endpointIdentifier]`. Identifiers containing dots remain literal
 properties. Every retained branch and endpoint has `key()`; buffered endpoints also have
-`queryKey`, `queryOptions`, `mutationKey`, and `mutationOptions`.
+`queryKey`, `queryOptions`, `mutationKey`, `mutationOptions`, `infiniteKey`, and `infiniteOptions`.
+Every buffered endpoint exposes all these builders regardless of HTTP method; the application
+chooses whether a call is a query or mutation.
+
+## Query options
+
+Ordinary options work with native query, suspense, and prefetch hooks and QueryClient operations.
+Callbacks retain the decoded result, complete failure union, and request types. `select` changes
+observer data; data-tagged keys retain the underlying cache data and error types. Defined and
+possibly undefined `initialData` preserve TanStack's corresponding hook overloads.
+
+Applicable TanStack options pass through. The package owns the key, function, and query hash
+fields, and consumes its `input` before returning options.
+
+Input-bearing `queryOptions` accepts a complete request, `queryOptions(skipToken)`, or
+`queryOptions({ input: skipToken, ...options })`. Import `skipToken` from `effect-api-query` or
+TanStack. Skipping preserves caller options and returns the exact sentinel as `queryFn`, with the
+operation-level key and no request identity. It performs no request encoding or client call.
+Supplied initial data remains available, but native skipped hook data stays possibly undefined.
+
+Inputless builders, key builders, and mutations reject `skipToken`. A skipped function cannot run
+through manual refetch; supply valid input or use `enabled: false` with a complete request when
+manual execution is required. Native suspense and prefetch-only hooks reject skipped options.
+
+## Pagination
+
+`infiniteOptions` requires `initialPageParam` and `getNextPageParam`. For an input-bearing endpoint,
+`input(pageParam)` returns the complete decoded HTTP request for that page. Inputless endpoints
+omit `input`. Input-bearing endpoints can pause with `input: skipToken` in the options object;
+the direct sentinel form is unavailable.
+
+The initial request supplies cache identity. Infinite keys use an `infinite` discriminator, so
+they remain separate from ordinary queries for the same request. `infiniteKey(request)` builds
+the corresponding key from a complete initial request; `infiniteKey()` serves inputless endpoints.
+Options-generated keys also retain the inferred page-parameter type for cache reads.
+
+The caller keeps stable filters in the initial request and every page, changes the initial request
+when those filters change, and advances cursors through `getNextPageParam`. Keep the input mapper
+deterministic: options construction evaluates it for the initial key, and execution evaluates it
+for every page. QueryClient stores native `InfiniteData` and owns invalidation and refetching.
+Selections can transform observer data without changing cached pages. Every page preserves the
+ordinary HTTP execution contract, including `undefined`-to-`null` normalization, wrapped errors,
+and cancellation. See [Load pages](/effect-rpc-query/guides/http-queries-and-mutations/#load-pages).
 
 ## Factory options
 

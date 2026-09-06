@@ -10,26 +10,26 @@ definitions. Choose a factory for your API:
 | ------------------------- | ------------------------- | --------------------------------------------- |
 | Unary RPC                 | `createRpcQueryUtils`     | Queries, infinite queries, and mutations      |
 | Streaming RPC             | `createRpcQueryUtils`     | Accumulated streamed queries and live queries |
-| Buffered HttpApi endpoint | `createHttpApiQueryUtils` | Queries and mutations                         |
+| Buffered HttpApi endpoint | `createHttpApiQueryUtils` | Queries, infinite queries, and mutations      |
 
 An HTTP endpoint with any streaming success or multipart request alternative is omitted from the
-utility tree. HTTP endpoints have no infinite or stream builders. See the
+utility tree. Stream builders apply to RPC streams. See the
 [HTTP guide](/effect-rpc-query/guides/http-queries-and-mutations/) for request input and examples.
 
 ## Use TanStack Query features
 
-| Task                                            | How to use it                                                                        |
-| ----------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Fetch and cache data                            | Pass generated `queryOptions` to Query Core or React Query.                          |
-| Run a write                                     | Pass generated `mutationOptions` to a mutation observer or hook.                     |
-| Pause an RPC query until input exists           | Use `input: skipToken` with a payload-bearing RPC query.                             |
-| Load RPC pages                                  | Use `infiniteOptions`, mapping each page parameter to an RPC payload.                |
-| Retain stream history                           | Use `streamedOptions`; set `maxChunks` to bound the retained elements.               |
-| Show the latest stream value                    | Use `liveOptions`.                                                                   |
-| Read, update, or invalidate cached data         | Pass generated keys to the corresponding `QueryClient` methods.                      |
-| Configure retries, freshness, or data selection | Supply the applicable TanStack options to the builder.                               |
-| Cancel a query                                  | Use `queryClient.cancelQueries`; the runner must forward its abort signal to Effect. |
-| Prefetch or server-render data                  | Reuse generated options in loaders and dehydrate completed query data.               |
+| Task                                            | How to use it                                                                         |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Fetch and cache data                            | Pass generated `queryOptions` to Query Core or React Query.                           |
+| Run a write                                     | Pass generated `mutationOptions` to a mutation observer or hook.                      |
+| Pause a query until input exists                | Use `input: skipToken` with an input-bearing RPC or HTTP query.                       |
+| Load pages                                      | Use `infiniteOptions`, mapping each page parameter to an RPC payload or HTTP request. |
+| Retain stream history                           | Use `streamedOptions`; set `maxChunks` to bound the retained elements.                |
+| Show the latest stream value                    | Use `liveOptions`.                                                                    |
+| Read, update, or invalidate cached data         | Pass generated keys to the corresponding `QueryClient` methods.                       |
+| Configure retries, freshness, or data selection | Supply the applicable TanStack options to the builder.                                |
+| Cancel a query                                  | Use `queryClient.cancelQueries`; the runner must forward its abort signal to Effect.  |
+| Prefetch or server-render data                  | Reuse generated options in loaders and dehydrate completed query data.                |
 
 Generated options work with React Query hooks and TanStack Router loaders, including TanStack
 Start. Configure other framework adapters through their native TanStack APIs; compatibility with

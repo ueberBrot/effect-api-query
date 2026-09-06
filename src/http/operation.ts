@@ -34,6 +34,11 @@ export const extractHttpEndpoints = (
         path: group.topLevel ? [endpoint.identifier] : [group.identifier, endpoint.identifier],
         kind: 'Unary',
         input,
+        infinite: {
+          pageInput: (input) => input,
+          executionError: (operation, cause) =>
+            new EffectHttpApiQueryError(identity, operation, cause),
+        },
         takeOptions: () => undefined,
         invoke: (input) =>
           target[endpoint.identifier]!({

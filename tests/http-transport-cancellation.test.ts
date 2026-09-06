@@ -67,16 +67,12 @@ describe('HTTP transport cancellation', () => {
           mode === 'query'
             ? queryClient.query(utils.pages.read.queryOptions({ input: { params: { page: 1 } } }))
             : queryClient.infiniteQuery({
-                queryKey: [...utils.pages.read.key(), 'native-pages'],
-                initialPageParam: 0,
-                getNextPageParam: (_last, _pages, page) => page + 1,
+                ...utils.pages.read.infiniteOptions({
+                  initialPageParam: 0,
+                  input: (page) => ({ params: { page } }),
+                  getNextPageParam: (_last, _pages, page) => page + 1,
+                }),
                 pages: 2,
-                queryFn: ({ pageParam, signal, meta, client }) => {
-                  const options = utils.pages.read.queryOptions({
-                    input: { params: { page: pageParam } },
-                  })
-                  return options.queryFn({ client, signal, meta, queryKey: options.queryKey })
-                },
               })
         const result = pending.catch((error: unknown) => error)
         await requestReceived

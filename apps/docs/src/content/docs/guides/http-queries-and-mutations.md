@@ -46,8 +46,72 @@ containers. For example, a `Schema.FiniteFromString` parameter takes a number; t
 encodes it for transport. Include every declared container, even when its fields are optional.
 An endpoint without request input uses `queryOptions()`.
 
-React applications can pass `userOptions` directly to `useQuery`. HTTP builders require complete
-request input; they do not accept `skipToken`.
+React applications can pass `userOptions` directly to `useQuery`, `useSuspenseQuery`, or
+`usePrefetchQuery`. A `select` callback receives decoded response data; it changes the observer's
+data type without changing the cached value. `queryClient.getQueryData(userOptions.queryKey)`
+still infers the decoded user type.
+
+## Wait for request input
+
+Use `skipToken` until the complete request is available:
+
+```ts
+import { useQuery } from '@tanstack/react-query'
+import { skipToken } from 'effect-api-query'
+
+const user = useQuery(
+  http.users.get.queryOptions({
+    input: userId === undefined ? skipToken : { params: { id: userId } },
+    staleTime: 30_000,
+    select: (user) => user.name,
+  }),
+)
+```
+
+`queryOptions(skipToken)` is shorthand when you need no other options. Skipping preserves caller
+options and performs no request encoding or client call. Its query function is TanStack's exact
+sentinel, so manual `refetch()` cannot execute it. Supply valid input to enable the query. Use
+`enabled: false` with a complete request when you need a query that can run through manual refetch.
+Suspense and prefetch-only hooks require executable options and reject skipped options. See
+[Conditional Queries](/effect-rpc-query/guides/conditional-queries/) for the shared contract.
+
+## Load pages
+
+For an endpoint `users.list` with decoded query fields `cursor: number` and `filter: string`, and
+a response `{ items: User[]; nextCursor: number | null }`, map each page parameter to a complete
+request:
+
+```ts
+import { useInfiniteQuery } from '@tanstack/react-query'
+
+const filter = 'active'
+const pageOptions = http.users.list.infiniteOptions({
+  initialPageParam: 0,
+  input: (cursor) => ({ query: { cursor, filter } }),
+  getNextPageParam: (page) => page.nextCursor ?? undefined,
+  select: (data) => data.pages.flatMap((page) => page.items),
+})
+
+const users = useInfiniteQuery(pageOptions)
+```
+
+`cursor` is inferred from `initialPageParam`. Return every declared request container from `input`,
+including any `params`, `headers`, or `payload`; each page is a fresh decoded HTTP request.
+Use `users.fetchNextPage()` when `users.hasNextPage` is true. The caller owns cursor progression:
+return the server's next cursor from `getNextPageParam`, and return `undefined` or `null` when
+there are no more pages.
+
+The cache key uses `input(initialPageParam)` and an `infinite` discriminator. Keep all stable
+filters in that initial request and in every later request. Rebuild the options when a filter
+changes so the first request produces a different key. Keep `input` deterministic and free of
+side effects: it runs during key construction and again for page execution. A custom key encoder
+must preserve these same result-affecting filters.
+
+TanStack owns page storage, invalidation, and refetching. `select` changes the hook result to the
+flattened users; the cache still holds `pages` and `pageParams`. Every page retains ordinary HTTP
+response normalization, wrapped failures, and cancellation. To pause pagination, use
+`input: skipToken` with `initialPageParam` and `getNextPageParam`; the infinite builder accepts
+only this object form for skipping.
 
 ## Create a user and refresh the cache
 
@@ -85,7 +149,8 @@ If client middleware changes results by user or tenant, include a safe user or t
 [custom encoder](/effect-rpc-query/guides/custom-key-encoders/#http-requests) when request schemas
 need encoding services, contain redacted values, or allow multiple payload alternatives.
 
-Retained HTTP endpoints expose ordinary query and mutation builders. Streaming responses and
+Retained HTTP endpoints expose ordinary query, infinite query, and mutation builders regardless
+of HTTP method. Choose the builder for the operation you intend. Streaming responses and
 multipart requests are omitted; see the [HTTP factory reference](/effect-rpc-query/reference/http-factory/)
 for supported request formats and the complete builder contract.
 
