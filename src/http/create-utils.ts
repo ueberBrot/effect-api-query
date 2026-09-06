@@ -17,8 +17,15 @@ export const createHttpApiQueryUtils = <
 ): HttpApiQueryUtils<Api, Prefix, Client> => {
   const runtimeApi = api as unknown as HttpApi.Top
   const operations = extractHttpEndpoints(runtimeApi, options.client)
+  const errors = httpTreeErrors(runtimeApi, operations)
+  const encoderGroups = new Set(
+    operations
+      .filter((operation) => operation.input._tag === 'Input')
+      .map((operation) => operation.identity.groupId),
+  )
   const keyEncoders = new Map<string, RuntimeKeyEncoder>()
   for (const [groupId, endpoints] of Object.entries(options.keyEncoders ?? {})) {
+    if (!encoderGroups.has(groupId)) throw errors.unknownEncoder(JSON.stringify([groupId]))
     for (const [endpoint, encoder] of Object.entries(endpoints as object)) {
       keyEncoders.set(JSON.stringify([groupId, endpoint]), encoder as RuntimeKeyEncoder)
     }
@@ -28,6 +35,6 @@ export const createHttpApiQueryUtils = <
     keyNamespace: ['http', runtimeApi.identifier],
     keyEncoders,
     runPromiseExit: options.runPromiseExit as RunPromiseExit<unknown> | undefined,
-    errors: httpTreeErrors(runtimeApi, operations),
+    errors,
   }) as HttpApiQueryUtils<Api, Prefix, Client>
 }

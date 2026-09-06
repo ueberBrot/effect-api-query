@@ -9,12 +9,14 @@ import {
   isEffectHttpApiQueryError,
   type RunPromiseExit,
 } from 'effect-api-query'
-import { HttpServer } from 'effect/unstable/http'
+import { HttpClient, HttpClientRequest, HttpClientResponse, HttpServer } from 'effect/unstable/http'
 import {
   HttpApi,
   HttpApiBuilder,
+  HttpApiClient,
   HttpApiEndpoint,
   HttpApiGroup,
+  HttpApiMiddleware,
   HttpApiSchema,
   HttpApiTest,
 } from 'effect/unstable/httpapi'
@@ -38,6 +40,83 @@ const api = HttpApi.make('packed-http').add(
     HttpApiEndpoint.get('empty', '/empty', { success: HttpApiSchema.NoContent }),
   ),
 )
+
+class Authentication extends HttpApiMiddleware.Service<Authentication>()(
+  'PackedHttp/Authentication',
+  {
+    requiredForClient: true,
+  },
+) {}
+const identityApi = HttpApi.make('identity').add(
+  HttpApiGroup.make('accounts').add(
+    HttpApiEndpoint.get('read', '/account', {
+      query: { locale: Schema.optional(Schema.String) },
+      success: Schema.String,
+    }).middleware(Authentication),
+  ),
+)
+let identityRequests = 0
+const transport = HttpClient.make((request) => {
+  identityRequests += 1
+  return Effect.succeed(
+    HttpClientResponse.fromWeb(
+      request,
+      Response.json(request.headers['authorization'] === 'Bearer token-ada' ? 'Ada' : 'Grace'),
+    ),
+  )
+})
+const readyClientFor = (token: string) =>
+  Effect.runPromise(
+    HttpApiClient.makeWith(identityApi, {
+      httpClient: transport,
+      baseUrl: 'https://example.test',
+    }).pipe(
+      Effect.provide(
+        HttpApiMiddleware.layerClient(Authentication, ({ request, next }) =>
+          next(HttpClientRequest.bearerToken(request, token)),
+        ),
+      ),
+    ),
+  )
+const ada = createHttpApiQueryUtils(identityApi, {
+  client: await readyClientFor('token-ada'),
+  keyPrefix: ['tenant', 'north', 'user', 'ada'],
+})
+const grace = createHttpApiQueryUtils(identityApi, {
+  client: await readyClientFor('token-grace'),
+  keyPrefix: ['tenant', 'north', 'user', 'grace'],
+})
+const south = createHttpApiQueryUtils(identityApi, {
+  client: await readyClientFor('token-ada'),
+  keyPrefix: ['tenant', 'south', 'user', 'ada'],
+})
+const identityCache = new QueryClient({ defaultOptions: { queries: { staleTime: Infinity } } })
+try {
+  equal(await identityCache.query(ada.accounts.read.queryOptions({ input: { query: {} } })), 'Ada')
+  equal(
+    await identityCache.query(
+      ada.accounts.read.queryOptions({ input: { query: { locale: undefined } } }),
+    ),
+    'Ada',
+  )
+  equal(identityRequests, 1)
+  equal(
+    await identityCache.query(grace.accounts.read.queryOptions({ input: { query: {} } })),
+    'Grace',
+  )
+  equal(
+    await identityCache.query(south.accounts.read.queryOptions({ input: { query: {} } })),
+    'Ada',
+  )
+  equal(identityRequests, 3)
+  notDeepStrictEqual(
+    ada.accounts.read.queryKey({ query: {} }),
+    grace.accounts.read.queryKey({ query: {} }),
+  )
+  ok(!JSON.stringify(ada.accounts.read.queryKey({ query: {} })).includes('token-ada'))
+} finally {
+  identityCache.clear()
+}
 
 let value = 1
 const decodedRequests: Array<unknown> = []

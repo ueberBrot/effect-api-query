@@ -3,7 +3,7 @@ title: Semantic Keys
 description: Learn how normalized payloads produce stable cache identity.
 ---
 
-For a payload-bearing query, the factory constructs the payload before creating its key. Constructor
+For a payload-bearing RPC query, the factory constructs the payload before creating its key. Constructor
 defaults therefore become part of cache identity:
 
 ```ts
@@ -38,3 +38,14 @@ all descendant operations.
 Unsupported values, failed construction, and failed encoding raise `EffectRpcQueryKeyError` before
 network execution. Serviceful or redacted payloads require a
 [custom key encoder](/effect-rpc-query/guides/custom-key-encoders/).
+
+HTTP keys use the endpoint's decoded request input without RPC construction. Default preparation
+schema-encodes the labelled request parts, omits encoded undefined object members, normalizes header
+names, and then freezes canonical JSON. Labels preserve distinctions between query and payload even
+when both contribute URL parameters. The key represents declared request meaning, rather than
+trying to infer every possible equivalence between HTTP requests.
+
+Client middleware is outside that declared identity. Use safe user, tenant, or other identity
+partitions in the caller prefix when they affect results. See the
+[HTTP factory reference](/effect-rpc-query/reference/http-factory/#cache-identity-and-failures) and
+[HTTP encoder guide](/effect-rpc-query/guides/custom-key-encoders/#http-requests) for the complete rules.

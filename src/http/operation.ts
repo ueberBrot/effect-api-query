@@ -66,13 +66,13 @@ const prepareRequest = (
   input: unknown,
   encoder: RuntimeKeyEncoder | undefined,
 ) => {
+  let keyValue: unknown
   try {
-    const keyValue = encoder
+    keyValue = encoder
       ? encoder(input)
       : Schema.encodeUnknownSync(schema as unknown as Schema.ConstraintEncoder<unknown, never>)(
           input,
         )
-    return { input, keyValue }
   } catch (cause) {
     throw new EffectHttpApiQueryKeyError(
       encoder ? 'KeyEncoderFailed' : 'RequestEncodingFailed',
@@ -81,6 +81,57 @@ const prepareRequest = (
       cause,
     )
   }
+  try {
+    return { input, keyValue: encoder ? keyValue : normalizeRequestKey(keyValue) }
+  } catch (cause) {
+    throw new EffectHttpApiQueryKeyError(
+      'InvalidKeyValue',
+      identity,
+      `The HTTP key for ${identity.groupId}/${identity.endpoint} is not JSON-safe`,
+      cause,
+    )
+  }
+}
+
+// HTTP omits undefined object members; arrays still undergo strict JSON validation.
+const omitUndefined = (value: unknown, seen = new WeakSet<object>()): unknown => {
+  if (!Predicate.isObjectOrArray(value)) return value
+  if (seen.has(value)) throw new TypeError('Key values must not contain cycles')
+  seen.add(value)
+  let result: unknown = value
+  if (Array.isArray(value)) {
+    result = value.map((item) => omitUndefined(item, seen))
+  } else if (
+    Object.getPrototypeOf(value) === Object.prototype ||
+    Object.getPrototypeOf(value) === null
+  ) {
+    result = Object.fromEntries(
+      Object.entries(value)
+        .filter(([, item]) => item !== undefined)
+        .map(([name, item]) => [name, omitUndefined(item, seen)]),
+    )
+  }
+  seen.delete(value)
+  return result
+}
+
+const normalizeRequestKey = (value: unknown): unknown => {
+  const request = omitUndefined(value) as Record<string, unknown>
+  if (Predicate.isObject(request['headers'])) {
+    const headers: Record<string, unknown> = Object.create(null)
+    for (const [name, value] of Object.entries(request['headers'])) {
+      const lower = name.toLowerCase()
+      if (
+        Object.hasOwn(headers, lower) &&
+        JSON.stringify(headers[lower]) !== JSON.stringify(value)
+      ) {
+        throw new TypeError('Encoded header names must not have conflicting values')
+      }
+      headers[lower] = value
+    }
+    request['headers'] = headers
+  }
+  return request
 }
 
 export const extractHttpEndpoints = (

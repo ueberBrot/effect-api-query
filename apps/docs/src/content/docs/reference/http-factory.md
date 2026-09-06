@@ -31,6 +31,11 @@ HTTP input contains the endpoint's declared `params`, `query`, `headers`, and `p
 their decoded types. It does not apply RPC constructor defaults. Inputless queries need no input
 argument. Mutations receive the same decoded request shape as their variables.
 
+Each declared container stays required even if all its fields are optional: a declared optional
+query filter still needs `input: { query: {} }`. A `Schema.FiniteFromString` field accepts a number,
+which the ready client encodes as a string. Raw response controls are excluded from query input,
+mutation variables, and encoder input.
+
 The adapter forces decoded-only responses. Queries cache a successful `undefined` as `null`;
 mutations retain `undefined`. Buffered response-header wrappers retain their decoded shape.
 The package does not add serialization for arbitrary decoded domain values.
@@ -48,6 +53,36 @@ endpoint has input. `utils.key()` includes the generated root and matches every 
 RPC utilities use a separate `rpc` discriminator. Use the original caller prefix deliberately
 when invalidating across both adapters.
 
+Default query preparation synchronously encodes the declared `params`, `query`, `payload`, and
+`headers` schemas. The key retains these labels, including when a bodyless method sends its payload
+as URL parameters. It uses the endpoint's effective schemas, without constructing an HTTP request
+or body. JSON, text, form-urlencoded, and requests without bodies follow the same rule.
+
+Encoded object members whose value is `undefined` are omitted. An encoded `null` stays `null`,
+including when Effect's JSON codec produces it from a decoded optional value. Arrays retain their
+order; sparse arrays and encoded `undefined` items are rejected. Header field names become lowercase;
+equal duplicates collapse and conflicting duplicates fail. Other values follow strict canonical
+JSON: finite numbers, plain objects, copied arrays, sorted object properties, cycle rejection, and
+deep freezing.
+
+Multiple effective payload schemas require a custom encoder, including alternatives with the same
+content type. Static enforcement applies where declaration types retain distinct schemas; runtime
+validation covers alternatives erased by annotation types. Buffered binary input needs an explicit
+JSON-safe projection because default keys cannot contain `Uint8Array`. See
+[custom key encoders](/effect-rpc-query/guides/custom-key-encoders/#http-requests).
+
+`EffectHttpApiQueryKeyError` identifies the API, group, endpoint, and method and distinguishes:
+
+| Code                    | Trigger                                                                   |
+| ----------------------- | ------------------------------------------------------------------------- |
+| `RequestEncodingFailed` | A default request-schema encoder fails.                                   |
+| `KeyEncoderFailed`      | A custom encoder throws.                                                  |
+| `InvalidKeyValue`       | Encoded identity violates canonical JSON or has conflicting header names. |
+
+These failures occur in `queryKey` or `queryOptions`, before client invocation. Mutation preparation
+does not encode a query key; request encoding runs inside the ready client's Effect. Custom encoder
+output follows strict JSON without default HTTP omission or header normalization.
+
 `EffectHttpApiQueryError` wraps a failed execution `Exit`, identifies the API, group, endpoint,
 method, and operation, and preserves its complete Cause. The package adds no concrete request
 values to that metadata; upstream Causes can still contain requests, responses, or Schema issue
@@ -58,3 +93,5 @@ The [packed HTTP consumer](https://github.com/ueberBrot/effect-rpc-query/blob/ma
 exercises the real HTTP encoding, routing, and decoding pipeline. The
 [type contract](https://github.com/ueberBrot/effect-rpc-query/blob/main/tests/types/http-contract.ts)
 checks request input, result inference, services, and endpoint omission.
+The [semantic-key tests](https://github.com/ueberBrot/effect-rpc-query/blob/main/tests/http-semantic-keys.test.ts)
+exercise request formats, alternative payload identity, normalization, and cache reuse.
