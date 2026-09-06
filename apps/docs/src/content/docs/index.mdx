@@ -1,9 +1,9 @@
 ---
-title: effect-rpc-query
-description: Type-safe TanStack Query utilities generated from Effect RPC definitions.
+title: effect-api-query
+description: Use Effect RPC and HttpApi with typed TanStack Query options and cache keys.
 template: splash
 hero:
-  tagline: Build typed query options, mutation options, and semantic cache keys from one Effect RPC group.
+  tagline: Use your Effect RPC or HttpApi definition to query, mutate, and cache data with TanStack Query.
   actions:
     - text: Get started
       link: /effect-rpc-query/getting-started/installation/
@@ -14,25 +14,25 @@ hero:
       icon: external
 ---
 
-`effect-rpc-query` projects dotted unary and streaming RPC tags into a typed RPC utility tree. Each
-leaf builds TanStack Query options and stable keys while the application keeps ownership of its RPC
-client, Query Client, and lifecycle.
+`effect-api-query` turns your Effect RPC group or HttpApi definition into typed query options,
+mutation options, and cache keys. Pass them directly to TanStack Query while your application
+controls its client, cache policies, and resource lifetime.
 
 ## What it provides
 
-- One factory that derives utilities from an RPC group and a ready flat client.
-- Semantic cache keys that account for payload defaults and Schema encoding.
-- Query Core options for ordinary, infinite, accumulated-stream, live, and mutation use.
-- Typed RPC failures that retain the complete Effect Cause.
+- Queries and mutations for unary RPCs and buffered HTTP endpoints.
+- Infinite queries, accumulated streams, and live queries for RPCs.
+- Semantic cache keys for prefetching, cache updates, and invalidation.
+- Typed execution failures that retain the complete Effect Cause.
 
 ## Choose a path
 
-- Follow the [quick start](/effect-rpc-query/getting-started/quick-start/) to create utilities and run
-  a query.
+- Follow the [RPC quick start](/effect-rpc-query/getting-started/quick-start/) to create utilities and
+  run a query, or [use an HttpApi](/effect-rpc-query/guides/http-queries-and-mutations/).
 - [Run the examples](/effect-rpc-query/examples/) to compare standalone Vite hosting with an
   embedded TanStack Start RPC route.
-- Check [feature support](/effect-rpc-query/getting-started/feature-support/) for the generated,
-  native, application-owned, and unsupported boundaries.
+- Check [feature support](/effect-rpc-query/getting-started/feature-support/) to choose operations
+  and plan your integration.
 - Use the [React Query guide](/effect-rpc-query/guides/react-query/) for hooks and mutations.
 - Use the [TanStack Start guide](/effect-rpc-query/guides/tanstack-start/) for loaders, SSR, and
   hydration.

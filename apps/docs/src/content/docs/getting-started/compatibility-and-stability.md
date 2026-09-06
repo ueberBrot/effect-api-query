@@ -8,7 +8,7 @@ The package supports the Effect `4.0.0-rc.112` release candidate and TanStack Qu
 
 Query Core's streamed-query interface is experimental and may change between v5 releases.
 
-TypeScript 5.9 and 7 are supported with `strict: true`.
+TypeScript 5.9 or newer is required, with `strict: true`.
 
 The package is ESM-only and targets ES2022. It is under active development before its first stable
 release, so minor releases can change the API. Review release notes before upgrading.

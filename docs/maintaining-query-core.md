@@ -1,7 +1,4 @@
----
-title: Update Query Core Support
-description: Check package compatibility when updating the Query Core dependency.
----
+# Maintain Query Core compatibility
 
 Query Core's streamed-query interface is experimental. Check both types and runtime behavior when
 updating the supported dependency versions.

@@ -34,3 +34,18 @@ Query keys have this flat shape:
 
 Mutation keys end in `'mutation'` and never include variables. See
 [Semantic Keys](/effect-rpc-query/concepts/semantic-keys/) for normalization and hashing rules.
+
+## Manage HTTP caches
+
+HTTP utilities expose the same branch-prefix and ordinary-query key builders. Supply the endpoint's
+decoded request input for a specific entry:
+
+```ts
+const key = http.users.get.queryKey({ params: { id: 1 } })
+const cachedUser = queryClient.getQueryData(key)
+await queryClient.invalidateQueries({ queryKey: http.users.key() })
+```
+
+HTTP keys include `'http'` and the HttpApi identifier after your `keyPrefix`. RPC keys include
+`'rpc'`, so the two factories keep separate caches even with the same caller prefix. Use the original
+caller prefix when you deliberately want to invalidate both.

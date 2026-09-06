@@ -1,66 +1,56 @@
-# effect-rpc-query
+# effect-api-query
 
-Type-safe TanStack Query utilities generated from Effect RPC definitions.
+Use Effect RPC and HttpApi with typed TanStack Query options and semantic cache keys.
 
-`effect-rpc-query` turns dotted unary and streaming RPC tags into a typed utility tree. Its builders
-produce Query Core options and semantic cache keys while your application owns the RPC client,
-Query Client, and lifecycle.
+Create utilities from your API definition and ready client, then pass their options directly to
+TanStack Query. Your application controls the client lifetime, cache policies, and framework setup.
 
 ## Install
 
 ```sh
-pnpm add effect-rpc-query effect @tanstack/query-core
+pnpm add effect-api-query effect@4.0.0-rc.112 @tanstack/query-core@^5.102.0
 ```
 
-The current source targets Effect 4, TanStack Query 5, strict TypeScript, ESM, and ES2022. The
-package is under active development before its first stable release.
+Use TypeScript 5.9 or newer with `strict: true`. The package requires ESM and ES2022 support.
+Before upgrading, review [compatibility and stability](https://ueberbrot.github.io/effect-rpc-query/getting-started/compatibility-and-stability/).
 
-## Use
+## Query an RPC
+
+Given your RPC group and ready flat client:
 
 ```ts
-import { createRpcQueryUtils } from 'effect-rpc-query'
+import { createRpcQueryUtils } from 'effect-api-query'
 
-const rpcQuery = createRpcQueryUtils(rpcGroup, {
+const rpc = createRpcQueryUtils(rpcGroup, {
   client,
-  keyPrefix: ['my-app'] as const,
+  keyPrefix: ['my-app'],
   runPromiseExit,
 })
 
-const options = rpcQuery.users.get.queryOptions({ input: { id: 1 } })
+const options = rpc.users.get.queryOptions({ input: { id: 1 } })
+const user = await queryClient.query(options)
 ```
 
-Read the [documentation](https://ueberbrot.github.io/effect-rpc-query/) for setup, React Query,
-TanStack Start, cache keys, cancellation, failures, and the API reference.
+Follow the [RPC quick start](https://ueberbrot.github.io/effect-rpc-query/getting-started/quick-start/)
+for setup and cleanup. For an Effect HttpApi, use
+[`createHttpApiQueryUtils`](https://ueberbrot.github.io/effect-rpc-query/guides/http-queries-and-mutations/).
 
-## Feature support
+## Choose an operation
 
-| Capability                            | Status            | Boundary                                                                                         |
-| ------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------ |
-| Unary queries and mutations           | Generated         | Typed options, semantic keys, conditional queries, and mutations                                 |
-| Infinite queries                      | Generated         | Typed page parameters, semantic initial-page keys, conditional queries, and cancellation         |
-| Accumulated and live streams          | Generated         | Typed stream elements, semantic keys, refetch behavior, cancellation, and complete Effect Causes |
-| Native TanStack Query APIs            | Tested            | Query Core, React Query, Router loaders, TanStack Start, and `QueryClient` cache operations      |
-| Transport and application integration | Application-owned | RPC client lifetime, providers, policies, Devtools, persistence, and framework integration       |
-| Automatic policy                      | Application-owned | Invalidation, interceptors, defaults, and framework lifecycle                                    |
-| Mutation cancellation                 | Impossible        | TanStack mutation functions provide no abort signal                                              |
+| API definition            | Available operations                          |
+| ------------------------- | --------------------------------------------- |
+| Unary RPC                 | Queries, infinite queries, and mutations      |
+| Streaming RPC             | Accumulated streamed queries and live queries |
+| Buffered HttpApi endpoint | Queries and mutations                         |
 
-See the [full capability matrix](https://ueberbrot.github.io/effect-rpc-query/getting-started/feature-support/)
-for the exact boundary of each feature.
+Both factories generate keys for cache reads, writes, prefetching, and invalidation. Query functions
+forward cancellation to Effect. Mutations use TanStack's normal callbacks; invalidate affected
+queries in your application.
 
-## Develop
+## Integrate with your application
 
-The repository includes executable [Vite React](./examples/vite-react) and
-[TanStack Start](./examples/tanstack-start) applications. Run `vp run vite-react-dev` or
-`vp run tanstack-start-dev` from the repository root. Run the complete validation suite with
-`vp run validate`.
-
-See the [Dev Container guide](https://ueberbrot.github.io/effect-rpc-query/contributing/dev-container/)
-for the reproducible environment.
-
-## Design influences
-
-The design draws on
-[tRPC's TanStack React Query integration](https://github.com/trpc/trpc/tree/main/packages/tanstack-react-query)
-and [Effect Query](https://github.com/voidhashcom/effect-query). It builds directly on
-[Effect](https://github.com/Effect-TS/effect) and
-[TanStack Query](https://github.com/TanStack/query).
+- [React Query](https://ueberbrot.github.io/effect-rpc-query/guides/react-query/): use generated options with hooks.
+- [TanStack Start](https://ueberbrot.github.io/effect-rpc-query/guides/tanstack-start/): share RPC options across loaders, server rendering, and hydration.
+- [Run the examples](https://ueberbrot.github.io/effect-rpc-query/examples/): try complete Vite React and TanStack Start applications.
+- [Feature support](https://ueberbrot.github.io/effect-rpc-query/getting-started/feature-support/): check available operations and integration limits.
+- [API reference](https://ueberbrot.github.io/effect-rpc-query/reference/public-exports/): look up factories, builders, and errors.

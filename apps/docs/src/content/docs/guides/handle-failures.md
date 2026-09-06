@@ -8,7 +8,7 @@ operation that ran, and the complete Effect `Cause`:
 
 ```ts
 import { Cause } from 'effect'
-import { isEffectRpcQueryError } from 'effect-rpc-query'
+import { isEffectRpcQueryError } from 'effect-api-query'
 
 const logRpcError = (error: unknown) => {
   if (isEffectRpcQueryError(error)) {

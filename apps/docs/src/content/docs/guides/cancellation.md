@@ -22,7 +22,7 @@ await queryClient.cancelQueries({
 ```
 
 TanStack aborts the signal. The runner must translate that abort into Effect interruption, and the
-RPC transport must support interruption if the server operation should stop. `effect-rpc-query`
+RPC transport must support interruption if the server operation should stop. `effect-api-query`
 does not add a transport-specific cancellation protocol.
 
 Infinite page requests, accumulated streams, and live queries use the same signal. Cancelling a

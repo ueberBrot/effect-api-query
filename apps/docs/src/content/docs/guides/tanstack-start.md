@@ -55,7 +55,7 @@ its state to the browser, and hydrate a browser-owned Query Client. Reusing the 
 options preserves cache identity because the keys depend on the key prefix, RPC tag, operation, and
 canonical payload.
 
-`effect-rpc-query` does not create the router, providers, request context, or hydration boundary.
+`effect-api-query` does not create the router, providers, request context, or hydration boundary.
 The executable [TanStack Start example](https://github.com/ueberBrot/effect-rpc-query/tree/main/examples/tanstack-start)
 shows the complete integration, including handler cleanup for server-route requests and hot module
 replacement.

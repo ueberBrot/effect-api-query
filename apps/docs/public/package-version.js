@@ -1,6 +1,6 @@
 ;(() => {
-  const packageUrl = 'https://www.npmjs.com/package/effect-rpc-query'
-  const packageManifestUrl = 'https://registry.npmjs.org/effect-rpc-query/latest'
+  const packageUrl = 'https://www.npmjs.com/package/effect-api-query'
+  const packageManifestUrl = 'https://registry.npmjs.org/effect-api-query/latest'
   const semanticVersion = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/
 
   const updatePackageVersion = (version) => {
@@ -8,7 +8,7 @@
 
     for (const link of document.querySelectorAll(`a[href="${packageUrl}"]`)) {
       link.textContent = label
-      link.setAttribute('aria-label', `effect-rpc-query ${label} on npm`)
+      link.setAttribute('aria-label', `effect-api-query ${label} on npm`)
     }
   }
 

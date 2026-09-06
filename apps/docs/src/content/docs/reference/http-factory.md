@@ -1,10 +1,12 @@
 ---
 title: HTTP Factory
-description: Buffered HTTP utility construction, request input, and ownership.
+description: HTTP factory options, decoded request input, response data, and cache keys.
 ---
 
 `createHttpApiQueryUtils(api, options)` derives an eager, frozen HTTP utility tree from an Effect
 HttpApi and an application-owned ready HttpApiClient. Import it from `effect-api-query`.
+
+For a step-by-step example, see [HTTP Queries and Mutations](/effect-rpc-query/guides/http-queries-and-mutations/).
 
 Ordinary groups appear as `utils[groupIdentifier][endpointIdentifier]`. Top-level groups place
 their endpoints at `utils[endpointIdentifier]`. Identifiers containing dots remain literal

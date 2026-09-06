@@ -1,10 +1,14 @@
 ---
 title: Query and Mutation Operations
-description: Choose the generated operation that matches your RPC use.
+description: Choose queries, mutations, pagination, or streams for your API calls.
 ---
 
 Every unary RPC leaf exposes query, infinite-query, and mutation builders. The RPC definition does
 not decide how the application uses the operation.
+
+Every retained HTTP endpoint exposes query and mutation builders regardless of its HTTP method.
+Choose the builder according to the call's role in your application. HTTP endpoints have no
+infinite-query or stream builders.
 
 Use a query when TanStack should cache a result by semantic request identity. Payload-bearing query
 keys contain the normalized, canonical payload, and TanStack can refetch or cancel the query.
@@ -27,4 +31,4 @@ removeUser.mutate({ id: 1 })
 ```
 
 After a successful mutation, invalidate the affected query prefix explicitly. The package does not
-infer relationships between RPCs.
+infer relationships between API operations.

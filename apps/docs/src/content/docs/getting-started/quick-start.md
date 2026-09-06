@@ -4,7 +4,7 @@ description: Create an RPC utility tree and use it with TanStack Query.
 ---
 
 Start with an Effect RPC group and a ready flat RPC client. The application creates and disposes the
-client; `effect-rpc-query` only derives Query Core utilities from it.
+client; `effect-api-query` only derives Query Core utilities from it.
 
 ## Create and use the utilities
 
@@ -13,7 +13,7 @@ with the modules that define your RPC group and acquire your ready client.
 
 ```ts
 import { MutationObserver, QueryClient } from '@tanstack/query-core'
-import { createRpcQueryUtils } from 'effect-rpc-query'
+import { createRpcQueryUtils } from 'effect-api-query'
 
 import { exampleRpcGroup } from './contracts.js'
 import { startExampleRpcClient } from './rpc-client.js'
