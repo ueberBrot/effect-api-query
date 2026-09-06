@@ -348,6 +348,7 @@ export type RetainedClientServices<Api extends HttpApi.Constraint, Client> = [
     : never
 export type ClientServices<Api extends HttpApi.Constraint, Client> =
   | HttpApiEndpoint.ClientServices<Supported<Endpoints<Groups<Api>>>>
+  | HttpApiEndpoint.ErrorServicesDecode<Supported<Endpoints<Groups<Api>>>>
   | RetainedClientServices<Api, Client>
 export type RunnerOption<Api extends HttpApi.Constraint, Client> = [
   ClientServices<Api, Client>,

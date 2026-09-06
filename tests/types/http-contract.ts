@@ -11,7 +11,7 @@ import {
   type HttpApiQueryUtils,
   type RunPromiseExit,
 } from 'effect-api-query'
-import type { HttpClientError } from 'effect/unstable/http'
+import type { HttpClient, HttpClientError } from 'effect/unstable/http'
 import {
   HttpApi,
   HttpApiClient,
@@ -487,21 +487,39 @@ createHttpApiQueryUtils(keysApi, {
   keyEncoders: { 'forms.v1': { secrets: () => null } },
 })
 
-const ServicefulString = Schema.String.pipe(
-  Schema.middlewareEncoding<typeof Schema.String, EncodeRequest>((encoding) =>
-    Effect.flatMap(EncodeRequest, () => encoding),
+class EncodeParams extends Context.Service<EncodeParams, {}>()('EncodeParams') {}
+class EncodeQuery extends Context.Service<EncodeQuery, {}>()('EncodeQuery') {}
+class EncodeHeaders extends Context.Service<EncodeHeaders, {}>()('EncodeHeaders') {}
+const ServicefulParams = Schema.String.pipe(
+  Schema.middlewareEncoding<typeof Schema.String, EncodeParams>((encoding) =>
+    Effect.flatMap(EncodeParams, () => encoding),
+  ),
+)
+const ServicefulQuery = Schema.String.pipe(
+  Schema.middlewareEncoding<typeof Schema.String, EncodeQuery>((encoding) =>
+    Effect.flatMap(EncodeQuery, () => encoding),
+  ),
+)
+const ServicefulRequestHeaders = Schema.String.pipe(
+  Schema.middlewareEncoding<typeof Schema.String, EncodeHeaders>((encoding) =>
+    Effect.flatMap(EncodeHeaders, () => encoding),
   ),
 )
 const ServiceParts = HttpApiEndpoint.get('serviceParts', '/service-parts/:value', {
-  params: { value: ServicefulString },
-  query: { value: ServicefulString },
-  headers: { value: ServicefulString },
+  params: { value: ServicefulParams },
+  query: { value: ServicefulQuery },
+  headers: { value: ServicefulRequestHeaders },
 })
 const servicePartsApi = HttpApi.make('service-parts').add(
   HttpApiGroup.make('parts').add(ServiceParts),
 )
 declare const servicePartsClient: HttpApiClient.ForApi<typeof servicePartsApi>
-declare const encodingRunner: RunPromiseExit<EncodeRequest>
+declare const encodingRunner: RunPromiseExit<EncodeParams | EncodeQuery | EncodeHeaders>
+type RequestPartRequirements = CreateHttpApiQueryUtilsOptions<
+  typeof servicePartsApi,
+  readonly ['app']
+>['runPromiseExit']
+true satisfies Assert<Equal<RequestPartRequirements, typeof encodingRunner>>
 // @ts-expect-error Encoding services in non-payload request parts require a key encoder.
 createHttpApiQueryUtils(servicePartsApi, {
   client: servicePartsClient,
@@ -521,4 +539,170 @@ createHttpApiQueryUtils(servicePartsApi, {
       }),
     },
   },
+})
+
+const bufferedApi = HttpApi.make('buffered').add(
+  HttpApiGroup.make('responses').add(
+    HttpApiEndpoint.get('text', '/text', {
+      success: Schema.String.pipe(HttpApiSchema.asText()),
+    }),
+    HttpApiEndpoint.get('binary', '/binary', {
+      success: Schema.Uint8Array.pipe(HttpApiSchema.asUint8Array()),
+    }),
+    HttpApiEndpoint.get('decoded', '/decoded', { success: Schema.FiniteFromString }),
+  ),
+)
+const constructed = Effect.gen(function* () {
+  const ready = yield* HttpApiClient.make(bufferedApi)
+  const generated = createHttpApiQueryUtils(bufferedApi, { client: ready, keyPrefix: ['app'] })
+  const text = queryClient.query(generated.responses.text.queryOptions())
+  const binary = queryClient.query(generated.responses.binary.queryOptions())
+  const decoded = queryClient.query(generated.responses.decoded.queryOptions())
+  true satisfies Assert<Equal<typeof text, Promise<string>>>
+  true satisfies Assert<Equal<typeof binary, Promise<Uint8Array>>>
+  true satisfies Assert<Equal<typeof decoded, Promise<number>>>
+  const changed = generated.responses.binary.mutationOptions().mutationFn()
+  true satisfies Assert<Equal<typeof changed, Promise<Uint8Array>>>
+  return generated
+})
+true satisfies Assert<Equal<Effect.Services<typeof constructed>, HttpClient.HttpClient>>
+
+declare const configuredTransport: HttpClient.HttpClient.With<
+  HttpClientError.HttpClientError | 'configured-transport-error',
+  ExtraClientService
+>
+const constructedWith = Effect.gen(function* () {
+  const ready = yield* HttpApiClient.makeWith(authorizedApi, {
+    httpClient: configuredTransport,
+  })
+  // @ts-expect-error Transport services remain required after client construction.
+  createHttpApiQueryUtils(authorizedApi, { client: ready, keyPrefix: ['app'] })
+  const generated = createHttpApiQueryUtils(authorizedApi, {
+    client: ready,
+    keyPrefix: ['app'],
+    runPromiseExit: extraRunner,
+  })
+  const state = queryClient.getQueryState(generated.account.ping.queryKey())
+  true satisfies Assert<
+    Equal<
+      NonNullable<typeof state>['error'],
+      EffectHttpApiQueryError<
+        | 'unauthorized'
+        | 'client-auth'
+        | 'configured-transport-error'
+        | HttpClientError.HttpClientError
+        | Schema.SchemaError
+      > | null
+    >
+  >
+  return generated
+})
+true satisfies Assert<
+  Equal<Effect.Services<typeof constructedWith>, HttpApiMiddleware.ForClient<Auth>>
+>
+
+const customClient = {
+  ...client,
+  'user.accounts': {
+    ...client['user.accounts'],
+    save: <Mode extends HttpApiClient.Client.ResponseMode>(request: {
+      readonly payload: typeof User.Type
+      readonly responseMode?: Mode
+    }) =>
+      Effect.flatMap(ExtraClientService, () =>
+        client['user.accounts']
+          .save(request)
+          .pipe(Effect.mapError(() => 'custom-save-error' as const)),
+      ),
+  },
+}
+// @ts-expect-error Compatible custom methods retain their residual services.
+createHttpApiQueryUtils(api, { client: customClient, keyPrefix: ['app'] })
+const custom = createHttpApiQueryUtils(api, {
+  client: customClient,
+  keyPrefix: ['app'],
+  runPromiseExit: extraRunner,
+})
+const customState = queryClient.getQueryState(
+  custom['user.accounts'].save.queryKey({ payload: { id: 1, name: 'Ada' } }),
+)
+true satisfies Assert<
+  Equal<
+    NonNullable<typeof customState>['error'],
+    EffectHttpApiQueryError<'custom-save-error'> | null
+  >
+>
+const customData = queryClient.query(
+  custom['user.accounts'].save.queryOptions({ input: { payload: { id: 1, name: 'Ada' } } }),
+)
+true satisfies Assert<Equal<typeof customData, Promise<typeof User.Type>>>
+createHttpApiQueryUtils(api, {
+  client: customClient,
+  keyPrefix: ['app'],
+  // @ts-expect-error An unrelated schema runner cannot supply custom method services.
+  runPromiseExit: headerRunner,
+})
+createHttpApiQueryUtils(serviceApi, {
+  client: serviceClient,
+  keyPrefix: ['app'],
+  keyEncoders: { work: { serviceful: encoder } },
+  // @ts-expect-error A custom key encoder leaves execution schema services intact.
+  runPromiseExit: extraRunner,
+})
+
+const omittedCustomClient = {
+  ...omittedServiceClient,
+  system: {
+    ...omittedServiceClient.system,
+    omittedService: <Mode extends HttpApiClient.Client.ResponseMode>(request: {
+      readonly query: typeof User.Type
+      readonly responseMode?: Mode
+    }) =>
+      Effect.flatMap(ExtraClientService, () => omittedServiceClient.system.omittedService(request)),
+  },
+}
+const omittedCustom = createHttpApiQueryUtils(omittedServiceApi, {
+  client: omittedCustomClient,
+  keyPrefix: ['app'],
+})
+true satisfies Assert<Equal<keyof typeof omittedCustom.system, 'key' | 'ping'>>
+
+class DecodeMiddlewareError extends Context.Service<DecodeMiddlewareError, {}>()(
+  'DecodeMiddlewareError',
+) {}
+const MiddlewareErrorSchema = Schema.Literal('serviceful-middleware-error')
+class ServicefulAuth extends HttpApiMiddleware.Service<ServicefulAuth>()('ServicefulAuth', {
+  error: MiddlewareErrorSchema.pipe(
+    Schema.middlewareDecoding<typeof MiddlewareErrorSchema, DecodeMiddlewareError>((decoding) =>
+      Effect.flatMap(DecodeMiddlewareError, () => decoding),
+    ),
+  ),
+}) {}
+const middlewareServiceApi = HttpApi.make('middleware-services').add(
+  HttpApiGroup.make('account').add(Ping.middleware(ServicefulAuth)),
+)
+declare const middlewareServiceClient: HttpApiClient.ForApi<typeof middlewareServiceApi>
+// @ts-expect-error Middleware error schemas retain their decoding services.
+createHttpApiQueryUtils(middlewareServiceApi, {
+  client: middlewareServiceClient,
+  keyPrefix: ['app'],
+})
+declare const middlewareRunner: RunPromiseExit<DecodeMiddlewareError>
+createHttpApiQueryUtils(middlewareServiceApi, {
+  client: middlewareServiceClient,
+  keyPrefix: ['app'],
+  runPromiseExit: middlewareRunner,
+})
+type MiddlewareRequirements = CreateHttpApiQueryUtilsOptions<
+  typeof middlewareServiceApi,
+  readonly ['app']
+>['runPromiseExit']
+true satisfies Assert<Equal<MiddlewareRequirements, typeof middlewareRunner>>
+const omittedMiddlewareApi = HttpApi.make('omitted-middleware').add(
+  HttpApiGroup.make('account').add(Ping, Stream.middleware(ServicefulAuth)),
+)
+declare const omittedMiddlewareClient: HttpApiClient.ForApi<typeof omittedMiddlewareApi>
+createHttpApiQueryUtils(omittedMiddlewareApi, {
+  client: omittedMiddlewareClient,
+  keyPrefix: ['app'],
 })

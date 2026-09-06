@@ -37,8 +37,15 @@ which the ready client encodes as a string. Raw response controls are excluded f
 mutation variables, and encoder input.
 
 The adapter forces decoded-only responses. Queries cache a successful `undefined` as `null`;
-mutations retain `undefined`. Buffered response-header wrappers retain their decoded shape.
-The package does not add serialization for arbitrary decoded domain values.
+mutations retain `undefined`. Buffered text stays a string, binary data stays a `Uint8Array`, and
+declared response-header wrappers retain their decoded body and headers. Binary and other domain
+values gain no automatic SSR serializer; applications own their serialization strategy.
+
+Execution retains declared endpoint errors, middleware server/client errors, Schema errors, HTTP
+client errors, and additional ready-client errors in the wrapped Cause's type. Required services
+include request encoders, success/error decoders, and residual ready-client services for exposed
+endpoints. See [client lifecycle](/effect-rpc-query/concepts/client-lifecycle/#http-clients-and-execution-services)
+and [cancellation](/effect-rpc-query/guides/cancellation/#cancel-an-http-query) for runtime ownership.
 
 Any streaming success alternative, including a header-wrapped stream, omits the complete endpoint.
 Any multipart request alternative does the same. Groups containing only omitted endpoints disappear.
