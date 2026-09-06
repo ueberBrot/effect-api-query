@@ -44,7 +44,9 @@ values gain no automatic SSR serializer; applications own their serialization st
 Execution retains declared endpoint errors, middleware server/client errors, Schema errors, HTTP
 client errors, and additional ready-client errors in the wrapped Cause's type. Required services
 include request encoders, success/error decoders, and residual ready-client services for exposed
-endpoints. See [client lifecycle](/effect-rpc-query/concepts/client-lifecycle/#http-clients-and-execution-services)
+endpoints. Compatible custom clients retain errors and residual services from their decoded-only
+call signatures; raw-response overloads contribute neither.
+See [client lifecycle](/effect-rpc-query/concepts/client-lifecycle/#http-clients-and-execution-services)
 and [cancellation](/effect-rpc-query/guides/cancellation/#cancel-an-http-query) for runtime ownership.
 
 Any streaming success alternative, including a header-wrapped stream, omits the complete endpoint.

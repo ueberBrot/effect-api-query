@@ -11,7 +11,7 @@ import {
   type HttpApiQueryUtils,
   type RunPromiseExit,
 } from 'effect-api-query'
-import type { HttpClient, HttpClientError } from 'effect/unstable/http'
+import type { HttpClient, HttpClientError, HttpClientResponse } from 'effect/unstable/http'
 import {
   HttpApi,
   HttpApiClient,
@@ -706,3 +706,104 @@ createHttpApiQueryUtils(omittedMiddlewareApi, {
   client: omittedMiddlewareClient,
   keyPrefix: ['app'],
 })
+
+class RawResponseService extends Context.Service<RawResponseService, {}>()('RawResponseService') {}
+type RawResponseMethod = (request: {
+  readonly responseMode: 'response-only'
+}) => Effect.Effect<HttpClientResponse.HttpClientResponse, 'raw-response-error', RawResponseService>
+type SpecificRawResponseMethod = (request: {
+  readonly responseMode: 'response-only'
+  readonly trace: string
+}) => Effect.Effect<HttpClientResponse.HttpClientResponse, 'raw-response-error', RawResponseService>
+type ResponseTupleMethod = (request: {
+  readonly responseMode: 'decoded-and-response'
+}) => Effect.Effect<
+  readonly [typeof User.Type, HttpClientResponse.HttpClientResponse],
+  'tuple-error',
+  RawResponseService
+>
+
+declare const overloadedServiceMethod: typeof serviceClient.work.serviceful &
+  ResponseTupleMethod &
+  RawResponseMethod &
+  SpecificRawResponseMethod
+const overloadedServiceClient = { work: { serviceful: overloadedServiceMethod } }
+// @ts-expect-error A trailing raw-response overload cannot hide decoded execution services.
+createHttpApiQueryUtils(serviceApi, {
+  client: overloadedServiceClient,
+  keyPrefix: ['app'],
+  keyEncoders: { work: { serviceful: encoder } },
+})
+const overloadedServiceUtils = createHttpApiQueryUtils(serviceApi, {
+  client: overloadedServiceClient,
+  keyPrefix: ['app'],
+  keyEncoders: { work: { serviceful: encoder } },
+  runPromiseExit: runner,
+})
+type OverloadedRequirements = CreateHttpApiQueryUtilsOptions<
+  typeof serviceApi,
+  readonly ['app'],
+  typeof overloadedServiceClient
+>['runPromiseExit']
+true satisfies Assert<Equal<OverloadedRequirements, typeof runner>>
+const overloadedServiceState = queryClient.getQueryState(
+  overloadedServiceUtils.work.serviceful.queryKey({ payload: { id: 1, name: 'Ada' } }),
+)
+true satisfies Assert<
+  Equal<
+    NonNullable<typeof overloadedServiceState>['error'],
+    NonNullable<typeof serviceState>['error']
+  >
+>
+createHttpApiQueryUtils(serviceApi, {
+  client: overloadedServiceClient,
+  keyPrefix: ['app'],
+  keyEncoders: { work: { serviceful: encoder } },
+  // @ts-expect-error Decoded schema requirements survive response-control overloads.
+  runPromiseExit: extraRunner,
+})
+
+declare const overloadedCustomMethod: (typeof customClient)['user.accounts']['save'] &
+  RawResponseMethod
+const overloadedCustomClient = {
+  ...client,
+  'user.accounts': { ...client['user.accounts'], save: overloadedCustomMethod },
+}
+const overloadedCustomUtils = createHttpApiQueryUtils(api, {
+  client: overloadedCustomClient,
+  keyPrefix: ['app'],
+  runPromiseExit: extraRunner,
+})
+const overloadedCustomState = queryClient.getQueryState(
+  overloadedCustomUtils['user.accounts'].save.queryKey({ payload: { id: 1, name: 'Ada' } }),
+)
+true satisfies Assert<
+  Equal<
+    NonNullable<typeof overloadedCustomState>['error'],
+    EffectHttpApiQueryError<'custom-save-error'> | null
+  >
+>
+
+declare const rawFirstMethod: RawResponseMethod & typeof client.ping
+const rawFirst = createHttpApiQueryUtils(extraApi, {
+  client: { ping: rawFirstMethod },
+  keyPrefix: ['app'],
+})
+declare const rawLastMethod: typeof client.ping & RawResponseMethod
+const rawLast = createHttpApiQueryUtils(extraApi, {
+  client: { ping: rawLastMethod },
+  keyPrefix: ['app'],
+})
+const rawFirstState = queryClient.getQueryState(rawFirst.ping.queryKey())
+const rawLastState = queryClient.getQueryState(rawLast.ping.queryKey())
+true satisfies Assert<
+  Equal<NonNullable<typeof rawFirstState>['error'], NonNullable<typeof rawLastState>['error']>
+>
+
+const overloadedCustomMutation = new MutationObserver(
+  queryClient,
+  overloadedCustomUtils['user.accounts'].save.mutationOptions(),
+).getCurrentResult()
+true satisfies Assert<
+  Equal<typeof overloadedCustomMutation.error, EffectHttpApiQueryError<'custom-save-error'> | null>
+>

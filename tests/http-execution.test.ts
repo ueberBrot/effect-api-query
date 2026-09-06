@@ -108,8 +108,8 @@ describe('HTTP execution', () => {
       'HttpExecution/ErrorTranslation',
     ) {}
     const errorSchema = Schema.String.pipe(
-      Schema.middlewareDecoding<Schema.String, ErrorTranslation>((decode) =>
-        Effect.gen(function* () {
+      Schema.middlewareDecoding<Schema.String, ErrorTranslation>(
+        Effect.fn('ErrorTranslation.decode')(function* (decode) {
           const translation = yield* ErrorTranslation
           return Option.map(yield* decode, (value) => `${translation.prefix}${value}`)
         }),

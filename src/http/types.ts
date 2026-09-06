@@ -82,16 +82,47 @@ export type ClientGroup<Group, Client> = Group extends { readonly topLevel: true
   : Group extends HttpApiGroup.Constraint
     ? Member<Client, Group['identifier']>
     : never
-export type MethodEffect<Method> = Method extends (...args: never[]) => infer Result
+/** Exact identity keeps related response-only overloads from ending the traversal early. */
+export type SeenMethod<Method, Seen extends readonly unknown[]> = Seen extends readonly [
+  infer First,
+  ...infer Rest,
+]
+  ? (<Value>() => Value extends Method ? 1 : 2) extends <Value>() => Value extends First ? 1 : 2
+    ? true
+    : SeenMethod<Method, Rest>
+  : false
+/** Rotates overloads into a union so response-only calls cannot replace decoded execution. */
+export type MethodSignatures<
+  Method,
+  Partial = unknown,
+  Seen extends readonly unknown[] = [],
+> = Method extends (...args: infer Args) => infer Result
+  ? SeenMethod<(...args: Args) => Result, Seen> extends true
+    ? never
+    :
+        | ((...args: Args) => Result)
+        | MethodSignatures<
+            ((...args: Args) => Result) & Partial & Method,
+            Partial & ((...args: Args) => Result),
+            [...Seen, (...args: Args) => Result]
+          >
+  : never
+export type DecodedEffect<
+  Method,
+  Endpoint extends HttpApiEndpoint.ConstraintRequest,
+> = Method extends (
+  request: RequestFields<Endpoint> & { readonly responseMode: 'decoded-only' },
+) => infer Result
   ? Result
   : never
 export type ClientEffect<
   Group,
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Client,
-> = MethodEffect<Member<ClientGroup<Group, Client>, Endpoint['identifier']>>
-export type MethodError<Method> =
-  MethodEffect<Method> extends Effect.Effect<infer _A, infer Error, infer _R> ? Error : never
+> = DecodedEffect<
+  MethodSignatures<Member<ClientGroup<Group, Client>, Endpoint['identifier']>>,
+  Endpoint
+>
 export type ExposedEffects<Api extends HttpApi.Constraint, Client> =
   SupportedGroups<Api> extends infer Group
     ? Group extends HttpApiGroup.Constraint
@@ -249,7 +280,7 @@ export type HttpApiQueryUtils<
     readonly [Endpoint in Supported<Endpoints<Group>> as Endpoint['identifier']]: Leaf<
       Endpoint,
       EndpointKey<Api, Prefix, Group, Endpoint>,
-      MethodError<Member<ClientGroup<Group, Client>, Endpoint['identifier']>>
+      Effect.Error<ClientEffect<Group, Endpoint, Client>>
     >
   }
 } & {
@@ -260,7 +291,7 @@ export type HttpApiQueryUtils<
   ]: Leaf<
     Endpoint,
     readonly [...Root<Api, Prefix>, Endpoint['identifier']],
-    MethodError<Member<Client, Endpoint['identifier']>>
+    Effect.Error<ClientEffect<{ readonly topLevel: true }, Endpoint, Client>>
   >
 }
 
@@ -339,17 +370,10 @@ export type EncoderOption<Api extends HttpApi.Constraint> = [EncoderGroups<Api>]
   : [RequiredEncoderGroups<Api>] extends [never]
     ? { readonly keyEncoders?: Encoders<Api> }
     : { readonly keyEncoders: Encoders<Api> }
-export type RetainedClientServices<Api extends HttpApi.Constraint, Client> = [
-  ExposedEffects<Api, Client>,
-] extends [never]
-  ? never
-  : ExposedEffects<Api, Client> extends Effect.Effect<infer _A, infer _E, infer Services>
-    ? Services
-    : never
 export type ClientServices<Api extends HttpApi.Constraint, Client> =
   | HttpApiEndpoint.ClientServices<Supported<Endpoints<Groups<Api>>>>
   | HttpApiEndpoint.ErrorServicesDecode<Supported<Endpoints<Groups<Api>>>>
-  | RetainedClientServices<Api, Client>
+  | Effect.Services<ExposedEffects<Api, Client>>
 export type RunnerOption<Api extends HttpApi.Constraint, Client> = [
   ClientServices<Api, Client>,
 ] extends [never]
