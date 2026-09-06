@@ -23,7 +23,7 @@ observer data; data-tagged keys retain the underlying cache data and error types
 possibly undefined `initialData` preserve TanStack's corresponding hook overloads.
 
 Applicable TanStack options pass through. The package owns the key, function, and query hash
-fields, and consumes its `input` before returning options.
+fields, including the precomputed `queryHash`, and consumes its `input` before returning options.
 
 Input-bearing `queryOptions` accepts a complete request, `queryOptions(skipToken)`, or
 `queryOptions({ input: skipToken, ...options })`. Import `skipToken` from `effect-api-query` or

@@ -51,6 +51,7 @@ it('maps HTTP page requests, partitions stable filters, and refetches through na
     input: (cursor) => ({ query: { cursor, filter: 'active' } }),
     getNextPageParam: (lastPage) => lastPage.next,
     staleTime: Infinity,
+    ...({ queryHash: 'collision' } as {}),
   })
   const observer = new InfiniteQueryObserver(queryClient, options)
   const unsubscribe = observer.subscribe(() => {})
@@ -64,6 +65,15 @@ it('maps HTTP page requests, partitions stable filters, and refetches through na
       ],
       pageParams: [0, 1],
     })
+    expect(
+      await queryClient.query(
+        utils.users.list.queryOptions({
+          input: { query: { cursor: 42, filter: 'active' } },
+          staleTime: Infinity,
+          ...({ queryHash: 'collision' } as {}),
+        }),
+      ),
+    ).toEqual({ items: ['active:42'], next: null })
     expect(options.queryKey).toEqual([
       'test',
       'http',

@@ -42,6 +42,9 @@ and package-owned hash function.
 `skipToken` is valid only for payload-bearing query options. It is not accepted by key or mutation
 builders, and skipped options are unsuitable for suspense and prefetch-only hooks.
 
+Generated query options also reserve `queryHash`: a caller-supplied hash cannot override generated
+cache identity.
+
 ## Request-local RPC options
 
 All option builders accept `rpcOptions`. The package forwards it to the ready RPC client on each

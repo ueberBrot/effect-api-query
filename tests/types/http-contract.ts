@@ -1160,3 +1160,15 @@ const documentedPages = pageUtils.users.list.infiniteOptions({
 })
 const documentedResult = useInfiniteQuery(documentedPages)
 true satisfies Assert<Equal<typeof documentedResult.data, (typeof User.Type)[] | undefined>>
+
+// @ts-expect-error A caller hash cannot override generated HTTP cache identity.
+getUser.queryOptions({ input, queryHash: 'shared' })
+// @ts-expect-error Skipped options reserve the operation-level cache identity.
+getUser.queryOptions({ input: skipToken, queryHash: 'shared' })
+getUser.infiniteOptions({
+  initialPageParam: 0,
+  input: () => input,
+  getNextPageParam: () => undefined,
+  // @ts-expect-error A caller hash cannot merge ordinary and infinite caches.
+  queryHash: 'shared',
+})
