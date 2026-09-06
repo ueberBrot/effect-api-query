@@ -1,59 +1,62 @@
 ---
 title: Feature Support
-description: Check which capabilities the package generates, tests, leaves to the application, or does not support.
+description: Choose supported RPC and HTTP operations and plan your TanStack Query integration.
 ---
 
-`effect-rpc-query` turns unary and streaming Effect RPC definitions into semantic keys and TanStack
-Query Core options. Applications continue to configure TanStack Query and manage the RPC client.
+`effect-api-query` creates TanStack Query options and cache keys from Effect RPC groups and HttpApi
+definitions. Choose a factory for your API:
 
-## Status definitions
+| API definition            | Factory                   | Operations                                    |
+| ------------------------- | ------------------------- | --------------------------------------------- |
+| Unary RPC                 | `createRpcQueryUtils`     | Queries, infinite queries, and mutations      |
+| Streaming RPC             | `createRpcQueryUtils`     | Accumulated streamed queries and live queries |
+| Buffered HttpApi endpoint | `createHttpApiQueryUtils` | Queries and mutations                         |
 
-- **Generated**: the package creates the key, function, or option object.
-- **Tested**: repository fixtures or executable applications verify that generated output works
-  with the listed native TanStack API.
-- **Application-owned**: use the upstream Effect, TanStack, or framework API directly.
-- **Impossible**: the upstream TanStack contract provides no seam for this capability.
-- **Deferred**: the package may add or certify this capability after `0.1.0`.
+An HTTP endpoint with any streaming success or multipart request alternative is omitted from the
+utility tree. HTTP endpoints have no infinite or stream builders. See the
+[HTTP guide](/effect-rpc-query/guides/http-queries-and-mutations/) for request input and examples.
 
-## Capability matrix
+## Use TanStack Query features
 
-| Capability                                              | Status            | Boundary                                                                                                                                                |
-| ------------------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Unary RPC queries                                       | Generated         | Each unary leaf builds `queryOptions` and semantic `queryKey` values with inferred input, data, and failure types.                                      |
-| Infinite queries                                        | Generated         | Each unary leaf builds `infiniteOptions` and `infiniteKey` values with inferred page parameters, payloads, data, selected data, and failures.           |
-| Unary RPC mutations                                     | Generated         | Each unary leaf builds `mutationOptions` and a stable `mutationKey`; variables remain inferred at execution.                                            |
-| Accumulated streamed queries                            | Generated         | Each streaming leaf builds `streamedOptions` and `streamedKey`; values accumulate in emission order.                                                    |
-| Live queries                                            | Generated         | Each streaming leaf builds `liveOptions` and `liveKey`; every value replaces the previous cached value.                                                 |
-| Hierarchical cache keys                                 | Generated         | Root, branch, RPC, query, infinite, streamed, live, and mutation keys support native array-prefix matching without collisions.                          |
-| Conditional queries                                     | Generated         | Payload-bearing ordinary, infinite, accumulated-stream, and live builders accept TanStack's exact `skipToken` value.                                    |
-| Query cancellation                                      | Generated         | Every query function forwards TanStack's `AbortSignal`; stream cancellation also closes the iterator and its Effect resources.                          |
-| Query policies, transformations, and stream refetching  | Tested            | Applicable Query Core options pass through. Accumulated streams support `reset`, `append`, and `replace` refetch modes.                                 |
-| Mutation callbacks                                      | Tested            | Applicable mutation options pass through. Build native optimistic updates with the application's `QueryClient`.                                         |
-| Cache reads, writes, prefetching, invalidation, and SSR | Tested            | Native `QueryClient` methods accept generated options and keys. Completed data dehydrates normally; open server streams use a cancelled first snapshot. |
-| React Query                                             | Tested            | Generated options work with ordinary, infinite, suspense, prefetch, mutation, accumulated-stream, and live hooks.                                       |
-| TanStack Router and Start                               | Tested            | Packed fixtures and the executable Start application cover loaders, server rendering, hydration, streams, and client navigation.                        |
-| RPC transport, middleware, and client lifecycle         | Application-owned | Supply a ready flat RPC client and keep its `Scope` alive. The package does not construct a transport or add interceptors.                              |
-| Providers, Devtools, persistence, broadcast, and policy | Application-owned | Configure these through TanStack Query. The package provides no wrapper or default policy.                                                              |
-| Query-versus-mutation classification                    | Application-owned | Every unary leaf offers both builders because Effect RPC definitions do not label reads and writes.                                                     |
-| Automatic invalidation                                  | Application-owned | Invalidate with generated prefix keys in application callbacks.                                                                                         |
-| Direct RPC execution                                    | Application-owned | Call the ready RPC client directly; generated leaves remain limited to TanStack key and option builders.                                                |
-| SSR error and Effect Cause serialization                | Application-owned | Failed queries are omitted from example dehydration and refetched in the browser. Applications choose any cross-realm error format.                     |
-| Mutation cancellation                                   | Impossible        | TanStack mutation functions provide no query-style abort signal.                                                                                        |
-| Asynchronous or Effect-returning key encoders           | Impossible        | TanStack requires cache identity synchronously when options are built.                                                                                  |
-| Non-React framework certification                       | Deferred          | The package remains framework-neutral, but the repository certifies React Query only for `0.1.0`.                                                       |
+| Task                                            | How to use it                                                                        |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Fetch and cache data                            | Pass generated `queryOptions` to Query Core or React Query.                          |
+| Run a write                                     | Pass generated `mutationOptions` to a mutation observer or hook.                     |
+| Pause an RPC query until input exists           | Use `input: skipToken` with a payload-bearing RPC query.                             |
+| Load RPC pages                                  | Use `infiniteOptions`, mapping each page parameter to an RPC payload.                |
+| Retain stream history                           | Use `streamedOptions`; set `maxChunks` to bound the retained elements.               |
+| Show the latest stream value                    | Use `liveOptions`.                                                                   |
+| Read, update, or invalidate cached data         | Pass generated keys to the corresponding `QueryClient` methods.                      |
+| Configure retries, freshness, or data selection | Supply the applicable TanStack options to the builder.                               |
+| Cancel a query                                  | Use `queryClient.cancelQueries`; the runner must forward its abort signal to Effect. |
+| Prefetch or server-render data                  | Reuse generated options in loaders and dehydrate completed query data.               |
 
-Read [Compatibility and Limits](/effect-rpc-query/reference/compatibility-and-limits/) for version,
-module-format, payload, key-safety, and error-boundary details.
+Generated options work with React Query hooks and TanStack Router loaders, including TanStack
+Start. Configure other framework adapters through their native TanStack APIs; compatibility with
+non-React adapters is not guaranteed.
 
-## Design influences
+## Configure application behavior
 
-The API design draws on these projects:
+Create the ready client, transport, middleware, and runtime before constructing the utilities.
+Keep their resources alive while queries and mutations use them. Configure providers, Devtools,
+persistence, broadcasting, and cache defaults through TanStack Query.
 
-- [tRPC's TanStack React Query integration](https://github.com/trpc/trpc/tree/main/packages/tanstack-react-query)
-  derives TanStack-native option builders from a typed RPC surface.
-- [Effect Query](https://github.com/voidhashcom/effect-query) runs Effect programs through TanStack
-  Query and demonstrates Effect RPC integration.
+Both query and mutation builders are available for every unary RPC and retained HTTP endpoint.
+Choose the operation for each call; after a mutation, explicitly invalidate the affected query keys.
+For execution without TanStack Query, call your ready client directly.
 
-This package builds directly on [Effect](https://github.com/Effect-TS/effect) RPC definitions and
-[TanStack Query](https://github.com/TanStack/query). Its focused contract adds an eager RPC utility
-tree, Schema-derived semantic keys, caller-owned RPC clients, and complete Effect Cause preservation.
+Keep authentication in your client configuration. If a tenant, user, or other client setting changes
+the result, include its safe identity in `keyPrefix` to keep cache entries separate.
+
+## Limits to account for
+
+- Mutations receive no TanStack query abort signal. Long-running commands need an explicit
+  [server cancellation operation](/effect-rpc-query/guides/cancellation/#cancel-a-command-while-its-mutation-is-pending).
+- Key encoders must synchronously return strict JSON. Encoding services, redacted values, and
+  ambiguous HTTP payload alternatives require [custom encoders](/effect-rpc-query/guides/custom-key-encoders/).
+- Cancel an open server stream after capturing a successful snapshot before dehydration.
+- Provide your own SSR error serialization, or omit failed queries from dehydration and refetch
+  them in the browser.
+
+See [Compatibility and Limits](/effect-rpc-query/reference/compatibility-and-limits/) for required
+versions and the full input, cache, and runtime constraints.

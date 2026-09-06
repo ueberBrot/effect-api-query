@@ -22,7 +22,7 @@ await queryClient.cancelQueries({
 ```
 
 TanStack aborts the signal. The runner must translate that abort into Effect interruption, and the
-RPC transport must support interruption if the server operation should stop. `effect-rpc-query`
+RPC transport must support interruption if the server operation should stop. `effect-api-query`
 does not add a transport-specific cancellation protocol.
 
 Infinite page requests, accumulated streams, and live queries use the same signal. Cancelling a
@@ -31,6 +31,19 @@ TanStack also cancels an active stream when its last observer unmounts or a refe
 
 Mutations do not receive TanStack query signals, so the generated mutation function provides no
 automatic mutation cancellation helper.
+
+## Cancel an HTTP query
+
+Use `queryClient.cancelQueries` with the HTTP endpoint's generated `queryKey(input)` or `key()`
+prefix. Generated HTTP query functions pass the signal to the supplied runner; the default Effect
+runner interrupts the ready HttpApiClient, and a fetch transport aborts its pending request.
+Custom runners must forward the signal to preserve this behavior. TanStack retains its native
+query-cancellation result and cache policy.
+
+HTTP interruption stops local client execution cooperatively. A closed connection does not prove
+that server work stopped, and it does not undo a completed write. Durable server cancellation needs
+an explicit application operation identified before work begins; compensation remains separate.
+HTTP mutations receive no query abort signal and keep TanStack's normal mutation lifecycle.
 
 ## Cancel a command while its mutation is pending
 

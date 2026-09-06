@@ -10,13 +10,13 @@ import packageManifest from '../../package.json' with { type: 'json' }
 
 const repositoryUrl = 'https://github.com/ueberBrot/effect-rpc-query'
 const docsBase = '/effect-rpc-query'
-const packageUrl = 'https://www.npmjs.com/package/effect-rpc-query'
+const packageUrl = `https://www.npmjs.com/package/${packageManifest.name}`
 
 export default defineConfig({
   base: docsBase,
   integrations: [
     starlight({
-      description: 'Type-safe TanStack Query utilities generated from Effect RPC definitions.',
+      description: 'Use Effect RPC and HttpApi with typed TanStack Query options and cache keys.',
       editLink: {
         baseUrl: `${repositoryUrl}/edit/main/apps/docs/`,
       },
@@ -65,6 +65,7 @@ export default defineConfig({
           label: 'Guides',
           items: [
             { label: 'React Query', slug: 'guides/react-query' },
+            { label: 'HTTP Queries and Mutations', slug: 'guides/http-queries-and-mutations' },
             { label: 'TanStack Start', slug: 'guides/tanstack-start' },
             { label: 'Cache Management', slug: 'guides/cache-management' },
             { label: 'Cancellation', slug: 'guides/cancellation' },
@@ -94,13 +95,9 @@ export default defineConfig({
             { label: 'Compatibility and Limits', slug: 'reference/compatibility-and-limits' },
           ],
         },
-        {
-          label: 'Contributing',
-          items: [{ label: 'Dev Container', slug: 'contributing/dev-container' }],
-        },
       ],
       social: [{ icon: 'github', label: 'GitHub', href: repositoryUrl }],
-      title: 'effect-rpc-query',
+      title: packageManifest.name,
     }),
   ],
   site: 'https://ueberbrot.github.io',

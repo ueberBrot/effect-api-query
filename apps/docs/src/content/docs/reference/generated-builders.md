@@ -26,7 +26,7 @@ rpcQuery.users.get.queryOptions({ input: { id: 1 }, staleTime: 30_000 })
 Disable a payload-bearing query with `input: skipToken`, retaining its other TanStack options:
 
 ```ts
-import { skipToken } from 'effect-rpc-query'
+import { skipToken } from 'effect-api-query'
 
 const options =
   userId === undefined

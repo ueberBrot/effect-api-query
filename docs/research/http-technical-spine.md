@@ -1,6 +1,6 @@
 # HTTP technical spine
 
-This reference records the Effect HttpApi assumptions behind issue #63. It is for maintainers extending the HTTP adapter or updating Effect. The inspected dependency is **Effect 4.0.0-rc.112**, pinned in [the workspace catalog](../../pnpm-workspace.yaml). Source links below resolve after installing the repository dependencies. Recheck these assumptions when changing that pin.
+The HTTP adapter relies on the Effect HttpApi behavior described below. The inspected dependency is **Effect 4.0.0-rc.112**, pinned in [the workspace catalog](../../pnpm-workspace.yaml). Source links resolve after installing the repository dependencies. Recheck these assumptions when extending the adapter or updating Effect.
 
 ## Decoded requests and responses
 
@@ -50,14 +50,6 @@ This agreement applies to literal declarations whose Effect constructors preserv
 | [Public HTTP factory tests](../../tests/create-http-api-query-utils.test.ts) | Runtime projection, atomic validation, unsupported alternatives, contradictory metadata, keys, and execution.                                                                                                                             |
 | [Packed consumer verifier](../../scripts/verify-packed-consumer.mts)         | Installs the tarball into isolated consumers and runs their compiler and runtime fixtures against the supported peer matrix.                                                                                                              |
 
-The fixtures are the repeatable checks; this document is not a record that every validation task passed. In-process routing does not prove network abort behavior or application host routing.
+In-process routing does not prove network abort behavior or application host routing.
 
-## Follow-up scope
-
-Issue #63 establishes buffered JSON and no-content query/mutation execution. The dependent tickets extend this baseline:
-
-- **#64:** Complete semantic HTTP request keys and custom encoders.
-- **#65:** Preserve HTTP errors, services, middleware, and cancellation.
-- **#66:** Complete HTTP conditional and infinite query options.
-
-Recheck the source assumptions and packed fixtures before extending those guarantees. HTTP streams, multipart uploads, and raw response modes remain outside the adapter's supported endpoint contract.
+HTTP streams, multipart uploads, and raw response modes remain outside the adapter's supported endpoint contract.

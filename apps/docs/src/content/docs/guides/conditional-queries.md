@@ -1,13 +1,13 @@
 ---
 title: Conditional Queries
-description: Disable payload-bearing queries with the exact TanStack skip sentinel.
+description: Pause queries until their required input is available.
 ---
 
 Use `{ input: skipToken }` when a payload-bearing query has no valid input yet and needs TanStack
 options such as `staleTime`, `select`, or `initialData`:
 
 ```ts
-import { skipToken } from 'effect-rpc-query'
+import { skipToken } from 'effect-api-query'
 
 type User = { id: number; name: string }
 

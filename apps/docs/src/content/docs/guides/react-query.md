@@ -6,6 +6,8 @@ description: Use generated options with React Query hooks.
 Create the RPC utility tree beside the application’s `QueryClient`, then provide both through your
 application context. Generated options pass directly to React Query hooks.
 
+In the example below, `AppRpcQuery` is your utility tree's type, such as `typeof rpcQuery`.
+
 ```tsx
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
@@ -57,3 +59,14 @@ const latestEvent = useQuery(rpcQuery.events.watch.liveOptions())
 The package owns each generated `queryFn`, `queryKey`, `queryKeyHashFn`, `mutationFn`, and
 `mutationKey`. Stream builders own the same query fields. Other Query options, including `select`,
 `retry`, and lifecycle callbacks, retain their normal TanStack types.
+
+## Use an HTTP endpoint
+
+The same hooks accept HTTP options. For an endpoint that declares an `id` parameter, use:
+
+```ts
+const user = useQuery(http.users.get.queryOptions({ input: { params: { id: 1 } } }))
+```
+
+Follow [HTTP Queries and Mutations](/effect-rpc-query/guides/http-queries-and-mutations/) to create
+the HTTP utilities and configure mutation invalidation.

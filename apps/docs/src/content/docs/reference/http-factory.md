@@ -1,10 +1,12 @@
 ---
 title: HTTP Factory
-description: Buffered HTTP utility construction, request input, and ownership.
+description: HTTP factory options, decoded request input, response data, and cache keys.
 ---
 
 `createHttpApiQueryUtils(api, options)` derives an eager, frozen HTTP utility tree from an Effect
 HttpApi and an application-owned ready HttpApiClient. Import it from `effect-api-query`.
+
+For a step-by-step example, see [HTTP Queries and Mutations](/effect-rpc-query/guides/http-queries-and-mutations/).
 
 Ordinary groups appear as `utils[groupIdentifier][endpointIdentifier]`. Top-level groups place
 their endpoints at `utils[endpointIdentifier]`. Identifiers containing dots remain literal
@@ -37,8 +39,17 @@ which the ready client encodes as a string. Raw response controls are excluded f
 mutation variables, and encoder input.
 
 The adapter forces decoded-only responses. Queries cache a successful `undefined` as `null`;
-mutations retain `undefined`. Buffered response-header wrappers retain their decoded shape.
-The package does not add serialization for arbitrary decoded domain values.
+mutations retain `undefined`. Buffered text stays a string, binary data stays a `Uint8Array`, and
+declared response-header wrappers retain their decoded body and headers. Binary and other domain
+values gain no automatic SSR serializer; applications own their serialization strategy.
+
+Execution retains declared endpoint errors, middleware server/client errors, Schema errors, HTTP
+client errors, and additional ready-client errors in the wrapped Cause's type. Required services
+include request encoders, success/error decoders, and residual ready-client services for exposed
+endpoints. Compatible custom clients retain errors and residual services from their decoded-only
+call signatures; raw-response overloads contribute neither.
+See [client lifecycle](/effect-rpc-query/concepts/client-lifecycle/#http-clients-and-execution-services)
+and [cancellation](/effect-rpc-query/guides/cancellation/#cancel-an-http-query) for runtime ownership.
 
 Any streaming success alternative, including a header-wrapped stream, omits the complete endpoint.
 Any multipart request alternative does the same. Groups containing only omitted endpoints disappear.
@@ -88,10 +99,3 @@ method, and operation, and preserves its complete Cause. The package adds no con
 values to that metadata; upstream Causes can still contain requests, responses, or Schema issue
 values. `isEffectHttpApiQueryError` narrows execution errors. Configuration and key preparation
 failures use `EffectHttpApiQueryConfigError` and `EffectHttpApiQueryKeyError` respectively.
-
-The [packed HTTP consumer](https://github.com/ueberBrot/effect-rpc-query/blob/main/tests/packed-consumer/http-runtime.mts)
-exercises the real HTTP encoding, routing, and decoding pipeline. The
-[type contract](https://github.com/ueberBrot/effect-rpc-query/blob/main/tests/types/http-contract.ts)
-checks request input, result inference, services, and endpoint omission.
-The [semantic-key tests](https://github.com/ueberBrot/effect-rpc-query/blob/main/tests/http-semantic-keys.test.ts)
-exercise request formats, alternative payload identity, normalization, and cache reuse.

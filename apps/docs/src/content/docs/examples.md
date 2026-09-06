@@ -12,6 +12,29 @@ up to 1 MiB and return HTTP 413 for larger bodies.
 | [Vite React](https://github.com/ueberBrot/effect-rpc-query/tree/main/examples/vite-react)         | Ordinary, infinite, accumulated-stream, live, and mutation hooks with failures and cancellation      | Standalone server on port `3001`, proxied by Vite | `http://127.0.0.1:5173` |
 | [TanStack Start](https://github.com/ueberBrot/effect-rpc-query/tree/main/examples/tanstack-start) | The same operation kinds in loaders, server rendering, dehydration, hydration, and client navigation | Same-origin `POST /rpc` server route              | `http://127.0.0.1:3000` |
 
+## Set up locally
+
+Clone the repository, then run commands from its root:
+
+```sh
+git clone https://github.com/ueberBrot/effect-rpc-query.git
+cd effect-rpc-query
+```
+
+Install the Node version in `.node-version` and the pnpm version in `package.json`, then install
+the workspace dependencies:
+
+```sh
+pnpm install --frozen-lockfile
+```
+
+The workspace includes Vite+. If `vp` is not on your shell's PATH, prefix the commands below with
+`pnpm exec`, for example `pnpm exec vp run vite-react-dev`.
+
+You can also use the included Dev Container: install Docker and the VS Code Dev Containers
+extension, open the clone, and choose **Dev Containers: Reopen in Container**. The container
+installs the declared tool versions and workspace dependencies, and forwards the application ports.
+
 ## Run Vite React
 
 ```sh
@@ -70,10 +93,7 @@ vp run vite-react-build
 vp run tanstack-start-build
 ```
 
-## Browser playground status
+## Run in a local environment
 
-The examples do not currently run in StackBlitz WebContainers. Vite+ requires a native binding
-that is unavailable there. [Issue #33](https://github.com/ueberBrot/effect-rpc-query/issues/33)
-records the decision, and the
-[minimal reproduction](https://github.com/ueberBrot/vite-plus-webcontainer-repro) tracks the
-upstream limitation. Run either example locally or in the Dev Container.
+Run either example locally or in the Dev Container. StackBlitz WebContainers cannot run these
+examples because Vite+ requires a native binding that is unavailable there.
