@@ -15,11 +15,11 @@ description: Supported versions, RPC and HTTP operations, cache identity, and ru
 
 - Unary RPCs expose ordinary query, infinite-query, and mutation builders. Streaming RPCs expose
   accumulated-stream and live-query builders.
-- Infinite queries map each TanStack `pageParam` to one unary RPC payload. Streaming builders adapt
-  an Effect RPC stream through TanStack's experimental `streamedQuery` helper.
-- Buffered HTTP endpoints expose ordinary query and mutation builders. Any streaming success or
+- Infinite queries map each TanStack `pageParam` to one unary RPC payload or complete HTTP request.
+  Streaming builders adapt an Effect RPC stream through TanStack's experimental `streamedQuery` helper.
+- Buffered HTTP endpoints expose ordinary query, infinite query, and mutation builders. Any streaming success or
   multipart request alternative omits the endpoint. See the [HTTP factory](/effect-rpc-query/reference/http-factory/).
-- Conditional RPC queries accept `skipToken`. HTTP builders require complete request input and do not accept it.
+- Input-bearing RPC and HTTP queries accept `skipToken`. Skipped query functions cannot run through manual refetch.
 - Use the ready client directly for calls that do not need TanStack Query.
 
 ## Runtime and cache behavior

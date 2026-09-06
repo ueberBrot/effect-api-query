@@ -7,6 +7,7 @@ import {
   createRpcQueryUtils,
   EffectHttpApiQueryError,
   isEffectHttpApiQueryError,
+  skipToken,
   type RunPromiseExit,
 } from 'effect-api-query'
 import { HttpClient, HttpClientRequest, HttpClientResponse, HttpServer } from 'effect/unstable/http'
@@ -247,6 +248,37 @@ await Effect.runPromise(
             return true
           },
         ),
+      )
+
+      const skipped = http.compatibility.read.queryOptions({ input: skipToken, staleTime: 123 })
+      equal(skipped.queryFn, skipToken)
+      equal(skipped.staleTime, 123)
+      deepStrictEqual(skipped.queryKey, [...http.compatibility.read.key(), 'query'])
+      const pages = http.compatibility.read.infiniteOptions({
+        initialPageParam: 0,
+        input: (id) => ({ params: { id } }),
+        getNextPageParam: (_last, _pages, id) => (id < 1 ? id + 1 : undefined),
+      })
+      decodedRequests.length = 0
+      deepStrictEqual(
+        yield* Effect.promise(() => queryClient.infiniteQuery({ ...pages, pages: 2 })),
+        {
+          pages: [7, 7],
+          pageParams: [0, 1],
+        },
+      )
+      deepStrictEqual(decodedRequests, [{ id: 0 }, { id: 1 }])
+      notDeepStrictEqual(pages.queryKey, http.compatibility.read.queryKey({ params: { id: 0 } }))
+      deepStrictEqual(
+        yield* Effect.promise(() =>
+          queryClient.infiniteQuery(
+            http.empty.infiniteOptions({
+              initialPageParam: 0,
+              getNextPageParam: () => undefined,
+            }),
+          ),
+        ),
+        { pages: [null], pageParams: [0] },
       )
 
       let completeCause: Cause.Cause<unknown> | undefined

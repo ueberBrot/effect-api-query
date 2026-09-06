@@ -34,6 +34,7 @@ export const extractHttpEndpoints = (
         path: group.topLevel ? [endpoint.identifier] : [group.identifier, endpoint.identifier],
         kind: 'Unary',
         input,
+        pageInput: (input) => input,
         takeOptions: () => undefined,
         invoke: (input) =>
           target[endpoint.identifier]!({

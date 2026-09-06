@@ -1121,3 +1121,6 @@ utils.events.audit.watch.liveOptions({ rpcOptions: { streamBufferSize: '8' } })
 const discardOptions = { ...unaryRpcOptions, discard: true }
 // @ts-expect-error variables cannot bypass the result control restriction
 utils.users.get.mutationOptions({ rpcOptions: discardOptions })
+
+// @ts-expect-error A caller hash cannot override generated RPC cache identity.
+utils.users.get.queryOptions({ input: skipToken, queryHash: 'shared' })

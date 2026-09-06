@@ -223,6 +223,8 @@ const prepareQueryOptions = (
   }
   const input = options['input']
   delete options['input']
+  // Query Core prefers an explicit hash over the generated hash function.
+  delete options['queryHash']
   const requestOptions = description.takeOptions(options)
   if (description.input._tag !== 'Inputless' && input === skipToken) {
     return {
@@ -240,7 +242,6 @@ const prepareQueryOptions = (
 
 const createInfiniteBuilders = (
   description: UnaryOperation,
-  infinite: NonNullable<UnaryOperation['infinite']>,
   operationKey: readonly JsonValue[],
   keyEncoder: RuntimeKeyEncoder | undefined,
   runPromiseExit: RunPromiseExit<unknown>,
@@ -273,9 +274,9 @@ const createInfiniteBuilders = (
         readonly signal: AbortSignal
       }) => {
         const pageInput = inputForPage(pageParam)
-        const executionInput = infinite.pageInput(pageInput)
+        const executionInput = description.pageInput(pageInput)
         return execute(
-          { invoke: description.invoke, executionError: infinite.executionError },
+          description,
           'infinite',
           executionInput,
           runPromiseExit,
@@ -333,15 +334,7 @@ const createUnaryLeaf = (
   }
 
   return Object.freeze({
-    ...(description.infinite === undefined
-      ? {}
-      : createInfiniteBuilders(
-          description,
-          description.infinite,
-          operationKey,
-          keyEncoder,
-          runPromiseExit,
-        )),
+    ...createInfiniteBuilders(description, operationKey, keyEncoder, runPromiseExit),
     key: () => operationKey,
     mutationKey: () => mutationKey,
     mutationOptions,

@@ -1,5 +1,20 @@
-import { MutationObserver, QueryClient, QueryObserver, skipToken } from '@tanstack/query-core'
-import { useQuery } from '@tanstack/react-query'
+import {
+  InfiniteQueryObserver,
+  MutationObserver,
+  QueryClient,
+  QueryObserver,
+  skipToken,
+  type InfiniteData,
+  type SkipToken,
+} from '@tanstack/query-core'
+import {
+  useInfiniteQuery,
+  usePrefetchInfiniteQuery,
+  usePrefetchQuery,
+  useQuery,
+  useSuspenseInfiniteQuery,
+  useSuspenseQuery,
+} from '@tanstack/react-query'
 import { Context, Effect, Schema } from 'effect'
 import {
   createHttpApiQueryUtils,
@@ -109,7 +124,13 @@ true satisfies Assert<
 true satisfies Assert<
   Equal<
     keyof typeof utils.ping,
-    'key' | 'queryKey' | 'queryOptions' | 'mutationKey' | 'mutationOptions'
+    | 'key'
+    | 'queryKey'
+    | 'queryOptions'
+    | 'mutationKey'
+    | 'mutationOptions'
+    | 'infiniteKey'
+    | 'infiniteOptions'
   >
 >
 // @ts-expect-error HTTP identifiers preserve literal dots.
@@ -132,7 +153,6 @@ declare const genericMode: HttpApiClient.Client.ResponseMode
 const genericRequest = { ...input, responseMode: genericMode }
 // @ts-expect-error A generic response-mode union cannot enter generated query data.
 utils['user.accounts']['get.user'].queryOptions({ input: genericRequest })
-// @ts-expect-error HTTP skip builders belong to the later expansion.
 utils['user.accounts']['get.user'].queryOptions({ input: skipToken })
 // @ts-expect-error HTTP requests do not accept RPC options.
 utils.ping.queryOptions({ rpcOptions: {} })
@@ -807,3 +827,348 @@ const overloadedCustomMutation = new MutationObserver(
 true satisfies Assert<
   Equal<typeof overloadedCustomMutation.error, EffectHttpApiQueryError<'custom-save-error'> | null>
 >
+
+// HTTP option builders retain native inference for complete requests and buffered results.
+type GetFailure = EffectHttpApiQueryError<
+  'not-found' | HttpClientError.HttpClientError | Schema.SchemaError
+>
+const getUser = utils['user.accounts']['get.user']
+const nativeQuery = getUser.queryOptions({
+  input,
+  select: (user) => user.name,
+  retry: (_count, error) => {
+    error satisfies GetFailure
+    return false
+  },
+  staleTime: (query) => {
+    query.state.data satisfies typeof User.Type | undefined
+    query.queryKey satisfies ReturnType<typeof getUser.queryKey>
+    return 1_000
+  },
+  refetchInterval: (query) => {
+    query.state.error satisfies GetFailure | null
+    return false
+  },
+  throwOnError: (error, query) => {
+    error satisfies GetFailure
+    query.state.data satisfies typeof User.Type | undefined
+    return true
+  },
+})
+useQuery(nativeQuery).data satisfies string | undefined
+useSuspenseQuery(nativeQuery).data satisfies string
+usePrefetchQuery(nativeQuery)
+queryClient.prefetchQuery(query)
+queryClient.invalidateQueries({ queryKey: query.queryKey })
+queryClient.refetchQueries({ queryKey: getUser.key() })
+// @ts-expect-error HTTP input is consumed before returning Query Core options.
+nativeQuery.input
+// @ts-expect-error Query keys belong to the package.
+getUser.queryOptions({ input, queryKey: ['other'] })
+// @ts-expect-error Query hashing belongs to the package.
+getUser.queryOptions({ input, queryKeyHashFn: () => 'other' })
+const optionalInitial = (): typeof User.Type | undefined => undefined
+const maybeInitial = useQuery(
+  getUser.queryOptions({ input, initialData: optionalInitial, select: (user) => user.name }),
+)
+true satisfies Assert<Equal<typeof maybeInitial.data, string | undefined>>
+const definedInitial = useQuery(
+  getUser.queryOptions({
+    input,
+    initialData: () => ({ id: 1, name: 'Ada' }),
+    select: (user) => user.name,
+  }),
+)
+true satisfies Assert<Equal<typeof definedInitial.data, string>>
+
+const skippedDirect = getUser.queryOptions(skipToken)
+skippedDirect.queryFn satisfies SkipToken
+const skippedObject = getUser.queryOptions({
+  input: skipToken,
+  select: (user) => user.name,
+  staleTime: (query) => {
+    query.queryKey satisfies readonly [
+      'app',
+      'http',
+      'account.api',
+      'user.accounts',
+      'get.user',
+      'query',
+    ]
+    return 1_000
+  },
+  retry: (_count, error) => {
+    error satisfies GetFailure
+    return false
+  },
+})
+skippedObject.queryFn satisfies SkipToken
+useQuery(skippedObject).data satisfies string | undefined
+new QueryObserver(queryClient, skippedObject).getCurrentResult().error satisfies GetFailure | null
+// @ts-expect-error Suspense requires an executable query function.
+useSuspenseQuery(skippedDirect)
+// @ts-expect-error Prefetch-only hooks require an executable query function.
+usePrefetchQuery(skippedObject)
+const skippedDefined = useQuery(
+  getUser.queryOptions({
+    input: skipToken,
+    initialData: { id: 1, name: 'Ada' },
+    select: (user) => user.name,
+  }),
+)
+true satisfies Assert<Equal<typeof skippedDefined.data, string | undefined>>
+const skippedOptional = useQuery(
+  getUser.queryOptions({ input: skipToken, initialData: optionalInitial }),
+)
+true satisfies Assert<Equal<typeof skippedOptional.data, typeof User.Type | undefined>>
+declare const hasUser: boolean
+const conditional = getUser.queryOptions({
+  input: hasUser ? input : skipToken,
+  select: (user) => user.name,
+})
+useQuery(conditional).data satisfies string | undefined
+// @ts-expect-error A conditional request cannot guarantee suspense execution.
+useSuspenseQuery(conditional)
+// @ts-expect-error Key builders require concrete requests.
+getUser.queryKey(skipToken)
+// @ts-expect-error Infinite key builders require concrete requests.
+getUser.infiniteKey(skipToken)
+// @ts-expect-error Mutation builders reject the skip sentinel.
+getUser.mutationOptions(skipToken)
+// @ts-expect-error Mutation variables require concrete requests.
+getUser.mutationOptions().mutationFn(skipToken)
+// @ts-expect-error Inputless ordinary builders cannot be skipped.
+utils.ping.queryOptions(skipToken)
+// @ts-expect-error Inputless object builders cannot be skipped.
+utils.ping.queryOptions({ input: skipToken })
+
+const userPages = getUser.infiniteOptions({
+  initialPageParam: 0,
+  input: (page) => {
+    page satisfies number
+    return { ...input, params: { id: page } }
+  },
+  getNextPageParam: (page, pages, pageParam, pageParams) => {
+    page satisfies typeof User.Type
+    pages satisfies (typeof User.Type)[]
+    pageParam satisfies number
+    pageParams satisfies number[]
+    return pageParam < 3 ? pageParam + 1 : undefined
+  },
+  getPreviousPageParam: (_first, _pages, firstParam) =>
+    firstParam > 0 ? firstParam - 1 : undefined,
+  retry: (_count, error) => {
+    error satisfies GetFailure
+    return false
+  },
+  select: (data) => {
+    data.pageParams satisfies number[]
+    return data.pages.map((user) => user.name)
+  },
+})
+const infiniteHook = useInfiniteQuery(userPages)
+true satisfies Assert<Equal<typeof infiniteHook.data, string[] | undefined>>
+true satisfies Assert<Equal<typeof infiniteHook.error, GetFailure | null>>
+useSuspenseInfiniteQuery(userPages).data satisfies string[]
+new InfiniteQueryObserver(queryClient, userPages).getCurrentResult().data satisfies
+  | string[]
+  | undefined
+const infiniteCache = queryClient.getQueryData(userPages.queryKey)
+true satisfies Assert<
+  Equal<typeof infiniteCache, InfiniteData<typeof User.Type, number> | undefined>
+>
+const infiniteKeyCache = queryClient.getQueryData(getUser.infiniteKey(input))
+true satisfies Assert<
+  Equal<typeof infiniteKeyCache, InfiniteData<typeof User.Type, unknown> | undefined>
+>
+queryClient.setQueryData(userPages.queryKey, (previous) => {
+  previous satisfies InfiniteData<typeof User.Type, number> | undefined
+  return previous
+})
+// @ts-expect-error Infinite cache entries contain pages and page parameters.
+queryClient.setQueryData(userPages.queryKey, { id: 1, name: 'Ada' })
+// @ts-expect-error Request mappers are consumed before returning Query Core options.
+userPages.input
+const fetchPages = getUser.infiniteOptions({
+  initialPageParam: 0,
+  input: (page) => ({ ...input, params: { id: page } }),
+  getNextPageParam: (_page, _pages, cursor) => cursor + 1,
+})
+queryClient.fetchInfiniteQuery(fetchPages) satisfies Promise<InfiniteData<typeof User.Type, number>>
+queryClient.ensureInfiniteQueryData(fetchPages) satisfies Promise<
+  InfiniteData<typeof User.Type, number>
+>
+queryClient.prefetchInfiniteQuery(fetchPages)
+usePrefetchInfiniteQuery(fetchPages)
+const initialPages = { pages: [{ id: 1, name: 'Ada' }], pageParams: [0] }
+const definedPages = useInfiniteQuery(
+  getUser.infiniteOptions({
+    initialPageParam: 0,
+    input: (page) => ({ ...input, params: { id: page } }),
+    getNextPageParam: () => undefined,
+    initialData: () => initialPages,
+    select: (data) => data.pages.length,
+  }),
+)
+true satisfies Assert<Equal<typeof definedPages.data, number>>
+const optionalPages = (): InfiniteData<typeof User.Type, number> | undefined => undefined
+const undefinedPages = useInfiniteQuery(
+  getUser.infiniteOptions({
+    initialPageParam: 0,
+    input: (page) => ({ ...input, params: { id: page } }),
+    getNextPageParam: () => undefined,
+    initialData: optionalPages,
+    select: (data) => data.pages.length,
+  }),
+)
+true satisfies Assert<Equal<typeof undefinedPages.data, number | undefined>>
+const skippedPages = getUser.infiniteOptions({
+  input: skipToken,
+  initialPageParam: 0,
+  getNextPageParam: (page, _pages, cursor) => {
+    page satisfies typeof User.Type
+    cursor satisfies number
+    return cursor + 1
+  },
+  select: (data) => data.pages.map((user) => user.name),
+})
+skippedPages.queryFn satisfies SkipToken
+skippedPages.queryKey satisfies readonly [
+  'app',
+  'http',
+  'account.api',
+  'user.accounts',
+  'get.user',
+  'infinite',
+]
+useInfiniteQuery(skippedPages).data satisfies string[] | undefined
+// @ts-expect-error Infinite suspense requires an executable query function.
+useSuspenseInfiniteQuery(skippedPages)
+// @ts-expect-error Infinite prefetch-only hooks require an executable query function.
+usePrefetchInfiniteQuery(skippedPages)
+const skippedDefinedPages = useInfiniteQuery(
+  getUser.infiniteOptions({
+    input: skipToken,
+    initialPageParam: 0,
+    getNextPageParam: () => undefined,
+    initialData: initialPages,
+    select: (data) => data.pages.length,
+  }),
+)
+true satisfies Assert<Equal<typeof skippedDefinedPages.data, number>>
+// @ts-expect-error Infinite skipping requires object options with pagination fields.
+getUser.infiniteOptions(skipToken)
+getUser.infiniteOptions({
+  initialPageParam: 0,
+  getNextPageParam: () => undefined,
+  // @ts-expect-error Infinite requests must include every decoded request field.
+  input: (page: number) => ({ params: { id: page } }),
+})
+utils.ping.infiniteOptions({
+  initialPageParam: 0,
+  getNextPageParam: () => undefined,
+  // @ts-expect-error Inputless infinite builders cannot be skipped.
+  input: skipToken,
+})
+getUser.infiniteOptions({
+  initialPageParam: 0,
+  getNextPageParam: () => undefined,
+  input: () => input,
+  // @ts-expect-error Infinite query functions belong to the package.
+  queryFn: async () => ({ id: 1, name: 'Ada' }),
+})
+const inputlessPages = utils.ping.infiniteOptions({
+  initialPageParam: 0,
+  getNextPageParam: () => undefined,
+})
+useInfiniteQuery(inputlessPages).data satisfies InfiniteData<null, number> | undefined
+
+const callbackMutation = getUser.mutationOptions({
+  onMutate: (request) => ({ previousId: request.params.id }),
+  onSuccess: (user, request, result) => {
+    user satisfies typeof User.Type
+    request satisfies typeof input
+    result.previousId satisfies number
+  },
+  onError: (error, request, result) => {
+    error satisfies GetFailure
+    request satisfies typeof input
+    result?.previousId satisfies number | undefined
+  },
+  onSettled: (user, error, request, result) => {
+    user satisfies typeof User.Type | undefined
+    error satisfies GetFailure | null
+    request satisfies typeof input
+    result?.previousId satisfies number | undefined
+  },
+})
+new MutationObserver(queryClient, callbackMutation).mutate(input) satisfies Promise<
+  typeof User.Type
+>
+// @ts-expect-error Mutation keys belong to the package.
+getUser.mutationOptions({ mutationKey: ['other'] })
+// @ts-expect-error Mutation functions belong to the package.
+getUser.mutationOptions({ mutationFn: async () => ({ id: 1, name: 'Ada' }) })
+const servicePages = serviceUtils.work.serviceful.infiniteOptions({
+  initialPageParam: 0,
+  input: (id) => ({ payload: { id, name: 'Ada' } }),
+  getNextPageParam: () => undefined,
+})
+const servicePagesState = queryClient.getQueryState(servicePages.queryKey)
+true satisfies Assert<
+  Equal<NonNullable<typeof servicePagesState>['error'], NonNullable<typeof serviceState>['error']>
+>
+const overloadedPages = overloadedCustomUtils['user.accounts'].save.infiniteOptions({
+  initialPageParam: 0,
+  input: (id) => ({ payload: { id, name: 'Ada' } }),
+  getNextPageParam: () => undefined,
+})
+const overloadedPagesResult = useInfiniteQuery(overloadedPages)
+true satisfies Assert<
+  Equal<typeof overloadedPagesResult.error, EffectHttpApiQueryError<'custom-save-error'> | null>
+>
+
+const conditionalPages = getUser.infiniteOptions({
+  initialPageParam: 0,
+  input: hasUser ? (page) => ({ ...input, params: { id: page } }) : skipToken,
+  getNextPageParam: (_page, _pages, cursor) => cursor + 1,
+  select: (data) => data.pages.length,
+})
+const conditionalPagesHook = useInfiniteQuery(conditionalPages)
+true satisfies Assert<Equal<typeof conditionalPagesHook.data, number | undefined>>
+// @ts-expect-error Conditional infinite requests cannot guarantee suspense execution.
+useSuspenseInfiniteQuery(conditionalPages)
+const pageApi = HttpApi.make('pages').add(
+  HttpApiGroup.make('users').add(
+    HttpApiEndpoint.get('list', '/users', {
+      query: { cursor: Schema.FiniteFromString, filter: Schema.String },
+      success: Schema.Struct({
+        items: Schema.Array(User),
+        nextCursor: Schema.NullOr(Schema.Finite),
+      }),
+    }),
+  ),
+)
+declare const pageClient: HttpApiClient.ForApi<typeof pageApi>
+const pageUtils = createHttpApiQueryUtils(pageApi, { client: pageClient, keyPrefix: ['app'] })
+const filter = 'active'
+const documentedPages = pageUtils.users.list.infiniteOptions({
+  initialPageParam: 0,
+  input: (cursor) => ({ query: { cursor, filter } }),
+  getNextPageParam: (page) => page.nextCursor ?? undefined,
+  select: (data) => data.pages.flatMap((page) => page.items),
+})
+const documentedResult = useInfiniteQuery(documentedPages)
+true satisfies Assert<Equal<typeof documentedResult.data, (typeof User.Type)[] | undefined>>
+
+// @ts-expect-error A caller hash cannot override generated HTTP cache identity.
+getUser.queryOptions({ input, queryHash: 'shared' })
+// @ts-expect-error Skipped options reserve the operation-level cache identity.
+getUser.queryOptions({ input: skipToken, queryHash: 'shared' })
+getUser.infiniteOptions({
+  initialPageParam: 0,
+  input: () => input,
+  getNextPageParam: () => undefined,
+  // @ts-expect-error A caller hash cannot merge ordinary and infinite caches.
+  queryHash: 'shared',
+})

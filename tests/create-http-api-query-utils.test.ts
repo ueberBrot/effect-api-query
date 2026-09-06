@@ -215,6 +215,8 @@ describe('createHttpApiQueryUtils', () => {
         'query',
       ])
       expect(Object.keys(utils['health.check'])).toEqual([
+        'infiniteKey',
+        'infiniteOptions',
         'key',
         'mutationKey',
         'mutationOptions',

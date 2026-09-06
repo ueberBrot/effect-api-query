@@ -30,7 +30,7 @@ export type RunPromiseExit<R = never> = <A, E>(
   options?: { readonly signal?: AbortSignal },
 ) => Promise<Exit.Exit<A, E>>
 
-export type OwnedQueryOption = 'queryFn' | 'queryKey' | 'queryKeyHashFn'
+export type OwnedQueryOption = 'queryFn' | 'queryKey' | 'queryKeyHashFn' | 'queryHash'
 export type OwnedMutationOption = 'mutationFn' | 'mutationKey'
 
 /** Retains the initial-data guarantee through a generated options overload. */

@@ -3,7 +3,7 @@ title: Conditional Queries
 description: Pause queries until their required input is available.
 ---
 
-Use `{ input: skipToken }` when a payload-bearing query has no valid input yet and needs TanStack
+Use `{ input: skipToken }` when an input-bearing query has no valid input yet and needs TanStack
 options such as `staleTime`, `select`, or `initialData`:
 
 ```ts
@@ -21,19 +21,31 @@ const userOptions = rpcQuery.users.get.queryOptions({
 const user = useQuery(userOptions)
 ```
 
-The export preserves the identity of Query Core’s sentinel. A skipped query uses the RPC’s query
-operation prefix as its key and contains no unconstructed payload. The builder preserves caller
-options and their selected-data types. It consumes `input` before returning the options to TanStack.
+The same form works for HTTP request input:
+
+```ts
+const httpUserOptions = http.users.get.queryOptions({
+  input: userId === undefined ? skipToken : { params: { id: userId } },
+  staleTime: 30_000,
+  select: (user) => user.name,
+})
+```
+
+The export preserves the identity of Query Core’s sentinel. A skipped query uses its operation
+prefix as its key, without payload or request identity. HTTP skipping performs no request encoding
+or client invocation. The builder preserves caller options and their selected-data types. It
+consumes `input` before returning the options to TanStack.
 Supplied `initialData` remains available, but React Query types skipped hook data as possibly
 `undefined`, even with an initial value, because its defined-data overload excludes `skipToken`.
 
-The sentinel applies to payload-bearing `queryOptions`, `infiniteOptions`, `streamedOptions`, and
-`liveOptions`. Payloadless operations run without input, and key and mutation builders do not accept
-`skipToken`. TanStack suspense and prefetch-only hooks also reject skipped options at the type level.
+The sentinel applies to input-bearing `queryOptions` and `infiniteOptions` in both adapters, and
+to RPC `streamedOptions` and `liveOptions`. Inputless operations run without input, and key and
+mutation builders do not accept `skipToken`. TanStack suspense and prefetch-only hooks also reject
+skipped options at the type level.
 
-Unary `queryOptions` accepts an input that may be either a payload or `skipToken`. Keep that
-condition inside one builder call so the observer has one consistent callback type. Concrete inputs
-and literal `skipToken` keep their precise key types.
+Unary `queryOptions` accepts an input that may be either a valid RPC payload or HTTP request, or
+`skipToken`. Keep that condition inside one builder call so the observer has one consistent
+callback type. Concrete inputs and literal `skipToken` keep their precise key types.
 
 The object form also works for accumulated streams and live queries:
 
@@ -51,7 +63,12 @@ queries use `{ input: skipToken }` with their required `initialPageParam` and `g
 
 When no caller options are needed, `queryOptions(skipToken)`, `streamedOptions(skipToken)`, and
 `liveOptions(skipToken)` remain available as shorthand. A skipped query has no executable query
-function; supply valid input to enable it.
+function, so manual `refetch()` cannot run it. Supply valid input to enable it. If a complete
+request is available and you need manual refetch, use `enabled: false` instead.
+
+For HTTP pagination, map each page parameter to the complete request and keep stable filters in
+every page. See [Load pages](/effect-rpc-query/guides/http-queries-and-mutations/#load-pages) for
+initial-request identity and cursor progression.
 
 Try this in either [executable example](/effect-rpc-query/examples/#pause-a-query-until-a-user-is-selected).
 The **Choose before fetching** control demonstrates pausing, selecting a user, and reusing fresh

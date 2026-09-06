@@ -126,10 +126,7 @@ const describeRpc = <Rpcs extends Rpc.Any, ClientError>(
     return {
       ...identity,
       kind: 'Unary',
-      infinite: {
-        pageInput: keyPayload._tag === 'Payloadless' ? () => undefined : keyPayload.make,
-        executionError: (operation, cause) => new EffectRpcQueryError(rpcTag, operation, cause),
-      },
+      pageInput: keyPayload._tag === 'Payloadless' ? () => undefined : keyPayload.make,
       invoke: (input, options) =>
         client(rpcTag as never, input as never, options as never) as Effect.Effect<
           unknown,
