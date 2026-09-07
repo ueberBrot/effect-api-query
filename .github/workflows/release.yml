@@ -141,7 +141,11 @@ jobs:
 
       - name: Rehearse the initial release in a disposable directory
         if: github.event_name != 'push'
-        run: vp run rehearse-release
+        shell: bash
+        run: |
+          if [[ "$(node --print "require('./package.json').version")" == "0.0.0" ]]; then
+            vp run rehearse-release
+          fi
 
   publish:
     name: Publish verified artifact
