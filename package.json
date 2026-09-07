@@ -13,7 +13,8 @@
     "url": "git+https://github.com/ueberBrot/effect-api-query.git"
   },
   "files": [
-    "dist"
+    "dist",
+    "CHANGELOG.md"
   ],
   "type": "module",
   "sideEffects": false,
