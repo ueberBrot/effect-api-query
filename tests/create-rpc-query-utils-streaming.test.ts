@@ -9,7 +9,7 @@ import {
   EffectRpcQueryEmptyStreamError,
   EffectRpcQueryError,
   type RunPromiseExit,
-} from '#effect-rpc-query'
+} from '#effect-api-query'
 
 import { makeRpcTestClient } from './fixtures/effect-rpc'
 

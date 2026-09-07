@@ -9,6 +9,7 @@ import {
 } from '@tanstack/query-core'
 import {
   useInfiniteQuery,
+  useMutation,
   usePrefetchInfiniteQuery,
   usePrefetchQuery,
   useQuery,
@@ -1105,6 +1106,24 @@ const callbackMutation = getUser.mutationOptions({
 new MutationObserver(queryClient, callbackMutation).mutate(input) satisfies Promise<
   typeof User.Type
 >
+const mutationHook = useMutation(callbackMutation)
+true satisfies Assert<Equal<typeof mutationHook.data, typeof User.Type | undefined>>
+true satisfies Assert<Equal<typeof mutationHook.error, GetFailure | null>>
+mutationHook.variables satisfies typeof input | undefined
+mutationHook.mutateAsync(input, {
+  onSuccess: (user, request, result) => {
+    user satisfies typeof User.Type
+    request satisfies typeof input
+    result?.previousId satisfies number | undefined
+  },
+  onError: (error, request, result) => {
+    error satisfies GetFailure
+    request satisfies typeof input
+    result?.previousId satisfies number | undefined
+  },
+}) satisfies Promise<typeof User.Type>
+// @ts-expect-error React mutations preserve complete HTTP request containers.
+mutationHook.mutate({ params: { id: 1 } })
 // @ts-expect-error Mutation keys belong to the package.
 getUser.mutationOptions({ mutationKey: ['other'] })
 // @ts-expect-error Mutation functions belong to the package.

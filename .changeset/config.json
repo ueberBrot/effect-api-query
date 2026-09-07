@@ -8,7 +8,7 @@
     "@changesets/changelog-github",
     {
       "disableThanks": true,
-      "repo": "ueberBrot/effect-rpc-query"
+      "repo": "ueberBrot/effect-api-query"
     }
   ],
   "commit": false,

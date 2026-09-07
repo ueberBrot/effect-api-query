@@ -3,6 +3,7 @@
 import { deepStrictEqual, equal, match } from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
 import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { builtinModules } from 'node:module'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -19,10 +20,7 @@ const workspaceConfig = readFileSync(workspaceConfigPath, 'utf8')
 const defaultTarballName = `${repositoryManifest.name.replace(/^@/, '').replaceAll('/', '-')}-${repositoryManifest.version}.tgz`
 const tarballPath = resolve(
   repositoryRoot,
-  process.env['EFFECT_API_QUERY_TARBALL'] ??
-    // Remove the legacy override after the rename migration (#71).
-    process.env['EFFECT_RPC_QUERY_TARBALL'] ??
-    join(artifactDirectory, defaultTarballName),
+  process.env['EFFECT_API_QUERY_TARBALL'] ?? join(artifactDirectory, defaultTarballName),
 )
 
 if (!existsSync(tarballPath)) {
@@ -40,6 +38,12 @@ equal(
   'The packed version must match the root manifest',
 )
 equal('dependencies' in packedManifest, false)
+equal(packedManifest.license, 'ISC')
+equal(packedManifest.sideEffects, false)
+equal(packedManifest.type, 'module')
+equal(packedManifest.repository.url, 'git+https://github.com/ueberBrot/effect-api-query.git')
+equal(packedManifest.homepage, 'https://github.com/ueberBrot/effect-api-query#readme')
+equal(packedManifest.bugs.url, 'https://github.com/ueberBrot/effect-api-query/issues')
 
 const testedVersion = (dependency: keyof typeof repositoryManifest.devDependencies): string => {
   const specifier = repositoryManifest.devDependencies[dependency]
@@ -95,6 +99,23 @@ const builtModule = execFileSync('tar', ['-xOzf', tarballPath, 'package/dist/ind
 match(builtModule, /from ["']@tanstack\/query-core["']/u)
 match(builtModule, /from ["']effect(?:\/unstable\/rpc)?["']/u)
 equal(/\bnode:/u.test(builtModule), false, 'The runtime must not import Node APIs')
+for (const imported of builtModule.matchAll(/\bfrom\s*["'](?<specifier>[^"']+)["']/gu)) {
+  equal(
+    builtinModules.includes(imported.groups?.['specifier'] ?? ''),
+    false,
+    'The runtime must not import bare Node built-ins',
+  )
+}
+const sourceMap = JSON.parse(
+  execFileSync('tar', ['-xOzf', tarballPath, 'package/dist/index.mjs.map'], {
+    encoding: 'utf8',
+  }),
+) as { sources: Array<string> }
+equal(
+  sourceMap.sources.some((source) => source.includes('node_modules/')),
+  false,
+  'The runtime must not bundle private copies of dependencies',
+)
 
 const builtDeclaration = execFileSync('tar', ['-xOzf', tarballPath, 'package/dist/index.d.mts'], {
   encoding: 'utf8',
@@ -247,6 +268,10 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       join(consumerDirectory, 'http-contract.ts'),
     )
     cpSync(join(typeFixtureDirectory, 'type-scale.ts'), join(consumerDirectory, 'type-scale.ts'))
+    cpSync(
+      join(typeFixtureDirectory, 'http-type-scale.ts'),
+      join(consumerDirectory, 'http-type-scale.ts'),
+    )
     for (const fixture of ['docs-rpc-quick-start.ts', 'docs-http-quick-start.ts']) {
       cpSync(join(typeFixtureDirectory, fixture), join(consumerDirectory, fixture))
     }
@@ -285,7 +310,8 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
         consumerDirectory,
         compiler,
         'tsconfig.type-scale.json',
-        peer.label === 'query-core-current' && compiler.label === 'typescript-current',
+        peer.queryCoreVersion === testedVersion('@tanstack/query-core') &&
+          compiler.label === 'typescript-current',
       )
     }
 
