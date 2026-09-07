@@ -49,7 +49,7 @@ export const Route = createFileRoute('/')({
 })
 
 function UsersPage() {
-  const { queryClient, rpcQuery } = Route.useRouteContext()
+  const { invalidateUsers, queryClient, rpcQuery } = Route.useRouteContext()
   const users = useSuspenseQuery(rpcQuery.users.list.queryOptions())
   const [boundedHistory, setBoundedHistory] = useState(false)
   const diagnostics = useSuspenseQuery(streamedDiagnosticsOptions(rpcQuery, boundedHistory))
@@ -65,7 +65,6 @@ function UsersPage() {
   const remainingUsers = Math.max(0, totalUsers - loadedUsers.length)
   const nextPageSize = Math.min(PAGE_SIZE, remainingUsers)
   const [message, setMessage] = useState<string>()
-  const invalidateUsers = () => queryClient.invalidateQueries({ queryKey: rpcQuery.users.key() })
   const addGrace = useMutation(
     rpcQuery.users.create.mutationOptions({
       onSuccess: invalidateUsers,

@@ -1,6 +1,6 @@
-import type { User } from '@effect-rpc-query/contracts'
+import type { User } from '@effect-api-query/contracts'
 import { useQuery } from '@tanstack/react-query'
-import { skipToken } from 'effect-rpc-query'
+import { skipToken } from 'effect-api-query'
 import { useState } from 'react'
 
 import type { TanStackStartApplication } from '../lib/application.ts'

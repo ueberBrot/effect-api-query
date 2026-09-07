@@ -195,12 +195,12 @@ export default defineConfig({
         dependsOn: ['vite-react-build'],
       },
       'tanstack-start-dev': {
-        command: 'vp run --filter @effect-rpc-query/tanstack-start dev',
+        command: 'vp run --filter @effect-api-query/tanstack-start dev',
         cache: false,
         dependsOn: ['pack'],
       },
       'tanstack-start-build': {
-        command: 'vp run --filter @effect-rpc-query/tanstack-start build',
+        command: 'vp run --filter @effect-api-query/tanstack-start build',
         dependsOn: ['pack'],
         input: [{ auto: true }, '!examples/tanstack-start/dist/**'],
         output: ['examples/tanstack-start/dist/**'],

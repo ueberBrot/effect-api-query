@@ -1,4 +1,4 @@
-import { expect, type Page } from '@playwright/test'
+import { expect, type Page, type Request } from '@playwright/test'
 
 export interface ExampleApplication {
   readonly heading: string
@@ -30,3 +30,6 @@ export const prepareExampleApplication = async (
 
 export const recordsRpc = (postData: string | null, rpcTag: string): boolean =>
   postData?.includes(rpcTag) ?? false
+
+export const isHttpRequest = (request: Request, method: string, pathname: string): boolean =>
+  request.method() === method && new URL(request.url()).pathname === `/api${pathname}`

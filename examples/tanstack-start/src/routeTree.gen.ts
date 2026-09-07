@@ -13,7 +13,10 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DetailsRouteImport } from './routes/details'
 import { Route as DiagnosticsRouteImport } from './routes/diagnostics'
 import { Route as FailureRouteImport } from './routes/failure'
+import { Route as HttpRouteImport } from './routes/http'
+import { Route as HttpFailureRouteImport } from './routes/http-failure'
 import { Route as RpcRouteImport } from './routes/rpc'
+import { Route as ApiSplatRouteImport } from './routes/api.$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -35,9 +38,24 @@ const FailureRoute = FailureRouteImport.update({
   path: '/failure',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HttpRoute = HttpRouteImport.update({
+  id: '/http',
+  path: '/http',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HttpFailureRoute = HttpFailureRouteImport.update({
+  id: '/http-failure',
+  path: '/http-failure',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RpcRoute = RpcRouteImport.update({
   id: '/rpc',
   path: '/rpc',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSplatRoute = ApiSplatRouteImport.update({
+  id: '/api/$',
+  path: '/api/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -46,14 +64,20 @@ export interface FileRoutesByFullPath {
   '/details': typeof DetailsRoute
   '/diagnostics': typeof DiagnosticsRoute
   '/failure': typeof FailureRoute
+  '/http': typeof HttpRoute
+  '/http-failure': typeof HttpFailureRoute
   '/rpc': typeof RpcRoute
+  '/api/$': typeof ApiSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/details': typeof DetailsRoute
   '/diagnostics': typeof DiagnosticsRoute
   '/failure': typeof FailureRoute
+  '/http': typeof HttpRoute
+  '/http-failure': typeof HttpFailureRoute
   '/rpc': typeof RpcRoute
+  '/api/$': typeof ApiSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -61,14 +85,42 @@ export interface FileRoutesById {
   '/details': typeof DetailsRoute
   '/diagnostics': typeof DiagnosticsRoute
   '/failure': typeof FailureRoute
+  '/http': typeof HttpRoute
+  '/http-failure': typeof HttpFailureRoute
   '/rpc': typeof RpcRoute
+  '/api/$': typeof ApiSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/details' | '/diagnostics' | '/failure' | '/rpc'
+  fullPaths:
+    | '/'
+    | '/details'
+    | '/diagnostics'
+    | '/failure'
+    | '/http'
+    | '/http-failure'
+    | '/rpc'
+    | '/api/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/details' | '/diagnostics' | '/failure' | '/rpc'
-  id: '__root__' | '/' | '/details' | '/diagnostics' | '/failure' | '/rpc'
+  to:
+    | '/'
+    | '/details'
+    | '/diagnostics'
+    | '/failure'
+    | '/http'
+    | '/http-failure'
+    | '/rpc'
+    | '/api/$'
+  id:
+    | '__root__'
+    | '/'
+    | '/details'
+    | '/diagnostics'
+    | '/failure'
+    | '/http'
+    | '/http-failure'
+    | '/rpc'
+    | '/api/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -76,7 +128,10 @@ export interface RootRouteChildren {
   DetailsRoute: typeof DetailsRoute
   DiagnosticsRoute: typeof DiagnosticsRoute
   FailureRoute: typeof FailureRoute
+  HttpRoute: typeof HttpRoute
+  HttpFailureRoute: typeof HttpFailureRoute
   RpcRoute: typeof RpcRoute
+  ApiSplatRoute: typeof ApiSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -109,11 +164,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FailureRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/http': {
+      id: '/http'
+      path: '/http'
+      fullPath: '/http'
+      preLoaderRoute: typeof HttpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/http-failure': {
+      id: '/http-failure'
+      path: '/http-failure'
+      fullPath: '/http-failure'
+      preLoaderRoute: typeof HttpFailureRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/rpc': {
       id: '/rpc'
       path: '/rpc'
       fullPath: '/rpc'
       preLoaderRoute: typeof RpcRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$': {
+      id: '/api/$'
+      path: '/api/$'
+      fullPath: '/api/$'
+      preLoaderRoute: typeof ApiSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -124,7 +200,10 @@ const rootRouteChildren: RootRouteChildren = {
   DetailsRoute: DetailsRoute,
   DiagnosticsRoute: DiagnosticsRoute,
   FailureRoute: FailureRoute,
+  HttpRoute: HttpRoute,
+  HttpFailureRoute: HttpFailureRoute,
   RpcRoute: RpcRoute,
+  ApiSplatRoute: ApiSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

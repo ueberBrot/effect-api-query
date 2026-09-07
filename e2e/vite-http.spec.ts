@@ -1,13 +1,11 @@
 import { expect, test, type Request } from '@playwright/test'
 
 import {
+  isHttpRequest,
   prepareExampleApplication,
   recordsRpc,
   viteReactApplication,
 } from './example-application.ts'
-
-const isHttpRequest = (request: Request, method: string, pathname: string): boolean =>
-  request.method() === method && new URL(request.url()).pathname === `/api${pathname}`
 
 test.describe('Vite React HTTP API example', () => {
   test.beforeEach(async ({ page }) => prepareExampleApplication(page, viteReactApplication))
