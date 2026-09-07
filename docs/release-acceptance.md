@@ -11,17 +11,12 @@ Commit the candidate, then run:
 
 ```sh
 vp run validate
-vp run rehearse-release
 DOCS_BASE_URL=https://ueberbrot.github.io vp run docs-e2e
 ```
 
-The rehearsal exports the committed source to a temporary directory, projects the initial `0.1.0`
-manifest and changelog there, and builds exactly one archive. It verifies the archive through the
-same isolated RPC/HTTP consumers, compiler matrix, and type-scale fixtures as the release workflow.
-Every private workspace manifest must remain unchanged. The temporary directory is removed on exit.
-
-This projection verifies the versioned package shape and content. Production version-plan generation,
-account configuration, and publication remain in #19. The repository stays at its development version.
+The completed one-time artifact rehearsal is recorded in
+[#73's acceptance evidence](https://github.com/ueberBrot/effect-api-query/issues/73#issuecomment-5569401718).
+Production version-plan generation, account configuration, and publication remain in #19.
 
 The package verifier prints the archive's SHA-512 digest, version, file inventory, peer cases, and
 compiler cases after validation. Record that identity with the candidate SHA and workflow links.
@@ -53,7 +48,7 @@ experiment in #33 remains a recorded deferral.
 ## Record the handoff
 
 Attach the exact candidate SHA, successful validation and dry-run workflow links, artifact digest,
-compiler/peer matrix, local and hosted browser results, dependency audit, and rehearsal result to #73.
+compiler/peer matrix, local and hosted browser results, and dependency audit to #73.
 Check only acceptance criteria supported by that evidence. Keep #1 and #19 open.
 
 The release workflow passes the verified artifact ID directly to publication. Its publication job

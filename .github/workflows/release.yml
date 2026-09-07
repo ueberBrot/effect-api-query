@@ -9,7 +9,6 @@ on:
       - pnpm-lock.yaml
       - pnpm-workspace.yaml
       - scripts/verify-packed-consumer.mts
-      - scripts/rehearse-release.mts
       - vite.config.ts
   push:
     branches:
@@ -138,14 +137,6 @@ jobs:
       - name: Verify dry-run artifact
         if: github.event_name != 'push'
         run: vp run verify-packed-package
-
-      - name: Rehearse the initial release in a disposable directory
-        if: github.event_name != 'push'
-        shell: bash
-        run: |
-          if [[ "$(node --print "require('./package.json').version")" == "0.0.0" ]]; then
-            vp run rehearse-release
-          fi
 
   publish:
     name: Publish verified artifact
