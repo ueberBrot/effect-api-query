@@ -207,7 +207,7 @@ test.describe('TanStack Start HTTP API example', () => {
       ).toBeVisible()
       await expect(serverPage.getByText('Refetching in the browser…')).toBeVisible()
       await expect(serverPage.getByRole('alert')).toHaveCount(0)
-      expect(await response!.text()).not.toContain('requested-failure')
+      expect(await serverPage.content()).not.toContain('requested-failure')
     } finally {
       await context.close()
     }
