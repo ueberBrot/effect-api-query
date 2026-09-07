@@ -108,7 +108,7 @@ test.describe('TanStack Start application', () => {
     await expect(page.getByRole('heading', { name: 'Featured user' })).toBeVisible()
     await expect(page.getByText('Ada Lovelace', { exact: true })).toBeVisible()
 
-    await page.getByRole('link', { name: 'Users' }).click()
+    await page.getByRole('link', { name: 'Users', exact: true }).click()
     await expect(
       page.getByRole('heading', { name: 'Compare full queries, pages, and streams' }),
     ).toBeVisible()
