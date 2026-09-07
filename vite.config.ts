@@ -138,6 +138,10 @@ export default defineConfig({
         command: 'node scripts/verify-packed-consumer.mts',
         cache: false,
       },
+      'rehearse-release': {
+        command: 'node scripts/rehearse-release.mts',
+        cache: false,
+      },
       fallow: {
         command: [
           // Public barrel exports must be exercised by repository evidence.
