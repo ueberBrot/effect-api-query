@@ -255,24 +255,15 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
 
   try {
     cpSync(consumerFixtureDirectory, consumerDirectory, { recursive: true })
-    cpSync(
-      join(typeFixtureDirectory, 'public-contract.ts'),
-      join(consumerDirectory, 'public-contract.ts'),
-    )
-    cpSync(
-      join(typeFixtureDirectory, 'tanstack-start-contract.ts'),
-      join(consumerDirectory, 'tanstack-start-contract.ts'),
-    )
-    cpSync(
-      join(typeFixtureDirectory, 'http-contract.ts'),
-      join(consumerDirectory, 'http-contract.ts'),
-    )
-    cpSync(join(typeFixtureDirectory, 'type-scale.ts'), join(consumerDirectory, 'type-scale.ts'))
-    cpSync(
-      join(typeFixtureDirectory, 'http-type-scale.ts'),
-      join(consumerDirectory, 'http-type-scale.ts'),
-    )
-    for (const fixture of ['docs-rpc-quick-start.ts', 'docs-http-quick-start.ts']) {
+    for (const fixture of [
+      'public-contract.ts',
+      'tanstack-start-contract.ts',
+      'http-contract.ts',
+      'type-scale.ts',
+      'http-type-scale.ts',
+      'docs-rpc-quick-start.ts',
+      'docs-http-quick-start.ts',
+    ]) {
       cpSync(join(typeFixtureDirectory, fixture), join(consumerDirectory, fixture))
     }
 
