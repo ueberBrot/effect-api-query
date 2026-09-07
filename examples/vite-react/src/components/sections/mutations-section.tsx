@@ -10,14 +10,13 @@ export const MutationsSection = ({
 }: {
   readonly application: ViteReactApplication
 }) => {
-  const { queryClient, rpcQuery } = application
+  const { invalidateUsers, rpcQuery } = application
   const voidQuery = useQuery(
     rpcQuery.diagnostics.cancel.queryOptions({
       enabled: false,
       input: { operationId: 'no-active-operation' },
     }),
   )
-  const invalidateUsers = () => queryClient.invalidateQueries({ queryKey: rpcQuery.users.key() })
   const resetUsers = useMutation(
     rpcQuery.testing.reset.mutationOptions({ onSuccess: invalidateUsers }),
   )

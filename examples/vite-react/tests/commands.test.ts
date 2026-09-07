@@ -1,4 +1,4 @@
-import { startExampleRpcServer } from '@effect-rpc-query/server'
+import { startExampleRpcServer } from '@effect-api-query/server'
 import { MutationObserver, QueryObserver } from '@tanstack/react-query'
 import { Effect, Exit, Scope } from 'effect'
 import { expect, it } from 'vitest'

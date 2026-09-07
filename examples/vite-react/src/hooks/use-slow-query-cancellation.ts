@@ -1,5 +1,4 @@
-import type { DiagnosticStatus } from '@effect-rpc-query/contracts'
-import { useQuery } from '@tanstack/react-query'
+import type { DiagnosticStatus } from '@effect-api-query/contracts'
 import { useRef, useState } from 'react'
 
 import type { ViteReactApplication } from '../lib/application.ts'
@@ -42,21 +41,25 @@ const delay = (milliseconds: number) =>
     globalThis.setTimeout(resolve, milliseconds)
   })
 
-/** Coordinates several typed RPC operations as one cancellation demonstration. */
-export const useSlowQueryCancellation = ({ queryClient, rpcQuery }: ViteReactApplication) => {
+/** Coordinates typed diagnostic operations as one cancellation demonstration. */
+export const useSlowQueryCancellation = (
+  { queryClient, rpcQuery, httpQuery }: ViteReactApplication,
+  transport: 'rpc' | 'http' = 'rpc',
+) => {
   const [state, setState] = useState<SlowQueryCancellationState>({ _tag: 'Idle' })
   const baseline = useRef<DiagnosticStatus | undefined>(undefined)
-  const slowQuery = useQuery(
-    rpcQuery.diagnostics.slow.queryOptions({
-      enabled: false,
-      input: slowInput,
-    }),
-  )
+  const slowKey =
+    transport === 'http'
+      ? httpQuery.diagnostics.slow.queryKey({ query: slowInput })
+      : rpcQuery.diagnostics.slow.queryKey(slowInput)
+  const runSlowQuery = () =>
+    transport === 'http'
+      ? queryClient.query(httpQuery.diagnostics.slow.queryOptions({ input: { query: slowInput } }))
+      : queryClient.query(rpcQuery.diagnostics.slow.queryOptions({ input: slowInput }))
   const readStatus = () =>
-    queryClient.query({
-      ...rpcQuery.diagnostics.status.queryOptions(),
-      staleTime: 0,
-    })
+    transport === 'http'
+      ? queryClient.query({ ...httpQuery.diagnostics.status.queryOptions(), staleTime: 0 })
+      : queryClient.query({ ...rpcQuery.diagnostics.status.queryOptions(), staleTime: 0 })
 
   const waitForStatus = async (
     predicate: (status: DiagnosticStatus) => boolean,
@@ -74,7 +77,7 @@ export const useSlowQueryCancellation = ({ queryClient, rpcQuery }: ViteReactApp
     try {
       const before = await readStatus()
       baseline.current = before
-      void slowQuery.refetch()
+      void runSlowQuery().catch(() => undefined)
       await waitForStatus(({ started }) => started > before.started)
       setState({ _tag: 'Ready' })
     } catch (error) {
@@ -90,7 +93,7 @@ export const useSlowQueryCancellation = ({ queryClient, rpcQuery }: ViteReactApp
     try {
       // TanStack aborts the query signal; the ready client interrupts the server operation.
       await queryClient.cancelQueries({
-        queryKey: rpcQuery.diagnostics.slow.queryKey(slowInput),
+        queryKey: slowKey,
       })
       const status = await waitForStatus(({ interrupted }) => interrupted > before.interrupted)
       setState({ _tag: 'Cancelled', interruptions: status.interrupted })

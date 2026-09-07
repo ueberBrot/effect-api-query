@@ -1,5 +1,5 @@
 {
-  "name": "@effect-rpc-query/vite-react",
+  "name": "@effect-api-query/vite-react",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -8,15 +8,15 @@
     "dev": "vp dev"
   },
   "dependencies": {
-    "@effect-rpc-query/contracts": "workspace:@effect-api-query/contracts@*",
+    "@effect-api-query/contracts": "workspace:*",
     "@tanstack/react-query": "catalog:",
     "effect": "catalog:",
-    "effect-rpc-query": "workspace:effect-api-query@*",
+    "effect-api-query": "workspace:*",
     "react": "catalog:",
     "react-dom": "catalog:"
   },
   "devDependencies": {
-    "@effect-rpc-query/server": "workspace:@effect-api-query/server@*",
+    "@effect-api-query/server": "workspace:*",
     "@tailwindcss/vite": "catalog:",
     "@testing-library/react": "catalog:",
     "@types/react": "catalog:",

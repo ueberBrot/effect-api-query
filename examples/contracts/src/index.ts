@@ -9,3 +9,4 @@ export {
   UserPage,
 } from './contracts.ts'
 export type { CommandPayload, DiagnosticStatus, SlowDiagnosticInput } from './contracts.ts'
+export { exampleHttpApi, ExampleHttpAuthorization } from './http-api.ts'

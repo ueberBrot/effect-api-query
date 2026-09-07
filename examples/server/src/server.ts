@@ -3,7 +3,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import { Readable } from 'node:stream'
 
 import { acquireNodeServer, closeNodeServer } from './node-server-resource.ts'
-import { makeExampleRpcWebHandler } from './web-handler.ts'
+import { makeExampleWebHandler } from './web-handler.ts'
 
 class ExampleRpcServerError extends Schema.TaggedError<ExampleRpcServerError>()(
   'ExampleRpcServerError',
@@ -63,18 +63,22 @@ const writeWebResponse = async (response: Response, target: ServerResponse): Pro
   })
 }
 
-const setCorsHeaders = (response: ServerResponse): void => {
+const setCorsHeaders = (response: ServerResponse, httpApi: boolean): void => {
   response.setHeader(
     'access-control-allow-headers',
     'baggage,content-type,traceparent,tracestate,x-example-authorization',
   )
-  response.setHeader('access-control-allow-methods', 'POST,OPTIONS')
+  response.setHeader(
+    'access-control-allow-methods',
+    httpApi ? 'GET,POST,DELETE,OPTIONS' : 'POST,OPTIONS',
+  )
   response.setHeader('access-control-allow-origin', '*')
 }
 
 export interface RunningExampleRpcServer {
   readonly host: string
   readonly port: number
+  readonly httpApiUrl: string
   readonly rpcUrl: string
   readonly url: string
 }
@@ -89,7 +93,7 @@ export const startExampleRpcServer = Effect.fn('ExampleRpc.startExampleRpcServer
   options: StartExampleRpcServerOptions = {},
 ) {
   const host = options.host ?? '127.0.0.1'
-  const webHandler = yield* makeExampleRpcWebHandler()
+  const webHandler = yield* makeExampleWebHandler()
   const server = createServer((request, response) => {
     const address = server.address()
     const port = typeof address === 'object' && address !== null ? address.port : 0
@@ -104,6 +108,7 @@ export const startExampleRpcServer = Effect.fn('ExampleRpc.startExampleRpcServer
     }
     const path = url.pathname
     const isRpcPath = path === '/rpc' || path === '/rpc/'
+    const isHttpPath = path.startsWith('/api/')
 
     if (request.method === 'GET' && path === '/health') {
       response.statusCode = 200
@@ -112,20 +117,20 @@ export const startExampleRpcServer = Effect.fn('ExampleRpc.startExampleRpcServer
       return
     }
 
-    if (request.method === 'OPTIONS' && isRpcPath) {
-      setCorsHeaders(response)
+    if (request.method === 'OPTIONS' && (isRpcPath || isHttpPath)) {
+      setCorsHeaders(response, isHttpPath)
       response.statusCode = 204
       response.end()
       return
     }
 
-    if (request.method !== 'POST' || !isRpcPath) {
+    if (!(request.method === 'POST' && isRpcPath) && !isHttpPath) {
       response.statusCode = 404
       response.end()
       return
     }
 
-    setCorsHeaders(response)
+    setCorsHeaders(response, isHttpPath)
     let webRequest: Request
     try {
       webRequest = toWebRequest(request, response, url)
@@ -184,6 +189,7 @@ export const startExampleRpcServer = Effect.fn('ExampleRpc.startExampleRpcServer
   return {
     host,
     port,
+    httpApiUrl: `${url}/api`,
     rpcUrl: `${url}/rpc`,
     url,
   } satisfies RunningExampleRpcServer
