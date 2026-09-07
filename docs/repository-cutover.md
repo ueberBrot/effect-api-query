@@ -1,48 +1,96 @@
-# Hosted documentation cutover
+# Repository cutover
 
-Issue #70 prepares the documentation for the rename. The new addresses below are cutover targets,
-not evidence of a deployed site. Execute this checklist in #72 after #71 certifies the package.
+The existing repository was renamed in place on 7 September 2026 for
+[issue #72](https://github.com/ueberBrot/effect-api-query/issues/72). The package and documentation
+preparation from #71 was already merged at `b23d7bf0a2f09c2a406f1f78fe5bd93093f118a6`.
 
-| Reference      | Before cutover                                  | Target                                          |
-| -------------- | ----------------------------------------------- | ----------------------------------------------- |
-| Repository     | `ueberBrot/effect-rpc-query`                    | `ueberBrot/effect-api-query`                    |
-| Pages root     | `https://ueberbrot.github.io/effect-rpc-query/` | `https://ueberbrot.github.io/effect-api-query/` |
-| npm package    | `effect-api-query`                              | `effect-api-query`                              |
-| Docs workspace | `@effect-api-query/docs`                        | `@effect-api-query/docs`                        |
+## Canonical addresses
 
-The package repository URL is `git+https://github.com/ueberBrot/effect-api-query.git`, its homepage
-is `https://github.com/ueberBrot/effect-api-query#readme`, and its issue URL is
-`https://github.com/ueberBrot/effect-api-query/issues`. The changelog repository slug is
-`ueberBrot/effect-api-query`. These local inputs are prepared; #72 verifies the hosted targets.
-After the rename, set an SSH origin with
-`git remote set-url origin git@github.com:ueberBrot/effect-api-query.git`.
+| Reference     | Address                                         |
+| ------------- | ----------------------------------------------- |
+| Repository    | https://github.com/ueberBrot/effect-api-query   |
+| Documentation | https://ueberbrot.github.io/effect-api-query/   |
+| SSH origin    | `git@github.com:ueberBrot/effect-api-query.git` |
+| Package       | `effect-api-query`                              |
 
-The repository database ID is `1349852547` (node ID `R_kgDOUHUdgw`), with default branch `main`.
-Confirm these identities before and after cutover; renaming must preserve the existing repository.
+The root manifest and site configuration contain the current package metadata, documentation base,
+and source/edit/social links. The repository description and homepage now match them.
 
-1. Record the repository database identity, default branch, current commit, settings, native
-   sub-issues, and dependency edges. Verify that the target repository name is usable and that
-   #71's metadata preparation has merged. Rename the existing repository in place.
-2. Update local remotes and the repository homepage to the target addresses. Inspect protections,
-   environments, required checks, and installed integrations for references to the old slug.
-   Confirm that the repository identity, history, issues, PRs, and dependency edges survived.
-3. Run the configured docs checks, build, and browser acceptance against the selected commit.
-   Inspect source/edit/social links, the npm version link and fallback, SVG metadata, and generated
-   `llms.txt`, `llms-full.txt`, and linked Markdown under the target Pages root.
-4. Dispatch `.github/workflows/deploy-docs.yml` from the reviewed commit through its existing
-   `workflow_dispatch` trigger. Preserve its reusable `workflow_call` trigger and `github-pages`
-   environment. Record the successful workflow and deployment URL.
-5. Open the deployed target URL directly. Follow both quick starts, sidebar links, search results,
-   and source/edit links. Check script, stylesheet, icon, and search asset responses. Repeat the
-   generated-text URL checks against the hosted files. Preview results alone do not verify Pages.
-6. Request both old repository and old Pages URLs and record their actual status and redirect
-   targets separately. Repository redirects do not establish Pages behavior. Keep the old
-   repository name vacant so its redirects remain available.
-7. Clone the new repository URL into a fresh disposable directory, install the declared workspace,
-   and verify source links and workflow access. Link the evidence in #72 and pass the canonical
-   repository identity, `.github/workflows/release.yml`, and `npm` publication environment to #19.
-   Account configuration and publication remain in that human issue.
+## Preserved identity and settings
 
-The site configuration, workspace manifest, and root task graph are authoritative for executable
-paths and commands. The rename does not require moving an existing checkout. To change its folder
-name, close the editor, move the checkout yourself, and reopen it; keep existing caches and volumes.
+Before/after GitHub API snapshots confirmed the same repository database ID `1349852547`, node ID
+`R_kgDOUHUdgw`, default branch `main`, and main commit. All 84 existing issue/PR records retained
+their IDs, numbers, and states; all 34 native children of #1 survived. The recorded dependency
+sets for #1, #19, #71, #72, and #73 were unchanged, including all 11 blockers of #19.
+Issues #1 and #19 remain open; completed work remains closed.
+
+There were no branch protections, rulesets, required checks, or repository webhooks to migrate.
+Actions remained enabled with read-only default workflow permissions. Existing CI check names and
+workflow IDs were preserved. The repository's installed-app page still lists its release bot
+(installation `104164746`); no repository-side integration needed a slug change. Its account-level
+configuration requires GitHub reauthentication and was not changed.
+
+The existing `github-pages` environment retained its ID and `main` deployment policy. Pages still
+uses workflow deployment, enforces HTTPS, and has no custom domain. The release workflow referred
+to an absent `npm` environment; the cutover created it with a `main`-only deployment policy.
+No credentials or npm account settings were added.
+
+## Hosted verification
+
+The [documentation deployment](https://github.com/ueberBrot/effect-api-query/actions/runs/34109083418)
+succeeded for the prepared main commit above. The shared browser acceptance suite passed all 21
+cases against the deployed site in Chromium, Firefox, and WebKit. It checks both quick starts,
+sidebar navigation, real search results and assets, canonical source/edit/social links, branded SVG
+icons, registry-version updates and fallback, generated text, and its internal documentation links.
+Registry responses are controlled in the version cases; the other site responses come from Pages.
+
+The [release dry run](https://github.com/ueberBrot/effect-api-query/actions/runs/34109094089)
+passed artifact packing and isolated package verification from the same commit. Publication and
+version-PR jobs were skipped: both require a `push` event, while this run used `workflow_dispatch`.
+A fresh SSH clone from the canonical URL resolved the same commit and installed all six workspaces
+with the frozen lockfile.
+
+Direct unauthenticated requests observed these responses after deployment:
+
+| Old address                                                         | Response                                               |
+| ------------------------------------------------------------------- | ------------------------------------------------------ |
+| `https://github.com/ueberBrot/effect-rpc-query`                     | 301 to the canonical repository                        |
+| `https://github.com/ueberBrot/effect-rpc-query/pull/84`             | 301 to the same PR under the new name                  |
+| `https://github.com/ueberBrot/effect-rpc-query/blob/main/README.md` | 301 to the same source path under the new name         |
+| `https://github.com/ueberBrot/effect-rpc-query/issues/72`           | 404 for both GET and HEAD; use the canonical issue URL |
+| `https://ueberbrot.github.io/effect-rpc-query/`                     | 404; no Pages redirect                                 |
+
+The canonical Pages root returned 200. These are observed responses, not a promise that every old
+URL redirects. Keep the old repository name vacant to preserve GitHub's available redirects.
+
+## Repeat documentation acceptance
+
+Run the configured documentation checks and browser suite against the local production preview.
+To verify an existing deployment with the same suite:
+
+```sh
+DOCS_BASE_URL=https://ueberbrot.github.io vp run docs-e2e
+```
+
+The override supplies the origin; the suite retains the canonical project path and starts no local
+preview server. Deployment remains available through the existing documentation workflow's manual
+and reusable triggers, using the `github-pages` environment.
+
+## Publication handoff
+
+[Issue #19](https://github.com/ueberBrot/effect-api-query/issues/19) owns npm name control, trusted
+publisher configuration, any first-publication bootstrap, final publication, and independent npm
+verification. Its exact publisher identity is owner `ueberBrot`, repository `effect-api-query`,
+workflow `release.yml` at `.github/workflows/release.yml`, and environment `npm`.
+Issue #73 remains the final implementation gate before those operations.
+
+## Existing checkouts
+
+Update an existing SSH origin with:
+
+```sh
+git remote set-url origin git@github.com:ueberBrot/effect-api-query.git
+```
+
+The checkout directory is independent of package resolution. If you rename its folder, finish
+active processes and reopen the editor at the new path. Existing caches and volumes remain usable.

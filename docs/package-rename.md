@@ -6,22 +6,22 @@ fixtures use the canonical package identity. Temporary rename bridges have been 
 
 ## Remaining migration batches
 
-| Ticket    | Remaining names and locations                           | Completion condition                                                                        |
-| --------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| #72       | Local git remote and hosted repository/Pages references | Rename upstream and verify hosted references using the prepared metadata.                   |
-| #73 / #19 | Final artifact acceptance and publication identity      | Rehearse the complete package in #73; perform account configuration and publication in #19. |
+| Ticket    | Remaining names and locations                      | Completion condition                                                                        |
+| --------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| #73 / #19 | Final artifact acceptance and publication identity | Rehearse the complete package in #73; perform account configuration and publication in #19. |
 
 `EFFECT_API_QUERY_TARBALL` overrides the archive path. Otherwise, the verifier derives the archive
 name from the root manifest. CI passes its selected archive through this same variable.
 
-After #72 completes the upstream cutover, #73 removes this inventory and replaces the link in
+The upstream cutover is recorded in [the verification record](repository-cutover.md).
+Issue #73 removes this inventory and replaces the link in
 ADR 0016 with the completed #62 issue. Lasting decisions remain in the ADRs.
 
 ## Intentional old names
 
-Documentation now prepares `ueberBrot/effect-api-query` and `/effect-api-query/`. The current
-upstream repository and deployed Pages site retain their old addresses until #72 completes the
-[hosted cutover checklist](repository-cutover.md). Root package metadata targets the new repository.
+The repository is `ueberBrot/effect-api-query`, and the deployed documentation uses
+`/effect-api-query/`. The [cutover record](repository-cutover.md) retains the old addresses solely
+to document observed redirects and the old Pages 404. Root package metadata uses the new repository.
 
 ADR 0013 records the original root-package identity. Historical ADR rationale, closed issue and PR
 references, commit history, and immutable build evidence retain their original names. When a later
