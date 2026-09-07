@@ -1,195 +1,144 @@
 ---
 title: TanStack Start
-description: Share generated query options across loaders, SSR, and React components.
+description: Use generated query options in Start loaders, server rendering, and React components.
 ---
 
-Use this guide to connect an existing Effect contract to Start loaders and React Query hooks.
-The runnable example serves both RPC and HTTP from one Start process.
+Use `effect-api-query` with your existing TanStack Start router and Effect contract. Choose the
+factory for your contract, then use its generated options with TanStack Query in loaders and
+components.
 
-## Host Effect RPC in Start
+## Choose a factory
 
-Create an exact server route and pass its Web `Request` to a long-lived Effect RPC handler:
+For an Effect RPC group, pass your ready RPC client to `createRpcQueryUtils`:
 
 ```ts
-export const Route = createFileRoute('/rpc')({
-  server: {
-    handlers: {
-      POST: ({ request }) => handleApiRequest(request),
-    },
-  },
+import { createRpcQueryUtils } from 'effect-api-query'
+
+const queryUtils = createRpcQueryUtils(rpcGroup, {
+  client: rpcClient,
+  keyPrefix: ['app', identity],
+  runPromiseExit,
 })
 ```
 
-Effect's request/response RPC transport sends every query and mutation to this POST endpoint. It
-does not map queries to GET requests or encode procedure names in the URL. Build the handler once
-for the Start server's lifetime so RPC state and acquired resources survive individual requests.
-
-Configure a trusted application origin for server rendering. In the executable example, set the server-only
-`EXAMPLE_API_ORIGIN` environment variable; it defaults to `http://127.0.0.1:3000`. Use the relative
-`/rpc` endpoint for browser calls.
-
-## Host an Effect HTTP API alongside RPC
-
-Mount the shared HTTP contract at `/api/$` and forward each endpoint's declared method to the
-long-lived HTTP handler. Keep the exact `/rpc` route for RPC requests. In the example, both handlers
-share the user directory, while each transport retains its own generated query keys.
+For an Effect HTTP API, use `createHttpApiQueryUtils` with your ready `HttpApiClient` instead:
 
 ```ts
-export const Route = createFileRoute('/api/$')({
-  server: {
-    handlers: {
-      GET: ({ request }) => handleApiRequest(request),
-      POST: ({ request }) => handleApiRequest(request),
-      DELETE: ({ request }) => handleApiRequest(request),
-    },
-  },
+import { createHttpApiQueryUtils } from 'effect-api-query'
+
+const queryUtils = createHttpApiQueryUtils(httpApi, {
+  client: httpClient,
+  keyPrefix: ['app', identity],
+  runPromiseExit,
 })
 ```
 
-The example uses the trusted `EXAMPLE_API_ORIGIN` for server calls to both `/rpc` and `/api`.
-Browser calls use same-origin paths. Keep the server destination in trusted configuration so
-incoming `Host` and forwarded headers cannot redirect server-side requests.
+Here, `identity` is a safe cache partition for the current user or tenant, and `runPromiseExit`
+is your application's runner. Configure transport URLs, authentication, and required services when
+creating the client and runner. Use a trusted server destination for SSR and a browser-accessible
+destination for client requests.
 
-Create a ready `HttpApiClient` with the request's authentication context, then pass it to
-`createHttpApiQueryUtils`. Add the resulting `httpQuery` tree to the same router context as
-`queryClient` and `rpcQuery`. See [HTTP queries and mutations](/effect-rpc-query/guides/http-queries-and-mutations/)
-for the factory and request containers.
+The [RPC factory reference](/effect-rpc-query/reference/factory/) and
+[HTTP guide](/effect-rpc-query/guides/http-queries-and-mutations/) cover client setup, optional
+runners, and request inputs. The package generates query options; your application owns the API
+host, router, and providers.
 
-## Share utilities through the router context
+## Prefetch in a loader and read in a component
 
-Put the application-owned `QueryClient` and generated utility trees in the router context. A route loader
-can then fill the cache used by its component:
+Expose your `queryUtils` and application-owned `QueryClient` through the router context. For a
+contract with a `users.list` operation, the same generated options work in both places:
 
 ```tsx
-export const Route = createFileRoute('/')({
-  loader: async ({ context }) => {
-    await context.queryClient.query({
-      ...context.rpcQuery.users.list.queryOptions(),
-      staleTime: 'static',
-    })
-  },
+export const Route = createFileRoute('/users')({
+  loader: ({ context }) => context.queryClient.query(context.queryUtils.users.list.queryOptions()),
   component: UsersRoute,
 })
 
 function UsersRoute() {
-  const { rpcQuery } = Route.useRouteContext()
-  const users = useSuspenseQuery(rpcQuery.users.list.queryOptions())
+  const { queryUtils } = Route.useRouteContext()
+  const users = useSuspenseQuery(queryUtils.users.list.queryOptions())
   return <pre>{JSON.stringify(users.data, null, 2)}</pre>
 }
 ```
 
-For HTTP, prefetch the directory and first page in the loader. Use the same builders in the
-component so the browser reads the hydrated entries:
+Set a suitable `staleTime` on the Query Client or generated options so successful loader data
+remains fresh during hydration and navigation. Keep the same key prefix and request inputs on
+the server and browser to address the same cache entry.
 
-```tsx
-import type { TanStackStartApplication } from '../lib/application.ts'
+For pagination, pass generated `infiniteOptions` to `queryClient.infiniteQuery` in the loader and
+`useInfiniteQuery` in the component. After a write, use generated `mutationOptions` and invalidate
+the relevant group key. These are ordinary TanStack Query operations; see
+[Cache Management](/effect-rpc-query/guides/cache-management/) and
+[Generated Builders](/effect-rpc-query/reference/generated-builders/).
 
-const userPagesOptions = (httpQuery: TanStackStartApplication['httpQuery']) =>
-  httpQuery.users.page.infiniteOptions({
-    initialPageParam: 0,
-    input: (cursor: number) => ({ query: { cursor, pageSize: 4 } }),
-    getNextPageParam: (page) => page.nextCursor ?? undefined,
-  })
+## Own request lifetimes and hydration
 
-export const Route = createFileRoute('/http')({
-  loader: ({ context }) =>
-    Promise.all([
-      context.queryClient.query(context.httpQuery.users.list.queryOptions()),
-      context.queryClient.infiniteQuery(userPagesOptions(context.httpQuery)),
-    ]),
-  component: HttpUsersRoute,
-})
+Create a fresh Query Client and request-specific client, runner, and utility tree for each
+server-rendered page. Keep authentication in that request's client or runner. A key prefix can
+partition cached data by identity, but does not replace separate request ownership.
 
-function HttpUsersRoute() {
-  const { httpQuery } = Route.useRouteContext()
-  const users = useSuspenseQuery(httpQuery.users.list.queryOptions())
-  const pages = useInfiniteQuery(userPagesOptions(httpQuery))
-  return (
-    <>
-      <pre>{JSON.stringify(users.data, null, 2)}</pre>
-      <button disabled={!pages.hasNextPage} onClick={() => void pages.fetchNextPage()}>
-        Load next page
-      </button>
-    </>
-  )
-}
-```
-
-Set a suitable `staleTime` on the Query Client or generated options. The example keeps successful
-data fresh for 60 seconds, allowing hydration and navigation to reuse it without duplicate reads.
-Use generated mutations and group keys to invalidate the relevant cache after a write. When both
-transports expose the same data, invalidate both utility groups.
-
-## Preserve application lifetimes
-
-Create a fresh Query Client, ready clients, runners, and utility trees for each server-rendered
-page request. Keep authentication context in that request's clients and use a safe identity partition
-in the key prefix when identity affects results. Dehydrate that request's Query Client, send
-its state to the browser, and hydrate a browser-owned Query Client. Reusing the same generated
-options preserves cache identity. RPC keys include the RPC tag, operation, and canonical payload;
-HTTP keys include the API identifier, group, endpoint, operation, and encoded request parts. Both
-include the application key prefix.
-
-`effect-api-query` does not create the router, providers, request context, or hydration boundary.
-The executable [TanStack Start example](https://github.com/ueberBrot/effect-rpc-query/tree/main/examples/tanstack-start)
-shows the complete integration, including handler cleanup for server-route requests and hot module
-replacement. Cancel outstanding queries and dispose the request's runtime when SSR finishes or
-the request aborts. The browser owns a separate runtime for its application lifetime.
-
-The example's authorization header is a public demonstration value. The ownership fixture creates
-separate authorized and anonymous clients and verifies their cache and disposal isolation; replace
-that value with your application's request authentication when adapting the example.
-
-The Vite preview configuration disables compression for `/api/` and `/rpc`. Its current compression
-middleware delays response-close listeners until the first write, preventing a pending buffered
-request from observing a disconnect. The browser acceptance test verifies both the aborted request
-and the server's interruption count. Production hosts must likewise propagate disconnects to the
-Web `Request` signal.
-
-## Omit failed queries from dehydration
-
-Keep TanStack's `defaultShouldDehydrateQuery` policy. It dehydrates successful data and omits failed
-queries, so `EffectHttpApiQueryError` and its Effect cause need no SSR serializer. The browser
-refetches an omitted query and receives a fresh typed error if the endpoint fails again.
-
-The example's `/http-failure` route catches the loader rejection so rendering can continue, then
-uses the same generated query options in `useQuery`. The browser renders the new error's group,
-endpoint, operation, and cause. Successful decoded Schema class values are converted to plain data
-with `structuredClone` before serialization; applications needing class methods must restore them
-explicitly after hydration.
-
-## Dehydrate an open stream
-
-Completed query data, including a completed stream's cached value, uses TanStack's normal
-dehydration contract. An open stream remains in `fetchStatus: 'fetching'`, so a server loader must
-capture a successful snapshot and cancel the query before dehydration can finish:
+Connect the router to that Query Client with TanStack's SSR integration:
 
 ```ts
-const fetchStreamSnapshot = async (queryClient, options) => {
-  let stopWatching = () => {}
-  const snapshotReady = new Promise((resolve, reject) => {
-    const inspect = () => {
-      const state = queryClient.getQueryState(options.queryKey)
-      if (state?.status === 'success') resolve()
-      if (state?.status === 'error') reject(state.error)
-    }
-    stopWatching = queryClient.getQueryCache().subscribe(inspect)
-    inspect()
-  })
-  const fetching = queryClient.query(options)
+import { defaultShouldDehydrateQuery } from '@tanstack/react-query'
+import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
 
-  try {
-    await snapshotReady
-    await queryClient.cancelQueries({ exact: true, queryKey: options.queryKey })
-    return await fetching
-  } catch (error) {
-    await fetching.catch(() => undefined)
-    throw error
-  } finally {
-    stopWatching()
-  }
-}
+setupRouterSsrQueryIntegration({
+  router,
+  queryClient,
+  dehydrateOptions: {
+    shouldDehydrateQuery: defaultShouldDehydrateQuery,
+  },
+})
 ```
 
-Cancellation closes the stream iterator and its Effect resources. The browser hydrates the server
-snapshot, then may refetch according to ordinary TanStack policies.
+The server dehydrates its Query Client; the browser hydrates a browser-owned Query Client and
+uses its own ready client and runner. Register cleanup with the server request lifecycle: cancel
+outstanding queries before disposing their runtime when SSR finishes or the request aborts. Keep
+the browser runtime alive for the browser application's lifetime.
+
+Successful query data must satisfy your serializer's contract. If an endpoint returns decoded
+Schema class instances, decide whether the browser needs plain data or reconstructed instances.
+The package does not serialize query data for you.
+
+## Let the browser refetch failed queries
+
+Keep TanStack's `defaultShouldDehydrateQuery` policy to dehydrate successful data and omit failed
+queries. The browser can then refetch an omitted query and receive a fresh `EffectRpcQueryError`
+or `EffectHttpApiQueryError`, including its Effect cause, if the operation fails again. This avoids
+serializing an error and its cause into the page.
+
+When the page should render despite a loader failure, catch the loader rejection and use
+`useQuery` in the component to render pending and error states. Otherwise, allow the loader error
+to reach your route's error handling. See
+[Handle Failures](/effect-rpc-query/guides/handle-failures/) for inspecting typed failures.
+
+## Capture an RPC stream snapshot
+
+Completed stream data uses TanStack's normal dehydration contract. An open RPC stream remains
+in `fetchStatus: 'fetching'`. To render its first successful value, start the generated query,
+wait for a successful cache snapshot, then cancel the query before dehydration completes.
+Cancellation closes the iterator and releases its Effect resources. The browser hydrates the
+snapshot and may refetch according to your TanStack policies.
+
+The example's
+[`fetchStreamSnapshot`](https://github.com/ueberBrot/effect-rpc-query/blob/main/examples/tanstack-start/src/lib/query-ssr.ts)
+shows the cache subscription, cancellation, and cleanup needed for this pattern.
+
+## Explore the executable example
+
+The [TanStack Start example](https://github.com/ueberBrot/effect-rpc-query/tree/main/examples/tanstack-start)
+includes separate RPC and HTTP views to demonstrate both factories. It verifies successful SSR,
+hydration without duplicate reads, cached navigation, pagination, mutations, failures, and
+cancellation. Its `/http-failure` route demonstrates omission and browser refetch of a failed query.
+See [Executable Examples](/effect-rpc-query/examples/) for commands and controls.
+
+The example serves RPC at `/rpc` and HTTP at `/api/$`. Both handlers share a demonstration user
+directory, so writes invalidate both sets of query keys. Its authorization header is a public
+demonstration value; the ownership tests use separate identities to verify cache and disposal
+isolation. Its SSR setup converts decoded Schema class values to plain data with `structuredClone`.
+
+The example also disables Vite preview compression for its API routes. The pinned middleware
+delays response-close listeners until the first write, preventing a pending buffered request from
+observing a disconnect. This host-specific setting lets the browser tests verify both aborted
+requests and server interruption.

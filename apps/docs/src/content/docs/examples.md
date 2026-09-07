@@ -3,9 +3,10 @@ title: Executable Examples
 description: Run the repository's React Query and TanStack Start applications.
 ---
 
-The repository contains two complete applications. Both use the same RPC and HTTP contracts
-and handlers, with a separate host for Vite and server routes for Start. Both RPC endpoints accept request bodies
-up to 1 MiB and return HTTP 413 for larger bodies.
+The repository contains two complete applications. Each includes separate RPC and HTTP views
+to demonstrate the corresponding factory. The applications share contracts and handlers, with a
+separate host for Vite and server routes for Start. Both RPC endpoints accept request bodies up
+to 1 MiB and return HTTP 413 for larger bodies.
 
 | Example                                                                                           | Demonstrates                                                                                       | API host                                          | Application URL         |
 | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------- | ----------------------- |

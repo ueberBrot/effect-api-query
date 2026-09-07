@@ -1,9 +1,11 @@
-import { expect, test, type Request } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
-import { prepareExampleApplication, tanStackStartApplication } from './example-application.ts'
-
-const isHttpRequest = (request: Request, method: string, pathname: string): boolean =>
-  request.method() === method && new URL(request.url()).pathname === `/api${pathname}`
+import {
+  isHttpRequest,
+  prepareExampleApplication,
+  recordsRpc,
+  tanStackStartApplication,
+} from './example-application.ts'
 
 const httpUrl = `${tanStackStartApplication.url}/http`
 
@@ -136,6 +138,62 @@ test.describe('TanStack Start HTTP API example', () => {
     expect(request.failure()).not.toBeNull()
     await expect(page.getByText('HTTP: Server interruptions: 1')).toBeVisible()
   })
+
+  for (const transport of ['http', 'rpc'] as const) {
+    test(`navigation cancels the pending ${transport.toUpperCase()} operation and stops status requests`, async ({
+      page,
+    }) => {
+      if (transport === 'rpc') {
+        await page.getByRole('link', { name: 'Diagnostics', exact: true }).click()
+      }
+      let statusRequests = 0
+      page.on('request', (request) => {
+        if (
+          new URL(request.url()).pathname.startsWith('/api/diagnostics/operations/') ||
+          recordsRpc(request.postData(), 'diagnostics.operationStatus')
+        )
+          statusRequests += 1
+      })
+      const started = page.waitForRequest((request) =>
+        transport === 'http'
+          ? isHttpRequest(request, 'GET', '/diagnostics/slow')
+          : recordsRpc(request.postData(), 'diagnostics.slow'),
+      )
+      await page
+        .getByRole('button', {
+          name: transport === 'http' ? 'Start slow HTTP query' : 'Start slow query',
+          exact: true,
+        })
+        .click()
+      const request = await started
+      const operationId =
+        transport === 'http'
+          ? new URL(request.url()).searchParams.get('operationId')
+          : /"operationId"\s*:\s*"([^"]+)"/.exec(request.postData() ?? '')?.[1]
+      expect(operationId).toBeTruthy()
+      await expect(
+        page.getByText(transport === 'http' ? 'HTTP: Ready to cancel' : 'Ready to cancel', {
+          exact: true,
+        }),
+      ).toBeVisible()
+      expect(statusRequests).toBeGreaterThan(0)
+
+      const aborted = page.waitForEvent('requestfailed', (failed) => failed === request)
+      await page.getByRole('link', { name: 'Featured user', exact: true }).click()
+      await expect(page.getByRole('heading', { name: 'Featured user', exact: true })).toBeVisible()
+      await aborted
+      const requestsAfterNavigation = statusRequests
+      const statusUrl = `${tanStackStartApplication.url}/api/diagnostics/operations/${encodeURIComponent(operationId!)}`
+      await expect
+        .poll(async () => {
+          const response = await page.request.get(statusUrl)
+          expect(response.ok()).toBe(true)
+          return response.json()
+        })
+        .toEqual({ started: 1, interrupted: 1 })
+      expect(statusRequests).toBe(requestsAfterNavigation)
+    })
+  }
 
   test('omits a failed server query and refetches it in the browser', async ({ browser, page }) => {
     const url = `${tanStackStartApplication.url}/http-failure`

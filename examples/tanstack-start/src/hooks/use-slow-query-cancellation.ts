@@ -1,5 +1,5 @@
 import type { DiagnosticStatus } from '@effect-api-query/contracts'
-import { useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import type { TanStackStartApplication } from '../lib/application.ts'
 
@@ -47,40 +47,63 @@ export const useSlowQueryCancellation = (
     durationMs: 60_000,
     operationId: globalThis.crypto.randomUUID(),
   }))
-  const adapter =
-    transport === 'http'
-      ? {
-          key: httpQuery.diagnostics.slow.queryKey({ query: slowInput }),
-          run: () =>
-            queryClient.query(
-              httpQuery.diagnostics.slow.queryOptions({ input: { query: slowInput } }),
-            ),
-          readStatus: () =>
-            queryClient.query({
-              ...httpQuery.diagnostics.operationStatus.queryOptions({
-                input: { params: { operationId: slowInput.operationId } },
-              }),
-              staleTime: 0,
+  const lifetime = useRef<AbortController | null>(null)
+  const adapter = useMemo(
+    () =>
+      transport === 'http'
+        ? {
+            key: httpQuery.diagnostics.slow.queryKey({ query: slowInput }),
+            statusKey: httpQuery.diagnostics.operationStatus.queryKey({
+              params: { operationId: slowInput.operationId },
             }),
-        }
-      : {
-          key: rpcQuery.diagnostics.slow.queryKey(slowInput),
-          run: () =>
-            queryClient.query(rpcQuery.diagnostics.slow.queryOptions({ input: slowInput })),
-          readStatus: () =>
-            queryClient.query({
-              ...rpcQuery.diagnostics.operationStatus.queryOptions({
-                input: { operationId: slowInput.operationId },
+            run: () =>
+              queryClient.query(
+                httpQuery.diagnostics.slow.queryOptions({ input: { query: slowInput } }),
+              ),
+            readStatus: () =>
+              queryClient.query({
+                ...httpQuery.diagnostics.operationStatus.queryOptions({
+                  input: { params: { operationId: slowInput.operationId } },
+                }),
+                staleTime: 0,
               }),
-              staleTime: 0,
+          }
+        : {
+            key: rpcQuery.diagnostics.slow.queryKey(slowInput),
+            statusKey: rpcQuery.diagnostics.operationStatus.queryKey({
+              operationId: slowInput.operationId,
             }),
-        }
+            run: () =>
+              queryClient.query(rpcQuery.diagnostics.slow.queryOptions({ input: slowInput })),
+            readStatus: () =>
+              queryClient.query({
+                ...rpcQuery.diagnostics.operationStatus.queryOptions({
+                  input: { operationId: slowInput.operationId },
+                }),
+                staleTime: 0,
+              }),
+          },
+    [httpQuery, queryClient, rpcQuery, slowInput, transport],
+  )
+
+  useEffect(() => {
+    const controller = new AbortController()
+    lifetime.current = controller
+    return () => {
+      controller.abort()
+      void queryClient.cancelQueries({ queryKey: adapter.key, exact: true })
+      void queryClient.cancelQueries({ queryKey: adapter.statusKey, exact: true })
+    }
+  }, [adapter, queryClient])
 
   const waitForStatus = async (
     predicate: (status: DiagnosticStatus) => boolean,
+    signal: AbortSignal,
   ): Promise<DiagnosticStatus> => {
     for (let attempt = 0; attempt < 100; attempt += 1) {
+      signal.throwIfAborted()
       const status = await adapter.readStatus()
+      signal.throwIfAborted()
       if (predicate(status)) return status
       await delay(10)
     }
@@ -88,21 +111,25 @@ export const useSlowQueryCancellation = (
   }
 
   const start = async () => {
+    const signal = lifetime.current?.signal
+    if (signal === undefined || signal.aborted) return
     setState({ _tag: 'Starting' })
     try {
       const before = await adapter.readStatus()
+      signal.throwIfAborted()
       baseline.current = before
       void adapter.run().catch(() => undefined)
-      await waitForStatus(({ started }) => started > before.started)
+      await waitForStatus(({ started }) => started > before.started, signal)
       setState({ _tag: 'Ready' })
     } catch (error) {
-      setState({ _tag: 'Failed', error })
+      if (!signal.aborted) setState({ _tag: 'Failed', error })
     }
   }
 
   const cancel = async () => {
     const before = baseline.current
-    if (before === undefined) return
+    const signal = lifetime.current?.signal
+    if (before === undefined || signal === undefined || signal.aborted) return
 
     setState({ _tag: 'Cancelling' })
     try {
@@ -110,10 +137,13 @@ export const useSlowQueryCancellation = (
       await queryClient.cancelQueries({
         queryKey: adapter.key,
       })
-      const status = await waitForStatus(({ interrupted }) => interrupted > before.interrupted)
+      const status = await waitForStatus(
+        ({ interrupted }) => interrupted > before.interrupted,
+        signal,
+      )
       setState({ _tag: 'Cancelled', interruptions: status.interrupted })
     } catch (error) {
-      setState({ _tag: 'Failed', error })
+      if (!signal.aborted) setState({ _tag: 'Failed', error })
     }
   }
 

@@ -24,13 +24,29 @@
   ],
 
   // Each executable example keeps its resource ownership and cancellation
-  // workflow in place so readers can understand and copy the integration.
+  // workflow and UI in place so readers can understand and copy the integration.
   // Fingerprints expire when the duplicated code or occurrence count changes.
   "duplicates": {
     "ignoredClones": [
+      "dup:22704c46:2",
+      "dup:3fec4231:2",
+      "dup:91b44e3a:2",
+      "dup:c77b3abb6f87acd9-10:2",
+      "dup:c77b3abb6f87acd9-11:2",
+      "dup:c77b3abb6f87acd9-12:2",
+      "dup:c77b3abb6f87acd9-13:2",
+      "dup:c77b3abb6f87acd9-14:2",
+      "dup:c77b3abb6f87acd9-15:2",
+      "dup:c77b3abb6f87acd9-16:2",
       "dup:c77b3abb6f87acd9-1:2",
       "dup:c77b3abb6f87acd9-2:2",
-      "dup:c77b3abb6f87acd9-3:2"
+      "dup:c77b3abb6f87acd9-3:2",
+      "dup:c77b3abb6f87acd9-4:2",
+      "dup:c77b3abb6f87acd9-5:2",
+      "dup:c77b3abb6f87acd9-6:2",
+      "dup:c77b3abb6f87acd9-7:2",
+      "dup:c77b3abb6f87acd9-8:2",
+      "dup:c77b3abb6f87acd9-9:2"
     ]
   },
 
