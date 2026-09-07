@@ -26,7 +26,13 @@ export class DiagnosticFailure extends Schema.TaggedError<DiagnosticFailure>()(
   {
     reason: Schema.Literal('requested-failure'),
   },
-) {}
+) {
+  // Effect Cause.pretty reads Error.message through the base error interface.
+  // fallow-ignore-next-line unused-class-member
+  override get message(): string {
+    return this.reason
+  }
+}
 
 export class ExampleAuthorizationError extends Schema.TaggedError<ExampleAuthorizationError>()(
   'ExampleAuthorizationError',
@@ -134,14 +140,21 @@ const DiagnosticsCancel = Rpc.make('diagnostics.cancel', {
   success: Schema.Void,
 })
 
-const DiagnosticsStatusRpc = Rpc.make('diagnostics.status', {
-  success: Schema.Struct({
-    interrupted: Schema.Int,
-    started: Schema.Int,
-  }),
+export const DiagnosticStatus = Schema.Struct({
+  interrupted: Schema.Int,
+  started: Schema.Int,
 })
 
-export type DiagnosticStatus = Rpc.Success<typeof DiagnosticsStatusRpc>
+export type DiagnosticStatus = typeof DiagnosticStatus.Type
+
+const DiagnosticsStatusRpc = Rpc.make('diagnostics.status', {
+  success: DiagnosticStatus,
+})
+
+const DiagnosticsOperationStatus = Rpc.make('diagnostics.operationStatus', {
+  payload: { operationId: Schema.String },
+  success: DiagnosticStatus,
+})
 
 const DiagnosticsFail = Rpc.make('diagnostics.fail', {
   success: Schema.Never,
@@ -167,6 +180,7 @@ export const exampleRpcGroup = RpcGroup.make(
   DiagnosticsSlow,
   DiagnosticsCancel,
   DiagnosticsStatusRpc,
+  DiagnosticsOperationStatus,
   DiagnosticsFail,
   DiagnosticsStream,
 )

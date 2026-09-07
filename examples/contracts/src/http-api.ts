@@ -7,7 +7,13 @@ import {
   HttpApiSchema,
 } from 'effect/unstable/httpapi'
 
-import { DiagnosticFailure, ExampleAuthorizationError, User, UserPage } from './contracts.ts'
+import {
+  DiagnosticFailure,
+  DiagnosticStatus,
+  ExampleAuthorizationError,
+  User,
+  UserPage,
+} from './contracts.ts'
 
 export class ExampleHttpAuthorization extends HttpApiMiddleware.Service<ExampleHttpAuthorization>()(
   '@effect-api-query/contracts/ExampleHttpAuthorization',
@@ -54,8 +60,12 @@ const diagnostics = HttpApiGroup.make('diagnostics').add(
     },
     success: Schema.String,
   }),
+  HttpApiEndpoint.get('operationStatus', '/diagnostics/operations/:operationId', {
+    params: { operationId: Schema.String },
+    success: DiagnosticStatus,
+  }),
   HttpApiEndpoint.get('status', '/diagnostics/status', {
-    success: Schema.Struct({ started: Schema.Int, interrupted: Schema.Int }),
+    success: DiagnosticStatus,
   }),
 )
 

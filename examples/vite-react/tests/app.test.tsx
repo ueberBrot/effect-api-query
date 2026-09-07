@@ -153,6 +153,31 @@ describe('plain Vite React integration', () => {
     expect(await screen.findByText('HTTP: Server interruptions: 1')).toBeTruthy()
   })
 
+  it('cancels simultaneous RPC and HTTP queries independently', async () => {
+    expect(await screen.findByText('HTTP: Ada Lovelace')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Start slow query' }))
+    expect(await screen.findByText('Ready to cancel', { exact: true })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Start slow HTTP query' }))
+    expect(await screen.findByText('HTTP: Ready to cancel')).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel query' }))
+    expect(await screen.findByText('Server interruptions: 1', { exact: true })).toBeTruthy()
+    expect(
+      application?.queryClient.isFetching({
+        queryKey: application.httpQuery.diagnostics.slow.key(),
+      }),
+    ).toBe(1)
+    expect(screen.getByText('HTTP: Ready to cancel')).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel HTTP query' }))
+    expect(await screen.findByText('HTTP: Server interruptions: 1')).toBeTruthy()
+    expect(
+      application?.queryClient.isFetching({
+        queryKey: application.httpQuery.diagnostics.slow.key(),
+      }),
+    ).toBe(0)
+  })
+
   it('disposes its client Scope and runtime idempotently', async () => {
     const ownedApplication = application
     expect(ownedApplication).toBeDefined()

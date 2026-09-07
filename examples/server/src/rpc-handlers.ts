@@ -1,5 +1,4 @@
 import {
-  DiagnosticFailure,
   exampleRpcGroup,
   ExampleAuthorization,
   ExampleAuthorizationError,
@@ -26,12 +25,10 @@ const handlersLayer = exampleRpcGroup.toLayer(
       'diagnostics.cancel': Effect.fn('ExampleRpc.diagnostics.cancel')(
         ({ operationId }: { readonly operationId: string }) => diagnostics.cancel(operationId),
       ),
-      'diagnostics.fail': Effect.fn('ExampleRpc.diagnostics.fail')(() =>
-        Effect.fail(
-          new DiagnosticFailure({
-            reason: 'requested-failure',
-          }),
-        ),
+      'diagnostics.fail': Effect.fn('ExampleRpc.diagnostics.fail')(() => diagnostics.fail),
+      'diagnostics.operationStatus': Effect.fn('ExampleRpc.diagnostics.operationStatus')(
+        ({ operationId }: { readonly operationId: string }) =>
+          diagnostics.operationStatus(operationId),
       ),
       'diagnostics.slow': diagnostics.slow,
       'diagnostics.status': Effect.fn('ExampleRpc.diagnostics.status')(() => diagnostics.status),

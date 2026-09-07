@@ -69,7 +69,9 @@ request, response, or schema issue values.
 
 Choose **Start slow HTTP query**, wait for **HTTP: Ready to cancel**, then choose
 **Cancel HTTP query**. The
-example observes server interruption after the HTTP request is aborted. This cancels observation
+example observes server interruption for that operation after the HTTP request is aborted. Each
+panel owns a distinct operation ID, so cancelling an RPC query leaves a concurrent HTTP query
+running. This cancels observation
 and work in this handler; it does not compensate completed mutations. The RPC cancellable-command
 panel continues to demonstrate explicit domain cancellation.
 

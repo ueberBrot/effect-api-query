@@ -1,5 +1,4 @@
 import {
-  DiagnosticFailure,
   exampleHttpApi,
   ExampleAuthorizationError,
   ExampleHttpAuthorization,
@@ -31,7 +30,8 @@ const diagnostics = HttpApiBuilder.group(
   Effect.fn(function* (handlers) {
     const { diagnostics } = yield* ExampleDomain
     return handlers.handleAll({
-      fail: () => Effect.fail(new DiagnosticFailure({ reason: 'requested-failure' })),
+      fail: () => diagnostics.fail,
+      operationStatus: ({ params }) => diagnostics.operationStatus(params.operationId),
       slow: ({ query }) => diagnostics.slow(query),
       status: () => diagnostics.status,
     })

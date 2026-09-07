@@ -121,14 +121,37 @@ test.describe('Vite React HTTP API example', () => {
     await expect(failure).toContainText('requested-failure')
   })
 
-  test('aborts the HTTP request and observes server interruption', async ({ page }) => {
+  test('cancels concurrent RPC and HTTP queries independently', async ({ page }) => {
     const http = page.getByRole('region', { name: 'HTTP API example' })
+    let httpSettled = false
+    const observeCompletion = (completed: Request) => {
+      if (isHttpRequest(completed, 'GET', '/diagnostics/slow')) httpSettled = true
+    }
+    page.on('requestfinished', observeCompletion)
+    page.on('requestfailed', observeCompletion)
     const started = page.waitForRequest((request) =>
       isHttpRequest(request, 'GET', '/diagnostics/slow'),
     )
     await http.getByRole('button', { name: 'Start slow HTTP query' }).click()
     const request = await started
     await expect(http.getByText('HTTP: Ready to cancel')).toBeVisible()
+
+    await page.getByRole('button', { name: 'Start slow query', exact: true }).click()
+    await expect(page.getByText('Ready to cancel', { exact: true })).toBeVisible()
+    await page.getByRole('button', { name: 'Cancel query', exact: true }).click()
+    await expect(page.getByText('Server interruptions: 1', { exact: true })).toBeVisible()
+    const statusUrl = new URL(request.url())
+    const operationId = statusUrl.searchParams.get('operationId')
+    expect(operationId).not.toBeNull()
+    statusUrl.pathname = `/api/diagnostics/operations/${encodeURIComponent(operationId!)}`
+    statusUrl.search = ''
+    const status = await page.request.get(statusUrl.toString())
+    expect(status.ok()).toBe(true)
+    expect(await status.json()).toEqual({ started: 1, interrupted: 0 })
+    await expect(http.getByRole('button', { name: 'Cancel HTTP query' })).toBeEnabled()
+    expect(httpSettled).toBe(false)
+    expect(request.failure()).toBeNull()
+
     const aborted = page.waitForEvent('requestfailed', (failed) => failed === request)
     await http.getByRole('button', { name: 'Cancel HTTP query' }).click()
     await aborted

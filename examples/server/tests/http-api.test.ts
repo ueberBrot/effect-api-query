@@ -3,7 +3,7 @@ import { makeExampleRpcClient } from '@effect-api-query/contracts/client'
 import { startExampleRpcServer } from '@effect-api-query/server'
 import { makeExampleWebHandler } from '@effect-api-query/server/web-handler'
 import { describe, expect, it } from '@effect/vitest'
-import { Effect, Exit, Scope } from 'effect'
+import { Effect, Exit, Fiber, Scope } from 'effect'
 import { FetchHttpClient } from 'effect/unstable/http'
 import { HttpApiClient } from 'effect/unstable/httpapi'
 
@@ -68,6 +68,7 @@ describe('example HTTP API', () => {
       expect(yield* Effect.flip(client.diagnostics.fail())).toMatchObject({
         _tag: 'DiagnosticFailure',
         reason: 'requested-failure',
+        message: 'requested-failure',
       })
     }),
   )
@@ -181,6 +182,60 @@ describe('example HTTP API', () => {
       yield* Scope.close(owner, Exit.void)
       expect(yield* Effect.promise(() => pending)).toBe('closed')
       yield* Effect.promise(() => expect(fetch(`${server.url}/health`)).rejects.toThrow())
+    }),
+  )
+
+  it.live('tracks and cancels simultaneous RPC and HTTP diagnostic operations independently', () =>
+    Effect.gen(function* () {
+      const server = yield* startExampleRpcServer()
+      const rpc = yield* makeExampleRpcClient(server.rpcUrl)
+      const readStatus = (id: string) =>
+        fetch(`${server.url}/api/diagnostics/operations/${id}`).then((response) => response.json())
+      expect(yield* Effect.promise(() => readStatus('unused'))).toEqual({
+        started: 0,
+        interrupted: 0,
+      })
+      const rpcSlow = yield* rpc('diagnostics.slow', {
+        durationMs: 60_000,
+        operationId: 'rpc-panel',
+      }).pipe(Effect.forkChild)
+      const controller = new AbortController()
+      const httpSlow = fetch(
+        `${server.url}/api/diagnostics/slow?durationMs=60000&operationId=http-panel`,
+        {
+          signal: controller.signal,
+        },
+      ).then(
+        () => 'completed',
+        () => 'aborted',
+      )
+      yield* Effect.promise(() =>
+        expect.poll(() => readStatus('rpc-panel')).toEqual({ started: 1, interrupted: 0 }),
+      )
+      yield* Effect.promise(() =>
+        expect.poll(() => readStatus('http-panel')).toEqual({ started: 1, interrupted: 0 }),
+      )
+      yield* rpc('diagnostics.cancel', { operationId: 'rpc-panel' })
+      expect(Exit.isFailure(yield* Fiber.await(rpcSlow))).toBe(true)
+      expect(yield* rpc('diagnostics.operationStatus', { operationId: 'rpc-panel' })).toEqual({
+        started: 1,
+        interrupted: 1,
+      })
+      expect(yield* Effect.promise(() => readStatus('http-panel'))).toEqual({
+        started: 1,
+        interrupted: 0,
+      })
+      controller.abort()
+      expect(yield* Effect.promise(() => httpSlow)).toBe('aborted')
+      yield* Effect.promise(() =>
+        expect.poll(() => readStatus('http-panel')).toEqual({ started: 1, interrupted: 1 }),
+      )
+      expect(yield* rpc('diagnostics.status', undefined)).toEqual({ started: 2, interrupted: 2 })
+      yield* rpc('testing.reset', undefined)
+      expect(yield* Effect.promise(() => readStatus('rpc-panel'))).toEqual({
+        started: 0,
+        interrupted: 0,
+      })
     }),
   )
 })
