@@ -1,19 +1,16 @@
 import type { Effect } from 'effect'
 import type { HttpApi } from 'effect/unstable/httpapi'
 
-import type { TreeErrors, UnaryOperation } from '../core/operation'
+import type { RuntimeKeyEncoder, TreeErrors, UnaryOperation } from '../core/operation'
 import { EffectHttpApiQueryConfigError, EffectHttpApiQueryError } from './errors'
 import type { HttpApiEndpointIdentity } from './errors'
 import { createHttpRequestInput } from './request'
 
-export interface HttpOperation extends UnaryOperation {
+interface HttpOperation extends UnaryOperation {
   readonly identity: HttpApiEndpointIdentity
 }
 
-export const extractHttpEndpoints = (
-  api: HttpApi.Top,
-  client: unknown,
-): readonly HttpOperation[] => {
+const extractHttpEndpoints = (api: HttpApi.Top, client: unknown): readonly HttpOperation[] => {
   const operations: HttpOperation[] = []
   for (const group of Object.values(api.groups)) {
     for (const endpoint of Object.values(group.endpoints)) {
@@ -34,7 +31,6 @@ export const extractHttpEndpoints = (
         path: group.topLevel ? [endpoint.identifier] : [group.identifier, endpoint.identifier],
         kind: 'Unary',
         input,
-        pageInput: (input) => input,
         takeOptions: () => undefined,
         invoke: (input) =>
           target[endpoint.identifier]!({
@@ -49,10 +45,7 @@ export const extractHttpEndpoints = (
   return operations
 }
 
-export const httpTreeErrors = (
-  api: HttpApi.Top,
-  operations: readonly HttpOperation[],
-): TreeErrors => {
+const httpTreeErrors = (api: HttpApi.Top, operations: readonly HttpOperation[]): TreeErrors => {
   const identities = new Map(operations.map((operation) => [operation.id, operation.identity]))
   const identity = (id: string) => identities.get(id) ?? { apiId: api.identifier }
   return {
@@ -89,4 +82,31 @@ export const httpTreeErrors = (
         identity(id),
       ),
   }
+}
+
+/** Binds declaration identities, endpoint projection, and encoder configuration together. */
+export const compileHttpOperations = (
+  api: HttpApi.Top,
+  client: unknown,
+  suppliedEncoders: object | undefined,
+): {
+  readonly operations: readonly UnaryOperation[]
+  readonly errors: TreeErrors
+  readonly keyEncoders: ReadonlyMap<string, RuntimeKeyEncoder>
+} => {
+  const operations = extractHttpEndpoints(api, client)
+  const errors = httpTreeErrors(api, operations)
+  const encoderGroups = new Set(
+    operations
+      .filter((operation) => operation.input._tag === 'Input')
+      .map((operation) => operation.identity.groupId),
+  )
+  const keyEncoders = new Map<string, RuntimeKeyEncoder>()
+  for (const [groupId, endpoints] of Object.entries(suppliedEncoders ?? {})) {
+    if (!encoderGroups.has(groupId)) throw errors.unknownEncoder(JSON.stringify([groupId]))
+    for (const [endpoint, encoder] of Object.entries(endpoints as object)) {
+      keyEncoders.set(JSON.stringify([groupId, endpoint]), encoder as RuntimeKeyEncoder)
+    }
+  }
+  return { operations, errors, keyEncoders }
 }

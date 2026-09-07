@@ -22,25 +22,22 @@ export const fetchStreamSnapshot = async <TQueryFnData, TError, TData, TQueryKey
   queryClient: QueryClient,
   options: QueryExecuteOptions<TQueryFnData, TError, TData, TQueryFnData, TQueryKey>,
 ): Promise<TData> => {
+  // Start first so an earlier cached error or reset snapshot cannot settle this request.
+  const fetching = queryClient.query(options)
   let stopWatching = () => {}
-  const snapshotReady = new Promise<void>((resolve, reject) => {
+  const snapshotReady = new Promise<void>((resolve) => {
     const inspect = () => {
       const state = queryClient.getQueryState<TData, TError, TQueryKey>(options.queryKey)
       if (state?.status === 'success') resolve()
-      if (state?.status === 'error') reject(state.error)
     }
     stopWatching = queryClient.getQueryCache().subscribe(inspect)
     inspect()
   })
-  const fetching = queryClient.query(options)
-
   try {
-    await snapshotReady
+    // Cancellation can restore pending state; the fetch promise owns terminal failures.
+    await Promise.race([snapshotReady, fetching])
     await queryClient.cancelQueries({ exact: true, queryKey: options.queryKey })
     return await fetching
-  } catch (error) {
-    await fetching.catch(() => undefined)
-    throw error
   } finally {
     stopWatching()
   }

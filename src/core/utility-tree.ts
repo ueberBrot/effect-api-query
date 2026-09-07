@@ -116,7 +116,7 @@ const normalizePrefix = (
   }
 
   try {
-    return Object.freeze(prefix.map((part) => canonicalize(part)))
+    return canonicalize(prefix) as readonly JsonValue[]
   } catch (cause) {
     throw errors.invalidPrefix('Value', cause)
   }
@@ -223,21 +223,30 @@ const prepareQueryOptions = (
   }
   const input = options['input']
   delete options['input']
-  // Query Core prefers an explicit hash over the generated hash function.
-  delete options['queryHash']
   const requestOptions = description.takeOptions(options)
   if (description.input._tag !== 'Inputless' && input === skipToken) {
     return {
       _tag: 'Skipped' as const,
-      options: {
-        ...options,
-        queryFn: skipToken,
-        queryKey: operationKey,
-        queryKeyHashFn: hashCanonicalKey,
-      } as Record<string, unknown>,
+      options: finalizeQueryOptions(options, operationKey, skipToken),
     }
   }
   return { _tag: 'Executable' as const, input, options, requestOptions }
+}
+
+const finalizeQueryOptions = <QueryFn>(
+  options: Record<string, unknown>,
+  queryKey: readonly JsonValue[],
+  queryFn: QueryFn,
+) => {
+  // Query Core prefers an explicit hash over the generated hash function.
+  delete options['queryHash']
+  return {
+    ...options,
+    // Owned fields follow user options so callers cannot replace keys or runners.
+    queryFn,
+    queryKey,
+    queryKeyHashFn: hashCanonicalKey,
+  }
 }
 
 const createInfiniteBuilders = (
@@ -264,17 +273,13 @@ const createInfiniteBuilders = (
     const initialInput = inputForPage(initialPageParam)
     const prepared = prepareQuery(description, initialInput, infiniteOperationKey, keyEncoder)
 
-    return {
-      ...options,
-      queryFn: ({
-        pageParam,
-        signal,
-      }: {
-        readonly pageParam: unknown
-        readonly signal: AbortSignal
-      }) => {
+    return finalizeQueryOptions(
+      options,
+      prepared.key,
+      ({ pageParam, signal }: { readonly pageParam: unknown; readonly signal: AbortSignal }) => {
         const pageInput = inputForPage(pageParam)
-        const executionInput = description.pageInput(pageInput)
+        const executionInput =
+          description.input._tag === 'Input' ? description.input.pageInput(pageInput) : undefined
         return execute(
           description,
           'infinite',
@@ -284,9 +289,7 @@ const createInfiniteBuilders = (
           signal,
         )
       },
-      queryKey: prepared.key,
-      queryKeyHashFn: hashCanonicalKey,
-    }
+    )
   }
 
   return { infiniteKey, infiniteOptions }
@@ -312,14 +315,12 @@ const createUnaryLeaf = (
 
     const prepared = prepareQuery(description, input, queryOperationKey, keyEncoder)
 
-    return {
-      // Owned fields follow user options so callers cannot replace keys or runners.
-      ...options,
-      queryFn: ({ signal }: { readonly signal: AbortSignal }) =>
+    return finalizeQueryOptions(
+      options,
+      prepared.key,
+      ({ signal }: { readonly signal: AbortSignal }) =>
         execute(description, 'query', prepared.input, runPromiseExit, requestOptions, signal),
-      queryKey: prepared.key,
-      queryKeyHashFn: hashCanonicalKey,
-    }
+    )
   }
 
   const mutationOptions = (argument: Record<string, unknown> = {}) => {
@@ -371,12 +372,7 @@ const createStreamingLeaf = (
     const prepared = prepareQuery(description, supplied.input, operationKey, keyEncoder)
     const queryFn = makeQuery(prepared.input)
 
-    return {
-      ...options,
-      queryFn,
-      queryKey: prepared.key,
-      queryKeyHashFn: hashCanonicalKey,
-    }
+    return finalizeQueryOptions(options, prepared.key, queryFn)
   }
 
   return Object.freeze({

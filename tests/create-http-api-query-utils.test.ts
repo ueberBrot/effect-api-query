@@ -47,6 +47,30 @@ const makeClient = HttpApiTest.groups(Api, ['users']).pipe(
 )
 
 describe('createHttpApiQueryUtils', () => {
+  it('rejects sparse key prefixes through both adapters, including nested arrays', () => {
+    const sparse = ['app', 'tenant'] as const
+    Reflect.deleteProperty(sparse, 1)
+
+    for (const keyPrefix of [sparse, ['app', sparse] as const]) {
+      expect(() =>
+        createHttpApiQueryUtils(HttpApi.make('empty'), { client: {}, keyPrefix }),
+      ).toThrow(
+        expect.objectContaining({
+          _tag: 'EffectHttpApiQueryConfigError',
+          code: 'InvalidKeyPrefix',
+        }),
+      )
+      expect(() =>
+        createRpcQueryUtils(RpcGroup.make(), { client: () => Effect.void, keyPrefix }),
+      ).toThrow(
+        expect.objectContaining({
+          _tag: 'EffectRpcQueryConfigError',
+          code: 'InvalidKeyPrefix',
+        }),
+      )
+    }
+  })
+
   it('executes decoded reads and writes through the real HTTP pipeline and QueryClient', async () => {
     const scope = Scope.makeUnsafe()
     const client = await Effect.runPromise(

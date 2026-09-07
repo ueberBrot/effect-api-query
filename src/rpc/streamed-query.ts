@@ -1,11 +1,16 @@
 import { experimental_streamedQuery, type QueryFunctionContext } from '@tanstack/query-core'
 import { Cause, Exit, Stream } from 'effect'
 
+import type { StreamingOperation } from '../core/operation'
 import type { RunPromiseExit } from '../core/types'
-import { EffectRpcQueryEmptyStreamError, EffectRpcQueryError } from './errors'
+import {
+  EffectRpcQueryConfigError,
+  EffectRpcQueryEmptyStreamError,
+  EffectRpcQueryError,
+} from './errors'
 import type { StreamRefetchMode, StreamingRpcOptions } from './types'
 
-export type StreamQueryPolicy =
+type StreamQueryPolicy =
   | {
       readonly maxChunks?: number
       readonly _tag: 'Accumulated'
@@ -13,17 +18,19 @@ export type StreamQueryPolicy =
     }
   | { readonly _tag: 'Live' }
 
-export interface MakeStreamQueryOptions {
+export interface RpcStreamInvocation {
+  readonly tag: string
+  readonly invoke: (
+    input: unknown,
+    options?: StreamingRpcOptions,
+  ) => Stream.Stream<unknown, unknown, unknown>
+}
+
+interface MakeStreamQueryOptions {
   readonly rpcOptions: StreamingRpcOptions | undefined
   readonly input: unknown
   readonly policy: StreamQueryPolicy
-  readonly rpc: {
-    readonly tag: string
-    readonly invoke: (
-      input: unknown,
-      options?: StreamingRpcOptions,
-    ) => Stream.Stream<unknown, unknown, unknown>
-  }
+  readonly rpc: RpcStreamInvocation
   readonly runPromiseExit: RunPromiseExit<unknown>
 }
 
@@ -98,7 +105,7 @@ const requireFirstValue = <A>(source: AsyncIterable<A>, rpcTag: string): AsyncIt
 })
 
 /** Adapts one Effect stream invocation to an accumulated or latest-value Query Core function. */
-export const makeStreamQuery = ({
+const makeStreamQuery = ({
   input,
   policy,
   rpc,
@@ -151,3 +158,36 @@ export const makeStreamQuery = ({
     return reset && !emitted ? [] : result
   }
 }
+
+/** Owns policy validation and execution for both accumulated and live queries. */
+export const createStreamPreparation =
+  (rpc: RpcStreamInvocation): StreamingOperation['prepareStream'] =>
+  (options, operation, runPromiseExit, requestOptions) => {
+    const refetchMode = options['refetchMode'] as StreamRefetchMode | undefined
+    delete options['refetchMode']
+    const maxChunks = options['maxChunks'] as number | undefined
+    delete options['maxChunks']
+    // Preparation also runs for skipped queries; invalid policy fails synchronously.
+    if (maxChunks !== undefined && (!Number.isSafeInteger(maxChunks) || maxChunks <= 0)) {
+      throw new EffectRpcQueryConfigError(
+        'InvalidMaxChunks',
+        'maxChunks must be a positive safe integer',
+        { rpcTag: rpc.tag },
+      )
+    }
+    return (input) =>
+      makeStreamQuery({
+        input,
+        rpcOptions: requestOptions as StreamingRpcOptions | undefined,
+        policy:
+          operation === 'live'
+            ? { _tag: 'Live' }
+            : {
+                _tag: 'Accumulated',
+                ...(refetchMode === undefined ? {} : { refetchMode }),
+                ...(maxChunks === undefined ? {} : { maxChunks }),
+              },
+        rpc,
+        runPromiseExit,
+      })
+  }

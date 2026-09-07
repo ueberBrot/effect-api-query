@@ -286,25 +286,29 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       cpSync(join(typeFixtureDirectory, fixture), join(consumerDirectory, fixture))
     }
 
-    const manifestTemplate = readFileSync(join(consumerDirectory, 'package.template.json'), 'utf8')
-    const consumerManifest = manifestTemplate
-      .replaceAll('__LABEL__', peer.label)
-      .replaceAll('__QUERY_CORE_VERSION__', peer.queryCoreVersion)
-      .replaceAll('__REACT_QUERY_VERSION__', peer.reactQueryVersion)
-      .replaceAll('__REACT_ROUTER_VERSION__', testedVersion('@tanstack/react-router'))
-      .replaceAll(
-        '__REACT_ROUTER_SSR_QUERY_VERSION__',
-        testedVersion('@tanstack/react-router-ssr-query'),
-      )
-      .replaceAll('__REACT_START_VERSION__', testedVersion('@tanstack/react-start'))
-      .replaceAll('__NODE_TYPES_VERSION__', testedVersion('@types/node'))
-      .replaceAll('__REACT_TYPES_VERSION__', testedVersion('@types/react'))
-      .replaceAll('__REACT_DOM_TYPES_VERSION__', testedVersion('@types/react-dom'))
-      .replaceAll('__EFFECT_VERSION__', testedVersion('effect'))
-      .replaceAll('__PACKAGE_TARBALL__', `file:${tarballPath}`)
-      .replaceAll('__REACT_VERSION__', testedVersion('react'))
-      .replaceAll('__REACT_DOM_VERSION__', testedVersion('react-dom'))
-    writeFileSync(join(consumerDirectory, 'package.json'), consumerManifest)
+    const consumerManifest = {
+      name: `effect-api-query-packed-consumer-${peer.label}`,
+      private: true,
+      type: 'module',
+      dependencies: {
+        '@tanstack/query-core': peer.queryCoreVersion,
+        '@tanstack/react-query': peer.reactQueryVersion,
+        '@tanstack/react-router': testedVersion('@tanstack/react-router'),
+        '@tanstack/react-router-ssr-query': testedVersion('@tanstack/react-router-ssr-query'),
+        '@tanstack/react-start': testedVersion('@tanstack/react-start'),
+        '@types/node': testedVersion('@types/node'),
+        '@types/react': testedVersion('@types/react'),
+        '@types/react-dom': testedVersion('@types/react-dom'),
+        effect: testedVersion('effect'),
+        'effect-api-query': `file:${tarballPath}`,
+        react: testedVersion('react'),
+        'react-dom': testedVersion('react-dom'),
+      },
+    }
+    writeFileSync(
+      join(consumerDirectory, 'package.json'),
+      JSON.stringify(consumerManifest, null, 2),
+    )
 
     // Prefer cached artifacts, but allow a fresh machine to fetch exact pinned versions.
     // The temporary project must resolve every peer from its own node_modules.
