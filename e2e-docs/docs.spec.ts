@@ -139,8 +139,8 @@ test('serves generated LLM documentation with the public URLs', async ({ request
     expect(content).toContain('RPC Quick Start')
     expect(content).toContain('HTTP Quick Start')
     expect(content).toContain(`](${docsBase}getting-started/quick-start/)`)
-    expect(content).not.toContain('](/effect-rpc-query/')
-    for (const match of content.matchAll(/\]\((\/effect-api-query\/[^)\s]*)\)/g)) {
+    for (const match of content.matchAll(/\]\((\/[^)\s]*)\)/g)) {
+      expect(match[1]).toMatch(/^\/effect-api-query\//)
       linkedPaths.add(match[1]!.split('#')[0]!)
     }
   }

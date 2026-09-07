@@ -2,6 +2,7 @@ import { defineConfig } from '@playwright/test'
 
 import { browserTestDefaults, browserTestServer } from './e2e/browser-test-config.ts'
 
+// DOCS_BASE_URL is the deployment origin, e.g. https://ueberbrot.github.io.
 const hostedOrigin = process.env['DOCS_BASE_URL']
 
 export default defineConfig(browserTestDefaults, {
