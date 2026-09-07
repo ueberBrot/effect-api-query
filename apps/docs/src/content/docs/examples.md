@@ -7,10 +7,10 @@ The repository contains two complete applications. Both use the same contracts a
 handler implementation, but each hosts HTTP differently. Both RPC endpoints accept request bodies
 up to 1 MiB and return HTTP 413 for larger bodies.
 
-| Example                                                                                           | Demonstrates                                                                                         | RPC host                                          | Application URL         |
-| ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------- | ----------------------- |
-| [Vite React](https://github.com/ueberBrot/effect-rpc-query/tree/main/examples/vite-react)         | Ordinary, infinite, accumulated-stream, live, and mutation hooks with failures and cancellation      | Standalone server on port `3001`, proxied by Vite | `http://127.0.0.1:5173` |
-| [TanStack Start](https://github.com/ueberBrot/effect-rpc-query/tree/main/examples/tanstack-start) | The same operation kinds in loaders, server rendering, dehydration, hydration, and client navigation | Same-origin `POST /rpc` server route              | `http://127.0.0.1:3000` |
+| Example                                                                                           | Demonstrates                                                                                       | RPC host                                          | Application URL         |
+| ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------- | ----------------------- |
+| [Vite React](https://github.com/ueberBrot/effect-rpc-query/tree/main/examples/vite-react)         | RPC queries and streams beside buffered HTTP reads, writes, pagination, failures, and cancellation | Standalone server on port `3001`, proxied by Vite | `http://127.0.0.1:5173` |
+| [TanStack Start](https://github.com/ueberBrot/effect-rpc-query/tree/main/examples/tanstack-start) | RPC operation kinds in loaders, server rendering, dehydration, hydration, and client navigation    | Same-origin `POST /rpc` server route              | `http://127.0.0.1:3000` |
 
 ## Set up locally
 
@@ -41,7 +41,46 @@ installs the declared tool versions and workspace dependencies, and forwards the
 vp run vite-react-dev
 ```
 
-This task starts both the standalone RPC server and the Vite development server.
+This task starts the standalone server and the Vite development server. Vite proxies `/rpc`
+and `/api` to the standalone host. The HTTP and RPC handlers share one user directory.
+To use another HTTP host, set `VITE_HTTP_BASE_URL` to its origin, such as
+`http://127.0.0.1:3001`; the contract already supplies `/api`. The application provides the
+demo authorization header through its HTTP client middleware.
+
+### Compare HTTP and RPC
+
+The HTTP panel uses `createHttpApiQueryUtils` from `effect-api-query`; the existing RPC panels
+use `createRpcQueryUtils` from the same package root. The application owns both ready clients,
+their runners, and the QueryClient. Its disposal cancels queries before releasing client resources.
+
+Use the HTTP directory to read users, load another page, and create or delete a user. Each write
+explicitly invalidates both generated user prefixes, so the RPC directory reflects HTTP writes
+and the HTTP directory reflects RPC writes. The two adapters retain separate cache keys.
+**Reset directory** restores the deterministic shared data.
+
+The HTTP user selector passes `skipToken` until a user is selected. HTTP request inputs use
+structured decoded parts such as `params`, `query`, and `payload`; RPC inputs retain their
+payload-constructor defaults. Deleting a user demonstrates an HTTP no-content mutation whose
+result remains `undefined`.
+
+Trigger the HTTP failure to inspect `EffectHttpApiQueryError` and its preserved `Cause`.
+The package adds declaration identifiers to error metadata; upstream Causes can still contain
+request, response, or schema issue values.
+
+Choose **Start slow HTTP query**, wait for **HTTP: Ready to cancel**, then choose
+**Cancel HTTP query**. The
+example observes server interruption for that operation after the HTTP request is aborted. Each
+panel owns a distinct operation ID, so cancelling an RPC query leaves a concurrent HTTP query
+running. This cancels observation
+and work in this handler; it does not compensate completed mutations. The RPC cancellable-command
+panel continues to demonstrate explicit domain cancellation.
+
+The executable sources are
+[application ownership](https://github.com/ueberBrot/effect-rpc-query/blob/main/examples/vite-react/src/lib/application.ts),
+[HTTP contracts](https://github.com/ueberBrot/effect-rpc-query/tree/main/examples/contracts/src), and
+[server handlers](https://github.com/ueberBrot/effect-rpc-query/tree/main/examples/server/src).
+The application is type-checked against the public package root and exercised through the real
+server and browser suites.
 
 ## Run TanStack Start
 

@@ -2,6 +2,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 
 import { CommandsSection } from './components/sections/commands-section.tsx'
 import { DiagnosticsSection } from './components/sections/diagnostics-section.tsx'
+import { HttpSection } from './components/sections/http-section.tsx'
 import { MutationsSection } from './components/sections/mutations-section.tsx'
 import { QueriesSection } from './components/sections/queries-section.tsx'
 import type { ViteReactApplication } from './lib/application.ts'
@@ -14,11 +15,12 @@ const ExampleContent = ({ application }: { readonly application: ViteReactApplic
           Compare full queries, pages, and streams
         </h1>
         <p className="mt-5 max-w-3xl leading-7 text-zinc-400">
-          See how generated Effect RPC options load a complete directory, append cursor-based pages,
-          retain stream history, and display the latest live value.
+          See how generated Effect HTTP and RPC options share a directory, append cursor-based
+          pages, retain stream history, and display the latest live value.
         </p>
       </header>
 
+      <HttpSection application={application} />
       <QueriesSection application={application} />
       <MutationsSection application={application} />
       <DiagnosticsSection application={application} />

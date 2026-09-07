@@ -13,7 +13,10 @@ if (container === null) {
   throw new Error('The Vite React root element is missing')
 }
 
-const application = await startViteReactApplication({ rpcUrl })
+const application = await startViteReactApplication({
+  rpcUrl,
+  httpBaseUrl: import.meta.env.VITE_HTTP_BASE_URL ?? globalThis.location.origin,
+})
 const root = createRoot(container)
 root.render(
   <StrictMode>

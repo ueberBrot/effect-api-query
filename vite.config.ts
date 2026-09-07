@@ -179,12 +179,12 @@ export default defineConfig({
       },
       'vite-react-dev': {
         command:
-          'vp run --parallel --log labeled --filter @effect-api-query/server --filter @effect-rpc-query/vite-react dev',
+          'vp run --parallel --log labeled --filter @effect-api-query/server --filter @effect-api-query/vite-react dev',
         cache: false,
         dependsOn: ['pack'],
       },
       'vite-react-build': {
-        command: 'vp run --filter @effect-rpc-query/vite-react build',
+        command: 'vp run --filter @effect-api-query/vite-react build',
         dependsOn: ['pack'],
         input: [{ auto: true }, '!examples/vite-react/dist/**'],
         output: ['examples/vite-react/dist/**'],

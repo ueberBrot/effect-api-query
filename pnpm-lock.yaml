@@ -258,8 +258,8 @@ importers:
 
   examples/vite-react:
     dependencies:
-      '@effect-rpc-query/contracts':
-        specifier: workspace:@effect-api-query/contracts@*
+      '@effect-api-query/contracts':
+        specifier: workspace:*
         version: link:../contracts
       '@tanstack/react-query':
         specifier: 'catalog:'
@@ -267,8 +267,8 @@ importers:
       effect:
         specifier: 'catalog:'
         version: 4.0.0-rc.112
-      effect-rpc-query:
-        specifier: workspace:effect-api-query@*
+      effect-api-query:
+        specifier: workspace:*
         version: link:../..
       react:
         specifier: 'catalog:'
@@ -277,8 +277,8 @@ importers:
         specifier: 'catalog:'
         version: 19.2.8(react@19.2.8)
     devDependencies:
-      '@effect-rpc-query/server':
-        specifier: workspace:@effect-api-query/server@*
+      '@effect-api-query/server':
+        specifier: workspace:*
         version: link:../server
       '@tailwindcss/vite':
         specifier: 'catalog:'

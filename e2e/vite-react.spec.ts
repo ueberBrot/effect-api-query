@@ -26,8 +26,8 @@ test.describe('plain Vite React application', () => {
   })
 
   test('loads and accumulates infinite-query pages', async ({ page }) => {
-    await expect(page.getByText('4 of 12 loaded')).toBeVisible()
-    await expect(page.getByText('Page 1: 4 users')).toBeVisible()
+    await expect(page.getByText('4 of 12 loaded', { exact: true })).toBeVisible()
+    await expect(page.getByText('Page 1: 4 users', { exact: true })).toBeVisible()
 
     const nextPageResponse = page.waitForResponse(
       (response) => response.ok() && recordsRpc(response.request().postData(), 'users.page'),
@@ -35,8 +35,8 @@ test.describe('plain Vite React application', () => {
     await page.getByRole('button', { name: 'Load next 4 users' }).click()
     await nextPageResponse
 
-    await expect(page.getByText('Page 2: 4 users')).toBeVisible()
-    await expect(page.getByText('8 of 12 loaded')).toBeVisible()
+    await expect(page.getByText('Page 2: 4 users', { exact: true })).toBeVisible()
+    await expect(page.getByText('8 of 12 loaded', { exact: true })).toBeVisible()
   })
 
   test('renders accumulated and live stream values', async ({ page }) => {

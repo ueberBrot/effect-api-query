@@ -1,4 +1,4 @@
-import type { User } from '@effect-rpc-query/contracts'
+import type { User } from '@effect-api-query/contracts'
 import { useMutation } from '@tanstack/react-query'
 
 import type { ViteReactApplication } from '../../lib/application.ts'
@@ -12,10 +12,10 @@ export const UserList = ({
   readonly application: ViteReactApplication
   readonly users: ReadonlyArray<User> | undefined
 }) => {
-  const { queryClient, rpcQuery } = application
+  const { invalidateUsers, rpcQuery } = application
   const deleteUser = useMutation(
     rpcQuery.users.delete.mutationOptions({
-      onSuccess: () => queryClient.invalidateQueries({ queryKey: rpcQuery.users.key() }),
+      onSuccess: invalidateUsers,
     }),
   )
 
