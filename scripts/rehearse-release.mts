@@ -58,18 +58,18 @@ HTTP streaming, multipart uploads, and raw-response modes remain outside the sup
     }
   }
 
-  const run = (...args: string[]) => execFileSync('vp', args, { cwd: directory, stdio: 'inherit' })
-  run('run', 'pack')
-  run('pm', 'pack', '--pack-destination', '.artifacts', '--', '--config.ignore-scripts=true')
+  execFileSync('vp', ['run', 'packed-package'], {
+    cwd: directory,
+    stdio: 'inherit',
+    env: {
+      ...process.env,
+      EFFECT_API_QUERY_TARBALL: join(directory, '.artifacts', 'effect-api-query-0.1.0.tgz'),
+    },
+  })
   const archives = readdirSync(join(directory, '.artifacts')).filter((file) =>
     file.endsWith('.tgz'),
   )
   deepStrictEqual(archives, ['effect-api-query-0.1.0.tgz'])
-  execFileSync('vp', ['run', 'verify-packed-package'], {
-    cwd: directory,
-    stdio: 'inherit',
-    env: { ...process.env, EFFECT_API_QUERY_TARBALL: join(directory, '.artifacts', archives[0]!) },
-  })
   console.log(`Initial release rehearsal passed for ${commit}; private workspaces are unchanged.`)
 } finally {
   rmSync(directory, { recursive: true, force: true })
