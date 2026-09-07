@@ -67,9 +67,12 @@ function, so manual `refetch()` cannot run it. Supply valid input to enable it. 
 request is available and you need manual refetch, use `enabled: false` instead.
 
 For HTTP pagination, map each page parameter to the complete request and keep stable filters in
-every page. See [Load pages](/effect-rpc-query/guides/http-queries-and-mutations/#load-pages) for
+every page. See [Load pages](/effect-api-query/guides/http-queries-and-mutations/#load-pages) for
 initial-request identity and cursor progression.
 
-Try this in either [executable example](/effect-rpc-query/examples/#pause-a-query-until-a-user-is-selected).
+Try this in either [executable example](/effect-api-query/examples/#pause-a-query-until-a-user-is-selected).
 The **Choose before fetching** control demonstrates pausing, selecting a user, and reusing fresh
 cached data after clearing and reselecting the same user.
+
+The [public RPC consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/public-contract.ts) and
+[public HTTP consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/http-contract.ts) check skipped hook inference and rejected uses.

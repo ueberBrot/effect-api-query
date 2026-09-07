@@ -10,16 +10,16 @@ to 1 MiB and return HTTP 413 for larger bodies.
 
 | Example                                                                                           | Demonstrates                                                                                       | API host                                          | Application URL         |
 | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------- | ----------------------- |
-| [Vite React](https://github.com/ueberBrot/effect-rpc-query/tree/main/examples/vite-react)         | RPC queries and streams beside buffered HTTP reads, writes, pagination, failures, and cancellation | Standalone server on port `3001`, proxied by Vite | `http://127.0.0.1:5173` |
-| [TanStack Start](https://github.com/ueberBrot/effect-rpc-query/tree/main/examples/tanstack-start) | RPC and HTTP loaders, server rendering, hydration, navigation, mutations, and cancellation         | Same-origin `/rpc` and `/api/$` server routes     | `http://127.0.0.1:3000` |
+| [Vite React](https://github.com/ueberBrot/effect-api-query/tree/main/examples/vite-react)         | RPC queries and streams beside buffered HTTP reads, writes, pagination, failures, and cancellation | Standalone server on port `3001`, proxied by Vite | `http://127.0.0.1:5173` |
+| [TanStack Start](https://github.com/ueberBrot/effect-api-query/tree/main/examples/tanstack-start) | RPC and HTTP loaders, server rendering, hydration, navigation, mutations, and cancellation         | Same-origin `/rpc` and `/api/$` server routes     | `http://127.0.0.1:3000` |
 
 ## Set up locally
 
 Clone the repository, then run commands from its root:
 
 ```sh
-git clone https://github.com/ueberBrot/effect-rpc-query.git
-cd effect-rpc-query
+git clone https://github.com/ueberBrot/effect-api-query.git
+cd effect-api-query
 ```
 
 Install the Node version in `.node-version` and the pnpm version in `package.json`, then install
@@ -77,9 +77,9 @@ and work in this handler; it does not compensate completed mutations. The RPC ca
 panel continues to demonstrate explicit domain cancellation.
 
 The executable sources are
-[application ownership](https://github.com/ueberBrot/effect-rpc-query/blob/main/examples/vite-react/src/lib/application.ts),
-[HTTP contracts](https://github.com/ueberBrot/effect-rpc-query/tree/main/examples/contracts/src), and
-[server handlers](https://github.com/ueberBrot/effect-rpc-query/tree/main/examples/server/src).
+[application ownership](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/lib/application.ts),
+[HTTP contracts](https://github.com/ueberBrot/effect-api-query/tree/main/examples/contracts/src), and
+[server handlers](https://github.com/ueberBrot/effect-api-query/tree/main/examples/server/src).
 The application is type-checked against the public package root and exercised through the real
 server and browser suites.
 
@@ -98,7 +98,7 @@ in the browser.
 Server rendering uses the trusted origin `http://127.0.0.1:3000`. If the Start server listens
 elsewhere, set the server-only `EXAMPLE_API_ORIGIN` environment variable to its HTTP(S) origin,
 without a path, credentials, query, or fragment. Browser requests stay on the same origin.
-See [TanStack Start](/effect-rpc-query/guides/tanstack-start/) for request ownership, authentication,
+See [TanStack Start](/effect-api-query/guides/tanstack-start/) for request ownership, authentication,
 cache isolation, and hydration setup.
 
 ## Pause a query until a user is selected
@@ -127,7 +127,7 @@ In either application's diagnostics panel, choose **Trigger declared failure**. 
 mutation options supply the `x-request-source: diagnostics-panel` RPC header. Application-wide
 authorization still comes from the shared client runner. The same `rpcOptions` input works with
 queries, infinite queries, and both stream builders; see
-[Generated Builders](/effect-rpc-query/reference/generated-builders/#request-local-rpc-options).
+[Generated Builders](/effect-api-query/reference/generated-builders/#request-local-rpc-options).
 
 ## Build the examples
 

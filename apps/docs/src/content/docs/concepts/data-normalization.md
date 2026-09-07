@@ -22,11 +22,17 @@ values, while the ready HttpApiClient encodes them for execution.
 Every declared request container remains required, even when its fields are optional. For example,
 an endpoint with optional query filters still takes `input: { query: {} }` when no filter is selected.
 
-## Undefined query results
+## No-content and undefined query results
 
 TanStack Query rejects `undefined` as successful query data. If an RPC or HTTP query success type may be
 `undefined`, the generated query resolves to `null` instead. The exported `QueryData<A>` type models
 that rule.
 
+An HTTP endpoint using `HttpApiSchema.NoContent` decodes its successful 204 response to
+`undefined`, so its ordinary and infinite queries cache `null`.
+
 Mutations keep the original success type. A mutation that succeeds with `undefined` still
 resolves to `undefined`.
+
+The [packed RPC consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/packed-consumer/runtime.mts) and
+[packed HTTP consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/packed-consumer/http-runtime.mts) exercise these normalization rules.

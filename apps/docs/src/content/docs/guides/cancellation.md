@@ -131,3 +131,7 @@ This example stores operation records in memory until the example is reset or th
 Production applications need their own authorization, durable storage, and retention policy if
 operations must survive restarts. The explicit RPC contract does not make this in-memory example
 a durable job queue.
+
+The [command panel](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/components/sections/commands-section.tsx)
+and [command tests](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/tests/commands.test.ts) exercise this workflow.
+The [HTTP transport tests](https://github.com/ueberBrot/effect-api-query/blob/main/tests/http-transport-cancellation.test.ts) verify cancellation through fetch.

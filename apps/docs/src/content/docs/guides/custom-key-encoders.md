@@ -72,5 +72,9 @@ when excluding a secret.
 Return strict `JsonValue` synchronously. The factory copies and freezes the result; it rejects
 undefined object members, undefined or sparse array entries, non-finite numbers, cycles, and
 non-JSON objects. Custom output does not receive the default HTTP omission or header normalization.
-See the [HTTP reference](/effect-rpc-query/reference/http-factory/#cache-identity-and-failures) for
+See the [HTTP reference](/effect-api-query/reference/http-factory/#cache-identity-and-failures) for
 failure codes. Underlying error Causes remain intact and may contain values supplied by Effect.
+
+The [public RPC consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/public-contract.ts) and
+[public HTTP consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/http-contract.ts) check encoder inputs and required services.
+The [HTTP key tests](https://github.com/ueberBrot/effect-api-query/blob/main/tests/http-semantic-keys.test.ts) verify alternative payload and binary projections.

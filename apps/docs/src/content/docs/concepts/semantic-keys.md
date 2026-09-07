@@ -37,7 +37,7 @@ all descendant operations.
 
 Unsupported values, failed construction, and failed encoding raise `EffectRpcQueryKeyError` before
 network execution. Serviceful or redacted payloads require a
-[custom key encoder](/effect-rpc-query/guides/custom-key-encoders/).
+[custom key encoder](/effect-api-query/guides/custom-key-encoders/).
 
 HTTP keys use the endpoint's decoded request input without RPC construction. Default preparation
 schema-encodes the labelled request parts, omits encoded undefined object members, normalizes header
@@ -47,5 +47,8 @@ trying to infer every possible equivalence between HTTP requests.
 
 Client middleware is outside that declared identity. Use safe user, tenant, or other identity
 partitions in the caller prefix when they affect results. See the
-[HTTP factory reference](/effect-rpc-query/reference/http-factory/#cache-identity-and-failures) and
-[HTTP encoder guide](/effect-rpc-query/guides/custom-key-encoders/#http-requests) for the complete rules.
+[HTTP factory reference](/effect-api-query/reference/http-factory/#cache-identity-and-failures) and
+[HTTP encoder guide](/effect-api-query/guides/custom-key-encoders/#http-requests) for the complete rules.
+
+The [RPC key tests](https://github.com/ueberBrot/effect-api-query/blob/main/tests/create-rpc-query-utils-keys.test.ts) and
+[HTTP key tests](https://github.com/ueberBrot/effect-api-query/blob/main/tests/http-semantic-keys.test.ts) verify canonical identity and its failure cases.

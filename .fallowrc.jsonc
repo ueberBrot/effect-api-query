@@ -3,7 +3,7 @@
 
   // Astro copies this browser entry from public/ and loads it through the
   // Starlight head configuration, which static import analysis cannot follow.
-  "entry": ["apps/docs/public/package-version.js"],
+  "entry": ["apps/docs/public/package-version.js", "playwright.docs.config.ts"],
 
   "ignorePatterns": ["examples/tanstack-start/src/routeTree.gen.ts"],
 
@@ -15,6 +15,10 @@
     },
     {
       "file": "playwright.config.ts",
+      "exports": ["default"]
+    },
+    {
+      "file": "playwright.docs.config.ts",
       "exports": ["default"]
     },
     {

@@ -1,8 +1,8 @@
 # Add buffered HTTP utilities with separate key roots
 
-Status: Accepted. Amends ADR 0001, ADR 0003, ADR 0005–0008, and ADR 0021.
+Status: Accepted. Amends ADR 0001, ADR 0003, ADR 0005–0008, ADR 0013, and ADR 0021.
 
-Export `createHttpApiQueryUtils` beside `createRpcQueryUtils` through one package root. Private
+Publish one `effect-api-query` package at the workspace root. Export `createHttpApiQueryUtils` beside `createRpcQueryUtils` through one package root. Private
 adapters share utility construction but retain their distinct request and projection contracts.
 Use `src/core`, `src/http`, and `src/rpc` with direct imports and explicit root exports.
 

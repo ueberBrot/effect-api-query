@@ -68,5 +68,9 @@ The same hooks accept HTTP options. For an endpoint that declares an `id` parame
 const user = useQuery(http.users.get.queryOptions({ input: { params: { id: 1 } } }))
 ```
 
-Follow [HTTP Queries and Mutations](/effect-rpc-query/guides/http-queries-and-mutations/) to create
+Follow [HTTP Queries and Mutations](/effect-api-query/guides/http-queries-and-mutations/) to create
 the HTTP utilities and configure mutation invalidation.
+
+The [public RPC consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/public-contract.ts) and
+[public HTTP consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/http-contract.ts) compile these hook patterns.
+The [Vite React example](/effect-api-query/examples/) provides the application setup.

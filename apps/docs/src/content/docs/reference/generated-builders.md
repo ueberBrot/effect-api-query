@@ -1,5 +1,5 @@
 ---
-title: Generated Builders
+title: RPC Builders
 description: Branch and RPC leaf methods for keys, queries, mutations, and streams.
 ---
 
@@ -76,7 +76,7 @@ because the package adapts streams itself. Request options do not affect generat
 header changes the identity of the returned data, represent that identity in the RPC payload or
 an application-owned key prefix to keep cache entries separate.
 
-See [Client Lifecycle](/effect-rpc-query/concepts/client-lifecycle/) for application-wide configuration.
+See [Client Lifecycle](/effect-api-query/concepts/client-lifecycle/) for application-wide configuration.
 
 ## Build an infinite query
 
@@ -157,3 +157,7 @@ including skipped options. Invalid bounds throw `EffectRpcQueryConfigError` with
 
 Live queries always replace the cached value and therefore expose no `refetchMode`. Cancelling,
 unmounting, or superseding either stream closes its iterator and interrupts its Effect resources.
+
+The [public RPC consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/public-contract.ts) checks the builder examples
+and hook types. The [streaming tests](https://github.com/ueberBrot/effect-api-query/blob/main/tests/create-rpc-query-utils-streaming.test.ts)
+verify accumulation, replacement, bounds, and cancellation.

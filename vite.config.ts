@@ -206,21 +206,28 @@ export default defineConfig({
         output: ['examples/tanstack-start/dist/**'],
       },
       docs: {
-        command: 'vp run --filter @effect-rpc-query/docs dev',
+        command: 'vp run --filter @effect-api-query/docs dev',
         cache: false,
       },
       'docs-build': {
-        command: 'vp run --filter @effect-rpc-query/docs build',
+        command: 'vp run --filter @effect-api-query/docs build',
         dependsOn: ['docs-check'],
         input: [{ auto: true }, '!apps/docs/dist/**'],
         output: ['apps/docs/dist/**'],
       },
       'docs-check': {
-        command: 'vp run --filter @effect-rpc-query/docs check',
+        command: [
+          'node scripts/verify-docs-examples.mts',
+          'vp run --filter @effect-api-query/docs check',
+        ],
         output: [],
       },
+      'docs-e2e': {
+        command: 'playwright test --config playwright.docs.config.ts',
+        cache: false,
+      },
       'docs-preview': {
-        command: 'vp run --filter @effect-rpc-query/docs preview',
+        command: 'vp run --filter @effect-api-query/docs preview',
         cache: false,
         dependsOn: ['docs-build'],
       },
@@ -236,6 +243,7 @@ export default defineConfig({
           'vp run vite-react-build',
           'vp run tanstack-start-build',
           'vp run docs-build',
+          'vp run docs-e2e',
           'vp run e2e',
         ],
       },

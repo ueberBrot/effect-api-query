@@ -24,7 +24,7 @@ All supported imports come from `effect-api-query`.
 | `EffectRpcQueryConfigErrorCode`  | Stable configuration error-code union.                             |
 | `EffectRpcQueryKeyErrorCode`     | Stable key error-code union.                                       |
 
-The [HTTP factory](/effect-rpc-query/reference/http-factory/) adds `createHttpApiQueryUtils`,
+The [HTTP factory](/effect-api-query/reference/http-factory/) adds `createHttpApiQueryUtils`,
 `HttpApiQueryUtils`, `CreateHttpApiQueryUtilsOptions`, and `HttpApiKeyEncoder`. Its errors are
 `EffectHttpApiQueryError`, `EffectHttpApiQueryConfigError`, and `EffectHttpApiQueryKeyError`, with
 `isEffectHttpApiQueryError`, `EffectHttpApiQueryConfigErrorCode`, and
@@ -32,4 +32,4 @@ The [HTTP factory](/effect-rpc-query/reference/http-factory/) adds `createHttpAp
 
 `UnaryRpcOptions` describes request-local headers and Context for unary builders.
 `StreamingRpcOptions` additionally accepts the Effect client's stream buffer size.
-See [Generated Builders](/effect-rpc-query/reference/generated-builders/#request-local-rpc-options) for their behavior.
+See [Generated Builders](/effect-api-query/reference/generated-builders/#request-local-rpc-options) for their behavior.

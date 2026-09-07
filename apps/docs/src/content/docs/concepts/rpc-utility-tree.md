@@ -17,4 +17,4 @@ Streaming leaves add accumulated-stream and live-query builders. The tree is bui
 tags, collisions, and encoder configuration fail during factory construction.
 
 Reserved builder names cannot appear where they would collide with generated members. See
-[Generated Builders](/effect-rpc-query/reference/generated-builders/) for the leaf interface.
+[Generated Builders](/effect-api-query/reference/generated-builders/) for the leaf interface.

@@ -38,8 +38,8 @@ is your application's runner. Configure transport URLs, authentication, and requ
 creating the client and runner. Use a trusted server destination for SSR and a browser-accessible
 destination for client requests.
 
-The [RPC factory reference](/effect-rpc-query/reference/factory/) and
-[HTTP guide](/effect-rpc-query/guides/http-queries-and-mutations/) cover client setup, optional
+The [RPC factory reference](/effect-api-query/reference/factory/) and
+[HTTP guide](/effect-api-query/guides/http-queries-and-mutations/) cover client setup, optional
 runners, and request inputs. The package generates query options; your application owns the API
 host, router, and providers.
 
@@ -68,8 +68,8 @@ the server and browser to address the same cache entry.
 For pagination, pass generated `infiniteOptions` to `queryClient.infiniteQuery` in the loader and
 `useInfiniteQuery` in the component. After a write, use generated `mutationOptions` and invalidate
 the relevant group key. These are ordinary TanStack Query operations; see
-[Cache Management](/effect-rpc-query/guides/cache-management/) and
-[Generated Builders](/effect-rpc-query/reference/generated-builders/).
+[Cache Management](/effect-api-query/guides/cache-management/) and
+[Generated Builders](/effect-api-query/reference/generated-builders/).
 
 ## Own request lifetimes and hydration
 
@@ -111,7 +111,7 @@ serializing an error and its cause into the page.
 When the page should render despite a loader failure, catch the loader rejection and use
 `useQuery` in the component to render pending and error states. Otherwise, allow the loader error
 to reach your route's error handling. See
-[Handle Failures](/effect-rpc-query/guides/handle-failures/) for inspecting typed failures.
+[Handle Failures](/effect-api-query/guides/handle-failures/) for inspecting typed failures.
 
 ## Capture an RPC stream snapshot
 
@@ -122,16 +122,16 @@ Cancellation closes the iterator and releases its Effect resources. The browser 
 snapshot and may refetch according to your TanStack policies.
 
 The example's
-[`fetchStreamSnapshot`](https://github.com/ueberBrot/effect-rpc-query/blob/main/examples/tanstack-start/src/lib/query-ssr.ts)
+[`fetchStreamSnapshot`](https://github.com/ueberBrot/effect-api-query/blob/main/examples/tanstack-start/src/lib/query-ssr.ts)
 shows the cache subscription, cancellation, and cleanup needed for this pattern.
 
 ## Explore the executable example
 
-The [TanStack Start example](https://github.com/ueberBrot/effect-rpc-query/tree/main/examples/tanstack-start)
+The [TanStack Start example](https://github.com/ueberBrot/effect-api-query/tree/main/examples/tanstack-start)
 includes separate RPC and HTTP views to demonstrate both factories. It verifies successful SSR,
 hydration without duplicate reads, cached navigation, pagination, mutations, failures, and
 cancellation. Its `/http-failure` route demonstrates omission and browser refetch of a failed query.
-See [Executable Examples](/effect-rpc-query/examples/) for commands and controls.
+See [Executable Examples](/effect-api-query/examples/) for commands and controls.
 
 The example serves RPC at `/rpc` and HTTP at `/api/$`. Both handlers share a demonstration user
 directory, so writes invalidate both sets of query keys. Its authorization header is a public

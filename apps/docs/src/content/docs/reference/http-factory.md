@@ -6,7 +6,7 @@ description: HTTP factory options, decoded request input, response data, and cac
 `createHttpApiQueryUtils(api, options)` derives an eager, frozen HTTP utility tree from an Effect
 HttpApi and an application-owned ready HttpApiClient. Import it from `effect-api-query`.
 
-For a step-by-step example, see [HTTP Queries and Mutations](/effect-rpc-query/guides/http-queries-and-mutations/).
+For a step-by-step example, see [HTTP Queries and Mutations](/effect-api-query/guides/http-queries-and-mutations/).
 
 Ordinary groups appear as `utils[groupIdentifier][endpointIdentifier]`. Top-level groups place
 their endpoints at `utils[endpointIdentifier]`. Identifiers containing dots remain literal
@@ -53,7 +53,7 @@ deterministic: options construction evaluates it for the initial key, and execut
 for every page. QueryClient stores native `InfiniteData` and owns invalidation and refetching.
 Selections can transform observer data without changing cached pages. Every page preserves the
 ordinary HTTP execution contract, including `undefined`-to-`null` normalization, wrapped errors,
-and cancellation. See [Load pages](/effect-rpc-query/guides/http-queries-and-mutations/#load-pages).
+and cancellation. See [Load pages](/effect-api-query/guides/http-queries-and-mutations/#load-pages).
 
 ## Factory options
 
@@ -90,8 +90,8 @@ client errors, and additional ready-client errors in the wrapped Cause's type. R
 include request encoders, success/error decoders, and residual ready-client services for exposed
 endpoints. Compatible custom clients retain errors and residual services from their decoded-only
 call signatures; raw-response overloads contribute neither.
-See [client lifecycle](/effect-rpc-query/concepts/client-lifecycle/#http-clients-and-execution-services)
-and [cancellation](/effect-rpc-query/guides/cancellation/#cancel-an-http-query) for runtime ownership.
+See [client lifecycle](/effect-api-query/concepts/client-lifecycle/#http-clients-and-execution-services)
+and [cancellation](/effect-api-query/guides/cancellation/#cancel-an-http-query) for runtime ownership.
 
 Any streaming success alternative, including a header-wrapped stream, omits the complete endpoint.
 Any multipart request alternative does the same. Groups containing only omitted endpoints disappear.
@@ -122,7 +122,7 @@ Multiple effective payload schemas require a custom encoder, including alternati
 content type. Static enforcement applies where declaration types retain distinct schemas; runtime
 validation covers alternatives erased by annotation types. Buffered binary input needs an explicit
 JSON-safe projection because default keys cannot contain `Uint8Array`. See
-[custom key encoders](/effect-rpc-query/guides/custom-key-encoders/#http-requests).
+[custom key encoders](/effect-api-query/guides/custom-key-encoders/#http-requests).
 
 `EffectHttpApiQueryKeyError` identifies the API, group, endpoint, and method and distinguishes:
 

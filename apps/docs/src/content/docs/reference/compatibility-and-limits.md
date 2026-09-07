@@ -5,22 +5,50 @@ description: Supported versions, RPC and HTTP operations, cache identity, and ru
 
 ## Supported integrations
 
-- Effect `4.0.0-rc.112`.
-- TanStack Query Core `>=5.102.0 <6`.
-- Query Core, React Query, TanStack Router loaders, and TanStack Start.
-- TypeScript 5.9 or newer with `strict: true`.
-- The package is ESM-only and targets ES2022.
+The package targets Effect 4 and TanStack Query Core 5, with React Query and TanStack Start
+integrations checked in this repository. It is ESM-only and targets ES2022. Use TypeScript with
+`strict: true`.
 
-## Operations
+Consult [package metadata](https://github.com/ueberBrot/effect-api-query/blob/main/package.json) for
+peer ranges and the [workspace catalog](https://github.com/ueberBrot/effect-api-query/blob/main/pnpm-workspace.yaml)
+for the pinned Effect prerelease and framework versions. The
+[packed consumer verifier](https://github.com/ueberBrot/effect-api-query/blob/main/scripts/verify-packed-consumer.mts)
+defines the compiler and peer combinations tested against the published package shape.
 
-- Unary RPCs expose ordinary query, infinite-query, and mutation builders. Streaming RPCs expose
-  accumulated-stream and live-query builders.
-- Infinite queries map each TanStack `pageParam` to one unary RPC payload or complete HTTP request.
-  Streaming builders adapt an Effect RPC stream through TanStack's experimental `streamedQuery` helper.
-- Buffered HTTP endpoints expose ordinary query, infinite query, and mutation builders. Any streaming success or
-  multipart request alternative omits the endpoint. See the [HTTP factory](/effect-rpc-query/reference/http-factory/).
-- Input-bearing RPC and HTTP queries accept `skipToken`. Skipped query functions cannot run through manual refetch.
-- Use the ready client directly for calls that do not need TanStack Query.
+## Capability matrix
+
+**Generated** means the package supplies the typed builders and runtime behavior. **Tested** means
+an executable consumer verifies the integration. **Application-owned** means your application
+supplies the client, policy, or lifecycle. **Deferred** means the adapter does not expose it.
+
+| Capability                                        | RPC                                                                                                      | HTTP                                                                                        |
+| ------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Ordinary queries and mutations                    | Generated for unary RPCs                                                                                 | Generated for buffered endpoints, regardless of method                                      |
+| Pagination                                        | Generated `infiniteOptions`; pages map to payloads                                                       | Generated `infiniteOptions`; pages map to complete decoded requests                         |
+| Accumulated streams and live queries              | Generated for streaming RPCs; tested cancellation and SSR snapshots                                      | Deferred; any streaming success alternative omits the endpoint                              |
+| Multipart uploads                                 | Application-owned transport and payload contract                                                         | Deferred; any multipart request alternative omits the endpoint                              |
+| Raw HTTP response modes                           | Outside the RPC contract                                                                                 | Deferred; generated calls force decoded-only responses                                      |
+| Conditional queries                               | Generated `skipToken` support for input-bearing queries                                                  | Generated `skipToken` support for input-bearing queries                                     |
+| Cache keys and invalidation prefixes              | Generated `rpc` namespace and dotted tag paths                                                           | Generated `http` namespace, API identifier, and literal projected paths                     |
+| Failure inspection                                | Generated wrapper preserves the failed Exit Cause                                                        | Generated wrapper preserves the failed Exit Cause and declaration identity                  |
+| Query cancellation                                | Generated signal forwarding and stream iterator cleanup; transport support is application-owned          | Generated signal forwarding; fetch abort is tested                                          |
+| Mutation cancellation                             | No upstream TanStack mutation abort signal; explicit cancellable command is application-owned and tested | No upstream TanStack mutation abort signal; domain cancellation is application-owned        |
+| Authentication, middleware, and residual services | Application-owned ready client and runner                                                                | Application-owned ready client and runner                                                   |
+| React hooks and QueryClient                       | Tested public consumers and Vite React example                                                           | Tested public consumers and Vite React example                                              |
+| SSR and hydration                                 | Application-owned; tested Start route loading and stream snapshots                                       | Application-owned; tested Start SSR, hydration, failed-query refetch, and request isolation |
+| Host routes                                       | Application-owned; tested standalone server and Start `/rpc`                                             | Application-owned; tested standalone server and Start `/api/$`                              |
+| Cache serialization and mutation invalidation     | Application-owned                                                                                        | Application-owned                                                                           |
+
+The package uses the ready client as its execution seam. TanStack provides query cancellation
+signals but has no corresponding mutation signal for the adapter to forward. Configure request
+interception through client middleware and transport construction. Use an explicit domain
+operation when server cancellation must be observable; compensation is a separate operation.
+
+The [public RPC consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/public-contract.ts),
+[public HTTP consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/http-contract.ts),
+and [executable examples](/effect-api-query/examples/) establish the tested scope. Streaming RPC
+builders use TanStack's experimental `streamedQuery` helper. Use the ready client directly for
+calls that do not need TanStack Query.
 
 ## Runtime and cache behavior
 

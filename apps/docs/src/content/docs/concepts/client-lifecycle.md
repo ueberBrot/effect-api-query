@@ -3,7 +3,7 @@ title: Client Lifecycle
 description: Keep RPC and HTTP clients, runtimes, and resources under caller ownership.
 ---
 
-The factory accepts a ready flat RPC client. It does not acquire the client, open its `Scope`, or
+`createRpcQueryUtils` accepts a ready flat RPC client. It does not acquire the client, open its `Scope`, or
 dispose application resources.
 
 This boundary keeps ownership explicit:
@@ -33,10 +33,10 @@ A custom key encoder supplies cache identity only; execution still needs those s
 
 Configure HTTP authentication and request middleware when constructing the ready client. HTTP
 builders have no `rpcOptions`. Partition `keyPrefix` with safe identity values whenever middleware
-changes the result for a user or tenant. See the [HTTP factory](/effect-rpc-query/reference/http-factory/)
+changes the result for a user or tenant. See the [HTTP factory](/effect-api-query/reference/http-factory/)
 for decoded request input and the independent key-encoder contract.
 
-## Request-local configuration
+## Request-local RPC configuration
 
 Use a builder's `rpcOptions` for metadata or configuration specific to one request, such as a
 request-source header or streaming buffer size. The `context` value is local to Effect RPC client

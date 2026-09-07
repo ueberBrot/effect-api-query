@@ -65,13 +65,13 @@ Thrown synchronously while preparing an HTTP query key, before client execution.
 - `KeyEncoderFailed`
 - `InvalidKeyValue`
 
-See [HTTP cache identity and failures](/effect-rpc-query/reference/http-factory/#cache-identity-and-failures)
+See [HTTP cache identity and failures](/effect-api-query/reference/http-factory/#cache-identity-and-failures)
 for the trigger for each code.
 
 ## `EffectHttpApiQueryError<E>`
 
 Thrown when the HTTP runner returns a failed `Exit`. It exposes `apiId`, `groupId`, `endpoint`,
-`method`, `operation`, and the full `Cause.Cause<E>`. The operation is `query` or `mutation`.
+`method`, `operation`, and the full `Cause.Cause<E>`. The operation is `query`, `infinite`, or `mutation`.
 Use `isEffectHttpApiQueryError(value)` to narrow errors within the same JavaScript realm.
 
 The Cause preserves endpoint, middleware, Schema, and HTTP client errors, including defects and

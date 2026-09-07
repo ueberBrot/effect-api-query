@@ -1,5 +1,5 @@
 ---
-title: Factory
+title: RPC Factory
 description: Create an RPC utility tree from an RPC group and a ready client.
 ---
 
@@ -26,3 +26,5 @@ const rpcQuery = createRpcQueryUtils(rpcGroup, {
 
 The factory throws `EffectRpcQueryConfigError` for an invalid prefix, RPC path collision, reserved
 path segment, or invalid encoder map. It performs no network request.
+
+The [public RPC consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/public-contract.ts) checks factory inference and runner requirements.
