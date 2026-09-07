@@ -41,7 +41,7 @@ test('opens both tutorials and searches the production index under the public ba
 
   await page.getByRole('button', { name: 'Search', exact: true }).click()
   const search = page.getByRole('dialog', { name: 'Search', exact: true })
-  await search.getByRole('searchbox').fill('RPC Quick Start')
+  await search.getByRole('textbox', { name: 'Search' }).fill('RPC Quick Start')
   const result = search.locator(`a[href$="${docsBase}getting-started/quick-start/"]`).first()
   await expect(result).toBeVisible()
   await result.click()

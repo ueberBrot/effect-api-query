@@ -138,7 +138,7 @@ jobs:
         run: vp exec playwright install --with-deps ${{ matrix.browser }}
 
       - name: Check documentation in ${{ matrix.browser }}
-        run: vp run docs-e2e -- --project=${{ matrix.browser }}
+        run: vp run docs-e2e --project=${{ matrix.browser }}
 
       - name: Run ${{ matrix.browser }} acceptance tests
         run: vp run e2e:${{ matrix.browser }}

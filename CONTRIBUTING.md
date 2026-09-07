@@ -5,7 +5,7 @@ workspace. Install Docker and a Dev Container client, open the repository, and c
 Containers: Reopen in Container** in VS Code.
 
 The container forwards ports `3000`, `3001`, `4173`, and `5173` for the examples and previews.
-See [Run the examples](https://ueberbrot.github.io/effect-rpc-query/examples/) to start an application.
+See [Run the examples](https://ueberbrot.github.io/effect-api-query/examples/) to start an application.
 
 ## Validate changes
 
@@ -19,6 +19,7 @@ Run the documentation site with `vp run docs`. Check and build it with:
 
 ```sh
 vp run docs-build
+vp run docs-e2e
 ```
 
 ## Update dependencies
