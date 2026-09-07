@@ -1,6 +1,6 @@
 # Use a Vite+ workspace with a root package
 
-Status: Amended by ADR 0019 and [ADR 0022](0022-add-buffered-http-utilities-with-separate-key-roots.md). The single root package now installs as `effect-api-query`; both adapters remain private implementations within it.
+Status: Amended by ADR 0019 and [ADR 0022](0022-add-buffered-http-utilities-with-separate-key-roots.md). Both adapters are private implementations within the single root package.
 
 ## Context
 
@@ -9,7 +9,7 @@ initial release path.
 
 ## Decision
 
-Use a Vite+ pnpm workspace with the publishable `effect-rpc-query` package permanently at the root.
+Use a Vite+ pnpm workspace with the publishable `effect-api-query` package permanently at the root.
 Keep examples private. Future public packages may live under `packages/`.
 
 ## Consequences
