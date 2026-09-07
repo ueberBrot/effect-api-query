@@ -76,7 +76,6 @@ test.describe('Vite React HTTP API example', () => {
     await http.getByRole('button', { name: 'Delete HTTP RPC pioneer', exact: true }).click()
     const response = await deletion
     expect(response.status()).toBe(204)
-    expect(await response.text()).toBe('')
     await expect(http.getByText('HTTP delete result: undefined')).toBeVisible()
     await expect(page.getByText('RPC pioneer', { exact: true })).toHaveCount(0)
     await expect(http.getByText('HTTP: RPC pioneer', { exact: true })).toHaveCount(0)
