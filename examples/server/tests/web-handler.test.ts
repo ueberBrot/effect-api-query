@@ -1,4 +1,4 @@
-import { makeExampleRpcWebHandler } from '@effect-rpc-query/server/web-handler'
+import { makeExampleRpcWebHandler } from '@effect-api-query/server/web-handler'
 import { describe, expect, it } from '@effect/vitest'
 import { Effect } from 'effect'
 

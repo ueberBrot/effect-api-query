@@ -75,10 +75,10 @@ importers:
       '@changesets/config':
         specifier: 4.0.0
         version: 4.0.0
-      '@effect-rpc-query/contracts':
+      '@effect-api-query/contracts':
         specifier: workspace:*
         version: link:examples/contracts
-      '@effect-rpc-query/server':
+      '@effect-api-query/server':
         specifier: workspace:*
         version: link:examples/server
       '@effect/tsgo':
@@ -181,7 +181,7 @@ importers:
 
   examples/server:
     dependencies:
-      '@effect-rpc-query/contracts':
+      '@effect-api-query/contracts':
         specifier: workspace:*
         version: link:../contracts
       effect:
@@ -195,10 +195,10 @@ importers:
   examples/tanstack-start:
     dependencies:
       '@effect-rpc-query/contracts':
-        specifier: workspace:*
+        specifier: workspace:@effect-api-query/contracts@*
         version: link:../contracts
       '@effect-rpc-query/server':
-        specifier: workspace:*
+        specifier: workspace:@effect-api-query/server@*
         version: link:../server
       '@tanstack/react-query':
         specifier: 'catalog:'
@@ -259,7 +259,7 @@ importers:
   examples/vite-react:
     dependencies:
       '@effect-rpc-query/contracts':
-        specifier: workspace:*
+        specifier: workspace:@effect-api-query/contracts@*
         version: link:../contracts
       '@tanstack/react-query':
         specifier: 'catalog:'
@@ -278,7 +278,7 @@ importers:
         version: 19.2.8(react@19.2.8)
     devDependencies:
       '@effect-rpc-query/server':
-        specifier: workspace:*
+        specifier: workspace:@effect-api-query/server@*
         version: link:../server
       '@tailwindcss/vite':
         specifier: 'catalog:'

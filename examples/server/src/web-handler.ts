@@ -1,4 +1,4 @@
-import { exampleRpcGroup } from '@effect-rpc-query/contracts'
+import { exampleRpcGroup } from '@effect-api-query/contracts'
 import { Effect, Layer, Scope } from 'effect'
 import { HttpEffect, HttpMiddleware, HttpServerRequest } from 'effect/unstable/http'
 import { RpcSerialization, RpcServer } from 'effect/unstable/rpc'

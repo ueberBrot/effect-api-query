@@ -8,7 +8,7 @@
     "dev": "vp dev"
   },
   "dependencies": {
-    "@effect-rpc-query/contracts": "workspace:*",
+    "@effect-rpc-query/contracts": "workspace:@effect-api-query/contracts@*",
     "@tanstack/react-query": "catalog:",
     "effect": "catalog:",
     "effect-rpc-query": "workspace:effect-api-query@*",
@@ -16,7 +16,7 @@
     "react-dom": "catalog:"
   },
   "devDependencies": {
-    "@effect-rpc-query/server": "workspace:*",
+    "@effect-rpc-query/server": "workspace:@effect-api-query/server@*",
     "@tailwindcss/vite": "catalog:",
     "@testing-library/react": "catalog:",
     "@types/react": "catalog:",

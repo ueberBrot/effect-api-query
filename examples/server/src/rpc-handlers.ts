@@ -6,7 +6,7 @@ import {
   type SeedUser,
   User,
   UserPage,
-} from '@effect-rpc-query/contracts'
+} from '@effect-api-query/contracts'
 import { Effect, Layer, Ref, Schedule, Stream } from 'effect'
 
 import { makeCommands } from './commands.ts'

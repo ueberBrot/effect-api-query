@@ -1,5 +1,5 @@
 {
-  "name": "@effect-rpc-query/server",
+  "name": "@effect-api-query/server",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -12,7 +12,7 @@
     "start": "tsx src/main.ts"
   },
   "dependencies": {
-    "@effect-rpc-query/contracts": "workspace:*",
+    "@effect-api-query/contracts": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {
