@@ -14,9 +14,10 @@ const commit = git('rev-parse', 'HEAD')
 const directory = mkdtempSync(join(tmpdir(), 'effect-api-query-release-'))
 
 try {
-  execFileSync('tar', ['-x', '-C', directory], {
-    input: execFileSync('git', ['archive', commit], { cwd: root }),
-  })
+  const archive = join(directory, 'source.tar')
+  execFileSync('git', ['archive', '--output', archive, commit], { cwd: root })
+  execFileSync('tar', ['-xf', archive, '-C', directory])
+  rmSync(archive)
   symlinkSync(join(root, 'node_modules'), join(directory, 'node_modules'), 'dir')
 
   const manifestPath = join(directory, 'package.json')
