@@ -2,6 +2,7 @@
 // Vite+ invokes this verifier through its dynamically declared packed-package task.
 import { deepStrictEqual, equal, match } from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
+import { createHash } from 'node:crypto'
 import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { builtinModules } from 'node:module'
 import { tmpdir } from 'node:os'
@@ -27,6 +28,9 @@ if (!existsSync(tarballPath)) {
   throw new Error(`Packed tarball does not exist: ${tarballPath}`)
 }
 
+const artifactDigest = () => createHash('sha512').update(readFileSync(tarballPath)).digest('hex')
+const initialDigest = artifactDigest()
+
 const packedManifest = JSON.parse(
   execFileSync('tar', ['-xOzf', tarballPath, 'package/package.json'], { encoding: 'utf8' }),
 ) as typeof repositoryManifest
@@ -44,6 +48,8 @@ equal(packedManifest.type, 'module')
 equal(packedManifest.repository.url, 'git+https://github.com/ueberBrot/effect-api-query.git')
 equal(packedManifest.homepage, 'https://github.com/ueberBrot/effect-api-query#readme')
 equal(packedManifest.bugs.url, 'https://github.com/ueberBrot/effect-api-query/issues')
+equal(packedManifest.description, repositoryManifest.description)
+deepStrictEqual(packedManifest.publishConfig, { access: 'public' })
 
 const testedVersion = (dependency: keyof typeof repositoryManifest.devDependencies): string => {
   const specifier = repositoryManifest.devDependencies[dependency]
@@ -207,7 +213,20 @@ const packedFiles = execFileSync('tar', ['-tzf', tarballPath], { encoding: 'utf8
   .trim()
   .split('\n')
   .sort()
+const changelogPath = join(repositoryRoot, 'CHANGELOG.md')
+const hasChangelog = existsSync(changelogPath)
+if (repositoryManifest.version !== '0.0.0') {
+  equal(hasChangelog, true, 'A versioned release must include its changelog')
+}
+if (hasChangelog) {
+  equal(
+    execFileSync('tar', ['-xOzf', tarballPath, 'package/CHANGELOG.md'], { encoding: 'utf8' }),
+    readFileSync(changelogPath, 'utf8'),
+    'The packed changelog must match the candidate',
+  )
+}
 deepStrictEqual(packedFiles, [
+  ...(hasChangelog ? ['package/CHANGELOG.md'] : []),
   'package/LICENSE',
   'package/README.md',
   'package/dist/index.d.mts',
@@ -320,3 +339,19 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
 for (const peer of peerCases) {
   verifyConsumer(peer)
 }
+
+equal(artifactDigest(), initialDigest, 'The tested release archive must remain unchanged')
+console.log(
+  JSON.stringify(
+    {
+      package: `${packedManifest.name}@${packedManifest.version}`,
+      tarball: tarballPath,
+      sha512: initialDigest,
+      files: packedFiles,
+      compilers: compilerCases.map((compiler) => compiler.label),
+      peers: peerCases,
+    },
+    null,
+    2,
+  ),
+)
