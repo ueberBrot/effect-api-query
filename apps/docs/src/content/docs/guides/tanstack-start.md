@@ -33,7 +33,7 @@ const queryUtils = createHttpApiQueryUtils(httpApi, {
 })
 ```
 
-Here, `identity` is a safe cache partition for the current user or tenant, and `runPromiseExit`
+Use `identity` to partition the cache safely by the current user or tenant. `runPromiseExit`
 is your application's runner. Configure transport URLs, authentication, and required services when
 creating the client and runner. Use a trusted server destination for SSR and a browser-accessible
 destination for client requests.
@@ -61,8 +61,8 @@ function UsersRoute() {
 }
 ```
 
-Set a suitable `staleTime` on the Query Client or generated options so successful loader data
-remains fresh during hydration and navigation. Keep the same key prefix and request inputs on
+Set `staleTime` on the Query Client or generated options long enough to keep successful loader
+data fresh during hydration and navigation. Keep the same key prefix and request inputs on
 the server and browser to address the same cache entry.
 
 For pagination, pass generated `infiniteOptions` to `queryClient.infiniteQuery` in the loader and
@@ -92,10 +92,10 @@ setupRouterSsrQueryIntegration({
 })
 ```
 
-The server dehydrates its Query Client; the browser hydrates a browser-owned Query Client and
-uses its own ready client and runner. Register cleanup with the server request lifecycle: cancel
-outstanding queries before disposing their runtime when SSR finishes or the request aborts. Keep
-the browser runtime alive for the browser application's lifetime.
+The server dehydrates its Query Client. The browser hydrates its own Query Client and uses its
+own ready client and runner. Register cleanup with the server request lifecycle. When SSR finishes
+or the request aborts, cancel outstanding queries before disposing their runtime. Keep the browser
+runtime alive for the browser application's lifetime.
 
 Successful query data must satisfy your serializer's contract. If an endpoint returns decoded
 Schema class instances, decide whether the browser needs plain data or reconstructed instances.
@@ -134,9 +134,10 @@ cancellation. Its `/http-failure` route demonstrates omission and browser refetc
 See [Executable Examples](/effect-api-query/examples/) for commands and controls.
 
 The example serves RPC at `/rpc` and HTTP at `/api/$`. Both handlers share a demonstration user
-directory, so writes invalidate both sets of query keys. Its authorization header is a public
-demonstration value; the ownership tests use separate identities to verify cache and disposal
-isolation. Its SSR setup converts decoded Schema class values to plain data with `structuredClone`.
+directory, so writes invalidate both sets of query keys. The authorization header contains a
+public demonstration value. The ownership tests use separate identities to verify that caches
+and resource disposal stay isolated. Its SSR setup converts decoded Schema class values to plain
+data with `structuredClone`.
 
 The example also disables Vite preview compression for its API routes. The pinned middleware
 delays response-close listeners until the first write, preventing a pending buffered request from

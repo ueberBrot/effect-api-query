@@ -29,8 +29,8 @@ Infinite page requests, accumulated streams, and live queries use the same signa
 stream query also calls `return()` on its AsyncIterator, which runs the Effect stream's finalizers.
 TanStack also cancels an active stream when its last observer unmounts or a refetch supersedes it.
 
-Mutations do not receive TanStack query signals, so the generated mutation function provides no
-automatic mutation cancellation helper.
+Mutations do not receive TanStack query signals, so generated mutation functions cannot cancel
+a mutation automatically.
 
 ## Cancel an HTTP query
 
@@ -41,8 +41,9 @@ Custom runners must forward the signal to preserve this behavior. TanStack retai
 query-cancellation result and cache policy.
 
 HTTP interruption stops local client execution cooperatively. A closed connection does not prove
-that server work stopped, and it does not undo a completed write. Durable server cancellation needs
-an explicit application operation identified before work begins; compensation remains separate.
+that server work stopped, and it does not undo a completed write. Durable server cancellation
+requires an explicit application operation with an identity assigned before work begins.
+Compensation remains separate.
 HTTP mutations receive no query abort signal and keep TanStack's normal mutation lifecycle.
 
 ## Cancel a command while its mutation is pending
@@ -93,9 +94,10 @@ return (
 )
 ```
 
-The cancel handler signals the worker and waits until it has stopped. Its `onSettled` callback
-invalidates the generated status key, so the active query refetches the server's status even if the cancel
-request failed. Polling stops at a terminal state. The application chooses this invalidation policy.
+The cancel handler signals the worker and waits until it has stopped. The cancel mutation's
+`onSettled` callback then invalidates the generated status key. The active query refetches the
+server's status even if the cancel request failed, and polling stops at a terminal state.
+The application chooses this invalidation policy.
 
 A cancelled command returns `{ state: 'cancelled', ... }` successfully. TanStack therefore reports
 both mutations as `success` and runs their normal callbacks. The domain state does not add a
@@ -123,8 +125,8 @@ package itself does not provide that behavior.
 
 The command example owns workers in the server Scope. Unmounting a view or interrupting the
 client's wait does not cancel these workers automatically. A cancel request stops future steps;
-completed steps remain recorded. Cancellation after completion returns the completed result and
-promises no rollback. Repeating a start with the same ID returns the existing result; a cancel
+completed steps remain recorded. Cancellation after completion returns the completed result without
+promising a rollback. Repeating a start with the same ID returns the existing result; a cancel
 that arrives before start reserves that ID as cancelled.
 
 This example stores operation records in memory until the example is reset or the server stops.

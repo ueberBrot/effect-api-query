@@ -32,13 +32,13 @@ See the [error reference](/effect-api-query/reference/errors/) for stable codes 
 ## Inspect HTTP failures
 
 Import `isEffectHttpApiQueryError` from `effect-api-query` to recognize a failed HTTP execution.
-The wrapper identifies `apiId`, `groupId`, `endpoint`, `method`, and `operation`. Its `cause` is the
-original complete Effect Cause: use `Cause.findError` to inspect declared endpoint errors,
-middleware errors, Schema errors, and HTTP client errors; use `Cause.hasDies` and
+The wrapper identifies `apiId`, `groupId`, `endpoint`, `method`, and `operation`, and its `cause`
+retains the complete original Effect Cause. Use `Cause.findError` to inspect declared endpoint
+errors, middleware errors, Schema errors, and HTTP client errors. Use `Cause.hasDies` and
 `Cause.hasInterrupts` to distinguish defects and interruption. A Cause may contain several reasons.
 
 The package adds only declaration identity to execution-error metadata. The preserved Cause can
-itself contain upstream request headers, bodies, concrete URLs, responses, or Schema issue values.
+contain upstream request headers, bodies, concrete URLs, responses, or Schema issue values.
 Review those values before logging or exposing them. The package does not sanitize the Cause.
 
 `EffectHttpApiQueryConfigError` reports invalid factory configuration synchronously.

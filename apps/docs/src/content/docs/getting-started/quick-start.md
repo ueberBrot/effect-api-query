@@ -75,8 +75,8 @@ try {
 ```
 
 `RpcClient.make(..., { flatten: true })` acquires the ready client inside the application's scope.
-The factory receives that client and derives the utility tree; it uses `Effect.runPromiseExit`
-when no custom runner is supplied.
+The factory derives the utility tree from that client and uses `Effect.runPromiseExit`
+unless you supply a custom runner.
 
 The query accepts the RPC payload's **constructor input**. Here `{ id: 1 }` is valid because the
 schema constructor supplies `locale: 'en'`. Use deterministic constructor defaults: key preparation
@@ -93,12 +93,12 @@ call fails. This short program waits for its mutation before cleanup. In a UI, k
 for the application lifetime and settle pending mutations before disposal; query cancellation does
 not cancel mutations.
 
-Use a safe user or tenant identity in `keyPrefix` when client configuration changes the data that
-can be returned. See [Client Lifecycle](/effect-api-query/concepts/client-lifecycle/) and
+Use a safe user or tenant identity in `keyPrefix` when client configuration affects which data
+the client can return. See [Client Lifecycle](/effect-api-query/concepts/client-lifecycle/) and
 [Cache Keys](/effect-api-query/concepts/semantic-keys/) before sharing clients or caches.
 
-This complete snippet is compiled from the public package root in
-[`tests/types/docs-rpc-quick-start.ts`](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-rpc-quick-start.ts).
-The docs check verifies that this page matches that consumer. Continue with
+The repository compiles this complete snippet against the public package root in
+[`tests/types/docs-rpc-quick-start.ts`](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-rpc-quick-start.ts)
+and checks that this page matches it. Continue with
 [queries and mutations](/effect-api-query/concepts/queries-and-mutations/) or the
 [generated RPC builders](/effect-api-query/reference/generated-builders/).

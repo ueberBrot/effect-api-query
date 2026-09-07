@@ -9,12 +9,12 @@ Returns an eager, frozen `RpcQueryUtils` tree for the group's unary and streamin
 
 ### Options
 
-| Option           | Meaning                                                                                                                |
-| ---------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `client`         | Ready flat RPC client. The caller owns its `Scope` and lifecycle.                                                      |
-| `keyPrefix`      | Non-empty, JSON-safe tuple that namespaces every generated key.                                                        |
-| `runPromiseExit` | Runner used for RPC Effects. Required when client-side services remain; otherwise defaults to `Effect.runPromiseExit`. |
-| `keyEncoders`    | Synchronous encoders keyed by literal RPC tags. Required for serviceful or redacted payloads.                          |
+| Option           | Meaning                                                                                                                       |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `client`         | Ready flat RPC client. The caller owns its `Scope` and lifecycle.                                                             |
+| `keyPrefix`      | Non-empty, JSON-safe tuple that namespaces every generated key.                                                               |
+| `runPromiseExit` | Runner used for RPC Effects. Required when client-side services remain; otherwise defaults to `Effect.runPromiseExit`.        |
+| `keyEncoders`    | Synchronous encoders keyed by literal RPC tags. Required for payloads that need encoding services or contain redacted values. |
 
 ```ts
 const rpcQuery = createRpcQueryUtils(rpcGroup, {

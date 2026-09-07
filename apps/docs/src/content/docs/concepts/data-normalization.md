@@ -10,8 +10,8 @@ RPC client constructs that value again during execution, so the payload Schema m
 reconstruction must preserve every field that affects the RPC result. Constructor defaults then
 describe both execution and cache identity.
 
-This avoids a split where two constructor inputs share an RPC meaning but occupy different cache
-entries. Custom key encoders also receive the normalized payload.
+Inputs that normalize to the same payload then share a cache entry. Custom key encoders also
+receive the normalized payload.
 
 ## Decoded HTTP inputs
 
@@ -24,9 +24,9 @@ an endpoint with optional query filters still takes `input: { query: {} }` when 
 
 ## No-content and undefined query results
 
-TanStack Query rejects `undefined` as successful query data. If an RPC or HTTP query success type may be
-`undefined`, the generated query resolves to `null` instead. The exported `QueryData<A>` type models
-that rule.
+TanStack Query rejects `undefined` as successful query data. When an RPC or HTTP query succeeds
+with `undefined`, the generated query resolves to `null` instead. The exported `QueryData<A>` type
+models that rule.
 
 An HTTP endpoint using `HttpApiSchema.NoContent` decodes its successful 204 response to
 `undefined`, so its ordinary and infinite queries cache `null`.

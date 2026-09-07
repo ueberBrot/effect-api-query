@@ -26,19 +26,18 @@ must not reveal secrets. Return a stable public identifier, digest, or other saf
 Define encoders as own enumerable properties keyed by literal payload-bearing RPC tags. TypeScript
 requires entries for unsafe payloads; the factory also rejects missing or unknown entries at runtime.
 
-Choose an encoder carefully: inputs that can produce different RPC results must not collapse to the
-same key.
+Inputs that can produce different RPC results must produce different keys.
 
 ## HTTP requests
 
-Use `createHttpApiQueryUtils` encoders for complete decoded request inputs. HTTP encoders receive
-the declared `params`, `query`, `payload`, and `headers` containers; RPC encoders receive a normalized
-payload after constructor defaults. Keep each encoder under its literal declaration group and endpoint
-identifier, even for a top-level group or an identifier containing dots.
+HTTP encoders receive the complete decoded request input: the declared `params`, `query`,
+`payload`, and `headers` containers. RPC encoders receive the normalized payload after constructor
+defaults. Configure each HTTP encoder in `createHttpApiQueryUtils` under its literal declaration
+group and endpoint identifier, even for a top-level group or an identifier containing dots.
 
-For a `forms` group whose `submit` endpoint accepts either a number encoded as text or a string
-encoded as JSON, both alternatives can schema-encode to `"1"`. Their HTTP bodies differ. Preserve
-that distinction explicitly:
+Suppose a `forms` group's `submit` endpoint accepts a number encoded as text or a string encoded
+as JSON. Both schemas can encode to `"1"`, but the HTTP bodies differ. Preserve that distinction
+in the key:
 
 ```ts
 const http = createHttpApiQueryUtils(contract, {
@@ -60,9 +59,10 @@ binary input, return a JSON-safe representation such as `{ bytes: Array.from(pay
 client still receives the original `Uint8Array`.
 
 Encoding services or explicit `Redacted` values in any request part also require an encoder.
-Opaque encoding middleware is treated conservatively at runtime. An encoder supplies identity only;
-provide an execution runner independently when the ready client needs services. Encoder entries for
-unknown, omitted, or inputless endpoints fail synchronously during factory construction.
+The factory treats opaque encoding middleware conservatively at runtime. An encoder supplies
+identity only; the ready client still needs an execution runner when it requires services. The
+factory synchronously rejects encoder entries for unknown, omitted, or inputless endpoints during
+construction.
 
 Keep ordinary authentication in client middleware. Partition the cache with safe tenant and user
 identifiers in `keyPrefix`, for example `['tenant', 'north', 'user', 'ada']`. The factory cannot infer

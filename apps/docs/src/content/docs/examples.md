@@ -3,10 +3,10 @@ title: Executable Examples
 description: Run the repository's React Query and TanStack Start applications.
 ---
 
-The repository contains two complete applications. Each includes separate RPC and HTTP views
-to demonstrate the corresponding factory. The applications share contracts and handlers, with a
-separate host for Vite and server routes for Start. Both RPC endpoints accept request bodies up
-to 1 MiB and return HTTP 413 for larger bodies.
+The repository contains two complete applications, each with separate RPC and HTTP views that
+demonstrate both factories. They share contracts and handlers: Vite uses a separate host, while
+Start serves its own routes. Both RPC endpoints accept request bodies up to 1 MiB and return
+HTTP 413 for larger bodies.
 
 | Example                                                                                           | Demonstrates                                                                                       | API host                                          | Application URL         |
 | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------- | ----------------------- |
@@ -52,12 +52,13 @@ demo authorization header through its HTTP client middleware.
 
 The HTTP panel uses `createHttpApiQueryUtils` from `effect-api-query`; the existing RPC panels
 use `createRpcQueryUtils` from the same package root. The application owns both ready clients,
-their runners, and the QueryClient. Its disposal cancels queries before releasing client resources.
+their runners, and the QueryClient. During disposal, it cancels queries before releasing client
+resources.
 
 Use the HTTP directory to read users, load another page, and create or delete a user. Each write
 explicitly invalidates both generated user prefixes, so the RPC directory reflects HTTP writes
 and the HTTP directory reflects RPC writes. The two adapters retain separate cache keys.
-**Reset directory** restores the deterministic shared data.
+Choose **Reset directory** to restore the deterministic shared data.
 
 The HTTP user selector passes `skipToken` until a user is selected. HTTP request inputs use
 structured decoded parts such as `params`, `query`, and `payload`; RPC inputs retain their
@@ -69,19 +70,18 @@ The package adds declaration identifiers to error metadata; upstream Causes can 
 request, response, or schema issue values.
 
 Choose **Start slow HTTP query**, wait for **HTTP: Ready to cancel**, then choose
-**Cancel HTTP query**. The
-example observes server interruption for that operation after the HTTP request is aborted. Each
-panel owns a distinct operation ID, so cancelling an RPC query leaves a concurrent HTTP query
-running. This cancels observation
-and work in this handler; it does not compensate completed mutations. The RPC cancellable-command
-panel continues to demonstrate explicit domain cancellation.
+**Cancel HTTP query**. After the HTTP request aborts, the example observes server interruption for
+that operation. Each panel owns a distinct operation ID, so cancelling an RPC query leaves a
+concurrent HTTP query running. This cancels observation and work in this handler; it does not
+compensate completed mutations. The RPC cancellable-command panel demonstrates explicit domain
+cancellation.
 
 The executable sources are
 [application ownership](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/lib/application.ts),
 [HTTP contracts](https://github.com/ueberBrot/effect-api-query/tree/main/examples/contracts/src), and
 [server handlers](https://github.com/ueberBrot/effect-api-query/tree/main/examples/server/src).
-The application is type-checked against the public package root and exercised through the real
-server and browser suites.
+The repository type-checks the application against the public package root and exercises it
+through the real server and browser suites.
 
 ## Run TanStack Start
 
@@ -92,8 +92,8 @@ vp run tanstack-start-dev
 This task starts one full-stack process. The browser and server-rendering clients call the
 Start-owned `/rpc` and `/api/$` routes. Choose **HTTP users** to inspect the server-rendered directory
 and first page, reuse the hydrated cache, and try the same HTTP operations as in Vite React.
-Choose **HTTP SSR failure** to see a failed server query omitted from dehydration and retried
-in the browser.
+Choose **HTTP SSR failure** to see the browser retry a failed server query that was omitted
+from dehydration.
 
 Server rendering uses the trusted origin `http://127.0.0.1:3000`. If the Start server listens
 elsewhere, set the server-only `EXAMPLE_API_ORIGIN` environment variable to its HTTP(S) origin,
@@ -107,8 +107,8 @@ In either application, find **Choose before fetching**. With **No user selected*
 query uses `{ input: skipToken }` and sends no lookup request. Select **User 2: Edsger Dijkstra** to
 load the user summary, then clear and reselect it within 30 seconds to reuse the cached result.
 
-Both branches preserve the same `select` and `staleTime` options. The example uses ordinary
-`useQuery`; the TanStack Start loader leaves this interactive query paused during server rendering.
+The skipped and active queries preserve the same `select` and `staleTime` options. The example uses
+ordinary `useQuery`; the TanStack Start loader leaves this interactive query paused during server rendering.
 
 ## Compare full and bounded stream history
 

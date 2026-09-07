@@ -95,21 +95,21 @@ const pageOptions = http.users.list.infiniteOptions({
 const users = useInfiniteQuery(pageOptions)
 ```
 
-`cursor` is inferred from `initialPageParam`. Return every declared request container from `input`,
-including any `params`, `headers`, or `payload`; each page is a fresh decoded HTTP request.
-Use `users.fetchNextPage()` when `users.hasNextPage` is true. The caller owns cursor progression:
-return the server's next cursor from `getNextPageParam`, and return `undefined` or `null` when
-there are no more pages.
+TypeScript infers `cursor` from `initialPageParam`. Return every declared request container from
+`input`, including any `params`, `headers`, or `payload`; each page is a fresh decoded HTTP request.
+Use `users.fetchNextPage()` when `users.hasNextPage` is true. You control cursor progression through
+`getNextPageParam`: return the server's next cursor, or `undefined` or `null` when there are no more
+pages.
 
 The cache key uses `input(initialPageParam)` and an `infinite` discriminator. Keep all stable
-filters in that initial request and in every later request. Rebuild the options when a filter
+filters in the initial request and every later request. Rebuild the options when a filter
 changes so the first request produces a different key. Keep `input` deterministic and free of
 side effects: it runs during key construction and again for page execution. A custom key encoder
 must preserve these same result-affecting filters.
 
 TanStack owns page storage, invalidation, and refetching. `select` changes the hook result to the
-flattened users; the cache still holds `pages` and `pageParams`. Every page retains ordinary HTTP
-response normalization, wrapped failures, and cancellation. To pause pagination, use
+flattened users; the cache still holds `pages` and `pageParams`. Each page uses the same response
+normalization, wrapped failures, and cancellation as an ordinary HTTP query. To pause pagination, use
 `input: skipToken` with `initialPageParam` and `getNextPageParam`; the infinite builder accepts
 only this object form for skipping.
 
@@ -160,4 +160,4 @@ before disposing client and runtime resources. See
 
 The [public HTTP consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/http-contract.ts) checks query, mutation,
 pagination, and skipped-input types. The [Vite React HTTP panel](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/components/sections/http-section.tsx)
-provides an executable version with its contract, ready client, hooks, and cache invalidation.
+puts the contract, ready client, hooks, and cache invalidation to use in a running application.

@@ -8,19 +8,20 @@ definitions. Use `createRpcQueryUtils` for RPC and `createHttpApiQueryUtils` for
 from the package root.
 
 The [capability matrix](/effect-api-query/reference/compatibility-and-limits/#capability-matrix)
-has separate RPC and HTTP columns. It distinguishes generated behavior, tested integrations,
-application responsibilities, deferred operations, and unavailable upstream seams.
+compares RPC and HTTP support in separate columns. It shows what the package generates, which
+integrations are tested, what your application must supply, which operations are deferred, and
+where upstream libraries provide no integration point.
 
 ## Pick the operation
 
 Use ordinary queries for cached reads, infinite queries for pagination, and mutations for commands.
-Both adapters generate these builders for every retained unary operation; the application chooses
-which one fits the call. Writes refresh cached reads only when the application invalidates the
-affected keys.
+Both adapters generate these builders for every retained unary operation, so choose the one that
+fits each call. Writes refresh cached reads only when your application invalidates the affected keys.
 
 RPC streams also have `streamedOptions` to accumulate values and `liveOptions` to retain the latest
-value. HTTP streams, multipart uploads, and raw-response modes are deferred. An HTTP endpoint with
-any streaming success or multipart request alternative is omitted from the generated utility tree.
+value. HTTP streams, multipart uploads, and raw-response modes are deferred. The factory omits an
+HTTP endpoint from the generated utility tree if it has any streaming success or multipart request
+alternative.
 
 ## Plan application ownership
 

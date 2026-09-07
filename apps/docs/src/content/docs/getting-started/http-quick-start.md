@@ -76,11 +76,12 @@ try {
 runtime's `runPromiseExit` to the factory so generated calls use the application's runner and
 forward TanStack's query abort signal.
 
-HTTP input is the client's **decoded request**, with `params`, `query`, `headers`, and `payload`
-containers as declared by the endpoint. The numeric `id` is decoded input; the client handles its
-wire encoding. Even though `locale` has a constructor default, the request must supply
-`query: { locale: 'en' }`: HTTP builders do not construct RPC payloads or fill constructor defaults.
-The POST mutation therefore receives `{ payload: { name: 'Ada' } }`.
+HTTP input is the client's **decoded request**, with the `params`, `query`, `headers`, and `payload`
+containers declared by the endpoint. Pass `id` as a number; the client handles its wire encoding.
+The POST mutation receives `{ payload: { name: 'Ada' } }`.
+
+The request must supply `query: { locale: 'en' }` even though `locale` has a constructor default.
+HTTP builders do not construct RPC payloads or fill constructor defaults.
 
 Groups and endpoint identifiers retain their literal names. `users` and `get` produce
 `http.users.get`; a name containing a dot would require bracket access. A group declared with
@@ -97,8 +98,8 @@ The `finally` block cancels queries, clears the cache, and disposes the runtime.
 alive for the application lifetime in a UI, and settle pending mutations before disposal. Include a
 safe user or tenant identity in `keyPrefix` whenever client configuration affects returned data.
 
-This complete snippet is compiled from the public package root in
-[`tests/types/docs-http-quick-start.ts`](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-http-quick-start.ts).
-The docs check verifies that this page matches that consumer. Continue with
+The repository compiles this complete snippet against the public package root in
+[`tests/types/docs-http-quick-start.ts`](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-http-quick-start.ts)
+and checks that this page matches it. Continue with
 [HTTP queries and mutations](/effect-api-query/guides/http-queries-and-mutations/) and the
 [HTTP factory reference](/effect-api-query/reference/http-factory/).
