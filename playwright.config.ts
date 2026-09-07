@@ -1,6 +1,6 @@
 import { defineConfig } from '@playwright/test'
 
-import { browserTestDefaults, browserTestServer } from './scripts/browser-test-config.mts'
+import { browserTestDefaults, browserTestServer } from './e2e/browser-test-config.ts'
 
 export default defineConfig(browserTestDefaults, {
   outputDir: 'test-results',

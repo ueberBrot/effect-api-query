@@ -1,7 +1,5 @@
 import { defineConfig, devices, type PlaywrightTestConfig } from '@playwright/test'
 
-type WebServer = Exclude<NonNullable<PlaywrightTestConfig['webServer']>, readonly unknown[]>
-
 export const browserTestDefaults = defineConfig({
   expect: { timeout: 10_000 },
   forbidOnly: Boolean(process.env['CI']),
@@ -21,7 +19,10 @@ export const browserTestDefaults = defineConfig({
   workers: 1,
 })
 
-export const browserTestServer = (command: string, url: string): WebServer => ({
+export const browserTestServer = (
+  command: string,
+  url: string,
+): Exclude<NonNullable<PlaywrightTestConfig['webServer']>, readonly unknown[]> => ({
   command,
   reuseExistingServer: false,
   stderr: 'pipe',
