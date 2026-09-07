@@ -1,5 +1,5 @@
 {
-  "name": "@effect-rpc-query/contracts",
+  "name": "@effect-api-query/contracts",
   "version": "0.0.0",
   "private": true,
   "type": "module",

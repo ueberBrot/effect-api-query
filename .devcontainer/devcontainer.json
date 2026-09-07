@@ -1,14 +1,14 @@
 {
-  "name": "effect-rpc-query",
+  "name": "effect-api-query",
   "build": {
     "dockerfile": "Dockerfile"
   },
   "remoteUser": "node",
   "updateRemoteUserUID": true,
   "mounts": [
-    "source=effect-rpc-query-node-modules,target=${containerWorkspaceFolder}/node_modules,type=volume",
-    "source=effect-rpc-query-pnpm-store,target=/home/node/.local/share/pnpm/store,type=volume",
-    "source=effect-rpc-query-tool-cache,target=/home/node/.cache,type=volume"
+    "source=effect-api-query-node-modules,target=${containerWorkspaceFolder}/node_modules,type=volume",
+    "source=effect-api-query-pnpm-store,target=/home/node/.local/share/pnpm/store,type=volume",
+    "source=effect-api-query-tool-cache,target=/home/node/.cache,type=volume"
   ],
   "postCreateCommand": "bash .devcontainer/setup.sh",
   "remoteEnv": {

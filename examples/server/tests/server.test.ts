@@ -1,10 +1,10 @@
-import type { DiagnosticStatus } from '@effect-rpc-query/contracts'
+import type { DiagnosticStatus } from '@effect-api-query/contracts'
 import {
   type ExampleRpcClient,
   makeExampleRpcClient,
   startExampleRpcClient,
-} from '@effect-rpc-query/contracts/client'
-import { startExampleRpcServer } from '@effect-rpc-query/server'
+} from '@effect-api-query/contracts/client'
+import { startExampleRpcServer } from '@effect-api-query/server'
 import { describe, expect, it } from '@effect/vitest'
 import { Cause, Deferred, Effect, Exit, Fiber, Logger, Result, Scope, Stream } from 'effect'
 import { RpcClient } from 'effect/unstable/rpc'

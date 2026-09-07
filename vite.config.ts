@@ -174,12 +174,12 @@ export default defineConfig({
         command: ['vp run check', 'vp run effect-check', 'vp run fallow', 'vp run test'],
       },
       server: {
-        command: 'vp run --filter @effect-rpc-query/server dev',
+        command: 'vp run --filter @effect-api-query/server dev',
         cache: false,
       },
       'vite-react-dev': {
         command:
-          'vp run --parallel --log labeled --filter @effect-rpc-query/server --filter @effect-rpc-query/vite-react dev',
+          'vp run --parallel --log labeled --filter @effect-api-query/server --filter @effect-rpc-query/vite-react dev',
         cache: false,
         dependsOn: ['pack'],
       },

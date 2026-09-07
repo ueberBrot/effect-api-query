@@ -1,4 +1,4 @@
-import type { DiagnosticStatus, SlowDiagnosticInput } from '@effect-rpc-query/contracts'
+import type { DiagnosticStatus, SlowDiagnosticInput } from '@effect-api-query/contracts'
 import { Deferred, Effect, Ref } from 'effect'
 
 const initialStatus = (): DiagnosticStatus => ({ interrupted: 0, started: 0 })

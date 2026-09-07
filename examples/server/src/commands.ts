@@ -1,4 +1,4 @@
-import { type CommandPayload, CommandStatus } from '@effect-rpc-query/contracts'
+import { type CommandPayload, CommandStatus } from '@effect-api-query/contracts'
 import { Deferred, Effect, Scope } from 'effect'
 
 interface Command {

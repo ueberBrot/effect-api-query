@@ -36,7 +36,7 @@ export class ExampleAuthorizationError extends Schema.TaggedError<ExampleAuthori
 ) {}
 
 export class ExampleAuthorization extends RpcMiddleware.Service<ExampleAuthorization>()(
-  '@effect-rpc-query/contracts/ExampleAuthorization',
+  '@effect-api-query/contracts/ExampleAuthorization',
   { error: ExampleAuthorizationError },
 ) {}
 

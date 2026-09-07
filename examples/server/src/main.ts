@@ -2,7 +2,7 @@ import {
   type RunningExampleRpcServer,
   type StartExampleRpcServerOptions,
   startExampleRpcServer,
-} from '@effect-rpc-query/server'
+} from '@effect-api-query/server'
 import { Effect, Logger, Runtime } from 'effect'
 
 const serverOptions = { port: 3001 } satisfies StartExampleRpcServerOptions
