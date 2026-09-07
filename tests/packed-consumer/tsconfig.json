@@ -11,5 +11,12 @@
     "target": "ES2022",
     "types": ["node"]
   },
-  "include": ["runtime.mts", "http-runtime.mts", "public-contract.ts", "http-contract.ts"]
+  "include": [
+    "runtime.mts",
+    "http-runtime.mts",
+    "public-contract.ts",
+    "http-contract.ts",
+    "docs-rpc-quick-start.ts",
+    "docs-http-quick-start.ts"
+  ]
 }

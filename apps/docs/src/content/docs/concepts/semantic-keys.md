@@ -28,7 +28,7 @@ Key objects cannot contain `__proto__` or `constructor` properties at any depth.
 prefixes, Schema output, and custom encoder output.
 
 RPC keys begin with the caller prefix followed by `rpc`. HTTP keys begin with the caller prefix,
-`http`, and the HttpApi identifier. A factory’s `key()` includes these generated segments.
+`http`, and the HttpApi identifier. A factory's `key()` includes these generated segments.
 
 Every RPC operation adds its own segment after the RPC path: `query`, `infinite`, `streamed`, `live`, or
 `mutation`. Concrete query keys append the canonical payload when the RPC has one. These segments
@@ -36,16 +36,19 @@ keep different cache shapes from colliding while root, branch, and RPC prefixes 
 all descendant operations.
 
 Unsupported values, failed construction, and failed encoding raise `EffectRpcQueryKeyError` before
-network execution. Serviceful or redacted payloads require a
-[custom key encoder](/effect-rpc-query/guides/custom-key-encoders/).
+network execution. Payloads whose encoding needs services or that contain redacted values require a
+[custom key encoder](/effect-api-query/guides/custom-key-encoders/).
 
 HTTP keys use the endpoint's decoded request input without RPC construction. Default preparation
 schema-encodes the labelled request parts, omits encoded undefined object members, normalizes header
 names, and then freezes canonical JSON. Labels preserve distinctions between query and payload even
-when both contribute URL parameters. The key represents declared request meaning, rather than
-trying to infer every possible equivalence between HTTP requests.
+when both contribute URL parameters. The key follows the declared request meaning. It does not try to infer every possible equivalence
+between HTTP requests.
 
-Client middleware is outside that declared identity. Use safe user, tenant, or other identity
-partitions in the caller prefix when they affect results. See the
-[HTTP factory reference](/effect-rpc-query/reference/http-factory/#cache-identity-and-failures) and
-[HTTP encoder guide](/effect-rpc-query/guides/custom-key-encoders/#http-requests) for the complete rules.
+Client middleware does not contribute to that declared identity. Include safe user, tenant, or
+other identifiers in the caller prefix when they affect results. See the
+[HTTP factory reference](/effect-api-query/reference/http-factory/#cache-identity-and-failures) and
+[HTTP encoder guide](/effect-api-query/guides/custom-key-encoders/#http-requests) for the complete rules.
+
+The [RPC key tests](https://github.com/ueberBrot/effect-api-query/blob/main/tests/create-rpc-query-utils-keys.test.ts) and
+[HTTP key tests](https://github.com/ueberBrot/effect-api-query/blob/main/tests/http-semantic-keys.test.ts) verify canonical identity and its failure cases.

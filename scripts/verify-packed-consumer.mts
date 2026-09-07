@@ -247,6 +247,9 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       join(consumerDirectory, 'http-contract.ts'),
     )
     cpSync(join(typeFixtureDirectory, 'type-scale.ts'), join(consumerDirectory, 'type-scale.ts'))
+    for (const fixture of ['docs-rpc-quick-start.ts', 'docs-http-quick-start.ts']) {
+      cpSync(join(typeFixtureDirectory, fixture), join(consumerDirectory, fixture))
+    }
 
     const manifestTemplate = readFileSync(join(consumerDirectory, 'package.template.json'), 'utf8')
     const consumerManifest = manifestTemplate

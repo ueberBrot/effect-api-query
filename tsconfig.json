@@ -32,9 +32,11 @@
   },
   "include": [
     "e2e/**/*.ts",
+    "e2e-docs/**/*.ts",
     "examples/**/*.ts",
     "examples/**/*.tsx",
     "playwright.config.ts",
+    "playwright.docs.config.ts",
     "scripts/**/*.mts",
     "src/**/*.ts",
     "tests/**/*.ts",

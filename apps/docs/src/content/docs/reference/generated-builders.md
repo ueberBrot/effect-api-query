@@ -1,5 +1,5 @@
 ---
-title: Generated Builders
+title: RPC Builders
 description: Branch and RPC leaf methods for keys, queries, mutations, and streams.
 ---
 
@@ -35,9 +35,9 @@ const options =
 ```
 
 `queryOptions`, `streamedOptions`, and `liveOptions` also accept the direct `skipToken` shorthand.
-The object form preserves applicable caller options and consumes package fields (`input` and, for
-accumulated streams, `refetchMode` and `maxChunks`). Skipped options retain the exact sentinel, operation-level key,
-and package-owned hash function.
+The object form preserves applicable caller options. The builder consumes `input` and, for
+accumulated streams, `refetchMode` and `maxChunks`, removing them from the returned options.
+Skipped options retain the exact sentinel, operation-level key, and package-owned hash function.
 
 `skipToken` is valid only for payload-bearing query options. It is not accepted by key or mutation
 builders, and skipped options are unsuitable for suspense and prefetch-only hooks.
@@ -56,7 +56,7 @@ execution and removes it from the returned Query Core options, including skipped
 | `streamedOptions`, `liveOptions`                     | `StreamingRpcOptions`: `headers`, `context`, and `streamBufferSize` |
 
 `headers` accepts Effect's `Headers.Input`; `context` accepts `Context.Context<never>`.
-`streamBufferSize` is a number configuring the Effect client's stream buffer. It is independent of
+`streamBufferSize` is a number that configures the Effect client's stream buffer. It is independent of
 `maxChunks`, which limits the accumulated query cache.
 
 ```ts
@@ -67,16 +67,16 @@ const options = rpcQuery.users.get.queryOptions({
 })
 ```
 
-The options are static for that builder result. Infinite pages, retries, refetches, and repeated
-mutations use the same request options; callbacks based on variables or page parameters are
-unsupported. Omitting `rpcOptions` leaves the ready client's defaults in effect.
+Request options are fixed for each builder result. Infinite pages, retries, refetches, and repeated
+mutations use those same options. Callbacks based on variables or page parameters are unsupported.
+Omitting `rpcOptions` leaves the ready client's defaults in effect.
 
 `discard` is unavailable because unary operations need their result. `asQueue` is unavailable
 because the package adapts streams itself. Request options do not affect generated keys. If a
 header changes the identity of the returned data, represent that identity in the RPC payload or
 an application-owned key prefix to keep cache entries separate.
 
-See [Client Lifecycle](/effect-rpc-query/concepts/client-lifecycle/) for application-wide configuration.
+See [Client Lifecycle](/effect-api-query/concepts/client-lifecycle/) for application-wide configuration.
 
 ## Build an infinite query
 
@@ -107,8 +107,8 @@ const options = rpcQuery.users.page.infiniteOptions({
 ```
 
 The builder forwards applicable Query Core options but owns `queryFn`, `queryKey`, and
-`queryKeyHashFn`. Each page runs through the same Effect runner and cancellation signal as an
-ordinary query.
+`queryKeyHashFn`. Each page uses the same Effect runner and cancellation signal as an ordinary
+query.
 
 ## Stream values
 
@@ -142,14 +142,18 @@ const options = utils.events.watch.streamedOptions({
 })
 ```
 
-After each emission, the accumulated array contains at most `maxChunks` elements. On refetch,
-`reset` starts an empty accumulation, even when `initialData` was supplied; `append` trims the
-combined cached and new history; `replace` builds a bounded replacement and publishes it when
-the stream completes. Initial fetches and append refetches trim existing data only when an element
-arrives. An empty append refetch preserves existing data; empty reset and replace refetches finish
-with an empty array.
-The bound controls element count, not byte size, and discards older history. Without it, accumulation
-remains unbounded. Use `liveOptions` when only the latest value matters.
+After each emission, the accumulated array contains at most `maxChunks` elements. On refetch:
+
+- `reset` starts an empty accumulation, even when `initialData` was supplied.
+- `append` trims the combined cached and new history.
+- `replace` builds a bounded replacement and publishes it when the stream completes.
+
+Initial fetches and append refetches trim existing data only when an element arrives. An empty
+append refetch preserves existing data; empty reset and replace refetches finish with an empty
+array.
+
+The bound limits the number of elements, discarding older history; it does not limit byte size.
+Without it, accumulation remains unbounded. Use `liveOptions` when only the latest value matters.
 
 `maxChunks` configures accumulation, not key identity. Builders consume it before returning options,
 including skipped options. Invalid bounds throw `EffectRpcQueryConfigError` with code
@@ -157,3 +161,7 @@ including skipped options. Invalid bounds throw `EffectRpcQueryConfigError` with
 
 Live queries always replace the cached value and therefore expose no `refetchMode`. Cancelling,
 unmounting, or superseding either stream closes its iterator and interrupts its Effect resources.
+
+The [public RPC consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/public-contract.ts) checks the builder examples
+and hook types. The [streaming tests](https://github.com/ueberBrot/effect-api-query/blob/main/tests/create-rpc-query-utils-streaming.test.ts)
+verify accumulation, replacement, bounds, and cancellation.

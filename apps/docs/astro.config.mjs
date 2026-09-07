@@ -8,8 +8,8 @@ import starlightThemeBlack from 'starlight-theme-black'
 
 import packageManifest from '../../package.json' with { type: 'json' }
 
-const repositoryUrl = 'https://github.com/ueberBrot/effect-rpc-query'
-const docsBase = '/effect-rpc-query'
+const repositoryUrl = 'https://github.com/ueberBrot/effect-api-query'
+const docsBase = '/effect-api-query'
 const packageUrl = `https://www.npmjs.com/package/${packageManifest.name}`
 
 export default defineConfig({
@@ -52,7 +52,8 @@ export default defineConfig({
           label: 'Start Here',
           items: [
             { label: 'Installation', slug: 'getting-started/installation' },
-            { label: 'Quick Start', slug: 'getting-started/quick-start' },
+            { label: 'RPC Quick Start', slug: 'getting-started/quick-start' },
+            { label: 'HTTP Quick Start', slug: 'getting-started/http-quick-start' },
             { label: 'Executable Examples', slug: 'examples' },
             { label: 'Feature Support', slug: 'getting-started/feature-support' },
             {
@@ -78,6 +79,7 @@ export default defineConfig({
           label: 'Concepts',
           items: [
             { label: 'RPC Utility Tree', slug: 'concepts/rpc-utility-tree' },
+            { label: 'HTTP Utility Tree', slug: 'concepts/http-utility-tree' },
             { label: 'Queries and Mutations', slug: 'concepts/queries-and-mutations' },
             { label: 'Client Lifecycle', slug: 'concepts/client-lifecycle' },
             { label: 'Semantic Keys', slug: 'concepts/semantic-keys' },
@@ -87,9 +89,9 @@ export default defineConfig({
         {
           label: 'Reference',
           items: [
-            { label: 'Factory', slug: 'reference/factory' },
+            { label: 'RPC Factory', slug: 'reference/factory' },
             { label: 'HTTP Factory', slug: 'reference/http-factory' },
-            { label: 'Generated Builders', slug: 'reference/generated-builders' },
+            { label: 'RPC Builders', slug: 'reference/generated-builders' },
             { label: 'Errors', slug: 'reference/errors' },
             { label: 'Public Exports', slug: 'reference/public-exports' },
             { label: 'Compatibility and Limits', slug: 'reference/compatibility-and-limits' },

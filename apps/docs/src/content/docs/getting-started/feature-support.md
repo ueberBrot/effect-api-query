@@ -1,62 +1,40 @@
 ---
 title: Feature Support
-description: Choose supported RPC and HTTP operations and plan your TanStack Query integration.
+description: Choose the RPC or HTTP adapter and find its supported TanStack Query features.
 ---
 
 `effect-api-query` creates TanStack Query options and cache keys from Effect RPC groups and HttpApi
-definitions. Choose a factory for your API:
+definitions. Use `createRpcQueryUtils` for RPC and `createHttpApiQueryUtils` for HTTP, both imported
+from the package root.
 
-| API definition            | Factory                   | Operations                                    |
-| ------------------------- | ------------------------- | --------------------------------------------- |
-| Unary RPC                 | `createRpcQueryUtils`     | Queries, infinite queries, and mutations      |
-| Streaming RPC             | `createRpcQueryUtils`     | Accumulated streamed queries and live queries |
-| Buffered HttpApi endpoint | `createHttpApiQueryUtils` | Queries, infinite queries, and mutations      |
+The [capability matrix](/effect-api-query/reference/compatibility-and-limits/#capability-matrix)
+compares RPC and HTTP support in separate columns. It shows what the package generates, which
+integrations are tested, what your application must supply, which operations are deferred, and
+where upstream libraries provide no integration point.
 
-An HTTP endpoint with any streaming success or multipart request alternative is omitted from the
-utility tree. Stream builders apply to RPC streams. See the
-[HTTP guide](/effect-rpc-query/guides/http-queries-and-mutations/) for request input and examples.
+## Pick the operation
 
-## Use TanStack Query features
+Use ordinary queries for cached reads, infinite queries for pagination, and mutations for commands.
+Both adapters generate these builders for every retained unary operation, so choose the one that
+fits each call. Writes refresh cached reads only when your application invalidates the affected keys.
 
-| Task                                            | How to use it                                                                         |
-| ----------------------------------------------- | ------------------------------------------------------------------------------------- |
-| Fetch and cache data                            | Pass generated `queryOptions` to Query Core or React Query.                           |
-| Run a write                                     | Pass generated `mutationOptions` to a mutation observer or hook.                      |
-| Pause a query until input exists                | Use `input: skipToken` with an input-bearing RPC or HTTP query.                       |
-| Load pages                                      | Use `infiniteOptions`, mapping each page parameter to an RPC payload or HTTP request. |
-| Retain stream history                           | Use `streamedOptions`; set `maxChunks` to bound the retained elements.                |
-| Show the latest stream value                    | Use `liveOptions`.                                                                    |
-| Read, update, or invalidate cached data         | Pass generated keys to the corresponding `QueryClient` methods.                       |
-| Configure retries, freshness, or data selection | Supply the applicable TanStack options to the builder.                                |
-| Cancel a query                                  | Use `queryClient.cancelQueries`; the runner must forward its abort signal to Effect.  |
-| Prefetch or server-render data                  | Reuse generated options in loaders and dehydrate completed query data.                |
+RPC streams also have `streamedOptions` to accumulate values and `liveOptions` to retain the latest
+value. HTTP streams, multipart uploads, and raw-response modes are deferred. The factory omits an
+HTTP endpoint from the generated utility tree if it has any streaming success or multipart request
+alternative.
 
-Generated options work with React Query hooks and TanStack Router loaders, including TanStack
-Start. Configure other framework adapters through their native TanStack APIs; compatibility with
-non-React adapters is not guaranteed.
+## Plan application ownership
 
-## Configure application behavior
+Acquire the ready client, configure transport and authentication, and own its runtime before
+constructing utilities. Keep those resources alive while queries and mutations use them. Configure
+TanStack providers, Devtools, persistence, broadcasting, and cache defaults in your application.
 
-Create the ready client, transport, middleware, and runtime before constructing the utilities.
-Keep their resources alive while queries and mutations use them. Configure providers, Devtools,
-persistence, broadcasting, and cache defaults through TanStack Query.
+Include a safe user or tenant identity in `keyPrefix` whenever client configuration changes the
+returned data. Keep credentials out of keys. See [semantic keys](/effect-api-query/concepts/semantic-keys/)
+and [client lifecycle](/effect-api-query/concepts/client-lifecycle/).
 
-Both query and mutation builders are available for every unary RPC and retained HTTP endpoint.
-Choose the operation for each call; after a mutation, explicitly invalidate the affected query keys.
-For execution without TanStack Query, call your ready client directly.
-
-Keep authentication in your client configuration. If a tenant, user, or other client setting changes
-the result, include its safe identity in `keyPrefix` to keep cache entries separate.
-
-## Limits to account for
-
-- Mutations receive no TanStack query abort signal. Long-running commands need an explicit
-  [server cancellation operation](/effect-rpc-query/guides/cancellation/#cancel-a-command-while-its-mutation-is-pending).
-- Key encoders must synchronously return strict JSON. Encoding services, redacted values, and
-  ambiguous HTTP payload alternatives require [custom encoders](/effect-rpc-query/guides/custom-key-encoders/).
-- Cancel an open server stream after capturing a successful snapshot before dehydration.
-- Provide your own SSR error serialization, or omit failed queries from dehydration and refetch
-  them in the browser.
-
-See [Compatibility and Limits](/effect-rpc-query/reference/compatibility-and-limits/) for required
-versions and the full input, cache, and runtime constraints.
+Start with the [RPC tutorial](/effect-api-query/getting-started/quick-start/) or
+[HTTP tutorial](/effect-api-query/getting-started/http-quick-start/), then use the shared guides for
+[conditional queries](/effect-api-query/guides/conditional-queries/),
+[cache management](/effect-api-query/guides/cache-management/), and
+[cancellation](/effect-api-query/guides/cancellation/).

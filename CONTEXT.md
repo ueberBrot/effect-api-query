@@ -1,4 +1,4 @@
-# Effect RPC Query
+# Effect API Query
 
 This glossary defines the project-specific language for deriving TanStack Query utilities from Effect RPC and HTTP contracts.
 
@@ -77,5 +77,5 @@ A synchronous error that rejects invalid configuration for a utility tree or its
 _Avoid_: RPC execution error
 
 **Key-generation error**:
-A synchronous error produced while deriving canonical cache identity from query input.
+A synchronous error produced while deriving canonical cache identity from RPC payload constructor input or HTTP request input.
 _Avoid_: RPC execution error, configuration error

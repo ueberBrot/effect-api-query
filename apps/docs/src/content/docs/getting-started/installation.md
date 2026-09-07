@@ -3,21 +3,28 @@ title: Installation
 description: Install effect-api-query and its peer dependencies.
 ---
 
-Install the package with Effect and TanStack Query Core:
+Install the package and TanStack Query Core:
 
 ```sh
-pnpm add effect-api-query effect@4.0.0-rc.112 @tanstack/query-core@^5.102.0
+pnpm add effect-api-query @tanstack/query-core
 ```
 
-React applications also need the React adapter:
+With pnpm's default peer installation enabled, this also installs the exact Effect release required
+by the package. If your application already pins Effect or disables automatic peer installation,
+install the Effect version from the package's `peerDependencies` and resolve any peer mismatch
+before continuing. The [package manifest](https://github.com/ueberBrot/effect-api-query/blob/main/package.json)
+and [workspace catalog](https://github.com/ueberBrot/effect-api-query/blob/main/pnpm-workspace.yaml)
+are the source for supported and tested versions.
+
+React applications also need `@tanstack/react-query`, matching their Query Core version:
 
 ```sh
-pnpm add @tanstack/react-query@^5.102.0
+pnpm add @tanstack/react-query
 ```
 
-Use TypeScript 5.9 or newer with `strict: true` in your `tsconfig.json`. Your application must support
-ESM and ES2022.
+Use strict TypeScript checking, ESM, and an ES2022-capable application. See the
+[compatibility reference](/effect-api-query/reference/compatibility-and-limits/) for the tested
+compiler and framework integrations.
 
-Continue with the [RPC quick start](/effect-rpc-query/getting-started/quick-start/) or
-[HTTP queries and mutations](/effect-rpc-query/guides/http-queries-and-mutations/). Before adopting
-the package, review [compatibility and stability](/effect-rpc-query/getting-started/compatibility-and-stability/).
+Continue with the [RPC quick start](/effect-api-query/getting-started/quick-start/) or
+[HTTP quick start](/effect-api-query/getting-started/http-quick-start/).

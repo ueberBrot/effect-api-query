@@ -28,7 +28,7 @@ const http = createHttpApiQueryUtils(api, {
 
 This client needs no additional execution services. If your client or its schemas require services,
 also supply a `runPromiseExit` backed by your application runtime. Forward the runner's options
-so [query cancellation](/effect-rpc-query/guides/cancellation/#cancel-an-http-query) reaches Effect.
+so [query cancellation](/effect-api-query/guides/cancellation/#cancel-an-http-query) reaches Effect.
 
 ## Fetch a user
 
@@ -73,7 +73,7 @@ options and performs no request encoding or client call. Its query function is T
 sentinel, so manual `refetch()` cannot execute it. Supply valid input to enable the query. Use
 `enabled: false` with a complete request when you need a query that can run through manual refetch.
 Suspense and prefetch-only hooks require executable options and reject skipped options. See
-[Conditional Queries](/effect-rpc-query/guides/conditional-queries/) for the shared contract.
+[Conditional Queries](/effect-api-query/guides/conditional-queries/) for the shared contract.
 
 ## Load pages
 
@@ -95,21 +95,21 @@ const pageOptions = http.users.list.infiniteOptions({
 const users = useInfiniteQuery(pageOptions)
 ```
 
-`cursor` is inferred from `initialPageParam`. Return every declared request container from `input`,
-including any `params`, `headers`, or `payload`; each page is a fresh decoded HTTP request.
-Use `users.fetchNextPage()` when `users.hasNextPage` is true. The caller owns cursor progression:
-return the server's next cursor from `getNextPageParam`, and return `undefined` or `null` when
-there are no more pages.
+TypeScript infers `cursor` from `initialPageParam`. Return every declared request container from
+`input`, including any `params`, `headers`, or `payload`; each page is a fresh decoded HTTP request.
+Use `users.fetchNextPage()` when `users.hasNextPage` is true. You control cursor progression through
+`getNextPageParam`: return the server's next cursor, or `undefined` or `null` when there are no more
+pages.
 
 The cache key uses `input(initialPageParam)` and an `infinite` discriminator. Keep all stable
-filters in that initial request and in every later request. Rebuild the options when a filter
+filters in the initial request and every later request. Rebuild the options when a filter
 changes so the first request produces a different key. Keep `input` deterministic and free of
 side effects: it runs during key construction and again for page execution. A custom key encoder
 must preserve these same result-affecting filters.
 
 TanStack owns page storage, invalidation, and refetching. `select` changes the hook result to the
-flattened users; the cache still holds `pages` and `pageParams`. Every page retains ordinary HTTP
-response normalization, wrapped failures, and cancellation. To pause pagination, use
+flattened users; the cache still holds `pages` and `pageParams`. Each page uses the same response
+normalization, wrapped failures, and cancellation as an ordinary HTTP query. To pause pagination, use
 `input: skipToken` with `initialPageParam` and `getNextPageParam`; the infinite builder accepts
 only this object form for skipping.
 
@@ -132,7 +132,7 @@ prefix for the data your write changes. React applications can pass the same mut
 
 Both builders return decoded response data. Successful `undefined` query data becomes `null`;
 mutation results retain `undefined`. Inspect execution failures with
-[`isEffectHttpApiQueryError`](/effect-rpc-query/guides/handle-failures/#inspect-http-failures).
+[`isEffectHttpApiQueryError`](/effect-api-query/guides/handle-failures/#inspect-http-failures).
 
 ## Keep cache entries separate
 
@@ -146,14 +146,18 @@ await queryClient.invalidateQueries({ queryKey: http.users.key() })
 
 If client middleware changes results by user or tenant, include a safe user or tenant identifier in
 `keyPrefix`. Keep credentials out of keys. Use a
-[custom encoder](/effect-rpc-query/guides/custom-key-encoders/#http-requests) when request schemas
+[custom encoder](/effect-api-query/guides/custom-key-encoders/#http-requests) when request schemas
 need encoding services, contain redacted values, or allow multiple payload alternatives.
 
 Retained HTTP endpoints expose ordinary query, infinite query, and mutation builders regardless
 of HTTP method. Choose the builder for the operation you intend. Streaming responses and
-multipart requests are omitted; see the [HTTP factory reference](/effect-rpc-query/reference/http-factory/)
+multipart requests are omitted; see the [HTTP factory reference](/effect-api-query/reference/http-factory/)
 for supported request formats and the complete builder contract.
 
 When your application or server request ends, cancel its active queries and clear its QueryClient
 before disposing client and runtime resources. See
-[Client Lifecycle](/effect-rpc-query/concepts/client-lifecycle/#http-clients-and-execution-services).
+[Client Lifecycle](/effect-api-query/concepts/client-lifecycle/#http-clients-and-execution-services).
+
+The [public HTTP consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/http-contract.ts) checks query, mutation,
+pagination, and skipped-input types. The [Vite React HTTP panel](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/components/sections/http-section.tsx)
+puts the contract, ready client, hooks, and cache invalidation to use in a running application.

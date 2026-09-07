@@ -1,6 +1,6 @@
 # Use a Vite+ workspace with a root package
 
-Status: Amended by ADR 0019.
+Status: Amended by ADR 0019 and [ADR 0022](0022-add-buffered-http-utilities-with-separate-key-roots.md). The single root package now installs as `effect-api-query`; both adapters remain private implementations within it.
 
 ## Context
 
