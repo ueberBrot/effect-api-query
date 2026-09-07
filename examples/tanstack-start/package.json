@@ -1,5 +1,5 @@
 {
-  "name": "@effect-rpc-query/tanstack-start",
+  "name": "@effect-api-query/tanstack-start",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -8,14 +8,14 @@
     "dev": "vp dev"
   },
   "dependencies": {
-    "@effect-rpc-query/contracts": "workspace:@effect-api-query/contracts@*",
-    "@effect-rpc-query/server": "workspace:@effect-api-query/server@*",
+    "@effect-api-query/contracts": "workspace:*",
+    "@effect-api-query/server": "workspace:*",
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-router-ssr-query": "catalog:",
     "@tanstack/react-start": "catalog:",
     "effect": "catalog:",
-    "effect-rpc-query": "workspace:effect-api-query@*",
+    "effect-api-query": "workspace:*",
     "react": "catalog:",
     "react-dom": "catalog:"
   },

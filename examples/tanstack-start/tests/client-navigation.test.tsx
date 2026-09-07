@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { startExampleRpcServer } from '@effect-rpc-query/server'
+import { startExampleRpcServer } from '@effect-api-query/server'
 import { dehydrate } from '@tanstack/react-query'
 import { createMemoryHistory, RouterProvider } from '@tanstack/react-router'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'

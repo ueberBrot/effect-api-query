@@ -3,14 +3,14 @@ title: Executable Examples
 description: Run the repository's React Query and TanStack Start applications.
 ---
 
-The repository contains two complete applications. Both use the same contracts and Effect RPC
-handler implementation, but each hosts HTTP differently. Both RPC endpoints accept request bodies
+The repository contains two complete applications. Both use the same RPC and HTTP contracts
+and handlers, with a separate host for Vite and server routes for Start. Both RPC endpoints accept request bodies
 up to 1 MiB and return HTTP 413 for larger bodies.
 
-| Example                                                                                           | Demonstrates                                                                                       | RPC host                                          | Application URL         |
+| Example                                                                                           | Demonstrates                                                                                       | API host                                          | Application URL         |
 | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------- | ----------------------- |
 | [Vite React](https://github.com/ueberBrot/effect-rpc-query/tree/main/examples/vite-react)         | RPC queries and streams beside buffered HTTP reads, writes, pagination, failures, and cancellation | Standalone server on port `3001`, proxied by Vite | `http://127.0.0.1:5173` |
-| [TanStack Start](https://github.com/ueberBrot/effect-rpc-query/tree/main/examples/tanstack-start) | RPC operation kinds in loaders, server rendering, dehydration, hydration, and client navigation    | Same-origin `POST /rpc` server route              | `http://127.0.0.1:3000` |
+| [TanStack Start](https://github.com/ueberBrot/effect-rpc-query/tree/main/examples/tanstack-start) | RPC and HTTP loaders, server rendering, hydration, navigation, mutations, and cancellation         | Same-origin `/rpc` and `/api/$` server routes     | `http://127.0.0.1:3000` |
 
 ## Set up locally
 
@@ -88,12 +88,17 @@ server and browser suites.
 vp run tanstack-start-dev
 ```
 
-This task starts one full-stack process. The browser and server-rendering client both call the
-Start-owned `/rpc` route.
+This task starts one full-stack process. The browser and server-rendering clients call the
+Start-owned `/rpc` and `/api/$` routes. Choose **HTTP users** to inspect the server-rendered directory
+and first page, reuse the hydrated cache, and try the same HTTP operations as in Vite React.
+Choose **HTTP SSR failure** to see a failed server query omitted from dehydration and retried
+in the browser.
 
-Server rendering uses `http://127.0.0.1:3000/rpc`. If the Start server listens elsewhere, set the
-server-only `EXAMPLE_RPC_ORIGIN` environment variable to its HTTP(S) origin, without a path,
-credentials, query, or fragment. The browser uses the relative `/rpc` endpoint.
+Server rendering uses the trusted origin `http://127.0.0.1:3000`. If the Start server listens
+elsewhere, set the server-only `EXAMPLE_API_ORIGIN` environment variable to its HTTP(S) origin,
+without a path, credentials, query, or fragment. Browser requests stay on the same origin.
+See [TanStack Start](/effect-rpc-query/guides/tanstack-start/) for request ownership, authentication,
+cache isolation, and hydration setup.
 
 ## Pause a query until a user is selected
 

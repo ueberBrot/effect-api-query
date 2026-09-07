@@ -61,7 +61,7 @@ export const createTanStackStartRouter = async (options: CreateTanStackStartRout
 
 const rpcUrl = createIsomorphicFn()
   .server(() => {
-    const origin = new URL(process.env['EXAMPLE_RPC_ORIGIN'] ?? 'http://127.0.0.1:3000')
+    const origin = new URL(process.env['EXAMPLE_API_ORIGIN'] ?? 'http://127.0.0.1:3000')
     if (
       !['http:', 'https:'].includes(origin.protocol) ||
       origin.username !== '' ||
@@ -70,7 +70,7 @@ const rpcUrl = createIsomorphicFn()
       origin.search !== '' ||
       origin.hash !== ''
     ) {
-      throw new Error('EXAMPLE_RPC_ORIGIN must be an HTTP(S) origin without credentials')
+      throw new Error('EXAMPLE_API_ORIGIN must be an HTTP(S) origin without credentials')
     }
     return new URL('/rpc', origin).href
   })

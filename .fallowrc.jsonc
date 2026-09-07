@@ -39,10 +39,6 @@
   // required by the no-test-yet foundation and become visible in later issues.
   "ignoreDependencies": [
     "@arethetypeswrong/cli",
-    // The unmigrated applications consume these temporary workspace aliases.
-    // Remove each alias and this exception when #68 and #69 migrate their imports.
-    "@effect-rpc-query/contracts",
-    "@effect-rpc-query/server",
     "@effect/tsgo",
     "@effect/vitest",
     "effect",

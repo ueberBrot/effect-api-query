@@ -13,7 +13,7 @@ export const Route = createRootRouteWithContext<TanStackStartApplication>()({
     meta: [
       { charSet: 'utf-8' },
       { content: 'width=device-width, initial-scale=1', name: 'viewport' },
-      { title: 'Effect RPC Query with TanStack Start' },
+      { title: 'Effect API Query with TanStack Start' },
     ],
   }),
 })
@@ -29,7 +29,7 @@ function Root() {
               to="/"
             >
               <span aria-hidden="true" className="size-2 rounded-full bg-violet-600" />
-              effect-rpc-query
+              effect-api-query
             </NavigationLink>
             <nav aria-label="Primary">
               <ul className="flex flex-wrap gap-1 p-0">
@@ -41,6 +41,26 @@ function Root() {
                     to="/"
                   >
                     Users
+                  </NavigationLink>
+                </li>
+                <li className="list-none">
+                  <NavigationLink
+                    activeProps={{
+                      className: 'border-violet-800 bg-violet-950/60 text-violet-200',
+                    }}
+                    to="/http"
+                  >
+                    HTTP users
+                  </NavigationLink>
+                </li>
+                <li className="list-none">
+                  <NavigationLink
+                    activeProps={{
+                      className: 'border-violet-800 bg-violet-950/60 text-violet-200',
+                    }}
+                    to="/http-failure"
+                  >
+                    HTTP SSR failure
                   </NavigationLink>
                 </li>
                 <li className="list-none">
@@ -79,7 +99,7 @@ function Root() {
         </header>
         <Outlet />
         <footer className="mx-auto w-full max-w-7xl border-t border-zinc-900 px-4 py-6 text-sm text-zinc-500 sm:px-6">
-          Generated Effect RPC options with the TanStack Query lifecycle.
+          Generated Effect RPC and HTTP options with the TanStack Query lifecycle.
         </footer>
       </div>
     </Document>

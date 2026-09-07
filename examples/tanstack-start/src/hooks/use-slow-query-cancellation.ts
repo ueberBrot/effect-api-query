@@ -1,15 +1,9 @@
-import type { DiagnosticStatus } from '@effect-rpc-query/contracts'
-import { useQuery } from '@tanstack/react-query'
+import type { DiagnosticStatus } from '@effect-api-query/contracts'
 import { useRef, useState } from 'react'
 
 import type { TanStackStartApplication } from '../lib/application.ts'
 
-const slowInput = {
-  durationMs: 60_000,
-  operationId: 'tanstack-start-slow-query',
-} as const
-
-// This union describes browser workflow, not data sent by Effect RPC.
+// Browser workflow shared by both transports.
 export type SlowQueryCancellationState =
   | { readonly _tag: 'Idle' }
   | { readonly _tag: 'Starting' }
@@ -42,27 +36,51 @@ const delay = (milliseconds: number) =>
     globalThis.setTimeout(resolve, milliseconds)
   })
 
-/** Coordinates several typed RPC operations as one cancellation demonstration. */
-export const useSlowQueryCancellation = ({ queryClient, rpcQuery }: TanStackStartApplication) => {
+/** Coordinates typed diagnostic operations as one cancellation demonstration. */
+export const useSlowQueryCancellation = (
+  { queryClient, rpcQuery, httpQuery }: TanStackStartApplication,
+  transport: 'rpc' | 'http' = 'rpc',
+) => {
   const [state, setState] = useState<SlowQueryCancellationState>({ _tag: 'Idle' })
   const baseline = useRef<DiagnosticStatus | undefined>(undefined)
-  const slowQuery = useQuery(
-    rpcQuery.diagnostics.slow.queryOptions({
-      enabled: false,
-      input: slowInput,
-    }),
-  )
-  const readStatus = () =>
-    queryClient.query({
-      ...rpcQuery.diagnostics.status.queryOptions(),
-      staleTime: 0,
-    })
+  const [slowInput] = useState(() => ({
+    durationMs: 60_000,
+    operationId: globalThis.crypto.randomUUID(),
+  }))
+  const adapter =
+    transport === 'http'
+      ? {
+          key: httpQuery.diagnostics.slow.queryKey({ query: slowInput }),
+          run: () =>
+            queryClient.query(
+              httpQuery.diagnostics.slow.queryOptions({ input: { query: slowInput } }),
+            ),
+          readStatus: () =>
+            queryClient.query({
+              ...httpQuery.diagnostics.operationStatus.queryOptions({
+                input: { params: { operationId: slowInput.operationId } },
+              }),
+              staleTime: 0,
+            }),
+        }
+      : {
+          key: rpcQuery.diagnostics.slow.queryKey(slowInput),
+          run: () =>
+            queryClient.query(rpcQuery.diagnostics.slow.queryOptions({ input: slowInput })),
+          readStatus: () =>
+            queryClient.query({
+              ...rpcQuery.diagnostics.operationStatus.queryOptions({
+                input: { operationId: slowInput.operationId },
+              }),
+              staleTime: 0,
+            }),
+        }
 
   const waitForStatus = async (
     predicate: (status: DiagnosticStatus) => boolean,
   ): Promise<DiagnosticStatus> => {
     for (let attempt = 0; attempt < 100; attempt += 1) {
-      const status = await readStatus()
+      const status = await adapter.readStatus()
       if (predicate(status)) return status
       await delay(10)
     }
@@ -72,9 +90,9 @@ export const useSlowQueryCancellation = ({ queryClient, rpcQuery }: TanStackStar
   const start = async () => {
     setState({ _tag: 'Starting' })
     try {
-      const before = await readStatus()
+      const before = await adapter.readStatus()
       baseline.current = before
-      void slowQuery.refetch()
+      void adapter.run().catch(() => undefined)
       await waitForStatus(({ started }) => started > before.started)
       setState({ _tag: 'Ready' })
     } catch (error) {
@@ -90,7 +108,7 @@ export const useSlowQueryCancellation = ({ queryClient, rpcQuery }: TanStackStar
     try {
       // TanStack aborts the query signal; the ready client interrupts the server operation.
       await queryClient.cancelQueries({
-        queryKey: rpcQuery.diagnostics.slow.queryKey(slowInput),
+        queryKey: adapter.key,
       })
       const status = await waitForStatus(({ interrupted }) => interrupted > before.interrupted)
       setState({ _tag: 'Cancelled', interruptions: status.interrupted })
