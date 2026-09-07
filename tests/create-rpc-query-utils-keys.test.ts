@@ -8,7 +8,7 @@ import {
   EffectRpcQueryConfigError,
   EffectRpcQueryKeyError,
   type JsonValue,
-} from '#effect-rpc-query'
+} from '#effect-api-query'
 
 import { group, makeClient, makeRpcTestClient } from './fixtures/effect-rpc'
 

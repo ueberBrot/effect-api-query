@@ -16,7 +16,7 @@ import type {
 import { Rpc, RpcGroup, RpcTest } from 'effect/unstable/rpc'
 // fallow-ignore-file unused-file
 // The packed-package verifier copies and executes this fixture in temporary consumers.
-import { deepStrictEqual, equal } from 'node:assert/strict'
+import { deepStrictEqual, equal, ok, rejects } from 'node:assert/strict'
 
 type PublicTypes = [
   CreateRpcQueryUtilsOptions<any, readonly [JsonValue, ...JsonValue[]]>,
@@ -53,6 +53,34 @@ if (rpcQuery.skipToken !== skipToken || rpcQuery.skipToken !== reactQuerySkipTok
 
 const resolveFrom = import.meta.resolve as (specifier: string, parent?: string) => string
 const packageEntry = resolveFrom('effect-api-query')
+const consumerModules = new URL('./node_modules/', import.meta.url).href
+
+for (const specifier of ['effect-api-query', 'effect', '@tanstack/query-core']) {
+  ok(
+    resolveFrom(specifier).startsWith(consumerModules),
+    `${specifier} must resolve inside the isolated consumer`,
+  )
+}
+for (const specifier of [
+  '#effect-api-query',
+  '#effect-api-query/core',
+  'effect-api-query/core',
+  'effect-api-query/rpc',
+  'effect-api-query/http',
+  'effect-api-query/src/index.ts',
+  'effect-api-query/dist/index.mjs',
+]) {
+  await rejects(import(specifier), (error: unknown) => {
+    ok(error instanceof Error && 'code' in error)
+    equal(
+      error.code,
+      specifier.startsWith('#')
+        ? 'ERR_PACKAGE_IMPORT_NOT_DEFINED'
+        : 'ERR_PACKAGE_PATH_NOT_EXPORTED',
+    )
+    return true
+  })
+}
 
 equal(
   resolveFrom('@tanstack/query-core', packageEntry),

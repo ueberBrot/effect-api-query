@@ -1,6 +1,6 @@
 // fallow-ignore-file unused-file
 // The packed-package verifier executes this fixture in isolated consumers.
-import { MutationObserver, QueryClient } from '@tanstack/query-core'
+import { MutationObserver, QueryClient, isCancelledError } from '@tanstack/query-core'
 import { Cause, Effect, Exit, Layer, Schema } from 'effect'
 import {
   createHttpApiQueryUtils,
@@ -10,7 +10,13 @@ import {
   skipToken,
   type RunPromiseExit,
 } from 'effect-api-query'
-import { HttpClient, HttpClientRequest, HttpClientResponse, HttpServer } from 'effect/unstable/http'
+import {
+  FetchHttpClient,
+  HttpClient,
+  HttpClientRequest,
+  HttpClientResponse,
+  HttpServer,
+} from 'effect/unstable/http'
 import {
   HttpApi,
   HttpApiBuilder,
@@ -23,6 +29,8 @@ import {
 } from 'effect/unstable/httpapi'
 import { Rpc, RpcGroup, RpcTest } from 'effect/unstable/rpc'
 import { deepStrictEqual, equal, notDeepStrictEqual, ok, rejects } from 'node:assert/strict'
+import { once } from 'node:events'
+import { createServer } from 'node:http'
 
 const api = HttpApi.make('packed-http').add(
   HttpApiGroup.make('compatibility').add(
@@ -41,6 +49,99 @@ const api = HttpApi.make('packed-http').add(
     HttpApiEndpoint.get('empty', '/empty', { success: HttpApiSchema.NoContent }),
   ),
 )
+
+const cancellationApi = HttpApi.make('packed-cancellation').add(
+  HttpApiGroup.make('pages').add(
+    HttpApiEndpoint.get('read', '/pages/:page', {
+      params: { page: Schema.FiniteFromString },
+      success: Schema.String,
+    }),
+  ),
+)
+for (const mode of ['query', 'later page'] as const) {
+  let received!: () => void
+  let disconnected!: () => void
+  const requestReceived = new Promise<void>((resolve) => {
+    received = resolve
+  })
+  const requestDisconnected = new Promise<void>((resolve) => {
+    disconnected = resolve
+  })
+  const paths: string[] = []
+  const server = createServer((request, response) => {
+    paths.push(request.url ?? '')
+    if (request.url === '/pages/0') {
+      response.setHeader('content-type', 'application/json')
+      response.end(JSON.stringify('first'))
+      return
+    }
+    response.on('close', disconnected)
+    received()
+  })
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  let timeout: ReturnType<typeof setTimeout> | undefined
+  const deadline = new Promise<never>((_resolve, reject) => {
+    timeout = setTimeout(() => reject(new Error(`HTTP ${mode} cancellation timed out`)), 10_000)
+  })
+  try {
+    server.listen(0, '127.0.0.1')
+    await Promise.race([once(server, 'listening'), deadline])
+    const address = server.address()
+    ok(address !== null && typeof address !== 'string')
+    const client = await Effect.runPromise(
+      HttpApiClient.make(cancellationApi, {
+        baseUrl: `http://127.0.0.1:${address.port}`,
+      }).pipe(Effect.provide(FetchHttpClient.layer)),
+    )
+    let interrupted!: (cause: Cause.Cause<unknown>) => void
+    const interruption = new Promise<Cause.Cause<unknown>>((resolve) => {
+      interrupted = resolve
+    })
+    let requestSignal: AbortSignal | undefined
+    const runPromiseExit: RunPromiseExit = async (effect, options) => {
+      requestSignal = options?.signal
+      const exit = await Effect.runPromiseExit(effect, options)
+      if (Exit.isFailure(exit)) interrupted(exit.cause)
+      return exit
+    }
+    const utils = createHttpApiQueryUtils(cancellationApi, {
+      client,
+      keyPrefix: ['packed'],
+      runPromiseExit,
+    })
+    const pending =
+      mode === 'query'
+        ? queryClient.query(utils.pages.read.queryOptions({ input: { params: { page: 1 } } }))
+        : queryClient.infiniteQuery({
+            ...utils.pages.read.infiniteOptions({
+              initialPageParam: 0,
+              input: (page) => ({ params: { page } }),
+              getNextPageParam: (_last, _pages, page) => page + 1,
+            }),
+            pages: 2,
+          })
+    const result = pending.catch((error: unknown) => error)
+    await Promise.race([requestReceived, deadline])
+    equal(requestSignal?.aborted, false)
+    await queryClient.cancelQueries({ queryKey: utils.pages.read.key() })
+    ok(isCancelledError(await result))
+    equal(requestSignal?.aborted, true)
+    ok(Cause.hasInterrupts(await Promise.race([interruption, deadline])))
+    await Promise.race([requestDisconnected, deadline])
+    deepStrictEqual(paths, mode === 'query' ? ['/pages/1'] : ['/pages/0', '/pages/1'])
+    equal(queryClient.isFetching(), 0)
+  } finally {
+    clearTimeout(timeout)
+    queryClient.clear()
+    if (server.listening) {
+      const closed = new Promise<void>((resolve, reject) => {
+        server.close((error) => (error === undefined ? resolve() : reject(error)))
+      })
+      server.closeAllConnections()
+      await closed
+    }
+  }
+}
 
 class Authentication extends HttpApiMiddleware.Service<Authentication>()(
   'PackedHttp/Authentication',

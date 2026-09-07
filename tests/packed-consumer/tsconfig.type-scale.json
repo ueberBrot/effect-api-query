@@ -1,4 +1,4 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["type-scale.ts"]
+  "include": ["type-scale.ts", "http-type-scale.ts"]
 }

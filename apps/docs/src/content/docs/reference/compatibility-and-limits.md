@@ -15,6 +15,12 @@ for the pinned Effect prerelease and framework versions. The
 [packed consumer verifier](https://github.com/ueberBrot/effect-api-query/blob/main/scripts/verify-packed-consumer.mts)
 defines the compiler and peer combinations tested against the published package shape.
 
+Both factories are checked with TypeScript 5.9 and the repository compiler at Query Core's lower
+bound and development version. Isolated consumers install the tarball with their own peers and
+verify runtime exports, peer identity, and private-subpath rejection. Separate RPC and HTTP
+contracts each exercise roughly 250 operations; compiler diagnostics record their combined cost
+without imposing a timing threshold.
+
 ## Capability matrix
 
 **Generated** means the package supplies the typed builders and runtime behavior. **Tested** means

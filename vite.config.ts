@@ -34,13 +34,13 @@ export default defineConfig({
     sortImports: {
       customGroups: [
         {
-          groupName: 'effect-rpc-query',
-          elementNamePattern: ['#effect-rpc-query', '#effect-rpc-query/**'],
+          groupName: 'effect-api-query',
+          elementNamePattern: ['#effect-api-query', '#effect-api-query/**'],
         },
       ],
       groups: [
         ['builtin', 'external'],
-        'effect-rpc-query',
+        'effect-api-query',
         ['parent', 'sibling', 'index'],
         ['side_effect_style', 'style'],
         'unknown',

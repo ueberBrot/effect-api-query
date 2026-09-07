@@ -15,7 +15,7 @@ import {
   EffectRpcQueryKeyError,
   isEffectRpcQueryError,
   type RunPromiseExit,
-} from '#effect-rpc-query'
+} from '#effect-api-query'
 
 import { group, makeClient, makeRpcTestClient } from './fixtures/effect-rpc'
 
@@ -141,7 +141,7 @@ describe('createRpcQueryUtils execution boundaries', () => {
       class MutationEncodingService extends Context.Service<
         MutationEncodingService,
         { readonly suffix: string }
-      >()('effect-rpc-query/tests/MutationEncodingService') {}
+      >()('effect-api-query/tests/MutationEncodingService') {}
       const Payload = Schema.Struct({ value: Schema.String }).pipe(
         Schema.middlewareEncoding((encoding) =>
           Effect.flatMap(MutationEncodingService, () => encoding),

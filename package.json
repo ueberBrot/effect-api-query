@@ -1,16 +1,16 @@
 {
   "name": "effect-api-query",
   "version": "0.0.0",
-  "description": "Type-safe TanStack Query utilities generated from Effect RPC definitions.",
-  "homepage": "https://github.com/ueberBrot/effect-rpc-query#readme",
+  "description": "Type-safe TanStack Query utilities derived from Effect RPC and HTTP API contracts.",
+  "homepage": "https://github.com/ueberBrot/effect-api-query#readme",
   "bugs": {
-    "url": "https://github.com/ueberBrot/effect-rpc-query/issues"
+    "url": "https://github.com/ueberBrot/effect-api-query/issues"
   },
   "license": "ISC",
   "author": "Maurice de Bruyn",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ueberBrot/effect-rpc-query.git"
+    "url": "git+https://github.com/ueberBrot/effect-api-query.git"
   },
   "files": [
     "dist"
@@ -22,9 +22,7 @@
   "types": "./dist/index.d.mts",
   "imports": {
     "#effect-api-query": "./src/index.ts",
-    "#effect-api-query/*": "./src/*.ts",
-    "#effect-rpc-query": "./src/index.ts",
-    "#effect-rpc-query/*": "./src/*.ts"
+    "#effect-api-query/*": "./src/*.ts"
   },
   "exports": {
     ".": {

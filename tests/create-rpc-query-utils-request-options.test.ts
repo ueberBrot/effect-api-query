@@ -8,7 +8,7 @@ import {
   createRpcQueryUtils,
   type UnaryRpcOptions,
   type StreamingRpcOptions,
-} from '#effect-rpc-query'
+} from '#effect-api-query'
 
 import { makeRpcTestClient } from './fixtures/effect-rpc'
 
