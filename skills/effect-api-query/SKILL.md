@@ -76,15 +76,15 @@ pagination, streaming, React Query, or server rendering.
 
 ## Own execution and cleanup
 
-Keep the client's Scope or ManagedRuntime alive for every operation using it. An RPC
+Keep the client's Scope or ManagedRuntime alive for every operation that uses it. An RPC
 client returned from an already completed `Effect.scoped` region is no longer
-usable. Create utilities with the lifetime of that client, rather than during
-each component render.
+usable. Create utilities when setting up that client and reuse them across component renders.
 
-When client or Schema services remain, pass a `runPromiseExit` runner that
-provides them. It must return an Effect `Exit` and forward its second argument's
+When execution requires client or Schema services, pass a `runPromiseExit` runner
+that provides them. It must return an Effect `Exit` and forward its second argument's
 `signal`; `runtime.runPromiseExit` has this shape. Service-free calls can use the
-factory default. A custom key encoder supplies cache identity, not services.
+factory default. A custom key encoder supplies cache identity; execution services
+still come from the runner.
 
 Queries forward TanStack cancellation to Effect. Cancel outstanding queries
 before disposing their resources. Mutations receive no query abort signal;

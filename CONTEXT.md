@@ -9,11 +9,11 @@ A nested object derived from literal Effect RPC tags. Branches represent RPC nam
 _Avoid_: Router, generated client
 
 **HTTP utility tree**:
-A nested object derived from an Effect HttpApi's literal group and endpoint identifiers. Buffered endpoints provide typed key and option builders; top-level groups place their endpoints at the root.
+A nested object derived from an Effect HttpApi's literal group and endpoint identifiers. Buffered endpoints provide typed key and option builders; endpoints in top-level groups appear at the root.
 _Avoid_: RPC utility tree, generated client
 
 **Query data**:
-The successful decoded RPC or HTTP value presented to TanStack Query. A successful runtime `undefined` becomes `null`; mutation data remains unchanged.
+The successful decoded RPC or HTTP value presented to TanStack Query. Buffered queries convert successful `undefined` to `null`; streamed values and mutation data remain unchanged.
 _Avoid_: RPC success value when it is `undefined`
 
 **Accumulated streamed query**:
@@ -21,13 +21,13 @@ A streaming RPC view that caches emitted values in order, optionally retaining o
 _Avoid_: Live query, infinite query
 
 **Live query**:
-A streaming RPC view that caches only the latest emitted value. Completion preserves that value; completion before the first value produces a package error.
+A streaming RPC view that caches only the latest emitted value. Stream completion preserves that value; completion before the first emission produces a package error.
 _Avoid_: Accumulated streamed query, subscription
 
 ## Payloads and keys
 
 **HTTP request input**:
-The decoded request parts accepted by a ready HTTP API client: declared params, query, headers, and payload. It excludes response controls and carries no RPC payload-constructor semantics.
+The decoded request parts accepted by a ready HTTP API client: declared params, query, headers, and payload. It excludes response controls; RPC payload constructors do not apply to it.
 _Avoid_: Payload constructor input, wire request
 
 **Payload constructor input**:
@@ -35,7 +35,7 @@ The call-site value accepted by an RPC payload Schema constructor. It may omit f
 _Avoid_: Normalized payload, encoded payload
 
 **Normalized payload**:
-The payload Schema's decoded `Type` after construction applies defaults and validates the input.
+The payload Schema's decoded `Type` after the constructor applies defaults and validates the input.
 _Avoid_: Payload constructor input, encoded payload
 
 **Query-stable payload Schema**:

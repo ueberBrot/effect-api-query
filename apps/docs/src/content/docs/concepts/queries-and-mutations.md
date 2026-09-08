@@ -7,11 +7,11 @@ Every unary RPC leaf and retained HTTP endpoint has query, infinite-query, and m
 Your application chooses how to use each operation; neither the RPC definition nor the HTTP
 method determines the builder. HTTP stream builders are deferred.
 
-Use a query when TanStack should cache a result by semantic request identity. For RPCs with a payload, the query
-key contains the normalized, canonical payload. TanStack can refetch or cancel the query.
+Use a query when TanStack should cache a result by semantic request identity. For RPCs with a
+payload, the query key contains the normalized, canonical payload. TanStack can refetch or cancel the query.
 
-Use a mutation when the call represents an action or write. Mutation variables arrive when the
-mutation runs, and their values do not become part of the mutation key.
+Use a mutation when the call represents an action or write. Pass variables when the mutation
+runs; their values do not become part of the mutation key.
 
 Use an infinite query when TanStack should accumulate paginated results. Map each page parameter
 to an RPC payload or complete decoded HTTP request; the mapped initial request becomes part of

@@ -1,11 +1,12 @@
 # Verify the initial release candidate
 
-This guide is for maintainers accepting [#73](https://github.com/ueberBrot/effect-api-query/issues/73)
-before the human publication work in [#19](https://github.com/ueberBrot/effect-api-query/issues/19).
+This one-time checklist covers acceptance of the initial release candidate in
+[#73](https://github.com/ueberBrot/effect-api-query/issues/73) before the human publication work in
+[#19](https://github.com/ueberBrot/effect-api-query/issues/19).
 The [parent specification](https://github.com/ueberBrot/effect-api-query/issues/1) defines the delivery
 contract. Keep run-specific evidence in the issue so it identifies the exact tested commit.
 
-## Run the acceptance gate
+## Run the acceptance checks
 
 Commit the candidate, then run:
 
@@ -39,8 +40,8 @@ the verifier tests that archive and checks that its bytes remain unchanged.
 | Shared private modules and protocol decisions                                                 | `CONTEXT.md`, `docs/adr/0021-share-utility-construction-through-private-modules.md`, `docs/adr/0022-add-buffered-http-utilities-with-separate-key-roots.md` |
 | Current package identity and hosted cutover                                                   | Package metadata checks, hosted documentation suite, closed #71/#72 evidence                                                                                |
 
-Inspect each closed extension ticket #61–72 against its merged PR and evidence. Audit native
-dependencies separately from parent membership: every extension ticket belongs to #1, #73 reaches
+Inspect each closed extension ticket #61 through #72 against its merged PR and evidence. Audit GitHub
+issue dependencies separately from parent membership: every extension ticket belongs to #1, #73 reaches
 every implementation ticket through closed blockers, and #73 blocks #19. Preserve #19's earlier
 closed dependencies. Check the complete dependency graph for cycles. The deferred browser sandbox
 experiment in #33 remains a recorded deferral.

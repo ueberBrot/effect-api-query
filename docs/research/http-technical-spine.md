@@ -1,12 +1,12 @@
 # HTTP technical spine
 
-The HTTP adapter relies on the Effect HttpApi behavior described below. The inspected dependency is **Effect 4.0.0-rc.112**, pinned in [the workspace catalog](../../pnpm-workspace.yaml). Source links resolve after installing the repository dependencies. Recheck these assumptions when extending the adapter or updating Effect.
+The HTTP adapter relies on the Effect HttpApi behavior described below. This reference describes Effect 4.0.0-rc.112, pinned in [the workspace catalog](../../pnpm-workspace.yaml). Source links resolve after installing the repository dependencies. Recheck these assumptions when extending the adapter or updating Effect.
 
 ## Decoded requests and responses
 
 [`HttpApiEndpoint.ClientRequest`](../../node_modules/effect/src/unstable/httpapi/HttpApiEndpoint.ts) derives `params`, `query`, `payload`, and `headers` from each schema's `Type`. A declared container stays required even when its fields are optional. An endpoint without request parts accepts `void`. Payload declarations take a schema or schema alternatives; use `Schema.Struct` for an object payload.
 
-The HTTP adapter therefore accepts decoded request fields. It does not call schema constructors or supply RPC constructor defaults. For example, `Schema.NumberFromString` accepts a number at the client call and encodes it as a string on the wire. The request-part encoders in [`HttpApiClient.makeWith`](../../node_modules/effect/src/unstable/httpapi/HttpApiClient.ts) confirm this direction.
+The HTTP adapter therefore accepts decoded request fields. It does not call schema constructors or supply RPC constructor defaults. For example, `Schema.NumberFromString` accepts a number at the client call and encodes it as a string on the wire. The request-part encoders in [`HttpApiClient.makeWith`](../../node_modules/effect/src/unstable/httpapi/HttpApiClient.ts) confirm that requests follow this encoding direction.
 
 `HttpApiEndpoint.ClientResponseMode` has three values: `decoded-only`, `decoded-and-response`, and `response-only`. `HttpApiClient.Client.Method` is generic over that mode. Its `Response` conditional uses tuple-wrapped comparisons, so a generic mode union is not a reliable substitute for explicitly selecting a mode. The HTTP adapter derives buffered data from the endpoint success schema's `Type` and supplies `responseMode: 'decoded-only'` after spreading the request. Public request types reserve `responseMode`; runtime callers cannot override it.
 

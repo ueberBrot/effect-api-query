@@ -2,15 +2,15 @@
 
 ### Issue tracker
 
-Issues are tracked in this repository's GitHub Issues. See `docs/agents/issue-tracker.md`.
+Before reading or updating GitHub issues, read [the issue tracker workflow](docs/agents/issue-tracker.md).
 
 ### Triage labels
 
-The default five-role triage vocabulary is used. See `docs/agents/triage-labels.md`.
+When triaging issues, use [the five triage roles](docs/agents/triage-labels.md).
 
 ### Domain docs
 
-This repository uses a single-context domain-doc layout. See `docs/agents/domain.md`.
+Before exploring the codebase, read [the domain documentation guide](docs/agents/domain.md).
 
 ### Vite+
 
@@ -18,7 +18,7 @@ Check `package.json` and `vite.config.ts` first, and run `vp run <name>` when th
 
 ### Testing
 
-Don't write tests for what the type system already guarantees. Use compile-time fixtures to verify the published type contract; reserve runtime tests for behavior that can fail at runtime.
+Use compile-time fixtures to verify the published type contract. Reserve runtime tests for behavior that can fail at runtime; avoid testing guarantees already enforced by the type system.
 
 ## Learning more about Effect
 

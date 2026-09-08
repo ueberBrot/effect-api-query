@@ -19,7 +19,7 @@ export type EffectRpcQueryKeyErrorCode =
 /** The TanStack operation that executed an RPC. */
 export type RpcOperation = 'infinite' | 'live' | 'mutation' | 'query' | 'streamed'
 
-/** Safe metadata identifying the configuration entry that failed. */
+/** Identifies the failed configuration entry and retains any underlying failure. */
 export interface EffectRpcQueryConfigErrorOptions {
   /** The underlying failure, when one exists. */
   readonly cause?: unknown
@@ -34,7 +34,7 @@ export interface EffectRpcQueryConfigErrorOptions {
 /**
  * Wraps a failed RPC Exit for TanStack while preserving its complete Effect Cause.
  *
- * Runner rejections do not use this class because they contain no Effect Cause.
+ * Runner rejections pass through unchanged; this class wraps failed Exits.
  */
 export class EffectRpcQueryError<E> extends Error {
   /** Identifies this error without relying on `instanceof`. */

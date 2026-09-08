@@ -13,10 +13,10 @@ Consult [package metadata](https://github.com/ueberBrot/effect-api-query/blob/ma
 peer ranges and the [workspace catalog](https://github.com/ueberBrot/effect-api-query/blob/main/pnpm-workspace.yaml)
 for the pinned Effect prerelease and framework versions. The
 [packed consumer verifier](https://github.com/ueberBrot/effect-api-query/blob/main/scripts/verify-packed-consumer.mts)
-defines the compiler and peer combinations tested against the published package shape.
+defines the compiler and peer combinations tested against the packaged library.
 
-Both factories are checked with TypeScript 5.9 and the repository compiler at Query Core's lower
-bound and development version. Isolated consumers install the tarball with their own peers and
+Both factories are checked with TypeScript 5.9 and the repository compiler, using the minimum
+supported Query Core version and the version installed for development. Isolated consumers install the tarball with their own peers and
 verify runtime exports, peer identity, and private-subpath rejection. Separate RPC and HTTP
 contracts each exercise roughly 250 operations; compiler diagnostics record their combined cost
 without imposing a timing threshold.
@@ -45,7 +45,7 @@ supplies the client, policy, or lifecycle. **Deferred** means the adapter does n
 | Host routes                                       | Application-owned; tested standalone server and Start `/rpc`                                             | Application-owned; tested standalone server and Start `/api/$`                              |
 | Cache serialization and mutation invalidation     | Application-owned                                                                                        | Application-owned                                                                           |
 
-The package uses the ready client as its execution seam. TanStack provides query cancellation
+The package executes calls through the ready client. TanStack provides query cancellation
 signals but has no corresponding mutation signal for the adapter to forward. Configure request
 interception through client middleware and transport construction. Use an explicit domain
 operation when server cancellation must be observable; compensation is a separate operation.

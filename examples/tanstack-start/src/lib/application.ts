@@ -45,7 +45,7 @@ export interface StartTanStackStartApplicationOptions {
   readonly httpAuthorization?: string
 }
 
-/** Keeps the complete, caller-owned integration visible at the application seam. */
+/** Creates clients, query utilities, and cleanup together so the example can be copied as a whole. */
 export const startTanStackStartApplication = async ({
   rpcUrl,
   identity = 'example',

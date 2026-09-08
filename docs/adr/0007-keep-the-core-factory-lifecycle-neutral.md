@@ -4,8 +4,8 @@ Status: Accepted. Implementation ownership clarified by [ADR 0021](0021-share-ut
 
 ## Context
 
-The application, not the query adapter, knows the correct protocol, middleware, runtime, and
-browser-versus-server lifetime.
+The application knows the required protocol, middleware, runtime, and resource lifetime in the
+browser or on the server.
 
 ## Decision
 

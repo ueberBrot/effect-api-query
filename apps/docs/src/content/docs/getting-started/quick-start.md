@@ -8,8 +8,8 @@ acquire a ready flat client, read a user, and create another user.
 
 First [install the package](/effect-api-query/getting-started/installation/). Use a server that
 implements the declaration below at `http://localhost:3000/rpc` with JSON RPC serialization and
-an existing user with ID `1`. Change the URL to your server; browser callers also need its CORS policy
-to allow their origin. For a complete server and browser application, [run the examples](/effect-api-query/examples/).
+an existing user with ID `1`. Change the URL to your server. For browser requests, configure the
+server's CORS policy to allow the application's origin. For a complete server and browser application, [run the examples](/effect-api-query/examples/).
 
 ## Declare, connect, and call
 
@@ -78,13 +78,13 @@ try {
 The factory derives the utility tree from that client and uses `Effect.runPromiseExit`
 unless you supply a custom runner.
 
-The query accepts the RPC payload's **constructor input**. Here `{ id: 1 }` is valid because the
+The query accepts the RPC payload's constructor input. Here `{ id: 1 }` is valid because the
 schema constructor supplies `locale: 'en'`. Use deterministic constructor defaults: key preparation
 and ready-client execution construct the payload separately.
 
 Dotted RPC tags become nested properties: `users.get` becomes `rpc.users.get`. The query returns
-a decoded user. Mutation variables arrive at `mutate`, and invalidation explicitly refreshes the
-cached reads affected by the write.
+a decoded user. Pass mutation variables to `mutate`, then invalidate the cached reads affected by
+the write.
 
 ## Keep the owner alive
 

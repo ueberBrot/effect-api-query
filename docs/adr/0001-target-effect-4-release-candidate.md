@@ -4,8 +4,8 @@ Status: Accepted. Extended by [ADR 0022](0022-add-buffered-http-utilities-with-s
 
 ## Context
 
-Supporting Effect 3 and Effect 4 together would couple the first release to two incompatible RPC
-surfaces.
+Supporting Effect 3 and Effect 4 together would require the first release to support two incompatible
+RPC APIs.
 
 ## Decision
 
@@ -16,6 +16,6 @@ and invocation.
 ## Consequences
 
 Before `1.0`, breaking public changes raise the minor version and compatible changes raise the
-patch. An RC-only upgrade may raise the patch when the public surface remains compatible. The
+patch. An RC-only upgrade may raise the patch when the public API remains compatible. The
 project keeps a changelog from its first release and waits for a sufficiently stable Effect RPC
-surface before publishing `1.0`.
+API before publishing `1.0`.

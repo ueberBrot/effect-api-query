@@ -54,9 +54,8 @@
     ]
   },
 
-  // These tools are invoked through Vite+ task and pack configuration, which
-  // Fallow cannot discover as dependency usage. Effect and @effect/vitest are
-  // required by the no-test-yet foundation and become visible in later issues.
+  // Vite+ task and pack configuration invokes tools that Fallow cannot trace.
+  // Keep Effect peer and test dependencies available for the library and fixtures.
   "ignoreDependencies": [
     "@arethetypeswrong/cli",
     "@effect/tsgo",

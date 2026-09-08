@@ -44,9 +44,8 @@ to RPC `streamedOptions` and `liveOptions`. Inputless operations run without inp
 mutation builders do not accept `skipToken`. TanStack suspense and prefetch-only hooks also reject
 skipped options at the type level.
 
-Unary `queryOptions` accepts an input that may be a valid RPC payload or HTTP request, or
-`skipToken`. Keep the conditional input inside one builder call so the observer has one consistent
-callback type. Concrete inputs and literal `skipToken` keep their precise key types.
+Unary `queryOptions` accepts a valid RPC payload, a valid HTTP request, or `skipToken`. Keep the
+conditional input inside one builder call so the observer has one consistent callback type. Concrete inputs and the literal `skipToken` retain their precise key types.
 
 The object form also works for accumulated streams and live queries:
 

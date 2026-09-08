@@ -105,7 +105,7 @@ The cache key uses `input(initialPageParam)` and an `infinite` discriminator. Ke
 filters in the initial request and every later request. Rebuild the options when a filter
 changes so the first request produces a different key. Keep `input` deterministic and free of
 side effects: it runs during key construction and again for page execution. A custom key encoder
-must preserve these same result-affecting filters.
+must preserve these same filters because they affect results.
 
 TanStack owns page storage, invalidation, and refetching. `select` changes the hook result to the
 flattened users; the cache still holds `pages` and `pageParams`. Each page uses the same response
@@ -160,4 +160,4 @@ before disposing client and runtime resources. See
 
 The [public HTTP consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/http-contract.ts) checks query, mutation,
 pagination, and skipped-input types. The [Vite React HTTP panel](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/components/sections/http-section.tsx)
-puts the contract, ready client, hooks, and cache invalidation to use in a running application.
+shows the contract, ready client, hooks, and cache invalidation in a running application.

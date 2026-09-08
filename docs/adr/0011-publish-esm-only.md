@@ -11,9 +11,9 @@ dependency graph CommonJS-native.
 
 The package publishes side-effect-free ES2022 ESM through one root export. Public barrels enumerate
 named exports and avoid `export *`. Framework and internal subpaths become exports only when they are
-genuine public modules.
+intended for public use.
 
 ## Consequences
 
-There is no CommonJS build. The package uses no Node-only APIs and declares no invented Node engine
-floor. Applications may transform the complete dependency graph when their deployment requires it.
+There is no CommonJS build. The package uses no Node-only APIs and declares no minimum Node
+version. Applications may transform the complete dependency graph when their deployment requires it.

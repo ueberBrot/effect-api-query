@@ -5,7 +5,7 @@ description: Create an RPC utility tree from an RPC group and a ready client.
 
 ## `createRpcQueryUtils(group, options)`
 
-Returns an eager, frozen `RpcQueryUtils` tree for the group's unary and streaming RPCs.
+Builds and freezes a `RpcQueryUtils` tree for the group's unary and streaming RPCs when called.
 
 ### Options
 
