@@ -367,12 +367,18 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       readFileSync(join(repositoryRoot, 'skills/effect-api-query/SKILL.md'), 'utf8'),
       'Intent must load the shipped skill from the installed package',
     )
+    // Intent can emit paths relative to the consumer or absolute paths when the
+    // package resolves outside it (for example through a symlinked temp directory).
+    const loadedReferences = Array.from(
+      loadedSkill.content.matchAll(/\]\((?<destination>[^)\n]+\.md)\)/gu),
+      (link) => realpathSync(resolve(consumerDirectory, link.groups!['destination']!)),
+    )
     for (const path of skillPaths.slice(1)) {
       const installedReference = realpathSync(
         resolve(consumerDirectory, loadedSkill.packageRoot, path),
       )
       equal(
-        loadedSkill.content.includes(`](${installedReference})`),
+        loadedReferences.includes(installedReference),
         true,
         `Intent must resolve the shipped ${path} reference`,
       )
