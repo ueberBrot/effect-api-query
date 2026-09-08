@@ -67,10 +67,19 @@
     "unplugin-unused"
   ],
 
-  // Health measures shipped library code. Repository configuration and tests
-  // remain covered by dead-code, duplication, lint, type, and execution checks.
+  // Health measures shipped library code in src/. Exclude docs, examples,
+  // tooling, and tests here; other audits retain their repository-wide scope.
   "health": {
-    "ignore": ["tests/**", "vite.config.ts"]
+    "ignore": [
+      "apps/**",
+      "docs/**",
+      "e2e/**",
+      "e2e-docs/**",
+      "examples/**",
+      "scripts/**",
+      "tests/**",
+      "*.config.*"
+    ]
   },
 
   "rules": {

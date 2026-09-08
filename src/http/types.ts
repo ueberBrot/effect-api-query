@@ -16,6 +16,7 @@ import type {
 
 import type {
   ContainsRedacted,
+  UnaryQueryBuilder,
   InfiniteInput,
   InfiniteOptions,
   JsonValue,
@@ -23,8 +24,6 @@ import type {
   OwnedMutationOption,
   OwnedQueryOption,
   QueryData,
-  QueryInput,
-  QueryOptions,
   RunPromiseExit,
   WithDefinedInitialData,
   WithUndefinedInitialData,
@@ -166,145 +165,18 @@ export type ConcreteKey<
   QueryData<Success<Endpoint>>,
   Failure<ClientError>
 >
-export type Input<
-  Endpoint extends HttpApiEndpoint.ConstraintRequest,
-  Key extends readonly JsonValue[],
-  ClientError,
-  Selected,
-> = QueryInput<
-  QueryData<Success<Endpoint>>,
-  Failure<ClientError>,
-  Selected,
-  ConcreteKey<Endpoint, Key, ClientError>
->
-export type Options<
-  Endpoint extends HttpApiEndpoint.ConstraintRequest,
-  Key extends readonly JsonValue[],
-  ClientError,
-  Selected,
-> = QueryOptions<
-  QueryData<Success<Endpoint>>,
-  Failure<ClientError>,
-  Selected,
-  ConcreteKey<Endpoint, Key, ClientError>
->
-export type DefinedInput<
-  Endpoint extends HttpApiEndpoint.ConstraintRequest,
-  Key extends readonly JsonValue[],
-  ClientError,
-  Selected,
-> = WithDefinedInitialData<
-  Input<Endpoint, Key, ClientError, Selected>,
-  QueryData<Success<Endpoint>>
->
-export type UndefinedInput<
-  Endpoint extends HttpApiEndpoint.ConstraintRequest,
-  Key extends readonly JsonValue[],
-  ClientError,
-  Selected,
-> = WithUndefinedInitialData<
-  Input<Endpoint, Key, ClientError, Selected>,
-  QueryData<Success<Endpoint>>
->
-export type DefinedOptions<
-  Endpoint extends HttpApiEndpoint.ConstraintRequest,
-  Key extends readonly JsonValue[],
-  ClientError,
-  Selected,
-> = WithDefinedInitialData<
-  Options<Endpoint, Key, ClientError, Selected>,
-  QueryData<Success<Endpoint>>
->
-
-export type SkippedOptions<
-  Endpoint extends HttpApiEndpoint.ConstraintRequest,
-  Key extends readonly JsonValue[],
-  ClientError,
-  Selected = QueryData<Success<Endpoint>>,
-> = QueryOptions<
-  QueryData<Success<Endpoint>>,
-  Failure<ClientError>,
-  Selected,
-  readonly [...Key, 'query'],
-  SkipToken
->
-
-export type ConditionalKey<
-  Endpoint extends HttpApiEndpoint.ConstraintRequest,
-  Key extends readonly JsonValue[],
-  ClientError,
-> = ConcreteKey<Endpoint, Key, ClientError> | readonly [...Key, 'query']
-
-export type ConditionalOptions<
-  Endpoint extends HttpApiEndpoint.ConstraintRequest,
-  Key extends readonly JsonValue[],
-  ClientError,
-  Selected,
-> = QueryOptions<
-  QueryData<Success<Endpoint>>,
-  Failure<ClientError>,
-  Selected,
-  ConditionalKey<Endpoint, Key, ClientError>,
-  | QueryFunction<QueryData<Success<Endpoint>>, ConditionalKey<Endpoint, Key, ClientError>>
-  | SkipToken
->
-
+/** Supplies HTTP request inference to the shared unary query builder. */
 export type QueryBuilder<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Key extends readonly JsonValue[],
   ClientError,
-> =
-  void extends Request<Endpoint>
-    ? {
-        <Selected = QueryData<Success<Endpoint>>>(
-          options: DefinedInput<Endpoint, Key, ClientError, Selected>,
-        ): DefinedOptions<Endpoint, Key, ClientError, Selected>
-        <Selected = QueryData<Success<Endpoint>>>(
-          options?: UndefinedInput<Endpoint, Key, ClientError, Selected>,
-        ): Options<Endpoint, Key, ClientError, Selected>
-      }
-    : {
-        <Selected = QueryData<Success<Endpoint>>>(
-          options: DefinedInput<Endpoint, Key, ClientError, Selected> & {
-            readonly input: Request<Endpoint>
-          },
-        ): DefinedOptions<Endpoint, Key, ClientError, Selected>
-        <Selected = QueryData<Success<Endpoint>>>(
-          options: UndefinedInput<Endpoint, Key, ClientError, Selected> & {
-            readonly input: Request<Endpoint>
-          },
-        ): Options<Endpoint, Key, ClientError, Selected>
-        <Selected = QueryData<Success<Endpoint>>>(
-          options: WithDefinedInitialData<
-            Omit<SkippedOptions<Endpoint, Key, ClientError, Selected>, OwnedQueryOption>,
-            QueryData<Success<Endpoint>>
-          > & { readonly input: SkipToken },
-        ): WithDefinedInitialData<
-          SkippedOptions<Endpoint, Key, ClientError, Selected>,
-          QueryData<Success<Endpoint>>
-        >
-        <Selected = QueryData<Success<Endpoint>>>(
-          options: Omit<SkippedOptions<Endpoint, Key, ClientError, Selected>, OwnedQueryOption> & {
-            readonly input: SkipToken
-          },
-        ): SkippedOptions<Endpoint, Key, ClientError, Selected>
-        <Selected = QueryData<Success<Endpoint>>>(
-          options: WithDefinedInitialData<
-            Omit<ConditionalOptions<Endpoint, Key, ClientError, Selected>, OwnedQueryOption>,
-            QueryData<Success<Endpoint>>
-          > & { readonly input: Request<Endpoint> | SkipToken },
-        ): WithDefinedInitialData<
-          ConditionalOptions<Endpoint, Key, ClientError, Selected>,
-          QueryData<Success<Endpoint>>
-        >
-        <Selected = QueryData<Success<Endpoint>>>(
-          options: Omit<
-            ConditionalOptions<Endpoint, Key, ClientError, Selected>,
-            OwnedQueryOption
-          > & { readonly input: Request<Endpoint> | SkipToken },
-        ): ConditionalOptions<Endpoint, Key, ClientError, Selected>
-        (token: SkipToken): SkippedOptions<Endpoint, Key, ClientError>
-      }
+> = UnaryQueryBuilder<
+  Request<Endpoint>,
+  QueryData<Success<Endpoint>>,
+  Failure<ClientError>,
+  ConcreteKey<Endpoint, Key, ClientError>,
+  readonly [...Key, 'query']
+>
 
 export type ConcreteInfiniteKey<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,

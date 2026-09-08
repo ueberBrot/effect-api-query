@@ -7,6 +7,7 @@ import type {
   QueryKey,
   QueryKeyHashFunction,
   QueryObserverOptions,
+  SkipToken,
 } from '@tanstack/query-core'
 import type { Effect, Exit, Redacted } from 'effect'
 
@@ -66,6 +67,84 @@ export type QueryOptions<
   readonly queryKey: Key
   readonly queryKeyHashFn: QueryKeyHashFunction<Key>
 }
+
+export type ConditionalQueryOptions<Data, Error, Selected, Key extends QueryKey> = QueryOptions<
+  Data,
+  Error,
+  Selected,
+  Key,
+  QueryFunction<Data, Key> | SkipToken
+>
+
+/** Owns unary query inference; adapters supply their request, data, error, and key types. */
+export type UnaryQueryBuilder<
+  Input,
+  Data,
+  Error,
+  Key extends QueryKey,
+  SkippedKey extends QueryKey,
+  AdapterOptions = unknown,
+> = void extends Input
+  ? {
+      <Selected = Data>(
+        options: WithDefinedInitialData<
+          QueryInput<Data, Error, Selected, Key, AdapterOptions>,
+          Data
+        >,
+      ): WithDefinedInitialData<QueryOptions<Data, Error, Selected, Key>, Data>
+      <Selected = Data>(
+        options?: WithUndefinedInitialData<
+          QueryInput<Data, Error, Selected, Key, AdapterOptions>,
+          Data
+        >,
+      ): QueryOptions<Data, Error, Selected, Key>
+    }
+  : {
+      <Selected = Data>(
+        options: WithDefinedInitialData<
+          QueryInput<Data, Error, Selected, Key, AdapterOptions>,
+          Data
+        > & { readonly input: Input },
+      ): WithDefinedInitialData<QueryOptions<Data, Error, Selected, Key>, Data>
+      <Selected = Data>(
+        options: WithUndefinedInitialData<
+          QueryInput<Data, Error, Selected, Key, AdapterOptions>,
+          Data
+        > & { readonly input: Input },
+      ): QueryOptions<Data, Error, Selected, Key>
+      <Selected = Data>(
+        options: WithDefinedInitialData<
+          Omit<QueryOptions<Data, Error, Selected, SkippedKey, SkipToken>, OwnedQueryOption>,
+          Data
+        > &
+          AdapterOptions & { readonly input: SkipToken },
+      ): WithDefinedInitialData<QueryOptions<Data, Error, Selected, SkippedKey, SkipToken>, Data>
+      <Selected = Data>(
+        options: Omit<
+          QueryOptions<Data, Error, Selected, SkippedKey, SkipToken>,
+          OwnedQueryOption
+        > &
+          AdapterOptions & { readonly input: SkipToken },
+      ): QueryOptions<Data, Error, Selected, SkippedKey, SkipToken>
+      <Selected = Data>(
+        options: WithDefinedInitialData<
+          Omit<ConditionalQueryOptions<Data, Error, Selected, Key | SkippedKey>, OwnedQueryOption>,
+          Data
+        > &
+          AdapterOptions & { readonly input: Input | SkipToken },
+      ): WithDefinedInitialData<
+        ConditionalQueryOptions<Data, Error, Selected, Key | SkippedKey>,
+        Data
+      >
+      <Selected = Data>(
+        options: Omit<
+          ConditionalQueryOptions<Data, Error, Selected, Key | SkippedKey>,
+          OwnedQueryOption
+        > &
+          AdapterOptions & { readonly input: Input | SkipToken },
+      ): ConditionalQueryOptions<Data, Error, Selected, Key | SkippedKey>
+      (token: SkipToken): QueryOptions<Data, Error, Data, SkippedKey, SkipToken>
+    }
 
 export type InfiniteInput<
   Data,

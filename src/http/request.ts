@@ -113,6 +113,7 @@ export const createHttpRequestInput = (
   return {
     _tag: 'Input',
     requiresEncoder: payloads.length > 1 || containsUnsafeKeyEncoding(schema.ast),
+    pageInput: (input) => input,
     invalidKey,
     prepare: (input, encoder) => {
       let keyValue: unknown

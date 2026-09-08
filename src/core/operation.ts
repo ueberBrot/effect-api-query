@@ -11,6 +11,8 @@ export type OperationInput =
   | {
       readonly _tag: 'Input'
       readonly requiresEncoder: boolean
+      /** Prepares page requests without deriving another cache identity. */
+      readonly pageInput: (input: unknown) => unknown
       readonly prepare: (
         input: unknown,
         encoder: RuntimeKeyEncoder | undefined,
@@ -28,8 +30,6 @@ export interface OperationIdentity {
 
 export interface UnaryOperation extends OperationIdentity {
   readonly kind: 'Unary'
-  /** Prepares page requests without deriving another cache identity. */
-  readonly pageInput: (input: unknown) => unknown
   readonly invoke: (input: unknown, options: unknown) => Effect.Effect<unknown, unknown, unknown>
   readonly executionError: (operation: UnaryQueryOperation, cause: Cause.Cause<unknown>) => Error
 }

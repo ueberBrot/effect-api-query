@@ -963,6 +963,12 @@ utils.events.watch.streamedOptions({ input: { channel: 'news' }, maxChunks: '2' 
 utils.events.audit.watch.streamedOptions({ maxChunks: 2, initialData: [] })
 utils.events.watch.streamedOptions({ input: skipToken, maxChunks: 2, initialData: [] })
 
+declare const conditionalStreamInput: { readonly channel: string } | typeof skipToken
+// @ts-expect-error streaming builders retain exact-input and exact-skip overloads
+utils.events.watch.streamedOptions({ input: conditionalStreamInput })
+// @ts-expect-error live builders retain exact-input and exact-skip overloads
+utils.events.watch.liveOptions({ input: conditionalStreamInput })
+
 declare const conditionalUserId: number | undefined
 const conditionalUserOptions = utils.users.get.queryOptions({
   input: conditionalUserId === undefined ? skipToken : { id: conditionalUserId },

@@ -113,27 +113,97 @@ describe('TanStack Start server rendering', () => {
     }
   })
 
-  it('finalizes an open stream after its first successful server snapshot', async () => {
-    const Watch = Rpc.make('diagnostics.watch', { success: Schema.String, stream: true })
+  it.each([false, true])(
+    'finalizes a stream after its first new snapshot (cached: %s)',
+    async (cached) => {
+      const Watch = Rpc.make('diagnostics.watch', { success: Schema.String, stream: true })
+      const group = RpcGroup.make(Watch)
+      const finalized = Deferred.makeUnsafe<void>()
+      const source = Stream.make('snapshot').pipe(
+        Stream.concat(Stream.fromEffect(Effect.never)),
+        Stream.ensuring(Deferred.succeed(finalized, undefined).pipe(Effect.asVoid)),
+      )
+      const client = ((_tag: string, _payload: unknown) => source) as RpcClient.RpcClient.Flat<
+        RpcGroup.Rpcs<typeof group>
+      >
+      const queryClient = new QueryClient()
+      const options = createRpcQueryUtils(group, {
+        client,
+        keyPrefix: ['start'] as const,
+      }).diagnostics.watch.streamedOptions()
+      if (cached) queryClient.setQueryData(options.queryKey, ['previous'])
+
+      const snapshot = await fetchStreamSnapshot(queryClient, options)
+
+      expect(snapshot).toEqual(['snapshot'])
+      expect(queryClient.getQueryState(options.queryKey)?.fetchStatus).toBe('idle')
+      expect(Deferred.isDoneUnsafe(finalized)).toBe(true)
+    },
+  )
+
+  it('settles and releases its listener when cancelled before the first streamed value', async () => {
+    const Watch = Rpc.make('watch', { success: Schema.String, stream: true })
     const group = RpcGroup.make(Watch)
+    const started = Deferred.makeUnsafe<void>()
     const finalized = Deferred.makeUnsafe<void>()
-    const source = Stream.make('snapshot').pipe(
-      Stream.concat(Stream.fromEffect(Effect.never)),
-      Stream.ensuring(Deferred.succeed(finalized, undefined).pipe(Effect.asVoid)),
-    )
-    const client = ((_tag: string, _payload: unknown) => source) as RpcClient.RpcClient.Flat<
-      RpcGroup.Rpcs<typeof group>
-    >
+    const source = Stream.fromEffect(
+      Deferred.succeed(started, undefined).pipe(Effect.andThen(Effect.never)),
+    ).pipe(Stream.ensuring(Deferred.succeed(finalized, undefined).pipe(Effect.asVoid)))
+    const client = (() => source) as RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof group>>
     const queryClient = new QueryClient()
     const options = createRpcQueryUtils(group, {
       client,
-      keyPrefix: ['start'] as const,
-    }).diagnostics.watch.streamedOptions()
+      keyPrefix: ['cancel-snapshot'],
+    }).watch.streamedOptions()
 
-    const snapshot = await fetchStreamSnapshot(queryClient, options)
+    try {
+      const snapshot = fetchStreamSnapshot(queryClient, options)
+      const rejected = expect(snapshot).rejects.toMatchObject({
+        message: 'CancelledError',
+        revert: true,
+      })
+      await Effect.runPromise(Deferred.await(started))
+      expect(queryClient.getQueryCache().hasListeners()).toBe(true)
+      await queryClient.cancelQueries({ queryKey: options.queryKey, exact: true })
+      await rejected
+      await Effect.runPromise(Deferred.await(finalized))
+      expect(queryClient.getQueryCache().hasListeners()).toBe(false)
+    } finally {
+      queryClient.clear()
+    }
+  }, 1500)
 
-    expect(snapshot).toEqual(['snapshot'])
-    expect(queryClient.getQueryState(options.queryKey)?.fetchStatus).toBe('idle')
-    expect(Deferred.isDoneUnsafe(finalized)).toBe(true)
-  })
+  it('releases its listener on failure and can take a fresh snapshot after a cached error', async () => {
+    const Watch = Rpc.make('watch', { success: Schema.String, stream: true })
+    const group = RpcGroup.make(Watch)
+    const finalized = Deferred.makeUnsafe<void>()
+    const source = Stream.make('recovered').pipe(
+      Stream.concat(Stream.fromEffect(Effect.never)),
+      Stream.ensuring(Deferred.succeed(finalized, undefined).pipe(Effect.asVoid)),
+    )
+    const client = (() => source) as RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof group>>
+    const queryClient = new QueryClient()
+    const options = createRpcQueryUtils(group, {
+      client,
+      keyPrefix: ['recover-snapshot'],
+    }).watch.streamedOptions()
+    const failure = new Error('first request failed')
+
+    try {
+      await expect(
+        fetchStreamSnapshot(queryClient, {
+          ...options,
+          queryFn: () => Promise.reject(failure),
+        }),
+      ).rejects.toBe(failure)
+      expect(queryClient.getQueryCache().hasListeners()).toBe(false)
+
+      expect(await fetchStreamSnapshot(queryClient, options)).toEqual(['recovered'])
+      await Effect.runPromise(Deferred.await(finalized))
+      expect(queryClient.getQueryCache().hasListeners()).toBe(false)
+      expect(queryClient.isFetching()).toBe(0)
+    } finally {
+      queryClient.clear()
+    }
+  }, 1500)
 })
