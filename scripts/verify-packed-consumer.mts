@@ -1,9 +1,18 @@
+import { listIntentSkills, loadIntentSkill } from '@tanstack/intent/core'
 // fallow-ignore-file unused-file
 // Vite+ invokes this verifier through its dynamically declared packed-package task.
 import { deepStrictEqual, equal, match } from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import {
+  cpSync,
+  existsSync,
+  mkdtempSync,
+  readFileSync,
+  realpathSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs'
 import { builtinModules } from 'node:module'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
@@ -213,6 +222,28 @@ const packedFiles = execFileSync('tar', ['-tzf', tarballPath], { encoding: 'utf8
   .trim()
   .split('\n')
   .sort()
+const skillPaths = [
+  'skills/effect-api-query/SKILL.md',
+  'skills/effect-api-query/references/http.md',
+  'skills/effect-api-query/references/query-patterns.md',
+  'skills/effect-api-query/references/rpc.md',
+]
+const skillExamples: Array<string> = []
+for (const path of ['LICENSE', ...skillPaths]) {
+  const packedContent = execFileSync('tar', ['-xOzf', tarballPath, `package/${path}`], {
+    encoding: 'utf8',
+  })
+  equal(
+    packedContent,
+    readFileSync(join(repositoryRoot, path), 'utf8'),
+    `The packed ${path} must match the candidate`,
+  )
+  for (const sample of packedContent.matchAll(/^```ts\n([\s\S]*?)^```/gmu)) {
+    if (sample[1] !== undefined) skillExamples.push(sample[1])
+  }
+}
+equal(skillExamples.length > 0, true, 'The packed usage skill must have compilable examples')
+equal(packedManifest.keywords.includes('tanstack-intent'), true)
 const changelogPath = join(repositoryRoot, 'CHANGELOG.md')
 const hasChangelog = existsSync(changelogPath)
 if (repositoryManifest.version !== '0.0.0') {
@@ -233,6 +264,7 @@ deepStrictEqual(packedFiles, [
   'package/dist/index.mjs',
   'package/dist/index.mjs.map',
   'package/package.json',
+  ...skillPaths.map((path) => `package/${path}`),
 ])
 
 const compilerCases = [
@@ -290,6 +322,7 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       name: `effect-api-query-packed-consumer-${peer.label}`,
       private: true,
       type: 'module',
+      intent: { skills: ['effect-api-query'] },
       dependencies: {
         '@tanstack/query-core': peer.queryCoreVersion,
         '@tanstack/react-query': peer.reactQueryVersion,
@@ -309,6 +342,9 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       join(consumerDirectory, 'package.json'),
       JSON.stringify(consumerManifest, null, 2),
     )
+    for (const [index, source] of skillExamples.entries()) {
+      writeFileSync(join(consumerDirectory, `skill-example-${index}.ts`), source)
+    }
 
     // Prefer cached artifacts, but allow a fresh machine to fetch exact pinned versions.
     // The temporary project must resolve every peer from its own node_modules.
@@ -316,6 +352,37 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       cwd: consumerDirectory,
       stdio: 'inherit',
     })
+
+    const skillUse = 'effect-api-query#effect-api-query'
+    const intentOptions = { cwd: consumerDirectory }
+    const catalog = listIntentSkills(intentOptions)
+    deepStrictEqual(
+      catalog.skills.map((skill) => skill.use),
+      [skillUse],
+    )
+    const loadedSkill = loadIntentSkill(skillUse, intentOptions)
+    equal(loadedSkill.version, packedManifest.version)
+    equal(
+      readFileSync(resolve(consumerDirectory, loadedSkill.path), 'utf8'),
+      readFileSync(join(repositoryRoot, 'skills/effect-api-query/SKILL.md'), 'utf8'),
+      'Intent must load the shipped skill from the installed package',
+    )
+    // Intent can emit paths relative to the consumer or absolute paths when the
+    // package resolves outside it (for example through a symlinked temp directory).
+    const loadedReferences = Array.from(
+      loadedSkill.content.matchAll(/\]\((?<destination>[^)\n]+\.md)\)/gu),
+      (link) => realpathSync(resolve(consumerDirectory, link.groups!['destination']!)),
+    )
+    for (const path of skillPaths.slice(1)) {
+      const installedReference = realpathSync(
+        resolve(consumerDirectory, loadedSkill.packageRoot, path),
+      )
+      equal(
+        loadedReferences.includes(installedReference),
+        true,
+        `Intent must resolve the shipped ${path} reference`,
+      )
+    }
 
     for (const compiler of compilerCases) {
       runTypeScript(consumerDirectory, compiler, 'tsconfig.json', false)

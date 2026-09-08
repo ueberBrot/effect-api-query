@@ -131,12 +131,16 @@ export default defineConfig({
           'fallow dead-code --private-type-leaks --file dist/index.d.mts',
           'vp run verify-packed-package',
         ],
-        dependsOn: ['pack'],
+        dependsOn: ['pack', 'skills-check'],
         output: ['.artifacts/*.tgz'],
       },
       'verify-packed-package': {
         command: 'node scripts/verify-packed-consumer.mts',
         cache: false,
+      },
+      'skills-check': {
+        command: 'intent validate skills --check',
+        output: [],
       },
       fallow: {
         command: [

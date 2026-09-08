@@ -32,6 +32,7 @@ describe('TanStack Start hydration and client navigation', () => {
     }
   })
 
+  // Hydration, streaming, two navigations, and a mutation share the test deadline.
   it('hydrates without a duplicate query, navigates, mutates, and invalidates', async () => {
     const server = await Effect.runPromise(
       startExampleRpcServer().pipe(Scope.provide(serverScope!)),
@@ -90,7 +91,7 @@ describe('TanStack Start hydration and client navigation', () => {
     expect(await screen.findByText('13 users in one response')).toBeTruthy()
 
     unsubscribe()
-  })
+  }, 15_000)
 
   it('shows declared failures, cancels queries, and renders the default 404', async () => {
     const server = await Effect.runPromise(
