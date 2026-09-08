@@ -14,6 +14,24 @@ pnpm add effect-api-query @tanstack/query-core
 pnpm installs the exact Effect peer declared by the package. Use TypeScript 5.9 or newer with `strict: true`. The package requires ESM and ES2022 support.
 Before upgrading, review [compatibility and stability](https://ueberbrot.github.io/effect-api-query/getting-started/compatibility-and-stability/).
 
+## Agent skill
+
+Install the library usage skill from this repository:
+
+```sh
+npx skills add ueberBrot/effect-api-query --skill effect-api-query
+```
+
+The same skill ships in the npm package. With the library installed, run
+`npx @tanstack/intent@latest install` and enable `effect-api-query`, then load it with:
+
+```sh
+npx @tanstack/intent@latest load effect-api-query#effect-api-query
+```
+
+Intent reads the skill from the installed library version. Skills installed from
+GitHub are updated separately through the Skills CLI.
+
 ## Query an RPC
 
 Given your RPC group and ready flat client:

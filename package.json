@@ -2,6 +2,9 @@
   "name": "effect-api-query",
   "version": "0.0.0",
   "description": "Type-safe TanStack Query utilities derived from Effect RPC and HTTP API contracts.",
+  "keywords": [
+    "tanstack-intent"
+  ],
   "homepage": "https://github.com/ueberBrot/effect-api-query#readme",
   "bugs": {
     "url": "https://github.com/ueberBrot/effect-api-query/issues"
@@ -14,7 +17,9 @@
   },
   "files": [
     "dist",
-    "CHANGELOG.md"
+    "skills",
+    "CHANGELOG.md",
+    "LICENSE"
   ],
   "type": "module",
   "sideEffects": false,
@@ -49,6 +54,7 @@
     "@effect/tsgo": "0.38.0",
     "@effect/vitest": "4.0.0-rc.112",
     "@playwright/test": "1.62.1",
+    "@tanstack/intent": "0.3.8",
     "@tanstack/query-core": "catalog:",
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-router": "catalog:",
