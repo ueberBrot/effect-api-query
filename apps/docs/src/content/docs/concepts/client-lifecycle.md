@@ -8,9 +8,9 @@ its `Scope` open, and disposes its resources:
 
 1. Open the RPC client's `Scope` and build any required runtime.
 2. Create a `QueryClient` and RPC utility tree.
-3. Generated ordinary, infinite, accumulated-stream, live, and mutation functions call the ready
-   client through `runPromiseExit`.
-4. At shutdown, cancel active queries, clear the cache, and then close the RPC client resources.
+3. Run ordinary, infinite, accumulated-stream, and live queries or mutations. Their generated
+   functions call the ready client through `runPromiseExit`.
+4. At shutdown, cancel active queries, clear the cache, and then dispose the RPC client's resources.
 
 On the server, create these resources separately for each request to keep request data and scoped
 services isolated. In the browser, keep them for the application lifetime.
@@ -20,8 +20,8 @@ The factory has no React, router, transport, provider, or server-rendering lifec
 ## HTTP clients and execution services
 
 `createHttpApiQueryUtils` accepts a ready HttpApiClient. The application builds its HTTP transport,
-installs client middleware, and owns any runtime or Scope used by that client. Use request-scoped
-clients and QueryClients on the server, and dispose their resources when the request ends.
+installs client middleware, and manages any runtime or `Scope` the client uses. On the server,
+create a client and `QueryClient` for each request and dispose their resources when it ends.
 
 Calls that need no services default to `Effect.runPromiseExit`. If an exposed endpoint needs request
 encoding, success decoding, or error decoding services, supply a `runPromiseExit` that provides
@@ -40,5 +40,5 @@ Use a builder's `rpcOptions` for metadata or configuration specific to one reque
 request-source header or streaming buffer size. The `context` value is local to Effect RPC client
 processing; it is not a serialized server Context and does not replace the supplied Effect runner.
 
-Keep ordinary authentication, middleware, transport setup, runtime services, and Scope ownership
-in the application-owned client and runtime.
+Manage authentication, middleware, transport setup, runtime services, and `Scope` in your
+application client and runtime.

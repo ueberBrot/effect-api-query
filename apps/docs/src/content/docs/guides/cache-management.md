@@ -3,7 +3,7 @@ title: Cache Management
 description: Invalidate and inspect caches with generated prefix keys.
 ---
 
-Every branch and leaf exposes `key()`. Use these prefix-matchable keys for cache-wide operations:
+Every branch and leaf exposes `key()`. Use these prefixes to match related cache entries:
 
 ```ts
 await queryClient.invalidateQueries({ queryKey: rpcQuery.users.key() })
@@ -37,7 +37,7 @@ Mutation keys end in `'mutation'` and never include variables. See
 
 ## Manage HTTP caches
 
-HTTP utilities expose the same branch-prefix and ordinary-query key builders. Supply the endpoint's
+HTTP utilities also expose branch prefixes and keys for individual queries. Supply the endpoint's
 decoded request input for a specific entry:
 
 ```ts

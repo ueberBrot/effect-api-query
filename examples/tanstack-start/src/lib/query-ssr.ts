@@ -61,8 +61,8 @@ export const setupQuerySsr = <TRouter extends AnyRouter>(
 
   if (router.isServer) return
 
-  // The current mature helper hydrates the terminal stream value before checking `done`.
-  // Keep its provider and redirect integration, but read its dehydrated stream safely.
+  // The upstream helper hydrates the terminal stream value before checking `done`.
+  // Keep its provider and redirect integration, and check `done` before hydrating each value.
   router.options.hydrate = async (dehydrated: DehydratedRouterQueryState) => {
     await originalHydrate?.(dehydrated)
     if (dehydrated.dehydratedQueryClient !== undefined) {

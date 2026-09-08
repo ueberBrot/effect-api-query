@@ -134,15 +134,15 @@ finish with `[]`. Empty live completion raises `EffectRpcQueryEmptyStreamError`.
 Emitted chunks are retained as supplied, unlike buffered query `undefined`
 normalization.
 
-On an initial fetch, both views become successful after the first emission while
-remaining fetching until completion. Canceling closes the iterator and interrupts its Effect
-resources. An awaited QueryClient call waits for stream completion; use cache
+On an initial fetch, both views become successful after the first emission, but
+keep fetching until completion. Canceling closes the iterator and interrupts its
+Effect resources. An awaited QueryClient call waits for stream completion; use cache
 observation to consume intermediate values.
 
 ## Server rendering and hydration
 
-Create a fresh QueryClient and request-owned client/runtime for each server
-request. Share the generated options between loaders and components through
+Create a fresh QueryClient, client, and runtime for each server request.
+Share the generated options between loaders and components through
 router context. Keep key prefixes and inputs equivalent between server and
 browser, while preserving separate resource ownership. Choose `staleTime` to
 avoid an immediate duplicate read during hydration.

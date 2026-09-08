@@ -1,4 +1,4 @@
-/** Query Core's exact runtime sentinel for disabling payload-bearing queries. */
+/** Query Core's exact runtime sentinel for disabling queries that require input. */
 export { skipToken } from '@tanstack/query-core'
 
 /** Creates the public RPC utility tree. @api public */
@@ -25,7 +25,7 @@ export type {
   // fallow-ignore-next-line unused-type
   HttpApiQueryUtils,
 } from './http/types'
-/** Errors and guards raised by the public runtime API. @api public */
+/** Errors raised by the public runtime API and guards for execution errors. @api public */
 export {
   EffectRpcQueryConfigError,
   EffectRpcQueryEmptyStreamError,

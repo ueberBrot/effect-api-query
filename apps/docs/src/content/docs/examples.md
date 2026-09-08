@@ -36,6 +36,9 @@ You can also use the included Dev Container: install Docker and the VS Code Dev 
 extension, open the clone, and choose **Dev Containers: Reopen in Container**. The container
 installs the declared tool versions and workspace dependencies, and forwards the application ports.
 
+StackBlitz WebContainers cannot run these examples because Vite+ requires a native binding
+that is unavailable there.
+
 ## Run Vite React
 
 ```sh
@@ -50,7 +53,7 @@ demo authorization header through its HTTP client middleware.
 
 ### Compare HTTP and RPC
 
-The HTTP panel uses `createHttpApiQueryUtils` from `effect-api-query`; the existing RPC panels
+The HTTP panel uses `createHttpApiQueryUtils` from `effect-api-query`; the RPC panels
 use `createRpcQueryUtils` from the same package root. The application owns both ready clients,
 their runners, and the QueryClient. During disposal, it cancels queries before releasing client
 resources.
@@ -90,7 +93,7 @@ vp run tanstack-start-dev
 ```
 
 This task starts one full-stack process. The browser and server-rendering clients call the
-Start-owned `/rpc` and `/api/$` routes. Choose **HTTP users** to inspect the server-rendered directory
+Start application's `/rpc` and `/api/$` routes. Choose **HTTP users** to inspect the server-rendered directory
 and first page, reuse the hydrated cache, and try the same HTTP operations as in Vite React.
 Choose **HTTP SSR failure** to see the browser retry a failed server query that was omitted
 from dehydration.
@@ -113,9 +116,9 @@ ordinary `useQuery`; the TanStack Start loader leaves this interactive query pau
 ## Compare full and bounded stream history
 
 In either application, let the diagnostic stream finish, then choose **Replay newest 2**.
-The accumulated history retains only “Workspace synchronized” and “Ready”; earlier updates disappear
+The accumulated history retains only "Workspace synchronized" and "Ready"; earlier updates disappear
 as new ones arrive. Choose **Replay full history** to retain all four states again. The live query
-continues to show only “Ready”.
+continues to show only "Ready".
 
 The bounded replay supplies `maxChunks: 2` to `streamedOptions`. Both controls reuse the generated
 streamed key: the bound changes retention policy, not RPC identity. The application keeps the selected
@@ -137,8 +140,3 @@ Build either application without starting it:
 vp run vite-react-build
 vp run tanstack-start-build
 ```
-
-## Run in a local environment
-
-Run either example locally or in the Dev Container. StackBlitz WebContainers cannot run these
-examples because Vite+ requires a native binding that is unavailable there.

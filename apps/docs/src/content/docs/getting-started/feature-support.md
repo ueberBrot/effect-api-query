@@ -8,9 +8,8 @@ definitions. Use `createRpcQueryUtils` for RPC and `createHttpApiQueryUtils` for
 from the package root.
 
 The [capability matrix](/effect-api-query/reference/compatibility-and-limits/#capability-matrix)
-compares RPC and HTTP support in separate columns. It shows what the package generates, which
-integrations are tested, what your application must supply, which operations are deferred, and
-where upstream libraries provide no integration point.
+compares RPC and HTTP support. It lists generated features, tested integrations, application
+responsibilities, deferred operations, and missing upstream integration points.
 
 ## Pick the operation
 
@@ -25,8 +24,8 @@ alternative.
 
 ## Plan application ownership
 
-Acquire the ready client, configure transport and authentication, and own its runtime before
-constructing utilities. Keep those resources alive while queries and mutations use them. Configure
+Configure transport and authentication, acquire the ready client, and create any required runtime
+before constructing utilities. Keep those resources alive while queries and mutations use them. Configure
 TanStack providers, Devtools, persistence, broadcasting, and cache defaults in your application.
 
 Include a safe user or tenant identity in `keyPrefix` whenever client configuration changes the

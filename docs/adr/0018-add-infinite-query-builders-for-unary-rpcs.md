@@ -1,6 +1,6 @@
 # Add infinite-query builders for unary RPCs
 
-Status: Accepted. Partially supersedes ADR 0002–0005 and ADR 0008.
+Status: Accepted. Partially supersedes ADR 0002 through ADR 0005 and ADR 0008.
 
 Unary RPC leaves expose `infiniteKey` and `infiniteOptions` so pagination shares ordinary queries'
 key and execution contracts. The mapper converts each `pageParam` to payload constructor input;

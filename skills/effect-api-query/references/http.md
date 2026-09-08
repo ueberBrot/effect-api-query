@@ -76,7 +76,7 @@ binary responses, and declared response-header wrappers keep their decoded types
 
 An endpoint with **any streaming success alternative** or **any multipart request
 alternative** is omitted entirely. Empty groups disappear. Use the underlying
-Effect client for these endpoints instead of inventing missing utility builders.
+Effect client directly for these endpoints.
 
 ## Key encoding
 

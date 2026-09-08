@@ -7,14 +7,14 @@ Every branch and leaf exposes `key()`, which returns its immutable cache-key pre
 
 Each unary RPC leaf also exposes:
 
-| Builder                     | Result                                                                                                     |
-| --------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `queryKey(input?)`          | Payload-specific, data-tagged query key. Payload-bearing RPCs require constructor input.                   |
-| `queryOptions(options?)`    | Fresh Query Core options with owned `queryFn`, `queryKey`, and `queryKeyHashFn`.                           |
-| `infiniteKey(input?)`       | Data-tagged infinite-query key derived from the initial page's payload.                                    |
-| `infiniteOptions(options)`  | Fresh infinite-query options that map each `pageParam` to an RPC payload.                                  |
-| `mutationKey()`             | Immutable operation key shared by mutations of this RPC.                                                   |
-| `mutationOptions(options?)` | Fresh mutation options with owned `mutationFn` and `mutationKey`. Variables arrive when the mutation runs. |
+| Builder                     | Result                                                                                                       |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `queryKey(input?)`          | Payload-specific, data-tagged query key. Payload-bearing RPCs require constructor input.                     |
+| `queryOptions(options?)`    | Fresh Query Core options with generated `queryFn`, `queryKey`, and `queryKeyHashFn`.                         |
+| `infiniteKey(input?)`       | Data-tagged infinite-query key derived from the initial page's payload.                                      |
+| `infiniteOptions(options)`  | Fresh infinite-query options that map each `pageParam` to an RPC payload.                                    |
+| `mutationKey()`             | Immutable operation key shared by mutations of this RPC.                                                     |
+| `mutationOptions(options?)` | Fresh mutation options with generated `mutationFn` and `mutationKey`. Pass variables when the mutation runs. |
 
 Payloadless query builders take no input. Payload-bearing builders require an `input` field:
 
@@ -152,7 +152,7 @@ Initial fetches and append refetches trim existing data only when an element arr
 append refetch preserves existing data; empty reset and replace refetches finish with an empty
 array.
 
-The bound limits the number of elements, discarding older history; it does not limit byte size.
+The bound discards older history to limit the number of elements; it does not limit byte size.
 Without it, accumulation remains unbounded. Use `liveOptions` when only the latest value matters.
 
 `maxChunks` configures accumulation, not key identity. Builders consume it before returning options,

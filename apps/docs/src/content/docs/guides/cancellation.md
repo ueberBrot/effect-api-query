@@ -43,7 +43,8 @@ query-cancellation result and cache policy.
 HTTP interruption stops local client execution cooperatively. A closed connection does not prove
 that server work stopped, and it does not undo a completed write. Durable server cancellation
 requires an explicit application operation with an identity assigned before work begins.
-Compensation remains separate.
+Reversing completed work requires a separate compensation operation.
+
 HTTP mutations receive no query abort signal and keep TanStack's normal mutation lifecycle.
 
 ## Cancel a command while its mutation is pending
@@ -118,8 +119,8 @@ and QueryClient. It can reuse the workflow above with its own QueryClient.
 | Call `commands.cancel`    | Requests cooperative server cancellation by operation ID and waits for a terminal state.    |
 | Compensate committed work | Requires a separate application operation that reverses or offsets prior effects.           |
 
-Transport interruption is cooperative and transport-dependent. An explicit cancel RPC is the
-durable application contract for requesting server cancellation. The existing slow-query demo
+Transport interruption is cooperative and depends on transport support. An explicit cancel RPC is the
+durable application contract for requesting server cancellation. The slow-query demo
 adds a transport-specific `diagnostics.cancel` call when its local Effect is interrupted; the
 package itself does not provide that behavior.
 

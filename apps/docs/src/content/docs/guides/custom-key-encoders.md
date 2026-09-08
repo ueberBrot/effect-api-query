@@ -31,8 +31,8 @@ Inputs that can produce different RPC results must produce different keys.
 ## HTTP requests
 
 HTTP encoders receive the complete decoded request input: the declared `params`, `query`,
-`payload`, and `headers` containers. RPC encoders receive the normalized payload after constructor
-defaults. Configure each HTTP encoder in `createHttpApiQueryUtils` under its literal declaration
+`payload`, and `headers` containers. RPC encoders receive the normalized payload after the constructor
+applies defaults. Configure each HTTP encoder in `createHttpApiQueryUtils` under its literal declaration
 group and endpoint identifier, even for a top-level group or an identifier containing dots.
 
 Suppose a `forms` group's `submit` endpoint accepts a number encoded as text or a string encoded
@@ -66,12 +66,12 @@ construction.
 
 Keep ordinary authentication in client middleware. Partition the cache with safe tenant and user
 identifiers in `keyPrefix`, for example `['tenant', 'north', 'user', 'ada']`. The factory cannot infer
-identity from a client, base URL, or middleware. Retain every safe value that distinguishes results
-when excluding a secret.
+identity from a client, base URL, or middleware. When excluding a secret, retain every safe value
+that distinguishes results.
 
 Return strict `JsonValue` synchronously. The factory copies and freezes the result; it rejects
 undefined object members, undefined or sparse array entries, non-finite numbers, cycles, and
-non-JSON objects. Custom output does not receive the default HTTP omission or header normalization.
+non-JSON objects. Custom output bypasses the default HTTP rules for omitting `undefined` members and normalizing headers.
 See the [HTTP reference](/effect-api-query/reference/http-factory/#cache-identity-and-failures) for
 failure codes. Underlying error Causes remain intact and may contain values supplied by Effect.
 

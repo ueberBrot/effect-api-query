@@ -24,14 +24,13 @@ names, collisions, and invalid encoder configuration before returning any utilit
 The factory omits an entire endpoint if any success alternative streams, including a stream
 wrapped with response headers, or any request alternative is multipart. It also omits groups
 containing only omitted endpoints. It never keeps just the buffered alternatives of a partially
-supported endpoint. Contradictory multipart metadata fails factory construction. HTTP streams and multipart uploads
-remain deferred; use the ready client directly when you need them.
+supported endpoint. Contradictory multipart metadata causes factory construction to fail. HTTP
+streams and multipart uploads remain deferred; use the ready client directly when you need them.
 
 Raw-response modes are also deferred. Generated calls force decoded-only responses and exclude
 response controls from their input. See the [HTTP factory](/effect-api-query/reference/http-factory/)
 for request, response, and builder contracts, and [Semantic Keys](/effect-api-query/concepts/semantic-keys/)
 for the `http` namespace.
 
-The
-[public HTTP type consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/http-contract.ts)
+The [public HTTP type consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/http-contract.ts)
 and [factory runtime tests](https://github.com/ueberBrot/effect-api-query/blob/main/tests/create-http-api-query-utils.test.ts) check these projection rules.

@@ -523,7 +523,7 @@ export type RequiredEncoderRpcs<Group extends RpcGroup.Any> =
       : never
     : never
 
-/** Exact encoder map with unsafe or serviceful payload entries made required. */
+/** An exact encoder map requiring entries for unsafe payloads or those needing encoding services. */
 export type KeyEncoders<Group extends RpcGroup.Any> = {
   readonly [R in RequiredEncoderRpcs<Group> as R['_tag']]: KeyEncoder<R>
 } & Partial<{
@@ -543,7 +543,10 @@ export type KeyEncoderOption<Group extends RpcGroup.Any> = [PayloadBearingRpcs<G
         readonly keyEncoders?: KeyEncoders<Group>
       }
     : {
-        /** Supplies safe synchronous identity for every serviceful or redacted payload. */
+        /**
+         * Supplies safe synchronous identity for payloads that need encoding services or contain
+         * redacted values.
+         */
         readonly keyEncoders: KeyEncoders<Group>
       }
 

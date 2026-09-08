@@ -8,13 +8,14 @@ endpoints, acquire a ready client, read a user, and create another user.
 
 First [install the package](/effect-api-query/getting-started/installation/). Use a server that
 implements the declaration below at `http://localhost:3000`, with an existing user with ID `1`.
-Change the base URL to your server; browser callers also need its CORS policy to allow their origin.
+Change the base URL to your server. For browser requests, configure the server's CORS policy to
+allow the application's origin.
 For complete HTTP handlers and applications, [run the examples](/effect-api-query/examples/).
 
 ## Declare, connect, and call
 
 Save this as `http-client.ts` in your application. Share the HttpApi declaration with your server;
-keep the runtime, client, and Query Client in the application that owns their lifetime.
+keep the runtime, client, and `QueryClient` in the application that manages their lifetime.
 
 ```ts
 import { MutationObserver, QueryClient } from '@tanstack/query-core'
@@ -73,10 +74,10 @@ try {
 ```
 
 `HttpApiClient.make` creates a ready client using the application's Fetch runtime. Pass that same
-runtime's `runPromiseExit` to the factory so generated calls use the application's runner and
+runtime's `runPromiseExit` to the factory so generated calls use that runner and
 forward TanStack's query abort signal.
 
-HTTP input is the client's **decoded request**, with the `params`, `query`, `headers`, and `payload`
+HTTP input is the client's decoded request, with the `params`, `query`, `headers`, and `payload`
 containers declared by the endpoint. Pass `id` as a number; the client handles its wire encoding.
 The POST mutation receives `{ payload: { name: 'Ada' } }`.
 

@@ -45,7 +45,7 @@ host, router, and providers.
 
 ## Prefetch in a loader and read in a component
 
-Expose your `queryUtils` and application-owned `QueryClient` through the router context. For a
+Expose your `queryUtils` and `QueryClient` through the router context. For a
 contract with a `users.list` operation, the same generated options work in both places:
 
 ```tsx
@@ -105,8 +105,8 @@ The package does not serialize query data for you.
 
 Keep TanStack's `defaultShouldDehydrateQuery` policy to dehydrate successful data and omit failed
 queries. The browser can then refetch an omitted query and receive a fresh `EffectRpcQueryError`
-or `EffectHttpApiQueryError`, including its Effect cause, if the operation fails again. This avoids
-serializing an error and its cause into the page.
+or `EffectHttpApiQueryError`, including its Effect Cause, if the operation fails again. This avoids
+serializing an error and its Cause into the page.
 
 When the page should render despite a loader failure, catch the loader rejection and use
 `useQuery` in the component to render pending and error states. Otherwise, allow the loader error
@@ -130,7 +130,8 @@ shows the cache subscription, cancellation, and cleanup needed for this pattern.
 The [TanStack Start example](https://github.com/ueberBrot/effect-api-query/tree/main/examples/tanstack-start)
 includes separate RPC and HTTP views to demonstrate both factories. It verifies successful SSR,
 hydration without duplicate reads, cached navigation, pagination, mutations, failures, and
-cancellation. Its `/http-failure` route demonstrates omission and browser refetch of a failed query.
+cancellation. Its `/http-failure` route omits a failed query from dehydration so the browser can
+refetch it.
 See [Executable Examples](/effect-api-query/examples/) for commands and controls.
 
 The example serves RPC at `/rpc` and HTTP at `/api/$`. Both handlers share a demonstration user

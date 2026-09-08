@@ -14,7 +14,7 @@ become nested properties. The factory rejects:
 - empty segments;
 - reserved utility names;
 - `__proto__`, `prototype`, and `constructor`;
-- every leaf–branch collision.
+- every collision between a leaf and a branch.
 
 All other string segments are valid, including segments that require bracket notation. The factory
 provides neither escaping nor a separate path map.

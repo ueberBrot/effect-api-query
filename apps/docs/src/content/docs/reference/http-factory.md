@@ -3,8 +3,9 @@ title: HTTP Factory
 description: HTTP factory options, decoded request input, response data, and cache keys.
 ---
 
-`createHttpApiQueryUtils(api, options)` derives an eager, frozen HTTP utility tree from an Effect
-HttpApi and an application-owned ready HttpApiClient. Import it from `effect-api-query`.
+`createHttpApiQueryUtils(api, options)` builds and freezes an HTTP utility tree when called. It
+uses an Effect HttpApi and a ready HttpApiClient whose lifetime your application manages. Import
+it from `effect-api-query`.
 
 For a step-by-step example, see [HTTP Queries and Mutations](/effect-api-query/guides/http-queries-and-mutations/).
 
@@ -14,6 +15,52 @@ properties. Every retained branch and endpoint has `key()`; buffered endpoints a
 `queryKey`, `queryOptions`, `mutationKey`, `mutationOptions`, `infiniteKey`, and `infiniteOptions`.
 Every buffered endpoint exposes all these builders regardless of HTTP method; the application
 chooses whether a call is a query or mutation.
+
+## Factory options
+
+| Option           | Contract                                                                                                                    |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `client`         | Ready client for the supplied HttpApi. The application owns its transport, middleware, and lifetime.                        |
+| `keyPrefix`      | Non-empty JSON tuple containing any safe tenant, user, or other client-identity partition.                                  |
+| `runPromiseExit` | Required when exposed endpoints or the ready client need execution services. Service-free calls default to Effect's runner. |
+| `keyEncoders`    | Synchronous encoders keyed first by declaration group identifier, then endpoint identifier, including top-level groups.     |
+
+A key encoder receives the complete decoded HTTP request input and returns `JsonValue`. Request
+encoding services, explicit redacted values, and multiple payload alternatives require an encoder.
+For alternatives, preserve every body and content-type distinction that affects the result. An
+encoder does not provide execution services; the runner remains independently required.
+
+## Request and result contract
+
+HTTP input contains the endpoint's declared `params`, `query`, `headers`, and `payload` parts in
+their decoded types. It does not apply RPC constructor defaults. Inputless queries need no input
+argument. Mutations receive the same decoded request shape as their variables.
+
+Each declared container stays required even if all its fields are optional: a declared optional
+query filter still needs `input: { query: {} }`. A `Schema.FiniteFromString` field accepts a number,
+which the ready client encodes as a string. Raw response controls are excluded from query input,
+mutation variables, and encoder input.
+
+The adapter forces decoded-only responses. Queries cache a successful `undefined` as `null`;
+mutations retain `undefined`. Buffered text stays a string, binary data stays a `Uint8Array`, and
+declared response-header wrappers retain their decoded body and headers. Applications own the
+serialization strategy for binary and other domain values; the package supplies no automatic SSR
+serializer.
+
+Execution retains declared endpoint errors, middleware server/client errors, Schema errors, HTTP
+client errors, and additional ready-client errors in the wrapped Cause's type.
+
+Required services include those needed by request encoders, success and error decoders, and the
+ready client for exposed endpoints. Compatible custom clients retain the errors and remaining
+service requirements of their decoded-only call signatures; raw-response overloads contribute neither.
+See [client lifecycle](/effect-api-query/concepts/client-lifecycle/#http-clients-and-execution-services)
+and [cancellation](/effect-api-query/guides/cancellation/#cancel-an-http-query) for runtime ownership.
+
+Any streaming success alternative, including a header-wrapped stream, omits the complete endpoint.
+Any multipart request alternative does the same. Groups containing only omitted endpoints disappear.
+Factory construction rejects unsafe names, path collisions, and contradictory multipart metadata
+before returning a tree. Preserve literal declaration types so the inferred tree omits the same
+endpoints.
 
 ## Query options
 
@@ -58,52 +105,6 @@ transform observer data without changing cached pages. Every page preserves the
 ordinary HTTP execution contract, including `undefined`-to-`null` normalization, wrapped errors,
 and cancellation. See [Load pages](/effect-api-query/guides/http-queries-and-mutations/#load-pages).
 
-## Factory options
-
-| Option           | Contract                                                                                                                    |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `client`         | Ready client for the supplied HttpApi. The application owns its transport, middleware, and lifetime.                        |
-| `keyPrefix`      | Non-empty JSON tuple containing any safe tenant, user, or other client-identity partition.                                  |
-| `runPromiseExit` | Required when exposed endpoints or the ready client need execution services. Service-free calls default to Effect's runner. |
-| `keyEncoders`    | Synchronous encoders keyed first by declaration group identifier, then endpoint identifier, including top-level groups.     |
-
-A key encoder receives the complete decoded HTTP request input and returns `JsonValue`. Request
-encoding services, explicit redacted values, and multiple payload alternatives require an encoder.
-For alternatives, preserve every body and content-type distinction that affects the result. An
-encoder does not provide execution services; the runner remains independently required.
-
-## Request and result contract
-
-HTTP input contains the endpoint's declared `params`, `query`, `headers`, and `payload` parts in
-their decoded types. It does not apply RPC constructor defaults. Inputless queries need no input
-argument. Mutations receive the same decoded request shape as their variables.
-
-Each declared container stays required even if all its fields are optional: a declared optional
-query filter still needs `input: { query: {} }`. A `Schema.FiniteFromString` field accepts a number,
-which the ready client encodes as a string. Raw response controls are excluded from query input,
-mutation variables, and encoder input.
-
-The adapter forces decoded-only responses. Queries cache a successful `undefined` as `null`;
-mutations retain `undefined`. Buffered text stays a string, binary data stays a `Uint8Array`, and
-declared response-header wrappers retain their decoded body and headers. Applications own the
-serialization strategy for binary and other domain values; the package supplies no automatic SSR
-serializer.
-
-Execution retains declared endpoint errors, middleware server/client errors, Schema errors, HTTP
-client errors, and additional ready-client errors in the wrapped Cause's type.
-
-Required services include request encoders, success/error decoders, and residual ready-client
-services for exposed endpoints. Compatible custom clients retain errors and residual services
-from their decoded-only call signatures; raw-response overloads contribute neither.
-See [client lifecycle](/effect-api-query/concepts/client-lifecycle/#http-clients-and-execution-services)
-and [cancellation](/effect-api-query/guides/cancellation/#cancel-an-http-query) for runtime ownership.
-
-Any streaming success alternative, including a header-wrapped stream, omits the complete endpoint.
-Any multipart request alternative does the same. Groups containing only omitted endpoints disappear.
-Factory construction rejects unsafe names, path collisions, and contradictory multipart metadata
-before returning a tree. Preserve literal declaration types so the inferred tree omits the same
-endpoints.
-
 ## Cache identity and failures
 
 HTTP keys begin with `keyPrefix`, `http`, and the HttpApi identifier, followed by the projected
@@ -127,8 +128,8 @@ deep freezing.
 
 Multiple effective payload schemas require a custom encoder, including alternatives with the same
 content type. Types enforce this requirement when declarations retain distinct schemas. Runtime
-validation also covers alternatives that the declaration types no longer distinguish. Buffered binary input needs an explicit
-JSON-safe projection because default keys cannot contain `Uint8Array`. See
+validation also covers alternatives that the declaration types no longer distinguish. Buffered binary
+input needs an explicit JSON-safe projection because default keys cannot contain `Uint8Array`. See
 [custom key encoders](/effect-api-query/guides/custom-key-encoders/#http-requests).
 
 `EffectHttpApiQueryKeyError` identifies the API, group, endpoint, and method and distinguishes:
@@ -141,7 +142,8 @@ JSON-safe projection because default keys cannot contain `Uint8Array`. See
 
 These failures occur in `queryKey` or `queryOptions`, before the client runs. Mutation preparation
 does not encode a query key; request encoding runs inside the ready client's Effect. Custom encoder
-output follows strict JSON without default HTTP omission or header normalization.
+output follows strict JSON and bypasses the default HTTP rules for omitting `undefined` members
+and normalizing headers.
 
 `EffectHttpApiQueryError` wraps a failed execution `Exit`, identifies the API, group, endpoint,
 method, and operation, and preserves its complete Cause. The package adds no concrete request

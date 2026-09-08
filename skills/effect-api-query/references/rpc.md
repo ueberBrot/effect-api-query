@@ -80,7 +80,7 @@ constructor-sensitive Schemas remain usable for mutations.
 ## Request-local options
 
 Pass `rpcOptions` through option builders to set `headers` and `context` for that
-operation. Stream builders additionally accept `streamBufferSize`. These options
+operation. Stream builders also accept `streamBufferSize`. These options
 are fixed for the builder result, including retries and all infinite pages. They
 are removed from the returned TanStack options and do not contribute to keys.
 
