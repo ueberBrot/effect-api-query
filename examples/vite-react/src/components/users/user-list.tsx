@@ -10,7 +10,7 @@ export const UserList = ({
   users,
 }: {
   readonly application: ViteReactApplication
-  readonly users: ReadonlyArray<User> | undefined
+  readonly users: readonly User[] | undefined
 }) => {
   const { invalidateUsers, rpcQuery } = application
   const deleteUser = useMutation(
@@ -24,19 +24,21 @@ export const UserList = ({
       <ul className="grid gap-3 sm:grid-cols-2">
         {users?.map((user) => (
           <li
-            className="flex items-center justify-between gap-4 border border-zinc-800 bg-black p-3"
+            className="flex items-center justify-between gap-4 border border-border bg-background p-3"
             key={user.id}
           >
             <span className="grid gap-0.5">
-              <strong className="text-zinc-100">{user.name}</strong>
-              <span className="text-sm text-zinc-500">
+              <strong className="text-text-primary">{user.name}</strong>
+              <span className="text-sm text-text-subtle">
                 User {user.id}, locale {user.locale}
               </span>
             </span>
             <ActionButton
               aria-label={`Delete ${user.name}`}
               disabled={deleteUser.isPending && deleteUser.variables.id === user.id}
-              onClick={() => deleteUser.mutate({ id: user.id })}
+              onClick={() => {
+                deleteUser.mutate({ id: user.id })
+              }}
               type="button"
               variant="danger"
             >

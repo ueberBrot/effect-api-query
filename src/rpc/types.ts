@@ -281,7 +281,7 @@ export type InfiniteKeyBuilder<
     : (input: Rpc.PayloadConstructor<R>) => ConcreteInfiniteKey<Prefix, R, ClientError>
 
 /** The accumulated data cached for a streaming RPC. */
-export type StreamedData<R extends Rpc.Any> = ReadonlyArray<Rpc.SuccessChunk<R>>
+export type StreamedData<R extends Rpc.Any> = readonly Rpc.SuccessChunk<R>[]
 
 /** A payload-specific accumulated-stream key carrying Query Core's inferred tags. */
 export type ConcreteStreamedKey<
@@ -469,17 +469,23 @@ export type PathTree<
   ClientError,
   Path extends readonly string[] = readonly [],
 > = Tag extends `${infer Head}.${infer Tail}`
-  ? {
-      readonly [Key in Head]: {
-        /** Returns the immutable key prefix for this RPC namespace. */
-        readonly key: () => readonly [...Prefix, 'rpc', ...Path, Head]
-      } & PathTree<Tail, R, Prefix, ClientError, readonly [...Path, Head]>
-    }
-  : {
-      readonly [Key in Tag]: StreamingRpc<R> extends never
-        ? RpcQueryLeaf<R, Prefix, ClientError>
-        : RpcStreamLeaf<R, Prefix, ClientError>
-    }
+  ? Readonly<
+      Record<
+        Head,
+        {
+          /** Returns the immutable key prefix for this RPC namespace. */
+          readonly key: () => readonly [...Prefix, 'rpc', ...Path, Head]
+        } & PathTree<Tail, R, Prefix, ClientError, readonly [...Path, Head]>
+      >
+    >
+  : Readonly<
+      Record<
+        Tag,
+        StreamingRpc<R> extends never
+          ? RpcQueryLeaf<R, Prefix, ClientError>
+          : RpcStreamLeaf<R, Prefix, ClientError>
+      >
+    >
 
 /** Merges every projected RPC path into one nested utility object. */
 export type UnionToIntersection<Union> = (

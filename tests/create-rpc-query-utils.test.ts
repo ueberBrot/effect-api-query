@@ -13,7 +13,7 @@ import { createRpcQueryUtils, skipToken } from '#effect-api-query'
 
 import { group, makeClient, makeRpcTestClient } from './fixtures/effect-rpc'
 
-describe('createRpcQueryUtils', () => {
+describe(createRpcQueryUtils, () => {
   it.effect('preserves caller options while skipping a payload-bearing query', () =>
     Effect.gen(function* () {
       const client = yield* makeClient()
@@ -21,9 +21,9 @@ describe('createRpcQueryUtils', () => {
       const utils = createRpcQueryUtils(group, {
         client,
         keyPrefix: ['app'] as const,
-        runPromiseExit: (effect, options) => {
+        runPromiseExit: async (effect, options) => {
           executions += 1
-          return Effect.runPromiseExit(effect, options)
+          return await Effect.runPromiseExit(effect, options)
         },
       })
       const supplied = Object.freeze({
@@ -36,7 +36,7 @@ describe('createRpcQueryUtils', () => {
         retry: false as const,
       })
       const options = utils.users.get.queryOptions(supplied)
-      expect(options).toEqual({
+      expect(options).toStrictEqual({
         initialData: supplied.initialData,
         select: supplied.select,
         staleTime: 30_000,
@@ -49,8 +49,10 @@ describe('createRpcQueryUtils', () => {
       })
       const queryClient = new QueryClient()
       const observer = new QueryObserver(queryClient, options)
-      const unsubscribe = observer.subscribe(() => undefined)
-      yield* Effect.promise(() => queryClient.invalidateQueries({ queryKey: utils.users.key() }))
+      const unsubscribe = observer.subscribe(() => {})
+      yield* Effect.promise(async () => {
+        await queryClient.invalidateQueries({ queryKey: utils.users.key() })
+      })
       expect(observer.getCurrentResult()).toMatchObject({ data: 'Ada', fetchStatus: 'idle' })
       expect(executions).toBe(0)
       unsubscribe()
@@ -66,11 +68,17 @@ describe('createRpcQueryUtils', () => {
         keyPrefix: ['app'] as const,
       })
 
-      expect(utils.key()).toEqual(['app', 'rpc'])
-      expect(utils.users.key()).toEqual(['app', 'rpc', 'users'])
-      expect(utils.users.get.key()).toEqual(['app', 'rpc', 'users', 'get'])
-      expect(utils.users.get.mutationKey()).toEqual(['app', 'rpc', 'users', 'get', 'mutation'])
-      expect(utils.users.get.queryKey({ id: 1 })).toEqual([
+      expect(utils.key()).toStrictEqual(['app', 'rpc'])
+      expect(utils.users.key()).toStrictEqual(['app', 'rpc', 'users'])
+      expect(utils.users.get.key()).toStrictEqual(['app', 'rpc', 'users', 'get'])
+      expect(utils.users.get.mutationKey()).toStrictEqual([
+        'app',
+        'rpc',
+        'users',
+        'get',
+        'mutation',
+      ])
+      expect(utils.users.get.queryKey({ id: 1 })).toStrictEqual([
         'app',
         'rpc',
         'users',
@@ -78,16 +86,16 @@ describe('createRpcQueryUtils', () => {
         'query',
         { id: 1, locale: 'en' },
       ])
-      expect(utils.toString.child.key()).toEqual(['app', 'rpc', 'toString', 'child'])
-      expect(utils.events.watch.key()).toEqual(['app', 'rpc', 'events', 'watch'])
-      expect(utils.events.watch.streamedKey()).toEqual([
+      expect(utils.toString.child.key()).toStrictEqual(['app', 'rpc', 'toString', 'child'])
+      expect(utils.events.watch.key()).toStrictEqual(['app', 'rpc', 'events', 'watch'])
+      expect(utils.events.watch.streamedKey()).toStrictEqual([
         'app',
         'rpc',
         'events',
         'watch',
         'streamed',
       ])
-      expect(utils.events.watch.liveKey()).toEqual(['app', 'rpc', 'events', 'watch', 'live'])
+      expect(utils.events.watch.liveKey()).toStrictEqual(['app', 'rpc', 'events', 'watch', 'live'])
       expect(Object.isFrozen(utils)).toBe(true)
       expect(Object.isFrozen(utils.users)).toBe(true)
       expect(Object.isFrozen(utils.users.get.queryKey({ id: 1 }))).toBe(true)
@@ -106,14 +114,14 @@ describe('createRpcQueryUtils', () => {
         keyPrefix: ['app'] as const,
       })
 
-      const user = yield* Effect.promise(() =>
-        queryClient.query(utils.users.get.queryOptions({ input: { id: 1 } })),
+      const user = yield* Effect.promise(
+        async () => await queryClient.query(utils.users.get.queryOptions({ input: { id: 1 } })),
       )
-      expect(user).toEqual({ id: 1, locale: 'en', name: 'Ada' })
+      expect(user).toStrictEqual({ id: 1, locale: 'en', name: 'Ada' })
 
       const getMutation = new MutationObserver(queryClient, utils.users.get.mutationOptions())
-      const mutated = yield* Effect.promise(() => getMutation.mutate({ id: 2 }))
-      expect(mutated).toEqual({ id: 2, locale: 'en', name: 'Ada' })
+      const mutated = yield* Effect.promise(async () => await getMutation.mutate({ id: 2 }))
+      expect(mutated).toStrictEqual({ id: 2, locale: 'en', name: 'Ada' })
     }),
   )
 
@@ -126,14 +134,15 @@ describe('createRpcQueryUtils', () => {
         keyPrefix: ['app'] as const,
       })
 
-      const queryResult = yield* Effect.promise(() =>
-        queryClient.query(utils.health.ping.queryOptions()),
+      const queryResult = yield* Effect.promise(
+        async () => await queryClient.query(utils.health.ping.queryOptions()),
       )
       expect(queryResult).toBeNull()
 
       const mutation = new MutationObserver(queryClient, utils.health.ping.mutationOptions())
-      const mutationResult = yield* Effect.promise(() => mutation.mutate(undefined))
-      expect(mutationResult).toBeUndefined()
+      yield* Effect.promise(async () => {
+        await expect(mutation.mutate()).resolves.toBeUndefined()
+      })
     }),
   )
 
@@ -155,10 +164,10 @@ describe('createRpcQueryUtils', () => {
       expect(skipped.queryKeyHashFn(skipped.queryKey)).toBe(JSON.stringify(skipped.queryKey))
 
       const infiniteCallerOptions = {
-        getNextPageParam: () => undefined,
+        getNextPageParam: (): undefined => {},
         initialPageParam: 0,
         initialData: { pages: [{ id: 1, locale: 'en', name: 'Ada' }], pageParams: [0] },
-        select: (data: { pages: ReadonlyArray<{ name: string }> }) => data.pages[0]?.name,
+        select: (data: { pages: readonly { name: string }[] }) => data.pages[0]?.name,
         staleTime: 30_000,
         meta: { source: 'conditional' },
       }
@@ -166,7 +175,7 @@ describe('createRpcQueryUtils', () => {
         ...infiniteCallerOptions,
         input: skipToken,
       })
-      expect(skippedInfinite).toEqual({
+      expect(skippedInfinite).toStrictEqual({
         ...infiniteCallerOptions,
         queryFn: queryCoreSkipToken,
         queryKey: ['app', 'rpc', 'users', 'get', 'infinite'],
@@ -193,8 +202,8 @@ describe('createRpcQueryUtils', () => {
       })
 
       expect(Object.getPrototypeOf(utils)).toBe(Object.prototype)
-      expect(Reflect.ownKeys(utils)).toEqual(['key', 'status', 'billing-history'])
-      expect(Object.keys(utils['billing-history']['list all']).sort()).toEqual([
+      expect(Reflect.ownKeys(utils)).toStrictEqual(['key', 'status', 'billing-history'])
+      expect(Object.keys(utils['billing-history']['list all']).sort()).toStrictEqual([
         'infiniteKey',
         'infiniteOptions',
         'key',
@@ -203,13 +212,13 @@ describe('createRpcQueryUtils', () => {
         'queryKey',
         'queryOptions',
       ])
-      expect(utils['billing-history']['list all'].key()).toEqual([
+      expect(utils['billing-history']['list all'].key()).toStrictEqual([
         'app',
         'rpc',
         'billing-history',
         'list all',
       ])
-      expect(yield* Effect.promise(() => Promise.resolve(utils))).toBe(utils)
+      expect(yield* Effect.promise(async () => await Promise.resolve(utils))).toBe(utils)
     }),
   )
 
@@ -225,13 +234,13 @@ describe('createRpcQueryUtils', () => {
       const mutationMeta = { source: 'caller' }
 
       const firstInfinite = utils.users.get.infiniteOptions({
-        getNextPageParam: () => undefined,
+        getNextPageParam: (): undefined => {},
         initialPageParam: 0,
         input: (id: number) => ({ id }),
         meta: infiniteMeta,
       })
       const secondInfinite = utils.users.get.infiniteOptions({
-        getNextPageParam: () => undefined,
+        getNextPageParam: (): undefined => {},
         initialPageParam: 0,
         input: (id: number) => ({ id }),
         meta: infiniteMeta,
@@ -281,17 +290,17 @@ describe('createRpcQueryUtils', () => {
         keyPrefix: ['app'] as const,
       })
 
-      expect(Object.keys(utils).sort()).toEqual(['events', 'key', 'reports', 'updates'])
-      expect(Object.keys(utils.reports).sort()).toEqual(['key', 'list', 'watch'])
-      expect(utils.reports.list.key()).toEqual(['app', 'rpc', 'reports', 'list'])
-      expect(Object.keys(utils.events.audit.watch).sort()).toEqual([
+      expect(Object.keys(utils).sort()).toStrictEqual(['events', 'key', 'reports', 'updates'])
+      expect(Object.keys(utils.reports).sort()).toStrictEqual(['key', 'list', 'watch'])
+      expect(utils.reports.list.key()).toStrictEqual(['app', 'rpc', 'reports', 'list'])
+      expect(Object.keys(utils.events.audit.watch).sort()).toStrictEqual([
         'key',
         'liveKey',
         'liveOptions',
         'streamedKey',
         'streamedOptions',
       ])
-      expect(utils.events.audit.watch.streamedKey()).toEqual([
+      expect(utils.events.audit.watch.streamedKey()).toStrictEqual([
         'app',
         'rpc',
         'events',
@@ -299,7 +308,7 @@ describe('createRpcQueryUtils', () => {
         'watch',
         'streamed',
       ])
-      expect(utils.events.audit.watch.liveKey()).toEqual([
+      expect(utils.events.audit.watch.liveKey()).toStrictEqual([
         'app',
         'rpc',
         'events',
@@ -307,8 +316,10 @@ describe('createRpcQueryUtils', () => {
         'watch',
         'live',
       ])
-      expect(utils.events.audit.watch.streamedKey()).not.toEqual(utils.events.audit.watch.liveKey())
-      expect(utils.updates.watch.streamedKey()).toEqual([
+      expect(utils.events.audit.watch.streamedKey()).not.toStrictEqual(
+        utils.events.audit.watch.liveKey(),
+      )
+      expect(utils.updates.watch.streamedKey()).toStrictEqual([
         'app',
         'rpc',
         'updates',

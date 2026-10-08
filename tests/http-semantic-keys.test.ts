@@ -1,10 +1,9 @@
 import { QueryClient } from '@tanstack/query-core'
-import { Context, Effect, Exit, Layer, Redacted, Schema, Scope } from 'effect'
+import { Context, Effect, Exit, Layer, Predicate, Redacted, Schema, Scope } from 'effect'
 import { HttpServer } from 'effect/http'
 import {
   HttpApi,
   HttpApiBuilder,
-  type HttpApiClient,
   HttpApiEndpoint,
   HttpApiGroup,
   HttpApiSchema,
@@ -13,6 +12,8 @@ import {
 import { describe, expect, it } from 'vite-plus/test'
 
 import { createHttpApiQueryUtils } from '#effect-api-query'
+
+import { unusedHttpClientFor } from './fixtures/http-client'
 
 const api = HttpApi.make('keys').add(
   HttpApiGroup.make('requests').add(
@@ -31,9 +32,19 @@ const api = HttpApi.make('keys').add(
   ),
 )
 const utils = createHttpApiQueryUtils(api, {
-  client: {} as HttpApiClient.ForApi<typeof api>,
+  client: unusedHttpClientFor(api),
   keyPrefix: ['test'],
 })
+
+// SAFETY: The encoder deliberately returns malformed JavaScript values to exercise strict JSON rejection.
+/* oxlint-disable anti-slop/no-unknown-returns, typescript/no-unsafe-type-assertion */
+const encodeTestKey = (encode: () => unknown) =>
+  createHttpApiQueryUtils(api, {
+    client: unusedHttpClientFor(api),
+    keyPrefix: ['test'],
+    keyEncoders: { requests: { save: encode as never } },
+  })
+/* oxlint-enable anti-slop/no-unknown-returns, typescript/no-unsafe-type-assertion */
 
 describe('HTTP semantic keys', () => {
   it('reuses equivalent requests and partitions every result-affecting request part', async () => {
@@ -75,21 +86,30 @@ describe('HTTP semantic keys', () => {
       payload: { name: 'Ada' },
     }
     try {
-      const read = (request: typeof input) =>
-        queryClient.query(http.requests.read.queryOptions({ input: request }))
-      expect(await read(input)).toBe('[1,null,"Ada","en"]')
-      expect(
-        await read({
+      const read = async (request: typeof input) =>
+        await queryClient.query(http.requests.read.queryOptions({ input: request }))
+      await expect(read(input)).resolves.toBe('[1,null,"Ada","en"]')
+      // SAFETY: A required encoder is deliberately omitted to verify the synchronous configuration-error boundary.
+      /* oxlint-disable typescript/no-unsafe-type-assertion */
+      await expect(
+        read({
           ...input,
           query: { filter: undefined },
           headers: { 'x-locale': 'en' },
         } as never),
-      ).toBe('[1,null,"Ada","en"]')
+      ).resolves.toBe('[1,null,"Ada","en"]')
+      /* oxlint-enable typescript/no-unsafe-type-assertion */
       expect(calls).toBe(1)
-      expect(await read({ ...input, params: { id: 2 } })).toBe('[2,null,"Ada","en"]')
-      expect(await read({ ...input, query: { filter: 'active' } })).toBe('[1,"active","Ada","en"]')
-      expect(await read({ ...input, payload: { name: 'Grace' } })).toBe('[1,null,"Grace","en"]')
-      expect(await read({ ...input, headers: { 'X-Locale': 'de' } })).toBe('[1,null,"Ada","de"]')
+      await expect(read({ ...input, params: { id: 2 } })).resolves.toBe('[2,null,"Ada","en"]')
+      await expect(read({ ...input, query: { filter: 'active' } })).resolves.toBe(
+        '[1,"active","Ada","en"]',
+      )
+      await expect(read({ ...input, payload: { name: 'Grace' } })).resolves.toBe(
+        '[1,null,"Grace","en"]',
+      )
+      await expect(read({ ...input, headers: { 'X-Locale': 'de' } })).resolves.toBe(
+        '[1,null,"Ada","de"]',
+      )
       expect(calls).toBe(5)
     } finally {
       queryClient.clear()
@@ -128,7 +148,13 @@ describe('HTTP semantic keys', () => {
         .handle('text', ({ payload }) => Effect.succeed(payload))
         .handle('form', ({ payload }) => Effect.succeed(payload.page))
         .handle('search', ({ payload, query }) => Effect.succeed(`${payload.page}:${query.sort}`))
-        .handle('binary', ({ payload }) => Effect.succeed(payload[0]!)),
+        .handle('binary', ({ payload }) => {
+          const [firstByte] = payload
+          if (firstByte === undefined) {
+            return Effect.die(new Error('Expected a nonempty binary payload'))
+          }
+          return Effect.succeed(firstByte)
+        }),
     )
     const scope = Scope.makeUnsafe()
     const client = await Effect.runPromise(
@@ -140,29 +166,31 @@ describe('HTTP semantic keys', () => {
     const http = createHttpApiQueryUtils(contract, {
       client,
       keyPrefix: ['formats'],
-      keyEncoders: { formats: { binary: ({ payload }) => ({ bytes: Array.from(payload) }) } },
+      keyEncoders: { formats: { binary: ({ payload }) => ({ bytes: [...payload] }) } },
     })
     const queryClient = new QueryClient()
     try {
-      expect(http.text.queryKey({ payload: 42 }).at(-1)).toEqual({ payload: '42' })
-      expect(await queryClient.query(http.text.queryOptions({ input: { payload: 42 } }))).toBe(42)
-      expect(http.form.queryKey({ payload: { page: 2, filter: undefined } }).at(-1)).toEqual({
+      expect(http.text.queryKey({ payload: 42 }).at(-1)).toStrictEqual({ payload: '42' })
+      await expect(
+        queryClient.query(http.text.queryOptions({ input: { payload: 42 } })),
+      ).resolves.toBe(42)
+      expect(http.form.queryKey({ payload: { page: 2, filter: undefined } }).at(-1)).toStrictEqual({
         payload: { page: '2' },
       })
-      expect(
-        await queryClient.query(http.form.queryOptions({ input: { payload: { page: 2 } } })),
-      ).toBe(2)
+      await expect(
+        queryClient.query(http.form.queryOptions({ input: { payload: { page: 2 } } })),
+      ).resolves.toBe(2)
       const search = { payload: { page: 3 }, query: { sort: 'name' } }
-      expect(http.search.queryKey(search).at(-1)).toEqual({
+      expect(http.search.queryKey(search).at(-1)).toStrictEqual({
         payload: { page: '3' },
         query: { sort: 'name' },
       })
-      expect(await queryClient.query(http.search.queryOptions({ input: search }))).toBe('3:name')
-      expect(
-        await queryClient.query(
-          http.binary.queryOptions({ input: { payload: new Uint8Array([7]) } }),
-        ),
-      ).toBe(7)
+      await expect(queryClient.query(http.search.queryOptions({ input: search }))).resolves.toBe(
+        '3:name',
+      )
+      await expect(
+        queryClient.query(http.binary.queryOptions({ input: { payload: new Uint8Array([7]) } })),
+      ).resolves.toBe(7)
       const defaults = createHttpApiQueryUtils(contract, { client, keyPrefix: ['default'] })
       expect(() => defaults.binary.queryKey({ payload: new Uint8Array([7]) })).toThrow(
         expect.objectContaining({ code: 'InvalidKeyValue' }),
@@ -172,18 +200,19 @@ describe('HTTP semantic keys', () => {
       await Effect.runPromise(Scope.close(scope, Exit.void))
     }
   })
+
   it('omits undefined object members and normalizes encoded header names', () => {
     const key = utils.requests.save.queryKey({
       query: { filter: undefined },
       headers: { 'X-Locale': 'en', 'x-locale': 'en', ignored: undefined },
       payload: { nested: { kept: [2, 1] } },
     })
-    expect(key.at(-1)).toEqual({
+    expect(key.at(-1)).toStrictEqual({
       query: {},
       headers: { 'x-locale': 'en' },
       payload: { nested: { kept: [2, 1] } },
     })
-    expect(key).toEqual(
+    expect(key).toStrictEqual(
       utils.requests.save.queryKey({
         query: {},
         headers: { 'x-locale': 'en' },
@@ -213,42 +242,51 @@ describe('HTTP semantic keys', () => {
       ),
     )
     const http = createHttpApiQueryUtils(contract, {
-      client: {} as HttpApiClient.ForApi<typeof contract>,
+      client: unusedHttpClientFor(contract),
       keyPrefix: ['test'],
     })
-    expect(http.search.find.queryKey({ query: { values: ['b', 'a'] } }).at(-1)).toEqual({
+    expect(http.search.find.queryKey({ query: { values: ['b', 'a'] } }).at(-1)).toStrictEqual({
       query: { values: ['b', 'a'] },
     })
-    expect(http.search.find.queryKey({ query: { values: ['b', 'a'] } })).not.toEqual(
+    expect(http.search.find.queryKey({ query: { values: ['b', 'a'] } })).not.toStrictEqual(
       http.search.find.queryKey({ query: { values: ['a', 'b'] } }),
     )
-    for (const values of [Array(1), [undefined]]) {
+    // SAFETY: The sparse array deliberately preserves missing entries so strict JSON validation can reject it.
+    /* oxlint-disable unicorn/no-new-array */
+    for (const values of [new Array<unknown>(1), [undefined]]) {
+      // SAFETY: A required encoder is deliberately omitted to verify the synchronous configuration-error boundary.
+      /* oxlint-disable typescript/no-unsafe-type-assertion */
       expect(() =>
         http.search.find.queryOptions({ input: { query: { values } } } as never),
       ).toThrow(expect.objectContaining({ _tag: 'EffectHttpApiQueryKeyError' }))
+      /* oxlint-enable typescript/no-unsafe-type-assertion */
     }
+    /* oxlint-enable unicorn/no-new-array */
   })
 
   it('keeps custom encoder output strict, copied, and deeply frozen', () => {
     const input = { query: {}, headers: {}, payload: null }
     const value = { nested: { values: [2, 1] } }
-    const custom = (encode: () => unknown) =>
-      createHttpApiQueryUtils(api, {
-        client: {} as HttpApiClient.ForApi<typeof api>,
-        keyPrefix: ['test'],
-        keyEncoders: { requests: { save: encode as never } },
-      })
-    const key = custom(() => value).requests.save.queryKey(input)
+    const key = encodeTestKey(() => value).requests.save.queryKey(input)
     value.nested.values.push(3)
-    expect(key.at(-1)).toEqual({ nested: { values: [2, 1] } })
-    expect(Object.isFrozen((key.at(-1) as typeof value).nested.values)).toBe(true)
-    const cycle: Record<string, unknown> = {}
-    cycle['self'] = cycle
+    expect(key.at(-1)).toStrictEqual({ nested: { values: [2, 1] } })
+    const encoded = key.at(-1)
+    if (!Predicate.isObject(encoded) || !Predicate.isObject(encoded['nested'])) {
+      throw new TypeError('Expected a nested canonical key value')
+    }
+    expect(Object.isFrozen(encoded['nested']['values'])).toBe(true)
+    interface Cycle {
+      self?: Cycle
+    }
+    const cycle: Cycle = {}
+    cycle.self = cycle
+    // SAFETY: The sparse array deliberately preserves missing entries so strict JSON validation can reject it.
+    /* oxlint-disable unicorn/no-new-array */
     for (const invalid of [
       undefined,
       { absent: undefined },
       [undefined],
-      Array(1),
+      new Array<unknown>(1),
       Number.NaN,
       Infinity,
       1n,
@@ -257,10 +295,11 @@ describe('HTTP semantic keys', () => {
       cycle,
       () => null,
     ]) {
-      expect(() => custom(() => invalid).requests.save.queryOptions({ input })).toThrow(
+      expect(() => encodeTestKey(() => invalid).requests.save.queryOptions({ input })).toThrow(
         expect.objectContaining({ code: 'InvalidKeyValue' }),
       )
     }
+    /* oxlint-enable unicorn/no-new-array */
   })
 
   it('validates the declaration-based encoder map atomically, including empty unknown groups', () => {
@@ -285,23 +324,34 @@ describe('HTTP semantic keys', () => {
       { 'forms.v1': { ping: encode } },
       { 'forms.v1': { upload: encode } },
     ]) {
+      // SAFETY: Undeclared encoders deliberately exercise atomic validation of the encoder map.
+      /* oxlint-disable typescript/no-unsafe-type-assertion */
       expect(() =>
         createHttpApiQueryUtils(contract, {
-          client: {} as never,
+          client: unusedHttpClientFor(contract),
           keyPrefix: ['test'],
           keyEncoders,
         } as never),
       ).toThrow(expect.objectContaining({ code: 'UnknownKeyEncoder' }))
+      /* oxlint-enable typescript/no-unsafe-type-assertion */
     }
     expect(encoded).toBe(false)
     const custom = createHttpApiQueryUtils(contract, {
-      client: {} as HttpApiClient.ForApi<typeof contract>,
+      client: unusedHttpClientFor(contract),
       keyPrefix: ['test'],
       keyEncoders: {
-        'forms.v1': { 'save.one': ({ payload }) => ({ kind: typeof payload, value: payload }) },
+        'forms.v1': {
+          'save.one': ({ payload }) => ({
+            kind: Predicate.isNumber(payload) ? 'number' : 'string',
+            value: payload,
+          }),
+        },
       },
     })
-    expect(custom['save.one'].queryKey({ payload: 1 }).at(-1)).toEqual({ kind: 'number', value: 1 })
+    expect(custom['save.one'].queryKey({ payload: 1 }).at(-1)).toStrictEqual({
+      kind: 'number',
+      value: 1,
+    })
   })
 
   it('distinguishes equal encoded scalars sent with different payload encodings', async () => {
@@ -314,7 +364,9 @@ describe('HTTP semantic keys', () => {
       ),
     )
     const handlers = HttpApiBuilder.group(contract, 'forms', (group) =>
-      group.handle('submit', ({ payload }) => Effect.succeed(`${typeof payload}:${payload}`)),
+      group.handle('submit', ({ payload }) =>
+        Effect.succeed(`${Predicate.isNumber(payload) ? 'number' : 'string'}:${payload}`),
+      ),
     )
     const scope = Scope.makeUnsafe()
     const client = await Effect.runPromise(
@@ -329,7 +381,7 @@ describe('HTTP semantic keys', () => {
       keyEncoders: {
         forms: {
           submit: ({ payload }) => ({
-            format: typeof payload === 'number' ? 'text' : 'json',
+            format: Predicate.isNumber(payload) ? 'text' : 'json',
             value: String(payload),
           }),
         },
@@ -337,13 +389,13 @@ describe('HTTP semantic keys', () => {
     })
     const queryClient = new QueryClient({ defaultOptions: { queries: { staleTime: Infinity } } })
     try {
-      expect(
-        await queryClient.query(http.forms.submit.queryOptions({ input: { payload: 1 } })),
-      ).toBe('number:1')
-      expect(
-        await queryClient.query(http.forms.submit.queryOptions({ input: { payload: '1' } })),
-      ).toBe('string:1')
-      expect(http.forms.submit.queryKey({ payload: 1 })).not.toEqual(
+      await expect(
+        queryClient.query(http.forms.submit.queryOptions({ input: { payload: 1 } })),
+      ).resolves.toBe('number:1')
+      await expect(
+        queryClient.query(http.forms.submit.queryOptions({ input: { payload: '1' } })),
+      ).resolves.toBe('string:1')
+      expect(http.forms.submit.queryKey({ payload: 1 })).not.toStrictEqual(
         http.forms.submit.queryKey({ payload: '1' }),
       )
     } finally {
@@ -353,13 +405,15 @@ describe('HTTP semantic keys', () => {
   })
 
   it('requires an encoder for Redacted values and opaque encoding middleware in every request part', () => {
-    class Encoding extends Context.Service<Encoding, {}>()('HttpKeys/Encoding') {}
+    class Encoding extends Context.Service<Encoding, Record<string, never>>()(
+      'HttpKeys/Encoding',
+    ) {}
     const plain = Schema.Struct({ value: Schema.String })
     const schemas = [
       Schema.Struct({ value: Schema.Redacted(Schema.String) }),
       plain.pipe(
         Schema.middlewareEncoding<typeof plain, Encoding>((encoding) =>
-          Effect.flatMap(Encoding, () => encoding),
+          Encoding.pipe(Effect.flatMap(() => encoding)),
         ),
       ),
       plain.pipe(Schema.middlewareEncoding((encoding) => encoding)),
@@ -371,15 +425,20 @@ describe('HTTP semantic keys', () => {
             HttpApiEndpoint.post('save', '/:value', { [part]: schema }),
           ),
         )
+        // SAFETY: A required encoder is deliberately omitted to verify the synchronous configuration-error boundary.
+        /* oxlint-disable typescript/no-unsafe-type-assertion */
         expect(() =>
           createHttpApiQueryUtils(contract, {
-            client: {} as never,
+            client: unusedHttpClientFor(contract),
             keyPrefix: ['test'],
           } as never),
         ).toThrow(expect.objectContaining({ code: 'MissingKeyEncoder' }))
+        /* oxlint-enable typescript/no-unsafe-type-assertion */
         let received: unknown
+        // SAFETY: This mock records arbitrary invocation values so request ownership can be asserted without changing the input.
+        /* oxlint-disable anti-slop/no-unknown-parameters, typescript/no-unsafe-type-assertion */
         const safe = createHttpApiQueryUtils(contract, {
-          client: {} as never,
+          client: unusedHttpClientFor(contract),
           keyPrefix: ['test'],
           keyEncoders: {
             requests: {
@@ -390,10 +449,14 @@ describe('HTTP semantic keys', () => {
             },
           },
         } as never)
+        /* oxlint-enable anti-slop/no-unknown-parameters, typescript/no-unsafe-type-assertion */
         const input = { [part]: { value: Redacted.make('secret') } }
+        // SAFETY: This mock records arbitrary invocation values so request ownership can be asserted without changing the input.
+        /* oxlint-disable anti-slop/no-unknown-parameters */
         expect(
           (safe.requests.save.queryKey as (input: unknown) => readonly unknown[])(input).at(-1),
-        ).toEqual({ identity: 'public-id' })
+        ).toStrictEqual({ identity: 'public-id' })
+        /* oxlint-enable anti-slop/no-unknown-parameters */
         expect(received).toBe(input)
       }
     }

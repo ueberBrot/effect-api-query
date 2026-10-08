@@ -4,15 +4,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { EffectErrorDetails } from '../components/effect-error-details.tsx'
 import { PageLayout, Panel } from '../components/page-layout.tsx'
 
-export const Route = createFileRoute('/failure')({
-  component: FailurePage,
-  loader: ({ context }) =>
-    context.queryClient
-      .query(context.rpcQuery.diagnostics.fail.queryOptions())
-      .catch(() => undefined),
-})
-
-function FailurePage() {
+const FailurePage = () => {
   const { rpcQuery } = Route.useRouteContext()
   const failure = useQuery(rpcQuery.diagnostics.fail.queryOptions())
 
@@ -24,7 +16,7 @@ function FailurePage() {
       <div className="mt-8">
         <Panel title="Declared query failure">
           {failure.isPending ? (
-            <p className="mt-3 text-zinc-400">Refetching in the browser…</p>
+            <p className="mt-3 text-muted-foreground">Refetching in the browser…</p>
           ) : null}
           <EffectErrorDetails error={failure.error} />
         </Panel>
@@ -32,3 +24,14 @@ function FailurePage() {
     </PageLayout>
   )
 }
+
+export const Route = createFileRoute('/failure')({
+  component: FailurePage,
+  loader: async ({ context }) => {
+    try {
+      await context.queryClient.query(context.rpcQuery.diagnostics.fail.queryOptions())
+    } catch {
+      // Query state retains the error for rendering.
+    }
+  },
+})

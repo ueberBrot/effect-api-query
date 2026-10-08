@@ -1,5 +1,6 @@
 import { MutationObserver, QueryClient, QueryObserver } from '@tanstack/query-core'
-import { Cause, Context, Effect, Exit, Layer, Option, Schema } from 'effect'
+import type { Cause } from 'effect'
+import { Context, Effect, Exit, Layer, Option, Schema } from 'effect'
 import { HttpClient, HttpClientError, HttpClientRequest, HttpClientResponse } from 'effect/http'
 import {
   HttpApi,
@@ -11,11 +12,10 @@ import {
 } from 'effect/http-api'
 import { describe, expect, it } from 'vite-plus/test'
 
-import {
-  createHttpApiQueryUtils,
-  EffectHttpApiQueryError,
-  type RunPromiseExit,
-} from '#effect-api-query'
+import { createHttpApiQueryUtils, EffectHttpApiQueryError } from '#effect-api-query'
+import type { RunPromiseExit } from '#effect-api-query'
+
+import { captureFailure } from './fixtures/async'
 
 const BufferedApi = HttpApi.make('buffered').add(
   HttpApiGroup.make('responses').add(
@@ -58,8 +58,8 @@ const privateToken = 'private-authentication-token'
 const middlewareDefect = new Error('middleware defect')
 const transportFailure = new Error('socket closed')
 
-const makeFailureClient = (requests: Array<HttpClientRequest.HttpClientRequest>) =>
-  Effect.runPromise(
+const makeFailureClient = async (requests: HttpClientRequest.HttpClientRequest[]) =>
+  await Effect.runPromise(
     HttpApiClient.makeWith(FailureApi, {
       baseUrl: 'https://example.test',
       httpClient: HttpClient.make((request) => {
@@ -71,16 +71,33 @@ const makeFailureClient = (requests: Array<HttpClientRequest.HttpClientRequest>)
             }),
           )
         }
-        const response = request.url.endsWith('/declared')
-          ? Response.json({ _tag: 'Denied', message: 'access denied' }, { status: 400 })
-          : request.url.endsWith('/decode')
-            ? Response.json({ unexpected: true })
-            : request.url.endsWith('/malformed-error')
-              ? Response.json({ unexpected: true }, { status: 400 })
-              : request.url.endsWith('/status')
-                ? new Response('unavailable', { status: 503 })
-                : Response.json('42')
-        return Effect.succeed(HttpClientResponse.fromWeb(request, response))
+        if (request.url.endsWith('/declared')) {
+          return Effect.succeed(
+            HttpClientResponse.fromWeb(
+              request,
+              Response.json({ _tag: 'Denied', message: 'access denied' }, { status: 400 }),
+            ),
+          )
+        }
+        if (request.url.endsWith('/decode')) {
+          return Effect.succeed(
+            HttpClientResponse.fromWeb(request, Response.json({ unexpected: true })),
+          )
+        }
+        if (request.url.endsWith('/malformed-error')) {
+          return Effect.succeed(
+            HttpClientResponse.fromWeb(
+              request,
+              Response.json({ unexpected: true }, { status: 400 }),
+            ),
+          )
+        }
+        if (request.url.endsWith('/status')) {
+          return Effect.succeed(
+            HttpClientResponse.fromWeb(request, new Response('unavailable', { status: 503 })),
+          )
+        }
+        return Effect.succeed(HttpClientResponse.fromWeb(request, Response.json('42')))
       }),
     }).pipe(
       Effect.provide(
@@ -88,8 +105,12 @@ const makeFailureClient = (requests: Array<HttpClientRequest.HttpClientRequest>)
           Authentication,
           Effect.fn('Authentication.client')(function* ({ request, next }) {
             const credentials = yield* Credentials
-            if (request.url.endsWith('/defect')) return yield* Effect.die(middlewareDefect)
-            if (request.url.endsWith('/interrupt')) return yield* Effect.interrupt
+            if (request.url.endsWith('/defect')) {
+              return yield* Effect.die(middlewareDefect)
+            }
+            if (request.url.endsWith('/interrupt')) {
+              return yield* Effect.interrupt
+            }
             return yield* next(HttpClientRequest.bearerToken(request, credentials.token))
           }),
         ).pipe(Layer.provide(Layer.succeed(Credentials, { token: privateToken }))),
@@ -98,6 +119,72 @@ const makeFailureClient = (requests: Array<HttpClientRequest.HttpClientRequest>)
   )
 
 describe('HTTP execution', () => {
+  it('preserves group and top-level receivers of caller-provided ready client methods', async () => {
+    const api = HttpApi.make('receivers').add(
+      HttpApiGroup.make('grouped').add(
+        HttpApiEndpoint.get('read', '/grouped/:id', {
+          params: { id: Schema.String },
+          success: Schema.String,
+        }),
+      ),
+      HttpApiGroup.make('root', { topLevel: true }).add(
+        HttpApiEndpoint.get('readRoot', '/root/:id', {
+          params: { id: Schema.String },
+          success: Schema.String,
+        }),
+      ),
+    )
+    const readyClient = await Effect.runPromise(
+      HttpApiClient.makeWith(api, {
+        baseUrl: 'https://example.test',
+        httpClient: HttpClient.make((request) =>
+          Effect.succeed(HttpClientResponse.fromWeb(request, Response.json(request.url))),
+        ),
+      }),
+    )
+    interface Receiver {
+      readonly delegate: typeof readyClient.grouped.read
+    }
+    const receivers: Receiver[] = []
+    const grouped = {
+      delegate: readyClient.grouped.read,
+      read<Mode extends HttpApiEndpoint.ClientResponseMode>(
+        this: Receiver,
+        request: { readonly params: { readonly id: string }; readonly responseMode?: Mode },
+      ) {
+        receivers.push(this)
+        return this.delegate(request)
+      },
+    }
+    const client = {
+      grouped,
+      delegate: readyClient.readRoot,
+      readRoot<Mode extends HttpApiEndpoint.ClientResponseMode>(
+        this: Receiver,
+        request: { readonly params: { readonly id: string }; readonly responseMode?: Mode },
+      ) {
+        receivers.push(this)
+        return this.delegate(request)
+      },
+    } satisfies HttpApiClient.ForApi<typeof api> & Receiver
+    const utils = createHttpApiQueryUtils(api, { client, keyPrefix: ['test'] })
+    const queryClient = new QueryClient()
+    try {
+      await expect(
+        queryClient.query(utils.grouped.read.queryOptions({ input: { params: { id: 'query' } } })),
+      ).resolves.toBe('https://example.test/grouped/query')
+      await expect(
+        new MutationObserver(queryClient, utils.readRoot.mutationOptions()).mutate({
+          params: { id: 'mutation' },
+        }),
+      ).resolves.toBe('https://example.test/root/mutation')
+      expect(receivers[0]).toBe(grouped)
+      expect(receivers[1]).toBe(client)
+    } finally {
+      queryClient.clear()
+    }
+  })
+
   it('uses the caller runner to decode serviceful middleware error responses', async () => {
     class ErrorTranslation extends Context.Service<ErrorTranslation, { readonly prefix: string }>()(
       'HttpExecution/ErrorTranslation',
@@ -106,7 +193,7 @@ describe('HTTP execution', () => {
       Schema.middlewareDecoding<Schema.String, ErrorTranslation>(
         Effect.fn('ErrorTranslation.decode')(function* (decode) {
           const translation = yield* ErrorTranslation
-          return Option.map(yield* decode, (value) => `${translation.prefix}${value}`)
+          return (yield* decode).pipe(Option.map((value) => `${translation.prefix}${value}`))
         }),
       ),
       HttpApiSchema.status(403),
@@ -132,8 +219,8 @@ describe('HTTP execution', () => {
         ),
       }),
     )
-    const runPromiseExit: RunPromiseExit<ErrorTranslation> = (effect, options) =>
-      Effect.runPromiseExit(
+    const runPromiseExit: RunPromiseExit<ErrorTranslation> = async (effect, options) =>
+      await Effect.runPromiseExit(
         effect.pipe(Effect.provideService(ErrorTranslation, { prefix: 'translated: ' })),
         options,
       )
@@ -154,37 +241,53 @@ describe('HTTP execution', () => {
       HttpApiClient.makeWith(BufferedApi, {
         baseUrl: 'https://example.test',
         httpClient: HttpClient.make((request) => {
-          const response = request.url.endsWith('/text')
-            ? new Response('hello', { headers: { 'content-type': 'text/plain' } })
-            : request.url.endsWith('/bytes')
-              ? new Response(new Uint8Array([0, 128, 255]), {
+          if (request.url.endsWith('/text')) {
+            return Effect.succeed(
+              HttpClientResponse.fromWeb(
+                request,
+                new Response('hello', { headers: { 'content-type': 'text/plain' } }),
+              ),
+            )
+          }
+          if (request.url.endsWith('/bytes')) {
+            return Effect.succeed(
+              HttpClientResponse.fromWeb(
+                request,
+                new Response(new Uint8Array([0, 128, 255]), {
                   headers: { 'content-type': 'application/octet-stream' },
-                })
-              : Response.json('42', { headers: { 'x-version': '7' } })
-          return Effect.succeed(HttpClientResponse.fromWeb(request, response))
+                }),
+              ),
+            )
+          }
+          return Effect.succeed(
+            HttpClientResponse.fromWeb(
+              request,
+              Response.json('42', { headers: { 'x-version': '7' } }),
+            ),
+          )
         }),
       }),
     )
     const utils = createHttpApiQueryUtils(BufferedApi, { client, keyPrefix: ['test'] })
     const queryClient = new QueryClient()
     try {
-      expect(await queryClient.query(utils.responses.text.queryOptions())).toBe('hello')
-      expect(await queryClient.query(utils.responses.bytes.queryOptions())).toEqual(
+      await expect(queryClient.query(utils.responses.text.queryOptions())).resolves.toBe('hello')
+      await expect(queryClient.query(utils.responses.bytes.queryOptions())).resolves.toStrictEqual(
         new Uint8Array([0, 128, 255]),
       )
       const expectedHeaders = HttpApiSchema.withHeaders({ body: 42, headers: { 'x-version': 7 } })
-      expect(await queryClient.query(utils.responses.headers.queryOptions())).toEqual(
-        expectedHeaders,
-      )
-      expect(
-        await new MutationObserver(queryClient, utils.responses.text.mutationOptions()).mutate(),
-      ).toBe('hello')
-      expect(
-        await new MutationObserver(queryClient, utils.responses.bytes.mutationOptions()).mutate(),
-      ).toEqual(new Uint8Array([0, 128, 255]))
-      expect(
-        await new MutationObserver(queryClient, utils.responses.headers.mutationOptions()).mutate(),
-      ).toEqual(expectedHeaders)
+      await expect(
+        queryClient.query(utils.responses.headers.queryOptions()),
+      ).resolves.toStrictEqual(expectedHeaders)
+      await expect(
+        new MutationObserver(queryClient, utils.responses.text.mutationOptions()).mutate(),
+      ).resolves.toBe('hello')
+      await expect(
+        new MutationObserver(queryClient, utils.responses.bytes.mutationOptions()).mutate(),
+      ).resolves.toStrictEqual(new Uint8Array([0, 128, 255]))
+      await expect(
+        new MutationObserver(queryClient, utils.responses.headers.mutationOptions()).mutate(),
+      ).resolves.toStrictEqual(expectedHeaders)
     } finally {
       queryClient.clear()
     }
@@ -225,7 +328,9 @@ describe('HTTP execution', () => {
       let originalCause: Cause.Cause<unknown> | undefined
       const runPromiseExit: RunPromiseExit = async (effect, options) => {
         const exit = await Effect.runPromiseExit(effect, options)
-        if (Exit.isFailure(exit)) originalCause = exit.cause
+        if (Exit.isFailure(exit)) {
+          originalCause = exit.cause
+        }
         return exit
       }
       const utils = createHttpApiQueryUtils(FailureApi, {
@@ -239,15 +344,20 @@ describe('HTTP execution', () => {
       const input = { params: { scenario } }
       try {
         for (const operation of ['query', 'mutation'] as const) {
-          const error: unknown = await (
+          // SAFETY: Query and mutation runs share a Cause recorder; sequential execution isolates each identity assertion.
+          /* oxlint-disable eslint/no-await-in-loop */
+          const error: unknown = await captureFailure(
             operation === 'query'
               ? queryClient.query(utils.actions.read.queryOptions({ input }))
               : new MutationObserver(queryClient, utils.actions.read.mutationOptions()).mutate(
                   input,
-                )
-          ).catch((error: unknown) => error)
+                ),
+          )
+          /* oxlint-enable eslint/no-await-in-loop */
           expect(error).toBeInstanceOf(EffectHttpApiQueryError)
-          if (!(error instanceof EffectHttpApiQueryError)) throw error
+          if (!(error instanceof EffectHttpApiQueryError)) {
+            throw error
+          }
           expect(error.cause).toBe(originalCause)
           expect(error.cause.reasons).toMatchObject(reasons)
           expect(error.cause.reasons).toHaveLength(reasons.length)
@@ -260,7 +370,7 @@ describe('HTTP execution', () => {
           })
           expect(error.message).not.toContain(scenario)
           expect(error.message).not.toContain(privateToken)
-          expect(Object.keys(error).sort()).toEqual([
+          expect(Object.keys(error).sort()).toStrictEqual([
             '_tag',
             'apiId',
             'cause',
@@ -278,12 +388,12 @@ describe('HTTP execution', () => {
   )
 
   it('keeps middleware context and headers, and supplies a runner signal only for queries', async () => {
-    const requests: Array<HttpClientRequest.HttpClientRequest> = []
+    const requests: HttpClientRequest.HttpClientRequest[] = []
     const client = await makeFailureClient(requests)
-    const runnerOptions: Array<{ readonly signal?: AbortSignal } | undefined> = []
-    const runPromiseExit: RunPromiseExit = (effect, options) => {
+    const runnerOptions: ({ readonly signal?: AbortSignal } | undefined)[] = []
+    const runPromiseExit: RunPromiseExit = async (effect, options) => {
       runnerOptions.push(options)
-      return Effect.runPromiseExit(effect, options)
+      return await Effect.runPromiseExit(effect, options)
     }
     const utils = createHttpApiQueryUtils(FailureApi, {
       client,
@@ -293,11 +403,11 @@ describe('HTTP execution', () => {
     const queryClient = new QueryClient()
     const input = { params: { scenario: 'success' } }
     try {
-      expect(await queryClient.query(utils.actions.read.queryOptions({ input }))).toBe(42)
-      expect(
-        await new MutationObserver(queryClient, utils.actions.read.mutationOptions()).mutate(input),
-      ).toBe(42)
-      expect(requests.map((request) => request.headers['authorization'])).toEqual([
+      await expect(queryClient.query(utils.actions.read.queryOptions({ input }))).resolves.toBe(42)
+      await expect(
+        new MutationObserver(queryClient, utils.actions.read.mutationOptions()).mutate(input),
+      ).resolves.toBe(42)
+      expect(requests.map((request) => request.headers['authorization'])).toStrictEqual([
         `Bearer ${privateToken}`,
         `Bearer ${privateToken}`,
       ])
@@ -314,7 +424,7 @@ describe('HTTP execution', () => {
     const utils = createHttpApiQueryUtils(FailureApi, {
       client,
       keyPrefix: ['test'],
-      runPromiseExit: (): Promise<never> => Promise.reject(rejection),
+      runPromiseExit: async (): Promise<never> => await Promise.reject(rejection),
     })
     const queryClient = new QueryClient()
     const input = { params: { scenario: 'success' } }
@@ -332,15 +442,15 @@ describe('HTTP execution', () => {
 
   it.each(['onMutate', 'onSuccess'] as const)(
     'passes mutation %s callback failures through unchanged',
-    async (callback) => {
+    async (lifecycle) => {
       const client = await makeFailureClient([])
       const utils = createHttpApiQueryUtils(FailureApi, { client, keyPrefix: ['test'] })
       const queryClient = new QueryClient()
-      const rejection = new Error(`${callback} failed`)
+      const rejection = new Error(`${lifecycle} failed`)
       const mutation = new MutationObserver(
         queryClient,
         utils.actions.read.mutationOptions({
-          [callback]: () => {
+          [lifecycle]: () => {
             throw rejection
           },
         }),

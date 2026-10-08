@@ -15,7 +15,9 @@ for (const [name, application] of [
     let lookupRequests = 0
     page.on('request', (request) => {
       const body = request.postData()
-      if (recordsRpc(body, 'users.get') && /"id"\s*:\s*2[,}]/.test(body ?? '')) lookupRequests += 1
+      if (recordsRpc(body, 'users.get') && /"id"\s*:\s*2[,}]/u.test(body ?? '')) {
+        lookupRequests += 1
+      }
     })
     await page.clock.install()
     await prepareExampleApplication(page, application)

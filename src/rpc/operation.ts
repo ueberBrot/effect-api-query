@@ -1,6 +1,6 @@
 import { Schema, SchemaAST } from 'effect'
-import type { Effect } from 'effect'
-import { Rpc, RpcClient, RpcGroup, RpcSchema } from 'effect/rpc'
+import type { Rpc, RpcClient, RpcGroup } from 'effect/rpc'
+import { RpcSchema } from 'effect/rpc'
 
 import type { OperationDescription, OperationInput, TreeErrors } from '../core/operation'
 import { containsUnsafeKeyEncoding } from '../core/schema-key'
@@ -9,7 +9,9 @@ import { createStreamPreparation } from './streamed-query'
 
 const createRpcInput = (definition: Rpc.AnyWithProps): OperationInput => {
   const { payloadSchema, _tag: rpcTag } = definition
-  if (SchemaAST.isVoid(payloadSchema.ast)) return { _tag: 'Inputless' }
+  if (SchemaAST.isVoid(payloadSchema.ast)) {
+    return { _tag: 'Inputless' }
+  }
 
   return {
     _tag: 'Input',
@@ -26,27 +28,32 @@ const createRpcInput = (definition: Rpc.AnyWithProps): OperationInput => {
       let normalized: unknown
       try {
         normalized = payloadSchema.make(input)
-      } catch (cause) {
+      } catch (error) {
         throw new EffectRpcQueryKeyError(
           'PayloadConstructionFailed',
           rpcTag,
           `Could not construct the payload for RPC ${rpcTag}`,
-          cause,
+          error,
         )
       }
       let keyValue: unknown
       try {
-        keyValue = encoder
-          ? encoder(normalized)
-          : Schema.encodeUnknownSync(
-              payloadSchema as unknown as Schema.ConstraintEncoder<unknown, never>,
-            )(normalized)
-      } catch (cause) {
+        if (encoder) {
+          keyValue = encoder(normalized)
+        } else {
+          // SAFETY: Middleware requiring encoding services needs a custom encoder;
+          // the remaining payload schema can encode synchronously.
+          // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/no-chained-type-assertions
+          const encodingSchema = payloadSchema as unknown as Schema.ConstraintEncoder<unknown>
+          const encode = Schema.encodeUnknownSync(encodingSchema)
+          keyValue = encode(normalized)
+        }
+      } catch (error) {
         throw new EffectRpcQueryKeyError(
           encoder ? 'KeyEncoderFailed' : 'PayloadEncodingFailed',
           rpcTag,
           `Could not encode the key payload for RPC ${rpcTag}`,
-          cause,
+          error,
         )
       }
       // The ready client constructs this normalized payload again during execution.
@@ -55,16 +62,8 @@ const createRpcInput = (definition: Rpc.AnyWithProps): OperationInput => {
   }
 }
 
-export const extractRpcs = <Rpcs extends Rpc.Any, ClientError>(
-  group: RpcGroup.RpcGroup<Rpcs>,
-  client: RpcClient.RpcClient.Flat<Rpcs, ClientError>,
-): ReadonlyArray<OperationDescription> =>
-  Array.from(group.requests.values(), (value) =>
-    describeRpc(value as unknown as Rpc.AnyWithProps, client),
-  )
-
 const takeRpcOptions = (options: Record<string, unknown>) => {
-  const rpcOptions = options['rpcOptions']
+  const { rpcOptions } = options
   delete options['rpcOptions']
   return rpcOptions
 }
@@ -81,28 +80,41 @@ const describeRpc = <Rpcs extends Rpc.Any, ClientError>(
     takeOptions: takeRpcOptions,
   }
   if (!RpcSchema.isStreamSchema(definition.successSchema)) {
+    // SAFETY: The ready client belongs to this group. Its tag selects this exact
+    // declaration's payload and unary result; never erases only the generic call site.
     return {
       ...identity,
       kind: 'Unary',
       invoke: (input, options) =>
-        client(rpcTag as never, input as never, options as never) as Effect.Effect<
-          unknown,
-          unknown,
-          unknown
-        >,
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+        client(rpcTag as never, input as never, options as never),
       executionError: (operation, cause) => new EffectRpcQueryError(rpcTag, operation, cause),
     }
   }
+  // SAFETY: RpcSchema identified this tag's streaming success schema; the client
+  // is from the same group, so this call returns that declaration's Stream.
   return {
     ...identity,
     kind: 'Streaming',
     prepareStream: createStreamPreparation({
       tag: rpcTag,
       invoke: (input, options) =>
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion
         client(rpcTag as never, input as never, options as never) as never,
     }),
   }
 }
+
+// SAFETY: A RpcGroup stores complete runtime definitions for all its members;
+// AnyWithProps restores that SDK metadata surface after generic member erasure.
+export const extractRpcs = <Rpcs extends Rpc.Any, ClientError>(
+  group: RpcGroup.RpcGroup<Rpcs>,
+  client: RpcClient.RpcClient.Flat<Rpcs, ClientError>,
+): readonly OperationDescription[] =>
+  Array.from(group.requests.values(), (value) =>
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/no-chained-type-assertions
+    describeRpc(value as unknown as Rpc.AnyWithProps, client),
+  )
 
 export const rpcTreeErrors: TreeErrors = {
   invalidPrefix: (reason, cause) =>

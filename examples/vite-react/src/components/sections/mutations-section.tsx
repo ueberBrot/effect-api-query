@@ -25,14 +25,14 @@ export const MutationsSection = ({
   )
 
   return (
-    <section className="space-y-4 border border-zinc-800 bg-[#111113] p-6 shadow-2xl shadow-black/40">
-      <h2 className="display-heading text-2xl font-bold text-zinc-50">
+    <section className="space-y-4 border border-border bg-card p-6 shadow-2xl shadow-shadow/40">
+      <h2 className="display-heading text-2xl font-bold text-foreground">
         Mutations and invalidation
       </h2>
       <CreateUserForm application={application} />
       <div className="flex flex-wrap gap-3">
         <ActionButton
-          onClick={() =>
+          onClick={() => {
             seedUsers.mutate({
               users: [
                 { name: 'Grace Hopper' },
@@ -45,19 +45,27 @@ export const MutationsSection = ({
                 { name: 'Sister Mary Kenneth Keller' },
               ],
             })
-          }
+          }}
           type="button"
         >
           Replace with eight pioneers
         </ActionButton>
         <ActionButton
-          onClick={() => resetUsers.mutate(undefined)}
+          onClick={() => {
+            resetUsers.mutate()
+          }}
           type="button"
           variant="secondary"
         >
           Reset directory
         </ActionButton>
-        <ActionButton onClick={() => void voidQuery.refetch()} type="button" variant="secondary">
+        <ActionButton
+          onClick={() => {
+            void voidQuery.refetch()
+          }}
+          type="button"
+          variant="secondary"
+        >
           Run void query
         </ActionButton>
       </div>

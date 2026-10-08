@@ -54,12 +54,13 @@
     ]
   },
 
-  // Vite+ task and pack configuration invokes tools that Fallow cannot trace.
+  // Vite+ tasks, packing, and imported lint presets invoke tools Fallow cannot trace.
   // Keep Effect peer and test dependencies available for the library and fixtures.
   "ignoreDependencies": [
     "@arethetypeswrong/cli",
     "@effect/tsgo",
     "@effect/vitest",
+    "@shadcn/lint",
     "effect",
     "publint",
     "typescript-5.9",

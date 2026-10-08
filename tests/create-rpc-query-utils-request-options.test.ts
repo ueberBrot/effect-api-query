@@ -4,11 +4,8 @@ import { Context, Effect, Schema, Stream } from 'effect'
 import type { Headers } from 'effect/http'
 import { Rpc, RpcGroup } from 'effect/rpc'
 
-import {
-  createRpcQueryUtils,
-  type UnaryRpcOptions,
-  type StreamingRpcOptions,
-} from '#effect-api-query'
+import { createRpcQueryUtils } from '#effect-api-query'
+import type { UnaryRpcOptions, StreamingRpcOptions } from '#effect-api-query'
 
 import { makeRpcTestClient } from './fixtures/effect-rpc'
 
@@ -43,11 +40,11 @@ it.effect(
       } satisfies UnaryRpcOptions
       const options = utils.read.queryOptions({ input: { page: 0 }, rpcOptions, staleTime: 0 })
       const queryClient = new QueryClient()
-      expect(yield* Effect.promise(() => queryClient.query(options))).toBe('query')
-      expect(yield* Effect.promise(() => queryClient.query(options))).toBe('query')
-      expect(requests).toEqual([rpcOptions, rpcOptions])
+      expect(yield* Effect.promise(async () => await queryClient.query(options))).toBe('query')
+      expect(yield* Effect.promise(async () => await queryClient.query(options))).toBe('query')
+      expect(requests).toStrictEqual([rpcOptions, rpcOptions])
       expect(options).not.toHaveProperty('rpcOptions')
-      expect(rpcOptions.headers).toEqual({ 'x-request-id': 'query' })
+      expect(rpcOptions.headers).toStrictEqual({ 'x-request-id': 'query' })
     }),
 )
 
@@ -84,17 +81,19 @@ it.effect(
         rpcOptions,
       })
       expect(
-        yield* Effect.promise(() => queryClient.infiniteQuery({ ...infinite, pages: 2 })),
-      ).toEqual({
+        yield* Effect.promise(
+          async () => await queryClient.infiniteQuery({ ...infinite, pages: 2 }),
+        ),
+      ).toStrictEqual({
         pageParams: [0, 1],
         pages: ['pages:0', 'pages:1'],
       })
-      expect(requests).toEqual([rpcOptions, rpcOptions])
+      expect(requests).toStrictEqual([rpcOptions, rpcOptions])
       const mutation = utils.read.mutationOptions({ rpcOptions })
       const observer = new MutationObserver(queryClient, mutation)
-      expect(yield* Effect.promise(() => observer.mutate({ page: 3 }))).toBe('pages:3')
-      expect(yield* Effect.promise(() => observer.mutate({ page: 4 }))).toBe('pages:4')
-      expect(requests.slice(2)).toEqual([rpcOptions, rpcOptions])
+      expect(yield* Effect.promise(async () => await observer.mutate({ page: 3 }))).toBe('pages:3')
+      expect(yield* Effect.promise(async () => await observer.mutate({ page: 4 }))).toBe('pages:4')
+      expect(requests.slice(2)).toStrictEqual([rpcOptions, rpcOptions])
 
       const streamOptions = { ...rpcOptions, streamBufferSize: 3 } satisfies StreamingRpcOptions
       const streamed = utils.watch.streamedOptions({
@@ -102,9 +101,11 @@ it.effect(
         rpcOptions: streamOptions,
       })
       const live = utils.watch.liveOptions({ input: { page: 0 }, rpcOptions: streamOptions })
-      expect(yield* Effect.promise(() => queryClient.query(streamed))).toEqual(['pages'])
-      expect(yield* Effect.promise(() => queryClient.query(live))).toBe('pages')
-      expect(requests.slice(4)).toEqual([streamOptions, streamOptions])
+      expect(yield* Effect.promise(async () => await queryClient.query(streamed))).toStrictEqual([
+        'pages',
+      ])
+      expect(yield* Effect.promise(async () => await queryClient.query(live))).toBe('pages')
+      expect(requests.slice(4)).toStrictEqual([streamOptions, streamOptions])
       for (const options of [infinite, mutation, streamed, live]) {
         expect(options).not.toHaveProperty('rpcOptions')
       }
@@ -125,8 +126,8 @@ it.effect(
         expect(options.queryFn).toBe(skipToken)
         expect(options).not.toHaveProperty('rpcOptions')
       }
-      yield* Effect.promise(() =>
-        queryClient.query(utils.read.queryOptions({ input: { page: 9 } })),
+      yield* Effect.promise(
+        async () => await queryClient.query(utils.read.queryOptions({ input: { page: 9 } })),
       )
       expect(requests.at(-1)).toBeUndefined()
     }),

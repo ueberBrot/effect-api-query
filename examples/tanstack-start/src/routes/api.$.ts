@@ -5,9 +5,9 @@ import { handleApiRequest } from '../lib/api-server.ts'
 export const Route = createFileRoute('/api/$')({
   server: {
     handlers: {
-      GET: ({ request }) => handleApiRequest(request),
-      POST: ({ request }) => handleApiRequest(request),
-      DELETE: ({ request }) => handleApiRequest(request),
+      GET: async ({ request }) => handleApiRequest(request),
+      POST: async ({ request }) => handleApiRequest(request),
+      DELETE: async ({ request }) => handleApiRequest(request),
     },
   },
 })

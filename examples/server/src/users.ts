@@ -1,4 +1,5 @@
-import { type SeedUser, User, UserPage } from '@effect-api-query/contracts'
+import { User, UserPage } from '@effect-api-query/contracts'
+import type { SeedUser } from '@effect-api-query/contracts'
 import { Effect, Ref } from 'effect'
 
 const initialUsers = [
@@ -14,11 +15,11 @@ const initialUsers = [
   new User({ id: 10, locale: 'en', name: 'Dennis Ritchie' }),
   new User({ id: 11, locale: 'en', name: 'Annie Easley' }),
   new User({ id: 12, locale: 'en', name: 'James Gosling' }),
-] as const satisfies ReadonlyArray<User>
+] as const satisfies readonly User[]
 
 interface ServerState {
   readonly nextUserId: number
-  readonly users: ReadonlyArray<User>
+  readonly users: readonly User[]
 }
 
 const initialState = (): ServerState => ({
@@ -33,7 +34,7 @@ export const makeUsers = Effect.fn('ExampleUsers.make')(function* () {
   const state = yield* Ref.make(initialState())
   return {
     reset: Ref.set(state, initialState()),
-    seed: Effect.fn('ExampleUsers.seed')(({ users }: { readonly users: ReadonlyArray<SeedUser> }) =>
+    seed: Effect.fn('ExampleUsers.seed')(({ users }: { readonly users: readonly SeedUser[] }) =>
       Ref.modify(state, (current) => {
         const seeded = users.map((user, index) => makeUser(index + 1, user))
         return [

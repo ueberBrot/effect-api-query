@@ -41,7 +41,7 @@
   },
   "scripts": {
     "changeset": "changeset",
-    "prepare": "vp config --no-agent && effect-tsgo patch --typescript",
+    "prepare": "vp config --no-agent && effect-tsgo patch --typescript --oxlint",
     "version-packages": "changeset version && vp fmt"
   },
   "devDependencies": {
@@ -54,6 +54,7 @@
     "@effect/tsgo": "0.47.2",
     "@effect/vitest": "4.0.0",
     "@playwright/test": "1.63.0",
+    "@shadcn/lint": "0.2.0",
     "@tanstack/intent": "0.5.0",
     "@tanstack/query-core": "catalog:",
     "@tanstack/react-query": "catalog:",
@@ -65,12 +66,14 @@
     "@types/react-dom": "catalog:",
     "effect": "catalog:",
     "fallow": "3.31.0",
+    "oxlint": "1.85.0",
     "publint": "0.3.24",
     "react": "catalog:",
     "react-dom": "catalog:",
     "tsx": "catalog:",
     "typescript": "7.0.2",
     "typescript-5.9": "npm:typescript@5.9.3",
+    "ultracite": "7.12.2",
     "unplugin-unused": "0.6.0",
     "vite": "catalog:",
     "vite-plus": "catalog:",

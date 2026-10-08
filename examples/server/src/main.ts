@@ -1,7 +1,7 @@
-import {
-  type RunningExampleRpcServer,
-  type StartExampleRpcServerOptions,
-  startExampleRpcServer,
+import { startExampleRpcServer } from '@effect-api-query/server'
+import type {
+  RunningExampleRpcServer,
+  StartExampleRpcServerOptions,
 } from '@effect-api-query/server'
 import { Effect, Logger, Runtime } from 'effect'
 
@@ -17,7 +17,9 @@ const program = Effect.scoped(
 )
 
 const runMain = Runtime.makeRunMain(({ fiber, teardown }) => {
-  const shutdown = () => fiber.interruptUnsafe()
+  const shutdown = () => {
+    fiber.interruptUnsafe()
+  }
   process.once('SIGINT', shutdown)
   process.once('SIGTERM', shutdown)
   fiber.addObserver((exit) => {

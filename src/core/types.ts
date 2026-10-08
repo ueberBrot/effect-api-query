@@ -177,11 +177,14 @@ export type MutationOptions<Data, Error, Input, Key extends QueryKey, OnMutateRe
   readonly mutationKey: Key
 }
 
+// Generic function comparison tests exact type identity, not a callable API.
+/* oxlint-disable typescript/no-unnecessary-type-parameters */
 export type HasSeenType<A, Seen> = Seen extends unknown
   ? (<T>() => T extends A ? 1 : 2) extends <T>() => T extends Seen ? 1 : 2
     ? true
     : false
   : never
+/* oxlint-enable typescript/no-unnecessary-type-parameters */
 
 /** Recursively detects explicit redacted values in a decoded value. */
 export type ContainsRedacted<A, Seen = never> =

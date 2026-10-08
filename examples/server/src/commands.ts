@@ -1,4 +1,5 @@
-import { type CommandPayload, CommandStatus } from '@effect-api-query/contracts'
+import { CommandStatus } from '@effect-api-query/contracts'
+import type { CommandPayload } from '@effect-api-query/contracts'
 import { Deferred, Effect, Scope } from 'effect'
 
 interface Command {
@@ -27,11 +28,14 @@ export const makeCommands = Effect.fn('ExampleRpc.makeCommands')(function* () {
   const work = Effect.fn('ExampleRpc.Commands.work')(
     function* (command: Command) {
       for (let step = 0; step < command.status.totalSteps; step += 1) {
-        const cancelled = yield* Effect.raceFirst(
-          Effect.sleep('100 millis').pipe(Effect.as(false)),
-          Deferred.await(command.cancellation).pipe(Effect.as(true)),
+        const cancelled = yield* Deferred.await(command.cancellation).pipe(
+          Effect.as(true),
+          Effect.timeoutOrElse({ duration: '100 millis', orElse: () => Effect.succeed(false) }),
         )
-        if (cancelled) return yield* finish(command, 'cancelled')
+        if (cancelled) {
+          yield* finish(command, 'cancelled')
+          return
+        }
         command.status = new CommandStatus({
           operationId: command.status.operationId,
           state: command.status.state,
@@ -50,7 +54,9 @@ export const makeCommands = Effect.fn('ExampleRpc.makeCommands')(function* () {
     steps: number,
   ) {
     const existing = commands.get(operationId)
-    if (existing !== undefined) return existing
+    if (existing !== undefined) {
+      return existing
+    }
     const command: Command = {
       status: new CommandStatus({
         operationId,
@@ -58,16 +64,16 @@ export const makeCommands = Effect.fn('ExampleRpc.makeCommands')(function* () {
         completedSteps: 0,
         totalSteps: steps,
       }),
+      // Void represents a cancellation signal without payload.
+      // oxlint-disable-next-line typescript/no-invalid-void-type
       cancellation: Deferred.makeUnsafe<void>(),
       done: Deferred.makeUnsafe<CommandStatus>(),
     }
     commands.set(operationId, command)
-    if (steps === 0) {
-      // A cancel request may arrive before its start request.
-      yield* Deferred.succeed(command.done, command.status)
-    } else {
-      yield* Effect.forkIn(work(command), scope, { uninterruptible: false })
-    }
+    // A cancel request may arrive before its start request.
+    yield* steps === 0
+      ? Deferred.succeed(command.done, command.status)
+      : Effect.forkIn(work(command), scope, { uninterruptible: false })
     return command
   }, Effect.uninterruptible)
 

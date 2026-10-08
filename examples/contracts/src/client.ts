@@ -1,8 +1,10 @@
-import { Effect, Exit, Layer, ManagedRuntime, Scope } from 'effect'
+import { Effect, Exit, Layer, ManagedRuntime, Predicate, Scope } from 'effect'
 import { FetchHttpClient } from 'effect/http'
-import { RpcClient, RpcClientError, RpcGroup, RpcSerialization } from 'effect/rpc'
+import type { RpcClientError, RpcGroup } from 'effect/rpc'
+import { RpcClient, RpcSerialization } from 'effect/rpc'
 
-import { exampleRpcGroup, type SlowDiagnosticInput } from './contracts.ts'
+import { exampleRpcGroup } from './contracts.ts'
+import type { SlowDiagnosticInput } from './contracts.ts'
 
 export type ExampleRpcClient = RpcClient.RpcClient.Flat<
   RpcGroup.Rpcs<typeof exampleRpcGroup>,
@@ -31,25 +33,44 @@ export const makeExampleRpcClient = Effect.fn('ExampleRpc.makeExampleRpcClient')
     Effect.provide(protocolLayer),
   )
   let nextSlowOperation = 1
+  const forwardClient: (...args: Parameters<ExampleRpcClient>) => ReturnType<ExampleRpcClient> =
+    client
 
-  return ((tag: string, payload: unknown, options?: unknown) => {
+  const cancellationAwareClient = (
+    tag: Parameters<ExampleRpcClient>[0],
+    payload: Parameters<ExampleRpcClient>[1],
+    options?: Parameters<ExampleRpcClient>[2],
+  ) => {
     if (tag !== 'diagnostics.slow') {
-      return Reflect.apply(client, undefined, [tag, payload, options])
+      return forwardClient(tag, payload, options)
     }
 
+    // SAFETY: ExampleRpcClient pairs this checked tag with SlowDiagnosticInput;
+    // Parameters erases that generic relationship inside the forwarding wrapper.
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const slowPayload = payload as SlowDiagnosticInput
+    const suppliedOperationId = slowPayload.operationId
     const operationId =
-      slowPayload.operationId ?? `${globalThis.crypto.randomUUID()}-${String(nextSlowOperation++)}`
+      suppliedOperationId ?? `${globalThis.crypto.randomUUID()}-${String(nextSlowOperation)}`
+
+    if (Predicate.isNullish(suppliedOperationId)) {
+      nextSlowOperation += 1
+    }
 
     // The buffered HTTP protocol cannot carry a caller's interruption after sending a request.
-    return client('diagnostics.slow', { ...slowPayload, operationId }, options as never).pipe(
+    return client('diagnostics.slow', { ...slowPayload, operationId }, options).pipe(
       Effect.onInterrupt(() =>
         client('diagnostics.cancel', { operationId }).pipe(
           Effect.ignoreCause({ log: true, message: 'Failed to cancel example slow operation' }),
         ),
       ),
     )
-  }) as ExampleRpcClient
+  }
+
+  // SAFETY: Every tag forwards its original payload/options and result unchanged;
+  // the slow tag only adds cancellation while preserving the SDK's generic call signature.
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+  return cancellationAwareClient as ExampleRpcClient
 })
 
 /** Starts the ready RPC client resource shared by each executable application. */
@@ -57,17 +78,19 @@ export const startExampleRpcClient = async (rpcUrl: string): Promise<StartedExam
   const clientScope = await Effect.runPromise(Scope.make())
   const runtime = ManagedRuntime.make(Layer.empty)
   let disposal: Promise<void> | undefined
-  const dispose = () => {
+  const dispose = async () => {
     disposal ??= (async () => {
       try {
         await runtime.dispose()
-      } catch (cause) {
+      } catch (error) {
         try {
           await Effect.runPromise(Scope.close(clientScope, Exit.void))
-        } catch (cleanupCause) {
-          throw new AggregateError([cause, cleanupCause], 'RPC client cleanup failed')
+        } catch (cleanupError) {
+          throw new AggregateError([error, cleanupError], 'RPC client cleanup failed', {
+            cause: cleanupError,
+          })
         }
-        throw cause
+        throw error
       }
       await Effect.runPromise(Scope.close(clientScope, Exit.void))
     })()
@@ -81,7 +104,7 @@ export const startExampleRpcClient = async (rpcUrl: string): Promise<StartedExam
     return {
       client,
       dispose,
-      runPromiseExit: (effect, options) =>
+      runPromiseExit: async (effect, options) =>
         runtime.runPromiseExit(
           RpcClient.withHeaders(effect, {
             'x-example-authorization': 'allowed',
@@ -89,12 +112,14 @@ export const startExampleRpcClient = async (rpcUrl: string): Promise<StartedExam
           options,
         ),
     }
-  } catch (cause) {
+  } catch (error) {
     try {
       await dispose()
-    } catch (cleanupCause) {
-      throw new AggregateError([cause, cleanupCause], 'RPC client startup and cleanup failed')
+    } catch (cleanupError) {
+      throw new AggregateError([error, cleanupError], 'RPC client startup and cleanup failed', {
+        cause: cleanupError,
+      })
     }
-    throw cause
+    throw error
   }
 }

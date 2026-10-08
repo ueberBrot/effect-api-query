@@ -12,6 +12,8 @@ const Command = ({
   readonly application: ViteReactApplication
   readonly number: number
 }) => {
+  // This command keeps its idempotency key for the component lifetime.
+  // oxlint-disable-next-line react/hook-use-state
   const [operationId] = useState(() => globalThis.crypto.randomUUID())
   const { rpcQuery, queryClient } = application
   const input = { operationId }
@@ -25,7 +27,11 @@ const Command = ({
       input,
       enabled: start.status !== 'idle',
       refetchInterval: (query) =>
-        query.state.data?.state === 'running' || query.state.data == null ? 100 : false,
+        query.state.data?.state === 'running' ||
+        query.state.data === null ||
+        query.state.data === undefined
+          ? 100
+          : false,
     }),
   )
   const command = status.data
@@ -33,14 +39,16 @@ const Command = ({
   return (
     <section
       aria-label={`Command ${String(number)}`}
-      className="space-y-3 border border-zinc-700 p-4"
+      className="space-y-3 border border-border-strong p-4"
     >
       <h3 className="font-semibold">Command {number}</h3>
       <div className="flex flex-wrap gap-3">
         <ActionButton
           type="button"
           disabled={start.status !== 'idle'}
-          onClick={() => start.mutate(input)}
+          onClick={() => {
+            start.mutate(input)
+          }}
         >
           Start command
         </ActionButton>
@@ -53,7 +61,9 @@ const Command = ({
             command?.state === 'completed' ||
             command?.state === 'cancelled'
           }
-          onClick={() => cancel.mutate(input)}
+          onClick={() => {
+            cancel.mutate(input)
+          }}
         >
           Cancel command
         </ActionButton>
@@ -62,7 +72,7 @@ const Command = ({
       <p>Cancel mutation: {cancel.status}</p>
       <p>Server state: {command?.state ?? 'not started'}</p>
       <p>
-        {command == null
+        {command === null || command === undefined
           ? 'Progress: waiting for server'
           : `Progress: ${String(command.completedSteps)} / ${String(command.totalSteps)}`}
       </p>
@@ -76,9 +86,9 @@ export const CommandsSection = ({
 }: {
   readonly application: ViteReactApplication
 }) => (
-  <section className="space-y-4 border border-zinc-800 bg-[#111113] p-6 shadow-2xl shadow-black/40 md:col-span-2">
-    <h2 className="display-heading text-2xl font-bold text-zinc-50">Cancellable commands</h2>
-    <p className="text-sm leading-6 text-zinc-400">
+  <section className="space-y-4 border border-border bg-card p-6 shadow-2xl shadow-shadow/40 md:col-span-2">
+    <h2 className="display-heading text-2xl font-bold text-foreground">Cancellable commands</h2>
+    <p className="text-sm leading-6 text-muted-foreground">
       Start two independent commands and cancel one while it runs. Cancellation stops future steps;
       completed steps remain. Both mutations settle normally, and the status query refreshes from
       the server.

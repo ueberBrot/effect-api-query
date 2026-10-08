@@ -1,4 +1,5 @@
 import { listIntentSkills, loadIntentSkill } from '@tanstack/intent/core'
+import { Schema } from 'effect'
 // fallow-ignore-file unused-file
 // Vite+ invokes this verifier through its dynamically declared packed-package task.
 import { deepStrictEqual, equal, match } from 'node:assert/strict'
@@ -15,23 +16,22 @@ import {
 } from 'node:fs'
 import { builtinModules } from 'node:module'
 import { tmpdir } from 'node:os'
-import { dirname, join, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import nodePath from 'node:path'
 import ts from 'typescript-5.9'
 
 import repositoryManifest from '../package.json' with { type: 'json' }
 
-const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const artifactDirectory = join(repositoryRoot, '.artifacts')
-const consumerFixtureDirectory = join(repositoryRoot, 'tests', 'packed-consumer')
-const lockfilePath = join(repositoryRoot, 'pnpm-lock.yaml')
-const typeFixtureDirectory = join(repositoryRoot, 'tests', 'types')
-const workspaceConfigPath = join(repositoryRoot, 'pnpm-workspace.yaml')
-const workspaceConfig = readFileSync(workspaceConfigPath, 'utf8')
-const defaultTarballName = `${repositoryManifest.name.replace(/^@/, '').replaceAll('/', '-')}-${repositoryManifest.version}.tgz`
-const tarballPath = resolve(
+const repositoryRoot = nodePath.resolve(import.meta.dirname, '..')
+const artifactDirectory = nodePath.join(repositoryRoot, '.artifacts')
+const consumerFixtureDirectory = nodePath.join(repositoryRoot, 'tests', 'packed-consumer')
+const lockfilePath = nodePath.join(repositoryRoot, 'pnpm-lock.yaml')
+const typeFixtureDirectory = nodePath.join(repositoryRoot, 'tests', 'types')
+const workspaceConfigPath = nodePath.join(repositoryRoot, 'pnpm-workspace.yaml')
+const workspaceConfig = readFileSync(workspaceConfigPath, 'utf-8')
+const defaultTarballName = `${repositoryManifest.name.replace(/^@/u, '').replaceAll('/', '-')}-${repositoryManifest.version}.tgz`
+const tarballPath = nodePath.resolve(
   repositoryRoot,
-  process.env['EFFECT_API_QUERY_TARBALL'] ?? join(artifactDirectory, defaultTarballName),
+  process.env['EFFECT_API_QUERY_TARBALL'] ?? nodePath.join(artifactDirectory, defaultTarballName),
 )
 
 if (!existsSync(tarballPath)) {
@@ -41,9 +41,32 @@ if (!existsSync(tarballPath)) {
 const artifactDigest = () => createHash('sha512').update(readFileSync(tarballPath)).digest('hex')
 const initialDigest = artifactDigest()
 
-const packedManifest = JSON.parse(
-  execFileSync('tar', ['-xOzf', tarballPath, 'package/package.json'], { encoding: 'utf8' }),
-) as typeof repositoryManifest
+const packedManifest = Schema.decodeSync(
+  Schema.fromJsonString(
+    Schema.Struct({
+      bugs: Schema.Struct({ url: Schema.String }),
+      dependencies: Schema.optionalKey(Schema.Unknown),
+      description: Schema.String,
+      engines: Schema.optionalKey(Schema.Unknown),
+      exports: Schema.Unknown,
+      homepage: Schema.String,
+      keywords: Schema.Array(Schema.String),
+      license: Schema.String,
+      name: Schema.String,
+      peerDependencies: Schema.Struct({
+        '@tanstack/query-core': Schema.String,
+        effect: Schema.String,
+      }).annotate({ parseOptions: { onExcessProperty: 'error' } }),
+      publishConfig: Schema.Struct({ access: Schema.String }).annotate({
+        parseOptions: { onExcessProperty: 'error' },
+      }),
+      repository: Schema.Struct({ url: Schema.String }),
+      sideEffects: Schema.Boolean,
+      type: Schema.String,
+      version: Schema.String,
+    }),
+  ),
+)(execFileSync('tar', ['-xOzf', tarballPath, 'package/package.json'], { encoding: 'utf-8' }))
 
 equal(packedManifest.name, 'effect-api-query')
 equal(
@@ -63,9 +86,11 @@ deepStrictEqual(packedManifest.publishConfig, { access: 'public' })
 
 const testedVersion = (dependency: keyof typeof repositoryManifest.devDependencies): string => {
   const specifier = repositoryManifest.devDependencies[dependency]
-  if (specifier !== 'catalog:') return specifier
+  if (specifier !== 'catalog:') {
+    return specifier
+  }
 
-  const escapedDependency = dependency.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&')
+  const escapedDependency = dependency.replaceAll(/[.*+?^${}()|[\]\\]/gu, '\\$&')
   const catalogVersion = new RegExp(
     `^  ['"]?${escapedDependency}['"]?: (?<version>\\S+)$`,
     'mu',
@@ -76,10 +101,10 @@ const testedVersion = (dependency: keyof typeof repositoryManifest.devDependenci
   return catalogVersion
 }
 
-const lockedVersions = (dependency: string): ReadonlyArray<string> => {
+const lockedVersions = (dependency: string): readonly string[] => {
   const escapedDependency = dependency.replaceAll('/', '\\/')
   // pnpm stores the project graph last, after any package-manager/config document.
-  const projectLockfile = readFileSync(lockfilePath, 'utf8')
+  const projectLockfile = readFileSync(lockfilePath, 'utf-8')
     .split(/^---[ \t]*(?:#[^\r\n]*)?\r?$/mu)
     .at(-1)
   if (
@@ -97,7 +122,7 @@ const lockedVersions = (dependency: string): ReadonlyArray<string> => {
   const matches = lockedPackages.matchAll(
     new RegExp(`^  ['"]?${escapedDependency}@(?<version>[^('":]+)`, 'gmu'),
   )
-  return [...new Set(Array.from(matches, (match) => match.groups?.['version']))]
+  return [...new Set(Array.from(matches, (lockedMatch) => lockedMatch.groups?.['version']))]
     .filter((version): version is string => version !== undefined)
     .sort()
 }
@@ -105,7 +130,7 @@ const lockedVersions = (dependency: string): ReadonlyArray<string> => {
 const overrides = /^overrides:\n(?<entries>(?:[ \t]+[^\n]*\n)*)/mu.exec(workspaceConfig)?.groups?.[
   'entries'
 ]
-match(overrides ?? '', /^  ['"]?vitest@\*['"]?: ['"]?catalog:['"]?$/mu)
+match(overrides ?? '', /^ {2}['"]?vitest@\*['"]?: ['"]?catalog:['"]?$/mu)
 const vitestOverride = testedVersion('vitest')
 
 deepStrictEqual(lockedVersions('effect'), [testedVersion('effect')])
@@ -119,7 +144,7 @@ deepStrictEqual(packedManifest.exports, {
 })
 equal('engines' in packedManifest, false)
 
-const publicBarrel = readFileSync(join(repositoryRoot, 'src', 'index.ts'), 'utf8')
+const publicBarrel = readFileSync(nodePath.join(repositoryRoot, 'src', 'index.ts'), 'utf-8')
 equal(
   /\bexport\s+(?:type\s+)?\*/u.test(publicBarrel),
   false,
@@ -127,7 +152,7 @@ equal(
 )
 
 const builtModule = execFileSync('tar', ['-xOzf', tarballPath, 'package/dist/index.mjs'], {
-  encoding: 'utf8',
+  encoding: 'utf-8',
 })
 match(builtModule, /from ["']@tanstack\/query-core["']/u)
 match(builtModule, /from ["']effect(?:\/rpc)?["']/u)
@@ -139,11 +164,17 @@ for (const imported of builtModule.matchAll(/\bfrom\s*["'](?<specifier>[^"']+)["
     'The runtime must not import bare Node built-ins',
   )
 }
-const sourceMap = JSON.parse(
+const sourceMap = Schema.decodeSync(
+  Schema.fromJsonString(
+    Schema.Struct({
+      sources: Schema.Array(Schema.String),
+    }),
+  ),
+)(
   execFileSync('tar', ['-xOzf', tarballPath, 'package/dist/index.mjs.map'], {
-    encoding: 'utf8',
+    encoding: 'utf-8',
   }),
-) as { sources: Array<string> }
+)
 equal(
   sourceMap.sources.some((source) => source.includes('node_modules/')),
   false,
@@ -151,7 +182,7 @@ equal(
 )
 
 const builtDeclaration = execFileSync('tar', ['-xOzf', tarballPath, 'package/dist/index.d.mts'], {
-  encoding: 'utf8',
+  encoding: 'utf-8',
 })
 const declarationSource = ts.createSourceFile(
   'index.d.mts',
@@ -175,7 +206,9 @@ const declarationNames = declarationSource.statements
       return ['default']
     }
     const modifiers = ts.canHaveModifiers(statement) ? ts.getModifiers(statement) : undefined
-    if (!modifiers?.some((modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword)) return []
+    if (modifiers?.some((modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword) !== true) {
+      return []
+    }
     if (modifiers.some((modifier) => modifier.kind === ts.SyntaxKind.DefaultKeyword)) {
       return ['default']
     }
@@ -279,7 +312,7 @@ const queryCoreCompatibilityCases = () => {
       ]
 }
 
-const packedFiles = execFileSync('tar', ['-tzf', tarballPath], { encoding: 'utf8' })
+const packedFiles = execFileSync('tar', ['-tzf', tarballPath], { encoding: 'utf-8' })
   .trim()
   .split('\n')
   .sort()
@@ -289,31 +322,34 @@ const skillPaths = [
   'skills/effect-api-query/references/query-patterns.md',
   'skills/effect-api-query/references/rpc.md',
 ]
-const skillExamples: Array<string> = []
+const skillExamples: string[] = []
 for (const path of ['LICENSE', ...skillPaths]) {
   const packedContent = execFileSync('tar', ['-xOzf', tarballPath, `package/${path}`], {
-    encoding: 'utf8',
+    encoding: 'utf-8',
   })
   equal(
     packedContent,
-    readFileSync(join(repositoryRoot, path), 'utf8'),
+    readFileSync(nodePath.join(repositoryRoot, path), 'utf-8'),
     `The packed ${path} must match the candidate`,
   )
-  for (const sample of packedContent.matchAll(/^```ts\n([\s\S]*?)^```/gmu)) {
-    if (sample[1] !== undefined) skillExamples.push(sample[1])
+  for (const sample of packedContent.matchAll(/^```ts\n(?<source>[\s\S]*?)^```/gmu)) {
+    const source = sample.groups?.['source']
+    if (source !== undefined) {
+      skillExamples.push(source)
+    }
   }
 }
 equal(skillExamples.length > 0, true, 'The packed usage skill must have compilable examples')
 equal(packedManifest.keywords.includes('tanstack-intent'), true)
-const changelogPath = join(repositoryRoot, 'CHANGELOG.md')
+const changelogPath = nodePath.join(repositoryRoot, 'CHANGELOG.md')
 const hasChangelog = existsSync(changelogPath)
 if (repositoryManifest.version !== '0.0.0') {
   equal(hasChangelog, true, 'A versioned release must include its changelog')
 }
 if (hasChangelog) {
   equal(
-    execFileSync('tar', ['-xOzf', tarballPath, 'package/CHANGELOG.md'], { encoding: 'utf8' }),
-    readFileSync(changelogPath, 'utf8'),
+    execFileSync('tar', ['-xOzf', tarballPath, 'package/CHANGELOG.md'], { encoding: 'utf-8' }),
+    readFileSync(changelogPath, 'utf-8'),
     'The packed changelog must match the candidate',
   )
 }
@@ -330,11 +366,11 @@ deepStrictEqual(packedFiles, [
 
 const compilerCases = [
   {
-    executable: join(repositoryRoot, 'node_modules', 'typescript-5.9', 'bin', 'tsc'),
+    executable: nodePath.join(repositoryRoot, 'node_modules', 'typescript-5.9', 'bin', 'tsc'),
     label: 'typescript-5.9',
   },
   {
-    executable: join(repositoryRoot, 'node_modules', 'typescript', 'bin', 'tsc'),
+    executable: nodePath.join(repositoryRoot, 'node_modules', 'typescript', 'bin', 'tsc'),
     label: 'typescript-current',
   },
 ] as const
@@ -363,7 +399,7 @@ const runTypeScript = (
 }
 
 const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
-  const consumerDirectory = mkdtempSync(join(tmpdir(), `effect-api-query-${peer.label}-`))
+  const consumerDirectory = mkdtempSync(nodePath.join(tmpdir(), `effect-api-query-${peer.label}-`))
 
   try {
     cpSync(consumerFixtureDirectory, consumerDirectory, { recursive: true })
@@ -376,7 +412,10 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       'docs-rpc-quick-start.ts',
       'docs-http-quick-start.ts',
     ]) {
-      cpSync(join(typeFixtureDirectory, fixture), join(consumerDirectory, fixture))
+      cpSync(
+        nodePath.join(typeFixtureDirectory, fixture),
+        nodePath.join(consumerDirectory, fixture),
+      )
     }
 
     const consumerManifest = {
@@ -400,11 +439,11 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       },
     }
     writeFileSync(
-      join(consumerDirectory, 'package.json'),
+      nodePath.join(consumerDirectory, 'package.json'),
       JSON.stringify(consumerManifest, null, 2),
     )
     for (const [index, source] of skillExamples.entries()) {
-      writeFileSync(join(consumerDirectory, `skill-example-${index}.ts`), source)
+      writeFileSync(nodePath.join(consumerDirectory, `skill-example-${index}.ts`), source)
     }
 
     // Prefer cached artifacts, but allow a fresh machine to fetch exact pinned versions.
@@ -424,22 +463,27 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
     const loadedSkill = loadIntentSkill(skillUse, intentOptions)
     equal(loadedSkill.version, packedManifest.version)
     equal(
-      readFileSync(resolve(consumerDirectory, loadedSkill.path), 'utf8'),
-      readFileSync(join(repositoryRoot, 'skills/effect-api-query/SKILL.md'), 'utf8'),
+      readFileSync(nodePath.resolve(consumerDirectory, loadedSkill.path), 'utf-8'),
+      readFileSync(nodePath.join(repositoryRoot, 'skills/effect-api-query/SKILL.md'), 'utf-8'),
       'Intent must load the shipped skill from the installed package',
     )
     // Intent can emit paths relative to the consumer or absolute paths when the
     // package resolves outside it (for example through a symlinked temp directory).
-    const loadedReferences = Array.from(
-      loadedSkill.content.matchAll(/\]\((?<destination>[^)\n]+\.md)\)/gu),
-      (link) => realpathSync(resolve(consumerDirectory, link.groups!['destination']!)),
+    const loadedReferences = new Set(
+      Array.from(loadedSkill.content.matchAll(/\]\((?<destination>[^)\n]+\.md)\)/gu), (link) => {
+        const destination = link.groups?.['destination']
+        if (destination === undefined) {
+          throw new Error('The reference link must include its destination')
+        }
+        return realpathSync(nodePath.resolve(consumerDirectory, destination))
+      }),
     )
     for (const path of skillPaths.slice(1)) {
       const installedReference = realpathSync(
-        resolve(consumerDirectory, loadedSkill.packageRoot, path),
+        nodePath.resolve(consumerDirectory, loadedSkill.packageRoot, path),
       )
       equal(
-        loadedReferences.includes(installedReference),
+        loadedReferences.has(installedReference),
         true,
         `Intent must resolve the shipped ${path} reference`,
       )

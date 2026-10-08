@@ -9,7 +9,7 @@ import { HttpApiBuilder } from 'effect/http-api'
 
 import { ExampleDomain } from './domain.ts'
 
-const users = HttpApiBuilder.group(
+const usersRoutes = HttpApiBuilder.group(
   exampleHttpApi,
   'users',
   Effect.fn(function* (handlers) {
@@ -24,7 +24,7 @@ const users = HttpApiBuilder.group(
   }),
 )
 
-const diagnostics = HttpApiBuilder.group(
+const diagnosticRoutes = HttpApiBuilder.group(
   exampleHttpApi,
   'diagnostics',
   Effect.fn(function* (handlers) {
@@ -52,6 +52,6 @@ const authorization = Layer.succeed(
 )
 
 export const exampleHttpRoutes = HttpApiBuilder.layer(exampleHttpApi).pipe(
-  Layer.provide([users, diagnostics]),
+  Layer.provide([usersRoutes, diagnosticRoutes]),
   Layer.provide(authorization),
 )

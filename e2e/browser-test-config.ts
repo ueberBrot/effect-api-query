@@ -1,4 +1,5 @@
-import { defineConfig, devices, type PlaywrightTestConfig } from '@playwright/test'
+import { defineConfig, devices } from '@playwright/test'
+import type { PlaywrightTestConfig } from '@playwright/test'
 
 export const browserTestDefaults = defineConfig({
   expect: { timeout: 10_000 },

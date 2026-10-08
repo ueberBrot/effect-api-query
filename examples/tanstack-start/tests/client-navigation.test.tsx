@@ -7,10 +7,8 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { Effect, Exit, Scope } from 'effect'
 import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test'
 
-import {
-  startTanStackStartApplication,
-  type TanStackStartApplication,
-} from '../src/lib/application.ts'
+import { startTanStackStartApplication } from '../src/lib/application.ts'
+import type { TanStackStartApplication } from '../src/lib/application.ts'
 import { createTanStackStartRouter } from '../src/router.tsx'
 
 describe('TanStack Start hydration and client navigation', () => {
@@ -19,7 +17,7 @@ describe('TanStack Start hydration and client navigation', () => {
   let serverScope: Scope.Closeable | undefined
 
   beforeEach(async () => {
-    window.scrollTo = () => undefined
+    window.scrollTo = () => {}
     serverScope = await Effect.runPromise(Scope.make())
   })
 
@@ -34,9 +32,10 @@ describe('TanStack Start hydration and client navigation', () => {
 
   // Hydration, streaming, two navigations, and a mutation share the test deadline.
   it('hydrates without a duplicate query, navigates, mutates, and invalidates', async () => {
-    const server = await Effect.runPromise(
-      startExampleRpcServer().pipe(Scope.provide(serverScope!)),
-    )
+    if (serverScope === undefined) {
+      throw new Error('Server scope was not initialized')
+    }
+    const server = await Effect.runPromise(startExampleRpcServer().pipe(Scope.provide(serverScope)))
     serverApplication = await startTanStackStartApplication({ rpcUrl: server.rpcUrl })
     const serverOptions = serverApplication.rpcQuery.users.list.queryOptions()
     await serverApplication.queryClient.query({ ...serverOptions, staleTime: 'static' })
@@ -51,7 +50,9 @@ describe('TanStack Start hydration and client navigation', () => {
       query: {
         initial: dehydrate(serverApplication.queryClient).queries,
         stream: new ReadableStream({
-          start: (controller) => controller.close(),
+          start: (controller) => {
+            controller.close()
+          },
         }),
       },
     })
@@ -68,37 +69,38 @@ describe('TanStack Start hydration and client navigation', () => {
     await router.load()
     render(<RouterProvider router={router} />)
 
-    expect(await screen.findByText('Ada Lovelace')).toBeTruthy()
+    await expect(screen.findByText('Ada Lovelace')).resolves.toBeDefined()
     expect(duplicateListFetches).toBe(0)
-    expect(await screen.findByText('4 of 12 loaded')).toBeTruthy()
-    expect(await screen.findByText('Page 1: 4 users')).toBeTruthy()
-    expect(
-      await screen.findByText('4 updates retained', undefined, { timeout: 3_000 }),
-    ).toBeTruthy()
-    expect(await screen.findByText('Current state: Ready')).toBeTruthy()
+    await expect(screen.findByText('4 of 12 loaded')).resolves.toBeDefined()
+    await expect(screen.findByText('Page 1: 4 users')).resolves.toBeDefined()
+    await expect(
+      screen.findByText('4 updates retained', undefined, { timeout: 3000 }),
+    ).resolves.toBeDefined()
+    await expect(screen.findByText('Current state: Ready')).resolves.toBeDefined()
 
     fireEvent.click(screen.getByRole('button', { name: 'Load next 4 users' }))
-    expect(await screen.findByText('Page 2: 4 users')).toBeTruthy()
-    expect(await screen.findByText('8 of 12 loaded')).toBeTruthy()
+    await expect(screen.findByText('Page 2: 4 users')).resolves.toBeDefined()
+    await expect(screen.findByText('8 of 12 loaded')).resolves.toBeDefined()
 
-    await act(() => router.navigate({ to: '/details' }))
-    expect(await screen.findByRole('heading', { name: 'Featured user' })).toBeTruthy()
-    expect(await screen.findByText('Ada Lovelace')).toBeTruthy()
+    await act(async () => router.navigate({ to: '/details' }))
+    await expect(screen.findByRole('heading', { name: 'Featured user' })).resolves.toBeDefined()
+    await expect(screen.findByText('Ada Lovelace')).resolves.toBeDefined()
 
-    await act(() => router.navigate({ to: '/' }))
+    await act(async () => router.navigate({ to: '/' }))
     fireEvent.click(
-      await screen.findByRole('button', { name: 'Add Grace Hopper' }, { timeout: 4_000 }),
+      await screen.findByRole('button', { name: 'Add Grace Hopper' }, { timeout: 4000 }),
     )
-    expect(await screen.findByText('Grace Hopper')).toBeTruthy()
-    expect(await screen.findByText('13 users in one response')).toBeTruthy()
+    await expect(screen.findByText('Grace Hopper')).resolves.toBeDefined()
+    await expect(screen.findByText('13 users in one response')).resolves.toBeDefined()
 
     unsubscribe()
   }, 15_000)
 
   it('shows declared failures, cancels queries, and renders the default 404', async () => {
-    const server = await Effect.runPromise(
-      startExampleRpcServer().pipe(Scope.provide(serverScope!)),
-    )
+    if (serverScope === undefined) {
+      throw new Error('Server scope was not initialized')
+    }
+    const server = await Effect.runPromise(startExampleRpcServer().pipe(Scope.provide(serverScope)))
     const router = await createTanStackStartRouter({
       history: createMemoryHistory({ initialEntries: ['/diagnostics'] }),
       rpcUrl: server.rpcUrl,
@@ -115,11 +117,11 @@ describe('TanStack Start hydration and client navigation', () => {
     expect(failure.textContent).toContain('DiagnosticFailure')
 
     fireEvent.click(screen.getByRole('button', { name: 'Start slow query' }))
-    expect(await screen.findByText('Ready to cancel')).toBeTruthy()
+    await expect(screen.findByText('Ready to cancel')).resolves.toBeDefined()
     fireEvent.click(screen.getByRole('button', { name: 'Cancel query' }))
-    expect(await screen.findByText('Server interruptions: 1')).toBeTruthy()
+    await expect(screen.findByText('Server interruptions: 1')).resolves.toBeDefined()
 
-    await act(() => router.navigate({ to: '/failure' }))
+    await act(async () => router.navigate({ to: '/failure' }))
     const refetchedFailure = await screen.findByRole('alert')
     expect(refetchedFailure.textContent).toContain('DiagnosticFailure')
 
@@ -127,6 +129,6 @@ describe('TanStack Start hydration and client navigation', () => {
       router.history.push('/missing')
       await router.load()
     })
-    expect(await screen.findByRole('heading', { name: 'Page not found' })).toBeTruthy()
+    await expect(screen.findByRole('heading', { name: 'Page not found' })).resolves.toBeDefined()
   })
 })

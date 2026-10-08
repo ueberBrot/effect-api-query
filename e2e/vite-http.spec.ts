@@ -1,4 +1,5 @@
-import { expect, test, type Request } from '@playwright/test'
+import { expect, test } from '@playwright/test'
+import type { Request } from '@playwright/test'
 
 import {
   isHttpRequest,
@@ -8,17 +9,21 @@ import {
 } from './example-application.ts'
 
 test.describe('Vite React HTTP API example', () => {
-  test.beforeEach(async ({ page }) => prepareExampleApplication(page, viteReactApplication))
+  test.beforeEach(async ({ page }) => {
+    await prepareExampleApplication(page, viteReactApplication)
+  })
 
   test('reuses the HTTP directory cache and skips an unselected user query', async ({ page }) => {
     const http = page.getByRole('region', { name: 'HTTP API example' })
     let listRequests = 0
     let lookupRequests = 0
     page.on('request', (request) => {
-      if (isHttpRequest(request, 'GET', '/users')) listRequests += 1
+      if (isHttpRequest(request, 'GET', '/users')) {
+        listRequests += 1
+      }
       if (
         request.method() === 'GET' &&
-        /\/api\/users\/\d+$/.test(new URL(request.url()).pathname)
+        /\/api\/users\/\d+$/u.test(new URL(request.url()).pathname)
       ) {
         lookupRequests += 1
       }
@@ -35,7 +40,8 @@ test.describe('Vite React HTTP API example', () => {
     const selection = http.getByLabel('HTTP user details')
     const lookup = page.waitForRequest((request) => isHttpRequest(request, 'GET', '/users/2'))
     await selection.selectOption('2')
-    expect(new URL((await lookup).url()).searchParams.get('locale')).toBe('fr')
+    const lookupRequest = await lookup
+    expect(new URL(lookupRequest.url()).searchParams.get('locale')).toBe('fr')
     await expect(http.getByText('HTTP selected: Edsger Dijkstra, locale fr')).toBeVisible()
     expect(lookupRequests).toBe(1)
     await selection.selectOption('')
@@ -69,11 +75,11 @@ test.describe('Vite React HTTP API example', () => {
     const deletion = page.waitForResponse(
       (response) =>
         response.request().method() === 'DELETE' &&
-        /\/api\/users\/\d+$/.test(new URL(response.url()).pathname),
+        /\/api\/users\/\d+$/u.test(new URL(response.url()).pathname),
     )
     await http.getByRole('button', { name: 'Delete HTTP RPC pioneer', exact: true }).click()
-    const response = await deletion
-    expect(response.status()).toBe(204)
+    const deletionResponse = await deletion
+    expect(deletionResponse.status()).toBe(204)
     await expect(http.getByText('HTTP delete result: undefined')).toBeVisible()
     await expect(page.getByText('RPC pioneer', { exact: true })).toHaveCount(0)
     await expect(http.getByText('HTTP: RPC pioneer', { exact: true })).toHaveCount(0)
@@ -122,7 +128,9 @@ test.describe('Vite React HTTP API example', () => {
     const http = page.getByRole('region', { name: 'HTTP API example' })
     let httpSettled = false
     const observeCompletion = (completed: Request) => {
-      if (isHttpRequest(completed, 'GET', '/diagnostics/slow')) httpSettled = true
+      if (isHttpRequest(completed, 'GET', '/diagnostics/slow')) {
+        httpSettled = true
+      }
     }
     page.on('requestfinished', observeCompletion)
     page.on('requestfailed', observeCompletion)
@@ -140,7 +148,10 @@ test.describe('Vite React HTTP API example', () => {
     const statusUrl = new URL(request.url())
     const operationId = statusUrl.searchParams.get('operationId')
     expect(operationId).not.toBeNull()
-    statusUrl.pathname = `/api/diagnostics/operations/${encodeURIComponent(operationId!)}`
+    if (operationId === null) {
+      throw new Error('The started HTTP query must include its operation ID')
+    }
+    statusUrl.pathname = `/api/diagnostics/operations/${encodeURIComponent(operationId)}`
     statusUrl.search = ''
     const status = await page.request.get(statusUrl.toString())
     expect(status.ok()).toBe(true)

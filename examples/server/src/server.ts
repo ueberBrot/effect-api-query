@@ -1,10 +1,13 @@
-import { Effect, Schema } from 'effect'
-import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
+import { Effect, Predicate, Schema } from 'effect'
+import { createServer } from 'node:http'
+import type { IncomingMessage, ServerResponse } from 'node:http'
 import { Readable } from 'node:stream'
 
 import { acquireNodeServer, closeNodeServer } from './node-server-resource.ts'
 import { makeExampleWebHandler } from './web-handler.ts'
 
+// Effect Schema.TaggedError is a curried class factory; only instances use new.
+// oxlint-disable-next-line unicorn/throw-new-error
 class ExampleRpcServerError extends Schema.TaggedError<ExampleRpcServerError>()(
   'ExampleRpcServerError',
   {
@@ -17,7 +20,9 @@ const nodeHeaders = (request: IncomingMessage): Headers => {
   const headers = new Headers()
   for (const [name, value] of Object.entries(request.headers)) {
     if (Array.isArray(value)) {
-      for (const entry of value) headers.append(name, entry)
+      for (const entry of value) {
+        headers.append(name, entry)
+      }
     } else if (value !== undefined) {
       headers.set(name, value)
     }
@@ -27,35 +32,54 @@ const nodeHeaders = (request: IncomingMessage): Headers => {
 
 const toWebRequest = (request: IncomingMessage, response: ServerResponse, url: URL): Request => {
   const controller = new AbortController()
-  request.once('aborted', () => controller.abort())
+  request.once('aborted', () => {
+    controller.abort()
+  })
   request.once('close', () => {
-    if (!request.complete) controller.abort()
+    if (!request.complete) {
+      controller.abort()
+    }
   })
   response.once('close', () => {
-    if (!response.writableFinished) controller.abort()
+    if (!response.writableFinished) {
+      controller.abort()
+    }
   })
 
   const method = request.method ?? 'GET'
   const hasBody = method !== 'GET' && method !== 'HEAD'
-  return new Request(url, {
-    body: hasBody ? (Readable.toWeb(request) as ReadableStream) : undefined,
-    duplex: hasBody ? 'half' : undefined,
+  const requestInit: RequestInit & { duplex?: 'half' } = {
     headers: nodeHeaders(request),
     method,
     signal: controller.signal,
-  } as RequestInit)
+  }
+  if (hasBody) {
+    // SAFETY: IncomingMessage emits bytes and toWeb exposes the Web stream protocol
+    // consumed by Request; Node and DOM declarations use different stream types.
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+    requestInit.body = Readable.toWeb(request) as BodyInit
+    requestInit.duplex = 'half'
+  }
+  return new Request(url, requestInit)
 }
 
 const writeWebResponse = async (response: Response, target: ServerResponse): Promise<void> => {
   target.statusCode = response.status
-  response.headers.forEach((value, name) => target.setHeader(name, value))
+  for (const [name, value] of response.headers) {
+    target.setHeader(name, value)
+  }
   if (response.body === null) {
     target.end()
     return
   }
 
+  // Node's Web stream type and the DOM stream share the same protocol at this bridge.
+  // oxlint-disable-next-line promise/avoid-new
   await new Promise<void>((resolve, reject) => {
-    const body = Readable.fromWeb(response.body as never)
+    // SAFETY: Response.body is a byte stream implementing the same Web stream
+    // protocol Node consumes; only the Node/DOM declaration sets differ.
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+    const body = Readable.fromWeb(response.body as Parameters<typeof Readable.fromWeb>[0])
     body.once('error', reject)
     target.once('error', reject)
     target.once('finish', resolve)
@@ -96,7 +120,7 @@ export const startExampleRpcServer = Effect.fn('ExampleRpc.startExampleRpcServer
   const webHandler = yield* makeExampleWebHandler()
   const server = createServer((request, response) => {
     const address = server.address()
-    const port = typeof address === 'object' && address !== null ? address.port : 0
+    const port = address === null || Predicate.isString(address) ? 0 : address.port
     const origin = `http://${host}:${String(port)}`
     let url: URL
     try {
@@ -139,20 +163,24 @@ export const startExampleRpcServer = Effect.fn('ExampleRpc.startExampleRpcServer
       response.end()
       return
     }
-    void Promise.resolve()
-      .then(() => webHandler(webRequest))
-      .then((webResponse) => writeWebResponse(webResponse, response))
-      .catch((cause: unknown) => {
-        console.error(cause)
-        if (!response.headersSent) response.statusCode = 500
+    void (async () => {
+      try {
+        const webResponse = await webHandler(webRequest)
+        await writeWebResponse(webResponse, response)
+      } catch (error) {
+        console.error(error)
+        if (!response.headersSent) {
+          response.statusCode = 500
+        }
         response.end()
-      })
+      }
+    })()
   })
 
   const port = yield* acquireNodeServer(
     server,
     Effect.callback<number, ExampleRpcServerError>((resume) => {
-      const onError = (cause: Error) =>
+      const onError = (cause: Error) => {
         resume(
           Effect.fail(
             new ExampleRpcServerError({
@@ -161,13 +189,14 @@ export const startExampleRpcServer = Effect.fn('ExampleRpc.startExampleRpcServer
             }),
           ),
         )
+      }
       server.once('error', onError)
       server.listen(options.port ?? 0, host, () => {
         server.off('error', onError)
         const address = server.address()
-        if (address === null || typeof address === 'string') {
+        if (address === null || Predicate.isString(address)) {
           resume(
-            Effect.promise(() => closeNodeServer(server)).pipe(
+            Effect.promise(async () => closeNodeServer(server)).pipe(
               Effect.andThen(
                 Effect.fail(
                   new ExampleRpcServerError({

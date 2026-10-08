@@ -1,5 +1,6 @@
-import { experimental_streamedQuery, type QueryFunctionContext } from '@tanstack/query-core'
-import { Cause, Exit, Stream } from 'effect'
+import { experimental_streamedQuery } from '@tanstack/query-core'
+import type { QueryFunctionContext } from '@tanstack/query-core'
+import { Cause, Exit, Predicate, Stream } from 'effect'
 
 import type { StreamingOperation } from '../core/operation'
 import type { RunPromiseExit } from '../core/types'
@@ -41,13 +42,15 @@ const abortableAsyncIterable = <A>(
   [Symbol.asyncIterator]() {
     const iterator = source[Symbol.asyncIterator]()
     let closePromise: Promise<IteratorResult<A>> | undefined
-    const detach = () => signal.removeEventListener('abort', onAbort)
-    const close = () => {
+    // This callback runs after the listener has been initialized below.
+    const detach = () => {
+      // oxlint-disable-next-line eslint/no-use-before-define
+      signal.removeEventListener('abort', onAbort)
+    }
+    const close = async () => {
       closePromise ??= (async () => {
         try {
-          return (
-            (await iterator.return?.()) ?? ({ done: true, value: undefined } as IteratorResult<A>)
-          )
+          return (await iterator.return?.()) ?? { done: true, value: undefined }
         } finally {
           detach()
         }
@@ -55,26 +58,36 @@ const abortableAsyncIterable = <A>(
       return closePromise
     }
     const onAbort = () => {
-      void close().catch(() => undefined)
+      // Abort listeners are synchronous; attach cleanup rejection handling immediately.
+      // oxlint-disable-next-line promise/prefer-await-to-then
+      void close().catch(() => {
+        // The pending iterator pull or explicit return reports failures to Query Core.
+      })
     }
     signal.addEventListener('abort', onAbort, { once: true })
 
     return {
       async next() {
-        if (signal.aborted) return close()
+        if (signal.aborted) {
+          return await close()
+        }
         try {
           const result = await iterator.next()
-          if (result.done) detach()
+          if (result.done === true) {
+            detach()
+          }
           return result
-        } catch (cause) {
+        } catch (error) {
           detach()
-          throw cause
+          throw error
         }
       },
       return: close,
       async throw(cause?: unknown) {
         detach()
-        if (iterator.throw !== undefined) return iterator.throw(cause)
+        if (iterator.throw !== undefined) {
+          return await iterator.throw(cause)
+        }
         await close()
         throw cause
       },
@@ -89,14 +102,18 @@ const requireFirstValue = <A>(source: AsyncIterable<A>, rpcTag: string): AsyncIt
     return {
       async next() {
         const result = await iterator.next()
-        if (result.done && !emitted) throw new EffectRpcQueryEmptyStreamError(rpcTag)
+        if (result.done === true && !emitted) {
+          throw new EffectRpcQueryEmptyStreamError(rpcTag)
+        }
         emitted = true
         return result
       },
-      return: (value?: unknown) =>
+      return: async (value?: unknown) =>
         iterator.return?.(value) ?? Promise.resolve({ done: true, value: undefined }),
       async throw(cause?: unknown) {
-        if (iterator.throw !== undefined) return iterator.throw(cause)
+        if (iterator.throw !== undefined) {
+          return await iterator.throw(cause)
+        }
         await iterator.return?.()
         throw cause
       },
@@ -121,8 +138,12 @@ const makeStreamQuery = ({
       ),
     )
     // Capture the runner's Context so iterator pulls use the caller-owned runtime.
+    // The injected runner provides the erased caller-owned service requirements.
+    // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
     const exit = await runPromiseExit(Stream.toAsyncIterableEffect(stream), { signal })
-    if (Exit.isFailure(exit)) throw new EffectRpcQueryError(rpc.tag, operation, exit.cause)
+    if (Exit.isFailure(exit)) {
+      throw new EffectRpcQueryError(rpc.tag, operation, exit.cause)
+    }
     const iterable = abortableAsyncIterable(exit.value, signal)
     return policy._tag === 'Live' ? requireFirstValue(iterable, rpc.tag) : iterable
   }
@@ -136,15 +157,21 @@ const makeStreamQuery = ({
   }
 
   const { maxChunks, refetchMode = 'reset' } = policy
-  if (maxChunks === undefined) return experimental_streamedQuery({ refetchMode, streamFn })
+  if (maxChunks === undefined) {
+    return experimental_streamedQuery({ refetchMode, streamFn })
+  }
 
   return async (context: QueryFunctionContext) => {
     const reset =
       refetchMode === 'reset' &&
-      context.client.getQueryCache().find({ queryKey: context.queryKey, exact: true })?.isFetched()
+      context.client
+        .getQueryCache()
+        .find({ queryKey: context.queryKey, exact: true })
+        ?.isFetched() === true
     let emitted = false
+    const initialValue: unknown[] = []
     const queryFn = experimental_streamedQuery({
-      initialValue: [] as unknown[],
+      initialValue,
       reducer: (values: unknown[], value: unknown) => {
         // Query Core restores initialData on reset; a refetch starts a fresh accumulation.
         const history = reset && !emitted ? [] : values
@@ -163,30 +190,38 @@ const makeStreamQuery = ({
 export const createStreamPreparation =
   (rpc: RpcStreamInvocation): StreamingOperation['prepareStream'] =>
   (options, operation, runPromiseExit, requestOptions) => {
+    // SAFETY: Public streamedOptions restricts this field to StreamRefetchMode;
+    // the options copy changes neither its value nor its contract.
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const refetchMode = options['refetchMode'] as StreamRefetchMode | undefined
     delete options['refetchMode']
-    const maxChunks = options['maxChunks'] as number | undefined
+    const { maxChunks } = options
     delete options['maxChunks']
     // Preparation also runs for skipped queries; invalid policy fails synchronously.
-    if (maxChunks !== undefined && (!Number.isSafeInteger(maxChunks) || maxChunks <= 0)) {
+    if (
+      maxChunks !== undefined &&
+      (!Predicate.isNumber(maxChunks) || !Number.isSafeInteger(maxChunks) || maxChunks <= 0)
+    ) {
       throw new EffectRpcQueryConfigError(
         'InvalidMaxChunks',
         'maxChunks must be a positive safe integer',
         { rpcTag: rpc.tag },
       )
     }
+    const policy: StreamQueryPolicy =
+      operation === 'live' ? { _tag: 'Live' } : { _tag: 'Accumulated' }
+    if (policy._tag === 'Accumulated') {
+      Object.assign(policy, refetchMode === undefined ? undefined : { refetchMode })
+      Object.assign(policy, maxChunks === undefined ? undefined : { maxChunks })
+    }
+    // SAFETY: takeRpcOptions extracted this unchanged from the typed public options.
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+    const rpcOptions = requestOptions as StreamingRpcOptions | undefined
     return (input) =>
       makeStreamQuery({
         input,
-        rpcOptions: requestOptions as StreamingRpcOptions | undefined,
-        policy:
-          operation === 'live'
-            ? { _tag: 'Live' }
-            : {
-                _tag: 'Accumulated',
-                ...(refetchMode === undefined ? {} : { refetchMode }),
-                ...(maxChunks === undefined ? {} : { maxChunks }),
-              },
+        rpcOptions,
+        policy,
         rpc,
         runPromiseExit,
       })

@@ -5,7 +5,7 @@ import { handleApiRequest } from '../lib/api-server.ts'
 export const Route = createFileRoute('/rpc')({
   server: {
     handlers: {
-      POST: ({ request }) => handleApiRequest(request),
+      POST: async ({ request }) => handleApiRequest(request),
     },
   },
 })

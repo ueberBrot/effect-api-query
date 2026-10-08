@@ -5,17 +5,7 @@ import { PageLayout, Panel } from '../components/page-layout.tsx'
 
 const featuredUserInput = { id: 1 } as const
 
-export const Route = createFileRoute('/details')({
-  component: FeaturedUserPage,
-  loader: async ({ context }) => {
-    await context.queryClient.query({
-      ...context.rpcQuery.users.get.queryOptions({ input: featuredUserInput }),
-      staleTime: 'static',
-    })
-  },
-})
-
-function FeaturedUserPage() {
+const FeaturedUserPage = () => {
   const { rpcQuery } = Route.useRouteContext()
   const featured = useSuspenseQuery(rpcQuery.users.get.queryOptions({ input: featuredUserInput }))
 
@@ -26,7 +16,7 @@ function FeaturedUserPage() {
     >
       <div className="mt-8">
         <Panel title={featured.data.name}>
-          <p className="mt-2 text-sm text-zinc-400">
+          <p className="mt-2 text-sm text-muted-foreground">
             User {featured.data.id}, locale {featured.data.locale}
           </p>
         </Panel>
@@ -34,3 +24,13 @@ function FeaturedUserPage() {
     </PageLayout>
   )
 }
+
+export const Route = createFileRoute('/details')({
+  component: FeaturedUserPage,
+  loader: async ({ context }) => {
+    await context.queryClient.query({
+      ...context.rpcQuery.users.get.queryOptions({ input: featuredUserInput }),
+      staleTime: 'static',
+    })
+  },
+})

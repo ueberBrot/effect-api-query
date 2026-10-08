@@ -1,8 +1,10 @@
-import { createRouter, type RouterHistory } from '@tanstack/react-router'
+import { createRouter } from '@tanstack/react-router'
+import type { RouterHistory } from '@tanstack/react-router'
 import { createIsomorphicFn } from '@tanstack/react-start'
 
 import { ErrorPage, NotFoundPage, PendingPage } from './components/router-status.tsx'
-import { startTanStackStartApplication, type TanStackStartApplication } from './lib/application.ts'
+import { startTanStackStartApplication } from './lib/application.ts'
+import type { TanStackStartApplication } from './lib/application.ts'
 import { setupQuerySsr } from './lib/query-ssr.ts'
 import { routeTree } from './routeTree.gen.ts'
 
@@ -19,8 +21,12 @@ export type CreateTanStackStartRouterOptions = RouterOptions &
   )
 
 const registerBrowserDisposal = (application: TanStackStartApplication): void => {
-  if (typeof window === 'undefined') return
-  const dispose = () => void application.dispose()
+  if (typeof window === 'undefined') {
+    return
+  }
+  const dispose = () => {
+    void application.dispose()
+  }
   window.addEventListener('pagehide', dispose, { once: true })
 }
 
@@ -28,6 +34,13 @@ export const createTanStackStartRouter = async (options: CreateTanStackStartRout
   const { history, isServer, scrollRestoration = true } = options
   const application =
     options.application ?? (await startTanStackStartApplication({ rpcUrl: options.rpcUrl }))
+  const navigation: { -readonly [Key in keyof RouterOptions]: RouterOptions[Key] } = {}
+  if (history !== undefined) {
+    navigation.history = history
+  }
+  if (isServer !== undefined) {
+    navigation.isServer = isServer
+  }
   const router = createRouter({
     context: application,
     defaultErrorComponent: ErrorPage,
@@ -36,8 +49,7 @@ export const createTanStackStartRouter = async (options: CreateTanStackStartRout
     defaultPendingMs: 150,
     defaultPreload: 'intent',
     defaultPreloadStaleTime: 0,
-    ...(history === undefined ? {} : { history }),
-    ...(isServer === undefined ? {} : { isServer }),
+    ...navigation,
     routeTree,
     scrollRestoration,
   })
@@ -49,7 +61,11 @@ export const createTanStackStartRouter = async (options: CreateTanStackStartRout
       ...router.serverSsrLifecycle,
       onServerSsrAttach: [
         ...(router.serverSsrLifecycle?.onServerSsrAttach ?? []),
-        (serverSsr) => serverSsr.onCleanup(() => void application.dispose()),
+        (serverSsr) => {
+          serverSsr.onCleanup(() => {
+            void application.dispose()
+          })
+        },
       ],
     }
   } else {
@@ -76,7 +92,7 @@ const rpcUrl = createIsomorphicFn()
   })
   .client(() => '/rpc')
 
-export const getRouter = () => createTanStackStartRouter({ rpcUrl: rpcUrl() })
+export const getRouter = async () => createTanStackStartRouter({ rpcUrl: rpcUrl() })
 
 declare module '@tanstack/react-router' {
   interface Register {

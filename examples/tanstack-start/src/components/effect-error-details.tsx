@@ -2,7 +2,7 @@ import { Cause } from 'effect'
 import { isEffectHttpApiQueryError, isEffectRpcQueryError } from 'effect-api-query'
 
 const alertClassName =
-  'mt-4 border border-red-900/80 border-l-4 border-l-red-600 bg-red-950/50 p-3 text-sm whitespace-pre-wrap text-red-200'
+  'mt-4 border border-destructive-900/80 border-l-4 border-l-destructive-600 bg-destructive-950/50 p-3 text-sm whitespace-pre-wrap text-destructive-200'
 
 export const EffectErrorDetails = ({ error }: { readonly error: unknown }) => {
   if (isEffectRpcQueryError(error) || isEffectHttpApiQueryError(error)) {

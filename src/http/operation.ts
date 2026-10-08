@@ -1,3 +1,4 @@
+import { Predicate } from 'effect'
 import type { Effect } from 'effect'
 import type { HttpApi } from 'effect/http-api'
 
@@ -8,6 +9,12 @@ import { createHttpRequestInput } from './request'
 
 interface HttpOperation extends UnaryOperation {
   readonly identity: HttpApiEndpointIdentity
+}
+
+export interface CompiledHttpOperations {
+  readonly operations: readonly UnaryOperation[]
+  readonly errors: TreeErrors
+  readonly keyEncoders: ReadonlyMap<string, RuntimeKeyEncoder>
 }
 
 const extractHttpEndpoints = (api: HttpApi.Top, client: unknown): readonly HttpOperation[] => {
@@ -21,22 +28,38 @@ const extractHttpEndpoints = (api: HttpApi.Top, client: unknown): readonly HttpO
         method: endpoint.method,
       }
       const input = createHttpRequestInput(endpoint, identity)
-      if (input === undefined) continue
-      const target = (
-        group.topLevel ? client : (client as Record<string, unknown>)[group.identifier]
-      ) as Record<string, (request: unknown) => Effect.Effect<unknown, unknown, unknown>>
+      if (input === undefined) {
+        continue
+      }
+      // SAFETY: The public client is tied to this Api. HttpApiClient mirrors group
+      // identifiers and topLevel placement, with the declaration's endpoint functions.
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+      const target = // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+        (group.topLevel ? client : (client as Record<string, unknown>)[group.identifier]) as Record<
+          string,
+          (request: unknown) => Effect.Effect<unknown, unknown, unknown>
+        >
       operations.push({
         identity,
         id: JSON.stringify([group.identifier, endpoint.identifier]),
         path: group.topLevel ? [endpoint.identifier] : [group.identifier, endpoint.identifier],
         kind: 'Unary',
         input,
-        takeOptions: () => undefined,
-        invoke: (input) =>
-          target[endpoint.identifier]!({
-            ...(input as object | undefined),
+        takeOptions: () => {
+          // HTTP has no adapter-owned options.
+        },
+        invoke: (requestInput) => {
+          const invoke = target[endpoint.identifier]
+          if (invoke === undefined) {
+            throw new TypeError(`Missing HTTP client endpoint ${endpoint.identifier}`)
+          }
+          // The ready client preserves caller errors and service requirements.
+          // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
+          return invoke.call(target, {
+            ...(Predicate.isObject(requestInput) ? requestInput : undefined),
             responseMode: 'decoded-only',
-          }),
+          })
+        },
         executionError: (operation, cause) =>
           new EffectHttpApiQueryError(identity, operation, cause),
       })
@@ -88,12 +111,8 @@ const httpTreeErrors = (api: HttpApi.Top, operations: readonly HttpOperation[]):
 export const compileHttpOperations = (
   api: HttpApi.Top,
   client: unknown,
-  suppliedEncoders: object | undefined,
-): {
-  readonly operations: readonly UnaryOperation[]
-  readonly errors: TreeErrors
-  readonly keyEncoders: ReadonlyMap<string, RuntimeKeyEncoder>
-} => {
+  suppliedEncoders: unknown,
+): CompiledHttpOperations => {
   const operations = extractHttpEndpoints(api, client)
   const errors = httpTreeErrors(api, operations)
   const encoderGroups = new Set(
@@ -102,9 +121,19 @@ export const compileHttpOperations = (
       .map((operation) => operation.identity.groupId),
   )
   const keyEncoders = new Map<string, RuntimeKeyEncoder>()
-  for (const [groupId, endpoints] of Object.entries(suppliedEncoders ?? {})) {
-    if (!encoderGroups.has(groupId)) throw errors.unknownEncoder(JSON.stringify([groupId]))
-    for (const [endpoint, encoder] of Object.entries(endpoints as object)) {
+  for (const [groupId, endpoints] of Object.entries(
+    Predicate.isObject(suppliedEncoders) ? suppliedEncoders : {},
+  )) {
+    if (!encoderGroups.has(groupId)) {
+      throw errors.unknownEncoder(JSON.stringify([groupId]))
+    }
+    if (!Predicate.isObject(endpoints)) {
+      throw new TypeError('HTTP key encoders must be grouped by endpoint')
+    }
+    for (const [endpoint, encoder] of Object.entries(endpoints)) {
+      // SAFETY: Public keyEncoders pairs each endpoint with a payload encoder;
+      // the runtime tree validates required callability and canonicalizes its result.
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion
       keyEncoders.set(JSON.stringify([groupId, endpoint]), encoder as RuntimeKeyEncoder)
     }
   }

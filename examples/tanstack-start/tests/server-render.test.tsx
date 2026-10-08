@@ -3,7 +3,8 @@ import { QueryClient } from '@tanstack/react-query'
 import { createMemoryHistory, RouterProvider } from '@tanstack/react-router'
 import { Deferred, Effect, Exit, Schema, Scope, Stream } from 'effect'
 import { createRpcQueryUtils } from 'effect-api-query'
-import { Rpc, type RpcClient, RpcGroup } from 'effect/rpc'
+import { Rpc, RpcGroup } from 'effect/rpc'
+import type { RpcClient } from 'effect/rpc'
 import { renderToString } from 'react-dom/server'
 import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test'
 
@@ -24,9 +25,10 @@ describe('TanStack Start server rendering', () => {
   })
 
   it('renders a cancelled server snapshot from generated query and stream options', async () => {
-    const server = await Effect.runPromise(
-      startExampleRpcServer().pipe(Scope.provide(serverScope!)),
-    )
+    if (serverScope === undefined) {
+      throw new Error('Server scope was not initialized')
+    }
+    const server = await Effect.runPromise(startExampleRpcServer().pipe(Scope.provide(serverScope)))
     const router = await createTanStackStartRouter({
       history: createMemoryHistory({ initialEntries: ['/'] }),
       rpcUrl: server.rpcUrl,
@@ -39,8 +41,8 @@ describe('TanStack Start server rendering', () => {
 
       expect(html).toContain('Ada Lovelace')
       expect(html).toContain('Edsger Dijkstra')
-      expect(html).toMatch(/4.*of.*12.*loaded/s)
-      expect(html).toMatch(/Page.*1/s)
+      expect(html).toMatch(/4.*of.*12.*loaded/su)
+      expect(html).toMatch(/Page.*1/su)
       expect(html).toContain('Accumulated stream')
       expect(html).toContain('Connection opened')
       expect(html).toContain('Current state:')
@@ -64,7 +66,7 @@ describe('TanStack Start server rendering', () => {
       expect(
         queryClient.getQueryState(rpcQuery.diagnostics.stream.streamedKey())?.fetchStatus,
       ).toBe('idle')
-      expect(queryClient.getQueryData(rpcQuery.diagnostics.stream.streamedKey())).toEqual([
+      expect(queryClient.getQueryData(rpcQuery.diagnostics.stream.streamedKey())).toStrictEqual([
         'Connection opened',
       ])
       expect(queryClient.getQueryState(rpcQuery.diagnostics.stream.liveKey())?.fetchStatus).toBe(
@@ -79,9 +81,10 @@ describe('TanStack Start server rendering', () => {
   })
 
   it('renders generated HTTP directory and page queries in the server snapshot', async () => {
-    const server = await Effect.runPromise(
-      startExampleRpcServer().pipe(Scope.provide(serverScope!)),
-    )
+    if (serverScope === undefined) {
+      throw new Error('Server scope was not initialized')
+    }
+    const server = await Effect.runPromise(startExampleRpcServer().pipe(Scope.provide(serverScope)))
     const router = await createTanStackStartRouter({
       history: createMemoryHistory({ initialEntries: ['/http'] }),
       rpcUrl: server.rpcUrl,
@@ -93,9 +96,9 @@ describe('TanStack Start server rendering', () => {
       const { httpQuery, queryClient, rpcQuery } = router.options.context
 
       expect(html).toContain('HTTP users')
-      expect(html).toMatch(/HTTP: (?:<!-- -->)?Ada Lovelace/)
-      expect(html).toMatch(/HTTP: (?:<!-- -->)?Edsger Dijkstra/)
-      expect(html).toMatch(/HTTP:.*4.*of.*12.*loaded/s)
+      expect(html).toMatch(/HTTP: (?:<!-- -->)?Ada Lovelace/u)
+      expect(html).toMatch(/HTTP: (?:<!-- -->)?Edsger Dijkstra/u)
+      expect(html).toMatch(/HTTP:.*4.*of.*12.*loaded/su)
       expect(html).toContain('HTTP user query skipped')
       expect(queryClient.getQueryData(httpQuery.users.list.queryKey())).toHaveLength(12)
       expect(
@@ -118,24 +121,28 @@ describe('TanStack Start server rendering', () => {
     async (cached) => {
       const Watch = Rpc.make('diagnostics.watch', { success: Schema.String, stream: true })
       const group = RpcGroup.make(Watch)
+      // Void is the deliberate success channel of this Effect factory.
+      // oxlint-disable-next-line typescript/no-invalid-void-type
       const finalized = Deferred.makeUnsafe<void>()
       const source = Stream.make('snapshot').pipe(
         Stream.concat(Stream.fromEffect(Effect.never)),
         Stream.ensuring(Deferred.succeed(finalized, undefined).pipe(Effect.asVoid)),
       )
-      const client = ((_tag: string, _payload: unknown) => source) as RpcClient.RpcClient.Flat<
-        RpcGroup.Rpcs<typeof group>
-      >
+      // SAFETY: This group contains only the watch RPC, whose handler always returns the typed source.
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+      const client = (() => source) as RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof group>>
       const queryClient = new QueryClient()
       const options = createRpcQueryUtils(group, {
         client,
         keyPrefix: ['start'] as const,
       }).diagnostics.watch.streamedOptions()
-      if (cached) queryClient.setQueryData(options.queryKey, ['previous'])
+      if (cached) {
+        queryClient.setQueryData(options.queryKey, ['previous'])
+      }
 
       const snapshot = await fetchStreamSnapshot(queryClient, options)
 
-      expect(snapshot).toEqual(['snapshot'])
+      expect(snapshot).toStrictEqual(['snapshot'])
       expect(queryClient.getQueryState(options.queryKey)?.fetchStatus).toBe('idle')
       expect(Deferred.isDoneUnsafe(finalized)).toBe(true)
     },
@@ -144,11 +151,17 @@ describe('TanStack Start server rendering', () => {
   it('settles and releases its listener when cancelled before the first streamed value', async () => {
     const Watch = Rpc.make('watch', { success: Schema.String, stream: true })
     const group = RpcGroup.make(Watch)
+    // Void is the deliberate success channel of this Effect factory.
+    // oxlint-disable-next-line typescript/no-invalid-void-type
     const started = Deferred.makeUnsafe<void>()
+    // Void is the deliberate success channel of this Effect factory.
+    // oxlint-disable-next-line typescript/no-invalid-void-type
     const finalized = Deferred.makeUnsafe<void>()
     const source = Stream.fromEffect(
       Deferred.succeed(started, undefined).pipe(Effect.andThen(Effect.never)),
     ).pipe(Stream.ensuring(Deferred.succeed(finalized, undefined).pipe(Effect.asVoid)))
+    // SAFETY: This group contains only the watch RPC, whose handler always returns the typed source.
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const client = (() => source) as RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof group>>
     const queryClient = new QueryClient()
     const options = createRpcQueryUtils(group, {
@@ -158,10 +171,9 @@ describe('TanStack Start server rendering', () => {
 
     try {
       const snapshot = fetchStreamSnapshot(queryClient, options)
-      const rejected = expect(snapshot).rejects.toMatchObject({
-        message: 'CancelledError',
-        revert: true,
-      })
+      const rejected = (async () => {
+        await expect(snapshot).rejects.toMatchObject({ message: 'CancelledError', revert: true })
+      })()
       await Effect.runPromise(Deferred.await(started))
       expect(queryClient.getQueryCache().hasListeners()).toBe(true)
       await queryClient.cancelQueries({ queryKey: options.queryKey, exact: true })
@@ -176,11 +188,15 @@ describe('TanStack Start server rendering', () => {
   it('releases its listener on failure and can take a fresh snapshot after a cached error', async () => {
     const Watch = Rpc.make('watch', { success: Schema.String, stream: true })
     const group = RpcGroup.make(Watch)
+    // Void is the deliberate success channel of this Effect factory.
+    // oxlint-disable-next-line typescript/no-invalid-void-type
     const finalized = Deferred.makeUnsafe<void>()
     const source = Stream.make('recovered').pipe(
       Stream.concat(Stream.fromEffect(Effect.never)),
       Stream.ensuring(Deferred.succeed(finalized, undefined).pipe(Effect.asVoid)),
     )
+    // SAFETY: This group contains only the watch RPC, whose handler always returns the typed source.
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const client = (() => source) as RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof group>>
     const queryClient = new QueryClient()
     const options = createRpcQueryUtils(group, {
@@ -193,12 +209,14 @@ describe('TanStack Start server rendering', () => {
       await expect(
         fetchStreamSnapshot(queryClient, {
           ...options,
-          queryFn: () => Promise.reject(failure),
+          queryFn: () => {
+            throw failure
+          },
         }),
       ).rejects.toBe(failure)
       expect(queryClient.getQueryCache().hasListeners()).toBe(false)
 
-      expect(await fetchStreamSnapshot(queryClient, options)).toEqual(['recovered'])
+      await expect(fetchStreamSnapshot(queryClient, options)).resolves.toStrictEqual(['recovered'])
       await Effect.runPromise(Deferred.await(finalized))
       expect(queryClient.getQueryCache().hasListeners()).toBe(false)
       expect(queryClient.isFetching()).toBe(0)

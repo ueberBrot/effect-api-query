@@ -2,30 +2,29 @@ import { Function, Predicate, SchemaAST } from 'effect'
 
 // Runtime Schema metadata erases encoding service types. Conservatively require a
 // custom encoder for encoding-side middleware; decoding-only middleware uses identity.
-export const containsUnsafeKeyEncoding = (
-  value: unknown,
-  seen = new WeakSet<object>(),
-): boolean => {
+export const containsUnsafeKeyEncoding = (value: unknown, seen = new WeakSet()): boolean => {
   if (!Predicate.isObjectOrArray(value) || seen.has(value)) {
     return false
   }
   seen.add(value)
 
-  const transformation = value as { readonly _tag?: unknown; readonly encode?: unknown }
-  if (transformation._tag === 'Middleware') {
-    return transformation.encode !== Function.identity
+  if (Predicate.hasProperty(value, '_tag') && value._tag === 'Middleware') {
+    return !Predicate.hasProperty(value, 'encode') || value.encode !== Function.identity
   }
 
   if (SchemaAST.isAST(value)) {
-    const representation = value.annotations?.['representation'] as
-      | { readonly id?: unknown }
-      | undefined
-    if (representation?.id === 'effect/schema/Redacted') {
+    const representation = value.annotations?.['representation']
+    if (
+      Predicate.hasProperty(representation, 'id') &&
+      representation.id === 'effect/schema/Redacted'
+    ) {
       return true
     }
     if (SchemaAST.isSuspend(value)) {
       try {
-        if (containsUnsafeKeyEncoding(value.thunk(), seen)) return true
+        if (containsUnsafeKeyEncoding(value.thunk(), seen)) {
+          return true
+        }
       } catch {
         return true
       }
