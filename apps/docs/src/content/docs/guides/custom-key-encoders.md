@@ -54,15 +54,19 @@ const http = createHttpApiQueryUtils(contract, {
 })
 ```
 
-Multiple buffered alternatives require an encoder even when they share a content type. For buffered
+Multiple non-multipart buffered alternatives require an encoder even when they share a content type. For buffered
 binary input, return a JSON-safe representation such as `{ bytes: Array.from(payload) }`; the ready
 client still receives the original `Uint8Array`.
 
 Encoding services or explicit `Redacted` values in any request part also require an encoder.
 The factory treats opaque encoding middleware conservatively at runtime. An encoder supplies
 identity only; the ready client still needs an execution runner when it requires services. The
-factory synchronously rejects encoder entries for unknown, omitted, or inputless endpoints during
+factory synchronously rejects encoder entries for unknown, omitted, inputless, or mutation-only endpoints during
 construction.
+
+Buffered multipart endpoints expose mutation builders only and require no query identity encoder,
+including endpoints with mixed plain and multipart payload alternatives. Keep these endpoints out of
+`keyEncoders`; pass `FormData` directly to their mutation instead.
 
 Keep ordinary authentication in client middleware. Partition the cache with safe tenant and user
 identifiers in `keyPrefix`, for example `['tenant', 'north', 'user', 'ada']`. The factory cannot infer

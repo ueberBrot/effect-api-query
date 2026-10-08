@@ -34,12 +34,21 @@ export type MultipartPayload =
   | Brand.Brand<HttpApiSchema.MultipartTypeId>
   | Brand.Brand<HttpApiSchema.MultipartStreamTypeId>
 
-/** Omits the complete endpoint when any declared alternative requires streaming or multipart. */
+/** Omits the complete endpoint when any success or multipart payload alternative streams. */
 export type Supported<Endpoint> = Endpoint extends HttpApiEndpoint.ConstraintRequest
   ? [Extract<ResponseBody<Endpoint['~Success']>, HttpApiSchema.StreamSchema>] extends [never]
-    ? [Extract<Endpoint['~Payload']['Type'], MultipartPayload>] extends [never]
+    ? [
+        Extract<Endpoint['~Payload']['Type'], Brand.Brand<HttpApiSchema.MultipartStreamTypeId>>,
+      ] extends [never]
       ? Endpoint
       : never
+    : never
+  : never
+
+/** Retains the endpoints whose requests can have canonical query identity. */
+export type Queryable<Endpoint> = Endpoint extends HttpApiEndpoint.ConstraintRequest
+  ? [Extract<Endpoint['~Payload']['Type'], MultipartPayload>] extends [never]
+    ? Endpoint
     : never
   : never
 
@@ -197,20 +206,12 @@ export type InfiniteBuilder<
   readonly [...Key, 'infinite']
 >
 
-export type Leaf<
+export type MutationLeaf<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Key extends readonly JsonValue[],
   ClientError,
 > = {
   readonly key: () => Key
-  readonly queryKey: void extends Request<Endpoint>
-    ? () => ConcreteKey<Endpoint, Key, ClientError>
-    : (input: Request<Endpoint>) => ConcreteKey<Endpoint, Key, ClientError>
-  readonly queryOptions: QueryBuilder<Endpoint, Key, ClientError>
-  readonly infiniteKey: void extends Request<Endpoint>
-    ? () => ConcreteInfiniteKey<Endpoint, Key, ClientError>
-    : (input: Request<Endpoint>) => ConcreteInfiniteKey<Endpoint, Key, ClientError>
-  readonly infiniteOptions: InfiniteBuilder<Endpoint, Key, ClientError>
   readonly mutationKey: () => readonly [...Key, 'mutation']
   readonly mutationOptions: <OnMutateResult = unknown>(
     options?: Omit<
@@ -230,6 +231,24 @@ export type Leaf<
     OnMutateResult
   >
 }
+
+export type Leaf<
+  Endpoint extends HttpApiEndpoint.ConstraintRequest,
+  Key extends readonly JsonValue[],
+  ClientError,
+> = MutationLeaf<Endpoint, Key, ClientError> &
+  ([Queryable<Endpoint>] extends [never]
+    ? unknown
+    : {
+        readonly queryKey: void extends Request<Endpoint>
+          ? () => ConcreteKey<Endpoint, Key, ClientError>
+          : (input: Request<Endpoint>) => ConcreteKey<Endpoint, Key, ClientError>
+        readonly queryOptions: QueryBuilder<Endpoint, Key, ClientError>
+        readonly infiniteKey: void extends Request<Endpoint>
+          ? () => ConcreteInfiniteKey<Endpoint, Key, ClientError>
+          : (input: Request<Endpoint>) => ConcreteInfiniteKey<Endpoint, Key, ClientError>
+        readonly infiniteOptions: InfiniteBuilder<Endpoint, Key, ClientError>
+      })
 
 /** An eager utility tree mirroring the ready HTTP client's literal properties. */
 export type HttpApiQueryUtils<
@@ -268,7 +287,7 @@ export type HttpApiKeyEncoder<Endpoint extends HttpApiEndpoint.ConstraintRequest
 ) => JsonValue
 
 export type InputEndpoints<Group> =
-  Supported<Endpoints<Group>> extends infer Endpoint
+  Queryable<Supported<Endpoints<Group>>> extends infer Endpoint
     ? Endpoint extends HttpApiEndpoint.ConstraintRequest
       ? void extends Request<Endpoint>
         ? never

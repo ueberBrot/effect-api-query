@@ -4,6 +4,7 @@ import { Effect, Exit, Predicate } from 'effect'
 import type { Cause } from 'effect'
 
 import type {
+  BufferedOperation,
   OperationDescription,
   RuntimeKeyEncoder,
   StreamingOperation,
@@ -207,7 +208,7 @@ const defineKey = (target: Record<string, unknown>, parts: readonly (JsonValue |
 
 // One preparation produces both the retained execution input and its immutable key.
 const prepareQuery = (
-  description: OperationDescription,
+  description: UnaryOperation | StreamingOperation,
   input: unknown,
   operationKey: readonly JsonValue[],
   keyEncoder: RuntimeKeyEncoder | undefined,
@@ -254,7 +255,7 @@ const finalizeQueryOptions = <QueryFn>(
 }
 
 const createQueryBuilders = (
-  description: OperationDescription,
+  description: UnaryOperation | StreamingOperation,
   operationKey: readonly JsonValue[],
   keyEncoder: RuntimeKeyEncoder | undefined,
   prepareExecution: (
@@ -337,25 +338,12 @@ const createInfiniteBuilders = (
   return { infiniteKey, infiniteOptions }
 }
 
-const createUnaryLeaf = (
-  description: UnaryOperation,
-  keyParts: readonly (JsonValue | string)[],
-  keyEncoder: RuntimeKeyEncoder | undefined,
+const createMutationBuilders = (
+  description: BufferedOperation,
+  operationKey: readonly JsonValue[],
   runPromiseExit: RunPromiseExit<unknown>,
 ) => {
-  const operationKey = freezeKey(keyParts)
-  const queryOperationKey = freezeKey([...operationKey, 'query'])
   const mutationKey = freezeKey([...operationKey, 'mutation'])
-
-  const query = createQueryBuilders(
-    description,
-    queryOperationKey,
-    keyEncoder,
-    (_options, requestOptions) =>
-      (input) =>
-      async ({ signal }: { readonly signal: AbortSignal }) =>
-        execute(description, 'query', input, runPromiseExit, requestOptions, signal),
-  )
 
   const mutationOptions = (argument: Record<string, unknown> = {}) => {
     const options = { ...argument }
@@ -367,12 +355,43 @@ const createUnaryLeaf = (
       mutationKey,
     }
   }
+  return { mutationKey: () => mutationKey, mutationOptions }
+}
+
+const createMutationLeaf = (
+  description: BufferedOperation,
+  keyParts: readonly (JsonValue | string)[],
+  runPromiseExit: RunPromiseExit<unknown>,
+) => {
+  const operationKey = freezeKey(keyParts)
+  return Object.freeze({
+    key: () => operationKey,
+    ...createMutationBuilders(description, operationKey, runPromiseExit),
+  })
+}
+
+const createUnaryLeaf = (
+  description: UnaryOperation,
+  keyParts: readonly (JsonValue | string)[],
+  keyEncoder: RuntimeKeyEncoder | undefined,
+  runPromiseExit: RunPromiseExit<unknown>,
+) => {
+  const operationKey = freezeKey(keyParts)
+  const queryOperationKey = freezeKey([...operationKey, 'query'])
+  const query = createQueryBuilders(
+    description,
+    queryOperationKey,
+    keyEncoder,
+    (_options, requestOptions) =>
+      (input) =>
+      async ({ signal }: { readonly signal: AbortSignal }) =>
+        execute(description, 'query', input, runPromiseExit, requestOptions, signal),
+  )
 
   return Object.freeze({
     ...createInfiniteBuilders(description, operationKey, keyEncoder, runPromiseExit),
     key: () => operationKey,
-    mutationKey: () => mutationKey,
-    mutationOptions,
+    ...createMutationBuilders(description, operationKey, runPromiseExit),
     queryKey: query.key,
     queryOptions: query.options,
   })
@@ -427,7 +446,7 @@ const validateKeyEncoders = (
 ) => {
   const supportedIds = new Set(
     operations
-      .filter((operation) => operation.input._tag !== 'Inputless')
+      .filter((operation) => operation.kind !== 'Mutation' && operation.input._tag !== 'Inputless')
       .map((operation) => operation.id),
   )
   for (const id of keyEncoders.keys()) {
@@ -437,6 +456,7 @@ const validateKeyEncoders = (
   }
   for (const operation of operations) {
     if (
+      operation.kind !== 'Mutation' &&
       operation.input._tag === 'Input' &&
       operation.input.requiresEncoder &&
       !Predicate.isFunction(keyEncoders.get(operation.id))
@@ -474,10 +494,15 @@ const insertLeaf = (
   if (leafName === undefined) {
     throw new TypeError('Validated operation paths must have a leaf')
   }
+  const keyParts = [...prefix, ...segments]
+  if (operation.kind === 'Mutation') {
+    branch[leafName] = createMutationLeaf(operation, keyParts, runPromiseExit)
+    return
+  }
   branch[leafName] =
     operation.kind === 'Streaming'
-      ? createStreamingLeaf(operation, [...prefix, ...segments], keyEncoder, runPromiseExit)
-      : createUnaryLeaf(operation, [...prefix, ...segments], keyEncoder, runPromiseExit)
+      ? createStreamingLeaf(operation, keyParts, keyEncoder, runPromiseExit)
+      : createUnaryLeaf(operation, keyParts, keyEncoder, runPromiseExit)
 }
 
 const createTree = (

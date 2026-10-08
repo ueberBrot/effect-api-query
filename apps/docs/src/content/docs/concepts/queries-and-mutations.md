@@ -3,9 +3,10 @@ title: Query and Mutation Operations
 description: Choose queries, mutations, pagination, or streams for your API calls.
 ---
 
-Every unary RPC leaf and retained HTTP endpoint has query, infinite-query, and mutation builders.
-Your application chooses how to use each operation; neither the RPC definition nor the HTTP
-method determines the builder. HTTP stream builders are deferred.
+Every unary RPC leaf and buffered HTTP endpoint without multipart has query, infinite-query,
+and mutation builders. Your application chooses how to use each operation; neither the RPC
+definition nor the HTTP method determines the builder. Buffered multipart HTTP endpoints expose
+mutations only. HTTP stream builders are deferred.
 
 Use a query when TanStack should cache a result by semantic request identity. For RPCs with a
 payload, the query key contains the normalized, canonical payload. TanStack can refetch or cancel the query.

@@ -23,19 +23,27 @@ export type OperationInput =
 export interface OperationIdentity {
   readonly id: string
   readonly path: readonly string[]
-  readonly input: OperationInput
   /** Removes adapter-owned fields from the fresh options copy. */
   readonly takeOptions: (options: Record<string, unknown>) => unknown
 }
 
-export interface UnaryOperation extends OperationIdentity {
-  readonly kind: 'Unary'
+export interface BufferedOperation extends OperationIdentity {
   readonly invoke: (input: unknown, options: unknown) => Effect.Effect<unknown, unknown, unknown>
   readonly executionError: (operation: UnaryQueryOperation, cause: Cause.Cause<unknown>) => Error
 }
 
+export interface UnaryOperation extends BufferedOperation {
+  readonly kind: 'Unary'
+  readonly input: OperationInput
+}
+
+export interface MutationOperation extends BufferedOperation {
+  readonly kind: 'Mutation'
+}
+
 export interface StreamingOperation extends OperationIdentity {
   readonly kind: 'Streaming'
+  readonly input: OperationInput
   /** Consumes and validates stream policy, including for skipped requests. */
   readonly prepareStream: (
     options: Record<string, unknown>,
@@ -45,7 +53,7 @@ export interface StreamingOperation extends OperationIdentity {
   ) => (input: unknown) => QueryFunction
 }
 
-export type OperationDescription = UnaryOperation | StreamingOperation
+export type OperationDescription = UnaryOperation | MutationOperation | StreamingOperation
 
 export interface TreeErrors {
   readonly invalidPrefix: (reason: 'Shape' | 'Value', cause?: unknown) => Error

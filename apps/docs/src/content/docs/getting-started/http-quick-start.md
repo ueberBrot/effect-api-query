@@ -90,7 +90,8 @@ Groups and endpoint identifiers retain their literal names. `users` and `get` pr
 
 ## Choose cache and resource ownership
 
-Every supported endpoint offers both query and mutation builders, regardless of HTTP method.
+Buffered endpoints without multipart offer both query and mutation builders, regardless of HTTP method.
+Buffered multipart endpoints expose mutations only; see [upload a file](/effect-api-query/guides/http-queries-and-mutations/#upload-a-file).
 Choose a query for an idempotent cached read and a mutation for a command. After a write, invalidate
 the affected keys explicitly. RPC and HTTP have separate key namespaces, so applications that
 expose the same resource through both must invalidate the affected keys in both namespaces.

@@ -4,8 +4,8 @@ description: Understand literal HTTP identifiers, top-level groups, and omitted 
 ---
 
 `createHttpApiQueryUtils` builds and freezes an HTTP utility tree when you call it with a literal
-Effect HttpApi declaration. Each endpoint in the tree has ordinary query, infinite-query, and
-mutation builders, regardless of its HTTP method.
+Effect HttpApi declaration. Buffered endpoints without multipart have ordinary query, infinite-query,
+and mutation builders. Buffered multipart endpoints have mutation builders only, regardless of HTTP method.
 
 | Declaration                                | Generated path                      |
 | ------------------------------------------ | ----------------------------------- |
@@ -22,10 +22,15 @@ custom key encoders still use their declaration group identifier. The factory re
 names, collisions, and invalid encoder configuration before returning any utilities.
 
 The factory omits an entire endpoint if any success alternative streams, including a stream
-wrapped with response headers, or any request alternative is multipart. It also omits groups
+wrapped with response headers, or any request alternative uses streaming multipart. It also omits groups
 containing only omitted endpoints. It never keeps just the buffered alternatives of a partially
 supported endpoint. Contradictory multipart metadata causes factory construction to fail. HTTP
-streams and multipart uploads remain deferred; use the ready client directly when you need them.
+streams and streaming multipart remain deferred; use the ready client directly when you need them.
+
+Any buffered multipart payload alternative makes the endpoint mutation-only, including an endpoint
+that also accepts ordinary payloads. Its leaf exposes `key()`, `mutationKey()`, and `mutationOptions()`.
+Files and other mutation variables do not become cache identity, so these leaves require no key
+encoder and reject encoder entries. See [upload a file](/effect-api-query/guides/http-queries-and-mutations/#upload-a-file).
 
 Raw-response modes are also deferred. Generated calls force decoded-only responses and exclude
 response controls from their input. See the [HTTP factory](/effect-api-query/reference/http-factory/)

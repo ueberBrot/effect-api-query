@@ -26,12 +26,20 @@ const multipartBrands = (schema: Schema.Top): ReadonlySet<string> => {
   return brands
 }
 
-const bufferedPayloads = (
+export type HttpRequestDescription =
+  | { readonly kind: 'Unary'; readonly input: OperationInput }
+  | { readonly kind: 'Mutation' }
+
+const classifyEndpoint = (
   endpoint: HttpApiEndpoint.Top,
   identity: HttpApiEndpointIdentity,
-): readonly Schema.Top[] | undefined => {
+):
+  | { readonly kind: 'Unary'; readonly schemas: readonly Schema.Top[] }
+  | { readonly kind: 'Mutation' }
+  | undefined => {
   const payloads: Schema.Top[] = []
   let multipart = false
+  let multipartStream = false
   for (const { encoding, schemas } of endpoint.payload.values()) {
     for (const schema of schemas) {
       const brands = multipartBrands(schema)
@@ -47,12 +55,13 @@ const bufferedPayloads = (
           identity,
         )
       }
-      multipart ||= encoding._tag === 'Multipart'
+      multipart ||= expectedBuffered
+      multipartStream ||= expectedStreamed
       payloads.push(schema)
     }
   }
   if (
-    multipart ||
+    multipartStream ||
     [...endpoint.success].some((schema) =>
       Predicate.hasProperty(
         HttpApiSchema.isWithHeaders(schema) ? schema.schema : schema,
@@ -62,7 +71,7 @@ const bufferedPayloads = (
   ) {
     return undefined
   }
-  return payloads
+  return multipart ? { kind: 'Mutation' } : { kind: 'Unary', schemas: payloads }
 }
 
 // HTTP omits undefined object members; arrays still undergo strict JSON validation.
@@ -115,15 +124,16 @@ const normalizeRequestKey = (value: unknown): unknown => {
   return request
 }
 
-/** Returns a complete input description, or omits an endpoint requiring streaming or multipart. */
-export const createHttpRequestInput = (
+/** Retains buffered multipart mutations and omits streaming requests or responses. */
+export const createHttpRequest = (
   endpoint: HttpApiEndpoint.Top,
   identity: HttpApiEndpointIdentity,
-): OperationInput | undefined => {
-  const payloads = bufferedPayloads(endpoint, identity)
-  if (payloads === undefined) {
-    return undefined
+): HttpRequestDescription | undefined => {
+  const classified = classifyEndpoint(endpoint, identity)
+  if (classified === undefined || classified.kind === 'Mutation') {
+    return classified
   }
+  const payloads = classified.schemas
   const fields: Record<string, Schema.Top> = {}
   if (endpoint.params !== undefined) {
     fields['params'] = endpoint.params
@@ -138,7 +148,7 @@ export const createHttpRequestInput = (
     fields['payload'] = Schema.Union(payloads)
   }
   if (Object.keys(fields).length === 0) {
-    return { _tag: 'Inputless' }
+    return { kind: 'Unary', input: { _tag: 'Inputless' } }
   }
   const schema = Schema.Struct(fields)
   const invalidKey = (cause: unknown) =>
@@ -149,36 +159,39 @@ export const createHttpRequestInput = (
       cause,
     )
   return {
-    _tag: 'Input',
-    requiresEncoder: payloads.length > 1 || containsUnsafeKeyEncoding(schema.ast),
-    pageInput: (input) => input,
-    invalidKey,
-    prepare: (input, encoder) => {
-      let keyValue: unknown
-      try {
-        if (encoder) {
-          keyValue = encoder(input)
-        } else {
-          // SAFETY: Middleware requiring encoding services needs a custom encoder;
-          // the remaining generated request schema can encode synchronously.
-          // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/no-chained-type-assertions
-          const encodingSchema = schema as unknown as Schema.ConstraintEncoder<unknown>
-          const encode = Schema.encodeUnknownSync(encodingSchema)
-          keyValue = encode(input)
+    kind: 'Unary',
+    input: {
+      _tag: 'Input',
+      requiresEncoder: payloads.length > 1 || containsUnsafeKeyEncoding(schema.ast),
+      pageInput: (input) => input,
+      invalidKey,
+      prepare: (input, encoder) => {
+        let keyValue: unknown
+        try {
+          if (encoder) {
+            keyValue = encoder(input)
+          } else {
+            // SAFETY: Middleware requiring encoding services needs a custom encoder;
+            // the remaining generated request schema can encode synchronously.
+            // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/no-chained-type-assertions
+            const encodingSchema = schema as unknown as Schema.ConstraintEncoder<unknown>
+            const encode = Schema.encodeUnknownSync(encodingSchema)
+            keyValue = encode(input)
+          }
+        } catch (error) {
+          throw new EffectHttpApiQueryKeyError(
+            encoder ? 'KeyEncoderFailed' : 'RequestEncodingFailed',
+            identity,
+            `Could not encode the HTTP key for ${identity.groupId}/${identity.endpoint}`,
+            error,
+          )
         }
-      } catch (error) {
-        throw new EffectHttpApiQueryKeyError(
-          encoder ? 'KeyEncoderFailed' : 'RequestEncodingFailed',
-          identity,
-          `Could not encode the HTTP key for ${identity.groupId}/${identity.endpoint}`,
-          error,
-        )
-      }
-      try {
-        return { input, keyValue: encoder ? keyValue : normalizeRequestKey(keyValue) }
-      } catch (error) {
-        throw invalidKey(error)
-      }
+        try {
+          return { input, keyValue: encoder ? keyValue : normalizeRequestKey(keyValue) }
+        } catch (error) {
+          throw invalidKey(error)
+        }
+      },
     },
   }
 }

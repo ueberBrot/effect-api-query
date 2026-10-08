@@ -9,7 +9,7 @@ A nested object derived from literal Effect RPC tags. Branches represent RPC nam
 _Avoid_: Router, generated client
 
 **HTTP utility tree**:
-A nested object derived from an Effect HttpApi's literal group and endpoint identifiers. Buffered endpoints provide typed key and option builders; endpoints in top-level groups appear at the root.
+A nested object derived from an Effect HttpApi's literal group and endpoint identifiers. Supported buffered endpoints provide typed key and option builders, with multipart endpoints limited to mutations; endpoints in top-level groups appear at the root.
 _Avoid_: RPC utility tree, generated client
 
 **Query data**:

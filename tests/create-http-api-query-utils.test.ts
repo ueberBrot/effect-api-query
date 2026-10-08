@@ -136,7 +136,7 @@ describe(createHttpApiQueryUtils, () => {
     }
   })
 
-  it('omits whole streaming and multipart endpoints and their empty groups', () => {
+  it('retains buffered multipart mutations and omits streaming endpoints and empty groups', () => {
     const streaming = HttpApiEndpoint.get('mixed', '/mixed', {
       success: [
         Schema.String,
@@ -162,13 +162,14 @@ describe(createHttpApiQueryUtils, () => {
       ),
     })
     const mixed = HttpApi.make('mixed').add(
-      HttpApiGroup.make('empty').add(
+      HttpApiGroup.make('uploads').add(
         streaming,
         wrapped,
         multipart,
         multipartStream,
         brandedMultipart,
       ),
+      HttpApiGroup.make('empty').add(streaming, wrapped, multipartStream),
       HttpApiGroup.make('kept').add(
         HttpApiEndpoint.get('read', '/read', { success: Schema.String }),
         streaming,
@@ -178,7 +179,16 @@ describe(createHttpApiQueryUtils, () => {
       client: unusedHttpClientFor(mixed),
       keyPrefix: ['test'],
     })
-    expect(Object.keys(utils)).toStrictEqual(['key', 'kept'])
+    expect(Object.keys(utils)).toStrictEqual(['key', 'uploads', 'kept'])
+    expect(Object.keys(utils.uploads)).toStrictEqual(['key', 'upload', 'brandedUpload'])
+    expect(utils.uploads.upload.mutationKey()).toStrictEqual([
+      'test',
+      'http',
+      'mixed',
+      'uploads',
+      'upload',
+      'mutation',
+    ])
     expect(Object.keys(utils.kept)).toStrictEqual(['key', 'read'])
   })
 

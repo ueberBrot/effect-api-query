@@ -11,10 +11,11 @@ For a step-by-step example, see [HTTP Queries and Mutations](/effect-api-query/g
 
 Ordinary groups appear as `utils[groupIdentifier][endpointIdentifier]`. Top-level groups place
 their endpoints at `utils[endpointIdentifier]`. Identifiers containing dots remain literal
-properties. Every retained branch and endpoint has `key()`; buffered endpoints also have
+properties. Every retained branch and endpoint has `key()`; buffered endpoints without multipart have
 `queryKey`, `queryOptions`, `mutationKey`, `mutationOptions`, `infiniteKey`, and `infiniteOptions`.
-Every buffered endpoint exposes all these builders regardless of HTTP method; the application
-chooses whether a call is a query or mutation.
+An endpoint with any buffered multipart payload alternative exposes only `key`, `mutationKey`, and
+`mutationOptions`, even when it also accepts plain payload alternatives. This classification applies
+regardless of HTTP method; applications choose the builder for endpoints with query support.
 
 ## Factory options
 
@@ -25,16 +26,21 @@ chooses whether a call is a query or mutation.
 | `runPromiseExit` | Required when exposed endpoints or the ready client need execution services. Service-free calls default to Effect's runner. |
 | `keyEncoders`    | Synchronous encoders keyed first by declaration group identifier, then endpoint identifier, including top-level groups.     |
 
-A key encoder receives the complete decoded HTTP request input and returns `JsonValue`. Request
-encoding services, explicit redacted values, and multiple payload alternatives require an encoder.
+A key encoder receives the complete decoded HTTP request input and returns `JsonValue`. For endpoints
+with query support, request encoding services, explicit redacted values, and multiple payload
+alternatives require an encoder.
 For alternatives, preserve every body and content-type distinction that affects the result. An
 encoder does not provide execution services; the runner remains independently required.
+Multipart mutation-only endpoints require no encoder and reject configured encoder entries.
 
 ## Request and result contract
 
 HTTP input contains the endpoint's declared `params`, `query`, `headers`, and `payload` parts in
-their decoded types. It does not apply RPC constructor defaults. Inputless queries need no input
-argument. Mutations receive the same decoded request shape as their variables.
+the ready client's request types. Params, query, headers, and ordinary payloads use decoded values;
+multipart payloads use `FormData`. Mixed plain and buffered multipart alternatives preserve the
+upstream client request union. Build multipart fields and files explicitly; the adapter forwards
+your `FormData` to the ready client. It does not apply RPC constructor defaults. Inputless queries
+need no input argument. Mutations receive the same complete request shape as their variables.
 
 Each declared container stays required even if all its fields are optional: a declared optional
 query filter still needs `input: { query: {} }`. A `Schema.FiniteFromString` field accepts a number,
@@ -57,7 +63,8 @@ See [client lifecycle](/effect-api-query/concepts/client-lifecycle/#http-clients
 and [cancellation](/effect-api-query/guides/cancellation/#cancel-an-http-query) for runtime ownership.
 
 Any streaming success alternative, including a header-wrapped stream, omits the complete endpoint.
-Any multipart request alternative does the same. Groups containing only omitted endpoints disappear.
+Any streaming multipart request alternative does the same. Buffered multipart alternatives retain
+the endpoint's mutation builders. Groups containing only omitted endpoints disappear.
 Factory construction rejects unsafe names, path collisions, and contradictory multipart metadata
 before returning a tree. Preserve literal declaration types so the inferred tree omits the same
 endpoints.
@@ -126,8 +133,8 @@ equal duplicates collapse and conflicting duplicates fail. Other values follow s
 JSON: finite numbers, plain objects, copied arrays, sorted object properties, cycle rejection, and
 deep freezing.
 
-Multiple effective payload schemas require a custom encoder, including alternatives with the same
-content type. Types enforce this requirement when declarations retain distinct schemas. Runtime
+For endpoints with query support, multiple effective payload schemas require a custom encoder,
+including alternatives with the same content type. Types enforce this requirement when declarations retain distinct schemas. Runtime
 validation also covers alternatives that the declaration types no longer distinguish. Buffered binary
 input needs an explicit JSON-safe projection because default keys cannot contain `Uint8Array`. See
 [custom key encoders](/effect-api-query/guides/custom-key-encoders/#http-requests).
@@ -144,6 +151,10 @@ These failures occur in `queryKey` or `queryOptions`, before the client runs. Mu
 does not encode a query key; request encoding runs inside the ready client's Effect. Custom encoder
 output follows strict JSON and bypasses the default HTTP rules for omitting `undefined` members
 and normalizing headers.
+
+Multipart mutation keys contain no request variables or files. `mutationKey()` identifies the
+operation, and `key()` retains the endpoint's normal invalidation prefix. Use mutation callbacks
+to invalidate the affected read endpoints. Multipart leaves have no query or infinite-query builders.
 
 `EffectHttpApiQueryError` wraps a failed execution `Exit`, identifies the API, group, endpoint,
 method, and operation, and preserves its complete Cause. The package adds no concrete request
