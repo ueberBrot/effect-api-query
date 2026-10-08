@@ -1,5 +1,38 @@
 @import 'tailwindcss';
 
+/* Semantic aliases preserve the examples' existing dark palette. */
+@theme inline {
+  --tracking-display: -0.04em;
+  --color-destructive-600: var(--color-red-600);
+  --color-background: #000;
+  --color-primary-foreground: #fff;
+  --color-card: #111113;
+  --color-shadow: #000;
+  --color-foreground: var(--color-zinc-50);
+  --color-text-primary: var(--color-zinc-100);
+  --color-text-secondary: var(--color-zinc-200);
+  --color-text-tertiary: var(--color-zinc-300);
+  --color-muted-foreground: var(--color-zinc-400);
+  --color-text-subtle: var(--color-zinc-500);
+  --color-placeholder: var(--color-zinc-600);
+  --color-border-strong: var(--color-zinc-700);
+  --color-border: var(--color-zinc-800);
+  --color-border-subtle: var(--color-zinc-900);
+  --color-muted: var(--color-zinc-900);
+  --color-brand-200: var(--color-violet-200);
+  --color-brand-300: var(--color-violet-300);
+  --color-brand-400: var(--color-violet-400);
+  --color-brand-500: var(--color-violet-500);
+  --color-brand-600: var(--color-violet-600);
+  --color-brand-800: var(--color-violet-800);
+  --color-brand-900: var(--color-violet-900);
+  --color-brand-950: var(--color-violet-950);
+  --color-destructive-200: var(--color-red-200);
+  --color-destructive-800: var(--color-red-800);
+  --color-destructive-900: var(--color-red-900);
+  --color-destructive-950: var(--color-red-950);
+}
+
 @layer base {
   :root {
     --app-black: #050505;

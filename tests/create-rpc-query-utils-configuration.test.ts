@@ -3,12 +3,11 @@ import { Context, Effect, Redacted, Schema } from 'effect'
 import { Rpc, RpcGroup } from 'effect/rpc'
 import type { RpcClient } from 'effect/rpc'
 
-import {
-  createRpcQueryUtils,
+import { createRpcQueryUtils, EffectRpcQueryKeyError } from '#effect-api-query'
+import type {
+  CreateRpcQueryUtilsOptions,
   EffectRpcQueryConfigError,
-  EffectRpcQueryKeyError,
-  type CreateRpcQueryUtilsOptions,
-  type JsonValue,
+  JsonValue,
 } from '#effect-api-query'
 
 import { group, makeClient, makeRpcTestClient } from './fixtures/effect-rpc'
@@ -17,31 +16,73 @@ const unusedClient = Effect.fn('TestRpc.unusedClient')(function* () {
   return yield* Effect.die('configuration tests must not execute RPCs')
 })
 
+// SAFETY: This key-only client fixture always fails if executed; it never runs an RPC.
+/* oxlint-disable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
 const unusedClientFor = <Group extends RpcGroup.Any>(_group: Group) =>
   unusedClient as unknown as RpcClient.RpcClient.Flat<RpcGroup.Rpcs<Group>>
+/* oxlint-enable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
+
+const captureKeyError = (run: () => readonly JsonValue[]): EffectRpcQueryKeyError => {
+  try {
+    run()
+  } catch (error) {
+    if (error instanceof EffectRpcQueryKeyError) {
+      return error
+    }
+    throw error
+  }
+  throw new Error('Expected key preparation to fail')
+}
 
 describe('createRpcQueryUtils configuration', () => {
+  it('rejects a key prefix when a getter removes a later enumerated property', () => {
+    const namespace = { first: 'stable', later: 'removed' } satisfies Record<string, JsonValue>
+    Object.defineProperty(namespace, 'first', {
+      enumerable: true,
+      get() {
+        Reflect.deleteProperty(namespace, 'later')
+        return 'stable'
+      },
+    })
+
+    expect(() =>
+      createRpcQueryUtils(group, {
+        client: unusedClientFor(group),
+        keyPrefix: ['app', namespace],
+      }),
+    ).toThrow(
+      expect.objectContaining<Partial<EffectRpcQueryConfigError>>({
+        _tag: 'EffectRpcQueryConfigError',
+        code: 'InvalidKeyPrefix',
+      }),
+    )
+  })
+
   it('ignores inherited key encoders for allowed Object prototype names', () => {
     const rpcGroup = RpcGroup.make(
       Rpc.make('toString', {
-        payload: { id: Schema.Number },
+        payload: { id: Schema.Finite },
         success: Schema.String,
       }),
     )
-    for (const keyEncoders of [undefined, {}, Object.create({ toString: () => 'shared' })]) {
-      const utils = createRpcQueryUtils(rpcGroup, {
-        client: unusedClientFor(rpcGroup),
-        keyPrefix: ['app'],
-        keyEncoders,
-      })
-      expect(utils.toString.queryKey({ id: 1 })).not.toEqual(utils.toString.queryKey({ id: 2 }))
+    const inheritedEncoders: Record<string, never> = {}
+    Object.setPrototypeOf(inheritedEncoders, { toString: () => 'shared' })
+    for (const keyEncoders of [undefined, {}, inheritedEncoders]) {
+      const options = { client: unusedClientFor(rpcGroup), keyPrefix: ['app'] as const }
+      const utils =
+        keyEncoders === undefined
+          ? createRpcQueryUtils(rpcGroup, options)
+          : createRpcQueryUtils(rpcGroup, { ...options, keyEncoders })
+      expect(utils.toString.queryKey({ id: 1 })).not.toStrictEqual(
+        utils.toString.queryKey({ id: 2 }),
+      )
     }
     const utils = createRpcQueryUtils(rpcGroup, {
       client: unusedClientFor(rpcGroup),
       keyPrefix: ['app'],
       keyEncoders: { toString: ({ id }) => id },
     })
-    expect(utils.toString.queryKey({ id: 1 })).toEqual(['app', 'rpc', 'toString', 'query', 1])
+    expect(utils.toString.queryKey({ id: 1 })).toStrictEqual(['app', 'rpc', 'toString', 'query', 1])
   })
 
   it('does not accept an inherited encoder for redacted payloads', () => {
@@ -51,11 +92,13 @@ describe('createRpcQueryUtils configuration', () => {
         success: Schema.String,
       }),
     )
+    const inheritedEncoders: Record<string, never> = {}
+    Object.setPrototypeOf(inheritedEncoders, { toString: () => 'safe' })
     expect(() =>
       createRpcQueryUtils(rpcGroup, {
         client: unusedClientFor(rpcGroup),
         keyPrefix: ['app'],
-        keyEncoders: Object.create({ toString: () => 'safe' }),
+        keyEncoders: inheritedEncoders,
       }),
     ).toThrow(expect.objectContaining({ code: 'MissingKeyEncoder' }))
   })
@@ -148,7 +191,10 @@ describe('createRpcQueryUtils configuration', () => {
     const First = Rpc.make('duplicates.read', { success: Schema.Literal('first') })
     const Duplicate = Rpc.make('duplicates.read', { success: Schema.Literal('second') })
     const duplicateGroup = RpcGroup.make(First)
+    // SAFETY: The test mutates the upstream request map to simulate duplicate paths the normal API prevents.
+    /* oxlint-disable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
     const requests = duplicateGroup.requests as unknown as Map<string, Rpc.Any>
+    /* oxlint-enable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
     requests.set('duplicate-map-key', Duplicate)
 
     expect(() =>
@@ -176,17 +222,21 @@ describe('createRpcQueryUtils configuration', () => {
     type UnsupportedOptions = CreateRpcQueryUtilsOptions<typeof unsupportedGroup, readonly ['app']>
     let encoderExecutions = 0
 
+    const unexpectedEncoder = () => {
+      encoderExecutions += 1
+      return null
+    }
     for (const rpcTag of ['health.ping', 'events.watch', 'unknown.read']) {
+      // SAFETY: Undeclared encoders deliberately exercise synchronous configuration validation.
+      /* oxlint-disable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
       const options = {
         client: unusedClientFor(unsupportedGroup),
         keyEncoders: {
-          [rpcTag]: () => {
-            encoderExecutions += 1
-            return null
-          },
+          [rpcTag]: unexpectedEncoder,
         },
         keyPrefix: ['app'] as const,
       } as unknown as UnsupportedOptions
+      /* oxlint-enable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
 
       expect(() => createRpcQueryUtils(unsupportedGroup, options)).toThrow(
         expect.objectContaining<Partial<EffectRpcQueryConfigError>>({
@@ -202,6 +252,8 @@ describe('createRpcQueryUtils configuration', () => {
   it.effect('reports non-JSON encoder output with a stable key error', () =>
     Effect.gen(function* () {
       const client = yield* makeClient()
+      // SAFETY: Invalid JSON encoder output is deliberate so key generation can reject it before execution.
+      /* oxlint-disable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
       const utils = createRpcQueryUtils(group, {
         client,
         keyEncoders: {
@@ -210,6 +262,7 @@ describe('createRpcQueryUtils configuration', () => {
         },
         keyPrefix: ['app'] as const,
       })
+      /* oxlint-enable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
 
       expect(() => utils.users.get.queryKey({ id: 1 })).toThrow(
         expect.objectContaining<Partial<EffectRpcQueryKeyError>>({
@@ -238,8 +291,8 @@ describe('createRpcQueryUtils configuration', () => {
 
       const key = utils.users.get.queryKey({ id: 1 })
 
-      expect(receivedPayload).toEqual({ id: 1, locale: 'en' })
-      expect(key).toEqual(['app', 'rpc', 'users', 'get', 'query', { id: 1, locale: 'en' }])
+      expect(receivedPayload).toStrictEqual({ id: 1, locale: 'en' })
+      expect(key).toStrictEqual(['app', 'rpc', 'users', 'get', 'query', { id: 1, locale: 'en' }])
       expect(Object.isFrozen(key.at(-1))).toBe(true)
     }),
   )
@@ -287,10 +340,13 @@ describe('createRpcQueryUtils configuration', () => {
       const client = yield* makeRpcTestClient(secretGroup, {
         'secrets.read': () => Effect.succeed('ok'),
       })
+      // SAFETY: A required encoder is deliberately omitted to verify synchronous configuration rejection.
+      /* oxlint-disable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
       const unsafeOptions = {
         client,
         keyPrefix: ['app'] as const,
       } as unknown as SecretOptions
+      /* oxlint-enable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
 
       expect(() => createRpcQueryUtils(secretGroup, unsafeOptions)).toThrow(
         expect.objectContaining<Partial<EffectRpcQueryConfigError>>({
@@ -314,7 +370,14 @@ describe('createRpcQueryUtils configuration', () => {
       const key = utils.secrets.read.queryKey({ secret: Redacted.make('do-not-key') })
 
       expect(receivedRedacted).toBe(true)
-      expect(key).toEqual(['app', 'rpc', 'secrets', 'read', 'query', { subject: 'current-user' }])
+      expect(key).toStrictEqual([
+        'app',
+        'rpc',
+        'secrets',
+        'read',
+        'query',
+        { subject: 'current-user' },
+      ])
       expect(JSON.stringify(key)).not.toContain('do-not-key')
     }),
   )
@@ -327,10 +390,13 @@ describe('createRpcQueryUtils configuration', () => {
     for (const payload of [Secret, Schema.Struct({ nested: Schema.Array(Secret) }), Encoded]) {
       const rpcGroup = RpcGroup.make(Rpc.make('read', { payload, success: Schema.String }))
       type Options = CreateRpcQueryUtilsOptions<typeof rpcGroup, readonly ['app']>
+      // SAFETY: Undeclared encoders deliberately exercise synchronous configuration validation.
+      /* oxlint-disable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
       const options = {
         client: unusedClientFor(rpcGroup),
         keyPrefix: ['app'],
       } as unknown as Options
+      /* oxlint-enable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
       expect(() => createRpcQueryUtils(rpcGroup, options)).toThrow(
         expect.objectContaining({ code: 'MissingKeyEncoder' }),
       )
@@ -338,7 +404,7 @@ describe('createRpcQueryUtils configuration', () => {
         createRpcQueryUtils(rpcGroup, {
           ...options,
           keyEncoders: { read: () => 'safe-identity' },
-        } as unknown as Options),
+        }),
       ).not.toThrow()
     }
   })
@@ -348,18 +414,20 @@ describe('createRpcQueryUtils configuration', () => {
       readonly name: string
       readonly children: readonly Tree[]
     }
-    const Tree = Schema.Struct({
+    const TreeSchema = Schema.Struct({
       name: Schema.String,
-      children: Schema.Array(Schema.suspend((): Schema.Codec<Tree> => Tree)),
+      children: Schema.Array(Schema.suspend((): Schema.Codec<Tree> => TreeSchema)),
     })
-    const rpcGroup = RpcGroup.make(Rpc.make('read', { payload: Tree, success: Schema.String }))
+    const rpcGroup = RpcGroup.make(
+      Rpc.make('read', { payload: TreeSchema, success: Schema.String }),
+    )
     const utils = createRpcQueryUtils(rpcGroup, {
       client: unusedClientFor(rpcGroup),
       keyPrefix: ['app'],
     })
     expect(
       utils.read.queryKey({ name: 'root', children: [{ name: 'leaf', children: [] }] }),
-    ).toEqual([
+    ).toStrictEqual([
       'app',
       'rpc',
       'read',
@@ -375,7 +443,7 @@ describe('createRpcQueryUtils configuration', () => {
       ) {}
       const Payload = Schema.Struct({ value: Schema.String }).pipe(
         Schema.middlewareEncoding((encoding) =>
-          Effect.flatMap(encoding, (encoded) => Effect.as(EncodingService, encoded)),
+          encoding.pipe(Effect.flatMap((encoded) => Effect.as(EncodingService, encoded))),
         ),
       )
       const Serviceful = Rpc.make('encoding.serviceful', {
@@ -387,10 +455,13 @@ describe('createRpcQueryUtils configuration', () => {
       const client = yield* makeRpcTestClient(servicefulGroup, {
         'encoding.serviceful': () => Effect.succeed('ok'),
       })
+      // SAFETY: A required encoder is deliberately omitted to verify synchronous configuration rejection.
+      /* oxlint-disable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
       const unsafeOptions = {
         client,
         keyPrefix: ['app'] as const,
       } as unknown as ServicefulOptions
+      /* oxlint-enable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
 
       expect(() => createRpcQueryUtils(servicefulGroup, unsafeOptions)).toThrow(
         expect.objectContaining<Partial<EffectRpcQueryConfigError>>({
@@ -399,6 +470,8 @@ describe('createRpcQueryUtils configuration', () => {
         }),
       )
 
+      // SAFETY: Only key generation is exercised here; the deliberately omitted execution runner cannot be called.
+      /* oxlint-disable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
       const safeOptions = {
         client,
         keyEncoders: {
@@ -406,9 +479,10 @@ describe('createRpcQueryUtils configuration', () => {
         },
         keyPrefix: ['app'] as const,
       } as unknown as ServicefulOptions
+      /* oxlint-enable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
       const utils = createRpcQueryUtils(servicefulGroup, safeOptions)
 
-      expect(utils.encoding.serviceful.queryKey({ value: 'safe' })).toEqual([
+      expect(utils.encoding.serviceful.queryKey({ value: 'safe' })).toStrictEqual([
         'app',
         'rpc',
         'encoding',
@@ -425,7 +499,9 @@ describe('createRpcQueryUtils configuration', () => {
         'DecodingService',
       ) {}
       const Payload = Schema.Struct({ value: Schema.String }).pipe(
-        Schema.middlewareDecoding((decoding) => Effect.flatMap(DecodingService, () => decoding)),
+        Schema.middlewareDecoding((decoding) =>
+          DecodingService.pipe(Effect.flatMap(() => decoding)),
+        ),
       )
       const DecodingOnly = Rpc.make('decoding.only', {
         payload: Payload,
@@ -438,12 +514,12 @@ describe('createRpcQueryUtils configuration', () => {
       const options: CreateRpcQueryUtilsOptions<typeof decodingGroup, readonly ['app']> = {
         client,
         keyPrefix: ['app'] as const,
-        runPromiseExit: Effect.runPromiseExit as never,
+        runPromiseExit: Effect.runPromiseExit,
       }
 
       const utils = createRpcQueryUtils(decodingGroup, options)
 
-      expect(utils.decoding.only.queryKey({ value: 'safe' })).toEqual([
+      expect(utils.decoding.only.queryKey({ value: 'safe' })).toStrictEqual([
         'app',
         'rpc',
         'decoding',
@@ -463,7 +539,10 @@ describe('createRpcQueryUtils configuration', () => {
           success: Schema.String,
         }),
       )
+      // SAFETY: The parsed fixture deliberately contains unsafe object keys so key validation can reject them.
+      /* oxlint-disable typescript/no-unsafe-type-assertion */
       const unsafe = JSON.parse(`{"${property}":null}`) as JsonValue
+      /* oxlint-enable typescript/no-unsafe-type-assertion */
       for (const value of [unsafe, { nested: [unsafe] }]) {
         const options = { client: unusedClientFor(rpcGroup), keyPrefix: ['app'] as const }
         expect(() =>
@@ -473,10 +552,10 @@ describe('createRpcQueryUtils configuration', () => {
           }),
         ).toThrow(expect.objectContaining({ code: 'InvalidKeyPrefix' }))
         for (const keyEncoders of [undefined, { read: () => value }]) {
-          const utils = createRpcQueryUtils(rpcGroup, {
-            ...options,
-            ...(keyEncoders === undefined ? {} : { keyEncoders }),
-          })
+          const utils =
+            keyEncoders === undefined
+              ? createRpcQueryUtils(rpcGroup, options)
+              : createRpcQueryUtils(rpcGroup, { ...options, keyEncoders })
           expect(() => utils.read.queryKey({ value })).toThrow(
             expect.objectContaining({ code: 'InvalidKeyValue' }),
           )
@@ -487,6 +566,7 @@ describe('createRpcQueryUtils configuration', () => {
 
   it.effect('rejects an own __proto__ property defined by an encoder', () =>
     Effect.gen(function* () {
+      // SAFETY: The fixture deliberately defines an own __proto__ property to exercise key rejection.
       const encoded = Object.defineProperty({}, '__proto__', {
         enumerable: true,
         value: 'semantic-value',
@@ -504,15 +584,3 @@ describe('createRpcQueryUtils configuration', () => {
     }),
   )
 })
-
-const captureKeyError = (run: () => unknown): EffectRpcQueryKeyError => {
-  try {
-    run()
-  } catch (error) {
-    if (error instanceof EffectRpcQueryKeyError) {
-      return error
-    }
-    throw error
-  }
-  throw new Error('Expected key preparation to fail')
-}

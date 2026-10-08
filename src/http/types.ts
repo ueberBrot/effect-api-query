@@ -91,6 +91,8 @@ export type ClientGroup<Group, Client> = Group extends { readonly topLevel: true
     ? Member<Client, Group['identifier']>
     : never
 /** Exact identity keeps related response-only overloads from ending the traversal early. */
+// Generic function comparison distinguishes overloads by exact type identity.
+/* oxlint-disable typescript/no-unnecessary-type-parameters */
 export type SeenMethod<Method, Seen extends readonly unknown[]> = Seen extends readonly [
   infer First,
   ...infer Rest,
@@ -99,6 +101,7 @@ export type SeenMethod<Method, Seen extends readonly unknown[]> = Seen extends r
     ? true
     : SeenMethod<Method, Rest>
   : false
+/* oxlint-enable typescript/no-unnecessary-type-parameters */
 /** Rotates overloads into a union so response-only calls cannot replace decoded execution. */
 export type MethodSignatures<
   Method,

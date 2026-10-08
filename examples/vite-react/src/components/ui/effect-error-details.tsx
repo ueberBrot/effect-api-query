@@ -8,7 +8,7 @@ export const EffectErrorDetails = ({ error }: { readonly error: unknown }) => {
       : `${error.groupId}.${error.endpoint}`
     return (
       <p
-        className="border border-l-4 border-red-900/80 border-l-red-600 bg-red-950/50 p-3 text-sm whitespace-pre-wrap text-red-200"
+        className="border border-l-4 border-destructive-900/80 border-l-destructive-600 bg-destructive-950/50 p-3 text-sm whitespace-pre-wrap text-destructive-200"
         role="alert"
       >
         {error.name} from {operation} ({error.operation})
@@ -20,7 +20,7 @@ export const EffectErrorDetails = ({ error }: { readonly error: unknown }) => {
 
   return error instanceof Error ? (
     <p
-      className="border border-l-4 border-red-900/80 border-l-red-600 bg-red-950/50 p-3 text-sm whitespace-pre-wrap text-red-200"
+      className="border border-l-4 border-destructive-900/80 border-l-destructive-600 bg-destructive-950/50 p-3 text-sm whitespace-pre-wrap text-destructive-200"
       role="alert"
     >
       {error.name}: {error.message}

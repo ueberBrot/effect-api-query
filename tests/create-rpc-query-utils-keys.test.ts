@@ -1,16 +1,24 @@
 import { describe, expect, it } from '@effect/vitest'
 import { dehydrate, hydrate, QueryClient } from '@tanstack/query-core'
-import { Effect, Schema, SchemaTransformation } from 'effect'
+import { Effect, Predicate, Schema, SchemaTransformation } from 'effect'
 import { Rpc, RpcGroup } from 'effect/rpc'
 
-import {
-  createRpcQueryUtils,
-  EffectRpcQueryConfigError,
-  EffectRpcQueryKeyError,
-  type JsonValue,
-} from '#effect-api-query'
+import { createRpcQueryUtils, EffectRpcQueryKeyError } from '#effect-api-query'
+import type { EffectRpcQueryConfigError, JsonValue } from '#effect-api-query'
 
 import { group, makeClient, makeRpcTestClient } from './fixtures/effect-rpc'
+
+const captureKeyError = (run: () => readonly JsonValue[]): EffectRpcQueryKeyError => {
+  try {
+    run()
+  } catch (error) {
+    if (error instanceof EffectRpcQueryKeyError) {
+      return error
+    }
+    throw error
+  }
+  throw new Error('Expected key preparation to fail')
+}
 
 describe('createRpcQueryUtils semantic keys', () => {
   it.effect(
@@ -24,16 +32,22 @@ describe('createRpcQueryUtils semantic keys', () => {
         })
         const options = utils.users.get.queryOptions({ input: { id: 1 } })
         const queryClient = new QueryClient()
-        const user = yield* Effect.promise(() => queryClient.query(options))
-        expect(queryClient.getQueryData(options.queryKey)).toEqual(user)
+        const user = yield* Effect.promise(async () => await queryClient.query(options))
+        expect(queryClient.getQueryData(options.queryKey)).toStrictEqual(user)
         queryClient.setQueryData(options.queryKey, { ...user, name: 'Updated' })
         expect(
           queryClient.getQueryCache().find({ queryKey: options.queryKey, exact: true })?.state.data,
-        ).toEqual({ ...user, name: 'Updated' })
+        ).toStrictEqual({ ...user, name: 'Updated' })
         expect(queryClient.getQueryCache().findAll({ queryKey: utils.key() })).toHaveLength(1)
         const hydrated = new QueryClient()
-        hydrate(hydrated, JSON.parse(JSON.stringify(dehydrate(queryClient))))
-        expect(hydrated.getQueryData(options.queryKey)).toEqual({ ...user, name: 'Updated' })
+        // SAFETY: The input comes from Query Core dehydration; this test intentionally verifies JSON serialization and hydration.
+        /* oxlint-disable typescript/no-unsafe-type-assertion, unicorn/prefer-structured-clone */
+        hydrate(
+          hydrated,
+          JSON.parse(JSON.stringify(dehydrate(queryClient))) as ReturnType<typeof dehydrate>,
+        )
+        /* oxlint-enable typescript/no-unsafe-type-assertion, unicorn/prefer-structured-clone */
+        expect(hydrated.getQueryData(options.queryKey)).toStrictEqual({ ...user, name: 'Updated' })
       }),
   )
 
@@ -50,7 +64,7 @@ describe('createRpcQueryUtils semantic keys', () => {
       mutableNamespace.nested.value = 2
       mutableNamespace.numbers[0] = 3
 
-      expect(utils.key()).toEqual([
+      expect(utils.key()).toStrictEqual([
         'app',
         {
           nested: { value: 1 },
@@ -76,11 +90,11 @@ describe('createRpcQueryUtils semantic keys', () => {
 
       const queryKey = utils.users.get.queryKey({ id: 1 })
 
-      expect(utils.key()).toEqual(queryKey.slice(0, 3))
-      expect(utils.users.key()).toEqual(queryKey.slice(0, 4))
-      expect(utils.users.get.key()).toEqual(queryKey.slice(0, 5))
-      expect(queryKey.slice(0, 6)).toEqual(['tenant', 42, 'rpc', 'users', 'get', 'query'])
-      expect(utils.users.get.mutationKey()).toEqual([
+      expect(utils.key()).toStrictEqual(queryKey.slice(0, 3))
+      expect(utils.users.key()).toStrictEqual(queryKey.slice(0, 4))
+      expect(utils.users.get.key()).toStrictEqual(queryKey.slice(0, 5))
+      expect(queryKey.slice(0, 6)).toStrictEqual(['tenant', 42, 'rpc', 'users', 'get', 'query'])
+      expect(utils.users.get.mutationKey()).toStrictEqual([
         'tenant',
         42,
         'rpc',
@@ -89,7 +103,14 @@ describe('createRpcQueryUtils semantic keys', () => {
         'mutation',
       ])
       expect(utils.users.get.mutationOptions().mutationKey).toBe(utils.users.get.mutationKey())
-      expect(utils.health.ping.queryKey()).toEqual(['tenant', 42, 'rpc', 'health', 'ping', 'query'])
+      expect(utils.health.ping.queryKey()).toStrictEqual([
+        'tenant',
+        42,
+        'rpc',
+        'health',
+        'ping',
+        'query',
+      ])
     }),
   )
 
@@ -103,7 +124,7 @@ describe('createRpcQueryUtils semantic keys', () => {
 
       const infiniteKey = utils.users.get.infiniteKey({ id: 1 })
 
-      expect(infiniteKey).toEqual([
+      expect(infiniteKey).toStrictEqual([
         'tenant',
         42,
         'rpc',
@@ -112,12 +133,12 @@ describe('createRpcQueryUtils semantic keys', () => {
         'infinite',
         { id: 1, locale: 'en' },
       ])
-      expect(infiniteKey).toEqual(utils.users.get.infiniteKey({ id: 1, locale: 'en' }))
-      expect(infiniteKey).not.toEqual(utils.users.get.queryKey({ id: 1 }))
-      expect(infiniteKey).not.toEqual(utils.users.get.mutationKey())
+      expect(infiniteKey).toStrictEqual(utils.users.get.infiniteKey({ id: 1, locale: 'en' }))
+      expect(infiniteKey).not.toStrictEqual(utils.users.get.queryKey({ id: 1 }))
+      expect(infiniteKey).not.toStrictEqual(utils.users.get.mutationKey())
       expect(Object.isFrozen(infiniteKey)).toBe(true)
       expect(Object.isFrozen(infiniteKey.at(-1))).toBe(true)
-      expect(utils.health.ping.infiniteKey()).toEqual([
+      expect(utils.health.ping.infiniteKey()).toStrictEqual([
         'tenant',
         42,
         'rpc',
@@ -151,29 +172,29 @@ describe('createRpcQueryUtils semantic keys', () => {
       })
       const Class = Rpc.make('shapes.class', { payload: ClassPayload })
       const Void = Rpc.make('shapes.void')
-      const shapes = RpcGroup.make(Struct, Defaulted, Transformed, Class, Void)
-      const client = yield* makeRpcTestClient(shapes, {
+      const payloadGroup = RpcGroup.make(Struct, Defaulted, Transformed, Class, Void)
+      const client = yield* makeRpcTestClient(payloadGroup, {
         'shapes.class': () => Effect.void,
         'shapes.defaulted': () => Effect.void,
         'shapes.struct': () => Effect.void,
         'shapes.transformed': () => Effect.void,
         'shapes.void': () => Effect.void,
       })
-      const utils = createRpcQueryUtils(shapes, {
+      const utils = createRpcQueryUtils(payloadGroup, {
         client,
         keyPrefix: ['app'] as const,
       })
 
-      expect(utils.shapes.struct.queryKey({ id: 1, name: 'Ada' }).at(-1)).toEqual({
+      expect(utils.shapes.struct.queryKey({ id: 1, name: 'Ada' }).at(-1)).toStrictEqual({
         id: 1,
         name: 'Ada',
       })
-      expect(utils.shapes.defaulted.queryKey({ id: 1 })).toEqual(
+      expect(utils.shapes.defaulted.queryKey({ id: 1 })).toStrictEqual(
         utils.shapes.defaulted.queryKey({ id: 1, locale: 'en' }),
       )
-      expect(utils.shapes.transformed.queryKey({ id: 42 }).at(-1)).toEqual({ id: '42' })
-      expect(utils.shapes.class.queryKey({ id: 1 }).at(-1)).toEqual({ id: 1 })
-      expect(utils.shapes.void.queryKey()).toEqual(['app', 'rpc', 'shapes', 'void', 'query'])
+      expect(utils.shapes.transformed.queryKey({ id: 42 }).at(-1)).toStrictEqual({ id: '42' })
+      expect(utils.shapes.class.queryKey({ id: 1 }).at(-1)).toStrictEqual({ id: 1 })
+      expect(utils.shapes.void.queryKey()).toStrictEqual(['app', 'rpc', 'shapes', 'void', 'query'])
     }),
   )
 
@@ -200,10 +221,13 @@ describe('createRpcQueryUtils semantic keys', () => {
       input.details.a = 99
       input.a = 'changed'
 
-      const canonical = key.at(-1) as Record<string, JsonValue>
-      expect(Object.keys(canonical)).toEqual(['a', 'details', 'z'])
-      expect(Object.keys(canonical['details'] as Record<string, JsonValue>)).toEqual(['a', 'z'])
-      expect(canonical).toEqual({ a: 'first', details: { a: 1, z: 2 }, z: 'last' })
+      const canonical = key.at(-1)
+      if (!Predicate.isObject(canonical) || !Predicate.isObject(canonical['details'])) {
+        throw new TypeError('Expected canonical nested payload objects')
+      }
+      expect(Object.keys(canonical)).toStrictEqual(['a', 'details', 'z'])
+      expect(Object.keys(canonical['details'])).toStrictEqual(['a', 'z'])
+      expect(canonical).toStrictEqual({ a: 'first', details: { a: 1, z: 2 }, z: 'last' })
       expect(Object.isFrozen(key)).toBe(true)
       expect(Object.isFrozen(canonical)).toBe(true)
       expect(Object.isFrozen(canonical['details'])).toBe(true)
@@ -223,23 +247,26 @@ describe('createRpcQueryUtils semantic keys', () => {
           return Effect.void
         },
       })
-      const cycle: Record<string, unknown> = {}
-      cycle['self'] = cycle
+      interface Cycle {
+        self?: Cycle
+      }
+      const cycle: Cycle = {}
+      cycle.self = cycle
       const sparse = ['removed', 'present']
       Reflect.deleteProperty(sparse, '0')
       const inheritedSparse = ['removed', 'present']
       Reflect.deleteProperty(inheritedSparse, '0')
-      const inheritedArrayPrototype = Object.create(Array.prototype) as Array<unknown>
-      inheritedArrayPrototype[0] = 'inherited'
+      const inheritedArrayPrototype = { 0: 'inherited' }
+      Object.setPrototypeOf(inheritedArrayPrototype, Array.prototype)
       Object.setPrototypeOf(inheritedSparse, inheritedArrayPrototype)
-      const invalidValues: ReadonlyArray<unknown> = [
+      const invalidValues: readonly unknown[] = [
         undefined,
         Number.NaN,
         Number.POSITIVE_INFINITY,
         Number.NEGATIVE_INFINITY,
         1n,
         Symbol('invalid'),
-        () => undefined,
+        () => {},
         sparse,
         inheritedSparse,
         cycle,
@@ -296,9 +323,12 @@ describe('createRpcQueryUtils semantic keys', () => {
         keyPrefix: ['app'] as const,
       })
 
+      // SAFETY: An invalid literal payload exercises construction failure without retaining the supplied secret.
+      /* oxlint-disable typescript/no-unsafe-type-assertion */
       const construction = captureKeyError(() =>
         utils.errors.construction.queryKey({ secret: 'do-not-retain' as 'expected' }),
       )
+      /* oxlint-enable typescript/no-unsafe-type-assertion */
       expect(construction).toMatchObject({
         code: 'PayloadConstructionFailed',
         rpcTag: 'errors.construction',
@@ -320,7 +350,7 @@ describe('createRpcQueryUtils semantic keys', () => {
   )
 
   it('rejects invalid runtime prefixes before returning a utility tree', () => {
-    const invalidPrefixes: ReadonlyArray<unknown> = [
+    const invalidPrefixes: readonly unknown[] = [
       [],
       ['app', undefined],
       ['app', Number.NaN],
@@ -328,6 +358,8 @@ describe('createRpcQueryUtils semantic keys', () => {
     ]
 
     for (const keyPrefix of invalidPrefixes) {
+      // SAFETY: Invalid runtime prefixes deliberately bypass the tuple contract; client execution is never reached.
+      /* oxlint-disable typescript/no-unsafe-type-assertion */
       expect(() =>
         createRpcQueryUtils(group, {
           client: (() => Effect.void) as never,
@@ -338,18 +370,7 @@ describe('createRpcQueryUtils semantic keys', () => {
           code: 'InvalidKeyPrefix',
         }),
       )
+      /* oxlint-enable typescript/no-unsafe-type-assertion */
     }
   })
 })
-
-const captureKeyError = (run: () => unknown): EffectRpcQueryKeyError => {
-  try {
-    run()
-  } catch (error) {
-    if (error instanceof EffectRpcQueryKeyError) {
-      return error
-    }
-    throw error
-  }
-  throw new Error('Expected key preparation to fail')
-}

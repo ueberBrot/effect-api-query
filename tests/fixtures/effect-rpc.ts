@@ -45,9 +45,10 @@ const handlersLayer = group.toLayer(handlers)
 /** Acquires an official in-memory flat client for an RPC group and its handlers. */
 export const makeRpcTestClient = Effect.fn('TestRpc.makeRpcTestClient')(function* <
   Rpcs extends Rpc.Any,
->(rpcGroup: RpcGroup.RpcGroup<Rpcs>, handlers: RpcGroup.HandlersFrom<Rpcs>) {
+  const Handlers extends RpcGroup.HandlersFrom<Rpcs>,
+>(rpcGroup: RpcGroup.RpcGroup<Rpcs>, rpcHandlers: Handlers) {
   return yield* RpcTest.makeClient(rpcGroup, { flatten: true }).pipe(
-    Effect.provide(rpcGroup.toLayer(handlers)),
+    Effect.provide(rpcGroup.toLayer(rpcHandlers)),
   )
 })
 

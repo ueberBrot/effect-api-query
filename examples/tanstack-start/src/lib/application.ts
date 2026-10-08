@@ -1,8 +1,10 @@
 import { exampleHttpApi, exampleRpcGroup } from '@effect-api-query/contracts'
-import { type ExampleRpcClient, startExampleRpcClient } from '@effect-api-query/contracts/client'
+import { startExampleRpcClient } from '@effect-api-query/contracts/client'
+import type { ExampleRpcClient } from '@effect-api-query/contracts/client'
 import { QueryClient } from '@tanstack/react-query'
 import { ManagedRuntime } from 'effect'
-import { createHttpApiQueryUtils, createRpcQueryUtils, type RunPromiseExit } from 'effect-api-query'
+import { createHttpApiQueryUtils, createRpcQueryUtils } from 'effect-api-query'
+import type { RunPromiseExit } from 'effect-api-query'
 import { FetchHttpClient, HttpClient, HttpClientRequest } from 'effect/http'
 import { HttpApiClient } from 'effect/http-api'
 
@@ -61,7 +63,7 @@ export const startTanStackStartApplication = async ({
     },
   })
   let disposal: Promise<void> | undefined
-  const dispose = () => {
+  const dispose = async () => {
     // Stop queries before releasing the ready clients they execute through.
     disposal ??= (async () => {
       try {
@@ -101,12 +103,14 @@ export const startTanStackStartApplication = async ({
       queryClient,
       rpcQuery,
     }
-  } catch (cause) {
+  } catch (error) {
     try {
       await dispose()
-    } catch (cleanupCause) {
-      throw new AggregateError([cause, cleanupCause], 'Application startup and cleanup failed')
+    } catch (cleanupError) {
+      throw new AggregateError([error, cleanupError], 'Application startup and cleanup failed', {
+        cause: cleanupError,
+      })
     }
-    throw cause
+    throw error
   }
 }

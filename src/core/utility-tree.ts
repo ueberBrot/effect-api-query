@@ -1,6 +1,6 @@
 import { skipToken } from '@tanstack/query-core'
 import type { QueryKey } from '@tanstack/query-core'
-import { Effect, Exit } from 'effect'
+import { Effect, Exit, Predicate } from 'effect'
 import type { Cause } from 'effect'
 
 import type {
@@ -48,11 +48,13 @@ const canonicalizeNumber = (value: number): number => {
 }
 
 const canonicalizeArray = (value: unknown[], seen: WeakSet<object>): JsonValue => {
-  const copy: Array<JsonValue> = []
+  const copy: JsonValue[] = []
   for (let index = 0; index < value.length; index += 1) {
     if (!Object.hasOwn(value, index)) {
       throw new TypeError('Key values must not contain sparse arrays')
     }
+    // canonicalize is initialized before any query tree is constructed.
+    // oxlint-disable-next-line eslint/no-use-before-define
     copy.push(canonicalize(value[index], seen))
   }
   // Shared references are valid JSON; only references on the active path form cycles.
@@ -60,8 +62,8 @@ const canonicalizeArray = (value: unknown[], seen: WeakSet<object>): JsonValue =
   return Object.freeze(copy)
 }
 
-const canonicalizeObject = (value: object, seen: WeakSet<object>): JsonValue => {
-  const prototype = Object.getPrototypeOf(value)
+const canonicalizeObject = (value: Record<string, unknown>, seen: WeakSet<object>): JsonValue => {
+  const prototype: unknown = Object.getPrototypeOf(value)
   if (prototype !== Object.prototype && prototype !== null) {
     throw new TypeError('Key values must contain only plain objects')
   }
@@ -71,23 +73,25 @@ const canonicalizeObject = (value: object, seen: WeakSet<object>): JsonValue => 
     if (key === '__proto__' || key === 'constructor') {
       throw new TypeError('Key objects must not contain __proto__ or constructor properties')
     }
-    copy[key] = canonicalize((value as Record<string, unknown>)[key], seen)
+    // Every enumerated member must remain JSON-safe, including getter side effects.
+    // oxlint-disable-next-line eslint/no-use-before-define
+    copy[key] = canonicalize(value[key], seen)
   }
   seen.delete(value)
   return Object.freeze(copy)
 }
 
 // Copying prevents caller mutation; sorting makes equivalent objects hash identically.
-const canonicalize = (value: unknown, seen: WeakSet<object> = new WeakSet()): JsonValue => {
-  if (value === null || typeof value === 'string' || typeof value === 'boolean') {
+const canonicalize = (value: unknown, seen = new WeakSet()): JsonValue => {
+  if (value === null || Predicate.isString(value) || Predicate.isBoolean(value)) {
     return value
   }
 
-  if (typeof value === 'number') {
+  if (Predicate.isNumber(value)) {
     return canonicalizeNumber(value)
   }
 
-  if (typeof value !== 'object') {
+  if (!Predicate.isObjectOrArray(value)) {
     throw new TypeError('Key values must be JSON-safe')
   }
 
@@ -103,7 +107,7 @@ const canonicalize = (value: unknown, seen: WeakSet<object> = new WeakSet()): Js
   return canonicalizeObject(value, seen)
 }
 
-const freezeKey = (parts: ReadonlyArray<JsonValue | string>) => Object.freeze([...parts])
+const freezeKey = (parts: readonly (JsonValue | string)[]) => Object.freeze([...parts])
 
 const hashCanonicalKey = (queryKey: QueryKey): string => JSON.stringify(queryKey)
 
@@ -116,9 +120,12 @@ const normalizePrefix = (
   }
 
   try {
+    // SAFETY: prefix is checked to be a nonempty array; canonicalize preserves arrays
+    // while validating and freezing every JSON value recursively.
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     return canonicalize(prefix) as readonly JsonValue[]
-  } catch (cause) {
-    throw errors.invalidPrefix('Value', cause)
+  } catch (error) {
+    throw errors.invalidPrefix('Value', error)
   }
 }
 
@@ -126,7 +133,7 @@ const normalizePrefix = (
 const planPaths = (operations: readonly OperationDescription[], errors: TreeErrors) => {
   const branchPaths = new Map<string, readonly string[]>()
   const leafPaths = new Set<string>()
-  const plan: Array<ValidatedOperationPath> = []
+  const plan: ValidatedOperationPath[] = []
 
   for (const operation of operations) {
     const segments = operation.path
@@ -154,9 +161,13 @@ const planPaths = (operations: readonly OperationDescription[], errors: TreeErro
       parents.push(parentKey)
     }
     for (const parent of parents) {
-      if (!branchPaths.has(parent)) branchPaths.set(parent, segments)
+      if (!branchPaths.has(parent)) {
+        branchPaths.set(parent, segments)
+      }
     }
     leafPaths.add(pathKey)
+    // SAFETY: The empty path was rejected above before recording this plan.
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     plan.push({ operation, segments: segments as readonly [string, ...string[]] })
   }
   return plan
@@ -173,8 +184,12 @@ const execute = async <Operation extends UnaryQueryOperation>(
   requestOptions?: unknown,
   signal?: AbortSignal,
 ) => {
+  // The transport contract preserves arbitrary caller errors and Context services.
+  // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
   const effect = description.invoke(input, requestOptions)
   // Await outside the Exit branch so a runner rejection passes through untouched.
+  // The erased transport channels retain the caller's errors and service requirements.
+  // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
   const exit = await runPromiseExit(effect, signal === undefined ? undefined : { signal })
 
   if (Exit.isFailure(exit)) {
@@ -185,7 +200,7 @@ const execute = async <Operation extends UnaryQueryOperation>(
   return operation !== 'mutation' && exit.value === undefined ? null : exit.value
 }
 
-const defineKey = (target: Record<string, unknown>, parts: ReadonlyArray<JsonValue | string>) => {
+const defineKey = (target: Record<string, unknown>, parts: readonly (JsonValue | string)[]) => {
   const key = freezeKey(parts)
   target['key'] = () => key
 }
@@ -206,8 +221,8 @@ const prepareQuery = (
       input: prepared.input,
       key: freezeKey([...operationKey, canonicalize(prepared.keyValue)]),
     }
-  } catch (cause) {
-    throw description.input.invalidKey(cause)
+  } catch (error) {
+    throw description.input.invalidKey(error)
   }
 }
 
@@ -216,17 +231,18 @@ const prepareQueryOptions = (
   argument: unknown,
   operationKey: readonly JsonValue[],
 ) => {
-  const options = {
-    ...(argument === skipToken
+  const options: Record<string, unknown> =
+    argument === skipToken
       ? { input: skipToken }
-      : (argument as Record<string, unknown> | undefined)),
-  }
-  const input = options['input']
+      : { ...(Predicate.isObject(argument) ? argument : undefined) }
+  const { input } = options
   delete options['input']
   const requestOptions = description.takeOptions(options)
   if (description.input._tag !== 'Inputless' && input === skipToken) {
     return {
       _tag: 'Skipped' as const,
+      // The builder is invoked after finalizeQueryOptions has been initialized.
+      // oxlint-disable-next-line eslint/no-use-before-define
       options: finalizeQueryOptions(options, operationKey, skipToken),
     }
   }
@@ -262,24 +278,41 @@ const createInfiniteBuilders = (
 
   const infiniteOptions = (argument: Record<string, unknown>) => {
     const supplied = prepareQueryOptions(description, argument, infiniteOperationKey)
-    if (supplied._tag === 'Skipped') return supplied.options
+    if (supplied._tag === 'Skipped') {
+      return supplied.options
+    }
     const { input, options, requestOptions } = supplied
 
-    const initialPageParam = options['initialPageParam']
+    const { initialPageParam } = options
     const inputForPage =
       description.input._tag === 'Inputless'
-        ? () => undefined
-        : (input as (pageParam: unknown) => unknown)
-    const initialInput = inputForPage(initialPageParam)
+        ? () => {
+            // Inputless operations do not construct a page payload.
+          }
+        : input
+    if (!Predicate.isFunction(inputForPage)) {
+      throw new TypeError('Infinite query input must be a page input function')
+    }
+    // SAFETY: The function guard above validates callability; the adapter validates
+    // the returned payload through the operation's declaration before execution.
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+    const pageInput = inputForPage as (pageParam: unknown) => unknown
+    const initialInput = pageInput(initialPageParam)
     const prepared = prepareQuery(description, initialInput, infiniteOperationKey, keyEncoder)
 
     return finalizeQueryOptions(
       options,
       prepared.key,
-      ({ pageParam, signal }: { readonly pageParam: unknown; readonly signal: AbortSignal }) => {
-        const pageInput = inputForPage(pageParam)
+      async ({
+        pageParam,
+        signal,
+      }: {
+        readonly pageParam: unknown
+        readonly signal: AbortSignal
+      }) => {
+        const pageRequest = pageInput(pageParam)
         const executionInput =
-          description.input._tag === 'Input' ? description.input.pageInput(pageInput) : undefined
+          description.input._tag === 'Input' ? description.input.pageInput(pageRequest) : undefined
         return execute(
           description,
           'infinite',
@@ -297,7 +330,7 @@ const createInfiniteBuilders = (
 
 const createUnaryLeaf = (
   description: UnaryOperation,
-  keyParts: ReadonlyArray<JsonValue | string>,
+  keyParts: readonly (JsonValue | string)[],
   keyEncoder: RuntimeKeyEncoder | undefined,
   runPromiseExit: RunPromiseExit<unknown>,
 ) => {
@@ -310,7 +343,9 @@ const createUnaryLeaf = (
 
   const queryOptions = (argument?: unknown) => {
     const supplied = prepareQueryOptions(description, argument, queryOperationKey)
-    if (supplied._tag === 'Skipped') return supplied.options
+    if (supplied._tag === 'Skipped') {
+      return supplied.options
+    }
     const { input, options, requestOptions } = supplied
 
     const prepared = prepareQuery(description, input, queryOperationKey, keyEncoder)
@@ -318,7 +353,7 @@ const createUnaryLeaf = (
     return finalizeQueryOptions(
       options,
       prepared.key,
-      ({ signal }: { readonly signal: AbortSignal }) =>
+      async ({ signal }: { readonly signal: AbortSignal }) =>
         execute(description, 'query', prepared.input, runPromiseExit, requestOptions, signal),
     )
   }
@@ -328,7 +363,7 @@ const createUnaryLeaf = (
     const requestOptions = description.takeOptions(options)
     return {
       ...options,
-      mutationFn: (variables: unknown) =>
+      mutationFn: async (variables: unknown) =>
         execute(description, 'mutation', variables, runPromiseExit, requestOptions),
       mutationKey,
     }
@@ -346,7 +381,7 @@ const createUnaryLeaf = (
 
 const createStreamingLeaf = (
   description: StreamingOperation,
-  keyParts: ReadonlyArray<JsonValue | string>,
+  keyParts: readonly (JsonValue | string)[],
   keyEncoder: RuntimeKeyEncoder | undefined,
   runPromiseExit: RunPromiseExit<unknown>,
 ) => {
@@ -359,8 +394,8 @@ const createStreamingLeaf = (
     prepareQuery(description, input, streamedOperationKey, keyEncoder).key
 
   const buildOptions = (argument: unknown, operation: 'live' | 'streamed') => {
-    const operationKey = operation === 'live' ? liveOperationKey : streamedOperationKey
-    const supplied = prepareQueryOptions(description, argument, operationKey)
+    const streamOperationKey = operation === 'live' ? liveOperationKey : streamedOperationKey
+    const supplied = prepareQueryOptions(description, argument, streamOperationKey)
     const { options } = supplied
     const makeQuery = description.prepareStream(
       options,
@@ -368,8 +403,10 @@ const createStreamingLeaf = (
       runPromiseExit,
       supplied._tag === 'Executable' ? supplied.requestOptions : undefined,
     )
-    if (supplied._tag === 'Skipped') return options
-    const prepared = prepareQuery(description, supplied.input, operationKey, keyEncoder)
+    if (supplied._tag === 'Skipped') {
+      return options
+    }
+    const prepared = prepareQuery(description, supplied.input, streamOperationKey, keyEncoder)
     const queryFn = makeQuery(prepared.input)
 
     return finalizeQueryOptions(options, prepared.key, queryFn)
@@ -386,8 +423,8 @@ const createStreamingLeaf = (
 
 const deepFreezeTree = (value: Record<string, unknown>) => {
   for (const child of Object.values(value)) {
-    if (typeof child === 'object' && child !== null) {
-      deepFreezeTree(child as Record<string, unknown>)
+    if (Predicate.isObject(child)) {
+      deepFreezeTree(child)
     }
   }
   return Object.freeze(value)
@@ -404,13 +441,15 @@ const validateKeyEncoders = (
       .map((operation) => operation.id),
   )
   for (const id of keyEncoders.keys()) {
-    if (!supportedIds.has(id)) throw errors.unknownEncoder(id)
+    if (!supportedIds.has(id)) {
+      throw errors.unknownEncoder(id)
+    }
   }
   for (const operation of operations) {
     if (
       operation.input._tag === 'Input' &&
       operation.input.requiresEncoder &&
-      typeof keyEncoders.get(operation.id) !== 'function'
+      !Predicate.isFunction(keyEncoders.get(operation.id))
     ) {
       throw errors.missingEncoder(operation.id)
     }
@@ -427,10 +466,12 @@ const insertLeaf = (
   const { operation, segments } = path
   let branch = tree
   for (let index = 0; index < segments.length - 1; index += 1) {
-    const segment = segments[index] as string
-    let child = Object.hasOwn(branch, segment)
-      ? (branch[segment] as Record<string, unknown>)
-      : undefined
+    const segment = segments[index]
+    if (segment === undefined) {
+      throw new TypeError('Validated operation paths must have defined segments')
+    }
+    const candidate = Object.hasOwn(branch, segment) ? branch[segment] : undefined
+    let child = Predicate.isObject(candidate) ? candidate : undefined
     if (child === undefined) {
       child = {}
       defineKey(child, [...prefix, ...segments.slice(0, index + 1)])
@@ -439,7 +480,10 @@ const insertLeaf = (
     branch = child
   }
 
-  const leafName = segments.at(-1) as string
+  const leafName = segments.at(-1)
+  if (leafName === undefined) {
+    throw new TypeError('Validated operation paths must have a leaf')
+  }
   branch[leafName] =
     operation.kind === 'Streaming'
       ? createStreamingLeaf(operation, [...prefix, ...segments], keyEncoder, runPromiseExit)
@@ -448,7 +492,7 @@ const insertLeaf = (
 
 const createTree = (
   prefix: readonly JsonValue[],
-  paths: ReadonlyArray<ValidatedOperationPath>,
+  paths: readonly ValidatedOperationPath[],
   keyEncoders: ReadonlyMap<string, RuntimeKeyEncoder>,
   runPromiseExit: RunPromiseExit<unknown>,
 ) => {
@@ -477,6 +521,9 @@ export const createUtilityTree = (
   ])
   const paths = planPaths(operations, options.errors)
   validateKeyEncoders(operations, options.keyEncoders, options.errors)
+  // SAFETY: Public options require a runner when a client has remaining services;
+  // otherwise the captured client is fully provided and the default runner needs none.
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion
   const runner = options.runPromiseExit ?? (Effect.runPromiseExit as RunPromiseExit<unknown>)
   return createTree(prefix, paths, options.keyEncoders, runner)
 }

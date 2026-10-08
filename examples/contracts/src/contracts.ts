@@ -1,3 +1,5 @@
+// Related Schema classes define one RPC contract family.
+// oxlint-disable eslint/max-classes-per-file
 import { Effect, Schema } from 'effect'
 import { Rpc, RpcGroup, RpcMiddleware } from 'effect/rpc'
 
@@ -21,6 +23,8 @@ export class UserPage extends Schema.Class<UserPage>('UserPage')({
   users: Schema.Array(User),
 }) {}
 
+// Effect Schema.TaggedError is a curried class factory; only instances use new.
+// oxlint-disable-next-line unicorn/throw-new-error
 export class DiagnosticFailure extends Schema.TaggedError<DiagnosticFailure>()(
   'DiagnosticFailure',
   {
@@ -34,6 +38,8 @@ export class DiagnosticFailure extends Schema.TaggedError<DiagnosticFailure>()(
   }
 }
 
+// Effect Schema.TaggedError is a curried class factory; only instances use new.
+// oxlint-disable-next-line unicorn/throw-new-error
 export class ExampleAuthorizationError extends Schema.TaggedError<ExampleAuthorizationError>()(
   'ExampleAuthorizationError',
   {
@@ -140,6 +146,8 @@ const DiagnosticsCancel = Rpc.make('diagnostics.cancel', {
   success: Schema.Void,
 })
 
+// The Schema value and its decoded type deliberately share the domain name.
+// oxlint-disable-next-line eslint/no-redeclare
 export const DiagnosticStatus = Schema.Struct({
   interrupted: Schema.Int,
   started: Schema.Int,

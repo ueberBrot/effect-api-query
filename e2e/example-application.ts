@@ -1,4 +1,5 @@
-import { expect, type Page, type Request } from '@playwright/test'
+import { expect } from '@playwright/test'
+import type { Page, Request } from '@playwright/test'
 
 export interface ExampleApplication {
   readonly heading: string

@@ -1,5 +1,5 @@
 import { startExampleRpcServer } from '@effect-api-query/server'
-import { type QueryKey } from '@tanstack/react-query'
+import type { QueryKey } from '@tanstack/react-query'
 import { createMemoryHistory } from '@tanstack/react-router'
 import { attachRouterServerSsrUtils } from '@tanstack/react-start/server'
 import { Effect, Exit, Scope } from 'effect'
@@ -9,7 +9,7 @@ import type { TanStackStartApplication } from '../src/lib/application.ts'
 import { createTanStackStartRouter } from '../src/router.tsx'
 
 describe('TanStack Start router dehydration', () => {
-  const applications: Array<TanStackStartApplication> = []
+  const applications: TanStackStartApplication[] = []
   let serverScope: Scope.Closeable | undefined
 
   beforeEach(async () => {
@@ -17,7 +17,7 @@ describe('TanStack Start router dehydration', () => {
   })
 
   afterEach(async () => {
-    await Promise.all(applications.splice(0).map(({ dispose }) => dispose()))
+    await Promise.all(applications.splice(0).map(async ({ dispose }) => dispose()))
     if (serverScope !== undefined) {
       await Effect.runPromise(Scope.close(serverScope, Exit.void))
     }
@@ -30,8 +30,11 @@ describe('TanStack Start router dehydration', () => {
   ] as const)(
     'round-trips $adapter query data through the router hooks without refetching',
     async ({ route, adapter }) => {
+      if (serverScope === undefined) {
+        throw new Error('Server scope was not initialized')
+      }
       const server = await Effect.runPromise(
-        startExampleRpcServer().pipe(Scope.provide(serverScope!)),
+        startExampleRpcServer().pipe(Scope.provide(serverScope)),
       )
       const serverRouter = await createTanStackStartRouter({
         history: createMemoryHistory({ initialEntries: [route] }),
@@ -44,7 +47,9 @@ describe('TanStack Start router dehydration', () => {
 
       await serverRouter.load()
       const dehydrated = await serverRouter.options.dehydrate?.()
-      if (dehydrated === undefined) throw new Error('Router dehydration is not configured')
+      if (dehydrated === undefined) {
+        throw new Error('Router dehydration is not configured')
+      }
       serverRouter.serverSsr?.setRenderFinished()
 
       const browserWindow = Object.assign(new EventTarget(), { origin: 'http://localhost' })
@@ -67,7 +72,7 @@ describe('TanStack Start router dehydration', () => {
               query: { cursor: 0, pageSize: 4 },
             })
           : browserApplication.rpcQuery.users.page.infiniteKey({ cursor: 0, pageSize: 4 })
-      const watchedKeys: ReadonlyArray<QueryKey> = [usersKey, pagesKey]
+      const watchedKeys: readonly QueryKey[] = [usersKey, pagesKey]
       let duplicateFetches = 0
       const unsubscribe = browserApplication.queryClient.getQueryCache().subscribe((event) => {
         if (
@@ -85,7 +90,7 @@ describe('TanStack Start router dehydration', () => {
       await browserRouter.options.hydrate?.(dehydrated)
       await browserRouter.load()
 
-      expect(browserApplication.queryClient.getQueryData(usersKey)).toEqual(
+      expect(browserApplication.queryClient.getQueryData(usersKey)).toStrictEqual(
         expect.arrayContaining([expect.objectContaining({ name: 'Ada Lovelace' })]),
       )
       expect(browserApplication.queryClient.getQueryData(pagesKey)).toMatchObject({
@@ -104,8 +109,11 @@ describe('TanStack Start router dehydration', () => {
   ] as const)(
     'loads the $adapter failure route but omits its failed query from router dehydration',
     async ({ route, adapter }) => {
+      if (serverScope === undefined) {
+        throw new Error('Server scope was not initialized')
+      }
       const server = await Effect.runPromise(
-        startExampleRpcServer().pipe(Scope.provide(serverScope!)),
+        startExampleRpcServer().pipe(Scope.provide(serverScope)),
       )
       const router = await createTanStackStartRouter({
         history: createMemoryHistory({ initialEntries: [route] }),

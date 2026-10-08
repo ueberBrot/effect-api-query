@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { Schema } from 'effect'
 
 import {
   isHttpRequest,
@@ -34,8 +35,9 @@ test.describe('TanStack Start HTTP API example', () => {
 
     const requests: string[] = []
     page.on('request', (request) => {
-      if (isHttpRequest(request, 'GET', '/users') || isHttpRequest(request, 'GET', '/users/page'))
+      if (isHttpRequest(request, 'GET', '/users') || isHttpRequest(request, 'GET', '/users/page')) {
         requests.push(request.url())
+      }
     })
     await page.reload()
     await page.getByRole('button', { name: 'Read cached HTTP directory' }).click()
@@ -57,7 +59,7 @@ test.describe('TanStack Start HTTP API example', () => {
     page.on('request', (request) => {
       if (
         request.method() === 'GET' &&
-        /\/api\/users\/\d+$/.test(new URL(request.url()).pathname)
+        /\/api\/users\/\d+$/u.test(new URL(request.url()).pathname)
       ) {
         lookups += 1
       }
@@ -109,10 +111,11 @@ test.describe('TanStack Start HTTP API example', () => {
     const deletion = page.waitForResponse(
       (response) =>
         response.request().method() === 'DELETE' &&
-        /\/api\/users\/\d+$/.test(new URL(response.url()).pathname),
+        /\/api\/users\/\d+$/u.test(new URL(response.url()).pathname),
     )
     await page.getByRole('button', { name: 'Delete HTTP Start pioneer', exact: true }).click()
-    expect((await deletion).status()).toBe(204)
+    const deletionResponse = await deletion
+    expect(deletionResponse.status()).toBe(204)
     await expect(page.getByText('HTTP delete result: undefined')).toBeVisible()
     await expect(page.getByText('HTTP: Start pioneer', { exact: true })).toHaveCount(0)
   })
@@ -151,8 +154,9 @@ test.describe('TanStack Start HTTP API example', () => {
         if (
           new URL(request.url()).pathname.startsWith('/api/diagnostics/operations/') ||
           recordsRpc(request.postData(), 'diagnostics.operationStatus')
-        )
+        ) {
           statusRequests += 1
+        }
       })
       const started = page.waitForRequest((request) =>
         transport === 'http'
@@ -169,8 +173,13 @@ test.describe('TanStack Start HTTP API example', () => {
       const operationId =
         transport === 'http'
           ? new URL(request.url()).searchParams.get('operationId')
-          : /"operationId"\s*:\s*"([^"]+)"/.exec(request.postData() ?? '')?.[1]
+          : /"operationId"\s*:\s*"(?<operationId>[^"]+)"/u.exec(request.postData() ?? '')?.groups?.[
+              'operationId'
+            ]
       expect(operationId).toBeTruthy()
+      if (operationId === null || operationId === undefined) {
+        throw new Error('The started query must include its operation ID')
+      }
       await expect(
         page.getByText(transport === 'http' ? 'HTTP: Ready to cancel' : 'Ready to cancel', {
           exact: true,
@@ -183,12 +192,17 @@ test.describe('TanStack Start HTTP API example', () => {
       await expect(page.getByRole('heading', { name: 'Featured user', exact: true })).toBeVisible()
       await aborted
       const requestsAfterNavigation = statusRequests
-      const statusUrl = `${tanStackStartApplication.url}/api/diagnostics/operations/${encodeURIComponent(operationId!)}`
+      const statusUrl = `${tanStackStartApplication.url}/api/diagnostics/operations/${encodeURIComponent(operationId)}`
       await expect
         .poll(async () => {
           const response = await page.request.get(statusUrl)
           expect(response.ok()).toBe(true)
-          return response.json()
+          return Schema.decodeUnknownSync(
+            Schema.Struct({
+              interrupted: Schema.Int,
+              started: Schema.Int,
+            }),
+          )(await response.json())
         })
         .toEqual({ started: 1, interrupted: 1 })
       expect(statusRequests).toBe(requestsAfterNavigation)
@@ -214,7 +228,9 @@ test.describe('TanStack Start HTTP API example', () => {
 
     let failures = 0
     page.on('request', (request) => {
-      if (isHttpRequest(request, 'GET', '/diagnostics/fail')) failures += 1
+      if (isHttpRequest(request, 'GET', '/diagnostics/fail')) {
+        failures += 1
+      }
     })
     await page.goto(url)
     const failure = page.getByRole('alert')

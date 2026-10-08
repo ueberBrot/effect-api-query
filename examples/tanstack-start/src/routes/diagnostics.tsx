@@ -8,9 +8,8 @@ import {
   describeSlowQueryCancellation,
   useSlowQueryCancellation,
 } from '../hooks/use-slow-query-cancellation.ts'
-export const Route = createFileRoute('/diagnostics')({ component: DiagnosticsPage })
 
-function DiagnosticsPage() {
+const DiagnosticsPage = () => {
   const application = Route.useRouteContext()
   const declaredFailure = useMutation(
     application.rpcQuery.diagnostics.fail.mutationOptions({
@@ -29,7 +28,9 @@ function DiagnosticsPage() {
         <Panel title="Runtime diagnostics">
           <div className="mt-5 flex flex-wrap gap-3">
             <ActionButton
-              onClick={() => declaredFailure.mutate(undefined)}
+              onClick={() => {
+                declaredFailure.mutate()
+              }}
               type="button"
               variant="danger"
             >
@@ -37,7 +38,9 @@ function DiagnosticsPage() {
             </ActionButton>
             <ActionButton
               disabled={!slowQuery.canStart}
-              onClick={() => void slowQuery.start()}
+              onClick={() => {
+                void slowQuery.start()
+              }}
               type="button"
               variant="secondary"
             >
@@ -45,7 +48,9 @@ function DiagnosticsPage() {
             </ActionButton>
             <ActionButton
               disabled={!slowQuery.canCancel}
-              onClick={() => void slowQuery.cancel()}
+              onClick={() => {
+                void slowQuery.cancel()
+              }}
               type="button"
               variant="secondary"
             >
@@ -57,10 +62,12 @@ function DiagnosticsPage() {
             <EffectErrorDetails error={slowQuery.state.error} />
           ) : null}
           {cancellationMessage === undefined ? null : (
-            <p className="mt-4 text-sm text-zinc-300">{cancellationMessage}</p>
+            <p className="mt-4 text-sm text-text-tertiary">{cancellationMessage}</p>
           )}
         </Panel>
       </div>
     </PageLayout>
   )
 }
+
+export const Route = createFileRoute('/diagnostics')({ component: DiagnosticsPage })

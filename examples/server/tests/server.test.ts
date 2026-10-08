@@ -1,12 +1,22 @@
+import { User } from '@effect-api-query/contracts'
 import type { DiagnosticStatus } from '@effect-api-query/contracts'
-import {
-  type ExampleRpcClient,
-  makeExampleRpcClient,
-  startExampleRpcClient,
-} from '@effect-api-query/contracts/client'
+import { makeExampleRpcClient, startExampleRpcClient } from '@effect-api-query/contracts/client'
+import type { ExampleRpcClient } from '@effect-api-query/contracts/client'
 import { startExampleRpcServer } from '@effect-api-query/server'
 import { describe, expect, it } from '@effect/vitest'
-import { Cause, Deferred, Effect, Exit, Fiber, Logger, Result, Scope, Stream } from 'effect'
+import {
+  Cause,
+  Deferred,
+  Effect,
+  Exit,
+  Fiber,
+  Logger,
+  Predicate,
+  Result,
+  Schema,
+  Scope,
+  Stream,
+} from 'effect'
 import { RpcClient } from 'effect/rpc'
 import { createServer, request as nodeRequest } from 'node:http'
 
@@ -18,7 +28,9 @@ const waitForStatus = Effect.fn('TestExampleRpc.waitForStatus')(function* (
 ) {
   for (let attempt = 0; attempt < 100; attempt += 1) {
     const status = yield* client('diagnostics.status', undefined)
-    if (predicate(status)) return status
+    if (predicate(status)) {
+      return status
+    }
     yield* Effect.sleep('10 millis')
   }
   return yield* Effect.die(new Error('Timed out waiting for diagnostic status'))
@@ -29,7 +41,9 @@ describe('example RPC server', () => {
     Effect.gen(function* () {
       const server = yield* startExampleRpcServer()
       const status = yield* Effect.promise(
-        () =>
+        async () =>
+          // The callback/event API needs a Promise bridge in the ES2022 target.
+          // oxlint-disable-next-line promise/avoid-new
           new Promise<number | undefined>((resolve, reject) => {
             const request = nodeRequest(server.rpcUrl, { method: 'POST' }, (response) => {
               response.resume()
@@ -39,12 +53,14 @@ describe('example RPC server', () => {
               })
             })
             request.once('error', reject)
-            request.setTimeout(1000, () => request.destroy(new Error('Request timed out')))
+            request.setTimeout(1000, () => {
+              request.destroy(new Error('Request timed out'))
+            })
             request.write(' '.repeat(1024 * 1024 + 1))
           }),
       )
       expect(status).toBe(413)
-      expect((yield* Effect.promise(() => fetch(`${server.url}/health`))).status).toBe(200)
+      expect((yield* Effect.promise(async () => fetch(`${server.url}/health`))).status).toBe(200)
     }),
   )
 
@@ -53,20 +69,26 @@ describe('example RPC server', () => {
       const server = yield* startExampleRpcServer()
       for (const path of ['//[', 'http://user:password@localhost/rpc']) {
         const status = yield* Effect.promise(
-          () =>
+          async () =>
+            // The callback/event API needs a Promise bridge in the ES2022 target.
+            // oxlint-disable-next-line promise/avoid-new
             new Promise<number | undefined>((resolve, reject) => {
               const request = nodeRequest(server.url, { method: 'POST', path }, (response) => {
                 response.resume()
-                response.once('end', () => resolve(response.statusCode))
+                response.once('end', () => {
+                  resolve(response.statusCode)
+                })
               })
               request.once('error', reject)
-              request.setTimeout(1000, () => request.destroy(new Error('Request timed out')))
+              request.setTimeout(1000, () => {
+                request.destroy(new Error('Request timed out'))
+              })
               request.end()
             }),
         )
         expect(status).toBe(400)
       }
-      expect((yield* Effect.promise(() => fetch(`${server.url}/health`))).status).toBe(200)
+      expect((yield* Effect.promise(async () => fetch(`${server.url}/health`))).status).toBe(200)
       const client = yield* makeExampleRpcClient(server.rpcUrl)
       expect(yield* client('users.list', undefined)).toHaveLength(12)
     }),
@@ -76,11 +98,19 @@ describe('example RPC server', () => {
     Effect.gen(function* () {
       const server = yield* startExampleRpcServer()
 
-      const readiness = yield* Effect.promise(() => fetch(`${server.url}/health`))
+      const readiness = yield* Effect.promise(async () => fetch(`${server.url}/health`))
       expect(readiness.status).toBe(200)
-      expect(yield* Effect.promise(() => readiness.json())).toEqual({ status: 'ready' })
+      const healthJson: unknown = yield* Effect.promise(async () => {
+        const json: unknown = await readiness.json()
+        return json
+      })
+      expect(
+        yield* Schema.decodeUnknownEffect(Schema.Struct({ status: Schema.Literal('ready') }))(
+          healthJson,
+        ),
+      ).toStrictEqual({ status: 'ready' })
 
-      const preflight = yield* Effect.promise(() =>
+      const preflight = yield* Effect.promise(async () =>
         fetch(server.rpcUrl, {
           headers: {
             'access-control-request-headers':
@@ -98,19 +128,23 @@ describe('example RPC server', () => {
       )
       expect(preflight.headers.get('access-control-allow-methods')).toContain('POST')
 
-      const missing = yield* Effect.promise(() => fetch(`${server.url}/missing`))
+      const missing = yield* Effect.promise(async () => fetch(`${server.url}/missing`))
       expect(missing.status).toBe(404)
     }),
   )
 
   it.effect('logs structured HTTP response metadata for RPC requests', () => {
-    const entries: Array<{
-      readonly annotations: Record<string, unknown>
+    const entries: {
+      readonly annotations: unknown
       readonly message: unknown
-    }> = []
+    }[] = []
+    // Void is the deliberate success channel of this Effect factory.
+    // oxlint-disable-next-line typescript/no-invalid-void-type
     const collectingLogger = Logger.make<unknown, void>((options) => {
       const entry = Logger.formatStructured.log(options)
-      entries.push({ annotations: entry.annotations, message: entry.message })
+      const annotations: unknown = entry.annotations
+      const message: unknown = entry.message
+      entries.push({ annotations, message })
     })
 
     return Effect.gen(function* () {
@@ -120,11 +154,13 @@ describe('example RPC server', () => {
       yield* client('users.list', undefined)
 
       expect(entries).toContainEqual({
+        // Vitest's matcher returns any, widened here because entries are checked by the matcher.
+        // SAFETY: expect.objectContaining is consumed only as an expected test value.
         annotations: expect.objectContaining({
           'http.method': 'POST',
           'http.status': 200,
           'http.url': '/rpc/',
-        }),
+        }) as unknown,
         message: 'Sent HTTP response',
       })
     }).pipe(Effect.provide(Logger.layer([collectingLogger])))
@@ -138,17 +174,23 @@ describe('example RPC server', () => {
 
       const initialDirectory = yield* client('users.list', undefined)
       expect(initialDirectory).toHaveLength(12)
-      expect(initialDirectory[0]).toEqual({ id: 1, locale: 'en', name: 'Ada Lovelace' })
-      expect(initialDirectory[11]).toEqual({ id: 12, locale: 'en', name: 'James Gosling' })
+      expect(initialDirectory[0]).toStrictEqual(
+        new User({ id: 1, locale: 'en', name: 'Ada Lovelace' }),
+      )
+      expect(initialDirectory[11]).toStrictEqual(
+        new User({ id: 12, locale: 'en', name: 'James Gosling' }),
+      )
 
-      expect(yield* client('users.create', { name: 'Grace Hopper' })).toEqual({
-        id: 13,
-        locale: 'en',
-        name: 'Grace Hopper',
-      })
+      expect(yield* client('users.create', { name: 'Grace Hopper' })).toStrictEqual(
+        new User({
+          id: 13,
+          locale: 'en',
+          name: 'Grace Hopper',
+        }),
+      )
 
       expect(yield* client('testing.reset', undefined)).toBeUndefined()
-      expect(yield* client('users.list', undefined)).toEqual(initialDirectory)
+      expect(yield* client('users.list', undefined)).toStrictEqual(initialDirectory)
     }),
   )
 
@@ -162,15 +204,17 @@ describe('example RPC server', () => {
         yield* client('testing.seed', {
           users: [{ name: 'Grace Hopper' }, { locale: 'nl', name: 'Dijkstra' }],
         }),
-      ).toEqual([
-        { id: 1, locale: 'en', name: 'Grace Hopper' },
-        { id: 2, locale: 'nl', name: 'Dijkstra' },
+      ).toStrictEqual([
+        new User({ id: 1, locale: 'en', name: 'Grace Hopper' }),
+        new User({ id: 2, locale: 'nl', name: 'Dijkstra' }),
       ])
-      expect(yield* client('users.get', { id: 1 })).toEqual({
-        id: 1,
-        locale: 'en',
-        name: 'Grace Hopper',
-      })
+      expect(yield* client('users.get', { id: 1 })).toStrictEqual(
+        new User({
+          id: 1,
+          locale: 'en',
+          name: 'Grace Hopper',
+        }),
+      )
 
       const unauthorized = yield* Effect.flip(client('users.delete', { id: 1 }))
       expect(unauthorized).toMatchObject({
@@ -183,26 +227,28 @@ describe('example RPC server', () => {
           'x-example-authorization': 'allowed',
         }),
       ).toBeUndefined()
-      expect(yield* client('users.list', undefined)).toEqual([
-        { id: 2, locale: 'nl', name: 'Dijkstra' },
+      expect(yield* client('users.list', undefined)).toStrictEqual([
+        new User({ id: 2, locale: 'nl', name: 'Dijkstra' }),
       ])
 
       const declaredFailure = yield* Effect.exit(client('diagnostics.fail', undefined))
       expect(Exit.isFailure(declaredFailure)).toBe(true)
-      if (Exit.isSuccess(declaredFailure))
+      if (Exit.isSuccess(declaredFailure)) {
         return yield* Effect.die('Expected diagnostics.fail to fail')
+      }
       expect(Result.getOrThrow(Cause.findError(declaredFailure.cause))).toMatchObject({
         _tag: 'DiagnosticFailure',
         reason: 'requested-failure',
       })
 
       const streamed = yield* Stream.runCollect(client('diagnostics.stream', undefined))
-      expect(Array.from(streamed)).toEqual([
+      expect([...streamed]).toStrictEqual([
         'Connection opened',
         'Permissions loaded',
         'Workspace synchronized',
         'Ready',
       ])
+      return yield* Effect.void
     }),
   )
 
@@ -213,12 +259,12 @@ describe('example RPC server', () => {
       yield* client('testing.reset', undefined)
       const slow = yield* client('diagnostics.slow', { durationMs: 60_000 }).pipe(Effect.forkChild)
 
-      expect(yield* waitForStatus(client, ({ started }) => started === 1)).toEqual({
+      expect(yield* waitForStatus(client, ({ started }) => started === 1)).toStrictEqual({
         interrupted: 0,
         started: 1,
       })
       yield* Fiber.interrupt(slow)
-      expect(yield* waitForStatus(client, ({ interrupted }) => interrupted === 1)).toEqual({
+      expect(yield* waitForStatus(client, ({ interrupted }) => interrupted === 1)).toStrictEqual({
         interrupted: 1,
         started: 1,
       })
@@ -229,8 +275,8 @@ describe('example RPC server', () => {
     Effect.gen(function* () {
       const server = yield* startExampleRpcServer()
       const subject = yield* Effect.acquireRelease(
-        Effect.promise(() => startExampleRpcClient(server.rpcUrl)),
-        (client) => Effect.promise(() => client.dispose()).pipe(Effect.orDie),
+        Effect.promise(async () => startExampleRpcClient(server.rpcUrl)),
+        (client) => Effect.promise(async () => client.dispose()).pipe(Effect.orDie),
       )
       const observer = yield* makeExampleRpcClient(server.rpcUrl)
       yield* observer('testing.reset', undefined)
@@ -242,14 +288,14 @@ describe('example RPC server', () => {
         }),
       )
 
-      expect(yield* waitForStatus(observer, ({ started }) => started === 1)).toEqual({
+      expect(yield* waitForStatus(observer, ({ started }) => started === 1)).toStrictEqual({
         interrupted: 0,
         started: 1,
       })
 
-      yield* Effect.promise(() => subject.dispose())
-      expect(Exit.isFailure(yield* Effect.promise(() => running))).toBe(true)
-      expect(yield* waitForStatus(observer, ({ interrupted }) => interrupted === 1)).toEqual({
+      yield* Effect.promise(async () => subject.dispose())
+      expect(Exit.isFailure(yield* Effect.promise(async () => running))).toBe(true)
+      expect(yield* waitForStatus(observer, ({ interrupted }) => interrupted === 1)).toStrictEqual({
         interrupted: 1,
         started: 1,
       })
@@ -269,17 +315,21 @@ describe('example RPC server', () => {
         Effect.forkChild,
       )
 
-      expect(yield* waitForStatus(firstClient, ({ started }) => started === 2)).toEqual({
+      expect(yield* waitForStatus(firstClient, ({ started }) => started === 2)).toStrictEqual({
         interrupted: 0,
         started: 2,
       })
       yield* Fiber.interrupt(firstSlow)
-      expect(yield* waitForStatus(firstClient, ({ interrupted }) => interrupted === 1)).toEqual({
+      expect(
+        yield* waitForStatus(firstClient, ({ interrupted }) => interrupted === 1),
+      ).toStrictEqual({
         interrupted: 1,
         started: 2,
       })
       yield* Fiber.interrupt(secondSlow)
-      expect(yield* waitForStatus(firstClient, ({ interrupted }) => interrupted === 2)).toEqual({
+      expect(
+        yield* waitForStatus(firstClient, ({ interrupted }) => interrupted === 2),
+      ).toStrictEqual({
         interrupted: 2,
         started: 2,
       })
@@ -291,22 +341,26 @@ describe('example RPC server', () => {
       const scope = yield* Scope.make()
       const server = yield* startExampleRpcServer().pipe(Scope.provide(scope))
 
-      expect((yield* Effect.promise(() => fetch(`${server.url}/health`))).status).toBe(200)
+      expect((yield* Effect.promise(async () => fetch(`${server.url}/health`))).status).toBe(200)
       yield* Scope.close(scope, Exit.void)
-      yield* Effect.promise(() => expect(fetch(`${server.url}/health`)).rejects.toThrow())
+      yield* Effect.promise(async () =>
+        expect(fetch(`${server.url}/health`)).rejects.toThrow('fetch failed'),
+      )
     }),
   )
 
   it.live('releases a listener when startup is interrupted', () =>
     Effect.gen(function* () {
       const listening = yield* Deferred.make<number>()
+      // Void is the deliberate success channel of this Effect factory.
+      // oxlint-disable-next-line typescript/no-invalid-void-type
       const finishAcquisition = yield* Deferred.make<void>()
       const owner = yield* Scope.make()
       const nodeServer = createServer()
       const listen = Effect.callback<number>((resume) => {
         nodeServer.listen(0, '127.0.0.1', () => {
           const address = nodeServer.address()
-          if (address === null || typeof address === 'string') {
+          if (address === null || Predicate.isString(address)) {
             resume(Effect.die('Expected a TCP address'))
             return
           }

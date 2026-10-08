@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { Schema } from 'effect'
 import { createServer, request as nodeRequest } from 'node:http'
 
 import {
@@ -8,6 +9,8 @@ import {
 } from './example-application.ts'
 
 test('Start rejects an oversized upload before the sender ends the request', async () => {
+  // Bridge Node's streaming request callbacks; fetch would buffer/end the upload.
+  // oxlint-disable-next-line promise/avoid-new
   const status = await new Promise<number | undefined>((resolve, reject) => {
     const request = nodeRequest(
       `${tanStackStartApplication.url}/rpc`,
@@ -21,7 +24,9 @@ test('Start rejects an oversized upload before the sender ends the request', asy
       },
     )
     request.once('error', reject)
-    request.setTimeout(1000, () => request.destroy(new Error('Request timed out')))
+    request.setTimeout(1000, () => {
+      request.destroy(new Error('Request timed out'))
+    })
     request.write(' '.repeat(1024 * 1024 + 1))
   })
   expect(status).toBe(413)
@@ -33,10 +38,15 @@ test('SSR keeps its RPC destination independent of incoming host headers', async
     redirectedRequests += 1
     response.writeHead(500).end()
   })
-  await new Promise<void>((resolve) => destination.listen(0, '127.0.0.1', resolve))
+  // Bridge the listener callback so the assertion uses its assigned TCP port.
+  // oxlint-disable-next-line promise/avoid-new
+  await new Promise<void>((resolve) => {
+    destination.listen(0, '127.0.0.1', resolve)
+  })
   try {
-    const address = destination.address()
-    if (address === null || typeof address === 'string') throw new Error('Expected TCP listener')
+    const address = Schema.decodeUnknownSync(Schema.Struct({ port: Schema.Int }))(
+      destination.address(),
+    )
     const host = `127.0.0.1:${String(address.port)}`
     const response = await request.get(`${tanStackStartApplication.url}/details`, {
       headers: { host, 'x-forwarded-host': host, 'x-forwarded-proto': 'http' },
@@ -46,14 +56,24 @@ test('SSR keeps its RPC destination independent of incoming host headers', async
     expect(await response.text()).toContain('Ada Lovelace')
   } finally {
     destination.closeAllConnections()
-    await new Promise<void>((resolve, reject) =>
-      destination.close((error) => (error ? reject(error) : resolve())),
-    )
+    // Wait for Node's close callback before the next test starts another listener.
+    // oxlint-disable-next-line promise/avoid-new
+    await new Promise<void>((resolve, reject) => {
+      destination.close((error) => {
+        if (error) {
+          reject(error)
+        } else {
+          resolve()
+        }
+      })
+    })
   }
 })
 
 test.describe('TanStack Start application', () => {
-  test.beforeEach(async ({ page }) => prepareExampleApplication(page, tanStackStartApplication))
+  test.beforeEach(async ({ page }) => {
+    await prepareExampleApplication(page, tanStackStartApplication)
+  })
 
   test('server-renders and hydrates without a duplicate successful query', async ({
     browser,
@@ -75,7 +95,9 @@ test.describe('TanStack Start application', () => {
 
     let browserListRequests = 0
     page.on('request', (request) => {
-      if (recordsRpc(request.postData(), 'users.list')) browserListRequests += 1
+      if (recordsRpc(request.postData(), 'users.list')) {
+        browserListRequests += 1
+      }
     })
 
     const response = await page.reload()
@@ -94,7 +116,7 @@ test.describe('TanStack Start application', () => {
 
     const history = page.getByRole('region', { name: 'Accumulated stream history' })
     await page.getByRole('button', { name: 'Replay newest 2' }).click()
-    await expect(history.getByRole('listitem')).toHaveText([/Workspace synchronized$/, /Ready$/])
+    await expect(history.getByRole('listitem')).toHaveText([/Workspace synchronized$/u, /Ready$/u])
     await expect(page.getByText('2 updates retained')).toBeVisible()
     await expect(page.getByText('Current state: Ready')).toBeVisible()
 
@@ -114,7 +136,9 @@ test.describe('TanStack Start application', () => {
     ).toBeVisible()
     let browserListRequests = 0
     page.on('request', (request) => {
-      if (recordsRpc(request.postData(), 'users.list')) browserListRequests += 1
+      if (recordsRpc(request.postData(), 'users.list')) {
+        browserListRequests += 1
+      }
     })
     await page.getByRole('button', { name: 'Read cached directory' }).click()
     await expect(page.getByText('Cached directory: 12 users')).toBeVisible()

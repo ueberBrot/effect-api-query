@@ -5,8 +5,9 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { Effect, Exit, Scope } from 'effect'
 import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test'
 
-import { ViteReactExample } from '../src/App.tsx'
-import { startViteReactApplication, type ViteReactApplication } from '../src/lib/application.ts'
+import { ViteReactExample } from '../src/app.tsx'
+import { startViteReactApplication } from '../src/lib/application.ts'
+import type { ViteReactApplication } from '../src/lib/application.ts'
 
 describe('plain Vite React integration', () => {
   let application: ViteReactApplication | undefined
@@ -28,27 +29,27 @@ describe('plain Vite React integration', () => {
   })
 
   it('uses generated options with ordinary, suspense, and mutation hooks', async () => {
-    expect(await screen.findByText('Ada Lovelace')).toBeTruthy()
-    expect(await screen.findByText('Featured: Ada Lovelace')).toBeTruthy()
-    expect(await screen.findByText('4 of 12 loaded')).toBeTruthy()
-    expect(await screen.findByText('Page 1: 4 users')).toBeTruthy()
-    expect(
-      await screen.findByText('4 updates retained', undefined, { timeout: 3_000 }),
-    ).toBeTruthy()
-    expect(await screen.findByText('Current state: Ready')).toBeTruthy()
+    await expect(screen.findByText('Ada Lovelace')).resolves.toBeDefined()
+    await expect(screen.findByText('Featured: Ada Lovelace')).resolves.toBeDefined()
+    await expect(screen.findByText('4 of 12 loaded')).resolves.toBeDefined()
+    await expect(screen.findByText('Page 1: 4 users')).resolves.toBeDefined()
+    await expect(
+      screen.findByText('4 updates retained', undefined, { timeout: 3000 }),
+    ).resolves.toBeDefined()
+    await expect(screen.findByText('Current state: Ready')).resolves.toBeDefined()
 
     fireEvent.click(screen.getByRole('button', { name: 'Load next 4 users' }))
-    expect(await screen.findByText('Page 2: 4 users')).toBeTruthy()
-    expect(await screen.findByText('8 of 12 loaded')).toBeTruthy()
+    await expect(screen.findByText('Page 2: 4 users')).resolves.toBeDefined()
+    await expect(screen.findByText('8 of 12 loaded')).resolves.toBeDefined()
 
     fireEvent.click(screen.getByRole('button', { name: 'Read cached directory' }))
-    expect(await screen.findByText('Cached directory: 12 users')).toBeTruthy()
+    await expect(screen.findByText('Cached directory: 12 users')).resolves.toBeDefined()
 
     fireEvent.click(screen.getByRole('button', { name: 'Run void query' }))
-    expect(await screen.findByText('Void query result: null')).toBeTruthy()
+    await expect(screen.findByText('Void query result: null')).resolves.toBeDefined()
 
     fireEvent.click(screen.getByRole('button', { name: 'Reset directory' }))
-    expect(await screen.findByText('Reset result: undefined')).toBeTruthy()
+    await expect(screen.findByText('Reset result: undefined')).resolves.toBeDefined()
 
     fireEvent.click(screen.getByRole('button', { name: 'Trigger declared failure' }))
     const failure = await screen.findByRole('alert')
@@ -58,19 +59,21 @@ describe('plain Vite React integration', () => {
   })
 
   it('seeds and invalidates user queries through generated keys', async () => {
-    expect(await screen.findByText('Ada Lovelace')).toBeTruthy()
+    await expect(screen.findByText('Ada Lovelace')).resolves.toBeDefined()
 
     fireEvent.click(screen.getByRole('button', { name: 'Replace with eight pioneers' }))
-    expect(await screen.findByText('Grace Hopper')).toBeTruthy()
-    expect(screen.getByText('Margaret Hamilton')).toBeTruthy()
-    expect(await screen.findByText('8 users in one response')).toBeTruthy()
+    await expect(screen.findByText('Grace Hopper')).resolves.toBeDefined()
+    expect(screen.getByText('Margaret Hamilton')).toBeDefined()
+    await expect(screen.findByText('8 users in one response')).resolves.toBeDefined()
 
     fireEvent.click(screen.getByRole('button', { name: 'Invalidate user queries' }))
-    expect(await screen.findByText('Directory queries invalidated and refetched')).toBeTruthy()
+    await expect(
+      screen.findByText('Directory queries invalidated and refetched'),
+    ).resolves.toBeDefined()
   })
 
   it('adds the user details submitted through the form', async () => {
-    expect(await screen.findByText('Ada Lovelace')).toBeTruthy()
+    await expect(screen.findByText('Ada Lovelace')).resolves.toBeDefined()
 
     fireEvent.change(screen.getByLabelText('Name'), {
       target: { value: 'Katherine Johnson' },
@@ -80,13 +83,13 @@ describe('plain Vite React integration', () => {
     })
     fireEvent.click(screen.getByRole('button', { name: 'Add user' }))
 
-    expect(await screen.findByText('Added Katherine Johnson')).toBeTruthy()
-    expect(await screen.findByText('Katherine Johnson')).toBeTruthy()
-    expect(screen.getByText('User 13, locale fr')).toBeTruthy()
+    await expect(screen.findByText('Added Katherine Johnson')).resolves.toBeDefined()
+    await expect(screen.findByText('Katherine Johnson')).resolves.toBeDefined()
+    expect(screen.getByText('User 13, locale fr')).toBeDefined()
   })
 
   it('deletes the user selected from the rendered list', async () => {
-    expect(await screen.findByText('Edsger Dijkstra')).toBeTruthy()
+    await expect(screen.findByText('Edsger Dijkstra')).resolves.toBeDefined()
 
     fireEvent.click(screen.getByRole('button', { name: 'Delete Edsger Dijkstra' }))
 
@@ -96,51 +99,51 @@ describe('plain Vite React integration', () => {
   })
 
   it('cancels a started slow query and observes server-side interruption', async () => {
-    expect(await screen.findByText('Ada Lovelace')).toBeTruthy()
+    await expect(screen.findByText('Ada Lovelace')).resolves.toBeDefined()
 
     fireEvent.click(screen.getByRole('button', { name: 'Start slow query' }))
-    expect(await screen.findByText('Ready to cancel')).toBeTruthy()
+    await expect(screen.findByText('Ready to cancel')).resolves.toBeDefined()
 
     fireEvent.click(screen.getByRole('button', { name: 'Cancel query' }))
-    expect(await screen.findByText('Server interruptions: 1')).toBeTruthy()
+    await expect(screen.findByText('Server interruptions: 1')).resolves.toBeDefined()
   })
 
   it('uses HTTP request parts, skipToken, pages, and shared directory invalidation', async () => {
-    expect(await screen.findByText('HTTP: Ada Lovelace')).toBeTruthy()
-    expect(screen.getByText('HTTP user query skipped')).toBeTruthy()
-    expect(await screen.findByText('HTTP: 4 of 12 loaded')).toBeTruthy()
+    await expect(screen.findByText('HTTP: Ada Lovelace')).resolves.toBeDefined()
+    expect(screen.getByText('HTTP user query skipped')).toBeDefined()
+    await expect(screen.findByText('HTTP: 4 of 12 loaded')).resolves.toBeDefined()
 
     fireEvent.change(screen.getByLabelText('HTTP user details'), { target: { value: '1' } })
-    expect(await screen.findByText('HTTP selected: Ada Lovelace, locale fr')).toBeTruthy()
+    await expect(screen.findByText('HTTP selected: Ada Lovelace, locale fr')).resolves.toBeDefined()
     fireEvent.click(screen.getByRole('button', { name: 'Load next HTTP page' }))
-    expect(await screen.findByText('HTTP page 2: 4 users')).toBeTruthy()
-    expect(await screen.findByText('HTTP: 8 of 12 loaded')).toBeTruthy()
+    await expect(screen.findByText('HTTP page 2: 4 users')).resolves.toBeDefined()
+    await expect(screen.findByText('HTTP: 8 of 12 loaded')).resolves.toBeDefined()
     fireEvent.click(screen.getByRole('button', { name: 'Read cached HTTP directory' }))
-    expect(await screen.findByText('HTTP cached directory: 12 users')).toBeTruthy()
+    await expect(screen.findByText('HTTP cached directory: 12 users')).resolves.toBeDefined()
 
     fireEvent.change(screen.getByLabelText('HTTP name'), {
       target: { value: 'Karen Spärck Jones' },
     })
     fireEvent.change(screen.getByLabelText('HTTP locale (optional)'), { target: { value: 'de' } })
     fireEvent.click(screen.getByRole('button', { name: 'Add HTTP user' }))
-    expect(await screen.findByText('HTTP added Karen Spärck Jones')).toBeTruthy()
-    expect(await screen.findByText('HTTP: Karen Spärck Jones')).toBeTruthy()
-    expect(await screen.findByText('Karen Spärck Jones')).toBeTruthy()
-    expect(screen.getByText('User 13, locale de')).toBeTruthy()
+    await expect(screen.findByText('HTTP added Karen Spärck Jones')).resolves.toBeDefined()
+    await expect(screen.findByText('HTTP: Karen Spärck Jones')).resolves.toBeDefined()
+    await expect(screen.findByText('Karen Spärck Jones')).resolves.toBeDefined()
+    expect(screen.getByText('User 13, locale de')).toBeDefined()
 
     fireEvent.click(screen.getByRole('button', { name: 'Delete HTTP Karen Spärck Jones' }))
-    expect(await screen.findByText('HTTP delete result: undefined')).toBeTruthy()
+    await expect(screen.findByText('HTTP delete result: undefined')).resolves.toBeDefined()
     await waitFor(() => {
       expect(screen.queryByText('HTTP: Karen Spärck Jones')).toBeNull()
       expect(screen.queryByText('Karen Spärck Jones')).toBeNull()
     })
     fireEvent.click(screen.getByRole('button', { name: 'Replace with eight pioneers' }))
-    expect(await screen.findByText('HTTP: Margaret Hamilton')).toBeTruthy()
-    expect(await screen.findByText('HTTP directory: 8 users')).toBeTruthy()
+    await expect(screen.findByText('HTTP: Margaret Hamilton')).resolves.toBeDefined()
+    await expect(screen.findByText('HTTP directory: 8 users')).resolves.toBeDefined()
   })
 
   it('preserves the HTTP declared failure and cancels the server request', async () => {
-    expect(await screen.findByText('HTTP: Ada Lovelace')).toBeTruthy()
+    await expect(screen.findByText('HTTP: Ada Lovelace')).resolves.toBeDefined()
     fireEvent.click(screen.getByRole('button', { name: 'Trigger HTTP declared failure' }))
     const failure = await screen.findByRole('alert')
     expect(failure.textContent).toContain('EffectHttpApiQueryError')
@@ -148,29 +151,31 @@ describe('plain Vite React integration', () => {
     expect(failure.textContent).toContain('DiagnosticFailure')
 
     fireEvent.click(screen.getByRole('button', { name: 'Start slow HTTP query' }))
-    expect(await screen.findByText('HTTP: Ready to cancel')).toBeTruthy()
+    await expect(screen.findByText('HTTP: Ready to cancel')).resolves.toBeDefined()
     fireEvent.click(screen.getByRole('button', { name: 'Cancel HTTP query' }))
-    expect(await screen.findByText('HTTP: Server interruptions: 1')).toBeTruthy()
+    await expect(screen.findByText('HTTP: Server interruptions: 1')).resolves.toBeDefined()
   })
 
   it('cancels simultaneous RPC and HTTP queries independently', async () => {
-    expect(await screen.findByText('HTTP: Ada Lovelace')).toBeTruthy()
+    await expect(screen.findByText('HTTP: Ada Lovelace')).resolves.toBeDefined()
     fireEvent.click(screen.getByRole('button', { name: 'Start slow query' }))
-    expect(await screen.findByText('Ready to cancel', { exact: true })).toBeTruthy()
+    await expect(screen.findByText('Ready to cancel', { exact: true })).resolves.toBeDefined()
     fireEvent.click(screen.getByRole('button', { name: 'Start slow HTTP query' }))
-    expect(await screen.findByText('HTTP: Ready to cancel')).toBeTruthy()
+    await expect(screen.findByText('HTTP: Ready to cancel')).resolves.toBeDefined()
 
     fireEvent.click(screen.getByRole('button', { name: 'Cancel query' }))
-    expect(await screen.findByText('Server interruptions: 1', { exact: true })).toBeTruthy()
+    await expect(
+      screen.findByText('Server interruptions: 1', { exact: true }),
+    ).resolves.toBeDefined()
     expect(
       application?.queryClient.isFetching({
         queryKey: application.httpQuery.diagnostics.slow.key(),
       }),
     ).toBe(1)
-    expect(screen.getByText('HTTP: Ready to cancel')).toBeTruthy()
+    expect(screen.getByText('HTTP: Ready to cancel')).toBeDefined()
 
     fireEvent.click(screen.getByRole('button', { name: 'Cancel HTTP query' }))
-    expect(await screen.findByText('HTTP: Server interruptions: 1')).toBeTruthy()
+    await expect(screen.findByText('HTTP: Server interruptions: 1')).resolves.toBeDefined()
     expect(
       application?.queryClient.isFetching({
         queryKey: application.httpQuery.diagnostics.slow.key(),

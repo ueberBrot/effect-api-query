@@ -2,6 +2,9 @@ import { makeExampleRpcWebHandler } from '@effect-api-query/server/web-handler'
 import { describe, expect, it } from '@effect/vitest'
 import { Effect } from 'effect'
 
+const streamingRequest = (url: string, init: RequestInit & { readonly duplex?: 'half' }) =>
+  new Request(url, init)
+
 describe('example RPC request body limit', () => {
   it.effect('rejects failed and aborted uploads without waiting for more bytes', () =>
     Effect.gen(function* () {
@@ -11,18 +14,22 @@ describe('example RPC request body limit', () => {
           controller.error(new Error('Upload failed'))
         },
       })
-      const failedResponse = yield* Effect.promise(() =>
+      const failedResponse = yield* Effect.promise(async () =>
         handler(
-          new Request('http://localhost/rpc', {
+          streamingRequest('http://localhost/rpc', {
             method: 'POST',
             body: failed,
             duplex: 'half',
-          } as RequestInit),
+          }),
         ),
       )
       expect(failedResponse.status).toBe(400)
 
+      // This test drives external browser cancellation independently of the surrounding Effect.
+      /* oxlint-disable effecttsgo/abort-controller-in-effect */
+      // @effect-diagnostics-next-line abortControllerInEffect:off
       const controller = new AbortController()
+      /* oxlint-enable effecttsgo/abort-controller-in-effect */
       let cancelled = false
       const body = new ReadableStream<Uint8Array>({
         cancel() {
@@ -30,15 +37,15 @@ describe('example RPC request body limit', () => {
         },
       })
       const response = handler(
-        new Request('http://localhost/rpc', {
+        streamingRequest('http://localhost/rpc', {
           method: 'POST',
           body,
           signal: controller.signal,
           duplex: 'half',
-        } as RequestInit),
+        }),
       )
       controller.abort()
-      expect((yield* Effect.promise(() => response)).status).toBe(400)
+      expect((yield* Effect.promise(async () => response)).status).toBe(400)
       expect(cancelled).toBe(true)
     }),
   )
@@ -47,16 +54,16 @@ describe('example RPC request body limit', () => {
     Effect.gen(function* () {
       const handler = yield* makeExampleRpcWebHandler()
       for (const size of [1024 * 1024 - 1, 1024 * 1024, 1024 * 1024 + 1]) {
-        const response = yield* Effect.promise(() =>
+        const response = yield* Effect.promise(async () =>
           handler(
-            new Request('http://localhost/rpc', {
+            streamingRequest('http://localhost/rpc', {
               method: 'POST',
               body: '[]'.padEnd(size),
             }),
           ),
         )
         expect(response.status).toBe(size > 1024 * 1024 ? 413 : 200)
-        yield* Effect.promise(() => response.arrayBuffer())
+        yield* Effect.promise(async () => response.arrayBuffer())
       }
     }),
   )
@@ -76,14 +83,14 @@ describe('example RPC request body limit', () => {
               cancelled = true
             },
           })
-          const response = yield* Effect.promise(() =>
+          const response = yield* Effect.promise(async () =>
             handler(
-              new Request('http://localhost/rpc', {
+              streamingRequest('http://localhost/rpc', {
                 method: 'POST',
                 body,
                 headers,
                 duplex: 'half',
-              } as RequestInit),
+              }),
             ),
           )
           expect(response.status).toBe(413)

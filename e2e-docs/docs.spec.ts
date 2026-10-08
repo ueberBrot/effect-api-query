@@ -11,23 +11,34 @@ test('opens both tutorials and searches the production index under the public ba
   page,
   baseURL,
 }) => {
-  const origin = new URL(baseURL!).origin
+  if (baseURL === undefined) {
+    throw new Error('The docs browser fixture must define baseURL')
+  }
+  const { origin } = new URL(baseURL)
   const failedAssets: string[] = []
   const loadedAssets: string[] = []
   const pageErrors: string[] = []
-  page.on('pageerror', (error) => pageErrors.push(error.message))
+  page.on('pageerror', (error) => {
+    pageErrors.push(error.message)
+  })
   page.on('response', (response) => {
     const url = new URL(response.url())
-    if (url.origin !== origin) return
-    if (!response.ok()) failedAssets.push(`${response.status()} ${url.pathname}`)
+    if (url.origin !== origin) {
+      return
+    }
+    if (!response.ok()) {
+      failedAssets.push(`${response.status()} ${url.pathname}`)
+    }
     if (url.pathname.includes('/_astro/') || url.pathname.includes('/pagefind/')) {
       loadedAssets.push(url.pathname)
     }
   })
   page.on('requestfailed', (request) => {
-    if (new URL(request.url()).origin === origin) failedAssets.push(request.url())
+    if (new URL(request.url()).origin === origin) {
+      failedAssets.push(request.url())
+    }
   })
-  await page.route(registryUrl, (route) => route.fulfill({ status: 404, json: {} }))
+  await page.route(registryUrl, async (route) => route.fulfill({ status: 404, json: {} }))
 
   await page.goto(docsBase, { waitUntil: 'networkidle' })
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('effect-api-query')
@@ -69,7 +80,7 @@ test('opens both tutorials and searches the production index under the public ba
 })
 
 test('uses canonical repository links and serves branded icons', async ({ page, request }) => {
-  await page.route(registryUrl, (route) => route.fulfill({ status: 404, json: {} }))
+  await page.route(registryUrl, async (route) => route.fulfill({ status: 404, json: {} }))
   await page.goto(`${docsBase}getting-started/quick-start/`)
   await expect(page.getByRole('link', { name: 'GitHub', exact: true })).toHaveAttribute(
     'href',
@@ -87,31 +98,46 @@ test('uses canonical repository links and serves branded icons', async ({ page, 
     await page.locator('link[rel="shortcut icon"]').getAttribute('href'),
     await page.locator('.site-title img').getAttribute('src'),
   ]
+  // Keep each icon's request and assertions together to identify the failing URL.
+  /* oxlint-disable eslint/no-await-in-loop */
   for (const url of iconUrls) {
-    expect(url).toMatch(/^\/effect-api-query\//)
-    const response = await request.get(url!)
-    expect(response.ok(), url!).toBe(true)
+    expect(url).toMatch(/^\/effect-api-query\//u)
+    if (url === null) {
+      throw new Error('The branded icon must declare a URL')
+    }
+    const response = await request.get(url)
+    expect(response.ok(), url).toBe(true)
     expect(response.headers()['content-type']).toContain('image/svg+xml')
-    expect(await response.text()).toMatch(/<title(?:\s[^>]*)?>effect-api-query<\/title>/)
+    expect(await response.text()).toMatch(/<title(?:\s[^>]*)?>effect-api-query<\/title>/u)
   }
+  /* oxlint-enable eslint/no-await-in-loop */
 })
 
 test('shows the latest published version from the package registry', async ({ page }) => {
-  await page.route(registryUrl, (route) => route.fulfill({ json: { version: '1.2.3-beta.1' } }))
+  await page.route(registryUrl, async (route) =>
+    route.fulfill({ json: { version: '1.2.3-beta.1' } }),
+  )
   await page.goto(docsBase)
   const links = page.locator(`a[href="${packageUrl}"]`)
   await expect(links.first()).toHaveText('v1.2.3-beta.1')
+  // Check each DOM locator sequentially while this test owns the page.
+  /* oxlint-disable eslint/no-await-in-loop */
   for (const link of await links.all()) {
     await expect(link).toHaveText('v1.2.3-beta.1')
     await expect(link).toHaveAttribute('aria-label', 'effect-api-query v1.2.3-beta.1 on npm')
   }
+  /* oxlint-enable eslint/no-await-in-loop */
 })
 
 for (const failure of ['unpublished package', 'network failure', 'invalid version'] as const) {
   test(`retains the build version after ${failure}`, async ({ page }) => {
-    await page.route(registryUrl, (route) => {
-      if (failure === 'network failure') return route.abort('failed')
-      if (failure === 'unpublished package') return route.fulfill({ status: 404, json: {} })
+    await page.route(registryUrl, async (route) => {
+      if (failure === 'network failure') {
+        return route.abort('failed')
+      }
+      if (failure === 'unpublished package') {
+        return route.fulfill({ status: 404, json: {} })
+      }
       return route.fulfill({ json: { version: 'latest' } })
     })
     const request = page.waitForRequest(registryUrl)
@@ -119,9 +145,12 @@ for (const failure of ['unpublished package', 'network failure', 'invalid versio
     await request
     const links = page.locator(`a[href="${packageUrl}"]`)
     await expect(links.first()).toHaveText(`v${packageManifest.version}`)
+    // Check each DOM locator sequentially while this test owns the page.
+    /* oxlint-disable eslint/no-await-in-loop */
     for (const link of await links.all()) {
       await expect(link).toHaveText(`v${packageManifest.version}`)
     }
+    /* oxlint-enable eslint/no-await-in-loop */
   })
 }
 
@@ -131,6 +160,8 @@ test('serves generated LLM documentation with the public URLs', async ({ request
   expect(index.ok()).toBe(true)
   const indexText = await index.text()
   expect(indexText).toContain('# effect-api-query')
+  // Fetch and inspect one generated document at a time to attribute broken links.
+  /* oxlint-disable eslint/no-await-in-loop */
   for (const filename of ['llms-small.txt', 'llms-full.txt']) {
     expect(indexText).toContain(`https://ueberbrot.github.io${docsBase}${filename}`)
     const response = await request.get(`${docsBase}${filename}`)
@@ -139,11 +170,20 @@ test('serves generated LLM documentation with the public URLs', async ({ request
     expect(content).toContain('RPC Quick Start')
     expect(content).toContain('HTTP Quick Start')
     expect(content).toContain(`](${docsBase}getting-started/quick-start/)`)
-    for (const match of content.matchAll(/\]\((\/[^)\s]*)\)/g)) {
-      expect(match[1]).toMatch(/^\/effect-api-query\//)
-      linkedPaths.add(match[1]!.split('#')[0]!)
+    for (const match of content.matchAll(/\]\((?<destination>\/[^)\s]*)\)/gu)) {
+      const destination = match.groups?.['destination']
+      expect(destination).toMatch(/^\/effect-api-query\//u)
+      if (destination === undefined) {
+        throw new Error('The documentation link must include its destination')
+      }
+      const [path] = destination.split('#')
+      if (path === undefined) {
+        throw new Error('The documentation URL must include its path')
+      }
+      linkedPaths.add(path)
     }
   }
+  /* oxlint-enable eslint/no-await-in-loop */
   expect(linkedPaths.size).toBeGreaterThan(0)
   await Promise.all(
     [...linkedPaths].map(async (path) => {

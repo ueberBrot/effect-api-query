@@ -1,12 +1,15 @@
-import { QueryClient, isCancelledError } from '@tanstack/query-core'
-import { Cause, Effect, Exit, Schema } from 'effect'
+import { CancelledError, QueryClient } from '@tanstack/query-core'
+import { Cause, Effect, Exit, Predicate, Schema } from 'effect'
 import { FetchHttpClient } from 'effect/http'
 import { HttpApi, HttpApiClient, HttpApiEndpoint, HttpApiGroup } from 'effect/http-api'
 import { once } from 'node:events'
 import { createServer } from 'node:http'
 import { describe, expect, it } from 'vite-plus/test'
 
-import { createHttpApiQueryUtils, type RunPromiseExit } from '#effect-api-query'
+import { createHttpApiQueryUtils } from '#effect-api-query'
+import type { RunPromiseExit } from '#effect-api-query'
+
+import { captureFailure } from './fixtures/async'
 
 const Api = HttpApi.make('transport').add(
   HttpApiGroup.make('pages').add(
@@ -23,12 +26,18 @@ describe('HTTP transport cancellation', () => {
     async (mode) => {
       let received!: () => void
       let disconnected!: () => void
+      // SAFETY: This Promise bridges a callback or externally observed event so cancellation can be awaited.
+      /* oxlint-disable promise/avoid-new */
       const requestReceived = new Promise<void>((resolve) => {
         received = resolve
       })
+      /* oxlint-enable promise/avoid-new */
+      // SAFETY: This Promise bridges a callback or externally observed event so cancellation can be awaited.
+      /* oxlint-disable promise/avoid-new */
       const requestDisconnected = new Promise<void>((resolve) => {
         disconnected = resolve
       })
+      /* oxlint-enable promise/avoid-new */
       const paths: string[] = []
       const server = createServer((request, response) => {
         paths.push(request.url ?? '')
@@ -43,7 +52,9 @@ describe('HTTP transport cancellation', () => {
       server.listen(0, '127.0.0.1')
       await once(server, 'listening')
       const address = server.address()
-      if (address === null || typeof address === 'string') throw new Error('Expected TCP address')
+      if (address === null || Predicate.isString(address)) {
+        throw new Error('Expected TCP address')
+      }
       const queryClient = new QueryClient()
       try {
         const client = await Effect.runPromise(
@@ -52,14 +63,19 @@ describe('HTTP transport cancellation', () => {
           ),
         )
         let interrupted!: (cause: Cause.Cause<unknown>) => void
+        // SAFETY: This Promise bridges a callback or externally observed event so cancellation can be awaited.
+        /* oxlint-disable promise/avoid-new */
         const interruption = new Promise<Cause.Cause<unknown>>((resolve) => {
           interrupted = resolve
         })
+        /* oxlint-enable promise/avoid-new */
         let requestSignal: AbortSignal | undefined
         const runPromiseExit: RunPromiseExit = async (effect, options) => {
           requestSignal = options?.signal
           const exit = await Effect.runPromiseExit(effect, options)
-          if (Exit.isFailure(exit)) interrupted(exit.cause)
+          if (Exit.isFailure(exit)) {
+            interrupted(exit.cause)
+          }
           return exit
         }
         const utils = createHttpApiQueryUtils(Api, { client, keyPrefix: ['test'], runPromiseExit })
@@ -74,21 +90,33 @@ describe('HTTP transport cancellation', () => {
                 }),
                 pages: 2,
               })
-        const result = pending.catch((error: unknown) => error)
+        const result = captureFailure(pending)
         await requestReceived
         expect(requestSignal?.aborted).toBe(false)
         await queryClient.cancelQueries({ queryKey: utils.pages.read.key() })
-        expect(isCancelledError(await result)).toBe(true)
+        await expect(result).resolves.toBeInstanceOf(CancelledError)
         expect(requestSignal?.aborted).toBe(true)
         expect(Cause.hasInterrupts(await interruption)).toBe(true)
         await requestDisconnected
-        expect(paths).toEqual(mode === 'query' ? ['/pages/1'] : ['/pages/0', '/pages/1'])
+        expect(paths).toStrictEqual(mode === 'query' ? ['/pages/1'] : ['/pages/0', '/pages/1'])
         expect(queryClient.isFetching()).toBe(0)
       } finally {
         queryClient.clear()
+        // SAFETY: The Node server-close callback must be bridged to a Promise to await shutdown.
+        /* oxlint-disable promise/avoid-new */
         const closed = new Promise<void>((resolve, reject) => {
-          server.close((error) => (error === undefined ? resolve() : reject(error)))
+          // SAFETY: The Node server-close callback must be bridged to a Promise to await shutdown.
+          /* oxlint-disable promise/prefer-await-to-callbacks */
+          server.close((error) => {
+            if (error === undefined) {
+              resolve()
+            } else {
+              reject(error)
+            }
+          })
+          /* oxlint-enable promise/prefer-await-to-callbacks */
         })
+        /* oxlint-enable promise/avoid-new */
         server.closeAllConnections()
         await closed
       }

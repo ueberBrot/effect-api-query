@@ -9,10 +9,14 @@ for (const [page, fixture] of [
 ]) {
   const markdown = readFileSync(
     new URL(`../apps/docs/src/content/docs/getting-started/${page}.md`, import.meta.url),
-    'utf8',
+    'utf-8',
   )
-  const source = readFileSync(new URL(`../tests/types/${fixture}.ts`, import.meta.url), 'utf8')
-  const samples = [...markdown.matchAll(/^```ts\n([\s\S]*?)^```/gm)]
+  const source = readFileSync(new URL(`../tests/types/${fixture}.ts`, import.meta.url), 'utf-8')
+  const samples = [...markdown.matchAll(/^```ts\n(?<source>[\s\S]*?)^```/gmu)]
   strictEqual(samples.length, 1, `${page} must contain its complete TypeScript fixture`)
-  strictEqual(samples[0]?.[1]?.trimEnd(), source.trimEnd(), `${page} differs from ${fixture}.ts`)
+  strictEqual(
+    samples[0]?.groups?.['source']?.trimEnd(),
+    source.trimEnd(),
+    `${page} differs from ${fixture}.ts`,
+  )
 }

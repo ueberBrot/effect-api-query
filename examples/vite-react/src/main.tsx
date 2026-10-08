@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
-import { ViteReactExample } from './App.tsx'
+import { ViteReactExample } from './app.tsx'
 import { startViteReactApplication } from './lib/application.ts'
 
 import './styles/tailwind.css'
@@ -26,11 +26,15 @@ root.render(
 
 let disposed = false
 const dispose = () => {
-  if (disposed) return
+  if (disposed) {
+    return
+  }
   disposed = true
   root.unmount()
   void application.dispose()
 }
 
 globalThis.addEventListener('pagehide', dispose, { once: true })
-if (import.meta.hot !== undefined) import.meta.hot.dispose(dispose)
+if (import.meta.hot !== undefined) {
+  import.meta.hot.dispose(dispose)
+}

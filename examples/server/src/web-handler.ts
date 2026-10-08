@@ -1,6 +1,7 @@
 import { exampleRpcGroup } from '@effect-api-query/contracts'
 import { Effect, Layer, Scope } from 'effect'
-import { HttpEffect, HttpMiddleware, HttpRouter, HttpServer, HttpServerRequest } from 'effect/http'
+import type { HttpServerRequest } from 'effect/http'
+import { HttpEffect, HttpMiddleware, HttpRouter, HttpServer } from 'effect/http'
 import { RpcSerialization, RpcServer } from 'effect/rpc'
 
 import { ExampleDomain } from './domain.ts'
@@ -11,20 +12,33 @@ const rpcLayer = Layer.mergeAll(exampleRpcHandlersLayer, RpcSerialization.layerJ
 const maxRequestBodyBytes = 1024 * 1024
 
 const readRequestBody = async (request: Request): Promise<Uint8Array<ArrayBuffer> | Response> => {
-  if (request.body === null) return new Uint8Array()
+  if (request.body === null) {
+    return new Uint8Array()
+  }
   const reader = request.body.getReader()
   const body = new Uint8Array(maxRequestBodyBytes)
   let length = 0
+  const cancelReader = async () => {
+    try {
+      await reader.cancel()
+    } catch {
+      // Failed or already closed uploads no longer need cancellation.
+    }
+  }
   const cancel = () => {
-    void reader.cancel().catch(() => undefined)
+    void cancelReader()
   }
   request.signal.addEventListener('abort', cancel, { once: true })
   try {
     while (true) {
       request.signal.throwIfAborted()
+      // Each stream read must complete before the next chunk can be requested.
+      // oxlint-disable-next-line eslint/no-await-in-loop
       const chunk = await reader.read()
       request.signal.throwIfAborted()
-      if (chunk.done) return body.subarray(0, length)
+      if (chunk.done) {
+        return body.subarray(0, length)
+      }
       if (chunk.value.byteLength > maxRequestBodyBytes - length) {
         cancel()
         return new Response(null, { status: 413 })
@@ -40,6 +54,23 @@ const readRequestBody = async (request: Request): Promise<Uint8Array<ArrayBuffer
     reader.releaseLock()
   }
 }
+
+const withRequestBodyLimit =
+  (handler: (request: Request) => Promise<Response>) =>
+  async (request: Request): Promise<Response> => {
+    const body = await readRequestBody(request)
+    if (body instanceof Response) {
+      return body
+    }
+    return await handler(
+      new Request(request.url, {
+        body: request.body === null ? null : body,
+        headers: request.headers,
+        method: request.method,
+        signal: request.signal,
+      }),
+    )
+  }
 
 /** Builds the host-neutral HTTP RPC handler within the caller-owned Scope. */
 const makeRpcWebHandler = Effect.fn('ExampleRpc.makeRpcWebHandler')(function* () {
@@ -57,21 +88,6 @@ const makeRpcWebHandler = Effect.fn('ExampleRpc.makeRpcWebHandler')(function* ()
   >(runtimeContext)(HttpMiddleware.logger(rpcHttpEffect))
   return withRequestBodyLimit(handler)
 })
-
-const withRequestBodyLimit =
-  (handler: (request: Request) => Promise<Response>) =>
-  async (request: Request): Promise<Response> => {
-    const body = await readRequestBody(request)
-    if (body instanceof Response) return body
-    return handler(
-      new Request(request.url, {
-        body: request.body === null ? null : body,
-        headers: request.headers,
-        method: request.method,
-        signal: request.signal,
-      }),
-    )
-  }
 
 const provideDomain = Effect.fn('ExampleDomain.provide')(function* <A, E, R>(
   effect: Effect.Effect<A, E, R | ExampleDomain>,
@@ -99,10 +115,14 @@ export const makeExampleWebHandler = Effect.fn('ExampleServer.makeExampleWebHand
     )(HttpMiddleware.logger(httpEffect)),
   )
 
-  return (request: Request): Promise<Response> => {
+  return async (request: Request): Promise<Response> => {
     const path = new URL(request.url).pathname
-    if ((path === '/rpc' || path === '/rpc/') && request.method === 'POST') return rpc(request)
-    if (path.startsWith('/api/')) return http(request)
-    return Promise.resolve(new Response(null, { status: 404 }))
+    if ((path === '/rpc' || path === '/rpc/') && request.method === 'POST') {
+      return await rpc(request)
+    }
+    if (path.startsWith('/api/')) {
+      return await http(request)
+    }
+    return new Response(null, { status: 404 })
   }
 }, provideDomain)

@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
-import { type SubmitEvent, useState } from 'react'
+import { useState } from 'react'
+import type { SubmitEvent } from 'react'
 
 import type { ViteReactApplication } from '../../lib/application.ts'
 import { ActionButton } from '../ui/action-button.tsx'
@@ -19,42 +20,41 @@ export const CreateUserForm = ({ application }: { readonly application: ViteReac
     event.preventDefault()
     const userName = name.trim()
     const userLocale = locale.trim()
-    if (userName.length === 0) return
+    if (userName.length === 0) {
+      return
+    }
 
-    createUser.mutate(
-      {
-        name: userName,
-        ...(userLocale.length === 0 ? {} : { locale: userLocale }),
+    const input =
+      userLocale.length === 0 ? { name: userName } : { name: userName, locale: userLocale }
+    createUser.mutate(input, {
+      onSuccess: () => {
+        setLocale('')
+        setName('')
       },
-      {
-        onSuccess: () => {
-          setLocale('')
-          setName('')
-        },
-      },
-    )
+    })
   }
 
   return (
     <>
-      <form
-        className="grid gap-3 md:grid-cols-[minmax(0,1fr)_minmax(0,0.65fr)_auto] md:items-end"
-        onSubmit={submitUser}
-      >
-        <label className="grid gap-1.5 text-sm font-semibold text-zinc-300">
+      <form className="user-form-grid grid gap-3 md:items-end" onSubmit={submitUser}>
+        <label className="grid gap-1.5 text-sm font-semibold text-text-tertiary">
           Name
           <input
-            className="min-w-0 rounded-sm border border-zinc-700 bg-black px-3 py-2.5 text-zinc-100 outline-none placeholder:text-zinc-600 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20"
-            onChange={(event) => setName(event.currentTarget.value)}
+            className="min-w-0 rounded-sm border border-border-strong bg-background px-3 py-2.5 text-text-primary outline-none placeholder:text-placeholder focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
+            onChange={(event) => {
+              setName(event.currentTarget.value)
+            }}
             required
             value={name}
           />
         </label>
-        <label className="grid gap-1.5 text-sm font-semibold text-zinc-300">
+        <label className="grid gap-1.5 text-sm font-semibold text-text-tertiary">
           Locale (optional)
           <input
-            className="min-w-0 rounded-sm border border-zinc-700 bg-black px-3 py-2.5 text-zinc-100 outline-none placeholder:text-zinc-600 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20"
-            onChange={(event) => setLocale(event.currentTarget.value)}
+            className="min-w-0 rounded-sm border border-border-strong bg-background px-3 py-2.5 text-text-primary outline-none placeholder:text-placeholder focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
+            onChange={(event) => {
+              setLocale(event.currentTarget.value)
+            }}
             placeholder="en"
             value={locale}
           />

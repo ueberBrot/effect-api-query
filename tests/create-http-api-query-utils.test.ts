@@ -4,12 +4,12 @@ import { HttpServer } from 'effect/http'
 import {
   HttpApi,
   HttpApiBuilder,
-  type HttpApiClient,
   HttpApiEndpoint,
   HttpApiGroup,
   HttpApiSchema,
   HttpApiTest,
 } from 'effect/http-api'
+import type { HttpApiClient } from 'effect/http-api'
 import { Rpc, RpcGroup } from 'effect/rpc'
 import { describe, expect, it } from 'vite-plus/test'
 
@@ -21,6 +21,9 @@ import {
   isEffectHttpApiQueryError,
   createRpcQueryUtils,
 } from '#effect-api-query'
+
+import { captureFailure } from './fixtures/async'
+import { unusedHttpClientFor } from './fixtures/http-client'
 
 const Api = HttpApi.make('test').add(
   HttpApiGroup.make('users').add(
@@ -46,7 +49,7 @@ const makeClient = HttpApiTest.groups(Api, ['users']).pipe(
   Effect.provide(Layer.mergeAll(Handlers, HttpServer.layerServices)),
 )
 
-describe('createHttpApiQueryUtils', () => {
+describe(createHttpApiQueryUtils, () => {
   it('rejects sparse key prefixes through both adapters, including nested arrays', () => {
     const sparse = ['app', 'tenant'] as const
     Reflect.deleteProperty(sparse, 1)
@@ -84,35 +87,41 @@ describe('createHttpApiQueryUtils', () => {
     const utils = createHttpApiQueryUtils(Api, { client, keyPrefix: ['shared'] })
     const queryClient = new QueryClient()
     try {
-      expect(
-        await queryClient.query(
+      // SAFETY: Undeclared response controls are injected to verify that decoded-only execution cannot be overridden.
+      /* oxlint-disable typescript/no-unsafe-type-assertion */
+      await expect(
+        queryClient.query(
           utils.users.get.queryOptions({
             input: { params: { id: 1 }, responseMode: 'response-only' } as never,
           }),
         ),
-      ).toEqual({ id: 1, name: 'Ada' })
+      ).resolves.toStrictEqual({ id: 1, name: 'Ada' })
+      /* oxlint-enable typescript/no-unsafe-type-assertion */
       const mutation = queryClient
         .getMutationCache()
         .build(queryClient, utils.users.create.mutationOptions())
-      expect(
-        await mutation.execute({
+      // SAFETY: Undeclared response controls are injected to verify that decoded-only execution cannot be overridden.
+      /* oxlint-disable typescript/no-unsafe-type-assertion */
+      await expect(
+        mutation.execute({
           payload: { name: 'Grace' },
           responseMode: 'decoded-and-response',
         } as never),
-      ).toEqual({
+      ).resolves.toStrictEqual({
         id: 2,
         name: 'Grace',
       })
-      expect(
-        await queryClient.query(utils.users.remove.queryOptions({ input: { params: { id: 1 } } })),
-      ).toBeNull()
-      expect(
-        await queryClient
+      /* oxlint-enable typescript/no-unsafe-type-assertion */
+      await expect(
+        queryClient.query(utils.users.remove.queryOptions({ input: { params: { id: 1 } } })),
+      ).resolves.toBeNull()
+      await expect(
+        queryClient
           .getMutationCache()
           .build(queryClient, utils.users.remove.mutationOptions())
           .execute({ params: { id: 1 } }),
-      ).toBeUndefined()
-      expect(utils.users.get.queryKey({ params: { id: 1 } })).toEqual([
+      ).resolves.toBeUndefined()
+      expect(utils.users.get.queryKey({ params: { id: 1 } })).toStrictEqual([
         'shared',
         'http',
         'test',
@@ -126,6 +135,7 @@ describe('createHttpApiQueryUtils', () => {
       await Effect.runPromise(Scope.close(scope, Exit.void))
     }
   })
+
   it('omits whole streaming and multipart endpoints and their empty groups', () => {
     const streaming = HttpApiEndpoint.get('mixed', '/mixed', {
       success: [
@@ -165,11 +175,11 @@ describe('createHttpApiQueryUtils', () => {
       ),
     )
     const utils = createHttpApiQueryUtils(mixed, {
-      client: {} as HttpApiClient.ForApi<typeof mixed>,
+      client: unusedHttpClientFor(mixed),
       keyPrefix: ['test'],
     })
-    expect(Object.keys(utils)).toEqual(['key', 'kept'])
-    expect(Object.keys(utils.kept)).toEqual(['key', 'read'])
+    expect(Object.keys(utils)).toStrictEqual(['key', 'kept'])
+    expect(Object.keys(utils.kept)).toStrictEqual(['key', 'read'])
   })
 
   it('rejects contradictory multipart brands and encoding atomically', () => {
@@ -213,7 +223,7 @@ describe('createHttpApiQueryUtils', () => {
       )
       expect(() =>
         createHttpApiQueryUtils(api, {
-          client: {} as HttpApiClient.ForApi<typeof api>,
+          client: unusedHttpClientFor(api),
           keyPrefix: ['test'],
         }),
       ).toThrow(
@@ -239,6 +249,8 @@ describe('createHttpApiQueryUtils', () => {
       ),
     )
     const calls: unknown[] = []
+    // SAFETY: This mock records arbitrary invocation values so request ownership can be asserted without changing the input.
+    /* oxlint-disable anti-slop/no-unknown-parameters */
     const client = {
       'users.v1': {
         'read.one': (request: unknown) => {
@@ -251,23 +263,32 @@ describe('createHttpApiQueryUtils', () => {
         return Effect.succeed('healthy')
       },
     }
+    /* oxlint-enable anti-slop/no-unknown-parameters */
+    // SAFETY: The mock implements only the endpoint under test, and its invocation and result are asserted below.
+    /* oxlint-disable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
     const utils = createHttpApiQueryUtils(api, {
       client: client as unknown as HttpApiClient.ForApi<typeof api>,
       keyPrefix: ['test'],
     })
+    /* oxlint-enable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
     const queryClient = new QueryClient()
     try {
-      expect(await queryClient.query(utils['users.v1']['read.one'].queryOptions())).toBe('one')
-      expect(await queryClient.query(utils['health.check'].queryOptions())).toBe('healthy')
-      expect(calls).toEqual([{ responseMode: 'decoded-only' }, { responseMode: 'decoded-only' }])
-      expect(utils['health.check'].queryKey()).toEqual([
+      await expect(queryClient.query(utils['users.v1']['read.one'].queryOptions())).resolves.toBe(
+        'one',
+      )
+      await expect(queryClient.query(utils['health.check'].queryOptions())).resolves.toBe('healthy')
+      expect(calls).toStrictEqual([
+        { responseMode: 'decoded-only' },
+        { responseMode: 'decoded-only' },
+      ])
+      expect(utils['health.check'].queryKey()).toStrictEqual([
         'test',
         'http',
         'literal.api',
         'health.check',
         'query',
       ])
-      expect(Object.keys(utils['health.check'])).toEqual([
+      expect(Object.keys(utils['health.check'])).toStrictEqual([
         'infiniteKey',
         'infiniteOptions',
         'key',
@@ -295,13 +316,14 @@ describe('createHttpApiQueryUtils', () => {
         HttpApiGroup.make('', { topLevel: true }).add(HttpApiEndpoint.get('', '/read')),
       ),
     ]
-    for (const api of invalidApis)
+    for (const api of invalidApis) {
       expect(() =>
         createHttpApiQueryUtils(api, {
-          client: {} as HttpApiClient.ForApi<typeof api>,
+          client: unusedHttpClientFor(api),
           keyPrefix: ['test'],
         }),
       ).toThrow(expect.objectContaining({ code: 'InvalidEndpointPath' }))
+    }
     const topLevel = HttpApiGroup.make('top', { topLevel: true }).add(
       HttpApiEndpoint.get('users', '/top'),
     )
@@ -313,7 +335,7 @@ describe('createHttpApiQueryUtils', () => {
       const api = HttpApi.make('collision').add(...groups)
       expect(() =>
         createHttpApiQueryUtils(api, {
-          client: {} as HttpApiClient.ForApi<typeof api>,
+          client: unusedHttpClientFor(api),
           keyPrefix: ['test'],
         }),
       ).toThrow(expect.objectContaining({ code: 'EndpointPathCollision' }))
@@ -326,7 +348,7 @@ describe('createHttpApiQueryUtils', () => {
     )
     expect(() =>
       createHttpApiQueryUtils(duplicate, {
-        client: {} as HttpApiClient.ForApi<typeof duplicate>,
+        client: unusedHttpClientFor(duplicate),
         keyPrefix: ['test'],
       }),
     ).toThrow(EffectHttpApiQueryConfigError)
@@ -340,15 +362,16 @@ describe('createHttpApiQueryUtils', () => {
     )
     const cause = Cause.combine(Cause.fail('denied'), Cause.die(new Error('defect')))
     const client = { actions: { fail: () => Effect.failCause(cause) } }
+    // SAFETY: The mock implements only the endpoint under test, and its invocation and result are asserted below.
+    /* oxlint-disable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
     const utils = createHttpApiQueryUtils(api, {
       client: client as unknown as HttpApiClient.ForApi<typeof api>,
       keyPrefix: ['test'],
     })
+    /* oxlint-enable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
     const queryClient = new QueryClient()
     try {
-      const error = await queryClient
-        .query(utils.actions.fail.queryOptions())
-        .catch((error: unknown) => error)
+      const error = await captureFailure(queryClient.query(utils.actions.fail.queryOptions()))
       expect(error).toBeInstanceOf(EffectHttpApiQueryError)
       expect(isEffectHttpApiQueryError(error)).toBe(true)
       expect(error).toMatchObject({
@@ -359,13 +382,19 @@ describe('createHttpApiQueryUtils', () => {
         operation: 'query',
         cause,
       })
-      if (isEffectHttpApiQueryError(error)) expect(error.cause).toBe(cause)
+      if (!isEffectHttpApiQueryError(error)) {
+        throw new Error('Expected HTTP execution error')
+      }
+      expect(error.cause).toBe(cause)
       const rejection = new Error('runner')
+      // SAFETY: The mock implements only the endpoint under test, and its invocation and result are asserted below.
+      /* oxlint-disable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
       const rejected = createHttpApiQueryUtils(api, {
         client: client as unknown as HttpApiClient.ForApi<typeof api>,
         keyPrefix: ['test'],
-        runPromiseExit: (): Promise<never> => Promise.reject(rejection),
+        runPromiseExit: async (): Promise<never> => await Promise.reject(rejection),
       })
+      /* oxlint-enable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
       await expect(queryClient.query(rejected.actions.fail.queryOptions())).rejects.toBe(rejection)
     } finally {
       queryClient.clear()
@@ -383,7 +412,7 @@ describe('createHttpApiQueryUtils', () => {
       ),
     )
     const http = createHttpApiQueryUtils(api, {
-      client: {} as HttpApiClient.ForApi<typeof api>,
+      client: unusedHttpClientFor(api),
       keyPrefix: ['shared'],
     })
     const group = RpcGroup.make(
@@ -392,18 +421,23 @@ describe('createHttpApiQueryUtils', () => {
         success: Schema.String,
       }),
     )
+    // SAFETY: This one-RPC fixture returns the declared string; this test compares only its cached key partition.
+    /* oxlint-disable typescript/no-unsafe-type-assertion */
     const rpc = createRpcQueryUtils(group, {
       client: (() => Effect.succeed('rpc')) as never,
       keyPrefix: ['shared'],
     })
+    /* oxlint-enable typescript/no-unsafe-type-assertion */
     const queryClient = new QueryClient()
     const first = http.users.get.queryKey({ params: { id: 1 } })
     const second = http.users.get.queryKey({ params: { id: 2 } })
     const other = http.users.list.queryKey()
     const rpcKey = rpc.users.get.queryKey({ id: 1 })
     try {
-      for (const key of [first, second, other, rpcKey]) queryClient.setQueryData(key, 'cached')
-      expect(http.users.get.mutationKey()).not.toEqual(
+      for (const key of [first, second, other, rpcKey]) {
+        queryClient.setQueryData(key, 'cached')
+      }
+      expect(http.users.get.mutationKey()).not.toStrictEqual(
         http.users.get.queryKey({ params: { id: 1 } }),
       )
       await queryClient.invalidateQueries({ queryKey: http.users.get.key() })
@@ -431,18 +465,21 @@ describe('createHttpApiQueryUtils', () => {
         }),
       ),
     )
+    // SAFETY: A required encoder is deliberately omitted to verify the synchronous configuration-error boundary.
+    /* oxlint-disable typescript/no-unsafe-type-assertion */
     expect(() =>
       createHttpApiQueryUtils(api, {
-        client: {} as HttpApiClient.ForApi<typeof api>,
+        client: unusedHttpClientFor(api),
         keyPrefix: ['test'],
       } as never),
     ).toThrow(expect.objectContaining({ code: 'MissingKeyEncoder' }))
+    /* oxlint-enable typescript/no-unsafe-type-assertion */
     const utils = createHttpApiQueryUtils(api, {
-      client: {} as HttpApiClient.ForApi<typeof api>,
+      client: unusedHttpClientFor(api),
       keyPrefix: ['test'],
       keyEncoders: { forms: { submit: ({ payload }) => ({ payload }) } },
     })
-    expect(utils.submit.queryKey({ payload: 'yes' })).toEqual([
+    expect(utils.submit.queryKey({ payload: 'yes' })).toStrictEqual([
       'test',
       'http',
       'keys',
@@ -452,7 +489,7 @@ describe('createHttpApiQueryUtils', () => {
     ])
     const cause = new Error('encoder')
     const invalid = createHttpApiQueryUtils(api, {
-      client: {} as HttpApiClient.ForApi<typeof api>,
+      client: unusedHttpClientFor(api),
       keyPrefix: ['test'],
       keyEncoders: {
         forms: {
@@ -471,6 +508,7 @@ describe('createHttpApiQueryUtils', () => {
     )
     expect(() => invalid.submit.queryKey({ payload: 1 })).toThrow(EffectHttpApiQueryKeyError)
   })
+
   it('labels all declared request fields in keys and reports synchronous key failures', () => {
     const api = HttpApi.make('labels').add(
       HttpApiGroup.make('users').add(
@@ -483,7 +521,7 @@ describe('createHttpApiQueryUtils', () => {
       ),
     )
     const utils = createHttpApiQueryUtils(api, {
-      client: {} as HttpApiClient.ForApi<typeof api>,
+      client: unusedHttpClientFor(api),
       keyPrefix: ['test'],
     })
     const input = {
@@ -493,7 +531,7 @@ describe('createHttpApiQueryUtils', () => {
       payload: { name: 'Ada' },
     }
     const key = utils.users.save.queryKey(input)
-    expect(key.at(-1)).toEqual({
+    expect(key.at(-1)).toStrictEqual({
       params: { id: '1' },
       query: { page: '2' },
       headers: { 'x-version': '3' },
@@ -501,29 +539,38 @@ describe('createHttpApiQueryUtils', () => {
     })
     input.payload.name = 'Grace'
     expect(key.at(-1)).toMatchObject({ payload: { name: 'Ada' } })
+    // SAFETY: A string replaces the decoded numeric parameter to verify synchronous request encoding fails.
+    /* oxlint-disable typescript/no-unsafe-type-assertion */
     expect(() => utils.users.save.queryKey({ ...input, params: { id: 'raw' } } as never)).toThrow(
       expect.objectContaining({ code: 'RequestEncodingFailed', endpoint: 'save' }),
     )
+    /* oxlint-enable typescript/no-unsafe-type-assertion */
     const unsafe = createHttpApiQueryUtils(api, {
-      client: {} as HttpApiClient.ForApi<typeof api>,
+      client: unusedHttpClientFor(api),
       keyPrefix: ['test'],
       keyEncoders: { users: { save: () => Number.NaN } },
     })
     expect(() => unsafe.users.save.queryKey(input)).toThrow(
       expect.objectContaining({ code: 'InvalidKeyValue' }),
     )
+    // SAFETY: An empty prefix deliberately violates the nonempty tuple contract to verify configuration rejection.
+    /* oxlint-disable typescript/no-unsafe-type-assertion */
     expect(() =>
       createHttpApiQueryUtils(api, {
-        client: {} as HttpApiClient.ForApi<typeof api>,
+        client: unusedHttpClientFor(api),
         keyPrefix: [],
       } as never),
     ).toThrow(expect.objectContaining({ code: 'InvalidKeyPrefix' }))
+    /* oxlint-enable typescript/no-unsafe-type-assertion */
+    // SAFETY: Undeclared encoders deliberately exercise atomic validation of the encoder map.
+    /* oxlint-disable typescript/no-unsafe-type-assertion */
     expect(() =>
       createHttpApiQueryUtils(api, {
-        client: {} as HttpApiClient.ForApi<typeof api>,
+        client: unusedHttpClientFor(api),
         keyPrefix: ['test'],
         keyEncoders: { users: { missing: () => null } },
       } as never),
     ).toThrow(expect.objectContaining({ code: 'UnknownKeyEncoder' }))
+    /* oxlint-enable typescript/no-unsafe-type-assertion */
   })
 })

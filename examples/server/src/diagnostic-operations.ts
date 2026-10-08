@@ -1,8 +1,5 @@
-import {
-  DiagnosticFailure,
-  type DiagnosticStatus,
-  type SlowDiagnosticInput,
-} from '@effect-api-query/contracts'
+import { DiagnosticFailure } from '@effect-api-query/contracts'
+import type { DiagnosticStatus, SlowDiagnosticInput } from '@effect-api-query/contracts'
 import { Deferred, Effect, Ref } from 'effect'
 
 const initialStatus = (): DiagnosticStatus => ({ interrupted: 0, started: 0 })
@@ -35,8 +32,12 @@ export const makeDiagnosticOperations = Effect.fn('ExampleRpc.makeDiagnosticOper
       (operationId: string, cancellation: Deferred.Deferred<void>) =>
         Effect.sync(() => {
           const operations = active.get(operationId)
-          if (operations === undefined || !operations.delete(cancellation)) return false
-          if (operations.size === 0) active.delete(operationId)
+          if (operations === undefined || !operations.delete(cancellation)) {
+            return false
+          }
+          if (operations.size === 0) {
+            active.delete(operationId)
+          }
           return true
         }),
     )
@@ -44,19 +45,22 @@ export const makeDiagnosticOperations = Effect.fn('ExampleRpc.makeDiagnosticOper
     const cancel = Effect.fn('ExampleRpc.DiagnosticOperations.cancel')((operationId: string) =>
       Effect.suspend(() => {
         const operations = active.get(operationId)
-        return operations === undefined
-          ? Effect.void
-          : Effect.forEach(operations, (cancellation) =>
-              Deferred.succeed(cancellation, undefined),
-            ).pipe(Effect.asVoid)
+        if (operations === undefined) {
+          return Effect.void
+        }
+        // Effect.forEach accepts the iterable first and its effectful callback second.
+        // oxlint-disable-next-line unicorn/no-array-method-this-argument
+        return Effect.forEach(operations, (cancellation) =>
+          Deferred.succeed(cancellation, undefined),
+        ).pipe(Effect.asVoid)
       }),
     )
 
     const reset = Effect.suspend(() => {
-      const cancellations = Array.from(active.values()).flatMap((operations) =>
-        Array.from(operations),
-      )
+      const cancellations = [...active.values()].flatMap((operations) => [...operations])
       active.clear()
+      // Effect.forEach accepts the iterable first and its effectful callback second.
+      // oxlint-disable-next-line unicorn/no-array-method-this-argument
       return Effect.forEach(cancellations, (cancellation) =>
         Deferred.succeed(cancellation, undefined),
       ).pipe(Effect.andThen(Ref.set(state, initialState())))
@@ -67,16 +71,20 @@ export const makeDiagnosticOperations = Effect.fn('ExampleRpc.makeDiagnosticOper
       operationId,
     }: SlowDiagnosticInput) {
       const id = operationId ?? 'anonymous'
+      // Void is the deliberate success channel of this Effect factory.
+      // oxlint-disable-next-line typescript/no-invalid-void-type
       const cancellation = yield* Deferred.make<void>()
       const operations = active.get(id) ?? new Set<Deferred.Deferred<void>>()
       operations.add(cancellation)
       active.set(id, operations)
       yield* record(id, 'started')
 
-      return yield* Effect.raceFirst(
-        Effect.sleep(durationMs ?? 60_000).pipe(Effect.as('completed')),
-        Deferred.await(cancellation).pipe(Effect.andThen(Effect.interrupt)),
-      ).pipe(
+      return yield* Deferred.await(cancellation).pipe(
+        Effect.andThen(Effect.interrupt),
+        Effect.timeoutOrElse({
+          duration: durationMs ?? 60_000,
+          orElse: () => Effect.succeed('completed'),
+        }),
         Effect.onInterrupt(() =>
           remove(id, cancellation).pipe(
             Effect.flatMap((removed) => (removed ? record(id, 'interrupted') : Effect.void)),

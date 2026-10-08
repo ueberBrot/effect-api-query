@@ -43,9 +43,9 @@ type Equal<Left, Right> =
     : false
 type Assert<Value extends true> = Value
 
-const User = Schema.Struct({ id: Schema.Number, name: Schema.String })
+const User = Schema.Struct({ id: Schema.Finite, name: Schema.String })
 const Get = HttpApiEndpoint.get('get.user', '/users/:id', {
-  params: { id: Schema.Number },
+  params: { id: Schema.Finite },
   query: { locale: Schema.String.pipe(Schema.withConstructorDefault(Effect.succeed('en'))) },
   headers: { 'x-version': Schema.Literal('v1') },
   success: User,
@@ -103,6 +103,11 @@ const configuration: CreateHttpApiQueryUtilsOptions<typeof api, typeof prefix> =
 }
 const utils = createHttpApiQueryUtils(api, configuration)
 const annotated: HttpApiQueryUtils<typeof api, typeof prefix> = utils
+
+// Generated leaves keep the structural index assignability of the public type alias.
+true satisfies Assert<
+  (typeof utils)['user.accounts']['get.user'] extends Record<string, unknown> ? true : false
+>
 void annotated
 const input = {
   params: { id: 1 },
@@ -365,7 +370,7 @@ const emptyUtils = createHttpApiQueryUtils(emptyApi, { client: emptyClient, keyP
 true satisfies Assert<Equal<keyof typeof emptyUtils, 'key'>>
 
 const Alternatives = HttpApiEndpoint.post('alternatives', '/alternatives', {
-  payload: [Schema.Struct({ name: Schema.String }), Schema.Struct({ id: Schema.Number })],
+  payload: [Schema.Struct({ name: Schema.String }), Schema.Struct({ id: Schema.Finite })],
 })
 const alternativesApi = HttpApi.make('alternatives').add(
   HttpApiGroup.make('requests').add(Alternatives),

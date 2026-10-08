@@ -1,19 +1,33 @@
 import { createLink } from '@tanstack/react-router'
-import { forwardRef, type ComponentPropsWithoutRef } from 'react'
+import { forwardRef } from 'react'
+import type { ComponentPropsWithoutRef } from 'react'
 
-const NavigationAnchor = forwardRef<HTMLAnchorElement, ComponentPropsWithoutRef<'a'>>(
-  ({ className, ...props }, ref) => (
+interface NavigationAnchorProps extends ComponentPropsWithoutRef<'a'> {
+  readonly variant?: 'brand' | 'default'
+}
+
+const variants = {
+  brand:
+    'display-heading flex items-center gap-2 px-0 text-lg font-black tracking-tight text-text-primary normal-case hover:border-transparent hover:bg-transparent hover:text-brand-300',
+  default:
+    'inline-block px-3 text-sm font-bold text-muted-foreground hover:border-brand-900 hover:bg-brand-950/30 hover:text-brand-200',
+} as const
+
+const NavigationAnchor = forwardRef<HTMLAnchorElement, NavigationAnchorProps>(
+  ({ className, children, variant = 'default', ...props }, ref) => (
     <a
       className={[
-        'inline-block border border-transparent px-3 py-2 text-sm font-bold no-underline transition-colors',
-        'text-zinc-400 hover:border-violet-900 hover:bg-violet-950/30 hover:text-violet-200',
+        'border border-transparent py-2 no-underline transition-colors',
+        variants[variant],
         className,
       ]
         .filter(Boolean)
         .join(' ')}
       ref={ref}
       {...props}
-    />
+    >
+      {children}
+    </a>
   ),
 )
 

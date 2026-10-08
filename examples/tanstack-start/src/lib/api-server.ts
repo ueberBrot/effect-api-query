@@ -7,13 +7,15 @@ const serverScope = Scope.makeUnsafe()
 const serverHandler = Effect.runPromise(makeExampleWebHandler().pipe(Scope.provide(serverScope)))
 let disposal: Promise<void> | undefined
 
-const disposeServerHandler = (): Promise<void> => {
+const disposeServerHandler = async (): Promise<void> => {
   disposal ??= Effect.runPromise(Scope.close(serverScope, Exit.void))
   return disposal
 }
 
 if (import.meta.hot !== undefined) {
-  import.meta.hot.dispose(() => void disposeServerHandler())
+  import.meta.hot.dispose(() => {
+    void disposeServerHandler()
+  })
 }
 
 /** Serves HTTP and RPC for the lifetime of this TanStack Start server module. */

@@ -16,7 +16,7 @@ export const ConditionalUserQuery = ({
   users,
 }: {
   readonly rpcQuery: ViteReactApplication['rpcQuery']
-  readonly users: ReadonlyArray<User>
+  readonly users: readonly User[]
 }) => {
   const [userId, setUserId] = useState('')
   const options = rpcQuery.users.get.queryOptions({
@@ -26,18 +26,25 @@ export const ConditionalUserQuery = ({
   const user = useQuery(options)
 
   return (
-    <section aria-label="Conditional user lookup" className="border border-zinc-800 bg-black p-5">
-      <h3 className="display-heading text-xl font-bold text-zinc-100">Choose before fetching</h3>
-      <p className="mt-2 text-sm leading-6 text-zinc-400">
+    <section
+      aria-label="Conditional user lookup"
+      className="border border-border bg-background p-5"
+    >
+      <h3 className="display-heading text-xl font-bold text-text-primary">
+        Choose before fetching
+      </h3>
+      <p className="mt-2 text-sm leading-6 text-muted-foreground">
         The query waits until you choose a user. Clear the selection to pause it again. Reselect the
         same user within 30 seconds to reuse the cached result.
       </p>
-      <label className="mt-4 grid gap-2 text-sm font-bold text-violet-300">
+      <label className="mt-4 grid gap-2 text-sm font-bold text-brand-300">
         User to inspect
         <select
-          className="border border-zinc-700 bg-zinc-900 p-2 text-zinc-100"
+          className="border border-border-strong bg-muted p-2 text-text-primary"
           value={userId}
-          onChange={(event) => setUserId(event.target.value)}
+          onChange={(event) => {
+            setUserId(event.target.value)
+          }}
         >
           <option value="">No user selected</option>
           {users.map((entry) => (
@@ -47,7 +54,7 @@ export const ConditionalUserQuery = ({
           ))}
         </select>
       </label>
-      <div aria-live="polite" className="mt-4 text-sm text-zinc-200">
+      <div aria-live="polite" className="mt-4 text-sm text-text-secondary">
         {userId === '' ? <p>Choose a user to start the query.</p> : null}
         {user.isFetching ? <p>Loading selected user…</p> : null}
         {user.data === undefined ? null : <p>Selected user: {user.data}</p>}

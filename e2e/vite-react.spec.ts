@@ -7,7 +7,9 @@ import {
 } from './example-application.ts'
 
 test.describe('plain Vite React application', () => {
-  test.beforeEach(async ({ page }) => prepareExampleApplication(page, viteReactApplication))
+  test.beforeEach(async ({ page }) => {
+    await prepareExampleApplication(page, viteReactApplication)
+  })
 
   test('loads the initial query, reuses its cache, and survives reload', async ({ page }) => {
     await expect(page.getByText('Edsger Dijkstra', { exact: true })).toBeVisible()
@@ -15,7 +17,9 @@ test.describe('plain Vite React application', () => {
 
     let listRequests = 0
     page.on('request', (request) => {
-      if (recordsRpc(request.postData(), 'users.list')) listRequests += 1
+      if (recordsRpc(request.postData(), 'users.list')) {
+        listRequests += 1
+      }
     })
     await page.getByRole('button', { name: 'Read cached directory' }).click()
     await expect(page.getByText('Cached directory: 12 users')).toBeVisible()
@@ -45,7 +49,7 @@ test.describe('plain Vite React application', () => {
 
     const history = page.getByRole('region', { name: 'Accumulated stream history' })
     await page.getByRole('button', { name: 'Replay newest 2' }).click()
-    await expect(history.getByRole('listitem')).toHaveText([/Workspace synchronized$/, /Ready$/])
+    await expect(history.getByRole('listitem')).toHaveText([/Workspace synchronized$/u, /Ready$/u])
     await expect(page.getByText('2 updates retained')).toBeVisible()
     await expect(page.getByText('Current state: Ready')).toBeVisible()
 
@@ -93,15 +97,18 @@ test.describe('plain Vite React application', () => {
     await first.getByRole('button', { name: 'Start command' }).click()
     await second.getByRole('button', { name: 'Start command' }).click()
     await expect(first.getByText('Server state: running')).toBeVisible()
-    await expect(first.getByText(/^Progress: [1-9]\d* \/ 40$/)).toBeVisible()
+    await expect(first.getByText(/^Progress: [1-9]\d* \/ 40$/u)).toBeVisible()
     await expect(first.getByText('Start mutation: pending')).toBeVisible()
     await first.getByRole('button', { name: 'Cancel command' }).click()
     await expect(first.getByText('Cancel mutation: success')).toBeVisible()
     await expect(first.getByText('Start mutation: success')).toBeVisible()
     await expect(first.getByText('Server state: cancelled')).toBeVisible()
-    const stoppedProgress = await first.getByText(/^Progress:/).textContent()
+    const stoppedProgress = await first.getByText(/^Progress:/u).textContent()
+    if (stoppedProgress === null) {
+      throw new Error('The cancelled command must display its progress')
+    }
     await expect(second.getByText('Server state: completed')).toBeVisible()
     await expect(second.getByText('Progress: 40 / 40')).toBeVisible()
-    await expect(first.getByText(/^Progress:/)).toHaveText(stoppedProgress!)
+    await expect(first.getByText(/^Progress:/u)).toHaveText(stoppedProgress)
   })
 })

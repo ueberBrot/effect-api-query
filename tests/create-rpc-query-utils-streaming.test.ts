@@ -1,16 +1,20 @@
 import { describe, expect, it, vi } from '@effect/vitest'
 import { QueryClient, QueryObserver, skipToken } from '@tanstack/query-core'
-import { Deferred, Effect, Equal, Exit, Schema, Stream } from 'effect'
-import { Rpc, RpcClient, RpcGroup } from 'effect/rpc'
+import { Deferred, Effect, Equal, Exit, Predicate, Schema, Stream } from 'effect'
+import type { RpcClient } from 'effect/rpc'
+import { Rpc, RpcGroup } from 'effect/rpc'
+import { setTimeout } from 'node:timers/promises'
 
 import {
   createRpcQueryUtils,
   EffectRpcQueryConfigError,
   EffectRpcQueryEmptyStreamError,
   EffectRpcQueryError,
-  type RunPromiseExit,
+  isEffectRpcQueryError,
 } from '#effect-api-query'
+import type { RunPromiseExit } from '#effect-api-query'
 
+import { captureFailure } from './fixtures/async'
 import { makeRpcTestClient } from './fixtures/effect-rpc'
 
 describe('createRpcQueryUtils streaming execution', () => {
@@ -43,19 +47,23 @@ describe('createRpcQueryUtils streaming execution', () => {
         keyPrefix: ['app'] as const,
       })
 
-      const streamed = yield* Effect.promise(() =>
-        queryClient.query(utils.events.watch.streamedOptions({ input: { channel: 'news' } })),
+      const streamed = yield* Effect.promise(
+        async () =>
+          await queryClient.query(
+            utils.events.watch.streamedOptions({ input: { channel: 'news' } }),
+          ),
       )
-      const live = yield* Effect.promise(() =>
-        queryClient.query(utils.events.watch.liveOptions({ input: { channel: 'news' } })),
+      const live = yield* Effect.promise(
+        async () =>
+          await queryClient.query(utils.events.watch.liveOptions({ input: { channel: 'news' } })),
       )
 
-      expect(streamed).toEqual(['news:en:first', 'news:en:second'])
+      expect(streamed).toStrictEqual(['news:en:first', 'news:en:second'])
       expect(live).toBe('news:en:second')
-      expect(utils.events.watch.streamedKey({ channel: 'news' })).toEqual(
+      expect(utils.events.watch.streamedKey({ channel: 'news' })).toStrictEqual(
         utils.events.watch.streamedKey({ channel: 'news', locale: 'en' }),
       )
-      expect(utils.events.watch.streamedKey({ channel: 'news' })).not.toEqual(
+      expect(utils.events.watch.streamedKey({ channel: 'news' })).not.toStrictEqual(
         utils.events.watch.liveKey({ channel: 'news' }),
       )
       expect(Object.isFrozen(utils.events.watch.streamedKey({ channel: 'news' }))).toBe(true)
@@ -79,8 +87,10 @@ describe('createRpcQueryUtils streaming execution', () => {
         }
       })
       try {
-        expect(yield* Effect.promise(() => queryClient.query(options))).toEqual([3, 4])
-        expect(snapshots.slice(0, 4)).toEqual([[1], [1, 2], [2, 3], [3, 4]])
+        expect(yield* Effect.promise(async () => await queryClient.query(options))).toStrictEqual([
+          3, 4,
+        ])
+        expect(snapshots.slice(0, 4)).toStrictEqual([[1], [1, 2], [2, 3], [3, 4]])
         expect(options).not.toHaveProperty('maxChunks')
       } finally {
         unsubscribe()
@@ -122,7 +132,8 @@ describe('createRpcQueryUtils streaming execution', () => {
           'events.watch': () =>
             Stream.fromAsyncIterable(
               (async function* () {
-                expect(queryClient.getQueryData(key)).toEqual(start)
+                await Promise.resolve()
+                expect(queryClient.getQueryData(key)).toStrictEqual(start)
                 for (const value of [1, 2, 3]) {
                   yield value
                 }
@@ -139,9 +150,11 @@ describe('createRpcQueryUtils streaming execution', () => {
           }
         })
         try {
-          expect(yield* Effect.promise(() => queryClient.query(options))).toEqual([2, 3])
-          expect(snapshots).toEqual(during)
-          expect(queryClient.getQueryData(options.queryKey)).toEqual([2, 3])
+          expect(yield* Effect.promise(async () => await queryClient.query(options))).toStrictEqual(
+            [2, 3],
+          )
+          expect(snapshots).toStrictEqual(during)
+          expect(queryClient.getQueryData(options.queryKey)).toStrictEqual([2, 3])
         } finally {
           unsubscribe()
           queryClient.clear()
@@ -163,7 +176,9 @@ describe('createRpcQueryUtils streaming execution', () => {
       const queryClient = new QueryClient()
       try {
         const options = utils.events.watch.streamedOptions({ maxChunks })
-        expect(yield* Effect.promise(() => queryClient.query(options))).toEqual(expected)
+        expect(yield* Effect.promise(async () => await queryClient.query(options))).toStrictEqual(
+          expected,
+        )
       } finally {
         queryClient.clear()
       }
@@ -182,12 +197,18 @@ describe('createRpcQueryUtils streaming execution', () => {
       const options = utils.events.watch.streamedOptions({ initialData: [9], maxChunks: 2 })
       const queryClient = new QueryClient()
       try {
-        expect(yield* Effect.promise(() => queryClient.query(options))).toEqual([9, 1])
+        expect(yield* Effect.promise(async () => await queryClient.query(options))).toStrictEqual([
+          9, 1,
+        ])
         values = [2]
-        expect(yield* Effect.promise(() => queryClient.query(options))).toEqual([2])
+        expect(yield* Effect.promise(async () => await queryClient.query(options))).toStrictEqual([
+          2,
+        ])
         values = []
-        expect(yield* Effect.promise(() => queryClient.query(options))).toEqual([])
-        expect(queryClient.getQueryData(options.queryKey)).toEqual([])
+        expect(yield* Effect.promise(async () => await queryClient.query(options))).toStrictEqual(
+          [],
+        )
+        expect(queryClient.getQueryData(options.queryKey)).toStrictEqual([])
       } finally {
         queryClient.clear()
       }
@@ -204,7 +225,15 @@ describe('createRpcQueryUtils streaming execution', () => {
       const group = RpcGroup.make(Watch)
       const client = yield* makeRpcTestClient(group, { 'events.watch': () => Stream.make(1) })
       const utils = createRpcQueryUtils(group, { client, keyPrefix: ['bounded'] })
-      for (const maxChunks of [0, -1, 1.5, NaN, Infinity, -Infinity, Number.MAX_SAFE_INTEGER + 1]) {
+      for (const maxChunks of [
+        0,
+        -1,
+        1.5,
+        Number.NaN,
+        Infinity,
+        -Infinity,
+        Number.MAX_SAFE_INTEGER + 1,
+      ]) {
         for (const input of [{ channel: 'news' }, skipToken] as const) {
           const buildOptions = () =>
             input === skipToken
@@ -240,13 +269,16 @@ describe('createRpcQueryUtils streaming execution', () => {
         keyPrefix: ['app'] as const,
       })
 
-      const error = yield* Effect.promise(() =>
-        new QueryClient({ defaultOptions: { queries: { retry: false } } })
-          .query(utils.events.empty.liveOptions())
-          .catch((cause: unknown) => cause),
+      const error = yield* Effect.promise(
+        async () =>
+          await captureFailure(
+            new QueryClient({ defaultOptions: { queries: { retry: false } } }).query(
+              utils.events.empty.liveOptions(),
+            ),
+          ),
       )
 
-      expect(error).toEqual(
+      expect(error).toStrictEqual(
         expect.objectContaining({
           _tag: 'EffectRpcQueryEmptyStreamError',
           rpcTag: 'events.empty',
@@ -273,18 +305,27 @@ describe('createRpcQueryUtils streaming execution', () => {
         keyPrefix: ['app'] as const,
       })
 
-      const fetch = (refetchMode: 'append' | 'replace' | 'reset') =>
-        queryClient.query(utils.events.watch.streamedOptions({ refetchMode }))
+      const fetch = async (refetchMode: 'append' | 'replace' | 'reset') =>
+        await queryClient.query(utils.events.watch.streamedOptions({ refetchMode }))
 
-      expect(yield* Effect.promise(() => fetch('reset'))).toEqual(['run-1-first', 'run-1-second'])
-      expect(yield* Effect.promise(() => fetch('append'))).toEqual([
+      expect(yield* Effect.promise(async () => await fetch('reset'))).toStrictEqual([
+        'run-1-first',
+        'run-1-second',
+      ])
+      expect(yield* Effect.promise(async () => await fetch('append'))).toStrictEqual([
         'run-1-first',
         'run-1-second',
         'run-2-first',
         'run-2-second',
       ])
-      expect(yield* Effect.promise(() => fetch('replace'))).toEqual(['run-3-first', 'run-3-second'])
-      expect(yield* Effect.promise(() => fetch('reset'))).toEqual(['run-4-first', 'run-4-second'])
+      expect(yield* Effect.promise(async () => await fetch('replace'))).toStrictEqual([
+        'run-3-first',
+        'run-3-second',
+      ])
+      expect(yield* Effect.promise(async () => await fetch('reset'))).toStrictEqual([
+        'run-4-first',
+        'run-4-second',
+      ])
     }),
   )
 
@@ -317,19 +358,20 @@ describe('createRpcQueryUtils streaming execution', () => {
       const cases = [
         {
           direct: yield* Effect.exit(Stream.runCollect(client('events.declared', undefined))),
-          fetch: () => queryClient.query(utils.events.declared.streamedOptions()),
+          fetch: async () => await queryClient.query(utils.events.declared.streamedOptions()),
           operation: 'streamed',
           tag: 'events.declared',
         },
         {
           direct: yield* Effect.exit(Stream.runCollect(client('events.stream-failure', undefined))),
-          fetch: () => queryClient.query(utils.events['stream-failure'].streamedOptions()),
+          fetch: async () =>
+            await queryClient.query(utils.events['stream-failure'].streamedOptions()),
           operation: 'streamed',
           tag: 'events.stream-failure',
         },
         {
           direct: yield* Effect.exit(Stream.runCollect(client('events.defect', undefined))),
-          fetch: () => queryClient.query(utils.events.defect.liveOptions()),
+          fetch: async () => await queryClient.query(utils.events.defect.liveOptions()),
           operation: 'live',
           tag: 'events.defect',
         },
@@ -339,11 +381,14 @@ describe('createRpcQueryUtils streaming execution', () => {
         if (Exit.isSuccess(direct)) {
           throw new Error(`Expected ${tag} to fail`)
         }
-        const error = yield* Effect.promise(() => fetch().catch((cause: unknown) => cause))
+        const error = yield* Effect.promise(async () => await captureFailure(fetch()))
 
         expect(error).toBeInstanceOf(EffectRpcQueryError)
         expect(error).toMatchObject({ operation, rpcTag: tag })
-        expect(Equal.equals((error as EffectRpcQueryError<unknown>).cause, direct.cause)).toBe(true)
+        if (!isEffectRpcQueryError(error)) {
+          throw new Error('Expected RPC execution error')
+        }
+        expect(Equal.equals(error.cause, direct.cause)).toBe(true)
       }
     }),
   )
@@ -352,23 +397,24 @@ describe('createRpcQueryUtils streaming execution', () => {
     Effect.gen(function* () {
       const Watch = Rpc.make('events.watch', { success: Schema.String, stream: true })
       const streamGroup = RpcGroup.make(Watch)
-      const finalized = yield* Deferred.make<void>()
+      const finalized = yield* Deferred.make<undefined>()
       const source = Stream.make('first', 'second').pipe(
         Stream.ensuring(Deferred.succeed(finalized, undefined).pipe(Effect.asVoid)),
       )
-      const client = ((_tag: string, _payload: unknown) => source) as RpcClient.RpcClient.Flat<
-        RpcGroup.Rpcs<typeof streamGroup>
-      >
+      // SAFETY: This one-RPC client fixture supplies the declared stream directly so finalization can be observed.
+      /* oxlint-disable typescript/no-unsafe-type-assertion */
+      const client = (() => source) as RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof streamGroup>>
+      /* oxlint-enable typescript/no-unsafe-type-assertion */
       const utils = createRpcQueryUtils(streamGroup, {
         client,
         keyPrefix: ['app'] as const,
       })
 
-      const result = yield* Effect.promise(() =>
-        new QueryClient().query(utils.events.watch.streamedOptions()),
+      const result = yield* Effect.promise(
+        async () => await new QueryClient().query(utils.events.watch.streamedOptions()),
       )
 
-      expect(result).toEqual(['first', 'second'])
+      expect(result).toStrictEqual(['first', 'second'])
       yield* Deferred.await(finalized)
     }),
   )
@@ -376,9 +422,9 @@ describe('createRpcQueryUtils streaming execution', () => {
   it('interrupts and finalizes a stream when Query Core cancels it', async () => {
     const Watch = Rpc.make('events.watch', { success: Schema.String, stream: true })
     const streamGroup = RpcGroup.make(Watch)
-    const waiting = Deferred.makeUnsafe<void>()
-    const interrupted = Deferred.makeUnsafe<void>()
-    const finalized = Deferred.makeUnsafe<void>()
+    const waiting = Deferred.makeUnsafe<undefined>()
+    const interrupted = Deferred.makeUnsafe<undefined>()
+    const finalized = Deferred.makeUnsafe<undefined>()
     const source = Stream.make('ready').pipe(
       Stream.concat(
         Stream.fromEffect(
@@ -390,9 +436,10 @@ describe('createRpcQueryUtils streaming execution', () => {
       ),
       Stream.ensuring(Deferred.succeed(finalized, undefined).pipe(Effect.asVoid)),
     )
-    const client = ((_tag: string, _payload: unknown) => source) as RpcClient.RpcClient.Flat<
-      RpcGroup.Rpcs<typeof streamGroup>
-    >
+    // SAFETY: This one-RPC client fixture supplies the declared stream directly so finalization can be observed.
+    /* oxlint-disable typescript/no-unsafe-type-assertion */
+    const client = (() => source) as RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof streamGroup>>
+    /* oxlint-enable typescript/no-unsafe-type-assertion */
     const queryClient = new QueryClient()
     const utils = createRpcQueryUtils(streamGroup, {
       client,
@@ -400,14 +447,14 @@ describe('createRpcQueryUtils streaming execution', () => {
     })
     const options = utils.events.watch.streamedOptions()
 
-    const query = queryClient.query(options).catch((cause: unknown) => cause)
+    const query = captureFailure(queryClient.query(options))
     await Effect.runPromise(Deferred.await(waiting))
     await queryClient.cancelQueries({ queryKey: options.queryKey })
-    await new Promise<void>((resolve) => globalThis.setTimeout(resolve, 10))
+    await setTimeout(10)
 
     expect(Deferred.isDoneUnsafe(interrupted)).toBe(true)
     expect(Deferred.isDoneUnsafe(finalized)).toBe(true)
-    expect(await query).toEqual(['ready'])
+    await expect(query).resolves.toStrictEqual(['ready'])
   })
 
   it('detaches the abort listener when iterator closure fails', async () => {
@@ -416,24 +463,28 @@ describe('createRpcQueryUtils streaming execution', () => {
     const closeError = new Error('iterator closure failed')
     const source: AsyncIterable<unknown> = {
       [Symbol.asyncIterator]: () => ({
-        next: () => Promise.resolve({ done: false, value: 'ready' }),
-        return: () => Promise.reject(closeError),
+        next: async () => await Promise.resolve({ done: false, value: 'ready' }),
+        return: async () => await Promise.reject(closeError),
       }),
     }
-    const runPromiseExit: RunPromiseExit = async () => Exit.succeed(source) as never
+    // SAFETY: The custom runner returns only this stream fixture so failed iterator closure can be observed.
+    /* oxlint-disable typescript/no-unsafe-type-assertion */
+    const runPromiseExit: RunPromiseExit = async () =>
+      (await Promise.resolve(Exit.succeed(source))) as never
+    /* oxlint-enable typescript/no-unsafe-type-assertion */
+    // SAFETY: This one-RPC client fixture supplies the declared stream directly so finalization can be observed.
+    /* oxlint-disable typescript/no-unsafe-type-assertion */
     const utils = createRpcQueryUtils(streamGroup, {
-      client: ((_tag: string, _payload: unknown) => Stream.empty) as RpcClient.RpcClient.Flat<
-        RpcGroup.Rpcs<typeof streamGroup>
-      >,
+      client: (() => Stream.empty) as RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof streamGroup>>,
       keyPrefix: ['app'] as const,
       runPromiseExit,
     })
+    /* oxlint-enable typescript/no-unsafe-type-assertion */
     const options = utils.events.watch.streamedOptions()
-    const queryFn = options.queryFn as (context: {
-      readonly client: QueryClient
-      readonly queryKey: typeof options.queryKey
-      readonly signal: AbortSignal
-    }) => Promise<unknown>
+    const { queryFn } = options
+    if (!Predicate.isFunction(queryFn)) {
+      throw new TypeError('Expected a callable stream query function')
+    }
     const controller = new AbortController()
     const removeEventListener = vi.spyOn(controller.signal, 'removeEventListener')
     controller.abort()
@@ -443,6 +494,7 @@ describe('createRpcQueryUtils streaming execution', () => {
         client: new QueryClient(),
         queryKey: options.queryKey,
         signal: controller.signal,
+        meta: undefined,
       }),
     ).rejects.toBe(closeError)
     expect(removeEventListener).toHaveBeenCalledWith('abort', expect.any(Function))
@@ -452,12 +504,14 @@ describe('createRpcQueryUtils streaming execution', () => {
     Effect.gen(function* () {
       const Watch = Rpc.make('events.watch', { success: Schema.String, stream: true })
       const streamGroup = RpcGroup.make(Watch)
-      const firstStarted = yield* Deferred.make<void>()
-      const firstFinalized = yield* Deferred.make<void>()
-      const secondStarted = yield* Deferred.make<void>()
-      const secondFinalized = yield* Deferred.make<void>()
+      const firstStarted = yield* Deferred.make<undefined>()
+      const firstFinalized = yield* Deferred.make<undefined>()
+      const secondStarted = yield* Deferred.make<undefined>()
+      const secondFinalized = yield* Deferred.make<undefined>()
       let run = 0
-      const client = ((_tag: string, _payload: unknown) => {
+      // SAFETY: This one-RPC fixture creates the declared stream directly so successive finalization can be observed.
+      /* oxlint-disable typescript/no-unsafe-type-assertion */
+      const client = (() => {
         run += 1
         const started = run === 1 ? firstStarted : secondStarted
         const finalized = run === 1 ? firstFinalized : secondFinalized
@@ -470,27 +524,28 @@ describe('createRpcQueryUtils streaming execution', () => {
           Stream.ensuring(Deferred.succeed(finalized, undefined).pipe(Effect.asVoid)),
         )
       }) as RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof streamGroup>>
+      /* oxlint-enable typescript/no-unsafe-type-assertion */
       const queryClient = new QueryClient()
       const options = createRpcQueryUtils(streamGroup, {
         client,
         keyPrefix: ['app'] as const,
       }).events.watch.streamedOptions()
 
-      const firstFetch = queryClient.query(options).catch((cause: unknown) => cause)
+      const firstFetch = captureFailure(queryClient.query(options))
       yield* Deferred.await(firstStarted)
-      const refetch = queryClient
-        .refetchQueries({ exact: true, queryKey: options.queryKey })
-        .catch((cause: unknown) => cause)
+      const refetch = captureFailure(
+        queryClient.refetchQueries({ exact: true, queryKey: options.queryKey }),
+      )
       yield* Deferred.await(firstFinalized)
       yield* Deferred.await(secondStarted)
-      yield* Effect.promise(() =>
-        queryClient.cancelQueries({ queryKey: options.queryKey }).catch(() => undefined),
-      )
+      yield* Effect.promise(async () => {
+        await queryClient.cancelQueries({ queryKey: options.queryKey }).catch(() => {})
+      })
       yield* Deferred.await(secondFinalized)
 
-      yield* Effect.promise(() => firstFetch)
+      yield* Effect.promise(async () => await firstFetch)
       expect(run).toBe(2)
-      yield* Effect.promise(() => refetch)
+      yield* Effect.promise(async () => await refetch)
     }),
   )
 
@@ -498,8 +553,8 @@ describe('createRpcQueryUtils streaming execution', () => {
     Effect.gen(function* () {
       const Watch = Rpc.make('events.watch', { success: Schema.String, stream: true })
       const streamGroup = RpcGroup.make(Watch)
-      const started = yield* Deferred.make<void>()
-      const finalized = yield* Deferred.make<void>()
+      const started = yield* Deferred.make<undefined>()
+      const finalized = yield* Deferred.make<undefined>()
       const source = Stream.make('ready').pipe(
         Stream.concat(
           Stream.fromEffect(
@@ -508,20 +563,22 @@ describe('createRpcQueryUtils streaming execution', () => {
         ),
         Stream.ensuring(Deferred.succeed(finalized, undefined).pipe(Effect.asVoid)),
       )
-      const client = ((_tag: string, _payload: unknown) => source) as RpcClient.RpcClient.Flat<
-        RpcGroup.Rpcs<typeof streamGroup>
-      >
+      // SAFETY: This one-RPC client fixture supplies the declared stream directly so finalization can be observed.
+      /* oxlint-disable typescript/no-unsafe-type-assertion */
+      const client = (() => source) as RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof streamGroup>>
+      /* oxlint-enable typescript/no-unsafe-type-assertion */
       const queryClient = new QueryClient()
       const options = createRpcQueryUtils(streamGroup, {
         client,
         keyPrefix: ['app'] as const,
       }).events.watch.streamedOptions()
       const observer = new QueryObserver(queryClient, options)
-      const unsubscribe = observer.subscribe(() => undefined)
+      const unsubscribe = observer.subscribe(() => {})
 
       yield* Deferred.await(started)
       unsubscribe()
       yield* Deferred.await(finalized)
+      expect(Deferred.isDoneUnsafe(finalized)).toBe(true)
     }),
   )
 
@@ -542,9 +599,9 @@ describe('createRpcQueryUtils streaming execution', () => {
         const utils = createRpcQueryUtils(streamGroup, {
           client,
           keyPrefix: ['app'] as const,
-          runPromiseExit: (effect, options) => {
+          runPromiseExit: async (effect, options) => {
             executions += 1
-            return Effect.runPromiseExit(effect, options)
+            return await Effect.runPromiseExit(effect, options)
           },
         })
         const callerOptions = Object.freeze({
@@ -574,7 +631,7 @@ describe('createRpcQueryUtils streaming execution', () => {
                   select: (values) => values.length,
                 }),
               )
-        const options = observer.options
+        const { options } = observer
         expect(options).toMatchObject({
           ...callerOptions,
           queryFn: skipToken,
@@ -585,8 +642,10 @@ describe('createRpcQueryUtils streaming execution', () => {
         expect(options.queryKeyHashFn).toBe(
           utils.events.watch.liveOptions(skipToken).queryKeyHashFn,
         )
-        const unsubscribe = observer.subscribe(() => undefined)
-        yield* Effect.promise(() => queryClient.invalidateQueries({ queryKey: utils.events.key() }))
+        const unsubscribe = observer.subscribe(() => {})
+        yield* Effect.promise(async () => {
+          await queryClient.invalidateQueries({ queryKey: utils.events.key() })
+        })
         expect(observer.getCurrentResult()).toMatchObject({
           data: operation === 'live' ? 5 : 1,
           fetchStatus: 'idle',

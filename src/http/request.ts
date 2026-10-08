@@ -10,7 +10,7 @@ import type { HttpApiEndpointIdentity } from './errors'
 // Codec conversion can wrap a branded schema; the brand remains on its inner schema.
 const multipartBrands = (schema: Schema.Top): ReadonlySet<string> => {
   const brands = new Set<string>()
-  const visited = new WeakSet<object>()
+  const visited = new WeakSet()
   let current: unknown = schema
   while (Schema.isSchema(current) && !visited.has(current)) {
     visited.add(current)
@@ -18,8 +18,9 @@ const multipartBrands = (schema: Schema.Top): ReadonlySet<string> => {
       Predicate.hasProperty(current, 'identifier') &&
       (current.identifier === HttpApiSchema.MultipartTypeId ||
         current.identifier === HttpApiSchema.MultipartStreamTypeId)
-    )
+    ) {
       brands.add(current.identifier)
+    }
     current = Predicate.hasProperty(current, 'schema') ? current.schema : undefined
   }
   return brands
@@ -36,12 +37,9 @@ const bufferedPayloads = (
       const brands = multipartBrands(schema)
       const buffered = brands.has(HttpApiSchema.MultipartTypeId)
       const streamed = brands.has(HttpApiSchema.MultipartStreamTypeId)
-      const metadataAgrees =
-        encoding._tag === 'Multipart'
-          ? encoding.mode === 'buffered'
-            ? buffered && !streamed
-            : streamed && !buffered
-          : !buffered && !streamed
+      const expectedBuffered = encoding._tag === 'Multipart' && encoding.mode === 'buffered'
+      const expectedStreamed = encoding._tag === 'Multipart' && encoding.mode === 'stream'
+      const metadataAgrees = buffered === expectedBuffered && streamed === expectedStreamed
       if (!metadataAgrees) {
         throw new EffectHttpApiQueryConfigError(
           'UnsupportedEndpointMetadata',
@@ -55,21 +53,26 @@ const bufferedPayloads = (
   }
   if (
     multipart ||
-    Array.from(endpoint.success).some((schema) =>
+    [...endpoint.success].some((schema) =>
       Predicate.hasProperty(
         HttpApiSchema.isWithHeaders(schema) ? schema.schema : schema,
         '~effect/http-api/HttpApiSchema/Stream',
       ),
     )
-  )
+  ) {
     return undefined
+  }
   return payloads
 }
 
 // HTTP omits undefined object members; arrays still undergo strict JSON validation.
-const omitUndefined = (value: unknown, seen = new WeakSet<object>()): unknown => {
-  if (!Predicate.isObjectOrArray(value)) return value
-  if (seen.has(value)) throw new TypeError('Key values must not contain cycles')
+const omitUndefined = (value: unknown, seen = new WeakSet()): unknown => {
+  if (!Predicate.isObjectOrArray(value)) {
+    return value
+  }
+  if (seen.has(value)) {
+    throw new TypeError('Key values must not contain cycles')
+  }
   seen.add(value)
   let result: unknown = value
   if (Array.isArray(value)) {
@@ -89,18 +92,23 @@ const omitUndefined = (value: unknown, seen = new WeakSet<object>()): unknown =>
 }
 
 const normalizeRequestKey = (value: unknown): unknown => {
-  const request = omitUndefined(value) as Record<string, unknown>
+  const request = omitUndefined(value)
+  if (!Predicate.isObject(request)) {
+    throw new TypeError('Encoded HTTP requests must be objects')
+  }
   if (Predicate.isObject(request['headers'])) {
+    // SAFETY: Object.create(null) allocates an empty dictionary without a prototype.
+    // oxlint-disable-next-line typescript/no-unsafe-assignment
     const headers: Record<string, unknown> = Object.create(null)
-    for (const [name, value] of Object.entries(request['headers'])) {
+    for (const [name, headerValue] of Object.entries(request['headers'])) {
       const lower = name.toLowerCase()
       if (
         Object.hasOwn(headers, lower) &&
-        JSON.stringify(headers[lower]) !== JSON.stringify(value)
+        JSON.stringify(headers[lower]) !== JSON.stringify(headerValue)
       ) {
         throw new TypeError('Encoded header names must not have conflicting values')
       }
-      headers[lower] = value
+      headers[lower] = headerValue
     }
     request['headers'] = headers
   }
@@ -113,13 +121,25 @@ export const createHttpRequestInput = (
   identity: HttpApiEndpointIdentity,
 ): OperationInput | undefined => {
   const payloads = bufferedPayloads(endpoint, identity)
-  if (payloads === undefined) return undefined
+  if (payloads === undefined) {
+    return undefined
+  }
   const fields: Record<string, Schema.Top> = {}
-  if (endpoint.params !== undefined) fields['params'] = endpoint.params
-  if (endpoint.query !== undefined) fields['query'] = endpoint.query
-  if (endpoint.headers !== undefined) fields['headers'] = endpoint.headers
-  if (payloads.length > 0) fields['payload'] = Schema.Union(payloads)
-  if (Object.keys(fields).length === 0) return { _tag: 'Inputless' }
+  if (endpoint.params !== undefined) {
+    fields['params'] = endpoint.params
+  }
+  if (endpoint.query !== undefined) {
+    fields['query'] = endpoint.query
+  }
+  if (endpoint.headers !== undefined) {
+    fields['headers'] = endpoint.headers
+  }
+  if (payloads.length > 0) {
+    fields['payload'] = Schema.Union(payloads)
+  }
+  if (Object.keys(fields).length === 0) {
+    return { _tag: 'Inputless' }
+  }
   const schema = Schema.Struct(fields)
   const invalidKey = (cause: unknown) =>
     new EffectHttpApiQueryKeyError(
@@ -136,23 +156,28 @@ export const createHttpRequestInput = (
     prepare: (input, encoder) => {
       let keyValue: unknown
       try {
-        keyValue = encoder
-          ? encoder(input)
-          : Schema.encodeUnknownSync(schema as unknown as Schema.ConstraintEncoder<unknown, never>)(
-              input,
-            )
-      } catch (cause) {
+        if (encoder) {
+          keyValue = encoder(input)
+        } else {
+          // SAFETY: Middleware requiring encoding services needs a custom encoder;
+          // the remaining generated request schema can encode synchronously.
+          // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/no-chained-type-assertions
+          const encodingSchema = schema as unknown as Schema.ConstraintEncoder<unknown>
+          const encode = Schema.encodeUnknownSync(encodingSchema)
+          keyValue = encode(input)
+        }
+      } catch (error) {
         throw new EffectHttpApiQueryKeyError(
           encoder ? 'KeyEncoderFailed' : 'RequestEncodingFailed',
           identity,
           `Could not encode the HTTP key for ${identity.groupId}/${identity.endpoint}`,
-          cause,
+          error,
         )
       }
       try {
         return { input, keyValue: encoder ? keyValue : normalizeRequestKey(keyValue) }
-      } catch (cause) {
-        throw invalidKey(cause)
+      } catch (error) {
+        throw invalidKey(error)
       }
     },
   }
