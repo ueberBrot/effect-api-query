@@ -261,7 +261,9 @@ export default defineConfig({
         },
       },
       typecheck: {
-        command: 'vp check --no-fmt --no-lint',
+        // Vite+ 1.0's --no-lint path reports typed rules without honoring suppressions.
+        // Keep lint active so typechecking uses the same policy as the normal check.
+        command: 'vp check --no-fmt',
         dependsOn: ['pack'],
         cache: {
           output: [],
