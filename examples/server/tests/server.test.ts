@@ -7,7 +7,7 @@ import {
 import { startExampleRpcServer } from '@effect-api-query/server'
 import { describe, expect, it } from '@effect/vitest'
 import { Cause, Deferred, Effect, Exit, Fiber, Logger, Result, Scope, Stream } from 'effect'
-import { RpcClient } from 'effect/unstable/rpc'
+import { RpcClient } from 'effect/rpc'
 import { createServer, request as nodeRequest } from 'node:http'
 
 import { acquireNodeServer } from '../src/node-server-resource.ts'

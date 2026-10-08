@@ -1,7 +1,7 @@
 import { startExampleRpcServer } from '@effect-api-query/server'
 import { MutationObserver, QueryObserver } from '@tanstack/react-query'
 import { Effect, Exit, Scope } from 'effect'
-import { expect, it } from 'vitest'
+import { expect, it } from 'vite-plus/test'
 
 import { startViteReactApplication } from '../src/lib/application.ts'
 

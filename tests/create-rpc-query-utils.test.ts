@@ -7,7 +7,7 @@ import {
 } from '@tanstack/query-core'
 import { skipToken as reactQuerySkipToken } from '@tanstack/react-query'
 import { Effect, Schema, Stream } from 'effect'
-import { Rpc, RpcGroup } from 'effect/unstable/rpc'
+import { Rpc, RpcGroup } from 'effect/rpc'
 
 import { createRpcQueryUtils, skipToken } from '#effect-api-query'
 

@@ -1,8 +1,8 @@
 import { MutationObserver, QueryClient } from '@tanstack/query-core'
 import { Effect, Exit, Layer, Schema, Scope } from 'effect'
 import { createRpcQueryUtils } from 'effect-api-query'
-import { FetchHttpClient } from 'effect/unstable/http'
-import { Rpc, RpcClient, RpcGroup, RpcSerialization } from 'effect/unstable/rpc'
+import { FetchHttpClient } from 'effect/http'
+import { Rpc, RpcClient, RpcGroup, RpcSerialization } from 'effect/rpc'
 
 const User = Schema.Struct({ id: Schema.Int, name: Schema.String })
 const usersRpc = RpcGroup.make(

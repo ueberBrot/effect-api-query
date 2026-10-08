@@ -7,7 +7,7 @@ import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query
 import { createStart } from '@tanstack/react-start'
 import { Schema } from 'effect'
 import { createHttpApiQueryUtils } from 'effect-api-query'
-import { HttpApi, HttpApiEndpoint, HttpApiGroup, type HttpApiClient } from 'effect/unstable/httpapi'
+import { HttpApi, HttpApiEndpoint, HttpApiGroup, type HttpApiClient } from 'effect/http-api'
 
 import type { PublicContractUtils } from './public-contract.js'
 

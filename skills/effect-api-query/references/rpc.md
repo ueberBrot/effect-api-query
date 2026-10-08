@@ -1,15 +1,15 @@
 # RPC setup and rules
 
 Use the application's existing RPC group and protocol. The standalone example
-below illustrates acquisition and cleanup against a server at
+shows how to acquire and clean up a client for a server at
 `http://localhost:3000/rpc` implementing the same contract.
 
 ```ts
 import { MutationObserver, QueryClient } from '@tanstack/query-core'
 import { Effect, Exit, Layer, Schema, Scope } from 'effect'
 import { createRpcQueryUtils } from 'effect-api-query'
-import { FetchHttpClient } from 'effect/unstable/http'
-import { Rpc, RpcClient, RpcGroup, RpcSerialization } from 'effect/unstable/rpc'
+import { FetchHttpClient } from 'effect/http'
+import { Rpc, RpcClient, RpcGroup, RpcSerialization } from 'effect/rpc'
 
 const users = RpcGroup.make(
   Rpc.make('users.get', {
@@ -73,16 +73,16 @@ reconstruct the normalized payload without changing its encoded meaning. Use
 standard struct-shaped payloads and materialized defaults. If reconstruction
 changes existing values, expose a stable query-facing RPC.
 
-Mutations pass constructor input directly to the ready client for construction
-at execution time. Their keys contain no variables and invoke no key encoder;
+Mutations pass constructor input directly to the ready client. The client constructs
+the payload at execution time. Mutation keys contain no variables and invoke no key encoder;
 constructor-sensitive Schemas remain usable for mutations.
 
 ## Request-local options
 
 Pass `rpcOptions` through option builders to set `headers` and `context` for that
 operation. Stream builders also accept `streamBufferSize`. These options
-are fixed for the builder result, including retries and all infinite pages. They
-are removed from the returned TanStack options and do not contribute to keys.
+are fixed for the builder result, including retries and all infinite pages. The
+adapter removes them from the returned TanStack options. They do not contribute to keys.
 
 Use the payload or a safe key prefix for any identity carried by these options.
 `streamBufferSize` controls the client's stream buffer; `maxChunks` controls the
@@ -99,7 +99,7 @@ null, dense arrays, and plain objects with defined JSON values. Default RPC
 encoding must also produce strict JSON. Dates and binary values need an encoding
 or projection; undefined entries, cycles, and unsafe property names fail.
 
-Preserve every distinction that changes results, using safe identifiers for
+Preserve every distinction that changes results. Use safe identifiers for
 secrets. Encoders affect query identity only; they leave execution input and
 service requirements unchanged.
 

@@ -1,5 +1,5 @@
 import tailwindcss from '@tailwindcss/vite'
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vite-plus'
 
 const apiProxy = {
   '/api': 'http://127.0.0.1:3001',

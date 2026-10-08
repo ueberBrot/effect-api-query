@@ -1,8 +1,8 @@
 import { expect, it } from '@effect/vitest'
 import { MutationObserver, QueryClient, skipToken } from '@tanstack/query-core'
 import { Context, Effect, Schema, Stream } from 'effect'
-import type { Headers } from 'effect/unstable/http'
-import { Rpc, RpcGroup } from 'effect/unstable/rpc'
+import type { Headers } from 'effect/http'
+import { Rpc, RpcGroup } from 'effect/rpc'
 
 import {
   createRpcQueryUtils,

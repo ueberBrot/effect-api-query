@@ -1,8 +1,8 @@
 import { MutationObserver, QueryClient } from '@tanstack/query-core'
 import { Effect, ManagedRuntime, Schema } from 'effect'
 import { createHttpApiQueryUtils } from 'effect-api-query'
-import { FetchHttpClient } from 'effect/unstable/http'
-import { HttpApi, HttpApiClient, HttpApiEndpoint, HttpApiGroup } from 'effect/unstable/httpapi'
+import { FetchHttpClient } from 'effect/http'
+import { HttpApi, HttpApiClient, HttpApiEndpoint, HttpApiGroup } from 'effect/http-api'
 
 const User = Schema.Struct({ id: Schema.Int, name: Schema.String })
 const usersApi = HttpApi.make('users-api').add(

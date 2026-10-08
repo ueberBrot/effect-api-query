@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from '@effect/vitest'
 import { QueryClient, QueryObserver, skipToken } from '@tanstack/query-core'
 import { Deferred, Effect, Equal, Exit, Schema, Stream } from 'effect'
-import { Rpc, RpcClient, RpcGroup } from 'effect/unstable/rpc'
+import { Rpc, RpcClient, RpcGroup } from 'effect/rpc'
 
 import {
   createRpcQueryUtils,

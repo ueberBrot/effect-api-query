@@ -7,14 +7,14 @@ constructs a concrete key and therefore needs valid input. Use `enabled: false`
 when you have valid input and intend to execute through manual refetch.
 
 This example exports a hook factory for an application-owned ready RPC client.
-Call the factory during application setup and the returned hook in components
+Call the factory during application setup. Use the returned hook in components
 under the application's `QueryClientProvider`.
 
 ```ts
 import { useQuery } from '@tanstack/react-query'
 import { Schema } from 'effect'
 import { createRpcQueryUtils, skipToken } from 'effect-api-query'
-import { Rpc, RpcGroup, type RpcClient } from 'effect/unstable/rpc'
+import { Rpc, RpcGroup, type RpcClient } from 'effect/rpc'
 
 export const users = RpcGroup.make(
   Rpc.make('users.get', {
@@ -52,7 +52,7 @@ the mapper deterministic: it runs during key construction and again on execution
 import { QueryClient } from '@tanstack/query-core'
 import { Schema } from 'effect'
 import { createRpcQueryUtils } from 'effect-api-query'
-import { Rpc, RpcGroup, type RpcClient } from 'effect/unstable/rpc'
+import { Rpc, RpcGroup, type RpcClient } from 'effect/rpc'
 
 export const catalog = RpcGroup.make(
   Rpc.make('items.page', {
@@ -91,7 +91,7 @@ different keys and shapes. Pause an input-bearing infinite query with
 ```ts
 import { Schema } from 'effect'
 import { createRpcQueryUtils } from 'effect-api-query'
-import { Rpc, RpcGroup, type RpcClient } from 'effect/unstable/rpc'
+import { Rpc, RpcGroup, type RpcClient } from 'effect/rpc'
 
 export const events = RpcGroup.make(
   Rpc.make('events.watch', {
@@ -125,7 +125,7 @@ are not part of its identity.
 - `reset` (default) clears data and returns to pending on refetch.
 - `append` adds new emissions to cached history.
 - `replace` retains cached history until the refetch stream completes, then
-  replaces it. Use a completing stream when choosing this publication policy.
+  replaces it. For this policy, use a stream that completes.
 
 Live queries cache only the latest value and accept neither history option.
 With no cached data, an empty accumulated stream resolves to `[]`. An empty
@@ -134,23 +134,23 @@ finish with `[]`. Empty live completion raises `EffectRpcQueryEmptyStreamError`.
 Emitted chunks are retained as supplied, unlike buffered query `undefined`
 normalization.
 
-On an initial fetch, both views become successful after the first emission, but
+On an initial fetch, both views become successful after the first emission. They
 keep fetching until completion. Canceling closes the iterator and interrupts its
-Effect resources. An awaited QueryClient call waits for stream completion; use cache
-observation to consume intermediate values.
+Effect resources. An awaited QueryClient call waits for stream completion. Observe
+the cache to consume intermediate values.
 
 ## Server rendering and hydration
 
 Create a fresh QueryClient, client, and runtime for each server request.
 Share the generated options between loaders and components through
 router context. Keep key prefixes and inputs equivalent between server and
-browser, while preserving separate resource ownership. Choose `staleTime` to
+browser. Keep server and browser resource ownership separate. Choose `staleTime` to
 avoid an immediate duplicate read during hydration.
 
 Keep successful query data compatible with the application's serializer. The
 package does not serialize Schema classes, dates, binary values, or error Causes.
 TanStack's default dehydration policy omits failed queries so the browser can
-refetch them; preserve that policy unless the application defines its own safe
+refetch them. Preserve that policy unless the application defines its own safe
 error serialization contract.
 
 For an open RPC stream, observe the first successful cache snapshot, cancel the

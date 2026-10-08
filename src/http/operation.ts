@@ -1,5 +1,5 @@
 import type { Effect } from 'effect'
-import type { HttpApi } from 'effect/unstable/httpapi'
+import type { HttpApi } from 'effect/http-api'
 
 import type { RuntimeKeyEncoder, TreeErrors, UnaryOperation } from '../core/operation'
 import { EffectHttpApiQueryConfigError, EffectHttpApiQueryError } from './errors'

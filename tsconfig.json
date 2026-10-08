@@ -26,7 +26,35 @@
         "includeSuggestionsInTsc": true,
         "ignoreEffectSuggestionsInTscExitCode": true,
         "ignoreEffectWarningsInTscExitCode": false,
-        "ignoreEffectErrorsInTscExitCode": false
+        "ignoreEffectErrorsInTscExitCode": false,
+        "overrides": [
+          {
+            "include": [
+              "examples/contracts/src/client.ts",
+              "examples/contracts/src/contracts.ts",
+              "examples/contracts/src/http-api.ts",
+              "examples/server/src/http-handlers.ts",
+              "examples/server/src/web-handler.ts",
+              "examples/server/tests/http-api.test.ts",
+              "examples/server/tests/server.test.ts",
+              "examples/tanstack-start/src/lib/application.ts",
+              "examples/tanstack-start/tests/server-render.test.tsx",
+              "examples/vite-react/src/lib/application.ts",
+              "src/http/**/*.ts",
+              "src/rpc/**/*.ts",
+              "tests/create-http-api-query-utils.test.ts",
+              "tests/create-rpc-query-utils*.test.ts",
+              "tests/http-*.test.ts",
+              "tests/fixtures/effect-rpc.ts",
+              "tests/types/**/*.ts"
+            ],
+            "options": {
+              "diagnosticSeverity": {
+                "unstableApiUsage": "off"
+              }
+            }
+          }
+        ]
       }
     ]
   },

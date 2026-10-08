@@ -4,8 +4,8 @@ import {
   ExampleHttpAuthorization,
 } from '@effect-api-query/contracts'
 import { Effect, Layer } from 'effect'
-import { HttpServerRequest } from 'effect/unstable/http'
-import { HttpApiBuilder } from 'effect/unstable/httpapi'
+import { HttpServerRequest } from 'effect/http'
+import { HttpApiBuilder } from 'effect/http-api'
 
 import { ExampleDomain } from './domain.ts'
 

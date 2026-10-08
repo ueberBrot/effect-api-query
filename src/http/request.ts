@@ -1,11 +1,29 @@
 import { Predicate, Schema } from 'effect'
-import { HttpApiSchema } from 'effect/unstable/httpapi'
-import type { HttpApiEndpoint } from 'effect/unstable/httpapi'
+import { HttpApiSchema } from 'effect/http-api'
+import type { HttpApiEndpoint } from 'effect/http-api'
 
 import type { OperationInput } from '../core/operation'
 import { containsUnsafeKeyEncoding } from '../core/schema-key'
 import { EffectHttpApiQueryConfigError, EffectHttpApiQueryKeyError } from './errors'
 import type { HttpApiEndpointIdentity } from './errors'
+
+// Codec conversion can wrap a branded schema; the brand remains on its inner schema.
+const multipartBrands = (schema: Schema.Top): ReadonlySet<string> => {
+  const brands = new Set<string>()
+  const visited = new WeakSet<object>()
+  let current: unknown = schema
+  while (Schema.isSchema(current) && !visited.has(current)) {
+    visited.add(current)
+    if (
+      Predicate.hasProperty(current, 'identifier') &&
+      (current.identifier === HttpApiSchema.MultipartTypeId ||
+        current.identifier === HttpApiSchema.MultipartStreamTypeId)
+    )
+      brands.add(current.identifier)
+    current = Predicate.hasProperty(current, 'schema') ? current.schema : undefined
+  }
+  return brands
+}
 
 const bufferedPayloads = (
   endpoint: HttpApiEndpoint.Top,
@@ -15,9 +33,9 @@ const bufferedPayloads = (
   let multipart = false
   for (const { encoding, schemas } of endpoint.payload.values()) {
     for (const schema of schemas) {
-      const brands = (schema.ast.annotations?.['brands'] as readonly string[] | undefined) ?? []
-      const buffered = brands.includes(HttpApiSchema.MultipartTypeId)
-      const streamed = brands.includes(HttpApiSchema.MultipartStreamTypeId)
+      const brands = multipartBrands(schema)
+      const buffered = brands.has(HttpApiSchema.MultipartTypeId)
+      const streamed = brands.has(HttpApiSchema.MultipartStreamTypeId)
       const metadataAgrees =
         encoding._tag === 'Multipart'
           ? encoding.mode === 'buffered'
@@ -40,7 +58,7 @@ const bufferedPayloads = (
     Array.from(endpoint.success).some((schema) =>
       Predicate.hasProperty(
         HttpApiSchema.isWithHeaders(schema) ? schema.schema : schema,
-        '~effect/httpapi/HttpApiSchema/Stream',
+        '~effect/http-api/HttpApiSchema/Stream',
       ),
     )
   )

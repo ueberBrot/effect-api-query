@@ -17,6 +17,7 @@ import { builtinModules } from 'node:module'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import ts from 'typescript-5.9'
 
 import repositoryManifest from '../package.json' with { type: 'json' }
 
@@ -77,7 +78,23 @@ const testedVersion = (dependency: keyof typeof repositoryManifest.devDependenci
 
 const lockedVersions = (dependency: string): ReadonlyArray<string> => {
   const escapedDependency = dependency.replaceAll('/', '\\/')
-  const matches = readFileSync(lockfilePath, 'utf8').matchAll(
+  // pnpm stores the project graph last, after any package-manager/config document.
+  const projectLockfile = readFileSync(lockfilePath, 'utf8')
+    .split(/^---[ \t]*(?:#[^\r\n]*)?\r?$/mu)
+    .at(-1)
+  if (
+    projectLockfile === undefined ||
+    !/^lockfileVersion: ['"]9\.0['"]\r?$/mu.test(projectLockfile) ||
+    !/^importers:\r?$/mu.test(projectLockfile)
+  ) {
+    throw new Error('The last lockfile document must define the version 9 project graph')
+  }
+  const lockedPackages = /^packages:\n(?<packages>[\s\S]*?)^snapshots:/mu.exec(projectLockfile)
+    ?.groups?.['packages']
+  if (lockedPackages === undefined) {
+    throw new Error('The project lockfile must define resolved packages and snapshots')
+  }
+  const matches = lockedPackages.matchAll(
     new RegExp(`^  ['"]?${escapedDependency}@(?<version>[^('":]+)`, 'gmu'),
   )
   return [...new Set(Array.from(matches, (match) => match.groups?.['version']))]
@@ -85,10 +102,11 @@ const lockedVersions = (dependency: string): ReadonlyArray<string> => {
     .sort()
 }
 
-const vitestOverride = /^  vitest: (?<version>\S+)$/mu.exec(workspaceConfig)?.groups?.['version']
-if (vitestOverride === undefined) {
-  throw new Error('The workspace must pin one Vitest override')
-}
+const overrides = /^overrides:\n(?<entries>(?:[ \t]+[^\n]*\n)*)/mu.exec(workspaceConfig)?.groups?.[
+  'entries'
+]
+match(overrides ?? '', /^  ['"]?vitest@\*['"]?: ['"]?catalog:['"]?$/mu)
+const vitestOverride = testedVersion('vitest')
 
 deepStrictEqual(lockedVersions('effect'), [testedVersion('effect')])
 deepStrictEqual(lockedVersions('vitest'), [vitestOverride])
@@ -112,7 +130,7 @@ const builtModule = execFileSync('tar', ['-xOzf', tarballPath, 'package/dist/ind
   encoding: 'utf8',
 })
 match(builtModule, /from ["']@tanstack\/query-core["']/u)
-match(builtModule, /from ["']effect(?:\/unstable\/rpc)?["']/u)
+match(builtModule, /from ["']effect(?:\/rpc)?["']/u)
 equal(/\bnode:/u.test(builtModule), false, 'The runtime must not import Node APIs')
 for (const imported of builtModule.matchAll(/\bfrom\s*["'](?<specifier>[^"']+)["']/gu)) {
   equal(
@@ -135,13 +153,56 @@ equal(
 const builtDeclaration = execFileSync('tar', ['-xOzf', tarballPath, 'package/dist/index.d.mts'], {
   encoding: 'utf8',
 })
-const declarationExport = /export \{ (?<names>[^}]+) \};/u.exec(builtDeclaration)?.groups?.['names']
-if (declarationExport === undefined) {
-  throw new Error('The declaration entry has no root export statement')
-}
-const declarationNames = declarationExport
-  .split(',')
-  .map((name) => name.trim().replace(/^type /u, ''))
+const declarationSource = ts.createSourceFile(
+  'index.d.mts',
+  builtDeclaration,
+  ts.ScriptTarget.Latest,
+  true,
+  ts.ScriptKind.TS,
+)
+const declarationNames = declarationSource.statements
+  .flatMap((statement) => {
+    if (ts.isExportDeclaration(statement)) {
+      if (statement.exportClause === undefined) {
+        throw new Error('The declaration entry must use named exports')
+      }
+      return ts.isNamedExports(statement.exportClause)
+        ? statement.exportClause.elements.map((element) => element.name.text)
+        : [statement.exportClause.name.text]
+    }
+    if (ts.isExportAssignment(statement)) {
+      equal(statement.isExportEquals, false, 'The declaration entry must use ESM exports')
+      return ['default']
+    }
+    const modifiers = ts.canHaveModifiers(statement) ? ts.getModifiers(statement) : undefined
+    if (!modifiers?.some((modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword)) return []
+    if (modifiers.some((modifier) => modifier.kind === ts.SyntaxKind.DefaultKeyword)) {
+      return ['default']
+    }
+    if (ts.isVariableStatement(statement)) {
+      return statement.declarationList.declarations.map((declaration) => {
+        if (!ts.isIdentifier(declaration.name)) {
+          throw new Error('Exported declaration variables must have names')
+        }
+        return declaration.name.text
+      })
+    }
+    if (
+      ts.isClassDeclaration(statement) ||
+      ts.isFunctionDeclaration(statement) ||
+      ts.isInterfaceDeclaration(statement) ||
+      ts.isTypeAliasDeclaration(statement) ||
+      ts.isEnumDeclaration(statement) ||
+      ts.isModuleDeclaration(statement) ||
+      ts.isImportEqualsDeclaration(statement)
+    ) {
+      if (statement.name === undefined) {
+        throw new Error('Exported declarations must have names')
+      }
+      return [statement.name.text]
+    }
+    throw new Error('Unsupported exported declaration')
+  })
   .sort()
 deepStrictEqual(declarationNames, [
   'CreateHttpApiQueryUtilsOptions',

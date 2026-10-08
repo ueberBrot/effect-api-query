@@ -35,7 +35,7 @@ jobs:
       - name: Build and upload documentation
         uses: withastro/action@e84f40bd8d2caa9e768ec82ad30dd81f0b280853 # v6
         with:
-          package-manager: pnpm@11.24.0
+          package-manager: pnpm@12.8.2
           path: ./apps/docs
 
   deploy:

@@ -1,6 +1,6 @@
 import { startExampleRpcServer } from '@effect-api-query/server'
 import { Effect, Exit, Scope } from 'effect'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test'
 
 import {
   startTanStackStartApplication,

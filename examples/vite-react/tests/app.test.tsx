@@ -3,7 +3,7 @@
 import { startExampleRpcServer } from '@effect-api-query/server'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { Effect, Exit, Scope } from 'effect'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test'
 
 import { ViteReactExample } from '../src/App.tsx'
 import { startViteReactApplication, type ViteReactApplication } from '../src/lib/application.ts'

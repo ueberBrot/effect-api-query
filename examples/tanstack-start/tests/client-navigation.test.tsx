@@ -5,7 +5,7 @@ import { dehydrate } from '@tanstack/react-query'
 import { createMemoryHistory, RouterProvider } from '@tanstack/react-router'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { Effect, Exit, Scope } from 'effect'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test'
 
 import {
   startTanStackStartApplication,
@@ -48,10 +48,12 @@ describe('TanStack Start hydration and client navigation', () => {
       scrollRestoration: false,
     })
     await router.options.hydrate?.({
-      dehydratedQueryClient: dehydrate(serverApplication.queryClient),
-      queryStream: new ReadableStream({
-        start: (controller) => controller.close(),
-      }),
+      query: {
+        initial: dehydrate(serverApplication.queryClient).queries,
+        stream: new ReadableStream({
+          start: (controller) => controller.close(),
+        }),
+      },
     })
     let duplicateListFetches = 0
     const unsubscribe = browserApplication.queryClient.getQueryCache().subscribe((event) => {

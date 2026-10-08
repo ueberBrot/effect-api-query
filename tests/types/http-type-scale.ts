@@ -5,8 +5,8 @@ import {
   type EffectHttpApiQueryError,
   type HttpApiQueryUtils,
 } from 'effect-api-query'
-import type { HttpClientError } from 'effect/unstable/http'
-import { HttpApi, HttpApiClient, HttpApiEndpoint, HttpApiGroup } from 'effect/unstable/httpapi'
+import type { HttpClientError } from 'effect/http'
+import { HttpApi, HttpApiClient, HttpApiEndpoint, HttpApiGroup } from 'effect/http-api'
 
 // Five groups retain 250 literal endpoint identifiers. The packed verifier records
 // extended diagnostics for this fixture without timing or memory thresholds.

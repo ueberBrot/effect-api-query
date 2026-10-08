@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@effect/vitest'
 import { Context, Effect, Redacted, Schema } from 'effect'
-import { Rpc, RpcGroup } from 'effect/unstable/rpc'
-import type { RpcClient } from 'effect/unstable/rpc'
+import { Rpc, RpcGroup } from 'effect/rpc'
+import type { RpcClient } from 'effect/rpc'
 
 import {
   createRpcQueryUtils,

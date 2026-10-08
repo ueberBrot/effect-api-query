@@ -6,8 +6,8 @@ description: Declare an HttpApi, own a ready client, and run a generated query a
 This tutorial connects an Effect HttpApi client to TanStack Query Core. You will declare two
 endpoints, acquire a ready client, read a user, and create another user.
 
-First [install the package](/effect-api-query/getting-started/installation/). Use a server that
-implements the declaration below at `http://localhost:3000`, with an existing user with ID `1`.
+First [install the package](/effect-api-query/getting-started/installation/). Use a server at
+`http://localhost:3000` that implements the declaration below and has an existing user with ID `1`.
 Change the base URL to your server. For browser requests, configure the server's CORS policy to
 allow the application's origin.
 For complete HTTP handlers and applications, [run the examples](/effect-api-query/examples/).
@@ -21,8 +21,8 @@ keep the runtime, client, and `QueryClient` in the application that manages thei
 import { MutationObserver, QueryClient } from '@tanstack/query-core'
 import { Effect, ManagedRuntime, Schema } from 'effect'
 import { createHttpApiQueryUtils } from 'effect-api-query'
-import { FetchHttpClient } from 'effect/unstable/http'
-import { HttpApi, HttpApiClient, HttpApiEndpoint, HttpApiGroup } from 'effect/unstable/httpapi'
+import { FetchHttpClient } from 'effect/http'
+import { HttpApi, HttpApiClient, HttpApiEndpoint, HttpApiGroup } from 'effect/http-api'
 
 const User = Schema.Struct({ id: Schema.Int, name: Schema.String })
 const usersApi = HttpApi.make('users-api').add(
@@ -93,11 +93,11 @@ Groups and endpoint identifiers retain their literal names. `users` and `get` pr
 Every supported endpoint offers both query and mutation builders, regardless of HTTP method.
 Choose a query for an idempotent cached read and a mutation for a command. After a write, invalidate
 the affected keys explicitly. RPC and HTTP have separate key namespaces, so applications that
-expose the same resource through both must invalidate both.
+expose the same resource through both must invalidate the affected keys in both namespaces.
 
-The `finally` block cancels queries, clears the cache, and disposes the runtime. Keep these resources
-alive for the application lifetime in a UI, and settle pending mutations before disposal. Include a
-safe user or tenant identity in `keyPrefix` whenever client configuration affects returned data.
+The `finally` block cancels queries, clears the cache, and disposes the runtime. In a UI, keep these
+resources alive for the application lifetime and settle pending mutations before disposal. Include
+a safe user or tenant identity in `keyPrefix` whenever client configuration affects returned data.
 
 The repository compiles this complete snippet against the public package root in
 [`tests/types/docs-http-quick-start.ts`](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-http-quick-start.ts)

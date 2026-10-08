@@ -12,6 +12,9 @@ requirements are tested.
 
 The package is ESM-only and targets ES2022. Enable strict TypeScript checking.
 
+The tested Effect release is stable, but its RPC and HTTP API modules declare unstable APIs.
+The package therefore pins one exact Effect peer version. Upgrade Effect and this package together.
+
 The first release is still pending, so breaking changes remain possible. Review the release notes
 when upgrading. Query Core's streamed-query interface is experimental and may change between v5 releases.
 

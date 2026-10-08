@@ -4,8 +4,8 @@ import { startExampleRpcServer } from '@effect-api-query/server'
 import { makeExampleWebHandler } from '@effect-api-query/server/web-handler'
 import { describe, expect, it } from '@effect/vitest'
 import { Effect, Exit, Fiber, Scope } from 'effect'
-import { FetchHttpClient } from 'effect/unstable/http'
-import { HttpApiClient } from 'effect/unstable/httpapi'
+import { FetchHttpClient } from 'effect/http'
+import { HttpApiClient } from 'effect/http-api'
 
 describe('example HTTP API', () => {
   it.effect('shares user state with RPC and returns no content after deletion', () =>
@@ -89,14 +89,14 @@ describe('example HTTP API', () => {
       )
       yield* Effect.promise(() =>
         expect
-          .poll(async () => Effect.runPromise(rpc('diagnostics.status', undefined)))
+          .poll(({ signal }) => Effect.runPromise(rpc('diagnostics.status', undefined), { signal }))
           .toMatchObject({ started: 1 }),
       )
       controller.abort()
       expect(yield* Effect.promise(() => pending)).toBe('aborted')
       yield* Effect.promise(() =>
         expect
-          .poll(async () => Effect.runPromise(rpc('diagnostics.status', undefined)))
+          .poll(({ signal }) => Effect.runPromise(rpc('diagnostics.status', undefined), { signal }))
           .toEqual({ started: 1, interrupted: 1 }),
       )
       const status = yield* Effect.promise(() =>
@@ -176,7 +176,7 @@ describe('example HTTP API', () => {
       )
       yield* Effect.promise(() =>
         expect
-          .poll(() => Effect.runPromise(client.diagnostics.status()))
+          .poll(({ signal }) => Effect.runPromise(client.diagnostics.status(), { signal }))
           .toMatchObject({ started: 1 }),
       )
       yield* Scope.close(owner, Exit.void)
@@ -189,8 +189,10 @@ describe('example HTTP API', () => {
     Effect.gen(function* () {
       const server = yield* startExampleRpcServer()
       const rpc = yield* makeExampleRpcClient(server.rpcUrl)
-      const readStatus = (id: string) =>
-        fetch(`${server.url}/api/diagnostics/operations/${id}`).then((response) => response.json())
+      const readStatus = (id: string, signal: AbortSignal | null = null) =>
+        fetch(`${server.url}/api/diagnostics/operations/${id}`, { signal }).then((response) =>
+          response.json(),
+        )
       expect(yield* Effect.promise(() => readStatus('unused'))).toEqual({
         started: 0,
         interrupted: 0,
@@ -210,10 +212,14 @@ describe('example HTTP API', () => {
         () => 'aborted',
       )
       yield* Effect.promise(() =>
-        expect.poll(() => readStatus('rpc-panel')).toEqual({ started: 1, interrupted: 0 }),
+        expect
+          .poll(({ signal }) => readStatus('rpc-panel', signal))
+          .toEqual({ started: 1, interrupted: 0 }),
       )
       yield* Effect.promise(() =>
-        expect.poll(() => readStatus('http-panel')).toEqual({ started: 1, interrupted: 0 }),
+        expect
+          .poll(({ signal }) => readStatus('http-panel', signal))
+          .toEqual({ started: 1, interrupted: 0 }),
       )
       yield* rpc('diagnostics.cancel', { operationId: 'rpc-panel' })
       expect(Exit.isFailure(yield* Fiber.await(rpcSlow))).toBe(true)
@@ -228,7 +234,9 @@ describe('example HTTP API', () => {
       controller.abort()
       expect(yield* Effect.promise(() => httpSlow)).toBe('aborted')
       yield* Effect.promise(() =>
-        expect.poll(() => readStatus('http-panel')).toEqual({ started: 1, interrupted: 1 }),
+        expect
+          .poll(({ signal }) => readStatus('http-panel', signal))
+          .toEqual({ started: 1, interrupted: 1 }),
       )
       expect(yield* rpc('diagnostics.status', undefined)).toEqual({ started: 2, interrupted: 2 })
       yield* rpc('testing.reset', undefined)

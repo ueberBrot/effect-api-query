@@ -1,5 +1,5 @@
 import { Effect, Schema, Stream } from 'effect'
-import { Rpc, RpcGroup, RpcTest } from 'effect/unstable/rpc'
+import { Rpc, RpcGroup, RpcTest } from 'effect/rpc'
 
 const GetUser = Rpc.make('users.get', {
   payload: {

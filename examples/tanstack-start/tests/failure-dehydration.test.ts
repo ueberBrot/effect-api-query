@@ -3,7 +3,7 @@ import { type QueryKey } from '@tanstack/react-query'
 import { createMemoryHistory } from '@tanstack/react-router'
 import { attachRouterServerSsrUtils } from '@tanstack/react-start/server'
 import { Effect, Exit, Scope } from 'effect'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 import type { TanStackStartApplication } from '../src/lib/application.ts'
 import { createTanStackStartRouter } from '../src/router.tsx'
@@ -127,7 +127,7 @@ describe('TanStack Start router dehydration', () => {
       expect(application.queryClient.getQueryState(failureKey)?.error).toMatchObject({
         name: adapter === 'http' ? 'EffectHttpApiQueryError' : 'EffectRpcQueryError',
       })
-      expect(dehydrated).not.toHaveProperty('dehydratedQueryClient')
+      expect(dehydrated).not.toHaveProperty('query.initial')
       router.serverSsr?.cleanup()
     },
   )
