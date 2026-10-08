@@ -3,7 +3,7 @@ import type { DiagnosticStatus } from '@effect-api-query/contracts'
 import { makeExampleRpcClient, startExampleRpcClient } from '@effect-api-query/contracts/client'
 import type { ExampleRpcClient } from '@effect-api-query/contracts/client'
 import { startExampleRpcServer } from '@effect-api-query/server'
-import { describe, expect, it } from '@effect/vitest'
+import { describe, expect, it, vi } from '@effect/vitest'
 import {
   Cause,
   Deferred,
@@ -18,9 +18,8 @@ import {
   Stream,
 } from 'effect'
 import { RpcClient } from 'effect/rpc'
-import { createServer, request as nodeRequest } from 'node:http'
-
-import { acquireNodeServer } from '../src/node-server-resource.ts'
+import dns from 'node:dns'
+import { request as nodeRequest } from 'node:http'
 
 const waitForStatus = Effect.fn('TestExampleRpc.waitForStatus')(function* (
   client: ExampleRpcClient,
@@ -349,37 +348,75 @@ describe('example RPC server', () => {
     }),
   )
 
-  it.live('releases a listener when startup is interrupted', () =>
+  it.live('releases its listener when the owning fiber is interrupted', () =>
     Effect.gen(function* () {
       const listening = yield* Deferred.make<number>()
-      // Void is the deliberate success channel of this Effect factory.
-      // oxlint-disable-next-line typescript/no-invalid-void-type
-      const finishAcquisition = yield* Deferred.make<void>()
-      const owner = yield* Scope.make()
-      const nodeServer = createServer()
-      const listen = Effect.callback<number>((resume) => {
-        nodeServer.listen(0, '127.0.0.1', () => {
-          const address = nodeServer.address()
-          if (address === null || Predicate.isString(address)) {
-            resume(Effect.die('Expected a TCP address'))
-            return
-          }
-          resume(Effect.succeed(address.port))
-        })
-      }).pipe(
-        Effect.tap((port) => Deferred.succeed(listening, port)),
-        Effect.tap(() => Deferred.await(finishAcquisition)),
-      )
-      const starting = yield* acquireNodeServer(nodeServer, listen).pipe(
-        Scope.provide(owner),
+      const starting = yield* startExampleRpcServer().pipe(
+        Effect.tap((server) => Deferred.succeed(listening, server.port)),
+        Effect.andThen(Effect.never),
+        Effect.scoped,
         Effect.forkChild,
       )
       const port = yield* Deferred.await(listening)
-      const interruption = yield* Fiber.interrupt(starting).pipe(Effect.forkChild)
+      yield* Fiber.interrupt(starting)
 
-      yield* Deferred.succeed(finishAcquisition, undefined)
+      const replacement = yield* startExampleRpcServer({ port })
+      expect(replacement.port).toBe(port)
+      expect((yield* Effect.promise(async () => fetch(`${replacement.url}/health`))).status).toBe(
+        200,
+      )
+    }),
+  )
+
+  it.live('releases its listener when startup is interrupted during hostname resolution', () =>
+    Effect.gen(function* () {
+      const reservation = yield* Scope.make()
+      const reserved = yield* startExampleRpcServer().pipe(Scope.provide(reservation))
+      const { port } = reserved
+      yield* Scope.close(reservation, Exit.void)
+
+      const lookupRequested = yield* Deferred.make<() => void>()
+      const lookup = yield* Effect.acquireRelease(
+        Effect.sync(() => vi.spyOn(dns, 'lookup')),
+        (spy) =>
+          Effect.sync(() => {
+            spy.mockRestore()
+          }),
+      )
+      // Node's DNS callback is controlled here to pause real server startup.
+      /* oxlint-disable promise/prefer-await-to-callbacks */
+      lookup.mockImplementationOnce(
+        (
+          _hostname,
+          optionsOrCallback:
+            | dns.LookupOptions
+            | ((error: NodeJS.ErrnoException | null, address: string, family: number) => void),
+          callback?: (error: NodeJS.ErrnoException | null, addresses: dns.LookupAddress[]) => void,
+        ) => {
+          Deferred.doneUnsafe(
+            lookupRequested,
+            Effect.succeed(() => {
+              if (Predicate.isFunction(optionsOrCallback)) {
+                optionsOrCallback(null, '127.0.0.1', 4)
+                return
+              }
+              callback?.(null, [{ address: '127.0.0.1', family: 4 }])
+            }),
+          )
+        },
+      )
+      /* oxlint-enable promise/prefer-await-to-callbacks */
+      const starting = yield* startExampleRpcServer({ host: 'localhost', port }).pipe(
+        Effect.scoped,
+        Effect.forkChild,
+      )
+      const completeLookup = yield* Deferred.await(lookupRequested)
+      const interruption = yield* Fiber.interrupt(starting).pipe(
+        Effect.forkChild({ startImmediately: true }),
+      )
+      yield* Effect.yieldNow
+      yield* Effect.sync(completeLookup)
       yield* Fiber.join(interruption)
-      yield* Scope.close(owner, Exit.void)
 
       const replacement = yield* startExampleRpcServer({ port })
       expect(replacement.port).toBe(port)

@@ -3,7 +3,8 @@ import type {
   RunningExampleRpcServer,
   StartExampleRpcServerOptions,
 } from '@effect-api-query/server'
-import { Effect, Logger, Runtime } from 'effect'
+import { NodeRuntime } from '@effect/platform-node'
+import { Effect, Logger } from 'effect'
 
 const serverOptions = { port: 3001 } satisfies StartExampleRpcServerOptions
 const developmentLogger = Logger.layer([Logger.consolePretty(), Logger.tracerLogger])
@@ -16,19 +17,4 @@ const program = Effect.scoped(
   }),
 )
 
-const runMain = Runtime.makeRunMain(({ fiber, teardown }) => {
-  const shutdown = () => {
-    fiber.interruptUnsafe()
-  }
-  process.once('SIGINT', shutdown)
-  process.once('SIGTERM', shutdown)
-  fiber.addObserver((exit) => {
-    process.off('SIGINT', shutdown)
-    process.off('SIGTERM', shutdown)
-    teardown(exit, (code) => {
-      process.exitCode = code
-    })
-  })
-})
-
-runMain(program.pipe(Effect.provide(developmentLogger), Effect.orDie))
+NodeRuntime.runMain(program.pipe(Effect.provide(developmentLogger), Effect.orDie))

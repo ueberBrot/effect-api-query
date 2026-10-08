@@ -34,6 +34,7 @@
               "examples/contracts/src/contracts.ts",
               "examples/contracts/src/http-api.ts",
               "examples/server/src/http-handlers.ts",
+              "examples/server/src/server.ts",
               "examples/server/src/web-handler.ts",
               "examples/server/tests/http-api.test.ts",
               "examples/server/tests/server.test.ts",
