@@ -426,7 +426,8 @@ export default defineConfig({
     },
   },
   staged: {
-    '*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}': 'vp check --fix',
+    // Typed lint fixes need the full project context; formatting stays scoped to staged files.
+    '*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}': ['vp fmt', () => 'vp run --no-cache typecheck --fix'],
     '*.{json,jsonc,md,yaml,yml}': 'vp fmt',
   },
 })

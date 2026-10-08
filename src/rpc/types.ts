@@ -1,27 +1,17 @@
-import type {
-  DataTag,
-  InfiniteData,
-  MutationObserverOptions,
-  QueryFunction,
-  QueryKey,
-  SkipToken,
-} from '@tanstack/query-core'
+import type { DataTag, MutationObserverOptions, QueryKey } from '@tanstack/query-core'
 import type { Context, Schema } from 'effect'
 import type { Headers } from 'effect/http'
 import type { Rpc, RpcClient, RpcGroup, RpcSchema } from 'effect/rpc'
 
 import type {
   ContainsRedacted,
+  InfiniteQueryBuilder,
+  InfiniteQueryKey,
   UnaryQueryBuilder,
   JsonValue,
   QueryData,
   RunPromiseExit,
-  OwnedQueryOption,
   OwnedMutationOption,
-  WithDefinedInitialData,
-  WithUndefinedInitialData,
-  InfiniteInput,
-  InfiniteOptions,
   MutationOptions,
 } from '../core/types'
 import type { EffectRpcQueryEmptyStreamError, EffectRpcQueryError } from './errors'
@@ -188,168 +178,26 @@ export type ConcreteInfiniteKey<
   R extends Rpc.Any,
   ClientError,
   PageParam = unknown,
-> = DataTag<
-  void extends Rpc.PayloadConstructor<R>
-    ? InfiniteOperationKey<Prefix, R>
-    : readonly [...InfiniteOperationKey<Prefix, R>, JsonValue],
-  InfiniteData<QueryData<Rpc.Success<R>>, PageParam>,
-  EffectRpcQueryError<RpcFailure<R, ClientError>>
->
-
-/** Infinite-query inputs after removing fields owned by this package. */
-export type InfiniteInputOptions<
-  R extends Rpc.Any,
-  Prefix extends readonly JsonValue[],
-  ClientError,
-  Selected,
-  PageParam,
-> = InfiniteInput<
+> = InfiniteQueryKey<
+  Rpc.PayloadConstructor<R>,
   QueryData<Rpc.Success<R>>,
   EffectRpcQueryError<RpcFailure<R, ClientError>>,
-  Selected,
-  ConcreteInfiniteKey<Prefix, R, ClientError, PageParam>,
-  PageParam,
-  RpcOptionsInput
-> &
-  (void extends Rpc.PayloadConstructor<R>
-    ? unknown
-    : { readonly input: (pageParam: PageParam) => Rpc.PayloadConstructor<R> })
-
-/** Infinite-query options generated for one unary RPC. */
-export type RpcInfiniteOptions<
-  R extends Rpc.Any,
-  Prefix extends readonly JsonValue[],
-  ClientError,
-  Selected,
-  PageParam,
-> = InfiniteOptions<
-  QueryData<Rpc.Success<R>>,
-  EffectRpcQueryError<RpcFailure<R, ClientError>>,
-  Selected,
-  ConcreteInfiniteKey<Prefix, R, ClientError, PageParam>,
+  InfiniteOperationKey<Prefix, R>,
   PageParam
 >
 
-/** Query Core options returned when a payload-bearing infinite query uses `skipToken`. */
-export type SkippedRpcInfiniteOptions<
-  R extends Rpc.Any,
-  Prefix extends readonly JsonValue[],
-  ClientError,
-  PageParam,
-  Selected = InfiniteData<QueryData<Rpc.Success<R>>, PageParam>,
-> = InfiniteOptions<
-  QueryData<Rpc.Success<R>>,
-  EffectRpcQueryError<RpcFailure<R, ClientError>>,
-  Selected,
-  InfiniteOperationKey<Prefix, R>,
-  PageParam,
-  SkipToken
->
-
-export type ConditionalRpcInfiniteKey<
-  R extends Rpc.Any,
-  Prefix extends readonly JsonValue[],
-  ClientError,
-  PageParam,
-> = ConcreteInfiniteKey<Prefix, R, ClientError, PageParam> | InfiniteOperationKey<Prefix, R>
-
-export type ConditionalRpcInfiniteOptions<
-  R extends Rpc.Any,
-  Prefix extends readonly JsonValue[],
-  ClientError,
-  Selected,
-  PageParam,
-> = InfiniteOptions<
-  QueryData<Rpc.Success<R>>,
-  EffectRpcQueryError<RpcFailure<R, ClientError>>,
-  Selected,
-  ConditionalRpcInfiniteKey<R, Prefix, ClientError, PageParam>,
-  PageParam,
-  | QueryFunction<
-      QueryData<Rpc.Success<R>>,
-      ConditionalRpcInfiniteKey<R, Prefix, ClientError, PageParam>,
-      PageParam
-    >
-  | SkipToken
->
-
-/** Preserves initial-data inference for page-input mappers and conditional skipping. */
+/** Supplies RPC payload and request-local options to the shared infinite query builder. */
 export type InfiniteOptionsBuilder<
   R extends Rpc.Any,
   Prefix extends readonly JsonValue[],
   ClientError,
-> = {
-  <PageParam, Selected = InfiniteData<QueryData<Rpc.Success<R>>, PageParam>>(
-    options: WithDefinedInitialData<
-      InfiniteInputOptions<R, Prefix, ClientError, Selected, PageParam>,
-      InfiniteData<QueryData<Rpc.Success<R>>, PageParam>
-    >,
-  ): WithDefinedInitialData<
-    RpcInfiniteOptions<R, Prefix, ClientError, Selected, PageParam>,
-    InfiniteData<QueryData<Rpc.Success<R>>, PageParam>
-  >
-  <PageParam, Selected = InfiniteData<QueryData<Rpc.Success<R>>, PageParam>>(
-    options: WithUndefinedInitialData<
-      InfiniteInputOptions<R, Prefix, ClientError, Selected, PageParam>,
-      InfiniteData<QueryData<Rpc.Success<R>>, PageParam>
-    >,
-  ): RpcInfiniteOptions<R, Prefix, ClientError, Selected, PageParam>
-} & (void extends Rpc.PayloadConstructor<R>
-  ? unknown
-  : {
-      <PageParam, Selected = InfiniteData<QueryData<Rpc.Success<R>>, PageParam>>(
-        options: WithDefinedInitialData<
-          Omit<
-            SkippedRpcInfiniteOptions<R, Prefix, ClientError, PageParam, Selected>,
-            OwnedQueryOption
-          >,
-          InfiniteData<QueryData<Rpc.Success<R>>, PageParam>
-        > &
-          RpcOptionsInput & { readonly input: SkipToken },
-      ): WithDefinedInitialData<
-        SkippedRpcInfiniteOptions<R, Prefix, ClientError, PageParam, Selected>,
-        InfiniteData<QueryData<Rpc.Success<R>>, PageParam>
-      >
-      <PageParam, Selected = InfiniteData<QueryData<Rpc.Success<R>>, PageParam>>(
-        options: WithUndefinedInitialData<
-          Omit<
-            SkippedRpcInfiniteOptions<R, Prefix, ClientError, PageParam, Selected>,
-            OwnedQueryOption
-          >,
-          InfiniteData<QueryData<Rpc.Success<R>>, PageParam>
-        > &
-          RpcOptionsInput & {
-            readonly input: SkipToken
-          },
-      ): SkippedRpcInfiniteOptions<R, Prefix, ClientError, PageParam, Selected>
-      <PageParam, Selected = InfiniteData<QueryData<Rpc.Success<R>>, PageParam>>(
-        options: WithDefinedInitialData<
-          Omit<
-            ConditionalRpcInfiniteOptions<R, Prefix, ClientError, Selected, PageParam>,
-            OwnedQueryOption
-          >,
-          InfiniteData<QueryData<Rpc.Success<R>>, PageParam>
-        > &
-          RpcOptionsInput & {
-            readonly input: ((pageParam: PageParam) => Rpc.PayloadConstructor<R>) | SkipToken
-          },
-      ): WithDefinedInitialData<
-        ConditionalRpcInfiniteOptions<R, Prefix, ClientError, Selected, PageParam>,
-        InfiniteData<QueryData<Rpc.Success<R>>, PageParam>
-      >
-      <PageParam, Selected = InfiniteData<QueryData<Rpc.Success<R>>, PageParam>>(
-        options: WithUndefinedInitialData<
-          Omit<
-            ConditionalRpcInfiniteOptions<R, Prefix, ClientError, Selected, PageParam>,
-            OwnedQueryOption
-          >,
-          InfiniteData<QueryData<Rpc.Success<R>>, PageParam>
-        > &
-          RpcOptionsInput & {
-            readonly input: ((pageParam: PageParam) => Rpc.PayloadConstructor<R>) | SkipToken
-          },
-      ): ConditionalRpcInfiniteOptions<R, Prefix, ClientError, Selected, PageParam>
-    })
+> = InfiniteQueryBuilder<
+  Rpc.PayloadConstructor<R>,
+  QueryData<Rpc.Success<R>>,
+  EffectRpcQueryError<RpcFailure<R, ClientError>>,
+  InfiniteOperationKey<Prefix, R>,
+  RpcOptionsInput
+>
 
 export type InfiniteKeyBuilder<
   R extends Rpc.Any,

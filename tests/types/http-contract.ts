@@ -941,12 +941,25 @@ const skippedOptional = useQuery(
   getUser.queryOptions({ input: skipToken, initialData: optionalInitial }),
 )
 true satisfies Assert<Equal<typeof skippedOptional.data, typeof User.Type | undefined>>
+declare const optionalInitialValue: typeof User.Type | undefined
+const skippedOptionalValue = useQuery(
+  getUser.queryOptions({ input: skipToken, initialData: optionalInitialValue }),
+)
+true satisfies Assert<Equal<typeof skippedOptionalValue.data, typeof User.Type | undefined>>
 declare const hasUser: boolean
 const conditional = getUser.queryOptions({
   input: hasUser ? input : skipToken,
   select: (user) => user.name,
 })
 useQuery(conditional).data satisfies string | undefined
+const conditionalOptionalValue = useQuery(
+  getUser.queryOptions({
+    input: hasUser ? input : skipToken,
+    initialData: optionalInitialValue,
+    select: (user) => user.name,
+  }),
+)
+true satisfies Assert<Equal<typeof conditionalOptionalValue.data, string | undefined>>
 // @ts-expect-error A conditional request cannot guarantee suspense execution.
 useSuspenseQuery(conditional)
 // @ts-expect-error Key builders require concrete requests.
@@ -1076,6 +1089,17 @@ const skippedDefinedPages = useInfiniteQuery(
   }),
 )
 true satisfies Assert<Equal<typeof skippedDefinedPages.data, number>>
+declare const optionalPageValue: InfiniteData<typeof User.Type, number> | undefined
+const optionalSkippedPages = useInfiniteQuery(
+  getUser.infiniteOptions({
+    input: skipToken,
+    initialPageParam: 0,
+    getNextPageParam: () => undefined,
+    initialData: optionalPageValue,
+    select: (data) => data.pages.length,
+  }),
+)
+true satisfies Assert<Equal<typeof optionalSkippedPages.data, number | undefined>>
 // @ts-expect-error Infinite skipping requires object options with pagination fields.
 getUser.infiniteOptions(skipToken)
 getUser.infiniteOptions({
@@ -1180,6 +1204,41 @@ const conditionalPages = getUser.infiniteOptions({
 })
 const conditionalPagesHook = useInfiniteQuery(conditionalPages)
 true satisfies Assert<Equal<typeof conditionalPagesHook.data, number | undefined>>
+const optionalConditionalPages = useInfiniteQuery(
+  getUser.infiniteOptions({
+    initialPageParam: 0,
+    input: hasUser ? (page) => ({ ...input, params: { id: page } }) : skipToken,
+    getNextPageParam: () => undefined,
+    initialData: optionalPageValue,
+    select: (data) => data.pages.length,
+  }),
+)
+true satisfies Assert<Equal<typeof optionalConditionalPages.data, number | undefined>>
+const definedConditionalPages = useInfiniteQuery(
+  getUser.infiniteOptions({
+    initialPageParam: 0,
+    input: hasUser ? (page) => ({ ...input, params: { id: page } }) : skipToken,
+    getNextPageParam: () => undefined,
+    initialData: () => initialPages,
+    select: (data) => data.pages.length,
+  }),
+)
+true satisfies Assert<Equal<typeof definedConditionalPages.data, number>>
+const nullableConditionalPages = getUser.infiniteOptions({
+  initialPageParam: null as number | null,
+  input: hasUser ? (page) => ({ ...input, params: { id: page ?? 0 } }) : skipToken,
+  getNextPageParam: (_page, _pages, cursor) => {
+    cursor satisfies number | null
+    return cursor === null ? 1 : cursor + 1
+  },
+})
+const nullableConditionalPagesHook = useInfiniteQuery(nullableConditionalPages)
+true satisfies Assert<
+  Equal<
+    typeof nullableConditionalPagesHook.data,
+    InfiniteData<typeof User.Type, number | null> | undefined
+  >
+>
 // @ts-expect-error Conditional infinite requests cannot guarantee suspense execution.
 useSuspenseInfiniteQuery(conditionalPages)
 const pageApi = HttpApi.make('pages').add(

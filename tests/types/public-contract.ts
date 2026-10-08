@@ -996,6 +996,16 @@ const optionalQueryResult = useQuery(
 )
 // @ts-expect-error an initial-data function may return undefined
 optionalQueryResult.data satisfies { id: number; name: string }
+declare const optionalQueryInitialValue: { readonly id: number; readonly name: string } | undefined
+const optionalSkippedQueryValue = useQuery(
+  utils.users.get.queryOptions({ input: skipToken, initialData: optionalQueryInitialValue }),
+)
+true satisfies Assert<
+  Equal<
+    typeof optionalSkippedQueryValue.data,
+    { readonly id: number; readonly name: string } | undefined
+  >
+>
 useQuery(
   utils.events.watch.streamedOptions({
     input: skipToken,
@@ -1016,6 +1026,16 @@ const optionalStreamedResult = useQuery(
 )
 // @ts-expect-error an initial-data function may return undefined
 optionalStreamedResult.data satisfies ReadonlyArray<string>
+declare const optionalStreamedInitialValue: ReadonlyArray<string> | undefined
+const optionalSkippedStreamedValue = useQuery(
+  utils.events.watch.streamedOptions({
+    input: skipToken,
+    initialData: optionalStreamedInitialValue,
+  }),
+)
+true satisfies Assert<
+  Equal<typeof optionalSkippedStreamedValue.data, ReadonlyArray<string> | undefined>
+>
 useQuery(
   utils.events.watch.liveOptions({
     input: skipToken,
@@ -1036,6 +1056,11 @@ const optionalLiveResult = useQuery(
 )
 // @ts-expect-error an initial-data function may return undefined
 optionalLiveResult.data satisfies string
+declare const optionalLiveInitialValue: string | undefined
+const optionalSkippedLiveValue = useQuery(
+  utils.events.watch.liveOptions({ input: skipToken, initialData: optionalLiveInitialValue }),
+)
+true satisfies Assert<Equal<typeof optionalSkippedLiveValue.data, string | undefined>>
 // @ts-expect-error skipping does not widen the supported builder inputs
 utils.health.ping.queryOptions({ input: skipToken })
 utils.health.ping.infiniteOptions({
@@ -1184,6 +1209,22 @@ const initializedConditionalLiveOptions = utils.events.watch.liveOptions({
 initializedConditionalLiveOptions.initialData satisfies string | (() => string)
 const initializedConditionalLiveHook = useQuery(initializedConditionalLiveOptions)
 true satisfies Assert<Equal<typeof initializedConditionalLiveHook.data, number | undefined>>
+const optionalConditionalStreamedValue = useQuery(
+  utils.events.watch.streamedOptions({
+    input: conditionalStreamInput,
+    initialData: optionalStreamedInitialValue,
+    select: (values) => values.length,
+  }),
+)
+true satisfies Assert<Equal<typeof optionalConditionalStreamedValue.data, number | undefined>>
+const optionalConditionalLiveValue = useQuery(
+  utils.events.watch.liveOptions({
+    input: conditionalStreamInput,
+    initialData: optionalLiveInitialValue,
+    select: (value) => value.length,
+  }),
+)
+true satisfies Assert<Equal<typeof optionalConditionalLiveValue.data, number | undefined>>
 
 declare const conditionalUserId: number | undefined
 const conditionalUserOptions = utils.users.get.queryOptions({
@@ -1218,6 +1259,14 @@ initializedConditionalUser.initialData satisfies
   | { readonly id: number; readonly name: string }
   | (() => { readonly id: number; readonly name: string })
 useQuery(initializedConditionalUser).data satisfies string | undefined
+const optionalConditionalUser = useQuery(
+  utils.users.get.queryOptions({
+    input: conditionalUserId === undefined ? skipToken : { id: conditionalUserId },
+    initialData: optionalQueryInitialValue,
+    select: (user) => user.name,
+  }),
+)
+true satisfies Assert<Equal<typeof optionalConditionalUser.data, string | undefined>>
 
 // Request-local inputs retain inference and stay out of the returned Query Core contract.
 const unaryRpcOptions = {

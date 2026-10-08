@@ -35,13 +35,15 @@ interface MakeStreamQueryOptions {
   readonly runPromiseExit: RunPromiseExit<unknown>
 }
 
-const abortableAsyncIterable = <A>(
+const streamQueryIterable = <A>(
   source: AsyncIterable<A>,
   signal: AbortSignal,
+  liveRpcTag: string | undefined,
 ): AsyncIterable<A> => ({
   [Symbol.asyncIterator]() {
     const iterator = source[Symbol.asyncIterator]()
     let closePromise: Promise<IteratorResult<A>> | undefined
+    let emitted = false
     // This callback runs after the listener has been initialized below.
     const detach = () => {
       // oxlint-disable-next-line eslint/no-use-before-define
@@ -68,19 +70,25 @@ const abortableAsyncIterable = <A>(
 
     return {
       async next() {
+        let result: IteratorResult<A>
         if (signal.aborted) {
-          return await close()
-        }
-        try {
-          const result = await iterator.next()
-          if (result.done === true) {
+          result = await close()
+        } else {
+          try {
+            result = await iterator.next()
+          } catch (error) {
             detach()
+            throw error
           }
-          return result
-        } catch (error) {
-          detach()
-          throw error
         }
+        if (result.done === true) {
+          detach()
+          if (!emitted && liveRpcTag !== undefined) {
+            throw new EffectRpcQueryEmptyStreamError(liveRpcTag)
+          }
+        }
+        emitted = true
+        return result
       },
       return: close,
       async throw(cause?: unknown) {
@@ -89,32 +97,6 @@ const abortableAsyncIterable = <A>(
           return await iterator.throw(cause)
         }
         await close()
-        throw cause
-      },
-    }
-  },
-})
-
-const requireFirstValue = <A>(source: AsyncIterable<A>, rpcTag: string): AsyncIterable<A> => ({
-  [Symbol.asyncIterator]() {
-    const iterator = source[Symbol.asyncIterator]()
-    let emitted = false
-    return {
-      async next() {
-        const result = await iterator.next()
-        if (result.done === true && !emitted) {
-          throw new EffectRpcQueryEmptyStreamError(rpcTag)
-        }
-        emitted = true
-        return result
-      },
-      return: async (value?: unknown) =>
-        iterator.return?.(value) ?? Promise.resolve({ done: true, value: undefined }),
-      async throw(cause?: unknown) {
-        if (iterator.throw !== undefined) {
-          return await iterator.throw(cause)
-        }
-        await iterator.return?.()
         throw cause
       },
     }
@@ -144,8 +126,7 @@ const makeStreamQuery = ({
     if (Exit.isFailure(exit)) {
       throw new EffectRpcQueryError(rpc.tag, operation, exit.cause)
     }
-    const iterable = abortableAsyncIterable(exit.value, signal)
-    return policy._tag === 'Live' ? requireFirstValue(iterable, rpc.tag) : iterable
+    return streamQueryIterable(exit.value, signal, policy._tag === 'Live' ? rpc.tag : undefined)
   }
 
   if (policy._tag === 'Live') {
