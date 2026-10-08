@@ -2,6 +2,7 @@ import type {
   DataTag,
   InfiniteData,
   MutationObserverOptions,
+  QueryFunction,
   QueryKey,
   SkipToken,
 } from '@tanstack/query-core'
@@ -19,8 +20,6 @@ import type {
   OwnedMutationOption,
   WithDefinedInitialData,
   WithUndefinedInitialData,
-  QueryInput,
-  QueryOptions,
   InfiniteInput,
   InfiniteOptions,
   MutationOptions,
@@ -211,7 +210,10 @@ export type InfiniteInputOptions<
   ConcreteInfiniteKey<Prefix, R, ClientError, PageParam>,
   PageParam,
   RpcOptionsInput
->
+> &
+  (void extends Rpc.PayloadConstructor<R>
+    ? unknown
+    : { readonly input: (pageParam: PageParam) => Rpc.PayloadConstructor<R> })
 
 /** Infinite-query options generated for one unary RPC. */
 export type RpcInfiniteOptions<
@@ -244,32 +246,110 @@ export type SkippedRpcInfiniteOptions<
   SkipToken
 >
 
-/** Builds infinite-query options from page parameters or the exact skip sentinel. */
+export type ConditionalRpcInfiniteKey<
+  R extends Rpc.Any,
+  Prefix extends readonly JsonValue[],
+  ClientError,
+  PageParam,
+> = ConcreteInfiniteKey<Prefix, R, ClientError, PageParam> | InfiniteOperationKey<Prefix, R>
+
+export type ConditionalRpcInfiniteOptions<
+  R extends Rpc.Any,
+  Prefix extends readonly JsonValue[],
+  ClientError,
+  Selected,
+  PageParam,
+> = InfiniteOptions<
+  QueryData<Rpc.Success<R>>,
+  EffectRpcQueryError<RpcFailure<R, ClientError>>,
+  Selected,
+  ConditionalRpcInfiniteKey<R, Prefix, ClientError, PageParam>,
+  PageParam,
+  | QueryFunction<
+      QueryData<Rpc.Success<R>>,
+      ConditionalRpcInfiniteKey<R, Prefix, ClientError, PageParam>,
+      PageParam
+    >
+  | SkipToken
+>
+
+/** Preserves initial-data inference for page-input mappers and conditional skipping. */
 export type InfiniteOptionsBuilder<
   R extends Rpc.Any,
   Prefix extends readonly JsonValue[],
   ClientError,
-> =
-  void extends Rpc.PayloadConstructor<R>
-    ? <PageParam, Selected = InfiniteData<QueryData<Rpc.Success<R>>, PageParam>>(
-        options: InfiniteInputOptions<R, Prefix, ClientError, Selected, PageParam>,
-      ) => RpcInfiniteOptions<R, Prefix, ClientError, Selected, PageParam>
-    : {
-        <PageParam, Selected = InfiniteData<QueryData<Rpc.Success<R>>, PageParam>>(
-          options: InfiniteInputOptions<R, Prefix, ClientError, Selected, PageParam> & {
-            readonly input: (pageParam: PageParam) => Rpc.PayloadConstructor<R>
-          },
-        ): RpcInfiniteOptions<R, Prefix, ClientError, Selected, PageParam>
-        <PageParam, Selected = InfiniteData<QueryData<Rpc.Success<R>>, PageParam>>(
-          options: Omit<
+> = {
+  <PageParam, Selected = InfiniteData<QueryData<Rpc.Success<R>>, PageParam>>(
+    options: WithDefinedInitialData<
+      InfiniteInputOptions<R, Prefix, ClientError, Selected, PageParam>,
+      InfiniteData<QueryData<Rpc.Success<R>>, PageParam>
+    >,
+  ): WithDefinedInitialData<
+    RpcInfiniteOptions<R, Prefix, ClientError, Selected, PageParam>,
+    InfiniteData<QueryData<Rpc.Success<R>>, PageParam>
+  >
+  <PageParam, Selected = InfiniteData<QueryData<Rpc.Success<R>>, PageParam>>(
+    options: WithUndefinedInitialData<
+      InfiniteInputOptions<R, Prefix, ClientError, Selected, PageParam>,
+      InfiniteData<QueryData<Rpc.Success<R>>, PageParam>
+    >,
+  ): RpcInfiniteOptions<R, Prefix, ClientError, Selected, PageParam>
+} & (void extends Rpc.PayloadConstructor<R>
+  ? unknown
+  : {
+      <PageParam, Selected = InfiniteData<QueryData<Rpc.Success<R>>, PageParam>>(
+        options: WithDefinedInitialData<
+          Omit<
             SkippedRpcInfiniteOptions<R, Prefix, ClientError, PageParam, Selected>,
             OwnedQueryOption
-          > &
-            RpcOptionsInput & {
-              readonly input: SkipToken
-            },
-        ): SkippedRpcInfiniteOptions<R, Prefix, ClientError, PageParam, Selected>
-      }
+          >,
+          InfiniteData<QueryData<Rpc.Success<R>>, PageParam>
+        > &
+          RpcOptionsInput & { readonly input: SkipToken },
+      ): WithDefinedInitialData<
+        SkippedRpcInfiniteOptions<R, Prefix, ClientError, PageParam, Selected>,
+        InfiniteData<QueryData<Rpc.Success<R>>, PageParam>
+      >
+      <PageParam, Selected = InfiniteData<QueryData<Rpc.Success<R>>, PageParam>>(
+        options: WithUndefinedInitialData<
+          Omit<
+            SkippedRpcInfiniteOptions<R, Prefix, ClientError, PageParam, Selected>,
+            OwnedQueryOption
+          >,
+          InfiniteData<QueryData<Rpc.Success<R>>, PageParam>
+        > &
+          RpcOptionsInput & {
+            readonly input: SkipToken
+          },
+      ): SkippedRpcInfiniteOptions<R, Prefix, ClientError, PageParam, Selected>
+      <PageParam, Selected = InfiniteData<QueryData<Rpc.Success<R>>, PageParam>>(
+        options: WithDefinedInitialData<
+          Omit<
+            ConditionalRpcInfiniteOptions<R, Prefix, ClientError, Selected, PageParam>,
+            OwnedQueryOption
+          >,
+          InfiniteData<QueryData<Rpc.Success<R>>, PageParam>
+        > &
+          RpcOptionsInput & {
+            readonly input: ((pageParam: PageParam) => Rpc.PayloadConstructor<R>) | SkipToken
+          },
+      ): WithDefinedInitialData<
+        ConditionalRpcInfiniteOptions<R, Prefix, ClientError, Selected, PageParam>,
+        InfiniteData<QueryData<Rpc.Success<R>>, PageParam>
+      >
+      <PageParam, Selected = InfiniteData<QueryData<Rpc.Success<R>>, PageParam>>(
+        options: WithUndefinedInitialData<
+          Omit<
+            ConditionalRpcInfiniteOptions<R, Prefix, ClientError, Selected, PageParam>,
+            OwnedQueryOption
+          >,
+          InfiniteData<QueryData<Rpc.Success<R>>, PageParam>
+        > &
+          RpcOptionsInput & {
+            readonly input: ((pageParam: PageParam) => Rpc.PayloadConstructor<R>) | SkipToken
+          },
+      ): ConditionalRpcInfiniteOptions<R, Prefix, ClientError, Selected, PageParam>
+    })
 
 export type InfiniteKeyBuilder<
   R extends Rpc.Any,
@@ -318,7 +398,7 @@ export type StreamedPolicyOptions = {
   readonly maxChunks?: number
 }
 
-/** Shares initial-data and exact-skip inference across accumulated and live queries. */
+/** Shares query inference across accumulated and live queries, including conditional inputs. */
 export type StreamingQueryBuilder<
   Input,
   Data,
@@ -326,52 +406,14 @@ export type StreamingQueryBuilder<
   Key extends QueryKey,
   SkippedKey extends QueryKey,
   Policy = unknown,
-> = void extends Input
-  ? {
-      <Selected = Data>(
-        options: WithDefinedInitialData<
-          QueryInput<Data, Error, Selected, Key, Policy & RpcOptionsInput<StreamingRpcOptions>>,
-          Data
-        >,
-      ): WithDefinedInitialData<QueryOptions<Data, Error, Selected, Key>, Data>
-      <Selected = Data>(
-        options?: WithUndefinedInitialData<
-          QueryInput<Data, Error, Selected, Key, Policy & RpcOptionsInput<StreamingRpcOptions>>,
-          Data
-        >,
-      ): QueryOptions<Data, Error, Selected, Key>
-    }
-  : {
-      <Selected = Data>(
-        options: WithDefinedInitialData<
-          QueryInput<Data, Error, Selected, Key, Policy & RpcOptionsInput<StreamingRpcOptions>>,
-          Data
-        > & { readonly input: Input },
-      ): WithDefinedInitialData<QueryOptions<Data, Error, Selected, Key>, Data>
-      <Selected = Data>(
-        options: WithUndefinedInitialData<
-          QueryInput<Data, Error, Selected, Key, Policy & RpcOptionsInput<StreamingRpcOptions>>,
-          Data
-        > & { readonly input: Input },
-      ): QueryOptions<Data, Error, Selected, Key>
-      <Selected = Data>(
-        options: WithDefinedInitialData<
-          Omit<QueryOptions<Data, Error, Selected, SkippedKey, SkipToken>, OwnedQueryOption>,
-          Data
-        > &
-          Policy &
-          RpcOptionsInput<StreamingRpcOptions> & { readonly input: SkipToken },
-      ): WithDefinedInitialData<QueryOptions<Data, Error, Selected, SkippedKey, SkipToken>, Data>
-      <Selected = Data>(
-        options: Omit<
-          QueryOptions<Data, Error, Selected, SkippedKey, SkipToken>,
-          OwnedQueryOption
-        > &
-          Policy &
-          RpcOptionsInput<StreamingRpcOptions> & { readonly input: SkipToken },
-      ): QueryOptions<Data, Error, Selected, SkippedKey, SkipToken>
-      (token: SkipToken): QueryOptions<Data, Error, Data, SkippedKey, SkipToken>
-    }
+> = UnaryQueryBuilder<
+  Input,
+  Data,
+  Error,
+  Key,
+  SkippedKey,
+  Policy & RpcOptionsInput<StreamingRpcOptions>
+>
 
 export type StreamedOptionsBuilder<
   R extends Rpc.Any,

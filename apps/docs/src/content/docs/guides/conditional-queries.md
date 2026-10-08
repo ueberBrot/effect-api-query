@@ -36,31 +36,39 @@ prefix as its key, without payload or request identity. Skipping an HTTP query d
 request or invoke the client. The builder preserves caller options and their selected-data types,
 and removes `input` before returning the options to TanStack.
 
-Supplied `initialData` remains available. React Query still types skipped hook data as possibly
-`undefined`, even with an initial value, because its defined-data overload excludes `skipToken`.
+Supplied `initialData` remains available. React Query's `useQuery` still types skipped hook data as
+possibly `undefined`, even with an initial value, because its defined-data overload excludes
+`skipToken`. `useInfiniteQuery` preserves its defined-data overload when `initialData` is a defined
+value or factory, including for conditional and skipped inputs.
 
 The sentinel applies to input-bearing `queryOptions` and `infiniteOptions` in both adapters, and
 to RPC `streamedOptions` and `liveOptions`. Inputless operations run without input, and key and
 mutation builders do not accept `skipToken`. TanStack suspense and prefetch-only hooks also reject
 skipped options at the type level.
 
-Unary `queryOptions` accepts a valid RPC payload, a valid HTTP request, or `skipToken`. Keep the
-conditional input inside one builder call so the observer has one consistent callback type. Concrete inputs and the literal `skipToken` retain their precise key types.
+`queryOptions`, RPC `streamedOptions`, and RPC `liveOptions` accept concrete input or `skipToken`,
+including a conditional union. Keep the conditional input inside one builder call so the observer
+has one consistent callback type. Concrete inputs and the literal `skipToken` retain their precise
+key and query-function types; conditional inputs preserve both possibilities.
 
 The object form also works for accumulated streams and live queries:
 
 ```ts
 rpcQuery.events.watch.streamedOptions({
-  input: skipToken,
+  input: channel === undefined ? skipToken : { channel },
   refetchMode: 'append',
   staleTime: 30_000,
 })
-rpcQuery.events.watch.liveOptions({ input: skipToken, select: (value) => value.length })
+rpcQuery.events.watch.liveOptions({
+  input: channel === undefined ? skipToken : { channel },
+  select: (value) => value.length,
+})
 ```
 
 `refetchMode` configures accumulation. The builder removes it from the returned options even when
-the query is skipped. Infinite queries use `{ input: skipToken }` with their required
-`initialPageParam` and `getNextPageParam`.
+the query is skipped. Infinite queries accept a page-to-input mapper or `skipToken`, including a
+conditional union, with their required `initialPageParam` and `getNextPageParam`. Choose between
+the mapper and sentinel in `input`; each mapper result must be valid input.
 
 When no caller options are needed, `queryOptions(skipToken)`, `streamedOptions(skipToken)`, and
 `liveOptions(skipToken)` remain available as shorthand. A skipped query has no executable query

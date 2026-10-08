@@ -6,6 +6,7 @@ import {
   QueryClient,
   QueryObserver,
   InfiniteQueryObserver,
+  type QueryFunction,
   skipToken as queryCoreSkipToken,
 } from '@tanstack/query-core'
 import {
@@ -457,6 +458,30 @@ const fetchedPages: Promise<
 void fetchedPages
 usePrefetchInfiniteQuery(fetchableInfiniteOptions)
 
+const initialInfiniteData = { pages: [{ nextCursor: null, users: [] }], pageParams: [0] }
+const initializedInfiniteOptions = utils.users.pages.infiniteOptions({
+  getNextPageParam: () => undefined,
+  initialData: () => initialInfiniteData,
+  initialPageParam: 0,
+  input: (cursor: number) => ({ cursor }),
+  select: (data) => data.pages.length,
+})
+const initializedInfiniteHook = useInfiniteQuery(initializedInfiniteOptions)
+true satisfies Assert<Equal<typeof initializedInfiniteHook.data, number>>
+const maybeInitialInfiniteData = ():
+  | InfiniteData<Rpc.Success<typeof ListPages>, number>
+  | undefined => undefined
+const maybeInitializedInfiniteHook = useInfiniteQuery(
+  utils.users.pages.infiniteOptions({
+    getNextPageParam: () => undefined,
+    initialData: maybeInitialInfiniteData,
+    initialPageParam: 0,
+    input: (cursor: number) => ({ cursor }),
+    select: (data) => data.pages.length,
+  }),
+)
+true satisfies Assert<Equal<typeof maybeInitializedInfiniteHook.data, number | undefined>>
+
 const infiniteKey = utils.users.pages.infiniteKey({ cursor: 0 })
 infiniteKey satisfies readonly ['app', 'rpc', 'users', 'pages', 'infinite', JsonValue]
 const cachedPages = queryClient.getQueryData(fetchableInfiniteOptions.queryKey)
@@ -482,6 +507,106 @@ useSuspenseInfiniteQuery(skippedInfinite)
 // @ts-expect-error prefetch-only infinite hooks cannot use the skip sentinel
 usePrefetchInfiniteQuery(skippedInfinite)
 
+const initializedSkippedInfiniteOptions = utils.users.pages.infiniteOptions({
+  getNextPageParam: () => undefined,
+  initialData: initialInfiniteData,
+  initialPageParam: 0,
+  input: skipToken,
+  select: (data) => data.pages.length,
+})
+initializedSkippedInfiniteOptions.queryFn satisfies SkipToken
+const initializedSkippedInfiniteHook = useInfiniteQuery(initializedSkippedInfiniteOptions)
+true satisfies Assert<Equal<typeof initializedSkippedInfiniteHook.data, number>>
+
+declare const canLoadPages: boolean
+const conditionalInfiniteOptions = utils.users.pages.infiniteOptions({
+  getNextPageParam: (page, _pages, cursor) => {
+    page satisfies Rpc.Success<typeof ListPages>
+    cursor satisfies number
+    return page.nextCursor ?? undefined
+  },
+  initialPageParam: 0,
+  input: canLoadPages ? (cursor: number) => ({ cursor }) : skipToken,
+  retry: (_count, error) => {
+    error satisfies EffectRpcQueryError<'page-failure'>
+    return false
+  },
+  staleTime: (query) => {
+    query.queryKey satisfies
+      | readonly ['app', 'rpc', 'users', 'pages', 'infinite']
+      | readonly ['app', 'rpc', 'users', 'pages', 'infinite', JsonValue]
+    return 30_000
+  },
+  select: (data) => data.pages.length,
+})
+conditionalInfiniteOptions.queryFn satisfies
+  | QueryFunction<Rpc.Success<typeof ListPages>, typeof conditionalInfiniteOptions.queryKey, number>
+  | SkipToken
+const conditionalInfiniteHook = useInfiniteQuery(conditionalInfiniteOptions)
+true satisfies Assert<Equal<typeof conditionalInfiniteHook.data, number | undefined>>
+new InfiniteQueryObserver(queryClient, conditionalInfiniteOptions).getCurrentResult()
+  .data satisfies number | undefined
+// @ts-expect-error conditional input may produce a skipped query function
+conditionalInfiniteOptions.queryFn satisfies QueryFunction<Rpc.Success<typeof ListPages>>
+// @ts-expect-error suspense infinite queries require an executable query function
+useSuspenseInfiniteQuery(conditionalInfiniteOptions)
+// @ts-expect-error prefetch-only infinite hooks require an executable query function
+usePrefetchInfiniteQuery(conditionalInfiniteOptions)
+
+const initializedConditionalInfiniteHook = useInfiniteQuery(
+  utils.users.pages.infiniteOptions({
+    getNextPageParam: () => undefined,
+    initialData: () => initialInfiniteData,
+    initialPageParam: 0,
+    input: canLoadPages ? (cursor: number) => ({ cursor }) : skipToken,
+    select: (data) => data.pages.length,
+  }),
+)
+true satisfies Assert<Equal<typeof initializedConditionalInfiniteHook.data, number>>
+declare const optionalInfiniteData: InfiniteData<Rpc.Success<typeof ListPages>, number> | undefined
+const maybeInitializedConditionalInfiniteHook = useInfiniteQuery(
+  utils.users.pages.infiniteOptions({
+    getNextPageParam: () => undefined,
+    initialData: optionalInfiniteData,
+    initialPageParam: 0,
+    input: canLoadPages ? (cursor: number) => ({ cursor }) : skipToken,
+    select: (data) => data.pages.length,
+  }),
+)
+true satisfies Assert<
+  Equal<typeof maybeInitializedConditionalInfiniteHook.data, number | undefined>
+>
+const maybeInitializedSkippedInfiniteHook = useInfiniteQuery(
+  utils.users.pages.infiniteOptions({
+    getNextPageParam: () => undefined,
+    initialData: maybeInitialInfiniteData,
+    initialPageParam: 0,
+    input: skipToken,
+    select: (data) => data.pages.length,
+  }),
+)
+true satisfies Assert<Equal<typeof maybeInitializedSkippedInfiniteHook.data, number | undefined>>
+declare const initialCursor: number | null
+const conditionalNullablePages = utils.users.pages.infiniteOptions({
+  getNextPageParam: (page, _pages, cursor) => {
+    true satisfies Assert<Equal<typeof cursor, number | null>>
+    return page.nextCursor
+  },
+  initialPageParam: initialCursor,
+  input: canLoadPages ? (cursor: number | null) => ({ cursor: cursor ?? 0 }) : skipToken,
+})
+const conditionalNullableHook = useInfiniteQuery(conditionalNullablePages)
+true satisfies Assert<
+  Equal<
+    typeof conditionalNullableHook.data,
+    InfiniteData<Rpc.Success<typeof ListPages>, number | null> | undefined
+  >
+>
+// @ts-expect-error infinite-query input is consumed for conditional inputs
+conditionalInfiniteOptions.input
+// @ts-expect-error infinite skipping requires object options with pagination fields
+utils.users.pages.infiniteOptions(skipToken)
+
 const payloadlessInfinite = utils.health.ping.infiniteOptions({
   getNextPageParam: () => undefined,
   initialPageParam: 0,
@@ -489,6 +614,16 @@ const payloadlessInfinite = utils.health.ping.infiniteOptions({
 const payloadlessPages: Promise<InfiniteData<null, number>> =
   queryClient.infiniteQuery(payloadlessInfinite)
 void payloadlessPages
+const initializedPayloadlessInfiniteHook = useInfiniteQuery(
+  utils.health.ping.infiniteOptions({
+    getNextPageParam: () => undefined,
+    initialData: { pages: [null], pageParams: [0] },
+    initialPageParam: 0,
+  }),
+)
+true satisfies Assert<
+  Equal<typeof initializedPayloadlessInfiniteHook.data, InfiniteData<null, number>>
+>
 
 // @ts-expect-error payload-bearing infinite queries require an input mapper or skipToken
 utils.users.pages.infiniteOptions({ getNextPageParam: () => undefined, initialPageParam: 0 })
@@ -497,6 +632,12 @@ utils.health.ping.infiniteOptions({
   initialPageParam: 0,
   // @ts-expect-error payloadless infinite queries do not accept an input mapper
   input: () => undefined,
+})
+utils.health.ping.infiniteOptions({
+  getNextPageParam: () => undefined,
+  initialPageParam: 0,
+  // @ts-expect-error payloadless infinite queries cannot be skipped
+  input: skipToken,
 })
 const buildPages = utils.users.pages.infiniteOptions<number, never>
 const validPageOptions = {
@@ -964,10 +1105,85 @@ utils.events.audit.watch.streamedOptions({ maxChunks: 2, initialData: [] })
 utils.events.watch.streamedOptions({ input: skipToken, maxChunks: 2, initialData: [] })
 
 declare const conditionalStreamInput: { readonly channel: string } | typeof skipToken
-// @ts-expect-error streaming builders retain exact-input and exact-skip overloads
-utils.events.watch.streamedOptions({ input: conditionalStreamInput })
-// @ts-expect-error live builders retain exact-input and exact-skip overloads
-utils.events.watch.liveOptions({ input: conditionalStreamInput })
+const conditionalStreamOptions = utils.events.watch.streamedOptions({
+  input: conditionalStreamInput,
+  maxChunks: 5,
+  refetchMode: 'append',
+  rpcOptions: { streamBufferSize: 8 },
+  select: (values) => values.join(', '),
+  staleTime: (query) => {
+    query.queryKey satisfies
+      | readonly ['app', 'rpc', 'events', 'watch', 'streamed']
+      | readonly ['app', 'rpc', 'events', 'watch', 'streamed', JsonValue]
+    return 30_000
+  },
+})
+conditionalStreamOptions.queryFn satisfies
+  | QueryFunction<ReadonlyArray<string>, typeof conditionalStreamOptions.queryKey>
+  | SkipToken
+const conditionalStreamHook = useQuery(conditionalStreamOptions)
+true satisfies Assert<Equal<typeof conditionalStreamHook.data, string | undefined>>
+true satisfies Assert<
+  Equal<
+    typeof conditionalStreamHook.error,
+    EffectRpcQueryError<'unauthorized' | 'watch-failure' | 'watch-rpc-failure'> | null
+  >
+>
+new QueryObserver(queryClient, conditionalStreamOptions).getCurrentResult().data satisfies
+  | string
+  | undefined
+// @ts-expect-error accumulated-stream policy is consumed for conditional inputs
+conditionalStreamOptions.maxChunks
+// @ts-expect-error request-local options are consumed for conditional inputs
+conditionalStreamOptions.rpcOptions
+// @ts-expect-error suspense requires an executable query function
+useSuspenseQuery(conditionalStreamOptions)
+// @ts-expect-error prefetch-only hooks require an executable query function
+usePrefetchQuery(conditionalStreamOptions)
+
+const conditionalLiveOptions = utils.events.watch.liveOptions({
+  input: conditionalStreamInput,
+  rpcOptions: { headers: { 'x-request-id': 'fixture' }, streamBufferSize: 8 },
+  select: (value) => value.length,
+})
+conditionalLiveOptions.queryFn satisfies
+  | QueryFunction<string, typeof conditionalLiveOptions.queryKey>
+  | SkipToken
+const conditionalLiveHook = useQuery(conditionalLiveOptions)
+true satisfies Assert<Equal<typeof conditionalLiveHook.data, number | undefined>>
+true satisfies Assert<
+  Equal<
+    typeof conditionalLiveHook.error,
+    | EffectRpcQueryEmptyStreamError
+    | EffectRpcQueryError<'unauthorized' | 'watch-failure' | 'watch-rpc-failure'>
+    | null
+  >
+>
+// @ts-expect-error conditional live queries do not accept accumulation policy
+utils.events.watch.liveOptions({ input: conditionalStreamInput, maxChunks: 2 })
+// @ts-expect-error suspense requires an executable query function
+useSuspenseQuery(conditionalLiveOptions)
+// @ts-expect-error prefetch-only hooks require an executable query function
+usePrefetchQuery(conditionalLiveOptions)
+
+const initializedConditionalStreamOptions = utils.events.watch.streamedOptions({
+  input: conditionalStreamInput,
+  initialData: ['initial'],
+  select: (values) => values.join(', '),
+})
+initializedConditionalStreamOptions.initialData satisfies
+  | ReadonlyArray<string>
+  | (() => ReadonlyArray<string>)
+const initializedConditionalStreamHook = useQuery(initializedConditionalStreamOptions)
+true satisfies Assert<Equal<typeof initializedConditionalStreamHook.data, string | undefined>>
+const initializedConditionalLiveOptions = utils.events.watch.liveOptions({
+  input: conditionalStreamInput,
+  initialData: () => 'initial',
+  select: (value) => value.length,
+})
+initializedConditionalLiveOptions.initialData satisfies string | (() => string)
+const initializedConditionalLiveHook = useQuery(initializedConditionalLiveOptions)
+true satisfies Assert<Equal<typeof initializedConditionalLiveHook.data, number | undefined>>
 
 declare const conditionalUserId: number | undefined
 const conditionalUserOptions = utils.users.get.queryOptions({
