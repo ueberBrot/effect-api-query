@@ -1,4 +1,4 @@
-import type { HttpApi, HttpApiClient } from 'effect/unstable/httpapi'
+import type { HttpApi, HttpApiClient } from 'effect/http-api'
 
 import type { JsonValue, RunPromiseExit } from '../core/types'
 import { createUtilityTree } from '../core/utility-tree'

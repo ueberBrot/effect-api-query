@@ -8,8 +8,8 @@ same declaration.
 import { MutationObserver, QueryClient } from '@tanstack/query-core'
 import { ManagedRuntime, Schema } from 'effect'
 import { createHttpApiQueryUtils } from 'effect-api-query'
-import { FetchHttpClient } from 'effect/unstable/http'
-import { HttpApi, HttpApiClient, HttpApiEndpoint, HttpApiGroup } from 'effect/unstable/httpapi'
+import { FetchHttpClient } from 'effect/http'
+import { HttpApi, HttpApiClient, HttpApiEndpoint, HttpApiGroup } from 'effect/http-api'
 
 const users = HttpApi.make('users-api').add(
   HttpApiGroup.make('users').add(
@@ -71,25 +71,26 @@ A declared container remains required even if all fields inside it are optional:
 use `{ query: {} }` for an empty declared query container.
 
 Mutation variables use that same complete request shape. The adapter forces
-decoded-only responses; raw-response controls are not part of the input. Text,
-binary responses, and declared response-header wrappers keep their decoded types.
+decoded-only responses; raw-response controls are not part of the input. Text
+responses, binary responses, and declared response-header wrappers keep their decoded types.
 
-An endpoint with **any streaming success alternative** or **any multipart request
-alternative** is omitted entirely. Empty groups disappear. Use the underlying
+The adapter omits an endpoint entirely if it has **any streaming success alternative**
+or **any multipart request alternative**. Empty groups disappear. Use the underlying
 Effect client directly for these endpoints.
 
 ## Key encoding
 
-Default keys schema-encode labelled request parts synchronously. Encoded undefined
-object members are omitted, while array order and encoded null are retained.
+The adapter synchronously schema-encodes labelled request parts for default keys. It omits
+encoded undefined object members and retains array order and encoded null.
 Header names become lowercase; conflicting duplicate header names fail. These
 rules apply to default encoding, not custom encoder output.
 
 Configure custom encoders under declaration group and endpoint identifiers,
 including top-level groups: `keyEncoders: { groupId: { endpointId: encoder } }`.
-The encoder receives the complete decoded request. Provide one for encoding
-services, explicit redacted values, or multiple payload alternatives. Binary
-inputs need a JSON-safe projection, such as an array of bytes.
+The encoder receives the complete decoded request. Provide one when encoding
+requires services, the request contains explicit redacted values, or the endpoint
+declares multiple payload alternatives. Binary inputs need a JSON-safe projection,
+such as an array of bytes.
 
 Return strict synchronous `JsonValue` and preserve body/content-type distinctions
 between alternatives, even if two schemas encode to the same scalar. An encoder

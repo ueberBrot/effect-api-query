@@ -1,13 +1,7 @@
 import { exampleRpcGroup } from '@effect-api-query/contracts'
 import { Effect, Layer, Scope } from 'effect'
-import {
-  HttpEffect,
-  HttpMiddleware,
-  HttpRouter,
-  HttpServer,
-  HttpServerRequest,
-} from 'effect/unstable/http'
-import { RpcSerialization, RpcServer } from 'effect/unstable/rpc'
+import { HttpEffect, HttpMiddleware, HttpRouter, HttpServer, HttpServerRequest } from 'effect/http'
+import { RpcSerialization, RpcServer } from 'effect/rpc'
 
 import { ExampleDomain } from './domain.ts'
 import { exampleHttpRoutes } from './http-handlers.ts'

@@ -6,10 +6,11 @@ description: Declare an RPC group, own a ready client, and run a generated query
 This tutorial connects an Effect RPC client to TanStack Query Core. You will declare two operations,
 acquire a ready flat client, read a user, and create another user.
 
-First [install the package](/effect-api-query/getting-started/installation/). Use a server that
-implements the declaration below at `http://localhost:3000/rpc` with JSON RPC serialization and
-an existing user with ID `1`. Change the URL to your server. For browser requests, configure the
-server's CORS policy to allow the application's origin. For a complete server and browser application, [run the examples](/effect-api-query/examples/).
+First [install the package](/effect-api-query/getting-started/installation/). Use a server at
+`http://localhost:3000/rpc` that implements the declaration below with JSON RPC serialization.
+The server must have an existing user with ID `1`. Change the URL to your server. For browser
+requests, configure the server's CORS policy to allow the application's origin. For a complete
+server and browser application, [run the examples](/effect-api-query/examples/).
 
 ## Declare, connect, and call
 
@@ -20,8 +21,8 @@ you connect your own server and client. Only the client application imports `eff
 import { MutationObserver, QueryClient } from '@tanstack/query-core'
 import { Effect, Exit, Layer, Schema, Scope } from 'effect'
 import { createRpcQueryUtils } from 'effect-api-query'
-import { FetchHttpClient } from 'effect/unstable/http'
-import { Rpc, RpcClient, RpcGroup, RpcSerialization } from 'effect/unstable/rpc'
+import { FetchHttpClient } from 'effect/http'
+import { Rpc, RpcClient, RpcGroup, RpcSerialization } from 'effect/rpc'
 
 const User = Schema.Struct({ id: Schema.Int, name: Schema.String })
 const usersRpc = RpcGroup.make(

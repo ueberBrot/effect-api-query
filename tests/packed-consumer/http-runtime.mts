@@ -16,7 +16,7 @@ import {
   HttpClientRequest,
   HttpClientResponse,
   HttpServer,
-} from 'effect/unstable/http'
+} from 'effect/http'
 import {
   HttpApi,
   HttpApiBuilder,
@@ -26,8 +26,8 @@ import {
   HttpApiMiddleware,
   HttpApiSchema,
   HttpApiTest,
-} from 'effect/unstable/httpapi'
-import { Rpc, RpcGroup, RpcTest } from 'effect/unstable/rpc'
+} from 'effect/http-api'
+import { Rpc, RpcGroup, RpcTest } from 'effect/rpc'
 import { deepStrictEqual, equal, notDeepStrictEqual, ok, rejects } from 'node:assert/strict'
 import { once } from 'node:events'
 import { createServer } from 'node:http'

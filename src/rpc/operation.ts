@@ -1,6 +1,6 @@
 import { Schema, SchemaAST } from 'effect'
 import type { Effect } from 'effect'
-import { Rpc, RpcClient, RpcGroup, RpcSchema } from 'effect/unstable/rpc'
+import { Rpc, RpcClient, RpcGroup, RpcSchema } from 'effect/rpc'
 
 import type { OperationDescription, OperationInput, TreeErrors } from '../core/operation'
 import { containsUnsafeKeyEncoding } from '../core/schema-key'

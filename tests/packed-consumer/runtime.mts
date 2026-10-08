@@ -13,7 +13,7 @@ import type {
   RunPromiseExit,
   SkipToken,
 } from 'effect-api-query'
-import { Rpc, RpcGroup, RpcTest } from 'effect/unstable/rpc'
+import { Rpc, RpcGroup, RpcTest } from 'effect/rpc'
 // fallow-ignore-file unused-file
 // The packed-package verifier copies and executes this fixture in temporary consumers.
 import { deepStrictEqual, equal, ok, rejects } from 'node:assert/strict'

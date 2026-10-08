@@ -1,6 +1,6 @@
 import { Schema } from 'effect'
 import { createRpcQueryUtils, type RpcQueryUtils } from 'effect-api-query'
-import { Rpc, RpcClient, RpcGroup } from 'effect/unstable/rpc'
+import { Rpc, RpcClient, RpcGroup } from 'effect/rpc'
 
 // Reviewable baseline for TypeScript 7.0.2 with Query Core 5.102.2:
 // 380 files, 169,060 types, and 220,313 instantiations. The packed-package task

@@ -27,7 +27,7 @@ import {
   type HttpApiQueryUtils,
   type RunPromiseExit,
 } from 'effect-api-query'
-import type { HttpClient, HttpClientError, HttpClientResponse } from 'effect/unstable/http'
+import type { HttpClient, HttpClientError, HttpClientResponse } from 'effect/http'
 import {
   HttpApi,
   HttpApiClient,
@@ -35,7 +35,7 @@ import {
   HttpApiGroup,
   HttpApiMiddleware,
   HttpApiSchema,
-} from 'effect/unstable/httpapi'
+} from 'effect/http-api'
 
 type Equal<Left, Right> =
   (<Value>() => Value extends Left ? 1 : 2) extends <Value>() => Value extends Right ? 1 : 2
@@ -134,6 +134,10 @@ true satisfies Assert<
     | 'infiniteOptions'
   >
 >
+true satisfies Assert<Equal<Parameters<typeof utils.ping.queryKey>, []>>
+true satisfies Assert<Equal<Parameters<typeof utils.ping.infiniteKey>, []>>
+const inputlessMutation = utils.ping.mutationOptions()
+true satisfies Assert<Equal<Parameters<typeof inputlessMutation.mutationFn>, [variables?: void]>>
 // @ts-expect-error HTTP identifiers preserve literal dots.
 utils.user.accounts
 // @ts-expect-error Groups containing only omitted endpoints disappear.
@@ -154,7 +158,14 @@ declare const genericMode: HttpApiClient.Client.ResponseMode
 const genericRequest = { ...input, responseMode: genericMode }
 // @ts-expect-error A generic response-mode union cannot enter generated query data.
 utils['user.accounts']['get.user'].queryOptions({ input: genericRequest })
+const requestWithSseOptions = { ...input, sseOptions: {} }
+// @ts-expect-error SSE response controls are refused, including predeclared request objects.
+utils['user.accounts']['get.user'].queryKey(requestWithSseOptions)
+// @ts-expect-error Buffered query inputs cannot configure SSE decoding.
+utils['user.accounts']['get.user'].queryOptions({ input: requestWithSseOptions })
 utils['user.accounts']['get.user'].queryOptions({ input: skipToken })
+// @ts-expect-error Inputless endpoints do not acquire request inputs for SSE controls.
+utils.ping.queryOptions({ input: { sseOptions: {} } })
 // @ts-expect-error HTTP requests do not accept RPC options.
 utils.ping.queryOptions({ rpcOptions: {} })
 // @ts-expect-error The package owns query functions.
@@ -483,6 +494,9 @@ keyUtils['request.parts'].mutationOptions().mutationFn({ payload: { page: 2 } })
 const rawMutationRequest = { ...completeRequest, responseMode: 'response-only' as const }
 // @ts-expect-error Mutation variables reserve response controls, including predeclared objects.
 keyUtils['request.parts'].mutationOptions().mutationFn(rawMutationRequest)
+const sseMutationRequest = { ...completeRequest, sseOptions: {} }
+// @ts-expect-error Buffered mutation variables cannot configure SSE decoding.
+keyUtils['request.parts'].mutationOptions().mutationFn(sseMutationRequest)
 // @ts-expect-error Encoders use declaration groups even when endpoints project to the root.
 createHttpApiQueryUtils(keysApi, { ...keyOptions, keyEncoders: { secrets: () => null } })
 // @ts-expect-error Dotted identifiers are literal map keys.
@@ -1064,6 +1078,12 @@ getUser.infiniteOptions({
   getNextPageParam: () => undefined,
   // @ts-expect-error Infinite requests must include every decoded request field.
   input: (page: number) => ({ params: { id: page } }),
+})
+getUser.infiniteOptions({
+  initialPageParam: 0,
+  getNextPageParam: () => undefined,
+  // @ts-expect-error Buffered infinite requests cannot configure SSE decoding.
+  input: () => requestWithSseOptions,
 })
 utils.ping.infiniteOptions({
   initialPageParam: 0,

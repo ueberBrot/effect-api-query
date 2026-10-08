@@ -1,5 +1,5 @@
 import { Effect, Schema } from 'effect'
-import { Rpc, RpcGroup, RpcMiddleware } from 'effect/unstable/rpc'
+import { Rpc, RpcGroup, RpcMiddleware } from 'effect/rpc'
 
 export class User extends Schema.Class<User>('User')({
   id: Schema.Int,

@@ -1,11 +1,6 @@
 import { MutationObserver, QueryClient, QueryObserver } from '@tanstack/query-core'
 import { Cause, Context, Effect, Exit, Layer, Option, Schema } from 'effect'
-import {
-  HttpClient,
-  HttpClientError,
-  HttpClientRequest,
-  HttpClientResponse,
-} from 'effect/unstable/http'
+import { HttpClient, HttpClientError, HttpClientRequest, HttpClientResponse } from 'effect/http'
 import {
   HttpApi,
   HttpApiClient,
@@ -13,7 +8,7 @@ import {
   HttpApiGroup,
   HttpApiMiddleware,
   HttpApiSchema,
-} from 'effect/unstable/httpapi'
+} from 'effect/http-api'
 import { describe, expect, it } from 'vite-plus/test'
 
 import {

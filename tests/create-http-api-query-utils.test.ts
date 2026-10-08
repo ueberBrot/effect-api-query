@@ -1,6 +1,6 @@
 import { QueryClient } from '@tanstack/query-core'
 import { Cause, Effect, Exit, Layer, Schema, Scope } from 'effect'
-import { HttpServer } from 'effect/unstable/http'
+import { HttpServer } from 'effect/http'
 import {
   HttpApi,
   HttpApiBuilder,
@@ -9,8 +9,8 @@ import {
   HttpApiGroup,
   HttpApiSchema,
   HttpApiTest,
-} from 'effect/unstable/httpapi'
-import { Rpc, RpcGroup } from 'effect/unstable/rpc'
+} from 'effect/http-api'
+import { Rpc, RpcGroup } from 'effect/rpc'
 import { describe, expect, it } from 'vite-plus/test'
 
 import {
@@ -61,7 +61,12 @@ describe('createHttpApiQueryUtils', () => {
         }),
       )
       expect(() =>
-        createRpcQueryUtils(RpcGroup.make(), { client: () => Effect.void, keyPrefix }),
+        createRpcQueryUtils(RpcGroup.make(), {
+          client: () => {
+            throw new Error('Empty RPC group has no callable methods')
+          },
+          keyPrefix,
+        }),
       ).toThrow(
         expect.objectContaining({
           _tag: 'EffectRpcQueryConfigError',
@@ -137,8 +142,23 @@ describe('createHttpApiQueryUtils', () => {
         Schema.Struct({ file: Schema.String }).pipe(HttpApiSchema.asMultipart()),
       ],
     })
+    const multipartStream = HttpApiEndpoint.post('uploadStream', '/upload-stream', {
+      payload: Schema.Struct({ file: Schema.String }).pipe(HttpApiSchema.asMultipartStream()),
+    })
+    const brandedMultipart = HttpApiEndpoint.post('brandedUpload', '/branded-upload', {
+      payload: Schema.Struct({ file: Schema.String }).pipe(
+        HttpApiSchema.asMultipart(),
+        Schema.brand('test/Upload'),
+      ),
+    })
     const mixed = HttpApi.make('mixed').add(
-      HttpApiGroup.make('empty').add(streaming, wrapped, multipart),
+      HttpApiGroup.make('empty').add(
+        streaming,
+        wrapped,
+        multipart,
+        multipartStream,
+        brandedMultipart,
+      ),
       HttpApiGroup.make('kept').add(
         HttpApiEndpoint.get('read', '/read', { success: Schema.String }),
         streaming,
@@ -157,6 +177,15 @@ describe('createHttpApiQueryUtils', () => {
       Schema.Struct({ file: Schema.String }).pipe(
         HttpApiSchema.asMultipart(),
         HttpApiSchema.asJson(),
+      ),
+      Schema.Struct({ file: Schema.String }).pipe(
+        HttpApiSchema.asMultipart(),
+        Schema.brand('test/Upload'),
+        HttpApiSchema.asJson(),
+      ),
+      Schema.Struct({ file: Schema.String }).pipe(
+        HttpApiSchema.asMultipart(),
+        HttpApiSchema.asMultipartStream(),
       ),
       Schema.Struct({ file: Schema.String }).annotate({
         '~httpApiEncoding': {

@@ -3,8 +3,8 @@ import { type ExampleRpcClient, startExampleRpcClient } from '@effect-api-query/
 import { QueryClient } from '@tanstack/react-query'
 import { ManagedRuntime } from 'effect'
 import { createHttpApiQueryUtils, createRpcQueryUtils, type RunPromiseExit } from 'effect-api-query'
-import { FetchHttpClient, HttpClient, HttpClientRequest } from 'effect/unstable/http'
-import { HttpApiClient } from 'effect/unstable/httpapi'
+import { FetchHttpClient, HttpClient, HttpClientRequest } from 'effect/http'
+import { HttpApiClient } from 'effect/http-api'
 
 const makeExampleRpcQueryUtils = (
   client: ExampleRpcClient,

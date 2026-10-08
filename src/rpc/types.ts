@@ -6,8 +6,8 @@ import type {
   SkipToken,
 } from '@tanstack/query-core'
 import type { Context, Schema } from 'effect'
-import type { Headers } from 'effect/unstable/http'
-import type { Rpc, RpcClient, RpcGroup, RpcSchema } from 'effect/unstable/rpc'
+import type { Headers } from 'effect/http'
+import type { Rpc, RpcClient, RpcGroup, RpcSchema } from 'effect/rpc'
 
 import type {
   ContainsRedacted,

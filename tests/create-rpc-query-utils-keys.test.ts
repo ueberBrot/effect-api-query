@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@effect/vitest'
 import { dehydrate, hydrate, QueryClient } from '@tanstack/query-core'
 import { Effect, Schema, SchemaTransformation } from 'effect'
-import { Rpc, RpcGroup } from 'effect/unstable/rpc'
+import { Rpc, RpcGroup } from 'effect/rpc'
 
 import {
   createRpcQueryUtils,

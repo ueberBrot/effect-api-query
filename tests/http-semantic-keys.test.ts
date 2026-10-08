@@ -1,6 +1,6 @@
 import { QueryClient } from '@tanstack/query-core'
 import { Context, Effect, Exit, Layer, Redacted, Schema, Scope } from 'effect'
-import { HttpServer } from 'effect/unstable/http'
+import { HttpServer } from 'effect/http'
 import {
   HttpApi,
   HttpApiBuilder,
@@ -9,7 +9,7 @@ import {
   HttpApiGroup,
   HttpApiSchema,
   HttpApiTest,
-} from 'effect/unstable/httpapi'
+} from 'effect/http-api'
 import { describe, expect, it } from 'vite-plus/test'
 
 import { createHttpApiQueryUtils } from '#effect-api-query'

@@ -34,7 +34,7 @@ import {
   type RunPromiseExit,
   type SkipToken,
 } from 'effect-api-query'
-import { Rpc, RpcClient, RpcGroup, RpcMiddleware } from 'effect/unstable/rpc'
+import { Rpc, RpcClient, RpcGroup, RpcMiddleware } from 'effect/rpc'
 
 class AuthMiddleware extends RpcMiddleware.Service<AuthMiddleware>()('AuthMiddleware', {
   error: Schema.Literal('unauthorized'),

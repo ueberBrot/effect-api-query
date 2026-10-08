@@ -1,6 +1,6 @@
 import { Effect, Exit, Layer, ManagedRuntime, Scope } from 'effect'
-import { FetchHttpClient } from 'effect/unstable/http'
-import { RpcClient, RpcClientError, RpcGroup, RpcSerialization } from 'effect/unstable/rpc'
+import { FetchHttpClient } from 'effect/http'
+import { RpcClient, RpcClientError, RpcGroup, RpcSerialization } from 'effect/rpc'
 
 import { exampleRpcGroup, type SlowDiagnosticInput } from './contracts.ts'
 

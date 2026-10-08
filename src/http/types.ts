@@ -12,7 +12,7 @@ import type {
   HttpApiEndpoint,
   HttpApiGroup,
   HttpApiSchema,
-} from 'effect/unstable/httpapi'
+} from 'effect/http-api'
 
 import type {
   ContainsRedacted,
@@ -72,14 +72,14 @@ export type RequestFields<Endpoint extends HttpApiEndpoint.ConstraintRequest> = 
     >,
     void
   >,
-  'responseMode'
+  'responseMode' | 'sseOptions'
 >
 
-/** Uses decoded request fields while reserving response mode for the adapter. */
+/** Uses decoded request fields while reserving response controls for the adapter. */
 export type Request<Endpoint extends HttpApiEndpoint.ConstraintRequest> =
   keyof RequestFields<Endpoint> extends never
     ? void
-    : RequestFields<Endpoint> & { readonly responseMode?: never }
+    : RequestFields<Endpoint> & { readonly responseMode?: never; readonly sseOptions?: never }
 
 export type Success<Endpoint extends HttpApiEndpoint.ConstraintRequest> =
   Endpoint['~Success']['Type']

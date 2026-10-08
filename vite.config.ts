@@ -5,6 +5,7 @@ const ignoredPaths = [
   '.artifacts/**',
   '.fallow/**',
   '.vite/**',
+  '.vitest/**',
   'apps/docs/.astro/**',
   'apps/docs/dist/**',
   'coverage/**',
@@ -77,6 +78,7 @@ export default defineConfig({
     clean: true,
     deps: {
       neverBundle: ['effect', '@tanstack/query-core'],
+      onlyImport: ['effect', '@tanstack/query-core'],
     },
     dts: true,
     entry: ['src/index.ts'],
@@ -99,31 +101,43 @@ export default defineConfig({
       check: {
         command: 'vp check',
         dependsOn: ['pack'],
-        output: [],
+        cache: {
+          output: [],
+        },
       },
       format: {
         command: 'vp fmt --check',
-        output: [],
+        cache: {
+          output: [],
+        },
       },
       lint: {
         command: 'vp lint',
         dependsOn: ['pack'],
-        output: [],
+        cache: {
+          output: [],
+        },
       },
       typecheck: {
         command: 'vp check --no-fmt --no-lint',
         dependsOn: ['pack'],
-        output: [],
+        cache: {
+          output: [],
+        },
       },
       'effect-check': {
         command: 'effect-tsgo diagnostics --project tsconfig.json --strict',
         dependsOn: ['pack'],
-        output: [],
+        cache: {
+          output: [],
+        },
       },
       pack: {
         command: 'vp pack',
-        input: [{ auto: true }, '!dist/**'],
-        output: ['dist/**'],
+        cache: {
+          input: [{ auto: true }, '!dist/**'],
+          output: ['dist/**'],
+        },
       },
       'packed-package': {
         command: [
@@ -132,7 +146,9 @@ export default defineConfig({
           'vp run verify-packed-package',
         ],
         dependsOn: ['pack', 'skills-check'],
-        output: ['.artifacts/*.tgz'],
+        cache: {
+          output: ['.artifacts/*.tgz'],
+        },
       },
       'verify-packed-package': {
         command: 'node scripts/verify-packed-consumer.mts',
@@ -140,7 +156,9 @@ export default defineConfig({
       },
       'skills-check': {
         command: 'intent validate skills --check',
-        output: [],
+        cache: {
+          output: [],
+        },
       },
       fallow: {
         command: [
@@ -156,7 +174,9 @@ export default defineConfig({
       test: {
         command: 'vp test',
         dependsOn: ['pack'],
-        output: [],
+        cache: {
+          output: [],
+        },
       },
       e2e: {
         command: 'playwright test',
@@ -190,8 +210,10 @@ export default defineConfig({
       'vite-react-build': {
         command: 'vp run --filter @effect-api-query/vite-react build',
         dependsOn: ['pack'],
-        input: [{ auto: true }, '!examples/vite-react/dist/**'],
-        output: ['examples/vite-react/dist/**'],
+        cache: {
+          input: [{ auto: true }, '!examples/vite-react/dist/**'],
+          output: ['examples/vite-react/dist/**'],
+        },
       },
       'vite-react-preview': {
         command: 'vp -C examples/vite-react preview',
@@ -206,8 +228,10 @@ export default defineConfig({
       'tanstack-start-build': {
         command: 'vp run --filter @effect-api-query/tanstack-start build',
         dependsOn: ['pack'],
-        input: [{ auto: true }, '!examples/tanstack-start/dist/**'],
-        output: ['examples/tanstack-start/dist/**'],
+        cache: {
+          input: [{ auto: true }, '!examples/tanstack-start/dist/**'],
+          output: ['examples/tanstack-start/dist/**'],
+        },
       },
       docs: {
         command: 'vp run --filter @effect-api-query/docs dev',
@@ -216,15 +240,19 @@ export default defineConfig({
       'docs-build': {
         command: 'vp run --filter @effect-api-query/docs build',
         dependsOn: ['docs-check'],
-        input: [{ auto: true }, '!apps/docs/dist/**'],
-        output: ['apps/docs/dist/**'],
+        cache: {
+          input: [{ auto: true }, '!apps/docs/dist/**'],
+          output: ['apps/docs/dist/**'],
+        },
       },
       'docs-check': {
         command: [
           'node scripts/verify-docs-examples.mts',
           'vp run --filter @effect-api-query/docs check',
         ],
-        output: [],
+        cache: {
+          output: [],
+        },
       },
       'docs-e2e': {
         command: 'playwright test --config playwright.docs.config.ts',

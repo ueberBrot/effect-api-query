@@ -1,4 +1,4 @@
-import type { Rpc, RpcClient, RpcGroup } from 'effect/unstable/rpc'
+import type { Rpc, RpcClient, RpcGroup } from 'effect/rpc'
 
 import type { RuntimeKeyEncoder } from '../core/operation'
 import type { JsonValue, RunPromiseExit } from '../core/types'

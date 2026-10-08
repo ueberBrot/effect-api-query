@@ -1,13 +1,13 @@
 import { InfiniteQueryObserver, QueryClient, QueryObserver } from '@tanstack/query-core'
 import { Cause, Effect, Exit, Layer, Schema, Scope } from 'effect'
-import { HttpServer } from 'effect/unstable/http'
+import { HttpServer } from 'effect/http'
 import {
   HttpApi,
   HttpApiBuilder,
   HttpApiEndpoint,
   HttpApiGroup,
   HttpApiTest,
-} from 'effect/unstable/httpapi'
+} from 'effect/http-api'
 import { expect, it } from 'vite-plus/test'
 
 import { createHttpApiQueryUtils, skipToken } from '#effect-api-query'

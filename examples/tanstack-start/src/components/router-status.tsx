@@ -31,7 +31,7 @@ export const NotFoundPage = () => (
 export const ErrorPage = ({ error, reset }: ErrorComponentProps) => (
   <StatusPage title="Route failed">
     <p className="border border-l-4 border-red-900/80 border-l-red-600 bg-red-950/50 p-4 text-sm text-red-200">
-      {error.message}
+      {error instanceof Error ? error.message : String(error)}
     </p>
     <button
       className="rounded-sm border border-violet-500 bg-violet-600 px-4 py-2 text-sm font-bold text-white hover:bg-violet-500"
