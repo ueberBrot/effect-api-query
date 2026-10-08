@@ -1,4 +1,4 @@
-import type { DataTag, MutationObserverOptions } from '@tanstack/query-core'
+import type { DataTag } from '@tanstack/query-core'
 import type { Brand, Effect, Schema } from 'effect'
 import type {
   HttpApi,
@@ -14,8 +14,7 @@ import type {
   InfiniteQueryKey,
   UnaryQueryBuilder,
   JsonValue,
-  MutationOptions,
-  OwnedMutationOption,
+  MutationBuilder,
   QueryData,
   RunPromiseExit,
 } from '../core/types'
@@ -213,22 +212,11 @@ export type MutationLeaf<
 > = {
   readonly key: () => Key
   readonly mutationKey: () => readonly [...Key, 'mutation']
-  readonly mutationOptions: <OnMutateResult = unknown>(
-    options?: Omit<
-      MutationObserverOptions<
-        Success<Endpoint>,
-        Failure<ClientError>,
-        Request<Endpoint>,
-        OnMutateResult
-      >,
-      OwnedMutationOption
-    >,
-  ) => MutationOptions<
+  readonly mutationOptions: MutationBuilder<
     Success<Endpoint>,
     Failure<ClientError>,
     Request<Endpoint>,
-    readonly [...Key, 'mutation'],
-    OnMutateResult
+    readonly [...Key, 'mutation']
   >
 }
 

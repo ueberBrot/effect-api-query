@@ -1,4 +1,4 @@
-import type { DataTag, MutationObserverOptions, QueryKey } from '@tanstack/query-core'
+import type { DataTag, QueryKey } from '@tanstack/query-core'
 import type { Context, Schema } from 'effect'
 import type { Headers } from 'effect/http'
 import type { Rpc, RpcClient, RpcGroup, RpcSchema } from 'effect/rpc'
@@ -11,8 +11,7 @@ import type {
   JsonValue,
   QueryData,
   RunPromiseExit,
-  OwnedMutationOption,
-  MutationOptions,
+  MutationBuilder,
 } from '../core/types'
 import type { EffectRpcQueryEmptyStreamError, EffectRpcQueryError } from './errors'
 
@@ -138,20 +137,6 @@ export type MutationKey<Prefix extends readonly JsonValue[], R extends Rpc.Any> 
   ...RpcKey<Prefix, R>,
   'mutation',
 ]
-
-/** Mutation options generated for one unary RPC. */
-export type RpcMutationOptions<
-  R extends Rpc.Any,
-  Prefix extends readonly JsonValue[],
-  ClientError,
-  OnMutateResult = unknown,
-> = MutationOptions<
-  Rpc.Success<R>,
-  EffectRpcQueryError<RpcFailure<R, ClientError>>,
-  Rpc.PayloadConstructor<R>,
-  MutationKey<Prefix, R>,
-  OnMutateResult
->
 
 /** Supplies RPC inference to the shared unary query builder. */
 export type QueryOptionsBuilder<
@@ -331,18 +316,13 @@ export interface RpcQueryLeaf<R extends Rpc.Any, Prefix extends readonly JsonVal
   readonly mutationKey: () => MutationKey<Prefix, R>
 
   /** Builds fresh Query Core mutation options without binding variables. */
-  readonly mutationOptions: <OnMutateResult = unknown>(
-    options?: Omit<
-      MutationObserverOptions<
-        Rpc.Success<R>,
-        EffectRpcQueryError<RpcFailure<R, ClientError>>,
-        Rpc.PayloadConstructor<R>,
-        OnMutateResult
-      >,
-      OwnedMutationOption
-    > &
-      RpcOptionsInput,
-  ) => RpcMutationOptions<R, Prefix, ClientError, OnMutateResult>
+  readonly mutationOptions: MutationBuilder<
+    Rpc.Success<R>,
+    EffectRpcQueryError<RpcFailure<R, ClientError>>,
+    Rpc.PayloadConstructor<R>,
+    MutationKey<Prefix, R>,
+    RpcOptionsInput
+  >
 
   /** Builds a semantic, data-tagged query key from constructor input. */
   readonly queryKey: QueryKeyBuilder<R, Prefix, ClientError>

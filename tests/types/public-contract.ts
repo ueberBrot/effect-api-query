@@ -833,6 +833,35 @@ const getMutationResult: Promise<{ readonly id: number; readonly name: string }>
   getMutation.mutate({ id: 1 })
 void getMutationResult
 
+const inferredMutationOptions = utils.users.get.mutationOptions({
+  onMutate: (variables) => {
+    true satisfies Assert<
+      Equal<typeof variables, { readonly id: number; readonly locale?: string }>
+    >
+    return { previousId: variables.id }
+  },
+  onSuccess: (data, variables, onMutateResult) => {
+    data satisfies { readonly id: number; readonly name: string }
+    variables satisfies { readonly id: number; readonly locale?: string }
+    onMutateResult.previousId satisfies number
+  },
+  onError: (error, variables, onMutateResult) => {
+    error satisfies EffectRpcQueryError<'not-found'>
+    variables satisfies { readonly id: number; readonly locale?: string }
+    onMutateResult?.previousId satisfies number | undefined
+  },
+  onSettled: (data, error, variables, onMutateResult) => {
+    data satisfies { readonly id: number; readonly name: string } | undefined
+    error satisfies EffectRpcQueryError<'not-found'> | null
+    variables satisfies { readonly id: number; readonly locale?: string }
+    onMutateResult?.previousId satisfies number | undefined
+  },
+})
+new MutationObserver(queryClient, inferredMutationOptions).mutate({ id: 1 }) satisfies Promise<{
+  readonly id: number
+  readonly name: string
+}>
+
 // @ts-expect-error mutation variables arrive at execution, not option construction
 utils.users.get.mutationOptions({ input: { id: 1 } })
 utils.users.get.mutationOptions({

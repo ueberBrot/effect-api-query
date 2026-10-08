@@ -3,7 +3,7 @@ import { HttpApiSchema } from 'effect/http-api'
 import type { HttpApiEndpoint } from 'effect/http-api'
 
 import type { OperationInput } from '../core/operation'
-import { containsUnsafeKeyEncoding } from '../core/schema-key'
+import { createSchemaKeyEncoding } from '../core/schema-key'
 import { EffectHttpApiQueryConfigError, EffectHttpApiQueryKeyError } from './errors'
 import type { HttpApiEndpointIdentity } from './errors'
 
@@ -151,6 +151,7 @@ export const createHttpRequest = (
     return { kind: 'Unary', input: { _tag: 'Inputless' } }
   }
   const schema = Schema.Struct(fields)
+  const keyEncoding = createSchemaKeyEncoding(schema)
   const invalidKey = (cause: unknown) =>
     new EffectHttpApiQueryKeyError(
       'InvalidKeyValue',
@@ -162,22 +163,13 @@ export const createHttpRequest = (
     kind: 'Unary',
     input: {
       _tag: 'Input',
-      requiresEncoder: payloads.length > 1 || containsUnsafeKeyEncoding(schema.ast),
+      requiresEncoder: payloads.length > 1 || keyEncoding.requiresEncoder,
       pageInput: (input) => input,
       invalidKey,
       prepare: (input, encoder) => {
         let keyValue: unknown
         try {
-          if (encoder) {
-            keyValue = encoder(input)
-          } else {
-            // SAFETY: Middleware requiring encoding services needs a custom encoder;
-            // the remaining generated request schema can encode synchronously.
-            // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/no-chained-type-assertions
-            const encodingSchema = schema as unknown as Schema.ConstraintEncoder<unknown>
-            const encode = Schema.encodeUnknownSync(encodingSchema)
-            keyValue = encode(input)
-          }
+          keyValue = encoder ? encoder(input) : keyEncoding.encode(input)
         } catch (error) {
           throw new EffectHttpApiQueryKeyError(
             encoder ? 'KeyEncoderFailed' : 'RequestEncodingFailed',

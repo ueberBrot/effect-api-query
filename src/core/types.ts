@@ -321,6 +321,14 @@ export type MutationOptions<Data, Error, Input, Key extends QueryKey, OnMutateRe
   readonly mutationKey: Key
 }
 
+/** Owns mutation callback inference while adapters supply their request and execution types. */
+export type MutationBuilder<Data, Error, Input, Key extends QueryKey, AdapterOptions = unknown> = <
+  OnMutateResult = unknown,
+>(
+  options?: Omit<MutationObserverOptions<Data, Error, Input, OnMutateResult>, OwnedMutationOption> &
+    AdapterOptions,
+) => MutationOptions<Data, Error, Input, Key, OnMutateResult>
+
 // Generic function comparison tests exact type identity, not a callable API.
 /* oxlint-disable typescript/no-unnecessary-type-parameters */
 export type HasSeenType<A, Seen> = Seen extends unknown

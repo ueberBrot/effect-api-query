@@ -12,7 +12,3 @@ Mutation-only endpoints require no key encoder and reject configured encoders be
 variables never enter cache identity. They retain decoded-only responses, caller-owned runners and
 resources, typed callbacks, and complete failed-Exit Causes. HTTP method does not change this
 capability boundary.
-
-The shared private utility construction supports mutation-only operation descriptions; adapters
-continue to own endpoint classification and request types. Keep public factories and packed
-compile-time fixtures as the test seams, with runtime tests for request forwarding and execution.
