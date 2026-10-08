@@ -10,7 +10,7 @@ When triaging issues, use [the five triage roles](docs/agents/triage-labels.md).
 
 ### Domain docs
 
-Before exploring the codebase, read [the domain documentation guide](docs/agents/domain.md).
+Before exploring the codebase, read [the domain documentation guide](docs/agents/domain.md) for `GLOSSARY.md` vocabulary and relevant ADRs.
 
 ### Vite+
 
