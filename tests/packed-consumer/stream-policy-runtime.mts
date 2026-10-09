@@ -269,14 +269,15 @@ for (const maxChunks of [undefined, 3]) {
             input: { channel: 'news' },
             maxChunks,
             refetchMode,
+            initialData: [99],
           })
           try {
-            deepStrictEqual(yield* Effect.promise(() => queryClient.query(options)), [1, 2])
+            deepStrictEqual(yield* Effect.promise(() => queryClient.query(options)), [99, 1, 2])
             values = [3, 4]
             release = Deferred.makeUnsafe<undefined>()
             const pending = queryClient.refetchQueries({ queryKey: options.queryKey, exact: true })
             yield* Deferred.await(received).pipe(Effect.timeout('5 seconds'))
-            const appended = maxChunks === 3 ? [2, 3, 4] : [1, 2, 3, 4]
+            const appended = maxChunks === 3 ? [2, 3, 4] : [99, 1, 2, 3, 4]
             if (refetchMode !== 'replace') {
               yield* Effect.promise(() =>
                 waitFor(
@@ -287,7 +288,7 @@ for (const maxChunks of [undefined, 3]) {
             }
             deepStrictEqual(
               queryClient.getQueryData(options.queryKey),
-              refetchMode === 'replace' ? [1, 2] : refetchMode === 'append' ? appended : [3, 4],
+              refetchMode === 'replace' ? [99, 1, 2] : refetchMode === 'append' ? appended : [3, 4],
             )
             equal(queryClient.getQueryState(options.queryKey)?.fetchStatus, 'fetching')
             yield* Deferred.succeed(release, undefined)
@@ -297,6 +298,12 @@ for (const maxChunks of [undefined, 3]) {
               refetchMode === 'append' ? appended : [3, 4],
             )
             equal(queryClient.getQueryState(options.queryKey)?.fetchStatus, 'idle')
+            values = []
+            release = undefined
+            deepStrictEqual(
+              yield* Effect.promise(() => queryClient.query(options)),
+              refetchMode === 'append' ? appended : [],
+            )
           } finally {
             queryClient.clear()
           }

@@ -177,6 +177,50 @@ plain payloads. Mixed alternatives retain Effect's client request union. Leave t
 `keyEncoders`: mutation keys contain no request variables, and encoder entries are rejected. Any
 streaming success or streaming multipart alternative omits the whole endpoint.
 
+## Retain SSE events
+
+An endpoint with one `HttpApiSchema.StreamSse` success exposes `streamedKey` and
+`streamedOptions`. For a `watch` endpoint whose query declares `channel: Schema.String`,
+retain its latest 100 decoded events:
+
+```ts
+const events = http.events.watch.streamedOptions({
+  input: { query: { channel: 'news' } },
+  maxChunks: 100,
+  refetchMode: 'reset',
+  sseOptions: { maxEventSize: 1024 * 1024 },
+})
+
+const observer = new QueryObserver(queryClient, events)
+const unsubscribe = observer.subscribe((result) => {
+  renderEvents(result.data ?? [])
+})
+```
+
+Import `QueryObserver` from `@tanstack/query-core`, or pass the options to your framework's
+query hook. Replace `renderEvents` with your application's rendering callback. The first event
+makes the query successful while it remains fetching. Unsubscribe and cancel the owning queries
+before disposing the ready client and runtime.
+
+The cache holds decoded events in order. Omit `maxChunks` for unlimited history; use a positive
+safe integer to bound retention. `reset` starts a fresh history on refetch, `append` extends the
+existing history, and `replace` keeps the previous history visible until the refetch completes.
+Empty completion succeeds with an empty or retained history according to the refetch mode.
+Accumulated arrays preserve decoded `undefined` elements. A declared `WithHeaders` success wraps
+each event with the response's decoded headers.
+
+Keep `sseOptions` beside `input`. Its `maxEventSize` limits pending SSE parser text in JavaScript
+string code units and defaults to 10 MiB. The same request with different effective decoder,
+retention, or refetch policies has a different cache key. To read that exact entry, pass the
+same policy to `streamedKey(input, policy)`; inputless endpoints accept policy alone.
+`key()` remains a prefix matching every policy. Input-bearing builders also support `skipToken`.
+
+Declared request headers, such as a resume cursor, remain inside `input.headers` and contribute
+to request identity. The ready client handles SSE decoding and failures; the adapter preserves
+complete Causes, including `Sse.Retry`. Your application owns reconnection and resume policy.
+Raw byte streams, mixed buffered/SSE successes, and SSE endpoints with multipart payloads are
+omitted. Consume unsupported streams directly through the ready client.
+
 ## Keep cache entries separate
 
 Use generated keys for individual queries or whole branches:
@@ -194,8 +238,8 @@ need encoding services, contain redacted values, or allow multiple payload alter
 
 Buffered HTTP endpoints without multipart expose ordinary query, infinite query, and mutation
 builders regardless of HTTP method. Choose the builder for the operation you intend. Buffered
-multipart endpoints expose mutations only. Streaming responses and streaming multipart requests
-are omitted; see the [HTTP factory reference](/effect-api-query/reference/http-factory/)
+multipart endpoints expose mutations only. A single SSE success exposes accumulated streamed
+queries; raw byte streams, mixed buffered/SSE successes, and streaming multipart requests are omitted; see the [HTTP factory reference](/effect-api-query/reference/http-factory/)
 for supported request formats and the complete builder contract.
 
 When your application or server request ends, cancel its active queries and clear its QueryClient

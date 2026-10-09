@@ -19,6 +19,8 @@
     "stream-policy-runtime.mts",
     "retry-runtime.mts",
     "http-runtime.mts",
+    "http-stream-runtime.mts",
+    "http-stream-contract.ts",
     "public-contract.ts",
     "http-contract.ts",
     "docs-rpc-quick-start.ts",

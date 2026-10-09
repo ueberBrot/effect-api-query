@@ -6,6 +6,7 @@ description: Understand literal HTTP identifiers, top-level groups, and omitted 
 `createHttpApiQueryUtils` builds and freezes an HTTP utility tree when you call it with a literal
 Effect HttpApi declaration. Buffered endpoints without multipart have ordinary query, infinite-query,
 and mutation builders. Buffered multipart endpoints have mutation builders only, regardless of HTTP method.
+Endpoints with one SSE success expose accumulated streamed-query builders.
 
 | Declaration                                | Generated path                      |
 | ------------------------------------------ | ----------------------------------- |
@@ -21,11 +22,15 @@ Every retained branch and endpoint has `key()`. Top-level groups have no branch 
 custom key encoders still use their declaration group identifier. The factory rejects unsafe
 names, collisions, and invalid encoder configuration before returning any utilities.
 
-The factory omits an entire endpoint if any success alternative streams, including a stream
-wrapped with response headers, or any request alternative uses streaming multipart. It also omits groups
-containing only omitted endpoints. It never keeps just the buffered alternatives of a partially
-supported endpoint. Contradictory multipart metadata causes factory construction to fail. HTTP
-streams and streaming multipart remain deferred; use the ready client directly when you need them.
+The factory retains a single SSE success, including a decoded response-header wrapper. Its leaf
+exposes `key()`, `streamedKey()`, and `streamedOptions()`. Cache entries hold ordered decoded events;
+header wrappers surround each event. Decoder, retention, and refetch policies contribute to concrete
+identity while endpoint prefixes continue to select every view policy.
+
+Raw byte streams, mixed buffered/SSE successes, SSE endpoints with multipart payloads, and streaming
+multipart requests omit the complete endpoint. Groups containing only omitted endpoints disappear.
+Contradictory multipart metadata causes factory construction to fail. Use the ready client directly
+for unsupported streams; applications own byte sinks, reconnection, and resume policy.
 
 Any buffered multipart payload alternative makes the endpoint mutation-only, including an endpoint
 that also accepts ordinary payloads. Its leaf exposes `key()`, `mutationKey()`, and `mutationOptions()`.

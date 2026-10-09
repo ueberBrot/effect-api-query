@@ -1,5 +1,6 @@
 import type { DataTag } from '@tanstack/query-core'
-import type { Brand, Effect, Schema } from 'effect'
+import type { Brand, Effect, Schema, Stream } from 'effect'
+import type { Sse } from 'effect/encoding'
 import type {
   HttpApi,
   HttpApiClient,
@@ -33,14 +34,23 @@ export type MultipartPayload =
   | Brand.Brand<HttpApiSchema.MultipartTypeId>
   | Brand.Brand<HttpApiSchema.MultipartStreamTypeId>
 
-/** Omits the complete endpoint when any success or multipart payload alternative streams. */
+export type SseEndpoint<Endpoint> = Endpoint extends HttpApiEndpoint.ConstraintRequest
+  ? [ResponseBody<Endpoint['~Success']>] extends [{ readonly _tag: 'StreamSse' }]
+    ? Endpoint
+    : never
+  : never
+
 export type Supported<Endpoint> = Endpoint extends HttpApiEndpoint.ConstraintRequest
-  ? [Extract<ResponseBody<Endpoint['~Success']>, HttpApiSchema.StreamSchema>] extends [never]
-    ? [
-        Extract<Endpoint['~Payload']['Type'], Brand.Brand<HttpApiSchema.MultipartStreamTypeId>>,
-      ] extends [never]
+  ? [
+      Extract<Endpoint['~Payload']['Type'], Brand.Brand<HttpApiSchema.MultipartStreamTypeId>>,
+    ] extends [never]
+    ? [Extract<ResponseBody<Endpoint['~Success']>, HttpApiSchema.StreamSchema>] extends [never]
       ? Endpoint
-      : never
+      : [SseEndpoint<Endpoint>] extends [never]
+        ? never
+        : [Extract<Endpoint['~Payload']['Type'], MultipartPayload>] extends [never]
+          ? Endpoint
+          : never
     : never
   : never
 
@@ -220,7 +230,7 @@ export type MutationLeaf<
   >
 }
 
-export type Leaf<
+export type BufferedLeaf<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Key extends readonly JsonValue[],
   ClientError,
@@ -238,6 +248,68 @@ export type Leaf<
         readonly infiniteOptions: InfiniteBuilder<Endpoint, Key, ClientError>
       })
 
+export type StreamChunk<Value> =
+  Value extends HttpApiSchema.withHeaders<infer Body, infer Headers>
+    ? Body extends Stream.Stream<infer Chunk, infer _Error, infer _Services>
+      ? HttpApiSchema.withHeaders<Chunk, Headers>
+      : never
+    : Value extends Stream.Stream<infer Chunk, infer _Error, infer _Services>
+      ? Chunk
+      : never
+
+export type StreamFailure<Value> =
+  Value extends HttpApiSchema.withHeaders<infer Body, infer _Headers>
+    ? StreamFailure<Body>
+    : Value extends Stream.Stream<infer _Chunk, infer Error, infer _Services>
+      ? Error
+      : never
+
+export type HttpStreamPolicy = {
+  readonly sseOptions?: Sse.DecodeOptions | undefined
+  readonly maxChunks?: number | undefined
+  readonly refetchMode?: 'reset' | 'append' | 'replace' | undefined
+}
+
+export type StreamedKey<
+  Endpoint extends HttpApiEndpoint.ConstraintRequest,
+  Key extends readonly JsonValue[],
+  ClientError,
+> = DataTag<
+  readonly [...Key, 'streamed', ...JsonValue[]],
+  readonly StreamChunk<Success<Endpoint>>[],
+  Failure<ClientError | StreamFailure<Success<Endpoint>>>
+>
+
+export type StreamedLeaf<
+  Endpoint extends HttpApiEndpoint.ConstraintRequest,
+  Key extends readonly JsonValue[],
+  ClientError,
+> = {
+  readonly key: () => Key
+  readonly streamedKey: void extends Request<Endpoint>
+    ? (policy?: HttpStreamPolicy) => StreamedKey<Endpoint, Key, ClientError>
+    : (
+        input: Request<Endpoint>,
+        policy?: HttpStreamPolicy,
+      ) => StreamedKey<Endpoint, Key, ClientError>
+  readonly streamedOptions: UnaryQueryBuilder<
+    Request<Endpoint>,
+    readonly StreamChunk<Success<Endpoint>>[],
+    Failure<ClientError | StreamFailure<Success<Endpoint>>>,
+    StreamedKey<Endpoint, Key, ClientError>,
+    readonly [...Key, 'streamed'],
+    HttpStreamPolicy
+  >
+}
+
+export type Leaf<
+  Endpoint extends HttpApiEndpoint.ConstraintRequest,
+  Key extends readonly JsonValue[],
+  ClientError,
+> = [SseEndpoint<Endpoint>] extends [never]
+  ? BufferedLeaf<Endpoint, Key, ClientError>
+  : StreamedLeaf<Endpoint, Key, ClientError>
+
 /** An eager utility tree mirroring the ready HTTP client's literal properties. */
 export type HttpApiQueryUtils<
   Api extends HttpApi.Constraint,
@@ -254,7 +326,8 @@ export type HttpApiQueryUtils<
     readonly [Endpoint in Supported<Endpoints<Group>> as Endpoint['identifier']]: Leaf<
       Endpoint,
       EndpointKey<Api, Prefix, Group, Endpoint>,
-      Effect.Error<ClientEffect<Group, Endpoint, Client>>
+      | Effect.Error<ClientEffect<Group, Endpoint, Client>>
+      | StreamFailure<Effect.Success<ClientEffect<Group, Endpoint, Client>>>
     >
   }
 } & {
@@ -265,7 +338,8 @@ export type HttpApiQueryUtils<
   ]: Leaf<
     Endpoint,
     readonly [...Root<Api, Prefix>, Endpoint['identifier']],
-    Effect.Error<ClientEffect<{ readonly topLevel: true }, Endpoint, Client>>
+    | Effect.Error<ClientEffect<{ readonly topLevel: true }, Endpoint, Client>>
+    | StreamFailure<Effect.Success<ClientEffect<{ readonly topLevel: true }, Endpoint, Client>>>
   >
 }
 
@@ -344,10 +418,18 @@ export type EncoderOption<Api extends HttpApi.Constraint> = [EncoderGroups<Api>]
   : [RequiredEncoderGroups<Api>] extends [never]
     ? { readonly keyEncoders?: Encoders<Api> }
     : { readonly keyEncoders: Encoders<Api> }
+export type StreamServices<Value> =
+  Value extends HttpApiSchema.withHeaders<infer Body, infer _Headers>
+    ? StreamServices<Body>
+    : Value extends Stream.Stream<infer _Chunk, infer _Error, infer Services>
+      ? Services
+      : never
+
 export type ClientServices<Api extends HttpApi.Constraint, Client> =
   | HttpApiEndpoint.ClientServices<Supported<Endpoints<Groups<Api>>>>
   | HttpApiEndpoint.ErrorServicesDecode<Supported<Endpoints<Groups<Api>>>>
   | Effect.Services<ExposedEffects<Api, Client>>
+  | StreamServices<Effect.Success<ExposedEffects<Api, Client>>>
 export type RunnerOption<Api extends HttpApi.Constraint, Client> = [
   ClientServices<Api, Client>,
 ] extends [never]
