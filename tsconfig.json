@@ -48,6 +48,7 @@
               "tests/create-rpc-query-utils*.test.ts",
               "tests/http-*.test.ts",
               "tests/fixtures/effect-rpc.ts",
+              "tests/fixtures/server-local-rpc.ts",
               "tests/fixtures/http-client.ts",
               "tests/types/**/*.ts"
             ],

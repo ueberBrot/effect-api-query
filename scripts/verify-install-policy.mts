@@ -1,5 +1,3 @@
-// fallow-ignore-file unused-file
-// Vite+ invokes this verifier through the install-policy task.
 import { equal, match, ok } from 'node:assert/strict'
 import { execFileSync, spawn } from 'node:child_process'
 import { createHash } from 'node:crypto'

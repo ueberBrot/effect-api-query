@@ -321,7 +321,16 @@ export default defineConfig({
       },
       test: {
         command: 'vp test',
-        dependsOn: ['pack'],
+        dependsOn: ['pack', 'server-local-types'],
+        cache: {
+          output: [],
+        },
+      },
+      'server-local-types': {
+        command: [
+          'tsc --project tests/fixtures/tsconfig.server-local.json',
+          'node node_modules/typescript-5.9/bin/tsc --project tests/fixtures/tsconfig.server-local.json',
+        ],
         cache: {
           env: ['RPC_TRANSPORT_MEASURE'],
           output: [],

@@ -1,5 +1,3 @@
-// fallow-ignore-file unused-file
-// Used by Vite+'s dynamically registered packed-package and install-policy verifiers.
 import { readFileSync, writeFileSync } from 'node:fs'
 import nodePath from 'node:path'
 
