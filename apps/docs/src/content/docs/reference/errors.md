@@ -13,6 +13,7 @@ Thrown synchronously while configuring the utility tree or an option builder. It
 - `RpcPathCollision`
 - `MissingKeyEncoder`
 - `UnknownKeyEncoder`
+- `UnsupportedQueryHash`: an option builder received `queryKeyHashFn` or `queryHash`.
 
 It can also expose `rpcTag`, `path`, and an underlying `cause`.
 
@@ -52,6 +53,7 @@ Thrown synchronously while configuring HTTP utilities. Its `code` is one of:
 - `MissingKeyEncoder`
 - `UnknownKeyEncoder`
 - `UnsupportedEndpointMetadata`
+- `UnsupportedQueryHash`: an option builder received `queryKeyHashFn` or `queryHash`.
 
 It exposes `apiId` and, when available, `groupId`, `endpoint`, `method`, `path`, and an underlying
 `cause`.

@@ -502,7 +502,12 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       )
     }
 
-    for (const fixture of ['runtime.mts', 'http-runtime.mts', 'stream-cause-runtime.mts']) {
+    for (const fixture of [
+      'hashing-runtime.mts',
+      'runtime.mts',
+      'http-runtime.mts',
+      'stream-cause-runtime.mts',
+    ]) {
       execFileSync(process.execPath, ['--experimental-import-meta-resolve', fixture], {
         cwd: consumerDirectory,
         stdio: 'inherit',

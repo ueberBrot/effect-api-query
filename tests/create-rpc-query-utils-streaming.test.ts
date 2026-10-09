@@ -687,9 +687,7 @@ describe('createRpcQueryUtils streaming execution', () => {
         })
         expect(options).not.toHaveProperty('input')
         expect(options).not.toHaveProperty('refetchMode')
-        expect(options.queryKeyHashFn).toBe(
-          utils.events.watch.liveOptions(skipToken).queryKeyHashFn,
-        )
+        expect(options).not.toHaveProperty('queryKeyHashFn')
         const unsubscribe = observer.subscribe(() => {})
         yield* Effect.promise(async () => {
           await queryClient.invalidateQueries({ queryKey: utils.events.key() })

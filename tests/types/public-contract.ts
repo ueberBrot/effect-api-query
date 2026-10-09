@@ -741,10 +741,10 @@ const queryOptions = utils.users.get.queryOptions({
   staleTime: (query) => (query.state.data?.name === 'Ada' ? Infinity : 0),
   structuralSharing: false,
 })
-type ExactQueryHashInput = Assert<
-  Equal<Parameters<typeof queryOptions.queryKeyHashFn>[0], typeof queryOptions.queryKey>
+type ClientOwnedQueryHash = Assert<
+  Equal<Extract<'queryKeyHashFn' | 'queryHash', keyof typeof queryOptions>, never>
 >
-const exactQueryHashInput: ExactQueryHashInput = true
+const clientOwnedQueryHash: ClientOwnedQueryHash = true
 
 const queryHook = useQuery(queryOptions)
 const queryHookData: string | undefined = queryHook.data
@@ -754,7 +754,7 @@ const suspenseData: string = suspenseHook.data
 suspenseHook.error satisfies EffectRpcQueryError<'not-found'> | null
 usePrefetchQuery(queryOptions)
 
-void [exactQueryHashInput, queryHookData, suspenseData]
+void [clientOwnedQueryHash, queryHookData, suspenseData]
 
 const possiblyInitialized = utils.users.get.queryOptions({
   input: { id: 1, locale: 'de' },
@@ -828,11 +828,11 @@ const skipped = utils.users.get.queryOptions(skipToken)
 skipped.queryFn satisfies typeof queryCoreSkipToken
 const typedSkipToken: SkipToken = skipped.queryFn
 void typedSkipToken
-type ExactSkippedQueryHashInput = Assert<
-  Equal<Parameters<typeof skipped.queryKeyHashFn>[0], typeof skipped.queryKey>
+type ClientOwnedSkippedQueryHash = Assert<
+  Equal<Extract<'queryKeyHashFn' | 'queryHash', keyof typeof skipped>, never>
 >
-const exactSkippedQueryHashInput: ExactSkippedQueryHashInput = true
-void exactSkippedQueryHashInput
+const clientOwnedSkippedQueryHash: ClientOwnedSkippedQueryHash = true
+void clientOwnedSkippedQueryHash
 const skippedHook = useQuery(skipped)
 const skippedData: { readonly id: number; readonly name: string } | undefined = skippedHook.data
 skippedHook.error satisfies EffectRpcQueryError<'not-found'> | null
@@ -950,7 +950,7 @@ utils.users.get.queryOptions({
   input: { id: 1 },
   queryKey: ['custom'],
 })
-// @ts-expect-error the package owns the per-call query key hash function
+// @ts-expect-error QueryClient defaults own hashing.
 utils.users.get.queryOptions({
   input: { id: 1 },
   queryKeyHashFn: JSON.stringify,
@@ -1474,6 +1474,32 @@ utils.users.get.mutationOptions({ rpcOptions: discardOptions })
 
 // @ts-expect-error A caller hash cannot override generated RPC cache identity.
 utils.users.get.queryOptions({ input: skipToken, queryHash: 'shared' })
+
+true satisfies Assert<
+  Equal<
+    Extract<
+      'queryKeyHashFn' | 'queryHash',
+      | keyof typeof infiniteOptions
+      | keyof typeof skippedInfinite
+      | keyof typeof conditionalInfiniteOptions
+      | keyof typeof streamedOptions
+      | keyof typeof liveOptions
+    >,
+    never
+  >
+>
+
+// @ts-expect-error QueryClient defaults own hashing.
+utils.events.watch.streamedOptions({ input: { channel: 'news' }, queryHash: 'shared' })
+// @ts-expect-error QueryClient defaults own hashing.
+utils.events.watch.liveOptions({ input: { channel: 'news' }, queryKeyHashFn: JSON.stringify })
+utils.users.pages.infiniteOptions({
+  initialPageParam: 0,
+  input: (cursor) => ({ cursor }),
+  getNextPageParam: () => undefined,
+  // @ts-expect-error QueryClient defaults own hashing.
+  queryKeyHashFn: JSON.stringify,
+})
 
 const UnknownRead = Rpc.make('payload.unknown', {
   payload: Schema.Unknown,

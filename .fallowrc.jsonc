@@ -6,6 +6,7 @@
   "entry": [
     "apps/docs/public/package-version.js",
     "playwright.docs.config.ts",
+    "tests/packed-consumer/hashing-runtime.mts",
     "tests/packed-consumer/stream-cause-runtime.mts"
   ],
 

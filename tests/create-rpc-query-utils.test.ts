@@ -45,7 +45,6 @@ describe(createRpcQueryUtils, () => {
         retry: false,
         queryFn: queryCoreSkipToken,
         queryKey: ['app', 'rpc', 'users', 'get', 'query'],
-        queryKeyHashFn: utils.users.get.queryOptions(skipToken).queryKeyHashFn,
       })
       const queryClient = new QueryClient()
       const observer = new QueryObserver(queryClient, options)
@@ -101,7 +100,7 @@ describe(createRpcQueryUtils, () => {
       expect(Object.isFrozen(utils.users.get.queryKey({ id: 1 }))).toBe(true)
       expect(Object.isFrozen(utils.users.get.queryKey({ id: 1 }).at(-1))).toBe(true)
       const options = utils.users.get.queryOptions({ input: { id: 1 } })
-      expect(options.queryKeyHashFn(options.queryKey)).toBe(JSON.stringify(options.queryKey))
+      expect(options).not.toHaveProperty('queryKeyHashFn')
     }),
   )
 
@@ -161,7 +160,7 @@ describe(createRpcQueryUtils, () => {
         queryFn: queryCoreSkipToken,
         queryKey: ['app', 'rpc', 'users', 'get', 'query'],
       })
-      expect(skipped.queryKeyHashFn(skipped.queryKey)).toBe(JSON.stringify(skipped.queryKey))
+      expect(skipped).not.toHaveProperty('queryKeyHashFn')
 
       const infiniteCallerOptions = {
         getNextPageParam: (): undefined => {},
@@ -179,11 +178,8 @@ describe(createRpcQueryUtils, () => {
         ...infiniteCallerOptions,
         queryFn: queryCoreSkipToken,
         queryKey: ['app', 'rpc', 'users', 'get', 'infinite'],
-        queryKeyHashFn: skipped.queryKeyHashFn,
       })
-      expect(skippedInfinite.queryKeyHashFn(skippedInfinite.queryKey)).toBe(
-        JSON.stringify(skippedInfinite.queryKey),
-      )
+      expect(skippedInfinite).not.toHaveProperty('queryKeyHashFn')
     }),
   )
 
