@@ -20,7 +20,6 @@ import nodePath from 'node:path'
 import ts from 'typescript-5.9'
 
 import repositoryManifest from '../package.json' with { type: 'json' }
-import { writeConsumerWorkspace } from './install-policy.mts'
 
 const repositoryRoot = nodePath.resolve(import.meta.dirname, '..')
 const artifactDirectory = nodePath.join(repositoryRoot, '.artifacts')
@@ -449,7 +448,7 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
 
     // Prefer cached artifacts, but allow a fresh machine to fetch exact pinned versions.
     // The temporary project must resolve every peer from its own node_modules.
-    writeConsumerWorkspace(consumerDirectory)
+    writeFileSync(nodePath.join(consumerDirectory, 'pnpm-workspace.yaml'), workspaceConfig)
     execFileSync('pnpm', ['install', '--ignore-scripts', '--prefer-offline'], {
       cwd: consumerDirectory,
       stdio: 'inherit',
