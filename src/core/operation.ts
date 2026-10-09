@@ -23,6 +23,7 @@ export type OperationInput =
 export interface OperationIdentity {
   readonly id: string
   readonly path: readonly string[]
+  readonly unsupportedQueryHash: (option: 'queryKeyHashFn' | 'queryHash') => Error
   /** Removes adapter-owned fields from the fresh options copy. */
   readonly takeOptions: (options: Record<string, unknown>) => unknown
 }
@@ -44,6 +45,7 @@ export interface MutationOperation extends BufferedOperation {
 export interface StreamingOperation extends OperationIdentity {
   readonly kind: 'Streaming'
   readonly input: OperationInput
+  readonly streamedIdentity: (options: Record<string, unknown>) => readonly JsonValue[]
   /** Consumes and validates stream policy, including for skipped requests. */
   readonly prepareStream: (
     options: Record<string, unknown>,

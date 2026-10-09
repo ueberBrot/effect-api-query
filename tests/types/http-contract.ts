@@ -1092,7 +1092,7 @@ queryClient.refetchQueries({ queryKey: getUser.key() })
 nativeQuery.input
 // @ts-expect-error Query keys belong to the package.
 getUser.queryOptions({ input, queryKey: ['other'] })
-// @ts-expect-error Query hashing belongs to the package.
+// @ts-expect-error QueryClient defaults own hashing.
 getUser.queryOptions({ input, queryKeyHashFn: () => 'other' })
 const optionalInitial = (): typeof User.Type | undefined => undefined
 const maybeInitial = useQuery(
@@ -1491,4 +1491,25 @@ getUser.infiniteOptions({
   getNextPageParam: () => undefined,
   // @ts-expect-error A caller hash cannot merge ordinary and infinite caches.
   queryHash: 'shared',
+})
+
+true satisfies Assert<
+  Equal<
+    Extract<
+      'queryKeyHashFn' | 'queryHash',
+      | keyof typeof userPages
+      | keyof typeof skippedPages
+      | keyof typeof conditionalPages
+      | keyof ReturnType<typeof getUser.queryOptions>
+    >,
+    never
+  >
+>
+
+getUser.infiniteOptions({
+  initialPageParam: 0,
+  input: () => input,
+  getNextPageParam: () => undefined,
+  // @ts-expect-error QueryClient defaults own hashing.
+  queryKeyHashFn: JSON.stringify,
 })

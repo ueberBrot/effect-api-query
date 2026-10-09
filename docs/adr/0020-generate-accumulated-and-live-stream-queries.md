@@ -9,6 +9,12 @@ that completes without emitting a value raises `EffectRpcQueryEmptyStreamError`.
 and `live` key segments prevent collisions with other query shapes and mutations; generated prefixes
 support invalidation.
 
+Concrete accumulated-stream identity includes the normalized retention bound and refetch mode,
+so incompatible histories occupy separate cache entries. Omitted bounds mean unlimited retention;
+omitted refetch mode means reset. Exact key builders accept the same policy as options builders,
+and explicit defaults share identity with omitted defaults. Broad prefixes remain stable; persisted
+accumulated histories require a version change when adopting this identity.
+
 Live emissions normalize `undefined` to `null` under
 [ADR 0012](0012-normalize-undefined-query-success-to-null.md); accumulated elements remain
 unchanged. On an initial fetch, the first emission makes either view successful while the open

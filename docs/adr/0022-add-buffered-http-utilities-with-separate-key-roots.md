@@ -24,6 +24,3 @@ Keys append `rpc` plus tag segments, or `http` plus API identifier and projected
 caller prefix. Operation and canonical query input follow. Factory `key()` includes this generated
 root, preventing cross-adapter collisions while retaining prefix invalidation. Applications own
 safe client-identity partitions and deliberate cross-adapter invalidation through the caller prefix.
-
-See the [HTTP technical reference](../research/http-technical-spine.md) for upstream assumptions and
-executable evidence.

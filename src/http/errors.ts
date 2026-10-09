@@ -19,6 +19,7 @@ export type EffectHttpApiQueryConfigErrorCode =
   | 'MissingKeyEncoder'
   | 'UnknownKeyEncoder'
   | 'UnsupportedEndpointMetadata'
+  | 'UnsupportedQueryHash'
 
 /** Stable codes for synchronous HTTP key failures. */
 export type EffectHttpApiQueryKeyErrorCode =

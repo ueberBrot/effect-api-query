@@ -127,7 +127,7 @@ describe('createRpcQueryUtils streaming execution', () => {
         const group = RpcGroup.make(Watch)
         const queryClient = new QueryClient()
         const snapshots: unknown[] = []
-        const key = ['bounded', 'rpc', 'events', 'watch', 'streamed'] as const
+        let key: readonly unknown[] = []
         const client = yield* makeRpcTestClient(group, {
           'events.watch': () =>
             Stream.fromAsyncIterable(
@@ -143,6 +143,7 @@ describe('createRpcQueryUtils streaming execution', () => {
         })
         const utils = createRpcQueryUtils(group, { client, keyPrefix: ['bounded'] })
         const options = utils.events.watch.streamedOptions({ maxChunks: 2, refetchMode })
+        key = options.queryKey
         queryClient.setQueryData(options.queryKey, [-2, -1, 0, 9])
         const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
           if (event.type === 'updated' && event.action.type === 'success') {
@@ -313,18 +314,26 @@ describe('createRpcQueryUtils streaming execution', () => {
         'run-1-second',
       ])
       expect(yield* Effect.promise(async () => await fetch('append'))).toStrictEqual([
-        'run-1-first',
-        'run-1-second',
         'run-2-first',
         'run-2-second',
       ])
-      expect(yield* Effect.promise(async () => await fetch('replace'))).toStrictEqual([
+      expect(yield* Effect.promise(async () => await fetch('append'))).toStrictEqual([
+        'run-2-first',
+        'run-2-second',
         'run-3-first',
         'run-3-second',
       ])
-      expect(yield* Effect.promise(async () => await fetch('reset'))).toStrictEqual([
+      expect(yield* Effect.promise(async () => await fetch('replace'))).toStrictEqual([
         'run-4-first',
         'run-4-second',
+      ])
+      expect(yield* Effect.promise(async () => await fetch('replace'))).toStrictEqual([
+        'run-5-first',
+        'run-5-second',
+      ])
+      expect(yield* Effect.promise(async () => await fetch('reset'))).toStrictEqual([
+        'run-6-first',
+        'run-6-second',
       ])
     }),
   )
@@ -687,9 +696,7 @@ describe('createRpcQueryUtils streaming execution', () => {
         })
         expect(options).not.toHaveProperty('input')
         expect(options).not.toHaveProperty('refetchMode')
-        expect(options.queryKeyHashFn).toBe(
-          utils.events.watch.liveOptions(skipToken).queryKeyHashFn,
-        )
+        expect(options).not.toHaveProperty('queryKeyHashFn')
         const unsubscribe = observer.subscribe(() => {})
         yield* Effect.promise(async () => {
           await queryClient.invalidateQueries({ queryKey: utils.events.key() })

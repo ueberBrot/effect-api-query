@@ -8,11 +8,13 @@ description: Configuration, key-generation, and execution errors for RPC and HTT
 Thrown synchronously while configuring the utility tree or an option builder. Its `code` is one of:
 
 - `InvalidMaxChunks`: a streamed-query bound is not a positive safe integer.
+- `InvalidRefetchMode`: a streamed-query mode is not `reset`, `append`, or `replace`.
 - `InvalidKeyPrefix`
 - `InvalidRpcPath`
 - `RpcPathCollision`
 - `MissingKeyEncoder`
 - `UnknownKeyEncoder`
+- `UnsupportedQueryHash`: an option builder received `queryKeyHashFn` or `queryHash`.
 
 It can also expose `rpcTag`, `path`, and an underlying `cause`.
 
@@ -52,6 +54,7 @@ Thrown synchronously while configuring HTTP utilities. Its `code` is one of:
 - `MissingKeyEncoder`
 - `UnknownKeyEncoder`
 - `UnsupportedEndpointMetadata`
+- `UnsupportedQueryHash`: an option builder received `queryKeyHashFn` or `queryHash`.
 
 It exposes `apiId` and, when available, `groupId`, `endpoint`, `method`, `path`, and an underlying
 `cause`.

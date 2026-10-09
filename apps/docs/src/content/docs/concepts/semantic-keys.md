@@ -21,8 +21,9 @@ The default process is:
 3. Canonicalize strict JSON by sorting object keys recursively.
 4. Store the canonical key payload in a flat, prefix-matchable query key.
 
-The generated `queryKeyHashFn` serializes the already-canonical key so TanStack Query uses the same
-identity as the key builders.
+QueryClient owns hashing through its global and prefix defaults. Generated options omit hash
+fields so fetching, stream publications, and native `getQueryData`/`setQueryData` calls address the
+same cache entry. Builders reject per-call `queryKeyHashFn` and `queryHash` overrides.
 
 Key objects cannot contain `__proto__` or `constructor` properties at any depth. This applies to
 prefixes, Schema output, and custom encoder output.
@@ -34,6 +35,12 @@ Every RPC operation adds its own segment after the RPC path: `query`, `infinite`
 `mutation`. Concrete query keys append the canonical payload when the RPC has one. These segments
 keep different cache shapes from colliding while root, branch, and RPC prefixes continue to match
 all descendant operations.
+
+Accumulated-stream keys also include normalized retention and refetch policy. Unlimited/reset is
+the default identity; different bounds or modes have separate cache entries. Supply the same policy
+to `streamedKey` and `streamedOptions` for exact cache access. Broad prefixes continue to match all
+views. Treat the concrete suffix as opaque and change your persistence version buster when migrating
+from keys that omitted stream policy.
 
 Unsupported values, failed construction, and failed encoding raise `EffectRpcQueryKeyError` before
 network execution. Payloads whose encoding needs services or that contain redacted values require a

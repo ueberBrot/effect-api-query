@@ -49,6 +49,12 @@ const extractHttpEndpoints = (api: HttpApi.Top, client: unknown): readonly HttpO
         identity,
         id: JSON.stringify([group.identifier, endpoint.identifier]),
         path: group.topLevel ? [endpoint.identifier] : [group.identifier, endpoint.identifier],
+        unsupportedQueryHash: (option) =>
+          new EffectHttpApiQueryConfigError(
+            'UnsupportedQueryHash',
+            `${option} must be configured through QueryClient defaults`,
+            identity,
+          ),
         takeOptions: () => {
           // HTTP has no adapter-owned options.
         },

@@ -77,8 +77,10 @@ observer data; data-tagged keys retain the underlying cache data and error types
 `initialData`, whether defined or possibly undefined, preserves the corresponding TanStack hook
 overload.
 
-Applicable TanStack options pass through. The package owns the key, function, and query hash
-fields, including the precomputed `queryHash`. It removes `input` before returning options.
+Applicable TanStack options pass through. The package owns the key and function and removes
+`input` before returning options. QueryClient global and prefix defaults own hashing. Builders
+reject per-call `queryKeyHashFn` and `queryHash` with `EffectHttpApiQueryConfigError` code
+`UnsupportedQueryHash`.
 
 Input-bearing `queryOptions` accepts a complete request, `queryOptions(skipToken)`, or
 `queryOptions({ input: skipToken, ...options })`. Import `skipToken` from `effect-api-query` or

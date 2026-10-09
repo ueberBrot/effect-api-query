@@ -328,9 +328,35 @@ streamedHook.error satisfies EffectRpcQueryError<
 > | null
 const streamedResult: Promise<string> = queryClient.query(streamedOptions)
 const streamedKey = utils.events.watch.streamedKey({ channel: 'news' })
-streamedKey satisfies readonly ['app', 'rpc', 'events', 'watch', 'streamed', JsonValue]
+streamedKey satisfies readonly ['app', 'rpc', 'events', 'watch', 'streamed', ...JsonValue[]]
 const cachedStream = queryClient.getQueryData(utils.events.watch.streamedKey({ channel: 'news' }))
 cachedStream satisfies ReadonlyArray<string> | undefined
+const boundedStreamKey = utils.events.watch.streamedKey(
+  { channel: 'news' },
+  { maxChunks: 2, refetchMode: 'append' },
+)
+const boundedStreamData = queryClient.getQueryData(boundedStreamKey)
+boundedStreamData satisfies ReadonlyArray<string> | undefined
+queryClient.setQueryData(boundedStreamKey, ['latest'])
+queryClient.getQueryState(boundedStreamKey)?.error satisfies
+  | EffectRpcQueryError<'unauthorized' | 'watch-failure' | 'watch-rpc-failure'>
+  | null
+  | undefined
+utils.events.watch.streamedKey({ channel: 'news' }, { maxChunks: undefined, refetchMode: 'reset' })
+utils.events.audit.watch.streamedKey()
+utils.events.audit.watch.streamedKey({ maxChunks: 2, refetchMode: 'replace' })
+utils.events.audit.watch.streamedKey({ maxChunks: undefined, refetchMode: undefined })
+queryClient.getQueryData(utils.events.audit.watch.streamedKey({ maxChunks: 2 })) satisfies
+  | ReadonlyArray<string>
+  | undefined
+// @ts-expect-error refetch policy is one of the declared modes
+utils.events.watch.streamedKey({ channel: 'news' }, { refetchMode: 'unknown' })
+// @ts-expect-error accumulation bounds are numeric
+utils.events.audit.watch.streamedKey({ maxChunks: '2' })
+// @ts-expect-error a payload-bearing key still requires constructor input
+utils.events.watch.streamedKey({ maxChunks: 2 })
+// @ts-expect-error live keys have no accumulation policy
+utils.events.watch.liveKey({ channel: 'news' }, { maxChunks: 2 })
 queryClient.invalidateQueries({ queryKey: streamedKey })
 queryClient.refetchQueries({ queryKey: streamedKey })
 void [streamedHookData, streamedResult]
@@ -759,10 +785,10 @@ const queryOptions = utils.users.get.queryOptions({
   staleTime: (query) => (query.state.data?.name === 'Ada' ? Infinity : 0),
   structuralSharing: false,
 })
-type ExactQueryHashInput = Assert<
-  Equal<Parameters<typeof queryOptions.queryKeyHashFn>[0], typeof queryOptions.queryKey>
+type ClientOwnedQueryHash = Assert<
+  Equal<Extract<'queryKeyHashFn' | 'queryHash', keyof typeof queryOptions>, never>
 >
-const exactQueryHashInput: ExactQueryHashInput = true
+const clientOwnedQueryHash: ClientOwnedQueryHash = true
 
 const queryHook = useQuery(queryOptions)
 const queryHookData: string | undefined = queryHook.data
@@ -772,7 +798,7 @@ const suspenseData: string = suspenseHook.data
 suspenseHook.error satisfies EffectRpcQueryError<'not-found'> | null
 usePrefetchQuery(queryOptions)
 
-void [exactQueryHashInput, queryHookData, suspenseData]
+void [clientOwnedQueryHash, queryHookData, suspenseData]
 
 const possiblyInitialized = utils.users.get.queryOptions({
   input: { id: 1, locale: 'de' },
@@ -846,11 +872,11 @@ const skipped = utils.users.get.queryOptions(skipToken)
 skipped.queryFn satisfies typeof queryCoreSkipToken
 const typedSkipToken: SkipToken = skipped.queryFn
 void typedSkipToken
-type ExactSkippedQueryHashInput = Assert<
-  Equal<Parameters<typeof skipped.queryKeyHashFn>[0], typeof skipped.queryKey>
+type ClientOwnedSkippedQueryHash = Assert<
+  Equal<Extract<'queryKeyHashFn' | 'queryHash', keyof typeof skipped>, never>
 >
-const exactSkippedQueryHashInput: ExactSkippedQueryHashInput = true
-void exactSkippedQueryHashInput
+const clientOwnedSkippedQueryHash: ClientOwnedSkippedQueryHash = true
+void clientOwnedSkippedQueryHash
 const skippedHook = useQuery(skipped)
 const skippedData: { readonly id: number; readonly name: string } | undefined = skippedHook.data
 skippedHook.error satisfies EffectRpcQueryError<'not-found'> | null
@@ -973,7 +999,7 @@ utils.users.get.queryOptions({
   input: { id: 1 },
   queryKey: ['custom'],
 })
-// @ts-expect-error the package owns the per-call query key hash function
+// @ts-expect-error QueryClient defaults own hashing.
 utils.users.get.queryOptions({
   input: { id: 1 },
   queryKeyHashFn: JSON.stringify,
@@ -1241,7 +1267,7 @@ const conditionalStreamOptions = utils.events.watch.streamedOptions({
   staleTime: (query) => {
     query.queryKey satisfies
       | readonly ['app', 'rpc', 'events', 'watch', 'streamed']
-      | readonly ['app', 'rpc', 'events', 'watch', 'streamed', JsonValue]
+      | readonly ['app', 'rpc', 'events', 'watch', 'streamed', ...JsonValue[]]
     return 30_000
   },
 })
@@ -1498,6 +1524,32 @@ utils.users.get.mutationOptions({ rpcOptions: discardOptions })
 // @ts-expect-error A caller hash cannot override generated RPC cache identity.
 utils.users.get.queryOptions({ input: skipToken, queryHash: 'shared' })
 
+true satisfies Assert<
+  Equal<
+    Extract<
+      'queryKeyHashFn' | 'queryHash',
+      | keyof typeof infiniteOptions
+      | keyof typeof skippedInfinite
+      | keyof typeof conditionalInfiniteOptions
+      | keyof typeof streamedOptions
+      | keyof typeof liveOptions
+    >,
+    never
+  >
+>
+
+// @ts-expect-error QueryClient defaults own hashing.
+utils.events.watch.streamedOptions({ input: { channel: 'news' }, queryHash: 'shared' })
+// @ts-expect-error QueryClient defaults own hashing.
+utils.events.watch.liveOptions({ input: { channel: 'news' }, queryKeyHashFn: JSON.stringify })
+utils.users.pages.infiniteOptions({
+  initialPageParam: 0,
+  input: (cursor) => ({ cursor }),
+  getNextPageParam: () => undefined,
+  // @ts-expect-error QueryClient defaults own hashing.
+  queryKeyHashFn: JSON.stringify,
+})
+
 const UnknownRead = Rpc.make('payload.unknown', {
   payload: Schema.Unknown,
   success: Schema.String,
@@ -1698,16 +1750,23 @@ unknownStreamedKey satisfies readonly [
   'payload',
   'unknownWatch',
   'streamed',
-  JsonValue,
+  ...JsonValue[],
 ]
-anyStreamedKey satisfies readonly ['payload', 'rpc', 'payload', 'anyWatch', 'streamed', JsonValue]
+anyStreamedKey satisfies readonly [
+  'payload',
+  'rpc',
+  'payload',
+  'anyWatch',
+  'streamed',
+  ...JsonValue[],
+]
 optionalStreamedKey satisfies readonly [
   'payload',
   'rpc',
   'payload',
   'optionalWatch',
   'streamed',
-  JsonValue,
+  ...JsonValue[],
 ]
 unknownLiveKey satisfies readonly ['payload', 'rpc', 'payload', 'unknownWatch', 'live', JsonValue]
 anyLiveKey satisfies readonly ['payload', 'rpc', 'payload', 'anyWatch', 'live', JsonValue]
@@ -1722,6 +1781,17 @@ broadOptionalLiveKey satisfies readonly [
 queryClient.getQueryData(unknownStreamedKey) satisfies readonly string[] | undefined
 queryClient.getQueryData(anyStreamedKey) satisfies readonly string[] | undefined
 queryClient.getQueryData(optionalStreamedKey) satisfies readonly string[] | undefined
+const unknownBoundedStream = broadPayloadUtils.payload.unknownWatch.streamedKey(
+  { id: 1 },
+  { maxChunks: 2, refetchMode: 'append' },
+)
+queryClient.getQueryData(unknownBoundedStream) satisfies readonly string[] | undefined
+broadPayloadUtils.payload.anyWatch.streamedKey({ id: 1 }, { maxChunks: 2 })
+broadPayloadUtils.payload.optionalWatch.streamedKey(undefined, { refetchMode: 'replace' })
+// @ts-expect-error Unknown accumulated keys require constructor input
+broadPayloadUtils.payload.unknownWatch.streamedKey()
+// @ts-expect-error Any accumulated keys require constructor input
+broadPayloadUtils.payload.anyWatch.streamedKey()
 queryClient.getQueryData(unknownLiveKey) satisfies string | undefined
 queryClient.getQueryData(anyLiveKey) satisfies string | undefined
 queryClient.getQueryData(broadOptionalLiveKey) satisfies string | undefined
@@ -1814,7 +1884,9 @@ broadPayloadUtils.payload.voidWatch.streamedKey() satisfies readonly [
   'payload',
   'voidWatch',
   'streamed',
+  ...JsonValue[],
 ]
+broadPayloadUtils.payload.voidWatch.streamedKey({ maxChunks: 2, refetchMode: 'append' })
 broadPayloadUtils.payload.voidWatch.liveKey() satisfies readonly [
   'payload',
   'rpc',

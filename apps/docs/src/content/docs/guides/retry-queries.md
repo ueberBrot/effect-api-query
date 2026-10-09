@@ -32,7 +32,7 @@ export class AuthenticationRequired extends Schema.TaggedError<AuthenticationReq
   {},
 ) {}
 export class RetryLater extends Schema.TaggedError<RetryLater>()('RetryLater', {
-  retryAfterMs: Schema.Number,
+  retryAfterMs: Schema.Finite,
 }) {}
 
 const ReadError = Schema.Union([NotFound, AuthenticationRequired, RetryLater])
