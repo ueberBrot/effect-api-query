@@ -9,18 +9,12 @@ Immediate dependency upgrades provide too little time to observe supply-chain in
 ## Decision
 
 pnpm enforces a strict seven-day minimum release age, frozen lockfiles in CI, and explicit
-lifecycle-script permissions. Missing registry publication times fail closed. The same policy
-applies to workspace packages, examples, CI, and isolated consumers. Lockfile verification stays
-enabled so frozen and cached installations also reject ineligible versions.
+lifecycle-script permissions. Missing registry publication times fail closed. The same native
+workspace settings apply to isolated consumers; frozen and cached installs remain subject to
+registry publication metadata.
 
 ## Consequences
 
-No release-age exceptions, exclusions, configuration overrides, alternate installers, or missing-time
-bypasses are allowed. An ineligible version remains blocked until its registry publication is seven
-days old. Record its next eligibility time and continue independent work with eligible dependencies.
-Existing version-resolution overrides remain valid when they preserve this policy.
-
-Locally built project tarballs can be verified before publication; their registry dependencies still
-obey the quarantine. External installation of a newly published version waits for that version's
-own seven-day eligibility. See the [install policy](../agents/install-policy.md) for consumer setup
-and verification.
+Every registry version becomes eligible seven days after publication. Release-age exceptions,
+exclusions, configuration overrides, alternate installers, and missing-time bypasses are forbidden.
+Already-installed dependencies may be reused read-only while an ineligible version remains blocked.

@@ -9,8 +9,6 @@ on:
       - pnpm-lock.yaml
       - pnpm-workspace.yaml
       - scripts/verify-packed-consumer.mts
-      - scripts/install-policy.mts
-      - scripts/verify-install-policy.mts
       - vite.config.ts
   push:
     branches:

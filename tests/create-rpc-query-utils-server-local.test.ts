@@ -201,7 +201,6 @@ describe('server-local ready-client construction', () => {
       expect(
         error.cause.reasons.filter(Cause.isFailReason).map((reason) => reason.error),
       ).toStrictEqual(['declared-failure'])
-      // The default server policy collapses fatal defects; the local recipe keeps all reasons.
       failureCause = Cause.combine(
         Cause.fail('declared-failure' as const),
         Cause.die('fatal defect'),
