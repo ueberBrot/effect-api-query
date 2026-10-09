@@ -29,6 +29,10 @@ the workspace dependencies:
 pnpm install --frozen-lockfile
 ```
 
+The workspace enforces a strict seven-day quarantine for every registry dependency. Frozen
+lockfiles and cached packages remain subject to the same check, and missing publication times
+fail installation. Wait for rejected versions to become eligible; do not approve an exception.
+
 The workspace includes Vite+. If `vp` is not on your shell's PATH, prefix the commands below with
 `pnpm exec`, for example `pnpm exec vp run vite-react-dev`.
 
