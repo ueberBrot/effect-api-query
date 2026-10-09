@@ -9,7 +9,8 @@ that completes without emitting a value raises `EffectRpcQueryEmptyStreamError`.
 and `live` key segments prevent collisions with other query shapes and mutations; generated prefixes
 support invalidation.
 
-Live emissions normalize `undefined` to `null` under ADR 0012; accumulated elements remain
+Live emissions normalize `undefined` to `null` under
+[ADR 0012](0012-normalize-undefined-query-success-to-null.md); accumulated elements remain
 unchanged. On an initial fetch, the first emission makes either view successful while the open
 stream remains fetching. Live completion preserves the latest normalized value.
 
