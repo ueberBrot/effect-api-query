@@ -26,6 +26,7 @@ catalog:
 minimumReleaseAge: 10080
 minimumReleaseAgeStrict: true
 minimumReleaseAgeIgnoreMissingTime: false
+trustLockfile: false
 
 allowBuilds:
   'esbuild@0.28.2': true

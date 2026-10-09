@@ -38,6 +38,9 @@ jobs:
       - name: Verify formatting
         run: vp run format
 
+      - name: Verify dependency quarantine
+        run: vp run install-policy
+
       - name: Construct package prerequisite
         run: vp run pack
 

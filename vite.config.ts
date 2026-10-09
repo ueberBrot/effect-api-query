@@ -298,6 +298,10 @@ export default defineConfig({
         command: 'node scripts/verify-packed-consumer.mts',
         cache: false,
       },
+      'install-policy': {
+        command: 'node scripts/verify-install-policy.mts',
+        cache: false,
+      },
       'skills-check': {
         command: 'intent validate skills --check',
         cache: {
@@ -339,7 +343,13 @@ export default defineConfig({
         cache: false,
       },
       quality: {
-        command: ['vp run check', 'vp run effect-check', 'vp run fallow', 'vp run test'],
+        command: [
+          'vp run install-policy',
+          'vp run check',
+          'vp run effect-check',
+          'vp run fallow',
+          'vp run test',
+        ],
       },
       server: {
         command: 'vp run --filter @effect-api-query/server dev',
