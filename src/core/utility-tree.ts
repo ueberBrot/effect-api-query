@@ -212,15 +212,19 @@ const prepareQuery = (
   input: unknown,
   operationKey: readonly JsonValue[],
   keyEncoder: RuntimeKeyEncoder | undefined,
+  identity: readonly JsonValue[] = [],
 ): PreparedQuery => {
   if (description.input._tag === 'Inputless') {
-    return { input: undefined, key: operationKey }
+    return {
+      input: undefined,
+      key: identity.length === 0 ? operationKey : freezeKey([...operationKey, ...identity]),
+    }
   }
   const prepared = description.input.prepare(input, keyEncoder)
   try {
     return {
       input: prepared.input,
-      key: freezeKey([...operationKey, canonicalize(prepared.keyValue)]),
+      key: freezeKey([...operationKey, canonicalize(prepared.keyValue), ...identity]),
     }
   } catch (error) {
     throw description.input.invalidKey(error)
@@ -261,16 +265,22 @@ const createQueryBuilders = (
     options: Record<string, unknown>,
     requestOptions: unknown,
   ) => (input: unknown) => QueryFunction,
+  prepareIdentity?: (options: Record<string, unknown>) => readonly JsonValue[],
 ) => ({
-  key: (input?: unknown) => prepareQuery(description, input, operationKey, keyEncoder).key,
+  key: (input?: unknown, policy?: Record<string, unknown>) => {
+    const options = description.input._tag === 'Inputless' ? input : policy
+    const identity = prepareIdentity?.(Predicate.isObject(options) ? { ...options } : {}) ?? []
+    return prepareQuery(description, input, operationKey, keyEncoder, identity).key
+  },
   options: (argument?: unknown) => {
     const { input, options, requestOptions } = prepareQueryOptions(description, argument)
+    const identity = prepareIdentity?.(options) ?? []
     // Stream policy is consumed and validated even when execution will be skipped.
     const makeQuery = prepareExecution(options, requestOptions)
     if (description.input._tag !== 'Inputless' && input === skipToken) {
       return finalizeQueryOptions(options, operationKey, skipToken)
     }
-    const prepared = prepareQuery(description, input, operationKey, keyEncoder)
+    const prepared = prepareQuery(description, input, operationKey, keyEncoder, identity)
     return finalizeQueryOptions(options, prepared.key, makeQuery(prepared.input))
   },
 })
@@ -434,6 +444,7 @@ const createStreamingLeaf = (
     keyEncoder,
     (options, requestOptions) =>
       description.prepareStream(options, 'streamed', runPromiseExit, requestOptions),
+    description.streamedIdentity,
   )
 
   return Object.freeze({

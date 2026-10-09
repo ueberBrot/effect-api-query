@@ -8,6 +8,7 @@ description: Configuration, key-generation, and execution errors for RPC and HTT
 Thrown synchronously while configuring the utility tree or an option builder. Its `code` is one of:
 
 - `InvalidMaxChunks`: a streamed-query bound is not a positive safe integer.
+- `InvalidRefetchMode`: a streamed-query mode is not `reset`, `append`, or `replace`.
 - `InvalidKeyPrefix`
 - `InvalidRpcPath`
 - `RpcPathCollision`

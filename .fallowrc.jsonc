@@ -9,7 +9,8 @@
     "tests/packed-consumer/hashing-runtime.mts",
     "tests/packed-consumer/http-metadata-runtime.mts",
     "tests/packed-consumer/http-etag-recipe.mts",
-    "tests/packed-consumer/stream-cause-runtime.mts"
+    "tests/packed-consumer/stream-cause-runtime.mts",
+    "tests/packed-consumer/stream-policy-runtime.mts"
   ],
 
   "ignorePatterns": ["examples/tanstack-start/src/routeTree.gen.ts"],

@@ -15,6 +15,7 @@
     "hashing-runtime.mts",
     "runtime.mts",
     "stream-cause-runtime.mts",
+    "stream-policy-runtime.mts",
     "http-runtime.mts",
     "http-metadata-runtime.mts",
     "http-etag-recipe.mts",
