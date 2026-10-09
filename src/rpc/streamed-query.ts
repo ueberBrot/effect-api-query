@@ -1,6 +1,6 @@
 import { experimental_streamedQuery } from '@tanstack/query-core'
 import type { QueryFunctionContext } from '@tanstack/query-core'
-import { Cause, Exit, Predicate, Stream } from 'effect'
+import { Exit, Predicate, Stream } from 'effect'
 
 import type { StreamingOperation } from '../core/operation'
 import type { RunPromiseExit } from '../core/types'
@@ -115,7 +115,7 @@ const makeStreamQuery = ({
   const streamFn = async ({ signal }: { readonly signal: AbortSignal }) => {
     const stream = rpc.invoke(input, rpcOptions).pipe(
       Stream.catchCauseIf(
-        (cause) => !Cause.hasInterruptsOnly(cause),
+        () => !signal.aborted,
         (cause) => Stream.fail(new EffectRpcQueryError(rpc.tag, operation, cause)),
       ),
     )

@@ -13,6 +13,7 @@
   },
   "include": [
     "runtime.mts",
+    "stream-cause-runtime.mts",
     "http-runtime.mts",
     "public-contract.ts",
     "http-contract.ts",
