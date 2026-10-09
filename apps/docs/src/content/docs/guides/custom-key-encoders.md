@@ -23,6 +23,10 @@ const rpcQuery = createRpcQueryUtils(rpcGroup, {
 An encoder receives the normalized payload and must return a strict `JsonValue` synchronously. It
 must not reveal secrets. Return a stable public identifier, digest, or other safe semantic identity.
 
+Broad payload declarations such as `Schema.Unknown`, `Schema.Any`, and void-containing unions
+accept encoders too. Their default keys still require strict JSON: an accepted RPC input such as
+`undefined`, a bigint, or a class instance may require an encoder to supply JSON-safe identity.
+
 Define encoders as own enumerable properties keyed by literal payload-bearing RPC tags. TypeScript
 requires entries for unsafe payloads; the factory also rejects missing or unknown entries at runtime.
 

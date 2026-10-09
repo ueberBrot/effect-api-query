@@ -16,6 +16,12 @@ Each unary RPC leaf also exposes:
 | `mutationKey()`             | Immutable operation key shared by mutations of this RPC.                                                     |
 | `mutationOptions(options?)` | Fresh mutation options with generated `mutationFn` and `mutationKey`. Pass variables when the mutation runs. |
 
+Omitting `payload` or declaring `Schema.Void` makes an RPC payloadless. `Schema.Unknown`,
+`Schema.Any`, and unions containing `Schema.Void` remain payload-bearing: key builders accept their
+constructor input, query builders require an `input` field, and infinite queries require a page-input
+mapper. Mutation variables and custom encoders retain the declaration's input and normalized payload
+types, respectively.
+
 Payloadless query builders take no input. Payload-bearing builders require an `input` field:
 
 ```ts
@@ -42,6 +48,7 @@ Skipped options retain the exact sentinel and operation-level key.
 `queryOptions`, `streamedOptions`, and `liveOptions` accept conditional `input` unions of payload
 constructor input and `skipToken`. Concrete inputs retain callable query functions and
 payload-specific keys. Conditional inputs retain the possible sentinel and both key shapes.
+Inputs typed `unknown` or `any` can contain the sentinel and therefore return conditional options.
 
 `skipToken` is valid only for payload-bearing query options. It is not accepted by key or mutation
 builders, and skipped options are unsuitable for suspense and prefetch-only hooks.
