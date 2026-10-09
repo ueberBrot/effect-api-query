@@ -6,7 +6,8 @@
   "entry": [
     "apps/docs/public/package-version.js",
     "playwright.docs.config.ts",
-    "tests/packed-consumer/stream-cause-runtime.mts"
+    "tests/packed-consumer/stream-cause-runtime.mts",
+    "tests/packed-consumer/retry-runtime.mts"
   ],
 
   "ignorePatterns": ["examples/tanstack-start/src/routeTree.gen.ts"],

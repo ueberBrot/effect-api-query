@@ -28,6 +28,8 @@ These error classes distinguish failure stages:
 
 If a custom runner rejects instead of returning an `Exit`, its rejection passes through unchanged.
 See the [error reference](/effect-api-query/reference/errors/) for stable codes and metadata.
+Use [retry queries](/effect-api-query/guides/retry-queries/) for typed `Cause`/`Result` decisions,
+bounded attempt counts, and synchronous preparation errors.
 
 ## Inspect HTTP failures
 

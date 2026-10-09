@@ -71,6 +71,7 @@ export default defineConfig({
             { label: 'Cache Management', slug: 'guides/cache-management' },
             { label: 'Cancellation', slug: 'guides/cancellation' },
             { label: 'Handle Failures', slug: 'guides/handle-failures' },
+            { label: 'Retry Queries', slug: 'guides/retry-queries' },
             { label: 'Custom Key Encoders', slug: 'guides/custom-key-encoders' },
             { label: 'Conditional Queries', slug: 'guides/conditional-queries' },
           ],
