@@ -42,3 +42,34 @@ processing; it is not a serialized server Context and does not replace the suppl
 
 Manage authentication, middleware, transport setup, runtime services, and `Scope` in your
 application client and runtime.
+
+## Stream creation and consumption
+
+For an accumulated streamed RPC or live RPC query, the runner executes
+`Stream.toAsyncIterableEffect` to create an iterable and capture its Effect `Context`. The runner
+returns a successful `Exit` before Query Core pulls values. Iterator pulls then use that captured
+Context while the query remains fetching. Keep its services and the ready client's Scope alive
+until consumption finishes.
+
+Apply transformations to the stream returned by the ready client, before it reaches the utility
+tree. Use `Stream.map` for value changes, `Stream.mapEffect` for service-dependent work,
+`Stream.tap` for per-emission instrumentation, and `Stream.ensuring` for completion or cancellation
+cleanup. For RPC, wrap the streaming call at the ready-client boundary; preserve its payload,
+request options, and declared success/error types. For HTTP, retain the native client's response
+mode contract when applying a stream transformation.
+
+A timer, span, finalizer, or retry schedule around the runner's creation Effect ends with iterable
+creation. It does not wrap the later pulls. Put stream-lifetime instrumentation and recovery on the
+stream itself. A retry in generated Query options reruns the query function and creates another
+iterable. Coordinate it with stream and transport schedules as described in
+[retry queries](/effect-api-query/guides/retry-queries/#set-defaults-deliberately).
+
+At shutdown, cancel active queries, await application-owned stream finalization, clear the cache,
+and then dispose the runtime or close the client Scope. `cancelQueries` restores Query's cache
+state; iterator cleanup can finish asynchronously, so wait for your resource's completion signal
+before disposal. Settle pending mutations separately because they have no query abort signal.
+
+The [packed runner fixture](https://github.com/ueberBrot/effect-api-query/blob/main/tests/packed-consumer/retry-runtime.mts)
+checks both stream views: creation finishes before the first transformed emission, pulls and
+finalizers retain the runner's provided Context, and cancellation finalizes the stream before
+client disposal.

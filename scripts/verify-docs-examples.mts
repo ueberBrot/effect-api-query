@@ -4,14 +4,15 @@ import { strictEqual } from 'node:assert'
 import { readFileSync } from 'node:fs'
 
 for (const [page, fixture] of [
-  ['quick-start', 'docs-rpc-quick-start'],
-  ['http-quick-start', 'docs-http-quick-start'],
+  ['getting-started/quick-start', 'types/docs-rpc-quick-start'],
+  ['getting-started/http-quick-start', 'types/docs-http-quick-start'],
+  ['guides/retry-queries', 'packed-consumer/docs-retry'],
 ]) {
   const markdown = readFileSync(
-    new URL(`../apps/docs/src/content/docs/getting-started/${page}.md`, import.meta.url),
+    new URL(`../apps/docs/src/content/docs/${page}.md`, import.meta.url),
     'utf-8',
   )
-  const source = readFileSync(new URL(`../tests/types/${fixture}.ts`, import.meta.url), 'utf-8')
+  const source = readFileSync(new URL(`../tests/${fixture}.ts`, import.meta.url), 'utf-8')
   const samples = [...markdown.matchAll(/^```ts\n(?<source>[\s\S]*?)^```/gmu)]
   strictEqual(samples.length, 1, `${page} must contain its complete TypeScript fixture`)
   strictEqual(

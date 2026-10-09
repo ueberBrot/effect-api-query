@@ -1057,6 +1057,11 @@ type GetFailure = EffectHttpApiQueryError<
 const getUser = utils['user.accounts']['get.user']
 const nativeQuery = getUser.queryOptions({
   input,
+  retryDelay: (attemptIndex, error) => {
+    attemptIndex satisfies number
+    error satisfies GetFailure
+    return 0
+  },
   select: (user) => user.name,
   retry: (_count, error) => {
     error satisfies GetFailure
@@ -1192,6 +1197,11 @@ const userPages = getUser.infiniteOptions({
   },
   getPreviousPageParam: (_first, _pages, firstParam) =>
     firstParam > 0 ? firstParam - 1 : undefined,
+  retryDelay: (attemptIndex, error) => {
+    attemptIndex satisfies number
+    error satisfies GetFailure
+    return 0
+  },
   retry: (_count, error) => {
     error satisfies GetFailure
     return false
@@ -1336,6 +1346,11 @@ const inputlessPages = utils.ping.infiniteOptions({
 useInfiniteQuery(inputlessPages).data satisfies InfiniteData<null, number> | undefined
 
 const callbackMutation = getUser.mutationOptions({
+  retryDelay: (attemptIndex, error) => {
+    attemptIndex satisfies number
+    error satisfies GetFailure
+    return 0
+  },
   onMutate: (request) => ({ previousId: request.params.id }),
   onSuccess: (user, request, result) => {
     user satisfies typeof User.Type
