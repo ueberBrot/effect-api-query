@@ -14,8 +14,8 @@ commit links. Private examples remain outside versioning, and releases run only 
 
 ## Consequences
 
-While the package is unpublished at `0.0.0`, changes accumulate without Changesets. Prepare a single
-initial release candidate when publication is authorized.
+Before initial publication, changes accumulate without Changesets. Prepare a single initial release
+candidate when publication is authorized.
 
 After initial publication, changes to published behavior, types, exports, dependency ranges, or
 installation metadata require a non-empty changeset. Documentation, examples, tests, internal
