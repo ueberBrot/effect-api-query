@@ -13,6 +13,8 @@ its own `Type` or preserves encoded meaning across repeated construction.
 Query use requires a query-stable payload Schema. Standard struct-shaped payloads and materialized
 defaults are the supported path.
 
+Only a Void payload declaration is payloadless. Broader constructor types remain payload-bearing.
+
 ## Consequences
 
 Constructor-sensitive Schemas remain available to mutations. Query callers instead expose a stable

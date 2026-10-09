@@ -1,5 +1,5 @@
 import type { DataTag, QueryKey } from '@tanstack/query-core'
-import type { Context, Schema } from 'effect'
+import type { Context, Schema, SchemaAST } from 'effect'
 import type { Headers } from 'effect/http'
 import type { Rpc, RpcClient, RpcGroup, RpcSchema } from 'effect/rpc'
 
@@ -53,6 +53,10 @@ export type PayloadSchema<R extends Rpc.Any> =
     ? Payload
     : never
 
+export type PayloadlessRpc<R extends Rpc.Any> = [PayloadSchema<R>['ast']] extends [SchemaAST.Void]
+  ? true
+  : false
+
 /** Retains only streaming RPC definitions. */
 export type StreamingRpc<R extends Rpc.Any> =
   Rpc.SuccessSchema<R> extends RpcSchema.Stream<Schema.Top, Schema.Top> ? R : never
@@ -61,7 +65,7 @@ export type StreamingRpc<R extends Rpc.Any> =
 export type PayloadBearingRpcs<Group extends RpcGroup.Any> =
   RpcsOf<Group> extends infer R
     ? R extends Rpc.Any
-      ? void extends Rpc.PayloadConstructor<R>
+      ? PayloadlessRpc<R> extends true
         ? never
         : R
       : never
@@ -126,7 +130,7 @@ export type ConcreteQueryKey<
   R extends Rpc.Any,
   ClientError,
 > = DataTag<
-  void extends Rpc.PayloadConstructor<R>
+  PayloadlessRpc<R> extends true
     ? QueryOperationKey<Prefix, R>
     : readonly [...QueryOperationKey<Prefix, R>, JsonValue],
   QueryData<Rpc.Success<R>>,
@@ -149,11 +153,12 @@ export type QueryOptionsBuilder<
   EffectRpcQueryError<RpcFailure<R, ClientError>>,
   ConcreteQueryKey<Prefix, R, ClientError>,
   QueryOperationKey<Prefix, R>,
-  RpcOptionsInput
+  RpcOptionsInput,
+  PayloadlessRpc<R>
 >
 
 export type QueryKeyBuilder<R extends Rpc.Any, Prefix extends readonly JsonValue[], ClientError> =
-  void extends Rpc.PayloadConstructor<R>
+  PayloadlessRpc<R> extends true
     ? () => ConcreteQueryKey<Prefix, R, ClientError>
     : (input: Rpc.PayloadConstructor<R>) => ConcreteQueryKey<Prefix, R, ClientError>
 
@@ -168,7 +173,8 @@ export type ConcreteInfiniteKey<
   QueryData<Rpc.Success<R>>,
   EffectRpcQueryError<RpcFailure<R, ClientError>>,
   InfiniteOperationKey<Prefix, R>,
-  PageParam
+  PageParam,
+  PayloadlessRpc<R>
 >
 
 /** Supplies RPC payload and request-local options to the shared infinite query builder. */
@@ -181,7 +187,8 @@ export type InfiniteOptionsBuilder<
   QueryData<Rpc.Success<R>>,
   EffectRpcQueryError<RpcFailure<R, ClientError>>,
   InfiniteOperationKey<Prefix, R>,
-  RpcOptionsInput
+  RpcOptionsInput,
+  PayloadlessRpc<R>
 >
 
 export type InfiniteKeyBuilder<
@@ -189,7 +196,7 @@ export type InfiniteKeyBuilder<
   Prefix extends readonly JsonValue[],
   ClientError,
 > =
-  void extends Rpc.PayloadConstructor<R>
+  PayloadlessRpc<R> extends true
     ? () => ConcreteInfiniteKey<Prefix, R, ClientError>
     : (input: Rpc.PayloadConstructor<R>) => ConcreteInfiniteKey<Prefix, R, ClientError>
 
@@ -202,7 +209,7 @@ export type ConcreteStreamedKey<
   R extends Rpc.Any,
   ClientError,
 > = DataTag<
-  void extends Rpc.PayloadConstructor<R>
+  PayloadlessRpc<R> extends true
     ? StreamedOperationKey<Prefix, R>
     : readonly [...StreamedOperationKey<Prefix, R>, JsonValue],
   StreamedData<R>,
@@ -215,7 +222,7 @@ export type ConcreteLiveKey<
   R extends Rpc.Any,
   ClientError,
 > = DataTag<
-  void extends Rpc.PayloadConstructor<R>
+  PayloadlessRpc<R> extends true
     ? LiveOperationKey<Prefix, R>
     : readonly [...LiveOperationKey<Prefix, R>, JsonValue],
   QueryData<Rpc.SuccessChunk<R>>,
@@ -239,13 +246,15 @@ export type StreamingQueryBuilder<
   Key extends QueryKey,
   SkippedKey extends QueryKey,
   Policy = unknown,
+  Inputless extends boolean = void extends Input ? true : false,
 > = UnaryQueryBuilder<
   Input,
   Data,
   Error,
   Key,
   SkippedKey,
-  Policy & RpcOptionsInput<StreamingRpcOptions>
+  Policy & RpcOptionsInput<StreamingRpcOptions>,
+  Inputless
 >
 
 export type StreamedOptionsBuilder<
@@ -258,7 +267,8 @@ export type StreamedOptionsBuilder<
   EffectRpcQueryError<RpcStreamFailure<R, ClientError>>,
   ConcreteStreamedKey<Prefix, R, ClientError>,
   StreamedOperationKey<Prefix, R>,
-  StreamedPolicyOptions
+  StreamedPolicyOptions,
+  PayloadlessRpc<R>
 >
 
 export type LiveOptionsBuilder<
@@ -270,11 +280,13 @@ export type LiveOptionsBuilder<
   QueryData<Rpc.SuccessChunk<R>>,
   RpcLiveError<R, ClientError>,
   ConcreteLiveKey<Prefix, R, ClientError>,
-  LiveOperationKey<Prefix, R>
+  LiveOperationKey<Prefix, R>,
+  unknown,
+  PayloadlessRpc<R>
 >
 
 export type StreamKeyBuilder<R extends Rpc.Any, Key> =
-  void extends Rpc.PayloadConstructor<R> ? () => Key : (input: Rpc.PayloadConstructor<R>) => Key
+  PayloadlessRpc<R> extends true ? () => Key : (input: Rpc.PayloadConstructor<R>) => Key
 
 /** The key and option builders exposed at one streaming RPC path. */
 export interface RpcStreamLeaf<
@@ -380,9 +392,11 @@ export type RpcQueryUtils<
 export type NeedsKeyEncoder<R extends Rpc.Any> = [PayloadSchema<R>['EncodingServices']] extends [
   never,
 ]
-  ? true extends ContainsRedacted<Rpc.Payload<R>>
-    ? true
-    : false
+  ? PayloadSchema<R>['ast'] extends SchemaAST.Any | SchemaAST.Unknown
+    ? false
+    : true extends ContainsRedacted<Rpc.Payload<R>>
+      ? true
+      : false
   : true
 
 /** Selects RPCs whose default key encoding is unsafe or cannot run synchronously. */
