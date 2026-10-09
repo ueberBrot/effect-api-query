@@ -38,6 +38,7 @@
               "examples/server/src/web-handler.ts",
               "examples/server/tests/http-api.test.ts",
               "examples/server/tests/server.test.ts",
+              "examples/server/tests/rpc-transport-overhead.test.ts",
               "examples/tanstack-start/src/lib/application.ts",
               "examples/tanstack-start/tests/server-render.test.tsx",
               "examples/vite-react/src/lib/application.ts",
@@ -48,6 +49,7 @@
               "tests/http-*.test.ts",
               "tests/fixtures/effect-rpc.ts",
               "tests/fixtures/server-local-rpc.ts",
+              "tests/fixtures/rpc-transport-queries.ts",
               "tests/fixtures/http-client.ts",
               "tests/types/**/*.ts"
             ],
