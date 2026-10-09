@@ -1,10 +1,4 @@
-import type {
-  DataTag,
-  InfiniteData,
-  MutationObserverOptions,
-  QueryFunction,
-  SkipToken,
-} from '@tanstack/query-core'
+import type { DataTag } from '@tanstack/query-core'
 import type { Brand, Effect, Schema } from 'effect'
 import type {
   HttpApi,
@@ -16,17 +10,13 @@ import type {
 
 import type {
   ContainsRedacted,
+  InfiniteQueryBuilder,
+  InfiniteQueryKey,
   UnaryQueryBuilder,
-  InfiniteInput,
-  InfiniteOptions,
   JsonValue,
-  MutationOptions,
-  OwnedMutationOption,
-  OwnedQueryOption,
+  MutationBuilder,
   QueryData,
   RunPromiseExit,
-  WithDefinedInitialData,
-  WithUndefinedInitialData,
 } from '../core/types'
 import type { EffectHttpApiQueryError } from './errors'
 
@@ -43,12 +33,21 @@ export type MultipartPayload =
   | Brand.Brand<HttpApiSchema.MultipartTypeId>
   | Brand.Brand<HttpApiSchema.MultipartStreamTypeId>
 
-/** Omits the complete endpoint when any declared alternative requires streaming or multipart. */
+/** Omits the complete endpoint when any success or multipart payload alternative streams. */
 export type Supported<Endpoint> = Endpoint extends HttpApiEndpoint.ConstraintRequest
   ? [Extract<ResponseBody<Endpoint['~Success']>, HttpApiSchema.StreamSchema>] extends [never]
-    ? [Extract<Endpoint['~Payload']['Type'], MultipartPayload>] extends [never]
+    ? [
+        Extract<Endpoint['~Payload']['Type'], Brand.Brand<HttpApiSchema.MultipartStreamTypeId>>,
+      ] extends [never]
       ? Endpoint
       : never
+    : never
+  : never
+
+/** Retains the endpoints whose requests can have canonical query identity. */
+export type Queryable<Endpoint> = Endpoint extends HttpApiEndpoint.ConstraintRequest
+  ? [Extract<Endpoint['~Payload']['Type'], MultipartPayload>] extends [never]
+    ? Endpoint
     : never
   : never
 
@@ -186,181 +185,58 @@ export type ConcreteInfiniteKey<
   Key extends readonly JsonValue[],
   ClientError,
   PageParam = unknown,
-> = DataTag<
-  void extends Request<Endpoint>
-    ? readonly [...Key, 'infinite']
-    : readonly [...Key, 'infinite', JsonValue],
-  InfiniteData<QueryData<Success<Endpoint>>, PageParam>,
-  Failure<ClientError>
->
-
-export type InfiniteQueryInput<
-  Endpoint extends HttpApiEndpoint.ConstraintRequest,
-  Key extends readonly JsonValue[],
-  ClientError,
-  Selected,
-  PageParam,
-> = InfiniteInput<
+> = InfiniteQueryKey<
+  Request<Endpoint>,
   QueryData<Success<Endpoint>>,
   Failure<ClientError>,
-  Selected,
-  ConcreteInfiniteKey<Endpoint, Key, ClientError, PageParam>,
-  PageParam
-> &
-  (void extends Request<Endpoint>
-    ? unknown
-    : { readonly input: (pageParam: PageParam) => Request<Endpoint> })
-
-export type InfiniteQueryOptions<
-  Endpoint extends HttpApiEndpoint.ConstraintRequest,
-  Key extends readonly JsonValue[],
-  ClientError,
-  Selected,
-  PageParam,
-> = InfiniteOptions<
-  QueryData<Success<Endpoint>>,
-  Failure<ClientError>,
-  Selected,
-  ConcreteInfiniteKey<Endpoint, Key, ClientError, PageParam>,
-  PageParam
->
-
-export type SkippedInfiniteOptions<
-  Endpoint extends HttpApiEndpoint.ConstraintRequest,
-  Key extends readonly JsonValue[],
-  ClientError,
-  Selected,
-  PageParam,
-> = InfiniteOptions<
-  QueryData<Success<Endpoint>>,
-  Failure<ClientError>,
-  Selected,
   readonly [...Key, 'infinite'],
-  PageParam,
-  SkipToken
+  PageParam
 >
 
-export type ConditionalInfiniteKey<
-  Endpoint extends HttpApiEndpoint.ConstraintRequest,
-  Key extends readonly JsonValue[],
-  ClientError,
-  PageParam,
-> = ConcreteInfiniteKey<Endpoint, Key, ClientError, PageParam> | readonly [...Key, 'infinite']
-
-export type ConditionalInfiniteOptions<
-  Endpoint extends HttpApiEndpoint.ConstraintRequest,
-  Key extends readonly JsonValue[],
-  ClientError,
-  Selected,
-  PageParam,
-> = InfiniteOptions<
-  QueryData<Success<Endpoint>>,
-  Failure<ClientError>,
-  Selected,
-  ConditionalInfiniteKey<Endpoint, Key, ClientError, PageParam>,
-  PageParam,
-  | QueryFunction<
-      QueryData<Success<Endpoint>>,
-      ConditionalInfiniteKey<Endpoint, Key, ClientError, PageParam>,
-      PageParam
-    >
-  | SkipToken
->
-
+/** Supplies decoded HTTP requests to the shared infinite query builder. */
 export type InfiniteBuilder<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Key extends readonly JsonValue[],
   ClientError,
-> = {
-  <PageParam, Selected = InfiniteData<QueryData<Success<Endpoint>>, PageParam>>(
-    options: WithDefinedInitialData<
-      InfiniteQueryInput<Endpoint, Key, ClientError, Selected, PageParam>,
-      InfiniteData<QueryData<Success<Endpoint>>, PageParam>
-    >,
-  ): WithDefinedInitialData<
-    InfiniteQueryOptions<Endpoint, Key, ClientError, Selected, PageParam>,
-    InfiniteData<QueryData<Success<Endpoint>>, PageParam>
-  >
-  <PageParam, Selected = InfiniteData<QueryData<Success<Endpoint>>, PageParam>>(
-    options: WithUndefinedInitialData<
-      InfiniteQueryInput<Endpoint, Key, ClientError, Selected, PageParam>,
-      InfiniteData<QueryData<Success<Endpoint>>, PageParam>
-    >,
-  ): InfiniteQueryOptions<Endpoint, Key, ClientError, Selected, PageParam>
-} & (void extends Request<Endpoint>
-  ? unknown
-  : {
-      <PageParam, Selected = InfiniteData<QueryData<Success<Endpoint>>, PageParam>>(
-        options: WithDefinedInitialData<
-          Omit<
-            SkippedInfiniteOptions<Endpoint, Key, ClientError, Selected, PageParam>,
-            OwnedQueryOption
-          >,
-          InfiniteData<QueryData<Success<Endpoint>>, PageParam>
-        > & { readonly input: SkipToken },
-      ): WithDefinedInitialData<
-        SkippedInfiniteOptions<Endpoint, Key, ClientError, Selected, PageParam>,
-        InfiniteData<QueryData<Success<Endpoint>>, PageParam>
-      >
-      <PageParam, Selected = InfiniteData<QueryData<Success<Endpoint>>, PageParam>>(
-        options: Omit<
-          SkippedInfiniteOptions<Endpoint, Key, ClientError, Selected, PageParam>,
-          OwnedQueryOption
-        > & { readonly input: SkipToken },
-      ): SkippedInfiniteOptions<Endpoint, Key, ClientError, Selected, PageParam>
-      <PageParam, Selected = InfiniteData<QueryData<Success<Endpoint>>, PageParam>>(
-        options: WithDefinedInitialData<
-          Omit<
-            ConditionalInfiniteOptions<Endpoint, Key, ClientError, Selected, PageParam>,
-            OwnedQueryOption
-          >,
-          InfiniteData<QueryData<Success<Endpoint>>, PageParam>
-        > & { readonly input: ((pageParam: PageParam) => Request<Endpoint>) | SkipToken },
-      ): WithDefinedInitialData<
-        ConditionalInfiniteOptions<Endpoint, Key, ClientError, Selected, PageParam>,
-        InfiniteData<QueryData<Success<Endpoint>>, PageParam>
-      >
-      <PageParam, Selected = InfiniteData<QueryData<Success<Endpoint>>, PageParam>>(
-        options: Omit<
-          ConditionalInfiniteOptions<Endpoint, Key, ClientError, Selected, PageParam>,
-          OwnedQueryOption
-        > & { readonly input: ((pageParam: PageParam) => Request<Endpoint>) | SkipToken },
-      ): ConditionalInfiniteOptions<Endpoint, Key, ClientError, Selected, PageParam>
-    })
+> = InfiniteQueryBuilder<
+  Request<Endpoint>,
+  QueryData<Success<Endpoint>>,
+  Failure<ClientError>,
+  readonly [...Key, 'infinite']
+>
 
-export type Leaf<
+export type MutationLeaf<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Key extends readonly JsonValue[],
   ClientError,
 > = {
   readonly key: () => Key
-  readonly queryKey: void extends Request<Endpoint>
-    ? () => ConcreteKey<Endpoint, Key, ClientError>
-    : (input: Request<Endpoint>) => ConcreteKey<Endpoint, Key, ClientError>
-  readonly queryOptions: QueryBuilder<Endpoint, Key, ClientError>
-  readonly infiniteKey: void extends Request<Endpoint>
-    ? () => ConcreteInfiniteKey<Endpoint, Key, ClientError>
-    : (input: Request<Endpoint>) => ConcreteInfiniteKey<Endpoint, Key, ClientError>
-  readonly infiniteOptions: InfiniteBuilder<Endpoint, Key, ClientError>
   readonly mutationKey: () => readonly [...Key, 'mutation']
-  readonly mutationOptions: <OnMutateResult = unknown>(
-    options?: Omit<
-      MutationObserverOptions<
-        Success<Endpoint>,
-        Failure<ClientError>,
-        Request<Endpoint>,
-        OnMutateResult
-      >,
-      OwnedMutationOption
-    >,
-  ) => MutationOptions<
+  readonly mutationOptions: MutationBuilder<
     Success<Endpoint>,
     Failure<ClientError>,
     Request<Endpoint>,
-    readonly [...Key, 'mutation'],
-    OnMutateResult
+    readonly [...Key, 'mutation']
   >
 }
+
+export type Leaf<
+  Endpoint extends HttpApiEndpoint.ConstraintRequest,
+  Key extends readonly JsonValue[],
+  ClientError,
+> = MutationLeaf<Endpoint, Key, ClientError> &
+  ([Queryable<Endpoint>] extends [never]
+    ? unknown
+    : {
+        readonly queryKey: void extends Request<Endpoint>
+          ? () => ConcreteKey<Endpoint, Key, ClientError>
+          : (input: Request<Endpoint>) => ConcreteKey<Endpoint, Key, ClientError>
+        readonly queryOptions: QueryBuilder<Endpoint, Key, ClientError>
+        readonly infiniteKey: void extends Request<Endpoint>
+          ? () => ConcreteInfiniteKey<Endpoint, Key, ClientError>
+          : (input: Request<Endpoint>) => ConcreteInfiniteKey<Endpoint, Key, ClientError>
+        readonly infiniteOptions: InfiniteBuilder<Endpoint, Key, ClientError>
+      })
 
 /** An eager utility tree mirroring the ready HTTP client's literal properties. */
 export type HttpApiQueryUtils<
@@ -399,7 +275,7 @@ export type HttpApiKeyEncoder<Endpoint extends HttpApiEndpoint.ConstraintRequest
 ) => JsonValue
 
 export type InputEndpoints<Group> =
-  Supported<Endpoints<Group>> extends infer Endpoint
+  Queryable<Supported<Endpoints<Group>>> extends infer Endpoint
     ? Endpoint extends HttpApiEndpoint.ConstraintRequest
       ? void extends Request<Endpoint>
         ? never

@@ -1,29 +1,17 @@
-import type {
-  DataTag,
-  InfiniteData,
-  MutationObserverOptions,
-  QueryKey,
-  SkipToken,
-} from '@tanstack/query-core'
+import type { DataTag, QueryKey } from '@tanstack/query-core'
 import type { Context, Schema } from 'effect'
 import type { Headers } from 'effect/http'
 import type { Rpc, RpcClient, RpcGroup, RpcSchema } from 'effect/rpc'
 
 import type {
   ContainsRedacted,
+  InfiniteQueryBuilder,
+  InfiniteQueryKey,
   UnaryQueryBuilder,
   JsonValue,
   QueryData,
   RunPromiseExit,
-  OwnedQueryOption,
-  OwnedMutationOption,
-  WithDefinedInitialData,
-  WithUndefinedInitialData,
-  QueryInput,
-  QueryOptions,
-  InfiniteInput,
-  InfiniteOptions,
-  MutationOptions,
+  MutationBuilder,
 } from '../core/types'
 import type { EffectRpcQueryEmptyStreamError, EffectRpcQueryError } from './errors'
 
@@ -150,20 +138,6 @@ export type MutationKey<Prefix extends readonly JsonValue[], R extends Rpc.Any> 
   'mutation',
 ]
 
-/** Mutation options generated for one unary RPC. */
-export type RpcMutationOptions<
-  R extends Rpc.Any,
-  Prefix extends readonly JsonValue[],
-  ClientError,
-  OnMutateResult = unknown,
-> = MutationOptions<
-  Rpc.Success<R>,
-  EffectRpcQueryError<RpcFailure<R, ClientError>>,
-  Rpc.PayloadConstructor<R>,
-  MutationKey<Prefix, R>,
-  OnMutateResult
->
-
 /** Supplies RPC inference to the shared unary query builder. */
 export type QueryOptionsBuilder<
   R extends Rpc.Any,
@@ -189,87 +163,26 @@ export type ConcreteInfiniteKey<
   R extends Rpc.Any,
   ClientError,
   PageParam = unknown,
-> = DataTag<
-  void extends Rpc.PayloadConstructor<R>
-    ? InfiniteOperationKey<Prefix, R>
-    : readonly [...InfiniteOperationKey<Prefix, R>, JsonValue],
-  InfiniteData<QueryData<Rpc.Success<R>>, PageParam>,
-  EffectRpcQueryError<RpcFailure<R, ClientError>>
->
-
-/** Infinite-query inputs after removing fields owned by this package. */
-export type InfiniteInputOptions<
-  R extends Rpc.Any,
-  Prefix extends readonly JsonValue[],
-  ClientError,
-  Selected,
-  PageParam,
-> = InfiniteInput<
+> = InfiniteQueryKey<
+  Rpc.PayloadConstructor<R>,
   QueryData<Rpc.Success<R>>,
   EffectRpcQueryError<RpcFailure<R, ClientError>>,
-  Selected,
-  ConcreteInfiniteKey<Prefix, R, ClientError, PageParam>,
-  PageParam,
-  RpcOptionsInput
->
-
-/** Infinite-query options generated for one unary RPC. */
-export type RpcInfiniteOptions<
-  R extends Rpc.Any,
-  Prefix extends readonly JsonValue[],
-  ClientError,
-  Selected,
-  PageParam,
-> = InfiniteOptions<
-  QueryData<Rpc.Success<R>>,
-  EffectRpcQueryError<RpcFailure<R, ClientError>>,
-  Selected,
-  ConcreteInfiniteKey<Prefix, R, ClientError, PageParam>,
+  InfiniteOperationKey<Prefix, R>,
   PageParam
 >
 
-/** Query Core options returned when a payload-bearing infinite query uses `skipToken`. */
-export type SkippedRpcInfiniteOptions<
-  R extends Rpc.Any,
-  Prefix extends readonly JsonValue[],
-  ClientError,
-  PageParam,
-  Selected = InfiniteData<QueryData<Rpc.Success<R>>, PageParam>,
-> = InfiniteOptions<
-  QueryData<Rpc.Success<R>>,
-  EffectRpcQueryError<RpcFailure<R, ClientError>>,
-  Selected,
-  InfiniteOperationKey<Prefix, R>,
-  PageParam,
-  SkipToken
->
-
-/** Builds infinite-query options from page parameters or the exact skip sentinel. */
+/** Supplies RPC payload and request-local options to the shared infinite query builder. */
 export type InfiniteOptionsBuilder<
   R extends Rpc.Any,
   Prefix extends readonly JsonValue[],
   ClientError,
-> =
-  void extends Rpc.PayloadConstructor<R>
-    ? <PageParam, Selected = InfiniteData<QueryData<Rpc.Success<R>>, PageParam>>(
-        options: InfiniteInputOptions<R, Prefix, ClientError, Selected, PageParam>,
-      ) => RpcInfiniteOptions<R, Prefix, ClientError, Selected, PageParam>
-    : {
-        <PageParam, Selected = InfiniteData<QueryData<Rpc.Success<R>>, PageParam>>(
-          options: InfiniteInputOptions<R, Prefix, ClientError, Selected, PageParam> & {
-            readonly input: (pageParam: PageParam) => Rpc.PayloadConstructor<R>
-          },
-        ): RpcInfiniteOptions<R, Prefix, ClientError, Selected, PageParam>
-        <PageParam, Selected = InfiniteData<QueryData<Rpc.Success<R>>, PageParam>>(
-          options: Omit<
-            SkippedRpcInfiniteOptions<R, Prefix, ClientError, PageParam, Selected>,
-            OwnedQueryOption
-          > &
-            RpcOptionsInput & {
-              readonly input: SkipToken
-            },
-        ): SkippedRpcInfiniteOptions<R, Prefix, ClientError, PageParam, Selected>
-      }
+> = InfiniteQueryBuilder<
+  Rpc.PayloadConstructor<R>,
+  QueryData<Rpc.Success<R>>,
+  EffectRpcQueryError<RpcFailure<R, ClientError>>,
+  InfiniteOperationKey<Prefix, R>,
+  RpcOptionsInput
+>
 
 export type InfiniteKeyBuilder<
   R extends Rpc.Any,
@@ -318,7 +231,7 @@ export type StreamedPolicyOptions = {
   readonly maxChunks?: number
 }
 
-/** Shares initial-data and exact-skip inference across accumulated and live queries. */
+/** Shares query inference across accumulated and live queries, including conditional inputs. */
 export type StreamingQueryBuilder<
   Input,
   Data,
@@ -326,52 +239,14 @@ export type StreamingQueryBuilder<
   Key extends QueryKey,
   SkippedKey extends QueryKey,
   Policy = unknown,
-> = void extends Input
-  ? {
-      <Selected = Data>(
-        options: WithDefinedInitialData<
-          QueryInput<Data, Error, Selected, Key, Policy & RpcOptionsInput<StreamingRpcOptions>>,
-          Data
-        >,
-      ): WithDefinedInitialData<QueryOptions<Data, Error, Selected, Key>, Data>
-      <Selected = Data>(
-        options?: WithUndefinedInitialData<
-          QueryInput<Data, Error, Selected, Key, Policy & RpcOptionsInput<StreamingRpcOptions>>,
-          Data
-        >,
-      ): QueryOptions<Data, Error, Selected, Key>
-    }
-  : {
-      <Selected = Data>(
-        options: WithDefinedInitialData<
-          QueryInput<Data, Error, Selected, Key, Policy & RpcOptionsInput<StreamingRpcOptions>>,
-          Data
-        > & { readonly input: Input },
-      ): WithDefinedInitialData<QueryOptions<Data, Error, Selected, Key>, Data>
-      <Selected = Data>(
-        options: WithUndefinedInitialData<
-          QueryInput<Data, Error, Selected, Key, Policy & RpcOptionsInput<StreamingRpcOptions>>,
-          Data
-        > & { readonly input: Input },
-      ): QueryOptions<Data, Error, Selected, Key>
-      <Selected = Data>(
-        options: WithDefinedInitialData<
-          Omit<QueryOptions<Data, Error, Selected, SkippedKey, SkipToken>, OwnedQueryOption>,
-          Data
-        > &
-          Policy &
-          RpcOptionsInput<StreamingRpcOptions> & { readonly input: SkipToken },
-      ): WithDefinedInitialData<QueryOptions<Data, Error, Selected, SkippedKey, SkipToken>, Data>
-      <Selected = Data>(
-        options: Omit<
-          QueryOptions<Data, Error, Selected, SkippedKey, SkipToken>,
-          OwnedQueryOption
-        > &
-          Policy &
-          RpcOptionsInput<StreamingRpcOptions> & { readonly input: SkipToken },
-      ): QueryOptions<Data, Error, Selected, SkippedKey, SkipToken>
-      (token: SkipToken): QueryOptions<Data, Error, Data, SkippedKey, SkipToken>
-    }
+> = UnaryQueryBuilder<
+  Input,
+  Data,
+  Error,
+  Key,
+  SkippedKey,
+  Policy & RpcOptionsInput<StreamingRpcOptions>
+>
 
 export type StreamedOptionsBuilder<
   R extends Rpc.Any,
@@ -441,18 +316,13 @@ export interface RpcQueryLeaf<R extends Rpc.Any, Prefix extends readonly JsonVal
   readonly mutationKey: () => MutationKey<Prefix, R>
 
   /** Builds fresh Query Core mutation options without binding variables. */
-  readonly mutationOptions: <OnMutateResult = unknown>(
-    options?: Omit<
-      MutationObserverOptions<
-        Rpc.Success<R>,
-        EffectRpcQueryError<RpcFailure<R, ClientError>>,
-        Rpc.PayloadConstructor<R>,
-        OnMutateResult
-      >,
-      OwnedMutationOption
-    > &
-      RpcOptionsInput,
-  ) => RpcMutationOptions<R, Prefix, ClientError, OnMutateResult>
+  readonly mutationOptions: MutationBuilder<
+    Rpc.Success<R>,
+    EffectRpcQueryError<RpcFailure<R, ClientError>>,
+    Rpc.PayloadConstructor<R>,
+    MutationKey<Prefix, R>,
+    RpcOptionsInput
+  >
 
   /** Builds a semantic, data-tagged query key from constructor input. */
   readonly queryKey: QueryKeyBuilder<R, Prefix, ClientError>

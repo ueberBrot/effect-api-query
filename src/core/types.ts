@@ -1,4 +1,6 @@
 import type {
+  DataTag,
+  InfiniteData,
   InfiniteQueryObserverOptions,
   InitialDataFunction,
   MutationObserverOptions,
@@ -120,9 +122,9 @@ export type UnaryQueryBuilder<
           AdapterOptions & { readonly input: SkipToken },
       ): WithDefinedInitialData<QueryOptions<Data, Error, Selected, SkippedKey, SkipToken>, Data>
       <Selected = Data>(
-        options: Omit<
-          QueryOptions<Data, Error, Selected, SkippedKey, SkipToken>,
-          OwnedQueryOption
+        options: WithUndefinedInitialData<
+          Omit<QueryOptions<Data, Error, Selected, SkippedKey, SkipToken>, OwnedQueryOption>,
+          Data
         > &
           AdapterOptions & { readonly input: SkipToken },
       ): QueryOptions<Data, Error, Selected, SkippedKey, SkipToken>
@@ -137,9 +139,9 @@ export type UnaryQueryBuilder<
         Data
       >
       <Selected = Data>(
-        options: Omit<
-          ConditionalQueryOptions<Data, Error, Selected, Key | SkippedKey>,
-          OwnedQueryOption
+        options: WithUndefinedInitialData<
+          Omit<ConditionalQueryOptions<Data, Error, Selected, Key | SkippedKey>, OwnedQueryOption>,
+          Data
         > &
           AdapterOptions & { readonly input: Input | SkipToken },
       ): ConditionalQueryOptions<Data, Error, Selected, Key | SkippedKey>
@@ -169,6 +171,148 @@ export type InfiniteOptions<
   readonly queryKeyHashFn: QueryKeyHashFunction<Key>
 }
 
+/** Tags concrete infinite keys with their cached pages and inferred page parameter. */
+export type InfiniteQueryKey<
+  Input,
+  Data,
+  Error,
+  OperationKey extends readonly JsonValue[],
+  PageParam = unknown,
+> = DataTag<
+  void extends Input ? OperationKey : readonly [...OperationKey, JsonValue],
+  InfiniteData<Data, PageParam>,
+  Error
+>
+
+export type MappedInfiniteInput<
+  Input,
+  Data,
+  Error,
+  OperationKey extends readonly JsonValue[],
+  Selected,
+  PageParam,
+  AdapterOptions,
+> = InfiniteInput<
+  Data,
+  Error,
+  Selected,
+  InfiniteQueryKey<Input, Data, Error, OperationKey, PageParam>,
+  PageParam,
+  AdapterOptions
+> &
+  (void extends Input ? unknown : { readonly input: (pageParam: PageParam) => Input })
+
+export type ConditionalInfiniteOptions<
+  Data,
+  Error,
+  Selected,
+  Key extends QueryKey,
+  PageParam,
+> = InfiniteOptions<
+  Data,
+  Error,
+  Selected,
+  Key,
+  PageParam,
+  QueryFunction<Data, Key, PageParam> | SkipToken
+>
+
+/** Owns infinite-query inference while adapters supply request, data, error, and operation keys. */
+export type InfiniteQueryBuilder<
+  Input,
+  Data,
+  Error,
+  OperationKey extends readonly JsonValue[],
+  AdapterOptions = unknown,
+> = {
+  <PageParam, Selected = InfiniteData<Data, PageParam>>(
+    options: WithDefinedInitialData<
+      MappedInfiniteInput<Input, Data, Error, OperationKey, Selected, PageParam, AdapterOptions>,
+      InfiniteData<Data, PageParam>
+    >,
+  ): WithDefinedInitialData<
+    InfiniteOptions<
+      Data,
+      Error,
+      Selected,
+      InfiniteQueryKey<Input, Data, Error, OperationKey, PageParam>,
+      PageParam
+    >,
+    InfiniteData<Data, PageParam>
+  >
+  <PageParam, Selected = InfiniteData<Data, PageParam>>(
+    options: WithUndefinedInitialData<
+      MappedInfiniteInput<Input, Data, Error, OperationKey, Selected, PageParam, AdapterOptions>,
+      InfiniteData<Data, PageParam>
+    >,
+  ): InfiniteOptions<
+    Data,
+    Error,
+    Selected,
+    InfiniteQueryKey<Input, Data, Error, OperationKey, PageParam>,
+    PageParam
+  >
+} & (void extends Input
+  ? unknown
+  : {
+      <PageParam, Selected = InfiniteData<Data, PageParam>>(
+        options: WithDefinedInitialData<
+          InfiniteInput<Data, Error, Selected, OperationKey, PageParam, AdapterOptions>,
+          InfiniteData<Data, PageParam>
+        > & { readonly input: SkipToken },
+      ): WithDefinedInitialData<
+        InfiniteOptions<Data, Error, Selected, OperationKey, PageParam, SkipToken>,
+        InfiniteData<Data, PageParam>
+      >
+      <PageParam, Selected = InfiniteData<Data, PageParam>>(
+        options: WithUndefinedInitialData<
+          InfiniteInput<Data, Error, Selected, OperationKey, PageParam, AdapterOptions>,
+          InfiniteData<Data, PageParam>
+        > & { readonly input: SkipToken },
+      ): InfiniteOptions<Data, Error, Selected, OperationKey, PageParam, SkipToken>
+      <PageParam, Selected = InfiniteData<Data, PageParam>>(
+        options: WithDefinedInitialData<
+          InfiniteInput<
+            Data,
+            Error,
+            Selected,
+            InfiniteQueryKey<Input, Data, Error, OperationKey, PageParam> | OperationKey,
+            PageParam,
+            AdapterOptions
+          >,
+          InfiniteData<Data, PageParam>
+        > & { readonly input: ((pageParam: PageParam) => Input) | SkipToken },
+      ): WithDefinedInitialData<
+        ConditionalInfiniteOptions<
+          Data,
+          Error,
+          Selected,
+          InfiniteQueryKey<Input, Data, Error, OperationKey, PageParam> | OperationKey,
+          PageParam
+        >,
+        InfiniteData<Data, PageParam>
+      >
+      <PageParam, Selected = InfiniteData<Data, PageParam>>(
+        options: WithUndefinedInitialData<
+          InfiniteInput<
+            Data,
+            Error,
+            Selected,
+            InfiniteQueryKey<Input, Data, Error, OperationKey, PageParam> | OperationKey,
+            PageParam,
+            AdapterOptions
+          >,
+          InfiniteData<Data, PageParam>
+        > & { readonly input: ((pageParam: PageParam) => Input) | SkipToken },
+      ): ConditionalInfiniteOptions<
+        Data,
+        Error,
+        Selected,
+        InfiniteQueryKey<Input, Data, Error, OperationKey, PageParam> | OperationKey,
+        PageParam
+      >
+    })
+
 export type MutationOptions<Data, Error, Input, Key extends QueryKey, OnMutateResult> = Omit<
   MutationObserverOptions<Data, Error, Input, OnMutateResult>,
   OwnedMutationOption
@@ -176,6 +320,14 @@ export type MutationOptions<Data, Error, Input, Key extends QueryKey, OnMutateRe
   readonly mutationFn: (variables: Input) => Promise<Data>
   readonly mutationKey: Key
 }
+
+/** Owns mutation callback inference while adapters supply their request and execution types. */
+export type MutationBuilder<Data, Error, Input, Key extends QueryKey, AdapterOptions = unknown> = <
+  OnMutateResult = unknown,
+>(
+  options?: Omit<MutationObserverOptions<Data, Error, Input, OnMutateResult>, OwnedMutationOption> &
+    AdapterOptions,
+) => MutationOptions<Data, Error, Input, Key, OnMutateResult>
 
 // Generic function comparison tests exact type identity, not a callable API.
 /* oxlint-disable typescript/no-unnecessary-type-parameters */

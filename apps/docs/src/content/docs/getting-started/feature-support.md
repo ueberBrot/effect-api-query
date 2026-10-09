@@ -14,13 +14,16 @@ responsibilities, deferred operations, and missing upstream integration points.
 ## Pick the operation
 
 Use ordinary queries for cached reads, infinite queries for pagination, and mutations for commands.
-Both adapters generate these builders for every retained unary operation, so choose the one that
-fits each call. Writes refresh cached reads only when your application invalidates the affected keys.
+Unary RPCs and buffered HTTP endpoints without multipart provide all three builders. Buffered
+multipart HTTP endpoints provide mutations only. Writes refresh cached reads only when your
+application invalidates the affected keys.
 
 RPC streams also have `streamedOptions` to accumulate values and `liveOptions` to retain the latest
-value. HTTP streams, multipart uploads, and raw-response modes are deferred. The factory omits an
-HTTP endpoint from the generated utility tree if it has any streaming success or multipart request
-alternative.
+value. Buffered multipart HTTP uploads accept explicit `FormData` through `mutationOptions`;
+see [upload a file](/effect-api-query/guides/http-queries-and-mutations/#upload-a-file).
+HTTP streams, streaming multipart, and raw-response modes are deferred. The factory omits an
+HTTP endpoint from the generated utility tree if it has any streaming success or streaming multipart
+request alternative.
 
 ## Plan application ownership
 

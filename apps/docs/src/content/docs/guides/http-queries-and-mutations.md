@@ -134,6 +134,49 @@ Both builders return decoded response data. Successful `undefined` query data be
 mutation results retain `undefined`. Inspect execution failures with
 [`isEffectHttpApiQueryError`](/effect-api-query/guides/handle-failures/#inspect-http-failures).
 
+## Upload a file
+
+Declare a buffered multipart payload in your shared API definition. For example, add this endpoint
+to the `users` group and include it in the server implementation:
+
+```ts
+import { Schema } from 'effect'
+import { Multipart } from 'effect/http'
+import { HttpApiEndpoint, HttpApiSchema } from 'effect/http-api'
+
+const upload = HttpApiEndpoint.post('upload', '/users/:id/files', {
+  params: { id: Schema.Int },
+  payload: Schema.Struct({ file: Multipart.SingleFileSchema }).pipe(HttpApiSchema.asMultipart()),
+  success: Schema.Struct({ name: Schema.String }),
+})
+```
+
+Create the utilities from the updated API and ready client. This endpoint exposes `key()`,
+`mutationKey()`, and `mutationOptions()`. Build `FormData` explicitly and supply every other declared
+request container in its decoded type:
+
+```ts
+const uploadFile = new MutationObserver(
+  queryClient,
+  http.users.upload.mutationOptions({
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: http.users.key() }),
+  }),
+)
+
+const payload = new FormData()
+payload.set('file', new Blob(['profile notes'], { type: 'text/plain' }), 'notes.txt')
+const uploaded = await uploadFile.mutate({ params: { id: 1 }, payload })
+```
+
+The adapter forwards the `FormData` to the ready client and returns the decoded success. React
+applications can use these options with `useMutation`; callback variables retain the complete request
+type. Request encoding and middleware still use your application's client and runner.
+
+A buffered multipart alternative makes the whole endpoint mutation-only, even when it also accepts
+plain payloads. Mixed alternatives retain Effect's client request union. Leave the endpoint out of
+`keyEncoders`: mutation keys contain no request variables, and encoder entries are rejected. Any
+streaming success or streaming multipart alternative omits the whole endpoint.
+
 ## Keep cache entries separate
 
 Use generated keys for individual queries or whole branches:
@@ -149,9 +192,10 @@ If client middleware changes results by user or tenant, include a safe user or t
 [custom encoder](/effect-api-query/guides/custom-key-encoders/#http-requests) when request schemas
 need encoding services, contain redacted values, or allow multiple payload alternatives.
 
-Retained HTTP endpoints expose ordinary query, infinite query, and mutation builders regardless
-of HTTP method. Choose the builder for the operation you intend. Streaming responses and
-multipart requests are omitted; see the [HTTP factory reference](/effect-api-query/reference/http-factory/)
+Buffered HTTP endpoints without multipart expose ordinary query, infinite query, and mutation
+builders regardless of HTTP method. Choose the builder for the operation you intend. Buffered
+multipart endpoints expose mutations only. Streaming responses and streaming multipart requests
+are omitted; see the [HTTP factory reference](/effect-api-query/reference/http-factory/)
 for supported request formats and the complete builder contract.
 
 When your application or server request ends, cancel its active queries and clear its QueryClient

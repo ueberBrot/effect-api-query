@@ -20,7 +20,8 @@ controls its client, cache policies, and resource lifetime.
 
 ## What it provides
 
-- Queries and mutations for unary RPCs and buffered HTTP endpoints.
+- Queries and mutations for unary RPCs and buffered HTTP endpoints without multipart.
+- Mutations for buffered HTTP multipart uploads with explicit `FormData`.
 - Infinite and conditional queries for both adapters.
 - Accumulated streams and live queries for RPCs.
 - Semantic cache keys for prefetching, cache updates, and invalidation.

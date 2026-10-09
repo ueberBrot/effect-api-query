@@ -1,3 +1,4 @@
+import { QueryClient, type InfiniteData } from '@tanstack/query-core'
 import { Schema } from 'effect'
 import { createRpcQueryUtils, type RpcQueryUtils } from 'effect-api-query'
 import { Rpc, RpcClient, RpcGroup } from 'effect/rpc'
@@ -62,5 +63,12 @@ utils.scale['group-12'].get.mutationOptions()
 utils.scale['region-24'].users.get.queryKey({ id: 'user-24' })
 utils.scale['zone-36'].accounts.users.get.queryOptions({ input: { id: 'user-36' } })
 utils.scale['cluster-49'].organizations.accounts.users.get.mutationOptions()
+const pages = utils.scale['zone-36'].accounts.users.get.infiniteOptions({
+  initialPageParam: 0,
+  input: (page) => ({ id: `user-${page}` }),
+  getNextPageParam: (_page, _pages, cursor) => cursor + 1,
+})
+const cachedPages = new QueryClient().getQueryData(pages.queryKey)
+true satisfies Assert<Equal<typeof cachedPages, InfiniteData<string, number> | undefined>>
 
 void [allTagsPreserved, typedUtils]

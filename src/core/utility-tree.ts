@@ -1,9 +1,10 @@
 import { skipToken } from '@tanstack/query-core'
-import type { QueryKey } from '@tanstack/query-core'
+import type { QueryFunction, QueryKey } from '@tanstack/query-core'
 import { Effect, Exit, Predicate } from 'effect'
 import type { Cause } from 'effect'
 
 import type {
+  BufferedOperation,
   OperationDescription,
   RuntimeKeyEncoder,
   StreamingOperation,
@@ -207,7 +208,7 @@ const defineKey = (target: Record<string, unknown>, parts: readonly (JsonValue |
 
 // One preparation produces both the retained execution input and its immutable key.
 const prepareQuery = (
-  description: OperationDescription,
+  description: UnaryOperation | StreamingOperation,
   input: unknown,
   operationKey: readonly JsonValue[],
   keyEncoder: RuntimeKeyEncoder | undefined,
@@ -226,11 +227,7 @@ const prepareQuery = (
   }
 }
 
-const prepareQueryOptions = (
-  description: OperationDescription,
-  argument: unknown,
-  operationKey: readonly JsonValue[],
-) => {
+const prepareQueryOptions = (description: OperationDescription, argument: unknown) => {
   const options: Record<string, unknown> =
     argument === skipToken
       ? { input: skipToken }
@@ -238,15 +235,7 @@ const prepareQueryOptions = (
   const { input } = options
   delete options['input']
   const requestOptions = description.takeOptions(options)
-  if (description.input._tag !== 'Inputless' && input === skipToken) {
-    return {
-      _tag: 'Skipped' as const,
-      // The builder is invoked after finalizeQueryOptions has been initialized.
-      // oxlint-disable-next-line eslint/no-use-before-define
-      options: finalizeQueryOptions(options, operationKey, skipToken),
-    }
-  }
-  return { _tag: 'Executable' as const, input, options, requestOptions }
+  return { input, options, requestOptions }
 }
 
 const finalizeQueryOptions = <QueryFn>(
@@ -265,6 +254,28 @@ const finalizeQueryOptions = <QueryFn>(
   }
 }
 
+const createQueryBuilders = (
+  description: UnaryOperation | StreamingOperation,
+  operationKey: readonly JsonValue[],
+  keyEncoder: RuntimeKeyEncoder | undefined,
+  prepareExecution: (
+    options: Record<string, unknown>,
+    requestOptions: unknown,
+  ) => (input: unknown) => QueryFunction,
+) => ({
+  key: (input?: unknown) => prepareQuery(description, input, operationKey, keyEncoder).key,
+  options: (argument?: unknown) => {
+    const { input, options, requestOptions } = prepareQueryOptions(description, argument)
+    // Stream policy is consumed and validated even when execution will be skipped.
+    const makeQuery = prepareExecution(options, requestOptions)
+    if (description.input._tag !== 'Inputless' && input === skipToken) {
+      return finalizeQueryOptions(options, operationKey, skipToken)
+    }
+    const prepared = prepareQuery(description, input, operationKey, keyEncoder)
+    return finalizeQueryOptions(options, prepared.key, makeQuery(prepared.input))
+  },
+})
+
 const createInfiniteBuilders = (
   description: UnaryOperation,
   operationKey: readonly JsonValue[],
@@ -277,11 +288,10 @@ const createInfiniteBuilders = (
     prepareQuery(description, input, infiniteOperationKey, keyEncoder).key
 
   const infiniteOptions = (argument: Record<string, unknown>) => {
-    const supplied = prepareQueryOptions(description, argument, infiniteOperationKey)
-    if (supplied._tag === 'Skipped') {
-      return supplied.options
+    const { input, options, requestOptions } = prepareQueryOptions(description, argument)
+    if (description.input._tag !== 'Inputless' && input === skipToken) {
+      return finalizeQueryOptions(options, infiniteOperationKey, skipToken)
     }
-    const { input, options, requestOptions } = supplied
 
     const { initialPageParam } = options
     const inputForPage =
@@ -328,35 +338,12 @@ const createInfiniteBuilders = (
   return { infiniteKey, infiniteOptions }
 }
 
-const createUnaryLeaf = (
-  description: UnaryOperation,
-  keyParts: readonly (JsonValue | string)[],
-  keyEncoder: RuntimeKeyEncoder | undefined,
+const createMutationBuilders = (
+  description: BufferedOperation,
+  operationKey: readonly JsonValue[],
   runPromiseExit: RunPromiseExit<unknown>,
 ) => {
-  const operationKey = freezeKey(keyParts)
-  const queryOperationKey = freezeKey([...operationKey, 'query'])
   const mutationKey = freezeKey([...operationKey, 'mutation'])
-
-  const queryKey = (input?: unknown) =>
-    prepareQuery(description, input, queryOperationKey, keyEncoder).key
-
-  const queryOptions = (argument?: unknown) => {
-    const supplied = prepareQueryOptions(description, argument, queryOperationKey)
-    if (supplied._tag === 'Skipped') {
-      return supplied.options
-    }
-    const { input, options, requestOptions } = supplied
-
-    const prepared = prepareQuery(description, input, queryOperationKey, keyEncoder)
-
-    return finalizeQueryOptions(
-      options,
-      prepared.key,
-      async ({ signal }: { readonly signal: AbortSignal }) =>
-        execute(description, 'query', prepared.input, runPromiseExit, requestOptions, signal),
-    )
-  }
 
   const mutationOptions = (argument: Record<string, unknown> = {}) => {
     const options = { ...argument }
@@ -368,14 +355,45 @@ const createUnaryLeaf = (
       mutationKey,
     }
   }
+  return { mutationKey: () => mutationKey, mutationOptions }
+}
+
+const createMutationLeaf = (
+  description: BufferedOperation,
+  keyParts: readonly (JsonValue | string)[],
+  runPromiseExit: RunPromiseExit<unknown>,
+) => {
+  const operationKey = freezeKey(keyParts)
+  return Object.freeze({
+    key: () => operationKey,
+    ...createMutationBuilders(description, operationKey, runPromiseExit),
+  })
+}
+
+const createUnaryLeaf = (
+  description: UnaryOperation,
+  keyParts: readonly (JsonValue | string)[],
+  keyEncoder: RuntimeKeyEncoder | undefined,
+  runPromiseExit: RunPromiseExit<unknown>,
+) => {
+  const operationKey = freezeKey(keyParts)
+  const queryOperationKey = freezeKey([...operationKey, 'query'])
+  const query = createQueryBuilders(
+    description,
+    queryOperationKey,
+    keyEncoder,
+    (_options, requestOptions) =>
+      (input) =>
+      async ({ signal }: { readonly signal: AbortSignal }) =>
+        execute(description, 'query', input, runPromiseExit, requestOptions, signal),
+  )
 
   return Object.freeze({
     ...createInfiniteBuilders(description, operationKey, keyEncoder, runPromiseExit),
     key: () => operationKey,
-    mutationKey: () => mutationKey,
-    mutationOptions,
-    queryKey,
-    queryOptions,
+    ...createMutationBuilders(description, operationKey, runPromiseExit),
+    queryKey: query.key,
+    queryOptions: query.options,
   })
 }
 
@@ -388,36 +406,27 @@ const createStreamingLeaf = (
   const operationKey = freezeKey(keyParts)
   const liveOperationKey = freezeKey([...operationKey, 'live'])
   const streamedOperationKey = freezeKey([...operationKey, 'streamed'])
-  const liveKey = (input?: unknown) =>
-    prepareQuery(description, input, liveOperationKey, keyEncoder).key
-  const streamedKey = (input?: unknown) =>
-    prepareQuery(description, input, streamedOperationKey, keyEncoder).key
-
-  const buildOptions = (argument: unknown, operation: 'live' | 'streamed') => {
-    const streamOperationKey = operation === 'live' ? liveOperationKey : streamedOperationKey
-    const supplied = prepareQueryOptions(description, argument, streamOperationKey)
-    const { options } = supplied
-    const makeQuery = description.prepareStream(
-      options,
-      operation,
-      runPromiseExit,
-      supplied._tag === 'Executable' ? supplied.requestOptions : undefined,
-    )
-    if (supplied._tag === 'Skipped') {
-      return options
-    }
-    const prepared = prepareQuery(description, supplied.input, streamOperationKey, keyEncoder)
-    const queryFn = makeQuery(prepared.input)
-
-    return finalizeQueryOptions(options, prepared.key, queryFn)
-  }
+  const live = createQueryBuilders(
+    description,
+    liveOperationKey,
+    keyEncoder,
+    (options, requestOptions) =>
+      description.prepareStream(options, 'live', runPromiseExit, requestOptions),
+  )
+  const streamed = createQueryBuilders(
+    description,
+    streamedOperationKey,
+    keyEncoder,
+    (options, requestOptions) =>
+      description.prepareStream(options, 'streamed', runPromiseExit, requestOptions),
+  )
 
   return Object.freeze({
     key: () => operationKey,
-    liveKey,
-    liveOptions: (argument?: unknown) => buildOptions(argument, 'live'),
-    streamedKey,
-    streamedOptions: (argument?: unknown) => buildOptions(argument, 'streamed'),
+    liveKey: live.key,
+    liveOptions: live.options,
+    streamedKey: streamed.key,
+    streamedOptions: streamed.options,
   })
 }
 
@@ -437,7 +446,7 @@ const validateKeyEncoders = (
 ) => {
   const supportedIds = new Set(
     operations
-      .filter((operation) => operation.input._tag !== 'Inputless')
+      .filter((operation) => operation.kind !== 'Mutation' && operation.input._tag !== 'Inputless')
       .map((operation) => operation.id),
   )
   for (const id of keyEncoders.keys()) {
@@ -447,6 +456,7 @@ const validateKeyEncoders = (
   }
   for (const operation of operations) {
     if (
+      operation.kind !== 'Mutation' &&
       operation.input._tag === 'Input' &&
       operation.input.requiresEncoder &&
       !Predicate.isFunction(keyEncoders.get(operation.id))
@@ -484,10 +494,15 @@ const insertLeaf = (
   if (leafName === undefined) {
     throw new TypeError('Validated operation paths must have a leaf')
   }
+  const keyParts = [...prefix, ...segments]
+  if (operation.kind === 'Mutation') {
+    branch[leafName] = createMutationLeaf(operation, keyParts, runPromiseExit)
+    return
+  }
   branch[leafName] =
     operation.kind === 'Streaming'
-      ? createStreamingLeaf(operation, [...prefix, ...segments], keyEncoder, runPromiseExit)
-      : createUnaryLeaf(operation, [...prefix, ...segments], keyEncoder, runPromiseExit)
+      ? createStreamingLeaf(operation, keyParts, keyEncoder, runPromiseExit)
+      : createUnaryLeaf(operation, keyParts, keyEncoder, runPromiseExit)
 }
 
 const createTree = (

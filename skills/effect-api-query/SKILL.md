@@ -47,8 +47,10 @@ an eager, frozen utility tree without making a request.
 | Ordered RPC stream history | `streamedOptions({ input, maxChunks, refetchMode })`             | Ordinary query hooks or observers                             |
 | Latest RPC stream value    | `liveOptions({ input })`                                         | Ordinary query hooks or observers                             |
 
-Unary RPCs and buffered HTTP endpoints expose read, write, and pagination builders.
+Unary RPCs and buffered HTTP endpoints without multipart expose read, write, and pagination builders.
 Choose by application intent; HTTP method and RPC name do not restrict the choice.
+Buffered multipart HTTP endpoints expose mutation builders only and accept explicit `FormData`;
+follow the [HTTP rules](references/http.md) for upload input and encoder configuration.
 Streaming RPCs expose only accumulated and live query builders. Inputless
 operations omit `input`.
 

@@ -30,10 +30,11 @@ supplies the client, policy, or lifecycle. **Deferred** means the adapter does n
 
 | Capability                                        | RPC                                                                                                      | HTTP                                                                                        |
 | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| Ordinary queries and mutations                    | Generated for unary RPCs                                                                                 | Generated for buffered endpoints, regardless of method                                      |
-| Pagination                                        | Generated `infiniteOptions`; pages map to payloads                                                       | Generated `infiniteOptions`; pages map to complete decoded requests                         |
+| Ordinary queries and mutations                    | Generated for unary RPCs                                                                                 | Generated for buffered endpoints without multipart, regardless of method                    |
+| Pagination                                        | Generated `infiniteOptions`; pages map to payloads                                                       | Generated for buffered endpoints without multipart; pages map to decoded requests           |
 | Accumulated streams and live queries              | Generated for streaming RPCs; tested cancellation and SSR snapshots                                      | Deferred; any streaming success alternative omits the endpoint                              |
-| Multipart uploads                                 | Application-owned transport and payload contract                                                         | Deferred; any multipart request alternative omits the endpoint                              |
+| Buffered multipart uploads                        | Application-owned transport and payload contract                                                         | Generated mutation-only builders; application supplies `FormData`                           |
+| Streaming multipart                               | Application-owned transport and payload contract                                                         | Deferred; any streaming multipart request alternative omits the endpoint                    |
 | Raw HTTP response modes                           | Outside the RPC contract                                                                                 | Deferred; generated calls force decoded-only responses                                      |
 | Conditional queries                               | Generated `skipToken` support for input-bearing queries                                                  | Generated `skipToken` support for input-bearing queries                                     |
 | Cache keys and invalidation prefixes              | Generated `rpc` namespace and dotted tag paths                                                           | Generated `http` namespace, API identifier, and literal projected paths                     |
@@ -69,7 +70,8 @@ calls that do not need TanStack Query.
 - RPC and HTTP query successes that may be `undefined` become `null` because TanStack Query rejects
   `undefined` query data. Mutation results keep their original success type.
 - Cache identity must be strict JSON. Encoding services, redacted values, and multiple HTTP payload
-  alternatives require safe custom encoders. Binary request input needs a JSON-safe projection.
+  alternatives require safe custom encoders for endpoints with query support. Binary query input needs
+  a JSON-safe projection. Multipart mutation-only endpoints require no encoder and reject encoder entries.
 - Key encoders are synchronous; asynchronous and Effect-returning encoders are unsupported.
 - RPC payload Schemas must be query-stable because key preparation and ready-client execution
   construct the payload separately. HTTP builders accept decoded request input without RPC construction.

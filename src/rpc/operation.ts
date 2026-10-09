@@ -1,9 +1,9 @@
-import { Schema, SchemaAST } from 'effect'
+import { SchemaAST } from 'effect'
 import type { Rpc, RpcClient, RpcGroup } from 'effect/rpc'
 import { RpcSchema } from 'effect/rpc'
 
 import type { OperationDescription, OperationInput, TreeErrors } from '../core/operation'
-import { containsUnsafeKeyEncoding } from '../core/schema-key'
+import { createSchemaKeyEncoding } from '../core/schema-key'
 import { EffectRpcQueryConfigError, EffectRpcQueryError, EffectRpcQueryKeyError } from './errors'
 import { createStreamPreparation } from './streamed-query'
 
@@ -12,10 +12,11 @@ const createRpcInput = (definition: Rpc.AnyWithProps): OperationInput => {
   if (SchemaAST.isVoid(payloadSchema.ast)) {
     return { _tag: 'Inputless' }
   }
+  const keyEncoding = createSchemaKeyEncoding(payloadSchema)
 
   return {
     _tag: 'Input',
-    requiresEncoder: containsUnsafeKeyEncoding(payloadSchema.ast),
+    requiresEncoder: keyEncoding.requiresEncoder,
     pageInput: (input) => payloadSchema.make(input),
     invalidKey: (cause) =>
       new EffectRpcQueryKeyError(
@@ -38,16 +39,7 @@ const createRpcInput = (definition: Rpc.AnyWithProps): OperationInput => {
       }
       let keyValue: unknown
       try {
-        if (encoder) {
-          keyValue = encoder(normalized)
-        } else {
-          // SAFETY: Middleware requiring encoding services needs a custom encoder;
-          // the remaining payload schema can encode synchronously.
-          // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/no-chained-type-assertions
-          const encodingSchema = payloadSchema as unknown as Schema.ConstraintEncoder<unknown>
-          const encode = Schema.encodeUnknownSync(encodingSchema)
-          keyValue = encode(normalized)
-        }
+        keyValue = encoder ? encoder(normalized) : keyEncoding.encode(normalized)
       } catch (error) {
         throw new EffectRpcQueryKeyError(
           encoder ? 'KeyEncoderFailed' : 'PayloadEncodingFailed',

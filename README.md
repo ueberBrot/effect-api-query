@@ -58,15 +58,20 @@ for a complete declaration, client, query, and mutation.
 
 ## Choose an operation
 
-| API definition            | Available operations                          |
-| ------------------------- | --------------------------------------------- |
-| Unary RPC                 | Queries, infinite queries, and mutations      |
-| Streaming RPC             | Accumulated streamed queries and live queries |
-| Buffered HttpApi endpoint | Queries, infinite queries, and mutations      |
+| API definition                              | Available operations                          |
+| ------------------------------------------- | --------------------------------------------- |
+| Unary RPC                                   | Queries, infinite queries, and mutations      |
+| Streaming RPC                               | Accumulated streamed queries and live queries |
+| Buffered HttpApi endpoint without multipart | Queries, infinite queries, and mutations      |
+| Buffered HttpApi endpoint with multipart    | Mutations with `FormData`                     |
 
 Both factories generate keys for cache reads, writes, prefetching, and invalidation. Query functions
 forward cancellation to Effect. Mutations use TanStack's normal callbacks; invalidate affected
 queries in your application.
+
+For uploads, build `FormData` explicitly and pass it as mutation `payload`. See the
+[HTTP upload guide](https://ueberbrot.github.io/effect-api-query/guides/http-queries-and-mutations/#upload-a-file).
+Streaming HTTP responses and streaming multipart requests remain omitted.
 
 ## Integrate with your application
 

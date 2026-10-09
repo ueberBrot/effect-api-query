@@ -16,6 +16,7 @@ import {
   HttpClientRequest,
   HttpClientResponse,
   HttpServer,
+  Multipart,
 } from 'effect/http'
 import {
   HttpApi,
@@ -32,6 +33,11 @@ import { deepStrictEqual, equal, notDeepStrictEqual, ok, rejects } from 'node:as
 import { once } from 'node:events'
 import { createServer } from 'node:http'
 
+const UploadPayload = Schema.Struct({
+  name: Schema.String,
+  amount: Schema.NumberFromString,
+  file: Multipart.SingleFileSchema,
+}).pipe(HttpApiSchema.asMultipart())
 const api = HttpApi.make('packed-http').add(
   HttpApiGroup.make('compatibility').add(
     HttpApiEndpoint.get('read', '/value/:id', {
@@ -47,6 +53,28 @@ const api = HttpApi.make('packed-http').add(
   HttpApiGroup.make('other').add(HttpApiEndpoint.get('read', '/other', { success: Schema.String })),
   HttpApiGroup.make('system', { topLevel: true }).add(
     HttpApiEndpoint.get('empty', '/empty', { success: HttpApiSchema.NoContent }),
+  ),
+)
+const uploadApi = HttpApi.make('packed-uploads').add(
+  HttpApiGroup.make('files').add(
+    HttpApiEndpoint.post('upload', '/upload/:id', {
+      params: { id: Schema.NumberFromString },
+      query: { factor: Schema.NumberFromString },
+      headers: { 'x-version': Schema.Literal('v1') },
+      payload: UploadPayload,
+      success: Schema.NumberFromString,
+      error: Schema.Literal('upload-rejected'),
+    }),
+    HttpApiEndpoint.post('mixedUpload', '/mixed-upload', {
+      payload: [Schema.Struct({ value: Schema.NumberFromString }), UploadPayload],
+      success: Schema.NumberFromString,
+    }),
+  ),
+  HttpApiGroup.make('system', { topLevel: true }).add(
+    HttpApiEndpoint.post('uploaded', '/uploaded', {
+      payload: UploadPayload,
+      success: HttpApiSchema.NoContent,
+    }),
   ),
 )
 
@@ -222,6 +250,8 @@ try {
 
 let value = 1
 const decodedRequests: Array<unknown> = []
+const serializedUploadRequests: Array<unknown> = []
+const uploadKinds: string[] = []
 const handlers = Layer.mergeAll(
   HttpApiBuilder.group(api, 'compatibility', (group) =>
     group
@@ -254,6 +284,50 @@ await Effect.runPromise(
   Effect.scoped(
     Effect.gen(function* () {
       const client = yield* HttpApiTest.groups(api, ['compatibility', 'other', 'system'])
+      const uploadClient = yield* HttpApiClient.makeWith(uploadApi, {
+        baseUrl: 'https://uploads.test',
+        httpClient: HttpClient.make((request) =>
+          Effect.gen(function* () {
+            const web = yield* HttpClientRequest.toWeb(request).pipe(Effect.orDie)
+            const url = new URL(web.url)
+            if (
+              url.pathname === '/mixed-upload' &&
+              web.headers.get('content-type')?.startsWith('application/json')
+            ) {
+              const body = yield* Effect.promise(() => web.json())
+              deepStrictEqual(body, { value: '9' })
+              uploadKinds.push('plain')
+              return HttpClientResponse.fromWeb(request, Response.json('9'))
+            }
+            const body = yield* Effect.promise(() => web.formData())
+            if (url.pathname === '/uploaded') {
+              return HttpClientResponse.fromWeb(request, new Response(null, { status: 204 }))
+            }
+            if (url.pathname === '/mixed-upload') {
+              equal(body.get('amount'), '7')
+              uploadKinds.push('multipart')
+              return HttpClientResponse.fromWeb(request, Response.json('7'))
+            }
+            if (body.get('name') === 'reject') {
+              return HttpClientResponse.fromWeb(
+                request,
+                Response.json('upload-rejected', { status: 500 }),
+              )
+            }
+            const file = body.get('file')
+            ok(file instanceof File)
+            serializedUploadRequests.push({
+              url: web.url,
+              version: web.headers.get('x-version'),
+              name: body.get('name'),
+              amount: body.get('amount'),
+              fileName: file.name,
+              contents: yield* Effect.promise(() => file.text()),
+            })
+            return HttpClientResponse.fromWeb(request, Response.json('17'))
+          }),
+        ),
+      })
       const rpcClient = yield* RpcTest.makeClient(rpc, { flatten: true }).pipe(
         Effect.provide(rpc.toLayer({ 'compatibility.read': () => Effect.succeed('rpc') })),
       )
@@ -265,6 +339,10 @@ await Effect.runPromise(
       })
       yield* Effect.addFinalizer(() => Effect.sync(() => queryClient.clear()))
       const http = createHttpApiQueryUtils(api, { client, keyPrefix: ['shared'] as const })
+      const uploads = createHttpApiQueryUtils(uploadApi, {
+        client: uploadClient,
+        keyPrefix: ['shared'] as const,
+      })
       const rpcUtils = createRpcQueryUtils(rpc, {
         client: rpcClient,
         keyPrefix: ['shared'] as const,
@@ -296,6 +374,103 @@ await Effect.runPromise(
         1,
       )
       notDeepStrictEqual(http.empty.queryKey(), http.empty.mutationKey())
+
+      const formData = new FormData()
+      formData.set('name', 'Ada')
+      formData.set('amount', '7')
+      formData.set('file', new File(['release upload'], 'release.txt', { type: 'text/plain' }))
+      const uploadInput = {
+        params: { id: 3 },
+        query: { factor: 2 },
+        headers: { 'x-version': 'v1' as const },
+        payload: formData,
+      }
+      const uploadCallbacks: string[] = []
+      const upload = new MutationObserver(
+        queryClient,
+        uploads.files.upload.mutationOptions({
+          onMutate: (request) => {
+            equal(request, uploadInput)
+            equal(request.payload, formData)
+            uploadCallbacks.push('mutate')
+            return 'prepared'
+          },
+          onSuccess: (data, request, mutateResult) => {
+            equal(data, 17)
+            equal(request, uploadInput)
+            equal(mutateResult, 'prepared')
+            uploadCallbacks.push('success')
+          },
+          onSettled: (data, error, request, mutateResult) => {
+            equal(data, 17)
+            equal(error, null)
+            equal(request, uploadInput)
+            equal(mutateResult, 'prepared')
+            uploadCallbacks.push('settled')
+          },
+        }),
+      )
+      equal(yield* Effect.promise(() => upload.mutate(uploadInput)), 17)
+      deepStrictEqual(uploadCallbacks, ['mutate', 'success', 'settled'])
+      deepStrictEqual(serializedUploadRequests, [
+        {
+          url: 'https://uploads.test/upload/3?factor=2',
+          version: 'v1',
+          name: 'Ada',
+          amount: '7',
+          fileName: 'release.txt',
+          contents: 'release upload',
+        },
+      ])
+      deepStrictEqual(uploads.files.upload.mutationKey(), [
+        'shared',
+        'http',
+        'packed-uploads',
+        'files',
+        'upload',
+        'mutation',
+      ])
+      equal(
+        queryClient.getMutationCache().findAll({ mutationKey: uploads.files.upload.key() }).length,
+        1,
+      )
+      const mixedUpload = new MutationObserver(
+        queryClient,
+        uploads.files.mixedUpload.mutationOptions(),
+      )
+      equal(yield* Effect.promise(() => mixedUpload.mutate({ payload: { value: 9 } })), 9)
+      equal(yield* Effect.promise(() => mixedUpload.mutate({ payload: formData })), 7)
+      deepStrictEqual(uploadKinds, ['plain', 'multipart'])
+      const completedUpload = new MutationObserver(queryClient, uploads.uploaded.mutationOptions())
+      equal(yield* Effect.promise(() => completedUpload.mutate({ payload: formData })), undefined)
+      equal(completedUpload.getCurrentResult().status, 'success')
+      const rejectedFormData = new FormData()
+      rejectedFormData.set('name', 'reject')
+      rejectedFormData.set('amount', '0')
+      const rejectedUpload = new MutationObserver(
+        queryClient,
+        uploads.files.upload.mutationOptions(),
+      )
+      yield* Effect.promise(() =>
+        rejects(
+          rejectedUpload.mutate({ ...uploadInput, payload: rejectedFormData }),
+          (error: unknown) => {
+            ok(isEffectHttpApiQueryError(error))
+            equal(error.apiId, 'packed-uploads')
+            equal(error.groupId, 'files')
+            equal(error.endpoint, 'upload')
+            equal(error.method, 'POST')
+            equal(error.operation, 'mutation')
+            deepStrictEqual(
+              error.cause.reasons.map((reason) =>
+                reason._tag === 'Fail' ? reason.error : undefined,
+              ),
+              ['upload-rejected'],
+            )
+            return true
+          },
+        ),
+      )
 
       const rpcOptions = rpcUtils.compatibility.read.queryOptions()
       equal(yield* Effect.promise(() => queryClient.query(rpcOptions)), 'rpc')

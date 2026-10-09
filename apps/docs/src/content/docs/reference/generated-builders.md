@@ -28,16 +28,20 @@ Disable a payload-bearing query with `input: skipToken`, retaining its other Tan
 ```ts
 import { skipToken } from 'effect-api-query'
 
-const options =
-  userId === undefined
-    ? rpcQuery.users.get.queryOptions({ input: skipToken, staleTime: 30_000 })
-    : rpcQuery.users.get.queryOptions({ input: { id: userId }, staleTime: 30_000 })
+const options = rpcQuery.users.get.queryOptions({
+  input: userId === undefined ? skipToken : { id: userId },
+  staleTime: 30_000,
+})
 ```
 
 `queryOptions`, `streamedOptions`, and `liveOptions` also accept the direct `skipToken` shorthand.
 The object form preserves applicable caller options. The builder consumes `input` and, for
 accumulated streams, `refetchMode` and `maxChunks`, removing them from the returned options.
 Skipped options retain the exact sentinel, operation-level key, and package-owned hash function.
+
+`queryOptions`, `streamedOptions`, and `liveOptions` accept conditional `input` unions of payload
+constructor input and `skipToken`. Concrete inputs retain callable query functions and
+payload-specific keys. Conditional inputs retain the possible sentinel and both key shapes.
 
 `skipToken` is valid only for payload-bearing query options. It is not accepted by key or mutation
 builders, and skipped options are unsuitable for suspense and prefetch-only hooks.
@@ -96,7 +100,7 @@ const initialKey = rpcQuery.users.page.infiniteKey({ cursor: 0, pageSize: 20 })
 ```
 
 Payloadless RPCs omit `input`. To disable a payload-bearing infinite query, set its `input` field to
-the exact sentinel:
+`skipToken`:
 
 ```ts
 const options = rpcQuery.users.page.infiniteOptions({
@@ -105,6 +109,25 @@ const options = rpcQuery.users.page.infiniteOptions({
   getNextPageParam: () => undefined,
 })
 ```
+
+The mapper and `skipToken` can also share one conditional input:
+
+```ts
+const options = rpcQuery.users.page.infiniteOptions({
+  initialPageParam: 0,
+  input: canLoadPages ? (cursor) => ({ cursor, pageSize: 20 }) : skipToken,
+  getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+})
+```
+
+Concrete mappers retain callable query functions and payload-specific keys. The exact sentinel
+retains the operation key; conditional inputs preserve both key shapes and the query-function
+union. Mapper results must be payload constructor input.
+
+A defined `initialData` value or factory remains required in the generated options, preserving
+`useInfiniteQuery`'s defined-data inference. This applies to payload-bearing and payloadless RPCs,
+including conditional and skipped inputs. A factory that may return `undefined` keeps hook data
+possibly undefined.
 
 The builder forwards applicable Query Core options but owns `queryFn`, `queryKey`, and
 `queryKeyHashFn`. Each page uses the same Effect runner and cancellation signal as an ordinary

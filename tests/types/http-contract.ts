@@ -66,7 +66,12 @@ const MixedStream = HttpApiEndpoint.get('mixed', '/mixed', {
   success: [Schema.String, HttpApiSchema.StreamUint8Array()],
 })
 const Multipart = HttpApiEndpoint.post('upload', '/upload', {
+  params: { id: Schema.FiniteFromString },
+  query: { version: Schema.FiniteFromString },
+  headers: { 'x-version': Schema.Literal('v1') },
   payload: Schema.Struct({ name: Schema.String }).pipe(HttpApiSchema.asMultipart()),
+  success: User,
+  error: Schema.Literal('upload-rejected'),
 })
 const MultipartStream = HttpApiEndpoint.post('uploadStream', '/upload-stream', {
   payload: Schema.Struct({ name: Schema.String }).pipe(HttpApiSchema.asMultipartStream()),
@@ -76,6 +81,16 @@ const MixedMultipart = HttpApiEndpoint.post('mixedUpload', '/mixed-upload', {
     Schema.Struct({ name: Schema.String }),
     Schema.Struct({ file: Schema.String }).pipe(HttpApiSchema.asMultipart()),
   ],
+})
+const MixedMultipartStream = HttpApiEndpoint.post('mixedUploadStream', '/mixed-upload-stream', {
+  payload: [
+    Schema.Struct({ name: Schema.String }).pipe(HttpApiSchema.asMultipart()),
+    Schema.Struct({ file: Schema.String }).pipe(HttpApiSchema.asMultipartStream()),
+  ],
+})
+const MultipartStreamingSuccess = HttpApiEndpoint.post('streamedUpload', '/streamed-upload', {
+  payload: Schema.Struct({ name: Schema.String }).pipe(HttpApiSchema.asMultipart()),
+  success: [Schema.String, HttpApiSchema.StreamUint8Array()],
 })
 const WrappedBuffered = HttpApiEndpoint.get('wrappedBuffered', '/wrapped-buffered', {
   success: HttpApiSchema.WithHeaders(User, Schema.Struct({ version: Schema.String })),
@@ -90,9 +105,12 @@ const api = HttpApi.make('account.api').add(
     Multipart,
     MultipartStream,
     MixedMultipart,
+    MixedMultipartStream,
+    MultipartStreamingSuccess,
     WrappedBuffered,
   ),
-  HttpApiGroup.make('system', { topLevel: true }).add(Ping),
+  HttpApiGroup.make('system', { topLevel: true }).add(Ping, Multipart),
+  HttpApiGroup.make('uploads').add(MixedMultipart),
   HttpApiGroup.make('omitted').add(Stream),
 )
 declare const client: HttpApiClient.ForApi<typeof api>
@@ -125,8 +143,22 @@ const endpointKey: readonly ['app', 'http', 'account.api', 'user.accounts', 'get
 const topLevelKey: readonly ['app', 'http', 'account.api', 'ping'] = utils.ping.key()
 void [root, groupKey, endpointKey, topLevelKey]
 true satisfies Assert<
-  Equal<keyof (typeof utils)['user.accounts'], 'key' | 'get.user' | 'save' | 'wrappedBuffered'>
+  Equal<
+    keyof (typeof utils)['user.accounts'],
+    'key' | 'get.user' | 'save' | 'upload' | 'mixedUpload' | 'wrappedBuffered'
+  >
 >
+true satisfies Assert<Equal<keyof typeof utils.uploads, 'key' | 'mixedUpload'>>
+true satisfies Assert<
+  Equal<keyof (typeof utils)['user.accounts']['upload'], 'key' | 'mutationKey' | 'mutationOptions'>
+>
+true satisfies Assert<
+  Equal<keyof (typeof utils)['user.accounts']['mixedUpload'], keyof typeof utils.upload>
+>
+const uploadKey: readonly ['app', 'http', 'account.api', 'upload'] = utils.upload.key()
+const uploadMutationKey: readonly ['app', 'http', 'account.api', 'upload', 'mutation'] =
+  utils.upload.mutationKey()
+void [uploadKey, uploadMutationKey]
 true satisfies Assert<
   Equal<
     keyof typeof utils.ping,
@@ -216,6 +248,73 @@ const mutationData: Promise<typeof User.Type> = mutationObserver.mutate({
 })
 const noContentMutation: Promise<void> = utils.ping.mutationOptions().mutationFn()
 void [mutationData, noContentMutation]
+
+declare const formData: FormData
+const uploadMutation = utils['user.accounts'].upload.mutationOptions({
+  onMutate: (request) => {
+    request.payload satisfies FormData
+    request.params.id satisfies number
+    request.query.version satisfies number
+    request.headers['x-version'] satisfies 'v1'
+    return request.params.id
+  },
+  onSuccess: (user, request, mutateResult) => {
+    user satisfies typeof User.Type
+    request.payload satisfies FormData
+    mutateResult satisfies number | undefined
+  },
+  onError: (error, request) => {
+    error satisfies EffectHttpApiQueryError<
+      'upload-rejected' | HttpClientError.HttpClientError | Schema.SchemaError
+    >
+    request.payload satisfies FormData
+  },
+})
+const uploadData: Promise<typeof User.Type> = uploadMutation.mutationFn({
+  params: { id: 1 },
+  query: { version: 2 },
+  headers: { 'x-version': 'v1' },
+  payload: formData,
+})
+const uploadHook = useMutation(uploadMutation)
+true satisfies Assert<Equal<typeof uploadHook.data, typeof User.Type | undefined>>
+true satisfies Assert<Equal<Parameters<typeof uploadMutation.mutationFn>[0]['payload'], FormData>>
+const completeUploadRequest = {
+  params: { id: 1 },
+  query: { version: 2 },
+  headers: { 'x-version': 'v1' as const },
+  payload: formData,
+}
+// @ts-expect-error Buffered multipart payloads use FormData, not the server's decoded object.
+uploadMutation.mutationFn({ ...completeUploadRequest, payload: { name: 'Ada' } })
+// @ts-expect-error Multipart request params remain decoded numbers.
+uploadMutation.mutationFn({ ...completeUploadRequest, params: { id: '1' } })
+// @ts-expect-error Multipart request containers remain required.
+uploadMutation.mutationFn({ payload: formData })
+// @ts-expect-error The adapter owns multipart mutation functions.
+utils.upload.mutationOptions({ mutationFn: async () => ({ id: 1, name: 'Ada' }) })
+const rawUploadRequest = { ...completeUploadRequest, responseMode: 'response-only' as const }
+// @ts-expect-error Predeclared multipart variables cannot select raw responses.
+uploadMutation.mutationFn(rawUploadRequest)
+const sseUploadRequest = { ...completeUploadRequest, sseOptions: {} }
+// @ts-expect-error Multipart variables cannot configure SSE decoding.
+uploadMutation.mutationFn(sseUploadRequest)
+const mixedUpload = utils['user.accounts'].mixedUpload.mutationOptions()
+const mixedPlainData: Promise<void> = mixedUpload.mutationFn({ payload: { name: 'Ada' } })
+const mixedFormData: Promise<void> = mixedUpload.mutationFn({ payload: formData })
+// @ts-expect-error Multipart leaves expose no ordinary query builder.
+utils.upload.queryOptions({ input: completeUploadRequest })
+// @ts-expect-error Multipart leaves expose no query key builder.
+utils.upload.queryKey(completeUploadRequest)
+// @ts-expect-error Multipart leaves expose no infinite query builder.
+utils.upload.infiniteOptions({ initialPageParam: 0, input: () => completeUploadRequest })
+// @ts-expect-error Multipart leaves expose no infinite key builder.
+utils.upload.infiniteKey(completeUploadRequest)
+// @ts-expect-error HTTP uploads expose no accumulated streamed query builder.
+utils.upload.streamedOptions()
+// @ts-expect-error HTTP uploads expose no live query builder.
+utils.upload.liveOptions()
+void [uploadData, mixedPlainData, mixedFormData]
 // @ts-expect-error Mutations require the complete request container.
 mutationObserver.mutate({ id: 1, name: 'Ada' })
 
@@ -347,7 +446,7 @@ createHttpApiQueryUtils(api, {
 createHttpApiQueryUtils(api, {
   client,
   keyPrefix: prefix,
-  // @ts-expect-error Omitted endpoints cannot have encoders.
+  // @ts-expect-error Mutation-only multipart endpoints cannot have encoders.
   keyEncoders: { 'user.accounts': { upload: () => null } },
 })
 
@@ -513,7 +612,7 @@ createHttpApiQueryUtils(keysApi, {
 })
 createHttpApiQueryUtils(keysApi, {
   ...keyOptions,
-  // @ts-expect-error Omitted endpoints have no encoder entry.
+  // @ts-expect-error Mutation-only multipart endpoints have no encoder entry.
   keyEncoders: { 'forms.v1': { ...keyOptions.keyEncoders['forms.v1'], upload: () => null } },
 })
 createHttpApiQueryUtils(keysApi, {
@@ -747,6 +846,109 @@ createHttpApiQueryUtils(omittedMiddlewareApi, {
   keyPrefix: ['app'],
 })
 
+const ServicefulUpload = HttpApiEndpoint.post('upload', '/serviceful-upload/:value', {
+  params: { value: ServicefulParams },
+  query: { value: ServicefulQuery },
+  headers: { value: ServicefulRequestHeaders },
+  payload: ServicefulPayload.pipe(HttpApiSchema.asMultipart()),
+  success: ServicefulSuccess,
+  error: ServicefulError,
+}).middleware(ServicefulAuth)
+const servicefulUploadApi = HttpApi.make('serviceful-uploads').add(
+  HttpApiGroup.make('files').add(ServicefulUpload),
+)
+declare const servicefulUploadClient: HttpApiClient.ForApi<
+  typeof servicefulUploadApi,
+  'extra-upload-error',
+  ExtraClientService
+>
+declare const uploadRunner: RunPromiseExit<
+  | EncodeRequest
+  | EncodeParams
+  | EncodeQuery
+  | EncodeHeaders
+  | DecodeSuccess
+  | DecodeError
+  | DecodeMiddlewareError
+  | ExtraClientService
+>
+// @ts-expect-error Mutation-only endpoints retain Schema, middleware and client services.
+createHttpApiQueryUtils(servicefulUploadApi, {
+  client: servicefulUploadClient,
+  keyPrefix: ['app'],
+})
+const servicefulUploadUtils = createHttpApiQueryUtils(servicefulUploadApi, {
+  client: servicefulUploadClient,
+  keyPrefix: ['app'],
+  runPromiseExit: uploadRunner,
+})
+type UploadRequirements = CreateHttpApiQueryUtilsOptions<
+  typeof servicefulUploadApi,
+  readonly ['app'],
+  typeof servicefulUploadClient
+>['runPromiseExit']
+true satisfies Assert<Equal<UploadRequirements, typeof uploadRunner>>
+const servicefulUploadOptions = servicefulUploadUtils.files.upload.mutationOptions()
+const servicefulUploadHook = useMutation(servicefulUploadOptions)
+true satisfies Assert<Equal<typeof servicefulUploadHook.data, typeof User.Type | undefined>>
+true satisfies Assert<
+  Equal<
+    typeof servicefulUploadHook.error,
+    EffectHttpApiQueryError<
+      | 'service-error'
+      | 'serviceful-middleware-error'
+      | 'extra-upload-error'
+      | HttpClientError.HttpClientError
+      | Schema.SchemaError
+    > | null
+  >
+>
+servicefulUploadOptions.mutationFn({
+  params: { value: '1' },
+  query: { value: '2' },
+  headers: { value: '3' },
+  payload: formData,
+})
+createHttpApiQueryUtils(servicefulUploadApi, {
+  client: servicefulUploadClient,
+  keyPrefix: ['app'],
+  // @ts-expect-error Supplying only custom client services cannot run serviceful request/response schemas.
+  runPromiseExit: extraRunner,
+})
+createHttpApiQueryUtils(servicefulUploadApi, {
+  client: servicefulUploadClient,
+  keyPrefix: ['app'],
+  runPromiseExit: uploadRunner,
+  // @ts-expect-error Serviceful multipart endpoints need execution services but accept no key encoder.
+  keyEncoders: { files: { upload: () => 'unused' } },
+})
+
+const customUploadClient = {
+  ...client,
+  upload: <Mode extends HttpApiClient.Client.ResponseMode>(request: {
+    readonly params: { readonly id: number }
+    readonly query: { readonly version: number }
+    readonly headers: { readonly 'x-version': 'v1' }
+    readonly payload: FormData
+    readonly responseMode?: Mode
+  }) =>
+    Effect.flatMap(ExtraClientService, () =>
+      client.upload(request).pipe(Effect.mapError(() => 'custom-upload-error' as const)),
+    ),
+}
+// @ts-expect-error Compatible custom upload methods retain residual execution services.
+createHttpApiQueryUtils(api, { client: customUploadClient, keyPrefix: ['app'] })
+const customUploadUtils = createHttpApiQueryUtils(api, {
+  client: customUploadClient,
+  keyPrefix: ['app'],
+  runPromiseExit: extraRunner,
+})
+const customUploadHook = useMutation(customUploadUtils.upload.mutationOptions())
+true satisfies Assert<
+  Equal<typeof customUploadHook.error, EffectHttpApiQueryError<'custom-upload-error'> | null>
+>
+true satisfies Assert<Equal<typeof customUploadHook.data, typeof User.Type | undefined>>
+
 class RawResponseService extends Context.Service<RawResponseService, {}>()('RawResponseService') {}
 type RawResponseMethod = (request: {
   readonly responseMode: 'response-only'
@@ -941,12 +1143,25 @@ const skippedOptional = useQuery(
   getUser.queryOptions({ input: skipToken, initialData: optionalInitial }),
 )
 true satisfies Assert<Equal<typeof skippedOptional.data, typeof User.Type | undefined>>
+declare const optionalInitialValue: typeof User.Type | undefined
+const skippedOptionalValue = useQuery(
+  getUser.queryOptions({ input: skipToken, initialData: optionalInitialValue }),
+)
+true satisfies Assert<Equal<typeof skippedOptionalValue.data, typeof User.Type | undefined>>
 declare const hasUser: boolean
 const conditional = getUser.queryOptions({
   input: hasUser ? input : skipToken,
   select: (user) => user.name,
 })
 useQuery(conditional).data satisfies string | undefined
+const conditionalOptionalValue = useQuery(
+  getUser.queryOptions({
+    input: hasUser ? input : skipToken,
+    initialData: optionalInitialValue,
+    select: (user) => user.name,
+  }),
+)
+true satisfies Assert<Equal<typeof conditionalOptionalValue.data, string | undefined>>
 // @ts-expect-error A conditional request cannot guarantee suspense execution.
 useSuspenseQuery(conditional)
 // @ts-expect-error Key builders require concrete requests.
@@ -1076,6 +1291,17 @@ const skippedDefinedPages = useInfiniteQuery(
   }),
 )
 true satisfies Assert<Equal<typeof skippedDefinedPages.data, number>>
+declare const optionalPageValue: InfiniteData<typeof User.Type, number> | undefined
+const optionalSkippedPages = useInfiniteQuery(
+  getUser.infiniteOptions({
+    input: skipToken,
+    initialPageParam: 0,
+    getNextPageParam: () => undefined,
+    initialData: optionalPageValue,
+    select: (data) => data.pages.length,
+  }),
+)
+true satisfies Assert<Equal<typeof optionalSkippedPages.data, number | undefined>>
 // @ts-expect-error Infinite skipping requires object options with pagination fields.
 getUser.infiniteOptions(skipToken)
 getUser.infiniteOptions({
@@ -1180,6 +1406,41 @@ const conditionalPages = getUser.infiniteOptions({
 })
 const conditionalPagesHook = useInfiniteQuery(conditionalPages)
 true satisfies Assert<Equal<typeof conditionalPagesHook.data, number | undefined>>
+const optionalConditionalPages = useInfiniteQuery(
+  getUser.infiniteOptions({
+    initialPageParam: 0,
+    input: hasUser ? (page) => ({ ...input, params: { id: page } }) : skipToken,
+    getNextPageParam: () => undefined,
+    initialData: optionalPageValue,
+    select: (data) => data.pages.length,
+  }),
+)
+true satisfies Assert<Equal<typeof optionalConditionalPages.data, number | undefined>>
+const definedConditionalPages = useInfiniteQuery(
+  getUser.infiniteOptions({
+    initialPageParam: 0,
+    input: hasUser ? (page) => ({ ...input, params: { id: page } }) : skipToken,
+    getNextPageParam: () => undefined,
+    initialData: () => initialPages,
+    select: (data) => data.pages.length,
+  }),
+)
+true satisfies Assert<Equal<typeof definedConditionalPages.data, number>>
+const nullableConditionalPages = getUser.infiniteOptions({
+  initialPageParam: null as number | null,
+  input: hasUser ? (page) => ({ ...input, params: { id: page ?? 0 } }) : skipToken,
+  getNextPageParam: (_page, _pages, cursor) => {
+    cursor satisfies number | null
+    return cursor === null ? 1 : cursor + 1
+  },
+})
+const nullableConditionalPagesHook = useInfiniteQuery(nullableConditionalPages)
+true satisfies Assert<
+  Equal<
+    typeof nullableConditionalPagesHook.data,
+    InfiniteData<typeof User.Type, number | null> | undefined
+  >
+>
 // @ts-expect-error Conditional infinite requests cannot guarantee suspense execution.
 useSuspenseInfiniteQuery(conditionalPages)
 const pageApi = HttpApi.make('pages').add(

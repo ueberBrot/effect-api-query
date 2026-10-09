@@ -2,17 +2,22 @@ import { Predicate } from 'effect'
 import type { Effect } from 'effect'
 import type { HttpApi } from 'effect/http-api'
 
-import type { RuntimeKeyEncoder, TreeErrors, UnaryOperation } from '../core/operation'
+import type {
+  MutationOperation,
+  RuntimeKeyEncoder,
+  TreeErrors,
+  UnaryOperation,
+} from '../core/operation'
 import { EffectHttpApiQueryConfigError, EffectHttpApiQueryError } from './errors'
 import type { HttpApiEndpointIdentity } from './errors'
-import { createHttpRequestInput } from './request'
+import { createHttpRequest } from './request'
 
-interface HttpOperation extends UnaryOperation {
+type HttpOperation = (UnaryOperation | MutationOperation) & {
   readonly identity: HttpApiEndpointIdentity
 }
 
 export interface CompiledHttpOperations {
-  readonly operations: readonly UnaryOperation[]
+  readonly operations: readonly (UnaryOperation | MutationOperation)[]
   readonly errors: TreeErrors
   readonly keyEncoders: ReadonlyMap<string, RuntimeKeyEncoder>
 }
@@ -27,8 +32,8 @@ const extractHttpEndpoints = (api: HttpApi.Top, client: unknown): readonly HttpO
         endpoint: endpoint.identifier,
         method: endpoint.method,
       }
-      const input = createHttpRequestInput(endpoint, identity)
-      if (input === undefined) {
+      const request = createHttpRequest(endpoint, identity)
+      if (request === undefined) {
         continue
       }
       // SAFETY: The public client is tied to this Api. HttpApiClient mirrors group
@@ -40,11 +45,10 @@ const extractHttpEndpoints = (api: HttpApi.Top, client: unknown): readonly HttpO
           (request: unknown) => Effect.Effect<unknown, unknown, unknown>
         >
       operations.push({
+        ...request,
         identity,
         id: JSON.stringify([group.identifier, endpoint.identifier]),
         path: group.topLevel ? [endpoint.identifier] : [group.identifier, endpoint.identifier],
-        kind: 'Unary',
-        input,
         takeOptions: () => {
           // HTTP has no adapter-owned options.
         },
@@ -95,7 +99,7 @@ const httpTreeErrors = (api: HttpApi.Top, operations: readonly HttpOperation[]):
     unknownEncoder: (id) =>
       new EffectHttpApiQueryConfigError(
         'UnknownKeyEncoder',
-        `No request-bearing HTTP endpoint exists for key encoder ${id}`,
+        `No query-enabled HTTP endpoint exists for key encoder ${id}`,
         identity(id),
       ),
     missingEncoder: (id) =>
@@ -117,7 +121,7 @@ export const compileHttpOperations = (
   const errors = httpTreeErrors(api, operations)
   const encoderGroups = new Set(
     operations
-      .filter((operation) => operation.input._tag === 'Input')
+      .filter((operation) => operation.kind === 'Unary' && operation.input._tag === 'Input')
       .map((operation) => operation.identity.groupId),
   )
   const keyEncoders = new Map<string, RuntimeKeyEncoder>()
