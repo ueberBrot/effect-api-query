@@ -323,6 +323,7 @@ export default defineConfig({
         command: 'vp test',
         dependsOn: ['pack'],
         cache: {
+          env: ['RPC_TRANSPORT_MEASURE'],
           output: [],
         },
       },
