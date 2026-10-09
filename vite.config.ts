@@ -332,6 +332,7 @@ export default defineConfig({
           'node node_modules/typescript-5.9/bin/tsc --project tests/fixtures/tsconfig.server-local.json',
         ],
         cache: {
+          env: ['RPC_TRANSPORT_MEASURE'],
           output: [],
         },
       },
