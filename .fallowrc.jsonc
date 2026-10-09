@@ -12,7 +12,9 @@
     "tests/packed-consumer/http-stream-runtime.mts",
     "tests/packed-consumer/stream-cause-runtime.mts",
     "tests/packed-consumer/stream-policy-runtime.mts",
-    "tests/packed-consumer/retry-runtime.mts"
+    "tests/packed-consumer/retry-runtime.mts",
+    "tests/packed-consumer/hydration-runtime.mts",
+    "tests/packed-consumer/hydration-contract.ts"
   ],
 
   "ignorePatterns": ["examples/tanstack-start/src/routeTree.gen.ts"],

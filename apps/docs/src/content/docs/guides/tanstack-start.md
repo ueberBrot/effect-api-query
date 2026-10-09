@@ -100,6 +100,8 @@ runtime alive for the browser application's lifetime.
 Successful query data must satisfy your serializer's contract. If an endpoint returns decoded
 Schema class instances, decide whether the browser needs plain data or reconstructed instances.
 The package does not serialize query data for you.
+Use [Hydrate Unary Data](/effect-api-query/guides/hydrate-unary-data/) to keep a DTO representation
+or pair Schema encoding and decoding across hydration and later browser refetch.
 
 ## Let the browser refetch failed queries
 
@@ -137,8 +139,9 @@ See [Executable Examples](/effect-api-query/examples/) for commands and controls
 The example serves RPC at `/rpc` and HTTP at `/api/$`. Both handlers share a demonstration user
 directory, so writes invalidate both sets of query keys. The authorization header contains a
 public demonstration value. The ownership tests use separate identities to verify that caches
-and resource disposal stay isolated. Its SSR setup converts decoded Schema class values to plain
-data with `structuredClone`.
+and resource disposal stay isolated. Its SSR setup clones class properties for field-only views.
+`structuredClone` does not reconstruct class methods or define a JSON encoding for rich values;
+use a paired codec when the browser needs the decoded domain representation.
 
 The example also disables Vite preview compression for its API routes. The pinned middleware
 delays response-close listeners until the first write, preventing a pending buffered request from

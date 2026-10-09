@@ -3,21 +3,31 @@
 import { strictEqual } from 'node:assert'
 import { readFileSync } from 'node:fs'
 
-for (const [page, fixture] of [
-  ['getting-started/quick-start', 'types/docs-rpc-quick-start'],
-  ['getting-started/http-quick-start', 'types/docs-http-quick-start'],
-  ['guides/retry-queries', 'packed-consumer/docs-retry'],
-]) {
+for (const [page, fixtures] of [
+  ['getting-started/quick-start', ['types/docs-rpc-quick-start']],
+  ['getting-started/http-quick-start', ['types/docs-http-quick-start']],
+  ['guides/retry-queries', ['packed-consumer/docs-retry']],
+  [
+    'guides/hydrate-unary-data',
+    [
+      'packed-consumer/docs-hydration-dto',
+      'packed-consumer/docs-hydration-rich',
+      'packed-consumer/docs-hydration-async',
+    ],
+  ],
+] as const) {
   const markdown = readFileSync(
     new URL(`../apps/docs/src/content/docs/${page}.md`, import.meta.url),
     'utf-8',
   )
-  const source = readFileSync(new URL(`../tests/${fixture}.ts`, import.meta.url), 'utf-8')
   const samples = [...markdown.matchAll(/^```ts\n(?<source>[\s\S]*?)^```/gmu)]
-  strictEqual(samples.length, 1, `${page} must contain its complete TypeScript fixture`)
-  strictEqual(
-    samples[0]?.groups?.['source']?.trimEnd(),
-    source.trimEnd(),
-    `${page} differs from ${fixture}.ts`,
-  )
+  strictEqual(samples.length, fixtures.length, `${page} must contain its TypeScript fixtures`)
+  for (const [index, fixture] of fixtures.entries()) {
+    const source = readFileSync(new URL(`../tests/${fixture}.ts`, import.meta.url), 'utf-8')
+    strictEqual(
+      samples[index]?.groups?.['source']?.trimEnd(),
+      source.trimEnd(),
+      `${page} differs from ${fixture}.ts`,
+    )
+  }
 }
