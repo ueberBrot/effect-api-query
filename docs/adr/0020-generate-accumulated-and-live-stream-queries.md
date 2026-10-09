@@ -1,6 +1,7 @@
 # Generate accumulated and live stream queries
 
-Status: Accepted. Partially supersedes ADR 0002 and ADR 0003.
+Status: Accepted. Partially supersedes ADR 0002 and ADR 0003. Extended to HTTP SSE views by
+[ADR 0024](0024-project-http-streams-and-buffered-metadata.md).
 
 Streaming RPC leaves expose `streamedKey`/`streamedOptions` for ordered history with `reset`,
 `append`, and `replace` refetch modes, and `liveKey`/`liveOptions` for the latest value. A live stream

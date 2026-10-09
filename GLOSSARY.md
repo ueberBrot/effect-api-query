@@ -9,7 +9,7 @@ A nested object derived from literal Effect RPC tags. Branches represent RPC nam
 _Avoid_: Router, generated client
 
 **HTTP utility tree**:
-A nested object derived from an Effect HttpApi's literal group and endpoint identifiers. Supported buffered endpoints provide typed key and option builders, with multipart endpoints limited to mutations; endpoints in top-level groups appear at the root.
+A nested object derived from an Effect HttpApi's literal group and endpoint identifiers. Supported buffered and SSE endpoints provide typed key and option builders, with multipart endpoints limited to buffered mutations; endpoints in top-level groups appear at the root.
 _Avoid_: RPC utility tree, generated client
 
 **Query data**:
@@ -17,12 +17,16 @@ The successful decoded RPC or HTTP value presented to TanStack Query. Buffered q
 _Avoid_: RPC success value when it is `undefined`
 
 **Accumulated streamed query**:
-A streaming RPC view that caches emitted values in order, optionally retaining only a bounded recent history. Refetches may reset, append to, or replace the cached sequence.
+A streaming RPC or HTTP SSE view that caches emitted values in order, optionally retaining only a bounded recent history. Refetches may reset, append to, or replace the cached sequence.
 _Avoid_: Live query, infinite query
 
 **Live query**:
-A streaming RPC view that caches only the latest emitted value, converting `undefined` to `null`. Stream completion preserves that value; completion before the first emission produces a package error.
+A streaming RPC or HTTP SSE view that caches only the latest emitted value, converting `undefined` to `null`. Stream completion preserves that value; completion before the first emission produces a package error.
 _Avoid_: Accumulated streamed query, subscription
+
+**HTTP metadata view**:
+A buffered HTTP query view containing decoded query data and an immutable snapshot of the response status and raw string headers. Declared decoded header wrappers remain part of its data.
+_Avoid_: Raw response, header-wrapped success
 
 ## Payloads and keys
 
