@@ -8,7 +8,7 @@ export interface HttpApiEndpointIdentity {
   readonly method: string
 }
 
-export type HttpApiOperation = 'query' | 'infinite' | 'mutation' | 'streamed'
+export type HttpApiOperation = 'query' | 'infinite' | 'mutation' | 'streamed' | 'live'
 
 /** Stable codes for invalid HTTP utility configuration. */
 export type EffectHttpApiQueryConfigErrorCode =
@@ -54,6 +54,26 @@ export class EffectHttpApiQueryError<E> extends Error implements HttpApiEndpoint
     this.method = identity.method
     this.operation = operation
     this.cause = cause
+  }
+}
+
+export class EffectHttpApiQueryEmptyStreamError extends Error implements HttpApiEndpointIdentity {
+  readonly _tag = 'EffectHttpApiQueryEmptyStreamError'
+  readonly apiId: string
+  readonly groupId: string
+  readonly endpoint: string
+  readonly method: string
+  readonly operation = 'live'
+
+  constructor(identity: HttpApiEndpointIdentity) {
+    super(
+      `HTTP ${identity.method} ${identity.groupId}/${identity.endpoint} live stream completed without a value`,
+    )
+    this.name = 'EffectHttpApiQueryEmptyStreamError'
+    this.apiId = identity.apiId
+    this.groupId = identity.groupId
+    this.endpoint = identity.endpoint
+    this.method = identity.method
   }
 }
 
