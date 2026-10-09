@@ -310,6 +310,11 @@ const streamedOptions = utils.events.watch.streamedOptions({
   meta: { source: 'fixture' },
   networkMode: 'offlineFirst',
   refetchMode: 'append',
+  retryDelay: (attemptIndex, error) => {
+    attemptIndex satisfies number
+    error satisfies EffectRpcQueryError<'unauthorized' | 'watch-failure' | 'watch-rpc-failure'>
+    return 0
+  },
   retry: (_count, error) => {
     error satisfies EffectRpcQueryError<'unauthorized' | 'watch-failure' | 'watch-rpc-failure'>
     return false
@@ -358,6 +363,13 @@ void [streamedHookData, streamedResult]
 
 const liveOptions = utils.events.watch.liveOptions({
   input: { channel: 'news' },
+  retryDelay: (attemptIndex, error) => {
+    attemptIndex satisfies number
+    error satisfies
+      | EffectRpcQueryEmptyStreamError
+      | EffectRpcQueryError<'unauthorized' | 'watch-failure' | 'watch-rpc-failure'>
+    return 0
+  },
   select: (value) => value.length,
 })
 const liveHook = useQuery(liveOptions)
@@ -509,6 +521,11 @@ const infiniteOptions = utils.users.pages.infiniteOptions({
   retry: (_count, error) => {
     error satisfies EffectRpcQueryError<'page-failure'>
     return false
+  },
+  retryDelay: (attemptIndex, error) => {
+    attemptIndex satisfies number
+    error satisfies EffectRpcQueryError<'page-failure'>
+    return 0
   },
   select: (data) => data.pages.flatMap((page) => page.users.map((user) => user.name)),
 })
@@ -760,6 +777,7 @@ const queryOptions = utils.users.get.queryOptions({
     return false
   },
   retryDelay: (_attempt, error) => {
+    _attempt satisfies number
     error satisfies EffectRpcQueryError<'not-found'>
     return 0
   },
@@ -880,6 +898,11 @@ const getMutationOptions = utils.users.get.mutationOptions<{
   readonly previousName: string
 }>({
   gcTime: 60_000,
+  retryDelay: (attemptIndex, error) => {
+    attemptIndex satisfies number
+    error satisfies EffectRpcQueryError<'not-found'>
+    return 0
+  },
   onError: (error, variables, onMutateResult) => {
     error satisfies EffectRpcQueryError<'not-found'>
     variables satisfies { readonly id: number; readonly locale?: string }

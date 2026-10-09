@@ -510,6 +510,7 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       'http-etag-recipe.mts',
       'stream-cause-runtime.mts',
       'stream-policy-runtime.mts',
+      'retry-runtime.mts',
     ]) {
       execFileSync(process.execPath, ['--experimental-import-meta-resolve', fixture], {
         cwd: consumerDirectory,

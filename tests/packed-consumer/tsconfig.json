@@ -4,6 +4,7 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "exactOptionalPropertyTypes": true,
     "noUncheckedIndexedAccess": true,
     "skipLibCheck": false,
@@ -16,6 +17,7 @@
     "runtime.mts",
     "stream-cause-runtime.mts",
     "stream-policy-runtime.mts",
+    "retry-runtime.mts",
     "http-runtime.mts",
     "http-metadata-runtime.mts",
     "http-etag-recipe.mts",
@@ -23,6 +25,7 @@
     "http-contract.ts",
     "docs-rpc-quick-start.ts",
     "docs-http-quick-start.ts",
+    "docs-retry.ts",
     "skill-example-*.ts"
   ]
 }
