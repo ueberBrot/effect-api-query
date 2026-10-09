@@ -16,6 +16,8 @@ properties. Every retained branch and endpoint has `key()`; buffered endpoints w
 An endpoint with any buffered multipart payload alternative exposes only `key`, `mutationKey`, and
 `mutationOptions`, even when it also accepts plain payload alternatives. This classification applies
 regardless of HTTP method; applications choose the builder for endpoints with query support.
+An endpoint with exactly one SSE success and no multipart payload exposes `key`, `streamedKey`,
+and `streamedOptions`.
 
 ## Factory options
 
@@ -62,8 +64,10 @@ service requirements of their decoded-only call signatures; raw-response overloa
 See [client lifecycle](/effect-api-query/concepts/client-lifecycle/#http-clients-and-execution-services)
 and [cancellation](/effect-api-query/guides/cancellation/#cancel-an-http-query) for runtime ownership.
 
-Any streaming success alternative, including a header-wrapped stream, omits the complete endpoint.
-Any streaming multipart request alternative does the same. Buffered multipart alternatives retain
+A single SSE success, including `WithHeaders(StreamSse(...), ...)`, supports accumulated queries.
+Raw byte streams and mixed buffered/SSE success alternatives omit the complete endpoint.
+Any streaming multipart request alternative does the same. SSE endpoints with buffered multipart
+payload alternatives are also omitted. Buffered multipart alternatives retain
 the endpoint's mutation builders. Groups containing only omitted endpoints disappear.
 Factory construction rejects unsafe names, path collisions, and contradictory multipart metadata
 before returning a tree. Preserve literal declaration types so the inferred tree omits the same
@@ -91,6 +95,30 @@ Supplied initial data remains available, but native skipped hook data stays poss
 Inputless builders, key builders, and mutations reject `skipToken`. A skipped function cannot run
 through manual refetch; supply valid input or use `enabled: false` with a complete request when
 manual execution is required. Native suspense and prefetch-only hooks reject skipped options.
+
+## Accumulated SSE options
+
+`streamedOptions` accepts native query options, decoded `input` when declared, and:
+
+| Option                    | Contract                                                                                                |
+| ------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `maxChunks`               | Positive safe integer limiting retained events; omitted means unlimited.                                |
+| `refetchMode`             | `reset` (default), `append`, or `replace`.                                                              |
+| `sseOptions.maxEventSize` | Positive safe integer limiting pending parser text; defaults to 10 MiB of JavaScript string code units. |
+
+Decoded data is an ordered readonly array. Accumulated elements keep `undefined`; decoded header
+wrappers surround each emitted body. Empty completion succeeds. Acquisition and consumption errors
+use `EffectHttpApiQueryError` with operation `streamed`, preserving declared event failures,
+`Sse.Retry`, `Sse.SseError`, HTTP and Schema errors, and additional client channels.
+The caller's runner supplies acquisition and consumption services and receives Query's abort signal.
+Cancellation closes the iterator and follows native Query cache reversion.
+
+`streamedKey(input, policy)` accepts the same decoder, retention, and refetch policy; inputless
+endpoints use `streamedKey(policy)`. Equivalent defaults have equal keys. Different effective
+policies occupy separate entries. Endpoint `key()` selects them all. Decoder controls are excluded
+from decoded request input and custom encoders. Declared resume headers remain request identity.
+
+See [Retain SSE events](/effect-api-query/guides/http-queries-and-mutations/#retain-sse-events).
 
 ## Pagination
 

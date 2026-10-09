@@ -407,6 +407,7 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       'public-contract.ts',
       'tanstack-start-contract.ts',
       'http-contract.ts',
+      'http-stream-contract.ts',
       'type-scale.ts',
       'http-type-scale.ts',
       'docs-rpc-quick-start.ts',
@@ -506,6 +507,7 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       'hashing-runtime.mts',
       'runtime.mts',
       'http-runtime.mts',
+      'http-stream-runtime.mts',
       'stream-cause-runtime.mts',
       'stream-policy-runtime.mts',
     ]) {

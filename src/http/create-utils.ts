@@ -5,7 +5,6 @@ import { createUtilityTree } from '../core/utility-tree'
 import { compileHttpOperations } from './operation'
 import type { CreateHttpApiQueryUtilsOptions, HttpApiQueryUtils } from './types'
 
-/** Derives a frozen utility tree from buffered endpoints and a caller-owned ready HTTP client. */
 export const createHttpApiQueryUtils = <
   const Api extends HttpApi.Constraint,
   const Prefix extends readonly [JsonValue, ...JsonValue[]],

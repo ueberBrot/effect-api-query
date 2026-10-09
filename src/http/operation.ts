@@ -1,9 +1,11 @@
 import { Predicate } from 'effect'
 import type { Effect } from 'effect'
+import type { Sse } from 'effect/encoding'
 import type { HttpApi } from 'effect/http-api'
 
 import type {
   MutationOperation,
+  StreamingOperation,
   RuntimeKeyEncoder,
   TreeErrors,
   UnaryOperation,
@@ -11,13 +13,14 @@ import type {
 import { EffectHttpApiQueryConfigError, EffectHttpApiQueryError } from './errors'
 import type { HttpApiEndpointIdentity } from './errors'
 import { createHttpRequest } from './request'
+import { createHttpStreamIdentity, createHttpStreamPreparation } from './streamed-query'
 
-type HttpOperation = (UnaryOperation | MutationOperation) & {
+type HttpOperation = (UnaryOperation | MutationOperation | StreamingOperation) & {
   readonly identity: HttpApiEndpointIdentity
 }
 
 export interface CompiledHttpOperations {
-  readonly operations: readonly (UnaryOperation | MutationOperation)[]
+  readonly operations: readonly (UnaryOperation | MutationOperation | StreamingOperation)[]
   readonly errors: TreeErrors
   readonly keyEncoders: ReadonlyMap<string, RuntimeKeyEncoder>
 }
@@ -44,35 +47,50 @@ const extractHttpEndpoints = (api: HttpApi.Top, client: unknown): readonly HttpO
           string,
           (request: unknown) => Effect.Effect<unknown, unknown, unknown>
         >
-      operations.push({
-        ...request,
+      const common = {
         identity,
         id: JSON.stringify([group.identifier, endpoint.identifier]),
         path: group.topLevel ? [endpoint.identifier] : [group.identifier, endpoint.identifier],
-        unsupportedQueryHash: (option) =>
+        unsupportedQueryHash: (option: 'queryKeyHashFn' | 'queryHash') =>
           new EffectHttpApiQueryConfigError(
             'UnsupportedQueryHash',
             `${option} must be configured through QueryClient defaults`,
             identity,
           ),
-        takeOptions: () => {
-          // HTTP has no adapter-owned options.
-        },
-        invoke: (requestInput) => {
-          const invoke = target[endpoint.identifier]
-          if (invoke === undefined) {
-            throw new TypeError(`Missing HTTP client endpoint ${endpoint.identifier}`)
-          }
-          // The ready client preserves caller errors and service requirements.
+        takeOptions: () => null,
+      }
+      const invoke = (requestInput: unknown, sseOptions?: Sse.DecodeOptions) => {
+        const method = target[endpoint.identifier]
+        if (method === undefined) {
+          throw new TypeError(`Missing HTTP client endpoint ${endpoint.identifier}`)
+        }
+        // The ready client preserves caller errors and service requirements.
+        // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
+        return method.call(target, {
+          ...(Predicate.isObject(requestInput) ? requestInput : undefined),
+          responseMode: 'decoded-only',
+          ...(sseOptions === undefined ? undefined : { sseOptions }),
+        })
+      }
+      if (request.kind === 'Streaming') {
+        operations.push({
+          ...common,
+          ...request,
+          kind: 'Streaming',
+          supportsLive: false,
+          streamedIdentity: createHttpStreamIdentity(identity),
+          prepareStream: createHttpStreamPreparation(identity, invoke),
+        })
+      } else {
+        operations.push({
+          ...common,
+          ...request,
           // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
-          return invoke.call(target, {
-            ...(Predicate.isObject(requestInput) ? requestInput : undefined),
-            responseMode: 'decoded-only',
-          })
-        },
-        executionError: (operation, cause) =>
-          new EffectHttpApiQueryError(identity, operation, cause),
-      })
+          invoke: (requestInput) => invoke(requestInput),
+          executionError: (operation, cause) =>
+            new EffectHttpApiQueryError(identity, operation, cause),
+        })
+      }
     }
   }
   return operations
@@ -127,7 +145,7 @@ export const compileHttpOperations = (
   const errors = httpTreeErrors(api, operations)
   const encoderGroups = new Set(
     operations
-      .filter((operation) => operation.kind === 'Unary' && operation.input._tag === 'Input')
+      .filter((operation) => operation.kind !== 'Mutation' && operation.input._tag === 'Input')
       .map((operation) => operation.identity.groupId),
   )
   const keyEncoders = new Map<string, RuntimeKeyEncoder>()
