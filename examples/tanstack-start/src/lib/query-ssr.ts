@@ -36,11 +36,9 @@ export const fetchStreamSnapshot = async <TQueryFnData, TError, TData, TQueryKey
   }
 }
 
-/** Configures QueryClient hydration, including Effect Schema class serialization. */
 export const setupQuerySsr = (router: AnyRouter, queryClient: QueryClient): void => {
   setupRouterSsrQueryIntegration({
     dehydrateOptions: {
-      // Query cache data is opaque; structuredClone preserves the serialization boundary.
       // oxlint-disable-next-line anti-slop/no-unknown-parameters
       serializeData: (data: unknown) => structuredClone(data),
       shouldDehydrateQuery: defaultShouldDehydrateQuery,

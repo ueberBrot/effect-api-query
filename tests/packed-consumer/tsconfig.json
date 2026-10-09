@@ -18,12 +18,15 @@
     "stream-cause-runtime.mts",
     "stream-policy-runtime.mts",
     "retry-runtime.mts",
+    "hydration-runtime.mts",
     "http-runtime.mts",
     "public-contract.ts",
     "http-contract.ts",
     "docs-rpc-quick-start.ts",
     "docs-http-quick-start.ts",
     "docs-retry.ts",
+    "docs-hydration-*.ts",
+    "hydration-contract.ts",
     "skill-example-*.ts"
   ]
 }

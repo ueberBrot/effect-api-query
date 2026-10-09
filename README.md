@@ -77,6 +77,7 @@ Streaming HTTP responses and streaming multipart requests remain omitted.
 
 - [React Query](https://ueberbrot.github.io/effect-api-query/guides/react-query/): use generated options with hooks.
 - [TanStack Start](https://ueberbrot.github.io/effect-api-query/guides/tanstack-start/): share RPC and HTTP options across loaders, server rendering, and hydration.
+- [Hydrate Unary Data](https://ueberbrot.github.io/effect-api-query/guides/hydrate-unary-data/): keep DTOs or reconstructed Schema values consistent across JSON hydration and refetch.
 - [Run the examples](https://ueberbrot.github.io/effect-api-query/examples/): try complete Vite React and TanStack Start applications.
 - [Feature support](https://ueberbrot.github.io/effect-api-query/getting-started/feature-support/): check available operations and integration limits.
 - [API reference](https://ueberbrot.github.io/effect-api-query/reference/public-exports/): look up factories, builders, and errors.
