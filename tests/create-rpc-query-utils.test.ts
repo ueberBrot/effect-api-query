@@ -87,7 +87,7 @@ describe(createRpcQueryUtils, () => {
       ])
       expect(utils.toString.child.key()).toStrictEqual(['app', 'rpc', 'toString', 'child'])
       expect(utils.events.watch.key()).toStrictEqual(['app', 'rpc', 'events', 'watch'])
-      expect(utils.events.watch.streamedKey()).toStrictEqual([
+      expect(utils.events.watch.streamedKey().slice(0, 5)).toStrictEqual([
         'app',
         'rpc',
         'events',
@@ -296,7 +296,7 @@ describe(createRpcQueryUtils, () => {
         'streamedKey',
         'streamedOptions',
       ])
-      expect(utils.events.audit.watch.streamedKey()).toStrictEqual([
+      expect(utils.events.audit.watch.streamedKey().slice(0, 6)).toStrictEqual([
         'app',
         'rpc',
         'events',
@@ -315,7 +315,7 @@ describe(createRpcQueryUtils, () => {
       expect(utils.events.audit.watch.streamedKey()).not.toStrictEqual(
         utils.events.audit.watch.liveKey(),
       )
-      expect(utils.updates.watch.streamedKey()).toStrictEqual([
+      expect(utils.updates.watch.streamedKey().slice(0, 5)).toStrictEqual([
         'app',
         'rpc',
         'updates',

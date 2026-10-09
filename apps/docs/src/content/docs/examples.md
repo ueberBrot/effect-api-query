@@ -120,9 +120,10 @@ The accumulated history retains only "Workspace synchronized" and "Ready"; earli
 as new ones arrive. Choose **Replay full history** to retain all four states again. The live query
 continues to show only "Ready".
 
-The bounded replay supplies `maxChunks: 2` to `streamedOptions`. Both controls reuse the generated
-streamed key: the bound changes retention policy, not RPC identity. The application keeps the selected
-policy for subsequent refetches. TanStack Start also demonstrates this after hydrating its server snapshot.
+The bounded replay supplies `maxChunks: 2` to `streamedOptions`. Each policy has its own generated
+streamed key, so a cached full history cannot satisfy the bounded view. The application keeps the
+selected policy for subsequent refetches. TanStack Start also demonstrates this after hydrating its
+server snapshot.
 
 ## Inspect request-local metadata
 

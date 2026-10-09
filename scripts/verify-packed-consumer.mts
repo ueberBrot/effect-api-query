@@ -507,6 +507,7 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       'runtime.mts',
       'http-runtime.mts',
       'stream-cause-runtime.mts',
+      'stream-policy-runtime.mts',
     ]) {
       execFileSync(process.execPath, ['--experimental-import-meta-resolve', fixture], {
         cwd: consumerDirectory,

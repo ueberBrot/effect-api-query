@@ -3,7 +3,7 @@ import type { QueryFunctionContext } from '@tanstack/query-core'
 import { Exit, Predicate, Stream } from 'effect'
 
 import type { StreamingOperation } from '../core/operation'
-import type { RunPromiseExit } from '../core/types'
+import type { JsonValue, RunPromiseExit } from '../core/types'
 import {
   EffectRpcQueryConfigError,
   EffectRpcQueryEmptyStreamError,
@@ -13,9 +13,9 @@ import type { StreamRefetchMode, StreamingRpcOptions } from './types'
 
 type StreamQueryPolicy =
   | {
-      readonly maxChunks?: number
+      readonly maxChunks: number | undefined
       readonly _tag: 'Accumulated'
-      readonly refetchMode?: StreamRefetchMode
+      readonly refetchMode: StreamRefetchMode
     }
   | { readonly _tag: 'Live' }
 
@@ -34,6 +34,39 @@ interface MakeStreamQueryOptions {
   readonly rpc: RpcStreamInvocation
   readonly runPromiseExit: RunPromiseExit<unknown>
 }
+
+const accumulatedPolicy = (
+  rpcTag: string,
+  options: Record<string, unknown>,
+): Extract<StreamQueryPolicy, { readonly _tag: 'Accumulated' }> => {
+  const { maxChunks, refetchMode = 'reset' } = options
+  if (
+    maxChunks !== undefined &&
+    (!Predicate.isNumber(maxChunks) || !Number.isSafeInteger(maxChunks) || maxChunks <= 0)
+  ) {
+    throw new EffectRpcQueryConfigError(
+      'InvalidMaxChunks',
+      'maxChunks must be a positive safe integer',
+      { rpcTag },
+    )
+  }
+  if (refetchMode !== 'reset' && refetchMode !== 'append' && refetchMode !== 'replace') {
+    throw new EffectRpcQueryConfigError(
+      'InvalidRefetchMode',
+      'refetchMode must be reset, append, or replace',
+      { rpcTag },
+    )
+  }
+  return { _tag: 'Accumulated' as const, maxChunks, refetchMode }
+}
+
+export const createStreamIdentity =
+  (rpcTag: string): StreamingOperation['streamedIdentity'] =>
+  (options) => {
+    const { maxChunks, refetchMode } = accumulatedPolicy(rpcTag, options)
+    const identity: JsonValue = Object.freeze({ maxChunks: maxChunks ?? null, refetchMode })
+    return [identity]
+  }
 
 const streamQueryIterable = <A>(
   source: AsyncIterable<A>,
@@ -137,7 +170,7 @@ const makeStreamQuery = ({
     })
   }
 
-  const { maxChunks, refetchMode = 'reset' } = policy
+  const { maxChunks, refetchMode } = policy
   if (maxChunks === undefined) {
     return experimental_streamedQuery({ refetchMode, streamFn })
   }
@@ -171,30 +204,10 @@ const makeStreamQuery = ({
 export const createStreamPreparation =
   (rpc: RpcStreamInvocation): StreamingOperation['prepareStream'] =>
   (options, operation, runPromiseExit, requestOptions) => {
-    // SAFETY: Public streamedOptions restricts this field to StreamRefetchMode;
-    // the options copy changes neither its value nor its contract.
-    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-    const refetchMode = options['refetchMode'] as StreamRefetchMode | undefined
-    delete options['refetchMode']
-    const { maxChunks } = options
-    delete options['maxChunks']
-    // Preparation also runs for skipped queries; invalid policy fails synchronously.
-    if (
-      maxChunks !== undefined &&
-      (!Predicate.isNumber(maxChunks) || !Number.isSafeInteger(maxChunks) || maxChunks <= 0)
-    ) {
-      throw new EffectRpcQueryConfigError(
-        'InvalidMaxChunks',
-        'maxChunks must be a positive safe integer',
-        { rpcTag: rpc.tag },
-      )
-    }
     const policy: StreamQueryPolicy =
-      operation === 'live' ? { _tag: 'Live' } : { _tag: 'Accumulated' }
-    if (policy._tag === 'Accumulated') {
-      Object.assign(policy, refetchMode === undefined ? undefined : { refetchMode })
-      Object.assign(policy, maxChunks === undefined ? undefined : { maxChunks })
-    }
+      operation === 'live' ? { _tag: 'Live' } : accumulatedPolicy(rpc.tag, options)
+    delete options['refetchMode']
+    delete options['maxChunks']
     // SAFETY: takeRpcOptions extracted this unchanged from the typed public options.
     // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const rpcOptions = requestOptions as StreamingRpcOptions | undefined
