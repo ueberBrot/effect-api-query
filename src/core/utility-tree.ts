@@ -22,6 +22,8 @@ const reservedPathSegments = new Set([
   'key',
   'liveKey',
   'liveOptions',
+  'metadataKey',
+  'metadataOptions',
   'mutationKey',
   'mutationOptions',
   'prototype',
@@ -172,7 +174,7 @@ const planPaths = (operations: readonly OperationDescription[], errors: TreeErro
   return plan
 }
 
-const execute = async <Operation extends UnaryQueryOperation>(
+const execute = async <Operation extends UnaryQueryOperation | 'metadata'>(
   description: {
     readonly invoke: UnaryOperation['invoke']
     readonly executionError: (operation: Operation, cause: Cause.Cause<unknown>) => Error
@@ -384,6 +386,19 @@ const createUnaryLeaf = (
       async ({ signal }: { readonly signal: AbortSignal }) =>
         execute(description, 'query', input, runPromiseExit, requestOptions, signal),
   )
+  const { metadata } = description
+  const metadataQuery =
+    metadata === undefined
+      ? undefined
+      : createQueryBuilders(
+          description,
+          freezeKey([...operationKey, 'metadata']),
+          keyEncoder,
+          (_options, requestOptions) =>
+            (input) =>
+            async ({ signal }: { readonly signal: AbortSignal }) =>
+              execute(metadata, 'metadata', input, runPromiseExit, requestOptions, signal),
+        )
 
   return Object.freeze({
     ...createInfiniteBuilders(description, operationKey, keyEncoder, runPromiseExit),
@@ -391,6 +406,9 @@ const createUnaryLeaf = (
     ...createMutationBuilders(description, operationKey, runPromiseExit),
     queryKey: query.key,
     queryOptions: query.options,
+    ...(metadataQuery === undefined
+      ? undefined
+      : { metadataKey: metadataQuery.key, metadataOptions: metadataQuery.options }),
   })
 }
 

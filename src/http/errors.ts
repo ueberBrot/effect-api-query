@@ -9,7 +9,7 @@ export interface HttpApiEndpointIdentity {
 }
 
 /** TanStack operations supported by buffered HTTP endpoints. */
-export type HttpApiOperation = 'query' | 'infinite' | 'mutation'
+export type HttpApiOperation = 'query' | 'infinite' | 'mutation' | 'metadata'
 
 /** Stable codes for invalid HTTP utility configuration. */
 export type EffectHttpApiQueryConfigErrorCode =

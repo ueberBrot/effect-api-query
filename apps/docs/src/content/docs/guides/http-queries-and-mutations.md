@@ -51,6 +51,51 @@ React applications can pass `userOptions` directly to `useQuery`, `useSuspenseQu
 data type without changing the cached value. `queryClient.getQueryData(userOptions.queryKey)`
 still infers the decoded user type.
 
+## Update with an ETag
+
+Use a metadata view to read decoded data, status, and raw response headers together. For this
+recipe, `users.get` returns a user and its server supplies an ETag. The `users.update` endpoint
+declares numeric `id` params, a string `if-match` header, a `{ name: string }` payload, and its
+precondition failure as a declared error.
+
+```ts
+const input = { params: { id: 1 } }
+const metadataOptions = http.users.get.metadataOptions({ input })
+const current = await queryClient.query(metadataOptions)
+const etag = current.headers['etag']
+if (etag === undefined) throw new Error('The server supplied no ETag')
+
+await queryClient.cancelQueries({ queryKey: http.users.get.key() })
+const update = new MutationObserver(
+  queryClient,
+  http.users.update.mutationOptions({
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: http.users.get.key() }),
+  }),
+)
+await update.mutate({
+  params: input.params,
+  headers: { 'if-match': etag },
+  payload: { name: 'Ada' },
+})
+
+const refreshed = await queryClient.query(metadataOptions)
+```
+
+Send the ETag unchanged, including quotes. The server owns conditional-write enforcement; handle a
+declared precondition failure through the mutation's HTTP execution error. Invalidation uses the
+endpoint prefix so both ordinary data and metadata views refresh. Read the next ETag from the fresh
+metadata result before another write.
+
+`current.data` retains the endpoint's decoded success, including any declared decoded header
+wrapper. A top-level successful `undefined` becomes `null`. `current.status` is the response status;
+`current.headers` is a copied, frozen plain string record. The outer result is frozen, while decoded
+data keeps its declared representation. Raw headers can contain private values: choose which headers
+your application may persist or dehydrate.
+
+`metadataKey(input)` provides a typed key for cache reads and writes. Metadata options support
+selection, initial data, skipped input, native hashing defaults, and cancellation like ordinary
+queries. Metadata has its own cache identity and no mutation or infinite-query builders.
+
 ## Wait for request input
 
 Use `skipToken` until the complete request is available:

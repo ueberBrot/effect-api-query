@@ -169,6 +169,8 @@ true satisfies Assert<
     | 'mutationOptions'
     | 'infiniteKey'
     | 'infiniteOptions'
+    | 'metadataKey'
+    | 'metadataOptions'
   >
 >
 true satisfies Assert<Equal<Parameters<typeof utils.ping.queryKey>, []>>
@@ -970,6 +972,9 @@ declare const overloadedServiceMethod: typeof serviceClient.work.serviceful &
   RawResponseMethod &
   SpecificRawResponseMethod
 const overloadedServiceClient = { work: { serviceful: overloadedServiceMethod } }
+declare const metadataRunner: RunPromiseExit<
+  EncodeRequest | DecodeSuccess | DecodeError | ExtraClientService | RawResponseService
+>
 // @ts-expect-error A trailing raw-response overload cannot hide decoded execution services.
 createHttpApiQueryUtils(serviceApi, {
   client: overloadedServiceClient,
@@ -980,14 +985,14 @@ const overloadedServiceUtils = createHttpApiQueryUtils(serviceApi, {
   client: overloadedServiceClient,
   keyPrefix: ['app'],
   keyEncoders: { work: { serviceful: encoder } },
-  runPromiseExit: runner,
+  runPromiseExit: metadataRunner,
 })
 type OverloadedRequirements = CreateHttpApiQueryUtilsOptions<
   typeof serviceApi,
   readonly ['app'],
   typeof overloadedServiceClient
 >['runPromiseExit']
-true satisfies Assert<Equal<OverloadedRequirements, typeof runner>>
+true satisfies Assert<Equal<OverloadedRequirements, typeof metadataRunner>>
 const overloadedServiceState = queryClient.getQueryState(
   overloadedServiceUtils.work.serviceful.queryKey({ payload: { id: 1, name: 'Ada' } }),
 )
@@ -1055,6 +1060,115 @@ type GetFailure = EffectHttpApiQueryError<
   'not-found' | HttpClientError.HttpClientError | Schema.SchemaError
 >
 const getUser = utils['user.accounts']['get.user']
+const metadata = getUser.metadataOptions({
+  input,
+  select: (view) => view.data.name,
+  retry: (_count, error) => {
+    error satisfies GetFailure
+    return false
+  },
+  staleTime: (query) => {
+    query.state.data?.data satisfies typeof User.Type | undefined
+    query.queryKey satisfies ReturnType<typeof getUser.metadataKey>
+    return 1_000
+  },
+})
+useQuery(metadata).data satisfies string | undefined
+useSuspenseQuery(metadata).data satisfies string
+usePrefetchQuery(metadata)
+type UserMetadata = {
+  readonly data: typeof User.Type
+  readonly status: number
+  readonly headers: Readonly<Record<string, string>>
+}
+true satisfies Assert<Equal<ReturnType<typeof getUser.metadataKey>[5], 'metadata'>>
+const metadataCache = queryClient.getQueryData(getUser.metadataKey(input))
+true satisfies Assert<Equal<typeof metadataCache, UserMetadata | undefined>>
+const initialMetadata = { data: { id: 1, name: 'Ada' }, status: 200, headers: { etag: 'v1' } }
+const definedMetadata = useQuery(
+  getUser.metadataOptions({
+    input,
+    initialData: initialMetadata,
+    select: (view) => view.data.name,
+  }),
+)
+true satisfies Assert<Equal<typeof definedMetadata.data, string>>
+declare const optionalMetadata: UserMetadata | undefined
+const optionalMetadataHook = useQuery(
+  getUser.metadataOptions({
+    input,
+    initialData: optionalMetadata,
+    select: (view) => view.data.name,
+  }),
+)
+true satisfies Assert<Equal<typeof optionalMetadataHook.data, string | undefined>>
+const skippedMetadata = getUser.metadataOptions({ input: skipToken, initialData: initialMetadata })
+skippedMetadata.queryFn satisfies SkipToken
+skippedMetadata.queryKey satisfies readonly [
+  'app',
+  'http',
+  'account.api',
+  'user.accounts',
+  'get.user',
+  'metadata',
+]
+const skippedMetadataHook = useQuery(skippedMetadata)
+true satisfies Assert<Equal<typeof skippedMetadataHook.data, UserMetadata | undefined>>
+getUser.metadataOptions(skipToken).queryFn satisfies SkipToken
+const conditionalMetadata = getUser.metadataOptions({
+  input: hasUser ? input : skipToken,
+  select: (view) => view.status,
+})
+useQuery(conditionalMetadata).data satisfies number | undefined
+const emptyMetadata = queryClient.getQueryData(utils.ping.metadataKey())
+true satisfies Assert<Equal<NonNullable<typeof emptyMetadata>['data'], null>>
+const wrappedMetadata = queryClient.getQueryData(
+  utils['user.accounts'].wrappedBuffered.metadataKey(),
+)
+true satisfies Assert<
+  Equal<
+    NonNullable<typeof wrappedMetadata>['data'],
+    HttpApiSchema.withHeaders<typeof User.Type, { readonly version: string }>
+  >
+>
+// @ts-expect-error Metadata snapshots have readonly status.
+metadataCache!.status = 201
+// @ts-expect-error Metadata headers form a readonly string snapshot.
+metadataCache!.headers['etag'] = 'other'
+// @ts-expect-error Metadata is available only for query-enabled buffered requests.
+utils.upload.metadataOptions()
+// @ts-expect-error Metadata adds no infinite-query builder.
+getUser.metadataInfiniteOptions()
+// @ts-expect-error Metadata adds no mutation builder.
+getUser.metadataMutationOptions()
+// @ts-expect-error Metadata views retain complete decoded request containers.
+getUser.metadataOptions({ input: { params: { id: 1 } } })
+// @ts-expect-error Response controls belong to the metadata view.
+getUser.metadataKey({ ...input, responseMode: 'response-only' })
+// @ts-expect-error Inputless metadata builders cannot be skipped.
+utils.ping.metadataOptions(skipToken)
+// @ts-expect-error Metadata hash defaults belong to QueryClient.
+getUser.metadataOptions({ input: skipToken, queryHash: 'other' })
+// @ts-expect-error Metadata hash functions belong to QueryClient.
+getUser.metadataOptions({ input, queryKeyHashFn: JSON.stringify })
+// @ts-expect-error Skipped metadata cannot guarantee suspense execution.
+useSuspenseQuery(skippedMetadata)
+true satisfies Assert<Equal<Extract<'queryHash' | 'queryKeyHashFn', keyof typeof metadata>, never>>
+const metadataServiceState = queryClient.getQueryState(
+  overloadedServiceUtils.work.serviceful.metadataKey({ payload: { id: 1, name: 'Ada' } }),
+)
+true satisfies Assert<
+  Equal<
+    NonNullable<typeof metadataServiceState>['error'],
+    EffectHttpApiQueryError<
+      | 'service-error'
+      | 'extra-client-error'
+      | 'tuple-error'
+      | HttpClientError.HttpClientError
+      | Schema.SchemaError
+    > | null
+  >
+>
 const nativeQuery = getUser.queryOptions({
   input,
   select: (user) => user.name,

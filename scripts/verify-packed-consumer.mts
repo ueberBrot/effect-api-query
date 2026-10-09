@@ -506,6 +506,8 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       'hashing-runtime.mts',
       'runtime.mts',
       'http-runtime.mts',
+      'http-metadata-runtime.mts',
+      'http-etag-recipe.mts',
       'stream-cause-runtime.mts',
     ]) {
       execFileSync(process.execPath, ['--experimental-import-meta-resolve', fixture], {
