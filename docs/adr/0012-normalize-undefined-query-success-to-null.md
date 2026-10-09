@@ -9,14 +9,11 @@ runtime `undefined` for success.
 
 ## Decision
 
-Generated buffered query functions and live-stream reducers map successful `undefined` to cacheable
-`null`. Their query-data types replace `undefined` with `null`, including key DataTags, selectors,
-and initial data. Explicit `null` stays `null`. Accumulated stream elements and mutation results
-preserve `undefined`: an array containing `undefined` remains cacheable query data.
+Buffered and live queries map successful `undefined` to cacheable `null` in both values and types.
+Accumulated stream elements and mutation results preserve `undefined`, because neither needs this
+normalization to produce valid query data.
 
 ## Consequences
 
-Every unary RPC remains usable as a query without disguising an upstream failure. Every live
-emission becomes the latest query data, including an undefined emission after a defined value.
-An undefined emission counts as the first value; an empty live stream still fails. This is the
-adapter's only success-value normalization.
+Every unary RPC and live emission remains usable as query data without disguising a failure or an
+empty stream. This is the adapter's only success-value normalization.
