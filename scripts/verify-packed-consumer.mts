@@ -507,6 +507,8 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       'hashing-runtime.mts',
       'runtime.mts',
       'http-runtime.mts',
+      'http-metadata-runtime.mts',
+      'http-etag-recipe.mts',
       'http-stream-runtime.mts',
       'stream-cause-runtime.mts',
       'stream-policy-runtime.mts',

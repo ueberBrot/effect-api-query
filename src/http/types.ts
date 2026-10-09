@@ -130,8 +130,9 @@ export type MethodSignatures<
 export type DecodedEffect<
   Method,
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
+  Mode extends 'decoded-only' | 'decoded-and-response' = 'decoded-only',
 > = Method extends (
-  request: RequestFields<Endpoint> & { readonly responseMode: 'decoded-only' },
+  request: RequestFields<Endpoint> & { readonly responseMode: Mode },
 ) => infer Result
   ? Result
   : never
@@ -139,16 +140,24 @@ export type ClientEffect<
   Group,
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Client,
+  Mode extends 'decoded-only' | 'decoded-and-response' = 'decoded-only',
 > = DecodedEffect<
   MethodSignatures<Member<ClientGroup<Group, Client>, Endpoint['identifier']>>,
-  Endpoint
+  Endpoint,
+  Mode
 >
 export type ExposedEffects<Api extends HttpApi.Constraint, Client> =
   SupportedGroups<Api> extends infer Group
     ? Group extends HttpApiGroup.Constraint
       ? Supported<Endpoints<Group>> extends infer Endpoint
         ? Endpoint extends HttpApiEndpoint.ConstraintRequest
-          ? ClientEffect<Group, Endpoint, Client>
+          ?
+              | ClientEffect<Group, Endpoint, Client>
+              | ([Queryable<Endpoint>] extends [never]
+                  ? never
+                  : [SseEndpoint<Endpoint>] extends [never]
+                    ? ClientEffect<Group, Endpoint, Client, 'decoded-and-response'>
+                    : never)
           : never
         : never
       : never
@@ -188,6 +197,36 @@ export type QueryBuilder<
   Failure<ClientError>,
   ConcreteKey<Endpoint, Key, ClientError>,
   readonly [...Key, 'query']
+>
+
+export type MetadataData<Endpoint extends HttpApiEndpoint.ConstraintRequest> = {
+  readonly data: QueryData<Success<Endpoint>>
+  readonly status: number
+  readonly headers: Readonly<Record<string, string>>
+}
+
+export type ConcreteMetadataKey<
+  Endpoint extends HttpApiEndpoint.ConstraintRequest,
+  Key extends readonly JsonValue[],
+  ClientError,
+> = DataTag<
+  void extends Request<Endpoint>
+    ? readonly [...Key, 'metadata']
+    : readonly [...Key, 'metadata', JsonValue],
+  MetadataData<Endpoint>,
+  Failure<ClientError>
+>
+
+export type MetadataBuilder<
+  Endpoint extends HttpApiEndpoint.ConstraintRequest,
+  Key extends readonly JsonValue[],
+  ClientError,
+> = UnaryQueryBuilder<
+  Request<Endpoint>,
+  MetadataData<Endpoint>,
+  Failure<ClientError>,
+  ConcreteMetadataKey<Endpoint, Key, ClientError>,
+  readonly [...Key, 'metadata']
 >
 
 export type ConcreteInfiniteKey<
@@ -234,6 +273,7 @@ export type BufferedLeaf<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Key extends readonly JsonValue[],
   ClientError,
+  MetadataClientError = ClientError,
 > = MutationLeaf<Endpoint, Key, ClientError> &
   ([Queryable<Endpoint>] extends [never]
     ? unknown
@@ -242,6 +282,10 @@ export type BufferedLeaf<
           ? () => ConcreteKey<Endpoint, Key, ClientError>
           : (input: Request<Endpoint>) => ConcreteKey<Endpoint, Key, ClientError>
         readonly queryOptions: QueryBuilder<Endpoint, Key, ClientError>
+        readonly metadataKey: void extends Request<Endpoint>
+          ? () => ConcreteMetadataKey<Endpoint, Key, MetadataClientError>
+          : (input: Request<Endpoint>) => ConcreteMetadataKey<Endpoint, Key, MetadataClientError>
+        readonly metadataOptions: MetadataBuilder<Endpoint, Key, MetadataClientError>
         readonly infiniteKey: void extends Request<Endpoint>
           ? () => ConcreteInfiniteKey<Endpoint, Key, ClientError>
           : (input: Request<Endpoint>) => ConcreteInfiniteKey<Endpoint, Key, ClientError>
@@ -306,8 +350,9 @@ export type Leaf<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Key extends readonly JsonValue[],
   ClientError,
+  MetadataClientError = ClientError,
 > = [SseEndpoint<Endpoint>] extends [never]
-  ? BufferedLeaf<Endpoint, Key, ClientError>
+  ? BufferedLeaf<Endpoint, Key, ClientError, MetadataClientError>
   : StreamedLeaf<Endpoint, Key, ClientError>
 
 /** An eager utility tree mirroring the ready HTTP client's literal properties. */
@@ -327,7 +372,8 @@ export type HttpApiQueryUtils<
       Endpoint,
       EndpointKey<Api, Prefix, Group, Endpoint>,
       | Effect.Error<ClientEffect<Group, Endpoint, Client>>
-      | StreamFailure<Effect.Success<ClientEffect<Group, Endpoint, Client>>>
+      | StreamFailure<Effect.Success<ClientEffect<Group, Endpoint, Client>>>,
+      Effect.Error<ClientEffect<Group, Endpoint, Client, 'decoded-and-response'>>
     >
   }
 } & {
@@ -339,7 +385,10 @@ export type HttpApiQueryUtils<
     Endpoint,
     readonly [...Root<Api, Prefix>, Endpoint['identifier']],
     | Effect.Error<ClientEffect<{ readonly topLevel: true }, Endpoint, Client>>
-    | StreamFailure<Effect.Success<ClientEffect<{ readonly topLevel: true }, Endpoint, Client>>>
+    | StreamFailure<Effect.Success<ClientEffect<{ readonly topLevel: true }, Endpoint, Client>>>,
+    Effect.Error<
+      ClientEffect<{ readonly topLevel: true }, Endpoint, Client, 'decoded-and-response'>
+    >
   >
 }
 

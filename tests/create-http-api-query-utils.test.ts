@@ -306,6 +306,8 @@ describe(createHttpApiQueryUtils, () => {
         'mutationOptions',
         'queryKey',
         'queryOptions',
+        'metadataKey',
+        'metadataOptions',
       ])
       expect(Object.isFrozen(utils)).toBe(true)
       expect(Object.isFrozen(utils['users.v1'])).toBe(true)

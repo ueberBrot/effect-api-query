@@ -78,7 +78,7 @@ for each code's trigger.
 
 Thrown when the HTTP runner returns a failed `Exit`. It exposes `apiId`, `groupId`, `endpoint`,
 `method`, `operation`, and the full `Cause.Cause<E>`. The operation is `query`, `infinite`, `mutation`,
-or `streamed`.
+`metadata`, or `streamed`.
 Use `isEffectHttpApiQueryError(value)` to narrow errors within the same JavaScript realm.
 
 The Cause preserves endpoint, middleware, Schema, and HTTP client errors, including defects and
