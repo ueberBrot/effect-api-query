@@ -1,4 +1,4 @@
-import { QueryClient, skipToken } from '@tanstack/query-core'
+import { MutationObserver, QueryClient, QueryObserver, skipToken } from '@tanstack/query-core'
 import { skipToken as reactQuerySkipToken } from '@tanstack/react-query'
 import { Effect, Schema, Stream } from 'effect'
 import * as rpcQuery from 'effect-api-query'
@@ -99,11 +99,40 @@ const Page = Rpc.make('compatibility.page', {
   success: Schema.Int,
 })
 const Watch = Rpc.make('compatibility.watch', { success: Schema.String, stream: true })
-const group = RpcGroup.make(Read, Page, Watch)
+const UndefinedWatch = Rpc.make('compatibility.undefined', {
+  success: Schema.Undefined,
+  stream: true,
+})
+const NullWatch = Rpc.make('compatibility.null', { success: Schema.Null, stream: true })
+const OptionalWatch = Rpc.make('compatibility.optional', {
+  success: Schema.UndefinedOr(Schema.String),
+  stream: true,
+})
+const OpenWatch = Rpc.make('compatibility.open', { success: Schema.Undefined, stream: true })
+const EmptyWatch = Rpc.make('compatibility.empty', { success: Schema.Undefined, stream: true })
+const WriteUndefined = Rpc.make('compatibility.write', { success: Schema.Undefined })
+const group = RpcGroup.make(
+  Read,
+  Page,
+  Watch,
+  UndefinedWatch,
+  NullWatch,
+  OptionalWatch,
+  OpenWatch,
+  EmptyWatch,
+  WriteUndefined,
+)
 const handlers = group.of({
+  'compatibility.empty': () => Stream.empty,
+  'compatibility.null': () => Stream.succeed(null),
+  'compatibility.open': () =>
+    Stream.succeed(undefined).pipe(Stream.concat(Stream.fromEffect(Effect.never))),
+  'compatibility.optional': () => Stream.make('value', undefined),
   'compatibility.page': Effect.fn('CompatibilityRpc.page')(({ cursor }) => Effect.succeed(cursor)),
   'compatibility.read': Effect.fn('CompatibilityRpc.read')(() => Effect.succeed('ordinary')),
+  'compatibility.undefined': () => Stream.succeed(undefined),
   'compatibility.watch': () => Stream.make('first', 'second'),
+  'compatibility.write': () => Effect.succeed(undefined),
 })
 
 await Effect.runPromise(
@@ -148,6 +177,107 @@ await Effect.runPromise(
         ),
         'second',
       )
+      equal(
+        yield* Effect.promise(() =>
+          queryClient.query(rpcUtilityTree.compatibility.undefined.liveOptions()),
+        ),
+        null,
+        'An undefined emission must become the live value',
+      )
+      equal(queryClient.getQueryData(rpcUtilityTree.compatibility.undefined.liveKey()), null)
+      equal(
+        yield* Effect.promise(() =>
+          queryClient.query(rpcUtilityTree.compatibility.null.liveOptions()),
+        ),
+        null,
+        'An explicit null emission must remain null',
+      )
+      equal(queryClient.getQueryData(rpcUtilityTree.compatibility.null.liveKey()), null)
+
+      const optionalOptions = rpcUtilityTree.compatibility.optional.liveOptions()
+      const latestValues: unknown[] = []
+      const stopRecording = queryClient.getQueryCache().subscribe((event) => {
+        if (
+          event.type === 'updated' &&
+          event.action.type === 'success' &&
+          event.query ===
+            queryClient.getQueryCache().find({ queryKey: optionalOptions.queryKey, exact: true })
+        ) {
+          latestValues.push(event.query.state.data)
+        }
+      })
+      try {
+        equal(yield* Effect.promise(() => queryClient.query(optionalOptions)), null)
+        deepStrictEqual(latestValues.slice(0, 2), ['value', null])
+        equal(queryClient.getQueryData(optionalOptions.queryKey), null)
+      } finally {
+        stopRecording()
+      }
+
+      deepStrictEqual(
+        yield* Effect.promise(() =>
+          queryClient.query(rpcUtilityTree.compatibility.undefined.streamedOptions()),
+        ),
+        [undefined],
+        'Accumulated undefined elements must be preserved',
+      )
+      deepStrictEqual(
+        yield* Effect.promise(() =>
+          queryClient.query(rpcUtilityTree.compatibility.optional.streamedOptions()),
+        ),
+        ['value', undefined],
+      )
+      const mutation = new MutationObserver(
+        queryClient,
+        rpcUtilityTree.compatibility.write.mutationOptions(),
+      )
+      equal(yield* Effect.promise(() => mutation.mutate(undefined)), undefined)
+
+      yield* Effect.promise(() =>
+        rejects(
+          queryClient.query(rpcUtilityTree.compatibility.empty.liveOptions({ retry: false })),
+          (error: unknown) => {
+            ok(error instanceof rpcQuery.EffectRpcQueryEmptyStreamError)
+            equal(error.rpcTag, 'compatibility.empty')
+            return true
+          },
+        ),
+      )
+      equal(queryClient.getQueryData(rpcUtilityTree.compatibility.empty.liveKey()), undefined)
+
+      const openOptions = rpcUtilityTree.compatibility.open.liveOptions({ retry: false })
+      const observer = new QueryObserver(queryClient, openOptions)
+      let unsubscribe = () => {}
+      let timeout: ReturnType<typeof setTimeout> | undefined
+      try {
+        const firstSnapshot = yield* Effect.promise(
+          () =>
+            new Promise<{ readonly data: null; readonly fetchStatus: string }>(
+              (resolve, reject) => {
+                timeout = setTimeout(
+                  () => reject(new Error('Live first emission timed out')),
+                  10_000,
+                )
+                unsubscribe = observer.subscribe((result) => {
+                  if (result.status === 'success') {
+                    resolve(result)
+                  } else if (result.status === 'error') {
+                    reject(result.error)
+                  }
+                })
+              },
+            ),
+        )
+        equal(firstSnapshot.data, null)
+        equal(firstSnapshot.fetchStatus, 'fetching')
+        equal(queryClient.getQueryData(openOptions.queryKey), null)
+      } finally {
+        clearTimeout(timeout)
+        unsubscribe()
+        yield* Effect.promise(() => queryClient.cancelQueries({ queryKey: openOptions.queryKey }))
+        observer.destroy()
+        queryClient.clear()
+      }
     }),
   ),
 )

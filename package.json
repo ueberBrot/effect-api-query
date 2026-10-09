@@ -80,7 +80,7 @@
     "vitest": "catalog:"
   },
   "peerDependencies": {
-    "@tanstack/query-core": ">=5.102.0 <6",
+    "@tanstack/query-core": ">=5.103.1 <6",
     "effect": "catalog:"
   },
   "packageManager": "pnpm@12.8.2"

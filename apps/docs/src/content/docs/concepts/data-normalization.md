@@ -34,8 +34,13 @@ An HTTP endpoint using `HttpApiSchema.NoContent` decodes its successful 204 resp
 Mutations keep the original success type. A mutation that succeeds with `undefined` still
 resolves to `undefined`.
 
-Accumulated streamed queries and live queries retain emitted values as supplied; they do not
-apply buffered query normalization.
+Live queries also convert each emitted `undefined` to `null`. A stream emitting a value followed
+by `undefined` ends with `null` as its latest query data. Live keys, selectors, and `initialData`
+use the same normalized type. The first emission makes an open live query successful while it
+remains fetching; completion without any emission raises `EffectRpcQueryEmptyStreamError`.
+
+Accumulated streamed queries retain emitted values as supplied, including `undefined` elements
+inside their cached arrays.
 
 The [packed RPC consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/packed-consumer/runtime.mts) and
 [packed HTTP consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/packed-consumer/http-runtime.mts) exercise these normalization rules.

@@ -5,7 +5,7 @@ description: Supported versions, RPC and HTTP operations, cache identity, and ru
 
 ## Supported integrations
 
-The package targets Effect 4 and TanStack Query Core 5, with React Query and TanStack Start
+The package targets Effect 4 and TanStack Query Core 5.103.1 or later in v5, with React Query and TanStack Start
 integrations checked in this repository. It is ESM-only and targets ES2022. Use TypeScript with
 `strict: true`.
 
@@ -68,7 +68,8 @@ calls that do not need TanStack Query.
 - Mutation cancellation is outside the generated API.
 - Mutations do not invalidate queries automatically. Applications choose the affected key prefix.
 - RPC and HTTP query successes that may be `undefined` become `null` because TanStack Query rejects
-  `undefined` query data. Mutation results keep their original success type.
+  `undefined` query data. Live emissions follow this rule; accumulated stream elements and mutation
+  results keep their original success types.
 - Cache identity must be strict JSON. Encoding services, redacted values, and multiple HTTP payload
   alternatives require safe custom encoders for endpoints with query support. Binary query input needs
   a JSON-safe projection. Multipart mutation-only endpoints require no encoder and reject encoder entries.
