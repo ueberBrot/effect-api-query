@@ -16,7 +16,10 @@ stream remains fetching. Live completion preserves the latest normalized value.
 
 The ready RPC client remains the execution seam, including direct execution outside TanStack.
 Client construction and Effect middleware remain interception seams. Stream functions forward
-TanStack's abort signal, close the AsyncIterator on cancellation, and preserve the complete Cause.
+TanStack's abort signal and close the AsyncIterator on cancellation. A stream failure preserves its
+complete Cause in `EffectRpcQueryError`, including interruption-only and mixed interruption/defect
+Causes, while that signal is not aborted. Requested cancellation retains TanStack's native result
+and cache reversion, including superseded refetches and removal of the last observer.
 The application owns client/runtime resources, transport, middleware, Scope, QueryClient, and
 framework lifecycle. SSR dehydrates completed data normally; open streams require cancellation
 after the first successful snapshot. Mutations have no cancellation signal.

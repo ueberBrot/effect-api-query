@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from '@effect/vitest'
 import { QueryClient, QueryObserver, skipToken } from '@tanstack/query-core'
-import { Deferred, Effect, Equal, Exit, Predicate, Schema, Stream } from 'effect'
+import { Cause, Deferred, Effect, Equal, Exit, Predicate, Schema, Stream } from 'effect'
 import type { RpcClient } from 'effect/rpc'
 import { Rpc, RpcGroup } from 'effect/rpc'
 import { setTimeout } from 'node:timers/promises'
@@ -391,6 +391,54 @@ describe('createRpcQueryUtils streaming execution', () => {
         expect(Equal.equals(error.cause, direct.cause)).toBe(true)
       }
     }),
+  )
+
+  it.effect.each(['live', 'streamed'] as const)(
+    'preserves independent interruption and mixed Causes from an official client in %s queries',
+    (operation) =>
+      Effect.gen(function* () {
+        const Watch = Rpc.make('events.watch', { success: Schema.String, stream: true })
+        const streamGroup = RpcGroup.make(Watch)
+        const defect = new Error('stream defect')
+        const causes = [
+          Cause.interrupt(42),
+          Cause.combine(Cause.interrupt(42), Cause.die(defect)),
+        ] as const
+        let [currentCause] = causes
+        const client = yield* makeRpcTestClient(streamGroup, {
+          'events.watch': () => Stream.failCause(currentCause),
+        })
+        const utils = createRpcQueryUtils(streamGroup, {
+          client,
+          keyPrefix: ['interrupt', operation],
+        })
+        const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+        try {
+          for (const cause of causes) {
+            currentCause = cause
+            const direct = yield* Effect.exit(Stream.runCollect(client('events.watch', undefined)))
+            if (Exit.isSuccess(direct)) {
+              throw new TypeError('Expected a failed client stream')
+            }
+            const error = yield* Effect.promise(
+              async () =>
+                await captureFailure(
+                  operation === 'live'
+                    ? queryClient.query(utils.events.watch.liveOptions())
+                    : queryClient.query(utils.events.watch.streamedOptions()),
+                ),
+            )
+            expect(error).toBeInstanceOf(EffectRpcQueryError)
+            expect(error).toMatchObject({ rpcTag: 'events.watch', operation })
+            if (!isEffectRpcQueryError(error)) {
+              throw new TypeError('Expected an RPC execution error')
+            }
+            expect(error.cause).toStrictEqual(direct.cause)
+          }
+        } finally {
+          queryClient.clear()
+        }
+      }),
   )
 
   it.effect('finalizes a stream after normal completion', () =>
