@@ -149,54 +149,69 @@ await Effect.runPromise(
       }
 
       for (const operation of operations) {
-        const started = Deferred.makeUnsafe<undefined>()
-        const finalized = Deferred.makeUnsafe<undefined>()
-        let signal: AbortSignal | undefined
-        const runPromiseExit: RunPromiseExit = async (effect, options) => {
-          signal = options?.signal
-          return await Effect.runPromiseExit(effect, options)
-        }
-        const client = yield* RpcTest.makeClient(group, { flatten: true }).pipe(
-          Effect.provide(
-            group.toLayer({
-              'events.watch': () =>
-                Stream.fromEffect(
-                  Deferred.succeed(started, undefined).pipe(Effect.andThen(Effect.never)),
-                ).pipe(Stream.ensuring(Deferred.succeed(finalized, undefined).pipe(Effect.asVoid))),
-            }),
-          ),
-        )
-        const utils = createRpcQueryUtils(group, {
-          client,
-          keyPrefix: ['cancellation', operation],
-          runPromiseExit,
-        })
-        const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-        const query =
-          operation === 'live'
-            ? queryClient.query(utils.events.watch.liveOptions({ initialData: 'cached' }))
-            : queryClient.query(utils.events.watch.streamedOptions({ initialData: ['cached'] }))
-        const key =
-          operation === 'live' ? utils.events.watch.liveKey() : utils.events.watch.streamedKey()
-        try {
-          yield* Effect.promise(() => wait(started))
-          equal(signal?.aborted, false)
-          yield* Effect.promise(() => queryClient.cancelQueries({ queryKey: key, exact: true }))
-          yield* Effect.promise(() => wait(finalized))
-          equal(signal?.aborted, true)
-          deepStrictEqual(
-            yield* Effect.promise(async () => await query),
-            operation === 'live' ? 'cached' : ['cached'],
+        for (const cached of [false, true]) {
+          const started = Deferred.makeUnsafe<undefined>()
+          const finalized = Deferred.makeUnsafe<undefined>()
+          let signal: AbortSignal | undefined
+          const runPromiseExit: RunPromiseExit = async (effect, options) => {
+            signal = options?.signal
+            return await Effect.runPromiseExit(effect, options)
+          }
+          const client = yield* RpcTest.makeClient(group, { flatten: true }).pipe(
+            Effect.provide(
+              group.toLayer({
+                'events.watch': () =>
+                  Stream.fromEffect(
+                    Deferred.succeed(started, undefined).pipe(Effect.andThen(Effect.never)),
+                  ).pipe(
+                    Stream.ensuring(Deferred.succeed(finalized, undefined).pipe(Effect.asVoid)),
+                  ),
+              }),
+            ),
           )
-          deepStrictEqual(
-            queryClient.getQueryData(key),
-            operation === 'live' ? 'cached' : ['cached'],
+          const utils = createRpcQueryUtils(group, {
+            client,
+            keyPrefix: ['cancellation', operation, cached],
+            runPromiseExit,
+          })
+          const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+          const query = settle(
+            operation === 'live'
+              ? queryClient.query(
+                  utils.events.watch.liveOptions(cached ? { initialData: 'cached' } : {}),
+                )
+              : queryClient.query(
+                  utils.events.watch.streamedOptions(cached ? { initialData: ['cached'] } : {}),
+                ),
           )
-          equal(queryClient.getQueryState(key)?.status, 'success')
-          equal(queryClient.getQueryState(key)?.fetchStatus, 'idle')
-          equal(queryClient.getQueryState(key)?.error, null)
-        } finally {
-          queryClient.clear()
+          const key =
+            operation === 'live' ? utils.events.watch.liveKey() : utils.events.watch.streamedKey()
+          try {
+            yield* Effect.promise(() => wait(started))
+            equal(signal?.aborted, false)
+            yield* Effect.promise(() => queryClient.cancelQueries({ queryKey: key, exact: true }))
+            yield* Effect.promise(() => wait(finalized))
+            equal(signal?.aborted, true)
+            const result = yield* Effect.promise(() => query)
+            if (cached) {
+              equal(result.status, 'success')
+              ok(result.status === 'success')
+              deepStrictEqual(result.data, operation === 'live' ? 'cached' : ['cached'])
+            } else {
+              equal(result.status, 'error')
+              ok(result.status === 'error')
+              ok(isCancelledError(result.error))
+            }
+            deepStrictEqual(
+              queryClient.getQueryData(key),
+              cached ? (operation === 'live' ? 'cached' : ['cached']) : undefined,
+            )
+            equal(queryClient.getQueryState(key)?.status, cached ? 'success' : 'pending')
+            equal(queryClient.getQueryState(key)?.fetchStatus, 'idle')
+            equal(queryClient.getQueryState(key)?.error, null)
+          } finally {
+            queryClient.clear()
+          }
         }
       }
 
