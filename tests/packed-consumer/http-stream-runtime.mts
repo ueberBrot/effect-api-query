@@ -184,6 +184,10 @@ await Effect.runPromise(
         yield* Effect.promise(() => queryClient.query(utils.events.plain.streamedOptions())),
         [],
       )
+      deepStrictEqual(
+        yield* Effect.promise(() => queryClient.query(utils.events.undefined.streamedOptions())),
+        [undefined, undefined],
+      )
       const defaultKey = utils.events.watch.streamedKey(input)
       for (const sseOptions of [
         undefined,
@@ -270,6 +274,46 @@ await Effect.runPromise(
       )
       equal(queryClient.getQueryState(options.queryKey)?.isInvalidated, true)
       equal(queryClient.getQueryState(utils.events.wrapped.streamedKey())?.isInvalidated, false)
+      for (const [channel, tags] of [
+        ['failure', ['Fail']],
+        ['interruption', ['Interrupt']],
+        ['mixed', ['Interrupt', 'Die']],
+      ] as const) {
+        const stream = yield* client.events.watch({
+          query: { channel },
+          responseMode: 'decoded-only',
+        })
+        const native = yield* Effect.exit(Stream.runCollect(stream))
+        ok(Exit.isFailure(native))
+        deepStrictEqual(
+          native.cause.reasons.map((reason) => reason._tag),
+          tags,
+        )
+        const failedOptions = utils.events.watch.streamedOptions({
+          input: { query: { channel } },
+          retry: false,
+        })
+        yield* Effect.promise(() =>
+          rejects(
+            queryClient.query(failedOptions),
+            expectFailure('watch', (cause) => {
+              deepStrictEqual(
+                cause.reasons.map((reason) => reason._tag),
+                tags,
+              )
+              if (channel === 'failure') {
+                deepStrictEqual(cause.reasons[0]?._tag === 'Fail' && cause.reasons[0].error, {
+                  _tag: 'Expired',
+                  reason: 'resume',
+                })
+              }
+            }),
+          ),
+        )
+        if (channel === 'failure') {
+          deepStrictEqual(queryClient.getQueryData(failedOptions.queryKey), [1])
+        }
+      }
     } finally {
       queryClient.clear()
     }

@@ -2,7 +2,11 @@ import { QueryClient, QueryObserver, skipToken } from '@tanstack/query-core'
 import { Context, Effect, Schema, SchemaTransformation } from 'effect'
 import type { Stream } from 'effect'
 import { createHttpApiQueryUtils } from 'effect-api-query'
-import type { EffectHttpApiQueryError, RunPromiseExit } from 'effect-api-query'
+import type {
+  CreateHttpApiQueryUtilsOptions,
+  EffectHttpApiQueryError,
+  RunPromiseExit,
+} from 'effect-api-query'
 import type { Sse } from 'effect/encoding'
 import type { HttpClientError } from 'effect/http'
 import { HttpApi, HttpApiEndpoint, HttpApiGroup, HttpApiSchema } from 'effect/http-api'
@@ -182,9 +186,10 @@ type ExtraFailure = NonNullable<typeof extraState>['error'] extends EffectHttpAp
 true satisfies Assert<
   Equal<Extract<ExtraFailure, 'extra-error' | 'stream-error'>, 'extra-error' | 'stream-error'>
 >
-createHttpApiQueryUtils(api, {
-  client: extraClient,
-  keyPrefix: ['extra'],
-  // @ts-expect-error Additional acquisition and consumption requirements remain caller-owned.
-  runPromiseExit: Effect.runPromiseExit,
-})
+type ExtraRequirements = CreateHttpApiQueryUtilsOptions<
+  typeof api,
+  readonly ['extra'],
+  typeof extraClient
+>['runPromiseExit']
+true satisfies Assert<Equal<ExtraRequirements, typeof extraRunner>>
+true satisfies Assert<RunPromiseExit extends ExtraRequirements ? false : true>
