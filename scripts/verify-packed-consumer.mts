@@ -511,6 +511,7 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       'stream-cause-runtime.mts',
       'stream-policy-runtime.mts',
       'retry-runtime.mts',
+      'snapshot-runtime.mts',
     ]) {
       execFileSync(process.execPath, ['--experimental-import-meta-resolve', fixture], {
         cwd: consumerDirectory,

@@ -39,6 +39,7 @@ const expectedExports = [
   'EffectRpcQueryKeyError',
   'createHttpApiQueryUtils',
   'createRpcQueryUtils',
+  'fetchStreamSnapshot',
   'isEffectHttpApiQueryError',
   'isEffectRpcQueryError',
   'skipToken',
