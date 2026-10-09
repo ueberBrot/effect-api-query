@@ -18,7 +18,10 @@
     "stream-cause-runtime.mts",
     "stream-policy-runtime.mts",
     "retry-runtime.mts",
+    "hydration-runtime.mts",
     "http-runtime.mts",
+    "http-metadata-runtime.mts",
+    "http-etag-recipe.mts",
     "http-stream-runtime.mts",
     "http-live-runtime.mts",
     "http-stream-contract.ts",
@@ -27,6 +30,8 @@
     "docs-rpc-quick-start.ts",
     "docs-http-quick-start.ts",
     "docs-retry.ts",
+    "docs-hydration-*.ts",
+    "hydration-contract.ts",
     "skill-example-*.ts"
   ]
 }

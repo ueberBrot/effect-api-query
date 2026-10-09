@@ -18,6 +18,10 @@ Unary RPCs and buffered HTTP endpoints without multipart provide all three build
 multipart HTTP endpoints provide mutations only. Writes refresh cached reads only when your
 application invalidates the affected keys.
 
+Query-enabled buffered HTTP endpoints also expose `metadataOptions` for decoded data, status, and
+raw response headers with separate cache identity. See
+[Update with an ETag](/effect-api-query/guides/http-queries-and-mutations/#update-with-an-etag).
+
 RPC streams also have `streamedOptions` to accumulate values and `liveOptions` to retain the latest
 value. Buffered multipart HTTP uploads accept explicit `FormData` through `mutationOptions`;
 see [upload a file](/effect-api-query/guides/http-queries-and-mutations/#upload-a-file).

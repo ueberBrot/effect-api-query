@@ -12,7 +12,8 @@ For a step-by-step example, see [HTTP Queries and Mutations](/effect-api-query/g
 Ordinary groups appear as `utils[groupIdentifier][endpointIdentifier]`. Top-level groups place
 their endpoints at `utils[endpointIdentifier]`. Identifiers containing dots remain literal
 properties. Every retained branch and endpoint has `key()`; buffered endpoints without multipart have
-`queryKey`, `queryOptions`, `mutationKey`, `mutationOptions`, `infiniteKey`, and `infiniteOptions`.
+`queryKey`, `queryOptions`, `metadataKey`, `metadataOptions`, `mutationKey`, `mutationOptions`,
+`infiniteKey`, and `infiniteOptions`.
 An endpoint with any buffered multipart payload alternative exposes only `key`, `mutationKey`, and
 `mutationOptions`, even when it also accepts plain payload alternatives. This classification applies
 regardless of HTTP method; applications choose the builder for endpoints with query support.
@@ -49,7 +50,7 @@ query filter still needs `input: { query: {} }`. A `Schema.FiniteFromString` fie
 which the ready client encodes as a string. Raw response controls are excluded from query input,
 mutation variables, and encoder input.
 
-The adapter forces decoded-only responses. Queries cache a successful `undefined` as `null`;
+Ordinary queries and mutations use decoded-only responses. Queries cache a successful `undefined` as `null`;
 mutations retain `undefined`. Buffered text stays a string, binary data stays a `Uint8Array`, and
 declared response-header wrappers retain their decoded body and headers. Applications own the
 serialization strategy for binary and other domain values; the package supplies no automatic SSR
@@ -60,7 +61,8 @@ client errors, and additional ready-client errors in the wrapped Cause's type.
 
 Required services include those needed by request encoders, success and error decoders, and the
 ready client for exposed endpoints. Compatible custom clients retain the errors and remaining
-service requirements of their decoded-only call signatures; raw-response overloads contribute neither.
+service requirements of their decoded-only and decoded-and-response call signatures;
+response-only overloads contribute neither.
 See [client lifecycle](/effect-api-query/concepts/client-lifecycle/#http-clients-and-execution-services)
 and [cancellation](/effect-api-query/guides/cancellation/#cancel-an-http-query) for runtime ownership.
 
@@ -95,6 +97,40 @@ Supplied initial data remains available, but native skipped hook data stays poss
 Inputless builders, key builders, and mutations reject `skipToken`. A skipped function cannot run
 through manual refetch; supply valid input or use `enabled: false` with a complete request when
 manual execution is required. Native suspense and prefetch-only hooks reject skipped options.
+
+## Buffered metadata
+
+Query-enabled buffered endpoints also provide `metadataKey(request)` and `metadataOptions({ input,
+...options })`; inputless endpoints omit the request. The ready client runs in decoded-and-response
+mode, and the cache contains:
+
+```ts
+type Metadata<DecodedSuccess> = {
+  readonly data: QueryData<DecodedSuccess>
+  readonly status: number
+  readonly headers: Readonly<Record<string, string>>
+}
+```
+
+The outer envelope and copied plain header record are frozen. `data` preserves the declared decoded
+value and its ownership, including decoded `WithHeaders` wrappers. Only top-level successful
+`undefined` becomes `null`. Raw headers retain their string values without Effect's inspection
+redaction; applications decide which headers may be persisted or dehydrated.
+
+Fetched snapshots remain frozen after native structural sharing, while preserving global, prefix,
+and per-call sharing policies. Mutable envelopes or header records selected by sharing are copied
+before freezing, retaining the selected decoded data reference. The adapter does not freeze
+decoded data or caller-supplied `initialData`, hydrated values, or manual cache writes.
+
+Metadata keys use a `metadata` discriminator and the ordinary request identity. Endpoint prefixes
+match every view. Native `select`, `initialData`, skip-token inference, QueryClient hashing defaults,
+and cancellation apply to metadata options. Execution failures identify operation `metadata` and
+preserve that client mode's full error and service channels. Metadata adds no mutation or infinite
+builders and is absent on multipart and streaming endpoints.
+
+The cache retains the decoded value and metadata snapshot, without a response object or open body.
+See [Update with an ETag](/effect-api-query/guides/http-queries-and-mutations/#update-with-an-etag)
+for conditional writes.
 
 ## Accumulated SSE options
 

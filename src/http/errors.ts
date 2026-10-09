@@ -8,7 +8,7 @@ export interface HttpApiEndpointIdentity {
   readonly method: string
 }
 
-export type HttpApiOperation = 'query' | 'infinite' | 'mutation' | 'streamed' | 'live'
+export type HttpApiOperation = 'query' | 'infinite' | 'mutation' | 'metadata' | 'streamed' | 'live'
 
 /** Stable codes for invalid HTTP utility configuration. */
 export type EffectHttpApiQueryConfigErrorCode =

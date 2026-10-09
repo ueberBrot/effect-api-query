@@ -86,7 +86,7 @@ const cancellationApi = HttpApi.make('packed-cancellation').add(
     }),
   ),
 )
-for (const mode of ['query', 'later page'] as const) {
+for (const mode of ['query', 'metadata', 'metadata body', 'later page'] as const) {
   let received!: () => void
   let disconnected!: () => void
   const requestReceived = new Promise<void>((resolve) => {
@@ -104,6 +104,10 @@ for (const mode of ['query', 'later page'] as const) {
       return
     }
     response.on('close', disconnected)
+    if (mode === 'metadata body') {
+      response.setHeader('content-type', 'application/json')
+      response.write('"pending')
+    }
     received()
   })
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
@@ -140,23 +144,45 @@ for (const mode of ['query', 'later page'] as const) {
     const pending =
       mode === 'query'
         ? queryClient.query(utils.pages.read.queryOptions({ input: { params: { page: 1 } } }))
-        : queryClient.infiniteQuery({
-            ...utils.pages.read.infiniteOptions({
-              initialPageParam: 0,
-              input: (page) => ({ params: { page } }),
-              getNextPageParam: (_last, _pages, page) => page + 1,
-            }),
-            pages: 2,
-          })
+        : mode === 'metadata' || mode === 'metadata body'
+          ? queryClient.query(
+              utils.pages.read.metadataOptions({
+                input: { params: { page: 1 } },
+                initialData: { data: 'cached', status: 200, headers: { etag: 'cached' } },
+              }),
+            )
+          : queryClient.infiniteQuery({
+              ...utils.pages.read.infiniteOptions({
+                initialPageParam: 0,
+                input: (page) => ({ params: { page } }),
+                getNextPageParam: (_last, _pages, page) => page + 1,
+              }),
+              pages: 2,
+            })
     const result = pending.catch((error: unknown) => error)
     await Promise.race([requestReceived, deadline])
     equal(requestSignal?.aborted, false)
     await queryClient.cancelQueries({ queryKey: utils.pages.read.key() })
-    ok(isCancelledError(await result))
+    const settled = await result
+    if (mode === 'metadata' || mode === 'metadata body') {
+      deepStrictEqual(settled, { data: 'cached', status: 200, headers: { etag: 'cached' } })
+    } else {
+      ok(isCancelledError(settled))
+    }
     equal(requestSignal?.aborted, true)
     ok(Cause.hasInterrupts(await Promise.race([interruption, deadline])))
     await Promise.race([requestDisconnected, deadline])
-    deepStrictEqual(paths, mode === 'query' ? ['/pages/1'] : ['/pages/0', '/pages/1'])
+    deepStrictEqual(paths, mode === 'later page' ? ['/pages/0', '/pages/1'] : ['/pages/1'])
+    if (mode === 'metadata' || mode === 'metadata body') {
+      deepStrictEqual(
+        queryClient.getQueryData(utils.pages.read.metadataKey({ params: { page: 1 } })),
+        {
+          data: 'cached',
+          status: 200,
+          headers: { etag: 'cached' },
+        },
+      )
+    }
     equal(queryClient.isFetching(), 0)
   } finally {
     clearTimeout(timeout)
