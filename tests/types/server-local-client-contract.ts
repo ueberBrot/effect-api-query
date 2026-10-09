@@ -1,4 +1,3 @@
-// This upstream design proof adds no library export or published adapter contract.
 import { Context, Effect, Schema } from 'effect'
 import { Rpc, RpcGroup } from 'effect/rpc'
 

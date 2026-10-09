@@ -3,7 +3,6 @@ import type { Scope } from 'effect'
 import type { Rpc, RpcGroup, RpcMessage } from 'effect/rpc'
 import { RpcClient, RpcServer } from 'effect/rpc'
 
-/** Bounded application recipe, outside the published library contract. */
 export const makeServerLocalRpcClient = Effect.fnUntraced(function* <Rpcs extends Rpc.Any>(
   group: RpcGroup.RpcGroup<Rpcs>,
 ) {
