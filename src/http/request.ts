@@ -28,13 +28,14 @@ const multipartBrands = (schema: Schema.Top): ReadonlySet<string> => {
 
 export type HttpRequestDescription =
   | { readonly kind: 'Unary'; readonly input: OperationInput }
+  | { readonly kind: 'Streaming'; readonly input: OperationInput }
   | { readonly kind: 'Mutation' }
 
 const classifyEndpoint = (
   endpoint: HttpApiEndpoint.Top,
   identity: HttpApiEndpointIdentity,
 ):
-  | { readonly kind: 'Unary'; readonly schemas: readonly Schema.Top[] }
+  | { readonly kind: 'Unary' | 'Streaming'; readonly schemas: readonly Schema.Top[] }
   | { readonly kind: 'Mutation' }
   | undefined => {
   const payloads: Schema.Top[] = []
@@ -60,16 +61,28 @@ const classifyEndpoint = (
       payloads.push(schema)
     }
   }
-  if (
-    multipartStream ||
-    [...endpoint.success].some((schema) =>
-      Predicate.hasProperty(
-        HttpApiSchema.isWithHeaders(schema) ? schema.schema : schema,
-        '~effect/http-api/HttpApiSchema/Stream',
-      ),
-    )
-  ) {
+  if (multipartStream) {
     return undefined
+  }
+  const successes = [...endpoint.success]
+  const streams = successes.filter((schema) =>
+    Predicate.hasProperty(
+      HttpApiSchema.isWithHeaders(schema) ? schema.schema : schema,
+      '~effect/http-api/HttpApiSchema/Stream',
+    ),
+  )
+  if (streams.length > 0) {
+    const [success] = successes
+    const body = HttpApiSchema.isWithHeaders(success) ? success.schema : success
+    if (
+      multipart ||
+      successes.length !== 1 ||
+      !Predicate.hasProperty(body, '_tag') ||
+      body._tag !== 'StreamSse'
+    ) {
+      return undefined
+    }
+    return { kind: 'Streaming', schemas: payloads }
   }
   return multipart ? { kind: 'Mutation' } : { kind: 'Unary', schemas: payloads }
 }
@@ -124,7 +137,6 @@ const normalizeRequestKey = (value: unknown): unknown => {
   return request
 }
 
-/** Retains buffered multipart mutations and omits streaming requests or responses. */
 export const createHttpRequest = (
   endpoint: HttpApiEndpoint.Top,
   identity: HttpApiEndpointIdentity,
@@ -148,7 +160,7 @@ export const createHttpRequest = (
     fields['payload'] = Schema.Union(payloads)
   }
   if (Object.keys(fields).length === 0) {
-    return { kind: 'Unary', input: { _tag: 'Inputless' } }
+    return { kind: classified.kind, input: { _tag: 'Inputless' } }
   }
   const schema = Schema.Struct(fields)
   const keyEncoding = createSchemaKeyEncoding(schema)
@@ -160,7 +172,7 @@ export const createHttpRequest = (
       cause,
     )
   return {
-    kind: 'Unary',
+    kind: classified.kind,
     input: {
       _tag: 'Input',
       requiresEncoder: payloads.length > 1 || keyEncoding.requiresEncoder,

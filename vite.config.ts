@@ -173,6 +173,10 @@ export default defineConfig({
         },
       },
       {
+        files: ['src/http/types.ts'],
+        rules: { 'typescript/no-redundant-type-constituents': 'off' },
+      },
+      {
         files: ['src/{core,http,rpc}/types.ts'],
         rules: {
           // void is part of Effect channel and no-payload RPC type contracts.
@@ -186,9 +190,11 @@ export default defineConfig({
         files: [
           'src/core/operation.ts',
           'src/core/schema-key.ts',
+          'src/core/streamed-query.ts',
           'src/core/utility-tree.ts',
           'src/http/operation.ts',
           'src/http/request.ts',
+          'src/http/streamed-query.ts',
           'src/rpc/operation.ts',
           'src/rpc/streamed-query.ts',
         ],

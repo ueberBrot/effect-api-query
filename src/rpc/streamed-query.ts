@@ -1,23 +1,15 @@
-import { experimental_streamedQuery } from '@tanstack/query-core'
-import type { QueryFunctionContext } from '@tanstack/query-core'
-import { Exit, Predicate, Stream } from 'effect'
+import { Predicate, Stream } from 'effect'
 
 import type { StreamingOperation } from '../core/operation'
-import type { JsonValue, RunPromiseExit } from '../core/types'
+import { makeStreamQuery } from '../core/streamed-query'
+import type { StreamQueryPolicy } from '../core/streamed-query'
+import type { JsonValue } from '../core/types'
 import {
   EffectRpcQueryConfigError,
   EffectRpcQueryEmptyStreamError,
   EffectRpcQueryError,
 } from './errors'
-import type { StreamRefetchMode, StreamingRpcOptions } from './types'
-
-type StreamQueryPolicy =
-  | {
-      readonly maxChunks: number | undefined
-      readonly _tag: 'Accumulated'
-      readonly refetchMode: StreamRefetchMode
-    }
-  | { readonly _tag: 'Live' }
+import type { StreamingRpcOptions } from './types'
 
 export interface RpcStreamInvocation {
   readonly tag: string
@@ -25,14 +17,6 @@ export interface RpcStreamInvocation {
     input: unknown,
     options?: StreamingRpcOptions,
   ) => Stream.Stream<unknown, unknown, unknown>
-}
-
-interface MakeStreamQueryOptions {
-  readonly rpcOptions: StreamingRpcOptions | undefined
-  readonly input: unknown
-  readonly policy: StreamQueryPolicy
-  readonly rpc: RpcStreamInvocation
-  readonly runPromiseExit: RunPromiseExit<unknown>
 }
 
 const accumulatedPolicy = (
@@ -68,138 +52,6 @@ export const createStreamIdentity =
     return [identity]
   }
 
-const streamQueryIterable = <A>(
-  source: AsyncIterable<A>,
-  signal: AbortSignal,
-  liveRpcTag: string | undefined,
-): AsyncIterable<A> => ({
-  [Symbol.asyncIterator]() {
-    const iterator = source[Symbol.asyncIterator]()
-    let closePromise: Promise<IteratorResult<A>> | undefined
-    let emitted = false
-    // This callback runs after the listener has been initialized below.
-    const detach = () => {
-      // oxlint-disable-next-line eslint/no-use-before-define
-      signal.removeEventListener('abort', onAbort)
-    }
-    const close = async () => {
-      closePromise ??= (async () => {
-        try {
-          return (await iterator.return?.()) ?? { done: true, value: undefined }
-        } finally {
-          detach()
-        }
-      })()
-      return closePromise
-    }
-    const onAbort = () => {
-      // Abort listeners are synchronous; attach cleanup rejection handling immediately.
-      // oxlint-disable-next-line promise/prefer-await-to-then
-      void close().catch(() => {
-        // The pending iterator pull or explicit return reports failures to Query Core.
-      })
-    }
-    signal.addEventListener('abort', onAbort, { once: true })
-
-    return {
-      async next() {
-        let result: IteratorResult<A>
-        if (signal.aborted) {
-          result = await close()
-        } else {
-          try {
-            result = await iterator.next()
-          } catch (error) {
-            detach()
-            throw error
-          }
-        }
-        if (result.done === true) {
-          detach()
-          if (!emitted && liveRpcTag !== undefined) {
-            throw new EffectRpcQueryEmptyStreamError(liveRpcTag)
-          }
-        }
-        emitted = true
-        return result
-      },
-      return: close,
-      async throw(cause?: unknown) {
-        detach()
-        if (iterator.throw !== undefined) {
-          return await iterator.throw(cause)
-        }
-        await close()
-        throw cause
-      },
-    }
-  },
-})
-
-/** Adapts one Effect stream invocation to an accumulated or latest-value Query Core function. */
-const makeStreamQuery = ({
-  input,
-  policy,
-  rpc,
-  rpcOptions,
-  runPromiseExit,
-}: MakeStreamQueryOptions) => {
-  const operation = policy._tag === 'Live' ? 'live' : 'streamed'
-  const streamFn = async ({ signal }: { readonly signal: AbortSignal }) => {
-    const stream = rpc.invoke(input, rpcOptions).pipe(
-      Stream.catchCauseIf(
-        () => !signal.aborted,
-        (cause) => Stream.fail(new EffectRpcQueryError(rpc.tag, operation, cause)),
-      ),
-    )
-    // Capture the runner's Context so iterator pulls use the caller-owned runtime.
-    // The injected runner provides the erased caller-owned service requirements.
-    // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
-    const exit = await runPromiseExit(Stream.toAsyncIterableEffect(stream), { signal })
-    if (Exit.isFailure(exit)) {
-      throw new EffectRpcQueryError(rpc.tag, operation, exit.cause)
-    }
-    return streamQueryIterable(exit.value, signal, policy._tag === 'Live' ? rpc.tag : undefined)
-  }
-
-  if (policy._tag === 'Live') {
-    return experimental_streamedQuery({
-      initialValue: null,
-      reducer: (_latest: unknown, value: unknown) => (value === undefined ? null : value),
-      streamFn,
-    })
-  }
-
-  const { maxChunks, refetchMode } = policy
-  if (maxChunks === undefined) {
-    return experimental_streamedQuery({ refetchMode, streamFn })
-  }
-
-  return async (context: QueryFunctionContext) => {
-    const reset =
-      refetchMode === 'reset' &&
-      context.client
-        .getQueryCache()
-        .find({ queryKey: context.queryKey, exact: true })
-        ?.isFetched() === true
-    let emitted = false
-    const initialValue: unknown[] = []
-    const queryFn = experimental_streamedQuery({
-      initialValue,
-      reducer: (values: unknown[], value: unknown) => {
-        // Query Core restores initialData on reset; a refetch starts a fresh accumulation.
-        const history = reset && !emitted ? [] : values
-        emitted = true
-        return [...history.slice(Math.max(0, history.length + 1 - maxChunks)), value]
-      },
-      refetchMode,
-      streamFn,
-    })
-    const result = await queryFn(context)
-    return reset && !emitted ? [] : result
-  }
-}
-
 /** Owns policy validation and execution for both accumulated and live queries. */
 export const createStreamPreparation =
   (rpc: RpcStreamInvocation): StreamingOperation['prepareStream'] =>
@@ -213,10 +65,10 @@ export const createStreamPreparation =
     const rpcOptions = requestOptions as StreamingRpcOptions | undefined
     return (input) =>
       makeStreamQuery({
-        input,
-        rpcOptions,
         policy,
-        rpc,
+        source: Stream.suspend(() => rpc.invoke(input, rpcOptions)),
+        executionError: (cause) => new EffectRpcQueryError(rpc.tag, operation, cause),
+        emptyError: () => new EffectRpcQueryEmptyStreamError(rpc.tag),
         runPromiseExit,
       })
   }
