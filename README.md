@@ -79,7 +79,7 @@ for conditional writes and invalidation.
 | Streaming RPC                               | Accumulated streamed queries and live queries      |
 | Buffered HttpApi endpoint without multipart | Queries, metadata, infinite queries, and mutations |
 | Buffered HttpApi endpoint with multipart    | Mutations with `FormData`                          |
-| Unambiguous HttpApi SSE endpoint            | Accumulated streamed queries                       |
+| Unambiguous HttpApi SSE endpoint            | Accumulated streamed queries and live queries      |
 
 Both factories generate keys for cache reads, writes, prefetching, and invalidation. Query functions
 forward cancellation to Effect. Mutations use TanStack's normal callbacks; invalidate affected

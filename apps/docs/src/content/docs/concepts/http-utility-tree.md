@@ -39,8 +39,9 @@ that also accepts ordinary payloads. Its leaf exposes `key()`, `mutationKey()`, 
 Files and other mutation variables do not become cache identity, so these leaves require no key
 encoder and reject encoder entries. See [upload a file](/effect-api-query/guides/http-queries-and-mutations/#upload-a-file).
 
-Raw-response modes are also deferred. Generated calls force decoded-only responses and exclude
-response controls from their input. See the [HTTP factory](/effect-api-query/reference/http-factory/)
+Raw response objects remain omitted. Ordinary queries, mutations, and SSE views use decoded-only
+responses; buffered metadata views copy status and headers alongside decoded data. Response
+controls are excluded from request input. See the [HTTP factory](/effect-api-query/reference/http-factory/)
 for request, response, and builder contracts, and [Semantic Keys](/effect-api-query/concepts/semantic-keys/)
 for the `http` namespace.
 
