@@ -131,8 +131,8 @@ const makeStreamQuery = ({
 
   if (policy._tag === 'Live') {
     return experimental_streamedQuery({
-      initialValue: undefined,
-      reducer: (_latest: unknown, value: unknown) => value,
+      initialValue: null,
+      reducer: (_latest: unknown, value: unknown) => (value === undefined ? null : value),
       streamFn,
     })
   }

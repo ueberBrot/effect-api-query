@@ -148,6 +148,10 @@ Both option builders publish the query as successful after its first value and k
 `fetchStatus: 'fetching'` until the stream ends. An empty accumulated stream resolves to `[]`; an
 empty live stream fails with `EffectRpcQueryEmptyStreamError`.
 
+Live queries convert emitted `undefined` to `null`; explicit `null` stays `null`. Their keys,
+selectors, and initial-data options describe this normalized value. Accumulated arrays preserve
+`undefined` elements.
+
 Accumulated streams accept TanStack's `refetchMode` option:
 
 - `reset` clears cached values and returns the query to pending before refetching. This is the

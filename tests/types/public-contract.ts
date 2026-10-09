@@ -364,6 +364,56 @@ const initializedLive = useQuery(
 )
 initializedLive.data satisfies number
 
+const normalizedLiveGroup = RpcGroup.make(
+  Rpc.make('values.undefined', { success: Schema.Undefined, stream: true }),
+  Rpc.make('values.void', { success: Schema.Void, stream: true }),
+  Rpc.make('values.null', { success: Schema.Null, stream: true }),
+  Rpc.make('values.optional', { success: Schema.UndefinedOr(Schema.String), stream: true }),
+)
+declare const normalizedLiveClient: RpcClient.RpcClient.Flat<
+  RpcGroup.Rpcs<typeof normalizedLiveGroup>
+>
+const normalizedLiveUtils = createRpcQueryUtils(normalizedLiveGroup, {
+  client: normalizedLiveClient,
+  keyPrefix,
+})
+true satisfies Assert<Equal<QueryData<string | undefined>, string | null>>
+true satisfies Assert<Equal<QueryData<void>, null>>
+const undefinedLiveResult = queryClient.query(normalizedLiveUtils.values.undefined.liveOptions())
+true satisfies Assert<Equal<typeof undefinedLiveResult, Promise<null>>>
+const voidLiveResult = queryClient.query(normalizedLiveUtils.values.void.liveOptions())
+true satisfies Assert<Equal<typeof voidLiveResult, Promise<null>>>
+const nullLiveResult = queryClient.query(normalizedLiveUtils.values.null.liveOptions())
+true satisfies Assert<Equal<typeof nullLiveResult, Promise<null>>>
+const optionalLiveKey = normalizedLiveUtils.values.optional.liveKey()
+const cachedOptionalLive = queryClient.getQueryData(optionalLiveKey)
+true satisfies Assert<Equal<typeof cachedOptionalLive, string | null | undefined>>
+const cachedUndefinedLive = queryClient.getQueryData(normalizedLiveUtils.values.undefined.liveKey())
+true satisfies Assert<Equal<typeof cachedUndefinedLive, null | undefined>>
+queryClient.setQueryData(optionalLiveKey, null)
+const initializedNormalizedLive = useQuery(
+  normalizedLiveUtils.values.optional.liveOptions({
+    initialData: null,
+    select: (value) => {
+      true satisfies Assert<Equal<typeof value, string | null>>
+      return value === null ? 0 : value.length
+    },
+  }),
+)
+true satisfies Assert<Equal<typeof initializedNormalizedLive.data, number>>
+const initializedUndefinedLive = useQuery(
+  normalizedLiveUtils.values.undefined.liveOptions({ initialData: () => null }),
+)
+true satisfies Assert<Equal<typeof initializedUndefinedLive.data, null>>
+const optionalNormalizedInitial = useQuery(
+  normalizedLiveUtils.values.optional.liveOptions({ initialData: () => undefined }),
+)
+true satisfies Assert<Equal<typeof optionalNormalizedInitial.data, string | null | undefined>>
+const accumulatedUndefined = queryClient.query(
+  normalizedLiveUtils.values.undefined.streamedOptions({ initialData: [undefined] }),
+)
+true satisfies Assert<Equal<typeof accumulatedUndefined, Promise<readonly undefined[]>>>
+
 declare const clientFailureClient: RpcClient.RpcClient.Flat<Rpcs, 'client-failure'>
 const clientFailureUtils = createRpcQueryUtils<typeof group, typeof keyPrefix, 'client-failure'>(
   group,

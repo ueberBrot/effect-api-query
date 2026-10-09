@@ -95,9 +95,9 @@ work starts. Interrupting a client call does not undo a completed write.
 
 ## Interpret results and failures
 
-Buffered queries normalize successful `undefined` to `null`; mutations preserve
-`undefined`. Streamed values follow the stream contract described in the query
-patterns reference.
+Buffered queries and live emissions normalize successful `undefined` to `null`.
+Accumulated stream elements and mutation results preserve `undefined`. See the
+query patterns reference for stream behavior.
 
 Configuration and key-generation errors are synchronous: an options builder may
 fail before a hook or query function runs. Failed execution Exits become

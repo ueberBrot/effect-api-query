@@ -270,7 +270,7 @@ deepStrictEqual(declarationNames, [
 ])
 
 const queryCoreCompatibilityCases = () => {
-  const supportedPeerRange = '>=5.102.0 <6'
+  const supportedPeerRange = '>=5.103.1 <6'
   deepStrictEqual(packedManifest.peerDependencies, {
     '@tanstack/query-core': supportedPeerRange,
     effect: testedVersion('effect'),

@@ -20,10 +20,10 @@ export type JsonPrimitive = boolean | null | number | string
 export type JsonValue = JsonPrimitive | { readonly [key: string]: JsonValue } | readonly JsonValue[]
 
 /**
- * The value cached for a successful buffered query.
+ * The value cached for a successful buffered query or live stream emission.
  *
  * TanStack rejects `undefined` query data, so possible `undefined` values become
- * `null`. Mutation results keep the success type unchanged.
+ * `null`. Accumulated stream elements and mutation results keep their success types unchanged.
  */
 export type QueryData<A> = undefined extends A ? Exclude<A, undefined | void> | null : A
 
