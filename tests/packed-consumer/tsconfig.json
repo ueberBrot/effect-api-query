@@ -23,6 +23,7 @@
     "http-metadata-runtime.mts",
     "http-etag-recipe.mts",
     "http-stream-runtime.mts",
+    "http-live-runtime.mts",
     "http-stream-contract.ts",
     "public-contract.ts",
     "http-contract.ts",

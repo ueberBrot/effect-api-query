@@ -18,7 +18,7 @@ An endpoint with any buffered multipart payload alternative exposes only `key`, 
 `mutationOptions`, even when it also accepts plain payload alternatives. This classification applies
 regardless of HTTP method; applications choose the builder for endpoints with query support.
 An endpoint with exactly one SSE success and no multipart payload exposes `key`, `streamedKey`,
-and `streamedOptions`.
+`streamedOptions`, `liveKey`, and `liveOptions`.
 
 ## Factory options
 
@@ -66,7 +66,7 @@ response-only overloads contribute neither.
 See [client lifecycle](/effect-api-query/concepts/client-lifecycle/#http-clients-and-execution-services)
 and [cancellation](/effect-api-query/guides/cancellation/#cancel-an-http-query) for runtime ownership.
 
-A single SSE success, including `WithHeaders(StreamSse(...), ...)`, supports accumulated queries.
+A single SSE success, including `WithHeaders(StreamSse(...), ...)`, supports accumulated and live queries.
 Raw byte streams and mixed buffered/SSE success alternatives omit the complete endpoint.
 Any streaming multipart request alternative does the same. SSE endpoints with buffered multipart
 payload alternatives are also omitted. Buffered multipart alternatives retain
@@ -160,6 +160,24 @@ policies occupy separate entries. Endpoint `key()` selects them all. Decoder con
 from decoded request input and custom encoders. Declared resume headers remain request identity.
 
 See [Retain SSE events](/effect-api-query/guides/http-queries-and-mutations/#retain-sse-events).
+
+## Live SSE options
+
+`liveOptions` accepts native query options, declared decoded `input`, and `sseOptions`.
+`liveKey(input, { sseOptions })`, or `liveKey({ sseOptions })` for inputless endpoints, includes
+normalized decoder policy in its separate `live` identity. Its keys carry the latest decoded value
+and the execution error union, including `EffectHttpApiQueryEmptyStreamError`. Live builders
+preserve selection, initial-data, and skipped-input inference.
+
+The first emission makes the query successful. Later emissions replace the cached value, and
+completion preserves the latest value. Only a top-level `undefined` becomes `null`; declared
+header wrappers retain their decoded body and headers. An empty live completion fails with
+declaration metadata. Live queries accept no `maxChunks` or accumulated `refetchMode`.
+
+The acquisition and consumption error/service channels, decoder limit validation, iterator cleanup,
+and caller-owned reconnection contract match accumulated SSE queries. Input-bearing builders
+validate decoder policy even when skipped. Endpoint prefixes match both representations and every
+concrete decoder policy. See [Keep the latest SSE value](/effect-api-query/guides/http-queries-and-mutations/#keep-the-latest-sse-value).
 
 ## Pagination
 

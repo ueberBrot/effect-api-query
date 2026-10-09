@@ -6,7 +6,11 @@ import type { StreamingOperation } from '../core/operation'
 import { makeStreamQuery } from '../core/streamed-query'
 import type { StreamQueryPolicy } from '../core/streamed-query'
 import type { JsonValue } from '../core/types'
-import { EffectHttpApiQueryConfigError, EffectHttpApiQueryError } from './errors'
+import {
+  EffectHttpApiQueryConfigError,
+  EffectHttpApiQueryEmptyStreamError,
+  EffectHttpApiQueryError,
+} from './errors'
 import type { HttpApiEndpointIdentity } from './errors'
 
 const decoderOptions = (
@@ -64,6 +68,13 @@ export const createHttpStreamIdentity =
     return [policy]
   }
 
+export const createHttpLiveIdentity =
+  (identity: HttpApiEndpointIdentity): NonNullable<StreamingOperation['liveIdentity']> =>
+  (options) => {
+    const { maxEventSize } = decoderOptions(identity, options)
+    return [Object.freeze({ maxEventSize })]
+  }
+
 export const createHttpStreamPreparation =
   (
     identity: HttpApiEndpointIdentity,
@@ -72,8 +83,9 @@ export const createHttpStreamPreparation =
       sseOptions: Sse.DecodeOptions,
     ) => Effect.Effect<unknown, unknown, unknown>,
   ): StreamingOperation['prepareStream'] =>
-  (options, _operation, runPromiseExit) => {
-    const policy = accumulatedPolicy(identity, options)
+  (options, operation, runPromiseExit) => {
+    const policy: StreamQueryPolicy =
+      operation === 'live' ? { _tag: 'Live' } : accumulatedPolicy(identity, options)
     const sseOptions = decoderOptions(identity, options)
     delete options['refetchMode']
     delete options['maxChunks']
@@ -103,7 +115,8 @@ export const createHttpStreamPreparation =
             }),
           ),
         ),
-        executionError: (cause) => new EffectHttpApiQueryError(identity, 'streamed', cause),
+        executionError: (cause) => new EffectHttpApiQueryError(identity, operation, cause),
+        emptyError: () => new EffectHttpApiQueryEmptyStreamError(identity),
         runPromiseExit,
       })
   }
