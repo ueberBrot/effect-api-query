@@ -92,9 +92,11 @@ wrapper. A top-level successful `undefined` becomes `null`. `current.status` is 
 data keeps its declared representation. Raw headers can contain private values: choose which headers
 your application may persist or dehydrate.
 
-Fetched snapshots stay frozen after native structural sharing. Your global, prefix, and per-call
-sharing policies still apply; decoded data is not frozen by the adapter. Values supplied through
-`initialData`, hydration, or manual cache writes remain application-owned.
+Fetched snapshots stay frozen after structural sharing, using your global, prefix, or per-call
+policy. Decoded data and values supplied through `initialData`, hydration, or manual cache writes
+remain application-owned. After execution, manual writes use the policy explicitly passed to
+`metadataOptions`, or standard deep sharing if omitted; they do not inherit global or prefix sharing
+policies. See [Buffered metadata](/effect-api-query/reference/http-factory/#buffered-metadata).
 
 `metadataKey(input)` provides a typed key for cache reads and writes. Metadata options support
 selection, initial data, skipped input, native hashing defaults, and cancellation like ordinary
