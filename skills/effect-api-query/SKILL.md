@@ -63,9 +63,9 @@ pagination, streaming, React Query, or server rendering.
   backend identifiers when they distinguish results. The factory cannot infer
   identity from a client, URL, middleware, or RPC request options.
 - Pass caller options such as `staleTime`, `select`, and callbacks into the
-  builder. Preserve its `queryFn`, `queryKey`, and `queryKeyHashFn`; the builder
-  removes caller-supplied `queryHash`. Mutation builders own `mutationFn` and
-  `mutationKey`.
+  builder. Preserve its `queryFn` and `queryKey`. Configure custom hashing through
+  QueryClient global or prefix defaults; builders reject per-call `queryKeyHashFn`
+  and `queryHash`. Mutation builders own `mutationFn` and `mutationKey`.
 - Treat captured inputs as immutable and build new options when they change.
   Keys are frozen snapshots; request inputs are not necessarily copied or frozen,
   so later mutation can make execution disagree with its key.

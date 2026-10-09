@@ -1,5 +1,5 @@
 import { skipToken } from '@tanstack/query-core'
-import type { QueryFunction, QueryKey } from '@tanstack/query-core'
+import type { QueryFunction } from '@tanstack/query-core'
 import { Effect, Exit, Predicate } from 'effect'
 import type { Cause } from 'effect'
 
@@ -109,8 +109,6 @@ const canonicalize = (value: unknown, seen = new WeakSet()): JsonValue => {
 }
 
 const freezeKey = (parts: readonly (JsonValue | string)[]) => Object.freeze([...parts])
-
-const hashCanonicalKey = (queryKey: QueryKey): string => JSON.stringify(queryKey)
 
 const normalizePrefix = (
   prefix: readonly [JsonValue, ...JsonValue[]],
@@ -236,6 +234,11 @@ const prepareQueryOptions = (description: OperationDescription, argument: unknow
     argument === skipToken
       ? { input: skipToken }
       : { ...(Predicate.isObject(argument) ? argument : undefined) }
+  for (const option of ['queryKeyHashFn', 'queryHash'] as const) {
+    if (Object.hasOwn(options, option)) {
+      throw description.unsupportedQueryHash(option)
+    }
+  }
   const { input } = options
   delete options['input']
   const requestOptions = description.takeOptions(options)
@@ -246,17 +249,11 @@ const finalizeQueryOptions = <QueryFn>(
   options: Record<string, unknown>,
   queryKey: readonly JsonValue[],
   queryFn: QueryFn,
-) => {
-  // Query Core prefers an explicit hash over the generated hash function.
-  delete options['queryHash']
-  return {
-    ...options,
-    // Owned fields follow user options so callers cannot replace keys or runners.
-    queryFn,
-    queryKey,
-    queryKeyHashFn: hashCanonicalKey,
-  }
-}
+) => ({
+  ...options,
+  queryFn,
+  queryKey,
+})
 
 const createQueryBuilders = (
   description: UnaryOperation | StreamingOperation,

@@ -9,6 +9,7 @@ export type EffectRpcQueryConfigErrorCode =
   | 'RpcPathCollision'
   | 'MissingKeyEncoder'
   | 'UnknownKeyEncoder'
+  | 'UnsupportedQueryHash'
 
 /** Stable codes for synchronous query-key preparation failures. */
 export type EffectRpcQueryKeyErrorCode =

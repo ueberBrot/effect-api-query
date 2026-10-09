@@ -12,6 +12,7 @@
     "types": ["node"]
   },
   "include": [
+    "hashing-runtime.mts",
     "runtime.mts",
     "stream-cause-runtime.mts",
     "stream-policy-runtime.mts",

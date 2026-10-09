@@ -16,7 +16,7 @@ import type {
 import { Rpc, RpcGroup, RpcTest } from 'effect/rpc'
 // fallow-ignore-file unused-file
 // The packed-package verifier copies and executes this fixture in temporary consumers.
-import { deepStrictEqual, equal, ok, rejects } from 'node:assert/strict'
+import { deepStrictEqual, equal, ok, rejects, throws } from 'node:assert/strict'
 
 type PublicTypes = [
   CreateRpcQueryUtilsOptions<any, readonly [JsonValue, ...JsonValue[]]>,
@@ -278,6 +278,277 @@ await Effect.runPromise(
         observer.destroy()
         queryClient.clear()
       }
+    }),
+  ),
+)
+
+const BroadRead = Rpc.make('payload.unknown', { payload: Schema.Unknown, success: Schema.String })
+const AnyRead = Rpc.make('payload.any', { payload: Schema.Any, success: Schema.String })
+const OptionalRead = Rpc.make('payload.optional', {
+  payload: Schema.Union([Schema.String, Schema.Void]),
+  success: Schema.String,
+})
+const VoidRead = Rpc.make('payload.void', { payload: Schema.Void, success: Schema.String })
+const DefaultRead = Rpc.make('payload.defaults', {
+  payload: {
+    id: Schema.Int,
+    locale: Schema.String.pipe(
+      Schema.optionalKey,
+      Schema.withConstructorDefault(Effect.succeed('en')),
+    ),
+  },
+  success: Schema.String,
+})
+const BroadWatch = Rpc.make('payload.unknownWatch', {
+  payload: Schema.Unknown,
+  success: Schema.String,
+  stream: true,
+})
+const AnyWatch = Rpc.make('payload.anyWatch', {
+  payload: Schema.Any,
+  success: Schema.String,
+  stream: true,
+})
+const BroadOptionalWatch = Rpc.make('payload.optionalWatch', {
+  payload: Schema.Union([Schema.String, Schema.Void]),
+  success: Schema.String,
+  stream: true,
+})
+const VoidWatch = Rpc.make('payload.voidWatch', {
+  payload: Schema.Void,
+  success: Schema.String,
+  stream: true,
+})
+const broadGroup = RpcGroup.make(
+  BroadRead,
+  AnyRead,
+  OptionalRead,
+  VoidRead,
+  DefaultRead,
+  BroadWatch,
+  AnyWatch,
+  BroadOptionalWatch,
+  VoidWatch,
+)
+const broadHandlers = broadGroup.of({
+  'payload.unknown': (input) => Effect.succeed(JSON.stringify(input)),
+  'payload.any': (input) => Effect.succeed(String(input)),
+  'payload.optional': (input) => Effect.succeed(input ?? 'empty'),
+  'payload.void': () => Effect.succeed('payloadless'),
+  'payload.defaults': ({ id, locale }) => Effect.succeed(`${id}:${locale}`),
+  'payload.unknownWatch': (input) => Stream.make(JSON.stringify(input), 'unknown-last'),
+  'payload.anyWatch': (input) => Stream.make(String(input), 'any-last'),
+  'payload.optionalWatch': (input) => Stream.make(input ?? 'empty', 'optional-last'),
+  'payload.voidWatch': () => Stream.make('payloadless-first', 'payloadless-last'),
+})
+
+await Effect.runPromise(
+  Effect.scoped(
+    Effect.gen(function* () {
+      const client = yield* RpcTest.makeClient(broadGroup, { flatten: true }).pipe(
+        Effect.provide(broadGroup.toLayer(broadHandlers)),
+      )
+      const queryClient = new QueryClient()
+      const defaults = rpcQuery.createRpcQueryUtils(broadGroup, {
+        client,
+        keyPrefix: ['payload'],
+      })
+      const encoded = rpcQuery.createRpcQueryUtils(broadGroup, {
+        client,
+        keyPrefix: ['encoded'],
+        keyEncoders: {
+          'payload.unknown': (input) => (input === undefined ? 'empty' : String(input)),
+          'payload.any': (input) => String(input),
+          'payload.optional': (input) => input ?? null,
+          'payload.unknownWatch': (input) => String(input),
+          'payload.anyWatch': (input) => String(input),
+          'payload.optionalWatch': (input) => input ?? null,
+        },
+      })
+
+      deepStrictEqual(defaults.payload.unknown.queryKey({ id: 7 }), [
+        'payload',
+        'rpc',
+        'payload',
+        'unknown',
+        'query',
+        { id: 7 },
+      ])
+      deepStrictEqual(defaults.payload.any.queryKey(7), [
+        'payload',
+        'rpc',
+        'payload',
+        'any',
+        'query',
+        7,
+      ])
+      deepStrictEqual(defaults.payload.optional.queryKey('input'), [
+        'payload',
+        'rpc',
+        'payload',
+        'optional',
+        'query',
+        'input',
+      ])
+      for (const invalid of [undefined, 1n, new Date(0)]) {
+        throws(() => defaults.payload.unknown.queryKey(invalid), rpcQuery.EffectRpcQueryKeyError)
+        throws(() => defaults.payload.any.queryKey(invalid), rpcQuery.EffectRpcQueryKeyError)
+      }
+      throws(() => defaults.payload.optional.queryKey(undefined), rpcQuery.EffectRpcQueryKeyError)
+      deepStrictEqual(encoded.payload.optional.queryKey(undefined), [
+        'encoded',
+        'rpc',
+        'payload',
+        'optional',
+        'query',
+        null,
+      ])
+      deepStrictEqual(
+        defaults.payload.defaults.queryKey({ id: 7 }),
+        defaults.payload.defaults.queryKey({ id: 7, locale: 'en' }),
+      )
+      equal(
+        yield* Effect.promise(() =>
+          queryClient.query(defaults.payload.defaults.queryOptions({ input: { id: 7 } })),
+        ),
+        '7:en',
+      )
+      equal(
+        yield* Effect.promise(() =>
+          queryClient.query(defaults.payload.unknown.queryOptions({ input: { id: 7 } })),
+        ),
+        '{"id":7}',
+      )
+      equal(
+        yield* Effect.promise(() =>
+          queryClient.query(defaults.payload.any.queryOptions({ input: 7 })),
+        ),
+        '7',
+      )
+      equal(
+        yield* Effect.promise(() =>
+          queryClient.query(encoded.payload.optional.queryOptions({ input: undefined })),
+        ),
+        'empty',
+      )
+      equal(
+        yield* Effect.promise(() =>
+          queryClient.query(encoded.payload.any.queryOptions({ input: 1n })),
+        ),
+        '1',
+      )
+      equal(
+        yield* Effect.promise(() =>
+          new MutationObserver(queryClient, defaults.payload.unknown.mutationOptions()).mutate({
+            id: 8,
+          }),
+        ),
+        '{"id":8}',
+      )
+      equal(
+        yield* Effect.promise(() =>
+          new MutationObserver(queryClient, defaults.payload.any.mutationOptions()).mutate(2n),
+        ),
+        '2',
+      )
+      equal(
+        yield* Effect.promise(() =>
+          new MutationObserver(queryClient, defaults.payload.optional.mutationOptions()).mutate(
+            undefined,
+          ),
+        ),
+        'empty',
+      )
+      deepStrictEqual(
+        yield* Effect.promise(() =>
+          queryClient.infiniteQuery(
+            defaults.payload.unknown.infiniteOptions({
+              input: (page: number) => ({ page }),
+              initialPageParam: 0,
+              getNextPageParam: () => undefined,
+            }),
+          ),
+        ),
+        { pages: ['{"page":0}'], pageParams: [0] },
+      )
+      deepStrictEqual(
+        yield* Effect.promise(() =>
+          queryClient.infiniteQuery(
+            defaults.payload.any.infiniteOptions({
+              input: (page: number) => page,
+              initialPageParam: 0,
+              getNextPageParam: () => undefined,
+            }),
+          ),
+        ),
+        { pages: ['0'], pageParams: [0] },
+      )
+      deepStrictEqual(
+        yield* Effect.promise(() =>
+          queryClient.infiniteQuery(
+            encoded.payload.optional.infiniteOptions({
+              input: () => undefined,
+              initialPageParam: 0,
+              getNextPageParam: () => undefined,
+            }),
+          ),
+        ),
+        { pages: ['empty'], pageParams: [0] },
+      )
+      deepStrictEqual(
+        yield* Effect.promise(() =>
+          queryClient.query(defaults.payload.unknownWatch.streamedOptions({ input: { id: 7 } })),
+        ),
+        ['{"id":7}', 'unknown-last'],
+      )
+      deepStrictEqual(
+        yield* Effect.promise(() =>
+          queryClient.query(defaults.payload.anyWatch.streamedOptions({ input: 7 })),
+        ),
+        ['7', 'any-last'],
+      )
+      deepStrictEqual(
+        yield* Effect.promise(() =>
+          queryClient.query(encoded.payload.optionalWatch.streamedOptions({ input: undefined })),
+        ),
+        ['empty', 'optional-last'],
+      )
+      equal(
+        yield* Effect.promise(() =>
+          queryClient.query(defaults.payload.unknownWatch.liveOptions({ input: { id: 7 } })),
+        ),
+        'unknown-last',
+      )
+      equal(
+        yield* Effect.promise(() =>
+          queryClient.query(defaults.payload.anyWatch.liveOptions({ input: 7 })),
+        ),
+        'any-last',
+      )
+      equal(
+        yield* Effect.promise(() =>
+          queryClient.query(encoded.payload.optionalWatch.liveOptions({ input: undefined })),
+        ),
+        'optional-last',
+      )
+      equal(
+        yield* Effect.promise(() => queryClient.query(defaults.payload.void.queryOptions())),
+        'payloadless',
+      )
+      equal(
+        yield* Effect.promise(() => defaults.payload.void.mutationOptions().mutationFn()),
+        'payloadless',
+      )
+      deepStrictEqual(
+        yield* Effect.promise(() =>
+          queryClient.query(defaults.payload.voidWatch.streamedOptions()),
+        ),
+        ['payloadless-first', 'payloadless-last'],
+      )
+      equal(
+        yield* Effect.promise(() => queryClient.query(defaults.payload.voidWatch.liveOptions())),
+        'payloadless-last',
+      )
     }),
   ),
 )

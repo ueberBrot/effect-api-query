@@ -23,6 +23,7 @@ export type OperationInput =
 export interface OperationIdentity {
   readonly id: string
   readonly path: readonly string[]
+  readonly unsupportedQueryHash: (option: 'queryKeyHashFn' | 'queryHash') => Error
   /** Removes adapter-owned fields from the fresh options copy. */
   readonly takeOptions: (options: Record<string, unknown>) => unknown
 }
