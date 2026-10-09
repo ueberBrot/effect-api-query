@@ -6,8 +6,6 @@
   "entry": [
     "apps/docs/public/package-version.js",
     "playwright.docs.config.ts",
-    // Vite+ invokes this verifier through its dynamically declared install-policy task.
-    "scripts/verify-install-policy.mts",
     "tests/packed-consumer/stream-cause-runtime.mts"
   ],
 

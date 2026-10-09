@@ -9,10 +9,6 @@ Install the package and TanStack Query Core:
 pnpm add effect-api-query @tanstack/query-core
 ```
 
-This repository uses a strict seven-day dependency quarantine. A newly published package version
-becomes eligible for registry installation seven days after publication; this includes the initial
-release. Use an eligible version and preserve your application's release-age policy.
-
 With pnpm's default peer installation enabled, this also installs the exact Effect release required
 by the package. If your application already pins Effect or disables automatic peer installation,
 install the Effect version from the package's `peerDependencies` and resolve any peer mismatch

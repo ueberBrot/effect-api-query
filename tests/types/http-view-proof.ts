@@ -67,7 +67,6 @@ true satisfies Assert<Equal<Stream.Success<WrappedSuccess['body']>, number>>
 true satisfies Assert<Equal<WrappedSuccess['headers'], { readonly 'x-version': number }>>
 true satisfies Assert<Equal<Effect.Services<typeof wrapped>, Scale | 'client-service'>>
 
-/** Proof-only projection: each cached emission retains its decoded declaration wrapper. */
 type Chunk<Value> =
   Value extends HttpApiSchema.withHeaders<infer Body, infer Headers>
     ? HttpApiSchema.withHeaders<Chunk<Body>, Headers>
@@ -78,7 +77,6 @@ true satisfies Assert<
   Equal<Chunk<WrappedSuccess>, HttpApiSchema.withHeaders<number, { readonly 'x-version': number }>>
 >
 
-/** Decoder controls never enter decoded request or custom key-encoder input. */
 type Request<Endpoint extends HttpApiEndpoint.ConstraintRequest> = Omit<
   Exclude<
     HttpApiEndpoint.ClientRequest<

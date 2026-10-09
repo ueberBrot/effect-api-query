@@ -218,7 +218,7 @@ export type ConcreteLiveKey<
   void extends Rpc.PayloadConstructor<R>
     ? LiveOperationKey<Prefix, R>
     : readonly [...LiveOperationKey<Prefix, R>, JsonValue],
-  Rpc.SuccessChunk<R>,
+  QueryData<Rpc.SuccessChunk<R>>,
   RpcLiveError<R, ClientError>
 >
 
@@ -267,7 +267,7 @@ export type LiveOptionsBuilder<
   ClientError,
 > = StreamingQueryBuilder<
   Rpc.PayloadConstructor<R>,
-  Rpc.SuccessChunk<R>,
+  QueryData<Rpc.SuccessChunk<R>>,
   RpcLiveError<R, ClientError>,
   ConcreteLiveKey<Prefix, R, ClientError>,
   LiveOperationKey<Prefix, R>
@@ -288,10 +288,6 @@ export interface RpcStreamLeaf<
   /** Builds a semantic key for the latest-value view of the stream. */
   readonly liveKey: StreamKeyBuilder<R, ConcreteLiveKey<Prefix, R, ClientError>>
 
-  /**
-   * Builds latest-value query options. A stream that completes before its first value fails with
-   * {@link EffectRpcQueryEmptyStreamError}.
-   */
   readonly liveOptions: LiveOptionsBuilder<R, Prefix, ClientError>
 
   /** Builds a semantic key for the accumulated view of the stream. */

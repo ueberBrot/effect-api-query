@@ -131,8 +131,9 @@ Live queries cache only the latest value and accept neither history option.
 With no cached data, an empty accumulated stream resolves to `[]`. An empty
 append refetch preserves existing history; empty reset and replace refetches
 finish with `[]`. Empty live completion raises `EffectRpcQueryEmptyStreamError`.
-Emitted chunks are retained as supplied, unlike buffered query `undefined`
-normalization.
+Live queries normalize each emitted `undefined` to `null`, including an emission
+after a defined value. Live keys, selectors, and initial data use that normalized
+type. Accumulated chunks retain their original values, including `undefined`.
 
 On an initial fetch, both views become successful after the first emission. They
 keep fetching until completion. Canceling closes the iterator and interrupts its

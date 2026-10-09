@@ -13,7 +13,7 @@ A nested object derived from an Effect HttpApi's literal group and endpoint iden
 _Avoid_: RPC utility tree, generated client
 
 **Query data**:
-The successful decoded RPC or HTTP value presented to TanStack Query. Buffered queries convert successful `undefined` to `null`; streamed values and mutation data remain unchanged.
+The successful decoded RPC or HTTP value presented to TanStack Query. Buffered queries and live queries convert successful `undefined` to `null`; accumulated stream elements and mutation data remain unchanged.
 _Avoid_: RPC success value when it is `undefined`
 
 **Accumulated streamed query**:
@@ -21,7 +21,7 @@ A streaming RPC or HTTP SSE view that caches emitted values in order, optionally
 _Avoid_: Live query, infinite query
 
 **Live query**:
-A streaming RPC or HTTP SSE view that caches only the latest emitted value. Stream completion preserves that value; completion before the first emission produces a package error.
+A streaming RPC or HTTP SSE view that caches only the latest emitted value, converting `undefined` to `null`. Stream completion preserves that value; completion before the first emission produces a package error.
 _Avoid_: Accumulated streamed query, subscription
 
 **HTTP metadata view**:
