@@ -1,5 +1,5 @@
 import { MutationObserver, QueryClient, QueryObserver } from '@tanstack/query-core'
-import { Cause, Effect, Exit, Layer, Result, Schema } from 'effect'
+import { Cause, Effect, Exit, Layer, Predicate, Result, Schema } from 'effect'
 import {
   createHttpApiQueryUtils,
   EffectHttpApiQueryConfigError,
@@ -170,9 +170,59 @@ await Effect.runPromise(
       equal(queryClient.getQueryState(options.queryKey)?.isInvalidated, true)
       equal(queryClient.getQueryState(http.documents.read.queryKey(input))?.isInvalidated, true)
       const refreshed = yield* Effect.promise(() => queryClient.query(options))
+      equal(Object.isFrozen(refreshed), true)
+      equal(Object.isFrozen(refreshed.headers), true)
+      equal(Object.isFrozen(queryClient.getQueryData(options.queryKey)), true)
+      equal(Object.isFrozen(queryClient.getQueryData(options.queryKey)?.headers), true)
+      equal(Object.isFrozen(refreshed.data), false)
+      equal(Object.isFrozen(refreshed.data.headers), false)
       equal(refreshed.data.body, 29)
       equal(refreshed.headers['etag'], '"revision-5"')
       equal(metadata.headers['etag'], '"revision-4"')
+      const sharedMetadata = queryClient.getQueryData(options.queryKey)
+      yield* Effect.promise(() =>
+        queryClient.invalidateQueries({ queryKey: options.queryKey, exact: true }),
+      )
+      yield* Effect.promise(() => queryClient.query(options))
+      equal(queryClient.getQueryData(options.queryKey), sharedMetadata)
+      yield* Effect.promise(async () => {
+        const owned = { ...refreshed, headers: { ...refreshed.headers } }
+        const initialClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+        const customClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+        try {
+          const initialOptions = http.documents.read.metadataOptions({ input, initialData: owned })
+          await initialClient.query(initialOptions)
+          const initialSnapshot = initialClient.getQueryData(initialOptions.queryKey)
+          ok(initialSnapshot !== owned)
+          ok(initialSnapshot?.headers !== owned.headers)
+          equal(initialSnapshot?.data, owned.data)
+          equal(Object.isFrozen(initialSnapshot), true)
+          equal(Object.isFrozen(initialSnapshot?.headers), true)
+          equal(Object.isFrozen(owned), false)
+          equal(Object.isFrozen(owned.headers), false)
+          const customOptions = http.documents.read.metadataOptions({
+            input,
+            structuralSharing: () => owned,
+          })
+          await customClient.query(customOptions)
+          const customSnapshot = customClient.getQueryData(customOptions.queryKey)
+          ok(customSnapshot !== owned)
+          ok(customSnapshot?.headers !== owned.headers)
+          equal(customSnapshot?.data, owned.data)
+          equal(Object.isFrozen(customSnapshot), true)
+          equal(Object.isFrozen(customSnapshot?.headers), true)
+          owned.status = 299
+          owned.headers['etag'] = 'application-owned'
+          equal(initialSnapshot?.status, 203)
+          equal(customSnapshot?.status, 203)
+          equal(initialSnapshot?.headers['etag'], '"revision-5"')
+          equal(customSnapshot?.headers['etag'], '"revision-5"')
+          equal(Object.isFrozen(owned.data), false)
+        } finally {
+          initialClient.clear()
+          customClient.clear()
+        }
+      })
       yield* Effect.promise(() =>
         rejects(
           update.mutate({
@@ -255,6 +305,88 @@ await Effect.runPromise(
           (error: unknown) => error === rejected,
         ),
       )
+      yield* Effect.promise(async () => {
+        let globalCalls = 0
+        let prefixCalls = 0
+        let localCalls = 0
+        const left = new QueryClient({
+          defaultOptions: {
+            queries: {
+              retry: false,
+              structuralSharing: (_previous, data) => {
+                globalCalls += 1
+                return { ...(Predicate.isObject(data) ? data : undefined), status: 211 }
+              },
+            },
+          },
+        })
+        const right = new QueryClient({
+          defaultOptions: {
+            queries: {
+              retry: false,
+              structuralSharing: false,
+            },
+          },
+        })
+        right.setQueryDefaults(http.empty.key(), {
+          structuralSharing: (_previous, data) => {
+            prefixCalls += 1
+            return { ...(Predicate.isObject(data) ? data : undefined), status: 212 }
+          },
+        })
+        try {
+          const sharedOptions = http.empty.metadataOptions()
+          await Promise.all([left.query(sharedOptions), right.query(sharedOptions)])
+          equal(left.getQueryData(sharedOptions.queryKey)?.status, 211)
+          equal(right.getQueryData(sharedOptions.queryKey)?.status, 212)
+          equal(globalCalls, 1)
+          equal(prefixCalls, 1)
+          equal(Object.isFrozen(left.getQueryData(sharedOptions.queryKey)), true)
+          equal(Object.isFrozen(right.getQueryData(sharedOptions.queryKey)?.headers), true)
+          await Promise.all([left.query(sharedOptions), right.query(sharedOptions)])
+          equal(globalCalls, 2)
+          equal(prefixCalls, 2)
+          equal(left.getQueryData(sharedOptions.queryKey)?.status, 211)
+          equal(right.getQueryData(sharedOptions.queryKey)?.status, 212)
+          const localOptions = http.empty.metadataOptions({
+            structuralSharing: (_previous, data) => {
+              localCalls += 1
+              return { ...(Predicate.isObject(data) ? data : undefined), status: 213 }
+            },
+          })
+          await Promise.all([left.query(localOptions), right.query(localOptions)])
+          equal(globalCalls, 2)
+          equal(prefixCalls, 2)
+          equal(localCalls, 2)
+          equal(left.getQueryData(localOptions.queryKey)?.status, 213)
+          equal(right.getQueryData(localOptions.queryKey)?.status, 213)
+          const inheritedFalse = http.empty.metadataOptions()
+          left.setDefaultOptions({ queries: { retry: false, structuralSharing: false } })
+          right.setQueryDefaults(http.empty.key(), { structuralSharing: false })
+          const [leftInherited, rightInherited] = await Promise.all([
+            left.query(inheritedFalse),
+            right.query(inheritedFalse),
+          ])
+          equal(left.getQueryData(inheritedFalse.queryKey), leftInherited)
+          equal(right.getQueryData(inheritedFalse.queryKey), rightInherited)
+          equal(globalCalls, 2)
+          equal(prefixCalls, 2)
+          const noSharing = http.empty.metadataOptions({ structuralSharing: false })
+          const [leftValue, rightValue] = await Promise.all([
+            left.query(noSharing),
+            right.query(noSharing),
+          ])
+          equal(left.getQueryData(noSharing.queryKey), leftValue)
+          equal(right.getQueryData(noSharing.queryKey), rightValue)
+          equal(Object.isFrozen(leftValue), true)
+          equal(globalCalls, 2)
+          equal(prefixCalls, 2)
+          equal(localCalls, 2)
+        } finally {
+          left.clear()
+          right.clear()
+        }
+      })
     }).pipe(Effect.provide(Layer.mergeAll(handlers, HttpServer.layerServices))),
   ),
 )

@@ -39,6 +39,7 @@ export interface UnaryOperation extends BufferedOperation {
   readonly metadata?: {
     readonly invoke: BufferedOperation['invoke']
     readonly executionError: (operation: 'metadata', cause: Cause.Cause<unknown>) => Error
+    readonly finalizeData: (data: unknown) => unknown
   }
 }
 

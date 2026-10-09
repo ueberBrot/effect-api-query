@@ -113,6 +113,11 @@ value and its ownership, including decoded `WithHeaders` wrappers. Only top-leve
 `undefined` becomes `null`. Raw headers retain their string values without Effect's inspection
 redaction; applications decide which headers may be persisted or dehydrated.
 
+Fetched snapshots remain frozen after native structural sharing, while preserving global, prefix,
+and per-call sharing policies. Mutable envelopes or header records selected by sharing are copied
+before freezing, retaining the selected decoded data reference. The adapter does not freeze
+decoded data or caller-supplied `initialData`, hydrated values, or manual cache writes.
+
 Metadata keys use a `metadata` discriminator and the ordinary request identity. Endpoint prefixes
 match every view. Native `select`, `initialData`, skip-token inference, QueryClient hashing defaults,
 and cancellation apply to metadata options. Execution failures identify operation `metadata` and

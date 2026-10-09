@@ -1,5 +1,5 @@
-import { skipToken } from '@tanstack/query-core'
-import type { QueryFunction } from '@tanstack/query-core'
+import { replaceEqualDeep, skipToken } from '@tanstack/query-core'
+import type { QueryFunction, QueryFunctionContext } from '@tanstack/query-core'
 import { Effect, Exit, Predicate } from 'effect'
 import type { Cause } from 'effect'
 
@@ -264,6 +264,7 @@ const createQueryBuilders = (
   prepareExecution: (
     options: Record<string, unknown>,
     requestOptions: unknown,
+    input: unknown,
   ) => (input: unknown) => QueryFunction,
   prepareIdentity?: (options: Record<string, unknown>) => readonly JsonValue[],
 ) => ({
@@ -276,7 +277,7 @@ const createQueryBuilders = (
     const { input, options, requestOptions } = prepareQueryOptions(description, argument)
     const identity = prepareIdentity?.(options) ?? []
     // Stream policy is consumed and validated even when execution will be skipped.
-    const makeQuery = prepareExecution(options, requestOptions)
+    const makeQuery = prepareExecution(options, requestOptions, input)
     if (description.input._tag !== 'Inputless' && input === skipToken) {
       return finalizeQueryOptions(options, operationKey, skipToken)
     }
@@ -379,6 +380,59 @@ const createMutationLeaf = (
   })
 }
 
+type RuntimeStructuralSharing = (previous: unknown, data: unknown) => unknown
+
+const isStructuralSharing = (policy: unknown): policy is RuntimeStructuralSharing =>
+  Predicate.isFunction(policy)
+
+const shareQueryData = (previous: unknown, data: unknown, policy: unknown) => {
+  if (policy === false) {
+    return data
+  }
+  if (isStructuralSharing(policy)) {
+    return policy(previous, data)
+  }
+  return replaceEqualDeep(previous, data)
+}
+
+const prepareMetadataExecution = (
+  description: NonNullable<UnaryOperation['metadata']>,
+  options: Record<string, unknown>,
+  runPromiseExit: RunPromiseExit<unknown>,
+  requestOptions: unknown,
+  skipped: boolean,
+) => {
+  const hasLocalPolicy = Object.hasOwn(options, 'structuralSharing')
+  const localPolicy = options['structuralSharing']
+  const policies = new WeakMap<object, unknown>()
+  if (!skipped) {
+    options['structuralSharing'] = (previous: unknown, data: unknown) => {
+      const produced = Predicate.isObject(data) && policies.has(data)
+      const policy = produced ? policies.get(data) : localPolicy
+      const shared = shareQueryData(previous, data, policy)
+      return produced ? description.finalizeData(shared) : shared
+    }
+  }
+  return (input: unknown) =>
+    async ({ client, queryKey, signal }: QueryFunctionContext) => {
+      const policy = hasLocalPolicy
+        ? localPolicy
+        : client.defaultQueryOptions({ queryKey }).structuralSharing
+      const data = await execute(
+        description,
+        'metadata',
+        input,
+        runPromiseExit,
+        requestOptions,
+        signal,
+      )
+      if (Predicate.isObject(data)) {
+        policies.set(data, policy)
+      }
+      return data
+    }
+}
+
 const createUnaryLeaf = (
   description: UnaryOperation,
   keyParts: readonly (JsonValue | string)[],
@@ -404,10 +458,14 @@ const createUnaryLeaf = (
           description,
           freezeKey([...operationKey, 'metadata']),
           keyEncoder,
-          (_options, requestOptions) =>
-            (input) =>
-            async ({ signal }: { readonly signal: AbortSignal }) =>
-              execute(metadata, 'metadata', input, runPromiseExit, requestOptions, signal),
+          (options, requestOptions, input) =>
+            prepareMetadataExecution(
+              metadata,
+              options,
+              runPromiseExit,
+              requestOptions,
+              description.input._tag !== 'Inputless' && input === skipToken,
+            ),
         )
 
   return Object.freeze({

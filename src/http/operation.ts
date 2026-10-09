@@ -99,6 +99,19 @@ const extractHttpEndpoints = (api: HttpApi.Top, client: unknown): readonly HttpO
                   ),
                 executionError: (operation: 'metadata', cause: Cause.Cause<unknown>) =>
                   new EffectHttpApiQueryError(identity, operation, cause),
+                finalizeData: (data: unknown) => {
+                  if (!Predicate.isObject(data)) {
+                    return data
+                  }
+                  const { headers } = data
+                  const snapshot =
+                    Predicate.isObject(headers) && !Object.isFrozen(headers)
+                      ? Object.freeze({ ...headers })
+                      : headers
+                  return Object.isFrozen(data) && snapshot === headers
+                    ? data
+                    : Object.freeze({ ...data, headers: snapshot })
+                },
               },
             }
           : undefined),
