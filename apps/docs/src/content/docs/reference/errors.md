@@ -48,6 +48,9 @@ Thrown when a live query's stream completes before emitting a value. It exposes 
 
 Thrown synchronously while configuring HTTP utilities. Its `code` is one of:
 
+- `InvalidMaxChunks`: a streamed-query bound is not a positive safe integer.
+- `InvalidRefetchMode`: a streamed-query mode is not `reset`, `append`, or `replace`.
+- `InvalidMaxEventSize`: an SSE parser limit is not a positive safe integer.
 - `InvalidKeyPrefix`
 - `InvalidEndpointPath`
 - `EndpointPathCollision`
@@ -75,9 +78,10 @@ for each code's trigger.
 
 Thrown when the HTTP runner returns a failed `Exit`. It exposes `apiId`, `groupId`, `endpoint`,
 `method`, `operation`, and the full `Cause.Cause<E>`. The operation is `query`, `infinite`, `mutation`,
-or `metadata`.
+`metadata`, or `streamed`.
 Use `isEffectHttpApiQueryError(value)` to narrow errors within the same JavaScript realm.
 
 The Cause preserves endpoint, middleware, Schema, and HTTP client errors, including defects and
-interruption. It can contain upstream requests, responses, or sensitive input values; inspect those
+interruption. SSE failures also preserve declared event errors, `Sse.Retry`, and `Sse.SseError`.
+It can contain upstream requests, responses, or sensitive input values; inspect those
 values before logging or exposing them. Runner rejections pass through unchanged.

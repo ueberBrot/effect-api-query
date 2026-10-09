@@ -489,13 +489,12 @@ const createStreamingLeaf = (
   const operationKey = freezeKey(keyParts)
   const liveOperationKey = freezeKey([...operationKey, 'live'])
   const streamedOperationKey = freezeKey([...operationKey, 'streamed'])
-  const live = createQueryBuilders(
-    description,
-    liveOperationKey,
-    keyEncoder,
-    (options, requestOptions) =>
-      description.prepareStream(options, 'live', runPromiseExit, requestOptions),
-  )
+  const live =
+    description.supportsLive === false
+      ? undefined
+      : createQueryBuilders(description, liveOperationKey, keyEncoder, (options, requestOptions) =>
+          description.prepareStream(options, 'live', runPromiseExit, requestOptions),
+        )
   const streamed = createQueryBuilders(
     description,
     streamedOperationKey,
@@ -507,8 +506,7 @@ const createStreamingLeaf = (
 
   return Object.freeze({
     key: () => operationKey,
-    liveKey: live.key,
-    liveOptions: live.options,
+    ...(live === undefined ? undefined : { liveKey: live.key, liveOptions: live.options }),
     streamedKey: streamed.key,
     streamedOptions: streamed.options,
   })

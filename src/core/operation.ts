@@ -50,6 +50,7 @@ export interface MutationOperation extends BufferedOperation {
 export interface StreamingOperation extends OperationIdentity {
   readonly kind: 'Streaming'
   readonly input: OperationInput
+  readonly supportsLive?: boolean
   readonly streamedIdentity: (options: Record<string, unknown>) => readonly JsonValue[]
   /** Consumes and validates stream policy, including for skipped requests. */
   readonly prepareStream: (

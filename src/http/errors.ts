@@ -8,8 +8,7 @@ export interface HttpApiEndpointIdentity {
   readonly method: string
 }
 
-/** TanStack operations supported by buffered HTTP endpoints. */
-export type HttpApiOperation = 'query' | 'infinite' | 'mutation' | 'metadata'
+export type HttpApiOperation = 'query' | 'infinite' | 'mutation' | 'metadata' | 'streamed'
 
 /** Stable codes for invalid HTTP utility configuration. */
 export type EffectHttpApiQueryConfigErrorCode =
@@ -20,6 +19,9 @@ export type EffectHttpApiQueryConfigErrorCode =
   | 'UnknownKeyEncoder'
   | 'UnsupportedEndpointMetadata'
   | 'UnsupportedQueryHash'
+  | 'InvalidMaxChunks'
+  | 'InvalidRefetchMode'
+  | 'InvalidMaxEventSize'
 
 /** Stable codes for synchronous HTTP key failures. */
 export type EffectHttpApiQueryKeyErrorCode =
