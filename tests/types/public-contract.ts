@@ -323,9 +323,35 @@ streamedHook.error satisfies EffectRpcQueryError<
 > | null
 const streamedResult: Promise<string> = queryClient.query(streamedOptions)
 const streamedKey = utils.events.watch.streamedKey({ channel: 'news' })
-streamedKey satisfies readonly ['app', 'rpc', 'events', 'watch', 'streamed', JsonValue]
+streamedKey satisfies readonly ['app', 'rpc', 'events', 'watch', 'streamed', ...JsonValue[]]
 const cachedStream = queryClient.getQueryData(utils.events.watch.streamedKey({ channel: 'news' }))
 cachedStream satisfies ReadonlyArray<string> | undefined
+const boundedStreamKey = utils.events.watch.streamedKey(
+  { channel: 'news' },
+  { maxChunks: 2, refetchMode: 'append' },
+)
+const boundedStreamData = queryClient.getQueryData(boundedStreamKey)
+boundedStreamData satisfies ReadonlyArray<string> | undefined
+queryClient.setQueryData(boundedStreamKey, ['latest'])
+queryClient.getQueryState(boundedStreamKey)?.error satisfies
+  | EffectRpcQueryError<'unauthorized' | 'watch-failure' | 'watch-rpc-failure'>
+  | null
+  | undefined
+utils.events.watch.streamedKey({ channel: 'news' }, { maxChunks: undefined, refetchMode: 'reset' })
+utils.events.audit.watch.streamedKey()
+utils.events.audit.watch.streamedKey({ maxChunks: 2, refetchMode: 'replace' })
+utils.events.audit.watch.streamedKey({ maxChunks: undefined, refetchMode: undefined })
+queryClient.getQueryData(utils.events.audit.watch.streamedKey({ maxChunks: 2 })) satisfies
+  | ReadonlyArray<string>
+  | undefined
+// @ts-expect-error refetch policy is one of the declared modes
+utils.events.watch.streamedKey({ channel: 'news' }, { refetchMode: 'unknown' })
+// @ts-expect-error accumulation bounds are numeric
+utils.events.audit.watch.streamedKey({ maxChunks: '2' })
+// @ts-expect-error a payload-bearing key still requires constructor input
+utils.events.watch.streamedKey({ maxChunks: 2 })
+// @ts-expect-error live keys have no accumulation policy
+utils.events.watch.liveKey({ channel: 'news' }, { maxChunks: 2 })
 queryClient.invalidateQueries({ queryKey: streamedKey })
 queryClient.refetchQueries({ queryKey: streamedKey })
 void [streamedHookData, streamedResult]
@@ -1218,7 +1244,7 @@ const conditionalStreamOptions = utils.events.watch.streamedOptions({
   staleTime: (query) => {
     query.queryKey satisfies
       | readonly ['app', 'rpc', 'events', 'watch', 'streamed']
-      | readonly ['app', 'rpc', 'events', 'watch', 'streamed', JsonValue]
+      | readonly ['app', 'rpc', 'events', 'watch', 'streamed', ...JsonValue[]]
     return 30_000
   },
 })

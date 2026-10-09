@@ -137,12 +137,12 @@ query.
 
 Each streaming RPC leaf exposes:
 
-| Builder                     | Result                                                                      |
-| --------------------------- | --------------------------------------------------------------------------- |
-| `streamedKey(input?)`       | Data-tagged key for the accumulated sequence.                               |
-| `streamedOptions(options?)` | Fresh Query Core options that append each emitted value to an array.        |
-| `liveKey(input?)`           | Data-tagged key for the latest value.                                       |
-| `liveOptions(options?)`     | Fresh Query Core options that replace the cached value after each emission. |
+| Builder                       | Result                                                                         |
+| ----------------------------- | ------------------------------------------------------------------------------ |
+| `streamedKey(input, policy?)` | Data-tagged key for the accumulated sequence and its retention/refetch policy. |
+| `streamedOptions(options?)`   | Fresh Query Core options that append each emitted value to an array.           |
+| `liveKey(input?)`             | Data-tagged key for the latest value.                                          |
+| `liveOptions(options?)`       | Fresh Query Core options that replace the cached value after each emission.    |
 
 Both option builders publish the query as successful after its first value and keep
 `fetchStatus: 'fetching'` until the stream ends. An empty accumulated stream resolves to `[]`; an
@@ -151,6 +151,16 @@ empty live stream fails with `EffectRpcQueryEmptyStreamError`.
 Live queries convert emitted `undefined` to `null`; explicit `null` stays `null`. Their keys,
 selectors, and initial-data options describe this normalized value. Accumulated arrays preserve
 `undefined` elements.
+
+For an inputless RPC, call `streamedKey(policy?)`. Existing calls without a policy retain
+unlimited history and reset refetches. Pass the same policy to the key and options builders when
+reading, seeding, cancelling, or refetching an exact accumulated view:
+
+```ts
+const policy = { maxChunks: 100, refetchMode: 'append' } as const
+const key = utils.events.watch.streamedKey({ channel: 'news' }, policy)
+const options = utils.events.watch.streamedOptions({ input: { channel: 'news' }, ...policy })
+```
 
 Accumulated streams accept TanStack's `refetchMode` option:
 
@@ -182,9 +192,19 @@ array.
 The bound discards older history to limit the number of elements; it does not limit byte size.
 Without it, accumulation remains unbounded. Use `liveOptions` when only the latest value matters.
 
-`maxChunks` configures accumulation, not key identity. Builders consume it before returning options,
-including skipped options. Invalid bounds throw `EffectRpcQueryConfigError` with code
-`InvalidMaxChunks` synchronously, even when `input` is `skipToken`.
+`maxChunks` and `refetchMode` both contribute to concrete accumulated-stream identity. Omitted
+values mean unlimited retention and `reset`; explicit `undefined` and explicit `reset` produce
+the same default identity. Different policies have separate histories, including concurrent views
+of the same RPC payload. Root, branch, RPC, and streamed-operation prefixes still match every policy.
+
+Builders consume both fields before returning options, including skipped options. Invalid bounds
+throw `EffectRpcQueryConfigError` with code `InvalidMaxChunks`; invalid modes use
+`InvalidRefetchMode`. Both fail synchronously, even when `input` is `skipToken`.
+
+Accumulated-stream keys have changed from earlier versions. Regenerate exact keys through the
+builders and include the view's policy; treat their concrete suffix as opaque. Bump your persisted
+cache's version buster or discard old accumulated histories before restoring data. Live, unary,
+infinite, and mutation key identities retain their existing contracts.
 
 Live queries always replace the cached value and therefore expose no `refetchMode`. Cancelling,
 unmounting, or superseding either stream closes its iterator and interrupts its Effect resources.

@@ -5,7 +5,7 @@ import { RpcSchema } from 'effect/rpc'
 import type { OperationDescription, OperationInput, TreeErrors } from '../core/operation'
 import { createSchemaKeyEncoding } from '../core/schema-key'
 import { EffectRpcQueryConfigError, EffectRpcQueryError, EffectRpcQueryKeyError } from './errors'
-import { createStreamPreparation } from './streamed-query'
+import { createStreamIdentity, createStreamPreparation } from './streamed-query'
 
 const createRpcInput = (definition: Rpc.AnyWithProps): OperationInput => {
   const { payloadSchema, _tag: rpcTag } = definition
@@ -88,6 +88,7 @@ const describeRpc = <Rpcs extends Rpc.Any, ClientError>(
   return {
     ...identity,
     kind: 'Streaming',
+    streamedIdentity: createStreamIdentity(rpcTag),
     prepareStream: createStreamPreparation({
       tag: rpcTag,
       invoke: (input, options) =>

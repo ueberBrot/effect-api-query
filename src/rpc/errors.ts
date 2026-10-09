@@ -3,6 +3,7 @@ import type { Cause } from 'effect'
 /** Stable codes for errors raised while configuring an RPC utility tree or its builders. */
 export type EffectRpcQueryConfigErrorCode =
   | 'InvalidMaxChunks'
+  | 'InvalidRefetchMode'
   | 'InvalidKeyPrefix'
   | 'InvalidRpcPath'
   | 'RpcPathCollision'

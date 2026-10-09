@@ -202,9 +202,7 @@ export type ConcreteStreamedKey<
   R extends Rpc.Any,
   ClientError,
 > = DataTag<
-  void extends Rpc.PayloadConstructor<R>
-    ? StreamedOperationKey<Prefix, R>
-    : readonly [...StreamedOperationKey<Prefix, R>, JsonValue],
+  readonly [...StreamedOperationKey<Prefix, R>, ...JsonValue[]],
   StreamedData<R>,
   EffectRpcQueryError<RpcStreamFailure<R, ClientError>>
 >
@@ -226,9 +224,9 @@ export type StreamRefetchMode = 'append' | 'replace' | 'reset'
 
 export type StreamedPolicyOptions = {
   /** Controls whether a refetch clears, appends to, or replaces accumulated data. */
-  readonly refetchMode?: StreamRefetchMode
+  readonly refetchMode?: StreamRefetchMode | undefined
   /** Retains at most this many newest elements; must be a positive safe integer. */
-  readonly maxChunks?: number
+  readonly maxChunks?: number | undefined
 }
 
 /** Shares query inference across accumulated and live queries, including conditional inputs. */
@@ -276,6 +274,11 @@ export type LiveOptionsBuilder<
 export type StreamKeyBuilder<R extends Rpc.Any, Key> =
   void extends Rpc.PayloadConstructor<R> ? () => Key : (input: Rpc.PayloadConstructor<R>) => Key
 
+export type StreamedKeyBuilder<R extends Rpc.Any, Key> =
+  void extends Rpc.PayloadConstructor<R>
+    ? (policy?: StreamedPolicyOptions) => Key
+    : (input: Rpc.PayloadConstructor<R>, policy?: StreamedPolicyOptions) => Key
+
 /** The key and option builders exposed at one streaming RPC path. */
 export interface RpcStreamLeaf<
   R extends Rpc.Any,
@@ -291,7 +294,7 @@ export interface RpcStreamLeaf<
   readonly liveOptions: LiveOptionsBuilder<R, Prefix, ClientError>
 
   /** Builds a semantic key for the accumulated view of the stream. */
-  readonly streamedKey: StreamKeyBuilder<R, ConcreteStreamedKey<Prefix, R, ClientError>>
+  readonly streamedKey: StreamedKeyBuilder<R, ConcreteStreamedKey<Prefix, R, ClientError>>
 
   /** Builds accumulated streamed-query options with Query Core refetch semantics. */
   readonly streamedOptions: StreamedOptionsBuilder<R, Prefix, ClientError>
