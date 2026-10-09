@@ -94,9 +94,10 @@ your application may persist or dehydrate.
 
 Fetched snapshots stay frozen after structural sharing, using your global, prefix, or per-call
 policy. Decoded data and values supplied through `initialData`, hydration, or manual cache writes
-remain application-owned. After execution, manual writes use the policy explicitly passed to
-`metadataOptions`, or standard deep sharing if omitted; they do not inherit global or prefix sharing
-policies. See [Buffered metadata](/effect-api-query/reference/http-factory/#buffered-metadata).
+remain application-owned. Selected observer results and subsequent manual writes use the policy
+explicitly passed to `metadataOptions`, or standard deep sharing if omitted; they do not inherit
+global or prefix sharing policies. See
+[Buffered metadata](/effect-api-query/reference/http-factory/#buffered-metadata).
 
 `metadataKey(input)` provides a typed key for cache reads and writes. Metadata options support
 selection, initial data, skipped input, native hashing defaults, and cancellation like ordinary

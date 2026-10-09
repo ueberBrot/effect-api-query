@@ -398,6 +398,27 @@ await Effect.runPromise(
           equal(right.setQueryData(noSharing.queryKey, falseManual), falseManual)
           equal(Object.isFrozen(falseManual), false)
           equal(Object.isFrozen(falseManual.headers), false)
+          const selected = new QueryObserver(
+            left,
+            http.empty.metadataOptions({ select: (view) => ({ status: view.status }) }),
+          )
+          await selected.refetch()
+          const inheritedSelection = selected.getCurrentResult().data
+          await selected.refetch()
+          equal(selected.getCurrentResult().data, inheritedSelection)
+          equal(Object.isFrozen(inheritedSelection), false)
+          selected.setOptions(
+            http.empty.metadataOptions({
+              select: (view) => ({ status: view.status }),
+              structuralSharing: false,
+            }),
+          )
+          await selected.refetch()
+          const explicitSelection = selected.getCurrentResult().data
+          await selected.refetch()
+          ok(selected.getCurrentResult().data !== explicitSelection)
+          equal(Object.isFrozen(selected.getCurrentResult().data), false)
+          selected.destroy()
           equal(globalCalls, 2)
           equal(prefixCalls, 2)
           equal(localCalls, 4)
