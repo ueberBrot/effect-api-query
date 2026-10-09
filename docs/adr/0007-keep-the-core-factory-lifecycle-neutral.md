@@ -18,7 +18,5 @@ an injected runner with the same `effect, { signal? }` shape.
 The caller owns protocol, middleware, lifetime, and resources. Queries forward TanStack's abort
 signal, mutations omit it, and runner rejections propagate untouched.
 
-The [transport batching measurement](../rpc-transport-batching.md) confirms that shared WebSocket
-connections reduce repeated HTTP overhead while retaining independent request envelopes. Transport
-aggregation and backend RequestResolver batching remain application choices; the utility tree does
-not automatically collect independent calls.
+[ADR 0026](0026-keep-rpc-transport-aggregation-in-the-application.md) records the transport overhead
+measurement and preserves application ownership of aggregation.

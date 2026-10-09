@@ -1,19 +1,18 @@
 import { NodeHttpServer, NodeSocket } from '@effect/platform-node'
 import { describe, expect, it } from '@effect/vitest'
-import { QueryClient } from '@tanstack/query-core'
-import { Effect, Exit, Layer, Schema, Scope } from 'effect'
+import { Effect, Exit, Layer, Scope } from 'effect'
 import { FetchHttpClient, HttpClient } from 'effect/http'
-import { Rpc, RpcClient, RpcGroup, RpcMessage, RpcSerialization, RpcServer } from 'effect/rpc'
+import { RpcClient, RpcMessage, RpcSerialization, RpcServer } from 'effect/rpc'
 import { Socket } from 'effect/socket'
 import { createServer } from 'node:http'
 import type { IncomingMessage } from 'node:http'
 import type { Socket as TcpSocket } from 'node:net'
 
-import { createRpcQueryUtils } from '../../../src/index.ts'
+import {
+  queryTransportCalls,
+  transportGroup as group,
+} from '../../../tests/fixtures/rpc-transport-queries.ts'
 
-const group = RpcGroup.make(
-  Rpc.make('values.read', { payload: { id: Schema.Int }, success: Schema.Int }),
-)
 const handlers = group.toLayer({ 'values.read': ({ id }) => Effect.succeed(id) })
 
 const headerBytes = (request: IncomingMessage) => {
@@ -73,29 +72,19 @@ const measureHttpCalls = Effect.fn('TransportOverhead.measureHttpCalls')(functio
       }).pipe(Layer.provide(RpcSerialization.layerJson), Layer.provide(FetchHttpClient.layer)),
     ),
   )
-  const queryClient = new QueryClient()
   yield* Effect.addFinalizer(() =>
     Effect.sync(() => {
-      queryClient.clear()
       nodeServer.closeAllConnections()
     }),
   )
-  const utils = createRpcQueryUtils(group, { client, keyPrefix: ['overhead'] })
-  const values = yield* Effect.promise(async () =>
-    Promise.all(
-      Array.from({ length: count }, async (_unused, id) =>
-        queryClient.query(utils.values.read.queryOptions({ input: { id }, retry: false })),
-      ),
-    ),
-  )
+  const queries = yield* queryTransportCalls(client, count)
   return {
-    values,
+    ...queries,
     requests,
     requestBodyBytes,
     requestHeaderBytes,
     connections: connections.size,
     clientToServerBytes: [...connections].reduce((total, socket) => total + socket.bytesRead, 0),
-    cacheEntries: queryClient.getQueryCache().getAll().length,
   }
 })
 
@@ -172,28 +161,14 @@ const measureWebSocketCalls = Effect.fn('TransportOverhead.measureWebSocketCalls
       return id
     },
   }).pipe(Effect.provide(protocolContext), Scope.provide(clientScope))
-  const queryClient = new QueryClient()
-  yield* Effect.addFinalizer(() =>
-    Effect.sync(() => {
-      queryClient.clear()
-    }),
-  )
-  const utils = createRpcQueryUtils(group, { client, keyPrefix: ['overhead'] })
-  const values = yield* Effect.promise(async () =>
-    Promise.all(
-      Array.from({ length: count }, async (_unused, id) =>
-        queryClient.query(utils.values.read.queryOptions({ input: { id }, retry: false })),
-      ),
-    ),
-  )
+  const queries = yield* queryTransportCalls(client, count)
   const measurement = {
-    values,
+    ...queries,
     writes,
     requestBodyBytes,
     upgradeHeaderBytes,
     clientToServerBytes: connection?.bytesRead ?? 0,
     connections,
-    cacheEntries: queryClient.getQueryCache().getAll().length,
   }
   yield* Scope.close(clientScope, Exit.void)
   return measurement
