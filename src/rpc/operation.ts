@@ -69,6 +69,12 @@ const describeRpc = <Rpcs extends Rpc.Any, ClientError>(
     id: rpcTag,
     path: rpcTag.split('.'),
     input: createRpcInput(definition),
+    unsupportedQueryHash: (option: 'queryKeyHashFn' | 'queryHash') =>
+      new EffectRpcQueryConfigError(
+        'UnsupportedQueryHash',
+        `${option} must be configured through QueryClient defaults`,
+        { rpcTag },
+      ),
     takeOptions: takeRpcOptions,
   }
   if (!RpcSchema.isStreamSchema(definition.successSchema)) {

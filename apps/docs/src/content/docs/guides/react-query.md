@@ -56,9 +56,10 @@ const events = useQuery(rpcQuery.events.watch.streamedOptions())
 const latestEvent = useQuery(rpcQuery.events.watch.liveOptions())
 ```
 
-The package owns each generated `queryFn`, `queryKey`, `queryKeyHashFn`, `mutationFn`, and
-`mutationKey`. Stream builders own the same query fields. Other TanStack Query options, including `select`,
-`retry`, and lifecycle callbacks, retain their normal TanStack types.
+The package owns each generated `queryFn`, `queryKey`, `mutationFn`, and `mutationKey`.
+Stream builders own the same query fields. Configure custom hashing through QueryClient global
+or prefix defaults; builders reject per-call `queryKeyHashFn` and `queryHash`. Other TanStack Query
+options, including `select`, `retry`, and lifecycle callbacks, retain their normal TanStack types.
 
 ## Use an HTTP endpoint
 

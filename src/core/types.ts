@@ -7,7 +7,6 @@ import type {
   NonUndefinedGuard,
   QueryFunction,
   QueryKey,
-  QueryKeyHashFunction,
   QueryObserverOptions,
   SkipToken,
 } from '@tanstack/query-core'
@@ -61,7 +60,6 @@ export type QueryOptions<
 > = QueryInput<Data, Error, Selected, Key> & {
   readonly queryFn: Fn
   readonly queryKey: Key
-  readonly queryKeyHashFn: QueryKeyHashFunction<Key>
 }
 
 export type ConditionalQueryOptions<Data, Error, Selected, Key extends QueryKey> = QueryOptions<
@@ -162,7 +160,6 @@ export type InfiniteOptions<
 > = InfiniteInput<Data, Error, Selected, Key, PageParam> & {
   readonly queryFn: Fn
   readonly queryKey: Key
-  readonly queryKeyHashFn: QueryKeyHashFunction<Key>
 }
 
 /** Tags concrete infinite keys with their cached pages and inferred page parameter. */

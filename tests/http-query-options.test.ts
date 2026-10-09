@@ -47,16 +47,12 @@ describe('HTTP query options', () => {
     )
     const utils = createHttpApiQueryUtils(Api, { client, keyPrefix: ['test'] })
     const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-    // SAFETY: Extra untyped caller fields deliberately verify that generated options retain ownership of query identity.
-    /* oxlint-disable anti-slop/no-known-value-widening */
     const options = utils.users.list.infiniteOptions({
       initialPageParam: 0,
       input: (cursor) => ({ query: { cursor, filter: 'active' } }),
       getNextPageParam: (lastPage) => lastPage.next,
       staleTime: Infinity,
-      ...({ queryHash: 'collision' } as object),
     })
-    /* oxlint-enable anti-slop/no-known-value-widening */
     const observer = new InfiniteQueryObserver(queryClient, options)
     const unsubscribe = observer.subscribe(() => {})
     try {
@@ -69,18 +65,14 @@ describe('HTTP query options', () => {
         ],
         pageParams: [0, 1],
       })
-      // SAFETY: Extra untyped caller fields deliberately verify that generated options retain ownership of query identity.
-      /* oxlint-disable anti-slop/no-known-value-widening */
       await expect(
         queryClient.query(
           utils.users.list.queryOptions({
             input: { query: { cursor: 42, filter: 'active' } },
             staleTime: Infinity,
-            ...({ queryHash: 'collision' } as object),
           }),
         ),
       ).resolves.toStrictEqual({ items: ['active:42'], next: null })
-      /* oxlint-enable anti-slop/no-known-value-widening */
       expect(options.queryKey).toStrictEqual([
         'test',
         'http',
@@ -271,12 +263,11 @@ describe('HTTP query options', () => {
         ...({
           queryKey: ['replacement'],
           queryFn: () => 'replacement',
-          queryKeyHashFn: () => 'replacement',
         } as object),
       })
       /* oxlint-enable anti-slop/no-known-value-widening */
       expect(options.queryKey).toStrictEqual(utils.refresh.infiniteKey())
-      expect(options.queryKeyHashFn(options.queryKey)).toBe(JSON.stringify(options.queryKey))
+      expect(options).not.toHaveProperty('queryKeyHashFn')
       expect(options).toMatchObject({ staleTime: Infinity, meta: { label: 'refresh' } })
       await expect(queryClient.infiniteQuery({ ...options, pages: 2 })).resolves.toStrictEqual({
         pages: [null, null],

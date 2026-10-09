@@ -261,7 +261,7 @@ describe('createRpcQueryUtils execution boundaries', () => {
       })
       const options = utils.health.ping.queryOptions()
 
-      expect(Object.keys(options).sort()).toStrictEqual(['queryFn', 'queryKey', 'queryKeyHashFn'])
+      expect(Object.keys(options).sort()).toStrictEqual(['queryFn', 'queryKey'])
       expect(yield* Effect.promise(async () => await new QueryClient().query(options))).toBeNull()
     }),
   )

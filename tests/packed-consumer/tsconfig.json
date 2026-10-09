@@ -12,6 +12,7 @@
     "types": ["node"]
   },
   "include": [
+    "hashing-runtime.mts",
     "runtime.mts",
     "http-runtime.mts",
     "public-contract.ts",

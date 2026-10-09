@@ -21,8 +21,9 @@ The default process is:
 3. Canonicalize strict JSON by sorting object keys recursively.
 4. Store the canonical key payload in a flat, prefix-matchable query key.
 
-The generated `queryKeyHashFn` serializes the already-canonical key so TanStack Query uses the same
-identity as the key builders.
+QueryClient owns hashing through its global and prefix defaults. Generated options omit hash
+fields so fetching, stream publications, and native `getQueryData`/`setQueryData` calls address the
+same cache entry. Builders reject per-call `queryKeyHashFn` and `queryHash` overrides.
 
 Key objects cannot contain `__proto__` or `constructor` properties at any depth. This applies to
 prefixes, Schema output, and custom encoder output.
