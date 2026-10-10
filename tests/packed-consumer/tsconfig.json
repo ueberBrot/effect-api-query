@@ -13,6 +13,8 @@
     "types": ["node"]
   },
   "include": [
+    "optimistic-runtime.mts",
+    "optimistic-contract.ts",
     "hashing-runtime.mts",
     "filter-runtime.mts",
     "filter-contract.ts",

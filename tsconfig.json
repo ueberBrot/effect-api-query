@@ -51,6 +51,7 @@
               "tests/fixtures/server-local-rpc.ts",
               "tests/fixtures/rpc-transport-queries.ts",
               "tests/fixtures/http-client.ts",
+              "tests/fixtures/optimistic-users.ts",
               "tests/types/**/*.ts"
             ],
             "options": {
