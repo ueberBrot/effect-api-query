@@ -88,10 +88,3 @@ Track mutation-function completion before releasing the application's ready clie
 writes use `networkMode: 'always'` and `retry: false`, so a retired owner does not retain paused
 mutation work. They do not use a native mutation scope queue. Mutations have no query abort signal;
 retirement and cache clearing do not cancel an accepted server write.
-
-The existing
-[Vite tests](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/tests/user-writes.test.ts)
-and
-[copied packed consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/packed-consumer/optimistic-runtime.mts)
-exercise response seeding, page reconciliation, older failures, late callbacks, stale refetches,
-native hashes, and retired owners.
