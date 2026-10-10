@@ -1,6 +1,6 @@
 {
   "name": "effect-api-query",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Type-safe TanStack Query utilities derived from Effect RPC and HTTP API contracts.",
   "keywords": [
     "tanstack-intent"

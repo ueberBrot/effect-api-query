@@ -1,6 +1,6 @@
 library:
   name: effect-api-query
-  version: 0.0.0
+  version: 0.1.0
   repository: https://github.com/ueberBrot/effect-api-query
   description: TanStack Query utilities derived from ready Effect RPC and HTTP clients.
   primary_framework: framework-agnostic
@@ -126,6 +126,10 @@ gaps:
     context: README/site now describe the current contract and application-owned cache workflows.
     status: resolved
   - skill: effect-api-query
-    question: Release-version metadata and exact candidate acceptance.
-    context: The next approved slices prepare and verify the 0.1.0 archive.
+    question: Initial release-version metadata.
+    context: The 0.1.0 candidate includes its initial changelog and matching skill metadata.
+    status: resolved
+  - skill: effect-api-query
+    question: Exact candidate acceptance.
+    context: Final acceptance must verify the selected 0.1.0 archive across the complete integration path.
     status: open
