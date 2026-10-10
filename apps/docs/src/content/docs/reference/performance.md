@@ -11,7 +11,7 @@ application uses only a few leaves.
 
 Payload-bearing keys prepare a fresh immutable canonical payload. RPC preparation constructs
 and Schema-encodes the normalized payload; HTTP preparation encodes the declared request parts.
-Larger payloads increase this work. Option builders also capture the request and create a fresh
+Larger payloads increase this work. Executable query options also capture the request and create a fresh
 query function. Repeated calls do not memoize payloads or option objects.
 
 A custom RPC key encoder replaces Schema encoding. Payload construction, JSON validation,
@@ -53,7 +53,7 @@ Vite's Oxc minifier and an ES2022 target. Each probe has two sizes:
 | External       | Retained package code and peer imports; dependency code is excluded. |
 | Included       | Retained package code and the peer code needed by that import.       |
 
-Sizes include JavaScript bytes and gzip bytes at compression level nine. An error guard can
+Sizes exclude comments and include JavaScript bytes and gzip bytes at compression level nine. An error guard can
 eliminate all peer code in the included probe, while an external probe retains bare peer imports
 whose side effects the bundler cannot inspect. The included size can therefore be smaller for
 that probe.

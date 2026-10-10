@@ -118,6 +118,7 @@ const measureBundles = async (consumerDirectory: string) => {
               target: 'es2022',
               lib: { entry, formats: ['es'] },
               rolldownOptions: {
+                output: { minify: true, comments: false },
                 external:
                   peers === 'external'
                     ? (id) =>
@@ -194,7 +195,7 @@ const measurePackedConsumer = async (consumerDirectory: string, compilers: reado
     }),
   )
   return {
-    tools: { vite: viteVersion, minifier: 'oxc', target: 'es2022', gzipLevel: 9 },
+    tools: { vite: viteVersion, minifier: 'oxc', comments: false, target: 'es2022', gzipLevel: 9 },
     construction,
     compilers: compilers.flatMap((compiler) => measureCompiler(consumerDirectory, compiler)),
     bundles: await measureBundles(consumerDirectory),
