@@ -70,6 +70,7 @@ export default defineConfig({
             { label: 'Vue and Solid Query', slug: 'guides/vue-and-solid' },
             { label: 'HTTP Queries and Mutations', slug: 'guides/http-queries-and-mutations' },
             { label: 'TanStack Start', slug: 'guides/tanstack-start' },
+            { label: 'WebSocket Ready Clients', slug: 'guides/websocket-clients' },
             { label: 'Stream Snapshots', slug: 'guides/stream-snapshots' },
             { label: 'Cache Management', slug: 'guides/cache-management' },
             { label: 'Cache Filters', slug: 'guides/cache-filters' },

@@ -18,6 +18,7 @@
     "tests/packed-consumer/optimistic-runtime.mts",
     "tests/packed-consumer/optimistic-contract.ts",
     "tests/packed-consumer/events-runtime.mts",
+    "tests/packed-consumer/websocket-runtime.mts",
     "tests/packed-consumer/events-contract.ts",
     "tests/packed-consumer/filter-runtime.mts",
     "tests/packed-consumer/filter-contract.ts",

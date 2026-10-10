@@ -129,7 +129,7 @@ registered finalizer cancels queries and clears their cache before the client an
 close. For a replacement owner, await disposal, acquire a new application Scope and
 ready client, and construct a new QueryClient. The same semantic prefix can produce
 the same keys while resource lifetimes and cache instances remain independent. Follow
-[owner-switching rules](/guides/switch-cache-owners/) when authentication changes.
+[owner-switching rules](/effect-api-query/guides/switch-cache-owners/) when authentication changes.
 
 Replacement acquires a new connection. Transport reconnection, backoff, credentials,
 event replay, and whether failed queries retry belong to the application and Effect's
@@ -154,4 +154,4 @@ stall other calls on the connection. This recipe uses the native default of 16. 
 smaller buffers against the pinned transport version before changing that setting.
 
 Query cancellation stops future work cooperatively. It does not undo completed writes;
-use an [explicit cancellable command](/guides/cancellation/) when the domain requires one.
+use an [explicit cancellable command](/effect-api-query/guides/cancellation/) when the domain requires one.

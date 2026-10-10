@@ -73,6 +73,11 @@ calls that do not need TanStack Query.
 framework-free execution matrix and distinguishes worker-hosted ready clients from a worker RPC
 transport.
 
+The [WebSocket ready-client recipe](/effect-api-query/guides/websocket-clients/) supports concurrent
+unary calls, both stream views, independent interruption, and application-owned connection replacement.
+Cooperative server stream finalizers are observed through the native RPC WebSocket protocol;
+local cancellation alone remains insufficient proof of remote completion.
+
 ## Runtime and cache behavior
 
 - The caller owns RPC or HTTP client acquisition, `Scope`, transport, Query Client, providers, router, SSR,

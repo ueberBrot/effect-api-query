@@ -9,6 +9,7 @@ import {
   runSocketCase,
   serveSocketGroup,
 } from '../../examples/server/tests/fixtures/websocket-server.ts'
+import { readSocketSnapshot } from './docs-websocket-use.ts'
 import { acquireSocketQueries } from './socket-client.ts'
 
 const wait = <A>(deferred: Deferred.Deferred<A>) =>
@@ -61,7 +62,11 @@ export const exerciseSocketConcurrency = async () =>
         }),
         'values.watch': ({ channel }) =>
           Stream.succeed(1).pipe(
-            Stream.concat(Stream.fromEffect(Deferred.await(releaseSecond).pipe(Effect.as(2)))),
+            Stream.concat(
+              channel === 'clock'
+                ? Stream.empty
+                : Stream.fromEffect(Deferred.await(releaseSecond).pipe(Effect.as(2))),
+            ),
             Stream.concat(Stream.fromEffect(Effect.never)),
             Stream.ensuring(
               Deferred.succeed(channel === 'history' ? historyClosed : liveClosed, undefined).pipe(
@@ -114,6 +119,11 @@ export const exerciseSocketConcurrency = async () =>
       const liveResult = yield* Effect.promise(() => live)
       equal(liveResult.status, 'success')
       if (liveResult.status === 'success') equal(liveResult.data, 2)
+      deepStrictEqual(yield* readSocketSnapshot(url), {
+        reads: [10, 20],
+        history: [1],
+        latest: 1,
+      })
       yield* dispose
       equal(queryClient.isFetching(), 0)
       equal(queryClient.getQueryCache().getAll().length, 0)
@@ -172,7 +182,20 @@ export const exerciseSocketInterruption = async () =>
             view === 'streamed'
               ? rpc.values.watch.streamedOptions({ input, rpcOptions: { streamBufferSize: 16 } })
               : rpc.values.watch.liveOptions({ input, rpcOptions: { streamBufferSize: 16 } })
-          const generatedStream = yield* Effect.promise(() => settle(queryClient.query(options)))
+          const generatedStream = yield* Effect.promise(() =>
+            settle(
+              view === 'streamed'
+                ? queryClient.query(
+                    rpc.values.watch.streamedOptions({
+                      input,
+                      rpcOptions: { streamBufferSize: 16 },
+                    }),
+                  )
+                : queryClient.query(
+                    rpc.values.watch.liveOptions({ input, rpcOptions: { streamBufferSize: 16 } }),
+                  ),
+            ),
+          )
           ok(Exit.isFailure(nativeStream))
           equal(generatedStream.status, 'failure')
           if (generatedStream.status === 'failure') {
