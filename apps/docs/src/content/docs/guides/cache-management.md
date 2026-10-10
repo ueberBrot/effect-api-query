@@ -12,6 +12,8 @@ await queryClient.invalidateQueries({ queryKey: rpcQuery.users.get.key() })
 
 For response seeding, targeted rollback, and overlapping mutations, follow
 [Optimistic User Writes](/effect-api-query/guides/optimistic-writes/).
+Map delivered domain events and scoped Effect Reactivity keys with
+[Refresh Reads from Domain Events](/effect-api-query/guides/refresh-from-events/).
 
 For operation prefixes and partial encoded-input matching, use the complete
 [Cache Filters recipe](/effect-api-query/guides/cache-filters/).

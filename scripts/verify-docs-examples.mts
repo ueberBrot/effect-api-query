@@ -8,6 +8,7 @@ for (const [page, fixtures] of [
   ['getting-started/http-quick-start', ['types/docs-http-quick-start']],
   ['guides/retry-queries', ['packed-consumer/docs-retry']],
   ['guides/switch-cache-owners', ['packed-consumer/docs-owner-cache']],
+  ['guides/refresh-from-events', ['packed-consumer/docs-user-events']],
   ['guides/stream-snapshots', ['packed-consumer/docs-stream-snapshot']],
   [
     'guides/cache-filters',
