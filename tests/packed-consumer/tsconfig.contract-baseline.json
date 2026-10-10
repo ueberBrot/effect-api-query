@@ -1,0 +1,4 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["public-contract.ts", "http-contract.ts", "http-stream-contract.ts"]
+}
