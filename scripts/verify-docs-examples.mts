@@ -8,6 +8,10 @@ for (const [page, fixtures] of [
   ['getting-started/http-quick-start', ['types/docs-http-quick-start']],
   ['guides/retry-queries', ['packed-consumer/docs-retry']],
   [
+    'guides/query-defaults',
+    ['packed-consumer/docs-defaults', 'packed-consumer/docs-http-defaults'],
+  ],
+  [
     'guides/hydrate-unary-data',
     [
       'packed-consumer/docs-hydration-dto',
