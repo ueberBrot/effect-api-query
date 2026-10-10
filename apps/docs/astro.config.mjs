@@ -106,6 +106,7 @@ export default defineConfig({
             { label: 'Errors', slug: 'reference/errors' },
             { label: 'Public Exports', slug: 'reference/public-exports' },
             { label: 'Browser and Worker Hosts', slug: 'reference/browser-and-worker-hosts' },
+            { label: 'External HTTP Clients', slug: 'reference/external-http-clients' },
             { label: 'Compatibility and Limits', slug: 'reference/compatibility-and-limits' },
           ],
         },

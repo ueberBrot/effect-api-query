@@ -1,0 +1,4 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["openapi-*.ts", "openapi-*.mts", "docs-openapi.ts"]
+}
