@@ -316,7 +316,7 @@ const settleSharedStream = Effect.fn('settleSharedStream')(function* (
     if (completion === 'complete') {
       yield* Scope.close(requestScope, Exit.void)
     }
-    const finalizers = yield* Deferred.await(serverFinalized).pipe(Effect.timeout('2 seconds'))
+    yield* Deferred.await(serverFinalized).pipe(Effect.timeout('2 seconds'))
     yield* Deferred.succeed(unaryRelease, undefined)
     const wireValue = yield* Deferred.await(unaryOnWire).pipe(Effect.timeout('2 seconds'))
     const unaryResult = yield* Fiber.join(unary).pipe(Effect.timeout('1 second'), Effect.exit)
@@ -325,14 +325,13 @@ const settleSharedStream = Effect.fn('settleSharedStream')(function* (
     return {
       values,
       bufferedAtCancellation,
-      remoteFinalizers: finalizers,
       chunkOnWire,
       unaryOnWire: wireValue,
       cacheEntries: queryClient.getQueryCache().getAll().length,
       unaryExit,
     }
   }).pipe(Effect.scoped)
-  return { ...result, clientClosed, serverClosed }
+  return { ...result, remoteFinalizers, clientClosed, serverClosed }
 })
 
 describe('shared RPC streams over WebSocket', () => {
