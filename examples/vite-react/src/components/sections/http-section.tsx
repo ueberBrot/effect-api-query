@@ -56,7 +56,9 @@ export const HttpSection = ({ application }: { readonly application: ViteReactAp
   const [cacheMessage, setCacheMessage] = useState<string>()
   const createUser = useMutation(userWrites.httpCreate())
   const deleteUser = useMutation(userWrites.httpDelete())
-  const failure = useMutation(httpQuery.diagnostics.fail.mutationOptions())
+  const failure = useMutation(
+    application.trackMutationOptions(httpQuery.diagnostics.fail.mutationOptions()),
+  )
   const slowQuery = useSlowQueryCancellation(application, 'http')
   const slowMessage = describeSlowQueryCancellation(slowQuery.state)
   const submit = (event: SubmitEvent<HTMLFormElement>) => {

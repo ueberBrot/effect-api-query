@@ -41,6 +41,9 @@ Query keys have this flat shape:
 Mutation keys end in `'mutation'` and never include variables. See
 [Semantic Keys](/effect-api-query/concepts/semantic-keys/) for normalization and hashing rules.
 
+For private caches across user, tenant, session, or permission changes, follow
+[Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/).
+
 ## Manage HTTP caches
 
 HTTP utilities also expose branch prefixes and keys for individual queries. Supply the endpoint's

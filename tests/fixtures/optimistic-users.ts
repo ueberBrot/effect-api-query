@@ -18,6 +18,7 @@ import type { RpcClientError } from 'effect/rpc'
 import { createHttpApiQueryUtils, createRpcQueryUtils } from '#effect-api-query'
 
 import type { ViteReactApplication } from '../../examples/vite-react/src/lib/application.ts'
+import { makeOwnerCache, ownerKeyPrefix } from '../../examples/vite-react/src/lib/owner-cache.ts'
 import { makeUserWrites } from '../../examples/vite-react/src/lib/user-writes.ts'
 
 interface CreateRequest {
@@ -54,7 +55,6 @@ export const makeControlledUserWrites = Effect.fnUntraced(function* (
   const deletes = yield* Queue.unbounded<DeleteRequest>()
   const lists = yield* Queue.unbounded<ListRequest>()
   let holdLists = false
-  let active = true
   let users: readonly User[] = []
   const create = Effect.fnUntraced(function* ({ name }: { readonly name: string }) {
     const gate = yield* Deferred.make<User>()
@@ -179,37 +179,50 @@ export const makeControlledUserWrites = Effect.fnUntraced(function* (
     ),
     Scope.provide(scope),
   )
+  const identity = {
+    tenantId: 'example-team',
+    userId: 'example-user',
+    sessionGeneration: 1,
+    permissionGeneration: 1,
+  }
+  const keyPrefix = ownerKeyPrefix(identity)
   const rpcQuery = createRpcQueryUtils<
     typeof exampleRpcGroup,
-    readonly ['vite-react'],
+    ReturnType<typeof ownerKeyPrefix>,
     RpcClientError.RpcClientError
   >(exampleRpcGroup, {
     client: rpcClient,
-    keyPrefix: ['vite-react'],
+    keyPrefix,
   })
   const httpQuery = createHttpApiQueryUtils(exampleHttpApi, {
     client: httpClient,
-    keyPrefix: ['vite-react'],
+    keyPrefix,
   })
-  const isActive = () => active
-  const runMutation = async <T>(execute: () => Promise<T>) => {
-    if (!active) {
-      throw new Error('The application owner has retired')
-    }
-    return execute()
-  }
+  const owner = makeOwnerCache({
+    identity,
+    queryClient,
+    directoryKeys: {
+      rpc: rpcQuery.users.list.queryKey(),
+      http: httpQuery.users.list.queryKey(),
+    },
+  })
+  const { isActive, runMutation, persistDirectory, trackMutationOptions } = owner
   const userWrites = makeUserWrites({ queryClient, rpcQuery, httpQuery, isActive, runMutation })
   const invalidateUsers = async () => {
+    if (!isActive()) {
+      return
+    }
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: rpcQuery.users.key() }),
       queryClient.invalidateQueries({ queryKey: httpQuery.users.key() }),
     ])
   }
   const dispose = async () => {
-    active = false
-    await queryClient.cancelQueries()
-    queryClient.clear()
-    await run(Scope.close(scope, Exit.void))
+    try {
+      await owner.retire()
+    } finally {
+      await run(Scope.close(scope, Exit.void))
+    }
   }
   return {
     application: {
@@ -217,6 +230,9 @@ export const makeControlledUserWrites = Effect.fnUntraced(function* (
       rpcQuery,
       httpQuery,
       userWrites,
+      identity: owner.identity,
+      persistDirectory,
+      trackMutationOptions,
       isActive,
       runMutation,
       invalidateUsers,
@@ -232,7 +248,7 @@ export const makeControlledUserWrites = Effect.fnUntraced(function* (
       users = data
     },
     retire: () => {
-      active = false
+      void owner.retire()
     },
   }
 })

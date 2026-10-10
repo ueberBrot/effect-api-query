@@ -446,6 +446,10 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
           "'./optimistic-application/application.ts'",
         )
         .replaceAll(
+          "'../../examples/vite-react/src/lib/owner-cache.ts'",
+          "'./optimistic-application/owner-cache.ts'",
+        )
+        .replaceAll(
           "'../../examples/vite-react/src/lib/user-writes.ts'",
           "'./optimistic-application/user-writes.ts'",
         ),
@@ -477,6 +481,11 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
         nodePath.join(consumerDirectory, fixture),
       )
     }
+
+    cpSync(
+      nodePath.join(repositoryRoot, 'examples/vite-react/src/lib/owner-cache.ts'),
+      nodePath.join(consumerDirectory, 'owner-cache.ts'),
+    )
 
     const consumerManifest = {
       name: `effect-api-query-packed-consumer-${peer.label}`,
@@ -563,6 +572,7 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
     }
 
     for (const fixture of [
+      'owner-cache-runtime.mts',
       'optimistic-runtime.mts',
       'hashing-runtime.mts',
       'filter-runtime.mts',

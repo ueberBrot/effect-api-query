@@ -71,6 +71,7 @@ export default defineConfig({
             { label: 'Stream Snapshots', slug: 'guides/stream-snapshots' },
             { label: 'Cache Management', slug: 'guides/cache-management' },
             { label: 'Cache Filters', slug: 'guides/cache-filters' },
+            { label: 'Switch Cache Owners', slug: 'guides/switch-cache-owners' },
             { label: 'Optimistic User Writes', slug: 'guides/optimistic-writes' },
             { label: 'Cancellation', slug: 'guides/cancellation' },
             { label: 'Handle Failures', slug: 'guides/handle-failures' },

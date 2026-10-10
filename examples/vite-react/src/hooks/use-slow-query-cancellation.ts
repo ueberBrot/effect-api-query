@@ -49,7 +49,7 @@ const delay = async (milliseconds: number) =>
 
 /** Coordinates typed diagnostic operations as one cancellation demonstration. */
 export const useSlowQueryCancellation = (
-  { queryClient, rpcQuery, httpQuery }: ViteReactApplication,
+  { queryClient, rpcQuery, httpQuery, isActive }: ViteReactApplication,
   transport: 'rpc' | 'http' = 'rpc',
 ) => {
   const [state, setState] = useState<SlowQueryCancellationState>({ _tag: 'Idle' })
@@ -93,6 +93,9 @@ export const useSlowQueryCancellation = (
     predicate: (status: DiagnosticStatus) => boolean,
   ): Promise<DiagnosticStatus> => {
     for (let attempt = 0; attempt < 100; attempt += 1) {
+      if (!isActive()) {
+        throw new Error('Owner is inactive')
+      }
       // Each poll depends on the preceding result and must finish before the next attempt.
       // oxlint-disable-next-line eslint/no-await-in-loop
       const status = await adapter.readStatus()
@@ -115,9 +118,15 @@ export const useSlowQueryCancellation = (
   }
 
   const start = async () => {
+    if (!isActive()) {
+      return
+    }
     setState({ _tag: 'Starting' })
     try {
       const before = await adapter.readStatus()
+      if (!isActive()) {
+        return
+      }
       baseline.current = before
       void runQuery()
       await waitForStatus(({ started }) => started > before.started)
@@ -129,7 +138,7 @@ export const useSlowQueryCancellation = (
 
   const cancel = async () => {
     const before = baseline.current
-    if (before === undefined) {
+    if (before === undefined || !isActive()) {
       return
     }
 
