@@ -43,7 +43,10 @@ const program = Effect.gen(function* () {
       )
       strictEqual(
         samples[index]?.groups?.['source']?.trimEnd(),
-        source.replaceAll("from '#effect-api-query'", "from 'effect-api-query'").trimEnd(),
+        source
+          .replaceAll("from '#effect-api-query'", "from 'effect-api-query'")
+          .replaceAll("from '../fixtures/user-events.ts'", "from './user-events.ts'")
+          .trimEnd(),
         `${page} differs from ${fixture}.ts`,
       )
     }

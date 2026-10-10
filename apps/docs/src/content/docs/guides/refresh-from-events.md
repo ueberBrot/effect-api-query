@@ -22,8 +22,8 @@ your application runtime and keep that Scope open across transport reconnects.
 import { Effect, Stream } from 'effect'
 import type { Reactivity } from 'effect/reactivity'
 
-import { decodeUserEvent, makeUserEventConsumer } from '../fixtures/user-events.ts'
-import type { UserEventOwner } from '../fixtures/user-events.ts'
+import { decodeUserEvent, makeUserEventConsumer } from './user-events.ts'
+import type { UserEventOwner } from './user-events.ts'
 
 const attachUserEvents = Effect.fnUntraced(function* (
   owner: UserEventOwner,

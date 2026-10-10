@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "48fdd7d812fe4e2751de4f32aeba48bc7099c74992ea09e6d4116cb0ebb18e6d",
+      "fingerprint": "2b8fd1a3ae0c84ebe7e69e0dd47d528b6cc6ef7484604b8980654b0d81724678",
       "snapshot": {
         "GLOSSARY.md": "67de06543ad2fd9fd2917419e19d1f071e7b6eee53d48fca05e9dddfc739c683",
         "README.md": "b84fc747700efa4d7e53447f4b670e52fc22018de2777eaae0a663dd296e6528",
@@ -27,12 +27,12 @@
         "apps/docs/src/content/docs/guides/custom-key-encoders.md": "ffa8b915f0831e2081a5bd50c115977e444ee6319c624123e296e3455d754230",
         "apps/docs/src/content/docs/guides/handle-failures.md": "6b4e7bed61daba9c29d988c9795e570efc5a4f2783503d696a419cfcf9737a91",
         "apps/docs/src/content/docs/guides/http-queries-and-mutations.md": "6e4377bfbc2300f7cc195ce095125a5d9051c1f09c7b20cfc09a7251852d1056",
-        "apps/docs/src/content/docs/guides/hydrate-query-views.md": "c81aaa70bba0f60a475ebd3796b01af77e6a1e222ad416446e4c7d52bf7fca7e",
+        "apps/docs/src/content/docs/guides/hydrate-query-views.md": "085a7ba81468cd5cca835d6957e03797d1e66fd410bf8992accf40973ef15a66",
         "apps/docs/src/content/docs/guides/hydrate-unary-data.md": "a4e34e994b6c606ac918726e0c02ad20c9f1a668f483042979b1798400b35e18",
         "apps/docs/src/content/docs/guides/optimistic-writes.md": "b76e2336f6958e7482786312a15bb9c25a1608c659018c5b4d3162301e767bef",
         "apps/docs/src/content/docs/guides/query-defaults.md": "98353365fc09fab7d2424cdc7d2870a52735710a05778aa6c693697bc16c288c",
         "apps/docs/src/content/docs/guides/react-query.md": "29a200b31d19e0339805a0ae3e50be403300e1b8bb7b870949cf779853fbb347",
-        "apps/docs/src/content/docs/guides/refresh-from-events.md": "31397960dc42e41aff19ae3b0b15cfe2246e80750c1772aff6b8ad501107bd6a",
+        "apps/docs/src/content/docs/guides/refresh-from-events.md": "a51ef3777eb9ea07f561d2223c6d8ffa063c87ecda25cb74ce0aea4b037fa2fe",
         "apps/docs/src/content/docs/guides/retry-queries.md": "f725f54696712cc917089e18e905022c6ab097e44f8d22f499ab87fb30af9a99",
         "apps/docs/src/content/docs/guides/stream-snapshots.md": "62e343dc7fa2f4b1b6fb1b699ecb947bcdfc0312c9ffab584b0b8bfaf954f854",
         "apps/docs/src/content/docs/guides/svelte-and-angular.md": "aa8d0e6c20a46e95050314b3ef3b0e6b1d88fce8474a7b719f823d1c26ca502b",
@@ -117,7 +117,7 @@
         "scripts/measure-construction.mts": "10522cb10ab51fd44d8990896a2a73e8bf4d4cd2646441e958b6180cb1afd147",
         "scripts/measure-packed-consumer.mts": null,
         "scripts/run-command.mts": null,
-        "scripts/verify-docs-examples.mts": "83cbca671490730d02b0c7a780f879104d82b8ef474d80122de46c87479cf3a9",
+        "scripts/verify-docs-examples.mts": "9e379c826c5d7adafb1d6b59b526cbd59d3fd76b32f417da0ce2cd1bb40eb01c",
         "scripts/verify-framework-browser.mts": null,
         "scripts/verify-packed-consumer.mts": null,
         "scripts/verify-svelte-angular-consumer.mts": null,
@@ -171,6 +171,7 @@
         "tests/fixtures/websocket-checks.ts": "7b8035264ece4e501e829b3e2b755f9d7b17c010ffa1036db6338a368ff6f93c",
         "tests/http-cached-views.test.ts": "a1dc10f45dcc2d8a53c8b80e4205f6adb48646fba60a427b8531f02a26068725",
         "tests/http-execution.test.ts": "d5869dc2faef8f2edf0f721173f40b352f1b2d70ef19919214a342b3bd82ea18",
+        "tests/http-hydration.test.ts": "1873ccb57214eb9542927fd92204cff9e98d2cc0217fd78fbeeb20bebd5e05b7",
         "tests/http-live-query.test.ts": "79df219cb204669520c584123f167479ea3fa514d899897bf2810a04e8e1ca65",
         "tests/http-multipart.test.ts": "ff816ffae79e827883cea1d1f99f5f763e95c9e856040627a34818df6569feb1",
         "tests/http-query-options.test.ts": "bba47a56841732c7a3f3451ce100e9b864ab2fa6374bc7c8c912658e31c30a3a",
@@ -222,7 +223,7 @@
         "tests/types/docs-hydration-async.ts": "de67135bf3da0dffdac47e9f2e49469edddac3d7d026fbd93d39aea6964c0dd8",
         "tests/types/docs-hydration-dto.ts": "ebcd5c3895e8fa40bff3b62e8e13213e98a3e1c4796d89979b23ecc64cdc13ff",
         "tests/types/docs-hydration-rich.ts": "56b35d7bb4a0f0ebc777161beb2e73a19dfc7de4db26fc74e3abab5d164f1402",
-        "tests/types/docs-hydration-views.ts": "6756cada98db671590898fe05a5b1c42e048e8b77d55b064cb9bea879b5c1e16",
+        "tests/types/docs-hydration-views.ts": "08d75fe114e4a682fc0ad62b847898dba270672e0ce6d19a4f4d66cf92f75365",
         "tests/types/docs-retry.ts": "30d8a5635399635c8b1a21ad77e7b1e2b6d12df4d032eaa95b1b0438da0486f2",
         "tests/types/docs-rpc-quick-start.ts": "95deee30de122cbaa7b9cb28257c234aa1162a0b549a87cf50a80bd84e871081",
         "tests/types/docs-stream-snapshot.ts": "bc924cff90a9f9a8e416bf7fbdfedbd607c88e7a678435aaf20ef878862e06ff",
@@ -237,15 +238,15 @@
         "tests/types/tanstack-start-contract.ts": "51681e3d0d7504a614d490f18adb6f44db82d34b9d4d7cb9cf941aea33de284f",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
-      "outcome": "updated",
-      "reason": "Reference claims now distinguish application-owned reactive and worker integration from the retired maintained certification matrices. The entry and tree source mappings follow retained ordinary tests/recipes and concise ADRs; description, purpose, supported factories, exact Effect peer, cache/lifetime rules and existing task routing are preserved. Public runtime implementation is unchanged.",
+      "head": "55ee50f86d171e05f9c66df2f36bc6ce1f15c1a1",
+      "outcome": "no-change",
+      "reason": "The existing hydration-and-ssr reference already requires reconstruction of decoded HTTP wrappers, preservation of undefined wrapped bodies, all declared successes, rich values and caller-owned encoding/decoding services. Existing cache-workflows guidance retains original-owner scoped events. New ordinary HTTP controls exercise those claims and the event guide now matches its documented app-relative helper layout through compiler parity normalization; skill task routing, source globs, activation and purpose remain accurate.",
       "evidence": [
-        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: skills/effect-api-query/SKILL.md."
+        "Correction source at 55ee50f86d171e05f9c66df2f36bc6ce1f15c1a1 on full base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d. Native vp run --no-cache test tests/http-hydration.test.ts tests/cache-recipes.test.ts passed 4 tests in 2 files plus public/server-local compiler projects on TS 7.0.2 and TS 5.9.3, native pack publint/attw. Native check, strict effect-check, Fallow and docs-check passed. Logs: /tmp/effect-api-query-implementation/notes/131-correction-*. No fresh independent consumer session was run for these existing-guidance/import and regression-test corrections; it remains unverified. No skill description, purpose, public behavior, dependency, host, release or support-claim change. Reviewed item: skills/effect-api-query/SKILL.md."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "526464efc6f053d6f536e3e700b3251e3effd3223db4d8e5a7b229b9f93089fb",
+      "fingerprint": "ac317b6880cb266c398ece266cb61985ec63ec00bbcbd163fe824ed10eafc13d",
       "snapshot": {
         ".agents/skills/ask-matt/PHASE-BOUNDARIES.md": "a8aa20158609ef39e2b308b6ba0660c91066838d07a867202e63a7744a88a3ed",
         ".agents/skills/ask-matt/SKILL.md": "1371f5ce005de0992a44b137748bfb960a56948aa9871b405fe9d90b24332e3c",
@@ -352,12 +353,12 @@
         "apps/docs/src/content/docs/guides/custom-key-encoders.md": "ffa8b915f0831e2081a5bd50c115977e444ee6319c624123e296e3455d754230",
         "apps/docs/src/content/docs/guides/handle-failures.md": "6b4e7bed61daba9c29d988c9795e570efc5a4f2783503d696a419cfcf9737a91",
         "apps/docs/src/content/docs/guides/http-queries-and-mutations.md": "6e4377bfbc2300f7cc195ce095125a5d9051c1f09c7b20cfc09a7251852d1056",
-        "apps/docs/src/content/docs/guides/hydrate-query-views.md": "c81aaa70bba0f60a475ebd3796b01af77e6a1e222ad416446e4c7d52bf7fca7e",
+        "apps/docs/src/content/docs/guides/hydrate-query-views.md": "085a7ba81468cd5cca835d6957e03797d1e66fd410bf8992accf40973ef15a66",
         "apps/docs/src/content/docs/guides/hydrate-unary-data.md": "a4e34e994b6c606ac918726e0c02ad20c9f1a668f483042979b1798400b35e18",
         "apps/docs/src/content/docs/guides/optimistic-writes.md": "b76e2336f6958e7482786312a15bb9c25a1608c659018c5b4d3162301e767bef",
         "apps/docs/src/content/docs/guides/query-defaults.md": "98353365fc09fab7d2424cdc7d2870a52735710a05778aa6c693697bc16c288c",
         "apps/docs/src/content/docs/guides/react-query.md": "29a200b31d19e0339805a0ae3e50be403300e1b8bb7b870949cf779853fbb347",
-        "apps/docs/src/content/docs/guides/refresh-from-events.md": "31397960dc42e41aff19ae3b0b15cfe2246e80750c1772aff6b8ad501107bd6a",
+        "apps/docs/src/content/docs/guides/refresh-from-events.md": "a51ef3777eb9ea07f561d2223c6d8ffa063c87ecda25cb74ce0aea4b037fa2fe",
         "apps/docs/src/content/docs/guides/retry-queries.md": "f725f54696712cc917089e18e905022c6ab097e44f8d22f499ab87fb30af9a99",
         "apps/docs/src/content/docs/guides/stream-snapshots.md": "62e343dc7fa2f4b1b6fb1b699ecb947bcdfc0312c9ffab584b0b8bfaf954f854",
         "apps/docs/src/content/docs/guides/svelte-and-angular.md": "aa8d0e6c20a46e95050314b3ef3b0e6b1d88fce8474a7b719f823d1c26ca502b",
@@ -442,7 +443,7 @@
         "scripts/measure-construction.mts": "10522cb10ab51fd44d8990896a2a73e8bf4d4cd2646441e958b6180cb1afd147",
         "scripts/measure-packed-consumer.mts": null,
         "scripts/run-command.mts": null,
-        "scripts/verify-docs-examples.mts": "83cbca671490730d02b0c7a780f879104d82b8ef474d80122de46c87479cf3a9",
+        "scripts/verify-docs-examples.mts": "9e379c826c5d7adafb1d6b59b526cbd59d3fd76b32f417da0ce2cd1bb40eb01c",
         "scripts/verify-framework-browser.mts": null,
         "scripts/verify-packed-consumer.mts": null,
         "scripts/verify-svelte-angular-consumer.mts": null,
@@ -496,6 +497,7 @@
         "tests/fixtures/websocket-checks.ts": "7b8035264ece4e501e829b3e2b755f9d7b17c010ffa1036db6338a368ff6f93c",
         "tests/http-cached-views.test.ts": "a1dc10f45dcc2d8a53c8b80e4205f6adb48646fba60a427b8531f02a26068725",
         "tests/http-execution.test.ts": "d5869dc2faef8f2edf0f721173f40b352f1b2d70ef19919214a342b3bd82ea18",
+        "tests/http-hydration.test.ts": "1873ccb57214eb9542927fd92204cff9e98d2cc0217fd78fbeeb20bebd5e05b7",
         "tests/http-live-query.test.ts": "79df219cb204669520c584123f167479ea3fa514d899897bf2810a04e8e1ca65",
         "tests/http-multipart.test.ts": "ff816ffae79e827883cea1d1f99f5f763e95c9e856040627a34818df6569feb1",
         "tests/http-query-options.test.ts": "bba47a56841732c7a3f3451ce100e9b864ab2fa6374bc7c8c912658e31c30a3a",
@@ -547,7 +549,7 @@
         "tests/types/docs-hydration-async.ts": "de67135bf3da0dffdac47e9f2e49469edddac3d7d026fbd93d39aea6964c0dd8",
         "tests/types/docs-hydration-dto.ts": "ebcd5c3895e8fa40bff3b62e8e13213e98a3e1c4796d89979b23ecc64cdc13ff",
         "tests/types/docs-hydration-rich.ts": "56b35d7bb4a0f0ebc777161beb2e73a19dfc7de4db26fc74e3abab5d164f1402",
-        "tests/types/docs-hydration-views.ts": "6756cada98db671590898fe05a5b1c42e048e8b77d55b064cb9bea879b5c1e16",
+        "tests/types/docs-hydration-views.ts": "08d75fe114e4a682fc0ad62b847898dba270672e0ce6d19a4f4d66cf92f75365",
         "tests/types/docs-retry.ts": "30d8a5635399635c8b1a21ad77e7b1e2b6d12df4d032eaa95b1b0438da0486f2",
         "tests/types/docs-rpc-quick-start.ts": "95deee30de122cbaa7b9cb28257c234aa1162a0b549a87cf50a80bd84e871081",
         "tests/types/docs-stream-snapshot.ts": "bc924cff90a9f9a8e416bf7fbdfedbd607c88e7a678435aaf20ef878862e06ff",
@@ -562,11 +564,11 @@
         "tests/types/tanstack-start-contract.ts": "51681e3d0d7504a614d490f18adb6f44db82d34b9d4d7cb9cf941aea33de284f",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
-      "outcome": "updated",
-      "reason": "All three shared planning records were reconciled: domain_map points hydration and reactive failure evidence to retained ordinary fixtures/guides; skill_tree matches the existing skill source mappings; skill_spec describes strict compiler/runtime/application/native build validation without the retired installed gate. Existing domains, coverage, ownership decisions and unrelated skills remain intact.",
+      "head": "55ee50f86d171e05f9c66df2f36bc6ce1f15c1a1",
+      "outcome": "no-change",
+      "reason": "Reviewed all three planning records. domain_map already covers all decoded query views, rich paired codecs, caller ownership and snapshot cleanup, with the same retained hydration fixture as evidence. skill_spec already distinguishes compiler fixtures from runtime recipe/ownership checks. skill_tree existing tests/**/*.ts, scripts/*.mts and docs source globs cover the new focused test and corrected imports. No domain, task, boundary, file route, version or source-mapping change is needed.",
       "evidence": [
-        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: _artifacts."
+        "Correction source at 55ee50f86d171e05f9c66df2f36bc6ce1f15c1a1 on full base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d. Native vp run --no-cache test tests/http-hydration.test.ts tests/cache-recipes.test.ts passed 4 tests in 2 files plus public/server-local compiler projects on TS 7.0.2 and TS 5.9.3, native pack publint/attw. Native check, strict effect-check, Fallow and docs-check passed. Logs: /tmp/effect-api-query-implementation/notes/131-correction-*. No fresh independent consumer session was run for these existing-guidance/import and regression-test corrections; it remains unverified. No skill description, purpose, public behavior, dependency, host, release or support-claim change. Reviewed item: _artifacts."
       ]
     },
     "source:vite.config.ts": {

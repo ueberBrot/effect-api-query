@@ -65,7 +65,7 @@ const ProfilePages = Schema.Struct({
   pageParams: Schema.Array(Cursor),
 })
 
-class ArchivedProfile extends Schema.Class<ArchivedProfile>('ArchivedProfile')({
+export class ArchivedProfile extends Schema.Class<ArchivedProfile>('ArchivedProfile')({
   archived: Schema.Literal(true),
   name: Schema.String,
   credits: Schema.BigIntFromString,
