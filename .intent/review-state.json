@@ -568,15 +568,17 @@
       ]
     },
     "source:.fallowrc.jsonc": {
-      "fingerprint": "b446acae3ab99d47f9faf63e50f26342d84dec40d958328e038d670da4efdf91",
+      "fingerprint": "2c6bb6ebb6e814610554e636e2d203764192734a848111efdedaf145cc0b62f6",
       "snapshot": {
-        ".fallowrc.jsonc": "984d1fa5cb742119f829e1cd30df07024882bc7be2145e3ee003b462e78c76af"
+        ".fallowrc.jsonc": "c0b0ec773be6b6247fd4e7a1db0229965323d01b40236e05f1fa7c3cbb0f95a1"
       },
-      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "head": "2e4ecf18e93a4ee086d74102c3addb5e2029be56",
       "outcome": "no-change",
-      "reason": "Retired installed-consumer entries and obsolete framework/OpenAPI allowances were removed. Retained compiler fixtures and actual source tooling are entry points. Intent remains a required native repository CLI after its verifier imports disappear, so its dependency receives the same tooling allowance as other native tasks. Normal entry/production/dependency/duplication/health audits pass; this changes maintenance reachability, not integration guidance.",
+      "reason": "The explicit ignored default-export path now names apps/docs/astro.config.mts. This preserves the existing framework-tooling export exception for the same unchanged configuration; native Fallow entry/production checks pass. No library integration task, shipped guidance, or planning source mapping changes.",
       "evidence": [
-        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: .fallowrc.jsonc. The final tooling list was alphabetized and the native Fallow task passed again after that configuration-only cleanup."
+        "Author base 2e4ecf18e93a4ee086d74102c3addb5e2029be56. Rename apps/docs/astro.config.mjs to astro.config.mts, remove ts-check directive, and update only .fallowrc.jsonc ignoreExports path. Installed loader evidence: apps/docs/node_modules/astro/dist/core/config/config.js configPaths contains astro.config.mts.",
+        "vp run format apps/docs/astro.config.mts .fallowrc.jsonc passed. vp run fallow passed entry/production dead-code checks, duplicates task, and health threshold. vp run docs-build passed Astro check with zero errors/warnings/hints and build of 44 pages with valid internal links; unchanged documentation example parity was a native cache hit. Logs: /tmp/effect-api-query-implementation/notes/astro-mts-*.log.",
+        "Read _artifacts/domain_map.yaml, skill_spec.md, and skill_tree.yaml: existing library task/seam/ownership coverage and source globs remain accurate; no library behavior, guidance, dependency or installation change. Native sync changed nothing; review reports no owned skill/planning drift. No new independent consumer or browser execution is needed for this repository config rename."
       ]
     },
     "source:.github/workflows/ci.yml": {
@@ -997,6 +999,34 @@
       "reason": "The ordinary strict compiler project explicitly includes retained public declaration and documentation fixtures and inherits the existing repository strict settings. Both installed compilers pass after native pack; it adds no installation or peer matrix and requires no separate usage skill.",
       "evidence": [
         "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/types/tsconfig.json."
+      ]
+    },
+    "source:apps/docs/astro.config.mjs": {
+      "fingerprint": "b235762ea71837b6baccbfcaa7064ba8bdf99fc1f45eb6ca6e70b31d209f970e",
+      "snapshot": {
+        "apps/docs/astro.config.mjs": null
+      },
+      "head": "2e4ecf18e93a4ee086d74102c3addb5e2029be56",
+      "outcome": "no-change",
+      "reason": "The authored JavaScript config is removed in favor of astro.config.mts, with the same imports, JSON import attribute, and complete Astro/Starlight configuration. Only the redundant JavaScript ts-check directive disappears. Removing the old path lets installed Astro discover the .mts file; no runtime setting, public API, recipe or support claim changes, so shipped guidance and planning remain accurate.",
+      "evidence": [
+        "Author base 2e4ecf18e93a4ee086d74102c3addb5e2029be56. Rename apps/docs/astro.config.mjs to astro.config.mts, remove ts-check directive, and update only .fallowrc.jsonc ignoreExports path. Installed loader evidence: apps/docs/node_modules/astro/dist/core/config/config.js configPaths contains astro.config.mts.",
+        "vp run format apps/docs/astro.config.mts .fallowrc.jsonc passed. vp run fallow passed entry/production dead-code checks, duplicates task, and health threshold. vp run docs-build passed Astro check with zero errors/warnings/hints and build of 44 pages with valid internal links; unchanged documentation example parity was a native cache hit. Logs: /tmp/effect-api-query-implementation/notes/astro-mts-*.log.",
+        "Read _artifacts/domain_map.yaml, skill_spec.md, and skill_tree.yaml: existing library task/seam/ownership coverage and source globs remain accurate; no library behavior, guidance, dependency or installation change. Native sync changed nothing; review reports no owned skill/planning drift. No new independent consumer or browser execution is needed for this repository config rename."
+      ]
+    },
+    "source:apps/docs/astro.config.mts": {
+      "fingerprint": "a203f42f861dd5c68e83ad5196f881fd30a98b99e9378bdf8137569697216d8b",
+      "snapshot": {
+        "apps/docs/astro.config.mts": "397aafc4621e59a3df38395dab8ae88f7dab3c86d121399c25f3e79dcbd23d85"
+      },
+      "head": "2e4ecf18e93a4ee086d74102c3addb5e2029be56",
+      "outcome": "no-change",
+      "reason": "This is the existing Astro configuration under an explicitly TypeScript ESM extension. Installed Astro 7.3.5 discovers .mts configurations; ordinary Astro diagnostics and the complete static documentation build load it successfully. The source settings, plugins, paths and site content are preserved. It remains repository tooling, outside the shipped integration skill source scope, so no new mapping or guidance task is warranted.",
+      "evidence": [
+        "Author base 2e4ecf18e93a4ee086d74102c3addb5e2029be56. Rename apps/docs/astro.config.mjs to astro.config.mts, remove ts-check directive, and update only .fallowrc.jsonc ignoreExports path. Installed loader evidence: apps/docs/node_modules/astro/dist/core/config/config.js configPaths contains astro.config.mts.",
+        "vp run format apps/docs/astro.config.mts .fallowrc.jsonc passed. vp run fallow passed entry/production dead-code checks, duplicates task, and health threshold. vp run docs-build passed Astro check with zero errors/warnings/hints and build of 44 pages with valid internal links; unchanged documentation example parity was a native cache hit. Logs: /tmp/effect-api-query-implementation/notes/astro-mts-*.log.",
+        "Read _artifacts/domain_map.yaml, skill_spec.md, and skill_tree.yaml: existing library task/seam/ownership coverage and source globs remain accurate; no library behavior, guidance, dependency or installation change. Native sync changed nothing; review reports no owned skill/planning drift. No new independent consumer or browser execution is needed for this repository config rename."
       ]
     }
   }
