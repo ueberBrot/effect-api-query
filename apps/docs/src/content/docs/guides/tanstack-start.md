@@ -115,17 +115,16 @@ When the page should render despite a loader failure, catch the loader rejection
 to reach your route's error handling. See
 [Handle Failures](/effect-api-query/guides/handle-failures/) for inspecting typed failures.
 
-## Capture an RPC stream snapshot
+## Capture a stream snapshot
 
-Completed stream data uses TanStack's normal dehydration contract. An open RPC stream remains
-in `fetchStatus: 'fetching'`. To render its first successful value, start the generated query,
-wait for a successful cache snapshot, then cancel the query before dehydration completes.
-Cancellation closes the iterator and releases its Effect resources. The browser hydrates the
-snapshot and may refetch according to your TanStack policies.
+Use the package's `fetchStreamSnapshot` with generated accumulated or live options when an open
+RPC or HTTP SSE stream must provide data for SSR. It captures a new publication, cancels the exact
+query, and waits for local iterator cleanup before settling. Dehydrate the resulting successful
+cache, then dispose request-owned resources. The browser hydrates its own cache and reconnects
+through its own ready client and runner.
 
-The example's
-[`fetchStreamSnapshot`](https://github.com/ueberBrot/effect-api-query/blob/main/examples/tanstack-start/src/lib/query-ssr.ts)
-shows the cache subscription, cancellation, and cleanup needed for this pattern.
+[Stream Snapshots](/effect-api-query/guides/stream-snapshots/) covers fresh and cached modes,
+timeouts, aborts, stream policies, and exclusive query ownership.
 
 ## Explore the executable example
 

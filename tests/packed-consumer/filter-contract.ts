@@ -1,5 +1,6 @@
 import { QueryClient } from '@tanstack/query-core'
 import type { QueryFilters } from '@tanstack/query-core'
+import type { EffectRpcQueryError } from 'effect-api-query'
 import { HttpApiClient } from 'effect/http-api'
 import { RpcClient, RpcGroup } from 'effect/rpc'
 
@@ -14,9 +15,19 @@ type Assert<Value extends true> = Value
 
 declare const rpcClient: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof usersRpc>>
 declare const httpClient: HttpApiClient.ForApi<typeof usersApi>
+declare const transportClient: RpcClient.RpcClient.Flat<
+  RpcGroup.Rpcs<typeof usersRpc>,
+  { readonly _tag: 'TransportUnavailable' }
+>
 const queryClient = new QueryClient()
 const rpcFilters = userCacheFilters(rpcClient)
 const httpFilters = httpCacheFilters(httpClient)
+const transportFilters = userCacheFilters(transportClient)
+const transportState = queryClient.getQueryState(transportFilters.exact(1).queryKey)
+transportState?.error satisfies
+  | EffectRpcQueryError<{ readonly _tag: 'TransportUnavailable' }>
+  | null
+  | undefined
 
 rpcFilters.root.queryKey satisfies readonly ['users-app', 'rpc']
 rpcFilters.branch.queryKey satisfies readonly ['users-app', 'rpc', 'users']

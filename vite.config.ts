@@ -125,6 +125,10 @@ export default defineConfig({
     },
     overrides: [
       {
+        files: ['src/core/stream-snapshot.ts'],
+        rules: { 'promise/avoid-new': 'off' },
+      },
+      {
         files: ['examples/**/*.{ts,tsx}'],
         ...ultraciteReact,
         rules: {

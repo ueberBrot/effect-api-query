@@ -5,6 +5,8 @@ export { skipToken } from '@tanstack/query-core'
 export { createRpcQueryUtils } from './rpc/create-utils'
 /** Creates the public HTTP utility tree. @api public */
 export { createHttpApiQueryUtils } from './http/create-utils'
+export { fetchStreamSnapshot } from './core/stream-snapshot'
+export type { StreamSnapshotOptions } from './core/stream-snapshot'
 export {
   EffectHttpApiQueryConfigError,
   EffectHttpApiQueryEmptyStreamError,
