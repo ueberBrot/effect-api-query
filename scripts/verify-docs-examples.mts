@@ -7,6 +7,7 @@ for (const [page, fixtures] of [
   ['getting-started/quick-start', ['types/docs-rpc-quick-start']],
   ['getting-started/http-quick-start', ['types/docs-http-quick-start']],
   ['guides/retry-queries', ['packed-consumer/docs-retry']],
+  ['guides/switch-cache-owners', ['packed-consumer/docs-owner-cache']],
   [
     'guides/cache-filters',
     ['packed-consumer/docs-cache-filters-rpc', 'packed-consumer/docs-cache-filters-http'],

@@ -70,6 +70,7 @@ export default defineConfig({
             { label: 'TanStack Start', slug: 'guides/tanstack-start' },
             { label: 'Cache Management', slug: 'guides/cache-management' },
             { label: 'Cache Filters', slug: 'guides/cache-filters' },
+            { label: 'Switch Cache Owners', slug: 'guides/switch-cache-owners' },
             { label: 'Cancellation', slug: 'guides/cancellation' },
             { label: 'Handle Failures', slug: 'guides/handle-failures' },
             { label: 'Retry Queries', slug: 'guides/retry-queries' },

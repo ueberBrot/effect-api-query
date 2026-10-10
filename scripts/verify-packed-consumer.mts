@@ -420,6 +420,11 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       )
     }
 
+    cpSync(
+      nodePath.join(repositoryRoot, 'examples/vite-react/src/lib/owner-cache.ts'),
+      nodePath.join(consumerDirectory, 'owner-cache.ts'),
+    )
+
     const consumerManifest = {
       name: `effect-api-query-packed-consumer-${peer.label}`,
       private: true,
@@ -505,6 +510,7 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
     }
 
     for (const fixture of [
+      'owner-cache-runtime.mts',
       'hashing-runtime.mts',
       'filter-runtime.mts',
       'runtime.mts',

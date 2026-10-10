@@ -34,7 +34,7 @@ export const ViteReactExample = ({
 }: {
   readonly application: ViteReactApplication
 }) => (
-  <QueryClientProvider client={application.queryClient}>
+  <QueryClientProvider key={JSON.stringify(application.identity)} client={application.queryClient}>
     <ExampleContent application={application} />
   </QueryClientProvider>
 )

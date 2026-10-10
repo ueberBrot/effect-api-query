@@ -67,7 +67,9 @@ export const HttpSection = ({ application }: { readonly application: ViteReactAp
       },
     }),
   )
-  const failure = useMutation(httpQuery.diagnostics.fail.mutationOptions())
+  const failure = useMutation(
+    application.trackMutationOptions(httpQuery.diagnostics.fail.mutationOptions()),
+  )
   const slowQuery = useSlowQueryCancellation(application, 'http')
   const slowMessage = describeSlowQueryCancellation(slowQuery.state)
   const submit = (event: SubmitEvent<HTMLFormElement>) => {

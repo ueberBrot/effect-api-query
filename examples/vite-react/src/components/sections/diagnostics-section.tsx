@@ -14,9 +14,11 @@ export const DiagnosticsSection = ({
   readonly application: ViteReactApplication
 }) => {
   const declaredFailure = useMutation(
-    application.rpcQuery.diagnostics.fail.mutationOptions({
-      rpcOptions: { headers: { 'x-request-source': 'diagnostics-panel' } },
-    }),
+    application.trackMutationOptions(
+      application.rpcQuery.diagnostics.fail.mutationOptions({
+        rpcOptions: { headers: { 'x-request-source': 'diagnostics-panel' } },
+      }),
+    ),
   )
   const slowQuery = useSlowQueryCancellation(application)
   const message = describeSlowQueryCancellation(slowQuery.state)

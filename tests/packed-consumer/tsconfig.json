@@ -13,6 +13,10 @@
     "types": ["node"]
   },
   "include": [
+    "owner-cache.ts",
+    "docs-owner-cache.ts",
+    "owner-cache-contract.ts",
+    "owner-cache-runtime.mts",
     "hashing-runtime.mts",
     "filter-runtime.mts",
     "filter-contract.ts",

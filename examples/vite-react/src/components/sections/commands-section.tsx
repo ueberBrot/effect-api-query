@@ -15,13 +15,20 @@ const Command = ({
   // This command keeps its idempotency key for the component lifetime.
   // oxlint-disable-next-line react/hook-use-state
   const [operationId] = useState(() => globalThis.crypto.randomUUID())
-  const { rpcQuery, queryClient } = application
+  const { rpcQuery, queryClient, trackMutationOptions } = application
   const input = { operationId }
   const reconcile = async () => {
+    if (!application.isActive()) {
+      return
+    }
     await queryClient.invalidateQueries({ queryKey: rpcQuery.commands.status.queryKey(input) })
   }
-  const start = useMutation(rpcQuery.commands.start.mutationOptions({ onSettled: reconcile }))
-  const cancel = useMutation(rpcQuery.commands.cancel.mutationOptions({ onSettled: reconcile }))
+  const start = useMutation(
+    trackMutationOptions(rpcQuery.commands.start.mutationOptions({ onSettled: reconcile })),
+  )
+  const cancel = useMutation(
+    trackMutationOptions(rpcQuery.commands.cancel.mutationOptions({ onSettled: reconcile })),
+  )
   const status = useQuery(
     rpcQuery.commands.status.queryOptions({
       input,
