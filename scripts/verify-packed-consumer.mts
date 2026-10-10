@@ -10,6 +10,7 @@ import ts from 'typescript-5.9'
 
 import serverManifest from '../examples/server/package.json' with { type: 'json' }
 import repositoryManifest from '../package.json' with { type: 'json' }
+import { decodeUtf8 } from './decode-utf8.mts'
 import { runCommand } from './run-command.mts'
 
 const program = Effect.gen(function* () {
@@ -23,7 +24,8 @@ const program = Effect.gen(function* () {
   const lockfilePath = nodePath.join(repositoryRoot, 'pnpm-lock.yaml')
   const typeFixtureDirectory = nodePath.join(repositoryRoot, 'tests', 'types')
   const workspaceConfigPath = nodePath.join(repositoryRoot, 'pnpm-workspace.yaml')
-  const workspaceConfig = yield* fs.readFileString(workspaceConfigPath)
+  const workspaceConfigBytes = yield* fs.readFile(workspaceConfigPath)
+  const workspaceConfig = decodeUtf8(workspaceConfigBytes)
   const defaultTarballName = `${repositoryManifest.name.replace(/^@/u, '').replaceAll('/', '-')}-${repositoryManifest.version}.tgz`
   const tarballPath = nodePath.resolve(
     repositoryRoot,
@@ -96,7 +98,7 @@ const program = Effect.gen(function* () {
     }
     return catalogVersion
   }
-  const lockfile = yield* fs.readFileString(lockfilePath)
+  const lockfile = decodeUtf8(yield* fs.readFile(lockfilePath))
   const lockedVersions = (dependency: string): readonly string[] => {
     const escapedDependency = dependency.replaceAll('/', '\\/')
     // pnpm stores the project graph last, after any package-manager/config document.
@@ -133,7 +135,9 @@ const program = Effect.gen(function* () {
     },
   })
   equal('engines' in packedManifest, false)
-  const publicBarrel = yield* fs.readFileString(nodePath.join(repositoryRoot, 'src', 'index.ts'))
+  const publicBarrel = decodeUtf8(
+    yield* fs.readFile(nodePath.join(repositoryRoot, 'src', 'index.ts')),
+  )
   equal(
     /\bexport\s+(?:type\s+)?\*/u.test(publicBarrel),
     false,
@@ -313,7 +317,7 @@ const program = Effect.gen(function* () {
     const packedContent = yield* runCommand('tar', ['-xOzf', tarballPath, `package/${path}`], {})
     equal(
       packedContent,
-      yield* fs.readFileString(nodePath.join(repositoryRoot, path)),
+      decodeUtf8(yield* fs.readFile(nodePath.join(repositoryRoot, path))),
       `The packed ${path} must match the candidate`,
     )
     for (const sample of packedContent.matchAll(/^```ts\n(?<source>[\s\S]*?)^```/gmu)) {
@@ -381,14 +385,16 @@ const program = Effect.gen(function* () {
     yield* fs.copy(consumerFixtureDirectory, consumerDirectory, { overwrite: true })
     yield* fs.writeFileString(
       nodePath.join(consumerDirectory, 'websocket-server.ts'),
-      (yield* fs.readFileString(
-        nodePath.join(repositoryRoot, 'examples/server/tests/fixtures/websocket-server.ts'),
-      )).replaceAll("'../../../../tests/packed-consumer/socket-client.ts'", "'./socket-client.ts'"),
+      decodeUtf8(
+        yield* fs.readFile(
+          nodePath.join(repositoryRoot, 'examples/server/tests/fixtures/websocket-server.ts'),
+        ),
+      ).replaceAll("'../../../../tests/packed-consumer/socket-client.ts'", "'./socket-client.ts'"),
     )
     const socketChecksPath = nodePath.join(consumerDirectory, 'websocket-checks.ts')
     yield* fs.writeFileString(
       socketChecksPath,
-      (yield* fs.readFileString(socketChecksPath)).replaceAll(
+      decodeUtf8(yield* fs.readFile(socketChecksPath)).replaceAll(
         "'../../examples/server/tests/fixtures/websocket-server.ts'",
         "'./websocket-server.ts'",
       ),
@@ -409,7 +415,7 @@ const program = Effect.gen(function* () {
         const path = nodePath.join(applicationDirectory, file)
         yield* fs.writeFileString(
           path,
-          (yield* fs.readFileString(path))
+          decodeUtf8(yield* fs.readFile(path))
             .replaceAll(
               "'@effect-api-query/contracts/client'",
               "'../optimistic-contracts/client.ts'",
@@ -447,7 +453,7 @@ const program = Effect.gen(function* () {
         )
         yield* fs.writeFileString(
           nodePath.join(destination, file),
-          (yield* fs.readFileString(source))
+          decodeUtf8(yield* fs.readFile(source))
             .replaceAll(
               "'@effect-api-query/contracts/client'",
               "'../optimistic-contracts/client.ts'",
@@ -462,9 +468,11 @@ const program = Effect.gen(function* () {
     }
     yield* fs.writeFileString(
       nodePath.join(consumerDirectory, 'optimistic-users.ts'),
-      (yield* fs.readFileString(
-        nodePath.join(repositoryRoot, 'tests', 'fixtures', 'optimistic-users.ts'),
-      ))
+      decodeUtf8(
+        yield* fs.readFile(
+          nodePath.join(repositoryRoot, 'tests', 'fixtures', 'optimistic-users.ts'),
+        ),
+      )
         .replaceAll("'@effect-api-query/contracts/client'", "'./optimistic-contracts/client.ts'")
         .replaceAll("'@effect-api-query/contracts'", "'./optimistic-contracts/index.ts'")
         .replaceAll("'#effect-api-query'", "'effect-api-query'")
@@ -490,7 +498,7 @@ const program = Effect.gen(function* () {
       const path = nodePath.join(consumerDirectory, file)
       yield* fs.writeFileString(
         path,
-        (yield* fs.readFileString(path))
+        decodeUtf8(yield* fs.readFile(path))
           .replaceAll(
             "'../../examples/contracts/src/contracts.ts'",
             "'./optimistic-contracts/contracts.ts'",
@@ -501,7 +509,7 @@ const program = Effect.gen(function* () {
     const startRuntimePath = nodePath.join(consumerDirectory, 'start-ssr-runtime.mts')
     yield* fs.writeFileString(
       startRuntimePath,
-      (yield* fs.readFileString(startRuntimePath))
+      decodeUtf8(yield* fs.readFile(startRuntimePath))
         .replaceAll(
           "'../../examples/contracts/src/contracts.ts'",
           "'./optimistic-contracts/contracts.ts'",
@@ -519,7 +527,7 @@ const program = Effect.gen(function* () {
     const eventRecipe = nodePath.join(consumerDirectory, 'user-events.ts')
     yield* fs.writeFileString(
       eventRecipe,
-      (yield* fs.readFileString(eventRecipe))
+      decodeUtf8(yield* fs.readFile(eventRecipe))
         .replaceAll(
           "'../../examples/vite-react/src/lib/application.ts'",
           "'./optimistic-application/application.ts'",
@@ -600,9 +608,9 @@ const program = Effect.gen(function* () {
     }
     // Prefer cached artifacts, but allow a fresh machine to fetch exact pinned versions.
     // The temporary project must resolve every peer from its own node_modules.
-    yield* fs.writeFileString(
+    yield* fs.writeFile(
       nodePath.join(consumerDirectory, 'pnpm-workspace.yaml'),
-      workspaceConfig,
+      workspaceConfigBytes,
     )
     yield* runCommand('pnpm', ['install', '--ignore-scripts', '--prefer-offline'], {
       cwd: consumerDirectory,
@@ -622,8 +630,10 @@ const program = Effect.gen(function* () {
     const loadedSkill = loadIntentSkill(skillUse, intentOptions)
     equal(loadedSkill.version, packedManifest.version)
     equal(
-      yield* fs.readFileString(nodePath.resolve(consumerDirectory, loadedSkill.path)),
-      yield* fs.readFileString(nodePath.join(repositoryRoot, 'skills/effect-api-query/SKILL.md')),
+      decodeUtf8(yield* fs.readFile(nodePath.resolve(consumerDirectory, loadedSkill.path))),
+      decodeUtf8(
+        yield* fs.readFile(nodePath.join(repositoryRoot, 'skills/effect-api-query/SKILL.md')),
+      ),
       'Intent must load the shipped skill from the installed package',
     )
     // Intent can emit paths relative to the consumer or absolute paths when the
@@ -665,7 +675,7 @@ const program = Effect.gen(function* () {
         { stdio: 'inherit' },
       )
       const baseline: unknown = JSON.parse(
-        yield* fs.readFileString(nodePath.join(consumerDirectory, 'packed-baseline.json')),
+        decodeUtf8(yield* fs.readFile(nodePath.join(consumerDirectory, 'packed-baseline.json'))),
       )
       baselines.push(baseline)
     }

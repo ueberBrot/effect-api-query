@@ -1,6 +1,8 @@
 import { Effect, Stream } from 'effect'
 import { ChildProcess } from 'effect/process'
 
+import { decodeUtf8 } from './decode-utf8.mts'
+
 interface CommandOptions {
   readonly cwd?: string
   readonly maxBuffer?: number
@@ -50,7 +52,7 @@ export const runCommand = Effect.fnUntraced(function* (
           bytes.set(chunk, offset)
           offset += chunk.byteLength
         }
-        return new TextDecoder().decode(bytes)
+        return decodeUtf8(bytes)
       }),
     )
   const [stdout, stderr, code] = yield* Effect.all(

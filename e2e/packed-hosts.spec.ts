@@ -4,6 +4,7 @@ import { Config, ConfigProvider, Crypto, Effect, FileSystem, Option, Path, Schem
 import { Hex } from 'effect/encoding'
 import { build, preview } from 'vite'
 
+import { decodeUtf8 } from '../scripts/decode-utf8.mts'
 import { runCommand } from '../scripts/run-command.mts'
 
 const startPackedHostConsumer = Effect.fnUntraced(function* (queryCoreVersion: string) {
@@ -13,7 +14,7 @@ const startPackedHostConsumer = Effect.fnUntraced(function* (queryCoreVersion: s
   const repositoryRoot = path.resolve(yield* path.fromFileUrl(new URL('..', import.meta.url)))
   const manifest = yield* Schema.decodeEffect(
     Schema.fromJsonString(Schema.Struct({ version: Schema.String })),
-  )(yield* fs.readFileString(path.join(repositoryRoot, 'package.json')))
+  )(decodeUtf8(yield* fs.readFile(path.join(repositoryRoot, 'package.json'))))
   const configuredArchive = yield* Config.String('EFFECT_API_QUERY_TARBALL')
     .pipe(Config.option)
     .parse(ConfigProvider.fromEnv({ preserveEmptyStrings: true }))
@@ -37,7 +38,8 @@ const startPackedHostConsumer = Effect.fnUntraced(function* (queryCoreVersion: s
     ),
   )
   const directory = yield* fs.makeTempDirectoryScoped({ prefix: 'effect-api-query-host-' })
-  const workspace = yield* fs.readFileString(path.join(repositoryRoot, 'pnpm-workspace.yaml'))
+  const workspaceBytes = yield* fs.readFile(path.join(repositoryRoot, 'pnpm-workspace.yaml'))
+  const workspace = decodeUtf8(workspaceBytes)
   const effectVersion = /^ {2}effect: (?<version>\S+)$/mu.exec(workspace)?.groups?.['version']
   if (effectVersion === undefined) {
     throw new Error('The catalog must define Effect')
@@ -45,7 +47,7 @@ const startPackedHostConsumer = Effect.fnUntraced(function* (queryCoreVersion: s
   yield* fs.copy(path.join(repositoryRoot, 'tests/packed-consumer/hosts'), directory, {
     overwrite: true,
   })
-  yield* fs.writeFileString(path.join(directory, 'pnpm-workspace.yaml'), workspace)
+  yield* fs.writeFile(path.join(directory, 'pnpm-workspace.yaml'), workspaceBytes)
   yield* fs.writeFileString(
     path.join(directory, 'package.json'),
     JSON.stringify({
@@ -70,7 +72,11 @@ const startPackedHostConsumer = Effect.fnUntraced(function* (queryCoreVersion: s
   ] as const) {
     const installed = yield* Schema.decodeEffect(
       Schema.fromJsonString(Schema.Struct({ version: Schema.String })),
-    )(yield* fs.readFileString(path.join(directory, 'node_modules', dependency, 'package.json')))
+    )(
+      decodeUtf8(
+        yield* fs.readFile(path.join(directory, 'node_modules', dependency, 'package.json')),
+      ),
+    )
     expect(installed.version).toBe(version)
   }
   yield* Effect.uninterruptible(
@@ -109,8 +115,10 @@ const workspace = await Effect.runPromise(
   Effect.gen(function* () {
     const fs = yield* FileSystem.FileSystem
     const path = yield* Path.Path
-    return yield* fs.readFileString(
-      yield* path.fromFileUrl(new URL('../pnpm-workspace.yaml', import.meta.url)),
+    return decodeUtf8(
+      yield* fs.readFile(
+        yield* path.fromFileUrl(new URL('../pnpm-workspace.yaml', import.meta.url)),
+      ),
     )
   }).pipe(Effect.provide(NodeServices.layer)),
 )

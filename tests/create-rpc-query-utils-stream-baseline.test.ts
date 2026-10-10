@@ -20,6 +20,8 @@ import { afterAll } from 'vitest'
 
 import { createRpcQueryUtils } from '#effect-api-query'
 
+import { decodeUtf8 } from '../scripts/decode-utf8.mts'
+
 const SampleSchema = Schema.Struct({
   version: Schema.Finite,
   reading: Schema.Struct({ unit: Schema.Literal('items'), value: Schema.Finite }),
@@ -227,8 +229,10 @@ const manifestVersion = Effect.fnUntraced(function* (name: string) {
   const manifest = yield* Schema.decodeEffect(
     Schema.fromJsonString(Schema.Struct({ version: Schema.String })),
   )(
-    yield* fs.readFileString(
-      yield* path.fromFileUrl(new URL(`../node_modules/${name}/package.json`, import.meta.url)),
+    decodeUtf8(
+      yield* fs.readFile(
+        yield* path.fromFileUrl(new URL(`../node_modules/${name}/package.json`, import.meta.url)),
+      ),
     ),
   )
   return manifest.version

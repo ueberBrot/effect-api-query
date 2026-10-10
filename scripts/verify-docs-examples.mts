@@ -4,6 +4,8 @@ import { Effect, FileSystem, Path } from 'effect'
 // The docs-check task verifies tutorial text against packed compiler fixtures.
 import { strictEqual } from 'node:assert'
 
+import { decodeUtf8 } from './decode-utf8.mts'
+
 const program = Effect.gen(function* () {
   const fs = yield* FileSystem.FileSystem
   const path = yield* Path.Path
@@ -42,14 +44,20 @@ const program = Effect.gen(function* () {
       ],
     ],
   ] as const) {
-    const markdown = yield* fs.readFileString(
-      yield* path.fromFileUrl(new URL(`../apps/docs/src/content/docs/${page}.md`, import.meta.url)),
+    const markdown = decodeUtf8(
+      yield* fs.readFile(
+        yield* path.fromFileUrl(
+          new URL(`../apps/docs/src/content/docs/${page}.md`, import.meta.url),
+        ),
+      ),
     )
     const samples = [...markdown.matchAll(/^```ts\n(?<source>[\s\S]*?)^```/gmu)]
     strictEqual(samples.length, fixtures.length, `${page} must contain its TypeScript fixtures`)
     for (const [index, fixture] of fixtures.entries()) {
-      const source = yield* fs.readFileString(
-        yield* path.fromFileUrl(new URL(`../tests/${fixture}.ts`, import.meta.url)),
+      const source = decodeUtf8(
+        yield* fs.readFile(
+          yield* path.fromFileUrl(new URL(`../tests/${fixture}.ts`, import.meta.url)),
+        ),
       )
       strictEqual(
         samples[index]?.groups?.['source']?.trimEnd(),
