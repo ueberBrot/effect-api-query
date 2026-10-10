@@ -73,6 +73,11 @@ calls that do not need TanStack Query.
 framework-free execution matrix and distinguishes worker-hosted ready clients from a worker RPC
 transport.
 
+[External HTTP clients](/effect-api-query/reference/external-http-clients/) covers generated
+OpenAPI consumption with `openapi-fetch` 0.17.0 and `openapi-typescript` 7.13.0. Encoded DTOs,
+multipart serialization, and raw SSE access retain their own contracts; the external client does
+not replace a ready Effect client.
+
 ## Runtime and cache behavior
 
 - The caller owns RPC or HTTP client acquisition, `Scope`, transport, Query Client, providers, router, SSR,
