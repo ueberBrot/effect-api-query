@@ -41,12 +41,12 @@ possibly `undefined`, even with an initial value, because its defined-data overl
 `skipToken`. `useInfiniteQuery` preserves its defined-data overload when `initialData` is a defined
 value or factory, including for conditional and skipped inputs.
 
-The sentinel applies to input-bearing `queryOptions` and `infiniteOptions` in both adapters, and
-to RPC `streamedOptions` and `liveOptions`. Inputless operations run without input, and key and
+The sentinel applies to input-bearing `queryOptions`, `infiniteOptions`, `streamedOptions`, and
+`liveOptions` in both adapters, and buffered HTTP `metadataOptions`. Inputless operations run without input, and key and
 mutation builders do not accept `skipToken`. TanStack suspense and prefetch-only hooks also reject
 skipped options at the type level.
 
-`queryOptions`, RPC `streamedOptions`, and RPC `liveOptions` accept concrete input or `skipToken`,
+`queryOptions`, `metadataOptions`, `streamedOptions`, and `liveOptions` accept concrete input or `skipToken`,
 including a conditional union. Keep the conditional input inside one builder call so the observer
 has one consistent callback type. Concrete inputs and the literal `skipToken` retain their precise
 key and query-function types; conditional inputs preserve both possibilities.
@@ -66,7 +66,8 @@ rpcQuery.events.watch.liveOptions({
 ```
 
 `refetchMode` configures accumulation. The builder removes it from the returned options even when
-the query is skipped. Infinite queries accept a page-to-input mapper or `skipToken`, including a
+the query is skipped. Retention, refetch, and HTTP SSE decoder policy validation still occurs for
+skipped streams. Infinite queries accept a page-to-input mapper or `skipToken`, including a
 conditional union, with their required `initialPageParam` and `getNextPageParam`. Choose between
 the mapper and sentinel in `input`; each mapper result must be valid input.
 

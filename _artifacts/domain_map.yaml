@@ -95,6 +95,13 @@ skills:
         source: tests/packed-consumer/vue-solid-contract.ts
         priority: HIGH
         status: active
+      - mistake: Rely on changed metadata options after a fresh hit
+        mechanism: An imperative fresh cache hit retains the existing Query options.
+        wrong_pattern: await queryClient.query(newOptions); queryClient.setQueryData(key, value)
+        correct_pattern: Install the policy through an observer or actual fetch before manual writes.
+        source: apps/docs/src/content/docs/guides/query-defaults.md
+        priority: HIGH
+        status: active
     compositions:
       - library: TanStack Query
       - library: Effect
@@ -115,6 +122,10 @@ tensions:
 cross_references: []
 gaps:
   - skill: effect-api-query
-    question: Final human-document reconciliation and release-version metadata.
-    context: The next approved slices update README/site and prepare the 0.1.0 archive.
+    question: Final human-document reconciliation.
+    context: README/site now describe the current contract and application-owned cache workflows.
+    status: resolved
+  - skill: effect-api-query
+    question: Release-version metadata and exact candidate acceptance.
+    context: The next approved slices prepare and verify the 0.1.0 archive.
     status: open

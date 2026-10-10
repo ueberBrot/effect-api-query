@@ -139,6 +139,10 @@ policy, or standard deep sharing if omitted. Initial, hydrated, manually written
 objects remain application-owned. Decoded data is not deep-frozen. See
 [Buffered metadata](/effect-api-query/reference/http-factory/#buffered-metadata) for that boundary.
 
+An imperative `queryClient.query(newOptions)` hit on fresh cached data retains existing Query
+options. Install a changed sharing policy through an observer or an actual fetch before relying
+on it for subsequent manual writes.
+
 ## Keep defaults in native Query APIs
 
 A per-operation defaults map would replace the repeated `setQueryDefaults(prefix, policy)` calls

@@ -23,6 +23,10 @@ Builders capture plain input when called. Build options inside Vue `computed` or
 accessor so a changed input produces a new key and query function. Passing a builder's result
 once leaves the query attached to the original input.
 
+Keep captured values unchanged while their options can execute. See
+[Data Normalization](/effect-api-query/concepts/data-normalization/#keep-captured-inputs-unchanged)
+for the distinction between immutable keys and caller-owned input.
+
 In Vue component setup, use a computed options object. This example assumes `rpc.users.read`
 returns a user with a `name`:
 

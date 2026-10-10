@@ -176,4 +176,8 @@ constructors and methods are not restored by this recipe; use a paired codec fro
 Default `dispose()` and owner switches erase persistence. The browser's pagehide cleanup explicitly
 uses `dispose({ discardPersistence: false })` to snapshot a settled directory for a reload while
 retiring the old in-memory owner and releasing its clients. Old-owner persistence calls become
-no-ops. Storage failures propagate while query, cache, and client cleanup still run.
+no-ops. Explicit disposal rejects on storage failure after query, cache, and client cleanup runs.
+The pagehide and HMR callbacks await that cleanup and report a rejection through the console.
+
+Accepted tracked commands finish before a replacement owner is acquired. Retiring their client
+owner does not undo server work; use the explicit command cancellation operation when required.

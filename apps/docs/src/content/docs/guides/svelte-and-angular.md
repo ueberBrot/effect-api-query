@@ -7,6 +7,10 @@ Pass generated options through the framework's reactive accessor. Each builder c
 plain input when called, so create the options inside that accessor whenever the input can change.
 The same rule applies to RPC and HTTP queries, metadata views, accumulated streams, and live queries.
 
+Keep captured values unchanged while their options can execute. See
+[Data Normalization](/effect-api-query/concepts/data-normalization/#keep-captured-inputs-unchanged)
+for the distinction between immutable keys and caller-owned input.
+
 ## Svelte
 
 Create the utility tree in your application module from an acquired ready client. Provide a

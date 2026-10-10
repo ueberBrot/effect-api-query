@@ -8,9 +8,21 @@ description: Supported versions, RPC and HTTP operations, cache identity, and ru
 See [Performance and Bundling](/effect-api-query/reference/performance/) for construction costs,
 repeatable compiler measurements, and adapter versus application bundle sizes.
 
-The package targets Effect 4 and TanStack Query Core 5.103.1 or later in v5, with React Query and TanStack Start
-integrations checked in this repository. It is ESM-only and targets ES2022. Use TypeScript with
-`strict: true`.
+The package declares one exact Effect peer and Query Core `>=5.103.1 <6`. It is ESM-only and
+targets ES2022. Use TypeScript with `strict: true`. These are the concrete tested versions:
+
+| Integration                                         | Tested versions                             |
+| --------------------------------------------------- | ------------------------------------------- |
+| Effect runtime, testing, and Node platform packages | 4.0.0                                       |
+| Query Core and React Query                          | 5.103.1 and 5.104.0, with matching versions |
+| Published TypeScript contract                       | 5.9.3 and 7.0.2                             |
+| React                                               | 19.3.0                                      |
+| TanStack Start                                      | 1.168.60                                    |
+| TanStack Router and Router SSR Query                | 1.170.41 and 1.167.3, respectively          |
+
+The stable Effect release contains unstable RPC and HTTP API modules. Keep the application's
+Effect packages coordinated with the exact peer; see
+[Compatibility and Stability](/effect-api-query/getting-started/compatibility-and-stability/).
 
 Svelte 5.57.1 and Angular 22.2.1 browser components can consume generated Core options through
 their native accessors. See [Svelte and Angular](/effect-api-query/guides/svelte-and-angular/) for
@@ -27,12 +39,12 @@ for the pinned Effect release and framework versions. The
 [packed consumer verifier](https://github.com/ueberBrot/effect-api-query/blob/main/scripts/verify-packed-consumer.mts)
 defines the compiler and peer combinations tested against the packaged library.
 
-The repository checks both factories with TypeScript 5.9 and its own compiler against the minimum
+The repository checks both factories with TypeScript 5.9.3 and 7.0.2 against the minimum
 supported Query Core version and the version installed for development. Isolated consumers install
 the tarball with their own peers and
 verify runtime exports, peer identity, and private-subpath rejection. Separate RPC and HTTP
-contracts each exercise roughly 250 operations; compiler diagnostics record their combined cost
-without imposing a timing threshold.
+contracts each exercise 250 operations. Compiler measurements separate the public contract, RPC,
+and HTTP projects into cold and unchanged-incremental runs without imposing a timing threshold.
 
 ## Capability matrix
 
@@ -56,7 +68,7 @@ supplies the client, policy, or lifecycle. **Deferred** means the adapter does n
 | Authentication, middleware, and residual services | Application-owned ready client and runner                                                                | Application-owned ready client and runner                                                   |
 | React hooks and QueryClient                       | Tested public consumers and Vite React example                                                           | Tested public consumers and Vite React example                                              |
 | Svelte and Angular browser components             | Tested native reactive accessors for generated queries and streams                                       | Tested native reactive accessors for buffered, metadata, and SSE views                      |
-| Vue and Solid Query                               | Generated options with reactive browser lifecycle                                                        | Generated options with reactive browser lifecycle                                           |
+| Vue and Solid Query                               | Tested native reactive accessors and browser lifecycle                                                   | Tested native reactive accessors and browser lifecycle                                      |
 | SSR and hydration                                 | Application-owned; tested Start route loading and stream snapshots                                       | Application-owned; tested Start SSR, hydration, failed-query refetch, and request isolation |
 | Host routes                                       | Application-owned; tested standalone server and Start `/rpc`                                             | Application-owned; tested standalone server and Start `/api/$`                              |
 | Cache serialization and mutation invalidation     | Application-owned                                                                                        | Application-owned                                                                           |
@@ -78,6 +90,9 @@ transport.
 
 The [WebSocket ready-client recipe](/effect-api-query/guides/websocket-clients/) supports concurrent
 unary calls, both stream views, independent interruption, and application-owned connection replacement.
+The default-buffer cancellation control covers one acknowledged 16-value chunk with zero
+consumption, immediate request-Scope closure, and concurrent unary success. Larger chunks and
+unfinished queue offers remain unverified; the recipe describes the reproduced Effect 4.0.0 limits.
 Cooperative server stream finalizers are observed through the native RPC WebSocket protocol;
 local cancellation alone remains insufficient proof of remote completion.
 
@@ -107,12 +122,17 @@ decoding. Array query parameters and JSON array responses retain their usual rep
 - Key encoders are synchronous; asynchronous and Effect-returning encoders are unsupported.
 - RPC payload Schemas must be query-stable because key preparation and ready-client execution
   construct the payload separately. HTTP builders accept decoded request input without RPC construction.
+- Query options retain execution input. Keep captured values unchanged while they can run; immutable
+  keys do not clone or freeze arbitrary input or decoded data. See
+  [Data Normalization](/effect-api-query/concepts/data-normalization/#keep-captured-inputs-unchanged).
 
 ## Server rendering and errors
 
 - The package does not serialize errors for SSR. Omit failed queries from dehydration and refetch
   them in the browser, or provide your own error serializer.
-- Completed stream data dehydrates normally. An open stream must be cancelled after its first
-  successful server snapshot before route loading and dehydration can finish.
+- Await [fetchStreamSnapshot](/effect-api-query/guides/stream-snapshots/) to capture an open stream
+  before dehydration. A fresh capture exclusively owns an idle, unobserved exact query and awaits
+  local iterator cleanup. Its timeout limits the wait for data, not finalizer duration or remote
+  cancellation acknowledgement.
 - HTTP binary data and other domain values need an application serialization strategy.
 - Both execution-error guards use `instanceof` and recognize errors from the same JavaScript realm.

@@ -99,6 +99,9 @@ explicitly passed to `metadataOptions`, or standard deep sharing if omitted; the
 global or prefix sharing policies. See
 [Buffered metadata](/effect-api-query/reference/http-factory/#buffered-metadata).
 
+A fresh-cache hit from imperative `queryClient.query(newOptions)` retains existing Query options.
+Install a changed sharing policy through an observer or an actual fetch before later manual writes.
+
 `metadataKey(input)` provides a typed key for cache reads and writes. Metadata options support
 selection, initial data, skipped input, native hashing defaults, and cancellation like ordinary
 queries. Metadata has its own cache identity and no mutation or infinite-query builders.

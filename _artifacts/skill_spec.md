@@ -17,14 +17,15 @@ authoring tools or repository-local agent skills to use this guidance.
 
 ## Failure modes
 
-| Mistake                                               | Priority | Source                                            |
-| ----------------------------------------------------- | -------- | ------------------------------------------------- |
-| Reuse an accumulated key across incompatible policies | High     | src/rpc/streamed-query.ts                         |
-| Dispose resources after native cancellation alone     | High     | src/core/stream-snapshot.ts                       |
-| Roll back an overlapping write with an old snapshot   | Critical | examples/vite-react/src/lib/user-writes.ts        |
-| Redirect late callbacks to a replacement owner        | Critical | examples/vite-react/src/lib/user-writes.ts        |
-| Hydrate rich values without paired view codecs        | High     | tests/packed-consumer/hydration-views-runtime.mts |
-| Construct reactive query options only once            | High     | tests/packed-consumer/vue-solid-contract.ts       |
+| Mistake                                               | Priority | Source                                              |
+| ----------------------------------------------------- | -------- | --------------------------------------------------- |
+| Reuse an accumulated key across incompatible policies | High     | src/rpc/streamed-query.ts                           |
+| Dispose resources after native cancellation alone     | High     | src/core/stream-snapshot.ts                         |
+| Roll back an overlapping write with an old snapshot   | Critical | examples/vite-react/src/lib/user-writes.ts          |
+| Redirect late callbacks to a replacement owner        | Critical | examples/vite-react/src/lib/user-writes.ts          |
+| Hydrate rich values without paired view codecs        | High     | tests/packed-consumer/hydration-views-runtime.mts   |
+| Construct reactive query options only once            | High     | tests/packed-consumer/vue-solid-contract.ts         |
+| Rely on changed metadata options after a fresh hit    | High     | apps/docs/src/content/docs/guides/query-defaults.md |
 
 The domain map records mechanisms and task coverage. The skill tree owns paths and
 source mappings. Public declarations and runtime own API facts; tested application
@@ -44,9 +45,11 @@ modules and guides own recommended cache and lifecycle recipes.
   Repository-wide native review also selects unrelated local authoring skills,
   so it cannot serve as this library skill's CI gate. Preserve those unresolved
   items and the existing pinned installer semantics.
-- Keep the audited coordinated Effect 4.0.0 set. Default buffer-16 cancellation has
-  a passing full-queue/concurrent-unary control; overflowing buffer-one, chunk Schema
-  isolation, and single-element GET/form payload-array limitations remain explicit.
+- Keep the audited coordinated Effect 4.0.0 set. The buffer-16 cancellation control
+  covers one acknowledged 16-value chunk, zero consumption, immediate request-Scope
+  closure, and concurrent unary success. Larger chunks and unfinished offers remain
+  unverified; buffer-one overflow, chunk Schema isolation, and single-element
+  GET/form payload-array limitations remain explicit.
 - Add no clients, providers, codecs, invalidation helpers, transport aggregation,
   batching, framework adapters, or public API. Measured fixtures do not define
   universal timing, memory, renderer, or application-bundle budgets.
@@ -82,11 +85,26 @@ bookkeeping nor syntax validation establishes semantic correctness by itself.
   concurrent unary success. Larger chunks and unfinished offers remain unverified;
   the reproduced overflowing buffer-one and chunk-Schema limits remain explicit.
 
+- At source revision `a55b931a093f380b79b8d3d714cb3ec640a1411c`, human documentation
+  reconciliation aligns capability summaries, captured inputs, metadata policy
+  installation, local cleanup, exact tested versions, and application ownership
+  with the maintained skill. Earlier-build migration language is removed because
+  the package is unreleased. The exact-peer ADR retains its architectural rationale
+  and upgrade validation responsibility while configuration mechanics are removed.
+  Existing recipes and skill examples retain their behavior and source mappings.
+  Documentation snippets, Astro diagnostics, scoped skill validation, and the
+  fresh packed-consumer matrix pass. The worktree's Starlight build cannot resolve
+  virtual style metadata through linked dependencies; canonical build and browser
+  checks remain required before integration.
+  Standards review corrects the Vite example summary to its actual query
+  cancellation, accepted-command drain, cache clearing, and client disposal.
+  Independent iterator cleanup remains an application-owned completion signal.
+
 ## Remaining work
 
-Following approved slices reconcile README/site with final behavior, update skill
-version metadata during manual 0.1.0 preparation, and verify the exact candidate
-archive. Their actual source changes require a new native review. Framework SSR/AOT,
+Following approved slices update skill version metadata during manual 0.1.0
+preparation and verify the exact candidate archive. Their actual source changes
+require a new native review. Framework SSR/AOT,
 cross-host worker transport, durable event delivery, and future dependency releases
 remain outside the verified integration scope.
 
