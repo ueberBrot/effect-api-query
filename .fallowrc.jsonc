@@ -23,6 +23,10 @@
     "tests/packed-consumer/filter-runtime.mts",
     "tests/packed-consumer/filter-contract.ts",
     "tests/packed-consumer/http-metadata-runtime.mts",
+    "tests/packed-consumer/openapi-contract.ts",
+    "tests/packed-consumer/openapi-runtime.mts",
+    "tests/packed-consumer/openapi-generate.mjs",
+    "tests/packed-consumer/docs-openapi.ts",
     "tests/packed-consumer/http-etag-recipe.mts",
     "tests/packed-consumer/http-stream-runtime.mts",
     "tests/packed-consumer/http-live-runtime.mts",
@@ -45,6 +49,7 @@
   ],
 
   "ignorePatterns": ["examples/tanstack-start/src/routeTree.gen.ts"],
+  "ignoreUnresolvedImports": ["./openapi-generated.ts"],
 
   // Framework tooling consumes these exports through convention-generated entries.
   "ignoreExports": [
@@ -106,10 +111,13 @@
     "@arethetypeswrong/cli",
     "@effect/tsgo",
     "@effect/vitest",
+    "@effect/platform-node",
     "@shadcn/lint",
     "@tanstack/angular-query-experimental",
     "@tanstack/svelte-query",
     "effect",
+    "openapi-fetch",
+    "openapi-typescript",
     "publint",
     "svelte",
     "typescript-5.9",

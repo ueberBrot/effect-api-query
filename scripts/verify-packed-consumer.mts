@@ -388,6 +388,7 @@ const runTypeScript = (
   compiler: (typeof compilerCases)[number],
   project:
     | 'tsconfig.json'
+    | 'tsconfig.openapi.json'
     | 'tsconfig.tanstack-start.json'
     | 'tsconfig.type-scale.json'
     | 'tsconfig.svelte-angular.json'
@@ -616,11 +617,14 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
         '@types/react-dom': testedVersion('@types/react-dom'),
         effect: testedVersion('effect'),
         'effect-api-query': `file:${tarballPath}`,
+        'openapi-fetch': '0.17.0',
+        'openapi-typescript': '7.13.0',
         react: testedVersion('react'),
         'react-dom': testedVersion('react-dom'),
         rxjs: '7.8.2',
         svelte: '5.57.1',
         'solid-js': '1.9.15',
+        typescript: testedVersion('typescript-5.9').replace('npm:typescript@', ''),
         vue: '3.5.43',
       },
     }
@@ -636,6 +640,10 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
     // The temporary project must resolve every peer from its own node_modules.
     writeFileSync(nodePath.join(consumerDirectory, 'pnpm-workspace.yaml'), workspaceConfig)
     execFileSync('pnpm', ['install', '--ignore-scripts', '--prefer-offline'], {
+      cwd: consumerDirectory,
+      stdio: 'inherit',
+    })
+    execFileSync(process.execPath, ['openapi-generate.mjs'], {
       cwd: consumerDirectory,
       stdio: 'inherit',
     })
@@ -678,6 +686,7 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
 
     for (const compiler of compilerCases) {
       runTypeScript(consumerDirectory, compiler, 'tsconfig.json', false)
+      runTypeScript(consumerDirectory, compiler, 'tsconfig.openapi.json', false)
       runTypeScript(consumerDirectory, compiler, 'tsconfig.tanstack-start.json', false)
       runTypeScript(consumerDirectory, compiler, 'tsconfig.svelte-angular.json', false)
       runTypeScript(consumerDirectory, compiler, 'tsconfig.vue-solid.json', false)
@@ -700,6 +709,7 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       'filter-runtime.mts',
       'runtime.mts',
       'http-runtime.mts',
+      'openapi-runtime.mts',
       'http-metadata-runtime.mts',
       'http-etag-recipe.mts',
       'http-stream-runtime.mts',

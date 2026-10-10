@@ -78,6 +78,11 @@ unary calls, both stream views, independent interruption, and application-owned 
 Cooperative server stream finalizers are observed through the native RPC WebSocket protocol;
 local cancellation alone remains insufficient proof of remote completion.
 
+[External HTTP clients](/effect-api-query/reference/external-http-clients/) covers generated
+OpenAPI consumption with `openapi-fetch` 0.17.0 and `openapi-typescript` 7.13.0. Encoded DTOs,
+multipart serialization, and raw SSE access retain their own contracts; the external client does
+not replace a ready Effect client.
+
 ## Runtime and cache behavior
 
 - The caller owns RPC or HTTP client acquisition, `Scope`, transport, Query Client, providers, router, SSR,
