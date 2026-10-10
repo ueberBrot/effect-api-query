@@ -16,7 +16,7 @@
   // Framework tooling consumes these exports through convention-generated entries.
   "ignoreExports": [
     {
-      "file": "apps/docs/astro.config.mjs",
+      "file": "apps/docs/astro.config.mts",
       "exports": ["default"]
     },
     {
