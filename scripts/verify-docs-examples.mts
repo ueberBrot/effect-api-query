@@ -12,6 +12,10 @@ for (const [page, fixtures] of [
   ['guides/vue-and-solid', ['packed-consumer/docs-vue-query', 'packed-consumer/docs-solid-query']],
   ['guides/switch-cache-owners', ['packed-consumer/docs-owner-cache']],
   ['guides/refresh-from-events', ['packed-consumer/docs-user-events']],
+  [
+    'guides/websocket-clients',
+    ['packed-consumer/socket-client', 'packed-consumer/docs-websocket-use'],
+  ],
   ['guides/stream-snapshots', ['packed-consumer/docs-stream-snapshot']],
   [
     'guides/cache-filters',

@@ -415,6 +415,21 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
 
   try {
     cpSync(consumerFixtureDirectory, consumerDirectory, { recursive: true })
+    writeFileSync(
+      nodePath.join(consumerDirectory, 'websocket-server.ts'),
+      readFileSync(
+        nodePath.join(repositoryRoot, 'examples/server/tests/fixtures/websocket-server.ts'),
+        'utf-8',
+      ).replaceAll("'../../../../tests/packed-consumer/socket-client.ts'", "'./socket-client.ts'"),
+    )
+    const socketChecksPath = nodePath.join(consumerDirectory, 'websocket-checks.ts')
+    writeFileSync(
+      socketChecksPath,
+      readFileSync(socketChecksPath, 'utf-8').replaceAll(
+        "'../../examples/server/tests/fixtures/websocket-server.ts'",
+        "'./websocket-server.ts'",
+      ),
+    )
     cpSync(
       nodePath.join(repositoryRoot, 'examples', 'contracts', 'src'),
       nodePath.join(consumerDirectory, 'optimistic-contracts'),
@@ -689,6 +704,7 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       'start-ssr-runtime.mts',
       'optimistic-runtime.mts',
       'events-runtime.mts',
+      'websocket-runtime.mts',
       'hashing-runtime.mts',
       'filter-runtime.mts',
       'runtime.mts',
