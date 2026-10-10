@@ -1,5 +1,15 @@
 ## Agent skills
 
+### Shipped library skill
+
+When changing public behavior, usage documentation, or shipped guidance, run
+`vp exec intent meta generate-skill` and follow the installed maintenance procedure.
+Read the shared [planning record](_artifacts/skill_spec.md); maintain its domain map
+and skill tree alongside the affected guidance. Run `vp exec intent maintainer sync`,
+review actual source changes with `vp exec intent maintainer review --json`, and
+record justified outcomes for the owned skill, planning, and source items after
+task checks. Leave unrelated skills unresolved. Finish with `vp run skills-check`.
+
 ### Issue tracker
 
 Before reading or updating GitHub issues, read [the issue tracker workflow](docs/agents/issue-tracker.md).

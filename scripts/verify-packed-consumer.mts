@@ -324,7 +324,10 @@ const packedFiles = execFileSync('tar', ['-tzf', tarballPath], { encoding: 'utf-
   .sort()
 const skillPaths = [
   'skills/effect-api-query/SKILL.md',
+  'skills/effect-api-query/references/cache-workflows.md',
+  'skills/effect-api-query/references/frameworks-and-hosts.md',
   'skills/effect-api-query/references/http.md',
+  'skills/effect-api-query/references/hydration-and-ssr.md',
   'skills/effect-api-query/references/query-patterns.md',
   'skills/effect-api-query/references/rpc.md',
 ]
