@@ -4,8 +4,8 @@ description: Generated OpenAPI consumers, encoded request values, multipart uplo
 ---
 
 An external HTTP client can call an Effect HttpApi server through its declared HTTP contract.
-The supported combination is `openapi-fetch` 0.17.0 with `openapi-typescript` 7.13.0 and Effect 4.0.0.
-Generate `paths` from the JSON document returned by native `OpenApi.fromApi(api)`.
+For example, use `openapi-typescript` to generate `paths` from the JSON document returned by
+native `OpenApi.fromApi(api)` and call the server with `openapi-fetch`.
 
 `createHttpApiQueryUtils` accepts a ready Effect HttpApiClient. Keep that client and its runner
 native; the external Promise client calls HTTP independently. This interoperability does not

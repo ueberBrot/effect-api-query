@@ -5,7 +5,7 @@ import {
   exerciseSocketConcurrency,
   exerciseSocketInterruption,
   exerciseSocketReplacement,
-} from '../../../tests/packed-consumer/websocket-checks.ts'
+} from '../../../tests/fixtures/websocket-checks.ts'
 
 it.live(
   'runs concurrent reads and both open stream views through a ready WebSocket client',

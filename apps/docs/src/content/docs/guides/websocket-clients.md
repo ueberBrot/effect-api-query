@@ -17,9 +17,10 @@ the socket, protocol, ready client, and QueryClient cleanup.
 ```ts
 import { QueryClient } from '@tanstack/query-core'
 import { Effect, Exit, Layer, Schema, Scope } from 'effect'
-import { createRpcQueryUtils } from 'effect-api-query'
 import { Rpc, RpcClient, RpcGroup, RpcSerialization } from 'effect/rpc'
 import { Socket } from 'effect/socket'
+
+import { createRpcQueryUtils } from 'effect-api-query'
 
 export const socketGroup = RpcGroup.make(
   Rpc.make('values.read', { payload: { id: Schema.Int }, success: Schema.Int }),
@@ -75,8 +76,9 @@ snapshot without waiting for completion.
 
 ```ts
 import { Effect } from 'effect'
-import { fetchStreamSnapshot } from 'effect-api-query'
 import { Socket } from 'effect/socket'
+
+import { fetchStreamSnapshot } from 'effect-api-query'
 
 import { acquireSocketQueries } from './socket-client.ts'
 
@@ -86,22 +88,29 @@ export const readSocketSnapshot = Effect.fn('readSocketSnapshot')(function* (url
   )
   const { queryClient, rpc } = application
   try {
-    const reads = yield* Effect.promise(() =>
-      Promise.all([
-        queryClient.query(rpc.values.read.queryOptions({ input: { id: 1 } })),
-        queryClient.query(rpc.values.read.queryOptions({ input: { id: 2 } })),
-      ]),
+    const reads = yield* Effect.promise(
+      async () =>
+        await Promise.all([
+          queryClient.query(rpc.values.read.queryOptions({ input: { id: 1 } })),
+          queryClient.query(rpc.values.read.queryOptions({ input: { id: 2 } })),
+        ]),
     )
     const input = { channel: 'clock' }
-    const history = yield* Effect.promise(() =>
-      fetchStreamSnapshot(queryClient, rpc.values.watch.streamedOptions({ input, maxChunks: 20 }), {
-        timeoutMs: 5_000,
-      }),
+    const history = yield* Effect.promise(
+      async () =>
+        await fetchStreamSnapshot(
+          queryClient,
+          rpc.values.watch.streamedOptions({ input, maxChunks: 20 }),
+          {
+            timeoutMs: 5000,
+          },
+        ),
     )
-    const latest = yield* Effect.promise(() =>
-      fetchStreamSnapshot(queryClient, rpc.values.watch.liveOptions({ input }), {
-        timeoutMs: 5_000,
-      }),
+    const latest = yield* Effect.promise(
+      async () =>
+        await fetchStreamSnapshot(queryClient, rpc.values.watch.liveOptions({ input }), {
+          timeoutMs: 5000,
+        }),
     )
     return { reads, history, latest }
   } finally {

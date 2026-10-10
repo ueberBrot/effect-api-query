@@ -60,6 +60,3 @@ await queryClient.invalidateQueries({ queryKey: http.users.key() })
 HTTP keys include `'http'` and the HttpApi identifier after your `keyPrefix`. RPC keys include
 `'rpc'`, so the two factories keep separate caches even with the same caller prefix. Use the original
 caller prefix when you deliberately want to invalidate both.
-
-The [packed RPC consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/packed-consumer/runtime.mts) and
-[packed HTTP consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/packed-consumer/http-runtime.mts) exercise generated keys through QueryClient.

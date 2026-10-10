@@ -19,7 +19,6 @@ metadata:
 sources:
   - 'src/**/*.ts'
   - 'tests/**/*.ts'
-  - '**/tests/packed-consumer/**'
   - '**/examples/vite-react/src/lib/*.ts'
   - '**/examples/vite-react/src/main.tsx'
   - '**/examples/vite-react/src/app.tsx'
@@ -28,15 +27,17 @@ sources:
   - '**/examples/tanstack-start/src/router.tsx'
   - '**/examples/tanstack-start/tests/*.ts*'
   - '**/examples/server/src/*.ts'
-  - '**/examples/server/tests/rpc-transport-overhead.test.ts'
+  - '**/examples/server/tests/**/*.ts'
   - 'GLOSSARY.md'
   - 'README.md'
   - 'package.json'
   - 'pnpm-workspace.yaml'
   - 'scripts/*.mts'
   - 'docs/adr/000*.md'
+  - 'docs/adr/0010-*.md'
   - 'docs/adr/0012-*.md'
   - 'docs/adr/0014-*.md'
+  - 'docs/adr/0015-*.md'
   - 'docs/adr/002*.md'
   - '**/apps/docs/src/content/docs/**/*.md'
   - '**/apps/docs/src/content/docs/**/*.mdx'
@@ -52,9 +53,9 @@ the application owns transport, authentication, resources, and cache policy.
 
 Inspect the installed package manifest for its version and peers. The reviewed
 coordinated Effect set is exactly 4.0.0; Query Core peers are `>=5.103.1 <6`.
-Use the installed declarations and preserve literal contracts. Wider peer ranges
-do not certify every release; [frameworks and hosts](references/frameworks-and-hosts.md)
-records the tested combinations and current upstream limits.
+Use the installed declarations and preserve literal contracts.
+[Frameworks and hosts](references/frameworks-and-hosts.md) explains reactive
+options, version constraints, and transport ownership.
 
 Read the reference for the contract you are integrating:
 

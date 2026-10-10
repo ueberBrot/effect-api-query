@@ -19,7 +19,7 @@ import { createRpcQueryUtils, fetchStreamSnapshot } from 'effect-api-query'
 import { Rpc, RpcGroup } from 'effect/rpc'
 import type { RpcClient } from 'effect/rpc'
 
-export const updates = RpcGroup.make(
+const updates = RpcGroup.make(
   Rpc.make('updates.watch', {
     payload: { channel: Schema.String },
     success: Schema.String,
@@ -27,7 +27,7 @@ export const updates = RpcGroup.make(
   }),
 )
 
-export async function captureUpdates<E>(
+async function captureUpdates<E>(
   queryClient: QueryClient,
   client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof updates>, E>,
   signal: AbortSignal,

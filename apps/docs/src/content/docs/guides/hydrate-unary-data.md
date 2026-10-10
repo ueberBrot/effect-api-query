@@ -27,36 +27,34 @@ import { createHttpApiQueryUtils, createRpcQueryUtils } from 'effect-api-query'
 import { HttpApi, HttpApiClient, HttpApiEndpoint, HttpApiGroup } from 'effect/http-api'
 import { Rpc, RpcClient, RpcGroup } from 'effect/rpc'
 
-export const ProfileDto = Schema.Struct({
+const ProfileDto = Schema.Struct({
   name: Schema.String,
   credits: Schema.String,
   avatar: Schema.String.check(Schema.isBase64()),
 })
 
-export const dtoGroup = RpcGroup.make(Rpc.make('profile.read', { success: ProfileDto }))
-export const dtoApi = HttpApi.make('dto').add(
+const dtoGroup = RpcGroup.make(Rpc.make('profile.read', { success: ProfileDto }))
+const dtoApi = HttpApi.make('dto').add(
   HttpApiGroup.make('profile').add(
     HttpApiEndpoint.get('read', '/profile', { success: ProfileDto }),
   ),
 )
 
-export function dtoRpcOptions<E>(
-  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof dtoGroup>, E>,
-) {
+function dtoRpcOptions<E>(client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof dtoGroup>, E>) {
   return createRpcQueryUtils<typeof dtoGroup, readonly ['dto', 'rpc'], E>(dtoGroup, {
     client,
     keyPrefix: ['dto', 'rpc'],
   }).profile.read.queryOptions({ retry: false, staleTime: 60_000 })
 }
 
-export function dtoHttpOptions(client: HttpApiClient.ForApi<typeof dtoApi>) {
+function dtoHttpOptions(client: HttpApiClient.ForApi<typeof dtoApi>) {
   return createHttpApiQueryUtils(dtoApi, {
     client,
     keyPrefix: ['dto', 'http'],
   }).profile.read.queryOptions({ retry: false, staleTime: 60_000 })
 }
 
-export const snapshotDto = (queryClient: QueryClient): string =>
+const snapshotDto = (queryClient: QueryClient): string =>
   JSON.stringify(
     dehydrate(queryClient, {
       shouldDehydrateMutation: () => false,
@@ -65,7 +63,7 @@ export const snapshotDto = (queryClient: QueryClient): string =>
     }),
   )
 
-export const hydrateDto = (queryClient: QueryClient, json: string): void =>
+const hydrateDto = (queryClient: QueryClient, json: string): void =>
   hydrate(queryClient, JSON.parse(json))
 ```
 
@@ -105,16 +103,16 @@ export class Profile extends Schema.Class<Profile>('Profile')({
   }
 }
 
-export const profileGroup = RpcGroup.make(
+const profileGroup = RpcGroup.make(
   Rpc.make('profile.read', { success: Profile, error: Schema.String }),
 )
-export const profileApi = HttpApi.make('rich').add(
+const profileApi = HttpApi.make('rich').add(
   HttpApiGroup.make('profile').add(
     HttpApiEndpoint.get('read', '/profile', { success: Profile, error: Schema.String }),
   ),
 )
 
-export function profileRpcOptions<E>(
+function profileRpcOptions<E>(
   client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof profileGroup>, E>,
 ) {
   return createRpcQueryUtils<typeof profileGroup, readonly ['profile', 'rpc'], E>(profileGroup, {
@@ -123,14 +121,14 @@ export function profileRpcOptions<E>(
   }).profile.read.queryOptions({ retry: false, staleTime: 60_000 })
 }
 
-export function profileHttpOptions(client: HttpApiClient.ForApi<typeof profileApi>) {
+function profileHttpOptions(client: HttpApiClient.ForApi<typeof profileApi>) {
   return createHttpApiQueryUtils(profileApi, {
     client,
     keyPrefix: ['profile', 'http'],
   }).profile.read.queryOptions({ retry: false, staleTime: 60_000 })
 }
 
-export const snapshotProfile = (queryClient: QueryClient): string =>
+const snapshotProfile = (queryClient: QueryClient): string =>
   JSON.stringify(
     dehydrate(queryClient, {
       shouldDehydrateMutation: () => false,
@@ -140,7 +138,7 @@ export const snapshotProfile = (queryClient: QueryClient): string =>
     }),
   )
 
-export const hydrateProfile = (queryClient: QueryClient, json: string): void =>
+const hydrateProfile = (queryClient: QueryClient, json: string): void =>
   hydrate(queryClient, JSON.parse(json), {
     defaultOptions: { deserializeData: Schema.decodeUnknownSync(Profile) },
   })
@@ -176,7 +174,7 @@ import { Context, Effect, Schema } from 'effect'
 
 import { Profile } from './docs-hydration-rich.ts'
 
-export class HydrationPreparation extends Context.Service<
+class HydrationPreparation extends Context.Service<
   HydrationPreparation,
   {
     readonly beforeEncode: Effect.Effect<void>
@@ -197,7 +195,7 @@ const PreparedProfile = Profile.pipe(
   ),
 )
 
-export const prepareProfileSnapshot = Effect.fnUntraced(function* (queryClient: QueryClient) {
+const prepareProfileSnapshot = Effect.fnUntraced(function* (queryClient: QueryClient) {
   const snapshot = dehydrate(queryClient, {
     shouldDehydrateMutation: () => false,
     shouldDehydrateQuery: (query) =>
@@ -211,7 +209,7 @@ export const prepareProfileSnapshot = Effect.fnUntraced(function* (queryClient: 
   return JSON.stringify({ ...snapshot, queries })
 })
 
-export const prepareProfileHydration = Effect.fnUntraced(function* (
+const prepareProfileHydration = Effect.fnUntraced(function* (
   queryClient: QueryClient,
   json: string,
 ) {

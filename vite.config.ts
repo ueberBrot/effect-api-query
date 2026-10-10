@@ -24,9 +24,6 @@ const ignoredPaths = [
   'test-results/**',
 ]
 
-// Packed fixtures resolve only the installed tarball from isolated temporary projects.
-const packedFixtures = ['tests/packed-consumer/**', 'tests/types/**']
-
 const testFiles = ['tests/**/*.test.ts', 'examples/**/*.test.{ts,tsx}']
 const effectTestBlocks = ['it.effect', 'it.live', 'it.scoped', 'it.scopedLive']
 
@@ -99,7 +96,7 @@ export default defineConfig({
     ignorePatterns: [
       ...(ultraciteCore.ignorePatterns ?? []),
       ...ignoredPaths,
-      ...packedFixtures,
+      'tests/types/**',
       'apps/docs/**',
     ],
     options: {
@@ -167,8 +164,7 @@ export default defineConfig({
           'src/{http,rpc}/**/*.ts',
           'tests/**/*.ts',
           'examples/**/*.{ts,tsx}',
-          'scripts/run-command.mts',
-          'scripts/measure-packed-consumer.mts',
+          'scripts/measure-construction.mts',
         ],
         rules: {
           // Effect 4 transports are experimental and pinned; match the compiler policy.
@@ -211,7 +207,7 @@ export default defineConfig({
         rules: {
           // These runtime adapters erase caller-defined schemas/options, then validate
           // inputs with their declaration. A domain-specific replacement loses the
-          // generic public contract, which the packed compile-time fixtures verify.
+          // generic public contract.
           'anti-slop/no-unknown-parameters': 'off',
           'anti-slop/no-unknown-returns': 'off',
           'anti-slop/no-unsafe-dictionary-type': 'off',
@@ -299,21 +295,6 @@ export default defineConfig({
           output: ['dist/**'],
         },
       },
-      'packed-package': {
-        command: [
-          'vp pm pack --pack-destination .artifacts -- --config.ignore-scripts=true',
-          'fallow dead-code --private-type-leaks --file dist/index.d.mts',
-          'vp run verify-packed-package',
-        ],
-        dependsOn: ['pack', 'skills-check'],
-        cache: {
-          output: ['.artifacts/*.tgz'],
-        },
-      },
-      'verify-packed-package': {
-        command: 'node scripts/verify-packed-consumer.mts',
-        cache: false,
-      },
       'skills-check': {
         command: 'intent validate skills --check',
         cache: false,
@@ -331,11 +312,23 @@ export default defineConfig({
       },
       test: {
         command: 'vp test',
-        dependsOn: ['pack', 'server-local-types'],
+        dependsOn: ['pack', 'api-types', 'server-local-types'],
         cache: {
           env: ['RPC_TRANSPORT_MEASURE', 'STREAM_MEASURE'],
           output: [],
         },
+      },
+      'construction-baseline': {
+        command: 'tsx scripts/measure-construction.mts',
+        cache: false,
+      },
+      'api-types': {
+        command: [
+          'tsc --project tests/types/tsconfig.json',
+          'node node_modules/typescript-5.9/bin/tsc --project tests/types/tsconfig.json',
+        ],
+        dependsOn: ['pack'],
+        cache: { output: [] },
       },
       'server-local-types': {
         command: [
@@ -439,7 +432,7 @@ export default defineConfig({
       validate: {
         command: [
           'vp run quality',
-          'vp run packed-package',
+          'vp run skills-check',
           'vp run vite-react-build',
           'vp run tanstack-start-build',
           'vp run docs-build',

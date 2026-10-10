@@ -19,7 +19,6 @@ skills:
     sources:
       - src/**/*.ts
       - tests/**/*.ts
-      - '**/tests/packed-consumer/**'
       - '**/examples/vite-react/src/lib/*.ts'
       - '**/examples/vite-react/src/main.tsx'
       - '**/examples/vite-react/src/app.tsx'
@@ -28,15 +27,17 @@ skills:
       - '**/examples/tanstack-start/src/router.tsx'
       - '**/examples/tanstack-start/tests/*.ts*'
       - '**/examples/server/src/*.ts'
-      - '**/examples/server/tests/rpc-transport-overhead.test.ts'
+      - '**/examples/server/tests/**/*.ts'
       - GLOSSARY.md
       - README.md
       - package.json
       - pnpm-workspace.yaml
       - scripts/*.mts
       - docs/adr/000*.md
+      - docs/adr/0010-*.md
       - docs/adr/0012-*.md
       - docs/adr/0014-*.md
+      - docs/adr/0015-*.md
       - docs/adr/002*.md
       - '**/apps/docs/src/content/docs/**/*.md'
       - '**/apps/docs/src/content/docs/**/*.mdx'

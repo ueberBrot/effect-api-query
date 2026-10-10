@@ -41,7 +41,7 @@ provide the input for each execution. Mutation options can be static when their 
 other settings do not depend on reactive state.
 
 Compile the Svelte application with `module: "ESNext"` and `moduleResolution: "Bundler"`.
-The supported Svelte Query releases require this resolution for their emitted `.svelte`
+Svelte Query 6 requires this resolution for its emitted `.svelte`
 declarations; strict NodeNext declaration checking reports an upstream `Box` import error.
 
 ## Angular
@@ -106,17 +106,6 @@ then dispose its client resources. Mount the new tree with independently owned r
 safe key prefix. See [Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/) and
 [Client Lifecycle](/effect-api-query/concepts/client-lifecycle/).
 
-## Version boundaries
-
-| Framework | Framework release | Query integration                  | Matching Query Core |
-| --------- | ----------------- | ---------------------------------- | ------------------- |
-| Svelte    | 5.57.1            | Svelte Query 6.2.1                 | 5.103.1             |
-| Svelte    | 5.57.1            | Svelte Query 6.3.0                 | 5.104.0             |
-| Angular   | 22.2.1            | Angular Query experimental 5.103.1 | 5.103.1             |
-| Angular   | 22.2.1            | Angular Query experimental 5.104.0 | 5.104.0             |
-
-Angular core, common, compiler, and platform-browser use the same release, with RxJS 7.8.2.
-The published option contract supports TypeScript 5.9.3 and 7.0.2 with strict checking; choose a
-compiler release supported by your framework's build tooling. Framework query wrappers
-must share the application's Query Core version. This scope covers browser components; framework
-server rendering and hydration need their own application integration.
+Match each framework Query wrapper to the application's Query Core and use a compiler supported
+by its build tooling. Angular core, common, compiler, and platform-browser should share one
+release. Framework server rendering and hydration remain application integrations.

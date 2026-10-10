@@ -39,9 +39,7 @@ Native Intent maintenance detects source changes and records justified outcomes
 for the owned skill and planning records. Leave unrelated skills unresolved and
 run the uncached scoped `skills-check` task.
 
-The packed-consumer verifier checks installed version and peers, package-only
-discovery, reference resolution, archive inventory, and skill examples with both
-supported compilers and Query peers. Runtime fixtures cover cached views,
-cancellation and preparation, hydration, cache ownership, and reactive framework
-hosts. Independent consumer execution checks that the guidance supports actual
-tasks.
+Strict compiler fixtures check the public declarations and retained documentation
+examples. Ordinary runtime tests and application examples cover cache views,
+cancellation, hydration, and ownership. Native builds validate package
+declarations and exports.

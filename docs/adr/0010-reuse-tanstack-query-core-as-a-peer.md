@@ -9,10 +9,9 @@ Generated objects and declarations expose TanStack Query Core runtime values and
 ## Decision
 
 `@tanstack/query-core` is an external peer. Its supported v5 range must preserve `null` stream
-data, and both the declared lower bound and development version are tested. Because the package imports Query Core's
-experimental streamed-query interface, each development update must pass packed-consumer type and
-runtime checks. The package re-exports only primitives required by its own interface, including the
-exact `skipToken` and `SkipToken` bindings.
+data. The package uses Query Core's experimental streamed-query interface, so dependency updates
+require public-type and runtime validation. The package re-exports only primitives required by its
+own interface, including the exact `skipToken` and `SkipToken` bindings.
 
 ## Consequences
 

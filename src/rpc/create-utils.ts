@@ -39,8 +39,7 @@ export const createRpcQueryUtils = <
     runPromiseExit,
     errors: rpcTreeErrors,
   })
-  // SAFETY: extractRpcs projects every Group member, preserving each tag/payload;
-  // compile-time packed fixtures verify the generated builder overloads and channels.
+  // SAFETY: extractRpcs projects every Group member, preserving each tag/payload.
   // oxlint-disable-next-line typescript/no-unsafe-type-assertion
   return tree as RpcQueryUtils<Group, Prefix, ClientError>
 }

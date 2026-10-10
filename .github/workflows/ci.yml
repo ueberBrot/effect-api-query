@@ -47,6 +47,12 @@ jobs:
       - name: Run TypeScript checking
         run: vp run typecheck
 
+      - name: Check public API compiler fixtures
+        run: vp run api-types
+
+      - name: Check shipped skills
+        run: vp run skills-check
+
       - name: Run Effect diagnostics
         run: vp run effect-check
 
@@ -55,35 +61,6 @@ jobs:
 
       - name: Run Fallow audits
         run: vp run fallow
-
-  package-contract:
-    name: Package contract
-    needs: source-quality
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-
-    steps:
-      - *checkout
-      - *setup_repository
-
-      - name: Construct and inspect package
-        run: vp run pack
-
-      - name: Install Chromium for framework consumers
-        run: vp exec playwright install --with-deps chromium
-
-      - name: Verify packed consumers and type scale
-        run: vp run packed-package
-
-      - name: Preserve verified package artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: package-${{ github.sha }}
-          path: .artifacts/*.tgz
-          if-no-files-found: error
-          include-hidden-files: true
-          compression-level: 0
-          retention-days: 7
 
   example-builds:
     name: Example builds
@@ -120,7 +97,6 @@ jobs:
   browser:
     name: Playwright (${{ matrix.browser }})
     needs:
-      - package-contract
       - example-builds
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -139,12 +115,6 @@ jobs:
 
       - name: Install ${{ matrix.browser }}
         run: vp exec playwright install --with-deps ${{ matrix.browser }}
-
-      - name: Download verified package for host acceptance
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        with:
-          name: package-${{ github.sha }}
-          path: .artifacts
 
       - name: Check documentation in ${{ matrix.browser }}
         run: vp run docs-e2e --project=${{ matrix.browser }}
