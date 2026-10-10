@@ -86,6 +86,9 @@ OpenAPI consumption with `openapi-fetch` 0.17.0 and `openapi-typescript` 7.13.0.
 multipart serialization, and raw SSE access retain their own contracts; the external client does
 not replace a ready Effect client.
 
+With Effect 4.0.0, single-element arrays in GET and form-urlencoded payloads can fail server
+decoding. Array query parameters and JSON array responses retain their usual representation.
+
 ## Runtime and cache behavior
 
 - The caller owns RPC or HTTP client acquisition, `Scope`, transport, Query Client, providers, router, SSR,

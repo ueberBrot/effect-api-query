@@ -153,5 +153,9 @@ With Effect 4.0.0, cancelling a paused stream with a full transport buffer of si
 stall other calls on the connection. This recipe uses the native default of 16. Verify
 smaller buffers against the pinned transport version before changing that setting.
 
+Keep streaming success schemas compatible on both ends. With Effect 4.0.0, a chunk that fails
+client Schema decoding can also fail unrelated calls sharing the connection. A larger buffer
+does not isolate decoding failures.
+
 Query cancellation stops future work cooperatively. It does not undo completed writes;
 use an [explicit cancellable command](/effect-api-query/guides/cancellation/) when the domain requires one.

@@ -1,6 +1,6 @@
 import { NodeHttpServer, NodeSocket } from '@effect/platform-node'
 import { describe, expect, it } from '@effect/vitest'
-import { Effect, Exit, Layer, Scope } from 'effect'
+import { Deferred, Effect, Exit, Fiber, Layer, Option, Queue, Schema, Scope, Stream } from 'effect'
 import { FetchHttpClient, HttpClient } from 'effect/http'
 import { RpcClient, RpcMessage, RpcSerialization, RpcServer } from 'effect/rpc'
 import { Socket } from 'effect/socket'
@@ -10,6 +10,8 @@ import type { Socket as TcpSocket } from 'node:net'
 
 import {
   queryTransportCalls,
+  sharedStreamGroup,
+  startSharedTransportQuery,
   transportGroup as group,
 } from '../../../tests/fixtures/rpc-transport-queries.ts'
 
@@ -185,6 +187,174 @@ const reportMeasurement = (
     process.stdout.write(`${JSON.stringify({ transport, count, ...measurement })}\n`)
   }
 }
+
+const decodeBurst = Schema.decodeUnknownOption(
+  Schema.TaggedStruct('Chunk', {
+    values: Schema.NonEmptyArray(Schema.Int),
+  }),
+)
+const decodeUnaryExit = Schema.decodeUnknownOption(
+  Schema.TaggedStruct('Exit', {
+    exit: Schema.TaggedStruct('Success', { value: Schema.Literal(42) }),
+  }),
+)
+const decodeWireData = Schema.decodeUnknownSync(Schema.Union([Schema.String, Schema.Uint8Array]))
+
+const settleSharedStream = Effect.fn('settleSharedStream')(function* (
+  completion: 'cancel' | 'complete',
+) {
+  let clientClosed = false
+  let serverClosed = false
+  let remoteFinalizers = 0
+  const result = yield* Effect.gen(function* () {
+    const unaryStarted = yield* Deferred.make<undefined>()
+    const unaryRelease = yield* Deferred.make<undefined>()
+    const serverFinalized = yield* Deferred.make<number>()
+    const burstOnWire = yield* Deferred.make<readonly number[]>()
+    const serverAcknowledged = yield* Deferred.make<undefined>()
+    const unaryOnWire = yield* Deferred.make<42>()
+    const cancellationHandlers = sharedStreamGroup.toLayer({
+      burst: () =>
+        (completion === 'cancel'
+          ? Stream.make(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16).pipe(
+              Stream.concat(
+                Stream.fromEffect(
+                  Deferred.succeed(serverAcknowledged, undefined).pipe(
+                    Effect.andThen(Effect.never),
+                  ),
+                ),
+              ),
+            )
+          : Stream.make(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
+        ).pipe(
+          Stream.ensuring(
+            Effect.sync(() => {
+              remoteFinalizers += 1
+              return remoteFinalizers
+            }).pipe(Effect.flatMap((count) => Deferred.succeed(serverFinalized, count))),
+          ),
+        ),
+      read: Effect.fnUntraced(function* () {
+        yield* Deferred.succeed(unaryStarted, undefined)
+        yield* Deferred.await(unaryRelease)
+        return 42
+      }),
+    })
+    const nodeServer = createServer()
+    nodeServer.on('close', () => {
+      serverClosed = true
+    })
+    const server = yield* NodeHttpServer.make(() => nodeServer, {
+      host: '127.0.0.1',
+      port: 0,
+      disablePreemptiveShutdown: true,
+    })
+    if (server.address._tag === 'UnixPathAddress') {
+      return yield* Effect.die(new Error('Expected TCP address'))
+    }
+    const app = yield* RpcServer.toHttpEffectWebsocket(sharedStreamGroup).pipe(
+      Effect.provide(Layer.merge(cancellationHandlers, RpcSerialization.layerJson)),
+    )
+    yield* server.serve(app)
+    const makeWebSocket = yield* Socket.WebSocketConstructor.pipe(
+      Effect.provide(NodeSocket.layerWebSocketConstructorWS),
+    )
+    const runSync = Effect.runSyncWith(yield* Effect.context())
+    const clientScope = yield* Scope.fork(yield* Effect.scope, 'sequential')
+    const socket = yield* Socket.makeWebSocket(
+      `ws://127.0.0.1:${String(server.address.port)}/rpc`,
+    ).pipe(
+      Scope.provide(clientScope),
+      Effect.provideService(Socket.WebSocketConstructor, (url, options) => {
+        const webSocket = makeWebSocket(url, options)
+        const parser = RpcSerialization.json.makeUnsafe()
+        webSocket.addEventListener('close', () => {
+          clientClosed = true
+        })
+        webSocket.addEventListener('message', (event) => {
+          for (const message of parser.decode(decodeWireData(event.data))) {
+            const burst = decodeBurst(message)
+            if (Option.isSome(burst)) {
+              runSync(Deferred.succeed(burstOnWire, burst.value.values))
+            }
+            const unaryExit = decodeUnaryExit(message)
+            if (Option.isSome(unaryExit)) {
+              runSync(Deferred.succeed(unaryOnWire, unaryExit.value.exit.value))
+            }
+          }
+        })
+        return webSocket
+      }),
+    )
+    const protocol = yield* Layer.buildWithScope(
+      RpcClient.layerProtocolSocket().pipe(
+        Layer.provide(RpcSerialization.layerJson),
+        Layer.provide(Layer.succeed(Socket.Socket, socket)),
+      ),
+      clientScope,
+    )
+    const client = yield* RpcClient.make(sharedStreamGroup, {
+      flatten: true,
+      disableTracing: true,
+    }).pipe(Effect.provide(protocol), Scope.provide(clientScope))
+    const { queryClient, unary } = yield* startSharedTransportQuery(client, clientScope)
+    yield* Deferred.await(unaryStarted).pipe(Effect.timeout('2 seconds'))
+    const requestScope = yield* Scope.fork(clientScope, 'sequential')
+    const { values, bufferedAtCancellation } = yield* Effect.gen(function* () {
+      if (completion === 'cancel') {
+        const queue = yield* client('burst', undefined, { asQueue: true })
+        yield* Deferred.await(burstOnWire).pipe(Effect.timeout('2 seconds'))
+        yield* Deferred.await(serverAcknowledged).pipe(Effect.timeout('2 seconds'))
+        const buffered = yield* Queue.size(queue)
+        yield* Scope.close(requestScope, Exit.void)
+        return { values: [], bufferedAtCancellation: buffered }
+      }
+      const completedValues = yield* client('burst', undefined).pipe(Stream.runCollect)
+      return { values: completedValues, bufferedAtCancellation: undefined }
+    }).pipe(Scope.provide(requestScope), Effect.timeout('2 seconds'))
+    const chunkOnWire = yield* Deferred.await(burstOnWire).pipe(Effect.timeout('2 seconds'))
+    if (completion === 'complete') {
+      yield* Scope.close(requestScope, Exit.void)
+    }
+    yield* Deferred.await(serverFinalized).pipe(Effect.timeout('2 seconds'))
+    yield* Deferred.succeed(unaryRelease, undefined)
+    const wireValue = yield* Deferred.await(unaryOnWire).pipe(Effect.timeout('2 seconds'))
+    const unaryResult = yield* Fiber.join(unary).pipe(Effect.timeout('1 second'), Effect.exit)
+    const unaryExit = Exit.isSuccess(unaryResult) ? unaryResult.value : unaryResult
+    yield* Scope.close(clientScope, Exit.void)
+    return {
+      values,
+      bufferedAtCancellation,
+      chunkOnWire,
+      unaryOnWire: wireValue,
+      cacheEntries: queryClient.getQueryCache().getAll().length,
+      unaryExit,
+    }
+  }).pipe(Effect.scoped)
+  return { ...result, remoteFinalizers, clientClosed, serverClosed }
+})
+
+describe('shared RPC streams over WebSocket', () => {
+  it.live.each(['cancel', 'complete'] as const)(
+    'keeps an active unary query live when a valid stream settles by %s',
+    (completion) =>
+      Effect.gen(function* () {
+        const { unaryExit, ...observations } = yield* settleSharedStream(completion)
+        expect(observations).toStrictEqual({
+          values:
+            completion === 'cancel' ? [] : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+          bufferedAtCancellation: completion === 'cancel' ? 16 : undefined,
+          remoteFinalizers: 1,
+          chunkOnWire: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+          unaryOnWire: 42,
+          cacheEntries: 0,
+          clientClosed: true,
+          serverClosed: true,
+        })
+        expect(unaryExit).toStrictEqual(Exit.succeed(42))
+      }),
+  )
+})
 
 describe('independent RPC request overhead', () => {
   it.live('keeps eight independent queries as eight HTTP requests', () =>
