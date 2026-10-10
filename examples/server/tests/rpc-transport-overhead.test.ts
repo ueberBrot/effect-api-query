@@ -213,6 +213,7 @@ const settleSharedStream = Effect.fn('settleSharedStream')(function* (
     const burstOnWire = yield* Deferred.make<readonly number[]>()
     const serverAcknowledged = yield* Deferred.make<undefined>()
     const unaryOnWire = yield* Deferred.make<42>()
+    const clientSocketClosed = yield* Deferred.make<undefined>()
     const cancellationHandlers = sharedStreamGroup.toLayer({
       burst: () =>
         (completion === 'cancel'
@@ -270,6 +271,7 @@ const settleSharedStream = Effect.fn('settleSharedStream')(function* (
         const parser = RpcSerialization.json.makeUnsafe()
         webSocket.addEventListener('close', () => {
           clientClosed = true
+          runSync(Deferred.succeed(clientSocketClosed, undefined))
         })
         webSocket.addEventListener('message', (event) => {
           for (const message of parser.decode(decodeWireData(event.data))) {
@@ -322,16 +324,18 @@ const settleSharedStream = Effect.fn('settleSharedStream')(function* (
     const unaryResult = yield* Fiber.join(unary).pipe(Effect.timeout('1 second'), Effect.exit)
     const unaryExit = Exit.isSuccess(unaryResult) ? unaryResult.value : unaryResult
     yield* Scope.close(clientScope, Exit.void)
+    yield* Deferred.await(clientSocketClosed).pipe(Effect.timeout('2 seconds'))
     return {
       values,
       bufferedAtCancellation,
       chunkOnWire,
       unaryOnWire: wireValue,
+      clientClosed,
       cacheEntries: queryClient.getQueryCache().getAll().length,
       unaryExit,
     }
   }).pipe(Effect.scoped)
-  return { ...result, remoteFinalizers, clientClosed, serverClosed }
+  return { ...result, remoteFinalizers, serverClosed }
 })
 
 describe('shared RPC streams over WebSocket', () => {
