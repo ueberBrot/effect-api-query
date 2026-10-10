@@ -69,6 +69,10 @@ and [executable examples](/effect-api-query/examples/) establish the tested scop
 builders use TanStack's experimental `streamedQuery` helper. Use the ready client directly for
 calls that do not need TanStack Query.
 
+[Browser and worker hosts](/effect-api-query/reference/browser-and-worker-hosts/) lists the
+framework-free execution matrix and distinguishes worker-hosted ready clients from a worker RPC
+transport.
+
 ## Runtime and cache behavior
 
 - The caller owns RPC or HTTP client acquisition, `Scope`, transport, Query Client, providers, router, SSR,

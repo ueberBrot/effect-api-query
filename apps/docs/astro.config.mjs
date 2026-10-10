@@ -105,6 +105,7 @@ export default defineConfig({
             { label: 'RPC Builders', slug: 'reference/generated-builders' },
             { label: 'Errors', slug: 'reference/errors' },
             { label: 'Public Exports', slug: 'reference/public-exports' },
+            { label: 'Browser and Worker Hosts', slug: 'reference/browser-and-worker-hosts' },
             { label: 'Compatibility and Limits', slug: 'reference/compatibility-and-limits' },
           ],
         },
