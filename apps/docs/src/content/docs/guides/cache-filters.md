@@ -42,10 +42,13 @@ export const usersRpc = RpcGroup.make(
   Rpc.make('health.ping', { success: Schema.String }),
 )
 
-export const userCacheFilters = (
-  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof usersRpc>>,
+export const userCacheFilters = <ClientError>(
+  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof usersRpc>, ClientError>,
 ) => {
-  const rpc = createRpcQueryUtils(usersRpc, { client, keyPrefix: ['users-app'] })
+  const rpc = createRpcQueryUtils<typeof usersRpc, readonly ['users-app'], ClientError>(usersRpc, {
+    client,
+    keyPrefix: ['users-app'],
+  })
   const queryPrefix = [...rpc.users.get.key(), 'query'] as const
   const historyPrefix = [...rpc.users.watch.key(), 'streamed'] as const
 
