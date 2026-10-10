@@ -1,6 +1,6 @@
 library:
   name: effect-api-query
-  version: 0.0.0
+  version: 0.1.0
 generated_from:
   domain_map: _artifacts/domain_map.yaml
   skill_spec: _artifacts/skill_spec.md
@@ -30,6 +30,7 @@ skills:
       - '**/examples/server/tests/rpc-transport-overhead.test.ts'
       - GLOSSARY.md
       - README.md
+      - CHANGELOG.md
       - package.json
       - pnpm-workspace.yaml
       - scripts/*.mts

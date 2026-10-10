@@ -37,7 +37,7 @@ modules and guides own recommended cache and lifecycle recipes.
   skills for existing branches. Conditional references avoid loading every workflow.
 - Migrate the original description to purpose, then apply the approved correction
   for the settled HTTP and framework scope. Keep activation task-oriented and
-  record the verified package version, currently 0.0.0.
+  record the verified package version in skill metadata.
 - Keep package-only distribution. Planning records and review state remain outside
   shipped skills and the package allowlist.
 - Keep scoped native skill validation in the existing uncached task and CI path.
@@ -100,11 +100,20 @@ bookkeeping nor syntax validation establishes semantic correctness by itself.
   cancellation, accepted-command drain, cache clearing, and client disposal.
   Independent iterator cleanup remains an application-owned completion signal.
 
+- At source revision `809bc2513421a175e091fac904306955f9c532a7`, initial candidate
+  preparation sets the root and maintained skill records to 0.1.0 and registers
+  the initial changelog as an authoritative source. Release notes describe the
+  current contract, exact Effect peer, tested Query Core versions, normalized
+  query data, and cache identity. Package-only distribution, existing references,
+  and application ownership remain unchanged. The fresh native build, scoped
+  skill validation, installed version, examples, and both compiler/peer matrices
+  pass for the selected archive. Owned native source reviews are recorded;
+  complete integration acceptance remains open.
+
 ## Remaining work
 
-Following approved slices update skill version metadata during manual 0.1.0
-preparation and verify the exact candidate archive. Their actual source changes
-require a new native review. Framework SSR/AOT,
+Verify the selected 0.1.0 archive through final integration acceptance. Subsequent
+source or guidance changes require a new native review. Framework SSR/AOT,
 cross-host worker transport, durable event delivery, and future dependency releases
 remain outside the verified integration scope.
 

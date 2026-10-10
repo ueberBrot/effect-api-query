@@ -3,8 +3,9 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "2e63127101267abf3bf2fd691f4554cca23ebcbad3a479d43de861b5aa6a7c38",
+      "fingerprint": "fb4f69906cb036383959240d877ac26912c1174b63f309604d27fc73a83e6fbf",
       "snapshot": {
+        "CHANGELOG.md": "03dbf3658db26e2a9ad8ce89ceee451abc6898700a22e5a6c7b6c64abdc6c4c6",
         "GLOSSARY.md": "67de06543ad2fd9fd2917419e19d1f071e7b6eee53d48fca05e9dddfc739c683",
         "README.md": "8ad663677e295d3583814150fe259553e4d7f2d7702fb5e432ab60c686af731e",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "2df7835da74d37065ef2866008439e8bdc6b748c10edead65fcb52044d929399",
@@ -103,7 +104,7 @@
         "examples/vite-react/tests/owner-cache.test.ts": "8818e30fdd3071a2e5dc2d865161e0d9f40de1ff37813b0a396bb2e83dd08a1d",
         "examples/vite-react/tests/owner-switch.test.ts": "c997c9758269586591cbf55de4651c64091abc9061b56edb024dcbf9dbaa9c1d",
         "examples/vite-react/tests/user-writes.test.ts": "2492f48018e7d8e684eae1c8d302acc9961a1bfbd60bf3214c113dc1b6fbe54a",
-        "package.json": "70b3ec37ed23c50f1b72897bf8557e58c31cd95c93ff41f749c1a19c40cdda67",
+        "package.json": "942594c19839f0ecc1d4fca935701c958fb596e4916e15708ec1a58ac655d3a9",
         "pnpm-workspace.yaml": "82d497fe7617af3dcd84242d3d074ef827ad62e8e726bad63301cea2fd03d633",
         "scripts/measure-packed-consumer.mts": "2a4d12f007219cf710d25981c5ca1ceb75c816e009cd0fda3b1a8931a4f2d0fb",
         "scripts/verify-docs-examples.mts": "79c08ea5d45287740cceb1c4fe47f2f1a0b264d9a20c5e0d095d327622c5be8b",
@@ -111,7 +112,7 @@
         "scripts/verify-packed-consumer.mts": "397b85cd496bcdcfc41ef4b1f7f1d5be6e4fa257671ff3db589c8de27367df8b",
         "scripts/verify-svelte-angular-consumer.mts": "7e13a21938aaba6615b5443513f4e45f5dfa4b13eb4373da8a6656146ed3a5ea",
         "scripts/verify-vue-solid-consumer.mts": "0ba286c3ac90f2ba30a9e40fc33ea954cedeca8b81d016ccbc7c246c0d587f8c",
-        "skills/effect-api-query/SKILL.md": "3a669780d107fbcb42b802991cff55ba3ff3d1bb2a77b24d1c658bc107894d5b",
+        "skills/effect-api-query/SKILL.md": "dc5ee238f9657908b3d3593099cdc6052caf96a65ff30c4efba4ca9a46e6435b",
         "skills/effect-api-query/references/cache-workflows.md": "27bb96c48c84254ab8c379a529402f81cea3723c17d6396527c090a8c37e6f65",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "4143e54e4361d09272a6207b032185494df851ed3e5adddf0fa5aee9ee7d65ec",
         "skills/effect-api-query/references/http.md": "9625411753fcc3ce816512f80158a19aa1057518ab3bfde98720e0cc7f845b66",
@@ -243,17 +244,18 @@
         "tests/types/tanstack-start-contract.ts": "c99d47160bcaeeb851a489c79f3e8b62c202b41339ba1de3579811b28ee491e8",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "2270d9ae34b86f2cb340b94cf3226e0d15c5a47c",
-      "outcome": "no-change",
-      "reason": "The Vite example summary now describes its implemented query cancellation, cache clearing, accepted-command/mutation drain and runtime/client disposal. It links the existing separate stream-completion requirement instead of claiming the example already joins iterator cleanup. The shipped lifecycle and owner guidance is already accurate and remains byte-identical.",
+      "head": "809bc2513421a175e091fac904306955f9c532a7",
+      "outcome": "updated",
+      "reason": "The initial package candidate is 0.1.0. Verified metadata.library_version now matches root, packed and installed versions; CHANGELOG.md is registered as an authoritative source. Existing task guidance, activation, purpose and six references retain the completed current contract without an unreleased-build migration narrative.",
       "evidence": [
-        "129-standards-review.md identifies the accuracy breach; owner-cache.ts:147-173 awaits query cancellation and tracked mutations, and application.ts:91-110 then disposes the HTTP runtime and RPC client without a joined iterator-return signal.",
-        "apps/docs/src/content/docs/examples.md now states the actual disposal sequence and links concepts/client-lifecycle.md#stream-creation-and-consumption for the independent completion signal.",
-        "129-correction-input-proof.json proves all shipped README/skill/source/type/runtime/fixture/build/dependency inputs unchanged from the verified 2270d9 commit. The exact fresh 129 archive and full packed matrix remain applicable; no redundant repack or runtime test is needed for this unshipped prose correction."
+        "package.json, skills/effect-api-query/SKILL.md and CHANGELOG.md are compared with completed integration 809bc2513421a175e091fac904306955f9c532a7; only root version and the owned skill version/source mapping change existing shipped inputs.",
+        "Fresh uncached native packed-package passes attw/publint, declarations/maps, scoped Intent validation, exact version/peer/inventory checks, 26 ordinary compiler checks across TypeScript 5.9.3 and 7.0.2+effect-tsgo.0.47.2 with Query Core 5.103.1/5.104.0, all runtime fixtures and four native framework hosts per peer (130-packed-host.log).",
+        "Installed package-only Intent discovery loads the 0.1.0 skill byte-for-byte, resolves all six references and compiles all ten examples. Independent 130-changelog-fact-review.md confirms current capabilities/support; prior independent 128 consumer evidence remains semantically applicable to unchanged guidance.",
+        "The immutable 14-file selected archive 130-fc1497e17b4d5888.tgz is byte-identical to the archive checked before and after the consumer matrix; SHA512 fc1497e17b4d58889ddbbbfacc277073815a8b34aa48e32a5823ffdeea8022bf268ba37f1f7a7ff24a78d33efe3932691d208d06ea889092004ddb83f5d9c88d. Final whole-programme acceptance remains ticket 131."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "22a4742a3cdc25354d74766419f62c4e20d146ff6270027f41d8309f70d3ca22",
+      "fingerprint": "c823bc03b224b06a4747dee7bd2e97ef5b081ef4bdf3471113af0f730b4e6407",
       "snapshot": {
         ".agents/skills/ask-matt/PHASE-BOUNDARIES.md": "a8aa20158609ef39e2b308b6ba0660c91066838d07a867202e63a7744a88a3ed",
         ".agents/skills/ask-matt/SKILL.md": "1371f5ce005de0992a44b137748bfb960a56948aa9871b405fe9d90b24332e3c",
@@ -335,11 +337,12 @@
         ".agents/skills/writing-for-agents/SKILL-MECHANICS.md": "c768e6307c7c10728c401c213f2c4ba71c542127eeb7ad2956aabd15a0fa0059",
         ".agents/skills/writing-for-agents/SKILL.md": "551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a",
         ".agents/skills/writing-for-agents/agents/openai.yaml": "eacb24b2a618cfb81dacb0416f4fdd75ddf3a8060f8ddb99aae1b1e301907e4b",
+        "CHANGELOG.md": "03dbf3658db26e2a9ad8ce89ceee451abc6898700a22e5a6c7b6c64abdc6c4c6",
         "GLOSSARY.md": "67de06543ad2fd9fd2917419e19d1f071e7b6eee53d48fca05e9dddfc739c683",
         "README.md": "8ad663677e295d3583814150fe259553e4d7f2d7702fb5e432ab60c686af731e",
-        "_artifacts/domain_map.yaml": "793814eafd522d0dc5ae008a79ada21dd0c68b58550e283efab36e18309a759a",
-        "_artifacts/skill_spec.md": "140c0a2fa7a54f4e4078a7f0736e6d87137576ecbf5f8a39ceaa1c2997b37983",
-        "_artifacts/skill_tree.yaml": "10613ee32d40eeabf09ef0c0d4850705c162fd9006fc88c46257338a7e16cb2f",
+        "_artifacts/domain_map.yaml": "2864e9d8736d5e2e8ca02146e687e998b8a11d87e7f8a5e3bf3f34072dc914e3",
+        "_artifacts/skill_spec.md": "9b5ce0026f150c58f47179ba36f69d91338e4010dbecbfd9a8511aaf1478c2c1",
+        "_artifacts/skill_tree.yaml": "25e6fe1f22751f6dd0e898540a8e50728f7119c93d0454ab12faec67617d654c",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "2df7835da74d37065ef2866008439e8bdc6b748c10edead65fcb52044d929399",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "13ec7ee3eba3859ec1c6f079cd8bc4dd80bf116eb63299e3645c004ff9fdf6ec",
         "apps/docs/src/content/docs/concepts/http-utility-tree.md": "ca4acbe1af20538c0d08a3e03969efe1966e7822ce6dfce8d0c1efb6913795cf",
@@ -436,7 +439,7 @@
         "examples/vite-react/tests/owner-cache.test.ts": "8818e30fdd3071a2e5dc2d865161e0d9f40de1ff37813b0a396bb2e83dd08a1d",
         "examples/vite-react/tests/owner-switch.test.ts": "c997c9758269586591cbf55de4651c64091abc9061b56edb024dcbf9dbaa9c1d",
         "examples/vite-react/tests/user-writes.test.ts": "2492f48018e7d8e684eae1c8d302acc9961a1bfbd60bf3214c113dc1b6fbe54a",
-        "package.json": "70b3ec37ed23c50f1b72897bf8557e58c31cd95c93ff41f749c1a19c40cdda67",
+        "package.json": "942594c19839f0ecc1d4fca935701c958fb596e4916e15708ec1a58ac655d3a9",
         "pnpm-workspace.yaml": "82d497fe7617af3dcd84242d3d074ef827ad62e8e726bad63301cea2fd03d633",
         "scripts/measure-packed-consumer.mts": "2a4d12f007219cf710d25981c5ca1ceb75c816e009cd0fda3b1a8931a4f2d0fb",
         "scripts/verify-docs-examples.mts": "79c08ea5d45287740cceb1c4fe47f2f1a0b264d9a20c5e0d095d327622c5be8b",
@@ -444,7 +447,7 @@
         "scripts/verify-packed-consumer.mts": "397b85cd496bcdcfc41ef4b1f7f1d5be6e4fa257671ff3db589c8de27367df8b",
         "scripts/verify-svelte-angular-consumer.mts": "7e13a21938aaba6615b5443513f4e45f5dfa4b13eb4373da8a6656146ed3a5ea",
         "scripts/verify-vue-solid-consumer.mts": "0ba286c3ac90f2ba30a9e40fc33ea954cedeca8b81d016ccbc7c246c0d587f8c",
-        "skills/effect-api-query/SKILL.md": "3a669780d107fbcb42b802991cff55ba3ff3d1bb2a77b24d1c658bc107894d5b",
+        "skills/effect-api-query/SKILL.md": "dc5ee238f9657908b3d3593099cdc6052caf96a65ff30c4efba4ca9a46e6435b",
         "skills/effect-api-query/references/cache-workflows.md": "27bb96c48c84254ab8c379a529402f81cea3723c17d6396527c090a8c37e6f65",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "4143e54e4361d09272a6207b032185494df851ed3e5adddf0fa5aee9ee7d65ec",
         "skills/effect-api-query/references/http.md": "9625411753fcc3ce816512f80158a19aa1057518ab3bfde98720e0cc7f845b66",
@@ -576,13 +579,14 @@
         "tests/types/tanstack-start-contract.ts": "c99d47160bcaeeb851a489c79f3e8b62c202b41339ba1de3579811b28ee491e8",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "2270d9ae34b86f2cb340b94cf3226e0d15c5a47c",
+      "head": "809bc2513421a175e091fac904306955f9c532a7",
       "outcome": "updated",
-      "reason": "The planning history records the reviewed distinction between the Vite example disposal sequence and independently awaited iterator cleanup. The existing domain map and skill tree already express application-owned finalization and cover the example/lifecycle sources; their tasks, references and paths remain correct.",
+      "reason": "All three planning records are reconciled with the verified initial 0.1.0 candidate. Domain/tree versions match package and skill metadata; initial changelog coverage and completed human documentation are recorded, while exact final integration acceptance stays open. Existing tasks, ownership, references, exclusions and unrelated unresolved reviews are preserved.",
       "evidence": [
-        "_artifacts/skill_spec.md records the corrected query-cancellation/accepted-command-drain/cache-clear/client-disposal sequence and separate application-owned iterator completion.",
-        "129-correction-native-sync.log and 129-correction-native-review.json identify only examples.md for the owned skill and examples.md plus skill_spec.md for planning; both owned items have no structural problems.",
-        "129-correction-input-proof.json preserves the exact applicable packed evidence. The unchanged domain map and skill tree retain accurate source mappings; unrelated native review outcomes are left untouched."
+        "_artifacts/domain_map.yaml resolves only initial release metadata and retains exact-candidate acceptance as open; the already resolved human-document reconciliation remains intact.",
+        "_artifacts/skill_tree.yaml retains its existing skill identity, activation, purpose, paths, prerequisites and package-only distribution, adds CHANGELOG.md via native sync, and records library.version 0.1.0.",
+        "_artifacts/skill_spec.md removes duplicated placeholder-version wording, records the bounded initial-candidate batch with actual fresh native package/consumer check results, and leaves whole integration acceptance and unverified host/dependency scope explicit.",
+        "130-native-sync-host.log records the unchanged installed synchronization command; the completed review has no owned structural problem. 130-packed-host.log verifies this candidate with both compilers/peers, all shipped examples and installed consumers; unrelated native items remain unannotated."
       ]
     },
     "source:vite.config.ts": {
@@ -598,6 +602,20 @@
         "Native vp pack passed attw/publint; full packed-consumer verification passed both Query peers and both supported compilers, compiling all ten skill examples (notes/128-packed-final.log).",
         "Independent package-only forward evaluation passed numeric snapshot cleanup, hydration, metadata codecs and sharing; its fresh-cache policy experiment supports the HTTP option-installation clarification (notes/128-forward-test.md and proof).",
         "No public source/type or dependency inputs changed; native source mappings include all current guidance sources."
+      ]
+    },
+    "source:.github/workflows/release.yml": {
+      "fingerprint": "8d489fc303d9c22abd57cd8598f14ed46e4d46fa4be70706691ba3e1dc6f7cfb",
+      "snapshot": {
+        ".github/workflows/release.yml": "581faa02f015865f1481ea598efbca5c3c10e1c48142470bb31c0aa70f18db52"
+      },
+      "head": "809bc2513421a175e091fac904306955f9c532a7",
+      "outcome": "updated",
+      "reason": "The placeholder rejection now requires a real package version and changelog rather than a Changeset for the authorized unpublished initial candidate. The condition, exit, original pack artifact forwarding, permissions, dry-run mode and main-only publication gates are unchanged; future Changesets automation remains present.",
+      "evidence": [
+        "The only release.yml diff from 809bc2513421a175e091fac904306955f9c532a7 is the error sentence in Reject placeholder publication. ADR 0016 keeps the initial-candidate and subsequent Changesets decisions.",
+        "130-packed-host.log verifies the native 0.1.0 archive; 131-artifact-rehearsal.md already establishes the retained original-ID artifact chain on the older 0.0.0 archive, not final candidate acceptance.",
+        "No GitHub release run, main merge, publication or account change is performed. Root owns push/PR dry runs/final 131 acceptance; actual publication remains human-owned issue 19."
       ]
     }
   }

@@ -15,7 +15,7 @@ metadata:
     behavior, and application-owned execution, hydration, and resource lifetime.
   type: core
   library: effect-api-query
-  library_version: '0.0.0'
+  library_version: '0.1.0'
 sources:
   - 'src/**/*.ts'
   - 'tests/**/*.ts'
@@ -30,6 +30,7 @@ sources:
   - '**/examples/server/tests/rpc-transport-overhead.test.ts'
   - 'GLOSSARY.md'
   - 'README.md'
+  - 'CHANGELOG.md'
   - 'package.json'
   - 'pnpm-workspace.yaml'
   - 'scripts/*.mts'
