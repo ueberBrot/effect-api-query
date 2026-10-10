@@ -35,8 +35,8 @@ const queryUtils = createHttpApiQueryUtils(httpApi, {
 
 Use `identity` to partition the cache safely by the current user or tenant. `runPromiseExit`
 is your application's runner. Configure transport URLs, authentication, and required services when
-creating the client and runner. Use a trusted server destination for SSR and a browser-accessible
-destination for client requests.
+creating the client and runner. Use a request-owned server-local client when your application can execute the handlers locally.
+Otherwise, use a trusted server destination. Browser clients use a browser-accessible destination.
 
 The [RPC factory reference](/effect-api-query/reference/factory/) and
 [HTTP guide](/effect-api-query/guides/http-queries-and-mutations/) cover client setup, optional
@@ -94,7 +94,9 @@ setupRouterSsrQueryIntegration({
 
 The server dehydrates its Query Client. The browser hydrates its own Query Client and uses its
 own ready client and runner. Register cleanup with the server request lifecycle. When SSR finishes
-or the request aborts, cancel outstanding queries before disposing their runtime. Keep the browser
+or the request aborts, cancel outstanding queries and await outstanding snapshot captures before
+disposing their ready clients and runtime. Native cancellation alone may settle before local iterator
+finalizers finish. Keep the browser
 runtime alive for the browser application's lifetime.
 
 Successful query data must satisfy your serializer's contract. If an endpoint returns decoded
@@ -137,10 +139,28 @@ See [Executable Examples](/effect-api-query/examples/) for commands and controls
 
 The example serves RPC at `/rpc` and HTTP at `/api/$`. Both handlers share a demonstration user
 directory, so writes invalidate both sets of query keys. The authorization header contains a
-public demonstration value. The ownership tests use separate identities to verify that caches
-and resource disposal stay isolated. Its SSR setup clones class properties for field-only views.
-`structuredClone` does not reconstruct class methods or define a JSON encoding for rich values;
-use a paired codec when the browser needs the decoded domain representation.
+public demonstration value. Each request owns its cache and connections; disposing one request
+leaves other requests usable.
+
+Server rendering uses request-owned connections built with Effect's public decoded-message client
+and server. They execute the same application state as the network handlers. RPC execution avoids
+HTTP round trips; HTTP loaders call the host's Web handler in process and retain HTTP Schema codecs.
+The browser acquires separate network clients and reconnects both stream views after hydration.
+
+Local RPC middleware captures the request's demonstration authorization value. Per-call headers and
+caller execution services cannot replace that authority. The example defaults that public value to
+`allowed`; replace this demonstration policy with your application's authentication. Decoded-message
+RPC execution bypasses transport Schema codecs. Keep a schema-aware protocol when wire validation
+or codec effects are required.
+
+The example pairs Schema encoding and decoding for its directory, pages, diagnostic history and
+live values. It awaits encoding before publishing the initial snapshot and each streamed batch,
+and awaits decoding of an entire batch before native hydration. Request disposal interrupts
+preparation and awaits its finalizers before releasing the clients. Serialization callbacks stay
+synchronous. Failed queries remain omitted. Its copied map covers the example's own generated
+key families; add an explicit codec when you add another hydratable view. See
+[Hydrate Query Views](/effect-api-query/guides/hydrate-query-views/) for page parameters, richer values
+and application-owned preparation services.
 
 The example also disables Vite preview compression for its API routes. The pinned middleware
 delays response-close listeners until the first write, preventing a pending buffered request from

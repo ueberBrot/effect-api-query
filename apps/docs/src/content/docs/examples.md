@@ -92,15 +92,16 @@ through the real server and browser suites.
 vp run tanstack-start-dev
 ```
 
-This task starts one full-stack process. The browser and server-rendering clients call the
-Start application's `/rpc` and `/api/$` routes. Choose **HTTP users** to inspect the server-rendered directory
+This task starts one full-stack process. Browser clients call the Start application's `/rpc` and
+`/api/$` routes. Server loaders execute within the same host without a network round trip. Choose **HTTP users** to inspect the server-rendered directory
 and first page, reuse the hydrated cache, and try the same HTTP operations as in Vite React.
 Choose **HTTP SSR failure** to see the browser retry a failed server query that was omitted
 from dehydration.
 
-Server rendering uses the trusted origin `http://127.0.0.1:3000`. If the Start server listens
-elsewhere, set the server-only `EXAMPLE_API_ORIGIN` environment variable to its HTTP(S) origin,
-without a path, credentials, query, or fragment. Browser requests stay on the same origin.
+Server rendering owns a separate RPC connection and Query Client for each request. Local RPC and
+HTTP execution share the network handlers' demonstration directory. A browser write therefore
+appears in the next server-rendered page, while disposing one request leaves other owners usable.
+Browser requests stay on the same origin.
 See [TanStack Start](/effect-api-query/guides/tanstack-start/) for request ownership, authentication,
 cache isolation, and hydration setup.
 

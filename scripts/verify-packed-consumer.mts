@@ -8,6 +8,7 @@ import { createHash } from 'node:crypto'
 import {
   cpSync,
   existsSync,
+  mkdirSync,
   mkdtempSync,
   readFileSync,
   readdirSync,
@@ -436,6 +437,48 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
         )
       }
     }
+    for (const [directory, files] of [
+      [
+        'server',
+        [
+          'commands.ts',
+          'diagnostic-operations.ts',
+          'domain.ts',
+          'http-handlers.ts',
+          'rpc-handlers.ts',
+          'server-local-rpc.ts',
+          'users.ts',
+          'web-handler.ts',
+        ],
+      ],
+      ['tanstack-start', ['application.ts', 'server-application.ts', 'snapshot-preparation.ts']],
+    ] as const) {
+      const destination = nodePath.join(consumerDirectory, `start-${directory}`)
+      mkdirSync(destination)
+      for (const file of files) {
+        const source = nodePath.join(
+          repositoryRoot,
+          'examples',
+          directory,
+          'src',
+          directory === 'tanstack-start' ? 'lib' : '',
+          file,
+        )
+        writeFileSync(
+          nodePath.join(destination, file),
+          readFileSync(source, 'utf-8')
+            .replaceAll(
+              "'@effect-api-query/contracts/client'",
+              "'../optimistic-contracts/client.ts'",
+            )
+            .replaceAll("'@effect-api-query/contracts'", "'../optimistic-contracts/index.ts'")
+            .replaceAll(
+              "'@effect-api-query/server/web-handler'",
+              "'../start-server/web-handler.ts'",
+            ),
+        )
+      }
+    }
     writeFileSync(
       nodePath.join(consumerDirectory, 'optimistic-users.ts'),
       readFileSync(
@@ -458,7 +501,12 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
           "'./optimistic-application/user-writes.ts'",
         ),
     )
-    for (const file of ['optimistic-runtime.mts', 'optimistic-contract.ts']) {
+    for (const file of [
+      'optimistic-runtime.mts',
+      'optimistic-contract.ts',
+      'events-runtime.mts',
+      'events-contract.ts',
+    ]) {
       const path = nodePath.join(consumerDirectory, file)
       writeFileSync(
         path,
@@ -470,6 +518,34 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
           .replaceAll("'../fixtures/optimistic-users.ts'", "'./optimistic-users.ts'"),
       )
     }
+    const startRuntimePath = nodePath.join(consumerDirectory, 'start-ssr-runtime.mts')
+    writeFileSync(
+      startRuntimePath,
+      readFileSync(startRuntimePath, 'utf-8')
+        .replaceAll(
+          "'../../examples/contracts/src/contracts.ts'",
+          "'./optimistic-contracts/contracts.ts'",
+        )
+        .replaceAll("'../../examples/server/src/web-handler.ts'", "'./start-server/web-handler.ts'")
+        .replaceAll(
+          "'../../examples/tanstack-start/src/lib/server-application.ts'",
+          "'./start-tanstack-start/server-application.ts'",
+        )
+        .replaceAll(
+          "'../../examples/tanstack-start/src/lib/snapshot-preparation.ts'",
+          "'./start-tanstack-start/snapshot-preparation.ts'",
+        ),
+    )
+    const eventRecipe = nodePath.join(consumerDirectory, 'user-events.ts')
+    writeFileSync(
+      eventRecipe,
+      readFileSync(eventRecipe, 'utf-8')
+        .replaceAll(
+          "'../../examples/vite-react/src/lib/application.ts'",
+          "'./optimistic-application/application.ts'",
+        )
+        .replaceAll("'../../examples/vite-react/src/lib/owner-cache.ts'", "'./owner-cache.ts'"),
+    )
     for (const fixture of [
       'public-contract.ts',
       'tanstack-start-contract.ts',
@@ -582,7 +658,9 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
 
     for (const fixture of [
       'owner-cache-runtime.mts',
+      'start-ssr-runtime.mts',
       'optimistic-runtime.mts',
+      'events-runtime.mts',
       'hashing-runtime.mts',
       'filter-runtime.mts',
       'runtime.mts',

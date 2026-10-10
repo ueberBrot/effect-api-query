@@ -2,7 +2,7 @@ import { startExampleRpcServer } from '@effect-api-query/server'
 import { QueryClient } from '@tanstack/react-query'
 import { createMemoryHistory, RouterProvider } from '@tanstack/react-router'
 import { Deferred, Effect, Exit, Schema, Scope, Stream } from 'effect'
-import { createRpcQueryUtils } from 'effect-api-query'
+import { createRpcQueryUtils, fetchStreamSnapshot } from 'effect-api-query'
 import { Rpc, RpcGroup } from 'effect/rpc'
 import type { RpcClient } from 'effect/rpc'
 import { renderToString } from 'react-dom/server'
@@ -10,7 +10,6 @@ import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test'
 
 import { fetchStreamSnapshot as captureStreamSnapshot } from '../../../src/index.ts'
 import type { StreamSnapshotOptions } from '../../../src/index.ts'
-import { fetchStreamSnapshot } from '../src/lib/query-ssr.ts'
 import { createTanStackStartRouter } from '../src/router.tsx'
 
 describe('TanStack Start server rendering', () => {

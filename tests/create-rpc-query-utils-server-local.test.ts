@@ -5,8 +5,8 @@ import { describe, expect, it, vi } from 'vite-plus/test'
 
 import { createRpcQueryUtils, isEffectRpcQueryError } from '#effect-api-query'
 
+import { makeServerLocalRpcClient } from '../examples/server/src/server-local-rpc.ts'
 import { captureFailure } from './fixtures/async.ts'
-import { makeServerLocalRpcClient } from './fixtures/server-local-rpc.ts'
 
 describe('server-local ready-client construction', () => {
   it('executes a production decoded-message client without calling the network fetch boundary', async () => {

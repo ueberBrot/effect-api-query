@@ -6,7 +6,6 @@ import { ActionButton } from '../components/action-button.tsx'
 import { ConditionalUserQuery } from '../components/conditional-user-query.tsx'
 import { PageLayout, Panel } from '../components/page-layout.tsx'
 import type { TanStackStartApplication } from '../lib/application.ts'
-import { fetchStreamSnapshot } from '../lib/query-ssr.ts'
 
 const PAGE_SIZE = 4
 
@@ -281,8 +280,8 @@ export const Route = createFileRoute('/')({
         ...userPagesOptions(context.rpcQuery),
         staleTime: 'static',
       }),
-      fetchStreamSnapshot(context.queryClient, streamedDiagnosticsOptions(context.rpcQuery)),
-      fetchStreamSnapshot(context.queryClient, liveDiagnosticOptions(context.rpcQuery)),
+      context.captureSnapshot(context.queryClient, streamedDiagnosticsOptions(context.rpcQuery)),
+      context.captureSnapshot(context.queryClient, liveDiagnosticOptions(context.rpcQuery)),
     ])
   },
 })

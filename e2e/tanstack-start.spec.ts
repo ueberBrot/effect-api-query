@@ -164,13 +164,16 @@ test.describe('TanStack Start application', () => {
     await expect(page.getByText('8 of 12 loaded')).toBeVisible()
   })
 
-  test('mutates and invalidates the hydrated users query', async ({ page }) => {
+  test('mutates, invalidates and server-renders the shared directory', async ({ page }) => {
     const listResponse = page.waitForResponse(
       (response) => response.ok() && recordsRpc(response.request().postData(), 'users.list'),
     )
     await page.getByRole('button', { name: 'Add Grace Hopper' }).click()
     await listResponse
 
+    await expect(page.getByText('Grace Hopper', { exact: true })).toBeVisible()
+    await expect(page.getByText('13 users in one response')).toBeVisible()
+    await page.reload()
     await expect(page.getByText('Grace Hopper', { exact: true })).toBeVisible()
     await expect(page.getByText('13 users in one response')).toBeVisible()
   })
