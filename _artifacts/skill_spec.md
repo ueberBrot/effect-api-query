@@ -77,6 +77,10 @@ bookkeeping nor syntax validation establishes semantic correctness by itself.
   Source coverage includes README and all Markdown/MDX site pages so the final
   documentation reconciliation requires a native review. Check outcomes and
   justified source reviews are recorded before handoff.
+  Independent Standards review narrows the buffer-16 statement to the acknowledged
+  16-value chunk, zero-consumption, immediate request-Scope closure control with
+  concurrent unary success. Larger chunks and unfinished offers remain unverified;
+  the reproduced overflowing buffer-one and chunk-Schema limits remain explicit.
 
 ## Remaining work
 

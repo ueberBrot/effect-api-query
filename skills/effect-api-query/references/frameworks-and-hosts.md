@@ -129,9 +129,11 @@ insufficient evidence.
   Multipart needs explicit FormData serialization. Raw SSE bytes provide neither
   event parsing nor Schema decoding or reserved-failure handling.
 
-With Effect 4.0.0, native-default buffer-16 cancellation preserves an active unary
-on a shared WebSocket even with the queue full. An overflowing buffer of size one
-can stall other calls. A client chunk Schema failure can also fail unrelated calls;
+With Effect 4.0.0, a shared-WebSocket control filled the native buffer of size 16
+with one acknowledged 16-value chunk, consumed no values, then immediately closed
+the request Scope; an active unary still succeeded. Larger chunks and unfinished
+offers are outside that control's evidence. An overflowing buffer of size one can
+stall other calls. A client chunk Schema failure can also fail unrelated calls;
 larger buffers do not isolate decoding failures. Keep streaming schemas compatible.
 
 Single-element arrays in GET and form-urlencoded payloads can fail native server

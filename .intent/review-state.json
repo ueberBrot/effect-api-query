@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "c496757f699960869149de59b1a37280c22e1f022c3cc6f25cc0ea7ecbf20734",
+      "fingerprint": "a3bf4bade8a0d22421ac0a8269a28dcdb2bde043b9c8b89c69243a4908081363",
       "snapshot": {
         "GLOSSARY.md": "67de06543ad2fd9fd2917419e19d1f071e7b6eee53d48fca05e9dddfc739c683",
         "README.md": "180645e1034d98e8bf748412b448da09233c4189551e28164f4ac0c6254b0b5d",
@@ -113,7 +113,7 @@
         "scripts/verify-vue-solid-consumer.mts": "0ba286c3ac90f2ba30a9e40fc33ea954cedeca8b81d016ccbc7c246c0d587f8c",
         "skills/effect-api-query/SKILL.md": "3a669780d107fbcb42b802991cff55ba3ff3d1bb2a77b24d1c658bc107894d5b",
         "skills/effect-api-query/references/cache-workflows.md": "27bb96c48c84254ab8c379a529402f81cea3723c17d6396527c090a8c37e6f65",
-        "skills/effect-api-query/references/frameworks-and-hosts.md": "2a8aac07813aa1bf064d99950a62d60e916b78336c44dd49a83b4be131c6b7a4",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "4143e54e4361d09272a6207b032185494df851ed3e5adddf0fa5aee9ee7d65ec",
         "skills/effect-api-query/references/http.md": "9625411753fcc3ce816512f80158a19aa1057518ab3bfde98720e0cc7f845b66",
         "skills/effect-api-query/references/hydration-and-ssr.md": "61e761b36ebcf56c7cc1b67b3d795edba52d0c0224c3e7964297ed6864e1b044",
         "skills/effect-api-query/references/query-patterns.md": "33ea307b7042660da4ee4f6acea147d4218688a0256d82f3d582ff2e9cef4f9c",
@@ -243,17 +243,18 @@
         "tests/types/tanstack-start-contract.ts": "c99d47160bcaeeb851a489c79f3e8b62c202b41339ba1de3579811b28ee491e8",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "8b2b346ebe98e134de19a9ff5bff91c431fd80c3",
-      "outcome": "no-change",
-      "reason": "Restored the exact original default-expression bytes after the reversible native source-drift demonstration. The documented 10 MiB decoder default and its normalized identity are unchanged.",
+      "head": "b9750fadddbb4a2acc9672132b8ad2f49f76d62f",
+      "outcome": "updated",
+      "reason": "Narrowed the Effect 4.0.0 shared-WebSocket buffer-16 claim to the exact observed control: one acknowledged 16-value chunk, zero consumption, immediate request-Scope closure, and concurrent active unary success. Kept larger chunks and unfinished offers unverified and retained reproduced buffer-one overflow and chunk-Schema isolation limits.",
       "evidence": [
-        "src/http/streamed-query.ts restored byte-for-byte from the captured pre-demonstration file and matches integration 8b2b346e.",
-        "Both expression orders equal 10485760; actual changed-source HTTP stream fixture passed; the restored source is the same input used by the successful complete packed-consumer matrix.",
-        "Native restoration reopened both owned items; this revision-bound assessment clears them without suppressing unrelated review issues."
+        "Independent Standards finding: notes/128-standards-review.md; the prior statement generalized the observed control.",
+        "notes/102-audit-upstream-assessment.md lines 11-13 and notes/102-merged.md describe the acknowledged single-chunk/native-full-queue/zero-consumption control, unary result 42 and exact limits.",
+        "Only reference prose and native planning history changed; all TypeScript examples, public source/type/runtime inputs, dependency policy, installed tools and unrelated native reports remain untouched.",
+        "Unreleased scope introduces no migration guide, old-version recipe or backward-compatibility shim obligation; current cache identity and owner guidance remains relevant."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "e8be75fe4ad834867008582b3add9b04b1db8414621dee407ae08e17439e3a11",
+      "fingerprint": "a236016a83007fa27c6817b020a93587288a96814f9c1ac0e8df6b1908849495",
       "snapshot": {
         ".agents/skills/ask-matt/PHASE-BOUNDARIES.md": "a8aa20158609ef39e2b308b6ba0660c91066838d07a867202e63a7744a88a3ed",
         ".agents/skills/ask-matt/SKILL.md": "1371f5ce005de0992a44b137748bfb960a56948aa9871b405fe9d90b24332e3c",
@@ -338,7 +339,7 @@
         "GLOSSARY.md": "67de06543ad2fd9fd2917419e19d1f071e7b6eee53d48fca05e9dddfc739c683",
         "README.md": "180645e1034d98e8bf748412b448da09233c4189551e28164f4ac0c6254b0b5d",
         "_artifacts/domain_map.yaml": "8224488c427ad6ae380228b8094f42c242ab3776d5fbf0ca468dee7640f46c0e",
-        "_artifacts/skill_spec.md": "9b9c19bb59a032974a80f770fc51bb130967b8892b15f6469de0cb0abe7f30fa",
+        "_artifacts/skill_spec.md": "f0dbb231cf68a87a1516b079d8393e8e3e2da60ffb7cecd35fd47d536fd242a6",
         "_artifacts/skill_tree.yaml": "10613ee32d40eeabf09ef0c0d4850705c162fd9006fc88c46257338a7e16cb2f",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "d5e19bc6fca8a885c46c411c9f9d793b02e00ff8a057e15bec6da63988098540",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "9361c0ccecc832338835f87103518d1ff8295bbdb24ae1b402e0f218322d8258",
@@ -446,7 +447,7 @@
         "scripts/verify-vue-solid-consumer.mts": "0ba286c3ac90f2ba30a9e40fc33ea954cedeca8b81d016ccbc7c246c0d587f8c",
         "skills/effect-api-query/SKILL.md": "3a669780d107fbcb42b802991cff55ba3ff3d1bb2a77b24d1c658bc107894d5b",
         "skills/effect-api-query/references/cache-workflows.md": "27bb96c48c84254ab8c379a529402f81cea3723c17d6396527c090a8c37e6f65",
-        "skills/effect-api-query/references/frameworks-and-hosts.md": "2a8aac07813aa1bf064d99950a62d60e916b78336c44dd49a83b4be131c6b7a4",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "4143e54e4361d09272a6207b032185494df851ed3e5adddf0fa5aee9ee7d65ec",
         "skills/effect-api-query/references/http.md": "9625411753fcc3ce816512f80158a19aa1057518ab3bfde98720e0cc7f845b66",
         "skills/effect-api-query/references/hydration-and-ssr.md": "61e761b36ebcf56c7cc1b67b3d795edba52d0c0224c3e7964297ed6864e1b044",
         "skills/effect-api-query/references/query-patterns.md": "33ea307b7042660da4ee4f6acea147d4218688a0256d82f3d582ff2e9cef4f9c",
@@ -576,13 +577,14 @@
         "tests/types/tanstack-start-contract.ts": "c99d47160bcaeeb851a489c79f3e8b62c202b41339ba1de3579811b28ee491e8",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "8b2b346ebe98e134de19a9ff5bff91c431fd80c3",
-      "outcome": "no-change",
-      "reason": "Restored the exact original default-expression bytes after the reversible native source-drift demonstration. The documented 10 MiB decoder default and its normalized identity are unchanged.",
+      "head": "b9750fadddbb4a2acc9672132b8ad2f49f76d62f",
+      "outcome": "updated",
+      "reason": "Narrowed the Effect 4.0.0 shared-WebSocket buffer-16 claim to the exact observed control: one acknowledged 16-value chunk, zero consumption, immediate request-Scope closure, and concurrent active unary success. Kept larger chunks and unfinished offers unverified and retained reproduced buffer-one overflow and chunk-Schema isolation limits.",
       "evidence": [
-        "src/http/streamed-query.ts restored byte-for-byte from the captured pre-demonstration file and matches integration 8b2b346e.",
-        "Both expression orders equal 10485760; actual changed-source HTTP stream fixture passed; the restored source is the same input used by the successful complete packed-consumer matrix.",
-        "Native restoration reopened both owned items; this revision-bound assessment clears them without suppressing unrelated review issues."
+        "Independent Standards finding: notes/128-standards-review.md; the prior statement generalized the observed control.",
+        "notes/102-audit-upstream-assessment.md lines 11-13 and notes/102-merged.md describe the acknowledged single-chunk/native-full-queue/zero-consumption control, unary result 42 and exact limits.",
+        "Only reference prose and native planning history changed; all TypeScript examples, public source/type/runtime inputs, dependency policy, installed tools and unrelated native reports remain untouched.",
+        "Unreleased scope introduces no migration guide, old-version recipe or backward-compatibility shim obligation; current cache identity and owner guidance remains relevant."
       ]
     },
     "source:vite.config.ts": {
