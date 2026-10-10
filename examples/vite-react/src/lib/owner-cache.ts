@@ -15,6 +15,16 @@ const OwnerIdentity = Schema.Struct({
 
 export type ApplicationOwnerIdentity = typeof OwnerIdentity.Type
 export type DirectoryStorage = Pick<Storage, 'getItem' | 'removeItem' | 'setItem'>
+type TrackedMutationOptions<TData, TError, TVariables, TOnMutateResult> = MutationOptions<
+  TData,
+  TError,
+  TVariables,
+  TOnMutateResult
+> & {
+  readonly mutationFn: MutationFunction<TData, TVariables>
+  readonly networkMode: 'always'
+  readonly retry: false
+}
 
 const Directory = Schema.Array(
   Schema.Struct({ id: Schema.Int, name: Schema.String, locale: Schema.String }),
@@ -78,7 +88,7 @@ export const makeOwnerCache = ({
     options: MutationOptions<TData, TError, TVariables, TOnMutateResult> & {
       readonly mutationFn: MutationFunction<TData, TVariables>
     },
-  ) => ({
+  ): TrackedMutationOptions<TData, TError, TVariables, TOnMutateResult> => ({
     ...options,
     networkMode: 'always' as const,
     retry: false as const,
