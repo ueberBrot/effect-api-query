@@ -37,10 +37,10 @@ an indefinitely open replacement therefore keeps showing the previous history. S
 
 ## Assess writes and references separately
 
-Accumulated streams publish immutable arrays. A history bound limits their length; each consumed
-value still contributes to cache updates. Live queries also accept each value, including repeated
-values. Native structural sharing can preserve equal data references without suppressing those
-cache writes.
+Accumulated streams build new history arrays without mutating previous publications. A history
+bound limits their length; each consumed value still contributes to cache updates. Live queries
+also accept each value, including repeated values. Native structural sharing can preserve equal
+data references without suppressing those cache writes.
 
 For JSON-compatible values, TanStack's default structural sharing can reuse unchanged objects and
 nested values. A moving window changes array positions, so sharing can also produce additional
