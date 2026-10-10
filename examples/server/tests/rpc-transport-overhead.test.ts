@@ -300,20 +300,22 @@ const settleSharedStream = Effect.fn('settleSharedStream')(function* (
     const { queryClient, unary } = yield* startSharedTransportQuery(client, clientScope)
     yield* Deferred.await(unaryStarted).pipe(Effect.timeout('2 seconds'))
     const requestScope = yield* Scope.fork(clientScope, 'sequential')
-    const { values, bufferedBeforeConsumption } = yield* Effect.gen(function* () {
+    const { values, bufferedAtCancellation } = yield* Effect.gen(function* () {
       if (completion === 'cancel') {
         const queue = yield* client('burst', undefined, { asQueue: true })
         yield* Deferred.await(burstOnWire).pipe(Effect.timeout('2 seconds'))
         yield* Deferred.await(serverAcknowledged).pipe(Effect.timeout('2 seconds'))
         const buffered = yield* Queue.size(queue)
-        const first = yield* Queue.take(queue).pipe(Effect.timeout('2 seconds'))
-        return { values: [first], bufferedBeforeConsumption: buffered }
+        yield* Scope.close(requestScope, Exit.void)
+        return { values: [], bufferedAtCancellation: buffered }
       }
       const completedValues = yield* client('burst', undefined).pipe(Stream.runCollect)
-      return { values: completedValues, bufferedBeforeConsumption: undefined }
+      return { values: completedValues, bufferedAtCancellation: undefined }
     }).pipe(Scope.provide(requestScope), Effect.timeout('2 seconds'))
     const chunkOnWire = yield* Deferred.await(burstOnWire).pipe(Effect.timeout('2 seconds'))
-    yield* Scope.close(requestScope, Exit.void)
+    if (completion === 'complete') {
+      yield* Scope.close(requestScope, Exit.void)
+    }
     const finalizers = yield* Deferred.await(serverFinalized).pipe(Effect.timeout('2 seconds'))
     yield* Deferred.succeed(unaryRelease, undefined)
     const wireValue = yield* Deferred.await(unaryOnWire).pipe(Effect.timeout('2 seconds'))
@@ -322,7 +324,7 @@ const settleSharedStream = Effect.fn('settleSharedStream')(function* (
     yield* Scope.close(clientScope, Exit.void)
     return {
       values,
-      bufferedBeforeConsumption,
+      bufferedAtCancellation,
       remoteFinalizers: finalizers,
       chunkOnWire,
       unaryOnWire: wireValue,
@@ -341,8 +343,8 @@ describe('shared RPC streams over WebSocket', () => {
         const { unaryExit, ...observations } = yield* settleSharedStream(completion)
         expect(observations).toStrictEqual({
           values:
-            completion === 'cancel' ? [1] : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
-          bufferedBeforeConsumption: completion === 'cancel' ? 16 : undefined,
+            completion === 'cancel' ? [] : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+          bufferedAtCancellation: completion === 'cancel' ? 16 : undefined,
           remoteFinalizers: 1,
           chunkOnWire: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
           unaryOnWire: 42,
