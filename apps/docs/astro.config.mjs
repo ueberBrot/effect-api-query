@@ -76,6 +76,7 @@ export default defineConfig({
             { label: 'Retry Queries', slug: 'guides/retry-queries' },
             { label: 'Query Defaults', slug: 'guides/query-defaults' },
             { label: 'Hydrate Unary Data', slug: 'guides/hydrate-unary-data' },
+            { label: 'Hydrate Query Views', slug: 'guides/hydrate-query-views' },
             { label: 'Custom Key Encoders', slug: 'guides/custom-key-encoders' },
             { label: 'Conditional Queries', slug: 'guides/conditional-queries' },
           ],
