@@ -7,6 +7,9 @@ Pass generated options from either factory to the framework's native Query hooks
 `VueQueryPlugin` in Vue or `QueryClientProvider` in Solid, and acquire the ready client before
 creating the utilities. Keep its `Scope` and any serviceful runner alive while queries use them.
 
+The examples target Vue 3.5.43 with Vue Query 5.104.0 and Solid 1.9.15 with Solid Query 5.104.0.
+Both use Query Core 5.104.0.
+
 Match the native Query wrapper to the application's Query Core and use a compiler supported by
 the framework's tooling. See the
 [compatibility reference](/effect-api-query/reference/compatibility-and-limits/) for adapter capabilities.
@@ -74,6 +77,11 @@ const user = useQuery(() => {
 
 Read the selected value from `user.data`. Apply the same computed/accessor pattern to
 `infiniteOptions`, `streamedOptions`, `liveOptions`, and `metadataOptions` when their input changes.
+
+Pass `rpc.users.write.mutationOptions()` to Vue's `useMutation`, or use
+`useMutation(() => rpc.users.write.mutationOptions())` in Solid. Supply each execution's input
+through `mutate(variables)`; use Vue `computed` or a Solid accessor when mutation settings depend
+on reactive state.
 
 ## Choose native options carefully
 

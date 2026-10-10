@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "7c985709b807e79703000bd34c139f7a306d7fe16136783a0bc55090eac2f8f4",
+      "fingerprint": "9ef1b45598771f31217b5424f0b5fa3db37bdec994fff19f4fe7fd5011f61302",
       "snapshot": {
         "GLOSSARY.md": "67de06543ad2fd9fd2917419e19d1f071e7b6eee53d48fca05e9dddfc739c683",
         "README.md": "35d680dfe39a73da641b0d3fda4480883a486b6f43942138d2db9981971b82bf",
@@ -35,10 +35,10 @@
         "apps/docs/src/content/docs/guides/refresh-from-events.md": "a51ef3777eb9ea07f561d2223c6d8ffa063c87ecda25cb74ce0aea4b037fa2fe",
         "apps/docs/src/content/docs/guides/retry-queries.md": "f725f54696712cc917089e18e905022c6ab097e44f8d22f499ab87fb30af9a99",
         "apps/docs/src/content/docs/guides/stream-snapshots.md": "62e343dc7fa2f4b1b6fb1b699ecb947bcdfc0312c9ffab584b0b8bfaf954f854",
-        "apps/docs/src/content/docs/guides/svelte-and-angular.md": "aa8d0e6c20a46e95050314b3ef3b0e6b1d88fce8474a7b719f823d1c26ca502b",
+        "apps/docs/src/content/docs/guides/svelte-and-angular.md": "8a5741996407c81c54a75ab3fb086a4c6866913a2a14f71801876891fb49753f",
         "apps/docs/src/content/docs/guides/switch-cache-owners.md": "08e883a245679cf05d4cb65c93e5b9f1887022a972b98ab295aa248880ab9b7f",
         "apps/docs/src/content/docs/guides/tanstack-start.md": "28a196e44e1b6b49131b05e370cb029670599fefe6aad6ff54ed9d3d3f07ddac",
-        "apps/docs/src/content/docs/guides/vue-and-solid.md": "53bf77115f7d5e1bb5538041d0435643991294b945d4f37cf6ecdbfb8afca269",
+        "apps/docs/src/content/docs/guides/vue-and-solid.md": "2b0b31da53f2b5e86cd5fb3abe5353c28e02e73dc485133d6f593c9f5d30cf06",
         "apps/docs/src/content/docs/guides/websocket-clients.md": "9ec635105fd84c30dc52833ed3adcf80a46313deb0112d4e72cd1a5603c6170c",
         "apps/docs/src/content/docs/index.mdx": "5c22ad2256052013855d92e21d4a277f4c3e92931ea71fd0c1b3e7f5aceb9584",
         "apps/docs/src/content/docs/reference/browser-and-worker-hosts.md": "70743a4429a39937515c8d5fee79ca75714a92dd526f1093f9fa8ea12fbde984",
@@ -193,17 +193,19 @@
         "tests/types/tanstack-start-contract.ts": "51681e3d0d7504a614d490f18adb6f44db82d34b9d4d7cb9cf941aea33de284f",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "6893603eab70bd9d67e9848414eccc8a3421d870",
+      "head": "f56fbfaa6c79e869f15e98d457b5ee6eb07d7b86",
       "outcome": "no-change",
-      "reason": "The only mapped changes since the last review are README delivery syntax and the Intent devDependency pin. The seven-file integration skill still describes the same public API and application ownership; no consumer recipe changed.",
+      "reason": "The two human guides now state their historical example-version scope and the existing native Vue/Solid mutation-hook mapping. The shipped frameworks reference already specifies matching native mutation hooks, per-execution variables, reactive option rebuilding, wrapper/Core matching, and the same native inference/lifetime limits. No public behavior or developer task changed, so all seven skill files remain accurate.",
       "evidence": [
-        "README.md adds the native-supported --full-depth flag; package.json pins eligible @tanstack/intent 0.5.3.",
-        "Skills CLI 1.7.0 genuinely discovered and copied this repository-root skill: seven byte-identical files and 13 internal relative links; notes/skills-cli-smoke.md records the local-copy scope and limits.",
-        "Current batch: scoped vp run format, native vp run skills-check, and installed YAML parsing passed; vp exec intent maintainer sync reported nothing to synchronize."
+        "Read skills/effect-api-query/SKILL.md and references/frameworks-and-hosts.md; the existing mutation/variable/reactivity and framework-boundary statements still match the guide corrections.",
+        "Historical 5ff2638289a1ba47d4b7d867d9c50deb5b4d5c4a tests/packed-consumer/vue-solid-contract.ts:185-205 and 352-359 use Vue useMutation(options), Solid useMutation(() => options), and mutate(variables); completed 118-final-matrix.log records the actual Vue3.5.43/Solid1.9.15 plus wrappers5.104.0 checks.",
+        "119.md and primary 119-framework-metadata.json establish the Svelte5.57.1/Query6.3.0 and Angular22.2.1/experimentalQuery5.104.0 recipe scope. No current certification or new framework matrix is claimed.",
+        "Fresh vp run docs-build passed exact snippet parity, Astro0errors/warnings/hints,44pages/search/internal links with0/3cache hits; scoped vp run format and git diff --check passed.",
+        "No fresh framework consumer task was run for these prose additions; unchanged historical compiler/host evidence supplies the API comparison. Retired installed matrices remain retired."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "be5b9673275b1e93a738b52799433b9f9c6785a34ada4b9250c84a9fa5d4bbea",
+      "fingerprint": "ce230bb1a3ed5e994d0aac0740ecaee72fe7601fc1feafa3b78a2718dad155d0",
       "snapshot": {
         "GLOSSARY.md": "67de06543ad2fd9fd2917419e19d1f071e7b6eee53d48fca05e9dddfc739c683",
         "README.md": "35d680dfe39a73da641b0d3fda4480883a486b6f43942138d2db9981971b82bf",
@@ -238,10 +240,10 @@
         "apps/docs/src/content/docs/guides/refresh-from-events.md": "a51ef3777eb9ea07f561d2223c6d8ffa063c87ecda25cb74ce0aea4b037fa2fe",
         "apps/docs/src/content/docs/guides/retry-queries.md": "f725f54696712cc917089e18e905022c6ab097e44f8d22f499ab87fb30af9a99",
         "apps/docs/src/content/docs/guides/stream-snapshots.md": "62e343dc7fa2f4b1b6fb1b699ecb947bcdfc0312c9ffab584b0b8bfaf954f854",
-        "apps/docs/src/content/docs/guides/svelte-and-angular.md": "aa8d0e6c20a46e95050314b3ef3b0e6b1d88fce8474a7b719f823d1c26ca502b",
+        "apps/docs/src/content/docs/guides/svelte-and-angular.md": "8a5741996407c81c54a75ab3fb086a4c6866913a2a14f71801876891fb49753f",
         "apps/docs/src/content/docs/guides/switch-cache-owners.md": "08e883a245679cf05d4cb65c93e5b9f1887022a972b98ab295aa248880ab9b7f",
         "apps/docs/src/content/docs/guides/tanstack-start.md": "28a196e44e1b6b49131b05e370cb029670599fefe6aad6ff54ed9d3d3f07ddac",
-        "apps/docs/src/content/docs/guides/vue-and-solid.md": "53bf77115f7d5e1bb5538041d0435643991294b945d4f37cf6ecdbfb8afca269",
+        "apps/docs/src/content/docs/guides/vue-and-solid.md": "2b0b31da53f2b5e86cd5fb3abe5353c28e02e73dc485133d6f593c9f5d30cf06",
         "apps/docs/src/content/docs/guides/websocket-clients.md": "9ec635105fd84c30dc52833ed3adcf80a46313deb0112d4e72cd1a5603c6170c",
         "apps/docs/src/content/docs/index.mdx": "5c22ad2256052013855d92e21d4a277f4c3e92931ea71fd0c1b3e7f5aceb9584",
         "apps/docs/src/content/docs/reference/browser-and-worker-hosts.md": "70743a4429a39937515c8d5fee79ca75714a92dd526f1093f9fa8ea12fbde984",
@@ -396,16 +398,14 @@
         "tests/types/tanstack-start-contract.ts": "51681e3d0d7504a614d490f18adb6f44db82d34b9d4d7cb9cf941aea33de284f",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "6893603eab70bd9d67e9848414eccc8a3421d870",
-      "outcome": "updated",
-      "reason": "Added actual coverage and batch history plus the native combined-check requirement to the existing spec. The domain map still owns ten tasks and their failure modes; the tree still registers one skill with the same sources, path, prerequisites, and package-only distribution. Removed hidden authoring paths in this snapshot reflect native 0.5.3 selection, not edits or completed reviews of unrelated skills.",
+      "head": "f56fbfaa6c79e869f15e98d457b5ee6eb07d7b86",
+      "outcome": "no-change",
+      "reason": "All three shared planning documents remain accurate: the domain map retains the same ten tasks and reactive/ownership failure modes; the spec retains one skill, six references, assessed coverage and existing history; the tree retains the same identity, source globs covering both changed guides, prerequisites and package-only distribution. This guide clarification adds no task, seam, source mapping, dependency, or behavior, so no planning rewrite or artificial history entry is needed.",
       "evidence": [
-        "Reviewed _artifacts/domain_map.yaml, _artifacts/skill_spec.md, and _artifacts/skill_tree.yaml against unchanged skills/effect-api-query.",
-        "Both planning YAML files parsed; existing task coverage, source mappings, local prerequisite list, and distribution.mode:none verified. Native sync required no metadata edits.",
-        "Installed 0.5.3 dist/utils-BIaJYiMg.mjs isDefaultSkillPath excludes hidden directories; no .agents ignore or tool patch was added.",
-        "Source 6893603: CI 38085762210 passed source quality, both example builds, documentation, and Chromium/Firefox/WebKit acceptance; saved final-mts-ci.json and final-mts-ci.log.",
-        "Current batch: scoped vp run format, native vp run skills-check, and installed YAML parsing passed; vp exec intent maintainer sync reported nothing to synchronize.",
-        "Native combined maintainer check passed with default base and actual PR base 5b91ddb1de13970365669c887b9d767ea417fbd4; GitHub summary reports one skill, zero stale metadata, zero authoring issues, and zero pending reviews. Scoped formatting passed after the history edit."
+        "Read _artifacts/domain_map.yaml, _artifacts/skill_spec.md and _artifacts/skill_tree.yaml against the two guide additions and unchanged seven-file skill.",
+        "Installed YAML parsing passed for map/tree, verified ten assessed tasks, one implemented skill with existing path/no prerequisites, and distribution.mode:none; native maintainer sync reported nothing to synchronize.",
+        "Fresh vp run docs-build and scoped format passed; documentation version scopes are historical recipe targets and do not widen the planning support claims.",
+        "Current native review contains only this planning item and the owned skill item; mapped documentation inputs are not separate unmapped source items. All other stored outcomes are preserved."
       ]
     },
     "source:vite.config.ts": {
