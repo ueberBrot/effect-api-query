@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "types": ["node"] },
+  "include": [
+    "vue-solid-contract.ts",
+    "vue-solid-runtime.ts",
+    "docs-vue-query.ts",
+    "docs-solid-query.ts"
+  ]
+}

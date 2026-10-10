@@ -385,7 +385,11 @@ const peerCases = queryCoreCompatibilityCases()
 const runTypeScript = (
   consumerDirectory: string,
   compiler: (typeof compilerCases)[number],
-  project: 'tsconfig.json' | 'tsconfig.tanstack-start.json' | 'tsconfig.type-scale.json',
+  project:
+    | 'tsconfig.json'
+    | 'tsconfig.tanstack-start.json'
+    | 'tsconfig.type-scale.json'
+    | 'tsconfig.vue-solid.json',
   extendedDiagnostics: boolean,
 ): void => {
   console.log(`Verifying ${project} with ${compiler.label}`)
@@ -571,6 +575,8 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       dependencies: {
         '@tanstack/query-core': peer.queryCoreVersion,
         '@tanstack/react-query': peer.reactQueryVersion,
+        '@tanstack/solid-query': peer.queryCoreVersion,
+        '@tanstack/vue-query': peer.queryCoreVersion,
         '@tanstack/react-router': testedVersion('@tanstack/react-router'),
         '@tanstack/react-router-ssr-query': testedVersion('@tanstack/react-router-ssr-query'),
         '@tanstack/react-start': testedVersion('@tanstack/react-start'),
@@ -581,6 +587,8 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
         'effect-api-query': `file:${tarballPath}`,
         react: testedVersion('react'),
         'react-dom': testedVersion('react-dom'),
+        'solid-js': '1.9.15',
+        vue: '3.5.43',
       },
     }
     writeFileSync(
@@ -638,6 +646,7 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
     for (const compiler of compilerCases) {
       runTypeScript(consumerDirectory, compiler, 'tsconfig.json', false)
       runTypeScript(consumerDirectory, compiler, 'tsconfig.tanstack-start.json', false)
+      runTypeScript(consumerDirectory, compiler, 'tsconfig.vue-solid.json', false)
       runTypeScript(
         consumerDirectory,
         compiler,
@@ -673,6 +682,14 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
         stdio: 'inherit',
       })
     }
+    execFileSync(
+      process.execPath,
+      [
+        nodePath.join(repositoryRoot, 'scripts', 'verify-vue-solid-consumer.mts'),
+        consumerDirectory,
+      ],
+      { stdio: 'inherit' },
+    )
   } finally {
     rmSync(consumerDirectory, { force: true, recursive: true })
   }

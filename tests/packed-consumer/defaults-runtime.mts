@@ -74,6 +74,35 @@ await Effect.runPromise(
       queryClient.clear()
     }
     for (const mode of ['global', 'prefix'] as const) {
+      const seedClient = new QueryClient({
+        defaultOptions: {
+          queries: {
+            gcTime: Infinity,
+            staleTime: Infinity,
+            retry: false,
+            ...(mode === 'global' ? { initialData: { id: -1, name: 'inherited' } } : {}),
+          },
+        },
+      })
+      if (mode === 'prefix') {
+        seedClient.setQueryDefaults(rpc.users.key(), {
+          initialData: { id: -1, name: 'inherited' },
+        })
+      }
+      try {
+        const options = rpc.users.get.queryOptions({
+          input: { id: 1 },
+          initialData: undefined,
+        })
+        deepStrictEqual(yield* Effect.promise(() => seedClient.query(options)), {
+          id: 1,
+          name: 'Ada',
+        })
+      } finally {
+        seedClient.clear()
+      }
+    }
+    for (const mode of ['global', 'prefix'] as const) {
       let fallbackCalls = 0
       const hashClient = new QueryClient({
         defaultOptions: {
