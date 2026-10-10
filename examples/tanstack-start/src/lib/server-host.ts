@@ -1,7 +1,7 @@
 import '@tanstack/react-start/server-only'
+import { makeExampleHost } from '@effect-api-query/server/web-handler'
 import { Effect, Exit, Scope } from 'effect'
 
-import { makeExampleHost } from '../../../server/src/web-handler.ts'
 import { reportCleanupFailure } from './application.ts'
 import { startServerApplication } from './server-application.ts'
 

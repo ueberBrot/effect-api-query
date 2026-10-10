@@ -473,7 +473,10 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
               "'../optimistic-contracts/client.ts'",
             )
             .replaceAll("'@effect-api-query/contracts'", "'../optimistic-contracts/index.ts'")
-            .replaceAll("'../../../server/src/web-handler.ts'", "'../start-server/web-handler.ts'"),
+            .replaceAll(
+              "'@effect-api-query/server/web-handler'",
+              "'../start-server/web-handler.ts'",
+            ),
         )
       }
     }
