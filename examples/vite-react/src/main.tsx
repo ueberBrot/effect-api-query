@@ -32,7 +32,13 @@ const dispose = () => {
   }
   disposed = true
   root.unmount()
-  void application.dispose({ discardPersistence: false })
+  void (async () => {
+    try {
+      await application.dispose({ discardPersistence: false })
+    } catch (error) {
+      console.error('Vite resource cleanup failed', error)
+    }
+  })()
 }
 
 globalThis.addEventListener('pagehide', dispose, { once: true })
