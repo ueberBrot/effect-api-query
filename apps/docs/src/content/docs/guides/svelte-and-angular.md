@@ -7,6 +7,9 @@ Pass generated options through the framework's reactive accessor. Each builder c
 plain input when called, so create the options inside that accessor whenever the input can change.
 The same rule applies to RPC and HTTP queries, metadata views, accumulated streams, and live queries.
 
+The examples target Svelte 5.57.1 with Svelte Query 6.3.0 and Angular 22.2.1 with Angular Query
+experimental 5.104.0, both using Query Core 5.104.0.
+
 Keep captured values unchanged while their options can execute. See
 [Data Normalization](/effect-api-query/concepts/data-normalization/#keep-captured-inputs-unchanged)
 for the distinction between immutable keys and caller-owned input.
