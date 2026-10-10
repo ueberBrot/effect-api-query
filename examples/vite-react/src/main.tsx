@@ -16,6 +16,7 @@ if (container === null) {
 const application = await startViteReactApplication({
   rpcUrl,
   httpBaseUrl: import.meta.env.VITE_HTTP_BASE_URL ?? globalThis.location.origin,
+  directoryStorage: globalThis.sessionStorage,
 })
 const root = createRoot(container)
 root.render(
@@ -31,7 +32,7 @@ const dispose = () => {
   }
   disposed = true
   root.unmount()
-  void application.dispose()
+  void application.dispose({ discardPersistence: false })
 }
 
 globalThis.addEventListener('pagehide', dispose, { once: true })

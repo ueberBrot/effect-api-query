@@ -148,6 +148,75 @@ describe('User writes in the Vite application', () => {
     }
   })
 
+  it.each([true, false])(
+    'restores distinct failed deletions in directory order with the earlier failure first: %s',
+    async (earlierFailsFirst) => {
+      const fixture = await Effect.runPromise(makeControlledUserWrites(new QueryClient()))
+      const { queryClient, rpcQuery, httpQuery, userWrites } = fixture.application
+      const ada = new User({ id: 1, name: 'Ada', locale: 'en' })
+      const alan = new User({ id: 2, name: 'Alan', locale: 'en' })
+      const grace = new User({ id: 3, name: 'Grace', locale: 'en' })
+      const lists = [rpcQuery.users.list.queryKey(), httpQuery.users.list.queryKey()]
+      const pages = [
+        rpcQuery.users.page.infiniteKey({ cursor: 0, pageSize: 4 }),
+        httpQuery.users.page.infiniteKey({ query: { cursor: 0, pageSize: 4 } }),
+      ]
+      for (const key of lists) {
+        queryClient.setQueryData(key, [ada, alan])
+      }
+      for (const key of pages) {
+        queryClient.setQueryData(key, {
+          pages: [new UserPage({ users: [ada, alan], total: 2, nextCursor: null })],
+          pageParams: [0],
+        })
+      }
+      try {
+        const older = Effect.runPromiseExit(
+          Effect.promise(async () =>
+            new MutationObserver(queryClient, userWrites.rpcDelete()).mutate({ id: 1 }),
+          ),
+        )
+        const first = await fixture.nextDelete()
+        const newer = Effect.runPromiseExit(
+          Effect.promise(async () =>
+            new MutationObserver(queryClient, userWrites.httpDelete()).mutate({
+              params: { id: 2 },
+            }),
+          ),
+        )
+        const second = await fixture.nextDelete()
+        const creation = new MutationObserver(queryClient, userWrites.rpcCreate()).mutate({
+          name: 'Grace',
+        })
+        const created = await fixture.nextCreate()
+        await created.succeed(grace)
+        await creation
+        if (earlierFailsFirst) {
+          await first.fail()
+          await older
+          await second.fail()
+          await newer
+        } else {
+          await second.fail()
+          await newer
+          await first.fail()
+          await older
+        }
+        for (const key of lists) {
+          expect(queryClient.getQueryData(key)).toStrictEqual([ada, alan, grace])
+        }
+        for (const key of pages) {
+          expect(queryClient.getQueryData(key)).toStrictEqual({
+            pages: [new UserPage({ users: [ada, alan, grace], total: 3, nextCursor: null })],
+            pageParams: [0],
+          })
+        }
+      } finally {
+        await fixture.application.dispose()
+      }
+    },
+  )
+
   it('preserves a newer creation when an older create callback completes late', async () => {
     const fixture = await Effect.runPromise(makeControlledUserWrites(new QueryClient()))
     const { queryClient, rpcQuery, userWrites } = fixture.application

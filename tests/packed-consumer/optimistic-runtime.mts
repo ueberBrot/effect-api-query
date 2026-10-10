@@ -94,6 +94,66 @@ const grace = new User({ id: 3, name: 'Grace', locale: 'fr' })
   }
 }
 
+for (const earlierFailsFirst of [true, false]) {
+  const fixture = await makeOwner()
+  const { queryClient, rpcQuery, httpQuery, userWrites } = fixture.application
+  seed(fixture, [ada, alan])
+  const lists = [rpcQuery.users.list.queryKey(), httpQuery.users.list.queryKey()]
+  const pages = [
+    rpcQuery.users.page.infiniteKey({ cursor: 0, pageSize: 4 }),
+    httpQuery.users.page.infiniteKey({ query: { cursor: 0, pageSize: 4 } }),
+  ]
+  for (const key of pages) {
+    queryClient.setQueryData(key, {
+      pages: [new UserPage({ users: [ada, alan], total: 2, nextCursor: null })],
+      pageParams: [0],
+    })
+  }
+  try {
+    const older = Effect.runPromiseExit(
+      Effect.promise(() =>
+        new MutationObserver(queryClient, userWrites.rpcDelete()).mutate({ id: 1 }),
+      ),
+    )
+    const first = await fixture.nextDelete()
+    const newer = Effect.runPromiseExit(
+      Effect.promise(() =>
+        new MutationObserver(queryClient, userWrites.httpDelete()).mutate({ params: { id: 2 } }),
+      ),
+    )
+    const second = await fixture.nextDelete()
+    const creation = new MutationObserver(queryClient, userWrites.rpcCreate()).mutate({
+      name: 'Grace',
+      locale: 'fr',
+    })
+    const created = await fixture.nextCreate()
+    await created.succeed(grace)
+    await creation
+    if (earlierFailsFirst) {
+      await first.fail()
+      await older
+      await second.fail()
+      await newer
+    } else {
+      await second.fail()
+      await newer
+      await first.fail()
+      await older
+    }
+    for (const key of lists) {
+      deepStrictEqual(queryClient.getQueryData(key), [ada, alan, grace])
+    }
+    for (const key of pages) {
+      deepStrictEqual(queryClient.getQueryData(key), {
+        pages: [new UserPage({ users: [ada, alan, grace], total: 3, nextCursor: null })],
+        pageParams: [0],
+      })
+    }
+  } finally {
+    await fixture.application.dispose()
+  }
+}
+
 for (const newerSucceeds of [true, false]) {
   const fixture = await makeOwner()
   const { queryClient, rpcQuery, userWrites } = fixture.application
