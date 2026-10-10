@@ -54,5 +54,3 @@ render scheduling add their own behavior; cache notification counts do not count
 If the producer outruns the interface, set an explicit rate or sampling policy in the producer or
 an application-owned Effect Stream transformation. Sampling intentionally discards values.
 Retention and transport buffering serve different purposes from publication rate.
-
-See [Performance](/effect-api-query/reference/performance/) for repeatable stream measurements.

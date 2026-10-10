@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "027bc0aa2b2409a7772e55d9ac59ca7f3eda699d6d7bc936da7b4b340de6d163",
+      "fingerprint": "409a3ac75fed1835fc08dce902b467d8501daa91f658cd9e03a8eab345436941",
       "snapshot": {
         "GLOSSARY.md": "67de06543ad2fd9fd2917419e19d1f071e7b6eee53d48fca05e9dddfc739c683",
         "README.md": "b84fc747700efa4d7e53447f4b670e52fc22018de2777eaae0a663dd296e6528",
@@ -22,7 +22,7 @@
         "apps/docs/src/content/docs/guides/cache-filters.md": "46d06ee7e24f2ec143d0bb174442a7f5bc5299657d4bcdfb28a36782a69b3de6",
         "apps/docs/src/content/docs/guides/cache-management.md": "dd37ab2de934d10408a8f7c9ab07e39fde92e03d6190681e552c2dceea5b3607",
         "apps/docs/src/content/docs/guides/cancellation.md": "b0a79fb1578777115619d65f075f407595de0634ef0c52c4fc77256f0dca833c",
-        "apps/docs/src/content/docs/guides/choose-stream-history.md": "5b373e2febc6fae5ad811de00b93351ea677ed486a83e9cfe4aa3b3ec039c873",
+        "apps/docs/src/content/docs/guides/choose-stream-history.md": "6996df3a8b18c4fadbcc76a3635a8a5408f155b4068509d4801b38afa7f22f16",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "37cd6436daf90c0c060dcfcf4b9d7f0b165ee95858bb30cff9f38b45e132e029",
         "apps/docs/src/content/docs/guides/custom-key-encoders.md": "ffa8b915f0831e2081a5bd50c115977e444ee6319c624123e296e3455d754230",
         "apps/docs/src/content/docs/guides/handle-failures.md": "9cf4495638e2660cd272f4cfb634e58b53df33bba2242f6a91634e053a405ecf",
@@ -244,18 +244,18 @@
         "tests/types/tanstack-start-contract.ts": "c99d47160bcaeeb851a489c79f3e8b62c202b41339ba1de3579811b28ee491e8",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "879a98d73b73122aea334bd3964f80e443f2716f",
-      "outcome": "updated",
-      "reason": "Removed the canceled initial changelog source and registered the Start router lifecycle source. Current task guidance and library behavior remain intact; README/site prose now keeps recipes and practical limits without duplicated examples or maintenance narration.",
+      "head": "01f5d8c606397b157f74c9042fc28df53c7000d4",
+      "outcome": "no-change",
+      "reason": "Removed an inaccurate Performance-page pointer from the stream-history guide. The guide retains its retention, buffering, sharing and producer-rate instructions; the package and shipped skill recommend the same current behavior.",
       "evidence": [
-        "The exact source diff at 879a98d73b73122aea334bd3964f80e443f2716f removes CHANGELOG.md, its package allowlist/guard and source pointers; it preserves all library source/types and all six skill references.",
-        "131-content-packed.log: fresh uncached packed-package passes both Query peers and both supported compilers, all ten skill examples, installed discovery/reference resolution, runtime fixtures and four native framework hosts per peer; archive SHA512 d58d1f507bb5c6f4c4d95c74289d5f420f9aa3e67bd0196274a7f0a647d9526f45c9497eb52abc55923bba55a834df6ca0c8e39510262719d2312d7083ac2864.",
-        "131-content-start-tests-host.log: 22 tests across six files pass. 131-content-start-build.log and 131-content-start-boundary.json: native production build accepts static server imports and omits server modules from client output.",
-        "131-content-docs-check-final.log, 131-content-check-final.log and 131-content-effect-check.log pass. Independent content audit is 131-content-brevity-audit.md; no recommended runtime behavior or activation description changed."
+        "The only source change from 01f5d8c606397b157f74c9042fc28df53c7000d4 removes the two-line final pointer in guides/choose-stream-history.md; the destination and benchmark script concern construction/compiler/bundle costs, not stream-publication measurements.",
+        "The domain map, coverage spec and skill tree remain byte-identical and retain the same domain tasks, failure modes, source mappings and validation criteria. Native sync reports Nothing to synchronize.",
+        "131-content-correction-docs-check.log: fresh uncached snippet verification and Astro diagnostics pass with zero errors/warnings/hints. No TypeScript fence or compiled consumer fixture changed.",
+        "All thirteen selected archive members still match current source/native normalization. The complete fresh d58d1f507bb5c6f4 matrix and real Start source/build/client-boundary evidence remain input-identical; no new matrix execution is claimed."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "f5e607bbf2b6cb419627bf4a4ebc21ea7b2f74b8d2c8d3883a6fcc1469da5a98",
+      "fingerprint": "eb6821bf36cf3b4ac1d20903da7bd766463c75708a4ad2cb11f6c11084832343",
       "snapshot": {
         ".agents/skills/ask-matt/PHASE-BOUNDARIES.md": "a8aa20158609ef39e2b308b6ba0660c91066838d07a867202e63a7744a88a3ed",
         ".agents/skills/ask-matt/SKILL.md": "1371f5ce005de0992a44b137748bfb960a56948aa9871b405fe9d90b24332e3c",
@@ -357,7 +357,7 @@
         "apps/docs/src/content/docs/guides/cache-filters.md": "46d06ee7e24f2ec143d0bb174442a7f5bc5299657d4bcdfb28a36782a69b3de6",
         "apps/docs/src/content/docs/guides/cache-management.md": "dd37ab2de934d10408a8f7c9ab07e39fde92e03d6190681e552c2dceea5b3607",
         "apps/docs/src/content/docs/guides/cancellation.md": "b0a79fb1578777115619d65f075f407595de0634ef0c52c4fc77256f0dca833c",
-        "apps/docs/src/content/docs/guides/choose-stream-history.md": "5b373e2febc6fae5ad811de00b93351ea677ed486a83e9cfe4aa3b3ec039c873",
+        "apps/docs/src/content/docs/guides/choose-stream-history.md": "6996df3a8b18c4fadbcc76a3635a8a5408f155b4068509d4801b38afa7f22f16",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "37cd6436daf90c0c060dcfcf4b9d7f0b165ee95858bb30cff9f38b45e132e029",
         "apps/docs/src/content/docs/guides/custom-key-encoders.md": "ffa8b915f0831e2081a5bd50c115977e444ee6319c624123e296e3455d754230",
         "apps/docs/src/content/docs/guides/handle-failures.md": "9cf4495638e2660cd272f4cfb634e58b53df33bba2242f6a91634e053a405ecf",
@@ -579,14 +579,14 @@
         "tests/types/tanstack-start-contract.ts": "c99d47160bcaeeb851a489c79f3e8b62c202b41339ba1de3579811b28ee491e8",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "879a98d73b73122aea334bd3964f80e443f2716f",
-      "outcome": "updated",
-      "reason": "All three planning documents retain present domain tasks, failure modes, source ownership and reference routing. Removed superseded changelog pointers, batch/migration diaries and misplaced release-acceptance status; release acceptance remains tracker work rather than a missing guidance domain.",
+      "head": "01f5d8c606397b157f74c9042fc28df53c7000d4",
+      "outcome": "no-change",
+      "reason": "Removed an inaccurate Performance-page pointer from the stream-history guide. The guide retains its retention, buffering, sharing and producer-rate instructions; the package and shipped skill recommend the same current behavior.",
       "evidence": [
-        "_artifacts/domain_map.yaml preserves existing tasks, failure modes and tensions and removes only process-status gaps. _artifacts/skill_spec.md preserves current coverage and validation criteria without history. _artifacts/skill_tree.yaml matches current skill sources including the Start router.",
-        "Native maintainer sync reports Nothing to synchronize after final source mapping and formatting; the real review report shows both owned items without authoring problems.",
-        "Fresh installed package discovery, six references, ten compiler-checked skill examples, runtime recipes and native framework hosts pass in 131-content-packed.log; final docs diagnostics, full typed checks and strict Effect diagnostics pass.",
-        "Candidate all-engine CI and publication acceptance are not claimed by these planning records."
+        "The only source change from 01f5d8c606397b157f74c9042fc28df53c7000d4 removes the two-line final pointer in guides/choose-stream-history.md; the destination and benchmark script concern construction/compiler/bundle costs, not stream-publication measurements.",
+        "The domain map, coverage spec and skill tree remain byte-identical and retain the same domain tasks, failure modes, source mappings and validation criteria. Native sync reports Nothing to synchronize.",
+        "131-content-correction-docs-check.log: fresh uncached snippet verification and Astro diagnostics pass with zero errors/warnings/hints. No TypeScript fence or compiled consumer fixture changed.",
+        "All thirteen selected archive members still match current source/native normalization. The complete fresh d58d1f507bb5c6f4 matrix and real Start source/build/client-boundary evidence remain input-identical; no new matrix execution is claimed."
       ]
     },
     "source:vite.config.ts": {
