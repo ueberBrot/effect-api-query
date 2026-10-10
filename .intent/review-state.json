@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "a2bada77b166d6970eeed631cc1b1380bd5a383e999fd06e9f44951166c4519d",
+      "fingerprint": "2e63127101267abf3bf2fd691f4554cca23ebcbad3a479d43de861b5aa6a7c38",
       "snapshot": {
         "GLOSSARY.md": "67de06543ad2fd9fd2917419e19d1f071e7b6eee53d48fca05e9dddfc739c683",
         "README.md": "8ad663677e295d3583814150fe259553e4d7f2d7702fb5e432ab60c686af731e",
@@ -13,7 +13,7 @@
         "apps/docs/src/content/docs/concepts/queries-and-mutations.md": "a7f95a5c002e87261fa988fbbfe3c936e3601aea8c5b9c1878b8b60bc17da696",
         "apps/docs/src/content/docs/concepts/rpc-utility-tree.md": "fd5fcc232279e9577b8b2faf321a85e9a340e6090ea5887bbab208cca2d24a4e",
         "apps/docs/src/content/docs/concepts/semantic-keys.md": "eaf6d79c40af97da698bce206705633cdc3bf202921b745a82700214c2c4d48c",
-        "apps/docs/src/content/docs/examples.md": "33a788a5ddc6cdb5b1ce465562c7d8c93465d686cc4c15c5c2b9a6074ac5a3e8",
+        "apps/docs/src/content/docs/examples.md": "5fd7ea3c1e08d4a17e296870051657f5a18c3e8da0910b3420a5c2c9cfc9110c",
         "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "5ac3dc898362d5a12efcfedef6b2b026bd18e6ad5f7ac07a8449308aa7525789",
         "apps/docs/src/content/docs/getting-started/feature-support.md": "01c46393cfdda15574c57f97081ccfd0b690457a7a247abc61444af408002f64",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "eaf62e213ba22d1926dd75d7bad7bb9e6e69419309f0fcb1e6a7c0efe4d85c8b",
@@ -243,18 +243,17 @@
         "tests/types/tanstack-start-contract.ts": "c99d47160bcaeeb851a489c79f3e8b62c202b41339ba1de3579811b28ee491e8",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "a55b931a093f380b79b8d3d714cb3ec640a1411c",
+      "head": "2270d9ae34b86f2cb340b94cf3226e0d15c5a47c",
       "outcome": "no-change",
-      "reason": "The changed human documentation now states existing behavior already covered by the shipped skill and six references: captured inputs, stream cleanup and narrow transport limits, metadata policy installation, native workflows, tested versions, owner retirement and reactive consumers. All seven shipped guidance files and their ten TypeScript examples remain unchanged; no new capability or task branch is introduced.",
+      "reason": "The Vite example summary now describes its implemented query cancellation, cache clearing, accepted-command/mutation drain and runtime/client disposal. It links the existing separate stream-completion requirement instead of claiming the example already joins iterator cleanup. The shipped lifecycle and owner guidance is already accurate and remains byte-identical.",
       "evidence": [
-        "129-packed.log and 129-packed-baseline.json: fresh uncached packed-package task passes both supported compilers and Query peers, runtime fixtures, native framework hosts, package-only Intent discovery/loading, reference resolution and all ten shipped TypeScript examples.",
-        "129-archive-proof.json: all public source/type, packed-consumer, compiler-fixture and package/lock/workspace/config inputs match the a55b931 integration base; the fresh archive differs from the previous verified archive only in README.md. All seven shipped skill files are byte-identical.",
-        "129-docs-check.log: exact documentation TypeScript fence parity and Astro diagnostics pass. 129-skills-check.log: native scoped skill validation passes.",
-        "Independent prose review found no misleading capability claims and preserved the ADR architectural boundary. Native fresh-cache metadata and the acknowledged 16-value cancellation control retain the corrected 128 guidance and its explicit limits."
+        "129-standards-review.md identifies the accuracy breach; owner-cache.ts:147-173 awaits query cancellation and tracked mutations, and application.ts:91-110 then disposes the HTTP runtime and RPC client without a joined iterator-return signal.",
+        "apps/docs/src/content/docs/examples.md now states the actual disposal sequence and links concepts/client-lifecycle.md#stream-creation-and-consumption for the independent completion signal.",
+        "129-correction-input-proof.json proves all shipped README/skill/source/type/runtime/fixture/build/dependency inputs unchanged from the verified 2270d9 commit. The exact fresh 129 archive and full packed matrix remain applicable; no redundant repack or runtime test is needed for this unshipped prose correction."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "36d1d4a1ec1aa5431043400f0e8b08eeabe87e3eb152df738f62fe1d3cc4f873",
+      "fingerprint": "22a4742a3cdc25354d74766419f62c4e20d146ff6270027f41d8309f70d3ca22",
       "snapshot": {
         ".agents/skills/ask-matt/PHASE-BOUNDARIES.md": "a8aa20158609ef39e2b308b6ba0660c91066838d07a867202e63a7744a88a3ed",
         ".agents/skills/ask-matt/SKILL.md": "1371f5ce005de0992a44b137748bfb960a56948aa9871b405fe9d90b24332e3c",
@@ -339,7 +338,7 @@
         "GLOSSARY.md": "67de06543ad2fd9fd2917419e19d1f071e7b6eee53d48fca05e9dddfc739c683",
         "README.md": "8ad663677e295d3583814150fe259553e4d7f2d7702fb5e432ab60c686af731e",
         "_artifacts/domain_map.yaml": "793814eafd522d0dc5ae008a79ada21dd0c68b58550e283efab36e18309a759a",
-        "_artifacts/skill_spec.md": "42526aea48841221aabedb520997eaff74370ede376004108fc2bc4de91957db",
+        "_artifacts/skill_spec.md": "140c0a2fa7a54f4e4078a7f0736e6d87137576ecbf5f8a39ceaa1c2997b37983",
         "_artifacts/skill_tree.yaml": "10613ee32d40eeabf09ef0c0d4850705c162fd9006fc88c46257338a7e16cb2f",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "2df7835da74d37065ef2866008439e8bdc6b748c10edead65fcb52044d929399",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "13ec7ee3eba3859ec1c6f079cd8bc4dd80bf116eb63299e3645c004ff9fdf6ec",
@@ -347,7 +346,7 @@
         "apps/docs/src/content/docs/concepts/queries-and-mutations.md": "a7f95a5c002e87261fa988fbbfe3c936e3601aea8c5b9c1878b8b60bc17da696",
         "apps/docs/src/content/docs/concepts/rpc-utility-tree.md": "fd5fcc232279e9577b8b2faf321a85e9a340e6090ea5887bbab208cca2d24a4e",
         "apps/docs/src/content/docs/concepts/semantic-keys.md": "eaf6d79c40af97da698bce206705633cdc3bf202921b745a82700214c2c4d48c",
-        "apps/docs/src/content/docs/examples.md": "33a788a5ddc6cdb5b1ce465562c7d8c93465d686cc4c15c5c2b9a6074ac5a3e8",
+        "apps/docs/src/content/docs/examples.md": "5fd7ea3c1e08d4a17e296870051657f5a18c3e8da0910b3420a5c2c9cfc9110c",
         "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "5ac3dc898362d5a12efcfedef6b2b026bd18e6ad5f7ac07a8449308aa7525789",
         "apps/docs/src/content/docs/getting-started/feature-support.md": "01c46393cfdda15574c57f97081ccfd0b690457a7a247abc61444af408002f64",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "eaf62e213ba22d1926dd75d7bad7bb9e6e69419309f0fcb1e6a7c0efe4d85c8b",
@@ -577,14 +576,13 @@
         "tests/types/tanstack-start-contract.ts": "c99d47160bcaeeb851a489c79f3e8b62c202b41339ba1de3579811b28ee491e8",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "a55b931a093f380b79b8d3d714cb3ec640a1411c",
+      "head": "2270d9ae34b86f2cb340b94cf3226e0d15c5a47c",
       "outcome": "updated",
-      "reason": "The domain map records the observed imperative fresh-cache-hit policy failure and closes the human-documentation reconciliation gap. The planning specification records the exact acknowledged 16-value queue control, current unreleased scope, architectural ADR boundary and actual check results. The existing skill tree remains correct: the same single skill, six references, tasks, prerequisites and registered source paths cover these changes.",
+      "reason": "The planning history records the reviewed distinction between the Vite example disposal sequence and independently awaited iterator cleanup. The existing domain map and skill tree already express application-owned finalization and cover the example/lifecycle sources; their tasks, references and paths remain correct.",
       "evidence": [
-        "_artifacts/domain_map.yaml and _artifacts/skill_spec.md contain the reviewed metadata failure mode, resolved reconciliation scope, current queue limits and check history; the remaining approved work is version preparation and exact candidate verification.",
-        "_artifacts/skill_tree.yaml is unchanged after source-map review because README, every affected site page and ADR 0001 already belong to the existing registered tasks and source globs; no new skill or task is needed.",
-        "129-native-sync-final.log and 129-native-review-final.json: native synchronization succeeds; both owned items have no structural problems and actual changed-source fingerprints. The 54 unrelated review items receive no outcome.",
-        "129-packed.log, 129-docs-check.log and 129-skills-check.log pass. 129-docs-build.log records the linked Starlight virtual-style metadata failure; canonical build and browser validation remain required before integration."
+        "_artifacts/skill_spec.md records the corrected query-cancellation/accepted-command-drain/cache-clear/client-disposal sequence and separate application-owned iterator completion.",
+        "129-correction-native-sync.log and 129-correction-native-review.json identify only examples.md for the owned skill and examples.md plus skill_spec.md for planning; both owned items have no structural problems.",
+        "129-correction-input-proof.json preserves the exact applicable packed evidence. The unchanged domain map and skill tree retain accurate source mappings; unrelated native review outcomes are left untouched."
       ]
     },
     "source:vite.config.ts": {

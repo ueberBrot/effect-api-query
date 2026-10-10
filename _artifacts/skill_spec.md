@@ -96,6 +96,9 @@ bookkeeping nor syntax validation establishes semantic correctness by itself.
   fresh packed-consumer matrix pass. The worktree's Starlight build cannot resolve
   virtual style metadata through linked dependencies; canonical build and browser
   checks remain required before integration.
+  Standards review corrects the Vite example summary to its actual query
+  cancellation, accepted-command drain, cache clearing, and client disposal.
+  Independent iterator cleanup remains an application-owned completion signal.
 
 ## Remaining work
 
