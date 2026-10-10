@@ -17,49 +17,37 @@ This example disables retries globally, retries reads in the `users` branch twic
 `users.get` query view fresh for two minutes. The call-site `refreshUser` options request an
 immediate fetch without retries. `user` selects a name while the cache retains the full user.
 
+In the application cache module, import `QueryClient` from `@tanstack/query-core`:
+
 ```ts
-import { QueryClient } from '@tanstack/query-core'
-import { Schema } from 'effect'
-import { createRpcQueryUtils } from 'effect-api-query'
-import { Rpc, RpcGroup } from 'effect/rpc'
-import type { RpcClient } from 'effect/rpc'
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { staleTime: 30_000, gcTime: 600_000, retry: false, retryDelay: 250 },
+    mutations: { retry: false },
+  },
+})
+```
 
-export const usersRpc = RpcGroup.make(
-  Rpc.make('users.get', {
-    payload: { id: Schema.Int },
-    success: Schema.Struct({ id: Schema.Int, name: Schema.String }),
-    error: Schema.TaggedStruct('RetryLater', {}),
-  }),
-)
+After creating `rpc` with your ready client, register matching defaults:
 
-export const createApplicationQueries = <ClientError>(
-  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof usersRpc>, ClientError>,
-) => {
-  const rpc = createRpcQueryUtils<typeof usersRpc, readonly ['users-app'], ClientError>(usersRpc, {
-    client,
-    keyPrefix: ['users-app'],
-  })
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: { staleTime: 30_000, gcTime: 600_000, retry: false, retryDelay: 250 },
-      mutations: { retry: false },
-    },
-  })
-  queryClient.setQueryDefaults(rpc.key(), { staleTime: 60_000 })
-  queryClient.setQueryDefaults(rpc.users.key(), { retry: 2 })
-  queryClient.setQueryDefaults([...rpc.users.get.key(), 'query'], { staleTime: 120_000 })
+```ts
+queryClient.setQueryDefaults(rpc.key(), { staleTime: 60_000 })
+queryClient.setQueryDefaults(rpc.users.key(), { retry: 2 })
+queryClient.setQueryDefaults([...rpc.users.get.key(), 'query'], { staleTime: 120_000 })
+```
 
-  const user = rpc.users.get.queryOptions({
-    input: { id: 1 },
-    select: (value) => value.name,
-  })
-  const refreshUser = rpc.users.get.queryOptions({
-    input: { id: 1 },
-    staleTime: 0,
-    retry: false,
-  })
-  return { queryClient, rpc, user, refreshUser }
-}
+In the query consumer, omit inherited settings or override them for this call:
+
+```ts
+const user = rpc.users.get.queryOptions({
+  input: { id: 1 },
+  select: (value) => value.name,
+})
+const refreshUser = rpc.users.get.queryOptions({
+  input: { id: 1 },
+  staleTime: 0,
+  retry: false,
+})
 ```
 
 TanStack merges the QueryClient's global query defaults, every matching registered prefix in
@@ -85,41 +73,22 @@ HTTP prefixes use the same native APIs. This example retries the `users` group o
 five-second stale time only to the metadata view, and hashes every view through QueryClient's
 root-prefix policy. The ordinary query retains the global thirty-second stale time.
 
+In the same application cache module, with an existing `http` tree:
+
 ```ts
-import { QueryClient } from '@tanstack/query-core'
-import { Schema } from 'effect'
-import { createHttpApiQueryUtils } from 'effect-api-query'
-import { HttpApi, HttpApiEndpoint, HttpApiGroup, HttpApiSchema } from 'effect/http-api'
-import type { HttpApiClient } from 'effect/http-api'
+queryClient.setQueryDefaults(http.key(), {
+  queryKeyHashFn: (key) => `users:${JSON.stringify(key)}`,
+})
+queryClient.setQueryDefaults(http.users.key(), { retry: 1 })
+queryClient.setQueryDefaults([...http.users.get.key(), 'metadata'], { staleTime: 5_000 })
+```
 
-export const usersApi = HttpApi.make('users').add(
-  HttpApiGroup.make('users').add(
-    HttpApiEndpoint.get('get', '/users/:id', {
-      params: { id: Schema.Int },
-      success: Schema.Struct({ id: Schema.Int, name: Schema.String }),
-      error: Schema.TaggedStruct('RetryLater', {}).pipe(HttpApiSchema.status(503)),
-    }),
-  ),
-)
+In its query consumer:
 
-export const createHttpApplicationQueries = (client: HttpApiClient.ForApi<typeof usersApi>) => {
-  const http = createHttpApiQueryUtils(usersApi, { client, keyPrefix: ['users-app'] })
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: { staleTime: 30_000, retry: false, retryDelay: 250 },
-    },
-  })
-  queryClient.setQueryDefaults(http.key(), {
-    queryKeyHashFn: (key) => `users:${JSON.stringify(key)}`,
-  })
-  queryClient.setQueryDefaults(http.users.key(), { retry: 1 })
-  queryClient.setQueryDefaults([...http.users.get.key(), 'metadata'], { staleTime: 5_000 })
-
-  const input = { params: { id: 1 } }
-  const user = http.users.get.queryOptions({ input })
-  const metadata = http.users.get.metadataOptions({ input })
-  return { queryClient, http, user, metadata }
-}
+```ts
+const input = { params: { id: 1 } }
+const user = http.users.get.queryOptions({ input })
+const metadata = http.users.get.metadataOptions({ input })
 ```
 
 The ordinary and metadata views have separate keys. Configure global or prefix `queryKeyHashFn`
@@ -133,15 +102,14 @@ Use the generated exact `queryKey(input)` or `metadataKey(input)` with native `g
 the observer result, while a native write still supplies the complete user. A fresh native write
 is visible to observers and subsequent imperative reads without another client execution.
 
-Fetched metadata snapshots inherit QueryClient's global or prefix `structuralSharing` policy.
-Selected metadata results and later manual writes use an explicit per-call `metadataOptions`
-policy, or standard deep sharing if omitted. Initial, hydrated, manually written, and selected
-objects remain application-owned. Decoded data is not deep-frozen. See
-[Buffered metadata](/effect-api-query/reference/http-factory/#buffered-metadata) for that boundary.
+Fetched metadata follows native sharing defaults, while selected results and later manual writes
+use explicit per-call policy or standard deep sharing. See
+[Buffered metadata](/effect-api-query/reference/http-factory/#buffered-metadata) for immutable
+snapshot and application-owned data rules.
 
 An imperative `queryClient.query(newOptions)` hit on fresh cached data retains existing Query
-options. Install a changed sharing policy through an observer or an actual fetch before relying
-on it for subsequent manual writes.
+options. Install a changed sharing policy through an observer or actual fetch before relying
+on it for later manual writes.
 
 Keep shared policies on QueryClient and operation-specific selection, input, and typed error
 callbacks on the generated builders.

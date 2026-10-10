@@ -44,12 +44,19 @@ Use a `bodySerializer` that returns `FormData`. Let Fetch set the multipart boun
 JSON serializer receives HTTP 415 from a multipart-only endpoint. The example upload includes
 path/query/header values, a text field, and a file with its filename and contents intact.
 
+In the external client module, use the generated `paths` type and create the client:
+
 ```ts
 import createClient from 'openapi-fetch'
 
 import type { paths } from './openapi-generated.ts'
 
 const external = createClient<paths>({ baseUrl: 'https://api.example.test' })
+```
+
+In a loader or request handler, send encoded values and inspect the buffered result:
+
+```ts
 const report = await external.POST('/reports/{id}', {
   params: {
     path: { id: '5' },
@@ -62,7 +69,11 @@ if (report.error) {
   throw new Error(`Report failed with HTTP ${report.response.status}`)
 }
 const revision = report.response.headers.get('x-revision')
+```
 
+In the upload handler, serialize the declared fields as `FormData`:
+
+```ts
 const uploaded = await external.POST('/reports/{id}/files', {
   params: {
     path: { id: '5' },
@@ -77,11 +88,15 @@ const uploaded = await external.POST('/reports/{id}/files', {
     return form
   },
 })
+```
+
+For raw SSE access, request a stream in that consumer:
+
+```ts
 const events = await external.GET('/reports/events/{channel}', {
   params: { path: { channel: 'values' } },
   parseAs: 'stream',
 })
-export { events, report, revision, uploaded }
 ```
 
 The external client's `Response` retains HTTP status and raw headers after buffering. The native

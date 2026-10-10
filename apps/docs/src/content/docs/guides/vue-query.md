@@ -23,8 +23,8 @@ Keep captured values unchanged while their options can execute. See
 [Data Normalization](/effect-api-query/concepts/data-normalization/#keep-captured-inputs-unchanged)
 for the distinction between immutable keys and caller-owned input.
 
-In component setup, use a computed options object. This example assumes `rpc.users.read` returns
-a user with a `name`:
+In component setup, use the `rpc` tree from your [ready client](/effect-api-query/getting-started/quick-start/).
+Here `users.read` returns a user with a `name`:
 
 ```ts
 import type { InferDataFromTag, InferErrorFromTag } from '@tanstack/query-core'
@@ -41,6 +41,11 @@ const options = computed(() =>
     select: (user) => user.name,
   }),
 )
+```
+
+In the same component setup, pass the tagged types to the native hook:
+
+```ts
 type UserKey = ReturnType<typeof rpc.users.read.queryKey>
 const user = useQuery<
   InferDataFromTag<unknown, UserKey>,
@@ -70,6 +75,9 @@ Vue accepts an initial-data initializer that may return `undefined`, with option
 An explicit `initialData: undefined` overrides inherited QueryClient initial data.
 
 ## Own streams and disposal
+
+Other observers of the same query keep it active. At owner disposal, drain accepted mutations
+as well as local stream finalizers before releasing client resources.
 
 Open streams expose their first value while fetching continues. Changing reactive input replaces
 the query; when its last observer leaves, query cancellation closes the stream iterator. Component

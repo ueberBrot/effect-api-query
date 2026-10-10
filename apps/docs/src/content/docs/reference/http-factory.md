@@ -9,16 +9,18 @@ it from `effect-api-query`.
 
 For a step-by-step example, see [HTTP Queries and Mutations](/effect-api-query/guides/http-queries-and-mutations/).
 
-Ordinary groups appear as `utils[groupIdentifier][endpointIdentifier]`. Top-level groups place
-their endpoints at `utils[endpointIdentifier]`. Identifiers containing dots remain literal
-properties. Every retained branch and endpoint has `key()`; buffered endpoints without multipart have
-`queryKey`, `queryOptions`, `metadataKey`, `metadataOptions`, `mutationKey`, `mutationOptions`,
-`infiniteKey`, and `infiniteOptions`.
-An endpoint with any buffered multipart payload alternative exposes only `key`, `mutationKey`, and
-`mutationOptions`, even when it also accepts plain payload alternatives. This classification applies
-regardless of HTTP method; applications choose the builder for endpoints with query support.
-An endpoint with exactly one SSE success and no multipart payload exposes `key`, `streamedKey`,
-`streamedOptions`, `liveKey`, and `liveOptions`.
+Ordinary groups project to `utils[groupIdentifier][endpointIdentifier]`; top-level groups
+project endpoints to `utils[endpointIdentifier]`. Dots remain literal properties. Every retained
+branch and endpoint has `key()`.
+
+| Endpoint                                   | Builders beside `key()`                                                                 |
+| ------------------------------------------ | --------------------------------------------------------------------------------------- |
+| Buffered without multipart                 | `queryKey/Options`, `metadataKey/Options`, `infiniteKey/Options`, `mutationKey/Options` |
+| Any buffered multipart payload alternative | `mutationKey`, `mutationOptions`                                                        |
+| Exactly one SSE success, no multipart      | `streamedKey/Options`, `liveKey/Options`                                                |
+
+Any multipart alternative makes a buffered endpoint mutation-only, including mixed plain and
+multipart alternatives. HTTP method does not determine the builder for query-enabled endpoints.
 
 ## Factory options
 

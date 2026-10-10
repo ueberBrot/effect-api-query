@@ -11,28 +11,19 @@ Keep your native Effect declarations and ready clients. Effect and your applicat
 server, transport, authentication, and resource lifetime; this package derives the Query-facing
 keys, functions, and options.
 
-The [capability matrix](/effect-api-query/reference/compatibility-and-limits/#capability-matrix)
-compares RPC and HTTP support. It lists generated features, tested integrations, application
-responsibilities, deferred operations, and missing upstream integration points.
-
 ## Pick the operation
 
-Use ordinary queries for cached reads, infinite queries for pagination, and mutations for commands.
-Unary RPCs and buffered HTTP endpoints without multipart provide all three builders. Buffered
-multipart HTTP endpoints provide mutations only. Writes refresh cached reads only when your
-application invalidates the affected keys.
+| Contract                               | Available views                              | Details                                                                                                                    |
+| -------------------------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Unary RPC / buffered nonmultipart HTTP | Query, infinite query, mutation              | [RPC Builders](/effect-api-query/reference/generated-builders/), [HTTP Factory](/effect-api-query/reference/http-factory/) |
+| Buffered HTTP                          | Separate decoded data/status/header metadata | [ETag workflow](/effect-api-query/guides/http-queries-and-mutations/#update-with-an-etag)                                  |
+| Buffered multipart HTTP                | Mutation with explicit `FormData`            | [Upload](/effect-api-query/guides/http-queries-and-mutations/#upload-a-file)                                               |
+| RPC stream / unambiguous HTTP SSE      | Accumulated history or latest value          | [Choose Stream History](/effect-api-query/guides/choose-stream-history/)                                                   |
 
-Query-enabled buffered HTTP endpoints also expose `metadataOptions` for decoded data, status, and
-raw response headers with separate cache identity. See
-[Update with an ETag](/effect-api-query/guides/http-queries-and-mutations/#update-with-an-etag).
-
-RPC streams and unambiguous HTTP SSE endpoints have `streamedOptions` to accumulate values and
-`liveOptions` to retain the latest value. Buffered multipart HTTP uploads accept explicit `FormData`
-through `mutationOptions`;
-see [upload a file](/effect-api-query/guides/http-queries-and-mutations/#upload-a-file).
-Raw byte streams, mixed buffered/SSE successes, streaming multipart, and raw-response modes remain
-omitted. SSE endpoints with buffered multipart payloads are also omitted. See
-[HTTP streams](/effect-api-query/guides/http-queries-and-mutations/#retain-sse-events).
+Use queries for cached reads and mutations for commands; writes refresh reads only when the
+application invalidates them. Raw byte streams, mixed buffered/SSE successes, streaming
+multipart and raw-response modes are omitted, as are SSE endpoints with multipart payloads.
+See [Compatibility and Limits](/effect-api-query/reference/compatibility-and-limits/).
 
 ## Plan application ownership
 
@@ -44,16 +35,5 @@ Include a safe user or tenant identity in `keyPrefix` whenever client configurat
 returned data. Keep credentials out of keys. See [semantic keys](/effect-api-query/concepts/semantic-keys/)
 and [client lifecycle](/effect-api-query/concepts/client-lifecycle/).
 
-Start with the [RPC tutorial](/effect-api-query/getting-started/quick-start/) or
-[HTTP tutorial](/effect-api-query/getting-started/http-quick-start/), then use the shared guides for
-[conditional queries](/effect-api-query/guides/conditional-queries/),
-[cache management](/effect-api-query/guides/cache-management/), and
-[cancellation](/effect-api-query/guides/cancellation/).
-
-For application workflows, use [Query Defaults](/effect-api-query/guides/query-defaults/),
-[Optimistic User Writes](/effect-api-query/guides/optimistic-writes/),
-[Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/), and
-[Refresh from Domain Events](/effect-api-query/guides/refresh-from-events/).
-For server data, use [Stream Snapshots](/effect-api-query/guides/stream-snapshots/) and
-[Hydrate Query Views](/effect-api-query/guides/hydrate-query-views/). These recipes retain
-application ownership of policies, codecs, persistence, and disposal.
+Start with the [RPC Quick Start](/effect-api-query/getting-started/quick-start/) or
+[HTTP Quick Start](/effect-api-query/getting-started/http-quick-start/).

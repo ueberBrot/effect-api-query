@@ -18,7 +18,8 @@ for the distinction between immutable keys and caller-owned input.
 Create the utility tree in your application module from an acquired ready client. Provide a
 QueryClient through Svelte Query's `QueryClientProvider`, then read reactive inputs inside the
 accessor passed to `createQuery`. Keep the client's `Scope` and any serviceful runner alive while
-queries use them:
+queries use them. Here `users.read` accepts an ID and returns a user with `name`.
+In the Svelte component script:
 
 ```svelte
 <script lang="ts">
@@ -33,9 +34,6 @@ queries use them:
     }),
   )
 </script>
-
-<button onclick={() => id += 1}>Next user</button>
-<p>{user.data}</p>
 ```
 
 Use `createInfiniteQuery(() => rpc.users.list.infiniteOptions(...))` for pagination and

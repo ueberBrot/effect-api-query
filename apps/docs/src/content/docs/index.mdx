@@ -20,31 +20,19 @@ controls its client, cache policies, and resource lifetime.
 
 ## What it provides
 
-- Queries and mutations for unary RPCs and buffered HTTP endpoints without multipart.
-- Mutations for buffered HTTP multipart uploads with explicit `FormData`.
-- Infinite and conditional queries for both adapters.
-- Accumulated streams and live queries for RPCs and supported HTTP SSE endpoints.
-- Buffered HTTP metadata views containing decoded data, status, and raw headers.
-- Semantic cache keys for prefetching, cache updates, and invalidation.
-- Typed execution failures that retain the complete Effect Cause.
+- Typed keys and options for reads, mutations, pagination and conditional queries.
+- Accumulated and live RPC/SSE views, buffered HTTP metadata and multipart mutations.
+- Decoded query data and execution failures preserving the complete Effect Cause.
+
+See [Feature Support](/effect-api-query/getting-started/feature-support/) for operation boundaries.
 
 ## Choose a path
 
-- Create utilities and run a query with the [RPC quick start](/effect-api-query/getting-started/quick-start/)
+- Start with an existing contract and ready client: [RPC quick start](/effect-api-query/getting-started/quick-start/)
   or [HTTP quick start](/effect-api-query/getting-started/http-quick-start/).
-- [Run the examples](/effect-api-query/examples/) to compare standalone Vite hosting with
-  TanStack Start routes for both protocols.
-- Check [feature support](/effect-api-query/getting-started/feature-support/) to choose operations
-  and plan your integration.
-- Use the [React Query guide](/effect-api-query/guides/react-query/) for hooks and mutations.
-- Use [Vue Query](/effect-api-query/guides/vue-query/), [Solid Query](/effect-api-query/guides/solid-query/),
-  [Svelte Query](/effect-api-query/guides/svelte-query/), or [Angular Query](/effect-api-query/guides/angular-query/)
-  for native reactive consumers.
-- Use the [TanStack Start guide](/effect-api-query/guides/tanstack-start/) for loaders, SSR, and
-  hydration.
-- Capture open streams with [Stream Snapshots](/effect-api-query/guides/stream-snapshots/), then
-  [hydrate query views](/effect-api-query/guides/hydrate-query-views/) with application-owned codecs.
-- Follow [Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/) and
-  [Refresh from Domain Events](/effect-api-query/guides/refresh-from-events/) for private cache workflows.
-- Read [compatibility and limits](/effect-api-query/reference/compatibility-and-limits/) before
-  adopting the package.
+- Consume options in [React](/effect-api-query/guides/react-query/), [Vue](/effect-api-query/guides/vue-query/),
+  [Solid](/effect-api-query/guides/solid-query/), [Svelte](/effect-api-query/guides/svelte-query/),
+  [Angular](/effect-api-query/guides/angular-query/), or [TanStack Start](/effect-api-query/guides/tanstack-start/).
+- [Run the examples](/effect-api-query/examples/) for complete Vite React and Start applications.
+- Look up [API contracts](/effect-api-query/reference/public-exports/) and
+  [compatibility limits](/effect-api-query/reference/compatibility-and-limits/).

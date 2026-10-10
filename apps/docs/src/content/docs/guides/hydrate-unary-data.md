@@ -17,55 +17,18 @@ Use a JSON-safe success schema when components need plain data. The contract bel
 as decimal strings and binary data as base64 strings. Return this DTO from the server operation;
 the ready RPC or HTTP client produces the same DTO on the server and browser.
 
-Save the following as `docs-hydration-dto.ts`:
+In the shared contract module, import `Schema` from `effect` and declare the DTO:
 
 ```ts
-import { defaultShouldDehydrateQuery, dehydrate, hydrate } from '@tanstack/query-core'
-import type { QueryClient } from '@tanstack/query-core'
-import { Schema } from 'effect'
-import { createHttpApiQueryUtils, createRpcQueryUtils } from 'effect-api-query'
-import { HttpApi, HttpApiClient, HttpApiEndpoint, HttpApiGroup } from 'effect/http-api'
-import { Rpc, RpcClient, RpcGroup } from 'effect/rpc'
-
 const ProfileDto = Schema.Struct({
   name: Schema.String,
   credits: Schema.String,
   avatar: Schema.String.check(Schema.isBase64()),
 })
-
-const dtoGroup = RpcGroup.make(Rpc.make('profile.read', { success: ProfileDto }))
-const dtoApi = HttpApi.make('dto').add(
-  HttpApiGroup.make('profile').add(
-    HttpApiEndpoint.get('read', '/profile', { success: ProfileDto }),
-  ),
-)
-
-function dtoRpcOptions<E>(client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof dtoGroup>, E>) {
-  return createRpcQueryUtils<typeof dtoGroup, readonly ['dto', 'rpc'], E>(dtoGroup, {
-    client,
-    keyPrefix: ['dto', 'rpc'],
-  }).profile.read.queryOptions({ retry: false, staleTime: 60_000 })
-}
-
-function dtoHttpOptions(client: HttpApiClient.ForApi<typeof dtoApi>) {
-  return createHttpApiQueryUtils(dtoApi, {
-    client,
-    keyPrefix: ['dto', 'http'],
-  }).profile.read.queryOptions({ retry: false, staleTime: 60_000 })
-}
-
-const snapshotDto = (queryClient: QueryClient): string =>
-  JSON.stringify(
-    dehydrate(queryClient, {
-      shouldDehydrateMutation: () => false,
-      shouldDehydrateQuery: (query) =>
-        defaultShouldDehydrateQuery(query) && query.queryKey[0] === 'dto',
-    }),
-  )
-
-const hydrateDto = (queryClient: QueryClient, json: string): void =>
-  hydrate(queryClient, JSON.parse(json))
 ```
+
+The [complete DTO recipe](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-hydration-dto.ts)
+connects this schema to both factories and provides `snapshotDto` and `hydrateDto`.
 
 Prefetch with `queryClient.query(dtoRpcOptions(rpcClient))` or the HTTP equivalent, then publish
 `snapshotDto(queryClient)` through your framework's JSON transport. Call `hydrateDto` on the
@@ -83,16 +46,9 @@ the snapshot boundary and decode during hydration. This `Profile` encodes bigint
 string and its `Uint8Array` avatar as base64. Decoding reconstructs the class and its `summary`
 method.
 
-Save the following as `docs-hydration-rich.ts`:
+In the shared contract module, define the rich success schema:
 
 ```ts
-import { defaultShouldDehydrateQuery, dehydrate, hydrate } from '@tanstack/query-core'
-import type { QueryClient } from '@tanstack/query-core'
-import { Schema } from 'effect'
-import { createHttpApiQueryUtils, createRpcQueryUtils } from 'effect-api-query'
-import { HttpApi, HttpApiClient, HttpApiEndpoint, HttpApiGroup } from 'effect/http-api'
-import { Rpc, RpcClient, RpcGroup } from 'effect/rpc'
-
 export class Profile extends Schema.Class<Profile>('Profile')({
   name: Schema.String,
   credits: Schema.BigIntFromString,
@@ -102,47 +58,13 @@ export class Profile extends Schema.Class<Profile>('Profile')({
     return `${this.name}: ${this.credits} credits`
   }
 }
-
-const profileGroup = RpcGroup.make(
-  Rpc.make('profile.read', { success: Profile, error: Schema.String }),
-)
-const profileApi = HttpApi.make('rich').add(
-  HttpApiGroup.make('profile').add(
-    HttpApiEndpoint.get('read', '/profile', { success: Profile, error: Schema.String }),
-  ),
-)
-
-function profileRpcOptions<E>(
-  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof profileGroup>, E>,
-) {
-  return createRpcQueryUtils<typeof profileGroup, readonly ['profile', 'rpc'], E>(profileGroup, {
-    client,
-    keyPrefix: ['profile', 'rpc'],
-  }).profile.read.queryOptions({ retry: false, staleTime: 60_000 })
-}
-
-function profileHttpOptions(client: HttpApiClient.ForApi<typeof profileApi>) {
-  return createHttpApiQueryUtils(profileApi, {
-    client,
-    keyPrefix: ['profile', 'http'],
-  }).profile.read.queryOptions({ retry: false, staleTime: 60_000 })
-}
-
-const snapshotProfile = (queryClient: QueryClient): string =>
-  JSON.stringify(
-    dehydrate(queryClient, {
-      shouldDehydrateMutation: () => false,
-      shouldDehydrateQuery: (query) =>
-        defaultShouldDehydrateQuery(query) && query.queryKey[0] === 'profile',
-      serializeData: Schema.encodeUnknownSync(Profile),
-    }),
-  )
-
-const hydrateProfile = (queryClient: QueryClient, json: string): void =>
-  hydrate(queryClient, JSON.parse(json), {
-    defaultOptions: { deserializeData: Schema.decodeUnknownSync(Profile) },
-  })
 ```
+
+In the server snapshot and browser hydration modules, pair
+`serializeData: Schema.encodeUnknownSync(Profile)` with
+`defaultOptions: { deserializeData: Schema.decodeUnknownSync(Profile) }`.
+The [complete rich-value recipe](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-hydration-rich.ts)
+provides `snapshotProfile`, `hydrateProfile`, and options for both factories.
 
 Prefetch with `profileRpcOptions` or `profileHttpOptions`, publish `snapshotProfile`, then call
 `hydrateProfile` on the browser's Query Client. The hydrated value and a later browser refetch
@@ -165,50 +87,12 @@ When a codec needs services or asynchronous work, prepare the entire snapshot ou
 synchronous callbacks. This example adds a caller-owned preparation service to the same Profile
 codec. Its hooks can await application work before encoding or decoding.
 
-Save the following alongside `docs-hydration-rich.ts`:
+The application's hydration module decodes all entries before changing the cache.
+With `PreparedProfile` and its services from the
+[complete asynchronous recipe](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-hydration-async.ts),
+that boundary is:
 
 ```ts
-import { defaultShouldDehydrateQuery, dehydrate, hydrate } from '@tanstack/query-core'
-import type { DehydratedState, QueryClient } from '@tanstack/query-core'
-import { Context, Effect, Schema } from 'effect'
-
-import { Profile } from './docs-hydration-rich.ts'
-
-class HydrationPreparation extends Context.Service<
-  HydrationPreparation,
-  {
-    readonly beforeEncode: Effect.Effect<void>
-    readonly beforeDecode: Effect.Effect<void>
-  }
->()('HydrationPreparation') {}
-
-const PreparedProfile = Profile.pipe(
-  Schema.middlewareEncoding<typeof Profile, HydrationPreparation>((encoding) =>
-    Effect.flatMap(HydrationPreparation, ({ beforeEncode }) =>
-      Effect.andThen(beforeEncode, encoding),
-    ),
-  ),
-  Schema.middlewareDecoding((decoding) =>
-    Effect.flatMap(HydrationPreparation, ({ beforeDecode }) =>
-      Effect.andThen(beforeDecode, decoding),
-    ),
-  ),
-)
-
-const prepareProfileSnapshot = Effect.fnUntraced(function* (queryClient: QueryClient) {
-  const snapshot = dehydrate(queryClient, {
-    shouldDehydrateMutation: () => false,
-    shouldDehydrateQuery: (query) =>
-      defaultShouldDehydrateQuery(query) && query.queryKey[0] === 'profile',
-  })
-  const queries = yield* Effect.forEach(snapshot.queries, (query) =>
-    Schema.encodeUnknownEffect(PreparedProfile)(query.state.data).pipe(
-      Effect.map((data) => ({ ...query, state: { ...query.state, data } })),
-    ),
-  )
-  return JSON.stringify({ ...snapshot, queries })
-})
-
 const prepareProfileHydration = Effect.fnUntraced(function* (
   queryClient: QueryClient,
   json: string,

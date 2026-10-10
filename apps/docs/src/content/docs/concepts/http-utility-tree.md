@@ -22,12 +22,15 @@ Every retained branch and endpoint has `key()`. Top-level groups have no branch 
 custom key encoders still use their declaration group identifier. The factory rejects unsafe
 names, collisions, and invalid encoder configuration before returning any utilities.
 
-The factory retains a single SSE success, including a decoded response-header wrapper. Its leaf
-exposes `key()`, `streamedKey()`, `streamedOptions()`, `liveKey()`, and `liveOptions()`. Accumulated cache entries hold
-ordered decoded events; live entries hold the latest value.
-Decoded header wrappers surround each event. Decoder policy contributes to both views' concrete
-identity; accumulated identity also includes retention and refetch policies. Endpoint prefixes
-select every view policy.
+| Endpoint success/payload                   | Generated cache views                                        |
+| ------------------------------------------ | ------------------------------------------------------------ |
+| Buffered without multipart                 | Ordinary, infinite and mutation builders; buffered metadata  |
+| Any buffered multipart payload alternative | Mutations only, including mixed plain/multipart alternatives |
+| Single SSE success without multipart       | Accumulated history and latest-value views                   |
+
+SSE events retain decoded response-header wrappers. Decoder policy contributes to both view
+keys; accumulated keys also include retention and refetch policy. Endpoint prefixes select all
+policies. See [HTTP Factory](/effect-api-query/reference/http-factory/) for exact builders.
 
 Raw byte streams, mixed buffered/SSE successes, SSE endpoints with multipart payloads, and streaming
 multipart requests omit the complete endpoint. Groups containing only omitted endpoints disappear.
@@ -44,6 +47,3 @@ responses; buffered metadata views copy status and headers alongside decoded dat
 controls are excluded from request input. See the [HTTP factory](/effect-api-query/reference/http-factory/)
 for request, response, and builder contracts, and [Semantic Keys](/effect-api-query/concepts/semantic-keys/)
 for the `http` namespace.
-
-The [public HTTP type consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/http-contract.ts)
-and [factory runtime tests](https://github.com/ueberBrot/effect-api-query/blob/main/tests/create-http-api-query-utils.test.ts) check these projection rules.

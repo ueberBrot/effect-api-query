@@ -1,9 +1,18 @@
 import { NodeRuntime, NodeServices } from '@effect/platform-node'
 import { Effect, FileSystem, Path } from 'effect'
 // fallow-ignore-file unused-file
-import { strictEqual } from 'node:assert'
+import { ok } from 'node:assert'
 
 import { decodeUtf8 } from './decode-utf8.mts'
+
+const unindent = (lines: readonly string[]) => {
+  const indentation = Math.min(
+    ...lines
+      .filter((line) => line.trim().length > 0)
+      .map((line) => /^ */u.exec(line)?.[0].length ?? 0),
+  )
+  return lines.map((line) => line.slice(indentation)).join('\n')
+}
 
 const program = Effect.gen(function* () {
   const fs = yield* FileSystem.FileSystem
@@ -36,18 +45,33 @@ const program = Effect.gen(function* () {
       ),
     )
     const samples = [...markdown.matchAll(/^```ts\n(?<source>[\s\S]*?)^```/gmu)]
-    strictEqual(samples.length, fixtures.length, `${page} must contain its TypeScript fixtures`)
-    for (const [index, fixture] of fixtures.entries()) {
+    ok(samples.length > 0, `${page} must contain a TypeScript excerpt`)
+    const sources: string[][] = []
+    for (const fixture of fixtures) {
       const source = decodeUtf8(
         yield* fs.readFile(yield* path.fromFileUrl(new URL(`../${fixture}.ts`, import.meta.url))),
       )
-      strictEqual(
-        samples[index]?.groups?.['source']?.trimEnd(),
+      sources.push(
         source
           .replaceAll("from '#effect-api-query'", "from 'effect-api-query'")
           .replaceAll("from '../fixtures/user-events.ts'", "from './user-events.ts'")
-          .trimEnd(),
-        `${page} differs from ${fixture}.ts`,
+          .trimEnd()
+          .split('\n'),
+      )
+    }
+    for (const [index, sample] of samples.entries()) {
+      const lines = sample.groups?.['source']?.trimEnd().split('\n') ?? []
+      ok(
+        lines.some((line) => line.trim().length > 0),
+        `${page} excerpt ${index + 1} is empty`,
+      )
+      ok(
+        sources.some((source) =>
+          source.some(
+            (_, start) => unindent(source.slice(start, start + lines.length)) === unindent(lines),
+          ),
+        ),
+        `${page} excerpt ${index + 1} differs from its allowed fixtures`,
       )
     }
   }

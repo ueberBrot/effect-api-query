@@ -30,5 +30,3 @@ path segment, or invalid encoder map. It performs no network request.
 Query options retain the normalized payload for execution. Keep captured values unchanged; see
 [Data Normalization](/effect-api-query/concepts/data-normalization/#keep-captured-inputs-unchanged)
 for the distinction between immutable keys and caller-owned input.
-
-The [public RPC consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/public-contract.ts) checks factory inference and runner requirements.

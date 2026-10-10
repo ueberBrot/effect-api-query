@@ -10,125 +10,87 @@ interruptions, and rejected runners.
 
 ## Inspect the typed failure
 
-Share the declarations with your server and pass your application's ready client to
-`rpcReadOptions` or `httpReadOptions`. Both functions return native query options for `useQuery`
-or `queryClient.query`. Adapt the allowed tags and transport reasons to your read's contract.
+Use the error union declared by your contract and the native builder's inferred callback types.
+Import `Cause` and `Result` from `effect`, adapter guards from `effect-api-query`, and
+`HttpClientError` from `effect/http`. The
+[complete typed recipe](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-retry.ts)
+includes `RetryLater`, `NotFound`, authentication errors and both ready-client factories.
+
+### RPC retry callback
+
+In the query-options module, use these statements inside the `retry: (failureCount, error) => { ... }`
+callback passed to `rpc.profile.read.queryOptions`. This example allows only an HTTP transport
+failure or its declared `RetryLater`:
 
 ```ts
-import { Cause, Result, Schema } from 'effect'
-import {
-  createHttpApiQueryUtils,
-  createRpcQueryUtils,
-  isEffectHttpApiQueryError,
-  isEffectRpcQueryError,
-} from 'effect-api-query'
-import { HttpClientError } from 'effect/http'
-import { HttpApi, HttpApiClient, HttpApiEndpoint, HttpApiGroup } from 'effect/http-api'
-import { Rpc, RpcClient, RpcClientError, RpcGroup } from 'effect/rpc'
-
-class NotFound extends Schema.TaggedError<NotFound>()('NotFound', {}) {}
-class AuthenticationRequired extends Schema.TaggedError<AuthenticationRequired>()(
-  'AuthenticationRequired',
-  {},
-) {}
-class RetryLater extends Schema.TaggedError<RetryLater>()('RetryLater', {
-  retryAfterMs: Schema.Finite,
-}) {}
-
-const ReadError = Schema.Union([NotFound, AuthenticationRequired, RetryLater])
-const readGroup = RpcGroup.make(
-  Rpc.make('profile.read', { success: Schema.String, error: ReadError }),
-)
-const readApi = HttpApi.make('profile-api').add(
-  HttpApiGroup.make('profile').add(
-    HttpApiEndpoint.get('read', '/profile', { success: Schema.String, error: ReadError }),
-  ),
-)
-
-const rpcReadOptions = (
-  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof readGroup>, RpcClientError.RpcClientError>,
-) => {
-  const rpc = createRpcQueryUtils<
-    typeof readGroup,
-    readonly ['profile-app'],
-    RpcClientError.RpcClientError
-  >(readGroup, { client, keyPrefix: ['profile-app'] })
-
-  return rpc.profile.read.queryOptions({
-    retry: (failureCount, error) => {
-      if (!isEffectRpcQueryError(error) || failureCount >= 2) {
-        return false
-      }
-      if (Cause.hasDies(error.cause) || Cause.hasInterrupts(error.cause)) {
-        return false
-      }
-      const failure = Cause.findError(error.cause)
-      if (Result.isFailure(failure) || error.cause.reasons.length !== 1) {
-        return false
-      }
-      switch (failure.success._tag) {
-        case 'RetryLater':
-          return true
-        case 'RpcClientError':
-          return (
-            failure.success.reason._tag === 'HttpError' &&
-            failure.success.reason.kind === 'TransportError'
-          )
-        default:
-          return false
-      }
-    },
-    retryDelay: (attemptIndex, error) => {
-      if (isEffectRpcQueryError(error)) {
-        const failure = Cause.findError(error.cause)
-        if (Result.isSuccess(failure) && failure.success._tag === 'RetryLater') {
-          return Math.min(30_000, Math.max(0, failure.success.retryAfterMs))
-        }
-      }
-      return Math.min(1_000 * 2 ** attemptIndex, 30_000)
-    },
-  })
+if (!isEffectRpcQueryError(error) || failureCount >= 2) {
+  return false
 }
-
-const httpReadOptions = (client: HttpApiClient.ForApi<typeof readApi>) => {
-  const http = createHttpApiQueryUtils(readApi, { client, keyPrefix: ['profile-app'] })
-
-  return http.profile.read.queryOptions({
-    retry: (failureCount, error) => {
-      if (!isEffectHttpApiQueryError(error) || failureCount >= 2) {
-        return false
-      }
-      if (Cause.hasDies(error.cause) || Cause.hasInterrupts(error.cause)) {
-        return false
-      }
-      const failure = Cause.findError(error.cause)
-      if (Result.isFailure(failure) || error.cause.reasons.length !== 1) {
-        return false
-      }
-      switch (failure.success._tag) {
-        case 'RetryLater':
-          return true
-        case 'HttpClientError':
-          return (
-            HttpClientError.isHttpClientError(failure.success) &&
-            failure.success.reason._tag === 'TransportError'
-          )
-        default:
-          return false
-      }
-    },
-    retryDelay: (attemptIndex, error) => {
-      if (isEffectHttpApiQueryError(error)) {
-        const failure = Cause.findError(error.cause)
-        if (Result.isSuccess(failure) && failure.success._tag === 'RetryLater') {
-          return Math.min(30_000, Math.max(0, failure.success.retryAfterMs))
-        }
-      }
-      return Math.min(1_000 * 2 ** attemptIndex, 30_000)
-    },
-  })
+if (Cause.hasDies(error.cause) || Cause.hasInterrupts(error.cause)) {
+  return false
+}
+const failure = Cause.findError(error.cause)
+if (Result.isFailure(failure) || error.cause.reasons.length !== 1) {
+  return false
+}
+switch (failure.success._tag) {
+  case 'RetryLater':
+    return true
+  case 'RpcClientError':
+    return (
+      failure.success.reason._tag === 'HttpError' &&
+      failure.success.reason.kind === 'TransportError'
+    )
+  default:
+    return false
 }
 ```
+
+### HTTP retry callback
+
+For `http.profile.read.queryOptions`, the callback has the same guard stages but a different
+transport-error union. Its `retry` callback body is:
+
+```ts
+if (!isEffectHttpApiQueryError(error) || failureCount >= 2) {
+  return false
+}
+if (Cause.hasDies(error.cause) || Cause.hasInterrupts(error.cause)) {
+  return false
+}
+const failure = Cause.findError(error.cause)
+if (Result.isFailure(failure) || error.cause.reasons.length !== 1) {
+  return false
+}
+switch (failure.success._tag) {
+  case 'RetryLater':
+    return true
+  case 'HttpClientError':
+    return (
+      HttpClientError.isHttpClientError(failure.success) &&
+      failure.success.reason._tag === 'TransportError'
+    )
+  default:
+    return false
+}
+```
+
+### Retry delay callback
+
+In the RPC builder's `retryDelay: (attemptIndex, error) => { ... }` body:
+
+```ts
+if (isEffectRpcQueryError(error)) {
+  const failure = Cause.findError(error.cause)
+  if (Result.isSuccess(failure) && failure.success._tag === 'RetryLater') {
+    return Math.min(30_000, Math.max(0, failure.success.retryAfterMs))
+  }
+}
+return Math.min(1_000 * 2 ** attemptIndex, 30_000)
+```
+
+The complete recipe applies the equivalent guarded delay to HTTP. These callbacks are application
+policy for idempotent reads, not a package retry policy.
 
 `Cause.findError` returns a `Result`; after `Result.isSuccess`, `success` retains the declared
 error union. It extracts the first typed failure. Check defects and interruptions first, and

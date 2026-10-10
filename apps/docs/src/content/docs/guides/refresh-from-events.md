@@ -12,54 +12,6 @@ next to your owner, write, and client modules, adjusting its local application i
 an application-owned Effect Reactivity service. Supply your own decoded network stream; the module
 creates no connection, broker, provider, or second cache.
 
-## Register one consumer for the owner
-
-Acquire the consumer once in the owner's Scope. The following attachment accepts a supplied
-Effect Stream and preserves its failure and service requirements. Run its `consume` Effect with
-your application runtime and keep that Scope open across transport reconnects.
-
-```ts
-import { Effect, Stream } from 'effect'
-import type { Reactivity } from 'effect/reactivity'
-
-import { decodeUserEvent, makeUserEventConsumer } from './user-events.ts'
-import type { UserEventOwner } from './user-events.ts'
-
-const attachUserEvents = Effect.fnUntraced(function* (
-  owner: UserEventOwner,
-  reactivity: Reactivity.Reactivity,
-) {
-  const consumer = yield* makeUserEventConsumer(owner, reactivity, {
-    observedUsers: [{ id: 1, locale: 'en' }],
-  })
-  const consume = <E, R>(events: Stream.Stream<unknown, E, R>) =>
-    events.pipe(
-      Stream.mapEffect((event) => decodeUserEvent(event)),
-      Stream.runForEach(consumer.deliver),
-      Effect.ensuring(Effect.promise(consumer.flush)),
-    )
-  return {
-    consumer,
-    consume,
-    latestDiagnostic: owner.rpcQuery.diagnostics.stream.liveOptions(),
-    diagnosticHistory: owner.rpcQuery.diagnostics.stream.streamedOptions({
-      maxChunks: 64,
-      refetchMode: 'reset',
-    }),
-  }
-})
-```
-
-`makeUserEventConsumer` rejects an inactive owner or a second consumer for the same QueryClient.
-Scope closure unregisters Reactivity handlers and the mutation-cache listener. Close the event
-Scope, retire the captured owner, and await its disposal before replacing clients; remount the
-React consumers as described in [Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/).
-
-A closed or retired consumer ignores queued delivery and invalidation callbacks. It retains its
-original QueryClient and cannot redirect an old event to a replacement client. A refresh already
-started belongs to the native query lifecycle; owner retirement cancels those reads and awaits
-local cleanup before releasing ready clients.
-
 ## Map events to reads
 
 The `users.v1` envelope includes the consumer's `ownerKey`, a positive safe-integer cursor, and one
@@ -80,6 +32,33 @@ The `ownerKey` contains safe tenant, user, session, and permission-generation id
 routing partition, not authentication. The application must authenticate the transport and
 validate which owner may receive each event.
 
+## Register one consumer for the owner
+
+`makeUserEventConsumer`, `decodeUserEvent` and `flush` are application helpers from the linked
+consumer module. Import `Effect` and `Stream` from `effect`; provide the captured `owner` and
+application `reactivity` service. Inside the owner's Effect Scope, acquire once:
+
+Acquire `consumer` with `yield* makeUserEventConsumer(owner, reactivity, { observedUsers:
+[{ id: 1, locale: 'en' }] })`. This registers the owner's selected local detail mappings.
+
+In that same scope, attach the supplied network stream with its existing service/error channels:
+
+```ts
+const consume = <E, R>(events: Stream.Stream<unknown, E, R>) =>
+  events.pipe(
+    Stream.mapEffect((event) => decodeUserEvent(event)),
+    Stream.runForEach(consumer.deliver),
+    Effect.ensuring(Effect.promise(consumer.flush)),
+  )
+```
+
+Run `consume(events)` with the application's runtime. The
+[complete typed attachment](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-user-events.ts)
+shows composition. It rejects inactive/duplicate owners and unregisters listeners on Scope closure.
+A retired consumer ignores late delivery and cannot redirect it to a replacement QueryClient.
+Close its Scope, cancel/drain started reads, then release clients before replacing the owner.
+See [Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/).
+
 ## Coalesce local invalidation
 
 Use the consumer's `reactivityKeys.directory`, `reactivityKeys.all`, or
@@ -91,22 +70,12 @@ These keys are stable application strings. Reactivity hashes its own keys; a Tan
 has no implied Reactivity subscription or prefix relationship. Register the deliberate mapping
 rather than passing generated tuples to both systems.
 
-Reactivity `withBatch` combines repeated invalidations of the same key. Distinct keys can still
-invoke distinct handlers. The consumer collects their intent in one microtask and lets a full
-user-branch refresh subsume narrower work. It merges more than 64 pending detail identities into
-a full refresh, bounding delivery bookkeeping. Events received during a refresh form the next
-batch.
-
-Refreshes wait while the captured QueryClient has pending mutations, so an event does not start a
-read over an optimistic write. The scoped mutation listener schedules retained intent when those
-writes settle. Use the same QueryClient for these writes and follow
-[Optimistic User Writes](/effect-api-query/guides/optimistic-writes/). Coordinate external writes
-and other manual refresh paths through your own application policy.
-
-`flush()` awaits currently runnable batches. During a pending mutation it leaves intent queued
-until settlement. `onRefreshError` receives failures from the refresh job; ordinary native query
-failures retain TanStack's query/error state and retry policy. The default refresh-job handler
-reports the error to the console.
+The consumer coalesces invalidation intent and lets broad refreshes subsume narrow work.
+It defers refresh while its captured QueryClient has pending mutations, protecting optimistic
+writes; other refresh paths need the same application policy. `flush()` drains runnable batches,
+leaving intent queued during pending writes. Refresh-job errors go to `onRefreshError`; query
+errors retain native Query retry/state behavior. See the linked consumer for its bookkeeping
+bounds and [Optimistic User Writes](/effect-api-query/guides/optimistic-writes/) for overlap rules.
 
 ## Resume delivery deliberately
 
@@ -127,16 +96,6 @@ durable or exactly-once delivery. Invalid envelopes fail Schema decoding before 
 
 ## Choose a visible stream view
 
-The example's diagnostic stream emits complete diagnostic values. `latestDiagnostic` uses a live
-query; `diagnosticHistory` keeps at most 64 values with reset refetch behavior. Use the same choices
-for an indefinitely running state stream: live queries require complete snapshots, while a bounded
-accumulated query can display a recent event history.
-
-An accumulated query with `refetchMode: 'replace'` publishes its replacement only when the refetch
-stream completes. An indefinite stream may never publish that replacement. Use a live full
-snapshot or a bounded history with a visibility policy suited to the UI. A live query containing
-only the latest delta does not reconstruct domain state.
-
-Native `Stream.runForEach` runs the supplied stream, and generated keys serve native Query filters.
-Keep delivery, replay, and owner policy in the application consumer so its runtime and Scope remain
-explicit.
+Use a live query for complete snapshots or bounded history for recent events. The latest delta
+alone does not reconstruct state. An indefinitely open `replace` stream does not publish a
+replacement before completion; see [Choose Stream History](/effect-api-query/guides/choose-stream-history/).

@@ -17,43 +17,19 @@ for the distinction between immutable keys and caller-owned input.
 
 Register `provideTanStackQuery(queryClient)` in your application providers. Construct queries
 inside an Angular injection context and read the signal inside the accessor passed to `injectQuery`.
-The ready client below is acquired and disposed by the application. Keep its `Scope` and any
-serviceful runner alive while queries use them:
+Create `rpc` from your [ready client](/effect-api-query/getting-started/quick-start/).
+Here `users.read` accepts `{ id: number }` and returns a user with `name`.
+In an existing component's field initializers, with `signal` from `@angular/core` and
+`injectQuery` from `@tanstack/angular-query-experimental`:
 
 ```ts
-import { Component, signal } from '@angular/core'
-import { injectQuery } from '@tanstack/angular-query-experimental'
-import { Schema } from 'effect'
-import { createRpcQueryUtils } from 'effect-api-query'
-import { Rpc, RpcGroup, type RpcClient } from 'effect/rpc'
-
-const group = RpcGroup.make(
-  Rpc.make('users.read', {
-    payload: { id: Schema.Int },
-    success: Schema.Struct({ id: Schema.Int, name: Schema.String }),
+readonly id = signal(1)
+readonly user = injectQuery(() =>
+  rpc.users.read.queryOptions({
+    input: { id: this.id() },
+    select: (user) => user.name,
   }),
 )
-declare const client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof group>>
-const rpc = createRpcQueryUtils(group, { client, keyPrefix: ['current-owner'] })
-
-@Component({
-  selector: 'user-details',
-  standalone: true,
-  template: '<button (click)="next()">Next user</button><p>{{ user.data() }}</p>',
-})
-class UserDetails {
-  readonly id = signal(1)
-  readonly user = injectQuery(() =>
-    rpc.users.read.queryOptions({
-      input: { id: this.id() },
-      select: (user) => user.name,
-    }),
-  )
-
-  next() {
-    this.id.update((id) => id + 1)
-  }
-}
 ```
 
 Use `injectInfiniteQuery` with `infiniteOptions` and `injectMutation` with `mutationOptions`.

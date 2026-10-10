@@ -14,7 +14,7 @@ by the package. If your application already pins Effect or disables automatic pe
 install the Effect version from the package's `peerDependencies` and resolve any peer mismatch
 before continuing. The [package manifest](https://github.com/ueberBrot/effect-api-query/blob/main/package.json)
 and [workspace catalog](https://github.com/ueberBrot/effect-api-query/blob/main/pnpm-workspace.yaml)
-are the source for supported and tested versions.
+define peer requirements and repository integration versions.
 
 React applications also need `@tanstack/react-query`, matching their Query Core version:
 
@@ -23,8 +23,7 @@ pnpm add @tanstack/react-query
 ```
 
 Use strict TypeScript checking, ESM, and an ES2022-capable application. See the
-[compatibility reference](/effect-api-query/reference/compatibility-and-limits/) for the tested
-compiler and framework integrations.
+[compatibility reference](/effect-api-query/reference/compatibility-and-limits/) for compiler and framework versions.
 
 Continue with the [RPC quick start](/effect-api-query/getting-started/quick-start/) or
 [HTTP quick start](/effect-api-query/getting-started/http-quick-start/).

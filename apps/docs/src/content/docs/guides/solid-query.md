@@ -23,7 +23,9 @@ Keep captured values unchanged while their options can execute. See
 [Data Normalization](/effect-api-query/concepts/data-normalization/#keep-captured-inputs-unchanged)
 for the distinction between immutable keys and caller-owned input.
 
-In a Solid component, pass the builder call as an accessor:
+In component setup, use `rpc` from your [ready client](/effect-api-query/getting-started/quick-start/)
+and pass the builder call as an accessor. Here `users.read` accepts an ID and returns a user
+with `name`:
 
 ```ts
 import { useQuery } from '@tanstack/solid-query'
@@ -55,6 +57,9 @@ return `undefined` does not match those overloads. Omit `initialData` or supply 
 An explicit `initialData: undefined` overrides inherited QueryClient initial data.
 
 ## Own streams and disposal
+
+Other observers of the same query keep it active. At owner disposal, drain accepted mutations
+as well as local stream finalizers before releasing client resources.
 
 Open streams expose their first value while fetching continues. Changing reactive input replaces
 the query; when its last observer leaves, query cancellation closes the stream iterator. Solid

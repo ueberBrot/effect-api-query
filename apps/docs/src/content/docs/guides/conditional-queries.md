@@ -3,7 +3,9 @@ title: Conditional Queries
 description: Pause queries until their required input is available.
 ---
 
-Use `{ input: skipToken }` when an input-bearing query has no valid input yet and needs TanStack
+In component setup, import the native `useQuery` hook and use the ready utility tree from the
+[RPC quick start](/effect-api-query/getting-started/quick-start/). `userId` is the selected ID,
+which may be undefined. Use `{ input: skipToken }` when an input-bearing query has no valid input yet and needs TanStack
 options such as `staleTime`, `select`, or `initialData`:
 
 ```ts
@@ -21,7 +23,7 @@ const userOptions = rpcQuery.users.get.queryOptions({
 const user = useQuery(userOptions)
 ```
 
-The same form works for HTTP request input:
+In the same component, the HTTP utility tree accepts a complete decoded request:
 
 ```ts
 const httpUserOptions = http.users.get.queryOptions({
@@ -51,7 +53,7 @@ including a conditional union. Keep the conditional input inside one builder cal
 has one consistent callback type. Concrete inputs and the literal `skipToken` retain their precise
 key and query-function types; conditional inputs preserve both possibilities.
 
-The object form also works for accumulated streams and live queries:
+For a declared `events.watch` stream with a channel input, build either view in that consumer:
 
 ```ts
 rpcQuery.events.watch.streamedOptions({
@@ -83,6 +85,3 @@ initial-request identity and cursor progression.
 Try this in either [executable example](/effect-api-query/examples/#pause-a-query-until-a-user-is-selected).
 The **Choose before fetching** control demonstrates pausing, selecting a user, and reusing fresh
 cached data after clearing and reselecting the same user.
-
-The [public RPC consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/public-contract.ts) and
-[public HTTP consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/http-contract.ts) check skipped hook inference and rejected uses.

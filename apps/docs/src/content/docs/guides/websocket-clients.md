@@ -10,120 +10,35 @@ and cancellation.
 
 ## Acquire the connection
 
-Save this module as `socket-client.ts`, and replace `socketGroup` with your shared contract.
-Keep the parent Scope alive while any returned utility is in use. The child Scope owns
-the socket, protocol, ready client, and QueryClient cleanup.
+Keep the flat ready client and its parent Scope alive. The
+[complete acquisition recipe](https://github.com/ueberBrot/effect-api-query/blob/main/tests/fixtures/socket-client.ts)
+owns the socket, protocol, client and QueryClient cleanup. In that application setup:
 
 ```ts
-import { QueryClient } from '@tanstack/query-core'
-import { Effect, Exit, Layer, Schema, Scope } from 'effect'
-import { Rpc, RpcClient, RpcGroup, RpcSerialization } from 'effect/rpc'
-import { Socket } from 'effect/socket'
-
-import { createRpcQueryUtils } from 'effect-api-query'
-
-export const socketGroup = RpcGroup.make(
-  Rpc.make('values.read', { payload: { id: Schema.Int }, success: Schema.Int }),
-  Rpc.make('values.watch', {
-    payload: { channel: Schema.String },
-    success: Schema.Int,
-    stream: true,
-  }),
-)
-
-export const acquireSocketQueries = Effect.fn('acquireSocketQueries')(function* (
-  url: string,
-  owner: string,
-) {
-  const clientScope = yield* Scope.fork(yield* Effect.scope, 'sequential')
-  const socket = yield* Socket.makeWebSocket(url).pipe(Scope.provide(clientScope))
-  const protocol = yield* Layer.buildWithScope(
-    RpcClient.layerProtocolSocket().pipe(
-      Layer.provide(RpcSerialization.layerJson),
-      Layer.provide(Layer.succeed(Socket.Socket, socket)),
-    ),
-    clientScope,
-  )
-  const client = yield* RpcClient.make(socketGroup, { flatten: true }).pipe(
-    Effect.provide(protocol),
-    Scope.provide(clientScope),
-  )
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-  const rpc = createRpcQueryUtils(socketGroup, { client, keyPrefix: ['socket', owner] })
-  yield* Scope.addFinalizer(
-    clientScope,
-    Effect.promise(async () => {
-      await queryClient.cancelQueries()
-      queryClient.clear()
-    }),
-  )
-  return { client, rpc, queryClient, dispose: Scope.close(clientScope, Exit.void) }
-})
+const rpc = createRpcQueryUtils(socketGroup, { client, keyPrefix: ['socket', owner] })
 ```
 
-Supply a WebSocket constructor for the host. Browsers can use
-`Socket.layerWebSocketConstructorGlobal`; Node applications can supply the existing
-`NodeSocket.layerWebSocketConstructorWS` from `@effect/platform-node`.
-The server must expose the matching group through `RpcServer.toHttpEffectWebsocket`
-and use the same serialization. This recipe uses JSON on both ends.
+The host supplies `Socket.layerWebSocketConstructorGlobal` in browsers or
+`NodeSocket.layerWebSocketConstructorWS` in Node. The server uses the same group and
+serialization through `RpcServer.toHttpEffectWebsocket`; this recipe uses JSON.
 
 ## Read and capture stream data
 
-The following browser function runs two unary reads, then captures the first successful
-value from each stream view. Run it within a caller-owned Scope. `fetchStreamSnapshot`
-stops and drains local iterator work before returning, so an open stream can supply a
-snapshot without waiting for completion.
+Use generated `queryOptions` for unary reads and native observers for `streamedOptions` or
+`liveOptions`. Independent keys share the connection without sharing cancellation.
+The first stream emission becomes successful data while `fetchStatus` remains `fetching`.
 
-```ts
-import { Effect } from 'effect'
-import { Socket } from 'effect/socket'
+In a server/request loader, await `fetchStreamSnapshot(queryClient, options, controls)`
+with the generated history or live options. For this recipe, `input` is
+`{ channel: 'clock' }`; history uses
+`rpc.values.watch.streamedOptions({ input, maxChunks: 20 })`, while latest data uses
+`rpc.values.watch.liveOptions({ input })`. Each capture has `timeoutMs: 5000` and settles
+local cleanup before disposal.
 
-import { fetchStreamSnapshot } from 'effect-api-query'
-
-import { acquireSocketQueries } from './socket-client.ts'
-
-export const readSocketSnapshot = Effect.fn('readSocketSnapshot')(function* (url: string) {
-  const application = yield* acquireSocketQueries(url, 'account-42').pipe(
-    Effect.provide(Socket.layerWebSocketConstructorGlobal),
-  )
-  const { queryClient, rpc } = application
-  try {
-    const reads = yield* Effect.promise(
-      async () =>
-        await Promise.all([
-          queryClient.query(rpc.values.read.queryOptions({ input: { id: 1 } })),
-          queryClient.query(rpc.values.read.queryOptions({ input: { id: 2 } })),
-        ]),
-    )
-    const input = { channel: 'clock' }
-    const history = yield* Effect.promise(
-      async () =>
-        await fetchStreamSnapshot(
-          queryClient,
-          rpc.values.watch.streamedOptions({ input, maxChunks: 20 }),
-          {
-            timeoutMs: 5000,
-          },
-        ),
-    )
-    const latest = yield* Effect.promise(
-      async () =>
-        await fetchStreamSnapshot(queryClient, rpc.values.watch.liveOptions({ input }), {
-          timeoutMs: 5000,
-        }),
-    )
-    return { reads, history, latest }
-  } finally {
-    yield* application.dispose
-  }
-})
-```
-
-For a long-lived UI, give the generated `streamedOptions` or `liveOptions` to a native
-observer instead. Its first emission becomes successful query data while `fetchStatus`
-remains `fetching`. Accumulated streams preserve history; live queries retain the latest
-value. `maxChunks` controls cached history, and `rpcOptions.streamBufferSize` controls
-the ready client's transport queue. They govern different resources.
+The [complete typed snapshot recipe](https://github.com/ueberBrot/effect-api-query/blob/main/tests/fixtures/docs-websocket-use.ts)
+includes concurrent reads and disposal. [Stream Snapshots](/effect-api-query/guides/stream-snapshots/)
+explains exclusive capture and local finalizer drain. `maxChunks` bounds cached history;
+`rpcOptions.streamBufferSize` bounds the transport queue. They govern different resources.
 
 ## Cancel and replace an owner
 
@@ -133,7 +48,7 @@ concurrent unary calls continue on the same connection. TanStack retains its nat
 cancellation result: after a stream has published data, cancellation can settle its
 query promise successfully with cached data.
 
-Call `application.dispose` before disposing the server or an enclosing runtime. The
+Drain local work and call `application.dispose` before disposing the server or an enclosing runtime. The
 registered finalizer cancels queries and clears their cache before the client and socket
 close. For a replacement owner, await disposal, acquire a new application Scope and
 ready client, and construct a new QueryClient. The same semantic prefix can produce

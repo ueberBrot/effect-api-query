@@ -3,26 +3,18 @@ title: Client Lifecycle
 description: Keep RPC and HTTP clients, runtimes, and resources under caller ownership.
 ---
 
-`createRpcQueryUtils` accepts a ready flat RPC client. Your application acquires the client, keeps
-its `Scope` open, and disposes its resources:
+Both factories use ready clients. The application owns transport, middleware, runtime,
+Scope, and QueryClient:
 
-1. Open the RPC client's `Scope` and build any required runtime.
-2. Create a `QueryClient` and RPC utility tree.
-3. Run ordinary, infinite, accumulated-stream, and live queries or mutations. Their generated
-   functions call the ready client through `runPromiseExit`.
-4. At shutdown, cancel queries, await local stream cleanup and accepted mutations, clear the cache,
-   and then dispose the RPC client's resources.
+1. Acquire the RPC or HTTP client and the services it requires.
+2. Create a QueryClient and utility tree for that owner.
+3. Keep those resources alive while queries, streams, and mutations run.
+4. Stop consumers, cancel queries, await local stream cleanup and accepted mutations,
+   clear the cache, then release the client and runtime.
 
-On the server, create these resources separately for each request to keep request data and scoped
-services isolated. In the browser, keep them for the application lifetime.
-
-The factory has no React, router, transport, provider, or server-rendering lifecycle of its own.
+Server requests own independent resources. Browser applications keep them for their lifetime.
 
 ## HTTP clients and execution services
-
-`createHttpApiQueryUtils` accepts a ready HttpApiClient. The application builds its HTTP transport,
-installs client middleware, and manages any runtime or `Scope` the client uses. On the server,
-create a client and `QueryClient` for each request and dispose their resources when it ends.
 
 Calls that need no services default to `Effect.runPromiseExit`. If an exposed endpoint needs request
 encoding, success decoding, or error decoding services, supply a `runPromiseExit` that provides
@@ -52,12 +44,9 @@ returns a successful `Exit` before Query Core pulls values. Iterator pulls then 
 Context while the query remains fetching. Keep its services and the ready client's Scope alive
 until consumption finishes.
 
-Apply transformations to the stream returned by the ready client, before it reaches the utility
-tree. Use `Stream.map` for value changes, `Stream.mapEffect` for service-dependent work,
-`Stream.tap` for per-emission instrumentation, and `Stream.ensuring` for completion or cancellation
-cleanup. For RPC, wrap the streaming call at the ready-client boundary; preserve its payload,
-request options, and declared success/error types. For HTTP, retain the native client's response
-mode contract when applying a stream transformation.
+Transform or instrument the ready-client stream when the work must cover consumption.
+Preserve its request options, declared value/error types, and HTTP response-mode contract.
+Use a stream finalizer for completion or cancellation cleanup.
 
 A timer, span, finalizer, or retry schedule around the runner's creation Effect ends with iterable
 creation. It does not wrap the later pulls. Put stream-lifetime instrumentation and recovery on the
@@ -65,10 +54,9 @@ stream itself. A retry in generated Query options reruns the query function and 
 iterable. Coordinate it with stream and transport schedules as described in
 [retry queries](/effect-api-query/guides/retry-queries/#set-defaults-deliberately).
 
-At shutdown, cancel active queries, await application-owned stream finalization, clear the cache,
-and then dispose the runtime or close the client Scope. `cancelQueries` restores Query's cache
-state; iterator cleanup can finish asynchronously, so wait for your resource's completion signal
-before disposal. Settle pending mutations separately because they have no query abort signal.
+Native `cancelQueries` settlement can precede asynchronous iterator cleanup. Await the
+resource's completion signal before releasing its services. Mutations settle separately because
+they have no query abort signal.
 
 For an open-stream server capture, await
 [fetchStreamSnapshot](/effect-api-query/guides/stream-snapshots/) before dehydration or client

@@ -17,7 +17,7 @@ Before upgrading, review [compatibility and stability](https://ueberbrot.github.
 
 ## Query an RPC
 
-Pass your RPC group and ready flat client to the factory:
+In the application client module, use your existing RPC group, ready flat client and runner:
 
 ```ts
 import { createRpcQueryUtils } from 'effect-api-query'
@@ -27,7 +27,11 @@ const rpc = createRpcQueryUtils(rpcGroup, {
   keyPrefix: ['my-app'],
   runPromiseExit,
 })
+```
 
+In a loader or event handler, use the application's QueryClient:
+
+```ts
 const options = rpc.users.get.queryOptions({ input: { id: 1 } })
 const user = await queryClient.query(options)
 ```
@@ -37,7 +41,7 @@ for setup and cleanup.
 
 ## Query an HttpApi
 
-Pass your HttpApi declaration and ready HTTP API client to the factory:
+In the application client module, use your existing HttpApi, ready client and runner:
 
 ```ts
 import { createHttpApiQueryUtils } from 'effect-api-query'
@@ -47,7 +51,11 @@ const http = createHttpApiQueryUtils(api, {
   keyPrefix: ['my-app'],
   runPromiseExit,
 })
+```
 
+In a loader or event handler:
+
+```ts
 const options = http.users.get.queryOptions({ input: { params: { id: 1 } } })
 const user = await queryClient.query(options)
 ```
@@ -55,10 +63,6 @@ const user = await queryClient.query(options)
 HTTP accepts decoded request parts; RPC accepts payload constructor input. Follow the
 [HTTP quick start](https://ueberbrot.github.io/effect-api-query/getting-started/http-quick-start/)
 for a complete declaration, client, query, and mutation.
-
-Use `metadataOptions` for response status and headers; follow the
-[ETag recipe](https://ueberbrot.github.io/effect-api-query/guides/http-queries-and-mutations/#update-with-an-etag)
-for conditional writes.
 
 ## Choose an operation
 
@@ -74,24 +78,16 @@ Both factories generate keys for cache reads, writes, prefetching, and invalidat
 forward cancellation to Effect. Mutations use TanStack's normal callbacks; invalidate affected
 queries in your application.
 
-For uploads, build `FormData` explicitly and pass it as mutation `payload`. See the
-[HTTP upload guide](https://ueberbrot.github.io/effect-api-query/guides/http-queries-and-mutations/#upload-a-file).
-Mixed HTTP success modes, raw byte streams, and streaming multipart requests remain omitted. See
-the [SSE guide](https://ueberbrot.github.io/effect-api-query/guides/http-queries-and-mutations/#retain-sse-events)
-for accumulated HTTP event queries.
+Multipart payloads use explicit `FormData`. Mixed HTTP success modes, raw byte streams and
+streaming multipart requests are omitted; see [feature support](https://ueberbrot.github.io/effect-api-query/getting-started/feature-support/).
 
 ## Integrate with your application
 
 - [React Query](https://ueberbrot.github.io/effect-api-query/guides/react-query/): use generated options with hooks.
 - [Vue Query](https://ueberbrot.github.io/effect-api-query/guides/vue-query/), [Solid Query](https://ueberbrot.github.io/effect-api-query/guides/solid-query/), [Svelte Query](https://ueberbrot.github.io/effect-api-query/guides/svelte-query/), and [Angular Query](https://ueberbrot.github.io/effect-api-query/guides/angular-query/): rebuild options from reactive input with native Query integrations.
 - [TanStack Start](https://ueberbrot.github.io/effect-api-query/guides/tanstack-start/): share RPC and HTTP options across loaders, server rendering, and hydration.
-- [Stream snapshots](https://ueberbrot.github.io/effect-api-query/guides/stream-snapshots/): capture open streams and await local cleanup before server disposal.
-- [Hydrate Unary Data](https://ueberbrot.github.io/effect-api-query/guides/hydrate-unary-data/) and [Query Views](https://ueberbrot.github.io/effect-api-query/guides/hydrate-query-views/): keep DTOs or reconstructed Schema values consistent across JSON hydration and refetch.
-- [Switch cache owners](https://ueberbrot.github.io/effect-api-query/guides/switch-cache-owners/) and [refresh from events](https://ueberbrot.github.io/effect-api-query/guides/refresh-from-events/): coordinate application-owned writes, persistence, and invalidation.
-- [Run the examples](https://ueberbrot.github.io/effect-api-query/examples/): try complete Vite React and TanStack Start applications.
-- [Feature support](https://ueberbrot.github.io/effect-api-query/getting-started/feature-support/): check available operations and integration limits.
-- [Performance and bundling](https://ueberbrot.github.io/effect-api-query/reference/performance/): assess construction, compiler, and bundle costs.
-- [API reference](https://ueberbrot.github.io/effect-api-query/reference/public-exports/): look up factories, builders, and errors.
+- [Run the examples](https://ueberbrot.github.io/effect-api-query/examples/): copy complete Vite React and Start integrations.
+- [API reference](https://ueberbrot.github.io/effect-api-query/reference/public-exports/): look up builders, cache views and errors.
 
 ## Agent skill
 
