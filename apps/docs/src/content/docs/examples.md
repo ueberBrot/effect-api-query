@@ -57,7 +57,6 @@ The HTTP panel uses `createHttpApiQueryUtils` from `effect-api-query`; the RPC p
 use `createRpcQueryUtils` from the same package root. The application owns both ready clients,
 their runners, and the QueryClient. During disposal, it awaits query cancellation, clears the
 cache, drains accepted commands and mutations, and then disposes the HTTP runtime and RPC client.
-Pagehide and HMR cleanup report failures after disposal finishes; explicit disposal rejects.
 Query cancellation can settle before iterator cleanup. See
 [Client Lifecycle](/effect-api-query/concepts/client-lifecycle/#stream-creation-and-consumption)
 for a separate stream-completion signal, and

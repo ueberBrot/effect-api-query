@@ -120,16 +120,4 @@ tensions:
       remote writes.
     implication: Keep originating-owner guards after drain and model command cancellation explicitly.
 cross_references: []
-gaps:
-  - skill: effect-api-query
-    question: Final human-document reconciliation.
-    context: README/site now describe the current contract and application-owned cache workflows.
-    status: resolved
-  - skill: effect-api-query
-    question: Initial release-version metadata.
-    context: The 0.1.0 candidate includes its initial changelog and matching skill metadata.
-    status: resolved
-  - skill: effect-api-query
-    question: Exact candidate acceptance.
-    context: Final acceptance must verify the selected 0.1.0 archive across the complete integration path.
-    status: open
+gaps: []

@@ -143,10 +143,5 @@ An imperative `queryClient.query(newOptions)` hit on fresh cached data retains e
 options. Install a changed sharing policy through an observer or an actual fetch before relying
 on it for subsequent manual writes.
 
-## Keep defaults in native Query APIs
-
-A per-operation defaults map would replace the repeated `setQueryDefaults(prefix, policy)` calls
-with a map and a registration loop. These recipes need only prefix selection and native policy
-merging, both already provided by TanStack. The map would add configuration without useful
-behavior, so the package provides no defaults helper. Keep shared policies on QueryClient and
-operation-specific selection, input, and typed error callbacks on the generated builders.
+Keep shared policies on QueryClient and operation-specific selection, input, and typed error
+callbacks on the generated builders.

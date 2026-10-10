@@ -21,7 +21,6 @@ Review upstream dependencies when adding an API or upgrading Effect. Each coordi
 upgrade requires published-type, runtime, and packed-consumer checks.
 
 Before `1.0`, breaking public changes raise the minor version and compatible changes raise the
-patch. An Effect-only upgrade may raise the patch when the public API remains compatible. The
-project keeps a changelog from its first release. Before publishing `1.0`, it evaluates the stability
-of the upstream RPC and HTTP APIs. The Effect package's stable version alone does not establish
-the stability of those APIs.
+patch. An Effect-only upgrade may raise the patch when the public API remains compatible.
+Before publishing `1.0`, evaluate the stability of the upstream RPC and HTTP APIs.
+The Effect package's stable version alone does not establish the stability of those APIs.

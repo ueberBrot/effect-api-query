@@ -55,7 +55,7 @@ jobs:
         run: |
           version="$(node --print "require('./package.json').version")"
           if [[ "$version" == "0.0.0" ]]; then
-            echo '::error::Refusing to publish the placeholder 0.0.0 version. Prepare a real package version and changelog before publishing.'
+            echo '::error::Refusing to publish the placeholder 0.0.0 version. Prepare a real package version before publishing.'
             exit 1
           fi
 

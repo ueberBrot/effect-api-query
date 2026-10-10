@@ -25,12 +25,12 @@ skills:
       - '**/examples/vite-react/src/app.tsx'
       - '**/examples/vite-react/tests/*.ts*'
       - '**/examples/tanstack-start/src/lib/*.ts'
+      - '**/examples/tanstack-start/src/router.tsx'
       - '**/examples/tanstack-start/tests/*.ts*'
       - '**/examples/server/src/*.ts'
       - '**/examples/server/tests/rpc-transport-overhead.test.ts'
       - GLOSSARY.md
       - README.md
-      - CHANGELOG.md
       - package.json
       - pnpm-workspace.yaml
       - scripts/*.mts

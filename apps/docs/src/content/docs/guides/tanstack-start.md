@@ -153,16 +153,6 @@ caller execution services cannot replace that authority. The example defaults th
 RPC execution bypasses transport Schema codecs. Keep a schema-aware protocol when wire validation
 or codec effects are required.
 
-The example pairs Schema encoding and decoding for its directory, pages, diagnostic history and
-live values. It awaits encoding before publishing the initial snapshot and each streamed batch,
-and awaits decoding of an entire batch before native hydration. Request disposal interrupts
-preparation and awaits its finalizers before releasing the clients. Serialization callbacks stay
-synchronous. Failed queries remain omitted. Its copied map covers the example's own generated
-key families; add an explicit codec when you add another hydratable view. See
-[Hydrate Query Views](/effect-api-query/guides/hydrate-query-views/) for page parameters, richer values
-and application-owned preparation services.
-
-The example also disables Vite preview compression for its API routes. The pinned middleware
-delays response-close listeners until the first write, preventing a pending buffered request from
-observing a disconnect. This host-specific setting lets the browser tests verify both aborted
-requests and server interruption.
+The example pairs Schema codecs for its generated query views and completes asynchronous
+preparation before publishing or hydrating. Add a codec for each new hydratable view. See
+[Hydrate Query Views](/effect-api-query/guides/hydrate-query-views/).

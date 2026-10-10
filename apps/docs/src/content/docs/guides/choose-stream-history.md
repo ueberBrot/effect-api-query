@@ -54,23 +54,3 @@ render scheduling add their own behavior; cache notification counts do not count
 If the producer outruns the interface, set an explicit rate or sampling policy in the producer or
 an application-owned Effect Stream transformation. Sampling intentionally discards values.
 Retention and transport buffering serve different purposes from publication rate.
-
-## Repeat the repository baseline
-
-From a repository checkout with its dependencies available, run:
-
-```sh
-STREAM_MEASURE=/tmp/stream-baseline.json vp run --no-cache test tests/create-rpc-query-utils-stream-baseline.test.ts
-```
-
-The command replaces the chosen JSON file. It compares 64 numeric or object emissions across
-unlimited history, windows of four and sixteen elements, and live values, with native structural
-sharing enabled and disabled. Each case uses a fresh QueryClient and a finite in-memory ready
-RPC client, with no framework observers.
-
-The report records dependency versions, source and workload fingerprints, cache notifications,
-data writes, changed references, and retained sequences. It separates the stream's manual cache
-writes from the final successful fetch write. Array-slot and object-reference counts
-describe values observed at the cache boundary. They do not measure total allocation, heap size,
-garbage collection, network throughput, or browser rendering time. Use the same workload and
-toolchain when comparing changes, then measure any rendering concern in the application that has it.

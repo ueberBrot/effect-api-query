@@ -70,11 +70,6 @@ and then dispose the runtime or close the client Scope. `cancelQueries` restores
 state; iterator cleanup can finish asynchronously, so wait for your resource's completion signal
 before disposal. Settle pending mutations separately because they have no query abort signal.
 
-The [packed runner fixture](https://github.com/ueberBrot/effect-api-query/blob/main/tests/packed-consumer/retry-runtime.mts)
-checks both stream views: creation finishes before the first transformed emission, pulls and
-finalizers retain the runner's provided Context, and cancellation finalizes the stream before
-client disposal.
-
 For an open-stream server capture, await
 [fetchStreamSnapshot](/effect-api-query/guides/stream-snapshots/) before dehydration or client
 disposal. The helper waits for local iterator cleanup; remote completion still requires an
