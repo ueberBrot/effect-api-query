@@ -29,7 +29,9 @@
     "tests/packed-consumer/defaults-contract.ts",
     "tests/packed-consumer/hydration-runtime.mts",
     "tests/packed-consumer/hydration-views-runtime.mts",
-    "tests/packed-consumer/hydration-contract.ts"
+    "tests/packed-consumer/hydration-contract.ts",
+    "tests/packed-consumer/hosts/browser.ts",
+    "tests/packed-consumer/hosts/worker.ts"
   ],
 
   "ignorePatterns": ["examples/tanstack-start/src/routeTree.gen.ts"],

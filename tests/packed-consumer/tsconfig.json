@@ -49,6 +49,7 @@
     "http-stream-contract.ts",
     "public-contract.ts",
     "http-contract.ts",
+    "hosts/**/*.ts",
     "docs-rpc-quick-start.ts",
     "docs-http-quick-start.ts",
     "docs-retry.ts",
