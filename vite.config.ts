@@ -329,7 +329,7 @@ export default defineConfig({
         command: 'vp test',
         dependsOn: ['pack', 'server-local-types'],
         cache: {
-          env: ['RPC_TRANSPORT_MEASURE'],
+          env: ['RPC_TRANSPORT_MEASURE', 'STREAM_MEASURE'],
           output: [],
         },
       },
