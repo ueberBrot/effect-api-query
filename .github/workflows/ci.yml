@@ -137,6 +137,12 @@ jobs:
       - name: Install ${{ matrix.browser }}
         run: vp exec playwright install --with-deps ${{ matrix.browser }}
 
+      - name: Download verified package for host acceptance
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: package-${{ github.sha }}
+          path: .artifacts
+
       - name: Check documentation in ${{ matrix.browser }}
         run: vp run docs-e2e --project=${{ matrix.browser }}
 
