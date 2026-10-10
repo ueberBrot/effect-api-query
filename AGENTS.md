@@ -8,7 +8,8 @@ Read the shared [planning record](_artifacts/skill_spec.md); maintain its domain
 and skill tree alongside the affected guidance. Run `vp exec intent maintainer sync`,
 review actual source changes with `vp exec intent maintainer review --json`, and
 record justified outcomes for the owned skill, planning, and source items after
-task checks. Leave unrelated skills unresolved. Finish with `vp run skills-check`.
+task checks. Leave unrelated skills unresolved. Run `vp exec intent maintainer check`,
+report pending work, and finish with `vp run skills-check`.
 
 ### Issue tracker
 
