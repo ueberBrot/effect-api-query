@@ -71,6 +71,7 @@ export default defineConfig({
             { label: 'HTTP Queries and Mutations', slug: 'guides/http-queries-and-mutations' },
             { label: 'TanStack Start', slug: 'guides/tanstack-start' },
             { label: 'Stream Snapshots', slug: 'guides/stream-snapshots' },
+            { label: 'Choose Stream History', slug: 'guides/choose-stream-history' },
             { label: 'Cache Management', slug: 'guides/cache-management' },
             { label: 'Cache Filters', slug: 'guides/cache-filters' },
             { label: 'Switch Cache Owners', slug: 'guides/switch-cache-owners' },
