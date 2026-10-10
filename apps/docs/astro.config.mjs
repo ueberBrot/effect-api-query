@@ -108,6 +108,7 @@ export default defineConfig({
             { label: 'Public Exports', slug: 'reference/public-exports' },
             { label: 'Browser and Worker Hosts', slug: 'reference/browser-and-worker-hosts' },
             { label: 'External HTTP Clients', slug: 'reference/external-http-clients' },
+            { label: 'Performance and Bundling', slug: 'reference/performance' },
             { label: 'Compatibility and Limits', slug: 'reference/compatibility-and-limits' },
           ],
         },

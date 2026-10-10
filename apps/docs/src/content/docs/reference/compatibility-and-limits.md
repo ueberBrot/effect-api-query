@@ -5,6 +5,9 @@ description: Supported versions, RPC and HTTP operations, cache identity, and ru
 
 ## Supported integrations
 
+See [Performance and Bundling](/effect-api-query/reference/performance/) for construction costs,
+repeatable compiler measurements, and adapter versus application bundle sizes.
+
 The package targets Effect 4 and TanStack Query Core 5.103.1 or later in v5, with React Query and TanStack Start
 integrations checked in this repository. It is ESM-only and targets ES2022. Use TypeScript with
 `strict: true`.
