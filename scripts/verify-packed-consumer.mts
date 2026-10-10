@@ -588,6 +588,7 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       'snapshot-runtime.mts',
       'defaults-runtime.mts',
       'hydration-runtime.mts',
+      'hydration-views-runtime.mts',
     ]) {
       execFileSync(process.execPath, ['--experimental-import-meta-resolve', fixture], {
         cwd: consumerDirectory,

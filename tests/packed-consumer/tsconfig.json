@@ -34,6 +34,8 @@
     "docs-defaults.ts",
     "docs-http-defaults.ts",
     "hydration-runtime.mts",
+    "hydration-views-runtime.mts",
+    "hydration-views-contract.ts",
     "http-runtime.mts",
     "http-metadata-runtime.mts",
     "http-etag-recipe.mts",

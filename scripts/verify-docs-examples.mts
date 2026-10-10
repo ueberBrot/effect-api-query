@@ -17,6 +17,7 @@ for (const [page, fixtures] of [
     'guides/query-defaults',
     ['packed-consumer/docs-defaults', 'packed-consumer/docs-http-defaults'],
   ],
+  ['guides/hydrate-query-views', ['packed-consumer/docs-hydration-views']],
   [
     'guides/hydrate-unary-data',
     [

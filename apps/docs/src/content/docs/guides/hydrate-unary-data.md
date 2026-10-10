@@ -8,8 +8,8 @@ and browser must use the same contract, key prefix, and inputs. Each owns its Qu
 Effect client, and runtime. Cancel outstanding queries before disposing a runtime.
 
 These recipes cover unary profile reads through either factory. They keep only successful profile
-queries and omit mutations. Use an explicit strategy for other cached shapes, including infinite
-pages and stream snapshots.
+queries and omit mutations. Use the [query-view recipe](/effect-api-query/guides/hydrate-query-views/)
+for infinite pages, stream snapshots, and HTTP metadata.
 
 ## Keep DTOs in both caches
 
