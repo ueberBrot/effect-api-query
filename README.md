@@ -98,7 +98,7 @@ for accumulated HTTP event queries.
 Install the library usage skill from this repository:
 
 ```sh
-npx skills add ueberBrot/effect-api-query --skill effect-api-query
+npx skills add ueberBrot/effect-api-query --full-depth --skill effect-api-query
 ```
 
 The same skill ships in the npm package. With the library installed, run

@@ -271,8 +271,8 @@ importers:
         specifier: 0.2.0
         version: 0.2.0
       '@tanstack/intent':
-        specifier: 0.5.0
-        version: 0.5.0
+        specifier: 0.5.3
+        version: 0.5.3
       '@tanstack/query-core':
         specifier: 'catalog:'
         version: 5.104.0
@@ -2149,8 +2149,8 @@ packages:
     resolution: {integrity: sha512-utTS5L2OkeYUzXGohL1Z8sefu1GLNOJcxe8Hd6iIdc/Xo1K1nDB2JEp4iSFhvYh33xKC9V91TxrS8qfrpoKobQ==}
     engines: {node: '>=20.19'}
 
-  '@tanstack/intent@0.5.0':
-    resolution: {integrity: sha512-27zOOpQLfBTM5cQjqkASf6JH3jggMwr29UhK8dlAI1WP9rjzywJ87/I6meiH/khyPIFNRluh9Q8wlIVrpN4Jpg==}
+  '@tanstack/intent@0.5.3':
+    resolution: {integrity: sha512-2zeLGRJ+796daqv3DrwXsrXn7TZb4yOIogJgrqeF96YEIwOsJoDIW/eQBwZVAcR1OQ3znA3dGDizb5GBmxk4Zg==}
     engines: {node: '>=20.12.0'}
     hasBin: true
 
@@ -6583,7 +6583,7 @@ snapshots:
 
   '@tanstack/history@1.162.4': {}
 
-  '@tanstack/intent@0.5.0': {}
+  '@tanstack/intent@0.5.3': {}
 
   '@tanstack/query-core@5.104.0': {}
 

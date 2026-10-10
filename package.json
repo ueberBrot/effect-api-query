@@ -55,7 +55,7 @@
     "@effect/vitest": "4.0.0",
     "@playwright/test": "1.63.0",
     "@shadcn/lint": "0.2.0",
-    "@tanstack/intent": "0.5.0",
+    "@tanstack/intent": "0.5.3",
     "@tanstack/query-core": "catalog:",
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-router": "catalog:",

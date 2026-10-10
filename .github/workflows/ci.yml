@@ -29,6 +29,7 @@ jobs:
         name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          fetch-depth: 0
           persist-credentials: false
 
       - &setup_repository
@@ -51,7 +52,15 @@ jobs:
         run: vp run api-types
 
       - name: Check shipped skills
-        run: vp run skills-check
+        env:
+          INTENT_REVIEW_BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          vp run skills-check
+          if [ -n "$INTENT_REVIEW_BASE" ]; then
+            vp exec intent maintainer check --base "$INTENT_REVIEW_BASE" --github-summary
+          else
+            vp exec intent maintainer check --github-summary
+          fi
 
       - name: Run Effect diagnostics
         run: vp run effect-check
