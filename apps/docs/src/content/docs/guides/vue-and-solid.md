@@ -7,15 +7,9 @@ Pass generated options from either factory to the framework's native Query hooks
 `VueQueryPlugin` in Vue or `QueryClientProvider` in Solid, and acquire the ready client before
 creating the utilities. Keep its `Scope` and any serviceful runner alive while queries use them.
 
-| Framework | Framework version | Query wrapper and matching Query Core |
-| --------- | ----------------- | ------------------------------------- |
-| Vue       | 3.5.43            | 5.103.1 and 5.104.0                   |
-| Solid     | 1.9.15            | 5.103.1 and 5.104.0                   |
-
-These combinations use Effect 4.0.0 with strict TypeScript 5.9.3 and 7.0.2. The same generated
-builders provide selection, defined initial data, skipping, mutations, pagination, accumulated
-streams, live values, and HTTP metadata views. See the
-[compatibility reference](/effect-api-query/reference/compatibility-and-limits/) for the wider scope.
+Match the native Query wrapper to the application's Query Core and use a compiler supported by
+the framework's tooling. See the
+[compatibility reference](/effect-api-query/reference/compatibility-and-limits/) for adapter capabilities.
 
 ## Rebuild options when input changes
 
@@ -87,7 +81,7 @@ Vue evaluates a function-valued `enabled` as a getter with no arguments. Use a b
 computed options, or a zero-argument getter returning a boolean. A Core `enabled(query)` callback
 cannot be passed directly to Vue. Solid accepts the native Core callback.
 
-The pinned Solid query and infinite-query overloads accept defined initial data or absent initial
+Solid Query 5.104.0 query and infinite-query overloads accept defined initial data or absent initial
 data. A value or initializer that may return `undefined` does not match those overloads. Omit
 `initialData` or supply a defined seed. Vue accepts a possibly undefined initializer. An explicit
 `initialData: undefined` still overrides inherited QueryClient initial data in both integrations.

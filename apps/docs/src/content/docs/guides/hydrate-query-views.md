@@ -60,12 +60,12 @@ export const ProfilePage = Schema.Struct({
   rows: Schema.Array(Profile),
   next: Schema.NullOr(Schema.Finite),
 })
-export const ProfilePages = Schema.Struct({
+const ProfilePages = Schema.Struct({
   pages: Schema.Array(ProfilePage),
   pageParams: Schema.Array(Cursor),
 })
 
-export class ArchivedProfile extends Schema.Class<ArchivedProfile>('ArchivedProfile')({
+class ArchivedProfile extends Schema.Class<ArchivedProfile>('ArchivedProfile')({
   archived: Schema.Literal(true),
   name: Schema.String,
   credits: Schema.BigIntFromString,
@@ -76,7 +76,7 @@ export class ArchivedProfile extends Schema.Class<ArchivedProfile>('ArchivedProf
 }
 
 const DecodedHeaders = Schema.Struct({ 'x-version': Schema.FiniteFromString })
-export const WrappedElement = Schema.Struct({ body: HistoryElement, headers: DecodedHeaders }).pipe(
+const WrappedElement = Schema.Struct({ body: HistoryElement, headers: DecodedHeaders }).pipe(
   Schema.decodeTo(
     Schema.toType(HttpApiSchema.WithHeaders(HistoryElement, DecodedHeaders)),
     SchemaTransformation.transform({
@@ -86,7 +86,7 @@ export const WrappedElement = Schema.Struct({ body: HistoryElement, headers: Dec
   ),
 )
 const BufferedBody = Schema.Union([Profile, ArchivedProfile])
-export const BufferedProfile = Schema.Struct({
+const BufferedProfile = Schema.Struct({
   body: BufferedBody,
   headers: DecodedHeaders,
 }).pipe(
@@ -98,7 +98,7 @@ export const BufferedProfile = Schema.Struct({
     }),
   ),
 )
-export const ProfileMetadata = Schema.Struct({
+const ProfileMetadata = Schema.Struct({
   data: BufferedProfile,
   status: Schema.Finite,
   headers: Schema.Record(Schema.String, Schema.String),

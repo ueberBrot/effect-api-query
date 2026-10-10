@@ -53,6 +53,3 @@ or `EffectHttpApiQueryEmptyStreamError` for HTTP SSE.
 
 Accumulated streamed queries retain emitted values as supplied, including `undefined` elements
 inside their cached arrays.
-
-The [packed RPC consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/packed-consumer/runtime.mts) and
-[packed HTTP consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/packed-consumer/http-runtime.mts) exercise these normalization rules.

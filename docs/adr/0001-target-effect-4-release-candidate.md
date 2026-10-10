@@ -18,7 +18,7 @@ Internal adapters isolate upstream extraction and invocation.
 ## Consequences
 
 Review upstream dependencies when adding an API or upgrading Effect. Each coordinated Effect
-upgrade requires published-type, runtime, and packed-consumer checks.
+upgrade requires public-type, runtime, and native build checks.
 
 Before `1.0`, breaking public changes raise the minor version and compatible changes raise the
 patch. An Effect-only upgrade may raise the patch when the public API remains compatible.

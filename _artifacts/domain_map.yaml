@@ -35,7 +35,7 @@ skills:
       - Defer event refresh until participating writes settle.
       - Retire consumers and accepted work before acquiring a replacement owner.
       - Rebuild options inside native reactive framework accessors.
-      - Choose an application-owned transport within verified version and host limits.
+      - Choose an application-owned transport within documented version and host boundaries.
     subsystems:
       - name: RPC
         package: effect-api-query
@@ -85,14 +85,14 @@ skills:
         mechanism: JSON loses prototypes, rich page parameters, and distinct undefined elements.
         wrong_pattern: hydrate(queryClient, JSON.parse(snapshot))
         correct_pattern: await decodeAllSelectedViewsThenHydrate(snapshot)
-        source: tests/packed-consumer/hydration-views-runtime.mts
+        source: tests/types/docs-hydration-views.ts
         priority: HIGH
         status: active
       - mistake: Construct reactive query options only once
         mechanism: Builders capture the first input and cannot follow reactive changes.
         wrong_pattern: useQuery(rpc.users.read.queryOptions({ input }))
         correct_pattern: 'useQuery(() => rpc.users.read.queryOptions({ input: readInput() }))'
-        source: tests/packed-consumer/vue-solid-contract.ts
+        source: apps/docs/src/content/docs/guides/vue-and-solid.md
         priority: HIGH
         status: active
       - mistake: Rely on changed metadata options after a fresh hit

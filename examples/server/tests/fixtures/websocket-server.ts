@@ -5,7 +5,7 @@ import { RpcSerialization, RpcServer } from 'effect/rpc'
 import type { Socket } from 'effect/socket'
 import { createServer } from 'node:http'
 
-import { socketGroup } from '../../../../tests/packed-consumer/socket-client.ts'
+import { socketGroup } from '../../../../tests/fixtures/socket-client.ts'
 
 export const serveSocketGroup = Effect.fn('serveSocketGroup')(function* (handlers: {
   readonly 'values.read': (input: { readonly id: number }) => Effect.Effect<number>

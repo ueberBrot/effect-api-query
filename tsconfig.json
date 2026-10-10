@@ -54,9 +54,14 @@
               "tests/fixtures/rpc-transport-queries.ts",
               "tests/fixtures/http-client.ts",
               "tests/fixtures/optimistic-users.ts",
-              "tests/types/**/*.ts",
-              "scripts/run-command.mts",
-              "scripts/measure-packed-consumer.mts"
+              "tests/fixtures/user-events.ts",
+              "tests/fixtures/socket-client.ts",
+              "tests/fixtures/websocket-checks.ts",
+              "tests/fixtures/docs-websocket-use.ts",
+              "tests/stream-snapshot.test.ts",
+              "tests/cache-recipes.test.ts",
+              "scripts/measure-construction.mts",
+              "tests/types/**/*.ts"
             ],
             "options": {
               "diagnosticSeverity": {
@@ -80,5 +85,5 @@
     "tests/**/*.ts",
     "vite.config.ts"
   ],
-  "exclude": ["dist", "node_modules", "tests/packed-consumer"]
+  "exclude": ["dist", "node_modules"]
 }

@@ -7,7 +7,7 @@ Use one application-owned consumer to map a domain event to the reads it changes
 must name both adapters when RPC and HTTP represent the same domain: their generated cache roots
 remain separate.
 
-Copy [the user-event consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/packed-consumer/user-events.ts)
+Copy [the user-event consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/fixtures/user-events.ts)
 next to your owner, write, and client modules, adjusting its local application imports. Its inputs are the captured owner and
 an application-owned Effect Reactivity service. Supply your own decoded network stream; the module
 creates no connection, broker, provider, or second cache.
@@ -22,10 +22,10 @@ your application runtime and keep that Scope open across transport reconnects.
 import { Effect, Stream } from 'effect'
 import type { Reactivity } from 'effect/reactivity'
 
-import { decodeUserEvent, makeUserEventConsumer } from './user-events.ts'
-import type { UserEventOwner } from './user-events.ts'
+import { decodeUserEvent, makeUserEventConsumer } from '../fixtures/user-events.ts'
+import type { UserEventOwner } from '../fixtures/user-events.ts'
 
-export const attachUserEvents = Effect.fnUntraced(function* (
+const attachUserEvents = Effect.fnUntraced(function* (
   owner: UserEventOwner,
   reactivity: Reactivity.Reactivity,
 ) {

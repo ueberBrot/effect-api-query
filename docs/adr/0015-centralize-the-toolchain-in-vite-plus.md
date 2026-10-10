@@ -11,11 +11,10 @@ drift apart.
 
 Centralize those tasks in Vite+'s `vite.config.ts` and integrated tools. Keep separate tools only for
 capabilities Vite+ does not own, such as Astro diagnostics, Effect-aware test helpers, full-process
-browser tests, packed-package checks, and release management.
+browser tests, public compiler fixtures, and release management.
 
 ## Consequences
 
-Library development uses TypeScript 7 with matching Effect diagnostics. Packed declarations are
-also checked with TypeScript 5.9. The private documentation package may use a compatible compiler
-when Astro does not support the repository compiler API. Strict package and dependency checks remain
-release gates; dependency-update automation remains deferred.
+Library development uses TypeScript 7 with matching Effect diagnostics. Public declarations are
+also checked with TypeScript 5.9. The documentation package may use a compiler supported by Astro.
+Native package validation remains part of the build; dependency-update automation remains deferred.

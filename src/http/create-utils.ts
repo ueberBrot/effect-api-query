@@ -34,7 +34,7 @@ export const createHttpApiQueryUtils = <
     errors,
   })
   // SAFETY: The compiled operations retain this Api's endpoint identities and ready
-  // client; packed type fixtures verify its generated builder overloads and channels.
+  // client.
   // oxlint-disable-next-line typescript/no-unsafe-type-assertion
   return tree as HttpApiQueryUtils<Api, Prefix, Client>
 }

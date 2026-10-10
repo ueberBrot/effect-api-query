@@ -1,7 +1,6 @@
 import { NodeRuntime, NodeServices } from '@effect/platform-node'
 import { Effect, FileSystem, Path } from 'effect'
 // fallow-ignore-file unused-file
-// The docs-check task verifies tutorial text against packed compiler fixtures.
 import { strictEqual } from 'node:assert'
 
 import { decodeUtf8 } from './decode-utf8.mts'
@@ -10,37 +9,22 @@ const program = Effect.gen(function* () {
   const fs = yield* FileSystem.FileSystem
   const path = yield* Path.Path
   for (const [page, fixtures] of [
-    ['getting-started/quick-start', ['types/docs-rpc-quick-start']],
-    ['getting-started/http-quick-start', ['types/docs-http-quick-start']],
-    ['reference/external-http-clients', ['packed-consumer/docs-openapi']],
-    ['guides/retry-queries', ['packed-consumer/docs-retry']],
-    ['guides/svelte-and-angular', ['packed-consumer/docs-angular']],
-    [
-      'guides/vue-and-solid',
-      ['packed-consumer/docs-vue-query', 'packed-consumer/docs-solid-query'],
-    ],
-    ['guides/switch-cache-owners', ['packed-consumer/docs-owner-cache']],
-    ['guides/refresh-from-events', ['packed-consumer/docs-user-events']],
+    ['getting-started/quick-start', ['tests/types/docs-rpc-quick-start']],
+    ['getting-started/http-quick-start', ['tests/types/docs-http-quick-start']],
+    ['guides/retry-queries', ['tests/types/docs-retry']],
+    ['guides/refresh-from-events', ['tests/types/docs-user-events']],
     [
       'guides/websocket-clients',
-      ['packed-consumer/socket-client', 'packed-consumer/docs-websocket-use'],
+      ['tests/fixtures/socket-client', 'tests/fixtures/docs-websocket-use'],
     ],
-    ['guides/stream-snapshots', ['packed-consumer/docs-stream-snapshot']],
-    [
-      'guides/cache-filters',
-      ['packed-consumer/docs-cache-filters-rpc', 'packed-consumer/docs-cache-filters-http'],
-    ],
-    [
-      'guides/query-defaults',
-      ['packed-consumer/docs-defaults', 'packed-consumer/docs-http-defaults'],
-    ],
-    ['guides/hydrate-query-views', ['packed-consumer/docs-hydration-views']],
+    ['guides/stream-snapshots', ['tests/types/docs-stream-snapshot']],
+    ['guides/hydrate-query-views', ['tests/types/docs-hydration-views']],
     [
       'guides/hydrate-unary-data',
       [
-        'packed-consumer/docs-hydration-dto',
-        'packed-consumer/docs-hydration-rich',
-        'packed-consumer/docs-hydration-async',
+        'tests/types/docs-hydration-dto',
+        'tests/types/docs-hydration-rich',
+        'tests/types/docs-hydration-async',
       ],
     ],
   ] as const) {
@@ -55,13 +39,11 @@ const program = Effect.gen(function* () {
     strictEqual(samples.length, fixtures.length, `${page} must contain its TypeScript fixtures`)
     for (const [index, fixture] of fixtures.entries()) {
       const source = decodeUtf8(
-        yield* fs.readFile(
-          yield* path.fromFileUrl(new URL(`../tests/${fixture}.ts`, import.meta.url)),
-        ),
+        yield* fs.readFile(yield* path.fromFileUrl(new URL(`../${fixture}.ts`, import.meta.url))),
       )
       strictEqual(
         samples[index]?.groups?.['source']?.trimEnd(),
-        source.trimEnd(),
+        source.replaceAll("from '#effect-api-query'", "from 'effect-api-query'").trimEnd(),
         `${page} differs from ${fixture}.ts`,
       )
     }

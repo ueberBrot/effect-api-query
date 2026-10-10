@@ -26,26 +26,26 @@ import { HttpClientError } from 'effect/http'
 import { HttpApi, HttpApiClient, HttpApiEndpoint, HttpApiGroup } from 'effect/http-api'
 import { Rpc, RpcClient, RpcClientError, RpcGroup } from 'effect/rpc'
 
-export class NotFound extends Schema.TaggedError<NotFound>()('NotFound', {}) {}
-export class AuthenticationRequired extends Schema.TaggedError<AuthenticationRequired>()(
+class NotFound extends Schema.TaggedError<NotFound>()('NotFound', {}) {}
+class AuthenticationRequired extends Schema.TaggedError<AuthenticationRequired>()(
   'AuthenticationRequired',
   {},
 ) {}
-export class RetryLater extends Schema.TaggedError<RetryLater>()('RetryLater', {
+class RetryLater extends Schema.TaggedError<RetryLater>()('RetryLater', {
   retryAfterMs: Schema.Finite,
 }) {}
 
 const ReadError = Schema.Union([NotFound, AuthenticationRequired, RetryLater])
-export const readGroup = RpcGroup.make(
+const readGroup = RpcGroup.make(
   Rpc.make('profile.read', { success: Schema.String, error: ReadError }),
 )
-export const readApi = HttpApi.make('profile-api').add(
+const readApi = HttpApi.make('profile-api').add(
   HttpApiGroup.make('profile').add(
     HttpApiEndpoint.get('read', '/profile', { success: Schema.String, error: ReadError }),
   ),
 )
 
-export const rpcReadOptions = (
+const rpcReadOptions = (
   client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof readGroup>, RpcClientError.RpcClientError>,
 ) => {
   const rpc = createRpcQueryUtils<
@@ -90,7 +90,7 @@ export const rpcReadOptions = (
   })
 }
 
-export const httpReadOptions = (client: HttpApiClient.ForApi<typeof readApi>) => {
+const httpReadOptions = (client: HttpApiClient.ForApi<typeof readApi>) => {
   const http = createHttpApiQueryUtils(readApi, { client, keyPrefix: ['profile-app'] })
 
   return http.profile.read.queryOptions({
@@ -185,4 +185,4 @@ ready client's Effect, so their encoding failures use the execution Cause.
 
 Use [failure handling](/effect-api-query/guides/handle-failures/) for error-stage guards and
 [the error reference](/effect-api-query/reference/errors/) for stable metadata. See the
-[complete example](https://github.com/ueberBrot/effect-api-query/blob/main/tests/packed-consumer/docs-retry.ts).
+[complete example](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-retry.ts).

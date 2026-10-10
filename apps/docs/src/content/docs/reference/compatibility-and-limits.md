@@ -6,65 +6,59 @@ description: Supported versions, RPC and HTTP operations, cache identity, and ru
 ## Supported integrations
 
 See [Performance and Bundling](/effect-api-query/reference/performance/) for construction costs,
-repeatable compiler measurements, and adapter versus application bundle sizes.
+source measurements, and adapter versus application bundles.
 
 The package declares one exact Effect peer and Query Core `>=5.103.1 <6`. It is ESM-only and
-targets ES2022. Use TypeScript with `strict: true`. These are the concrete tested versions:
+targets ES2022. Use TypeScript with `strict: true`. The repository uses these versions:
 
-| Integration                                         | Tested versions                             |
-| --------------------------------------------------- | ------------------------------------------- |
-| Effect runtime, testing, and Node platform packages | 4.0.0                                       |
-| Query Core and React Query                          | 5.103.1 and 5.104.0, with matching versions |
-| Published TypeScript contract                       | 5.9.3 and 7.0.2                             |
-| React                                               | 19.3.0                                      |
-| TanStack Start                                      | 1.168.60                                    |
-| TanStack Router and Router SSR Query                | 1.170.41 and 1.167.3, respectively          |
+| Integration                                         | Versions                           |
+| --------------------------------------------------- | ---------------------------------- |
+| Effect runtime, testing, and Node platform packages | 4.0.0                              |
+| Query Core and React Query                          | 5.104.0, with matching versions    |
+| Published TypeScript contract                       | 5.9.3 and 7.0.2                    |
+| React                                               | 19.3.0                             |
+| TanStack Start                                      | 1.168.60                           |
+| TanStack Router and Router SSR Query                | 1.170.41 and 1.167.3, respectively |
 
 The stable Effect release contains unstable RPC and HTTP API modules. Keep the application's
 Effect packages coordinated with the exact peer; see
 [Compatibility and Stability](/effect-api-query/getting-started/compatibility-and-stability/).
 
-Svelte 5.57.1 and Angular 22.2.1 browser components can consume generated Core options through
-their native accessors. See [Svelte and Angular](/effect-api-query/guides/svelte-and-angular/) for
-matching Query wrapper versions, compiler resolution, and reactive ownership boundaries.
-
-Vue 3.5.43 and Solid 1.9.15 use their native Query wrappers at 5.103.1 and 5.104.0, each with matching
-Query Core, Effect 4.0.0, and TypeScript 5.9.3 or 7.0.2. See
-[Vue and Solid Query](/effect-api-query/guides/vue-and-solid/) for reactive option rebuilding,
-Vue's type-inference and `enabled` distinctions, and Solid's initial-data overload limits.
+Use native reactive accessors with generated Core options. See
+[Svelte and Angular](/effect-api-query/guides/svelte-and-angular/) and
+[Vue and Solid Query](/effect-api-query/guides/vue-and-solid/) for option rebuilding,
+compiler resolution, hook overloads, and resource ownership.
 
 Consult [package metadata](https://github.com/ueberBrot/effect-api-query/blob/main/package.json) for
 peer ranges and the [workspace catalog](https://github.com/ueberBrot/effect-api-query/blob/main/pnpm-workspace.yaml)
-for the pinned Effect release and framework versions. The
-[packed consumer verifier](https://github.com/ueberBrot/effect-api-query/blob/main/scripts/verify-packed-consumer.mts)
-defines the compiler and peer combinations tested against the packaged library.
+for the pinned Effect release and example dependencies.
 
 ## Capability matrix
 
 **Generated** means the package supplies the typed builders and runtime behavior. **Tested** means
-an executable consumer verifies the integration. **Application-owned** means your application
+a public-contract fixture or executable example covers the integration. **Application-owned** means your application
 supplies the client, policy, or lifecycle. **Deferred** means the adapter does not expose it.
 
-| Capability                                        | RPC                                                                                                      | HTTP                                                                                        |
-| ------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| Ordinary queries and mutations                    | Generated for unary RPCs                                                                                 | Generated for buffered endpoints without multipart, regardless of method                    |
-| Pagination                                        | Generated `infiniteOptions`; pages map to payloads                                                       | Generated for buffered endpoints without multipart; pages map to decoded requests           |
-| Accumulated streams and live queries              | Generated for streaming RPCs; tested cancellation and SSR snapshots                                      | Generated for unambiguous SSE successes without multipart; tested failures and cleanup      |
-| Buffered multipart uploads                        | Application-owned transport and payload contract                                                         | Generated mutation-only builders; application supplies `FormData`                           |
-| Streaming multipart                               | Application-owned transport and payload contract                                                         | Deferred; any streaming multipart request alternative omits the endpoint                    |
-| Raw HTTP response modes                           | Outside the RPC contract                                                                                 | Raw responses omitted; metadata views retain decoded data and plain status/header snapshots |
-| Conditional queries                               | Generated `skipToken` support for input-bearing queries                                                  | Generated `skipToken` support for input-bearing queries                                     |
-| Cache keys and invalidation prefixes              | Generated `rpc` namespace and dotted tag paths                                                           | Generated `http` namespace, API identifier, and literal projected paths                     |
-| Failure inspection                                | Generated wrapper preserves the failed Exit Cause                                                        | Generated wrapper preserves the failed Exit Cause and declaration identity                  |
-| Query cancellation                                | Generated signal forwarding and stream iterator cleanup; transport support is application-owned          | Generated signal forwarding; fetch abort is tested                                          |
-| Mutation cancellation                             | No upstream TanStack mutation abort signal; explicit cancellable command is application-owned and tested | No upstream TanStack mutation abort signal; domain cancellation is application-owned        |
-| Authentication, middleware, and residual services | Application-owned ready client and runner                                                                | Application-owned ready client and runner                                                   |
-| React hooks and QueryClient                       | Tested public consumers and Vite React example                                                           | Tested public consumers and Vite React example                                              |
-| Svelte and Angular browser components             | Tested native reactive accessors for generated queries and streams                                       | Tested native reactive accessors for buffered, metadata, and SSE views                      |
-| Vue and Solid Query                               | Tested native reactive accessors and browser lifecycle                                                   | Tested native reactive accessors and browser lifecycle                                      |
-| SSR and hydration                                 | Application-owned; tested Start route loading and stream snapshots                                       | Application-owned; tested Start SSR, hydration, failed-query refetch, and request isolation |
-| Host routes                                       | Application-owned; tested standalone server and Start `/rpc`                                             | Application-owned; tested standalone server and Start `/api/$`                              |
-| Cache serialization and mutation invalidation     | Application-owned                                                                                        | Application-owned                                                                           |
+| Capability                                        | RPC                                                                                                      | HTTP                                                                                         |
+| ------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Ordinary queries and mutations                    | Generated for unary RPCs                                                                                 | Generated for buffered endpoints without multipart, regardless of method                     |
+| Pagination                                        | Generated `infiniteOptions`; pages map to payloads                                                       | Generated for buffered endpoints without multipart; pages map to decoded requests            |
+| Accumulated streams and live queries              | Generated for streaming RPCs; tested cancellation and SSR snapshots                                      | Generated for unambiguous SSE successes without multipart; tested failures and cleanup       |
+| Buffered multipart uploads                        | Application-owned transport and payload contract                                                         | Generated mutation-only builders; application supplies `FormData`                            |
+| Streaming multipart                               | Application-owned transport and payload contract                                                         | Deferred; any streaming multipart request alternative omits the endpoint                     |
+| Raw HTTP response modes                           | Outside the RPC contract                                                                                 | Raw responses omitted; metadata views retain decoded data and plain status/header snapshots  |
+| Conditional queries                               | Generated `skipToken` support for input-bearing queries                                                  | Generated `skipToken` support for input-bearing queries                                      |
+| Cache keys and invalidation prefixes              | Generated `rpc` namespace and dotted tag paths                                                           | Generated `http` namespace, API identifier, and literal projected paths                      |
+| Failure inspection                                | Generated wrapper preserves the failed Exit Cause                                                        | Generated wrapper preserves the failed Exit Cause and declaration identity                   |
+| Query cancellation                                | Generated signal forwarding and stream iterator cleanup; transport support is application-owned          | Generated signal forwarding; fetch abort is tested                                           |
+| Mutation cancellation                             | No upstream TanStack mutation abort signal; explicit cancellable command is application-owned and tested | No upstream TanStack mutation abort signal; domain cancellation is application-owned         |
+| Authentication, middleware, and residual services | Application-owned ready client and runner                                                                | Application-owned ready client and runner                                                    |
+| React hooks and QueryClient                       | Tested public types and Vite React example                                                               | Tested public types and Vite React example                                                   |
+| Svelte and Angular browser components             | Native reactive accessors for generated queries and streams; application-owned lifecycle                 | Native reactive accessors for buffered, metadata, and SSE views; application-owned lifecycle |
+| Vue and Solid Query                               | Native reactive accessors; application-owned lifecycle                                                   | Native reactive accessors; application-owned lifecycle                                       |
+| SSR and hydration                                 | Application-owned; tested Start route loading and stream snapshots                                       | Application-owned; tested Start SSR, hydration, failed-query refetch, and request isolation  |
+| Host routes                                       | Application-owned; tested standalone server and Start `/rpc`                                             | Application-owned; tested standalone server and Start `/api/$`                               |
+| Cache serialization and mutation invalidation     | Application-owned                                                                                        | Application-owned                                                                            |
 
 The package executes calls through the ready client. TanStack provides query cancellation
 signals but has no corresponding mutation signal for the adapter to forward. Configure request
@@ -77,16 +71,15 @@ and [executable examples](/effect-api-query/examples/) establish the tested scop
 builders use TanStack's experimental `streamedQuery` helper. Use the ready client directly for
 calls that do not need TanStack Query.
 
-[Browser and worker hosts](/effect-api-query/reference/browser-and-worker-hosts/) lists the
-framework-free execution matrix and distinguishes worker-hosted ready clients from a worker RPC
-transport.
+[Browser and worker hosts](/effect-api-query/reference/browser-and-worker-hosts/) explains
+ready-client ownership and the worker transport boundary.
 
 WebSocket clients support unary calls, both stream views, and application-owned connection
 replacement. Follow the [WebSocket recipe](/effect-api-query/guides/websocket-clients/) for
 buffering and chunk-decoding limits. Local cancellation alone does not prove remote completion.
 
 [External HTTP clients](/effect-api-query/reference/external-http-clients/) covers generated
-OpenAPI consumption with `openapi-fetch` 0.17.0 and `openapi-typescript` 7.13.0. Encoded DTOs,
+OpenAPI consumption with `openapi-fetch` and `openapi-typescript`. Encoded DTOs,
 multipart serialization, and raw SSE access retain their own contracts; the external client does
 not replace a ready Effect client.
 
