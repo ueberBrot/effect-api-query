@@ -5,6 +5,8 @@
   // Starlight head configuration, which static import analysis cannot follow.
   "entry": [
     "scripts/verify-vue-solid-consumer.mts",
+    "tests/packed-consumer/docs-vue-query.ts",
+    "tests/packed-consumer/docs-solid-query.ts",
     "tests/packed-consumer/vue-solid-contract.ts",
     "tests/packed-consumer/vue-solid-runtime.ts",
     "tests/packed-consumer/owner-cache-runtime.mts",
@@ -94,6 +96,10 @@
     "@angular/compiler",
     "@angular/core",
     "@angular/platform-browser",
+    "@tanstack/solid-query",
+    "@tanstack/vue-query",
+    "solid-js",
+    "vue",
     "@arethetypeswrong/cli",
     "@effect/tsgo",
     "@effect/vitest",
