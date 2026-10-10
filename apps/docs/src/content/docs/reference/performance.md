@@ -23,7 +23,7 @@ it must preserve every input field that can change the result.
 Maintainers can save a report while verifying the packed package:
 
 ```sh
-EFFECT_API_QUERY_BASELINE=.artifacts/packed-baseline.json vp run packed-package
+EFFECT_API_QUERY_BASELINE=.artifacts/packed-baseline.json vp run --no-cache packed-package
 ```
 
 The report identifies the exact archive, runtime, peers, compiler versions, and source hashes.

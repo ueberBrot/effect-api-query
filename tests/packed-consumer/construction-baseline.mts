@@ -5,6 +5,7 @@ import {
   createRpcQueryUtils,
   EffectRpcQueryConfigError,
   EffectRpcQueryKeyError,
+  type JsonValue,
 } from 'effect-api-query'
 import { HttpServer } from 'effect/http'
 import {
@@ -149,7 +150,7 @@ await Effect.runPromise(
           const encode = Schema.encodeSync(Payload)
           const request = { params: { owner: 7 }, payload: normalized }
           const queryKey = leaf.queryKey(value)
-          const httpKey = httpLeaf.queryKey(request)
+          const httpKey: readonly JsonValue[] = httpLeaf.queryKey(request)
           deepStrictEqual(httpKey.slice(0, 7), [
             'construction',
             'owner-a',

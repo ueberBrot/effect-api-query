@@ -201,7 +201,7 @@ const measurePackedConsumer = async (consumerDirectory: string, compilers: reado
   }
 }
 
-const [, , consumerDirectory] = process.argv
+const [consumerDirectory] = process.argv.slice(2)
 if (consumerDirectory === undefined) {
   throw new Error('Pass the installed packed-consumer directory')
 }
