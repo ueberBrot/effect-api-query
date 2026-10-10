@@ -10,6 +10,7 @@ import {
   existsSync,
   mkdtempSync,
   readFileSync,
+  readdirSync,
   realpathSync,
   rmSync,
   writeFileSync,
@@ -406,6 +407,61 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
 
   try {
     cpSync(consumerFixtureDirectory, consumerDirectory, { recursive: true })
+    cpSync(
+      nodePath.join(repositoryRoot, 'examples', 'contracts', 'src'),
+      nodePath.join(consumerDirectory, 'optimistic-contracts'),
+      { recursive: true },
+    )
+    const applicationDirectory = nodePath.join(consumerDirectory, 'optimistic-application')
+    cpSync(
+      nodePath.join(repositoryRoot, 'examples', 'vite-react', 'src', 'lib'),
+      applicationDirectory,
+      { recursive: true },
+    )
+    for (const file of readdirSync(applicationDirectory)) {
+      if (file.endsWith('.ts')) {
+        const path = nodePath.join(applicationDirectory, file)
+        writeFileSync(
+          path,
+          readFileSync(path, 'utf-8')
+            .replaceAll(
+              "'@effect-api-query/contracts/client'",
+              "'../optimistic-contracts/client.ts'",
+            )
+            .replaceAll("'@effect-api-query/contracts'", "'../optimistic-contracts/index.ts'"),
+        )
+      }
+    }
+    writeFileSync(
+      nodePath.join(consumerDirectory, 'optimistic-users.ts'),
+      readFileSync(
+        nodePath.join(repositoryRoot, 'tests', 'fixtures', 'optimistic-users.ts'),
+        'utf-8',
+      )
+        .replaceAll("'@effect-api-query/contracts/client'", "'./optimistic-contracts/client.ts'")
+        .replaceAll("'@effect-api-query/contracts'", "'./optimistic-contracts/index.ts'")
+        .replaceAll("'#effect-api-query'", "'effect-api-query'")
+        .replaceAll(
+          "'../../examples/vite-react/src/lib/application.ts'",
+          "'./optimistic-application/application.ts'",
+        )
+        .replaceAll(
+          "'../../examples/vite-react/src/lib/user-writes.ts'",
+          "'./optimistic-application/user-writes.ts'",
+        ),
+    )
+    for (const file of ['optimistic-runtime.mts', 'optimistic-contract.ts']) {
+      const path = nodePath.join(consumerDirectory, file)
+      writeFileSync(
+        path,
+        readFileSync(path, 'utf-8')
+          .replaceAll(
+            "'../../examples/contracts/src/contracts.ts'",
+            "'./optimistic-contracts/contracts.ts'",
+          )
+          .replaceAll("'../fixtures/optimistic-users.ts'", "'./optimistic-users.ts'"),
+      )
+    }
     for (const fixture of [
       'public-contract.ts',
       'tanstack-start-contract.ts',
@@ -507,6 +563,7 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
     }
 
     for (const fixture of [
+      'optimistic-runtime.mts',
       'hashing-runtime.mts',
       'filter-runtime.mts',
       'runtime.mts',

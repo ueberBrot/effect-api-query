@@ -32,7 +32,7 @@ const HttpSelectionResult = ({
 }
 
 export const HttpSection = ({ application }: { readonly application: ViteReactApplication }) => {
-  const { httpQuery, invalidateUsers, queryClient } = application
+  const { httpQuery, invalidateUsers, queryClient, userWrites } = application
   const users = useQuery(httpQuery.users.list.queryOptions())
   const [selectedId, setSelectedId] = useState<number>()
   const selectedUser = useQuery(
@@ -54,19 +54,8 @@ export const HttpSection = ({ application }: { readonly application: ViteReactAp
   const [name, setName] = useState('')
   const [locale, setLocale] = useState('')
   const [cacheMessage, setCacheMessage] = useState<string>()
-  const createUser = useMutation(
-    httpQuery.users.create.mutationOptions({ onSuccess: invalidateUsers }),
-  )
-  const deleteUser = useMutation(
-    httpQuery.users.delete.mutationOptions({
-      onSuccess: async (_, input) => {
-        if (selectedId === input.params.id) {
-          setSelectedId(undefined)
-        }
-        await invalidateUsers()
-      },
-    }),
-  )
+  const createUser = useMutation(userWrites.httpCreate())
+  const deleteUser = useMutation(userWrites.httpDelete())
   const failure = useMutation(httpQuery.diagnostics.fail.mutationOptions())
   const slowQuery = useSlowQueryCancellation(application, 'http')
   const slowMessage = describeSlowQueryCancellation(slowQuery.state)
@@ -123,9 +112,18 @@ export const HttpSection = ({ application }: { readonly application: ViteReactAp
                 <span>HTTP: {user.name}</span>
                 <ActionButton
                   aria-label={`Delete HTTP ${user.name}`}
-                  disabled={deleteUser.isPending}
+                  disabled={user.id < 0 || deleteUser.isPending}
                   onClick={() => {
-                    deleteUser.mutate({ params: { id: user.id } })
+                    deleteUser.mutate(
+                      { params: { id: user.id } },
+                      {
+                        onSuccess: () => {
+                          if (selectedId === user.id) {
+                            setSelectedId(undefined)
+                          }
+                        },
+                      },
+                    )
                   }}
                   type="button"
                   variant="danger"
