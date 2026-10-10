@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "abc793d15c7e9583f327d2b3b7668ef20b172b64ae928c3d905cf4914715804c",
+      "fingerprint": "876dbdfa739a9405b66d7e9cf8f7b6711858036f0fbeac0f93ac2fd2f7927cf0",
       "snapshot": {
         "GLOSSARY.md": "67de06543ad2fd9fd2917419e19d1f071e7b6eee53d48fca05e9dddfc739c683",
         "README.md": "b84fc747700efa4d7e53447f4b670e52fc22018de2777eaae0a663dd296e6528",
@@ -108,7 +108,7 @@
         "pnpm-workspace.yaml": "58fd69fb2ebc237bf589893fd3150ec0dd25988aee57f465f5b373b038aee606",
         "scripts/decode-utf8.mts": "2e90c53e95c22b864a209a87c98084db6ec95e83f842007b21528d286d45c18c",
         "scripts/measure-packed-consumer.mts": "fbaa7edacc4d250be7fc5098360eb3eeaad2ec2a23b5d8f5c7a68ecc3a9103d5",
-        "scripts/run-command.mts": "d2946bca837b693f2bb4770adc0e1197e008b85ec86b9565fb9efd11caf9f7d0",
+        "scripts/run-command.mts": "e419d2af783588a08f3ded7986cb1786c70b756feccd543653f1c821279ace31",
         "scripts/verify-docs-examples.mts": "aac0f2c990472651042b573af66215658f1aba05647c0aea8fa89c57e3ae636d",
         "scripts/verify-framework-browser.mts": "3635e15218ce0b0fb0249c70a6ae8b3a9a314dc0ab3e4185c78dc6a49c9d4afb",
         "scripts/verify-packed-consumer.mts": "e8f5a1de95544087b9e62a61f27f6e33e99a48bd3a0b2ae74ed4a19dcccfe075",
@@ -246,19 +246,19 @@
         "tests/types/tanstack-start-contract.ts": "c99d47160bcaeeb851a489c79f3e8b62c202b41339ba1de3579811b28ee491e8",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "1d4786ec627ea94854f7f69bbeb84eb2bf55cdf7",
+      "head": "de129263482c3d0ebe851773f009ec8d84c03b20",
       "outcome": "no-change",
-      "reason": "The private decoder preserves leading UTF-8 BOMs in captured commands and the newly converted file reads; consumer YAML is copied as its original bytes. This restores the previous native UTF-8 behavior without changing the public API, application ownership, or verified support claims. The shipped skill and all six references remain accurate.",
+      "reason": "The private command helper now restores native captured stderr forwarding and one aggregate raw stdout/stderr budget while preserving UTF-8 BOMs, nonzero diagnostic text, concurrent drains and scoped termination. Public APIs, library usage and verified support claims are unchanged; the shipped skill and six references remain accurate.",
       "evidence": [
-        "Corrects the grouped P2 BOM finding against immutable 1d4786ec627ea94854f7f69bbeb84eb2bf55cdf7; actual six-file source correction uses scripts/decode-utf8.mts with public FileSystem.readFile and binary workspace writes. All eighteen public source/type files and three native outputs remain identical to integrated base 4ea1e4329da229c4c9853ddc2f6a50a6309afe9e.",
-        "Complete external RED exercised all eighteen cases before editing: five BOM cases failed and all original eleven controls passed. GREEN passes all eighteen unchanged expectations through the actual helper, decoder and public file operations; all thirteen native child handles stopped and temporary scopes closed. Evidence: notes/133-correction-command-probes.red.json and .green.json outside the repository.",
-        "Fresh uncached check passes 330 formatted files and 136 lint/type files with no diagnostics; strict Effect checks 147 files with zero diagnostics under the same narrow process/compression exceptions. Docs parity/site check, native Fallow and explicit 421-input format pass.",
-        "Fresh full selected packed matrix and Chromium/Firefox packed hosts pass; the native pack produced the same 64,390-byte SHA512 437c863f archive. All six fresh bundle hashes and gzip sizes match the independent complete-byte gzip proof. Fresh reporting tests pass all twenty-four cases with real HTTP/WebSocket measurements.",
-        "All installed Effect/platform-node/shared provider/backend bytes, native tool payloads, workspace dependencies, catalog, lock and pnpm policy remain unchanged. Existing skill, all six references and all three planning records were reviewed against the actual correction; unrelated authoring/source items remain pending."
+        "Actual helper correction of the two accepted P2 findings at de129263482c3d0ebe851773f009ec8d84c03b20 uses public Stdio.stderr with endOnDone:false, one shared raw-byte budget, bounded captured prefixes and Effect.onExit. No dependency, policy, exception, public source, documentation or unrelated UTF-8 read changed.",
+        "External actual native RED/GREEN retains all 27 expectations: eight RED failures, zero GREEN failures. Both corrected aggregate exact boundaries and all former oversized inputs agree with native outcomes; captured stderr and parent continued-use markers pass on success, failure and overflow. All 49 observed PIDs exited. The earlier per-stream successful-limit assumptions are explicitly superseded by actual native evidence; old proofs remain untouched.",
+        "Separate actual interruption acceptance forwards the complete 28-byte BOM/Unicode warning and preserves both public/native stderr continued-use markers. Deterministic public-stream readiness precedes Fiber.interrupt; actual SIGTERM then SIGKILL, native PID absence and both Scope removals are proven. Helper/decoder hashes and all six primary probe evidence hashes remain unchanged.",
+        "Fresh uncached source check passes 330 formatted and 136 lint/type files; strict Effect checks 147 files with zero diagnostics under unchanged narrow exceptions. Native Fallow, docs parity/site check, 421-input format, full selected packed matrix and four Chromium/Firefox packed Window/Worker hosts pass. Fresh native pack remains the identical 64,390-byte 437c863f archive; all six fresh bundle byte hashes/gzip sizes match the retained complete-byte compressor proof.",
+        "The actual helper diff, shipped skill, six references and all three planning records were reviewed after these checks. Complete installed tool/provider/shim inputs remain unchanged. All runtime/report/application inputs retain their accepted prior correspondence; no repeated full 262-test or source-production-build claim is made. Leave all 50 unrelated pending items and outcomes unchanged."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "9c27dd76a006af1f9a49af0e09cf799ca71dfd3dd4859f5322457b6b11bf063d",
+      "fingerprint": "20c934ae33aa909591527c73b29599ab2874bd1bffe391fa43c258c2e0c6a0c2",
       "snapshot": {
         ".agents/skills/ask-matt/PHASE-BOUNDARIES.md": "a8aa20158609ef39e2b308b6ba0660c91066838d07a867202e63a7744a88a3ed",
         ".agents/skills/ask-matt/SKILL.md": "1371f5ce005de0992a44b137748bfb960a56948aa9871b405fe9d90b24332e3c",
@@ -446,7 +446,7 @@
         "pnpm-workspace.yaml": "58fd69fb2ebc237bf589893fd3150ec0dd25988aee57f465f5b373b038aee606",
         "scripts/decode-utf8.mts": "2e90c53e95c22b864a209a87c98084db6ec95e83f842007b21528d286d45c18c",
         "scripts/measure-packed-consumer.mts": "fbaa7edacc4d250be7fc5098360eb3eeaad2ec2a23b5d8f5c7a68ecc3a9103d5",
-        "scripts/run-command.mts": "d2946bca837b693f2bb4770adc0e1197e008b85ec86b9565fb9efd11caf9f7d0",
+        "scripts/run-command.mts": "e419d2af783588a08f3ded7986cb1786c70b756feccd543653f1c821279ace31",
         "scripts/verify-docs-examples.mts": "aac0f2c990472651042b573af66215658f1aba05647c0aea8fa89c57e3ae636d",
         "scripts/verify-framework-browser.mts": "3635e15218ce0b0fb0249c70a6ae8b3a9a314dc0ab3e4185c78dc6a49c9d4afb",
         "scripts/verify-packed-consumer.mts": "e8f5a1de95544087b9e62a61f27f6e33e99a48bd3a0b2ae74ed4a19dcccfe075",
@@ -584,15 +584,15 @@
         "tests/types/tanstack-start-contract.ts": "c99d47160bcaeeb851a489c79f3e8b62c202b41339ba1de3579811b28ee491e8",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "1d4786ec627ea94854f7f69bbeb84eb2bf55cdf7",
+      "head": "de129263482c3d0ebe851773f009ec8d84c03b20",
       "outcome": "no-change",
-      "reason": "The UTF-8 correction restores exact text and workspace-byte preservation in existing repository tooling. The domain map, skill specification and skill tree already map these scripts and tests to the existing library skill; no task, failure mode, dependency, domain or guidance boundary changes.",
+      "reason": "The existing skill tree maps scripts/run-command.mts to the shipped skill. Restoring native command output and aggregate limits changes no library task, failure mode, dependency, domain or coverage boundary. The domain map, skill specification and tree remain accurate.",
       "evidence": [
-        "Corrects the grouped P2 BOM finding against immutable 1d4786ec627ea94854f7f69bbeb84eb2bf55cdf7; actual six-file source correction uses scripts/decode-utf8.mts with public FileSystem.readFile and binary workspace writes. All eighteen public source/type files and three native outputs remain identical to integrated base 4ea1e4329da229c4c9853ddc2f6a50a6309afe9e.",
-        "Complete external RED exercised all eighteen cases before editing: five BOM cases failed and all original eleven controls passed. GREEN passes all eighteen unchanged expectations through the actual helper, decoder and public file operations; all thirteen native child handles stopped and temporary scopes closed. Evidence: notes/133-correction-command-probes.red.json and .green.json outside the repository.",
-        "Fresh uncached check passes 330 formatted files and 136 lint/type files with no diagnostics; strict Effect checks 147 files with zero diagnostics under the same narrow process/compression exceptions. Docs parity/site check, native Fallow and explicit 421-input format pass.",
-        "Fresh full selected packed matrix and Chromium/Firefox packed hosts pass; the native pack produced the same 64,390-byte SHA512 437c863f archive. All six fresh bundle hashes and gzip sizes match the independent complete-byte gzip proof. Fresh reporting tests pass all twenty-four cases with real HTTP/WebSocket measurements.",
-        "All installed Effect/platform-node/shared provider/backend bytes, native tool payloads, workspace dependencies, catalog, lock and pnpm policy remain unchanged. Existing skill, all six references and all three planning records were reviewed against the actual correction; unrelated authoring/source items remain pending."
+        "Actual helper correction of the two accepted P2 findings at de129263482c3d0ebe851773f009ec8d84c03b20 uses public Stdio.stderr with endOnDone:false, one shared raw-byte budget, bounded captured prefixes and Effect.onExit. No dependency, policy, exception, public source, documentation or unrelated UTF-8 read changed.",
+        "External actual native RED/GREEN retains all 27 expectations: eight RED failures, zero GREEN failures. Both corrected aggregate exact boundaries and all former oversized inputs agree with native outcomes; captured stderr and parent continued-use markers pass on success, failure and overflow. All 49 observed PIDs exited. The earlier per-stream successful-limit assumptions are explicitly superseded by actual native evidence; old proofs remain untouched.",
+        "Separate actual interruption acceptance forwards the complete 28-byte BOM/Unicode warning and preserves both public/native stderr continued-use markers. Deterministic public-stream readiness precedes Fiber.interrupt; actual SIGTERM then SIGKILL, native PID absence and both Scope removals are proven. Helper/decoder hashes and all six primary probe evidence hashes remain unchanged.",
+        "Fresh uncached source check passes 330 formatted and 136 lint/type files; strict Effect checks 147 files with zero diagnostics under unchanged narrow exceptions. Native Fallow, docs parity/site check, 421-input format, full selected packed matrix and four Chromium/Firefox packed Window/Worker hosts pass. Fresh native pack remains the identical 64,390-byte 437c863f archive; all six fresh bundle byte hashes/gzip sizes match the retained complete-byte compressor proof.",
+        "The actual helper diff, shipped skill, six references and all three planning records were reviewed after these checks. Complete installed tool/provider/shim inputs remain unchanged. All runtime/report/application inputs retain their accepted prior correspondence; no repeated full 262-test or source-production-build claim is made. Leave all 50 unrelated pending items and outcomes unchanged."
       ]
     },
     "source:vite.config.ts": {

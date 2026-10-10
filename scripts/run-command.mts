@@ -1,4 +1,4 @@
-import { Effect, Stream } from 'effect'
+import { Effect, Stdio, Stream } from 'effect'
 import { ChildProcess } from 'effect/process'
 
 import { decodeUtf8 } from './decode-utf8.mts'
@@ -28,36 +28,51 @@ export const runCommand = Effect.fnUntraced(function* (
     }
     return ''
   }
+  const stdio = yield* Stdio.Stdio
   const maxBuffer = options.maxBuffer ?? 1024 * 1024
-  const collect = (stream: typeof handle.stdout) =>
+  let capturedBytes = 0
+  const stderrChunks: Uint8Array[] = []
+  const stderrOutput = { bytes: 0, chunks: stderrChunks }
+  const decodeOutput = (output: typeof stderrOutput) => {
+    const bytes = new Uint8Array(output.bytes)
+    let offset = 0
+    for (const chunk of output.chunks) {
+      bytes.set(chunk, offset)
+      offset += chunk.byteLength
+    }
+    return decodeUtf8(bytes)
+  }
+  const collect = (stream: typeof handle.stdout, initial?: typeof stderrOutput) =>
     stream.pipe(
       Stream.runFoldEffect(
         () => {
           const chunks: Uint8Array[] = []
-          return { bytes: 0, chunks }
+          return initial ?? { bytes: 0, chunks }
         },
         (output, chunk) => {
-          if (output.bytes + chunk.byteLength > maxBuffer) {
+          const captured = chunk.subarray(0, Math.max(0, maxBuffer - capturedBytes))
+          capturedBytes += captured.byteLength
+          output.bytes += captured.byteLength
+          output.chunks.push(captured)
+          if (captured.byteLength < chunk.byteLength) {
             return Effect.die(new Error(`${executable} output exceeded ${maxBuffer} bytes`))
           }
-          output.bytes += chunk.byteLength
-          output.chunks.push(chunk)
           return Effect.succeed(output)
         },
       ),
-      Effect.map((output) => {
-        const bytes = new Uint8Array(output.bytes)
-        let offset = 0
-        for (const chunk of output.chunks) {
-          bytes.set(chunk, offset)
-          offset += chunk.byteLength
-        }
-        return decodeUtf8(bytes)
-      }),
+      Effect.map(decodeOutput),
     )
   const [stdout, stderr, code] = yield* Effect.all(
-    [collect(handle.stdout), collect(handle.stderr), handle.exitCode],
+    [collect(handle.stdout), collect(handle.stderr, stderrOutput), handle.exitCode],
     { concurrency: 'unbounded' },
+  ).pipe(
+    Effect.onExit(() =>
+      stderrOutput.bytes === 0
+        ? Effect.void
+        : Stream.succeed(decodeOutput(stderrOutput)).pipe(
+            Stream.run(stdio.stderr({ endOnDone: false })),
+          ),
+    ),
   )
   if (code !== 0) {
     return yield* Effect.die(new Error(`${executable} exited with ${code}\n${stdout}${stderr}`))
