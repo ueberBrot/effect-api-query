@@ -10,6 +10,9 @@ await queryClient.invalidateQueries({ queryKey: rpcQuery.users.key() })
 await queryClient.invalidateQueries({ queryKey: rpcQuery.users.get.key() })
 ```
 
+For response seeding, targeted rollback, and overlapping mutations, follow
+[Optimistic User Writes](/effect-api-query/guides/optimistic-writes/).
+
 For operation prefixes and partial encoded-input matching, use the complete
 [Cache Filters recipe](/effect-api-query/guides/cache-filters/).
 

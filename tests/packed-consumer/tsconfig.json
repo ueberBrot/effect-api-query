@@ -17,6 +17,8 @@
     "docs-owner-cache.ts",
     "owner-cache-contract.ts",
     "owner-cache-runtime.mts",
+    "optimistic-runtime.mts",
+    "optimistic-contract.ts",
     "hashing-runtime.mts",
     "filter-runtime.mts",
     "filter-contract.ts",

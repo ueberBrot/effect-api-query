@@ -28,6 +28,42 @@ const storage = () => {
 }
 
 describe('existing Vite application owner handoff', () => {
+  it('captures the original identity before acquiring clients', async () => {
+    const serverScope = await Effect.runPromise(Scope.make())
+    let application: ViteReactApplication | undefined
+    try {
+      const server = await Effect.runPromise(
+        startExampleRpcServer().pipe(Scope.provide(serverScope)),
+      )
+      const callerIdentity = { ...identity }
+      const starting = startViteReactApplication({
+        rpcUrl: server.rpcUrl,
+        identity: callerIdentity,
+      })
+      callerIdentity.permissionGeneration = 7
+      application = await starting
+      expect(application.identity).toStrictEqual(identity)
+      expect(Object.isFrozen(application.identity)).toBe(true)
+      expect(application.rpcQuery.users.list.queryKey().slice(0, 5)).toStrictEqual([
+        'vite-react',
+        identity.tenantId,
+        identity.userId,
+        identity.sessionGeneration,
+        identity.permissionGeneration,
+      ])
+      expect(application.httpQuery.users.list.queryKey().slice(0, 5)).toStrictEqual([
+        'vite-react',
+        identity.tenantId,
+        identity.userId,
+        identity.sessionGeneration,
+        identity.permissionGeneration,
+      ])
+    } finally {
+      await application?.dispose()
+      await Effect.runPromise(Scope.close(serverScope, Exit.void))
+    }
+  })
+
   it('reports concurrent persistence-removal failures after cleaning its captured owner', async () => {
     const serverScope = await Effect.runPromise(Scope.make())
     const persisted = storage()

@@ -11,6 +11,7 @@ import type { RpcClientError } from 'effect/rpc'
 
 import { makeOwnerCache, ownerKeyPrefix } from './owner-cache.ts'
 import type { ApplicationOwnerIdentity, DirectoryStorage } from './owner-cache.ts'
+import { makeUserWrites } from './user-writes.ts'
 
 const makeExampleRpcQueryUtils = (
   client: ExampleRpcClient,
@@ -39,6 +40,7 @@ export type ExampleHttpQueryUtils = ReturnType<typeof makeExampleHttpQueryUtils>
 
 export interface ViteReactApplication {
   readonly httpQuery: ExampleHttpQueryUtils
+  readonly userWrites: ReturnType<typeof makeUserWrites>
   readonly invalidateUsers: () => Promise<void>
   readonly dispose: (options?: { readonly discardPersistence?: boolean }) => Promise<void>
   readonly identity: ApplicationOwnerIdentity
@@ -70,6 +72,12 @@ export const startViteReactApplication = async ({
   directoryStorage,
 }: StartViteReactApplicationOptions): Promise<ViteReactApplication> => {
   const keyPrefix = ownerKeyPrefix(identity)
+  const capturedIdentity = Object.freeze({
+    tenantId: keyPrefix[1],
+    userId: keyPrefix[2],
+    sessionGeneration: keyPrefix[3],
+    permissionGeneration: keyPrefix[4],
+  })
   const rpcClient = await startExampleRpcClient(rpcUrl)
   const httpRuntime = ManagedRuntime.make(FetchHttpClient.layer)
   const queryClient = new QueryClient({
@@ -117,7 +125,7 @@ export const startViteReactApplication = async ({
     const httpQuery = makeExampleHttpQueryUtils(httpClient, httpRuntime.runPromiseExit, keyPrefix)
     const rpcQuery = makeExampleRpcQueryUtils(rpcClient.client, rpcClient.runPromiseExit, keyPrefix)
     owner = makeOwnerCache({
-      identity,
+      identity: capturedIdentity,
       queryClient,
       directoryKeys: {
         rpc: rpcQuery.users.list.queryKey(),
@@ -134,6 +142,13 @@ export const startViteReactApplication = async ({
       persistDirectory: capturedOwner.persistDirectory,
       runMutation: capturedOwner.runMutation,
       trackMutationOptions: capturedOwner.trackMutationOptions,
+      userWrites: makeUserWrites({
+        queryClient,
+        rpcQuery,
+        httpQuery,
+        isActive: capturedOwner.isActive,
+        runMutation: capturedOwner.runMutation,
+      }),
       invalidateUsers: async () => {
         if (!capturedOwner.isActive()) {
           return
