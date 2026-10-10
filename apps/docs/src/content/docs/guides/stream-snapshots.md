@@ -81,8 +81,7 @@ observers, or concurrent fetches until capture settles: an external `setQueryDat
 otherwise be mistaken for the stream's first value. Configure hashing through QueryClient global
 or prefix defaults; per-call `queryHash` and `queryKeyHashFn` are rejected.
 
-The helper removes its cache listener, request abort listener, and timeout on every outcome. It
-waits for the supplied query function to finish local cleanup before returning or rejecting.
+The helper waits for the supplied query function to finish local cleanup before returning or rejecting.
 Dispose the server's ready client, Scope, or runtime after that settlement. This does not await a
 remote server's cancellation acknowledgement. A finalizer that never finishes also prevents
 settlement; `timeoutMs` limits the wait for data, not the duration of finalization.

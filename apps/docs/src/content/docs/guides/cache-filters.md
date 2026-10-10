@@ -181,12 +181,6 @@ busters. For opaque or noninvertible projections, use generated broad prefixes o
 key. A custom predicate can inspect only the information retained in the key or other
 application-owned query metadata; it cannot reconstruct omitted input.
 
-The package keeps filter composition native. A generic partial-constructor helper cannot promise
-meaningful matching across defaults, Schema transformations, and arbitrary encoder output. The
-small operation-prefix expressions already compose with every native condition, so an additional
-public helper would add no proven capability. This preserves the
-[filter-composition decision](https://github.com/ueberBrot/effect-api-query/blob/main/docs/adr/0008-use-flat-prefix-matchable-key-tuples.md).
-
 Concrete builders retain DataTags for typed `getQueryData` and `setQueryData`. Manually composed
 prefixes and partial keys carry no query-data tag, and native `getQueriesData` does not infer a
 homogeneous result from its filter. Keep broad reads as `unknown` until the application establishes

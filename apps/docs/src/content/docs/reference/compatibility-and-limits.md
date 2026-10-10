@@ -39,13 +39,6 @@ for the pinned Effect release and framework versions. The
 [packed consumer verifier](https://github.com/ueberBrot/effect-api-query/blob/main/scripts/verify-packed-consumer.mts)
 defines the compiler and peer combinations tested against the packaged library.
 
-The repository checks both factories with TypeScript 5.9.3 and 7.0.2 against the minimum
-supported Query Core version and the version installed for development. Isolated consumers install
-the tarball with their own peers and
-verify runtime exports, peer identity, and private-subpath rejection. Separate RPC and HTTP
-contracts each exercise 250 operations. Compiler measurements separate the public contract, RPC,
-and HTTP projects into cold and unchanged-incremental runs without imposing a timing threshold.
-
 ## Capability matrix
 
 **Generated** means the package supplies the typed builders and runtime behavior. **Tested** means
@@ -88,13 +81,9 @@ calls that do not need TanStack Query.
 framework-free execution matrix and distinguishes worker-hosted ready clients from a worker RPC
 transport.
 
-The [WebSocket ready-client recipe](/effect-api-query/guides/websocket-clients/) supports concurrent
-unary calls, both stream views, independent interruption, and application-owned connection replacement.
-The default-buffer cancellation control covers one acknowledged 16-value chunk with zero
-consumption, immediate request-Scope closure, and concurrent unary success. Larger chunks and
-unfinished queue offers remain unverified; the recipe describes the reproduced Effect 4.0.0 limits.
-Cooperative server stream finalizers are observed through the native RPC WebSocket protocol;
-local cancellation alone remains insufficient proof of remote completion.
+WebSocket clients support unary calls, both stream views, and application-owned connection
+replacement. Follow the [WebSocket recipe](/effect-api-query/guides/websocket-clients/) for
+buffering and chunk-decoding limits. Local cancellation alone does not prove remote completion.
 
 [External HTTP clients](/effect-api-query/reference/external-http-clients/) covers generated
 OpenAPI consumption with `openapi-fetch` 0.17.0 and `openapi-typescript` 7.13.0. Encoded DTOs,

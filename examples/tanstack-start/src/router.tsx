@@ -1,11 +1,13 @@
 import { createRouter } from '@tanstack/react-router'
 import type { RouterHistory } from '@tanstack/react-router'
 import { createIsomorphicFn } from '@tanstack/react-start'
+import { getRequest } from '@tanstack/react-start/server'
 
 import { ErrorPage, NotFoundPage, PendingPage } from './components/router-status.tsx'
 import { reportCleanupFailure, startTanStackStartApplication } from './lib/application.ts'
 import type { TanStackStartApplication } from './lib/application.ts'
 import { setupQuerySsr } from './lib/query-ssr.ts'
+import { startRequestApplication } from './lib/server-host.ts'
 import type { SnapshotPreparation } from './lib/snapshot-preparation.ts'
 import { routeTree } from './routeTree.gen.ts'
 
@@ -78,11 +80,7 @@ export const createTanStackStartRouter = async (options: CreateTanStackStartRout
 }
 
 const startApplication = createIsomorphicFn()
-  .server(async () => {
-    const { getRequest } = await import('@tanstack/react-start/server')
-    const { startRequestApplication } = await import('./lib/server-host.ts')
-    return await startRequestApplication(getRequest())
-  })
+  .server(async () => startRequestApplication(getRequest()))
   .client(async () => startTanStackStartApplication({ rpcUrl: '/rpc' }))
 
 export const getRouter = async () =>

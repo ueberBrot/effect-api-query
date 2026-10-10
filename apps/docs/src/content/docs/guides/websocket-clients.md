@@ -153,9 +153,7 @@ With Effect 4.0.0, cancelling a paused stream with a full transport buffer of si
 stall other calls on the connection. This recipe uses the native default of 16. Verify
 smaller buffers against the pinned transport version before changing that setting.
 
-The default-buffer cancellation control covers one acknowledged 16-value chunk with zero
-consumption, immediate request-Scope closure, and concurrent active unary success. It does not
-establish safety for larger chunks or unfinished queue offers.
+The default buffer is not a guarantee for larger chunks or unfinished queue offers.
 
 Keep streaming success schemas compatible on both ends. With Effect 4.0.0, a chunk that fails
 client Schema decoding can also fail unrelated calls sharing the connection. A larger buffer

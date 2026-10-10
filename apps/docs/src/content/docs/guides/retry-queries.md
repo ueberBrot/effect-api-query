@@ -184,6 +184,5 @@ TanStack unchanged and need an explicit non-retry decision. Mutations encode inp
 ready client's Effect, so their encoding failures use the execution Cause.
 
 Use [failure handling](/effect-api-query/guides/handle-failures/) for error-stage guards and
-[the error reference](/effect-api-query/reference/errors/) for stable metadata. The complete example
-is compiled against the installed package in
-[`tests/packed-consumer/docs-retry.ts`](https://github.com/ueberBrot/effect-api-query/blob/main/tests/packed-consumer/docs-retry.ts).
+[the error reference](/effect-api-query/reference/errors/) for stable metadata. See the
+[complete example](https://github.com/ueberBrot/effect-api-query/blob/main/tests/packed-consumer/docs-retry.ts).

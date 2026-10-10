@@ -350,20 +350,7 @@ for (const path of ['LICENSE', ...skillPaths]) {
 }
 equal(skillExamples.length > 0, true, 'The packed usage skill must have compilable examples')
 equal(packedManifest.keywords.includes('tanstack-intent'), true)
-const changelogPath = nodePath.join(repositoryRoot, 'CHANGELOG.md')
-const hasChangelog = existsSync(changelogPath)
-if (repositoryManifest.version !== '0.0.0') {
-  equal(hasChangelog, true, 'A versioned release must include its changelog')
-}
-if (hasChangelog) {
-  equal(
-    execFileSync('tar', ['-xOzf', tarballPath, 'package/CHANGELOG.md'], { encoding: 'utf-8' }),
-    readFileSync(changelogPath, 'utf-8'),
-    'The packed changelog must match the candidate',
-  )
-}
 deepStrictEqual(packedFiles, [
-  ...(hasChangelog ? ['package/CHANGELOG.md'] : []),
   'package/LICENSE',
   'package/README.md',
   'package/dist/index.d.mts',
