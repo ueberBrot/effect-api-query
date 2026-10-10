@@ -389,6 +389,7 @@ const runTypeScript = (
     | 'tsconfig.json'
     | 'tsconfig.tanstack-start.json'
     | 'tsconfig.type-scale.json'
+    | 'tsconfig.svelte-angular.json'
     | 'tsconfig.vue-solid.json',
   extendedDiagnostics: boolean,
 ): void => {
@@ -567,12 +568,24 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       nodePath.join(consumerDirectory, 'owner-cache.ts'),
     )
 
+    const svelteQueryVersion = new Map([
+      ['5.103.1', '6.2.1'],
+      ['5.104.0', '6.3.0'],
+    ]).get(peer.queryCoreVersion)
+    if (svelteQueryVersion === undefined) {
+      throw new Error(`No Svelte Query compatibility case for Query Core ${peer.queryCoreVersion}`)
+    }
     const consumerManifest = {
       name: `effect-api-query-packed-consumer-${peer.label}`,
       private: true,
       type: 'module',
       intent: { skills: ['effect-api-query'] },
       dependencies: {
+        '@angular/common': '22.2.1',
+        '@angular/compiler': '22.2.1',
+        '@angular/core': '22.2.1',
+        '@angular/platform-browser': '22.2.1',
+        '@tanstack/angular-query-experimental': peer.queryCoreVersion,
         '@tanstack/query-core': peer.queryCoreVersion,
         '@tanstack/react-query': peer.reactQueryVersion,
         '@tanstack/solid-query': peer.queryCoreVersion,
@@ -580,6 +593,7 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
         '@tanstack/react-router': testedVersion('@tanstack/react-router'),
         '@tanstack/react-router-ssr-query': testedVersion('@tanstack/react-router-ssr-query'),
         '@tanstack/react-start': testedVersion('@tanstack/react-start'),
+        '@tanstack/svelte-query': svelteQueryVersion,
         '@types/node': testedVersion('@types/node'),
         '@types/react': testedVersion('@types/react'),
         '@types/react-dom': testedVersion('@types/react-dom'),
@@ -587,6 +601,8 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
         'effect-api-query': `file:${tarballPath}`,
         react: testedVersion('react'),
         'react-dom': testedVersion('react-dom'),
+        rxjs: '7.8.2',
+        svelte: '5.57.1',
         'solid-js': '1.9.15',
         vue: '3.5.43',
       },
@@ -646,6 +662,7 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
     for (const compiler of compilerCases) {
       runTypeScript(consumerDirectory, compiler, 'tsconfig.json', false)
       runTypeScript(consumerDirectory, compiler, 'tsconfig.tanstack-start.json', false)
+      runTypeScript(consumerDirectory, compiler, 'tsconfig.svelte-angular.json', false)
       runTypeScript(consumerDirectory, compiler, 'tsconfig.vue-solid.json', false)
       runTypeScript(
         consumerDirectory,
@@ -685,10 +702,18 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
     execFileSync(
       process.execPath,
       [
+        nodePath.join(repositoryRoot, 'scripts', 'verify-svelte-angular-consumer.mts'),
+        consumerDirectory,
+      ],
+      { cwd: repositoryRoot, stdio: 'inherit' },
+    )
+    execFileSync(
+      process.execPath,
+      [
         nodePath.join(repositoryRoot, 'scripts', 'verify-vue-solid-consumer.mts'),
         consumerDirectory,
       ],
-      { stdio: 'inherit' },
+      { cwd: repositoryRoot, stdio: 'inherit' },
     )
   } finally {
     rmSync(consumerDirectory, { force: true, recursive: true })
