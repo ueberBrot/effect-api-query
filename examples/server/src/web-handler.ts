@@ -1,5 +1,9 @@
-import { exampleRpcGroup } from '@effect-api-query/contracts'
-import { Effect, Layer, Scope } from 'effect'
+import {
+  exampleRpcGroup,
+  ExampleAuthorization,
+  ExampleAuthorizationError,
+} from '@effect-api-query/contracts'
+import { Context, Effect, Layer, Scope } from 'effect'
 import type { HttpServerRequest } from 'effect/http'
 import { HttpEffect, HttpMiddleware, HttpRouter, HttpServer } from 'effect/http'
 import { RpcSerialization, RpcServer } from 'effect/rpc'
@@ -7,6 +11,7 @@ import { RpcSerialization, RpcServer } from 'effect/rpc'
 import { ExampleDomain } from './domain.ts'
 import { exampleHttpRoutes } from './http-handlers.ts'
 import { exampleRpcHandlersLayer } from './rpc-handlers.ts'
+import { makeServerLocalRpcClient } from './server-local-rpc.ts'
 
 const rpcLayer = Layer.mergeAll(exampleRpcHandlersLayer, RpcSerialization.layerJson)
 const maxRequestBodyBytes = 1024 * 1024
@@ -103,7 +108,7 @@ export const makeExampleRpcWebHandler = Effect.fn('ExampleRpc.makeExampleRpcWebH
 )
 
 /** Hosts RPC and HTTP contracts over one application state within the caller-owned Scope. */
-export const makeExampleWebHandler = Effect.fn('ExampleServer.makeExampleWebHandler')(function* () {
+const makeHostWebHandler = Effect.fn('ExampleServer.makeHostWebHandler')(function* () {
   const rpc = yield* makeRpcWebHandler()
   const httpEffect = yield* HttpRouter.toHttpEffect(
     exampleHttpRoutes.pipe(Layer.provide(HttpServer.layerServices)),
@@ -125,4 +130,38 @@ export const makeExampleWebHandler = Effect.fn('ExampleServer.makeExampleWebHand
     }
     return new Response(null, { status: 404 })
   }
-}, provideDomain)
+})
+
+export const makeExampleHost = Effect.fn('ExampleServer.makeExampleHost')(function* () {
+  const scope = yield* Scope.Scope
+  const domainContext = yield* Layer.buildWithScope(ExampleDomain.layer, scope)
+  const handlersContext = yield* Layer.buildWithScope(exampleRpcHandlersLayer, scope).pipe(
+    Effect.provide(domainContext),
+  )
+  const handleRequest = yield* makeHostWebHandler().pipe(Effect.provide(domainContext))
+  const makeRpcClient = Effect.fn('ExampleServer.makeRequestRpcClient')(function* (
+    authorization: string | undefined,
+  ) {
+    const requestScope = yield* Scope.Scope
+    const authority = ExampleAuthorization.of((effect) =>
+      authorization === 'allowed'
+        ? effect
+        : Effect.fail(new ExampleAuthorizationError({ reason: 'missing-example-authorization' })),
+    )
+    const serverContext = Context.add(
+      Context.add(handlersContext, ExampleAuthorization, authority),
+      Scope.Scope,
+      requestScope,
+    )
+    return yield* makeServerLocalRpcClient(exampleRpcGroup).pipe(
+      Effect.provideContext(serverContext),
+    )
+  })
+  return { handleRequest, makeRpcClient }
+})
+
+export type ExampleHost = Effect.Success<ReturnType<typeof makeExampleHost>>
+
+export const makeExampleWebHandler = Effect.fn('ExampleServer.makeExampleWebHandler')(() =>
+  makeExampleHost().pipe(Effect.map(({ handleRequest }) => handleRequest)),
+)

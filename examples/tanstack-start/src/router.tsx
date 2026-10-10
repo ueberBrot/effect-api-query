@@ -3,13 +3,15 @@ import type { RouterHistory } from '@tanstack/react-router'
 import { createIsomorphicFn } from '@tanstack/react-start'
 
 import { ErrorPage, NotFoundPage, PendingPage } from './components/router-status.tsx'
-import { startTanStackStartApplication } from './lib/application.ts'
+import { reportCleanupFailure, startTanStackStartApplication } from './lib/application.ts'
 import type { TanStackStartApplication } from './lib/application.ts'
 import { setupQuerySsr } from './lib/query-ssr.ts'
+import type { SnapshotPreparation } from './lib/snapshot-preparation.ts'
 import { routeTree } from './routeTree.gen.ts'
 
 export interface RouterOptions {
   readonly history?: RouterHistory
+  readonly preparation?: SnapshotPreparation
   readonly isServer?: boolean
   readonly scrollRestoration?: boolean
 }
@@ -25,7 +27,7 @@ const registerBrowserDisposal = (application: TanStackStartApplication): void =>
     return
   }
   const dispose = () => {
-    void application.dispose()
+    void reportCleanupFailure(application.dispose())
   }
   window.addEventListener('pagehide', dispose, { once: true })
 }
@@ -54,7 +56,7 @@ export const createTanStackStartRouter = async (options: CreateTanStackStartRout
     scrollRestoration,
   })
 
-  setupQuerySsr(router, application.queryClient)
+  setupQuerySsr(router, application, options.preparation)
 
   if (router.isServer) {
     router.serverSsrLifecycle = {
@@ -63,7 +65,7 @@ export const createTanStackStartRouter = async (options: CreateTanStackStartRout
         ...(router.serverSsrLifecycle?.onServerSsrAttach ?? []),
         (serverSsr) => {
           serverSsr.onCleanup(() => {
-            void application.dispose()
+            void reportCleanupFailure(application.dispose())
           })
         },
       ],
@@ -75,24 +77,16 @@ export const createTanStackStartRouter = async (options: CreateTanStackStartRout
   return router
 }
 
-const rpcUrl = createIsomorphicFn()
-  .server(() => {
-    const origin = new URL(process.env['EXAMPLE_API_ORIGIN'] ?? 'http://127.0.0.1:3000')
-    if (
-      !['http:', 'https:'].includes(origin.protocol) ||
-      origin.username !== '' ||
-      origin.password !== '' ||
-      origin.pathname !== '/' ||
-      origin.search !== '' ||
-      origin.hash !== ''
-    ) {
-      throw new Error('EXAMPLE_API_ORIGIN must be an HTTP(S) origin without credentials')
-    }
-    return new URL('/rpc', origin).href
+const startApplication = createIsomorphicFn()
+  .server(async () => {
+    const { getRequest } = await import('@tanstack/react-start/server')
+    const { startRequestApplication } = await import('./lib/server-host.ts')
+    return await startRequestApplication(getRequest())
   })
-  .client(() => '/rpc')
+  .client(async () => startTanStackStartApplication({ rpcUrl: '/rpc' }))
 
-export const getRouter = async () => createTanStackStartRouter({ rpcUrl: rpcUrl() })
+export const getRouter = async () =>
+  createTanStackStartRouter({ application: await startApplication() })
 
 declare module '@tanstack/react-router' {
   interface Register {

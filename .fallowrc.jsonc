@@ -5,6 +5,7 @@
   // Starlight head configuration, which static import analysis cannot follow.
   "entry": [
     "tests/packed-consumer/owner-cache-runtime.mts",
+    "tests/packed-consumer/start-ssr-runtime.mts",
     "tests/packed-consumer/owner-cache-contract.ts",
     "apps/docs/public/package-version.js",
     "playwright.docs.config.ts",
