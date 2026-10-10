@@ -13,3 +13,9 @@ complete Effect failures. Applications own transport, reconnection, and resource
 rendering must settle and stop open work before disposing those resources. Live values follow
 [ADR 0012](0012-normalize-undefined-query-success-to-null.md), while accumulated elements retain
 their decoded representation.
+
+Expose a framework-neutral snapshot helper because native query cancellation can settle before
+local iterator finalizers finish. A fresh capture exclusively owns an idle, unobserved exact query;
+explicit cached capture can reuse successful data without acquiring work. Applications retain
+client and runtime ownership and dispose them only after local cleanup settles. Browser
+reconnection uses independently owned resources.

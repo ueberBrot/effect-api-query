@@ -7,6 +7,7 @@ for (const [page, fixtures] of [
   ['getting-started/quick-start', ['types/docs-rpc-quick-start']],
   ['getting-started/http-quick-start', ['types/docs-http-quick-start']],
   ['guides/retry-queries', ['packed-consumer/docs-retry']],
+  ['guides/stream-snapshots', ['packed-consumer/docs-stream-snapshot']],
   [
     'guides/hydrate-unary-data',
     [

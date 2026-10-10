@@ -68,6 +68,7 @@ export default defineConfig({
             { label: 'React Query', slug: 'guides/react-query' },
             { label: 'HTTP Queries and Mutations', slug: 'guides/http-queries-and-mutations' },
             { label: 'TanStack Start', slug: 'guides/tanstack-start' },
+            { label: 'Stream Snapshots', slug: 'guides/stream-snapshots' },
             { label: 'Cache Management', slug: 'guides/cache-management' },
             { label: 'Cancellation', slug: 'guides/cancellation' },
             { label: 'Handle Failures', slug: 'guides/handle-failures' },
