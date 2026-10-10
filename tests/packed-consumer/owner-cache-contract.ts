@@ -1,7 +1,8 @@
 import type { MutationOptions, QueryClient } from '@tanstack/react-query'
 import type { Schema } from 'effect'
+import type { EffectRpcQueryError } from 'effect-api-query'
 import type { HttpApiClient } from 'effect/http-api'
-import type { RpcClient, RpcGroup } from 'effect/rpc'
+import type { RpcClient, RpcClientError, RpcGroup } from 'effect/rpc'
 
 import { DirectoryUser, makeOwnerQueries, ownerApi, ownerGroup } from './docs-owner-cache.ts'
 import { ownerKeyPrefix } from './owner-cache.ts'
@@ -11,32 +12,42 @@ type Equal<A, B> =
   (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2 ? true : false
 type Assert<T extends true> = T
 
-export type OwnerPrefixProof = Assert<
-  Equal<ReturnType<typeof ownerKeyPrefix>, readonly ['vite-react', string, string, number, number]>
+declare const rpcClient: RpcClient.RpcClient.Flat<
+  RpcGroup.Rpcs<typeof ownerGroup>,
+  RpcClientError.RpcClientError
 >
+declare const httpClient: HttpApiClient.ForApi<typeof ownerApi>
+declare const identity: ApplicationOwnerIdentity
 
-export const ownerContract = <RpcError>(
-  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof ownerGroup>, RpcError>,
-  httpClient: HttpApiClient.ForApi<typeof ownerApi>,
-  identity: ApplicationOwnerIdentity,
-) => {
-  const application = makeOwnerQueries({ rpcClient: client, httpClient, identity })
-  const rpcData: readonly (typeof DirectoryUser.Type)[] | undefined =
-    application.queryClient.getQueryData(application.rpc.users.list.queryKey())
-  const httpData: readonly (typeof DirectoryUser.Type)[] | undefined =
-    application.queryClient.getQueryData(application.http.users.list.queryKey())
-  const mutation: MutationOptions<typeof DirectoryUser.Type, unknown, { readonly name: string }> =
-    application.createUser
-  const queryClient: QueryClient = application.queryClient
-  return { rpcData, httpData, mutation, queryClient }
-}
-
-export type PersistedDtoProof = Assert<
-  Equal<
-    Schema.Schema.Type<typeof DirectoryUser>,
-    { readonly id: number; readonly name: string; readonly locale: string }
-  >
+const application = makeOwnerQueries({ rpcClient, httpClient, identity })
+const rpcData = application.queryClient.getQueryData(application.rpc.users.list.queryKey())
+const httpData = application.queryClient.getQueryData(application.http.users.list.queryKey())
+application.createUser satisfies MutationOptions<
+  typeof DirectoryUser.Type,
+  EffectRpcQueryError<RpcClientError.RpcClientError>,
+  { readonly name: string },
+  undefined
 >
+application.queryClient satisfies QueryClient
+
+type Contract = [
+  Assert<
+    Equal<
+      ReturnType<typeof ownerKeyPrefix>,
+      readonly ['vite-react', string, string, number, number]
+    >
+  >,
+  Assert<Equal<typeof rpcData, readonly (typeof DirectoryUser.Type)[] | undefined>>,
+  Assert<Equal<typeof httpData, readonly (typeof DirectoryUser.Type)[] | undefined>>,
+  Assert<
+    Equal<
+      Schema.Schema.Type<typeof DirectoryUser>,
+      { readonly id: number; readonly name: string; readonly locale: string }
+    >
+  >,
+]
+declare const contract: Contract
+contract satisfies [true, true, true, true]
 
 if (false) {
   ownerKeyPrefix({

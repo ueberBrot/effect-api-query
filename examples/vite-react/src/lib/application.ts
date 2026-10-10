@@ -7,6 +7,7 @@ import { createHttpApiQueryUtils, createRpcQueryUtils } from 'effect-api-query'
 import type { RunPromiseExit } from 'effect-api-query'
 import { FetchHttpClient, HttpClient, HttpClientRequest } from 'effect/http'
 import { HttpApiClient } from 'effect/http-api'
+import type { RpcClientError } from 'effect/rpc'
 
 import { makeOwnerCache, ownerKeyPrefix } from './owner-cache.ts'
 import type { ApplicationOwnerIdentity, DirectoryStorage } from './owner-cache.ts'
@@ -16,7 +17,11 @@ const makeExampleRpcQueryUtils = (
   runPromiseExit: RunPromiseExit,
   keyPrefix: ReturnType<typeof ownerKeyPrefix>,
 ) =>
-  createRpcQueryUtils(exampleRpcGroup, {
+  createRpcQueryUtils<
+    typeof exampleRpcGroup,
+    ReturnType<typeof ownerKeyPrefix>,
+    RpcClientError.RpcClientError
+  >(exampleRpcGroup, {
     client,
     keyPrefix,
     runPromiseExit,
@@ -30,8 +35,10 @@ const makeExampleHttpQueryUtils = (
   keyPrefix: ReturnType<typeof ownerKeyPrefix>,
 ) => createHttpApiQueryUtils(exampleHttpApi, { client, keyPrefix, runPromiseExit })
 
+export type ExampleHttpQueryUtils = ReturnType<typeof makeExampleHttpQueryUtils>
+
 export interface ViteReactApplication {
-  readonly httpQuery: ReturnType<typeof makeExampleHttpQueryUtils>
+  readonly httpQuery: ExampleHttpQueryUtils
   readonly invalidateUsers: () => Promise<void>
   readonly dispose: (options?: { readonly discardPersistence?: boolean }) => Promise<void>
   readonly identity: ApplicationOwnerIdentity
@@ -75,7 +82,15 @@ export const startViteReactApplication = async ({
   let disposal: Promise<void> | undefined
   const dispose = async (options?: { readonly discardPersistence?: boolean }) => {
     const retirement = owner === undefined ? queryClient.cancelQueries() : owner.retire(options)
-    disposal ??= (async () => {
+    if (disposal !== undefined) {
+      try {
+        await retirement
+      } finally {
+        await disposal
+      }
+      return
+    }
+    disposal = (async () => {
       try {
         await retirement
       } finally {

@@ -1,5 +1,4 @@
 import { MutationObserver, QueryClient } from '@tanstack/react-query'
-import type { QueryKey } from '@tanstack/react-query'
 import { Deferred, Effect, Exit, Scope, Stream } from 'effect'
 import { HttpServer } from 'effect/http'
 import { HttpApiBuilder, HttpApiTest } from 'effect/http-api'
@@ -27,17 +26,17 @@ const storage = {
 }
 const wait = async (deferred: Deferred.Deferred<undefined>) =>
   await Effect.runPromise(Deferred.await(deferred).pipe(Effect.timeout('5 seconds')))
-const waitForData = async (queryClient: QueryClient, key: QueryKey, expected: string) => {
-  const published = Deferred.makeUnsafe<undefined>()
+const waitForCache = async (queryClient: QueryClient, predicate: () => boolean) => {
+  const reached = Deferred.makeUnsafe<undefined>()
   const check = () => {
-    if (queryClient.getQueryData(key) === expected) {
-      Effect.runSync(Deferred.succeed(published, undefined))
+    if (predicate()) {
+      Effect.runSync(Deferred.succeed(reached, undefined))
     }
   }
   const unsubscribe = queryClient.getQueryCache().subscribe(check)
   try {
     check()
-    await wait(published)
+    await wait(reached)
   } finally {
     unsubscribe()
   }
@@ -107,7 +106,7 @@ await Effect.runPromise(
       })
       const oldClients = yield* makeClients(oldScope, true)
       const previous = makeOwnerQueries({ ...oldClients, identity, storage })
-      let current: ReturnType<typeof makeOwnerQueries> | undefined
+      let current: ReturnType<typeof makeOwnerQueries<never>> | undefined
       try {
         yield* Effect.promise(() =>
           previous.queryClient.query(previous.rpc.users.list.queryOptions()),
@@ -120,7 +119,10 @@ await Effect.runPromise(
         const watchOptions = previous.rpc.users.watch.liveOptions()
         const watching = previous.queryClient.query(watchOptions).catch(() => null)
         yield* Effect.promise(() =>
-          waitForData(previous.queryClient, watchOptions.queryKey, 'old first visible'),
+          waitForCache(
+            previous.queryClient,
+            () => previous.queryClient.getQueryData(watchOptions.queryKey) === 'old first visible',
+          ),
         )
         const mutation = new MutationObserver(previous.queryClient, {
           ...previous.createUser,
@@ -134,6 +136,10 @@ await Effect.runPromise(
         yield* Deferred.await(mutationEntered)
         previous.owner.persistDirectory()
         equal(values.size, 0)
+        const cacheCleared = waitForCache(
+          previous.queryClient,
+          () => previous.queryClient.getQueryCache().getAll().length === 0,
+        )
         let retired = false
         const retirement = (async () => {
           await previous.owner.retire()
@@ -146,9 +152,7 @@ await Effect.runPromise(
             /Owner is inactive/u,
           ),
         )
-        yield* Effect.promise(async () => {
-          await Promise.resolve()
-        })
+        yield* Effect.promise(() => cacheCleared)
         equal(retired, false)
         equal(previous.queryClient.getQueryCache().getAll().length, 0)
         yield* Deferred.succeed(releaseMutation, undefined)

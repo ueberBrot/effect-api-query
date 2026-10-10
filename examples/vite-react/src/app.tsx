@@ -1,4 +1,5 @@
 import { QueryClientProvider } from '@tanstack/react-query'
+import { useMemo } from 'react'
 
 import { CommandsSection } from './components/sections/commands-section.tsx'
 import { DiagnosticsSection } from './components/sections/diagnostics-section.tsx'
@@ -33,8 +34,14 @@ export const ViteReactExample = ({
   application,
 }: {
   readonly application: ViteReactApplication
-}) => (
-  <QueryClientProvider key={JSON.stringify(application.identity)} client={application.queryClient}>
-    <ExampleContent application={application} />
-  </QueryClientProvider>
-)
+}) => {
+  const boundary = useMemo(
+    () => ({ client: application.queryClient, key: globalThis.crypto.randomUUID() }),
+    [application.queryClient],
+  )
+  return (
+    <QueryClientProvider key={boundary.key} client={boundary.client}>
+      <ExampleContent application={application} />
+    </QueryClientProvider>
+  )
+}

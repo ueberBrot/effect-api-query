@@ -34,7 +34,7 @@ export const ownerApi = HttpApi.make('owner-directory').add(
       success: DirectoryUser,
     }),
     HttpApiEndpoint.post('create', '/users', {
-      payload: { name: Schema.String },
+      payload: Schema.Struct({ name: Schema.String }),
       success: DirectoryUser,
     }),
   ),

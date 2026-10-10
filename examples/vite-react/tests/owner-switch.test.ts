@@ -28,6 +28,45 @@ const storage = () => {
 }
 
 describe('existing Vite application owner handoff', () => {
+  it('reports concurrent persistence-removal failures after cleaning its captured owner', async () => {
+    const serverScope = await Effect.runPromise(Scope.make())
+    const persisted = storage()
+    const removalFailure = new Error('Storage removal failed')
+    let removalFails = false
+    let application: ViteReactApplication | undefined
+    try {
+      const server = await Effect.runPromise(
+        startExampleRpcServer().pipe(Scope.provide(serverScope)),
+      )
+      application = await startViteReactApplication({
+        rpcUrl: server.rpcUrl,
+        identity,
+        directoryStorage: {
+          ...persisted,
+          removeItem: (key) => {
+            if (removalFails) {
+              throw removalFailure
+            }
+            persisted.removeItem(key)
+          },
+        },
+      })
+      await application.queryClient.query(application.rpcQuery.users.list.queryOptions())
+      removalFails = true
+      const results = await Promise.allSettled([application.dispose(), application.dispose()])
+      expect(results).toStrictEqual([
+        { status: 'rejected', reason: removalFailure },
+        { status: 'rejected', reason: removalFailure },
+      ])
+      expect(application.isActive()).toBe(false)
+      expect(application.queryClient.getQueryCache().getAll()).toHaveLength(0)
+    } finally {
+      removalFails = false
+      await application?.dispose().catch(() => null)
+      await Effect.runPromise(Scope.close(serverScope, Exit.void))
+    }
+  })
+
   it('isolates delayed mutation callbacks while preserving the completed server write', async () => {
     const serverScope = await Effect.runPromise(Scope.make())
     const callbackEntered = Deferred.makeUnsafe<undefined>()

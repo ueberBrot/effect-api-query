@@ -53,7 +53,7 @@ export const ownerApi = HttpApi.make('owner-directory').add(
       success: DirectoryUser,
     }),
     HttpApiEndpoint.post('create', '/users', {
-      payload: { name: Schema.String },
+      payload: Schema.Struct({ name: Schema.String }),
       success: DirectoryUser,
     }),
   ),
@@ -128,11 +128,13 @@ The [existing Vite application](https://github.com/ueberBrot/effect-api-query/bl
 provides `switchViteReactApplication(previous, options)`. Capture `previous`, unmount its consumer
 tree, then await the handoff and render the returned application. The helper retires the old owner
 before constructing the new clients, QueryClient, and utilities. A failed acquisition leaves the
-old owner inactive; handle that failure in the surrounding application.
+old owner inactive; handle that failure in the surrounding application. Use the same unmount,
+retire, and replacement sequence when reconnecting clients with an unchanged semantic identity.
 
 [ViteReactExample](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/app.tsx)
-keys its QueryClientProvider by the immutable owner identity. A changed identity or generation
-therefore remounts query and mutation consumers. Passing a new QueryClient through an existing
+keys its QueryClientProvider by a component key that changes with the application QueryClient.
+Replacing that client therefore remounts query and mutation consumers, including when the safe
+semantic identity stays the same. This component key is not part of query keys or persistence. Passing a new QueryClient through an existing
 provider alone does not replace the QueryClient captured by existing hooks. Reassigning options
 on a pending MutationObserver can also replace its callbacks. Capture originating ownership in
 mutation context and replace observers at the handoff; arbitrary observer reassignment is outside
