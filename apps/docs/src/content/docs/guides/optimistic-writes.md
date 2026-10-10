@@ -61,6 +61,9 @@ uses; this example registers only its existing page size and initial cursor.
 
 A full snapshot rollback can erase a later successful write. The example instead removes a
 failed creation's own temporary user, or restores one deleted user without replacing the list.
+Overlapping deletions retain their original relative order, even when their failures finish in a
+different order. Rollback places the removed user beside surviving original neighbors and keeps
+newly created users.
 Overlapping deletions of the same user share the first snapshot: one successful deletion prevents
 an older failure from restoring it, while all failed deletions restore the original entity once.
 
