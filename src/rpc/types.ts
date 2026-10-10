@@ -23,10 +23,11 @@ export interface UnaryRpcOptions {
   readonly discard?: never
   /** Stream adaptation belongs to the package. */
   readonly asQueue?: never
+  readonly streamBufferSize?: never
 }
 
 /** Request-local options for accumulated-stream and live queries. */
-export interface StreamingRpcOptions extends UnaryRpcOptions {
+export interface StreamingRpcOptions extends Omit<UnaryRpcOptions, 'streamBufferSize'> {
   readonly streamBufferSize?: number | undefined
 }
 

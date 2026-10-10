@@ -9,6 +9,11 @@ The package targets Effect 4 and TanStack Query Core 5.103.1 or later in v5, wit
 integrations checked in this repository. It is ESM-only and targets ES2022. Use TypeScript with
 `strict: true`.
 
+Vue 3.5.43 and Solid 1.9.15 use their native Query wrappers at 5.103.1 and 5.104.0, each with matching
+Query Core, Effect 4.0.0, and TypeScript 5.9.3 or 7.0.2. See
+[Vue and Solid Query](/effect-api-query/guides/vue-and-solid/) for reactive option rebuilding,
+Vue's type-inference and `enabled` distinctions, and Solid's initial-data overload limits.
+
 Consult [package metadata](https://github.com/ueberBrot/effect-api-query/blob/main/package.json) for
 peer ranges and the [workspace catalog](https://github.com/ueberBrot/effect-api-query/blob/main/pnpm-workspace.yaml)
 for the pinned Effect release and framework versions. The
@@ -43,6 +48,7 @@ supplies the client, policy, or lifecycle. **Deferred** means the adapter does n
 | Mutation cancellation                             | No upstream TanStack mutation abort signal; explicit cancellable command is application-owned and tested | No upstream TanStack mutation abort signal; domain cancellation is application-owned        |
 | Authentication, middleware, and residual services | Application-owned ready client and runner                                                                | Application-owned ready client and runner                                                   |
 | React hooks and QueryClient                       | Tested public consumers and Vite React example                                                           | Tested public consumers and Vite React example                                              |
+| Vue and Solid Query                               | Generated options with reactive browser lifecycle                                                        | Generated options with reactive browser lifecycle                                           |
 | SSR and hydration                                 | Application-owned; tested Start route loading and stream snapshots                                       | Application-owned; tested Start SSR, hydration, failed-query refetch, and request isolation |
 | Host routes                                       | Application-owned; tested standalone server and Start `/rpc`                                             | Application-owned; tested standalone server and Start `/api/$`                              |
 | Cache serialization and mutation invalidation     | Application-owned                                                                                        | Application-owned                                                                           |

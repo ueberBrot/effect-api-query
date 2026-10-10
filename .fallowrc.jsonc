@@ -4,6 +4,9 @@
   // Astro copies this browser entry from public/ and loads it through the
   // Starlight head configuration, which static import analysis cannot follow.
   "entry": [
+    "scripts/verify-vue-solid-consumer.mts",
+    "tests/packed-consumer/vue-solid-contract.ts",
+    "tests/packed-consumer/vue-solid-runtime.ts",
     "tests/packed-consumer/owner-cache-runtime.mts",
     "tests/packed-consumer/owner-cache-contract.ts",
     "apps/docs/public/package-version.js",

@@ -738,6 +738,39 @@ const validPageOptions = {
   initialPageParam: 0,
   input: (cursor: number) => ({ cursor }),
 }
+const instantiatedPages = buildPages({
+  ...validPageOptions,
+  enabled: (query) => query.state.data?.pages.length !== 0,
+  getPreviousPageParam: (_page, _pages, cursor) => cursor - 1,
+  networkMode: 'offlineFirst',
+})
+instantiatedPages.enabled
+instantiatedPages.getPreviousPageParam
+instantiatedPages.networkMode
+const explicitUnary = utils.users.get.queryOptions<string>({
+  input: { id: 1 },
+  enabled: (query) => query.state.data?.id !== 0,
+  select: (user) => user.name,
+  networkMode: 'offlineFirst',
+})
+explicitUnary.enabled
+explicitUnary.networkMode
+true satisfies Assert<
+  Equal<
+    ReturnType<typeof explicitUnary.queryFn>,
+    Rpc.Success<typeof GetUser> | Promise<Rpc.Success<typeof GetUser>>
+  >
+>
+useQuery(explicitUnary).data satisfies string | undefined
+const explicitInfinite = utils.users.pages.infiniteOptions<number, string[]>({
+  ...validPageOptions,
+  initialData: initialInfiniteData,
+  select: (data) => data.pages.flatMap((page) => page.users.map((user) => user.name)),
+  enabled: (query) => query.state.data?.pages.length !== 0,
+})
+explicitInfinite.enabled
+const explicitInfiniteHook = useInfiniteQuery(explicitInfinite)
+true satisfies Assert<Equal<typeof explicitInfiniteHook.data, string[]>>
 // @ts-expect-error infinite input mappers must return the RPC payload constructor input
 buildPages({ ...validPageOptions, input: () => ({ cursor: 'invalid' }) })
 // @ts-expect-error the package owns the infinite-query function
@@ -1845,18 +1878,8 @@ const broadUnknownOptions = broadPayloadUtils.payload.unknown.queryOptions({
   input: broadUnknownInput,
 })
 const broadAnyOptions = broadPayloadUtils.payload.any.queryOptions({ input: broadAnyInput })
-true satisfies Assert<
-  Equal<
-    typeof broadUnknownOptions.queryFn,
-    QueryFunction<string, typeof broadUnknownOptions.queryKey> | SkipToken
-  >
->
-true satisfies Assert<
-  Equal<
-    typeof broadAnyOptions.queryFn,
-    QueryFunction<string, typeof broadAnyOptions.queryKey> | SkipToken
-  >
->
+true satisfies Assert<Equal<typeof broadUnknownOptions.queryFn, QueryFunction<string> | SkipToken>>
+true satisfies Assert<Equal<typeof broadAnyOptions.queryFn, QueryFunction<string> | SkipToken>>
 
 broadPayloadUtils.payload.void.queryKey() satisfies readonly [
   'payload',
