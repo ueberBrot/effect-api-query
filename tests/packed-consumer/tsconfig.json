@@ -13,6 +13,7 @@
     "types": ["node"]
   },
   "include": [
+    "construction-baseline.mts",
     "owner-cache.ts",
     "docs-owner-cache.ts",
     "owner-cache-contract.ts",

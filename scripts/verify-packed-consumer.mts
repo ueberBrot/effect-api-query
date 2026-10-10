@@ -390,7 +390,9 @@ const runTypeScript = (
     | 'tsconfig.json'
     | 'tsconfig.openapi.json'
     | 'tsconfig.tanstack-start.json'
-    | 'tsconfig.type-scale.json'
+    | 'tsconfig.contract-baseline.json'
+    | 'tsconfig.rpc-baseline.json'
+    | 'tsconfig.http-baseline.json'
     | 'tsconfig.svelte-angular.json'
     | 'tsconfig.vue-solid.json',
   extendedDiagnostics: boolean,
@@ -409,6 +411,8 @@ const runTypeScript = (
     { cwd: consumerDirectory, stdio: 'inherit' },
   )
 }
+
+const baselines: unknown[] = []
 
 const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
   const consumerDirectory = mkdtempSync(nodePath.join(tmpdir(), `effect-api-query-${peer.label}-`))
@@ -690,13 +694,23 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       runTypeScript(consumerDirectory, compiler, 'tsconfig.tanstack-start.json', false)
       runTypeScript(consumerDirectory, compiler, 'tsconfig.svelte-angular.json', false)
       runTypeScript(consumerDirectory, compiler, 'tsconfig.vue-solid.json', false)
-      runTypeScript(
-        consumerDirectory,
-        compiler,
-        'tsconfig.type-scale.json',
-        peer.queryCoreVersion === testedVersion('@tanstack/query-core') &&
-          compiler.label === 'typescript-current',
+      if (peer.queryCoreVersion !== testedVersion('@tanstack/query-core')) {
+        runTypeScript(consumerDirectory, compiler, 'tsconfig.contract-baseline.json', false)
+        runTypeScript(consumerDirectory, compiler, 'tsconfig.rpc-baseline.json', false)
+        runTypeScript(consumerDirectory, compiler, 'tsconfig.http-baseline.json', false)
+      }
+    }
+
+    if (peer.queryCoreVersion === testedVersion('@tanstack/query-core')) {
+      execFileSync(
+        process.execPath,
+        [nodePath.join(repositoryRoot, 'scripts/measure-packed-consumer.mts'), consumerDirectory],
+        { stdio: 'inherit' },
       )
+      const baseline: unknown = JSON.parse(
+        readFileSync(nodePath.join(consumerDirectory, 'packed-baseline.json'), 'utf-8'),
+      )
+      baselines.push(baseline)
     }
 
     for (const fixture of [
@@ -753,6 +767,22 @@ for (const peer of peerCases) {
 }
 
 equal(artifactDigest(), initialDigest, 'The tested release archive must remain unchanged')
+const baselineReport = {
+  package: `${packedManifest.name}@${packedManifest.version}`,
+  sha512: initialDigest,
+  runtime: process.version,
+  platform: process.platform,
+  architecture: process.arch,
+  peers: { effect: testedVersion('effect'), queryCore: testedVersion('@tanstack/query-core') },
+  measurements: baselines,
+}
+const baselinePath = process.env['EFFECT_API_QUERY_BASELINE']
+if (baselinePath !== undefined) {
+  writeFileSync(
+    nodePath.resolve(repositoryRoot, baselinePath),
+    `${JSON.stringify(baselineReport, null, 2)}\n`,
+  )
+}
 console.log(
   JSON.stringify(
     {
@@ -762,6 +792,7 @@ console.log(
       files: packedFiles,
       compilers: compilerCases.map((compiler) => compiler.label),
       peers: peerCases,
+      baseline: baselineReport,
     },
     null,
     2,
