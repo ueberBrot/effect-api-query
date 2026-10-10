@@ -1,0 +1,123 @@
+library:
+  name: effect-api-query
+  version: 0.1.0
+  repository: https://github.com/ueberBrot/effect-api-query
+  description: TanStack Query utilities derived from ready Effect RPC and HTTP clients.
+  primary_framework: framework-agnostic
+domains:
+  - name: Contract-derived query workflows
+    slug: contract-queries
+    description: Choose typed cache views while preserving application-owned execution and lifetime.
+skills:
+  - name: effect-api-query
+    slug: effect-api-query
+    domain: contract-queries
+    description: Derive options and keys, coordinate cache owners, and integrate native Query
+      consumers.
+    type: core
+    packages:
+      - effect-api-query
+    covers:
+      - RPC construction and canonical identity
+      - HTTP decoded requests, SSE, multipart mutations, and metadata
+      - Native defaults, filters, skipping, and pagination
+      - Stream policies, snapshots, and request cleanup
+      - Optimistic overlap, event refresh, and owner replacement
+      - DTO and rich-value hydration
+      - Reactive framework accessors and host boundaries
+    tasks:
+      - Derive buffered, paginated, accumulated, live, and metadata options from a ready client.
+      - Address exact stream policy keys and compose encoded partial native filters.
+      - Apply native defaults without losing selected or explicitly undefined seed behavior.
+      - Capture open streams and drain preparation before request disposal.
+      - Hydrate every selected view into its normal decoded cache representation.
+      - Preserve neighboring writes and originating ownership during mutation overlap.
+      - Defer event refresh until participating writes settle.
+      - Retire consumers and accepted work before acquiring a replacement owner.
+      - Rebuild options inside native reactive framework accessors.
+      - Choose an application-owned transport within documented version and host boundaries.
+    subsystems:
+      - name: RPC
+        package: effect-api-query
+        config_surface: Literal RpcGroup, flat ready client, prefix, key encoders, runner.
+      - name: HTTP
+        package: effect-api-query
+        config_surface: Literal HttpApi, ready client, prefix, request encoders, runner.
+    reference_candidates:
+      - topic: Adapter inputs and capabilities
+        reason: RPC construction and HTTP decoded containers differ.
+      - topic: Cache workflows
+        reason: Defaults, filters, writes, events, and replacement share ownership.
+      - topic: Hydration and SSR
+        reason: Captures, view codecs, and preparation require request lifetime.
+      - topic: Frameworks and hosts
+        reason: Hook overloads and transport evidence are conditional.
+    failure_modes:
+      - mistake: Reuse an accumulated key across incompatible policies
+        mechanism: Retention and refetch policy change representation and normalized identity.
+        wrong_pattern: rpc.events.watch.streamedKey(input)
+        correct_pattern: rpc.events.watch.streamedKey(input, policy)
+        source: src/rpc/streamed-query.ts
+        priority: HIGH
+        status: active
+      - mistake: Dispose resources after native cancellation alone
+        mechanism: Query settlement can precede local finalization and preparation drain.
+        wrong_pattern: await queryClient.cancelQueries(); await runtime.dispose()
+        correct_pattern: await captureAndPreparationDrain; await runtime.dispose()
+        source: src/core/stream-snapshot.ts
+        priority: HIGH
+        status: active
+      - mistake: Roll back an overlapping write with an old snapshot
+        mechanism: Whole-list replacement erases intervening successful writes.
+        wrong_pattern: queryClient.setQueryData(key, oldList)
+        correct_pattern: rollbackOriginatingEntityAndPositions()
+        source: examples/vite-react/src/lib/user-writes.ts
+        priority: CRITICAL
+        status: active
+      - mistake: Redirect late callbacks to a replacement owner
+        mechanism: Mutable current-owner lookup can send private results to another cache.
+        wrong_pattern: currentOwner.queryClient.setQueryData(key, result)
+        correct_pattern: transaction.commit(result)
+        source: examples/vite-react/src/lib/user-writes.ts
+        priority: CRITICAL
+        status: active
+      - mistake: Hydrate rich values without paired view codecs
+        mechanism: JSON loses prototypes, rich page parameters, and distinct undefined elements.
+        wrong_pattern: hydrate(queryClient, JSON.parse(snapshot))
+        correct_pattern: await decodeAllSelectedViewsThenHydrate(snapshot)
+        source: tests/types/docs-hydration-views.ts
+        priority: HIGH
+        status: active
+      - mistake: Construct reactive query options only once
+        mechanism: Builders capture the first input and cannot follow reactive changes.
+        wrong_pattern: useQuery(rpc.users.read.queryOptions({ input }))
+        correct_pattern: 'useQuery(() => rpc.users.read.queryOptions({ input: readInput() }))'
+        source: apps/docs/src/content/docs/guides/vue-and-solid.md
+        priority: HIGH
+        status: active
+      - mistake: Rely on changed metadata options after a fresh hit
+        mechanism: An imperative fresh cache hit retains the existing Query options.
+        wrong_pattern: await queryClient.query(newOptions); queryClient.setQueryData(key, value)
+        correct_pattern: Install the policy through an observer or actual fetch before manual writes.
+        source: apps/docs/src/content/docs/guides/query-defaults.md
+        priority: HIGH
+        status: active
+    compositions:
+      - library: TanStack Query
+      - library: Effect
+tensions:
+  - name: Exact identity and broad refresh
+    skills:
+      - effect-api-query
+    description: Concrete keys include encoding and view policy while native prefixes group
+      related entries.
+    implication: Partial constructor input or omitted stream policy cannot stand in for an exact
+      key.
+  - name: Local retirement and accepted domain work
+    skills:
+      - effect-api-query
+    description: Private cache retirement stops local side effects without pretending to undo
+      remote writes.
+    implication: Keep originating-owner guards after drain and model command cancellation explicitly.
+cross_references: []
+gaps: []

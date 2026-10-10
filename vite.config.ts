@@ -24,9 +24,6 @@ const ignoredPaths = [
   'test-results/**',
 ]
 
-// Packed fixtures resolve only the installed tarball from isolated temporary projects.
-const packedFixtures = ['tests/packed-consumer/**', 'tests/types/**']
-
 const testFiles = ['tests/**/*.test.ts', 'examples/**/*.test.{ts,tsx}']
 const effectTestBlocks = ['it.effect', 'it.live', 'it.scoped', 'it.scopedLive']
 
@@ -99,7 +96,7 @@ export default defineConfig({
     ignorePatterns: [
       ...(ultraciteCore.ignorePatterns ?? []),
       ...ignoredPaths,
-      ...packedFixtures,
+      'tests/types/**',
       'apps/docs/**',
     ],
     options: {
@@ -124,6 +121,10 @@ export default defineConfig({
       'effecttsgo/unstable-api-usage': 'error',
     },
     overrides: [
+      {
+        files: ['src/core/stream-snapshot.ts'],
+        rules: { 'promise/avoid-new': 'off' },
+      },
       {
         files: ['examples/**/*.{ts,tsx}'],
         ...ultraciteReact,
@@ -159,7 +160,12 @@ export default defineConfig({
         ),
       },
       {
-        files: ['src/{http,rpc}/**/*.ts', 'tests/**/*.ts', 'examples/**/*.{ts,tsx}'],
+        files: [
+          'src/{http,rpc}/**/*.ts',
+          'tests/**/*.ts',
+          'examples/**/*.{ts,tsx}',
+          'scripts/measure-construction.mts',
+        ],
         rules: {
           // Effect 4 transports are experimental and pinned; match the compiler policy.
           'effecttsgo/unstable-api-usage': 'off',
@@ -171,6 +177,10 @@ export default defineConfig({
           // Each transport keeps its related tagged error family together.
           'eslint/max-classes-per-file': ['error', 4],
         },
+      },
+      {
+        files: ['src/http/types.ts'],
+        rules: { 'typescript/no-redundant-type-constituents': 'off' },
       },
       {
         files: ['src/{core,http,rpc}/types.ts'],
@@ -186,16 +196,18 @@ export default defineConfig({
         files: [
           'src/core/operation.ts',
           'src/core/schema-key.ts',
+          'src/core/streamed-query.ts',
           'src/core/utility-tree.ts',
           'src/http/operation.ts',
           'src/http/request.ts',
+          'src/http/streamed-query.ts',
           'src/rpc/operation.ts',
           'src/rpc/streamed-query.ts',
         ],
         rules: {
           // These runtime adapters erase caller-defined schemas/options, then validate
           // inputs with their declaration. A domain-specific replacement loses the
-          // generic public contract, which the packed compile-time fixtures verify.
+          // generic public contract.
           'anti-slop/no-unknown-parameters': 'off',
           'anti-slop/no-unknown-returns': 'off',
           'anti-slop/no-unsafe-dictionary-type': 'off',
@@ -283,26 +295,9 @@ export default defineConfig({
           output: ['dist/**'],
         },
       },
-      'packed-package': {
-        command: [
-          'vp pm pack --pack-destination .artifacts -- --config.ignore-scripts=true',
-          'fallow dead-code --private-type-leaks --file dist/index.d.mts',
-          'vp run verify-packed-package',
-        ],
-        dependsOn: ['pack', 'skills-check'],
-        cache: {
-          output: ['.artifacts/*.tgz'],
-        },
-      },
-      'verify-packed-package': {
-        command: 'node scripts/verify-packed-consumer.mts',
-        cache: false,
-      },
       'skills-check': {
         command: 'intent validate skills --check',
-        cache: {
-          output: [],
-        },
+        cache: false,
       },
       fallow: {
         command: [
@@ -317,7 +312,29 @@ export default defineConfig({
       },
       test: {
         command: 'vp test',
+        dependsOn: ['pack', 'api-types', 'server-local-types'],
+        cache: {
+          env: ['RPC_TRANSPORT_MEASURE', 'STREAM_MEASURE'],
+          output: [],
+        },
+      },
+      'construction-baseline': {
+        command: 'tsx scripts/measure-construction.mts',
+        cache: false,
+      },
+      'api-types': {
+        command: [
+          'tsc --project tests/types/tsconfig.json',
+          'node node_modules/typescript-5.9/bin/tsc --project tests/types/tsconfig.json',
+        ],
         dependsOn: ['pack'],
+        cache: { output: [] },
+      },
+      'server-local-types': {
+        command: [
+          'tsc --project tests/fixtures/tsconfig.server-local.json',
+          'node node_modules/typescript-5.9/bin/tsc --project tests/fixtures/tsconfig.server-local.json',
+        ],
         cache: {
           output: [],
         },
@@ -415,7 +432,7 @@ export default defineConfig({
       validate: {
         command: [
           'vp run quality',
-          'vp run packed-package',
+          'vp run skills-check',
           'vp run vite-react-build',
           'vp run tanstack-start-build',
           'vp run docs-build',

@@ -1,9 +1,12 @@
-import { Predicate } from 'effect'
-import type { Effect } from 'effect'
+import { Effect, Predicate } from 'effect'
+import type { Cause } from 'effect'
+import type { Sse } from 'effect/encoding'
+import type { HttpClientResponse } from 'effect/http'
 import type { HttpApi } from 'effect/http-api'
 
 import type {
   MutationOperation,
+  StreamingOperation,
   RuntimeKeyEncoder,
   TreeErrors,
   UnaryOperation,
@@ -11,13 +14,28 @@ import type {
 import { EffectHttpApiQueryConfigError, EffectHttpApiQueryError } from './errors'
 import type { HttpApiEndpointIdentity } from './errors'
 import { createHttpRequest } from './request'
+import {
+  createHttpLiveIdentity,
+  createHttpStreamIdentity,
+  createHttpStreamPreparation,
+} from './streamed-query'
 
-type HttpOperation = (UnaryOperation | MutationOperation) & {
+type HttpOperation = (UnaryOperation | MutationOperation | StreamingOperation) & {
   readonly identity: HttpApiEndpointIdentity
 }
 
+type RuntimeHttpMethod = <Mode extends 'decoded-only' | 'decoded-and-response'>(
+  request: Record<string, unknown> & { readonly responseMode: Mode },
+) => Effect.Effect<
+  Mode extends 'decoded-and-response'
+    ? readonly [unknown, HttpClientResponse.HttpClientResponse]
+    : unknown,
+  unknown,
+  unknown
+>
+
 export interface CompiledHttpOperations {
-  readonly operations: readonly (UnaryOperation | MutationOperation)[]
+  readonly operations: readonly (UnaryOperation | MutationOperation | StreamingOperation)[]
   readonly errors: TreeErrors
   readonly keyEncoders: ReadonlyMap<string, RuntimeKeyEncoder>
 }
@@ -42,31 +60,90 @@ const extractHttpEndpoints = (api: HttpApi.Top, client: unknown): readonly HttpO
       const target = // oxlint-disable-next-line typescript/no-unsafe-type-assertion
         (group.topLevel ? client : (client as Record<string, unknown>)[group.identifier]) as Record<
           string,
-          (request: unknown) => Effect.Effect<unknown, unknown, unknown>
+          RuntimeHttpMethod
         >
-      operations.push({
-        ...request,
+      const invoke = <Mode extends 'decoded-only' | 'decoded-and-response'>(
+        requestInput: unknown,
+        responseMode: Mode,
+        sseOptions?: Sse.DecodeOptions,
+      ) => {
+        const method = target[endpoint.identifier]
+        if (method === undefined) {
+          throw new TypeError(`Missing HTTP client endpoint ${endpoint.identifier}`)
+        }
+        // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
+        return method.bind(target)({
+          ...(Predicate.isObject(requestInput) ? requestInput : undefined),
+          responseMode,
+          ...(sseOptions === undefined ? undefined : { sseOptions }),
+        })
+      }
+      const common = {
         identity,
         id: JSON.stringify([group.identifier, endpoint.identifier]),
         path: group.topLevel ? [endpoint.identifier] : [group.identifier, endpoint.identifier],
-        takeOptions: () => {
-          // HTTP has no adapter-owned options.
-        },
-        invoke: (requestInput) => {
-          const invoke = target[endpoint.identifier]
-          if (invoke === undefined) {
-            throw new TypeError(`Missing HTTP client endpoint ${endpoint.identifier}`)
-          }
-          // The ready client preserves caller errors and service requirements.
+        unsupportedQueryHash: (option: 'queryKeyHashFn' | 'queryHash') =>
+          new EffectHttpApiQueryConfigError(
+            'UnsupportedQueryHash',
+            `${option} must be configured through QueryClient defaults`,
+            identity,
+          ),
+        takeOptions: () => null,
+      }
+      if (request.kind === 'Streaming') {
+        operations.push({
+          ...common,
+          ...request,
+          kind: 'Streaming',
+          liveIdentity: createHttpLiveIdentity(identity),
+          streamedIdentity: createHttpStreamIdentity(identity),
+          prepareStream: createHttpStreamPreparation(identity, (requestInput, sseOptions) =>
+            // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
+            invoke(requestInput, 'decoded-only', sseOptions),
+          ),
+        })
+      } else {
+        operations.push({
+          ...common,
+          ...request,
           // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
-          return invoke.call(target, {
-            ...(Predicate.isObject(requestInput) ? requestInput : undefined),
-            responseMode: 'decoded-only',
-          })
-        },
-        executionError: (operation, cause) =>
-          new EffectHttpApiQueryError(identity, operation, cause),
-      })
+          invoke: (requestInput) => invoke(requestInput, 'decoded-only'),
+          ...(request.kind === 'Unary'
+            ? {
+                metadata: {
+                  invoke: (requestInput: unknown) =>
+                    // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
+                    Effect.map(invoke(requestInput, 'decoded-and-response'), ([data, response]) =>
+                      Object.freeze({
+                        data: data === undefined ? null : data,
+                        status: response.status,
+                        headers: Object.freeze(
+                          Object.fromEntries(Object.entries(response.headers)),
+                        ),
+                      }),
+                    ),
+                  executionError: (operation: 'metadata', cause: Cause.Cause<unknown>) =>
+                    new EffectHttpApiQueryError(identity, operation, cause),
+                  finalizeData: (data: unknown) => {
+                    if (!Predicate.isObject(data)) {
+                      return data
+                    }
+                    const { headers } = data
+                    const snapshot =
+                      Predicate.isObject(headers) && !Object.isFrozen(headers)
+                        ? Object.freeze({ ...headers })
+                        : headers
+                    return Object.isFrozen(data) && snapshot === headers
+                      ? data
+                      : Object.freeze({ ...data, headers: snapshot })
+                  },
+                },
+              }
+            : undefined),
+          executionError: (operation, cause) =>
+            new EffectHttpApiQueryError(identity, operation, cause),
+        })
+      }
     }
   }
   return operations
@@ -121,7 +198,7 @@ export const compileHttpOperations = (
   const errors = httpTreeErrors(api, operations)
   const encoderGroups = new Set(
     operations
-      .filter((operation) => operation.kind === 'Unary' && operation.input._tag === 'Input')
+      .filter((operation) => operation.kind !== 'Mutation' && operation.input._tag === 'Input')
       .map((operation) => operation.identity.groupId),
   )
   const keyEncoders = new Map<string, RuntimeKeyEncoder>()

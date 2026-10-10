@@ -55,8 +55,12 @@ demo authorization header through its HTTP client middleware.
 
 The HTTP panel uses `createHttpApiQueryUtils` from `effect-api-query`; the RPC panels
 use `createRpcQueryUtils` from the same package root. The application owns both ready clients,
-their runners, and the QueryClient. During disposal, it cancels queries before releasing client
-resources.
+their runners, and the QueryClient. During disposal, it awaits query cancellation, clears the
+cache, drains accepted commands and mutations, and then disposes the HTTP runtime and RPC client.
+Query cancellation can settle before iterator cleanup. See
+[Client Lifecycle](/effect-api-query/concepts/client-lifecycle/#stream-creation-and-consumption)
+for a separate stream-completion signal, and
+[Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/) for persistence and replacement.
 
 Use the HTTP directory to read users, load another page, and create or delete a user. Each write
 explicitly invalidates both generated user prefixes, so the RPC directory reflects HTTP writes
@@ -92,15 +96,16 @@ through the real server and browser suites.
 vp run tanstack-start-dev
 ```
 
-This task starts one full-stack process. The browser and server-rendering clients call the
-Start application's `/rpc` and `/api/$` routes. Choose **HTTP users** to inspect the server-rendered directory
+This task starts one full-stack process. Browser clients call the Start application's `/rpc` and
+`/api/$` routes. Server loaders execute within the same host without a network round trip. Choose **HTTP users** to inspect the server-rendered directory
 and first page, reuse the hydrated cache, and try the same HTTP operations as in Vite React.
 Choose **HTTP SSR failure** to see the browser retry a failed server query that was omitted
 from dehydration.
 
-Server rendering uses the trusted origin `http://127.0.0.1:3000`. If the Start server listens
-elsewhere, set the server-only `EXAMPLE_API_ORIGIN` environment variable to its HTTP(S) origin,
-without a path, credentials, query, or fragment. Browser requests stay on the same origin.
+Server rendering owns a separate RPC connection and Query Client for each request. Local RPC and
+HTTP execution share the network handlers' demonstration directory. A browser write therefore
+appears in the next server-rendered page, while disposing one request leaves other owners usable.
+Browser requests stay on the same origin.
 See [TanStack Start](/effect-api-query/guides/tanstack-start/) for request ownership, authentication,
 cache isolation, and hydration setup.
 
@@ -120,9 +125,10 @@ The accumulated history retains only "Workspace synchronized" and "Ready"; earli
 as new ones arrive. Choose **Replay full history** to retain all four states again. The live query
 continues to show only "Ready".
 
-The bounded replay supplies `maxChunks: 2` to `streamedOptions`. Both controls reuse the generated
-streamed key: the bound changes retention policy, not RPC identity. The application keeps the selected
-policy for subsequent refetches. TanStack Start also demonstrates this after hydrating its server snapshot.
+The bounded replay supplies `maxChunks: 2` to `streamedOptions`. Each policy has its own generated
+streamed key, so a cached full history cannot satisfy the bounded view. The application keeps the
+selected policy for subsequent refetches. TanStack Start also demonstrates this after hydrating its
+server snapshot.
 
 ## Inspect request-local metadata
 

@@ -238,6 +238,8 @@ type ExactStreamLeafInterface = Assert<
 const exactStreamLeafInterface: ExactStreamLeafInterface = true
 const projectKey = utils.projects['by-id'].find.queryKey({ id: 'project-1' })
 const projectPing = utils.projects.health.ping.queryOptions()
+const omittedInputlessArguments: Parameters<typeof utils.health.ping.queryOptions> = []
+void omittedInputlessArguments
 const bracketOnly = utils['billing-history']['list all'].queryOptions({
   input: { accountId: 'account-1' },
 })
@@ -310,6 +312,11 @@ const streamedOptions = utils.events.watch.streamedOptions({
   meta: { source: 'fixture' },
   networkMode: 'offlineFirst',
   refetchMode: 'append',
+  retryDelay: (attemptIndex, error) => {
+    attemptIndex satisfies number
+    error satisfies EffectRpcQueryError<'unauthorized' | 'watch-failure' | 'watch-rpc-failure'>
+    return 0
+  },
   retry: (_count, error) => {
     error satisfies EffectRpcQueryError<'unauthorized' | 'watch-failure' | 'watch-rpc-failure'>
     return false
@@ -323,15 +330,48 @@ streamedHook.error satisfies EffectRpcQueryError<
 > | null
 const streamedResult: Promise<string> = queryClient.query(streamedOptions)
 const streamedKey = utils.events.watch.streamedKey({ channel: 'news' })
-streamedKey satisfies readonly ['app', 'rpc', 'events', 'watch', 'streamed', JsonValue]
+streamedKey satisfies readonly ['app', 'rpc', 'events', 'watch', 'streamed', ...JsonValue[]]
 const cachedStream = queryClient.getQueryData(utils.events.watch.streamedKey({ channel: 'news' }))
 cachedStream satisfies ReadonlyArray<string> | undefined
+const boundedStreamKey = utils.events.watch.streamedKey(
+  { channel: 'news' },
+  { maxChunks: 2, refetchMode: 'append' },
+)
+const boundedStreamData = queryClient.getQueryData(boundedStreamKey)
+boundedStreamData satisfies ReadonlyArray<string> | undefined
+queryClient.setQueryData(boundedStreamKey, ['latest'])
+queryClient.getQueryState(boundedStreamKey)?.error satisfies
+  | EffectRpcQueryError<'unauthorized' | 'watch-failure' | 'watch-rpc-failure'>
+  | null
+  | undefined
+utils.events.watch.streamedKey({ channel: 'news' }, { maxChunks: undefined, refetchMode: 'reset' })
+utils.events.audit.watch.streamedKey()
+utils.events.audit.watch.streamedKey({ maxChunks: 2, refetchMode: 'replace' })
+utils.events.audit.watch.streamedKey({ maxChunks: undefined, refetchMode: undefined })
+queryClient.getQueryData(utils.events.audit.watch.streamedKey({ maxChunks: 2 })) satisfies
+  | ReadonlyArray<string>
+  | undefined
+// @ts-expect-error refetch policy is one of the declared modes
+utils.events.watch.streamedKey({ channel: 'news' }, { refetchMode: 'unknown' })
+// @ts-expect-error accumulation bounds are numeric
+utils.events.audit.watch.streamedKey({ maxChunks: '2' })
+// @ts-expect-error a payload-bearing key still requires constructor input
+utils.events.watch.streamedKey({ maxChunks: 2 })
+// @ts-expect-error live keys have no accumulation policy
+utils.events.watch.liveKey({ channel: 'news' }, { maxChunks: 2 })
 queryClient.invalidateQueries({ queryKey: streamedKey })
 queryClient.refetchQueries({ queryKey: streamedKey })
 void [streamedHookData, streamedResult]
 
 const liveOptions = utils.events.watch.liveOptions({
   input: { channel: 'news' },
+  retryDelay: (attemptIndex, error) => {
+    attemptIndex satisfies number
+    error satisfies
+      | EffectRpcQueryEmptyStreamError
+      | EffectRpcQueryError<'unauthorized' | 'watch-failure' | 'watch-rpc-failure'>
+    return 0
+  },
   select: (value) => value.length,
 })
 const liveHook = useQuery(liveOptions)
@@ -363,6 +403,56 @@ const initializedLive = useQuery(
   }),
 )
 initializedLive.data satisfies number
+
+const normalizedLiveGroup = RpcGroup.make(
+  Rpc.make('values.undefined', { success: Schema.Undefined, stream: true }),
+  Rpc.make('values.void', { success: Schema.Void, stream: true }),
+  Rpc.make('values.null', { success: Schema.Null, stream: true }),
+  Rpc.make('values.optional', { success: Schema.UndefinedOr(Schema.String), stream: true }),
+)
+declare const normalizedLiveClient: RpcClient.RpcClient.Flat<
+  RpcGroup.Rpcs<typeof normalizedLiveGroup>
+>
+const normalizedLiveUtils = createRpcQueryUtils(normalizedLiveGroup, {
+  client: normalizedLiveClient,
+  keyPrefix,
+})
+true satisfies Assert<Equal<QueryData<string | undefined>, string | null>>
+true satisfies Assert<Equal<QueryData<void>, null>>
+const undefinedLiveResult = queryClient.query(normalizedLiveUtils.values.undefined.liveOptions())
+true satisfies Assert<Equal<typeof undefinedLiveResult, Promise<null>>>
+const voidLiveResult = queryClient.query(normalizedLiveUtils.values.void.liveOptions())
+true satisfies Assert<Equal<typeof voidLiveResult, Promise<null>>>
+const nullLiveResult = queryClient.query(normalizedLiveUtils.values.null.liveOptions())
+true satisfies Assert<Equal<typeof nullLiveResult, Promise<null>>>
+const optionalLiveKey = normalizedLiveUtils.values.optional.liveKey()
+const cachedOptionalLive = queryClient.getQueryData(optionalLiveKey)
+true satisfies Assert<Equal<typeof cachedOptionalLive, string | null | undefined>>
+const cachedUndefinedLive = queryClient.getQueryData(normalizedLiveUtils.values.undefined.liveKey())
+true satisfies Assert<Equal<typeof cachedUndefinedLive, null | undefined>>
+queryClient.setQueryData(optionalLiveKey, null)
+const initializedNormalizedLive = useQuery(
+  normalizedLiveUtils.values.optional.liveOptions({
+    initialData: null,
+    select: (value) => {
+      true satisfies Assert<Equal<typeof value, string | null>>
+      return value === null ? 0 : value.length
+    },
+  }),
+)
+true satisfies Assert<Equal<typeof initializedNormalizedLive.data, number>>
+const initializedUndefinedLive = useQuery(
+  normalizedLiveUtils.values.undefined.liveOptions({ initialData: () => null }),
+)
+true satisfies Assert<Equal<typeof initializedUndefinedLive.data, null>>
+const optionalNormalizedInitial = useQuery(
+  normalizedLiveUtils.values.optional.liveOptions({ initialData: () => undefined }),
+)
+true satisfies Assert<Equal<typeof optionalNormalizedInitial.data, string | null | undefined>>
+const accumulatedUndefined = queryClient.query(
+  normalizedLiveUtils.values.undefined.streamedOptions({ initialData: [undefined] }),
+)
+true satisfies Assert<Equal<typeof accumulatedUndefined, Promise<readonly undefined[]>>>
 
 declare const clientFailureClient: RpcClient.RpcClient.Flat<Rpcs, 'client-failure'>
 const clientFailureUtils = createRpcQueryUtils<typeof group, typeof keyPrefix, 'client-failure'>(
@@ -433,6 +523,11 @@ const infiniteOptions = utils.users.pages.infiniteOptions({
   retry: (_count, error) => {
     error satisfies EffectRpcQueryError<'page-failure'>
     return false
+  },
+  retryDelay: (attemptIndex, error) => {
+    attemptIndex satisfies number
+    error satisfies EffectRpcQueryError<'page-failure'>
+    return 0
   },
   select: (data) => data.pages.flatMap((page) => page.users.map((user) => user.name)),
 })
@@ -645,6 +740,39 @@ const validPageOptions = {
   initialPageParam: 0,
   input: (cursor: number) => ({ cursor }),
 }
+const instantiatedPages = buildPages({
+  ...validPageOptions,
+  enabled: (query) => query.state.data?.pages.length !== 0,
+  getPreviousPageParam: (_page, _pages, cursor) => cursor - 1,
+  networkMode: 'offlineFirst',
+})
+instantiatedPages.enabled
+instantiatedPages.getPreviousPageParam
+instantiatedPages.networkMode
+const explicitUnary = utils.users.get.queryOptions<string>({
+  input: { id: 1 },
+  enabled: (query) => query.state.data?.id !== 0,
+  select: (user) => user.name,
+  networkMode: 'offlineFirst',
+})
+explicitUnary.enabled
+explicitUnary.networkMode
+true satisfies Assert<
+  Equal<
+    ReturnType<typeof explicitUnary.queryFn>,
+    Rpc.Success<typeof GetUser> | Promise<Rpc.Success<typeof GetUser>>
+  >
+>
+useQuery(explicitUnary).data satisfies string | undefined
+const explicitInfinite = utils.users.pages.infiniteOptions<number, string[]>({
+  ...validPageOptions,
+  initialData: initialInfiniteData,
+  select: (data) => data.pages.flatMap((page) => page.users.map((user) => user.name)),
+  enabled: (query) => query.state.data?.pages.length !== 0,
+})
+explicitInfinite.enabled
+const explicitInfiniteHook = useInfiniteQuery(explicitInfinite)
+true satisfies Assert<Equal<typeof explicitInfiniteHook.data, string[]>>
 // @ts-expect-error infinite input mappers must return the RPC payload constructor input
 buildPages({ ...validPageOptions, input: () => ({ cursor: 'invalid' }) })
 // @ts-expect-error the package owns the infinite-query function
@@ -684,6 +812,7 @@ const queryOptions = utils.users.get.queryOptions({
     return false
   },
   retryDelay: (_attempt, error) => {
+    _attempt satisfies number
     error satisfies EffectRpcQueryError<'not-found'>
     return 0
   },
@@ -691,10 +820,10 @@ const queryOptions = utils.users.get.queryOptions({
   staleTime: (query) => (query.state.data?.name === 'Ada' ? Infinity : 0),
   structuralSharing: false,
 })
-type ExactQueryHashInput = Assert<
-  Equal<Parameters<typeof queryOptions.queryKeyHashFn>[0], typeof queryOptions.queryKey>
+type ClientOwnedQueryHash = Assert<
+  Equal<Extract<'queryKeyHashFn' | 'queryHash', keyof typeof queryOptions>, never>
 >
-const exactQueryHashInput: ExactQueryHashInput = true
+const clientOwnedQueryHash: ClientOwnedQueryHash = true
 
 const queryHook = useQuery(queryOptions)
 const queryHookData: string | undefined = queryHook.data
@@ -704,7 +833,7 @@ const suspenseData: string = suspenseHook.data
 suspenseHook.error satisfies EffectRpcQueryError<'not-found'> | null
 usePrefetchQuery(queryOptions)
 
-void [exactQueryHashInput, queryHookData, suspenseData]
+void [clientOwnedQueryHash, queryHookData, suspenseData]
 
 const possiblyInitialized = utils.users.get.queryOptions({
   input: { id: 1, locale: 'de' },
@@ -778,11 +907,11 @@ const skipped = utils.users.get.queryOptions(skipToken)
 skipped.queryFn satisfies typeof queryCoreSkipToken
 const typedSkipToken: SkipToken = skipped.queryFn
 void typedSkipToken
-type ExactSkippedQueryHashInput = Assert<
-  Equal<Parameters<typeof skipped.queryKeyHashFn>[0], typeof skipped.queryKey>
+type ClientOwnedSkippedQueryHash = Assert<
+  Equal<Extract<'queryKeyHashFn' | 'queryHash', keyof typeof skipped>, never>
 >
-const exactSkippedQueryHashInput: ExactSkippedQueryHashInput = true
-void exactSkippedQueryHashInput
+const clientOwnedSkippedQueryHash: ClientOwnedSkippedQueryHash = true
+void clientOwnedSkippedQueryHash
 const skippedHook = useQuery(skipped)
 const skippedData: { readonly id: number; readonly name: string } | undefined = skippedHook.data
 skippedHook.error satisfies EffectRpcQueryError<'not-found'> | null
@@ -804,6 +933,11 @@ const getMutationOptions = utils.users.get.mutationOptions<{
   readonly previousName: string
 }>({
   gcTime: 60_000,
+  retryDelay: (attemptIndex, error) => {
+    attemptIndex satisfies number
+    error satisfies EffectRpcQueryError<'not-found'>
+    return 0
+  },
   onError: (error, variables, onMutateResult) => {
     error satisfies EffectRpcQueryError<'not-found'>
     variables satisfies { readonly id: number; readonly locale?: string }
@@ -900,7 +1034,7 @@ utils.users.get.queryOptions({
   input: { id: 1 },
   queryKey: ['custom'],
 })
-// @ts-expect-error the package owns the per-call query key hash function
+// @ts-expect-error QueryClient defaults own hashing.
 utils.users.get.queryOptions({
   input: { id: 1 },
   queryKeyHashFn: JSON.stringify,
@@ -1168,7 +1302,7 @@ const conditionalStreamOptions = utils.events.watch.streamedOptions({
   staleTime: (query) => {
     query.queryKey satisfies
       | readonly ['app', 'rpc', 'events', 'watch', 'streamed']
-      | readonly ['app', 'rpc', 'events', 'watch', 'streamed', JsonValue]
+      | readonly ['app', 'rpc', 'events', 'watch', 'streamed', ...JsonValue[]]
     return 30_000
   },
 })
@@ -1424,3 +1558,372 @@ utils.users.get.mutationOptions({ rpcOptions: discardOptions })
 
 // @ts-expect-error A caller hash cannot override generated RPC cache identity.
 utils.users.get.queryOptions({ input: skipToken, queryHash: 'shared' })
+
+true satisfies Assert<
+  Equal<
+    Extract<
+      'queryKeyHashFn' | 'queryHash',
+      | keyof typeof infiniteOptions
+      | keyof typeof skippedInfinite
+      | keyof typeof conditionalInfiniteOptions
+      | keyof typeof streamedOptions
+      | keyof typeof liveOptions
+    >,
+    never
+  >
+>
+
+// @ts-expect-error QueryClient defaults own hashing.
+utils.events.watch.streamedOptions({ input: { channel: 'news' }, queryHash: 'shared' })
+// @ts-expect-error QueryClient defaults own hashing.
+utils.events.watch.liveOptions({ input: { channel: 'news' }, queryKeyHashFn: JSON.stringify })
+utils.users.pages.infiniteOptions({
+  initialPageParam: 0,
+  input: (cursor) => ({ cursor }),
+  getNextPageParam: () => undefined,
+  // @ts-expect-error QueryClient defaults own hashing.
+  queryKeyHashFn: JSON.stringify,
+})
+
+const UnknownRead = Rpc.make('payload.unknown', {
+  payload: Schema.Unknown,
+  success: Schema.String,
+})
+const AnyRead = Rpc.make('payload.any', { payload: Schema.Any, success: Schema.String })
+const OptionalRead = Rpc.make('payload.optional', {
+  payload: Schema.Union([Schema.String, Schema.Void]),
+  success: Schema.String,
+})
+const VoidRead = Rpc.make('payload.void', {
+  payload: Schema.Void.annotate({ title: 'Payloadless' }),
+  success: Schema.String,
+})
+const UnknownWatch = Rpc.make('payload.unknownWatch', {
+  payload: Schema.Unknown,
+  success: Schema.String,
+  stream: true,
+})
+const AnyWatch = Rpc.make('payload.anyWatch', {
+  payload: Schema.Any,
+  success: Schema.String,
+  stream: true,
+})
+const OptionalWatch = Rpc.make('payload.optionalWatch', {
+  payload: Schema.Union([Schema.String, Schema.Void]),
+  success: Schema.String,
+  stream: true,
+})
+const VoidWatch = Rpc.make('payload.voidWatch', {
+  payload: Schema.Void,
+  success: Schema.String,
+  stream: true,
+})
+const broadPayloadGroup = RpcGroup.make(
+  UnknownRead,
+  AnyRead,
+  OptionalRead,
+  VoidRead,
+  UnknownWatch,
+  AnyWatch,
+  OptionalWatch,
+  VoidWatch,
+)
+declare const broadPayloadClient: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof broadPayloadGroup>>
+const broadPayloadUtils = createRpcQueryUtils(broadPayloadGroup, {
+  client: broadPayloadClient,
+  keyPrefix: ['payload'],
+})
+createRpcQueryUtils(broadPayloadGroup, {
+  client: broadPayloadClient,
+  keyPrefix: ['payload'],
+  keyEncoders: {
+    'payload.unknown': (payload) => {
+      true satisfies Assert<Equal<typeof payload, unknown>>
+      return 'unknown'
+    },
+    'payload.any': (payload) => {
+      true satisfies Assert<Equal<typeof payload, any>>
+      return 'any'
+    },
+    'payload.optional': (payload) => {
+      true satisfies Assert<Equal<typeof payload, void | string>>
+      return payload ?? null
+    },
+    'payload.unknownWatch': (payload) => {
+      true satisfies Assert<Equal<typeof payload, unknown>>
+      return 'unknown'
+    },
+    'payload.anyWatch': (payload) => {
+      true satisfies Assert<Equal<typeof payload, any>>
+      return 'any'
+    },
+    'payload.optionalWatch': (payload) => {
+      true satisfies Assert<Equal<typeof payload, void | string>>
+      return payload ?? null
+    },
+    // @ts-expect-error Void declarations have no payload identity encoder
+    'payload.void': () => null,
+  },
+})
+const unknownKey = broadPayloadUtils.payload.unknown.queryKey({ id: 1 })
+const anyKey = broadPayloadUtils.payload.any.queryKey({ id: 1 })
+const optionalKey = broadPayloadUtils.payload.optional.queryKey('input')
+unknownKey satisfies readonly ['payload', 'rpc', 'payload', 'unknown', 'query', JsonValue]
+anyKey satisfies readonly ['payload', 'rpc', 'payload', 'any', 'query', JsonValue]
+optionalKey satisfies readonly ['payload', 'rpc', 'payload', 'optional', 'query', JsonValue]
+queryClient.getQueryData(unknownKey) satisfies string | undefined
+queryClient.getQueryData(anyKey) satisfies string | undefined
+queryClient.getQueryData(optionalKey) satisfies string | undefined
+broadPayloadUtils.payload.unknown.queryOptions({ input: { id: 1 } })
+broadPayloadUtils.payload.any.queryOptions({ input: { id: 1 } })
+broadPayloadUtils.payload.optional.queryOptions({ input: undefined })
+// @ts-expect-error Unknown declarations require an input field
+broadPayloadUtils.payload.unknown.queryOptions()
+// @ts-expect-error Any declarations require an input field
+broadPayloadUtils.payload.any.queryOptions()
+// @ts-expect-error void-containing declarations require an input field
+broadPayloadUtils.payload.optional.queryOptions()
+// @ts-expect-error Unknown declarations require constructor input for keys
+broadPayloadUtils.payload.unknown.queryKey()
+// @ts-expect-error Any declarations require constructor input for keys
+broadPayloadUtils.payload.any.queryKey()
+// @ts-expect-error void-containing unions retain their declared constructor type
+broadPayloadUtils.payload.optional.queryKey(1)
+
+const unknownMutation = broadPayloadUtils.payload.unknown.mutationOptions({
+  onMutate: (input) => {
+    true satisfies Assert<Equal<typeof input, unknown>>
+    return 'unknown'
+  },
+})
+const anyMutation = broadPayloadUtils.payload.any.mutationOptions({
+  onMutate: (input) => {
+    true satisfies Assert<Equal<typeof input, any>>
+    return 'any'
+  },
+})
+const optionalMutation = broadPayloadUtils.payload.optional.mutationOptions({
+  onMutate: (input) => {
+    true satisfies Assert<Equal<typeof input, void | string>>
+    return 'optional'
+  },
+})
+unknownMutation.mutationFn({ id: 1 }) satisfies Promise<string>
+anyMutation.mutationFn({ id: 1 }) satisfies Promise<string>
+optionalMutation.mutationFn('input') satisfies Promise<string>
+optionalMutation.mutationFn(undefined) satisfies Promise<string>
+// @ts-expect-error void-containing mutation variables retain their constructor type
+optionalMutation.mutationFn(1)
+
+const broadUnknownPages = broadPayloadUtils.payload.unknown.infiniteOptions({
+  input: (page: number) => ({ page }),
+  initialPageParam: 0,
+  getNextPageParam: () => undefined,
+})
+const broadAnyPages = broadPayloadUtils.payload.any.infiniteOptions({
+  input: (page: number) => ({ page }),
+  initialPageParam: 0,
+  getNextPageParam: () => undefined,
+})
+const broadOptionalPages = broadPayloadUtils.payload.optional.infiniteOptions({
+  input: (page: number) => String(page),
+  initialPageParam: 0,
+  getNextPageParam: () => undefined,
+})
+queryClient.infiniteQuery(broadUnknownPages) satisfies Promise<InfiniteData<string, number>>
+queryClient.infiniteQuery(broadAnyPages) satisfies Promise<InfiniteData<string, number>>
+queryClient.infiniteQuery(broadOptionalPages) satisfies Promise<InfiniteData<string, number>>
+broadPayloadUtils.payload.unknown.infiniteKey({ page: 0 }) satisfies readonly [
+  'payload',
+  'rpc',
+  'payload',
+  'unknown',
+  'infinite',
+  JsonValue,
+]
+broadPayloadUtils.payload.any.infiniteKey({ page: 0 }) satisfies readonly [
+  'payload',
+  'rpc',
+  'payload',
+  'any',
+  'infinite',
+  JsonValue,
+]
+broadPayloadUtils.payload.optional.infiniteKey('0') satisfies readonly [
+  'payload',
+  'rpc',
+  'payload',
+  'optional',
+  'infinite',
+  JsonValue,
+]
+// @ts-expect-error Unknown infinite queries require a page-input mapper
+broadPayloadUtils.payload.unknown.infiniteOptions({
+  initialPageParam: 0,
+  getNextPageParam: () => undefined,
+})
+// @ts-expect-error Any infinite queries require a page-input mapper
+broadPayloadUtils.payload.any.infiniteOptions({
+  initialPageParam: 0,
+  getNextPageParam: () => undefined,
+})
+// @ts-expect-error void-containing infinite queries require a page-input mapper
+broadPayloadUtils.payload.optional.infiniteOptions({
+  initialPageParam: 0,
+  getNextPageParam: () => undefined,
+})
+
+const unknownStreamedKey = broadPayloadUtils.payload.unknownWatch.streamedKey({ id: 1 })
+const anyStreamedKey = broadPayloadUtils.payload.anyWatch.streamedKey({ id: 1 })
+const optionalStreamedKey = broadPayloadUtils.payload.optionalWatch.streamedKey('input')
+const unknownLiveKey = broadPayloadUtils.payload.unknownWatch.liveKey({ id: 1 })
+const anyLiveKey = broadPayloadUtils.payload.anyWatch.liveKey({ id: 1 })
+const broadOptionalLiveKey = broadPayloadUtils.payload.optionalWatch.liveKey('input')
+unknownStreamedKey satisfies readonly [
+  'payload',
+  'rpc',
+  'payload',
+  'unknownWatch',
+  'streamed',
+  ...JsonValue[],
+]
+anyStreamedKey satisfies readonly [
+  'payload',
+  'rpc',
+  'payload',
+  'anyWatch',
+  'streamed',
+  ...JsonValue[],
+]
+optionalStreamedKey satisfies readonly [
+  'payload',
+  'rpc',
+  'payload',
+  'optionalWatch',
+  'streamed',
+  ...JsonValue[],
+]
+unknownLiveKey satisfies readonly ['payload', 'rpc', 'payload', 'unknownWatch', 'live', JsonValue]
+anyLiveKey satisfies readonly ['payload', 'rpc', 'payload', 'anyWatch', 'live', JsonValue]
+broadOptionalLiveKey satisfies readonly [
+  'payload',
+  'rpc',
+  'payload',
+  'optionalWatch',
+  'live',
+  JsonValue,
+]
+queryClient.getQueryData(unknownStreamedKey) satisfies readonly string[] | undefined
+queryClient.getQueryData(anyStreamedKey) satisfies readonly string[] | undefined
+queryClient.getQueryData(optionalStreamedKey) satisfies readonly string[] | undefined
+const unknownBoundedStream = broadPayloadUtils.payload.unknownWatch.streamedKey(
+  { id: 1 },
+  { maxChunks: 2, refetchMode: 'append' },
+)
+queryClient.getQueryData(unknownBoundedStream) satisfies readonly string[] | undefined
+broadPayloadUtils.payload.anyWatch.streamedKey({ id: 1 }, { maxChunks: 2 })
+broadPayloadUtils.payload.optionalWatch.streamedKey(undefined, { refetchMode: 'replace' })
+// @ts-expect-error Unknown accumulated keys require constructor input
+broadPayloadUtils.payload.unknownWatch.streamedKey()
+// @ts-expect-error Any accumulated keys require constructor input
+broadPayloadUtils.payload.anyWatch.streamedKey()
+queryClient.getQueryData(unknownLiveKey) satisfies string | undefined
+queryClient.getQueryData(anyLiveKey) satisfies string | undefined
+queryClient.getQueryData(broadOptionalLiveKey) satisfies string | undefined
+broadPayloadUtils.payload.unknownWatch.streamedOptions({ input: { id: 1 } })
+broadPayloadUtils.payload.anyWatch.streamedOptions({ input: { id: 1 } })
+broadPayloadUtils.payload.optionalWatch.streamedOptions({ input: undefined })
+broadPayloadUtils.payload.unknownWatch.liveOptions({ input: { id: 1 } })
+broadPayloadUtils.payload.anyWatch.liveOptions({ input: { id: 1 } })
+broadPayloadUtils.payload.optionalWatch.liveOptions({ input: undefined })
+// @ts-expect-error Unknown accumulated queries require an input field
+broadPayloadUtils.payload.unknownWatch.streamedOptions()
+// @ts-expect-error Any accumulated queries require an input field
+broadPayloadUtils.payload.anyWatch.streamedOptions()
+// @ts-expect-error void-containing accumulated queries require an input field
+broadPayloadUtils.payload.optionalWatch.streamedOptions()
+// @ts-expect-error Unknown live queries require an input field
+broadPayloadUtils.payload.unknownWatch.liveOptions()
+// @ts-expect-error Any live queries require an input field
+broadPayloadUtils.payload.anyWatch.liveOptions()
+// @ts-expect-error void-containing live queries require an input field
+broadPayloadUtils.payload.optionalWatch.liveOptions()
+
+const unknownSkipped = broadPayloadUtils.payload.unknown.queryOptions({ input: skipToken })
+const anySkipped = broadPayloadUtils.payload.any.queryOptions({ input: skipToken })
+const optionalSkipped = broadPayloadUtils.payload.optional.queryOptions({ input: skipToken })
+const unknownStreamSkipped = broadPayloadUtils.payload.unknownWatch.streamedOptions({
+  input: skipToken,
+})
+const anyStreamSkipped = broadPayloadUtils.payload.anyWatch.streamedOptions({ input: skipToken })
+const optionalStreamSkipped = broadPayloadUtils.payload.optionalWatch.streamedOptions({
+  input: skipToken,
+})
+const unknownLiveSkipped = broadPayloadUtils.payload.unknownWatch.liveOptions({ input: skipToken })
+const anyLiveSkipped = broadPayloadUtils.payload.anyWatch.liveOptions({ input: skipToken })
+const optionalLiveSkipped = broadPayloadUtils.payload.optionalWatch.liveOptions({
+  input: skipToken,
+})
+true satisfies Assert<Equal<typeof unknownSkipped.queryFn, SkipToken>>
+true satisfies Assert<Equal<typeof anySkipped.queryFn, SkipToken>>
+true satisfies Assert<Equal<typeof optionalSkipped.queryFn, SkipToken>>
+true satisfies Assert<Equal<typeof unknownStreamSkipped.queryFn, SkipToken>>
+true satisfies Assert<Equal<typeof anyStreamSkipped.queryFn, SkipToken>>
+true satisfies Assert<Equal<typeof optionalStreamSkipped.queryFn, SkipToken>>
+true satisfies Assert<Equal<typeof unknownLiveSkipped.queryFn, SkipToken>>
+true satisfies Assert<Equal<typeof anyLiveSkipped.queryFn, SkipToken>>
+true satisfies Assert<Equal<typeof optionalLiveSkipped.queryFn, SkipToken>>
+
+declare const broadUnknownInput: unknown
+declare const broadAnyInput: any
+const broadUnknownOptions = broadPayloadUtils.payload.unknown.queryOptions({
+  input: broadUnknownInput,
+})
+const broadAnyOptions = broadPayloadUtils.payload.any.queryOptions({ input: broadAnyInput })
+true satisfies Assert<Equal<typeof broadUnknownOptions.queryFn, QueryFunction<string> | SkipToken>>
+true satisfies Assert<Equal<typeof broadAnyOptions.queryFn, QueryFunction<string> | SkipToken>>
+
+broadPayloadUtils.payload.void.queryKey() satisfies readonly [
+  'payload',
+  'rpc',
+  'payload',
+  'void',
+  'query',
+]
+broadPayloadUtils.payload.void.infiniteKey() satisfies readonly [
+  'payload',
+  'rpc',
+  'payload',
+  'void',
+  'infinite',
+]
+broadPayloadUtils.payload.void.queryOptions()
+broadPayloadUtils.payload.void.infiniteOptions({
+  initialPageParam: 0,
+  getNextPageParam: () => undefined,
+})
+broadPayloadUtils.payload.void.mutationOptions().mutationFn() satisfies Promise<string>
+broadPayloadUtils.payload.voidWatch.streamedKey() satisfies readonly [
+  'payload',
+  'rpc',
+  'payload',
+  'voidWatch',
+  'streamed',
+  ...JsonValue[],
+]
+broadPayloadUtils.payload.voidWatch.streamedKey({ maxChunks: 2, refetchMode: 'append' })
+broadPayloadUtils.payload.voidWatch.liveKey() satisfies readonly [
+  'payload',
+  'rpc',
+  'payload',
+  'voidWatch',
+  'live',
+]
+broadPayloadUtils.payload.voidWatch.streamedOptions()
+broadPayloadUtils.payload.voidWatch.liveOptions()
+// @ts-expect-error Void query declarations omit the input field
+broadPayloadUtils.payload.void.queryOptions({ input: undefined })
+// @ts-expect-error Void accumulated declarations omit the input field
+broadPayloadUtils.payload.voidWatch.streamedOptions({ input: undefined })
+// @ts-expect-error Void live declarations omit the input field
+broadPayloadUtils.payload.voidWatch.liveOptions({ input: undefined })

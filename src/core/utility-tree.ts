@@ -1,5 +1,5 @@
-import { skipToken } from '@tanstack/query-core'
-import type { QueryFunction, QueryKey } from '@tanstack/query-core'
+import { replaceEqualDeep, skipToken } from '@tanstack/query-core'
+import type { QueryFunction, QueryFunctionContext } from '@tanstack/query-core'
 import { Effect, Exit, Predicate } from 'effect'
 import type { Cause } from 'effect'
 
@@ -22,6 +22,8 @@ const reservedPathSegments = new Set([
   'key',
   'liveKey',
   'liveOptions',
+  'metadataKey',
+  'metadataOptions',
   'mutationKey',
   'mutationOptions',
   'prototype',
@@ -110,8 +112,6 @@ const canonicalize = (value: unknown, seen = new WeakSet()): JsonValue => {
 
 const freezeKey = (parts: readonly (JsonValue | string)[]) => Object.freeze([...parts])
 
-const hashCanonicalKey = (queryKey: QueryKey): string => JSON.stringify(queryKey)
-
 const normalizePrefix = (
   prefix: readonly [JsonValue, ...JsonValue[]],
   errors: TreeErrors,
@@ -174,7 +174,7 @@ const planPaths = (operations: readonly OperationDescription[], errors: TreeErro
   return plan
 }
 
-const execute = async <Operation extends UnaryQueryOperation>(
+const execute = async <Operation extends UnaryQueryOperation | 'metadata'>(
   description: {
     readonly invoke: UnaryOperation['invoke']
     readonly executionError: (operation: Operation, cause: Cause.Cause<unknown>) => Error
@@ -212,15 +212,19 @@ const prepareQuery = (
   input: unknown,
   operationKey: readonly JsonValue[],
   keyEncoder: RuntimeKeyEncoder | undefined,
+  identity: readonly JsonValue[] = [],
 ): PreparedQuery => {
   if (description.input._tag === 'Inputless') {
-    return { input: undefined, key: operationKey }
+    return {
+      input: undefined,
+      key: identity.length === 0 ? operationKey : freezeKey([...operationKey, ...identity]),
+    }
   }
   const prepared = description.input.prepare(input, keyEncoder)
   try {
     return {
       input: prepared.input,
-      key: freezeKey([...operationKey, canonicalize(prepared.keyValue)]),
+      key: freezeKey([...operationKey, canonicalize(prepared.keyValue), ...identity]),
     }
   } catch (error) {
     throw description.input.invalidKey(error)
@@ -232,6 +236,11 @@ const prepareQueryOptions = (description: OperationDescription, argument: unknow
     argument === skipToken
       ? { input: skipToken }
       : { ...(Predicate.isObject(argument) ? argument : undefined) }
+  for (const option of ['queryKeyHashFn', 'queryHash'] as const) {
+    if (Object.hasOwn(options, option)) {
+      throw description.unsupportedQueryHash(option)
+    }
+  }
   const { input } = options
   delete options['input']
   const requestOptions = description.takeOptions(options)
@@ -242,17 +251,11 @@ const finalizeQueryOptions = <QueryFn>(
   options: Record<string, unknown>,
   queryKey: readonly JsonValue[],
   queryFn: QueryFn,
-) => {
-  // Query Core prefers an explicit hash over the generated hash function.
-  delete options['queryHash']
-  return {
-    ...options,
-    // Owned fields follow user options so callers cannot replace keys or runners.
-    queryFn,
-    queryKey,
-    queryKeyHashFn: hashCanonicalKey,
-  }
-}
+) => ({
+  ...options,
+  queryFn,
+  queryKey,
+})
 
 const createQueryBuilders = (
   description: UnaryOperation | StreamingOperation,
@@ -261,17 +264,24 @@ const createQueryBuilders = (
   prepareExecution: (
     options: Record<string, unknown>,
     requestOptions: unknown,
+    input: unknown,
   ) => (input: unknown) => QueryFunction,
+  prepareIdentity?: (options: Record<string, unknown>) => readonly JsonValue[],
 ) => ({
-  key: (input?: unknown) => prepareQuery(description, input, operationKey, keyEncoder).key,
+  key: (input?: unknown, policy?: Record<string, unknown>) => {
+    const options = description.input._tag === 'Inputless' ? input : policy
+    const identity = prepareIdentity?.(Predicate.isObject(options) ? { ...options } : {}) ?? []
+    return prepareQuery(description, input, operationKey, keyEncoder, identity).key
+  },
   options: (argument?: unknown) => {
     const { input, options, requestOptions } = prepareQueryOptions(description, argument)
+    const identity = prepareIdentity?.(options) ?? []
     // Stream policy is consumed and validated even when execution will be skipped.
-    const makeQuery = prepareExecution(options, requestOptions)
+    const makeQuery = prepareExecution(options, requestOptions, input)
     if (description.input._tag !== 'Inputless' && input === skipToken) {
       return finalizeQueryOptions(options, operationKey, skipToken)
     }
-    const prepared = prepareQuery(description, input, operationKey, keyEncoder)
+    const prepared = prepareQuery(description, input, operationKey, keyEncoder, identity)
     return finalizeQueryOptions(options, prepared.key, makeQuery(prepared.input))
   },
 })
@@ -370,6 +380,59 @@ const createMutationLeaf = (
   })
 }
 
+type RuntimeStructuralSharing = (previous: unknown, data: unknown) => unknown
+
+const isStructuralSharing = (policy: unknown): policy is RuntimeStructuralSharing =>
+  Predicate.isFunction(policy)
+
+const shareQueryData = (previous: unknown, data: unknown, policy: unknown) => {
+  if (policy === false) {
+    return data
+  }
+  if (isStructuralSharing(policy)) {
+    return policy(previous, data)
+  }
+  return replaceEqualDeep(previous, data)
+}
+
+const prepareMetadataExecution = (
+  description: NonNullable<UnaryOperation['metadata']>,
+  options: Record<string, unknown>,
+  runPromiseExit: RunPromiseExit<unknown>,
+  requestOptions: unknown,
+  skipped: boolean,
+) => {
+  const hasLocalPolicy = Object.hasOwn(options, 'structuralSharing')
+  const localPolicy = options['structuralSharing']
+  const policies = new WeakMap<object, unknown>()
+  if (!skipped) {
+    options['structuralSharing'] = (previous: unknown, data: unknown) => {
+      const produced = Predicate.isObject(data) && policies.has(data)
+      const policy = produced ? policies.get(data) : localPolicy
+      const shared = shareQueryData(previous, data, policy)
+      return produced ? description.finalizeData(shared) : shared
+    }
+  }
+  return (input: unknown) =>
+    async ({ client, queryKey, signal }: QueryFunctionContext) => {
+      const policy = hasLocalPolicy
+        ? localPolicy
+        : client.defaultQueryOptions({ queryKey }).structuralSharing
+      const data = await execute(
+        description,
+        'metadata',
+        input,
+        runPromiseExit,
+        requestOptions,
+        signal,
+      )
+      if (Predicate.isObject(data)) {
+        policies.set(data, policy)
+      }
+      return data
+    }
+}
+
 const createUnaryLeaf = (
   description: UnaryOperation,
   keyParts: readonly (JsonValue | string)[],
@@ -387,6 +450,23 @@ const createUnaryLeaf = (
       async ({ signal }: { readonly signal: AbortSignal }) =>
         execute(description, 'query', input, runPromiseExit, requestOptions, signal),
   )
+  const { metadata } = description
+  const metadataQuery =
+    metadata === undefined
+      ? undefined
+      : createQueryBuilders(
+          description,
+          freezeKey([...operationKey, 'metadata']),
+          keyEncoder,
+          (options, requestOptions, input) =>
+            prepareMetadataExecution(
+              metadata,
+              options,
+              runPromiseExit,
+              requestOptions,
+              description.input._tag !== 'Inputless' && input === skipToken,
+            ),
+        )
 
   return Object.freeze({
     ...createInfiniteBuilders(description, operationKey, keyEncoder, runPromiseExit),
@@ -394,6 +474,9 @@ const createUnaryLeaf = (
     ...createMutationBuilders(description, operationKey, runPromiseExit),
     queryKey: query.key,
     queryOptions: query.options,
+    ...(metadataQuery === undefined
+      ? undefined
+      : { metadataKey: metadataQuery.key, metadataOptions: metadataQuery.options }),
   })
 }
 
@@ -412,6 +495,7 @@ const createStreamingLeaf = (
     keyEncoder,
     (options, requestOptions) =>
       description.prepareStream(options, 'live', runPromiseExit, requestOptions),
+    description.liveIdentity,
   )
   const streamed = createQueryBuilders(
     description,
@@ -419,6 +503,7 @@ const createStreamingLeaf = (
     keyEncoder,
     (options, requestOptions) =>
       description.prepareStream(options, 'streamed', runPromiseExit, requestOptions),
+    description.streamedIdentity,
   )
 
   return Object.freeze({

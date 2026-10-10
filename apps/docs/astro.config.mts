@@ -1,5 +1,3 @@
-// @ts-check
-
 import starlight from '@astrojs/starlight'
 import { defineConfig } from 'astro/config'
 import starlightLinksValidator from 'starlight-links-validator'
@@ -66,11 +64,24 @@ export default defineConfig({
           label: 'Guides',
           items: [
             { label: 'React Query', slug: 'guides/react-query' },
+            { label: 'Svelte and Angular', slug: 'guides/svelte-and-angular' },
+            { label: 'Vue and Solid Query', slug: 'guides/vue-and-solid' },
             { label: 'HTTP Queries and Mutations', slug: 'guides/http-queries-and-mutations' },
             { label: 'TanStack Start', slug: 'guides/tanstack-start' },
+            { label: 'WebSocket Ready Clients', slug: 'guides/websocket-clients' },
+            { label: 'Stream Snapshots', slug: 'guides/stream-snapshots' },
+            { label: 'Choose Stream History', slug: 'guides/choose-stream-history' },
             { label: 'Cache Management', slug: 'guides/cache-management' },
+            { label: 'Cache Filters', slug: 'guides/cache-filters' },
+            { label: 'Switch Cache Owners', slug: 'guides/switch-cache-owners' },
+            { label: 'Optimistic User Writes', slug: 'guides/optimistic-writes' },
+            { label: 'Refresh from Domain Events', slug: 'guides/refresh-from-events' },
             { label: 'Cancellation', slug: 'guides/cancellation' },
             { label: 'Handle Failures', slug: 'guides/handle-failures' },
+            { label: 'Retry Queries', slug: 'guides/retry-queries' },
+            { label: 'Query Defaults', slug: 'guides/query-defaults' },
+            { label: 'Hydrate Unary Data', slug: 'guides/hydrate-unary-data' },
+            { label: 'Hydrate Query Views', slug: 'guides/hydrate-query-views' },
             { label: 'Custom Key Encoders', slug: 'guides/custom-key-encoders' },
             { label: 'Conditional Queries', slug: 'guides/conditional-queries' },
           ],
@@ -94,6 +105,9 @@ export default defineConfig({
             { label: 'RPC Builders', slug: 'reference/generated-builders' },
             { label: 'Errors', slug: 'reference/errors' },
             { label: 'Public Exports', slug: 'reference/public-exports' },
+            { label: 'Browser and Worker Hosts', slug: 'reference/browser-and-worker-hosts' },
+            { label: 'External HTTP Clients', slug: 'reference/external-http-clients' },
+            { label: 'Performance and Bundling', slug: 'reference/performance' },
             { label: 'Compatibility and Limits', slug: 'reference/compatibility-and-limits' },
           ],
         },

@@ -4,6 +4,7 @@ packages:
   - examples/*
 
 catalog:
+  '@effect/platform-node': 4.0.0
   '@tailwindcss/vite': 4.3.3
   '@tanstack/query-core': 5.104.0
   '@tanstack/react-query': 5.104.0
@@ -19,13 +20,19 @@ catalog:
   react-dom: 19.3.0
   tailwindcss: 4.3.3
   tsx: 4.23.15
+  typescript: 7.0.2
   vite: npm:@voidzero-dev/vite-plus-core@1.0.0
   vite-plus: 1.0.0
   vitest: 5.0.1
 
+catalogs:
+  docs:
+    typescript: 6.0.3
+
 minimumReleaseAge: 10080
 minimumReleaseAgeStrict: true
 minimumReleaseAgeIgnoreMissingTime: false
+trustLockfile: false
 
 allowBuilds:
   'esbuild@0.28.2': true

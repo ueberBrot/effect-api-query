@@ -38,6 +38,9 @@
               "examples/server/src/web-handler.ts",
               "examples/server/tests/http-api.test.ts",
               "examples/server/tests/server.test.ts",
+              "examples/server/tests/rpc-transport-overhead.test.ts",
+              "examples/server/tests/rpc-websocket-consumer.test.ts",
+              "examples/server/tests/fixtures/websocket-server.ts",
               "examples/tanstack-start/src/lib/application.ts",
               "examples/tanstack-start/tests/server-render.test.tsx",
               "examples/vite-react/src/lib/application.ts",
@@ -47,7 +50,17 @@
               "tests/create-rpc-query-utils*.test.ts",
               "tests/http-*.test.ts",
               "tests/fixtures/effect-rpc.ts",
+              "examples/server/src/server-local-rpc.ts",
+              "tests/fixtures/rpc-transport-queries.ts",
               "tests/fixtures/http-client.ts",
+              "tests/fixtures/optimistic-users.ts",
+              "tests/fixtures/user-events.ts",
+              "tests/fixtures/socket-client.ts",
+              "tests/fixtures/websocket-checks.ts",
+              "tests/fixtures/docs-websocket-use.ts",
+              "tests/stream-snapshot.test.ts",
+              "tests/cache-recipes.test.ts",
+              "scripts/measure-construction.mts",
               "tests/types/**/*.ts"
             ],
             "options": {
@@ -72,5 +85,5 @@
     "tests/**/*.ts",
     "vite.config.ts"
   ],
-  "exclude": ["dist", "node_modules", "tests/packed-consumer"]
+  "exclude": ["dist", "node_modules"]
 }

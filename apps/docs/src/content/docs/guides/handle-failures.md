@@ -28,6 +28,8 @@ These error classes distinguish failure stages:
 
 If a custom runner rejects instead of returning an `Exit`, its rejection passes through unchanged.
 See the [error reference](/effect-api-query/reference/errors/) for stable codes and metadata.
+Use [retry queries](/effect-api-query/guides/retry-queries/) for typed `Cause`/`Result` decisions,
+bounded attempt counts, and synchronous preparation errors.
 
 ## Inspect HTTP failures
 
@@ -49,6 +51,3 @@ pass through unchanged when they produce no failed Exit.
 
 See the [HTTP factory reference](/effect-api-query/reference/http-factory/#cache-identity-and-failures)
 for key-error codes.
-
-The [packed RPC consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/packed-consumer/runtime.mts) and
-[packed HTTP consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/packed-consumer/http-runtime.mts) verify error guards and preserved Causes.

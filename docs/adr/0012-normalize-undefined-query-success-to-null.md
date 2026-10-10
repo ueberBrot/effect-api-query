@@ -9,10 +9,11 @@ runtime `undefined` for success.
 
 ## Decision
 
-Generated query functions map successful `undefined` to cacheable `null`. Their query-data type also
-replaces `undefined` with `null`. Mutations preserve `undefined`.
+Buffered and live queries map successful `undefined` to cacheable `null` in both values and types.
+Accumulated stream elements and mutation results preserve `undefined`, because neither needs this
+normalization to produce valid query data.
 
 ## Consequences
 
-Every unary RPC remains usable as a query without disguising an upstream failure. This is the
-adapter's only success-value normalization.
+Every unary RPC and live emission remains usable as query data without disguising a failure or an
+empty stream. This is the adapter's only success-value normalization.

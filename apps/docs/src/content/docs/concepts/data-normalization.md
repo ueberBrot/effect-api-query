@@ -22,6 +22,17 @@ with their schemas; the ready HttpApiClient encodes them separately for executio
 Every declared request container remains required, even when its fields are optional. For example,
 an endpoint with optional query filters still takes `input: { query: {} }` when no filter is selected.
 
+## Keep captured inputs unchanged
+
+Query options retain the normalized RPC payload or decoded HTTP request for later execution.
+Keep those values and their nested mutable values unchanged while the options can run. When input
+changes, create new input and options rather than modifying the captured values.
+
+Canonical keys copy and deeply freeze the encoded identity. They do not clone or freeze arbitrary
+execution inputs or decoded query data. RPC construction can retain nested caller values; HTTP
+preparation retains the decoded request. In reactive frameworks, rebuild options inside the
+framework's computed value or accessor.
+
 ## No-content and undefined query results
 
 TanStack Query rejects `undefined` as successful query data. When a buffered RPC or HTTP query succeeds
@@ -34,8 +45,11 @@ An HTTP endpoint using `HttpApiSchema.NoContent` decodes its successful 204 resp
 Mutations keep the original success type. A mutation that succeeds with `undefined` still
 resolves to `undefined`.
 
-Accumulated streamed queries and live queries retain emitted values as supplied; they do not
-apply buffered query normalization.
+Live queries also convert each emitted `undefined` to `null`. A stream emitting a value followed
+by `undefined` ends with `null` as its latest query data. Live keys, selectors, and `initialData`
+use the same normalized type. The first emission makes an open live query successful while it
+remains fetching; completion without any emission raises `EffectRpcQueryEmptyStreamError` for RPC
+or `EffectHttpApiQueryEmptyStreamError` for HTTP SSE.
 
-The [packed RPC consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/packed-consumer/runtime.mts) and
-[packed HTTP consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/packed-consumer/http-runtime.mts) exercise these normalization rules.
+Accumulated streamed queries retain emitted values as supplied, including `undefined` elements
+inside their cached arrays.

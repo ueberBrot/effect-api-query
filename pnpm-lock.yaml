@@ -164,6 +164,9 @@ settings:
 
 catalogs:
   default:
+    '@effect/platform-node':
+      specifier: 4.0.0
+      version: 4.0.0
     '@tailwindcss/vite':
       specifier: 4.3.3
       version: 4.3.3
@@ -209,6 +212,9 @@ catalogs:
     tsx:
       specifier: 4.23.15
       version: 4.23.15
+    typescript:
+      specifier: 7.0.2
+      version: 7.0.2
     vite:
       specifier: npm:@voidzero-dev/vite-plus-core@1.0.0
       version: 1.0.0
@@ -218,6 +224,10 @@ catalogs:
     vitest:
       specifier: 5.0.1
       version: 5.0.1
+  docs:
+    typescript:
+      specifier: 6.0.3
+      version: 6.0.3
 
 overrides:
   vite@*: npm:@voidzero-dev/vite-plus-core@1.0.0
@@ -245,6 +255,9 @@ importers:
       '@effect-api-query/server':
         specifier: workspace:*
         version: link:examples/server
+      '@effect/platform-node':
+        specifier: 'catalog:'
+        version: 4.0.0(effect@4.0.0)(redis@6.3.0)
       '@effect/tsgo':
         specifier: 0.47.2
         version: 0.47.2
@@ -258,8 +271,8 @@ importers:
         specifier: 0.2.0
         version: 0.2.0
       '@tanstack/intent':
-        specifier: 0.5.0
-        version: 0.5.0
+        specifier: 0.5.3
+        version: 0.5.3
       '@tanstack/query-core':
         specifier: 'catalog:'
         version: 5.104.0
@@ -306,7 +319,7 @@ importers:
         specifier: 'catalog:'
         version: 4.23.15
       typescript:
-        specifier: 7.0.2
+        specifier: 'catalog:'
         version: 7.0.2
       typescript-5.9:
         specifier: npm:typescript@5.9.3
@@ -349,7 +362,7 @@ importers:
         specifier: 0.9.10
         version: 0.9.10(@emnapi/runtime@1.11.3)(prettier@3.9.9)(typescript@6.0.3)
       typescript:
-        specifier: 6.0.3
+        specifier: catalog:docs
         version: 6.0.3
 
   examples/contracts:
@@ -364,7 +377,7 @@ importers:
         specifier: workspace:*
         version: link:../contracts
       '@effect/platform-node':
-        specifier: 4.0.0
+        specifier: 'catalog:'
         version: 4.0.0(effect@4.0.0)(redis@6.3.0)
       effect:
         specifier: 'catalog:'
@@ -2136,8 +2149,8 @@ packages:
     resolution: {integrity: sha512-utTS5L2OkeYUzXGohL1Z8sefu1GLNOJcxe8Hd6iIdc/Xo1K1nDB2JEp4iSFhvYh33xKC9V91TxrS8qfrpoKobQ==}
     engines: {node: '>=20.19'}
 
-  '@tanstack/intent@0.5.0':
-    resolution: {integrity: sha512-27zOOpQLfBTM5cQjqkASf6JH3jggMwr29UhK8dlAI1WP9rjzywJ87/I6meiH/khyPIFNRluh9Q8wlIVrpN4Jpg==}
+  '@tanstack/intent@0.5.3':
+    resolution: {integrity: sha512-2zeLGRJ+796daqv3DrwXsrXn7TZb4yOIogJgrqeF96YEIwOsJoDIW/eQBwZVAcR1OQ3znA3dGDizb5GBmxk4Zg==}
     engines: {node: '>=20.12.0'}
     hasBin: true
 
@@ -6570,7 +6583,7 @@ snapshots:
 
   '@tanstack/history@1.162.4': {}
 
-  '@tanstack/intent@0.5.0': {}
+  '@tanstack/intent@0.5.3': {}
 
   '@tanstack/query-core@5.104.0': {}
 

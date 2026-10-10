@@ -10,6 +10,14 @@ await queryClient.invalidateQueries({ queryKey: rpcQuery.users.key() })
 await queryClient.invalidateQueries({ queryKey: rpcQuery.users.get.key() })
 ```
 
+For response seeding, targeted rollback, and overlapping mutations, follow
+[Optimistic User Writes](/effect-api-query/guides/optimistic-writes/).
+Map delivered domain events and scoped Effect Reactivity keys with
+[Refresh Reads from Domain Events](/effect-api-query/guides/refresh-from-events/).
+
+For operation prefixes and partial encoded-input matching, use the complete
+[Cache Filters recipe](/effect-api-query/guides/cache-filters/).
+
 Use `queryKey(input)` for one payload-specific query:
 
 ```ts
@@ -35,6 +43,9 @@ Query keys have this flat shape:
 Mutation keys end in `'mutation'` and never include variables. See
 [Semantic Keys](/effect-api-query/concepts/semantic-keys/) for normalization and hashing rules.
 
+For private caches across user, tenant, session, or permission changes, follow
+[Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/).
+
 ## Manage HTTP caches
 
 HTTP utilities also expose branch prefixes and keys for individual queries. Supply the endpoint's
@@ -49,6 +60,3 @@ await queryClient.invalidateQueries({ queryKey: http.users.key() })
 HTTP keys include `'http'` and the HttpApi identifier after your `keyPrefix`. RPC keys include
 `'rpc'`, so the two factories keep separate caches even with the same caller prefix. Use the original
 caller prefix when you deliberately want to invalidate both.
-
-The [packed RPC consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/packed-consumer/runtime.mts) and
-[packed HTTP consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/packed-consumer/http-runtime.mts) exercise generated keys through QueryClient.

@@ -7,11 +7,24 @@ import { createHttpApiQueryUtils, createRpcQueryUtils } from 'effect-api-query'
 import type { RunPromiseExit } from 'effect-api-query'
 import { FetchHttpClient, HttpClient, HttpClientRequest } from 'effect/http'
 import { HttpApiClient } from 'effect/http-api'
+import type { RpcClientError } from 'effect/rpc'
 
-const makeExampleRpcQueryUtils = (client: ExampleRpcClient, runPromiseExit: RunPromiseExit) =>
-  createRpcQueryUtils(exampleRpcGroup, {
+import { makeOwnerCache, ownerKeyPrefix } from './owner-cache.ts'
+import type { ApplicationOwnerIdentity, DirectoryStorage } from './owner-cache.ts'
+import { makeUserWrites } from './user-writes.ts'
+
+const makeExampleRpcQueryUtils = (
+  client: ExampleRpcClient,
+  runPromiseExit: RunPromiseExit,
+  keyPrefix: ReturnType<typeof ownerKeyPrefix>,
+) =>
+  createRpcQueryUtils<
+    typeof exampleRpcGroup,
+    ReturnType<typeof ownerKeyPrefix>,
+    RpcClientError.RpcClientError
+  >(exampleRpcGroup, {
     client,
-    keyPrefix: ['vite-react'] as const,
+    keyPrefix,
     runPromiseExit,
   })
 
@@ -20,12 +33,21 @@ export type ExampleRpcQueryUtils = ReturnType<typeof makeExampleRpcQueryUtils>
 const makeExampleHttpQueryUtils = (
   client: HttpApiClient.ForApi<typeof exampleHttpApi>,
   runPromiseExit: RunPromiseExit,
-) => createHttpApiQueryUtils(exampleHttpApi, { client, keyPrefix: ['vite-react'], runPromiseExit })
+  keyPrefix: ReturnType<typeof ownerKeyPrefix>,
+) => createHttpApiQueryUtils(exampleHttpApi, { client, keyPrefix, runPromiseExit })
+
+export type ExampleHttpQueryUtils = ReturnType<typeof makeExampleHttpQueryUtils>
 
 export interface ViteReactApplication {
-  readonly httpQuery: ReturnType<typeof makeExampleHttpQueryUtils>
+  readonly httpQuery: ExampleHttpQueryUtils
+  readonly userWrites: ReturnType<typeof makeUserWrites>
   readonly invalidateUsers: () => Promise<void>
-  readonly dispose: () => Promise<void>
+  readonly dispose: (options?: { readonly discardPersistence?: boolean }) => Promise<void>
+  readonly identity: ApplicationOwnerIdentity
+  readonly isActive: () => boolean
+  readonly persistDirectory: () => void
+  readonly runMutation: <T>(execute: () => Promise<T>) => Promise<T>
+  readonly trackMutationOptions: ReturnType<typeof makeOwnerCache>['trackMutationOptions']
   readonly queryClient: QueryClient
   readonly rpcQuery: ExampleRpcQueryUtils
 }
@@ -33,27 +55,52 @@ export interface ViteReactApplication {
 export interface StartViteReactApplicationOptions {
   readonly rpcUrl: string
   readonly httpBaseUrl?: string
+  readonly identity?: ApplicationOwnerIdentity
+  readonly directoryStorage?: DirectoryStorage
 }
 
 /** Creates clients, query utilities, and cleanup together so the example can be copied as a whole. */
 export const startViteReactApplication = async ({
   rpcUrl,
   httpBaseUrl = new URL(rpcUrl, globalThis.location?.href).origin,
+  identity = {
+    tenantId: 'example-team',
+    userId: 'example-user',
+    sessionGeneration: 1,
+    permissionGeneration: 1,
+  },
+  directoryStorage,
 }: StartViteReactApplicationOptions): Promise<ViteReactApplication> => {
+  const keyPrefix = ownerKeyPrefix(identity)
+  const capturedIdentity = Object.freeze({
+    tenantId: keyPrefix[1],
+    userId: keyPrefix[2],
+    sessionGeneration: keyPrefix[3],
+    permissionGeneration: keyPrefix[4],
+  })
   const rpcClient = await startExampleRpcClient(rpcUrl)
   const httpRuntime = ManagedRuntime.make(FetchHttpClient.layer)
   const queryClient = new QueryClient({
     defaultOptions: {
-      mutations: { retry: false },
+      mutations: { retry: false, networkMode: 'always' },
       queries: { retry: false },
     },
   })
+  let owner: ReturnType<typeof makeOwnerCache> | undefined
   let disposal: Promise<void> | undefined
-  const dispose = async () => {
-    // Stop queries before releasing the ready clients they execute through.
-    disposal ??= (async () => {
+  const dispose = async (options?: { readonly discardPersistence?: boolean }) => {
+    const retirement = owner === undefined ? queryClient.cancelQueries() : owner.retire(options)
+    if (disposal !== undefined) {
       try {
-        await queryClient.cancelQueries()
+        await retirement
+      } finally {
+        await disposal
+      }
+      return
+    }
+    disposal = (async () => {
+      try {
+        await retirement
       } finally {
         queryClient.clear()
         try {
@@ -75,11 +122,37 @@ export const startViteReactApplication = async ({
         ),
       }),
     )
-    const httpQuery = makeExampleHttpQueryUtils(httpClient, httpRuntime.runPromiseExit)
-    const rpcQuery = makeExampleRpcQueryUtils(rpcClient.client, rpcClient.runPromiseExit)
+    const httpQuery = makeExampleHttpQueryUtils(httpClient, httpRuntime.runPromiseExit, keyPrefix)
+    const rpcQuery = makeExampleRpcQueryUtils(rpcClient.client, rpcClient.runPromiseExit, keyPrefix)
+    owner = makeOwnerCache({
+      identity: capturedIdentity,
+      queryClient,
+      directoryKeys: {
+        rpc: rpcQuery.users.list.queryKey(),
+        http: httpQuery.users.list.queryKey(),
+      },
+      storage: directoryStorage,
+    })
+    owner.restoreDirectory()
+    const capturedOwner = owner
     return {
       httpQuery,
+      identity: capturedOwner.identity,
+      isActive: capturedOwner.isActive,
+      persistDirectory: capturedOwner.persistDirectory,
+      runMutation: capturedOwner.runMutation,
+      trackMutationOptions: capturedOwner.trackMutationOptions,
+      userWrites: makeUserWrites({
+        queryClient,
+        rpcQuery,
+        httpQuery,
+        isActive: capturedOwner.isActive,
+        runMutation: capturedOwner.runMutation,
+      }),
       invalidateUsers: async () => {
+        if (!capturedOwner.isActive()) {
+          return
+        }
         await Promise.all([
           queryClient.invalidateQueries({ queryKey: rpcQuery.users.key() }),
           queryClient.invalidateQueries({ queryKey: httpQuery.users.key() }),

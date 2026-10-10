@@ -12,10 +12,13 @@ For a step-by-step example, see [HTTP Queries and Mutations](/effect-api-query/g
 Ordinary groups appear as `utils[groupIdentifier][endpointIdentifier]`. Top-level groups place
 their endpoints at `utils[endpointIdentifier]`. Identifiers containing dots remain literal
 properties. Every retained branch and endpoint has `key()`; buffered endpoints without multipart have
-`queryKey`, `queryOptions`, `mutationKey`, `mutationOptions`, `infiniteKey`, and `infiniteOptions`.
+`queryKey`, `queryOptions`, `metadataKey`, `metadataOptions`, `mutationKey`, `mutationOptions`,
+`infiniteKey`, and `infiniteOptions`.
 An endpoint with any buffered multipart payload alternative exposes only `key`, `mutationKey`, and
 `mutationOptions`, even when it also accepts plain payload alternatives. This classification applies
 regardless of HTTP method; applications choose the builder for endpoints with query support.
+An endpoint with exactly one SSE success and no multipart payload exposes `key`, `streamedKey`,
+`streamedOptions`, `liveKey`, and `liveOptions`.
 
 ## Factory options
 
@@ -47,7 +50,11 @@ query filter still needs `input: { query: {} }`. A `Schema.FiniteFromString` fie
 which the ready client encodes as a string. Raw response controls are excluded from query input,
 mutation variables, and encoder input.
 
-The adapter forces decoded-only responses. Queries cache a successful `undefined` as `null`;
+Query options retain the decoded request for execution. Keep captured values unchanged; see
+[Data Normalization](/effect-api-query/concepts/data-normalization/#keep-captured-inputs-unchanged)
+for the distinction between immutable keys and caller-owned input.
+
+Ordinary queries and mutations use decoded-only responses. Queries cache a successful `undefined` as `null`;
 mutations retain `undefined`. Buffered text stays a string, binary data stays a `Uint8Array`, and
 declared response-header wrappers retain their decoded body and headers. Applications own the
 serialization strategy for binary and other domain values; the package supplies no automatic SSR
@@ -58,12 +65,15 @@ client errors, and additional ready-client errors in the wrapped Cause's type.
 
 Required services include those needed by request encoders, success and error decoders, and the
 ready client for exposed endpoints. Compatible custom clients retain the errors and remaining
-service requirements of their decoded-only call signatures; raw-response overloads contribute neither.
+service requirements of their decoded-only and decoded-and-response call signatures;
+response-only overloads contribute neither.
 See [client lifecycle](/effect-api-query/concepts/client-lifecycle/#http-clients-and-execution-services)
 and [cancellation](/effect-api-query/guides/cancellation/#cancel-an-http-query) for runtime ownership.
 
-Any streaming success alternative, including a header-wrapped stream, omits the complete endpoint.
-Any streaming multipart request alternative does the same. Buffered multipart alternatives retain
+A single SSE success, including `WithHeaders(StreamSse(...), ...)`, supports accumulated and live queries.
+Raw byte streams and mixed buffered/SSE success alternatives omit the complete endpoint.
+Any streaming multipart request alternative does the same. SSE endpoints with buffered multipart
+payload alternatives are also omitted. Buffered multipart alternatives retain
 the endpoint's mutation builders. Groups containing only omitted endpoints disappear.
 Factory construction rejects unsafe names, path collisions, and contradictory multipart metadata
 before returning a tree. Preserve literal declaration types so the inferred tree omits the same
@@ -77,8 +87,10 @@ observer data; data-tagged keys retain the underlying cache data and error types
 `initialData`, whether defined or possibly undefined, preserves the corresponding TanStack hook
 overload.
 
-Applicable TanStack options pass through. The package owns the key, function, and query hash
-fields, including the precomputed `queryHash`. It removes `input` before returning options.
+Applicable TanStack options pass through. The package owns the key and function and removes
+`input` before returning options. QueryClient global and prefix defaults own hashing. Builders
+reject per-call `queryKeyHashFn` and `queryHash` with `EffectHttpApiQueryConfigError` code
+`UnsupportedQueryHash`.
 
 Input-bearing `queryOptions` accepts a complete request, `queryOptions(skipToken)`, or
 `queryOptions({ input: skipToken, ...options })`. Import `skipToken` from `effect-api-query` or
@@ -89,6 +101,91 @@ Supplied initial data remains available, but native skipped hook data stays poss
 Inputless builders, key builders, and mutations reject `skipToken`. A skipped function cannot run
 through manual refetch; supply valid input or use `enabled: false` with a complete request when
 manual execution is required. Native suspense and prefetch-only hooks reject skipped options.
+
+## Buffered metadata
+
+Query-enabled buffered endpoints also provide `metadataKey(request)` and `metadataOptions({ input,
+...options })`; inputless endpoints omit the request. The ready client runs in decoded-and-response
+mode, and the cache contains:
+
+```ts
+type Metadata<DecodedSuccess> = {
+  readonly data: QueryData<DecodedSuccess>
+  readonly status: number
+  readonly headers: Readonly<Record<string, string>>
+}
+```
+
+The outer envelope and copied plain header record are frozen. `data` preserves the declared decoded
+value and its ownership, including decoded `WithHeaders` wrappers. Only top-level successful
+`undefined` becomes `null`. Raw headers retain their string values without Effect's inspection
+redaction; applications decide which headers may be persisted or dehydrated.
+
+Fetched snapshots remain frozen after structural sharing. Global and prefix sharing policies apply
+to fetched data; a policy passed to `metadataOptions` overrides them. Mutable envelopes or header
+records selected by sharing are copied
+before freezing, retaining the selected decoded data reference. The adapter does not freeze
+decoded data or caller-supplied `initialData`, hydrated values, or manual cache writes.
+
+Selected observer results and, after execution, manual cache writes use the sharing policy explicitly
+passed to `metadataOptions`, or standard deep sharing when it is absent. Inherited global and prefix
+sharing policies apply only to fetched metadata snapshots.
+
+A fresh-cache hit from imperative `queryClient.query(newOptions)` retains the Query's existing
+options. Install a changed sharing policy through an observer or an actual fetch before relying
+on it for later manual writes.
+
+Metadata keys use a `metadata` discriminator and the ordinary request identity. Endpoint prefixes
+match every view. Native `select`, `initialData`, skip-token inference, QueryClient hashing defaults,
+and cancellation apply to metadata options. Execution failures identify operation `metadata` and
+preserve that client mode's full error and service channels. Metadata adds no mutation or infinite
+builders and is absent on multipart and streaming endpoints.
+
+The cache retains the decoded value and metadata snapshot, without a response object or open body.
+See [Update with an ETag](/effect-api-query/guides/http-queries-and-mutations/#update-with-an-etag)
+for conditional writes.
+
+## Accumulated SSE options
+
+`streamedOptions` accepts native query options, decoded `input` when declared, and:
+
+| Option                    | Contract                                                                                                |
+| ------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `maxChunks`               | Positive safe integer limiting retained events; omitted means unlimited.                                |
+| `refetchMode`             | `reset` (default), `append`, or `replace`.                                                              |
+| `sseOptions.maxEventSize` | Positive safe integer limiting pending parser text; defaults to 10 MiB of JavaScript string code units. |
+
+Decoded data is an ordered readonly array. Accumulated elements keep `undefined`; decoded header
+wrappers surround each emitted body. Empty completion succeeds. Acquisition and consumption errors
+use `EffectHttpApiQueryError` with operation `streamed`, preserving declared event failures,
+`Sse.Retry`, `Sse.SseError`, HTTP and Schema errors, and additional client channels.
+The caller's runner supplies acquisition and consumption services and receives Query's abort signal.
+Cancellation closes the iterator and follows native Query cache reversion.
+
+`streamedKey(input, policy)` accepts the same decoder, retention, and refetch policy; inputless
+endpoints use `streamedKey(policy)`. Equivalent defaults have equal keys. Different effective
+policies occupy separate entries. Endpoint `key()` selects them all. Decoder controls are excluded
+from decoded request input and custom encoders. Declared resume headers remain request identity.
+
+See [Retain SSE events](/effect-api-query/guides/http-queries-and-mutations/#retain-sse-events).
+
+## Live SSE options
+
+`liveOptions` accepts native query options, declared decoded `input`, and `sseOptions`.
+`liveKey(input, { sseOptions })`, or `liveKey({ sseOptions })` for inputless endpoints, includes
+normalized decoder policy in its separate `live` identity. Its keys carry the latest decoded value
+and the execution error union, including `EffectHttpApiQueryEmptyStreamError`. Live builders
+preserve selection, initial-data, and skipped-input inference.
+
+The first emission makes the query successful. Later emissions replace the cached value, and
+completion preserves the latest value. Only a top-level `undefined` becomes `null`; declared
+header wrappers retain their decoded body and headers. An empty live completion fails with
+declaration metadata. Live queries accept no `maxChunks` or accumulated `refetchMode`.
+
+The acquisition and consumption error/service channels, decoder limit validation, iterator cleanup,
+and caller-owned reconnection contract match accumulated SSE queries. Input-bearing builders
+validate decoder policy even when skipped. Endpoint prefixes match both representations and every
+concrete decoder policy. See [Keep the latest SSE value](/effect-api-query/guides/http-queries-and-mutations/#keep-the-latest-sse-value).
 
 ## Pagination
 

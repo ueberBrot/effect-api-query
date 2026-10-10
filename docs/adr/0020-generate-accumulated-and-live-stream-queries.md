@@ -1,16 +1,21 @@
 # Generate accumulated and live stream queries
 
-Status: Accepted. Partially supersedes ADR 0002 and ADR 0003.
+Status: Accepted. Partially supersedes ADR 0002 and ADR 0003. Extended to HTTP SSE views by
+[ADR 0024](0024-project-http-streams-and-buffered-metadata.md).
 
-Streaming RPC leaves expose `streamedKey`/`streamedOptions` for ordered history with `reset`,
-`append`, and `replace` refetch modes, and `liveKey`/`liveOptions` for the latest value. A live stream
-that completes without emitting a value raises `EffectRpcQueryEmptyStreamError`. Separate `streamed`
-and `live` key segments prevent collisions with other query shapes and mutations; generated prefixes
-support invalidation.
+Streams support two cached representations: ordered accumulated history and the latest live value.
+Keep these representations separate, and include retention and refetch policies in accumulated
+cache identity, because incompatible histories cannot safely share an entry. Broad key prefixes
+still support invalidation across views and policies.
 
-The ready RPC client remains the execution seam, including direct execution outside TanStack.
-Client construction and Effect middleware remain interception seams. Stream functions forward
-TanStack's abort signal, close the AsyncIterator on cancellation, and preserve the complete Cause.
-The application owns client/runtime resources, transport, middleware, Scope, QueryClient, and
-framework lifecycle. SSR dehydrates completed data normally; open streams require cancellation
-after the first successful snapshot. Mutations have no cancellation signal.
+The adapter consumes caller-owned ready clients and follows TanStack cancellation while preserving
+complete Effect failures. Applications own transport, reconnection, and resource lifetime; server
+rendering must settle and stop open work before disposing those resources. Live values follow
+[ADR 0012](0012-normalize-undefined-query-success-to-null.md), while accumulated elements retain
+their decoded representation.
+
+Expose a framework-neutral snapshot helper because native query cancellation can settle before
+local iterator finalizers finish. A fresh capture exclusively owns an idle, unobserved exact query;
+explicit cached capture can reuse successful data without acquiring work. Applications retain
+client and runtime ownership and dispose them only after local cleanup settles. Browser
+reconnection uses independently owned resources.

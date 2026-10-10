@@ -3,14 +3,20 @@
 
   // Astro copies this browser entry from public/ and loads it through the
   // Starlight head configuration, which static import analysis cannot follow.
-  "entry": ["apps/docs/public/package-version.js", "playwright.docs.config.ts"],
+  "entry": [
+    "scripts/measure-construction.mts",
+    "scripts/verify-docs-examples.mts",
+    "apps/docs/public/package-version.js",
+    "playwright.docs.config.ts",
+    "tests/types/*.ts"
+  ],
 
   "ignorePatterns": ["examples/tanstack-start/src/routeTree.gen.ts"],
 
   // Framework tooling consumes these exports through convention-generated entries.
   "ignoreExports": [
     {
-      "file": "apps/docs/astro.config.mjs",
+      "file": "apps/docs/astro.config.mts",
       "exports": ["default"]
     },
     {
@@ -58,9 +64,11 @@
   // Keep Effect peer and test dependencies available for the library and fixtures.
   "ignoreDependencies": [
     "@arethetypeswrong/cli",
+    "@effect/platform-node",
     "@effect/tsgo",
     "@effect/vitest",
     "@shadcn/lint",
+    "@tanstack/intent",
     "effect",
     "publint",
     "typescript-5.9",

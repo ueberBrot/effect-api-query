@@ -1,0 +1,1144 @@
+{
+  "schemaVersion": 1,
+  "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
+  "items": {
+    "skill:skills/effect-api-query/SKILL.md": {
+      "fingerprint": "9ef1b45598771f31217b5424f0b5fa3db37bdec994fff19f4fe7fd5011f61302",
+      "snapshot": {
+        "GLOSSARY.md": "67de06543ad2fd9fd2917419e19d1f071e7b6eee53d48fca05e9dddfc739c683",
+        "README.md": "35d680dfe39a73da641b0d3fda4480883a486b6f43942138d2db9981971b82bf",
+        "apps/docs/src/content/docs/concepts/client-lifecycle.md": "4a7d412f6e3c7dfbf0442b51ee9054c2b854026bcf968961cee65071f7cbb424",
+        "apps/docs/src/content/docs/concepts/data-normalization.md": "f1505ec3eb35a33fac289706c2cc318a2ffb80555e3302ca102e67e21c9012da",
+        "apps/docs/src/content/docs/concepts/http-utility-tree.md": "ca4acbe1af20538c0d08a3e03969efe1966e7822ce6dfce8d0c1efb6913795cf",
+        "apps/docs/src/content/docs/concepts/queries-and-mutations.md": "a7f95a5c002e87261fa988fbbfe3c936e3601aea8c5b9c1878b8b60bc17da696",
+        "apps/docs/src/content/docs/concepts/rpc-utility-tree.md": "fd5fcc232279e9577b8b2faf321a85e9a340e6090ea5887bbab208cca2d24a4e",
+        "apps/docs/src/content/docs/concepts/semantic-keys.md": "eaf6d79c40af97da698bce206705633cdc3bf202921b745a82700214c2c4d48c",
+        "apps/docs/src/content/docs/examples.md": "7f22a2309b148934546fec37991fb81fe733ac7b8a3b843e8001a1d2ec1d8606",
+        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "b526e3f718863655caa6f98018aefdb82103464f9bd4a5730f7c75fa4d502f3e",
+        "apps/docs/src/content/docs/getting-started/feature-support.md": "01c46393cfdda15574c57f97081ccfd0b690457a7a247abc61444af408002f64",
+        "apps/docs/src/content/docs/getting-started/http-quick-start.md": "eaf62e213ba22d1926dd75d7bad7bb9e6e69419309f0fcb1e6a7c0efe4d85c8b",
+        "apps/docs/src/content/docs/getting-started/installation.md": "a334554486477e2c6ecd63c325b90fa9738c57877a3a23ec22a64c406c3f21ab",
+        "apps/docs/src/content/docs/getting-started/quick-start.md": "52689fd2313064eb8660ec4152cba36fb46dbaba7f1039d43ed02b12a5f9ae2e",
+        "apps/docs/src/content/docs/guides/cache-filters.md": "46d06ee7e24f2ec143d0bb174442a7f5bc5299657d4bcdfb28a36782a69b3de6",
+        "apps/docs/src/content/docs/guides/cache-management.md": "18f9ef5b5c51365a629601d19d2d2307c243c3fa4e2dd4f53bed3974eae802e5",
+        "apps/docs/src/content/docs/guides/cancellation.md": "b0a79fb1578777115619d65f075f407595de0634ef0c52c4fc77256f0dca833c",
+        "apps/docs/src/content/docs/guides/choose-stream-history.md": "6996df3a8b18c4fadbcc76a3635a8a5408f155b4068509d4801b38afa7f22f16",
+        "apps/docs/src/content/docs/guides/conditional-queries.md": "37cd6436daf90c0c060dcfcf4b9d7f0b165ee95858bb30cff9f38b45e132e029",
+        "apps/docs/src/content/docs/guides/custom-key-encoders.md": "ffa8b915f0831e2081a5bd50c115977e444ee6319c624123e296e3455d754230",
+        "apps/docs/src/content/docs/guides/handle-failures.md": "6b4e7bed61daba9c29d988c9795e570efc5a4f2783503d696a419cfcf9737a91",
+        "apps/docs/src/content/docs/guides/http-queries-and-mutations.md": "6e4377bfbc2300f7cc195ce095125a5d9051c1f09c7b20cfc09a7251852d1056",
+        "apps/docs/src/content/docs/guides/hydrate-query-views.md": "085a7ba81468cd5cca835d6957e03797d1e66fd410bf8992accf40973ef15a66",
+        "apps/docs/src/content/docs/guides/hydrate-unary-data.md": "a4e34e994b6c606ac918726e0c02ad20c9f1a668f483042979b1798400b35e18",
+        "apps/docs/src/content/docs/guides/optimistic-writes.md": "b76e2336f6958e7482786312a15bb9c25a1608c659018c5b4d3162301e767bef",
+        "apps/docs/src/content/docs/guides/query-defaults.md": "98353365fc09fab7d2424cdc7d2870a52735710a05778aa6c693697bc16c288c",
+        "apps/docs/src/content/docs/guides/react-query.md": "29a200b31d19e0339805a0ae3e50be403300e1b8bb7b870949cf779853fbb347",
+        "apps/docs/src/content/docs/guides/refresh-from-events.md": "a51ef3777eb9ea07f561d2223c6d8ffa063c87ecda25cb74ce0aea4b037fa2fe",
+        "apps/docs/src/content/docs/guides/retry-queries.md": "f725f54696712cc917089e18e905022c6ab097e44f8d22f499ab87fb30af9a99",
+        "apps/docs/src/content/docs/guides/stream-snapshots.md": "62e343dc7fa2f4b1b6fb1b699ecb947bcdfc0312c9ffab584b0b8bfaf954f854",
+        "apps/docs/src/content/docs/guides/svelte-and-angular.md": "8a5741996407c81c54a75ab3fb086a4c6866913a2a14f71801876891fb49753f",
+        "apps/docs/src/content/docs/guides/switch-cache-owners.md": "08e883a245679cf05d4cb65c93e5b9f1887022a972b98ab295aa248880ab9b7f",
+        "apps/docs/src/content/docs/guides/tanstack-start.md": "28a196e44e1b6b49131b05e370cb029670599fefe6aad6ff54ed9d3d3f07ddac",
+        "apps/docs/src/content/docs/guides/vue-and-solid.md": "2b0b31da53f2b5e86cd5fb3abe5353c28e02e73dc485133d6f593c9f5d30cf06",
+        "apps/docs/src/content/docs/guides/websocket-clients.md": "9ec635105fd84c30dc52833ed3adcf80a46313deb0112d4e72cd1a5603c6170c",
+        "apps/docs/src/content/docs/index.mdx": "5c22ad2256052013855d92e21d4a277f4c3e92931ea71fd0c1b3e7f5aceb9584",
+        "apps/docs/src/content/docs/reference/browser-and-worker-hosts.md": "70743a4429a39937515c8d5fee79ca75714a92dd526f1093f9fa8ea12fbde984",
+        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "99909357a5c32eb8ed9443fc0d92c43b228591d5c2203f1c822c9bcc4a7b280d",
+        "apps/docs/src/content/docs/reference/errors.md": "4454725375e05ea7a7d976d798c1c1d0c2731eefc79043f5e40dba88154069b1",
+        "apps/docs/src/content/docs/reference/external-http-clients.md": "613f0e9493221416993e0c8012a97abdb3de2f80321aa7e4b0cda0f585618f91",
+        "apps/docs/src/content/docs/reference/factory.md": "b099ed80d1ad8aab6a59213ee286290302bcf7885569ffb693fed784ca872dd3",
+        "apps/docs/src/content/docs/reference/generated-builders.md": "b0f990437f967752f971ab0b7dc183119d619ee0159387079114fb83bea3ed21",
+        "apps/docs/src/content/docs/reference/http-factory.md": "b4e24e6d63e4ed2088920dda8d142fbcae1bdda7ae23e43cfad398f8c95d9f0e",
+        "apps/docs/src/content/docs/reference/performance.md": "2f68c31cae28de0a84b1ce77f065481d37899171b78d9593ff65e017ff75d97a",
+        "apps/docs/src/content/docs/reference/public-exports.md": "500d864720857c9098b325d6018b20b5ad6c1e666ef326921721ffdf6435dcb2",
+        "docs/adr/0001-target-effect-4-release-candidate.md": "44119ba9104f767c5804c5026c4a21a78a8367f6d9ff5a9035bb3f423969fbb3",
+        "docs/adr/0002-let-call-sites-choose-query-or-mutation.md": "3ababe863eabf9cc53c70629dfe65af4a82a77e91467e5082041b8c71f93f482",
+        "docs/adr/0003-project-dotted-rpc-tags-into-utility-paths.md": "a99856e94af4004484fed939d46ae4388363031cf396b07f04a92a7119fec2fe",
+        "docs/adr/0004-build-core-shaped-options-and-certify-react-first.md": "3e936951b2987c55d8ddff13e740e4070409c683294040744ed65a2f1cbcb16d",
+        "docs/adr/0005-preserve-the-cause-in-one-error-wrapper.md": "1e04885542f22f166b5daa913ae2dae121c407baa775a2c4a16590f96857e3fe",
+        "docs/adr/0006-use-canonical-semantic-json-for-payload-keys.md": "694d8665938af25abb91ada71ea9c95cb77dd4ea90019adb2f642e16a88948c7",
+        "docs/adr/0007-keep-the-core-factory-lifecycle-neutral.md": "a83dc0d6061ac0328a3ee6075aa872a55feb4f0154edf6dae964e74276bb15b5",
+        "docs/adr/0008-use-flat-prefix-matchable-key-tuples.md": "d2a146eed07be984daca0a4cd8209eb1ca86734b162d5362b5663c50863cd526",
+        "docs/adr/0009-build-an-eager-frozen-utility-tree.md": "bc3b08a3385f1dc8874d81f867f15ef6c30b203c94936fd991d2941fd5bacc27",
+        "docs/adr/0010-reuse-tanstack-query-core-as-a-peer.md": "633a1ce44c8d58b29096f540871b61566352462e1d4bd5335162b3e08652527d",
+        "docs/adr/0012-normalize-undefined-query-success-to-null.md": "5d076f168223f67a205138d3e258f1f3aac9dfe5d607ffe8efd12a71322ef022",
+        "docs/adr/0014-require-query-stable-payload-construction.md": "2f4381fb3e7406304ff3b914db541419f799f8a71d1d527b37a9e971e9949e47",
+        "docs/adr/0015-centralize-the-toolchain-in-vite-plus.md": "d2001383bc0f92363289c04b6b8df26acb5b0f5dfc0163b2a838f2eee8057b75",
+        "docs/adr/0020-generate-accumulated-and-live-stream-queries.md": "5e4f5c92e08ffb769137e930908dded993f928a497b018f9c6e4fd4f12232727",
+        "docs/adr/0021-share-utility-construction-through-private-modules.md": "a7d6774a6652735e690e5099ccc7dcad10da416de482068f87b74e6063fe90a7",
+        "docs/adr/0022-add-buffered-http-utilities-with-separate-key-roots.md": "f1fb5d91cd91a70b356bc98b84176920ec822315dbdeaf5e247921853598b62f",
+        "docs/adr/0023-expose-buffered-multipart-http-mutations.md": "b72f20cb513d2a7db94b2dbe27576352048ba22288ad6eac6e80d1a7c81cefb8",
+        "docs/adr/0024-project-http-streams-and-buffered-metadata.md": "2797a5a4a751c5e37c38aa454c14b99ce1615870ffa13cfcedb98cca8a0af633",
+        "docs/adr/0025-use-public-decoded-message-clients-for-server-local-rpc.md": "36df8e1227af22018d5a9063699986ceb8dcfd4c8bb5615aa62557f2ec36e111",
+        "docs/adr/0026-keep-rpc-transport-aggregation-in-the-application.md": "b73af29d8f73a36f61f110ad8778e045d37253fe42a8888883e78089b93e955e",
+        "examples/server/src/commands.ts": "62d60db1094eaaa3e927899431800daec6f9cd1f345509ec324f3369147d9e06",
+        "examples/server/src/diagnostic-operations.ts": "9ea6dd3f5243888b251bb64f534e3273253b79daf1c623edcc0f5034e627d049",
+        "examples/server/src/domain.ts": "c00fced49e54d7bfff9045479e91aabdbd7c0868cc89afe00bae5473b17d2f82",
+        "examples/server/src/http-handlers.ts": "601f37c428015e75e94cb282af356878aa49c887804cc29e2b4f0c1a47ca92f0",
+        "examples/server/src/index.ts": "9e121809a5493c649e61e76fefec52a8c79a394983368060a95dc7000dcedc9a",
+        "examples/server/src/main.ts": "de9520cc16e4bff9d02b8507ee70641936b1287959823429f7759c0f05fdc0a7",
+        "examples/server/src/rpc-handlers.ts": "c2c57eb9a2ca5e602fff9f798c4d5165e91216c5b7e64e0a71220c4ba9316f3d",
+        "examples/server/src/server-local-rpc.ts": "de2a05bba54042f1d2d5781023cb5d20eb63915dd2a52635e9debf83911b5421",
+        "examples/server/src/server.ts": "eab2d80d9e6ecc4c74b89a50223ff968bf5b98da72d9aece4e726c0cfd6832e8",
+        "examples/server/src/users.ts": "15c363e2162f8dab4da1bfcf6324abbb3dc8ca34a8d8e036eb4db2481fe6be5b",
+        "examples/server/src/web-handler.ts": "55447fe9ec14213d3d69811be11c9d6d6b266d50cf37b57dd5d4870132905523",
+        "examples/server/tests/fixtures/websocket-server.ts": "b59863766bb60e5fb4de040d7d97ae2e67bca2ec44810ddc577f4cf5cb03129f",
+        "examples/server/tests/http-api.test.ts": "0e4ea6656cdc67d4fb29710cec1d10af505f7dbb3bcd3d85947f7ed19c220df9",
+        "examples/server/tests/rpc-transport-overhead.test.ts": "8d3dd40cfbbd0ce64b74f44f205f7f83163ea08dfc264a6deb1902e96b74a7fb",
+        "examples/server/tests/rpc-websocket-consumer.test.ts": "16253ef720e8a85cb7c583bcf6f9883c5893423d6da952659731e5823fcf0a62",
+        "examples/server/tests/server.test.ts": "e36862bcc44433777c78e36355efea2779c8e866a0e63c9a5cf8fe2d5e86d673",
+        "examples/server/tests/web-handler.test.ts": "e32f61699348bb483adc15d9d2fc69663402767a7cfa893506c69758150313f0",
+        "examples/tanstack-start/src/lib/api-server.ts": "7a1d9e860dc1c77b17f8ec1dfa8207ae5e5b4d53b287e7c76e2ee4138b605779",
+        "examples/tanstack-start/src/lib/application.ts": "5f2eeb9920fa77b18dc7ad00a2688fe9225bfd2c57db35a5040b0a38e299ec71",
+        "examples/tanstack-start/src/lib/query-ssr.ts": "0754abae5faf2f7562e1d86d27df0e14820a5ba9830146690ff1dc9f5beb3ec9",
+        "examples/tanstack-start/src/lib/server-application.ts": "442278fc08c4beb9a69cf1ab7672f661385d9c49998db77ce2870d349ffdc8a1",
+        "examples/tanstack-start/src/lib/server-host.ts": "1682ee37ea7551ec52c9530d6a4b476b967fa0572f5ddc26351ad427ce854e37",
+        "examples/tanstack-start/src/lib/snapshot-preparation.ts": "2dcdb78a86f0cc51240ecd672c03779139f408d29e639f850a544efd2d569755",
+        "examples/tanstack-start/src/router.tsx": "801aac19cff9a4e2a4acb0823a9ea5c28b4aea9245f7e26cb63548bb5234bd15",
+        "examples/tanstack-start/tests/application.test.ts": "81f9b44df80dded727f1fedf51ffee2df2c7afd7f25a68668a263deb88cd3ec1",
+        "examples/tanstack-start/tests/async-hydration.test.ts": "1f983917d2a469b83b876e882ad6a2ece4d28d360338ed614232807a168a1620",
+        "examples/tanstack-start/tests/client-navigation.test.tsx": "e91e23be9c5695035462fd5b27a1c1d627bf6d1d0f6a8124d45ac1bc220db416",
+        "examples/tanstack-start/tests/failure-dehydration.test.ts": "b9d135c54e8e70ff454903f8016e6560fabaa487095cb40cb8725ed73577f079",
+        "examples/tanstack-start/tests/server-local.test.ts": "a2bbaf6cfad8701e2f8912a07c6a9f3d91a8d8ecb394a94c09d25289134576c9",
+        "examples/tanstack-start/tests/server-render.test.tsx": "01061f209d72df769235c47bae552402e6c9a692c95e67267e4317b2e338b8f5",
+        "examples/vite-react/src/app.tsx": "691f77aee6fb9f2b1f6f9df40a3afcf78f4af2d043d7b379f38c75c647a5f91e",
+        "examples/vite-react/src/lib/application.ts": "7e6ab21e6beaa78a65da1c2da076f956f77e4470fe87f81390e8e26195fdd9e1",
+        "examples/vite-react/src/lib/owner-cache.ts": "7e11ad168da93e5d2740766b40600a41301729e9f07433f8d3d7fdde06bc88bb",
+        "examples/vite-react/src/lib/user-writes.ts": "125662c3e9a17854d0dafa194d4d491d3982f211e1e4785b853438177418213a",
+        "examples/vite-react/src/main.tsx": "cdee6ca4095b58e1750015db473bda8651702a8ab32c408fa77961873db0e6fe",
+        "examples/vite-react/tests/app.test.tsx": "ff86b42023eb40658dd6feccbfd1f236a75bf2831f40b02955ebc1306be6329c",
+        "examples/vite-react/tests/commands.test.ts": "3e24222572c0f7a4b68cfc4069c545cbebf410cacd0063a328cead9ad5baab08",
+        "examples/vite-react/tests/owner-boundary.test.tsx": "d4ce58a002aac2b8f752936a65495558f89bff145d5cf2556f5c0d9286f8d6b3",
+        "examples/vite-react/tests/owner-cache.test.ts": "8818e30fdd3071a2e5dc2d865161e0d9f40de1ff37813b0a396bb2e83dd08a1d",
+        "examples/vite-react/tests/owner-switch.test.ts": "c997c9758269586591cbf55de4651c64091abc9061b56edb024dcbf9dbaa9c1d",
+        "examples/vite-react/tests/user-writes.test.ts": "2492f48018e7d8e684eae1c8d302acc9961a1bfbd60bf3214c113dc1b6fbe54a",
+        "package.json": "dc41aa3f5b1633ffb2e6f6a0b7efb4e0119d74b9bc8c0003b1a8ee5fad854782",
+        "pnpm-workspace.yaml": "58fd69fb2ebc237bf589893fd3150ec0dd25988aee57f465f5b373b038aee606",
+        "scripts/decode-utf8.mts": "2e90c53e95c22b864a209a87c98084db6ec95e83f842007b21528d286d45c18c",
+        "scripts/measure-construction.mts": "10522cb10ab51fd44d8990896a2a73e8bf4d4cd2646441e958b6180cb1afd147",
+        "scripts/verify-docs-examples.mts": "9e379c826c5d7adafb1d6b59b526cbd59d3fd76b32f417da0ce2cd1bb40eb01c",
+        "scripts/verify-packed-consumer.mts": null,
+        "skills/effect-api-query/SKILL.md": "1939a0f7536f3e88e1e1106e8125019c11d6fdd4ada8ae4d010507f264b234e5",
+        "skills/effect-api-query/references/cache-workflows.md": "27bb96c48c84254ab8c379a529402f81cea3723c17d6396527c090a8c37e6f65",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "d84c787ccfc76b1f01f3d44d02d969ed9422af7d9dbdda862e661d65af9e44df",
+        "skills/effect-api-query/references/http.md": "9625411753fcc3ce816512f80158a19aa1057518ab3bfde98720e0cc7f845b66",
+        "skills/effect-api-query/references/hydration-and-ssr.md": "61e761b36ebcf56c7cc1b67b3d795edba52d0c0224c3e7964297ed6864e1b044",
+        "skills/effect-api-query/references/query-patterns.md": "33ea307b7042660da4ee4f6acea147d4218688a0256d82f3d582ff2e9cef4f9c",
+        "skills/effect-api-query/references/rpc.md": "f77eb39bb1b3e1f5f8c56f4b827ecef350a255a23380d8b9515dc61b54165d5d",
+        "src/core/operation.ts": "98e3a2103ffc29003e10398d90c0b05840ee2b6e93c687942d2577b86246fe84",
+        "src/core/schema-key.ts": "6e3ec8e7aa089ab6d2a85e71880f9bf4985f572b28e0b4325fcb0eed00b5dfd3",
+        "src/core/stream-snapshot.ts": "abd83051df4e7fd3e4de5f9147b029993d59e19e5dd72ee7b73d40ebae12acc7",
+        "src/core/streamed-query.ts": "094418739ed9216ef008960dd6aa4b99b261c375bd778c8679a58722d8a9eea5",
+        "src/core/types.ts": "c8e222c1d18736b2009fb67d4dcfb6985a87241ed2266d588decac32bd1b8f17",
+        "src/core/utility-tree.ts": "059fe4f87e72d367b38ca0d71d5313f5148e68fe1d3fc39010fed3d036f3c862",
+        "src/http/create-utils.ts": "56894da25c6a2c07ce5d251836b793c458ed869d7c0f29ce92c6d0fab89e6532",
+        "src/http/errors.ts": "dbe4aa9a4ce8c5c996f914387e9ec61568f774c5ea5a585c4f9480b13f97706b",
+        "src/http/operation.ts": "e0bb361315592289c816b03d0b318dc069c1611932593d778558c0a9d3f9568f",
+        "src/http/request.ts": "2416d809ab164a68b67627456686e52a6a49a5173790e652d129dcd503b1d424",
+        "src/http/streamed-query.ts": "d0a2522a99a4068b0420cbbcc83f65f8bc2dc911637b031148844d32938e4606",
+        "src/http/types.ts": "e63f305feae5452bbe125b46cbfc6ebaecabdf72c224ec6d4732daa798e250d9",
+        "src/index.ts": "95300336b198d7cec9a0113597970f462cb431718be9f2aae0fd64402b6655a4",
+        "src/rpc/create-utils.ts": "e25a361bee900850650b7d0d5bfaa6d8555d7ef48382f4125bd48cd440ba1c1f",
+        "src/rpc/errors.ts": "7e4fbde05e6dd3647f8a12f524a659b5c378ee27092ae4e28151effb7b2feb88",
+        "src/rpc/operation.ts": "017dea3ba6f270d84c19b4afd5fb5624bd2414e65634b54ce0d3467ebd1b3aca",
+        "src/rpc/streamed-query.ts": "35f399311a6fc6928df469d2d47312d2e0d0e12c8ae6e0e36b059c0a17a74878",
+        "src/rpc/types.ts": "f5fda172e9746512b1c51082eebaee7b5a16bd8b382d59b51ed80e07e8e552e3",
+        "tests/cache-recipes.test.ts": "2eee65e29e118b08bb0e17e4661f30e7b6e4d00f5f15bf55e070680a2eebb867",
+        "tests/create-http-api-query-utils.test.ts": "a76295644389a37e1a00a9825d192cbd0dceeab7d43e7ad1196c171ef5059ad1",
+        "tests/create-rpc-query-utils-configuration.test.ts": "839191fd31986c13f77585d191d643599426ce3294a930af421a26439b37b664",
+        "tests/create-rpc-query-utils-execution.test.ts": "8556cd62ba1ecdcc130c9a5d35f165b60d18a9c6f3f8eed30822f213ecd57e73",
+        "tests/create-rpc-query-utils-keys.test.ts": "e79abaa3659d9e212d1a1b3b923abe3493fcdb1d1ab5c92cd895df199043f9da",
+        "tests/create-rpc-query-utils-request-options.test.ts": "bcd76859a2830e522bdeb212be70f2e14be3b815da75a5caf3e596fd5fbd13e7",
+        "tests/create-rpc-query-utils-server-local.test.ts": "45ee329a736bcb6b114727ef8874f3f34541ce6dc55d5e13ffc80be9c2af2ddd",
+        "tests/create-rpc-query-utils-stream-baseline.test.ts": "cec0a8906b3512e38c0272dc07a4cac81402ac014549eb11f24a594d7b792616",
+        "tests/create-rpc-query-utils-stream-cache.test.ts": "c1a5588608e43b99bf98914d3e764d89e25d9f7dc47379e68316fd1f1332e935",
+        "tests/create-rpc-query-utils-stream-publication.test.ts": "cc3a25d02015b1410a8d1406249a846bf711f7b829fa7fccce1da90e600530d3",
+        "tests/create-rpc-query-utils-streaming.test.ts": "7b392709f029af806a6b42038c058dcd1645969581aafedb8696e8bf43e7507b",
+        "tests/create-rpc-query-utils.test.ts": "93589d8c857d716ce384a4a97d442d005f0501c890a524b69f6594f039fb530e",
+        "tests/fixtures/async.ts": "f9ccc474ad87dd5aedebc5660d74386de6551dd5f8900d572c485c11054ff6b9",
+        "tests/fixtures/docs-websocket-use.ts": "6e2aa0bb7b1a653ffc215bad7a39b9a79aa1a9b3707bb32b1e80f4636faac544",
+        "tests/fixtures/effect-rpc.ts": "73be762e670e37e4cc3cfcc2b1d40724f23721726d75b45524ad0b3aba78eb61",
+        "tests/fixtures/http-client.ts": "a0a77029f4c786c1616f24ce6aa44120de40e243d3dc5570d85d1767bb527a11",
+        "tests/fixtures/optimistic-users.ts": "0f8827553ee52ca4f4105c61006cf5a4fffce3e5170a3ca9e2216975f72a2a63",
+        "tests/fixtures/query-cache.ts": "ee6509aac5d0cf4f781652da10c2b1c3501a222ddd9a6b05f447e6a226548071",
+        "tests/fixtures/rpc-transport-queries.ts": "46be1d1e6048d57d83e9ae64b00c8c0c11deec6a67d0d4b115cdc9aac7447158",
+        "tests/fixtures/socket-client.ts": "d2d0a4a31011e2cfeec0e7e7ca996ad752a3a51db5675ac5efce54d284c8db89",
+        "tests/fixtures/user-events.ts": "13d8167b811bec6319de96f7cb50410f586c18cc92677d7fd17488b16d15b329",
+        "tests/fixtures/websocket-checks.ts": "7b8035264ece4e501e829b3e2b755f9d7b17c010ffa1036db6338a368ff6f93c",
+        "tests/http-cached-views.test.ts": "a1dc10f45dcc2d8a53c8b80e4205f6adb48646fba60a427b8531f02a26068725",
+        "tests/http-execution.test.ts": "d5869dc2faef8f2edf0f721173f40b352f1b2d70ef19919214a342b3bd82ea18",
+        "tests/http-hydration.test.ts": "1873ccb57214eb9542927fd92204cff9e98d2cc0217fd78fbeeb20bebd5e05b7",
+        "tests/http-live-query.test.ts": "79df219cb204669520c584123f167479ea3fa514d899897bf2810a04e8e1ca65",
+        "tests/http-multipart.test.ts": "ff816ffae79e827883cea1d1f99f5f763e95c9e856040627a34818df6569feb1",
+        "tests/http-query-options.test.ts": "bba47a56841732c7a3f3451ce100e9b864ab2fa6374bc7c8c912658e31c30a3a",
+        "tests/http-semantic-keys.test.ts": "2e78788697bdf7efec374669d8123da57c93df3c368d41920decfcd175bc2359",
+        "tests/http-transport-cancellation.test.ts": "e56f8571f949adc9d44f14b61e20edddb188a9565bf7a585859ffe73a851ac39",
+        "tests/http-view-proof.test.ts": "4dc91c38efe5b0c643ef61c98dcdf4a89acf4ef4c1651030124d82ca6cb55a61",
+        "tests/stream-snapshot.test.ts": "c419902fad27b91205ff5e4b65510ce9ed0c3d0969300c8891f1bc314a7ce0e5",
+        "tests/types/docs-http-quick-start.ts": "5f7eef98be244ea392fc2c5b527858f159a08efebf6f2665725301aa8a910050",
+        "tests/types/docs-hydration-async.ts": "de67135bf3da0dffdac47e9f2e49469edddac3d7d026fbd93d39aea6964c0dd8",
+        "tests/types/docs-hydration-dto.ts": "ebcd5c3895e8fa40bff3b62e8e13213e98a3e1c4796d89979b23ecc64cdc13ff",
+        "tests/types/docs-hydration-rich.ts": "56b35d7bb4a0f0ebc777161beb2e73a19dfc7de4db26fc74e3abab5d164f1402",
+        "tests/types/docs-hydration-views.ts": "08d75fe114e4a682fc0ad62b847898dba270672e0ce6d19a4f4d66cf92f75365",
+        "tests/types/docs-retry.ts": "30d8a5635399635c8b1a21ad77e7b1e2b6d12df4d032eaa95b1b0438da0486f2",
+        "tests/types/docs-rpc-quick-start.ts": "95deee30de122cbaa7b9cb28257c234aa1162a0b549a87cf50a80bd84e871081",
+        "tests/types/docs-stream-snapshot.ts": "bc924cff90a9f9a8e416bf7fbdfedbd607c88e7a678435aaf20ef878862e06ff",
+        "tests/types/docs-user-events.ts": "87647140d5434b95cc5389b1fea9919f20df7b6fcee4f00565836a4eae549a70",
+        "tests/types/http-contract.ts": "56bcbf5c82a1d0413e82d6db253c5bc0ae27a5e3121cd0fb28ea7bac9fcef1c8",
+        "tests/types/http-stream-contract.ts": "459968ad3ba9fc33c1435758b4520e8a8214c9d82db96b2d1704e86986919cf2",
+        "tests/types/http-type-scale.ts": "b456543b88316a2dd899f929efbffcf514e54e213e109b5f7d52eb785d2255aa",
+        "tests/types/http-view-proof.ts": "f42a1ebf36eeab7a906b722f5d2c2af0aabe8d30ef378fc50386c16d464fb64e",
+        "tests/types/public-contract.ts": "1adc90bd7d8f359e9b159d61cb5a8b98caa56c66e46a1109154c61e5cd1c4014",
+        "tests/types/server-local-client-contract.ts": "443a60788ce7d91a77459c99f07d3fc9bf70d5a64a83c05ece5c40cfac63d298",
+        "tests/types/snapshot-contract.ts": "9e6a2edaddb7545f20d351511ed99be2828d4ca56779503bcc443963d8b73716",
+        "tests/types/tanstack-start-contract.ts": "51681e3d0d7504a614d490f18adb6f44db82d34b9d4d7cb9cf941aea33de284f",
+        "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
+      },
+      "head": "f56fbfaa6c79e869f15e98d457b5ee6eb07d7b86",
+      "outcome": "no-change",
+      "reason": "The two human guides now state their historical example-version scope and the existing native Vue/Solid mutation-hook mapping. The shipped frameworks reference already specifies matching native mutation hooks, per-execution variables, reactive option rebuilding, wrapper/Core matching, and the same native inference/lifetime limits. No public behavior or developer task changed, so all seven skill files remain accurate.",
+      "evidence": [
+        "Read skills/effect-api-query/SKILL.md and references/frameworks-and-hosts.md; the existing mutation/variable/reactivity and framework-boundary statements still match the guide corrections.",
+        "Historical 5ff2638289a1ba47d4b7d867d9c50deb5b4d5c4a tests/packed-consumer/vue-solid-contract.ts:185-205 and 352-359 use Vue useMutation(options), Solid useMutation(() => options), and mutate(variables); completed 118-final-matrix.log records the actual Vue3.5.43/Solid1.9.15 plus wrappers5.104.0 checks.",
+        "119.md and primary 119-framework-metadata.json establish the Svelte5.57.1/Query6.3.0 and Angular22.2.1/experimentalQuery5.104.0 recipe scope. No current certification or new framework matrix is claimed.",
+        "Fresh vp run docs-build passed exact snippet parity, Astro0errors/warnings/hints,44pages/search/internal links with0/3cache hits; scoped vp run format and git diff --check passed.",
+        "No fresh framework consumer task was run for these prose additions; unchanged historical compiler/host evidence supplies the API comparison. Retired installed matrices remain retired."
+      ]
+    },
+    "planning:_artifacts": {
+      "fingerprint": "ce230bb1a3ed5e994d0aac0740ecaee72fe7601fc1feafa3b78a2718dad155d0",
+      "snapshot": {
+        "GLOSSARY.md": "67de06543ad2fd9fd2917419e19d1f071e7b6eee53d48fca05e9dddfc739c683",
+        "README.md": "35d680dfe39a73da641b0d3fda4480883a486b6f43942138d2db9981971b82bf",
+        "_artifacts/domain_map.yaml": "cc465ff4f0142ca19c5e9af32b31f618420db77a4601a8e827df709b8af7acfc",
+        "_artifacts/skill_spec.md": "3d590a87ae382859f39d028319e46e7dbccc16e69315e6a0b31cd4c31ec1cefd",
+        "_artifacts/skill_tree.yaml": "da82bd81b41250e02e263147afd7a12ce5379f86cf8b6a9e09895d1227df84fc",
+        "apps/docs/src/content/docs/concepts/client-lifecycle.md": "4a7d412f6e3c7dfbf0442b51ee9054c2b854026bcf968961cee65071f7cbb424",
+        "apps/docs/src/content/docs/concepts/data-normalization.md": "f1505ec3eb35a33fac289706c2cc318a2ffb80555e3302ca102e67e21c9012da",
+        "apps/docs/src/content/docs/concepts/http-utility-tree.md": "ca4acbe1af20538c0d08a3e03969efe1966e7822ce6dfce8d0c1efb6913795cf",
+        "apps/docs/src/content/docs/concepts/queries-and-mutations.md": "a7f95a5c002e87261fa988fbbfe3c936e3601aea8c5b9c1878b8b60bc17da696",
+        "apps/docs/src/content/docs/concepts/rpc-utility-tree.md": "fd5fcc232279e9577b8b2faf321a85e9a340e6090ea5887bbab208cca2d24a4e",
+        "apps/docs/src/content/docs/concepts/semantic-keys.md": "eaf6d79c40af97da698bce206705633cdc3bf202921b745a82700214c2c4d48c",
+        "apps/docs/src/content/docs/examples.md": "7f22a2309b148934546fec37991fb81fe733ac7b8a3b843e8001a1d2ec1d8606",
+        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "b526e3f718863655caa6f98018aefdb82103464f9bd4a5730f7c75fa4d502f3e",
+        "apps/docs/src/content/docs/getting-started/feature-support.md": "01c46393cfdda15574c57f97081ccfd0b690457a7a247abc61444af408002f64",
+        "apps/docs/src/content/docs/getting-started/http-quick-start.md": "eaf62e213ba22d1926dd75d7bad7bb9e6e69419309f0fcb1e6a7c0efe4d85c8b",
+        "apps/docs/src/content/docs/getting-started/installation.md": "a334554486477e2c6ecd63c325b90fa9738c57877a3a23ec22a64c406c3f21ab",
+        "apps/docs/src/content/docs/getting-started/quick-start.md": "52689fd2313064eb8660ec4152cba36fb46dbaba7f1039d43ed02b12a5f9ae2e",
+        "apps/docs/src/content/docs/guides/cache-filters.md": "46d06ee7e24f2ec143d0bb174442a7f5bc5299657d4bcdfb28a36782a69b3de6",
+        "apps/docs/src/content/docs/guides/cache-management.md": "18f9ef5b5c51365a629601d19d2d2307c243c3fa4e2dd4f53bed3974eae802e5",
+        "apps/docs/src/content/docs/guides/cancellation.md": "b0a79fb1578777115619d65f075f407595de0634ef0c52c4fc77256f0dca833c",
+        "apps/docs/src/content/docs/guides/choose-stream-history.md": "6996df3a8b18c4fadbcc76a3635a8a5408f155b4068509d4801b38afa7f22f16",
+        "apps/docs/src/content/docs/guides/conditional-queries.md": "37cd6436daf90c0c060dcfcf4b9d7f0b165ee95858bb30cff9f38b45e132e029",
+        "apps/docs/src/content/docs/guides/custom-key-encoders.md": "ffa8b915f0831e2081a5bd50c115977e444ee6319c624123e296e3455d754230",
+        "apps/docs/src/content/docs/guides/handle-failures.md": "6b4e7bed61daba9c29d988c9795e570efc5a4f2783503d696a419cfcf9737a91",
+        "apps/docs/src/content/docs/guides/http-queries-and-mutations.md": "6e4377bfbc2300f7cc195ce095125a5d9051c1f09c7b20cfc09a7251852d1056",
+        "apps/docs/src/content/docs/guides/hydrate-query-views.md": "085a7ba81468cd5cca835d6957e03797d1e66fd410bf8992accf40973ef15a66",
+        "apps/docs/src/content/docs/guides/hydrate-unary-data.md": "a4e34e994b6c606ac918726e0c02ad20c9f1a668f483042979b1798400b35e18",
+        "apps/docs/src/content/docs/guides/optimistic-writes.md": "b76e2336f6958e7482786312a15bb9c25a1608c659018c5b4d3162301e767bef",
+        "apps/docs/src/content/docs/guides/query-defaults.md": "98353365fc09fab7d2424cdc7d2870a52735710a05778aa6c693697bc16c288c",
+        "apps/docs/src/content/docs/guides/react-query.md": "29a200b31d19e0339805a0ae3e50be403300e1b8bb7b870949cf779853fbb347",
+        "apps/docs/src/content/docs/guides/refresh-from-events.md": "a51ef3777eb9ea07f561d2223c6d8ffa063c87ecda25cb74ce0aea4b037fa2fe",
+        "apps/docs/src/content/docs/guides/retry-queries.md": "f725f54696712cc917089e18e905022c6ab097e44f8d22f499ab87fb30af9a99",
+        "apps/docs/src/content/docs/guides/stream-snapshots.md": "62e343dc7fa2f4b1b6fb1b699ecb947bcdfc0312c9ffab584b0b8bfaf954f854",
+        "apps/docs/src/content/docs/guides/svelte-and-angular.md": "8a5741996407c81c54a75ab3fb086a4c6866913a2a14f71801876891fb49753f",
+        "apps/docs/src/content/docs/guides/switch-cache-owners.md": "08e883a245679cf05d4cb65c93e5b9f1887022a972b98ab295aa248880ab9b7f",
+        "apps/docs/src/content/docs/guides/tanstack-start.md": "28a196e44e1b6b49131b05e370cb029670599fefe6aad6ff54ed9d3d3f07ddac",
+        "apps/docs/src/content/docs/guides/vue-and-solid.md": "2b0b31da53f2b5e86cd5fb3abe5353c28e02e73dc485133d6f593c9f5d30cf06",
+        "apps/docs/src/content/docs/guides/websocket-clients.md": "9ec635105fd84c30dc52833ed3adcf80a46313deb0112d4e72cd1a5603c6170c",
+        "apps/docs/src/content/docs/index.mdx": "5c22ad2256052013855d92e21d4a277f4c3e92931ea71fd0c1b3e7f5aceb9584",
+        "apps/docs/src/content/docs/reference/browser-and-worker-hosts.md": "70743a4429a39937515c8d5fee79ca75714a92dd526f1093f9fa8ea12fbde984",
+        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "99909357a5c32eb8ed9443fc0d92c43b228591d5c2203f1c822c9bcc4a7b280d",
+        "apps/docs/src/content/docs/reference/errors.md": "4454725375e05ea7a7d976d798c1c1d0c2731eefc79043f5e40dba88154069b1",
+        "apps/docs/src/content/docs/reference/external-http-clients.md": "613f0e9493221416993e0c8012a97abdb3de2f80321aa7e4b0cda0f585618f91",
+        "apps/docs/src/content/docs/reference/factory.md": "b099ed80d1ad8aab6a59213ee286290302bcf7885569ffb693fed784ca872dd3",
+        "apps/docs/src/content/docs/reference/generated-builders.md": "b0f990437f967752f971ab0b7dc183119d619ee0159387079114fb83bea3ed21",
+        "apps/docs/src/content/docs/reference/http-factory.md": "b4e24e6d63e4ed2088920dda8d142fbcae1bdda7ae23e43cfad398f8c95d9f0e",
+        "apps/docs/src/content/docs/reference/performance.md": "2f68c31cae28de0a84b1ce77f065481d37899171b78d9593ff65e017ff75d97a",
+        "apps/docs/src/content/docs/reference/public-exports.md": "500d864720857c9098b325d6018b20b5ad6c1e666ef326921721ffdf6435dcb2",
+        "docs/adr/0001-target-effect-4-release-candidate.md": "44119ba9104f767c5804c5026c4a21a78a8367f6d9ff5a9035bb3f423969fbb3",
+        "docs/adr/0002-let-call-sites-choose-query-or-mutation.md": "3ababe863eabf9cc53c70629dfe65af4a82a77e91467e5082041b8c71f93f482",
+        "docs/adr/0003-project-dotted-rpc-tags-into-utility-paths.md": "a99856e94af4004484fed939d46ae4388363031cf396b07f04a92a7119fec2fe",
+        "docs/adr/0004-build-core-shaped-options-and-certify-react-first.md": "3e936951b2987c55d8ddff13e740e4070409c683294040744ed65a2f1cbcb16d",
+        "docs/adr/0005-preserve-the-cause-in-one-error-wrapper.md": "1e04885542f22f166b5daa913ae2dae121c407baa775a2c4a16590f96857e3fe",
+        "docs/adr/0006-use-canonical-semantic-json-for-payload-keys.md": "694d8665938af25abb91ada71ea9c95cb77dd4ea90019adb2f642e16a88948c7",
+        "docs/adr/0007-keep-the-core-factory-lifecycle-neutral.md": "a83dc0d6061ac0328a3ee6075aa872a55feb4f0154edf6dae964e74276bb15b5",
+        "docs/adr/0008-use-flat-prefix-matchable-key-tuples.md": "d2a146eed07be984daca0a4cd8209eb1ca86734b162d5362b5663c50863cd526",
+        "docs/adr/0009-build-an-eager-frozen-utility-tree.md": "bc3b08a3385f1dc8874d81f867f15ef6c30b203c94936fd991d2941fd5bacc27",
+        "docs/adr/0010-reuse-tanstack-query-core-as-a-peer.md": "633a1ce44c8d58b29096f540871b61566352462e1d4bd5335162b3e08652527d",
+        "docs/adr/0012-normalize-undefined-query-success-to-null.md": "5d076f168223f67a205138d3e258f1f3aac9dfe5d607ffe8efd12a71322ef022",
+        "docs/adr/0014-require-query-stable-payload-construction.md": "2f4381fb3e7406304ff3b914db541419f799f8a71d1d527b37a9e971e9949e47",
+        "docs/adr/0015-centralize-the-toolchain-in-vite-plus.md": "d2001383bc0f92363289c04b6b8df26acb5b0f5dfc0163b2a838f2eee8057b75",
+        "docs/adr/0020-generate-accumulated-and-live-stream-queries.md": "5e4f5c92e08ffb769137e930908dded993f928a497b018f9c6e4fd4f12232727",
+        "docs/adr/0021-share-utility-construction-through-private-modules.md": "a7d6774a6652735e690e5099ccc7dcad10da416de482068f87b74e6063fe90a7",
+        "docs/adr/0022-add-buffered-http-utilities-with-separate-key-roots.md": "f1fb5d91cd91a70b356bc98b84176920ec822315dbdeaf5e247921853598b62f",
+        "docs/adr/0023-expose-buffered-multipart-http-mutations.md": "b72f20cb513d2a7db94b2dbe27576352048ba22288ad6eac6e80d1a7c81cefb8",
+        "docs/adr/0024-project-http-streams-and-buffered-metadata.md": "2797a5a4a751c5e37c38aa454c14b99ce1615870ffa13cfcedb98cca8a0af633",
+        "docs/adr/0025-use-public-decoded-message-clients-for-server-local-rpc.md": "36df8e1227af22018d5a9063699986ceb8dcfd4c8bb5615aa62557f2ec36e111",
+        "docs/adr/0026-keep-rpc-transport-aggregation-in-the-application.md": "b73af29d8f73a36f61f110ad8778e045d37253fe42a8888883e78089b93e955e",
+        "examples/server/src/commands.ts": "62d60db1094eaaa3e927899431800daec6f9cd1f345509ec324f3369147d9e06",
+        "examples/server/src/diagnostic-operations.ts": "9ea6dd3f5243888b251bb64f534e3273253b79daf1c623edcc0f5034e627d049",
+        "examples/server/src/domain.ts": "c00fced49e54d7bfff9045479e91aabdbd7c0868cc89afe00bae5473b17d2f82",
+        "examples/server/src/http-handlers.ts": "601f37c428015e75e94cb282af356878aa49c887804cc29e2b4f0c1a47ca92f0",
+        "examples/server/src/index.ts": "9e121809a5493c649e61e76fefec52a8c79a394983368060a95dc7000dcedc9a",
+        "examples/server/src/main.ts": "de9520cc16e4bff9d02b8507ee70641936b1287959823429f7759c0f05fdc0a7",
+        "examples/server/src/rpc-handlers.ts": "c2c57eb9a2ca5e602fff9f798c4d5165e91216c5b7e64e0a71220c4ba9316f3d",
+        "examples/server/src/server-local-rpc.ts": "de2a05bba54042f1d2d5781023cb5d20eb63915dd2a52635e9debf83911b5421",
+        "examples/server/src/server.ts": "eab2d80d9e6ecc4c74b89a50223ff968bf5b98da72d9aece4e726c0cfd6832e8",
+        "examples/server/src/users.ts": "15c363e2162f8dab4da1bfcf6324abbb3dc8ca34a8d8e036eb4db2481fe6be5b",
+        "examples/server/src/web-handler.ts": "55447fe9ec14213d3d69811be11c9d6d6b266d50cf37b57dd5d4870132905523",
+        "examples/server/tests/fixtures/websocket-server.ts": "b59863766bb60e5fb4de040d7d97ae2e67bca2ec44810ddc577f4cf5cb03129f",
+        "examples/server/tests/http-api.test.ts": "0e4ea6656cdc67d4fb29710cec1d10af505f7dbb3bcd3d85947f7ed19c220df9",
+        "examples/server/tests/rpc-transport-overhead.test.ts": "8d3dd40cfbbd0ce64b74f44f205f7f83163ea08dfc264a6deb1902e96b74a7fb",
+        "examples/server/tests/rpc-websocket-consumer.test.ts": "16253ef720e8a85cb7c583bcf6f9883c5893423d6da952659731e5823fcf0a62",
+        "examples/server/tests/server.test.ts": "e36862bcc44433777c78e36355efea2779c8e866a0e63c9a5cf8fe2d5e86d673",
+        "examples/server/tests/web-handler.test.ts": "e32f61699348bb483adc15d9d2fc69663402767a7cfa893506c69758150313f0",
+        "examples/tanstack-start/src/lib/api-server.ts": "7a1d9e860dc1c77b17f8ec1dfa8207ae5e5b4d53b287e7c76e2ee4138b605779",
+        "examples/tanstack-start/src/lib/application.ts": "5f2eeb9920fa77b18dc7ad00a2688fe9225bfd2c57db35a5040b0a38e299ec71",
+        "examples/tanstack-start/src/lib/query-ssr.ts": "0754abae5faf2f7562e1d86d27df0e14820a5ba9830146690ff1dc9f5beb3ec9",
+        "examples/tanstack-start/src/lib/server-application.ts": "442278fc08c4beb9a69cf1ab7672f661385d9c49998db77ce2870d349ffdc8a1",
+        "examples/tanstack-start/src/lib/server-host.ts": "1682ee37ea7551ec52c9530d6a4b476b967fa0572f5ddc26351ad427ce854e37",
+        "examples/tanstack-start/src/lib/snapshot-preparation.ts": "2dcdb78a86f0cc51240ecd672c03779139f408d29e639f850a544efd2d569755",
+        "examples/tanstack-start/src/router.tsx": "801aac19cff9a4e2a4acb0823a9ea5c28b4aea9245f7e26cb63548bb5234bd15",
+        "examples/tanstack-start/tests/application.test.ts": "81f9b44df80dded727f1fedf51ffee2df2c7afd7f25a68668a263deb88cd3ec1",
+        "examples/tanstack-start/tests/async-hydration.test.ts": "1f983917d2a469b83b876e882ad6a2ece4d28d360338ed614232807a168a1620",
+        "examples/tanstack-start/tests/client-navigation.test.tsx": "e91e23be9c5695035462fd5b27a1c1d627bf6d1d0f6a8124d45ac1bc220db416",
+        "examples/tanstack-start/tests/failure-dehydration.test.ts": "b9d135c54e8e70ff454903f8016e6560fabaa487095cb40cb8725ed73577f079",
+        "examples/tanstack-start/tests/server-local.test.ts": "a2bbaf6cfad8701e2f8912a07c6a9f3d91a8d8ecb394a94c09d25289134576c9",
+        "examples/tanstack-start/tests/server-render.test.tsx": "01061f209d72df769235c47bae552402e6c9a692c95e67267e4317b2e338b8f5",
+        "examples/vite-react/src/app.tsx": "691f77aee6fb9f2b1f6f9df40a3afcf78f4af2d043d7b379f38c75c647a5f91e",
+        "examples/vite-react/src/lib/application.ts": "7e6ab21e6beaa78a65da1c2da076f956f77e4470fe87f81390e8e26195fdd9e1",
+        "examples/vite-react/src/lib/owner-cache.ts": "7e11ad168da93e5d2740766b40600a41301729e9f07433f8d3d7fdde06bc88bb",
+        "examples/vite-react/src/lib/user-writes.ts": "125662c3e9a17854d0dafa194d4d491d3982f211e1e4785b853438177418213a",
+        "examples/vite-react/src/main.tsx": "cdee6ca4095b58e1750015db473bda8651702a8ab32c408fa77961873db0e6fe",
+        "examples/vite-react/tests/app.test.tsx": "ff86b42023eb40658dd6feccbfd1f236a75bf2831f40b02955ebc1306be6329c",
+        "examples/vite-react/tests/commands.test.ts": "3e24222572c0f7a4b68cfc4069c545cbebf410cacd0063a328cead9ad5baab08",
+        "examples/vite-react/tests/owner-boundary.test.tsx": "d4ce58a002aac2b8f752936a65495558f89bff145d5cf2556f5c0d9286f8d6b3",
+        "examples/vite-react/tests/owner-cache.test.ts": "8818e30fdd3071a2e5dc2d865161e0d9f40de1ff37813b0a396bb2e83dd08a1d",
+        "examples/vite-react/tests/owner-switch.test.ts": "c997c9758269586591cbf55de4651c64091abc9061b56edb024dcbf9dbaa9c1d",
+        "examples/vite-react/tests/user-writes.test.ts": "2492f48018e7d8e684eae1c8d302acc9961a1bfbd60bf3214c113dc1b6fbe54a",
+        "package.json": "dc41aa3f5b1633ffb2e6f6a0b7efb4e0119d74b9bc8c0003b1a8ee5fad854782",
+        "pnpm-workspace.yaml": "58fd69fb2ebc237bf589893fd3150ec0dd25988aee57f465f5b373b038aee606",
+        "scripts/decode-utf8.mts": "2e90c53e95c22b864a209a87c98084db6ec95e83f842007b21528d286d45c18c",
+        "scripts/measure-construction.mts": "10522cb10ab51fd44d8990896a2a73e8bf4d4cd2646441e958b6180cb1afd147",
+        "scripts/verify-docs-examples.mts": "9e379c826c5d7adafb1d6b59b526cbd59d3fd76b32f417da0ce2cd1bb40eb01c",
+        "scripts/verify-packed-consumer.mts": null,
+        "skills/effect-api-query/SKILL.md": "1939a0f7536f3e88e1e1106e8125019c11d6fdd4ada8ae4d010507f264b234e5",
+        "skills/effect-api-query/references/cache-workflows.md": "27bb96c48c84254ab8c379a529402f81cea3723c17d6396527c090a8c37e6f65",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "d84c787ccfc76b1f01f3d44d02d969ed9422af7d9dbdda862e661d65af9e44df",
+        "skills/effect-api-query/references/http.md": "9625411753fcc3ce816512f80158a19aa1057518ab3bfde98720e0cc7f845b66",
+        "skills/effect-api-query/references/hydration-and-ssr.md": "61e761b36ebcf56c7cc1b67b3d795edba52d0c0224c3e7964297ed6864e1b044",
+        "skills/effect-api-query/references/query-patterns.md": "33ea307b7042660da4ee4f6acea147d4218688a0256d82f3d582ff2e9cef4f9c",
+        "skills/effect-api-query/references/rpc.md": "f77eb39bb1b3e1f5f8c56f4b827ecef350a255a23380d8b9515dc61b54165d5d",
+        "src/core/operation.ts": "98e3a2103ffc29003e10398d90c0b05840ee2b6e93c687942d2577b86246fe84",
+        "src/core/schema-key.ts": "6e3ec8e7aa089ab6d2a85e71880f9bf4985f572b28e0b4325fcb0eed00b5dfd3",
+        "src/core/stream-snapshot.ts": "abd83051df4e7fd3e4de5f9147b029993d59e19e5dd72ee7b73d40ebae12acc7",
+        "src/core/streamed-query.ts": "094418739ed9216ef008960dd6aa4b99b261c375bd778c8679a58722d8a9eea5",
+        "src/core/types.ts": "c8e222c1d18736b2009fb67d4dcfb6985a87241ed2266d588decac32bd1b8f17",
+        "src/core/utility-tree.ts": "059fe4f87e72d367b38ca0d71d5313f5148e68fe1d3fc39010fed3d036f3c862",
+        "src/http/create-utils.ts": "56894da25c6a2c07ce5d251836b793c458ed869d7c0f29ce92c6d0fab89e6532",
+        "src/http/errors.ts": "dbe4aa9a4ce8c5c996f914387e9ec61568f774c5ea5a585c4f9480b13f97706b",
+        "src/http/operation.ts": "e0bb361315592289c816b03d0b318dc069c1611932593d778558c0a9d3f9568f",
+        "src/http/request.ts": "2416d809ab164a68b67627456686e52a6a49a5173790e652d129dcd503b1d424",
+        "src/http/streamed-query.ts": "d0a2522a99a4068b0420cbbcc83f65f8bc2dc911637b031148844d32938e4606",
+        "src/http/types.ts": "e63f305feae5452bbe125b46cbfc6ebaecabdf72c224ec6d4732daa798e250d9",
+        "src/index.ts": "95300336b198d7cec9a0113597970f462cb431718be9f2aae0fd64402b6655a4",
+        "src/rpc/create-utils.ts": "e25a361bee900850650b7d0d5bfaa6d8555d7ef48382f4125bd48cd440ba1c1f",
+        "src/rpc/errors.ts": "7e4fbde05e6dd3647f8a12f524a659b5c378ee27092ae4e28151effb7b2feb88",
+        "src/rpc/operation.ts": "017dea3ba6f270d84c19b4afd5fb5624bd2414e65634b54ce0d3467ebd1b3aca",
+        "src/rpc/streamed-query.ts": "35f399311a6fc6928df469d2d47312d2e0d0e12c8ae6e0e36b059c0a17a74878",
+        "src/rpc/types.ts": "f5fda172e9746512b1c51082eebaee7b5a16bd8b382d59b51ed80e07e8e552e3",
+        "tests/cache-recipes.test.ts": "2eee65e29e118b08bb0e17e4661f30e7b6e4d00f5f15bf55e070680a2eebb867",
+        "tests/create-http-api-query-utils.test.ts": "a76295644389a37e1a00a9825d192cbd0dceeab7d43e7ad1196c171ef5059ad1",
+        "tests/create-rpc-query-utils-configuration.test.ts": "839191fd31986c13f77585d191d643599426ce3294a930af421a26439b37b664",
+        "tests/create-rpc-query-utils-execution.test.ts": "8556cd62ba1ecdcc130c9a5d35f165b60d18a9c6f3f8eed30822f213ecd57e73",
+        "tests/create-rpc-query-utils-keys.test.ts": "e79abaa3659d9e212d1a1b3b923abe3493fcdb1d1ab5c92cd895df199043f9da",
+        "tests/create-rpc-query-utils-request-options.test.ts": "bcd76859a2830e522bdeb212be70f2e14be3b815da75a5caf3e596fd5fbd13e7",
+        "tests/create-rpc-query-utils-server-local.test.ts": "45ee329a736bcb6b114727ef8874f3f34541ce6dc55d5e13ffc80be9c2af2ddd",
+        "tests/create-rpc-query-utils-stream-baseline.test.ts": "cec0a8906b3512e38c0272dc07a4cac81402ac014549eb11f24a594d7b792616",
+        "tests/create-rpc-query-utils-stream-cache.test.ts": "c1a5588608e43b99bf98914d3e764d89e25d9f7dc47379e68316fd1f1332e935",
+        "tests/create-rpc-query-utils-stream-publication.test.ts": "cc3a25d02015b1410a8d1406249a846bf711f7b829fa7fccce1da90e600530d3",
+        "tests/create-rpc-query-utils-streaming.test.ts": "7b392709f029af806a6b42038c058dcd1645969581aafedb8696e8bf43e7507b",
+        "tests/create-rpc-query-utils.test.ts": "93589d8c857d716ce384a4a97d442d005f0501c890a524b69f6594f039fb530e",
+        "tests/fixtures/async.ts": "f9ccc474ad87dd5aedebc5660d74386de6551dd5f8900d572c485c11054ff6b9",
+        "tests/fixtures/docs-websocket-use.ts": "6e2aa0bb7b1a653ffc215bad7a39b9a79aa1a9b3707bb32b1e80f4636faac544",
+        "tests/fixtures/effect-rpc.ts": "73be762e670e37e4cc3cfcc2b1d40724f23721726d75b45524ad0b3aba78eb61",
+        "tests/fixtures/http-client.ts": "a0a77029f4c786c1616f24ce6aa44120de40e243d3dc5570d85d1767bb527a11",
+        "tests/fixtures/optimistic-users.ts": "0f8827553ee52ca4f4105c61006cf5a4fffce3e5170a3ca9e2216975f72a2a63",
+        "tests/fixtures/query-cache.ts": "ee6509aac5d0cf4f781652da10c2b1c3501a222ddd9a6b05f447e6a226548071",
+        "tests/fixtures/rpc-transport-queries.ts": "46be1d1e6048d57d83e9ae64b00c8c0c11deec6a67d0d4b115cdc9aac7447158",
+        "tests/fixtures/socket-client.ts": "d2d0a4a31011e2cfeec0e7e7ca996ad752a3a51db5675ac5efce54d284c8db89",
+        "tests/fixtures/user-events.ts": "13d8167b811bec6319de96f7cb50410f586c18cc92677d7fd17488b16d15b329",
+        "tests/fixtures/websocket-checks.ts": "7b8035264ece4e501e829b3e2b755f9d7b17c010ffa1036db6338a368ff6f93c",
+        "tests/http-cached-views.test.ts": "a1dc10f45dcc2d8a53c8b80e4205f6adb48646fba60a427b8531f02a26068725",
+        "tests/http-execution.test.ts": "d5869dc2faef8f2edf0f721173f40b352f1b2d70ef19919214a342b3bd82ea18",
+        "tests/http-hydration.test.ts": "1873ccb57214eb9542927fd92204cff9e98d2cc0217fd78fbeeb20bebd5e05b7",
+        "tests/http-live-query.test.ts": "79df219cb204669520c584123f167479ea3fa514d899897bf2810a04e8e1ca65",
+        "tests/http-multipart.test.ts": "ff816ffae79e827883cea1d1f99f5f763e95c9e856040627a34818df6569feb1",
+        "tests/http-query-options.test.ts": "bba47a56841732c7a3f3451ce100e9b864ab2fa6374bc7c8c912658e31c30a3a",
+        "tests/http-semantic-keys.test.ts": "2e78788697bdf7efec374669d8123da57c93df3c368d41920decfcd175bc2359",
+        "tests/http-transport-cancellation.test.ts": "e56f8571f949adc9d44f14b61e20edddb188a9565bf7a585859ffe73a851ac39",
+        "tests/http-view-proof.test.ts": "4dc91c38efe5b0c643ef61c98dcdf4a89acf4ef4c1651030124d82ca6cb55a61",
+        "tests/stream-snapshot.test.ts": "c419902fad27b91205ff5e4b65510ce9ed0c3d0969300c8891f1bc314a7ce0e5",
+        "tests/types/docs-http-quick-start.ts": "5f7eef98be244ea392fc2c5b527858f159a08efebf6f2665725301aa8a910050",
+        "tests/types/docs-hydration-async.ts": "de67135bf3da0dffdac47e9f2e49469edddac3d7d026fbd93d39aea6964c0dd8",
+        "tests/types/docs-hydration-dto.ts": "ebcd5c3895e8fa40bff3b62e8e13213e98a3e1c4796d89979b23ecc64cdc13ff",
+        "tests/types/docs-hydration-rich.ts": "56b35d7bb4a0f0ebc777161beb2e73a19dfc7de4db26fc74e3abab5d164f1402",
+        "tests/types/docs-hydration-views.ts": "08d75fe114e4a682fc0ad62b847898dba270672e0ce6d19a4f4d66cf92f75365",
+        "tests/types/docs-retry.ts": "30d8a5635399635c8b1a21ad77e7b1e2b6d12df4d032eaa95b1b0438da0486f2",
+        "tests/types/docs-rpc-quick-start.ts": "95deee30de122cbaa7b9cb28257c234aa1162a0b549a87cf50a80bd84e871081",
+        "tests/types/docs-stream-snapshot.ts": "bc924cff90a9f9a8e416bf7fbdfedbd607c88e7a678435aaf20ef878862e06ff",
+        "tests/types/docs-user-events.ts": "87647140d5434b95cc5389b1fea9919f20df7b6fcee4f00565836a4eae549a70",
+        "tests/types/http-contract.ts": "56bcbf5c82a1d0413e82d6db253c5bc0ae27a5e3121cd0fb28ea7bac9fcef1c8",
+        "tests/types/http-stream-contract.ts": "459968ad3ba9fc33c1435758b4520e8a8214c9d82db96b2d1704e86986919cf2",
+        "tests/types/http-type-scale.ts": "b456543b88316a2dd899f929efbffcf514e54e213e109b5f7d52eb785d2255aa",
+        "tests/types/http-view-proof.ts": "f42a1ebf36eeab7a906b722f5d2c2af0aabe8d30ef378fc50386c16d464fb64e",
+        "tests/types/public-contract.ts": "1adc90bd7d8f359e9b159d61cb5a8b98caa56c66e46a1109154c61e5cd1c4014",
+        "tests/types/server-local-client-contract.ts": "443a60788ce7d91a77459c99f07d3fc9bf70d5a64a83c05ece5c40cfac63d298",
+        "tests/types/snapshot-contract.ts": "9e6a2edaddb7545f20d351511ed99be2828d4ca56779503bcc443963d8b73716",
+        "tests/types/tanstack-start-contract.ts": "51681e3d0d7504a614d490f18adb6f44db82d34b9d4d7cb9cf941aea33de284f",
+        "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
+      },
+      "head": "f56fbfaa6c79e869f15e98d457b5ee6eb07d7b86",
+      "outcome": "no-change",
+      "reason": "All three shared planning documents remain accurate: the domain map retains the same ten tasks and reactive/ownership failure modes; the spec retains one skill, six references, assessed coverage and existing history; the tree retains the same identity, source globs covering both changed guides, prerequisites and package-only distribution. This guide clarification adds no task, seam, source mapping, dependency, or behavior, so no planning rewrite or artificial history entry is needed.",
+      "evidence": [
+        "Read _artifacts/domain_map.yaml, _artifacts/skill_spec.md and _artifacts/skill_tree.yaml against the two guide additions and unchanged seven-file skill.",
+        "Installed YAML parsing passed for map/tree, verified ten assessed tasks, one implemented skill with existing path/no prerequisites, and distribution.mode:none; native maintainer sync reported nothing to synchronize.",
+        "Fresh vp run docs-build and scoped format passed; documentation version scopes are historical recipe targets and do not widen the planning support claims.",
+        "Current native review contains only this planning item and the owned skill item; mapped documentation inputs are not separate unmapped source items. All other stored outcomes are preserved."
+      ]
+    },
+    "source:vite.config.ts": {
+      "fingerprint": "57dbfc7e8c7aef6e91365bfe7b602d9887ade22ddb5d4c3b1c76b3ea7926f512",
+      "snapshot": {
+        "vite.config.ts": "7d73304228494989a4f2351b6a2f1a5503592bc33aef034ceefd1146e18e8cf9"
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "Retired install/archive tasks and cache outputs are gone. Ordinary runtime tests depend on native pack and explicit public/server-local compiler fixtures; existing example/docs/browser/native package validation remains. A small optional source construction workload replaces the installed runner without timing or inventory gates. The current existing skill and planning record cover these boundaries.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: vite.config.ts."
+      ]
+    },
+    "source:.github/workflows/release.yml": {
+      "fingerprint": "528b10b43b0c4dc9b65c941d28a96cf3d4e962e97ecd1b5b5d6385105d335559",
+      "snapshot": {
+        ".github/workflows/release.yml": "5592cad0da1c67e86df1b789a0e991855dda653ef588e0b827b865b5f31963c2"
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "Verifier-only archive downloads, selection/export and consumer browser steps were retired. Native select-mode, pack, publish and pack-dir-artifact-id routing remain; main validation remains before future publication. No new developer integration task or publication occurred.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: .github/workflows/release.yml."
+      ]
+    },
+    "source:e2e/browser-test-config.ts": {
+      "fingerprint": "7f044710dcd47c87c51384327d1e78696cd6286d91a3d102a8345096303f507b",
+      "snapshot": {
+        "e2e/browser-test-config.ts": "d2678060fc23a55740e276b850a918f5f2847e0b4208135ff9fcacea5f8b7186"
+      },
+      "head": "4ea1e4329da229c4c9853ddc2f6a50a6309afe9e",
+      "outcome": "no-change",
+      "reason": "Config reads preserve missing versus empty CI values and the existing browser project, retry and reporter behavior. This repository-only configuration adds no library capability or developer guidance task.",
+      "evidence": [
+        "Base 4ea1e4329da229c4c9853ddc2f6a50a6309afe9e; actual changed sources and native review fingerprints in this report.",
+        "Uncached typecheck: 135 files, zero lint/type errors; strict Effect diagnostics:146 files, zero diagnostics; runtime:262 tests/34 files and both server compilers.",
+        "Fresh packed-package matrix:26 compiler validations,21 runtime fixtures per peer,4 frameworks,12 diagnostic cells,18 construction cases and6 bundles. Selected archive SHA512 437c863fbae5d097d5947330524c004f1bf10e33cb1334fc245818be36ccd1d969458c7ba1a0eb135326f4f7c4030cb22518bc8aa08d8b03e8d543353f9b2876.",
+        "Chromium/Firefox packed Window/Worker:4 tests pass; native app/docs production builds and docs parity pass.",
+        "Finite command probes:11 real-host cases pass, every owned child exits and temp directory is removed; six actual bundle gzip outputs match complete prior native level9 bytes and exclude platform-node.",
+        "Fallow, formatting and native skills validation pass. Native sync reports nothing to synchronize; guidance and all three planning documents remain byte-identical to the reviewed base. Root owns final managed all-engine and Release provenance acceptance."
+      ]
+    },
+    "source:e2e/packed-hosts.spec.ts": {
+      "fingerprint": "9e9ba0561b6bff5e039ac0ec9e15bb8d5f72faa9018ed33ed778f56ddc062a56",
+      "snapshot": {
+        "e2e/packed-hosts.spec.ts": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: e2e/packed-hosts.spec.ts."
+      ]
+    },
+    "source:playwright.docs.config.ts": {
+      "fingerprint": "88742c8a9cc26dfe39f3825c1cfc869c1caa5254015c82e42eb7a285d9e2b938",
+      "snapshot": {
+        "playwright.docs.config.ts": "1e4d72ce40ce1c640abc1478f9897ffd5c2c3b03e28b012c85b79e5f89f4d7e2"
+      },
+      "head": "4ea1e4329da229c4c9853ddc2f6a50a6309afe9e",
+      "outcome": "no-change",
+      "reason": "Config reads preserve missing versus empty docs URL and CI values while retaining the existing docs browser server and assertions. This repository-only configuration requires no shipped guidance change.",
+      "evidence": [
+        "Base 4ea1e4329da229c4c9853ddc2f6a50a6309afe9e; actual changed sources and native review fingerprints in this report.",
+        "Uncached typecheck: 135 files, zero lint/type errors; strict Effect diagnostics:146 files, zero diagnostics; runtime:262 tests/34 files and both server compilers.",
+        "Fresh packed-package matrix:26 compiler validations,21 runtime fixtures per peer,4 frameworks,12 diagnostic cells,18 construction cases and6 bundles. Selected archive SHA512 437c863fbae5d097d5947330524c004f1bf10e33cb1334fc245818be36ccd1d969458c7ba1a0eb135326f4f7c4030cb22518bc8aa08d8b03e8d543353f9b2876.",
+        "Chromium/Firefox packed Window/Worker:4 tests pass; native app/docs production builds and docs parity pass.",
+        "Finite command probes:11 real-host cases pass, every owned child exits and temp directory is removed; six actual bundle gzip outputs match complete prior native level9 bytes and exclude platform-node.",
+        "Fallow, formatting and native skills validation pass. Native sync reports nothing to synchronize; guidance and all three planning documents remain byte-identical to the reviewed base. Root owns final managed all-engine and Release provenance acceptance."
+      ]
+    },
+    "source:tsconfig.json": {
+      "fingerprint": "10c14204ed159b471589e626416e7d23f5beaa227be4445ca67d2b327ffec788",
+      "snapshot": {
+        "tsconfig.json": "b09f0f296c87d00794e3bebb9dbfbafa3d7e948daefe8cc67c6cbbf9d8b7563f"
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "Retired-suite exclusions and unused script allowances were removed. Retained source fixtures/workloads use the existing exact pinned unstable-Effect policy; strict compiler settings remain. Native diagnostics and both compiler tasks pass; the existing integration guidance is unchanged.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tsconfig.json."
+      ]
+    },
+    "source:.fallowrc.jsonc": {
+      "fingerprint": "2c6bb6ebb6e814610554e636e2d203764192734a848111efdedaf145cc0b62f6",
+      "snapshot": {
+        ".fallowrc.jsonc": "c0b0ec773be6b6247fd4e7a1db0229965323d01b40236e05f1fa7c3cbb0f95a1"
+      },
+      "head": "2e4ecf18e93a4ee086d74102c3addb5e2029be56",
+      "outcome": "no-change",
+      "reason": "The explicit ignored default-export path now names apps/docs/astro.config.mts. This preserves the existing framework-tooling export exception for the same unchanged configuration; native Fallow entry/production checks pass. No library integration task, shipped guidance, or planning source mapping changes.",
+      "evidence": [
+        "Author base 2e4ecf18e93a4ee086d74102c3addb5e2029be56. Rename apps/docs/astro.config.mjs to astro.config.mts, remove ts-check directive, and update only .fallowrc.jsonc ignoreExports path. Installed loader evidence: apps/docs/node_modules/astro/dist/core/config/config.js configPaths contains astro.config.mts.",
+        "vp run format apps/docs/astro.config.mts .fallowrc.jsonc passed. vp run fallow passed entry/production dead-code checks, duplicates task, and health threshold. vp run docs-build passed Astro check with zero errors/warnings/hints and build of 44 pages with valid internal links; unchanged documentation example parity was a native cache hit. Logs: /tmp/effect-api-query-implementation/notes/astro-mts-*.log.",
+        "Read _artifacts/domain_map.yaml, skill_spec.md, and skill_tree.yaml: existing library task/seam/ownership coverage and source globs remain accurate; no library behavior, guidance, dependency or installation change. Native sync changed nothing; review reports no owned skill/planning drift. No new independent consumer or browser execution is needed for this repository config rename."
+      ]
+    },
+    "source:.github/workflows/ci.yml": {
+      "fingerprint": "2cc9c350f72e4978f0a280c50fe092cebcb834c05c14fdc52d887da2be89872e",
+      "snapshot": {
+        ".github/workflows/ci.yml": "73d896c802c0f78b275c14144ddae557b7efbbe296599be041e54791cda9714f"
+      },
+      "head": "6893603eab70bd9d67e9848414eccc8a3421d870",
+      "outcome": "no-change",
+      "reason": "The existing read-only workflow retains structural skill validation and now runs the installed native maintainer check with full checkout history, the actual PR base through a quoted environment variable, and a GitHub summary. This maintainer gate changes no library integration behavior or recipe.",
+      "evidence": [
+        ".github/workflows/ci.yml parsed with the installed YAML parser; contents:read, persist-credentials:false, fetch-depth:0, structural gate, quoted PR-base env, and both native check branches verified.",
+        "Installed native maintainer-commands.md and workflow-security.md reviewed before this existing workflow edit.",
+        "Current batch: scoped vp run format, native vp run skills-check, and installed YAML parsing passed; vp exec intent maintainer sync reported nothing to synchronize."
+      ]
+    },
+    "source:tests/packed-consumer/construction-baseline.mts": {
+      "fingerprint": "2db4e2c633021aa1fb6f3dbbb8b394c86022069f2f9655073cfc72e6f8a47c3e",
+      "snapshot": {
+        "tests/packed-consumer/construction-baseline.mts": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/construction-baseline.mts."
+      ]
+    },
+    "source:tests/packed-consumer/defaults-runtime.mts": {
+      "fingerprint": "5ec112a9737bc4e08d284035605f377997cbf9629e448601e41b2c678f55f34b",
+      "snapshot": {
+        "tests/packed-consumer/defaults-runtime.mts": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/defaults-runtime.mts."
+      ]
+    },
+    "source:tests/packed-consumer/events-runtime.mts": {
+      "fingerprint": "b4e841203f2c682e2c21756041e977df85a95ae4ee572fd50cdd1d7b905d1b2f",
+      "snapshot": {
+        "tests/packed-consumer/events-runtime.mts": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/events-runtime.mts."
+      ]
+    },
+    "source:tests/packed-consumer/filter-runtime.mts": {
+      "fingerprint": "9da257cfe3f1b140fd6b7e986b0e6858a4482fcf9358481c808ec02ddc8fee9a",
+      "snapshot": {
+        "tests/packed-consumer/filter-runtime.mts": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/filter-runtime.mts."
+      ]
+    },
+    "source:tests/packed-consumer/hashing-runtime.mts": {
+      "fingerprint": "a1facbc16a85798759d9b043d7430b85c737c453636250f2601fa3025a7777b2",
+      "snapshot": {
+        "tests/packed-consumer/hashing-runtime.mts": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/hashing-runtime.mts."
+      ]
+    },
+    "source:tests/packed-consumer/hosts/index.html": {
+      "fingerprint": "c1e73f22bfc41d87b6da1dedf8fdfda3a1672a66bd3dcaed74f7304171ad0771",
+      "snapshot": {
+        "tests/packed-consumer/hosts/index.html": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/hosts/index.html."
+      ]
+    },
+    "source:tests/packed-consumer/http-etag-recipe.mts": {
+      "fingerprint": "6221d54620d4050f75a5eb0f740d8372c666aef38889e5cbe51f803f59352208",
+      "snapshot": {
+        "tests/packed-consumer/http-etag-recipe.mts": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/http-etag-recipe.mts."
+      ]
+    },
+    "source:tests/packed-consumer/http-live-runtime.mts": {
+      "fingerprint": "d5bd5bc8ddeb7894dc01727f4a67df765c82abc3f1d9d011d8461188e6f1c7ef",
+      "snapshot": {
+        "tests/packed-consumer/http-live-runtime.mts": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/http-live-runtime.mts."
+      ]
+    },
+    "source:tests/packed-consumer/http-metadata-runtime.mts": {
+      "fingerprint": "6bfcd0fe37114c6de756518a4c159ee72bc657bea8b5e11b183d5e1e2fa4bc61",
+      "snapshot": {
+        "tests/packed-consumer/http-metadata-runtime.mts": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/http-metadata-runtime.mts."
+      ]
+    },
+    "source:tests/packed-consumer/http-runtime.mts": {
+      "fingerprint": "b47aa78c183c3d0fc93665760cc56b982a0e20271d3bd282c87f480fe37dfd2f",
+      "snapshot": {
+        "tests/packed-consumer/http-runtime.mts": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/http-runtime.mts."
+      ]
+    },
+    "source:tests/packed-consumer/http-stream-runtime.mts": {
+      "fingerprint": "ef685c9517a31d78c728d40668620a77cd6a5f24885c35b3ed96a3d1583f581c",
+      "snapshot": {
+        "tests/packed-consumer/http-stream-runtime.mts": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/http-stream-runtime.mts."
+      ]
+    },
+    "source:tests/packed-consumer/hydration-runtime.mts": {
+      "fingerprint": "5ab1a94b3756217c9a994b11cf3e3762649ae2859ed9bcbd1fe6ac35e889b303",
+      "snapshot": {
+        "tests/packed-consumer/hydration-runtime.mts": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/hydration-runtime.mts."
+      ]
+    },
+    "source:tests/packed-consumer/hydration-views-runtime.mts": {
+      "fingerprint": "077263ad073837a5f9169898e7edcf32c2ea2dedfc8b7ae2d8322d31b93038a1",
+      "snapshot": {
+        "tests/packed-consumer/hydration-views-runtime.mts": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/hydration-views-runtime.mts."
+      ]
+    },
+    "source:tests/packed-consumer/openapi-generate.mjs": {
+      "fingerprint": "7b87bbea6ce7e695fe4efd6728dac46268db7ae6df87cfc73f9311d321eea024",
+      "snapshot": {
+        "tests/packed-consumer/openapi-generate.mjs": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/openapi-generate.mjs."
+      ]
+    },
+    "source:tests/packed-consumer/openapi-runtime.mts": {
+      "fingerprint": "5ba484af38a27be547136319447d880647f407e16369ab572508e311e3cb0f4f",
+      "snapshot": {
+        "tests/packed-consumer/openapi-runtime.mts": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/openapi-runtime.mts."
+      ]
+    },
+    "source:tests/packed-consumer/optimistic-runtime.mts": {
+      "fingerprint": "c88cb433ff279a599f068dfe5e9f8c619b18725bb1f8242f736b2ff85ee0c2cb",
+      "snapshot": {
+        "tests/packed-consumer/optimistic-runtime.mts": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/optimistic-runtime.mts."
+      ]
+    },
+    "source:tests/packed-consumer/owner-cache-runtime.mts": {
+      "fingerprint": "6d7531302af18cd77d98144494cfba587a9df2f235b6cc8b7abfbba35bf2f954",
+      "snapshot": {
+        "tests/packed-consumer/owner-cache-runtime.mts": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/owner-cache-runtime.mts."
+      ]
+    },
+    "source:tests/packed-consumer/retry-runtime.mts": {
+      "fingerprint": "d5cf2283a0e6d6bce385b062c75c6381096b3b7581f206255a406473076dc87a",
+      "snapshot": {
+        "tests/packed-consumer/retry-runtime.mts": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/retry-runtime.mts."
+      ]
+    },
+    "source:tests/packed-consumer/runtime.mts": {
+      "fingerprint": "052904fd6d20ba06c524d632b3034e375ad01fa986e11d40b2eaa9768063788b",
+      "snapshot": {
+        "tests/packed-consumer/runtime.mts": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/runtime.mts."
+      ]
+    },
+    "source:tests/packed-consumer/snapshot-runtime.mts": {
+      "fingerprint": "8259933d616d9d06402538b9103d65cd7a5b3885368ad3e938270fccb0240ab9",
+      "snapshot": {
+        "tests/packed-consumer/snapshot-runtime.mts": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/snapshot-runtime.mts."
+      ]
+    },
+    "source:tests/packed-consumer/start-ssr-runtime.mts": {
+      "fingerprint": "112e744ec9746a23719715bbbeb14c7defa2a0bda1cd658d2f15e059ba84b365",
+      "snapshot": {
+        "tests/packed-consumer/start-ssr-runtime.mts": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/start-ssr-runtime.mts."
+      ]
+    },
+    "source:tests/packed-consumer/stream-cause-runtime.mts": {
+      "fingerprint": "771bc77ee9ebaddfcbf0faab92e6081090c2d500638efe7b261b52bcd72b5e4c",
+      "snapshot": {
+        "tests/packed-consumer/stream-cause-runtime.mts": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/stream-cause-runtime.mts."
+      ]
+    },
+    "source:tests/packed-consumer/stream-policy-runtime.mts": {
+      "fingerprint": "f427fd75c4d9ea5ce8b2bf079639a480d5c3f075d84295afe70ea57d7fdfba40",
+      "snapshot": {
+        "tests/packed-consumer/stream-policy-runtime.mts": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/stream-policy-runtime.mts."
+      ]
+    },
+    "source:tests/packed-consumer/svelte-consumer.svelte": {
+      "fingerprint": "7318224e4fb8906d47fdad76f628ae164bd4f971d95044fb39e7ca64de2ffedc",
+      "snapshot": {
+        "tests/packed-consumer/svelte-consumer.svelte": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/svelte-consumer.svelte."
+      ]
+    },
+    "source:tests/packed-consumer/tsconfig.contract-baseline.json": {
+      "fingerprint": "7220c01ba1fb0f402db20171b85a28cc7f7b42772fd77103cef737e651268e48",
+      "snapshot": {
+        "tests/packed-consumer/tsconfig.contract-baseline.json": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/tsconfig.contract-baseline.json."
+      ]
+    },
+    "source:tests/packed-consumer/tsconfig.http-baseline.json": {
+      "fingerprint": "2b8d1e5386292abd98a887d9d9301473b459f07afa432f7b205f72dc4468a950",
+      "snapshot": {
+        "tests/packed-consumer/tsconfig.http-baseline.json": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/tsconfig.http-baseline.json."
+      ]
+    },
+    "source:tests/packed-consumer/tsconfig.json": {
+      "fingerprint": "b2dc5cd5cfe3037f52b6ea99dafb1e44fc9883618d8185c21f2c4e615d26e774",
+      "snapshot": {
+        "tests/packed-consumer/tsconfig.json": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/tsconfig.json."
+      ]
+    },
+    "source:tests/packed-consumer/tsconfig.openapi.json": {
+      "fingerprint": "8f8116d97024d0a2e05767869a9e233ab1e221d84aff665370f3c06aea3c0048",
+      "snapshot": {
+        "tests/packed-consumer/tsconfig.openapi.json": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/tsconfig.openapi.json."
+      ]
+    },
+    "source:tests/packed-consumer/tsconfig.rpc-baseline.json": {
+      "fingerprint": "cdbbc17ee54aa1ab6ae0ef187a00bd76e81bc26cc75aefcebd4d4d9585d49376",
+      "snapshot": {
+        "tests/packed-consumer/tsconfig.rpc-baseline.json": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/tsconfig.rpc-baseline.json."
+      ]
+    },
+    "source:tests/packed-consumer/tsconfig.svelte-angular.json": {
+      "fingerprint": "21e4f12b9c6e725ca94bffc649c26f5b8a125e343efc9c67ec54ac5b0eb026c3",
+      "snapshot": {
+        "tests/packed-consumer/tsconfig.svelte-angular.json": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/tsconfig.svelte-angular.json."
+      ]
+    },
+    "source:tests/packed-consumer/tsconfig.tanstack-start.json": {
+      "fingerprint": "99299e38f61454d0bf1f46cdbd4b1803bad701672db87f21daf4dadaf0a50e2a",
+      "snapshot": {
+        "tests/packed-consumer/tsconfig.tanstack-start.json": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/tsconfig.tanstack-start.json."
+      ]
+    },
+    "source:tests/packed-consumer/tsconfig.vue-solid.json": {
+      "fingerprint": "e41810781fe3686f468994808ecc088eefde747465d8536a86d51cd460faacd5",
+      "snapshot": {
+        "tests/packed-consumer/tsconfig.vue-solid.json": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/tsconfig.vue-solid.json."
+      ]
+    },
+    "source:tests/packed-consumer/websocket-runtime.mts": {
+      "fingerprint": "772eebcc6b477be6542761906cfbda3a7a6d5784feb37b0bc87fa3dc2e78ef02",
+      "snapshot": {
+        "tests/packed-consumer/websocket-runtime.mts": null
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "This retired installed-consumer runtime, isolated compiler configuration or dedicated packed-host control was deleted under the revised scope. Only uncovered cache/stream/metadata/snapshot and recipe behavior remains in ordinary public-factory/source tests or explicit public compiler fixtures; existing application coverage remains. This maintenance removal does not require an independent skill, and certification claims were removed from the existing guidance.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/packed-consumer/websocket-runtime.mts."
+      ]
+    },
+    "source:tests/types/tsconfig.json": {
+      "fingerprint": "0fb4e26b8ea5ff9a95e9513aebea785a54821f1e52aea1003706273d53cef362",
+      "snapshot": {
+        "tests/types/tsconfig.json": "7822fb2eefd36af2218cabb11893a00d70d6fd98d6a8ba03f100d6e5fe438ed9"
+      },
+      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "outcome": "no-change",
+      "reason": "The ordinary strict compiler project explicitly includes retained public declaration and documentation fixtures and inherits the existing repository strict settings. Both installed compilers pass after native pack; it adds no installation or peer matrix and requires no separate usage skill.",
+      "evidence": [
+        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: tests/types/tsconfig.json."
+      ]
+    },
+    "source:apps/docs/astro.config.mjs": {
+      "fingerprint": "b235762ea71837b6baccbfcaa7064ba8bdf99fc1f45eb6ca6e70b31d209f970e",
+      "snapshot": {
+        "apps/docs/astro.config.mjs": null
+      },
+      "head": "2e4ecf18e93a4ee086d74102c3addb5e2029be56",
+      "outcome": "no-change",
+      "reason": "The authored JavaScript config is removed in favor of astro.config.mts, with the same imports, JSON import attribute, and complete Astro/Starlight configuration. Only the redundant JavaScript ts-check directive disappears. Removing the old path lets installed Astro discover the .mts file; no runtime setting, public API, recipe or support claim changes, so shipped guidance and planning remain accurate.",
+      "evidence": [
+        "Author base 2e4ecf18e93a4ee086d74102c3addb5e2029be56. Rename apps/docs/astro.config.mjs to astro.config.mts, remove ts-check directive, and update only .fallowrc.jsonc ignoreExports path. Installed loader evidence: apps/docs/node_modules/astro/dist/core/config/config.js configPaths contains astro.config.mts.",
+        "vp run format apps/docs/astro.config.mts .fallowrc.jsonc passed. vp run fallow passed entry/production dead-code checks, duplicates task, and health threshold. vp run docs-build passed Astro check with zero errors/warnings/hints and build of 44 pages with valid internal links; unchanged documentation example parity was a native cache hit. Logs: /tmp/effect-api-query-implementation/notes/astro-mts-*.log.",
+        "Read _artifacts/domain_map.yaml, skill_spec.md, and skill_tree.yaml: existing library task/seam/ownership coverage and source globs remain accurate; no library behavior, guidance, dependency or installation change. Native sync changed nothing; review reports no owned skill/planning drift. No new independent consumer or browser execution is needed for this repository config rename."
+      ]
+    },
+    "source:apps/docs/astro.config.mts": {
+      "fingerprint": "a203f42f861dd5c68e83ad5196f881fd30a98b99e9378bdf8137569697216d8b",
+      "snapshot": {
+        "apps/docs/astro.config.mts": "397aafc4621e59a3df38395dab8ae88f7dab3c86d121399c25f3e79dcbd23d85"
+      },
+      "head": "2e4ecf18e93a4ee086d74102c3addb5e2029be56",
+      "outcome": "no-change",
+      "reason": "This is the existing Astro configuration under an explicitly TypeScript ESM extension. Installed Astro 7.3.5 discovers .mts configurations; ordinary Astro diagnostics and the complete static documentation build load it successfully. The source settings, plugins, paths and site content are preserved. It remains repository tooling, outside the shipped integration skill source scope, so no new mapping or guidance task is warranted.",
+      "evidence": [
+        "Author base 2e4ecf18e93a4ee086d74102c3addb5e2029be56. Rename apps/docs/astro.config.mjs to astro.config.mts, remove ts-check directive, and update only .fallowrc.jsonc ignoreExports path. Installed loader evidence: apps/docs/node_modules/astro/dist/core/config/config.js configPaths contains astro.config.mts.",
+        "vp run format apps/docs/astro.config.mts .fallowrc.jsonc passed. vp run fallow passed entry/production dead-code checks, duplicates task, and health threshold. vp run docs-build passed Astro check with zero errors/warnings/hints and build of 44 pages with valid internal links; unchanged documentation example parity was a native cache hit. Logs: /tmp/effect-api-query-implementation/notes/astro-mts-*.log.",
+        "Read _artifacts/domain_map.yaml, skill_spec.md, and skill_tree.yaml: existing library task/seam/ownership coverage and source globs remain accurate; no library behavior, guidance, dependency or installation change. Native sync changed nothing; review reports no owned skill/planning drift. No new independent consumer or browser execution is needed for this repository config rename."
+      ]
+    },
+    "source:docs/adr/0016-automate-releases-with-changesets.md": {
+      "fingerprint": "6ef98996d907f829fdbb01507863ffb03582e7a4ce75f2739bb5a29f2fac03bf",
+      "snapshot": {
+        "docs/adr/0016-automate-releases-with-changesets.md": "35b5cdc29855b561c502d4bc5de33bbbbdd757ff69be55f13808d24176d5c67e"
+      },
+      "head": "6893603eab70bd9d67e9848414eccc8a3421d870",
+      "outcome": "no-change",
+      "reason": "The ADR distinguishes initial unpublished candidate preparation from post-publication Changesets and preserves main-only trusted publishing. This release decision changes neither public integrations nor the existing framework/host and runtime ownership guidance.",
+      "evidence": [
+        "Reviewed the complete ADR diff from 5b91ddb to 6893603.",
+        "Release run 38085762195 validated and packed the exact 6893603 candidate; publishing and deployment were skipped as intended.",
+        "Current batch: scoped vp run format, native vp run skills-check, and installed YAML parsing passed; vp exec intent maintainer sync reported nothing to synchronize."
+      ]
+    },
+    "source:docs/adr/0017-quarantine-new-dependency-releases-for-seven-days.md": {
+      "fingerprint": "4be5f1ac6db00f4e928006c3e6230947279e5df2ecc5203eb48d4c96a490607a",
+      "snapshot": {
+        "docs/adr/0017-quarantine-new-dependency-releases-for-seven-days.md": "683309834b8c9e15b801ff9a7e640a6facf47a26690765deaf7a5e0a540dcef6"
+      },
+      "head": "6893603eab70bd9d67e9848414eccc8a3421d870",
+      "outcome": "no-change",
+      "reason": "The ADR makes missing publication times fail closed and applies the same strict age policy to isolated consumers and frozen installs. Existing consumer API guidance and qualified dependency versions remain accurate; no new integration task is introduced.",
+      "evidence": [
+        "Reviewed the complete ADR diff from 5b91ddb to 6893603; pnpm-workspace.yaml policy remains unchanged.",
+        "Native eligible Intent 0.5.3 upgrade and isolated Skills CLI 1.7.0 install succeeded under minimumReleaseAge:10080, Strict:true, IgnoreMissingTime:false, trustLockfile:false without exceptions.",
+        "Current batch: scoped vp run format, native vp run skills-check, and installed YAML parsing passed; vp exec intent maintainer sync reported nothing to synchronize."
+      ]
+    },
+    "source:e2e/tanstack-start.spec.ts": {
+      "fingerprint": "ed1590bcfc4446b7fddb2924b2813b63d04124961f04f3ffb96fa2b719498b24",
+      "snapshot": {
+        "e2e/tanstack-start.spec.ts": "b50a8fd958cce8e66c3081aa0e7d2a4e759e67580efc3d8da6d7c251b36c6fcc"
+      },
+      "head": "6893603eab70bd9d67e9848414eccc8a3421d870",
+      "outcome": "no-change",
+      "reason": "The added reload assertion verifies that the shared directory mutation remains visible through server rendering. Existing hydration guidance already requires matching representations and independent server/browser owners; an acceptance assertion adds no new consumer contract.",
+      "evidence": [
+        "Reviewed the complete test diff from 5b91ddb to 6893603 against skills/effect-api-query/references/hydration-and-ssr.md.",
+        "Source 6893603: CI 38085762210 passed source quality, both example builds, documentation, and Chromium/Firefox/WebKit acceptance; saved final-mts-ci.json and final-mts-ci.log."
+      ]
+    },
+    "source:e2e/vite-react.spec.ts": {
+      "fingerprint": "cb02aba2d2d073025a375e34532f922c265466c21416ffa95a64a605afdb252e",
+      "snapshot": {
+        "e2e/vite-react.spec.ts": "e730e19cebf8ac11895bff4b466e9882f707666d1417ff6aaaef2df78aa30f64"
+      },
+      "head": "6893603eab70bd9d67e9848414eccc8a3421d870",
+      "outcome": "no-change",
+      "reason": "The pagehide storage-failure case verifies one handled disposal rejection, resource cleanup, and no page error. Existing cache-owner guidance already tells lifecycle callbacks to handle rejected disposal while completing cleanup.",
+      "evidence": [
+        "Reviewed the complete test diff from 5b91ddb to 6893603 against the disposal policy in skills/effect-api-query/references/cache-workflows.md.",
+        "Source 6893603: CI 38085762210 passed source quality, both example builds, documentation, and Chromium/Firefox/WebKit acceptance; saved final-mts-ci.json and final-mts-ci.log."
+      ]
+    },
+    "source:examples/tanstack-start/src/routes/index.tsx": {
+      "fingerprint": "a56fc6c1a96f303b4dda65d866efc454add3b44c6e201b1a62a2e53b94a3e513",
+      "snapshot": {
+        "examples/tanstack-start/src/routes/index.tsx": "857ac39eca9264b8df23814108092540aea6409b94019b6ed14c88262b1ca937"
+      },
+      "head": "6893603eab70bd9d67e9848414eccc8a3421d870",
+      "outcome": "no-change",
+      "reason": "Routing stream capture through the request context tracks the same snapshot in its owning request lifecycle. Existing SSR guidance already requires capture/preparation settlement and local finalizers before disposing request clients.",
+      "evidence": [
+        "Reviewed the complete route diff from 5b91ddb to 6893603 and skills/effect-api-query/references/hydration-and-ssr.md.",
+        "Source 6893603: CI 38085762210 passed source quality, both example builds, documentation, and Chromium/Firefox/WebKit acceptance; saved final-mts-ci.json and final-mts-ci.log."
+      ]
+    },
+    "source:examples/vite-react/src/components/sections/commands-section.tsx": {
+      "fingerprint": "a00dc770d73fd319e4da616e87460baaf5b0d415c7143437c3959b35fe2b20df",
+      "snapshot": {
+        "examples/vite-react/src/components/sections/commands-section.tsx": "113856c225c332dacf328f9d06b3ea98f3a56b288f5b1bdb9fa98c8d1e326cf3"
+      },
+      "head": "6893603eab70bd9d67e9848414eccc8a3421d870",
+      "outcome": "no-change",
+      "reason": "Start/cancel mutations now use the application mutation tracker and guard reconciliation with the originating owner. Existing cache guidance already distinguishes local retirement from remote command cancellation and preserves originating actions after awaits.",
+      "evidence": [
+        "Reviewed the complete component diff from 5b91ddb to 6893603 and skills/effect-api-query/references/cache-workflows.md.",
+        "Source 6893603: CI 38085762210 passed source quality, both example builds, documentation, and Chromium/Firefox/WebKit acceptance; saved final-mts-ci.json and final-mts-ci.log."
+      ]
+    },
+    "source:examples/vite-react/src/components/sections/diagnostics-section.tsx": {
+      "fingerprint": "be2a2add266d90ffc3b2a87a16f23492d57024bb88f69d176767edbcda3179a5",
+      "snapshot": {
+        "examples/vite-react/src/components/sections/diagnostics-section.tsx": "257ed7b14a4a971a1ee3547cd5e45a801425f25071ae53eb2ffb9d521b9b68ad"
+      },
+      "head": "6893603eab70bd9d67e9848414eccc8a3421d870",
+      "outcome": "no-change",
+      "reason": "Tracking the declared-failure mutation makes diagnostics obey the application-owned mutation drain. Existing cache-owner guidance already requires accepted mutations to settle before ready-client release; the error contract is unchanged.",
+      "evidence": [
+        "Reviewed the complete component diff from 5b91ddb to 6893603 and the owner replacement sequence in skills/effect-api-query/references/cache-workflows.md.",
+        "Source 6893603: CI 38085762210 passed source quality, both example builds, documentation, and Chromium/Firefox/WebKit acceptance; saved final-mts-ci.json and final-mts-ci.log."
+      ]
+    },
+    "source:examples/vite-react/src/components/sections/http-section.tsx": {
+      "fingerprint": "e0f0733aa85363147a8ad802fe4977a45bd920e82daa0d99884c7291a5953762",
+      "snapshot": {
+        "examples/vite-react/src/components/sections/http-section.tsx": "089876bb63fe88d62f0a5ec191e44e85bf93de1dbcd8b329f63b191b7911d0ca"
+      },
+      "head": "6893603eab70bd9d67e9848414eccc8a3421d870",
+      "outcome": "no-change",
+      "reason": "HTTP creates/deletes now use the shared write coordinator, track the failure demonstration, and disable deletion of temporary IDs. Existing guidance already reserves individual optimistic entities, preserves neighboring writes, and checks the originating owner; request builders are unchanged.",
+      "evidence": [
+        "Reviewed the complete component diff from 5b91ddb to 6893603 against skills/effect-api-query/references/cache-workflows.md and references/http.md.",
+        "Source 6893603: CI 38085762210 passed source quality, both example builds, documentation, and Chromium/Firefox/WebKit acceptance; saved final-mts-ci.json and final-mts-ci.log."
+      ]
+    },
+    "source:examples/vite-react/src/components/sections/mutations-section.tsx": {
+      "fingerprint": "d8883900b79077c3da3a9567125caa509d1982a184fe0d5c1ccafb5b5514e4e1",
+      "snapshot": {
+        "examples/vite-react/src/components/sections/mutations-section.tsx": "c2bf278014950f0e4a8d66d0cf397811858fae00f8284cb1ed01168c766a7b6a"
+      },
+      "head": "6893603eab70bd9d67e9848414eccc8a3421d870",
+      "outcome": "no-change",
+      "reason": "Seed/reset mutations enter the application tracker while existing application-owned invalidation remains in place. Existing guidance already requires every participating write and reconciliation to follow the owner lifecycle.",
+      "evidence": [
+        "Reviewed the complete component diff from 5b91ddb to 6893603 and skills/effect-api-query/references/cache-workflows.md.",
+        "Source 6893603: CI 38085762210 passed source quality, both example builds, documentation, and Chromium/Firefox/WebKit acceptance; saved final-mts-ci.json and final-mts-ci.log."
+      ]
+    },
+    "source:examples/vite-react/src/components/users/create-user-form.tsx": {
+      "fingerprint": "1768011de182927bc8d5a0341f65f7e323cfccf6f76152578bc25d877a54ded3",
+      "snapshot": {
+        "examples/vite-react/src/components/users/create-user-form.tsx": "1c89f7235da5c16d6a2f3c3dc0bf81d33234a8d65c1e2c687e54255b10017690"
+      },
+      "head": "6893603eab70bd9d67e9848414eccc8a3421d870",
+      "outcome": "no-change",
+      "reason": "Creation delegates to the shared RPC write coordinator instead of invalidating from the form. Existing optimistic-write guidance already assigns entity reservation, commit, rollback, and final reconciliation to application-owned actions.",
+      "evidence": [
+        "Reviewed the complete component diff from 5b91ddb to 6893603 against skills/effect-api-query/references/cache-workflows.md.",
+        "Source 6893603: CI 38085762210 passed source quality, both example builds, documentation, and Chromium/Firefox/WebKit acceptance; saved final-mts-ci.json and final-mts-ci.log."
+      ]
+    },
+    "source:examples/vite-react/src/components/users/user-list.tsx": {
+      "fingerprint": "74b615716653bc7b6ce5ec65939f0e0749bf3a7c470c9635c42878bc7af3d789",
+      "snapshot": {
+        "examples/vite-react/src/components/users/user-list.tsx": "4bff61d9e094f94f720f1351d206bf3d2d31fb9a8c0d0f3cdec904db701c434a"
+      },
+      "head": "6893603eab70bd9d67e9848414eccc8a3421d870",
+      "outcome": "no-change",
+      "reason": "Deletion delegates to the shared RPC write coordinator; pending temporary users display their state and cannot be deleted. Existing guidance already allocates temporary IDs per write and preserves neighboring optimistic entities, with no public API change.",
+      "evidence": [
+        "Reviewed the complete component diff from 5b91ddb to 6893603 against skills/effect-api-query/references/cache-workflows.md.",
+        "Source 6893603: CI 38085762210 passed source quality, both example builds, documentation, and Chromium/Firefox/WebKit acceptance; saved final-mts-ci.json and final-mts-ci.log."
+      ]
+    },
+    "source:examples/vite-react/src/hooks/use-slow-query-cancellation.ts": {
+      "fingerprint": "5d15e7915a554f041ccec537294f63a591016ef79a04d0a986cdf36fef89b710",
+      "snapshot": {
+        "examples/vite-react/src/hooks/use-slow-query-cancellation.ts": "6de14cf383862176674f3ac3cdc6651b54a3f63fe3fa866419d1274501a96057"
+      },
+      "head": "6893603eab70bd9d67e9848414eccc8a3421d870",
+      "outcome": "no-change",
+      "reason": "The helper receives an originating-owner activity guard and checks it before and after asynchronous status reads. Existing guidance already guards late side effects after owner replacement and treats remote command cancellation separately from local query cancellation.",
+      "evidence": [
+        "Reviewed the complete hook diff from 5b91ddb to 6893603 against skills/effect-api-query/references/cache-workflows.md and references/frameworks-and-hosts.md.",
+        "Source 6893603: CI 38085762210 passed source quality, both example builds, documentation, and Chromium/Firefox/WebKit acceptance; saved final-mts-ci.json and final-mts-ci.log."
+      ]
+    },
+    "source:tests/fixtures/tsconfig.server-local.json": {
+      "fingerprint": "3531d0da011912efd6ff745f45fd9407badcf84d19257252d43c3d13679a32aa",
+      "snapshot": {
+        "tests/fixtures/tsconfig.server-local.json": "870aa1b0555c672cc89142854f6f4328dd718272abc78d1efa28a01d878e949f"
+      },
+      "head": "6893603eab70bd9d67e9848414eccc8a3421d870",
+      "outcome": "no-change",
+      "reason": "The added compiler configuration scopes the existing server-local RPC contract fixture under ordinary repository type checks. It changes validation placement without changing an exported type or introducing a consumer recipe.",
+      "evidence": [
+        "Reviewed the seven-line configuration and its server-local RPC/type-contract includes from 5b91ddb to 6893603.",
+        "Source-quality CI 38085762210 ran the native test prerequisite that checks this fixture with both configured TypeScript versions; saved final-mts-ci.log.",
+        "Current batch: scoped vp run format, native vp run skills-check, and installed YAML parsing passed; vp exec intent maintainer sync reported nothing to synchronize."
+      ]
+    },
+    "source:tests/packed-consumer/tsconfig.type-scale.json": {
+      "fingerprint": "ed8ba74d56e70784820e5369ead1b0aea87da056caffeb5e61daeb4c68c55b4d",
+      "snapshot": {
+        "tests/packed-consumer/tsconfig.type-scale.json": null
+      },
+      "head": "6893603eab70bd9d67e9848414eccc8a3421d870",
+      "outcome": "no-change",
+      "reason": "Removing the redundant packed-consumer compiler configuration leaves type-scale coverage in ordinary repository fixtures. Existing guidance already bounds measurements to their fixtures and makes no installed-consumer budget claim.",
+      "evidence": [
+        "Reviewed the deleted configuration from 5b91ddb to 6893603 and the retained tests/types fixtures plus _artifacts/skill_spec.md measurement boundary.",
+        "Source 6893603: CI 38085762210 passed source quality, both example builds, documentation, and Chromium/Firefox/WebKit acceptance; saved final-mts-ci.json and final-mts-ci.log.",
+        "Current batch: scoped vp run format, native vp run skills-check, and installed YAML parsing passed; vp exec intent maintainer sync reported nothing to synchronize."
+      ]
+    }
+  }
+}

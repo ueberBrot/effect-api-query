@@ -10,11 +10,17 @@ Each unary RPC leaf also exposes:
 | Builder                     | Result                                                                                                       |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------ |
 | `queryKey(input?)`          | Payload-specific, data-tagged query key. Payload-bearing RPCs require constructor input.                     |
-| `queryOptions(options?)`    | Fresh Query Core options with generated `queryFn`, `queryKey`, and `queryKeyHashFn`.                         |
+| `queryOptions(options?)`    | Fresh Query Core options with generated `queryFn` and `queryKey`.                                            |
 | `infiniteKey(input?)`       | Data-tagged infinite-query key derived from the initial page's payload.                                      |
 | `infiniteOptions(options)`  | Fresh infinite-query options that map each `pageParam` to an RPC payload.                                    |
 | `mutationKey()`             | Immutable operation key shared by mutations of this RPC.                                                     |
 | `mutationOptions(options?)` | Fresh mutation options with generated `mutationFn` and `mutationKey`. Pass variables when the mutation runs. |
+
+Omitting `payload` or declaring `Schema.Void` makes an RPC payloadless. `Schema.Unknown`,
+`Schema.Any`, and unions containing `Schema.Void` remain payload-bearing: key builders accept their
+constructor input, query builders require an `input` field, and infinite queries require a page-input
+mapper. Mutation variables and custom encoders retain the declaration's input and normalized payload
+types, respectively.
 
 Payloadless query builders take no input. Payload-bearing builders require an `input` field:
 
@@ -37,17 +43,18 @@ const options = rpcQuery.users.get.queryOptions({
 `queryOptions`, `streamedOptions`, and `liveOptions` also accept the direct `skipToken` shorthand.
 The object form preserves applicable caller options. The builder consumes `input` and, for
 accumulated streams, `refetchMode` and `maxChunks`, removing them from the returned options.
-Skipped options retain the exact sentinel, operation-level key, and package-owned hash function.
+Skipped options retain the exact sentinel and operation-level key.
 
 `queryOptions`, `streamedOptions`, and `liveOptions` accept conditional `input` unions of payload
 constructor input and `skipToken`. Concrete inputs retain callable query functions and
 payload-specific keys. Conditional inputs retain the possible sentinel and both key shapes.
+Inputs typed `unknown` or `any` can contain the sentinel and therefore return conditional options.
 
 `skipToken` is valid only for payload-bearing query options. It is not accepted by key or mutation
 builders, and skipped options are unsuitable for suspense and prefetch-only hooks.
 
-Generated query options also reserve `queryHash`: a caller-supplied hash cannot override generated
-cache identity.
+Configure custom hashing through QueryClient global or prefix defaults. Builders reject per-call
+`queryKeyHashFn` and `queryHash` with `EffectRpcQueryConfigError` code `UnsupportedQueryHash`.
 
 ## Request-local RPC options
 
@@ -129,24 +136,38 @@ A defined `initialData` value or factory remains required in the generated optio
 including conditional and skipped inputs. A factory that may return `undefined` keeps hook data
 possibly undefined.
 
-The builder forwards applicable Query Core options but owns `queryFn`, `queryKey`, and
-`queryKeyHashFn`. Each page uses the same Effect runner and cancellation signal as an ordinary
-query.
+The builder forwards applicable Query Core options and owns `queryFn` and `queryKey`.
+QueryClient defaults own hashing. Each page uses the same Effect runner and cancellation signal
+as an ordinary query.
 
 ## Stream values
 
 Each streaming RPC leaf exposes:
 
-| Builder                     | Result                                                                      |
-| --------------------------- | --------------------------------------------------------------------------- |
-| `streamedKey(input?)`       | Data-tagged key for the accumulated sequence.                               |
-| `streamedOptions(options?)` | Fresh Query Core options that append each emitted value to an array.        |
-| `liveKey(input?)`           | Data-tagged key for the latest value.                                       |
-| `liveOptions(options?)`     | Fresh Query Core options that replace the cached value after each emission. |
+| Builder                       | Result                                                                         |
+| ----------------------------- | ------------------------------------------------------------------------------ |
+| `streamedKey(input, policy?)` | Data-tagged key for the accumulated sequence and its retention/refetch policy. |
+| `streamedOptions(options?)`   | Fresh Query Core options that append each emitted value to an array.           |
+| `liveKey(input?)`             | Data-tagged key for the latest value.                                          |
+| `liveOptions(options?)`       | Fresh Query Core options that replace the cached value after each emission.    |
 
 Both option builders publish the query as successful after its first value and keep
 `fetchStatus: 'fetching'` until the stream ends. An empty accumulated stream resolves to `[]`; an
 empty live stream fails with `EffectRpcQueryEmptyStreamError`.
+
+Live queries convert emitted `undefined` to `null`; explicit `null` stays `null`. Their keys,
+selectors, and initial-data options describe this normalized value. Accumulated arrays preserve
+`undefined` elements.
+
+For an inputless RPC, call `streamedKey(policy?)`. Existing calls without a policy retain
+unlimited history and reset refetches. Pass the same policy to the key and options builders when
+reading, seeding, cancelling, or refetching an exact accumulated view:
+
+```ts
+const policy = { maxChunks: 100, refetchMode: 'append' } as const
+const key = utils.events.watch.streamedKey({ channel: 'news' }, policy)
+const options = utils.events.watch.streamedOptions({ input: { channel: 'news' }, ...policy })
+```
 
 Accumulated streams accept TanStack's `refetchMode` option:
 
@@ -178,9 +199,18 @@ array.
 The bound discards older history to limit the number of elements; it does not limit byte size.
 Without it, accumulation remains unbounded. Use `liveOptions` when only the latest value matters.
 
-`maxChunks` configures accumulation, not key identity. Builders consume it before returning options,
-including skipped options. Invalid bounds throw `EffectRpcQueryConfigError` with code
-`InvalidMaxChunks` synchronously, even when `input` is `skipToken`.
+`maxChunks` and `refetchMode` both contribute to concrete accumulated-stream identity. Omitted
+values mean unlimited retention and `reset`; explicit `undefined` and explicit `reset` produce
+the same default identity. Different policies have separate histories, including concurrent views
+of the same RPC payload. Root, branch, RPC, and streamed-operation prefixes still match every policy.
+
+Builders consume both fields before returning options, including skipped options. Invalid bounds
+throw `EffectRpcQueryConfigError` with code `InvalidMaxChunks`; invalid modes use
+`InvalidRefetchMode`. Both fail synchronously, even when `input` is `skipToken`.
+
+Derive exact accumulated-stream keys through the builders with the view's policy, and treat their
+concrete suffix as opaque. Applications persisting data choose their own schema and key-version
+busters; see [Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/#restore-a-directory-snapshot).
 
 Live queries always replace the cached value and therefore expose no `refetchMode`. Cancelling,
 unmounting, or superseding either stream closes its iterator and interrupts its Effect resources.

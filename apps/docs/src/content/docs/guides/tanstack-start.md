@@ -35,8 +35,8 @@ const queryUtils = createHttpApiQueryUtils(httpApi, {
 
 Use `identity` to partition the cache safely by the current user or tenant. `runPromiseExit`
 is your application's runner. Configure transport URLs, authentication, and required services when
-creating the client and runner. Use a trusted server destination for SSR and a browser-accessible
-destination for client requests.
+creating the client and runner. Use a request-owned server-local client when your application can execute the handlers locally.
+Otherwise, use a trusted server destination. Browser clients use a browser-accessible destination.
 
 The [RPC factory reference](/effect-api-query/reference/factory/) and
 [HTTP guide](/effect-api-query/guides/http-queries-and-mutations/) cover client setup, optional
@@ -94,12 +94,16 @@ setupRouterSsrQueryIntegration({
 
 The server dehydrates its Query Client. The browser hydrates its own Query Client and uses its
 own ready client and runner. Register cleanup with the server request lifecycle. When SSR finishes
-or the request aborts, cancel outstanding queries before disposing their runtime. Keep the browser
+or the request aborts, cancel outstanding queries and await outstanding snapshot captures before
+disposing their ready clients and runtime. Native cancellation alone may settle before local iterator
+finalizers finish. Keep the browser
 runtime alive for the browser application's lifetime.
 
 Successful query data must satisfy your serializer's contract. If an endpoint returns decoded
 Schema class instances, decide whether the browser needs plain data or reconstructed instances.
 The package does not serialize query data for you.
+Use [Hydrate Unary Data](/effect-api-query/guides/hydrate-unary-data/) to keep a DTO representation
+or pair Schema encoding and decoding across hydration and later browser refetch.
 
 ## Let the browser refetch failed queries
 
@@ -113,17 +117,16 @@ When the page should render despite a loader failure, catch the loader rejection
 to reach your route's error handling. See
 [Handle Failures](/effect-api-query/guides/handle-failures/) for inspecting typed failures.
 
-## Capture an RPC stream snapshot
+## Capture a stream snapshot
 
-Completed stream data uses TanStack's normal dehydration contract. An open RPC stream remains
-in `fetchStatus: 'fetching'`. To render its first successful value, start the generated query,
-wait for a successful cache snapshot, then cancel the query before dehydration completes.
-Cancellation closes the iterator and releases its Effect resources. The browser hydrates the
-snapshot and may refetch according to your TanStack policies.
+Use the package's `fetchStreamSnapshot` with generated accumulated or live options when an open
+RPC or HTTP SSE stream must provide data for SSR. It captures a new publication, cancels the exact
+query, and waits for local iterator cleanup before settling. Dehydrate the resulting successful
+cache, then dispose request-owned resources. The browser hydrates its own cache and reconnects
+through its own ready client and runner.
 
-The example's
-[`fetchStreamSnapshot`](https://github.com/ueberBrot/effect-api-query/blob/main/examples/tanstack-start/src/lib/query-ssr.ts)
-shows the cache subscription, cancellation, and cleanup needed for this pattern.
+[Stream Snapshots](/effect-api-query/guides/stream-snapshots/) covers fresh and cached modes,
+timeouts, aborts, stream policies, and exclusive query ownership.
 
 ## Explore the executable example
 
@@ -136,11 +139,20 @@ See [Executable Examples](/effect-api-query/examples/) for commands and controls
 
 The example serves RPC at `/rpc` and HTTP at `/api/$`. Both handlers share a demonstration user
 directory, so writes invalidate both sets of query keys. The authorization header contains a
-public demonstration value. The ownership tests use separate identities to verify that caches
-and resource disposal stay isolated. Its SSR setup converts decoded Schema class values to plain
-data with `structuredClone`.
+public demonstration value. Each request owns its cache and connections; disposing one request
+leaves other requests usable.
 
-The example also disables Vite preview compression for its API routes. The pinned middleware
-delays response-close listeners until the first write, preventing a pending buffered request from
-observing a disconnect. This host-specific setting lets the browser tests verify both aborted
-requests and server interruption.
+Server rendering uses request-owned connections built with Effect's public decoded-message client
+and server. They execute the same application state as the network handlers. RPC execution avoids
+HTTP round trips; HTTP loaders call the host's Web handler in process and retain HTTP Schema codecs.
+The browser acquires separate network clients and reconnects both stream views after hydration.
+
+Local RPC middleware captures the request's demonstration authorization value. Per-call headers and
+caller execution services cannot replace that authority. The example defaults that public value to
+`allowed`; replace this demonstration policy with your application's authentication. Decoded-message
+RPC execution bypasses transport Schema codecs. Keep a schema-aware protocol when wire validation
+or codec effects are required.
+
+The example pairs Schema codecs for its generated query views and completes asynchronous
+preparation before publishing or hydrating. Add a codec for each new hydratable view. See
+[Hydrate Query Views](/effect-api-query/guides/hydrate-query-views/).

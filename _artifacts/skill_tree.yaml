@@ -1,0 +1,54 @@
+library:
+  name: effect-api-query
+  version: 0.1.0
+generated_from:
+  domain_map: _artifacts/domain_map.yaml
+  skill_spec: _artifacts/skill_spec.md
+skills:
+  - name: effect-api-query
+    slug: effect-api-query
+    domain: contract-queries
+    path: skills/effect-api-query/SKILL.md
+    description: 'Use when integrating effect-api-query with an Effect RPC or
+      HttpApi contract: derive TanStack Query keys and options, choose buffered
+      or streaming views, configure metadata, pagination, defaults or cache
+      filters, coordinate writes and cache owners, capture or hydrate SSR data,
+      or rebuild native framework queries from reactive input. Also use when
+      diagnosing execution failures, cancellation, or ready-client lifetime in
+      these integrations.'
+    sources:
+      - src/**/*.ts
+      - tests/**/*.ts
+      - '**/examples/vite-react/src/lib/*.ts'
+      - '**/examples/vite-react/src/main.tsx'
+      - '**/examples/vite-react/src/app.tsx'
+      - '**/examples/vite-react/tests/*.ts*'
+      - '**/examples/tanstack-start/src/lib/*.ts'
+      - '**/examples/tanstack-start/src/router.tsx'
+      - '**/examples/tanstack-start/tests/*.ts*'
+      - '**/examples/server/src/*.ts'
+      - '**/examples/server/tests/**/*.ts'
+      - GLOSSARY.md
+      - README.md
+      - package.json
+      - pnpm-workspace.yaml
+      - scripts/*.mts
+      - docs/adr/000*.md
+      - docs/adr/0010-*.md
+      - docs/adr/0012-*.md
+      - docs/adr/0014-*.md
+      - docs/adr/0015-*.md
+      - docs/adr/002*.md
+      - '**/apps/docs/src/content/docs/**/*.md'
+      - '**/apps/docs/src/content/docs/**/*.mdx'
+    requires: []
+    purpose: Derive typed TanStack Query keys and options from ready Effect RPC and
+      HTTP clients, preserving cache identity, decoded query views, native
+      framework behavior, and application-owned execution, hydration, and
+      resource lifetime.
+distribution:
+  mode: none
+review:
+  ignore:
+    - node_modules
+    - '**/node_modules'

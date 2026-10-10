@@ -23,7 +23,8 @@ controls its client, cache policies, and resource lifetime.
 - Queries and mutations for unary RPCs and buffered HTTP endpoints without multipart.
 - Mutations for buffered HTTP multipart uploads with explicit `FormData`.
 - Infinite and conditional queries for both adapters.
-- Accumulated streams and live queries for RPCs.
+- Accumulated streams and live queries for RPCs and supported HTTP SSE endpoints.
+- Buffered HTTP metadata views containing decoded data, status, and raw headers.
 - Semantic cache keys for prefetching, cache updates, and invalidation.
 - Typed execution failures that retain the complete Effect Cause.
 
@@ -36,7 +37,13 @@ controls its client, cache policies, and resource lifetime.
 - Check [feature support](/effect-api-query/getting-started/feature-support/) to choose operations
   and plan your integration.
 - Use the [React Query guide](/effect-api-query/guides/react-query/) for hooks and mutations.
+- Use [Vue and Solid Query](/effect-api-query/guides/vue-and-solid/) or
+  [Svelte and Angular](/effect-api-query/guides/svelte-and-angular/) for native reactive consumers.
 - Use the [TanStack Start guide](/effect-api-query/guides/tanstack-start/) for loaders, SSR, and
   hydration.
+- Capture open streams with [Stream Snapshots](/effect-api-query/guides/stream-snapshots/), then
+  [hydrate query views](/effect-api-query/guides/hydrate-query-views/) with application-owned codecs.
+- Follow [Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/) and
+  [Refresh from Domain Events](/effect-api-query/guides/refresh-from-events/) for private cache workflows.
 - Read [compatibility and limits](/effect-api-query/reference/compatibility-and-limits/) before
   adopting the package.

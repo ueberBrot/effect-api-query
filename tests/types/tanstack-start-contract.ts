@@ -1,5 +1,4 @@
 // fallow-ignore-file unused-file
-// This packed fixture verifies that every generated operation fits one TanStack Start route.
 import { QueryClient } from '@tanstack/query-core'
 import { useInfiniteQuery, useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { createRootRouteWithContext, createRoute, createRouter } from '@tanstack/react-router'
