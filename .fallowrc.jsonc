@@ -27,6 +27,10 @@
     "tests/packed-consumer/snapshot-contract.ts",
     "tests/packed-consumer/defaults-runtime.mts",
     "tests/packed-consumer/defaults-contract.ts",
+    "scripts/verify-svelte-angular-consumer.mts",
+    "tests/packed-consumer/svelte-angular-runtime.ts",
+    "tests/packed-consumer/svelte-angular-contract.ts",
+    "tests/packed-consumer/docs-angular.ts",
     "tests/packed-consumer/hydration-runtime.mts",
     "tests/packed-consumer/hydration-views-runtime.mts",
     "tests/packed-consumer/hydration-contract.ts"

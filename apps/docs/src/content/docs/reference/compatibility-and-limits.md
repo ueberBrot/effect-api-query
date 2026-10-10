@@ -9,6 +9,10 @@ The package targets Effect 4 and TanStack Query Core 5.103.1 or later in v5, wit
 integrations checked in this repository. It is ESM-only and targets ES2022. Use TypeScript with
 `strict: true`.
 
+Svelte 5.57.1 and Angular 22.2.1 browser components can consume generated Core options through
+their native accessors. See [Svelte and Angular](/effect-api-query/guides/svelte-and-angular/) for
+matching Query wrapper versions, compiler resolution, and reactive ownership boundaries.
+
 Consult [package metadata](https://github.com/ueberBrot/effect-api-query/blob/main/package.json) for
 peer ranges and the [workspace catalog](https://github.com/ueberBrot/effect-api-query/blob/main/pnpm-workspace.yaml)
 for the pinned Effect release and framework versions. The
@@ -43,6 +47,7 @@ supplies the client, policy, or lifecycle. **Deferred** means the adapter does n
 | Mutation cancellation                             | No upstream TanStack mutation abort signal; explicit cancellable command is application-owned and tested | No upstream TanStack mutation abort signal; domain cancellation is application-owned        |
 | Authentication, middleware, and residual services | Application-owned ready client and runner                                                                | Application-owned ready client and runner                                                   |
 | React hooks and QueryClient                       | Tested public consumers and Vite React example                                                           | Tested public consumers and Vite React example                                              |
+| Svelte and Angular browser components             | Tested native reactive accessors for generated queries and streams                                       | Tested native reactive accessors for buffered, metadata, and SSE views                      |
 | SSR and hydration                                 | Application-owned; tested Start route loading and stream snapshots                                       | Application-owned; tested Start SSR, hydration, failed-query refetch, and request isolation |
 | Host routes                                       | Application-owned; tested standalone server and Start `/rpc`                                             | Application-owned; tested standalone server and Start `/api/$`                              |
 | Cache serialization and mutation invalidation     | Application-owned                                                                                        | Application-owned                                                                           |
