@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "fb4f69906cb036383959240d877ac26912c1174b63f309604d27fc73a83e6fbf",
+      "fingerprint": "11b7c4ed271c632ed1fe2a5c6a4c7d69a3c8f77de697563553b3e12c7370d30a",
       "snapshot": {
         "CHANGELOG.md": "03dbf3658db26e2a9ad8ce89ceee451abc6898700a22e5a6c7b6c64abdc6c4c6",
         "GLOSSARY.md": "67de06543ad2fd9fd2917419e19d1f071e7b6eee53d48fca05e9dddfc739c683",
@@ -80,7 +80,7 @@
         "examples/server/src/server.ts": "eab2d80d9e6ecc4c74b89a50223ff968bf5b98da72d9aece4e726c0cfd6832e8",
         "examples/server/src/users.ts": "15c363e2162f8dab4da1bfcf6324abbb3dc8ca34a8d8e036eb4db2481fe6be5b",
         "examples/server/src/web-handler.ts": "55447fe9ec14213d3d69811be11c9d6d6b266d50cf37b57dd5d4870132905523",
-        "examples/server/tests/rpc-transport-overhead.test.ts": "2727719ecb2f04445d0bf0dfb5e6791550fc69f29ff04866baa45d9b764e551b",
+        "examples/server/tests/rpc-transport-overhead.test.ts": "81aeaf10f01fe18f5caf0e476d905cc64c01da8891933ecc39ee2d1cc807f32e",
         "examples/tanstack-start/src/lib/api-server.ts": "7a1d9e860dc1c77b17f8ec1dfa8207ae5e5b4d53b287e7c76e2ee4138b605779",
         "examples/tanstack-start/src/lib/application.ts": "5f2eeb9920fa77b18dc7ad00a2688fe9225bfd2c57db35a5040b0a38e299ec71",
         "examples/tanstack-start/src/lib/query-ssr.ts": "0754abae5faf2f7562e1d86d27df0e14820a5ba9830146690ff1dc9f5beb3ec9",
@@ -244,18 +244,18 @@
         "tests/types/tanstack-start-contract.ts": "c99d47160bcaeeb851a489c79f3e8b62c202b41339ba1de3579811b28ee491e8",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "809bc2513421a175e091fac904306955f9c532a7",
-      "outcome": "updated",
-      "reason": "The initial package candidate is 0.1.0. Verified metadata.library_version now matches root, packed and installed versions; CHANGELOG.md is registered as an authoritative source. Existing task guidance, activation, purpose and six references retain the completed current contract without an unreleased-build migration narrative.",
+      "head": "32359a8b10e51c5ea5bc03cf28adf040784eff35",
+      "outcome": "no-change",
+      "reason": "Only the real WebSocket test fixture changes: it awaits the actual client close event after Scope.close and captures completion before server teardown. Adapter behavior, transport limits, stream policy keys, native buffer-16 cancellation with zero consumption, and application-owned lifetime remain unchanged. Existing lifecycle and host guidance stays accurate; no shipped rewrite or version change is needed.",
       "evidence": [
-        "package.json, skills/effect-api-query/SKILL.md and CHANGELOG.md are compared with completed integration 809bc2513421a175e091fac904306955f9c532a7; only root version and the owned skill version/source mapping change existing shipped inputs.",
-        "Fresh uncached native packed-package passes attw/publint, declarations/maps, scoped Intent validation, exact version/peer/inventory checks, 26 ordinary compiler checks across TypeScript 5.9.3 and 7.0.2+effect-tsgo.0.47.2 with Query Core 5.103.1/5.104.0, all runtime fixtures and four native framework hosts per peer (130-packed-host.log).",
-        "Installed package-only Intent discovery loads the 0.1.0 skill byte-for-byte, resolves all six references and compiles all ten examples. Independent 130-changelog-fact-review.md confirms current capabilities/support; prior independent 128 consumer evidence remains semantically applicable to unchanged guidance.",
-        "The immutable 14-file selected archive 130-fc1497e17b4d5888.tgz is byte-identical to the archive checked before and after the consumer matrix; SHA512 fc1497e17b4d58889ddbbbfacc277073815a8b34aa48e32a5823ffdeea8022bf268ba37f1f7a7ff24a78d33efe3932691d208d06ea889092004ddb83f5d9c88d. Final whole-programme acceptance remains ticket 131."
+        "Base32359a8b10e51c5ea5bc03cf28adf040784eff35; examples/server/tests/rpc-transport-overhead.test.ts actual diff; Effect4.0.0 Socket.makeWebSocket release calls ws.close(1000) synchronously, while the actual native close event arrives later.",
+        "131-fix-owned-cleanup-red.log: both exact existing observations fail only clientClosedfalse when sampled at the client-owned Scope boundary. 131-fix-transport-green.log: all6 real cases pass after the event Deferred; 131-fix-runtime-green.log: all262 runtime tests pass with zero cache hits.",
+        "131-fix-source-check.log: changed-file format/lint/types pass; 131-fix-typecheck.log:134 full-project typed lint/type files pass; 131-fix-effect-check.log:145 strict Effect files pass. 131-fix-skills-check.log:uncached scoped native validation passes.",
+        "Read skills/effect-api-query/SKILL.md, references/rpc.md, query-patterns.md and frameworks-and-hosts.md; read _artifacts/domain_map.yaml, skill_spec.md and skill_tree.yaml fully. Guidance and all3 records unchanged with justified no-op; no new task example requires fresh-consumer execution. Completed130 consumer matrix remains applicable only with matching complete archive/consumer/tool inputs as captured separately."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "c823bc03b224b06a4747dee7bd2e97ef5b081ef4bdf3471113af0f730b4e6407",
+      "fingerprint": "628afb03d1c23e560554d6218e8e2a6d19feecba75ab66d28afc12f0fe6f93e3",
       "snapshot": {
         ".agents/skills/ask-matt/PHASE-BOUNDARIES.md": "a8aa20158609ef39e2b308b6ba0660c91066838d07a867202e63a7744a88a3ed",
         ".agents/skills/ask-matt/SKILL.md": "1371f5ce005de0992a44b137748bfb960a56948aa9871b405fe9d90b24332e3c",
@@ -415,7 +415,7 @@
         "examples/server/src/server.ts": "eab2d80d9e6ecc4c74b89a50223ff968bf5b98da72d9aece4e726c0cfd6832e8",
         "examples/server/src/users.ts": "15c363e2162f8dab4da1bfcf6324abbb3dc8ca34a8d8e036eb4db2481fe6be5b",
         "examples/server/src/web-handler.ts": "55447fe9ec14213d3d69811be11c9d6d6b266d50cf37b57dd5d4870132905523",
-        "examples/server/tests/rpc-transport-overhead.test.ts": "2727719ecb2f04445d0bf0dfb5e6791550fc69f29ff04866baa45d9b764e551b",
+        "examples/server/tests/rpc-transport-overhead.test.ts": "81aeaf10f01fe18f5caf0e476d905cc64c01da8891933ecc39ee2d1cc807f32e",
         "examples/tanstack-start/src/lib/api-server.ts": "7a1d9e860dc1c77b17f8ec1dfa8207ae5e5b4d53b287e7c76e2ee4138b605779",
         "examples/tanstack-start/src/lib/application.ts": "5f2eeb9920fa77b18dc7ad00a2688fe9225bfd2c57db35a5040b0a38e299ec71",
         "examples/tanstack-start/src/lib/query-ssr.ts": "0754abae5faf2f7562e1d86d27df0e14820a5ba9830146690ff1dc9f5beb3ec9",
@@ -579,14 +579,14 @@
         "tests/types/tanstack-start-contract.ts": "c99d47160bcaeeb851a489c79f3e8b62c202b41339ba1de3579811b28ee491e8",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "809bc2513421a175e091fac904306955f9c532a7",
-      "outcome": "updated",
-      "reason": "All three planning records are reconciled with the verified initial 0.1.0 candidate. Domain/tree versions match package and skill metadata; initial changelog coverage and completed human documentation are recorded, while exact final integration acceptance stays open. Existing tasks, ownership, references, exclusions and unrelated unresolved reviews are preserved.",
+      "head": "32359a8b10e51c5ea5bc03cf28adf040784eff35",
+      "outcome": "no-change",
+      "reason": "All three planning records remain accurate: the domain map still assigns request cleanup to the existing contract workflow; the spec preserves the exact buffer-16/zero-consumption control and open final-candidate acceptance gap; the tree already maps this transport fixture. Awaiting a native close event strengthens test ownership observation without new capability, task, dependency, or scope.",
       "evidence": [
-        "_artifacts/domain_map.yaml resolves only initial release metadata and retains exact-candidate acceptance as open; the already resolved human-document reconciliation remains intact.",
-        "_artifacts/skill_tree.yaml retains its existing skill identity, activation, purpose, paths, prerequisites and package-only distribution, adds CHANGELOG.md via native sync, and records library.version 0.1.0.",
-        "_artifacts/skill_spec.md removes duplicated placeholder-version wording, records the bounded initial-candidate batch with actual fresh native package/consumer check results, and leaves whole integration acceptance and unverified host/dependency scope explicit.",
-        "130-native-sync-host.log records the unchanged installed synchronization command; the completed review has no owned structural problem. 130-packed-host.log verifies this candidate with both compilers/peers, all shipped examples and installed consumers; unrelated native items remain unannotated."
+        "Base32359a8b10e51c5ea5bc03cf28adf040784eff35; examples/server/tests/rpc-transport-overhead.test.ts actual diff; Effect4.0.0 Socket.makeWebSocket release calls ws.close(1000) synchronously, while the actual native close event arrives later.",
+        "131-fix-owned-cleanup-red.log: both exact existing observations fail only clientClosedfalse when sampled at the client-owned Scope boundary. 131-fix-transport-green.log: all6 real cases pass after the event Deferred; 131-fix-runtime-green.log: all262 runtime tests pass with zero cache hits.",
+        "131-fix-source-check.log: changed-file format/lint/types pass; 131-fix-typecheck.log:134 full-project typed lint/type files pass; 131-fix-effect-check.log:145 strict Effect files pass. 131-fix-skills-check.log:uncached scoped native validation passes.",
+        "Read skills/effect-api-query/SKILL.md, references/rpc.md, query-patterns.md and frameworks-and-hosts.md; read _artifacts/domain_map.yaml, skill_spec.md and skill_tree.yaml fully. Guidance and all3 records unchanged with justified no-op; no new task example requires fresh-consumer execution. Completed130 consumer matrix remains applicable only with matching complete archive/consumer/tool inputs as captured separately."
       ]
     },
     "source:vite.config.ts": {
