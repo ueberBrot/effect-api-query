@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "409a3ac75fed1835fc08dce902b467d8501daa91f658cd9e03a8eab345436941",
+      "fingerprint": "876dbdfa739a9405b66d7e9cf8f7b6711858036f0fbeac0f93ac2fd2f7927cf0",
       "snapshot": {
         "GLOSSARY.md": "67de06543ad2fd9fd2917419e19d1f071e7b6eee53d48fca05e9dddfc739c683",
         "README.md": "b84fc747700efa4d7e53447f4b670e52fc22018de2777eaae0a663dd296e6528",
@@ -79,7 +79,7 @@
         "examples/server/src/server.ts": "eab2d80d9e6ecc4c74b89a50223ff968bf5b98da72d9aece4e726c0cfd6832e8",
         "examples/server/src/users.ts": "15c363e2162f8dab4da1bfcf6324abbb3dc8ca34a8d8e036eb4db2481fe6be5b",
         "examples/server/src/web-handler.ts": "55447fe9ec14213d3d69811be11c9d6d6b266d50cf37b57dd5d4870132905523",
-        "examples/server/tests/rpc-transport-overhead.test.ts": "81aeaf10f01fe18f5caf0e476d905cc64c01da8891933ecc39ee2d1cc807f32e",
+        "examples/server/tests/rpc-transport-overhead.test.ts": "8d3dd40cfbbd0ce64b74f44f205f7f83163ea08dfc264a6deb1902e96b74a7fb",
         "examples/tanstack-start/src/lib/api-server.ts": "7a1d9e860dc1c77b17f8ec1dfa8207ae5e5b4d53b287e7c76e2ee4138b605779",
         "examples/tanstack-start/src/lib/application.ts": "5f2eeb9920fa77b18dc7ad00a2688fe9225bfd2c57db35a5040b0a38e299ec71",
         "examples/tanstack-start/src/lib/query-ssr.ts": "0754abae5faf2f7562e1d86d27df0e14820a5ba9830146690ff1dc9f5beb3ec9",
@@ -104,14 +104,16 @@
         "examples/vite-react/tests/owner-cache.test.ts": "8818e30fdd3071a2e5dc2d865161e0d9f40de1ff37813b0a396bb2e83dd08a1d",
         "examples/vite-react/tests/owner-switch.test.ts": "c997c9758269586591cbf55de4651c64091abc9061b56edb024dcbf9dbaa9c1d",
         "examples/vite-react/tests/user-writes.test.ts": "2492f48018e7d8e684eae1c8d302acc9961a1bfbd60bf3214c113dc1b6fbe54a",
-        "package.json": "dff37541a7ec33d9205665bd1aec07d7b39e8be824c10d3032809bac7876cb35",
-        "pnpm-workspace.yaml": "82d497fe7617af3dcd84242d3d074ef827ad62e8e726bad63301cea2fd03d633",
-        "scripts/measure-packed-consumer.mts": "2a4d12f007219cf710d25981c5ca1ceb75c816e009cd0fda3b1a8931a4f2d0fb",
-        "scripts/verify-docs-examples.mts": "79c08ea5d45287740cceb1c4fe47f2f1a0b264d9a20c5e0d095d327622c5be8b",
+        "package.json": "3f04c1e2c88b69a86c704a0178d7a82a75d47fcec89e6225ca6be3272d8970ac",
+        "pnpm-workspace.yaml": "58fd69fb2ebc237bf589893fd3150ec0dd25988aee57f465f5b373b038aee606",
+        "scripts/decode-utf8.mts": "2e90c53e95c22b864a209a87c98084db6ec95e83f842007b21528d286d45c18c",
+        "scripts/measure-packed-consumer.mts": "fbaa7edacc4d250be7fc5098360eb3eeaad2ec2a23b5d8f5c7a68ecc3a9103d5",
+        "scripts/run-command.mts": "e419d2af783588a08f3ded7986cb1786c70b756feccd543653f1c821279ace31",
+        "scripts/verify-docs-examples.mts": "aac0f2c990472651042b573af66215658f1aba05647c0aea8fa89c57e3ae636d",
         "scripts/verify-framework-browser.mts": "3635e15218ce0b0fb0249c70a6ae8b3a9a314dc0ab3e4185c78dc6a49c9d4afb",
-        "scripts/verify-packed-consumer.mts": "574b1dedc8bbfc500faca210769f799d1199610d0010e429e2a53c17ca20daf9",
-        "scripts/verify-svelte-angular-consumer.mts": "7e13a21938aaba6615b5443513f4e45f5dfa4b13eb4373da8a6656146ed3a5ea",
-        "scripts/verify-vue-solid-consumer.mts": "0ba286c3ac90f2ba30a9e40fc33ea954cedeca8b81d016ccbc7c246c0d587f8c",
+        "scripts/verify-packed-consumer.mts": "e8f5a1de95544087b9e62a61f27f6e33e99a48bd3a0b2ae74ed4a19dcccfe075",
+        "scripts/verify-svelte-angular-consumer.mts": "71c75f485d42798323ea76807d9887d4958c341987db844b0efd52daf5c91261",
+        "scripts/verify-vue-solid-consumer.mts": "0a1740bd46d6eaff9fe05babcdc41809c6c4c60b88c6331fec1c5ff54fbd2074",
         "skills/effect-api-query/SKILL.md": "02cedb3672a84b099b23ddfe95f3ac5cb707cd781271c578b81171b314d34e09",
         "skills/effect-api-query/references/cache-workflows.md": "27bb96c48c84254ab8c379a529402f81cea3723c17d6396527c090a8c37e6f65",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "4143e54e4361d09272a6207b032185494df851ed3e5adddf0fa5aee9ee7d65ec",
@@ -139,13 +141,13 @@
         "src/rpc/types.ts": "f5fda172e9746512b1c51082eebaee7b5a16bd8b382d59b51ed80e07e8e552e3",
         "tests/create-http-api-query-utils.test.ts": "a76295644389a37e1a00a9825d192cbd0dceeab7d43e7ad1196c171ef5059ad1",
         "tests/create-rpc-query-utils-configuration.test.ts": "839191fd31986c13f77585d191d643599426ce3294a930af421a26439b37b664",
-        "tests/create-rpc-query-utils-execution.test.ts": "aab9805305f90b8cdf2b16983ccf8ba8a1f95b9fa29b09a66c57afb33569ee12",
+        "tests/create-rpc-query-utils-execution.test.ts": "8556cd62ba1ecdcc130c9a5d35f165b60d18a9c6f3f8eed30822f213ecd57e73",
         "tests/create-rpc-query-utils-keys.test.ts": "e79abaa3659d9e212d1a1b3b923abe3493fcdb1d1ab5c92cd895df199043f9da",
         "tests/create-rpc-query-utils-request-options.test.ts": "bcd76859a2830e522bdeb212be70f2e14be3b815da75a5caf3e596fd5fbd13e7",
         "tests/create-rpc-query-utils-server-local.test.ts": "45ee329a736bcb6b114727ef8874f3f34541ce6dc55d5e13ffc80be9c2af2ddd",
-        "tests/create-rpc-query-utils-stream-baseline.test.ts": "13fc86bef268efd326cacbadbaf3e46c4b47ce29fa52078d081171792b1aa3a7",
+        "tests/create-rpc-query-utils-stream-baseline.test.ts": "cec0a8906b3512e38c0272dc07a4cac81402ac014549eb11f24a594d7b792616",
         "tests/create-rpc-query-utils-stream-publication.test.ts": "cc3a25d02015b1410a8d1406249a846bf711f7b829fa7fccce1da90e600530d3",
-        "tests/create-rpc-query-utils-streaming.test.ts": "fcc6520bf47630f26e1ea7950a579ed27e46c5cbeb6b7f203e6c0e0daa9607f2",
+        "tests/create-rpc-query-utils-streaming.test.ts": "7b392709f029af806a6b42038c058dcd1645969581aafedb8696e8bf43e7507b",
         "tests/create-rpc-query-utils.test.ts": "93589d8c857d716ce384a4a97d442d005f0501c890a524b69f6594f039fb530e",
         "tests/fixtures/async.ts": "f9ccc474ad87dd5aedebc5660d74386de6551dd5f8900d572c485c11054ff6b9",
         "tests/fixtures/effect-rpc.ts": "73be762e670e37e4cc3cfcc2b1d40724f23721726d75b45524ad0b3aba78eb61",
@@ -157,9 +159,9 @@
         "tests/http-multipart.test.ts": "ff816ffae79e827883cea1d1f99f5f763e95c9e856040627a34818df6569feb1",
         "tests/http-query-options.test.ts": "bba47a56841732c7a3f3451ce100e9b864ab2fa6374bc7c8c912658e31c30a3a",
         "tests/http-semantic-keys.test.ts": "2e78788697bdf7efec374669d8123da57c93df3c368d41920decfcd175bc2359",
-        "tests/http-transport-cancellation.test.ts": "633a4197c7cc1b0e9039d4b7e33c4f5f59a5efc659bea5afb1b3047bc5e47dab",
+        "tests/http-transport-cancellation.test.ts": "e56f8571f949adc9d44f14b61e20edddb188a9565bf7a585859ffe73a851ac39",
         "tests/http-view-proof.test.ts": "4dc91c38efe5b0c643ef61c98dcdf4a89acf4ef4c1651030124d82ca6cb55a61",
-        "tests/packed-consumer/construction-baseline.mts": "39407db00e51c317e4ade26fe102bf01997f25d303e329e03e6de89a72dcf175",
+        "tests/packed-consumer/construction-baseline.mts": "b6582b268e5c1548d1bb36638ccd645fff9d4bb510de9e26ebbdf81faf1e6f1c",
         "tests/packed-consumer/defaults-contract.ts": "be6667b6957d1f1fc72c4acfc64baec6458bc2875a1d45f53d776a91f71a781b",
         "tests/packed-consumer/defaults-runtime.mts": "b5ee3e802bc4fd349a0616adb5fa5f96f73d4be88bd8959304869be787eb521b",
         "tests/packed-consumer/docs-angular.ts": "d2f46799de96f58ee35062eba6fee90966560b6afbf713a4787d5cc5d91b2105",
@@ -192,7 +194,7 @@
         "tests/packed-consumer/http-etag-recipe.mts": "9d274d4a19b0767b3d5c5dfcd17cde10c4156942486b68d39c9f6339dd837062",
         "tests/packed-consumer/http-live-runtime.mts": "c6931e7d6f805f82ab3e7cca00f6a256e149f1d5b89fc5cc779be243a8f771c8",
         "tests/packed-consumer/http-metadata-runtime.mts": "eaa306ab32c4053155801a49addffe9514a6223dad574ad4297e6d9298610fb7",
-        "tests/packed-consumer/http-runtime.mts": "122409ef4aabd17460447eb24fdb8af7d7b09cba364f9dd24d97f19746e08150",
+        "tests/packed-consumer/http-runtime.mts": "a6b68bb80e590e50f5849985837d39dd4e87eead58b034ed327ba1039ddcf885",
         "tests/packed-consumer/http-stream-runtime.mts": "8f040169c4e18c69432fdac2a6ff230cabe61815b2e1618068b60ecb767fdeb3",
         "tests/packed-consumer/hydration-contract.ts": "815f534dc2101fe5a70df64ab06f76387288effb08f6b68cae0589dcf5763cde",
         "tests/packed-consumer/hydration-runtime.mts": "e5d45f620e966230e79a88f4993691cde612849f80abf43a5aa83805fa2cc715",
@@ -200,7 +202,7 @@
         "tests/packed-consumer/hydration-views-runtime.mts": "7f787156aa8bc2c616178a7adbaecea11bbc772a61468dea40984187b09edd1a",
         "tests/packed-consumer/openapi-api.ts": "a480587e0544204cc23b3a427dd2df9e2d506e9ae92e46cc27431fb7c85e3e8e",
         "tests/packed-consumer/openapi-contract.ts": "0f1e253dd74a203e7fa8feff505c5f20c933927651dcbb026529b334c5612e1f",
-        "tests/packed-consumer/openapi-generate.mjs": "74c569548acffc7ec86b03b07f8c21ad8bbda5a954961c87d5442511a967b219",
+        "tests/packed-consumer/openapi-generate.mjs": "39938a962e6d6d6c71b78fc2cc22a4b6a516adbfbf875079106d628240c7dba6",
         "tests/packed-consumer/openapi-runtime.mts": "6464cb020114fe24b5530a2de289f29ed2a97ab272e7af692c3a5cd34fee2c18",
         "tests/packed-consumer/optimistic-contract.ts": "4c5e5656286aad1b7702bbeb5f30a3a99294adcabcf3511e73c1e1eca7729030",
         "tests/packed-consumer/optimistic-runtime.mts": "987c1eff8db7adeeae2bfe2892c19672ea49ad4e372c45421217140072588f71",
@@ -244,18 +246,19 @@
         "tests/types/tanstack-start-contract.ts": "c99d47160bcaeeb851a489c79f3e8b62c202b41339ba1de3579811b28ee491e8",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "01f5d8c606397b157f74c9042fc28df53c7000d4",
+      "head": "de129263482c3d0ebe851773f009ec8d84c03b20",
       "outcome": "no-change",
-      "reason": "Removed an inaccurate Performance-page pointer from the stream-history guide. The guide retains its retention, buffering, sharing and producer-rate instructions; the package and shipped skill recommend the same current behavior.",
+      "reason": "The private command helper now restores native captured stderr forwarding and one aggregate raw stdout/stderr budget while preserving UTF-8 BOMs, nonzero diagnostic text, concurrent drains and scoped termination. Public APIs, library usage and verified support claims are unchanged; the shipped skill and six references remain accurate.",
       "evidence": [
-        "The only source change from 01f5d8c606397b157f74c9042fc28df53c7000d4 removes the two-line final pointer in guides/choose-stream-history.md; the destination and benchmark script concern construction/compiler/bundle costs, not stream-publication measurements.",
-        "The domain map, coverage spec and skill tree remain byte-identical and retain the same domain tasks, failure modes, source mappings and validation criteria. Native sync reports Nothing to synchronize.",
-        "131-content-correction-docs-check.log: fresh uncached snippet verification and Astro diagnostics pass with zero errors/warnings/hints. No TypeScript fence or compiled consumer fixture changed.",
-        "All thirteen selected archive members still match current source/native normalization. The complete fresh d58d1f507bb5c6f4 matrix and real Start source/build/client-boundary evidence remain input-identical; no new matrix execution is claimed."
+        "Actual helper correction of the two accepted P2 findings at de129263482c3d0ebe851773f009ec8d84c03b20 uses public Stdio.stderr with endOnDone:false, one shared raw-byte budget, bounded captured prefixes and Effect.onExit. No dependency, policy, exception, public source, documentation or unrelated UTF-8 read changed.",
+        "External actual native RED/GREEN retains all 27 expectations: eight RED failures, zero GREEN failures. Both corrected aggregate exact boundaries and all former oversized inputs agree with native outcomes; captured stderr and parent continued-use markers pass on success, failure and overflow. All 49 observed PIDs exited. The earlier per-stream successful-limit assumptions are explicitly superseded by actual native evidence; old proofs remain untouched.",
+        "Separate actual interruption acceptance forwards the complete 28-byte BOM/Unicode warning and preserves both public/native stderr continued-use markers. Deterministic public-stream readiness precedes Fiber.interrupt; actual SIGTERM then SIGKILL, native PID absence and both Scope removals are proven. Helper/decoder hashes and all six primary probe evidence hashes remain unchanged.",
+        "Fresh uncached source check passes 330 formatted and 136 lint/type files; strict Effect checks 147 files with zero diagnostics under unchanged narrow exceptions. Native Fallow, docs parity/site check, 421-input format, full selected packed matrix and four Chromium/Firefox packed Window/Worker hosts pass. Fresh native pack remains the identical 64,390-byte 437c863f archive; all six fresh bundle byte hashes/gzip sizes match the retained complete-byte compressor proof.",
+        "The actual helper diff, shipped skill, six references and all three planning records were reviewed after these checks. Complete installed tool/provider/shim inputs remain unchanged. All runtime/report/application inputs retain their accepted prior correspondence; no repeated full 262-test or source-production-build claim is made. Leave all 50 unrelated pending items and outcomes unchanged."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "eb6821bf36cf3b4ac1d20903da7bd766463c75708a4ad2cb11f6c11084832343",
+      "fingerprint": "20c934ae33aa909591527c73b29599ab2874bd1bffe391fa43c258c2e0c6a0c2",
       "snapshot": {
         ".agents/skills/ask-matt/PHASE-BOUNDARIES.md": "a8aa20158609ef39e2b308b6ba0660c91066838d07a867202e63a7744a88a3ed",
         ".agents/skills/ask-matt/SKILL.md": "1371f5ce005de0992a44b137748bfb960a56948aa9871b405fe9d90b24332e3c",
@@ -414,7 +417,7 @@
         "examples/server/src/server.ts": "eab2d80d9e6ecc4c74b89a50223ff968bf5b98da72d9aece4e726c0cfd6832e8",
         "examples/server/src/users.ts": "15c363e2162f8dab4da1bfcf6324abbb3dc8ca34a8d8e036eb4db2481fe6be5b",
         "examples/server/src/web-handler.ts": "55447fe9ec14213d3d69811be11c9d6d6b266d50cf37b57dd5d4870132905523",
-        "examples/server/tests/rpc-transport-overhead.test.ts": "81aeaf10f01fe18f5caf0e476d905cc64c01da8891933ecc39ee2d1cc807f32e",
+        "examples/server/tests/rpc-transport-overhead.test.ts": "8d3dd40cfbbd0ce64b74f44f205f7f83163ea08dfc264a6deb1902e96b74a7fb",
         "examples/tanstack-start/src/lib/api-server.ts": "7a1d9e860dc1c77b17f8ec1dfa8207ae5e5b4d53b287e7c76e2ee4138b605779",
         "examples/tanstack-start/src/lib/application.ts": "5f2eeb9920fa77b18dc7ad00a2688fe9225bfd2c57db35a5040b0a38e299ec71",
         "examples/tanstack-start/src/lib/query-ssr.ts": "0754abae5faf2f7562e1d86d27df0e14820a5ba9830146690ff1dc9f5beb3ec9",
@@ -439,14 +442,16 @@
         "examples/vite-react/tests/owner-cache.test.ts": "8818e30fdd3071a2e5dc2d865161e0d9f40de1ff37813b0a396bb2e83dd08a1d",
         "examples/vite-react/tests/owner-switch.test.ts": "c997c9758269586591cbf55de4651c64091abc9061b56edb024dcbf9dbaa9c1d",
         "examples/vite-react/tests/user-writes.test.ts": "2492f48018e7d8e684eae1c8d302acc9961a1bfbd60bf3214c113dc1b6fbe54a",
-        "package.json": "dff37541a7ec33d9205665bd1aec07d7b39e8be824c10d3032809bac7876cb35",
-        "pnpm-workspace.yaml": "82d497fe7617af3dcd84242d3d074ef827ad62e8e726bad63301cea2fd03d633",
-        "scripts/measure-packed-consumer.mts": "2a4d12f007219cf710d25981c5ca1ceb75c816e009cd0fda3b1a8931a4f2d0fb",
-        "scripts/verify-docs-examples.mts": "79c08ea5d45287740cceb1c4fe47f2f1a0b264d9a20c5e0d095d327622c5be8b",
+        "package.json": "3f04c1e2c88b69a86c704a0178d7a82a75d47fcec89e6225ca6be3272d8970ac",
+        "pnpm-workspace.yaml": "58fd69fb2ebc237bf589893fd3150ec0dd25988aee57f465f5b373b038aee606",
+        "scripts/decode-utf8.mts": "2e90c53e95c22b864a209a87c98084db6ec95e83f842007b21528d286d45c18c",
+        "scripts/measure-packed-consumer.mts": "fbaa7edacc4d250be7fc5098360eb3eeaad2ec2a23b5d8f5c7a68ecc3a9103d5",
+        "scripts/run-command.mts": "e419d2af783588a08f3ded7986cb1786c70b756feccd543653f1c821279ace31",
+        "scripts/verify-docs-examples.mts": "aac0f2c990472651042b573af66215658f1aba05647c0aea8fa89c57e3ae636d",
         "scripts/verify-framework-browser.mts": "3635e15218ce0b0fb0249c70a6ae8b3a9a314dc0ab3e4185c78dc6a49c9d4afb",
-        "scripts/verify-packed-consumer.mts": "574b1dedc8bbfc500faca210769f799d1199610d0010e429e2a53c17ca20daf9",
-        "scripts/verify-svelte-angular-consumer.mts": "7e13a21938aaba6615b5443513f4e45f5dfa4b13eb4373da8a6656146ed3a5ea",
-        "scripts/verify-vue-solid-consumer.mts": "0ba286c3ac90f2ba30a9e40fc33ea954cedeca8b81d016ccbc7c246c0d587f8c",
+        "scripts/verify-packed-consumer.mts": "e8f5a1de95544087b9e62a61f27f6e33e99a48bd3a0b2ae74ed4a19dcccfe075",
+        "scripts/verify-svelte-angular-consumer.mts": "71c75f485d42798323ea76807d9887d4958c341987db844b0efd52daf5c91261",
+        "scripts/verify-vue-solid-consumer.mts": "0a1740bd46d6eaff9fe05babcdc41809c6c4c60b88c6331fec1c5ff54fbd2074",
         "skills/effect-api-query/SKILL.md": "02cedb3672a84b099b23ddfe95f3ac5cb707cd781271c578b81171b314d34e09",
         "skills/effect-api-query/references/cache-workflows.md": "27bb96c48c84254ab8c379a529402f81cea3723c17d6396527c090a8c37e6f65",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "4143e54e4361d09272a6207b032185494df851ed3e5adddf0fa5aee9ee7d65ec",
@@ -474,13 +479,13 @@
         "src/rpc/types.ts": "f5fda172e9746512b1c51082eebaee7b5a16bd8b382d59b51ed80e07e8e552e3",
         "tests/create-http-api-query-utils.test.ts": "a76295644389a37e1a00a9825d192cbd0dceeab7d43e7ad1196c171ef5059ad1",
         "tests/create-rpc-query-utils-configuration.test.ts": "839191fd31986c13f77585d191d643599426ce3294a930af421a26439b37b664",
-        "tests/create-rpc-query-utils-execution.test.ts": "aab9805305f90b8cdf2b16983ccf8ba8a1f95b9fa29b09a66c57afb33569ee12",
+        "tests/create-rpc-query-utils-execution.test.ts": "8556cd62ba1ecdcc130c9a5d35f165b60d18a9c6f3f8eed30822f213ecd57e73",
         "tests/create-rpc-query-utils-keys.test.ts": "e79abaa3659d9e212d1a1b3b923abe3493fcdb1d1ab5c92cd895df199043f9da",
         "tests/create-rpc-query-utils-request-options.test.ts": "bcd76859a2830e522bdeb212be70f2e14be3b815da75a5caf3e596fd5fbd13e7",
         "tests/create-rpc-query-utils-server-local.test.ts": "45ee329a736bcb6b114727ef8874f3f34541ce6dc55d5e13ffc80be9c2af2ddd",
-        "tests/create-rpc-query-utils-stream-baseline.test.ts": "13fc86bef268efd326cacbadbaf3e46c4b47ce29fa52078d081171792b1aa3a7",
+        "tests/create-rpc-query-utils-stream-baseline.test.ts": "cec0a8906b3512e38c0272dc07a4cac81402ac014549eb11f24a594d7b792616",
         "tests/create-rpc-query-utils-stream-publication.test.ts": "cc3a25d02015b1410a8d1406249a846bf711f7b829fa7fccce1da90e600530d3",
-        "tests/create-rpc-query-utils-streaming.test.ts": "fcc6520bf47630f26e1ea7950a579ed27e46c5cbeb6b7f203e6c0e0daa9607f2",
+        "tests/create-rpc-query-utils-streaming.test.ts": "7b392709f029af806a6b42038c058dcd1645969581aafedb8696e8bf43e7507b",
         "tests/create-rpc-query-utils.test.ts": "93589d8c857d716ce384a4a97d442d005f0501c890a524b69f6594f039fb530e",
         "tests/fixtures/async.ts": "f9ccc474ad87dd5aedebc5660d74386de6551dd5f8900d572c485c11054ff6b9",
         "tests/fixtures/effect-rpc.ts": "73be762e670e37e4cc3cfcc2b1d40724f23721726d75b45524ad0b3aba78eb61",
@@ -492,9 +497,9 @@
         "tests/http-multipart.test.ts": "ff816ffae79e827883cea1d1f99f5f763e95c9e856040627a34818df6569feb1",
         "tests/http-query-options.test.ts": "bba47a56841732c7a3f3451ce100e9b864ab2fa6374bc7c8c912658e31c30a3a",
         "tests/http-semantic-keys.test.ts": "2e78788697bdf7efec374669d8123da57c93df3c368d41920decfcd175bc2359",
-        "tests/http-transport-cancellation.test.ts": "633a4197c7cc1b0e9039d4b7e33c4f5f59a5efc659bea5afb1b3047bc5e47dab",
+        "tests/http-transport-cancellation.test.ts": "e56f8571f949adc9d44f14b61e20edddb188a9565bf7a585859ffe73a851ac39",
         "tests/http-view-proof.test.ts": "4dc91c38efe5b0c643ef61c98dcdf4a89acf4ef4c1651030124d82ca6cb55a61",
-        "tests/packed-consumer/construction-baseline.mts": "39407db00e51c317e4ade26fe102bf01997f25d303e329e03e6de89a72dcf175",
+        "tests/packed-consumer/construction-baseline.mts": "b6582b268e5c1548d1bb36638ccd645fff9d4bb510de9e26ebbdf81faf1e6f1c",
         "tests/packed-consumer/defaults-contract.ts": "be6667b6957d1f1fc72c4acfc64baec6458bc2875a1d45f53d776a91f71a781b",
         "tests/packed-consumer/defaults-runtime.mts": "b5ee3e802bc4fd349a0616adb5fa5f96f73d4be88bd8959304869be787eb521b",
         "tests/packed-consumer/docs-angular.ts": "d2f46799de96f58ee35062eba6fee90966560b6afbf713a4787d5cc5d91b2105",
@@ -527,7 +532,7 @@
         "tests/packed-consumer/http-etag-recipe.mts": "9d274d4a19b0767b3d5c5dfcd17cde10c4156942486b68d39c9f6339dd837062",
         "tests/packed-consumer/http-live-runtime.mts": "c6931e7d6f805f82ab3e7cca00f6a256e149f1d5b89fc5cc779be243a8f771c8",
         "tests/packed-consumer/http-metadata-runtime.mts": "eaa306ab32c4053155801a49addffe9514a6223dad574ad4297e6d9298610fb7",
-        "tests/packed-consumer/http-runtime.mts": "122409ef4aabd17460447eb24fdb8af7d7b09cba364f9dd24d97f19746e08150",
+        "tests/packed-consumer/http-runtime.mts": "a6b68bb80e590e50f5849985837d39dd4e87eead58b034ed327ba1039ddcf885",
         "tests/packed-consumer/http-stream-runtime.mts": "8f040169c4e18c69432fdac2a6ff230cabe61815b2e1618068b60ecb767fdeb3",
         "tests/packed-consumer/hydration-contract.ts": "815f534dc2101fe5a70df64ab06f76387288effb08f6b68cae0589dcf5763cde",
         "tests/packed-consumer/hydration-runtime.mts": "e5d45f620e966230e79a88f4993691cde612849f80abf43a5aa83805fa2cc715",
@@ -535,7 +540,7 @@
         "tests/packed-consumer/hydration-views-runtime.mts": "7f787156aa8bc2c616178a7adbaecea11bbc772a61468dea40984187b09edd1a",
         "tests/packed-consumer/openapi-api.ts": "a480587e0544204cc23b3a427dd2df9e2d506e9ae92e46cc27431fb7c85e3e8e",
         "tests/packed-consumer/openapi-contract.ts": "0f1e253dd74a203e7fa8feff505c5f20c933927651dcbb026529b334c5612e1f",
-        "tests/packed-consumer/openapi-generate.mjs": "74c569548acffc7ec86b03b07f8c21ad8bbda5a954961c87d5442511a967b219",
+        "tests/packed-consumer/openapi-generate.mjs": "39938a962e6d6d6c71b78fc2cc22a4b6a516adbfbf875079106d628240c7dba6",
         "tests/packed-consumer/openapi-runtime.mts": "6464cb020114fe24b5530a2de289f29ed2a97ab272e7af692c3a5cd34fee2c18",
         "tests/packed-consumer/optimistic-contract.ts": "4c5e5656286aad1b7702bbeb5f30a3a99294adcabcf3511e73c1e1eca7729030",
         "tests/packed-consumer/optimistic-runtime.mts": "987c1eff8db7adeeae2bfe2892c19672ea49ad4e372c45421217140072588f71",
@@ -579,29 +584,30 @@
         "tests/types/tanstack-start-contract.ts": "c99d47160bcaeeb851a489c79f3e8b62c202b41339ba1de3579811b28ee491e8",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "01f5d8c606397b157f74c9042fc28df53c7000d4",
+      "head": "de129263482c3d0ebe851773f009ec8d84c03b20",
       "outcome": "no-change",
-      "reason": "Removed an inaccurate Performance-page pointer from the stream-history guide. The guide retains its retention, buffering, sharing and producer-rate instructions; the package and shipped skill recommend the same current behavior.",
+      "reason": "The existing skill tree maps scripts/run-command.mts to the shipped skill. Restoring native command output and aggregate limits changes no library task, failure mode, dependency, domain or coverage boundary. The domain map, skill specification and tree remain accurate.",
       "evidence": [
-        "The only source change from 01f5d8c606397b157f74c9042fc28df53c7000d4 removes the two-line final pointer in guides/choose-stream-history.md; the destination and benchmark script concern construction/compiler/bundle costs, not stream-publication measurements.",
-        "The domain map, coverage spec and skill tree remain byte-identical and retain the same domain tasks, failure modes, source mappings and validation criteria. Native sync reports Nothing to synchronize.",
-        "131-content-correction-docs-check.log: fresh uncached snippet verification and Astro diagnostics pass with zero errors/warnings/hints. No TypeScript fence or compiled consumer fixture changed.",
-        "All thirteen selected archive members still match current source/native normalization. The complete fresh d58d1f507bb5c6f4 matrix and real Start source/build/client-boundary evidence remain input-identical; no new matrix execution is claimed."
+        "Actual helper correction of the two accepted P2 findings at de129263482c3d0ebe851773f009ec8d84c03b20 uses public Stdio.stderr with endOnDone:false, one shared raw-byte budget, bounded captured prefixes and Effect.onExit. No dependency, policy, exception, public source, documentation or unrelated UTF-8 read changed.",
+        "External actual native RED/GREEN retains all 27 expectations: eight RED failures, zero GREEN failures. Both corrected aggregate exact boundaries and all former oversized inputs agree with native outcomes; captured stderr and parent continued-use markers pass on success, failure and overflow. All 49 observed PIDs exited. The earlier per-stream successful-limit assumptions are explicitly superseded by actual native evidence; old proofs remain untouched.",
+        "Separate actual interruption acceptance forwards the complete 28-byte BOM/Unicode warning and preserves both public/native stderr continued-use markers. Deterministic public-stream readiness precedes Fiber.interrupt; actual SIGTERM then SIGKILL, native PID absence and both Scope removals are proven. Helper/decoder hashes and all six primary probe evidence hashes remain unchanged.",
+        "Fresh uncached source check passes 330 formatted and 136 lint/type files; strict Effect checks 147 files with zero diagnostics under unchanged narrow exceptions. Native Fallow, docs parity/site check, 421-input format, full selected packed matrix and four Chromium/Firefox packed Window/Worker hosts pass. Fresh native pack remains the identical 64,390-byte 437c863f archive; all six fresh bundle byte hashes/gzip sizes match the retained complete-byte compressor proof.",
+        "The actual helper diff, shipped skill, six references and all three planning records were reviewed after these checks. Complete installed tool/provider/shim inputs remain unchanged. All runtime/report/application inputs retain their accepted prior correspondence; no repeated full 262-test or source-production-build claim is made. Leave all 50 unrelated pending items and outcomes unchanged."
       ]
     },
     "source:vite.config.ts": {
-      "fingerprint": "d57305591a64aa304b90074afddd0b20bb6706a99e5bb2dab0384a90386c2bcb",
+      "fingerprint": "0c2d92e6ae909a6b1b36006c02cff057342c2ca3b27163e34df0ae5504b1dd91",
       "snapshot": {
-        "vite.config.ts": "6b01bf2a42146a7d1fe7e44a32a4d5f72f9939e288757bcd67e7be64b4b82c1a"
+        "vite.config.ts": "6237b752f846c14aaeba66bb508ab06d524b308430111f33b6c5543b7a2b1fcf"
       },
-      "head": "8b2b346ebe98e134de19a9ff5bff91c431fd80c3",
-      "outcome": "updated",
-      "reason": "Disabled caching for the existing scoped native Intent validation task so every CI invocation validates current shipped guidance; existing installer workflows remain unchanged.",
+      "head": "4ea1e4329da229c4c9853ddc2f6a50a6309afe9e",
+      "outcome": "no-change",
+      "reason": "The exact-pinned lint unstable API allow-list now adds only the private process helper and public compression measurement script. Removing the unnecessary host exception preserves strict checking and all task commands; source quality passes without a guidance change.",
       "evidence": [
-        "vp run skills-check passed with cache disabled.",
-        "Native vp pack passed attw/publint; full packed-consumer verification passed both Query peers and both supported compilers, compiling all ten skill examples (notes/128-packed-final.log).",
-        "Independent package-only forward evaluation passed numeric snapshot cleanup, hydration, metadata codecs and sharing; its fresh-cache policy experiment supports the HTTP option-installation clarification (notes/128-forward-test.md and proof).",
-        "No public source/type or dependency inputs changed; native source mappings include all current guidance sources."
+        "Only the unnecessary packed-host exception was removed after the matrix; runtime implementation, task commands, consumer fixtures, archive, native tool/provider inputs and all eighteen public source/type files are unchanged.",
+        "Final uncached vp run check passes:329 formatted files and135 files with zero lint/type warnings or errors. Final uncached vp run effect-check passes:146 files and zero diagnostics, including the packed host harness without an unstable exception.",
+        "Fresh selected archive437c863f remains immutable; Chromium/Firefox packed hosts4 tests, full selected packed matrix and11 real-host command probes already pass at identical runtime inputs.",
+        "Existing skill and all three planning records remain accurate; the exception only permits installed exact-pinned public process/compression calls in the two importing modules."
       ]
     },
     "source:.github/workflows/release.yml": {
@@ -615,6 +621,71 @@
       "evidence": [
         "The only release.yml change from 879a98d73b73122aea334bd3964f80e443f2716f removes the words and changelog from the existing error message.",
         "Final workflow formatting and full native source checks pass; fresh 0.1.0 archive acceptance remains independent of publication."
+      ]
+    },
+    "source:e2e/browser-test-config.ts": {
+      "fingerprint": "7f044710dcd47c87c51384327d1e78696cd6286d91a3d102a8345096303f507b",
+      "snapshot": {
+        "e2e/browser-test-config.ts": "d2678060fc23a55740e276b850a918f5f2847e0b4208135ff9fcacea5f8b7186"
+      },
+      "head": "4ea1e4329da229c4c9853ddc2f6a50a6309afe9e",
+      "outcome": "no-change",
+      "reason": "Config reads preserve missing versus empty CI values and the existing browser project, retry and reporter behavior. This repository-only configuration adds no library capability or developer guidance task.",
+      "evidence": [
+        "Base 4ea1e4329da229c4c9853ddc2f6a50a6309afe9e; actual changed sources and native review fingerprints in this report.",
+        "Uncached typecheck: 135 files, zero lint/type errors; strict Effect diagnostics:146 files, zero diagnostics; runtime:262 tests/34 files and both server compilers.",
+        "Fresh packed-package matrix:26 compiler validations,21 runtime fixtures per peer,4 frameworks,12 diagnostic cells,18 construction cases and6 bundles. Selected archive SHA512 437c863fbae5d097d5947330524c004f1bf10e33cb1334fc245818be36ccd1d969458c7ba1a0eb135326f4f7c4030cb22518bc8aa08d8b03e8d543353f9b2876.",
+        "Chromium/Firefox packed Window/Worker:4 tests pass; native app/docs production builds and docs parity pass.",
+        "Finite command probes:11 real-host cases pass, every owned child exits and temp directory is removed; six actual bundle gzip outputs match complete prior native level9 bytes and exclude platform-node.",
+        "Fallow, formatting and native skills validation pass. Native sync reports nothing to synchronize; guidance and all three planning documents remain byte-identical to the reviewed base. Root owns final managed all-engine and Release provenance acceptance."
+      ]
+    },
+    "source:e2e/packed-hosts.spec.ts": {
+      "fingerprint": "00c4b88f164616e8e328fc1fad6751f8afe29102649e9b6784d85c392c887d13",
+      "snapshot": {
+        "e2e/packed-hosts.spec.ts": "6df365b1b90cd19a22a6bfc6a7ac74bf308d68197d31f0ca5be5d24d7a33cd67"
+      },
+      "head": "1d4786ec627ea94854f7f69bbeb84eb2bf55cdf7",
+      "outcome": "no-change",
+      "reason": "The packed host harness decodes raw file bytes without stripping U+FEFF and copies frozen workspace YAML bytes unchanged. Existing host guidance and its application-owned runtime/transport boundary remain accurate; this correction adds no library behavior or host support claim.",
+      "evidence": [
+        "Corrects the grouped P2 BOM finding against immutable 1d4786ec627ea94854f7f69bbeb84eb2bf55cdf7; actual six-file source correction uses scripts/decode-utf8.mts with public FileSystem.readFile and binary workspace writes. All eighteen public source/type files and three native outputs remain identical to integrated base 4ea1e4329da229c4c9853ddc2f6a50a6309afe9e.",
+        "Complete external RED exercised all eighteen cases before editing: five BOM cases failed and all original eleven controls passed. GREEN passes all eighteen unchanged expectations through the actual helper, decoder and public file operations; all thirteen native child handles stopped and temporary scopes closed. Evidence: notes/133-correction-command-probes.red.json and .green.json outside the repository.",
+        "Fresh uncached check passes 330 formatted files and 136 lint/type files with no diagnostics; strict Effect checks 147 files with zero diagnostics under the same narrow process/compression exceptions. Docs parity/site check, native Fallow and explicit 421-input format pass.",
+        "Fresh full selected packed matrix and Chromium/Firefox packed hosts pass; the native pack produced the same 64,390-byte SHA512 437c863f archive. All six fresh bundle hashes and gzip sizes match the independent complete-byte gzip proof. Fresh reporting tests pass all twenty-four cases with real HTTP/WebSocket measurements.",
+        "All installed Effect/platform-node/shared provider/backend bytes, native tool payloads, workspace dependencies, catalog, lock and pnpm policy remain unchanged. Existing skill, all six references and all three planning records were reviewed against the actual correction; unrelated authoring/source items remain pending."
+      ]
+    },
+    "source:playwright.docs.config.ts": {
+      "fingerprint": "88742c8a9cc26dfe39f3825c1cfc869c1caa5254015c82e42eb7a285d9e2b938",
+      "snapshot": {
+        "playwright.docs.config.ts": "1e4d72ce40ce1c640abc1478f9897ffd5c2c3b03e28b012c85b79e5f89f4d7e2"
+      },
+      "head": "4ea1e4329da229c4c9853ddc2f6a50a6309afe9e",
+      "outcome": "no-change",
+      "reason": "Config reads preserve missing versus empty docs URL and CI values while retaining the existing docs browser server and assertions. This repository-only configuration requires no shipped guidance change.",
+      "evidence": [
+        "Base 4ea1e4329da229c4c9853ddc2f6a50a6309afe9e; actual changed sources and native review fingerprints in this report.",
+        "Uncached typecheck: 135 files, zero lint/type errors; strict Effect diagnostics:146 files, zero diagnostics; runtime:262 tests/34 files and both server compilers.",
+        "Fresh packed-package matrix:26 compiler validations,21 runtime fixtures per peer,4 frameworks,12 diagnostic cells,18 construction cases and6 bundles. Selected archive SHA512 437c863fbae5d097d5947330524c004f1bf10e33cb1334fc245818be36ccd1d969458c7ba1a0eb135326f4f7c4030cb22518bc8aa08d8b03e8d543353f9b2876.",
+        "Chromium/Firefox packed Window/Worker:4 tests pass; native app/docs production builds and docs parity pass.",
+        "Finite command probes:11 real-host cases pass, every owned child exits and temp directory is removed; six actual bundle gzip outputs match complete prior native level9 bytes and exclude platform-node.",
+        "Fallow, formatting and native skills validation pass. Native sync reports nothing to synchronize; guidance and all three planning documents remain byte-identical to the reviewed base. Root owns final managed all-engine and Release provenance acceptance."
+      ]
+    },
+    "source:tsconfig.json": {
+      "fingerprint": "7e91704768e77d0153f7be7d3a8b73ed534f7ddf0dec7e733110d4abc0f13fb2",
+      "snapshot": {
+        "tsconfig.json": "d591728f47a71ebd09eba95ce6852ae258c40573f36accb4042237d25f62f520"
+      },
+      "head": "4ea1e4329da229c4c9853ddc2f6a50a6309afe9e",
+      "outcome": "no-change",
+      "reason": "The exact-pinned compiler unstable API allow-list now adds only scripts/run-command.mts and scripts/measure-packed-consumer.mts, which import public process and HTTP compression APIs. The host harness needs no exception and strict diagnostics pass. Public declarations and shipped guidance are unchanged.",
+      "evidence": [
+        "Only the unnecessary packed-host exception was removed after the matrix; runtime implementation, task commands, consumer fixtures, archive, native tool/provider inputs and all eighteen public source/type files are unchanged.",
+        "Final uncached vp run check passes:329 formatted files and135 files with zero lint/type warnings or errors. Final uncached vp run effect-check passes:146 files and zero diagnostics, including the packed host harness without an unstable exception.",
+        "Fresh selected archive437c863f remains immutable; Chromium/Firefox packed hosts4 tests, full selected packed matrix and11 real-host command probes already pass at identical runtime inputs.",
+        "Existing skill and all three planning records remain accurate; the exception only permits installed exact-pinned public process/compression calls in the two importing modules."
       ]
     }
   }

@@ -1,12 +1,26 @@
+import { NodeServices } from '@effect/platform-node'
 import { describe, expect, it } from '@effect/vitest'
 import { QueryClient } from '@tanstack/query-core'
-import { Array as EffectArray, Effect, Predicate, Schema, Stream } from 'effect'
+import {
+  Array as EffectArray,
+  Config,
+  ConfigProvider,
+  Crypto,
+  Effect,
+  FileSystem,
+  Option,
+  Path,
+  Predicate,
+  Schema,
+  Stream,
+} from 'effect'
+import { Hex } from 'effect/encoding'
 import { Rpc, RpcGroup, RpcTest } from 'effect/rpc'
-import { createHash } from 'node:crypto'
-import { readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { afterAll } from 'vitest'
 
 import { createRpcQueryUtils } from '#effect-api-query'
+
+import { decodeUtf8 } from '../scripts/decode-utf8.mts'
 
 const SampleSchema = Schema.Struct({
   version: Schema.Finite,
@@ -209,53 +223,79 @@ const baselineCase = {
   structuralSharing: true,
 } as const
 
-const manifestVersion = (name: string) =>
-  Schema.decodeUnknownSync(Schema.Struct({ version: Schema.String }))(
-    JSON.parse(
-      readFileSync(new URL(`../node_modules/${name}/package.json`, import.meta.url), 'utf-8'),
+const manifestVersion = Effect.fnUntraced(function* (name: string) {
+  const fs = yield* FileSystem.FileSystem
+  const path = yield* Path.Path
+  const manifest = yield* Schema.decodeEffect(
+    Schema.fromJsonString(Schema.Struct({ version: Schema.String })),
+  )(
+    decodeUtf8(
+      yield* fs.readFile(
+        yield* path.fromFileUrl(new URL(`../node_modules/${name}/package.json`, import.meta.url)),
+      ),
     ),
-  ).version
+  )
+  return manifest.version
+})
 
-const context = () => {
-  const sources = readdirSync(new URL('../src/', import.meta.url), {
-    recursive: true,
-    encoding: 'utf-8',
-  })
+const context = Effect.fnUntraced(function* () {
+  const fs = yield* FileSystem.FileSystem
+  const path = yield* Path.Path
+  const crypto = yield* Crypto.Crypto
+  const directory = yield* path.fromFileUrl(new URL('../src/', import.meta.url))
+  const sources = (yield* fs.readDirectory(directory, { recursive: true }))
     .filter((source) => source.endsWith('.ts'))
     .sort((left, right) => left.localeCompare(right))
-  const sourceHash = createHash('sha256')
+  const parts: Uint8Array[] = []
   for (const source of sources) {
-    sourceHash.update(source)
-    sourceHash.update(readFileSync(new URL(`../src/${source}`, import.meta.url)))
+    parts.push(new TextEncoder().encode(source), yield* fs.readFile(path.join(directory, source)))
+  }
+  const bytes = new Uint8Array(parts.reduce((size, part) => size + part.byteLength, 0))
+  let offset = 0
+  for (const part of parts) {
+    bytes.set(part, offset)
+    offset += part.byteLength
   }
   return {
     node: process.version,
     platform: process.platform,
     arch: process.arch,
-    effect: manifestVersion('effect'),
-    queryCore: manifestVersion('@tanstack/query-core'),
-    vitest: manifestVersion('vitest'),
-    sourceSha256: sourceHash.digest('hex'),
-    fixtureSha256: createHash('sha256')
-      .update(readFileSync(new URL(import.meta.url)))
-      .digest('hex'),
+    effect: yield* manifestVersion('effect'),
+    queryCore: yield* manifestVersion('@tanstack/query-core'),
+    vitest: yield* manifestVersion('vitest'),
+    sourceSha256: Hex.encode(yield* crypto.digest('SHA-256', bytes)),
+    fixtureSha256: Hex.encode(
+      yield* crypto.digest(
+        'SHA-256',
+        yield* fs.readFile(yield* path.fromFileUrl(new URL(import.meta.url))),
+      ),
+    ),
     readyClient: 'RpcTest.makeClient, in-memory no-serialization, default stream buffer',
     execution: 'fresh QueryClient, finite initial fetch, default reset policy, no observers',
     workload: '64 emissions: versions 0 through 7, each repeated eight times',
   }
-}
+})
 
 const reports: Omit<Effect.Success<ReturnType<typeof measure>>, 'data'>[] = []
 
 describe('stream baseline', () => {
-  afterAll(() => {
-    const output = process.env['STREAM_MEASURE']
-    if (output !== undefined && output !== '') {
-      writeFileSync(
-        output,
-        `${JSON.stringify({ context: context(), measurements: reports }, null, 2)}\n`,
-      )
-    }
+  afterAll(async () => {
+    await Effect.runPromise(
+      Effect.gen(function* () {
+        const output = Option.getOrUndefined(
+          yield* Config.String('STREAM_MEASURE')
+            .pipe(Config.option)
+            .parse(ConfigProvider.fromEnv({ preserveEmptyStrings: true })),
+        )
+        if (output !== undefined && output !== '') {
+          const fs = yield* FileSystem.FileSystem
+          yield* fs.writeFileString(
+            output,
+            `${JSON.stringify({ context: yield* context(), measurements: reports }, null, 2)}\n`,
+          )
+        }
+      }).pipe(Effect.provide(NodeServices.layer)),
+    )
   })
   it.live('separates cache data writes from fetch lifecycle updates', () =>
     Effect.scoped(
@@ -294,7 +334,13 @@ describe('stream baseline', () => {
         expect(measurement.maxRetainedValues).toBe(expected.length)
         expect(measurement.dataReferenceChanges).toBeLessThanOrEqual(measurement.dataWrites)
         expect(measurement.lifecycleUpdates).toBeGreaterThan(0)
-        if (process.env['STREAM_MEASURE'] !== undefined) {
+        if (
+          Option.isSome(
+            yield* Config.String('STREAM_MEASURE')
+              .pipe(Config.option)
+              .parse(ConfigProvider.fromEnv({ preserveEmptyStrings: true })),
+          )
+        ) {
           const { data: _data, ...report } = measurement
           reports.push(report)
         }

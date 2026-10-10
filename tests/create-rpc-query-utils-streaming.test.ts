@@ -3,7 +3,6 @@ import { QueryClient, QueryObserver, skipToken } from '@tanstack/query-core'
 import { Cause, Deferred, Effect, Equal, Exit, Predicate, Schema, Stream } from 'effect'
 import type { RpcClient } from 'effect/rpc'
 import { Rpc, RpcGroup } from 'effect/rpc'
-import { setTimeout } from 'node:timers/promises'
 
 import {
   createRpcQueryUtils,
@@ -507,7 +506,9 @@ describe('createRpcQueryUtils streaming execution', () => {
     const query = captureFailure(queryClient.query(options))
     await Effect.runPromise(Deferred.await(waiting))
     await queryClient.cancelQueries({ queryKey: options.queryKey })
-    await setTimeout(10)
+    await Effect.runPromise(
+      Deferred.await(interrupted).pipe(Effect.andThen(Deferred.await(finalized))),
+    )
 
     expect(Deferred.isDoneUnsafe(interrupted)).toBe(true)
     expect(Deferred.isDoneUnsafe(finalized)).toBe(true)

@@ -1,10 +1,17 @@
 import { defineConfig } from '@playwright/test'
 import type { PlaywrightTestConfig } from '@playwright/test'
+import { Config, ConfigProvider, Effect, Option } from 'effect'
 
 import { browserTestDefaults, browserTestServer } from './e2e/browser-test-config.ts'
 
 // DOCS_BASE_URL is the deployment origin, e.g. https://ueberbrot.github.io.
-const hostedOrigin = process.env['DOCS_BASE_URL']
+const hostedOrigin = Option.getOrUndefined(
+  Effect.runSync(
+    Config.String('DOCS_BASE_URL')
+      .pipe(Config.option)
+      .parse(ConfigProvider.fromEnv({ preserveEmptyStrings: true })),
+  ),
+)
 
 const docsConfig: PlaywrightTestConfig = {
   outputDir: 'test-results/docs',

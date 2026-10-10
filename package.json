@@ -50,6 +50,7 @@
     "@changesets/config": "4.0.1",
     "@effect-api-query/contracts": "workspace:*",
     "@effect-api-query/server": "workspace:*",
+    "@effect/platform-node": "catalog:",
     "@effect/tsgo": "0.47.2",
     "@effect/vitest": "4.0.0",
     "@playwright/test": "1.63.0",
