@@ -8,7 +8,6 @@ import {
 } from '@tanstack/query-core'
 import { Context, Deferred, Effect, Equal, Exit, Schema } from 'effect'
 import { Rpc, RpcGroup } from 'effect/rpc'
-import { once } from 'node:events'
 
 import {
   createRpcQueryUtils,
@@ -667,12 +666,27 @@ describe('createRpcQueryUtils execution boundaries', () => {
     Effect.gen(function* () {
       let querySignal: AbortSignal | undefined
       let mutationReceivedOptions: boolean | undefined
+      const runPromise = Effect.runPromiseWith(yield* Effect.context())
       const runPromiseExit: RunPromiseExit = async (effect, options) => {
         if (options?.signal === undefined) {
           mutationReceivedOptions = options !== undefined
         } else {
-          querySignal = options.signal
-          await once(options.signal, 'abort')
+          const { signal } = options
+          querySignal = signal
+          await runPromise(
+            Effect.callback((resume) => {
+              const onAbort = () => {
+                resume(Effect.void)
+              }
+              signal.addEventListener('abort', onAbort, { once: true })
+              if (signal.aborted) {
+                onAbort()
+              }
+              return Effect.sync(() => {
+                signal.removeEventListener('abort', onAbort)
+              })
+            }),
+          )
         }
         return await Effect.runPromiseExit(effect, options)
       }

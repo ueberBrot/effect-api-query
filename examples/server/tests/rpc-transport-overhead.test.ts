@@ -1,6 +1,21 @@
-import { NodeHttpServer, NodeSocket } from '@effect/platform-node'
+import { NodeHttpServer, NodeSocket, NodeStdio } from '@effect/platform-node'
 import { describe, expect, it } from '@effect/vitest'
-import { Deferred, Effect, Exit, Fiber, Layer, Option, Queue, Schema, Scope, Stream } from 'effect'
+import {
+  Config,
+  ConfigProvider,
+  Deferred,
+  Effect,
+  Exit,
+  Fiber,
+  Layer,
+  Option,
+  Predicate,
+  Queue,
+  Schema,
+  Scope,
+  Stdio,
+  Stream,
+} from 'effect'
 import { FetchHttpClient, HttpClient } from 'effect/http'
 import { RpcClient, RpcMessage, RpcSerialization, RpcServer } from 'effect/rpc'
 import { Socket } from 'effect/socket'
@@ -16,13 +31,14 @@ import {
 } from '../../../tests/fixtures/rpc-transport-queries.ts'
 
 const handlers = group.toLayer({ 'values.read': ({ id }) => Effect.succeed(id) })
+const textEncoder = new TextEncoder()
 
 const headerBytes = (request: IncomingMessage) => {
   let headers = `${request.method ?? ''} ${request.url ?? ''} HTTP/${request.httpVersion}\r\n`
   for (let index = 0; index < request.rawHeaders.length; index += 2) {
     headers += `${request.rawHeaders[index]}: ${request.rawHeaders[index + 1]}\r\n`
   }
-  return Buffer.byteLength(`${headers}\r\n`)
+  return textEncoder.encode(`${headers}\r\n`).byteLength
 }
 
 const measureHttpCalls = Effect.fn('TransportOverhead.measureHttpCalls')(function* (count: number) {
@@ -140,7 +156,9 @@ const measureWebSocketCalls = Effect.fn('TransportOverhead.measureWebSocketCalls
         },
         send: (data) => {
           writes += 1
-          requestBodyBytes += Buffer.byteLength(data)
+          requestBodyBytes += Predicate.isString(data)
+            ? textEncoder.encode(data).byteLength
+            : data.byteLength
           webSocket.send(data)
         },
       }
@@ -176,17 +194,23 @@ const measureWebSocketCalls = Effect.fn('TransportOverhead.measureWebSocketCalls
   return measurement
 })
 
-const reportMeasurement = (
+const reportMeasurement = Effect.fn('TransportOverhead.reportMeasurement')(function* (
   transport: string,
   count: number,
   measurement:
     | Effect.Success<ReturnType<typeof measureHttpCalls>>
     | Effect.Success<ReturnType<typeof measureWebSocketCalls>>,
-) => {
-  if (process.env['RPC_TRANSPORT_MEASURE'] === '1') {
-    process.stdout.write(`${JSON.stringify({ transport, count, ...measurement })}\n`)
+) {
+  const reporting = yield* Config.String('RPC_TRANSPORT_MEASURE')
+    .pipe(Config.option)
+    .parse(ConfigProvider.fromEnv({ preserveEmptyStrings: true }))
+  if (Option.isSome(reporting) && reporting.value === '1') {
+    const stdio = yield* Stdio.Stdio
+    yield* Stream.make(`${JSON.stringify({ transport, count, ...measurement })}\n`).pipe(
+      Stream.run(stdio.stdout({ endOnDone: false })),
+    )
   }
-}
+}, Effect.provide(NodeStdio.layer))
 
 const decodeBurst = Schema.decodeUnknownOption(
   Schema.TaggedStruct('Chunk', {
@@ -371,7 +395,7 @@ describe('independent RPC request overhead', () => {
       expect(measurement.clientToServerBytes).toBe(
         measurement.requestHeaderBytes + measurement.requestBodyBytes,
       )
-      reportMeasurement('http', 8, measurement)
+      yield* reportMeasurement('http', 8, measurement)
     }),
   )
 
@@ -387,7 +411,7 @@ describe('independent RPC request overhead', () => {
         expect(measurement.clientToServerBytes).toBe(
           measurement.upgradeHeaderBytes + measurement.requestBodyBytes + 8 * 6,
         )
-        reportMeasurement('websocket', 8, measurement)
+        yield* reportMeasurement('websocket', 8, measurement)
       }),
   )
 
@@ -402,8 +426,8 @@ describe('independent RPC request overhead', () => {
       expect(websocket.cacheEntries).toBe(count)
       expect(http.values).toStrictEqual(websocket.values)
       expect(http.requestBodyBytes).toBe(websocket.requestBodyBytes)
-      reportMeasurement('http', count, http)
-      reportMeasurement('websocket', count, websocket)
+      yield* reportMeasurement('http', count, http)
+      yield* reportMeasurement('websocket', count, websocket)
     }),
   )
 })

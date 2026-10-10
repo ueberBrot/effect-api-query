@@ -1,7 +1,8 @@
+import { NodeHttpServer } from '@effect/platform-node'
 // fallow-ignore-file unused-file
 // The packed-package verifier executes this fixture in isolated consumers.
 import { MutationObserver, QueryClient, isCancelledError } from '@tanstack/query-core'
-import { Cause, Effect, Exit, Layer, Schema } from 'effect'
+import { Cause, Deferred, Effect, Exit, Layer, Predicate, Schema } from 'effect'
 import {
   createHttpApiQueryUtils,
   createRpcQueryUtils,
@@ -30,7 +31,6 @@ import {
 } from 'effect/http-api'
 import { Rpc, RpcGroup, RpcTest } from 'effect/rpc'
 import { deepStrictEqual, equal, notDeepStrictEqual, ok, rejects } from 'node:assert/strict'
-import { once } from 'node:events'
 import { createServer } from 'node:http'
 
 const UploadPayload = Schema.Struct({
@@ -87,114 +87,117 @@ const cancellationApi = HttpApi.make('packed-cancellation').add(
   ),
 )
 for (const mode of ['query', 'metadata', 'metadata body', 'later page'] as const) {
-  let received!: () => void
-  let disconnected!: () => void
-  const requestReceived = new Promise<void>((resolve) => {
-    received = resolve
-  })
-  const requestDisconnected = new Promise<void>((resolve) => {
-    disconnected = resolve
-  })
-  const paths: string[] = []
-  const server = createServer((request, response) => {
-    paths.push(request.url ?? '')
-    if (request.url === '/pages/0') {
-      response.setHeader('content-type', 'application/json')
-      response.end(JSON.stringify('first'))
-      return
-    }
-    response.on('close', disconnected)
-    if (mode === 'metadata body') {
-      response.setHeader('content-type', 'application/json')
-      response.write('"pending')
-    }
-    received()
-  })
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-  let timeout: ReturnType<typeof setTimeout> | undefined
-  const deadline = new Promise<never>((_resolve, reject) => {
-    timeout = setTimeout(() => reject(new Error(`HTTP ${mode} cancellation timed out`)), 10_000)
-  })
-  try {
-    server.listen(0, '127.0.0.1')
-    await Promise.race([once(server, 'listening'), deadline])
-    const address = server.address()
-    ok(address !== null && typeof address !== 'string')
-    const client = await Effect.runPromise(
-      HttpApiClient.make(cancellationApi, {
-        baseUrl: `http://127.0.0.1:${address.port}`,
-      }).pipe(Effect.provide(FetchHttpClient.layer)),
-    )
-    let interrupted!: (cause: Cause.Cause<unknown>) => void
-    const interruption = new Promise<Cause.Cause<unknown>>((resolve) => {
-      interrupted = resolve
-    })
-    let requestSignal: AbortSignal | undefined
-    const runPromiseExit: RunPromiseExit = async (effect, options) => {
-      requestSignal = options?.signal
-      const exit = await Effect.runPromiseExit(effect, options)
-      if (Exit.isFailure(exit)) interrupted(exit.cause)
-      return exit
-    }
-    const utils = createHttpApiQueryUtils(cancellationApi, {
-      client,
-      keyPrefix: ['packed'],
-      runPromiseExit,
-    })
-    const pending =
-      mode === 'query'
-        ? queryClient.query(utils.pages.read.queryOptions({ input: { params: { page: 1 } } }))
-        : mode === 'metadata' || mode === 'metadata body'
-          ? queryClient.query(
-              utils.pages.read.metadataOptions({
-                input: { params: { page: 1 } },
-                initialData: { data: 'cached', status: 200, headers: { etag: 'cached' } },
-              }),
-            )
-          : queryClient.infiniteQuery({
-              ...utils.pages.read.infiniteOptions({
-                initialPageParam: 0,
-                input: (page) => ({ params: { page } }),
-                getNextPageParam: (_last, _pages, page) => page + 1,
-              }),
-              pages: 2,
-            })
-    const result = pending.catch((error: unknown) => error)
-    await Promise.race([requestReceived, deadline])
-    equal(requestSignal?.aborted, false)
-    await queryClient.cancelQueries({ queryKey: utils.pages.read.key() })
-    const settled = await result
-    if (mode === 'metadata' || mode === 'metadata body') {
-      deepStrictEqual(settled, { data: 'cached', status: 200, headers: { etag: 'cached' } })
-    } else {
-      ok(isCancelledError(settled))
-    }
-    equal(requestSignal?.aborted, true)
-    ok(Cause.hasInterrupts(await Promise.race([interruption, deadline])))
-    await Promise.race([requestDisconnected, deadline])
-    deepStrictEqual(paths, mode === 'later page' ? ['/pages/0', '/pages/1'] : ['/pages/1'])
-    if (mode === 'metadata' || mode === 'metadata body') {
-      deepStrictEqual(
-        queryClient.getQueryData(utils.pages.read.metadataKey({ params: { page: 1 } })),
-        {
-          data: 'cached',
-          status: 200,
-          headers: { etag: 'cached' },
-        },
-      )
-    }
-    equal(queryClient.isFetching(), 0)
-  } finally {
-    clearTimeout(timeout)
-    queryClient.clear()
-    if (server.listening) {
-      const closed = new Promise<void>((resolve, reject) => {
-        server.close((error) => (error === undefined ? resolve() : reject(error)))
+  await Effect.runPromise(
+    Effect.gen(function* () {
+      const requestReceived = yield* Deferred.make<undefined>()
+      const requestDisconnected = yield* Deferred.make<undefined>()
+      const interruption = yield* Deferred.make<Cause.Cause<unknown>>()
+      const runSync = Effect.runSyncWith(yield* Effect.context())
+      const paths: string[] = []
+      const server = createServer((request, response) => {
+        paths.push(request.url ?? '')
+        if (request.url === '/pages/0') {
+          response.setHeader('content-type', 'application/json')
+          response.end(JSON.stringify('first'))
+          return
+        }
+        response.on('close', () => {
+          runSync(Deferred.succeed(requestDisconnected, undefined))
+        })
+        if (mode === 'metadata body') {
+          response.setHeader('content-type', 'application/json')
+          response.write('"pending')
+        }
+        runSync(Deferred.succeed(requestReceived, undefined))
       })
-      server.closeAllConnections()
-      await closed
-    }
-  }
+      yield* NodeHttpServer.make(() => server, {
+        host: '127.0.0.1',
+        port: 0,
+        disablePreemptiveShutdown: true,
+      })
+      yield* Effect.addFinalizer(() =>
+        Effect.sync(() => {
+          server.closeAllConnections()
+        }),
+      )
+      const address = server.address()
+      ok(address !== null && !Predicate.isString(address))
+      const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+      yield* Effect.addFinalizer(() =>
+        Effect.sync(() => {
+          queryClient.clear()
+        }),
+      )
+      const client = yield* HttpApiClient.make(cancellationApi, {
+        baseUrl: `http://127.0.0.1:${address.port}`,
+      }).pipe(Effect.provide(FetchHttpClient.layer))
+      let requestSignal: AbortSignal | undefined
+      const runPromiseExit: RunPromiseExit = async (effect, options) => {
+        requestSignal = options?.signal
+        const exit = await Effect.runPromiseExit(effect, options)
+        if (Exit.isFailure(exit)) {
+          runSync(Deferred.succeed(interruption, exit.cause))
+        }
+        return exit
+      }
+      const utils = createHttpApiQueryUtils(cancellationApi, {
+        client,
+        keyPrefix: ['packed'],
+        runPromiseExit,
+      })
+      const pending =
+        mode === 'query'
+          ? queryClient.query(utils.pages.read.queryOptions({ input: { params: { page: 1 } } }))
+          : mode === 'metadata' || mode === 'metadata body'
+            ? queryClient.query(
+                utils.pages.read.metadataOptions({
+                  input: { params: { page: 1 } },
+                  initialData: { data: 'cached', status: 200, headers: { etag: 'cached' } },
+                }),
+              )
+            : queryClient.infiniteQuery({
+                ...utils.pages.read.infiniteOptions({
+                  initialPageParam: 0,
+                  input: (page) => ({ params: { page } }),
+                  getNextPageParam: (_last, _pages, page) => page + 1,
+                }),
+                pages: 2,
+              })
+      const result = pending.catch((error: unknown) => error)
+      yield* Deferred.await(requestReceived)
+      equal(requestSignal?.aborted, false)
+      yield* Effect.promise(async () => {
+        await queryClient.cancelQueries({ queryKey: utils.pages.read.key() })
+      })
+      const settled = yield* Effect.promise(async () => await result)
+      if (mode === 'metadata' || mode === 'metadata body') {
+        deepStrictEqual(settled, { data: 'cached', status: 200, headers: { etag: 'cached' } })
+      } else {
+        ok(isCancelledError(settled))
+      }
+      equal(requestSignal?.aborted, true)
+      ok(Cause.hasInterrupts(yield* Deferred.await(interruption)))
+      yield* Deferred.await(requestDisconnected)
+      deepStrictEqual(paths, mode === 'later page' ? ['/pages/0', '/pages/1'] : ['/pages/1'])
+      if (mode === 'metadata' || mode === 'metadata body') {
+        deepStrictEqual(
+          queryClient.getQueryData(utils.pages.read.metadataKey({ params: { page: 1 } })),
+          {
+            data: 'cached',
+            status: 200,
+            headers: { etag: 'cached' },
+          },
+        )
+      }
+      equal(queryClient.isFetching(), 0)
+    }).pipe(
+      Effect.timeoutOrElse({
+        duration: '10 seconds',
+        orElse: () => Effect.fail(new Error(`HTTP ${mode} cancellation timed out`)),
+      }),
+      Effect.scoped,
+    ),
+  )
 }
 
 class Authentication extends HttpApiMiddleware.Service<Authentication>()(

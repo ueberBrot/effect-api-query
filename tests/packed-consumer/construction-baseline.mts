@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/query-core'
-import { Effect, Layer, Schema } from 'effect'
+import { Clock, Effect, Layer, Schema } from 'effect'
 import {
   createHttpApiQueryUtils,
   createRpcQueryUtils,
@@ -17,7 +17,6 @@ import {
 } from 'effect/http-api'
 import { Rpc, RpcGroup, RpcTest } from 'effect/rpc'
 import { deepStrictEqual, equal, ok, throws } from 'node:assert/strict'
-import { performance } from 'node:perf_hooks'
 
 const Payload = Schema.Struct({
   id: Schema.Int,
@@ -47,6 +46,7 @@ const measurements: {
 }[] = []
 
 const measure = (
+  clock: Clock.Clock,
   adapter: 'rpc' | 'http',
   stage: string,
   operations: number,
@@ -56,9 +56,9 @@ const measure = (
 ) => {
   for (let warmup = 0; warmup < 20; warmup += 1) operation()
   const milliseconds = Array.from({ length: samples }, () => {
-    const started = performance.now()
+    const started = clock.monotonicTimeNanosUnsafe()
     for (let iteration = 0; iteration < iterations; iteration += 1) operation()
-    return performance.now() - started
+    return Number(clock.monotonicTimeNanosUnsafe() - started) / 1_000_000
   })
   measurements.push({ adapter, stage, operations, records: recordCount, iterations, milliseconds })
 }
@@ -66,6 +66,7 @@ const measure = (
 await Effect.runPromise(
   Effect.scoped(
     Effect.gen(function* () {
+      const clock = yield* Clock.Clock
       for (const operationCount of operationCounts) {
         const rpcs = Array.from({ length: operationCount }, (_, index) =>
           Rpc.make(`records.read-${index}`, { payload: Payload, success: Schema.Int }),
@@ -90,7 +91,7 @@ await Effect.runPromise(
         equal(Object.isFrozen(rpc.records), true)
         equal(Object.keys(rpc.records).length, operationCount + 1)
         equal(Object.isFrozen(rpc.records['read-0']), true)
-        measure('rpc', 'factory', operationCount, 0, 50, rpcFactory)
+        measure(clock, 'rpc', 'factory', operationCount, 0, 50, rpcFactory)
 
         const endpoint = (index: number) =>
           HttpApiEndpoint.post(`read-${index}`, `/read-${index}/:owner`, {
@@ -130,7 +131,7 @@ await Effect.runPromise(
         equal(Object.isFrozen(http.records), true)
         equal(Object.keys(http.records).length, operationCount + 1)
         equal(Object.isFrozen(http.records['read-0']), true)
-        measure('http', 'factory', operationCount, 0, 50, httpFactory)
+        measure(clock, 'http', 'factory', operationCount, 0, 50, httpFactory)
 
         if (operationCount !== 1) continue
         const custom = createRpcQueryUtils(group, {
@@ -176,17 +177,19 @@ await Effect.runPromise(
           equal(Object.isFrozen(queryKey.at(-1)), true)
           equal(Object.isFrozen(value), false)
           equal(Object.isFrozen(value.rows), false)
-          measure('rpc', 'payload-construction', 1, recordCount, 500, () => Payload.make(value))
-          measure('rpc', 'schema-encoding', 1, recordCount, 500, () => encode(normalized))
-          measure('rpc', 'query-key', 1, recordCount, 500, () => leaf.queryKey(value))
-          measure('rpc', 'query-key-custom-encoder', 1, recordCount, 500, () =>
+          measure(clock, 'rpc', 'payload-construction', 1, recordCount, 500, () =>
+            Payload.make(value),
+          )
+          measure(clock, 'rpc', 'schema-encoding', 1, recordCount, 500, () => encode(normalized))
+          measure(clock, 'rpc', 'query-key', 1, recordCount, 500, () => leaf.queryKey(value))
+          measure(clock, 'rpc', 'query-key-custom-encoder', 1, recordCount, 500, () =>
             customLeaf.queryKey(value),
           )
-          measure('rpc', 'query-options', 1, recordCount, 500, () =>
+          measure(clock, 'rpc', 'query-options', 1, recordCount, 500, () =>
             leaf.queryOptions({ input: value }),
           )
-          measure('http', 'query-key', 1, recordCount, 500, () => httpLeaf.queryKey(request))
-          measure('http', 'query-options', 1, recordCount, 500, () =>
+          measure(clock, 'http', 'query-key', 1, recordCount, 500, () => httpLeaf.queryKey(request))
+          measure(clock, 'http', 'query-options', 1, recordCount, 500, () =>
             httpLeaf.queryOptions({ input: request }),
           )
         }

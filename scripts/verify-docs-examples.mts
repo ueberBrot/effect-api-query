@@ -1,52 +1,62 @@
+import { NodeRuntime, NodeServices } from '@effect/platform-node'
+import { Effect, FileSystem, Path } from 'effect'
 // fallow-ignore-file unused-file
 // The docs-check task verifies tutorial text against packed compiler fixtures.
 import { strictEqual } from 'node:assert'
-import { readFileSync } from 'node:fs'
 
-for (const [page, fixtures] of [
-  ['getting-started/quick-start', ['types/docs-rpc-quick-start']],
-  ['getting-started/http-quick-start', ['types/docs-http-quick-start']],
-  ['reference/external-http-clients', ['packed-consumer/docs-openapi']],
-  ['guides/retry-queries', ['packed-consumer/docs-retry']],
-  ['guides/svelte-and-angular', ['packed-consumer/docs-angular']],
-  ['guides/vue-and-solid', ['packed-consumer/docs-vue-query', 'packed-consumer/docs-solid-query']],
-  ['guides/switch-cache-owners', ['packed-consumer/docs-owner-cache']],
-  ['guides/refresh-from-events', ['packed-consumer/docs-user-events']],
-  [
-    'guides/websocket-clients',
-    ['packed-consumer/socket-client', 'packed-consumer/docs-websocket-use'],
-  ],
-  ['guides/stream-snapshots', ['packed-consumer/docs-stream-snapshot']],
-  [
-    'guides/cache-filters',
-    ['packed-consumer/docs-cache-filters-rpc', 'packed-consumer/docs-cache-filters-http'],
-  ],
-  [
-    'guides/query-defaults',
-    ['packed-consumer/docs-defaults', 'packed-consumer/docs-http-defaults'],
-  ],
-  ['guides/hydrate-query-views', ['packed-consumer/docs-hydration-views']],
-  [
-    'guides/hydrate-unary-data',
+const program = Effect.gen(function* () {
+  const fs = yield* FileSystem.FileSystem
+  const path = yield* Path.Path
+  for (const [page, fixtures] of [
+    ['getting-started/quick-start', ['types/docs-rpc-quick-start']],
+    ['getting-started/http-quick-start', ['types/docs-http-quick-start']],
+    ['reference/external-http-clients', ['packed-consumer/docs-openapi']],
+    ['guides/retry-queries', ['packed-consumer/docs-retry']],
+    ['guides/svelte-and-angular', ['packed-consumer/docs-angular']],
     [
-      'packed-consumer/docs-hydration-dto',
-      'packed-consumer/docs-hydration-rich',
-      'packed-consumer/docs-hydration-async',
+      'guides/vue-and-solid',
+      ['packed-consumer/docs-vue-query', 'packed-consumer/docs-solid-query'],
     ],
-  ],
-] as const) {
-  const markdown = readFileSync(
-    new URL(`../apps/docs/src/content/docs/${page}.md`, import.meta.url),
-    'utf-8',
-  )
-  const samples = [...markdown.matchAll(/^```ts\n(?<source>[\s\S]*?)^```/gmu)]
-  strictEqual(samples.length, fixtures.length, `${page} must contain its TypeScript fixtures`)
-  for (const [index, fixture] of fixtures.entries()) {
-    const source = readFileSync(new URL(`../tests/${fixture}.ts`, import.meta.url), 'utf-8')
-    strictEqual(
-      samples[index]?.groups?.['source']?.trimEnd(),
-      source.trimEnd(),
-      `${page} differs from ${fixture}.ts`,
+    ['guides/switch-cache-owners', ['packed-consumer/docs-owner-cache']],
+    ['guides/refresh-from-events', ['packed-consumer/docs-user-events']],
+    [
+      'guides/websocket-clients',
+      ['packed-consumer/socket-client', 'packed-consumer/docs-websocket-use'],
+    ],
+    ['guides/stream-snapshots', ['packed-consumer/docs-stream-snapshot']],
+    [
+      'guides/cache-filters',
+      ['packed-consumer/docs-cache-filters-rpc', 'packed-consumer/docs-cache-filters-http'],
+    ],
+    [
+      'guides/query-defaults',
+      ['packed-consumer/docs-defaults', 'packed-consumer/docs-http-defaults'],
+    ],
+    ['guides/hydrate-query-views', ['packed-consumer/docs-hydration-views']],
+    [
+      'guides/hydrate-unary-data',
+      [
+        'packed-consumer/docs-hydration-dto',
+        'packed-consumer/docs-hydration-rich',
+        'packed-consumer/docs-hydration-async',
+      ],
+    ],
+  ] as const) {
+    const markdown = yield* fs.readFileString(
+      yield* path.fromFileUrl(new URL(`../apps/docs/src/content/docs/${page}.md`, import.meta.url)),
     )
+    const samples = [...markdown.matchAll(/^```ts\n(?<source>[\s\S]*?)^```/gmu)]
+    strictEqual(samples.length, fixtures.length, `${page} must contain its TypeScript fixtures`)
+    for (const [index, fixture] of fixtures.entries()) {
+      const source = yield* fs.readFileString(
+        yield* path.fromFileUrl(new URL(`../tests/${fixture}.ts`, import.meta.url)),
+      )
+      strictEqual(
+        samples[index]?.groups?.['source']?.trimEnd(),
+        source.trimEnd(),
+        `${page} differs from ${fixture}.ts`,
+      )
+    }
   }
-}
+})
+NodeRuntime.runMain(program.pipe(Effect.provide(NodeServices.layer)))

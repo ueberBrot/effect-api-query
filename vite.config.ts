@@ -163,7 +163,13 @@ export default defineConfig({
         ),
       },
       {
-        files: ['src/{http,rpc}/**/*.ts', 'tests/**/*.ts', 'examples/**/*.{ts,tsx}'],
+        files: [
+          'src/{http,rpc}/**/*.ts',
+          'tests/**/*.ts',
+          'examples/**/*.{ts,tsx}',
+          'scripts/run-command.mts',
+          'scripts/measure-packed-consumer.mts',
+        ],
         rules: {
           // Effect 4 transports are experimental and pinned; match the compiler policy.
           'effecttsgo/unstable-api-usage': 'off',

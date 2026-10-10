@@ -1,18 +1,21 @@
+import { NodeHttpPlatform, NodeRuntime, NodeServices } from '@effect/platform-node'
+import { Clock, Crypto, Effect, FileSystem, Layer, Path, Stdio } from 'effect'
+import { Hex } from 'effect/encoding'
+import { HttpPlatform, HttpServerResponse } from 'effect/http'
 import { deepStrictEqual, equal } from 'node:assert/strict'
-import { execFileSync } from 'node:child_process'
-import { createHash } from 'node:crypto'
-import { readFileSync, rmSync, writeFileSync } from 'node:fs'
-import nodePath from 'node:path'
-import { performance } from 'node:perf_hooks'
-import { gzipSync } from 'node:zlib'
 import { build, version as viteVersion } from 'vite'
+
+import { runCommand } from './run-command.mts'
 
 interface Compiler {
   readonly executable: string
   readonly label: string
 }
 
-const digest = (value: string) => createHash('sha256').update(value).digest('hex')
+const digest = Effect.fnUntraced(function* (value: Uint8Array) {
+  const crypto = yield* Crypto.Crypto
+  return Hex.encode(yield* crypto.digest('SHA-256', value))
+})
 const compilerProjects = [
   [
     'contract',
@@ -23,22 +26,27 @@ const compilerProjects = [
   ['http', 'tsconfig.http-baseline.json', ['http-type-scale.ts']],
 ] as const
 
-const measureCompiler = (consumerDirectory: string, compiler: Compiler) => {
-  const version = execFileSync(process.execPath, [compiler.executable, '--version'], {
-    encoding: 'utf-8',
-  }).trim()
-  return compilerProjects.flatMap(([fixture, project, files]) => {
+const measureCompiler = Effect.fnUntraced(function* (
+  consumerDirectory: string,
+  compiler: Compiler,
+) {
+  const fs = yield* FileSystem.FileSystem
+  const nodePath = yield* Path.Path
+  const clock = yield* Clock.Clock
+  const version = (yield* runCommand(process.execPath, [compiler.executable, '--version'])).trim()
+  const measurements = []
+  for (const [fixture, project, files] of compilerProjects) {
     const buildInfo = nodePath.join(consumerDirectory, `${fixture}-${compiler.label}.tsbuildinfo`)
-    rmSync(buildInfo, { force: true })
-    const fixtureHashes = Object.fromEntries(
-      files.map((file) => [
-        file,
-        digest(readFileSync(nodePath.join(consumerDirectory, file), 'utf-8')),
-      ]),
-    )
-    return (['cold-compiler', 'incremental-unchanged'] as const).map((phase) => {
-      const started = performance.now()
-      const output = execFileSync(
+    yield* fs.remove(buildInfo, { force: true })
+    const fixtureHashes: Record<string, string> = {}
+    for (const file of files) {
+      fixtureHashes[file] = yield* digest(
+        yield* fs.readFile(nodePath.join(consumerDirectory, file)),
+      )
+    }
+    for (const phase of ['cold-compiler', 'incremental-unchanged'] as const) {
+      const started = clock.monotonicTimeNanosUnsafe()
+      const output = yield* runCommand(
         process.execPath,
         [
           compiler.executable,
@@ -51,9 +59,9 @@ const measureCompiler = (consumerDirectory: string, compiler: Compiler) => {
           '--tsBuildInfoFile',
           buildInfo,
         ],
-        { cwd: consumerDirectory, encoding: 'utf-8', maxBuffer: 16 * 1024 * 1024 },
+        { cwd: consumerDirectory, maxBuffer: 16 * 1024 * 1024 },
       )
-      const milliseconds = performance.now() - started
+      const milliseconds = Number(clock.monotonicTimeNanosUnsafe() - started) / 1_000_000
       const diagnostics: Record<string, string> = {}
       for (const entry of output.matchAll(/^(?<label>[^:\n]+):\s*(?<value>[^\n]+)$/gmu)) {
         const label = entry.groups?.['label']?.trim()
@@ -70,7 +78,7 @@ const measureCompiler = (consumerDirectory: string, compiler: Compiler) => {
         )
       }
       console.log(`Measured ${fixture} with ${compiler.label}: ${phase}\n${output}`)
-      return {
+      measurements.push({
         compiler: compiler.label,
         version,
         fixture,
@@ -78,10 +86,11 @@ const measureCompiler = (consumerDirectory: string, compiler: Compiler) => {
         phase,
         milliseconds,
         diagnostics,
-      }
-    })
-  })
-}
+      })
+    }
+  }
+  return measurements
+})
 
 const bundleProbes = [
   {
@@ -101,32 +110,42 @@ const bundleProbes = [
   },
 ] as const
 
-const measureBundles = async (consumerDirectory: string) => {
-  const measurements = await Promise.all(
-    bundleProbes.map(async (probe) => {
+const measureBundles = Effect.fnUntraced(function* (consumerDirectory: string) {
+  const fs = yield* FileSystem.FileSystem
+  const nodePath = yield* Path.Path
+  const platform = yield* HttpPlatform.HttpPlatform
+  const measurements = yield* Effect.forEach(
+    bundleProbes,
+    Effect.fnUntraced(function* (probe) {
       const entry = nodePath.join(consumerDirectory, `bundle-${probe.label}.mjs`)
-      writeFileSync(entry, `export { ${probe.exported} } from 'effect-api-query'\n`)
-      return Promise.all(
-        (['external', 'included'] as const).map(async (peers) => {
-          const result = await build({
-            configFile: false,
-            root: consumerDirectory,
-            logLevel: 'silent',
-            build: {
-              write: false,
-              minify: 'oxc',
-              target: 'es2022',
-              lib: { entry, formats: ['es'] },
-              rolldownOptions: {
-                output: { minify: true, comments: false },
-                external:
-                  peers === 'external'
-                    ? (id) =>
-                        id === 'effect' || id.startsWith('effect/') || id === '@tanstack/query-core'
-                    : [],
-              },
-            },
-          })
+      yield* fs.writeFileString(entry, `export { ${probe.exported} } from 'effect-api-query'\n`)
+      return yield* Effect.forEach(
+        ['external', 'included'] as const,
+        Effect.fnUntraced(function* (peers) {
+          const result = yield* Effect.promise(
+            async () =>
+              await build({
+                configFile: false,
+                root: consumerDirectory,
+                logLevel: 'silent',
+                build: {
+                  write: false,
+                  minify: 'oxc',
+                  target: 'es2022',
+                  lib: { entry, formats: ['es'] },
+                  rolldownOptions: {
+                    output: { minify: true, comments: false },
+                    external:
+                      peers === 'external'
+                        ? (id) =>
+                            id === 'effect' ||
+                            id.startsWith('effect/') ||
+                            id === '@tanstack/query-core'
+                        : [],
+                  },
+                },
+              }),
+          )
           if (!Array.isArray(result) && !('output' in result)) {
             throw new Error('The bundle probe unexpectedly created a watcher')
           }
@@ -170,54 +189,77 @@ const measureBundles = async (consumerDirectory: string) => {
               'The peer-inclusive browser probe must have no external imports',
             )
           }
+          const bytes = new TextEncoder().encode(chunk.code)
+          const compressed = yield* platform.compression.compressResponse(
+            HttpServerResponse.uint8Array(bytes),
+            'gzip',
+            { level: 9 },
+          )
+          const gzip = yield* HttpServerResponse.toClientResponse(compressed).arrayBuffer
           return {
             probe: probe.label,
             peers,
-            bytes: Buffer.byteLength(chunk.code),
-            gzipBytes: gzipSync(chunk.code, { level: 9 }).byteLength,
-            sha256: digest(chunk.code),
+            bytes: bytes.byteLength,
+            gzipBytes: gzip.byteLength,
+            sha256: yield* digest(bytes),
             externalImports: chunk.imports,
             renderedPackageExports: renderedExports,
             dependencyModules: dependencyModules.length,
           }
         }),
+        { concurrency: 'unbounded' },
       )
     }),
+    { concurrency: 'unbounded' },
   )
   return measurements.flat()
-}
+})
 
-const measurePackedConsumer = async (consumerDirectory: string, compilers: readonly Compiler[]) => {
+const measurePackedConsumer = Effect.fnUntraced(function* (
+  consumerDirectory: string,
+  compilers: readonly Compiler[],
+) {
   const construction: unknown = JSON.parse(
-    execFileSync(process.execPath, ['construction-baseline.mts'], {
-      cwd: consumerDirectory,
-      encoding: 'utf-8',
-    }),
+    yield* runCommand(process.execPath, ['construction-baseline.mts'], { cwd: consumerDirectory }),
   )
+  const compilerMeasurements = []
+  for (const compiler of compilers) {
+    compilerMeasurements.push(...(yield* measureCompiler(consumerDirectory, compiler)))
+  }
   return {
     tools: { vite: viteVersion, minifier: 'oxc', comments: false, target: 'es2022', gzipLevel: 9 },
     construction,
-    compilers: compilers.flatMap((compiler) => measureCompiler(consumerDirectory, compiler)),
-    bundles: await measureBundles(consumerDirectory),
+    compilers: compilerMeasurements,
+    bundles: yield* measureBundles(consumerDirectory),
   }
-}
+})
 
-const [consumerDirectory] = process.argv.slice(2)
-if (consumerDirectory === undefined) {
-  throw new Error('Pass the installed packed-consumer directory')
-}
-const repositoryRoot = nodePath.resolve(import.meta.dirname, '..')
-const measurements = await measurePackedConsumer(consumerDirectory, [
-  {
-    label: 'typescript-5.9',
-    executable: nodePath.join(repositoryRoot, 'node_modules/typescript-5.9/bin/tsc'),
-  },
-  {
-    label: 'typescript-current',
-    executable: nodePath.join(repositoryRoot, 'node_modules/typescript/bin/tsc'),
-  },
-])
-writeFileSync(
-  nodePath.join(consumerDirectory, 'packed-baseline.json'),
-  `${JSON.stringify(measurements, null, 2)}\n`,
+const program = Effect.gen(function* () {
+  const fs = yield* FileSystem.FileSystem
+  const nodePath = yield* Path.Path
+  const stdio = yield* Stdio.Stdio
+  const [consumerDirectory] = yield* stdio.args
+  if (consumerDirectory === undefined) {
+    throw new Error('Pass the installed packed-consumer directory')
+  }
+  const repositoryRoot = nodePath.resolve(
+    yield* nodePath.fromFileUrl(new URL('..', import.meta.url)),
+  )
+  const measurements = yield* measurePackedConsumer(consumerDirectory, [
+    {
+      label: 'typescript-5.9',
+      executable: nodePath.join(repositoryRoot, 'node_modules/typescript-5.9/bin/tsc'),
+    },
+    {
+      label: 'typescript-current',
+      executable: nodePath.join(repositoryRoot, 'node_modules/typescript/bin/tsc'),
+    },
+  ])
+  yield* fs.writeFileString(
+    nodePath.join(consumerDirectory, 'packed-baseline.json'),
+    `${JSON.stringify(measurements, null, 2)}\n`,
+  )
+})
+NodeRuntime.runMain(
+  program.pipe(Effect.provide(Layer.merge(NodeServices.layer, NodeHttpPlatform.layer))),
 )
