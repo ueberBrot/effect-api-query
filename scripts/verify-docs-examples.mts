@@ -12,6 +12,10 @@ for (const [page, fixtures] of [
     ['packed-consumer/docs-cache-filters-rpc', 'packed-consumer/docs-cache-filters-http'],
   ],
   [
+    'guides/query-defaults',
+    ['packed-consumer/docs-defaults', 'packed-consumer/docs-http-defaults'],
+  ],
+  [
     'guides/hydrate-unary-data',
     [
       'packed-consumer/docs-hydration-dto',

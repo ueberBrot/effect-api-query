@@ -14,6 +14,32 @@ import { deepStrictEqual, equal, throws } from 'node:assert/strict'
 import { httpCacheFilters, usersApi } from './docs-cache-filters-http.ts'
 import { userCacheFilters, usersRpc } from './docs-cache-filters-rpc.ts'
 
+const verifyFilters = Effect.fnUntraced(function* (
+  queryClient: QueryClient,
+  cases: readonly [QueryFilters, readonly QueryKey[]][],
+) {
+  const snapshots = queryClient.getQueriesData({})
+  for (const [filter, expectedKeys] of cases) {
+    const owner = new QueryClient()
+    try {
+      for (const [key, data] of snapshots) owner.setQueryData(key, data)
+      deepStrictEqual(
+        owner.getQueriesData(filter).map(([key]) => key),
+        expectedKeys,
+      )
+      yield* Effect.promise(() => owner.invalidateQueries(filter))
+      deepStrictEqual(
+        snapshots.map(([key]) => owner.getQueryState(key)?.isInvalidated),
+        snapshots.map(([key]) =>
+          expectedKeys.some((expected) => JSON.stringify(expected) === JSON.stringify(key)),
+        ),
+      )
+    } finally {
+      owner.clear()
+    }
+  }
+})
+
 await Effect.runPromise(
   Effect.scoped(
     Effect.gen(function* () {
@@ -88,7 +114,6 @@ await Effect.runPromise(
         queryClient.setQueryData(ping, 'ok')
         queryClient.setQueryData(['unrelated'], 'other')
 
-        const snapshots = queryClient.getQueriesData({})
         const unaryKeys = [
           filters.rpc.users.get.queryKey({ id: 1 }),
           filters.rpc.users.get.queryKey({ id: 1, locale: 'de' }),
@@ -122,25 +147,7 @@ await Effect.runPromise(
             [filters.rpc.users.watch.streamedKey({ id: 1 })],
           ],
         ]
-        for (const [filter, expectedKeys] of cases) {
-          const owner = new QueryClient()
-          try {
-            for (const [key, data] of snapshots) owner.setQueryData(key, data)
-            deepStrictEqual(
-              owner.getQueriesData(filter).map(([key]) => key),
-              expectedKeys,
-            )
-            yield* Effect.promise(() => owner.invalidateQueries(filter))
-            deepStrictEqual(
-              snapshots.map(([key]) => owner.getQueryState(key)?.isInvalidated),
-              snapshots.map(([key]) =>
-                expectedKeys.some((expected) => JSON.stringify(expected) === JSON.stringify(key)),
-              ),
-            )
-          } finally {
-            owner.clear()
-          }
-        }
+        yield* verifyFilters(queryClient, cases)
 
         const projected = createRpcQueryUtils(usersRpc, {
           client,
@@ -286,7 +293,6 @@ await Effect.runPromise(
         const ping = filters.http.ping.queryKey()
         queryClient.setQueryData(ping, 'ok')
         queryClient.setQueryData(['unrelated'], 'other')
-        const snapshots = queryClient.getQueriesData({})
         const unaryKeys = inputs.map((request) => filters.exact(request).queryKey)
         const userKeys = [...unaryKeys, metadata, infinite, ...histories, otherHistory, live]
         const bounded = filters.http.users.watch.streamedKey({ query: { id: 1 } }, { maxChunks: 2 })
@@ -307,25 +313,7 @@ await Effect.runPromise(
           ],
           [{ queryKey: bounded, exact: true }, [bounded]],
         ]
-        for (const [filter, expectedKeys] of cases) {
-          const owner = new QueryClient()
-          try {
-            for (const [key, data] of snapshots) owner.setQueryData(key, data)
-            deepStrictEqual(
-              owner.getQueriesData(filter).map(([key]) => key),
-              expectedKeys,
-            )
-            yield* Effect.promise(() => owner.invalidateQueries(filter))
-            deepStrictEqual(
-              snapshots.map(([key]) => owner.getQueryState(key)?.isInvalidated),
-              snapshots.map(([key]) =>
-                expectedKeys.some((expected) => JSON.stringify(expected) === JSON.stringify(key)),
-              ),
-            )
-          } finally {
-            owner.clear()
-          }
-        }
+        yield* verifyFilters(queryClient, cases)
 
         const projected = createHttpApiQueryUtils(usersApi, {
           client,
