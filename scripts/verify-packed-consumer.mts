@@ -506,6 +506,7 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
 
     for (const fixture of [
       'hashing-runtime.mts',
+      'filter-runtime.mts',
       'runtime.mts',
       'http-runtime.mts',
       'http-metadata-runtime.mts',

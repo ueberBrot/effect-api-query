@@ -10,6 +10,9 @@ await queryClient.invalidateQueries({ queryKey: rpcQuery.users.key() })
 await queryClient.invalidateQueries({ queryKey: rpcQuery.users.get.key() })
 ```
 
+For operation prefixes and partial encoded-input matching, use the complete
+[Cache Filters recipe](/effect-api-query/guides/cache-filters/).
+
 Use `queryKey(input)` for one payload-specific query:
 
 ```ts

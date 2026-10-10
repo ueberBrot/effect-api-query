@@ -8,6 +8,10 @@ for (const [page, fixtures] of [
   ['getting-started/http-quick-start', ['types/docs-http-quick-start']],
   ['guides/retry-queries', ['packed-consumer/docs-retry']],
   [
+    'guides/cache-filters',
+    ['packed-consumer/docs-cache-filters-rpc', 'packed-consumer/docs-cache-filters-http'],
+  ],
+  [
     'guides/query-defaults',
     ['packed-consumer/docs-defaults', 'packed-consumer/docs-http-defaults'],
   ],
