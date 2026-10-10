@@ -50,6 +50,10 @@ query filter still needs `input: { query: {} }`. A `Schema.FiniteFromString` fie
 which the ready client encodes as a string. Raw response controls are excluded from query input,
 mutation variables, and encoder input.
 
+Query options retain the decoded request for execution. Keep captured values unchanged; see
+[Data Normalization](/effect-api-query/concepts/data-normalization/#keep-captured-inputs-unchanged)
+for the distinction between immutable keys and caller-owned input.
+
 Ordinary queries and mutations use decoded-only responses. Queries cache a successful `undefined` as `null`;
 mutations retain `undefined`. Buffered text stays a string, binary data stays a `Uint8Array`, and
 declared response-header wrappers retain their decoded body and headers. Applications own the
@@ -126,6 +130,10 @@ decoded data or caller-supplied `initialData`, hydrated values, or manual cache 
 Selected observer results and, after execution, manual cache writes use the sharing policy explicitly
 passed to `metadataOptions`, or standard deep sharing when it is absent. Inherited global and prefix
 sharing policies apply only to fetched metadata snapshots.
+
+A fresh-cache hit from imperative `queryClient.query(newOptions)` retains the Query's existing
+options. Install a changed sharing policy through an observer or an actual fetch before relying
+on it for later manual writes.
 
 Metadata keys use a `metadata` discriminator and the ordinary request identity. Endpoint prefixes
 match every view. Native `select`, `initialData`, skip-token inference, QueryClient hashing defaults,

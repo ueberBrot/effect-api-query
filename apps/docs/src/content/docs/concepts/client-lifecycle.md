@@ -10,7 +10,8 @@ its `Scope` open, and disposes its resources:
 2. Create a `QueryClient` and RPC utility tree.
 3. Run ordinary, infinite, accumulated-stream, and live queries or mutations. Their generated
    functions call the ready client through `runPromiseExit`.
-4. At shutdown, cancel active queries, clear the cache, and then dispose the RPC client's resources.
+4. At shutdown, cancel queries, await local stream cleanup and accepted mutations, clear the cache,
+   and then dispose the RPC client's resources.
 
 On the server, create these resources separately for each request to keep request data and scoped
 services isolated. In the browser, keep them for the application lifetime.
@@ -45,7 +46,7 @@ application client and runtime.
 
 ## Stream creation and consumption
 
-For an accumulated streamed RPC or live RPC query, the runner executes
+For an accumulated or live RPC or HTTP SSE query, the runner executes
 `Stream.toAsyncIterableEffect` to create an iterable and capture its Effect `Context`. The runner
 returns a successful `Exit` before Query Core pulls values. Iterator pulls then use that captured
 Context while the query remains fetching. Keep its services and the ready client's Scope alive
@@ -73,3 +74,8 @@ The [packed runner fixture](https://github.com/ueberBrot/effect-api-query/blob/m
 checks both stream views: creation finishes before the first transformed emission, pulls and
 finalizers retain the runner's provided Context, and cancellation finalizes the stream before
 client disposal.
+
+For an open-stream server capture, await
+[fetchStreamSnapshot](/effect-api-query/guides/stream-snapshots/) before dehydration or client
+disposal. The helper waits for local iterator cleanup; remote completion still requires an
+application acknowledgement.

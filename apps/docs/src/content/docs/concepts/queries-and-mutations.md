@@ -6,7 +6,8 @@ description: Choose queries, mutations, pagination, or streams for your API call
 Every unary RPC leaf and buffered HTTP endpoint without multipart has query, infinite-query,
 and mutation builders. Your application chooses how to use each operation; neither the RPC
 definition nor the HTTP method determines the builder. Buffered multipart HTTP endpoints expose
-mutations only. HTTP stream builders are deferred.
+mutations only. Streaming RPCs and unambiguous HTTP SSE endpoints expose accumulated and live
+builders. Mixed buffered/SSE successes, raw byte streams, and multipart SSE endpoints are omitted.
 
 Use a query when TanStack should cache a result by semantic request identity. For RPCs with a
 payload, the query key contains the normalized, canonical payload. TanStack can refetch or cancel the query.

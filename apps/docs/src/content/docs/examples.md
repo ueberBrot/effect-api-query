@@ -55,8 +55,10 @@ demo authorization header through its HTTP client middleware.
 
 The HTTP panel uses `createHttpApiQueryUtils` from `effect-api-query`; the RPC panels
 use `createRpcQueryUtils` from the same package root. The application owns both ready clients,
-their runners, and the QueryClient. During disposal, it cancels queries before releasing client
-resources.
+their runners, and the QueryClient. During disposal, it cancels queries and awaits local stream
+cleanup and accepted mutations before releasing client resources. Pagehide and HMR cleanup
+reports failures after cleanup finishes; explicit disposal still rejects. See
+[Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/) for persistence and replacement.
 
 Use the HTTP directory to read users, load another page, and create or delete a user. Each write
 explicitly invalidates both generated user prefixes, so the RPC directory reflects HTTP writes

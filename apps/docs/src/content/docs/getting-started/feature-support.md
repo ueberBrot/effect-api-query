@@ -7,6 +7,10 @@ description: Choose the RPC or HTTP adapter and find its supported TanStack Quer
 definitions. Use `createRpcQueryUtils` for RPC and `createHttpApiQueryUtils` for HTTP, both imported
 from the package root.
 
+Keep your native Effect declarations and ready clients. Effect and your application own the
+server, transport, authentication, and resource lifetime; this package derives the Query-facing
+keys, functions, and options.
+
 The [capability matrix](/effect-api-query/reference/compatibility-and-limits/#capability-matrix)
 compares RPC and HTTP support. It lists generated features, tested integrations, application
 responsibilities, deferred operations, and missing upstream integration points.
@@ -45,3 +49,11 @@ Start with the [RPC tutorial](/effect-api-query/getting-started/quick-start/) or
 [conditional queries](/effect-api-query/guides/conditional-queries/),
 [cache management](/effect-api-query/guides/cache-management/), and
 [cancellation](/effect-api-query/guides/cancellation/).
+
+For application workflows, use [Query Defaults](/effect-api-query/guides/query-defaults/),
+[Optimistic User Writes](/effect-api-query/guides/optimistic-writes/),
+[Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/), and
+[Refresh from Domain Events](/effect-api-query/guides/refresh-from-events/).
+For server data, use [Stream Snapshots](/effect-api-query/guides/stream-snapshots/) and
+[Hydrate Query Views](/effect-api-query/guides/hydrate-query-views/). These recipes retain
+application ownership of policies, codecs, persistence, and disposal.

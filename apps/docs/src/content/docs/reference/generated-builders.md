@@ -208,10 +208,9 @@ Builders consume both fields before returning options, including skipped options
 throw `EffectRpcQueryConfigError` with code `InvalidMaxChunks`; invalid modes use
 `InvalidRefetchMode`. Both fail synchronously, even when `input` is `skipToken`.
 
-Accumulated-stream keys have changed from earlier versions. Regenerate exact keys through the
-builders and include the view's policy; treat their concrete suffix as opaque. Bump your persisted
-cache's version buster or discard old accumulated histories before restoring data. Live, unary,
-infinite, and mutation key identities retain their existing contracts.
+Derive exact accumulated-stream keys through the builders with the view's policy, and treat their
+concrete suffix as opaque. Applications persisting data choose their own schema and key-version
+busters; see [Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/#restore-a-directory-snapshot).
 
 Live queries always replace the cached value and therefore expose no `refetchMode`. Cancelling,
 unmounting, or superseding either stream closes its iterator and interrupts its Effect resources.

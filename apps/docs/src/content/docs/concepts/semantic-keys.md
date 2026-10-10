@@ -39,8 +39,8 @@ all descendant operations.
 Accumulated-stream keys also include normalized retention and refetch policy. Unlimited/reset is
 the default identity; different bounds or modes have separate cache entries. Supply the same policy
 to `streamedKey` and `streamedOptions` for exact cache access. Broad prefixes continue to match all
-views. Treat the concrete suffix as opaque and change your persistence version buster when migrating
-from keys that omitted stream policy.
+views. Treat the concrete suffix as opaque. Applications persisting query data choose schema and
+key-version busters as described in [Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/).
 
 Unsupported values, failed construction, and failed encoding raise `EffectRpcQueryKeyError` before
 network execution. Payloads whose encoding needs services or that contain redacted values require a
