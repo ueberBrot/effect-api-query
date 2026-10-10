@@ -139,8 +139,8 @@ See [Executable Examples](/effect-api-query/examples/) for commands and controls
 
 The example serves RPC at `/rpc` and HTTP at `/api/$`. Both handlers share a demonstration user
 directory, so writes invalidate both sets of query keys. The authorization header contains a
-public demonstration value. The ownership tests use separate identities to verify that caches
-and resource disposal stay isolated.
+public demonstration value. Each request owns its cache and connections; disposing one request
+leaves other requests usable.
 
 Server rendering uses request-owned connections built with Effect's public decoded-message client
 and server. They execute the same application state as the network handlers. RPC execution avoids

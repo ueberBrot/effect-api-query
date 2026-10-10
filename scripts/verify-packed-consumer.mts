@@ -494,7 +494,12 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
           "'./optimistic-application/user-writes.ts'",
         ),
     )
-    for (const file of ['optimistic-runtime.mts', 'optimistic-contract.ts']) {
+    for (const file of [
+      'optimistic-runtime.mts',
+      'optimistic-contract.ts',
+      'events-runtime.mts',
+      'events-contract.ts',
+    ]) {
       const path = nodePath.join(consumerDirectory, file)
       writeFileSync(
         path,
@@ -523,6 +528,16 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
           "'../../examples/tanstack-start/src/lib/snapshot-preparation.ts'",
           "'./start-tanstack-start/snapshot-preparation.ts'",
         ),
+    )
+    const eventRecipe = nodePath.join(consumerDirectory, 'user-events.ts')
+    writeFileSync(
+      eventRecipe,
+      readFileSync(eventRecipe, 'utf-8')
+        .replaceAll(
+          "'../../examples/vite-react/src/lib/application.ts'",
+          "'./optimistic-application/application.ts'",
+        )
+        .replaceAll("'../../examples/vite-react/src/lib/owner-cache.ts'", "'./owner-cache.ts'"),
     )
     for (const fixture of [
       'public-contract.ts',
@@ -633,6 +648,7 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       'owner-cache-runtime.mts',
       'start-ssr-runtime.mts',
       'optimistic-runtime.mts',
+      'events-runtime.mts',
       'hashing-runtime.mts',
       'filter-runtime.mts',
       'runtime.mts',
