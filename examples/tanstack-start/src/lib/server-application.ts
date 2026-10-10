@@ -1,6 +1,6 @@
+import type { ExampleHost } from '@effect-api-query/server/web-handler'
 import { Effect, Exit, Scope } from 'effect'
 
-import type { ExampleHost } from '../../../server/src/web-handler.ts'
 import { reportCleanupFailure, startTanStackStartApplication } from './application.ts'
 
 export const startServerApplication = async ({

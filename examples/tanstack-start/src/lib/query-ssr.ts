@@ -8,10 +8,8 @@ import type { TanStackStartApplication } from './application.ts'
 import { makeSnapshotPreparation } from './snapshot-preparation.ts'
 import type { SnapshotPreparation } from './snapshot-preparation.ts'
 
-export { fetchStreamSnapshot } from 'effect-api-query'
-
 type SnapshotQueries = DehydratedState['queries']
-export interface RouterSnapshot {
+interface RouterSnapshot {
   readonly query?: {
     initial?: DehydratedState['queries']
     readonly stream: ReadableStream<DehydratedState['queries']>

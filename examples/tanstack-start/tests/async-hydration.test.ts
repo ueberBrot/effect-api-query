@@ -1,13 +1,20 @@
 import { User } from '@effect-api-query/contracts'
+import type { DehydratedState } from '@tanstack/react-query'
 import { createMemoryHistory } from '@tanstack/react-router'
 import { attachRouterServerSsrUtils } from '@tanstack/react-start/server'
 import { Deferred, Effect, Exit, Schema, Scope } from 'effect'
 import { describe, expect, it, vi } from 'vite-plus/test'
 
 import { makeExampleHost } from '../../server/src/web-handler.ts'
-import type { RouterSnapshot } from '../src/lib/query-ssr.ts'
 import { startServerApplication } from '../src/lib/server-application.ts'
 import { createTanStackStartRouter } from '../src/router.tsx'
+
+interface RouterSnapshot {
+  readonly query?: {
+    readonly initial?: DehydratedState['queries']
+    readonly stream: ReadableStream<DehydratedState['queries']>
+  }
+}
 
 describe('Start snapshot preparation', () => {
   it('finishes application encoding before publication and decoding before native hydration', async () => {
