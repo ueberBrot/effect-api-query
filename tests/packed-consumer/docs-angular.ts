@@ -18,7 +18,7 @@ const rpc = createRpcQueryUtils(group, { client, keyPrefix: ['current-owner'] })
   standalone: true,
   template: '<button (click)="next()">Next user</button><p>{{ user.data() }}</p>',
 })
-export class UserDetails {
+class UserDetails {
   readonly id = signal(1)
   readonly user = injectQuery(() =>
     rpc.users.read.queryOptions({

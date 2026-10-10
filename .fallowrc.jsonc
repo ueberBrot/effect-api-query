@@ -91,12 +91,18 @@
   // Vite+ tasks, packing, and imported lint presets invoke tools Fallow cannot trace.
   // Keep Effect peer and test dependencies available for the library and fixtures.
   "ignoreDependencies": [
+    "@angular/compiler",
+    "@angular/core",
+    "@angular/platform-browser",
     "@arethetypeswrong/cli",
     "@effect/tsgo",
     "@effect/vitest",
     "@shadcn/lint",
+    "@tanstack/angular-query-experimental",
+    "@tanstack/svelte-query",
     "effect",
     "publint",
+    "svelte",
     "typescript-5.9",
     "unplugin-unused"
   ],
