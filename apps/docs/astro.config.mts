@@ -64,8 +64,10 @@ export default defineConfig({
           label: 'Guides',
           items: [
             { label: 'React Query', slug: 'guides/react-query' },
-            { label: 'Svelte and Angular', slug: 'guides/svelte-and-angular' },
-            { label: 'Vue and Solid Query', slug: 'guides/vue-and-solid' },
+            { label: 'Vue Query', slug: 'guides/vue-query' },
+            { label: 'Solid Query', slug: 'guides/solid-query' },
+            { label: 'Svelte Query', slug: 'guides/svelte-query' },
+            { label: 'Angular Query', slug: 'guides/angular-query' },
             { label: 'HTTP Queries and Mutations', slug: 'guides/http-queries-and-mutations' },
             { label: 'TanStack Start', slug: 'guides/tanstack-start' },
             { label: 'WebSocket Ready Clients', slug: 'guides/websocket-clients' },

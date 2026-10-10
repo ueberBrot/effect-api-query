@@ -83,7 +83,7 @@ for accumulated HTTP event queries.
 ## Integrate with your application
 
 - [React Query](https://ueberbrot.github.io/effect-api-query/guides/react-query/): use generated options with hooks.
-- [Vue and Solid](https://ueberbrot.github.io/effect-api-query/guides/vue-and-solid/) and [Svelte and Angular](https://ueberbrot.github.io/effect-api-query/guides/svelte-and-angular/): rebuild options from reactive input with native Query integrations.
+- [Vue Query](https://ueberbrot.github.io/effect-api-query/guides/vue-query/), [Solid Query](https://ueberbrot.github.io/effect-api-query/guides/solid-query/), [Svelte Query](https://ueberbrot.github.io/effect-api-query/guides/svelte-query/), and [Angular Query](https://ueberbrot.github.io/effect-api-query/guides/angular-query/): rebuild options from reactive input with native Query integrations.
 - [TanStack Start](https://ueberbrot.github.io/effect-api-query/guides/tanstack-start/): share RPC and HTTP options across loaders, server rendering, and hydration.
 - [Stream snapshots](https://ueberbrot.github.io/effect-api-query/guides/stream-snapshots/): capture open streams and await local cleanup before server disposal.
 - [Hydrate Unary Data](https://ueberbrot.github.io/effect-api-query/guides/hydrate-unary-data/) and [Query Views](https://ueberbrot.github.io/effect-api-query/guides/hydrate-query-views/): keep DTOs or reconstructed Schema values consistent across JSON hydration and refetch.

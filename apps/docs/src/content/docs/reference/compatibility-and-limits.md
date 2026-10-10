@@ -25,8 +25,9 @@ Effect packages coordinated with the exact peer; see
 [Compatibility and Stability](/effect-api-query/getting-started/compatibility-and-stability/).
 
 Use native reactive accessors with generated Core options. See
-[Svelte and Angular](/effect-api-query/guides/svelte-and-angular/) and
-[Vue and Solid Query](/effect-api-query/guides/vue-and-solid/) for option rebuilding,
+[Vue Query](/effect-api-query/guides/vue-query/), [Solid Query](/effect-api-query/guides/solid-query/),
+[Svelte Query](/effect-api-query/guides/svelte-query/), and [Angular Query](/effect-api-query/guides/angular-query/)
+for option rebuilding,
 compiler resolution, hook overloads, and resource ownership.
 
 Consult [package metadata](https://github.com/ueberBrot/effect-api-query/blob/main/package.json) for
@@ -54,8 +55,10 @@ supplies the client, policy, or lifecycle. **Deferred** means the adapter does n
 | Mutation cancellation                             | No upstream TanStack mutation abort signal; explicit cancellable command is application-owned and tested | No upstream TanStack mutation abort signal; domain cancellation is application-owned         |
 | Authentication, middleware, and residual services | Application-owned ready client and runner                                                                | Application-owned ready client and runner                                                    |
 | React hooks and QueryClient                       | Tested public types and Vite React example                                                               | Tested public types and Vite React example                                                   |
-| Svelte and Angular browser components             | Native reactive accessors for generated queries and streams; application-owned lifecycle                 | Native reactive accessors for buffered, metadata, and SSE views; application-owned lifecycle |
-| Vue and Solid Query                               | Native reactive accessors; application-owned lifecycle                                                   | Native reactive accessors; application-owned lifecycle                                       |
+| Vue Query                                         | Native reactive accessors; application-owned lifecycle                                                   | Native reactive accessors; application-owned lifecycle                                       |
+| Solid Query                                       | Native reactive accessors; application-owned lifecycle                                                   | Native reactive accessors; application-owned lifecycle                                       |
+| Svelte Query                                      | Native reactive accessors for generated queries and streams; application-owned lifecycle                 | Native reactive accessors for buffered, metadata, and SSE views; application-owned lifecycle |
+| Angular Query                                     | Native reactive accessors for generated queries and streams; application-owned lifecycle                 | Native reactive accessors for buffered, metadata, and SSE views; application-owned lifecycle |
 | SSR and hydration                                 | Application-owned; tested Start route loading and stream snapshots                                       | Application-owned; tested Start SSR, hydration, failed-query refetch, and request isolation  |
 | Host routes                                       | Application-owned; tested standalone server and Start `/rpc`                                             | Application-owned; tested standalone server and Start `/api/$`                               |
 | Cache serialization and mutation invalidation     | Application-owned                                                                                        | Application-owned                                                                            |

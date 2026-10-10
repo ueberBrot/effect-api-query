@@ -3,10 +3,10 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "9ef1b45598771f31217b5424f0b5fa3db37bdec994fff19f4fe7fd5011f61302",
+      "fingerprint": "b37da5dd07f1af5dc54bbb3eb88c0ec100fb5554c162275e5f48d9313094e4db",
       "snapshot": {
         "GLOSSARY.md": "67de06543ad2fd9fd2917419e19d1f071e7b6eee53d48fca05e9dddfc739c683",
-        "README.md": "35d680dfe39a73da641b0d3fda4480883a486b6f43942138d2db9981971b82bf",
+        "README.md": "324f4e55b7b41232cc25b9b8780f49b136b25a0ee7e6650dea6ca371ff46669f",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "4a7d412f6e3c7dfbf0442b51ee9054c2b854026bcf968961cee65071f7cbb424",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "f1505ec3eb35a33fac289706c2cc318a2ffb80555e3302ca102e67e21c9012da",
         "apps/docs/src/content/docs/concepts/http-utility-tree.md": "ca4acbe1af20538c0d08a3e03969efe1966e7822ce6dfce8d0c1efb6913795cf",
@@ -19,6 +19,7 @@
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "eaf62e213ba22d1926dd75d7bad7bb9e6e69419309f0fcb1e6a7c0efe4d85c8b",
         "apps/docs/src/content/docs/getting-started/installation.md": "a334554486477e2c6ecd63c325b90fa9738c57877a3a23ec22a64c406c3f21ab",
         "apps/docs/src/content/docs/getting-started/quick-start.md": "52689fd2313064eb8660ec4152cba36fb46dbaba7f1039d43ed02b12a5f9ae2e",
+        "apps/docs/src/content/docs/guides/angular-query.md": "14534aec24fab7549906456a35b8a12a47e85c924e04aaefda15c366c4a435f9",
         "apps/docs/src/content/docs/guides/cache-filters.md": "46d06ee7e24f2ec143d0bb174442a7f5bc5299657d4bcdfb28a36782a69b3de6",
         "apps/docs/src/content/docs/guides/cache-management.md": "18f9ef5b5c51365a629601d19d2d2307c243c3fa4e2dd4f53bed3974eae802e5",
         "apps/docs/src/content/docs/guides/cancellation.md": "b0a79fb1578777115619d65f075f407595de0634ef0c52c4fc77256f0dca833c",
@@ -34,15 +35,18 @@
         "apps/docs/src/content/docs/guides/react-query.md": "29a200b31d19e0339805a0ae3e50be403300e1b8bb7b870949cf779853fbb347",
         "apps/docs/src/content/docs/guides/refresh-from-events.md": "a51ef3777eb9ea07f561d2223c6d8ffa063c87ecda25cb74ce0aea4b037fa2fe",
         "apps/docs/src/content/docs/guides/retry-queries.md": "f725f54696712cc917089e18e905022c6ab097e44f8d22f499ab87fb30af9a99",
+        "apps/docs/src/content/docs/guides/solid-query.md": "e01a800c1a4b8dbfe2d5dfaef5a53e2a12e92e1db42fdd926422bb6fcd4eb780",
         "apps/docs/src/content/docs/guides/stream-snapshots.md": "62e343dc7fa2f4b1b6fb1b699ecb947bcdfc0312c9ffab584b0b8bfaf954f854",
-        "apps/docs/src/content/docs/guides/svelte-and-angular.md": "8a5741996407c81c54a75ab3fb086a4c6866913a2a14f71801876891fb49753f",
+        "apps/docs/src/content/docs/guides/svelte-and-angular.md": null,
+        "apps/docs/src/content/docs/guides/svelte-query.md": "ef3dd4cb2b88759223e77182446b41a53ccf6f4f471e8748f53c93aeafa880e2",
         "apps/docs/src/content/docs/guides/switch-cache-owners.md": "08e883a245679cf05d4cb65c93e5b9f1887022a972b98ab295aa248880ab9b7f",
         "apps/docs/src/content/docs/guides/tanstack-start.md": "28a196e44e1b6b49131b05e370cb029670599fefe6aad6ff54ed9d3d3f07ddac",
-        "apps/docs/src/content/docs/guides/vue-and-solid.md": "2b0b31da53f2b5e86cd5fb3abe5353c28e02e73dc485133d6f593c9f5d30cf06",
+        "apps/docs/src/content/docs/guides/vue-and-solid.md": null,
+        "apps/docs/src/content/docs/guides/vue-query.md": "b115c710cdd520cbf016fd19c48af2c849fe7e20344a2e900b78f0a0e5c5bd12",
         "apps/docs/src/content/docs/guides/websocket-clients.md": "9ec635105fd84c30dc52833ed3adcf80a46313deb0112d4e72cd1a5603c6170c",
-        "apps/docs/src/content/docs/index.mdx": "5c22ad2256052013855d92e21d4a277f4c3e92931ea71fd0c1b3e7f5aceb9584",
+        "apps/docs/src/content/docs/index.mdx": "232b5a9f64169463d7973c6801b3f3c326328870715fcb45e9b0a25ee085e197",
         "apps/docs/src/content/docs/reference/browser-and-worker-hosts.md": "70743a4429a39937515c8d5fee79ca75714a92dd526f1093f9fa8ea12fbde984",
-        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "99909357a5c32eb8ed9443fc0d92c43b228591d5c2203f1c822c9bcc4a7b280d",
+        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "1499a387d91e364fcfe44bd82f9e1589f9fab2a93fc081f9172a6e8da703cb25",
         "apps/docs/src/content/docs/reference/errors.md": "4454725375e05ea7a7d976d798c1c1d0c2731eefc79043f5e40dba88154069b1",
         "apps/docs/src/content/docs/reference/external-http-clients.md": "613f0e9493221416993e0c8012a97abdb3de2f80321aa7e4b0cda0f585618f91",
         "apps/docs/src/content/docs/reference/factory.md": "b099ed80d1ad8aab6a59213ee286290302bcf7885569ffb693fed784ca872dd3",
@@ -119,7 +123,7 @@
         "scripts/verify-packed-consumer.mts": null,
         "skills/effect-api-query/SKILL.md": "1939a0f7536f3e88e1e1106e8125019c11d6fdd4ada8ae4d010507f264b234e5",
         "skills/effect-api-query/references/cache-workflows.md": "27bb96c48c84254ab8c379a529402f81cea3723c17d6396527c090a8c37e6f65",
-        "skills/effect-api-query/references/frameworks-and-hosts.md": "d84c787ccfc76b1f01f3d44d02d969ed9422af7d9dbdda862e661d65af9e44df",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "8b39b303cf3a9ae3222a257f53df5f9696b80c54859765f2c4d7b39554b8719f",
         "skills/effect-api-query/references/http.md": "9625411753fcc3ce816512f80158a19aa1057518ab3bfde98720e0cc7f845b66",
         "skills/effect-api-query/references/hydration-and-ssr.md": "61e761b36ebcf56c7cc1b67b3d795edba52d0c0224c3e7964297ed6864e1b044",
         "skills/effect-api-query/references/query-patterns.md": "33ea307b7042660da4ee4f6acea147d4218688a0256d82f3d582ff2e9cef4f9c",
@@ -193,23 +197,21 @@
         "tests/types/tanstack-start-contract.ts": "51681e3d0d7504a614d490f18adb6f44db82d34b9d4d7cb9cf941aea33de284f",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "f56fbfaa6c79e869f15e98d457b5ee6eb07d7b86",
-      "outcome": "no-change",
-      "reason": "The two human guides now state their historical example-version scope and the existing native Vue/Solid mutation-hook mapping. The shipped frameworks reference already specifies matching native mutation hooks, per-execution variables, reactive option rebuilding, wrapper/Core matching, and the same native inference/lifetime limits. No public behavior or developer task changed, so all seven skill files remain accurate.",
+      "head": "a0a363afa19552badd7c40795ac7a4735595dddb",
+      "outcome": "updated",
+      "reason": "The human framework documentation is now four native Query guides rather than two paired pages. Update only the existing frameworks-and-hosts source footer to the four live routes. The single shipped skill, its six reference boundaries, activation, recommended integrations and public behavior remain unchanged.",
       "evidence": [
-        "Read skills/effect-api-query/SKILL.md and references/frameworks-and-hosts.md; the existing mutation/variable/reactivity and framework-boundary statements still match the guide corrections.",
-        "Historical 5ff2638289a1ba47d4b7d867d9c50deb5b4d5c4a tests/packed-consumer/vue-solid-contract.ts:185-205 and 352-359 use Vue useMutation(options), Solid useMutation(() => options), and mutate(variables); completed 118-final-matrix.log records the actual Vue3.5.43/Solid1.9.15 plus wrappers5.104.0 checks.",
-        "119.md and primary 119-framework-metadata.json establish the Svelte5.57.1/Query6.3.0 and Angular22.2.1/experimentalQuery5.104.0 recipe scope. No current certification or new framework matrix is claimed.",
-        "Fresh vp run docs-build passed exact snippet parity, Astro0errors/warnings/hints,44pages/search/internal links with0/3cache hits; scoped vp run format and git diff --check passed.",
-        "No fresh framework consumer task was run for these prose additions; unchanged historical compiler/host evidence supplies the API comparison. Retired installed matrices remain retired."
+        "Author base a0a363afa19552badd7c40795ac7a4735595dddb. Read skills/effect-api-query/SKILL.md and references/frameworks-and-hosts.md; footer now links Vue, Solid, Svelte and Angular Query guides. README, landing page, compatibility links and capability rows use the same four routes.",
+        "All four moved recipe fences match the prior paired guides byte for byte. Scoped format passed on 10 affected files. Uncached vp run docs-build passed retained 8-page snippet parity, Astro diagnostics (0 errors/warnings/hints), 46-page production build, search index and internal link validation; four built routes and full/small LLM links exist with old routes absent.",
+        "vp run skills-check passed native validation of 1 skill file. No recommended behavior or activation changed; no fresh framework compilation, consumer API task or independent consumer session is claimed for this editorial split. Evidence: /tmp/effect-api-query-implementation/notes/framework-guide-split-content-check.json, framework-guide-split-artifact-check.json and framework-guide-split-docs-build.log."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "ce230bb1a3ed5e994d0aac0740ecaee72fe7601fc1feafa3b78a2718dad155d0",
+      "fingerprint": "37ccd5a30b43c8dde4bab5e3cbf13616b38ab37280a50975dafc0b7ddec9976c",
       "snapshot": {
         "GLOSSARY.md": "67de06543ad2fd9fd2917419e19d1f071e7b6eee53d48fca05e9dddfc739c683",
-        "README.md": "35d680dfe39a73da641b0d3fda4480883a486b6f43942138d2db9981971b82bf",
-        "_artifacts/domain_map.yaml": "cc465ff4f0142ca19c5e9af32b31f618420db77a4601a8e827df709b8af7acfc",
+        "README.md": "324f4e55b7b41232cc25b9b8780f49b136b25a0ee7e6650dea6ca371ff46669f",
+        "_artifacts/domain_map.yaml": "47f3dda6368ce94f3dd14f6e49b7c1e26f54091e582a339aebb656bd3361664c",
         "_artifacts/skill_spec.md": "3d590a87ae382859f39d028319e46e7dbccc16e69315e6a0b31cd4c31ec1cefd",
         "_artifacts/skill_tree.yaml": "da82bd81b41250e02e263147afd7a12ce5379f86cf8b6a9e09895d1227df84fc",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "4a7d412f6e3c7dfbf0442b51ee9054c2b854026bcf968961cee65071f7cbb424",
@@ -224,6 +226,7 @@
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "eaf62e213ba22d1926dd75d7bad7bb9e6e69419309f0fcb1e6a7c0efe4d85c8b",
         "apps/docs/src/content/docs/getting-started/installation.md": "a334554486477e2c6ecd63c325b90fa9738c57877a3a23ec22a64c406c3f21ab",
         "apps/docs/src/content/docs/getting-started/quick-start.md": "52689fd2313064eb8660ec4152cba36fb46dbaba7f1039d43ed02b12a5f9ae2e",
+        "apps/docs/src/content/docs/guides/angular-query.md": "14534aec24fab7549906456a35b8a12a47e85c924e04aaefda15c366c4a435f9",
         "apps/docs/src/content/docs/guides/cache-filters.md": "46d06ee7e24f2ec143d0bb174442a7f5bc5299657d4bcdfb28a36782a69b3de6",
         "apps/docs/src/content/docs/guides/cache-management.md": "18f9ef5b5c51365a629601d19d2d2307c243c3fa4e2dd4f53bed3974eae802e5",
         "apps/docs/src/content/docs/guides/cancellation.md": "b0a79fb1578777115619d65f075f407595de0634ef0c52c4fc77256f0dca833c",
@@ -239,15 +242,18 @@
         "apps/docs/src/content/docs/guides/react-query.md": "29a200b31d19e0339805a0ae3e50be403300e1b8bb7b870949cf779853fbb347",
         "apps/docs/src/content/docs/guides/refresh-from-events.md": "a51ef3777eb9ea07f561d2223c6d8ffa063c87ecda25cb74ce0aea4b037fa2fe",
         "apps/docs/src/content/docs/guides/retry-queries.md": "f725f54696712cc917089e18e905022c6ab097e44f8d22f499ab87fb30af9a99",
+        "apps/docs/src/content/docs/guides/solid-query.md": "e01a800c1a4b8dbfe2d5dfaef5a53e2a12e92e1db42fdd926422bb6fcd4eb780",
         "apps/docs/src/content/docs/guides/stream-snapshots.md": "62e343dc7fa2f4b1b6fb1b699ecb947bcdfc0312c9ffab584b0b8bfaf954f854",
-        "apps/docs/src/content/docs/guides/svelte-and-angular.md": "8a5741996407c81c54a75ab3fb086a4c6866913a2a14f71801876891fb49753f",
+        "apps/docs/src/content/docs/guides/svelte-and-angular.md": null,
+        "apps/docs/src/content/docs/guides/svelte-query.md": "ef3dd4cb2b88759223e77182446b41a53ccf6f4f471e8748f53c93aeafa880e2",
         "apps/docs/src/content/docs/guides/switch-cache-owners.md": "08e883a245679cf05d4cb65c93e5b9f1887022a972b98ab295aa248880ab9b7f",
         "apps/docs/src/content/docs/guides/tanstack-start.md": "28a196e44e1b6b49131b05e370cb029670599fefe6aad6ff54ed9d3d3f07ddac",
-        "apps/docs/src/content/docs/guides/vue-and-solid.md": "2b0b31da53f2b5e86cd5fb3abe5353c28e02e73dc485133d6f593c9f5d30cf06",
+        "apps/docs/src/content/docs/guides/vue-and-solid.md": null,
+        "apps/docs/src/content/docs/guides/vue-query.md": "b115c710cdd520cbf016fd19c48af2c849fe7e20344a2e900b78f0a0e5c5bd12",
         "apps/docs/src/content/docs/guides/websocket-clients.md": "9ec635105fd84c30dc52833ed3adcf80a46313deb0112d4e72cd1a5603c6170c",
-        "apps/docs/src/content/docs/index.mdx": "5c22ad2256052013855d92e21d4a277f4c3e92931ea71fd0c1b3e7f5aceb9584",
+        "apps/docs/src/content/docs/index.mdx": "232b5a9f64169463d7973c6801b3f3c326328870715fcb45e9b0a25ee085e197",
         "apps/docs/src/content/docs/reference/browser-and-worker-hosts.md": "70743a4429a39937515c8d5fee79ca75714a92dd526f1093f9fa8ea12fbde984",
-        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "99909357a5c32eb8ed9443fc0d92c43b228591d5c2203f1c822c9bcc4a7b280d",
+        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "1499a387d91e364fcfe44bd82f9e1589f9fab2a93fc081f9172a6e8da703cb25",
         "apps/docs/src/content/docs/reference/errors.md": "4454725375e05ea7a7d976d798c1c1d0c2731eefc79043f5e40dba88154069b1",
         "apps/docs/src/content/docs/reference/external-http-clients.md": "613f0e9493221416993e0c8012a97abdb3de2f80321aa7e4b0cda0f585618f91",
         "apps/docs/src/content/docs/reference/factory.md": "b099ed80d1ad8aab6a59213ee286290302bcf7885569ffb693fed784ca872dd3",
@@ -324,7 +330,7 @@
         "scripts/verify-packed-consumer.mts": null,
         "skills/effect-api-query/SKILL.md": "1939a0f7536f3e88e1e1106e8125019c11d6fdd4ada8ae4d010507f264b234e5",
         "skills/effect-api-query/references/cache-workflows.md": "27bb96c48c84254ab8c379a529402f81cea3723c17d6396527c090a8c37e6f65",
-        "skills/effect-api-query/references/frameworks-and-hosts.md": "d84c787ccfc76b1f01f3d44d02d969ed9422af7d9dbdda862e661d65af9e44df",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "8b39b303cf3a9ae3222a257f53df5f9696b80c54859765f2c4d7b39554b8719f",
         "skills/effect-api-query/references/http.md": "9625411753fcc3ce816512f80158a19aa1057518ab3bfde98720e0cc7f845b66",
         "skills/effect-api-query/references/hydration-and-ssr.md": "61e761b36ebcf56c7cc1b67b3d795edba52d0c0224c3e7964297ed6864e1b044",
         "skills/effect-api-query/references/query-patterns.md": "33ea307b7042660da4ee4f6acea147d4218688a0256d82f3d582ff2e9cef4f9c",
@@ -398,14 +404,13 @@
         "tests/types/tanstack-start-contract.ts": "51681e3d0d7504a614d490f18adb6f44db82d34b9d4d7cb9cf941aea33de284f",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "f56fbfaa6c79e869f15e98d457b5ee6eb07d7b86",
-      "outcome": "no-change",
-      "reason": "All three shared planning documents remain accurate: the domain map retains the same ten tasks and reactive/ownership failure modes; the spec retains one skill, six references, assessed coverage and existing history; the tree retains the same identity, source globs covering both changed guides, prerequisites and package-only distribution. This guide clarification adds no task, seam, source mapping, dependency, or behavior, so no planning rewrite or artificial history entry is needed.",
+      "head": "a0a363afa19552badd7c40795ac7a4735595dddb",
+      "outcome": "updated",
+      "reason": "Update the reactive-options failure source in domain_map.yaml to solid-query.md, which contains the existing Solid accessor correction. The ten task domains, one-skill/six-reference coverage and source globs remain accurate. skill_tree.yaml and skill_spec.md retain their valid inventory, prior decisions and batch history; this route change needs no new task, skill, taxonomy or artificial history entry.",
       "evidence": [
-        "Read _artifacts/domain_map.yaml, _artifacts/skill_spec.md and _artifacts/skill_tree.yaml against the two guide additions and unchanged seven-file skill.",
-        "Installed YAML parsing passed for map/tree, verified ten assessed tasks, one implemented skill with existing path/no prerequisites, and distribution.mode:none; native maintainer sync reported nothing to synchronize.",
-        "Fresh vp run docs-build and scoped format passed; documentation version scopes are historical recipe targets and do not widen the planning support claims.",
-        "Current native review contains only this planning item and the owned skill item; mapped documentation inputs are not separate unmapped source items. All other stored outcomes are preserved."
+        "Read _artifacts/domain_map.yaml, _artifacts/skill_spec.md and _artifacts/skill_tree.yaml against the guide diff at a0a363afa19552badd7c40795ac7a4735595dddb. Map source now points to existing guides/solid-query.md and its accessor recipe; the unchanged **/apps/docs/src/content/docs/**/*.md glob covers all four new pages.",
+        "Both planning YAML files parsed with the installed Intent YAML parser and contain the existing library/skill entry. Native maintainer sync reports nothing to synchronize. Scoped formatting, 46-page docs build/internal links, verbatim recipe comparison and native skills-check passed; the existing skill activation and six reference files remain authoritative.",
+        "No runtime/type/API/dependency, ownership or support-matrix change. No new task-quality or discovery claim; planning guidance preserves existing scope and publication remains separately pending. This outcome covers all three shared planning documents and their current skill/source snapshot."
       ]
     },
     "source:vite.config.ts": {
@@ -941,17 +946,17 @@
       ]
     },
     "source:apps/docs/astro.config.mts": {
-      "fingerprint": "a203f42f861dd5c68e83ad5196f881fd30a98b99e9378bdf8137569697216d8b",
+      "fingerprint": "395c3f595f9efe24a1ef692865d00245e353817c323a941a2bc4bb426d86c608",
       "snapshot": {
-        "apps/docs/astro.config.mts": "397aafc4621e59a3df38395dab8ae88f7dab3c86d121399c25f3e79dcbd23d85"
+        "apps/docs/astro.config.mts": "a4ae131af72451431a9e667a4c5492ef837eec39b4fd7a11c23d9e86de97403a"
       },
-      "head": "2e4ecf18e93a4ee086d74102c3addb5e2029be56",
+      "head": "a0a363afa19552badd7c40795ac7a4735595dddb",
       "outcome": "no-change",
-      "reason": "This is the existing Astro configuration under an explicitly TypeScript ESM extension. Installed Astro 7.3.5 discovers .mts configurations; ordinary Astro diagnostics and the complete static documentation build load it successfully. The source settings, plugins, paths and site content are preserved. It remains repository tooling, outside the shipped integration skill source scope, so no new mapping or guidance task is warranted.",
+      "reason": "The existing documentation sidebar now names four individual framework guides. It remains documentation-site configuration outside the library integration task mapping; no new shipped skill, source glob or recommended behavior is warranted. The linked guide changes and existing skill source footer already own the developer-facing material.",
       "evidence": [
-        "Author base 2e4ecf18e93a4ee086d74102c3addb5e2029be56. Rename apps/docs/astro.config.mjs to astro.config.mts, remove ts-check directive, and update only .fallowrc.jsonc ignoreExports path. Installed loader evidence: apps/docs/node_modules/astro/dist/core/config/config.js configPaths contains astro.config.mts.",
-        "vp run format apps/docs/astro.config.mts .fallowrc.jsonc passed. vp run fallow passed entry/production dead-code checks, duplicates task, and health threshold. vp run docs-build passed Astro check with zero errors/warnings/hints and build of 44 pages with valid internal links; unchanged documentation example parity was a native cache hit. Logs: /tmp/effect-api-query-implementation/notes/astro-mts-*.log.",
-        "Read _artifacts/domain_map.yaml, skill_spec.md, and skill_tree.yaml: existing library task/seam/ownership coverage and source globs remain accurate; no library behavior, guidance, dependency or installation change. Native sync changed nothing; review reports no owned skill/planning drift. No new independent consumer or browser execution is needed for this repository config rename."
+        "Author base a0a363afa19552badd7c40795ac7a4735595dddb. apps/docs/astro.config.mts replaces only the two paired sidebar items with Vue Query, Solid Query, Svelte Query and Angular Query labels/slugs; every new slug matches its corresponding frontmatter title and generated page.",
+        "Scoped format passed. Uncached vp run docs-build loaded the actual .mts configuration, reported 0 Astro errors/warnings/hints, built/indexed 46 pages and validated all internal links. Static artifact inspection found all four sidebar links on every new framework page and no old route directories.",
+        "Read all three planning records and current shipped framework guidance. Documentation source globs already cover the four human guides, while sidebar configuration adds no developer integration task. No public API/runtime/dependency or independent-consumer behavior change."
       ]
     },
     "source:docs/adr/0016-automate-releases-with-changesets.md": {
