@@ -85,14 +85,14 @@ export type InputQueryOptions<
       ? ConditionalQueryOptions<Data, Error, Selected, Key | SkippedKey>
       : QueryOptions<Data, Error, Selected, Key>
 
-type ExactBuilderOptions<Expected, Supplied> = Expected &
+export type ExactBuilderOptions<Expected, Supplied> = Expected &
   Supplied & {
     readonly [
       Key in Exclude<keyof Supplied, keyof Expected | typeof uninferredBuilderOptions>
     ]: string extends Key ? Supplied[Key] : number extends Key ? Supplied[Key] : never
   }
 
-type SuppliedInitialData<Supplied> = 'initialData' extends keyof Supplied
+export type SuppliedInitialData<Supplied> = 'initialData' extends keyof Supplied
   ? undefined extends Supplied['initialData']
     ? Omit<Supplied, 'initialData'> & {
         readonly initialData?: Exclude<Supplied['initialData'], undefined>
@@ -101,9 +101,9 @@ type SuppliedInitialData<Supplied> = 'initialData' extends keyof Supplied
   : Supplied
 
 declare const uninferredBuilderOptions: unique symbol
-type UninferredBuilderOptions = { readonly [uninferredBuilderOptions]?: never }
+export type UninferredBuilderOptions = { readonly [uninferredBuilderOptions]?: never }
 
-type SuppliedQueryOptions<Options, Supplied, AdapterOptions> =
+export type SuppliedQueryOptions<Options, Supplied, AdapterOptions> =
   typeof uninferredBuilderOptions extends keyof Supplied
     ? Options
     : Pick<
@@ -149,7 +149,7 @@ export type UnaryQueryBuilder<
         Data
       >
       <Selected = Data, Supplied extends object = UninferredBuilderOptions>(
-        options: ExactBuilderOptions<
+        options?: ExactBuilderOptions<
           WithUndefinedInitialData<QueryInput<Data, Error, Selected, Key, AdapterOptions>, Data>,
           Supplied
         >,

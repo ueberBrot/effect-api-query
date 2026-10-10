@@ -32,6 +32,8 @@ import { useQuery } from '@tanstack/vue-query'
 import { skipToken } from 'effect-api-query'
 import { computed, ref } from 'vue'
 
+import { rpc } from './queries.ts'
+
 const userId = ref<number | undefined>(1)
 const options = computed(() =>
   rpc.users.read.queryOptions({
@@ -39,15 +41,16 @@ const options = computed(() =>
     select: (user) => user.name,
   }),
 )
+type UserKey = ReturnType<typeof rpc.users.read.queryKey>
 const user = useQuery<
-  InferDataFromTag<unknown, typeof options.value.queryKey>,
-  InferErrorFromTag<Error, typeof options.value.queryKey>,
+  InferDataFromTag<unknown, UserKey>,
+  InferErrorFromTag<Error, UserKey>,
   string
 >(options)
 ```
 
 Read the selected value from `user.data.value`. The explicit native hook generics preserve the
-data and error carried by the generated key while bounding Vue's recursive ref unwrapping.
+data and error carried by the concrete generated key while bounding Vue's recursive ref unwrapping.
 Automatic inference can otherwise exceed TypeScript's instantiation depth when it unwraps an
 Effect `Cause` through a tagged key. Let the builder infer its arguments; put these type arguments
 on the Vue hook.
@@ -58,6 +61,8 @@ In a Solid component, pass the builder call as an accessor:
 import { useQuery } from '@tanstack/solid-query'
 import { skipToken } from 'effect-api-query'
 import { createSignal } from 'solid-js'
+
+import { rpc } from './queries.ts'
 
 const [userId] = createSignal<number | undefined>(1)
 const user = useQuery(() => {
