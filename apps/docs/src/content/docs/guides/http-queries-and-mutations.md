@@ -92,9 +92,12 @@ wrapper. A top-level successful `undefined` becomes `null`. `current.status` is 
 data keeps its declared representation. Raw headers can contain private values: choose which headers
 your application may persist or dehydrate.
 
-Fetched snapshots stay frozen after native structural sharing. Your global, prefix, and per-call
-sharing policies still apply; decoded data is not frozen by the adapter. Values supplied through
-`initialData`, hydration, or manual cache writes remain application-owned.
+Fetched snapshots stay frozen after structural sharing, using your global, prefix, or per-call
+policy. Decoded data and values supplied through `initialData`, hydration, or manual cache writes
+remain application-owned. Selected observer results and subsequent manual writes use the policy
+explicitly passed to `metadataOptions`, or standard deep sharing if omitted; they do not inherit
+global or prefix sharing policies. See
+[Buffered metadata](/effect-api-query/reference/http-factory/#buffered-metadata).
 
 `metadataKey(input)` provides a typed key for cache reads and writes. Metadata options support
 selection, initial data, skipped input, native hashing defaults, and cancellation like ordinary
@@ -228,8 +231,7 @@ streaming success or streaming multipart alternative omits the whole endpoint.
 
 ## Retain SSE events
 
-An endpoint with one `HttpApiSchema.StreamSse` success exposes `streamedKey` and
-`streamedOptions`. For a `watch` endpoint whose query declares `channel: Schema.String`,
+An endpoint with one `HttpApiSchema.StreamSse` success exposes accumulated and live query builders. For a `watch` endpoint whose query declares `channel: Schema.String`,
 retain its latest 100 decoded events:
 
 ```ts
@@ -270,6 +272,43 @@ complete Causes, including `Sse.Retry`. Your application owns reconnection and r
 Raw byte streams, mixed buffered/SSE successes, and SSE endpoints with multipart payloads are
 omitted. Consume unsupported streams directly through the ready client.
 
+## Keep the latest SSE value
+
+Use `liveOptions` when a stream emits snapshots and only the latest value belongs in the cache:
+
+```ts
+const latest = http.events.watch.liveOptions({
+  input: { query: { channel: 'news' } },
+  sseOptions: { maxEventSize: 1024 * 1024 },
+})
+
+const observer = new QueryObserver(queryClient, latest)
+const unsubscribe = observer.subscribe((result) => {
+  if (result.status === 'success') renderLatest(result.data)
+})
+```
+
+Replace `renderLatest` with your application's rendering callback, or pass `latest` to your
+framework's query hook. The first emission makes the query successful while it remains fetching.
+Each later emission replaces the cached value; completion preserves the last value. A top-level
+`undefined` emission becomes `null`, including after a defined value. Decoded header wrappers keep
+their body unchanged, so a wrapped `undefined` body remains `undefined`.
+
+Completion before any emission raises `EffectHttpApiQueryEmptyStreamError`. Transport, decoding,
+declared event, and independent interruption failures retain the complete Cause in
+`EffectHttpApiQueryError` with operation `live`. Query cancellation closes consumption and follows
+native cache reversion; unsubscribe and cancel active queries before disposing client resources.
+
+`liveKey(input, { sseOptions })` builds the matching exact key. Inputless endpoints accept decoder
+policy alone. Live and accumulated views use separate cache entries; the endpoint's `key()`
+selects both views and every decoder policy. Live queries retain one value and accept no history
+bound or accumulated refetch mode. Input-bearing builders support `skipToken`.
+
+The ready client owns the SSE connection. Handle `Sse.Retry` and its resume cursor through your
+application's retry policy, and supply a declared cursor in `input.headers` when reconnecting.
+New cursor values produce new request identity. Raw bytes, mixed buffered/SSE successes, and
+multipart SSE endpoints remain omitted.
+
 ## Keep cache entries separate
 
 Use generated keys for individual queries or whole branches:
@@ -287,7 +326,7 @@ need encoding services, contain redacted values, or allow multiple payload alter
 
 Buffered HTTP endpoints without multipart expose ordinary query, infinite query, and mutation
 builders regardless of HTTP method. Choose the builder for the operation you intend. Buffered
-multipart endpoints expose mutations only. A single SSE success exposes accumulated streamed
+multipart endpoints expose mutations only. A single SSE success exposes accumulated and live streamed
 queries; raw byte streams, mixed buffered/SSE successes, and streaming multipart requests are omitted; see the [HTTP factory reference](/effect-api-query/reference/http-factory/)
 for supported request formats and the complete builder contract.
 

@@ -7,6 +7,7 @@ export { createRpcQueryUtils } from './rpc/create-utils'
 export { createHttpApiQueryUtils } from './http/create-utils'
 export {
   EffectHttpApiQueryConfigError,
+  EffectHttpApiQueryEmptyStreamError,
   EffectHttpApiQueryError,
   EffectHttpApiQueryKeyError,
   isEffectHttpApiQueryError,

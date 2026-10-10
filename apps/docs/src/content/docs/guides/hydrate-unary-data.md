@@ -197,31 +197,32 @@ const PreparedProfile = Profile.pipe(
   ),
 )
 
-export const prepareProfileSnapshot = (queryClient: QueryClient) =>
-  Effect.gen(function* () {
-    const snapshot = dehydrate(queryClient, {
-      shouldDehydrateMutation: () => false,
-      shouldDehydrateQuery: (query) =>
-        defaultShouldDehydrateQuery(query) && query.queryKey[0] === 'profile',
-    })
-    const queries = yield* Effect.forEach(snapshot.queries, (query) =>
-      Schema.encodeUnknownEffect(PreparedProfile)(query.state.data).pipe(
-        Effect.map((data) => ({ ...query, state: { ...query.state, data } })),
-      ),
-    )
-    return JSON.stringify({ ...snapshot, queries })
+export const prepareProfileSnapshot = Effect.fnUntraced(function* (queryClient: QueryClient) {
+  const snapshot = dehydrate(queryClient, {
+    shouldDehydrateMutation: () => false,
+    shouldDehydrateQuery: (query) =>
+      defaultShouldDehydrateQuery(query) && query.queryKey[0] === 'profile',
   })
+  const queries = yield* Effect.forEach(snapshot.queries, (query) =>
+    Schema.encodeUnknownEffect(PreparedProfile)(query.state.data).pipe(
+      Effect.map((data) => ({ ...query, state: { ...query.state, data } })),
+    ),
+  )
+  return JSON.stringify({ ...snapshot, queries })
+})
 
-export const prepareProfileHydration = (queryClient: QueryClient, json: string) =>
-  Effect.gen(function* () {
-    const snapshot: DehydratedState = JSON.parse(json)
-    const queries = yield* Effect.forEach(snapshot.queries, (query) =>
-      Schema.decodeUnknownEffect(PreparedProfile)(query.state.data).pipe(
-        Effect.map((data) => ({ ...query, state: { ...query.state, data } })),
-      ),
-    )
-    yield* Effect.sync(() => hydrate(queryClient, { ...snapshot, queries }))
-  })
+export const prepareProfileHydration = Effect.fnUntraced(function* (
+  queryClient: QueryClient,
+  json: string,
+) {
+  const snapshot: DehydratedState = JSON.parse(json)
+  const queries = yield* Effect.forEach(snapshot.queries, (query) =>
+    Schema.decodeUnknownEffect(PreparedProfile)(query.state.data).pipe(
+      Effect.map((data) => ({ ...query, state: { ...query.state, data } })),
+    ),
+  )
+  yield* Effect.sync(() => hydrate(queryClient, { ...snapshot, queries }))
+})
 ```
 
 Provide `HydrationPreparation` through your application Context or ManagedRuntime. Await the

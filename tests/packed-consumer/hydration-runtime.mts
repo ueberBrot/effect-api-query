@@ -152,38 +152,41 @@ await Effect.runPromise(
         const serverScope = yield* Scope.make()
         const serverClient = new QueryClient()
         const browserClient = new QueryClient()
-        const makeOptions = (profile: Profile, onRead: () => void, scope: Scope.Scope) =>
-          Effect.gen(function* () {
-            const read = () =>
-              Effect.suspend(() => {
-                onRead()
-                return failed ? Effect.fail('private upstream detail') : Effect.succeed(profile)
-              })
-            if (transport === 'rpc') {
-              const client = yield* RpcTest.makeClient(profileGroup, { flatten: true }).pipe(
-                Effect.provide(profileGroup.toLayer({ 'profile.read': read })),
-                Effect.provideService(Scope.Scope, scope),
-              )
-              const options = profileRpcOptions(client)
-              return {
-                query: (cache: QueryClient) => cache.query(options),
-                queryKey: options.queryKey,
-              }
-            }
-            const client = yield* HttpApiTest.groups(profileApi, ['profile']).pipe(
-              Effect.provide(
-                HttpApiBuilder.group(profileApi, 'profile', (handlers) =>
-                  handlers.handle('read', read),
-                ),
-              ),
+        const makeOptions = Effect.fnUntraced(function* (
+          profile: Profile,
+          onRead: () => void,
+          scope: Scope.Scope,
+        ) {
+          const read = () =>
+            Effect.suspend(() => {
+              onRead()
+              return failed ? Effect.fail('private upstream detail') : Effect.succeed(profile)
+            })
+          if (transport === 'rpc') {
+            const client = yield* RpcTest.makeClient(profileGroup, { flatten: true }).pipe(
+              Effect.provide(profileGroup.toLayer({ 'profile.read': read })),
               Effect.provideService(Scope.Scope, scope),
             )
-            const options = profileHttpOptions(client)
+            const options = profileRpcOptions(client)
             return {
               query: (cache: QueryClient) => cache.query(options),
               queryKey: options.queryKey,
             }
-          })
+          }
+          const client = yield* HttpApiTest.groups(profileApi, ['profile']).pipe(
+            Effect.provide(
+              HttpApiBuilder.group(profileApi, 'profile', (handlers) =>
+                handlers.handle('read', read),
+              ),
+            ),
+            Effect.provideService(Scope.Scope, scope),
+          )
+          const options = profileHttpOptions(client)
+          return {
+            query: (cache: QueryClient) => cache.query(options),
+            queryKey: options.queryKey,
+          }
+        })
         try {
           const browserScope = yield* Scope.Scope
           const serverOptions = yield* makeOptions(

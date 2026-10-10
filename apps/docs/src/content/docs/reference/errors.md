@@ -78,10 +78,17 @@ for each code's trigger.
 
 Thrown when the HTTP runner returns a failed `Exit`. It exposes `apiId`, `groupId`, `endpoint`,
 `method`, `operation`, and the full `Cause.Cause<E>`. The operation is `query`, `infinite`, `mutation`,
-`metadata`, or `streamed`.
+`metadata`, `streamed`, or `live`.
 Use `isEffectHttpApiQueryError(value)` to narrow errors within the same JavaScript realm.
 
 The Cause preserves endpoint, middleware, Schema, and HTTP client errors, including defects and
 interruption. SSE failures also preserve declared event errors, `Sse.Retry`, and `Sse.SseError`.
 It can contain upstream requests, responses, or sensitive input values; inspect those
 values before logging or exposing them. Runner rejections pass through unchanged.
+
+## `EffectHttpApiQueryEmptyStreamError`
+
+Thrown when an HTTP live SSE query completes before emitting a value. It exposes `apiId`,
+`groupId`, `endpoint`, `method`, and operation `live`. A decoded `undefined` emission counts as a
+value and becomes `null`; a declared header wrapper preserves its body. Accumulated streams
+complete with an empty or retained history according to their refetch mode.

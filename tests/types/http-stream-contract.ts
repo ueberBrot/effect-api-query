@@ -1,7 +1,8 @@
 import { QueryClient, QueryObserver, skipToken } from '@tanstack/query-core'
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { Context, Effect, Schema, SchemaTransformation } from 'effect'
 import type { Stream } from 'effect'
-import { createHttpApiQueryUtils } from 'effect-api-query'
+import { createHttpApiQueryUtils, EffectHttpApiQueryEmptyStreamError } from 'effect-api-query'
 import type {
   CreateHttpApiQueryUtilsOptions,
   EffectHttpApiQueryError,
@@ -70,7 +71,10 @@ const utils = createHttpApiQueryUtils(api, { client, keyPrefix: ['consumer'], ru
 true satisfies Assert<Equal<keyof typeof utils, 'key' | 'views' | 'events'>>
 true satisfies Assert<Equal<keyof typeof utils.views, 'key' | 'plain' | 'wrapped'>>
 true satisfies Assert<
-  Equal<keyof typeof utils.views.plain, 'key' | 'streamedKey' | 'streamedOptions'>
+  Equal<
+    keyof typeof utils.views.plain,
+    'key' | 'streamedKey' | 'streamedOptions' | 'liveKey' | 'liveOptions'
+  >
 >
 const queryClient = new QueryClient()
 const input = { params: { id: 1 } }
@@ -193,3 +197,147 @@ type ExtraRequirements = CreateHttpApiQueryUtilsOptions<
 >['runPromiseExit']
 true satisfies Assert<Equal<ExtraRequirements, typeof extraRunner>>
 true satisfies Assert<RunPromiseExit extends ExtraRequirements ? false : true>
+
+const liveOptions = utils.views.plain.liveOptions({
+  input,
+  sseOptions: { maxEventSize: 1024 },
+  select: (value) => value.toFixed(2),
+  staleTime: Infinity,
+})
+const liveKey = utils.views.plain.liveKey(input, { sseOptions: { maxEventSize: 1024 } })
+const liveData = queryClient.getQueryData(liveKey)
+true satisfies Assert<Equal<typeof liveData, number | undefined>>
+const liveState = queryClient.getQueryState(liveOptions.queryKey)
+true satisfies Assert<
+  Equal<NonNullable<typeof liveState>['error'], Error | EffectHttpApiQueryEmptyStreamError | null>
+>
+const liveObserver = new QueryObserver(queryClient, liveOptions)
+true satisfies Assert<
+  Equal<ReturnType<typeof liveObserver.getCurrentResult>['data'], string | undefined>
+>
+const liveSkipped = utils.views.plain.liveOptions({
+  input: skipToken,
+  sseOptions: { maxEventSize: 1024 },
+  initialData: 1,
+})
+liveSkipped.queryFn satisfies typeof skipToken
+utils.views.plain.liveOptions(skipToken).queryFn satisfies typeof skipToken
+const liveConditional = utils.views.plain.liveOptions({
+  input: Math.random() > 0.5 ? input : skipToken,
+  initialData: () => 1,
+  select: (value) => value.toString(),
+})
+const liveDefined = useQuery(
+  utils.views.plain.liveOptions({ input, initialData: 1, select: (value) => value.toString() }),
+)
+true satisfies Assert<Equal<typeof liveDefined.data, string>>
+const optionalNumber: number | undefined = Math.random() > 0.5 ? 1 : undefined
+const liveOptional = useQuery(
+  utils.views.plain.liveOptions({
+    input,
+    initialData: optionalNumber,
+    select: (value) => value.toString(),
+  }),
+)
+true satisfies Assert<Equal<typeof liveOptional.data, string | undefined>>
+const liveSkippedResult = useQuery(liveSkipped)
+true satisfies Assert<Equal<typeof liveSkippedResult.data, number | undefined>>
+useQuery(liveConditional)
+// @ts-expect-error Skipped live queries cannot guarantee suspense execution.
+useSuspenseQuery(liveSkipped)
+const liveWrapped = queryClient.getQueryData(utils.views.wrapped.liveKey())
+true satisfies Assert<
+  Equal<
+    typeof liveWrapped,
+    HttpApiSchema.withHeaders<number, { readonly 'x-version': number }> | undefined
+  >
+>
+const liveEvents = queryClient.getQueryData(utils.events.liveKey())
+true satisfies Assert<
+  Equal<
+    typeof liveEvents,
+    { readonly id: string; readonly event: 'changed'; readonly data: string } | undefined
+  >
+>
+const extraLiveState = queryClient.getQueryState(extra.views.plain.liveKey(input))
+type ExtraLiveFailure =
+  Exclude<
+    NonNullable<typeof extraLiveState>['error'],
+    EffectHttpApiQueryEmptyStreamError | null
+  > extends EffectHttpApiQueryError<infer E>
+    ? E
+    : never
+true satisfies Assert<
+  Equal<Extract<ExtraLiveFailure, 'extra-error' | 'stream-error'>, 'extra-error' | 'stream-error'>
+>
+// @ts-expect-error Decoder controls remain separate from captured requests.
+utils.views.plain.liveKey(captured)
+// @ts-expect-error The adapter owns response mode.
+utils.views.plain.liveOptions({ input: { ...input, responseMode: 'response-only' } })
+// @ts-expect-error Live queries retain one value and expose no history bound.
+utils.views.plain.liveOptions({ input, maxChunks: 2 })
+// @ts-expect-error Live queries expose no accumulated refetch mode.
+utils.views.plain.liveKey(input, { refetchMode: 'append' })
+// @ts-expect-error Caller hashes belong in QueryClient defaults.
+utils.views.plain.liveOptions({ input, queryKeyHashFn: JSON.stringify })
+// @ts-expect-error Inputless live endpoints reject skipToken.
+utils.events.liveOptions({ input: skipToken })
+custom.views.plain.liveKey(input)
+
+const UndefinedValue = Schema.Null.pipe(
+  Schema.decodeTo(
+    Schema.Void,
+    SchemaTransformation.transform({
+      decode: (): void => undefined,
+      encode: (_value: void) => null,
+    }),
+  ),
+)
+const normalizationApi = HttpApi.make('live-normalization').add(
+  HttpApiGroup.make('values').add(
+    HttpApiEndpoint.get('plain', '/plain', {
+      success: HttpApiSchema.StreamSse({ data: UndefinedValue }),
+    }),
+    HttpApiEndpoint.get('wrapped', '/wrapped', {
+      success: HttpApiSchema.WithHeaders(HttpApiSchema.StreamSse({ data: UndefinedValue }), {
+        etag: Schema.String,
+      }),
+    }),
+    HttpApiEndpoint.get('union', '/union', {
+      success: HttpApiSchema.StreamSse({ data: Schema.Union([Schema.Finite, UndefinedValue]) }),
+    }),
+  ),
+)
+declare const normalizationClient: HttpApiClient.ForApi<typeof normalizationApi>
+const normalized = createHttpApiQueryUtils(normalizationApi, {
+  client: normalizationClient,
+  keyPrefix: ['normalized'],
+})
+const undefinedData = queryClient.getQueryData(normalized.values.plain.liveKey())
+true satisfies Assert<Equal<typeof undefinedData, null | undefined>>
+const unionData = queryClient.getQueryData(normalized.values.union.liveKey())
+true satisfies Assert<Equal<typeof unionData, number | null | undefined>>
+const wrappedUndefinedData = queryClient.getQueryData(normalized.values.wrapped.liveKey())
+true satisfies Assert<
+  Equal<
+    typeof wrappedUndefinedData,
+    HttpApiSchema.withHeaders<void, { readonly etag: string }> | undefined
+  >
+>
+const undefinedLive = useQuery(
+  normalized.values.plain.liveOptions({
+    initialData: null,
+    select: (value) => {
+      value satisfies null
+      return 'ready' as const
+    },
+  }),
+)
+true satisfies Assert<Equal<typeof undefinedLive.data, 'ready'>>
+const emptyError: EffectHttpApiQueryEmptyStreamError = new EffectHttpApiQueryEmptyStreamError({
+  apiId: 'api',
+  groupId: 'group',
+  endpoint: 'empty',
+  method: 'GET',
+})
+emptyError.operation satisfies 'live'

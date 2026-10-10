@@ -19,7 +19,7 @@ import type {
   QueryData,
   RunPromiseExit,
 } from '../core/types'
-import type { EffectHttpApiQueryError } from './errors'
+import type { EffectHttpApiQueryEmptyStreamError, EffectHttpApiQueryError } from './errors'
 
 export type Groups<Api extends HttpApi.Constraint> =
   Api extends HttpApi.HttpApi<infer _Id, infer Group> ? Group : never
@@ -346,6 +346,42 @@ export type StreamedLeaf<
   >
 }
 
+export type HttpLivePolicy = {
+  readonly sseOptions?: Sse.DecodeOptions | undefined
+}
+
+export type LiveFailure<Endpoint extends HttpApiEndpoint.ConstraintRequest, ClientError> =
+  | Failure<ClientError | StreamFailure<Success<Endpoint>>>
+  | EffectHttpApiQueryEmptyStreamError
+
+export type LiveKey<
+  Endpoint extends HttpApiEndpoint.ConstraintRequest,
+  Key extends readonly JsonValue[],
+  ClientError,
+> = DataTag<
+  readonly [...Key, 'live', ...JsonValue[]],
+  QueryData<StreamChunk<Success<Endpoint>>>,
+  LiveFailure<Endpoint, ClientError>
+>
+
+export type LiveLeaf<
+  Endpoint extends HttpApiEndpoint.ConstraintRequest,
+  Key extends readonly JsonValue[],
+  ClientError,
+> = {
+  readonly liveKey: void extends Request<Endpoint>
+    ? (policy?: HttpLivePolicy) => LiveKey<Endpoint, Key, ClientError>
+    : (input: Request<Endpoint>, policy?: HttpLivePolicy) => LiveKey<Endpoint, Key, ClientError>
+  readonly liveOptions: UnaryQueryBuilder<
+    Request<Endpoint>,
+    QueryData<StreamChunk<Success<Endpoint>>>,
+    LiveFailure<Endpoint, ClientError>,
+    LiveKey<Endpoint, Key, ClientError>,
+    readonly [...Key, 'live'],
+    HttpLivePolicy
+  >
+}
+
 export type Leaf<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Key extends readonly JsonValue[],
@@ -353,7 +389,7 @@ export type Leaf<
   MetadataClientError = ClientError,
 > = [SseEndpoint<Endpoint>] extends [never]
   ? BufferedLeaf<Endpoint, Key, ClientError, MetadataClientError>
-  : StreamedLeaf<Endpoint, Key, ClientError>
+  : StreamedLeaf<Endpoint, Key, ClientError> & LiveLeaf<Endpoint, Key, ClientError>
 
 /** An eager utility tree mirroring the ready HTTP client's literal properties. */
 export type HttpApiQueryUtils<

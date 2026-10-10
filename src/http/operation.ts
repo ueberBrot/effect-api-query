@@ -14,7 +14,11 @@ import type {
 import { EffectHttpApiQueryConfigError, EffectHttpApiQueryError } from './errors'
 import type { HttpApiEndpointIdentity } from './errors'
 import { createHttpRequest } from './request'
-import { createHttpStreamIdentity, createHttpStreamPreparation } from './streamed-query'
+import {
+  createHttpLiveIdentity,
+  createHttpStreamIdentity,
+  createHttpStreamPreparation,
+} from './streamed-query'
 
 type HttpOperation = (UnaryOperation | MutationOperation | StreamingOperation) & {
   readonly identity: HttpApiEndpointIdentity
@@ -91,7 +95,7 @@ const extractHttpEndpoints = (api: HttpApi.Top, client: unknown): readonly HttpO
           ...common,
           ...request,
           kind: 'Streaming',
-          supportsLive: false,
+          liveIdentity: createHttpLiveIdentity(identity),
           streamedIdentity: createHttpStreamIdentity(identity),
           prepareStream: createHttpStreamPreparation(identity, (requestInput, sseOptions) =>
             // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context

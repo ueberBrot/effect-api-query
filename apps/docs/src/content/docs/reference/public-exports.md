@@ -26,7 +26,8 @@ All supported imports come from `effect-api-query`.
 
 The [HTTP factory](/effect-api-query/reference/http-factory/) adds `createHttpApiQueryUtils`,
 `HttpApiQueryUtils`, `CreateHttpApiQueryUtilsOptions`, and `HttpApiKeyEncoder`. Its errors are
-`EffectHttpApiQueryError`, `EffectHttpApiQueryConfigError`, and `EffectHttpApiQueryKeyError`, with
+`EffectHttpApiQueryError`, `EffectHttpApiQueryEmptyStreamError`, `EffectHttpApiQueryConfigError`, and
+`EffectHttpApiQueryKeyError`, with
 `isEffectHttpApiQueryError`, `EffectHttpApiQueryConfigErrorCode`, and
 `EffectHttpApiQueryKeyErrorCode` for narrowing and stable codes.
 

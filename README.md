@@ -79,6 +79,7 @@ for conditional writes and invalidation.
 | Streaming RPC                               | Accumulated streamed queries and live queries      |
 | Buffered HttpApi endpoint without multipart | Queries, metadata, infinite queries, and mutations |
 | Buffered HttpApi endpoint with multipart    | Mutations with `FormData`                          |
+| Unambiguous HttpApi SSE endpoint            | Accumulated streamed queries and live queries      |
 
 Both factories generate keys for cache reads, writes, prefetching, and invalidation. Query functions
 forward cancellation to Effect. Mutations use TanStack's normal callbacks; invalidate affected
@@ -86,7 +87,9 @@ queries in your application.
 
 For uploads, build `FormData` explicitly and pass it as mutation `payload`. See the
 [HTTP upload guide](https://ueberbrot.github.io/effect-api-query/guides/http-queries-and-mutations/#upload-a-file).
-Streaming HTTP responses and streaming multipart requests remain omitted.
+Mixed HTTP success modes, raw byte streams, and streaming multipart requests remain omitted. See
+the [SSE guide](https://ueberbrot.github.io/effect-api-query/guides/http-queries-and-mutations/#retain-sse-events)
+for accumulated HTTP event queries.
 
 ## Integrate with your application
 

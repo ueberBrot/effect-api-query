@@ -360,6 +360,20 @@ await Effect.runPromise(
           equal(localCalls, 2)
           equal(left.getQueryData(localOptions.queryKey)?.status, 213)
           equal(right.getQueryData(localOptions.queryKey)?.status, 213)
+          const customManual = { data: null, status: 218, headers: { etag: 'manual-custom' } }
+          const leftManual = left.setQueryData(localOptions.queryKey, customManual)
+          const rightManual = right.setQueryData(localOptions.queryKey, customManual)
+          equal(localCalls, 4)
+          equal(globalCalls, 2)
+          equal(prefixCalls, 2)
+          equal(leftManual?.status, 213)
+          equal(rightManual?.status, 213)
+          equal(leftManual?.headers, customManual.headers)
+          equal(rightManual?.headers, customManual.headers)
+          equal(Object.isFrozen(leftManual), false)
+          equal(Object.isFrozen(rightManual), false)
+          equal(Object.isFrozen(customManual), false)
+          equal(Object.isFrozen(customManual.headers), false)
           const inheritedFalse = http.empty.metadataOptions()
           left.setDefaultOptions({ queries: { retry: false, structuralSharing: false } })
           right.setQueryDefaults(http.empty.key(), { structuralSharing: false })
@@ -379,9 +393,35 @@ await Effect.runPromise(
           equal(left.getQueryData(noSharing.queryKey), leftValue)
           equal(right.getQueryData(noSharing.queryKey), rightValue)
           equal(Object.isFrozen(leftValue), true)
+          const falseManual = { data: null, status: 219, headers: { etag: 'manual-false' } }
+          equal(left.setQueryData(noSharing.queryKey, falseManual), falseManual)
+          equal(right.setQueryData(noSharing.queryKey, falseManual), falseManual)
+          equal(Object.isFrozen(falseManual), false)
+          equal(Object.isFrozen(falseManual.headers), false)
+          const selected = new QueryObserver(
+            left,
+            http.empty.metadataOptions({ select: (view) => ({ status: view.status }) }),
+          )
+          await selected.refetch()
+          const inheritedSelection = selected.getCurrentResult().data
+          await selected.refetch()
+          equal(selected.getCurrentResult().data, inheritedSelection)
+          equal(Object.isFrozen(inheritedSelection), false)
+          selected.setOptions(
+            http.empty.metadataOptions({
+              select: (view) => ({ status: view.status }),
+              structuralSharing: false,
+            }),
+          )
+          await selected.refetch()
+          const explicitSelection = selected.getCurrentResult().data
+          await selected.refetch()
+          ok(selected.getCurrentResult().data !== explicitSelection)
+          equal(Object.isFrozen(selected.getCurrentResult().data), false)
+          selected.destroy()
           equal(globalCalls, 2)
           equal(prefixCalls, 2)
-          equal(localCalls, 2)
+          equal(localCalls, 4)
         } finally {
           left.clear()
           right.clear()
