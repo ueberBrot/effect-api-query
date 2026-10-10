@@ -16,6 +16,8 @@
     "tests/packed-consumer/retry-runtime.mts",
     "tests/packed-consumer/snapshot-runtime.mts",
     "tests/packed-consumer/snapshot-contract.ts",
+    "tests/packed-consumer/defaults-runtime.mts",
+    "tests/packed-consumer/defaults-contract.ts",
     "tests/packed-consumer/hydration-runtime.mts",
     "tests/packed-consumer/hydration-contract.ts"
   ],
