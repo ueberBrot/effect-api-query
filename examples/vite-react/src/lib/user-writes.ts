@@ -21,6 +21,12 @@ export interface DeleteTransaction {
   readonly rollback: () => void
   readonly settle: () => Promise<void>
 }
+interface DirectorySnapshot {
+  readonly rpcList: readonly User[] | undefined
+  readonly httpList: readonly User[] | undefined
+  readonly rpcPages: InfiniteData<UserPage> | undefined
+  readonly httpPages: InfiniteData<UserPage> | undefined
+}
 export type UserMutationOptions<Data, Failure, Input, Transaction> = MutationOptions<
   Data,
   Failure,
@@ -81,7 +87,20 @@ const restoreList = (
   ) {
     return current
   }
-  return [...current.slice(0, index), user, ...current.slice(index)]
+  const following = snapshot
+    ?.slice(index + 1)
+    .find((candidate) => current.some((existing) => existing.id === candidate.id))
+  let position = 0
+  for (const candidate of snapshot?.slice(0, index) ?? []) {
+    const precedingIndex = current.findIndex((existing) => existing.id === candidate.id)
+    if (precedingIndex !== -1) {
+      position = precedingIndex + 1
+    }
+  }
+  if (following !== undefined) {
+    position = current.findIndex((existing) => existing.id === following.id)
+  }
+  return [...current.slice(0, position), user, ...current.slice(position)]
 }
 
 const restorePages = (
@@ -270,14 +289,11 @@ export const makeUserWrites = ({
         runMutation(async () => options.mutationFn(...args)),
     }
   }
+  let deletionBaseline: DirectorySnapshot | undefined
   const deletionGroups = new Map<
     number,
-    {
+    DirectorySnapshot & {
       readonly pending: Set<number>
-      readonly rpcList: readonly User[] | undefined
-      readonly httpList: readonly User[] | undefined
-      readonly rpcPages: InfiniteData<UserPage> | undefined
-      readonly httpPages: InfiniteData<UserPage> | undefined
       readonly applied: boolean
       succeeded: boolean
     }
@@ -296,6 +312,9 @@ export const makeUserWrites = ({
       return
     }
     deletionGroups.delete(id)
+    if (deletionGroups.size === 0) {
+      deletionBaseline = undefined
+    }
     if (!isActive() || group.succeeded || !group.applied) {
       return
     }
@@ -320,6 +339,23 @@ export const makeUserWrites = ({
     if (group === undefined) {
       const lists = [queryClient.getQueryData(rpcList), queryClient.getQueryData(httpList)]
       const pages = [queryClient.getQueryData(rpcPages), queryClient.getQueryData(httpPages)]
+      deletionBaseline ??= {
+        rpcList: lists[0],
+        httpList: lists[1],
+        rpcPages: pages[0],
+        httpPages: pages[1],
+      }
+      const listSnapshot = (
+        baseline: readonly User[] | undefined,
+        current: readonly User[] | undefined,
+      ) => ((baseline?.some((user) => user.id === id) ?? false) ? baseline : current)
+      const pageSnapshot = (
+        baseline: InfiniteData<UserPage> | undefined,
+        current: InfiniteData<UserPage> | undefined,
+      ) =>
+        (baseline?.pages.some((page) => page.users.some((user) => user.id === id)) ?? false)
+          ? baseline
+          : current
       const applied =
         lists.some((users) => users?.some((user) => user.id === id) ?? false) ||
         pages.some(
@@ -329,10 +365,10 @@ export const makeUserWrites = ({
         pending: new Set(),
         succeeded: false,
         applied,
-        rpcList: lists[0],
-        httpList: lists[1],
-        rpcPages: pages[0],
-        httpPages: pages[1],
+        rpcList: listSnapshot(deletionBaseline.rpcList, lists[0]),
+        httpList: listSnapshot(deletionBaseline.httpList, lists[1]),
+        rpcPages: pageSnapshot(deletionBaseline.rpcPages, pages[0]),
+        httpPages: pageSnapshot(deletionBaseline.httpPages, pages[1]),
       }
       deletionGroups.set(id, group)
       if (applied) {
