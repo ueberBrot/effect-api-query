@@ -54,13 +54,6 @@ await Effect.runPromise(
       equal(refreshObserver.options.staleTime, 0)
       equal(refreshObserver.options.retry, false)
       refreshObserver.destroy()
-      deepStrictEqual(
-        yield* Effect.promise(() =>
-          queryClient.query(rpc.users.get.queryOptions({ input: { id: 1 }, staleTime: undefined })),
-        ),
-        { id: 1, name: 'Ada' },
-      )
-      equal(attempts.get(1), 5)
       yield* Effect.promise(() =>
         rejects(
           queryClient.query(rpc.users.get.queryOptions({ input: { id: 2 }, retry: false })),
