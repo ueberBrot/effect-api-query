@@ -125,9 +125,9 @@ manual cache updates, and any later work after an `await` too.
 ## Replace the consumer boundary
 
 The [existing Vite application](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/lib/application.ts)
-provides `switchViteReactApplication(previous, options)`. Capture `previous`, unmount its consumer
-tree, then await the handoff and render the returned application. The helper retires the old owner
-before constructing the new clients, QueryClient, and utilities. A failed acquisition leaves the
+provides `startViteReactApplication(options)`. Capture `previous`, unmount its consumer tree,
+and await `previous.dispose()` before starting and rendering the replacement application. This
+retires the old owner before constructing the new clients, QueryClient, and utilities. A failed acquisition leaves the
 old owner inactive; handle that failure in the surrounding application. Use the same unmount,
 retire, and replacement sequence when reconnecting clients with an unchanged semantic identity.
 

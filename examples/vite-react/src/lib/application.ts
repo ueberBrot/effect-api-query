@@ -173,11 +173,3 @@ export const startViteReactApplication = async ({
     throw error
   }
 }
-
-export const switchViteReactApplication = async (
-  previous: ViteReactApplication,
-  options: StartViteReactApplicationOptions,
-): Promise<ViteReactApplication> => {
-  await previous.dispose()
-  return startViteReactApplication(options)
-}

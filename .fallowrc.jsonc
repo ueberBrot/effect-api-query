@@ -25,6 +25,7 @@
     "tests/packed-consumer/defaults-runtime.mts",
     "tests/packed-consumer/defaults-contract.ts",
     "tests/packed-consumer/hydration-runtime.mts",
+    "tests/packed-consumer/hydration-views-runtime.mts",
     "tests/packed-consumer/hydration-contract.ts"
   ],
 

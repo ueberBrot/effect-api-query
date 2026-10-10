@@ -3,7 +3,7 @@ import { MutationObserver } from '@tanstack/react-query'
 import { Deferred, Effect, Exit, Scope } from 'effect'
 import { describe, expect, it, vi } from 'vite-plus/test'
 
-import { startViteReactApplication, switchViteReactApplication } from '../src/lib/application.ts'
+import { startViteReactApplication } from '../src/lib/application.ts'
 import type { ViteReactApplication } from '../src/lib/application.ts'
 
 const identity = {
@@ -152,7 +152,8 @@ describe('existing Vite application owner handoff', () => {
       })
       const writing = mutation.mutate({ name: 'Completed before handoff' })
       await Effect.runPromise(Deferred.await(callbackEntered))
-      current = await switchViteReactApplication(captured, {
+      await captured.dispose()
+      current = await startViteReactApplication({
         rpcUrl: server.rpcUrl,
         identity: { ...identity, permissionGeneration: 2 },
         directoryStorage: persisted,

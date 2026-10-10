@@ -48,7 +48,7 @@ const UndefinedElement = Schema.Struct({ _tag: Schema.Literal('Undefined') }).pi
 )
 
 export const HistoryElement = Schema.Union([Profile, Schema.Null, UndefinedElement])
-export const ProfileHistory = Schema.Array(HistoryElement)
+const ProfileHistory = Schema.Array(HistoryElement)
 
 export class Cursor extends Schema.Class<Cursor>('Cursor')({ offset: Schema.BigIntFromString }) {
   isStart(): boolean {
