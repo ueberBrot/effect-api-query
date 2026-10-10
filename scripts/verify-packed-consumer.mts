@@ -21,6 +21,7 @@ import { tmpdir } from 'node:os'
 import nodePath from 'node:path'
 import ts from 'typescript-5.9'
 
+import serverManifest from '../examples/server/package.json' with { type: 'json' }
 import repositoryManifest from '../package.json' with { type: 'json' }
 
 const repositoryRoot = nodePath.resolve(import.meta.dirname, '..')
@@ -412,6 +413,21 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
 
   try {
     cpSync(consumerFixtureDirectory, consumerDirectory, { recursive: true })
+    writeFileSync(
+      nodePath.join(consumerDirectory, 'websocket-server.ts'),
+      readFileSync(
+        nodePath.join(repositoryRoot, 'examples/server/tests/fixtures/websocket-server.ts'),
+        'utf-8',
+      ).replaceAll("'../../../../tests/packed-consumer/socket-client.ts'", "'./socket-client.ts'"),
+    )
+    const socketChecksPath = nodePath.join(consumerDirectory, 'websocket-checks.ts')
+    writeFileSync(
+      socketChecksPath,
+      readFileSync(socketChecksPath, 'utf-8').replaceAll(
+        "'../../examples/server/tests/fixtures/websocket-server.ts'",
+        "'./websocket-server.ts'",
+      ),
+    )
     cpSync(
       nodePath.join(repositoryRoot, 'examples', 'contracts', 'src'),
       nodePath.join(consumerDirectory, 'optimistic-contracts'),
@@ -573,6 +589,7 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       type: 'module',
       intent: { skills: ['effect-api-query'] },
       dependencies: {
+        '@effect/platform-node': serverManifest.dependencies['@effect/platform-node'],
         '@tanstack/query-core': peer.queryCoreVersion,
         '@tanstack/react-query': peer.reactQueryVersion,
         '@tanstack/solid-query': peer.queryCoreVersion,
@@ -661,6 +678,7 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       'start-ssr-runtime.mts',
       'optimistic-runtime.mts',
       'events-runtime.mts',
+      'websocket-runtime.mts',
       'hashing-runtime.mts',
       'filter-runtime.mts',
       'runtime.mts',
