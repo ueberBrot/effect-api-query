@@ -134,6 +134,10 @@ jobs:
         if: github.event_name == 'push'
         run: vp run validate
 
+      - name: Install Chromium for dry-run framework consumers
+        if: github.event_name != 'push'
+        run: vp exec playwright install --with-deps chromium
+
       - name: Verify dry-run artifact
         if: github.event_name != 'push'
         run: vp run verify-packed-package

@@ -69,6 +69,9 @@ jobs:
       - name: Construct and inspect package
         run: vp run pack
 
+      - name: Install Chromium for framework consumers
+        run: vp exec playwright install --with-deps chromium
+
       - name: Verify packed consumers and type scale
         run: vp run packed-package
 
