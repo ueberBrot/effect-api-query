@@ -56,7 +56,7 @@ export type QueryOptions<
   Error,
   Selected,
   Key extends QueryKey,
-  Fn = QueryFunction<Data, Key>,
+  Fn = QueryFunction<Data>,
 > = QueryInput<Data, Error, Selected, Key> & {
   readonly queryFn: Fn
   readonly queryKey: Key
@@ -67,7 +67,7 @@ export type ConditionalQueryOptions<Data, Error, Selected, Key extends QueryKey>
   Error,
   Selected,
   Key,
-  QueryFunction<Data, Key> | SkipToken
+  QueryFunction<Data> | SkipToken
 >
 
 export type InputQueryOptions<
@@ -85,6 +85,42 @@ export type InputQueryOptions<
       ? ConditionalQueryOptions<Data, Error, Selected, Key | SkippedKey>
       : QueryOptions<Data, Error, Selected, Key>
 
+type ExactBuilderOptions<Expected, Supplied> = Expected &
+  Supplied & {
+    readonly [
+      Key in Exclude<keyof Supplied, keyof Expected | typeof uninferredBuilderOptions>
+    ]: string extends Key ? Supplied[Key] : number extends Key ? Supplied[Key] : never
+  }
+
+type SuppliedInitialData<Supplied> = 'initialData' extends keyof Supplied
+  ? undefined extends Supplied['initialData']
+    ? Omit<Supplied, 'initialData'> & {
+        readonly initialData?: Exclude<Supplied['initialData'], undefined>
+      }
+    : Supplied
+  : Supplied
+
+declare const uninferredBuilderOptions: unique symbol
+type UninferredBuilderOptions = { readonly [uninferredBuilderOptions]?: never }
+
+type SuppliedQueryOptions<Options, Supplied, AdapterOptions> =
+  typeof uninferredBuilderOptions extends keyof Supplied
+    ? Options
+    : Pick<
+        Options,
+        Extract<
+          keyof Options,
+          | 'queryFn'
+          | 'queryKey'
+          | 'select'
+          | 'retry'
+          | 'retryDelay'
+          | 'initialPageParam'
+          | 'getNextPageParam'
+        >
+      > &
+        Omit<SuppliedInitialData<Supplied>, 'input' | keyof AdapterOptions>
+
 /** Owns unary query inference; adapters supply their request, data, error, and key types. */
 export type UnaryQueryBuilder<
   Input,
@@ -97,91 +133,171 @@ export type UnaryQueryBuilder<
 > = Inputless extends true
   ? {
       <Selected = Data>(
-        options: WithDefinedInitialData<
-          QueryInput<Data, Error, Selected, Key, AdapterOptions>,
-          Data
+        options?: undefined,
+      ): SuppliedQueryOptions<
+        QueryOptions<Data, Error, Selected, Key>,
+        Record<never, never>,
+        AdapterOptions
+      >
+      <Selected = Data, Supplied extends object = UninferredBuilderOptions>(
+        options: ExactBuilderOptions<
+          WithDefinedInitialData<QueryInput<Data, Error, Selected, Key, AdapterOptions>, Data>,
+          Supplied
         >,
-      ): WithDefinedInitialData<QueryOptions<Data, Error, Selected, Key>, Data>
-      <Selected = Data>(
-        options?: WithUndefinedInitialData<
-          QueryInput<Data, Error, Selected, Key, AdapterOptions>,
-          Data
+      ): WithDefinedInitialData<
+        SuppliedQueryOptions<QueryOptions<Data, Error, Selected, Key>, Supplied, AdapterOptions>,
+        Data
+      >
+      <Selected = Data, Supplied extends object = UninferredBuilderOptions>(
+        options: ExactBuilderOptions<
+          WithUndefinedInitialData<QueryInput<Data, Error, Selected, Key, AdapterOptions>, Data>,
+          Supplied
         >,
-      ): QueryOptions<Data, Error, Selected, Key>
+      ): SuppliedQueryOptions<QueryOptions<Data, Error, Selected, Key>, Supplied, AdapterOptions>
     }
   : {
-      <Selected = Data, ActualInput extends SkipToken = SkipToken>(
-        options: WithDefinedInitialData<
-          QueryInput<
-            Data,
-            Error,
-            Selected,
-            InputQueryOptions<ActualInput, Data, Error, Selected, Key, SkippedKey>['queryKey'],
-            AdapterOptions
-          >,
-          Data
-        > & { readonly input: ActualInput },
+      <
+        Selected = Data,
+        ActualInput extends SkipToken = SkipToken,
+        Supplied extends object = UninferredBuilderOptions,
+      >(
+        options: ExactBuilderOptions<
+          WithDefinedInitialData<
+            QueryInput<
+              Data,
+              Error,
+              Selected,
+              InputQueryOptions<ActualInput, Data, Error, Selected, Key, SkippedKey>['queryKey'],
+              AdapterOptions
+            >,
+            Data
+          > & { readonly input: ActualInput },
+          Supplied
+        >,
       ): WithDefinedInitialData<
-        InputQueryOptions<ActualInput, Data, Error, Selected, Key, SkippedKey>,
+        SuppliedQueryOptions<
+          InputQueryOptions<ActualInput, Data, Error, Selected, Key, SkippedKey>,
+          Supplied,
+          AdapterOptions
+        >,
         Data
       >
-      <Selected = Data, ActualInput extends SkipToken = SkipToken>(
-        options: WithUndefinedInitialData<
-          QueryInput<
-            Data,
-            Error,
-            Selected,
-            InputQueryOptions<ActualInput, Data, Error, Selected, Key, SkippedKey>['queryKey'],
-            AdapterOptions
-          >,
-          Data
-        > & { readonly input: ActualInput },
-      ): InputQueryOptions<ActualInput, Data, Error, Selected, Key, SkippedKey>
-      <Selected = Data, ActualInput extends Input = Input>(
-        options: WithDefinedInitialData<
-          QueryInput<
-            Data,
-            Error,
-            Selected,
-            InputQueryOptions<ActualInput, Data, Error, Selected, Key, SkippedKey>['queryKey'],
-            AdapterOptions
-          >,
-          Data
-        > & { readonly input: ActualInput },
-      ): WithDefinedInitialData<
+      <
+        Selected = Data,
+        ActualInput extends SkipToken = SkipToken,
+        Supplied extends object = UninferredBuilderOptions,
+      >(
+        options: ExactBuilderOptions<
+          WithUndefinedInitialData<
+            QueryInput<
+              Data,
+              Error,
+              Selected,
+              InputQueryOptions<ActualInput, Data, Error, Selected, Key, SkippedKey>['queryKey'],
+              AdapterOptions
+            >,
+            Data
+          > & { readonly input: ActualInput },
+          Supplied
+        >,
+      ): SuppliedQueryOptions<
         InputQueryOptions<ActualInput, Data, Error, Selected, Key, SkippedKey>,
+        Supplied,
+        AdapterOptions
+      >
+      <
+        Selected = Data,
+        ActualInput extends Input = Input,
+        Supplied extends object = UninferredBuilderOptions,
+      >(
+        options: ExactBuilderOptions<
+          WithDefinedInitialData<
+            QueryInput<
+              Data,
+              Error,
+              Selected,
+              InputQueryOptions<ActualInput, Data, Error, Selected, Key, SkippedKey>['queryKey'],
+              AdapterOptions
+            >,
+            Data
+          > & { readonly input: ActualInput },
+          Supplied
+        >,
+      ): WithDefinedInitialData<
+        SuppliedQueryOptions<
+          InputQueryOptions<ActualInput, Data, Error, Selected, Key, SkippedKey>,
+          Supplied,
+          AdapterOptions
+        >,
         Data
       >
-      <Selected = Data, ActualInput extends Input = Input>(
-        options: WithUndefinedInitialData<
-          QueryInput<
-            Data,
-            Error,
-            Selected,
-            InputQueryOptions<ActualInput, Data, Error, Selected, Key, SkippedKey>['queryKey'],
-            AdapterOptions
-          >,
-          Data
-        > & { readonly input: ActualInput },
-      ): InputQueryOptions<ActualInput, Data, Error, Selected, Key, SkippedKey>
-      <Selected = Data>(
-        options: WithDefinedInitialData<
-          Omit<ConditionalQueryOptions<Data, Error, Selected, Key | SkippedKey>, OwnedQueryOption>,
-          Data
-        > &
-          AdapterOptions & { readonly input: Input | SkipToken },
+      <
+        Selected = Data,
+        ActualInput extends Input = Input,
+        Supplied extends object = UninferredBuilderOptions,
+      >(
+        options: ExactBuilderOptions<
+          WithUndefinedInitialData<
+            QueryInput<
+              Data,
+              Error,
+              Selected,
+              InputQueryOptions<ActualInput, Data, Error, Selected, Key, SkippedKey>['queryKey'],
+              AdapterOptions
+            >,
+            Data
+          > & { readonly input: ActualInput },
+          Supplied
+        >,
+      ): SuppliedQueryOptions<
+        InputQueryOptions<ActualInput, Data, Error, Selected, Key, SkippedKey>,
+        Supplied,
+        AdapterOptions
+      >
+      <Selected = Data, Supplied extends object = UninferredBuilderOptions>(
+        options: ExactBuilderOptions<
+          WithDefinedInitialData<
+            Omit<
+              ConditionalQueryOptions<Data, Error, Selected, Key | SkippedKey>,
+              OwnedQueryOption
+            >,
+            Data
+          > &
+            AdapterOptions & { readonly input: Input | SkipToken },
+          Supplied
+        >,
       ): WithDefinedInitialData<
+        SuppliedQueryOptions<
+          ConditionalQueryOptions<Data, Error, Selected, Key | SkippedKey>,
+          Supplied,
+          AdapterOptions
+        >,
+        Data
+      >
+      <Selected = Data, Supplied extends object = UninferredBuilderOptions>(
+        options: ExactBuilderOptions<
+          WithUndefinedInitialData<
+            Omit<
+              ConditionalQueryOptions<Data, Error, Selected, Key | SkippedKey>,
+              OwnedQueryOption
+            >,
+            Data
+          > &
+            AdapterOptions & { readonly input: Input | SkipToken },
+          Supplied
+        >,
+      ): SuppliedQueryOptions<
         ConditionalQueryOptions<Data, Error, Selected, Key | SkippedKey>,
-        Data
+        Supplied,
+        AdapterOptions
       >
-      <Selected = Data>(
-        options: WithUndefinedInitialData<
-          Omit<ConditionalQueryOptions<Data, Error, Selected, Key | SkippedKey>, OwnedQueryOption>,
-          Data
-        > &
-          AdapterOptions & { readonly input: Input | SkipToken },
-      ): ConditionalQueryOptions<Data, Error, Selected, Key | SkippedKey>
-      (token: SkipToken): QueryOptions<Data, Error, Data, SkippedKey, SkipToken>
+      (
+        token: SkipToken,
+      ): SuppliedQueryOptions<
+        QueryOptions<Data, Error, Data, SkippedKey, SkipToken>,
+        Record<never, never>,
+        AdapterOptions
+      >
     }
 
 export type InfiniteInput<
@@ -200,7 +316,7 @@ export type InfiniteOptions<
   Selected,
   Key extends QueryKey,
   PageParam,
-  Fn = QueryFunction<Data, Key, PageParam>,
+  Fn = QueryFunction<Data, QueryKey, PageParam>,
 > = InfiniteInput<Data, Error, Selected, Key, PageParam> & {
   readonly queryFn: Fn
   readonly queryKey: Key
@@ -251,7 +367,7 @@ export type ConditionalInfiniteOptions<
   Selected,
   Key,
   PageParam,
-  QueryFunction<Data, Key, PageParam> | SkipToken
+  QueryFunction<Data, QueryKey, PageParam> | SkipToken
 >
 
 /** Owns infinite-query inference while adapters supply request, data, error, and operation keys. */
@@ -263,21 +379,63 @@ export type InfiniteQueryBuilder<
   AdapterOptions = unknown,
   Inputless extends boolean = void extends Input ? true : false,
 > = {
-  <PageParam, Selected = InfiniteData<Data, PageParam>>(
-    options: WithDefinedInitialData<
-      MappedInfiniteInput<
-        Input,
-        Data,
-        Error,
-        OperationKey,
-        Selected,
-        PageParam,
-        AdapterOptions,
-        Inputless
+  <
+    PageParam,
+    Selected = InfiniteData<Data, PageParam>,
+    Supplied extends object = UninferredBuilderOptions,
+  >(
+    options: ExactBuilderOptions<
+      WithDefinedInitialData<
+        MappedInfiniteInput<
+          Input,
+          Data,
+          Error,
+          OperationKey,
+          Selected,
+          PageParam,
+          AdapterOptions,
+          Inputless
+        >,
+        InfiniteData<Data, PageParam>
       >,
-      InfiniteData<Data, PageParam>
+      Supplied
     >,
   ): WithDefinedInitialData<
+    SuppliedQueryOptions<
+      InfiniteOptions<
+        Data,
+        Error,
+        Selected,
+        InfiniteQueryKey<Input, Data, Error, OperationKey, PageParam, Inputless>,
+        PageParam
+      >,
+      Supplied,
+      AdapterOptions
+    >,
+    InfiniteData<Data, PageParam>
+  >
+  <
+    PageParam,
+    Selected = InfiniteData<Data, PageParam>,
+    Supplied extends object = UninferredBuilderOptions,
+  >(
+    options: ExactBuilderOptions<
+      WithUndefinedInitialData<
+        MappedInfiniteInput<
+          Input,
+          Data,
+          Error,
+          OperationKey,
+          Selected,
+          PageParam,
+          AdapterOptions,
+          Inputless
+        >,
+        InfiniteData<Data, PageParam>
+      >,
+      Supplied
+    >,
+  ): SuppliedQueryOptions<
     InfiniteOptions<
       Data,
       Error,
@@ -285,60 +443,104 @@ export type InfiniteQueryBuilder<
       InfiniteQueryKey<Input, Data, Error, OperationKey, PageParam, Inputless>,
       PageParam
     >,
-    InfiniteData<Data, PageParam>
-  >
-  <PageParam, Selected = InfiniteData<Data, PageParam>>(
-    options: WithUndefinedInitialData<
-      MappedInfiniteInput<
-        Input,
-        Data,
-        Error,
-        OperationKey,
-        Selected,
-        PageParam,
-        AdapterOptions,
-        Inputless
-      >,
-      InfiniteData<Data, PageParam>
-    >,
-  ): InfiniteOptions<
-    Data,
-    Error,
-    Selected,
-    InfiniteQueryKey<Input, Data, Error, OperationKey, PageParam, Inputless>,
-    PageParam
+    Supplied,
+    AdapterOptions
   >
 } & (Inputless extends true
   ? unknown
   : {
-      <PageParam, Selected = InfiniteData<Data, PageParam>>(
-        options: WithDefinedInitialData<
-          InfiniteInput<Data, Error, Selected, OperationKey, PageParam, AdapterOptions>,
-          InfiniteData<Data, PageParam>
-        > & { readonly input: SkipToken },
+      <
+        PageParam,
+        Selected = InfiniteData<Data, PageParam>,
+        Supplied extends object = UninferredBuilderOptions,
+      >(
+        options: ExactBuilderOptions<
+          WithDefinedInitialData<
+            InfiniteInput<Data, Error, Selected, OperationKey, PageParam, AdapterOptions>,
+            InfiniteData<Data, PageParam>
+          > & { readonly input: SkipToken },
+          Supplied
+        >,
       ): WithDefinedInitialData<
-        InfiniteOptions<Data, Error, Selected, OperationKey, PageParam, SkipToken>,
+        SuppliedQueryOptions<
+          InfiniteOptions<Data, Error, Selected, OperationKey, PageParam, SkipToken>,
+          Supplied,
+          AdapterOptions
+        >,
         InfiniteData<Data, PageParam>
       >
-      <PageParam, Selected = InfiniteData<Data, PageParam>>(
-        options: WithUndefinedInitialData<
-          InfiniteInput<Data, Error, Selected, OperationKey, PageParam, AdapterOptions>,
-          InfiniteData<Data, PageParam>
-        > & { readonly input: SkipToken },
-      ): InfiniteOptions<Data, Error, Selected, OperationKey, PageParam, SkipToken>
-      <PageParam, Selected = InfiniteData<Data, PageParam>>(
-        options: WithDefinedInitialData<
-          InfiniteInput<
+      <
+        PageParam,
+        Selected = InfiniteData<Data, PageParam>,
+        Supplied extends object = UninferredBuilderOptions,
+      >(
+        options: ExactBuilderOptions<
+          WithUndefinedInitialData<
+            InfiniteInput<Data, Error, Selected, OperationKey, PageParam, AdapterOptions>,
+            InfiniteData<Data, PageParam>
+          > & { readonly input: SkipToken },
+          Supplied
+        >,
+      ): SuppliedQueryOptions<
+        InfiniteOptions<Data, Error, Selected, OperationKey, PageParam, SkipToken>,
+        Supplied,
+        AdapterOptions
+      >
+      <
+        PageParam,
+        Selected = InfiniteData<Data, PageParam>,
+        Supplied extends object = UninferredBuilderOptions,
+      >(
+        options: ExactBuilderOptions<
+          WithDefinedInitialData<
+            InfiniteInput<
+              Data,
+              Error,
+              Selected,
+              | InfiniteQueryKey<Input, Data, Error, OperationKey, PageParam, Inputless>
+              | OperationKey,
+              PageParam,
+              AdapterOptions
+            >,
+            InfiniteData<Data, PageParam>
+          > & { readonly input: ((pageParam: PageParam) => Input) | SkipToken },
+          Supplied
+        >,
+      ): WithDefinedInitialData<
+        SuppliedQueryOptions<
+          ConditionalInfiniteOptions<
             Data,
             Error,
             Selected,
             InfiniteQueryKey<Input, Data, Error, OperationKey, PageParam, Inputless> | OperationKey,
-            PageParam,
-            AdapterOptions
+            PageParam
           >,
-          InfiniteData<Data, PageParam>
-        > & { readonly input: ((pageParam: PageParam) => Input) | SkipToken },
-      ): WithDefinedInitialData<
+          Supplied,
+          AdapterOptions
+        >,
+        InfiniteData<Data, PageParam>
+      >
+      <
+        PageParam,
+        Selected = InfiniteData<Data, PageParam>,
+        Supplied extends object = UninferredBuilderOptions,
+      >(
+        options: ExactBuilderOptions<
+          WithUndefinedInitialData<
+            InfiniteInput<
+              Data,
+              Error,
+              Selected,
+              | InfiniteQueryKey<Input, Data, Error, OperationKey, PageParam, Inputless>
+              | OperationKey,
+              PageParam,
+              AdapterOptions
+            >,
+            InfiniteData<Data, PageParam>
+          > & { readonly input: ((pageParam: PageParam) => Input) | SkipToken },
+          Supplied
+        >,
+      ): SuppliedQueryOptions<
         ConditionalInfiniteOptions<
           Data,
           Error,
@@ -346,26 +548,8 @@ export type InfiniteQueryBuilder<
           InfiniteQueryKey<Input, Data, Error, OperationKey, PageParam, Inputless> | OperationKey,
           PageParam
         >,
-        InfiniteData<Data, PageParam>
-      >
-      <PageParam, Selected = InfiniteData<Data, PageParam>>(
-        options: WithUndefinedInitialData<
-          InfiniteInput<
-            Data,
-            Error,
-            Selected,
-            InfiniteQueryKey<Input, Data, Error, OperationKey, PageParam, Inputless> | OperationKey,
-            PageParam,
-            AdapterOptions
-          >,
-          InfiniteData<Data, PageParam>
-        > & { readonly input: ((pageParam: PageParam) => Input) | SkipToken },
-      ): ConditionalInfiniteOptions<
-        Data,
-        Error,
-        Selected,
-        InfiniteQueryKey<Input, Data, Error, OperationKey, PageParam, Inputless> | OperationKey,
-        PageParam
+        Supplied,
+        AdapterOptions
       >
     })
 

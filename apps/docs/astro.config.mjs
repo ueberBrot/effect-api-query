@@ -67,6 +67,7 @@ export default defineConfig({
           items: [
             { label: 'React Query', slug: 'guides/react-query' },
             { label: 'Svelte and Angular', slug: 'guides/svelte-and-angular' },
+            { label: 'Vue and Solid Query', slug: 'guides/vue-and-solid' },
             { label: 'HTTP Queries and Mutations', slug: 'guides/http-queries-and-mutations' },
             { label: 'TanStack Start', slug: 'guides/tanstack-start' },
             { label: 'Stream Snapshots', slug: 'guides/stream-snapshots' },
