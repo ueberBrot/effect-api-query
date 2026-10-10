@@ -72,6 +72,7 @@ export default defineConfig({
             { label: 'TanStack Start', slug: 'guides/tanstack-start' },
             { label: 'WebSocket Ready Clients', slug: 'guides/websocket-clients' },
             { label: 'Stream Snapshots', slug: 'guides/stream-snapshots' },
+            { label: 'Choose Stream History', slug: 'guides/choose-stream-history' },
             { label: 'Cache Management', slug: 'guides/cache-management' },
             { label: 'Cache Filters', slug: 'guides/cache-filters' },
             { label: 'Switch Cache Owners', slug: 'guides/switch-cache-owners' },
