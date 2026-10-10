@@ -9,6 +9,10 @@ for (const [page, fixtures] of [
   ['guides/retry-queries', ['packed-consumer/docs-retry']],
   ['guides/stream-snapshots', ['packed-consumer/docs-stream-snapshot']],
   [
+    'guides/cache-filters',
+    ['packed-consumer/docs-cache-filters-rpc', 'packed-consumer/docs-cache-filters-http'],
+  ],
+  [
     'guides/query-defaults',
     ['packed-consumer/docs-defaults', 'packed-consumer/docs-http-defaults'],
   ],
