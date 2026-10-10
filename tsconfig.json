@@ -39,6 +39,8 @@
               "examples/server/tests/http-api.test.ts",
               "examples/server/tests/server.test.ts",
               "examples/server/tests/rpc-transport-overhead.test.ts",
+              "examples/server/tests/rpc-websocket-consumer.test.ts",
+              "examples/server/tests/fixtures/websocket-server.ts",
               "examples/tanstack-start/src/lib/application.ts",
               "examples/tanstack-start/tests/server-render.test.tsx",
               "examples/vite-react/src/lib/application.ts",

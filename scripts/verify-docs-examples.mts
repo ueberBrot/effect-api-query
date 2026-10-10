@@ -6,11 +6,16 @@ import { readFileSync } from 'node:fs'
 for (const [page, fixtures] of [
   ['getting-started/quick-start', ['types/docs-rpc-quick-start']],
   ['getting-started/http-quick-start', ['types/docs-http-quick-start']],
+  ['reference/external-http-clients', ['packed-consumer/docs-openapi']],
   ['guides/retry-queries', ['packed-consumer/docs-retry']],
   ['guides/svelte-and-angular', ['packed-consumer/docs-angular']],
   ['guides/vue-and-solid', ['packed-consumer/docs-vue-query', 'packed-consumer/docs-solid-query']],
   ['guides/switch-cache-owners', ['packed-consumer/docs-owner-cache']],
   ['guides/refresh-from-events', ['packed-consumer/docs-user-events']],
+  [
+    'guides/websocket-clients',
+    ['packed-consumer/socket-client', 'packed-consumer/docs-websocket-use'],
+  ],
   ['guides/stream-snapshots', ['packed-consumer/docs-stream-snapshot']],
   [
     'guides/cache-filters',

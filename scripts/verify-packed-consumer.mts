@@ -21,6 +21,7 @@ import { tmpdir } from 'node:os'
 import nodePath from 'node:path'
 import ts from 'typescript-5.9'
 
+import serverManifest from '../examples/server/package.json' with { type: 'json' }
 import repositoryManifest from '../package.json' with { type: 'json' }
 
 const repositoryRoot = nodePath.resolve(import.meta.dirname, '..')
@@ -387,6 +388,7 @@ const runTypeScript = (
   compiler: (typeof compilerCases)[number],
   project:
     | 'tsconfig.json'
+    | 'tsconfig.openapi.json'
     | 'tsconfig.tanstack-start.json'
     | 'tsconfig.type-scale.json'
     | 'tsconfig.svelte-angular.json'
@@ -413,6 +415,21 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
 
   try {
     cpSync(consumerFixtureDirectory, consumerDirectory, { recursive: true })
+    writeFileSync(
+      nodePath.join(consumerDirectory, 'websocket-server.ts'),
+      readFileSync(
+        nodePath.join(repositoryRoot, 'examples/server/tests/fixtures/websocket-server.ts'),
+        'utf-8',
+      ).replaceAll("'../../../../tests/packed-consumer/socket-client.ts'", "'./socket-client.ts'"),
+    )
+    const socketChecksPath = nodePath.join(consumerDirectory, 'websocket-checks.ts')
+    writeFileSync(
+      socketChecksPath,
+      readFileSync(socketChecksPath, 'utf-8').replaceAll(
+        "'../../examples/server/tests/fixtures/websocket-server.ts'",
+        "'./websocket-server.ts'",
+      ),
+    )
     cpSync(
       nodePath.join(repositoryRoot, 'examples', 'contracts', 'src'),
       nodePath.join(consumerDirectory, 'optimistic-contracts'),
@@ -585,6 +602,7 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
         '@angular/compiler': '22.2.1',
         '@angular/core': '22.2.1',
         '@angular/platform-browser': '22.2.1',
+        '@effect/platform-node': serverManifest.dependencies['@effect/platform-node'],
         '@tanstack/angular-query-experimental': peer.queryCoreVersion,
         '@tanstack/query-core': peer.queryCoreVersion,
         '@tanstack/react-query': peer.reactQueryVersion,
@@ -599,11 +617,14 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
         '@types/react-dom': testedVersion('@types/react-dom'),
         effect: testedVersion('effect'),
         'effect-api-query': `file:${tarballPath}`,
+        'openapi-fetch': '0.17.0',
+        'openapi-typescript': '7.13.0',
         react: testedVersion('react'),
         'react-dom': testedVersion('react-dom'),
         rxjs: '7.8.2',
         svelte: '5.57.1',
         'solid-js': '1.9.15',
+        typescript: testedVersion('typescript-5.9').replace('npm:typescript@', ''),
         vue: '3.5.43',
       },
     }
@@ -619,6 +640,10 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
     // The temporary project must resolve every peer from its own node_modules.
     writeFileSync(nodePath.join(consumerDirectory, 'pnpm-workspace.yaml'), workspaceConfig)
     execFileSync('pnpm', ['install', '--ignore-scripts', '--prefer-offline'], {
+      cwd: consumerDirectory,
+      stdio: 'inherit',
+    })
+    execFileSync(process.execPath, ['openapi-generate.mjs'], {
       cwd: consumerDirectory,
       stdio: 'inherit',
     })
@@ -661,6 +686,7 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
 
     for (const compiler of compilerCases) {
       runTypeScript(consumerDirectory, compiler, 'tsconfig.json', false)
+      runTypeScript(consumerDirectory, compiler, 'tsconfig.openapi.json', false)
       runTypeScript(consumerDirectory, compiler, 'tsconfig.tanstack-start.json', false)
       runTypeScript(consumerDirectory, compiler, 'tsconfig.svelte-angular.json', false)
       runTypeScript(consumerDirectory, compiler, 'tsconfig.vue-solid.json', false)
@@ -678,10 +704,12 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       'start-ssr-runtime.mts',
       'optimistic-runtime.mts',
       'events-runtime.mts',
+      'websocket-runtime.mts',
       'hashing-runtime.mts',
       'filter-runtime.mts',
       'runtime.mts',
       'http-runtime.mts',
+      'openapi-runtime.mts',
       'http-metadata-runtime.mts',
       'http-etag-recipe.mts',
       'http-stream-runtime.mts',
