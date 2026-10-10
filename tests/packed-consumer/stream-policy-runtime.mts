@@ -342,6 +342,8 @@ await Effect.runPromise(
           8,
         ])
         equal(initialData.length, 3)
+        equal(initialData[0], 1)
+        equal(initialData[2], 7)
         equal(1 in initialData, false)
       } finally {
         queryClient.clear()

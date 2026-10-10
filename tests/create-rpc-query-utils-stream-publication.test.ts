@@ -26,6 +26,8 @@ it.live('appends decoded values without mutating seeded sparse history', () =>
         const data = yield* Effect.promise(async () => await queryClient.query(options))
         expect(data).toStrictEqual([1, undefined, 7, 8])
         expect(initialData).toHaveLength(3)
+        expect(initialData[0]).toBe(1)
+        expect(initialData[2]).toBe(7)
         expect(1 in initialData).toBe(false)
       } finally {
         queryClient.clear()
