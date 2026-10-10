@@ -73,6 +73,7 @@ export default defineConfig({
             { label: 'Cache Filters', slug: 'guides/cache-filters' },
             { label: 'Switch Cache Owners', slug: 'guides/switch-cache-owners' },
             { label: 'Optimistic User Writes', slug: 'guides/optimistic-writes' },
+            { label: 'Refresh from Domain Events', slug: 'guides/refresh-from-events' },
             { label: 'Cancellation', slug: 'guides/cancellation' },
             { label: 'Handle Failures', slug: 'guides/handle-failures' },
             { label: 'Retry Queries', slug: 'guides/retry-queries' },
