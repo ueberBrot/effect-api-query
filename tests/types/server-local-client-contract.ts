@@ -1,7 +1,7 @@
 import { Context, Effect, Schema } from 'effect'
 import { Rpc, RpcGroup } from 'effect/rpc'
 
-import { makeServerLocalRpcClient } from '../fixtures/server-local-rpc.ts'
+import { makeServerLocalRpcClient } from '../../examples/server/src/server-local-rpc.ts'
 
 class CodecService extends Context.Service<CodecService, { readonly suffix: string }>()(
   'effect-api-query/tests/ServerLocalCodecService',

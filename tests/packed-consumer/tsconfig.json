@@ -17,6 +17,7 @@
     "docs-owner-cache.ts",
     "owner-cache-contract.ts",
     "owner-cache-runtime.mts",
+    "start-ssr-runtime.mts",
     "optimistic-runtime.mts",
     "optimistic-contract.ts",
     "events-runtime.mts",
