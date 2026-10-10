@@ -242,6 +242,7 @@ deepStrictEqual(declarationNames, [
   'CreateRpcQueryUtilsOptions',
   'EffectHttpApiQueryConfigError',
   'EffectHttpApiQueryConfigErrorCode',
+  'EffectHttpApiQueryEmptyStreamError',
   'EffectHttpApiQueryError',
   'EffectHttpApiQueryKeyError',
   'EffectHttpApiQueryKeyErrorCode',
@@ -507,11 +508,15 @@ const verifyConsumer = (peer: (typeof peerCases)[number]): void => {
       'hashing-runtime.mts',
       'runtime.mts',
       'http-runtime.mts',
+      'http-metadata-runtime.mts',
+      'http-etag-recipe.mts',
       'http-stream-runtime.mts',
+      'http-live-runtime.mts',
       'stream-cause-runtime.mts',
       'stream-policy-runtime.mts',
       'retry-runtime.mts',
       'snapshot-runtime.mts',
+      'hydration-runtime.mts',
     ]) {
       execFileSync(process.execPath, ['--experimental-import-meta-resolve', fixture], {
         cwd: consumerDirectory,

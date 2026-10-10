@@ -20,8 +20,12 @@
     "retry-runtime.mts",
     "snapshot-runtime.mts",
     "snapshot-contract.ts",
+    "hydration-runtime.mts",
     "http-runtime.mts",
+    "http-metadata-runtime.mts",
+    "http-etag-recipe.mts",
     "http-stream-runtime.mts",
+    "http-live-runtime.mts",
     "http-stream-contract.ts",
     "public-contract.ts",
     "http-contract.ts",
@@ -29,6 +33,8 @@
     "docs-http-quick-start.ts",
     "docs-retry.ts",
     "docs-stream-snapshot.ts",
+    "docs-hydration-*.ts",
+    "hydration-contract.ts",
     "skill-example-*.ts"
   ]
 }

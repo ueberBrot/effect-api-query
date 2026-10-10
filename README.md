@@ -56,14 +56,30 @@ HTTP accepts decoded request parts; RPC accepts payload constructor input. Follo
 [HTTP quick start](https://ueberbrot.github.io/effect-api-query/getting-started/http-quick-start/)
 for a complete declaration, client, query, and mutation.
 
+Use `metadataOptions` when a buffered query also needs response status or an ETag:
+
+```ts
+const result = await queryClient.query(
+  http.users.get.metadataOptions({ input: { params: { id: 1 } } }),
+)
+const etag = result.headers['etag']
+const user = result.data
+```
+
+Metadata has a separate cache key and frozen status/header snapshot. Declared decoded header
+wrappers stay inside `data`. Follow the
+[ETag recipe](https://ueberbrot.github.io/effect-api-query/guides/http-queries-and-mutations/#update-with-an-etag)
+for conditional writes and invalidation.
+
 ## Choose an operation
 
-| API definition                              | Available operations                          |
-| ------------------------------------------- | --------------------------------------------- |
-| Unary RPC                                   | Queries, infinite queries, and mutations      |
-| Streaming RPC                               | Accumulated streamed queries and live queries |
-| Buffered HttpApi endpoint without multipart | Queries, infinite queries, and mutations      |
-| Buffered HttpApi endpoint with multipart    | Mutations with `FormData`                     |
+| API definition                              | Available operations                               |
+| ------------------------------------------- | -------------------------------------------------- |
+| Unary RPC                                   | Queries, infinite queries, and mutations           |
+| Streaming RPC                               | Accumulated streamed queries and live queries      |
+| Buffered HttpApi endpoint without multipart | Queries, metadata, infinite queries, and mutations |
+| Buffered HttpApi endpoint with multipart    | Mutations with `FormData`                          |
+| Unambiguous HttpApi SSE endpoint            | Accumulated streamed queries and live queries      |
 
 Both factories generate keys for cache reads, writes, prefetching, and invalidation. Query functions
 forward cancellation to Effect. Mutations use TanStack's normal callbacks; invalidate affected
@@ -71,12 +87,15 @@ queries in your application.
 
 For uploads, build `FormData` explicitly and pass it as mutation `payload`. See the
 [HTTP upload guide](https://ueberbrot.github.io/effect-api-query/guides/http-queries-and-mutations/#upload-a-file).
-Streaming HTTP responses and streaming multipart requests remain omitted.
+Mixed HTTP success modes, raw byte streams, and streaming multipart requests remain omitted. See
+the [SSE guide](https://ueberbrot.github.io/effect-api-query/guides/http-queries-and-mutations/#retain-sse-events)
+for accumulated HTTP event queries.
 
 ## Integrate with your application
 
 - [React Query](https://ueberbrot.github.io/effect-api-query/guides/react-query/): use generated options with hooks.
 - [TanStack Start](https://ueberbrot.github.io/effect-api-query/guides/tanstack-start/): share RPC and HTTP options across loaders, server rendering, and hydration.
+- [Hydrate Unary Data](https://ueberbrot.github.io/effect-api-query/guides/hydrate-unary-data/): keep DTOs or reconstructed Schema values consistent across JSON hydration and refetch.
 - [Run the examples](https://ueberbrot.github.io/effect-api-query/examples/): try complete Vite React and TanStack Start applications.
 - [Feature support](https://ueberbrot.github.io/effect-api-query/getting-started/feature-support/): check available operations and integration limits.
 - [API reference](https://ueberbrot.github.io/effect-api-query/reference/public-exports/): look up factories, builders, and errors.

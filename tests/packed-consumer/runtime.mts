@@ -31,6 +31,7 @@ type PublicTypes = [
 
 const expectedExports = [
   'EffectHttpApiQueryConfigError',
+  'EffectHttpApiQueryEmptyStreamError',
   'EffectHttpApiQueryError',
   'EffectHttpApiQueryKeyError',
   'EffectRpcQueryConfigError',

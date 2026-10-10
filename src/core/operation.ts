@@ -36,6 +36,11 @@ export interface BufferedOperation extends OperationIdentity {
 export interface UnaryOperation extends BufferedOperation {
   readonly kind: 'Unary'
   readonly input: OperationInput
+  readonly metadata?: {
+    readonly invoke: BufferedOperation['invoke']
+    readonly executionError: (operation: 'metadata', cause: Cause.Cause<unknown>) => Error
+    readonly finalizeData: (data: unknown) => unknown
+  }
 }
 
 export interface MutationOperation extends BufferedOperation {
@@ -45,7 +50,7 @@ export interface MutationOperation extends BufferedOperation {
 export interface StreamingOperation extends OperationIdentity {
   readonly kind: 'Streaming'
   readonly input: OperationInput
-  readonly supportsLive?: boolean
+  readonly liveIdentity?: (options: Record<string, unknown>) => readonly JsonValue[]
   readonly streamedIdentity: (options: Record<string, unknown>) => readonly JsonValue[]
   /** Consumes and validates stream policy, including for skipped requests. */
   readonly prepareStream: (

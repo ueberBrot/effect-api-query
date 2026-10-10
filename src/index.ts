@@ -9,6 +9,7 @@ export { fetchStreamSnapshot } from './core/stream-snapshot'
 export type { StreamSnapshotOptions } from './core/stream-snapshot'
 export {
   EffectHttpApiQueryConfigError,
+  EffectHttpApiQueryEmptyStreamError,
   EffectHttpApiQueryError,
   EffectHttpApiQueryKeyError,
   isEffectHttpApiQueryError,

@@ -103,9 +103,16 @@ mutation-only, including mixed plain and multipart alternatives. Those leaves ex
 only `key()`, `mutationKey()`, and `mutationOptions()`, regardless of HTTP method.
 Mixed alternatives preserve Effect's client request union.
 
-The adapter omits an endpoint entirely if it has **any streaming success alternative**
-or **any streaming multipart request alternative**. Empty groups disappear. Use the underlying
-Effect client directly for these endpoints.
+An endpoint with exactly one SSE success exposes `streamedKey` / `streamedOptions` for
+ordered history and `liveKey` / `liveOptions` for the latest decoded value. Declared
+response-header wrappers surround each emission. Keep `sseOptions` beside decoded
+`input`; live keys include decoder policy, while accumulated keys also include retention
+and refetch policy. Applications own reconnect and resume controls. Empty live completion
+raises `EffectHttpApiQueryEmptyStreamError`; a top-level `undefined` emission becomes `null`.
+
+Raw byte streams, mixed buffered/SSE successes, multipart SSE payloads, and streaming
+multipart request alternatives omit the whole endpoint. Empty groups disappear. Consume
+unsupported streams through the underlying Effect client.
 
 ## Multipart mutations
 
