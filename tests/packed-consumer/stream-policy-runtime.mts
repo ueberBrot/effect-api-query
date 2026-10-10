@@ -313,4 +313,41 @@ for (const maxChunks of [undefined, 3]) {
   }
 }
 
+await Effect.runPromise(
+  Effect.scoped(
+    Effect.gen(function* () {
+      const watchGroup = RpcGroup.make(Watch)
+      const client = yield* RpcTest.makeClient(watchGroup, { flatten: true }).pipe(
+        Effect.provide(watchGroup.toLayer({ 'events.watch': () => Stream.make(8) })),
+      )
+      const initialData: number[] = []
+      initialData.length = 3
+      initialData[0] = 1
+      initialData[2] = 7
+      const queryClient = new QueryClient()
+      const options = createRpcQueryUtils(watchGroup, {
+        client,
+        keyPrefix: ['seeded-history'],
+      }).events.watch.streamedOptions({
+        input: { channel: 'news' },
+        initialData,
+        maxChunks: 4,
+        refetchMode: 'append',
+      })
+      try {
+        deepStrictEqual(yield* Effect.promise(() => queryClient.query(options)), [
+          1,
+          undefined,
+          7,
+          8,
+        ])
+        equal(initialData.length, 3)
+        equal(1 in initialData, false)
+      } finally {
+        queryClient.clear()
+      }
+    }),
+  ),
+)
+
 console.log('Packed stream policy identity, concurrent histories, refetches, and prefixes verified')
