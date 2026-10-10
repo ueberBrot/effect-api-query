@@ -1,4 +1,4 @@
-# Conditional reads, pages, streams, and SSR
+# Conditional reads, pages, and streams
 
 ## Conditional reads with React Query
 
@@ -103,13 +103,15 @@ export const events = RpcGroup.make(
 
 export function eventOptions(client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof events>>) {
   const rpc = createRpcQueryUtils(events, { client, keyPrefix: ['events-app'] })
+  const input = { channel: 'news' }
+  const policy = { maxChunks: 100, refetchMode: 'append' as const }
   return {
     history: rpc.events.watch.streamedOptions({
-      input: { channel: 'news' },
-      maxChunks: 100,
-      refetchMode: 'append',
+      input,
+      ...policy,
     }),
-    latest: rpc.events.watch.liveOptions({ input: { channel: 'news' } }),
+    historyKey: rpc.events.watch.streamedKey(input, policy),
+    latest: rpc.events.watch.liveOptions({ input }),
   }
 }
 ```
@@ -119,8 +121,12 @@ entries and start independent executions when both are observed.
 
 Accumulated queries retain emitted elements in order. `maxChunks` is a positive
 safe integer limiting element count, not bytes; omission leaves history unbounded.
-Choose a consistent policy for each cache entry: `maxChunks` and `refetchMode`
-are not part of its identity.
+Both `maxChunks` and `refetchMode` contribute to normalized cache identity.
+Omitted policy and explicit unlimited/reset policy share an identity; different
+bounds or refetch modes use different entries. Use `streamedKey(input, policy)`
+or the matching options' `queryKey`. Inputless operations take the policy first.
+HTTP accumulated views additionally include SSE decoder policy; HTTP live views
+include decoder policy too.
 
 - `reset` (default) clears data and returns to pending on refetch.
 - `append` adds new emissions to cached history.
@@ -137,27 +143,23 @@ type. Accumulated chunks retain their original values, including `undefined`.
 
 On an initial fetch, both views become successful after the first emission. They
 keep fetching until completion. Canceling closes the iterator and interrupts its
-Effect resources. An awaited QueryClient call waits for stream completion. Observe
-the cache to consume intermediate values.
+Effect resources. Native cancellation can settle before local finalizers finish.
+An awaited QueryClient call waits for stream completion; hooks and observers see
+intermediate values. For SSR, read [hydration and SSR](hydration-and-ssr.md) and use
+`fetchStreamSnapshot` to capture and drain an open query.
 
-## Server rendering and hydration
+Bounds take effect after a new emission. An oversized seed remains until then.
+Each publication uses a new array and leaves earlier histories unchanged; arrays
+are not runtime-frozen, so treat cache values as immutable. A bound limits element
+count, not retained object size or bytes.
 
-Create a fresh QueryClient, client, and runtime for each server request.
-Share the generated options between loaders and components through
-router context. Keep key prefixes and inputs equivalent between server and
-browser. Keep server and browser resource ownership separate. Choose `staleTime` to
-avoid an immediate duplicate read during hydration.
-
-Keep successful query data compatible with the application's serializer. The
-package does not serialize Schema classes, dates, binary values, or error Causes.
-TanStack's default dehydration policy omits failed queries so the browser can
-refetch them. Preserve that policy unless the application defines its own safe
-error serialization contract.
-
-For an open RPC stream, observe the first successful cache snapshot, cancel the
-query, and then dehydrate. Awaiting stream completion can stall SSR indefinitely.
-Register cleanup for request completion and abort; cancel queries before runtime
-disposal. Keep browser resources alive for the application's lifetime.
+Each consumed value contributes to cache writes. Native structural sharing does
+not suppress those writes or promise a renderer's update count. Choose a live
+query for complete current-state emissions and bounded history for recent events;
+the latest delta alone cannot reconstruct state. Construction, compiler, and
+bundle measurements describe the measured fixtures, not universal time, memory,
+or application-bundle budgets. No batching or publication-suppression API is
+provided.
 
 Sources: [builders](https://ueberbrot.github.io/effect-api-query/reference/generated-builders/),
-[TanStack Start integration](https://ueberbrot.github.io/effect-api-query/guides/tanstack-start/).
+[stream history](https://ueberbrot.github.io/effect-api-query/guides/choose-stream-history/).

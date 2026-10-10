@@ -310,9 +310,7 @@ export default defineConfig({
       },
       'skills-check': {
         command: 'intent validate skills --check',
-        cache: {
-          output: [],
-        },
+        cache: false,
       },
       fallow: {
         command: [

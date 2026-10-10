@@ -52,6 +52,10 @@ try {
   await queryClient.query(
     http.users.get.queryOptions({ input: { params: { id: 1 } }, staleTime: 30_000 }),
   )
+  const metadata = await queryClient.query(
+    http.users.get.metadataOptions({ input: { params: { id: 1 } } }),
+  )
+  console.log(metadata.data.name, metadata.status, metadata.headers['etag'])
   const rename = new MutationObserver(
     queryClient,
     http.users.rename.mutationOptions({
@@ -113,6 +117,73 @@ raises `EffectHttpApiQueryEmptyStreamError`; a top-level `undefined` emission be
 Raw byte streams, mixed buffered/SSE successes, multipart SSE payloads, and streaming
 multipart request alternatives omit the whole endpoint. Empty groups disappear. Consume
 unsupported streams through the underlying Effect client.
+
+## Read buffered metadata
+
+Use `metadataOptions` when a read needs decoded data, response status, or raw
+string headers. Use `metadataKey(input)` for typed cache access. Its `metadata`
+discriminator separates it from ordinary data; a leaf prefix matches both views.
+Metadata has no mutation or infinite builders and is absent on multipart and
+streaming endpoints.
+
+Fetched envelopes and their copied header records are frozen. The decoded `data`
+remains mutable and retains any declared decoded header wrapper. Only an entirely
+undefined success becomes `null`. Initial data, hydration, manual writes, and
+selected results remain application-owned.
+
+Native `select`, skipping, defaults, and cancellation apply. Global and prefix
+`structuralSharing` policies apply to fetched metadata snapshots. Selected results
+and later manual writes use an explicit policy passed to `metadataOptions`, or
+standard deep sharing when omitted. An inherited sharing callback does not govern
+those later values. A fresh-cache hit from `queryClient.query` does not replace an
+existing Query's options. Install a changed policy through an observer or an actual
+fetch before relying on it for manual writes.
+
+Apply an application disclosure policy before persisting raw headers: their strings
+receive no inspection redaction.
+
+## Consume decoded SSE
+
+Keep decoder options beside the request. This function accepts an already acquired
+client for the same declaration and returns independent history and latest views:
+
+```ts
+import { Schema } from 'effect'
+import { createHttpApiQueryUtils } from 'effect-api-query'
+import { HttpApi, HttpApiEndpoint, HttpApiGroup, HttpApiSchema } from 'effect/http-api'
+import type { HttpApiClient } from 'effect/http-api'
+
+export const eventsApi = HttpApi.make('events-api').add(
+  HttpApiGroup.make('events').add(
+    HttpApiEndpoint.get('watch', '/events', {
+      query: { channel: Schema.String },
+      success: HttpApiSchema.StreamSse({ data: Schema.String }),
+    }),
+  ),
+)
+
+export function httpEventOptions(client: HttpApiClient.ForApi<typeof eventsApi>) {
+  const http = createHttpApiQueryUtils(eventsApi, { client, keyPrefix: ['events-app'] })
+  const input = { query: { channel: 'news' } }
+  const policy = {
+    maxChunks: 100,
+    refetchMode: 'append' as const,
+    sseOptions: { maxEventSize: 1_048_576 },
+  }
+  return {
+    history: http.events.watch.streamedOptions({ input, ...policy }),
+    historyKey: http.events.watch.streamedKey(input, policy),
+    latest: http.events.watch.liveOptions({ input, sseOptions: policy.sseOptions }),
+  }
+}
+```
+
+The accumulated key includes normalized `maxChunks`, `refetchMode`, and
+`sseOptions.maxEventSize`; the live key includes the decoder limit. Its default is
+10 MiB per SSE event, distinct from the cache's element bound. Applications own
+reconnect, replay, and resume. For refetch visibility and retention, read
+[query patterns](query-patterns.md); for request capture, read
+[hydration and SSR](hydration-and-ssr.md).
 
 ## Multipart mutations
 
