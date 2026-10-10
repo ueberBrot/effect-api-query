@@ -7,9 +7,16 @@ import { createHttpApiQueryUtils, createRpcQueryUtils } from 'effect-api-query'
 import type { RunPromiseExit } from 'effect-api-query'
 import { FetchHttpClient, HttpClient, HttpClientRequest } from 'effect/http'
 import { HttpApiClient } from 'effect/http-api'
+import type { RpcClientError } from 'effect/rpc'
+
+import { makeUserWrites } from './user-writes.ts'
 
 const makeExampleRpcQueryUtils = (client: ExampleRpcClient, runPromiseExit: RunPromiseExit) =>
-  createRpcQueryUtils(exampleRpcGroup, {
+  createRpcQueryUtils<
+    typeof exampleRpcGroup,
+    readonly ['vite-react'],
+    RpcClientError.RpcClientError
+  >(exampleRpcGroup, {
     client,
     keyPrefix: ['vite-react'] as const,
     runPromiseExit,
@@ -22,8 +29,13 @@ const makeExampleHttpQueryUtils = (
   runPromiseExit: RunPromiseExit,
 ) => createHttpApiQueryUtils(exampleHttpApi, { client, keyPrefix: ['vite-react'], runPromiseExit })
 
+export type ExampleHttpQueryUtils = ReturnType<typeof makeExampleHttpQueryUtils>
+
 export interface ViteReactApplication {
   readonly httpQuery: ReturnType<typeof makeExampleHttpQueryUtils>
+  readonly isActive: () => boolean
+  readonly runMutation: <T>(execute: () => Promise<T>) => Promise<T>
+  readonly userWrites: ReturnType<typeof makeUserWrites>
   readonly invalidateUsers: () => Promise<void>
   readonly dispose: () => Promise<void>
   readonly queryClient: QueryClient
@@ -49,6 +61,13 @@ export const startViteReactApplication = async ({
     },
   })
   let disposal: Promise<void> | undefined
+  const isActive = () => disposal === undefined
+  const runMutation = async <T>(execute: () => Promise<T>) => {
+    if (!isActive()) {
+      throw new Error('The application owner has retired')
+    }
+    return execute()
+  }
   const dispose = async () => {
     // Stop queries before releasing the ready clients they execute through.
     disposal ??= (async () => {
@@ -79,6 +98,9 @@ export const startViteReactApplication = async ({
     const rpcQuery = makeExampleRpcQueryUtils(rpcClient.client, rpcClient.runPromiseExit)
     return {
       httpQuery,
+      isActive,
+      runMutation,
+      userWrites: makeUserWrites({ queryClient, rpcQuery, httpQuery, isActive, runMutation }),
       invalidateUsers: async () => {
         await Promise.all([
           queryClient.invalidateQueries({ queryKey: rpcQuery.users.key() }),
