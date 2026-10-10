@@ -191,8 +191,3 @@ Concrete builders retain DataTags for typed `getQueryData` and `setQueryData`. M
 prefixes and partial keys carry no query-data tag, and native `getQueriesData` does not infer a
 homogeneous result from its filter. Keep broad reads as `unknown` until the application establishes
 the matched representation; an explicit generic or cast does not validate cached values.
-
-The [packed filter consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/packed-consumer/filter-runtime.mts)
-executes these recipes with real QueryClient caches and official Effect test clients. Its
-[compiled contract](https://github.com/ueberBrot/effect-api-query/blob/main/tests/packed-consumer/filter-contract.ts)
-checks exact DataTags and the limits of partial-key inference.
