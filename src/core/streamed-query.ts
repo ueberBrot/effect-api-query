@@ -46,7 +46,7 @@ const streamQueryIterable = <A>(
     }
     const onAbort = () => {
       // oxlint-disable-next-line promise/prefer-await-to-then
-      void close().catch(detach)
+      void Promise.resolve().then(close).catch(detach)
     }
     signal.addEventListener('abort', onAbort, { once: true })
 

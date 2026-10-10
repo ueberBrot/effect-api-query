@@ -21,6 +21,8 @@
     "stream-cause-runtime.mts",
     "stream-policy-runtime.mts",
     "retry-runtime.mts",
+    "snapshot-runtime.mts",
+    "snapshot-contract.ts",
     "defaults-runtime.mts",
     "defaults-contract.ts",
     "docs-defaults.ts",
@@ -37,6 +39,7 @@
     "docs-rpc-quick-start.ts",
     "docs-http-quick-start.ts",
     "docs-retry.ts",
+    "docs-stream-snapshot.ts",
     "docs-hydration-*.ts",
     "hydration-contract.ts",
     "skill-example-*.ts"
