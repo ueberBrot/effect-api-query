@@ -22,6 +22,7 @@ concurrency:
 jobs:
   build:
     name: Build documentation
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -44,6 +45,10 @@ jobs:
         if: inputs.build-artifact == ''
         uses: ./.github/actions/setup-repository
 
+      - name: Check public API and documentation examples
+        if: inputs.build-artifact == ''
+        run: vp run api-types
+
       - name: Build documentation
         if: inputs.build-artifact == ''
         run: vp run docs-build
@@ -55,6 +60,7 @@ jobs:
 
   deploy:
     name: Deploy documentation
+    if: github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
     environment:

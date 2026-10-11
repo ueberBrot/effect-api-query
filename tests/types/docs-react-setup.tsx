@@ -1,63 +1,8 @@
-import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
-import { ManagedRuntime, Schema } from 'effect'
-import { createHttpApiQueryUtils } from 'effect-api-query'
-import type { RunPromiseExit } from 'effect-api-query'
-import { FetchHttpClient } from 'effect/http'
-import { HttpApi, HttpApiClient, HttpApiEndpoint, HttpApiGroup } from 'effect/http-api'
+import { QueryClientProvider, useQuery } from '@tanstack/react-query'
 import { createRoot } from 'react-dom/client'
 
-const usersApi = HttpApi.make('users-api').add(
-  HttpApiGroup.make('users').add(
-    HttpApiEndpoint.get('get', '/users/:id', {
-      params: { id: Schema.Int },
-      success: Schema.Struct({ id: Schema.Int, name: Schema.String }),
-    }),
-  ),
-)
-
-const startUsersApplication = async (baseUrl: string) => {
-  const runtime = ManagedRuntime.make(FetchHttpClient.layer)
-  const running = new Set<Promise<unknown>>()
-  const runPromiseExit: RunPromiseExit = (effect, options) => {
-    const pending = runtime.runPromiseExit(effect, options)
-    running.add(pending)
-    void pending.then(
-      () => running.delete(pending),
-      () => running.delete(pending),
-    )
-    return pending
-  }
-  try {
-    const client = await runtime.runPromise(HttpApiClient.make(usersApi, { baseUrl }))
-    const queryClient = new QueryClient()
-    const http = createHttpApiQueryUtils(usersApi, {
-      client,
-      keyPrefix: ['users-app'],
-      runPromiseExit,
-    })
-    return {
-      http,
-      queryClient,
-      dispose: async () => {
-        try {
-          await queryClient.cancelQueries()
-        } finally {
-          try {
-            await Promise.allSettled([...running])
-          } finally {
-            queryClient.clear()
-            await runtime.dispose()
-          }
-        }
-      },
-    }
-  } catch (error) {
-    await runtime.dispose()
-    throw error
-  }
-}
-
-type UsersApplication = Awaited<ReturnType<typeof startUsersApplication>>
+import { startUsersApplication } from './docs-react-client.ts'
+import type { UsersApplication } from './docs-react-client.ts'
 
 const User = ({ application }: { readonly application: UsersApplication }) => {
   const user = useQuery(application.http.users.get.queryOptions({ input: { params: { id: 1 } } }))

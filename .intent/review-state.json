@@ -3,10 +3,10 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "aa5a86ba2ce9edcfaf62e73f06f34b3e6b6504b709153f5c4961c8c085532b90",
+      "fingerprint": "1725c371227ab1e1a3a584b649a1456a02732ecb7d4a8bd6074d607ad295519c",
       "snapshot": {
         "GLOSSARY.md": "ad19a69727108dd047208b6e76e05f5b1d241620ed75cb241a62fb4c068dc792",
-        "README.md": "fd60880b03b69efdd8300aeee473fdf1a5b2894e5f3f1d4a701525a0ac2fa967",
+        "README.md": "81ca8fe3c5f95884e69a1f885c4e644eff70e0f3c557b45785834719e456caec",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "fcbaca84f266060b946eed9cbf9d0b9815352b7b1d6ddaff5803b29484345380",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "f1505ec3eb35a33fac289706c2cc318a2ffb80555e3302ca102e67e21c9012da",
         "apps/docs/src/content/docs/concepts/http-utility-tree.md": "ed03938167f31822b76efbeac381fd3f8d297061fe567928ee022f8dbfadb9b4",
@@ -17,9 +17,9 @@
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "c175cbd7f15b2322b3039a95aba937a440ae4198794195b6db7419b2a3acb245",
         "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "74f9d59c908fe6ab70ccfb8940c1f976e060b38a05cc6bbe75f72403d3b3ed7b",
         "apps/docs/src/content/docs/getting-started/feature-support.md": "5a6b57b8e539937b203da9bb571d31da2169a014f6f0ee6d0625627a8b0f7525",
-        "apps/docs/src/content/docs/getting-started/http-quick-start.md": "9ac402d68c35a3e8e4d3139ab0424a55395eecd671dd25ba2e942b311230a6ff",
+        "apps/docs/src/content/docs/getting-started/http-quick-start.md": "9df7c42c5f87270a065b4cfafb2f717c7735db79268fd8b9ed30b73b03fa9cc2",
         "apps/docs/src/content/docs/getting-started/installation.md": "fde89cc5c10d005672db696bdc8016deb42d86977fca1b89cfe6315c760bf2d3",
-        "apps/docs/src/content/docs/getting-started/quick-start.md": "34846f39ac2bc6275920d09f04f1141c2ef8d93688f2d83faaa6e29b3d7ac91a",
+        "apps/docs/src/content/docs/getting-started/quick-start.md": "5d0b2469e2e960c87110e0bfe404ad4137f6df1362c1e72989417db87a97b6fb",
         "apps/docs/src/content/docs/guides/angular-query.md": "82b6cc47488db0b166b0f79597526e26274823b48377482fb52949a00c5a9515",
         "apps/docs/src/content/docs/guides/cache-filters.md": "ac56ebb6d8949bec515be80850a5386d79eb9dc38533286ad3fa638f82654418",
         "apps/docs/src/content/docs/guides/cache-management.md": null,
@@ -37,7 +37,7 @@
         "apps/docs/src/content/docs/guides/pagination.md": "95a82e2cc2a972080152ac0816e06262ad63c7c0a7f9c8a60b3f836a42120a1a",
         "apps/docs/src/content/docs/guides/queries.md": "6fb845e9d9d86a94b4df323583c9f721c171d135e2cb64f184f8a6fea22350e7",
         "apps/docs/src/content/docs/guides/query-defaults.md": "74b7f9cd1c29b6bfa3777e8b48cc3dc6319856b48029d052adb4de34a9f5ddaf",
-        "apps/docs/src/content/docs/guides/react-query.md": "d17a75453131d062ea1ca25cdeea9d9d975503d1bfb0be74c90c13ff0708590f",
+        "apps/docs/src/content/docs/guides/react-query.md": "c8b23f26fd836a719cd3a03dc53c9abf46b1e607383cf0f66a59355bb4953671",
         "apps/docs/src/content/docs/guides/refresh-from-events.md": "a8e680ae9060a573336829b94dbf77dd32385671d48cd4aa0f092a1374444cd6",
         "apps/docs/src/content/docs/guides/retry-queries.md": "4326d4e0cec0ca0067182020f68e4db0f634ecefedcc5cadd0db3e90e3709684",
         "apps/docs/src/content/docs/guides/solid-query.md": "6ce866f49974edc7f5db579d08134734544de1137d5a9e5efdf49bc62d12b7f2",
@@ -47,7 +47,7 @@
         "apps/docs/src/content/docs/guides/svelte-query.md": "967257cd51f59723bd641c8553a4e50b931258e79f24d60f47fdfb3035ffe6a8",
         "apps/docs/src/content/docs/guides/switch-cache-owners.md": "cc209f13becec305af60c9f04fe29f85a2ca6db3bc11601cf09083bc2583d198",
         "apps/docs/src/content/docs/guides/tanstack-start.md": "7ec04e78ab8798f8cd89839f2a07b466f0c9834557126799373940b161a95b0b",
-        "apps/docs/src/content/docs/guides/trace-streams.md": "3e6bcd468881b23957b01e8222b2fd2d36b4de0e79141819234c54795b26f03a",
+        "apps/docs/src/content/docs/guides/trace-streams.md": "4213d016728cfc45a31f7d7cb125362f7a4edf46bf6e9c40b325642e800f5ba1",
         "apps/docs/src/content/docs/guides/vue-query.md": "bd8b50c940d0493780a60ae0cd80fc2843b2ebb22c2d3c9bc70653e0379d4155",
         "apps/docs/src/content/docs/guides/websocket-clients.md": "1cd31655e433ced7b24795255cb03280b27734eda58afeb9730a42bfad433c43",
         "apps/docs/src/content/docs/index.mdx": "b5bcd9d26ee0b8ea181b0c063afbae9ee057e31db9a2b3252c13589b5847339a",
@@ -137,7 +137,7 @@
         "pnpm-workspace.yaml": "1e73526ddc3448a43e8cfc77e98bad98d15d0617dc2e8caf98e6d5d43fa90641",
         "scripts/decode-utf8.mts": "2e90c53e95c22b864a209a87c98084db6ec95e83f842007b21528d286d45c18c",
         "scripts/measure-construction.mts": "10522cb10ab51fd44d8990896a2a73e8bf4d4cd2646441e958b6180cb1afd147",
-        "scripts/verify-docs-examples.mts": "9ba75dd2952a8ee92995904ce9891b6757b10637a298646b95f9af73d270caf8",
+        "scripts/verify-docs-examples.mts": "2fac318ffe8e627d0d19c6434171444647f1bc1369024501a3091cdefe06ed72",
         "scripts/verify-packed-consumer.mts": null,
         "skills/effect-api-query/SKILL.md": "41c0a5768977c0e25254f559de4454df7d9dc5fb6075487d65a6a52602b0e7d4",
         "skills/effect-api-query/references/cache-workflows.md": "61d3d363b410eac3f52273e642ec2924d29e887f365a7c21a965a52deeded0be",
@@ -202,20 +202,26 @@
         "tests/query-view-prefix.test.ts": "162de0fa5f68b1f778f8c0c7201a15dcdd78dce4f107fcd64c1e1a50c733e6fe",
         "tests/stream-snapshot.test.ts": "86449ef5d0f1baf165a5c973fcd0a190b9fce8ae5b6e8732a4454ab0c9f6c132",
         "tests/types/docs-functionality.ts": "d638721f8a5f291e30b97229933bbb48dc5a92f677897e330bd1959b35deb8ae",
-        "tests/types/docs-http-quick-start.ts": "5f7eef98be244ea392fc2c5b527858f159a08efebf6f2665725301aa8a910050",
+        "tests/types/docs-http-quick-start-contract.ts": "9f1b832d08b09f7e654e217dc4049f177326eb6274c4d61d0d17b4795b0ccf0a",
+        "tests/types/docs-http-quick-start.ts": "21690839bfcde19e7512ff507e507890eb869e547e316ec810451ae24906e641",
         "tests/types/docs-hydration-async.ts": "de67135bf3da0dffdac47e9f2e49469edddac3d7d026fbd93d39aea6964c0dd8",
         "tests/types/docs-hydration-dto.ts": "ebcd5c3895e8fa40bff3b62e8e13213e98a3e1c4796d89979b23ecc64cdc13ff",
         "tests/types/docs-hydration-rich.ts": "56b35d7bb4a0f0ebc777161beb2e73a19dfc7de4db26fc74e3abab5d164f1402",
         "tests/types/docs-hydration-views.ts": "08d75fe114e4a682fc0ad62b847898dba270672e0ce6d19a4f4d66cf92f75365",
         "tests/types/docs-policies.ts": "b52d09f03131797873d73ac73d48639010136673b9ac98b866762099899e79a4",
+        "tests/types/docs-react-client.ts": "9c4d6d0366c9cb2a9f8de147a3c48aa884856f5c778afe562e5c491059e18bd0",
         "tests/types/docs-react-entry.ts": "cfe186d60a53553103ef292261b48b09b5094d927b1f198f2d3c8bd6f08325d1",
-        "tests/types/docs-react-setup.tsx": "bf0bfb164818366487ce2742699589c62fee4ec5bcb9e906f7d8c423251ecf65",
-        "tests/types/docs-readme-http.ts": "f15c8d87a1522328bbec1bc81d6e7573d406a88134f37e2dfab4c2e4dfe877d5",
-        "tests/types/docs-readme-rpc.ts": "e41aaf93b7fd61f619a2a3fb1132ffe5c027dfe17040b5ba061fa3591f31c69d",
+        "tests/types/docs-react-setup.tsx": "34c3f91ff2fd8278601066b68974796f497f4bf75bfcd1aed6ce93fe7f19cb59",
+        "tests/types/docs-readme-http-contract.ts": "a076275bfe7f015a5652ccd9e18589661b4a2d12bbd2badbe5bd3b165de24156",
+        "tests/types/docs-readme-http.ts": "419ee1c6f84c8c0182ec6dd6c1696e45858cfddedcb06f92d869f075494187cc",
+        "tests/types/docs-readme-rpc-contract.ts": "b8b3b4718e0b76d58b690bd351b046167c7a8bee2602f678cbf5e81892bc53be",
+        "tests/types/docs-readme-rpc.ts": "7ea36bda29a45e909dbddfefed11b3fb3886810fd893fffd63754b22b2804787",
         "tests/types/docs-retry.ts": "78c782810b772e152ea0c47074fb2546fed5d397b93b147862644859fd20cc25",
-        "tests/types/docs-rpc-quick-start.ts": "95deee30de122cbaa7b9cb28257c234aa1162a0b549a87cf50a80bd84e871081",
+        "tests/types/docs-rpc-quick-start-contract.ts": "8404d3fe32e249bbc2371e0d1806262ba2c17c20f6ca589e28cbdf1dce411871",
+        "tests/types/docs-rpc-quick-start.ts": "af542c614987431347dfa6acee98190d593d76b27c0c87babf17de6096e2c2e7",
         "tests/types/docs-stream-snapshot.ts": "bc924cff90a9f9a8e416bf7fbdfedbd607c88e7a678435aaf20ef878862e06ff",
-        "tests/types/docs-stream-tracing.ts": "c839cd8a8d0875ddbe30e6234a0649c82d79f481084e718e5c341f7b4c427198",
+        "tests/types/docs-stream-tracing-contract.ts": "16cd2b3b5d14416da974f293d1a95ef391156c206b3b98b5703091349fff3e7f",
+        "tests/types/docs-stream-tracing.ts": "de288db06bb4e6e01800c0bfacd4d3ab1856feedc21743e656e757371f08a0a4",
         "tests/types/docs-suspense.tsx": "2adc801083df580498a6cfa78fd6b970eae087c6e2af8601fcae111a53d13f4c",
         "tests/types/docs-user-events.ts": "87647140d5434b95cc5389b1fea9919f20df7b6fcee4f00565836a4eae549a70",
         "tests/types/example-owner-contract.ts": "fb10bd087ee582a64806d110404c366cb74e520b0b8cc11701348036b08b9622",
@@ -230,24 +236,23 @@
         "tests/types/tanstack-start-contract.ts": "51681e3d0d7504a614d490f18adb6f44db82d34b9d4d7cb9cf941aea33de284f",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "3e3fd371f097ad7a7f430b73f09c69ef711acff4",
+      "head": "cb14a01c995cd9dfac5a3c5dc752ea5d71da862f",
       "outcome": "no-change",
-      "reason": "The README consolidates existing RPC and HTTP setup into compact concrete examples without changing the supported API, ready-client ownership, runner requirements, cache identity or workflow. Existing shipped RPC/HTTP and framework references already cover these contracts; no guidance rewrite is warranted.",
+      "reason": "Named contract/client/UI modules clarify existing canonical examples without changing supported inputs, generated options, ready-client acquisition, runner tracking, or cleanup. The shipped RPC/HTTP and framework guidance remains accurate, including the preserved React acquisition anchor; no guidance rewrite is justified.",
       "evidence": [
-        "Reviewed actual diff at HEAD 3e3fd371f097ad7a7f430b73f09c69ef711acff4: README.md, scripts/verify-docs-examples.mts, tests/types/docs-readme-rpc.ts and tests/types/docs-readme-http.ts. No library source, manifest, dependency, export or workflow change remains.",
-        "README now follows the approved purpose/install/RPC/HTTP/capabilities/links outline and uses published-package wording. Concrete service-free contracts accept typed ready clients; client acquisition/lifetime and required execution services remain application-owned. Checked ordinary HttpApiClient.make captures HttpClient during acquisition and returns default service-free Client<Groups>, consistent with the HTTP snippet.",
-        "vp run --no-cache pack passed ESM/declaration generation, strict publint and Are the Types Wrong. Inspected the local npm archive: effect peer resolves to exactly 4.0.0, Query Core range remains >=5.103.1 <6, root exports point to dist, and all seven shipped skill/reference files are included.",
-        "vp run --no-cache --ignore-depends-on api-types passed every public fixture, including both exact README examples, under TypeScript 7.0.2 and 5.9.3. The pre-existing docs-hydration-views TaggedStruct suggestion is non-failing.",
-        "vp run --no-cache docs-check passed exact snippets and Astro (0 errors/warnings/hints). After final fixture formatting, node scripts/verify-docs-examples.mts passed again. Type-aware lint/typecheck passed all 150 checked files with no errors or warnings; final vp run format passed 304 files and git diff --check passed.",
-        "Exact pushed HEAD 3e3fd371 passed all six CI jobs in run 38161476267: source quality, example builds, documentation, Chromium, Firefox and WebKit. Current uncommitted README/fixture/verifier changes received the separate local checks above; runtime tests were not repeated for this documentation-only change.",
-        "Read the owned skill and affected RPC, HTTP and framework references plus all three planning records. Intent sync reported Nothing to synchronize. No new API recommendation, activation rule, domain task, failure mode or source boundary; fresh consumer/discovery testing was not repeated because shipped guidance is unchanged."
+        "Source cb14a01c995cd9dfac5a3c5dc752ea5d71da862f plus current local diff. No public library behavior, types, dependencies, package version, or publishing setup changes.",
+        "Fresh vp run --no-cache api-types passed package/declaration construction, attw, publint, and actual importing compiler fixtures under TypeScript 7 and 5.9.3. Exact documentation excerpt verification and Astro checks passed; docs-build produced 56 pages with valid internal links.",
+        "Type-aware lint and checking passed 150 files; repository formatting passed 310 files. The two existing React mounting and stream tracing runtime recipe tests passed after real module extraction.",
+        "Seven Chromium documentation checks passed against the fresh local build: navigation/search/assets, published registry version, unpublished/network/invalid-version fallbacks, and generated LLM documentation links. Collaborative browser inspection confirmed separate quick-start and React modules, preserved React anchor, and the correct October 11 page-change date.",
+        "Workflow YAML 1.2 parsing and dependency/branch/artifact inspection passed. Documentation now depends on successful validation on main, reuses its browser-tested artifact, and has no publish dependency; standalone manual main builds check compiler fixtures. No live workflow was dispatched and npm publication remains unconfigured as confirmed by the maintainer.",
+        "Intent sync reported Nothing to synchronize. Reviewed the owned skill, RPC/HTTP and framework references, and all three planning records against the actual diff. Existing source patterns cover every new fixture and changed canonical guide. Fresh consumer/discovery sessions were not repeated because recommendations and library behavior are unchanged."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "3d7d7aec4b7470c0976ab35090f6642fc8f17eb3c938d52311ada6299a29119c",
+      "fingerprint": "1d9931241eda26f4d331c409c514108ccbfa050512905b381b1750fa81510317",
       "snapshot": {
         "GLOSSARY.md": "ad19a69727108dd047208b6e76e05f5b1d241620ed75cb241a62fb4c068dc792",
-        "README.md": "fd60880b03b69efdd8300aeee473fdf1a5b2894e5f3f1d4a701525a0ac2fa967",
+        "README.md": "81ca8fe3c5f95884e69a1f885c4e644eff70e0f3c557b45785834719e456caec",
         "_artifacts/domain_map.yaml": "03379e3cd6338cb4bb20bd15408af2ff86accf9fa009259f715123be50681d3c",
         "_artifacts/skill_spec.md": "93dbe6009f951ddb49a350b85ce212f1b092bbd381cf2a1425ab3e243200e199",
         "_artifacts/skill_tree.yaml": "0ef24d94a4bbc5c4b628892a130c2b36a81a16c5705a48e990919b5eec467a47",
@@ -261,9 +266,9 @@
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "c175cbd7f15b2322b3039a95aba937a440ae4198794195b6db7419b2a3acb245",
         "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "74f9d59c908fe6ab70ccfb8940c1f976e060b38a05cc6bbe75f72403d3b3ed7b",
         "apps/docs/src/content/docs/getting-started/feature-support.md": "5a6b57b8e539937b203da9bb571d31da2169a014f6f0ee6d0625627a8b0f7525",
-        "apps/docs/src/content/docs/getting-started/http-quick-start.md": "9ac402d68c35a3e8e4d3139ab0424a55395eecd671dd25ba2e942b311230a6ff",
+        "apps/docs/src/content/docs/getting-started/http-quick-start.md": "9df7c42c5f87270a065b4cfafb2f717c7735db79268fd8b9ed30b73b03fa9cc2",
         "apps/docs/src/content/docs/getting-started/installation.md": "fde89cc5c10d005672db696bdc8016deb42d86977fca1b89cfe6315c760bf2d3",
-        "apps/docs/src/content/docs/getting-started/quick-start.md": "34846f39ac2bc6275920d09f04f1141c2ef8d93688f2d83faaa6e29b3d7ac91a",
+        "apps/docs/src/content/docs/getting-started/quick-start.md": "5d0b2469e2e960c87110e0bfe404ad4137f6df1362c1e72989417db87a97b6fb",
         "apps/docs/src/content/docs/guides/angular-query.md": "82b6cc47488db0b166b0f79597526e26274823b48377482fb52949a00c5a9515",
         "apps/docs/src/content/docs/guides/cache-filters.md": "ac56ebb6d8949bec515be80850a5386d79eb9dc38533286ad3fa638f82654418",
         "apps/docs/src/content/docs/guides/cache-management.md": null,
@@ -281,7 +286,7 @@
         "apps/docs/src/content/docs/guides/pagination.md": "95a82e2cc2a972080152ac0816e06262ad63c7c0a7f9c8a60b3f836a42120a1a",
         "apps/docs/src/content/docs/guides/queries.md": "6fb845e9d9d86a94b4df323583c9f721c171d135e2cb64f184f8a6fea22350e7",
         "apps/docs/src/content/docs/guides/query-defaults.md": "74b7f9cd1c29b6bfa3777e8b48cc3dc6319856b48029d052adb4de34a9f5ddaf",
-        "apps/docs/src/content/docs/guides/react-query.md": "d17a75453131d062ea1ca25cdeea9d9d975503d1bfb0be74c90c13ff0708590f",
+        "apps/docs/src/content/docs/guides/react-query.md": "c8b23f26fd836a719cd3a03dc53c9abf46b1e607383cf0f66a59355bb4953671",
         "apps/docs/src/content/docs/guides/refresh-from-events.md": "a8e680ae9060a573336829b94dbf77dd32385671d48cd4aa0f092a1374444cd6",
         "apps/docs/src/content/docs/guides/retry-queries.md": "4326d4e0cec0ca0067182020f68e4db0f634ecefedcc5cadd0db3e90e3709684",
         "apps/docs/src/content/docs/guides/solid-query.md": "6ce866f49974edc7f5db579d08134734544de1137d5a9e5efdf49bc62d12b7f2",
@@ -291,7 +296,7 @@
         "apps/docs/src/content/docs/guides/svelte-query.md": "967257cd51f59723bd641c8553a4e50b931258e79f24d60f47fdfb3035ffe6a8",
         "apps/docs/src/content/docs/guides/switch-cache-owners.md": "cc209f13becec305af60c9f04fe29f85a2ca6db3bc11601cf09083bc2583d198",
         "apps/docs/src/content/docs/guides/tanstack-start.md": "7ec04e78ab8798f8cd89839f2a07b466f0c9834557126799373940b161a95b0b",
-        "apps/docs/src/content/docs/guides/trace-streams.md": "3e6bcd468881b23957b01e8222b2fd2d36b4de0e79141819234c54795b26f03a",
+        "apps/docs/src/content/docs/guides/trace-streams.md": "4213d016728cfc45a31f7d7cb125362f7a4edf46bf6e9c40b325642e800f5ba1",
         "apps/docs/src/content/docs/guides/vue-query.md": "bd8b50c940d0493780a60ae0cd80fc2843b2ebb22c2d3c9bc70653e0379d4155",
         "apps/docs/src/content/docs/guides/websocket-clients.md": "1cd31655e433ced7b24795255cb03280b27734eda58afeb9730a42bfad433c43",
         "apps/docs/src/content/docs/index.mdx": "b5bcd9d26ee0b8ea181b0c063afbae9ee057e31db9a2b3252c13589b5847339a",
@@ -381,7 +386,7 @@
         "pnpm-workspace.yaml": "1e73526ddc3448a43e8cfc77e98bad98d15d0617dc2e8caf98e6d5d43fa90641",
         "scripts/decode-utf8.mts": "2e90c53e95c22b864a209a87c98084db6ec95e83f842007b21528d286d45c18c",
         "scripts/measure-construction.mts": "10522cb10ab51fd44d8990896a2a73e8bf4d4cd2646441e958b6180cb1afd147",
-        "scripts/verify-docs-examples.mts": "9ba75dd2952a8ee92995904ce9891b6757b10637a298646b95f9af73d270caf8",
+        "scripts/verify-docs-examples.mts": "2fac318ffe8e627d0d19c6434171444647f1bc1369024501a3091cdefe06ed72",
         "scripts/verify-packed-consumer.mts": null,
         "skills/effect-api-query/SKILL.md": "41c0a5768977c0e25254f559de4454df7d9dc5fb6075487d65a6a52602b0e7d4",
         "skills/effect-api-query/references/cache-workflows.md": "61d3d363b410eac3f52273e642ec2924d29e887f365a7c21a965a52deeded0be",
@@ -446,20 +451,26 @@
         "tests/query-view-prefix.test.ts": "162de0fa5f68b1f778f8c0c7201a15dcdd78dce4f107fcd64c1e1a50c733e6fe",
         "tests/stream-snapshot.test.ts": "86449ef5d0f1baf165a5c973fcd0a190b9fce8ae5b6e8732a4454ab0c9f6c132",
         "tests/types/docs-functionality.ts": "d638721f8a5f291e30b97229933bbb48dc5a92f677897e330bd1959b35deb8ae",
-        "tests/types/docs-http-quick-start.ts": "5f7eef98be244ea392fc2c5b527858f159a08efebf6f2665725301aa8a910050",
+        "tests/types/docs-http-quick-start-contract.ts": "9f1b832d08b09f7e654e217dc4049f177326eb6274c4d61d0d17b4795b0ccf0a",
+        "tests/types/docs-http-quick-start.ts": "21690839bfcde19e7512ff507e507890eb869e547e316ec810451ae24906e641",
         "tests/types/docs-hydration-async.ts": "de67135bf3da0dffdac47e9f2e49469edddac3d7d026fbd93d39aea6964c0dd8",
         "tests/types/docs-hydration-dto.ts": "ebcd5c3895e8fa40bff3b62e8e13213e98a3e1c4796d89979b23ecc64cdc13ff",
         "tests/types/docs-hydration-rich.ts": "56b35d7bb4a0f0ebc777161beb2e73a19dfc7de4db26fc74e3abab5d164f1402",
         "tests/types/docs-hydration-views.ts": "08d75fe114e4a682fc0ad62b847898dba270672e0ce6d19a4f4d66cf92f75365",
         "tests/types/docs-policies.ts": "b52d09f03131797873d73ac73d48639010136673b9ac98b866762099899e79a4",
+        "tests/types/docs-react-client.ts": "9c4d6d0366c9cb2a9f8de147a3c48aa884856f5c778afe562e5c491059e18bd0",
         "tests/types/docs-react-entry.ts": "cfe186d60a53553103ef292261b48b09b5094d927b1f198f2d3c8bd6f08325d1",
-        "tests/types/docs-react-setup.tsx": "bf0bfb164818366487ce2742699589c62fee4ec5bcb9e906f7d8c423251ecf65",
-        "tests/types/docs-readme-http.ts": "f15c8d87a1522328bbec1bc81d6e7573d406a88134f37e2dfab4c2e4dfe877d5",
-        "tests/types/docs-readme-rpc.ts": "e41aaf93b7fd61f619a2a3fb1132ffe5c027dfe17040b5ba061fa3591f31c69d",
+        "tests/types/docs-react-setup.tsx": "34c3f91ff2fd8278601066b68974796f497f4bf75bfcd1aed6ce93fe7f19cb59",
+        "tests/types/docs-readme-http-contract.ts": "a076275bfe7f015a5652ccd9e18589661b4a2d12bbd2badbe5bd3b165de24156",
+        "tests/types/docs-readme-http.ts": "419ee1c6f84c8c0182ec6dd6c1696e45858cfddedcb06f92d869f075494187cc",
+        "tests/types/docs-readme-rpc-contract.ts": "b8b3b4718e0b76d58b690bd351b046167c7a8bee2602f678cbf5e81892bc53be",
+        "tests/types/docs-readme-rpc.ts": "7ea36bda29a45e909dbddfefed11b3fb3886810fd893fffd63754b22b2804787",
         "tests/types/docs-retry.ts": "78c782810b772e152ea0c47074fb2546fed5d397b93b147862644859fd20cc25",
-        "tests/types/docs-rpc-quick-start.ts": "95deee30de122cbaa7b9cb28257c234aa1162a0b549a87cf50a80bd84e871081",
+        "tests/types/docs-rpc-quick-start-contract.ts": "8404d3fe32e249bbc2371e0d1806262ba2c17c20f6ca589e28cbdf1dce411871",
+        "tests/types/docs-rpc-quick-start.ts": "af542c614987431347dfa6acee98190d593d76b27c0c87babf17de6096e2c2e7",
         "tests/types/docs-stream-snapshot.ts": "bc924cff90a9f9a8e416bf7fbdfedbd607c88e7a678435aaf20ef878862e06ff",
-        "tests/types/docs-stream-tracing.ts": "c839cd8a8d0875ddbe30e6234a0649c82d79f481084e718e5c341f7b4c427198",
+        "tests/types/docs-stream-tracing-contract.ts": "16cd2b3b5d14416da974f293d1a95ef391156c206b3b98b5703091349fff3e7f",
+        "tests/types/docs-stream-tracing.ts": "de288db06bb4e6e01800c0bfacd4d3ab1856feedc21743e656e757371f08a0a4",
         "tests/types/docs-suspense.tsx": "2adc801083df580498a6cfa78fd6b970eae087c6e2af8601fcae111a53d13f4c",
         "tests/types/docs-user-events.ts": "87647140d5434b95cc5389b1fea9919f20df7b6fcee4f00565836a4eae549a70",
         "tests/types/example-owner-contract.ts": "fb10bd087ee582a64806d110404c366cb74e520b0b8cc11701348036b08b9622",
@@ -474,17 +485,16 @@
         "tests/types/tanstack-start-contract.ts": "51681e3d0d7504a614d490f18adb6f44db82d34b9d4d7cb9cf941aea33de284f",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "3e3fd371f097ad7a7f430b73f09c69ef711acff4",
+      "head": "cb14a01c995cd9dfac5a3c5dc752ea5d71da862f",
       "outcome": "no-change",
-      "reason": "All three planning records remain accurate: domain_map.yaml retains the existing contract-query tasks, ownership boundaries and failure modes; skill_spec.md retains the same supported guidance and documented validation approach; skill_tree.yaml already maps README.md, scripts/*.mts and tests/**/*.ts. The README rewrite and its two compiler fixtures add no domain task, skill identity, recommendation or source boundary. Preserve the accurate records without a no-op history entry.",
+      "reason": "All three planning records remain accurate: domain_map.yaml covers the same contract, provider and tracing tasks; skill_spec.md retains the same ownership and executable checks, whose modules now import their extracted parts; skill_tree.yaml already maps all canonical guides and tests/**/*.ts and tests/**/*.tsx. Deployment/version-label maintenance introduces no consumer skill task, new failure mode, identity or source coverage. Preserve the accurate records without a no-op history entry.",
       "evidence": [
-        "Reviewed actual diff at HEAD 3e3fd371f097ad7a7f430b73f09c69ef711acff4: README.md, scripts/verify-docs-examples.mts, tests/types/docs-readme-rpc.ts and tests/types/docs-readme-http.ts. No library source, manifest, dependency, export or workflow change remains.",
-        "README now follows the approved purpose/install/RPC/HTTP/capabilities/links outline and uses published-package wording. Concrete service-free contracts accept typed ready clients; client acquisition/lifetime and required execution services remain application-owned. Checked ordinary HttpApiClient.make captures HttpClient during acquisition and returns default service-free Client<Groups>, consistent with the HTTP snippet.",
-        "vp run --no-cache pack passed ESM/declaration generation, strict publint and Are the Types Wrong. Inspected the local npm archive: effect peer resolves to exactly 4.0.0, Query Core range remains >=5.103.1 <6, root exports point to dist, and all seven shipped skill/reference files are included.",
-        "vp run --no-cache --ignore-depends-on api-types passed every public fixture, including both exact README examples, under TypeScript 7.0.2 and 5.9.3. The pre-existing docs-hydration-views TaggedStruct suggestion is non-failing.",
-        "vp run --no-cache docs-check passed exact snippets and Astro (0 errors/warnings/hints). After final fixture formatting, node scripts/verify-docs-examples.mts passed again. Type-aware lint/typecheck passed all 150 checked files with no errors or warnings; final vp run format passed 304 files and git diff --check passed.",
-        "Exact pushed HEAD 3e3fd371 passed all six CI jobs in run 38161476267: source quality, example builds, documentation, Chromium, Firefox and WebKit. Current uncommitted README/fixture/verifier changes received the separate local checks above; runtime tests were not repeated for this documentation-only change.",
-        "Read the owned skill and affected RPC, HTTP and framework references plus all three planning records. Intent sync reported Nothing to synchronize. No new API recommendation, activation rule, domain task, failure mode or source boundary; fresh consumer/discovery testing was not repeated because shipped guidance is unchanged."
+        "Source cb14a01c995cd9dfac5a3c5dc752ea5d71da862f plus current local diff. No public library behavior, types, dependencies, package version, or publishing setup changes.",
+        "Fresh vp run --no-cache api-types passed package/declaration construction, attw, publint, and actual importing compiler fixtures under TypeScript 7 and 5.9.3. Exact documentation excerpt verification and Astro checks passed; docs-build produced 56 pages with valid internal links.",
+        "Type-aware lint and checking passed 150 files; repository formatting passed 310 files. The two existing React mounting and stream tracing runtime recipe tests passed after real module extraction.",
+        "Seven Chromium documentation checks passed against the fresh local build: navigation/search/assets, published registry version, unpublished/network/invalid-version fallbacks, and generated LLM documentation links. Collaborative browser inspection confirmed separate quick-start and React modules, preserved React anchor, and the correct October 11 page-change date.",
+        "Workflow YAML 1.2 parsing and dependency/branch/artifact inspection passed. Documentation now depends on successful validation on main, reuses its browser-tested artifact, and has no publish dependency; standalone manual main builds check compiler fixtures. No live workflow was dispatched and npm publication remains unconfigured as confirmed by the maintainer.",
+        "Intent sync reported Nothing to synchronize. Reviewed the owned skill, RPC/HTTP and framework references, and all three planning records against the actual diff. Existing source patterns cover every new fixture and changed canonical guide. Fresh consumer/discovery sessions were not repeated because recommendations and library behavior are unchanged."
       ]
     },
     "source:vite.config.ts": {
@@ -500,19 +510,20 @@
       ]
     },
     "source:.github/workflows/release.yml": {
-      "fingerprint": "020cfeccbebeae32db3a779d8983c0151eb4d8b91405ae20716a365effb40382",
+      "fingerprint": "e634c95a4f74465f43e38de00aee2328dafcf292951e0bdb28ec98aff092dd39",
       "snapshot": {
-        ".github/workflows/release.yml": "17d01b72d314722784ea0d032426ca55b1860629234adfcc0f1c72c279b95b2b"
+        ".github/workflows/release.yml": "b956e496bebe9b427d93cc577f6cd2ded132ec969bdfa22f6764803759803e3c"
       },
-      "head": "f3ba2a62cdb0b28eaa6e592b010bb6879466cda2",
+      "head": "cb14a01c995cd9dfac5a3c5dc752ea5d71da862f",
       "outcome": "no-change",
-      "reason": "Every main push and manual run invokes shared validation once. Pending changesets still create a version PR on main; publication still requires publish mode, a main push, completed validation and native Changesets packing. These are release orchestration changes.",
+      "reason": "Reviewed the deployment dependency, main branch guards and artifact reuse. This maintainer CI change lets validated documentation deploy without npm publication and leaves publishing behavior intact. No consumer guidance or additional independent library skill is required.",
       "evidence": [
-        "Diff reviewed against f3ba2a62cdb0b28eaa6e592b010bb6879466cda2; actual PR base 5b91ddb1de13970365669c887b9d767ea417fbd4. Public library source, compiler fixtures, runtime cases, README, documentation pages and skills were not changed in this batch.",
-        "Native uncached typecheck passed 141 files and native pack attw/publint. Scoped native format passed seven affected configuration files; final YAML parsed and browser/trigger/publication prerequisite expressions were inspected.",
-        "Four existing application Chromium acceptance cases and all seven existing documentation Chromium cases passed against prepared outputs. Their preview logs contain no pack or build invocation. Hosted docs Playwright list mode listed seven cases without building a local site. Receipts: /tmp/effect-api-query-ci-audit/.",
-        "All three shared planning documents were read: _artifacts/domain_map.yaml retains the same ten consumer tasks/failure modes, _artifacts/skill_spec.md retains accurate source-backed coverage and boundaries, and _artifacts/skill_tree.yaml retains the same owned skill, six references, source mappings, prerequisites and distribution. CI-only orchestration requires no guidance or planning rewrite.",
-        "The first hosted run of artifact reuse and the reusable release/deployment workflows remains unverified locally. No package publication or Pages deployment was performed."
+        "Source cb14a01c995cd9dfac5a3c5dc752ea5d71da862f plus current local diff. No public library behavior, types, dependencies, package version, or publishing setup changes.",
+        "Fresh vp run --no-cache api-types passed package/declaration construction, attw, publint, and actual importing compiler fixtures under TypeScript 7 and 5.9.3. Exact documentation excerpt verification and Astro checks passed; docs-build produced 56 pages with valid internal links.",
+        "Type-aware lint and checking passed 150 files; repository formatting passed 310 files. The two existing React mounting and stream tracing runtime recipe tests passed after real module extraction.",
+        "Seven Chromium documentation checks passed against the fresh local build: navigation/search/assets, published registry version, unpublished/network/invalid-version fallbacks, and generated LLM documentation links. Collaborative browser inspection confirmed separate quick-start and React modules, preserved React anchor, and the correct October 11 page-change date.",
+        "Workflow YAML 1.2 parsing and dependency/branch/artifact inspection passed. Documentation now depends on successful validation on main, reuses its browser-tested artifact, and has no publish dependency; standalone manual main builds check compiler fixtures. No live workflow was dispatched and npm publication remains unconfigured as confirmed by the maintainer.",
+        "Intent sync reported Nothing to synchronize. Reviewed the owned skill, RPC/HTTP and framework references, and all three planning records against the actual diff. Existing source patterns cover every new fixture and changed canonical guide. Fresh consumer/discovery sessions were not repeated because recommendations and library behavior are unchanged."
       ]
     },
     "source:e2e/browser-test-config.ts": {
@@ -1029,16 +1040,20 @@
       ]
     },
     "source:apps/docs/astro.config.mts": {
-      "fingerprint": "e1ae593a08076f6fb1f8983a51a3b0c86481cbaae724a46b4389f4352aaae46c",
+      "fingerprint": "bdc0bddfd3f7f8c6e60ad19f8765e13e6e7ac83782a771b425038195af0213c7",
       "snapshot": {
-        "apps/docs/astro.config.mts": "9f435fd3765c6119a92beee7b6cb504eb6594afc8c1b4af018cf8254eb936ffc"
+        "apps/docs/astro.config.mts": "86b2ce101dabf1be2d8d59cb379049c7cf7293758178fa16988fb118f192f65e"
       },
-      "head": "8f4723c40f217b9ba82e8247d9147c143782538c",
-      "outcome": "updated",
-      "reason": "Navigation now leads with HTTP API and RPC setup/contract/factory/builder choices, then shared Library, native Integrations, complete Examples and shared API Reference. Existing skill pointers were updated for folded React setup, cache consolidation, inference and command examples; no additional skill is needed.",
+      "head": "cb14a01c995cd9dfac5a3c5dc752ea5d71da862f",
+      "outcome": "no-change",
+      "reason": "The static npm link is an honest fallback while the existing browser script still displays the registry latest version after a valid lookup. This prevents independently deployed docs from claiming an unpublished repository version; it changes documentation chrome, with no integration recommendation or consumer skill impact.",
       "evidence": [
-        "56-page Astro build and link validation passed; corrected the generated integrations landing slug to integrations.",
-        "All 7 Chromium docs tests passed, covering navigation, search, canonical repository links, icons, registry behavior and generated LLM docs. Collaborative preview confirmed both adapter choices and the RPC route. Firefox/WebKit browser tests could not launch because their executables are not installed."
+        "Source cb14a01c995cd9dfac5a3c5dc752ea5d71da862f plus current local diff. No public library behavior, types, dependencies, package version, or publishing setup changes.",
+        "Fresh vp run --no-cache api-types passed package/declaration construction, attw, publint, and actual importing compiler fixtures under TypeScript 7 and 5.9.3. Exact documentation excerpt verification and Astro checks passed; docs-build produced 56 pages with valid internal links.",
+        "Type-aware lint and checking passed 150 files; repository formatting passed 310 files. The two existing React mounting and stream tracing runtime recipe tests passed after real module extraction.",
+        "Seven Chromium documentation checks passed against the fresh local build: navigation/search/assets, published registry version, unpublished/network/invalid-version fallbacks, and generated LLM documentation links. Collaborative browser inspection confirmed separate quick-start and React modules, preserved React anchor, and the correct October 11 page-change date.",
+        "Workflow YAML 1.2 parsing and dependency/branch/artifact inspection passed. Documentation now depends on successful validation on main, reuses its browser-tested artifact, and has no publish dependency; standalone manual main builds check compiler fixtures. No live workflow was dispatched and npm publication remains unconfigured as confirmed by the maintainer.",
+        "Intent sync reported Nothing to synchronize. Reviewed the owned skill, RPC/HTTP and framework references, and all three planning records against the actual diff. Existing source patterns cover every new fixture and changed canonical guide. Fresh consumer/discovery sessions were not repeated because recommendations and library behavior are unchanged."
       ]
     },
     "source:docs/adr/0016-automate-releases-with-changesets.md": {
@@ -1281,15 +1296,20 @@
       ]
     },
     "source:e2e-docs/docs.spec.ts": {
-      "fingerprint": "1bb9637253ced30e78b9e2530a30af302dded927e1cc35c2ec2680f745b889a8",
+      "fingerprint": "a19c3ff2bd2dd764e61fb49f2906c46d4dd423c761128fba98096e2434d55677",
       "snapshot": {
-        "e2e-docs/docs.spec.ts": "b07fcf2f43cd972a823ff6f8c564a595f57af84e057326b72262e4e169f677cb"
+        "e2e-docs/docs.spec.ts": "cc227bfce7d3e9f559ab926e2dddea09cb4161c832c240391f8212c9a931d0c8"
       },
-      "head": "8f4723c40f217b9ba82e8247d9147c143782538c",
+      "head": "cb14a01c995cd9dfac5a3c5dc752ea5d71da862f",
       "outcome": "no-change",
-      "reason": "The repository browser test follows the revised HTTP API/RPC entry actions and navigates generated sidebar links, including policies, inference and React setup. Its old compiler-fixture prerequisite link assertion was removed because ready-client setup is now shown directly in the docs; this adds validation rather than a shipped developer task.",
+      "reason": "Existing browser assertions now verify the neutral npm fallback while preserving successful published-version checks for desktop and mobile links. Test coverage matches the actual site behavior and requires no shipped guidance update.",
       "evidence": [
-        "All 7 Chromium docs tests passed against the Astro preview; both generated LLM documents resolve their internal links. Type-aware lint and formatting passed."
+        "Source cb14a01c995cd9dfac5a3c5dc752ea5d71da862f plus current local diff. No public library behavior, types, dependencies, package version, or publishing setup changes.",
+        "Fresh vp run --no-cache api-types passed package/declaration construction, attw, publint, and actual importing compiler fixtures under TypeScript 7 and 5.9.3. Exact documentation excerpt verification and Astro checks passed; docs-build produced 56 pages with valid internal links.",
+        "Type-aware lint and checking passed 150 files; repository formatting passed 310 files. The two existing React mounting and stream tracing runtime recipe tests passed after real module extraction.",
+        "Seven Chromium documentation checks passed against the fresh local build: navigation/search/assets, published registry version, unpublished/network/invalid-version fallbacks, and generated LLM documentation links. Collaborative browser inspection confirmed separate quick-start and React modules, preserved React anchor, and the correct October 11 page-change date.",
+        "Workflow YAML 1.2 parsing and dependency/branch/artifact inspection passed. Documentation now depends on successful validation on main, reuses its browser-tested artifact, and has no publish dependency; standalone manual main builds check compiler fixtures. No live workflow was dispatched and npm publication remains unconfigured as confirmed by the maintainer.",
+        "Intent sync reported Nothing to synchronize. Reviewed the owned skill, RPC/HTTP and framework references, and all three planning records against the actual diff. Existing source patterns cover every new fixture and changed canonical guide. Fresh consumer/discovery sessions were not repeated because recommendations and library behavior are unchanged."
       ]
     },
     "source:e2e/conditional-query.spec.ts": {
@@ -1537,19 +1557,20 @@
       ]
     },
     "source:.github/workflows/deploy-docs.yml": {
-      "fingerprint": "b23c6bf5ef73b244b420516cd31b713672423d7d342472ca4e90e3570a3bec41",
+      "fingerprint": "2fce940a1dd4c1299b6060dda7c2d905207ca7c170a5ae75bb6829cb29a51976",
       "snapshot": {
-        ".github/workflows/deploy-docs.yml": "ab245e4f9057e32a15906f0202c4264842da05a1f44fa9c6969d59e70b97b31a"
+        ".github/workflows/deploy-docs.yml": "31a953c832f5a0e68b71c19ece0fdedc43c80a6c6300e45c8ee5997b31ab46c7"
       },
-      "head": "f3ba2a62cdb0b28eaa6e592b010bb6879466cda2",
+      "head": "cb14a01c995cd9dfac5a3c5dc752ea5d71da862f",
       "outcome": "no-change",
-      "reason": "A release restores the same validated documentation site from its current workflow run. Standalone manual deployment retains checkout, native docs checks and build. The site contents and library guidance are unchanged.",
+      "reason": "Reviewed the deployment dependency, main branch guards and artifact reuse. This maintainer CI change lets validated documentation deploy without npm publication and leaves publishing behavior intact. No consumer guidance or additional independent library skill is required.",
       "evidence": [
-        "Diff reviewed against f3ba2a62cdb0b28eaa6e592b010bb6879466cda2; actual PR base 5b91ddb1de13970365669c887b9d767ea417fbd4. Public library source, compiler fixtures, runtime cases, README, documentation pages and skills were not changed in this batch.",
-        "Native uncached typecheck passed 141 files and native pack attw/publint. Scoped native format passed seven affected configuration files; final YAML parsed and browser/trigger/publication prerequisite expressions were inspected.",
-        "Four existing application Chromium acceptance cases and all seven existing documentation Chromium cases passed against prepared outputs. Their preview logs contain no pack or build invocation. Hosted docs Playwright list mode listed seven cases without building a local site. Receipts: /tmp/effect-api-query-ci-audit/.",
-        "All three shared planning documents were read: _artifacts/domain_map.yaml retains the same ten consumer tasks/failure modes, _artifacts/skill_spec.md retains accurate source-backed coverage and boundaries, and _artifacts/skill_tree.yaml retains the same owned skill, six references, source mappings, prerequisites and distribution. CI-only orchestration requires no guidance or planning rewrite.",
-        "The first hosted run of artifact reuse and the reusable release/deployment workflows remains unverified locally. No package publication or Pages deployment was performed."
+        "Source cb14a01c995cd9dfac5a3c5dc752ea5d71da862f plus current local diff. No public library behavior, types, dependencies, package version, or publishing setup changes.",
+        "Fresh vp run --no-cache api-types passed package/declaration construction, attw, publint, and actual importing compiler fixtures under TypeScript 7 and 5.9.3. Exact documentation excerpt verification and Astro checks passed; docs-build produced 56 pages with valid internal links.",
+        "Type-aware lint and checking passed 150 files; repository formatting passed 310 files. The two existing React mounting and stream tracing runtime recipe tests passed after real module extraction.",
+        "Seven Chromium documentation checks passed against the fresh local build: navigation/search/assets, published registry version, unpublished/network/invalid-version fallbacks, and generated LLM documentation links. Collaborative browser inspection confirmed separate quick-start and React modules, preserved React anchor, and the correct October 11 page-change date.",
+        "Workflow YAML 1.2 parsing and dependency/branch/artifact inspection passed. Documentation now depends on successful validation on main, reuses its browser-tested artifact, and has no publish dependency; standalone manual main builds check compiler fixtures. No live workflow was dispatched and npm publication remains unconfigured as confirmed by the maintainer.",
+        "Intent sync reported Nothing to synchronize. Reviewed the owned skill, RPC/HTTP and framework references, and all three planning records against the actual diff. Existing source patterns cover every new fixture and changed canonical guide. Fresh consumer/discovery sessions were not repeated because recommendations and library behavior are unchanged."
       ]
     },
     "source:playwright.config.ts": {

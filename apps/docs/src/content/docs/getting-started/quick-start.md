@@ -7,20 +7,18 @@ First [install the package](/effect-api-query/getting-started/installation/). Th
 serve the same `usersRpc` contract at `http://localhost:3000/rpc` with Effect's JSON RPC protocol.
 Share the contract between your server and browser application.
 
-## Acquire the client and execute requests
+## Define the shared contract
 
-This complete module defines the contract, acquires a ready flat client, reads a user, writes a
-user, and releases its resources. Replace the URL with your server's RPC endpoint.
+Place the declaration in `rpc-contract.ts`. Both the server and client import this module.
+
+**Shared contract — `rpc-contract.ts`**
 
 ```ts
-import { MutationObserver, QueryClient } from '@tanstack/query-core'
-import { Effect, Exit, Layer, Schema, Scope } from 'effect'
-import { createRpcQueryUtils } from 'effect-api-query'
-import { FetchHttpClient } from 'effect/http'
-import { Rpc, RpcClient, RpcGroup, RpcSerialization } from 'effect/rpc'
+import { Effect, Schema } from 'effect'
+import { Rpc, RpcGroup } from 'effect/rpc'
 
 const User = Schema.Struct({ id: Schema.Int, name: Schema.String })
-const usersRpc = RpcGroup.make(
+export const usersRpc = RpcGroup.make(
   Rpc.make('users.get', {
     payload: {
       id: Schema.Int,
@@ -33,6 +31,23 @@ const usersRpc = RpcGroup.make(
     success: User,
   }),
 )
+```
+
+## Acquire the client and execute requests
+
+This client module acquires a ready flat client, reads a user, writes a user, and releases its
+resources. Replace the URL with your server's RPC endpoint.
+
+**Client integration — `client.ts`**
+
+```ts
+import { MutationObserver, QueryClient } from '@tanstack/query-core'
+import { Effect, Exit, Layer, Scope } from 'effect'
+import { createRpcQueryUtils } from 'effect-api-query'
+import { FetchHttpClient } from 'effect/http'
+import { RpcClient, RpcSerialization } from 'effect/rpc'
+
+import { usersRpc } from './rpc-contract.ts'
 
 const protocol = RpcClient.layerProtocolHttp({ url: 'http://localhost:3000/rpc' }).pipe(
   Layer.provide(RpcSerialization.layerJson),
@@ -85,7 +100,7 @@ do not. RPC and HTTP keys have separate namespaces.
 
 ## Keep a browser client alive
 
-The module above finishes each operation before disposing its resources. For an application,
+The client module above finishes each operation before disposing its resources. For an application,
 acquire once before mounting components and release after unmounting them. Use the
 [React client setup](/effect-api-query/guides/react-query/#acquire-and-mount-the-client) for a provider, component,
 and cleanup callback. Its HTTP client setup can be replaced with the RPC acquisition above.

@@ -1,24 +1,12 @@
 import { QueryClient } from '@tanstack/query-core'
-import { Effect, Layer, ManagedRuntime, Schema, Stream, Tracer } from 'effect'
+import { Effect, Layer, ManagedRuntime, Stream, Tracer } from 'effect'
 import { createHttpApiQueryUtils, fetchStreamSnapshot } from 'effect-api-query'
 import type { RunPromiseExit } from 'effect-api-query'
 import { FetchHttpClient } from 'effect/http'
-import {
-  HttpApi,
-  HttpApiClient,
-  HttpApiEndpoint,
-  HttpApiGroup,
-  HttpApiSchema,
-} from 'effect/http-api'
+import { HttpApiClient } from 'effect/http-api'
 import { OtlpSerialization, OtlpTracer } from 'effect/observability'
 
-const feedApi = HttpApi.make('feed-api').add(
-  HttpApiGroup.make('events').add(
-    HttpApiEndpoint.get('watch', '/events', {
-      success: HttpApiSchema.StreamSse({ data: Schema.String }),
-    }),
-  ),
-)
+import { feedApi } from './docs-stream-tracing-contract.ts'
 
 export const traceFeed = <A, E, R>(source: Stream.Stream<A, E, R>) =>
   Stream.unwrap(

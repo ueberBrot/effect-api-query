@@ -18,12 +18,37 @@ const program = Effect.gen(function* () {
   const fs = yield* FileSystem.FileSystem
   const path = yield* Path.Path
   for (const [page, fixtures] of [
-    ['README.md', ['tests/types/docs-readme-rpc', 'tests/types/docs-readme-http']],
-    ['getting-started/quick-start', ['tests/types/docs-rpc-quick-start']],
-    ['getting-started/http-quick-start', ['tests/types/docs-http-quick-start']],
-    ['guides/react-query', ['tests/types/docs-react-setup.tsx', 'tests/types/docs-react-entry']],
+    [
+      'README.md',
+      [
+        'tests/types/docs-readme-rpc-contract',
+        'tests/types/docs-readme-rpc',
+        'tests/types/docs-readme-http-contract',
+        'tests/types/docs-readme-http',
+      ],
+    ],
+    [
+      'getting-started/quick-start',
+      ['tests/types/docs-rpc-quick-start-contract', 'tests/types/docs-rpc-quick-start'],
+    ],
+    [
+      'getting-started/http-quick-start',
+      ['tests/types/docs-http-quick-start-contract', 'tests/types/docs-http-quick-start'],
+    ],
+    [
+      'guides/react-query',
+      [
+        'tests/types/docs-readme-http-contract',
+        'tests/types/docs-react-client',
+        'tests/types/docs-react-setup.tsx',
+        'tests/types/docs-react-entry',
+      ],
+    ],
     ['guides/suspense-and-recovery', ['tests/types/docs-suspense.tsx']],
-    ['guides/trace-streams', ['tests/types/docs-stream-tracing']],
+    [
+      'guides/trace-streams',
+      ['tests/types/docs-stream-tracing-contract', 'tests/types/docs-stream-tracing'],
+    ],
     ['guides/query-defaults', ['tests/types/docs-policies']],
     ['reference/type-inference', ['tests/types/docs-policies']],
     ['guides/queries', ['tests/types/docs-functionality']],
@@ -70,6 +95,12 @@ const program = Effect.gen(function* () {
       sources.push(
         source
           .replaceAll("from '#effect-api-query'", "from 'effect-api-query'")
+          .replaceAll("from './docs-readme-rpc-contract.ts'", "from './rpc-contract.ts'")
+          .replaceAll("from './docs-readme-http-contract.ts'", "from './http-contract.ts'")
+          .replaceAll("from './docs-rpc-quick-start-contract.ts'", "from './rpc-contract.ts'")
+          .replaceAll("from './docs-http-quick-start-contract.ts'", "from './http-contract.ts'")
+          .replaceAll("from './docs-react-client.ts'", "from './client.ts'")
+          .replaceAll("from './docs-stream-tracing-contract.ts'", "from './feed-contract.ts'")
           .replaceAll("from './docs-react-setup.tsx'", "from './users-app.tsx'")
           .replaceAll("from '../fixtures/user-events.ts'", "from './user-events.ts'")
           .trimEnd()

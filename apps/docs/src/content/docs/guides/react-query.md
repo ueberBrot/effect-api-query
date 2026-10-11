@@ -9,27 +9,24 @@ capture plain input for that execution.
 
 ## Acquire and mount the client
 
-Create a small client module and mount it once from your application entry point.
+Keep the shared contract, client lifetime, and React UI in separate modules. Mount the application
+once from its entry point.
+
 This read-only example requires React, React DOM, `@tanstack/react-query`, Effect, and
 `effect-api-query`. The server must implement the shared contract below: `GET /users/:id`
 returns `{ id: number, name: string }`.
 
-### Contract and ready client
+### Shared contract
 
-Place this code in `users-app.tsx`. Move `usersApi` to your shared contract module when connecting
-it to a real server. `startUsersApplication` acquires the ready HTTP API client and keeps one runtime
-and QueryClient alive until `dispose` runs.
+Place `usersApi` in `http-contract.ts`. Both the server and client import this module.
 
-```tsx
-import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
-import { ManagedRuntime, Schema } from 'effect'
-import { createHttpApiQueryUtils } from 'effect-api-query'
-import type { RunPromiseExit } from 'effect-api-query'
-import { FetchHttpClient } from 'effect/http'
-import { HttpApi, HttpApiClient, HttpApiEndpoint, HttpApiGroup } from 'effect/http-api'
-import { createRoot } from 'react-dom/client'
+**Shared contract — `http-contract.ts`**
 
-const usersApi = HttpApi.make('users-api').add(
+```ts
+import { Schema } from 'effect'
+import { HttpApi, HttpApiEndpoint, HttpApiGroup } from 'effect/http-api'
+
+export const usersApi = HttpApi.make('users-api').add(
   HttpApiGroup.make('users').add(
     HttpApiEndpoint.get('get', '/users/:id', {
       params: { id: Schema.Int },
@@ -37,8 +34,26 @@ const usersApi = HttpApi.make('users-api').add(
     }),
   ),
 )
+```
 
-const startUsersApplication = async (baseUrl: string) => {
+### Client lifetime
+
+In `client.ts`, `startUsersApplication` acquires the ready HTTP API client and keeps one runtime
+and QueryClient alive until `dispose` runs. Export its application type for the UI module.
+
+**Client integration — `client.ts`**
+
+```ts
+import { QueryClient } from '@tanstack/react-query'
+import { ManagedRuntime } from 'effect'
+import { createHttpApiQueryUtils } from 'effect-api-query'
+import type { RunPromiseExit } from 'effect-api-query'
+import { FetchHttpClient } from 'effect/http'
+import { HttpApiClient } from 'effect/http-api'
+
+import { usersApi } from './http-contract.ts'
+
+export const startUsersApplication = async (baseUrl: string) => {
   const runtime = ManagedRuntime.make(FetchHttpClient.layer)
   const running = new Set<Promise<unknown>>()
   const runPromiseExit: RunPromiseExit = (effect, options) => {
@@ -79,6 +94,8 @@ const startUsersApplication = async (baseUrl: string) => {
     throw error
   }
 }
+
+export type UsersApplication = Awaited<ReturnType<typeof startUsersApplication>>
 ```
 
 The supplied runner forwards TanStack's abort options and tracks in-flight reads. After cancellation,
@@ -87,11 +104,17 @@ before React renders. Acquisition failures also dispose the runtime.
 
 ### Component and provider
 
-Continue in the same module. The component receives the ready utility tree through props;
-`QueryClientProvider` exposes the matching cache to React Query.
+In `users-app.tsx`, import the client setup and its application type. The component receives the
+ready utility tree through props; `QueryClientProvider` exposes the matching cache to React Query.
+
+**React UI — `users-app.tsx`**
 
 ```tsx
-type UsersApplication = Awaited<ReturnType<typeof startUsersApplication>>
+import { QueryClientProvider, useQuery } from '@tanstack/react-query'
+import { createRoot } from 'react-dom/client'
+
+import { startUsersApplication } from './client.ts'
+import type { UsersApplication } from './client.ts'
 
 const User = ({ application }: { readonly application: UsersApplication }) => {
   const user = useQuery(application.http.users.get.queryOptions({ input: { params: { id: 1 } } }))
@@ -123,6 +146,8 @@ export const mountUsersApplication = async (element: HTMLElement, baseUrl: strin
 
 In `main.tsx`, mount into the root element supplied by your HTML page. Replace the base URL with
 your server's URL.
+
+**Application entry point — `main.tsx`**
 
 ```ts
 import { mountUsersApplication } from './users-app.tsx'

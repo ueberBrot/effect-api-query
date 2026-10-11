@@ -7,20 +7,18 @@ First [install the package](/effect-api-query/getting-started/installation/). Th
 serve the same `usersApi` contract at `http://localhost:3000`. Share the contract between your
 server and browser application.
 
-## Acquire the client and execute requests
+## Define the shared contract
 
-This complete module defines the API, acquires the ready client through a ManagedRuntime,
-reads a user, writes a user, and releases its resources. Replace the base URL with your server.
+Place the declaration in `http-contract.ts`. Both the server and client import this module.
+
+**Shared contract — `http-contract.ts`**
 
 ```ts
-import { MutationObserver, QueryClient } from '@tanstack/query-core'
-import { Effect, ManagedRuntime, Schema } from 'effect'
-import { createHttpApiQueryUtils } from 'effect-api-query'
-import { FetchHttpClient } from 'effect/http'
-import { HttpApi, HttpApiClient, HttpApiEndpoint, HttpApiGroup } from 'effect/http-api'
+import { Effect, Schema } from 'effect'
+import { HttpApi, HttpApiEndpoint, HttpApiGroup } from 'effect/http-api'
 
 const User = Schema.Struct({ id: Schema.Int, name: Schema.String })
-const usersApi = HttpApi.make('users-api').add(
+export const usersApi = HttpApi.make('users-api').add(
   HttpApiGroup.make('users').add(
     HttpApiEndpoint.get('get', '/users/:id', {
       params: { id: Schema.Int },
@@ -35,6 +33,23 @@ const usersApi = HttpApi.make('users-api').add(
     }),
   ),
 )
+```
+
+## Acquire the client and execute requests
+
+This client module acquires the ready client through a ManagedRuntime, reads a user, writes a
+user, and releases its resources. Replace the base URL with your server.
+
+**Client integration — `client.ts`**
+
+```ts
+import { MutationObserver, QueryClient } from '@tanstack/query-core'
+import { ManagedRuntime } from 'effect'
+import { createHttpApiQueryUtils } from 'effect-api-query'
+import { FetchHttpClient } from 'effect/http'
+import { HttpApiClient } from 'effect/http-api'
+
+import { usersApi } from './http-contract.ts'
 
 const runtime = ManagedRuntime.make(FetchHttpClient.layer)
 const queryClient = new QueryClient()
@@ -83,7 +98,7 @@ See [HTTP Factory](/effect-api-query/reference/http-factory/).
 
 ## Keep a browser client alive
 
-The module above awaits its mutation before disposal. For components, acquire once before
+The client module above awaits its mutation before disposal. For components, acquire once before
 mounting and keep the client alive for the application lifetime. Follow
 [React client setup](/effect-api-query/guides/react-query/#acquire-and-mount-the-client) for a complete provider,
 component, and cleanup callback.
