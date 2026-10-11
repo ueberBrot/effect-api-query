@@ -18,6 +18,7 @@ const program = Effect.gen(function* () {
   const fs = yield* FileSystem.FileSystem
   const path = yield* Path.Path
   for (const [page, fixtures] of [
+    ['README.md', ['tests/types/docs-readme-rpc', 'tests/types/docs-readme-http']],
     ['getting-started/quick-start', ['tests/types/docs-rpc-quick-start']],
     ['getting-started/http-quick-start', ['tests/types/docs-http-quick-start']],
     ['guides/react-query', ['tests/types/docs-react-setup.tsx', 'tests/types/docs-react-entry']],
@@ -51,7 +52,10 @@ const program = Effect.gen(function* () {
     const markdown = decodeUtf8(
       yield* fs.readFile(
         yield* path.fromFileUrl(
-          new URL(`../apps/docs/src/content/docs/${page}.md`, import.meta.url),
+          new URL(
+            page === 'README.md' ? '../README.md' : `../apps/docs/src/content/docs/${page}.md`,
+            import.meta.url,
+          ),
         ),
       ),
     )

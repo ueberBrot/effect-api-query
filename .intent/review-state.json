@@ -3,10 +3,10 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "72c2635ec622c40f59dfa104a88b9226ee36bd5ab9358d84d477862912608c67",
+      "fingerprint": "aa5a86ba2ce9edcfaf62e73f06f34b3e6b6504b709153f5c4961c8c085532b90",
       "snapshot": {
         "GLOSSARY.md": "ad19a69727108dd047208b6e76e05f5b1d241620ed75cb241a62fb4c068dc792",
-        "README.md": "5bae76fc8ff649c10add915b41ed4d46bc026a839a34e4fed91e6db6418f0bed",
+        "README.md": "fd60880b03b69efdd8300aeee473fdf1a5b2894e5f3f1d4a701525a0ac2fa967",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "fcbaca84f266060b946eed9cbf9d0b9815352b7b1d6ddaff5803b29484345380",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "f1505ec3eb35a33fac289706c2cc318a2ffb80555e3302ca102e67e21c9012da",
         "apps/docs/src/content/docs/concepts/http-utility-tree.md": "ed03938167f31822b76efbeac381fd3f8d297061fe567928ee022f8dbfadb9b4",
@@ -137,7 +137,7 @@
         "pnpm-workspace.yaml": "1e73526ddc3448a43e8cfc77e98bad98d15d0617dc2e8caf98e6d5d43fa90641",
         "scripts/decode-utf8.mts": "2e90c53e95c22b864a209a87c98084db6ec95e83f842007b21528d286d45c18c",
         "scripts/measure-construction.mts": "10522cb10ab51fd44d8990896a2a73e8bf4d4cd2646441e958b6180cb1afd147",
-        "scripts/verify-docs-examples.mts": "cc843d98c440e7cf21e59e206cd7648bca22c432b25c4f4e3eadc8702f2b0f70",
+        "scripts/verify-docs-examples.mts": "9ba75dd2952a8ee92995904ce9891b6757b10637a298646b95f9af73d270caf8",
         "scripts/verify-packed-consumer.mts": null,
         "skills/effect-api-query/SKILL.md": "41c0a5768977c0e25254f559de4454df7d9dc5fb6075487d65a6a52602b0e7d4",
         "skills/effect-api-query/references/cache-workflows.md": "61d3d363b410eac3f52273e642ec2924d29e887f365a7c21a965a52deeded0be",
@@ -210,6 +210,8 @@
         "tests/types/docs-policies.ts": "b52d09f03131797873d73ac73d48639010136673b9ac98b866762099899e79a4",
         "tests/types/docs-react-entry.ts": "cfe186d60a53553103ef292261b48b09b5094d927b1f198f2d3c8bd6f08325d1",
         "tests/types/docs-react-setup.tsx": "bf0bfb164818366487ce2742699589c62fee4ec5bcb9e906f7d8c423251ecf65",
+        "tests/types/docs-readme-http.ts": "f15c8d87a1522328bbec1bc81d6e7573d406a88134f37e2dfab4c2e4dfe877d5",
+        "tests/types/docs-readme-rpc.ts": "e41aaf93b7fd61f619a2a3fb1132ffe5c027dfe17040b5ba061fa3591f31c69d",
         "tests/types/docs-retry.ts": "78c782810b772e152ea0c47074fb2546fed5d397b93b147862644859fd20cc25",
         "tests/types/docs-rpc-quick-start.ts": "95deee30de122cbaa7b9cb28257c234aa1162a0b549a87cf50a80bd84e871081",
         "tests/types/docs-stream-snapshot.ts": "bc924cff90a9f9a8e416bf7fbdfedbd607c88e7a678435aaf20ef878862e06ff",
@@ -228,23 +230,24 @@
         "tests/types/tanstack-start-contract.ts": "51681e3d0d7504a614d490f18adb6f44db82d34b9d4d7cb9cf941aea33de284f",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "d870776a5f37835467beb611c6ca6a51fe3933eb",
+      "head": "3e3fd371f097ad7a7f430b73f09c69ef711acff4",
       "outcome": "no-change",
-      "reason": "Shared private types now own encoder-map presence, runner presence and plain key-builder arguments. Both adapters retain their eligibility, inputless proofs, service calculations, key data and policies. The published call contract and compiled runtime remain equivalent; existing RPC/HTTP setup, query-patterns and execution guidance remain accurate, so no guidance rewrite or version bump is warranted.",
+      "reason": "The README consolidates existing RPC and HTTP setup into compact concrete examples without changing the supported API, ready-client ownership, runner requirements, cache identity or workflow. Existing shipped RPC/HTTP and framework references already cover these contracts; no guidance rewrite is warranted.",
       "evidence": [
-        "Focused change from the pre-refactor working-tree snapshots under /tmp/eaq-type-refactor-before: src/core/types.ts, src/http/types.ts and src/rpc/types.ts. Existing source revision is d870776a5f37835467beb611c6ca6a51fe3933eb; earlier authorized architecture changes are preserved.",
-        "Independent review verified unchanged tuple never guards, adapter encoder eligibility and map layouts, client service unions, RPC AST.Void inputless proofs and HTTP void-request proofs. KeyBuilder uses a non-distributive definite-true guard. Policy-taking streamed/live key builders and root exports are unchanged.",
-        "Published TypeScript 7.0.2 and 5.9.3 fixtures passed via vp run --no-cache --ignore-depends-on api-types after completing pack. Added three public factory negatives for empty encoder maps without eligible inputs (RPC and HTTP) and required RPC execution runners despite supplied encoders. Existing broad Unknown/Any/void-union, inputless, tagged-key and overload assertions pass.",
-        "vp run --no-cache pack passed declaration emission, attw and publint. cmp confirmed dist/index.mjs is byte-identical to the pre-refactor bundle. Runtime tests were not repeated for this type-only refactor.",
-        "Full type-aware lint/typecheck passed on 150 files with zero warnings/errors. Strict Effect diagnostics checked 177 files with zero errors/warnings and one pre-existing TaggedStruct suggestion. Formatting passed on 302 files. All four uncached Fallow tasks passed; remaining source similarities were inspected, including generic-binding false positives. No new suppressions or dependencies were added.",
-        "Intent sync reported Nothing to synchronize. The three planning records and the owned skill plus affected RPC, HTTP and query-pattern references retain accurate coverage and source mappings. No recommendation, activation text, version claim or consumer workflow changes; fresh consumer/discovery checks were not repeated for this internal type-only refactor."
+        "Reviewed actual diff at HEAD 3e3fd371f097ad7a7f430b73f09c69ef711acff4: README.md, scripts/verify-docs-examples.mts, tests/types/docs-readme-rpc.ts and tests/types/docs-readme-http.ts. No library source, manifest, dependency, export or workflow change remains.",
+        "README now follows the approved purpose/install/RPC/HTTP/capabilities/links outline and uses published-package wording. Concrete service-free contracts accept typed ready clients; client acquisition/lifetime and required execution services remain application-owned. Checked ordinary HttpApiClient.make captures HttpClient during acquisition and returns default service-free Client<Groups>, consistent with the HTTP snippet.",
+        "vp run --no-cache pack passed ESM/declaration generation, strict publint and Are the Types Wrong. Inspected the local npm archive: effect peer resolves to exactly 4.0.0, Query Core range remains >=5.103.1 <6, root exports point to dist, and all seven shipped skill/reference files are included.",
+        "vp run --no-cache --ignore-depends-on api-types passed every public fixture, including both exact README examples, under TypeScript 7.0.2 and 5.9.3. The pre-existing docs-hydration-views TaggedStruct suggestion is non-failing.",
+        "vp run --no-cache docs-check passed exact snippets and Astro (0 errors/warnings/hints). After final fixture formatting, node scripts/verify-docs-examples.mts passed again. Type-aware lint/typecheck passed all 150 checked files with no errors or warnings; final vp run format passed 304 files and git diff --check passed.",
+        "Exact pushed HEAD 3e3fd371 passed all six CI jobs in run 38161476267: source quality, example builds, documentation, Chromium, Firefox and WebKit. Current uncommitted README/fixture/verifier changes received the separate local checks above; runtime tests were not repeated for this documentation-only change.",
+        "Read the owned skill and affected RPC, HTTP and framework references plus all three planning records. Intent sync reported Nothing to synchronize. No new API recommendation, activation rule, domain task, failure mode or source boundary; fresh consumer/discovery testing was not repeated because shipped guidance is unchanged."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "0c4f9fe9071a4c69194882c62ecc2f2967ab1aaa7338e8f59f95be715dc533ca",
+      "fingerprint": "3d7d7aec4b7470c0976ab35090f6642fc8f17eb3c938d52311ada6299a29119c",
       "snapshot": {
         "GLOSSARY.md": "ad19a69727108dd047208b6e76e05f5b1d241620ed75cb241a62fb4c068dc792",
-        "README.md": "5bae76fc8ff649c10add915b41ed4d46bc026a839a34e4fed91e6db6418f0bed",
+        "README.md": "fd60880b03b69efdd8300aeee473fdf1a5b2894e5f3f1d4a701525a0ac2fa967",
         "_artifacts/domain_map.yaml": "03379e3cd6338cb4bb20bd15408af2ff86accf9fa009259f715123be50681d3c",
         "_artifacts/skill_spec.md": "93dbe6009f951ddb49a350b85ce212f1b092bbd381cf2a1425ab3e243200e199",
         "_artifacts/skill_tree.yaml": "0ef24d94a4bbc5c4b628892a130c2b36a81a16c5705a48e990919b5eec467a47",
@@ -378,7 +381,7 @@
         "pnpm-workspace.yaml": "1e73526ddc3448a43e8cfc77e98bad98d15d0617dc2e8caf98e6d5d43fa90641",
         "scripts/decode-utf8.mts": "2e90c53e95c22b864a209a87c98084db6ec95e83f842007b21528d286d45c18c",
         "scripts/measure-construction.mts": "10522cb10ab51fd44d8990896a2a73e8bf4d4cd2646441e958b6180cb1afd147",
-        "scripts/verify-docs-examples.mts": "cc843d98c440e7cf21e59e206cd7648bca22c432b25c4f4e3eadc8702f2b0f70",
+        "scripts/verify-docs-examples.mts": "9ba75dd2952a8ee92995904ce9891b6757b10637a298646b95f9af73d270caf8",
         "scripts/verify-packed-consumer.mts": null,
         "skills/effect-api-query/SKILL.md": "41c0a5768977c0e25254f559de4454df7d9dc5fb6075487d65a6a52602b0e7d4",
         "skills/effect-api-query/references/cache-workflows.md": "61d3d363b410eac3f52273e642ec2924d29e887f365a7c21a965a52deeded0be",
@@ -451,6 +454,8 @@
         "tests/types/docs-policies.ts": "b52d09f03131797873d73ac73d48639010136673b9ac98b866762099899e79a4",
         "tests/types/docs-react-entry.ts": "cfe186d60a53553103ef292261b48b09b5094d927b1f198f2d3c8bd6f08325d1",
         "tests/types/docs-react-setup.tsx": "bf0bfb164818366487ce2742699589c62fee4ec5bcb9e906f7d8c423251ecf65",
+        "tests/types/docs-readme-http.ts": "f15c8d87a1522328bbec1bc81d6e7573d406a88134f37e2dfab4c2e4dfe877d5",
+        "tests/types/docs-readme-rpc.ts": "e41aaf93b7fd61f619a2a3fb1132ffe5c027dfe17040b5ba061fa3591f31c69d",
         "tests/types/docs-retry.ts": "78c782810b772e152ea0c47074fb2546fed5d397b93b147862644859fd20cc25",
         "tests/types/docs-rpc-quick-start.ts": "95deee30de122cbaa7b9cb28257c234aa1162a0b549a87cf50a80bd84e871081",
         "tests/types/docs-stream-snapshot.ts": "bc924cff90a9f9a8e416bf7fbdfedbd607c88e7a678435aaf20ef878862e06ff",
@@ -469,16 +474,17 @@
         "tests/types/tanstack-start-contract.ts": "51681e3d0d7504a614d490f18adb6f44db82d34b9d4d7cb9cf941aea33de284f",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "d870776a5f37835467beb611c6ca6a51fe3933eb",
+      "head": "3e3fd371f097ad7a7f430b73f09c69ef711acff4",
       "outcome": "no-change",
-      "reason": "All three planning documents remain accurate: _artifacts/domain_map.yaml retains the existing RPC/HTTP factory and inferred key tasks and failure modes; _artifacts/skill_spec.md retains supported behavior and task evidence without inventing a new batch of guidance; _artifacts/skill_tree.yaml already maps src/**/*.ts and tests/**/*.ts. The internal refactor changes no task, recommendation, source coverage, dependency or skill identity; preserve these documents unchanged.",
+      "reason": "All three planning records remain accurate: domain_map.yaml retains the existing contract-query tasks, ownership boundaries and failure modes; skill_spec.md retains the same supported guidance and documented validation approach; skill_tree.yaml already maps README.md, scripts/*.mts and tests/**/*.ts. The README rewrite and its two compiler fixtures add no domain task, skill identity, recommendation or source boundary. Preserve the accurate records without a no-op history entry.",
       "evidence": [
-        "Focused change from the pre-refactor working-tree snapshots under /tmp/eaq-type-refactor-before: src/core/types.ts, src/http/types.ts and src/rpc/types.ts. Existing source revision is d870776a5f37835467beb611c6ca6a51fe3933eb; earlier authorized architecture changes are preserved.",
-        "Independent review verified unchanged tuple never guards, adapter encoder eligibility and map layouts, client service unions, RPC AST.Void inputless proofs and HTTP void-request proofs. KeyBuilder uses a non-distributive definite-true guard. Policy-taking streamed/live key builders and root exports are unchanged.",
-        "Published TypeScript 7.0.2 and 5.9.3 fixtures passed via vp run --no-cache --ignore-depends-on api-types after completing pack. Added three public factory negatives for empty encoder maps without eligible inputs (RPC and HTTP) and required RPC execution runners despite supplied encoders. Existing broad Unknown/Any/void-union, inputless, tagged-key and overload assertions pass.",
-        "vp run --no-cache pack passed declaration emission, attw and publint. cmp confirmed dist/index.mjs is byte-identical to the pre-refactor bundle. Runtime tests were not repeated for this type-only refactor.",
-        "Full type-aware lint/typecheck passed on 150 files with zero warnings/errors. Strict Effect diagnostics checked 177 files with zero errors/warnings and one pre-existing TaggedStruct suggestion. Formatting passed on 302 files. All four uncached Fallow tasks passed; remaining source similarities were inspected, including generic-binding false positives. No new suppressions or dependencies were added.",
-        "Intent sync reported Nothing to synchronize. The three planning records and the owned skill plus affected RPC, HTTP and query-pattern references retain accurate coverage and source mappings. No recommendation, activation text, version claim or consumer workflow changes; fresh consumer/discovery checks were not repeated for this internal type-only refactor."
+        "Reviewed actual diff at HEAD 3e3fd371f097ad7a7f430b73f09c69ef711acff4: README.md, scripts/verify-docs-examples.mts, tests/types/docs-readme-rpc.ts and tests/types/docs-readme-http.ts. No library source, manifest, dependency, export or workflow change remains.",
+        "README now follows the approved purpose/install/RPC/HTTP/capabilities/links outline and uses published-package wording. Concrete service-free contracts accept typed ready clients; client acquisition/lifetime and required execution services remain application-owned. Checked ordinary HttpApiClient.make captures HttpClient during acquisition and returns default service-free Client<Groups>, consistent with the HTTP snippet.",
+        "vp run --no-cache pack passed ESM/declaration generation, strict publint and Are the Types Wrong. Inspected the local npm archive: effect peer resolves to exactly 4.0.0, Query Core range remains >=5.103.1 <6, root exports point to dist, and all seven shipped skill/reference files are included.",
+        "vp run --no-cache --ignore-depends-on api-types passed every public fixture, including both exact README examples, under TypeScript 7.0.2 and 5.9.3. The pre-existing docs-hydration-views TaggedStruct suggestion is non-failing.",
+        "vp run --no-cache docs-check passed exact snippets and Astro (0 errors/warnings/hints). After final fixture formatting, node scripts/verify-docs-examples.mts passed again. Type-aware lint/typecheck passed all 150 checked files with no errors or warnings; final vp run format passed 304 files and git diff --check passed.",
+        "Exact pushed HEAD 3e3fd371 passed all six CI jobs in run 38161476267: source quality, example builds, documentation, Chromium, Firefox and WebKit. Current uncommitted README/fixture/verifier changes received the separate local checks above; runtime tests were not repeated for this documentation-only change.",
+        "Read the owned skill and affected RPC, HTTP and framework references plus all three planning records. Intent sync reported Nothing to synchronize. No new API recommendation, activation rule, domain task, failure mode or source boundary; fresh consumer/discovery testing was not repeated because shipped guidance is unchanged."
       ]
     },
     "source:vite.config.ts": {
