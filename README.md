@@ -19,24 +19,33 @@ match it. Use TypeScript 5.9 or newer with `strict: true`, ESM, and ES2022 suppo
 
 ## RPC
 
-Share this contract with your server and acquire a matching **flat RPC client** before calling
-`readUser`. Keep its Scope alive while the client is in use. The
+Import the shared contract from both your server and client. Acquire a matching **flat RPC client**
+before calling `readUser`, and keep its Scope alive while the client is in use. The
 [RPC quick start](https://ueberbrot.github.io/effect-api-query/getting-started/quick-start/)
 shows acquisition and cleanup.
 
-```ts
-import { QueryClient } from '@tanstack/query-core'
-import { Schema } from 'effect'
-import { createRpcQueryUtils } from 'effect-api-query'
-import { Rpc, RpcGroup } from 'effect/rpc'
-import type { RpcClient } from 'effect/rpc'
+**Shared contract — `rpc-contract.ts`**
 
-const usersRpc = RpcGroup.make(
+```ts
+import { Schema } from 'effect'
+import { Rpc, RpcGroup } from 'effect/rpc'
+
+export const usersRpc = RpcGroup.make(
   Rpc.make('users.get', {
     payload: { id: Schema.Int },
     success: Schema.Struct({ id: Schema.Int, name: Schema.String }),
   }),
 )
+```
+
+**Client integration — `client.ts`**
+
+```ts
+import { QueryClient } from '@tanstack/query-core'
+import { createRpcQueryUtils } from 'effect-api-query'
+import type { RpcClient, RpcGroup } from 'effect/rpc'
+
+import { usersRpc } from './rpc-contract.ts'
 
 async function readUser(
   client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof usersRpc>>,
@@ -53,19 +62,18 @@ payload Schema's constructor input.
 
 ## HTTP
 
-Share this HttpApi with your server and acquire its **ready HttpApiClient** before calling
-`readUser`. Keep its transport resources alive while the client is in use. The
+Import the shared HttpApi from both your server and client. Acquire its **ready HttpApiClient**
+before calling `readUser`, and keep its transport resources alive while the client is in use. The
 [HTTP quick start](https://ueberbrot.github.io/effect-api-query/getting-started/http-quick-start/)
 shows acquisition and cleanup.
 
-```ts
-import { QueryClient } from '@tanstack/query-core'
-import { Schema } from 'effect'
-import { createHttpApiQueryUtils } from 'effect-api-query'
-import { HttpApi, HttpApiEndpoint, HttpApiGroup } from 'effect/http-api'
-import type { HttpApiClient } from 'effect/http-api'
+**Shared contract — `http-contract.ts`**
 
-const usersApi = HttpApi.make('users-api').add(
+```ts
+import { Schema } from 'effect'
+import { HttpApi, HttpApiEndpoint, HttpApiGroup } from 'effect/http-api'
+
+export const usersApi = HttpApi.make('users-api').add(
   HttpApiGroup.make('users').add(
     HttpApiEndpoint.get('get', '/users/:id', {
       params: { id: Schema.Int },
@@ -73,6 +81,16 @@ const usersApi = HttpApi.make('users-api').add(
     }),
   ),
 )
+```
+
+**Client integration — `client.ts`**
+
+```ts
+import { QueryClient } from '@tanstack/query-core'
+import { createHttpApiQueryUtils } from 'effect-api-query'
+import type { HttpApiClient } from 'effect/http-api'
+
+import { usersApi } from './http-contract.ts'
 
 async function readUser(client: HttpApiClient.ForApi<typeof usersApi>, queryClient: QueryClient) {
   const http = createHttpApiQueryUtils(usersApi, { client, keyPrefix: ['users-app'] })

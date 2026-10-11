@@ -1,15 +1,8 @@
 import { QueryClient } from '@tanstack/query-core'
-import { Schema } from 'effect'
 import { createRpcQueryUtils } from 'effect-api-query'
-import { Rpc, RpcGroup } from 'effect/rpc'
-import type { RpcClient } from 'effect/rpc'
+import type { RpcClient, RpcGroup } from 'effect/rpc'
 
-const usersRpc = RpcGroup.make(
-  Rpc.make('users.get', {
-    payload: { id: Schema.Int },
-    success: Schema.Struct({ id: Schema.Int, name: Schema.String }),
-  }),
-)
+import { usersRpc } from './docs-readme-rpc-contract.ts'
 
 async function readUser(
   client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof usersRpc>>,

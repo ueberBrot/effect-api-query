@@ -1,23 +1,10 @@
 import { MutationObserver, QueryClient } from '@tanstack/query-core'
-import { Effect, Exit, Layer, Schema, Scope } from 'effect'
+import { Effect, Exit, Layer, Scope } from 'effect'
 import { createRpcQueryUtils } from 'effect-api-query'
 import { FetchHttpClient } from 'effect/http'
-import { Rpc, RpcClient, RpcGroup, RpcSerialization } from 'effect/rpc'
+import { RpcClient, RpcSerialization } from 'effect/rpc'
 
-const User = Schema.Struct({ id: Schema.Int, name: Schema.String })
-const usersRpc = RpcGroup.make(
-  Rpc.make('users.get', {
-    payload: {
-      id: Schema.Int,
-      locale: Schema.String.pipe(Schema.withConstructorDefault(Effect.succeed('en'))),
-    },
-    success: User,
-  }),
-  Rpc.make('users.create', {
-    payload: { name: Schema.String },
-    success: User,
-  }),
-)
+import { usersRpc } from './docs-rpc-quick-start-contract.ts'
 
 const protocol = RpcClient.layerProtocolHttp({ url: 'http://localhost:3000/rpc' }).pipe(
   Layer.provide(RpcSerialization.layerJson),

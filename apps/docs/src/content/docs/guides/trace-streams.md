@@ -7,36 +7,45 @@ Configure telemetry in the application's runtime and instrument the stream that 
 returns. A span around the `runPromiseExit` creation Effect ends when it returns the iterable.
 Actual stream pulls happen later; they need their own span.
 
-## Attach a span to the decoded stream
+## Define the shared feed contract
 
-This client module declares a string SSE feed at `GET /events`. Its response transformation wraps
-only decoded streams and passes other values through. HttpApiClient applies that transformation
-before response-mode wrapping, so the client retains its native request options and response
-contract. Keep header-wrapped stream schemas intact if your API declares them; this simple feed
-has no decoded header wrapper.
+Place the string SSE feed declaration in `feed-contract.ts`. The server and client import the
+same contract for `GET /events`.
+
+**Shared contract — `feed-contract.ts`**
 
 ```ts
-import { QueryClient } from '@tanstack/query-core'
-import { Effect, Layer, ManagedRuntime, Schema, Stream, Tracer } from 'effect'
-import { createHttpApiQueryUtils, fetchStreamSnapshot } from 'effect-api-query'
-import type { RunPromiseExit } from 'effect-api-query'
-import { FetchHttpClient } from 'effect/http'
-import {
-  HttpApi,
-  HttpApiClient,
-  HttpApiEndpoint,
-  HttpApiGroup,
-  HttpApiSchema,
-} from 'effect/http-api'
-import { OtlpSerialization, OtlpTracer } from 'effect/observability'
+import { Schema } from 'effect'
+import { HttpApi, HttpApiEndpoint, HttpApiGroup, HttpApiSchema } from 'effect/http-api'
 
-const feedApi = HttpApi.make('feed-api').add(
+export const feedApi = HttpApi.make('feed-api').add(
   HttpApiGroup.make('events').add(
     HttpApiEndpoint.get('watch', '/events', {
       success: HttpApiSchema.StreamSse({ data: Schema.String }),
     }),
   ),
 )
+```
+
+## Attach a span to the decoded stream
+
+In `trace-feed.ts`, the response transformation wraps only decoded streams and passes other values
+through. HttpApiClient applies it before response-mode wrapping, so the client retains its native
+request options and response contract. Keep header-wrapped stream schemas intact if your API
+declares them; this simple feed has no decoded header wrapper.
+
+**Client tracing — `trace-feed.ts`**
+
+```ts
+import { QueryClient } from '@tanstack/query-core'
+import { Effect, Layer, ManagedRuntime, Stream, Tracer } from 'effect'
+import { createHttpApiQueryUtils, fetchStreamSnapshot } from 'effect-api-query'
+import type { RunPromiseExit } from 'effect-api-query'
+import { FetchHttpClient } from 'effect/http'
+import { HttpApiClient } from 'effect/http-api'
+import { OtlpSerialization, OtlpTracer } from 'effect/observability'
+
+import { feedApi } from './feed-contract.ts'
 
 export const traceFeed = <A, E, R>(source: Stream.Stream<A, E, R>) =>
   Stream.unwrap(
@@ -66,10 +75,12 @@ without exporting emitted data, request input, or credentials.
 
 ## Supply the runtime and await cleanup
 
-Use Effect's OTLP tracer with an exporter URL, such as your collector's `/v1/traces` endpoint.
-This function configures a runtime, acquires the ready client, injects a signal-aware runner,
-and captures one live value. Its snapshot helper stops the iterator and awaits local cleanup
-before the runtime is disposed.
+Continue in `trace-feed.ts`. Use Effect's OTLP tracer with an exporter URL, such as your collector's
+`/v1/traces` endpoint. This function configures a runtime, acquires the ready client, injects a
+signal-aware runner, and captures one live value. Its snapshot helper stops the iterator and awaits
+local cleanup before the runtime is disposed.
+
+**Client capture — `trace-feed.ts` (continued)**
 
 ```ts
 const captureTracedFeed = async (baseUrl: string, collectorUrl: string, signal: AbortSignal) => {

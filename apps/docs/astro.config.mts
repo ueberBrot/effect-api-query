@@ -36,7 +36,7 @@ export default defineConfig({
         starlightThemeBlack({
           navLinks: [
             {
-              label: `v${packageManifest.version}`,
+              label: 'npm',
               link: packageUrl,
             },
           ],

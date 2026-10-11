@@ -129,10 +129,11 @@ jobs:
           NPM_CONFIG_ACCESS: public
           NPM_CONFIG_PROVENANCE: true
 
+  # Docs-only merges deploy after validation without requiring npm publication.
   deploy-docs:
-    name: Deploy published documentation
-    if: needs.publish.result == 'success'
-    needs: publish
+    name: Deploy documentation
+    if: github.ref == 'refs/heads/main' && needs.validation.result == 'success'
+    needs: validation
     permissions:
       contents: read
       id-token: write

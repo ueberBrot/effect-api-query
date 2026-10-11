@@ -1,7 +1,5 @@
 import { expect, test } from '@playwright/test'
 
-import packageManifest from '../package.json' with { type: 'json' }
-
 const docsBase = '/effect-api-query/'
 const registryUrl = 'https://registry.npmjs.org/effect-api-query/latest'
 const packageUrl = 'https://www.npmjs.com/package/effect-api-query'
@@ -139,7 +137,7 @@ test('shows the latest published version from the package registry', async ({ pa
 })
 
 for (const failure of ['unpublished package', 'network failure', 'invalid version'] as const) {
-  test(`retains the build version after ${failure}`, async ({ page }) => {
+  test(`keeps the npm link without claiming a version after ${failure}`, async ({ page }) => {
     await page.route(registryUrl, async (route) => {
       if (failure === 'network failure') {
         return route.abort('failed')
@@ -153,10 +151,10 @@ for (const failure of ['unpublished package', 'network failure', 'invalid versio
     await page.goto(docsBase, { waitUntil: 'networkidle' })
     await request
     const links = page.locator(`a[href="${packageUrl}"]`)
-    await expect(links.first()).toHaveText(`v${packageManifest.version}`)
+    await expect(links.first()).toHaveText('npm')
     /* oxlint-disable eslint/no-await-in-loop */
     for (const link of await links.all()) {
-      await expect(link).toHaveText(`v${packageManifest.version}`)
+      await expect(link).toHaveText('npm')
     }
     /* oxlint-enable eslint/no-await-in-loop */
   })
