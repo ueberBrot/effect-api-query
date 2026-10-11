@@ -61,12 +61,21 @@ it.effect.each(['global', 'prefix'] as const)(
         Rpc.make('watch', { success: Schema.Undefined, stream: true }),
       )
       const finalized = yield* Deferred.make<undefined>()
+      let closed = 0
       const client = yield* makeRpcTestClient(group, {
         read: () => Effect.succeed('server'),
         watch: () =>
           Stream.succeed(undefined).pipe(
             Stream.concat(Stream.never),
-            Stream.ensuring(Deferred.succeed(finalized, undefined)),
+            Stream.ensuring(
+              Effect.sync(() => {
+                closed += 1
+              }).pipe(
+                Effect.flatMap(() =>
+                  closed === 2 ? Deferred.succeed(finalized, undefined) : Effect.void,
+                ),
+              ),
+            ),
           ),
       })
       const rpc = createRpcQueryUtils(group, { client, keyPrefix: ['hashing'] })
@@ -87,13 +96,28 @@ it.effect.each(['global', 'prefix'] as const)(
       const options = rpc.watch.liveOptions()
       const observer = new QueryObserver(queryClient, options)
       const unsubscribe = observer.subscribe(() => {})
+      const history = new QueryObserver(queryClient, rpc.watch.streamedOptions())
+      const stopHistory = history.subscribe(() => {})
       try {
         yield* waitForQueryState(
           queryClient,
-          () => observer.getCurrentResult().status === 'success',
+          () =>
+            observer.getCurrentResult().status === 'success' &&
+            history.getCurrentResult().status === 'success',
         )
         expect(observer.getCurrentResult()).toMatchObject({ data: null, fetchStatus: 'fetching' })
         expect(queryClient.getQueryData(rpc.watch.liveKey())).toBeNull()
+        expect(history.getCurrentResult()).toMatchObject({
+          data: [undefined],
+          fetchStatus: 'fetching',
+        })
+        expect(queryClient.getQueryData(rpc.watch.streamedKey())).toStrictEqual([undefined])
+        queryClient.setQueryData(rpc.watch.liveKey(), null)
+        queryClient.setQueryData(rpc.watch.streamedKey(), [undefined, undefined])
+        expect(queryClient.getQueryData(rpc.watch.streamedKey())).toStrictEqual([
+          undefined,
+          undefined,
+        ])
         expect(
           yield* Effect.promise(async () => await queryClient.query(rpc.read.queryOptions())),
         ).toBe('server')
@@ -101,7 +125,21 @@ it.effect.each(['global', 'prefix'] as const)(
         expect(
           yield* Effect.promise(async () => await queryClient.query(rpc.read.queryOptions())),
         ).toBe('native')
-        expect(queryClient.getQueryCache().getAll()).toHaveLength(2)
+        const pages = rpc.read.infiniteOptions({
+          initialPageParam: 0,
+          getNextPageParam: () => {},
+        })
+        expect(
+          yield* Effect.promise(async () => await queryClient.infiniteQuery(pages)),
+        ).toStrictEqual({ pages: ['server'], pageParams: [0] })
+        queryClient.setQueryData(rpc.read.infiniteKey(), {
+          pages: ['native'],
+          pageParams: [0],
+        })
+        expect(
+          yield* Effect.promise(async () => await queryClient.infiniteQuery(pages)),
+        ).toStrictEqual({ pages: ['native'], pageParams: [0] })
+        expect(queryClient.getQueryCache().getAll()).toHaveLength(4)
         expect(
           queryClient
             .getQueryCache()
@@ -110,6 +148,10 @@ it.effect.each(['global', 'prefix'] as const)(
         ).toBe(true)
       } finally {
         unsubscribe()
+        stopHistory()
+        yield* Effect.promise(async () => {
+          await queryClient.cancelQueries()
+        })
         yield* Deferred.await(finalized)
         queryClient.clear()
       }
@@ -157,4 +199,68 @@ it.effect('keeps concurrent retention views independent through completion', () 
       queryClient.clear()
     }
   }),
+)
+
+it.effect.each([{ order: [4, 2] }, { order: [2, 4] }] as const)(
+  'fetches retention views in order $order and invalidates exact versus broad policies',
+  ({ order }) =>
+    Effect.gen(function* () {
+      const group = RpcGroup.make(Rpc.make('watch', { success: Schema.Int, stream: true }))
+      let calls = 0
+      const client = yield* makeRpcTestClient(group, {
+        watch: () => {
+          calls += 1
+          return Stream.make(1, 2, 3, 4)
+        },
+      })
+      const rpc = createRpcQueryUtils(group, { client, keyPrefix: ['retention-order'] })
+      const queryClient = new QueryClient({ defaultOptions: { queries: { staleTime: Infinity } } })
+      try {
+        for (const maxChunks of order) {
+          expect(
+            yield* Effect.promise(
+              async () => await queryClient.query(rpc.watch.streamedOptions({ maxChunks })),
+            ),
+          ).toStrictEqual(maxChunks === 2 ? [3, 4] : [1, 2, 3, 4])
+        }
+        const narrow = rpc.watch.streamedKey({ maxChunks: 2 })
+        const wide = rpc.watch.streamedKey({ maxChunks: 4 })
+        const append = rpc.watch.streamedOptions({ maxChunks: 2, refetchMode: 'append' })
+        yield* Effect.promise(async () => await queryClient.query(append))
+        yield* Effect.promise(async () => await queryClient.query(rpc.watch.liveOptions()))
+        queryClient.setQueryData(['unrelated'], 42)
+        yield* Effect.promise(async () => {
+          await queryClient.invalidateQueries({
+            queryKey: narrow,
+            exact: true,
+            refetchType: 'none',
+          })
+        })
+        expect(queryClient.getQueryState(narrow)?.isInvalidated).toBe(true)
+        expect(queryClient.getQueryState(wide)?.isInvalidated).toBe(false)
+        expect(queryClient.getQueryState(append.queryKey)?.isInvalidated).toBe(false)
+        queryClient.setQueryData(narrow, [3, 4])
+        yield* Effect.promise(async () => {
+          await queryClient.invalidateQueries({
+            queryKey: [...rpc.watch.key(), 'streamed'],
+            refetchType: 'none',
+          })
+        })
+        for (const key of [narrow, wide, append.queryKey]) {
+          expect(queryClient.getQueryState(key)?.isInvalidated).toBe(true)
+        }
+        expect(queryClient.getQueryState(rpc.watch.liveKey())?.isInvalidated).toBe(false)
+        yield* Effect.promise(async () => {
+          await queryClient.invalidateQueries({ queryKey: rpc.watch.key(), refetchType: 'none' })
+        })
+        expect(queryClient.getQueryState(rpc.watch.liveKey())?.isInvalidated).toBe(true)
+        expect(queryClient.getQueryState(['unrelated'])?.isInvalidated).toBe(false)
+        expect(queryClient.getQueryData(narrow)).toStrictEqual([3, 4])
+        expect(queryClient.getQueryData(wide)).toStrictEqual([1, 2, 3, 4])
+        expect(queryClient.getQueryCache().getAll()).toHaveLength(5)
+        expect(calls).toBe(4)
+      } finally {
+        queryClient.clear()
+      }
+    }),
 )

@@ -121,6 +121,65 @@ export type SuppliedQueryOptions<Options, Supplied, AdapterOptions> =
       > &
         Omit<SuppliedInitialData<Supplied>, 'input' | keyof AdapterOptions>
 
+export type InputQueryBuilder<
+  Input,
+  Data,
+  Error,
+  Key extends QueryKey,
+  SkippedKey extends QueryKey,
+  AdapterOptions,
+> = {
+  <
+    Selected = Data,
+    ActualInput extends Input = Input,
+    Supplied extends object = UninferredBuilderOptions,
+  >(
+    options: ExactBuilderOptions<
+      WithDefinedInitialData<
+        QueryInput<
+          Data,
+          Error,
+          Selected,
+          InputQueryOptions<ActualInput, Data, Error, Selected, Key, SkippedKey>['queryKey'],
+          AdapterOptions
+        >,
+        Data
+      > & { readonly input: ActualInput },
+      Supplied
+    >,
+  ): WithDefinedInitialData<
+    SuppliedQueryOptions<
+      InputQueryOptions<ActualInput, Data, Error, Selected, Key, SkippedKey>,
+      Supplied,
+      AdapterOptions
+    >,
+    Data
+  >
+  <
+    Selected = Data,
+    ActualInput extends Input = Input,
+    Supplied extends object = UninferredBuilderOptions,
+  >(
+    options: ExactBuilderOptions<
+      WithUndefinedInitialData<
+        QueryInput<
+          Data,
+          Error,
+          Selected,
+          InputQueryOptions<ActualInput, Data, Error, Selected, Key, SkippedKey>['queryKey'],
+          AdapterOptions
+        >,
+        Data
+      > & { readonly input: ActualInput },
+      Supplied
+    >,
+  ): SuppliedQueryOptions<
+    InputQueryOptions<ActualInput, Data, Error, Selected, Key, SkippedKey>,
+    Supplied,
+    AdapterOptions
+  >
+}
+
 /** Owns unary query inference; adapters supply their request, data, error, and key types. */
 export type UnaryQueryBuilder<
   Input,
@@ -155,150 +214,46 @@ export type UnaryQueryBuilder<
         >,
       ): SuppliedQueryOptions<QueryOptions<Data, Error, Selected, Key>, Supplied, AdapterOptions>
     }
-  : {
-      <
-        Selected = Data,
-        ActualInput extends SkipToken = SkipToken,
-        Supplied extends object = UninferredBuilderOptions,
-      >(
-        options: ExactBuilderOptions<
-          WithDefinedInitialData<
-            QueryInput<
-              Data,
-              Error,
-              Selected,
-              InputQueryOptions<ActualInput, Data, Error, Selected, Key, SkippedKey>['queryKey'],
-              AdapterOptions
-            >,
-            Data
-          > & { readonly input: ActualInput },
-          Supplied
-        >,
-      ): WithDefinedInitialData<
-        SuppliedQueryOptions<
-          InputQueryOptions<ActualInput, Data, Error, Selected, Key, SkippedKey>,
-          Supplied,
-          AdapterOptions
-        >,
-        Data
-      >
-      <
-        Selected = Data,
-        ActualInput extends SkipToken = SkipToken,
-        Supplied extends object = UninferredBuilderOptions,
-      >(
-        options: ExactBuilderOptions<
-          WithUndefinedInitialData<
-            QueryInput<
-              Data,
-              Error,
-              Selected,
-              InputQueryOptions<ActualInput, Data, Error, Selected, Key, SkippedKey>['queryKey'],
-              AdapterOptions
-            >,
-            Data
-          > & { readonly input: ActualInput },
-          Supplied
-        >,
-      ): SuppliedQueryOptions<
-        InputQueryOptions<ActualInput, Data, Error, Selected, Key, SkippedKey>,
-        Supplied,
-        AdapterOptions
-      >
-      <
-        Selected = Data,
-        ActualInput extends Input = Input,
-        Supplied extends object = UninferredBuilderOptions,
-      >(
-        options: ExactBuilderOptions<
-          WithDefinedInitialData<
-            QueryInput<
-              Data,
-              Error,
-              Selected,
-              InputQueryOptions<ActualInput, Data, Error, Selected, Key, SkippedKey>['queryKey'],
-              AdapterOptions
-            >,
-            Data
-          > & { readonly input: ActualInput },
-          Supplied
-        >,
-      ): WithDefinedInitialData<
-        SuppliedQueryOptions<
-          InputQueryOptions<ActualInput, Data, Error, Selected, Key, SkippedKey>,
-          Supplied,
-          AdapterOptions
-        >,
-        Data
-      >
-      <
-        Selected = Data,
-        ActualInput extends Input = Input,
-        Supplied extends object = UninferredBuilderOptions,
-      >(
-        options: ExactBuilderOptions<
-          WithUndefinedInitialData<
-            QueryInput<
-              Data,
-              Error,
-              Selected,
-              InputQueryOptions<ActualInput, Data, Error, Selected, Key, SkippedKey>['queryKey'],
-              AdapterOptions
-            >,
-            Data
-          > & { readonly input: ActualInput },
-          Supplied
-        >,
-      ): SuppliedQueryOptions<
-        InputQueryOptions<ActualInput, Data, Error, Selected, Key, SkippedKey>,
-        Supplied,
-        AdapterOptions
-      >
-      <Selected = Data, Supplied extends object = UninferredBuilderOptions>(
-        options: ExactBuilderOptions<
-          WithDefinedInitialData<
-            Omit<
-              ConditionalQueryOptions<Data, Error, Selected, Key | SkippedKey>,
-              OwnedQueryOption
-            >,
-            Data
-          > &
-            AdapterOptions & { readonly input: Input | SkipToken },
-          Supplied
-        >,
-      ): WithDefinedInitialData<
-        SuppliedQueryOptions<
+  : InputQueryBuilder<SkipToken, Data, Error, Key, SkippedKey, AdapterOptions> &
+      InputQueryBuilder<Input, Data, Error, Key, SkippedKey, AdapterOptions> & {
+        <Selected = Data, Supplied extends object = UninferredBuilderOptions>(
+          options: ExactBuilderOptions<
+            WithDefinedInitialData<
+              Omit<
+                ConditionalQueryOptions<Data, Error, Selected, Key | SkippedKey>,
+                OwnedQueryOption
+              >,
+              Data
+            > &
+              AdapterOptions & { readonly input: Input | SkipToken },
+            Supplied
+          >,
+        ): WithDefinedInitialData<
+          SuppliedQueryOptions<
+            ConditionalQueryOptions<Data, Error, Selected, Key | SkippedKey>,
+            Supplied,
+            AdapterOptions
+          >,
+          Data
+        >
+        <Selected = Data, Supplied extends object = UninferredBuilderOptions>(
+          options: ExactBuilderOptions<
+            WithUndefinedInitialData<
+              Omit<
+                ConditionalQueryOptions<Data, Error, Selected, Key | SkippedKey>,
+                OwnedQueryOption
+              >,
+              Data
+            > &
+              AdapterOptions & { readonly input: Input | SkipToken },
+            Supplied
+          >,
+        ): SuppliedQueryOptions<
           ConditionalQueryOptions<Data, Error, Selected, Key | SkippedKey>,
           Supplied,
           AdapterOptions
-        >,
-        Data
-      >
-      <Selected = Data, Supplied extends object = UninferredBuilderOptions>(
-        options: ExactBuilderOptions<
-          WithUndefinedInitialData<
-            Omit<
-              ConditionalQueryOptions<Data, Error, Selected, Key | SkippedKey>,
-              OwnedQueryOption
-            >,
-            Data
-          > &
-            AdapterOptions & { readonly input: Input | SkipToken },
-          Supplied
-        >,
-      ): SuppliedQueryOptions<
-        ConditionalQueryOptions<Data, Error, Selected, Key | SkippedKey>,
-        Supplied,
-        AdapterOptions
-      >
-      (
-        token: SkipToken,
-      ): SuppliedQueryOptions<
-        QueryOptions<Data, Error, Data, SkippedKey, SkipToken>,
-        Record<never, never>,
-        AdapterOptions
-      >
-    }
+        >
+      }
 
 export type InfiniteInput<
   Data,

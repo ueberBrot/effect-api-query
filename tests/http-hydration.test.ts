@@ -24,7 +24,7 @@ import {
   SnapshotEncoding,
 } from './types/docs-hydration-views.ts'
 
-it.effect('hydrates rich HTTP metadata and refetches an alternate declared success', () =>
+it.effect('hydrates buffered and metadata views and refetches an alternate declared success', () =>
   Effect.gen(function* () {
     const api = HttpApi.make('hydration-metadata').add(
       HttpApiGroup.make('profiles').add(
@@ -106,7 +106,16 @@ it.effect('hydrates rich HTTP metadata and refetches an alternate declared succe
       client: browserClient,
       keyPrefix: ['hydration-views', 'metadata'],
     }).profiles.read.metadataOptions({ retry: false, staleTime: Infinity })
+    const serverBuffered = createHttpApiQueryUtils(api, {
+      client: serverClient,
+      keyPrefix: ['hydration-views', 'buffered'],
+    }).profiles.read.queryOptions({ retry: false, staleTime: Infinity })
+    const browserBuffered = createHttpApiQueryUtils(api, {
+      client: browserClient,
+      keyPrefix: ['hydration-views', 'buffered'],
+    }).profiles.read.queryOptions({ retry: false, staleTime: Infinity })
     const initial = yield* Effect.promise(async () => await server.query(serverOptions))
+    yield* Effect.promise(async () => await server.query(serverBuffered))
     const json = yield* prepareViewSnapshot(server).pipe(
       Effect.provideService(SnapshotEncoding, encoding),
     )
@@ -119,6 +128,13 @@ it.effect('hydrates rich HTTP metadata and refetches an alternate declared succe
       Effect.provideService(SnapshotDecoding, decoding),
     )
     const hydrated = yield* Effect.promise(async () => await browser.query(browserOptions))
+    const hydratedBuffered = yield* Effect.promise(async () => await browser.query(browserBuffered))
+    expect(hydratedBuffered).toStrictEqual(hydrated.data)
+    if (!(hydratedBuffered.body instanceof Profile)) {
+      throw new TypeError('Expected a hydrated buffered Profile')
+    }
+    expect(hydratedBuffered.body.summary()).toBe('Ada: 9007199254740993 credits')
+    expect(hydratedBuffered.body.avatar).toStrictEqual(new Uint8Array([0, 1, 255]))
     expect(browserReads).toBe(0)
     expect(hydrated.data).toStrictEqual(
       HttpApiSchema.withHeaders({ body: profile, headers: { 'x-version': 4 } }),
@@ -138,6 +154,11 @@ it.effect('hydrates rich HTTP metadata and refetches an alternate declared succe
         exact: true,
         refetchType: 'none',
       })
+      await browser.invalidateQueries({
+        queryKey: browserBuffered.queryKey,
+        exact: true,
+        refetchType: 'none',
+      })
     })
     const refreshed = yield* Effect.promise(async () => await browser.query(browserOptions))
     expect(refreshed.data.body).toBeInstanceOf(ArchivedProfile)
@@ -145,6 +166,12 @@ it.effect('hydrates rich HTTP metadata and refetches an alternate declared succe
     expect(refreshed.data.headers['x-version']).toBe(7)
     expect(refreshed.status).toBe(203)
     expect(refreshed.headers['x-version']).toBe('7')
+    const refreshedBuffered = yield* Effect.promise(
+      async () => await browser.query(browserBuffered),
+    )
+    expect(refreshedBuffered.body).toBeInstanceOf(ArchivedProfile)
+    expect(refreshedBuffered.body.summary()).toBe('Grace: 42 archived credits')
+    expect(refreshedBuffered.headers['x-version']).toBe(7)
     expect(Object.isFrozen(refreshed)).toBe(true)
     expect(Object.isFrozen(refreshed.headers)).toBe(true)
     const refreshedJson = yield* prepareViewSnapshot(browser).pipe(
@@ -164,11 +191,11 @@ it.effect('hydrates rich HTTP metadata and refetches an alternate declared succe
       headers: { 'x-version': '7' },
       data: { headers: { 'x-version': 7 } },
     })
-    expect([serverReads, browserReads, encoded, decoded]).toStrictEqual([1, 1, 2, 2])
+    expect([serverReads, browserReads, encoded, decoded]).toStrictEqual([2, 2, 4, 4])
   }).pipe(Effect.provide(HttpServer.layerServices)),
 )
 
-it.effect('hydrates a wrapped SSE snapshot and reconnects with independent browser resources', () =>
+it.effect('hydrates wrapped SSE live and history views with independent browser resources', () =>
   Effect.gen(function* () {
     const api = HttpApi.make('hydration-sse').add(
       HttpApiGroup.make('profiles').add(
@@ -252,12 +279,24 @@ it.effect('hydrates a wrapped SSE snapshot and reconnects with independent brows
       client: browserClient,
       keyPrefix: ['hydration-views', 'wrapped-live'],
     }).profiles.watch.liveOptions({ retry: false })
+    const serverHistory = createHttpApiQueryUtils(api, {
+      client: serverClient,
+      keyPrefix: ['hydration-views', 'wrapped-history'],
+    }).profiles.watch.streamedOptions({ retry: false })
+    const browserHistory = createHttpApiQueryUtils(api, {
+      client: browserClient,
+      keyPrefix: ['hydration-views', 'wrapped-history'],
+    }).profiles.watch.streamedOptions({ retry: false })
     const initial = yield* Effect.promise(
       async () => await fetchStreamSnapshot(server, serverOptions),
     )
     yield* Deferred.await(serverClosed)
     expect(initial.body).toBeInstanceOf(Profile)
     expect(initial.headers['x-version']).toBe(4)
+    const initialHistory = yield* Effect.promise(
+      async () => await fetchStreamSnapshot(server, serverHistory),
+    )
+    expect(initialHistory).toStrictEqual([initial])
     const json = yield* prepareViewSnapshot(server).pipe(
       Effect.provideService(SnapshotEncoding, { beforeEncode: Effect.void }),
     )
@@ -282,6 +321,11 @@ it.effect('hydrates a wrapped SSE snapshot and reconnects with independent brows
     expect(hydrated.body.summary()).toBe('Ada: 9007199254740993 credits')
     expect(hydrated.body.avatar).toStrictEqual(new Uint8Array([0, 1, 255]))
     expect(hydrated.headers['x-version']).toBe(4)
+    const hydratedHistory = yield* Effect.promise(
+      async () => await fetchStreamSnapshot(browser, browserHistory, { mode: 'cached' }),
+    )
+    expect(hydratedHistory).toStrictEqual([hydrated])
+    expect(browserReads).toBe(0)
     const fresh = yield* Effect.promise(
       async () => await fetchStreamSnapshot(browser, browserOptions),
     )
@@ -291,6 +335,10 @@ it.effect('hydrates a wrapped SSE snapshot and reconnects with independent brows
     )
     expect(fresh.body).toBeUndefined()
     expect(fresh.headers['x-version']).toBe(7)
+    const freshHistory = yield* Effect.promise(
+      async () => await fetchStreamSnapshot(browser, browserHistory),
+    )
+    expect(freshHistory).toStrictEqual([fresh])
     const freshJson = yield* prepareViewSnapshot(browser).pipe(
       Effect.provideService(SnapshotEncoding, { beforeEncode: Effect.void }),
     )
@@ -303,7 +351,8 @@ it.effect('hydrates a wrapped SSE snapshot and reconnects with independent brows
     )
     expect(restoredSnapshot).toHaveProperty('body', undefined)
     expect(restoredSnapshot?.headers['x-version']).toBe(7)
-    expect([serverReads, browserReads]).toStrictEqual([1, 1])
+    expect(restored.getQueryData(browserHistory.queryKey)).toStrictEqual([fresh])
+    expect([serverReads, browserReads]).toStrictEqual([2, 2])
     expect(server.isFetching()).toBe(0)
     expect(browser.isFetching()).toBe(0)
     expect(server.getQueryCache().hasListeners()).toBe(false)

@@ -155,7 +155,7 @@ describe(createRpcQueryUtils, () => {
 
       expect(skipToken).toBe(queryCoreSkipToken)
       expect(skipToken).toBe(reactQuerySkipToken)
-      const skipped = utils.users.get.queryOptions(skipToken)
+      const skipped = utils.users.get.queryOptions({ input: skipToken })
       expect(skipped).toMatchObject({
         queryFn: queryCoreSkipToken,
         queryKey: ['app', 'rpc', 'users', 'get', 'query'],

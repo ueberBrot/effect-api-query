@@ -207,7 +207,13 @@ export const makeControlledUserWrites = Effect.fnUntraced(function* (
     },
   })
   const { isActive, runMutation, persistDirectory, trackMutationOptions } = owner
-  const userWrites = makeUserWrites({ queryClient, rpcQuery, httpQuery, isActive, runMutation })
+  const userWrites = makeUserWrites({
+    queryClient,
+    rpcQuery,
+    httpQuery,
+    isActive,
+    trackMutationOptions,
+  })
   const invalidateUsers = async () => {
     if (!isActive()) {
       return

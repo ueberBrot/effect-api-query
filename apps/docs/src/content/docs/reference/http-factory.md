@@ -94,7 +94,7 @@ Applicable TanStack options pass through. The package owns the key and function 
 reject per-call `queryKeyHashFn` and `queryHash` with `EffectHttpApiQueryConfigError` code
 `UnsupportedQueryHash`.
 
-Input-bearing `queryOptions` accepts a complete request, `queryOptions(skipToken)`, or
+Input-bearing `queryOptions` accepts a complete request in `input` or
 `queryOptions({ input: skipToken, ...options })`. Import `skipToken` from `effect-api-query` or
 TanStack. Skipping preserves caller options and returns the exact sentinel as `queryFn`, with the
 operation-level key and no request identity. It performs no request encoding or client call.

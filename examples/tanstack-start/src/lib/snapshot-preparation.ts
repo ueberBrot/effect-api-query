@@ -67,34 +67,37 @@ export const makeSnapshotPreparation = (
   ]
   const codecFor = (key: QueryKey) =>
     codecs.find(({ prefix }) => hashKey(key.slice(0, prefix.length)) === hashKey(prefix))?.codec
-  const encode = Effect.fnUntraced(function* (queries: DehydratedState['queries']) {
-    return yield* Effect.forEach(
+  type ViewCodec = (typeof codecs)[number]['codec']
+  type SnapshotData = DehydratedState['queries'][number]['state']['data']
+  const transform = <R>(
+    queries: DehydratedState['queries'],
+    convert: (
+      codec: ViewCodec,
+      data: SnapshotData,
+    ) => Effect.Effect<SnapshotData, Schema.SchemaError, R>,
+  ) =>
+    Effect.forEach(
       Effect.fnUntraced(function* (query: DehydratedState['queries'][number]) {
         const codec = codecFor(query.queryKey)
         if (codec === undefined) {
           return yield* Effect.die(new TypeError('No Start snapshot codec for query'))
         }
-        const data = yield* Schema.encodeUnknownEffect(codec)(query.state.data)
+        const data = yield* convert(codec, query.state.data)
         return { ...query, state: { ...query.state, data } }
       }),
     )(queries)
-  })
-  const decode = Effect.fnUntraced(function* (queries: DehydratedState['queries']) {
-    return yield* Effect.forEach(
-      Effect.fnUntraced(function* (query: DehydratedState['queries'][number]) {
-        const codec = codecFor(query.queryKey)
-        if (codec === undefined) {
-          return yield* Effect.die(new TypeError('No Start snapshot codec for query'))
-        }
-        const data = yield* Schema.decodeUnknownEffect(codec)(query.state.data)
-        return { ...query, state: { ...query.state, data } }
-      }),
-    )(queries)
-  })
   return {
     encode: async (queries: DehydratedState['queries']) =>
-      runPreparation(encode(queries).pipe(Effect.provideService(SnapshotEncoding, services))),
+      runPreparation(
+        transform(queries, (codec, data) => Schema.encodeUnknownEffect(codec)(data)).pipe(
+          Effect.provideService(SnapshotEncoding, services),
+        ),
+      ),
     decode: async (queries: DehydratedState['queries']) =>
-      runPreparation(decode(queries).pipe(Effect.provideService(SnapshotDecoding, services))),
+      runPreparation(
+        transform(queries, (codec, data) => Schema.decodeUnknownEffect(codec)(data)).pipe(
+          Effect.provideService(SnapshotDecoding, services),
+        ),
+      ),
   }
 }

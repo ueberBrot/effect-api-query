@@ -221,7 +221,7 @@ const liveSkipped = utils.views.plain.liveOptions({
   initialData: 1,
 })
 liveSkipped.queryFn satisfies typeof skipToken
-utils.views.plain.liveOptions(skipToken).queryFn satisfies typeof skipToken
+utils.views.plain.liveOptions({ input: skipToken }).queryFn satisfies typeof skipToken
 const liveConditional = utils.views.plain.liveOptions({
   input: Math.random() > 0.5 ? input : skipToken,
   initialData: () => 1,

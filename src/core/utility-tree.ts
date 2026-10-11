@@ -1,11 +1,12 @@
 import { replaceEqualDeep, skipToken } from '@tanstack/query-core'
-import type { QueryFunction, QueryFunctionContext } from '@tanstack/query-core'
+import type { QueryFunctionContext } from '@tanstack/query-core'
 import { Effect, Exit, Predicate } from 'effect'
 import type { Cause } from 'effect'
 
 import type {
   BufferedOperation,
   OperationDescription,
+  QueryPreparation,
   RuntimeKeyEncoder,
   StreamingOperation,
   TreeErrors,
@@ -232,10 +233,10 @@ const prepareQuery = (
 }
 
 const prepareQueryOptions = (description: OperationDescription, argument: unknown) => {
-  const options: Record<string, unknown> =
-    argument === skipToken
-      ? { input: skipToken }
-      : { ...(Predicate.isObject(argument) ? argument : undefined) }
+  if (argument !== undefined && !Predicate.isObject(argument)) {
+    throw new TypeError('Query options must be an object')
+  }
+  const options = { ...argument }
   for (const option of ['queryKeyHashFn', 'queryHash'] as const) {
     if (Object.hasOwn(options, option)) {
       throw description.unsupportedQueryHash(option)
@@ -261,11 +262,11 @@ const createQueryBuilders = (
   description: UnaryOperation | StreamingOperation,
   operationKey: readonly JsonValue[],
   keyEncoder: RuntimeKeyEncoder | undefined,
-  prepareExecution: (
+  prepareOptions: (
     options: Record<string, unknown>,
     requestOptions: unknown,
     input: unknown,
-  ) => (input: unknown) => QueryFunction,
+  ) => QueryPreparation,
   prepareIdentity?: (options: Record<string, unknown>) => readonly JsonValue[],
 ) => ({
   key: (input?: unknown, policy?: Record<string, unknown>) => {
@@ -275,9 +276,8 @@ const createQueryBuilders = (
   },
   options: (argument?: unknown) => {
     const { input, options, requestOptions } = prepareQueryOptions(description, argument)
-    const identity = prepareIdentity?.(options) ?? []
     // Stream policy is consumed and validated even when execution will be skipped.
-    const makeQuery = prepareExecution(options, requestOptions, input)
+    const { identity, makeQuery } = prepareOptions(options, requestOptions, input)
     if (description.input._tag !== 'Inputless' && input === skipToken) {
       return finalizeQueryOptions(options, operationKey, skipToken)
     }
@@ -445,10 +445,13 @@ const createUnaryLeaf = (
     description,
     queryOperationKey,
     keyEncoder,
-    (_options, requestOptions) =>
-      (input) =>
-      async ({ signal }: { readonly signal: AbortSignal }) =>
-        execute(description, 'query', input, runPromiseExit, requestOptions, signal),
+    (_options, requestOptions) => ({
+      identity: [],
+      makeQuery:
+        (input) =>
+        async ({ signal }) =>
+          execute(description, 'query', input, runPromiseExit, requestOptions, signal),
+    }),
   )
   const { metadata } = description
   const metadataQuery =
@@ -458,14 +461,16 @@ const createUnaryLeaf = (
           description,
           freezeKey([...operationKey, 'metadata']),
           keyEncoder,
-          (options, requestOptions, input) =>
-            prepareMetadataExecution(
+          (options, requestOptions, input) => ({
+            identity: [],
+            makeQuery: prepareMetadataExecution(
               metadata,
               options,
               runPromiseExit,
               requestOptions,
               description.input._tag !== 'Inputless' && input === skipToken,
             ),
+          }),
         )
 
   return Object.freeze({
@@ -487,24 +492,19 @@ const createStreamingLeaf = (
   runPromiseExit: RunPromiseExit<unknown>,
 ) => {
   const operationKey = freezeKey(keyParts)
-  const liveOperationKey = freezeKey([...operationKey, 'live'])
-  const streamedOperationKey = freezeKey([...operationKey, 'streamed'])
-  const live = createQueryBuilders(
-    description,
-    liveOperationKey,
-    keyEncoder,
-    (options, requestOptions) =>
-      description.prepareStream(options, 'live', runPromiseExit, requestOptions),
-    description.liveIdentity,
-  )
-  const streamed = createQueryBuilders(
-    description,
-    streamedOperationKey,
-    keyEncoder,
-    (options, requestOptions) =>
-      description.prepareStream(options, 'streamed', runPromiseExit, requestOptions),
-    description.streamedIdentity,
-  )
+  const createView = (operation: 'live' | 'streamed') => {
+    const prepare = (options: Record<string, unknown>, requestOptions: unknown) =>
+      description.prepareStream(options, operation, runPromiseExit, requestOptions)
+    return createQueryBuilders(
+      description,
+      freezeKey([...operationKey, operation]),
+      keyEncoder,
+      prepare,
+      (options) => prepare(options, undefined).identity,
+    )
+  }
+  const live = createView('live')
+  const streamed = createView('streamed')
 
   return Object.freeze({
     key: () => operationKey,

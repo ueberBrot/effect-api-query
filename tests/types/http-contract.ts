@@ -1114,7 +1114,7 @@ skippedMetadata.queryKey satisfies readonly [
 ]
 const skippedMetadataHook = useQuery(skippedMetadata)
 true satisfies Assert<Equal<typeof skippedMetadataHook.data, UserMetadata | undefined>>
-getUser.metadataOptions(skipToken).queryFn satisfies SkipToken
+getUser.metadataOptions({ input: skipToken }).queryFn satisfies SkipToken
 const conditionalMetadata = getUser.metadataOptions({
   input: hasUser ? input : skipToken,
   select: (view) => view.status,
@@ -1222,7 +1222,11 @@ const definedInitial = useQuery(
 )
 true satisfies Assert<Equal<typeof definedInitial.data, string>>
 
-const skippedDirect = getUser.queryOptions(skipToken)
+// @ts-expect-error Query builders accept options objects.
+getUser.queryOptions(skipToken)
+// @ts-expect-error Metadata builders accept options objects.
+getUser.metadataOptions(skipToken)
+const skippedDirect = getUser.queryOptions({ input: skipToken })
 skippedDirect.queryFn satisfies SkipToken
 const skippedObject = getUser.queryOptions({
   input: skipToken,

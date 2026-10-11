@@ -469,9 +469,9 @@ clientFailureUtils.events.watch.streamedOptions({
   },
 })
 
-const skippedStreamed = utils.events.watch.streamedOptions(skipToken)
+const skippedStreamed = utils.events.watch.streamedOptions({ input: skipToken })
 skippedStreamed.queryFn satisfies typeof queryCoreSkipToken
-const skippedLive = utils.events.watch.liveOptions(skipToken)
+const skippedLive = utils.events.watch.liveOptions({ input: skipToken })
 skippedLive.queryFn satisfies typeof queryCoreSkipToken
 useQuery(skippedStreamed)
 useQuery(skippedLive)
@@ -903,7 +903,13 @@ concreteQueryKey satisfies readonly ['app', 'rpc', 'users', 'get', 'query', Json
 const cachedState = queryClient.getQueryState(concreteQueryKey)
 cachedState?.error satisfies EffectRpcQueryError<'not-found'> | null | undefined
 
-const skipped = utils.users.get.queryOptions(skipToken)
+// @ts-expect-error Query builders accept options objects.
+utils.users.get.queryOptions(skipToken)
+// @ts-expect-error Stream builders accept options objects.
+utils.events.watch.streamedOptions(skipToken)
+// @ts-expect-error Live builders accept options objects.
+utils.events.watch.liveOptions(skipToken)
+const skipped = utils.users.get.queryOptions({ input: skipToken })
 skipped.queryFn satisfies typeof queryCoreSkipToken
 const typedSkipToken: SkipToken = skipped.queryFn
 void typedSkipToken
@@ -1024,19 +1030,19 @@ utils.health.ping.queryOptions(skipToken)
 utils.users.get.queryKey(skipToken)
 // @ts-expect-error mutation builders never accept the skip sentinel
 utils.users.get.mutationOptions(skipToken)
-// @ts-expect-error the package owns the query function
 utils.users.get.queryOptions({
   input: { id: 1 },
+  // @ts-expect-error the package owns the query function
   queryFn: queryCoreSkipToken,
 })
-// @ts-expect-error the package owns the query key
 utils.users.get.queryOptions({
   input: { id: 1 },
+  // @ts-expect-error the package owns the query key
   queryKey: ['custom'],
 })
-// @ts-expect-error QueryClient defaults own hashing.
 utils.users.get.queryOptions({
   input: { id: 1 },
+  // @ts-expect-error QueryClient defaults own hashing.
   queryKeyHashFn: JSON.stringify,
 })
 void utils.projects.watch.streamedOptions({})

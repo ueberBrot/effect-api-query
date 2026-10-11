@@ -37,8 +37,8 @@ export function makeUseUser(client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeo
 ```
 
 HTTP uses the same conditional pattern with its decoded request shape. Unary,
-streamed, and live options also accept direct `skipToken`; their object form
-preserves caller options. Inputless operations, key builders, and mutations do
+metadata, streamed, and live builders take `input: skipToken` in the options
+object and preserve caller options. Inputless operations, key builders, and mutations do
 not accept it. Skipped options cannot execute through manual refetch and are
 unsuitable for suspense or prefetch-only hooks.
 

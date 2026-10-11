@@ -15,7 +15,7 @@ export const createHttpApiQueryUtils = <
 ): HttpApiQueryUtils<Api, Prefix, Client> => {
   // SAFETY: Api extends HttpApi.Constraint; this erases endpoint type parameters
   // only for metadata traversal, preserving the original Api in the public result.
-  // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/no-chained-type-assertions
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion, anti-slop/no-chained-type-assertions
   const runtimeApi = api as unknown as HttpApi.Top
   const { operations, errors, keyEncoders } = compileHttpOperations(
     runtimeApi,
@@ -24,7 +24,7 @@ export const createHttpApiQueryUtils = <
   )
   // SAFETY: Public options require a runner when the ready client retains services;
   // the runtime tree forwards the same runner without changing its Context.
-  // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion
   const runPromiseExit = options.runPromiseExit as RunPromiseExit<unknown> | undefined
   const tree = createUtilityTree(operations, {
     keyPrefix: options.keyPrefix,
@@ -33,8 +33,6 @@ export const createHttpApiQueryUtils = <
     runPromiseExit,
     errors,
   })
-  // SAFETY: The compiled operations retain this Api's endpoint identities and ready
-  // client.
-  // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion
   return tree as HttpApiQueryUtils<Api, Prefix, Client>
 }
