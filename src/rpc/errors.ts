@@ -1,13 +1,15 @@
 import type { Cause } from 'effect'
 
-/** Stable codes for errors raised while configuring an RPC utility tree or its builders. */
+/** Stable codes for invalid RPC utility configuration. */
 export type EffectRpcQueryConfigErrorCode =
   | 'InvalidMaxChunks'
+  | 'InvalidRefetchMode'
   | 'InvalidKeyPrefix'
   | 'InvalidRpcPath'
   | 'RpcPathCollision'
   | 'MissingKeyEncoder'
   | 'UnknownKeyEncoder'
+  | 'UnsupportedQueryHash'
 
 /** Stable codes for synchronous query-key preparation failures. */
 export type EffectRpcQueryKeyErrorCode =
@@ -73,7 +75,7 @@ export class EffectRpcQueryEmptyStreamError extends Error {
   }
 }
 
-/** Reports invalid factory or builder configuration synchronously. */
+/** Reports invalid factory, builder, or stream cache configuration. */
 export class EffectRpcQueryConfigError extends Error {
   /** Identifies this error without relying on `instanceof`. */
   readonly _tag = 'EffectRpcQueryConfigError'

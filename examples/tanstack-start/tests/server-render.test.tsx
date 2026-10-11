@@ -2,13 +2,14 @@ import { startExampleRpcServer } from '@effect-api-query/server'
 import { QueryClient } from '@tanstack/react-query'
 import { createMemoryHistory, RouterProvider } from '@tanstack/react-router'
 import { Deferred, Effect, Exit, Schema, Scope, Stream } from 'effect'
-import { createRpcQueryUtils } from 'effect-api-query'
+import { createRpcQueryUtils, fetchStreamSnapshot } from 'effect-api-query'
 import { Rpc, RpcGroup } from 'effect/rpc'
 import type { RpcClient } from 'effect/rpc'
 import { renderToString } from 'react-dom/server'
 import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test'
 
-import { fetchStreamSnapshot } from '../src/lib/query-ssr.ts'
+import { fetchStreamSnapshot as captureStreamSnapshot } from '../../../src/index.ts'
+import type { StreamSnapshotOptions } from '../../../src/index.ts'
 import { createTanStackStartRouter } from '../src/router.tsx'
 
 describe('TanStack Start server rendering', () => {
@@ -121,14 +122,12 @@ describe('TanStack Start server rendering', () => {
     async (cached) => {
       const Watch = Rpc.make('diagnostics.watch', { success: Schema.String, stream: true })
       const group = RpcGroup.make(Watch)
-      // Void is the deliberate success channel of this Effect factory.
       // oxlint-disable-next-line typescript/no-invalid-void-type
       const finalized = Deferred.makeUnsafe<void>()
       const source = Stream.make('snapshot').pipe(
         Stream.concat(Stream.fromEffect(Effect.never)),
         Stream.ensuring(Deferred.succeed(finalized, undefined).pipe(Effect.asVoid)),
       )
-      // SAFETY: This group contains only the watch RPC, whose handler always returns the typed source.
       // oxlint-disable-next-line typescript/no-unsafe-type-assertion
       const client = (() => source) as RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof group>>
       const queryClient = new QueryClient()
@@ -140,7 +139,8 @@ describe('TanStack Start server rendering', () => {
         queryClient.setQueryData(options.queryKey, ['previous'])
       }
 
-      const snapshot = await fetchStreamSnapshot(queryClient, options)
+      const controls: StreamSnapshotOptions = { mode: 'fresh', timeoutMs: 1000 }
+      const snapshot = await captureStreamSnapshot(queryClient, options, controls)
 
       expect(snapshot).toStrictEqual(['snapshot'])
       expect(queryClient.getQueryState(options.queryKey)?.fetchStatus).toBe('idle')
@@ -151,16 +151,13 @@ describe('TanStack Start server rendering', () => {
   it('settles and releases its listener when cancelled before the first streamed value', async () => {
     const Watch = Rpc.make('watch', { success: Schema.String, stream: true })
     const group = RpcGroup.make(Watch)
-    // Void is the deliberate success channel of this Effect factory.
     // oxlint-disable-next-line typescript/no-invalid-void-type
     const started = Deferred.makeUnsafe<void>()
-    // Void is the deliberate success channel of this Effect factory.
     // oxlint-disable-next-line typescript/no-invalid-void-type
     const finalized = Deferred.makeUnsafe<void>()
     const source = Stream.fromEffect(
       Deferred.succeed(started, undefined).pipe(Effect.andThen(Effect.never)),
     ).pipe(Stream.ensuring(Deferred.succeed(finalized, undefined).pipe(Effect.asVoid)))
-    // SAFETY: This group contains only the watch RPC, whose handler always returns the typed source.
     // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const client = (() => source) as RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof group>>
     const queryClient = new QueryClient()
@@ -188,14 +185,12 @@ describe('TanStack Start server rendering', () => {
   it('releases its listener on failure and can take a fresh snapshot after a cached error', async () => {
     const Watch = Rpc.make('watch', { success: Schema.String, stream: true })
     const group = RpcGroup.make(Watch)
-    // Void is the deliberate success channel of this Effect factory.
     // oxlint-disable-next-line typescript/no-invalid-void-type
     const finalized = Deferred.makeUnsafe<void>()
     const source = Stream.make('recovered').pipe(
       Stream.concat(Stream.fromEffect(Effect.never)),
       Stream.ensuring(Deferred.succeed(finalized, undefined).pipe(Effect.asVoid)),
     )
-    // SAFETY: This group contains only the watch RPC, whose handler always returns the typed source.
     // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const client = (() => source) as RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof group>>
     const queryClient = new QueryClient()

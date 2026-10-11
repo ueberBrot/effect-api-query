@@ -3,8 +3,14 @@ title: Conditional Queries
 description: Pause queries until their required input is available.
 ---
 
-Use `{ input: skipToken }` when an input-bearing query has no valid input yet and needs TanStack
-options such as `staleTime`, `select`, or `initialData`:
+In component setup, import the native `useQuery` hook and use your application's ready utility
+tree, named `rpcQuery` here. Its `users.get` RPC takes a numeric `id` with a default locale and
+returns a user with an `id` and `name`. Follow the [RPC quick start](/effect-api-query/getting-started/quick-start/)
+for the factory setup pattern.
+
+`userId` is the selected ID, which may be undefined. Use `{ input: skipToken }` when an
+input-bearing query has no valid input yet and needs TanStack options such as `staleTime`,
+`select`, or `initialData`:
 
 ```ts
 import { skipToken } from 'effect-api-query'
@@ -21,7 +27,8 @@ const userOptions = rpcQuery.users.get.queryOptions({
 const user = useQuery(userOptions)
 ```
 
-The same form works for HTTP request input:
+For an HTTP `users.get` endpoint with only a numeric `id` param and a user response, its complete
+decoded request contains only `params`:
 
 ```ts
 const httpUserOptions = http.users.get.queryOptions({
@@ -41,17 +48,18 @@ possibly `undefined`, even with an initial value, because its defined-data overl
 `skipToken`. `useInfiniteQuery` preserves its defined-data overload when `initialData` is a defined
 value or factory, including for conditional and skipped inputs.
 
-The sentinel applies to input-bearing `queryOptions` and `infiniteOptions` in both adapters, and
-to RPC `streamedOptions` and `liveOptions`. Inputless operations run without input, and key and
+The sentinel applies to input-bearing `queryOptions`, `infiniteOptions`, `streamedOptions`, and
+`liveOptions` in both adapters, and buffered HTTP `metadataOptions`. Inputless operations run without input, and key and
 mutation builders do not accept `skipToken`. TanStack suspense and prefetch-only hooks also reject
 skipped options at the type level.
 
-`queryOptions`, RPC `streamedOptions`, and RPC `liveOptions` accept concrete input or `skipToken`,
+`queryOptions`, `metadataOptions`, `streamedOptions`, and `liveOptions` accept concrete input or `skipToken`,
 including a conditional union. Keep the conditional input inside one builder call so the observer
 has one consistent callback type. Concrete inputs and the literal `skipToken` retain their precise
 key and query-function types; conditional inputs preserve both possibilities.
 
-The object form also works for accumulated streams and live queries:
+If your RPC group also declares `events.watch` with a string `channel` input and string
+emissions, build either view in that consumer:
 
 ```ts
 rpcQuery.events.watch.streamedOptions({
@@ -66,22 +74,18 @@ rpcQuery.events.watch.liveOptions({
 ```
 
 `refetchMode` configures accumulation. The builder removes it from the returned options even when
-the query is skipped. Infinite queries accept a page-to-input mapper or `skipToken`, including a
+the query is skipped. Retention, refetch, and HTTP SSE decoder policy validation still occurs for
+skipped streams. Infinite queries accept a page-to-input mapper or `skipToken`, including a
 conditional union, with their required `initialPageParam` and `getNextPageParam`. Choose between
 the mapper and sentinel in `input`; each mapper result must be valid input.
 
-When no caller options are needed, `queryOptions(skipToken)`, `streamedOptions(skipToken)`, and
-`liveOptions(skipToken)` remain available as shorthand. A skipped query has no executable query
-function, so manual `refetch()` cannot run it. Supply valid input to enable it. If a complete
+A skipped query has no executable query function, so manual `refetch()` cannot run it. Supply valid input to enable it. If a complete
 request is available and you need manual refetch, use `enabled: false` instead.
 
 For HTTP pagination, map each page parameter to the complete request and keep stable filters in
-every page. See [Load pages](/effect-api-query/guides/http-queries-and-mutations/#load-pages) for
+every page. See [Load pages](/effect-api-query/guides/pagination/) for
 initial-request identity and cursor progression.
 
 Try this in either [executable example](/effect-api-query/examples/#pause-a-query-until-a-user-is-selected).
 The **Choose before fetching** control demonstrates pausing, selecting a user, and reusing fresh
 cached data after clearing and reselecting the same user.
-
-The [public RPC consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/public-contract.ts) and
-[public HTTP consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/http-contract.ts) check skipped hook inference and rejected uses.

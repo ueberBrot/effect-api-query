@@ -3,13 +3,14 @@ title: Cancellation
 description: Cancel queries and request server-side cancellation for long-running commands.
 ---
 
-Generated query functions forward TanStack's `AbortSignal` to `runPromiseExit`:
+In the application client module, forward TanStack's `AbortSignal` to your runtime.
+Import `RunPromiseExit` from `effect-api-query`:
 
 ```ts
 const runPromiseExit: RunPromiseExit = (effect, options) => runtime.runPromiseExit(effect, options)
 ```
 
-Cancel one request with its generated query key:
+In a loader or event handler using the ready RPC utility tree, cancel one request with its generated key:
 
 ```ts
 const input = { durationMs: 60_000, operationId: 'slow-query' }
@@ -29,6 +30,13 @@ Infinite page requests, accumulated streams, and live queries use the same signa
 stream query also calls `return()` on its AsyncIterator, which runs the Effect stream's finalizers.
 TanStack also cancels an active stream when its last observer unmounts or a refetch supersedes it.
 
+These cancellation guarantees apply to ordinary query observers. TanStack documents that
+cancellation does not work with `useSuspenseQuery`, `useSuspenseQueries`, and
+`useSuspenseInfiniteQuery`; generated options and signal forwarding preserve that limitation.
+Choose ordinary hooks when your screen depends on cancellation, particularly for open streams.
+See [TanStack's limitations](https://tanstack.com/query/latest/docs/framework/react/guides/query-cancellation#limitations)
+and [Suspense and Error Recovery](/effect-api-query/guides/suspense-and-recovery/).
+
 Mutations do not receive TanStack query signals, so generated mutation functions cannot cancel
 a mutation automatically.
 
@@ -47,94 +55,27 @@ Reversing completed work requires a separate compensation operation.
 
 HTTP mutations receive no query abort signal and keep TanStack's normal mutation lifecycle.
 
-## Cancel a command while its mutation is pending
+## Request server cancellation explicitly
 
-Use an explicit cancel RPC for long-running commands. The Vite React example provides
-`commands.start`, `commands.status`, and `commands.cancel` in the shared contract. Each command
-has a client-generated operation ID. The start mutation waits for a terminal result; a separate
-query observes progress, and a separate mutation requests cancellation.
+Generated mutations receive no query abort signal. When long-running server work must be
+cancellable, assign an operation ID before starting it and provide an application operation
+that requests cancellation. Observe its terminal domain state through a separate read.
 
-```tsx
-const [operationId] = useState(() => crypto.randomUUID())
-const input = { operationId }
-const reconcile = async () => {
-  await queryClient.invalidateQueries({
-    queryKey: rpcQuery.commands.status.queryKey(input),
-  })
-}
+An interrupted client or closed HTTP connection does not establish remote completion. Cancellation
+requests stop future work cooperatively; completed work needs a separate compensation operation.
+Use an application acknowledgement when you must wait for server cleanup.
 
-const start = useMutation(rpcQuery.commands.start.mutationOptions({ onSettled: reconcile }))
-const cancel = useMutation(rpcQuery.commands.cancel.mutationOptions({ onSettled: reconcile }))
-const status = useQuery(
-  rpcQuery.commands.status.queryOptions({
-    input,
-    enabled: start.status !== 'idle',
-    refetchInterval: (query) =>
-      query.state.data == null || query.state.data.state === 'running' ? 100 : false,
-  }),
-)
+The [Cancellable Commands example](/effect-api-query/examples/cancellable-commands/) shows one
+protocol with start, status, and cancel operations. It also covers retries with the same operation ID,
+concurrent commands, and the limits of its in-memory workers.
 
-return (
-  <>
-    <button onClick={() => start.mutate(input)} disabled={start.status !== 'idle'}>
-      Start command
-    </button>
-    <button
-      onClick={() => cancel.mutate(input)}
-      disabled={
-        start.status === 'idle' ||
-        cancel.isPending ||
-        status.data?.state === 'completed' ||
-        status.data?.state === 'cancelled'
-      }
-    >
-      Cancel command
-    </button>
-    <p>Server state: {status.data?.state ?? 'not started'}</p>
-  </>
-)
-```
+## Release resources after local cleanup
 
-The cancel handler signals the worker and waits until it has stopped. The cancel mutation's
-`onSettled` callback then invalidates the generated status key. The active query refetches the
-server's status even if the cancel request failed, and polling stops at a terminal state.
-The application chooses this invalidation policy.
+Cancelling a query and releasing its services are separate steps. Native `cancelQueries` settlement
+can precede asynchronous iterator finalizers. Keep the ready client, its Scope, and the runner alive
+until application-owned cleanup signals settle. Mutations settle independently because they have
+no query abort signal.
 
-A cancelled command returns `{ state: 'cancelled', ... }` successfully. TanStack therefore reports
-both mutations as `success` and runs their normal callbacks. The domain state does not add a
-`cancelled` MutationCache state. Each operation ID has its own query key and worker, so cancelling
-one command leaves another running.
-
-Run the Vite React example and use the **Cancellable commands** panel to try two concurrent
-commands. The TanStack Start application hosts the same contract and handlers at `/rpc`; its
-`application.rpcQuery.commands` exposes these same framework-neutral options for hooks, loaders,
-and QueryClient. It can reuse the workflow above with its own QueryClient.
-
-## Choose what cancellation means
-
-| Action                    | Result                                                                                      |
-| ------------------------- | ------------------------------------------------------------------------------------------- |
-| Stop observing a query    | Removes local observation; whether work stops depends on the query lifecycle and transport. |
-| Interrupt an Effect       | Requests cooperative interruption and runs its finalizers.                                  |
-| Call `commands.cancel`    | Requests cooperative server cancellation by operation ID and waits for a terminal state.    |
-| Compensate committed work | Requires a separate application operation that reverses or offsets prior effects.           |
-
-Transport interruption is cooperative and depends on transport support. An explicit cancel RPC is the
-durable application contract for requesting server cancellation. The slow-query demo
-adds a transport-specific `diagnostics.cancel` call when its local Effect is interrupted; the
-package itself does not provide that behavior.
-
-The command example owns workers in the server Scope. Unmounting a view or interrupting the
-client's wait does not cancel these workers automatically. A cancel request stops future steps;
-completed steps remain recorded. Cancellation after completion returns the completed result without
-promising a rollback. Repeating a start with the same ID returns the existing result; a cancel
-that arrives before start reserves that ID as cancelled.
-
-This example stores operation records in memory until the example is reset or the server stops.
-Production applications need their own authorization, durable storage, and retention policy if
-operations must survive restarts. The explicit RPC contract does not make this in-memory example
-a durable job queue.
-
-The [command panel](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/components/sections/commands-section.tsx)
-and [command tests](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/tests/commands.test.ts) exercise this workflow.
-The [HTTP transport tests](https://github.com/ueberBrot/effect-api-query/blob/main/tests/http-transport-cancellation.test.ts) verify cancellation through fetch.
+Follow [Client Lifecycle](/effect-api-query/concepts/client-lifecycle/) for disposal. Use
+[Stream Snapshots](/effect-api-query/guides/stream-snapshots/) for a finite capture that waits for
+local iterator cleanup before it settles.

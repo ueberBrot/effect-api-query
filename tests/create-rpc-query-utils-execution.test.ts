@@ -8,7 +8,6 @@ import {
 } from '@tanstack/query-core'
 import { Context, Deferred, Effect, Equal, Exit, Schema } from 'effect'
 import { Rpc, RpcGroup } from 'effect/rpc'
-import { once } from 'node:events'
 
 import {
   createRpcQueryUtils,
@@ -261,7 +260,7 @@ describe('createRpcQueryUtils execution boundaries', () => {
       })
       const options = utils.health.ping.queryOptions()
 
-      expect(Object.keys(options).sort()).toStrictEqual(['queryFn', 'queryKey', 'queryKeyHashFn'])
+      expect(Object.keys(options).sort()).toStrictEqual(['queryFn', 'queryKey'])
       expect(yield* Effect.promise(async () => await new QueryClient().query(options))).toBeNull()
     }),
   )
@@ -282,7 +281,6 @@ describe('createRpcQueryUtils execution boundaries', () => {
         client,
         keyPrefix: ['app'] as const,
       })
-      // SAFETY: A numeric value deliberately violates the RPC string schema to test synchronous key preparation.
       /* oxlint-disable anti-slop/no-chained-type-assertions, anti-slop/no-known-value-widening, typescript/no-unsafe-type-assertion */
       const invalidInput = { value: 42 } as unknown as { readonly value: string }
       /* oxlint-enable anti-slop/no-chained-type-assertions, anti-slop/no-known-value-widening, typescript/no-unsafe-type-assertion */
@@ -546,7 +544,6 @@ describe('createRpcQueryUtils execution boundaries', () => {
       })
 
       const options = utils.profiles.update.mutationOptions()
-      // SAFETY: A numeric value deliberately violates the RPC string schema to test mutation execution failures.
       /* oxlint-disable anti-slop/no-chained-type-assertions, anti-slop/no-known-value-widening, typescript/no-unsafe-type-assertion */
       const invalidVariables = { name: 42 } as unknown as { readonly name: string }
       /* oxlint-enable anti-slop/no-chained-type-assertions, anti-slop/no-known-value-widening, typescript/no-unsafe-type-assertion */
@@ -667,12 +664,27 @@ describe('createRpcQueryUtils execution boundaries', () => {
     Effect.gen(function* () {
       let querySignal: AbortSignal | undefined
       let mutationReceivedOptions: boolean | undefined
+      const runPromise = Effect.runPromiseWith(yield* Effect.context())
       const runPromiseExit: RunPromiseExit = async (effect, options) => {
         if (options?.signal === undefined) {
           mutationReceivedOptions = options !== undefined
         } else {
-          querySignal = options.signal
-          await once(options.signal, 'abort')
+          const { signal } = options
+          querySignal = signal
+          await runPromise(
+            Effect.callback((resume) => {
+              const onAbort = () => {
+                resume(Effect.void)
+              }
+              signal.addEventListener('abort', onAbort, { once: true })
+              if (signal.aborted) {
+                onAbort()
+              }
+              return Effect.sync(() => {
+                signal.removeEventListener('abort', onAbort)
+              })
+            }),
+          )
         }
         return await Effect.runPromiseExit(effect, options)
       }

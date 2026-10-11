@@ -1,13 +1,28 @@
 // @vitest-environment jsdom
 
+import { User } from '@effect-api-query/contracts'
 import { startExampleRpcServer } from '@effect-api-query/server'
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { Effect, Exit, Scope } from 'effect'
 import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test'
 
+import { makeControlledUserWrites } from '../../../tests/fixtures/optimistic-users.ts'
 import { ViteReactExample } from '../src/app.tsx'
+import { CreateUserForm } from '../src/components/users/create-user-form.tsx'
+import { UserList } from '../src/components/users/user-list.tsx'
 import { startViteReactApplication } from '../src/lib/application.ts'
 import type { ViteReactApplication } from '../src/lib/application.ts'
+
+const OptimisticUsers = ({ application }: { readonly application: ViteReactApplication }) => {
+  const users = useQuery(application.rpcQuery.users.list.queryOptions({ staleTime: Infinity }))
+  return (
+    <>
+      <CreateUserForm application={application} />
+      <UserList application={application} users={users.data} />
+    </>
+  )
+}
 
 describe('plain Vite React integration', () => {
   let application: ViteReactApplication | undefined
@@ -181,6 +196,43 @@ describe('plain Vite React integration', () => {
         queryKey: application.httpQuery.diagnostics.slow.key(),
       }),
     ).toBe(0)
+  })
+
+  it('shows optimistic creation and removal, then restores a failed deletion beside the created user', async () => {
+    cleanup()
+    const fixture = await Effect.runPromise(makeControlledUserWrites(new QueryClient()))
+    const owned = fixture.application
+    const ada = new User({ id: 1, name: 'Ada', locale: 'en' })
+    fixture.seed([ada])
+    owned.queryClient.setQueryData(owned.rpcQuery.users.list.queryKey(), [ada])
+    render(
+      <QueryClientProvider client={owned.queryClient}>
+        <OptimisticUsers application={owned} />
+      </QueryClientProvider>,
+    )
+    try {
+      fireEvent.click(screen.getByRole('button', { name: 'Delete Ada' }))
+      const deletion = await fixture.nextDelete()
+      await waitFor(() => {
+        expect(screen.queryByText('Ada', { exact: true })).toBeNull()
+      })
+      fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'Grace' } })
+      fireEvent.click(screen.getByRole('button', { name: 'Add user' }))
+      const creation = await fixture.nextCreate()
+      await expect(screen.findByText('Grace', { exact: true })).resolves.toBeDefined()
+      expect(screen.getByRole('button', { name: 'Delete Grace' }).hasAttribute('disabled')).toBe(
+        true,
+      )
+      await creation.succeed(new User({ id: 2, name: 'Grace', locale: 'en' }))
+      await expect(screen.findByText('Added Grace')).resolves.toBeDefined()
+      await deletion.fail()
+      await expect(screen.findByText('Ada', { exact: true })).resolves.toBeDefined()
+      expect(screen.getByText('Grace', { exact: true })).toBeDefined()
+      expect(screen.getByRole('alert').textContent).toContain('users.delete')
+    } finally {
+      cleanup()
+      await owned.dispose()
+    }
   })
 
   it('disposes its client Scope and runtime idempotently', async () => {

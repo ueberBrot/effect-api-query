@@ -1,12 +1,12 @@
 import { DiagnosticFailure } from '@effect-api-query/contracts'
 import type { DiagnosticStatus, SlowDiagnosticInput } from '@effect-api-query/contracts'
-import { Deferred, Effect, Ref } from 'effect'
+import { Deferred, Effect, HashMap, Option, Ref } from 'effect'
 
 const initialStatus = (): DiagnosticStatus => ({ interrupted: 0, started: 0 })
 
 const initialState = () => ({
   total: initialStatus(),
-  operations: new Map<string, DiagnosticStatus>(),
+  operations: HashMap.empty<string, DiagnosticStatus>(),
 })
 
 export const makeDiagnosticOperations = Effect.fn('ExampleRpc.makeDiagnosticOperations')(
@@ -17,10 +17,13 @@ export const makeDiagnosticOperations = Effect.fn('ExampleRpc.makeDiagnosticOper
     const record = Effect.fn('ExampleDiagnostics.record')(
       (operationId: string, event: keyof DiagnosticStatus) =>
         Ref.update(state, (current) => {
-          const previous = current.operations.get(operationId) ?? initialStatus()
+          const previous = Option.getOrElse(
+            HashMap.get(current.operations, operationId),
+            initialStatus,
+          )
           return {
             total: { ...current.total, [event]: current.total[event] + 1 },
-            operations: new Map(current.operations).set(operationId, {
+            operations: HashMap.set(current.operations, operationId, {
               ...previous,
               [event]: previous[event] + 1,
             }),
@@ -48,7 +51,6 @@ export const makeDiagnosticOperations = Effect.fn('ExampleRpc.makeDiagnosticOper
         if (operations === undefined) {
           return Effect.void
         }
-        // Effect.forEach accepts the iterable first and its effectful callback second.
         // oxlint-disable-next-line unicorn/no-array-method-this-argument
         return Effect.forEach(operations, (cancellation) =>
           Deferred.succeed(cancellation, undefined),
@@ -59,7 +61,6 @@ export const makeDiagnosticOperations = Effect.fn('ExampleRpc.makeDiagnosticOper
     const reset = Effect.suspend(() => {
       const cancellations = [...active.values()].flatMap((operations) => [...operations])
       active.clear()
-      // Effect.forEach accepts the iterable first and its effectful callback second.
       // oxlint-disable-next-line unicorn/no-array-method-this-argument
       return Effect.forEach(cancellations, (cancellation) =>
         Deferred.succeed(cancellation, undefined),
@@ -71,7 +72,6 @@ export const makeDiagnosticOperations = Effect.fn('ExampleRpc.makeDiagnosticOper
       operationId,
     }: SlowDiagnosticInput) {
       const id = operationId ?? 'anonymous'
-      // Void is the deliberate success channel of this Effect factory.
       // oxlint-disable-next-line typescript/no-invalid-void-type
       const cancellation = yield* Deferred.make<void>()
       const operations = active.get(id) ?? new Set<Deferred.Deferred<void>>()
@@ -99,7 +99,9 @@ export const makeDiagnosticOperations = Effect.fn('ExampleRpc.makeDiagnosticOper
       fail: Effect.fail(new DiagnosticFailure({ reason: 'requested-failure' })),
       operationStatus: Effect.fn('ExampleDiagnostics.operationStatus')((operationId: string) =>
         Ref.get(state).pipe(
-          Effect.map((current) => current.operations.get(operationId) ?? initialStatus()),
+          Effect.map((current) =>
+            Option.getOrElse(HashMap.get(current.operations, operationId), initialStatus),
+          ),
         ),
       ),
       reset,

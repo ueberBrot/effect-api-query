@@ -1,76 +1,195 @@
 ---
 title: React Query
-description: Use generated options with React Query hooks.
+description: Acquire a ready client and use generated options with native React Query hooks.
 ---
 
-Create the RPC utility tree beside the application's `QueryClient`, then provide both through your
-application context. Generated options pass directly to React Query hooks.
+Pass generated options directly to React Query's native hooks. Build the utility tree once for
+its ready client and cache owner. Rebuild options when component input changes; the builders
+capture plain input for that execution.
 
-In the example below, `AppRpcQuery` is your utility tree's type, such as `typeof rpcQuery`.
+## Acquire and mount the client
+
+Create a small client module and mount it once from your application entry point.
+This read-only example requires React, React DOM, `@tanstack/react-query`, Effect, and
+`effect-api-query`. The server must implement the shared contract below: `GET /users/:id`
+returns `{ id: number, name: string }`.
+
+### Contract and ready client
+
+Place this code in `users-app.tsx`. Move `usersApi` to your shared contract module when connecting
+it to a real server. `startUsersApplication` acquires the ready HTTP API client and keeps one runtime
+and QueryClient alive until `dispose` runs.
 
 ```tsx
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
+import { ManagedRuntime, Schema } from 'effect'
+import { createHttpApiQueryUtils } from 'effect-api-query'
+import type { RunPromiseExit } from 'effect-api-query'
+import { FetchHttpClient } from 'effect/http'
+import { HttpApi, HttpApiClient, HttpApiEndpoint, HttpApiGroup } from 'effect/http-api'
+import { createRoot } from 'react-dom/client'
 
-export const Users = ({ rpcQuery }: { rpcQuery: AppRpcQuery }) => {
-  const queryClient = useQueryClient()
-  const users = useQuery(rpcQuery.users.list.queryOptions())
-  const removeUser = useMutation(
-    rpcQuery.users.delete.mutationOptions({
-      onSuccess: () => queryClient.invalidateQueries({ queryKey: rpcQuery.users.key() }),
+const usersApi = HttpApi.make('users-api').add(
+  HttpApiGroup.make('users').add(
+    HttpApiEndpoint.get('get', '/users/:id', {
+      params: { id: Schema.Int },
+      success: Schema.Struct({ id: Schema.Int, name: Schema.String }),
     }),
-  )
+  ),
+)
 
-  if (users.data === undefined) return null
-
-  return (
-    <ul>
-      {users.data.map((user) => (
-        <li key={user.id}>
-          {user.name}
-          <button onClick={() => removeUser.mutate({ id: user.id })}>Delete</button>
-        </li>
-      ))}
-    </ul>
-  )
+const startUsersApplication = async (baseUrl: string) => {
+  const runtime = ManagedRuntime.make(FetchHttpClient.layer)
+  const running = new Set<Promise<unknown>>()
+  const runPromiseExit: RunPromiseExit = (effect, options) => {
+    const pending = runtime.runPromiseExit(effect, options)
+    running.add(pending)
+    void pending.then(
+      () => running.delete(pending),
+      () => running.delete(pending),
+    )
+    return pending
+  }
+  try {
+    const client = await runtime.runPromise(HttpApiClient.make(usersApi, { baseUrl }))
+    const queryClient = new QueryClient()
+    const http = createHttpApiQueryUtils(usersApi, {
+      client,
+      keyPrefix: ['users-app'],
+      runPromiseExit,
+    })
+    return {
+      http,
+      queryClient,
+      dispose: async () => {
+        try {
+          await queryClient.cancelQueries()
+        } finally {
+          try {
+            await Promise.allSettled([...running])
+          } finally {
+            queryClient.clear()
+            await runtime.dispose()
+          }
+        }
+      },
+    }
+  } catch (error) {
+    await runtime.dispose()
+    throw error
+  }
 }
 ```
 
-Payload-bearing queries take constructor input inside the options argument:
+The supplied runner forwards TanStack's abort options and tracks in-flight reads. After cancellation,
+disposal waits for their Effect finalizers before releasing the runtime. Client acquisition finishes
+before React renders. Acquisition failures also dispose the runtime.
 
-```ts
-useQuery(rpcQuery.users.get.queryOptions({ input: { id: 1 } }))
+### Component and provider
+
+Continue in the same module. The component receives the ready utility tree through props;
+`QueryClientProvider` exposes the matching cache to React Query.
+
+```tsx
+type UsersApplication = Awaited<ReturnType<typeof startUsersApplication>>
+
+const User = ({ application }: { readonly application: UsersApplication }) => {
+  const user = useQuery(application.http.users.get.queryOptions({ input: { params: { id: 1 } } }))
+  if (user.isPending) {
+    return <p>Loading user…</p>
+  }
+  if (user.isError) {
+    return <p role="alert">Could not load the user.</p>
+  }
+  return <h1>{user.data.name}</h1>
+}
+
+export const mountUsersApplication = async (element: HTMLElement, baseUrl: string) => {
+  const application = await startUsersApplication(baseUrl)
+  const root = createRoot(element)
+  root.render(
+    <QueryClientProvider client={application.queryClient}>
+      <User application={application} />
+    </QueryClientProvider>,
+  )
+  return async () => {
+    root.unmount()
+    await application.dispose()
+  }
+}
 ```
 
-Pass mutation variables when calling `mutate`:
+### Application entry point
+
+In `main.tsx`, mount into the root element supplied by your HTML page. Replace the base URL with
+your server's URL.
 
 ```ts
-const createUser = useMutation(rpcQuery.users.create.mutationOptions())
-createUser.mutate({ name: 'Ada' })
+import { mountUsersApplication } from './users-app.tsx'
+
+const element = document.getElementById('root')
+if (element === null) {
+  throw new Error('Missing application root element')
+}
+
+export const stopUsers = await mountUsersApplication(element, 'http://localhost:3000')
 ```
 
-Streaming RPCs use the ordinary `useQuery` and `useSuspenseQuery` hooks. Choose whether the cache
-should retain every value or only the latest value:
+The host calls and awaits `stopUsers()` when tearing down this application;
+it unmounts React, cancels outstanding reads, awaits their local finalizers, clears the cache,
+and disposes the runtime.
+A browser's unload event cannot guarantee that async cleanup finishes.
 
-```ts
-const events = useQuery(rpcQuery.events.watch.streamedOptions())
-const latestEvent = useQuery(rpcQuery.events.watch.liveOptions())
-```
+This example has one buffered read. Before adding open streams or concurrent writes, use
+[Client Lifecycle](/effect-api-query/concepts/client-lifecycle/) to await their cleanup and settlement.
+For RPC, replace client acquisition with the Scope and protocol in
+[RPC Quick Start](/effect-api-query/getting-started/quick-start/) and pass the resulting RPC utility
+tree to the component. The provider and React hooks stay the same.
 
-The package owns each generated `queryFn`, `queryKey`, `queryKeyHashFn`, `mutationFn`, and
-`mutationKey`. Stream builders own the same query fields. Other TanStack Query options, including `select`,
-`retry`, and lifecycle callbacks, retain their normal TanStack types.
+## Choose the native hook
 
-## Use an HTTP endpoint
+The provider and component above use a buffered HTTP query. RPC uses the same hooks with its
+[constructor input](/effect-api-query/concepts/data-normalization/#query-stable-rpc-payloads);
+HTTP takes [decoded request input](/effect-api-query/concepts/data-normalization/#decoded-http-inputs).
 
-The same hooks accept HTTP options. For an endpoint that declares an `id` parameter, use:
+| Native consumer    | Generated options                      | Cached representation                                  |
+| ------------------ | -------------------------------------- | ------------------------------------------------------ |
+| `useQuery`         | `queryOptions`, HTTP `metadataOptions` | Decoded data, or decoded data with status and headers  |
+| `useInfiniteQuery` | `infiniteOptions`                      | Pages with their page parameters                       |
+| `useQuery`         | `streamedOptions`, `liveOptions`       | Retained history, or the latest emitted value          |
+| `useMutation`      | `mutationOptions`                      | Mutation result; variables supplied when `mutate` runs |
 
-```ts
-const user = useQuery(http.users.get.queryOptions({ input: { params: { id: 1 } } }))
-```
+Pass `select`, `staleTime`, retry policy, and other native options through the builder.
+`select` changes observer data while the cache retains the generated view's query data.
+Configure hashing on QueryClient before cache use. The package owns the generated key and function.
+See [RPC Builders](/effect-api-query/reference/generated-builders/) and
+[HTTP Builders](/effect-api-query/reference/http-builders/) for each view's exact contract.
 
-Follow [HTTP Queries and Mutations](/effect-api-query/guides/http-queries-and-mutations/) to create
-the HTTP utilities and configure mutation invalidation.
+## Share policy and refresh affected reads
 
-The [public RPC consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/public-contract.ts) and
-[public HTTP consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/http-contract.ts) compile these hook patterns.
-The [Vite React example](/effect-api-query/examples/) provides the application setup.
+Use [Defaults and Policies](/effect-api-query/guides/query-defaults/) to bind an endpoint-aware
+policy once, then reuse it in components, imperative queries, or route loaders. A call-site
+projection or callback keeps its native inference.
+
+For writes, pass generated mutation options to `useMutation` and supply variables through
+`mutate`. Choose the affected generated keys in the application: writes do not invalidate reads
+automatically. Use [Cache Keys and Filters](/effect-api-query/guides/cache-filters/) for broad or exact
+invalidation and [Optimistic Updates](/effect-api-query/guides/optimistic-writes/) for response seeding,
+rollback, and overlapping writes.
+
+## Streams and Suspense
+
+Ordinary hooks can show stream data while fetching continues. Choose
+[history retention](/effect-api-query/guides/choose-stream-history/) for accumulated views and keep
+clients alive until local iterator finalizers finish.
+
+TanStack documents that cancellation does not work with its Suspense hooks. Use ordinary query
+hooks when cancelling reads or stopping open stream work is part of the screen's lifecycle.
+For buffered reads with Suspense, use
+[Suspense and Error Recovery](/effect-api-query/guides/suspense-and-recovery/) for reset/retry,
+cached-data refetch failures, and independent loading with `useSuspenseQueries`.
+
+For router loaders and server rendering, continue with
+[Router and Start](/effect-api-query/guides/tanstack-start/).
+The [Vite React example](/effect-api-query/examples/#run-vite-react) is a complete application with
+reads, writes, streams, private cache owners, and resource disposal.

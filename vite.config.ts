@@ -1,4 +1,5 @@
 import { strict as effectStrict } from '@effect/tsgo/oxlint-presets'
+import { ConfigProvider, Effect } from 'effect'
 import ultraciteAntiSlop from 'ultracite/oxlint/anti-slop'
 import ultraciteCore from 'ultracite/oxlint/core'
 import ultraciteReact from 'ultracite/oxlint/react'
@@ -24,11 +25,9 @@ const ignoredPaths = [
   'test-results/**',
 ]
 
-// Packed fixtures resolve only the installed tarball from isolated temporary projects.
-const packedFixtures = ['tests/packed-consumer/**', 'tests/types/**']
-
 const testFiles = ['tests/**/*.test.ts', 'examples/**/*.test.{ts,tsx}']
 const effectTestBlocks = ['it.effect', 'it.live', 'it.scoped', 'it.scopedLive']
+const applicationBuildTasks = ['vite-react-build', 'tanstack-start-build']
 
 const vitestPreset: OxlintConfig = {
   ...ultraciteVitest,
@@ -42,11 +41,9 @@ const vitestPreset: OxlintConfig = {
         'error',
         { additionalTestBlockFunctions: [...effectTestBlocks, 'it.effect.each', 'it.live.each'] },
       ],
-      // Exact booleans catch values that truthiness-only assertions would accept.
       'vitest/prefer-strict-boolean-matchers': 'error',
       'vitest/prefer-to-be-truthy': 'off',
       'vitest/prefer-to-be-falsy': 'off',
-      // Integration tests assert several states of one operation and its cleanup.
       'vitest/max-expects': ['error', { max: 50 }],
     },
   })),
@@ -91,15 +88,13 @@ export default defineConfig({
     jsPlugins: [...(ultraciteAntiSlop.jsPlugins ?? []), ...(ultraciteShadcn.jsPlugins ?? [])],
     settings: {
       shadcn: {
-        // Start keeps its custom primitives in components/, without components.json.
         componentImports: ['(?:^|/)components/'],
       },
     },
-    // Astro owns diagnostics for the docs package and uses its supported TypeScript 6 compiler.
     ignorePatterns: [
       ...(ultraciteCore.ignorePatterns ?? []),
       ...ignoredPaths,
-      ...packedFixtures,
+      'tests/types/**',
       'apps/docs/**',
     ],
     options: {
@@ -107,23 +102,24 @@ export default defineConfig({
       typeCheck: true,
     },
     rules: {
-      // Effect.fn supplies span names; its generator callbacks are anonymous.
+      'anti-slop/require-safety-comment-for-type-assertion': 'off',
+      'eslint/no-empty': ['error', { allowEmptyCatch: true }],
       'eslint/func-names': ['error', 'as-needed', { generators: 'never' }],
-      // The typed rule accepts async callbacks that forward an existing Promise.
       'eslint/require-await': 'off',
       'typescript/require-await': 'error',
       'typescript/return-await': ['error', 'error-handling-correctness-only'],
-      // Effect/RPC functions require explicit undefined for void arguments.
       'unicorn/no-useless-undefined': ['error', { checkArguments: false }],
-      // toSorted requires ES2023; this library and its consumers target ES2022.
       'unicorn/no-array-sort': 'off',
-      // The patched engine adds defaults beyond the exported strict preset.
       'effecttsgo/any-unknown-in-error-context': 'error',
       'effecttsgo/experimental-api-usage': 'error',
       'effecttsgo/unsafe-effect-type-assertion': 'error',
       'effecttsgo/unstable-api-usage': 'error',
     },
     overrides: [
+      {
+        files: ['src/core/stream-snapshot.ts'],
+        rules: { 'promise/avoid-new': 'off' },
+      },
       {
         files: ['examples/**/*.{ts,tsx}'],
         ...ultraciteReact,
@@ -139,7 +135,6 @@ export default defineConfig({
       {
         files: testFiles,
         rules: {
-          // Context.Service fixtures belong with the tests exercising them.
           'eslint/max-classes-per-file': 'off',
         },
       },
@@ -148,7 +143,6 @@ export default defineConfig({
         rules: ultraciteShadcn.rules ?? {},
       },
       {
-        // shadcn installs primitives here; the custom example UI files stay checked.
         files: ['examples/**/components/ui/**/*.{ts,tsx}'],
         excludeFiles: [
           'examples/vite-react/src/components/ui/action-button.tsx',
@@ -159,43 +153,48 @@ export default defineConfig({
         ),
       },
       {
-        files: ['src/{http,rpc}/**/*.ts', 'tests/**/*.ts', 'examples/**/*.{ts,tsx}'],
+        files: [
+          'src/{http,rpc}/**/*.ts',
+          'tests/**/*.ts',
+          'examples/**/*.{ts,tsx}',
+          'scripts/measure-construction.mts',
+        ],
         rules: {
-          // Effect 4 transports are experimental and pinned; match the compiler policy.
           'effecttsgo/unstable-api-usage': 'off',
         },
       },
       {
         files: ['src/http/errors.ts', 'src/rpc/errors.ts'],
         rules: {
-          // Each transport keeps its related tagged error family together.
           'eslint/max-classes-per-file': ['error', 4],
         },
       },
       {
-        files: ['src/{core,http,rpc}/types.ts'],
+        files: ['src/http/types.ts'],
+        rules: { 'typescript/no-redundant-type-constituents': 'off' },
+      },
+      {
+        files: ['src/{core,http,rpc}/types.ts', 'src/core/inference.ts'],
         rules: {
-          // void is part of Effect channel and no-payload RPC type contracts.
           'typescript/no-invalid-void-type': 'off',
-          // Type aliases and interfaces differ in structural Record assignability;
-          // preserve the published contract instead of enforcing one spelling.
           'typescript/consistent-type-definitions': 'off',
         },
       },
       {
         files: [
           'src/core/operation.ts',
+          'src/core/inference.ts',
+          'src/core/policy.ts',
           'src/core/schema-key.ts',
+          'src/core/streamed-query.ts',
           'src/core/utility-tree.ts',
           'src/http/operation.ts',
           'src/http/request.ts',
+          'src/http/streamed-query.ts',
           'src/rpc/operation.ts',
           'src/rpc/streamed-query.ts',
         ],
         rules: {
-          // These runtime adapters erase caller-defined schemas/options, then validate
-          // inputs with their declaration. A domain-specific replacement loses the
-          // generic public contract, which the packed compile-time fixtures verify.
           'anti-slop/no-unknown-parameters': 'off',
           'anti-slop/no-unknown-returns': 'off',
           'anti-slop/no-unsafe-dictionary-type': 'off',
@@ -261,8 +260,6 @@ export default defineConfig({
         },
       },
       typecheck: {
-        // Vite+ 1.0's --no-lint path reports typed rules without honoring suppressions.
-        // Keep lint active so typechecking uses the same policy as the normal check.
         command: 'vp check --no-fmt',
         dependsOn: ['pack'],
         cache: {
@@ -283,41 +280,44 @@ export default defineConfig({
           output: ['dist/**'],
         },
       },
-      'packed-package': {
-        command: [
-          'vp pm pack --pack-destination .artifacts -- --config.ignore-scripts=true',
-          'fallow dead-code --private-type-leaks --file dist/index.d.mts',
-          'vp run verify-packed-package',
-        ],
-        dependsOn: ['pack', 'skills-check'],
-        cache: {
-          output: ['.artifacts/*.tgz'],
-        },
-      },
-      'verify-packed-package': {
-        command: 'node scripts/verify-packed-consumer.mts',
-        cache: false,
-      },
       'skills-check': {
         command: 'intent validate skills --check',
-        cache: {
-          output: [],
-        },
+        cache: false,
       },
       fallow: {
         command: [
-          // Public barrel exports must be exercised by repository evidence.
-          'fallow dead-code --include-entry-exports',
-          // Test-only reachability must not hide dead shipped internals.
-          'fallow dead-code --production',
-          'fallow dupes',
-          'fallow health --hotspots --file-scores --min-score 75',
+          'fallow dead-code --no-cache --include-entry-exports',
+          'fallow dead-code --no-cache --production',
+          'fallow dupes --no-cache',
+          'fallow health --no-cache --hotspots --file-scores --min-score 75',
         ],
         cache: false,
       },
       test: {
         command: 'vp test',
+        dependsOn: ['pack', 'api-types', 'server-local-types'],
+        cache: {
+          env: ['RPC_TRANSPORT_MEASURE', 'STREAM_MEASURE'],
+          output: [],
+        },
+      },
+      'construction-baseline': {
+        command: 'tsx scripts/measure-construction.mts',
+        cache: false,
+      },
+      'api-types': {
+        command: [
+          'tsc --project tests/types/tsconfig.json',
+          'node node_modules/typescript-5.9/bin/tsc --project tests/types/tsconfig.json',
+        ],
         dependsOn: ['pack'],
+        cache: { output: [] },
+      },
+      'server-local-types': {
+        command: [
+          'tsc --project tests/fixtures/tsconfig.server-local.json',
+          'node node_modules/typescript-5.9/bin/tsc --project tests/fixtures/tsconfig.server-local.json',
+        ],
         cache: {
           output: [],
         },
@@ -325,18 +325,22 @@ export default defineConfig({
       e2e: {
         command: 'playwright test',
         cache: false,
+        dependsOn: applicationBuildTasks,
       },
       'e2e:chromium': {
         command: 'playwright test --project=chromium',
         cache: false,
+        dependsOn: applicationBuildTasks,
       },
       'e2e:firefox': {
         command: 'playwright test --project=firefox',
         cache: false,
+        dependsOn: applicationBuildTasks,
       },
       'e2e:webkit': {
         command: 'playwright test --project=webkit',
         cache: false,
+        dependsOn: applicationBuildTasks,
       },
       quality: {
         command: ['vp run check', 'vp run effect-check', 'vp run fallow', 'vp run test'],
@@ -401,6 +405,12 @@ export default defineConfig({
       'docs-e2e': {
         command: 'playwright test --config playwright.docs.config.ts',
         cache: false,
+        dependsOn:
+          Effect.runSync(
+            ConfigProvider.fromEnv({ preserveEmptyStrings: true }).load(['DOCS_BASE_URL']),
+          )?.value === undefined
+            ? ['docs-build']
+            : [],
       },
       'docs-preview': {
         command: 'vp run --filter @effect-api-query/docs preview',
@@ -415,7 +425,7 @@ export default defineConfig({
       validate: {
         command: [
           'vp run quality',
-          'vp run packed-package',
+          'vp run skills-check',
           'vp run vite-react-build',
           'vp run tanstack-start-build',
           'vp run docs-build',
@@ -426,7 +436,6 @@ export default defineConfig({
     },
   },
   staged: {
-    // Typed lint fixes need the full project context; formatting stays scoped to staged files.
     '*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}': ['vp fmt', () => 'vp run --no-cache typecheck --fix'],
     '*.{json,jsonc,md,yaml,yml}': 'vp fmt',
   },

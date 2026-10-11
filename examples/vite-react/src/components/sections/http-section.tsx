@@ -6,7 +6,7 @@ import type { SubmitEvent } from 'react'
 import {
   describeSlowQueryCancellation,
   useSlowQueryCancellation,
-} from '../../hooks/use-slow-query-cancellation.ts'
+} from '../../../../shared/use-slow-query-cancellation.ts'
 import type { ViteReactApplication } from '../../lib/application.ts'
 import { ActionButton } from '../ui/action-button.tsx'
 import { EffectErrorDetails } from '../ui/effect-error-details.tsx'
@@ -32,7 +32,7 @@ const HttpSelectionResult = ({
 }
 
 export const HttpSection = ({ application }: { readonly application: ViteReactApplication }) => {
-  const { httpQuery, invalidateUsers, queryClient } = application
+  const { httpQuery, invalidateUsers, queryClient, userWrites } = application
   const users = useQuery(httpQuery.users.list.queryOptions())
   const [selectedId, setSelectedId] = useState<number>()
   const selectedUser = useQuery(
@@ -54,20 +54,11 @@ export const HttpSection = ({ application }: { readonly application: ViteReactAp
   const [name, setName] = useState('')
   const [locale, setLocale] = useState('')
   const [cacheMessage, setCacheMessage] = useState<string>()
-  const createUser = useMutation(
-    httpQuery.users.create.mutationOptions({ onSuccess: invalidateUsers }),
+  const createUser = useMutation(userWrites.httpCreate())
+  const deleteUser = useMutation(userWrites.httpDelete())
+  const failure = useMutation(
+    application.trackMutationOptions(httpQuery.diagnostics.fail.mutationOptions()),
   )
-  const deleteUser = useMutation(
-    httpQuery.users.delete.mutationOptions({
-      onSuccess: async (_, input) => {
-        if (selectedId === input.params.id) {
-          setSelectedId(undefined)
-        }
-        await invalidateUsers()
-      },
-    }),
-  )
-  const failure = useMutation(httpQuery.diagnostics.fail.mutationOptions())
   const slowQuery = useSlowQueryCancellation(application, 'http')
   const slowMessage = describeSlowQueryCancellation(slowQuery.state)
   const submit = (event: SubmitEvent<HTMLFormElement>) => {
@@ -99,7 +90,7 @@ export const HttpSection = ({ application }: { readonly application: ViteReactAp
     await invalidateUsers()
     setCacheMessage('HTTP and RPC user queries invalidated and refetched')
   }
-  const loaded = pages.data?.pages.flatMap((page) => page.users) ?? []
+  const loaded = pages.data?.pages.reduce((count, page) => count + page.users.length, 0) ?? 0
 
   return (
     <section
@@ -123,9 +114,18 @@ export const HttpSection = ({ application }: { readonly application: ViteReactAp
                 <span>HTTP: {user.name}</span>
                 <ActionButton
                   aria-label={`Delete HTTP ${user.name}`}
-                  disabled={deleteUser.isPending}
+                  disabled={user.id < 0 || deleteUser.isPending}
                   onClick={() => {
-                    deleteUser.mutate({ params: { id: user.id } })
+                    deleteUser.mutate(
+                      { params: { id: user.id } },
+                      {
+                        onSuccess: () => {
+                          if (selectedId === user.id) {
+                            setSelectedId(undefined)
+                          }
+                        },
+                      },
+                    )
                   }}
                   type="button"
                   variant="danger"
@@ -214,7 +214,7 @@ export const HttpSection = ({ application }: { readonly application: ViteReactAp
         <div className="space-y-4 border border-border bg-background p-5">
           <h3 className="text-xl font-bold">HTTP pagination</h3>
           <p>
-            HTTP: {String(loaded.length)} of {String(pages.data?.pages[0]?.total ?? 0)} loaded
+            HTTP: {String(loaded)} of {String(pages.data?.pages[0]?.total ?? 0)} loaded
           </p>
           <ol className="grid gap-3">
             {pages.data?.pages.map((page, index) => (

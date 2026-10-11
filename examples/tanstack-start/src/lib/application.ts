@@ -1,9 +1,9 @@
 import { exampleHttpApi, exampleRpcGroup } from '@effect-api-query/contracts'
 import { startExampleRpcClient } from '@effect-api-query/contracts/client'
-import type { ExampleRpcClient } from '@effect-api-query/contracts/client'
+import type { ExampleRpcClient, StartedExampleRpcClient } from '@effect-api-query/contracts/client'
 import { QueryClient } from '@tanstack/react-query'
-import { ManagedRuntime } from 'effect'
-import { createHttpApiQueryUtils, createRpcQueryUtils } from 'effect-api-query'
+import { Effect, Layer, ManagedRuntime } from 'effect'
+import { createHttpApiQueryUtils, createRpcQueryUtils, fetchStreamSnapshot } from 'effect-api-query'
 import type { RunPromiseExit } from 'effect-api-query'
 import { FetchHttpClient, HttpClient, HttpClientRequest } from 'effect/http'
 import { HttpApiClient } from 'effect/http-api'
@@ -33,6 +33,8 @@ const makeExampleHttpQueryUtils = (
   })
 
 export interface TanStackStartApplication {
+  readonly runPreparation: <A, E>(effect: Effect.Effect<A, E>) => Promise<A>
+  readonly captureSnapshot: typeof fetchStreamSnapshot
   readonly httpQuery: ReturnType<typeof makeExampleHttpQueryUtils>
   readonly invalidateUsers: () => Promise<void>
   readonly dispose: () => Promise<void>
@@ -42,32 +44,78 @@ export interface TanStackStartApplication {
 
 export interface StartTanStackStartApplicationOptions {
   readonly rpcUrl: string
+  readonly rpcClient?: StartedExampleRpcClient
+  readonly fetch?: typeof globalThis.fetch
   readonly httpBaseUrl?: string
   readonly identity?: string
   readonly httpAuthorization?: string
 }
 
-/** Creates clients, query utilities, and cleanup together so the example can be copied as a whole. */
 export const startTanStackStartApplication = async ({
   rpcUrl,
+  rpcClient: readyRpcClient,
+  fetch: applicationFetch,
   identity = 'example',
   httpAuthorization = 'allowed',
   httpBaseUrl = new URL(rpcUrl, globalThis.location?.href).origin,
 }: StartTanStackStartApplicationOptions): Promise<TanStackStartApplication> => {
-  const rpcClient = await startExampleRpcClient(rpcUrl)
-  const httpRuntime = ManagedRuntime.make(FetchHttpClient.layer)
+  const rpcClient = readyRpcClient ?? (await startExampleRpcClient(rpcUrl))
+  const httpRuntime = ManagedRuntime.make(
+    applicationFetch === undefined
+      ? FetchHttpClient.layer
+      : FetchHttpClient.layer.pipe(
+          Layer.provide(Layer.succeed(FetchHttpClient.Fetch, applicationFetch)),
+        ),
+  )
+  const abort = new AbortController()
+  const pendingWork = new Set<Promise<unknown>>()
+  const trackWork = async <A>(execute: () => A | Promise<A>): Promise<A> => {
+    abort.signal.throwIfAborted()
+    const execution = Promise.resolve(execute())
+    pendingWork.add(execution)
+    try {
+      return await execution
+    } finally {
+      pendingWork.delete(execution)
+    }
+  }
+  const ownRunner =
+    (runner: RunPromiseExit): RunPromiseExit =>
+    async (effect, options) =>
+      trackWork(async () => runner(effect, options))
   const queryClient = new QueryClient({
     defaultOptions: {
       mutations: { retry: false },
-      queries: { retry: false, staleTime: 60_000 },
+      queries: {
+        retry: false,
+        staleTime: 60_000,
+        persister: async (queryFn, context) => trackWork(() => queryFn(context)),
+      },
     },
   })
+  const runPreparation: TanStackStartApplication['runPreparation'] = async (effect) =>
+    trackWork(async () => Effect.runPromise(effect, { signal: abort.signal }))
+  const captureSnapshot: typeof fetchStreamSnapshot = async (owner, options, controls = {}) => {
+    if (owner !== queryClient) {
+      throw new Error('Snapshot belongs to another request')
+    }
+    return await trackWork(async () =>
+      fetchStreamSnapshot(owner, options, {
+        ...controls,
+        signal:
+          controls.signal === undefined
+            ? abort.signal
+            : AbortSignal.any([abort.signal, controls.signal]),
+      }),
+    )
+  }
   let disposal: Promise<void> | undefined
   const dispose = async () => {
-    // Stop queries before releasing the ready clients they execute through.
     disposal ??= (async () => {
       try {
+        abort.abort()
         await queryClient.cancelQueries()
+        await Promise.allSettled(pendingWork)
       } finally {
         queryClient.clear()
         try {
@@ -89,9 +137,19 @@ export const startTanStackStartApplication = async ({
         ),
       }),
     )
-    const httpQuery = makeExampleHttpQueryUtils(httpClient, httpRuntime.runPromiseExit, identity)
-    const rpcQuery = makeExampleRpcQueryUtils(rpcClient.client, rpcClient.runPromiseExit, identity)
+    const httpQuery = makeExampleHttpQueryUtils(
+      httpClient,
+      ownRunner(httpRuntime.runPromiseExit),
+      identity,
+    )
+    const rpcQuery = makeExampleRpcQueryUtils(
+      rpcClient.client,
+      ownRunner(rpcClient.runPromiseExit),
+      identity,
+    )
     return {
+      captureSnapshot,
+      runPreparation,
       httpQuery,
       invalidateUsers: async () => {
         await Promise.all([
@@ -112,5 +170,13 @@ export const startTanStackStartApplication = async ({
       })
     }
     throw error
+  }
+}
+
+export const reportCleanupFailure = async (cleanup: Promise<void>): Promise<void> => {
+  try {
+    await cleanup
+  } catch (error) {
+    console.error('Start resource cleanup failed', error)
   }
 }

@@ -24,7 +24,7 @@
 
       updatePackageVersion(manifest.version)
     } catch {
-      // Keep the version embedded by the last documentation build.
+      return
     }
   }
 

@@ -12,24 +12,31 @@ const Command = ({
   readonly application: ViteReactApplication
   readonly number: number
 }) => {
-  // This command keeps its idempotency key for the component lifetime.
   // oxlint-disable-next-line react/hook-use-state
   const [operationId] = useState(() => globalThis.crypto.randomUUID())
-  const { rpcQuery, queryClient } = application
+  const { rpcQuery, queryClient, trackMutationOptions } = application
   const input = { operationId }
   const reconcile = async () => {
+    if (!application.isActive()) {
+      return
+    }
     await queryClient.invalidateQueries({ queryKey: rpcQuery.commands.status.queryKey(input) })
   }
-  const start = useMutation(rpcQuery.commands.start.mutationOptions({ onSettled: reconcile }))
-  const cancel = useMutation(rpcQuery.commands.cancel.mutationOptions({ onSettled: reconcile }))
+  const start = useMutation(
+    trackMutationOptions(rpcQuery.commands.start.mutationOptions({ onSettled: reconcile })),
+  )
+  const cancel = useMutation(
+    trackMutationOptions(rpcQuery.commands.cancel.mutationOptions({ onSettled: reconcile })),
+  )
   const status = useQuery(
     rpcQuery.commands.status.queryOptions({
       input,
       enabled: start.status !== 'idle',
       refetchInterval: (query) =>
         query.state.data?.state === 'running' ||
-        query.state.data === null ||
-        query.state.data === undefined
+        query.state.status === 'error' ||
+        query.state.data === undefined ||
+        (query.state.data === null && start.isPending)
           ? 100
           : false,
     }),
@@ -45,7 +52,9 @@ const Command = ({
       <div className="flex flex-wrap gap-3">
         <ActionButton
           type="button"
-          disabled={start.status !== 'idle'}
+          disabled={
+            start.isPending || start.isSuccess || (command !== undefined && command !== null)
+          }
           onClick={() => {
             start.mutate(input)
           }}

@@ -17,3 +17,6 @@ an injected runner with the same `effect, { signal? }` shape.
 
 The caller owns protocol, middleware, lifetime, and resources. Queries forward TanStack's abort
 signal, mutations omit it, and runner rejections propagate untouched.
+
+[ADR 0026](0026-keep-rpc-transport-aggregation-in-the-application.md) preserves application ownership
+of transport aggregation.

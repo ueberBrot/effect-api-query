@@ -7,7 +7,6 @@ import { createSchemaKeyEncoding } from '../core/schema-key'
 import { EffectHttpApiQueryConfigError, EffectHttpApiQueryKeyError } from './errors'
 import type { HttpApiEndpointIdentity } from './errors'
 
-// Codec conversion can wrap a branded schema; the brand remains on its inner schema.
 const multipartBrands = (schema: Schema.Top): ReadonlySet<string> => {
   const brands = new Set<string>()
   const visited = new WeakSet()
@@ -28,13 +27,14 @@ const multipartBrands = (schema: Schema.Top): ReadonlySet<string> => {
 
 export type HttpRequestDescription =
   | { readonly kind: 'Unary'; readonly input: OperationInput }
+  | { readonly kind: 'Streaming'; readonly input: OperationInput }
   | { readonly kind: 'Mutation' }
 
 const classifyEndpoint = (
   endpoint: HttpApiEndpoint.Top,
   identity: HttpApiEndpointIdentity,
 ):
-  | { readonly kind: 'Unary'; readonly schemas: readonly Schema.Top[] }
+  | { readonly kind: 'Unary' | 'Streaming'; readonly schemas: readonly Schema.Top[] }
   | { readonly kind: 'Mutation' }
   | undefined => {
   const payloads: Schema.Top[] = []
@@ -60,21 +60,32 @@ const classifyEndpoint = (
       payloads.push(schema)
     }
   }
-  if (
-    multipartStream ||
-    [...endpoint.success].some((schema) =>
-      Predicate.hasProperty(
-        HttpApiSchema.isWithHeaders(schema) ? schema.schema : schema,
-        '~effect/http-api/HttpApiSchema/Stream',
-      ),
-    )
-  ) {
+  if (multipartStream) {
     return undefined
+  }
+  const successes = [...endpoint.success]
+  const streams = successes.filter((schema) =>
+    Predicate.hasProperty(
+      HttpApiSchema.isWithHeaders(schema) ? schema.schema : schema,
+      '~effect/http-api/HttpApiSchema/Stream',
+    ),
+  )
+  if (streams.length > 0) {
+    const [success] = successes
+    const body = HttpApiSchema.isWithHeaders(success) ? success.schema : success
+    if (
+      multipart ||
+      successes.length !== 1 ||
+      !Predicate.hasProperty(body, '_tag') ||
+      body._tag !== 'StreamSse'
+    ) {
+      return undefined
+    }
+    return { kind: 'Streaming', schemas: payloads }
   }
   return multipart ? { kind: 'Mutation' } : { kind: 'Unary', schemas: payloads }
 }
 
-// HTTP omits undefined object members; arrays still undergo strict JSON validation.
 const omitUndefined = (value: unknown, seen = new WeakSet()): unknown => {
   if (!Predicate.isObjectOrArray(value)) {
     return value
@@ -85,28 +96,50 @@ const omitUndefined = (value: unknown, seen = new WeakSet()): unknown => {
   seen.add(value)
   let result: unknown = value
   if (Array.isArray(value)) {
-    result = value.map((item) => omitUndefined(item, seen))
+    let copy: unknown[] | undefined
+    for (let index = 0; index < value.length; index += 1) {
+      if (!Object.hasOwn(value, index)) {
+        throw new TypeError('Key values must not contain sparse arrays')
+      }
+      const item = value[index]
+      const next = omitUndefined(item, seen)
+      if (copy !== undefined) {
+        copy.push(next)
+      } else if (next !== item) {
+        copy = Array.from({ length: index }, (_, offset) => value[offset])
+        copy.push(next)
+      }
+    }
+    result = copy ?? value
   } else if (
     Object.getPrototypeOf(value) === Object.prototype ||
     Object.getPrototypeOf(value) === null
   ) {
-    result = Object.fromEntries(
-      Object.entries(value)
-        .filter(([, item]) => item !== undefined)
-        .map(([name, item]) => [name, omitUndefined(item, seen)]),
-    )
+    let copy: [string, unknown][] | undefined
+    const entries = Object.entries(value)
+    for (const [index, [name, item]] of entries.entries()) {
+      if (item === undefined) {
+        copy ??= entries.slice(0, index)
+      } else {
+        const next = omitUndefined(item, seen)
+        if (next !== item) {
+          copy ??= entries.slice(0, index)
+        }
+        copy?.push([name, next])
+      }
+    }
+    result = copy === undefined ? value : Object.fromEntries(copy)
   }
   seen.delete(value)
   return result
 }
 
-const normalizeRequestKey = (value: unknown): unknown => {
+const normalizeRequestKey = (value: unknown) => {
   const request = omitUndefined(value)
   if (!Predicate.isObject(request)) {
     throw new TypeError('Encoded HTTP requests must be objects')
   }
   if (Predicate.isObject(request['headers'])) {
-    // SAFETY: Object.create(null) allocates an empty dictionary without a prototype.
     // oxlint-disable-next-line typescript/no-unsafe-assignment
     const headers: Record<string, unknown> = Object.create(null)
     for (const [name, headerValue] of Object.entries(request['headers'])) {
@@ -119,12 +152,11 @@ const normalizeRequestKey = (value: unknown): unknown => {
       }
       headers[lower] = headerValue
     }
-    request['headers'] = headers
+    return { ...request, headers }
   }
   return request
 }
 
-/** Retains buffered multipart mutations and omits streaming requests or responses. */
 export const createHttpRequest = (
   endpoint: HttpApiEndpoint.Top,
   identity: HttpApiEndpointIdentity,
@@ -148,7 +180,7 @@ export const createHttpRequest = (
     fields['payload'] = Schema.Union(payloads)
   }
   if (Object.keys(fields).length === 0) {
-    return { kind: 'Unary', input: { _tag: 'Inputless' } }
+    return { kind: classified.kind, input: { _tag: 'Inputless' } }
   }
   const schema = Schema.Struct(fields)
   const keyEncoding = createSchemaKeyEncoding(schema)
@@ -160,7 +192,7 @@ export const createHttpRequest = (
       cause,
     )
   return {
-    kind: 'Unary',
+    kind: classified.kind,
     input: {
       _tag: 'Input',
       requiresEncoder: payloads.length > 1 || keyEncoding.requiresEncoder,

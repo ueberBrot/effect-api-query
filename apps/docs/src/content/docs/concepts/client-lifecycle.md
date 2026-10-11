@@ -3,25 +3,18 @@ title: Client Lifecycle
 description: Keep RPC and HTTP clients, runtimes, and resources under caller ownership.
 ---
 
-`createRpcQueryUtils` accepts a ready flat RPC client. Your application acquires the client, keeps
-its `Scope` open, and disposes its resources:
+Both factories use ready clients. The application owns transport, middleware, runtime,
+Scope, and QueryClient:
 
-1. Open the RPC client's `Scope` and build any required runtime.
-2. Create a `QueryClient` and RPC utility tree.
-3. Run ordinary, infinite, accumulated-stream, and live queries or mutations. Their generated
-   functions call the ready client through `runPromiseExit`.
-4. At shutdown, cancel active queries, clear the cache, and then dispose the RPC client's resources.
+1. Acquire the RPC or HTTP client and the services it requires.
+2. Create a QueryClient and utility tree for that owner.
+3. Keep those resources alive while queries, streams, and mutations run.
+4. Stop consumers, cancel queries, await local stream cleanup and accepted mutations,
+   clear the cache, then release the client and runtime.
 
-On the server, create these resources separately for each request to keep request data and scoped
-services isolated. In the browser, keep them for the application lifetime.
-
-The factory has no React, router, transport, provider, or server-rendering lifecycle of its own.
+Server requests own independent resources. Browser applications keep them for their lifetime.
 
 ## HTTP clients and execution services
-
-`createHttpApiQueryUtils` accepts a ready HttpApiClient. The application builds its HTTP transport,
-installs client middleware, and manages any runtime or `Scope` the client uses. On the server,
-create a client and `QueryClient` for each request and dispose their resources when it ends.
 
 Calls that need no services default to `Effect.runPromiseExit`. If an exposed endpoint needs request
 encoding, success decoding, or error decoding services, supply a `runPromiseExit` that provides
@@ -42,3 +35,30 @@ processing; it is not a serialized server Context and does not replace the suppl
 
 Manage authentication, middleware, transport setup, runtime services, and `Scope` in your
 application client and runtime.
+
+## Stream creation and consumption
+
+For an accumulated or live RPC or HTTP SSE query, the runner executes
+`Stream.toAsyncIterableEffect` to create an iterable and capture its Effect `Context`. The runner
+returns a successful `Exit` before Query Core pulls values. Iterator pulls then use that captured
+Context while the query remains fetching. Keep its services and the ready client's Scope alive
+until consumption finishes.
+
+Transform or instrument the ready-client stream when the work must cover consumption.
+Preserve its request options, declared value/error types, and HTTP response-mode contract.
+Use a stream finalizer for completion or cancellation cleanup.
+
+A timer, span, finalizer, or retry schedule around the runner's creation Effect ends with iterable
+creation. It does not wrap the later pulls. Put stream-lifetime instrumentation and recovery on the
+stream itself. A retry in generated Query options reruns the query function and creates another
+iterable. Coordinate it with stream and transport schedules as described in
+[retry queries](/effect-api-query/guides/retry-queries/#set-defaults-deliberately).
+
+Native `cancelQueries` settlement can precede asynchronous iterator cleanup. Await the
+resource's completion signal before releasing its services. Mutations settle separately because
+they have no query abort signal.
+
+For an open-stream server capture, await
+[fetchStreamSnapshot](/effect-api-query/guides/stream-snapshots/) before dehydration or client
+disposal. The helper waits for local iterator cleanup; remote completion still requires an
+application acknowledgement.

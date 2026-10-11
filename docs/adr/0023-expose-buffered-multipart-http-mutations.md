@@ -1,6 +1,6 @@
 # Expose buffered multipart HTTP mutations
 
-Status: Accepted. Amends [ADR 0022](0022-add-buffered-http-utilities-with-separate-key-roots.md) and extends [ADR 0021](0021-share-utility-construction-through-private-modules.md).
+Status: Accepted. Amends [ADR 0022](0022-add-buffered-http-utilities-with-separate-key-roots.md) and extends [ADR 0021](0021-share-utility-construction-through-private-modules.md). Extended HTTP views in [ADR 0024](0024-project-http-streams-and-buffered-metadata.md) retain this multipart capability limit.
 
 Buffered multipart uploads need mutation execution without query cache identity for files or
 `FormData`. Expose only `key()`, `mutationKey()`, and `mutationOptions()` when an endpoint has any

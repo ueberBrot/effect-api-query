@@ -1,25 +1,14 @@
-import { Cause } from 'effect'
-import { isEffectHttpApiQueryError, isEffectRpcQueryError } from 'effect-api-query'
+import { describeEffectError } from '../../../shared/error-description.ts'
 
 const alertClassName =
   'mt-4 border border-destructive-900/80 border-l-4 border-l-destructive-600 bg-destructive-950/50 p-3 text-sm whitespace-pre-wrap text-destructive-200'
 
 export const EffectErrorDetails = ({ error }: { readonly error: unknown }) => {
-  if (isEffectRpcQueryError(error) || isEffectHttpApiQueryError(error)) {
-    const operation = isEffectRpcQueryError(error)
-      ? error.rpcTag
-      : `${error.groupId}.${error.endpoint}`
-    return (
-      <p className={alertClassName} role="alert">
-        {error.name} from {operation} ({error.operation}){'\n'}
-        {Cause.pretty(error.cause)}
-      </p>
-    )
-  }
-
-  return error instanceof Error ? (
+  const description = describeEffectError(error)
+  return description === undefined ? null : (
     <p className={alertClassName} role="alert">
-      {error.name}: {error.message}
+      {description.summary}
+      {description.details === undefined ? undefined : `\n${description.details}`}
     </p>
-  ) : null
+  )
 }

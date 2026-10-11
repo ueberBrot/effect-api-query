@@ -1,92 +1,121 @@
 # effect-api-query
 
-Use Effect RPC and HttpApi with typed TanStack Query options and semantic cache keys.
-
-Create utilities from your API definition and a ready client, then pass their options directly to
-TanStack Query. Your application controls the client lifetime, cache policies, and framework setup.
+Derive typed TanStack Query options and cache keys from your Effect RPC and HttpApi contracts.
+Pass the generated options to QueryClient or your framework's Query hooks. Inputs and results
+follow the contract; your application controls transport, client lifetime, and cache policy.
 
 ## Install
+
+Install the package and TanStack Query Core:
 
 ```sh
 pnpm add effect-api-query @tanstack/query-core
 ```
 
-With automatic peer installation enabled, pnpm installs the exact Effect version declared by the
-package. Use TypeScript 5.9 or newer with `strict: true`. The package requires ESM and ES2022 support.
-Before upgrading, review [compatibility and stability](https://ueberbrot.github.io/effect-api-query/getting-started/compatibility-and-stability/).
+The package pins one exact Effect 4 release because its RPC and HTTP API modules are unstable.
+With automatic peer installation enabled, pnpm installs that version. Existing applications must
+match it. Use TypeScript 5.9 or newer with `strict: true`, ESM, and ES2022 support. See
+[compatibility and stability](https://ueberbrot.github.io/effect-api-query/getting-started/compatibility-and-stability/).
 
-## Query an RPC
+## RPC
 
-Pass your RPC group and ready flat client to the factory:
+Share this contract with your server and acquire a matching **flat RPC client** before calling
+`readUser`. Keep its Scope alive while the client is in use. The
+[RPC quick start](https://ueberbrot.github.io/effect-api-query/getting-started/quick-start/)
+shows acquisition and cleanup.
 
 ```ts
+import { QueryClient } from '@tanstack/query-core'
+import { Schema } from 'effect'
 import { createRpcQueryUtils } from 'effect-api-query'
+import { Rpc, RpcGroup } from 'effect/rpc'
+import type { RpcClient } from 'effect/rpc'
 
-const rpc = createRpcQueryUtils(rpcGroup, {
-  client,
-  keyPrefix: ['my-app'],
-  runPromiseExit,
-})
+const usersRpc = RpcGroup.make(
+  Rpc.make('users.get', {
+    payload: { id: Schema.Int },
+    success: Schema.Struct({ id: Schema.Int, name: Schema.String }),
+  }),
+)
 
-const options = rpc.users.get.queryOptions({ input: { id: 1 } })
-const user = await queryClient.query(options)
+async function readUser(
+  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof usersRpc>>,
+  queryClient: QueryClient,
+) {
+  const rpc = createRpcQueryUtils(usersRpc, { client, keyPrefix: ['users-app'] })
+  const user = await queryClient.query(rpc.users.get.queryOptions({ input: { id: 1 } }))
+  return user.name
+}
 ```
 
-Follow the [RPC quick start](https://ueberbrot.github.io/effect-api-query/getting-started/quick-start/)
-for setup and cleanup.
+Dotted tags become nested utility paths: `users.get` becomes `rpc.users.get`. RPC inputs use the
+payload Schema's constructor input.
 
-## Query an HttpApi
+## HTTP
 
-Pass your HttpApi declaration and ready HTTP API client to the factory:
+Share this HttpApi with your server and acquire its **ready HttpApiClient** before calling
+`readUser`. Keep its transport resources alive while the client is in use. The
+[HTTP quick start](https://ueberbrot.github.io/effect-api-query/getting-started/http-quick-start/)
+shows acquisition and cleanup.
 
 ```ts
+import { QueryClient } from '@tanstack/query-core'
+import { Schema } from 'effect'
 import { createHttpApiQueryUtils } from 'effect-api-query'
+import { HttpApi, HttpApiEndpoint, HttpApiGroup } from 'effect/http-api'
+import type { HttpApiClient } from 'effect/http-api'
 
-const http = createHttpApiQueryUtils(api, {
-  client: httpClient,
-  keyPrefix: ['my-app'],
-  runPromiseExit,
-})
+const usersApi = HttpApi.make('users-api').add(
+  HttpApiGroup.make('users').add(
+    HttpApiEndpoint.get('get', '/users/:id', {
+      params: { id: Schema.Int },
+      success: Schema.Struct({ id: Schema.Int, name: Schema.String }),
+    }),
+  ),
+)
 
-const options = http.users.get.queryOptions({ input: { params: { id: 1 } } })
-const user = await queryClient.query(options)
+async function readUser(client: HttpApiClient.ForApi<typeof usersApi>, queryClient: QueryClient) {
+  const http = createHttpApiQueryUtils(usersApi, { client, keyPrefix: ['users-app'] })
+  const user = await queryClient.query(
+    http.users.get.queryOptions({ input: { params: { id: 1 } } }),
+  )
+  return user.name
+}
 ```
 
-HTTP accepts decoded request parts; RPC accepts payload constructor input. Follow the
-[HTTP quick start](https://ueberbrot.github.io/effect-api-query/getting-started/http-quick-start/)
-for a complete declaration, client, query, and mutation.
+HTTP inputs use decoded `params`, `query`, `headers`, and `payload` containers. Both examples use
+the default Effect runner; provide a signal-aware `runPromiseExit` when execution needs services.
+Choose a `keyPrefix` that identifies your application and any user or tenant that affects its data.
+Keep credentials out of keys.
 
-## Choose an operation
+## Capabilities
 
-| API definition                              | Available operations                          |
-| ------------------------------------------- | --------------------------------------------- |
-| Unary RPC                                   | Queries, infinite queries, and mutations      |
-| Streaming RPC                               | Accumulated streamed queries and live queries |
-| Buffered HttpApi endpoint without multipart | Queries, infinite queries, and mutations      |
-| Buffered HttpApi endpoint with multipart    | Mutations with `FormData`                     |
+| Contract                                | Generated operations                          |
+| --------------------------------------- | --------------------------------------------- |
+| Unary RPC or buffered nonmultipart HTTP | Query, infinite query, mutation               |
+| Buffered nonmultipart HTTP              | Separate response status/header metadata view |
+| Buffered multipart HTTP                 | Mutation with explicit `FormData`             |
+| RPC stream or unambiguous HTTP SSE      | Accumulated streamed query, live query        |
 
-Both factories generate keys for cache reads, writes, prefetching, and invalidation. Query functions
-forward cancellation to Effect. Mutations use TanStack's normal callbacks; invalidate affected
-queries in your application.
+Generated keys support cache reads, writes, and invalidation. Queries forward cancellation to
+Effect. Use `withQueryPolicy` and `withMutationPolicy` to share typed defaults. Your application
+invalidates affected queries after mutations. See
+[feature support](https://ueberbrot.github.io/effect-api-query/getting-started/feature-support/)
+for supported contracts and limits.
 
-For uploads, build `FormData` explicitly and pass it as mutation `payload`. See the
-[HTTP upload guide](https://ueberbrot.github.io/effect-api-query/guides/http-queries-and-mutations/#upload-a-file).
-Streaming HTTP responses and streaming multipart requests remain omitted.
+## Documentation and examples
 
-## Integrate with your application
-
-- [React Query](https://ueberbrot.github.io/effect-api-query/guides/react-query/): use generated options with hooks.
-- [TanStack Start](https://ueberbrot.github.io/effect-api-query/guides/tanstack-start/): share RPC and HTTP options across loaders, server rendering, and hydration.
-- [Run the examples](https://ueberbrot.github.io/effect-api-query/examples/): try complete Vite React and TanStack Start applications.
-- [Feature support](https://ueberbrot.github.io/effect-api-query/getting-started/feature-support/): check available operations and integration limits.
-- [API reference](https://ueberbrot.github.io/effect-api-query/reference/public-exports/): look up factories, builders, and errors.
+- [Documentation](https://ueberbrot.github.io/effect-api-query/): queries, mutations, pagination, streaming, policies, and caching.
+- [Integrations](https://ueberbrot.github.io/effect-api-query/integrations/): framework setup and client lifetime.
+- [Examples](https://ueberbrot.github.io/effect-api-query/examples/): complete Vite React and TanStack Start applications.
+- [API reference](https://ueberbrot.github.io/effect-api-query/reference/public-exports/): factories, builders, keys, and errors.
 
 ## Agent skill
 
 Install the library usage skill from this repository:
 
 ```sh
-npx skills add ueberBrot/effect-api-query --skill effect-api-query
+npx skills add ueberBrot/effect-api-query --full-depth --skill effect-api-query
 ```
 
 The same skill ships in the npm package. With the library installed, run
@@ -96,5 +125,5 @@ The same skill ships in the npm package. With the library installed, run
 npx @tanstack/intent@latest load effect-api-query#effect-api-query
 ```
 
-Intent reads the skill from the installed library version. Skills installed from
-GitHub are updated separately through the Skills CLI.
+Intent uses the skill from the installed library version. GitHub skill installations update
+separately through the Skills CLI.

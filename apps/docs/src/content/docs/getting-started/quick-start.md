@@ -1,21 +1,16 @@
 ---
 title: RPC Quick Start
-description: Declare an RPC group, own a ready client, and run a generated query and mutation.
+description: Acquire an RPC client and use generated query and mutation options.
 ---
 
-This tutorial connects an Effect RPC client to TanStack Query Core. You will declare two operations,
-acquire a ready flat client, read a user, and create another user.
+First [install the package](/effect-api-query/getting-started/installation/). The server must
+serve the same `usersRpc` contract at `http://localhost:3000/rpc` with Effect's JSON RPC protocol.
+Share the contract between your server and browser application.
 
-First [install the package](/effect-api-query/getting-started/installation/). Use a server at
-`http://localhost:3000/rpc` that implements the declaration below with JSON RPC serialization.
-The server must have an existing user with ID `1`. Change the URL to your server. For browser
-requests, configure the server's CORS policy to allow the application's origin. For a complete
-server and browser application, [run the examples](/effect-api-query/examples/).
+## Acquire the client and execute requests
 
-## Declare, connect, and call
-
-Save this as `rpc-client.ts` in your application. The declaration belongs in a shared module when
-you connect your own server and client. Only the client application imports `effect-api-query`.
+This complete module defines the contract, acquires a ready flat client, reads a user, writes a
+user, and releases its resources. Replace the URL with your server's RPC endpoint.
 
 ```ts
 import { MutationObserver, QueryClient } from '@tanstack/query-core'
@@ -75,31 +70,28 @@ try {
 }
 ```
 
-`RpcClient.make(..., { flatten: true })` acquires the ready client inside the application's scope.
-The factory derives the utility tree from that client and uses `Effect.runPromiseExit`
-unless you supply a custom runner.
+Dotted tags become nested paths: `users.get` becomes `rpc.users.get`. The factory uses
+`Effect.runPromiseExit` by default; supply a signal-aware `runPromiseExit` when execution needs
+services. Keep the client's Scope and runner alive while the utilities are used.
 
-The query accepts the RPC payload's constructor input. Here `{ id: 1 }` is valid because the
-schema constructor supplies `locale: 'en'`. Use deterministic constructor defaults: key preparation
-and ready-client execution construct the payload separately.
+Query input is the RPC payload's **constructor input**: `{ id: 1 }` works because its constructor
+supplies `locale: 'en'`. Defaults must be deterministic because key preparation and client execution
+construct the payload separately. The decoded response is the query data; each mutation receives
+its own variables when `mutate` runs.
 
-Dotted RPC tags become nested properties: `users.get` becomes `rpc.users.get`. The query returns
-a decoded user. Pass mutation variables to `mutate`, then invalidate the cached reads affected by
-the write.
+Invalidation is application policy. This example refreshes all `users` reads after creation.
+A safe user or tenant identity belongs in `keyPrefix` when it affects returned data; credentials
+do not. RPC and HTTP keys have separate namespaces.
 
-## Keep the owner alive
+## Keep a browser client alive
 
-The `finally` block cancels queries, clears their cache, and closes the client scope even when a
-call fails. This short program waits for its mutation before cleanup. In a UI, keep the owner alive
-for the application lifetime and settle pending mutations before disposal; query cancellation does
-not cancel mutations.
+The module above finishes each operation before disposing its resources. For an application,
+acquire once before mounting components and release after unmounting them. Use the
+[React client setup](/effect-api-query/guides/react-query/#acquire-and-mount-the-client) for a provider, component,
+and cleanup callback. Its HTTP client setup can be replaced with the RPC acquisition above.
 
-Use a safe user or tenant identity in `keyPrefix` when client configuration affects which data
-the client can return. See [Client Lifecycle](/effect-api-query/concepts/client-lifecycle/) and
-[Cache Keys](/effect-api-query/concepts/semantic-keys/) before sharing clients or caches.
-
-The repository compiles this complete snippet against the public package root in
-[`tests/types/docs-rpc-quick-start.ts`](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-rpc-quick-start.ts)
-and checks that this page matches it. Continue with
-[queries and mutations](/effect-api-query/concepts/queries-and-mutations/) or the
-[generated RPC builders](/effect-api-query/reference/generated-builders/).
+Before disposing clients that also serve streams or concurrent mutations, stop consumers and
+drain queries, local stream cleanup, and accepted mutations. Follow
+[Client Lifecycle](/effect-api-query/concepts/client-lifecycle/).
+For hooks, continue with [React Query](/effect-api-query/guides/react-query/); for exact method
+and input contracts, use [RPC Builders](/effect-api-query/reference/generated-builders/).

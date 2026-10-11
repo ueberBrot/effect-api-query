@@ -18,7 +18,6 @@ export const ActionButton = ({
   ...props
 }: ActionButtonProps) => (
   <button
-    // ComponentProps restricts type to button, submit, or reset, and defaults to button.
     // oxlint-disable-next-line react/button-has-type
     type={type}
     className={[

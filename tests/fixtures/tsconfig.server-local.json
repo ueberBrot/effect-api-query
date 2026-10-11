@@ -1,0 +1,7 @@
+{
+  "extends": "../../tsconfig.json",
+  "include": [
+    "../../examples/server/src/server-local-rpc.ts",
+    "../types/server-local-client-contract.ts"
+  ]
+}

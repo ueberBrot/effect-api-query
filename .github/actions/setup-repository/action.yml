@@ -1,12 +1,6 @@
 name: Set up repository
 description: Install the pinned package manager, Vite+, and workspace dependencies.
 
-inputs:
-  cache:
-    description: Whether setup-vp should restore and save its dependency cache.
-    required: false
-    default: 'true'
-
 runs:
   using: composite
   steps:
@@ -17,6 +11,6 @@ runs:
       uses: voidzero-dev/setup-vp@1b32467adbe183473499fd9d5d372c3ed9641754 # v1.18.0
       with:
         node-version-file: .node-version
-        cache: ${{ inputs.cache }}
+        cache: true
         run-install: |
           args: ['--frozen-lockfile']

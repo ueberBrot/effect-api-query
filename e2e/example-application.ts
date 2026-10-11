@@ -16,7 +16,6 @@ export const viteReactApplication = {
   url: 'http://127.0.0.1:4173',
 } satisfies ExampleApplication
 
-/** Establishes deterministic server state through the same controls a user exercises. */
 export const prepareExampleApplication = async (
   page: Page,
   application: ExampleApplication,

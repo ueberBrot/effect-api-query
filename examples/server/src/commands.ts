@@ -48,7 +48,6 @@ export const makeCommands = Effect.fn('ExampleRpc.makeCommands')(function* () {
     (effect, command) => effect.pipe(Effect.onInterrupt(() => finish(command, 'cancelled'))),
   )
 
-  // Reserve the ID and attach its worker atomically with respect to interruption.
   const getOrCreate = Effect.fn('ExampleRpc.Commands.getOrCreate')(function* (
     operationId: string,
     steps: number,
@@ -64,13 +63,11 @@ export const makeCommands = Effect.fn('ExampleRpc.makeCommands')(function* () {
         completedSteps: 0,
         totalSteps: steps,
       }),
-      // Void represents a cancellation signal without payload.
       // oxlint-disable-next-line typescript/no-invalid-void-type
       cancellation: Deferred.makeUnsafe<void>(),
       done: Deferred.makeUnsafe<CommandStatus>(),
     }
     commands.set(operationId, command)
-    // A cancel request may arrive before its start request.
     yield* steps === 0
       ? Deferred.succeed(command.done, command.status)
       : Effect.forkIn(work(command), scope, { uninterruptible: false })

@@ -3,13 +3,13 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import type { SubmitEvent } from 'react'
 
-import { ActionButton } from '../components/action-button.tsx'
-import { EffectErrorDetails } from '../components/effect-error-details.tsx'
-import { PageLayout } from '../components/page-layout.tsx'
 import {
   describeSlowQueryCancellation,
   useSlowQueryCancellation,
-} from '../hooks/use-slow-query-cancellation.ts'
+} from '../../../shared/use-slow-query-cancellation.ts'
+import { ActionButton } from '../components/action-button.tsx'
+import { EffectErrorDetails } from '../components/effect-error-details.tsx'
+import { PageLayout } from '../components/page-layout.tsx'
 import type { TanStackStartApplication } from '../lib/application.ts'
 
 const userPagesOptions = (httpQuery: TanStackStartApplication['httpQuery']) =>
@@ -211,13 +211,13 @@ const HttpPagination = ({
   readonly httpQuery: TanStackStartApplication['httpQuery']
 }) => {
   const pages = useInfiniteQuery(userPagesOptions(httpQuery))
-  const loaded = pages.data?.pages.flatMap((page) => page.users) ?? []
+  const loaded = pages.data?.pages.reduce((count, page) => count + page.users.length, 0) ?? 0
 
   return (
     <div className="space-y-4 border border-border bg-background p-5">
       <h2 className="text-xl font-bold">HTTP pagination</h2>
       <p>
-        HTTP: {String(loaded.length)} of {String(pages.data?.pages[0]?.total ?? 0)} loaded
+        HTTP: {String(loaded)} of {String(pages.data?.pages[0]?.total ?? 0)} loaded
       </p>
       <ol className="grid gap-3">
         {pages.data?.pages.map((page, index) => (

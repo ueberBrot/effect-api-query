@@ -10,7 +10,7 @@ export const MutationsSection = ({
 }: {
   readonly application: ViteReactApplication
 }) => {
-  const { invalidateUsers, rpcQuery } = application
+  const { invalidateUsers, rpcQuery, trackMutationOptions } = application
   const voidQuery = useQuery(
     rpcQuery.diagnostics.cancel.queryOptions({
       enabled: false,
@@ -18,10 +18,10 @@ export const MutationsSection = ({
     }),
   )
   const resetUsers = useMutation(
-    rpcQuery.testing.reset.mutationOptions({ onSuccess: invalidateUsers }),
+    trackMutationOptions(rpcQuery.testing.reset.mutationOptions({ onSuccess: invalidateUsers })),
   )
   const seedUsers = useMutation(
-    rpcQuery.testing.seed.mutationOptions({ onSuccess: invalidateUsers }),
+    trackMutationOptions(rpcQuery.testing.seed.mutationOptions({ onSuccess: invalidateUsers })),
   )
 
   return (

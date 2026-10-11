@@ -33,5 +33,4 @@ const NavigationAnchor = forwardRef<HTMLAnchorElement, NavigationAnchorProps>(
 
 NavigationAnchor.displayName = 'NavigationAnchor'
 
-/** A design-system anchor with TanStack Router's typed navigation interface. */
 export const NavigationLink = createLink(NavigationAnchor)

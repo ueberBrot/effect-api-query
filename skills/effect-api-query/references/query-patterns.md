@@ -1,4 +1,32 @@
-# Conditional reads, pages, streams, and SSR
+# Conditional reads, pages, and streams
+
+## Reuse inferred operation types
+
+Import inference helpers from `effect-api-query` and apply them to a utility leaf:
+
+| Helper                                                | Representation                                                        |
+| ----------------------------------------------------- | --------------------------------------------------------------------- |
+| `InferInput<typeof rpc.users.read>`                   | RPC payload constructor input, including omitted constructor defaults |
+| `InferInput<typeof http.users.read>`                  | Decoded HTTP request containers; multipart payloads use `FormData`    |
+| `InferQueryData<typeof rpc.users.read>`               | Cached ordinary query data, before `select`                           |
+| `InferQueryData<typeof http.users.read, 'metadata'>`  | Decoded data, status, and copied raw headers                          |
+| `InferQueryData<typeof rpc.events.watch, 'streamed'>` | Ordered decoded stream elements                                       |
+| `InferQueryData<typeof rpc.events.watch, 'live'>`     | Latest normalized query data                                          |
+| `InferQueryError<typeof rpc.users.read>`              | Error type carried by the concrete query key                          |
+| `InferMutationData<typeof rpc.users.write>`           | Successful mutation value, preserving `undefined`                     |
+| `InferMutationError<typeof rpc.users.write>`          | Buffered mutation execution error type                                |
+
+Specify `'infinite'` to infer `InfiniteData` with an unknown page-parameter type.
+Use the actual options' tagged key when the mapper establishes a more precise
+page-parameter type. Query and live data normalize `undefined` to `null`;
+accumulated elements and mutation data keep it. `InferQueryError` accepts the
+same view parameter as `InferQueryData`. Choose a view supported by that leaf;
+stream leaves need an explicit `'live'` or `'streamed'` view. Branches and
+unsupported default views infer `never`. These types describe the contract;
+runner rejections still pass through at runtime.
+
+For the complete input, supported-view, and cache representation contract, read
+[Type Inference](https://ueberbrot.github.io/effect-api-query/reference/type-inference/).
 
 ## Conditional reads with React Query
 
@@ -37,8 +65,8 @@ export function makeUseUser(client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeo
 ```
 
 HTTP uses the same conditional pattern with its decoded request shape. Unary,
-streamed, and live options also accept direct `skipToken`; their object form
-preserves caller options. Inputless operations, key builders, and mutations do
+metadata, streamed, and live builders take `input: skipToken` in the options
+object and preserve caller options. Inputless operations, key builders, and mutations do
 not accept it. Skipped options cannot execute through manual refetch and are
 unsuitable for suspense or prefetch-only hooks.
 
@@ -103,13 +131,15 @@ export const events = RpcGroup.make(
 
 export function eventOptions(client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof events>>) {
   const rpc = createRpcQueryUtils(events, { client, keyPrefix: ['events-app'] })
+  const input = { channel: 'news' }
+  const policy = { maxChunks: 100, refetchMode: 'append' as const }
   return {
     history: rpc.events.watch.streamedOptions({
-      input: { channel: 'news' },
-      maxChunks: 100,
-      refetchMode: 'append',
+      input,
+      ...policy,
     }),
-    latest: rpc.events.watch.liveOptions({ input: { channel: 'news' } }),
+    historyKey: rpc.events.watch.streamedKey(input, policy),
+    latest: rpc.events.watch.liveOptions({ input }),
   }
 }
 ```
@@ -119,8 +149,12 @@ entries and start independent executions when both are observed.
 
 Accumulated queries retain emitted elements in order. `maxChunks` is a positive
 safe integer limiting element count, not bytes; omission leaves history unbounded.
-Choose a consistent policy for each cache entry: `maxChunks` and `refetchMode`
-are not part of its identity.
+Both `maxChunks` and `refetchMode` contribute to normalized cache identity.
+Omitted policy and explicit unlimited/reset policy share an identity; different
+bounds or refetch modes use different entries. Use `streamedKey(input, policy)`
+or the matching options' `queryKey`. Inputless operations take the policy first.
+HTTP accumulated views additionally include SSE decoder policy; HTTP live views
+include decoder policy too.
 
 - `reset` (default) clears data and returns to pending on refetch.
 - `append` adds new emissions to cached history.
@@ -131,32 +165,44 @@ Live queries cache only the latest value and accept neither history option.
 With no cached data, an empty accumulated stream resolves to `[]`. An empty
 append refetch preserves existing history; empty reset and replace refetches
 finish with `[]`. Empty live completion raises `EffectRpcQueryEmptyStreamError`.
-Emitted chunks are retained as supplied, unlike buffered query `undefined`
-normalization.
+Live queries normalize each emitted `undefined` to `null`, including an emission
+after a defined value. Live keys, selectors, and initial data use that normalized
+type. Accumulated chunks retain their original values, including `undefined`.
 
 On an initial fetch, both views become successful after the first emission. They
-keep fetching until completion. Canceling closes the iterator and interrupts its
-Effect resources. An awaited QueryClient call waits for stream completion. Observe
-the cache to consume intermediate values.
+keep fetching until completion. Ordinary-query cancellation closes the iterator
+and interrupts its Effect resources. Native cancellation can settle before local
+finalizers finish. Suspense hooks have the native cancellation limitation described
+in [frameworks and hosts](frameworks-and-hosts.md).
+An awaited QueryClient call waits for stream completion; hooks and observers see
+intermediate values. For SSR, read [hydration and SSR](hydration-and-ssr.md) and use
+`fetchStreamSnapshot` to capture and drain an open query.
 
-## Server rendering and hydration
+Bounds take effect after a new emission. An oversized seed remains until then.
+Each publication uses a new array and leaves earlier histories unchanged; arrays
+are not runtime-frozen, so treat cache values as immutable. A bound limits element
+count, not retained object size or bytes.
 
-Create a fresh QueryClient, client, and runtime for each server request.
-Share the generated options between loaders and components through
-router context. Keep key prefixes and inputs equivalent between server and
-browser. Keep server and browser resource ownership separate. Choose `staleTime` to
-avoid an immediate duplicate read during hydration.
+Each consumed value contributes to cache writes. Native structural sharing does
+not suppress those writes or promise a renderer's update count. Choose a live
+query for complete current-state emissions and bounded history for recent events;
+the latest delta alone cannot reconstruct state. Set publication rate or sampling
+on the producer or an application-owned Stream transformation.
 
-Keep successful query data compatible with the application's serializer. The
-package does not serialize Schema classes, dates, binary values, or error Causes.
-TanStack's default dehydration policy omits failed queries so the browser can
-refetch them. Preserve that policy unless the application defines its own safe
-error serialization contract.
+## Trace stream consumption and cleanup
 
-For an open RPC stream, observe the first successful cache snapshot, cancel the
-query, and then dehydrate. Awaiting stream completion can stall SSR indefinitely.
-Register cleanup for request completion and abort; cancel queries before runtime
-disposal. Keep browser resources alive for the application's lifetime.
+Acquire an `Effect.makeSpanScoped` span when `Stream.unwrap` begins consumption.
+Provide that span as `Tracer.ParentSpan` for nested pull work, and update the captured
+span directly from emission instrumentation and `Stream.ensuring`. This keeps the
+span open through asynchronous local cleanup. Supply telemetry services through the
+ready client or its runner, and keep the runtime alive through iterator cleanup.
+A span or retry around the runner's iterable-creation Effect ends before consumption;
+it does not cover stream emissions or finalization.
+
+For a complete HTTP SSE client, Otlp layer, and drained snapshot example, use
+[the stream lifetime tracing recipe](https://ueberbrot.github.io/effect-api-query/guides/trace-streams/).
+Use the client's response transformation before response-mode wrapping to preserve
+decoded header wrappers. Applications own span attributes and disclosure policy.
 
 Sources: [builders](https://ueberbrot.github.io/effect-api-query/reference/generated-builders/),
-[TanStack Start integration](https://ueberbrot.github.io/effect-api-query/guides/tanstack-start/).
+[stream history](https://ueberbrot.github.io/effect-api-query/guides/choose-stream-history/).

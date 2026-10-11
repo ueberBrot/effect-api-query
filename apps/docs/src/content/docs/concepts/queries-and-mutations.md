@@ -1,38 +1,51 @@
 ---
-title: Query and Mutation Operations
-description: Choose queries, mutations, pagination, or streams for your API calls.
+title: Generated Utility Model
+description: Understand the contract, input, data, error, and cache identity carried by generated leaves.
 ---
 
-Every unary RPC leaf and buffered HTTP endpoint without multipart has query, infinite-query,
-and mutation builders. Your application chooses how to use each operation; neither the RPC
-definition nor the HTTP method determines the builder. Buffered multipart HTTP endpoints expose
-mutations only. HTTP stream builders are deferred.
+A factory combines an Effect declaration with its ready client and a caller-supplied key prefix.
+It eagerly builds an immutable utility tree. Branches represent declaration namespaces;
+leaves represent RPCs or supported HTTP endpoints. Each leaf supplies the builders for the views
+its contract supports.
 
-Use a query when TanStack should cache a result by semantic request identity. For RPCs with a
-payload, the query key contains the normalized, canonical payload. TanStack can refetch or cancel the query.
+## What a generated leaf carries
 
-Use a mutation when the call represents an action or write. Pass variables when the mutation
-runs; their values do not become part of the mutation key.
+| Part              | Contract                                                                                   |
+| ----------------- | ------------------------------------------------------------------------------------------ |
+| Input             | RPC payload constructor input or the complete decoded HTTP request                         |
+| Query data        | Decoded data for the selected cache view, before an observer's `select`                    |
+| Execution failure | Declaration identity plus the complete Effect Cause from a failed Exit                     |
+| Cache identity    | Caller prefix, adapter/declaration path, view, canonical input, and applicable view policy |
+| Options           | Generated key and function with the applicable native TanStack options                     |
 
-Use an infinite query when TanStack should accumulate paginated results. Map each page parameter
-to an RPC payload or complete decoded HTTP request; the mapped initial request becomes part of
-the semantic key. Keep stable filters in every page request. See
-[HTTP pagination](/effect-api-query/guides/http-queries-and-mutations/#load-pages) or
-[RPC pagination](/effect-api-query/reference/generated-builders/#build-an-infinite-query).
+Ordinary buffered reads cache decoded data. Infinite queries cache pages and page parameters.
+Accumulated streamed queries cache emissions in order; live queries cache the latest value.
+HTTP metadata caches decoded data beside immutable status and raw-header snapshots.
+Mutation variables are execution input and do not become mutation-key identity.
 
-Use an accumulated streamed query when the application needs every emitted value in order. Use a
-live query when it needs only the latest emitted value. Both operations close their stream iterator
-when TanStack cancels the query.
+See [Feature Support](/effect-api-query/getting-started/feature-support/) for supported contract
+shapes. [RPC Utility Tree](/effect-api-query/concepts/rpc-utility-tree/) explains dotted tags;
+[HTTP Utility Tree](/effect-api-query/concepts/http-utility-tree/) explains literal group and endpoint
+identifiers and omitted endpoints.
 
-```ts
-const user = useQuery(rpcQuery.users.get.queryOptions({ input: { id: 1 } }))
+## Keep input, cached data, and observer data distinct
 
-const removeUser = useMutation(rpcQuery.users.delete.mutationOptions())
-removeUser.mutate({ id: 1 })
-```
+RPC constructors can supply defaults before key preparation. HTTP builders accept decoded request
+containers without RPC construction. Equivalent canonical input shares identity, while distinct
+views remain separate. See [Inputs and Query Data](/effect-api-query/concepts/data-normalization/)
+and [Semantic Keys](/effect-api-query/concepts/semantic-keys/).
 
-After a successful mutation, invalidate the affected query prefix explicitly. The package does not
-infer relationships between API operations.
+An observer's `select` projects data without changing the cached representation. Buffered and
+live `undefined` values become `null`; mutation results and accumulated stream elements retain
+`undefined`. Infer these types from the generated leaf when extracting reusable application code.
 
-The [public RPC consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/public-contract.ts) and
-[public HTTP consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/http-contract.ts) check these builder and hook contracts.
+## Ownership at the boundary
+
+The package owns generated keys/functions, view identity, and adaptation of failed Effect Exits.
+TanStack owns caching, observers, retries, invalidation, and framework hooks. The application owns
+ready clients, runtimes, transport, authentication, providers, lifecycle, and relationships between
+writes and reads.
+
+The same generated options work in native QueryClient calls, framework hooks, and router loaders.
+[Defaults and Policies](/effect-api-query/guides/query-defaults/) keeps reusable policy attached to
+the leaf's types. [Integrations](/effect-api-query/integrations/) shows each consumer's wiring.

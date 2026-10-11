@@ -6,6 +6,7 @@ description: Understand literal HTTP identifiers, top-level groups, and omitted 
 `createHttpApiQueryUtils` builds and freezes an HTTP utility tree when you call it with a literal
 Effect HttpApi declaration. Buffered endpoints without multipart have ordinary query, infinite-query,
 and mutation builders. Buffered multipart endpoints have mutation builders only, regardless of HTTP method.
+Endpoints with one SSE success expose accumulated and live streamed-query builders.
 
 | Declaration                                | Generated path                      |
 | ------------------------------------------ | ----------------------------------- |
@@ -21,21 +22,28 @@ Every retained branch and endpoint has `key()`. Top-level groups have no branch 
 custom key encoders still use their declaration group identifier. The factory rejects unsafe
 names, collisions, and invalid encoder configuration before returning any utilities.
 
-The factory omits an entire endpoint if any success alternative streams, including a stream
-wrapped with response headers, or any request alternative uses streaming multipart. It also omits groups
-containing only omitted endpoints. It never keeps just the buffered alternatives of a partially
-supported endpoint. Contradictory multipart metadata causes factory construction to fail. HTTP
-streams and streaming multipart remain deferred; use the ready client directly when you need them.
+| Endpoint success/payload                   | Generated cache views                                        |
+| ------------------------------------------ | ------------------------------------------------------------ |
+| Buffered without multipart                 | Ordinary, infinite and mutation builders; buffered metadata  |
+| Any buffered multipart payload alternative | Mutations only, including mixed plain/multipart alternatives |
+| Single SSE success without multipart       | Accumulated history and latest-value views                   |
+
+SSE events retain decoded response-header wrappers. Decoder policy contributes to both view
+keys; accumulated keys also include retention and refetch policy. Endpoint prefixes select all
+policies. See [HTTP Factory](/effect-api-query/reference/http-factory/) for exact builders.
+
+Raw byte streams, mixed buffered/SSE successes, SSE endpoints with multipart payloads, and streaming
+multipart requests omit the complete endpoint. Groups containing only omitted endpoints disappear.
+Contradictory multipart metadata causes factory construction to fail. Use the ready client directly
+for unsupported streams; applications own byte sinks, reconnection, and resume policy.
 
 Any buffered multipart payload alternative makes the endpoint mutation-only, including an endpoint
 that also accepts ordinary payloads. Its leaf exposes `key()`, `mutationKey()`, and `mutationOptions()`.
 Files and other mutation variables do not become cache identity, so these leaves require no key
 encoder and reject encoder entries. See [upload a file](/effect-api-query/guides/http-queries-and-mutations/#upload-a-file).
 
-Raw-response modes are also deferred. Generated calls force decoded-only responses and exclude
-response controls from their input. See the [HTTP factory](/effect-api-query/reference/http-factory/)
+Raw response objects remain omitted. Ordinary queries, mutations, and SSE views use decoded-only
+responses; buffered metadata views copy status and headers alongside decoded data. Response
+controls are excluded from request input. See the [HTTP factory](/effect-api-query/reference/http-factory/)
 for request, response, and builder contracts, and [Semantic Keys](/effect-api-query/concepts/semantic-keys/)
 for the `http` namespace.
-
-The [public HTTP type consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/http-contract.ts)
-and [factory runtime tests](https://github.com/ueberBrot/effect-api-query/blob/main/tests/create-http-api-query-utils.test.ts) check these projection rules.

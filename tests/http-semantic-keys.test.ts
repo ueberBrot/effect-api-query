@@ -36,7 +36,6 @@ const utils = createHttpApiQueryUtils(api, {
   keyPrefix: ['test'],
 })
 
-// SAFETY: The encoder deliberately returns malformed JavaScript values to exercise strict JSON rejection.
 /* oxlint-disable anti-slop/no-unknown-returns, typescript/no-unsafe-type-assertion */
 const encodeTestKey = (encode: () => unknown) =>
   createHttpApiQueryUtils(api, {
@@ -89,7 +88,6 @@ describe('HTTP semantic keys', () => {
       const read = async (request: typeof input) =>
         await queryClient.query(http.requests.read.queryOptions({ input: request }))
       await expect(read(input)).resolves.toBe('[1,null,"Ada","en"]')
-      // SAFETY: A required encoder is deliberately omitted to verify the synchronous configuration-error boundary.
       /* oxlint-disable typescript/no-unsafe-type-assertion */
       await expect(
         read({
@@ -201,12 +199,13 @@ describe('HTTP semantic keys', () => {
     }
   })
 
-  it('omits undefined object members and normalizes encoded header names', () => {
-    const key = utils.requests.save.queryKey({
+  it('omits undefined members and normalizes header names without changing the input', () => {
+    const input = {
       query: { filter: undefined },
       headers: { 'X-Locale': 'en', 'x-locale': 'en', ignored: undefined },
       payload: { nested: { kept: [2, 1] } },
-    })
+    }
+    const key = utils.requests.save.queryKey(input)
     expect(key.at(-1)).toStrictEqual({
       query: {},
       headers: { 'x-locale': 'en' },
@@ -219,6 +218,21 @@ describe('HTTP semantic keys', () => {
         payload: { nested: { kept: [2, 1] } },
       }),
     )
+    expect(input.headers).toStrictEqual({
+      'X-Locale': 'en',
+      'x-locale': 'en',
+      ignored: undefined,
+    })
+    expect(input.query).toStrictEqual({ filter: undefined })
+    expect(input.payload.nested).toStrictEqual({ kept: [2, 1] })
+    expect(Object.isFrozen(input.headers)).toBe(false)
+    expect(Object.isFrozen(input.payload.nested.kept)).toBe(false)
+    input.payload.nested.kept[0] = 99
+    expect(key.at(-1)).toStrictEqual({
+      query: {},
+      headers: { 'x-locale': 'en' },
+      payload: { nested: { kept: [2, 1] } },
+    })
     expect(Object.isFrozen(key)).toBe(true)
     expect(Object.isFrozen(key.at(-1))).toBe(true)
   })
@@ -233,6 +247,39 @@ describe('HTTP semantic keys', () => {
         },
       }),
     ).toThrow(expect.objectContaining({ code: 'InvalidKeyValue' }))
+  })
+
+  it('omits nested undefined query members while preserving shared caller values', () => {
+    const contract = HttpApi.make('nested').add(
+      HttpApiGroup.make('requests').add(
+        HttpApiEndpoint.get('read', '/read', {
+          query: {
+            rows: Schema.Array(
+              Schema.Struct({ id: Schema.String, absent: Schema.optional(Schema.String) }),
+            ),
+          },
+        }),
+      ),
+    )
+    const http = createHttpApiQueryUtils(contract, {
+      client: unusedHttpClientFor(contract),
+      keyPrefix: ['test'],
+    })
+    const shared = { id: 'first' }
+    const input = { query: { rows: [shared, { id: 'second', absent: undefined }, shared] } }
+    const key = http.requests.read.queryKey(input)
+
+    expect(key.at(-1)).toStrictEqual({
+      query: { rows: [{ id: 'first' }, { id: 'second' }, { id: 'first' }] },
+    })
+    expect(input.query.rows[0]).toBe(shared)
+    expect(input.query.rows[1]).toStrictEqual({ id: 'second', absent: undefined })
+    expect(input.query.rows[2]).toBe(shared)
+    expect(Object.isFrozen(input.query.rows)).toBe(false)
+    shared.id = 'changed'
+    expect(key.at(-1)).toStrictEqual({
+      query: { rows: [{ id: 'first' }, { id: 'second' }, { id: 'first' }] },
+    })
   })
 
   it('preserves array order and rejects missing array entries in default request keys', () => {
@@ -251,10 +298,8 @@ describe('HTTP semantic keys', () => {
     expect(http.search.find.queryKey({ query: { values: ['b', 'a'] } })).not.toStrictEqual(
       http.search.find.queryKey({ query: { values: ['a', 'b'] } }),
     )
-    // SAFETY: The sparse array deliberately preserves missing entries so strict JSON validation can reject it.
     /* oxlint-disable unicorn/no-new-array */
     for (const values of [new Array<unknown>(1), [undefined]]) {
-      // SAFETY: A required encoder is deliberately omitted to verify the synchronous configuration-error boundary.
       /* oxlint-disable typescript/no-unsafe-type-assertion */
       expect(() =>
         http.search.find.queryOptions({ input: { query: { values } } } as never),
@@ -262,6 +307,30 @@ describe('HTTP semantic keys', () => {
       /* oxlint-enable typescript/no-unsafe-type-assertion */
     }
     /* oxlint-enable unicorn/no-new-array */
+  })
+
+  it('rejects inherited array entries in default request keys', () => {
+    const contract = HttpApi.make('inherited').add(
+      HttpApiGroup.make('requests').add(
+        HttpApiEndpoint.post('read', '/read', { payload: Schema.Unknown }),
+      ),
+    )
+    const http = createHttpApiQueryUtils(contract, {
+      client: unusedHttpClientFor(contract),
+      keyPrefix: ['test'],
+    })
+    const values = ['removed', 'present']
+    Reflect.deleteProperty(values, '0')
+    const prototype = { 0: 'inherited' }
+    Object.setPrototypeOf(prototype, Array.prototype)
+    Object.setPrototypeOf(values, prototype)
+
+    expect(() => http.requests.read.queryKey({ payload: values })).toThrow(
+      expect.objectContaining({ code: 'InvalidKeyValue' }),
+    )
+    expect(() => http.requests.read.queryOptions({ input: { payload: values } })).toThrow(
+      expect.objectContaining({ code: 'InvalidKeyValue' }),
+    )
   })
 
   it('keeps custom encoder output strict, copied, and deeply frozen', () => {
@@ -280,7 +349,6 @@ describe('HTTP semantic keys', () => {
     }
     const cycle: Cycle = {}
     cycle.self = cycle
-    // SAFETY: The sparse array deliberately preserves missing entries so strict JSON validation can reject it.
     /* oxlint-disable unicorn/no-new-array */
     for (const invalid of [
       undefined,
@@ -324,7 +392,6 @@ describe('HTTP semantic keys', () => {
       { 'forms.v1': { ping: encode } },
       { 'forms.v1': { upload: encode } },
     ]) {
-      // SAFETY: Undeclared encoders deliberately exercise atomic validation of the encoder map.
       /* oxlint-disable typescript/no-unsafe-type-assertion */
       expect(() =>
         createHttpApiQueryUtils(contract, {
@@ -425,7 +492,6 @@ describe('HTTP semantic keys', () => {
             HttpApiEndpoint.post('save', '/:value', { [part]: schema }),
           ),
         )
-        // SAFETY: A required encoder is deliberately omitted to verify the synchronous configuration-error boundary.
         /* oxlint-disable typescript/no-unsafe-type-assertion */
         expect(() =>
           createHttpApiQueryUtils(contract, {
@@ -435,7 +501,6 @@ describe('HTTP semantic keys', () => {
         ).toThrow(expect.objectContaining({ code: 'MissingKeyEncoder' }))
         /* oxlint-enable typescript/no-unsafe-type-assertion */
         let received: unknown
-        // SAFETY: This mock records arbitrary invocation values so request ownership can be asserted without changing the input.
         /* oxlint-disable anti-slop/no-unknown-parameters, typescript/no-unsafe-type-assertion */
         const safe = createHttpApiQueryUtils(contract, {
           client: unusedHttpClientFor(contract),
@@ -451,7 +516,6 @@ describe('HTTP semantic keys', () => {
         } as never)
         /* oxlint-enable anti-slop/no-unknown-parameters, typescript/no-unsafe-type-assertion */
         const input = { [part]: { value: Redacted.make('secret') } }
-        // SAFETY: This mock records arbitrary invocation values so request ownership can be asserted without changing the input.
         /* oxlint-disable anti-slop/no-unknown-parameters */
         expect(
           (safe.requests.save.queryKey as (input: unknown) => readonly unknown[])(input).at(-1),

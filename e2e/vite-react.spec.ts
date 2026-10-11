@@ -29,6 +29,40 @@ test.describe('plain Vite React application', () => {
     await expect(page.getByText('Ada Lovelace', { exact: true })).toBeVisible()
   })
 
+  test('reports failed pagehide persistence without an unhandled cleanup rejection', async ({
+    page,
+  }) => {
+    const pageErrors: Error[] = []
+    const cleanupReports: string[] = []
+    page.on('pageerror', (error) => {
+      pageErrors.push(error)
+    })
+    page.on('console', (message) => {
+      if (message.type() === 'error' && message.text().startsWith('Vite resource cleanup failed')) {
+        cleanupReports.push(message.text())
+      }
+    })
+    await page.evaluate(() => {
+      const setItem = Object.getOwnPropertyDescriptor(Storage.prototype, 'setItem')
+      if (setItem === undefined) {
+        throw new Error('Storage.setItem is missing')
+      }
+      try {
+        Storage.prototype.setItem = () => {
+          throw new Error('Session storage write failed')
+        }
+        globalThis.dispatchEvent(new Event('pagehide'))
+        globalThis.dispatchEvent(new Event('pagehide'))
+      } finally {
+        Object.defineProperty(Storage.prototype, 'setItem', setItem)
+      }
+    })
+    await expect.poll(() => cleanupReports.length + pageErrors.length).toBe(1)
+    expect(pageErrors).toStrictEqual([])
+    expect(cleanupReports).toHaveLength(1)
+    await expect(page.locator('#root')).toBeEmpty()
+  })
+
   test('loads and accumulates infinite-query pages', async ({ page }) => {
     await expect(page.getByText('4 of 12 loaded', { exact: true })).toBeVisible()
     await expect(page.getByText('Page 1: 4 users', { exact: true })).toBeVisible()

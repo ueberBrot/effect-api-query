@@ -1,11 +1,12 @@
-import { skipToken } from '@tanstack/query-core'
-import type { QueryFunction, QueryKey } from '@tanstack/query-core'
+import { replaceEqualDeep, skipToken } from '@tanstack/query-core'
+import type { QueryFunctionContext } from '@tanstack/query-core'
 import { Effect, Exit, Predicate } from 'effect'
 import type { Cause } from 'effect'
 
 import type {
   BufferedOperation,
   OperationDescription,
+  QueryPreparation,
   RuntimeKeyEncoder,
   StreamingOperation,
   TreeErrors,
@@ -22,6 +23,8 @@ const reservedPathSegments = new Set([
   'key',
   'liveKey',
   'liveOptions',
+  'metadataKey',
+  'metadataOptions',
   'mutationKey',
   'mutationOptions',
   'prototype',
@@ -54,11 +57,9 @@ const canonicalizeArray = (value: unknown[], seen: WeakSet<object>): JsonValue =
     if (!Object.hasOwn(value, index)) {
       throw new TypeError('Key values must not contain sparse arrays')
     }
-    // canonicalize is initialized before any query tree is constructed.
     // oxlint-disable-next-line eslint/no-use-before-define
     copy.push(canonicalize(value[index], seen))
   }
-  // Shared references are valid JSON; only references on the active path form cycles.
   seen.delete(value)
   return Object.freeze(copy)
 }
@@ -74,7 +75,6 @@ const canonicalizeObject = (value: Record<string, unknown>, seen: WeakSet<object
     if (key === '__proto__' || key === 'constructor') {
       throw new TypeError('Key objects must not contain __proto__ or constructor properties')
     }
-    // Every enumerated member must remain JSON-safe, including getter side effects.
     // oxlint-disable-next-line eslint/no-use-before-define
     copy[key] = canonicalize(value[key], seen)
   }
@@ -82,7 +82,6 @@ const canonicalizeObject = (value: Record<string, unknown>, seen: WeakSet<object
   return Object.freeze(copy)
 }
 
-// Copying prevents caller mutation; sorting makes equivalent objects hash identically.
 const canonicalize = (value: unknown, seen = new WeakSet()): JsonValue => {
   if (value === null || Predicate.isString(value) || Predicate.isBoolean(value)) {
     return value
@@ -108,9 +107,7 @@ const canonicalize = (value: unknown, seen = new WeakSet()): JsonValue => {
   return canonicalizeObject(value, seen)
 }
 
-const freezeKey = (parts: readonly (JsonValue | string)[]) => Object.freeze([...parts])
-
-const hashCanonicalKey = (queryKey: QueryKey): string => JSON.stringify(queryKey)
+const freezeKey = (parts: JsonValue[]) => Object.freeze(parts)
 
 const normalizePrefix = (
   prefix: readonly [JsonValue, ...JsonValue[]],
@@ -121,8 +118,6 @@ const normalizePrefix = (
   }
 
   try {
-    // SAFETY: prefix is checked to be a nonempty array; canonicalize preserves arrays
-    // while validating and freezing every JSON value recursively.
     // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     return canonicalize(prefix) as readonly JsonValue[]
   } catch (error) {
@@ -130,7 +125,6 @@ const normalizePrefix = (
   }
 }
 
-// Validate the entire plan before allocating branches or preparing any request.
 const planPaths = (operations: readonly OperationDescription[], errors: TreeErrors) => {
   const branchPaths = new Map<string, readonly string[]>()
   const leafPaths = new Set<string>()
@@ -167,14 +161,13 @@ const planPaths = (operations: readonly OperationDescription[], errors: TreeErro
       }
     }
     leafPaths.add(pathKey)
-    // SAFETY: The empty path was rejected above before recording this plan.
     // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     plan.push({ operation, segments: segments as readonly [string, ...string[]] })
   }
   return plan
 }
 
-const execute = async <Operation extends UnaryQueryOperation>(
+const execute = async <Operation extends UnaryQueryOperation | 'metadata'>(
   description: {
     readonly invoke: UnaryOperation['invoke']
     readonly executionError: (operation: Operation, cause: Cause.Cause<unknown>) => Error
@@ -185,11 +178,8 @@ const execute = async <Operation extends UnaryQueryOperation>(
   requestOptions?: unknown,
   signal?: AbortSignal,
 ) => {
-  // The transport contract preserves arbitrary caller errors and Context services.
   // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
   const effect = description.invoke(input, requestOptions)
-  // Await outside the Exit branch so a runner rejection passes through untouched.
-  // The erased transport channels retain the caller's errors and service requirements.
   // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
   const exit = await runPromiseExit(effect, signal === undefined ? undefined : { signal })
 
@@ -197,30 +187,27 @@ const execute = async <Operation extends UnaryQueryOperation>(
     throw description.executionError(operation, exit.cause)
   }
 
-  // TanStack rejects successful undefined query data; mutations keep it unchanged.
   return operation !== 'mutation' && exit.value === undefined ? null : exit.value
 }
 
-const defineKey = (target: Record<string, unknown>, parts: readonly (JsonValue | string)[]) => {
-  const key = freezeKey(parts)
-  target['key'] = () => key
-}
-
-// One preparation produces both the retained execution input and its immutable key.
 const prepareQuery = (
   description: UnaryOperation | StreamingOperation,
   input: unknown,
   operationKey: readonly JsonValue[],
   keyEncoder: RuntimeKeyEncoder | undefined,
+  identity: readonly JsonValue[] = [],
 ): PreparedQuery => {
   if (description.input._tag === 'Inputless') {
-    return { input: undefined, key: operationKey }
+    return {
+      input: undefined,
+      key: identity.length === 0 ? operationKey : freezeKey([...operationKey, ...identity]),
+    }
   }
   const prepared = description.input.prepare(input, keyEncoder)
   try {
     return {
       input: prepared.input,
-      key: freezeKey([...operationKey, canonicalize(prepared.keyValue)]),
+      key: freezeKey([...operationKey, canonicalize(prepared.keyValue), ...identity]),
     }
   } catch (error) {
     throw description.input.invalidKey(error)
@@ -228,10 +215,15 @@ const prepareQuery = (
 }
 
 const prepareQueryOptions = (description: OperationDescription, argument: unknown) => {
-  const options: Record<string, unknown> =
-    argument === skipToken
-      ? { input: skipToken }
-      : { ...(Predicate.isObject(argument) ? argument : undefined) }
+  if (argument !== undefined && !Predicate.isObject(argument)) {
+    throw new TypeError('Query options must be an object')
+  }
+  const options = { ...argument }
+  for (const option of ['queryKeyHashFn', 'queryHash'] as const) {
+    if (Object.hasOwn(options, option)) {
+      throw description.unsupportedQueryHash(option)
+    }
+  }
   const { input } = options
   delete options['input']
   const requestOptions = description.takeOptions(options)
@@ -242,36 +234,35 @@ const finalizeQueryOptions = <QueryFn>(
   options: Record<string, unknown>,
   queryKey: readonly JsonValue[],
   queryFn: QueryFn,
-) => {
-  // Query Core prefers an explicit hash over the generated hash function.
-  delete options['queryHash']
-  return {
-    ...options,
-    // Owned fields follow user options so callers cannot replace keys or runners.
-    queryFn,
-    queryKey,
-    queryKeyHashFn: hashCanonicalKey,
-  }
-}
+) => ({
+  ...options,
+  queryFn,
+  queryKey,
+})
 
 const createQueryBuilders = (
   description: UnaryOperation | StreamingOperation,
   operationKey: readonly JsonValue[],
   keyEncoder: RuntimeKeyEncoder | undefined,
-  prepareExecution: (
+  prepareOptions: (
     options: Record<string, unknown>,
     requestOptions: unknown,
-  ) => (input: unknown) => QueryFunction,
+    input: unknown,
+  ) => QueryPreparation,
+  prepareIdentity?: (options: Record<string, unknown>) => readonly JsonValue[],
 ) => ({
-  key: (input?: unknown) => prepareQuery(description, input, operationKey, keyEncoder).key,
+  key: (input?: unknown, policy?: Record<string, unknown>) => {
+    const options = description.input._tag === 'Inputless' ? input : policy
+    const identity = prepareIdentity?.(Predicate.isObject(options) ? { ...options } : {}) ?? []
+    return prepareQuery(description, input, operationKey, keyEncoder, identity).key
+  },
   options: (argument?: unknown) => {
     const { input, options, requestOptions } = prepareQueryOptions(description, argument)
-    // Stream policy is consumed and validated even when execution will be skipped.
-    const makeQuery = prepareExecution(options, requestOptions)
+    const { identity, makeQuery } = prepareOptions(options, requestOptions, input)
     if (description.input._tag !== 'Inputless' && input === skipToken) {
       return finalizeQueryOptions(options, operationKey, skipToken)
     }
-    const prepared = prepareQuery(description, input, operationKey, keyEncoder)
+    const prepared = prepareQuery(description, input, operationKey, keyEncoder, identity)
     return finalizeQueryOptions(options, prepared.key, makeQuery(prepared.input))
   },
 })
@@ -294,17 +285,11 @@ const createInfiniteBuilders = (
     }
 
     const { initialPageParam } = options
-    const inputForPage =
-      description.input._tag === 'Inputless'
-        ? () => {
-            // Inputless operations do not construct a page payload.
-          }
-        : input
+    // oxlint-disable-next-line unicorn/no-useless-undefined
+    const inputForPage = description.input._tag === 'Inputless' ? () => undefined : input
     if (!Predicate.isFunction(inputForPage)) {
       throw new TypeError('Infinite query input must be a page input function')
     }
-    // SAFETY: The function guard above validates callability; the adapter validates
-    // the returned payload through the operation's declaration before execution.
     // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const pageInput = inputForPage as (pageParam: unknown) => unknown
     const initialInput = pageInput(initialPageParam)
@@ -358,76 +343,135 @@ const createMutationBuilders = (
   return { mutationKey: () => mutationKey, mutationOptions }
 }
 
-const createMutationLeaf = (
-  description: BufferedOperation,
-  keyParts: readonly (JsonValue | string)[],
-  runPromiseExit: RunPromiseExit<unknown>,
-) => {
-  const operationKey = freezeKey(keyParts)
-  return Object.freeze({
-    key: () => operationKey,
-    ...createMutationBuilders(description, operationKey, runPromiseExit),
-  })
+type RuntimeStructuralSharing = (previous: unknown, data: unknown) => unknown
+
+const isStructuralSharing = (policy: unknown): policy is RuntimeStructuralSharing =>
+  Predicate.isFunction(policy)
+
+const shareQueryData = (previous: unknown, data: unknown, policy: unknown) => {
+  if (policy === false) {
+    return data
+  }
+  if (isStructuralSharing(policy)) {
+    return policy(previous, data)
+  }
+  return replaceEqualDeep(previous, data)
 }
 
-const createUnaryLeaf = (
+const prepareMetadataExecution = (
+  description: NonNullable<UnaryOperation['metadata']>,
+  options: Record<string, unknown>,
+  runPromiseExit: RunPromiseExit<unknown>,
+  requestOptions: unknown,
+  skipped: boolean,
+) => {
+  const hasLocalPolicy = Object.hasOwn(options, 'structuralSharing')
+  const localPolicy = options['structuralSharing']
+  const policies = new WeakMap<object, unknown>()
+  if (!skipped) {
+    options['structuralSharing'] = (previous: unknown, data: unknown) => {
+      const produced = Predicate.isObject(data) && policies.has(data)
+      const policy = produced ? policies.get(data) : localPolicy
+      const shared = shareQueryData(previous, data, policy)
+      return produced ? description.finalizeData(shared) : shared
+    }
+  }
+  return (input: unknown) =>
+    async ({ client, queryKey, signal }: QueryFunctionContext) => {
+      const policy = hasLocalPolicy
+        ? localPolicy
+        : client.defaultQueryOptions({ queryKey }).structuralSharing
+      const data = await execute(
+        description,
+        'metadata',
+        input,
+        runPromiseExit,
+        requestOptions,
+        signal,
+      )
+      if (Predicate.isObject(data)) {
+        policies.set(data, policy)
+      }
+      return data
+    }
+}
+
+const createUnaryBuilders = (
   description: UnaryOperation,
-  keyParts: readonly (JsonValue | string)[],
+  operationKey: readonly JsonValue[],
   keyEncoder: RuntimeKeyEncoder | undefined,
   runPromiseExit: RunPromiseExit<unknown>,
 ) => {
-  const operationKey = freezeKey(keyParts)
   const queryOperationKey = freezeKey([...operationKey, 'query'])
   const query = createQueryBuilders(
     description,
     queryOperationKey,
     keyEncoder,
-    (_options, requestOptions) =>
-      (input) =>
-      async ({ signal }: { readonly signal: AbortSignal }) =>
-        execute(description, 'query', input, runPromiseExit, requestOptions, signal),
+    (_options, requestOptions) => ({
+      identity: [],
+      makeQuery:
+        (input) =>
+        async ({ signal }) =>
+          execute(description, 'query', input, runPromiseExit, requestOptions, signal),
+    }),
   )
+  const { metadata } = description
+  const metadataQuery =
+    metadata === undefined
+      ? undefined
+      : createQueryBuilders(
+          description,
+          freezeKey([...operationKey, 'metadata']),
+          keyEncoder,
+          (options, requestOptions, input) => ({
+            identity: [],
+            makeQuery: prepareMetadataExecution(
+              metadata,
+              options,
+              runPromiseExit,
+              requestOptions,
+              description.input._tag !== 'Inputless' && input === skipToken,
+            ),
+          }),
+        )
 
-  return Object.freeze({
+  return {
     ...createInfiniteBuilders(description, operationKey, keyEncoder, runPromiseExit),
-    key: () => operationKey,
     ...createMutationBuilders(description, operationKey, runPromiseExit),
     queryKey: query.key,
     queryOptions: query.options,
-  })
+    ...(metadataQuery === undefined
+      ? undefined
+      : { metadataKey: metadataQuery.key, metadataOptions: metadataQuery.options }),
+  }
 }
 
-const createStreamingLeaf = (
+const createStreamingBuilders = (
   description: StreamingOperation,
-  keyParts: readonly (JsonValue | string)[],
+  operationKey: readonly JsonValue[],
   keyEncoder: RuntimeKeyEncoder | undefined,
   runPromiseExit: RunPromiseExit<unknown>,
 ) => {
-  const operationKey = freezeKey(keyParts)
-  const liveOperationKey = freezeKey([...operationKey, 'live'])
-  const streamedOperationKey = freezeKey([...operationKey, 'streamed'])
-  const live = createQueryBuilders(
-    description,
-    liveOperationKey,
-    keyEncoder,
-    (options, requestOptions) =>
-      description.prepareStream(options, 'live', runPromiseExit, requestOptions),
-  )
-  const streamed = createQueryBuilders(
-    description,
-    streamedOperationKey,
-    keyEncoder,
-    (options, requestOptions) =>
-      description.prepareStream(options, 'streamed', runPromiseExit, requestOptions),
-  )
+  const createView = (operation: 'live' | 'streamed') => {
+    const prepare = (options: Record<string, unknown>, requestOptions: unknown) =>
+      description.prepareStream(options, operation, runPromiseExit, requestOptions)
+    return createQueryBuilders(
+      description,
+      freezeKey([...operationKey, operation]),
+      keyEncoder,
+      prepare,
+      (options) => prepare(options, undefined).identity,
+    )
+  }
+  const live = createView('live')
+  const streamed = createView('streamed')
 
-  return Object.freeze({
-    key: () => operationKey,
+  return {
     liveKey: live.key,
     liveOptions: live.options,
     streamedKey: streamed.key,
     streamedOptions: streamed.options,
-  })
+  }
 }
 
 const deepFreezeTree = (value: Record<string, unknown>) => {
@@ -483,8 +527,8 @@ const insertLeaf = (
     const candidate = Object.hasOwn(branch, segment) ? branch[segment] : undefined
     let child = Predicate.isObject(candidate) ? candidate : undefined
     if (child === undefined) {
-      child = {}
-      defineKey(child, [...prefix, ...segments.slice(0, index + 1)])
+      const key = freezeKey([...prefix, ...segments.slice(0, index + 1)])
+      child = { key: () => key }
       branch[segment] = child
     }
     branch = child
@@ -494,15 +538,16 @@ const insertLeaf = (
   if (leafName === undefined) {
     throw new TypeError('Validated operation paths must have a leaf')
   }
-  const keyParts = [...prefix, ...segments]
+  const operationKey = freezeKey([...prefix, ...segments])
+  let builders
   if (operation.kind === 'Mutation') {
-    branch[leafName] = createMutationLeaf(operation, keyParts, runPromiseExit)
-    return
+    builders = createMutationBuilders(operation, operationKey, runPromiseExit)
+  } else if (operation.kind === 'Streaming') {
+    builders = createStreamingBuilders(operation, operationKey, keyEncoder, runPromiseExit)
+  } else {
+    builders = createUnaryBuilders(operation, operationKey, keyEncoder, runPromiseExit)
   }
-  branch[leafName] =
-    operation.kind === 'Streaming'
-      ? createStreamingLeaf(operation, keyParts, keyEncoder, runPromiseExit)
-      : createUnaryLeaf(operation, keyParts, keyEncoder, runPromiseExit)
+  branch[leafName] = { key: () => operationKey, ...builders }
 }
 
 const createTree = (
@@ -511,8 +556,7 @@ const createTree = (
   keyEncoders: ReadonlyMap<string, RuntimeKeyEncoder>,
   runPromiseExit: RunPromiseExit<unknown>,
 ) => {
-  const tree: Record<string, unknown> = {}
-  defineKey(tree, prefix)
+  const tree = { key: () => prefix }
 
   for (const path of paths) {
     insertLeaf(tree, prefix, path, keyEncoders.get(path.operation.id), runPromiseExit)
@@ -536,8 +580,6 @@ export const createUtilityTree = (
   ])
   const paths = planPaths(operations, options.errors)
   validateKeyEncoders(operations, options.keyEncoders, options.errors)
-  // SAFETY: Public options require a runner when a client has remaining services;
-  // otherwise the captured client is fully provided and the default runner needs none.
   // oxlint-disable-next-line typescript/no-unsafe-type-assertion
   const runner = options.runPromiseExit ?? (Effect.runPromiseExit as RunPromiseExit<unknown>)
   return createTree(prefix, paths, options.keyEncoders, runner)

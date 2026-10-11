@@ -7,7 +7,7 @@ const registryUrl = 'https://registry.npmjs.org/effect-api-query/latest'
 const packageUrl = 'https://www.npmjs.com/package/effect-api-query'
 const repositoryUrl = 'https://github.com/ueberBrot/effect-api-query'
 
-test('opens both tutorials and searches the production index under the public base', async ({
+test('opens tutorials and feature guides and searches the production index', async ({
   page,
   baseURL,
 }) => {
@@ -42,24 +42,39 @@ test('opens both tutorials and searches the production index under the public ba
 
   await page.goto(docsBase, { waitUntil: 'networkidle' })
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('effect-api-query')
-  await page.getByRole('link', { name: 'RPC quick start', exact: true }).click()
+  await page.getByRole('main').getByRole('link', { name: 'RPC', exact: true }).first().click()
   await expect(page).toHaveURL(`${docsBase}getting-started/quick-start/`)
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('RPC Quick Start')
   await page.waitForLoadState('networkidle')
 
-  await page
-    .getByRole('navigation', { name: 'Main', exact: true })
-    .getByRole('link', {
-      name: 'HTTP Factory',
-      exact: true,
-    })
-    .click()
-  await expect(page).toHaveURL(`${docsBase}reference/http-factory/`)
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('HTTP Factory')
-  await page.waitForLoadState('networkidle')
+  /* oxlint-disable eslint/no-await-in-loop */
+  for (const [title, slug] of [
+    ['Queries', 'guides/queries'],
+    ['Pagination', 'guides/pagination'],
+    ['HTTP Metadata', 'guides/http-metadata'],
+    ['HTTP Builders', 'reference/http-builders'],
+    ['Defaults and Policies', 'guides/query-defaults'],
+    ['Type Inference', 'reference/type-inference'],
+    ['React Query', 'guides/react-query'],
+    ['HTTP Factory', 'reference/http-factory'],
+  ] as const) {
+    const link = page
+      .getByRole('navigation', { name: 'Main', exact: true })
+      .locator(`a[href="${docsBase}${slug}/"]`)
+    for (const section of await link.locator('xpath=ancestor::details').all()) {
+      if ((await section.getAttribute('open')) === null) {
+        await section.locator(':scope > summary').click()
+      }
+    }
+    await link.click()
+    await expect(page).toHaveURL(`${docsBase}${slug}/`)
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(title)
+    await page.waitForLoadState('networkidle')
+  }
+  /* oxlint-enable eslint/no-await-in-loop */
 
   await page.goto(docsBase, { waitUntil: 'networkidle' })
-  await page.getByRole('link', { name: 'HTTP quick start', exact: true }).click()
+  await page.getByRole('main').getByRole('link', { name: 'HTTP API', exact: true }).first().click()
   await expect(page).toHaveURL(`${docsBase}getting-started/http-quick-start/`)
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('HTTP Quick Start')
   await page.waitForLoadState('networkidle')
@@ -90,15 +105,10 @@ test('uses canonical repository links and serves branded icons', async ({ page, 
     'href',
     `${repositoryUrl}/edit/main/apps/docs/src/content/docs/getting-started/quick-start.md`,
   )
-  await expect(
-    page.getByRole('link', { name: 'tests/types/docs-rpc-quick-start.ts', exact: true }),
-  ).toHaveAttribute('href', `${repositoryUrl}/blob/main/tests/types/docs-rpc-quick-start.ts`)
-
   const iconUrls = [
     await page.locator('link[rel="shortcut icon"]').getAttribute('href'),
     await page.locator('.site-title img').getAttribute('src'),
   ]
-  // Keep each icon's request and assertions together to identify the failing URL.
   /* oxlint-disable eslint/no-await-in-loop */
   for (const url of iconUrls) {
     expect(url).toMatch(/^\/effect-api-query\//u)
@@ -120,7 +130,6 @@ test('shows the latest published version from the package registry', async ({ pa
   await page.goto(docsBase)
   const links = page.locator(`a[href="${packageUrl}"]`)
   await expect(links.first()).toHaveText('v1.2.3-beta.1')
-  // Check each DOM locator sequentially while this test owns the page.
   /* oxlint-disable eslint/no-await-in-loop */
   for (const link of await links.all()) {
     await expect(link).toHaveText('v1.2.3-beta.1')
@@ -145,7 +154,6 @@ for (const failure of ['unpublished package', 'network failure', 'invalid versio
     await request
     const links = page.locator(`a[href="${packageUrl}"]`)
     await expect(links.first()).toHaveText(`v${packageManifest.version}`)
-    // Check each DOM locator sequentially while this test owns the page.
     /* oxlint-disable eslint/no-await-in-loop */
     for (const link of await links.all()) {
       await expect(link).toHaveText(`v${packageManifest.version}`)
@@ -160,7 +168,6 @@ test('serves generated LLM documentation with the public URLs', async ({ request
   expect(index.ok()).toBe(true)
   const indexText = await index.text()
   expect(indexText).toContain('# effect-api-query')
-  // Fetch and inspect one generated document at a time to attribute broken links.
   /* oxlint-disable eslint/no-await-in-loop */
   for (const filename of ['llms-small.txt', 'llms-full.txt']) {
     expect(indexText).toContain(`https://ueberbrot.github.io${docsBase}${filename}`)

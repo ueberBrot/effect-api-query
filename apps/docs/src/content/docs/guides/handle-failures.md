@@ -4,7 +4,7 @@ description: Inspect RPC and HTTP Causes and distinguish configuration and key e
 ---
 
 A failed RPC `Exit` becomes `EffectRpcQueryError`. The error records the RPC tag, the generated
-operation that ran, and the complete Effect `Cause`:
+operation that ran, and the complete Effect `Cause`. In the application's error handler:
 
 ```ts
 import { Cause } from 'effect'
@@ -18,9 +18,12 @@ const logRpcError = (error: unknown) => {
 }
 ```
 
+Review the Cause for private messages and transport values before logging it.
+
 These error classes distinguish failure stages:
 
-- `EffectRpcQueryConfigError` reports invalid factory or builder configuration synchronously.
+- `EffectRpcQueryConfigError` reports invalid configuration: synchronously during preparation,
+  or during stream execution with incompatible QueryClient hashing.
 - `EffectRpcQueryKeyError` reports synchronous payload construction, encoding, or JSON
   canonicalization failures.
 - `EffectRpcQueryError` reports a failed RPC execution and preserves its Effect `Cause`.
@@ -28,6 +31,8 @@ These error classes distinguish failure stages:
 
 If a custom runner rejects instead of returning an `Exit`, its rejection passes through unchanged.
 See the [error reference](/effect-api-query/reference/errors/) for stable codes and metadata.
+Use [retry queries](/effect-api-query/guides/retry-queries/) for typed `Cause`/`Result` decisions,
+bounded attempt counts, and synchronous preparation errors.
 
 ## Inspect HTTP failures
 
@@ -41,14 +46,12 @@ The package adds only declaration identity to execution-error metadata. The pres
 contain upstream request headers, bodies, concrete URLs, responses, or Schema issue values.
 Review those values before logging or exposing them. The package does not sanitize the Cause.
 
-`EffectHttpApiQueryConfigError` reports invalid factory configuration synchronously.
+`EffectHttpApiQueryConfigError` reports invalid configuration with the same preparation and
+stream-execution timing as the RPC error.
 `EffectHttpApiQueryKeyError` reports synchronous query-key preparation failures, before HTTP
 execution. Mutations encode their request inside the ready client's Effect, so encoding failures
 become `EffectHttpApiQueryError` instead. Runner rejections and user or TanStack callback failures
 pass through unchanged when they produce no failed Exit.
 
-See the [HTTP factory reference](/effect-api-query/reference/http-factory/#cache-identity-and-failures)
+See the [HTTP factory reference](/effect-api-query/reference/http-builders/#cache-identity-and-failures)
 for key-error codes.
-
-The [packed RPC consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/packed-consumer/runtime.mts) and
-[packed HTTP consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/packed-consumer/http-runtime.mts) verify error guards and preserved Causes.

@@ -7,14 +7,10 @@ import { ActionButton } from '../ui/action-button.tsx'
 import { EffectErrorDetails } from '../ui/effect-error-details.tsx'
 
 export const CreateUserForm = ({ application }: { readonly application: ViteReactApplication }) => {
-  const { invalidateUsers, rpcQuery } = application
+  const { userWrites } = application
   const [locale, setLocale] = useState('')
   const [name, setName] = useState('')
-  const createUser = useMutation(
-    rpcQuery.users.create.mutationOptions({
-      onSuccess: invalidateUsers,
-    }),
-  )
+  const createUser = useMutation(userWrites.rpcCreate())
 
   const submitUser = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault()

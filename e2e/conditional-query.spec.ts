@@ -24,7 +24,6 @@ for (const [name, application] of [
     const lookup = page.getByRole('region', { name: 'Conditional user lookup' })
     const select = lookup.getByLabel('User to inspect')
     await expect(lookup.getByText('Choose a user to start the query.')).toBeVisible()
-    // A completed unrelated interaction gives a mistakenly active lookup time to reach the server.
     await page.getByRole('button', { name: 'Read cached directory' }).click()
     await expect(page.getByText('Cached directory: 12 users')).toBeVisible()
     expect(lookupRequests).toBe(0)

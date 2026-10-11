@@ -88,11 +88,18 @@ Use the payload or a safe key prefix for any identity carried by these options.
 `streamBufferSize` controls the client's stream buffer; `maxChunks` controls the
 accumulated cache. Unary `discard` and stream `asQueue` controls are unavailable.
 
+Keep the native default stream buffer unless the application has tested another
+size with its transport. Effect 4.0.0's shared WebSocket receive loop can stall
+another request when cancellation meets an overflowing buffer of size one.
+`maxChunks` bounds cached history after emissions and does not resize that queue.
+
 ## Custom key encoders
 
 Configure `keyEncoders` by the original literal RPC tag, such as `'secrets.read'`.
 An encoder receives the normalized payload after constructor defaults. Provide
-one when payload encoding needs services or contains explicit redacted values.
+one when payload encoding needs services, contains explicit redacted values, or uses
+opaque encoding middleware. Runtime inspection treats middleware conservatively,
+including synchronous service-free middleware.
 
 Return a synchronous strict `JsonValue`: finite numbers, strings, booleans,
 null, dense arrays, and plain objects with defined JSON values. Default RPC

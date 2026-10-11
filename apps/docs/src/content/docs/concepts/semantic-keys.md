@@ -21,8 +21,11 @@ The default process is:
 3. Canonicalize strict JSON by sorting object keys recursively.
 4. Store the canonical key payload in a flat, prefix-matchable query key.
 
-The generated `queryKeyHashFn` serializes the already-canonical key so TanStack Query uses the same
-identity as the key builders.
+QueryClient owns hashing through its global and prefix defaults. Generated options omit hash
+fields so fetching, stream publications, and native `getQueryData`/`setQueryData` calls address the
+same cache entry. Builders reject per-call `queryKeyHashFn` and `queryHash` overrides.
+Configure hashing before cache use and keep it stable while entries remain. A stream execution
+rejects with `UnsupportedQueryHash` if changed hashing conflicts with a matching cached entry.
 
 Key objects cannot contain `__proto__` or `constructor` properties at any depth. This applies to
 prefixes, Schema output, and custom encoder output.
@@ -34,6 +37,12 @@ Every RPC operation adds its own segment after the RPC path: `query`, `infinite`
 `mutation`. Concrete query keys append the canonical payload when the RPC has one. These segments
 keep different cache shapes from colliding while root, branch, and RPC prefixes continue to match
 all descendant operations.
+
+Accumulated-stream keys also include normalized retention and refetch policy. Unlimited/reset is
+the default identity; different bounds or modes have separate cache entries. Supply the same policy
+to `streamedKey` and `streamedOptions` for exact cache access. Broad prefixes continue to match all
+views. Treat the concrete suffix as opaque. Applications persisting query data choose schema and
+key-version busters as described in [Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/).
 
 Unsupported values, failed construction, and failed encoding raise `EffectRpcQueryKeyError` before
 network execution. Payloads whose encoding needs services or that contain redacted values require a
@@ -47,8 +56,5 @@ infer every possible equivalence between HTTP requests.
 
 Client middleware does not contribute to that declared identity. Include safe user, tenant, or
 other identifiers in the caller prefix when they affect results. See the
-[HTTP factory reference](/effect-api-query/reference/http-factory/#cache-identity-and-failures) and
+[HTTP factory reference](/effect-api-query/reference/http-builders/#cache-identity-and-failures) and
 [HTTP encoder guide](/effect-api-query/guides/custom-key-encoders/#http-requests) for the complete rules.
-
-The [RPC key tests](https://github.com/ueberBrot/effect-api-query/blob/main/tests/create-rpc-query-utils-keys.test.ts) and
-[HTTP key tests](https://github.com/ueberBrot/effect-api-query/blob/main/tests/http-semantic-keys.test.ts) verify canonical identity and its failure cases.

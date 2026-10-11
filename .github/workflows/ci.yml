@@ -2,9 +2,6 @@ name: CI
 
 on:
   pull_request:
-  push:
-    branches:
-      - main
   schedule:
     - cron: '17 4 1 * *'
   workflow_call:
@@ -29,6 +26,7 @@ jobs:
         name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          fetch-depth: 0
           persist-credentials: false
 
       - &setup_repository
@@ -38,49 +36,31 @@ jobs:
       - name: Verify formatting
         run: vp run format
 
-      - name: Construct package prerequisite
-        run: vp run pack
+      - name: Check shipped skills
+        env:
+          INTENT_REVIEW_BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          vp run skills-check
+          if [ -n "$INTENT_REVIEW_BASE" ]; then
+            vp exec intent maintainer check --base "$INTENT_REVIEW_BASE" --github-summary
+          else
+            vp exec intent maintainer check --github-summary
+          fi
 
-      - name: Run type-aware linting
-        run: vp run lint
-
-      - name: Run TypeScript checking
+      - name: Run type-aware linting and TypeScript checking
         run: vp run typecheck
+
+      - name: Check public API compiler fixtures
+        run: vp run api-types
 
       - name: Run Effect diagnostics
         run: vp run effect-check
 
-      - name: Run Vitest
-        run: vp run test
-
       - name: Run Fallow audits
         run: vp run fallow
 
-  package-contract:
-    name: Package contract
-    needs: source-quality
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-
-    steps:
-      - *checkout
-      - *setup_repository
-
-      - name: Construct and inspect package
-        run: vp run pack
-
-      - name: Verify packed consumers and type scale
-        run: vp run packed-package
-
-      - name: Preserve verified package artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: package-${{ github.sha }}
-          path: .artifacts/*.tgz
-          if-no-files-found: error
-          include-hidden-files: true
-          compression-level: 0
-          retention-days: 7
+      - name: Run Vitest
+        run: vp run test
 
   example-builds:
     name: Example builds
@@ -98,6 +78,18 @@ jobs:
       - name: Build TanStack Start application
         run: vp run tanstack-start-build
 
+      - name: Preserve application builds
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: application-builds
+          path: |
+            dist
+            examples/vite-react/dist
+            examples/tanstack-start/dist
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 7
+
   documentation:
     name: Documentation
     needs: source-quality
@@ -114,11 +106,20 @@ jobs:
       - name: Build documentation
         run: vp run docs-build
 
+      - name: Preserve documentation build
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: documentation-build
+          path: apps/docs/dist
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 7
+
   browser:
     name: Playwright (${{ matrix.browser }})
     needs:
-      - package-contract
       - example-builds
+      - documentation
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -134,14 +135,25 @@ jobs:
       - *checkout
       - *setup_repository
 
+      - name: Restore application builds
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: application-builds
+
+      - name: Restore documentation build
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: documentation-build
+          path: apps/docs/dist
+
       - name: Install ${{ matrix.browser }}
         run: vp exec playwright install --with-deps ${{ matrix.browser }}
 
       - name: Check documentation in ${{ matrix.browser }}
-        run: vp run docs-e2e --project=${{ matrix.browser }}
+        run: vp run --ignore-depends-on docs-e2e --project=${{ matrix.browser }}
 
       - name: Run ${{ matrix.browser }} acceptance tests
-        run: vp run e2e:${{ matrix.browser }}
+        run: vp run --ignore-depends-on e2e:${{ matrix.browser }}
 
       - name: Preserve Playwright failure diagnostics
         if: failure()

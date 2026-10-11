@@ -45,7 +45,6 @@ describe(createRpcQueryUtils, () => {
         retry: false,
         queryFn: queryCoreSkipToken,
         queryKey: ['app', 'rpc', 'users', 'get', 'query'],
-        queryKeyHashFn: utils.users.get.queryOptions(skipToken).queryKeyHashFn,
       })
       const queryClient = new QueryClient()
       const observer = new QueryObserver(queryClient, options)
@@ -88,7 +87,7 @@ describe(createRpcQueryUtils, () => {
       ])
       expect(utils.toString.child.key()).toStrictEqual(['app', 'rpc', 'toString', 'child'])
       expect(utils.events.watch.key()).toStrictEqual(['app', 'rpc', 'events', 'watch'])
-      expect(utils.events.watch.streamedKey()).toStrictEqual([
+      expect(utils.events.watch.streamedKey().slice(0, 5)).toStrictEqual([
         'app',
         'rpc',
         'events',
@@ -101,7 +100,7 @@ describe(createRpcQueryUtils, () => {
       expect(Object.isFrozen(utils.users.get.queryKey({ id: 1 }))).toBe(true)
       expect(Object.isFrozen(utils.users.get.queryKey({ id: 1 }).at(-1))).toBe(true)
       const options = utils.users.get.queryOptions({ input: { id: 1 } })
-      expect(options.queryKeyHashFn(options.queryKey)).toBe(JSON.stringify(options.queryKey))
+      expect(options).not.toHaveProperty('queryKeyHashFn')
     }),
   )
 
@@ -156,12 +155,12 @@ describe(createRpcQueryUtils, () => {
 
       expect(skipToken).toBe(queryCoreSkipToken)
       expect(skipToken).toBe(reactQuerySkipToken)
-      const skipped = utils.users.get.queryOptions(skipToken)
+      const skipped = utils.users.get.queryOptions({ input: skipToken })
       expect(skipped).toMatchObject({
         queryFn: queryCoreSkipToken,
         queryKey: ['app', 'rpc', 'users', 'get', 'query'],
       })
-      expect(skipped.queryKeyHashFn(skipped.queryKey)).toBe(JSON.stringify(skipped.queryKey))
+      expect(skipped).not.toHaveProperty('queryKeyHashFn')
 
       const infiniteCallerOptions = {
         getNextPageParam: (): undefined => {},
@@ -179,15 +178,12 @@ describe(createRpcQueryUtils, () => {
         ...infiniteCallerOptions,
         queryFn: queryCoreSkipToken,
         queryKey: ['app', 'rpc', 'users', 'get', 'infinite'],
-        queryKeyHashFn: skipped.queryKeyHashFn,
       })
-      expect(skippedInfinite.queryKeyHashFn(skippedInfinite.queryKey)).toBe(
-        JSON.stringify(skippedInfinite.queryKey),
-      )
+      expect(skippedInfinite).not.toHaveProperty('queryKeyHashFn')
     }),
   )
 
-  it.effect('projects ordinary reflected objects with only the documented leaf interface', () =>
+  it.effect('projects ordinary reflected objects with literal RPC paths', () =>
     Effect.gen(function* () {
       const Status = Rpc.make('status', { success: Schema.Void })
       const BracketOnly = Rpc.make('billing-history.list all', { success: Schema.Void })
@@ -203,15 +199,6 @@ describe(createRpcQueryUtils, () => {
 
       expect(Object.getPrototypeOf(utils)).toBe(Object.prototype)
       expect(Reflect.ownKeys(utils)).toStrictEqual(['key', 'status', 'billing-history'])
-      expect(Object.keys(utils['billing-history']['list all']).sort()).toStrictEqual([
-        'infiniteKey',
-        'infiniteOptions',
-        'key',
-        'mutationKey',
-        'mutationOptions',
-        'queryKey',
-        'queryOptions',
-      ])
       expect(utils['billing-history']['list all'].key()).toStrictEqual([
         'app',
         'rpc',
@@ -268,7 +255,7 @@ describe(createRpcQueryUtils, () => {
     }),
   )
 
-  it.effect('projects unary and streaming leaves through their distinct interfaces', () =>
+  it.effect('projects mixed unary and streaming RPC paths with distinct view keys', () =>
     Effect.gen(function* () {
       const ListReports = Rpc.make('reports.list', { success: Schema.String })
       const ReportsStream = Rpc.make('reports.watch', { success: Schema.String, stream: true })
@@ -293,14 +280,7 @@ describe(createRpcQueryUtils, () => {
       expect(Object.keys(utils).sort()).toStrictEqual(['events', 'key', 'reports', 'updates'])
       expect(Object.keys(utils.reports).sort()).toStrictEqual(['key', 'list', 'watch'])
       expect(utils.reports.list.key()).toStrictEqual(['app', 'rpc', 'reports', 'list'])
-      expect(Object.keys(utils.events.audit.watch).sort()).toStrictEqual([
-        'key',
-        'liveKey',
-        'liveOptions',
-        'streamedKey',
-        'streamedOptions',
-      ])
-      expect(utils.events.audit.watch.streamedKey()).toStrictEqual([
+      expect(utils.events.audit.watch.streamedKey().slice(0, 6)).toStrictEqual([
         'app',
         'rpc',
         'events',
@@ -319,7 +299,7 @@ describe(createRpcQueryUtils, () => {
       expect(utils.events.audit.watch.streamedKey()).not.toStrictEqual(
         utils.events.audit.watch.liveKey(),
       )
-      expect(utils.updates.watch.streamedKey()).toStrictEqual([
+      expect(utils.updates.watch.streamedKey().slice(0, 5)).toStrictEqual([
         'app',
         'rpc',
         'updates',

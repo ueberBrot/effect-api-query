@@ -5,14 +5,18 @@ description: Configuration, key-generation, and execution errors for RPC and HTT
 
 ## `EffectRpcQueryConfigError`
 
-Thrown synchronously while configuring the utility tree or an option builder. Its `code` is one of:
+Thrown synchronously for invalid factory or builder configuration. Stream execution also rejects
+incompatible QueryClient hashing. Its `code` is one of:
 
 - `InvalidMaxChunks`: a streamed-query bound is not a positive safe integer.
+- `InvalidRefetchMode`: a streamed-query mode is not `reset`, `append`, or `replace`.
 - `InvalidKeyPrefix`
 - `InvalidRpcPath`
 - `RpcPathCollision`
 - `MissingKeyEncoder`
 - `UnknownKeyEncoder`
+- `UnsupportedQueryHash`: a builder received `queryKeyHashFn` or `queryHash`, or stream execution
+  found a default hash inconsistent with its key hasher or a conflicting cached identity.
 
 It can also expose `rpcTag`, `path`, and an underlying `cause`.
 
@@ -44,14 +48,20 @@ Thrown when a live query's stream completes before emitting a value. It exposes 
 
 ## `EffectHttpApiQueryConfigError`
 
-Thrown synchronously while configuring HTTP utilities. Its `code` is one of:
+Thrown synchronously for invalid factory or builder configuration. Stream execution also rejects
+incompatible QueryClient hashing. Its `code` is one of:
 
+- `InvalidMaxChunks`: a streamed-query bound is not a positive safe integer.
+- `InvalidRefetchMode`: a streamed-query mode is not `reset`, `append`, or `replace`.
+- `InvalidMaxEventSize`: an SSE parser limit is not a positive safe integer.
 - `InvalidKeyPrefix`
 - `InvalidEndpointPath`
 - `EndpointPathCollision`
 - `MissingKeyEncoder`
 - `UnknownKeyEncoder`
 - `UnsupportedEndpointMetadata`
+- `UnsupportedQueryHash`: a builder received `queryKeyHashFn` or `queryHash`, or stream execution
+  found a default hash inconsistent with its key hasher or a conflicting cached identity.
 
 It exposes `apiId` and, when available, `groupId`, `endpoint`, `method`, `path`, and an underlying
 `cause`.
@@ -65,15 +75,24 @@ Thrown synchronously while preparing an HTTP query key, before client execution.
 - `KeyEncoderFailed`
 - `InvalidKeyValue`
 
-See [HTTP cache identity and failures](/effect-api-query/reference/http-factory/#cache-identity-and-failures)
+See [HTTP cache identity and failures](/effect-api-query/reference/http-builders/#cache-identity-and-failures)
 for each code's trigger.
 
 ## `EffectHttpApiQueryError<E>`
 
 Thrown when the HTTP runner returns a failed `Exit`. It exposes `apiId`, `groupId`, `endpoint`,
-`method`, `operation`, and the full `Cause.Cause<E>`. The operation is `query`, `infinite`, or `mutation`.
+`method`, `operation`, and the full `Cause.Cause<E>`. The operation is `query`, `infinite`, `mutation`,
+`metadata`, `streamed`, or `live`.
 Use `isEffectHttpApiQueryError(value)` to narrow errors within the same JavaScript realm.
 
 The Cause preserves endpoint, middleware, Schema, and HTTP client errors, including defects and
-interruption. It can contain upstream requests, responses, or sensitive input values; inspect those
+interruption. SSE failures also preserve declared event errors, `Sse.Retry`, and `Sse.SseError`.
+It can contain upstream requests, responses, or sensitive input values; inspect those
 values before logging or exposing them. Runner rejections pass through unchanged.
+
+## `EffectHttpApiQueryEmptyStreamError`
+
+Thrown when an HTTP live SSE query completes before emitting a value. It exposes `apiId`,
+`groupId`, `endpoint`, `method`, and operation `live`. A decoded `undefined` emission counts as a
+value and becomes `null`; a declared header wrapper preserves its body. Accumulated streams
+complete with an empty or retained history according to their refetch mode.

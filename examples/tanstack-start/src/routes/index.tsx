@@ -6,7 +6,6 @@ import { ActionButton } from '../components/action-button.tsx'
 import { ConditionalUserQuery } from '../components/conditional-user-query.tsx'
 import { PageLayout, Panel } from '../components/page-layout.tsx'
 import type { TanStackStartApplication } from '../lib/application.ts'
-import { fetchStreamSnapshot } from '../lib/query-ssr.ts'
 
 const PAGE_SIZE = 4
 
@@ -43,16 +42,14 @@ const UsersPage = () => {
     setBoundedHistory(bounded)
     try {
       await queryClient.query(streamedDiagnosticsOptions(rpcQuery, bounded))
-    } catch {
-      // Query state retains the error for rendering.
-    }
+    } catch {}
   }
   const liveDiagnostic = useSuspenseQuery(liveDiagnosticOptions(rpcQuery))
   const userPages = useInfiniteQuery(userPagesOptions(rpcQuery))
-  const loadedUsers = userPages.data?.pages.flatMap((page) => page.users) ?? []
+  const loaded = userPages.data?.pages.reduce((count, page) => count + page.users.length, 0) ?? 0
   const totalUsers = userPages.data?.pages[0]?.total ?? 0
   const pageCount = userPages.data?.pages.length ?? 0
-  const remainingUsers = Math.max(0, totalUsers - loadedUsers.length)
+  const remainingUsers = Math.max(0, totalUsers - loaded)
   const nextPageSize = Math.min(PAGE_SIZE, remainingUsers)
   let nextPageLabel = 'All users loaded'
   if (userPages.hasNextPage) {
@@ -148,7 +145,7 @@ const UsersPage = () => {
               replacing the pages already in the cache.
             </p>
             <span className="border border-brand-800 bg-brand-950/80 px-3 py-1 text-sm font-bold text-brand-200">
-              {String(loadedUsers.length)} of {String(totalUsers)} loaded
+              {String(loaded)} of {String(totalUsers)} loaded
             </span>
           </div>
           <ol className="mt-4 grid gap-3 p-0">
@@ -281,8 +278,8 @@ export const Route = createFileRoute('/')({
         ...userPagesOptions(context.rpcQuery),
         staleTime: 'static',
       }),
-      fetchStreamSnapshot(context.queryClient, streamedDiagnosticsOptions(context.rpcQuery)),
-      fetchStreamSnapshot(context.queryClient, liveDiagnosticOptions(context.rpcQuery)),
+      context.captureSnapshot(context.queryClient, streamedDiagnosticsOptions(context.rpcQuery)),
+      context.captureSnapshot(context.queryClient, liveDiagnosticOptions(context.rpcQuery)),
     ])
   },
 })

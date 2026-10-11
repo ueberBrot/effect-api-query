@@ -10,8 +10,6 @@ export default defineConfig({
       configurePreviewServer(server) {
         server.middlewares.use((request, _response, next) => {
           const path = request.url?.split('?')[0] ?? ''
-          // Vite preview compression delays response close listeners until the first write.
-          // Keep disconnect signals live while buffered HTTP and RPC requests are pending.
           if (path.startsWith('/api/') || path === '/rpc' || path === '/rpc/') {
             request.headers['accept-encoding'] = 'identity'
           }

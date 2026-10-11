@@ -20,7 +20,6 @@ export interface StartedExampleRpcClient {
   ) => Promise<Exit.Exit<A, E>>
 }
 
-/** Acquires a caller-owned, scoped flat client for the example HTTP server. */
 export const makeExampleRpcClient = Effect.fn('ExampleRpc.makeExampleRpcClient')(function* (
   rpcUrl: string,
 ) {
@@ -45,8 +44,6 @@ export const makeExampleRpcClient = Effect.fn('ExampleRpc.makeExampleRpcClient')
       return forwardClient(tag, payload, options)
     }
 
-    // SAFETY: ExampleRpcClient pairs this checked tag with SlowDiagnosticInput;
-    // Parameters erases that generic relationship inside the forwarding wrapper.
     // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const slowPayload = payload as SlowDiagnosticInput
     const suppliedOperationId = slowPayload.operationId
@@ -57,7 +54,6 @@ export const makeExampleRpcClient = Effect.fn('ExampleRpc.makeExampleRpcClient')
       nextSlowOperation += 1
     }
 
-    // The buffered HTTP protocol cannot carry a caller's interruption after sending a request.
     return client('diagnostics.slow', { ...slowPayload, operationId }, options).pipe(
       Effect.onInterrupt(() =>
         client('diagnostics.cancel', { operationId }).pipe(
@@ -67,13 +63,10 @@ export const makeExampleRpcClient = Effect.fn('ExampleRpc.makeExampleRpcClient')
     )
   }
 
-  // SAFETY: Every tag forwards its original payload/options and result unchanged;
-  // the slow tag only adds cancellation while preserving the SDK's generic call signature.
   // oxlint-disable-next-line typescript/no-unsafe-type-assertion
   return cancellationAwareClient as ExampleRpcClient
 })
 
-/** Starts the ready RPC client resource shared by each executable application. */
 export const startExampleRpcClient = async (rpcUrl: string): Promise<StartedExampleRpcClient> => {
   const clientScope = await Effect.runPromise(Scope.make())
   const runtime = ManagedRuntime.make(Layer.empty)

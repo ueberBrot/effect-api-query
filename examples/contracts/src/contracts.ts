@@ -1,4 +1,3 @@
-// Related Schema classes define one RPC contract family.
 // oxlint-disable eslint/max-classes-per-file
 import { Effect, Schema } from 'effect'
 import { Rpc, RpcGroup, RpcMiddleware } from 'effect/rpc'
@@ -23,7 +22,6 @@ export class UserPage extends Schema.Class<UserPage>('UserPage')({
   users: Schema.Array(User),
 }) {}
 
-// Effect Schema.TaggedError is a curried class factory; only instances use new.
 // oxlint-disable-next-line unicorn/throw-new-error
 export class DiagnosticFailure extends Schema.TaggedError<DiagnosticFailure>()(
   'DiagnosticFailure',
@@ -31,14 +29,12 @@ export class DiagnosticFailure extends Schema.TaggedError<DiagnosticFailure>()(
     reason: Schema.Literal('requested-failure'),
   },
 ) {
-  // Effect Cause.pretty reads Error.message through the base error interface.
   // fallow-ignore-next-line unused-class-member
   override get message(): string {
     return this.reason
   }
 }
 
-// Effect Schema.TaggedError is a curried class factory; only instances use new.
 // oxlint-disable-next-line unicorn/throw-new-error
 export class ExampleAuthorizationError extends Schema.TaggedError<ExampleAuthorizationError>()(
   'ExampleAuthorizationError',
@@ -99,8 +95,8 @@ const UsersList = Rpc.make('users.list', {
 
 const UsersPage = Rpc.make('users.page', {
   payload: {
-    cursor: Schema.Int,
-    pageSize: Schema.Int,
+    cursor: Schema.Int.check(Schema.isGreaterThanOrEqualTo(0)),
+    pageSize: Schema.Int.check(Schema.isBetween({ minimum: 1, maximum: 100 })),
   },
   success: UserPage,
 })
@@ -146,7 +142,6 @@ const DiagnosticsCancel = Rpc.make('diagnostics.cancel', {
   success: Schema.Void,
 })
 
-// The Schema value and its decoded type deliberately share the domain name.
 // oxlint-disable-next-line eslint/no-redeclare
 export const DiagnosticStatus = Schema.Struct({
   interrupted: Schema.Int,

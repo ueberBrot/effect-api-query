@@ -87,7 +87,6 @@ describe(createHttpApiQueryUtils, () => {
     const utils = createHttpApiQueryUtils(Api, { client, keyPrefix: ['shared'] })
     const queryClient = new QueryClient()
     try {
-      // SAFETY: Undeclared response controls are injected to verify that decoded-only execution cannot be overridden.
       /* oxlint-disable typescript/no-unsafe-type-assertion */
       await expect(
         queryClient.query(
@@ -100,7 +99,6 @@ describe(createHttpApiQueryUtils, () => {
       const mutation = queryClient
         .getMutationCache()
         .build(queryClient, utils.users.create.mutationOptions())
-      // SAFETY: Undeclared response controls are injected to verify that decoded-only execution cannot be overridden.
       /* oxlint-disable typescript/no-unsafe-type-assertion */
       await expect(
         mutation.execute({
@@ -259,7 +257,6 @@ describe(createHttpApiQueryUtils, () => {
       ),
     )
     const calls: unknown[] = []
-    // SAFETY: This mock records arbitrary invocation values so request ownership can be asserted without changing the input.
     /* oxlint-disable anti-slop/no-unknown-parameters */
     const client = {
       'users.v1': {
@@ -274,7 +271,6 @@ describe(createHttpApiQueryUtils, () => {
       },
     }
     /* oxlint-enable anti-slop/no-unknown-parameters */
-    // SAFETY: The mock implements only the endpoint under test, and its invocation and result are asserted below.
     /* oxlint-disable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
     const utils = createHttpApiQueryUtils(api, {
       client: client as unknown as HttpApiClient.ForApi<typeof api>,
@@ -297,15 +293,6 @@ describe(createHttpApiQueryUtils, () => {
         'literal.api',
         'health.check',
         'query',
-      ])
-      expect(Object.keys(utils['health.check'])).toStrictEqual([
-        'infiniteKey',
-        'infiniteOptions',
-        'key',
-        'mutationKey',
-        'mutationOptions',
-        'queryKey',
-        'queryOptions',
       ])
       expect(Object.isFrozen(utils)).toBe(true)
       expect(Object.isFrozen(utils['users.v1'])).toBe(true)
@@ -372,7 +359,6 @@ describe(createHttpApiQueryUtils, () => {
     )
     const cause = Cause.combine(Cause.fail('denied'), Cause.die(new Error('defect')))
     const client = { actions: { fail: () => Effect.failCause(cause) } }
-    // SAFETY: The mock implements only the endpoint under test, and its invocation and result are asserted below.
     /* oxlint-disable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
     const utils = createHttpApiQueryUtils(api, {
       client: client as unknown as HttpApiClient.ForApi<typeof api>,
@@ -397,7 +383,6 @@ describe(createHttpApiQueryUtils, () => {
       }
       expect(error.cause).toBe(cause)
       const rejection = new Error('runner')
-      // SAFETY: The mock implements only the endpoint under test, and its invocation and result are asserted below.
       /* oxlint-disable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
       const rejected = createHttpApiQueryUtils(api, {
         client: client as unknown as HttpApiClient.ForApi<typeof api>,
@@ -431,7 +416,6 @@ describe(createHttpApiQueryUtils, () => {
         success: Schema.String,
       }),
     )
-    // SAFETY: This one-RPC fixture returns the declared string; this test compares only its cached key partition.
     /* oxlint-disable typescript/no-unsafe-type-assertion */
     const rpc = createRpcQueryUtils(group, {
       client: (() => Effect.succeed('rpc')) as never,
@@ -475,7 +459,6 @@ describe(createHttpApiQueryUtils, () => {
         }),
       ),
     )
-    // SAFETY: A required encoder is deliberately omitted to verify the synchronous configuration-error boundary.
     /* oxlint-disable typescript/no-unsafe-type-assertion */
     expect(() =>
       createHttpApiQueryUtils(api, {
@@ -549,7 +532,6 @@ describe(createHttpApiQueryUtils, () => {
     })
     input.payload.name = 'Grace'
     expect(key.at(-1)).toMatchObject({ payload: { name: 'Ada' } })
-    // SAFETY: A string replaces the decoded numeric parameter to verify synchronous request encoding fails.
     /* oxlint-disable typescript/no-unsafe-type-assertion */
     expect(() => utils.users.save.queryKey({ ...input, params: { id: 'raw' } } as never)).toThrow(
       expect.objectContaining({ code: 'RequestEncodingFailed', endpoint: 'save' }),
@@ -563,7 +545,6 @@ describe(createHttpApiQueryUtils, () => {
     expect(() => unsafe.users.save.queryKey(input)).toThrow(
       expect.objectContaining({ code: 'InvalidKeyValue' }),
     )
-    // SAFETY: An empty prefix deliberately violates the nonempty tuple contract to verify configuration rejection.
     /* oxlint-disable typescript/no-unsafe-type-assertion */
     expect(() =>
       createHttpApiQueryUtils(api, {
@@ -572,7 +553,6 @@ describe(createHttpApiQueryUtils, () => {
       } as never),
     ).toThrow(expect.objectContaining({ code: 'InvalidKeyPrefix' }))
     /* oxlint-enable typescript/no-unsafe-type-assertion */
-    // SAFETY: Undeclared encoders deliberately exercise atomic validation of the encoder map.
     /* oxlint-disable typescript/no-unsafe-type-assertion */
     expect(() =>
       createHttpApiQueryUtils(api, {

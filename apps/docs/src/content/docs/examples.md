@@ -53,38 +53,17 @@ demo authorization header through its HTTP client middleware.
 
 ### Compare HTTP and RPC
 
-The HTTP panel uses `createHttpApiQueryUtils` from `effect-api-query`; the RPC panels
-use `createRpcQueryUtils` from the same package root. The application owns both ready clients,
-their runners, and the QueryClient. During disposal, it cancels queries before releasing client
-resources.
+| Try                                                           | Observable result                                                | Complete source                                                                                                                          |
+| ------------------------------------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Create/delete a user in either directory                      | Both adapters refresh through explicit cross-prefix invalidation | [application.ts](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/lib/application.ts)                     |
+| Trigger a declared HTTP failure                               | HTTP execution metadata and preserved Cause                      | [http-section.tsx](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/components/sections/http-section.tsx) |
+| Start a slow query, wait for **Ready to cancel**, then cancel | Only that operation is interrupted; completed writes remain      | [Cancellation](/effect-api-query/guides/cancellation/)                                                                                   |
+| Switch cache owner or reload                                  | Private caches retire; allowlisted directory DTOs may persist    | [owner-cache.ts](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/lib/owner-cache.ts)                     |
 
-Use the HTTP directory to read users, load another page, and create or delete a user. Each write
-explicitly invalidates both generated user prefixes, so the RPC directory reflects HTTP writes
-and the HTTP directory reflects RPC writes. The two adapters retain separate cache keys.
-Choose **Reset directory** to restore the deterministic shared data.
-
-The HTTP user selector passes `skipToken` until a user is selected. HTTP request inputs use
-structured decoded parts such as `params`, `query`, and `payload`; RPC inputs retain their
-payload-constructor defaults. Deleting a user demonstrates an HTTP no-content mutation whose
-result remains `undefined`.
-
-Trigger the HTTP failure to inspect `EffectHttpApiQueryError` and its preserved `Cause`.
-The package adds declaration identifiers to error metadata; upstream Causes can still contain
-request, response, or schema issue values.
-
-Choose **Start slow HTTP query**, wait for **HTTP: Ready to cancel**, then choose
-**Cancel HTTP query**. After the HTTP request aborts, the example observes server interruption for
-that operation. Each panel owns a distinct operation ID, so cancelling an RPC query leaves a
-concurrent HTTP query running. This cancels observation and work in this handler; it does not
-compensate completed mutations. The RPC cancellable-command panel demonstrates explicit domain
-cancellation.
-
-The executable sources are
-[application ownership](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/lib/application.ts),
-[HTTP contracts](https://github.com/ueberBrot/effect-api-query/tree/main/examples/contracts/src), and
-[server handlers](https://github.com/ueberBrot/effect-api-query/tree/main/examples/server/src).
-The repository type-checks the application against the public package root and exercises it
-through the real server and browser suites.
+Copy [shared contracts](https://github.com/ueberBrot/effect-api-query/tree/main/examples/contracts/src),
+[ready-client ownership](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/lib/application.ts),
+and [server handlers](https://github.com/ueberBrot/effect-api-query/tree/main/examples/server/src).
+The application owns clients, runners, providers, cross-adapter invalidation and disposal.
 
 ## Run TanStack Start
 
@@ -92,45 +71,39 @@ through the real server and browser suites.
 vp run tanstack-start-dev
 ```
 
-This task starts one full-stack process. The browser and server-rendering clients call the
-Start application's `/rpc` and `/api/$` routes. Choose **HTTP users** to inspect the server-rendered directory
-and first page, reuse the hydrated cache, and try the same HTTP operations as in Vite React.
-Choose **HTTP SSR failure** to see the browser retry a failed server query that was omitted
-from dehydration.
+This task starts one full-stack process at `http://127.0.0.1:3000`, serving `/rpc` and `/api/$`.
+Choose **HTTP users** for server-rendered data and hydrated navigation, or **HTTP SSR failure**
+for browser refetch of a failure omitted from dehydration. Each request owns its cache and
+clients; the browser owns separate resources.
 
-Server rendering uses the trusted origin `http://127.0.0.1:3000`. If the Start server listens
-elsewhere, set the server-only `EXAMPLE_API_ORIGIN` environment variable to its HTTP(S) origin,
-without a path, credentials, query, or fragment. Browser requests stay on the same origin.
-See [TanStack Start](/effect-api-query/guides/tanstack-start/) for request ownership, authentication,
-cache isolation, and hydration setup.
+Copy the [router](https://github.com/ueberBrot/effect-api-query/blob/main/examples/tanstack-start/src/router.tsx),
+[SSR codecs](https://github.com/ueberBrot/effect-api-query/blob/main/examples/tanstack-start/src/lib/query-ssr.ts),
+and [failure route](https://github.com/ueberBrot/effect-api-query/blob/main/examples/tanstack-start/src/routes/http-failure.tsx).
+See [TanStack Start](/effect-api-query/guides/tanstack-start/) for the library integration.
+
+## Try cancellable commands
+
+Use the **Cancellable commands** panel to run two commands with independent operation IDs and
+cancel one while the other progresses. The [complete workflow](/effect-api-query/examples/cancellable-commands/)
+explains its start/status/cancel protocol, same-ID retries, and application-owned workers.
 
 ## Pause a query until a user is selected
 
-In either application, find **Choose before fetching**. With **No user selected**, the generated
-query uses `{ input: skipToken }` and sends no lookup request. Select **User 2: Edsger Dijkstra** to
-load the user summary, then clear and reselect it within 30 seconds to reuse the cached result.
-
-The skipped and active queries preserve the same `select` and `staleTime` options. The example uses
-ordinary `useQuery`; the TanStack Start loader leaves this interactive query paused during server rendering.
+In either app's **Choose before fetching** panel, **No user selected** sends no lookup.
+Select a user to fetch its summary; clear and reselect within 30 seconds to reuse the cache.
+Skipped and active options retain the same `select` and `staleTime`.
 
 ## Compare full and bounded stream history
 
-In either application, let the diagnostic stream finish, then choose **Replay newest 2**.
-The accumulated history retains only "Workspace synchronized" and "Ready"; earlier updates disappear
-as new ones arrive. Choose **Replay full history** to retain all four states again. The live query
-continues to show only "Ready".
-
-The bounded replay supplies `maxChunks: 2` to `streamedOptions`. Both controls reuse the generated
-streamed key: the bound changes retention policy, not RPC identity. The application keeps the selected
-policy for subsequent refetches. TanStack Start also demonstrates this after hydrating its server snapshot.
+After diagnostics finish, **Replay newest 2** retains the latest two states; **Replay full history**
+retains all four. The live view shows only the latest state. Each accumulated policy has its own
+key. See [Choose Stream History](/effect-api-query/guides/choose-stream-history/).
 
 ## Inspect request-local metadata
 
-In either application's diagnostics panel, choose **Trigger declared failure**. Its generated
-mutation options supply the `x-request-source: diagnostics-panel` RPC header. Application-wide
-authorization still comes from the shared client runner. The same `rpcOptions` input works with
-queries, infinite queries, and both stream builders; see
-[Generated Builders](/effect-api-query/reference/generated-builders/#request-local-rpc-options).
+**Trigger declared failure** supplies the request-local `x-request-source: diagnostics-panel`
+RPC header while shared authorization stays on the client runner. See
+[Request-local RPC Options](/effect-api-query/reference/generated-builders/#request-local-rpc-options).
 
 ## Build the examples
 
