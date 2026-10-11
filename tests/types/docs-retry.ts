@@ -4,7 +4,9 @@ import {
   createRpcQueryUtils,
   isEffectHttpApiQueryError,
   isEffectRpcQueryError,
+  withQueryPolicy,
 } from 'effect-api-query'
+import type { InferQueryError } from 'effect-api-query'
 import { HttpClientError } from 'effect/http'
 import { HttpApi, HttpApiClient, HttpApiEndpoint, HttpApiGroup } from 'effect/http-api'
 import { Rpc, RpcClient, RpcClientError, RpcGroup } from 'effect/rpc'
@@ -28,6 +30,39 @@ const readApi = HttpApi.make('profile-api').add(
   ),
 )
 
+const retryPolicy = <Error, Failure>(
+  causeOf: (error: Error) => Cause.Cause<Failure> | undefined,
+  isTransient: (failure: Failure) => boolean,
+) => ({
+  retry: (failureCount: number, error: Error) => {
+    const cause = causeOf(error)
+    if (
+      !cause ||
+      failureCount >= 2 ||
+      Cause.hasDies(cause) ||
+      Cause.hasInterrupts(cause) ||
+      cause.reasons.length !== 1
+    ) {
+      return false
+    }
+    const failure = Cause.findError(cause)
+    return (
+      Result.isSuccess(failure) &&
+      (Schema.is(RetryLater)(failure.success) || isTransient(failure.success))
+    )
+  },
+  retryDelay: (attemptIndex: number, error: Error) => {
+    const cause = causeOf(error)
+    if (cause) {
+      const failure = Cause.findError(cause)
+      if (Result.isSuccess(failure) && Schema.is(RetryLater)(failure.success)) {
+        return Math.min(30_000, Math.max(0, failure.success.retryAfterMs))
+      }
+    }
+    return Math.min(1_000 * 2 ** attemptIndex, 30_000)
+  },
+})
+
 const rpcReadOptions = (
   client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof readGroup>, RpcClientError.RpcClientError>,
 ) => {
@@ -37,77 +72,33 @@ const rpcReadOptions = (
     RpcClientError.RpcClientError
   >(readGroup, { client, keyPrefix: ['profile-app'] })
 
-  return rpc.profile.read.queryOptions({
-    retry: (failureCount, error) => {
-      if (!isEffectRpcQueryError(error) || failureCount >= 2) {
-        return false
-      }
-      if (Cause.hasDies(error.cause) || Cause.hasInterrupts(error.cause)) {
-        return false
-      }
-      const failure = Cause.findError(error.cause)
-      if (Result.isFailure(failure) || error.cause.reasons.length !== 1) {
-        return false
-      }
-      switch (failure.success._tag) {
-        case 'RetryLater':
-          return true
-        case 'RpcClientError':
-          return (
-            failure.success.reason._tag === 'HttpError' &&
-            failure.success.reason.kind === 'TransportError'
-          )
-        default:
-          return false
-      }
-    },
-    retryDelay: (attemptIndex, error) => {
-      if (isEffectRpcQueryError(error)) {
-        const failure = Cause.findError(error.cause)
-        if (Result.isSuccess(failure) && failure.success._tag === 'RetryLater') {
-          return Math.min(30_000, Math.max(0, failure.success.retryAfterMs))
-        }
-      }
-      return Math.min(1_000 * 2 ** attemptIndex, 30_000)
-    },
-  })
+  type Error = InferQueryError<typeof rpc.profile.read>
+  const read = withQueryPolicy(
+    rpc.profile.read,
+    'query',
+    retryPolicy(
+      (error: Error) => (isEffectRpcQueryError(error) ? error.cause : undefined),
+      (failure) =>
+        Schema.is(RpcClientError.RpcClientError)(failure) &&
+        failure.reason._tag === 'HttpError' &&
+        failure.reason.kind === 'TransportError',
+    ),
+  )
+  return read()
 }
 
 const httpReadOptions = (client: HttpApiClient.ForApi<typeof readApi>) => {
   const http = createHttpApiQueryUtils(readApi, { client, keyPrefix: ['profile-app'] })
 
-  return http.profile.read.queryOptions({
-    retry: (failureCount, error) => {
-      if (!isEffectHttpApiQueryError(error) || failureCount >= 2) {
-        return false
-      }
-      if (Cause.hasDies(error.cause) || Cause.hasInterrupts(error.cause)) {
-        return false
-      }
-      const failure = Cause.findError(error.cause)
-      if (Result.isFailure(failure) || error.cause.reasons.length !== 1) {
-        return false
-      }
-      switch (failure.success._tag) {
-        case 'RetryLater':
-          return true
-        case 'HttpClientError':
-          return (
-            HttpClientError.isHttpClientError(failure.success) &&
-            failure.success.reason._tag === 'TransportError'
-          )
-        default:
-          return false
-      }
-    },
-    retryDelay: (attemptIndex, error) => {
-      if (isEffectHttpApiQueryError(error)) {
-        const failure = Cause.findError(error.cause)
-        if (Result.isSuccess(failure) && failure.success._tag === 'RetryLater') {
-          return Math.min(30_000, Math.max(0, failure.success.retryAfterMs))
-        }
-      }
-      return Math.min(1_000 * 2 ** attemptIndex, 30_000)
-    },
-  })
+  type Error = InferQueryError<typeof http.profile.read>
+  const read = withQueryPolicy(
+    http.profile.read,
+    'query',
+    retryPolicy(
+      (error: Error) => (isEffectHttpApiQueryError(error) ? error.cause : undefined),
+      (failure) =>
+        HttpClientError.isHttpClientError(failure) && failure.reason._tag === 'TransportError',
+    ),
+  )
+  return read()
 }

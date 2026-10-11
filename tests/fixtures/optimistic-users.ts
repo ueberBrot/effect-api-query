@@ -20,7 +20,10 @@ import { createHttpApiQueryUtils, createRpcQueryUtils } from '#effect-api-query'
 
 import type { ViteReactApplication } from '../../examples/vite-react/src/lib/application.ts'
 import { makeOwnerCache, ownerKeyPrefix } from '../../examples/vite-react/src/lib/owner-cache.ts'
-import { makeUserWrites } from '../../examples/vite-react/src/lib/user-writes.ts'
+import {
+  makeUsersInvalidator,
+  makeUserWrites,
+} from '../../examples/vite-react/src/lib/user-writes.ts'
 
 interface CreateRequest {
   readonly name: string
@@ -216,22 +219,15 @@ export const makeControlledUserWrites = Effect.fnUntraced(function* (
     },
   })
   const { isActive, runMutation, persistDirectory, trackMutationOptions } = owner
+  const invalidateUsers = makeUsersInvalidator({ queryClient, rpcQuery, httpQuery, isActive })
   const userWrites = makeUserWrites({
     queryClient,
     rpcQuery,
     httpQuery,
     isActive,
+    invalidateUsers,
     trackMutationOptions,
   })
-  const invalidateUsers = async () => {
-    if (!isActive()) {
-      return
-    }
-    await Promise.all([
-      queryClient.invalidateQueries({ queryKey: rpcQuery.users.key() }),
-      queryClient.invalidateQueries({ queryKey: httpQuery.users.key() }),
-    ])
-  }
   const dispose = async () => {
     try {
       await owner.retire()

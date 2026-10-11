@@ -49,85 +49,301 @@ export default defineConfig({
         {
           label: 'Start Here',
           items: [
-            { label: 'Installation', slug: 'getting-started/installation' },
-            { label: 'RPC Quick Start', slug: 'getting-started/quick-start' },
-            { label: 'HTTP Quick Start', slug: 'getting-started/http-quick-start' },
-            { label: 'Feature Support', slug: 'getting-started/feature-support' },
             {
-              label: 'Compatibility and Stability',
-              slug: 'getting-started/compatibility-and-stability',
+              label: 'Installation',
+              slug: 'getting-started/installation',
+            },
+            {
+              label: 'Supported Operations',
+              slug: 'getting-started/feature-support',
             },
           ],
         },
         {
-          label: 'Functionality',
+          label: 'HTTP API',
           items: [
-            { label: 'Queries', slug: 'guides/queries' },
-            { label: 'Mutations', slug: 'guides/mutations' },
-            { label: 'Pagination', slug: 'guides/pagination' },
-            { label: 'Streaming', slug: 'guides/streaming' },
-            { label: 'HTTP Metadata', slug: 'guides/http-metadata' },
-            { label: 'HTTP Requests and Uploads', slug: 'guides/http-queries-and-mutations' },
-            { label: 'Conditional Queries', slug: 'guides/conditional-queries' },
-            { label: 'Cache Management', slug: 'guides/cache-management' },
-            { label: 'Cache Filters', slug: 'guides/cache-filters' },
-            { label: 'Query Defaults', slug: 'guides/query-defaults' },
-            { label: 'Choose Stream History', slug: 'guides/choose-stream-history' },
-            { label: 'Handle Failures', slug: 'guides/handle-failures' },
-            { label: 'Retry Queries', slug: 'guides/retry-queries' },
-            { label: 'Cancellation', slug: 'guides/cancellation' },
-            { label: 'Custom Key Encoders', slug: 'guides/custom-key-encoders' },
+            {
+              label: 'Quick Start',
+              slug: 'getting-started/http-quick-start',
+            },
+            {
+              label: 'Contract and Utility Tree',
+              slug: 'concepts/http-utility-tree',
+            },
+            {
+              label: 'Requests and Uploads',
+              slug: 'guides/http-queries-and-mutations',
+            },
+            {
+              label: 'Response Metadata',
+              slug: 'guides/http-metadata',
+            },
+            {
+              label: 'Factory',
+              slug: 'reference/http-factory',
+            },
+            {
+              label: 'Builders',
+              slug: 'reference/http-builders',
+            },
+          ],
+        },
+        {
+          label: 'RPC',
+          items: [
+            {
+              label: 'Quick Start',
+              slug: 'getting-started/quick-start',
+            },
+            {
+              label: 'Contract and Utility Tree',
+              slug: 'concepts/rpc-utility-tree',
+            },
+            {
+              label: 'Factory',
+              slug: 'reference/factory',
+            },
+            {
+              label: 'Builders',
+              slug: 'reference/generated-builders',
+            },
+          ],
+        },
+        {
+          label: 'Library',
+          items: [
+            {
+              label: 'Contracts and Inputs',
+              items: [
+                {
+                  label: 'Generated Utility Model',
+                  slug: 'concepts/queries-and-mutations',
+                },
+                {
+                  label: 'Inputs and Query Data',
+                  slug: 'concepts/data-normalization',
+                },
+              ],
+            },
+            {
+              label: 'Options and Cache Views',
+              items: [
+                {
+                  label: 'Queries',
+                  slug: 'guides/queries',
+                },
+                {
+                  label: 'Mutations',
+                  slug: 'guides/mutations',
+                },
+                {
+                  label: 'Pagination',
+                  slug: 'guides/pagination',
+                },
+                {
+                  label: 'Conditional Queries',
+                  slug: 'guides/conditional-queries',
+                },
+                {
+                  label: 'Streaming',
+                  slug: 'guides/streaming',
+                },
+                {
+                  label: 'Stream History',
+                  slug: 'guides/choose-stream-history',
+                },
+              ],
+              collapsed: true,
+            },
+            {
+              label: 'Cache and Policies',
+              items: [
+                {
+                  label: 'Semantic Keys',
+                  slug: 'concepts/semantic-keys',
+                },
+                {
+                  label: 'Cache Keys and Filters',
+                  slug: 'guides/cache-filters',
+                },
+                {
+                  label: 'Defaults and Policies',
+                  slug: 'guides/query-defaults',
+                },
+                {
+                  label: 'Custom Key Encoders',
+                  slug: 'guides/custom-key-encoders',
+                },
+                {
+                  label: 'Optimistic Updates',
+                  slug: 'guides/optimistic-writes',
+                },
+                {
+                  label: 'Refresh from Events',
+                  slug: 'guides/refresh-from-events',
+                },
+                {
+                  label: 'Switch Cache Owners',
+                  slug: 'guides/switch-cache-owners',
+                },
+              ],
+              collapsed: true,
+            },
+            {
+              label: 'Execution and Lifetime',
+              items: [
+                {
+                  label: 'Client Lifecycle',
+                  slug: 'concepts/client-lifecycle',
+                },
+                {
+                  label: 'Handle Failures',
+                  slug: 'guides/handle-failures',
+                },
+                {
+                  label: 'Retry Queries',
+                  slug: 'guides/retry-queries',
+                },
+                {
+                  label: 'Cancellation',
+                  slug: 'guides/cancellation',
+                },
+              ],
+              collapsed: true,
+            },
           ],
         },
         {
           label: 'Integrations',
           items: [
-            { label: 'React Query', slug: 'guides/react-query' },
-            { label: 'Vue Query', slug: 'guides/vue-query' },
-            { label: 'Solid Query', slug: 'guides/solid-query' },
-            { label: 'Svelte Query', slug: 'guides/svelte-query' },
-            { label: 'Angular Query', slug: 'guides/angular-query' },
-            { label: 'TanStack Start', slug: 'guides/tanstack-start' },
-            { label: 'WebSocket Ready Clients', slug: 'guides/websocket-clients' },
-            { label: 'Browser and Worker Hosts', slug: 'reference/browser-and-worker-hosts' },
-            { label: 'External HTTP Clients', slug: 'reference/external-http-clients' },
+            {
+              label: 'Overview',
+              slug: 'integrations',
+            },
+            {
+              label: 'React',
+              items: [
+                {
+                  label: 'Client Setup and Hooks',
+                  slug: 'guides/react-query',
+                },
+                {
+                  label: 'Suspense and Error Recovery',
+                  slug: 'guides/suspense-and-recovery',
+                },
+              ],
+            },
+            {
+              label: 'Reactive Frameworks',
+              items: [
+                {
+                  label: 'Vue Query',
+                  slug: 'guides/vue-query',
+                },
+                {
+                  label: 'Solid Query',
+                  slug: 'guides/solid-query',
+                },
+                {
+                  label: 'Svelte Query',
+                  slug: 'guides/svelte-query',
+                },
+                {
+                  label: 'Angular Query',
+                  slug: 'guides/angular-query',
+                },
+              ],
+              collapsed: true,
+            },
+            {
+              label: 'Router and Server Rendering',
+              items: [
+                {
+                  label: 'Router and Start',
+                  slug: 'guides/tanstack-start',
+                },
+                {
+                  label: 'Hydrate Query Data',
+                  slug: 'guides/hydrate-unary-data',
+                },
+                {
+                  label: 'Hydrate Query Views',
+                  slug: 'guides/hydrate-query-views',
+                },
+                {
+                  label: 'Stream Snapshots',
+                  slug: 'guides/stream-snapshots',
+                },
+              ],
+              collapsed: true,
+            },
+            {
+              label: 'Clients and Hosts',
+              items: [
+                {
+                  label: 'WebSocket Clients',
+                  slug: 'guides/websocket-clients',
+                },
+                {
+                  label: 'Browser and Worker Hosts',
+                  slug: 'reference/browser-and-worker-hosts',
+                },
+                {
+                  label: 'Stream Tracing',
+                  slug: 'guides/trace-streams',
+                },
+                {
+                  label: 'External HTTP Clients',
+                  slug: 'reference/external-http-clients',
+                },
+              ],
+              collapsed: true,
+            },
           ],
         },
         {
-          label: 'Recipes',
+          label: 'Examples',
           items: [
-            { label: 'Switch Cache Owners', slug: 'guides/switch-cache-owners' },
-            { label: 'Optimistic User Writes', slug: 'guides/optimistic-writes' },
-            { label: 'Refresh from Domain Events', slug: 'guides/refresh-from-events' },
-            { label: 'Stream Snapshots', slug: 'guides/stream-snapshots' },
-            { label: 'Hydrate Unary Data', slug: 'guides/hydrate-unary-data' },
-            { label: 'Hydrate Query Views', slug: 'guides/hydrate-query-views' },
-            { label: 'Executable Examples', slug: 'examples' },
+            {
+              label: 'Run the Applications',
+              slug: 'examples',
+            },
+            {
+              label: 'Cancellable Commands',
+              slug: 'examples/cancellable-commands',
+            },
           ],
+          collapsed: true,
         },
         {
-          label: 'Concepts',
+          label: 'API Reference',
           items: [
-            { label: 'RPC Utility Tree', slug: 'concepts/rpc-utility-tree' },
-            { label: 'HTTP Utility Tree', slug: 'concepts/http-utility-tree' },
-            { label: 'Queries and Mutations', slug: 'concepts/queries-and-mutations' },
-            { label: 'Client Lifecycle', slug: 'concepts/client-lifecycle' },
-            { label: 'Semantic Keys', slug: 'concepts/semantic-keys' },
-            { label: 'Data Normalization', slug: 'concepts/data-normalization' },
+            {
+              label: 'Type Inference',
+              slug: 'reference/type-inference',
+            },
+            {
+              label: 'Errors',
+              slug: 'reference/errors',
+            },
+            {
+              label: 'Public Exports',
+              slug: 'reference/public-exports',
+            },
+            {
+              label: 'Compatibility and Limits',
+              slug: 'reference/compatibility-and-limits',
+            },
+            {
+              label: 'Compatibility and Stability',
+              slug: 'getting-started/compatibility-and-stability',
+            },
+            {
+              label: 'Performance and Bundling',
+              slug: 'reference/performance',
+            },
           ],
-        },
-        {
-          label: 'Reference',
-          items: [
-            { label: 'RPC Factory', slug: 'reference/factory' },
-            { label: 'HTTP Factory', slug: 'reference/http-factory' },
-            { label: 'RPC Builders', slug: 'reference/generated-builders' },
-            { label: 'HTTP Builders', slug: 'reference/http-builders' },
-            { label: 'Errors', slug: 'reference/errors' },
-            { label: 'Public Exports', slug: 'reference/public-exports' },
-            { label: 'Performance and Bundling', slug: 'reference/performance' },
-            { label: 'Compatibility and Limits', slug: 'reference/compatibility-and-limits' },
-          ],
+          collapsed: true,
         },
       ],
       social: [{ icon: 'github', label: 'GitHub', href: repositoryUrl }],

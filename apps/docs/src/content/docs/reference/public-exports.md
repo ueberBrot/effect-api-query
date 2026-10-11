@@ -5,26 +5,33 @@ description: Package-root values and types.
 
 All supported imports come from `effect-api-query`.
 
-| Export                           | Purpose                                                                   |
-| -------------------------------- | ------------------------------------------------------------------------- |
-| `createRpcQueryUtils`            | Build the RPC utility tree.                                               |
-| `fetchStreamSnapshot`            | Capture stream data and await exact-query cancellation and local cleanup. |
-| `StreamSnapshotOptions`          | Fresh/cached mode, request abort signal, and publication timeout.         |
-| `skipToken`                      | Query Core's exact sentinel for disabling queries that require input.     |
-| `EffectRpcQueryConfigError`      | Invalid factory or builder configuration.                                 |
-| `EffectRpcQueryKeyError`         | Payload or key preparation failure.                                       |
-| `EffectRpcQueryError`            | Failed RPC `Exit` with its Effect `Cause`.                                |
-| `EffectRpcQueryEmptyStreamError` | Live stream completed without a value.                                    |
-| `isEffectRpcQueryError`          | Runtime guard for RPC execution errors.                                   |
-| `CreateRpcQueryUtilsOptions`     | Factory option type.                                                      |
-| `RpcQueryUtils`                  | Generated utility-tree type.                                              |
-| `RunPromiseExit`                 | Runner adapter type with optional abort signal.                           |
-| `KeyEncoder`                     | Synchronous semantic key-encoder type.                                    |
-| `JsonValue`                      | Immutable strict-JSON key value.                                          |
-| `QueryData`                      | Query success type with possible `undefined` normalized to `null`.        |
-| `SkipToken`                      | Type of the exported skip sentinel.                                       |
-| `EffectRpcQueryConfigErrorCode`  | Stable configuration error-code union.                                    |
-| `EffectRpcQueryKeyErrorCode`     | Stable key error-code union.                                              |
+| Export                                    | Purpose                                                                   |
+| ----------------------------------------- | ------------------------------------------------------------------------- |
+| `createRpcQueryUtils`                     | Build the RPC utility tree.                                               |
+| `viewPrefix`                              | Select every input of one supported leaf view.                            |
+| `withQueryPolicy`                         | Bind typed defaults to an existing query options builder.                 |
+| `withMutationPolicy`                      | Bind typed defaults to an existing mutation options builder.              |
+| `QueryPolicy`, `MutationPolicy`           | Annotate reusable leaf-specific native policies.                          |
+| `InferInput`                              | Derive the operation input from a generated leaf.                         |
+| `InferQueryData`, `InferQueryError`       | Derive cached data and failures for a supported query view.               |
+| `InferMutationData`, `InferMutationError` | Derive a buffered mutation's result and execution error.                  |
+| `fetchStreamSnapshot`                     | Capture stream data and await exact-query cancellation and local cleanup. |
+| `StreamSnapshotOptions`                   | Fresh/cached mode, request abort signal, and publication timeout.         |
+| `skipToken`                               | Query Core's exact sentinel for disabling queries that require input.     |
+| `EffectRpcQueryConfigError`               | Invalid factory or builder configuration.                                 |
+| `EffectRpcQueryKeyError`                  | Payload or key preparation failure.                                       |
+| `EffectRpcQueryError`                     | Failed RPC `Exit` with its Effect `Cause`.                                |
+| `EffectRpcQueryEmptyStreamError`          | Live stream completed without a value.                                    |
+| `isEffectRpcQueryError`                   | Runtime guard for RPC execution errors.                                   |
+| `CreateRpcQueryUtilsOptions`              | Factory option type.                                                      |
+| `RpcQueryUtils`                           | Generated utility-tree type.                                              |
+| `RunPromiseExit`                          | Runner adapter type with optional abort signal.                           |
+| `KeyEncoder`                              | Synchronous semantic key-encoder type.                                    |
+| `JsonValue`                               | Immutable strict-JSON key value.                                          |
+| `QueryData`                               | Query success type with possible `undefined` normalized to `null`.        |
+| `SkipToken`                               | Type of the exported skip sentinel.                                       |
+| `EffectRpcQueryConfigErrorCode`           | Stable configuration error-code union.                                    |
+| `EffectRpcQueryKeyErrorCode`              | Stable key error-code union.                                              |
 
 The [HTTP factory](/effect-api-query/reference/http-factory/) adds `createHttpApiQueryUtils`,
 `HttpApiQueryUtils`, `CreateHttpApiQueryUtilsOptions`, and `HttpApiKeyEncoder`. Its errors are
@@ -70,3 +77,24 @@ finish before the Promise settles; the timeout does not bound finalizers or ackn
 server cleanup. Keep the exact key exclusively owned throughout capture, including manual writes.
 See [Stream Snapshots](/effect-api-query/guides/stream-snapshots/) for request disposal and independent
 browser reconnection.
+
+## Type inference
+
+Use [Type Inference](/effect-api-query/reference/type-inference/) for accepted inputs, supported
+query views, cached data before `select`, mutation results, and failure types.
+
+## Select a view prefix
+
+`viewPrefix(leaf, view)` returns an immutable ordinary key for every input and stream policy of a
+supported leaf view. Pass it to native query filters or `setQueryDefaults`. It carries no DataTag;
+broad cache reads remain `unknown`. Use a concrete generated key for typed exact cache access.
+See [Cache Filters](/effect-api-query/guides/cache-filters/) for encoded partial input.
+
+## Reuse typed policies
+
+`withQueryPolicy(leaf, view, defaults)` and `withMutationPolicy(leaf, defaults)` return the leaf's
+original options builder with shared policy fields applied first. Call-site fields replace matching
+defaults, including callbacks. `QueryPolicy<Leaf, View>` and `MutationPolicy<Leaf>` annotate reusable
+objects. Inputs, projections, initial data, pagination setup, and adapter controls remain local.
+Shared mutation callbacks have an unknown optimistic result; supply `onMutate` and callbacks that
+use its result at the call site. See [Defaults and Policies](/effect-api-query/guides/query-defaults/).

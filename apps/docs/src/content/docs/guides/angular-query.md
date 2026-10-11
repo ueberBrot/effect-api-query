@@ -42,14 +42,11 @@ Angular's defined-data overload accepts a query function rather than `skipToken`
 therefore retains `undefined` in its `data()` type even when it has defined `initialData`. An
 initial-data function that may return `undefined` also produces optional result data.
 
-## Own the lifecycle
+## Own the native integration
 
-Changing input or destroying a component removes an observer. An abort-aware open stream cancels
-when its last observer leaves; other observers keep it active. Keep clients alive until local
-finalizers and accepted mutations settle. Follow
-[Client Lifecycle](/effect-api-query/concepts/client-lifecycle/) for disposal and
-[Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/) for owner replacement.
+Follow the [shared integration lifetime](/effect-api-query/integrations/#own-the-cache-and-client-lifetime)
+for providers, observer removal, stream finalizers, and accepted mutations. Match this native
+wrapper to the application's Query Core and the framework's supported compiler/tooling.
 
-Match Angular Query to the application's Query Core and use a compiler supported by its build
-tooling. Angular core, common, compiler, and platform-browser should share one release.
-Server rendering and hydration remain application integrations.
+Angular core, common, compiler, and platform-browser should share one release. Server rendering
+and hydration remain application integrations.

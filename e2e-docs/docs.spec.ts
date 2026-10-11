@@ -42,7 +42,7 @@ test('opens tutorials and feature guides and searches the production index', asy
 
   await page.goto(docsBase, { waitUntil: 'networkidle' })
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('effect-api-query')
-  await page.getByRole('link', { name: 'RPC quick start', exact: true }).click()
+  await page.getByRole('main').getByRole('link', { name: 'RPC', exact: true }).first().click()
   await expect(page).toHaveURL(`${docsBase}getting-started/quick-start/`)
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('RPC Quick Start')
   await page.waitForLoadState('networkidle')
@@ -53,30 +53,28 @@ test('opens tutorials and feature guides and searches the production index', asy
     ['Pagination', 'guides/pagination'],
     ['HTTP Metadata', 'guides/http-metadata'],
     ['HTTP Builders', 'reference/http-builders'],
+    ['Defaults and Policies', 'guides/query-defaults'],
+    ['Type Inference', 'reference/type-inference'],
+    ['React Query', 'guides/react-query'],
+    ['HTTP Factory', 'reference/http-factory'],
   ] as const) {
-    await page
+    const link = page
       .getByRole('navigation', { name: 'Main', exact: true })
-      .getByRole('link', { name: title, exact: true })
-      .click()
+      .locator(`a[href="${docsBase}${slug}/"]`)
+    for (const section of await link.locator('xpath=ancestor::details').all()) {
+      if ((await section.getAttribute('open')) === null) {
+        await section.locator(':scope > summary').click()
+      }
+    }
+    await link.click()
     await expect(page).toHaveURL(`${docsBase}${slug}/`)
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(title)
     await page.waitForLoadState('networkidle')
   }
   /* oxlint-enable eslint/no-await-in-loop */
 
-  await page
-    .getByRole('navigation', { name: 'Main', exact: true })
-    .getByRole('link', {
-      name: 'HTTP Factory',
-      exact: true,
-    })
-    .click()
-  await expect(page).toHaveURL(`${docsBase}reference/http-factory/`)
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('HTTP Factory')
-  await page.waitForLoadState('networkidle')
-
   await page.goto(docsBase, { waitUntil: 'networkidle' })
-  await page.getByRole('link', { name: 'HTTP quick start', exact: true }).click()
+  await page.getByRole('main').getByRole('link', { name: 'HTTP API', exact: true }).first().click()
   await expect(page).toHaveURL(`${docsBase}getting-started/http-quick-start/`)
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('HTTP Quick Start')
   await page.waitForLoadState('networkidle')
@@ -107,10 +105,6 @@ test('uses canonical repository links and serves branded icons', async ({ page, 
     'href',
     `${repositoryUrl}/edit/main/apps/docs/src/content/docs/getting-started/quick-start.md`,
   )
-  await expect(
-    page.getByRole('link', { name: 'tests/types/docs-rpc-quick-start.ts', exact: true }),
-  ).toHaveAttribute('href', `${repositoryUrl}/blob/main/tests/types/docs-rpc-quick-start.ts`)
-
   const iconUrls = [
     await page.locator('link[rel="shortcut icon"]').getAttribute('href'),
     await page.locator('.site-title img').getAttribute('src'),

@@ -50,13 +50,10 @@ Compile the Svelte application with `module: "ESNext"` and `moduleResolution: "B
 Svelte Query 6 requires this resolution for its emitted `.svelte` declarations; strict NodeNext
 declaration checking reports an upstream `Box` import error.
 
-## Own the lifecycle
+## Own the native integration
 
-Changing input or unmounting removes an observer. An abort-aware open stream cancels when its
-last observer leaves; other observers keep it active. Keep clients alive until local finalizers
-and accepted mutations settle. Follow
-[Client Lifecycle](/effect-api-query/concepts/client-lifecycle/) for disposal and
-[Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/) for owner replacement.
+Follow the [shared integration lifetime](/effect-api-query/integrations/#own-the-cache-and-client-lifetime)
+for providers, observer removal, stream finalizers, and accepted mutations. Match this native
+wrapper to the application's Query Core and the framework's supported compiler/tooling.
 
-Match Svelte Query to the application's Query Core and use a compiler supported by its build
-tooling. Server rendering and hydration remain application integrations.
+Server rendering and hydration remain application integrations.

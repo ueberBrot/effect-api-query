@@ -174,7 +174,7 @@ export default defineConfig({
         rules: { 'typescript/no-redundant-type-constituents': 'off' },
       },
       {
-        files: ['src/{core,http,rpc}/types.ts'],
+        files: ['src/{core,http,rpc}/types.ts', 'src/core/inference.ts'],
         rules: {
           'typescript/no-invalid-void-type': 'off',
           'typescript/consistent-type-definitions': 'off',
@@ -183,6 +183,8 @@ export default defineConfig({
       {
         files: [
           'src/core/operation.ts',
+          'src/core/inference.ts',
+          'src/core/policy.ts',
           'src/core/schema-key.ts',
           'src/core/streamed-query.ts',
           'src/core/utility-tree.ts',
@@ -284,10 +286,10 @@ export default defineConfig({
       },
       fallow: {
         command: [
-          'fallow dead-code --include-entry-exports',
-          'fallow dead-code --production',
-          'fallow dupes',
-          'fallow health --hotspots --file-scores --min-score 75',
+          'fallow dead-code --no-cache --include-entry-exports',
+          'fallow dead-code --no-cache --production',
+          'fallow dupes --no-cache',
+          'fallow health --no-cache --hotspots --file-scores --min-score 75',
         ],
         cache: false,
       },

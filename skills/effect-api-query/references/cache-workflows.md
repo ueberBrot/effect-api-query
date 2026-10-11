@@ -6,12 +6,13 @@ Create the QueryClient and utilities once for each owner. Register global defaul
 then matching prefixes from broad to specific; TanStack merges them in registration
 order, without sorting by specificity. Omit an option to inherit it. Explicit
 `initialData: undefined` overrides an inherited seed, and `staleTime: 0` overrides
-inherited freshness. Put typed retry decisions and selectors in the builder.
+inherited freshness. Reuse endpoint-aware callbacks through typed policies; keep
+selection and input at each builder call.
 
 ```ts
 import { QueryClient } from '@tanstack/query-core'
 import { Effect, Schema } from 'effect'
-import { createRpcQueryUtils } from 'effect-api-query'
+import { createRpcQueryUtils, viewPrefix } from 'effect-api-query'
 import { Rpc, RpcGroup } from 'effect/rpc'
 import type { RpcClient } from 'effect/rpc'
 
@@ -30,7 +31,7 @@ export function userCache(client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof 
   const rpc = createRpcQueryUtils(users, { client, keyPrefix: ['users-app'] })
   queryClient.setQueryDefaults(rpc.key(), { staleTime: 30_000 })
   queryClient.setQueryDefaults(rpc.users.key(), { gcTime: 600_000 })
-  const queryPrefix = [...rpc.users.read.key(), 'query'] as const
+  const queryPrefix = viewPrefix(rpc.users.read, 'query')
   queryClient.setQueryDefaults(queryPrefix, { staleTime: 60_000 })
   return {
     queryClient,
@@ -52,9 +53,11 @@ HTTP filters retain `params`, `query`, `headers`, and `payload` labels and defau
 lowercase header names. An opaque scalar encoder cannot expose omitted fields to
 partial matching; use a broad prefix or an exact generated key.
 
-Root, branch, leaf, and manually appended operation prefixes support native
+Root, branch, leaf, and `viewPrefix(leaf, view)` prefixes support native
 `invalidateQueries`, `cancelQueries`, and other filters. Exact stream keys include
-policy. Only concrete generated query keys carry data/error tags; broad reads
+policy; a view prefix matches all its inputs and stream policies. `viewPrefix`
+accepts only supported query views and returns a frozen ordinary tuple, without
+a DataTag. Only concrete generated query keys carry data/error tags; broad reads
 remain `unknown` until the application establishes their representation. Selection
 changes hook, observer, and `queryClient.query` results while the cache keeps full decoded data. Configure hashing
 through QueryClient global or prefix `queryKeyHashFn` and keep it stable; builders
@@ -62,6 +65,68 @@ reject per-call hashing. Streams reject inconsistent default `queryHash` values
 and conflicting cached identity with `UnsupportedQueryHash` during execution.
 Retire the old cache before changing its hash policy.
 Mutation defaults and keys use the separate native mutation cache.
+
+## Reuse typed query and mutation policies
+
+Use `withQueryPolicy(leaf, view, policy)` to bind common freshness, retry, or
+observer callbacks to that leaf's original options builder. Use
+`withMutationPolicy(leaf, policy)` for typed mutation callbacks and retry settings.
+Create these bound builders once per owner and reuse them at call sites. The
+following factory shares a freshness decision and mutation invalidation:
+
+```ts
+import { Schema } from 'effect'
+import { createRpcQueryUtils, withMutationPolicy, withQueryPolicy } from 'effect-api-query'
+import type { QueryPolicy } from 'effect-api-query'
+import { Rpc, RpcGroup } from 'effect/rpc'
+import type { RpcClient } from 'effect/rpc'
+
+export const directory = RpcGroup.make(
+  Rpc.make('users.get', {
+    payload: { id: Schema.Int },
+    success: Schema.Struct({ id: Schema.Int, name: Schema.String }),
+  }),
+  Rpc.make('users.rename', {
+    payload: { id: Schema.Int, name: Schema.String },
+    success: Schema.Void,
+  }),
+)
+
+export function userPolicies(client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof directory>>) {
+  const rpc = createRpcQueryUtils(directory, { client, keyPrefix: ['directory-app'] })
+  const policy = {
+    staleTime: (query) => (query.state.data === undefined ? 0 : 60_000),
+    retry: false,
+  } satisfies QueryPolicy<typeof rpc.users.get>
+  const read = withQueryPolicy(rpc.users.get, 'query', policy)
+  const rename = withMutationPolicy(rpc.users.rename, {
+    onSuccess: (_data, _variables, _result, context) =>
+      context.client.invalidateQueries({ queryKey: rpc.users.key() }),
+  })
+  return {
+    read,
+    rename,
+    selected: read({ input: { id: 1 }, select: (user) => user.name }),
+    refreshed: read({ input: { id: 2 }, staleTime: 0 }),
+  }
+}
+```
+
+Extract a stored policy with `satisfies QueryPolicy<typeof leaf, View>` or
+`MutationPolicy<typeof leaf>` to retain contextual callback types. Query callbacks
+see that view's cached data and error; mutation callbacks see its data and complete
+variables. Input, projection, initial/placeholder data, page mapping, stream
+identity, and adapter request controls belong to each bound builder invocation.
+QueryClient continues to own hashing; generated functions and keys stay owned.
+
+Mutation policies exclude `onMutate` so local optimistic context retains its
+inference. Shared callbacks receive that local result as `unknown`. Call-site
+options replace matching defaults, including whole callbacks; callbacks are not
+composed. Compose explicitly if both actions are required, and return their
+Promise when settlement must wait. Keep originating-owner checks and overlapping
+write coordination in the application workflow below. For typed domain failure
+classification and shared RPC/HTTP retry decisions, use
+[the retry recipe](https://ueberbrot.github.io/effect-api-query/guides/retry-queries/).
 
 ## Coordinate overlapping optimistic writes
 
@@ -122,7 +187,9 @@ ownership. Guard late commit, rollback, and settlement callbacks even after drai
 An accepted command may finish remotely during retirement; completed work persists.
 Use an explicit application command-cancellation operation to stop future domain
 work. Local retirement supplies neither rollback nor remote cancellation acknowledgement.
-A hanging request or finalizer can delay handoff.
+A hanging request or finalizer can delay handoff. For an operation-ID protocol with
+separate start, progress, and cancel calls, use the
+[cancellable commands example](https://ueberbrot.github.io/effect-api-query/examples/cancellable-commands/).
 
 For reload persistence, allowlist a validated DTO view, repeat the safe owner tuple
 in its envelope, and include schema/key version busters. Restore only matching
@@ -135,6 +202,8 @@ Lifecycle callbacks such as pagehide or HMR must handle a rejected disposal Prom
 so it does not become an unhandled rejection. Preserve the chosen reload-persistence
 policy and ordered cleanup.
 
-Sources: [optimistic writes](https://ueberbrot.github.io/effect-api-query/guides/optimistic-writes/),
+Sources: [defaults and policies](https://ueberbrot.github.io/effect-api-query/guides/query-defaults/),
+[cache keys and filters](https://ueberbrot.github.io/effect-api-query/guides/cache-filters/),
+[optimistic writes](https://ueberbrot.github.io/effect-api-query/guides/optimistic-writes/),
 [owner replacement](https://ueberbrot.github.io/effect-api-query/guides/switch-cache-owners/),
 [event refresh](https://ueberbrot.github.io/effect-api-query/guides/refresh-from-events/).

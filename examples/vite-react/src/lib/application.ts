@@ -11,7 +11,7 @@ import type { RpcClientError } from 'effect/rpc'
 
 import { makeOwnerCache, ownerKeyPrefix } from './owner-cache.ts'
 import type { ApplicationOwnerIdentity, DirectoryStorage } from './owner-cache.ts'
-import { makeUserWrites } from './user-writes.ts'
+import { makeUsersInvalidator, makeUserWrites } from './user-writes.ts'
 
 const makeExampleRpcQueryUtils = (
   client: ExampleRpcClient,
@@ -134,6 +134,12 @@ export const startViteReactApplication = async ({
     })
     owner.restoreDirectory()
     const capturedOwner = owner
+    const invalidateUsers = makeUsersInvalidator({
+      queryClient,
+      rpcQuery,
+      httpQuery,
+      isActive: capturedOwner.isActive,
+    })
     return {
       httpQuery,
       identity: capturedOwner.identity,
@@ -146,17 +152,10 @@ export const startViteReactApplication = async ({
         rpcQuery,
         httpQuery,
         isActive: capturedOwner.isActive,
+        invalidateUsers,
         trackMutationOptions: capturedOwner.trackMutationOptions,
       }),
-      invalidateUsers: async () => {
-        if (!capturedOwner.isActive()) {
-          return
-        }
-        await Promise.all([
-          queryClient.invalidateQueries({ queryKey: rpcQuery.users.key() }),
-          queryClient.invalidateQueries({ queryKey: httpQuery.users.key() }),
-        ])
-      },
+      invalidateUsers,
       dispose,
       queryClient,
       rpcQuery,

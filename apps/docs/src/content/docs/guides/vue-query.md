@@ -21,9 +21,9 @@ In component setup, use the `rpc` tree from your [ready client](/effect-api-quer
 Here `users.read` returns a user with a `name`:
 
 ```ts
-import type { InferDataFromTag, InferErrorFromTag } from '@tanstack/query-core'
 import { useQuery } from '@tanstack/vue-query'
 import { skipToken } from 'effect-api-query'
+import type { InferQueryData, InferQueryError } from 'effect-api-query'
 import { computed, ref } from 'vue'
 
 import { rpc } from './queries.ts'
@@ -37,19 +37,18 @@ const options = computed(() =>
 )
 ```
 
-In the same component setup, pass the tagged types to the native hook:
+In the same component setup, infer the leaf's cache data and error types for the native hook:
 
 ```ts
-type UserKey = ReturnType<typeof rpc.users.read.queryKey>
 const user = useQuery<
-  InferDataFromTag<unknown, UserKey>,
-  InferErrorFromTag<Error, UserKey>,
+  InferQueryData<typeof rpc.users.read>,
+  InferQueryError<typeof rpc.users.read>,
   string
 >(options)
 ```
 
 Read the selected value from `user.data.value`. The explicit native hook generics preserve the
-data and error carried by the concrete generated key while bounding Vue's recursive ref unwrapping.
+leaf's data and error types while bounding Vue's recursive ref unwrapping.
 Automatic inference can otherwise exceed TypeScript's instantiation depth when it unwraps an
 Effect `Cause` through a tagged key. Let the builder infer its arguments; put these type arguments
 on the Vue hook.
@@ -68,13 +67,8 @@ cannot be passed directly to Vue.
 Vue accepts an initial-data initializer that may return `undefined`, with optional result data.
 An explicit `initialData: undefined` overrides inherited QueryClient initial data.
 
-## Own streams and disposal
+## Own the native integration
 
-Changing input or unmounting removes an observer. An abort-aware open stream cancels when its
-last observer leaves; other observers keep it active. Keep clients alive until local finalizers
-and accepted mutations settle. Follow
-[Client Lifecycle](/effect-api-query/concepts/client-lifecycle/) for disposal and
-[Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/) for owner replacement.
-Transport interruption depends on the ready client.
-
-Match Vue Query to the application's Query Core and use a compiler supported by Vue's tooling.
+Follow [the shared cache and client lifetime](/effect-api-query/integrations/#own-the-cache-and-client-lifetime)
+when disposing clients or replacing an owner. Match Vue Query to the application's Query Core
+and use a compiler supported by Vue's tooling.

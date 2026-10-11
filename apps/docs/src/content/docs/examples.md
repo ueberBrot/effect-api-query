@@ -57,7 +57,7 @@ demo authorization header through its HTTP client middleware.
 | ------------------------------------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | Create/delete a user in either directory                      | Both adapters refresh through explicit cross-prefix invalidation | [application.ts](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/lib/application.ts)                     |
 | Trigger a declared HTTP failure                               | HTTP execution metadata and preserved Cause                      | [http-section.tsx](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/components/sections/http-section.tsx) |
-| Start a slow query, wait for **Ready to cancel**, then cancel | Only that operation is interrupted; completed writes remain      | [cancellation guide](/effect-api-query/guides/cancellation/)                                                                             |
+| Start a slow query, wait for **Ready to cancel**, then cancel | Only that operation is interrupted; completed writes remain      | [Cancellation](/effect-api-query/guides/cancellation/)                                                                                   |
 | Switch cache owner or reload                                  | Private caches retire; allowlisted directory DTOs may persist    | [owner-cache.ts](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/lib/owner-cache.ts)                     |
 
 Copy [shared contracts](https://github.com/ueberBrot/effect-api-query/tree/main/examples/contracts/src),
@@ -80,6 +80,12 @@ Copy the [router](https://github.com/ueberBrot/effect-api-query/blob/main/exampl
 [SSR codecs](https://github.com/ueberBrot/effect-api-query/blob/main/examples/tanstack-start/src/lib/query-ssr.ts),
 and [failure route](https://github.com/ueberBrot/effect-api-query/blob/main/examples/tanstack-start/src/routes/http-failure.tsx).
 See [TanStack Start](/effect-api-query/guides/tanstack-start/) for the library integration.
+
+## Try cancellable commands
+
+Use the **Cancellable commands** panel to run two commands with independent operation IDs and
+cancel one while the other progresses. The [complete workflow](/effect-api-query/examples/cancellable-commands/)
+explains its start/status/cancel protocol, same-ID retries, and application-owned workers.
 
 ## Pause a query until a user is selected
 

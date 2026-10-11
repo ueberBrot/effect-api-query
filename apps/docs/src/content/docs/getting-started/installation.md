@@ -25,5 +25,5 @@ pnpm add @tanstack/react-query
 Use strict TypeScript checking, ESM, and an ES2022-capable application. See the
 [compatibility reference](/effect-api-query/reference/compatibility-and-limits/) for compiler and framework versions.
 
-Continue with the [RPC quick start](/effect-api-query/getting-started/quick-start/) or
-[HTTP quick start](/effect-api-query/getting-started/http-quick-start/).
+Continue with the [HTTP API quick start](/effect-api-query/getting-started/http-quick-start/) or
+[RPC quick start](/effect-api-query/getting-started/quick-start/).

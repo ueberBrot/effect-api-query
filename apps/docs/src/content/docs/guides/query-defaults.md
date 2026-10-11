@@ -1,23 +1,24 @@
 ---
-title: Query Defaults
-description: Reuse QueryClient policies with generated prefixes and typed call-site options.
+title: Defaults and Policies
+description: Reuse native cache defaults and typed query or mutation policies.
 ---
 
-Configure common freshness and retry policies on your application-owned `QueryClient`. Use
-generated prefixes to specialize those policies, then pass call-site options to the generated
-builders. The utility tree owns keys and execution functions; QueryClient owns hashing.
+Choose where each setting belongs, then reuse it across generated builders:
 
-Create the utility tree and QueryClient once for each cache owner. Keep the ready client's Scope
-alive while its queries run. Use a request-local QueryClient during SSR and dispose application
-resources through their owning runtime.
+| Scope                    | Use                                         | Suitable settings                                               |
+| ------------------------ | ------------------------------------------- | --------------------------------------------------------------- |
+| Cache owner or namespace | QueryClient defaults and generated prefixes | Common freshness, retry, garbage collection, and hashing        |
+| One leaf and query view  | `withQueryPolicy`                           | Freshness and typed data/error callbacks                        |
+| One mutation leaf        | `withMutationPolicy`                        | Typed invalidation and other mutation callbacks                 |
+| One call                 | The options builder                         | Input, selection, initial data, pagination, and local overrides |
 
-## Register RPC policies from broad to specific
+Use your existing utility tree and application-owned QueryClient. Policies preserve the original
+builder's inference; the library continues to supply its keys and execution functions.
 
-This example disables retries globally, retries reads in the `users` branch twice, and keeps the
-`users.get` query view fresh for two minutes. The call-site `refreshUser` options request an
-immediate fetch without retries. `user` selects a name while the cache retains the full user.
+## Register native defaults
 
-In the application cache module, import `QueryClient` from `@tanstack/query-core`:
+In the cache module, import `QueryClient` from `@tanstack/query-core` and `viewPrefix` from
+`effect-api-query`:
 
 ```ts
 const queryClient = new QueryClient({
@@ -28,92 +29,92 @@ const queryClient = new QueryClient({
 })
 ```
 
-After creating `rpc` with your ready client, register matching defaults:
+After creating `rpc` with its ready client, register broader prefixes before narrower prefixes:
 
 ```ts
 queryClient.setQueryDefaults(rpc.key(), { staleTime: 60_000 })
 queryClient.setQueryDefaults(rpc.users.key(), { retry: 2 })
-queryClient.setQueryDefaults([...rpc.users.get.key(), 'query'], { staleTime: 120_000 })
+queryClient.setQueryDefaults(viewPrefix(rpc.users.get, 'query'), { staleTime: 120_000 })
 ```
 
-In the query consumer, omit inherited settings or override them for this call:
+TanStack merges global defaults, matching registered prefixes in registration order, and explicit
+builder options. It does not sort prefixes by specificity. Here `users.get` inherits
+`gcTime: 600_000`, `retry: 2`, and `staleTime: 120_000`; two retries allow at most three executions.
+
+`rpc.key()` covers the tree, `rpc.users.key()` covers its branch, and the view prefix covers only
+ordinary queries of that leaf, for every input. HTTP uses the same native APIs:
 
 ```ts
-const user = rpc.users.get.queryOptions({
-  input: { id: 1 },
-  select: (value) => value.name,
-})
-const refreshUser = rpc.users.get.queryOptions({
-  input: { id: 1 },
-  staleTime: 0,
-  retry: false,
-})
-```
-
-TanStack merges the QueryClient's global query defaults, every matching registered prefix in
-registration order, and the explicit options passed to the builder. Register broader prefixes
-first: TanStack does not sort them by specificity. Here the query inherits `gcTime: 600_000`,
-`retry: 2`, and `staleTime: 120_000`. `refreshUser` overrides freshness and retries for that call.
-
-`rpc.key()` covers the utility tree, `rpc.users.key()` covers its branch, and
-`rpc.users.get.key()` covers the leaf. Appending `'query'` targets that leaf's ordinary query view
-without applying its stale policy to an infinite or stream view. An operation prefix also covers
-all inputs of that view. Mutation policies use native `setMutationDefaults` separately.
-
-Omit an option to inherit its defaults. Use `staleTime: 0` to override an inherited freshness
-policy with immediate staleness. QueryClient imperative fetches and observers can have different
-built-in retry defaults, so set retry policy explicitly when attempts matter. `retry: 2` allows at
-most three executions. For typed decisions
-based on domain failures or transport errors, pass `retry` to the builder as shown in
-[Retry Queries](/effect-api-query/guides/retry-queries/).
-
-## Apply HTTP policies to separate views
-
-HTTP prefixes use the same native APIs. This example retries the `users` group once, applies a
-five-second stale time only to the metadata view, and hashes every view through QueryClient's
-root-prefix policy. The ordinary query retains the global thirty-second stale time.
-
-In the same application cache module, with an existing `http` tree:
-
-```ts
-queryClient.setQueryDefaults(http.key(), {
-  queryKeyHashFn: (key) => `users:${JSON.stringify(key)}`,
-})
 queryClient.setQueryDefaults(http.users.key(), { retry: 1 })
-queryClient.setQueryDefaults([...http.users.get.key(), 'metadata'], { staleTime: 5_000 })
+queryClient.setQueryDefaults(viewPrefix(http.users.get, 'metadata'), { staleTime: 5_000 })
 ```
 
-In its query consumer:
+This five-second policy applies to metadata without changing the ordinary view's freshness.
+Register mutation defaults separately with native `setMutationDefaults` and `mutationKey()`.
+See [Cache Keys and Filters](/effect-api-query/guides/cache-filters/) for prefix scopes.
+
+Configure hashing through QueryClient defaults before using the cache, and keep it stable for the
+cache owner's lifetime. Builders reject per-call hashing overrides; see
+[Semantic Keys](/effect-api-query/concepts/semantic-keys/) for the identity contract.
+
+## Bind a reusable query policy
+
+Use `withQueryPolicy` when a policy belongs to one leaf and view. `QueryPolicy` gives reusable
+objects that leaf's native option types; retry and refetch callbacks retain its data and error types.
+Import both from `effect-api-query`:
 
 ```ts
-const input = { params: { id: 1 } }
-const user = http.users.get.queryOptions({ input })
-const metadata = http.users.get.metadataOptions({ input })
+const policy = {
+  staleTime: 30_000,
+  refetchOnWindowFocus: false,
+  retry: false,
+} satisfies QueryPolicy<typeof rpc.users.get>
+const userOptions = withQueryPolicy(rpc.users.get, 'query', policy)
+const user = userOptions({ input: { id: 1 }, select: (value) => value.name })
+const refreshUser = userOptions({ input: { id: 1 }, staleTime: 0, retry: false })
 ```
 
-The ordinary and metadata views have separate keys. Configure global or prefix `queryKeyHashFn`
-on QueryClient before using the cache, and keep it stable for the cache owner's lifetime. Generated
-options retain their own query function even if a prefix registers another one. Builders reject
-per-call `queryHash` and `queryKeyHashFn` because native key-only reads and writes must resolve the
-same entry.
+The returned builder keeps selected-data, defined-initial-data, skipped-input, and page-parameter
+inference. `QueryPolicy<Leaf, View>` supports only that leaf's query views: `query`, `infinite`,
+`metadata`, `live`, or `streamed`. Specify the view in the type when it is not `query`.
+See [Type Inference](/effect-api-query/reference/type-inference/) for cache and failure types, and
+[Retry Queries](/effect-api-query/guides/retry-queries/) for reusable domain-aware decisions.
 
-Streams also reject a default `queryHash` that differs from the configured key hasher's result.
-Changing hash defaults while matching entries remain cached can make stream execution reject
-with `UnsupportedQueryHash`. Retire the old cache before changing its hash policy.
+Policies accept applicable native freshness, retry, refetch, and cache settings. Keep input,
+`select`, initial and placeholder data, page parameters and mappers, and adapter controls at the
+call site. Stream retention and decoder policies determine cache identity and also stay local.
 
-Use the generated exact `queryKey(input)` or `metadataKey(input)` with native `getQueryData` and
-`setQueryData`. Their data tags preserve the unselected query data type: selecting a name changes
-the observer result, while a native write still supplies the complete user. A fresh native write
-is visible to observers and subsequent imperative reads without another client execution.
+A bound policy supplies explicit builder options, so it overrides QueryClient defaults. Call-site
+options override the bound policy. Omit a field to inherit it; use `staleTime: 0` or `retry: false`
+to replace an inherited setting.
 
-Fetched metadata follows native sharing defaults, while selected results and later manual writes
-use explicit per-call policy or standard deep sharing. See
-[Buffered metadata](/effect-api-query/reference/http-builders/#buffered-metadata) for immutable
-snapshot and application-owned data rules.
+## Bind mutation invalidation
 
-An imperative `queryClient.query(newOptions)` hit on fresh cached data retains existing Query
-options. Install a changed sharing policy through an observer or actual fetch before relying
-on it for later manual writes.
+Import `withMutationPolicy` from `effect-api-query`. Seed the returned user and invalidate affected
+reads once for every use of the creation builder:
 
-Keep shared policies on QueryClient and operation-specific selection, input, and typed error
-callbacks on the generated builders.
+```ts
+const createUserOptions = withMutationPolicy(rpc.users.create, {
+  onSuccess: async (created) => {
+    queryClient.setQueryData(rpc.users.get.queryKey({ id: created.id }), created)
+    await queryClient.invalidateQueries({ queryKey: rpc.users.key() })
+  },
+})
+```
+
+Shared callbacks infer data, variables, and execution errors. `MutationPolicy<Leaf>` can annotate a
+reusable object. Its optimistic result is `unknown`: supply `onMutate` at each call site to infer
+that result in local callbacks. Here `reportCreationFailure` is the application's failure notifier:
+
+```ts
+const createUser = createUserOptions({
+  onMutate: (variables) => ({ submittedName: variables.name }),
+  onError: (error, _variables, context) => {
+    reportCreationFailure(context?.submittedName, error)
+  },
+})
+```
+
+A call-site callback replaces the corresponding shared callback. Compose callbacks explicitly
+when both must run. The [complete example](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-policies.ts)
+includes ready-client types and the imports used here.

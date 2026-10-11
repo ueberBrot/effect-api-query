@@ -49,4 +49,4 @@ retain the decoded user; generated keys preserve that type. Builders supply `que
 Configure hashing through [QueryClient defaults](/effect-api-query/guides/query-defaults/).
 
 Continue with [Conditional Queries](/effect-api-query/guides/conditional-queries/),
-[Cache Management](/effect-api-query/guides/cache-management/), or your framework's integration guide.
+[Cache Keys and Filters](/effect-api-query/guides/cache-filters/), or your framework's integration guide.

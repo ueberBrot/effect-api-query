@@ -1,5 +1,9 @@
 # Native frameworks, transports, and supported hosts
 
+When choosing a framework, router, or host, use the
+[integration overview](https://ueberbrot.github.io/effect-api-query/integrations/)
+for native consumer and application lifetime boundaries.
+
 ## Rebuild captured options from reactive input
 
 Acquire clients and create utilities during application setup. Supply the native
@@ -19,11 +23,11 @@ Apply this pattern to infinite, metadata, accumulated, and live options too. Thi
 factory constructs utilities once and returns hooks for native component setup:
 
 ```ts
-import type { InferDataFromTag, InferErrorFromTag } from '@tanstack/query-core'
 import { useQuery as useSolidQuery } from '@tanstack/solid-query'
 import { useQuery as useVueQuery } from '@tanstack/vue-query'
 import { Schema } from 'effect'
 import { createRpcQueryUtils, skipToken } from 'effect-api-query'
+import type { InferQueryData, InferQueryError } from 'effect-api-query'
 import { Rpc, RpcGroup } from 'effect/rpc'
 import type { RpcClient } from 'effect/rpc'
 import { computed, ref } from 'vue'
@@ -46,10 +50,9 @@ export function makeUserHooks(client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typ
           select: (user) => user.name,
         }),
       )
-      type Key = ReturnType<typeof rpc.users.read.queryKey>
       const user = useVueQuery<
-        InferDataFromTag<unknown, Key>,
-        InferErrorFromTag<Error, Key>,
+        InferQueryData<typeof rpc.users.read>,
+        InferQueryError<typeof rpc.users.read>,
         string
       >(options)
       return { id, user }
@@ -83,9 +86,33 @@ checking exposes an upstream `.svelte` declaration import limitation. Angular re
 are signals such as `data()`; register `provideTanStackQuery(queryClient)` and use an
 injection context. Use native infinite and mutation hooks with the matching builders.
 
-Last-observer removal cancels abort-aware open queries. Keep resources alive until
-local finalizers finish. For an owner change, follow the ordered unmount, drain,
-dispose, and remount procedure in [cache workflows](cache-workflows.md).
+For ordinary Query hooks and observers, last-observer removal cancels abort-aware
+open queries. Keep resources alive until local finalizers finish. For an owner
+change, follow the ordered unmount, drain, dispose, and remount procedure in
+[cache workflows](cache-workflows.md).
+
+## Mount a provider and recover Suspense
+
+For a first React integration, acquire one client, create the utility tree and
+QueryClient once, and mount `QueryClientProvider`. Unmount consumers before disposing
+the application's client resources. Use
+[the React client setup](https://ueberbrot.github.io/effect-api-query/guides/react-query/#acquire-and-mount-the-client)
+for one acquired HTTP client, one component, and an awaited cleanup function.
+
+Put `QueryErrorResetBoundary` around a component error boundary and Suspense.
+On retry, reset both the Query error boundary and the component boundary before
+rendering its queries again. With cached data, a failed refetch normally keeps
+rendering that data; show the local error when fetching stops, or deliberately
+throw it if the application wants boundary recovery.
+
+Use `useSuspenseQueries` for independent reads that should start together.
+Its native overload may need explicit `{ queryFnData, error }` type descriptors
+derived with the inference helpers. Follow
+[the complete Suspense recipe](https://ueberbrot.github.io/effect-api-query/guides/suspense-and-recovery/)
+for the boundary and parallel-query signatures. Native Suspense query hooks do
+not support cancellation: use ordinary Query hooks or observers when abort and
+open-stream cleanup are required. Skipped query options cannot be used with
+Suspense hooks.
 
 ## Match application dependencies
 

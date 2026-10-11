@@ -10,14 +10,14 @@ One automatically discoverable `effect-api-query` skill covers the existing
 library. Its entry point holds shared rules and routes conditional tasks to six
 references:
 
-| Reference            | Tasks                                                            |
-| -------------------- | ---------------------------------------------------------------- |
-| RPC                  | Payload construction, canonical identity, ready-client lifetime  |
-| HTTP                 | Decoded requests, SSE, multipart mutations, metadata             |
-| Query patterns       | Skipping, pagination, accumulated and live views                 |
-| Cache workflows      | Defaults, filters, overlapping writes, events, owner replacement |
-| Hydration and SSR    | Snapshots, paired view codecs, preparation and cleanup           |
-| Frameworks and hosts | Reactive accessors, transports, version and host limits          |
+| Reference            | Tasks                                                              |
+| -------------------- | ------------------------------------------------------------------ |
+| RPC                  | Payload construction, canonical identity, ready-client lifetime    |
+| HTTP                 | Decoded requests, SSE, multipart mutations, metadata               |
+| Query patterns       | Inference types, skipping, pagination, stream views and tracing    |
+| Cache workflows      | Typed policies, native defaults, view filters, writes and owners   |
+| Hydration and SSR    | Snapshots, paired view codecs, preparation and cleanup             |
+| Frameworks and hosts | Provider setup, Suspense, reactive accessors, transports and hosts |
 
 Consumers load the guidance from their installed package without repository-local
 authoring skills. Planning records remain outside the shipped package.
@@ -26,8 +26,10 @@ authoring skills. Planning records remain outside the shipped package.
 
 The [domain map](domain_map.yaml) owns task coverage and failure modes. The
 [skill tree](skill_tree.yaml) owns skill paths and source mappings. Public
-declarations and runtime own API facts; application modules and guides own cache
-and lifecycle recipes.
+declarations and runtime own API facts; application modules own domain and cache
+coordination. Library documentation explains generated options, keys,
+inference, policies, and cleanup contracts. Integration pages explain native
+providers and consumers; runnable examples demonstrate application protocols.
 
 Keep guidance within existing library behavior. Preserve application ownership
 and qualify support through [frameworks and hosts](../skills/effect-api-query/references/frameworks-and-hosts.md).
@@ -44,6 +46,21 @@ Strict compiler fixtures check the public declarations and retained documentatio
 examples. Ordinary runtime tests and application examples cover cache views,
 cancellation, hydration, and ownership. Native builds validate package
 declarations and exports.
+
+The usability batch reuses the existing executable consumer fixtures:
+
+| Task                                                                            | Checks                                                                                                                    |
+| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Infer operation inputs, views, and failures; retain local policy inference      | `tests/types/helper-contract.ts`, `tests/types/docs-policies.ts`, `tests/query-policy.test.ts`                            |
+| Select every input of a supported view and preserve exact tagged reads          | `tests/query-view-prefix.test.ts`, `tests/types/helper-contract.ts`                                                       |
+| Share typed RPC/HTTP retry decisions                                            | `tests/types/docs-retry.ts`                                                                                               |
+| Acquire, provide, render, and dispose a minimal React application               | `tests/types/docs-react-setup.tsx`, `tests/types/docs-react-entry.ts`, `examples/vite-react/tests/minimal-setup.test.tsx` |
+| Reset initial Suspense errors, retain failed-refetch data, start reads together | `tests/types/docs-suspense.tsx`, `examples/vite-react/tests/suspense-recovery.test.tsx`                                   |
+| Trace lazy stream emissions and awaited cleanup                                 | `tests/types/docs-stream-tracing.ts`, `examples/vite-react/tests/stream-tracing.test.ts`                                  |
+
+These checks verify the recommended APIs and observable behavior. A fresh isolated
+consumer session remains separate evidence; this authoring session does not
+establish skill discovery or consumer reliability.
 
 ## Coverage and batch history
 
@@ -83,3 +100,30 @@ declarations and exports.
   bookkeeping. All 491 remaining runtime cases and both public API compiler
   suites pass. Documentation builds with valid links, and all 38 application and
   documentation Chromium checks pass.
+- **Usability and policy reuse (2026-10-11), based on `8f4723c`:** extend the
+  existing skill and six references with operation inference, supported view
+  prefixes, typed query/mutation policy reuse, minimal native provider setup,
+  Suspense recovery, and consumed-stream tracing. Keep inputs, projections, seeds,
+  page mapping, stream identity, and optimistic context local; call-site callbacks
+  replace shared policy callbacks. Preserve native QueryClient defaults, canonical
+  encoded partial filtering, application lifetime, and all prior task coverage.
+  Semantic near-miss duplication detection found the repeated retry recipe;
+  shared owner invalidation and error descriptions also reduce example drift.
+  Expand source mappings for TSX fixtures and shared example error rendering.
+  A fresh consumer invoked the copied packaged skill and produced typed policy
+  builders in a disposable project. The behavior checks passed and rejected the
+  initial version without shared defaults; its result compiled on TypeScript 7
+  and 5.9. Skill discovery remains unverified. Final compiler, runtime,
+  documentation, and revision-bound Intent outcomes are recorded with the task's
+  maintenance review.
+- **Library-focused documentation (2026-10-11), based on `8f4723c`:** separate
+  library contracts, native integrations, runnable application examples, and API
+  reference. Keep the existing fourteen tasks and six shipped references.
+  Type Inference owns the detailed inference contract; Defaults and Policies owns
+  shared defaults and callbacks; Cache Keys and Filters replaces Cache Management.
+  Fold ready-client mounting into React Query and move the explicit command
+  protocol to Cancellable Commands. Update shipped pointers to those canonical
+  pages and the integration overview. Existing skill-tree source patterns already
+  cover the new and moved pages, so its identities and mappings remain accurate.
+  Preserve the fresh-consumer evidence above; this reorganization changes where
+  guidance is reached, without changing its recommended API behavior.

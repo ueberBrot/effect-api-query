@@ -20,6 +20,11 @@ const program = Effect.gen(function* () {
   for (const [page, fixtures] of [
     ['getting-started/quick-start', ['tests/types/docs-rpc-quick-start']],
     ['getting-started/http-quick-start', ['tests/types/docs-http-quick-start']],
+    ['guides/react-query', ['tests/types/docs-react-setup.tsx', 'tests/types/docs-react-entry']],
+    ['guides/suspense-and-recovery', ['tests/types/docs-suspense.tsx']],
+    ['guides/trace-streams', ['tests/types/docs-stream-tracing']],
+    ['guides/query-defaults', ['tests/types/docs-policies']],
+    ['reference/type-inference', ['tests/types/docs-policies']],
     ['guides/queries', ['tests/types/docs-functionality']],
     ['guides/mutations', ['tests/types/docs-functionality']],
     ['guides/pagination', ['tests/types/docs-functionality']],
@@ -50,16 +55,18 @@ const program = Effect.gen(function* () {
         ),
       ),
     )
-    const samples = [...markdown.matchAll(/^```ts\n(?<source>[\s\S]*?)^```/gmu)]
+    const samples = [...markdown.matchAll(/^```(?:ts|tsx)\n(?<source>[\s\S]*?)^```/gmu)]
     ok(samples.length > 0, `${page} must contain a TypeScript excerpt`)
     const sources: string[][] = []
     for (const fixture of fixtures) {
+      const fixturePath = /\.tsx?$/u.test(fixture) ? fixture : `${fixture}.ts`
       const source = decodeUtf8(
-        yield* fs.readFile(yield* path.fromFileUrl(new URL(`../${fixture}.ts`, import.meta.url))),
+        yield* fs.readFile(yield* path.fromFileUrl(new URL(`../${fixturePath}`, import.meta.url))),
       )
       sources.push(
         source
           .replaceAll("from '#effect-api-query'", "from 'effect-api-query'")
+          .replaceAll("from './docs-react-setup.tsx'", "from './users-app.tsx'")
           .replaceAll("from '../fixtures/user-events.ts'", "from './user-events.ts'")
           .trimEnd()
           .split('\n'),

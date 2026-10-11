@@ -19,12 +19,16 @@ metadata:
 sources:
   - 'src/**/*.ts'
   - 'tests/**/*.ts'
+  - 'tests/**/*.tsx'
+  - '**/examples/shared/*.ts'
   - '**/examples/vite-react/src/lib/*.ts'
   - '**/examples/vite-react/src/main.tsx'
   - '**/examples/vite-react/src/app.tsx'
+  - '**/examples/vite-react/src/components/ui/effect-error-details.tsx'
   - '**/examples/vite-react/tests/*.ts*'
   - '**/examples/tanstack-start/src/lib/*.ts'
   - '**/examples/tanstack-start/src/router.tsx'
+  - '**/examples/tanstack-start/src/components/effect-error-details.tsx'
   - '**/examples/tanstack-start/tests/*.ts*'
   - '**/examples/server/src/*.ts'
   - '**/examples/server/tests/**/*.ts'
@@ -91,10 +95,10 @@ Read only the branch needed for the task:
 
 | Task                                                                           | Read                                                       |
 | ------------------------------------------------------------------------------ | ---------------------------------------------------------- |
-| Skip missing input, paginate, or choose stream history                         | [Query patterns](references/query-patterns.md)             |
-| Set defaults, filter caches, apply optimistic writes or events, replace owners | [Cache workflows](references/cache-workflows.md)           |
+| Infer reusable operation types, skip input, paginate, or choose stream history | [Query patterns](references/query-patterns.md)             |
+| Reuse typed policies, filter caches, apply writes or events, replace owners    | [Cache workflows](references/cache-workflows.md)           |
 | Capture open streams, serialize query views, or dispose request work           | [Hydration and SSR](references/hydration-and-ssr.md)       |
-| Connect reactive hooks, choose transport/host, or assess version support       | [Frameworks and hosts](references/frameworks-and-hosts.md) |
+| Mount native providers, recover Suspense, choose transport/host or versions    | [Frameworks and hosts](references/frameworks-and-hosts.md) |
 
 ## Preserve generated cache identity
 
@@ -133,12 +137,17 @@ that provides them. It must return an Effect `Exit` and forward its second argum
 factory default. A custom key encoder supplies cache identity; execution services
 still come from the runner.
 
-Queries forward TanStack cancellation to Effect. Stop consumers, cancel queries,
+Ordinary queries forward TanStack cancellation to Effect. For Suspense hooks,
+read the cancellation limitation in [frameworks and hosts](references/frameworks-and-hosts.md).
+Stop consumers, cancel queries,
 and drain local streams, pending preparation, and accepted mutations before
 disposing resources. Native cancellation can settle before finalizers finish;
 `fetchStreamSnapshot` drains its own capture. Mutations receive no query abort
 signal. A cancellable command needs an application operation identified before
 work starts; owner retirement leaves completed remote work intact.
+
+For spans and cleanup that cover stream consumption, follow the lifetime tracing
+recipe in [query patterns](references/query-patterns.md).
 
 ## Interpret results and failures
 

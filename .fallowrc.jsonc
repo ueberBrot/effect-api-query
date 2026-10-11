@@ -6,7 +6,7 @@
     "scripts/verify-docs-examples.mts",
     "apps/docs/public/package-version.js",
     "playwright.docs.config.ts",
-    "tests/types/*.ts"
+    "tests/types/*.{ts,tsx}"
   ],
 
   "ignorePatterns": ["examples/tanstack-start/src/routeTree.gen.ts"],
@@ -31,6 +31,8 @@
   ],
 
   "duplicates": {
+    "mode": "semantic",
+    "near": true,
     "ignoredClones": [
       "dup:22704c46:2",
       "dup:3fec4231:2",
@@ -84,5 +86,12 @@
     "private-type-leaks": "error",
 
     "stale-suppressions": "off"
-  }
+  },
+
+  "overrides": [
+    {
+      "files": ["src/index.ts"],
+      "rules": { "unused-types": "off" }
+    }
+  ]
 }

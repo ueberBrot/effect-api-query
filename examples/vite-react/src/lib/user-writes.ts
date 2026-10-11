@@ -14,8 +14,26 @@ export interface UserWriteOwner {
   readonly rpcQuery: Pick<ExampleRpcQueryUtils, 'users'>
   readonly httpQuery: Pick<ExampleHttpQueryUtils, 'users'>
   readonly isActive: () => boolean
+  readonly invalidateUsers: () => Promise<void>
   readonly trackMutationOptions: ReturnType<typeof makeOwnerCache>['trackMutationOptions']
 }
+
+export const makeUsersInvalidator =
+  ({
+    queryClient,
+    rpcQuery,
+    httpQuery,
+    isActive,
+  }: Pick<UserWriteOwner, 'queryClient' | 'rpcQuery' | 'httpQuery' | 'isActive'>) =>
+  async () => {
+    if (!isActive()) {
+      return
+    }
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: rpcQuery.users.key() }),
+      queryClient.invalidateQueries({ queryKey: httpQuery.users.key() }),
+    ])
+  }
 
 interface DirectorySnapshot {
   readonly rpcList: readonly User[] | undefined
@@ -62,6 +80,7 @@ export const makeUserWrites = ({
   rpcQuery,
   httpQuery,
   isActive,
+  invalidateUsers,
   trackMutationOptions,
 }: UserWriteOwner) => {
   let nextWrite = 0
@@ -116,10 +135,7 @@ export const makeUserWrites = ({
     if (!isActive() || pending.size !== 0) {
       return
     }
-    await Promise.all([
-      queryClient.invalidateQueries({ queryKey: rpcQuery.users.key() }),
-      queryClient.invalidateQueries({ queryKey: httpQuery.users.key() }),
-    ])
+    await invalidateUsers()
   }
   const editList = (
     key: QueryKey,

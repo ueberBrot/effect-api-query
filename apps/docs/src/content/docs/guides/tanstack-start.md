@@ -1,18 +1,18 @@
 ---
-title: TanStack Start
-description: Use generated query options in Start loaders, server rendering, and React components.
+title: TanStack Router and Start
+description: Reuse generated options in Router loaders and components, then connect Start request ownership and hydration.
 ---
 
-Use `effect-api-query` with your existing TanStack Start router and Effect contract. Choose the
-factory for your contract, then use its generated options with TanStack Query in loaders and
-components.
+Use generated options with TanStack Router loaders and native Query hooks. TanStack Start adds
+server rendering to the same Router/Query integration. Choose the factory for your Effect
+contract and expose its utility tree beside the QueryClient in router context.
 
 Create `queryUtils` with the [RPC](/effect-api-query/getting-started/quick-start/) or
 [HTTP](/effect-api-query/getting-started/http-quick-start/) factory in your client module.
 Expose it and its QueryClient through router context. Use a safe identity prefix and a
 signal-aware runner. The application owns the router, providers, API host and authentication.
 
-## Prefetch in a loader and read in a component
+## Reuse options in a Router loader and component
 
 Expose your `queryUtils` and `QueryClient` through the router context. For a
 contract with a `users.list` operation, the same generated options work in both places:
@@ -40,10 +40,16 @@ the server and browser to address the same cache entry.
 For pagination, pass generated `infiniteOptions` to `queryClient.infiniteQuery` in the loader and
 `useInfiniteQuery` in the component. After a write, use generated `mutationOptions` and invalidate
 the relevant group key. These are ordinary TanStack Query operations; see
-[Cache Management](/effect-api-query/guides/cache-management/) and
+[Cache Keys and Filters](/effect-api-query/guides/cache-filters/) and
 [Generated Builders](/effect-api-query/reference/generated-builders/).
 
-## Own request lifetimes and hydration
+## Add Start server rendering
+
+The loader/component pattern also works in a browser-only TanStack Router application. For Start
+or another server-rendered host, connect native SSR query integration and give each request its
+own resources and serialization contract.
+
+### Own request lifetimes and hydration
 
 Create a fresh Query Client and request-specific client, runner, and utility tree for each
 server-rendered page. Keep authentication in that request's client or runner. A key prefix can

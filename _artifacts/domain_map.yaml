@@ -20,22 +20,29 @@ skills:
     covers:
       - RPC construction and canonical identity
       - HTTP decoded requests, SSE, multipart mutations, and metadata
-      - Native defaults, filters, input-field skipping, and pagination
-      - Stream policies, snapshots, and request cleanup
+      - Inferred operation types, typed policy reuse, native defaults, and view filters
+      - Input-field skipping, pagination, stream policies, and lifetime tracing
+      - Stream snapshots and request cleanup
       - Optimistic overlap, event refresh, and owner replacement
       - DTO and rich-value hydration
-      - Reactive framework accessors and host boundaries
+      - Native provider setup, Suspense recovery, reactive accessors, and host boundaries
     tasks:
       - Derive buffered, paginated, accumulated, live, and metadata options from a ready client.
-      - Address exact stream policy keys and compose encoded partial native filters.
-      - Apply native defaults and conditional input without losing selected or explicitly undefined
-        seed behavior.
+      - Address exact stream policy keys, select supported view prefixes, and compose encoded
+        partial native filters.
+      - Reuse inferred input, cached query data, and mutation types in application modules.
+      - Apply native defaults and typed reusable policies without losing call-site selection,
+        conditional input, or explicitly undefined seed behavior.
       - Capture open streams and drain queries, preparation, and accepted writes before request
         disposal.
       - Hydrate every selected view into its normal decoded cache representation.
       - Preserve neighboring writes and originating ownership during mutation overlap.
       - Defer event refresh until participating writes settle.
       - Retire consumers and accepted work before acquiring a replacement owner.
+      - Acquire a ready client and mount native providers with awaited cleanup.
+      - Recover initial Suspense failures, retain cached data after failed refetches, and start
+        independent reads together with native cancellation limits.
+      - Trace the consumed Stream and its cleanup while its owning runtime remains alive.
       - Rebuild options inside native reactive framework accessors.
       - Choose an application-owned transport within documented version and host boundaries.
     subsystems:
@@ -49,11 +56,13 @@ skills:
       - topic: Adapter inputs and capabilities
         reason: RPC construction and HTTP decoded containers differ.
       - topic: Cache workflows
-        reason: Defaults, filters, writes, events, and replacement share ownership.
+        reason: Keys, policies, and native filters are library contracts; writes and replacement
+          are application-owned workflows.
       - topic: Hydration and SSR
         reason: Captures, view codecs, and preparation require request lifetime.
       - topic: Frameworks and hosts
-        reason: Hook overloads and transport evidence are conditional.
+        reason: Native providers, Suspense recovery, hook overloads, and transport boundaries are
+          conditional integrations rather than package-provided services.
     failure_modes:
       - mistake: Reuse an accumulated key across incompatible policies
         mechanism: Retention and refetch policy change representation and normalized identity.
@@ -104,13 +113,44 @@ skills:
         mechanism: An imperative fresh cache hit retains the existing Query options.
         wrong_pattern: await queryClient.query(newOptions); queryClient.setQueryData(key, value)
         correct_pattern: Install the policy through an observer or actual fetch before manual writes.
-        source: apps/docs/src/content/docs/guides/query-defaults.md
+        source: apps/docs/src/content/docs/reference/http-builders.md
+        priority: HIGH
+        status: active
+      - mistake: Assume shared mutation callbacks compose automatically
+        mechanism: Call-site callbacks replace policy callbacks, and shared callbacks cannot
+          assume the local optimistic context's shape.
+        wrong_pattern: 'write({ onSuccess: localSuccess })'
+        correct_pattern: Compose required callbacks explicitly and keep onMutate at the call site.
+        source: tests/query-policy.test.ts
+        priority: HIGH
+        status: active
+      - mistake: Rely on Suspense cancellation for open streams
+        mechanism: Native Suspense hooks do not support cancellation; lifecycle cleanup needs
+          an ordinary abort-aware query or observer.
+        wrong_pattern: useSuspenseQuery(rpc.events.watch.liveOptions())
+        correct_pattern: Use an ordinary Query hook or observer for a stream requiring cancellation.
+        source: apps/docs/src/content/docs/guides/react-query.md
+        priority: HIGH
+        status: active
+      - mistake: Trace only the creation of an iterable
+        mechanism: The runner's Effect ends before stream consumption and local finalization.
+        wrong_pattern: runPromiseExit(effect.pipe(Effect.withSpan('feed.consume')))
+        correct_pattern: Acquire Effect.makeSpanScoped inside Stream.unwrap and retain it through
+          asynchronous Stream.ensuring cleanup.
+        source: tests/types/docs-stream-tracing.ts
         priority: HIGH
         status: active
     compositions:
       - library: TanStack Query
       - library: Effect
 tensions:
+  - name: Library contracts and application workflows
+    skills:
+      - effect-api-query
+    description: Generated options, keys, inference, and policy binding have a package contract;
+      native providers, transports, and domain protocols belong to the application.
+    implication: Explain package behavior in library guidance, native consumers in integrations,
+      and concrete protocols such as cancellable commands in runnable examples.
   - name: Exact identity and broad refresh
     skills:
       - effect-api-query
@@ -124,5 +164,12 @@ tensions:
     description: Private cache retirement stops local side effects without pretending to undo
       remote writes.
     implication: Keep originating-owner guards after drain and model command cancellation explicitly.
+  - name: Policy reuse and call-site inference
+    skills:
+      - effect-api-query
+    description: Shared endpoint-aware defaults reduce repetition while selected data and
+      optimistic context depend on each invocation.
+    implication: Bind typed policies once per owner, keeping projections, seeds, identity, and
+      optimistic context at the call site; compose required callbacks deliberately.
 cross_references: []
 gaps: []

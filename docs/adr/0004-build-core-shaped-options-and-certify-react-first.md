@@ -18,6 +18,12 @@ so generated fetches, stream publications, and native cache reads and writes sha
 Builders reject per-call hashing overrides because native key-only cache access cannot honor them.
 Callers may provide every other applicable Query Core option.
 
+Package-level policy helpers bind typed native defaults to a leaf's existing options builder.
+They preserve its overloads and apply call-site overrides after defaults. Inputs, selection,
+initial data, pagination mappers, adapter controls, and generated identity remain local to each
+call. Mutation policies leave `onMutate` local; shared callbacks receive an unknown optimistic
+result and are replaced by corresponding call-site callbacks.
+
 ## Consequences
 
 Applications own providers, reactive option rebuilding, router context, and SSR integration.

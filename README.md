@@ -89,11 +89,24 @@ queries in your application.
 Multipart payloads use explicit `FormData`. Mixed HTTP success modes, raw byte streams and
 streaming multipart requests are omitted; see [feature support](https://ueberbrot.github.io/effect-api-query/getting-started/feature-support/).
 
+## Reuse policies and cache keys
+
+Bind shared retry, freshness, or mutation callbacks with `withQueryPolicy` and
+`withMutationPolicy`. The returned builders preserve the leaf's input and result types;
+call-site options override the shared defaults. Use `viewPrefix` to target every input
+for one cache view, or a generated concrete key for a typed cache read or write.
+
+Follow [defaults and policies](https://ueberbrot.github.io/effect-api-query/guides/query-defaults/)
+and [cache filters](https://ueberbrot.github.io/effect-api-query/guides/cache-filters/).
+The [type inference helpers](https://ueberbrot.github.io/effect-api-query/reference/type-inference/)
+extract a leaf's input, cached data, mutation data, and execution error types.
+
 ## Integrate with your application
 
-- [React Query](https://ueberbrot.github.io/effect-api-query/guides/react-query/): use generated options with hooks.
+- [Integration setup](https://ueberbrot.github.io/effect-api-query/integrations/): choose a framework and manage client lifetime.
+- [React Query](https://ueberbrot.github.io/effect-api-query/guides/react-query/): acquire a client, mount a provider, and use generated options with hooks.
 - [Vue Query](https://ueberbrot.github.io/effect-api-query/guides/vue-query/), [Solid Query](https://ueberbrot.github.io/effect-api-query/guides/solid-query/), [Svelte Query](https://ueberbrot.github.io/effect-api-query/guides/svelte-query/), and [Angular Query](https://ueberbrot.github.io/effect-api-query/guides/angular-query/): rebuild options from reactive input with native Query integrations.
-- [TanStack Start](https://ueberbrot.github.io/effect-api-query/guides/tanstack-start/): share RPC and HTTP options across loaders, server rendering, and hydration.
+- [TanStack Router and Start](https://ueberbrot.github.io/effect-api-query/guides/tanstack-start/): share RPC and HTTP options across loaders, server rendering, and hydration.
 - [Run the examples](https://ueberbrot.github.io/effect-api-query/examples/): copy complete Vite React and Start integrations.
 - [API reference](https://ueberbrot.github.io/effect-api-query/reference/public-exports/): look up builders, cache views and errors.
 

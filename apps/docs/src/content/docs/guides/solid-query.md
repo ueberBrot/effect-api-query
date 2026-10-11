@@ -50,13 +50,8 @@ overloads accept defined initial data or absent initial data. A value or initial
 return `undefined` does not match those overloads. Omit `initialData` or supply a defined seed.
 An explicit `initialData: undefined` overrides inherited QueryClient initial data.
 
-## Own streams and disposal
+## Own the native integration
 
-Changing input or disposing the Solid owner removes an observer. An abort-aware open stream
-cancels when its last observer leaves; other observers keep it active. Keep clients alive until
-local finalizers and accepted mutations settle. Follow
-[Client Lifecycle](/effect-api-query/concepts/client-lifecycle/) for disposal and
-[Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/) for owner replacement.
-Transport interruption depends on the ready client.
-
-Match Solid Query to the application's Query Core and use a compiler supported by Solid's tooling.
+Follow the [shared integration lifetime](/effect-api-query/integrations/#own-the-cache-and-client-lifetime)
+for providers, observer removal, stream finalizers, and accepted mutations. Match this native
+wrapper to the application's Query Core and the framework's supported compiler/tooling.

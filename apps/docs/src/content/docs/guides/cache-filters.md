@@ -1,9 +1,11 @@
 ---
-title: Cache Filters
-description: Compose native filters for operations, encoded partial inputs, and exact cache entries.
+title: Cache Keys and Filters
+description: Read typed entries and target native cache operations with generated prefixes and exact keys.
 ---
 
-Pass generated prefixes or concrete keys to TanStack's native filters. Choose the scope before
+Use a generated concrete key for typed `getQueryData` and `setQueryData`. Use root, branch, leaf,
+or view prefixes for native `invalidateQueries`, `cancelQueries`, and query-state filters.
+Import `viewPrefix` from `effect-api-query` to select one supported cache view. Choose the scope before
 adding `type`, `stale`, `fetchStatus`, or `predicate` conditions:
 
 | Scope                 | Key                                                    | Matches                                                                |
@@ -11,14 +13,29 @@ adding `type`, `stale`, `fetchStatus`, or `predicate` conditions:
 | Root                  | `rpc.key()` or `http.key()`                            | All cached query views in that utility tree                            |
 | Branch                | `rpc.users.key()`                                      | Every descendant leaf and query view                                   |
 | Leaf                  | `rpc.users.get.key()`                                  | Ordinary and infinite queries; HTTP leaves also include metadata views |
-| Operation             | `[...rpc.users.get.key(), 'query']`                    | Ordinary queries for that leaf                                         |
+| Operation             | `viewPrefix(rpc.users.get, 'query')`                   | Ordinary queries for that leaf                                         |
 | Encoded partial input | Operation prefix followed by an encoded partial object | Entries containing those encoded fields                                |
 | Exact entry           | Generated concrete key with `exact: true`              | One complete cache identity, including its stream policy               |
 
-A streaming leaf prefix includes accumulated and live views. Append `streamed` or `live` to select
-one representation. HTTP buffered metadata uses `metadata`; pagination uses `infinite`.
+A streaming leaf prefix includes accumulated and live views. Use `viewPrefix(leaf, 'streamed')`
+or `viewPrefix(leaf, 'live')` to select one representation. HTTP buffered metadata uses `metadata`; pagination uses `infinite`.
 Mutation keys belong to TanStack's separate mutation cache, and query invalidation does not affect
 pending mutations.
+
+## Choose the cache operation
+
+Invalidation refreshes affected reads according to TanStack's native policy. It does not execute
+or cancel pending mutations. The application chooses which read keys a successful write affects.
+
+RPC roots append `rpc` to the caller prefix. HTTP roots append `http` and the HttpApi identifier.
+The factories keep separate caches even when the caller prefix is the same. Use the original
+caller prefix to deliberately match both; use a generated root to match one utility tree.
+
+For response seeding and rollback, follow [Optimistic Updates](/effect-api-query/guides/optimistic-writes/).
+Map delivered domain events with [Refresh from Events](/effect-api-query/guides/refresh-from-events/).
+[Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/) covers private data when
+users, tenants, sessions, or permissions change. [Defaults and Policies](/effect-api-query/guides/query-defaults/)
+uses the same prefixes to register native cache policy.
 
 ## Filter RPC queries
 
@@ -37,7 +54,7 @@ Derive `rpc` from this group and its ready client using the factory setup in
 every locale for user 1 with an encoded partial filter:
 
 ```ts
-const queryPrefix = [...rpc.users.get.key(), 'query'] as const
+const queryPrefix = viewPrefix(rpc.users.get, 'query')
 await queryClient.invalidateQueries({
   queryKey: [...queryPrefix, { id: '1' }],
   type: 'inactive',
@@ -64,7 +81,7 @@ the default `locale: "en"`; its key therefore cannot express every locale for us
 `{ locale: "en" }` rejects the missing required `id`. Do not cast partial constructor input into a
 key builder or run it through the full payload constructor to derive a broad filter.
 
-`[...rpc.users.watch.key(), 'streamed', { id: '1' }]` stops before the stream-policy suffix and matches every retention bound and
+`[...viewPrefix(rpc.users.watch, 'streamed'), { id: '1' }]` stops before the stream-policy suffix and matches every retention bound and
 refetch mode for that encoded user. For one history, use
 `rpc.users.watch.streamedKey({ id: 1 }, { maxChunks: 2, refetchMode: 'append' })` with `exact: true`.
 The omitted policy and explicit unlimited/reset policy share the same normalized identity. Keep the
@@ -82,7 +99,7 @@ Derive `http` from that HttpApi and its ready client using the factory setup in
 choose the path parameter or header independently:
 
 ```ts
-const queryPrefix = [...http.users.get.key(), 'query'] as const
+const queryPrefix = viewPrefix(http.users.get, 'query')
 await queryClient.invalidateQueries({ queryKey: [...queryPrefix, { params: { id: '1' } }] })
 await queryClient.invalidateQueries({
   queryKey: [...queryPrefix, { headers: { 'x-locale': 'en' } }],
@@ -102,7 +119,7 @@ const user = queryClient.getQueryData(key)
 ```
 
 The leaf prefix also includes metadata and infinite views. For every history policy of a
-`users.watch` request, use `[...http.users.watch.key(), 'streamed', { query: { id: '1' } }]`.
+`users.watch` request, use `[...viewPrefix(http.users.watch, 'streamed'), { query: { id: '1' } }]`.
 
 Default HTTP keys Schema-encode each request part, omit encoded `undefined` object members, and
 lowercase header names. In this contract, `params: { id: "1" }` is a meaningful partial object;
@@ -126,7 +143,7 @@ busters. For opaque or noninvertible projections, use generated broad prefixes o
 key. A custom predicate can inspect only the information retained in the key or other
 application-owned query metadata; it cannot reconstruct omitted input.
 
-Concrete builders retain DataTags for typed `getQueryData` and `setQueryData`. Manually composed
-prefixes and partial keys carry no query-data tag, and native `getQueriesData` does not infer a
+Concrete builders retain DataTags for typed `getQueryData` and `setQueryData`. `viewPrefix` returns an immutable ordinary key for supported leaf views; it has no DataTag.
+Manually composed prefixes and partial keys carry no query-data tag, and native `getQueriesData` does not infer a
 homogeneous result from its filter. Keep broad reads as `unknown` until the application establishes
 the matched representation; an explicit generic or cast does not validate cached values.

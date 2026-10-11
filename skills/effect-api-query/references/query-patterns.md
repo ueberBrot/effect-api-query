@@ -1,5 +1,33 @@
 # Conditional reads, pages, and streams
 
+## Reuse inferred operation types
+
+Import inference helpers from `effect-api-query` and apply them to a utility leaf:
+
+| Helper                                                | Representation                                                        |
+| ----------------------------------------------------- | --------------------------------------------------------------------- |
+| `InferInput<typeof rpc.users.read>`                   | RPC payload constructor input, including omitted constructor defaults |
+| `InferInput<typeof http.users.read>`                  | Decoded HTTP request containers; multipart payloads use `FormData`    |
+| `InferQueryData<typeof rpc.users.read>`               | Cached ordinary query data, before `select`                           |
+| `InferQueryData<typeof http.users.read, 'metadata'>`  | Decoded data, status, and copied raw headers                          |
+| `InferQueryData<typeof rpc.events.watch, 'streamed'>` | Ordered decoded stream elements                                       |
+| `InferQueryData<typeof rpc.events.watch, 'live'>`     | Latest normalized query data                                          |
+| `InferQueryError<typeof rpc.users.read>`              | Error type carried by the concrete query key                          |
+| `InferMutationData<typeof rpc.users.write>`           | Successful mutation value, preserving `undefined`                     |
+| `InferMutationError<typeof rpc.users.write>`          | Buffered mutation execution error type                                |
+
+Specify `'infinite'` to infer `InfiniteData` with an unknown page-parameter type.
+Use the actual options' tagged key when the mapper establishes a more precise
+page-parameter type. Query and live data normalize `undefined` to `null`;
+accumulated elements and mutation data keep it. `InferQueryError` accepts the
+same view parameter as `InferQueryData`. Choose a view supported by that leaf;
+stream leaves need an explicit `'live'` or `'streamed'` view. Branches and
+unsupported default views infer `never`. These types describe the contract;
+runner rejections still pass through at runtime.
+
+For the complete input, supported-view, and cache representation contract, read
+[Type Inference](https://ueberbrot.github.io/effect-api-query/reference/type-inference/).
+
 ## Conditional reads with React Query
 
 Use `input: skipToken` when required input is unavailable. `enabled: false` still
@@ -142,8 +170,10 @@ after a defined value. Live keys, selectors, and initial data use that normalize
 type. Accumulated chunks retain their original values, including `undefined`.
 
 On an initial fetch, both views become successful after the first emission. They
-keep fetching until completion. Canceling closes the iterator and interrupts its
-Effect resources. Native cancellation can settle before local finalizers finish.
+keep fetching until completion. Ordinary-query cancellation closes the iterator
+and interrupts its Effect resources. Native cancellation can settle before local
+finalizers finish. Suspense hooks have the native cancellation limitation described
+in [frameworks and hosts](frameworks-and-hosts.md).
 An awaited QueryClient call waits for stream completion; hooks and observers see
 intermediate values. For SSR, read [hydration and SSR](hydration-and-ssr.md) and use
 `fetchStreamSnapshot` to capture and drain an open query.
@@ -158,6 +188,21 @@ not suppress those writes or promise a renderer's update count. Choose a live
 query for complete current-state emissions and bounded history for recent events;
 the latest delta alone cannot reconstruct state. Set publication rate or sampling
 on the producer or an application-owned Stream transformation.
+
+## Trace stream consumption and cleanup
+
+Acquire an `Effect.makeSpanScoped` span when `Stream.unwrap` begins consumption.
+Provide that span as `Tracer.ParentSpan` for nested pull work, and update the captured
+span directly from emission instrumentation and `Stream.ensuring`. This keeps the
+span open through asynchronous local cleanup. Supply telemetry services through the
+ready client or its runner, and keep the runtime alive through iterator cleanup.
+A span or retry around the runner's iterable-creation Effect ends before consumption;
+it does not cover stream emissions or finalization.
+
+For a complete HTTP SSE client, Otlp layer, and drained snapshot example, use
+[the stream lifetime tracing recipe](https://ueberbrot.github.io/effect-api-query/guides/trace-streams/).
+Use the client's response transformation before response-mode wrapping to preserve
+decoded header wrappers. Applications own span attributes and disclosure policy.
 
 Sources: [builders](https://ueberbrot.github.io/effect-api-query/reference/generated-builders/),
 [stream history](https://ueberbrot.github.io/effect-api-query/guides/choose-stream-history/).

@@ -1,117 +1,110 @@
 ---
 title: Retry Queries
-description: Choose bounded retries by inspecting typed Effect failures and native Query options.
+description: Reuse bounded read policies with typed Effect failures and native Query options.
 ---
 
-Set an explicit retry policy for an idempotent read. The callbacks below allow two retries after
-an initial failure: at most three client executions. They retry a declared `RetryLater` or an HTTP
-transport failure, and stop for `NotFound`, `AuthenticationRequired`, Schema failures, defects,
-interruptions, and rejected runners.
+Bind a retry policy once with `withQueryPolicy`, then call the returned options builder wherever
+you need that read. Each call keeps native `select`, input, and initial-data inference. Call-site
+options replace matching defaults.
 
-## Inspect the typed failure
+The policy below permits two retries after the initial failure: at most three executions. It
+allows a declared `RetryLater` or an application-approved transport failure. Use it for idempotent
+reads whose transport does not already own retries.
 
-Use the error union declared by your contract and the native builder's inferred callback types.
-Import `Cause` and `Result` from `effect`, adapter guards from `effect-api-query`, and
-`HttpClientError` from `effect/http`. The
-[complete typed recipe](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-retry.ts)
-includes `RetryLater`, `NotFound`, authentication errors and both ready-client factories.
+## Share the decision and delay
 
-### RPC retry callback
-
-In the query-options module, use these statements inside the `retry: (failureCount, error) => { ... }`
-callback passed to `rpc.profile.read.queryOptions`. This example allows only an HTTP transport
-failure or its declared `RetryLater`:
+Import `Cause`, `Result`, and `Schema` from `effect`. Define `RetryLater` with a finite
+`retryAfterMs` field in your contract, then reuse this application helper for RPC and HTTP:
 
 ```ts
-if (!isEffectRpcQueryError(error) || failureCount >= 2) {
-  return false
-}
-if (Cause.hasDies(error.cause) || Cause.hasInterrupts(error.cause)) {
-  return false
-}
-const failure = Cause.findError(error.cause)
-if (Result.isFailure(failure) || error.cause.reasons.length !== 1) {
-  return false
-}
-switch (failure.success._tag) {
-  case 'RetryLater':
-    return true
-  case 'RpcClientError':
+const retryPolicy = <Error, Failure>(
+  causeOf: (error: Error) => Cause.Cause<Failure> | undefined,
+  isTransient: (failure: Failure) => boolean,
+) => ({
+  retry: (failureCount: number, error: Error) => {
+    const cause = causeOf(error)
+    if (
+      !cause ||
+      failureCount >= 2 ||
+      Cause.hasDies(cause) ||
+      Cause.hasInterrupts(cause) ||
+      cause.reasons.length !== 1
+    ) {
+      return false
+    }
+    const failure = Cause.findError(cause)
     return (
-      failure.success.reason._tag === 'HttpError' &&
-      failure.success.reason.kind === 'TransportError'
+      Result.isSuccess(failure) &&
+      (Schema.is(RetryLater)(failure.success) || isTransient(failure.success))
     )
-  default:
-    return false
-}
+  },
+  retryDelay: (attemptIndex: number, error: Error) => {
+    const cause = causeOf(error)
+    if (cause) {
+      const failure = Cause.findError(cause)
+      if (Result.isSuccess(failure) && Schema.is(RetryLater)(failure.success)) {
+        return Math.min(30_000, Math.max(0, failure.success.retryAfterMs))
+      }
+    }
+    return Math.min(1_000 * 2 ** attemptIndex, 30_000)
+  },
+})
 ```
 
-### HTTP retry callback
+This rejects defects, interruptions, and Causes with multiple reasons. `Cause.findError` returns
+a `Result`; the successful value retains the typed failure union. Schema refinement also handles
+unknown values safely. The adapter guard rejects custom runner failures that pass through unchanged.
 
-For `http.profile.read.queryOptions`, the callback has the same guard stages but a different
-transport-error union. Its `retry` callback body is:
+## Bind a typed RPC policy
+
+Import `withQueryPolicy`, `isEffectRpcQueryError`, and the type `InferQueryError` from
+`effect-api-query`, plus `RpcClientError` from `effect/rpc`. After acquiring your ready client and
+creating `rpc`, bind the profile read:
 
 ```ts
-if (!isEffectHttpApiQueryError(error) || failureCount >= 2) {
-  return false
-}
-if (Cause.hasDies(error.cause) || Cause.hasInterrupts(error.cause)) {
-  return false
-}
-const failure = Cause.findError(error.cause)
-if (Result.isFailure(failure) || error.cause.reasons.length !== 1) {
-  return false
-}
-switch (failure.success._tag) {
-  case 'RetryLater':
-    return true
-  case 'HttpClientError':
-    return (
-      HttpClientError.isHttpClientError(failure.success) &&
-      failure.success.reason._tag === 'TransportError'
-    )
-  default:
-    return false
-}
+type Error = InferQueryError<typeof rpc.profile.read>
+const read = withQueryPolicy(
+  rpc.profile.read,
+  'query',
+  retryPolicy(
+    (error: Error) => (isEffectRpcQueryError(error) ? error.cause : undefined),
+    (failure) =>
+      Schema.is(RpcClientError.RpcClientError)(failure) &&
+      failure.reason._tag === 'HttpError' &&
+      failure.reason.kind === 'TransportError',
+  ),
+)
+return read()
 ```
 
-### Retry delay callback
+This application allows only RPC's HTTP transport failures. Socket and worker reconnect policy
+belongs to the application that owns those transports.
 
-In the RPC builder's `retryDelay: (attemptIndex, error) => { ... }` body:
+## Bind the same decision to HTTP
+
+Import `isEffectHttpApiQueryError` from `effect-api-query` and `HttpClientError` from `effect/http`. Keep the shared retry
+logic and supply HTTP's transport classifier:
 
 ```ts
-if (isEffectRpcQueryError(error)) {
-  const failure = Cause.findError(error.cause)
-  if (Result.isSuccess(failure) && failure.success._tag === 'RetryLater') {
-    return Math.min(30_000, Math.max(0, failure.success.retryAfterMs))
-  }
-}
-return Math.min(1_000 * 2 ** attemptIndex, 30_000)
+type Error = InferQueryError<typeof http.profile.read>
+const read = withQueryPolicy(
+  http.profile.read,
+  'query',
+  retryPolicy(
+    (error: Error) => (isEffectHttpApiQueryError(error) ? error.cause : undefined),
+    (failure) =>
+      HttpClientError.isHttpClientError(failure) && failure.reason._tag === 'TransportError',
+  ),
+)
+return read()
 ```
 
-The complete recipe applies the equivalent guarded delay to HTTP. These callbacks are application
-policy for idempotent reads, not a package retry policy.
+Encoding, decoding, response, `NotFound`, and authentication failures receive no retry. Restore an
+expired session before invalidating its affected queries.
 
-`Cause.findError` returns a `Result`; after `Result.isSuccess`, `success` retains the declared
-error union. It extracts the first typed failure. Check defects and interruptions first, and
-inspect all `cause.reasons` when several failures are meaningful to your policy. This example
-rejects every Cause with more than one reason, including a retryable failure combined with a defect,
-interruption, or another typed failure.
-
-The runtime guard also rejects a custom runner's original rejection. A runner rejection produces
-no failed Effect `Exit`, so it need not have the statically declared execution-error shape. Keep
-this guard in retry and retry-delay callbacks that can receive custom runner failures.
-
-An HTTP `TransportError` is safe to retry here because this operation is an idempotent read. Other
-`HttpClientError` reasons include encoding, decoding, and response failures. An RPC
-`RpcClientError` can contain HTTP, socket, worker, or protocol failures; the RPC policy above
-explicitly allows only its HTTP transport reason. Choose socket/worker reconnection policy in the
-application that owns that transport. Handle expired authentication by restoring the application
-session and invalidating affected queries, instead of repeatedly sending the same credentials.
-
-`retryDelay` receives the zero-based attempt index and the same typed error. It returns milliseconds,
-not an Effect or Promise. Query Core can evaluate it even for a terminal failure, so keep it pure.
-The example bounds server-provided delays and caps exponential backoff at 30 seconds.
+The [complete compiled recipe](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-retry.ts)
+contains the contracts and both ready-client factories. See [Query Defaults](/effect-api-query/guides/query-defaults/)
+for policy types, mutation callbacks, and precedence.
 
 ## Set defaults deliberately
 
@@ -122,33 +115,27 @@ The example bounds server-provided delays and caps exponential backoff at 30 sec
 | Imperative `queryClient.query` and `queryClient.infiniteQuery` | Retries disabled                                   |
 | Mutation                                                       | Retries disabled                                   |
 
-Generated options preserve Query Core policy. QueryClient defaults, prefix defaults, and explicit
-builder options can change these defaults. Set `retry` explicitly when attempt counts matter;
-`retry: 2` also means at most three executions, while `retry: false` permits one.
+QueryClient global and prefix defaults still apply. Set `retry` explicitly when attempt counts
+matter. `retry: 2` permits three executions; `retry: false` permits one.
 
-Apply the same decision in an infinite, accumulated-stream, or live builder only when restarting
-that operation is safe. A stream retry starts a new stream invocation; its retained data and refetch
-policy still govern cache publication. Mutation retries require an application idempotency contract.
+Choose one layer to own retries. Two retries in TanStack combined with two retries per invocation
+in Effect can make nine client attempts. A retry around iterable creation does not retry later
+stream consumption. Restart a stream only when safe for that operation; retention and refetch policy
+still govern cache publication. Mutation retries require application idempotency.
 
-Choose one layer to own retries. If TanStack allows two retries and the underlying Effect or
-transport schedule also allows two retries per invocation, one query can make nine client attempts.
-Set `retry: false` in Query options when the ready client or runner owns a retry schedule. A retry
-around the runner's iterable-creation Effect does not retry subsequent stream consumption; see
-[client lifecycle](/effect-api-query/concepts/client-lifecycle/#stream-creation-and-consumption).
+`retryDelay` receives a zero-based attempt index and returns milliseconds. Query Core can evaluate
+it for terminal failures, so keep it pure. This recipe clamps server delays and exponential backoff
+to 30 seconds.
 
 ## Handle preparation before execution
 
-Factory and option-builder configuration errors and key-generation errors are synchronous. Prepare
-options inside a `try` block when input or custom encoders may fail, then pass the successful options
-to Query Core. These errors occur before a query is registered and never enter execution retry.
-For an infinite query, the later page-input mapper executes during fetching; errors it throws reach
-TanStack unchanged and need an explicit non-retry decision. Mutations encode input inside the
-ready client's Effect, so their encoding failures use the execution Cause.
+Factory, builder, and key-generation errors are synchronous. Prepare options inside `try` when
+input or custom encoders may fail, then pass successful options to Query Core. Preparation failures
+never enter execution retry. An infinite page-input mapper runs later; its thrown errors pass
+through unchanged. Mutation encoding occurs inside the ready client's Effect and uses its Cause.
 
-Keep QueryClient hashing stable while entries remain cached. A stream that encounters a matching
-entry under an incompatible hash policy rejects with configuration code `UnsupportedQueryHash`.
-Retries cannot repair that policy; retire the old cache before using a different hash function.
-
-Use [failure handling](/effect-api-query/guides/handle-failures/) for error-stage guards and
-[the error reference](/effect-api-query/reference/errors/) for stable metadata. See the
-[complete example](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-retry.ts).
+Keep QueryClient hashing stable while entries remain cached. `UnsupportedQueryHash` rejects an
+incompatible stream cache policy; retries cannot repair it. Retire the cache before replacing its
+hasher. See [Failure Handling](/effect-api-query/guides/handle-failures/) for error-stage guards and
+[Client Lifecycle](/effect-api-query/concepts/client-lifecycle/#stream-creation-and-consumption)
+for stream execution boundaries.

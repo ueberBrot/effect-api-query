@@ -19,12 +19,16 @@ skills:
     sources:
       - src/**/*.ts
       - tests/**/*.ts
+      - tests/**/*.tsx
+      - '**/examples/shared/*.ts'
       - '**/examples/vite-react/src/lib/*.ts'
       - '**/examples/vite-react/src/main.tsx'
       - '**/examples/vite-react/src/app.tsx'
+      - '**/examples/vite-react/src/components/ui/effect-error-details.tsx'
       - '**/examples/vite-react/tests/*.ts*'
       - '**/examples/tanstack-start/src/lib/*.ts'
       - '**/examples/tanstack-start/src/router.tsx'
+      - '**/examples/tanstack-start/src/components/effect-error-details.tsx'
       - '**/examples/tanstack-start/tests/*.ts*'
       - '**/examples/server/src/*.ts'
       - '**/examples/server/tests/**/*.ts'
