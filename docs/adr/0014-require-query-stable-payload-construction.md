@@ -4,16 +4,16 @@ Status: Accepted.
 
 ## Context
 
-Query options derive a synchronous key before execution. The ready RPC client then constructs the
-retained normalized payload again. Effect does not guarantee that every Schema constructor accepts
-its own `Type` or preserves encoded meaning across repeated construction.
+Query options derive a key synchronously before execution. The ready RPC client reconstructs the
+retained normalized payload when it executes. Effect does not guarantee that every Schema
+constructor accepts its own `Type` or preserves encoded meaning when construction repeats.
 
 ## Decision
 
-Query use requires a query-stable payload Schema. Standard struct-shaped payloads and materialized
-defaults are the supported path.
+Queries require a query-stable payload Schema. The supported path uses standard struct-shaped
+payloads and materialized defaults.
 
 ## Consequences
 
-Constructor-sensitive Schemas remain available to mutations. Query callers instead expose a stable
-query-facing RPC; the initial release adds no custom execution seam for this case.
+Mutations can still use constructor-sensitive Schemas. For queries, callers expose a stable
+query-facing RPC. The initial release adds no custom execution seam for this case.

@@ -4,19 +4,19 @@ Status: Accepted. Implementation ownership clarified by [ADR 0021](0021-share-ut
 
 ## Context
 
-The application knows the required protocol, middleware, runtime, and resource lifetime in the
-browser or on the server.
+The application determines the protocol, middleware, runtime, and resource lifetime that it needs
+in the browser or on the server.
 
 ## Decision
 
 The core factory accepts a ready flat Effect RPC client. It never constructs, scopes, or disposes
-that client. Service-free calls default to `Effect.runPromiseExit`; residual Schema services require
-an injected runner with the same `effect, { signal? }` shape.
+that client. Service-free calls default to `Effect.runPromiseExit`. If Schema services remain,
+inject a runner with the same `effect, { signal? }` shape.
 
 ## Consequences
 
-The caller owns protocol, middleware, lifetime, and resources. Queries forward TanStack's abort
-signal, mutations omit it, and runner rejections propagate untouched.
+The caller owns the protocol, middleware, lifetime, and resources. Queries forward TanStack's
+abort signal. Mutations omit that signal. Runner rejections propagate unchanged.
 
 [ADR 0026](0026-keep-rpc-transport-aggregation-in-the-application.md) preserves application ownership
 of transport aggregation.

@@ -4,21 +4,21 @@ Status: Amended by ADR 0018 and ADR 0020. Implementation ownership clarified by 
 
 ## Context
 
-Flattening Effect failures would discard typed failure, defect, interruption, and parallel-cause
-information.
+Flattening Effect failures discards information about typed failures, defects, interruptions, and
+parallel Causes.
 
 ## Decision
 
-Only a failed RPC `Exit` becomes an `EffectRpcQueryError<E>`. It preserves the untouched Effect
-`Cause<E>`, the literal RPC tag, and the operation. ADR 0018 adds infinite-query operations; ADR
-0020 adds accumulated-stream and live-query operations.
+Only a failed RPC `Exit` becomes an `EffectRpcQueryError<E>`. The error preserves the untouched
+Effect `Cause<E>`, literal RPC tag, and operation. ADR 0018 adds infinite-query operations.
+ADR 0020 adds accumulated-stream and live-query operations.
 
-Configuration and key-generation failures use `EffectRpcQueryConfigError` and
+Configuration failures use `EffectRpcQueryConfigError`. Key-generation failures use
 `EffectRpcQueryKeyError`. User callbacks, TanStack callbacks, and runner rejections that produce no
-`Exit` remain untouched.
+`Exit` pass through unchanged.
 
 ## Consequences
 
-Public errors expose discriminants and relevant tag or path metadata without retaining raw input or
-encoder output. Query preparation fails synchronously. Failures inside the RPC Effect remain in its
-Cause.
+Public errors expose discriminants and relevant tag or path metadata. They retain neither raw
+input nor encoder output. Query preparation fails synchronously. The Cause retains failures inside
+the RPC Effect.

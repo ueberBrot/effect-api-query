@@ -3,13 +3,13 @@ title: Retry Queries
 description: Reuse bounded read policies with typed Effect failures and native Query options.
 ---
 
-Bind a retry policy once with `withQueryPolicy`, then call the returned options builder wherever
-you need that read. Each call keeps native `select`, input, and initial-data inference. Call-site
-options replace matching defaults.
+Bind a retry policy with `withQueryPolicy`. Use the returned options builder wherever you need
+that read. Each call keeps native `select`, input, and initial-data inference. Call-site options
+replace matching defaults.
 
-The policy below permits two retries after the initial failure: at most three executions. It
-allows a declared `RetryLater` or an application-approved transport failure. Use it for idempotent
-reads whose transport does not already own retries.
+The policy below permits two retries after the initial failure, for at most three executions.
+It allows a declared `RetryLater` or an application-approved transport failure.
+Use it for idempotent reads whose transport does not already own retries.
 
 ## Share the decision and delay
 
@@ -51,8 +51,8 @@ const retryPolicy = <Error, Failure>(
 })
 ```
 
-This rejects defects, interruptions, and Causes with multiple reasons. `Cause.findError` returns
-a `Result`; the successful value retains the typed failure union. Schema refinement also handles
+The helper rejects defects, interruptions, and Causes with multiple reasons. `Cause.findError`
+returns a `Result`. The successful value retains the typed failure union. Schema refinement also handles
 unknown values safely. The adapter guard rejects custom runner failures that pass through unchanged.
 
 ## Bind a typed RPC policy
@@ -82,8 +82,8 @@ belongs to the application that owns those transports.
 
 ## Bind the same decision to HTTP
 
-Import `isEffectHttpApiQueryError` from `effect-api-query` and `HttpClientError` from `effect/http`. Keep the shared retry
-logic and supply HTTP's transport classifier:
+Import `isEffectHttpApiQueryError` from `effect-api-query` and `HttpClientError` from `effect/http`.
+Reuse the shared retry logic with HTTP's transport classifier:
 
 ```ts
 type Error = InferQueryError<typeof http.profile.read>
@@ -116,12 +116,12 @@ for policy types, mutation callbacks, and precedence.
 | Mutation                                                       | Retries disabled                                   |
 
 QueryClient global and prefix defaults still apply. Set `retry` explicitly when attempt counts
-matter. `retry: 2` permits three executions; `retry: false` permits one.
+matter. `retry: 2` permits three executions. `retry: false` permits one.
 
 Choose one layer to own retries. Two retries in TanStack combined with two retries per invocation
 in Effect can make nine client attempts. A retry around iterable creation does not retry later
-stream consumption. Restart a stream only when safe for that operation; retention and refetch policy
-still govern cache publication. Mutation retries require application idempotency.
+stream consumption. Restart a stream only when restarting is safe for that operation. Retention and refetch
+policies still govern cache publication. Mutation retries require application idempotency.
 
 `retryDelay` receives a zero-based attempt index and returns milliseconds. Query Core can evaluate
 it for terminal failures, so keep it pure. This recipe clamps server delays and exponential backoff
@@ -129,13 +129,13 @@ to 30 seconds.
 
 ## Handle preparation before execution
 
-Factory, builder, and key-generation errors are synchronous. Prepare options inside `try` when
-input or custom encoders may fail, then pass successful options to Query Core. Preparation failures
-never enter execution retry. An infinite page-input mapper runs later; its thrown errors pass
+Factory, builder, and key-generation errors are synchronous. If input or custom encoders can fail,
+prepare options inside `try`. Pass successfully prepared options to Query Core. Preparation failures
+never enter execution retry. An infinite page-input mapper runs later. Its thrown errors pass
 through unchanged. Mutation encoding occurs inside the ready client's Effect and uses its Cause.
 
 Keep QueryClient hashing stable while entries remain cached. `UnsupportedQueryHash` rejects an
-incompatible stream cache policy; retries cannot repair it. Retire the cache before replacing its
+incompatible stream cache policy. Retries cannot repair it. Retire the cache before replacing its
 hasher. See [Failure Handling](/effect-api-query/guides/handle-failures/) for error-stage guards and
 [Client Lifecycle](/effect-api-query/concepts/client-lifecycle/#stream-creation-and-consumption)
 for stream execution boundaries.

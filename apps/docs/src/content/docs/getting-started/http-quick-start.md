@@ -3,15 +3,15 @@ title: HTTP Quick Start
 description: Acquire an HttpApiClient and use generated query and mutation options.
 ---
 
-First [install the package](/effect-api-query/getting-started/installation/). The server must
-serve the same `usersApi` contract at `http://localhost:3000`. Share the contract between your
-server and browser application.
+[Install the package](/effect-api-query/getting-started/installation/) before starting.
+The server must serve the `usersApi` contract at `http://localhost:3000`.
+The server and browser application must share the same contract.
 
 ## Define the shared contract
 
 Place the declaration in `http-contract.ts`. Both the server and client import this module.
 
-**Shared contract — `http-contract.ts`**
+Shared contract in `http-contract.ts`:
 
 ```ts
 import { Effect, Schema } from 'effect'
@@ -37,10 +37,11 @@ export const usersApi = HttpApi.make('users-api').add(
 
 ## Acquire the client and execute requests
 
-This client module acquires the ready client through a ManagedRuntime, reads a user, writes a
-user, and releases its resources. Replace the base URL with your server.
+The client module uses a ManagedRuntime to acquire the ready client.
+It reads a user, creates a user, and then releases its resources.
+Replace the base URL with your server's URL.
 
-**Client integration — `client.ts`**
+Client integration in `client.ts`:
 
 ```ts
 import { MutationObserver, QueryClient } from '@tanstack/query-core'
@@ -83,23 +84,23 @@ try {
 }
 ```
 
-HTTP input is the **decoded request**. Supply the endpoint's declared `params`, `query`, `headers`,
-and `payload` containers; the client handles wire encoding. HTTP builders do not apply Schema
-constructor defaults: this request explicitly supplies `locale: 'en'`.
+HTTP input is the decoded request. Supply the endpoint's declared `params`, `query`, `headers`, and `payload` containers.
+The client encodes those values for transport. HTTP builders do not apply Schema constructor defaults.
+This request supplies `locale: 'en'` explicitly.
 
 The runtime provides the HTTP transport and forwards TanStack's signal through `runPromiseExit`.
-Keep the runtime and client resources alive while queries and mutations use them. Invalidation is
-application policy; this example refreshes the `users` endpoint prefix after creation.
+Keep the runtime and client resources alive while queries and mutations use them.
+Your application decides which queries to invalidate. This example refreshes the `users` endpoint prefix after creation.
 
-Buffered nonmultipart endpoints offer query and mutation builders regardless of HTTP method;
-buffered multipart endpoints offer mutations only. Literal group/endpoint names become utility
-paths; dots require bracket access, and `topLevel: true` places endpoints at the root.
+Buffered nonmultipart endpoints provide query and mutation builders for every HTTP method.
+Buffered multipart endpoints provide mutations only. Literal group and endpoint names become utility paths.
+Use bracket access for names that contain dots. With `topLevel: true`, endpoints appear at the root.
 See [HTTP Factory](/effect-api-query/reference/http-factory/).
 
 ## Keep a browser client alive
 
-The client module above awaits its mutation before disposal. For components, acquire once before
-mounting and keep the client alive for the application lifetime. Follow
+This client module awaits its mutation before disposal. If you use components, acquire the client once before mounting them.
+Keep the client alive for the application lifetime. Follow
 [React client setup](/effect-api-query/guides/react-query/#acquire-and-mount-the-client) for a complete provider,
 component, and cleanup callback.
 

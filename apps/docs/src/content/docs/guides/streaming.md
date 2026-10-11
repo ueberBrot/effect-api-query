@@ -3,8 +3,8 @@ title: Streaming
 description: Cache accumulated or latest values from RPC streams and HTTP SSE.
 ---
 
-Streaming leaves provide two views: an accumulated streamed query caches emissions in order;
-a live query caches the latest value. Use ordinary query hooks or `QueryObserver` for both.
+Streaming leaves provide two views. An accumulated streamed query caches emissions in order.
+A live query caches the latest value. Use ordinary query hooks or `QueryObserver` for both.
 Start with a ready [RPC](/effect-api-query/getting-started/quick-start/) or
 [HTTP](/effect-api-query/getting-started/http-quick-start/) utility tree.
 Here, `diagnostics.stream` is an inputless RPC emitting strings, and `events.watch` is an HTTP SSE
@@ -32,8 +32,10 @@ const sseHistory = http.events.watch.streamedOptions({
 ```
 
 The first emission makes the query successful while fetching continues. `maxChunks` bounds
-cached elements after each emission; omitted means unlimited. It does not bound bytes or
-transport buffering. Refetch mode `reset` starts a new history, `append` adds to it, and `replace`
+cached elements after each emission. If you omit it, history is unlimited. It does not bound bytes
+or transport buffering.
+
+Refetch mode `reset` starts a new history, `append` adds to it, and `replace`
 keeps the old history until successful completion. An indefinitely open replacement keeps
 showing that old history. Accumulated streams can succeed without emissions.
 
@@ -49,19 +51,19 @@ const latestSse = http.events.watch.liveOptions({
 })
 ```
 
-Each emission replaces cached data; completion preserves it. Live queries convert top-level
+Each emission replaces cached data. Completion preserves that data. Live queries convert top-level
 `undefined` to `null`, while accumulated elements retain `undefined`. Empty live completion
 raises the adapter's empty-stream error. Live options accept neither `maxChunks` nor `refetchMode`.
 
 ## Address and stop a view
 
-Reuse the options' `queryKey` for exact cache access. Accumulated history policies and HTTP decoder
-policies affect identity; live and accumulated views remain separate. Endpoint prefixes match
+For exact cache access, reuse the options' `queryKey`. Accumulated history policies and HTTP decoder
+policies affect identity. Live and accumulated views remain separate. Endpoint prefixes match
 all their views.
 
 Cancellation closes the stream iterator. Your application owns reconnection, resume policy,
 and client lifetime. HTTP `sseOptions.maxEventSize` bounds pending parser text in JavaScript string
-code units; its default is 10 × 1024 × 1024 code units. Declared resume headers belong in `input.headers`.
+code units. Its default is 10 × 1024 × 1024 code units. Put declared resume headers in `input.headers`.
 
 See [Choose Stream History](/effect-api-query/guides/choose-stream-history/) for retention and
 buffering, [Stream Snapshots](/effect-api-query/guides/stream-snapshots/) for finite server captures,

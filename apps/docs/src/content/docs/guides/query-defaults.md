@@ -3,17 +3,17 @@ title: Defaults and Policies
 description: Reuse native cache defaults and typed query or mutation policies.
 ---
 
-Choose where each setting belongs, then reuse it across generated builders:
+Choose where to define each setting before reusing it across generated builders:
 
 | Scope                    | Use                                         | Suitable settings                                               |
 | ------------------------ | ------------------------------------------- | --------------------------------------------------------------- |
 | Cache owner or namespace | QueryClient defaults and generated prefixes | Common freshness, retry, garbage collection, and hashing        |
-| One leaf and query view  | `withQueryPolicy`                           | Freshness and typed data/error callbacks                        |
+| One leaf and query view  | `withQueryPolicy`                           | Freshness and typed data and error callbacks                    |
 | One mutation leaf        | `withMutationPolicy`                        | Typed invalidation and other mutation callbacks                 |
 | One call                 | The options builder                         | Input, selection, initial data, pagination, and local overrides |
 
 Use your existing utility tree and application-owned QueryClient. Policies preserve the original
-builder's inference; the library continues to supply its keys and execution functions.
+builder's inference. The library supplies the generated keys and execution functions.
 
 ## Register native defaults
 
@@ -38,8 +38,8 @@ queryClient.setQueryDefaults(viewPrefix(rpc.users.get, 'query'), { staleTime: 12
 ```
 
 TanStack merges global defaults, matching registered prefixes in registration order, and explicit
-builder options. It does not sort prefixes by specificity. Here `users.get` inherits
-`gcTime: 600_000`, `retry: 2`, and `staleTime: 120_000`; two retries allow at most three executions.
+builder options. It does not sort prefixes by specificity. Here, `users.get` inherits
+`gcTime: 600_000`, `retry: 2`, and `staleTime: 120_000`. Two retries allow at most three executions.
 
 `rpc.key()` covers the tree, `rpc.users.key()` covers its branch, and the view prefix covers only
 ordinary queries of that leaf, for every input. HTTP uses the same native APIs:
@@ -53,14 +53,14 @@ This five-second policy applies to metadata without changing the ordinary view's
 Register mutation defaults separately with native `setMutationDefaults` and `mutationKey()`.
 See [Cache Keys and Filters](/effect-api-query/guides/cache-filters/) for prefix scopes.
 
-Configure hashing through QueryClient defaults before using the cache, and keep it stable for the
-cache owner's lifetime. Builders reject per-call hashing overrides; see
+Before using the cache, configure hashing through QueryClient defaults. Keep hashing stable for
+the cache owner's lifetime. Builders reject per-call hashing overrides. See
 [Semantic Keys](/effect-api-query/concepts/semantic-keys/) for the identity contract.
 
 ## Bind a reusable query policy
 
-Use `withQueryPolicy` when a policy belongs to one leaf and view. `QueryPolicy` gives reusable
-objects that leaf's native option types; retry and refetch callbacks retain its data and error types.
+If a policy belongs to one leaf and view, use `withQueryPolicy`. `QueryPolicy` types reusable
+objects with that leaf's native options. Retry and refetch callbacks retain its data and error types.
 Import both from `effect-api-query`:
 
 ```ts
@@ -85,8 +85,8 @@ Policies accept applicable native freshness, retry, refetch, and cache settings.
 call site. Stream retention and decoder policies determine cache identity and also stay local.
 
 A bound policy supplies explicit builder options, so it overrides QueryClient defaults. Call-site
-options override the bound policy. Omit a field to inherit it; use `staleTime: 0` or `retry: false`
-to replace an inherited setting.
+options override the bound policy. To inherit a field, omit it. To replace an inherited setting,
+use a value such as `staleTime: 0` or `retry: false`.
 
 ## Bind mutation invalidation
 
@@ -103,8 +103,8 @@ const createUserOptions = withMutationPolicy(rpc.users.create, {
 ```
 
 Shared callbacks infer data, variables, and execution errors. `MutationPolicy<Leaf>` can annotate a
-reusable object. Its optimistic result is `unknown`: supply `onMutate` at each call site to infer
-that result in local callbacks. Here `reportCreationFailure` is the application's failure notifier:
+reusable object. Its optimistic result is `unknown`. To infer that result in local callbacks,
+supply `onMutate` at each call site. Here, `reportCreationFailure` notifies the application of a failure:
 
 ```ts
 const createUser = createUserOptions({

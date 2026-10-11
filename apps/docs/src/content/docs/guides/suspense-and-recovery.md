@@ -3,7 +3,7 @@ title: Suspense and Error Recovery
 description: Reset failed Suspense queries, preserve cached data, and start independent reads together.
 ---
 
-Use TanStack's native Suspense hooks inside an existing `QueryClientProvider`, such as the
+Use TanStack's native Suspense hooks inside an existing `QueryClientProvider`. For example, use the
 [React client setup](/effect-api-query/guides/react-query/#acquire-and-mount-the-client).
 `useSuspenseQuery` provides defined data after its loading boundary resolves. An initial failure
 reaches the nearest React error boundary after retries finish.
@@ -16,9 +16,9 @@ See [TanStack query cancellation](https://tanstack.com/query/latest/docs/framewo
 
 ## Define a displayable failure
 
-This complete recipe uses a ready client for the following RPC contract. The application chooses
-which declared messages are suitable for users. Error boundaries receive `unknown`; recognize the
-execution wrapper and validate its Cause failure with Schema before reading a domain message.
+This recipe uses a ready client for the RPC contract below. The application chooses which
+declared messages users can see. Error boundaries receive `unknown`. Before reading a domain
+message, recognize the execution wrapper and validate its Cause failure with Schema.
 Transport failures, defects, and unexpected errors use a generic fallback.
 
 ```tsx
@@ -75,9 +75,9 @@ export const failureMessage = (error: unknown): string => {
 ## Reset both boundaries
 
 React owns the error boundary below. `QueryErrorResetBoundary` supplies its `onReset` callback.
-The retry button first resets TanStack's failed-query boundary, then clears React's error state
-so the component can mount and fetch again. This uses React's built-in Component class and
-requires no additional error-boundary package.
+The retry button resets TanStack's failed-query boundary, then clears React's error state.
+The component can then mount and fetch again. The boundary uses React's built-in Component class
+and requires no additional error-boundary package.
 
 ```tsx
 interface BoundaryProps {
@@ -121,8 +121,8 @@ class RequestErrorBoundary extends Component<BoundaryProps, BoundaryState> {
 ## Preserve data after a failed refresh
 
 Use both boundaries around the component. This example disables automatic retries so the user
-can choose when to retry. It retains native Suspense behavior: a failed initial load reaches the
-boundary; a failed background refetch keeps cached data visible and displays an inline error.
+can choose when to retry. Native Suspense behavior sends a failed initial load to the boundary.
+A failed background refetch keeps cached data visible and displays an inline error.
 The Refresh button retries that background request.
 
 ```tsx
@@ -156,18 +156,18 @@ export const UserScreen = <E,>({ rpc }: { readonly rpc: Queries<E> }) => (
 )
 ```
 
-Suspense throws query failures by default only when cached data is absent. If your application
-must route failed refetches to the error boundary too, throw the observer error from the component
-after fetching stops. Handle intentional `null` query data explicitly when using a void contract.
+By default, Suspense throws query failures only when cached data is absent. If failed refetches
+must also reach the error boundary, throw the observer error from the component after fetching stops.
+When using a void contract, handle intentional `null` query data explicitly.
 See [TanStack Suspense recovery](https://tanstack.com/query/latest/docs/framework/react/guides/suspense#resetting-error-boundaries).
 
 ## Start independent reads together
 
-Sequential `useSuspenseQuery` calls in one component can create a waterfall: the first hook
-suspends before the later hook runs. Pass independent requests to `useSuspenseQueries` instead.
-With generated options, explicit query descriptors retain the data and error types through
-TanStack's parallel-hook overloads. Derive these descriptors from the leaf so changes to its
-contract update every consumer.
+Sequential `useSuspenseQuery` calls in one component can delay later reads. The first hook
+suspends before the later hook runs. To start independent requests together, pass them to
+`useSuspenseQueries`. Explicit query descriptors retain generated data and error types through
+TanStack's parallel-hook overloads. Derive the descriptors from the leaf so contract changes
+update every consumer.
 
 ```tsx
 export const TwoUsers = <E,>({ rpc }: { readonly rpc: Queries<E> }) => {
@@ -190,5 +190,5 @@ export const TwoUsers = <E,>({ rpc }: { readonly rpc: Queries<E> }) => {
 ```
 
 Render `TwoUsers` inside the same reset and Suspense boundaries. Both reads start together.
-Choose a `staleTime` long enough that an earlier completed query remains fresh while the other
-finishes; otherwise mounting after Suspense resolves can cause an immediate refetch.
+Choose a `staleTime` that keeps the earlier completed query fresh until the other finishes.
+Otherwise, mounting after Suspense resolves can cause an immediate refetch.

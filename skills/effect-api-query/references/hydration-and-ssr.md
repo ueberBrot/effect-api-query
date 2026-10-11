@@ -2,10 +2,11 @@
 
 ## Capture an open stream
 
-Use a fresh request-owned QueryClient and keep its ready clients, runner, and Scope
+Use a fresh request-owned QueryClient. Keep its ready clients, runner, and Scope
 alive until every capture and preparation settles. `queryClient.query` waits for
-stream completion. Use `fetchStreamSnapshot` for the first new cache publication or
-normal completion; it cancels that exact query and awaits local iterator cleanup.
+stream completion. To capture the first new cache publication or normal completion,
+use `fetchStreamSnapshot`. It cancels that exact query and awaits local iterator
+cleanup.
 
 ```ts
 import { dehydrate } from '@tanstack/query-core'
@@ -39,34 +40,37 @@ export async function captureUpdates(
 }
 ```
 
-The same helper accepts RPC or HTTP accumulated/live options. Default `fresh` mode
+The helper accepts RPC or HTTP accumulated and live options. Default `fresh` mode
 starts a new attempt even with initial or cached success. `append` retains existing
-history. A `replace` refetch of previously fetched data publishes only at completion,
-so an indefinite replacement needs completion or timeout. Explicit `mode: 'cached'`
-reuses successful data without starting or cancelling work, and falls back to fresh
-when no successful entry exists. Native `select` and QueryClient defaults apply.
+history. A `replace` refetch of previously fetched data publishes only at completion.
+An indefinite replacement therefore needs completion or timeout. Explicit
+`mode: 'cached'` reuses successful data without starting or canceling work. If no
+successful entry exists, it falls back to fresh. Native `select` and QueryClient
+defaults apply.
 
-Reserve the exact key exclusively during fresh capture: it must be idle and
-unobserved. Avoid same-key writes, observers, and concurrent fetches until settlement;
-an external manual publication can otherwise look like a stream emission. Other
-keys keep running. Hash through QueryClient defaults; per-call `queryHash` and
-`queryKeyHashFn` are rejected.
+During fresh capture, reserve the exact key exclusively. The query must be idle and
+unobserved. Until settlement, avoid same-key writes, observers, and concurrent
+fetches. An external manual publication can otherwise appear to be a stream
+emission. Other keys keep running. Configure hashing through QueryClient defaults.
+The helper rejects per-call `queryHash` and `queryKeyHashFn`.
 
-Abort and timeout stop the data wait, then cleanup is awaited before resolution or
-rejection. `timeoutMs` does not bound finalization. Local settlement does not await a
-remote cancellation acknowledgement. Dispose client resources after helper settlement.
+Abort and timeout stop the wait for data. The helper then awaits cleanup before
+resolving or rejecting. `timeoutMs` does not bound finalization. Local settlement
+does not await acknowledgment of remote cancellation. After the helper settles,
+dispose client resources.
 
 ## Choose a consistent cache representation
 
-Server and browser need equivalent contracts, inputs, safe prefixes, and hashing.
-Use independent QueryClients, clients, runners, and Scopes. Choose `staleTime` to
-control the first browser refetch; a new browser stream reconnects independently.
+The server and browser need equivalent contracts, inputs, safe prefixes, and hashing.
+Use independent QueryClients, clients, runners, and Scopes. To control the first
+browser refetch, choose `staleTime`. A new browser stream reconnects independently.
 
-Use JSON-safe success DTOs in both caches, or encode decoded domain values at the
-snapshot boundary and decode them during hydration. `select` changes observer data,
-not the cache. `structuredClone` does not restore class prototypes or supply JSON
-codecs for bigint and bytes. This synchronous paired codec keeps rich values through
-hydration and later contract refetch:
+Use JSON-safe success DTOs in both caches. Alternatively, encode decoded domain
+values at the snapshot boundary and decode them during hydration. `select` changes
+observer data while the cache stays unchanged. `structuredClone` neither restores
+class prototypes nor supplies JSON codecs for bigint and bytes. The following
+synchronous paired codec preserves rich values through hydration and later contract
+refetch:
 
 ```ts
 import { defaultShouldDehydrateQuery, dehydrate, hydrate } from '@tanstack/query-core'
@@ -99,47 +103,51 @@ export const hydrateProfile = (queryClient: QueryClient, json: string): void =>
   })
 ```
 
-Reserve this recipe's prefix for unary `Profile` data and declare `Profile` as the
-operation success on both sides. The enclosing snapshot must come from the matching
-application encoder. Synchronous callbacks require service-free synchronous codecs.
+Reserve this recipe's prefix for unary `Profile` data. On both sides, declare
+`Profile` as the operation success. The enclosing snapshot must come from the
+matching application encoder. Synchronous callbacks require service-free synchronous
+codecs.
 
 For effectful or serviceful codecs, run application-owned preparation before native
-dehydration transport or hydration. Await all selected encodings before publishing
-one snapshot. Decode all selected entries before one native `hydrate` call, so one
-failed decode leaves the destination untouched. Never store preparation Effects or
-Promises as query data. Supply codec services through the owning runtime.
+dehydration transport or hydration. Before publishing one snapshot, await all
+selected encodings. Before one native `hydrate` call, decode all selected entries.
+A failed decode then leaves the destination untouched. Keep preparation Effects
+and Promises out of query data. Supply codec services through the owning runtime.
 
 Choose codecs for the complete view:
 
-| View                        | Preserve                                                                      |
-| --------------------------- | ----------------------------------------------------------------------------- |
-| Infinite data               | Every `pages` value and `pageParams` representation                           |
-| Accumulated stream          | Ordered decoded values, including distinct `undefined` and `null`             |
-| Live stream                 | Latest decoded value, with top-level `undefined` already normalized to `null` |
-| HTTP decoded header wrapper | Body and decoded headers, reconstructing the wrapper                          |
-| HTTP metadata               | Decoded data/wrapper, status, and approved raw string headers                 |
+| View                        | Preserve                                                                        |
+| --------------------------- | ------------------------------------------------------------------------------- |
+| Infinite data               | Every `pages` value and `pageParams` representation                             |
+| Accumulated stream          | Ordered decoded values, including distinct `undefined` and `null`               |
+| Live stream                 | Latest decoded value, with top-level `undefined` already normalized to `null`   |
+| HTTP decoded header wrapper | Body and decoded headers, reconstructing the wrapper                            |
+| HTTP metadata               | Decoded data with any declared wrapper, status, and approved raw string headers |
 
-JSON turns undefined array elements into null; use a tagged codec when accumulated
-history distinguishes them. A header wrapper with an undefined body remains a
-wrapper, so preserve that body separately. Encode all declared success alternatives
-and rich page parameters. The package supplies no codec registry or serializer.
+JSON turns undefined array elements into null. If accumulated history distinguishes
+them, use a tagged codec. A header wrapper with an undefined body remains a
+wrapper. Preserve that body separately. Encode all declared success alternatives
+and rich page parameters. The package supplies neither a codec registry nor a
+serializer.
 
-Retain `defaultShouldDehydrateQuery` to omit failed queries. Custom error transfer
-must separately encode `state.error` and `state.fetchFailureReason`; data codecs do
+To omit failed queries, retain `defaultShouldDehydrateQuery`. Custom error transfer
+must separately encode `state.error` and `state.fetchFailureReason`. Data codecs do
 not sanitize Causes, headers, or those fields. A safe error DTO does not automatically
-reconstruct package error classes. Apply application disclosure rules before transport.
+reconstruct package error classes. Before transport, apply the application's
+disclosure rules.
 
 ## Drain request work before disposal
 
 Track query execution, accepted mutations, preparation, and snapshot captures in
-the request owner. On request completion or abort, stop accepting work, abort pending preparation/captures, cancel
-queries, and drain accepted mutations and local finalizers before closing clients or
-runtimes. Cancelling QueryClient work alone does not drain codec preparation or
-acknowledge finalization. Clear the request's private cache as part of its lifecycle.
-The browser acquires independent resources after hydration.
+the request owner. On request completion or abort, stop accepting work. Abort pending
+preparation and captures, then cancel queries. Before closing clients or runtimes,
+drain accepted mutations and local finalizers. Canceling QueryClient work alone
+does not drain codec preparation or acknowledge finalization. Clear the request's
+private cache as part of its lifecycle. After hydration, the browser acquires
+independent resources.
 
 When adding query persistence to the Start example, compose its application-owned
-persister. Replacing it bypasses tracking of query and iterator cleanup.
+persister. A replacement bypasses tracking of query and iterator cleanup.
 
 Sources: [stream snapshots](https://ueberbrot.github.io/effect-api-query/guides/stream-snapshots/),
 [unary hydration](https://ueberbrot.github.io/effect-api-query/guides/hydrate-unary-data/),

@@ -9,20 +9,19 @@ Install the package and TanStack Query Core:
 pnpm add effect-api-query @tanstack/query-core
 ```
 
-With pnpm's default peer installation enabled, this also installs the exact Effect release required
-by the package. If your application already pins Effect or disables automatic peer installation,
-install the Effect version from the package's `peerDependencies` and resolve any peer mismatch
-before continuing. The [package manifest](https://github.com/ueberBrot/effect-api-query/blob/main/package.json)
-and [workspace catalog](https://github.com/ueberBrot/effect-api-query/blob/main/pnpm-workspace.yaml)
-define peer requirements and repository integration versions.
+With pnpm's default peer installation enabled, this command also installs the exact Effect release that the package requires.
+If your application already pins Effect or disables automatic peer installation, install the Effect version from the package's `peerDependencies`.
+Resolve peer mismatches before continuing. The [package manifest](https://github.com/ueberBrot/effect-api-query/blob/main/package.json)
+defines the peer requirements. The [workspace catalog](https://github.com/ueberBrot/effect-api-query/blob/main/pnpm-workspace.yaml)
+lists the versions used in this repository.
 
-React applications also need `@tanstack/react-query`, matching their Query Core version:
+For React, install `@tanstack/react-query` with a version that matches your Query Core version:
 
 ```sh
 pnpm add @tanstack/react-query
 ```
 
-Use strict TypeScript checking, ESM, and an ES2022-capable application. See the
+Enable strict TypeScript checking and use ESM with ES2022 support. See the
 [compatibility reference](/effect-api-query/reference/compatibility-and-limits/) for compiler and framework versions.
 
 Continue with the [HTTP API quick start](/effect-api-query/getting-started/http-quick-start/) or

@@ -3,9 +3,9 @@ title: HTTP Metadata
 description: Read decoded HTTP data, response status, and headers in a separate cache view.
 ---
 
-Buffered HTTP endpoints with query support expose `metadataOptions`. Use your ready `http` utility
-tree and QueryClient from the [HTTP quick start](/effect-api-query/getting-started/http-quick-start/).
-Here, `users.get` declares `params.id` and `query.locale` and returns a user with `id` and `name`.
+Buffered HTTP endpoints with query support expose `metadataOptions`. Start with the ready `http`
+utility tree and QueryClient from the [HTTP quick start](/effect-api-query/getting-started/http-quick-start/).
+In this example, `users.get` declares `params.id` and `query.locale`. It returns a user with `id` and `name`.
 
 ## Read status and headers
 
@@ -18,9 +18,9 @@ const etag = current.headers['etag']
 ```
 
 The cache holds decoded `data`, numeric `status`, and raw string `headers` in a separate view.
-Fetched envelopes and copied headers are immutable. Decoded data keeps its ownership, including
-declared response-header wrappers. Choose safe headers before persistence or hydration.
-Use `metadataOptions.queryKey` or `metadataKey(input)` for exact access; the endpoint's `key()`
+Fetched envelopes and copied headers are immutable. Decoded data retains its existing ownership,
+including declared response-header wrappers. Before persistence or hydration, choose safe headers.
+For exact access, use `metadataOptions.queryKey` or `metadataKey(input)`. The endpoint's `key()`
 matches ordinary and metadata views.
 
 ## Update with an ETag
@@ -40,7 +40,7 @@ const updateUser = new MutationObserver(
 )
 ```
 
-Send the raw ETag **including quotes**, then read the refreshed metadata before another write:
+Send the raw ETag with its quotes. Before another write, read the refreshed metadata:
 
 ```ts
 await updateUser.mutate({
@@ -55,5 +55,5 @@ The server enforces the precondition. Inspect its declared failure through the
 [HTTP execution error](/effect-api-query/guides/handle-failures/#inspect-http-failures).
 The invalidation prefix refreshes data and metadata entries.
 
-Native selection, initial data, skipping, and cancellation also apply. For precise immutability
+Native selection, initial data, skipping, and cancellation also apply. For details of immutability
 and structural-sharing behavior, see [Buffered Metadata](/effect-api-query/reference/http-builders/#buffered-metadata).

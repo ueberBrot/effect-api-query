@@ -4,36 +4,36 @@ description: Generated OpenAPI consumers, encoded request values, multipart uplo
 ---
 
 An external HTTP client can call an Effect HttpApi server through its declared HTTP contract.
-For example, use `openapi-typescript` to generate `paths` from the JSON document returned by
-native `OpenApi.fromApi(api)` and call the server with `openapi-fetch`.
+For example, `openapi-typescript` generates `paths` from the JSON document returned by native
+`OpenApi.fromApi(api)`. The generated types describe calls made with `openapi-fetch`.
 The examples target `openapi-fetch` 0.17.0, `openapi-typescript` 7.13.0, and Effect 4.0.0.
 
-`createHttpApiQueryUtils` accepts a ready Effect HttpApiClient. Keep that client and its runner
-native; the external Promise client calls HTTP independently. This interoperability does not
-establish compatibility with the Effect RPC wire protocol.
+`createHttpApiQueryUtils` accepts a ready Effect HttpApiClient with a native Effect runner.
+An external Promise client calls HTTP independently. Compatibility with the declared HTTP contract
+does not establish compatibility with the Effect RPC wire protocol.
 
 ## Encoded and decoded values
 
 OpenAPI describes encoded HTTP values. An endpoint using `Schema.NumberFromString` accepts a
 string on the wire and a number through the ready Effect client. A generated external client
-returns a plain encoded DTO; native Schema decoding constructs the domain value.
-The external client's generated types add no runtime Schema decoding or validation.
+returns a plain encoded DTO. Native Schema decoding constructs the domain value.
+The external client's generated types provide no runtime Schema decoding or validation.
 
-| Value                   | External client                   | Ready Effect client                                           |
-| ----------------------- | --------------------------------- | ------------------------------------------------------------- |
-| Request path parameter  | `params.path.id: '5'`             | `params.id: 5`                                                |
-| Request query parameter | `params.query.limit: '2'`         | `query.limit: 2`                                              |
-| Declared request header | `params.header['x-factor']: '3'`  | `headers['x-factor']: 3`                                      |
-| JSON request payload    | `body.amount: '7'`                | `payload.amount: 7`                                           |
-| Response body           | Plain object with `total: '17'`   | Schema class with `total: 17` and methods                     |
-| Response headers        | Raw strings on `response.headers` | Decoded declared header wrapper; raw strings in metadata view |
+| Value                   | External client                   | Ready Effect client                                                |
+| ----------------------- | --------------------------------- | ------------------------------------------------------------------ |
+| Request path parameter  | `params.path.id: '5'`             | `params.id: 5`                                                     |
+| Request query parameter | `params.query.limit: '2'`         | `query.limit: 2`                                                   |
+| Declared request header | `params.header['x-factor']: '3'`  | `headers['x-factor']: 3`                                           |
+| JSON request payload    | `body.amount: '7'`                | `payload.amount: 7`                                                |
+| Response body           | Plain object with `total: '17'`   | Schema class with `total: 17` and methods                          |
+| Response headers        | Raw strings on `response.headers` | Decoded declared header wrapper, with raw strings in metadata view |
 
 ## Call the declared HTTP contract
 
-Generate `paths` from your server's OpenAPI document. Its declared paths, headers and success/error
-responses determine the external client interface; the utility tree's decoded input does not.
+The server's OpenAPI document supplies `paths`. Declared paths, headers, success responses, and
+error responses determine the external client interface. The utility tree's decoded input does not.
 
-In the external client module, use the generated `paths` type and create the client:
+The external client module uses the generated `paths` type:
 
 ```ts
 import createClient from 'openapi-fetch'
@@ -43,7 +43,7 @@ import type { paths } from './openapi-generated.ts'
 const external = createClient<paths>({ baseUrl: 'https://api.example.test' })
 ```
 
-For a contract declaring `POST /reports/:id` with these fields, send encoded values:
+For a contract declaring `POST /reports/:id` with these fields, the request contains encoded values:
 
 ```ts
 const report = await external.POST('/reports/{id}', {
@@ -60,10 +60,11 @@ if (report.error) {
 const revision = report.response.headers.get('x-revision')
 ```
 
-Read declared failures through `error` and inspect `response.status`; the external client does
-not construct an Effect execution-error wrapper. Its `Response` keeps status and raw headers.
-The native [metadata view](/effect-api-query/reference/http-builders/#buffered-metadata) instead
-keeps decoded data and immutable plain status/header snapshots.
+Declared failures appear in `error`, with the status in `response.status`.
+The external client does not construct an Effect execution-error wrapper.
+Its `Response` retains status and raw headers. The native
+[metadata view](/effect-api-query/reference/http-builders/#buffered-metadata) retains decoded data
+alongside immutable plain snapshots of status and headers.
 
 Array query parameters use repeated names, including a single-element array. JSON array
 responses retain their ordinary representation. GET and form-urlencoded payloads have separate
@@ -71,24 +72,25 @@ responses retain their ordinary representation. GET and form-urlencoded payloads
 
 ## Serialize multipart uploads explicitly
 
-Map a binary schema to `Blob` with the generator's `transform` hook. Supply a `bodySerializer`
-that builds `FormData` from the declared text fields and files, preserving filenames. Let Fetch
-set the multipart boundary; the default JSON serializer receives HTTP 415 from a multipart-only
-endpoint. The ready Effect client instead takes `FormData` directly as its decoded payload;
-see [Upload a File](/effect-api-query/guides/http-queries-and-mutations/#upload-a-file).
+The generator's `transform` hook supports mapping a binary schema to `Blob`.
+Multipart uploads require a `bodySerializer` that builds `FormData` from declared text fields and
+files while preserving filenames. Fetch sets the multipart boundary.
+The default JSON serializer receives HTTP 415 from a multipart-only endpoint.
+The ready Effect client takes `FormData` directly as its decoded payload.
+See [Upload a File](/effect-api-query/guides/http-queries-and-mutations/#upload-a-file).
 
 ## SSE boundary
 
-Request `parseAs: 'stream'` for a raw `ReadableStream<Uint8Array>`. It does not parse events, decode
-Schema values, or turn a reserved failure event into an error. Default JSON parsing fails on
-an SSE response.
+The `parseAs: 'stream'` option returns a raw `ReadableStream<Uint8Array>`.
+It does not parse events, decode Schema values, or turn a reserved failure event into an error.
+Default JSON parsing fails on an SSE response.
 
-Effect's SSE data mode encodes each value as JSON in an event's `data` field. A custom event can
-also carry `id` and `event`. A stream failure uses the reserved event name
-`effect/http-api/stream/failure` and an encoded Cause body while HTTP status remains 200.
-The generated document records these details in `x-effect-stream`; this client does not consume
-that extension. Typed SSE consumption requires the native ready Effect client or an
-application-owned compatible decoder. Raw stream access alone gives no typed SSE guarantee.
+Effect's SSE data mode encodes each value as JSON in an event's `data` field.
+A custom event can also carry `id` and `event`. A stream failure uses the reserved event name
+`effect/http-api/stream/failure` and an encoded Cause body. HTTP status remains 200.
+The generated document records these details in `x-effect-stream`, which this client does not consume.
+Typed SSE consumption requires the native ready Effect client or a compatible decoder owned by the
+application. Raw stream access alone gives no typed SSE guarantee.
 
 See the [external client's API](https://openapi-ts.dev/openapi-fetch/api) and
 [generator's Node API](https://openapi-ts.dev/node) for their configuration.

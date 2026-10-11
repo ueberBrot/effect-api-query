@@ -5,12 +5,12 @@ description: Build typed RPC and HTTP writes and refresh affected queries.
 
 Use your ready utility tree and QueryClient from the [RPC quick start](/effect-api-query/getting-started/quick-start/)
 or [HTTP quick start](/effect-api-query/getting-started/http-quick-start/).
-The examples assume `users.create` accepts a `name` and returns a user with `id` and `name`.
+In these examples, `users.create` accepts a `name` and returns a user with `id` and `name`.
 Import `MutationObserver` from `@tanstack/query-core` for imperative execution.
 
 ## Execute a write
 
-Build options once, then supply each mutation's variables when it runs:
+Build the options once. Supply each mutation's variables when it runs:
 
 ```ts
 const createUser = new MutationObserver(
@@ -40,10 +40,10 @@ execution errors. Mutation keys identify the operation and exclude variables. Su
 
 ## Choose cache updates
 
-Writes refresh reads through your callback policy. Invalidate affected generated prefixes,
+Choose how your callbacks refresh reads after a write. Invalidate affected generated prefixes,
 seed a known result with `setQueryData`, or apply an
 [optimistic write](/effect-api-query/guides/optimistic-writes/).
-The library derives builders from the contract; the call site chooses read or write semantics.
+The library derives builders from the contract. The call site chooses read or write semantics.
 Buffered multipart endpoints support mutations only.
 
 See [HTTP uploads](/effect-api-query/guides/http-queries-and-mutations/#upload-a-file),
