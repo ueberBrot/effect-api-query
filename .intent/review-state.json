@@ -431,28 +431,35 @@
       ]
     },
     "source:vite.config.ts": {
-      "fingerprint": "bcbf70904051b7cfa515304490b57adddcebca804881f06ab864dc8f6eee7239",
+      "fingerprint": "cf5ab6a8493d687d112949fc788baabc197631de060d5f576d367e5df920782b",
       "snapshot": {
-        "vite.config.ts": "b48031f5feeae54b990ee8621d7b46aa6134b40d9c0123dfbbfe38db7cee851e"
+        "vite.config.ts": "97c276e255efbb004c3fc88b50dbe0a405c4004c167b1d6fdce6970d0b82c43f"
       },
-      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "head": "f3ba2a62cdb0b28eaa6e592b010bb6879466cda2",
       "outcome": "no-change",
-      "reason": "Allows comment-free assertions and intentional empty catch blocks while preserving typed lint and Effect safety diagnostics. Consumer guidance and task coverage are unchanged.",
+      "reason": "Browser tasks now own production build ordering rather than nested preview invocations. Hosted documentation checks omit the local prerequisite while preserving missing versus empty environment values. The exported package contract and shipped consumer guidance remain unchanged.",
       "evidence": [
-        "Reviewed the actual diff and current source at vite.config.ts against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
-        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+        "Diff reviewed against f3ba2a62cdb0b28eaa6e592b010bb6879466cda2; actual PR base 5b91ddb1de13970365669c887b9d767ea417fbd4. Public library source, compiler fixtures, runtime cases, README, documentation pages and skills were not changed in this batch.",
+        "Native uncached typecheck passed 141 files and native pack attw/publint. Scoped native format passed seven affected configuration files; final YAML parsed and browser/trigger/publication prerequisite expressions were inspected.",
+        "Four existing application Chromium acceptance cases and all seven existing documentation Chromium cases passed against prepared outputs. Their preview logs contain no pack or build invocation. Hosted docs Playwright list mode listed seven cases without building a local site. Receipts: /tmp/effect-api-query-ci-audit/.",
+        "All three shared planning documents were read: _artifacts/domain_map.yaml retains the same ten consumer tasks/failure modes, _artifacts/skill_spec.md retains accurate source-backed coverage and boundaries, and _artifacts/skill_tree.yaml retains the same owned skill, six references, source mappings, prerequisites and distribution. CI-only orchestration requires no guidance or planning rewrite.",
+        "The first hosted run of artifact reuse and the reusable release/deployment workflows remains unverified locally. No package publication or Pages deployment was performed."
       ]
     },
     "source:.github/workflows/release.yml": {
-      "fingerprint": "528b10b43b0c4dc9b65c941d28a96cf3d4e962e97ecd1b5b5d6385105d335559",
+      "fingerprint": "020cfeccbebeae32db3a779d8983c0151eb4d8b91405ae20716a365effb40382",
       "snapshot": {
-        ".github/workflows/release.yml": "5592cad0da1c67e86df1b789a0e991855dda653ef588e0b827b865b5f31963c2"
+        ".github/workflows/release.yml": "17d01b72d314722784ea0d032426ca55b1860629234adfcc0f1c72c279b95b2b"
       },
-      "head": "1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d",
+      "head": "f3ba2a62cdb0b28eaa6e592b010bb6879466cda2",
       "outcome": "no-change",
-      "reason": "Verifier-only archive downloads, selection/export and consumer browser steps were retired. Native select-mode, pack, publish and pack-dir-artifact-id routing remain; main validation remains before future publication. No new developer integration task or publication occurred.",
+      "reason": "Every main push and manual run invokes shared validation once. Pending changesets still create a version PR on main; publication still requires publish mode, a main push, completed validation and native Changesets packing. These are release orchestration changes.",
       "evidence": [
-        "Base 1e235b1b5f4e4f6d6d34ce397ad0b573e6c5392d; vp run --no-cache quality passed: 38 files, 283 runtime tests, strict public and server-local fixtures on TS 7.0.2 and TS 5.9.3, native pack/attw/publint, Effect diagnostics and Fallow audits. Both example builds and docs-build passed (44 pages; docs parity and Astro diagnostics). Existing docs-e2e passed 14 Chromium/Firefox tests. Native skills-check validated the owned skill. Native source construction-baseline passed. Logs are under /tmp/effect-api-query-implementation/notes/131-*. No fresh independent consumer session ran for this reference/source-mapping update; retired installation/certification matrices were not repeated. The optional generic skill-creator validator rejected the existing Intent sources frontmatter field; native Intent validation passed and its required schema is preserved. Reviewed item: .github/workflows/release.yml."
+        "Diff reviewed against f3ba2a62cdb0b28eaa6e592b010bb6879466cda2; actual PR base 5b91ddb1de13970365669c887b9d767ea417fbd4. Public library source, compiler fixtures, runtime cases, README, documentation pages and skills were not changed in this batch.",
+        "Native uncached typecheck passed 141 files and native pack attw/publint. Scoped native format passed seven affected configuration files; final YAML parsed and browser/trigger/publication prerequisite expressions were inspected.",
+        "Four existing application Chromium acceptance cases and all seven existing documentation Chromium cases passed against prepared outputs. Their preview logs contain no pack or build invocation. Hosted docs Playwright list mode listed seven cases without building a local site. Receipts: /tmp/effect-api-query-ci-audit/.",
+        "All three shared planning documents were read: _artifacts/domain_map.yaml retains the same ten consumer tasks/failure modes, _artifacts/skill_spec.md retains accurate source-backed coverage and boundaries, and _artifacts/skill_tree.yaml retains the same owned skill, six references, source mappings, prerequisites and distribution. CI-only orchestration requires no guidance or planning rewrite.",
+        "The first hosted run of artifact reuse and the reusable release/deployment workflows remains unverified locally. No package publication or Pages deployment was performed."
       ]
     },
     "source:e2e/browser-test-config.ts": {
@@ -485,16 +492,19 @@
       ]
     },
     "source:playwright.docs.config.ts": {
-      "fingerprint": "9ec6628f761e4c0bfe5d7a1575878947a037f5b9a0b21bf7dc8c2fd8e2343c41",
+      "fingerprint": "f66c846d0924902b33bbc055ad0972bff368f4d48059f552f48a5096ae3be496",
       "snapshot": {
-        "playwright.docs.config.ts": "395f4dc3c46154c74a8134ed21460bc155d4886bdc7cf3525b1e128e11302065"
+        "playwright.docs.config.ts": "3578d202bd05154db9e17f412fad7e2a7bfd707e1ea997fa0017cf5693498181"
       },
-      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "head": "f3ba2a62cdb0b28eaa6e592b010bb6879466cda2",
       "outcome": "no-change",
-      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
+      "reason": "The local documentation preview serves its prepared site. The native docs-e2e task owns the local build, and hosted DOCS_BASE_URL checks still omit a local server and build. Existing documentation acceptance cases are unchanged.",
       "evidence": [
-        "Reviewed the actual diff and current source at playwright.docs.config.ts against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
-        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+        "Diff reviewed against f3ba2a62cdb0b28eaa6e592b010bb6879466cda2; actual PR base 5b91ddb1de13970365669c887b9d767ea417fbd4. Public library source, compiler fixtures, runtime cases, README, documentation pages and skills were not changed in this batch.",
+        "Native uncached typecheck passed 141 files and native pack attw/publint. Scoped native format passed seven affected configuration files; final YAML parsed and browser/trigger/publication prerequisite expressions were inspected.",
+        "Four existing application Chromium acceptance cases and all seven existing documentation Chromium cases passed against prepared outputs. Their preview logs contain no pack or build invocation. Hosted docs Playwright list mode listed seven cases without building a local site. Receipts: /tmp/effect-api-query-ci-audit/.",
+        "All three shared planning documents were read: _artifacts/domain_map.yaml retains the same ten consumer tasks/failure modes, _artifacts/skill_spec.md retains accurate source-backed coverage and boundaries, and _artifacts/skill_tree.yaml retains the same owned skill, six references, source mappings, prerequisites and distribution. CI-only orchestration requires no guidance or planning rewrite.",
+        "The first hosted run of artifact reuse and the reusable release/deployment workflows remains unverified locally. No package publication or Pages deployment was performed."
       ]
     },
     "source:tsconfig.json": {
@@ -523,17 +533,19 @@
       ]
     },
     "source:.github/workflows/ci.yml": {
-      "fingerprint": "2cc9c350f72e4978f0a280c50fe092cebcb834c05c14fdc52d887da2be89872e",
+      "fingerprint": "cad5322457ab5941301e112617a26aee236fcae470a54f43881271389af5e9cf",
       "snapshot": {
-        ".github/workflows/ci.yml": "73d896c802c0f78b275c14144ddae557b7efbbe296599be041e54791cda9714f"
+        ".github/workflows/ci.yml": "91175ea9b646dbacc092ab0860a721331cdc4e312bc5f3b41fd3c6f8e0201f04"
       },
-      "head": "6893603eab70bd9d67e9848414eccc8a3421d870",
+      "head": "f3ba2a62cdb0b28eaa6e592b010bb6879466cda2",
       "outcome": "no-change",
-      "reason": "The existing read-only workflow retains structural skill validation and now runs the installed native maintainer check with full checkout history, the actual PR base through a quoted environment variable, and a GitHub summary. This maintainer gate changes no library integration behavior or recipe.",
+      "reason": "Source formatting, skills, typed lint, compiler fixtures, Effect diagnostics, Fallow and runtime checks remain. Successful example and documentation builds feed the same three browser projects through current-run artifacts. This changes CI scheduling and reuse, not library behavior or consumer tasks.",
       "evidence": [
-        ".github/workflows/ci.yml parsed with the installed YAML parser; contents:read, persist-credentials:false, fetch-depth:0, structural gate, quoted PR-base env, and both native check branches verified.",
-        "Installed native maintainer-commands.md and workflow-security.md reviewed before this existing workflow edit.",
-        "Current batch: scoped vp run format, native vp run skills-check, and installed YAML parsing passed; vp exec intent maintainer sync reported nothing to synchronize."
+        "Diff reviewed against f3ba2a62cdb0b28eaa6e592b010bb6879466cda2; actual PR base 5b91ddb1de13970365669c887b9d767ea417fbd4. Public library source, compiler fixtures, runtime cases, README, documentation pages and skills were not changed in this batch.",
+        "Native uncached typecheck passed 141 files and native pack attw/publint. Scoped native format passed seven affected configuration files; final YAML parsed and browser/trigger/publication prerequisite expressions were inspected.",
+        "Four existing application Chromium acceptance cases and all seven existing documentation Chromium cases passed against prepared outputs. Their preview logs contain no pack or build invocation. Hosted docs Playwright list mode listed seven cases without building a local site. Receipts: /tmp/effect-api-query-ci-audit/.",
+        "All three shared planning documents were read: _artifacts/domain_map.yaml retains the same ten consumer tasks/failure modes, _artifacts/skill_spec.md retains accurate source-backed coverage and boundaries, and _artifacts/skill_tree.yaml retains the same owned skill, six references, source mappings, prerequisites and distribution. CI-only orchestration requires no guidance or planning rewrite.",
+        "The first hosted run of artifact reuse and the reusable release/deployment workflows remains unverified locally. No package publication or Pages deployment was performed."
       ]
     },
     "source:tests/packed-consumer/construction-baseline.mts": {
@@ -1412,6 +1424,54 @@
       "evidence": [
         "Reviewed the actual diff and current source at examples/vite-react/src/styles/tailwind.css against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
         "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+      ]
+    },
+    "source:.github/actions/setup-repository/action.yml": {
+      "fingerprint": "ed0796c080ab8de729e657ad263c3df80c8170cac6ade354db92d97d5f85a4b8",
+      "snapshot": {
+        ".github/actions/setup-repository/action.yml": "1e48c3997b540b68b47e4dc5ef7bdb0ab6c9b19adc307f5a0a1280bef08a1fae"
+      },
+      "head": "f3ba2a62cdb0b28eaa6e592b010bb6879466cda2",
+      "outcome": "no-change",
+      "reason": "The shared setup still provisions the pinned pnpm executable and runs one frozen workspace install. Every caller uses dependency caching, so the unused cache switch was removed. This changes repository provisioning only.",
+      "evidence": [
+        "Diff reviewed against f3ba2a62cdb0b28eaa6e592b010bb6879466cda2; actual PR base 5b91ddb1de13970365669c887b9d767ea417fbd4. Public library source, compiler fixtures, runtime cases, README, documentation pages and skills were not changed in this batch.",
+        "Native uncached typecheck passed 141 files and native pack attw/publint. Scoped native format passed seven affected configuration files; final YAML parsed and browser/trigger/publication prerequisite expressions were inspected.",
+        "Four existing application Chromium acceptance cases and all seven existing documentation Chromium cases passed against prepared outputs. Their preview logs contain no pack or build invocation. Hosted docs Playwright list mode listed seven cases without building a local site. Receipts: /tmp/effect-api-query-ci-audit/.",
+        "All three shared planning documents were read: _artifacts/domain_map.yaml retains the same ten consumer tasks/failure modes, _artifacts/skill_spec.md retains accurate source-backed coverage and boundaries, and _artifacts/skill_tree.yaml retains the same owned skill, six references, source mappings, prerequisites and distribution. CI-only orchestration requires no guidance or planning rewrite.",
+        "The first hosted run of artifact reuse and the reusable release/deployment workflows remains unverified locally. No package publication or Pages deployment was performed."
+      ]
+    },
+    "source:.github/workflows/deploy-docs.yml": {
+      "fingerprint": "b23c6bf5ef73b244b420516cd31b713672423d7d342472ca4e90e3570a3bec41",
+      "snapshot": {
+        ".github/workflows/deploy-docs.yml": "ab245e4f9057e32a15906f0202c4264842da05a1f44fa9c6969d59e70b97b31a"
+      },
+      "head": "f3ba2a62cdb0b28eaa6e592b010bb6879466cda2",
+      "outcome": "no-change",
+      "reason": "A release restores the same validated documentation site from its current workflow run. Standalone manual deployment retains checkout, native docs checks and build. The site contents and library guidance are unchanged.",
+      "evidence": [
+        "Diff reviewed against f3ba2a62cdb0b28eaa6e592b010bb6879466cda2; actual PR base 5b91ddb1de13970365669c887b9d767ea417fbd4. Public library source, compiler fixtures, runtime cases, README, documentation pages and skills were not changed in this batch.",
+        "Native uncached typecheck passed 141 files and native pack attw/publint. Scoped native format passed seven affected configuration files; final YAML parsed and browser/trigger/publication prerequisite expressions were inspected.",
+        "Four existing application Chromium acceptance cases and all seven existing documentation Chromium cases passed against prepared outputs. Their preview logs contain no pack or build invocation. Hosted docs Playwright list mode listed seven cases without building a local site. Receipts: /tmp/effect-api-query-ci-audit/.",
+        "All three shared planning documents were read: _artifacts/domain_map.yaml retains the same ten consumer tasks/failure modes, _artifacts/skill_spec.md retains accurate source-backed coverage and boundaries, and _artifacts/skill_tree.yaml retains the same owned skill, six references, source mappings, prerequisites and distribution. CI-only orchestration requires no guidance or planning rewrite.",
+        "The first hosted run of artifact reuse and the reusable release/deployment workflows remains unverified locally. No package publication or Pages deployment was performed."
+      ]
+    },
+    "source:playwright.config.ts": {
+      "fingerprint": "0acc85c38e3fdfd4e5887ca39bc139a54cdbee979d61aefd21b66d3780b5d1f9",
+      "snapshot": {
+        "playwright.config.ts": "fe31f0f28ff40bd607e7b39b71426dd91ad1c51121bd2bed018bd7b83675b614"
+      },
+      "head": "f3ba2a62cdb0b28eaa6e592b010bb6879466cda2",
+      "outcome": "no-change",
+      "reason": "Application previews serve prepared outputs. Native browser tasks own their build prerequisites; CI skips them only after successful current-run artifact restoration. Existing acceptance cases and tested application behavior are unchanged.",
+      "evidence": [
+        "Diff reviewed against f3ba2a62cdb0b28eaa6e592b010bb6879466cda2; actual PR base 5b91ddb1de13970365669c887b9d767ea417fbd4. Public library source, compiler fixtures, runtime cases, README, documentation pages and skills were not changed in this batch.",
+        "Native uncached typecheck passed 141 files and native pack attw/publint. Scoped native format passed seven affected configuration files; final YAML parsed and browser/trigger/publication prerequisite expressions were inspected.",
+        "Four existing application Chromium acceptance cases and all seven existing documentation Chromium cases passed against prepared outputs. Their preview logs contain no pack or build invocation. Hosted docs Playwright list mode listed seven cases without building a local site. Receipts: /tmp/effect-api-query-ci-audit/.",
+        "All three shared planning documents were read: _artifacts/domain_map.yaml retains the same ten consumer tasks/failure modes, _artifacts/skill_spec.md retains accurate source-backed coverage and boundaries, and _artifacts/skill_tree.yaml retains the same owned skill, six references, source mappings, prerequisites and distribution. CI-only orchestration requires no guidance or planning rewrite.",
+        "The first hosted run of artifact reuse and the reusable release/deployment workflows remains unverified locally. No package publication or Pages deployment was performed."
       ]
     }
   }

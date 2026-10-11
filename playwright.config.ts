@@ -7,7 +7,7 @@ export default defineConfig(browserTestDefaults, {
   testDir: './e2e',
   webServer: [
     browserTestServer('vp run server', 'http://127.0.0.1:3001/health'),
-    browserTestServer('vp run --no-cache vite-react-preview', 'http://127.0.0.1:4173'),
-    browserTestServer('vp run --no-cache tanstack-start-preview', 'http://127.0.0.1:3000'),
+    browserTestServer('vp run --ignore-depends-on vite-react-preview', 'http://127.0.0.1:4173'),
+    browserTestServer('vp run --ignore-depends-on tanstack-start-preview', 'http://127.0.0.1:3000'),
   ],
 })

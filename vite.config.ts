@@ -1,4 +1,5 @@
 import { strict as effectStrict } from '@effect/tsgo/oxlint-presets'
+import { ConfigProvider, Effect } from 'effect'
 import ultraciteAntiSlop from 'ultracite/oxlint/anti-slop'
 import ultraciteCore from 'ultracite/oxlint/core'
 import ultraciteReact from 'ultracite/oxlint/react'
@@ -26,6 +27,7 @@ const ignoredPaths = [
 
 const testFiles = ['tests/**/*.test.ts', 'examples/**/*.test.{ts,tsx}']
 const effectTestBlocks = ['it.effect', 'it.live', 'it.scoped', 'it.scopedLive']
+const applicationBuildTasks = ['vite-react-build', 'tanstack-start-build']
 
 const vitestPreset: OxlintConfig = {
   ...ultraciteVitest,
@@ -321,18 +323,22 @@ export default defineConfig({
       e2e: {
         command: 'playwright test',
         cache: false,
+        dependsOn: applicationBuildTasks,
       },
       'e2e:chromium': {
         command: 'playwright test --project=chromium',
         cache: false,
+        dependsOn: applicationBuildTasks,
       },
       'e2e:firefox': {
         command: 'playwright test --project=firefox',
         cache: false,
+        dependsOn: applicationBuildTasks,
       },
       'e2e:webkit': {
         command: 'playwright test --project=webkit',
         cache: false,
+        dependsOn: applicationBuildTasks,
       },
       quality: {
         command: ['vp run check', 'vp run effect-check', 'vp run fallow', 'vp run test'],
@@ -397,6 +403,12 @@ export default defineConfig({
       'docs-e2e': {
         command: 'playwright test --config playwright.docs.config.ts',
         cache: false,
+        dependsOn:
+          Effect.runSync(
+            ConfigProvider.fromEnv({ preserveEmptyStrings: true }).load(['DOCS_BASE_URL']),
+          )?.value === undefined
+            ? ['docs-build']
+            : [],
       },
       'docs-preview': {
         command: 'vp run --filter @effect-api-query/docs preview',

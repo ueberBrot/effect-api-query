@@ -1,14 +1,6 @@
 name: Release
 
 on:
-  pull_request:
-    paths:
-      - .changeset/**
-      - .github/workflows/release.yml
-      - package.json
-      - pnpm-lock.yaml
-      - pnpm-workspace.yaml
-      - vite.config.ts
   push:
     branches:
       - main
@@ -21,6 +13,12 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  validation:
+    name: Repository validation
+    permissions:
+      contents: read
+    uses: ./.github/workflows/ci.yml
+
   select-mode:
     name: Select release mode
     runs-on: ubuntu-latest
@@ -41,8 +39,6 @@ jobs:
       - &setup_repository
         name: Set up repository
         uses: ./.github/actions/setup-repository
-        with:
-          cache: false
 
       - name: Select Changesets mode
         id: changesets
@@ -63,7 +59,7 @@ jobs:
     if: needs.select-mode.outputs.mode == 'version' && github.event_name == 'push'
     needs:
       - select-mode
-      - quality-and-pack
+      - validation
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -83,10 +79,12 @@ jobs:
 
   quality-and-pack:
     name: Validate and pack release artifact
-    if: needs.select-mode.outputs.mode != 'none' || github.event_name != 'push'
-    needs: select-mode
+    if: needs.select-mode.outputs.mode == 'publish'
+    needs:
+      - select-mode
+      - validation
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 15
     permissions:
       contents: read
     outputs:
@@ -97,23 +95,13 @@ jobs:
       - *setup_repository
 
       - name: Construct package for release packing
-        if: needs.select-mode.outputs.mode == 'publish' || github.event_name != 'push'
         run: vp run pack
 
       - name: Pack release artifact
-        if: needs.select-mode.outputs.mode == 'publish' || github.event_name != 'push'
         id: pack
         uses: changesets/action/pack@8488615a623b1b9c987934bb89eae8af6a946ac1 # v2.1.1
         with:
           publish-plan-artifact-id: ${{ needs.select-mode.outputs.publish-plan-artifact-id }}
-
-      - name: Install browser engines and system dependencies
-        if: github.event_name == 'push'
-        run: vp exec playwright install --with-deps chromium firefox webkit
-
-      - name: Run complete repository validation
-        if: github.event_name == 'push'
-        run: vp run validate
 
   publish:
     name: Publish release artifact
@@ -150,3 +138,5 @@ jobs:
       id-token: write
       pages: write
     uses: ./.github/workflows/deploy-docs.yml
+    with:
+      build-artifact: documentation-build

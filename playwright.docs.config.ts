@@ -23,7 +23,7 @@ const docsConfig: PlaywrightTestConfig = {
 if (hostedOrigin === undefined) {
   docsConfig.webServer = {
     ...browserTestServer(
-      'vp run docs-preview --host 127.0.0.1 --port 4321',
+      'vp run --ignore-depends-on docs-preview --host 127.0.0.1 --port 4321',
       'http://127.0.0.1:4321/effect-api-query/',
     ),
     env: { ASTRO_PREVIEW_BACKGROUND: '1' },
