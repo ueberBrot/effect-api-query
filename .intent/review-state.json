@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "95fabe60cb96109e0e8cc310d7a57d01ecc397cbdd19820599bb4113868beb86",
+      "fingerprint": "707c8eff0f7f314a6782661ff584f7f7ea872abbd29132a55f92b6616569e6a3",
       "snapshot": {
         "GLOSSARY.md": "67de06543ad2fd9fd2917419e19d1f071e7b6eee53d48fca05e9dddfc739c683",
         "README.md": "7af677dd785f95bf08b4a9dbafd10f1b0a2cd9ce40d42edf359ede1e59de6fd3",
@@ -48,7 +48,7 @@
         "apps/docs/src/content/docs/reference/errors.md": "4454725375e05ea7a7d976d798c1c1d0c2731eefc79043f5e40dba88154069b1",
         "apps/docs/src/content/docs/reference/external-http-clients.md": "4ed288ccf29f3bcdf2e3773172282eefe0ef0f84ed0fd1bc347e5cd388743aba",
         "apps/docs/src/content/docs/reference/factory.md": "7d972a9ff279ce80164aba793cbeb5a3e1621e6e16be97392b6faa7493de339c",
-        "apps/docs/src/content/docs/reference/generated-builders.md": "4a6403a4d5f62eb222cecb71f6cfaee631854ac706c702b19388467e313dc4a4",
+        "apps/docs/src/content/docs/reference/generated-builders.md": "eabe68d7cbecc4a15db83a5c97da48321d2ffffbf2d6869ff5323a80b8f205db",
         "apps/docs/src/content/docs/reference/http-factory.md": "13a238cb7de1fdd5b92f6bccc6061ff4cdfe49b23a5e0b52cc3126f031a6f39d",
         "apps/docs/src/content/docs/reference/performance.md": "2f68c31cae28de0a84b1ce77f065481d37899171b78d9593ff65e017ff75d97a",
         "apps/docs/src/content/docs/reference/public-exports.md": "500d864720857c9098b325d6018b20b5ad6c1e666ef326921721ffdf6435dcb2",
@@ -196,15 +196,15 @@
         "tests/types/tanstack-start-contract.ts": "51681e3d0d7504a614d490f18adb6f44db82d34b9d4d7cb9cf941aea33de284f",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "a7448d01cb97f369f87642ea3628d056641a6a48",
+      "head": "eac8805641c1acde48c4414dda2abe7042d1b795",
       "outcome": "no-change",
-      "reason": "The final runtime validation fixture removes a ternary whose two branches call the identical conditional-input builder. Normal commit formatting also expands the already-reviewed optimistic fixture tracker injection over several lines. Neither changes API behavior, task coverage, recommendations or source mappings.",
+      "reason": "The RPC reference now describes input: skipToken consistently with the existing shipped query-patterns guidance and current object-only public builders. The removed bare-sentinel claim was a human-reference error; the seven shipped skill files already use the correct form and require no rewrite.",
       "evidence": [
-        "Reviewed a7448d0..working diff and actual fixtures against the preceding fingerprint snapshot. Uncached typecheck passes 140 files, and the streaming suite passes all 22 cases; its native dependencies rerun both TypeScript 7.0.2 and 5.9.3 fixture compilers. Earlier full focused suite passes 124 cases. Read all three planning records: domain map and specification already record input-field skipping, ten tasks and task evidence; skill tree maps both affected fixture files. Logs architecture-typecheck-final-2.log and architecture-streaming-final-2.log. No fresh consumer-session evaluation repeated for these equivalent test/format changes."
+        "At eac8805 plus the generated-builders.md correction: inspected the actual reference diff, src/core/utility-tree.ts preparation, public-contract.ts direct-form negative compiler fixtures and skills/effect-api-query/references/query-patterns.md. Uncached docs-build passed Astro diagnostics, 46-page build, search and internal links (reference-fix-docs-build.log). Existing final public compiler and 124 in-memory runtime receipts cover the unchanged API. No fresh consumer activation/task evaluation repeated for this reference-only correction; offline Skills CLI delivery separately proves seven exact files and thirteen resolved links, not consumer-task reliability."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "0370ae3c659986920fc21a2121c8c4e2bb0b3f2b3f79d2c3c2da7efa33cc9bd6",
+      "fingerprint": "718d9de9ccfd5dadc4476f9698693974234cd481254d50924ff0ff37b30d05d0",
       "snapshot": {
         "GLOSSARY.md": "67de06543ad2fd9fd2917419e19d1f071e7b6eee53d48fca05e9dddfc739c683",
         "README.md": "7af677dd785f95bf08b4a9dbafd10f1b0a2cd9ce40d42edf359ede1e59de6fd3",
@@ -252,7 +252,7 @@
         "apps/docs/src/content/docs/reference/errors.md": "4454725375e05ea7a7d976d798c1c1d0c2731eefc79043f5e40dba88154069b1",
         "apps/docs/src/content/docs/reference/external-http-clients.md": "4ed288ccf29f3bcdf2e3773172282eefe0ef0f84ed0fd1bc347e5cd388743aba",
         "apps/docs/src/content/docs/reference/factory.md": "7d972a9ff279ce80164aba793cbeb5a3e1621e6e16be97392b6faa7493de339c",
-        "apps/docs/src/content/docs/reference/generated-builders.md": "4a6403a4d5f62eb222cecb71f6cfaee631854ac706c702b19388467e313dc4a4",
+        "apps/docs/src/content/docs/reference/generated-builders.md": "eabe68d7cbecc4a15db83a5c97da48321d2ffffbf2d6869ff5323a80b8f205db",
         "apps/docs/src/content/docs/reference/http-factory.md": "13a238cb7de1fdd5b92f6bccc6061ff4cdfe49b23a5e0b52cc3126f031a6f39d",
         "apps/docs/src/content/docs/reference/performance.md": "2f68c31cae28de0a84b1ce77f065481d37899171b78d9593ff65e017ff75d97a",
         "apps/docs/src/content/docs/reference/public-exports.md": "500d864720857c9098b325d6018b20b5ad6c1e666ef326921721ffdf6435dcb2",
@@ -400,11 +400,11 @@
         "tests/types/tanstack-start-contract.ts": "51681e3d0d7504a614d490f18adb6f44db82d34b9d4d7cb9cf941aea33de284f",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "a7448d01cb97f369f87642ea3628d056641a6a48",
+      "head": "eac8805641c1acde48c4414dda2abe7042d1b795",
       "outcome": "no-change",
-      "reason": "The final runtime validation fixture removes a ternary whose two branches call the identical conditional-input builder. Normal commit formatting also expands the already-reviewed optimistic fixture tracker injection over several lines. Neither changes API behavior, task coverage, recommendations or source mappings.",
+      "reason": "All three planning records remain accurate: domain_map.yaml owns input-field skipping among the same ten tasks; skill_spec.md keeps the six-reference scope and current validated architecture batch; skill_tree.yaml maps the corrected RPC reference to the same shipped skill. The correction adds no task, reference, package, source mapping or ownership decision.",
       "evidence": [
-        "Reviewed a7448d0..working diff and actual fixtures against the preceding fingerprint snapshot. Uncached typecheck passes 140 files, and the streaming suite passes all 22 cases; its native dependencies rerun both TypeScript 7.0.2 and 5.9.3 fixture compilers. Earlier full focused suite passes 124 cases. Read all three planning records: domain map and specification already record input-field skipping, ten tasks and task evidence; skill tree maps both affected fixture files. Logs architecture-typecheck-final-2.log and architecture-streaming-final-2.log. No fresh consumer-session evaluation repeated for these equivalent test/format changes."
+        "Read _artifacts/domain_map.yaml, _artifacts/skill_spec.md and _artifacts/skill_tree.yaml against the one-file human-reference diff and current shipped query-patterns reference. Native maintainer sync produced no content change; uncached documentation checks/build passed (reference-fix-docs-build.log)."
       ]
     },
     "source:vite.config.ts": {
