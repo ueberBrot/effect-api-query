@@ -1,6 +1,6 @@
 import { experimental_streamedQuery } from '@tanstack/query-core'
 import type { QueryFunctionContext } from '@tanstack/query-core'
-import { Exit, Stream } from 'effect'
+import { Exit, Predicate, Stream } from 'effect'
 import type { Cause } from 'effect'
 
 import type { RunPromiseExit } from './types'
@@ -12,6 +12,23 @@ export type StreamQueryPolicy =
       readonly refetchMode: 'reset' | 'append' | 'replace'
     }
   | { readonly _tag: 'Live' }
+
+export const accumulatedPolicy = (
+  options: Record<string, unknown>,
+  invalid: (code: 'InvalidMaxChunks' | 'InvalidRefetchMode', message: string) => Error,
+): Extract<StreamQueryPolicy, { readonly _tag: 'Accumulated' }> => {
+  const { maxChunks, refetchMode = 'reset' } = options
+  if (
+    maxChunks !== undefined &&
+    (!Predicate.isNumber(maxChunks) || !Number.isSafeInteger(maxChunks) || maxChunks <= 0)
+  ) {
+    throw invalid('InvalidMaxChunks', 'maxChunks must be a positive safe integer')
+  }
+  if (refetchMode !== 'reset' && refetchMode !== 'append' && refetchMode !== 'replace') {
+    throw invalid('InvalidRefetchMode', 'refetchMode must be reset, append, or replace')
+  }
+  return { _tag: 'Accumulated', maxChunks, refetchMode }
+}
 
 export interface MakeStreamQueryOptions {
   readonly policy: StreamQueryPolicy

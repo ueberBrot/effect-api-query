@@ -1,78 +1,23 @@
 import { User, UserPage } from '@effect-api-query/contracts'
-import type { InfiniteData, MutationOptions, QueryClient } from '@tanstack/react-query'
+import type { InfiniteData, QueryClient } from '@tanstack/react-query'
 
 import type { ExampleHttpQueryUtils, ExampleRpcQueryUtils } from './application.ts'
+import type { makeOwnerCache } from './owner-cache.ts'
 
 export interface UserWriteOwner {
   readonly queryClient: QueryClient
   readonly rpcQuery: Pick<ExampleRpcQueryUtils, 'users'>
   readonly httpQuery: Pick<ExampleHttpQueryUtils, 'users'>
   readonly isActive: () => boolean
-  readonly runMutation: <T>(execute: () => Promise<T>) => Promise<T>
+  readonly trackMutationOptions: ReturnType<typeof makeOwnerCache>['trackMutationOptions']
 }
 
-export interface CreateTransaction {
-  readonly commit: (user: User) => Promise<void>
-  readonly rollback: () => void
-  readonly settle: () => Promise<void>
-}
-export interface DeleteTransaction {
-  readonly commit: () => Promise<void>
-  readonly rollback: () => void
-  readonly settle: () => Promise<void>
-}
 interface DirectorySnapshot {
   readonly rpcList: readonly User[] | undefined
   readonly httpList: readonly User[] | undefined
   readonly rpcPages: InfiniteData<UserPage> | undefined
   readonly httpPages: InfiniteData<UserPage> | undefined
 }
-export type UserMutationOptions<Data, Failure, Input, Transaction> = MutationOptions<
-  Data,
-  Failure,
-  Input,
-  Transaction
-> &
-  Required<Pick<MutationOptions<Data, Failure, Input, Transaction>, 'mutationFn' | 'mutationKey'>>
-export type RpcCreateOptions = ReturnType<
-  ExampleRpcQueryUtils['users']['create']['mutationOptions']
->
-export type HttpCreateOptions = ReturnType<
-  ExampleHttpQueryUtils['users']['create']['mutationOptions']
->
-export type RpcDeleteOptions = ReturnType<
-  ExampleRpcQueryUtils['users']['delete']['mutationOptions']
->
-export type HttpDeleteOptions = ReturnType<
-  ExampleHttpQueryUtils['users']['delete']['mutationOptions']
->
-export interface UserWrites {
-  readonly rpcCreate: () => UserMutationOptions<
-    User,
-    Parameters<NonNullable<RpcCreateOptions['onError']>>[0],
-    Parameters<RpcCreateOptions['mutationFn']>[0],
-    CreateTransaction
-  >
-  readonly httpCreate: () => UserMutationOptions<
-    User,
-    Parameters<NonNullable<HttpCreateOptions['onError']>>[0],
-    Parameters<HttpCreateOptions['mutationFn']>[0],
-    CreateTransaction
-  >
-  readonly rpcDelete: () => UserMutationOptions<
-    void,
-    Parameters<NonNullable<RpcDeleteOptions['onError']>>[0],
-    Parameters<RpcDeleteOptions['mutationFn']>[0],
-    DeleteTransaction
-  >
-  readonly httpDelete: () => UserMutationOptions<
-    void,
-    Parameters<NonNullable<HttpDeleteOptions['onError']>>[0],
-    Parameters<HttpDeleteOptions['mutationFn']>[0],
-    DeleteTransaction
-  >
-}
-
 const restoreList = (
   current: readonly User[] | undefined,
   snapshot: readonly User[] | undefined,
@@ -126,8 +71,8 @@ export const makeUserWrites = ({
   rpcQuery,
   httpQuery,
   isActive,
-  runMutation,
-}: UserWriteOwner): UserWrites => {
+  trackMutationOptions,
+}: UserWriteOwner) => {
   let nextWrite = 0
   const pending = new Set<number>()
   const rpcList = rpcQuery.users.list.queryKey()
@@ -257,8 +202,6 @@ export const makeUserWrites = ({
   }
   const rpcCreate = () => {
     const options = rpcQuery.users.create.mutationOptions({
-      networkMode: 'always',
-      retry: false,
       onMutate: startCreate,
       onSuccess: async (user, _input, transaction) => transaction.commit(user),
       onError: (_error, _input, transaction) => {
@@ -266,16 +209,10 @@ export const makeUserWrites = ({
       },
       onSettled: async (_data, _error, _input, transaction) => transaction?.settle(),
     })
-    return {
-      ...options,
-      mutationFn: async (...args: Parameters<typeof options.mutationFn>) =>
-        runMutation(async () => options.mutationFn(...args)),
-    }
+    return trackMutationOptions(options)
   }
   const httpCreate = () => {
     const options = httpQuery.users.create.mutationOptions({
-      networkMode: 'always',
-      retry: false,
       onMutate: async ({ payload }) => startCreate(payload),
       onSuccess: async (user, _input, transaction) => transaction.commit(user),
       onError: (_error, _input, transaction) => {
@@ -283,11 +220,7 @@ export const makeUserWrites = ({
       },
       onSettled: async (_data, _error, _input, transaction) => transaction?.settle(),
     })
-    return {
-      ...options,
-      mutationFn: async (...args: Parameters<typeof options.mutationFn>) =>
-        runMutation(async () => options.mutationFn(...args)),
-    }
+    return trackMutationOptions(options)
   }
   let deletionBaseline: DirectorySnapshot | undefined
   const deletionGroups = new Map<
@@ -386,8 +319,6 @@ export const makeUserWrites = ({
   }
   const rpcDelete = () => {
     const options = rpcQuery.users.delete.mutationOptions({
-      networkMode: 'always',
-      retry: false,
       onMutate: async ({ id }) => startDelete(id),
       onSuccess: async (_data, _input, transaction) => transaction.commit(),
       onError: (_error, _input, transaction) => {
@@ -395,16 +326,10 @@ export const makeUserWrites = ({
       },
       onSettled: async (_data, _error, _input, transaction) => transaction?.settle(),
     })
-    return {
-      ...options,
-      mutationFn: async (...args: Parameters<typeof options.mutationFn>) =>
-        runMutation(async () => options.mutationFn(...args)),
-    }
+    return trackMutationOptions(options)
   }
   const httpDelete = () => {
     const options = httpQuery.users.delete.mutationOptions({
-      networkMode: 'always',
-      retry: false,
       onMutate: async ({ params }) => startDelete(params.id),
       onSuccess: async (_data, _input, transaction) => transaction.commit(),
       onError: (_error, _input, transaction) => {
@@ -412,11 +337,7 @@ export const makeUserWrites = ({
       },
       onSettled: async (_data, _error, _input, transaction) => transaction?.settle(),
     })
-    return {
-      ...options,
-      mutationFn: async (...args: Parameters<typeof options.mutationFn>) =>
-        runMutation(async () => options.mutationFn(...args)),
-    }
+    return trackMutationOptions(options)
   }
   return { rpcCreate, httpCreate, rpcDelete, httpDelete }
 }

@@ -205,9 +205,6 @@ export default defineConfig({
           'src/rpc/streamed-query.ts',
         ],
         rules: {
-          // These runtime adapters erase caller-defined schemas/options, then validate
-          // inputs with their declaration. A domain-specific replacement loses the
-          // generic public contract.
           'anti-slop/no-unknown-parameters': 'off',
           'anti-slop/no-unknown-returns': 'off',
           'anti-slop/no-unsafe-dictionary-type': 'off',

@@ -40,9 +40,8 @@ const options = rpcQuery.users.get.queryOptions({
 })
 ```
 
-`queryOptions`, `streamedOptions`, and `liveOptions` also accept the direct `skipToken` shorthand.
-The object form preserves applicable caller options. The builder consumes `input` and, for
-accumulated streams, `refetchMode` and `maxChunks`, removing them from the returned options.
+The builder consumes `input` and, for accumulated streams, `refetchMode` and `maxChunks`,
+removing them from the returned options.
 Skipped options retain the exact sentinel and operation-level key.
 
 `queryOptions`, `streamedOptions`, and `liveOptions` accept conditional `input` unions of payload

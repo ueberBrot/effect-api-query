@@ -215,46 +215,55 @@ describe('createRpcQueryUtils streaming execution', () => {
     }),
   )
 
-  it.effect('rejects invalid bounds synchronously, including skipped queries', () =>
-    Effect.gen(function* () {
-      const Watch = Rpc.make('events.watch', {
-        payload: { channel: Schema.String },
-        success: Schema.Finite,
-        stream: true,
-      })
-      const group = RpcGroup.make(Watch)
-      const client = yield* makeRpcTestClient(group, { 'events.watch': () => Stream.make(1) })
-      const utils = createRpcQueryUtils(group, { client, keyPrefix: ['bounded'] })
-      for (const maxChunks of [
-        0,
-        -1,
-        1.5,
-        Number.NaN,
-        Infinity,
-        -Infinity,
-        Number.MAX_SAFE_INTEGER + 1,
-      ]) {
-        for (const input of [{ channel: 'news' }, skipToken] as const) {
-          const buildOptions = () =>
-            input === skipToken
-              ? utils.events.watch.streamedOptions({ input, maxChunks })
-              : utils.events.watch.streamedOptions({ input, maxChunks })
-          expect(buildOptions).toThrow(EffectRpcQueryConfigError)
-          expect(buildOptions).toThrow(
-            expect.objectContaining({ code: 'InvalidMaxChunks', rpcTag: 'events.watch' }),
-          )
+  it.effect(
+    'rejects invalid retention and refetch policies synchronously, including skipped queries',
+    () =>
+      Effect.gen(function* () {
+        const Watch = Rpc.make('events.watch', {
+          payload: { channel: Schema.String },
+          success: Schema.Finite,
+          stream: true,
+        })
+        const group = RpcGroup.make(Watch)
+        const client = yield* makeRpcTestClient(group, { 'events.watch': () => Stream.make(1) })
+        const utils = createRpcQueryUtils(group, { client, keyPrefix: ['bounded'] })
+        for (const maxChunks of [
+          0,
+          -1,
+          1.5,
+          Number.NaN,
+          Infinity,
+          -Infinity,
+          Number.MAX_SAFE_INTEGER + 1,
+        ]) {
+          for (const input of [{ channel: 'news' }, skipToken] as const) {
+            const buildOptions = () => utils.events.watch.streamedOptions({ input, maxChunks })
+            expect(buildOptions).toThrow(EffectRpcQueryConfigError)
+            expect(buildOptions).toThrow(
+              expect.objectContaining({ code: 'InvalidMaxChunks', rpcTag: 'events.watch' }),
+            )
+          }
         }
-      }
-      const skipped = utils.events.watch.streamedOptions({ input: skipToken, maxChunks: 1 })
-      expect(skipped.queryFn).toBe(skipToken)
-      expect(skipped).not.toHaveProperty('maxChunks')
-      expect(() =>
-        utils.events.watch.streamedOptions({
-          input: { channel: 'news' },
-          maxChunks: Number.MAX_SAFE_INTEGER,
-        }),
-      ).not.toThrow()
-    }),
+        for (const refetchMode of ['invalid', null, 1]) {
+          for (const input of [{ channel: 'news' }, skipToken] as const) {
+            const build = () =>
+              // @ts-expect-error Invalid policies must reach runtime validation.
+              utils.events.watch.streamedOptions({ input, refetchMode })
+            expect(build).toThrow(
+              expect.objectContaining({ code: 'InvalidRefetchMode', rpcTag: 'events.watch' }),
+            )
+          }
+        }
+        const skipped = utils.events.watch.streamedOptions({ input: skipToken, maxChunks: 1 })
+        expect(skipped.queryFn).toBe(skipToken)
+        expect(skipped).not.toHaveProperty('maxChunks')
+        expect(() =>
+          utils.events.watch.streamedOptions({
+            input: { channel: 'news' },
+            maxChunks: Number.MAX_SAFE_INTEGER,
+          }),
+        ).not.toThrow()
+      }),
   )
 
   it.effect('fails an empty live stream with its documented package error', () =>
@@ -728,11 +737,11 @@ describe('createRpcQueryUtils streaming execution', () => {
         keyPrefix: ['app'] as const,
       })
 
-      expect(utils.events.watch.streamedOptions(skipToken)).toMatchObject({
+      expect(utils.events.watch.streamedOptions({ input: skipToken })).toMatchObject({
         queryFn: skipToken,
         queryKey: ['app', 'rpc', 'events', 'watch', 'streamed'],
       })
-      expect(utils.events.watch.liveOptions(skipToken)).toMatchObject({
+      expect(utils.events.watch.liveOptions({ input: skipToken })).toMatchObject({
         queryFn: skipToken,
         queryKey: ['app', 'rpc', 'events', 'watch', 'live'],
       })

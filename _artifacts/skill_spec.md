@@ -62,3 +62,8 @@ declarations and exports.
   tasks. Scoped formatting, skill validation, and native maintainer checks with
   the default and actual PR bases passed. Initial package publication remains
   pending.
+- **API and architecture review (2026-10-11), based on `bf38d85`:** use one
+  conditional-input form across buffered, metadata, streamed, and live options.
+  Retain the ten tasks and existing source mappings. Compiler fixtures verify
+  contextual inference and mutation tracking; 124 in-memory runtime cases cover
+  cache views, retry attempts, defaults, hydration, cancellation, and ownership.

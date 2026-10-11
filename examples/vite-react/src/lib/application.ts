@@ -147,7 +147,7 @@ export const startViteReactApplication = async ({
         rpcQuery,
         httpQuery,
         isActive: capturedOwner.isActive,
-        runMutation: capturedOwner.runMutation,
+        trackMutationOptions: capturedOwner.trackMutationOptions,
       }),
       invalidateUsers: async () => {
         if (!capturedOwner.isActive()) {

@@ -1,9 +1,4 @@
-import type {
-  MutationFunction,
-  MutationOptions,
-  QueryClient,
-  QueryKey,
-} from '@tanstack/react-query'
+import type { QueryClient, QueryKey } from '@tanstack/react-query'
 import { Schema } from 'effect'
 
 const OwnerIdentity = Schema.Struct({
@@ -15,17 +10,6 @@ const OwnerIdentity = Schema.Struct({
 
 export type ApplicationOwnerIdentity = typeof OwnerIdentity.Type
 export type DirectoryStorage = Pick<Storage, 'getItem' | 'removeItem' | 'setItem'>
-type TrackedMutationOptions<TData, TError, TVariables, TOnMutateResult> = MutationOptions<
-  TData,
-  TError,
-  TVariables,
-  TOnMutateResult
-> & {
-  readonly mutationFn: MutationFunction<TData, TVariables>
-  readonly networkMode: 'always'
-  readonly retry: false
-}
-
 const Directory = Schema.Array(
   Schema.Struct({ id: Schema.Int, name: Schema.String, locale: Schema.String }),
 )
@@ -84,15 +68,17 @@ export const makeOwnerCache = ({
       pendingMutations.delete(result)
     }
   }
-  const trackMutationOptions = <TData, TError, TVariables = void, TOnMutateResult = unknown>(
-    options: MutationOptions<TData, TError, TVariables, TOnMutateResult> & {
-      readonly mutationFn: MutationFunction<TData, TVariables>
-    },
-  ): TrackedMutationOptions<TData, TError, TVariables, TOnMutateResult> => ({
+  const trackMutationOptions = <Args extends unknown[], Data, Options extends object>(
+    options: Options & { readonly mutationFn: (...args: Args) => Promise<Data> },
+  ): Omit<Options, 'mutationFn' | 'networkMode' | 'retry'> & {
+    readonly mutationFn: (...args: Args) => Promise<Data>
+    readonly networkMode: 'always'
+    readonly retry: false
+  } => ({
     ...options,
     networkMode: 'always' as const,
     retry: false as const,
-    mutationFn: async (...args: Parameters<MutationFunction<TData, TVariables>>) =>
+    mutationFn: async (...args: Args) =>
       await runMutation(async () => await options.mutationFn(...args)),
   })
   const saveDirectory = () => {

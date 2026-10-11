@@ -1,5 +1,5 @@
 import { it } from '@effect/vitest'
-import { QueryClient } from '@tanstack/query-core'
+import { QueryClient, QueryObserver } from '@tanstack/query-core'
 import { Cause, Deferred, Effect, Exit, Predicate, Schema, SchemaTransformation } from 'effect'
 import { HttpClient, HttpClientResponse } from 'effect/http'
 import {
@@ -11,7 +11,7 @@ import {
 } from 'effect/http-api'
 import { expect } from 'vite-plus/test'
 
-import { createHttpApiQueryUtils, isEffectHttpApiQueryError } from '#effect-api-query'
+import { createHttpApiQueryUtils, isEffectHttpApiQueryError, skipToken } from '#effect-api-query'
 
 import { captureFailure } from './fixtures/async.ts'
 import { waitForQueryState } from './fixtures/query-cache.ts'
@@ -330,4 +330,227 @@ it.effect(
       expect(Object.isFrozen(manual)).toBe(false)
       expect(Object.isFrozen(manual.headers)).toBe(false)
     }),
+)
+
+it.effect.each(['global', 'prefix'] as const)(
+  'uses %s HTTP hashing across unary, infinite and open stream views',
+  (mode) =>
+    Effect.gen(function* () {
+      const finalized = yield* Deferred.make<undefined>()
+      let closed = 0
+      let reads = 0
+      const client = yield* HttpApiClient.makeWith(api, {
+        baseUrl: 'https://example.test',
+        httpClient: HttpClient.make((request) => {
+          if (request.url.endsWith('/read')) {
+            reads += 1
+            return Effect.succeed(
+              HttpClientResponse.fromWeb(
+                request,
+                Response.json('server', { status: 203, headers: { etag: 'server' } }),
+              ),
+            )
+          }
+          return Effect.succeed(
+            HttpClientResponse.fromWeb(
+              request,
+              new Response(
+                new ReadableStream<Uint8Array>({
+                  start(controller) {
+                    controller.enqueue(new TextEncoder().encode('data: 1\n\n'))
+                  },
+                  cancel() {
+                    closed += 1
+                    if (closed === 2) {
+                      Deferred.doneUnsafe(finalized, Exit.succeed(undefined))
+                    }
+                  },
+                }),
+                { headers: { 'content-type': 'text/event-stream' } },
+              ),
+            ),
+          )
+        }),
+      })
+      const http = createHttpApiQueryUtils(api, { client, keyPrefix: ['hashing-http'] })
+      const queryClient = new QueryClient({
+        defaultOptions: {
+          queries: {
+            retry: false,
+            staleTime: Infinity,
+            queryKeyHashFn: (key) => `global:${JSON.stringify(key)}`,
+          },
+        },
+      })
+      if (mode === 'prefix') {
+        queryClient.setQueryDefaults(http.key(), {
+          queryKeyHashFn: (key) => `prefix:${JSON.stringify(key)}`,
+        })
+      }
+      const history = new QueryObserver(queryClient, http.items.watch.streamedOptions())
+      const latest = new QueryObserver(queryClient, http.items.watch.liveOptions())
+      const stopHistory = history.subscribe(() => {})
+      const stopLatest = latest.subscribe(() => {})
+      try {
+        yield* waitForQueryState(
+          queryClient,
+          () =>
+            history.getCurrentResult().status === 'success' &&
+            latest.getCurrentResult().status === 'success',
+        )
+        expect(history.getCurrentResult()).toMatchObject({ data: [1], fetchStatus: 'fetching' })
+        expect(latest.getCurrentResult()).toMatchObject({ data: 1, fetchStatus: 'fetching' })
+        queryClient.setQueryData(http.items.watch.streamedKey(), [2])
+        queryClient.setQueryData(http.items.watch.liveKey(), 2)
+        expect(queryClient.getQueryData(http.items.watch.streamedKey())).toStrictEqual([2])
+        expect(queryClient.getQueryData(http.items.watch.liveKey())).toBe(2)
+        const unary = http.items.read.queryOptions()
+        const pages = http.items.read.infiniteOptions({
+          initialPageParam: 0,
+          getNextPageParam: () => {},
+        })
+        const returned = HttpApiSchema.withHeaders({ body: 'server', headers: { etag: 'server' } })
+        expect(yield* Effect.promise(async () => await queryClient.query(unary))).toStrictEqual(
+          returned,
+        )
+        expect(
+          yield* Effect.promise(async () => await queryClient.infiniteQuery(pages)),
+        ).toStrictEqual({ pages: [returned], pageParams: [0] })
+        const manual = HttpApiSchema.withHeaders({ body: 'native', headers: { etag: 'native' } })
+        queryClient.setQueryData(http.items.read.queryKey(), manual)
+        queryClient.setQueryData(http.items.read.infiniteKey(), {
+          pages: [manual],
+          pageParams: [0],
+        })
+        expect(yield* Effect.promise(async () => await queryClient.query(unary))).toStrictEqual(
+          manual,
+        )
+        expect(
+          yield* Effect.promise(async () => await queryClient.infiniteQuery(pages)),
+        ).toStrictEqual({ pages: [manual], pageParams: [0] })
+        expect(reads).toBe(2)
+        expect(queryClient.getQueryCache().getAll()).toHaveLength(4)
+        expect(
+          queryClient
+            .getQueryCache()
+            .getAll()
+            .every((query) => query.queryHash.startsWith(`${mode}:`)),
+        ).toBe(true)
+      } finally {
+        stopHistory()
+        stopLatest()
+        yield* Effect.promise(async () => {
+          await queryClient.cancelQueries()
+        })
+        yield* Deferred.await(finalized)
+        queryClient.clear()
+      }
+    }),
+)
+
+it.effect.each(['reset', 'append', 'replace'] as const)(
+  'retains bounded HTTP %s histories with native refetch publication',
+  (refetchMode) =>
+    Effect.gen(function* () {
+      let calls = 0
+      const client = yield* makeClient(() => {
+        calls += 1
+        return sse(
+          calls === 1 ? 'data: 1\n\ndata: 2\n\ndata: 3\n\n' : 'data: 4\n\ndata: 5\n\ndata: 6\n\n',
+        )
+      })
+      const http = createHttpApiQueryUtils(api, { client, keyPrefix: ['http-refetch'] })
+      const options = http.items.watch.streamedOptions({ maxChunks: 2, refetchMode })
+      const queryClient = new QueryClient()
+      const publications: unknown[] = []
+      try {
+        expect(yield* Effect.promise(async () => await queryClient.query(options))).toStrictEqual([
+          2, 3,
+        ])
+        const stop = queryClient.getQueryCache().subscribe((event) => {
+          if (event.type === 'updated' && event.action.type === 'success') {
+            publications.push(event.query.state.data)
+          }
+        })
+        try {
+          expect(yield* Effect.promise(async () => await queryClient.query(options))).toStrictEqual(
+            [5, 6],
+          )
+          expect(publications.length).toBeGreaterThan(0)
+          if (refetchMode === 'replace') {
+            expect(publications.every((data) => JSON.stringify(data) === '[5,6]')).toBe(true)
+          } else {
+            expect(publications).toContainEqual(refetchMode === 'reset' ? [4] : [3, 4])
+          }
+          expect(
+            queryClient.getQueryData(http.items.watch.streamedKey({ maxChunks: 2, refetchMode })),
+          ).toStrictEqual([5, 6])
+          expect(calls).toBe(2)
+        } finally {
+          stop()
+        }
+      } finally {
+        queryClient.clear()
+      }
+    }),
+)
+
+it.effect('validates HTTP history policies before skipped queries acquire a request', () =>
+  Effect.gen(function* () {
+    const inputApi = HttpApi.make('skipped-policies').add(
+      HttpApiGroup.make('events').add(
+        HttpApiEndpoint.get('watch', '/watch', {
+          query: { channel: Schema.String },
+          success: HttpApiSchema.StreamSse({ data: Schema.Int }),
+        }),
+      ),
+    )
+    let requests = 0
+    const client = yield* HttpApiClient.makeWith(inputApi, {
+      baseUrl: 'https://example.test',
+      httpClient: HttpClient.make((request) => {
+        requests += 1
+        return Effect.succeed(HttpClientResponse.fromWeb(request, sse('data: 1\n\n')))
+      }),
+    })
+    const http = createHttpApiQueryUtils(inputApi, { client, keyPrefix: ['skipped-http'] })
+    for (const input of [{ query: { channel: 'news' } }, skipToken] as const) {
+      for (const policy of [
+        { maxChunks: 0 },
+        { maxChunks: Number.NaN },
+        { maxChunks: Number.MAX_SAFE_INTEGER + 1 },
+        { refetchMode: 'invalid' },
+        { refetchMode: null },
+      ]) {
+        const build = () =>
+          // @ts-expect-error Invalid policies must reach runtime validation.
+          http.events.watch.streamedOptions({ input, ...policy })
+        expect(build).toThrow(
+          expect.objectContaining({
+            code: 'maxChunks' in policy ? 'InvalidMaxChunks' : 'InvalidRefetchMode',
+            apiId: 'skipped-policies',
+            endpoint: 'watch',
+          }),
+        )
+      }
+    }
+    const queryClient = new QueryClient()
+    const observer = new QueryObserver(
+      queryClient,
+      http.events.watch.streamedOptions({
+        input: skipToken,
+        initialData: [9],
+        maxChunks: 2,
+        refetchMode: 'append',
+      }),
+    )
+    const stop = observer.subscribe(() => {})
+    try {
+      expect(observer.getCurrentResult()).toMatchObject({ data: [9], fetchStatus: 'idle' })
+      expect(requests).toBe(0)
+    } finally {
+      stop()
+      queryClient.clear()
+    }
+  }),
 )

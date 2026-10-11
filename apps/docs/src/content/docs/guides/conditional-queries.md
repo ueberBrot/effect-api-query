@@ -79,9 +79,7 @@ skipped streams. Infinite queries accept a page-to-input mapper or `skipToken`, 
 conditional union, with their required `initialPageParam` and `getNextPageParam`. Choose between
 the mapper and sentinel in `input`; each mapper result must be valid input.
 
-When no caller options are needed, `queryOptions(skipToken)`, `streamedOptions(skipToken)`, and
-`liveOptions(skipToken)` remain available as shorthand. A skipped query has no executable query
-function, so manual `refetch()` cannot run it. Supply valid input to enable it. If a complete
+A skipped query has no executable query function, so manual `refetch()` cannot run it. Supply valid input to enable it. If a complete
 request is available and you need manual refetch, use `enabled: false` instead.
 
 For HTTP pagination, map each page parameter to the complete request and keep stable filters in
