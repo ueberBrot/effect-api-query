@@ -411,6 +411,12 @@ const normalizedLiveUtils = createRpcQueryUtils(normalizedLiveGroup, {
   client: normalizedLiveClient,
   keyPrefix,
 })
+createRpcQueryUtils(normalizedLiveGroup, {
+  client: normalizedLiveClient,
+  keyPrefix,
+  // @ts-expect-error Inputless RPC groups reject even an empty encoder map.
+  keyEncoders: {},
+})
 true satisfies Assert<Equal<QueryData<string | undefined>, string | null>>
 true satisfies Assert<Equal<QueryData<void>, null>>
 const undefinedLiveResult = queryClient.query(normalizedLiveUtils.values.undefined.liveOptions())
@@ -875,6 +881,12 @@ const encoderOptions: CreateRpcQueryUtilsOptions<typeof encoderGroup, typeof key
   runPromiseExit: encoderRunner,
 }
 createRpcQueryUtils(encoderGroup, encoderOptions)
+// @ts-expect-error Key encoders do not satisfy residual RPC execution services.
+createRpcQueryUtils(encoderGroup, {
+  client: encoderClient,
+  keyPrefix,
+  keyEncoders: encoderOptions.keyEncoders,
+})
 
 const secretListGroup = RpcGroup.make(SecretList)
 type SecretListRpcs = RpcGroup.Rpcs<typeof secretListGroup>

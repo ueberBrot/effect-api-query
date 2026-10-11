@@ -65,6 +65,8 @@
     "@tanstack/intent",
     "effect",
     "publint",
+    // React belongs to the private apps; Fallow attributes shared example sources to the root.
+    "react",
     "typescript-5.9",
     "unplugin-unused"
   ],

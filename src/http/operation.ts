@@ -36,6 +36,21 @@ export interface CompiledHttpOperations {
   readonly keyEncoders: ReadonlyMap<string, RuntimeKeyEncoder>
 }
 
+const freezeMetadata = (data: unknown) => {
+  if (!Predicate.isObject(data)) {
+    return data
+  }
+  const { headers } = data
+  const snapshot =
+    Predicate.isObject(headers) &&
+    (!Object.isFrozen(headers) || Object.getPrototypeOf(headers) !== Object.prototype)
+      ? Object.freeze({ ...headers })
+      : headers
+  return Object.isFrozen(data) && snapshot === headers
+    ? data
+    : Object.freeze({ ...data, headers: snapshot })
+}
+
 const extractHttpEndpoints = (api: HttpApi.Top, client: unknown): readonly HttpOperation[] => {
   const operations: HttpOperation[] = []
   for (const group of Object.values(api.groups)) {
@@ -106,29 +121,15 @@ const extractHttpEndpoints = (api: HttpApi.Top, client: unknown): readonly HttpO
                   invoke: (requestInput: unknown) =>
                     // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
                     Effect.map(invoke(requestInput, 'decoded-and-response'), ([data, response]) =>
-                      Object.freeze({
+                      freezeMetadata({
                         data: data === undefined ? null : data,
                         status: response.status,
-                        headers: Object.freeze(
-                          Object.fromEntries(Object.entries(response.headers)),
-                        ),
+                        headers: response.headers,
                       }),
                     ),
                   executionError: (operation: 'metadata', cause: Cause.Cause<unknown>) =>
                     new EffectHttpApiQueryError(identity, operation, cause),
-                  finalizeData: (data: unknown) => {
-                    if (!Predicate.isObject(data)) {
-                      return data
-                    }
-                    const { headers } = data
-                    const snapshot =
-                      Predicate.isObject(headers) && !Object.isFrozen(headers)
-                        ? Object.freeze({ ...headers })
-                        : headers
-                    return Object.isFrozen(data) && snapshot === headers
-                      ? data
-                      : Object.freeze({ ...data, headers: snapshot })
-                  },
+                  finalizeData: freezeMetadata,
                 },
               }
             : undefined),

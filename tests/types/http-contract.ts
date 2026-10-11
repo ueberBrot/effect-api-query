@@ -468,6 +468,12 @@ const emptyApi = HttpApi.make('empty').add(HttpApiGroup.make('streams').add(Stre
 declare const emptyClient: HttpApiClient.ForApi<typeof emptyApi>
 const emptyUtils = createHttpApiQueryUtils(emptyApi, { client: emptyClient, keyPrefix: ['app'] })
 true satisfies Assert<Equal<keyof typeof emptyUtils, 'key'>>
+createHttpApiQueryUtils(emptyApi, {
+  client: emptyClient,
+  keyPrefix: ['app'],
+  // @ts-expect-error An API without query-input endpoints rejects even an empty encoder map.
+  keyEncoders: {},
+})
 
 const Alternatives = HttpApiEndpoint.post('alternatives', '/alternatives', {
   payload: [Schema.Struct({ name: Schema.String }), Schema.Struct({ id: Schema.Finite })],

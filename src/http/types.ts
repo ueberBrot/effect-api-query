@@ -15,9 +15,12 @@ import type {
   InfiniteQueryKey,
   UnaryQueryBuilder,
   JsonValue,
+  KeyBuilder,
+  KeyEncoderRequirement,
   MutationBuilder,
   QueryData,
-  RunPromiseExit,
+  RunnerRequirement,
+  StreamedPolicyOptions,
 } from '../core/types'
 import type {
   EffectHttpApiQueryConfigError,
@@ -275,17 +278,23 @@ export type BufferedLeaf<
   ([Queryable<Endpoint>] extends [never]
     ? unknown
     : {
-        readonly queryKey: void extends Request<Endpoint>
-          ? () => ConcreteKey<Endpoint, Key, ClientError>
-          : (input: Request<Endpoint>) => ConcreteKey<Endpoint, Key, ClientError>
+        readonly queryKey: KeyBuilder<
+          Request<Endpoint>,
+          ConcreteKey<Endpoint, Key, ClientError>,
+          void extends Request<Endpoint> ? true : false
+        >
         readonly queryOptions: QueryBuilder<Endpoint, Key, ClientError>
-        readonly metadataKey: void extends Request<Endpoint>
-          ? () => ConcreteMetadataKey<Endpoint, Key, MetadataClientError>
-          : (input: Request<Endpoint>) => ConcreteMetadataKey<Endpoint, Key, MetadataClientError>
+        readonly metadataKey: KeyBuilder<
+          Request<Endpoint>,
+          ConcreteMetadataKey<Endpoint, Key, MetadataClientError>,
+          void extends Request<Endpoint> ? true : false
+        >
         readonly metadataOptions: MetadataBuilder<Endpoint, Key, MetadataClientError>
-        readonly infiniteKey: void extends Request<Endpoint>
-          ? () => ConcreteInfiniteKey<Endpoint, Key, ClientError>
-          : (input: Request<Endpoint>) => ConcreteInfiniteKey<Endpoint, Key, ClientError>
+        readonly infiniteKey: KeyBuilder<
+          Request<Endpoint>,
+          ConcreteInfiniteKey<Endpoint, Key, ClientError>,
+          void extends Request<Endpoint> ? true : false
+        >
         readonly infiniteOptions: InfiniteBuilder<Endpoint, Key, ClientError>
       })
 
@@ -305,10 +314,8 @@ export type StreamFailure<Value> =
       ? Error
       : never
 
-export type HttpStreamPolicy = {
+export type HttpStreamPolicy = StreamedPolicyOptions & {
   readonly sseOptions?: Sse.DecodeOptions | undefined
-  readonly maxChunks?: number | undefined
-  readonly refetchMode?: 'reset' | 'append' | 'replace' | undefined
 }
 
 export type HttpStreamQueryError<Endpoint extends HttpApiEndpoint.ConstraintRequest, ClientError> =
@@ -499,11 +506,11 @@ export type Encoders<Api extends HttpApi.Constraint> = {
     Group in Exclude<EncoderGroups<Api>, RequiredEncoderGroups<Api>> as Group['identifier']
   ]?: GroupEncoders<Group>
 }
-export type EncoderOption<Api extends HttpApi.Constraint> = [EncoderGroups<Api>] extends [never]
-  ? { readonly keyEncoders?: never }
-  : [RequiredEncoderGroups<Api>] extends [never]
-    ? { readonly keyEncoders?: Encoders<Api> }
-    : { readonly keyEncoders: Encoders<Api> }
+export type EncoderOption<Api extends HttpApi.Constraint> = KeyEncoderRequirement<
+  EncoderGroups<Api>,
+  RequiredEncoderGroups<Api>,
+  Encoders<Api>
+>
 export type StreamServices<Value> =
   Value extends HttpApiSchema.withHeaders<infer Body, infer _Headers>
     ? StreamServices<Body>
@@ -516,11 +523,9 @@ export type ClientServices<Api extends HttpApi.Constraint, Client> =
   | HttpApiEndpoint.ErrorServicesDecode<Supported<Endpoints<Groups<Api>>>>
   | Effect.Services<ExposedEffects<Api, Client>>
   | StreamServices<Effect.Success<ExposedEffects<Api, Client>>>
-export type RunnerOption<Api extends HttpApi.Constraint, Client> = [
-  ClientServices<Api, Client>,
-] extends [never]
-  ? { readonly runPromiseExit?: RunPromiseExit }
-  : { readonly runPromiseExit: RunPromiseExit<ClientServices<Api, Client>> }
+export type RunnerOption<Api extends HttpApi.Constraint, Client> = RunnerRequirement<
+  ClientServices<Api, Client>
+>
 
 /** Derives HTTP utilities while the caller retains client and runtime ownership. */
 export type CreateHttpApiQueryUtilsOptions<

@@ -9,9 +9,12 @@ import type {
   InfiniteQueryKey,
   UnaryQueryBuilder,
   JsonValue,
+  KeyBuilder,
+  KeyEncoderRequirement,
   QueryData,
-  RunPromiseExit,
+  RunnerRequirement,
   MutationBuilder,
+  StreamedPolicyOptions,
 } from '../core/types'
 import type {
   EffectRpcQueryConfigError,
@@ -156,10 +159,15 @@ export type QueryOptionsBuilder<
   PayloadlessRpc<R>
 >
 
-export type QueryKeyBuilder<R extends Rpc.Any, Prefix extends readonly JsonValue[], ClientError> =
-  PayloadlessRpc<R> extends true
-    ? () => ConcreteQueryKey<Prefix, R, ClientError>
-    : (input: Rpc.PayloadConstructor<R>) => ConcreteQueryKey<Prefix, R, ClientError>
+export type QueryKeyBuilder<
+  R extends Rpc.Any,
+  Prefix extends readonly JsonValue[],
+  ClientError,
+> = KeyBuilder<
+  Rpc.PayloadConstructor<R>,
+  ConcreteQueryKey<Prefix, R, ClientError>,
+  PayloadlessRpc<R>
+>
 
 export type ConcreteInfiniteKey<
   Prefix extends readonly JsonValue[],
@@ -192,10 +200,11 @@ export type InfiniteKeyBuilder<
   R extends Rpc.Any,
   Prefix extends readonly JsonValue[],
   ClientError,
-> =
-  PayloadlessRpc<R> extends true
-    ? () => ConcreteInfiniteKey<Prefix, R, ClientError>
-    : (input: Rpc.PayloadConstructor<R>) => ConcreteInfiniteKey<Prefix, R, ClientError>
+> = KeyBuilder<
+  Rpc.PayloadConstructor<R>,
+  ConcreteInfiniteKey<Prefix, R, ClientError>,
+  PayloadlessRpc<R>
+>
 
 export type StreamedData<R extends Rpc.Any> = readonly Rpc.SuccessChunk<R>[]
 
@@ -220,15 +229,6 @@ export type ConcreteLiveKey<
   QueryData<Rpc.SuccessChunk<R>>,
   RpcLiveError<R, ClientError>
 >
-
-export type StreamRefetchMode = 'append' | 'replace' | 'reset'
-
-export type StreamedPolicyOptions = {
-  /** Controls whether a refetch clears, appends to, or replaces accumulated data. */
-  readonly refetchMode?: StreamRefetchMode | undefined
-  /** Retains at most this many newest elements; must be a positive safe integer. */
-  readonly maxChunks?: number | undefined
-}
 
 export type StreamingQueryBuilder<
   Input,
@@ -276,8 +276,11 @@ export type LiveOptionsBuilder<
   PayloadlessRpc<R>
 >
 
-export type StreamKeyBuilder<R extends Rpc.Any, Key> =
-  PayloadlessRpc<R> extends true ? () => Key : (input: Rpc.PayloadConstructor<R>) => Key
+export type StreamKeyBuilder<R extends Rpc.Any, Key> = KeyBuilder<
+  Rpc.PayloadConstructor<R>,
+  Key,
+  PayloadlessRpc<R>
+>
 
 export type StreamedKeyBuilder<R extends Rpc.Any, Key> =
   PayloadlessRpc<R> extends true
@@ -409,35 +412,16 @@ export type KeyEncoders<Group extends RpcGroup.Any> = {
 }>
 
 /** Makes the encoder map optional only when no RPC requires an override. */
-export type KeyEncoderOption<Group extends RpcGroup.Any> = [PayloadBearingRpcs<Group>] extends [
-  never,
-]
-  ? { readonly keyEncoders?: never }
-  : [RequiredEncoderRpcs<Group>] extends [never]
-    ? {
-        /** Overrides synchronous semantic encoding for selected RPC payloads. */
-        readonly keyEncoders?: KeyEncoders<Group>
-      }
-    : {
-        /**
-         * Supplies safe synchronous identity for payloads that need encoding services or contain
-         * redacted values.
-         */
-        readonly keyEncoders: KeyEncoders<Group>
-      }
+export type KeyEncoderOption<Group extends RpcGroup.Any> = KeyEncoderRequirement<
+  PayloadBearingRpcs<Group>,
+  RequiredEncoderRpcs<Group>,
+  KeyEncoders<Group>
+>
 
 /** Requires a custom runner when client-side Schema services remain. */
-export type RunnerOption<Group extends RpcGroup.Any> = [Rpc.ServicesClient<RpcsOf<Group>>] extends [
-  never,
-]
-  ? {
-      /** Overrides service-free execution; defaults to `Effect.runPromiseExit`. */
-      readonly runPromiseExit?: RunPromiseExit
-    }
-  : {
-      /** Runs RPC Effects that retain client-side Schema services. */
-      readonly runPromiseExit: RunPromiseExit<Rpc.ServicesClient<RpcsOf<Group>>>
-    }
+export type RunnerOption<Group extends RpcGroup.Any> = RunnerRequirement<
+  Rpc.ServicesClient<RpcsOf<Group>>
+>
 
 /** Configuration for deriving a utility tree from an Effect RPC group. */
 export type CreateRpcQueryUtilsOptions<

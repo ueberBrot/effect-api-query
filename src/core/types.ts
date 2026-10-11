@@ -25,8 +25,46 @@ export type RunPromiseExit<R = never> = <A, E>(
   options?: { readonly signal?: AbortSignal },
 ) => Promise<Exit.Exit<A, E>>
 
+/** Requires encoders only when eligible requests need an override. */
+export type KeyEncoderRequirement<Eligible, Required, Encoders> = [Eligible] extends [never]
+  ? { readonly keyEncoders?: never }
+  : [Required] extends [never]
+    ? {
+        /** Overrides synchronous semantic encoding for selected requests. */
+        readonly keyEncoders?: Encoders
+      }
+    : {
+        /** Supplies safe synchronous cache identity for requests requiring an encoder. */
+        readonly keyEncoders: Encoders
+      }
+
+/** Requires a custom runner when client-side Schema services remain. */
+export type RunnerRequirement<Services> = [Services] extends [never]
+  ? {
+      /** Overrides service-free execution; defaults to `Effect.runPromiseExit`. */
+      readonly runPromiseExit?: RunPromiseExit
+    }
+  : {
+      /** Runs Effects that retain client-side Schema services. */
+      readonly runPromiseExit: RunPromiseExit<Services>
+    }
+
+/** Uses the adapter's inputless proof to determine key-builder arguments. */
+export type KeyBuilder<Input, Key, Inputless extends boolean> = [Inputless] extends [true]
+  ? () => Key
+  : (input: Input) => Key
+
 export type OwnedQueryOption = 'queryFn' | 'queryKey' | 'queryKeyHashFn' | 'queryHash'
 export type OwnedMutationOption = 'mutationFn' | 'mutationKey'
+
+export type StreamRefetchMode = 'append' | 'replace' | 'reset'
+
+export type StreamedPolicyOptions = {
+  /** Controls whether a refetch clears, appends to, or replaces accumulated data. */
+  readonly refetchMode?: StreamRefetchMode | undefined
+  /** Retains at most this many newest elements; must be a positive safe integer. */
+  readonly maxChunks?: number | undefined
+}
 
 export type WithDefinedInitialData<Options, Data> = Omit<Options, 'initialData'> & {
   readonly initialData: NonUndefinedGuard<Data> | (() => NonUndefinedGuard<Data>)

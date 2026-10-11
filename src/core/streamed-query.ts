@@ -3,13 +3,13 @@ import type { QueryFunctionContext } from '@tanstack/query-core'
 import { Exit, Predicate, Stream } from 'effect'
 import type { Cause } from 'effect'
 
-import type { RunPromiseExit } from './types'
+import type { RunPromiseExit, StreamRefetchMode } from './types'
 
 export type StreamQueryPolicy =
   | {
       readonly maxChunks: number | undefined
       readonly _tag: 'Accumulated'
-      readonly refetchMode: 'reset' | 'append' | 'replace'
+      readonly refetchMode: StreamRefetchMode
     }
   | { readonly _tag: 'Live' }
 

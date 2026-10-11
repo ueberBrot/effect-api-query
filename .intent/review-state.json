@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "71a7b3a6ee3c33cebb0539f27334bac7d8b72feb6bfd63bc7e36b0fa163cc8c1",
+      "fingerprint": "72c2635ec622c40f59dfa104a88b9226ee36bd5ab9358d84d477862912608c67",
       "snapshot": {
         "GLOSSARY.md": "ad19a69727108dd047208b6e76e05f5b1d241620ed75cb241a62fb4c068dc792",
         "README.md": "5bae76fc8ff649c10add915b41ed4d46bc026a839a34e4fed91e6db6418f0bed",
@@ -101,6 +101,7 @@
         "examples/server/tests/server.test.ts": "44530f1e8b9b67f4d4bd8486c7bd7790240128fb161c1244857eee15c87a068d",
         "examples/server/tests/web-handler.test.ts": "94d1b28810d908dcec8ca8299e56bb520f93804e8761b4d5e9c828087efae646",
         "examples/shared/error-description.ts": "374a804cd0daf1dcfdff8b7247194d278cc52fdf3bd0d9b5d2891124b439cf87",
+        "examples/shared/use-slow-query-cancellation.ts": "f6221dc3a725c2f3cb15f41167ab98f8f579f3a0c138cb66cdf3c368b93b996a",
         "examples/tanstack-start/src/components/effect-error-details.tsx": "a84187a90ebe207f9b8427f43dda44c81f6564821510c8c848ceca0f7d6940af",
         "examples/tanstack-start/src/lib/api-server.ts": "b678d6edab872786fb92db328f60095d604c8d2f5205c4d4a462c3405a782bad",
         "examples/tanstack-start/src/lib/application.ts": "7417de76eaf8a1a1cbd8464af6508bc3244a0176941c742e829880670a54ee8a",
@@ -128,6 +129,7 @@
         "examples/vite-react/tests/owner-boundary.test.tsx": "d4ce58a002aac2b8f752936a65495558f89bff145d5cf2556f5c0d9286f8d6b3",
         "examples/vite-react/tests/owner-cache.test.ts": "8818e30fdd3071a2e5dc2d865161e0d9f40de1ff37813b0a396bb2e83dd08a1d",
         "examples/vite-react/tests/owner-switch.test.ts": "c997c9758269586591cbf55de4651c64091abc9061b56edb024dcbf9dbaa9c1d",
+        "examples/vite-react/tests/slow-query-cancellation.test.tsx": "d8c054206d3613939b71e390cb37002e7d6385628ca15bc20c4984f100cca779",
         "examples/vite-react/tests/stream-tracing.test.ts": "0f09b669dc00a66e7db0d947f31daa88862e89cda9877d37caaa72631c1b247c",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "884e694a2a3ecc0cdd12d3555c953c30c6c7778bc613a78752b2ca27c17c173d",
         "examples/vite-react/tests/user-writes.test.ts": "3fe07c1fa8deab8c154d30481f7bc6ef77d3a8ed6c3d5e0d3cbfe75574061e33",
@@ -149,22 +151,22 @@
         "src/core/policy.ts": "bebe7a32bb958ba9a1817c6fec6792fd04541f5ae81cd70fa422106ac3cb4073",
         "src/core/schema-key.ts": "1f7d087793291b9763e82a0188367a9446f92b35bc25d73165b7e4f603e5ce05",
         "src/core/stream-snapshot.ts": "00bf4855cc745571ce440a9afcf7a52134450de9ced00007e4cd2cdab8e544d1",
-        "src/core/streamed-query.ts": "61e5918f83c55ed536bfd8aca21f2f1a58ece3bff189ffe94fb397524da68a0d",
-        "src/core/types.ts": "4fe7d3e2d9760fc8b226846c1e67fcd431dbf2f26b77d782ed66343f10c6afa1",
+        "src/core/streamed-query.ts": "0c29dd2bbf85ae2b4bda6ee65250f32ee17a5362e7a94f7423a0e457398ae9c4",
+        "src/core/types.ts": "c0904ecc411bd78cb82749f3461f67e78d05239e9e0802daf99f9cca5bf95a63",
         "src/core/utility-tree.ts": "2a3996f5d49d70838e377af85b01acae43e4e964ae69e2150fad5b43a1069821",
         "src/core/view-prefix.ts": "35a558e324547cb5a799114b937550704984ceae12c03205df5957adf55d988a",
         "src/http/create-utils.ts": "785dd9171fd9c6ab7619a9e3728f91a3e9d197c311a3a6c8a6dffc74904a4975",
         "src/http/errors.ts": "95869413973faefd2958f4e48feada7d5700e3aa0c2545f56a7202c8b9609a46",
-        "src/http/operation.ts": "7679702ebb65b94e1d3bdd6fce80213248e50cda32038402852c8b80964b7369",
+        "src/http/operation.ts": "c7a393845b6ba9d5382c7b697230463be4c78ae99525f923cca6f741ffaf6f3d",
         "src/http/request.ts": "9d31397ee4241319ae56260c65e7fb4973adcee974b55e43e2895e7524d39180",
         "src/http/streamed-query.ts": "bdac94b5d016578c249a46f4e1825424d5cf72acc85361e2fd00fda92e15ac5c",
-        "src/http/types.ts": "57394bbce9225f8df5746b9ccfa37ff4d80e2ee8a770edf683082fa2f06d405f",
+        "src/http/types.ts": "a638fe517865a1d341c2c974d4774f60cb7c10c0907287c9ec8a7d6f296def48",
         "src/index.ts": "2dfdc1e9a5994ca3a6d918704ecd57442f4e34831b0cba2da68d4e7cc07810c1",
         "src/rpc/create-utils.ts": "c0db42f6d9962b6c2e291f2b3d060be16ba7fc93826fa00471db5d82503e27dc",
         "src/rpc/errors.ts": "7048a786a55f2cd221788485ffa993277f47896110ffac742f74ee077382377e",
         "src/rpc/operation.ts": "e46cb103c4a79506cecb34c9337640ec9ab917a488e9360c7535d3dad733ebf5",
         "src/rpc/streamed-query.ts": "bf480b78f9d0e37d7e7b572395f1238e6539d0ba8386b22eb5f8b3c400d1dd0f",
-        "src/rpc/types.ts": "94a154bbc38d1996beb4fde2f11d2fabb86d6d4c2f47f6fce417dbd1ec2dfda2",
+        "src/rpc/types.ts": "90f4df74680db534f98c72f3bdcb5ae60fb720c45114dfb61a089dd62c1dc1be",
         "tests/cache-recipes.test.ts": "5d86c8f74e952aa6f614d9ba32b4f2680137d23b696d8c55cd07d0463e5b65b7",
         "tests/create-http-api-query-utils.test.ts": "c1307dbe52820f44526ec676f0b24e5a0e4635690b548185ceb819050b0e4605",
         "tests/create-rpc-query-utils-configuration.test.ts": "0e53c59e24291e0424e860b9030c439105a1468e4ba37bf24bef81dd846112e2",
@@ -216,31 +218,30 @@
         "tests/types/docs-user-events.ts": "87647140d5434b95cc5389b1fea9919f20df7b6fcee4f00565836a4eae549a70",
         "tests/types/example-owner-contract.ts": "fb10bd087ee582a64806d110404c366cb74e520b0b8cc11701348036b08b9622",
         "tests/types/helper-contract.ts": "93f5d4276dca08c4848ffe7fccff893081767c4f51e11ec27588caade4999a53",
-        "tests/types/http-contract.ts": "d5a8cc93a22186a6a4bdb3cc264f3739df6527e87bfc7c672f22b46fd18403cb",
+        "tests/types/http-contract.ts": "9b6134849353f790a91cfebe955d660a65dc1927ffc00adf471afb7ae84b064d",
         "tests/types/http-stream-contract.ts": "24031e37ac8cada4b8e9d3b2f4ce6e08448780571d94c8002bd8b267caa320bd",
         "tests/types/http-type-scale.ts": "b456543b88316a2dd899f929efbffcf514e54e213e109b5f7d52eb785d2255aa",
         "tests/types/http-view-proof.ts": "f42a1ebf36eeab7a906b722f5d2c2af0aabe8d30ef378fc50386c16d464fb64e",
-        "tests/types/public-contract.ts": "5bf988c06b41bc009b143f57371f9b347af8a2d7ad6ff3c88f1d70833972c5fe",
+        "tests/types/public-contract.ts": "0726d33528f8f08bb907d9cd9c18f2d73d4e5b900c35080a8f176fe9f32b944b",
         "tests/types/server-local-client-contract.ts": "443a60788ce7d91a77459c99f07d3fc9bf70d5a64a83c05ece5c40cfac63d298",
         "tests/types/snapshot-contract.ts": "9e6a2edaddb7545f20d351511ed99be2828d4ca56779503bcc443963d8b73716",
         "tests/types/tanstack-start-contract.ts": "51681e3d0d7504a614d490f18adb6f44db82d34b9d4d7cb9cf941aea33de284f",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "8f4723c40f217b9ba82e8247d9147c143782538c",
-      "outcome": "updated",
-      "reason": "Extend the existing six references for public inference, supported view prefixes, typed query/mutation policy reuse, application-owned setup, native Suspense recovery/cancellation limits, and actual consumed-stream tracing. Preserve local identity/projections/seeds/page mapping/optimistic context and callback replacement. Update canonical docs links for the HTTP API/RPC-first library/integration/example split; retain the activation description and purpose.",
+      "head": "d870776a5f37835467beb611c6ca6a51fe3933eb",
+      "outcome": "no-change",
+      "reason": "Shared private types now own encoder-map presence, runner presence and plain key-builder arguments. Both adapters retain their eligibility, inputless proofs, service calculations, key data and policies. The published call contract and compiled runtime remain equivalent; existing RPC/HTTP setup, query-patterns and execution guidance remain accurate, so no guidance rewrite or version bump is warranted.",
       "evidence": [
-        "Compared working-tree changes with 8f4723c; independent Standards and Spec reviews found no remaining concrete findings.",
-        "Published API fixtures passed with TypeScript 7.0.2 and 5.9.3; helper-contract.ts includes broad Schemas, supported views, policy exclusions, local selection/seed/page/context inference, and exact prefix tuples.",
-        "Runtime suite: 501 tests in 45 files passed. Focused view-prefix test passed after its lint-only correction; new setup, Suspense recovery, stream finalizer tracing, and policy tests are included.",
-        "Direct type-aware check and strict Effect diagnostics passed with no errors or warnings. Native Vite+ task compiler spawning hit EBUSY; equivalent installed compilers passed directly.",
-        "Docs check, exact copied-snippet verification, 56-page Astro build, all internal links, and all 7 Chromium docs/browser checks passed.",
-        "Shipped skill structural validation passed. A fresh isolated consumer explicitly invoked the copied packaged skill, produced reusable typed policy builders, passed behavior grading and both compiler versions; the initial builder without shared defaults failed the grader. Discovery remains unverified because the description is unchanged.",
-        "Vue guidance replaces equivalent manual DataTag extraction with the public inference helpers; native Vue compilation was not repeated because its dependency is unavailable in this workspace."
+        "Focused change from the pre-refactor working-tree snapshots under /tmp/eaq-type-refactor-before: src/core/types.ts, src/http/types.ts and src/rpc/types.ts. Existing source revision is d870776a5f37835467beb611c6ca6a51fe3933eb; earlier authorized architecture changes are preserved.",
+        "Independent review verified unchanged tuple never guards, adapter encoder eligibility and map layouts, client service unions, RPC AST.Void inputless proofs and HTTP void-request proofs. KeyBuilder uses a non-distributive definite-true guard. Policy-taking streamed/live key builders and root exports are unchanged.",
+        "Published TypeScript 7.0.2 and 5.9.3 fixtures passed via vp run --no-cache --ignore-depends-on api-types after completing pack. Added three public factory negatives for empty encoder maps without eligible inputs (RPC and HTTP) and required RPC execution runners despite supplied encoders. Existing broad Unknown/Any/void-union, inputless, tagged-key and overload assertions pass.",
+        "vp run --no-cache pack passed declaration emission, attw and publint. cmp confirmed dist/index.mjs is byte-identical to the pre-refactor bundle. Runtime tests were not repeated for this type-only refactor.",
+        "Full type-aware lint/typecheck passed on 150 files with zero warnings/errors. Strict Effect diagnostics checked 177 files with zero errors/warnings and one pre-existing TaggedStruct suggestion. Formatting passed on 302 files. All four uncached Fallow tasks passed; remaining source similarities were inspected, including generic-binding false positives. No new suppressions or dependencies were added.",
+        "Intent sync reported Nothing to synchronize. The three planning records and the owned skill plus affected RPC, HTTP and query-pattern references retain accurate coverage and source mappings. No recommendation, activation text, version claim or consumer workflow changes; fresh consumer/discovery checks were not repeated for this internal type-only refactor."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "47c949fd34c3285e4d3d3062b5921d03bef3825b359bc6d374a1822407425492",
+      "fingerprint": "0c4f9fe9071a4c69194882c62ecc2f2967ab1aaa7338e8f59f95be715dc533ca",
       "snapshot": {
         "GLOSSARY.md": "ad19a69727108dd047208b6e76e05f5b1d241620ed75cb241a62fb4c068dc792",
         "README.md": "5bae76fc8ff649c10add915b41ed4d46bc026a839a34e4fed91e6db6418f0bed",
@@ -341,6 +342,7 @@
         "examples/server/tests/server.test.ts": "44530f1e8b9b67f4d4bd8486c7bd7790240128fb161c1244857eee15c87a068d",
         "examples/server/tests/web-handler.test.ts": "94d1b28810d908dcec8ca8299e56bb520f93804e8761b4d5e9c828087efae646",
         "examples/shared/error-description.ts": "374a804cd0daf1dcfdff8b7247194d278cc52fdf3bd0d9b5d2891124b439cf87",
+        "examples/shared/use-slow-query-cancellation.ts": "f6221dc3a725c2f3cb15f41167ab98f8f579f3a0c138cb66cdf3c368b93b996a",
         "examples/tanstack-start/src/components/effect-error-details.tsx": "a84187a90ebe207f9b8427f43dda44c81f6564821510c8c848ceca0f7d6940af",
         "examples/tanstack-start/src/lib/api-server.ts": "b678d6edab872786fb92db328f60095d604c8d2f5205c4d4a462c3405a782bad",
         "examples/tanstack-start/src/lib/application.ts": "7417de76eaf8a1a1cbd8464af6508bc3244a0176941c742e829880670a54ee8a",
@@ -368,6 +370,7 @@
         "examples/vite-react/tests/owner-boundary.test.tsx": "d4ce58a002aac2b8f752936a65495558f89bff145d5cf2556f5c0d9286f8d6b3",
         "examples/vite-react/tests/owner-cache.test.ts": "8818e30fdd3071a2e5dc2d865161e0d9f40de1ff37813b0a396bb2e83dd08a1d",
         "examples/vite-react/tests/owner-switch.test.ts": "c997c9758269586591cbf55de4651c64091abc9061b56edb024dcbf9dbaa9c1d",
+        "examples/vite-react/tests/slow-query-cancellation.test.tsx": "d8c054206d3613939b71e390cb37002e7d6385628ca15bc20c4984f100cca779",
         "examples/vite-react/tests/stream-tracing.test.ts": "0f09b669dc00a66e7db0d947f31daa88862e89cda9877d37caaa72631c1b247c",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "884e694a2a3ecc0cdd12d3555c953c30c6c7778bc613a78752b2ca27c17c173d",
         "examples/vite-react/tests/user-writes.test.ts": "3fe07c1fa8deab8c154d30481f7bc6ef77d3a8ed6c3d5e0d3cbfe75574061e33",
@@ -389,22 +392,22 @@
         "src/core/policy.ts": "bebe7a32bb958ba9a1817c6fec6792fd04541f5ae81cd70fa422106ac3cb4073",
         "src/core/schema-key.ts": "1f7d087793291b9763e82a0188367a9446f92b35bc25d73165b7e4f603e5ce05",
         "src/core/stream-snapshot.ts": "00bf4855cc745571ce440a9afcf7a52134450de9ced00007e4cd2cdab8e544d1",
-        "src/core/streamed-query.ts": "61e5918f83c55ed536bfd8aca21f2f1a58ece3bff189ffe94fb397524da68a0d",
-        "src/core/types.ts": "4fe7d3e2d9760fc8b226846c1e67fcd431dbf2f26b77d782ed66343f10c6afa1",
+        "src/core/streamed-query.ts": "0c29dd2bbf85ae2b4bda6ee65250f32ee17a5362e7a94f7423a0e457398ae9c4",
+        "src/core/types.ts": "c0904ecc411bd78cb82749f3461f67e78d05239e9e0802daf99f9cca5bf95a63",
         "src/core/utility-tree.ts": "2a3996f5d49d70838e377af85b01acae43e4e964ae69e2150fad5b43a1069821",
         "src/core/view-prefix.ts": "35a558e324547cb5a799114b937550704984ceae12c03205df5957adf55d988a",
         "src/http/create-utils.ts": "785dd9171fd9c6ab7619a9e3728f91a3e9d197c311a3a6c8a6dffc74904a4975",
         "src/http/errors.ts": "95869413973faefd2958f4e48feada7d5700e3aa0c2545f56a7202c8b9609a46",
-        "src/http/operation.ts": "7679702ebb65b94e1d3bdd6fce80213248e50cda32038402852c8b80964b7369",
+        "src/http/operation.ts": "c7a393845b6ba9d5382c7b697230463be4c78ae99525f923cca6f741ffaf6f3d",
         "src/http/request.ts": "9d31397ee4241319ae56260c65e7fb4973adcee974b55e43e2895e7524d39180",
         "src/http/streamed-query.ts": "bdac94b5d016578c249a46f4e1825424d5cf72acc85361e2fd00fda92e15ac5c",
-        "src/http/types.ts": "57394bbce9225f8df5746b9ccfa37ff4d80e2ee8a770edf683082fa2f06d405f",
+        "src/http/types.ts": "a638fe517865a1d341c2c974d4774f60cb7c10c0907287c9ec8a7d6f296def48",
         "src/index.ts": "2dfdc1e9a5994ca3a6d918704ecd57442f4e34831b0cba2da68d4e7cc07810c1",
         "src/rpc/create-utils.ts": "c0db42f6d9962b6c2e291f2b3d060be16ba7fc93826fa00471db5d82503e27dc",
         "src/rpc/errors.ts": "7048a786a55f2cd221788485ffa993277f47896110ffac742f74ee077382377e",
         "src/rpc/operation.ts": "e46cb103c4a79506cecb34c9337640ec9ab917a488e9360c7535d3dad733ebf5",
         "src/rpc/streamed-query.ts": "bf480b78f9d0e37d7e7b572395f1238e6539d0ba8386b22eb5f8b3c400d1dd0f",
-        "src/rpc/types.ts": "94a154bbc38d1996beb4fde2f11d2fabb86d6d4c2f47f6fce417dbd1ec2dfda2",
+        "src/rpc/types.ts": "90f4df74680db534f98c72f3bdcb5ae60fb720c45114dfb61a089dd62c1dc1be",
         "tests/cache-recipes.test.ts": "5d86c8f74e952aa6f614d9ba32b4f2680137d23b696d8c55cd07d0463e5b65b7",
         "tests/create-http-api-query-utils.test.ts": "c1307dbe52820f44526ec676f0b24e5a0e4635690b548185ceb819050b0e4605",
         "tests/create-rpc-query-utils-configuration.test.ts": "0e53c59e24291e0424e860b9030c439105a1468e4ba37bf24bef81dd846112e2",
@@ -456,28 +459,26 @@
         "tests/types/docs-user-events.ts": "87647140d5434b95cc5389b1fea9919f20df7b6fcee4f00565836a4eae549a70",
         "tests/types/example-owner-contract.ts": "fb10bd087ee582a64806d110404c366cb74e520b0b8cc11701348036b08b9622",
         "tests/types/helper-contract.ts": "93f5d4276dca08c4848ffe7fccff893081767c4f51e11ec27588caade4999a53",
-        "tests/types/http-contract.ts": "d5a8cc93a22186a6a4bdb3cc264f3739df6527e87bfc7c672f22b46fd18403cb",
+        "tests/types/http-contract.ts": "9b6134849353f790a91cfebe955d660a65dc1927ffc00adf471afb7ae84b064d",
         "tests/types/http-stream-contract.ts": "24031e37ac8cada4b8e9d3b2f4ce6e08448780571d94c8002bd8b267caa320bd",
         "tests/types/http-type-scale.ts": "b456543b88316a2dd899f929efbffcf514e54e213e109b5f7d52eb785d2255aa",
         "tests/types/http-view-proof.ts": "f42a1ebf36eeab7a906b722f5d2c2af0aabe8d30ef378fc50386c16d464fb64e",
-        "tests/types/public-contract.ts": "5bf988c06b41bc009b143f57371f9b347af8a2d7ad6ff3c88f1d70833972c5fe",
+        "tests/types/public-contract.ts": "0726d33528f8f08bb907d9cd9c18f2d73d4e5b900c35080a8f176fe9f32b944b",
         "tests/types/server-local-client-contract.ts": "443a60788ce7d91a77459c99f07d3fc9bf70d5a64a83c05ece5c40cfac63d298",
         "tests/types/snapshot-contract.ts": "9e6a2edaddb7545f20d351511ed99be2828d4ca56779503bcc443963d8b73716",
         "tests/types/tanstack-start-contract.ts": "51681e3d0d7504a614d490f18adb6f44db82d34b9d4d7cb9cf941aea33de284f",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "8f4723c40f217b9ba82e8247d9147c143782538c",
-      "outcome": "updated",
-      "reason": "Reconcile all three planning artifacts: retain the ten prior tasks and add four focused usability/lifetime tasks, active failure modes and ownership/policy tensions; expand source mappings for TSX fixtures and shared example rendering. Record the explicit fresh-consumer checks and documentation reorganization, preserving prior batches, one skill, six references, and package-only distribution.",
+      "head": "d870776a5f37835467beb611c6ca6a51fe3933eb",
+      "outcome": "no-change",
+      "reason": "All three planning documents remain accurate: _artifacts/domain_map.yaml retains the existing RPC/HTTP factory and inferred key tasks and failure modes; _artifacts/skill_spec.md retains supported behavior and task evidence without inventing a new batch of guidance; _artifacts/skill_tree.yaml already maps src/**/*.ts and tests/**/*.ts. The internal refactor changes no task, recommendation, source coverage, dependency or skill identity; preserve these documents unchanged.",
       "evidence": [
-        "Compared working-tree changes with 8f4723c; independent Standards and Spec reviews found no remaining concrete findings.",
-        "Published API fixtures passed with TypeScript 7.0.2 and 5.9.3; helper-contract.ts includes broad Schemas, supported views, policy exclusions, local selection/seed/page/context inference, and exact prefix tuples.",
-        "Runtime suite: 501 tests in 45 files passed. Focused view-prefix test passed after its lint-only correction; new setup, Suspense recovery, stream finalizer tracing, and policy tests are included.",
-        "Direct type-aware check and strict Effect diagnostics passed with no errors or warnings. Native Vite+ task compiler spawning hit EBUSY; equivalent installed compilers passed directly.",
-        "Docs check, exact copied-snippet verification, 56-page Astro build, all internal links, and all 7 Chromium docs/browser checks passed.",
-        "Shipped skill structural validation passed. A fresh isolated consumer explicitly invoked the copied packaged skill, produced reusable typed policy builders, passed behavior grading and both compiler versions; the initial builder without shared defaults failed the grader. Discovery remains unverified because the description is unchanged.",
-        "Vue guidance replaces equivalent manual DataTag extraction with the public inference helpers; native Vue compilation was not repeated because its dependency is unavailable in this workspace.",
-        "_artifacts/domain_map.yaml, _artifacts/skill_spec.md and _artifacts/skill_tree.yaml inspected together; Intent sync completed and skill/tree source metadata matches."
+        "Focused change from the pre-refactor working-tree snapshots under /tmp/eaq-type-refactor-before: src/core/types.ts, src/http/types.ts and src/rpc/types.ts. Existing source revision is d870776a5f37835467beb611c6ca6a51fe3933eb; earlier authorized architecture changes are preserved.",
+        "Independent review verified unchanged tuple never guards, adapter encoder eligibility and map layouts, client service unions, RPC AST.Void inputless proofs and HTTP void-request proofs. KeyBuilder uses a non-distributive definite-true guard. Policy-taking streamed/live key builders and root exports are unchanged.",
+        "Published TypeScript 7.0.2 and 5.9.3 fixtures passed via vp run --no-cache --ignore-depends-on api-types after completing pack. Added three public factory negatives for empty encoder maps without eligible inputs (RPC and HTTP) and required RPC execution runners despite supplied encoders. Existing broad Unknown/Any/void-union, inputless, tagged-key and overload assertions pass.",
+        "vp run --no-cache pack passed declaration emission, attw and publint. cmp confirmed dist/index.mjs is byte-identical to the pre-refactor bundle. Runtime tests were not repeated for this type-only refactor.",
+        "Full type-aware lint/typecheck passed on 150 files with zero warnings/errors. Strict Effect diagnostics checked 177 files with zero errors/warnings and one pre-existing TaggedStruct suggestion. Formatting passed on 302 files. All four uncached Fallow tasks passed; remaining source similarities were inspected, including generic-binding false positives. No new suppressions or dependencies were added.",
+        "Intent sync reported Nothing to synchronize. The three planning records and the owned skill plus affected RPC, HTTP and query-pattern references retain accurate coverage and source mappings. No recommendation, activation text, version claim or consumer workflow changes; fresh consumer/discovery checks were not repeated for this internal type-only refactor."
       ]
     },
     "source:vite.config.ts": {
@@ -566,16 +567,21 @@
       ]
     },
     "source:.fallowrc.jsonc": {
-      "fingerprint": "e84bb8a2caa59f35f33cc746a77930fe3133af45fc3218b9cb445f2b88fb2422",
+      "fingerprint": "c88901fb689b35dfb47eaedffd2c4e1477db5d6bdb4d4de7a3a0bb75d59333c4",
       "snapshot": {
-        ".fallowrc.jsonc": "3c6328373522721091afab8ae3a5734378bffd6da33311cf18c929b1091ac2d9"
+        ".fallowrc.jsonc": "3ae2a2ff3c65e543550b35c15d620bc532f454e8d27ecaa8a88b007e7c46604e"
       },
-      "head": "8f4723c40f217b9ba82e8247d9147c143782538c",
+      "head": "d870776a5f37835467beb611c6ca6a51fe3933eb",
       "outcome": "no-change",
-      "reason": "This analyzer configuration enables semantic/near duplication and TSX fixture discovery and handles externally consumed package-root type exports once at src/index.ts. It changes repository analysis rather than a library-consumer workflow; the existing skill already documents the affected public APIs.",
+      "reason": "Correct the known source-only example ownership limitation with an exact React ignoreDependencies entry. Fallow attributes examples/shared to the root manifest, where React is a development dependency, while both private applications declare React at runtime and the root package files allowlist excludes examples. This does not make React a library runtime dependency, exclude shared code from analysis or suppress duplicate groups. No consumer guidance change follows.",
       "evidence": [
-        "All four fresh Fallow commands passed; both dead-code modes report no issues. The analyzer reports 67 remaining semantic clone groups; changed duplication was manually reviewed and shared retry, invalidation, and error-description logic was extracted. Fallow still reports a discovery advisory for the explicitly excluded examples/shared source directory.",
-        "src/index.ts has no inline unused-type suppressions; private/internal dead-code and runtime-export checks remain enabled."
+        "Compared the task working tree with d870776a5f37835467beb611c6ca6a51fe3933eb; three independent architecture passes and an additional independent check of the final diff found no remaining actionable findings.",
+        "Full runtime suite passed: 506 tests in 46 files, including 5 new hook-lifetime cases for RPC/HTTP operation isolation, pending status cancellation and post-await retired-owner guards. Independent pass 2 additionally verified 191 snapshot/lifecycle/hash cases.",
+        "Direct vp pack passed declaration emission, attw and publint. Published-contract fixtures passed installed TypeScript 7.0.2 and 5.9.3. Full type-aware lint passed with no errors or warnings; strict Effect diagnostics passed with 0 errors and 0 warnings (one pre-existing suggestion).",
+        "Both example application builds passed. Expanded shared CSS has exactly the original rules for both apps, ignoring whitespace. Documentation snippet and Astro checks passed.",
+        "All four uncached Fallow analyses passed: both dead-code modes have no issues, semantic near-duplicate groups decreased from 67 to 61. Existing workspace-discovery advisory for the explicitly excluded source-only shared examples remains visible.",
+        "The native task supervisor sometimes fails with spawn EBUSY or sandbox process initialization errors; identical installed commands ran directly after completing their package prerequisites. No checks or source rules were bypassed to obtain these results.",
+        "No shipped guidance, activation description or public interface changed. Fresh consumer and discovery sessions were not repeated for this internal refactor; executable published-contract and rendered-application checks provide this batch evidence."
       ]
     },
     "source:.github/workflows/ci.yml": {
@@ -1110,29 +1116,39 @@
       ]
     },
     "source:examples/vite-react/src/components/sections/diagnostics-section.tsx": {
-      "fingerprint": "be2a2add266d90ffc3b2a87a16f23492d57024bb88f69d176767edbcda3179a5",
+      "fingerprint": "869448ce3494e402e1b55144b195d6d2c1c6b50fab1229e7e2080c3392a6e8c1",
       "snapshot": {
-        "examples/vite-react/src/components/sections/diagnostics-section.tsx": "257ed7b14a4a971a1ee3547cd5e45a801425f25071ae53eb2ffb9d521b9b68ad"
+        "examples/vite-react/src/components/sections/diagnostics-section.tsx": "d1ee213fd9ddac0b8f6be014a73bc14451ff71275d2f3c630e559f38462e416b"
       },
-      "head": "6893603eab70bd9d67e9848414eccc8a3421d870",
+      "head": "d870776a5f37835467beb611c6ca6a51fe3933eb",
       "outcome": "no-change",
-      "reason": "Tracking the declared-failure mutation makes diagnostics obey the application-owned mutation drain. Existing cache-owner guidance already requires accepted mutations to settle before ready-client release; the error contract is unchanged.",
+      "reason": "Update direct example imports to the shared cancellation module, preserving rendered diagnostics and HTTP routes. Both application runtime suites and builds pass. This wiring adds no new library-consumer workflow and leaves existing guidance accurate.",
       "evidence": [
-        "Reviewed the complete component diff from 5b91ddb to 6893603 and the owner replacement sequence in skills/effect-api-query/references/cache-workflows.md.",
-        "Source 6893603: CI 38085762210 passed source quality, both example builds, documentation, and Chromium/Firefox/WebKit acceptance; saved final-mts-ci.json and final-mts-ci.log."
+        "Compared the task working tree with d870776a5f37835467beb611c6ca6a51fe3933eb; three independent architecture passes and an additional independent check of the final diff found no remaining actionable findings.",
+        "Full runtime suite passed: 506 tests in 46 files, including 5 new hook-lifetime cases for RPC/HTTP operation isolation, pending status cancellation and post-await retired-owner guards. Independent pass 2 additionally verified 191 snapshot/lifecycle/hash cases.",
+        "Direct vp pack passed declaration emission, attw and publint. Published-contract fixtures passed installed TypeScript 7.0.2 and 5.9.3. Full type-aware lint passed with no errors or warnings; strict Effect diagnostics passed with 0 errors and 0 warnings (one pre-existing suggestion).",
+        "Both example application builds passed. Expanded shared CSS has exactly the original rules for both apps, ignoring whitespace. Documentation snippet and Astro checks passed.",
+        "All four uncached Fallow analyses passed: both dead-code modes have no issues, semantic near-duplicate groups decreased from 67 to 61. Existing workspace-discovery advisory for the explicitly excluded source-only shared examples remains visible.",
+        "The native task supervisor sometimes fails with spawn EBUSY or sandbox process initialization errors; identical installed commands ran directly after completing their package prerequisites. No checks or source rules were bypassed to obtain these results.",
+        "No shipped guidance, activation description or public interface changed. Fresh consumer and discovery sessions were not repeated for this internal refactor; executable published-contract and rendered-application checks provide this batch evidence."
       ]
     },
     "source:examples/vite-react/src/components/sections/http-section.tsx": {
-      "fingerprint": "e89b26c6c412fb39a50a6c96504fc8cf82ff54bb0bc346d30bd9a198f0b72485",
+      "fingerprint": "d7fab68b2be0d629142416ac457ca5e5c0927e93cf3fd1b9f8e07116dd582778",
       "snapshot": {
-        "examples/vite-react/src/components/sections/http-section.tsx": "c5b3bcbe155a6c7ace30a8a25bdad8739b669a0e3e16053ead57eb2108681e9d"
+        "examples/vite-react/src/components/sections/http-section.tsx": "a705dee9fd6b87071c37e718d86183e7376690826f085a1e19814a9b1eb14563"
       },
-      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "head": "d870776a5f37835467beb611c6ca6a51fe3933eb",
       "outcome": "no-change",
-      "reason": "Count loaded users directly across pages without allocating a flattened array; query data, ownership and displayed counts are unchanged, and existing framework guidance remains accurate.",
+      "reason": "Update direct example imports to the shared cancellation module, preserving rendered diagnostics and HTTP routes. Both application runtime suites and builds pass. This wiring adds no new library-consumer workflow and leaves existing guidance accurate.",
       "evidence": [
-        "Reviewed the actual diff and current source at examples/vite-react/src/components/sections/http-section.tsx against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
-        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+        "Compared the task working tree with d870776a5f37835467beb611c6ca6a51fe3933eb; three independent architecture passes and an additional independent check of the final diff found no remaining actionable findings.",
+        "Full runtime suite passed: 506 tests in 46 files, including 5 new hook-lifetime cases for RPC/HTTP operation isolation, pending status cancellation and post-await retired-owner guards. Independent pass 2 additionally verified 191 snapshot/lifecycle/hash cases.",
+        "Direct vp pack passed declaration emission, attw and publint. Published-contract fixtures passed installed TypeScript 7.0.2 and 5.9.3. Full type-aware lint passed with no errors or warnings; strict Effect diagnostics passed with 0 errors and 0 warnings (one pre-existing suggestion).",
+        "Both example application builds passed. Expanded shared CSS has exactly the original rules for both apps, ignoring whitespace. Documentation snippet and Astro checks passed.",
+        "All four uncached Fallow analyses passed: both dead-code modes have no issues, semantic near-duplicate groups decreased from 67 to 61. Existing workspace-discovery advisory for the explicitly excluded source-only shared examples remains visible.",
+        "The native task supervisor sometimes fails with spawn EBUSY or sandbox process initialization errors; identical installed commands ran directly after completing their package prerequisites. No checks or source rules were bypassed to obtain these results.",
+        "No shipped guidance, activation description or public interface changed. Fresh consumer and discovery sessions were not repeated for this internal refactor; executable published-contract and rendered-application checks provide this batch evidence."
       ]
     },
     "source:examples/vite-react/src/components/sections/mutations-section.tsx": {
@@ -1175,16 +1191,21 @@
       ]
     },
     "source:examples/vite-react/src/hooks/use-slow-query-cancellation.ts": {
-      "fingerprint": "2aa37a46d7e10463590f37ee5f3ffc0eec7784ff7192363988340b2ecf1741d9",
+      "fingerprint": "4379124e7714fde864a91ac03391a2ebb94f8aa1cea77fab0c2b170ea40cc24f",
       "snapshot": {
-        "examples/vite-react/src/hooks/use-slow-query-cancellation.ts": "f30bf0af875d66873e5c7f0f74ec757c2fd91264c69ba20ce34e3d676f84fa73"
+        "examples/vite-react/src/hooks/use-slow-query-cancellation.ts": null
       },
-      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "head": "d870776a5f37835467beb611c6ca6a51fe3933eb",
       "outcome": "no-change",
-      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
+      "reason": "Delete duplicate application hooks in favor of the shared diagnostics-only module. The same start/cancel interface, independent operation IDs and server interruption checks remain; exact per-hook unmount cleanup and post-await owner guards now apply consistently to both applications. The existing shipped cleanup/owner guidance already recommends these rules, so no guidance edit or compatibility wrapper is needed.",
       "evidence": [
-        "Reviewed the actual diff and current source at examples/vite-react/src/hooks/use-slow-query-cancellation.ts against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
-        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+        "Compared the task working tree with d870776a5f37835467beb611c6ca6a51fe3933eb; three independent architecture passes and an additional independent check of the final diff found no remaining actionable findings.",
+        "Full runtime suite passed: 506 tests in 46 files, including 5 new hook-lifetime cases for RPC/HTTP operation isolation, pending status cancellation and post-await retired-owner guards. Independent pass 2 additionally verified 191 snapshot/lifecycle/hash cases.",
+        "Direct vp pack passed declaration emission, attw and publint. Published-contract fixtures passed installed TypeScript 7.0.2 and 5.9.3. Full type-aware lint passed with no errors or warnings; strict Effect diagnostics passed with 0 errors and 0 warnings (one pre-existing suggestion).",
+        "Both example application builds passed. Expanded shared CSS has exactly the original rules for both apps, ignoring whitespace. Documentation snippet and Astro checks passed.",
+        "All four uncached Fallow analyses passed: both dead-code modes have no issues, semantic near-duplicate groups decreased from 67 to 61. Existing workspace-discovery advisory for the explicitly excluded source-only shared examples remains visible.",
+        "The native task supervisor sometimes fails with spawn EBUSY or sandbox process initialization errors; identical installed commands ran directly after completing their package prerequisites. No checks or source rules were bypassed to obtain these results.",
+        "No shipped guidance, activation description or public interface changed. Fresh consumer and discovery sessions were not repeated for this internal refactor; executable published-contract and rendered-application checks provide this batch evidence."
       ]
     },
     "source:tests/fixtures/tsconfig.server-local.json": {
@@ -1357,16 +1378,21 @@
       ]
     },
     "source:examples/tanstack-start/src/hooks/use-slow-query-cancellation.ts": {
-      "fingerprint": "c85b302c983ad61446ac64bb9fb27735786b70210c22ab55f19ed23421a41aa4",
+      "fingerprint": "3bbf99d591efe71685bdfc68588e0762578ad051fb61d3aca180de3a8b0ae67c",
       "snapshot": {
-        "examples/tanstack-start/src/hooks/use-slow-query-cancellation.ts": "3a1e71d2fd0886af948bfb78d510071186760b341e205ff7543cb3b8d422456d"
+        "examples/tanstack-start/src/hooks/use-slow-query-cancellation.ts": null
       },
-      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "head": "d870776a5f37835467beb611c6ca6a51fe3933eb",
       "outcome": "no-change",
-      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
+      "reason": "Delete duplicate application hooks in favor of the shared diagnostics-only module. The same start/cancel interface, independent operation IDs and server interruption checks remain; exact per-hook unmount cleanup and post-await owner guards now apply consistently to both applications. The existing shipped cleanup/owner guidance already recommends these rules, so no guidance edit or compatibility wrapper is needed.",
       "evidence": [
-        "Reviewed the actual diff and current source at examples/tanstack-start/src/hooks/use-slow-query-cancellation.ts against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
-        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+        "Compared the task working tree with d870776a5f37835467beb611c6ca6a51fe3933eb; three independent architecture passes and an additional independent check of the final diff found no remaining actionable findings.",
+        "Full runtime suite passed: 506 tests in 46 files, including 5 new hook-lifetime cases for RPC/HTTP operation isolation, pending status cancellation and post-await retired-owner guards. Independent pass 2 additionally verified 191 snapshot/lifecycle/hash cases.",
+        "Direct vp pack passed declaration emission, attw and publint. Published-contract fixtures passed installed TypeScript 7.0.2 and 5.9.3. Full type-aware lint passed with no errors or warnings; strict Effect diagnostics passed with 0 errors and 0 warnings (one pre-existing suggestion).",
+        "Both example application builds passed. Expanded shared CSS has exactly the original rules for both apps, ignoring whitespace. Documentation snippet and Astro checks passed.",
+        "All four uncached Fallow analyses passed: both dead-code modes have no issues, semantic near-duplicate groups decreased from 67 to 61. Existing workspace-discovery advisory for the explicitly excluded source-only shared examples remains visible.",
+        "The native task supervisor sometimes fails with spawn EBUSY or sandbox process initialization errors; identical installed commands ran directly after completing their package prerequisites. No checks or source rules were bypassed to obtain these results.",
+        "No shipped guidance, activation description or public interface changed. Fresh consumer and discovery sessions were not repeated for this internal refactor; executable published-contract and rendered-application checks provide this batch evidence."
       ]
     },
     "source:examples/tanstack-start/src/routes/failure.tsx": {
@@ -1396,29 +1422,39 @@
       ]
     },
     "source:examples/tanstack-start/src/routes/http.tsx": {
-      "fingerprint": "17772c5479439557ae491d4836d8e8c3f0a4d66d6ab98339e3bb1fbe3393925e",
+      "fingerprint": "5bf6d229917158997ecae159648fa740b1183ca537bd7eaefa005ef7c806805e",
       "snapshot": {
-        "examples/tanstack-start/src/routes/http.tsx": "e54309cb14321d61e9ec0f5b51b2ed6231be4acc4cfaa634cdddd8d5dce459a4"
+        "examples/tanstack-start/src/routes/http.tsx": "af8b13103d7813a8143db021731e232fb8078170b573eb5fccbbe03c79e61480"
       },
-      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "head": "d870776a5f37835467beb611c6ca6a51fe3933eb",
       "outcome": "no-change",
-      "reason": "Count loaded users directly across pages without allocating a flattened array; query data, ownership and displayed counts are unchanged, and existing framework guidance remains accurate.",
+      "reason": "Update direct example imports to the shared cancellation module, preserving rendered diagnostics and HTTP routes. Both application runtime suites and builds pass. This wiring adds no new library-consumer workflow and leaves existing guidance accurate.",
       "evidence": [
-        "Reviewed the actual diff and current source at examples/tanstack-start/src/routes/http.tsx against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
-        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+        "Compared the task working tree with d870776a5f37835467beb611c6ca6a51fe3933eb; three independent architecture passes and an additional independent check of the final diff found no remaining actionable findings.",
+        "Full runtime suite passed: 506 tests in 46 files, including 5 new hook-lifetime cases for RPC/HTTP operation isolation, pending status cancellation and post-await retired-owner guards. Independent pass 2 additionally verified 191 snapshot/lifecycle/hash cases.",
+        "Direct vp pack passed declaration emission, attw and publint. Published-contract fixtures passed installed TypeScript 7.0.2 and 5.9.3. Full type-aware lint passed with no errors or warnings; strict Effect diagnostics passed with 0 errors and 0 warnings (one pre-existing suggestion).",
+        "Both example application builds passed. Expanded shared CSS has exactly the original rules for both apps, ignoring whitespace. Documentation snippet and Astro checks passed.",
+        "All four uncached Fallow analyses passed: both dead-code modes have no issues, semantic near-duplicate groups decreased from 67 to 61. Existing workspace-discovery advisory for the explicitly excluded source-only shared examples remains visible.",
+        "The native task supervisor sometimes fails with spawn EBUSY or sandbox process initialization errors; identical installed commands ran directly after completing their package prerequisites. No checks or source rules were bypassed to obtain these results.",
+        "No shipped guidance, activation description or public interface changed. Fresh consumer and discovery sessions were not repeated for this internal refactor; executable published-contract and rendered-application checks provide this batch evidence."
       ]
     },
     "source:examples/tanstack-start/src/styles.css": {
-      "fingerprint": "6511863c69c721f2f054b705fb32a59bece6f93029fa3d22d3f881df48470fa7",
+      "fingerprint": "e175f79bb10f4c0e3e2625dd8785537b1f1ffe8f43318559c0519bc4f457290d",
       "snapshot": {
-        "examples/tanstack-start/src/styles.css": "8fc6183bf34828b9909884e5eadefca6ebe8ee59bc0600389a22431ae7482856"
+        "examples/tanstack-start/src/styles.css": "7bca484171da0b685a1af733ae15669004e5adbde4bc8073d07faea65da103ee"
       },
-      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "head": "d870776a5f37835467beb611c6ca6a51fe3933eb",
       "outcome": "no-change",
-      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
+      "reason": "Move identical example theme declarations to examples/shared/theme.css while retaining Tailwind imports at both original entries and the Vite-specific grid locally. Expanded CSS preserves the original rules exactly and both builds pass. This is private example presentation reuse, with no query-library guidance or public-interface change.",
       "evidence": [
-        "Reviewed the actual diff and current source at examples/tanstack-start/src/styles.css against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
-        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+        "Compared the task working tree with d870776a5f37835467beb611c6ca6a51fe3933eb; three independent architecture passes and an additional independent check of the final diff found no remaining actionable findings.",
+        "Full runtime suite passed: 506 tests in 46 files, including 5 new hook-lifetime cases for RPC/HTTP operation isolation, pending status cancellation and post-await retired-owner guards. Independent pass 2 additionally verified 191 snapshot/lifecycle/hash cases.",
+        "Direct vp pack passed declaration emission, attw and publint. Published-contract fixtures passed installed TypeScript 7.0.2 and 5.9.3. Full type-aware lint passed with no errors or warnings; strict Effect diagnostics passed with 0 errors and 0 warnings (one pre-existing suggestion).",
+        "Both example application builds passed. Expanded shared CSS has exactly the original rules for both apps, ignoring whitespace. Documentation snippet and Astro checks passed.",
+        "All four uncached Fallow analyses passed: both dead-code modes have no issues, semantic near-duplicate groups decreased from 67 to 61. Existing workspace-discovery advisory for the explicitly excluded source-only shared examples remains visible.",
+        "The native task supervisor sometimes fails with spawn EBUSY or sandbox process initialization errors; identical installed commands ran directly after completing their package prerequisites. No checks or source rules were bypassed to obtain these results.",
+        "No shipped guidance, activation description or public interface changed. Fresh consumer and discovery sessions were not repeated for this internal refactor; executable published-contract and rendered-application checks provide this batch evidence."
       ]
     },
     "source:examples/tanstack-start/vite.config.ts": {
@@ -1461,16 +1497,21 @@
       ]
     },
     "source:examples/vite-react/src/styles/tailwind.css": {
-      "fingerprint": "bcd26043e6850ae901dc9de55c814583cc8d30cfa03e0d5c87e9a288ea08a03e",
+      "fingerprint": "ef9ab398e901958bc40a3dc2b73bd4f529b6066580714f8a61123aed96b2c9a3",
       "snapshot": {
-        "examples/vite-react/src/styles/tailwind.css": "8a15901ff92b03b284dc879a456e155235a5ccd4832153847ded0ffd0106933e"
+        "examples/vite-react/src/styles/tailwind.css": "51c4b3e6464deaf25b330dc651ab0b6a6ba277bc660cc45f128e1461eeb8daaa"
       },
-      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "head": "d870776a5f37835467beb611c6ca6a51fe3933eb",
       "outcome": "no-change",
-      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
+      "reason": "Move identical example theme declarations to examples/shared/theme.css while retaining Tailwind imports at both original entries and the Vite-specific grid locally. Expanded CSS preserves the original rules exactly and both builds pass. This is private example presentation reuse, with no query-library guidance or public-interface change.",
       "evidence": [
-        "Reviewed the actual diff and current source at examples/vite-react/src/styles/tailwind.css against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
-        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+        "Compared the task working tree with d870776a5f37835467beb611c6ca6a51fe3933eb; three independent architecture passes and an additional independent check of the final diff found no remaining actionable findings.",
+        "Full runtime suite passed: 506 tests in 46 files, including 5 new hook-lifetime cases for RPC/HTTP operation isolation, pending status cancellation and post-await retired-owner guards. Independent pass 2 additionally verified 191 snapshot/lifecycle/hash cases.",
+        "Direct vp pack passed declaration emission, attw and publint. Published-contract fixtures passed installed TypeScript 7.0.2 and 5.9.3. Full type-aware lint passed with no errors or warnings; strict Effect diagnostics passed with 0 errors and 0 warnings (one pre-existing suggestion).",
+        "Both example application builds passed. Expanded shared CSS has exactly the original rules for both apps, ignoring whitespace. Documentation snippet and Astro checks passed.",
+        "All four uncached Fallow analyses passed: both dead-code modes have no issues, semantic near-duplicate groups decreased from 67 to 61. Existing workspace-discovery advisory for the explicitly excluded source-only shared examples remains visible.",
+        "The native task supervisor sometimes fails with spawn EBUSY or sandbox process initialization errors; identical installed commands ran directly after completing their package prerequisites. No checks or source rules were bypassed to obtain these results.",
+        "No shipped guidance, activation description or public interface changed. Fresh consumer and discovery sessions were not repeated for this internal refactor; executable published-contract and rendered-application checks provide this batch evidence."
       ]
     },
     "source:.github/actions/setup-repository/action.yml": {
@@ -1519,6 +1560,42 @@
         "Four existing application Chromium acceptance cases and all seven existing documentation Chromium cases passed against prepared outputs. Their preview logs contain no pack or build invocation. Hosted docs Playwright list mode listed seven cases without building a local site. Receipts: /tmp/effect-api-query-ci-audit/.",
         "All three shared planning documents were read: _artifacts/domain_map.yaml retains the same ten consumer tasks/failure modes, _artifacts/skill_spec.md retains accurate source-backed coverage and boundaries, and _artifacts/skill_tree.yaml retains the same owned skill, six references, source mappings, prerequisites and distribution. CI-only orchestration requires no guidance or planning rewrite.",
         "The first hosted run of artifact reuse and the reusable release/deployment workflows remains unverified locally. No package publication or Pages deployment was performed."
+      ]
+    },
+    "source:examples/shared/theme.css": {
+      "fingerprint": "8d029321671dc85cbf712e9165c283c5bd8a1b9835174d8c79023453c07681f0",
+      "snapshot": {
+        "examples/shared/theme.css": "b48a2896fe934311ef529e62ee4a90e7c59e9e6202f6ee2bb571fd0e2fbab8eb"
+      },
+      "head": "d870776a5f37835467beb611c6ca6a51fe3933eb",
+      "outcome": "no-change",
+      "reason": "Move identical example theme declarations to examples/shared/theme.css while retaining Tailwind imports at both original entries and the Vite-specific grid locally. Expanded CSS preserves the original rules exactly and both builds pass. This is private example presentation reuse, with no query-library guidance or public-interface change.",
+      "evidence": [
+        "Compared the task working tree with d870776a5f37835467beb611c6ca6a51fe3933eb; three independent architecture passes and an additional independent check of the final diff found no remaining actionable findings.",
+        "Full runtime suite passed: 506 tests in 46 files, including 5 new hook-lifetime cases for RPC/HTTP operation isolation, pending status cancellation and post-await retired-owner guards. Independent pass 2 additionally verified 191 snapshot/lifecycle/hash cases.",
+        "Direct vp pack passed declaration emission, attw and publint. Published-contract fixtures passed installed TypeScript 7.0.2 and 5.9.3. Full type-aware lint passed with no errors or warnings; strict Effect diagnostics passed with 0 errors and 0 warnings (one pre-existing suggestion).",
+        "Both example application builds passed. Expanded shared CSS has exactly the original rules for both apps, ignoring whitespace. Documentation snippet and Astro checks passed.",
+        "All four uncached Fallow analyses passed: both dead-code modes have no issues, semantic near-duplicate groups decreased from 67 to 61. Existing workspace-discovery advisory for the explicitly excluded source-only shared examples remains visible.",
+        "The native task supervisor sometimes fails with spawn EBUSY or sandbox process initialization errors; identical installed commands ran directly after completing their package prerequisites. No checks or source rules were bypassed to obtain these results.",
+        "No shipped guidance, activation description or public interface changed. Fresh consumer and discovery sessions were not repeated for this internal refactor; executable published-contract and rendered-application checks provide this batch evidence."
+      ]
+    },
+    "source:examples/tanstack-start/src/routes/diagnostics.tsx": {
+      "fingerprint": "d7df381eb6eb247f0cfc9940181740b6fb1691dc94f4d93d2f6f1084aa4ecaf4",
+      "snapshot": {
+        "examples/tanstack-start/src/routes/diagnostics.tsx": "76e54e5f6834b75fd47f3f751414782daa5a9d5eb0472c0b466b8fb133418bc3"
+      },
+      "head": "d870776a5f37835467beb611c6ca6a51fe3933eb",
+      "outcome": "no-change",
+      "reason": "Update direct example imports to the shared cancellation module, preserving rendered diagnostics and HTTP routes. Both application runtime suites and builds pass. This wiring adds no new library-consumer workflow and leaves existing guidance accurate.",
+      "evidence": [
+        "Compared the task working tree with d870776a5f37835467beb611c6ca6a51fe3933eb; three independent architecture passes and an additional independent check of the final diff found no remaining actionable findings.",
+        "Full runtime suite passed: 506 tests in 46 files, including 5 new hook-lifetime cases for RPC/HTTP operation isolation, pending status cancellation and post-await retired-owner guards. Independent pass 2 additionally verified 191 snapshot/lifecycle/hash cases.",
+        "Direct vp pack passed declaration emission, attw and publint. Published-contract fixtures passed installed TypeScript 7.0.2 and 5.9.3. Full type-aware lint passed with no errors or warnings; strict Effect diagnostics passed with 0 errors and 0 warnings (one pre-existing suggestion).",
+        "Both example application builds passed. Expanded shared CSS has exactly the original rules for both apps, ignoring whitespace. Documentation snippet and Astro checks passed.",
+        "All four uncached Fallow analyses passed: both dead-code modes have no issues, semantic near-duplicate groups decreased from 67 to 61. Existing workspace-discovery advisory for the explicitly excluded source-only shared examples remains visible.",
+        "The native task supervisor sometimes fails with spawn EBUSY or sandbox process initialization errors; identical installed commands ran directly after completing their package prerequisites. No checks or source rules were bypassed to obtain these results.",
+        "No shipped guidance, activation description or public interface changed. Fresh consumer and discovery sessions were not repeated for this internal refactor; executable published-contract and rendered-application checks provide this batch evidence."
       ]
     }
   }

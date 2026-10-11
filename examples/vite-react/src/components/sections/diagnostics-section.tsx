@@ -3,7 +3,7 @@ import { useMutation } from '@tanstack/react-query'
 import {
   describeSlowQueryCancellation,
   useSlowQueryCancellation,
-} from '../../hooks/use-slow-query-cancellation.ts'
+} from '../../../../shared/use-slow-query-cancellation.ts'
 import type { ViteReactApplication } from '../../lib/application.ts'
 import { ActionButton } from '../ui/action-button.tsx'
 import { EffectErrorDetails } from '../ui/effect-error-details.tsx'
