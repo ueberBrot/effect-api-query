@@ -9,60 +9,41 @@ awaits its local iterator cleanup. Ordinary `queryClient.query` waits for an ope
 
 ## Capture data before dehydration
 
-Pass generated accumulated or live options to the helper. Keep the ready client and runner alive
-until the returned Promise settles. This example captures separate history and latest-value views:
+Import `fetchStreamSnapshot` from `effect-api-query`. In the request loader or server snapshot
+module, use your existing `rpc`, request-local `queryClient` and abort `signal`. Keep the ready
+client and runner alive until capture settles. For the declared `updates.watch` stream:
 
 ```ts
-import type { QueryClient } from '@tanstack/query-core'
-import { Schema } from 'effect'
-import { createRpcQueryUtils, fetchStreamSnapshot } from 'effect-api-query'
-import { Rpc, RpcGroup } from 'effect/rpc'
-import type { RpcClient } from 'effect/rpc'
-
-const updates = RpcGroup.make(
-  Rpc.make('updates.watch', {
-    payload: { channel: Schema.String },
-    success: Schema.String,
-    stream: true,
+const input = { channel: 'announcements' }
+const history = await fetchStreamSnapshot(
+  queryClient,
+  rpc.updates.watch.streamedOptions({
+    input,
+    retry: false,
+    maxChunks: 20,
   }),
+  { signal, timeoutMs: 5_000 },
 )
-
-async function captureUpdates<E>(
-  queryClient: QueryClient,
-  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof updates>, E>,
-  signal: AbortSignal,
-) {
-  const rpc = createRpcQueryUtils<typeof updates, readonly ['updates'], E>(updates, {
-    client,
-    keyPrefix: ['updates'],
-  })
-  const input = { channel: 'announcements' }
-  const history = await fetchStreamSnapshot(
-    queryClient,
-    rpc.updates.watch.streamedOptions({
-      input,
-      retry: false,
-      maxChunks: 20,
-    }),
-    { signal, timeoutMs: 5_000 },
-  )
-  const latest = await fetchStreamSnapshot(
-    queryClient,
-    rpc.updates.watch.liveOptions({
-      input,
-      retry: false,
-    }),
-    { signal, timeoutMs: 5_000 },
-  )
-  return { history, latest }
-}
 ```
 
-Call `captureUpdates` with a request-local QueryClient, ready client, and request abort signal.
-Then dehydrate successful data with TanStack's normal policy and your application's serializer.
-For HTTP SSE, pass `streamedOptions` or `liveOptions` from the HTTP utility tree in the same way.
-Use [Hydrate Unary Data](/effect-api-query/guides/hydrate-unary-data/) for paired Schema codecs,
-including accumulated arrays and live values.
+In the same request, capture the independent latest-value view:
+
+```ts
+const latest = await fetchStreamSnapshot(
+  queryClient,
+  rpc.updates.watch.liveOptions({
+    input,
+    retry: false,
+  }),
+  { signal, timeoutMs: 5_000 },
+)
+```
+
+Then dehydrate successful data with your application's serializer, and dispose request resources
+after cleanup. HTTP SSE accepts the same helper with its generated options. The
+[complete typed recipe](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-stream-snapshot.ts)
+includes contract/client composition; [Hydrate Query Views](/effect-api-query/guides/hydrate-query-views/)
+covers history, live values and paired codecs.
 
 The default `fresh` mode starts a new attempt even when cached or initial data has a future
 timestamp. Old data cannot settle that attempt. Native stream policies still apply: `append`

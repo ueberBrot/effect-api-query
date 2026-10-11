@@ -1,36 +1,28 @@
 ---
 title: HTTP Queries and Mutations
-description: Fetch and update data through an Effect HttpApi with TanStack Query.
+description: Use decoded requests, writes, metadata and SSE views from an existing HttpApi.
 ---
 
-Use `createHttpApiQueryUtils` with your HttpApi definition and ready HttpApiClient. The client
-keeps its existing base URL, transport, and middleware configuration.
-
-This example assumes your API has a `users` group with `get` and `create` endpoints. The `get`
-endpoint declares a decoded numeric `id` in `params`; `create` accepts `{ name: string }` in
-`payload`. Replace the application module imports with your own contract and client.
+Use your existing `http` utility tree and QueryClient. The examples below name the declared
+request parts and result shape for each endpoint; substitute the corresponding operation
+from your API. Import native observers/hooks from TanStack Query when using them.
 
 ## Create the utilities
 
+Create the tree in the application client module with your HttpApi and acquired client:
+
 ```ts
-import { MutationObserver, QueryClient } from '@tanstack/query-core'
-import { createHttpApiQueryUtils } from 'effect-api-query'
-
-import { api } from './api.js'
-import { client } from './http-client.js'
-
-const queryClient = new QueryClient()
-const http = createHttpApiQueryUtils(api, {
-  client,
-  keyPrefix: ['my-app'],
-})
+const http = createHttpApiQueryUtils(api, { client, keyPrefix: ['my-app'] })
 ```
 
-This client needs no additional execution services. If your client or its schemas require services,
-also supply a `runPromiseExit` backed by your application runtime. Forward the runner's options
-so [query cancellation](/effect-api-query/guides/cancellation/#cancel-an-http-query) reaches Effect.
+Import the factory from `effect-api-query`. Keep base URL, middleware and authentication on the
+ready client. When execution needs services, supply your application's signal-aware
+`runPromiseExit`. The [HTTP Quick Start](/effect-api-query/getting-started/http-quick-start/)
+shows factory, read and write setup.
 
 ## Fetch a user
+
+For `users.get` declaring an integer `id` param, in a loader or event handler:
 
 ```ts
 const userOptions = http.users.get.queryOptions({
@@ -41,22 +33,17 @@ const userOptions = http.users.get.queryOptions({
 const user = await queryClient.query(userOptions)
 ```
 
-Pass decoded values in the endpoint's declared `params`, `query`, `headers`, and `payload`
-containers. For example, a `Schema.FiniteFromString` parameter takes a number; the ready client
-encodes it for transport. Include every declared container, even when its fields are optional.
-An endpoint without request input uses `queryOptions()`.
+Pass decoded values in every declared `params`, `query`, `headers`, and `payload` container,
+even when its fields are optional. The client encodes them; HTTP builders add no constructor
+defaults. An inputless endpoint uses `queryOptions()`.
 
-React applications can pass `userOptions` directly to `useQuery`, `useSuspenseQuery`, or
-`usePrefetchQuery`. A `select` callback receives decoded response data; it changes the observer's
-data type without changing the cached value. `queryClient.getQueryData(userOptions.queryKey)`
-still infers the decoded user type.
+Pass `userOptions` to a native query hook for observation. `select` changes its result while
+`getQueryData(userOptions.queryKey)` still infers the decoded cache value.
 
 ## Update with an ETag
 
-Use a metadata view to read decoded data, status, and raw response headers together. For this
-recipe, `users.get` returns a user and its server supplies an ETag. The `users.update` endpoint
-declares numeric `id` params, a string `if-match` header, a `{ name: string }` payload, and its
-precondition failure as a declared error.
+Suppose `users.get` supplies an ETag and `users.update` declares `id` params, an `if-match`
+header, a `{ name }` payload and its precondition error. In the write handler, read metadata:
 
 ```ts
 const input = { params: { id: 1 } }
@@ -64,7 +51,11 @@ const metadataOptions = http.users.get.metadataOptions({ input })
 const current = await queryClient.query(metadataOptions)
 const etag = current.headers['etag']
 if (etag === undefined) throw new Error('The server supplied no ETag')
+```
 
+Cancel affected reads and prepare the mutation with endpoint-prefix invalidation:
+
+```ts
 await queryClient.cancelQueries({ queryKey: http.users.get.key() })
 const update = new MutationObserver(
   queryClient,
@@ -72,43 +63,37 @@ const update = new MutationObserver(
     onSuccess: () => queryClient.invalidateQueries({ queryKey: http.users.get.key() }),
   }),
 )
+```
+
+Execute that write with the ETag unchanged, **including quotes**:
+
+```ts
 await update.mutate({
   params: input.params,
   headers: { 'if-match': etag },
   payload: { name: 'Ada' },
 })
+```
 
+After invalidation, fetch metadata again and use its next ETag before another write:
+
+```ts
 const refreshed = await queryClient.query(metadataOptions)
 ```
 
-Send the ETag unchanged, including quotes. The server owns conditional-write enforcement; handle a
-declared precondition failure through the mutation's HTTP execution error. Invalidation uses the
-endpoint prefix so both ordinary data and metadata views refresh. Read the next ETag from the fresh
-metadata result before another write.
+The server enforces the precondition; handle a declared failure through the HTTP execution
+error. The prefix refreshes both data and metadata entries. Metadata retains decoded success
+(including decoded header wrappers), status and copied frozen raw string headers in a separate
+cache view. Choose safe headers before persistence or hydration.
 
-`current.data` retains the endpoint's decoded success, including any declared decoded header
-wrapper. A top-level successful `undefined` becomes `null`. `current.status` is the response status;
-`current.headers` is a copied, frozen plain string record. The outer result is frozen, while decoded
-data keeps its declared representation. Raw headers can contain private values: choose which headers
-your application may persist or dehydrate.
-
-Fetched snapshots stay frozen after structural sharing, using your global, prefix, or per-call
-policy. Decoded data and values supplied through `initialData`, hydration, or manual cache writes
-remain application-owned. Selected observer results and subsequent manual writes use the policy
-explicitly passed to `metadataOptions`, or standard deep sharing if omitted; they do not inherit
-global or prefix sharing policies. See
-[Buffered metadata](/effect-api-query/reference/http-factory/#buffered-metadata).
-
-A fresh-cache hit from imperative `queryClient.query(newOptions)` retains existing Query options.
-Install a changed sharing policy through an observer or an actual fetch before later manual writes.
-
-`metadataKey(input)` provides a typed key for cache reads and writes. Metadata options support
-selection, initial data, skipped input, native hashing defaults, and cancellation like ordinary
-queries. Metadata has its own cache identity and no mutation or infinite-query builders.
+[Buffered metadata](/effect-api-query/reference/http-factory/#buffered-metadata) specifies
+initial data, selection, immutable snapshots and structural sharing. A fresh imperative cache
+hit keeps existing Query options; install a changed policy through an observer or actual fetch
+before later manual writes.
 
 ## Wait for request input
 
-Use `skipToken` until the complete request is available:
+In a React component, use the exported `skipToken` until the full request exists:
 
 ```ts
 import { useQuery } from '@tanstack/react-query'
@@ -123,22 +108,16 @@ const user = useQuery(
 )
 ```
 
-`queryOptions(skipToken)` is shorthand when you need no other options. Skipping preserves caller
-options and performs no request encoding or client call. Its query function is TanStack's exact
-sentinel, so manual `refetch()` cannot execute it. Supply valid input to enable the query. Use
-`enabled: false` with a complete request when you need a query that can run through manual refetch.
-Suspense and prefetch-only hooks require executable options and reject skipped options. See
-[Conditional Queries](/effect-api-query/guides/conditional-queries/) for the shared contract.
+Skipping keeps caller options and performs no encoding or request. For manual refetch, use
+`enabled: false` with complete input. [Conditional Queries](/effect-api-query/guides/conditional-queries/)
+covers sentinel, suspense and prefetch restrictions.
 
 ## Load pages
 
-For an endpoint `users.list` with decoded query fields `cursor: number` and `filter: string`, and
-a response `{ items: User[]; nextCursor: number | null }`, map each page parameter to a complete
-request:
+For `users.list` declaring `cursor` and `filter` query fields and returning
+`{ items, nextCursor }`, build options in the query consumer:
 
 ```ts
-import { useInfiniteQuery } from '@tanstack/react-query'
-
 const filter = 'active'
 const pageOptions = http.users.list.infiniteOptions({
   initialPageParam: 0,
@@ -146,29 +125,18 @@ const pageOptions = http.users.list.infiniteOptions({
   getNextPageParam: (page) => page.nextCursor ?? undefined,
   select: (data) => data.pages.flatMap((page) => page.items),
 })
-
-const users = useInfiniteQuery(pageOptions)
 ```
 
-TypeScript infers `cursor` from `initialPageParam`. Return every declared request container from
-`input`, including any `params`, `headers`, or `payload`; each page is a fresh decoded HTTP request.
-Use `users.fetchNextPage()` when `users.hasNextPage` is true. You control cursor progression through
-`getNextPageParam`: return the server's next cursor, or `undefined` or `null` when there are no more
-pages.
-
-The cache key uses `input(initialPageParam)` and an `infinite` discriminator. Keep all stable
-filters in the initial request and every later request. Rebuild the options when a filter
-changes so the first request produces a different key. Keep `input` deterministic and free of
-side effects: it runs during key construction and again for page execution. A custom key encoder
-must preserve these same filters because they affect results.
-
-TanStack owns page storage, invalidation, and refetching. `select` changes the hook result to the
-flattened users; the cache still holds `pages` and `pageParams`. Each page uses the same response
-normalization, wrapped failures, and cancellation as an ordinary HTTP query. To pause pagination, use
-`input: skipToken` with `initialPageParam` and `getNextPageParam`; the infinite builder accepts
-only this object form for skipping.
+Pass `pageOptions` to the native infinite hook. The initial mapped request determines identity;
+keep stable filters in every page and rebuild options when they change. The mapper runs during
+key construction and execution, so keep it deterministic and return all declared containers.
+`select` changes the observer result; cache data retains `pages` and `pageParams`.
+See [HTTP pagination](/effect-api-query/reference/http-factory/#pagination) for skipping,
+page inference and execution contracts.
 
 ## Create a user and refresh the cache
+
+In the mutation module, prepare the write and refresh its affected branch:
 
 ```ts
 const createUser = new MutationObserver(
@@ -177,22 +145,20 @@ const createUser = new MutationObserver(
     onSuccess: () => queryClient.invalidateQueries({ queryKey: http.users.key() }),
   }),
 )
+```
 
+In an event handler, supply this execution's complete decoded request:
+
+```ts
 await createUser.mutate({ payload: { name: 'Ada' } })
 ```
 
-Mutation variables use the same decoded request shape as query input. Choose the invalidation
-prefix for the data your write changes. React applications can pass the same mutation options to
-`useMutation`.
-
-Both builders return decoded response data. Successful `undefined` query data becomes `null`;
-mutation results retain `undefined`. Inspect execution failures with
-[`isEffectHttpApiQueryError`](/effect-api-query/guides/handle-failures/#inspect-http-failures).
+Native `useMutation` accepts the same options. Successful `undefined` query data becomes
+`null`; mutation results keep `undefined`. See [Handle Failures](/effect-api-query/guides/handle-failures/#inspect-http-failures).
 
 ## Upload a file
 
-Declare a buffered multipart payload in your shared API definition. For example, add this endpoint
-to the `users` group and include it in the server implementation:
+In the shared contract module, declare the buffered multipart payload:
 
 ```ts
 import { Schema } from 'effect'
@@ -206,9 +172,8 @@ const upload = HttpApiEndpoint.post('upload', '/users/:id/files', {
 })
 ```
 
-Create the utilities from the updated API and ready client. This endpoint exposes `key()`,
-`mutationKey()`, and `mutationOptions()`. Build `FormData` explicitly and supply every other declared
-request container in its decoded type:
+In the mutation module, use the updated API's utilities. In the upload handler, build `FormData`
+explicitly and pass it with all other declared containers:
 
 ```ts
 const uploadFile = new MutationObserver(
@@ -223,19 +188,17 @@ payload.set('file', new Blob(['profile notes'], { type: 'text/plain' }), 'notes.
 const uploaded = await uploadFile.mutate({ params: { id: 1 }, payload })
 ```
 
-The adapter forwards the `FormData` to the ready client and returns the decoded success. React
-applications can use these options with `useMutation`; callback variables retain the complete request
-type. Request encoding and middleware still use your application's client and runner.
-
-A buffered multipart alternative makes the whole endpoint mutation-only, even when it also accepts
-plain payloads. Mixed alternatives retain Effect's client request union. Leave the endpoint out of
-`keyEncoders`: mutation keys contain no request variables, and encoder entries are rejected. Any
-streaming success or streaming multipart alternative omits the whole endpoint.
+The ready client and runner own encoding/middleware; the adapter returns decoded success.
+Any buffered multipart alternative makes the whole endpoint mutation-only. Leave it out of
+`keyEncoders`: mutation keys contain no variables, so encoder entries are rejected. Streaming
+success or streaming multipart alternatives omit the whole endpoint.
+The [multipart runtime recipe](https://github.com/ueberBrot/effect-api-query/blob/main/tests/http-multipart.test.ts)
+contains the complete contract and execution.
 
 ## Retain SSE events
 
-An endpoint with one `HttpApiSchema.StreamSse` success exposes accumulated and live query builders. For a `watch` endpoint whose query declares `channel: Schema.String`,
-retain its latest 100 decoded events:
+For one `HttpApiSchema.StreamSse` success declaring a `channel` query field, build observation
+options in the query consumer:
 
 ```ts
 const events = http.events.watch.streamedOptions({
@@ -244,77 +207,45 @@ const events = http.events.watch.streamedOptions({
   refetchMode: 'reset',
   sseOptions: { maxEventSize: 1024 * 1024 },
 })
-
-const observer = new QueryObserver(queryClient, events)
-const unsubscribe = observer.subscribe((result) => {
-  renderEvents(result.data ?? [])
-})
 ```
 
-Import `QueryObserver` from `@tanstack/query-core`, or pass the options to your framework's
-query hook. Replace `renderEvents` with your application's rendering callback. The first event
-makes the query successful while it remains fetching. Unsubscribe and cancel the owning queries
-before disposing the ready client and runtime.
+Pass `events` to the framework query hook or `QueryObserver`. The first emission is successful
+data while fetching continues. `maxChunks` bounds cached elements; omit it for unlimited
+history. It does not bound transport buffering. `reset`, `append` and `replace` choose refetch
+history; an open `replace` keeps old data until completion. Accumulated elements retain
+`undefined` and decoded header wrappers.
 
-The cache holds decoded events in order. Omit `maxChunks` for unlimited history; use a positive
-safe integer to bound retention. `reset` starts a fresh history on refetch, `append` extends the
-existing history, and `replace` keeps the previous history visible until the refetch completes.
-Empty completion succeeds with an empty or retained history according to the refetch mode.
-Accumulated arrays preserve decoded `undefined` elements. A declared `WithHeaders` success wraps
-each event with the response's decoded headers.
-
-Keep `sseOptions` beside `input`. Its `maxEventSize` limits pending SSE parser text in JavaScript
-string code units and defaults to 10 MiB. The same request with different effective decoder,
-retention, or refetch policies has a different cache key. To read that exact entry, pass the
-same policy to `streamedKey(input, policy)`; inputless endpoints accept policy alone.
-`key()` remains a prefix matching every policy. Input-bearing builders also support `skipToken`.
-
-Declared request headers, such as a resume cursor, remain inside `input.headers` and contribute
-to request identity. The ready client handles SSE decoding and failures; the adapter preserves
-complete Causes, including `Sse.Retry`. Your application owns reconnection and resume policy.
-Raw byte streams, mixed buffered/SSE successes, and SSE endpoints with multipart payloads are
-omitted. Consume unsupported streams directly through the ready client.
+`sseOptions.maxEventSize` bounds pending parser text in code units (default 10 MiB).
+Decoder and history policy affect exact identity; use the same policy with `streamedKey`, or
+reuse `events.queryKey`. Declared resume headers belong in `input.headers`. Reconnection,
+`Sse.Retry` and resume policy remain application-owned. See
+[HTTP streams](/effect-api-query/reference/http-factory/#accumulated-sse-options) for full policies,
+failures and omitted response shapes.
 
 ## Keep the latest SSE value
 
-Use `liveOptions` when a stream emits snapshots and only the latest value belongs in the cache:
+For snapshot-like emissions, in the same query consumer:
 
 ```ts
 const latest = http.events.watch.liveOptions({
   input: { query: { channel: 'news' } },
   sseOptions: { maxEventSize: 1024 * 1024 },
 })
-
-const observer = new QueryObserver(queryClient, latest)
-const unsubscribe = observer.subscribe((result) => {
-  if (result.status === 'success') renderLatest(result.data)
-})
 ```
 
-Replace `renderLatest` with your application's rendering callback, or pass `latest` to your
-framework's query hook. The first emission makes the query successful while it remains fetching.
-Each later emission replaces the cached value; completion preserves the last value. A top-level
-`undefined` emission becomes `null`, including after a defined value. Decoded header wrappers keep
-their body unchanged, so a wrapped `undefined` body remains `undefined`.
+Pass `latest` to a native query hook or observer. Each emission replaces cached data; completion
+preserves it. Top-level `undefined` becomes `null`; a decoded header wrapper keeps its body.
+Empty completion raises `EffectHttpApiQueryEmptyStreamError`. Transport/decoding/event failures
+and independent interruption preserve their full Cause.
 
-Completion before any emission raises `EffectHttpApiQueryEmptyStreamError`. Transport, decoding,
-declared event, and independent interruption failures retain the complete Cause in
-`EffectHttpApiQueryError` with operation `live`. Query cancellation closes consumption and follows
-native cache reversion; unsubscribe and cancel active queries before disposing client resources.
-
-`liveKey(input, { sseOptions })` builds the matching exact key. Inputless endpoints accept decoder
-policy alone. Live and accumulated views use separate cache entries; the endpoint's `key()`
-selects both views and every decoder policy. Live queries retain one value and accept no history
-bound or accumulated refetch mode. Input-bearing builders support `skipToken`.
-
-The ready client owns the SSE connection. Handle `Sse.Retry` and its resume cursor through your
-application's retry policy, and supply a declared cursor in `input.headers` when reconnecting.
-New cursor values produce new request identity. Raw bytes, mixed buffered/SSE successes, and
-multipart SSE endpoints remain omitted.
+Use `latest.queryKey` or `liveKey(input, { sseOptions })` for exact access. Live views accept no
+history bound/refetch mode and remain separate from accumulated views. Both support skipped
+input and endpoint-prefix filtering. Unsubscribe, cancel and drain local work before disposal;
+other observers retain their subscriptions. See [Client Lifecycle](/effect-api-query/concepts/client-lifecycle/).
 
 ## Keep cache entries separate
 
-Use generated keys for individual queries or whole branches:
+In a cache callback or event handler:
 
 ```ts
 const key = http.users.get.queryKey({ params: { id: 1 } })
@@ -322,21 +253,13 @@ const cachedUser = queryClient.getQueryData(key)
 await queryClient.invalidateQueries({ queryKey: http.users.key() })
 ```
 
-If client middleware changes results by user or tenant, include a safe user or tenant identifier in
-`keyPrefix`. Keep credentials out of keys. Use a
-[custom encoder](/effect-api-query/guides/custom-key-encoders/#http-requests) when request schemas
-need encoding services, contain redacted values, or allow multiple payload alternatives.
+Include safe user/tenant identity in `keyPrefix` when middleware changes results. Keep credentials
+out of keys; use [custom encoders](/effect-api-query/guides/custom-key-encoders/#http-requests)
+when default request encoding cannot supply safe JSON identity.
 
-Buffered HTTP endpoints without multipart expose ordinary query, infinite query, and mutation
-builders regardless of HTTP method. Choose the builder for the operation you intend. Buffered
-multipart endpoints expose mutations only. A single SSE success exposes accumulated and live streamed
-queries; raw byte streams, mixed buffered/SSE successes, and streaming multipart requests are omitted; see the [HTTP factory reference](/effect-api-query/reference/http-factory/)
-for supported request formats and the complete builder contract.
-
-When your application or server request ends, cancel its active queries and clear its QueryClient
-before disposing client and runtime resources. See
-[Client Lifecycle](/effect-api-query/concepts/client-lifecycle/#http-clients-and-execution-services).
-
-The [public HTTP consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/http-contract.ts) checks query, mutation,
-pagination, and skipped-input types. The [Vite React HTTP panel](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/components/sections/http-section.tsx)
-shows the contract, ready client, hooks, and cache invalidation in a running application.
+The [running React HTTP panel](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/components/sections/http-section.tsx)
+shows buffered users and diagnostics. Advanced type recipes are in
+[http-contract.ts](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/http-contract.ts) and
+[http-stream-contract.ts](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/http-stream-contract.ts);
+[metadata runtime recipes](https://github.com/ueberBrot/effect-api-query/blob/main/tests/http-cached-views.test.ts)
+cover metadata behavior.

@@ -129,6 +129,9 @@ The factories preserve the ready client's actual execution contract; they supply
 no transport batching, platform services, or framework providers. Error guards use
 same-realm `instanceof`; transfer safe error DTOs deliberately across realms.
 
-Sources: [framework guides](https://ueberbrot.github.io/effect-api-query/guides/vue-and-solid/),
+Sources: [Vue Query](https://ueberbrot.github.io/effect-api-query/guides/vue-query/),
+[Solid Query](https://ueberbrot.github.io/effect-api-query/guides/solid-query/),
+[Svelte Query](https://ueberbrot.github.io/effect-api-query/guides/svelte-query/),
+[Angular Query](https://ueberbrot.github.io/effect-api-query/guides/angular-query/),
 [host boundaries](https://ueberbrot.github.io/effect-api-query/reference/browser-and-worker-hosts/),
 [WebSocket clients](https://ueberbrot.github.io/effect-api-query/guides/websocket-clients/).

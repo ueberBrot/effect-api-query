@@ -9,6 +9,9 @@ By default, the factory constructs the RPC payload and synchronously encodes it 
 Supply a custom encoder when encoding requires Effect services or the payload contains
 `Schema.Redacted` values, including schemas reached through `Schema.suspend`.
 
+In the application client module, configure the ready RPC client. Here `identifySecret` is
+your synchronous public-identity projection:
+
 ```ts
 const rpcQuery = createRpcQueryUtils(rpcGroup, {
   client,
@@ -42,6 +45,8 @@ group and endpoint identifier, even for a top-level group or an identifier conta
 Suppose a `forms` group's `submit` endpoint accepts a number encoded as text or a string encoded
 as JSON. Both schemas can encode to `"1"`, but the HTTP bodies differ. Preserve that distinction
 in the key:
+
+In the HTTP client module, configure that endpoint's request projection:
 
 ```ts
 const http = createHttpApiQueryUtils(contract, {
@@ -82,7 +87,3 @@ undefined object members, undefined or sparse array entries, non-finite numbers,
 non-JSON objects. Custom output bypasses the default HTTP rules for omitting `undefined` members and normalizing headers.
 See the [HTTP reference](/effect-api-query/reference/http-factory/#cache-identity-and-failures) for
 failure codes. Underlying error Causes remain intact and may contain values supplied by Effect.
-
-The [public RPC consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/public-contract.ts) and
-[public HTTP consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/http-contract.ts) check encoder inputs and required services.
-The [HTTP key tests](https://github.com/ueberBrot/effect-api-query/blob/main/tests/http-semantic-keys.test.ts) verify alternative payload and binary projections.

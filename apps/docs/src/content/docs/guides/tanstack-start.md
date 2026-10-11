@@ -7,58 +7,30 @@ Use `effect-api-query` with your existing TanStack Start router and Effect contr
 factory for your contract, then use its generated options with TanStack Query in loaders and
 components.
 
-## Choose a factory
-
-For an Effect RPC group, pass your ready RPC client to `createRpcQueryUtils`:
-
-```ts
-import { createRpcQueryUtils } from 'effect-api-query'
-
-const queryUtils = createRpcQueryUtils(rpcGroup, {
-  client: rpcClient,
-  keyPrefix: ['app', identity],
-  runPromiseExit,
-})
-```
-
-For an Effect HTTP API, use `createHttpApiQueryUtils` with your ready `HttpApiClient` instead:
-
-```ts
-import { createHttpApiQueryUtils } from 'effect-api-query'
-
-const queryUtils = createHttpApiQueryUtils(httpApi, {
-  client: httpClient,
-  keyPrefix: ['app', identity],
-  runPromiseExit,
-})
-```
-
-Use `identity` to partition the cache safely by the current user or tenant. `runPromiseExit`
-is your application's runner. Configure transport URLs, authentication, and required services when
-creating the client and runner. Use a request-owned server-local client when your application can execute the handlers locally.
-Otherwise, use a trusted server destination. Browser clients use a browser-accessible destination.
-
-The [RPC factory reference](/effect-api-query/reference/factory/) and
-[HTTP guide](/effect-api-query/guides/http-queries-and-mutations/) cover client setup, optional
-runners, and request inputs. The package generates query options; your application owns the API
-host, router, and providers.
+Create `queryUtils` with the [RPC](/effect-api-query/getting-started/quick-start/) or
+[HTTP](/effect-api-query/getting-started/http-quick-start/) factory in your client module.
+Expose it and its QueryClient through router context. Use a safe identity prefix and a
+signal-aware runner. The application owns the router, providers, API host and authentication.
 
 ## Prefetch in a loader and read in a component
 
 Expose your `queryUtils` and `QueryClient` through the router context. For a
 contract with a `users.list` operation, the same generated options work in both places:
 
+In the route module, register the loader and the existing `UsersRoute` component:
+
 ```tsx
 export const Route = createFileRoute('/users')({
   loader: ({ context }) => context.queryClient.query(context.queryUtils.users.list.queryOptions()),
   component: UsersRoute,
 })
+```
 
-function UsersRoute() {
-  const { queryUtils } = Route.useRouteContext()
-  const users = useSuspenseQuery(queryUtils.users.list.queryOptions())
-  return <pre>{JSON.stringify(users.data, null, 2)}</pre>
-}
+Inside `UsersRoute`, read the same options with the native hook:
+
+```ts
+const { queryUtils } = Route.useRouteContext()
+const users = useSuspenseQuery(queryUtils.users.list.queryOptions())
 ```
 
 Set `staleTime` on the Query Client or generated options long enough to keep successful loader
@@ -130,29 +102,16 @@ timeouts, aborts, stream policies, and exclusive query ownership.
 
 ## Explore the executable example
 
-The [TanStack Start example](https://github.com/ueberBrot/effect-api-query/tree/main/examples/tanstack-start)
-includes separate RPC and HTTP views to demonstrate both factories. It verifies successful SSR,
-hydration without duplicate reads, cached navigation, pagination, mutations, failures, and
-cancellation. Its `/http-failure` route omits a failed query from dehydration so the browser can
-refetch it.
-See [Executable Examples](/effect-api-query/examples/) for commands and controls.
+[Run the Start application](/effect-api-query/examples/) for both adapters. Copy the seam you need:
 
-The example serves RPC at `/rpc` and HTTP at `/api/$`. Both handlers share a demonstration user
-directory, so writes invalidate both sets of query keys. The authorization header contains a
-public demonstration value. Each request owns its cache and connections; disposing one request
-leaves other requests usable.
+| Task                                     | Complete source                                                                                                                                                                                                                                                  |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Router context and Query integration     | [router.tsx](https://github.com/ueberBrot/effect-api-query/blob/main/examples/tanstack-start/src/router.tsx)                                                                                                                                                     |
+| Paired codecs and snapshot preparation   | [query-ssr.ts](https://github.com/ueberBrot/effect-api-query/blob/main/examples/tanstack-start/src/lib/query-ssr.ts), [snapshot-preparation.ts](https://github.com/ueberBrot/effect-api-query/blob/main/examples/tanstack-start/src/lib/snapshot-preparation.ts) |
+| Request-owned clients and cleanup        | [server-application.ts](https://github.com/ueberBrot/effect-api-query/blob/main/examples/tanstack-start/src/lib/server-application.ts)                                                                                                                           |
+| HTTP failure followed by browser refetch | [http-failure.tsx](https://github.com/ueberBrot/effect-api-query/blob/main/examples/tanstack-start/src/routes/http-failure.tsx)                                                                                                                                  |
 
-Server rendering uses request-owned connections built with Effect's public decoded-message client
-and server. They execute the same application state as the network handlers. RPC execution avoids
-HTTP round trips; HTTP loaders call the host's Web handler in process and retain HTTP Schema codecs.
-The browser acquires separate network clients and reconnects both stream views after hydration.
-
-Local RPC middleware captures the request's demonstration authorization value. Per-call headers and
-caller execution services cannot replace that authority. The example defaults that public value to
-`allowed`; replace this demonstration policy with your application's authentication. Decoded-message
-RPC execution bypasses transport Schema codecs. Keep a schema-aware protocol when wire validation
-or codec effects are required.
-
-The example pairs Schema codecs for its generated query views and completes asynchronous
-preparation before publishing or hydrating. Add a codec for each new hydratable view. See
-[Hydrate Query Views](/effect-api-query/guides/hydrate-query-views/).
+Server destinations must be trusted. The example uses request-owned server-local RPC execution;
+its middleware captures server-owned authority that per-call headers or caller services cannot
+replace. Decoded-message RPC bypasses transport Schema codecs, so use a schema-aware protocol
+when wire validation or codec effects matter. Browser clients acquire separate network resources.

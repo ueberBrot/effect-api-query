@@ -22,59 +22,36 @@ pending mutations.
 
 ## Filter RPC queries
 
-This recipe accepts an application-owned ready client. Its `forId` filter matches every locale for
-one user, while `exact` retains the generated DataTag for one complete payload:
+These filters assume your own unary `users.get` and streaming `users.watch` declarations share
+these payload fields. In their contract module, import `Effect` and `Schema` from `effect`:
 
 ```ts
-import { Effect, Schema } from 'effect'
-import { createRpcQueryUtils } from 'effect-api-query'
-import { Rpc, RpcClient, RpcGroup } from 'effect/rpc'
-
-const User = Schema.Struct({ id: Schema.Finite, name: Schema.String })
 const payload = {
   id: Schema.FiniteFromString,
   locale: Schema.String.pipe(Schema.withConstructorDefault(Effect.succeed('en'))),
 }
-export const usersRpc = RpcGroup.make(
-  Rpc.make('users.get', { payload, success: User }),
-  Rpc.make('users.watch', { payload, success: User, stream: true }),
-  Rpc.make('users.list', { success: Schema.Array(User) }),
-  Rpc.make('health.ping', { success: Schema.String }),
-)
-
-export const userCacheFilters = <ClientError>(
-  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof usersRpc>, ClientError>,
-) => {
-  const rpc = createRpcQueryUtils<typeof usersRpc, readonly ['users-app'], ClientError>(usersRpc, {
-    client,
-    keyPrefix: ['users-app'],
-  })
-  const queryPrefix = [...rpc.users.get.key(), 'query'] as const
-  const historyPrefix = [...rpc.users.watch.key(), 'streamed'] as const
-
-  return {
-    rpc,
-    root: { queryKey: rpc.key() },
-    branch: { queryKey: rpc.users.key() },
-    leaf: { queryKey: rpc.users.get.key() },
-    query: { queryKey: queryPrefix },
-    forId: (id: number) => ({ queryKey: [...queryPrefix, { id: String(id) }] as const }),
-    history: { queryKey: historyPrefix },
-    historyForId: (id: number) => ({
-      queryKey: [...historyPrefix, { id: String(id) }] as const,
-    }),
-    exact: (id: number, locale = 'en') => ({
-      queryKey: rpc.users.get.queryKey({ id, locale }),
-      exact: true as const,
-    }),
-  }
-}
 ```
 
-Create the filters with `userCacheFilters(client)`, then pass a filter to
-`queryClient.invalidateQueries(filters.forId(1))`. Combine native conditions by spreading the filter,
-for example `{ ...filters.forId(1), type: 'inactive', stale: false }`. Use
-`queryClient.getQueryData(filters.exact(1).queryKey)` for a typed user read.
+Derive `rpc` from this group and its ready client using the factory setup in
+[RPC Quick Start](/effect-api-query/getting-started/quick-start/). In a cache callback, select
+every locale for user 1 with an encoded partial filter:
+
+```ts
+const queryPrefix = [...rpc.users.get.key(), 'query'] as const
+await queryClient.invalidateQueries({
+  queryKey: [...queryPrefix, { id: '1' }],
+  type: 'inactive',
+  stale: false,
+})
+```
+
+For one complete request, preserve its generated DataTag and use `exact: true`:
+
+```ts
+const queryKey = rpc.users.get.queryKey({ id: 1, locale: 'en' })
+const user = queryClient.getQueryData(queryKey)
+await queryClient.invalidateQueries({ queryKey, exact: true })
+```
 
 Partial matching compares stored canonical key payloads. Here `FiniteFromString` encodes the numeric
 constructor input `1` as `"1"`, so the partial object must use `id: "1"`. A raw `id: 1` matches no
@@ -87,7 +64,7 @@ the default `locale: "en"`; its key therefore cannot express every locale for us
 `{ locale: "en" }` rejects the missing required `id`. Do not cast partial constructor input into a
 key builder or run it through the full payload constructor to derive a broad filter.
 
-`historyForId(1)` stops before the stream-policy suffix and matches every retention bound and
+`[...rpc.users.watch.key(), 'streamed', { id: '1' }]` stops before the stream-policy suffix and matches every retention bound and
 refetch mode for that encoded user. For one history, use
 `rpc.users.watch.streamedKey({ id: 1 }, { maxChunks: 2, refetchMode: 'append' })` with `exact: true`.
 The omitted policy and explicit unlimited/reset policy share the same normalized identity. Keep the
@@ -95,69 +72,37 @@ remaining concrete suffix opaque; root, branch, leaf, and operation filters surv
 
 ## Filter HTTP queries
 
-HTTP partial objects retain their labelled request containers. This recipe selects a path parameter
-or normalized header without constraining the query or payload:
+HTTP filters retain labelled request containers. These filters assume your own `users.get`
+declares `id: Schema.FiniteFromString` in each of `params`, `query`, and `payload`, plus
+`'X-Locale': Schema.String` in `headers`. Its `users.watch` SSE endpoint declares
+`query: { id: Schema.FiniteFromString }`.
+
+Derive `http` from that HttpApi and its ready client using the factory setup in
+[HTTP Quick Start](/effect-api-query/getting-started/http-quick-start/). In a cache callback,
+choose the path parameter or header independently:
 
 ```ts
-import { Schema } from 'effect'
-import { createHttpApiQueryUtils } from 'effect-api-query'
-import {
-  HttpApi,
-  HttpApiClient,
-  HttpApiEndpoint,
-  HttpApiGroup,
-  HttpApiSchema,
-} from 'effect/http-api'
-
-export const usersApi = HttpApi.make('users-api').add(
-  HttpApiGroup.make('users').add(
-    HttpApiEndpoint.post('get', '/users/:id', {
-      params: { id: Schema.FiniteFromString },
-      query: { id: Schema.FiniteFromString, filter: Schema.optional(Schema.String) },
-      headers: Schema.Record(Schema.String, Schema.optional(Schema.String)),
-      payload: Schema.Struct({ id: Schema.FiniteFromString }),
-      success: Schema.String,
-    }),
-    HttpApiEndpoint.get('watch', '/users/events', {
-      query: { id: Schema.FiniteFromString },
-      success: HttpApiSchema.StreamSse({ data: Schema.String }),
-    }),
-  ),
-  HttpApiGroup.make('system', { topLevel: true }).add(
-    HttpApiEndpoint.get('ping', '/health', { success: Schema.String }),
-  ),
-)
-
-export const httpCacheFilters = (client: HttpApiClient.ForApi<typeof usersApi>) => {
-  const http = createHttpApiQueryUtils(usersApi, { client, keyPrefix: ['users-app'] })
-  const queryPrefix = [...http.users.get.key(), 'query'] as const
-
-  return {
-    http,
-    root: { queryKey: http.key() },
-    branch: { queryKey: http.users.key() },
-    leaf: { queryKey: http.users.get.key() },
-    query: { queryKey: queryPrefix },
-    forId: (id: number) => ({
-      queryKey: [...queryPrefix, { params: { id: String(id) } }] as const,
-    }),
-    forLocale: (locale: string) => ({
-      queryKey: [...queryPrefix, { headers: { 'x-locale': locale } }] as const,
-    }),
-    historyForId: (id: number) => ({
-      queryKey: [...http.users.watch.key(), 'streamed', { query: { id: String(id) } }] as const,
-    }),
-    exact: (input: Parameters<typeof http.users.get.queryKey>[0]) => ({
-      queryKey: http.users.get.queryKey(input),
-      exact: true as const,
-    }),
-  }
-}
+const queryPrefix = [...http.users.get.key(), 'query'] as const
+await queryClient.invalidateQueries({ queryKey: [...queryPrefix, { params: { id: '1' } }] })
+await queryClient.invalidateQueries({
+  queryKey: [...queryPrefix, { headers: { 'x-locale': 'en' } }],
+})
 ```
 
-Pass `httpCacheFilters(client).forId(1)` to `invalidateQueries` to refresh ordinary queries for path
-parameter 1. Use the leaf filter to include infinite and metadata views too. `historyForId(1)`
-selects every accumulated retention policy for the SSE request with query parameter 1.
+For an exact read, supply the complete decoded request to the builder:
+
+```ts
+const key = http.users.get.queryKey({
+  params: { id: 1 },
+  query: { id: 7 },
+  headers: { 'X-Locale': 'en' },
+  payload: { id: 7 },
+})
+const user = queryClient.getQueryData(key)
+```
+
+The leaf prefix also includes metadata and infinite views. For every history policy of a
+`users.watch` request, use `[...http.users.watch.key(), 'streamed', { query: { id: '1' } }]`.
 
 Default HTTP keys Schema-encode each request part, omit encoded `undefined` object members, and
 lowercase header names. In this contract, `params: { id: "1" }` is a meaningful partial object;

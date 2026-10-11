@@ -34,6 +34,3 @@ removeUser.mutate({ id: 1 })
 
 After a successful mutation, invalidate the affected query prefix explicitly. The package does not
 infer relationships between API operations.
-
-The [public RPC consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/public-contract.ts) and
-[public HTTP consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/http-contract.ts) check these builder and hook contracts.

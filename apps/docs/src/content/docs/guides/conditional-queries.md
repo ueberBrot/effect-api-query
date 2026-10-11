@@ -3,8 +3,14 @@ title: Conditional Queries
 description: Pause queries until their required input is available.
 ---
 
-Use `{ input: skipToken }` when an input-bearing query has no valid input yet and needs TanStack
-options such as `staleTime`, `select`, or `initialData`:
+In component setup, import the native `useQuery` hook and use your application's ready utility
+tree, named `rpcQuery` here. Its `users.get` RPC takes a numeric `id` with a default locale and
+returns a user with an `id` and `name`. Follow the [RPC quick start](/effect-api-query/getting-started/quick-start/)
+for the factory setup pattern.
+
+`userId` is the selected ID, which may be undefined. Use `{ input: skipToken }` when an
+input-bearing query has no valid input yet and needs TanStack options such as `staleTime`,
+`select`, or `initialData`:
 
 ```ts
 import { skipToken } from 'effect-api-query'
@@ -21,7 +27,8 @@ const userOptions = rpcQuery.users.get.queryOptions({
 const user = useQuery(userOptions)
 ```
 
-The same form works for HTTP request input:
+For an HTTP `users.get` endpoint with only a numeric `id` param and a user response, its complete
+decoded request contains only `params`:
 
 ```ts
 const httpUserOptions = http.users.get.queryOptions({
@@ -51,7 +58,8 @@ including a conditional union. Keep the conditional input inside one builder cal
 has one consistent callback type. Concrete inputs and the literal `skipToken` retain their precise
 key and query-function types; conditional inputs preserve both possibilities.
 
-The object form also works for accumulated streams and live queries:
+If your RPC group also declares `events.watch` with a string `channel` input and string
+emissions, build either view in that consumer:
 
 ```ts
 rpcQuery.events.watch.streamedOptions({
@@ -83,6 +91,3 @@ initial-request identity and cursor progression.
 Try this in either [executable example](/effect-api-query/examples/#pause-a-query-until-a-user-is-selected).
 The **Choose before fetching** control demonstrates pausing, selecting a user, and reusing fresh
 cached data after clearing and reselecting the same user.
-
-The [public RPC consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/public-contract.ts) and
-[public HTTP consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/http-contract.ts) check skipped hook inference and rejected uses.

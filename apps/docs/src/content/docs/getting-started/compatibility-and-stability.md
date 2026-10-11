@@ -7,8 +7,7 @@ Both factories use the same public `effect-api-query` package root and peer depe
 The package's [manifest](https://github.com/ueberBrot/effect-api-query/blob/main/package.json)
 defines peer requirements; the [workspace catalog](https://github.com/ueberBrot/effect-api-query/blob/main/pnpm-workspace.yaml)
 records the versions tested in this repository. See the
-[compatibility reference](/effect-api-query/reference/compatibility-and-limits/) for how these
-requirements are tested.
+[compatibility reference](/effect-api-query/reference/compatibility-and-limits/) for integration versions and limits.
 
 The package is ESM-only and targets ES2022. Enable strict TypeScript checking.
 

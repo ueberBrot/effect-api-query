@@ -11,110 +11,48 @@ owns authorization.
 
 ## Capture one owner
 
-Copy [the existing Vite application's owner cache](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/lib/owner-cache.ts)
-into `owner-cache.ts`. The following focused recipe accepts already acquired clients and captures
-one QueryClient, identity, and set of generated utilities. Keep their owning Scopes and runtimes
-alive until this owner's work finishes.
+In a consumer or mutation module, receive the ready `application` returned by
+[`startViteReactApplication(options)`](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/lib/application.ts).
+Capture that application and its existing utility trees and QueryClient:
 
 ```ts
-import { QueryClient } from '@tanstack/react-query'
-import { Effect, Schema } from 'effect'
-import { createHttpApiQueryUtils, createRpcQueryUtils } from 'effect-api-query'
-import type { RunPromiseExit } from 'effect-api-query'
-import { HttpApi, HttpApiEndpoint, HttpApiGroup } from 'effect/http-api'
-import type { HttpApiClient } from 'effect/http-api'
-import { Rpc, RpcGroup } from 'effect/rpc'
-import type { RpcClient } from 'effect/rpc'
+const owner = application
+const { queryClient, rpcQuery: rpc, httpQuery: http } = owner
+```
 
-import { makeOwnerCache, ownerKeyPrefix } from './owner-cache.ts'
-import type { ApplicationOwnerIdentity, DirectoryStorage } from './owner-cache.ts'
+The application uses `ownerKeyPrefix(identity)` from its
+[owner-cache module](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/lib/owner-cache.ts)
+in both factories. It acquires clients, restores directory data, and exposes the original owner's
+guards and tracked mutation options. Keep its Scopes and runtimes alive until the owner's work
+finishes.
 
-export const DirectoryUser = Schema.Struct({
-  id: Schema.Int,
-  name: Schema.String,
-  locale: Schema.String,
-})
+In this owner's mutation options, guard each cache write and invalidation:
 
-export const ownerGroup = RpcGroup.make(
-  Rpc.make('users.list', { success: Schema.Array(DirectoryUser) }),
-  Rpc.make('users.get', { payload: { id: Schema.Int }, success: DirectoryUser }),
-  Rpc.make('users.create', {
-    payload: { name: Schema.String },
-    success: DirectoryUser,
-  }),
-  Rpc.make('users.watch', { success: Schema.String, stream: true }),
-)
-
-export const ownerApi = HttpApi.make('owner-directory').add(
-  HttpApiGroup.make('users').add(
-    HttpApiEndpoint.get('list', '/users', { success: Schema.Array(DirectoryUser) }),
-    HttpApiEndpoint.get('get', '/users/:id', {
-      params: { id: Schema.Int },
-      success: DirectoryUser,
-    }),
-    HttpApiEndpoint.post('create', '/users', {
-      payload: Schema.Struct({ name: Schema.String }),
-      success: DirectoryUser,
-    }),
-  ),
-)
-
-export const makeOwnerQueries = <RpcError>({
-  rpcClient,
-  httpClient,
-  identity,
-  storage,
-  runPromiseExit = Effect.runPromiseExit,
-}: {
-  readonly rpcClient: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof ownerGroup>, RpcError>
-  readonly httpClient: HttpApiClient.ForApi<typeof ownerApi>
-  readonly identity: ApplicationOwnerIdentity
-  readonly storage?: DirectoryStorage
-  readonly runPromiseExit?: RunPromiseExit
-}) => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: { retry: false },
-      mutations: { retry: false, networkMode: 'always' },
-    },
-  })
-  const keyPrefix = ownerKeyPrefix(identity)
-  const rpc = createRpcQueryUtils<typeof ownerGroup, typeof keyPrefix, RpcError>(ownerGroup, {
-    client: rpcClient,
-    keyPrefix,
-    runPromiseExit,
-  })
-  const http = createHttpApiQueryUtils(ownerApi, { client: httpClient, keyPrefix, runPromiseExit })
-  const owner = makeOwnerCache({
-    identity,
-    queryClient,
-    directoryKeys: { rpc: rpc.users.list.queryKey(), http: http.users.list.queryKey() },
-    storage,
-  })
-  owner.restoreDirectory()
-  const invalidateUsers = async () => {
-    if (!owner.isActive()) {
-      return
-    }
-    await Promise.all([
-      queryClient.invalidateQueries({ queryKey: rpc.users.key() }),
-      queryClient.invalidateQueries({ queryKey: http.users.key() }),
-    ])
+```ts
+const invalidateUsers = async () => {
+  if (!owner.isActive()) {
+    return
   }
-  const createUser = owner.trackMutationOptions(
-    rpc.users.create.mutationOptions({
-      onSuccess: async (user) => {
-        if (!owner.isActive()) {
-          return
-        }
-        queryClient.setQueryData(rpc.users.get.queryKey({ id: user.id }), user)
-        await invalidateUsers()
-      },
-      onSettled: invalidateUsers,
-    }),
-  )
-  return { owner, queryClient, rpc, http, createUser, invalidateUsers }
+  await Promise.all([
+    queryClient.invalidateQueries({ queryKey: rpc.users.key() }),
+    queryClient.invalidateQueries({ queryKey: http.users.key() }),
+  ])
 }
+```
+
+```ts
+const createUser = owner.trackMutationOptions(
+  rpc.users.create.mutationOptions({
+    onSuccess: async (user) => {
+      if (!owner.isActive()) {
+        return
+      }
+      queryClient.setQueryData(rpc.users.get.queryKey({ id: user.id, locale: user.locale }), user)
+      await invalidateUsers()
+    },
+    onSettled: invalidateUsers,
+  }),
+)
 ```
 
 The success callback captures its original owner. It checks that owner before seeding a concrete

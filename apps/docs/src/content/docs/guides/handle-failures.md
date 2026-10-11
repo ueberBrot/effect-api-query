@@ -4,7 +4,7 @@ description: Inspect RPC and HTTP Causes and distinguish configuration and key e
 ---
 
 A failed RPC `Exit` becomes `EffectRpcQueryError`. The error records the RPC tag, the generated
-operation that ran, and the complete Effect `Cause`:
+operation that ran, and the complete Effect `Cause`. In the application's error handler:
 
 ```ts
 import { Cause } from 'effect'
@@ -17,6 +17,8 @@ const logRpcError = (error: unknown) => {
   }
 }
 ```
+
+Review the Cause for private messages and transport values before logging it.
 
 These error classes distinguish failure stages:
 

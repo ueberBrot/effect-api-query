@@ -3,13 +3,14 @@ title: Cancellation
 description: Cancel queries and request server-side cancellation for long-running commands.
 ---
 
-Generated query functions forward TanStack's `AbortSignal` to `runPromiseExit`:
+In the application client module, forward TanStack's `AbortSignal` to your runtime.
+Import `RunPromiseExit` from `effect-api-query`:
 
 ```ts
 const runPromiseExit: RunPromiseExit = (effect, options) => runtime.runPromiseExit(effect, options)
 ```
 
-Cancel one request with its generated query key:
+In a loader or event handler using the ready RPC utility tree, cancel one request with its generated key:
 
 ```ts
 const input = { durationMs: 60_000, operationId: 'slow-query' }
@@ -54,7 +55,10 @@ Use an explicit cancel RPC for long-running commands. The Vite React example pro
 has a client-generated operation ID. The start mutation waits for a terminal result; a separate
 query observes progress, and a separate mutation requests cancellation.
 
-```tsx
+In the React component setup, import `useState`, `useQuery`, and `useMutation` from their native
+packages. With the example's ready `rpcQuery` and QueryClient:
+
+```ts
 const [operationId] = useState(() => crypto.randomUUID())
 const input = { operationId }
 const reconcile = async () => {
@@ -73,27 +77,19 @@ const status = useQuery(
       query.state.data == null || query.state.data.state === 'running' ? 100 : false,
   }),
 )
-
-return (
-  <>
-    <button onClick={() => start.mutate(input)} disabled={start.status !== 'idle'}>
-      Start command
-    </button>
-    <button
-      onClick={() => cancel.mutate(input)}
-      disabled={
-        start.status === 'idle' ||
-        cancel.isPending ||
-        status.data?.state === 'completed' ||
-        status.data?.state === 'cancelled'
-      }
-    >
-      Cancel command
-    </button>
-    <p>Server state: {status.data?.state ?? 'not started'}</p>
-  </>
-)
 ```
+
+In the start and cancel button handlers, call the corresponding mutation:
+
+```ts
+start.mutate(input)
+cancel.mutate(input)
+```
+
+Disable start after its first attempt, and disable cancel before start, while cancellation is
+pending, or after a terminal status. The
+[complete command panel](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/components/sections/commands-section.tsx)
+includes the UI.
 
 The cancel handler signals the worker and waits until it has stopped. The cancel mutation's
 `onSettled` callback then invalidates the generated status key. The active query refetches the
@@ -134,7 +130,3 @@ This example stores operation records in memory until the example is reset or th
 Production applications need their own authorization, durable storage, and retention policy if
 operations must survive restarts. The explicit RPC contract does not make this in-memory example
 a durable job queue.
-
-The [command panel](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/components/sections/commands-section.tsx)
-and [command tests](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/tests/commands.test.ts) exercise this workflow.
-The [HTTP transport tests](https://github.com/ueberBrot/effect-api-query/blob/main/tests/http-transport-cancellation.test.ts) verify cancellation through fetch.

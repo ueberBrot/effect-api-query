@@ -1,107 +1,68 @@
 ---
 title: HTTP Quick Start
-description: Declare an HttpApi, own a ready client, and run a generated query and mutation.
+description: Turn an existing HttpApi and ready client into query and mutation options.
 ---
 
-This tutorial connects an Effect HttpApi client to TanStack Query Core. You will declare two
-endpoints, acquire a ready client, read a user, and create another user.
+Use an existing `HttpApi`, ready `HttpApiClient`, and `QueryClient`. This example's
+`usersApi` declares `users.get` with an integer `id` param and `locale` query field,
+plus `users.create` with a `{ name }` payload.
+First [install the package](/effect-api-query/getting-started/installation/).
 
-First [install the package](/effect-api-query/getting-started/installation/). Use a server at
-`http://localhost:3000` that implements the declaration below and has an existing user with ID `1`.
-Change the base URL to your server. For browser requests, configure the server's CORS policy to
-allow the application's origin.
-For complete HTTP handlers and applications, [run the examples](/effect-api-query/examples/).
+Import `createHttpApiQueryUtils` from `effect-api-query` and `MutationObserver` from
+`@tanstack/query-core`. The [complete typed recipe](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-http-quick-start.ts)
+contains the API and runtime setup; the [application examples](/effect-api-query/examples/)
+contain runnable clients and handlers.
 
-## Declare, connect, and call
+## Create the utilities
 
-Save this as `http-client.ts` in your application. Share the HttpApi declaration with your server;
-keep the runtime, client, and `QueryClient` in the application that manages their lifetime.
+In the application client module, after acquiring the client:
 
 ```ts
-import { MutationObserver, QueryClient } from '@tanstack/query-core'
-import { Effect, ManagedRuntime, Schema } from 'effect'
-import { createHttpApiQueryUtils } from 'effect-api-query'
-import { FetchHttpClient } from 'effect/http'
-import { HttpApi, HttpApiClient, HttpApiEndpoint, HttpApiGroup } from 'effect/http-api'
-
-const User = Schema.Struct({ id: Schema.Int, name: Schema.String })
-const usersApi = HttpApi.make('users-api').add(
-  HttpApiGroup.make('users').add(
-    HttpApiEndpoint.get('get', '/users/:id', {
-      params: { id: Schema.Int },
-      query: {
-        locale: Schema.String.pipe(Schema.withConstructorDefault(Effect.succeed('en'))),
-      },
-      success: User,
-    }),
-    HttpApiEndpoint.post('create', '/users', {
-      payload: Schema.Struct({ name: Schema.String }),
-      success: User,
-    }),
-  ),
-)
-
-const runtime = ManagedRuntime.make(FetchHttpClient.layer)
-const queryClient = new QueryClient()
-
-try {
-  const client = await runtime.runPromise(
-    HttpApiClient.make(usersApi, { baseUrl: 'http://localhost:3000' }),
-  )
-  const http = createHttpApiQueryUtils(usersApi, {
-    client,
-    keyPrefix: ['users-app'] as const,
-    runPromiseExit: runtime.runPromiseExit,
-  })
-
-  const user = await queryClient.query(
-    http.users.get.queryOptions({ input: { params: { id: 1 }, query: { locale: 'en' } } }),
-  )
-  console.log(user.name)
-
-  const createUser = new MutationObserver(queryClient, http.users.create.mutationOptions())
-  const created = await createUser.mutate({ payload: { name: 'Ada' } })
-  console.log(created.id)
-  await queryClient.invalidateQueries({ queryKey: http.users.key() })
-} finally {
-  try {
-    await queryClient.cancelQueries()
-  } finally {
-    queryClient.clear()
-    await runtime.dispose()
-  }
-}
+const http = createHttpApiQueryUtils(usersApi, {
+  client,
+  keyPrefix: ['users-app'] as const,
+  runPromiseExit: runtime.runPromiseExit,
+})
 ```
 
-`HttpApiClient.make` creates a ready client using the application's Fetch runtime. Pass that same
-runtime's `runPromiseExit` to the factory so generated calls use that runner and
-forward TanStack's query abort signal.
+Use the application's signal-aware runner when client execution needs services. Keep its
+runtime and client resources alive while queries and mutations use them.
 
-HTTP input is the client's decoded request, with the `params`, `query`, `headers`, and `payload`
-containers declared by the endpoint. Pass `id` as a number; the client handles its wire encoding.
-The POST mutation receives `{ payload: { name: 'Ada' } }`.
+## Read a user
 
-The request must supply `query: { locale: 'en' }` even though `locale` has a constructor default.
-HTTP builders do not construct RPC payloads or fill constructor defaults.
+In a loader or event handler, use the existing `queryClient`:
 
-Groups and endpoint identifiers retain their literal names. `users` and `get` produce
-`http.users.get`; a name containing a dot would require bracket access. A group declared with
-`topLevel: true` places its endpoints at the utility root.
+```ts
+const user = await queryClient.query(
+  http.users.get.queryOptions({ input: { params: { id: 1 }, query: { locale: 'en' } } }),
+)
+```
 
-## Choose cache and resource ownership
+HTTP input is the **decoded request**. Supply the endpoint's declared `params`, `query`,
+`headers`, and `payload` containers; the client handles wire encoding. Even if the Schema
+has a constructor default, HTTP builders do not fill it: this request supplies `locale`.
 
-Buffered endpoints without multipart offer both query and mutation builders, regardless of HTTP method.
-Buffered multipart endpoints expose mutations only; see [upload a file](/effect-api-query/guides/http-queries-and-mutations/#upload-a-file).
-Choose a query for an idempotent cached read and a mutation for a command. After a write, invalidate
-the affected keys explicitly. RPC and HTTP have separate key namespaces, so applications that
-expose the same resource through both must invalidate the affected keys in both namespaces.
+## Execute a write
 
-The `finally` block cancels queries, clears the cache, and disposes the runtime. In a UI, keep these
-resources alive for the application lifetime and settle pending mutations before disposal. Include
-a safe user or tenant identity in `keyPrefix` whenever client configuration affects returned data.
+Pass the complete decoded request to each mutation execution:
 
-The repository compiles this complete snippet against the public package root in
-[`tests/types/docs-http-quick-start.ts`](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-http-quick-start.ts)
-and checks that this page matches it. Continue with
-[HTTP queries and mutations](/effect-api-query/guides/http-queries-and-mutations/) and the
-[HTTP factory reference](/effect-api-query/reference/http-factory/).
+```ts
+const createUser = new MutationObserver(queryClient, http.users.create.mutationOptions())
+const created = await createUser.mutate({ payload: { name: 'Ada' } })
+```
+
+After success, refresh the affected reads:
+
+```ts
+await queryClient.invalidateQueries({ queryKey: http.users.key() })
+```
+
+Buffered nonmultipart endpoints offer query and mutation builders regardless of HTTP method;
+buffered multipart endpoints offer mutations only. RPC and HTTP use separate namespaces,
+so refresh both deliberately when they represent the same resource.
+
+Literal group/endpoint names become utility paths; dots require bracket access, and
+`topLevel: true` places endpoints at the root. See [HTTP Factory](/effect-api-query/reference/http-factory/).
+Before disposal, follow [Client Lifecycle](/effect-api-query/concepts/client-lifecycle/).
+Continue with [HTTP Queries and Mutations](/effect-api-query/guides/http-queries-and-mutations/)
+for metadata, uploads, pagination and SSE.

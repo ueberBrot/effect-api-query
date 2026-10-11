@@ -214,7 +214,3 @@ busters; see [Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/
 
 Live queries always replace the cached value and therefore expose no `refetchMode`. Cancelling,
 unmounting, or superseding either stream closes its iterator and interrupts its Effect resources.
-
-The [public RPC consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/public-contract.ts) checks the builder examples
-and hook types. The [streaming tests](https://github.com/ueberBrot/effect-api-query/blob/main/tests/create-rpc-query-utils-streaming.test.ts)
-verify accumulation, replacement, bounds, and cancellation.

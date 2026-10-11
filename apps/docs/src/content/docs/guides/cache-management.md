@@ -3,7 +3,8 @@ title: Cache Management
 description: Invalidate and inspect caches with generated prefix keys.
 ---
 
-Every branch and leaf exposes `key()`. Use these prefixes to match related cache entries:
+In a mutation callback or event handler using the ready utility tree and QueryClient,
+use `key()` to match a branch or operation:
 
 ```ts
 await queryClient.invalidateQueries({ queryKey: rpcQuery.users.key() })
@@ -31,15 +32,10 @@ await queryClient.invalidateQueries({ queryKey: key, exact: true })
 Query keys have this flat shape:
 
 ```ts
-;[
-  ...keyPrefix,
-  'rpc',
-  ...rpcTagSegments,
-  'query',
-  canonicalPayload, // payload-bearing queries only
-]
+;[...keyPrefix, 'rpc', ...rpcTagSegments, 'query', canonicalPayload]
 ```
 
+Payload-bearing queries include `canonicalPayload`; payloadless queries omit it.
 Mutation keys end in `'mutation'` and never include variables. See
 [Semantic Keys](/effect-api-query/concepts/semantic-keys/) for normalization and hashing rules.
 

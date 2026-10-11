@@ -92,7 +92,7 @@ skills:
         mechanism: Builders capture the first input and cannot follow reactive changes.
         wrong_pattern: useQuery(rpc.users.read.queryOptions({ input }))
         correct_pattern: 'useQuery(() => rpc.users.read.queryOptions({ input: readInput() }))'
-        source: apps/docs/src/content/docs/guides/vue-and-solid.md
+        source: apps/docs/src/content/docs/guides/solid-query.md
         priority: HIGH
         status: active
       - mistake: Rely on changed metadata options after a fresh hit
