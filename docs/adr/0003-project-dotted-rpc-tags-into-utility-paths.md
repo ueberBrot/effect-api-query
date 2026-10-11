@@ -4,22 +4,22 @@ Status: Amended by ADR 0018 and ADR 0020. Implementation ownership clarified by 
 
 ## Context
 
-Generated utilities need deterministic paths without a second name-mapping configuration.
+Generated utilities need deterministic paths without a separate configuration that maps names.
 
 ## Decision
 
-The literal Effect RPC tag is the sole source of its public utility path. Dot-separated segments
-become nested properties. The factory rejects:
+The literal Effect RPC tag determines its public utility path. Dot-separated segments become
+nested properties. The factory rejects these segments and collisions:
 
-- empty segments;
-- reserved utility names;
-- `__proto__`, `prototype`, and `constructor`;
-- every collision between a leaf and a branch.
+- Empty segments.
+- Reserved utility names.
+- `__proto__`, `prototype`, and `constructor`.
+- Every collision between a leaf and a branch.
 
-All other string segments are valid, including segments that require bracket notation. The factory
-provides neither escaping nor a separate path map.
+All other string segments are valid, including those that require bracket notation. The factory
+provides no escaping or separate path map.
 
 ## Consequences
 
-This trades a small set of tag restrictions for deterministic, string-free access. ADR 0018 and ADR
-0020 extend the reserved utility names with their generated builders.
+These tag restrictions provide deterministic access without strings. ADR 0018 and ADR 0020 add
+their generated builder names to the reserved utility names.

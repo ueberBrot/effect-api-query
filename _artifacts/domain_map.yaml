@@ -7,7 +7,7 @@ library:
 domains:
   - name: Contract-derived query workflows
     slug: contract-queries
-    description: Choose typed cache views while preserving application-owned execution and lifetime.
+    description: Choose typed cache views. Keep execution and resource lifetime under application control.
 skills:
   - name: effect-api-query
     slug: effect-api-query
@@ -56,13 +56,13 @@ skills:
       - topic: Adapter inputs and capabilities
         reason: RPC construction and HTTP decoded containers differ.
       - topic: Cache workflows
-        reason: Keys, policies, and native filters are library contracts; writes and replacement
-          are application-owned workflows.
+        reason: The library defines keys, policies, and native filters. Applications own writes
+          and owner replacement.
       - topic: Hydration and SSR
         reason: Captures, view codecs, and preparation require request lifetime.
       - topic: Frameworks and hosts
-        reason: Native providers, Suspense recovery, hook overloads, and transport boundaries are
-          conditional integrations rather than package-provided services.
+        reason: Native providers, Suspense recovery, hook overloads, and transport boundaries
+          depend on the integration. The package does not provide these services.
     failure_modes:
       - mistake: Reuse an accumulated key across incompatible policies
         mechanism: Retention and refetch policy change representation and normalized identity.
@@ -72,15 +72,15 @@ skills:
         priority: HIGH
         status: active
       - mistake: Dispose resources after native cancellation alone
-        mechanism: Query settlement can precede local finalization; accepted writes and
-          preparation may still need the runtime.
+        mechanism: Query settlement can precede local finalization. Accepted writes and
+          preparation can still need the runtime.
         wrong_pattern: await queryClient.cancelQueries(); await runtime.dispose()
         correct_pattern: await acceptedWorkDrain; await runtime.dispose()
         source: examples/tanstack-start/src/lib/application.ts
         priority: HIGH
         status: active
       - mistake: Roll back an overlapping write with an old snapshot
-        mechanism: Whole-list replacement erases intervening writes; stale entity restoration
+        mechanism: Whole-list replacement erases intervening writes. Restoring a stale entity
           can overwrite a newer authoritative cache revision.
         wrong_pattern: queryClient.setQueryData(key, oldList)
         correct_pattern: Capture current entity fields and positions for each new write; restore
@@ -125,7 +125,7 @@ skills:
         priority: HIGH
         status: active
       - mistake: Rely on Suspense cancellation for open streams
-        mechanism: Native Suspense hooks do not support cancellation; lifecycle cleanup needs
+        mechanism: Native Suspense hooks do not support cancellation. Lifecycle cleanup needs
           an ordinary abort-aware query or observer.
         wrong_pattern: useSuspenseQuery(rpc.events.watch.liveOptions())
         correct_pattern: Use an ordinary Query hook or observer for a stream requiring cancellation.
@@ -147,8 +147,8 @@ tensions:
   - name: Library contracts and application workflows
     skills:
       - effect-api-query
-    description: Generated options, keys, inference, and policy binding have a package contract;
-      native providers, transports, and domain protocols belong to the application.
+    description: The package defines generated options, keys, inference, and policy binding.
+      The application owns native providers, transports, and domain protocols.
     implication: Explain package behavior in library guidance, native consumers in integrations,
       and concrete protocols such as cancellable commands in runnable examples.
   - name: Exact identity and broad refresh
@@ -161,15 +161,14 @@ tensions:
   - name: Local retirement and accepted domain work
     skills:
       - effect-api-query
-    description: Private cache retirement stops local side effects without pretending to undo
-      remote writes.
+    description: Private cache retirement stops local side effects. It does not undo remote writes.
     implication: Keep originating-owner guards after drain and model command cancellation explicitly.
   - name: Policy reuse and call-site inference
     skills:
       - effect-api-query
     description: Shared endpoint-aware defaults reduce repetition while selected data and
       optimistic context depend on each invocation.
-    implication: Bind typed policies once per owner, keeping projections, seeds, identity, and
-      optimistic context at the call site; compose required callbacks deliberately.
+    implication: Bind typed policies once per owner. Keep projections, seeds, identity, and
+      optimistic context at the call site. Compose required callbacks explicitly.
 cross_references: []
 gaps: []

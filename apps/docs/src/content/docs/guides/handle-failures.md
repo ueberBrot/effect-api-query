@@ -4,7 +4,7 @@ description: Inspect RPC and HTTP Causes and distinguish configuration and key e
 ---
 
 A failed RPC `Exit` becomes `EffectRpcQueryError`. The error records the RPC tag, the generated
-operation that ran, and the complete Effect `Cause`. In the application's error handler:
+operation, and the complete Effect `Cause`. Inspect the error in your application handler:
 
 ```ts
 import { Cause } from 'effect'
@@ -20,10 +20,10 @@ const logRpcError = (error: unknown) => {
 
 Review the Cause for private messages and transport values before logging it.
 
-These error classes distinguish failure stages:
+Use the error class to identify the failure stage:
 
-- `EffectRpcQueryConfigError` reports invalid configuration: synchronously during preparation,
-  or during stream execution with incompatible QueryClient hashing.
+- `EffectRpcQueryConfigError` reports invalid configuration. It occurs synchronously during
+  preparation, or during stream execution when QueryClient hashing is incompatible.
 - `EffectRpcQueryKeyError` reports synchronous payload construction, encoding, or JSON
   canonicalization failures.
 - `EffectRpcQueryError` reports a failed RPC execution and preserves its Effect `Cause`.
@@ -31,7 +31,7 @@ These error classes distinguish failure stages:
 
 If a custom runner rejects instead of returning an `Exit`, its rejection passes through unchanged.
 See the [error reference](/effect-api-query/reference/errors/) for stable codes and metadata.
-Use [retry queries](/effect-api-query/guides/retry-queries/) for typed `Cause`/`Result` decisions,
+Use [retry queries](/effect-api-query/guides/retry-queries/) for typed `Cause` and `Result` decisions,
 bounded attempt counts, and synchronous preparation errors.
 
 ## Inspect HTTP failures
@@ -40,18 +40,19 @@ Import `isEffectHttpApiQueryError` from `effect-api-query` to recognize a failed
 The wrapper records `apiId`, `groupId`, `endpoint`, `method`, and `operation`. Its `cause`
 retains the complete original Effect Cause. Use `Cause.findError` to inspect declared endpoint
 errors, middleware errors, Schema errors, and HTTP client errors. Use `Cause.hasDies` and
-`Cause.hasInterrupts` to distinguish defects and interruption. A Cause may contain several reasons.
+`Cause.hasInterrupts` to distinguish defects and interruption. A Cause can contain several reasons.
 
 The package adds only declaration identity to execution-error metadata. The preserved Cause can
 contain upstream request headers, bodies, concrete URLs, responses, or Schema issue values.
 Review those values before logging or exposing them. The package does not sanitize the Cause.
 
-`EffectHttpApiQueryConfigError` reports invalid configuration with the same preparation and
-stream-execution timing as the RPC error.
-`EffectHttpApiQueryKeyError` reports synchronous query-key preparation failures, before HTTP
-execution. Mutations encode their request inside the ready client's Effect, so encoding failures
-become `EffectHttpApiQueryError` instead. Runner rejections and user or TanStack callback failures
-pass through unchanged when they produce no failed Exit.
+`EffectHttpApiQueryConfigError` reports invalid configuration at the same stages as the RPC error:
+preparation or stream execution. `EffectHttpApiQueryKeyError` reports synchronous failures during
+query-key preparation, before HTTP execution.
+
+Mutations encode their request inside the ready client's Effect. Their encoding failures therefore
+become `EffectHttpApiQueryError`. Runner rejections and user or TanStack callback failures pass
+through unchanged when they produce no failed Exit.
 
 See the [HTTP factory reference](/effect-api-query/reference/http-builders/#cache-identity-and-failures)
 for key-error codes.

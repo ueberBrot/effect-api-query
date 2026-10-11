@@ -3,16 +3,16 @@ title: Vue Query
 description: Rebuild generated options with Vue computed and keep client resources alive.
 ---
 
-Pass generated options from either factory to Vue Query's native hooks. Configure `VueQueryPlugin`
-and acquire the ready client before creating the utilities.
+Pass options from either factory to Vue Query's native hooks. Before creating the utilities,
+configure `VueQueryPlugin` and acquire the ready client.
 
 The examples target Vue 3.5.43 with Vue Query 5.104.0 and Query Core 5.104.0.
 
 ## Rebuild options when input changes
 
-Builders capture plain input when called. Build options inside Vue `computed` so a changed input
-produces a new key and query function. Passing a builder's result once leaves the query attached
-to the original input.
+Builders capture plain input when you call them. Build options inside Vue `computed`.
+When input changes, the computed value contains a new key and query function. If you pass a
+builder's result once, the query keeps using the original input.
 
 Keep [captured inputs unchanged](/effect-api-query/concepts/data-normalization/#keep-captured-inputs-unchanged)
 while their options can execute.
@@ -48,15 +48,15 @@ const user = useQuery<
 ```
 
 Read the selected value from `user.data.value`. The explicit native hook generics preserve the
-leaf's data and error types while bounding Vue's recursive ref unwrapping.
+leaf's data and error types while limiting Vue's recursive ref unwrapping.
 Automatic inference can otherwise exceed TypeScript's instantiation depth when it unwraps an
-Effect `Cause` through a tagged key. Let the builder infer its arguments; put these type arguments
+Effect `Cause` through a tagged key. Let the builder infer its arguments. Put these type arguments
 on the Vue hook.
 
-Apply the same computed pattern to `infiniteOptions`, `streamedOptions`, `liveOptions`, and
-`metadataOptions` when their input changes. Pass `rpc.users.write.mutationOptions()` to
-`useMutation` and supply each execution's input through `mutate(variables)`. Use `computed`
-when mutation settings depend on reactive state.
+When input changes, use the same computed pattern for `infiniteOptions`, `streamedOptions`,
+`liveOptions`, and `metadataOptions`. For writes, pass `rpc.users.write.mutationOptions()` to
+`useMutation`. Supply each execution's input through `mutate(variables)`. If mutation settings
+depend on reactive state, use `computed`.
 
 ## Choose native options carefully
 
@@ -64,7 +64,7 @@ Vue evaluates a function-valued `enabled` as a getter with no arguments. Use a b
 computed options, or a zero-argument getter returning a boolean. A Core `enabled(query)` callback
 cannot be passed directly to Vue.
 
-Vue accepts an initial-data initializer that may return `undefined`, with optional result data.
+Vue accepts an initial-data initializer that can return `undefined`. Its result data is optional.
 An explicit `initialData: undefined` overrides inherited QueryClient initial data.
 
 ## Own the native integration

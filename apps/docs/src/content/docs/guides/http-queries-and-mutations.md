@@ -4,7 +4,7 @@ description: Supply decoded request parts and execute buffered multipart mutatio
 ---
 
 Use the HTTP utility tree from the [HTTP quick start](/effect-api-query/getting-started/http-quick-start/).
-Keep base URL, middleware, authentication, and execution services on your ready client and runner.
+Configure the base URL, middleware, authentication, and execution services on your ready client and runner.
 For shared builders, see [Queries](/effect-api-query/guides/queries/),
 [Mutations](/effect-api-query/guides/mutations/), [Pagination](/effect-api-query/guides/pagination/),
 [Streaming](/effect-api-query/guides/streaming/), and [HTTP Metadata](/effect-api-query/guides/http-metadata/).
@@ -12,8 +12,8 @@ For shared builders, see [Queries](/effect-api-query/guides/queries/),
 ## Supply decoded request parts
 
 HTTP input contains the declared `params`, `query`, `headers`, and `payload` containers.
-Include each declared container even when its fields are optional. For `users.get` declaring
-`params.id` and `query.locale`:
+Include each declared container, even when its fields are optional. This `users.get` endpoint
+declares `params.id` and `query.locale`:
 
 ```ts
 const httpUserOptions = http.users.get.queryOptions({
@@ -23,9 +23,9 @@ const httpUserOptions = http.users.get.queryOptions({
 const httpUser = await queryClient.query(httpUserOptions)
 ```
 
-The ready client encodes decoded values; HTTP builders apply no RPC constructor defaults.
+The ready client encodes decoded values. HTTP builders apply no RPC constructor defaults.
 Inputless endpoints use `queryOptions()`. Raw response controls are excluded from request input.
-Captured values remain caller-owned, so keep them unchanged while using the options.
+You own the captured values. Keep them unchanged while the options can execute.
 
 ## Upload a file
 
@@ -60,9 +60,9 @@ payload.set('file', new Blob(['profile notes'], { type: 'text/plain' }), 'notes.
 const uploaded = await uploadFile.mutate({ params: { id: 1 }, payload })
 ```
 
-The ready client owns encoding; the adapter returns decoded success. Any buffered multipart
-payload alternative makes the endpoint mutation-only. Mutation keys exclude variables and files,
-so omit these endpoints from `keyEncoders`; configured encoder entries are rejected.
+The ready client owns encoding. The adapter returns decoded success. Any buffered multipart
+payload alternative makes the endpoint mutation-only. Mutation keys exclude variables and files.
+Omit these endpoints from `keyEncoders`, because the factory rejects their encoder entries.
 Streaming successes or streaming multipart alternatives omit the endpoint entirely.
 
 See the [HTTP Factory](/effect-api-query/reference/http-factory/) for exact capability boundaries

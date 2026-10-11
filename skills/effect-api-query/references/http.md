@@ -1,8 +1,8 @@
 # HTTP setup and rules
 
 Use the application's existing HttpApi declaration and ready HttpApiClient. This
-standalone example expects a server at `http://localhost:3000` implementing the
-same declaration.
+standalone example requires a server at `http://localhost:3000` that implements
+the same declaration.
 
 ```ts
 import { MutationObserver, QueryClient } from '@tanstack/query-core'
@@ -86,66 +86,68 @@ try {
 
 ## Tree and request semantics
 
-Ordinary groups produce `http[groupId][endpointId]`; top-level groups put their
-endpoints at the root. Dots in HTTP identifiers remain literal properties. This
-differs from dotted RPC tag projection.
+Ordinary groups produce `http[groupId][endpointId]`. Top-level groups put their
+endpoints at the root. Dots in HTTP identifiers remain literal properties, unlike
+the nested paths produced by dotted RPC tags.
 
-Provide the declared `params`, `query`, `headers`, and ordinary `payload` containers in
-their decoded types. Buffered multipart payloads use explicit `FormData`. For a
-`Schema.FiniteFromString` field, pass a number; the client performs wire encoding.
-HTTP inputs receive no RPC constructor defaults.
-A declared container remains required even if all fields inside it are optional:
-use `{ query: {} }` for an empty declared query container.
+Provide the declared `params`, `query`, `headers`, and ordinary `payload` containers
+with their decoded types. Buffered multipart payloads use explicit `FormData`.
+For a `Schema.FiniteFromString` field, pass a number. The client performs wire
+encoding. HTTP inputs receive no RPC constructor defaults. A declared container
+is required even when all its fields are optional. For an empty declared query
+container, use `{ query: {} }`.
 
-Mutation variables use that same complete request shape. The adapter forces
-decoded-only responses; raw-response controls are not part of the input. Text
-responses, binary responses, and declared response-header wrappers keep their decoded types.
+Mutation variables use the same complete request shape. The adapter forces
+decoded-only responses. The input excludes raw-response controls. Text responses,
+binary responses, and declared response-header wrappers retain their decoded types.
 
 Buffered endpoints without multipart expose query, infinite-query, and mutation
-builders. Any buffered multipart payload alternative makes the whole endpoint
-mutation-only, including mixed plain and multipart alternatives. Those leaves expose
-only `key()`, `mutationKey()`, and `mutationOptions()`, regardless of HTTP method.
-Mixed alternatives preserve Effect's client request union.
+builders. Any buffered multipart payload alternative makes the entire endpoint
+mutation-only. This includes mixed plain and multipart alternatives. Those leaves
+expose only `key()`, `mutationKey()`, and `mutationOptions()`, regardless of HTTP
+method. Mixed alternatives preserve Effect's client request union.
 
-An endpoint with exactly one SSE success exposes `streamedKey` / `streamedOptions` for
-ordered history and `liveKey` / `liveOptions` for the latest decoded value. Declared
-response-header wrappers surround each emission. Keep `sseOptions` beside decoded
-`input`; live keys include decoder policy, while accumulated keys also include retention
-and refetch policy. Applications own reconnect and resume controls. Empty live completion
-raises `EffectHttpApiQueryEmptyStreamError`; a top-level `undefined` emission becomes `null`.
+An endpoint with exactly one SSE success exposes `streamedKey` and `streamedOptions`
+for ordered history. It exposes `liveKey` and `liveOptions` for the latest decoded
+value. Declared response-header wrappers surround each emission. Keep `sseOptions`
+beside decoded `input`. Live keys include decoder policy. Accumulated keys also
+include retention and refetch policy. Applications own reconnect and resume
+controls. Empty live completion raises `EffectHttpApiQueryEmptyStreamError`.
+A top-level `undefined` emission becomes `null`.
 
-Raw byte streams, mixed buffered/SSE successes, multipart SSE payloads, and streaming
-multipart request alternatives omit the whole endpoint. Empty groups disappear. Consume
-unsupported streams through the underlying Effect client.
+The adapter omits endpoints with raw byte streams, mixed buffered/SSE successes,
+multipart SSE payloads, or streaming multipart request alternatives. Empty groups
+disappear. To consume unsupported streams, use the underlying Effect client.
 
 ## Read buffered metadata
 
-Use `metadataOptions` when a read needs decoded data, response status, or raw
-string headers. Use `metadataKey(input)` for typed cache access. Its `metadata`
-discriminator separates it from ordinary data; a leaf prefix matches both views.
-Metadata has no mutation or infinite builders and is absent on multipart and
-streaming endpoints.
+If a read needs decoded data, response status, or raw string headers, use
+`metadataOptions`. For typed cache access, use `metadataKey(input)`. Its `metadata`
+discriminator separates metadata from ordinary data. A leaf prefix matches both
+views. Metadata has no mutation or infinite builders. Multipart and streaming
+endpoints have no metadata view.
 
-Fetched envelopes and their copied header records are frozen. The decoded `data`
-remains mutable and retains any declared decoded header wrapper. Only an entirely
-undefined success becomes `null`. Initial data, hydration, manual writes, and
-selected results remain application-owned.
+The adapter freezes fetched envelopes and their copied header records. Decoded
+`data` stays mutable and retains any declared decoded header wrapper. Only an
+entirely undefined success becomes `null`. The application owns initial data,
+hydration, manual writes, and selected results.
 
 Native `select`, skipping, defaults, and cancellation apply. Global and prefix
 `structuralSharing` policies apply to fetched metadata snapshots. Selected results
-and later manual writes use an explicit policy passed to `metadataOptions`, or
-standard deep sharing when omitted. An inherited sharing callback does not govern
-those later values. A fresh-cache hit from `queryClient.query` does not replace an
-existing Query's options. Install a changed policy through an observer or an actual
-fetch before relying on it for manual writes.
+and later manual writes use the explicit policy passed to `metadataOptions`.
+If no policy is passed, they use standard deep sharing. An inherited sharing
+callback does not control those later values. A fresh-cache hit from
+`queryClient.query` does not replace an existing Query's options. Before relying
+on a changed policy for manual writes, install it through an observer or an actual fetch.
 
-Apply an application disclosure policy before persisting raw headers: their strings
-receive no inspection redaction.
+Before persisting raw headers, apply the application's disclosure policy.
+Header strings receive no inspection redaction.
 
 ## Consume decoded SSE
 
-Keep decoder options beside the request. This function accepts an already acquired
-client for the same declaration and returns independent history and latest views:
+Keep decoder options beside the request. The following function accepts an already
+acquired client for the same declaration. It returns independent history and
+latest views:
 
 ```ts
 import { Schema } from 'effect'
@@ -179,43 +181,45 @@ export function httpEventOptions(client: HttpApiClient.ForApi<typeof eventsApi>)
 ```
 
 The accumulated key includes normalized `maxChunks`, `refetchMode`, and
-`sseOptions.maxEventSize`; the live key includes the decoder limit. Its default is
-10 MiB per SSE event, distinct from the cache's element bound. Applications own
-reconnect, replay, and resume. For refetch visibility and retention, read
-[query patterns](query-patterns.md); for request capture, read
+`sseOptions.maxEventSize`. The live key includes the decoder limit. That limit
+defaults to 10 MiB per SSE event, separately from the cache's element bound.
+Applications own reconnect, replay, and resume. For refetch visibility and
+retention, read [query patterns](query-patterns.md). For request capture, read
 [hydration and SSR](hydration-and-ssr.md).
 
 ## Multipart mutations
 
 The example declares `users.upload` with a buffered multipart file payload and
-numeric `params.id`. Build the multipart fields and files explicitly in `FormData`,
-then pass it as `payload` alongside the decoded request containers when calling `mutate`.
+numeric `params.id`. Build the multipart fields and files explicitly in `FormData`.
+When calling `mutate`, pass that value as `payload` alongside the decoded request
+containers.
 
-The adapter forwards the original `FormData` to the ready client. The decoded success,
-callback variables, execution services, and error Cause follow the ordinary mutation
-contract. Keep multipart mutation-only endpoints out of `keyEncoders`; encoder entries
-are rejected because mutation variables and files never enter query identity.
+The adapter forwards the original `FormData` to the ready client. Decoded success,
+callback variables, execution services, and the error Cause follow the ordinary
+mutation contract. Keep multipart mutation-only endpoints out of `keyEncoders`.
+The adapter rejects encoder entries because mutation variables and files never
+enter query identity.
 
 ## Key encoding
 
-The adapter synchronously schema-encodes labelled request parts for default keys. It omits
-encoded undefined object members and retains array order and encoded null.
-Header names become lowercase; conflicting duplicate header names fail. These
-rules apply to default encoding, not custom encoder output.
+For default keys, the adapter synchronously schema-encodes labeled request parts.
+It omits encoded undefined object members and retains array order and encoded null.
+Header names become lowercase. Conflicting duplicate header names fail. These
+rules govern default encoding. They do not govern custom encoder output.
 
-Configure custom encoders under declaration group and endpoint identifiers,
-including top-level groups: `keyEncoders: { groupId: { endpointId: encoder } }`.
-The encoder receives the complete decoded request. For endpoints with query support,
-provide one when encoding requires services, uses opaque middleware, contains explicit
-redacted values, or declares multiple payload alternatives. Runtime middleware inspection
-is conservative even for synchronous service-free encoding. Binary query inputs need a JSON-safe projection,
-such as an array of bytes.
+Configure custom encoders under declaration group and endpoint identifiers:
+`keyEncoders: { groupId: { endpointId: encoder } }`. Use that structure for top-level
+groups too. The encoder receives the complete decoded request. For endpoints with
+query support, provide an encoder if encoding requires services, uses opaque
+middleware, contains explicit redacted values, or declares multiple payload alternatives.
+Runtime middleware inspection is conservative even for synchronous service-free
+encoding. Binary query inputs need a JSON-safe projection, such as an array of bytes.
 
-Return strict synchronous `JsonValue` and preserve body/content-type distinctions
-between alternatives, even if two schemas encode to the same scalar. An encoder
-supplies identity only; the client still performs request encoding, and the
+Return strict synchronous `JsonValue`. Preserve differences in body and content
+type between alternatives, even if two schemas encode to the same scalar.
+An encoder supplies only identity. The client still encodes requests, and the
 runner must provide required services. Keep ordinary authentication in client
-middleware and use safe identity partitions in the key prefix.
+middleware. Use safe identity partitions in the key prefix.
 
 Sources: [HTTP factory](https://ueberbrot.github.io/effect-api-query/reference/http-factory/),
 [HTTP builders](https://ueberbrot.github.io/effect-api-query/reference/http-builders/).

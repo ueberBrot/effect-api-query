@@ -3,9 +3,9 @@ title: Queries
 description: Build typed query options for cached RPC and HTTP reads.
 ---
 
-Start with a ready utility tree and QueryClient from the [RPC quick start](/effect-api-query/getting-started/quick-start/)
+Use the ready utility tree and QueryClient from the [RPC quick start](/effect-api-query/getting-started/quick-start/)
 or [HTTP quick start](/effect-api-query/getting-started/http-quick-start/).
-Here, `users.get` returns a user with `id` and `name`; its RPC payload has an `id` and default locale.
+In this example, `users.get` returns a user with `id` and `name`. Its RPC payload has an `id` and default locale.
 The HTTP endpoint declares `params.id` and `query.locale`.
 
 ## Fetch decoded data
@@ -28,12 +28,12 @@ const httpUser = await queryClient.query(httpUserOptions)
 ```
 
 These options also work with native query, suspense, and prefetch hooks. An inputless operation
-uses `queryOptions()`. Queries cache decoded success, with top-level `undefined` converted to `null`.
+uses `queryOptions()`. Queries cache decoded success and convert top-level `undefined` to `null`.
 Keep captured input values unchanged while using the options.
 
 ## Select returned data
 
-Native options such as `staleTime`, `retry`, and `select` pass through:
+Pass native options such as `staleTime`, `retry`, and `select` to the builder:
 
 ```ts
 const nameOptions = rpc.users.get.queryOptions({
@@ -45,7 +45,7 @@ const cachedUser = queryClient.getQueryData(nameOptions.queryKey)
 ```
 
 Hooks, observers, and `queryClient.query` return the selected name. The cache and `getQueryData`
-retain the decoded user; generated keys preserve that type. Builders supply `queryKey` and `queryFn`.
+retain the decoded user. Generated keys preserve that type. Builders supply `queryKey` and `queryFn`.
 Configure hashing through [QueryClient defaults](/effect-api-query/guides/query-defaults/).
 
 Continue with [Conditional Queries](/effect-api-query/guides/conditional-queries/),

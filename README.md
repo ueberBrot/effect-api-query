@@ -1,8 +1,8 @@
 # effect-api-query
 
-Derive typed TanStack Query options and cache keys from your Effect RPC and HttpApi contracts.
-Pass the generated options to QueryClient or your framework's Query hooks. Inputs and results
-follow the contract; your application controls transport, client lifetime, and cache policy.
+`effect-api-query` builds typed TanStack Query options and cache keys from Effect RPC and HttpApi contracts.
+Pass these options to QueryClient or your framework's Query hooks. The contract defines the inputs and results.
+Your application controls transport, client lifetime, and cache policy.
 
 ## Install
 
@@ -12,19 +12,19 @@ Install the package and TanStack Query Core:
 pnpm add effect-api-query @tanstack/query-core
 ```
 
-The package pins one exact Effect 4 release because its RPC and HTTP API modules are unstable.
-With automatic peer installation enabled, pnpm installs that version. Existing applications must
-match it. Use TypeScript 5.9 or newer with `strict: true`, ESM, and ES2022 support. See
+The package requires one exact Effect 4 release because its RPC and HTTP API modules are unstable.
+If automatic peer installation is enabled, pnpm installs that version. Existing applications must
+use the same version. Use TypeScript 5.9 or newer with `strict: true`, ESM, and ES2022 support. See
 [compatibility and stability](https://ueberbrot.github.io/effect-api-query/getting-started/compatibility-and-stability/).
 
 ## RPC
 
-Import the shared contract from both your server and client. Acquire a matching **flat RPC client**
-before calling `readUser`, and keep its Scope alive while the client is in use. The
+Import the shared contract in both your server and client. Before calling `readUser`, acquire a matching flat RPC client.
+Keep its Scope alive while you use the client. The
 [RPC quick start](https://ueberbrot.github.io/effect-api-query/getting-started/quick-start/)
 shows acquisition and cleanup.
 
-**Shared contract — `rpc-contract.ts`**
+Shared contract in `rpc-contract.ts`:
 
 ```ts
 import { Schema } from 'effect'
@@ -38,7 +38,7 @@ export const usersRpc = RpcGroup.make(
 )
 ```
 
-**Client integration — `client.ts`**
+Client integration in `client.ts`:
 
 ```ts
 import { QueryClient } from '@tanstack/query-core'
@@ -57,17 +57,17 @@ async function readUser(
 }
 ```
 
-Dotted tags become nested utility paths: `users.get` becomes `rpc.users.get`. RPC inputs use the
-payload Schema's constructor input.
+Dotted tags become nested utility paths. For example, `users.get` becomes `rpc.users.get`.
+RPC inputs use the payload Schema's constructor input, including fields that its defaults can supply.
 
 ## HTTP
 
-Import the shared HttpApi from both your server and client. Acquire its **ready HttpApiClient**
-before calling `readUser`, and keep its transport resources alive while the client is in use. The
+Import the shared HttpApi in both your server and client. Before calling `readUser`, acquire its ready HttpApiClient.
+Keep its transport resources alive while you use the client. The
 [HTTP quick start](https://ueberbrot.github.io/effect-api-query/getting-started/http-quick-start/)
 shows acquisition and cleanup.
 
-**Shared contract — `http-contract.ts`**
+Shared contract in `http-contract.ts`:
 
 ```ts
 import { Schema } from 'effect'
@@ -83,7 +83,7 @@ export const usersApi = HttpApi.make('users-api').add(
 )
 ```
 
-**Client integration — `client.ts`**
+Client integration in `client.ts`:
 
 ```ts
 import { QueryClient } from '@tanstack/query-core'
@@ -102,22 +102,22 @@ async function readUser(client: HttpApiClient.ForApi<typeof usersApi>, queryClie
 ```
 
 HTTP inputs use decoded `params`, `query`, `headers`, and `payload` containers. Both examples use
-the default Effect runner; provide a signal-aware `runPromiseExit` when execution needs services.
-Choose a `keyPrefix` that identifies your application and any user or tenant that affects its data.
+the default Effect runner. If execution needs services, provide a signal-aware `runPromiseExit`.
+Choose a `keyPrefix` that identifies your application and any user or tenant that affects the returned data.
 Keep credentials out of keys.
 
 ## Capabilities
 
-| Contract                                | Generated operations                          |
-| --------------------------------------- | --------------------------------------------- |
-| Unary RPC or buffered nonmultipart HTTP | Query, infinite query, mutation               |
-| Buffered nonmultipart HTTP              | Separate response status/header metadata view |
-| Buffered multipart HTTP                 | Mutation with explicit `FormData`             |
-| RPC stream or unambiguous HTTP SSE      | Accumulated streamed query, live query        |
+| Contract                                | Generated operations                         |
+| --------------------------------------- | -------------------------------------------- |
+| Unary RPC or buffered nonmultipart HTTP | Query, infinite query, mutation              |
+| Buffered nonmultipart HTTP              | Separate view of response status and headers |
+| Buffered multipart HTTP                 | Mutation with explicit `FormData`            |
+| RPC stream or unambiguous HTTP SSE      | Accumulated streamed query, live query       |
 
-Generated keys support cache reads, writes, and invalidation. Queries forward cancellation to
-Effect. Use `withQueryPolicy` and `withMutationPolicy` to share typed defaults. Your application
-invalidates affected queries after mutations. See
+Use generated keys to read, write, and invalidate cache entries. Queries forward cancellation to
+Effect. Use `withQueryPolicy` and `withMutationPolicy` to share typed defaults.
+Your application decides which queries to invalidate after mutations. See
 [feature support](https://ueberbrot.github.io/effect-api-query/getting-started/feature-support/)
 for supported contracts and limits.
 
@@ -136,12 +136,12 @@ Install the library usage skill from this repository:
 npx skills add ueberBrot/effect-api-query --full-depth --skill effect-api-query
 ```
 
-The same skill ships in the npm package. With the library installed, run
+The npm package includes the same skill. After installing the library, run
 `npx @tanstack/intent@latest install` and enable `effect-api-query`, then load it with:
 
 ```sh
 npx @tanstack/intent@latest load effect-api-query#effect-api-query
 ```
 
-Intent uses the skill from the installed library version. GitHub skill installations update
-separately through the Skills CLI.
+Intent loads the skill from your installed library version. Update a skill installed from GitHub
+through the Skills CLI.

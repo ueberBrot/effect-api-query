@@ -4,18 +4,18 @@ Status: Accepted. Partially supersedes ADR 0002 and ADR 0003. Extended to HTTP S
 [ADR 0024](0024-project-http-streams-and-buffered-metadata.md).
 
 Streams support two cached representations: ordered accumulated history and the latest live value.
-Keep these representations separate, and include retention and refetch policies in accumulated
-cache identity, because incompatible histories cannot safely share an entry. Broad key prefixes
-still support invalidation across views and policies.
+Keep these representations separate. Include retention and refetch policies in accumulated cache
+identity because incompatible histories cannot safely share an entry. Broad key prefixes still
+support invalidation across views and policies.
 
-The adapter consumes caller-owned ready clients and follows TanStack cancellation while preserving
-complete Effect failures. Applications own transport, reconnection, and resource lifetime; server
-rendering must settle and stop open work before disposing those resources. Live values follow
-[ADR 0012](0012-normalize-undefined-query-success-to-null.md), while accumulated elements retain
-their decoded representation.
+The adapter consumes caller-owned ready clients and follows TanStack cancellation. It preserves
+complete Effect failures. Applications own transport, reconnection, and resource lifetime. Before
+disposing those resources, server rendering must settle and stop open work. Live values follow
+[ADR 0012](0012-normalize-undefined-query-success-to-null.md). Accumulated elements retain their
+decoded representation.
 
 Expose a framework-neutral snapshot helper because native query cancellation can settle before
-local iterator finalizers finish. A fresh capture exclusively owns an idle, unobserved exact query;
-explicit cached capture can reuse successful data without acquiring work. Applications retain
-client and runtime ownership and dispose them only after local cleanup settles. Browser
+local iterator finalizers finish. A fresh capture exclusively owns an idle, unobserved exact query.
+Explicit cached capture can reuse successful data without acquiring work. Applications retain
+client and runtime ownership. Dispose those resources only after local cleanup settles. Browser
 reconnection uses independently owned resources.

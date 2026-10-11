@@ -1,8 +1,8 @@
 # RPC setup and rules
 
-Use the application's existing RPC group and protocol. The standalone example
-shows how to acquire and clean up a client for a server at
-`http://localhost:3000/rpc` implementing the same contract.
+Use the application's existing RPC group and protocol. This standalone example
+acquires and cleans up a client for a server at `http://localhost:3000/rpc`.
+The server must implement the same contract.
 
 ```ts
 import { MutationObserver, QueryClient } from '@tanstack/query-core'
@@ -60,54 +60,55 @@ try {
 
 ## Tree and payload semantics
 
-Pass a ready **flat** client: `RpcClient.make(group, { flatten: true })`. Dotted
-RPC tags become nested paths: `users.get` becomes `rpc.users.get`. A tag segment
-containing a hyphen needs bracket access. Path collisions and reserved builder
-names fail at factory construction.
+Pass a ready flat client: `RpcClient.make(group, { flatten: true })`. Dotted RPC
+tags become nested paths. For example, `users.get` becomes `rpc.users.get`.
+If a tag segment contains a hyphen, use bracket access. The factory rejects path
+collisions and reserved builder names during construction.
 
 RPC builders accept payload constructor input. Query preparation applies Schema
-constructor defaults before deriving canonical identity. With a constructor default of
-`locale: 'en'`, `{ id: 1 }` and `{ id: 1, locale: 'en' }` address the same query.
-Queries require query-stable construction: the ready client must be able to
-reconstruct the normalized payload without changing its encoded meaning. Use
-standard struct-shaped payloads and materialized defaults. If reconstruction
-changes existing values, expose a stable query-facing RPC.
+constructor defaults, then derives canonical identity. With a constructor default
+of `locale: 'en'`, `{ id: 1 }` and `{ id: 1, locale: 'en' }` address the same query.
+Queries require query-stable payload construction. The ready client must reconstruct
+the normalized payload without changing its encoded meaning. Use standard
+struct-shaped payloads and materialized defaults. If reconstruction changes existing
+values, expose a stable query-facing RPC.
 
-Mutations pass constructor input directly to the ready client. The client constructs
-the payload at execution time. Mutation keys contain no variables and invoke no key encoder;
-constructor-sensitive Schemas remain usable for mutations.
+Mutations pass constructor input directly to the ready client, which constructs
+the payload at execution time. Mutation keys contain no variables and invoke no
+key encoder. Mutations can use constructor-sensitive Schemas.
 
 ## Request-local options
 
-Pass `rpcOptions` through option builders to set `headers` and `context` for that
-operation. Stream builders also accept `streamBufferSize`. These options
-are fixed for the builder result, including retries and all infinite pages. The
-adapter removes them from the returned TanStack options. They do not contribute to keys.
+To set an operation's `headers` and `context`, pass `rpcOptions` through its option
+builder. Stream builders also accept `streamBufferSize`. These options stay fixed
+for the builder result, including retries and all infinite pages. The adapter
+removes them from the returned TanStack options. They do not contribute to keys.
 
-Use the payload or a safe key prefix for any identity carried by these options.
-`streamBufferSize` controls the client's stream buffer; `maxChunks` controls the
-accumulated cache. Unary `discard` and stream `asQueue` controls are unavailable.
+If these options carry identity, include that identity in the payload or a safe
+key prefix. `streamBufferSize` controls the client's stream buffer. `maxChunks`
+controls the accumulated cache. Unary `discard` and stream `asQueue` controls are
+unavailable.
 
-Keep the native default stream buffer unless the application has tested another
-size with its transport. Effect 4.0.0's shared WebSocket receive loop can stall
-another request when cancellation meets an overflowing buffer of size one.
-`maxChunks` bounds cached history after emissions and does not resize that queue.
+Until the application finishes testing another size with its transport, keep the
+native default stream buffer. In Effect 4.0.0, cancellation with an overflowing buffer of
+size one can stall another request in the shared WebSocket receive loop.
+`maxChunks` bounds cached history after emissions. It does not resize that queue.
 
 ## Custom key encoders
 
-Configure `keyEncoders` by the original literal RPC tag, such as `'secrets.read'`.
-An encoder receives the normalized payload after constructor defaults. Provide
-one when payload encoding needs services, contains explicit redacted values, or uses
-opaque encoding middleware. Runtime inspection treats middleware conservatively,
-including synchronous service-free middleware.
+Index `keyEncoders` by the original literal RPC tag, such as `'secrets.read'`.
+An encoder receives the normalized payload after constructor defaults apply. If
+payload encoding needs services, contains explicit redacted values, or uses opaque
+encoding middleware, provide an encoder. Runtime inspection treats middleware
+conservatively, including synchronous service-free middleware.
 
-Return a synchronous strict `JsonValue`: finite numbers, strings, booleans,
-null, dense arrays, and plain objects with defined JSON values. Default RPC
-encoding must also produce strict JSON. Dates and binary values need an encoding
-or projection; undefined entries, cycles, and unsafe property names fail.
+Return a synchronous strict `JsonValue`. It can contain finite numbers, strings,
+booleans, null, dense arrays, and plain objects with defined JSON values. Default
+RPC encoding must also produce strict JSON. Dates and binary values need an
+encoding or projection. Undefined entries, cycles, and unsafe property names fail.
 
-Preserve every distinction that changes results. Use safe identifiers for
-secrets. Encoders affect query identity only; they leave execution input and
-service requirements unchanged.
+Preserve every distinction that changes results. For secrets, use safe identifiers.
+Encoders affect only query identity. Execution input and service requirements stay
+unchanged.
 
 Source: [RPC factory and builders](https://ueberbrot.github.io/effect-api-query/reference/generated-builders/).
