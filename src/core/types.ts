@@ -12,7 +12,6 @@ import type {
 } from '@tanstack/query-core'
 import type { Effect, Exit, Redacted } from 'effect'
 
-/** A JSON scalar accepted in key prefixes and canonical key payloads. */
 export type JsonPrimitive = boolean | null | number | string
 
 /** An immutable JSON value accepted in cache keys. */
@@ -29,12 +28,10 @@ export type RunPromiseExit<R = never> = <A, E>(
 export type OwnedQueryOption = 'queryFn' | 'queryKey' | 'queryKeyHashFn' | 'queryHash'
 export type OwnedMutationOption = 'mutationFn' | 'mutationKey'
 
-/** Retains the initial-data guarantee through a generated options overload. */
 export type WithDefinedInitialData<Options, Data> = Omit<Options, 'initialData'> & {
   readonly initialData: NonUndefinedGuard<Data> | (() => NonUndefinedGuard<Data>)
 }
 
-/** Keeps initialData optional in the non-defined overload. */
 export type WithUndefinedInitialData<Options, Data> = Omit<Options, 'initialData'> & {
   readonly initialData?:
     | undefined
@@ -42,7 +39,6 @@ export type WithUndefinedInitialData<Options, Data> = Omit<Options, 'initialData
     | NonUndefinedGuard<Data>
 }
 
-/** Shared Query Core fields plus the adapter's request-local options. */
 export type QueryInput<
   Data,
   Error,
@@ -180,7 +176,6 @@ export type InputQueryBuilder<
   >
 }
 
-/** Owns unary query inference; adapters supply their request, data, error, and key types. */
 export type UnaryQueryBuilder<
   Input,
   Data,
@@ -277,7 +272,6 @@ export type InfiniteOptions<
   readonly queryKey: Key
 }
 
-/** Tags concrete infinite keys with their cached pages and inferred page parameter. */
 export type InfiniteQueryKey<
   Input,
   Data,
@@ -325,7 +319,6 @@ export type ConditionalInfiniteOptions<
   QueryFunction<Data, QueryKey, PageParam> | SkipToken
 >
 
-/** Owns infinite-query inference while adapters supply request, data, error, and operation keys. */
 export type InfiniteQueryBuilder<
   Input,
   Data,
@@ -516,7 +509,6 @@ export type MutationOptions<Data, Error, Input, Key extends QueryKey, OnMutateRe
   readonly mutationKey: Key
 }
 
-/** Owns mutation callback inference while adapters supply their request and execution types. */
 export type MutationBuilder<Data, Error, Input, Key extends QueryKey, AdapterOptions = unknown> = <
   OnMutateResult = unknown,
 >(
@@ -524,7 +516,6 @@ export type MutationBuilder<Data, Error, Input, Key extends QueryKey, AdapterOpt
     AdapterOptions,
 ) => MutationOptions<Data, Error, Input, Key, OnMutateResult>
 
-// Generic function comparison tests exact type identity, not a callable API.
 /* oxlint-disable typescript/no-unnecessary-type-parameters */
 export type HasSeenType<A, Seen> = Seen extends unknown
   ? (<T>() => T extends A ? 1 : 2) extends <T>() => T extends Seen ? 1 : 2
@@ -533,7 +524,6 @@ export type HasSeenType<A, Seen> = Seen extends unknown
   : never
 /* oxlint-enable typescript/no-unnecessary-type-parameters */
 
-/** Recursively detects explicit redacted values in a decoded value. */
 export type ContainsRedacted<A, Seen = never> =
   A extends Redacted.Redacted<unknown>
     ? true

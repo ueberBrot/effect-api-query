@@ -57,11 +57,9 @@ const canonicalizeArray = (value: unknown[], seen: WeakSet<object>): JsonValue =
     if (!Object.hasOwn(value, index)) {
       throw new TypeError('Key values must not contain sparse arrays')
     }
-    // canonicalize is initialized before any query tree is constructed.
     // oxlint-disable-next-line eslint/no-use-before-define
     copy.push(canonicalize(value[index], seen))
   }
-  // Shared references are valid JSON; only references on the active path form cycles.
   seen.delete(value)
   return Object.freeze(copy)
 }
@@ -77,7 +75,6 @@ const canonicalizeObject = (value: Record<string, unknown>, seen: WeakSet<object
     if (key === '__proto__' || key === 'constructor') {
       throw new TypeError('Key objects must not contain __proto__ or constructor properties')
     }
-    // Every enumerated member must remain JSON-safe, including getter side effects.
     // oxlint-disable-next-line eslint/no-use-before-define
     copy[key] = canonicalize(value[key], seen)
   }
@@ -85,7 +82,6 @@ const canonicalizeObject = (value: Record<string, unknown>, seen: WeakSet<object
   return Object.freeze(copy)
 }
 
-// Copying prevents caller mutation; sorting makes equivalent objects hash identically.
 const canonicalize = (value: unknown, seen = new WeakSet()): JsonValue => {
   if (value === null || Predicate.isString(value) || Predicate.isBoolean(value)) {
     return value
@@ -111,7 +107,7 @@ const canonicalize = (value: unknown, seen = new WeakSet()): JsonValue => {
   return canonicalizeObject(value, seen)
 }
 
-const freezeKey = (parts: readonly (JsonValue | string)[]) => Object.freeze([...parts])
+const freezeKey = (parts: JsonValue[]) => Object.freeze(parts)
 
 const normalizePrefix = (
   prefix: readonly [JsonValue, ...JsonValue[]],
@@ -122,8 +118,6 @@ const normalizePrefix = (
   }
 
   try {
-    // SAFETY: prefix is checked to be a nonempty array; canonicalize preserves arrays
-    // while validating and freezing every JSON value recursively.
     // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     return canonicalize(prefix) as readonly JsonValue[]
   } catch (error) {
@@ -131,7 +125,6 @@ const normalizePrefix = (
   }
 }
 
-// Validate the entire plan before allocating branches or preparing any request.
 const planPaths = (operations: readonly OperationDescription[], errors: TreeErrors) => {
   const branchPaths = new Map<string, readonly string[]>()
   const leafPaths = new Set<string>()
@@ -168,7 +161,6 @@ const planPaths = (operations: readonly OperationDescription[], errors: TreeErro
       }
     }
     leafPaths.add(pathKey)
-    // SAFETY: The empty path was rejected above before recording this plan.
     // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     plan.push({ operation, segments: segments as readonly [string, ...string[]] })
   }
@@ -186,11 +178,8 @@ const execute = async <Operation extends UnaryQueryOperation | 'metadata'>(
   requestOptions?: unknown,
   signal?: AbortSignal,
 ) => {
-  // The transport contract preserves arbitrary caller errors and Context services.
   // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
   const effect = description.invoke(input, requestOptions)
-  // Await outside the Exit branch so a runner rejection passes through untouched.
-  // The erased transport channels retain the caller's errors and service requirements.
   // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
   const exit = await runPromiseExit(effect, signal === undefined ? undefined : { signal })
 
@@ -198,16 +187,9 @@ const execute = async <Operation extends UnaryQueryOperation | 'metadata'>(
     throw description.executionError(operation, exit.cause)
   }
 
-  // TanStack rejects successful undefined query data; mutations keep it unchanged.
   return operation !== 'mutation' && exit.value === undefined ? null : exit.value
 }
 
-const defineKey = (target: Record<string, unknown>, parts: readonly (JsonValue | string)[]) => {
-  const key = freezeKey(parts)
-  target['key'] = () => key
-}
-
-// One preparation produces both the retained execution input and its immutable key.
 const prepareQuery = (
   description: UnaryOperation | StreamingOperation,
   input: unknown,
@@ -276,7 +258,6 @@ const createQueryBuilders = (
   },
   options: (argument?: unknown) => {
     const { input, options, requestOptions } = prepareQueryOptions(description, argument)
-    // Stream policy is consumed and validated even when execution will be skipped.
     const { identity, makeQuery } = prepareOptions(options, requestOptions, input)
     if (description.input._tag !== 'Inputless' && input === skipToken) {
       return finalizeQueryOptions(options, operationKey, skipToken)
@@ -304,17 +285,11 @@ const createInfiniteBuilders = (
     }
 
     const { initialPageParam } = options
-    const inputForPage =
-      description.input._tag === 'Inputless'
-        ? () => {
-            // Inputless operations do not construct a page payload.
-          }
-        : input
+    // oxlint-disable-next-line unicorn/no-useless-undefined
+    const inputForPage = description.input._tag === 'Inputless' ? () => undefined : input
     if (!Predicate.isFunction(inputForPage)) {
       throw new TypeError('Infinite query input must be a page input function')
     }
-    // SAFETY: The function guard above validates callability; the adapter validates
-    // the returned payload through the operation's declaration before execution.
     // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const pageInput = inputForPage as (pageParam: unknown) => unknown
     const initialInput = pageInput(initialPageParam)
@@ -370,7 +345,7 @@ const createMutationBuilders = (
 
 const createMutationLeaf = (
   description: BufferedOperation,
-  keyParts: readonly (JsonValue | string)[],
+  keyParts: JsonValue[],
   runPromiseExit: RunPromiseExit<unknown>,
 ) => {
   const operationKey = freezeKey(keyParts)
@@ -435,7 +410,7 @@ const prepareMetadataExecution = (
 
 const createUnaryLeaf = (
   description: UnaryOperation,
-  keyParts: readonly (JsonValue | string)[],
+  keyParts: JsonValue[],
   keyEncoder: RuntimeKeyEncoder | undefined,
   runPromiseExit: RunPromiseExit<unknown>,
 ) => {
@@ -487,7 +462,7 @@ const createUnaryLeaf = (
 
 const createStreamingLeaf = (
   description: StreamingOperation,
-  keyParts: readonly (JsonValue | string)[],
+  keyParts: JsonValue[],
   keyEncoder: RuntimeKeyEncoder | undefined,
   runPromiseExit: RunPromiseExit<unknown>,
 ) => {
@@ -568,8 +543,8 @@ const insertLeaf = (
     const candidate = Object.hasOwn(branch, segment) ? branch[segment] : undefined
     let child = Predicate.isObject(candidate) ? candidate : undefined
     if (child === undefined) {
-      child = {}
-      defineKey(child, [...prefix, ...segments.slice(0, index + 1)])
+      const key = freezeKey([...prefix, ...segments.slice(0, index + 1)])
+      child = { key: () => key }
       branch[segment] = child
     }
     branch = child
@@ -596,8 +571,7 @@ const createTree = (
   keyEncoders: ReadonlyMap<string, RuntimeKeyEncoder>,
   runPromiseExit: RunPromiseExit<unknown>,
 ) => {
-  const tree: Record<string, unknown> = {}
-  defineKey(tree, prefix)
+  const tree = { key: () => prefix }
 
   for (const path of paths) {
     insertLeaf(tree, prefix, path, keyEncoders.get(path.operation.id), runPromiseExit)
@@ -621,8 +595,6 @@ export const createUtilityTree = (
   ])
   const paths = planPaths(operations, options.errors)
   validateKeyEncoders(operations, options.keyEncoders, options.errors)
-  // SAFETY: Public options require a runner when a client has remaining services;
-  // otherwise the captured client is fully provided and the default runner needs none.
   // oxlint-disable-next-line typescript/no-unsafe-type-assertion
   const runner = options.runPromiseExit ?? (Effect.runPromiseExit as RunPromiseExit<unknown>)
   return createTree(prefix, paths, options.keyEncoders, runner)

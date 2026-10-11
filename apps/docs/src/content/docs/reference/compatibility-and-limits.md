@@ -5,9 +5,6 @@ description: Supported versions, RPC and HTTP operations, cache identity, and ru
 
 ## Supported integrations
 
-See [Performance and Bundling](/effect-api-query/reference/performance/) for construction costs,
-construction workloads and adapter versus application bundles.
-
 The package declares one exact Effect peer and Query Core `>=5.103.1 <6`. It is ESM-only and
 targets ES2022. Use TypeScript with `strict: true`. The repository uses these versions:
 
@@ -77,27 +74,23 @@ not replace a ready Effect client.
 With Effect 4.0.0, single-element arrays in GET and form-urlencoded payloads can fail server
 decoding. Array query parameters and JSON array responses retain their usual representation.
 
-## Runtime and cache behavior
+## Input and cache limits
 
-- The caller owns RPC or HTTP client acquisition, `Scope`, transport, Query Client, providers, router, SSR,
-  hydration, and disposal.
-- The package provides no framework adapter, provider, or Node-specific integration helper.
-- Query cancellation reaches the runner as an `AbortSignal`; stream cancellation closes the
-  AsyncIterator. Transport-level interruption depends on the client integration.
-- Mutation cancellation is outside the generated API.
-- Mutations do not invalidate queries automatically. Applications choose the affected key prefix.
-- RPC and HTTP query successes that may be `undefined` become `null` because TanStack Query rejects
-  `undefined` query data. Live emissions follow this rule; accumulated stream elements and mutation
-  results keep their original success types.
-- Cache identity must be strict JSON. Encoding services, redacted values, and multiple HTTP payload
-  alternatives require safe custom encoders for endpoints with query support. Binary query input needs
-  a JSON-safe projection. Multipart mutation-only endpoints require no encoder and reject encoder entries.
-- Key encoders are synchronous; asynchronous and Effect-returning encoders are unsupported.
-- RPC payload Schemas must be query-stable because key preparation and ready-client execution
-  construct the payload separately. HTTP builders accept decoded request input without RPC construction.
-- Query options retain execution input. Keep captured values unchanged while they can run; immutable
-  keys do not clone or freeze arbitrary input or decoded data. See
-  [Data Normalization](/effect-api-query/concepts/data-normalization/#keep-captured-inputs-unchanged).
+Cache identity must be strict JSON. Encoding services, redacted values, and multiple HTTP payload
+alternatives require safe [custom encoders](/effect-api-query/guides/custom-key-encoders/)
+for endpoints with query support. Binary query input needs a JSON-safe projection. Multipart
+mutation-only endpoints require no encoder and reject encoder entries. Encoders are synchronous;
+asynchronous and Effect-returning encoders are unsupported.
+
+RPC payload Schemas must be query-stable because preparation and ready-client execution construct
+the payload separately. HTTP builders accept decoded request input without RPC construction.
+Keep captured input unchanged while its options can run; frozen keys do not freeze arbitrary
+input or decoded data.
+
+Buffered queries and live emissions normalize successful `undefined` to `null`. Accumulated stream
+elements and mutation results preserve it. See [Data Normalization](/effect-api-query/concepts/data-normalization/)
+for payload construction, input ownership and query data, and
+[Performance and Bundling](/effect-api-query/reference/performance/) for construction costs.
 
 ## Server rendering and errors
 

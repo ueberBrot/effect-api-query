@@ -67,3 +67,9 @@ declarations and exports.
   Retain the ten tasks and existing source mappings. Compiler fixtures verify
   contextual inference and mutation tracking; 124 in-memory runtime cases cover
   cache views, retry attempts, defaults, hydration, cancellation, and ownership.
+- **Runtime and guidance audit (2026-10-11), based on `54b6521`:** qualify stream
+  hashing and execution errors, preserve refreshed page totals during overlapping
+  writes, and reconcile command starts after transport failures. Shorten repeated
+  guidance while retaining the ten tasks, domain map, and source mappings. All
+  474 runtime cases and both public API compiler suites pass, alongside typed
+  lint, Effect diagnostics, dead-code checks, and documentation checks.

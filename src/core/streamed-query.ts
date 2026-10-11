@@ -1,4 +1,4 @@
-import { experimental_streamedQuery } from '@tanstack/query-core'
+import { experimental_streamedQuery, hashKey } from '@tanstack/query-core'
 import type { QueryFunctionContext } from '@tanstack/query-core'
 import { Exit, Predicate, Stream } from 'effect'
 import type { Cause } from 'effect'
@@ -34,6 +34,7 @@ export interface MakeStreamQueryOptions {
   readonly policy: StreamQueryPolicy
   readonly source: Stream.Stream<unknown, unknown, unknown>
   readonly executionError: (cause: Cause.Cause<unknown>) => Error
+  readonly unsupportedHash: () => Error
   readonly emptyError?: (() => Error) | undefined
   readonly runPromiseExit: RunPromiseExit<unknown>
 }
@@ -106,9 +107,42 @@ export const makeStreamQuery = ({
   policy,
   source,
   executionError,
+  unsupportedHash,
   emptyError,
   runPromiseExit,
 }: MakeStreamQueryOptions) => {
+  const validateHash = ({ client, queryKey }: QueryFunctionContext) => {
+    const { queryHash, queryKeyHashFn } = client.defaultQueryOptions({ queryKey })
+    if (queryHash !== (queryKeyHashFn ?? hashKey)(queryKey)) {
+      throw unsupportedHash()
+    }
+    const cache = client.getQueryCache()
+    let currentFound = false
+    let nativeHash: string | undefined
+    for (const query of cache.getAll()) {
+      if (query.queryHash === queryHash) {
+        currentFound = true
+        continue
+      }
+      if (query.options.queryKeyHashFn === queryKeyHashFn) {
+        continue
+      }
+      if (currentFound) {
+        try {
+          nativeHash ??= hashKey(queryKey)
+          if (hashKey(query.queryKey) !== nativeHash) {
+            continue
+          }
+        } catch {
+          continue
+        }
+      }
+      if (query.queryHash === (query.options.queryKeyHashFn ?? hashKey)(queryKey)) {
+        throw unsupportedHash()
+      }
+    }
+    return cache.get(queryHash)
+  }
   const streamFn = async ({ signal }: { readonly signal: AbortSignal }) => {
     const stream = source.pipe(
       Stream.catchCauseIf(
@@ -125,21 +159,21 @@ export const makeStreamQuery = ({
   }
 
   if (policy._tag === 'Live') {
-    return experimental_streamedQuery({
+    const queryFn = experimental_streamedQuery({
       initialValue: null,
       reducer: (_latest: unknown, value: unknown) => (value === undefined ? null : value),
       streamFn,
     })
+    return async (context: QueryFunctionContext) => {
+      validateHash(context)
+      return await queryFn(context)
+    }
   }
 
   const { maxChunks, refetchMode } = policy
   return async (context: QueryFunctionContext) => {
-    const reset =
-      refetchMode === 'reset' &&
-      context.client
-        .getQueryCache()
-        .find({ queryKey: context.queryKey, exact: true })
-        ?.isFetched() === true
+    const query = validateHash(context)
+    const reset = refetchMode === 'reset' && query?.isFetched() === true
     let emitted = false
     const initialValue: unknown[] = []
     const queryFn = experimental_streamedQuery({
@@ -147,12 +181,17 @@ export const makeStreamQuery = ({
       reducer: (values: unknown[], value: unknown) => {
         const history = reset && !emitted ? [] : values
         emitted = true
-        return [
-          ...(maxChunks === undefined
-            ? history
-            : history.slice(Math.max(0, history.length + 1 - maxChunks))),
-          value,
-        ]
+        if (maxChunks === undefined) {
+          return [...history, value]
+        }
+        const start = Math.max(0, history.length + 1 - maxChunks)
+        // oxlint-disable-next-line unicorn/no-new-array
+        const next = new Array<unknown>(history.length + 1 - start)
+        for (let index = start; index < history.length; index += 1) {
+          next[index - start] = history[index]
+        }
+        next[next.length - 1] = value
+        return next
       },
       refetchMode,
       streamFn,

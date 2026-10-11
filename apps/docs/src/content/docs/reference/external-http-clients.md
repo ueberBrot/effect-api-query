@@ -28,21 +28,10 @@ The external client's generated types add no runtime Schema decoding or validati
 | Response body           | Plain object with `total: '17'`   | Schema class with `total: 17` and methods                     |
 | Response headers        | Raw strings on `response.headers` | Decoded declared header wrapper; raw strings in metadata view |
 
-## Buffered requests and uploads
+## Call the declared HTTP contract
 
-The report contract below declares `POST /reports/:id`, a JSON payload, query and header fields,
-and a 203 response. Its missing-report response has status 404 and a tagged JSON body. An update
-uses `PATCH` and declares a 409 conflict. Read declared failures through `error` and inspect
-`response.status`; the external client does not construct an Effect execution-error wrapper.
-
-Array query parameters use repeated names, including a single-element array. JSON array
-responses retain their ordinary JSON representation. This scope does not include GET payloads
-or form-urlencoded payloads.
-
-For `multipart/form-data`, map a binary schema to `Blob` with the generator's `transform` hook.
-Use a `bodySerializer` that returns `FormData`. Let Fetch set the multipart boundary; the default
-JSON serializer receives HTTP 415 from a multipart-only endpoint. The example upload includes
-path/query/header values, a text field, and a file with its filename and contents intact.
+Generate `paths` from your server's OpenAPI document. Its declared paths, headers and success/error
+responses determine the external client interface; the utility tree's decoded input does not.
 
 In the external client module, use the generated `paths` type and create the client:
 
@@ -54,7 +43,7 @@ import type { paths } from './openapi-generated.ts'
 const external = createClient<paths>({ baseUrl: 'https://api.example.test' })
 ```
 
-In a loader or request handler, send encoded values and inspect the buffered result:
+For a contract declaring `POST /reports/:id` with these fields, send encoded values:
 
 ```ts
 const report = await external.POST('/reports/{id}', {
@@ -71,41 +60,26 @@ if (report.error) {
 const revision = report.response.headers.get('x-revision')
 ```
 
-In the upload handler, serialize the declared fields as `FormData`:
+Read declared failures through `error` and inspect `response.status`; the external client does
+not construct an Effect execution-error wrapper. Its `Response` keeps status and raw headers.
+The native [metadata view](/effect-api-query/reference/http-factory/#buffered-metadata) instead
+keeps decoded data and immutable plain status/header snapshots.
 
-```ts
-const uploaded = await external.POST('/reports/{id}/files', {
-  params: {
-    path: { id: '5' },
-    query: { revision: '3' },
-    header: { 'x-kind': 'document' },
-  },
-  body: { title: 'Notes', file: new File(['contents'], 'notes.txt') },
-  bodySerializer: (body) => {
-    const form = new FormData()
-    form.set('title', body.title)
-    form.set('file', body.file)
-    return form
-  },
-})
-```
+Array query parameters use repeated names, including a single-element array. JSON array
+responses retain their ordinary representation. GET and form-urlencoded payloads have separate
+[upstream limits](/effect-api-query/reference/compatibility-and-limits/#capability-matrix).
 
-For raw SSE access, request a stream in that consumer:
+## Serialize multipart uploads explicitly
 
-```ts
-const events = await external.GET('/reports/events/{channel}', {
-  params: { path: { channel: 'values' } },
-  parseAs: 'stream',
-})
-```
-
-The external client's `Response` retains HTTP status and raw headers after buffering. The native
-HTTP metadata view retains decoded data with immutable plain status/header snapshots. These
-are distinct representations.
+Map a binary schema to `Blob` with the generator's `transform` hook. Supply a `bodySerializer`
+that builds `FormData` from the declared text fields and files, preserving filenames. Let Fetch
+set the multipart boundary; the default JSON serializer receives HTTP 415 from a multipart-only
+endpoint. The ready Effect client instead takes `FormData` directly as its decoded payload;
+see [Upload a File](/effect-api-query/guides/http-queries-and-mutations/#upload-a-file).
 
 ## SSE boundary
 
-`parseAs: 'stream'` returns a raw `ReadableStream<Uint8Array>`. It does not parse events, decode
+Request `parseAs: 'stream'` for a raw `ReadableStream<Uint8Array>`. It does not parse events, decode
 Schema values, or turn a reserved failure event into an error. Default JSON parsing fails on
 an SSE response.
 

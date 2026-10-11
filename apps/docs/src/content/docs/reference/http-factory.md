@@ -93,6 +93,8 @@ Applicable TanStack options pass through. The package owns the key and function 
 `input` before returning options. QueryClient global and prefix defaults own hashing. Builders
 reject per-call `queryKeyHashFn` and `queryHash` with `EffectHttpApiQueryConfigError` code
 `UnsupportedQueryHash`.
+Keep hash defaults stable while entries remain cached. Stream execution also rejects with that
+code when changed hashing conflicts with a matching cached entry.
 
 Input-bearing `queryOptions` accepts a complete request in `input` or
 `queryOptions({ input: skipToken, ...options })`. Import `skipToken` from `effect-api-query` or

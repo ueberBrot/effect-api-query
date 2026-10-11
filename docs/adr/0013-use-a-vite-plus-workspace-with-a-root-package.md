@@ -10,10 +10,10 @@ initial release path.
 ## Decision
 
 Use a Vite+ pnpm workspace with the publishable `effect-api-query` package permanently at the root.
-Keep examples private. Future public packages may live under `packages/`.
+Keep examples private.
 
 ## Consequences
 
-The workspace accepts Vite+'s beta status. Private examples share RPC contracts and hosting code.
+Private examples share RPC contracts and hosting code.
 ADR 0019 supersedes this decision's original requirement that both browser examples use the
 standalone server.

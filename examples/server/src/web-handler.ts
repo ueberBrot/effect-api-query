@@ -21,14 +21,12 @@ const readRequestBody = async (request: Request): Promise<Uint8Array<ArrayBuffer
     return new Uint8Array()
   }
   const reader = request.body.getReader()
-  const body = new Uint8Array(maxRequestBodyBytes)
+  let body = new Uint8Array(0)
   let length = 0
   const cancelReader = async () => {
     try {
       await reader.cancel()
-    } catch {
-      // Failed or already closed uploads no longer need cancellation.
-    }
+    } catch {}
   }
   const cancel = () => {
     void cancelReader()
@@ -37,16 +35,22 @@ const readRequestBody = async (request: Request): Promise<Uint8Array<ArrayBuffer
   try {
     while (true) {
       request.signal.throwIfAborted()
-      // Each stream read must complete before the next chunk can be requested.
       // oxlint-disable-next-line eslint/no-await-in-loop
       const chunk = await reader.read()
       request.signal.throwIfAborted()
       if (chunk.done) {
-        return body.subarray(0, length)
+        return length === body.byteLength ? body : body.slice(0, length)
       }
       if (chunk.value.byteLength > maxRequestBodyBytes - length) {
         cancel()
         return new Response(null, { status: 413 })
+      }
+      const required = length + chunk.value.byteLength
+      if (required > body.byteLength) {
+        const capacity = Math.min(maxRequestBodyBytes, Math.max(required, body.byteLength * 2))
+        const expanded = new Uint8Array(capacity)
+        expanded.set(body.subarray(0, length))
+        body = expanded
       }
       body.set(chunk.value, length)
       length += chunk.value.byteLength
@@ -77,7 +81,6 @@ const withRequestBodyLimit =
     )
   }
 
-/** Builds the host-neutral HTTP RPC handler within the caller-owned Scope. */
 const makeRpcWebHandler = Effect.fn('ExampleRpc.makeRpcWebHandler')(function* () {
   const scope = yield* Scope.Scope
   const rpcContext = yield* Layer.buildWithScope(rpcLayer, scope)
@@ -102,12 +105,10 @@ const provideDomain = Effect.fn('ExampleDomain.provide')(function* <A, E, R>(
   return yield* Effect.provide(effect, context)
 })
 
-/** Builds the RPC handler within the caller-owned Scope. */
 export const makeExampleRpcWebHandler = Effect.fn('ExampleRpc.makeExampleRpcWebHandler')(() =>
   provideDomain(makeRpcWebHandler()),
 )
 
-/** Hosts RPC and HTTP contracts over one application state within the caller-owned Scope. */
 const makeHostWebHandler = Effect.fn('ExampleServer.makeHostWebHandler')(function* () {
   const rpc = yield* makeRpcWebHandler()
   const httpEffect = yield* HttpRouter.toHttpEffect(

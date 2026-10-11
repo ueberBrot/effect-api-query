@@ -1,6 +1,5 @@
 @import 'tailwindcss';
 
-/* Semantic aliases preserve the examples' existing dark palette. */
 @theme inline {
   --tracking-display: -0.04em;
   --color-destructive-600: var(--color-red-600);

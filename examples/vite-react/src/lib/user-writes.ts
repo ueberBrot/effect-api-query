@@ -1,5 +1,5 @@
 import { User, UserPage } from '@effect-api-query/contracts'
-import type { InfiniteData, QueryClient } from '@tanstack/react-query'
+import type { InfiniteData, MutationObserverOptions, QueryClient } from '@tanstack/react-query'
 
 import type { ExampleHttpQueryUtils, ExampleRpcQueryUtils } from './application.ts'
 import type { makeOwnerCache } from './owner-cache.ts'
@@ -32,38 +32,24 @@ const restoreList = (
   ) {
     return current
   }
-  const following = snapshot
-    ?.slice(index + 1)
-    .find((candidate) => current.some((existing) => existing.id === candidate.id))
+  const positions = new Map<number, number>()
+  for (const [currentIndex, existing] of current.entries()) {
+    if (!positions.has(existing.id)) {
+      positions.set(existing.id, currentIndex)
+    }
+  }
+  const following = snapshot?.slice(index + 1).find((candidate) => positions.has(candidate.id))
   let position = 0
   for (const candidate of snapshot?.slice(0, index) ?? []) {
-    const precedingIndex = current.findIndex((existing) => existing.id === candidate.id)
-    if (precedingIndex !== -1) {
+    const precedingIndex = positions.get(candidate.id)
+    if (precedingIndex !== undefined) {
       position = precedingIndex + 1
     }
   }
   if (following !== undefined) {
-    position = current.findIndex((existing) => existing.id === following.id)
+    position = positions.get(following.id) ?? position
   }
   return [...current.slice(0, position), user, ...current.slice(position)]
-}
-
-const restorePages = (
-  current: InfiniteData<UserPage> | undefined,
-  snapshot: InfiniteData<UserPage> | undefined,
-  id: number,
-) => {
-  if (current === undefined || snapshot === undefined) {
-    return current
-  }
-  return {
-    ...current,
-    pages: current.pages.map((page, pageIndex) => {
-      const before = snapshot.pages[pageIndex]
-      const restored = restoreList(page.users, before?.users, id) ?? page.users
-      return new UserPage({ users: restored, total: page.total + 1, nextCursor: page.nextCursor })
-    }),
-  }
 }
 
 export const makeUserWrites = ({
@@ -75,6 +61,7 @@ export const makeUserWrites = ({
 }: UserWriteOwner) => {
   let nextWrite = 0
   const pending = new Set<number>()
+  const pageWrites = new WeakMap<UserPage, Set<number>>()
   const rpcList = rpcQuery.users.list.queryKey()
   const httpList = httpQuery.users.list.queryKey()
   const rpcPages = rpcQuery.users.page.infiniteKey({ cursor: 0, pageSize: 4 })
@@ -124,7 +111,59 @@ export const makeUserWrites = ({
     queryClient.setQueryData(rpcPages, (data) => (data === undefined ? undefined : edit(data)))
     queryClient.setQueryData(httpPages, (data) => (data === undefined ? undefined : edit(data)))
   }
-  const replaceUser = (id: number, replacement: User | undefined, totalChange: number) => {
+  const patchPage = (
+    page: UserPage,
+    users: readonly User[],
+    write: number,
+    totalChange: number,
+    phase: 'optimistic' | 'settled',
+  ) => {
+    const writes = new Set(pageWrites.get(page))
+    const applied = phase === 'optimistic' || writes.delete(write)
+    if (phase === 'optimistic') {
+      writes.add(write)
+    }
+    const patched = new UserPage({
+      users,
+      total: page.total + (applied ? totalChange : 0),
+      nextCursor: page.nextCursor,
+    })
+    if (writes.size !== 0) {
+      pageWrites.set(patched, writes)
+    }
+    return patched
+  }
+  const restorePages = (
+    current: InfiniteData<UserPage> | undefined,
+    snapshot: InfiniteData<UserPage> | undefined,
+    id: number,
+    write: number,
+  ) => {
+    if (current === undefined || snapshot === undefined) {
+      return current
+    }
+    return {
+      ...current,
+      pages: current.pages.map((page, pageIndex) =>
+        pageWrites.get(page)?.has(write) === true
+          ? patchPage(
+              page,
+              restoreList(page.users, snapshot.pages[pageIndex]?.users, id) ?? page.users,
+              write,
+              1,
+              'settled',
+            )
+          : page,
+      ),
+    }
+  }
+  const replaceUser = (
+    id: number,
+    replacement: User | undefined,
+    write: number,
+    totalChange: number,
+    phase: 'optimistic' | 'settled',
+  ) => {
     editLists((users) => {
       const retained = users.filter((user) => user.id !== id && user.id !== replacement?.id)
       if (replacement === undefined) {
@@ -150,7 +189,7 @@ export const makeUserWrites = ({
         } else if (append) {
           users = [...retained, replacement]
         }
-        return new UserPage({ nextCursor: page.nextCursor, users, total: page.total + totalChange })
+        return patchPage(page, users, write, totalChange, phase)
       }),
     }))
   }
@@ -162,7 +201,7 @@ export const makeUserWrites = ({
     if (!isActive()) {
       return
     }
-    replaceUser(-write, user, 0)
+    replaceUser(-write, user, write, 0, 'settled')
     queryClient.setQueryData(
       rpcQuery.users.get.queryKey({ id: user.id, locale: user.locale }),
       user,
@@ -174,7 +213,7 @@ export const makeUserWrites = ({
   }
   const createFailed = (write: number | undefined) => {
     if (isActive() && write !== undefined) {
-      replaceUser(-write, undefined, -1)
+      replaceUser(-write, undefined, write, -1, 'settled')
     }
   }
   const startCreate = async (input: {
@@ -190,7 +229,9 @@ export const makeUserWrites = ({
     replaceUser(
       temporaryId,
       new User({ id: temporaryId, name: input.name, locale: input.locale ?? 'en' }),
+      write,
       1,
+      'optimistic',
     )
     return {
       commit: async (user: User) => created(user, write),
@@ -200,27 +241,13 @@ export const makeUserWrites = ({
       settle: async () => settle(write),
     }
   }
-  const rpcCreate = () => {
-    const options = rpcQuery.users.create.mutationOptions({
-      onMutate: startCreate,
-      onSuccess: async (user, _input, transaction) => transaction.commit(user),
-      onError: (_error, _input, transaction) => {
-        transaction?.rollback()
-      },
-      onSettled: async (_data, _error, _input, transaction) => transaction?.settle(),
-    })
-    return trackMutationOptions(options)
-  }
-  const httpCreate = () => {
-    const options = httpQuery.users.create.mutationOptions({
-      onMutate: async ({ payload }) => startCreate(payload),
-      onSuccess: async (user, _input, transaction) => transaction.commit(user),
-      onError: (_error, _input, transaction) => {
-        transaction?.rollback()
-      },
-      onSettled: async (_data, _error, _input, transaction) => transaction?.settle(),
-    })
-    return trackMutationOptions(options)
+  const createCallbacks: Pick<
+    MutationObserverOptions<User, Error, object, Awaited<ReturnType<typeof startCreate>>>,
+    'onSuccess' | 'onError' | 'onSettled'
+  > = {
+    onSuccess: async (user, _input, transaction) => transaction.commit(user),
+    onError: (_error, _input, transaction) => transaction?.rollback(),
+    onSettled: async (_data, _error, _input, transaction) => transaction?.settle(),
   }
   let deletionBaseline: DirectorySnapshot | undefined
   const deletionGroups = new Map<
@@ -228,6 +255,7 @@ export const makeUserWrites = ({
     DirectorySnapshot & {
       readonly pending: Set<number>
       readonly applied: boolean
+      readonly write: number
       succeeded: boolean
     }
   >()
@@ -248,13 +276,25 @@ export const makeUserWrites = ({
     if (deletionGroups.size === 0) {
       deletionBaseline = undefined
     }
-    if (!isActive() || group.succeeded || !group.applied) {
+    if (group.succeeded) {
+      for (const key of [rpcPages, httpPages]) {
+        for (const page of queryClient.getQueryData(key)?.pages ?? []) {
+          pageWrites.get(page)?.delete(group.write)
+        }
+      }
+      return
+    }
+    if (!isActive() || !group.applied) {
       return
     }
     queryClient.setQueryData(rpcList, (current) => restoreList(current, group.rpcList, id))
     queryClient.setQueryData(httpList, (current) => restoreList(current, group.httpList, id))
-    queryClient.setQueryData(rpcPages, (current) => restorePages(current, group.rpcPages, id))
-    queryClient.setQueryData(httpPages, (current) => restorePages(current, group.httpPages, id))
+    queryClient.setQueryData(rpcPages, (current) =>
+      restorePages(current, group.rpcPages, id, group.write),
+    )
+    queryClient.setQueryData(httpPages, (current) =>
+      restorePages(current, group.httpPages, id, group.write),
+    )
   }
   const deleted = async (id: number, write: number) => {
     if (isActive()) {
@@ -298,6 +338,7 @@ export const makeUserWrites = ({
         pending: new Set(),
         succeeded: false,
         applied,
+        write,
         rpcList: listSnapshot(deletionBaseline.rpcList, lists[0]),
         httpList: listSnapshot(deletionBaseline.httpList, lists[1]),
         rpcPages: pageSnapshot(deletionBaseline.rpcPages, pages[0]),
@@ -305,7 +346,7 @@ export const makeUserWrites = ({
       }
       deletionGroups.set(id, group)
       if (applied) {
-        replaceUser(id, undefined, -1)
+        replaceUser(id, undefined, write, -1, 'optimistic')
       }
     }
     group.pending.add(write)
@@ -317,27 +358,39 @@ export const makeUserWrites = ({
       settle: async () => settle(write),
     }
   }
-  const rpcDelete = () => {
-    const options = rpcQuery.users.delete.mutationOptions({
-      onMutate: async ({ id }) => startDelete(id),
-      onSuccess: async (_data, _input, transaction) => transaction.commit(),
-      onError: (_error, _input, transaction) => {
-        transaction?.rollback()
-      },
-      onSettled: async (_data, _error, _input, transaction) => transaction?.settle(),
-    })
-    return trackMutationOptions(options)
+  const deleteCallbacks: Pick<
+    MutationObserverOptions<void, Error, object, Awaited<ReturnType<typeof startDelete>>>,
+    'onSuccess' | 'onError' | 'onSettled'
+  > = {
+    onSuccess: async (_data, _input, transaction) => transaction.commit(),
+    onError: (_error, _input, transaction) => transaction?.rollback(),
+    onSettled: async (_data, _error, _input, transaction) => transaction?.settle(),
   }
-  const httpDelete = () => {
-    const options = httpQuery.users.delete.mutationOptions({
-      onMutate: async ({ params }) => startDelete(params.id),
-      onSuccess: async (_data, _input, transaction) => transaction.commit(),
-      onError: (_error, _input, transaction) => {
-        transaction?.rollback()
-      },
-      onSettled: async (_data, _error, _input, transaction) => transaction?.settle(),
-    })
-    return trackMutationOptions(options)
+  return {
+    rpcCreate: () =>
+      trackMutationOptions(
+        rpcQuery.users.create.mutationOptions({ ...createCallbacks, onMutate: startCreate }),
+      ),
+    httpCreate: () =>
+      trackMutationOptions(
+        httpQuery.users.create.mutationOptions({
+          ...createCallbacks,
+          onMutate: async ({ payload }) => startCreate(payload),
+        }),
+      ),
+    rpcDelete: () =>
+      trackMutationOptions(
+        rpcQuery.users.delete.mutationOptions({
+          ...deleteCallbacks,
+          onMutate: async ({ id }) => startDelete(id),
+        }),
+      ),
+    httpDelete: () =>
+      trackMutationOptions(
+        httpQuery.users.delete.mutationOptions({
+          ...deleteCallbacks,
+          onMutate: async ({ params }) => startDelete(params.id),
+        }),
+      ),
   }
-  return { rpcCreate, httpCreate, rpcDelete, httpDelete }
 }

@@ -18,7 +18,6 @@ export interface RpcStreamInvocation {
   ) => Stream.Stream<unknown, unknown, unknown>
 }
 
-/** Owns policy validation and execution for both accumulated and live queries. */
 export const createStreamPreparation =
   (rpc: RpcStreamInvocation): StreamingOperation['prepareStream'] =>
   (options, operation, runPromiseExit, requestOptions) => {
@@ -31,7 +30,6 @@ export const createStreamPreparation =
           )
     delete options['refetchMode']
     delete options['maxChunks']
-    // SAFETY: takeRpcOptions extracted this unchanged from the typed public options.
     // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const rpcOptions = requestOptions as StreamingRpcOptions | undefined
     return {
@@ -49,6 +47,12 @@ export const createStreamPreparation =
           policy,
           source: Stream.suspend(() => rpc.invoke(input, rpcOptions)),
           executionError: (cause) => new EffectRpcQueryError(rpc.tag, operation, cause),
+          unsupportedHash: () =>
+            new EffectRpcQueryConfigError(
+              'UnsupportedQueryHash',
+              'Stream queries require consistent QueryClient hashing',
+              { rpcTag: rpc.tag },
+            ),
           emptyError: () => new EffectRpcQueryEmptyStreamError(rpc.tag),
           runPromiseExit,
         }),

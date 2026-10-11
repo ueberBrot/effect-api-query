@@ -19,7 +19,11 @@ import type {
   QueryData,
   RunPromiseExit,
 } from '../core/types'
-import type { EffectHttpApiQueryEmptyStreamError, EffectHttpApiQueryError } from './errors'
+import type {
+  EffectHttpApiQueryConfigError,
+  EffectHttpApiQueryEmptyStreamError,
+  EffectHttpApiQueryError,
+} from './errors'
 
 export type Groups<Api extends HttpApi.Constraint> =
   Api extends HttpApi.HttpApi<infer _Id, infer Group> ? Group : never
@@ -54,7 +58,6 @@ export type Supported<Endpoint> = Endpoint extends HttpApiEndpoint.ConstraintReq
     : never
   : never
 
-/** Retains the endpoints whose requests can have canonical query identity. */
 export type Queryable<Endpoint> = Endpoint extends HttpApiEndpoint.ConstraintRequest
   ? [Extract<Endpoint['~Payload']['Type'], MultipartPayload>] extends [never]
     ? Endpoint
@@ -84,7 +87,6 @@ export type RequestFields<Endpoint extends HttpApiEndpoint.ConstraintRequest> = 
   'responseMode' | 'sseOptions'
 >
 
-/** Uses decoded request fields while reserving response controls for the adapter. */
 export type Request<Endpoint extends HttpApiEndpoint.ConstraintRequest> =
   keyof RequestFields<Endpoint> extends never
     ? void
@@ -99,8 +101,6 @@ export type ClientGroup<Group, Client> = Group extends { readonly topLevel: true
   : Group extends HttpApiGroup.Constraint
     ? Member<Client, Group['identifier']>
     : never
-/** Exact identity keeps related response-only overloads from ending the traversal early. */
-// Generic function comparison distinguishes overloads by exact type identity.
 /* oxlint-disable typescript/no-unnecessary-type-parameters */
 export type SeenMethod<Method, Seen extends readonly unknown[]> = Seen extends readonly [
   infer First,
@@ -111,7 +111,6 @@ export type SeenMethod<Method, Seen extends readonly unknown[]> = Seen extends r
     : SeenMethod<Method, Rest>
   : false
 /* oxlint-enable typescript/no-unnecessary-type-parameters */
-/** Rotates overloads into a union so response-only calls cannot replace decoded execution. */
 export type MethodSignatures<
   Method,
   Partial = unknown,
@@ -186,7 +185,6 @@ export type ConcreteKey<
   QueryData<Success<Endpoint>>,
   Failure<ClientError>
 >
-/** Supplies HTTP request inference to the shared unary query builder. */
 export type QueryBuilder<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Key extends readonly JsonValue[],
@@ -242,7 +240,6 @@ export type ConcreteInfiniteKey<
   PageParam
 >
 
-/** Supplies decoded HTTP requests to the shared infinite query builder. */
 export type InfiniteBuilder<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Key extends readonly JsonValue[],
@@ -314,6 +311,10 @@ export type HttpStreamPolicy = {
   readonly refetchMode?: 'reset' | 'append' | 'replace' | undefined
 }
 
+export type HttpStreamQueryError<Endpoint extends HttpApiEndpoint.ConstraintRequest, ClientError> =
+  | EffectHttpApiQueryConfigError
+  | Failure<ClientError | StreamFailure<Success<Endpoint>>>
+
 export type StreamedKey<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Key extends readonly JsonValue[],
@@ -321,7 +322,7 @@ export type StreamedKey<
 > = DataTag<
   readonly [...Key, 'streamed', ...JsonValue[]],
   readonly StreamChunk<Success<Endpoint>>[],
-  Failure<ClientError | StreamFailure<Success<Endpoint>>>
+  HttpStreamQueryError<Endpoint, ClientError>
 >
 
 export type StreamedLeaf<
@@ -339,7 +340,7 @@ export type StreamedLeaf<
   readonly streamedOptions: UnaryQueryBuilder<
     Request<Endpoint>,
     readonly StreamChunk<Success<Endpoint>>[],
-    Failure<ClientError | StreamFailure<Success<Endpoint>>>,
+    HttpStreamQueryError<Endpoint, ClientError>,
     StreamedKey<Endpoint, Key, ClientError>,
     readonly [...Key, 'streamed'],
     HttpStreamPolicy
@@ -351,7 +352,7 @@ export type HttpLivePolicy = {
 }
 
 export type LiveFailure<Endpoint extends HttpApiEndpoint.ConstraintRequest, ClientError> =
-  | Failure<ClientError | StreamFailure<Success<Endpoint>>>
+  | HttpStreamQueryError<Endpoint, ClientError>
   | EffectHttpApiQueryEmptyStreamError
 
 export type LiveKey<

@@ -5,7 +5,8 @@ description: Configuration, key-generation, and execution errors for RPC and HTT
 
 ## `EffectRpcQueryConfigError`
 
-Thrown synchronously while configuring the utility tree or an option builder. Its `code` is one of:
+Thrown synchronously for invalid factory or builder configuration. Stream execution also rejects
+incompatible QueryClient hashing. Its `code` is one of:
 
 - `InvalidMaxChunks`: a streamed-query bound is not a positive safe integer.
 - `InvalidRefetchMode`: a streamed-query mode is not `reset`, `append`, or `replace`.
@@ -14,7 +15,8 @@ Thrown synchronously while configuring the utility tree or an option builder. It
 - `RpcPathCollision`
 - `MissingKeyEncoder`
 - `UnknownKeyEncoder`
-- `UnsupportedQueryHash`: an option builder received `queryKeyHashFn` or `queryHash`.
+- `UnsupportedQueryHash`: a builder received `queryKeyHashFn` or `queryHash`, or stream execution
+  found a default hash inconsistent with its key hasher or a conflicting cached identity.
 
 It can also expose `rpcTag`, `path`, and an underlying `cause`.
 
@@ -46,7 +48,8 @@ Thrown when a live query's stream completes before emitting a value. It exposes 
 
 ## `EffectHttpApiQueryConfigError`
 
-Thrown synchronously while configuring HTTP utilities. Its `code` is one of:
+Thrown synchronously for invalid factory or builder configuration. Stream execution also rejects
+incompatible QueryClient hashing. Its `code` is one of:
 
 - `InvalidMaxChunks`: a streamed-query bound is not a positive safe integer.
 - `InvalidRefetchMode`: a streamed-query mode is not `reset`, `append`, or `replace`.
@@ -57,7 +60,8 @@ Thrown synchronously while configuring HTTP utilities. Its `code` is one of:
 - `MissingKeyEncoder`
 - `UnknownKeyEncoder`
 - `UnsupportedEndpointMetadata`
-- `UnsupportedQueryHash`: an option builder received `queryKeyHashFn` or `queryHash`.
+- `UnsupportedQueryHash`: a builder received `queryKeyHashFn` or `queryHash`, or stream execution
+  found a default hash inconsistent with its key hasher or a conflicting cached identity.
 
 It exposes `apiId` and, when available, `groupId`, `endpoint`, `method`, `path`, and an underlying
 `cause`.

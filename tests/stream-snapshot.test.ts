@@ -84,6 +84,117 @@ describe('stream snapshots', () => {
       }),
   )
 
+  test.each(['global', 'prefix'] as const)(
+    'captures the current %s hash without cancelling or invalidating a historical observed query',
+    async (hashing) => {
+      const queryClient = new QueryClient({
+        defaultOptions: {
+          queries: { retry: false, queryKeyHashFn: (key) => `old:${JSON.stringify(key)}` },
+        },
+      })
+      const queryKey = ['snapshot-hash', hashing]
+      const entered = Deferred.makeUnsafe<undefined>()
+      let oldSignal: AbortSignal | undefined
+      const observer = new QueryObserver(queryClient, {
+        queryKey,
+        queryFn: async ({ signal }) => {
+          oldSignal = signal
+          queryClient.setQueryData(queryKey, 1)
+          Deferred.doneUnsafe(entered, Exit.succeed(undefined))
+          return await Effect.runPromise(Effect.never, { signal }).catch(() => 1)
+        },
+      })
+      const unsubscribe = observer.subscribe(() => {})
+      let executions = 0
+      let finalized = false
+      const options = {
+        queryKey,
+        queryFn: async ({ signal }: { readonly signal: AbortSignal }) => {
+          executions += 1
+          queryClient.setQueryData(queryKey, 2)
+          await Effect.runPromise(Effect.never, { signal }).catch(() => {})
+          finalized = true
+          return 2
+        },
+      }
+      try {
+        await Effect.runPromise(Deferred.await(entered))
+        const historical = observer.getCurrentQuery()
+        const currentDefaults = {
+          retry: false as const,
+          queryKeyHashFn: (key: readonly unknown[]) => `new:${JSON.stringify(key)}`,
+        }
+        if (hashing === 'global') {
+          queryClient.setDefaultOptions({ queries: currentDefaults })
+        } else {
+          queryClient.setQueryDefaults(['snapshot-hash'], currentDefaults)
+        }
+        await expect(fetchStreamSnapshot(queryClient, options)).resolves.toBe(2)
+        expect(finalized).toBe(true)
+        expect(historical.state).toMatchObject({
+          data: 1,
+          fetchStatus: 'fetching',
+          isInvalidated: false,
+        })
+        expect(oldSignal?.aborted).toBe(false)
+        expect(queryClient.getQueryData(queryKey)).toBe(2)
+        await expect(fetchStreamSnapshot(queryClient, options, { mode: 'cached' })).resolves.toBe(2)
+        expect(executions).toBe(1)
+      } finally {
+        unsubscribe()
+        await queryClient.cancelQueries()
+        queryClient.clear()
+      }
+    },
+  )
+
+  test.each(['global', 'prefix'] as const)(
+    'times out cached %s capture when only a historical hash has data',
+    async (hashing) => {
+      const queryClient = new QueryClient({
+        defaultOptions: {
+          queries: { retry: false, queryKeyHashFn: (key) => `old:${JSON.stringify(key)}` },
+        },
+      })
+      const queryKey = ['snapshot-timeout', hashing]
+      queryClient.setQueryData(queryKey, 1)
+      const currentDefaults = {
+        retry: false as const,
+        queryKeyHashFn: (key: readonly unknown[]) => `new:${JSON.stringify(key)}`,
+      }
+      if (hashing === 'global') {
+        queryClient.setDefaultOptions({ queries: currentDefaults })
+      } else {
+        queryClient.setQueryDefaults(['snapshot-timeout'], currentDefaults)
+      }
+      let finalized = false
+      try {
+        await expect(
+          fetchStreamSnapshot(
+            queryClient,
+            {
+              queryKey,
+              queryFn: async ({ signal }) => {
+                try {
+                  return await Effect.runPromise(Effect.never, { signal })
+                } finally {
+                  finalized = true
+                }
+              },
+            },
+            { mode: 'cached', timeoutMs: 10 },
+          ),
+        ).rejects.toMatchObject({ name: 'TimeoutError' })
+        expect(finalized).toBe(true)
+        expect(queryClient.isFetching()).toBe(0)
+        expect(queryClient.getQueryCache().hasListeners()).toBe(false)
+      } finally {
+        await queryClient.cancelQueries()
+        queryClient.clear()
+      }
+    },
+  )
+
   test.each(['timeout', 'abort', 'cleanup-failure'] as const)(
     'settles a %s snapshot after query cleanup',
     async (path) => {

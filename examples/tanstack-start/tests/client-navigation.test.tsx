@@ -30,7 +30,6 @@ describe('TanStack Start hydration and client navigation', () => {
     }
   })
 
-  // Hydration, streaming, two navigations, and a mutation share the test deadline.
   it('hydrates without a duplicate query, navigates, mutates, and invalidates', async () => {
     if (serverScope === undefined) {
       throw new Error('Server scope was not initialized')

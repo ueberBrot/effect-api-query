@@ -9,7 +9,6 @@ import {
 } from './example-application.ts'
 
 test('Start rejects an oversized upload before the sender ends the request', async () => {
-  // Bridge Node's streaming request callbacks; fetch would buffer/end the upload.
   // oxlint-disable-next-line promise/avoid-new
   const status = await new Promise<number | undefined>((resolve, reject) => {
     const request = nodeRequest(
@@ -38,7 +37,6 @@ test('SSR keeps its RPC destination independent of incoming host headers', async
     redirectedRequests += 1
     response.writeHead(500).end()
   })
-  // Bridge the listener callback so the assertion uses its assigned TCP port.
   // oxlint-disable-next-line promise/avoid-new
   await new Promise<void>((resolve) => {
     destination.listen(0, '127.0.0.1', resolve)
@@ -56,7 +54,6 @@ test('SSR keeps its RPC destination independent of incoming host headers', async
     expect(await response.text()).toContain('Ada Lovelace')
   } finally {
     destination.closeAllConnections()
-    // Wait for Node's close callback before the next test starts another listener.
     // oxlint-disable-next-line promise/avoid-new
     await new Promise<void>((resolve, reject) => {
       destination.close((error) => {

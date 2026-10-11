@@ -156,10 +156,8 @@ count, not retained object size or bytes.
 Each consumed value contributes to cache writes. Native structural sharing does
 not suppress those writes or promise a renderer's update count. Choose a live
 query for complete current-state emissions and bounded history for recent events;
-the latest delta alone cannot reconstruct state. Construction, compiler, and
-bundle measurements describe the measured fixtures, not universal time, memory,
-or application-bundle budgets. No batching or publication-suppression API is
-provided.
+the latest delta alone cannot reconstruct state. Set publication rate or sampling
+on the producer or an application-owned Stream transformation.
 
 Sources: [builders](https://ueberbrot.github.io/effect-api-query/reference/generated-builders/),
 [stream history](https://ueberbrot.github.io/effect-api-query/guides/choose-stream-history/).

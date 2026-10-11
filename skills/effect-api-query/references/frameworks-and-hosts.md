@@ -116,12 +116,11 @@ should share one release.
   Multipart needs explicit FormData serialization. Raw SSE bytes provide neither
   event parsing nor Schema decoding or reserved-failure handling.
 
-With Effect 4.0.0, a shared-WebSocket control filled the native buffer of size 16
-with one acknowledged 16-value chunk, consumed no values, then immediately closed
-the request Scope; an active unary still succeeded. Larger chunks and unfinished
-offers are outside that control's evidence. An overflowing buffer of size one can
-stall other calls. A client chunk Schema failure can also fail unrelated calls;
-larger buffers do not isolate decoding failures. Keep streaming schemas compatible.
+Keep the native WebSocket buffer default of 16 unless the application verifies
+another size with its workload. With Effect 4.0.0, an overflowing buffer of size
+one can stall other calls; larger chunks and unfinished queue offers also need
+application checks. A client chunk Schema failure can fail unrelated calls, and
+larger buffers do not isolate it. Keep streaming schemas compatible.
 
 Single-element arrays in GET and form-urlencoded payloads can fail native server
 decoding. Array query parameters and JSON array responses retain their representation.

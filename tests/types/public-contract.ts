@@ -1,5 +1,4 @@
 // fallow-ignore-file code-duplication
-// This fixture stays self-contained so built-declaration checks exercise the full public contract.
 import {
   type InfiniteData,
   MutationObserver,
@@ -26,6 +25,7 @@ import {
   EffectRpcQueryError,
   skipToken,
   type CreateRpcQueryUtilsOptions,
+  type EffectRpcQueryConfigError,
   type EffectRpcQueryConfigErrorCode,
   type EffectRpcQueryKeyErrorCode,
   type JsonValue,
@@ -304,6 +304,10 @@ createRpcQueryUtils(group, {
   keyPrefix,
 })
 
+type WatchStreamError =
+  | EffectRpcQueryConfigError
+  | EffectRpcQueryError<'unauthorized' | 'watch-failure' | 'watch-rpc-failure'>
+
 const queryClient = new QueryClient()
 
 const streamedOptions = utils.events.watch.streamedOptions({
@@ -314,20 +318,18 @@ const streamedOptions = utils.events.watch.streamedOptions({
   refetchMode: 'append',
   retryDelay: (attemptIndex, error) => {
     attemptIndex satisfies number
-    error satisfies EffectRpcQueryError<'unauthorized' | 'watch-failure' | 'watch-rpc-failure'>
+    error satisfies WatchStreamError
     return 0
   },
   retry: (_count, error) => {
-    error satisfies EffectRpcQueryError<'unauthorized' | 'watch-failure' | 'watch-rpc-failure'>
+    error satisfies WatchStreamError
     return false
   },
   select: (values) => values.join(', '),
 })
 const streamedHook = useQuery(streamedOptions)
 const streamedHookData: string | undefined = streamedHook.data
-streamedHook.error satisfies EffectRpcQueryError<
-  'unauthorized' | 'watch-failure' | 'watch-rpc-failure'
-> | null
+streamedHook.error satisfies WatchStreamError | null
 const streamedResult: Promise<string> = queryClient.query(streamedOptions)
 const streamedKey = utils.events.watch.streamedKey({ channel: 'news' })
 streamedKey satisfies readonly ['app', 'rpc', 'events', 'watch', 'streamed', ...JsonValue[]]
@@ -340,10 +342,7 @@ const boundedStreamKey = utils.events.watch.streamedKey(
 const boundedStreamData = queryClient.getQueryData(boundedStreamKey)
 boundedStreamData satisfies ReadonlyArray<string> | undefined
 queryClient.setQueryData(boundedStreamKey, ['latest'])
-queryClient.getQueryState(boundedStreamKey)?.error satisfies
-  | EffectRpcQueryError<'unauthorized' | 'watch-failure' | 'watch-rpc-failure'>
-  | null
-  | undefined
+queryClient.getQueryState(boundedStreamKey)?.error satisfies WatchStreamError | null | undefined
 utils.events.watch.streamedKey({ channel: 'news' }, { maxChunks: undefined, refetchMode: 'reset' })
 utils.events.audit.watch.streamedKey()
 utils.events.audit.watch.streamedKey({ maxChunks: 2, refetchMode: 'replace' })
@@ -367,19 +366,14 @@ const liveOptions = utils.events.watch.liveOptions({
   input: { channel: 'news' },
   retryDelay: (attemptIndex, error) => {
     attemptIndex satisfies number
-    error satisfies
-      | EffectRpcQueryEmptyStreamError
-      | EffectRpcQueryError<'unauthorized' | 'watch-failure' | 'watch-rpc-failure'>
+    error satisfies EffectRpcQueryEmptyStreamError | WatchStreamError
     return 0
   },
   select: (value) => value.length,
 })
 const liveHook = useQuery(liveOptions)
 const liveHookData: number | undefined = liveHook.data
-liveHook.error satisfies
-  | EffectRpcQueryEmptyStreamError
-  | EffectRpcQueryError<'unauthorized' | 'watch-failure' | 'watch-rpc-failure'>
-  | null
+liveHook.error satisfies EffectRpcQueryEmptyStreamError | WatchStreamError | null
 const liveResult: Promise<number> = queryClient.query(liveOptions)
 const liveKey = utils.events.watch.liveKey({ channel: 'news' })
 liveKey satisfies readonly ['app', 'rpc', 'events', 'watch', 'live', JsonValue]
@@ -462,9 +456,11 @@ const clientFailureUtils = createRpcQueryUtils<typeof group, typeof keyPrefix, '
 clientFailureUtils.events.watch.streamedOptions({
   input: { channel: 'news' },
   retry: (_count, error) => {
-    error satisfies EffectRpcQueryError<
-      'client-failure' | 'unauthorized' | 'watch-failure' | 'watch-rpc-failure'
-    >
+    error satisfies
+      | EffectRpcQueryConfigError
+      | EffectRpcQueryError<
+          'client-failure' | 'unauthorized' | 'watch-failure' | 'watch-rpc-failure'
+        >
     return false
   },
 })
@@ -1059,7 +1055,6 @@ if (skipToken !== queryCoreSkipToken || skipToken !== reactQuerySkipToken) {
   throw new Error('skipToken must preserve Query Core and React Query identity')
 }
 
-// Object-form skipping preserves inference through Query Core and React Query.
 const skippedQueryObject = utils.users.get.queryOptions({
   input: skipToken,
   select: (user) => user.name,
@@ -1115,10 +1110,7 @@ const skippedLiveObject = utils.events.watch.liveOptions({
 })
 const skippedLiveResult = useQuery(skippedLiveObject)
 skippedLiveResult.data satisfies number | undefined
-skippedLiveResult.error satisfies
-  | EffectRpcQueryEmptyStreamError
-  | EffectRpcQueryError<'unauthorized' | 'watch-failure' | 'watch-rpc-failure'>
-  | null
+skippedLiveResult.error satisfies EffectRpcQueryEmptyStreamError | WatchStreamError | null
 new QueryObserver(queryClient, skippedLiveObject).getCurrentResult().data satisfies
   | number
   | undefined
@@ -1317,12 +1309,7 @@ conditionalStreamOptions.queryFn satisfies
   | SkipToken
 const conditionalStreamHook = useQuery(conditionalStreamOptions)
 true satisfies Assert<Equal<typeof conditionalStreamHook.data, string | undefined>>
-true satisfies Assert<
-  Equal<
-    typeof conditionalStreamHook.error,
-    EffectRpcQueryError<'unauthorized' | 'watch-failure' | 'watch-rpc-failure'> | null
-  >
->
+true satisfies Assert<Equal<typeof conditionalStreamHook.error, WatchStreamError | null>>
 new QueryObserver(queryClient, conditionalStreamOptions).getCurrentResult().data satisfies
   | string
   | undefined
@@ -1346,12 +1333,7 @@ conditionalLiveOptions.queryFn satisfies
 const conditionalLiveHook = useQuery(conditionalLiveOptions)
 true satisfies Assert<Equal<typeof conditionalLiveHook.data, number | undefined>>
 true satisfies Assert<
-  Equal<
-    typeof conditionalLiveHook.error,
-    | EffectRpcQueryEmptyStreamError
-    | EffectRpcQueryError<'unauthorized' | 'watch-failure' | 'watch-rpc-failure'>
-    | null
-  >
+  Equal<typeof conditionalLiveHook.error, EffectRpcQueryEmptyStreamError | WatchStreamError | null>
 >
 // @ts-expect-error conditional live queries do not accept accumulation policy
 utils.events.watch.liveOptions({ input: conditionalStreamInput, maxChunks: 2 })
@@ -1437,7 +1419,6 @@ const optionalConditionalUser = useQuery(
 )
 true satisfies Assert<Equal<typeof optionalConditionalUser.data, string | undefined>>
 
-// Request-local inputs retain inference and stay out of the returned Query Core contract.
 const unaryRpcOptions = {
   headers: { 'x-request-id': 'fixture' },
   context: Context.empty(),

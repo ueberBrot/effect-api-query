@@ -16,7 +16,6 @@ const unusedClient = Effect.fn('TestRpc.unusedClient')(function* () {
   return yield* Effect.die('configuration tests must not execute RPCs')
 })
 
-// SAFETY: This key-only client fixture always fails if executed; it never runs an RPC.
 /* oxlint-disable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
 const unusedClientFor = <Group extends RpcGroup.Any>(_group: Group) =>
   unusedClient as unknown as RpcClient.RpcClient.Flat<RpcGroup.Rpcs<Group>>
@@ -191,7 +190,6 @@ describe('createRpcQueryUtils configuration', () => {
     const First = Rpc.make('duplicates.read', { success: Schema.Literal('first') })
     const Duplicate = Rpc.make('duplicates.read', { success: Schema.Literal('second') })
     const duplicateGroup = RpcGroup.make(First)
-    // SAFETY: The test mutates the upstream request map to simulate duplicate paths the normal API prevents.
     /* oxlint-disable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
     const requests = duplicateGroup.requests as unknown as Map<string, Rpc.Any>
     /* oxlint-enable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
@@ -227,7 +225,6 @@ describe('createRpcQueryUtils configuration', () => {
       return null
     }
     for (const rpcTag of ['health.ping', 'events.watch', 'unknown.read']) {
-      // SAFETY: Undeclared encoders deliberately exercise synchronous configuration validation.
       /* oxlint-disable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
       const options = {
         client: unusedClientFor(unsupportedGroup),
@@ -252,12 +249,10 @@ describe('createRpcQueryUtils configuration', () => {
   it.effect('reports non-JSON encoder output with a stable key error', () =>
     Effect.gen(function* () {
       const client = yield* makeClient()
-      // SAFETY: Invalid JSON encoder output is deliberate so key generation can reject it before execution.
       /* oxlint-disable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
       const utils = createRpcQueryUtils(group, {
         client,
         keyEncoders: {
-          // The cast simulates an encoder that violates its declared JSON contract at runtime.
           'users.get': () => ({ invalid: undefined }) as unknown as JsonValue,
         },
         keyPrefix: ['app'] as const,
@@ -340,7 +335,6 @@ describe('createRpcQueryUtils configuration', () => {
       const client = yield* makeRpcTestClient(secretGroup, {
         'secrets.read': () => Effect.succeed('ok'),
       })
-      // SAFETY: A required encoder is deliberately omitted to verify synchronous configuration rejection.
       /* oxlint-disable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
       const unsafeOptions = {
         client,
@@ -390,7 +384,6 @@ describe('createRpcQueryUtils configuration', () => {
     for (const payload of [Secret, Schema.Struct({ nested: Schema.Array(Secret) }), Encoded]) {
       const rpcGroup = RpcGroup.make(Rpc.make('read', { payload, success: Schema.String }))
       type Options = CreateRpcQueryUtilsOptions<typeof rpcGroup, readonly ['app']>
-      // SAFETY: Undeclared encoders deliberately exercise synchronous configuration validation.
       /* oxlint-disable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
       const options = {
         client: unusedClientFor(rpcGroup),
@@ -455,7 +448,6 @@ describe('createRpcQueryUtils configuration', () => {
       const client = yield* makeRpcTestClient(servicefulGroup, {
         'encoding.serviceful': () => Effect.succeed('ok'),
       })
-      // SAFETY: A required encoder is deliberately omitted to verify synchronous configuration rejection.
       /* oxlint-disable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
       const unsafeOptions = {
         client,
@@ -470,7 +462,6 @@ describe('createRpcQueryUtils configuration', () => {
         }),
       )
 
-      // SAFETY: Only key generation is exercised here; the deliberately omitted execution runner cannot be called.
       /* oxlint-disable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
       const safeOptions = {
         client,
@@ -539,7 +530,6 @@ describe('createRpcQueryUtils configuration', () => {
           success: Schema.String,
         }),
       )
-      // SAFETY: The parsed fixture deliberately contains unsafe object keys so key validation can reject them.
       /* oxlint-disable typescript/no-unsafe-type-assertion */
       const unsafe = JSON.parse(`{"${property}":null}`) as JsonValue
       /* oxlint-enable typescript/no-unsafe-type-assertion */
@@ -566,7 +556,6 @@ describe('createRpcQueryUtils configuration', () => {
 
   it.effect('rejects an own __proto__ property defined by an encoder', () =>
     Effect.gen(function* () {
-      // SAFETY: The fixture deliberately defines an own __proto__ property to exercise key rejection.
       const encoded = Object.defineProperty({}, '__proto__', {
         enumerable: true,
         value: 'semantic-value',

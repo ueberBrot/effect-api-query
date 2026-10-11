@@ -7,6 +7,7 @@ import {
   exampleHttpApi,
   exampleRpcGroup,
 } from '@effect-api-query/contracts'
+import type { CommandPayload } from '@effect-api-query/contracts'
 import type { ExampleRpcClient } from '@effect-api-query/contracts/client'
 import type { QueryClient } from '@tanstack/query-core'
 import { Deferred, Effect, Exit, Layer, Queue, Scope, Stream } from 'effect'
@@ -48,6 +49,12 @@ interface ControlledUserWrites {
 
 export const makeControlledUserWrites = Effect.fnUntraced(function* (
   queryClient: QueryClient,
+  commandHandlers?: {
+    readonly start: (input: CommandPayload) => Effect.Effect<CommandStatus>
+    readonly status: (input: {
+      readonly operationId: string
+    }) => Effect.Effect<CommandStatus | null>
+  },
 ): Effect.fn.Return<ControlledUserWrites> {
   const scope = yield* Scope.make()
   const run = Effect.runPromiseWith(yield* Effect.context())
@@ -129,16 +136,18 @@ export const makeControlledUserWrites = Effect.fnUntraced(function* (
         'diagnostics.slow': () => Effect.succeed('done'),
         'diagnostics.status': () => Effect.succeed({ started: 0, interrupted: 0 }),
         'diagnostics.operationStatus': () => Effect.succeed({ started: 0, interrupted: 0 }),
-        'commands.start': ({ operationId, steps }) =>
-          Effect.succeed(
-            new CommandStatus({
-              operationId,
-              totalSteps: steps,
-              completedSteps: steps,
-              state: 'completed',
-            }),
-          ),
-        'commands.status': () => Effect.succeed(null),
+        'commands.start':
+          commandHandlers?.start ??
+          (({ operationId, steps }) =>
+            Effect.succeed(
+              new CommandStatus({
+                operationId,
+                totalSteps: steps,
+                completedSteps: steps,
+                state: 'completed',
+              }),
+            )),
+        'commands.status': commandHandlers?.status ?? (() => Effect.succeed(null)),
         'commands.cancel': ({ operationId }) =>
           Effect.succeed(
             new CommandStatus({

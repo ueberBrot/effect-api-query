@@ -37,7 +37,6 @@ const UploadApi = HttpApi.make('uploads').add(
 
 describe('HTTP multipart mutations', () => {
   it('rejects key encoders for retained multipart mutation endpoints', () => {
-    // SAFETY: JavaScript callers can configure an encoder that the published type contract rejects.
     /* oxlint-disable typescript/no-unsafe-type-assertion */
     const options = {
       client: unusedHttpClientFor(UploadApi),

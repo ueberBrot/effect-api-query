@@ -145,6 +145,10 @@ For an infinite query, the later page-input mapper executes during fetching; err
 TanStack unchanged and need an explicit non-retry decision. Mutations encode input inside the
 ready client's Effect, so their encoding failures use the execution Cause.
 
+Keep QueryClient hashing stable while entries remain cached. A stream that encounters a matching
+entry under an incompatible hash policy rejects with configuration code `UnsupportedQueryHash`.
+Retries cannot repair that policy; retire the old cache before using a different hash function.
+
 Use [failure handling](/effect-api-query/guides/handle-failures/) for error-stage guards and
 [the error reference](/effect-api-query/reference/errors/) for stable metadata. See the
 [complete example](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-retry.ts).

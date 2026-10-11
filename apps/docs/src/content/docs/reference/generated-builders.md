@@ -54,6 +54,8 @@ builders, and skipped options are unsuitable for suspense and prefetch-only hook
 
 Configure custom hashing through QueryClient global or prefix defaults. Builders reject per-call
 `queryKeyHashFn` and `queryHash` with `EffectRpcQueryConfigError` code `UnsupportedQueryHash`.
+Keep hash defaults stable while entries remain cached. Stream execution also rejects with that
+code when changed hashing conflicts with a matching cached entry.
 
 ## Request-local RPC options
 

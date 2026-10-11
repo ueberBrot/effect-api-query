@@ -87,6 +87,12 @@ export const createHttpStreamPreparation =
             ),
           ),
           executionError: (cause) => new EffectHttpApiQueryError(identity, operation, cause),
+          unsupportedHash: () =>
+            new EffectHttpApiQueryConfigError(
+              'UnsupportedQueryHash',
+              'Stream queries require consistent QueryClient hashing',
+              identity,
+            ),
           emptyError: () => new EffectHttpApiQueryEmptyStreamError(identity),
           runPromiseExit,
         }),

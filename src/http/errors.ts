@@ -77,7 +77,7 @@ export class EffectHttpApiQueryEmptyStreamError extends Error implements HttpApi
   }
 }
 
-/** Reports invalid HTTP projection, key configuration, or endpoint metadata. */
+/** Reports invalid factory, builder, or stream cache configuration. */
 export class EffectHttpApiQueryConfigError extends Error {
   readonly _tag = 'EffectHttpApiQueryConfigError'
   readonly code: EffectHttpApiQueryConfigErrorCode

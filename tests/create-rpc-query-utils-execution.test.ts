@@ -281,7 +281,6 @@ describe('createRpcQueryUtils execution boundaries', () => {
         client,
         keyPrefix: ['app'] as const,
       })
-      // SAFETY: A numeric value deliberately violates the RPC string schema to test synchronous key preparation.
       /* oxlint-disable anti-slop/no-chained-type-assertions, anti-slop/no-known-value-widening, typescript/no-unsafe-type-assertion */
       const invalidInput = { value: 42 } as unknown as { readonly value: string }
       /* oxlint-enable anti-slop/no-chained-type-assertions, anti-slop/no-known-value-widening, typescript/no-unsafe-type-assertion */
@@ -545,7 +544,6 @@ describe('createRpcQueryUtils execution boundaries', () => {
       })
 
       const options = utils.profiles.update.mutationOptions()
-      // SAFETY: A numeric value deliberately violates the RPC string schema to test mutation execution failures.
       /* oxlint-disable anti-slop/no-chained-type-assertions, anti-slop/no-known-value-widening, typescript/no-unsafe-type-assertion */
       const invalidVariables = { name: 42 } as unknown as { readonly name: string }
       /* oxlint-enable anti-slop/no-chained-type-assertions, anti-slop/no-known-value-widening, typescript/no-unsafe-type-assertion */

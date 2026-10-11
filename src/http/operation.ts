@@ -50,8 +50,6 @@ const extractHttpEndpoints = (api: HttpApi.Top, client: unknown): readonly HttpO
       if (request === undefined) {
         continue
       }
-      // SAFETY: The public client is tied to this Api. HttpApiClient mirrors group
-      // identifiers and topLevel placement, with the declaration's endpoint functions.
       // oxlint-disable-next-line typescript/no-unsafe-type-assertion
       const target = // oxlint-disable-next-line typescript/no-unsafe-type-assertion
         (group.topLevel ? client : (client as Record<string, unknown>)[group.identifier]) as Record<
@@ -182,7 +180,6 @@ const httpTreeErrors = (api: HttpApi.Top, operations: readonly HttpOperation[]):
   }
 }
 
-/** Binds declaration identities, endpoint projection, and encoder configuration together. */
 export const compileHttpOperations = (
   api: HttpApi.Top,
   client: unknown,
@@ -206,8 +203,6 @@ export const compileHttpOperations = (
       throw new TypeError('HTTP key encoders must be grouped by endpoint')
     }
     for (const [endpoint, encoder] of Object.entries(endpoints)) {
-      // SAFETY: Public keyEncoders pairs each endpoint with a payload encoder;
-      // the runtime tree validates required callability and canonicalizes its result.
       // oxlint-disable-next-line typescript/no-unsafe-type-assertion
       keyEncoders.set(JSON.stringify([groupId, endpoint]), encoder as RuntimeKeyEncoder)
     }

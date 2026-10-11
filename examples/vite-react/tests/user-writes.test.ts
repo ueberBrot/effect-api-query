@@ -1,11 +1,172 @@
 import { User, UserPage } from '@effect-api-query/contracts'
-import { MutationObserver, QueryClient, QueryObserver } from '@tanstack/react-query'
+import {
+  InfiniteQueryObserver,
+  MutationObserver,
+  QueryClient,
+  QueryObserver,
+} from '@tanstack/react-query'
 import { Effect } from 'effect'
 import { describe, expect, it } from 'vite-plus/test'
 
 import { makeControlledUserWrites } from '../../../tests/fixtures/optimistic-users.ts'
 
 describe('User writes in the Vite application', () => {
+  it.each(['rpc', 'http'] as const)(
+    'preserves refreshed %s page totals when a pending creation fails',
+    async (adapter) => {
+      const fixture = await Effect.runPromise(makeControlledUserWrites(new QueryClient()))
+      const { queryClient, rpcQuery, httpQuery, userWrites } = fixture.application
+      const rpcPages = rpcQuery.users.page.infiniteKey({ cursor: 0, pageSize: 4 })
+      const httpPages = httpQuery.users.page.infiniteKey({ query: { cursor: 0, pageSize: 4 } })
+      for (const key of [rpcPages, httpPages]) {
+        queryClient.setQueryData(key, {
+          pages: [new UserPage({ users: [], total: 0, nextCursor: null })],
+          pageParams: [0],
+        })
+      }
+      try {
+        const mutation =
+          adapter === 'rpc'
+            ? new MutationObserver(queryClient, userWrites.rpcCreate()).mutate({ name: 'Ada' })
+            : new MutationObserver(queryClient, userWrites.httpCreate()).mutate({
+                payload: { name: 'Ada' },
+              })
+        const failure = Promise.allSettled([mutation])
+        const request = await fixture.nextCreate()
+        await (adapter === 'rpc'
+          ? queryClient.infiniteQuery(
+              rpcQuery.users.page.infiniteOptions({
+                initialPageParam: 0,
+                input: (cursor: number) => ({ cursor, pageSize: 4 }),
+                getNextPageParam: (page) => page.nextCursor ?? undefined,
+              }),
+            )
+          : queryClient.infiniteQuery(
+              httpQuery.users.page.infiniteOptions({
+                initialPageParam: 0,
+                input: (cursor: number) => ({ query: { cursor, pageSize: 4 } }),
+                getNextPageParam: (page) => page.nextCursor ?? undefined,
+              }),
+            ))
+        await request.fail()
+        await expect(failure).resolves.toMatchObject([
+          {
+            status: 'rejected',
+            reason: { name: adapter === 'rpc' ? 'EffectRpcQueryError' : 'EffectHttpApiQueryError' },
+          },
+        ])
+        for (const key of [rpcPages, httpPages]) {
+          expect(queryClient.getQueryData(key)).toStrictEqual({
+            pages: [new UserPage({ users: [], total: 0, nextCursor: null })],
+            pageParams: [0],
+          })
+        }
+      } finally {
+        await fixture.application.dispose()
+      }
+    },
+  )
+
+  it.each(['rpc', 'http'] as const)(
+    'preserves refreshed %s page totals when a pending deletion fails',
+    async (adapter) => {
+      const fixture = await Effect.runPromise(makeControlledUserWrites(new QueryClient()))
+      const { queryClient, rpcQuery, httpQuery, userWrites } = fixture.application
+      const ada = new User({ id: 1, name: 'Ada', locale: 'en' })
+      fixture.seed([ada])
+      const rpcPages = rpcQuery.users.page.infiniteKey({ cursor: 0, pageSize: 4 })
+      const httpPages = httpQuery.users.page.infiniteKey({ query: { cursor: 0, pageSize: 4 } })
+      for (const key of [rpcPages, httpPages]) {
+        queryClient.setQueryData(key, {
+          pages: [new UserPage({ users: [ada], total: 1, nextCursor: null })],
+          pageParams: [0],
+        })
+      }
+      try {
+        const mutation =
+          adapter === 'rpc'
+            ? new MutationObserver(queryClient, userWrites.rpcDelete()).mutate({ id: 1 })
+            : new MutationObserver(queryClient, userWrites.httpDelete()).mutate({
+                params: { id: 1 },
+              })
+        const failure = Promise.allSettled([mutation])
+        const request = await fixture.nextDelete()
+        await (adapter === 'rpc'
+          ? queryClient.infiniteQuery(
+              rpcQuery.users.page.infiniteOptions({
+                initialPageParam: 0,
+                input: (cursor: number) => ({ cursor, pageSize: 4 }),
+                getNextPageParam: (page) => page.nextCursor ?? undefined,
+              }),
+            )
+          : queryClient.infiniteQuery(
+              httpQuery.users.page.infiniteOptions({
+                initialPageParam: 0,
+                input: (cursor: number) => ({ query: { cursor, pageSize: 4 } }),
+                getNextPageParam: (page) => page.nextCursor ?? undefined,
+              }),
+            ))
+        await request.fail()
+        await expect(failure).resolves.toMatchObject([
+          {
+            status: 'rejected',
+            reason: { name: adapter === 'rpc' ? 'EffectRpcQueryError' : 'EffectHttpApiQueryError' },
+          },
+        ])
+        for (const key of [rpcPages, httpPages]) {
+          expect(queryClient.getQueryData(key)).toStrictEqual({
+            pages: [new UserPage({ users: [ada], total: 1, nextCursor: null })],
+            pageParams: [0],
+          })
+        }
+      } finally {
+        await fixture.application.dispose()
+      }
+    },
+  )
+
+  it('restores an optimistic page without adjusting a freshly appended page', async () => {
+    const fixture = await Effect.runPromise(makeControlledUserWrites(new QueryClient()))
+    const { queryClient, rpcQuery, userWrites } = fixture.application
+    const ada = new User({ id: 1, name: 'Ada', locale: 'en' })
+    const alan = new User({ id: 2, name: 'Alan', locale: 'en' })
+    fixture.seed([ada, alan])
+    const options = rpcQuery.users.page.infiniteOptions({
+      initialPageParam: 0,
+      input: (cursor: number) => ({ cursor, pageSize: 4 }),
+      getNextPageParam: (page) => page.nextCursor ?? undefined,
+      staleTime: Infinity,
+    })
+    queryClient.setQueryData(options.queryKey, {
+      pages: [new UserPage({ users: [ada], total: 2, nextCursor: 1 })],
+      pageParams: [0],
+    })
+    let unsubscribe: (() => void) | undefined
+    try {
+      const deletion = new MutationObserver(queryClient, userWrites.rpcDelete()).mutate({ id: 1 })
+      const failure = Promise.allSettled([deletion])
+      const request = await fixture.nextDelete()
+      const observer = new InfiniteQueryObserver(queryClient, options)
+      unsubscribe = observer.subscribe(() => {})
+      await observer.fetchNextPage()
+      unsubscribe()
+      await request.fail()
+      await expect(failure).resolves.toMatchObject([
+        { status: 'rejected', reason: { name: 'EffectRpcQueryError' } },
+      ])
+      expect(queryClient.getQueryData(options.queryKey)).toStrictEqual({
+        pages: [
+          new UserPage({ users: [ada], total: 2, nextCursor: 1 }),
+          new UserPage({ users: [alan], total: 2, nextCursor: null }),
+        ],
+        pageParams: [0, 1],
+      })
+    } finally {
+      unsubscribe?.()
+      await fixture.application.dispose()
+    }
+  })
+
   it('publishes a pending user and seeds the returned user through exact generated keys', async () => {
     const fixture = await Effect.runPromise(makeControlledUserWrites(new QueryClient()))
     const { queryClient, rpcQuery, httpQuery, userWrites } = fixture.application

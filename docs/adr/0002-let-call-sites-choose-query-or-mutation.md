@@ -14,6 +14,5 @@ semantics. Leaves expose no direct execution helper.
 
 ## Consequences
 
-An optional branded classification may be added later without restricting the base utility tree.
 ADR 0018 adds infinite queries to unary leaves. ADR 0020 supersedes this decision's omission of
 streaming leaves.

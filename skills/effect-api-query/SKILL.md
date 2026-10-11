@@ -51,8 +51,8 @@ the application owns transport, authentication, resources, and cache policy.
 
 ## Choose the adapter
 
-Inspect the installed package manifest for its version and peers. The reviewed
-coordinated Effect set is exactly 4.0.0; Query Core peers are `>=5.103.1 <6`.
+Inspect the installed package manifest for its version and peers. This version
+uses the coordinated Effect 4.0.0 set; Query Core peers are `>=5.103.1 <6`.
 Use the installed declarations and preserve literal contracts.
 [Frameworks and hosts](references/frameworks-and-hosts.md) explains reactive
 options, version constraints, and transport ownership.
@@ -103,8 +103,11 @@ Read only the branch needed for the task:
   identity from a client, URL, middleware, or RPC request options.
 - Pass caller options such as `staleTime`, `select`, and callbacks into the
   builder. Preserve its `queryFn` and `queryKey`. Configure custom hashing through
-  QueryClient global or prefix defaults; builders reject per-call `queryKeyHashFn`
-  and `queryHash`. Mutation builders own `mutationFn` and `mutationKey`.
+  QueryClient global or prefix `queryKeyHashFn`; builders reject per-call hashing.
+  Keep hashing stable while cache entries remain. Streams reject a default
+  `queryHash` inconsistent with the key hasher or a conflicting cached identity
+  with `UnsupportedQueryHash`. Retire the old cache before changing its hash
+  policy. Mutation builders own `mutationFn` and `mutationKey`.
 - Treat captured inputs as immutable and build new options when they change.
   Keys are frozen snapshots; request inputs are not necessarily copied or frozen,
   so later mutation can make execution disagree with its key.
@@ -142,8 +145,9 @@ Buffered queries and live emissions normalize successful `undefined` to `null`.
 Accumulated stream elements and mutation results preserve `undefined`. See the
 query patterns reference for stream behavior.
 
-Configuration and key-generation errors are synchronous: an options builder may
-fail before a hook or query function runs. Failed execution Exits become
+Configuration and key-generation errors can fail preparation before a hook or
+query function runs. A stream's incompatible cache hashing rejects execution with
+a configuration error. Failed execution Exits become
 `EffectRpcQueryError` or `EffectHttpApiQueryError`. Narrow with
 `isEffectRpcQueryError` or `isEffectHttpApiQueryError`, then inspect the preserved
 Effect `cause`. A runner rejection passes through unchanged.

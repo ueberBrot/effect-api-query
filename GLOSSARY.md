@@ -77,7 +77,7 @@ An `Error` produced when an HTTP Effect returns a failed `Exit`. It identifies t
 _Avoid_: Sanitized Cause, configuration error
 
 **Configuration error**:
-A synchronous error that rejects invalid configuration for a utility tree or its option builders.
+An error that rejects invalid utility configuration during preparation or execution.
 _Avoid_: RPC execution error
 
 **Key-generation error**:

@@ -253,7 +253,6 @@ describe('HTTP query options', () => {
     const utils = createHttpApiQueryUtils(api, { client, keyPrefix: ['test'] })
     const queryClient = new QueryClient()
     try {
-      // SAFETY: Extra untyped caller fields deliberately verify that generated options retain ownership of query identity.
       /* oxlint-disable anti-slop/no-known-value-widening */
       const options = utils.refresh.infiniteOptions({
         initialPageParam: 0,

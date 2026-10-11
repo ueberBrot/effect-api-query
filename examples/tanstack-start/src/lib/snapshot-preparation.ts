@@ -64,10 +64,15 @@ export const makeSnapshotPreparation = (
     { prefix: [...httpQuery.diagnostics.slow.key(), 'query'], codec: Text },
     { prefix: [...rpcQuery.diagnostics.stream.key(), 'live'], codec: Text },
     { prefix: [...rpcQuery.diagnostics.stream.key(), 'streamed'], codec: History },
-  ]
+  ].map(({ prefix, codec }) => ({
+    length: prefix.length,
+    hash: hashKey(prefix),
+    encode: Schema.encodeUnknownEffect(codec),
+    decode: Schema.decodeUnknownEffect(codec),
+  }))
   const codecFor = (key: QueryKey) =>
-    codecs.find(({ prefix }) => hashKey(key.slice(0, prefix.length)) === hashKey(prefix))?.codec
-  type ViewCodec = (typeof codecs)[number]['codec']
+    codecs.find(({ length, hash }) => hashKey(key.slice(0, length)) === hash)
+  type ViewCodec = (typeof codecs)[number]
   type SnapshotData = DehydratedState['queries'][number]['state']['data']
   const transform = <R>(
     queries: DehydratedState['queries'],
@@ -89,13 +94,13 @@ export const makeSnapshotPreparation = (
   return {
     encode: async (queries: DehydratedState['queries']) =>
       runPreparation(
-        transform(queries, (codec, data) => Schema.encodeUnknownEffect(codec)(data)).pipe(
+        transform(queries, (codec, data) => codec.encode(data)).pipe(
           Effect.provideService(SnapshotEncoding, services),
         ),
       ),
     decode: async (queries: DehydratedState['queries']) =>
       runPreparation(
-        transform(queries, (codec, data) => Schema.decodeUnknownEffect(codec)(data)).pipe(
+        transform(queries, (codec, data) => codec.decode(data)).pipe(
           Effect.provideService(SnapshotDecoding, services),
         ),
       ),

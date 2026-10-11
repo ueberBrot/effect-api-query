@@ -22,7 +22,8 @@ Review the Cause for private messages and transport values before logging it.
 
 These error classes distinguish failure stages:
 
-- `EffectRpcQueryConfigError` reports invalid factory or builder configuration synchronously.
+- `EffectRpcQueryConfigError` reports invalid configuration: synchronously during preparation,
+  or during stream execution with incompatible QueryClient hashing.
 - `EffectRpcQueryKeyError` reports synchronous payload construction, encoding, or JSON
   canonicalization failures.
 - `EffectRpcQueryError` reports a failed RPC execution and preserves its Effect `Cause`.
@@ -45,7 +46,8 @@ The package adds only declaration identity to execution-error metadata. The pres
 contain upstream request headers, bodies, concrete URLs, responses, or Schema issue values.
 Review those values before logging or exposing them. The package does not sanitize the Cause.
 
-`EffectHttpApiQueryConfigError` reports invalid factory configuration synchronously.
+`EffectHttpApiQueryConfigError` reports invalid configuration with the same preparation and
+stream-execution timing as the RPC error.
 `EffectHttpApiQueryKeyError` reports synchronous query-key preparation failures, before HTTP
 execution. Mutations encode their request inside the ready client's Effect, so encoding failures
 become `EffectHttpApiQueryError` instead. Runner rejections and user or TanStack callback failures

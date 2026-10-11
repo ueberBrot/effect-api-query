@@ -40,7 +40,6 @@ describe('createRpcQueryUtils semantic keys', () => {
         ).toStrictEqual({ ...user, name: 'Updated' })
         expect(queryClient.getQueryCache().findAll({ queryKey: utils.key() })).toHaveLength(1)
         const hydrated = new QueryClient()
-        // SAFETY: The input comes from Query Core dehydration; this test intentionally verifies JSON serialization and hydration.
         /* oxlint-disable typescript/no-unsafe-type-assertion, unicorn/prefer-structured-clone */
         hydrate(
           hydrated,
@@ -323,7 +322,6 @@ describe('createRpcQueryUtils semantic keys', () => {
         keyPrefix: ['app'] as const,
       })
 
-      // SAFETY: An invalid literal payload exercises construction failure without retaining the supplied secret.
       /* oxlint-disable typescript/no-unsafe-type-assertion */
       const construction = captureKeyError(() =>
         utils.errors.construction.queryKey({ secret: 'do-not-retain' as 'expected' }),
@@ -358,7 +356,6 @@ describe('createRpcQueryUtils semantic keys', () => {
     ]
 
     for (const keyPrefix of invalidPrefixes) {
-      // SAFETY: Invalid runtime prefixes deliberately bypass the tuple contract; client execution is never reached.
       /* oxlint-disable typescript/no-unsafe-type-assertion */
       expect(() =>
         createRpcQueryUtils(group, {

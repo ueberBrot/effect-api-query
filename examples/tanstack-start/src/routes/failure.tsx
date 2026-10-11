@@ -30,8 +30,6 @@ export const Route = createFileRoute('/failure')({
   loader: async ({ context }) => {
     try {
       await context.queryClient.query(context.rpcQuery.diagnostics.fail.queryOptions())
-    } catch {
-      // Query state retains the error for rendering.
-    }
+    } catch {}
   },
 })

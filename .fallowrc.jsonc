@@ -1,8 +1,6 @@
 {
   "$schema": "./node_modules/fallow/schema.json",
 
-  // Astro copies this browser entry from public/ and loads it through the
-  // Starlight head configuration, which static import analysis cannot follow.
   "entry": [
     "scripts/measure-construction.mts",
     "scripts/verify-docs-examples.mts",
@@ -13,7 +11,6 @@
 
   "ignorePatterns": ["examples/tanstack-start/src/routeTree.gen.ts"],
 
-  // Framework tooling consumes these exports through convention-generated entries.
   "ignoreExports": [
     {
       "file": "apps/docs/astro.config.mts",
@@ -33,9 +30,6 @@
     }
   ],
 
-  // Each executable example keeps its resource ownership and cancellation
-  // workflow and UI in place so readers can understand and copy the integration.
-  // Fingerprints expire when the duplicated code or occurrence count changes.
   "duplicates": {
     "ignoredClones": [
       "dup:22704c46:2",
@@ -60,8 +54,6 @@
     ]
   },
 
-  // Vite+ tasks, packing, and imported lint presets invoke tools Fallow cannot trace.
-  // Keep Effect peer and test dependencies available for the library and fixtures.
   "ignoreDependencies": [
     "@arethetypeswrong/cli",
     "@effect/platform-node",
@@ -75,8 +67,6 @@
     "unplugin-unused"
   ],
 
-  // Health measures shipped library code in src/. Exclude docs, examples,
-  // tooling, and tests here; other audits retain their repository-wide scope.
   "health": {
     "ignore": [
       "apps/**",
@@ -93,8 +83,6 @@
   "rules": {
     "private-type-leaks": "error",
 
-    // Public-entry suppressions are valid in the entry audit but necessarily
-    // look stale in production mode, where package entry exports are exempt.
     "stale-suppressions": "off"
   }
 }

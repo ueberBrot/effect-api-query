@@ -97,6 +97,10 @@ options retain their own query function even if a prefix registers another one. 
 per-call `queryHash` and `queryKeyHashFn` because native key-only reads and writes must resolve the
 same entry.
 
+Streams also reject a default `queryHash` that differs from the configured key hasher's result.
+Changing hash defaults while matching entries remain cached can make stream execution reject
+with `UnsupportedQueryHash`. Retire the old cache before changing its hash policy.
+
 Use the generated exact `queryKey(input)` or `metadataKey(input)` with native `getQueryData` and
 `setQueryData`. Their data tags preserve the unselected query data type: selecting a name changes
 the observer result, while a native write still supplies the complete user. A fresh native write

@@ -16,6 +16,37 @@ describe('Start request-local execution', () => {
     vi.unstubAllGlobals()
   })
 
+  it('rejects RPC page inputs that cannot advance through the directory', async () => {
+    const ownerScope = Scope.makeUnsafe()
+    const host = await Effect.runPromise(makeExampleHost().pipe(Scope.provide(ownerScope)))
+    const application = await startServerApplication({ host, authorization: 'allowed' })
+    try {
+      for (const input of [
+        { cursor: -1, pageSize: 4 },
+        { cursor: 0, pageSize: 0 },
+        { cursor: 0, pageSize: 101 },
+      ]) {
+        expect(() => application.rpcQuery.users.page.queryOptions({ input })).toThrow(
+          'Could not construct the payload for RPC users.page',
+        )
+      }
+      await expect(
+        application.queryClient.query(
+          application.rpcQuery.users.page.queryOptions({ input: { cursor: 0, pageSize: 1 } }),
+        ),
+      ).resolves.toMatchObject({ nextCursor: 1, total: 12, users: [{ id: 1 }] })
+      await expect(
+        application.queryClient.query(
+          application.rpcQuery.users.page.queryOptions({ input: { cursor: 0, pageSize: 100 } }),
+        ),
+      ).resolves.toMatchObject({ nextCursor: null, total: 12 })
+      expect(application.queryClient.getQueryCache().getAll()).toHaveLength(2)
+    } finally {
+      await application.dispose()
+      await Effect.runPromise(Scope.close(ownerScope, Exit.void))
+    }
+  })
+
   it('renders shared host state without network calls and isolates request authority', async () => {
     vi.stubGlobal(
       'fetch',

@@ -20,5 +20,4 @@ Callers may provide every other applicable Query Core option.
 
 ## Consequences
 
-Applications own providers, router context, and SSR integration. A future reactive contract may add
-a dedicated adapter entry point when core-shaped options are insufficient.
+Applications own providers, reactive option rebuilding, router context, and SSR integration.

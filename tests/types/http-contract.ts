@@ -122,7 +122,6 @@ const configuration: CreateHttpApiQueryUtilsOptions<typeof api, typeof prefix> =
 const utils = createHttpApiQueryUtils(api, configuration)
 const annotated: HttpApiQueryUtils<typeof api, typeof prefix> = utils
 
-// Generated leaves keep the structural index assignability of the public type alias.
 true satisfies Assert<
   (typeof utils)['user.accounts']['get.user'] extends Record<string, unknown> ? true : false
 >
@@ -1055,7 +1054,6 @@ true satisfies Assert<
   Equal<typeof overloadedCustomMutation.error, EffectHttpApiQueryError<'custom-save-error'> | null>
 >
 
-// HTTP option builders retain native inference for complete requests and buffered results.
 type GetFailure = EffectHttpApiQueryError<
   'not-found' | HttpClientError.HttpClientError | Schema.SchemaError
 >

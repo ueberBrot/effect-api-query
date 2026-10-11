@@ -51,7 +51,6 @@ export interface StartTanStackStartApplicationOptions {
   readonly httpAuthorization?: string
 }
 
-/** Creates clients, query utilities, and cleanup together so the example can be copied as a whole. */
 export const startTanStackStartApplication = async ({
   rpcUrl,
   rpcClient: readyRpcClient,
@@ -76,9 +75,7 @@ export const startTanStackStartApplication = async ({
   })
   const abort = new AbortController()
   const pendingWork = new Set<Promise<unknown>>()
-  const runPreparation: TanStackStartApplication['runPreparation'] = async (effect) => {
-    abort.signal.throwIfAborted()
-    const execution = Effect.runPromise(effect, { signal: abort.signal })
+  const trackWork = async <A>(execution: Promise<A>): Promise<A> => {
     pendingWork.add(execution)
     try {
       return await execution
@@ -86,27 +83,26 @@ export const startTanStackStartApplication = async ({
       pendingWork.delete(execution)
     }
   }
+  const runPreparation: TanStackStartApplication['runPreparation'] = async (effect) => {
+    abort.signal.throwIfAborted()
+    return await trackWork(Effect.runPromise(effect, { signal: abort.signal }))
+  }
   const captureSnapshot: typeof fetchStreamSnapshot = async (owner, options, controls = {}) => {
     if (owner !== queryClient) {
       throw new Error('Snapshot belongs to another request')
     }
-    const snapshot = fetchStreamSnapshot(owner, options, {
-      ...controls,
-      signal:
-        controls.signal === undefined
-          ? abort.signal
-          : AbortSignal.any([abort.signal, controls.signal]),
-    })
-    pendingWork.add(snapshot)
-    try {
-      return await snapshot
-    } finally {
-      pendingWork.delete(snapshot)
-    }
+    return await trackWork(
+      fetchStreamSnapshot(owner, options, {
+        ...controls,
+        signal:
+          controls.signal === undefined
+            ? abort.signal
+            : AbortSignal.any([abort.signal, controls.signal]),
+      }),
+    )
   }
   let disposal: Promise<void> | undefined
   const dispose = async () => {
-    // Stop queries before releasing the ready clients they execute through.
     disposal ??= (async () => {
       try {
         abort.abort()

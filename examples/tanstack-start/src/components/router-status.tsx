@@ -20,7 +20,7 @@ const StatusPage = ({
 
 export const PendingPage = () => (
   <StatusPage title="Loading route">
-    <p className="text-muted-foreground">Loading generated RPC queries…</p>
+    <p className="text-muted-foreground">Loading queries…</p>
   </StatusPage>
 )
 

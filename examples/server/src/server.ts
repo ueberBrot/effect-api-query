@@ -5,7 +5,6 @@ import { createServer } from 'node:http'
 
 import { makeExampleWebHandler } from './web-handler.ts'
 
-// Effect Schema.TaggedError is a curried class factory; only instances use new.
 // oxlint-disable-next-line unicorn/throw-new-error
 class ExampleRpcServerError extends Schema.TaggedError<ExampleRpcServerError>()(
   'ExampleRpcServerError',
@@ -35,7 +34,6 @@ export interface StartExampleRpcServerOptions {
   readonly port?: number
 }
 
-/** Starts the standalone example server and closes it with the caller's Scope. */
 export const startExampleRpcServer = Effect.fn('ExampleRpc.startExampleRpcServer')(
   (options: StartExampleRpcServerOptions = {}) =>
     Effect.gen(function* () {
@@ -80,7 +78,6 @@ export const startExampleRpcServer = Effect.fn('ExampleRpc.startExampleRpcServer
           return HttpServerResponse.empty({ status: 404 })
         }
 
-        // Cancelling an oversized upload must leave its socket open to send the 413.
         const apiRequest = request.modify({})
         Object.defineProperty(apiRequest, 'stream', {
           value: NodeStream.fromReadable({
@@ -98,7 +95,6 @@ export const startExampleRpcServer = Effect.fn('ExampleRpc.startExampleRpcServer
         return HttpServerResponse.setHeaders(response, corsHeaders(isHttpPath))
       })
       yield* server.serve(app)
-      // Close active sockets before the adapter interrupts their request fibers.
       yield* Effect.addFinalizer(() =>
         Effect.sync(() => {
           nodeServer.closeAllConnections()
@@ -114,8 +110,5 @@ export const startExampleRpcServer = Effect.fn('ExampleRpc.startExampleRpcServer
         rpcUrl: `${url}/rpc`,
         url,
       } satisfies RunningExampleRpcServer
-    }).pipe(
-      // Finish acquisition and cleanup registration before accepting interruption.
-      Effect.uninterruptible,
-    ),
+    }).pipe(Effect.uninterruptible),
 )

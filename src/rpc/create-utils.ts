@@ -21,16 +21,11 @@ export const createRpcQueryUtils = <
   group: Group,
   options: CreateRpcQueryUtilsOptions<Group, Prefix, ClientError>,
 ): RpcQueryUtils<Group, Prefix, ClientError> => {
-  // SAFETY: Group is a RpcGroup.Any; this erases its member union only for runtime
-  // enumeration. The returned tree retains that union in the public generic type.
-  // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion, anti-slop/no-chained-type-assertions
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/no-chained-type-assertions
   const runtimeGroup = group as unknown as RpcGroup.RpcGroup<Rpc.Any>
-  // SAFETY: options.client is tied to this same Group by CreateRpcQueryUtilsOptions.
   const client = options.client as RpcClient.RpcClient.Flat<Rpc.Any, ClientError>
   const rpcs = extractRpcs(runtimeGroup, client)
-  // SAFETY: Public options require a runner for any remaining client services.
-  // The runtime tree preserves this runner unchanged while erasing its Context type.
-  // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion
   const runPromiseExit = options.runPromiseExit as RunPromiseExit<unknown> | undefined
   const tree = createUtilityTree(rpcs, {
     keyPrefix: options.keyPrefix,
@@ -39,6 +34,6 @@ export const createRpcQueryUtils = <
     runPromiseExit,
     errors: rpcTreeErrors,
   })
-  // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion
   return tree as RpcQueryUtils<Group, Prefix, ClientError>
 }

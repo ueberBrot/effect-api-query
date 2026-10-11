@@ -8,8 +8,8 @@ Applications need one key hierarchy for exact cache access and broad TanStack pr
 
 ## Decision
 
-Generated keys concatenate a required readonly, non-empty JSON prefix, the RPC path, an operation
-discriminator, and a canonical query payload when present. Concrete query keys use TanStack's
+Generated keys concatenate a required readonly, non-empty JSON prefix, the adapter namespace,
+the RPC path, an operation discriminator, and a canonical query payload when present. Concrete query keys use TanStack's
 `DataTag`; prefix and mutation keys remain ordinary readonly keys.
 
 ## Consequences

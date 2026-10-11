@@ -3,179 +3,181 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "707c8eff0f7f314a6782661ff584f7f7ea872abbd29132a55f92b6616569e6a3",
+      "fingerprint": "a980b4a6405f95f7c6bd8f0051885ec9ca40bfae8ddc7474db423014ce2381c2",
       "snapshot": {
-        "GLOSSARY.md": "67de06543ad2fd9fd2917419e19d1f071e7b6eee53d48fca05e9dddfc739c683",
+        "GLOSSARY.md": "ad19a69727108dd047208b6e76e05f5b1d241620ed75cb241a62fb4c068dc792",
         "README.md": "7af677dd785f95bf08b4a9dbafd10f1b0a2cd9ce40d42edf359ede1e59de6fd3",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "fcbaca84f266060b946eed9cbf9d0b9815352b7b1d6ddaff5803b29484345380",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "f1505ec3eb35a33fac289706c2cc318a2ffb80555e3302ca102e67e21c9012da",
         "apps/docs/src/content/docs/concepts/http-utility-tree.md": "ed03938167f31822b76efbeac381fd3f8d297061fe567928ee022f8dbfadb9b4",
         "apps/docs/src/content/docs/concepts/queries-and-mutations.md": "f62769112999ebe71a75aa3c22e73380e0f11d8c1f64c3125e2e5e8dba11997e",
         "apps/docs/src/content/docs/concepts/rpc-utility-tree.md": "fd5fcc232279e9577b8b2faf321a85e9a340e6090ea5887bbab208cca2d24a4e",
-        "apps/docs/src/content/docs/concepts/semantic-keys.md": "ae21f39db492acdad4f576c6942408b628124da775e40fdde543a4c8341de5ec",
+        "apps/docs/src/content/docs/concepts/semantic-keys.md": "e76e2443be443d6cda73166cd9a1d7d68db6813b9af4f98e6f1bdf7d7cc8c2e1",
         "apps/docs/src/content/docs/examples.md": "217a98fef80d350becc9fb7472eb120af9ce528e091fa13840bc9531930e5d53",
         "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "74f9d59c908fe6ab70ccfb8940c1f976e060b38a05cc6bbe75f72403d3b3ed7b",
         "apps/docs/src/content/docs/getting-started/feature-support.md": "47de4a30ab91559a5aa4cf211f9da13fa970ad444ee19a0c417efcb289e72bc1",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "f73cc87d44999e85b942b3ef284bdd2d0cf5bbd84cb4e7e3f14e65da185ff81d",
         "apps/docs/src/content/docs/getting-started/installation.md": "0e7d6e608fa0ea049446fd3784350ba635503c0010c12342bc5774b6e7105152",
         "apps/docs/src/content/docs/getting-started/quick-start.md": "43e8837b84df91af5dfe1b989c6f2cd94557ffb038fd1c0692a5bc7342716b3c",
-        "apps/docs/src/content/docs/guides/angular-query.md": "fcce47f32059d4164ae3a0b5fb1cf35922dd2bd5bb5b1dfa38a139339483c539",
+        "apps/docs/src/content/docs/guides/angular-query.md": "3093cdaccb8975047e0df2a56876d1258aff75f047aacaf5eac4ae4719d9affb",
         "apps/docs/src/content/docs/guides/cache-filters.md": "ac17c5bfd460a70988bdb4d7fd702fc96a6d0df46b6e0cd3455ac60e0ab4fe22",
         "apps/docs/src/content/docs/guides/cache-management.md": "72a1943ca0c4171a5d10b5b1667bfbec8b8f07922a1114b40b3457fbdc5c708e",
-        "apps/docs/src/content/docs/guides/cancellation.md": "eb846576e04d8e8fb3030352a8613664773f4140047e6da0ccd002fcb78a7a2e",
+        "apps/docs/src/content/docs/guides/cancellation.md": "922b18e192c0b75ccde3c7c2190f3c87336312f2d29afd73ff75dd0a90233ffb",
         "apps/docs/src/content/docs/guides/choose-stream-history.md": "6996df3a8b18c4fadbcc76a3635a8a5408f155b4068509d4801b38afa7f22f16",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "7770390ad17843b0883968cf35c4aa39054fac7adeceacae731e8899e3cc4ff2",
         "apps/docs/src/content/docs/guides/custom-key-encoders.md": "9a819f6c490234e46458d407e140fb3dc36cb7c67691a8574e8c2f6024c9c046",
-        "apps/docs/src/content/docs/guides/handle-failures.md": "f9d8e9abcf8a29a6d57bb8b2140b8faf02e8550490405eab75a3c2721186f5fe",
+        "apps/docs/src/content/docs/guides/handle-failures.md": "2eded0844b67dd4a54e21000fa516cd1017652004413495557ce8453953203eb",
         "apps/docs/src/content/docs/guides/http-queries-and-mutations.md": "928eb6def0170167e572ebd0e536bfc5cffaf6921c497da6367a6ecfec0841f7",
         "apps/docs/src/content/docs/guides/hydrate-query-views.md": "d71f573e4c6e6815e51f7a63080b773655f90cf9ef07155d293f1550eac091d4",
         "apps/docs/src/content/docs/guides/hydrate-unary-data.md": "0cf27b204e709f8a753fd61fd1510073404611e53a9fd6e82e8122af7e68f2fa",
         "apps/docs/src/content/docs/guides/optimistic-writes.md": "b76e2336f6958e7482786312a15bb9c25a1608c659018c5b4d3162301e767bef",
-        "apps/docs/src/content/docs/guides/query-defaults.md": "212138d564907a75c46a1b8261f5964c63b6dc8a9cbbd74e68e9f5d41b9b5248",
+        "apps/docs/src/content/docs/guides/query-defaults.md": "bb27c896ddaf1a5583b192d5407eeb5f53c26c299e17697991573f3aece5e0a8",
         "apps/docs/src/content/docs/guides/react-query.md": "efa6c38843bbc5ebd827244628e7d2ddaa0f3d67924c99d8ff2a8dcb4b91aa7e",
         "apps/docs/src/content/docs/guides/refresh-from-events.md": "a8e680ae9060a573336829b94dbf77dd32385671d48cd4aa0f092a1374444cd6",
-        "apps/docs/src/content/docs/guides/retry-queries.md": "23fe305768b5779d87a21af4f56c49ef2f03fcc7654ec6ffaf9db46628e3cc11",
-        "apps/docs/src/content/docs/guides/solid-query.md": "91151a68b0205da685a8e545fdc386cffa1c3ac76b6de9be73b19bfb470c19bc",
+        "apps/docs/src/content/docs/guides/retry-queries.md": "8ff86e673cf47fb208f7f1ec34adfd6f57b5580bffc4af49835a563ed159a514",
+        "apps/docs/src/content/docs/guides/solid-query.md": "37fc9edbb245db2e5468649195baa450274e26a99d024be8c2088e96a3156d7d",
         "apps/docs/src/content/docs/guides/stream-snapshots.md": "91e22e85c11d8822e25e5abb7b872b78f07af79fdb16eb2690baf8226fdbd9f7",
-        "apps/docs/src/content/docs/guides/svelte-query.md": "aeb8ba0254920677a3c0a0667d500a1186eb368ae56f16ff848f6edcae7903ac",
+        "apps/docs/src/content/docs/guides/svelte-query.md": "47725e8230c8af9646f375d39cc312c6baa8ccd15a7e9842627755e324840385",
         "apps/docs/src/content/docs/guides/switch-cache-owners.md": "cc209f13becec305af60c9f04fe29f85a2ca6db3bc11601cf09083bc2583d198",
         "apps/docs/src/content/docs/guides/tanstack-start.md": "6fae751389e9b5dfb843235059aea1a2fc885d62f797556de78a9ea77697ddcb",
-        "apps/docs/src/content/docs/guides/vue-query.md": "aff0843b1f4fb76563695e9a1d6050fad202007c4be994b74aff774ab2e038d0",
+        "apps/docs/src/content/docs/guides/vue-query.md": "405bc7b3dc0fb149bac4084be17b18a31a695c4e5fa2fe2fee7cfe579579e439",
         "apps/docs/src/content/docs/guides/websocket-clients.md": "1cd31655e433ced7b24795255cb03280b27734eda58afeb9730a42bfad433c43",
         "apps/docs/src/content/docs/index.mdx": "a141fa2f98d38ea8042ad596c07369b81c9a27935805c17f552db0bc9dd22f6f",
         "apps/docs/src/content/docs/reference/browser-and-worker-hosts.md": "70743a4429a39937515c8d5fee79ca75714a92dd526f1093f9fa8ea12fbde984",
-        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "f19fe01d6ab2fc2065827c23ceea2720bb136f28a35c3ba3759507224bb8b6c9",
-        "apps/docs/src/content/docs/reference/errors.md": "4454725375e05ea7a7d976d798c1c1d0c2731eefc79043f5e40dba88154069b1",
-        "apps/docs/src/content/docs/reference/external-http-clients.md": "4ed288ccf29f3bcdf2e3773172282eefe0ef0f84ed0fd1bc347e5cd388743aba",
+        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "4f60753887b52c33a47b993f0aaaf75832edaeb09d082f2664e2e5e512e568a3",
+        "apps/docs/src/content/docs/reference/errors.md": "a3eda1d28bb90c85bcdccd9594ebb90cf588357d8cd80de39de5dca49b300085",
+        "apps/docs/src/content/docs/reference/external-http-clients.md": "79b38018269ac81fed55330214a277d07d3ee61d127b029de250f75272df3268",
         "apps/docs/src/content/docs/reference/factory.md": "7d972a9ff279ce80164aba793cbeb5a3e1621e6e16be97392b6faa7493de339c",
-        "apps/docs/src/content/docs/reference/generated-builders.md": "eabe68d7cbecc4a15db83a5c97da48321d2ffffbf2d6869ff5323a80b8f205db",
-        "apps/docs/src/content/docs/reference/http-factory.md": "13a238cb7de1fdd5b92f6bccc6061ff4cdfe49b23a5e0b52cc3126f031a6f39d",
+        "apps/docs/src/content/docs/reference/generated-builders.md": "a0e26877f37161a6f083528771035d2ab686b5b92e0fdfca3ebc92e779f89816",
+        "apps/docs/src/content/docs/reference/http-factory.md": "f922f468926a3b33029a7cf8c46564009514392771f3851ba8acd00cbdab612d",
         "apps/docs/src/content/docs/reference/performance.md": "2f68c31cae28de0a84b1ce77f065481d37899171b78d9593ff65e017ff75d97a",
         "apps/docs/src/content/docs/reference/public-exports.md": "500d864720857c9098b325d6018b20b5ad6c1e666ef326921721ffdf6435dcb2",
         "docs/adr/0001-target-effect-4-release-candidate.md": "44119ba9104f767c5804c5026c4a21a78a8367f6d9ff5a9035bb3f423969fbb3",
-        "docs/adr/0002-let-call-sites-choose-query-or-mutation.md": "3ababe863eabf9cc53c70629dfe65af4a82a77e91467e5082041b8c71f93f482",
+        "docs/adr/0002-let-call-sites-choose-query-or-mutation.md": "4244d48ff136eea562aa2f94a0b6b1ab58412796f3ece47a3cf5b43f746e11f5",
         "docs/adr/0003-project-dotted-rpc-tags-into-utility-paths.md": "a99856e94af4004484fed939d46ae4388363031cf396b07f04a92a7119fec2fe",
-        "docs/adr/0004-build-core-shaped-options-and-certify-react-first.md": "3e936951b2987c55d8ddff13e740e4070409c683294040744ed65a2f1cbcb16d",
+        "docs/adr/0004-build-core-shaped-options-and-certify-react-first.md": "a04939a70fc1438dfe7fc467b4f7f83d16135edb8a4397f6e160d00616b605cb",
         "docs/adr/0005-preserve-the-cause-in-one-error-wrapper.md": "1e04885542f22f166b5daa913ae2dae121c407baa775a2c4a16590f96857e3fe",
         "docs/adr/0006-use-canonical-semantic-json-for-payload-keys.md": "694d8665938af25abb91ada71ea9c95cb77dd4ea90019adb2f642e16a88948c7",
         "docs/adr/0007-keep-the-core-factory-lifecycle-neutral.md": "a83dc0d6061ac0328a3ee6075aa872a55feb4f0154edf6dae964e74276bb15b5",
-        "docs/adr/0008-use-flat-prefix-matchable-key-tuples.md": "d2a146eed07be984daca0a4cd8209eb1ca86734b162d5362b5663c50863cd526",
+        "docs/adr/0008-use-flat-prefix-matchable-key-tuples.md": "2a2b5a6971a1841748aa18c326fc2fd5df181572397001753fa44468617eab1a",
         "docs/adr/0009-build-an-eager-frozen-utility-tree.md": "bc3b08a3385f1dc8874d81f867f15ef6c30b203c94936fd991d2941fd5bacc27",
         "docs/adr/0010-reuse-tanstack-query-core-as-a-peer.md": "633a1ce44c8d58b29096f540871b61566352462e1d4bd5335162b3e08652527d",
         "docs/adr/0012-normalize-undefined-query-success-to-null.md": "5d076f168223f67a205138d3e258f1f3aac9dfe5d607ffe8efd12a71322ef022",
         "docs/adr/0014-require-query-stable-payload-construction.md": "2f4381fb3e7406304ff3b914db541419f799f8a71d1d527b37a9e971e9949e47",
         "docs/adr/0015-centralize-the-toolchain-in-vite-plus.md": "d2001383bc0f92363289c04b6b8df26acb5b0f5dfc0163b2a838f2eee8057b75",
         "docs/adr/0020-generate-accumulated-and-live-stream-queries.md": "5e4f5c92e08ffb769137e930908dded993f928a497b018f9c6e4fd4f12232727",
-        "docs/adr/0021-share-utility-construction-through-private-modules.md": "a7d6774a6652735e690e5099ccc7dcad10da416de482068f87b74e6063fe90a7",
+        "docs/adr/0021-share-utility-construction-through-private-modules.md": "821720a3eee166d4b7d42b6f5c3906bb29dff339b4815e9ed1c516bc5af66fd4",
         "docs/adr/0022-add-buffered-http-utilities-with-separate-key-roots.md": "f1fb5d91cd91a70b356bc98b84176920ec822315dbdeaf5e247921853598b62f",
         "docs/adr/0023-expose-buffered-multipart-http-mutations.md": "b72f20cb513d2a7db94b2dbe27576352048ba22288ad6eac6e80d1a7c81cefb8",
         "docs/adr/0024-project-http-streams-and-buffered-metadata.md": "2797a5a4a751c5e37c38aa454c14b99ce1615870ffa13cfcedb98cca8a0af633",
         "docs/adr/0025-use-public-decoded-message-clients-for-server-local-rpc.md": "36df8e1227af22018d5a9063699986ceb8dcfd4c8bb5615aa62557f2ec36e111",
         "docs/adr/0026-keep-rpc-transport-aggregation-in-the-application.md": "b73af29d8f73a36f61f110ad8778e045d37253fe42a8888883e78089b93e955e",
-        "examples/server/src/commands.ts": "62d60db1094eaaa3e927899431800daec6f9cd1f345509ec324f3369147d9e06",
-        "examples/server/src/diagnostic-operations.ts": "9ea6dd3f5243888b251bb64f534e3273253b79daf1c623edcc0f5034e627d049",
+        "examples/server/src/commands.ts": "58f415fe0ab9bb0127c96c11ef0540a29b97d231eebd3a487513f0820a46b3d5",
+        "examples/server/src/diagnostic-operations.ts": "ddf8a0f2367b91ca08d6aaaf58380a51b77a5c51a9a85412bd7e7080ff0453ee",
         "examples/server/src/domain.ts": "c00fced49e54d7bfff9045479e91aabdbd7c0868cc89afe00bae5473b17d2f82",
         "examples/server/src/http-handlers.ts": "601f37c428015e75e94cb282af356878aa49c887804cc29e2b4f0c1a47ca92f0",
         "examples/server/src/index.ts": "9e121809a5493c649e61e76fefec52a8c79a394983368060a95dc7000dcedc9a",
         "examples/server/src/main.ts": "de9520cc16e4bff9d02b8507ee70641936b1287959823429f7759c0f05fdc0a7",
         "examples/server/src/rpc-handlers.ts": "c2c57eb9a2ca5e602fff9f798c4d5165e91216c5b7e64e0a71220c4ba9316f3d",
         "examples/server/src/server-local-rpc.ts": "de2a05bba54042f1d2d5781023cb5d20eb63915dd2a52635e9debf83911b5421",
-        "examples/server/src/server.ts": "eab2d80d9e6ecc4c74b89a50223ff968bf5b98da72d9aece4e726c0cfd6832e8",
+        "examples/server/src/server.ts": "5c9bbd7131ba3c55bbd61255fa8da8a275fc97412e1c8cb54f063bde517991e9",
         "examples/server/src/users.ts": "15c363e2162f8dab4da1bfcf6324abbb3dc8ca34a8d8e036eb4db2481fe6be5b",
-        "examples/server/src/web-handler.ts": "55447fe9ec14213d3d69811be11c9d6d6b266d50cf37b57dd5d4870132905523",
+        "examples/server/src/web-handler.ts": "2de54d8d2264024887ca63c8c53b20e9f9260ca6605b791d1f91bcea8c8d1b07",
         "examples/server/tests/fixtures/websocket-server.ts": "b59863766bb60e5fb4de040d7d97ae2e67bca2ec44810ddc577f4cf5cb03129f",
-        "examples/server/tests/http-api.test.ts": "0e4ea6656cdc67d4fb29710cec1d10af505f7dbb3bcd3d85947f7ed19c220df9",
+        "examples/server/tests/http-api.test.ts": "6ad2951b74c45a73ea4980e5da65c7ed4f758ff43db34702f1224de934548bca",
         "examples/server/tests/rpc-transport-overhead.test.ts": "8d3dd40cfbbd0ce64b74f44f205f7f83163ea08dfc264a6deb1902e96b74a7fb",
         "examples/server/tests/rpc-websocket-consumer.test.ts": "16253ef720e8a85cb7c583bcf6f9883c5893423d6da952659731e5823fcf0a62",
-        "examples/server/tests/server.test.ts": "e36862bcc44433777c78e36355efea2779c8e866a0e63c9a5cf8fe2d5e86d673",
-        "examples/server/tests/web-handler.test.ts": "e32f61699348bb483adc15d9d2fc69663402767a7cfa893506c69758150313f0",
-        "examples/tanstack-start/src/lib/api-server.ts": "7a1d9e860dc1c77b17f8ec1dfa8207ae5e5b4d53b287e7c76e2ee4138b605779",
-        "examples/tanstack-start/src/lib/application.ts": "5f2eeb9920fa77b18dc7ad00a2688fe9225bfd2c57db35a5040b0a38e299ec71",
+        "examples/server/tests/server.test.ts": "44530f1e8b9b67f4d4bd8486c7bd7790240128fb161c1244857eee15c87a068d",
+        "examples/server/tests/web-handler.test.ts": "94d1b28810d908dcec8ca8299e56bb520f93804e8761b4d5e9c828087efae646",
+        "examples/tanstack-start/src/lib/api-server.ts": "b678d6edab872786fb92db328f60095d604c8d2f5205c4d4a462c3405a782bad",
+        "examples/tanstack-start/src/lib/application.ts": "609e2d9ce04f24b1a1795650a49bfac139b9a28e8158234630c0845d2ace6392",
         "examples/tanstack-start/src/lib/query-ssr.ts": "0754abae5faf2f7562e1d86d27df0e14820a5ba9830146690ff1dc9f5beb3ec9",
         "examples/tanstack-start/src/lib/server-application.ts": "442278fc08c4beb9a69cf1ab7672f661385d9c49998db77ce2870d349ffdc8a1",
         "examples/tanstack-start/src/lib/server-host.ts": "1682ee37ea7551ec52c9530d6a4b476b967fa0572f5ddc26351ad427ce854e37",
-        "examples/tanstack-start/src/lib/snapshot-preparation.ts": "b50f578ff0aaf5a6301df7323d0b3ea1e3fdcc27f65be0cf706a73d790203fd7",
+        "examples/tanstack-start/src/lib/snapshot-preparation.ts": "eb9d9e422626d5d392fd842610c26de5ae517a6b3bea5cc93ea423fc3f942ff9",
         "examples/tanstack-start/src/router.tsx": "801aac19cff9a4e2a4acb0823a9ea5c28b4aea9245f7e26cb63548bb5234bd15",
         "examples/tanstack-start/tests/application.test.ts": "81f9b44df80dded727f1fedf51ffee2df2c7afd7f25a68668a263deb88cd3ec1",
         "examples/tanstack-start/tests/async-hydration.test.ts": "1f983917d2a469b83b876e882ad6a2ece4d28d360338ed614232807a168a1620",
-        "examples/tanstack-start/tests/client-navigation.test.tsx": "e91e23be9c5695035462fd5b27a1c1d627bf6d1d0f6a8124d45ac1bc220db416",
+        "examples/tanstack-start/tests/client-navigation.test.tsx": "62af6b9c4ad00e2bd772a0eb75d175e11329079bc787874b0d87e7f22030620e",
         "examples/tanstack-start/tests/failure-dehydration.test.ts": "b9d135c54e8e70ff454903f8016e6560fabaa487095cb40cb8725ed73577f079",
-        "examples/tanstack-start/tests/server-local.test.ts": "a2bbaf6cfad8701e2f8912a07c6a9f3d91a8d8ecb394a94c09d25289134576c9",
-        "examples/tanstack-start/tests/server-render.test.tsx": "01061f209d72df769235c47bae552402e6c9a692c95e67267e4317b2e338b8f5",
+        "examples/tanstack-start/tests/server-local.test.ts": "2facfdbf572cf8ed1cf5f6104a503504ab0e979546aca3e28d9dbc853c64c6e5",
+        "examples/tanstack-start/tests/server-render.test.tsx": "77b82127f9e3ddea55b201f7b2080f930ef340269010502f1515f6691ecc4ab2",
         "examples/vite-react/src/app.tsx": "691f77aee6fb9f2b1f6f9df40a3afcf78f4af2d043d7b379f38c75c647a5f91e",
-        "examples/vite-react/src/lib/application.ts": "c3fe076813ec5797de9e93274b07d07312e830cfa0998ae2d174191bc1c7d3fb",
+        "examples/vite-react/src/lib/application.ts": "0467aaf770fdb75095898c78c8cb243a2092cebb2a31986610cd7945e7f6e993",
         "examples/vite-react/src/lib/owner-cache.ts": "563f1758f6f387768ba8f068e02763fa6b1bd30ef84d59e8be1938adfec7eb26",
-        "examples/vite-react/src/lib/user-writes.ts": "46d8b7b5f02447344309a80f068bf045d71997d3dc40402dede9d835b6e36fdb",
+        "examples/vite-react/src/lib/user-writes.ts": "a746bb972220cd55b6bc1b6ceb8161bc01993506430082560f104d63244ec16b",
         "examples/vite-react/src/main.tsx": "cdee6ca4095b58e1750015db473bda8651702a8ab32c408fa77961873db0e6fe",
         "examples/vite-react/tests/app.test.tsx": "ff86b42023eb40658dd6feccbfd1f236a75bf2831f40b02955ebc1306be6329c",
+        "examples/vite-react/tests/commands-ui.test.tsx": "70005a656b9356fce97924dff6d4be82d87893cf48a619c119ad4372843246f8",
         "examples/vite-react/tests/commands.test.ts": "3e24222572c0f7a4b68cfc4069c545cbebf410cacd0063a328cead9ad5baab08",
         "examples/vite-react/tests/owner-boundary.test.tsx": "d4ce58a002aac2b8f752936a65495558f89bff145d5cf2556f5c0d9286f8d6b3",
         "examples/vite-react/tests/owner-cache.test.ts": "8818e30fdd3071a2e5dc2d865161e0d9f40de1ff37813b0a396bb2e83dd08a1d",
         "examples/vite-react/tests/owner-switch.test.ts": "c997c9758269586591cbf55de4651c64091abc9061b56edb024dcbf9dbaa9c1d",
-        "examples/vite-react/tests/user-writes.test.ts": "2492f48018e7d8e684eae1c8d302acc9961a1bfbd60bf3214c113dc1b6fbe54a",
+        "examples/vite-react/tests/user-writes.test.ts": "e104afaa57a9dd47391ac1da08175e8f7dae03dfd151edf9c9fd570bba816ae3",
         "package.json": "dc41aa3f5b1633ffb2e6f6a0b7efb4e0119d74b9bc8c0003b1a8ee5fad854782",
         "pnpm-workspace.yaml": "58fd69fb2ebc237bf589893fd3150ec0dd25988aee57f465f5b373b038aee606",
         "scripts/decode-utf8.mts": "2e90c53e95c22b864a209a87c98084db6ec95e83f842007b21528d286d45c18c",
         "scripts/measure-construction.mts": "10522cb10ab51fd44d8990896a2a73e8bf4d4cd2646441e958b6180cb1afd147",
         "scripts/verify-docs-examples.mts": "b20cdbf909f68c177125ddbc69e86d4244571ac5faebe505fa43cdf2faa34d91",
         "scripts/verify-packed-consumer.mts": null,
-        "skills/effect-api-query/SKILL.md": "1939a0f7536f3e88e1e1106e8125019c11d6fdd4ada8ae4d010507f264b234e5",
-        "skills/effect-api-query/references/cache-workflows.md": "27bb96c48c84254ab8c379a529402f81cea3723c17d6396527c090a8c37e6f65",
-        "skills/effect-api-query/references/frameworks-and-hosts.md": "8b39b303cf3a9ae3222a257f53df5f9696b80c54859765f2c4d7b39554b8719f",
+        "skills/effect-api-query/SKILL.md": "ca0822b4c5172bab93179c6885ffc1a64f434fce30d7af14d307d5492eeb90ed",
+        "skills/effect-api-query/references/cache-workflows.md": "e62daab7af8b3118962d1c0d8b5212927ffb1fcf4abf44ad9489ae695a0ed4b6",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "169ff6847997b4cdf49c4984e87c393876973c0ca28e7b0b9c3deff4bbbd8a8b",
         "skills/effect-api-query/references/http.md": "9625411753fcc3ce816512f80158a19aa1057518ab3bfde98720e0cc7f845b66",
         "skills/effect-api-query/references/hydration-and-ssr.md": "61e761b36ebcf56c7cc1b67b3d795edba52d0c0224c3e7964297ed6864e1b044",
-        "skills/effect-api-query/references/query-patterns.md": "5e20137ffe4b951ccaf41e869a7ac097633f91cb52ec44799ecdf47b4ba3883c",
+        "skills/effect-api-query/references/query-patterns.md": "69d58f67745a6ead7d86729cb8d137a22c0ce4bbbb31c0cc016dcb3fa428c6cb",
         "skills/effect-api-query/references/rpc.md": "f77eb39bb1b3e1f5f8c56f4b827ecef350a255a23380d8b9515dc61b54165d5d",
-        "src/core/operation.ts": "3b00c20d4f9cfa38b22574953804e7dc4648e912df74bfd5469c657ff5cc6e35",
-        "src/core/schema-key.ts": "6e3ec8e7aa089ab6d2a85e71880f9bf4985f572b28e0b4325fcb0eed00b5dfd3",
-        "src/core/stream-snapshot.ts": "abd83051df4e7fd3e4de5f9147b029993d59e19e5dd72ee7b73d40ebae12acc7",
-        "src/core/streamed-query.ts": "34ed5a18daa8c5aacdb5fbfede925b1bd84baef1f9e0580e0a8035b7cfde0eb1",
-        "src/core/types.ts": "ae7ad2d99e24cb7c98e54270ce2698ff8db4d21750e967d11ed4d9653a5e6264",
-        "src/core/utility-tree.ts": "5c0254aa71724e1a529fd090891fea5e853b0ff4e3ae0ae3eac265df1e8f9a83",
-        "src/http/create-utils.ts": "d989ce2b8c0b0fda6e3dfbec76babe33f30a60aef8f0028f3009b9367aeb21e2",
-        "src/http/errors.ts": "dbe4aa9a4ce8c5c996f914387e9ec61568f774c5ea5a585c4f9480b13f97706b",
-        "src/http/operation.ts": "be425a2829e1ab16d5b07b592ddde76d3e611b5670567030e17afe10ca4c202f",
-        "src/http/request.ts": "2416d809ab164a68b67627456686e52a6a49a5173790e652d129dcd503b1d424",
-        "src/http/streamed-query.ts": "ab4b9404db54fe5f77894c87bf7240474c4c7a00de12b3fe18914b67005e08af",
-        "src/http/types.ts": "e63f305feae5452bbe125b46cbfc6ebaecabdf72c224ec6d4732daa798e250d9",
+        "src/core/operation.ts": "7dabe4d21070d20534643e5051060c84a09db5a7aa39858e75846043f8a537ea",
+        "src/core/schema-key.ts": "f86690bd0ac063199f3207ee398e87dd8210601d1496ebe21844099a597f1946",
+        "src/core/stream-snapshot.ts": "00bf4855cc745571ce440a9afcf7a52134450de9ced00007e4cd2cdab8e544d1",
+        "src/core/streamed-query.ts": "cb94aef5458ed04ea90aa7b60bc187d171f15f911658848354753c2029f6a17b",
+        "src/core/types.ts": "4fe7d3e2d9760fc8b226846c1e67fcd431dbf2f26b77d782ed66343f10c6afa1",
+        "src/core/utility-tree.ts": "d8d788f370002b3f6058949130438b1e1f6f6a3b2f9e5eac4489526940af5f21",
+        "src/http/create-utils.ts": "785dd9171fd9c6ab7619a9e3728f91a3e9d197c311a3a6c8a6dffc74904a4975",
+        "src/http/errors.ts": "95869413973faefd2958f4e48feada7d5700e3aa0c2545f56a7202c8b9609a46",
+        "src/http/operation.ts": "7679702ebb65b94e1d3bdd6fce80213248e50cda32038402852c8b80964b7369",
+        "src/http/request.ts": "9d31397ee4241319ae56260c65e7fb4973adcee974b55e43e2895e7524d39180",
+        "src/http/streamed-query.ts": "186879ad046d841960d9ead272958659c45becfe0fcd7fd35fc41f8c2056aaa3",
+        "src/http/types.ts": "57394bbce9225f8df5746b9ccfa37ff4d80e2ee8a770edf683082fa2f06d405f",
         "src/index.ts": "95300336b198d7cec9a0113597970f462cb431718be9f2aae0fd64402b6655a4",
-        "src/rpc/create-utils.ts": "74edcb07d0c13466cd1d1b1343eefb91110e3d1ffb299cc4a92310a025d690d8",
-        "src/rpc/errors.ts": "7e4fbde05e6dd3647f8a12f524a659b5c378ee27092ae4e28151effb7b2feb88",
-        "src/rpc/operation.ts": "a0b34e68b4054d55b10936737cfef1617fa12074610e5147c912cab101ba7c9e",
-        "src/rpc/streamed-query.ts": "4e2588fa629b4332a13f921f900ed2580343831adc6c9d86769c830f2ac66545",
-        "src/rpc/types.ts": "f5fda172e9746512b1c51082eebaee7b5a16bd8b382d59b51ed80e07e8e552e3",
+        "src/rpc/create-utils.ts": "c0db42f6d9962b6c2e291f2b3d060be16ba7fc93826fa00471db5d82503e27dc",
+        "src/rpc/errors.ts": "7048a786a55f2cd221788485ffa993277f47896110ffac742f74ee077382377e",
+        "src/rpc/operation.ts": "e46cb103c4a79506cecb34c9337640ec9ab917a488e9360c7535d3dad733ebf5",
+        "src/rpc/streamed-query.ts": "554ee2fc1a833c6c6f3d97c132da66b0b86d524be56c3589511b564303e81856",
+        "src/rpc/types.ts": "94a154bbc38d1996beb4fde2f11d2fabb86d6d4c2f47f6fce417dbd1ec2dfda2",
         "tests/cache-recipes.test.ts": "5d86c8f74e952aa6f614d9ba32b4f2680137d23b696d8c55cd07d0463e5b65b7",
-        "tests/create-http-api-query-utils.test.ts": "a76295644389a37e1a00a9825d192cbd0dceeab7d43e7ad1196c171ef5059ad1",
-        "tests/create-rpc-query-utils-configuration.test.ts": "839191fd31986c13f77585d191d643599426ce3294a930af421a26439b37b664",
-        "tests/create-rpc-query-utils-execution.test.ts": "8556cd62ba1ecdcc130c9a5d35f165b60d18a9c6f3f8eed30822f213ecd57e73",
-        "tests/create-rpc-query-utils-keys.test.ts": "e79abaa3659d9e212d1a1b3b923abe3493fcdb1d1ab5c92cd895df199043f9da",
+        "tests/create-http-api-query-utils.test.ts": "afb7890a6f94a12fa51c5e3403e2886d01fe3d7c267534339282ec3e8c338c96",
+        "tests/create-rpc-query-utils-configuration.test.ts": "d5e7b5ccd4ae102c6e7cf6b99bbd161dc029380b04e1728bf1d3714b1bfcbd36",
+        "tests/create-rpc-query-utils-execution.test.ts": "05a0de82218666f39cc6ac2d120f2b2e96885e9cfc9323e5ccc658ad996da2c5",
+        "tests/create-rpc-query-utils-keys.test.ts": "c6b6918e08c10f097634179e65d0e8eb481ff6833561b04de8e6a093104fee31",
         "tests/create-rpc-query-utils-request-options.test.ts": "bcd76859a2830e522bdeb212be70f2e14be3b815da75a5caf3e596fd5fbd13e7",
         "tests/create-rpc-query-utils-server-local.test.ts": "45ee329a736bcb6b114727ef8874f3f34541ce6dc55d5e13ffc80be9c2af2ddd",
         "tests/create-rpc-query-utils-stream-baseline.test.ts": "cec0a8906b3512e38c0272dc07a4cac81402ac014549eb11f24a594d7b792616",
         "tests/create-rpc-query-utils-stream-cache.test.ts": "b97fd6eb63c0e8c023f98a1420555288c3dd2f4ab500b0d3e0b1d3a5c41e1347",
+        "tests/create-rpc-query-utils-stream-hashing.test.ts": "025f15582fe2a667dc6383a406d5b42654ea7634acf3591803d9f379896a69bc",
         "tests/create-rpc-query-utils-stream-publication.test.ts": "cc3a25d02015b1410a8d1406249a846bf711f7b829fa7fccce1da90e600530d3",
-        "tests/create-rpc-query-utils-streaming.test.ts": "07a2af009d755f6025d5329f1edf4c1d40dc1ce090dffdadf023c5ba812353d0",
+        "tests/create-rpc-query-utils-streaming.test.ts": "4f38bc56aa04c96709a96f37ba697265cb7f1992e00947f4d18f41615394bf7f",
         "tests/create-rpc-query-utils.test.ts": "786032f34d1b3386373901714de9f5e7f5a1d42cb7d29cf79cb9d224d17c0624",
-        "tests/fixtures/async.ts": "f9ccc474ad87dd5aedebc5660d74386de6551dd5f8900d572c485c11054ff6b9",
+        "tests/fixtures/async.ts": "61c314b76032dc197a7568b0602740d06eee0462414516788c699f1a7263114a",
         "tests/fixtures/docs-websocket-use.ts": "6e2aa0bb7b1a653ffc215bad7a39b9a79aa1a9b3707bb32b1e80f4636faac544",
-        "tests/fixtures/effect-rpc.ts": "73be762e670e37e4cc3cfcc2b1d40724f23721726d75b45524ad0b3aba78eb61",
-        "tests/fixtures/http-client.ts": "a0a77029f4c786c1616f24ce6aa44120de40e243d3dc5570d85d1767bb527a11",
-        "tests/fixtures/optimistic-users.ts": "34d06822585039f33d2f9df7bceb866d36acbeff7f8ca7ce30f25e5e37975ba3",
+        "tests/fixtures/effect-rpc.ts": "8a92d7b5e815012f830b7e87a8492b2680d8a1b8fa866c3db25274458d432745",
+        "tests/fixtures/http-client.ts": "184cef6b4864d32f1225149161e12d4286517a34c74eb0ba0a2437ff5f333891",
+        "tests/fixtures/optimistic-users.ts": "0e5363c07c5022da24c9d7753cafe646eadb99da8929a07d6e4469516d93b5ec",
         "tests/fixtures/query-cache.ts": "ee6509aac5d0cf4f781652da10c2b1c3501a222ddd9a6b05f447e6a226548071",
         "tests/fixtures/rpc-transport-queries.ts": "46be1d1e6048d57d83e9ae64b00c8c0c11deec6a67d0d4b115cdc9aac7447158",
         "tests/fixtures/socket-client.ts": "d2d0a4a31011e2cfeec0e7e7ca996ad752a3a51db5675ac5efce54d284c8db89",
         "tests/fixtures/user-events.ts": "13d8167b811bec6319de96f7cb50410f586c18cc92677d7fd17488b16d15b329",
         "tests/fixtures/websocket-checks.ts": "7b8035264ece4e501e829b3e2b755f9d7b17c010ffa1036db6338a368ff6f93c",
         "tests/http-cached-views.test.ts": "3cdf4e8895fcb0e511ccdc6c49abfcc0318a82038844219ae88f32b28f2d3df6",
-        "tests/http-execution.test.ts": "d5869dc2faef8f2edf0f721173f40b352f1b2d70ef19919214a342b3bd82ea18",
+        "tests/http-execution.test.ts": "d7a2070dc186cae08e0c97d9d7045ceb2776b622fbe8fcbcd3ba65629b24ae75",
         "tests/http-hydration.test.ts": "cead9c149e9aecbba7121b4e6bcfa3450368d24e6320ba1b8825545db747b98d",
         "tests/http-live-query.test.ts": "79df219cb204669520c584123f167479ea3fa514d899897bf2810a04e8e1ca65",
-        "tests/http-multipart.test.ts": "ff816ffae79e827883cea1d1f99f5f763e95c9e856040627a34818df6569feb1",
-        "tests/http-query-options.test.ts": "62db987483d1fa468a62da899a1938296f79e9ac37c8d57890f898b2d66bf0b2",
-        "tests/http-semantic-keys.test.ts": "2e78788697bdf7efec374669d8123da57c93df3c368d41920decfcd175bc2359",
+        "tests/http-multipart.test.ts": "cfda4574a8b10bfcf1b38c060f37d6791d83d94a01640edc8f85c468e45cb3c4",
+        "tests/http-query-options.test.ts": "e6abd4020fb4fd11877802c42d07ffb6f66822120d409c885150e97177769386",
+        "tests/http-semantic-keys.test.ts": "df50b9a0cf6981594100c93ca4283eb8ca11e7aca4db8719b4d7bd9a4333cd16",
         "tests/http-transport-cancellation.test.ts": "e56f8571f949adc9d44f14b61e20edddb188a9565bf7a585859ffe73a851ac39",
         "tests/http-view-proof.test.ts": "4dc91c38efe5b0c643ef61c98dcdf4a89acf4ef4c1651030124d82ca6cb55a61",
-        "tests/stream-snapshot.test.ts": "c419902fad27b91205ff5e4b65510ce9ed0c3d0969300c8891f1bc314a7ce0e5",
+        "tests/stream-snapshot.test.ts": "86449ef5d0f1baf165a5c973fcd0a190b9fce8ae5b6e8732a4454ab0c9f6c132",
         "tests/types/docs-http-quick-start.ts": "5f7eef98be244ea392fc2c5b527858f159a08efebf6f2665725301aa8a910050",
         "tests/types/docs-hydration-async.ts": "de67135bf3da0dffdac47e9f2e49469edddac3d7d026fbd93d39aea6964c0dd8",
         "tests/types/docs-hydration-dto.ts": "ebcd5c3895e8fa40bff3b62e8e13213e98a3e1c4796d89979b23ecc64cdc13ff",
@@ -186,200 +188,203 @@
         "tests/types/docs-stream-snapshot.ts": "bc924cff90a9f9a8e416bf7fbdfedbd607c88e7a678435aaf20ef878862e06ff",
         "tests/types/docs-user-events.ts": "87647140d5434b95cc5389b1fea9919f20df7b6fcee4f00565836a4eae549a70",
         "tests/types/example-owner-contract.ts": "fb10bd087ee582a64806d110404c366cb74e520b0b8cc11701348036b08b9622",
-        "tests/types/http-contract.ts": "3dd9e8c02b6c7039942fac3e578a3c2a848c2e1495efa87f658e025225b9cce9",
-        "tests/types/http-stream-contract.ts": "4c47b65a5088ae292bee39d5ec5df8df007aaa90c94fb2af5d01239c3f850017",
+        "tests/types/http-contract.ts": "d5a8cc93a22186a6a4bdb3cc264f3739df6527e87bfc7c672f22b46fd18403cb",
+        "tests/types/http-stream-contract.ts": "24031e37ac8cada4b8e9d3b2f4ce6e08448780571d94c8002bd8b267caa320bd",
         "tests/types/http-type-scale.ts": "b456543b88316a2dd899f929efbffcf514e54e213e109b5f7d52eb785d2255aa",
         "tests/types/http-view-proof.ts": "f42a1ebf36eeab7a906b722f5d2c2af0aabe8d30ef378fc50386c16d464fb64e",
-        "tests/types/public-contract.ts": "475048059f5f509008a119a6f0305fca018f1fdcc19c35f63df070a6bc7b9bf5",
+        "tests/types/public-contract.ts": "5bf988c06b41bc009b143f57371f9b347af8a2d7ad6ff3c88f1d70833972c5fe",
         "tests/types/server-local-client-contract.ts": "443a60788ce7d91a77459c99f07d3fc9bf70d5a64a83c05ece5c40cfac63d298",
         "tests/types/snapshot-contract.ts": "9e6a2edaddb7545f20d351511ed99be2828d4ca56779503bcc443963d8b73716",
         "tests/types/tanstack-start-contract.ts": "51681e3d0d7504a614d490f18adb6f44db82d34b9d4d7cb9cf941aea33de284f",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "eac8805641c1acde48c4414dda2abe7042d1b795",
-      "outcome": "no-change",
-      "reason": "The RPC reference now describes input: skipToken consistently with the existing shipped query-patterns guidance and current object-only public builders. The removed bare-sentinel claim was a human-reference error; the seven shipped skill files already use the correct form and require no rewrite.",
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "outcome": "updated",
+      "reason": "Shortened repeated framework and cache guidance; corrected stream execution configuration failures, consistent QueryClient hashing and default queryHash restrictions. RPC/HTTP option forms, originating owners, snapshot drain and paired codecs retain their existing developer tasks.",
       "evidence": [
-        "At eac8805 plus the generated-builders.md correction: inspected the actual reference diff, src/core/utility-tree.ts preparation, public-contract.ts direct-form negative compiler fixtures and skills/effect-api-query/references/query-patterns.md. Uncached docs-build passed Astro diagnostics, 46-page build, search and internal links (reference-fix-docs-build.log). Existing final public compiler and 124 in-memory runtime receipts cover the unchanged API. No fresh consumer activation/task evaluation repeated for this reference-only correction; offline Skills CLI delivery separately proves seven exact files and thirteen resolved links, not consumer-task reliability."
+        "Reviewed the actual source/guidance diff from 54b6521 and PR base 5b91ddb1de13970365669c887b9d767ea417fbd4, including src/core/streamed-query.ts, src/core/stream-snapshot.ts, src/http/request.ts, both transport type/error adapters, optimistic writes, commands and all six shipped references. All 160 hash regressions pass; independent final critic scored 8.5/10 with no actionable findings and 44 separate runtime probes.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "718d9de9ccfd5dadc4476f9698693974234cd481254d50924ff0ff37b30d05d0",
+      "fingerprint": "3407012ab66306152591a338a042af1eda310350ddc50c94108ba9da8cf4c8c8",
       "snapshot": {
-        "GLOSSARY.md": "67de06543ad2fd9fd2917419e19d1f071e7b6eee53d48fca05e9dddfc739c683",
+        "GLOSSARY.md": "ad19a69727108dd047208b6e76e05f5b1d241620ed75cb241a62fb4c068dc792",
         "README.md": "7af677dd785f95bf08b4a9dbafd10f1b0a2cd9ce40d42edf359ede1e59de6fd3",
         "_artifacts/domain_map.yaml": "c104af1d7610c2cc9d118719170f3a8d0c0cde7690933b1abc7cc124c88b18b0",
-        "_artifacts/skill_spec.md": "e87c0670bc924a1d710a496151ee6d549fdeba920afcede14b8bab432111ebb7",
+        "_artifacts/skill_spec.md": "468aa40b779f75664232df15da8c7804411afbfd2a48e536e11aae954d9379a4",
         "_artifacts/skill_tree.yaml": "da82bd81b41250e02e263147afd7a12ce5379f86cf8b6a9e09895d1227df84fc",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "fcbaca84f266060b946eed9cbf9d0b9815352b7b1d6ddaff5803b29484345380",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "f1505ec3eb35a33fac289706c2cc318a2ffb80555e3302ca102e67e21c9012da",
         "apps/docs/src/content/docs/concepts/http-utility-tree.md": "ed03938167f31822b76efbeac381fd3f8d297061fe567928ee022f8dbfadb9b4",
         "apps/docs/src/content/docs/concepts/queries-and-mutations.md": "f62769112999ebe71a75aa3c22e73380e0f11d8c1f64c3125e2e5e8dba11997e",
         "apps/docs/src/content/docs/concepts/rpc-utility-tree.md": "fd5fcc232279e9577b8b2faf321a85e9a340e6090ea5887bbab208cca2d24a4e",
-        "apps/docs/src/content/docs/concepts/semantic-keys.md": "ae21f39db492acdad4f576c6942408b628124da775e40fdde543a4c8341de5ec",
+        "apps/docs/src/content/docs/concepts/semantic-keys.md": "e76e2443be443d6cda73166cd9a1d7d68db6813b9af4f98e6f1bdf7d7cc8c2e1",
         "apps/docs/src/content/docs/examples.md": "217a98fef80d350becc9fb7472eb120af9ce528e091fa13840bc9531930e5d53",
         "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "74f9d59c908fe6ab70ccfb8940c1f976e060b38a05cc6bbe75f72403d3b3ed7b",
         "apps/docs/src/content/docs/getting-started/feature-support.md": "47de4a30ab91559a5aa4cf211f9da13fa970ad444ee19a0c417efcb289e72bc1",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "f73cc87d44999e85b942b3ef284bdd2d0cf5bbd84cb4e7e3f14e65da185ff81d",
         "apps/docs/src/content/docs/getting-started/installation.md": "0e7d6e608fa0ea049446fd3784350ba635503c0010c12342bc5774b6e7105152",
         "apps/docs/src/content/docs/getting-started/quick-start.md": "43e8837b84df91af5dfe1b989c6f2cd94557ffb038fd1c0692a5bc7342716b3c",
-        "apps/docs/src/content/docs/guides/angular-query.md": "fcce47f32059d4164ae3a0b5fb1cf35922dd2bd5bb5b1dfa38a139339483c539",
+        "apps/docs/src/content/docs/guides/angular-query.md": "3093cdaccb8975047e0df2a56876d1258aff75f047aacaf5eac4ae4719d9affb",
         "apps/docs/src/content/docs/guides/cache-filters.md": "ac17c5bfd460a70988bdb4d7fd702fc96a6d0df46b6e0cd3455ac60e0ab4fe22",
         "apps/docs/src/content/docs/guides/cache-management.md": "72a1943ca0c4171a5d10b5b1667bfbec8b8f07922a1114b40b3457fbdc5c708e",
-        "apps/docs/src/content/docs/guides/cancellation.md": "eb846576e04d8e8fb3030352a8613664773f4140047e6da0ccd002fcb78a7a2e",
+        "apps/docs/src/content/docs/guides/cancellation.md": "922b18e192c0b75ccde3c7c2190f3c87336312f2d29afd73ff75dd0a90233ffb",
         "apps/docs/src/content/docs/guides/choose-stream-history.md": "6996df3a8b18c4fadbcc76a3635a8a5408f155b4068509d4801b38afa7f22f16",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "7770390ad17843b0883968cf35c4aa39054fac7adeceacae731e8899e3cc4ff2",
         "apps/docs/src/content/docs/guides/custom-key-encoders.md": "9a819f6c490234e46458d407e140fb3dc36cb7c67691a8574e8c2f6024c9c046",
-        "apps/docs/src/content/docs/guides/handle-failures.md": "f9d8e9abcf8a29a6d57bb8b2140b8faf02e8550490405eab75a3c2721186f5fe",
+        "apps/docs/src/content/docs/guides/handle-failures.md": "2eded0844b67dd4a54e21000fa516cd1017652004413495557ce8453953203eb",
         "apps/docs/src/content/docs/guides/http-queries-and-mutations.md": "928eb6def0170167e572ebd0e536bfc5cffaf6921c497da6367a6ecfec0841f7",
         "apps/docs/src/content/docs/guides/hydrate-query-views.md": "d71f573e4c6e6815e51f7a63080b773655f90cf9ef07155d293f1550eac091d4",
         "apps/docs/src/content/docs/guides/hydrate-unary-data.md": "0cf27b204e709f8a753fd61fd1510073404611e53a9fd6e82e8122af7e68f2fa",
         "apps/docs/src/content/docs/guides/optimistic-writes.md": "b76e2336f6958e7482786312a15bb9c25a1608c659018c5b4d3162301e767bef",
-        "apps/docs/src/content/docs/guides/query-defaults.md": "212138d564907a75c46a1b8261f5964c63b6dc8a9cbbd74e68e9f5d41b9b5248",
+        "apps/docs/src/content/docs/guides/query-defaults.md": "bb27c896ddaf1a5583b192d5407eeb5f53c26c299e17697991573f3aece5e0a8",
         "apps/docs/src/content/docs/guides/react-query.md": "efa6c38843bbc5ebd827244628e7d2ddaa0f3d67924c99d8ff2a8dcb4b91aa7e",
         "apps/docs/src/content/docs/guides/refresh-from-events.md": "a8e680ae9060a573336829b94dbf77dd32385671d48cd4aa0f092a1374444cd6",
-        "apps/docs/src/content/docs/guides/retry-queries.md": "23fe305768b5779d87a21af4f56c49ef2f03fcc7654ec6ffaf9db46628e3cc11",
-        "apps/docs/src/content/docs/guides/solid-query.md": "91151a68b0205da685a8e545fdc386cffa1c3ac76b6de9be73b19bfb470c19bc",
+        "apps/docs/src/content/docs/guides/retry-queries.md": "8ff86e673cf47fb208f7f1ec34adfd6f57b5580bffc4af49835a563ed159a514",
+        "apps/docs/src/content/docs/guides/solid-query.md": "37fc9edbb245db2e5468649195baa450274e26a99d024be8c2088e96a3156d7d",
         "apps/docs/src/content/docs/guides/stream-snapshots.md": "91e22e85c11d8822e25e5abb7b872b78f07af79fdb16eb2690baf8226fdbd9f7",
-        "apps/docs/src/content/docs/guides/svelte-query.md": "aeb8ba0254920677a3c0a0667d500a1186eb368ae56f16ff848f6edcae7903ac",
+        "apps/docs/src/content/docs/guides/svelte-query.md": "47725e8230c8af9646f375d39cc312c6baa8ccd15a7e9842627755e324840385",
         "apps/docs/src/content/docs/guides/switch-cache-owners.md": "cc209f13becec305af60c9f04fe29f85a2ca6db3bc11601cf09083bc2583d198",
         "apps/docs/src/content/docs/guides/tanstack-start.md": "6fae751389e9b5dfb843235059aea1a2fc885d62f797556de78a9ea77697ddcb",
-        "apps/docs/src/content/docs/guides/vue-query.md": "aff0843b1f4fb76563695e9a1d6050fad202007c4be994b74aff774ab2e038d0",
+        "apps/docs/src/content/docs/guides/vue-query.md": "405bc7b3dc0fb149bac4084be17b18a31a695c4e5fa2fe2fee7cfe579579e439",
         "apps/docs/src/content/docs/guides/websocket-clients.md": "1cd31655e433ced7b24795255cb03280b27734eda58afeb9730a42bfad433c43",
         "apps/docs/src/content/docs/index.mdx": "a141fa2f98d38ea8042ad596c07369b81c9a27935805c17f552db0bc9dd22f6f",
         "apps/docs/src/content/docs/reference/browser-and-worker-hosts.md": "70743a4429a39937515c8d5fee79ca75714a92dd526f1093f9fa8ea12fbde984",
-        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "f19fe01d6ab2fc2065827c23ceea2720bb136f28a35c3ba3759507224bb8b6c9",
-        "apps/docs/src/content/docs/reference/errors.md": "4454725375e05ea7a7d976d798c1c1d0c2731eefc79043f5e40dba88154069b1",
-        "apps/docs/src/content/docs/reference/external-http-clients.md": "4ed288ccf29f3bcdf2e3773172282eefe0ef0f84ed0fd1bc347e5cd388743aba",
+        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "4f60753887b52c33a47b993f0aaaf75832edaeb09d082f2664e2e5e512e568a3",
+        "apps/docs/src/content/docs/reference/errors.md": "a3eda1d28bb90c85bcdccd9594ebb90cf588357d8cd80de39de5dca49b300085",
+        "apps/docs/src/content/docs/reference/external-http-clients.md": "79b38018269ac81fed55330214a277d07d3ee61d127b029de250f75272df3268",
         "apps/docs/src/content/docs/reference/factory.md": "7d972a9ff279ce80164aba793cbeb5a3e1621e6e16be97392b6faa7493de339c",
-        "apps/docs/src/content/docs/reference/generated-builders.md": "eabe68d7cbecc4a15db83a5c97da48321d2ffffbf2d6869ff5323a80b8f205db",
-        "apps/docs/src/content/docs/reference/http-factory.md": "13a238cb7de1fdd5b92f6bccc6061ff4cdfe49b23a5e0b52cc3126f031a6f39d",
+        "apps/docs/src/content/docs/reference/generated-builders.md": "a0e26877f37161a6f083528771035d2ab686b5b92e0fdfca3ebc92e779f89816",
+        "apps/docs/src/content/docs/reference/http-factory.md": "f922f468926a3b33029a7cf8c46564009514392771f3851ba8acd00cbdab612d",
         "apps/docs/src/content/docs/reference/performance.md": "2f68c31cae28de0a84b1ce77f065481d37899171b78d9593ff65e017ff75d97a",
         "apps/docs/src/content/docs/reference/public-exports.md": "500d864720857c9098b325d6018b20b5ad6c1e666ef326921721ffdf6435dcb2",
         "docs/adr/0001-target-effect-4-release-candidate.md": "44119ba9104f767c5804c5026c4a21a78a8367f6d9ff5a9035bb3f423969fbb3",
-        "docs/adr/0002-let-call-sites-choose-query-or-mutation.md": "3ababe863eabf9cc53c70629dfe65af4a82a77e91467e5082041b8c71f93f482",
+        "docs/adr/0002-let-call-sites-choose-query-or-mutation.md": "4244d48ff136eea562aa2f94a0b6b1ab58412796f3ece47a3cf5b43f746e11f5",
         "docs/adr/0003-project-dotted-rpc-tags-into-utility-paths.md": "a99856e94af4004484fed939d46ae4388363031cf396b07f04a92a7119fec2fe",
-        "docs/adr/0004-build-core-shaped-options-and-certify-react-first.md": "3e936951b2987c55d8ddff13e740e4070409c683294040744ed65a2f1cbcb16d",
+        "docs/adr/0004-build-core-shaped-options-and-certify-react-first.md": "a04939a70fc1438dfe7fc467b4f7f83d16135edb8a4397f6e160d00616b605cb",
         "docs/adr/0005-preserve-the-cause-in-one-error-wrapper.md": "1e04885542f22f166b5daa913ae2dae121c407baa775a2c4a16590f96857e3fe",
         "docs/adr/0006-use-canonical-semantic-json-for-payload-keys.md": "694d8665938af25abb91ada71ea9c95cb77dd4ea90019adb2f642e16a88948c7",
         "docs/adr/0007-keep-the-core-factory-lifecycle-neutral.md": "a83dc0d6061ac0328a3ee6075aa872a55feb4f0154edf6dae964e74276bb15b5",
-        "docs/adr/0008-use-flat-prefix-matchable-key-tuples.md": "d2a146eed07be984daca0a4cd8209eb1ca86734b162d5362b5663c50863cd526",
+        "docs/adr/0008-use-flat-prefix-matchable-key-tuples.md": "2a2b5a6971a1841748aa18c326fc2fd5df181572397001753fa44468617eab1a",
         "docs/adr/0009-build-an-eager-frozen-utility-tree.md": "bc3b08a3385f1dc8874d81f867f15ef6c30b203c94936fd991d2941fd5bacc27",
         "docs/adr/0010-reuse-tanstack-query-core-as-a-peer.md": "633a1ce44c8d58b29096f540871b61566352462e1d4bd5335162b3e08652527d",
         "docs/adr/0012-normalize-undefined-query-success-to-null.md": "5d076f168223f67a205138d3e258f1f3aac9dfe5d607ffe8efd12a71322ef022",
         "docs/adr/0014-require-query-stable-payload-construction.md": "2f4381fb3e7406304ff3b914db541419f799f8a71d1d527b37a9e971e9949e47",
         "docs/adr/0015-centralize-the-toolchain-in-vite-plus.md": "d2001383bc0f92363289c04b6b8df26acb5b0f5dfc0163b2a838f2eee8057b75",
         "docs/adr/0020-generate-accumulated-and-live-stream-queries.md": "5e4f5c92e08ffb769137e930908dded993f928a497b018f9c6e4fd4f12232727",
-        "docs/adr/0021-share-utility-construction-through-private-modules.md": "a7d6774a6652735e690e5099ccc7dcad10da416de482068f87b74e6063fe90a7",
+        "docs/adr/0021-share-utility-construction-through-private-modules.md": "821720a3eee166d4b7d42b6f5c3906bb29dff339b4815e9ed1c516bc5af66fd4",
         "docs/adr/0022-add-buffered-http-utilities-with-separate-key-roots.md": "f1fb5d91cd91a70b356bc98b84176920ec822315dbdeaf5e247921853598b62f",
         "docs/adr/0023-expose-buffered-multipart-http-mutations.md": "b72f20cb513d2a7db94b2dbe27576352048ba22288ad6eac6e80d1a7c81cefb8",
         "docs/adr/0024-project-http-streams-and-buffered-metadata.md": "2797a5a4a751c5e37c38aa454c14b99ce1615870ffa13cfcedb98cca8a0af633",
         "docs/adr/0025-use-public-decoded-message-clients-for-server-local-rpc.md": "36df8e1227af22018d5a9063699986ceb8dcfd4c8bb5615aa62557f2ec36e111",
         "docs/adr/0026-keep-rpc-transport-aggregation-in-the-application.md": "b73af29d8f73a36f61f110ad8778e045d37253fe42a8888883e78089b93e955e",
-        "examples/server/src/commands.ts": "62d60db1094eaaa3e927899431800daec6f9cd1f345509ec324f3369147d9e06",
-        "examples/server/src/diagnostic-operations.ts": "9ea6dd3f5243888b251bb64f534e3273253b79daf1c623edcc0f5034e627d049",
+        "examples/server/src/commands.ts": "58f415fe0ab9bb0127c96c11ef0540a29b97d231eebd3a487513f0820a46b3d5",
+        "examples/server/src/diagnostic-operations.ts": "ddf8a0f2367b91ca08d6aaaf58380a51b77a5c51a9a85412bd7e7080ff0453ee",
         "examples/server/src/domain.ts": "c00fced49e54d7bfff9045479e91aabdbd7c0868cc89afe00bae5473b17d2f82",
         "examples/server/src/http-handlers.ts": "601f37c428015e75e94cb282af356878aa49c887804cc29e2b4f0c1a47ca92f0",
         "examples/server/src/index.ts": "9e121809a5493c649e61e76fefec52a8c79a394983368060a95dc7000dcedc9a",
         "examples/server/src/main.ts": "de9520cc16e4bff9d02b8507ee70641936b1287959823429f7759c0f05fdc0a7",
         "examples/server/src/rpc-handlers.ts": "c2c57eb9a2ca5e602fff9f798c4d5165e91216c5b7e64e0a71220c4ba9316f3d",
         "examples/server/src/server-local-rpc.ts": "de2a05bba54042f1d2d5781023cb5d20eb63915dd2a52635e9debf83911b5421",
-        "examples/server/src/server.ts": "eab2d80d9e6ecc4c74b89a50223ff968bf5b98da72d9aece4e726c0cfd6832e8",
+        "examples/server/src/server.ts": "5c9bbd7131ba3c55bbd61255fa8da8a275fc97412e1c8cb54f063bde517991e9",
         "examples/server/src/users.ts": "15c363e2162f8dab4da1bfcf6324abbb3dc8ca34a8d8e036eb4db2481fe6be5b",
-        "examples/server/src/web-handler.ts": "55447fe9ec14213d3d69811be11c9d6d6b266d50cf37b57dd5d4870132905523",
+        "examples/server/src/web-handler.ts": "2de54d8d2264024887ca63c8c53b20e9f9260ca6605b791d1f91bcea8c8d1b07",
         "examples/server/tests/fixtures/websocket-server.ts": "b59863766bb60e5fb4de040d7d97ae2e67bca2ec44810ddc577f4cf5cb03129f",
-        "examples/server/tests/http-api.test.ts": "0e4ea6656cdc67d4fb29710cec1d10af505f7dbb3bcd3d85947f7ed19c220df9",
+        "examples/server/tests/http-api.test.ts": "6ad2951b74c45a73ea4980e5da65c7ed4f758ff43db34702f1224de934548bca",
         "examples/server/tests/rpc-transport-overhead.test.ts": "8d3dd40cfbbd0ce64b74f44f205f7f83163ea08dfc264a6deb1902e96b74a7fb",
         "examples/server/tests/rpc-websocket-consumer.test.ts": "16253ef720e8a85cb7c583bcf6f9883c5893423d6da952659731e5823fcf0a62",
-        "examples/server/tests/server.test.ts": "e36862bcc44433777c78e36355efea2779c8e866a0e63c9a5cf8fe2d5e86d673",
-        "examples/server/tests/web-handler.test.ts": "e32f61699348bb483adc15d9d2fc69663402767a7cfa893506c69758150313f0",
-        "examples/tanstack-start/src/lib/api-server.ts": "7a1d9e860dc1c77b17f8ec1dfa8207ae5e5b4d53b287e7c76e2ee4138b605779",
-        "examples/tanstack-start/src/lib/application.ts": "5f2eeb9920fa77b18dc7ad00a2688fe9225bfd2c57db35a5040b0a38e299ec71",
+        "examples/server/tests/server.test.ts": "44530f1e8b9b67f4d4bd8486c7bd7790240128fb161c1244857eee15c87a068d",
+        "examples/server/tests/web-handler.test.ts": "94d1b28810d908dcec8ca8299e56bb520f93804e8761b4d5e9c828087efae646",
+        "examples/tanstack-start/src/lib/api-server.ts": "b678d6edab872786fb92db328f60095d604c8d2f5205c4d4a462c3405a782bad",
+        "examples/tanstack-start/src/lib/application.ts": "609e2d9ce04f24b1a1795650a49bfac139b9a28e8158234630c0845d2ace6392",
         "examples/tanstack-start/src/lib/query-ssr.ts": "0754abae5faf2f7562e1d86d27df0e14820a5ba9830146690ff1dc9f5beb3ec9",
         "examples/tanstack-start/src/lib/server-application.ts": "442278fc08c4beb9a69cf1ab7672f661385d9c49998db77ce2870d349ffdc8a1",
         "examples/tanstack-start/src/lib/server-host.ts": "1682ee37ea7551ec52c9530d6a4b476b967fa0572f5ddc26351ad427ce854e37",
-        "examples/tanstack-start/src/lib/snapshot-preparation.ts": "b50f578ff0aaf5a6301df7323d0b3ea1e3fdcc27f65be0cf706a73d790203fd7",
+        "examples/tanstack-start/src/lib/snapshot-preparation.ts": "eb9d9e422626d5d392fd842610c26de5ae517a6b3bea5cc93ea423fc3f942ff9",
         "examples/tanstack-start/src/router.tsx": "801aac19cff9a4e2a4acb0823a9ea5c28b4aea9245f7e26cb63548bb5234bd15",
         "examples/tanstack-start/tests/application.test.ts": "81f9b44df80dded727f1fedf51ffee2df2c7afd7f25a68668a263deb88cd3ec1",
         "examples/tanstack-start/tests/async-hydration.test.ts": "1f983917d2a469b83b876e882ad6a2ece4d28d360338ed614232807a168a1620",
-        "examples/tanstack-start/tests/client-navigation.test.tsx": "e91e23be9c5695035462fd5b27a1c1d627bf6d1d0f6a8124d45ac1bc220db416",
+        "examples/tanstack-start/tests/client-navigation.test.tsx": "62af6b9c4ad00e2bd772a0eb75d175e11329079bc787874b0d87e7f22030620e",
         "examples/tanstack-start/tests/failure-dehydration.test.ts": "b9d135c54e8e70ff454903f8016e6560fabaa487095cb40cb8725ed73577f079",
-        "examples/tanstack-start/tests/server-local.test.ts": "a2bbaf6cfad8701e2f8912a07c6a9f3d91a8d8ecb394a94c09d25289134576c9",
-        "examples/tanstack-start/tests/server-render.test.tsx": "01061f209d72df769235c47bae552402e6c9a692c95e67267e4317b2e338b8f5",
+        "examples/tanstack-start/tests/server-local.test.ts": "2facfdbf572cf8ed1cf5f6104a503504ab0e979546aca3e28d9dbc853c64c6e5",
+        "examples/tanstack-start/tests/server-render.test.tsx": "77b82127f9e3ddea55b201f7b2080f930ef340269010502f1515f6691ecc4ab2",
         "examples/vite-react/src/app.tsx": "691f77aee6fb9f2b1f6f9df40a3afcf78f4af2d043d7b379f38c75c647a5f91e",
-        "examples/vite-react/src/lib/application.ts": "c3fe076813ec5797de9e93274b07d07312e830cfa0998ae2d174191bc1c7d3fb",
+        "examples/vite-react/src/lib/application.ts": "0467aaf770fdb75095898c78c8cb243a2092cebb2a31986610cd7945e7f6e993",
         "examples/vite-react/src/lib/owner-cache.ts": "563f1758f6f387768ba8f068e02763fa6b1bd30ef84d59e8be1938adfec7eb26",
-        "examples/vite-react/src/lib/user-writes.ts": "46d8b7b5f02447344309a80f068bf045d71997d3dc40402dede9d835b6e36fdb",
+        "examples/vite-react/src/lib/user-writes.ts": "a746bb972220cd55b6bc1b6ceb8161bc01993506430082560f104d63244ec16b",
         "examples/vite-react/src/main.tsx": "cdee6ca4095b58e1750015db473bda8651702a8ab32c408fa77961873db0e6fe",
         "examples/vite-react/tests/app.test.tsx": "ff86b42023eb40658dd6feccbfd1f236a75bf2831f40b02955ebc1306be6329c",
+        "examples/vite-react/tests/commands-ui.test.tsx": "70005a656b9356fce97924dff6d4be82d87893cf48a619c119ad4372843246f8",
         "examples/vite-react/tests/commands.test.ts": "3e24222572c0f7a4b68cfc4069c545cbebf410cacd0063a328cead9ad5baab08",
         "examples/vite-react/tests/owner-boundary.test.tsx": "d4ce58a002aac2b8f752936a65495558f89bff145d5cf2556f5c0d9286f8d6b3",
         "examples/vite-react/tests/owner-cache.test.ts": "8818e30fdd3071a2e5dc2d865161e0d9f40de1ff37813b0a396bb2e83dd08a1d",
         "examples/vite-react/tests/owner-switch.test.ts": "c997c9758269586591cbf55de4651c64091abc9061b56edb024dcbf9dbaa9c1d",
-        "examples/vite-react/tests/user-writes.test.ts": "2492f48018e7d8e684eae1c8d302acc9961a1bfbd60bf3214c113dc1b6fbe54a",
+        "examples/vite-react/tests/user-writes.test.ts": "e104afaa57a9dd47391ac1da08175e8f7dae03dfd151edf9c9fd570bba816ae3",
         "package.json": "dc41aa3f5b1633ffb2e6f6a0b7efb4e0119d74b9bc8c0003b1a8ee5fad854782",
         "pnpm-workspace.yaml": "58fd69fb2ebc237bf589893fd3150ec0dd25988aee57f465f5b373b038aee606",
         "scripts/decode-utf8.mts": "2e90c53e95c22b864a209a87c98084db6ec95e83f842007b21528d286d45c18c",
         "scripts/measure-construction.mts": "10522cb10ab51fd44d8990896a2a73e8bf4d4cd2646441e958b6180cb1afd147",
         "scripts/verify-docs-examples.mts": "b20cdbf909f68c177125ddbc69e86d4244571ac5faebe505fa43cdf2faa34d91",
         "scripts/verify-packed-consumer.mts": null,
-        "skills/effect-api-query/SKILL.md": "1939a0f7536f3e88e1e1106e8125019c11d6fdd4ada8ae4d010507f264b234e5",
-        "skills/effect-api-query/references/cache-workflows.md": "27bb96c48c84254ab8c379a529402f81cea3723c17d6396527c090a8c37e6f65",
-        "skills/effect-api-query/references/frameworks-and-hosts.md": "8b39b303cf3a9ae3222a257f53df5f9696b80c54859765f2c4d7b39554b8719f",
+        "skills/effect-api-query/SKILL.md": "ca0822b4c5172bab93179c6885ffc1a64f434fce30d7af14d307d5492eeb90ed",
+        "skills/effect-api-query/references/cache-workflows.md": "e62daab7af8b3118962d1c0d8b5212927ffb1fcf4abf44ad9489ae695a0ed4b6",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "169ff6847997b4cdf49c4984e87c393876973c0ca28e7b0b9c3deff4bbbd8a8b",
         "skills/effect-api-query/references/http.md": "9625411753fcc3ce816512f80158a19aa1057518ab3bfde98720e0cc7f845b66",
         "skills/effect-api-query/references/hydration-and-ssr.md": "61e761b36ebcf56c7cc1b67b3d795edba52d0c0224c3e7964297ed6864e1b044",
-        "skills/effect-api-query/references/query-patterns.md": "5e20137ffe4b951ccaf41e869a7ac097633f91cb52ec44799ecdf47b4ba3883c",
+        "skills/effect-api-query/references/query-patterns.md": "69d58f67745a6ead7d86729cb8d137a22c0ce4bbbb31c0cc016dcb3fa428c6cb",
         "skills/effect-api-query/references/rpc.md": "f77eb39bb1b3e1f5f8c56f4b827ecef350a255a23380d8b9515dc61b54165d5d",
-        "src/core/operation.ts": "3b00c20d4f9cfa38b22574953804e7dc4648e912df74bfd5469c657ff5cc6e35",
-        "src/core/schema-key.ts": "6e3ec8e7aa089ab6d2a85e71880f9bf4985f572b28e0b4325fcb0eed00b5dfd3",
-        "src/core/stream-snapshot.ts": "abd83051df4e7fd3e4de5f9147b029993d59e19e5dd72ee7b73d40ebae12acc7",
-        "src/core/streamed-query.ts": "34ed5a18daa8c5aacdb5fbfede925b1bd84baef1f9e0580e0a8035b7cfde0eb1",
-        "src/core/types.ts": "ae7ad2d99e24cb7c98e54270ce2698ff8db4d21750e967d11ed4d9653a5e6264",
-        "src/core/utility-tree.ts": "5c0254aa71724e1a529fd090891fea5e853b0ff4e3ae0ae3eac265df1e8f9a83",
-        "src/http/create-utils.ts": "d989ce2b8c0b0fda6e3dfbec76babe33f30a60aef8f0028f3009b9367aeb21e2",
-        "src/http/errors.ts": "dbe4aa9a4ce8c5c996f914387e9ec61568f774c5ea5a585c4f9480b13f97706b",
-        "src/http/operation.ts": "be425a2829e1ab16d5b07b592ddde76d3e611b5670567030e17afe10ca4c202f",
-        "src/http/request.ts": "2416d809ab164a68b67627456686e52a6a49a5173790e652d129dcd503b1d424",
-        "src/http/streamed-query.ts": "ab4b9404db54fe5f77894c87bf7240474c4c7a00de12b3fe18914b67005e08af",
-        "src/http/types.ts": "e63f305feae5452bbe125b46cbfc6ebaecabdf72c224ec6d4732daa798e250d9",
+        "src/core/operation.ts": "7dabe4d21070d20534643e5051060c84a09db5a7aa39858e75846043f8a537ea",
+        "src/core/schema-key.ts": "f86690bd0ac063199f3207ee398e87dd8210601d1496ebe21844099a597f1946",
+        "src/core/stream-snapshot.ts": "00bf4855cc745571ce440a9afcf7a52134450de9ced00007e4cd2cdab8e544d1",
+        "src/core/streamed-query.ts": "cb94aef5458ed04ea90aa7b60bc187d171f15f911658848354753c2029f6a17b",
+        "src/core/types.ts": "4fe7d3e2d9760fc8b226846c1e67fcd431dbf2f26b77d782ed66343f10c6afa1",
+        "src/core/utility-tree.ts": "d8d788f370002b3f6058949130438b1e1f6f6a3b2f9e5eac4489526940af5f21",
+        "src/http/create-utils.ts": "785dd9171fd9c6ab7619a9e3728f91a3e9d197c311a3a6c8a6dffc74904a4975",
+        "src/http/errors.ts": "95869413973faefd2958f4e48feada7d5700e3aa0c2545f56a7202c8b9609a46",
+        "src/http/operation.ts": "7679702ebb65b94e1d3bdd6fce80213248e50cda32038402852c8b80964b7369",
+        "src/http/request.ts": "9d31397ee4241319ae56260c65e7fb4973adcee974b55e43e2895e7524d39180",
+        "src/http/streamed-query.ts": "186879ad046d841960d9ead272958659c45becfe0fcd7fd35fc41f8c2056aaa3",
+        "src/http/types.ts": "57394bbce9225f8df5746b9ccfa37ff4d80e2ee8a770edf683082fa2f06d405f",
         "src/index.ts": "95300336b198d7cec9a0113597970f462cb431718be9f2aae0fd64402b6655a4",
-        "src/rpc/create-utils.ts": "74edcb07d0c13466cd1d1b1343eefb91110e3d1ffb299cc4a92310a025d690d8",
-        "src/rpc/errors.ts": "7e4fbde05e6dd3647f8a12f524a659b5c378ee27092ae4e28151effb7b2feb88",
-        "src/rpc/operation.ts": "a0b34e68b4054d55b10936737cfef1617fa12074610e5147c912cab101ba7c9e",
-        "src/rpc/streamed-query.ts": "4e2588fa629b4332a13f921f900ed2580343831adc6c9d86769c830f2ac66545",
-        "src/rpc/types.ts": "f5fda172e9746512b1c51082eebaee7b5a16bd8b382d59b51ed80e07e8e552e3",
+        "src/rpc/create-utils.ts": "c0db42f6d9962b6c2e291f2b3d060be16ba7fc93826fa00471db5d82503e27dc",
+        "src/rpc/errors.ts": "7048a786a55f2cd221788485ffa993277f47896110ffac742f74ee077382377e",
+        "src/rpc/operation.ts": "e46cb103c4a79506cecb34c9337640ec9ab917a488e9360c7535d3dad733ebf5",
+        "src/rpc/streamed-query.ts": "554ee2fc1a833c6c6f3d97c132da66b0b86d524be56c3589511b564303e81856",
+        "src/rpc/types.ts": "94a154bbc38d1996beb4fde2f11d2fabb86d6d4c2f47f6fce417dbd1ec2dfda2",
         "tests/cache-recipes.test.ts": "5d86c8f74e952aa6f614d9ba32b4f2680137d23b696d8c55cd07d0463e5b65b7",
-        "tests/create-http-api-query-utils.test.ts": "a76295644389a37e1a00a9825d192cbd0dceeab7d43e7ad1196c171ef5059ad1",
-        "tests/create-rpc-query-utils-configuration.test.ts": "839191fd31986c13f77585d191d643599426ce3294a930af421a26439b37b664",
-        "tests/create-rpc-query-utils-execution.test.ts": "8556cd62ba1ecdcc130c9a5d35f165b60d18a9c6f3f8eed30822f213ecd57e73",
-        "tests/create-rpc-query-utils-keys.test.ts": "e79abaa3659d9e212d1a1b3b923abe3493fcdb1d1ab5c92cd895df199043f9da",
+        "tests/create-http-api-query-utils.test.ts": "afb7890a6f94a12fa51c5e3403e2886d01fe3d7c267534339282ec3e8c338c96",
+        "tests/create-rpc-query-utils-configuration.test.ts": "d5e7b5ccd4ae102c6e7cf6b99bbd161dc029380b04e1728bf1d3714b1bfcbd36",
+        "tests/create-rpc-query-utils-execution.test.ts": "05a0de82218666f39cc6ac2d120f2b2e96885e9cfc9323e5ccc658ad996da2c5",
+        "tests/create-rpc-query-utils-keys.test.ts": "c6b6918e08c10f097634179e65d0e8eb481ff6833561b04de8e6a093104fee31",
         "tests/create-rpc-query-utils-request-options.test.ts": "bcd76859a2830e522bdeb212be70f2e14be3b815da75a5caf3e596fd5fbd13e7",
         "tests/create-rpc-query-utils-server-local.test.ts": "45ee329a736bcb6b114727ef8874f3f34541ce6dc55d5e13ffc80be9c2af2ddd",
         "tests/create-rpc-query-utils-stream-baseline.test.ts": "cec0a8906b3512e38c0272dc07a4cac81402ac014549eb11f24a594d7b792616",
         "tests/create-rpc-query-utils-stream-cache.test.ts": "b97fd6eb63c0e8c023f98a1420555288c3dd2f4ab500b0d3e0b1d3a5c41e1347",
+        "tests/create-rpc-query-utils-stream-hashing.test.ts": "025f15582fe2a667dc6383a406d5b42654ea7634acf3591803d9f379896a69bc",
         "tests/create-rpc-query-utils-stream-publication.test.ts": "cc3a25d02015b1410a8d1406249a846bf711f7b829fa7fccce1da90e600530d3",
-        "tests/create-rpc-query-utils-streaming.test.ts": "07a2af009d755f6025d5329f1edf4c1d40dc1ce090dffdadf023c5ba812353d0",
+        "tests/create-rpc-query-utils-streaming.test.ts": "4f38bc56aa04c96709a96f37ba697265cb7f1992e00947f4d18f41615394bf7f",
         "tests/create-rpc-query-utils.test.ts": "786032f34d1b3386373901714de9f5e7f5a1d42cb7d29cf79cb9d224d17c0624",
-        "tests/fixtures/async.ts": "f9ccc474ad87dd5aedebc5660d74386de6551dd5f8900d572c485c11054ff6b9",
+        "tests/fixtures/async.ts": "61c314b76032dc197a7568b0602740d06eee0462414516788c699f1a7263114a",
         "tests/fixtures/docs-websocket-use.ts": "6e2aa0bb7b1a653ffc215bad7a39b9a79aa1a9b3707bb32b1e80f4636faac544",
-        "tests/fixtures/effect-rpc.ts": "73be762e670e37e4cc3cfcc2b1d40724f23721726d75b45524ad0b3aba78eb61",
-        "tests/fixtures/http-client.ts": "a0a77029f4c786c1616f24ce6aa44120de40e243d3dc5570d85d1767bb527a11",
-        "tests/fixtures/optimistic-users.ts": "34d06822585039f33d2f9df7bceb866d36acbeff7f8ca7ce30f25e5e37975ba3",
+        "tests/fixtures/effect-rpc.ts": "8a92d7b5e815012f830b7e87a8492b2680d8a1b8fa866c3db25274458d432745",
+        "tests/fixtures/http-client.ts": "184cef6b4864d32f1225149161e12d4286517a34c74eb0ba0a2437ff5f333891",
+        "tests/fixtures/optimistic-users.ts": "0e5363c07c5022da24c9d7753cafe646eadb99da8929a07d6e4469516d93b5ec",
         "tests/fixtures/query-cache.ts": "ee6509aac5d0cf4f781652da10c2b1c3501a222ddd9a6b05f447e6a226548071",
         "tests/fixtures/rpc-transport-queries.ts": "46be1d1e6048d57d83e9ae64b00c8c0c11deec6a67d0d4b115cdc9aac7447158",
         "tests/fixtures/socket-client.ts": "d2d0a4a31011e2cfeec0e7e7ca996ad752a3a51db5675ac5efce54d284c8db89",
         "tests/fixtures/user-events.ts": "13d8167b811bec6319de96f7cb50410f586c18cc92677d7fd17488b16d15b329",
         "tests/fixtures/websocket-checks.ts": "7b8035264ece4e501e829b3e2b755f9d7b17c010ffa1036db6338a368ff6f93c",
         "tests/http-cached-views.test.ts": "3cdf4e8895fcb0e511ccdc6c49abfcc0318a82038844219ae88f32b28f2d3df6",
-        "tests/http-execution.test.ts": "d5869dc2faef8f2edf0f721173f40b352f1b2d70ef19919214a342b3bd82ea18",
+        "tests/http-execution.test.ts": "d7a2070dc186cae08e0c97d9d7045ceb2776b622fbe8fcbcd3ba65629b24ae75",
         "tests/http-hydration.test.ts": "cead9c149e9aecbba7121b4e6bcfa3450368d24e6320ba1b8825545db747b98d",
         "tests/http-live-query.test.ts": "79df219cb204669520c584123f167479ea3fa514d899897bf2810a04e8e1ca65",
-        "tests/http-multipart.test.ts": "ff816ffae79e827883cea1d1f99f5f763e95c9e856040627a34818df6569feb1",
-        "tests/http-query-options.test.ts": "62db987483d1fa468a62da899a1938296f79e9ac37c8d57890f898b2d66bf0b2",
-        "tests/http-semantic-keys.test.ts": "2e78788697bdf7efec374669d8123da57c93df3c368d41920decfcd175bc2359",
+        "tests/http-multipart.test.ts": "cfda4574a8b10bfcf1b38c060f37d6791d83d94a01640edc8f85c468e45cb3c4",
+        "tests/http-query-options.test.ts": "e6abd4020fb4fd11877802c42d07ffb6f66822120d409c885150e97177769386",
+        "tests/http-semantic-keys.test.ts": "df50b9a0cf6981594100c93ca4283eb8ca11e7aca4db8719b4d7bd9a4333cd16",
         "tests/http-transport-cancellation.test.ts": "e56f8571f949adc9d44f14b61e20edddb188a9565bf7a585859ffe73a851ac39",
         "tests/http-view-proof.test.ts": "4dc91c38efe5b0c643ef61c98dcdf4a89acf4ef4c1651030124d82ca6cb55a61",
-        "tests/stream-snapshot.test.ts": "c419902fad27b91205ff5e4b65510ce9ed0c3d0969300c8891f1bc314a7ce0e5",
+        "tests/stream-snapshot.test.ts": "86449ef5d0f1baf165a5c973fcd0a190b9fce8ae5b6e8732a4454ab0c9f6c132",
         "tests/types/docs-http-quick-start.ts": "5f7eef98be244ea392fc2c5b527858f159a08efebf6f2665725301aa8a910050",
         "tests/types/docs-hydration-async.ts": "de67135bf3da0dffdac47e9f2e49469edddac3d7d026fbd93d39aea6964c0dd8",
         "tests/types/docs-hydration-dto.ts": "ebcd5c3895e8fa40bff3b62e8e13213e98a3e1c4796d89979b23ecc64cdc13ff",
@@ -390,33 +395,35 @@
         "tests/types/docs-stream-snapshot.ts": "bc924cff90a9f9a8e416bf7fbdfedbd607c88e7a678435aaf20ef878862e06ff",
         "tests/types/docs-user-events.ts": "87647140d5434b95cc5389b1fea9919f20df7b6fcee4f00565836a4eae549a70",
         "tests/types/example-owner-contract.ts": "fb10bd087ee582a64806d110404c366cb74e520b0b8cc11701348036b08b9622",
-        "tests/types/http-contract.ts": "3dd9e8c02b6c7039942fac3e578a3c2a848c2e1495efa87f658e025225b9cce9",
-        "tests/types/http-stream-contract.ts": "4c47b65a5088ae292bee39d5ec5df8df007aaa90c94fb2af5d01239c3f850017",
+        "tests/types/http-contract.ts": "d5a8cc93a22186a6a4bdb3cc264f3739df6527e87bfc7c672f22b46fd18403cb",
+        "tests/types/http-stream-contract.ts": "24031e37ac8cada4b8e9d3b2f4ce6e08448780571d94c8002bd8b267caa320bd",
         "tests/types/http-type-scale.ts": "b456543b88316a2dd899f929efbffcf514e54e213e109b5f7d52eb785d2255aa",
         "tests/types/http-view-proof.ts": "f42a1ebf36eeab7a906b722f5d2c2af0aabe8d30ef378fc50386c16d464fb64e",
-        "tests/types/public-contract.ts": "475048059f5f509008a119a6f0305fca018f1fdcc19c35f63df070a6bc7b9bf5",
+        "tests/types/public-contract.ts": "5bf988c06b41bc009b143f57371f9b347af8a2d7ad6ff3c88f1d70833972c5fe",
         "tests/types/server-local-client-contract.ts": "443a60788ce7d91a77459c99f07d3fc9bf70d5a64a83c05ece5c40cfac63d298",
         "tests/types/snapshot-contract.ts": "9e6a2edaddb7545f20d351511ed99be2828d4ca56779503bcc443963d8b73716",
         "tests/types/tanstack-start-contract.ts": "51681e3d0d7504a614d490f18adb6f44db82d34b9d4d7cb9cf941aea33de284f",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "eac8805641c1acde48c4414dda2abe7042d1b795",
-      "outcome": "no-change",
-      "reason": "All three planning records remain accurate: domain_map.yaml owns input-field skipping among the same ten tasks; skill_spec.md keeps the six-reference scope and current validated architecture batch; skill_tree.yaml maps the corrected RPC reference to the same shipped skill. The correction adds no task, reference, package, source mapping or ownership decision.",
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "outcome": "updated",
+      "reason": "Updated skill_spec batch history for the audited behavior and actual check results. Reviewed domain_map.yaml and skill_tree.yaml: the same ten existing tasks, source mappings, six references and package-only distribution remain accurate; no new domain or independently useful skill is introduced.",
       "evidence": [
-        "Read _artifacts/domain_map.yaml, _artifacts/skill_spec.md and _artifacts/skill_tree.yaml against the one-file human-reference diff and current shipped query-patterns reference. Native maintainer sync produced no content change; uncached documentation checks/build passed (reference-fix-docs-build.log)."
+        "Reviewed all three shared planning records against the public builders, cache workflows, request lifecycle, hydration and framework guidance. Native maintainer sync reports nothing to synchronize.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
       ]
     },
     "source:vite.config.ts": {
-      "fingerprint": "c7e24b88d6cc661478533082a2dee8d4736faf1debbe74b9275cd7f75ff137ef",
+      "fingerprint": "bcbf70904051b7cfa515304490b57adddcebca804881f06ab864dc8f6eee7239",
       "snapshot": {
-        "vite.config.ts": "3a5ac2f87cfc9bca499b63c0d283319b91afd9b6db672b60d11bdebdff93138e"
+        "vite.config.ts": "b48031f5feeae54b990ee8621d7b46aa6134b40d9c0123dfbbfe38db7cee851e"
       },
-      "head": "bf38d8556744d8e45d459208cab6fe9d1b78b356",
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
       "outcome": "no-change",
-      "reason": "Removed three redundant prose lines preceding the existing generic-erasure lint policy; all rules, tasks, checks and packaging behavior remain identical. No shipped guidance change follows.",
+      "reason": "Allows comment-free assertions and intentional empty catch blocks while preserving typed lint and Effect safety diagnostics. Consumer guidance and task coverage are unchanged.",
       "evidence": [
-        "Actual bf38d855 diff is solely those three prose deletions. Uncached typecheck, compiler fixtures, ordinary runtime tests and native build prerequisite passed; no check was weakened."
+        "Reviewed the actual diff and current source at vite.config.ts against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
       ]
     },
     "source:.github/workflows/release.yml": {
@@ -461,20 +468,16 @@
       ]
     },
     "source:playwright.docs.config.ts": {
-      "fingerprint": "88742c8a9cc26dfe39f3825c1cfc869c1caa5254015c82e42eb7a285d9e2b938",
+      "fingerprint": "9ec6628f761e4c0bfe5d7a1575878947a037f5b9a0b21bf7dc8c2fd8e2343c41",
       "snapshot": {
-        "playwright.docs.config.ts": "1e4d72ce40ce1c640abc1478f9897ffd5c2c3b03e28b012c85b79e5f89f4d7e2"
+        "playwright.docs.config.ts": "395f4dc3c46154c74a8134ed21460bc155d4886bdc7cf3525b1e128e11302065"
       },
-      "head": "4ea1e4329da229c4c9853ddc2f6a50a6309afe9e",
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
       "outcome": "no-change",
-      "reason": "Config reads preserve missing versus empty docs URL and CI values while retaining the existing docs browser server and assertions. This repository-only configuration requires no shipped guidance change.",
+      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
       "evidence": [
-        "Base 4ea1e4329da229c4c9853ddc2f6a50a6309afe9e; actual changed sources and native review fingerprints in this report.",
-        "Uncached typecheck: 135 files, zero lint/type errors; strict Effect diagnostics:146 files, zero diagnostics; runtime:262 tests/34 files and both server compilers.",
-        "Fresh packed-package matrix:26 compiler validations,21 runtime fixtures per peer,4 frameworks,12 diagnostic cells,18 construction cases and6 bundles. Selected archive SHA512 437c863fbae5d097d5947330524c004f1bf10e33cb1334fc245818be36ccd1d969458c7ba1a0eb135326f4f7c4030cb22518bc8aa08d8b03e8d543353f9b2876.",
-        "Chromium/Firefox packed Window/Worker:4 tests pass; native app/docs production builds and docs parity pass.",
-        "Finite command probes:11 real-host cases pass, every owned child exits and temp directory is removed; six actual bundle gzip outputs match complete prior native level9 bytes and exclude platform-node.",
-        "Fallow, formatting and native skills validation pass. Native sync reports nothing to synchronize; guidance and all three planning documents remain byte-identical to the reviewed base. Root owns final managed all-engine and Release provenance acceptance."
+        "Reviewed the actual diff and current source at playwright.docs.config.ts against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
       ]
     },
     "source:tsconfig.json": {
@@ -490,17 +493,16 @@
       ]
     },
     "source:.fallowrc.jsonc": {
-      "fingerprint": "2c6bb6ebb6e814610554e636e2d203764192734a848111efdedaf145cc0b62f6",
+      "fingerprint": "fe993f492101c539100e9141bf1e7a35ad325dff972d4c4b7b957ebe29a344b3",
       "snapshot": {
-        ".fallowrc.jsonc": "c0b0ec773be6b6247fd4e7a1db0229965323d01b40236e05f1fa7c3cbb0f95a1"
+        ".fallowrc.jsonc": "fdc2e4edfe73b037a8a08c28692035a357481a9bb69f18e29b6e8357be56d110"
       },
-      "head": "2e4ecf18e93a4ee086d74102c3addb5e2029be56",
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
       "outcome": "no-change",
-      "reason": "The explicit ignored default-export path now names apps/docs/astro.config.mts. This preserves the existing framework-tooling export exception for the same unchanged configuration; native Fallow entry/production checks pass. No library integration task, shipped guidance, or planning source mapping changes.",
+      "reason": "Removed private explanatory comments without changing entries, exclusions or audit policy. Existing library guidance needs no separate tooling task.",
       "evidence": [
-        "Author base 2e4ecf18e93a4ee086d74102c3addb5e2029be56. Rename apps/docs/astro.config.mjs to astro.config.mts, remove ts-check directive, and update only .fallowrc.jsonc ignoreExports path. Installed loader evidence: apps/docs/node_modules/astro/dist/core/config/config.js configPaths contains astro.config.mts.",
-        "vp run format apps/docs/astro.config.mts .fallowrc.jsonc passed. vp run fallow passed entry/production dead-code checks, duplicates task, and health threshold. vp run docs-build passed Astro check with zero errors/warnings/hints and build of 44 pages with valid internal links; unchanged documentation example parity was a native cache hit. Logs: /tmp/effect-api-query-implementation/notes/astro-mts-*.log.",
-        "Read _artifacts/domain_map.yaml, skill_spec.md, and skill_tree.yaml: existing library task/seam/ownership coverage and source globs remain accurate; no library behavior, guidance, dependency or installation change. Native sync changed nothing; review reports no owned skill/planning drift. No new independent consumer or browser execution is needed for this repository config rename."
+        "Reviewed the actual diff and current source at .fallowrc.jsonc against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
       ]
     },
     "source:.github/workflows/ci.yml": {
@@ -982,16 +984,16 @@
       ]
     },
     "source:e2e/tanstack-start.spec.ts": {
-      "fingerprint": "ed1590bcfc4446b7fddb2924b2813b63d04124961f04f3ffb96fa2b719498b24",
+      "fingerprint": "326d8bf63a3852af4e5b276be477e3af235569ab15d12ed975e65c1507baed43",
       "snapshot": {
-        "e2e/tanstack-start.spec.ts": "b50a8fd958cce8e66c3081aa0e7d2a4e759e67580efc3d8da6d7c251b36c6fcc"
+        "e2e/tanstack-start.spec.ts": "ea1e5469e782796d5ab68b443b6d21bd460691d413ba15bb83fae5024fd1981e"
       },
-      "head": "6893603eab70bd9d67e9848414eccc8a3421d870",
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
       "outcome": "no-change",
-      "reason": "The added reload assertion verifies that the shared directory mutation remains visible through server rendering. Existing hydration guidance already requires matching representations and independent server/browser owners; an acceptance assertion adds no new consumer contract.",
+      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
       "evidence": [
-        "Reviewed the complete test diff from 5b91ddb to 6893603 against skills/effect-api-query/references/hydration-and-ssr.md.",
-        "Source 6893603: CI 38085762210 passed source quality, both example builds, documentation, and Chromium/Firefox/WebKit acceptance; saved final-mts-ci.json and final-mts-ci.log."
+        "Reviewed the actual diff and current source at e2e/tanstack-start.spec.ts against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
       ]
     },
     "source:e2e/vite-react.spec.ts": {
@@ -1008,29 +1010,29 @@
       ]
     },
     "source:examples/tanstack-start/src/routes/index.tsx": {
-      "fingerprint": "a56fc6c1a96f303b4dda65d866efc454add3b44c6e201b1a62a2e53b94a3e513",
+      "fingerprint": "a04a3037d3d997eff9b0aa1ec7c5915f79c7d28dcfbea1588338553b3e41d733",
       "snapshot": {
-        "examples/tanstack-start/src/routes/index.tsx": "857ac39eca9264b8df23814108092540aea6409b94019b6ed14c88262b1ca937"
+        "examples/tanstack-start/src/routes/index.tsx": "3118b095cfdde95ce04dd63f92a5213007e052d2fa0886ca0966ec0e7d6afcca"
       },
-      "head": "6893603eab70bd9d67e9848414eccc8a3421d870",
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
       "outcome": "no-change",
-      "reason": "Routing stream capture through the request context tracks the same snapshot in its owning request lifecycle. Existing SSR guidance already requires capture/preparation settlement and local finalizers before disposing request clients.",
+      "reason": "Count loaded users directly across pages without allocating a flattened array; query data, ownership and displayed counts are unchanged, and existing framework guidance remains accurate.",
       "evidence": [
-        "Reviewed the complete route diff from 5b91ddb to 6893603 and skills/effect-api-query/references/hydration-and-ssr.md.",
-        "Source 6893603: CI 38085762210 passed source quality, both example builds, documentation, and Chromium/Firefox/WebKit acceptance; saved final-mts-ci.json and final-mts-ci.log."
+        "Reviewed the actual diff and current source at examples/tanstack-start/src/routes/index.tsx against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
       ]
     },
     "source:examples/vite-react/src/components/sections/commands-section.tsx": {
-      "fingerprint": "a00dc770d73fd319e4da616e87460baaf5b0d415c7143437c3959b35fe2b20df",
+      "fingerprint": "59bb7e6fcf3553d5b5fc3b98b159aef67071397c70ad59892a746f826d74194d",
       "snapshot": {
-        "examples/vite-react/src/components/sections/commands-section.tsx": "113856c225c332dacf328f9d06b3ea98f3a56b288f5b1bdb9fa98c8d1e326cf3"
+        "examples/vite-react/src/components/sections/commands-section.tsx": "990c75cdfacc4391267e8b25948cddf12a0ae241a5444f02685c8f84a9f2aa39"
       },
-      "head": "6893603eab70bd9d67e9848414eccc8a3421d870",
-      "outcome": "no-change",
-      "reason": "Start/cancel mutations now use the application mutation tracker and guard reconciliation with the originating owner. Existing cache guidance already distinguishes local retirement from remote command cancellation and preserves originating actions after awaits.",
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "outcome": "updated",
+      "reason": "Command starts can retry after failed transport and reconcile accepted operations through status polling. The cancellation guide now covers this behavior and same-ID retries.",
       "evidence": [
-        "Reviewed the complete component diff from 5b91ddb to 6893603 and skills/effect-api-query/references/cache-workflows.md.",
-        "Source 6893603: CI 38085762210 passed source quality, both example builds, documentation, and Chromium/Firefox/WebKit acceptance; saved final-mts-ci.json and final-mts-ci.log."
+        "Reviewed the actual diff and current source at examples/vite-react/src/components/sections/commands-section.tsx against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
       ]
     },
     "source:examples/vite-react/src/components/sections/diagnostics-section.tsx": {
@@ -1047,16 +1049,16 @@
       ]
     },
     "source:examples/vite-react/src/components/sections/http-section.tsx": {
-      "fingerprint": "e0f0733aa85363147a8ad802fe4977a45bd920e82daa0d99884c7291a5953762",
+      "fingerprint": "e89b26c6c412fb39a50a6c96504fc8cf82ff54bb0bc346d30bd9a198f0b72485",
       "snapshot": {
-        "examples/vite-react/src/components/sections/http-section.tsx": "089876bb63fe88d62f0a5ec191e44e85bf93de1dbcd8b329f63b191b7911d0ca"
+        "examples/vite-react/src/components/sections/http-section.tsx": "c5b3bcbe155a6c7ace30a8a25bdad8739b669a0e3e16053ead57eb2108681e9d"
       },
-      "head": "6893603eab70bd9d67e9848414eccc8a3421d870",
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
       "outcome": "no-change",
-      "reason": "HTTP creates/deletes now use the shared write coordinator, track the failure demonstration, and disable deletion of temporary IDs. Existing guidance already reserves individual optimistic entities, preserves neighboring writes, and checks the originating owner; request builders are unchanged.",
+      "reason": "Count loaded users directly across pages without allocating a flattened array; query data, ownership and displayed counts are unchanged, and existing framework guidance remains accurate.",
       "evidence": [
-        "Reviewed the complete component diff from 5b91ddb to 6893603 against skills/effect-api-query/references/cache-workflows.md and references/http.md.",
-        "Source 6893603: CI 38085762210 passed source quality, both example builds, documentation, and Chromium/Firefox/WebKit acceptance; saved final-mts-ci.json and final-mts-ci.log."
+        "Reviewed the actual diff and current source at examples/vite-react/src/components/sections/http-section.tsx against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
       ]
     },
     "source:examples/vite-react/src/components/sections/mutations-section.tsx": {
@@ -1099,16 +1101,16 @@
       ]
     },
     "source:examples/vite-react/src/hooks/use-slow-query-cancellation.ts": {
-      "fingerprint": "5d15e7915a554f041ccec537294f63a591016ef79a04d0a986cdf36fef89b710",
+      "fingerprint": "2aa37a46d7e10463590f37ee5f3ffc0eec7784ff7192363988340b2ecf1741d9",
       "snapshot": {
-        "examples/vite-react/src/hooks/use-slow-query-cancellation.ts": "6de14cf383862176674f3ac3cdc6651b54a3f63fe3fa866419d1274501a96057"
+        "examples/vite-react/src/hooks/use-slow-query-cancellation.ts": "f30bf0af875d66873e5c7f0f74ec757c2fd91264c69ba20ce34e3d676f84fa73"
       },
-      "head": "6893603eab70bd9d67e9848414eccc8a3421d870",
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
       "outcome": "no-change",
-      "reason": "The helper receives an originating-owner activity guard and checks it before and after asynchronous status reads. Existing guidance already guards late side effects after owner replacement and treats remote command cancellation separately from local query cancellation.",
+      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
       "evidence": [
-        "Reviewed the complete hook diff from 5b91ddb to 6893603 against skills/effect-api-query/references/cache-workflows.md and references/frameworks-and-hosts.md.",
-        "Source 6893603: CI 38085762210 passed source quality, both example builds, documentation, and Chromium/Firefox/WebKit acceptance; saved final-mts-ci.json and final-mts-ci.log."
+        "Reviewed the actual diff and current source at examples/vite-react/src/hooks/use-slow-query-cancellation.ts against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
       ]
     },
     "source:tests/fixtures/tsconfig.server-local.json": {
@@ -1149,6 +1151,253 @@
       "reason": "A private class-name constant replaces two identical alert style strings; rendered error labels, Cause detail and alert semantics are unchanged. This presentation-only deduplication does not change any developer integration task or shipped guidance.",
       "evidence": [
         "Reviewed both render branches and their bf38d855 diff. Final uncached typecheck passes 140 files; scoped formatting passed. No application-wide UI sharing or dependency change."
+      ]
+    },
+    "source:apps/docs/public/package-version.js": {
+      "fingerprint": "22bfa3892fa1b85ae21f2c484fa190b10dd35556e9a47ed5b39eb8c6d3bcd551",
+      "snapshot": {
+        "apps/docs/public/package-version.js": "f88677a24f7a65061aa41cabde4f6727a9f4c52adfac5ac4fde2b478909c3dc0"
+      },
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "outcome": "no-change",
+      "reason": "Removed fallback implementation commentary; a failed registry request still retains the build version. Chromium covers unpublished, failed and invalid responses, so existing user-facing guidance remains accurate.",
+      "evidence": [
+        "Reviewed the actual diff and current source at apps/docs/public/package-version.js against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+      ]
+    },
+    "source:docs/adr/0013-use-a-vite-plus-workspace-with-a-root-package.md": {
+      "fingerprint": "c18a01558cba99c73dd6bbc8381e3243a4a2f324069d47f6217c11a424cd615e",
+      "snapshot": {
+        "docs/adr/0013-use-a-vite-plus-workspace-with-a-root-package.md": "7617802c14fd07b0e147f8168381285b078eb752fbf9981848cbfe86e1f7792a"
+      },
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "outcome": "no-change",
+      "reason": "Removed obsolete beta and editor-detail wording while preserving the native Vite+ workspace decision; no consumer instruction changes.",
+      "evidence": [
+        "Reviewed the actual diff and current source at docs/adr/0013-use-a-vite-plus-workspace-with-a-root-package.md against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+      ]
+    },
+    "source:e2e-docs/docs.spec.ts": {
+      "fingerprint": "291a43d058c8b2a73c082aa28a440a29df8db3e98910189779b7aba7efd24296",
+      "snapshot": {
+        "e2e-docs/docs.spec.ts": "77011c58032a0b6c35e159c62a0e76935e70c1779bbc923c71b28dc10c8ff0b1"
+      },
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "outcome": "no-change",
+      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
+      "evidence": [
+        "Reviewed the actual diff and current source at e2e-docs/docs.spec.ts against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+      ]
+    },
+    "source:e2e/conditional-query.spec.ts": {
+      "fingerprint": "6f0ab418799c94ae6ba540a6e12ca8a3115a5335418ee92b73af61b68e64798c",
+      "snapshot": {
+        "e2e/conditional-query.spec.ts": "cbcf8bd4084cada24635c7839a5bdf83e59115ad1175134d5d65eb37f0dcffa4"
+      },
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "outcome": "no-change",
+      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
+      "evidence": [
+        "Reviewed the actual diff and current source at e2e/conditional-query.spec.ts against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+      ]
+    },
+    "source:e2e/example-application.ts": {
+      "fingerprint": "7aa0cef9f7e89bc6264535884d5e3d1bcd4bafdd701b3d78124768b1cd82f262",
+      "snapshot": {
+        "e2e/example-application.ts": "3ce3024b409c7c28e9e159fce2b724009dd846fbe6fba75ef3d7ab95dc507e99"
+      },
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "outcome": "no-change",
+      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
+      "evidence": [
+        "Reviewed the actual diff and current source at e2e/example-application.ts against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+      ]
+    },
+    "source:examples/contracts/src/client.ts": {
+      "fingerprint": "edb8d760d8523f285a099edd65375f23a0bcab7321cddef564acd58d89f43241",
+      "snapshot": {
+        "examples/contracts/src/client.ts": "f645f690571d6f8d571ec8496607778c423fbc4b45848bf3cf725739e981953e"
+      },
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "outcome": "no-change",
+      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
+      "evidence": [
+        "Reviewed the actual diff and current source at examples/contracts/src/client.ts against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+      ]
+    },
+    "source:examples/contracts/src/contracts.ts": {
+      "fingerprint": "347cc797a64e13c1476d2f2aaa027a5a23f6ea56d9695b88750fe83b1c3c5ed9",
+      "snapshot": {
+        "examples/contracts/src/contracts.ts": "11ba2f683cfeaa16947864a12c3bccc96104dbe0f6139efcd81e6fc865482641"
+      },
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "outcome": "no-change",
+      "reason": "RPC pagination now enforces the same integer cursor and 1..100 page-size bounds as the HTTP example. Existing ready-client/query-pattern guidance remains sufficient; server-local regression tests cover rejection.",
+      "evidence": [
+        "Reviewed the actual diff and current source at examples/contracts/src/contracts.ts against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+      ]
+    },
+    "source:examples/tanstack-start/src/components/action-button.tsx": {
+      "fingerprint": "d0b70e406fe9c1eadf6da4c873a867c67dd0704778b0025afe2570fe957053e6",
+      "snapshot": {
+        "examples/tanstack-start/src/components/action-button.tsx": "79c37de2669992148e645a70f1b783a1dd7d85ac8e5a9ec267843550eafd3926"
+      },
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "outcome": "no-change",
+      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
+      "evidence": [
+        "Reviewed the actual diff and current source at examples/tanstack-start/src/components/action-button.tsx against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+      ]
+    },
+    "source:examples/tanstack-start/src/components/navigation-link.tsx": {
+      "fingerprint": "b54ce1620db2d94ed8d2f71f4900c2d8c17985ccca14093d9f419a353f67bd13",
+      "snapshot": {
+        "examples/tanstack-start/src/components/navigation-link.tsx": "a7d037126c9a648b3aa20ecb8af5f416982522f9da5703460b141bfb53124cf3"
+      },
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "outcome": "no-change",
+      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
+      "evidence": [
+        "Reviewed the actual diff and current source at examples/tanstack-start/src/components/navigation-link.tsx against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+      ]
+    },
+    "source:examples/tanstack-start/src/components/router-status.tsx": {
+      "fingerprint": "0fd4520270cc3cdedb23abb639bf655c538744fc11ae2ca2771b4b81b6025a3a",
+      "snapshot": {
+        "examples/tanstack-start/src/components/router-status.tsx": "6e9b8fb3bcd3397aa1d447d12f000b264b214463327ac03319dd59d6f229e99d"
+      },
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "outcome": "no-change",
+      "reason": "Loading queries labels both RPC and HTTP work accurately. This UI text change adds no developer task or skill requirement.",
+      "evidence": [
+        "Reviewed the actual diff and current source at examples/tanstack-start/src/components/router-status.tsx against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+      ]
+    },
+    "source:examples/tanstack-start/src/hooks/use-slow-query-cancellation.ts": {
+      "fingerprint": "c85b302c983ad61446ac64bb9fb27735786b70210c22ab55f19ed23421a41aa4",
+      "snapshot": {
+        "examples/tanstack-start/src/hooks/use-slow-query-cancellation.ts": "3a1e71d2fd0886af948bfb78d510071186760b341e205ff7543cb3b8d422456d"
+      },
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "outcome": "no-change",
+      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
+      "evidence": [
+        "Reviewed the actual diff and current source at examples/tanstack-start/src/hooks/use-slow-query-cancellation.ts against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+      ]
+    },
+    "source:examples/tanstack-start/src/routes/failure.tsx": {
+      "fingerprint": "5df8fdee6f55e2b69313237e1cadae26ec40dd05eff106d23fc0ef2752679c6b",
+      "snapshot": {
+        "examples/tanstack-start/src/routes/failure.tsx": "690a26c3ef52a28f5c89617a385de23d920840b591ea3b22f060673dd0d262d6"
+      },
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "outcome": "no-change",
+      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
+      "evidence": [
+        "Reviewed the actual diff and current source at examples/tanstack-start/src/routes/failure.tsx against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+      ]
+    },
+    "source:examples/tanstack-start/src/routes/http-failure.tsx": {
+      "fingerprint": "5947742b2cc9d79e14228e7429d5ecc9dd71963448c8fec0e4bd0978705767d9",
+      "snapshot": {
+        "examples/tanstack-start/src/routes/http-failure.tsx": "a7ade1d3bd9973903ab7e49461f82cdf413766e3ff1c194a50be21423b5e2de1"
+      },
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "outcome": "no-change",
+      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
+      "evidence": [
+        "Reviewed the actual diff and current source at examples/tanstack-start/src/routes/http-failure.tsx against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+      ]
+    },
+    "source:examples/tanstack-start/src/routes/http.tsx": {
+      "fingerprint": "17772c5479439557ae491d4836d8e8c3f0a4d66d6ab98339e3bb1fbe3393925e",
+      "snapshot": {
+        "examples/tanstack-start/src/routes/http.tsx": "e54309cb14321d61e9ec0f5b51b2ed6231be4acc4cfaa634cdddd8d5dce459a4"
+      },
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "outcome": "no-change",
+      "reason": "Count loaded users directly across pages without allocating a flattened array; query data, ownership and displayed counts are unchanged, and existing framework guidance remains accurate.",
+      "evidence": [
+        "Reviewed the actual diff and current source at examples/tanstack-start/src/routes/http.tsx against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+      ]
+    },
+    "source:examples/tanstack-start/src/styles.css": {
+      "fingerprint": "6511863c69c721f2f054b705fb32a59bece6f93029fa3d22d3f881df48470fa7",
+      "snapshot": {
+        "examples/tanstack-start/src/styles.css": "8fc6183bf34828b9909884e5eadefca6ebe8ee59bc0600389a22431ae7482856"
+      },
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "outcome": "no-change",
+      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
+      "evidence": [
+        "Reviewed the actual diff and current source at examples/tanstack-start/src/styles.css against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+      ]
+    },
+    "source:examples/tanstack-start/vite.config.ts": {
+      "fingerprint": "c2f207176f82c378faf65195877ae337a8c4ed7b0d62ba4eb16356327e8766e8",
+      "snapshot": {
+        "examples/tanstack-start/vite.config.ts": "e33ed6de04e21fd8b43f95e2a29fdf5adae9007b24faf307ac85b5f51fbb4180"
+      },
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "outcome": "no-change",
+      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
+      "evidence": [
+        "Reviewed the actual diff and current source at examples/tanstack-start/vite.config.ts against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+      ]
+    },
+    "source:examples/vite-react/src/components/sections/queries-section.tsx": {
+      "fingerprint": "6a00123ad89af1b93a07f046f5e3a8d06c9232996dfe15038468201d5d556064",
+      "snapshot": {
+        "examples/vite-react/src/components/sections/queries-section.tsx": "2f6d771e217f415d570a4483e44a398b49f3a1fb0afae7f7a9caebc8c6a2d41d"
+      },
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "outcome": "no-change",
+      "reason": "Count loaded users directly across pages without allocating a flattened array; query data, ownership and displayed counts are unchanged, and existing framework guidance remains accurate.",
+      "evidence": [
+        "Reviewed the actual diff and current source at examples/vite-react/src/components/sections/queries-section.tsx against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+      ]
+    },
+    "source:examples/vite-react/src/components/ui/action-button.tsx": {
+      "fingerprint": "1b0278c83a2efe4939ff4f81fb4cf741e3e65a0b5316df77dd14d7872b5df4f8",
+      "snapshot": {
+        "examples/vite-react/src/components/ui/action-button.tsx": "bdacb6e84d72e4e454c5a0062355a53062db3ebeb56873eb8bd5f5b7b0766fbf"
+      },
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "outcome": "no-change",
+      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
+      "evidence": [
+        "Reviewed the actual diff and current source at examples/vite-react/src/components/ui/action-button.tsx against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+      ]
+    },
+    "source:examples/vite-react/src/styles/tailwind.css": {
+      "fingerprint": "bcd26043e6850ae901dc9de55c814583cc8d30cfa03e0d5c87e9a288ea08a03e",
+      "snapshot": {
+        "examples/vite-react/src/styles/tailwind.css": "8a15901ff92b03b284dc879a456e155235a5ccd4832153847ded0ffd0106933e"
+      },
+      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "outcome": "no-change",
+      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
+      "evidence": [
+        "Reviewed the actual diff and current source at examples/vite-react/src/styles/tailwind.css against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
+        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
       ]
     }
   }

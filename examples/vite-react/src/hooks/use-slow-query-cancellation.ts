@@ -3,7 +3,6 @@ import { useRef, useState } from 'react'
 
 import type { ViteReactApplication } from '../lib/application.ts'
 
-// Browser workflow shared by both transports.
 export type SlowQueryCancellationState =
   | { readonly _tag: 'Idle' }
   | { readonly _tag: 'Starting' }
@@ -41,20 +40,17 @@ export const describeSlowQueryCancellation = (
 }
 
 const delay = async (milliseconds: number) =>
-  // Timers expose callbacks rather than an awaitable API in the ES2022 browser target.
   // oxlint-disable-next-line promise/avoid-new
   new Promise<void>((resolve) => {
     globalThis.setTimeout(resolve, milliseconds)
   })
 
-/** Coordinates typed diagnostic operations as one cancellation demonstration. */
 export const useSlowQueryCancellation = (
   { queryClient, rpcQuery, httpQuery, isActive }: ViteReactApplication,
   transport: 'rpc' | 'http' = 'rpc',
 ) => {
   const [state, setState] = useState<SlowQueryCancellationState>({ _tag: 'Idle' })
   const baseline = useRef<DiagnosticStatus | undefined>(undefined)
-  // The operation input stays fixed for this mounted cancellation workflow.
   // oxlint-disable-next-line react/hook-use-state
   const [slowInput] = useState(() => ({
     durationMs: 60_000,
@@ -96,13 +92,11 @@ export const useSlowQueryCancellation = (
       if (!isActive()) {
         throw new Error('Owner is inactive')
       }
-      // Each poll depends on the preceding result and must finish before the next attempt.
       // oxlint-disable-next-line eslint/no-await-in-loop
       const status = await adapter.readStatus()
       if (predicate(status)) {
         return status
       }
-      // Polls deliberately wait between sequential status reads.
       // oxlint-disable-next-line eslint/no-await-in-loop
       await delay(10)
     }
@@ -112,9 +106,7 @@ export const useSlowQueryCancellation = (
   const runQuery = async () => {
     try {
       await adapter.run()
-    } catch {
-      // Query state retains failures; interruption is expected after cancellation.
-    }
+    } catch {}
   }
 
   const start = async () => {
@@ -144,7 +136,6 @@ export const useSlowQueryCancellation = (
 
     setState({ _tag: 'Cancelling' })
     try {
-      // TanStack aborts the query signal; the ready client interrupts the server operation.
       await queryClient.cancelQueries({
         queryKey: adapter.key,
       })

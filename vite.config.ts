@@ -39,11 +39,9 @@ const vitestPreset: OxlintConfig = {
         'error',
         { additionalTestBlockFunctions: [...effectTestBlocks, 'it.effect.each', 'it.live.each'] },
       ],
-      // Exact booleans catch values that truthiness-only assertions would accept.
       'vitest/prefer-strict-boolean-matchers': 'error',
       'vitest/prefer-to-be-truthy': 'off',
       'vitest/prefer-to-be-falsy': 'off',
-      // Integration tests assert several states of one operation and its cleanup.
       'vitest/max-expects': ['error', { max: 50 }],
     },
   })),
@@ -88,11 +86,9 @@ export default defineConfig({
     jsPlugins: [...(ultraciteAntiSlop.jsPlugins ?? []), ...(ultraciteShadcn.jsPlugins ?? [])],
     settings: {
       shadcn: {
-        // Start keeps its custom primitives in components/, without components.json.
         componentImports: ['(?:^|/)components/'],
       },
     },
-    // Astro owns diagnostics for the docs package and uses its supported TypeScript 6 compiler.
     ignorePatterns: [
       ...(ultraciteCore.ignorePatterns ?? []),
       ...ignoredPaths,
@@ -104,17 +100,14 @@ export default defineConfig({
       typeCheck: true,
     },
     rules: {
-      // Effect.fn supplies span names; its generator callbacks are anonymous.
+      'anti-slop/require-safety-comment-for-type-assertion': 'off',
+      'eslint/no-empty': ['error', { allowEmptyCatch: true }],
       'eslint/func-names': ['error', 'as-needed', { generators: 'never' }],
-      // The typed rule accepts async callbacks that forward an existing Promise.
       'eslint/require-await': 'off',
       'typescript/require-await': 'error',
       'typescript/return-await': ['error', 'error-handling-correctness-only'],
-      // Effect/RPC functions require explicit undefined for void arguments.
       'unicorn/no-useless-undefined': ['error', { checkArguments: false }],
-      // toSorted requires ES2023; this library and its consumers target ES2022.
       'unicorn/no-array-sort': 'off',
-      // The patched engine adds defaults beyond the exported strict preset.
       'effecttsgo/any-unknown-in-error-context': 'error',
       'effecttsgo/experimental-api-usage': 'error',
       'effecttsgo/unsafe-effect-type-assertion': 'error',
@@ -140,7 +133,6 @@ export default defineConfig({
       {
         files: testFiles,
         rules: {
-          // Context.Service fixtures belong with the tests exercising them.
           'eslint/max-classes-per-file': 'off',
         },
       },
@@ -149,7 +141,6 @@ export default defineConfig({
         rules: ultraciteShadcn.rules ?? {},
       },
       {
-        // shadcn installs primitives here; the custom example UI files stay checked.
         files: ['examples/**/components/ui/**/*.{ts,tsx}'],
         excludeFiles: [
           'examples/vite-react/src/components/ui/action-button.tsx',
@@ -167,14 +158,12 @@ export default defineConfig({
           'scripts/measure-construction.mts',
         ],
         rules: {
-          // Effect 4 transports are experimental and pinned; match the compiler policy.
           'effecttsgo/unstable-api-usage': 'off',
         },
       },
       {
         files: ['src/http/errors.ts', 'src/rpc/errors.ts'],
         rules: {
-          // Each transport keeps its related tagged error family together.
           'eslint/max-classes-per-file': ['error', 4],
         },
       },
@@ -185,10 +174,7 @@ export default defineConfig({
       {
         files: ['src/{core,http,rpc}/types.ts'],
         rules: {
-          // void is part of Effect channel and no-payload RPC type contracts.
           'typescript/no-invalid-void-type': 'off',
-          // Type aliases and interfaces differ in structural Record assignability;
-          // preserve the published contract instead of enforcing one spelling.
           'typescript/consistent-type-definitions': 'off',
         },
       },
@@ -270,8 +256,6 @@ export default defineConfig({
         },
       },
       typecheck: {
-        // Vite+ 1.0's --no-lint path reports typed rules without honoring suppressions.
-        // Keep lint active so typechecking uses the same policy as the normal check.
         command: 'vp check --no-fmt',
         dependsOn: ['pack'],
         cache: {
@@ -298,9 +282,7 @@ export default defineConfig({
       },
       fallow: {
         command: [
-          // Public barrel exports must be exercised by repository evidence.
           'fallow dead-code --include-entry-exports',
-          // Test-only reachability must not hide dead shipped internals.
           'fallow dead-code --production',
           'fallow dupes',
           'fallow health --hotspots --file-scores --min-score 75',
@@ -440,7 +422,6 @@ export default defineConfig({
     },
   },
   staged: {
-    // Typed lint fixes need the full project context; formatting stays scoped to staged files.
     '*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}': ['vp fmt', () => 'vp run --no-cache typecheck --fix'],
     '*.{json,jsonc,md,yaml,yml}': 'vp fmt',
   },

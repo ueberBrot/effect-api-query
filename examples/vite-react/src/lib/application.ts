@@ -59,7 +59,6 @@ export interface StartViteReactApplicationOptions {
   readonly directoryStorage?: DirectoryStorage
 }
 
-/** Creates clients, query utilities, and cleanup together so the example can be copied as a whole. */
 export const startViteReactApplication = async ({
   rpcUrl,
   httpBaseUrl = new URL(rpcUrl, globalThis.location?.href).origin,

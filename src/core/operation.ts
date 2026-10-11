@@ -11,7 +11,6 @@ export type OperationInput =
   | {
       readonly _tag: 'Input'
       readonly requiresEncoder: boolean
-      /** Prepares page requests without deriving another cache identity. */
       readonly pageInput: (input: unknown) => unknown
       readonly prepare: (
         input: unknown,
@@ -24,7 +23,6 @@ export interface OperationIdentity {
   readonly id: string
   readonly path: readonly string[]
   readonly unsupportedQueryHash: (option: 'queryKeyHashFn' | 'queryHash') => Error
-  /** Removes adapter-owned fields from the fresh options copy. */
   readonly takeOptions: (options: Record<string, unknown>) => unknown
 }
 
@@ -55,7 +53,6 @@ export interface QueryPreparation {
 export interface StreamingOperation extends OperationIdentity {
   readonly kind: 'Streaming'
   readonly input: OperationInput
-  /** Consumes and validates stream policy, including for skipped requests. */
   readonly prepareStream: (
     options: Record<string, unknown>,
     operation: 'live' | 'streamed',

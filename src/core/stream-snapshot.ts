@@ -46,9 +46,10 @@ export const fetchStreamSnapshot = async <
     throw new TypeError('Stream snapshots require a callable query function')
   }
   const cache = queryClient.getQueryCache()
-  const existing = cache.find({ exact: true, queryKey: options.queryKey })
+  const { queryHash } = queryClient.defaultQueryOptions(options)
+  const existing = cache.get(queryHash)
   if (mode === 'cached' && existing?.state.status === 'success') {
-    return await queryClient.query({ ...options, staleTime: 'static' })
+    return await queryClient.query({ ...options, queryHash, staleTime: 'static' })
   }
   if (
     existing !== undefined &&
@@ -56,7 +57,6 @@ export const fetchStreamSnapshot = async <
   ) {
     throw new Error('Stream snapshots require an idle query without observers')
   }
-  const { queryHash } = queryClient.defaultQueryOptions(options)
   let published = false
   let started = false
   let executionSignal: AbortSignal | undefined
@@ -65,7 +65,9 @@ export const fetchStreamSnapshot = async <
   let cleanup = Promise.resolve()
   let cancellation: Promise<void> | undefined
   const cancel = async () => {
-    cancellation ??= queryClient.cancelQueries({ exact: true, queryKey: options.queryKey })
+    cancellation ??= queryClient.cancelQueries({
+      predicate: (query) => query.queryHash === queryHash,
+    })
     await cancellation
   }
   let ready!: () => void
@@ -96,13 +98,13 @@ export const fetchStreamSnapshot = async <
   let result: TData
   try {
     void queryClient.invalidateQueries({
-      exact: true,
-      queryKey: options.queryKey,
+      predicate: (query) => query.queryHash === queryHash,
       refetchType: 'none',
     })
     signal?.throwIfAborted()
     const fetching = queryClient.query({
       ...options,
+      queryHash,
       staleTime: 0,
       initialDataUpdatedAt: 0,
       queryFn: async (context) => {

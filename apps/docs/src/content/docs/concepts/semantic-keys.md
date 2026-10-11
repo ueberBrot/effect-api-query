@@ -24,6 +24,8 @@ The default process is:
 QueryClient owns hashing through its global and prefix defaults. Generated options omit hash
 fields so fetching, stream publications, and native `getQueryData`/`setQueryData` calls address the
 same cache entry. Builders reject per-call `queryKeyHashFn` and `queryHash` overrides.
+Configure hashing before cache use and keep it stable while entries remain. A stream execution
+rejects with `UnsupportedQueryHash` if changed hashing conflicts with a matching cached entry.
 
 Key objects cannot contain `__proto__` or `constructor` properties at any depth. This applies to
 prefixes, Schema output, and custom encoder output.

@@ -30,8 +30,6 @@ const ObjectNamed = Rpc.make('toString.child', { success: Schema.Void })
 
 export const group = RpcGroup.make(GetUser, Ping, Fail, Watch, ObjectNamed)
 
-// The stateless handlers and their layer are shared; each test gets a fresh scoped
-// transport.
 const handlers = group.of({
   'diagnostics.fail': () => Effect.fail('declared-failure' as const),
   'events.watch': () => Stream.empty,
@@ -42,7 +40,6 @@ const handlers = group.of({
 })
 const handlersLayer = group.toLayer(handlers)
 
-/** Acquires an official in-memory flat client for an RPC group and its handlers. */
 export const makeRpcTestClient = Effect.fn('TestRpc.makeRpcTestClient')(function* <
   Rpcs extends Rpc.Any,
   const Handlers extends RpcGroup.HandlersFrom<Rpcs>,
@@ -52,7 +49,6 @@ export const makeRpcTestClient = Effect.fn('TestRpc.makeRpcTestClient')(function
   )
 })
 
-/** Acquires a fresh scoped client backed by the shared test handlers. */
 export const makeClient = Effect.fn('TestRpc.makeClient')(function* () {
   return yield* RpcTest.makeClient(group, { flatten: true }).pipe(Effect.provide(handlersLayer))
 })

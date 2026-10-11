@@ -466,7 +466,6 @@ describe('createRpcQueryUtils streaming execution', () => {
       const source = Stream.make('first', 'second').pipe(
         Stream.ensuring(Deferred.succeed(finalized, undefined).pipe(Effect.asVoid)),
       )
-      // SAFETY: This one-RPC client fixture supplies the declared stream directly so finalization can be observed.
       /* oxlint-disable typescript/no-unsafe-type-assertion */
       const client = (() => source) as RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof streamGroup>>
       /* oxlint-enable typescript/no-unsafe-type-assertion */
@@ -501,7 +500,6 @@ describe('createRpcQueryUtils streaming execution', () => {
       ),
       Stream.ensuring(Deferred.succeed(finalized, undefined).pipe(Effect.asVoid)),
     )
-    // SAFETY: This one-RPC client fixture supplies the declared stream directly so finalization can be observed.
     /* oxlint-disable typescript/no-unsafe-type-assertion */
     const client = (() => source) as RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof streamGroup>>
     /* oxlint-enable typescript/no-unsafe-type-assertion */
@@ -534,12 +532,10 @@ describe('createRpcQueryUtils streaming execution', () => {
         return: async () => await Promise.reject(closeError),
       }),
     }
-    // SAFETY: The custom runner returns only this stream fixture so failed iterator closure can be observed.
     /* oxlint-disable typescript/no-unsafe-type-assertion */
     const runPromiseExit: RunPromiseExit = async () =>
       (await Promise.resolve(Exit.succeed(source))) as never
     /* oxlint-enable typescript/no-unsafe-type-assertion */
-    // SAFETY: This one-RPC client fixture supplies the declared stream directly so finalization can be observed.
     /* oxlint-disable typescript/no-unsafe-type-assertion */
     const utils = createRpcQueryUtils(streamGroup, {
       client: (() => Stream.empty) as RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof streamGroup>>,
@@ -576,7 +572,6 @@ describe('createRpcQueryUtils streaming execution', () => {
       const secondStarted = yield* Deferred.make<undefined>()
       const secondFinalized = yield* Deferred.make<undefined>()
       let run = 0
-      // SAFETY: This one-RPC fixture creates the declared stream directly so successive finalization can be observed.
       /* oxlint-disable typescript/no-unsafe-type-assertion */
       const client = (() => {
         run += 1
@@ -630,7 +625,6 @@ describe('createRpcQueryUtils streaming execution', () => {
         ),
         Stream.ensuring(Deferred.succeed(finalized, undefined).pipe(Effect.asVoid)),
       )
-      // SAFETY: This one-RPC client fixture supplies the declared stream directly so finalization can be observed.
       /* oxlint-disable typescript/no-unsafe-type-assertion */
       const client = (() => source) as RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof streamGroup>>
       /* oxlint-enable typescript/no-unsafe-type-assertion */

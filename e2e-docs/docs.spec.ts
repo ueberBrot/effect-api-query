@@ -98,7 +98,6 @@ test('uses canonical repository links and serves branded icons', async ({ page, 
     await page.locator('link[rel="shortcut icon"]').getAttribute('href'),
     await page.locator('.site-title img').getAttribute('src'),
   ]
-  // Keep each icon's request and assertions together to identify the failing URL.
   /* oxlint-disable eslint/no-await-in-loop */
   for (const url of iconUrls) {
     expect(url).toMatch(/^\/effect-api-query\//u)
@@ -120,7 +119,6 @@ test('shows the latest published version from the package registry', async ({ pa
   await page.goto(docsBase)
   const links = page.locator(`a[href="${packageUrl}"]`)
   await expect(links.first()).toHaveText('v1.2.3-beta.1')
-  // Check each DOM locator sequentially while this test owns the page.
   /* oxlint-disable eslint/no-await-in-loop */
   for (const link of await links.all()) {
     await expect(link).toHaveText('v1.2.3-beta.1')
@@ -145,7 +143,6 @@ for (const failure of ['unpublished package', 'network failure', 'invalid versio
     await request
     const links = page.locator(`a[href="${packageUrl}"]`)
     await expect(links.first()).toHaveText(`v${packageManifest.version}`)
-    // Check each DOM locator sequentially while this test owns the page.
     /* oxlint-disable eslint/no-await-in-loop */
     for (const link of await links.all()) {
       await expect(link).toHaveText(`v${packageManifest.version}`)
@@ -160,7 +157,6 @@ test('serves generated LLM documentation with the public URLs', async ({ request
   expect(index.ok()).toBe(true)
   const indexText = await index.text()
   expect(indexText).toContain('# effect-api-query')
-  // Fetch and inspect one generated document at a time to attribute broken links.
   /* oxlint-disable eslint/no-await-in-loop */
   for (const filename of ['llms-small.txt', 'llms-full.txt']) {
     expect(indexText).toContain(`https://ueberbrot.github.io${docsBase}${filename}`)

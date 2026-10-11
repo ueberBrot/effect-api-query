@@ -30,8 +30,6 @@ export const Route = createFileRoute('/http-failure')({
   loader: async ({ context }) => {
     try {
       await context.queryClient.query(context.httpQuery.diagnostics.fail.queryOptions())
-    } catch {
-      // Query state retains the error for rendering.
-    }
+    } catch {}
   },
 })

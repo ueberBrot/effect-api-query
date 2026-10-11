@@ -21,6 +21,8 @@ import { RpcClient } from 'effect/rpc'
 import dns from 'node:dns'
 import { request as nodeRequest } from 'node:http'
 
+import { makeDiagnosticOperations } from '../src/diagnostic-operations.ts'
+
 const waitForStatus = Effect.fn('TestExampleRpc.waitForStatus')(function* (
   client: ExampleRpcClient,
   predicate: (status: DiagnosticStatus) => boolean,
@@ -36,12 +38,41 @@ const waitForStatus = Effect.fn('TestExampleRpc.waitForStatus')(function* (
 })
 
 describe('example RPC server', () => {
+  it.effect('keeps captured diagnostic statuses intact across later operations and reset', () =>
+    Effect.gen(function* () {
+      const diagnostics = yield* makeDiagnosticOperations()
+      const unused = yield* diagnostics.operationStatus('first')
+      yield* diagnostics.slow({ operationId: 'first', durationMs: 0 })
+      const first = yield* diagnostics.operationStatus('first')
+      const total = yield* diagnostics.status
+      yield* diagnostics.slow({ operationId: 'first', durationMs: 0 })
+      yield* diagnostics.slow({ operationId: 'second', durationMs: 0 })
+      expect(yield* diagnostics.operationStatus('first')).toStrictEqual({
+        started: 2,
+        interrupted: 0,
+      })
+      expect(yield* diagnostics.operationStatus('second')).toStrictEqual({
+        started: 1,
+        interrupted: 0,
+      })
+      expect(yield* diagnostics.status).toStrictEqual({ started: 3, interrupted: 0 })
+      yield* diagnostics.reset
+      expect(yield* diagnostics.operationStatus('first')).toStrictEqual({
+        started: 0,
+        interrupted: 0,
+      })
+      expect(yield* diagnostics.status).toStrictEqual({ started: 0, interrupted: 0 })
+      expect(unused).toStrictEqual({ started: 0, interrupted: 0 })
+      expect(first).toStrictEqual({ started: 1, interrupted: 0 })
+      expect(total).toStrictEqual({ started: 1, interrupted: 0 })
+    }),
+  )
+
   it.live('rejects oversized chunked bodies before the client finishes sending', () =>
     Effect.gen(function* () {
       const server = yield* startExampleRpcServer()
       const status = yield* Effect.promise(
         async () =>
-          // The callback/event API needs a Promise bridge in the ES2022 target.
           // oxlint-disable-next-line promise/avoid-new
           new Promise<number | undefined>((resolve, reject) => {
             const request = nodeRequest(server.rpcUrl, { method: 'POST' }, (response) => {
@@ -69,7 +100,6 @@ describe('example RPC server', () => {
       for (const path of ['//[', 'http://user:password@localhost/rpc']) {
         const status = yield* Effect.promise(
           async () =>
-            // The callback/event API needs a Promise bridge in the ES2022 target.
             // oxlint-disable-next-line promise/avoid-new
             new Promise<number | undefined>((resolve, reject) => {
               const request = nodeRequest(server.url, { method: 'POST', path }, (response) => {
@@ -137,7 +167,6 @@ describe('example RPC server', () => {
       readonly annotations: unknown
       readonly message: unknown
     }[] = []
-    // Void is the deliberate success channel of this Effect factory.
     // oxlint-disable-next-line typescript/no-invalid-void-type
     const collectingLogger = Logger.make<unknown, void>((options) => {
       const entry = Logger.formatStructured.log(options)
@@ -153,8 +182,6 @@ describe('example RPC server', () => {
       yield* client('users.list', undefined)
 
       expect(entries).toContainEqual({
-        // Vitest's matcher returns any, widened here because entries are checked by the matcher.
-        // SAFETY: expect.objectContaining is consumed only as an expected test value.
         annotations: expect.objectContaining({
           'http.method': 'POST',
           'http.status': 200,
@@ -383,7 +410,6 @@ describe('example RPC server', () => {
             spy.mockRestore()
           }),
       )
-      // Node's DNS callback is controlled here to pause real server startup.
       /* oxlint-disable promise/prefer-await-to-callbacks */
       lookup.mockImplementationOnce(
         (

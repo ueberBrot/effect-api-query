@@ -48,7 +48,6 @@ const createRpcInput = (definition: Rpc.AnyWithProps): OperationInput => {
           error,
         )
       }
-      // The ready client constructs this normalized payload again during execution.
       return { input: normalized, keyValue }
     },
   }
@@ -78,8 +77,6 @@ const describeRpc = <Rpcs extends Rpc.Any, ClientError>(
     takeOptions: takeRpcOptions,
   }
   if (!RpcSchema.isStreamSchema(definition.successSchema)) {
-    // SAFETY: The ready client belongs to this group. Its tag selects this exact
-    // declaration's payload and unary result; never erases only the generic call site.
     return {
       ...identity,
       kind: 'Unary',
@@ -89,8 +86,6 @@ const describeRpc = <Rpcs extends Rpc.Any, ClientError>(
       executionError: (operation, cause) => new EffectRpcQueryError(rpcTag, operation, cause),
     }
   }
-  // SAFETY: RpcSchema identified this tag's streaming success schema; the client
-  // is from the same group, so this call returns that declaration's Stream.
   return {
     ...identity,
     kind: 'Streaming',
@@ -103,8 +98,6 @@ const describeRpc = <Rpcs extends Rpc.Any, ClientError>(
   }
 }
 
-// SAFETY: A RpcGroup stores complete runtime definitions for all its members;
-// AnyWithProps restores that SDK metadata surface after generic member erasure.
 export const extractRpcs = <Rpcs extends Rpc.Any, ClientError>(
   group: RpcGroup.RpcGroup<Rpcs>,
   client: RpcClient.RpcClient.Flat<Rpcs, ClientError>,

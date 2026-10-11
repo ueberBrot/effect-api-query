@@ -88,7 +88,6 @@ describe('example HTTP API', () => {
       const server = yield* startExampleRpcServer()
       const rpc = yield* makeExampleRpcClient(server.rpcUrl)
       const context = yield* Effect.context()
-      // This test drives external browser cancellation independently of the surrounding Effect.
       /* oxlint-disable effecttsgo/abort-controller-in-effect */
       // @effect-diagnostics-next-line abortControllerInEffect:off
       const controller = new AbortController()
@@ -231,7 +230,6 @@ describe('example HTTP API', () => {
         durationMs: 60_000,
         operationId: 'rpc-panel',
       }).pipe(Effect.forkChild)
-      // This test drives external browser cancellation independently of the surrounding Effect.
       /* oxlint-disable effecttsgo/abort-controller-in-effect */
       // @effect-diagnostics-next-line abortControllerInEffect:off
       const controller = new AbortController()

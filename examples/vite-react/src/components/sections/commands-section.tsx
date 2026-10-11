@@ -12,7 +12,6 @@ const Command = ({
   readonly application: ViteReactApplication
   readonly number: number
 }) => {
-  // This command keeps its idempotency key for the component lifetime.
   // oxlint-disable-next-line react/hook-use-state
   const [operationId] = useState(() => globalThis.crypto.randomUUID())
   const { rpcQuery, queryClient, trackMutationOptions } = application
@@ -35,8 +34,9 @@ const Command = ({
       enabled: start.status !== 'idle',
       refetchInterval: (query) =>
         query.state.data?.state === 'running' ||
-        query.state.data === null ||
-        query.state.data === undefined
+        query.state.status === 'error' ||
+        query.state.data === undefined ||
+        (query.state.data === null && start.isPending)
           ? 100
           : false,
     }),
@@ -52,7 +52,9 @@ const Command = ({
       <div className="flex flex-wrap gap-3">
         <ActionButton
           type="button"
-          disabled={start.status !== 'idle'}
+          disabled={
+            start.isPending || start.isSuccess || (command !== undefined && command !== null)
+          }
           onClick={() => {
             start.mutate(input)
           }}

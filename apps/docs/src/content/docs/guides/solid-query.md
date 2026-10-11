@@ -4,14 +4,9 @@ description: Rebuild generated options with a Solid accessor and keep client res
 ---
 
 Pass generated options from either factory to Solid Query's native hooks. Configure
-`QueryClientProvider` and acquire the ready client before creating the utilities. Keep its `Scope`
-and any serviceful runner alive while queries use them.
+`QueryClientProvider` and acquire the ready client before creating the utilities.
 
 The examples target Solid 1.9.15 with Solid Query 5.104.0 and Query Core 5.104.0.
-
-Match the native Query wrapper to the application's Query Core and use a compiler supported by
-the framework's tooling. See the
-[compatibility reference](/effect-api-query/reference/compatibility-and-limits/) for adapter capabilities.
 
 ## Rebuild options when input changes
 
@@ -19,9 +14,8 @@ Builders capture plain input when called. Build options inside Solid's options a
 changed input produces a new key and query function. Passing a builder's result once leaves the
 query attached to the original input.
 
-Keep captured values unchanged while their options can execute. See
-[Data Normalization](/effect-api-query/concepts/data-normalization/#keep-captured-inputs-unchanged)
-for the distinction between immutable keys and caller-owned input.
+Keep [captured inputs unchanged](/effect-api-query/concepts/data-normalization/#keep-captured-inputs-unchanged)
+while their options can execute.
 
 In component setup, use `rpc` from your [ready client](/effect-api-query/getting-started/quick-start/)
 and pass the builder call as an accessor. Here `users.read` accepts an ID and returns a user
@@ -58,16 +52,11 @@ An explicit `initialData: undefined` overrides inherited QueryClient initial dat
 
 ## Own streams and disposal
 
-Other observers of the same query keep it active. At owner disposal, drain accepted mutations
-as well as local stream finalizers before releasing client resources.
+Changing input or disposing the Solid owner removes an observer. An abort-aware open stream
+cancels when its last observer leaves; other observers keep it active. Keep clients alive until
+local finalizers and accepted mutations settle. Follow
+[Client Lifecycle](/effect-api-query/concepts/client-lifecycle/) for disposal and
+[Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/) for owner replacement.
+Transport interruption depends on the ready client.
 
-Open streams expose their first value while fetching continues. Changing reactive input replaces
-the query; when its last observer leaves, query cancellation closes the stream iterator. Solid
-owner disposal also releases observed streams. Keep client resources alive until these queries
-finish cancelling, then clear the owned QueryClient and close the client scope. Transport
-interruption depends on the ready client.
-
-Use `streamedOptions` for an accumulated history and `liveOptions` for its latest emission. HTTP
-`metadataOptions` retains decoded data, response status, and header snapshots in a separate cache
-entry. Follow [client lifecycle](/effect-api-query/concepts/client-lifecycle/) and
-[cancellation](/effect-api-query/guides/cancellation/) when disposing the cache owner.
+Match Solid Query to the application's Query Core and use a compiler supported by Solid's tooling.

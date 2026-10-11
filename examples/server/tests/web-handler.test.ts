@@ -25,7 +25,6 @@ describe('example RPC request body limit', () => {
       )
       expect(failedResponse.status).toBe(400)
 
-      // This test drives external browser cancellation independently of the surrounding Effect.
       /* oxlint-disable effecttsgo/abort-controller-in-effect */
       // @effect-diagnostics-next-line abortControllerInEffect:off
       const controller = new AbortController()
@@ -65,6 +64,42 @@ describe('example RPC request body limit', () => {
         expect(response.status).toBe(size > 1024 * 1024 ? 413 : 200)
         yield* Effect.promise(async () => response.arrayBuffer())
       }
+    }),
+  )
+
+  it.effect('preserves earlier upload bytes when a producer reuses its chunk buffer', () =>
+    Effect.gen(function* () {
+      const handler = yield* makeExampleRpcWebHandler()
+      const bytes = new Uint8Array(1024)
+      let chunks = 0
+      const body = new ReadableStream<Uint8Array>(
+        {
+          pull(controller) {
+            if (chunks === 5) {
+              controller.close()
+              return
+            }
+            bytes.fill(32)
+            if (chunks === 0) {
+              bytes.set(new TextEncoder().encode('[]'))
+            }
+            controller.enqueue(bytes)
+            chunks += 1
+          },
+        },
+        { highWaterMark: 0 },
+      )
+      const response = yield* Effect.promise(async () =>
+        handler(
+          streamingRequest('http://localhost/rpc', {
+            method: 'POST',
+            body,
+            duplex: 'half',
+          }),
+        ),
+      )
+      expect(response.status).toBe(200)
+      yield* Effect.promise(async () => response.arrayBuffer())
     }),
   )
 

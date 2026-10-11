@@ -5,6 +5,7 @@ import type { Stream } from 'effect'
 import { createHttpApiQueryUtils, EffectHttpApiQueryEmptyStreamError } from 'effect-api-query'
 import type {
   CreateHttpApiQueryUtilsOptions,
+  EffectHttpApiQueryConfigError,
   EffectHttpApiQueryError,
   RunPromiseExit,
 } from 'effect-api-query'
@@ -89,14 +90,16 @@ const options = utils.views.plain.streamedOptions({
 const data = queryClient.getQueryData(options.queryKey)
 true satisfies Assert<Equal<typeof data, readonly number[] | undefined>>
 const state = queryClient.getQueryState(options.queryKey)
-type Error = EffectHttpApiQueryError<
-  | 'client-error'
-  | typeof Expired.Type
-  | HttpClientError.HttpClientError
-  | Schema.SchemaError
-  | Sse.Retry
-  | Sse.SseError
->
+type Error =
+  | EffectHttpApiQueryConfigError
+  | EffectHttpApiQueryError<
+      | 'client-error'
+      | typeof Expired.Type
+      | HttpClientError.HttpClientError
+      | Schema.SchemaError
+      | Sse.Retry
+      | Sse.SseError
+    >
 true satisfies Assert<Equal<NonNullable<typeof state>['error'], Error | null>>
 const observer = new QueryObserver(queryClient, options)
 true satisfies Assert<
@@ -182,11 +185,13 @@ queryClient.getQueryData(extra.views.plain.streamedKey(input)) satisfies
   | undefined
 
 const extraState = queryClient.getQueryState(extra.views.plain.streamedKey(input))
-type ExtraFailure = NonNullable<typeof extraState>['error'] extends EffectHttpApiQueryError<
-  infer E
-> | null
-  ? E
-  : never
+type ExtraFailure =
+  Exclude<
+    NonNullable<typeof extraState>['error'],
+    EffectHttpApiQueryConfigError | null
+  > extends EffectHttpApiQueryError<infer E>
+    ? E
+    : never
 true satisfies Assert<
   Equal<Extract<ExtraFailure, 'extra-error' | 'stream-error'>, 'extra-error' | 'stream-error'>
 >
@@ -263,7 +268,7 @@ const extraLiveState = queryClient.getQueryState(extra.views.plain.liveKey(input
 type ExtraLiveFailure =
   Exclude<
     NonNullable<typeof extraLiveState>['error'],
-    EffectHttpApiQueryEmptyStreamError | null
+    EffectHttpApiQueryConfigError | EffectHttpApiQueryEmptyStreamError | null
   > extends EffectHttpApiQueryError<infer E>
     ? E
     : never

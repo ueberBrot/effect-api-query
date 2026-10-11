@@ -74,7 +74,12 @@ const status = useQuery(
     input,
     enabled: start.status !== 'idle',
     refetchInterval: (query) =>
-      query.state.data == null || query.state.data.state === 'running' ? 100 : false,
+      query.state.data?.state === 'running' ||
+      query.state.status === 'error' ||
+      query.state.data === undefined ||
+      (query.state.data === null && start.isPending)
+        ? 100
+        : false,
   }),
 )
 ```
@@ -86,14 +91,17 @@ start.mutate(input)
 cancel.mutate(input)
 ```
 
-Disable start after its first attempt, and disable cancel before start, while cancellation is
+Disable start while pending, after success, or when status confirms an accepted command.
+After a failed start with no accepted command, retry with the same operation ID; an uncertain
+response must not create a second command. Disable cancel before start, while cancellation is
 pending, or after a terminal status. The
 [complete command panel](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/components/sections/commands-section.tsx)
 includes the UI.
 
 The cancel handler signals the worker and waits until it has stopped. The cancel mutation's
 `onSettled` callback then invalidates the generated status key. The active query refetches the
-server's status even if the cancel request failed, and polling stops at a terminal state.
+server's status even if the cancel request failed. Poll unresolved or failed status reads and
+running commands. Stop at a terminal status, or when a settled start has no corresponding command.
 The application chooses this invalidation policy.
 
 A cancelled command returns `{ state: 'cancelled', ... }` successfully. TanStack therefore reports

@@ -57,8 +57,11 @@ Root, branch, leaf, and manually appended operation prefixes support native
 policy. Only concrete generated query keys carry data/error tags; broad reads
 remain `unknown` until the application establishes their representation. Selection
 changes observer results while the cache keeps full decoded data. Configure hashing
-on QueryClient global or prefix defaults and keep it stable; builders reject
-per-call hashing. Mutation defaults and keys use the separate native mutation cache.
+through QueryClient global or prefix `queryKeyHashFn` and keep it stable; builders
+reject per-call hashing. Streams reject inconsistent default `queryHash` values
+and conflicting cached identity with `UnsupportedQueryHash` during execution.
+Retire the old cache before changing its hash policy.
+Mutation defaults and keys use the separate native mutation cache.
 
 ## Coordinate overlapping optimistic writes
 

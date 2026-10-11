@@ -31,10 +31,10 @@ const InfiniteUserQueries = ({
       input: (cursor: number) => ({ cursor, pageSize: PAGE_SIZE }),
     }),
   )
-  const loadedUsers = userPages.data?.pages.flatMap((page) => page.users) ?? []
+  const loaded = userPages.data?.pages.reduce((count, page) => count + page.users.length, 0) ?? 0
   const totalUsers = userPages.data?.pages[0]?.total ?? 0
   const pageCount = userPages.data?.pages.length ?? 0
-  const remainingUsers = Math.max(0, totalUsers - loadedUsers.length)
+  const remainingUsers = Math.max(0, totalUsers - loaded)
   const nextPageSize = Math.min(PAGE_SIZE, remainingUsers)
   let nextPageLabel = 'All users loaded'
   if (userPages.hasNextPage) {
@@ -49,7 +49,7 @@ const InfiniteUserQueries = ({
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h3 className="display-heading text-xl font-bold text-text-primary">Infinite query</h3>
         <span className="border border-brand-800 bg-brand-950/80 px-3 py-1 text-sm font-bold text-brand-200">
-          {String(loadedUsers.length)} of {String(totalUsers)} loaded
+          {String(loaded)} of {String(totalUsers)} loaded
         </span>
       </div>
       <p className="mt-2 text-sm leading-6 text-muted-foreground">
@@ -105,9 +105,7 @@ export const QueriesSection = ({ application }: { readonly application: ViteReac
     setBoundedHistory(bounded)
     try {
       await queryClient.query(streamedDiagnosticsOptions(rpcQuery, bounded))
-    } catch {
-      // Query state retains the error for rendering.
-    }
+    } catch {}
   }
   const liveDiagnostic = useQuery(rpcQuery.diagnostics.stream.liveOptions())
   const [cacheMessage, setCacheMessage] = useState<string>()

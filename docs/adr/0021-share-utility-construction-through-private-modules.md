@@ -2,13 +2,10 @@
 
 Status: Accepted. Clarifies ADR 0003, ADR 0005 through ADR 0007, and ADR 0009. Extended by [ADR 0022](0022-add-buffered-http-utilities-with-separate-key-roots.md) and [ADR 0023](0023-expose-buffered-multipart-http-mutations.md).
 
-One root package and artifact expose the public factories; core and adapters remain private.
-The utility-tree module owns atomic validation, canonical keys, options, skipping, and unary
-execution through operation descriptions. Shared Query Core types contain no protocol declarations.
+Share validation, canonical keys, options, and execution through private core modules. Adapters
+own their protocol declarations, request preparation, ready-client invocation, and errors. Shared
+Query Core contracts remain independent of protocol declarations.
 
-Adapters own projection, Schema inspection, request preparation, ready-client invocation, request
-options, mapped types, and errors. Preparation binds input to its key; later RPC pages only
-construct payloads because they reuse the initial key. Streams retain their policy and cleanup.
-This keeps cache behavior in shared modules and protocol-specific behavior in adapters without
-changing public behavior. Tests exercise the public factories; public adapter registration and
-subpath exports stay excluded.
+This boundary gives common cache behavior one implementation while preserving each adapter's
+input and execution semantics. Consumers use public factories from one root package; internal
+modules and adapter registration remain private.

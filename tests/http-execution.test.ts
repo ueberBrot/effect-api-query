@@ -344,7 +344,6 @@ describe('HTTP execution', () => {
       const input = { params: { scenario } }
       try {
         for (const operation of ['query', 'mutation'] as const) {
-          // SAFETY: Query and mutation runs share a Cause recorder; sequential execution isolates each identity assertion.
           /* oxlint-disable eslint/no-await-in-loop */
           const error: unknown = await captureFailure(
             operation === 'query'
