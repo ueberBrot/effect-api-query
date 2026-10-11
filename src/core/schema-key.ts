@@ -5,8 +5,10 @@ export interface SchemaKeyEncoding {
   readonly encode: (input: unknown) => unknown
 }
 
-const containsUnsafeKeyEncoding = (value: unknown, seen = new WeakSet()): boolean => {
-  if (!Predicate.isObjectOrArray(value) || seen.has(value)) {
+const safeAsts = new WeakSet()
+
+const containsUnsafeKeyEncoding = (value: unknown, seen: Set<object>): boolean => {
+  if (!Predicate.isObjectOrArray(value) || seen.has(value) || safeAsts.has(value)) {
     return false
   }
   seen.add(value)
@@ -47,7 +49,17 @@ export const createSchemaKeyEncoding = (schema: Schema.Top): SchemaKeyEncoding =
 
   return {
     get requiresEncoder() {
-      requiresEncoder ??= containsUnsafeKeyEncoding(schema.ast)
+      if (requiresEncoder === undefined) {
+        const seen = new Set<object>()
+        requiresEncoder = containsUnsafeKeyEncoding(schema.ast, seen)
+        if (!requiresEncoder) {
+          for (const node of seen) {
+            if (SchemaAST.isAST(node)) {
+              safeAsts.add(node)
+            }
+          }
+        }
+      }
       return requiresEncoder
     },
     encode: (input) => {

@@ -7,7 +7,7 @@ const registryUrl = 'https://registry.npmjs.org/effect-api-query/latest'
 const packageUrl = 'https://www.npmjs.com/package/effect-api-query'
 const repositoryUrl = 'https://github.com/ueberBrot/effect-api-query'
 
-test('opens both tutorials and searches the production index under the public base', async ({
+test('opens tutorials and feature guides and searches the production index', async ({
   page,
   baseURL,
 }) => {
@@ -46,6 +46,23 @@ test('opens both tutorials and searches the production index under the public ba
   await expect(page).toHaveURL(`${docsBase}getting-started/quick-start/`)
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('RPC Quick Start')
   await page.waitForLoadState('networkidle')
+
+  /* oxlint-disable eslint/no-await-in-loop */
+  for (const [title, slug] of [
+    ['Queries', 'guides/queries'],
+    ['Pagination', 'guides/pagination'],
+    ['HTTP Metadata', 'guides/http-metadata'],
+    ['HTTP Builders', 'reference/http-builders'],
+  ] as const) {
+    await page
+      .getByRole('navigation', { name: 'Main', exact: true })
+      .getByRole('link', { name: title, exact: true })
+      .click()
+    await expect(page).toHaveURL(`${docsBase}${slug}/`)
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(title)
+    await page.waitForLoadState('networkidle')
+  }
+  /* oxlint-enable eslint/no-await-in-loop */
 
   await page
     .getByRole('navigation', { name: 'Main', exact: true })

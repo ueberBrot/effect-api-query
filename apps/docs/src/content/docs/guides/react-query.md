@@ -57,13 +57,17 @@ see [Choose Stream History](/effect-api-query/guides/choose-stream-history/) for
 The same hooks accept the complete decoded request:
 
 ```ts
-const user = useQuery(http.users.get.queryOptions({ input: { params: { id: 1 } } }))
+const user = useQuery(
+  http.users.get.queryOptions({ input: { params: { id: 1 }, query: { locale: 'en' } } }),
+)
 ```
 
-See [HTTP Queries and Mutations](/effect-api-query/guides/http-queries-and-mutations/) for
-metadata, uploads and SSE. Builders own their key/function fields; configure hashing through
+See [HTTP Metadata](/effect-api-query/guides/http-metadata/),
+[Streaming](/effect-api-query/guides/streaming/), and
+[HTTP Requests and Uploads](/effect-api-query/guides/http-queries-and-mutations/).
+Builders own their key/function fields; configure hashing through
 QueryClient defaults. [RPC Builders](/effect-api-query/reference/generated-builders/) and
-[HTTP Factory](/effect-api-query/reference/http-factory/) describe the precise option contracts.
+[HTTP Builders](/effect-api-query/reference/http-builders/) describe the precise option contracts.
 
 For complete components and resource setup, use the [Vite React example](/effect-api-query/examples/):
 [queries](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/components/sections/queries-section.tsx),

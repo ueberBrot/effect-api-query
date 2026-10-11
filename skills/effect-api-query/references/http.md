@@ -206,8 +206,9 @@ rules apply to default encoding, not custom encoder output.
 Configure custom encoders under declaration group and endpoint identifiers,
 including top-level groups: `keyEncoders: { groupId: { endpointId: encoder } }`.
 The encoder receives the complete decoded request. For endpoints with query support,
-provide one when encoding requires services, the request contains explicit redacted values, or the endpoint
-declares multiple payload alternatives. Binary query inputs need a JSON-safe projection,
+provide one when encoding requires services, uses opaque middleware, contains explicit
+redacted values, or declares multiple payload alternatives. Runtime middleware inspection
+is conservative even for synchronous service-free encoding. Binary query inputs need a JSON-safe projection,
 such as an array of bytes.
 
 Return strict synchronous `JsonValue` and preserve body/content-type distinctions
@@ -216,4 +217,5 @@ supplies identity only; the client still performs request encoding, and the
 runner must provide required services. Keep ordinary authentication in client
 middleware and use safe identity partitions in the key prefix.
 
-Source: [HTTP factory contract](https://ueberbrot.github.io/effect-api-query/reference/http-factory/).
+Sources: [HTTP factory](https://ueberbrot.github.io/effect-api-query/reference/http-factory/),
+[HTTP builders](https://ueberbrot.github.io/effect-api-query/reference/http-builders/).

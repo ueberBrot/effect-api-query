@@ -62,7 +62,7 @@ const revision = report.response.headers.get('x-revision')
 
 Read declared failures through `error` and inspect `response.status`; the external client does
 not construct an Effect execution-error wrapper. Its `Response` keeps status and raw headers.
-The native [metadata view](/effect-api-query/reference/http-factory/#buffered-metadata) instead
+The native [metadata view](/effect-api-query/reference/http-builders/#buffered-metadata) instead
 keeps decoded data and immutable plain status/header snapshots.
 
 Array query parameters use repeated names, including a single-element array. JSON array

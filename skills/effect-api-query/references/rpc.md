@@ -97,7 +97,9 @@ another request when cancellation meets an overflowing buffer of size one.
 
 Configure `keyEncoders` by the original literal RPC tag, such as `'secrets.read'`.
 An encoder receives the normalized payload after constructor defaults. Provide
-one when payload encoding needs services or contains explicit redacted values.
+one when payload encoding needs services, contains explicit redacted values, or uses
+opaque encoding middleware. Runtime inspection treats middleware conservatively,
+including synchronous service-free middleware.
 
 Return a synchronous strict `JsonValue`: finite numbers, strings, booleans,
 null, dense arrays, and plain objects with defined JSON values. Default RPC

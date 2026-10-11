@@ -10,7 +10,226 @@ import { describe, expect, it } from 'vite-plus/test'
 
 import { makeControlledUserWrites } from '../../../tests/fixtures/optimistic-users.ts'
 
+const twoPageDirectory = (users: readonly User[]) => ({
+  pages: [
+    new UserPage({ users: users.slice(0, 4), total: users.length, nextCursor: 4 }),
+    new UserPage({ users: users.slice(4), total: users.length, nextCursor: null }),
+  ],
+  pageParams: [0, 4],
+})
+
 describe('User writes in the Vite application', () => {
+  it.each(
+    (['rpc', 'http'] as const).flatMap((adapter) =>
+      (['rpc', 'http'] as const).flatMap((refreshedAdapter) =>
+        [false, true].map((retainOther) => ({ adapter, refreshedAdapter, retainOther })),
+      ),
+    ),
+  )(
+    'preserves an authoritative $refreshedAdapter list after a failed $adapter deletion with another user: $retainOther',
+    async ({ adapter, refreshedAdapter, retainOther }) => {
+      const fixture = await Effect.runPromise(makeControlledUserWrites(new QueryClient()))
+      const { queryClient, rpcQuery, httpQuery, userWrites } = fixture.application
+      const ada = new User({ id: 1, name: 'Ada', locale: 'en' })
+      const alan = new User({ id: 2, name: 'Alan', locale: 'en' })
+      const initial = retainOther ? [ada, alan] : [ada]
+      fixture.seed(initial)
+      const listKeys = {
+        rpc: rpcQuery.users.list.queryKey(),
+        http: httpQuery.users.list.queryKey(),
+      }
+      for (const key of Object.values(listKeys)) {
+        queryClient.setQueryData(key, initial)
+      }
+      try {
+        const deletion =
+          adapter === 'rpc'
+            ? new MutationObserver(queryClient, userWrites.rpcDelete()).mutate({ id: 1 })
+            : new MutationObserver(queryClient, userWrites.httpDelete()).mutate({
+                params: { id: 1 },
+              })
+        const failure = Promise.allSettled([deletion])
+        const request = await fixture.nextDelete()
+        const optimistic = queryClient.getQueryData(listKeys[refreshedAdapter])
+        const authoritative = retainOther ? [alan] : []
+        fixture.seed(authoritative)
+        await (refreshedAdapter === 'rpc'
+          ? queryClient.query(rpcQuery.users.list.queryOptions())
+          : queryClient.query(httpQuery.users.list.queryOptions()))
+        expect(queryClient.getQueryData(listKeys[refreshedAdapter]) === optimistic).toBe(
+          !retainOther || refreshedAdapter === 'rpc',
+        )
+        await request.fail()
+        await expect(failure).resolves.toMatchObject([{ status: 'rejected' }])
+        expect(queryClient.getQueryData(listKeys[refreshedAdapter])).toStrictEqual(authoritative)
+        const otherAdapter = refreshedAdapter === 'rpc' ? 'http' : 'rpc'
+        expect(queryClient.getQueryData(listKeys[otherAdapter])).toStrictEqual(initial)
+      } finally {
+        await fixture.application.dispose()
+      }
+    },
+  )
+
+  it.each(['rpc', 'http'] as const)(
+    'keeps a refreshed %s list authoritative through a later creation and failed deletion',
+    async (adapter) => {
+      const fixture = await Effect.runPromise(makeControlledUserWrites(new QueryClient()))
+      const { queryClient, rpcQuery, httpQuery, userWrites } = fixture.application
+      const ada = new User({ id: 1, name: 'Ada', locale: 'en' })
+      const grace = new User({ id: 2, name: 'Grace', locale: 'en' })
+      const listKeys = {
+        rpc: rpcQuery.users.list.queryKey(),
+        http: httpQuery.users.list.queryKey(),
+      }
+      fixture.seed([ada])
+      for (const key of Object.values(listKeys)) {
+        queryClient.setQueryData(key, [ada])
+      }
+      try {
+        const deletion = new MutationObserver(queryClient, userWrites.rpcDelete()).mutate({ id: 1 })
+        const failure = Promise.allSettled([deletion])
+        const deleteRequest = await fixture.nextDelete()
+        fixture.seed([])
+        await (adapter === 'rpc'
+          ? queryClient.query(rpcQuery.users.list.queryOptions())
+          : queryClient.query(httpQuery.users.list.queryOptions()))
+        const creation = new MutationObserver(queryClient, userWrites.httpCreate()).mutate({
+          payload: { name: 'Grace' },
+        })
+        const createRequest = await fixture.nextCreate()
+        await createRequest.succeed(grace)
+        await creation
+        await deleteRequest.fail()
+        await expect(failure).resolves.toMatchObject([{ status: 'rejected' }])
+        expect(queryClient.getQueryData(listKeys[adapter])).toStrictEqual([grace])
+        const otherAdapter = adapter === 'rpc' ? 'http' : 'rpc'
+        expect(queryClient.getQueryData(listKeys[otherAdapter])).toStrictEqual([ada, grace])
+      } finally {
+        await fixture.application.dispose()
+      }
+    },
+  )
+
+  it.each(['rpc', 'http'] as const)(
+    'preserves a reentrant authoritative %s list publication during an optimistic edit',
+    async (adapter) => {
+      const fixture = await Effect.runPromise(makeControlledUserWrites(new QueryClient()))
+      const { queryClient, rpcQuery, httpQuery, userWrites } = fixture.application
+      const ada = new User({ id: 1, name: 'Ada', locale: 'en' })
+      const alan = new User({ id: 2, name: 'Alan', locale: 'en' })
+      const key =
+        adapter === 'rpc' ? rpcQuery.users.list.queryKey() : httpQuery.users.list.queryKey()
+      queryClient.setQueryData(key, [ada, alan])
+      const { queryHash } = queryClient.defaultQueryOptions({ queryKey: key })
+      let replace = true
+      const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
+        if (
+          replace &&
+          event.query.queryHash === queryHash &&
+          event.type === 'updated' &&
+          event.action.type === 'success' &&
+          event.action.manual === true
+        ) {
+          replace = false
+          queryClient.setQueryData(key, [alan])
+        }
+      })
+      try {
+        const deletion = new MutationObserver(queryClient, userWrites.rpcDelete()).mutate({ id: 1 })
+        const failure = Promise.allSettled([deletion])
+        const request = await fixture.nextDelete()
+        await request.fail()
+        await expect(failure).resolves.toMatchObject([{ status: 'rejected' }])
+        expect(queryClient.getQueryData(key)).toStrictEqual([alan])
+      } finally {
+        unsubscribe()
+        await fixture.application.dispose()
+      }
+    },
+  )
+
+  it.each(['rpc', 'http'] as const)(
+    'keeps an authoritative %s list after both overlapping deletes fail',
+    async (adapter) => {
+      const fixture = await Effect.runPromise(makeControlledUserWrites(new QueryClient()))
+      const { queryClient, rpcQuery, httpQuery, userWrites } = fixture.application
+      const ada = new User({ id: 1, name: 'Ada', locale: 'en' })
+      const key =
+        adapter === 'rpc' ? rpcQuery.users.list.queryKey() : httpQuery.users.list.queryKey()
+      fixture.seed([ada])
+      queryClient.setQueryData(key, [ada])
+      try {
+        const older = new MutationObserver(queryClient, userWrites.rpcDelete()).mutate({ id: 1 })
+        const olderFailure = Promise.allSettled([older])
+        const olderRequest = await fixture.nextDelete()
+        const newer = new MutationObserver(queryClient, userWrites.httpDelete()).mutate({
+          params: { id: 1 },
+        })
+        const newerFailure = Promise.allSettled([newer])
+        const newerRequest = await fixture.nextDelete()
+        fixture.seed([])
+        await (adapter === 'rpc'
+          ? queryClient.query(rpcQuery.users.list.queryOptions())
+          : queryClient.query(httpQuery.users.list.queryOptions()))
+        await olderRequest.fail()
+        await olderFailure
+        await newerRequest.fail()
+        await expect(newerFailure).resolves.toMatchObject([{ status: 'rejected' }])
+        expect(queryClient.getQueryData(key)).toStrictEqual([])
+      } finally {
+        await fixture.application.dispose()
+      }
+    },
+  )
+
+  it.each(['rpc', 'http'] as const)(
+    'keeps equal authoritative %s pages independent of optimistic ownership',
+    async (adapter) => {
+      const fixture = await Effect.runPromise(makeControlledUserWrites(new QueryClient()))
+      const { queryClient, rpcQuery, httpQuery, userWrites } = fixture.application
+      const ada = new User({ id: 1, name: 'Ada', locale: 'en' })
+      const key =
+        adapter === 'rpc'
+          ? rpcQuery.users.page.infiniteKey({ cursor: 0, pageSize: 4 })
+          : httpQuery.users.page.infiniteKey({ query: { cursor: 0, pageSize: 4 } })
+      fixture.seed([ada])
+      queryClient.setQueryData(key, {
+        pages: [new UserPage({ users: [ada], total: 1, nextCursor: null })],
+        pageParams: [0],
+      })
+      try {
+        const deletion = new MutationObserver(queryClient, userWrites.rpcDelete()).mutate({ id: 1 })
+        const failure = Promise.allSettled([deletion])
+        const request = await fixture.nextDelete()
+        const optimisticPage = queryClient.getQueryData(key)?.pages[0]
+        fixture.seed([])
+        await (adapter === 'rpc'
+          ? queryClient.infiniteQuery(
+              rpcQuery.users.page.infiniteOptions({
+                initialPageParam: 0,
+                input: (cursor: number) => ({ cursor, pageSize: 4 }),
+                getNextPageParam: (page) => page.nextCursor ?? undefined,
+              }),
+            )
+          : queryClient.infiniteQuery(
+              httpQuery.users.page.infiniteOptions({
+                initialPageParam: 0,
+                input: (cursor: number) => ({ query: { cursor, pageSize: 4 } }),
+                getNextPageParam: (page) => page.nextCursor ?? undefined,
+              }),
+            ))
+        const authoritativePage = queryClient.getQueryData(key)?.pages[0]
+        expect(authoritativePage).toStrictEqual(optimisticPage)
+        expect(authoritativePage).not.toBe(optimisticPage)
+        await request.fail()
+        await expect(failure).resolves.toMatchObject([{ status: 'rejected' }])
+        expect(queryClient.getQueryData(key)?.pages[0]).toBe(authoritativePage)
+      } finally {
+        await fixture.application.dispose()
+      }
+    },
+  )
+
   it.each(['rpc', 'http'] as const)(
     'preserves refreshed %s page totals when a pending creation fails',
     async (adapter) => {
@@ -373,6 +592,116 @@ describe('User writes in the Vite application', () => {
           })
         }
       } finally {
+        await fixture.application.dispose()
+      }
+    },
+  )
+
+  it.each(
+    (['rpc', 'http'] as const).flatMap((adapter) =>
+      [false, true].flatMap((addedTarget) =>
+        [false, true].map((newerFailsFirst) => ({ adapter, addedTarget, newerFailsFirst })),
+      ),
+    ),
+  )(
+    'restores refreshed $adapter rows and pages through overlapping deletions; added target: $addedTarget, newer failure first: $newerFailsFirst',
+    async ({ adapter, addedTarget, newerFailsFirst }) => {
+      const fixture = await Effect.runPromise(makeControlledUserWrites(new QueryClient()))
+      const { queryClient, rpcQuery, httpQuery, userWrites } = fixture.application
+      const ada = new User({ id: 1, name: 'Ada', locale: 'en' })
+      const alan = new User({ id: 2, name: 'Alan', locale: 'en' })
+      const grace = new User({ id: 3, name: 'Grace', locale: 'en' })
+      const hopper = new User({ id: 4, name: 'Hopper', locale: 'en' })
+      const knuth = new User({ id: 5, name: 'Knuth', locale: 'en' })
+      const dennis = new User({ id: 6, name: 'Dennis', locale: 'en' })
+      const initial = [ada, alan, grace, hopper, knuth, dennis]
+      const updatedAlan = new User({ id: 2, name: 'Updated Alan', locale: 'fr' })
+      const linus = new User({ id: 7, name: 'Linus', locale: 'fr' })
+      const authoritative = [hopper, knuth, grace, dennis, updatedAlan, linus]
+      const lists = {
+        rpc: rpcQuery.users.list.queryKey(),
+        http: httpQuery.users.list.queryKey(),
+      }
+      const pages = {
+        rpc: rpcQuery.users.page.infiniteKey({ cursor: 0, pageSize: 4 }),
+        http: httpQuery.users.page.infiniteKey({ query: { cursor: 0, pageSize: 4 } }),
+      }
+      fixture.seed(initial)
+      for (const key of Object.values(lists)) {
+        queryClient.setQueryData(key, initial)
+      }
+      for (const key of Object.values(pages)) {
+        queryClient.setQueryData(key, twoPageDirectory(initial))
+      }
+      const older = new MutationObserver(queryClient, userWrites.rpcDelete()).mutate({ id: 1 })
+      const olderOutcome = Promise.allSettled([older])
+      const first = await fixture.nextDelete()
+      try {
+        fixture.seed(authoritative)
+        await (adapter === 'rpc'
+          ? queryClient.query(rpcQuery.users.list.queryOptions())
+          : queryClient.query(httpQuery.users.list.queryOptions()))
+        await (adapter === 'rpc'
+          ? queryClient.infiniteQuery(
+              rpcQuery.users.page.infiniteOptions({
+                initialPageParam: 0,
+                input: (cursor: number) => ({ cursor, pageSize: 4 }),
+                getNextPageParam: (page) => page.nextCursor ?? undefined,
+              }),
+            )
+          : queryClient.infiniteQuery(
+              httpQuery.users.page.infiniteOptions({
+                initialPageParam: 0,
+                input: (cursor: number) => ({ query: { cursor, pageSize: 4 } }),
+                getNextPageParam: (page) => page.nextCursor ?? undefined,
+              }),
+            ))
+        const target = addedTarget ? linus : updatedAlan
+        const newer =
+          adapter === 'rpc'
+            ? new MutationObserver(queryClient, userWrites.httpDelete()).mutate({
+                params: { id: target.id },
+              })
+            : new MutationObserver(queryClient, userWrites.rpcDelete()).mutate({ id: target.id })
+        const newerOutcome = Promise.allSettled([newer])
+        const second = await fixture.nextDelete()
+        const latest =
+          adapter === 'rpc'
+            ? new MutationObserver(queryClient, userWrites.rpcDelete()).mutate({ id: 3 })
+            : new MutationObserver(queryClient, userWrites.httpDelete()).mutate({
+                params: { id: 3 },
+              })
+        const latestOutcome = Promise.allSettled([latest])
+        const third = await fixture.nextDelete()
+        if (newerFailsFirst) {
+          await second.fail()
+          await newerOutcome
+          await third.fail()
+        } else {
+          await third.fail()
+          await latestOutcome
+          await second.fail()
+        }
+        await expect(newerOutcome).resolves.toMatchObject([{ status: 'rejected' }])
+        await expect(latestOutcome).resolves.toMatchObject([{ status: 'rejected' }])
+        expect(queryClient.getQueryData(lists[adapter])).toStrictEqual(authoritative)
+        expect(queryClient.getQueryData(pages[adapter])).toStrictEqual(
+          twoPageDirectory(authoritative),
+        )
+        await first.fail()
+        await olderOutcome
+        const otherAdapter = adapter === 'rpc' ? 'http' : 'rpc'
+        expect(queryClient.getQueryData(lists[adapter])).toStrictEqual(authoritative)
+        expect(queryClient.getQueryData(pages[adapter])).toStrictEqual(
+          twoPageDirectory(authoritative),
+        )
+        expect(queryClient.getQueryData(lists[otherAdapter])).toStrictEqual(initial)
+        expect(queryClient.getQueryData(pages[otherAdapter])).toStrictEqual(
+          twoPageDirectory(initial),
+        )
+      } finally {
+        await first.fail()
+        await olderOutcome
         await fixture.application.dispose()
       }
     },

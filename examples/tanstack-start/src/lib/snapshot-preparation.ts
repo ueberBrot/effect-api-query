@@ -70,9 +70,23 @@ export const makeSnapshotPreparation = (
     encode: Schema.encodeUnknownEffect(codec),
     decode: Schema.decodeUnknownEffect(codec),
   }))
-  const codecFor = (key: QueryKey) =>
-    codecs.find(({ length, hash }) => hashKey(key.slice(0, length)) === hash)
   type ViewCodec = (typeof codecs)[number]
+  const codecsByLength = new Map<number, Map<string, ViewCodec>>()
+  for (const codec of codecs) {
+    const lengthCodecs = codecsByLength.get(codec.length) ?? new Map<string, ViewCodec>()
+    lengthCodecs.set(codec.hash, codec)
+    codecsByLength.set(codec.length, lengthCodecs)
+  }
+  const codecFor = (key: QueryKey) => {
+    let codec: ViewCodec | undefined
+    for (const [length, lengthCodecs] of codecsByLength) {
+      codec = lengthCodecs.get(hashKey(key.slice(0, length)))
+      if (codec !== undefined) {
+        break
+      }
+    }
+    return codec
+  }
   type SnapshotData = DehydratedState['queries'][number]['state']['data']
   const transform = <R>(
     queries: DehydratedState['queries'],

@@ -13,21 +13,36 @@ export type StreamQueryPolicy =
     }
   | { readonly _tag: 'Live' }
 
-export const accumulatedPolicy = (
+export const prepareStreamPolicy = (
   options: Record<string, unknown>,
+  operation: 'live' | 'streamed',
   invalid: (code: 'InvalidMaxChunks' | 'InvalidRefetchMode', message: string) => Error,
-): Extract<StreamQueryPolicy, { readonly _tag: 'Accumulated' }> => {
-  const { maxChunks, refetchMode = 'reset' } = options
-  if (
-    maxChunks !== undefined &&
-    (!Predicate.isNumber(maxChunks) || !Number.isSafeInteger(maxChunks) || maxChunks <= 0)
-  ) {
-    throw invalid('InvalidMaxChunks', 'maxChunks must be a positive safe integer')
+) => {
+  let policy: StreamQueryPolicy
+  if (operation === 'streamed') {
+    const { maxChunks, refetchMode = 'reset' } = options
+    if (
+      maxChunks !== undefined &&
+      (!Predicate.isNumber(maxChunks) || !Number.isSafeInteger(maxChunks) || maxChunks <= 0)
+    ) {
+      throw invalid('InvalidMaxChunks', 'maxChunks must be a positive safe integer')
+    }
+    if (refetchMode !== 'reset' && refetchMode !== 'append' && refetchMode !== 'replace') {
+      throw invalid('InvalidRefetchMode', 'refetchMode must be reset, append, or replace')
+    }
+    policy = { _tag: 'Accumulated', maxChunks, refetchMode }
+  } else {
+    policy = { _tag: 'Live' }
   }
-  if (refetchMode !== 'reset' && refetchMode !== 'append' && refetchMode !== 'replace') {
-    throw invalid('InvalidRefetchMode', 'refetchMode must be reset, append, or replace')
+  delete options['refetchMode']
+  delete options['maxChunks']
+  return {
+    policy,
+    history:
+      policy._tag === 'Live'
+        ? undefined
+        : { maxChunks: policy.maxChunks ?? null, refetchMode: policy.refetchMode },
   }
-  return { _tag: 'Accumulated', maxChunks, refetchMode }
 }
 
 export interface MakeStreamQueryOptions {

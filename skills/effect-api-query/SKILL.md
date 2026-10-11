@@ -114,8 +114,9 @@ Read only the branch needed for the task:
 - Use the generated concrete key for its cache shape. Accumulated keys include
   normalized retention/refetch policy: `streamedKey(input, policy)`. HTTP stream
   keys also include decoder policy. Inputless stream keys take policy first.
-  Concrete keys retain the unselected cache data type; `select` changes observer
-  data only. Use the matching options' `queryKey` when it already exists.
+  Concrete keys retain the unselected cache data type. Hooks, observers, and
+  `queryClient.query` apply `select`; `getQueryData` reads the decoded cache value.
+  Use the matching options' `queryKey` when it already exists.
 - Use `key()` on a tree, branch, or leaf for prefix invalidation. After mutations,
   invalidate affected reads explicitly. RPC and HTTP roots are distinct; use
   the original caller prefix only for deliberate invalidation across adapters.

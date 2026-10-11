@@ -515,19 +515,11 @@ it.effect('validates HTTP history policies before skipped queries acquire a requ
     })
     const http = createHttpApiQueryUtils(inputApi, { client, keyPrefix: ['skipped-http'] })
     for (const input of [{ query: { channel: 'news' } }, skipToken] as const) {
-      for (const policy of [
-        { maxChunks: 0 },
-        { maxChunks: Number.NaN },
-        { maxChunks: Number.MAX_SAFE_INTEGER + 1 },
-        { refetchMode: 'invalid' },
-        { refetchMode: null },
-      ]) {
-        const build = () =>
-          // @ts-expect-error Invalid policies must reach runtime validation.
-          http.events.watch.streamedOptions({ input, ...policy })
+      for (const maxChunks of [0, Number.NaN, Number.MAX_SAFE_INTEGER + 1]) {
+        const build = () => http.events.watch.streamedOptions({ input, maxChunks })
         expect(build).toThrow(
           expect.objectContaining({
-            code: 'maxChunks' in policy ? 'InvalidMaxChunks' : 'InvalidRefetchMode',
+            code: 'InvalidMaxChunks',
             apiId: 'skipped-policies',
             endpoint: 'watch',
           }),

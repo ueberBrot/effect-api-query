@@ -1,8 +1,7 @@
 import { Stream } from 'effect'
 
 import type { StreamingOperation } from '../core/operation'
-import { accumulatedPolicy, makeStreamQuery } from '../core/streamed-query'
-import type { StreamQueryPolicy } from '../core/streamed-query'
+import { makeStreamQuery, prepareStreamPolicy } from '../core/streamed-query'
 import {
   EffectRpcQueryConfigError,
   EffectRpcQueryEmptyStreamError,
@@ -21,27 +20,15 @@ export interface RpcStreamInvocation {
 export const createStreamPreparation =
   (rpc: RpcStreamInvocation): StreamingOperation['prepareStream'] =>
   (options, operation, runPromiseExit, requestOptions) => {
-    const policy: StreamQueryPolicy =
-      operation === 'live'
-        ? { _tag: 'Live' }
-        : accumulatedPolicy(
-            options,
-            (code, message) => new EffectRpcQueryConfigError(code, message, { rpcTag: rpc.tag }),
-          )
-    delete options['refetchMode']
-    delete options['maxChunks']
+    const { policy, history } = prepareStreamPolicy(
+      options,
+      operation,
+      (code, message) => new EffectRpcQueryConfigError(code, message, { rpcTag: rpc.tag }),
+    )
     // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const rpcOptions = requestOptions as StreamingRpcOptions | undefined
     return {
-      identity:
-        policy._tag === 'Live'
-          ? []
-          : [
-              Object.freeze({
-                maxChunks: policy.maxChunks ?? null,
-                refetchMode: policy.refetchMode,
-              }),
-            ],
+      identity: history === undefined ? [] : [Object.freeze(history)],
       makeQuery: (input) =>
         makeStreamQuery({
           policy,

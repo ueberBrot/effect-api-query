@@ -131,12 +131,15 @@ reconstruct package error classes. Apply application disclosure rules before tra
 
 ## Drain request work before disposal
 
-Track abortable preparation and snapshot captures in the request owner. On request
-completion or abort, stop accepting work, abort pending preparation/captures, cancel
-queries, and await their settlement and local finalizers before closing clients or
+Track query execution, accepted mutations, preparation, and snapshot captures in
+the request owner. On request completion or abort, stop accepting work, abort pending preparation/captures, cancel
+queries, and drain accepted mutations and local finalizers before closing clients or
 runtimes. Cancelling QueryClient work alone does not drain codec preparation or
 acknowledge finalization. Clear the request's private cache as part of its lifecycle.
 The browser acquires independent resources after hydration.
+
+When adding query persistence to the Start example, compose its application-owned
+persister. Replacing it bypasses tracking of query and iterator cleanup.
 
 Sources: [stream snapshots](https://ueberbrot.github.io/effect-api-query/guides/stream-snapshots/),
 [unary hydration](https://ueberbrot.github.io/effect-api-query/guides/hydrate-unary-data/),

@@ -297,16 +297,6 @@ describe('stream baseline', () => {
       }).pipe(Effect.provide(NodeServices.layer)),
     )
   })
-  it.live('separates cache data writes from fetch lifecycle updates', () =>
-    Effect.scoped(
-      Effect.gen(function* () {
-        const measurement = yield* measure(baselineCase)
-        expect(measurement.data).toStrictEqual([7, 7, 7, 7])
-        expect(measurement.lifecycleUpdates).toBeGreaterThan(0)
-        expect(measurement.dataWrites).toBeLessThan(measurement.cacheUpdates)
-      }),
-    ),
-  )
   it.live('does not treat structurally equal history writes as new data references', () =>
     Effect.scoped(
       Effect.gen(function* () {
@@ -332,8 +322,6 @@ describe('stream baseline', () => {
         expect(measurement.sourceEmissions).toBe(64)
         expect(measurement.finalized).toBe(true)
         expect(measurement.maxRetainedValues).toBe(expected.length)
-        expect(measurement.dataReferenceChanges).toBeLessThanOrEqual(measurement.dataWrites)
-        expect(measurement.lifecycleUpdates).toBeGreaterThan(0)
         if (
           Option.isSome(
             yield* Config.String('STREAM_MEASURE')

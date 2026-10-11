@@ -108,7 +108,7 @@ is visible to observers and subsequent imperative reads without another client e
 
 Fetched metadata follows native sharing defaults, while selected results and later manual writes
 use explicit per-call policy or standard deep sharing. See
-[Buffered metadata](/effect-api-query/reference/http-factory/#buffered-metadata) for immutable
+[Buffered metadata](/effect-api-query/reference/http-builders/#buffered-metadata) for immutable
 snapshot and application-owned data rules.
 
 An imperative `queryClient.query(newOptions)` hit on fresh cached data retains existing Query

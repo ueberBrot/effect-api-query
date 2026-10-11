@@ -30,7 +30,8 @@ skills:
       - Address exact stream policy keys and compose encoded partial native filters.
       - Apply native defaults and conditional input without losing selected or explicitly undefined
         seed behavior.
-      - Capture open streams and drain preparation before request disposal.
+      - Capture open streams and drain queries, preparation, and accepted writes before request
+        disposal.
       - Hydrate every selected view into its normal decoded cache representation.
       - Preserve neighboring writes and originating ownership during mutation overlap.
       - Defer event refresh until participating writes settle.
@@ -62,16 +63,19 @@ skills:
         priority: HIGH
         status: active
       - mistake: Dispose resources after native cancellation alone
-        mechanism: Query settlement can precede local finalization and preparation drain.
+        mechanism: Query settlement can precede local finalization; accepted writes and
+          preparation may still need the runtime.
         wrong_pattern: await queryClient.cancelQueries(); await runtime.dispose()
-        correct_pattern: await captureAndPreparationDrain; await runtime.dispose()
-        source: src/core/stream-snapshot.ts
+        correct_pattern: await acceptedWorkDrain; await runtime.dispose()
+        source: examples/tanstack-start/src/lib/application.ts
         priority: HIGH
         status: active
       - mistake: Roll back an overlapping write with an old snapshot
-        mechanism: Whole-list replacement erases intervening successful writes.
+        mechanism: Whole-list replacement erases intervening writes; stale entity restoration
+          can overwrite a newer authoritative cache revision.
         wrong_pattern: queryClient.setQueryData(key, oldList)
-        correct_pattern: rollbackOriginatingEntityAndPositions()
+        correct_pattern: Capture current entity fields and positions for each new write; restore
+          them only while its optimistic cache revision remains owned.
         source: examples/vite-react/src/lib/user-writes.ts
         priority: CRITICAL
         status: active

@@ -343,18 +343,6 @@ const createMutationBuilders = (
   return { mutationKey: () => mutationKey, mutationOptions }
 }
 
-const createMutationLeaf = (
-  description: BufferedOperation,
-  keyParts: JsonValue[],
-  runPromiseExit: RunPromiseExit<unknown>,
-) => {
-  const operationKey = freezeKey(keyParts)
-  return Object.freeze({
-    key: () => operationKey,
-    ...createMutationBuilders(description, operationKey, runPromiseExit),
-  })
-}
-
 type RuntimeStructuralSharing = (previous: unknown, data: unknown) => unknown
 
 const isStructuralSharing = (policy: unknown): policy is RuntimeStructuralSharing =>
@@ -408,13 +396,12 @@ const prepareMetadataExecution = (
     }
 }
 
-const createUnaryLeaf = (
+const createUnaryBuilders = (
   description: UnaryOperation,
-  keyParts: JsonValue[],
+  operationKey: readonly JsonValue[],
   keyEncoder: RuntimeKeyEncoder | undefined,
   runPromiseExit: RunPromiseExit<unknown>,
 ) => {
-  const operationKey = freezeKey(keyParts)
   const queryOperationKey = freezeKey([...operationKey, 'query'])
   const query = createQueryBuilders(
     description,
@@ -448,25 +435,23 @@ const createUnaryLeaf = (
           }),
         )
 
-  return Object.freeze({
+  return {
     ...createInfiniteBuilders(description, operationKey, keyEncoder, runPromiseExit),
-    key: () => operationKey,
     ...createMutationBuilders(description, operationKey, runPromiseExit),
     queryKey: query.key,
     queryOptions: query.options,
     ...(metadataQuery === undefined
       ? undefined
       : { metadataKey: metadataQuery.key, metadataOptions: metadataQuery.options }),
-  })
+  }
 }
 
-const createStreamingLeaf = (
+const createStreamingBuilders = (
   description: StreamingOperation,
-  keyParts: JsonValue[],
+  operationKey: readonly JsonValue[],
   keyEncoder: RuntimeKeyEncoder | undefined,
   runPromiseExit: RunPromiseExit<unknown>,
 ) => {
-  const operationKey = freezeKey(keyParts)
   const createView = (operation: 'live' | 'streamed') => {
     const prepare = (options: Record<string, unknown>, requestOptions: unknown) =>
       description.prepareStream(options, operation, runPromiseExit, requestOptions)
@@ -481,13 +466,12 @@ const createStreamingLeaf = (
   const live = createView('live')
   const streamed = createView('streamed')
 
-  return Object.freeze({
-    key: () => operationKey,
+  return {
     liveKey: live.key,
     liveOptions: live.options,
     streamedKey: streamed.key,
     streamedOptions: streamed.options,
-  })
+  }
 }
 
 const deepFreezeTree = (value: Record<string, unknown>) => {
@@ -554,15 +538,16 @@ const insertLeaf = (
   if (leafName === undefined) {
     throw new TypeError('Validated operation paths must have a leaf')
   }
-  const keyParts = [...prefix, ...segments]
+  const operationKey = freezeKey([...prefix, ...segments])
+  let builders
   if (operation.kind === 'Mutation') {
-    branch[leafName] = createMutationLeaf(operation, keyParts, runPromiseExit)
-    return
+    builders = createMutationBuilders(operation, operationKey, runPromiseExit)
+  } else if (operation.kind === 'Streaming') {
+    builders = createStreamingBuilders(operation, operationKey, keyEncoder, runPromiseExit)
+  } else {
+    builders = createUnaryBuilders(operation, operationKey, keyEncoder, runPromiseExit)
   }
-  branch[leafName] =
-    operation.kind === 'Streaming'
-      ? createStreamingLeaf(operation, keyParts, keyEncoder, runPromiseExit)
-      : createUnaryLeaf(operation, keyParts, keyEncoder, runPromiseExit)
+  branch[leafName] = { key: () => operationKey, ...builders }
 }
 
 const createTree = (

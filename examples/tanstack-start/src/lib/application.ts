@@ -67,15 +67,11 @@ export const startTanStackStartApplication = async ({
           Layer.provide(Layer.succeed(FetchHttpClient.Fetch, applicationFetch)),
         ),
   )
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      mutations: { retry: false },
-      queries: { retry: false, staleTime: 60_000 },
-    },
-  })
   const abort = new AbortController()
   const pendingWork = new Set<Promise<unknown>>()
-  const trackWork = async <A>(execution: Promise<A>): Promise<A> => {
+  const trackWork = async <A>(execute: () => A | Promise<A>): Promise<A> => {
+    abort.signal.throwIfAborted()
+    const execution = Promise.resolve(execute())
     pendingWork.add(execution)
     try {
       return await execution
@@ -83,15 +79,27 @@ export const startTanStackStartApplication = async ({
       pendingWork.delete(execution)
     }
   }
-  const runPreparation: TanStackStartApplication['runPreparation'] = async (effect) => {
-    abort.signal.throwIfAborted()
-    return await trackWork(Effect.runPromise(effect, { signal: abort.signal }))
-  }
+  const ownRunner =
+    (runner: RunPromiseExit): RunPromiseExit =>
+    async (effect, options) =>
+      trackWork(async () => runner(effect, options))
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      mutations: { retry: false },
+      queries: {
+        retry: false,
+        staleTime: 60_000,
+        persister: async (queryFn, context) => trackWork(() => queryFn(context)),
+      },
+    },
+  })
+  const runPreparation: TanStackStartApplication['runPreparation'] = async (effect) =>
+    trackWork(async () => Effect.runPromise(effect, { signal: abort.signal }))
   const captureSnapshot: typeof fetchStreamSnapshot = async (owner, options, controls = {}) => {
     if (owner !== queryClient) {
       throw new Error('Snapshot belongs to another request')
     }
-    return await trackWork(
+    return await trackWork(async () =>
       fetchStreamSnapshot(owner, options, {
         ...controls,
         signal:
@@ -129,8 +137,16 @@ export const startTanStackStartApplication = async ({
         ),
       }),
     )
-    const httpQuery = makeExampleHttpQueryUtils(httpClient, httpRuntime.runPromiseExit, identity)
-    const rpcQuery = makeExampleRpcQueryUtils(rpcClient.client, rpcClient.runPromiseExit, identity)
+    const httpQuery = makeExampleHttpQueryUtils(
+      httpClient,
+      ownRunner(httpRuntime.runPromiseExit),
+      identity,
+    )
+    const rpcQuery = makeExampleRpcQueryUtils(
+      rpcClient.client,
+      ownRunner(rpcClient.runPromiseExit),
+      identity,
+    )
     return {
       captureSnapshot,
       runPreparation,

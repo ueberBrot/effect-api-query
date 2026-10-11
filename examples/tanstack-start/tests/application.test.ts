@@ -1,5 +1,8 @@
+import { User } from '@effect-api-query/contracts'
+import type { ExampleRpcClient } from '@effect-api-query/contracts/client'
 import { startExampleRpcServer } from '@effect-api-query/server'
-import { Effect, Exit, Scope } from 'effect'
+import { MutationObserver } from '@tanstack/react-query'
+import { Deferred, Effect, Exit, Scope, Stream } from 'effect'
 import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test'
 
 import { startTanStackStartApplication } from '../src/lib/application.ts'
@@ -112,4 +115,150 @@ describe('TanStack Start HTTP request ownership', () => {
       await Effect.runPromise(Scope.close(scope, Exit.void))
     }
   })
+})
+
+describe('TanStack Start execution settlement', () => {
+  it.each(['unary', 'stream'] as const)(
+    'drains ordinary %s query finalizers before disposing ready clients',
+    async (view) => {
+      const entered = Deferred.makeUnsafe<undefined>()
+      const closing = Deferred.makeUnsafe<undefined>()
+      const release = Deferred.makeUnsafe<undefined>()
+      const events: string[] = []
+      const cleanup = Deferred.succeed(closing, undefined).pipe(
+        Effect.andThen(Deferred.await(release)),
+        Effect.andThen(Effect.sync(() => events.push('finalized'))),
+      )
+      const source =
+        view === 'unary'
+          ? Deferred.succeed(entered, undefined).pipe(
+              Effect.andThen(Effect.never),
+              Effect.ensuring(cleanup),
+            )
+          : Stream.fromEffect(Deferred.succeed(entered, undefined).pipe(Effect.as('ready'))).pipe(
+              Stream.concat(Stream.never),
+              Stream.ensuring(cleanup),
+            )
+      const application = await startTanStackStartApplication({
+        rpcUrl: 'http://example.test/rpc',
+        rpcClient: {
+          // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+          client: (() => source) as ExampleRpcClient,
+          runPromiseExit: Effect.runPromiseExit,
+          dispose: async () => {
+            events.push('disposed')
+            await Promise.resolve()
+          },
+        },
+      })
+      const options =
+        view === 'unary'
+          ? application.rpcQuery.diagnostics.slow.queryOptions({
+              input: { durationMs: 60_000, operationId: 'disposal' },
+            })
+          : application.rpcQuery.diagnostics.stream.streamedOptions()
+      const pending =
+        view === 'unary'
+          ? application.queryClient.query(
+              application.rpcQuery.diagnostics.slow.queryOptions({
+                input: { durationMs: 60_000, operationId: 'disposal' },
+              }),
+            )
+          : application.queryClient.query(application.rpcQuery.diagnostics.stream.streamedOptions())
+      const outcome = Promise.allSettled([pending])
+      try {
+        await Effect.runPromise(Deferred.await(entered))
+        const disposal = application.dispose()
+        await Effect.runPromise(Deferred.await(closing))
+        await Effect.runPromise(Effect.sleep('20 millis'))
+        expect(events).toStrictEqual([])
+        await Effect.runPromise(Deferred.succeed(release, undefined))
+        await disposal
+        await outcome
+        expect(events).toStrictEqual(['finalized', 'disposed'])
+        await expect(
+          application.queryClient.query({
+            queryKey: options.queryKey,
+            queryFn: async () => await Promise.resolve('late'),
+          }),
+        ).rejects.toMatchObject({ name: 'AbortError' })
+        expect(events).toStrictEqual(['finalized', 'disposed'])
+      } finally {
+        await Effect.runPromise(Deferred.succeed(release, undefined))
+        await application.dispose()
+        await outcome
+      }
+    },
+  )
+
+  it.each(['rpc', 'http'] as const)(
+    'drains an accepted %s mutation without cancelling its work',
+    async (adapter) => {
+      const entered = Deferred.makeUnsafe<undefined>()
+      const release = Deferred.makeUnsafe<User>()
+      const events: string[] = []
+      const mutation = Deferred.succeed(entered, undefined).pipe(
+        Effect.andThen(Deferred.await(release)),
+        Effect.tap(() => Effect.sync(() => events.push('completed'))),
+      )
+      const application = await startTanStackStartApplication({
+        rpcUrl: 'http://example.test/rpc',
+        rpcClient: {
+          // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+          client: (() => mutation) as ExampleRpcClient,
+          runPromiseExit: Effect.runPromiseExit,
+          dispose: async () => {
+            events.push('disposed')
+            await Promise.resolve()
+          },
+        },
+        fetch: async () => {
+          await Effect.runPromise(Deferred.succeed(entered, undefined))
+          const user = await Effect.runPromise(Deferred.await(release))
+          events.push('completed')
+          return Response.json(user)
+        },
+      })
+      const pending =
+        adapter === 'rpc'
+          ? new MutationObserver(
+              application.queryClient,
+              application.rpcQuery.users.create.mutationOptions(),
+            ).mutate({ name: 'Ada' })
+          : new MutationObserver(
+              application.queryClient,
+              application.httpQuery.users.create.mutationOptions(),
+            ).mutate({ payload: { name: 'Ada' } })
+      const outcome = Promise.allSettled([pending])
+      try {
+        await Effect.runPromise(Deferred.await(entered))
+        const disposal = application.dispose()
+        await Effect.runPromise(Effect.sleep('20 millis'))
+        expect(events).toStrictEqual([])
+        const user = new User({ id: 1, name: 'Ada', locale: 'en' })
+        await Effect.runPromise(Deferred.succeed(release, user))
+        await expect(pending).resolves.toStrictEqual(user)
+        await disposal
+        expect(events).toStrictEqual(['completed', 'disposed'])
+        const late =
+          adapter === 'rpc'
+            ? new MutationObserver(
+                application.queryClient,
+                application.rpcQuery.users.create.mutationOptions(),
+              ).mutate({ name: 'late' })
+            : new MutationObserver(
+                application.queryClient,
+                application.httpQuery.users.create.mutationOptions(),
+              ).mutate({ payload: { name: 'late' } })
+        await expect(late).rejects.toMatchObject({ name: 'AbortError' })
+        expect(events).toStrictEqual(['completed', 'disposed'])
+      } finally {
+        await Effect.runPromise(
+          Deferred.succeed(release, new User({ id: 1, name: 'Ada', locale: 'en' })),
+        )
+        await application.dispose()
+        await outcome
+      }
+    },
+  )
 })

@@ -6,8 +6,9 @@ description: Supply safe semantic identity for RPC payloads and HTTP requests.
 ## RPC payloads
 
 By default, the factory constructs the RPC payload and synchronously encodes it with its Schema.
-Supply a custom encoder when encoding requires Effect services or the payload contains
-`Schema.Redacted` values, including schemas reached through `Schema.suspend`.
+Supply a custom encoder when encoding requires Effect services, uses opaque encoding middleware,
+or the payload contains `Schema.Redacted` values, including schemas reached through `Schema.suspend`.
+The runtime check treats middleware conservatively even when it is synchronous and service-free.
 
 In the application client module, configure the ready RPC client. Here `identifySecret` is
 your synchronous public-identity projection:
@@ -85,5 +86,5 @@ that distinguishes results.
 Return strict `JsonValue` synchronously. The factory copies and freezes the result; it rejects
 undefined object members, undefined or sparse array entries, non-finite numbers, cycles, and
 non-JSON objects. Custom output bypasses the default HTTP rules for omitting `undefined` members and normalizing headers.
-See the [HTTP reference](/effect-api-query/reference/http-factory/#cache-identity-and-failures) for
+See the [HTTP reference](/effect-api-query/reference/http-builders/#cache-identity-and-failures) for
 failure codes. Underlying error Causes remain intact and may contain values supplied by Effect.

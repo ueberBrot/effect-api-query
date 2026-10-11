@@ -3,8 +3,7 @@ import type { Sse } from 'effect/encoding'
 import { HttpApiSchema } from 'effect/http-api'
 
 import type { StreamingOperation } from '../core/operation'
-import { accumulatedPolicy, makeStreamQuery } from '../core/streamed-query'
-import type { StreamQueryPolicy } from '../core/streamed-query'
+import { makeStreamQuery, prepareStreamPolicy } from '../core/streamed-query'
 import {
   EffectHttpApiQueryConfigError,
   EffectHttpApiQueryEmptyStreamError,
@@ -38,26 +37,17 @@ export const createHttpStreamPreparation =
     ) => Effect.Effect<unknown, unknown, unknown>,
   ): StreamingOperation['prepareStream'] =>
   (options, operation, runPromiseExit) => {
-    const policy: StreamQueryPolicy =
-      operation === 'live'
-        ? { _tag: 'Live' }
-        : accumulatedPolicy(
-            options,
-            (code, message) => new EffectHttpApiQueryConfigError(code, message, identity),
-          )
+    const { policy, history } = prepareStreamPolicy(
+      options,
+      operation,
+      (code, message) => new EffectHttpApiQueryConfigError(code, message, identity),
+    )
     const sseOptions = decoderOptions(identity, options)
-    delete options['refetchMode']
-    delete options['maxChunks']
     delete options['sseOptions']
     return {
       identity: [
         Object.freeze({
-          ...(policy._tag === 'Live'
-            ? undefined
-            : {
-                maxChunks: policy.maxChunks ?? null,
-                refetchMode: policy.refetchMode,
-              }),
+          ...history,
           maxEventSize: sseOptions.maxEventSize,
         }),
       ],

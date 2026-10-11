@@ -294,17 +294,6 @@ describe(createHttpApiQueryUtils, () => {
         'health.check',
         'query',
       ])
-      expect(Object.keys(utils['health.check'])).toStrictEqual([
-        'infiniteKey',
-        'infiniteOptions',
-        'key',
-        'mutationKey',
-        'mutationOptions',
-        'queryKey',
-        'queryOptions',
-        'metadataKey',
-        'metadataOptions',
-      ])
       expect(Object.isFrozen(utils)).toBe(true)
       expect(Object.isFrozen(utils['users.v1'])).toBe(true)
     } finally {

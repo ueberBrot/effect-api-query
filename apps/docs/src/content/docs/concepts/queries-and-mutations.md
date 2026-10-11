@@ -18,8 +18,8 @@ runs; their values do not become part of the mutation key.
 Use an infinite query when TanStack should accumulate paginated results. Map each page parameter
 to an RPC payload or complete decoded HTTP request; the mapped initial request becomes part of
 the semantic key. Keep stable filters in every page request. See
-[HTTP pagination](/effect-api-query/guides/http-queries-and-mutations/#load-pages) or
-[RPC pagination](/effect-api-query/reference/generated-builders/#build-an-infinite-query).
+[HTTP pagination](/effect-api-query/guides/pagination/) or
+[RPC pagination](/effect-api-query/guides/pagination/).
 
 Use an accumulated streamed query when the application needs every emitted value in order. Use a
 live query when it needs only the latest emitted value. Both operations close their stream iterator

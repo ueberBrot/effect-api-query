@@ -402,6 +402,62 @@ describe('createRpcQueryUtils configuration', () => {
     }
   })
 
+  it('retries suspended schema inspection after an earlier construction failure', () => {
+    let ready = false
+    const Payload = Schema.suspend(() => {
+      if (!ready) {
+        throw new Error('Payload is unavailable')
+      }
+      return Schema.Struct({ id: Schema.Int })
+    })
+    const rpcGroup = RpcGroup.make(Rpc.make('read', { payload: Payload }))
+    const options = { client: unusedClientFor(rpcGroup), keyPrefix: ['app'] as const }
+
+    expect(() => createRpcQueryUtils(rpcGroup, options)).toThrow(
+      expect.objectContaining({ code: 'MissingKeyEncoder' }),
+    )
+
+    ready = true
+    const utils = createRpcQueryUtils(rpcGroup, options)
+    expect(utils.read.queryKey({ id: 1 })).toStrictEqual(['app', 'rpc', 'read', 'query', { id: 1 }])
+  })
+
+  it('requires safe encoders throughout mutually recursive redacted schemas', () => {
+    interface RootValue {
+      readonly branches: readonly BranchValue[]
+      readonly secret: Redacted.Redacted
+    }
+    interface BranchValue {
+      readonly roots: readonly RootValue[]
+    }
+    const Root = Schema.Struct({
+      // oxlint-disable-next-line eslint/no-use-before-define
+      branches: Schema.Array(Schema.suspend((): Schema.Codec<BranchValue> => Branch)),
+      secret: Schema.Redacted(Schema.String),
+    })
+    const Branch = Schema.Struct({
+      roots: Schema.Array(Schema.suspend((): Schema.Codec<RootValue> => Root)),
+    })
+    const rootGroup = RpcGroup.make(Rpc.make('root', { payload: Root }))
+    const branchGroup = RpcGroup.make(Rpc.make('branch', { payload: Branch }))
+
+    createRpcQueryUtils(rootGroup, {
+      client: unusedClientFor(rootGroup),
+      keyEncoders: { root: () => 'safe' },
+      keyPrefix: ['app'],
+    })
+
+    /* oxlint-disable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
+    const options = {
+      client: unusedClientFor(branchGroup),
+      keyPrefix: ['app'],
+    } as unknown as CreateRpcQueryUtilsOptions<typeof branchGroup, readonly ['app']>
+    /* oxlint-enable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion */
+    expect(() => createRpcQueryUtils(branchGroup, options)).toThrow(
+      expect.objectContaining({ code: 'MissingKeyEncoder' }),
+    )
+  })
+
   it('keeps ordinary recursive schemas usable', () => {
     interface Tree {
       readonly name: string

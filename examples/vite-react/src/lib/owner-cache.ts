@@ -78,8 +78,7 @@ export const makeOwnerCache = ({
     ...options,
     networkMode: 'always' as const,
     retry: false as const,
-    mutationFn: async (...args: Args) =>
-      await runMutation(async () => await options.mutationFn(...args)),
+    mutationFn: async (...args: Args) => runMutation(async () => options.mutationFn(...args)),
   })
   const saveDirectory = () => {
     if (storage === undefined) {

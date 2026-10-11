@@ -56,7 +56,7 @@ Root, branch, leaf, and manually appended operation prefixes support native
 `invalidateQueries`, `cancelQueries`, and other filters. Exact stream keys include
 policy. Only concrete generated query keys carry data/error tags; broad reads
 remain `unknown` until the application establishes their representation. Selection
-changes observer results while the cache keeps full decoded data. Configure hashing
+changes hook, observer, and `queryClient.query` results while the cache keeps full decoded data. Configure hashing
 through QueryClient global or prefix `queryKeyHashFn` and keep it stable; builders
 reject per-call hashing. Streams reject inconsistent default `queryHash` values
 and conflicting cached identity with `UnsupportedQueryHash` during execution.
@@ -71,13 +71,17 @@ Keep this workflow in the application and make every participating write follow 
    await. Cancel older reconciliation reads before publishing optimistic state.
 2. Snapshot only the affected entities and positions. Preserve unrelated list
    entries, infinite pages, and `pageParams`; allocate temporary IDs per creation.
+   Each new deletion captures current fields and positions after an authoritative
+   refresh; shared overlap snapshots retain ordering within the owned view.
 3. Return the original owner's commit, rollback, and settlement actions in mutation
    context. Check that owner after every await and before any cache side effect.
 4. On success, replace only this write's optimistic value and seed exact generated
    detail keys with the response's locale and other identity fields.
 5. On failure, remove this write's temporary entry or restore its removed entity
    beside surviving original neighbors. A whole stale-snapshot rollback can erase
-   another write. Coordinate repeated deletions of the same entity explicitly.
+   another write. Roll back only a cache revision still owned by the optimistic
+   write; preserve later authoritative updates even when structural sharing keeps
+   the same data object. Coordinate repeated deletions of the same entity explicitly.
 6. Reconcile when the final overlapping write settles. Each new write cancels an
    earlier reconciliation before its optimistic update.
 

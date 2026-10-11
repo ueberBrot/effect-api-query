@@ -64,5 +64,7 @@ so refresh both deliberately when they represent the same resource.
 Literal group/endpoint names become utility paths; dots require bracket access, and
 `topLevel: true` places endpoints at the root. See [HTTP Factory](/effect-api-query/reference/http-factory/).
 Before disposal, follow [Client Lifecycle](/effect-api-query/concepts/client-lifecycle/).
-Continue with [HTTP Queries and Mutations](/effect-api-query/guides/http-queries-and-mutations/)
-for metadata, uploads, pagination and SSE.
+Continue with [pagination](/effect-api-query/guides/pagination/),
+[streaming](/effect-api-query/guides/streaming/), or
+[HTTP metadata](/effect-api-query/guides/http-metadata/).
+For request containers and file uploads, use [HTTP Requests and Uploads](/effect-api-query/guides/http-queries-and-mutations/).

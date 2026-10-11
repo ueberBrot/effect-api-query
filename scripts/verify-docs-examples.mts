@@ -20,6 +20,12 @@ const program = Effect.gen(function* () {
   for (const [page, fixtures] of [
     ['getting-started/quick-start', ['tests/types/docs-rpc-quick-start']],
     ['getting-started/http-quick-start', ['tests/types/docs-http-quick-start']],
+    ['guides/queries', ['tests/types/docs-functionality']],
+    ['guides/mutations', ['tests/types/docs-functionality']],
+    ['guides/pagination', ['tests/types/docs-functionality']],
+    ['guides/streaming', ['tests/types/docs-functionality']],
+    ['guides/http-metadata', ['tests/types/docs-functionality']],
+    ['guides/http-queries-and-mutations', ['tests/types/docs-functionality']],
     ['guides/retry-queries', ['tests/types/docs-retry']],
     ['guides/refresh-from-events', ['tests/types/docs-user-events']],
     [

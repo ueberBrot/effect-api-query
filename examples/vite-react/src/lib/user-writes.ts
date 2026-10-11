@@ -1,5 +1,10 @@
 import { User, UserPage } from '@effect-api-query/contracts'
-import type { InfiniteData, MutationObserverOptions, QueryClient } from '@tanstack/react-query'
+import type {
+  InfiniteData,
+  MutationObserverOptions,
+  QueryClient,
+  QueryKey,
+} from '@tanstack/react-query'
 
 import type { ExampleHttpQueryUtils, ExampleRpcQueryUtils } from './application.ts'
 import type { makeOwnerCache } from './owner-cache.ts'
@@ -64,6 +69,19 @@ export const makeUserWrites = ({
   const pageWrites = new WeakMap<UserPage, Set<number>>()
   const rpcList = rpcQuery.users.list.queryKey()
   const httpList = httpQuery.users.list.queryKey()
+  const listKeys = [rpcList, httpList]
+  const listWrites = new WeakMap<
+    object,
+    { readonly dataUpdateCount: number; readonly writes: Set<number> }
+  >()
+  const listQuery = (queryKey: QueryKey) =>
+    queryClient.getQueryCache().get(queryClient.defaultQueryOptions({ queryKey }).queryHash)
+  const ownedList = (query: ReturnType<typeof listQuery>) => {
+    const ownership = query === undefined ? undefined : listWrites.get(query)
+    return query !== undefined && ownership?.dataUpdateCount === query.state.dataUpdateCount
+      ? ownership
+      : undefined
+  }
   const rpcPages = rpcQuery.users.page.infiniteKey({ cursor: 0, pageSize: 4 })
   const httpPages = httpQuery.users.page.infiniteKey({ query: { cursor: 0, pageSize: 4 } })
   const cancel = async () => {
@@ -103,13 +121,44 @@ export const makeUserWrites = ({
       queryClient.invalidateQueries({ queryKey: httpQuery.users.key() }),
     ])
   }
-  const editLists = (edit: (users: readonly User[]) => readonly User[]) => {
-    queryClient.setQueryData(rpcList, (users) => (users === undefined ? undefined : edit(users)))
-    queryClient.setQueryData(httpList, (users) => (users === undefined ? undefined : edit(users)))
+  const editList = (
+    key: QueryKey,
+    edit: (users: readonly User[]) => readonly User[],
+    write: number,
+    phase: 'optimistic' | 'settled',
+  ) => {
+    const query = listQuery(key)
+    if (query?.state.data === undefined) {
+      return
+    }
+    const writes = new Set(ownedList(query)?.writes)
+    if (phase === 'optimistic') {
+      writes.add(write)
+    } else {
+      writes.delete(write)
+    }
+    const dataUpdateCount = query.state.dataUpdateCount + 1
+    queryClient.setQueryData<readonly User[]>(key, (users) =>
+      users === undefined ? undefined : edit(users),
+    )
+    listWrites.set(query, { dataUpdateCount, writes })
   }
   const editPages = (edit: (data: InfiniteData<UserPage>) => InfiniteData<UserPage>) => {
     queryClient.setQueryData(rpcPages, (data) => (data === undefined ? undefined : edit(data)))
     queryClient.setQueryData(httpPages, (data) => (data === undefined ? undefined : edit(data)))
+  }
+  const releaseWrite = (write: number) => {
+    for (const key of listKeys) {
+      const query = listQuery(key)
+      if (query !== undefined) {
+        listWrites.get(query)?.writes.delete(write)
+      }
+    }
+    for (const key of [rpcPages, httpPages]) {
+      for (const page of queryClient.getQueryData(key)?.pages ?? []) {
+        pageWrites.get(page)?.delete(write)
+      }
+    }
   }
   const patchPage = (
     page: UserPage,
@@ -164,16 +213,23 @@ export const makeUserWrites = ({
     totalChange: number,
     phase: 'optimistic' | 'settled',
   ) => {
-    editLists((users) => {
-      const retained = users.filter((user) => user.id !== id && user.id !== replacement?.id)
-      if (replacement === undefined) {
-        return retained
-      }
-      const index = users.findIndex((user) => user.id === id)
-      return index === -1
-        ? [...retained, replacement]
-        : [...retained.slice(0, index), replacement, ...retained.slice(index)]
-    })
+    for (const key of listKeys) {
+      editList(
+        key,
+        (users) => {
+          const retained = users.filter((user) => user.id !== id && user.id !== replacement?.id)
+          if (replacement === undefined) {
+            return retained
+          }
+          const index = users.findIndex((user) => user.id === id)
+          return index === -1
+            ? [...retained, replacement]
+            : [...retained.slice(0, index), replacement, ...retained.slice(index)]
+        },
+        write,
+        phase,
+      )
+    }
     editPages((data) => ({
       ...data,
       pages: data.pages.map((page, pageIndex) => {
@@ -277,18 +333,25 @@ export const makeUserWrites = ({
       deletionBaseline = undefined
     }
     if (group.succeeded) {
-      for (const key of [rpcPages, httpPages]) {
-        for (const page of queryClient.getQueryData(key)?.pages ?? []) {
-          pageWrites.get(page)?.delete(group.write)
-        }
-      }
+      releaseWrite(group.write)
       return
     }
     if (!isActive() || !group.applied) {
       return
     }
-    queryClient.setQueryData(rpcList, (current) => restoreList(current, group.rpcList, id))
-    queryClient.setQueryData(httpList, (current) => restoreList(current, group.httpList, id))
+    for (const [key, snapshot] of [
+      [rpcList, group.rpcList],
+      [httpList, group.httpList],
+    ] as const) {
+      if (ownedList(listQuery(key))?.writes.has(group.write) === true) {
+        editList(
+          key,
+          (current) => restoreList(current, snapshot, id) ?? current,
+          group.write,
+          'settled',
+        )
+      }
+    }
     queryClient.setQueryData(rpcPages, (current) =>
       restorePages(current, group.rpcPages, id, group.write),
     )
@@ -312,37 +375,64 @@ export const makeUserWrites = ({
     if (group === undefined) {
       const lists = [queryClient.getQueryData(rpcList), queryClient.getQueryData(httpList)]
       const pages = [queryClient.getQueryData(rpcPages), queryClient.getQueryData(httpPages)]
-      deletionBaseline ??= {
-        rpcList: lists[0],
-        httpList: lists[1],
-        rpcPages: pages[0],
-        httpPages: pages[1],
-      }
       const listSnapshot = (
         baseline: readonly User[] | undefined,
         current: readonly User[] | undefined,
-      ) => ((baseline?.some((user) => user.id === id) ?? false) ? baseline : current)
+        owned: boolean,
+      ) => {
+        const target = current?.find((user) => user.id === id)
+        return owned && baseline !== undefined && baseline.some((user) => user.id === id)
+          ? baseline.map((user) => (user.id === id ? (target ?? user) : user))
+          : current
+      }
       const pageSnapshot = (
         baseline: InfiniteData<UserPage> | undefined,
         current: InfiniteData<UserPage> | undefined,
       ) =>
-        (baseline?.pages.some((page) => page.users.some((user) => user.id === id)) ?? false)
-          ? baseline
-          : current
+        current === undefined
+          ? undefined
+          : {
+              ...current,
+              pages: current.pages.map((page, index) => {
+                const users = listSnapshot(
+                  baseline?.pages[index]?.users,
+                  page.users,
+                  (pageWrites.get(page)?.size ?? 0) !== 0,
+                )
+                return users === page.users
+                  ? page
+                  : new UserPage({
+                      users: users ?? page.users,
+                      total: page.total,
+                      nextCursor: page.nextCursor,
+                    })
+              }),
+            }
+      deletionBaseline = {
+        rpcList: listSnapshot(
+          deletionBaseline?.rpcList,
+          lists[0],
+          (ownedList(listQuery(rpcList))?.writes.size ?? 0) !== 0,
+        ),
+        httpList: listSnapshot(
+          deletionBaseline?.httpList,
+          lists[1],
+          (ownedList(listQuery(httpList))?.writes.size ?? 0) !== 0,
+        ),
+        rpcPages: pageSnapshot(deletionBaseline?.rpcPages, pages[0]),
+        httpPages: pageSnapshot(deletionBaseline?.httpPages, pages[1]),
+      }
       const applied =
         lists.some((users) => users?.some((user) => user.id === id) ?? false) ||
         pages.some(
           (data) => data?.pages.some((page) => page.users.some((user) => user.id === id)) ?? false,
         )
       group = {
+        ...deletionBaseline,
         pending: new Set(),
         succeeded: false,
         applied,
         write,
-        rpcList: listSnapshot(deletionBaseline.rpcList, lists[0]),
-        httpList: listSnapshot(deletionBaseline.httpList, lists[1]),
-        rpcPages: pageSnapshot(deletionBaseline.rpcPages, pages[0]),
-        httpPages: pageSnapshot(deletionBaseline.httpPages, pages[1]),
       }
       deletionGroups.set(id, group)
       if (applied) {

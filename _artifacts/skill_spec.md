@@ -73,3 +73,13 @@ declarations and exports.
   guidance while retaining the ten tasks, domain map, and source mappings. All
   474 runtime cases and both public API compiler suites pass, alongside typed
   lint, Effect diagnostics, dead-code checks, and documentation checks.
+- **Functionality and lifetime review (2026-10-11), based on `512cd90`:** organize
+  documentation around queries, mutations, pagination, streaming, and metadata.
+  Request disposal drains ordinary query finalizers and accepted writes; rollback
+  respects newer authoritative cache revisions. Clarify selected return values
+  and opaque middleware's encoder requirement. Preserve the ten tasks and six
+  references; existing source mappings cover the new guides and compiler fixture.
+  Remove runtime cases that duplicate static contracts, upstream behavior, or
+  bookkeeping. All 491 remaining runtime cases and both public API compiler
+  suites pass. Documentation builds with valid links, and all 38 application and
+  documentation Chromium checks pass.

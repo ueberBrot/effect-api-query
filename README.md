@@ -56,7 +56,9 @@ const http = createHttpApiQueryUtils(api, {
 In a loader or event handler:
 
 ```ts
-const options = http.users.get.queryOptions({ input: { params: { id: 1 } } })
+const options = http.users.get.queryOptions({
+  input: { params: { id: 1 }, query: { locale: 'en' } },
+})
 const user = await queryClient.query(options)
 ```
 
@@ -73,6 +75,12 @@ for a complete declaration, client, query, and mutation.
 | Buffered HttpApi endpoint without multipart | Queries, metadata, infinite queries, and mutations |
 | Buffered HttpApi endpoint with multipart    | Mutations with `FormData`                          |
 | Unambiguous HttpApi SSE endpoint            | Accumulated streamed queries and live queries      |
+
+Use the focused guides for [queries](https://ueberbrot.github.io/effect-api-query/guides/queries/),
+[mutations](https://ueberbrot.github.io/effect-api-query/guides/mutations/),
+[pagination](https://ueberbrot.github.io/effect-api-query/guides/pagination/),
+[streaming](https://ueberbrot.github.io/effect-api-query/guides/streaming/), and
+[HTTP metadata](https://ueberbrot.github.io/effect-api-query/guides/http-metadata/).
 
 Both factories generate keys for cache reads, writes, prefetching, and invalidation. Query functions
 forward cancellation to Effect. Mutations use TanStack's normal callbacks; invalidate affected

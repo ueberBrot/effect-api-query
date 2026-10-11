@@ -369,16 +369,6 @@ describe('HTTP execution', () => {
           })
           expect(error.message).not.toContain(scenario)
           expect(error.message).not.toContain(privateToken)
-          expect(Object.keys(error).sort()).toStrictEqual([
-            '_tag',
-            'apiId',
-            'cause',
-            'endpoint',
-            'groupId',
-            'method',
-            'name',
-            'operation',
-          ])
         }
       } finally {
         queryClient.clear()

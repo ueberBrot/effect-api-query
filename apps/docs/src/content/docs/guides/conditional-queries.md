@@ -83,7 +83,7 @@ A skipped query has no executable query function, so manual `refetch()` cannot r
 request is available and you need manual refetch, use `enabled: false` instead.
 
 For HTTP pagination, map each page parameter to the complete request and keep stable filters in
-every page. See [Load pages](/effect-api-query/guides/http-queries-and-mutations/#load-pages) for
+every page. See [Load pages](/effect-api-query/guides/pagination/) for
 initial-request identity and cursor progression.
 
 Try this in either [executable example](/effect-api-query/examples/#pause-a-query-until-a-user-is-selected).

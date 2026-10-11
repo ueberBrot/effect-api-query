@@ -75,7 +75,7 @@ Thrown synchronously while preparing an HTTP query key, before client execution.
 - `KeyEncoderFailed`
 - `InvalidKeyValue`
 
-See [HTTP cache identity and failures](/effect-api-query/reference/http-factory/#cache-identity-and-failures)
+See [HTTP cache identity and failures](/effect-api-query/reference/http-builders/#cache-identity-and-failures)
 for each code's trigger.
 
 ## `EffectHttpApiQueryError<E>`

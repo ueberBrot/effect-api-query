@@ -53,5 +53,5 @@ execution. Mutations encode their request inside the ready client's Effect, so e
 become `EffectHttpApiQueryError` instead. Runner rejections and user or TanStack callback failures
 pass through unchanged when they produce no failed Exit.
 
-See the [HTTP factory reference](/effect-api-query/reference/http-factory/#cache-identity-and-failures)
+See the [HTTP factory reference](/effect-api-query/reference/http-builders/#cache-identity-and-failures)
 for key-error codes.

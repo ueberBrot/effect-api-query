@@ -9,12 +9,12 @@ Builds and freezes a `RpcQueryUtils` tree for the group's unary and streaming RP
 
 ### Options
 
-| Option           | Meaning                                                                                                                       |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `client`         | Ready flat RPC client. The caller owns its `Scope` and lifecycle.                                                             |
-| `keyPrefix`      | Non-empty, JSON-safe tuple that namespaces every generated key.                                                               |
-| `runPromiseExit` | Runner used for RPC Effects. Required when client-side services remain; otherwise defaults to `Effect.runPromiseExit`.        |
-| `keyEncoders`    | Synchronous encoders keyed by literal RPC tags. Required for payloads that need encoding services or contain redacted values. |
+| Option           | Meaning                                                                                                                                                                                             |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `client`         | Ready flat RPC client. The caller owns its `Scope` and lifecycle.                                                                                                                                   |
+| `keyPrefix`      | Non-empty, JSON-safe tuple that namespaces every generated key.                                                                                                                                     |
+| `runPromiseExit` | Runner used for RPC Effects. Required when client-side services remain; otherwise defaults to `Effect.runPromiseExit`.                                                                              |
+| `keyEncoders`    | Synchronous encoders keyed by literal RPC tags. Required for payloads that need encoding services or contain redacted values; runtime inspection also requires them for opaque encoding middleware. |
 
 ```ts
 const rpcQuery = createRpcQueryUtils(rpcGroup, {

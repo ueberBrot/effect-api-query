@@ -183,7 +183,7 @@ describe(createRpcQueryUtils, () => {
     }),
   )
 
-  it.effect('projects ordinary reflected objects with only the documented leaf interface', () =>
+  it.effect('projects ordinary reflected objects with literal RPC paths', () =>
     Effect.gen(function* () {
       const Status = Rpc.make('status', { success: Schema.Void })
       const BracketOnly = Rpc.make('billing-history.list all', { success: Schema.Void })
@@ -199,15 +199,6 @@ describe(createRpcQueryUtils, () => {
 
       expect(Object.getPrototypeOf(utils)).toBe(Object.prototype)
       expect(Reflect.ownKeys(utils)).toStrictEqual(['key', 'status', 'billing-history'])
-      expect(Object.keys(utils['billing-history']['list all']).sort()).toStrictEqual([
-        'infiniteKey',
-        'infiniteOptions',
-        'key',
-        'mutationKey',
-        'mutationOptions',
-        'queryKey',
-        'queryOptions',
-      ])
       expect(utils['billing-history']['list all'].key()).toStrictEqual([
         'app',
         'rpc',
@@ -264,7 +255,7 @@ describe(createRpcQueryUtils, () => {
     }),
   )
 
-  it.effect('projects unary and streaming leaves through their distinct interfaces', () =>
+  it.effect('projects mixed unary and streaming RPC paths with distinct view keys', () =>
     Effect.gen(function* () {
       const ListReports = Rpc.make('reports.list', { success: Schema.String })
       const ReportsStream = Rpc.make('reports.watch', { success: Schema.String, stream: true })
@@ -289,13 +280,6 @@ describe(createRpcQueryUtils, () => {
       expect(Object.keys(utils).sort()).toStrictEqual(['events', 'key', 'reports', 'updates'])
       expect(Object.keys(utils.reports).sort()).toStrictEqual(['key', 'list', 'watch'])
       expect(utils.reports.list.key()).toStrictEqual(['app', 'rpc', 'reports', 'list'])
-      expect(Object.keys(utils.events.audit.watch).sort()).toStrictEqual([
-        'key',
-        'liveKey',
-        'liveOptions',
-        'streamedKey',
-        'streamedOptions',
-      ])
       expect(utils.events.audit.watch.streamedKey().slice(0, 6)).toStrictEqual([
         'app',
         'rpc',

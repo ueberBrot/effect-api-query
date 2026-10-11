@@ -56,5 +56,5 @@ infer every possible equivalence between HTTP requests.
 
 Client middleware does not contribute to that declared identity. Include safe user, tenant, or
 other identifiers in the caller prefix when they affect results. See the
-[HTTP factory reference](/effect-api-query/reference/http-factory/#cache-identity-and-failures) and
+[HTTP factory reference](/effect-api-query/reference/http-builders/#cache-identity-and-failures) and
 [HTTP encoder guide](/effect-api-query/guides/custom-key-encoders/#http-requests) for the complete rules.
