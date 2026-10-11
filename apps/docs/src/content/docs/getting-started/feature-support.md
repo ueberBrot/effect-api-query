@@ -16,7 +16,7 @@ keys, functions, and options.
 | Contract                               | Available views                              | Details                                                                                                                    |
 | -------------------------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | Unary RPC / buffered nonmultipart HTTP | Query, infinite query, mutation              | [RPC Builders](/effect-api-query/reference/generated-builders/), [HTTP Factory](/effect-api-query/reference/http-factory/) |
-| Buffered HTTP                          | Separate decoded data/status/header metadata | [ETag workflow](/effect-api-query/guides/http-queries-and-mutations/#update-with-an-etag)                                  |
+| Buffered nonmultipart HTTP             | Separate decoded data/status/header metadata | [ETag workflow](/effect-api-query/guides/http-queries-and-mutations/#update-with-an-etag)                                  |
 | Buffered multipart HTTP                | Mutation with explicit `FormData`            | [Upload](/effect-api-query/guides/http-queries-and-mutations/#upload-a-file)                                               |
 | RPC stream / unambiguous HTTP SSE      | Accumulated history or latest value          | [Choose Stream History](/effect-api-query/guides/choose-stream-history/)                                                   |
 

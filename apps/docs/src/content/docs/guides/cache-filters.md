@@ -22,8 +22,8 @@ pending mutations.
 
 ## Filter RPC queries
 
-In the contract module, suppose `users.get` and `users.watch` share these fields
-(`Effect` and `Schema` are imported from `effect`):
+These filters assume your own unary `users.get` and streaming `users.watch` declarations share
+these payload fields. In their contract module, import `Effect` and `Schema` from `effect`:
 
 ```ts
 const payload = {
@@ -32,8 +32,9 @@ const payload = {
 }
 ```
 
-Use the existing `rpc` tree from [RPC Quick Start](/effect-api-query/getting-started/quick-start/).
-In a cache callback, select every locale for user 1 with an encoded partial filter:
+Derive `rpc` from this group and its ready client using the factory setup in
+[RPC Quick Start](/effect-api-query/getting-started/quick-start/). In a cache callback, select
+every locale for user 1 with an encoded partial filter:
 
 ```ts
 const queryPrefix = [...rpc.users.get.key(), 'query'] as const
@@ -71,10 +72,14 @@ remaining concrete suffix opaque; root, branch, leaf, and operation filters surv
 
 ## Filter HTTP queries
 
-HTTP filters retain labelled request containers. Suppose `users.get` declares
-`FiniteFromString` fields in params/query/payload and a decoded header record. Use the existing
-`http` tree from [HTTP Quick Start](/effect-api-query/getting-started/http-quick-start/).
-In a cache callback, choose the path parameter or header independently:
+HTTP filters retain labelled request containers. These filters assume your own `users.get`
+declares `id: Schema.FiniteFromString` in each of `params`, `query`, and `payload`, plus
+`'X-Locale': Schema.String` in `headers`. Its `users.watch` SSE endpoint declares
+`query: { id: Schema.FiniteFromString }`.
+
+Derive `http` from that HttpApi and its ready client using the factory setup in
+[HTTP Quick Start](/effect-api-query/getting-started/http-quick-start/). In a cache callback,
+choose the path parameter or header independently:
 
 ```ts
 const queryPrefix = [...http.users.get.key(), 'query'] as const

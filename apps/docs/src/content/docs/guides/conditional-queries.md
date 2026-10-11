@@ -3,10 +3,14 @@ title: Conditional Queries
 description: Pause queries until their required input is available.
 ---
 
-In component setup, import the native `useQuery` hook and use the ready utility tree from the
-[RPC quick start](/effect-api-query/getting-started/quick-start/). `userId` is the selected ID,
-which may be undefined. Use `{ input: skipToken }` when an input-bearing query has no valid input yet and needs TanStack
-options such as `staleTime`, `select`, or `initialData`:
+In component setup, import the native `useQuery` hook and use your application's ready utility
+tree, named `rpcQuery` here. Its `users.get` RPC takes a numeric `id` with a default locale and
+returns a user with an `id` and `name`. Follow the [RPC quick start](/effect-api-query/getting-started/quick-start/)
+for the factory setup pattern.
+
+`userId` is the selected ID, which may be undefined. Use `{ input: skipToken }` when an
+input-bearing query has no valid input yet and needs TanStack options such as `staleTime`,
+`select`, or `initialData`:
 
 ```ts
 import { skipToken } from 'effect-api-query'
@@ -23,7 +27,8 @@ const userOptions = rpcQuery.users.get.queryOptions({
 const user = useQuery(userOptions)
 ```
 
-In the same component, the HTTP utility tree accepts a complete decoded request:
+For an HTTP `users.get` endpoint with only a numeric `id` param and a user response, its complete
+decoded request contains only `params`:
 
 ```ts
 const httpUserOptions = http.users.get.queryOptions({
@@ -53,7 +58,8 @@ including a conditional union. Keep the conditional input inside one builder cal
 has one consistent callback type. Concrete inputs and the literal `skipToken` retain their precise
 key and query-function types; conditional inputs preserve both possibilities.
 
-For a declared `events.watch` stream with a channel input, build either view in that consumer:
+If your RPC group also declares `events.watch` with a string `channel` input and string
+emissions, build either view in that consumer:
 
 ```ts
 rpcQuery.events.watch.streamedOptions({

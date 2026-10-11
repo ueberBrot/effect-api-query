@@ -11,20 +11,20 @@ owns authorization.
 
 ## Capture one owner
 
-Create the utility trees in the application module with already acquired clients and a
-QueryClient reserved for this owner. Use a safe owner tuple in both factories:
+In a consumer or mutation module, receive the ready `application` returned by
+[`startViteReactApplication(options)`](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/lib/application.ts).
+Capture that application and its existing utility trees and QueryClient:
 
 ```ts
-const keyPrefix = ownerKeyPrefix(identity)
-const rpc = createRpcQueryUtils(ownerGroup, { client: rpcClient, keyPrefix, runPromiseExit })
-const http = createHttpApiQueryUtils(ownerApi, { client: httpClient, keyPrefix, runPromiseExit })
+const owner = application
+const { queryClient, rpcQuery: rpc, httpQuery: http } = owner
 ```
 
-`ownerKeyPrefix` and `owner` below come from the application's
-[owner-cache module](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/lib/owner-cache.ts).
-The [application module](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/lib/application.ts)
-acquires clients, restores directory data, and tracks accepted mutation requests. These are
-application helpers; keep their Scopes and runtimes alive until the owner's work finishes.
+The application uses `ownerKeyPrefix(identity)` from its
+[owner-cache module](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/lib/owner-cache.ts)
+in both factories. It acquires clients, restores directory data, and exposes the original owner's
+guards and tracked mutation options. Keep its Scopes and runtimes alive until the owner's work
+finishes.
 
 In this owner's mutation options, guard each cache write and invalidation:
 
@@ -47,7 +47,7 @@ const createUser = owner.trackMutationOptions(
       if (!owner.isActive()) {
         return
       }
-      queryClient.setQueryData(rpc.users.get.queryKey({ id: user.id }), user)
+      queryClient.setQueryData(rpc.users.get.queryKey({ id: user.id, locale: user.locale }), user)
       await invalidateUsers()
     },
     onSettled: invalidateUsers,
