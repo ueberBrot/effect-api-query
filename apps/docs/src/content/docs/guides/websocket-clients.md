@@ -75,15 +75,8 @@ has not cancelled the query. Its Cause preserves the failure received by the rea
 Wire serialization can change the original server's Cause representation. A failed stream
 leaves already published data available alongside its error.
 
-With Effect 4.0.0, cancelling a paused stream with a full transport buffer of size 1 can
-stall other calls on the connection. This recipe uses the native default of 16. Before changing
-that setting, test smaller buffers against the pinned transport version.
-
-The default buffer is not a guarantee for larger chunks or unfinished queue offers.
-
-Keep streaming success schemas compatible on both ends. With Effect 4.0.0, a chunk that fails
-client Schema decoding can also fail unrelated calls sharing the connection. A larger buffer
-does not isolate decoding failures.
+Keep streaming success schemas compatible on both ends. A chunk that fails client Schema
+decoding ends the affected request.
 
 Query cancellation cooperatively stops future work. It does not undo completed writes.
 If the domain needs an explicit cancellation operation, use an [explicit cancellable command](/effect-api-query/guides/cancellation/).

@@ -32,28 +32,7 @@
 
   "duplicates": {
     "mode": "semantic",
-    "near": true,
-    "ignoredClones": [
-      "dup:22704c46:2",
-      "dup:3fec4231:2",
-      "dup:91b44e3a:2",
-      "dup:c77b3abb6f87acd9-10:2",
-      "dup:c77b3abb6f87acd9-11:2",
-      "dup:c77b3abb6f87acd9-12:2",
-      "dup:c77b3abb6f87acd9-13:2",
-      "dup:c77b3abb6f87acd9-14:2",
-      "dup:c77b3abb6f87acd9-15:2",
-      "dup:c77b3abb6f87acd9-16:2",
-      "dup:c77b3abb6f87acd9-1:2",
-      "dup:c77b3abb6f87acd9-2:2",
-      "dup:c77b3abb6f87acd9-3:2",
-      "dup:c77b3abb6f87acd9-4:2",
-      "dup:c77b3abb6f87acd9-5:2",
-      "dup:c77b3abb6f87acd9-6:2",
-      "dup:c77b3abb6f87acd9-7:2",
-      "dup:c77b3abb6f87acd9-8:2",
-      "dup:c77b3abb6f87acd9-9:2"
-    ]
+    "near": true
   },
 
   "ignoreDependencies": [
@@ -64,6 +43,8 @@
     "@shadcn/lint",
     "@tanstack/intent",
     "effect",
+    // Fallow resolves workspace imports to source but misses the root package dependency.
+    "effect-api-query",
     "publint",
     // React belongs to the private apps; Fallow attributes shared example sources to the root.
     "react",

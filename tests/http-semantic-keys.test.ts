@@ -46,6 +46,51 @@ const encodeTestKey = (encode: () => unknown) =>
 /* oxlint-enable anti-slop/no-unknown-returns, typescript/no-unsafe-type-assertion */
 
 describe('HTTP semantic keys', () => {
+  it('preserves singleton and multi-value arrays in GET and form-urlencoded payloads', async () => {
+    const fields = Schema.Struct({ values: Schema.Array(Schema.String) })
+    const contract = HttpApi.make('array-payloads').add(
+      HttpApiGroup.make('formats', { topLevel: true }).add(
+        HttpApiEndpoint.get('search', '/search', {
+          payload: fields.fields,
+          success: Schema.Array(Schema.String),
+        }),
+        HttpApiEndpoint.post('form', '/form', {
+          payload: fields.pipe(HttpApiSchema.asFormUrlEncoded()),
+          success: Schema.Array(Schema.String),
+        }),
+      ),
+    )
+    const handlers = HttpApiBuilder.group(contract, 'formats', (group) =>
+      group
+        .handle('search', ({ payload }) => Effect.succeed(payload.values))
+        .handle('form', ({ payload }) => Effect.succeed(payload.values)),
+    )
+    const scope = Scope.makeUnsafe()
+    const client = await Effect.runPromise(
+      HttpApiTest.groups(contract, ['formats']).pipe(
+        Effect.provide(Layer.mergeAll(handlers, HttpServer.layerServices)),
+        Effect.provideService(Scope.Scope, scope),
+      ),
+    )
+    const http = createHttpApiQueryUtils(contract, { client, keyPrefix: ['array-payloads'] })
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    try {
+      await Promise.all(
+        [['one'], ['one', 'two']].map(async (values) => {
+          await expect(
+            queryClient.query(http.search.queryOptions({ input: { payload: { values } } })),
+          ).resolves.toStrictEqual(values)
+          await expect(
+            queryClient.query(http.form.queryOptions({ input: { payload: { values } } })),
+          ).resolves.toStrictEqual(values)
+        }),
+      )
+    } finally {
+      queryClient.clear()
+      await Effect.runPromise(Scope.close(scope, Exit.void))
+    }
+  })
+
   it('reuses equivalent requests and partitions every result-affecting request part', async () => {
     const contract = HttpApi.make('cache').add(
       HttpApiGroup.make('requests').add(
