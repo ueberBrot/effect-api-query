@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "a208998a8588b7e2ded8b672eeb42db6e5ba57242e0098944624b015b5fa9669",
+      "fingerprint": "7e989af2649dca57ea80ed70824ddd1ce94388c39209582ae87498bd03faf99c",
       "snapshot": {
         "GLOSSARY.md": "60e4919b11d134139ac1dcb9b796903caa2b672fd474a2b83338547802194a08",
         "README.md": "f26b555fe485bd27eeee35ac49928ff29f0326aac274644e56d4c11f166e50ad",
@@ -132,7 +132,7 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "0f09b669dc00a66e7db0d947f31daa88862e89cda9877d37caaa72631c1b247c",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "884e694a2a3ecc0cdd12d3555c953c30c6c7778bc613a78752b2ca27c17c173d",
         "examples/vite-react/tests/user-writes.test.ts": "3fe07c1fa8deab8c154d30481f7bc6ef77d3a8ed6c3d5e0d3cbfe75574061e33",
-        "package.json": "c4baab0fbf8e9fc3d71cdb1262ffbfc25163036f93e42b8f6bd8a8c6b8a9d9f3",
+        "package.json": "3ab2260e3992ef8559bdecc4a17758b6c988f871092c1d6c609d0482074a1210",
         "pnpm-workspace.yaml": "be1d28fb27e2c4af6fffb22fe71bccf5c1f48daf70e0abc149537fdccb49d7f2",
         "scripts/decode-utf8.mts": "2e90c53e95c22b864a209a87c98084db6ec95e83f842007b21528d286d45c18c",
         "scripts/measure-construction.mts": "10522cb10ab51fd44d8990896a2a73e8bf4d4cd2646441e958b6180cb1afd147",
@@ -234,22 +234,17 @@
         "tests/types/tanstack-start-contract.ts": "8c960ed8dbd3cad236d7941feeb41a70d3bdc428c6d511f3cc835aaabdbb2b41",
         "tests/types/type-scale.ts": "0367cafa06acd7613718288c17b72929c78905817d30074ef5144257af9a1bb4"
       },
-      "head": "c62ae6817c5bccb010a32f665d0fb8d8ce22f75d",
-      "outcome": "updated",
-      "reason": "Changed the library metadata and all public module specifiers in the entry skill and six references to @ueberbrot/effect-api-query. Preserved skill name/slug/path, project branding, activation description, purpose, version, APIs, resource ownership and all guidance boundaries. Fresh installed consumers now discover/load the skill under the scoped package identifier and execute its APIs.",
+      "head": "d598656708cc615e52b4c2810842f292babbf9ef",
+      "outcome": "no-change",
+      "reason": "Adding npm search keywords and pointing homepage at the existing documentation landing page does not change the installed API, peer requirements, imports or developer tasks. The existing skill activation, purpose, six references and usage guidance remain accurate.",
       "evidence": [
-        "Base origin/main c62ae6817c5bccb010a32f665d0fb8d8ce22f75d; git diff has no src runtime, release-workflow, Changeset or changelog changes.",
-        "vp install --frozen-lockfile verified1013 supply-chain entries; lockfile differs only in two renamed workspace importer keys.",
-        "vp run --no-cache pack passed ATTW/publint; final @ueberbrot/effect-api-query0.1.0 archive has14unique files and byte-identical runtime/declaration/map output to the unscoped tested archive.",
-        "Type-aware lint, publicAPI and server-local compiler fixtures on TypeScript7.0.2/5.9.3, Effect diagnostics and Fallow audits passed; all509 runtime tests passed.",
-        "Both application builds and final56page docsbuild passed; all7Chromium docs checks passed, including scoped registry/npm URLs, branding, unpublished/network/invalid-version fallbacks and generated LLM docs.",
-        "Fresh isolated scoped consumer: frozen nativepnpm12.11.2 install with25supply-chain checks and unchanged seven-day policy; strictNodeNext skipLibCheck:false TS7.0.2/5.9.3 and realRPC/HTTP runtime fixture passed.",
-        "Installed Intent list discovered @ueberbrot/effect-api-query#effect-api-query; load --path resolved the packagedskill; structural packagedskillvalidation passed and all16relative links resolve. Evidence: /tmp/eaq-scoped-release-0.1.0/consumer-evidence.json.",
-        "Packaged Intent snippet checking warns it requires Git-tracked declared files; installed dist/index.d.mts exists and both strictconsumer compiler checks passed independently."
+        "PR base 0ea1465a605c80725da9e0a0a9686c86de5b6b82 to d598656708cc615e52b4c2810842f292babbf9ef changes only package.json keywords and homepage. Package name, version, peers, exports, files, runtime, declarations and shipped guidance are unchanged.",
+        "vp run --no-cache format, vp run --no-cache pack (ATTW and publint), and vp run skills-check passed for the metadata change. Packed archive verification found 14 unique files and only keywords/homepage changed against the published archive.",
+        "Documentation homepage returned HTTP 200 with the effect-api-query page title. tanstack-intent remains in keywords. intent maintainer sync reported nothing to synchronize."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "86eb2a125e480fb30948c255ccfa2abbd80d8e7dc62f54d77ffb8bb4156e2878",
+      "fingerprint": "28fa12a6918d64ee3198b11f94b7dbf25f307d14134a08b41c10e13e0cdc993f",
       "snapshot": {
         "GLOSSARY.md": "60e4919b11d134139ac1dcb9b796903caa2b672fd474a2b83338547802194a08",
         "README.md": "f26b555fe485bd27eeee35ac49928ff29f0326aac274644e56d4c11f166e50ad",
@@ -381,7 +376,7 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "0f09b669dc00a66e7db0d947f31daa88862e89cda9877d37caaa72631c1b247c",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "884e694a2a3ecc0cdd12d3555c953c30c6c7778bc613a78752b2ca27c17c173d",
         "examples/vite-react/tests/user-writes.test.ts": "3fe07c1fa8deab8c154d30481f7bc6ef77d3a8ed6c3d5e0d3cbfe75574061e33",
-        "package.json": "c4baab0fbf8e9fc3d71cdb1262ffbfc25163036f93e42b8f6bd8a8c6b8a9d9f3",
+        "package.json": "3ab2260e3992ef8559bdecc4a17758b6c988f871092c1d6c609d0482074a1210",
         "pnpm-workspace.yaml": "be1d28fb27e2c4af6fffb22fe71bccf5c1f48daf70e0abc149537fdccb49d7f2",
         "scripts/decode-utf8.mts": "2e90c53e95c22b864a209a87c98084db6ec95e83f842007b21528d286d45c18c",
         "scripts/measure-construction.mts": "10522cb10ab51fd44d8990896a2a73e8bf4d4cd2646441e958b6180cb1afd147",
@@ -483,18 +478,13 @@
         "tests/types/tanstack-start-contract.ts": "8c960ed8dbd3cad236d7941feeb41a70d3bdc428c6d511f3cc835aaabdbb2b41",
         "tests/types/type-scale.ts": "0367cafa06acd7613718288c17b72929c78905817d30074ef5144257af9a1bb4"
       },
-      "head": "c62ae6817c5bccb010a32f665d0fb8d8ce22f75d",
-      "outcome": "updated",
-      "reason": "Updated _artifacts/domain_map.yaml library/packages/subsystem ownership and _artifacts/skill_tree.yaml library name to the scoped package, and the existing installed-consumer sentence in _artifacts/skill_spec.md. Parsed both YAML files and checked all seven guidance files and16relative links. Preserved all task coverage, failure modes, six references, source mappings, prior history, skill identity, version0.1.0 and package-only distribution.",
+      "head": "d598656708cc615e52b4c2810842f292babbf9ef",
+      "outcome": "no-change",
+      "reason": "Reviewed all three planning records. _artifacts/domain_map.yaml retains the same domains, tasks and failure modes; _artifacts/skill_spec.md retains accurate coverage and decisions; _artifacts/skill_tree.yaml retains the same identity, six references and source mappings. Keywords and homepage change package discovery only, so these records require no edits.",
       "evidence": [
-        "Base origin/main c62ae6817c5bccb010a32f665d0fb8d8ce22f75d; git diff has no src runtime, release-workflow, Changeset or changelog changes.",
-        "vp install --frozen-lockfile verified1013 supply-chain entries; lockfile differs only in two renamed workspace importer keys.",
-        "vp run --no-cache pack passed ATTW/publint; final @ueberbrot/effect-api-query0.1.0 archive has14unique files and byte-identical runtime/declaration/map output to the unscoped tested archive.",
-        "Type-aware lint, publicAPI and server-local compiler fixtures on TypeScript7.0.2/5.9.3, Effect diagnostics and Fallow audits passed; all509 runtime tests passed.",
-        "Both application builds and final56page docsbuild passed; all7Chromium docs checks passed, including scoped registry/npm URLs, branding, unpublished/network/invalid-version fallbacks and generated LLM docs.",
-        "Fresh isolated scoped consumer: frozen nativepnpm12.11.2 install with25supply-chain checks and unchanged seven-day policy; strictNodeNext skipLibCheck:false TS7.0.2/5.9.3 and realRPC/HTTP runtime fixture passed.",
-        "Installed Intent list discovered @ueberbrot/effect-api-query#effect-api-query; load --path resolved the packagedskill; structural packagedskillvalidation passed and all16relative links resolve. Evidence: /tmp/eaq-scoped-release-0.1.0/consumer-evidence.json.",
-        "Packaged Intent snippet checking warns it requires Git-tracked declared files; installed dist/index.d.mts exists and both strictconsumer compiler checks passed independently."
+        "PR base 0ea1465a605c80725da9e0a0a9686c86de5b6b82 to d598656708cc615e52b4c2810842f292babbf9ef changes only package.json keywords and homepage. Package name, version, peers, exports, files, runtime, declarations and shipped guidance are unchanged.",
+        "vp run --no-cache format, vp run --no-cache pack (ATTW and publint), and vp run skills-check passed for the metadata change. Packed archive verification found 14 unique files and only keywords/homepage changed against the published archive.",
+        "Documentation homepage returned HTTP 200 with the effect-api-query page title. tanstack-intent remains in keywords. intent maintainer sync reported nothing to synchronize."
       ]
     },
     "source:vite.config.ts": {
