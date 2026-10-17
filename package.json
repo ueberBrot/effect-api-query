@@ -3,9 +3,19 @@
   "version": "0.1.0",
   "description": "Type-safe TanStack Query utilities derived from Effect RPC and HTTP API contracts.",
   "keywords": [
-    "tanstack-intent"
+    "effect",
+    "effect-ts",
+    "http-api",
+    "query-cache",
+    "react-query",
+    "rpc",
+    "ssr",
+    "streaming",
+    "tanstack-intent",
+    "tanstack-query",
+    "typescript"
   ],
-  "homepage": "https://github.com/ueberBrot/effect-api-query#readme",
+  "homepage": "https://ueberbrot.github.io/effect-api-query/",
   "bugs": {
     "url": "https://github.com/ueberBrot/effect-api-query/issues"
   },
