@@ -58,7 +58,7 @@ unknown values safely. The adapter guard rejects custom runner failures that pas
 ## Bind a typed RPC policy
 
 Import `withQueryPolicy`, `isEffectRpcQueryError`, and the type `InferQueryError` from
-`effect-api-query`, plus `RpcClientError` from `effect/rpc`. After acquiring your ready client and
+`@ueberbrot/effect-api-query`, plus `RpcClientError` from `effect/rpc`. After acquiring your ready client and
 creating `rpc`, bind the profile read:
 
 ```ts
@@ -82,7 +82,7 @@ belongs to the application that owns those transports.
 
 ## Bind the same decision to HTTP
 
-Import `isEffectHttpApiQueryError` from `effect-api-query` and `HttpClientError` from `effect/http`.
+Import `isEffectHttpApiQueryError` from `@ueberbrot/effect-api-query` and `HttpClientError` from `effect/http`.
 Reuse the shared retry logic with HTTP's transport classifier:
 
 ```ts

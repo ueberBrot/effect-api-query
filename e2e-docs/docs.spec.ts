@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test'
 
 const docsBase = '/effect-api-query/'
-const registryUrl = 'https://registry.npmjs.org/effect-api-query/latest'
-const packageUrl = 'https://www.npmjs.com/package/effect-api-query'
+const registryUrl = 'https://registry.npmjs.org/@ueberbrot%2Feffect-api-query/latest'
+const packageUrl = 'https://www.npmjs.com/package/@ueberbrot/effect-api-query'
 const repositoryUrl = 'https://github.com/ueberBrot/effect-api-query'
 
 test('opens tutorials and feature guides and searches the production index', async ({

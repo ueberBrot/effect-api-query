@@ -38,9 +38,9 @@ Client tracing in `trace-feed.ts`:
 
 ```ts
 import { QueryClient } from '@tanstack/query-core'
+import { createHttpApiQueryUtils, fetchStreamSnapshot } from '@ueberbrot/effect-api-query'
+import type { RunPromiseExit } from '@ueberbrot/effect-api-query'
 import { Effect, Layer, ManagedRuntime, Stream, Tracer } from 'effect'
-import { createHttpApiQueryUtils, fetchStreamSnapshot } from 'effect-api-query'
-import type { RunPromiseExit } from 'effect-api-query'
 import { FetchHttpClient } from 'effect/http'
 import { HttpApiClient } from 'effect/http-api'
 import { OtlpSerialization, OtlpTracer } from 'effect/observability'

@@ -1,12 +1,12 @@
-import { Cause, Result, Schema } from 'effect'
 import {
   createHttpApiQueryUtils,
   createRpcQueryUtils,
   isEffectHttpApiQueryError,
   isEffectRpcQueryError,
   withQueryPolicy,
-} from 'effect-api-query'
-import type { InferQueryError } from 'effect-api-query'
+} from '@ueberbrot/effect-api-query'
+import type { InferQueryError } from '@ueberbrot/effect-api-query'
+import { Cause, Result, Schema } from 'effect'
 import { HttpClientError } from 'effect/http'
 import { HttpApi, HttpApiClient, HttpApiEndpoint, HttpApiGroup } from 'effect/http-api'
 import { Rpc, RpcClient, RpcClientError, RpcGroup } from 'effect/rpc'

@@ -23,7 +23,7 @@ with `name`:
 
 ```ts
 import { useQuery } from '@tanstack/solid-query'
-import { skipToken } from 'effect-api-query'
+import { skipToken } from '@ueberbrot/effect-api-query'
 import { createSignal } from 'solid-js'
 
 import { rpc } from './queries.ts'

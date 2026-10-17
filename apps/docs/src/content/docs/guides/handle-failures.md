@@ -7,8 +7,8 @@ A failed RPC `Exit` becomes `EffectRpcQueryError`. The error records the RPC tag
 operation, and the complete Effect `Cause`. Inspect the error in your application handler:
 
 ```ts
+import { isEffectRpcQueryError } from '@ueberbrot/effect-api-query'
 import { Cause } from 'effect'
-import { isEffectRpcQueryError } from 'effect-api-query'
 
 const logRpcError = (error: unknown) => {
   if (isEffectRpcQueryError(error)) {
@@ -36,7 +36,7 @@ bounded attempt counts, and synchronous preparation errors.
 
 ## Inspect HTTP failures
 
-Import `isEffectHttpApiQueryError` from `effect-api-query` to recognize a failed HTTP execution.
+Import `isEffectHttpApiQueryError` from `@ueberbrot/effect-api-query` to recognize a failed HTTP execution.
 The wrapper records `apiId`, `groupId`, `endpoint`, `method`, and `operation`. Its `cause`
 retains the complete original Effect Cause. Use `Cause.findError` to inspect declared endpoint
 errors, middleware errors, Schema errors, and HTTP client errors. Use `Cause.hasDies` and

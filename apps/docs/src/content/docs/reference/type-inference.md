@@ -3,7 +3,7 @@ title: Type Inference
 description: Derive operation inputs, cached data, mutation results, and failures from generated leaves.
 ---
 
-These types are exported from `effect-api-query`. Each describes a generated leaf's contract:
+These types are exported from `@ueberbrot/effect-api-query`. Each describes a generated leaf's contract:
 
 | Type                          | Result                                                    |
 | ----------------------------- | --------------------------------------------------------- |

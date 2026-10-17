@@ -1,6 +1,6 @@
 ;(() => {
-  const packageUrl = 'https://www.npmjs.com/package/effect-api-query'
-  const packageManifestUrl = 'https://registry.npmjs.org/effect-api-query/latest'
+  const packageUrl = 'https://www.npmjs.com/package/@ueberbrot/effect-api-query'
+  const packageManifestUrl = 'https://registry.npmjs.org/@ueberbrot%2Feffect-api-query/latest'
   const semanticVersion = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/
 
   const updatePackageVersion = (version) => {

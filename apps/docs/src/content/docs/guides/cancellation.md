@@ -4,7 +4,7 @@ description: Cancel queries and request server-side cancellation for long-runnin
 ---
 
 In your application client module, forward TanStack's `AbortSignal` to the runtime.
-Import `RunPromiseExit` from `effect-api-query`:
+Import `RunPromiseExit` from `@ueberbrot/effect-api-query`:
 
 ```ts
 const runPromiseExit: RunPromiseExit = (effect, options) => runtime.runPromiseExit(effect, options)

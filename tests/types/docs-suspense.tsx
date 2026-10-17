@@ -3,9 +3,9 @@ import {
   useSuspenseQueries,
   useSuspenseQuery,
 } from '@tanstack/react-query'
+import { createRpcQueryUtils, isEffectRpcQueryError } from '@ueberbrot/effect-api-query'
+import type { InferQueryData, InferQueryError } from '@ueberbrot/effect-api-query'
 import { Cause, Result, Schema } from 'effect'
-import { createRpcQueryUtils, isEffectRpcQueryError } from 'effect-api-query'
-import type { InferQueryData, InferQueryError } from 'effect-api-query'
 import { Rpc, RpcGroup } from 'effect/rpc'
 import type { RpcClient } from 'effect/rpc'
 import { Component, Suspense } from 'react'

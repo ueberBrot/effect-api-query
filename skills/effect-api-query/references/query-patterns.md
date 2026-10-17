@@ -2,7 +2,7 @@
 
 ## Reuse inferred operation types
 
-To infer operation types, import helpers from `effect-api-query` and apply them to
+To infer operation types, import helpers from `@ueberbrot/effect-api-query` and apply them to
 a utility leaf:
 
 | Helper                                                | Representation                                                          |
@@ -43,8 +43,8 @@ components under the application's `QueryClientProvider`.
 
 ```ts
 import { useQuery } from '@tanstack/react-query'
+import { createRpcQueryUtils, skipToken } from '@ueberbrot/effect-api-query'
 import { Schema } from 'effect'
-import { createRpcQueryUtils, skipToken } from 'effect-api-query'
 import { Rpc, RpcGroup, type RpcClient } from 'effect/rpc'
 
 export const users = RpcGroup.make(
@@ -82,8 +82,8 @@ execution.
 
 ```ts
 import { QueryClient } from '@tanstack/query-core'
+import { createRpcQueryUtils } from '@ueberbrot/effect-api-query'
 import { Schema } from 'effect'
-import { createRpcQueryUtils } from 'effect-api-query'
 import { Rpc, RpcGroup, type RpcClient } from 'effect/rpc'
 
 export const catalog = RpcGroup.make(
@@ -121,8 +121,8 @@ inside the options object. Do not return the sentinel from a mapper.
 ## RPC streams
 
 ```ts
+import { createRpcQueryUtils } from '@ueberbrot/effect-api-query'
 import { Schema } from 'effect'
-import { createRpcQueryUtils } from 'effect-api-query'
 import { Rpc, RpcGroup, type RpcClient } from 'effect/rpc'
 
 export const events = RpcGroup.make(

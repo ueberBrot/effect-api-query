@@ -11,8 +11,8 @@ policies. Keep selection and input at each builder call.
 
 ```ts
 import { QueryClient } from '@tanstack/query-core'
+import { createRpcQueryUtils, viewPrefix } from '@ueberbrot/effect-api-query'
 import { Effect, Schema } from 'effect'
-import { createRpcQueryUtils, viewPrefix } from 'effect-api-query'
 import { Rpc, RpcGroup } from 'effect/rpc'
 import type { RpcClient } from 'effect/rpc'
 
@@ -80,9 +80,13 @@ Reuse them at call sites. The following factory shares a freshness decision and
 mutation invalidation:
 
 ```ts
+import {
+  createRpcQueryUtils,
+  withMutationPolicy,
+  withQueryPolicy,
+} from '@ueberbrot/effect-api-query'
+import type { QueryPolicy } from '@ueberbrot/effect-api-query'
 import { Schema } from 'effect'
-import { createRpcQueryUtils, withMutationPolicy, withQueryPolicy } from 'effect-api-query'
-import type { QueryPolicy } from 'effect-api-query'
 import { Rpc, RpcGroup } from 'effect/rpc'
 import type { RpcClient } from 'effect/rpc'
 

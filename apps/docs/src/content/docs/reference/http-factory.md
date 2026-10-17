@@ -5,7 +5,7 @@ description: HTTP factory options, decoded request input, response data, and cac
 
 `createHttpApiQueryUtils(api, options)` builds and freezes an HTTP utility tree from an Effect
 HttpApi and a ready HttpApiClient. The application manages the client's lifetime.
-The factory is exported from `effect-api-query`.
+The factory is exported from `@ueberbrot/effect-api-query`.
 
 The [HTTP Quick Start](/effect-api-query/getting-started/http-quick-start/) shows factory setup.
 [HTTP Builders](/effect-api-query/reference/http-builders/) defines each generated option and key.

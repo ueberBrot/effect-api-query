@@ -17,8 +17,8 @@ The entry point contains shared rules and directs conditional tasks to six refer
 | Hydration and SSR    | Snapshots, paired view codecs, preparation and cleanup             |
 | Frameworks and hosts | Provider setup, Suspense, reactive accessors, transports and hosts |
 
-Consumers load the guidance from their installed package without repository-local
-authoring skills. Planning records remain outside the shipped package.
+Consumers load the guidance from installed `@ueberbrot/effect-api-query` without
+repository-local authoring skills. Planning records remain outside the shipped package.
 
 ## Sources and boundaries
 

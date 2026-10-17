@@ -86,7 +86,7 @@ for (const [page, fixtures] of [
     const source = decodeUtf8(readFileSync(new URL(`../${fixturePath}`, import.meta.url)))
     sources.push(
       source
-        .replaceAll("from '#effect-api-query'", "from 'effect-api-query'")
+        .replaceAll("from '#effect-api-query'", "from '@ueberbrot/effect-api-query'")
         .replaceAll("from './docs-readme-rpc-contract.ts'", "from './rpc-contract.ts'")
         .replaceAll("from './docs-readme-http-contract.ts'", "from './http-contract.ts'")
         .replaceAll("from './docs-rpc-quick-start-contract.ts'", "from './rpc-contract.ts'")

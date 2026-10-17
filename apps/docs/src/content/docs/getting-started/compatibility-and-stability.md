@@ -3,7 +3,7 @@ title: Compatibility and Stability
 description: Check supported integrations, module format, and the release policy.
 ---
 
-Import both factories from the `effect-api-query` package root. They use the same peer dependencies.
+Import both factories from the `@ueberbrot/effect-api-query` package root. They use the same peer dependencies.
 The package's [manifest](https://github.com/ueberBrot/effect-api-query/blob/main/package.json)
 defines the peer requirements. The [workspace catalog](https://github.com/ueberBrot/effect-api-query/blob/main/pnpm-workspace.yaml)
 lists the versions tested in this repository. See the

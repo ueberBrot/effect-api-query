@@ -9,7 +9,7 @@ query and awaits local iterator cleanup. Ordinary `queryClient.query` waits for 
 
 ## Capture data before dehydration
 
-Import `fetchStreamSnapshot` from `effect-api-query`. In the request loader or server snapshot
+Import `fetchStreamSnapshot` from `@ueberbrot/effect-api-query`. In the request loader or server snapshot
 module, use your existing `rpc`, request-local `queryClient` and abort `signal`. Keep the ready
 client and runner alive until capture settles. For the declared `updates.watch` stream:
 

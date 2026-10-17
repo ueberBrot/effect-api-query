@@ -347,7 +347,7 @@ export default defineConfig({
         },
       ],
       social: [{ icon: 'github', label: 'GitHub', href: repositoryUrl }],
-      title: packageManifest.name,
+      title: 'effect-api-query',
     }),
   ],
   site: 'https://ueberbrot.github.io',

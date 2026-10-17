@@ -5,7 +5,7 @@ import {
   viewPrefix,
   withMutationPolicy,
   withQueryPolicy,
-} from 'effect-api-query'
+} from '@ueberbrot/effect-api-query'
 import type {
   InferInput,
   InferMutationData,
@@ -13,7 +13,7 @@ import type {
   InferQueryData,
   InferQueryError,
   QueryPolicy,
-} from 'effect-api-query'
+} from '@ueberbrot/effect-api-query'
 import type { HttpApiClient } from 'effect/http-api'
 import type { RpcClient, RpcGroup } from 'effect/rpc'
 

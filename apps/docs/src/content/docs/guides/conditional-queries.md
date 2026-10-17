@@ -13,7 +13,7 @@ use `{ input: skipToken }`. The builder still accepts TanStack options such as `
 `select`, or `initialData`:
 
 ```ts
-import { skipToken } from 'effect-api-query'
+import { skipToken } from '@ueberbrot/effect-api-query'
 
 type User = { id: number; name: string }
 

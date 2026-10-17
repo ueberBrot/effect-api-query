@@ -1,7 +1,7 @@
 import { defaultShouldDehydrateQuery, dehydrate, hydrate } from '@tanstack/query-core'
 import type { QueryClient } from '@tanstack/query-core'
+import { createHttpApiQueryUtils, createRpcQueryUtils } from '@ueberbrot/effect-api-query'
 import { Schema } from 'effect'
-import { createHttpApiQueryUtils, createRpcQueryUtils } from 'effect-api-query'
 import { HttpApi, HttpApiClient, HttpApiEndpoint, HttpApiGroup } from 'effect/http-api'
 import { Rpc, RpcClient, RpcGroup } from 'effect/rpc'
 

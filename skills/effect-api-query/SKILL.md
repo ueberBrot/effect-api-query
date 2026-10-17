@@ -14,7 +14,7 @@ metadata:
     clients, preserving cache identity, decoded query views, native framework
     behavior, and application-owned execution, hydration, and resource lifetime.
   type: core
-  library: effect-api-query
+  library: '@ueberbrot/effect-api-query'
   library_version: '0.1.0'
 sources:
   - 'src/**/*.ts'
@@ -68,7 +68,7 @@ Read the reference for the contract you are integrating:
 | Effect RPC group | `createRpcQueryUtils` with payload constructor input | [RPC setup and rules](references/rpc.md)   |
 | Effect HttpApi   | `createHttpApiQueryUtils` with decoded request parts | [HTTP setup and rules](references/http.md) |
 
-Import both factories and error guards from `effect-api-query`, the package's one
+Import both factories and error guards from `@ueberbrot/effect-api-query`, the package's one
 public root export. Each factory accepts an already acquired client. It builds
 an eager, frozen utility tree without making a request.
 

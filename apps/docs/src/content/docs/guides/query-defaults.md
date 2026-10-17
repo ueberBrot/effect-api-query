@@ -18,7 +18,7 @@ builder's inference. The library supplies the generated keys and execution funct
 ## Register native defaults
 
 In the cache module, import `QueryClient` from `@tanstack/query-core` and `viewPrefix` from
-`effect-api-query`:
+`@ueberbrot/effect-api-query`:
 
 ```ts
 const queryClient = new QueryClient({
@@ -61,7 +61,7 @@ the cache owner's lifetime. Builders reject per-call hashing overrides. See
 
 If a policy belongs to one leaf and view, use `withQueryPolicy`. `QueryPolicy` types reusable
 objects with that leaf's native options. Retry and refetch callbacks retain its data and error types.
-Import both from `effect-api-query`:
+Import both from `@ueberbrot/effect-api-query`:
 
 ```ts
 const policy = {
@@ -90,7 +90,7 @@ use a value such as `staleTime: 0` or `retry: false`.
 
 ## Bind mutation invalidation
 
-Import `withMutationPolicy` from `effect-api-query`. Seed the returned user and invalidate affected
+Import `withMutationPolicy` from `@ueberbrot/effect-api-query`. Seed the returned user and invalidate affected
 reads once for every use of the creation builder:
 
 ```ts

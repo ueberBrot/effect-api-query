@@ -1,6 +1,5 @@
 import type { dataTagSymbol, InfiniteData, QueryClient, SkipToken } from '@tanstack/query-core'
 import { useInfiniteQuery, useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
-import { Effect, Schema } from 'effect'
 import {
   createHttpApiQueryUtils,
   createRpcQueryUtils,
@@ -8,7 +7,7 @@ import {
   viewPrefix,
   withMutationPolicy,
   withQueryPolicy,
-} from 'effect-api-query'
+} from '@ueberbrot/effect-api-query'
 import type {
   EffectHttpApiQueryError,
   EffectRpcQueryError,
@@ -20,7 +19,8 @@ import type {
   MutationPolicy,
   QueryPolicy,
   RpcQueryUtils,
-} from 'effect-api-query'
+} from '@ueberbrot/effect-api-query'
+import { Effect, Schema } from 'effect'
 import { HttpApi, HttpApiEndpoint, HttpApiGroup, HttpApiSchema } from 'effect/http-api'
 import type { HttpApiClient } from 'effect/http-api'
 import { Rpc, RpcGroup } from 'effect/rpc'

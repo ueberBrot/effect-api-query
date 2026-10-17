@@ -410,7 +410,7 @@ importers:
       effect:
         specifier: 'catalog:'
         version: 4.0.2
-      effect-api-query:
+      '@ueberbrot/effect-api-query':
         specifier: workspace:*
         version: link:../..
       react:
@@ -459,7 +459,7 @@ importers:
       effect:
         specifier: 'catalog:'
         version: 4.0.2
-      effect-api-query:
+      '@ueberbrot/effect-api-query':
         specifier: workspace:*
         version: link:../..
       react:

@@ -1,6 +1,6 @@
 import { MutationObserver, QueryClient } from '@tanstack/query-core'
+import { createRpcQueryUtils } from '@ueberbrot/effect-api-query'
 import { Effect, Exit, Layer, Scope } from 'effect'
-import { createRpcQueryUtils } from 'effect-api-query'
 import { FetchHttpClient } from 'effect/http'
 import { RpcClient, RpcSerialization } from 'effect/rpc'
 

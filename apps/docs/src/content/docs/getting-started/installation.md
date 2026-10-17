@@ -6,7 +6,7 @@ description: Install effect-api-query and its peer dependencies.
 Install the package and TanStack Query Core:
 
 ```sh
-pnpm add effect-api-query @tanstack/query-core
+pnpm add @ueberbrot/effect-api-query @tanstack/query-core
 ```
 
 With pnpm's default peer installation enabled, this command also installs the exact Effect release that the package requires.
