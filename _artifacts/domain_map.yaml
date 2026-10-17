@@ -1,5 +1,5 @@
 library:
-  name: effect-api-query
+  name: '@ueberbrot/effect-api-query'
   version: 0.1.0
   repository: https://github.com/ueberBrot/effect-api-query
   description: TanStack Query utilities derived from ready Effect RPC and HTTP clients.
@@ -16,7 +16,7 @@ skills:
       consumers.
     type: core
     packages:
-      - effect-api-query
+      - '@ueberbrot/effect-api-query'
     covers:
       - RPC construction and canonical identity
       - HTTP decoded requests, SSE, multipart mutations, and metadata
@@ -47,10 +47,10 @@ skills:
       - Choose an application-owned transport within documented version and host boundaries.
     subsystems:
       - name: RPC
-        package: effect-api-query
+        package: '@ueberbrot/effect-api-query'
         config_surface: Literal RpcGroup, flat ready client, prefix, key encoders, runner.
       - name: HTTP
-        package: effect-api-query
+        package: '@ueberbrot/effect-api-query'
         config_surface: Literal HttpApi, ready client, prefix, request encoders, runner.
     reference_candidates:
       - topic: Adapter inputs and capabilities

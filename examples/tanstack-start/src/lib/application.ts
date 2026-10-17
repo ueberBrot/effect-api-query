@@ -2,9 +2,13 @@ import { exampleHttpApi, exampleRpcGroup } from '@effect-api-query/contracts'
 import { startExampleRpcClient } from '@effect-api-query/contracts/client'
 import type { ExampleRpcClient, StartedExampleRpcClient } from '@effect-api-query/contracts/client'
 import { QueryClient } from '@tanstack/react-query'
+import {
+  createHttpApiQueryUtils,
+  createRpcQueryUtils,
+  fetchStreamSnapshot,
+} from '@ueberbrot/effect-api-query'
+import type { RunPromiseExit } from '@ueberbrot/effect-api-query'
 import { Effect, Layer, ManagedRuntime } from 'effect'
-import { createHttpApiQueryUtils, createRpcQueryUtils, fetchStreamSnapshot } from 'effect-api-query'
-import type { RunPromiseExit } from 'effect-api-query'
 import { FetchHttpClient, HttpClient, HttpClientRequest } from 'effect/http'
 import { HttpApiClient } from 'effect/http-api'
 

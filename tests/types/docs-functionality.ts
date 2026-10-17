@@ -1,6 +1,6 @@
 import { MutationObserver, QueryClient, QueryObserver } from '@tanstack/query-core'
+import { createHttpApiQueryUtils, createRpcQueryUtils } from '@ueberbrot/effect-api-query'
 import { Effect, Schema } from 'effect'
-import { createHttpApiQueryUtils, createRpcQueryUtils } from 'effect-api-query'
 import { Multipart } from 'effect/http'
 import { HttpApi, HttpApiEndpoint, HttpApiGroup, HttpApiSchema } from 'effect/http-api'
 import type { HttpApiClient } from 'effect/http-api'

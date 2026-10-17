@@ -5,7 +5,7 @@ description: Read typed entries and target native cache operations with generate
 
 For typed `getQueryData` and `setQueryData`, use a generated concrete key. For native
 `invalidateQueries`, `cancelQueries`, and query-state filters, use root, branch, leaf, or view prefixes.
-To select one supported cache view, import `viewPrefix` from `effect-api-query`.
+To select one supported cache view, import `viewPrefix` from `@ueberbrot/effect-api-query`.
 Choose the scope before adding `type`, `stale`, `fetchStatus`, or `predicate` conditions:
 
 | Scope                 | Key                                                    | Matches                                                            |

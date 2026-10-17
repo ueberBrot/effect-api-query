@@ -6,8 +6,8 @@ the same declaration.
 
 ```ts
 import { MutationObserver, QueryClient } from '@tanstack/query-core'
+import { createHttpApiQueryUtils } from '@ueberbrot/effect-api-query'
 import { ManagedRuntime, Schema } from 'effect'
-import { createHttpApiQueryUtils } from 'effect-api-query'
 import { FetchHttpClient, Multipart } from 'effect/http'
 import {
   HttpApi,
@@ -150,8 +150,8 @@ acquired client for the same declaration. It returns independent history and
 latest views:
 
 ```ts
+import { createHttpApiQueryUtils } from '@ueberbrot/effect-api-query'
 import { Schema } from 'effect'
-import { createHttpApiQueryUtils } from 'effect-api-query'
 import { HttpApi, HttpApiEndpoint, HttpApiGroup, HttpApiSchema } from 'effect/http-api'
 import type { HttpApiClient } from 'effect/http-api'
 

@@ -1,7 +1,7 @@
 import { QueryClient } from '@tanstack/react-query'
+import { createHttpApiQueryUtils } from '@ueberbrot/effect-api-query'
+import type { RunPromiseExit } from '@ueberbrot/effect-api-query'
 import { ManagedRuntime } from 'effect'
-import { createHttpApiQueryUtils } from 'effect-api-query'
-import type { RunPromiseExit } from 'effect-api-query'
 import { FetchHttpClient } from 'effect/http'
 import { HttpApiClient } from 'effect/http-api'
 

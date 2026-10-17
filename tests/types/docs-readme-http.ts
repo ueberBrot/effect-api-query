@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/query-core'
-import { createHttpApiQueryUtils } from 'effect-api-query'
+import { createHttpApiQueryUtils } from '@ueberbrot/effect-api-query'
 import type { HttpApiClient } from 'effect/http-api'
 
 import { usersApi } from './docs-readme-http-contract.ts'

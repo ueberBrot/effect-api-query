@@ -6,8 +6,8 @@ The server must implement the same contract.
 
 ```ts
 import { MutationObserver, QueryClient } from '@tanstack/query-core'
+import { createRpcQueryUtils } from '@ueberbrot/effect-api-query'
 import { Effect, Exit, Layer, Schema, Scope } from 'effect'
-import { createRpcQueryUtils } from 'effect-api-query'
 import { FetchHttpClient } from 'effect/http'
 import { Rpc, RpcClient, RpcGroup, RpcSerialization } from 'effect/rpc'
 

@@ -4,8 +4,8 @@ import { useInfiniteQuery, useMutation, useQuery, useSuspenseQuery } from '@tans
 import { createRootRouteWithContext, createRoute, createRouter } from '@tanstack/react-router'
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
 import { createStart } from '@tanstack/react-start'
+import { createHttpApiQueryUtils } from '@ueberbrot/effect-api-query'
 import { Schema } from 'effect'
-import { createHttpApiQueryUtils } from 'effect-api-query'
 import { HttpApi, HttpApiEndpoint, HttpApiGroup, type HttpApiClient } from 'effect/http-api'
 
 import type { PublicContractUtils } from './public-contract.js'

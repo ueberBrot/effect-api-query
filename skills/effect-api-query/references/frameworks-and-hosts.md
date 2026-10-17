@@ -26,9 +26,9 @@ component setup:
 ```ts
 import { useQuery as useSolidQuery } from '@tanstack/solid-query'
 import { useQuery as useVueQuery } from '@tanstack/vue-query'
+import { createRpcQueryUtils, skipToken } from '@ueberbrot/effect-api-query'
+import type { InferQueryData, InferQueryError } from '@ueberbrot/effect-api-query'
 import { Schema } from 'effect'
-import { createRpcQueryUtils, skipToken } from 'effect-api-query'
-import type { InferQueryData, InferQueryError } from 'effect-api-query'
 import { Rpc, RpcGroup } from 'effect/rpc'
 import type { RpcClient } from 'effect/rpc'
 import { computed, ref } from 'vue'

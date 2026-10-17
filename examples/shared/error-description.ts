@@ -1,5 +1,5 @@
+import { isEffectHttpApiQueryError, isEffectRpcQueryError } from '@ueberbrot/effect-api-query'
 import { Cause } from 'effect'
-import { isEffectHttpApiQueryError, isEffectRpcQueryError } from 'effect-api-query'
 
 // oxlint-disable-next-line anti-slop/no-unknown-parameters
 export const describeEffectError = (error: unknown) => {

@@ -17,8 +17,6 @@ import {
   useSuspenseInfiniteQuery,
   useSuspenseQuery,
 } from '@tanstack/react-query'
-import { Context, Effect, Schema } from 'effect'
-import type { Redacted } from 'effect'
 import {
   createRpcQueryUtils,
   EffectRpcQueryEmptyStreamError,
@@ -34,7 +32,9 @@ import {
   type RpcQueryUtils,
   type RunPromiseExit,
   type SkipToken,
-} from 'effect-api-query'
+} from '@ueberbrot/effect-api-query'
+import { Context, Effect, Schema } from 'effect'
+import type { Redacted } from 'effect'
 import { Rpc, RpcClient, RpcGroup, RpcMiddleware } from 'effect/rpc'
 
 class AuthMiddleware extends RpcMiddleware.Service<AuthMiddleware>()('AuthMiddleware', {
@@ -1437,11 +1437,11 @@ true satisfies Assert<Equal<typeof optionalConditionalUser.data, string | undefi
 const unaryRpcOptions = {
   headers: { 'x-request-id': 'fixture' },
   context: Context.empty(),
-} satisfies import('effect-api-query').UnaryRpcOptions
+} satisfies import('@ueberbrot/effect-api-query').UnaryRpcOptions
 const streamingRpcOptions = {
   ...unaryRpcOptions,
   streamBufferSize: 8,
-} satisfies import('effect-api-query').StreamingRpcOptions
+} satisfies import('@ueberbrot/effect-api-query').StreamingRpcOptions
 const requestQuery = utils.users.get.queryOptions({
   input: { id: 1 },
   rpcOptions: unaryRpcOptions,

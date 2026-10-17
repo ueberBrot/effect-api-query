@@ -1,6 +1,6 @@
 import type { QueryClient } from '@tanstack/query-core'
+import { createRpcQueryUtils, fetchStreamSnapshot } from '@ueberbrot/effect-api-query'
 import { Schema } from 'effect'
-import { createRpcQueryUtils, fetchStreamSnapshot } from 'effect-api-query'
 import { Rpc, RpcGroup } from 'effect/rpc'
 import type { RpcClient } from 'effect/rpc'
 

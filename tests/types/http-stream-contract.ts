@@ -1,14 +1,17 @@
 import { QueryClient, QueryObserver, skipToken } from '@tanstack/query-core'
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
-import { Context, Effect, Schema, SchemaTransformation } from 'effect'
-import type { Stream } from 'effect'
-import { createHttpApiQueryUtils, EffectHttpApiQueryEmptyStreamError } from 'effect-api-query'
+import {
+  createHttpApiQueryUtils,
+  EffectHttpApiQueryEmptyStreamError,
+} from '@ueberbrot/effect-api-query'
 import type {
   CreateHttpApiQueryUtilsOptions,
   EffectHttpApiQueryConfigError,
   EffectHttpApiQueryError,
   RunPromiseExit,
-} from 'effect-api-query'
+} from '@ueberbrot/effect-api-query'
+import { Context, Effect, Schema, SchemaTransformation } from 'effect'
+import type { Stream } from 'effect'
 import type { Sse } from 'effect/encoding'
 import type { HttpClientError } from 'effect/http'
 import { HttpApi, HttpApiEndpoint, HttpApiGroup, HttpApiSchema } from 'effect/http-api'

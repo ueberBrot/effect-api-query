@@ -14,8 +14,8 @@
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-router-ssr-query": "catalog:",
     "@tanstack/react-start": "catalog:",
+    "@ueberbrot/effect-api-query": "workspace:*",
     "effect": "catalog:",
-    "effect-api-query": "workspace:*",
     "react": "catalog:",
     "react-dom": "catalog:"
   },

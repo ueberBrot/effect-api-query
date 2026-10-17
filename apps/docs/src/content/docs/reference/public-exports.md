@@ -3,7 +3,7 @@ title: Public Exports
 description: Package-root values and types.
 ---
 
-The package root, `effect-api-query`, exports all supported values and types.
+The package root, `@ueberbrot/effect-api-query`, exports all supported values and types.
 
 | Export                                    | Purpose                                                                        |
 | ----------------------------------------- | ------------------------------------------------------------------------------ |

@@ -1,12 +1,12 @@
 import type { QueryClient, QueryExecuteOptions } from '@tanstack/query-core'
-import { Schema } from 'effect'
 import {
   createHttpApiQueryUtils,
   createRpcQueryUtils,
   fetchStreamSnapshot,
   skipToken,
-} from 'effect-api-query'
-import type { StreamSnapshotOptions } from 'effect-api-query'
+} from '@ueberbrot/effect-api-query'
+import type { StreamSnapshotOptions } from '@ueberbrot/effect-api-query'
+import { Schema } from 'effect'
 import { HttpApi, HttpApiEndpoint, HttpApiGroup, HttpApiSchema } from 'effect/http-api'
 import type { HttpApiClient } from 'effect/http-api'
 import { Rpc, RpcGroup } from 'effect/rpc'

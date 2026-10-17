@@ -1,5 +1,5 @@
 library:
-  name: effect-api-query
+  name: '@ueberbrot/effect-api-query'
   version: 0.1.0
 generated_from:
   domain_map: _artifacts/domain_map.yaml

@@ -1,10 +1,10 @@
 import { QueryClient, type InfiniteData } from '@tanstack/query-core'
-import { Schema } from 'effect'
 import {
   createHttpApiQueryUtils,
   type EffectHttpApiQueryError,
   type HttpApiQueryUtils,
-} from 'effect-api-query'
+} from '@ueberbrot/effect-api-query'
+import { Schema } from 'effect'
 import type { HttpClientError } from 'effect/http'
 import { HttpApi, HttpApiClient, HttpApiEndpoint, HttpApiGroup } from 'effect/http-api'
 

@@ -10,8 +10,8 @@
   "dependencies": {
     "@effect-api-query/contracts": "workspace:*",
     "@tanstack/react-query": "catalog:",
+    "@ueberbrot/effect-api-query": "workspace:*",
     "effect": "catalog:",
-    "effect-api-query": "workspace:*",
     "react": "catalog:",
     "react-dom": "catalog:"
   },

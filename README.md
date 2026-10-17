@@ -9,7 +9,7 @@ Your application controls transport, client lifetime, and cache policy.
 Install the package and TanStack Query Core:
 
 ```sh
-pnpm add effect-api-query @tanstack/query-core
+pnpm add @ueberbrot/effect-api-query @tanstack/query-core
 ```
 
 The package requires one exact Effect 4 release because its RPC and HTTP API modules are unstable.
@@ -42,7 +42,7 @@ Client integration in `client.ts`:
 
 ```ts
 import { QueryClient } from '@tanstack/query-core'
-import { createRpcQueryUtils } from 'effect-api-query'
+import { createRpcQueryUtils } from '@ueberbrot/effect-api-query'
 import type { RpcClient, RpcGroup } from 'effect/rpc'
 
 import { usersRpc } from './rpc-contract.ts'
@@ -87,7 +87,7 @@ Client integration in `client.ts`:
 
 ```ts
 import { QueryClient } from '@tanstack/query-core'
-import { createHttpApiQueryUtils } from 'effect-api-query'
+import { createHttpApiQueryUtils } from '@ueberbrot/effect-api-query'
 import type { HttpApiClient } from 'effect/http-api'
 
 import { usersApi } from './http-contract.ts'
@@ -137,10 +137,10 @@ npx skills add ueberBrot/effect-api-query --full-depth --skill effect-api-query
 ```
 
 The npm package includes the same skill. After installing the library, run
-`npx @tanstack/intent@latest install` and enable `effect-api-query`, then load it with:
+`npx @tanstack/intent@latest install` and enable `@ueberbrot/effect-api-query`, then load it with:
 
 ```sh
-npx @tanstack/intent@latest load effect-api-query#effect-api-query
+npx @tanstack/intent@latest load @ueberbrot/effect-api-query#effect-api-query
 ```
 
 Intent loads the skill from your installed library version. Update a skill installed from GitHub

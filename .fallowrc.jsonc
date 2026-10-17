@@ -44,7 +44,7 @@
     "@tanstack/intent",
     "effect",
     // Fallow resolves workspace imports to source but misses the root package dependency.
-    "effect-api-query",
+    "@ueberbrot/effect-api-query",
     "publint",
     // React belongs to the private apps; Fallow attributes shared example sources to the root.
     "react",

@@ -16,7 +16,6 @@ import {
   useSuspenseInfiniteQuery,
   useSuspenseQuery,
 } from '@tanstack/react-query'
-import { Context, Effect, Schema } from 'effect'
 import {
   createHttpApiQueryUtils,
   EffectHttpApiQueryError,
@@ -26,7 +25,8 @@ import {
   type HttpApiKeyEncoder,
   type HttpApiQueryUtils,
   type RunPromiseExit,
-} from 'effect-api-query'
+} from '@ueberbrot/effect-api-query'
+import { Context, Effect, Schema } from 'effect'
 import type { HttpClient, HttpClientError, HttpClientResponse } from 'effect/http'
 import {
   HttpApi,

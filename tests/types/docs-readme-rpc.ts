@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/query-core'
-import { createRpcQueryUtils } from 'effect-api-query'
+import { createRpcQueryUtils } from '@ueberbrot/effect-api-query'
 import type { RpcClient, RpcGroup } from 'effect/rpc'
 
 import { usersRpc } from './docs-readme-rpc-contract.ts'

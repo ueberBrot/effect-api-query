@@ -1,6 +1,6 @@
 import { QueryClient, type InfiniteData } from '@tanstack/query-core'
+import { createRpcQueryUtils, type RpcQueryUtils } from '@ueberbrot/effect-api-query'
 import { Schema } from 'effect'
-import { createRpcQueryUtils, type RpcQueryUtils } from 'effect-api-query'
 import { Rpc, RpcClient, RpcGroup } from 'effect/rpc'
 
 const indexes = [

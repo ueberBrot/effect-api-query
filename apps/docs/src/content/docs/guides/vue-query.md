@@ -22,8 +22,8 @@ Here `users.read` returns a user with a `name`:
 
 ```ts
 import { useQuery } from '@tanstack/vue-query'
-import { skipToken } from 'effect-api-query'
-import type { InferQueryData, InferQueryError } from 'effect-api-query'
+import { skipToken } from '@ueberbrot/effect-api-query'
+import type { InferQueryData, InferQueryError } from '@ueberbrot/effect-api-query'
 import { computed, ref } from 'vue'
 
 import { rpc } from './queries.ts'

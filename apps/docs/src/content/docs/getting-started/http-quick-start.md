@@ -45,8 +45,8 @@ Client integration in `client.ts`:
 
 ```ts
 import { MutationObserver, QueryClient } from '@tanstack/query-core'
+import { createHttpApiQueryUtils } from '@ueberbrot/effect-api-query'
 import { ManagedRuntime } from 'effect'
-import { createHttpApiQueryUtils } from 'effect-api-query'
 import { FetchHttpClient } from 'effect/http'
 import { HttpApiClient } from 'effect/http-api'
 
