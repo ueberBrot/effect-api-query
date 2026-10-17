@@ -18,7 +18,7 @@
   "files": [
     "dist",
     "skills",
-    "LICENSE"
+    "CHANGELOG.md"
   ],
   "type": "module",
   "sideEffects": false,

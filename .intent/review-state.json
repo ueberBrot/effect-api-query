@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "3d570b3d70d40cc80ab9bbcc3e3228d7dca02c41ea04f784525aefb65cd673dc",
+      "fingerprint": "429e8935db27acc58ffce07d4b10df3dc8b40b5dddf5480eeb7076ebe8b333ea",
       "snapshot": {
         "GLOSSARY.md": "60e4919b11d134139ac1dcb9b796903caa2b672fd474a2b83338547802194a08",
         "README.md": "501f99e7854c7e4e4154ad0cdc23afc6680e1cd27be38d2145e684d48884cfc6",
@@ -133,7 +133,7 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "0f09b669dc00a66e7db0d947f31daa88862e89cda9877d37caaa72631c1b247c",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "884e694a2a3ecc0cdd12d3555c953c30c6c7778bc613a78752b2ca27c17c173d",
         "examples/vite-react/tests/user-writes.test.ts": "3fe07c1fa8deab8c154d30481f7bc6ef77d3a8ed6c3d5e0d3cbfe75574061e33",
-        "package.json": "d3bca52ea38c85d14df9b2c6bcf5c333c8c351d72708961f7d563b751171e425",
+        "package.json": "a813edac320b65f884b9f90e016ed4eae0ef7268857ea43f52865270d883c6c9",
         "pnpm-workspace.yaml": "be1d28fb27e2c4af6fffb22fe71bccf5c1f48daf70e0abc149537fdccb49d7f2",
         "scripts/decode-utf8.mts": "2e90c53e95c22b864a209a87c98084db6ec95e83f842007b21528d286d45c18c",
         "scripts/measure-construction.mts": "10522cb10ab51fd44d8990896a2a73e8bf4d4cd2646441e958b6180cb1afd147",
@@ -236,19 +236,19 @@
         "tests/types/tanstack-start-contract.ts": "51681e3d0d7504a614d490f18adb6f44db82d34b9d4d7cb9cf941aea33de284f",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "fac2c2ffbf72b1b17e425c238a74089a68e9c1ab",
-      "outcome": "updated",
-      "reason": "Aligned the exact Effect target to 4.0.2 and removed obsolete WebSocket buffer/decode and singleton form-array restrictions from the existing skill references. Effect 4.0.1/4.0.2 changelogs and installed source identify the upstream fixes; three executable runtime regressions confirm the affected integration behavior. Remaining guidance and all six reference boundaries remain accurate.",
+      "head": "c2982f3ade1140f82940a97685ca44b21fb65879",
+      "outcome": "no-change",
+      "reason": "The root package files allowlist includes CHANGELOG.md and omits redundant LICENSE. Native pnpm includes README and LICENSE automatically. Published code, types, peers, README and all seven skill files are unchanged. The existing skill and all three planning records (_artifacts/domain_map.yaml, _artifacts/skill_spec.md, _artifacts/skill_tree.yaml) remain accurate for the same fourteen tasks, six references and package-only distribution.",
       "evidence": [
-        "Reviewed actual uncommitted diff against HEAD fac2c2ffbf72b1b17e425c238a74089a68e9c1ab on chore/update-dependencies-release-age. Native frozen installation with pnpm 12.11.2 verified all 1013 lockfile entries against unchanged strict seven-day, missing-time and trust policies. Independent npm timestamp audit passed all 157 introduced registry versions.",
-        "Package/declaration build with attw and publint passed. Public API and server-local compiler fixtures passed TypeScript 7.0.2 and 5.9.3. Exact inputless query option return keys are asserted in tests/types/public-contract.ts.",
-        "All 509 runtime tests across 46 files passed, including new singleton GET/form-urlencoded array, full WebSocket buffer cancellation, and request-local stream Schema decoding failure regressions. Full typed lint and checking, formatting, strict Effect diagnostics, both Fallow dead-code modes, duplicate reporting and health checks passed with cache disabled for the existing WSL2 fspy EBUSY limitation.",
-        "Both application production builds passed. Documentation excerpt verifier, Astro check, 56-page build and internal link validation passed. Intent structural validation passed one skill and its six references; maintainer sync found no metadata changes.",
-        "No activation-description, API-recommendation, task-coverage or package-export changes. Fresh isolated consumer and skill-discovery exercises were not repeated; runtime/compiler integration checks provide the evidence for this dependency update."
+        "Two isolated vp pm pack runs confirmed README/LICENSE included automatically, while CHANGELOG.md is absent unless explicitly listed.",
+        "Final native tarball has14unique file paths, one README.md, one LICENSE and one CHANGELOG.md; byte equality to source verified.",
+        "All prior archive files except manifest are byte-identical; manifest differs only in files allowlist; prior isolated compiler/runtime consumer checks remain applicable.",
+        "vp run --no-cache format passed; prior native vp pack ATTW/publint passed; no source/build changes.",
+        "Final SHA256: 1efc77169bd644f0a3cb4927ff4ed4b768bf4e686a2e66a157f277bf542fff18"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "b7320f3dd428daba664395fbd418f423d38ca523153eead8d9ffc975bafa25fe",
+      "fingerprint": "1e6a8d612abd50d4e8e34b0062aae9faaded5abba2f5d5b5c92e758e60cf0d31",
       "snapshot": {
         "GLOSSARY.md": "60e4919b11d134139ac1dcb9b796903caa2b672fd474a2b83338547802194a08",
         "README.md": "501f99e7854c7e4e4154ad0cdc23afc6680e1cd27be38d2145e684d48884cfc6",
@@ -381,7 +381,7 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "0f09b669dc00a66e7db0d947f31daa88862e89cda9877d37caaa72631c1b247c",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "884e694a2a3ecc0cdd12d3555c953c30c6c7778bc613a78752b2ca27c17c173d",
         "examples/vite-react/tests/user-writes.test.ts": "3fe07c1fa8deab8c154d30481f7bc6ef77d3a8ed6c3d5e0d3cbfe75574061e33",
-        "package.json": "d3bca52ea38c85d14df9b2c6bcf5c333c8c351d72708961f7d563b751171e425",
+        "package.json": "a813edac320b65f884b9f90e016ed4eae0ef7268857ea43f52865270d883c6c9",
         "pnpm-workspace.yaml": "be1d28fb27e2c4af6fffb22fe71bccf5c1f48daf70e0abc149537fdccb49d7f2",
         "scripts/decode-utf8.mts": "2e90c53e95c22b864a209a87c98084db6ec95e83f842007b21528d286d45c18c",
         "scripts/measure-construction.mts": "10522cb10ab51fd44d8990896a2a73e8bf4d4cd2646441e958b6180cb1afd147",
@@ -484,15 +484,15 @@
         "tests/types/tanstack-start-contract.ts": "51681e3d0d7504a614d490f18adb6f44db82d34b9d4d7cb9cf941aea33de284f",
         "tests/types/type-scale.ts": "a9b307c25c72f3c184eabc8e22ddaeea96feb331c0f8d748773d765d358dbfca"
       },
-      "head": "fac2c2ffbf72b1b17e425c238a74089a68e9c1ab",
-      "outcome": "updated",
-      "reason": "Reconciled all three planning records. skill_tree.yaml now explicitly inventories the six existing reference files required by Intent 0.5.5. domain_map.yaml and skill_spec.md are justified no-ops: the same fourteen developer tasks, ten failure modes, six reference boundaries, source mappings, library ownership and distribution decisions remain accurate. No new task or documentation artifact is introduced.",
+      "head": "c2982f3ade1140f82940a97685ca44b21fb65879",
+      "outcome": "no-change",
+      "reason": "The root package files allowlist includes CHANGELOG.md and omits redundant LICENSE. Native pnpm includes README and LICENSE automatically. Published code, types, peers, README and all seven skill files are unchanged. The existing skill and all three planning records (_artifacts/domain_map.yaml, _artifacts/skill_spec.md, _artifacts/skill_tree.yaml) remain accurate for the same fourteen tasks, six references and package-only distribution.",
       "evidence": [
-        "Reviewed actual uncommitted diff against HEAD fac2c2ffbf72b1b17e425c238a74089a68e9c1ab on chore/update-dependencies-release-age. Native frozen installation with pnpm 12.11.2 verified all 1013 lockfile entries against unchanged strict seven-day, missing-time and trust policies. Independent npm timestamp audit passed all 157 introduced registry versions.",
-        "Package/declaration build with attw and publint passed. Public API and server-local compiler fixtures passed TypeScript 7.0.2 and 5.9.3. Exact inputless query option return keys are asserted in tests/types/public-contract.ts.",
-        "All 509 runtime tests across 46 files passed, including new singleton GET/form-urlencoded array, full WebSocket buffer cancellation, and request-local stream Schema decoding failure regressions. Full typed lint and checking, formatting, strict Effect diagnostics, both Fallow dead-code modes, duplicate reporting and health checks passed with cache disabled for the existing WSL2 fspy EBUSY limitation.",
-        "Both application production builds passed. Documentation excerpt verifier, Astro check, 56-page build and internal link validation passed. Intent structural validation passed one skill and its six references; maintainer sync found no metadata changes.",
-        "No activation-description, API-recommendation, task-coverage or package-export changes. Fresh isolated consumer and skill-discovery exercises were not repeated; runtime/compiler integration checks provide the evidence for this dependency update."
+        "Two isolated vp pm pack runs confirmed README/LICENSE included automatically, while CHANGELOG.md is absent unless explicitly listed.",
+        "Final native tarball has14unique file paths, one README.md, one LICENSE and one CHANGELOG.md; byte equality to source verified.",
+        "All prior archive files except manifest are byte-identical; manifest differs only in files allowlist; prior isolated compiler/runtime consumer checks remain applicable.",
+        "vp run --no-cache format passed; prior native vp pack ATTW/publint passed; no source/build changes.",
+        "Final SHA256: 1efc77169bd644f0a3cb4927ff4ed4b768bf4e686a2e66a157f277bf542fff18"
       ]
     },
     "source:vite.config.ts": {
@@ -512,20 +512,19 @@
       ]
     },
     "source:.github/workflows/release.yml": {
-      "fingerprint": "e634c95a4f74465f43e38de00aee2328dafcf292951e0bdb28ec98aff092dd39",
+      "fingerprint": "e5102eba69e14f52d5e2e29a3656ca873aebb2afc32fd5e717e6f5af37a88280",
       "snapshot": {
-        ".github/workflows/release.yml": "b956e496bebe9b427d93cc577f6cd2ded132ec969bdfa22f6764803759803e3c"
+        ".github/workflows/release.yml": "36c3973760a93b8647b1e374d88cf194c818ddb39c4c6a66725be2a2a1bab713"
       },
-      "head": "cb14a01c995cd9dfac5a3c5dc752ea5d71da862f",
+      "head": "c2982f3ade1140f82940a97685ca44b21fb65879",
       "outcome": "no-change",
-      "reason": "Reviewed the deployment dependency, main branch guards and artifact reuse. This maintainer CI change lets validated documentation deploy without npm publication and leaves publishing behavior intact. No consumer guidance or additional independent library skill is required.",
+      "reason": "The publish job now additionally requires repository variable NPM_PUBLISH_ENABLED=true, preventing CI publication during the explicitly authorized local bootstrap. Release validation, version pull requests, packing, docs deployment, OIDC permissions and action pins are unchanged. This affects maintainer activation only; the shipped API/skill and _artifacts/domain_map.yaml, _artifacts/skill_spec.md, _artifacts/skill_tree.yaml remain accurate with the same developer tasks, references and package-only distribution.",
       "evidence": [
-        "Source cb14a01c995cd9dfac5a3c5dc752ea5d71da862f plus current local diff. No public library behavior, types, dependencies, package version, or publishing setup changes.",
-        "Fresh vp run --no-cache api-types passed package/declaration construction, attw, publint, and actual importing compiler fixtures under TypeScript 7 and 5.9.3. Exact documentation excerpt verification and Astro checks passed; docs-build produced 56 pages with valid internal links.",
-        "Type-aware lint and checking passed 150 files; repository formatting passed 310 files. The two existing React mounting and stream tracing runtime recipe tests passed after real module extraction.",
-        "Seven Chromium documentation checks passed against the fresh local build: navigation/search/assets, published registry version, unpublished/network/invalid-version fallbacks, and generated LLM documentation links. Collaborative browser inspection confirmed separate quick-start and React modules, preserved React anchor, and the correct October 11 page-change date.",
-        "Workflow YAML 1.2 parsing and dependency/branch/artifact inspection passed. Documentation now depends on successful validation on main, reuses its browser-tested artifact, and has no publish dependency; standalone manual main builds check compiler fixtures. No live workflow was dispatched and npm publication remains unconfigured as confirmed by the maintainer.",
-        "Intent sync reported Nothing to synchronize. Reviewed the owned skill, RPC/HTTP and framework references, and all three planning records against the actual diff. Existing source patterns cover every new fixture and changed canonical guide. Fresh consumer/discovery sessions were not repeated because recommendations and library behavior are unchanged."
+        ".github/workflows/release.yml: existing publish-mode and push conditions retained; new repository-variable condition applies only to the publish job.",
+        "GitHub repository variables listing empty: CI publication defaults to disabled until trusted publishing is configured and enabled.",
+        "Installed yaml parser accepted the final workflow; 27 mode/event/flag combinations passed; parsed workflow otherwise deeply equals HEAD.",
+        "vp run --no-cache format and git diff --check passed.",
+        "Independent review found no release blockers; final tarball retains14unique files including exact README, LICENSE and CHANGELOG, correct version and resolved peers."
       ]
     },
     "source:e2e/browser-test-config.ts": {
@@ -1712,6 +1711,24 @@
         "vp run --no-cache format, git diff --check, and vp exec intent validate skills --check passed. Intent maintainer sync reported nothing to synchronize.",
         "Independent prose reviews covered technical conditions, cleanup ordering, key identity, shared callbacks, hydration, and agent-facing ADR/skill instructions. No runtime or recommended API behavior changed. A fresh consumer session and new discovery check were not repeated for this editorial revision.",
         "Reviewed git diff HEAD -- docs/adr/0019-host-effect-rpc-inside-tanstack-start.md and retained the original decision/policy facts."
+      ]
+    },
+    "source:CHANGELOG.md": {
+      "fingerprint": "678cc226c8e1b6b1a78f9b2f21dc2912d3e3cf3485c572e7dbfc46ab490fda25",
+      "snapshot": {
+        "CHANGELOG.md": "422bc4a05a60a4c9075e6f4b0a43af59d3e037a02ae97f11bf9c129ae6384dc1"
+      },
+      "head": "c2982f3ade1140f82940a97685ca44b21fb65879",
+      "outcome": "no-change",
+      "reason": "Native Changesets output summarizes existing query, mutation, streaming, metadata, policy, filter and SSR capabilities. Source-grounded independent review confirmed each claim. It introduces no new behavior or guidance requirement.",
+      "evidence": [
+        "CHANGELOG.md: three flat bullets, first begins Initial release; no author mentions or thanks.",
+        ".changeset/config.json already sets disableThanks:true; installed GitHub changelog plugin verified to suppress automatic author mentions.",
+        "vp run --no-cache format passed; git diff --check passed.",
+        "vp run --no-cache pack passed ATTW and publint.",
+        "Final 14-file native pnpm tarball verified: README, LICENSE, CHANGELOG and seven skill files match source; all 16 relative skill links resolve.",
+        "Tarball dist and all other non-manifest preexisting files are byte-identical to the previously tested 13-file release archive; isolated consumer compiler and runtime checks from that archive remain applicable.",
+        "Final archive SHA256: 4dace3d66666e3bd92cbb97bd477204632efae205f1842774d24c3c0ce860e29"
       ]
     }
   }
