@@ -56,7 +56,7 @@ The application owns transport, authentication, resources, and cache policy.
 ## Choose the adapter
 
 Read the installed package manifest to find its version and peers. This version
-uses the coordinated Effect 4.0.0 set. Its Query Core peer range is `>=5.103.1 <6`.
+uses the coordinated Effect 4.0.2 set. Its Query Core peer range is `>=5.103.1 <6`.
 Use the installed declarations and keep contracts literal. For reactive options,
 version constraints, and transport ownership, read
 [frameworks and hosts](references/frameworks-and-hosts.md).

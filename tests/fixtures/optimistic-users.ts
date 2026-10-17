@@ -25,22 +25,22 @@ import {
   makeUserWrites,
 } from '../../examples/vite-react/src/lib/user-writes.ts'
 
-interface CreateRequest {
+export interface CreateRequest {
   readonly name: string
   readonly succeed: (user: User) => Promise<void>
   readonly fail: () => Promise<void>
 }
-interface DeleteRequest {
+export interface DeleteRequest {
   readonly id: number
   readonly succeed: () => Promise<void>
   readonly fail: () => Promise<void>
 }
-interface ListRequest {
+export interface ListRequest {
   readonly signal: Deferred.Deferred<readonly User[]>
   readonly succeed: (users: readonly User[]) => Promise<void>
 }
 
-interface ControlledUserWrites {
+export interface ControlledUserWrites {
   readonly application: ViteReactApplication
   readonly nextCreate: () => Promise<CreateRequest>
   readonly nextDelete: () => Promise<DeleteRequest>

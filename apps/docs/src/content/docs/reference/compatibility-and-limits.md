@@ -11,12 +11,12 @@ The repository uses these versions:
 
 | Integration                                         | Versions                           |
 | --------------------------------------------------- | ---------------------------------- |
-| Effect runtime, testing, and Node platform packages | 4.0.0                              |
-| Query Core and React Query                          | 5.104.0, with matching versions    |
+| Effect runtime, testing, and Node platform packages | 4.0.2                              |
+| Query Core and React Query                          | 5.104.1, with matching versions    |
 | Published TypeScript contract                       | 5.9.3 and 7.0.2                    |
 | React                                               | 19.3.0                             |
-| TanStack Start                                      | 1.168.60                           |
-| TanStack Router and Router SSR Query                | 1.170.41 and 1.167.3, respectively |
+| TanStack Start                                      | 1.168.61                           |
+| TanStack Router and Router SSR Query                | 1.170.42 and 1.167.3, respectively |
 
 The stable Effect release contains unstable RPC and HTTP API modules.
 The application's Effect packages must stay coordinated with the exact peer. See
@@ -70,9 +70,6 @@ and chunk-decoding limits. Local cancellation alone does not prove remote comple
 OpenAPI consumption with `openapi-fetch` and `openapi-typescript`. Encoded DTOs, multipart
 serialization, and raw SSE access retain their own contracts. The external client does not replace
 a ready Effect client.
-
-With Effect 4.0.0, single-element arrays in GET and form-urlencoded payloads can fail server
-decoding. Array query parameters and JSON array responses retain their usual representation.
 
 ## Input and cache limits
 

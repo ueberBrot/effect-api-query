@@ -89,10 +89,7 @@ key prefix. `streamBufferSize` controls the client's stream buffer. `maxChunks`
 controls the accumulated cache. Unary `discard` and stream `asQueue` controls are
 unavailable.
 
-Until the application finishes testing another size with its transport, keep the
-native default stream buffer. In Effect 4.0.0, cancellation with an overflowing buffer of
-size one can stall another request in the shared WebSocket receive loop.
-`maxChunks` bounds cached history after emissions. It does not resize that queue.
+`maxChunks` bounds cached history after emissions. It does not resize the transport queue.
 
 ## Custom key encoders
 

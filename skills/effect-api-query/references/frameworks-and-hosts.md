@@ -149,14 +149,6 @@ The application owns the transport and host resources in each integration:
   Multipart needs explicit FormData serialization. Raw SSE bytes provide no event
   parsing, Schema decoding, or reserved-failure handling.
 
-Unless the application verifies another size with its workload, keep the native
-WebSocket buffer default of 16. With Effect 4.0.0, an overflowing buffer of size
-one can stall other calls. The application also needs to check larger chunks and
-unfinished queue offers. A client chunk Schema failure can fail unrelated calls.
-Larger buffers do not isolate that failure. Keep streaming schemas compatible.
-
-Single-element arrays in GET and form-urlencoded payloads can fail native server
-decoding. Array query parameters and JSON array responses retain their representation.
 The factories preserve the ready client's actual execution contract. They supply
 no transport batching, platform services, or framework providers. Error guards use
 same-realm `instanceof`. Across realms, explicitly transfer safe error DTOs.

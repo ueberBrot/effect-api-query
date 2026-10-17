@@ -137,22 +137,24 @@ export type SuppliedInitialData<Supplied> = 'initialData' extends keyof Supplied
 declare const uninferredBuilderOptions: unique symbol
 export type UninferredBuilderOptions = { readonly [uninferredBuilderOptions]?: never }
 
+export type RetainedQueryOptions<Options> = Pick<
+  Options,
+  Extract<
+    keyof Options,
+    | 'queryFn'
+    | 'queryKey'
+    | 'select'
+    | 'retry'
+    | 'retryDelay'
+    | 'initialPageParam'
+    | 'getNextPageParam'
+  >
+>
+
 export type SuppliedQueryOptions<Options, Supplied, AdapterOptions> =
   typeof uninferredBuilderOptions extends keyof Supplied
     ? Options
-    : Pick<
-        Options,
-        Extract<
-          keyof Options,
-          | 'queryFn'
-          | 'queryKey'
-          | 'select'
-          | 'retry'
-          | 'retryDelay'
-          | 'initialPageParam'
-          | 'getNextPageParam'
-        >
-      > &
+    : RetainedQueryOptions<Options> &
         Omit<SuppliedInitialData<Supplied>, 'input' | keyof AdapterOptions>
 
 export type InputQueryBuilder<
@@ -226,11 +228,7 @@ export type UnaryQueryBuilder<
   ? {
       <Selected = Data>(
         options?: undefined,
-      ): SuppliedQueryOptions<
-        QueryOptions<Data, Error, Selected, Key>,
-        Record<never, never>,
-        AdapterOptions
-      >
+      ): RetainedQueryOptions<QueryOptions<Data, Error, Selected, Key>>
       <Selected = Data, Supplied extends object = UninferredBuilderOptions>(
         options: ExactBuilderOptions<
           WithDefinedInitialData<QueryInput<Data, Error, Selected, Key, AdapterOptions>, Data>,

@@ -9,6 +9,13 @@ skills:
     slug: effect-api-query
     domain: contract-queries
     path: skills/effect-api-query/SKILL.md
+    references:
+      - references/rpc.md
+      - references/http.md
+      - references/query-patterns.md
+      - references/cache-workflows.md
+      - references/hydration-and-ssr.md
+      - references/frameworks-and-hosts.md
     description: 'Use when integrating effect-api-query with an Effect RPC or
       HttpApi contract: derive TanStack Query keys and options, choose buffered
       or streaming views, configure metadata, pagination, defaults or cache

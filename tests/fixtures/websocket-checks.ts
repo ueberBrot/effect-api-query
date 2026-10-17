@@ -1,10 +1,11 @@
-import { CancelledError } from '@tanstack/query-core'
-import type { QueryClient, QueryKey } from '@tanstack/query-core'
-import { Cause, Deferred, Effect, Equal, Exit, Stream } from 'effect'
-import { RpcClient } from 'effect/rpc'
+import { CancelledError, QueryClient } from '@tanstack/query-core'
+import type { QueryKey } from '@tanstack/query-core'
+import { Cause, Deferred, Effect, Equal, Exit, Layer, Queue, Schema, Scope, Stream } from 'effect'
+import { Rpc, RpcClient, RpcGroup, RpcSerialization } from 'effect/rpc'
+import { Socket } from 'effect/socket'
 import { deepStrictEqual, equal, ok } from 'node:assert/strict'
 
-import { isEffectRpcQueryError } from '#effect-api-query'
+import { createRpcQueryUtils, isEffectRpcQueryError } from '#effect-api-query'
 
 import {
   runSocketCase,
@@ -48,6 +49,129 @@ const settle = async (promise: PromiseLike<unknown>) => {
     return { status: 'failure', error } as const
   }
 }
+
+export const exerciseSocketBufferCancellation = async () =>
+  await runSocketCase(
+    Effect.gen(function* () {
+      const streamClosed = yield* Deferred.make<undefined>()
+      const url = yield* serveSocketGroup({
+        'values.read': ({ id }) => Effect.succeed(id * 10),
+        'values.watch': () =>
+          Stream.range(1, 64).pipe(
+            Stream.concat(Stream.fromEffect(Effect.never)),
+            Stream.ensuring(Deferred.succeed(streamClosed, undefined).pipe(Effect.asVoid)),
+          ),
+      })
+      const { client, queryClient, rpc, dispose } = yield* acquireSocketQueries(url, 'overflow')
+      const streamScope = yield* Scope.fork(yield* Effect.scope, 'sequential')
+      const queue = yield* client(
+        'values.watch',
+        { channel: 'paused' },
+        { asQueue: true, streamBufferSize: 1 },
+      ).pipe(Scope.provide(streamScope))
+      yield* Effect.gen(function* () {
+        while (!(yield* Queue.isFull(queue))) {
+          yield* Effect.yieldNow
+        }
+      }).pipe(Effect.timeout('5 seconds'))
+      const read = queryClient.query(rpc.values.read.queryOptions({ input: { id: 3 } }))
+      yield* Scope.close(streamScope, Exit.void)
+      yield* wait(streamClosed)
+      const unaffectedRead = yield* Effect.promise(async () => await read).pipe(
+        Effect.timeout('5 seconds'),
+      )
+      equal(unaffectedRead, 30)
+      yield* dispose
+      return { unaffectedRead, streamCancelled: true }
+    }),
+  )
+
+export const exerciseSocketDecodeIsolation = async () =>
+  await runSocketCase(
+    Effect.gen(function* () {
+      const readStarted = yield* Deferred.make<undefined>()
+      const releaseRead = yield* Deferred.make<undefined>()
+      const streamsClosed = yield* Deferred.make<undefined>()
+      let closed = 0
+      const url = yield* serveSocketGroup({
+        'values.read': Effect.fnUntraced(function* ({ id }) {
+          yield* Deferred.succeed(readStarted, undefined)
+          yield* Deferred.await(releaseRead)
+          return id * 10
+        }),
+        'values.watch': () =>
+          Stream.succeed(-1).pipe(
+            Stream.concat(Stream.fromEffect(Effect.never)),
+            Stream.ensuring(
+              Effect.suspend(() => {
+                closed += 1
+                return closed === 2 ? Deferred.succeed(streamsClosed, undefined) : Effect.void
+              }),
+            ),
+          ),
+      })
+      const strictGroup = RpcGroup.make(
+        Rpc.make('values.read', { payload: { id: Schema.Int }, success: Schema.Int }),
+        Rpc.make('values.watch', {
+          payload: { channel: Schema.String },
+          success: Schema.Int.check(Schema.isGreaterThan(0)),
+          stream: true,
+        }),
+      )
+      const clientScope = yield* Scope.fork(yield* Effect.scope, 'sequential')
+      const protocol = yield* Layer.buildWithScope(
+        RpcClient.layerProtocolSocket().pipe(
+          Layer.provide(RpcSerialization.layerJson),
+          Layer.provide(Socket.layerWebSocket(url)),
+        ),
+        clientScope,
+      )
+      const client = yield* RpcClient.make(strictGroup, { flatten: true }).pipe(
+        Effect.provide(protocol),
+        Scope.provide(clientScope),
+      )
+      const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+      yield* Scope.addFinalizer(
+        clientScope,
+        Effect.promise(async () => {
+          await queryClient.cancelQueries()
+          queryClient.clear()
+        }),
+      )
+      const rpc = createRpcQueryUtils(strictGroup, { client, keyPrefix: ['socket', 'decode'] })
+      const readOptions = rpc.values.read.queryOptions({ input: { id: 3 } })
+      const read = settle(queryClient.query(readOptions))
+      yield* wait(readStarted)
+      for (const view of ['streamed', 'live'] as const) {
+        const result = yield* Effect.promise(async () =>
+          view === 'streamed'
+            ? await settle(
+                queryClient.query(rpc.values.watch.streamedOptions({ input: { channel: view } })),
+              )
+            : await settle(
+                queryClient.query(rpc.values.watch.liveOptions({ input: { channel: view } })),
+              ),
+        )
+        equal(result.status, 'failure')
+        if (result.status === 'failure') {
+          ok(isEffectRpcQueryError(result.error))
+          equal(result.error.rpcTag, 'values.watch')
+          equal(result.error.operation, view)
+          equal(Cause.hasDies(result.error.cause), true)
+        }
+        equal(queryClient.getQueryState(readOptions.queryKey)?.fetchStatus, 'fetching')
+      }
+      yield* wait(streamsClosed)
+      yield* Deferred.succeed(releaseRead, undefined)
+      const readResult = yield* Effect.promise(async () => await read)
+      equal(readResult.status, 'success')
+      if (readResult.status === 'success') {
+        equal(readResult.data, 30)
+      }
+      yield* Scope.close(clientScope, Exit.void)
+      return { rejectedStreams: closed, unaffectedRead: 30 }
+    }),
+  )
 
 export const exerciseSocketConcurrency = async () =>
   await runSocketCase(

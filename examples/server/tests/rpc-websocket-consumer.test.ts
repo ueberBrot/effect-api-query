@@ -2,10 +2,30 @@ import { expect, it } from '@effect/vitest'
 import { Effect } from 'effect'
 
 import {
+  exerciseSocketBufferCancellation,
   exerciseSocketConcurrency,
+  exerciseSocketDecodeIsolation,
   exerciseSocketInterruption,
   exerciseSocketReplacement,
 } from '../../../tests/fixtures/websocket-checks.ts'
+
+it.live('unblocks other socket calls when a full one-element stream buffer is cancelled', () =>
+  Effect.gen(function* () {
+    expect(yield* Effect.promise(exerciseSocketBufferCancellation)).toStrictEqual({
+      unaffectedRead: 30,
+      streamCancelled: true,
+    })
+  }),
+)
+
+it.live('keeps stream Schema decoding failures local to their request on a shared socket', () =>
+  Effect.gen(function* () {
+    expect(yield* Effect.promise(exerciseSocketDecodeIsolation)).toStrictEqual({
+      rejectedStreams: 2,
+      unaffectedRead: 30,
+    })
+  }),
+)
 
 it.live(
   'runs concurrent reads and both open stream views through a ready WebSocket client',

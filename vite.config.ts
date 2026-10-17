@@ -85,7 +85,7 @@ export default defineConfig({
   },
   lint: {
     extends: [ultraciteCore, ultraciteTanstack, ultraciteAntiSlop, effectStrict, vitestPreset],
-    jsPlugins: [...(ultraciteAntiSlop.jsPlugins ?? []), ...(ultraciteShadcn.jsPlugins ?? [])],
+    jsPlugins: [...ultraciteAntiSlop.jsPlugins, ...ultraciteShadcn.jsPlugins],
     settings: {
       shadcn: {
         componentImports: ['(?:^|/)components/'],

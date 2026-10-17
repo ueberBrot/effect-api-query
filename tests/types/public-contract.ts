@@ -238,6 +238,9 @@ type ExactStreamLeafInterface = Assert<
 const exactStreamLeafInterface: ExactStreamLeafInterface = true
 const projectKey = utils.projects['by-id'].find.queryKey({ id: 'project-1' })
 const projectPing = utils.projects.health.ping.queryOptions()
+true satisfies Assert<
+  Equal<keyof typeof projectPing, 'queryFn' | 'queryKey' | 'select' | 'retry' | 'retryDelay'>
+>
 const omittedInputlessArguments: Parameters<typeof utils.health.ping.queryOptions> = []
 void omittedInputlessArguments
 const bracketOnly = utils['billing-history']['list all'].queryOptions({

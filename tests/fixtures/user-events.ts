@@ -28,7 +28,7 @@ class UserEventConsumerUnavailable extends Data.TaggedError('UserEventConsumerUn
   readonly reason: 'inactive-owner' | 'already-registered'
 }> {}
 
-interface UserIdentity {
+export interface UserIdentity {
   readonly id: number
   readonly locale: string
 }
