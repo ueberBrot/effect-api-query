@@ -1,23 +1,23 @@
-import { useMutation } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { useMutation } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 
 import {
   describeSlowQueryCancellation,
   useSlowQueryCancellation,
-} from '../../../shared/use-slow-query-cancellation.ts'
-import { ActionButton } from '../components/action-button.tsx'
-import { EffectErrorDetails } from '../components/effect-error-details.tsx'
-import { PageLayout, Panel } from '../components/page-layout.tsx'
+} from "../../../shared/use-slow-query-cancellation.ts";
+import { ActionButton } from "../components/action-button.tsx";
+import { EffectErrorDetails } from "../components/effect-error-details.tsx";
+import { PageLayout, Panel } from "../components/page-layout.tsx";
 
 const DiagnosticsPage = () => {
-  const application = Route.useRouteContext()
+  const application = Route.useRouteContext();
   const declaredFailure = useMutation(
     application.rpcQuery.diagnostics.fail.mutationOptions({
-      rpcOptions: { headers: { 'x-request-source': 'diagnostics-panel' } },
-    }),
-  )
-  const slowQuery = useSlowQueryCancellation(application)
-  const cancellationMessage = describeSlowQueryCancellation(slowQuery.state)
+      rpcOptions: { headers: { "x-request-source": "diagnostics-panel" } },
+    })
+  );
+  const slowQuery = useSlowQueryCancellation(application);
+  const cancellationMessage = describeSlowQueryCancellation(slowQuery.state);
 
   return (
     <PageLayout
@@ -29,7 +29,7 @@ const DiagnosticsPage = () => {
           <div className="mt-5 flex flex-wrap gap-3">
             <ActionButton
               onClick={() => {
-                declaredFailure.mutate()
+                declaredFailure.mutate();
               }}
               type="button"
               variant="danger"
@@ -39,7 +39,7 @@ const DiagnosticsPage = () => {
             <ActionButton
               disabled={!slowQuery.canStart}
               onClick={() => {
-                void slowQuery.start()
+                void slowQuery.start();
               }}
               type="button"
               variant="secondary"
@@ -49,7 +49,7 @@ const DiagnosticsPage = () => {
             <ActionButton
               disabled={!slowQuery.canCancel}
               onClick={() => {
-                void slowQuery.cancel()
+                void slowQuery.cancel();
               }}
               type="button"
               variant="secondary"
@@ -58,16 +58,20 @@ const DiagnosticsPage = () => {
             </ActionButton>
           </div>
           <EffectErrorDetails error={declaredFailure.error} />
-          {slowQuery.state._tag === 'Failed' ? (
+          {slowQuery.state._tag === "Failed" ? (
             <EffectErrorDetails error={slowQuery.state.error} />
           ) : null}
           {cancellationMessage === undefined ? null : (
-            <p className="mt-4 text-sm text-text-tertiary">{cancellationMessage}</p>
+            <p className="text-text-tertiary mt-4 text-sm">
+              {cancellationMessage}
+            </p>
           )}
         </Panel>
       </div>
     </PageLayout>
-  )
-}
+  );
+};
 
-export const Route = createFileRoute('/diagnostics')({ component: DiagnosticsPage })
+export const Route = createFileRoute("/diagnostics")({
+  component: DiagnosticsPage,
+});

@@ -7,7 +7,7 @@ import {
   InfiniteQueryObserver,
   type QueryFunction,
   skipToken as queryCoreSkipToken,
-} from '@tanstack/query-core'
+} from "@tanstack/query-core";
 import {
   skipToken as reactQuerySkipToken,
   useInfiniteQuery,
@@ -16,7 +16,7 @@ import {
   useQuery,
   useSuspenseInfiniteQuery,
   useSuspenseQuery,
-} from '@tanstack/react-query'
+} from "@tanstack/react-query";
 import {
   createRpcQueryUtils,
   EffectRpcQueryEmptyStreamError,
@@ -32,149 +32,181 @@ import {
   type RpcQueryUtils,
   type RunPromiseExit,
   type SkipToken,
-} from '@ueberbrot/effect-api-query'
-import { Context, Effect, Schema } from 'effect'
-import type { Redacted } from 'effect'
-import { Rpc, RpcClient, RpcGroup, RpcMiddleware } from 'effect/rpc'
+} from "@ueberbrot/effect-api-query";
+import { Context, Effect, Schema } from "effect";
+import type { Redacted } from "effect";
+import { Rpc, RpcClient, RpcGroup, RpcMiddleware } from "effect/rpc";
 
-class AuthMiddleware extends RpcMiddleware.Service<AuthMiddleware>()('AuthMiddleware', {
-  error: Schema.Literal('unauthorized'),
-}) {}
+class AuthMiddleware extends RpcMiddleware.Service<AuthMiddleware>()(
+  "AuthMiddleware",
+  {
+    error: Schema.Literal("unauthorized"),
+  }
+) {}
 
-const GetUser = Rpc.make('users.get', {
+const GetUser = Rpc.make("users.get", {
   payload: {
     id: Schema.Finite,
     locale: Schema.String.pipe(
       Schema.optionalKey,
-      Schema.withConstructorDefault(Effect.succeed('en')),
+      Schema.withConstructorDefault(Effect.succeed("en"))
     ),
   },
   success: Schema.Struct({ id: Schema.Finite, name: Schema.String }),
-  error: Schema.Literal('not-found'),
-})
+  error: Schema.Literal("not-found"),
+});
 
-const Ping = Rpc.make('health.ping', { success: Schema.Void })
-const ListPages = Rpc.make('users.pages', {
+const Ping = Rpc.make("health.ping", { success: Schema.Void });
+const ListPages = Rpc.make("users.pages", {
   payload: {
     cursor: Schema.Int,
     locale: Schema.String.pipe(
       Schema.optionalKey,
-      Schema.withConstructorDefault(Effect.succeed('en')),
+      Schema.withConstructorDefault(Effect.succeed("en"))
     ),
   },
   success: Schema.Struct({
     nextCursor: Schema.NullOr(Schema.Int),
     users: Schema.Array(Schema.Struct({ id: Schema.Int, name: Schema.String })),
   }),
-  error: Schema.Literal('page-failure'),
-})
-const Secure = Rpc.make('admin.secure', {
+  error: Schema.Literal("page-failure"),
+});
+const Secure = Rpc.make("admin.secure", {
   success: Schema.String,
-}).middleware(AuthMiddleware)
-const Watch = Rpc.make('events.watch', {
+}).middleware(AuthMiddleware);
+const Watch = Rpc.make("events.watch", {
   payload: {
     channel: Schema.String,
     locale: Schema.String.pipe(
       Schema.optionalKey,
-      Schema.withConstructorDefault(Effect.succeed('en')),
+      Schema.withConstructorDefault(Effect.succeed("en"))
     ),
   },
   success: Schema.String,
-  error: Schema.Literal('watch-failure'),
+  error: Schema.Literal("watch-failure"),
   stream: true,
 })
-  .setError(Schema.Literal('watch-rpc-failure'))
-  .middleware(AuthMiddleware)
-const AuditWatch = Rpc.make('events.audit.watch', {
+  .setError(Schema.Literal("watch-rpc-failure"))
+  .middleware(AuthMiddleware);
+const AuditWatch = Rpc.make("events.audit.watch", {
   success: Schema.String,
   stream: true,
-})
-const FindProject = Rpc.make('projects.by-id.find', {
+});
+const FindProject = Rpc.make("projects.by-id.find", {
   payload: { id: Schema.String },
   success: Schema.Struct({ id: Schema.String }),
-})
-const ProjectHealth = Rpc.make('projects.health.ping', { success: Schema.Void })
-const ProjectWatch = Rpc.make('projects.watch', {
+});
+const ProjectHealth = Rpc.make("projects.health.ping", {
+  success: Schema.Void,
+});
+const ProjectWatch = Rpc.make("projects.watch", {
   success: Schema.String,
   stream: true,
-})
-const BracketOnly = Rpc.make('billing-history.list all', {
+});
+const BracketOnly = Rpc.make("billing-history.list all", {
   payload: { accountId: Schema.String },
   success: Schema.Array(Schema.String),
-})
+});
 
-class EncodingService extends Context.Service<EncodingService, { readonly suffix: string }>()(
-  'EncodingService',
-) {}
+class EncodingService extends Context.Service<
+  EncodingService,
+  { readonly suffix: string }
+>()("EncodingService") {}
 
-const BasePayload = Schema.Struct({ value: Schema.String })
+const BasePayload = Schema.Struct({ value: Schema.String });
 const ServicefulPayload = BasePayload.pipe(
   Schema.middlewareEncoding<typeof BasePayload, EncodingService>((encoding) =>
-    Effect.flatMap(EncodingService, () => encoding),
-  ),
-)
-const Serviceful = Rpc.make('encoding.serviceful', {
+    Effect.flatMap(EncodingService, () => encoding)
+  )
+);
+const Serviceful = Rpc.make("encoding.serviceful", {
   payload: ServicefulPayload,
   success: Schema.String,
-})
-const Secret = Rpc.make('secrets.read', {
+});
+const Secret = Rpc.make("secrets.read", {
   payload: { secret: Schema.Redacted(Schema.String) },
   success: Schema.String,
-})
-const SecretList = Rpc.make('secrets.list', {
-  payload: Schema.Array(Schema.Union([Schema.String, Schema.Redacted(Schema.String)])),
+});
+const SecretList = Rpc.make("secrets.list", {
+  payload: Schema.Array(
+    Schema.Union([Schema.String, Schema.Redacted(Schema.String)])
+  ),
   success: Schema.String,
-})
+});
 
 interface RecursiveSecret {
-  readonly children: readonly RecursiveSecret[]
-  readonly secret: Redacted.Redacted<string>
+  readonly children: readonly RecursiveSecret[];
+  readonly secret: Redacted.Redacted<string>;
 }
 const RecursiveSecret = Schema.Struct({
   children: Schema.Array(
-    Schema.suspend((): Schema.Codec<RecursiveSecret, unknown> => RecursiveSecret),
+    Schema.suspend(
+      (): Schema.Codec<RecursiveSecret, unknown> => RecursiveSecret
+    )
   ),
   secret: Schema.RedactedFromValue(Schema.String),
-})
+});
 const recursiveSecretGroup = RpcGroup.make(
-  Rpc.make('recursive.read', {
+  Rpc.make("recursive.read", {
     payload: RecursiveSecret,
     success: Schema.String,
-  }),
-)
+  })
+);
 declare const recursiveSecretClient: RpcClient.RpcClient.Flat<
   RpcGroup.Rpcs<typeof recursiveSecretGroup>
->
+>;
 // @ts-expect-error recursive redacted payloads require a safe key encoder
-createRpcQueryUtils(recursiveSecretGroup, { client: recursiveSecretClient, keyPrefix: ['app'] })
 createRpcQueryUtils(recursiveSecretGroup, {
   client: recursiveSecretClient,
-  keyPrefix: ['app'],
-  keyEncoders: { 'recursive.read': () => 'subject' },
-})
+  keyPrefix: ["app"],
+});
+createRpcQueryUtils(recursiveSecretGroup, {
+  client: recursiveSecretClient,
+  keyPrefix: ["app"],
+  keyEncoders: { "recursive.read": () => "subject" },
+});
 
 const nestedSecretGroup = RpcGroup.make(
-  Rpc.make('nested.read', {
+  Rpc.make("nested.read", {
     payload: Schema.Struct({
       value: Schema.Union([
         Schema.String,
-        Schema.Struct({ value: Schema.String, secret: Schema.RedactedFromValue(Schema.String) }),
+        Schema.Struct({
+          value: Schema.String,
+          secret: Schema.RedactedFromValue(Schema.String),
+        }),
       ]),
     }),
     success: Schema.String,
-  }),
-)
-declare const nestedSecretClient: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof nestedSecretGroup>>
+  })
+);
+declare const nestedSecretClient: RpcClient.RpcClient.Flat<
+  RpcGroup.Rpcs<typeof nestedSecretGroup>
+>;
 // @ts-expect-error nested redacted payloads require a safe encoder even when assignable to an ancestor
-createRpcQueryUtils(nestedSecretGroup, { client: nestedSecretClient, keyPrefix: ['app'] })
+createRpcQueryUtils(nestedSecretGroup, {
+  client: nestedSecretClient,
+  keyPrefix: ["app"],
+});
 
-class ClassPayload extends Schema.Class<ClassPayload>('ClassPayload')({
+class ClassPayload extends Schema.Class<
+  ClassPayload,
+  { readonly brand: unique symbol }
+>("ClassPayload")({
   id: Schema.Finite,
 }) {}
-const ClassRead = Rpc.make('classes.read', {
+const ClassRead = Rpc.make("classes.read", {
   payload: ClassPayload,
   success: Schema.String,
-})
+});
+
+const classConstructorInput: Rpc.PayloadConstructor<typeof ClassRead> = {
+  id: 1,
+};
+const nominalClassPayload = new ClassPayload(classConstructorInput);
+nominalClassPayload satisfies Rpc.Payload<typeof ClassRead>;
+// @ts-expect-error Decoded class payloads require a branded instance.
+classConstructorInput satisfies Rpc.Payload<typeof ClassRead>;
 
 const group = RpcGroup.make(
   GetUser,
@@ -186,391 +218,495 @@ const group = RpcGroup.make(
   FindProject,
   ProjectHealth,
   ProjectWatch,
-  BracketOnly,
-)
-type Rpcs = RpcGroup.Rpcs<typeof group>
+  BracketOnly
+);
+type Rpcs = RpcGroup.Rpcs<typeof group>;
 
-declare const client: RpcClient.RpcClient.Flat<Rpcs>
+declare const client: RpcClient.RpcClient.Flat<Rpcs>;
 
-const keyPrefix = ['app'] as const
+const keyPrefix = ["app"] as const;
 const options: CreateRpcQueryUtilsOptions<typeof group, typeof keyPrefix> = {
   client,
   keyPrefix,
-}
+};
 
 // @ts-expect-error key prefixes must contain at least one value
-createRpcQueryUtils(group, { client, keyPrefix: [] as const })
-// @ts-expect-error key prefixes accept only strict JSON values
-createRpcQueryUtils(group, { client, keyPrefix: ['app', new Date(0)] as const })
+createRpcQueryUtils(group, { client, keyPrefix: [] as const });
+createRpcQueryUtils(group, {
+  client,
+  // @ts-expect-error key prefixes accept only strict JSON values
+  keyPrefix: ["app", new Date(0)] as const,
+});
 
-const utils = createRpcQueryUtils(group, options)
-export type PublicContractUtils = typeof utils
-const typedUtils: RpcQueryUtils<typeof group, typeof keyPrefix> = utils
-void typedUtils
+const utils = createRpcQueryUtils(group, options);
+export type PublicContractUtils = typeof utils;
+const typedUtils: RpcQueryUtils<typeof group, typeof keyPrefix> = utils;
+void typedUtils;
 
 type Equal<Left, Right> =
-  (<Value>() => Value extends Left ? 1 : 2) extends <Value>() => Value extends Right ? 1 : 2
+  (<Value>() => Value extends Left ? 1 : 2) extends <
+    Value,
+  >() => Value extends Right ? 1 : 2
     ? true
-    : false
-type Assert<Condition extends true> = Condition
+    : false;
+type Assert<Condition extends true> = Condition;
 type ExpectedLeafInterface =
-  | 'infiniteKey'
-  | 'infiniteOptions'
-  | 'key'
-  | 'mutationKey'
-  | 'mutationOptions'
-  | 'queryKey'
-  | 'queryOptions'
+  | "infiniteKey"
+  | "infiniteOptions"
+  | "key"
+  | "mutationKey"
+  | "mutationOptions"
+  | "queryKey"
+  | "queryOptions";
 type ExactLeafInterface = Assert<
-  Equal<keyof (typeof utils)['projects']['by-id']['find'], ExpectedLeafInterface>
->
+  Equal<
+    keyof (typeof utils)["projects"]["by-id"]["find"],
+    ExpectedLeafInterface
+  >
+>;
 
-const exactLeafInterface: ExactLeafInterface = true
+const exactLeafInterface: ExactLeafInterface = true;
 type ExpectedStreamLeafInterface =
-  | 'key'
-  | 'liveKey'
-  | 'liveOptions'
-  | 'streamedKey'
-  | 'streamedOptions'
+  | "key"
+  | "liveKey"
+  | "liveOptions"
+  | "streamedKey"
+  | "streamedOptions";
 type ExactStreamLeafInterface = Assert<
-  Equal<keyof (typeof utils)['events']['watch'], ExpectedStreamLeafInterface>
->
-const exactStreamLeafInterface: ExactStreamLeafInterface = true
-const projectKey = utils.projects['by-id'].find.queryKey({ id: 'project-1' })
-const projectPing = utils.projects.health.ping.queryOptions()
+  Equal<keyof (typeof utils)["events"]["watch"], ExpectedStreamLeafInterface>
+>;
+const exactStreamLeafInterface: ExactStreamLeafInterface = true;
+const projectKey = utils.projects["by-id"].find.queryKey({ id: "project-1" });
+const projectPing = utils.projects.health.ping.queryOptions();
 true satisfies Assert<
-  Equal<keyof typeof projectPing, 'queryFn' | 'queryKey' | 'select' | 'retry' | 'retryDelay'>
->
-const omittedInputlessArguments: Parameters<typeof utils.health.ping.queryOptions> = []
-void omittedInputlessArguments
-const bracketOnly = utils['billing-history']['list all'].queryOptions({
-  input: { accountId: 'account-1' },
-})
-void [exactLeafInterface, exactStreamLeafInterface, projectKey, projectPing, bracketOnly]
+  Equal<
+    keyof typeof projectPing,
+    "queryFn" | "queryKey" | "select" | "retry" | "retryDelay"
+  >
+>;
+const omittedInputlessArguments: Parameters<
+  typeof utils.health.ping.queryOptions
+> = [];
+void omittedInputlessArguments;
+const bracketOnly = utils["billing-history"]["list all"].queryOptions({
+  input: { accountId: "account-1" },
+});
+void [
+  exactLeafInterface,
+  exactStreamLeafInterface,
+  projectKey,
+  projectPing,
+  bracketOnly,
+];
 
-const jsonValue: JsonValue = { nested: [true, null, 1, 'value'] }
-const keyEncoder: KeyEncoder<typeof GetUser> = (payload) => ({ id: payload.id })
+const jsonValue: JsonValue = { nested: [true, null, 1, "value"] };
+const keyEncoder: KeyEncoder<typeof GetUser> = (payload) => ({
+  id: payload.id,
+});
 const classKeyEncoder: KeyEncoder<typeof ClassRead> = (payload) => {
-  payload satisfies ClassPayload
-  return { id: payload.id }
-}
-const runPromiseExit: RunPromiseExit = Effect.runPromiseExit
-const queryData: QueryData<void> = null
-const configCode: EffectRpcQueryConfigErrorCode = 'InvalidMaxChunks'
-const keyCode: EffectRpcQueryKeyErrorCode = 'InvalidKeyValue'
-void [jsonValue, keyEncoder, classKeyEncoder, runPromiseExit, queryData, configCode, keyCode]
+  payload satisfies ClassPayload;
+  return { id: payload.id };
+};
+const runPromiseExit: RunPromiseExit = Effect.runPromiseExit;
+const queryData: QueryData<void> = null;
+const configCode: EffectRpcQueryConfigErrorCode = "InvalidMaxChunks";
+const keyCode: EffectRpcQueryKeyErrorCode = "InvalidKeyValue";
+void [
+  jsonValue,
+  keyEncoder,
+  classKeyEncoder,
+  runPromiseExit,
+  queryData,
+  configCode,
+  keyCode,
+];
 
 createRpcQueryUtils(group, {
   client,
   keyEncoders: {
     // @ts-expect-error payloadless operations have no payload identity to override
-    'health.ping': () => null,
+    "health.ping": () => null,
   },
   keyPrefix,
-})
+});
 
 createRpcQueryUtils(group, {
   client,
   keyEncoders: {
-    'events.watch': (payload) => {
-      payload satisfies { readonly channel: string; readonly locale?: string }
-      return { channel: payload.channel, locale: payload.locale ?? 'en' }
+    "events.watch": (payload) => {
+      payload satisfies { readonly channel: string; readonly locale?: string };
+      return { channel: payload.channel, locale: payload.locale ?? "en" };
     },
   },
   keyPrefix,
-})
+});
 
 createRpcQueryUtils(group, {
   client,
   keyEncoders: {
     // @ts-expect-error encoder configuration is keyed by literal payload-bearing RPC tags
-    'users.missing': () => null,
+    "users.missing": () => null,
   },
   keyPrefix,
-})
+});
 
 createRpcQueryUtils(group, {
   client,
   keyEncoders: {
     // @ts-expect-error key encoders must return synchronously
-    'users.get': async (payload) => ({ id: payload.id }),
+    "users.get": async (payload) => ({ id: payload.id }),
   },
   keyPrefix,
-})
+});
 
 createRpcQueryUtils(group, {
   client,
   keyEncoders: {
     // @ts-expect-error Effect-returning key encoders are outside the public contract
-    'users.get': (payload) => Effect.succeed({ id: payload.id }),
+    "users.get": (payload) => Effect.succeed({ id: payload.id }),
   },
   keyPrefix,
-})
+});
 
 type WatchStreamError =
   | EffectRpcQueryConfigError
-  | EffectRpcQueryError<'unauthorized' | 'watch-failure' | 'watch-rpc-failure'>
+  | EffectRpcQueryError<"unauthorized" | "watch-failure" | "watch-rpc-failure">;
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient();
 
 const streamedOptions = utils.events.watch.streamedOptions({
   maxChunks: 50,
-  input: { channel: 'news' },
-  meta: { source: 'fixture' },
-  networkMode: 'offlineFirst',
-  refetchMode: 'append',
+  input: { channel: "news" },
+  meta: { source: "fixture" },
+  networkMode: "offlineFirst",
+  refetchMode: "append",
   retryDelay: (attemptIndex, error) => {
-    attemptIndex satisfies number
-    error satisfies WatchStreamError
-    return 0
+    attemptIndex satisfies number;
+    error satisfies WatchStreamError;
+    return 0;
   },
   retry: (_count, error) => {
-    error satisfies WatchStreamError
-    return false
+    error satisfies WatchStreamError;
+    return false;
   },
-  select: (values) => values.join(', '),
-})
-const streamedHook = useQuery(streamedOptions)
-const streamedHookData: string | undefined = streamedHook.data
-streamedHook.error satisfies WatchStreamError | null
-const streamedResult: Promise<string> = queryClient.query(streamedOptions)
-const streamedKey = utils.events.watch.streamedKey({ channel: 'news' })
-streamedKey satisfies readonly ['app', 'rpc', 'events', 'watch', 'streamed', ...JsonValue[]]
-const cachedStream = queryClient.getQueryData(utils.events.watch.streamedKey({ channel: 'news' }))
-cachedStream satisfies ReadonlyArray<string> | undefined
+  select: (values) => values.join(", "),
+});
+const streamedHook = useQuery(streamedOptions);
+const streamedHookData: string | undefined = streamedHook.data;
+streamedHook.error satisfies WatchStreamError | null;
+const streamedResult: Promise<string> = queryClient.query(streamedOptions);
+const streamedKey = utils.events.watch.streamedKey({ channel: "news" });
+streamedKey satisfies readonly [
+  "app",
+  "rpc",
+  "events",
+  "watch",
+  "streamed",
+  ...JsonValue[],
+];
+const cachedStream = queryClient.getQueryData(
+  utils.events.watch.streamedKey({ channel: "news" })
+);
+cachedStream satisfies ReadonlyArray<string> | undefined;
 const boundedStreamKey = utils.events.watch.streamedKey(
-  { channel: 'news' },
-  { maxChunks: 2, refetchMode: 'append' },
-)
-const boundedStreamData = queryClient.getQueryData(boundedStreamKey)
-boundedStreamData satisfies ReadonlyArray<string> | undefined
-queryClient.setQueryData(boundedStreamKey, ['latest'])
-queryClient.getQueryState(boundedStreamKey)?.error satisfies WatchStreamError | null | undefined
-utils.events.watch.streamedKey({ channel: 'news' }, { maxChunks: undefined, refetchMode: 'reset' })
-utils.events.audit.watch.streamedKey()
-utils.events.audit.watch.streamedKey({ maxChunks: 2, refetchMode: 'replace' })
-utils.events.audit.watch.streamedKey({ maxChunks: undefined, refetchMode: undefined })
-queryClient.getQueryData(utils.events.audit.watch.streamedKey({ maxChunks: 2 })) satisfies
-  | ReadonlyArray<string>
-  | undefined
+  { channel: "news" },
+  { maxChunks: 2, refetchMode: "append" }
+);
+const boundedStreamData = queryClient.getQueryData(boundedStreamKey);
+boundedStreamData satisfies ReadonlyArray<string> | undefined;
+queryClient.setQueryData(boundedStreamKey, ["latest"]);
+queryClient.getQueryState(boundedStreamKey)?.error satisfies
+  | WatchStreamError
+  | null
+  | undefined;
+utils.events.watch.streamedKey(
+  { channel: "news" },
+  { maxChunks: undefined, refetchMode: "reset" }
+);
+utils.events.audit.watch.streamedKey();
+utils.events.audit.watch.streamedKey({ maxChunks: 2, refetchMode: "replace" });
+utils.events.audit.watch.streamedKey({
+  maxChunks: undefined,
+  refetchMode: undefined,
+});
+queryClient.getQueryData(
+  utils.events.audit.watch.streamedKey({ maxChunks: 2 })
+) satisfies ReadonlyArray<string> | undefined;
 // @ts-expect-error refetch policy is one of the declared modes
-utils.events.watch.streamedKey({ channel: 'news' }, { refetchMode: 'unknown' })
+utils.events.watch.streamedKey({ channel: "news" }, { refetchMode: "unknown" });
 // @ts-expect-error accumulation bounds are numeric
-utils.events.audit.watch.streamedKey({ maxChunks: '2' })
+utils.events.audit.watch.streamedKey({ maxChunks: "2" });
 // @ts-expect-error a payload-bearing key still requires constructor input
-utils.events.watch.streamedKey({ maxChunks: 2 })
+utils.events.watch.streamedKey({ maxChunks: 2 });
 // @ts-expect-error live keys have no accumulation policy
-utils.events.watch.liveKey({ channel: 'news' }, { maxChunks: 2 })
-queryClient.invalidateQueries({ queryKey: streamedKey })
-queryClient.refetchQueries({ queryKey: streamedKey })
-void [streamedHookData, streamedResult]
+utils.events.watch.liveKey({ channel: "news" }, { maxChunks: 2 });
+queryClient.invalidateQueries({ queryKey: streamedKey });
+queryClient.refetchQueries({ queryKey: streamedKey });
+void [streamedHookData, streamedResult];
 
 const liveOptions = utils.events.watch.liveOptions({
-  input: { channel: 'news' },
+  input: { channel: "news" },
   retryDelay: (attemptIndex, error) => {
-    attemptIndex satisfies number
-    error satisfies EffectRpcQueryEmptyStreamError | WatchStreamError
-    return 0
+    attemptIndex satisfies number;
+    error satisfies EffectRpcQueryEmptyStreamError | WatchStreamError;
+    return 0;
   },
   select: (value) => value.length,
-})
-const liveHook = useQuery(liveOptions)
-const liveHookData: number | undefined = liveHook.data
-liveHook.error satisfies EffectRpcQueryEmptyStreamError | WatchStreamError | null
-const liveResult: Promise<number> = queryClient.query(liveOptions)
-const liveKey = utils.events.watch.liveKey({ channel: 'news' })
-liveKey satisfies readonly ['app', 'rpc', 'events', 'watch', 'live', JsonValue]
-const cachedLive = queryClient.getQueryData(liveKey)
-cachedLive satisfies string | undefined
-void [liveHookData, liveResult]
+});
+const liveHook = useQuery(liveOptions);
+const liveHookData: number | undefined = liveHook.data;
+liveHook.error satisfies
+  | EffectRpcQueryEmptyStreamError
+  | WatchStreamError
+  | null;
+const liveResult: Promise<number> = queryClient.query(liveOptions);
+const liveKey = utils.events.watch.liveKey({ channel: "news" });
+liveKey satisfies readonly ["app", "rpc", "events", "watch", "live", JsonValue];
+const cachedLive = queryClient.getQueryData(liveKey);
+cachedLive satisfies string | undefined;
+void [liveHookData, liveResult];
 
 const initializedStream = useQuery(
   utils.events.watch.streamedOptions({
-    initialData: ['initial'],
-    input: { channel: 'news' },
-    select: (values) => values.join(', '),
-  }),
-)
-initializedStream.data satisfies string
+    initialData: ["initial"],
+    input: { channel: "news" },
+    select: (values) => values.join(", "),
+  })
+);
+initializedStream.data satisfies string;
 const initializedLive = useQuery(
   utils.events.watch.liveOptions({
-    initialData: 'initial',
-    input: { channel: 'news' },
+    initialData: "initial",
+    input: { channel: "news" },
     select: (value) => value.length,
-  }),
-)
-initializedLive.data satisfies number
+  })
+);
+initializedLive.data satisfies number;
 
 const normalizedLiveGroup = RpcGroup.make(
-  Rpc.make('values.undefined', { success: Schema.Undefined, stream: true }),
-  Rpc.make('values.void', { success: Schema.Void, stream: true }),
-  Rpc.make('values.null', { success: Schema.Null, stream: true }),
-  Rpc.make('values.optional', { success: Schema.UndefinedOr(Schema.String), stream: true }),
-)
+  Rpc.make("values.undefined", { success: Schema.Undefined, stream: true }),
+  Rpc.make("values.void", { success: Schema.Void, stream: true }),
+  Rpc.make("values.null", { success: Schema.Null, stream: true }),
+  Rpc.make("values.optional", {
+    success: Schema.UndefinedOr(Schema.String),
+    stream: true,
+  })
+);
 declare const normalizedLiveClient: RpcClient.RpcClient.Flat<
   RpcGroup.Rpcs<typeof normalizedLiveGroup>
->
+>;
 const normalizedLiveUtils = createRpcQueryUtils(normalizedLiveGroup, {
   client: normalizedLiveClient,
   keyPrefix,
-})
+});
 createRpcQueryUtils(normalizedLiveGroup, {
   client: normalizedLiveClient,
   keyPrefix,
   // @ts-expect-error Inputless RPC groups reject even an empty encoder map.
   keyEncoders: {},
-})
-true satisfies Assert<Equal<QueryData<string | undefined>, string | null>>
-true satisfies Assert<Equal<QueryData<void>, null>>
-const undefinedLiveResult = queryClient.query(normalizedLiveUtils.values.undefined.liveOptions())
-true satisfies Assert<Equal<typeof undefinedLiveResult, Promise<null>>>
-const voidLiveResult = queryClient.query(normalizedLiveUtils.values.void.liveOptions())
-true satisfies Assert<Equal<typeof voidLiveResult, Promise<null>>>
-const nullLiveResult = queryClient.query(normalizedLiveUtils.values.null.liveOptions())
-true satisfies Assert<Equal<typeof nullLiveResult, Promise<null>>>
-const optionalLiveKey = normalizedLiveUtils.values.optional.liveKey()
-const cachedOptionalLive = queryClient.getQueryData(optionalLiveKey)
-true satisfies Assert<Equal<typeof cachedOptionalLive, string | null | undefined>>
-const cachedUndefinedLive = queryClient.getQueryData(normalizedLiveUtils.values.undefined.liveKey())
-true satisfies Assert<Equal<typeof cachedUndefinedLive, null | undefined>>
-queryClient.setQueryData(optionalLiveKey, null)
+});
+true satisfies Assert<Equal<QueryData<string | undefined>, string | null>>;
+true satisfies Assert<Equal<QueryData<void>, null>>;
+const undefinedLiveResult = queryClient.query(
+  normalizedLiveUtils.values.undefined.liveOptions()
+);
+true satisfies Assert<Equal<typeof undefinedLiveResult, Promise<null>>>;
+const voidLiveResult = queryClient.query(
+  normalizedLiveUtils.values.void.liveOptions()
+);
+true satisfies Assert<Equal<typeof voidLiveResult, Promise<null>>>;
+const nullLiveResult = queryClient.query(
+  normalizedLiveUtils.values.null.liveOptions()
+);
+true satisfies Assert<Equal<typeof nullLiveResult, Promise<null>>>;
+const optionalLiveKey = normalizedLiveUtils.values.optional.liveKey();
+const cachedOptionalLive = queryClient.getQueryData(optionalLiveKey);
+true satisfies Assert<
+  Equal<typeof cachedOptionalLive, string | null | undefined>
+>;
+const cachedUndefinedLive = queryClient.getQueryData(
+  normalizedLiveUtils.values.undefined.liveKey()
+);
+true satisfies Assert<Equal<typeof cachedUndefinedLive, null | undefined>>;
+queryClient.setQueryData(optionalLiveKey, null);
 const initializedNormalizedLive = useQuery(
   normalizedLiveUtils.values.optional.liveOptions({
     initialData: null,
     select: (value) => {
-      true satisfies Assert<Equal<typeof value, string | null>>
-      return value === null ? 0 : value.length
+      true satisfies Assert<Equal<typeof value, string | null>>;
+      return value === null ? 0 : value.length;
     },
-  }),
-)
-true satisfies Assert<Equal<typeof initializedNormalizedLive.data, number>>
+  })
+);
+true satisfies Assert<Equal<typeof initializedNormalizedLive.data, number>>;
 const initializedUndefinedLive = useQuery(
-  normalizedLiveUtils.values.undefined.liveOptions({ initialData: () => null }),
-)
-true satisfies Assert<Equal<typeof initializedUndefinedLive.data, null>>
+  normalizedLiveUtils.values.undefined.liveOptions({ initialData: () => null })
+);
+true satisfies Assert<Equal<typeof initializedUndefinedLive.data, null>>;
 const optionalNormalizedInitial = useQuery(
-  normalizedLiveUtils.values.optional.liveOptions({ initialData: () => undefined }),
-)
-true satisfies Assert<Equal<typeof optionalNormalizedInitial.data, string | null | undefined>>
+  normalizedLiveUtils.values.optional.liveOptions({
+    initialData: () => undefined,
+  })
+);
+true satisfies Assert<
+  Equal<typeof optionalNormalizedInitial.data, string | null | undefined>
+>;
 const accumulatedUndefined = queryClient.query(
-  normalizedLiveUtils.values.undefined.streamedOptions({ initialData: [undefined] }),
-)
-true satisfies Assert<Equal<typeof accumulatedUndefined, Promise<readonly undefined[]>>>
+  normalizedLiveUtils.values.undefined.streamedOptions({
+    initialData: [undefined],
+  })
+);
+true satisfies Assert<
+  Equal<typeof accumulatedUndefined, Promise<readonly undefined[]>>
+>;
 
-declare const clientFailureClient: RpcClient.RpcClient.Flat<Rpcs, 'client-failure'>
-const clientFailureUtils = createRpcQueryUtils<typeof group, typeof keyPrefix, 'client-failure'>(
-  group,
-  { client: clientFailureClient, keyPrefix },
-)
+declare const clientFailureClient: RpcClient.RpcClient.Flat<
+  Rpcs,
+  "client-failure"
+>;
+const clientFailureUtils = createRpcQueryUtils<
+  typeof group,
+  typeof keyPrefix,
+  "client-failure"
+>(group, { client: clientFailureClient, keyPrefix });
 clientFailureUtils.events.watch.streamedOptions({
-  input: { channel: 'news' },
+  input: { channel: "news" },
   retry: (_count, error) => {
     error satisfies
       | EffectRpcQueryConfigError
       | EffectRpcQueryError<
-          'client-failure' | 'unauthorized' | 'watch-failure' | 'watch-rpc-failure'
-        >
-    return false
+          | "client-failure"
+          | "unauthorized"
+          | "watch-failure"
+          | "watch-rpc-failure"
+        >;
+    return false;
   },
-})
+});
 
-const skippedStreamed = utils.events.watch.streamedOptions({ input: skipToken })
-skippedStreamed.queryFn satisfies typeof queryCoreSkipToken
-const skippedLive = utils.events.watch.liveOptions({ input: skipToken })
-skippedLive.queryFn satisfies typeof queryCoreSkipToken
-useQuery(skippedStreamed)
-useQuery(skippedLive)
+const skippedStreamed = utils.events.watch.streamedOptions({
+  input: skipToken,
+});
+skippedStreamed.queryFn satisfies typeof queryCoreSkipToken;
+const skippedLive = utils.events.watch.liveOptions({ input: skipToken });
+skippedLive.queryFn satisfies typeof queryCoreSkipToken;
+useQuery(skippedStreamed);
+useQuery(skippedLive);
 // @ts-expect-error suspense queries cannot use a skipped stream
-useSuspenseQuery(skippedStreamed)
+useSuspenseQuery(skippedStreamed);
 // @ts-expect-error suspense queries cannot use a skipped live stream
-useSuspenseQuery(skippedLive)
+useSuspenseQuery(skippedLive);
 
-const payloadlessStreamed = utils.events.audit.watch.streamedOptions()
-const payloadlessLive = utils.events.audit.watch.liveOptions()
-queryClient.query(payloadlessStreamed)
-queryClient.query(payloadlessLive)
+const payloadlessStreamed = utils.events.audit.watch.streamedOptions();
+const payloadlessLive = utils.events.audit.watch.liveOptions();
+queryClient.query(payloadlessStreamed);
+queryClient.query(payloadlessLive);
 
 // @ts-expect-error payload-bearing streaming queries require input or skipToken
-utils.events.watch.streamedOptions({})
+utils.events.watch.streamedOptions({});
 // @ts-expect-error payload-bearing live queries require input or skipToken
-utils.events.watch.liveOptions({})
+utils.events.watch.liveOptions({});
 // @ts-expect-error payloadless streaming queries omit input
-utils.events.audit.watch.streamedOptions({ input: undefined })
+utils.events.audit.watch.streamedOptions({ input: undefined });
 // @ts-expect-error payloadless live queries omit input
-utils.events.audit.watch.liveOptions({ input: undefined })
-// @ts-expect-error the package owns the streamed query function
-utils.events.watch.streamedOptions({ input: { channel: 'news' }, queryFn: async () => [] })
-// @ts-expect-error the package owns the live query key
-utils.events.watch.liveOptions({ input: { channel: 'news' }, queryKey: ['custom'] })
-// @ts-expect-error live queries do not accept accumulated-stream refetch modes
-utils.events.watch.liveOptions({ input: { channel: 'news' }, refetchMode: 'append' })
+utils.events.audit.watch.liveOptions({ input: undefined });
+utils.events.watch.streamedOptions({
+  input: { channel: "news" },
+  // @ts-expect-error the package owns the streamed query function
+  queryFn: async () => [],
+});
+utils.events.watch.liveOptions({
+  input: { channel: "news" },
+  // @ts-expect-error the package owns the live query key
+  queryKey: ["custom"],
+});
+utils.events.watch.liveOptions({
+  input: { channel: "news" },
+  // @ts-expect-error live queries do not accept accumulated-stream refetch modes
+  refetchMode: "append",
+});
 
 const infiniteOptions = utils.users.pages.infiniteOptions({
   getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
     lastPage satisfies {
-      readonly nextCursor: number | null
-      readonly users: ReadonlyArray<{ readonly id: number; readonly name: string }>
-    }
-    allPages satisfies ReadonlyArray<typeof lastPage>
-    lastPageParam satisfies number
-    allPageParams satisfies ReadonlyArray<number>
-    return lastPage.nextCursor ?? undefined
+      readonly nextCursor: number | null;
+      readonly users: ReadonlyArray<{
+        readonly id: number;
+        readonly name: string;
+      }>;
+    };
+    allPages satisfies ReadonlyArray<typeof lastPage>;
+    lastPageParam satisfies number;
+    allPageParams satisfies ReadonlyArray<number>;
+    return lastPage.nextCursor ?? undefined;
   },
-  getPreviousPageParam: (_firstPage, _allPages, firstPageParam, allPageParams) => {
-    firstPageParam satisfies number
-    allPageParams satisfies ReadonlyArray<number>
-    return firstPageParam > 0 ? firstPageParam - 1 : undefined
+  getPreviousPageParam: (
+    _firstPage,
+    _allPages,
+    firstPageParam,
+    allPageParams
+  ) => {
+    firstPageParam satisfies number;
+    allPageParams satisfies ReadonlyArray<number>;
+    return firstPageParam > 0 ? firstPageParam - 1 : undefined;
   },
   initialPageParam: 0,
   input: (cursor: number) => ({ cursor }),
-  meta: { source: 'fixture' },
-  networkMode: 'offlineFirst',
+  meta: { source: "fixture" },
+  networkMode: "offlineFirst",
   retry: (_count, error) => {
-    error satisfies EffectRpcQueryError<'page-failure'>
-    return false
+    error satisfies EffectRpcQueryError<"page-failure">;
+    return false;
   },
   retryDelay: (attemptIndex, error) => {
-    attemptIndex satisfies number
-    error satisfies EffectRpcQueryError<'page-failure'>
-    return 0
+    attemptIndex satisfies number;
+    error satisfies EffectRpcQueryError<"page-failure">;
+    return 0;
   },
-  select: (data) => data.pages.flatMap((page) => page.users.map((user) => user.name)),
-})
-const infiniteHook = useInfiniteQuery(infiniteOptions)
-const infiniteHookData: ReadonlyArray<string> | undefined = infiniteHook.data
-infiniteHook.error satisfies EffectRpcQueryError<'page-failure'> | null
-void infiniteHookData
+  select: (data) =>
+    data.pages.flatMap((page) => page.users.map((user) => user.name)),
+});
+const infiniteHook = useInfiniteQuery(infiniteOptions);
+const infiniteHookData: ReadonlyArray<string> | undefined = infiniteHook.data;
+infiniteHook.error satisfies EffectRpcQueryError<"page-failure"> | null;
+void infiniteHookData;
 
 const fetchableInfiniteOptions = utils.users.pages.infiniteOptions({
   getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
   initialPageParam: 0,
   input: (cursor: number) => ({ cursor }),
-})
+});
 const fetchedPages: Promise<
   InfiniteData<
     {
-      readonly nextCursor: number | null
-      readonly users: ReadonlyArray<{ readonly id: number; readonly name: string }>
+      readonly nextCursor: number | null;
+      readonly users: ReadonlyArray<{
+        readonly id: number;
+        readonly name: string;
+      }>;
     },
     number
   >
-> = queryClient.infiniteQuery(fetchableInfiniteOptions)
-void fetchedPages
-usePrefetchInfiniteQuery(fetchableInfiniteOptions)
+> = queryClient.infiniteQuery(fetchableInfiniteOptions);
+void fetchedPages;
+usePrefetchInfiniteQuery(fetchableInfiniteOptions);
 
-const initialInfiniteData = { pages: [{ nextCursor: null, users: [] }], pageParams: [0] }
+const initialInfiniteData = {
+  pages: [{ nextCursor: null, users: [] }],
+  pageParams: [0],
+};
 const initializedInfiniteOptions = utils.users.pages.infiniteOptions({
   getNextPageParam: () => undefined,
   initialData: () => initialInfiniteData,
   initialPageParam: 0,
   input: (cursor: number) => ({ cursor }),
   select: (data) => data.pages.length,
-})
-const initializedInfiniteHook = useInfiniteQuery(initializedInfiniteOptions)
-true satisfies Assert<Equal<typeof initializedInfiniteHook.data, number>>
+});
+const initializedInfiniteHook = useInfiniteQuery(initializedInfiniteOptions);
+true satisfies Assert<Equal<typeof initializedInfiniteHook.data, number>>;
 const maybeInitialInfiniteData = ():
   | InfiniteData<Rpc.Success<typeof ListPages>, number>
-  | undefined => undefined
+  | undefined => undefined;
 const maybeInitializedInfiniteHook = useInfiniteQuery(
   utils.users.pages.infiniteOptions({
     getNextPageParam: () => undefined,
@@ -578,34 +714,46 @@ const maybeInitializedInfiniteHook = useInfiniteQuery(
     initialPageParam: 0,
     input: (cursor: number) => ({ cursor }),
     select: (data) => data.pages.length,
-  }),
-)
-true satisfies Assert<Equal<typeof maybeInitializedInfiniteHook.data, number | undefined>>
+  })
+);
+true satisfies Assert<
+  Equal<typeof maybeInitializedInfiniteHook.data, number | undefined>
+>;
 
-const infiniteKey = utils.users.pages.infiniteKey({ cursor: 0 })
-infiniteKey satisfies readonly ['app', 'rpc', 'users', 'pages', 'infinite', JsonValue]
-const cachedPages = queryClient.getQueryData(fetchableInfiniteOptions.queryKey)
-cachedPages?.pageParams satisfies ReadonlyArray<number> | undefined
+const infiniteKey = utils.users.pages.infiniteKey({ cursor: 0 });
+infiniteKey satisfies readonly [
+  "app",
+  "rpc",
+  "users",
+  "pages",
+  "infinite",
+  JsonValue,
+];
+const cachedPages = queryClient.getQueryData(fetchableInfiniteOptions.queryKey);
+cachedPages?.pageParams satisfies ReadonlyArray<number> | undefined;
 cachedPages?.pages satisfies
   | ReadonlyArray<{
-      readonly nextCursor: number | null
-      readonly users: ReadonlyArray<{ readonly id: number; readonly name: string }>
+      readonly nextCursor: number | null;
+      readonly users: ReadonlyArray<{
+        readonly id: number;
+        readonly name: string;
+      }>;
     }>
-  | undefined
-queryClient.invalidateQueries({ queryKey: infiniteKey })
-queryClient.refetchQueries({ queryKey: fetchableInfiniteOptions.queryKey })
+  | undefined;
+queryClient.invalidateQueries({ queryKey: infiniteKey });
+queryClient.refetchQueries({ queryKey: fetchableInfiniteOptions.queryKey });
 
 const skippedInfinite = utils.users.pages.infiniteOptions({
   getNextPageParam: () => undefined,
   initialPageParam: 0,
   input: skipToken,
-})
-skippedInfinite.queryFn satisfies typeof queryCoreSkipToken
-useInfiniteQuery(skippedInfinite)
+});
+skippedInfinite.queryFn satisfies typeof queryCoreSkipToken;
+useInfiniteQuery(skippedInfinite);
 // @ts-expect-error suspense infinite queries cannot use the skip sentinel
-useSuspenseInfiniteQuery(skippedInfinite)
+useSuspenseInfiniteQuery(skippedInfinite);
 // @ts-expect-error prefetch-only infinite hooks cannot use the skip sentinel
-usePrefetchInfiniteQuery(skippedInfinite)
+usePrefetchInfiniteQuery(skippedInfinite);
 
 const initializedSkippedInfiniteOptions = utils.users.pages.infiniteOptions({
   getNextPageParam: () => undefined,
@@ -613,45 +761,59 @@ const initializedSkippedInfiniteOptions = utils.users.pages.infiniteOptions({
   initialPageParam: 0,
   input: skipToken,
   select: (data) => data.pages.length,
-})
-initializedSkippedInfiniteOptions.queryFn satisfies SkipToken
-const initializedSkippedInfiniteHook = useInfiniteQuery(initializedSkippedInfiniteOptions)
-true satisfies Assert<Equal<typeof initializedSkippedInfiniteHook.data, number>>
+});
+initializedSkippedInfiniteOptions.queryFn satisfies SkipToken;
+const initializedSkippedInfiniteHook = useInfiniteQuery(
+  initializedSkippedInfiniteOptions
+);
+true satisfies Assert<
+  Equal<typeof initializedSkippedInfiniteHook.data, number>
+>;
 
-declare const canLoadPages: boolean
+declare const canLoadPages: boolean;
 const conditionalInfiniteOptions = utils.users.pages.infiniteOptions({
   getNextPageParam: (page, _pages, cursor) => {
-    page satisfies Rpc.Success<typeof ListPages>
-    cursor satisfies number
-    return page.nextCursor ?? undefined
+    page satisfies Rpc.Success<typeof ListPages>;
+    cursor satisfies number;
+    return page.nextCursor ?? undefined;
   },
   initialPageParam: 0,
   input: canLoadPages ? (cursor: number) => ({ cursor }) : skipToken,
   retry: (_count, error) => {
-    error satisfies EffectRpcQueryError<'page-failure'>
-    return false
+    error satisfies EffectRpcQueryError<"page-failure">;
+    return false;
   },
   staleTime: (query) => {
     query.queryKey satisfies
-      | readonly ['app', 'rpc', 'users', 'pages', 'infinite']
-      | readonly ['app', 'rpc', 'users', 'pages', 'infinite', JsonValue]
-    return 30_000
+      | readonly ["app", "rpc", "users", "pages", "infinite"]
+      | readonly ["app", "rpc", "users", "pages", "infinite", JsonValue];
+    return 30_000;
   },
   select: (data) => data.pages.length,
-})
+});
 conditionalInfiniteOptions.queryFn satisfies
-  | QueryFunction<Rpc.Success<typeof ListPages>, typeof conditionalInfiniteOptions.queryKey, number>
-  | SkipToken
-const conditionalInfiniteHook = useInfiniteQuery(conditionalInfiniteOptions)
-true satisfies Assert<Equal<typeof conditionalInfiniteHook.data, number | undefined>>
-new InfiniteQueryObserver(queryClient, conditionalInfiniteOptions).getCurrentResult()
-  .data satisfies number | undefined
+  | QueryFunction<
+      Rpc.Success<typeof ListPages>,
+      typeof conditionalInfiniteOptions.queryKey,
+      number
+    >
+  | SkipToken;
+const conditionalInfiniteHook = useInfiniteQuery(conditionalInfiniteOptions);
+true satisfies Assert<
+  Equal<typeof conditionalInfiniteHook.data, number | undefined>
+>;
+new InfiniteQueryObserver(
+  queryClient,
+  conditionalInfiniteOptions
+).getCurrentResult().data satisfies number | undefined;
 // @ts-expect-error conditional input may produce a skipped query function
-conditionalInfiniteOptions.queryFn satisfies QueryFunction<Rpc.Success<typeof ListPages>>
+conditionalInfiniteOptions.queryFn satisfies QueryFunction<
+  Rpc.Success<typeof ListPages>
+>;
 // @ts-expect-error suspense infinite queries require an executable query function
-useSuspenseInfiniteQuery(conditionalInfiniteOptions)
+useSuspenseInfiniteQuery(conditionalInfiniteOptions);
 // @ts-expect-error prefetch-only infinite hooks require an executable query function
-usePrefetchInfiniteQuery(conditionalInfiniteOptions)
+usePrefetchInfiniteQuery(conditionalInfiniteOptions);
 
 const initializedConditionalInfiniteHook = useInfiniteQuery(
   utils.users.pages.infiniteOptions({
@@ -660,10 +822,14 @@ const initializedConditionalInfiniteHook = useInfiniteQuery(
     initialPageParam: 0,
     input: canLoadPages ? (cursor: number) => ({ cursor }) : skipToken,
     select: (data) => data.pages.length,
-  }),
-)
-true satisfies Assert<Equal<typeof initializedConditionalInfiniteHook.data, number>>
-declare const optionalInfiniteData: InfiniteData<Rpc.Success<typeof ListPages>, number> | undefined
+  })
+);
+true satisfies Assert<
+  Equal<typeof initializedConditionalInfiniteHook.data, number>
+>;
+declare const optionalInfiniteData:
+  | InfiniteData<Rpc.Success<typeof ListPages>, number>
+  | undefined;
 const maybeInitializedConditionalInfiniteHook = useInfiniteQuery(
   utils.users.pages.infiniteOptions({
     getNextPageParam: () => undefined,
@@ -671,11 +837,11 @@ const maybeInitializedConditionalInfiniteHook = useInfiniteQuery(
     initialPageParam: 0,
     input: canLoadPages ? (cursor: number) => ({ cursor }) : skipToken,
     select: (data) => data.pages.length,
-  }),
-)
+  })
+);
 true satisfies Assert<
   Equal<typeof maybeInitializedConditionalInfiniteHook.data, number | undefined>
->
+>;
 const maybeInitializedSkippedInfiniteHook = useInfiniteQuery(
   utils.users.pages.infiniteOptions({
     getNextPageParam: () => undefined,
@@ -683,217 +849,243 @@ const maybeInitializedSkippedInfiniteHook = useInfiniteQuery(
     initialPageParam: 0,
     input: skipToken,
     select: (data) => data.pages.length,
-  }),
-)
-true satisfies Assert<Equal<typeof maybeInitializedSkippedInfiniteHook.data, number | undefined>>
-declare const initialCursor: number | null
+  })
+);
+true satisfies Assert<
+  Equal<typeof maybeInitializedSkippedInfiniteHook.data, number | undefined>
+>;
+declare const initialCursor: number | null;
 const conditionalNullablePages = utils.users.pages.infiniteOptions({
   getNextPageParam: (page, _pages, cursor) => {
-    true satisfies Assert<Equal<typeof cursor, number | null>>
-    return page.nextCursor
+    true satisfies Assert<Equal<typeof cursor, number | null>>;
+    return page.nextCursor;
   },
   initialPageParam: initialCursor,
-  input: canLoadPages ? (cursor: number | null) => ({ cursor: cursor ?? 0 }) : skipToken,
-})
-const conditionalNullableHook = useInfiniteQuery(conditionalNullablePages)
+  input: canLoadPages
+    ? (cursor: number | null) => ({ cursor: cursor ?? 0 })
+    : skipToken,
+});
+const conditionalNullableHook = useInfiniteQuery(conditionalNullablePages);
 true satisfies Assert<
   Equal<
     typeof conditionalNullableHook.data,
     InfiniteData<Rpc.Success<typeof ListPages>, number | null> | undefined
   >
->
+>;
 // @ts-expect-error infinite-query input is consumed for conditional inputs
-conditionalInfiniteOptions.input
+conditionalInfiniteOptions.input;
 // @ts-expect-error infinite skipping requires object options with pagination fields
-utils.users.pages.infiniteOptions(skipToken)
+utils.users.pages.infiniteOptions(skipToken);
 
 const payloadlessInfinite = utils.health.ping.infiniteOptions({
   getNextPageParam: () => undefined,
   initialPageParam: 0,
-})
+});
 const payloadlessPages: Promise<InfiniteData<null, number>> =
-  queryClient.infiniteQuery(payloadlessInfinite)
-void payloadlessPages
+  queryClient.infiniteQuery(payloadlessInfinite);
+void payloadlessPages;
 const initializedPayloadlessInfiniteHook = useInfiniteQuery(
   utils.health.ping.infiniteOptions({
     getNextPageParam: () => undefined,
     initialData: { pages: [null], pageParams: [0] },
     initialPageParam: 0,
-  }),
-)
+  })
+);
 true satisfies Assert<
-  Equal<typeof initializedPayloadlessInfiniteHook.data, InfiniteData<null, number>>
->
+  Equal<
+    typeof initializedPayloadlessInfiniteHook.data,
+    InfiniteData<null, number>
+  >
+>;
 
 // @ts-expect-error payload-bearing infinite queries require an input mapper or skipToken
-utils.users.pages.infiniteOptions({ getNextPageParam: () => undefined, initialPageParam: 0 })
+utils.users.pages.infiniteOptions({
+  getNextPageParam: () => undefined,
+  initialPageParam: 0,
+});
 utils.health.ping.infiniteOptions({
   getNextPageParam: () => undefined,
   initialPageParam: 0,
   // @ts-expect-error payloadless infinite queries do not accept an input mapper
   input: () => undefined,
-})
+});
 utils.health.ping.infiniteOptions({
   getNextPageParam: () => undefined,
   initialPageParam: 0,
   // @ts-expect-error payloadless infinite queries cannot be skipped
   input: skipToken,
-})
-const buildPages = utils.users.pages.infiniteOptions<number, never>
+});
+const buildPages = utils.users.pages.infiniteOptions<number, never>;
 const validPageOptions = {
   getNextPageParam: () => undefined,
   initialPageParam: 0,
   input: (cursor: number) => ({ cursor }),
-}
+};
 const instantiatedPages = buildPages({
   ...validPageOptions,
   enabled: (query) => query.state.data?.pages.length !== 0,
   getPreviousPageParam: (_page, _pages, cursor) => cursor - 1,
-  networkMode: 'offlineFirst',
-})
-instantiatedPages.enabled
-instantiatedPages.getPreviousPageParam
-instantiatedPages.networkMode
+  networkMode: "offlineFirst",
+});
+instantiatedPages.enabled;
+instantiatedPages.getPreviousPageParam;
+instantiatedPages.networkMode;
 const explicitUnary = utils.users.get.queryOptions<string>({
   input: { id: 1 },
   enabled: (query) => query.state.data?.id !== 0,
   select: (user) => user.name,
-  networkMode: 'offlineFirst',
-})
-explicitUnary.enabled
-explicitUnary.networkMode
+  networkMode: "offlineFirst",
+});
+explicitUnary.enabled;
+explicitUnary.networkMode;
 true satisfies Assert<
   Equal<
     ReturnType<typeof explicitUnary.queryFn>,
     Rpc.Success<typeof GetUser> | Promise<Rpc.Success<typeof GetUser>>
   >
->
-useQuery(explicitUnary).data satisfies string | undefined
+>;
+useQuery(explicitUnary).data satisfies string | undefined;
 const explicitInfinite = utils.users.pages.infiniteOptions<number, string[]>({
   ...validPageOptions,
   initialData: initialInfiniteData,
-  select: (data) => data.pages.flatMap((page) => page.users.map((user) => user.name)),
+  select: (data) =>
+    data.pages.flatMap((page) => page.users.map((user) => user.name)),
   enabled: (query) => query.state.data?.pages.length !== 0,
-})
-explicitInfinite.enabled
-const explicitInfiniteHook = useInfiniteQuery(explicitInfinite)
-true satisfies Assert<Equal<typeof explicitInfiniteHook.data, string[]>>
+});
+explicitInfinite.enabled;
+const explicitInfiniteHook = useInfiniteQuery(explicitInfinite);
+true satisfies Assert<Equal<typeof explicitInfiniteHook.data, string[]>>;
 // @ts-expect-error infinite input mappers must return the RPC payload constructor input
-buildPages({ ...validPageOptions, input: () => ({ cursor: 'invalid' }) })
-// @ts-expect-error the package owns the infinite-query function
-buildPages({ ...validPageOptions, queryFn: async () => ({ nextCursor: null, users: [] }) })
+buildPages({ ...validPageOptions, input: () => ({ cursor: "invalid" }) });
+buildPages({
+  ...validPageOptions,
+  // @ts-expect-error the package owns the infinite-query function
+  queryFn: async () => ({ nextCursor: null, users: [] }),
+});
 // @ts-expect-error the package owns the infinite-query key
-buildPages({ ...validPageOptions, queryKey: ['custom'] })
+buildPages({ ...validPageOptions, queryKey: ["custom"] });
 
 const selected = utils.users.get.queryOptions({
   input: { id: 1 },
-  initialData: { id: 1, name: 'Ada' },
+  initialData: { id: 1, name: "Ada" },
   select: (user) => user.name,
-})
+});
 const definedInitialData:
   | { readonly id: number; readonly name: string }
-  | (() => { readonly id: number; readonly name: string }) = selected.initialData
-void definedInitialData
-const selectedResult: Promise<string> = queryClient.query(selected)
-void selectedResult
+  | (() => { readonly id: number; readonly name: string }) =
+  selected.initialData;
+void definedInitialData;
+const selectedResult: Promise<string> = queryClient.query(selected);
+void selectedResult;
 
-const selectedHook = useQuery(selected)
-const selectedHookData: string = selectedHook.data
-selectedHook.error satisfies EffectRpcQueryError<'not-found'> | null
-void selectedHookData
+const selectedHook = useQuery(selected);
+const selectedHookData: string = selectedHook.data;
+selectedHook.error satisfies EffectRpcQueryError<"not-found"> | null;
+void selectedHookData;
 
 const queryOptions = utils.users.get.queryOptions({
   enabled: (query) => query.state.data?.id !== 0,
   gcTime: 60_000,
   input: { id: 1 },
-  meta: { source: 'fixture' },
-  networkMode: 'offlineFirst',
-  notifyOnChangeProps: ['data', 'error'],
+  meta: { source: "fixture" },
+  networkMode: "offlineFirst",
+  notifyOnChangeProps: ["data", "error"],
   placeholderData: (previous) => previous,
   refetchInterval: (query) => (query.state.data === undefined ? 1_000 : false),
   refetchOnMount: (query) => query.state.data === undefined,
   retry: (_count, error) => {
-    error satisfies EffectRpcQueryError<'not-found'>
-    return false
+    error satisfies EffectRpcQueryError<"not-found">;
+    return false;
   },
   retryDelay: (_attempt, error) => {
-    _attempt satisfies number
-    error satisfies EffectRpcQueryError<'not-found'>
-    return 0
+    _attempt satisfies number;
+    error satisfies EffectRpcQueryError<"not-found">;
+    return 0;
   },
   select: (user) => user.name,
-  staleTime: (query) => (query.state.data?.name === 'Ada' ? Infinity : 0),
+  staleTime: (query) => (query.state.data?.name === "Ada" ? Infinity : 0),
   structuralSharing: false,
-})
+});
 type ClientOwnedQueryHash = Assert<
-  Equal<Extract<'queryKeyHashFn' | 'queryHash', keyof typeof queryOptions>, never>
->
-const clientOwnedQueryHash: ClientOwnedQueryHash = true
+  Equal<
+    Extract<"queryKeyHashFn" | "queryHash", keyof typeof queryOptions>,
+    never
+  >
+>;
+const clientOwnedQueryHash: ClientOwnedQueryHash = true;
 
-const queryHook = useQuery(queryOptions)
-const queryHookData: string | undefined = queryHook.data
-queryHook.error satisfies EffectRpcQueryError<'not-found'> | null
-const suspenseHook = useSuspenseQuery(queryOptions)
-const suspenseData: string = suspenseHook.data
-suspenseHook.error satisfies EffectRpcQueryError<'not-found'> | null
-usePrefetchQuery(queryOptions)
+const queryHook = useQuery(queryOptions);
+const queryHookData: string | undefined = queryHook.data;
+queryHook.error satisfies EffectRpcQueryError<"not-found"> | null;
+const suspenseHook = useSuspenseQuery(queryOptions);
+const suspenseData: string = suspenseHook.data;
+suspenseHook.error satisfies EffectRpcQueryError<"not-found"> | null;
+usePrefetchQuery(queryOptions);
 
-void [clientOwnedQueryHash, queryHookData, suspenseData]
+void [clientOwnedQueryHash, queryHookData, suspenseData];
 
 const possiblyInitialized = utils.users.get.queryOptions({
-  input: { id: 1, locale: 'de' },
+  input: { id: 1, locale: "de" },
   initialData: () => undefined,
-})
+});
 const possiblyUndefinedInitialData:
   | { readonly id: number; readonly name: string }
   | (() => { readonly id: number; readonly name: string } | undefined)
-  | undefined = possiblyInitialized.initialData
-void possiblyUndefinedInitialData
+  | undefined = possiblyInitialized.initialData;
+void possiblyUndefinedInitialData;
 
-declare const directInitialData: QueryData<Rpc.Success<typeof GetUser>> | undefined
+declare const directInitialData:
+  | QueryData<Rpc.Success<typeof GetUser>>
+  | undefined;
 const possiblyDirectlyInitialized = utils.users.get.queryOptions({
   input: { id: 1 },
   initialData: directInitialData,
-})
+});
 const possiblyDirectInitialData:
   | { readonly id: number; readonly name: string }
   | (() => { readonly id: number; readonly name: string } | undefined)
-  | undefined = possiblyDirectlyInitialized.initialData
-void possiblyDirectInitialData
+  | undefined = possiblyDirectlyInitialized.initialData;
+void possiblyDirectInitialData;
 
-const encoderGroup = RpcGroup.make(Serviceful, Secret)
-type EncoderRpcs = RpcGroup.Rpcs<typeof encoderGroup>
-declare const encoderClient: RpcClient.RpcClient.Flat<EncoderRpcs>
-declare const encoderRunner: RunPromiseExit<EncodingService>
+const encoderGroup = RpcGroup.make(Serviceful, Secret);
+type EncoderRpcs = RpcGroup.Rpcs<typeof encoderGroup>;
+declare const encoderClient: RpcClient.RpcClient.Flat<EncoderRpcs>;
+declare const encoderRunner: RunPromiseExit<EncodingService>;
 
 // @ts-expect-error serviceful and redacted payloads require explicit key encoders
-const missingEncoderOptions: CreateRpcQueryUtilsOptions<typeof encoderGroup, typeof keyPrefix> = {
+const missingEncoderOptions: CreateRpcQueryUtilsOptions<
+  typeof encoderGroup,
+  typeof keyPrefix
+> = {
   client: encoderClient,
   keyPrefix,
   runPromiseExit: encoderRunner,
-}
-void missingEncoderOptions
+};
+void missingEncoderOptions;
 
-const encoderOptions: CreateRpcQueryUtilsOptions<typeof encoderGroup, typeof keyPrefix> = {
+const encoderOptions: CreateRpcQueryUtilsOptions<
+  typeof encoderGroup,
+  typeof keyPrefix
+> = {
   client: encoderClient,
   keyEncoders: {
-    'encoding.serviceful': (payload) => payload,
-    'secrets.read': () => ({ redacted: true }),
+    "encoding.serviceful": (payload) => payload,
+    "secrets.read": () => ({ redacted: true }),
   },
   keyPrefix,
   runPromiseExit: encoderRunner,
-}
-createRpcQueryUtils(encoderGroup, encoderOptions)
+};
+createRpcQueryUtils(encoderGroup, encoderOptions);
 // @ts-expect-error Key encoders do not satisfy residual RPC execution services.
 createRpcQueryUtils(encoderGroup, {
   client: encoderClient,
   keyPrefix,
   keyEncoders: encoderOptions.keyEncoders,
-})
+});
 
-const secretListGroup = RpcGroup.make(SecretList)
-type SecretListRpcs = RpcGroup.Rpcs<typeof secretListGroup>
-declare const secretListClient: RpcClient.RpcClient.Flat<SecretListRpcs>
+const secretListGroup = RpcGroup.make(SecretList);
+type SecretListRpcs = RpcGroup.Rpcs<typeof secretListGroup>;
+declare const secretListClient: RpcClient.RpcClient.Flat<SecretListRpcs>;
 
 // @ts-expect-error redacted values nested in a top-level array require an encoder
 const missingSecretListEncoder: CreateRpcQueryUtilsOptions<
@@ -902,622 +1094,736 @@ const missingSecretListEncoder: CreateRpcQueryUtilsOptions<
 > = {
   client: secretListClient,
   keyPrefix,
-}
-void missingSecretListEncoder
+};
+void missingSecretListEncoder;
 
 const cachedUser: { readonly id: number; readonly name: string } | undefined =
-  queryClient.getQueryData(utils.users.get.queryKey({ id: 1 }))
-void cachedUser
+  queryClient.getQueryData(utils.users.get.queryKey({ id: 1 }));
+void cachedUser;
 
-const concreteQueryKey = utils.users.get.queryKey({ id: 1 })
-concreteQueryKey satisfies readonly ['app', 'rpc', 'users', 'get', 'query', JsonValue]
-const cachedState = queryClient.getQueryState(concreteQueryKey)
-cachedState?.error satisfies EffectRpcQueryError<'not-found'> | null | undefined
+const concreteQueryKey = utils.users.get.queryKey({ id: 1 });
+concreteQueryKey satisfies readonly [
+  "app",
+  "rpc",
+  "users",
+  "get",
+  "query",
+  JsonValue,
+];
+const cachedState = queryClient.getQueryState(concreteQueryKey);
+cachedState?.error satisfies
+  | EffectRpcQueryError<"not-found">
+  | null
+  | undefined;
 
 // @ts-expect-error Query builders accept options objects.
-utils.users.get.queryOptions(skipToken)
+utils.users.get.queryOptions(skipToken);
 // @ts-expect-error Stream builders accept options objects.
-utils.events.watch.streamedOptions(skipToken)
+utils.events.watch.streamedOptions(skipToken);
 // @ts-expect-error Live builders accept options objects.
-utils.events.watch.liveOptions(skipToken)
-const skipped = utils.users.get.queryOptions({ input: skipToken })
-skipped.queryFn satisfies typeof queryCoreSkipToken
-const typedSkipToken: SkipToken = skipped.queryFn
-void typedSkipToken
+utils.events.watch.liveOptions(skipToken);
+const skipped = utils.users.get.queryOptions({ input: skipToken });
+skipped.queryFn satisfies typeof queryCoreSkipToken;
+const typedSkipToken: SkipToken = skipped.queryFn;
+void typedSkipToken;
 type ClientOwnedSkippedQueryHash = Assert<
-  Equal<Extract<'queryKeyHashFn' | 'queryHash', keyof typeof skipped>, never>
->
-const clientOwnedSkippedQueryHash: ClientOwnedSkippedQueryHash = true
-void clientOwnedSkippedQueryHash
-const skippedHook = useQuery(skipped)
-const skippedData: { readonly id: number; readonly name: string } | undefined = skippedHook.data
-skippedHook.error satisfies EffectRpcQueryError<'not-found'> | null
-void skippedData
+  Equal<Extract<"queryKeyHashFn" | "queryHash", keyof typeof skipped>, never>
+>;
+const clientOwnedSkippedQueryHash: ClientOwnedSkippedQueryHash = true;
+void clientOwnedSkippedQueryHash;
+const skippedHook = useQuery(skipped);
+const skippedData: { readonly id: number; readonly name: string } | undefined =
+  skippedHook.data;
+skippedHook.error satisfies EffectRpcQueryError<"not-found"> | null;
+void skippedData;
 
 // @ts-expect-error suspense queries cannot use the skip sentinel
-useSuspenseQuery(skipped)
+useSuspenseQuery(skipped);
 // @ts-expect-error prefetch-only hooks cannot use the skip sentinel
-usePrefetchQuery(skipped)
+usePrefetchQuery(skipped);
 
-const pingQuery: Promise<null> = queryClient.query(utils.health.ping.queryOptions())
-void pingQuery
+const pingQuery: Promise<null> = queryClient.query(
+  utils.health.ping.queryOptions()
+);
+void pingQuery;
 
-const pingMutation = new MutationObserver(queryClient, utils.health.ping.mutationOptions())
-const pingMutationResult: Promise<void> = pingMutation.mutate(undefined)
-void pingMutationResult
+const pingMutation = new MutationObserver(
+  queryClient,
+  utils.health.ping.mutationOptions()
+);
+const pingMutationResult: Promise<void> = pingMutation.mutate(undefined);
+void pingMutationResult;
 
 const getMutationOptions = utils.users.get.mutationOptions<{
-  readonly previousName: string
+  readonly previousName: string;
 }>({
   gcTime: 60_000,
   retryDelay: (attemptIndex, error) => {
-    attemptIndex satisfies number
-    error satisfies EffectRpcQueryError<'not-found'>
-    return 0
+    attemptIndex satisfies number;
+    error satisfies EffectRpcQueryError<"not-found">;
+    return 0;
   },
   onError: (error, variables, onMutateResult) => {
-    error satisfies EffectRpcQueryError<'not-found'>
-    variables satisfies { readonly id: number; readonly locale?: string }
-    onMutateResult satisfies { readonly previousName: string } | undefined
+    error satisfies EffectRpcQueryError<"not-found">;
+    variables satisfies { readonly id: number; readonly locale?: string };
+    onMutateResult satisfies { readonly previousName: string } | undefined;
   },
   onMutate: (variables) => {
-    variables satisfies { readonly id: number; readonly locale?: string }
-    return { previousName: 'Grace' }
+    variables satisfies { readonly id: number; readonly locale?: string };
+    return { previousName: "Grace" };
   },
   onSuccess: (data, variables, onMutateResult) => {
-    data satisfies { readonly id: number; readonly name: string }
-    variables satisfies { readonly id: number; readonly locale?: string }
-    onMutateResult satisfies { readonly previousName: string }
+    data satisfies { readonly id: number; readonly name: string };
+    variables satisfies { readonly id: number; readonly locale?: string };
+    onMutateResult satisfies { readonly previousName: string };
   },
   throwOnError: (error) => {
-    error satisfies EffectRpcQueryError<'not-found'>
-    return false
+    error satisfies EffectRpcQueryError<"not-found">;
+    return false;
   },
-})
-getMutationOptions.mutationKey satisfies readonly ['app', 'rpc', 'users', 'get', 'mutation']
+});
+getMutationOptions.mutationKey satisfies readonly [
+  "app",
+  "rpc",
+  "users",
+  "get",
+  "mutation",
+];
 getMutationOptions.throwOnError satisfies
   | boolean
-  | ((error: EffectRpcQueryError<'not-found'>) => boolean)
-  | undefined
-const getMutation = new MutationObserver(queryClient, getMutationOptions)
-const getMutationResult: Promise<{ readonly id: number; readonly name: string }> =
-  getMutation.mutate({ id: 1 })
-void getMutationResult
+  | ((error: EffectRpcQueryError<"not-found">) => boolean)
+  | undefined;
+const getMutation = new MutationObserver(queryClient, getMutationOptions);
+const getMutationResult: Promise<{
+  readonly id: number;
+  readonly name: string;
+}> = getMutation.mutate({ id: 1 });
+void getMutationResult;
 
 const inferredMutationOptions = utils.users.get.mutationOptions({
   onMutate: (variables) => {
     true satisfies Assert<
       Equal<typeof variables, { readonly id: number; readonly locale?: string }>
-    >
-    return { previousId: variables.id }
+    >;
+    return { previousId: variables.id };
   },
   onSuccess: (data, variables, onMutateResult) => {
-    data satisfies { readonly id: number; readonly name: string }
-    variables satisfies { readonly id: number; readonly locale?: string }
-    onMutateResult.previousId satisfies number
+    data satisfies { readonly id: number; readonly name: string };
+    variables satisfies { readonly id: number; readonly locale?: string };
+    onMutateResult.previousId satisfies number;
   },
   onError: (error, variables, onMutateResult) => {
-    error satisfies EffectRpcQueryError<'not-found'>
-    variables satisfies { readonly id: number; readonly locale?: string }
-    onMutateResult?.previousId satisfies number | undefined
+    error satisfies EffectRpcQueryError<"not-found">;
+    variables satisfies { readonly id: number; readonly locale?: string };
+    onMutateResult?.previousId satisfies number | undefined;
   },
   onSettled: (data, error, variables, onMutateResult) => {
-    data satisfies { readonly id: number; readonly name: string } | undefined
-    error satisfies EffectRpcQueryError<'not-found'> | null
-    variables satisfies { readonly id: number; readonly locale?: string }
-    onMutateResult?.previousId satisfies number | undefined
+    data satisfies { readonly id: number; readonly name: string } | undefined;
+    error satisfies EffectRpcQueryError<"not-found"> | null;
+    variables satisfies { readonly id: number; readonly locale?: string };
+    onMutateResult?.previousId satisfies number | undefined;
   },
-})
-new MutationObserver(queryClient, inferredMutationOptions).mutate({ id: 1 }) satisfies Promise<{
-  readonly id: number
-  readonly name: string
-}>
+});
+new MutationObserver(queryClient, inferredMutationOptions).mutate({
+  id: 1,
+}) satisfies Promise<{
+  readonly id: number;
+  readonly name: string;
+}>;
 
 // @ts-expect-error mutation variables arrive at execution, not option construction
-utils.users.get.mutationOptions({ input: { id: 1 } })
+utils.users.get.mutationOptions({ input: { id: 1 } });
 utils.users.get.mutationOptions({
   // @ts-expect-error the package owns the mutation function
-  mutationFn: async () => ({ id: 1, name: 'Grace' }),
-})
+  mutationFn: async () => ({ id: 1, name: "Grace" }),
+});
 utils.users.get.mutationOptions({
   // @ts-expect-error the package owns the mutation key
-  mutationKey: ['custom'],
-})
+  mutationKey: ["custom"],
+});
 
 utils.admin.secure.queryOptions({
   retry: (_count, error) => {
-    error satisfies EffectRpcQueryError<'unauthorized'>
-    return false
+    error satisfies EffectRpcQueryError<"unauthorized">;
+    return false;
   },
-})
+});
 
 // @ts-expect-error payload-bearing queries require input or skipToken
-utils.users.get.queryOptions({})
+utils.users.get.queryOptions({});
 // @ts-expect-error payloadless queries do not accept an input field
-utils.health.ping.queryOptions({ input: undefined })
+utils.health.ping.queryOptions({ input: undefined });
 // @ts-expect-error payloadless queries do not accept the skip sentinel
-utils.health.ping.queryOptions(skipToken)
+utils.health.ping.queryOptions(skipToken);
 // @ts-expect-error key builders never accept the skip sentinel
-utils.users.get.queryKey(skipToken)
+utils.users.get.queryKey(skipToken);
 // @ts-expect-error mutation builders never accept the skip sentinel
-utils.users.get.mutationOptions(skipToken)
+utils.users.get.mutationOptions(skipToken);
 utils.users.get.queryOptions({
   input: { id: 1 },
   // @ts-expect-error the package owns the query function
   queryFn: queryCoreSkipToken,
-})
+});
 utils.users.get.queryOptions({
   input: { id: 1 },
   // @ts-expect-error the package owns the query key
-  queryKey: ['custom'],
-})
+  queryKey: ["custom"],
+});
 utils.users.get.queryOptions({
   input: { id: 1 },
   // @ts-expect-error QueryClient defaults own hashing.
   queryKeyHashFn: JSON.stringify,
-})
-void utils.projects.watch.streamedOptions({})
+});
+void utils.projects.watch.streamedOptions({});
 // @ts-expect-error streaming leaves do not expose unary query builders
-void utils.projects.watch.queryOptions
+void utils.projects.watch.queryOptions;
 // @ts-expect-error unary leaves do not expose streaming query builders
-void utils.projects['by-id'].find.streamedOptions
+void utils.projects["by-id"].find.streamedOptions;
 // @ts-expect-error leaves expose no direct execution helper
-void utils.projects['by-id'].find.call
+void utils.projects["by-id"].find.call;
 // @ts-expect-error leaves expose no mutation cancellation helper
-void utils.users.get.cancelMutation
+void utils.users.get.cancelMutation;
 
 if (skipToken !== queryCoreSkipToken || skipToken !== reactQuerySkipToken) {
-  throw new Error('skipToken must preserve Query Core and React Query identity')
+  throw new Error(
+    "skipToken must preserve Query Core and React Query identity"
+  );
 }
 
 const skippedQueryObject = utils.users.get.queryOptions({
   input: skipToken,
   select: (user) => user.name,
   staleTime: (query) => {
-    query.queryKey satisfies readonly ['app', 'rpc', 'users', 'get', 'query']
-    return 30_000
+    query.queryKey satisfies readonly ["app", "rpc", "users", "get", "query"];
+    return 30_000;
   },
   retry: (_count, error) => {
-    error satisfies EffectRpcQueryError<'not-found'>
-    return false
+    error satisfies EffectRpcQueryError<"not-found">;
+    return false;
   },
-})
-const skippedQueryResult = useQuery(skippedQueryObject)
-skippedQueryResult.data satisfies string | undefined
+});
+const skippedQueryResult = useQuery(skippedQueryObject);
+skippedQueryResult.data satisfies string | undefined;
 // @ts-expect-error no initial data guarantees a value
-skippedQueryResult.data satisfies string
-new QueryObserver(queryClient, skippedQueryObject).getCurrentResult().data satisfies
-  | string
-  | undefined
-skippedQueryObject.queryFn satisfies SkipToken
-skippedQueryObject.queryKey satisfies readonly ['app', 'rpc', 'users', 'get', 'query']
+skippedQueryResult.data satisfies string;
+new QueryObserver(queryClient, skippedQueryObject).getCurrentResult()
+  .data satisfies string | undefined;
+skippedQueryObject.queryFn satisfies SkipToken;
+skippedQueryObject.queryKey satisfies readonly [
+  "app",
+  "rpc",
+  "users",
+  "get",
+  "query",
+];
 // @ts-expect-error package input is consumed
-skippedQueryObject.input
+skippedQueryObject.input;
 // @ts-expect-error suspense requires an executable query function
-useSuspenseQuery(skippedQueryObject)
+useSuspenseQuery(skippedQueryObject);
 // @ts-expect-error prefetch-only hooks require an executable query function
-usePrefetchQuery(skippedQueryObject)
+usePrefetchQuery(skippedQueryObject);
 
 const skippedStreamObject = utils.events.watch.streamedOptions({
   maxChunks: 50,
   input: skipToken,
-  refetchMode: 'append',
-  select: (values) => values.join(', '),
-})
-useQuery(skippedStreamObject).data satisfies string | undefined
-new QueryObserver(queryClient, skippedStreamObject).getCurrentResult().data satisfies
-  | string
-  | undefined
-skippedStreamObject.queryFn satisfies SkipToken
-skippedStreamObject.queryKey satisfies readonly ['app', 'rpc', 'events', 'watch', 'streamed']
+  refetchMode: "append",
+  select: (values) => values.join(", "),
+});
+useQuery(skippedStreamObject).data satisfies string | undefined;
+new QueryObserver(queryClient, skippedStreamObject).getCurrentResult()
+  .data satisfies string | undefined;
+skippedStreamObject.queryFn satisfies SkipToken;
+skippedStreamObject.queryKey satisfies readonly [
+  "app",
+  "rpc",
+  "events",
+  "watch",
+  "streamed",
+];
 // @ts-expect-error stream policy is consumed
-skippedStreamObject.refetchMode
+skippedStreamObject.refetchMode;
 // @ts-expect-error package input is consumed
-skippedStreamObject.input
+skippedStreamObject.input;
 // @ts-expect-error suspense requires an executable query function
-useSuspenseQuery(skippedStreamObject)
+useSuspenseQuery(skippedStreamObject);
 // @ts-expect-error prefetch-only hooks require an executable query function
-usePrefetchQuery(skippedStreamObject)
+usePrefetchQuery(skippedStreamObject);
 
 const skippedLiveObject = utils.events.watch.liveOptions({
   input: skipToken,
   select: (value) => value.length,
-})
-const skippedLiveResult = useQuery(skippedLiveObject)
-skippedLiveResult.data satisfies number | undefined
-skippedLiveResult.error satisfies EffectRpcQueryEmptyStreamError | WatchStreamError | null
-new QueryObserver(queryClient, skippedLiveObject).getCurrentResult().data satisfies
-  | number
-  | undefined
-skippedLiveObject.queryFn satisfies SkipToken
-skippedLiveObject.queryKey satisfies readonly ['app', 'rpc', 'events', 'watch', 'live']
+});
+const skippedLiveResult = useQuery(skippedLiveObject);
+skippedLiveResult.data satisfies number | undefined;
+skippedLiveResult.error satisfies
+  | EffectRpcQueryEmptyStreamError
+  | WatchStreamError
+  | null;
+new QueryObserver(queryClient, skippedLiveObject).getCurrentResult()
+  .data satisfies number | undefined;
+skippedLiveObject.queryFn satisfies SkipToken;
+skippedLiveObject.queryKey satisfies readonly [
+  "app",
+  "rpc",
+  "events",
+  "watch",
+  "live",
+];
 // @ts-expect-error package input is consumed
-skippedLiveObject.input
+skippedLiveObject.input;
 // @ts-expect-error suspense requires an executable query function
-useSuspenseQuery(skippedLiveObject)
+useSuspenseQuery(skippedLiveObject);
 // @ts-expect-error prefetch-only hooks require an executable query function
-usePrefetchQuery(skippedLiveObject)
+usePrefetchQuery(skippedLiveObject);
 
 const skippedInfiniteObject = utils.users.pages.infiniteOptions({
   input: skipToken,
   initialPageParam: 0,
   getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
   select: (data) => data.pages.flatMap((page) => page.users).length,
-})
-useInfiniteQuery(skippedInfiniteObject).data satisfies number | undefined
-new InfiniteQueryObserver(queryClient, skippedInfiniteObject).getCurrentResult().data satisfies
-  | number
-  | undefined
-skippedInfiniteObject.queryFn satisfies SkipToken
+});
+useInfiniteQuery(skippedInfiniteObject).data satisfies number | undefined;
+new InfiniteQueryObserver(queryClient, skippedInfiniteObject).getCurrentResult()
+  .data satisfies number | undefined;
+skippedInfiniteObject.queryFn satisfies SkipToken;
 // @ts-expect-error package input is consumed
-skippedInfiniteObject.input
+skippedInfiniteObject.input;
 
 useQuery(
   utils.users.get.queryOptions({
     input: skipToken,
-    initialData: { id: 1, name: 'Ada' },
+    initialData: { id: 1, name: "Ada" },
     select: (value) => value.name,
-  }),
-).data satisfies string | undefined
+  })
+).data satisfies string | undefined;
 useQuery(
   utils.users.get.queryOptions({
     input: skipToken,
-    initialData: () => ({ id: 1, name: 'Ada' }),
+    initialData: () => ({ id: 1, name: "Ada" }),
     select: (value) => value.name,
-  }),
-).data satisfies string | undefined
-declare const optionalQueryInitial: () => { id: number; name: string } | undefined
+  })
+).data satisfies string | undefined;
+declare const optionalQueryInitial: () =>
+  | { id: number; name: string }
+  | undefined;
 const optionalQueryResult = useQuery(
-  utils.users.get.queryOptions({ input: skipToken, initialData: optionalQueryInitial }),
-)
+  utils.users.get.queryOptions({
+    input: skipToken,
+    initialData: optionalQueryInitial,
+  })
+);
 // @ts-expect-error an initial-data function may return undefined
-optionalQueryResult.data satisfies { id: number; name: string }
-declare const optionalQueryInitialValue: { readonly id: number; readonly name: string } | undefined
+optionalQueryResult.data satisfies { id: number; name: string };
+declare const optionalQueryInitialValue:
+  | { readonly id: number; readonly name: string }
+  | undefined;
 const optionalSkippedQueryValue = useQuery(
-  utils.users.get.queryOptions({ input: skipToken, initialData: optionalQueryInitialValue }),
-)
+  utils.users.get.queryOptions({
+    input: skipToken,
+    initialData: optionalQueryInitialValue,
+  })
+);
 true satisfies Assert<
   Equal<
     typeof optionalSkippedQueryValue.data,
     { readonly id: number; readonly name: string } | undefined
   >
->
+>;
 useQuery(
   utils.events.watch.streamedOptions({
     input: skipToken,
-    initialData: ['first'],
-    select: (values) => values.join(', '),
-  }),
-).data satisfies string | undefined
+    initialData: ["first"],
+    select: (values) => values.join(", "),
+  })
+).data satisfies string | undefined;
 useQuery(
   utils.events.watch.streamedOptions({
     input: skipToken,
-    initialData: () => ['first'],
-    select: (values) => values.join(', '),
-  }),
-).data satisfies string | undefined
-declare const optionalStreamedInitial: () => ReadonlyArray<string> | undefined
+    initialData: () => ["first"],
+    select: (values) => values.join(", "),
+  })
+).data satisfies string | undefined;
+declare const optionalStreamedInitial: () => ReadonlyArray<string> | undefined;
 const optionalStreamedResult = useQuery(
-  utils.events.watch.streamedOptions({ input: skipToken, initialData: optionalStreamedInitial }),
-)
+  utils.events.watch.streamedOptions({
+    input: skipToken,
+    initialData: optionalStreamedInitial,
+  })
+);
 // @ts-expect-error an initial-data function may return undefined
-optionalStreamedResult.data satisfies ReadonlyArray<string>
-declare const optionalStreamedInitialValue: ReadonlyArray<string> | undefined
+optionalStreamedResult.data satisfies ReadonlyArray<string>;
+declare const optionalStreamedInitialValue: ReadonlyArray<string> | undefined;
 const optionalSkippedStreamedValue = useQuery(
   utils.events.watch.streamedOptions({
     input: skipToken,
     initialData: optionalStreamedInitialValue,
-  }),
-)
+  })
+);
 true satisfies Assert<
-  Equal<typeof optionalSkippedStreamedValue.data, ReadonlyArray<string> | undefined>
->
+  Equal<
+    typeof optionalSkippedStreamedValue.data,
+    ReadonlyArray<string> | undefined
+  >
+>;
 useQuery(
   utils.events.watch.liveOptions({
     input: skipToken,
-    initialData: 'first',
+    initialData: "first",
     select: (value) => value.length,
-  }),
-).data satisfies number | undefined
+  })
+).data satisfies number | undefined;
 useQuery(
   utils.events.watch.liveOptions({
     input: skipToken,
-    initialData: () => 'first',
+    initialData: () => "first",
     select: (value) => value.length,
-  }),
-).data satisfies number | undefined
-declare const optionalLiveInitial: () => string | undefined
+  })
+).data satisfies number | undefined;
+declare const optionalLiveInitial: () => string | undefined;
 const optionalLiveResult = useQuery(
-  utils.events.watch.liveOptions({ input: skipToken, initialData: optionalLiveInitial }),
-)
+  utils.events.watch.liveOptions({
+    input: skipToken,
+    initialData: optionalLiveInitial,
+  })
+);
 // @ts-expect-error an initial-data function may return undefined
-optionalLiveResult.data satisfies string
-declare const optionalLiveInitialValue: string | undefined
+optionalLiveResult.data satisfies string;
+declare const optionalLiveInitialValue: string | undefined;
 const optionalSkippedLiveValue = useQuery(
-  utils.events.watch.liveOptions({ input: skipToken, initialData: optionalLiveInitialValue }),
-)
-true satisfies Assert<Equal<typeof optionalSkippedLiveValue.data, string | undefined>>
+  utils.events.watch.liveOptions({
+    input: skipToken,
+    initialData: optionalLiveInitialValue,
+  })
+);
+true satisfies Assert<
+  Equal<typeof optionalSkippedLiveValue.data, string | undefined>
+>;
 // @ts-expect-error skipping does not widen the supported builder inputs
-utils.health.ping.queryOptions({ input: skipToken })
+utils.health.ping.queryOptions({ input: skipToken });
 utils.health.ping.infiniteOptions({
   // @ts-expect-error payloadless infinite queries have no input
   input: skipToken,
   initialPageParam: 0,
   getNextPageParam: () => undefined,
-})
+});
 // @ts-expect-error skipping does not widen the supported builder inputs
-utils.events.audit.watch.streamedOptions({ input: skipToken })
+utils.events.audit.watch.streamedOptions({ input: skipToken });
 // @ts-expect-error skipping does not widen the supported builder inputs
-utils.events.audit.watch.liveOptions({ input: skipToken })
+utils.events.audit.watch.liveOptions({ input: skipToken });
 // @ts-expect-error skipping does not widen the supported builder inputs
-utils.events.audit.watch.streamedOptions(skipToken)
+utils.events.audit.watch.streamedOptions(skipToken);
 // @ts-expect-error skipping does not widen the supported builder inputs
-utils.events.audit.watch.liveOptions(skipToken)
+utils.events.audit.watch.liveOptions(skipToken);
 // @ts-expect-error skipping does not widen the supported builder inputs
-utils.users.get.infiniteKey(skipToken)
+utils.users.get.infiniteKey(skipToken);
 // @ts-expect-error skipping does not widen the supported builder inputs
-utils.events.watch.streamedKey(skipToken)
+utils.events.watch.streamedKey(skipToken);
 // @ts-expect-error skipping does not widen the supported builder inputs
-utils.events.watch.liveKey(skipToken)
+utils.events.watch.liveKey(skipToken);
 // @ts-expect-error skipping does not widen the supported builder inputs
-utils.events.watch.liveOptions({ input: skipToken, refetchMode: 'append' })
+utils.events.watch.liveOptions({ input: skipToken, refetchMode: "append" });
 // @ts-expect-error skipping does not widen the supported builder inputs
-utils.users.get.queryOptions({ input: skipToken, queryKey: [] })
+utils.users.get.queryOptions({ input: skipToken, queryKey: [] });
 // @ts-expect-error skipping does not widen the supported builder inputs
-utils.events.watch.streamedOptions({ input: skipToken, queryFn: skipToken })
+utils.events.watch.streamedOptions({ input: skipToken, queryFn: skipToken });
 // @ts-expect-error skipping does not widen the supported builder inputs
-utils.events.watch.liveOptions({ input: skipToken, queryKeyHashFn: () => '' })
+utils.events.watch.liveOptions({ input: skipToken, queryKeyHashFn: () => "" });
 
 const initializedSkippedQuery = utils.users.get.queryOptions({
   input: skipToken,
-  initialData: { id: 1, name: 'Ada' },
-})
+  initialData: { id: 1, name: "Ada" },
+});
 initializedSkippedQuery.initialData satisfies
   | { readonly id: number; readonly name: string }
-  | (() => { readonly id: number; readonly name: string })
+  | (() => { readonly id: number; readonly name: string });
 const initializedSkippedStream = utils.events.watch.streamedOptions({
   input: skipToken,
-  initialData: () => ['first'],
-})
-initializedSkippedStream.initialData satisfies ReadonlyArray<string> | (() => ReadonlyArray<string>)
+  initialData: () => ["first"],
+});
+initializedSkippedStream.initialData satisfies
+  | ReadonlyArray<string>
+  | (() => ReadonlyArray<string>);
 const initializedSkippedLive = utils.events.watch.liveOptions({
   input: skipToken,
-  initialData: 'first',
-})
-initializedSkippedLive.initialData satisfies string | (() => string)
+  initialData: "first",
+});
+initializedSkippedLive.initialData satisfies string | (() => string);
 // @ts-expect-error React Query's defined-data overload excludes skipToken
-useQuery(initializedSkippedQuery).data satisfies { readonly id: number; readonly name: string }
+useQuery(initializedSkippedQuery).data satisfies {
+  readonly id: number;
+  readonly name: string;
+};
 // @ts-expect-error React Query's defined-data overload excludes skipToken
-useQuery(initializedSkippedStream).data satisfies ReadonlyArray<string>
+useQuery(initializedSkippedStream).data satisfies ReadonlyArray<string>;
 // @ts-expect-error React Query's defined-data overload excludes skipToken
-useQuery(initializedSkippedLive).data satisfies string
+useQuery(initializedSkippedLive).data satisfies string;
 
 // @ts-expect-error accumulated-stream policy is consumed before returning Query Core options
-streamedOptions.maxChunks
+streamedOptions.maxChunks;
 // @ts-expect-error skipped options also consume the accumulation bound
-skippedStreamObject.maxChunks
+skippedStreamObject.maxChunks;
 // @ts-expect-error live queries retain only the latest value
-utils.events.watch.liveOptions({ input: { channel: 'news' }, maxChunks: 2 })
+utils.events.watch.liveOptions({ input: { channel: "news" }, maxChunks: 2 });
 // @ts-expect-error skipped live queries have no accumulation policy
-utils.events.watch.liveOptions({ input: skipToken, maxChunks: 2 })
-// @ts-expect-error accumulation bounds are numeric
-utils.events.watch.streamedOptions({ input: { channel: 'news' }, maxChunks: '2' })
-utils.events.audit.watch.streamedOptions({ maxChunks: 2, initialData: [] })
-utils.events.watch.streamedOptions({ input: skipToken, maxChunks: 2, initialData: [] })
+utils.events.watch.liveOptions({ input: skipToken, maxChunks: 2 });
+utils.events.watch.streamedOptions({
+  input: { channel: "news" },
+  // @ts-expect-error accumulation bounds are numeric
+  maxChunks: "2",
+});
+utils.events.audit.watch.streamedOptions({ maxChunks: 2, initialData: [] });
+utils.events.watch.streamedOptions({
+  input: skipToken,
+  maxChunks: 2,
+  initialData: [],
+});
 
-declare const conditionalStreamInput: { readonly channel: string } | typeof skipToken
+declare const conditionalStreamInput:
+  | { readonly channel: string }
+  | typeof skipToken;
 const conditionalStreamOptions = utils.events.watch.streamedOptions({
   input: conditionalStreamInput,
   maxChunks: 5,
-  refetchMode: 'append',
+  refetchMode: "append",
   rpcOptions: { streamBufferSize: 8 },
-  select: (values) => values.join(', '),
+  select: (values) => values.join(", "),
   staleTime: (query) => {
     query.queryKey satisfies
-      | readonly ['app', 'rpc', 'events', 'watch', 'streamed']
-      | readonly ['app', 'rpc', 'events', 'watch', 'streamed', ...JsonValue[]]
-    return 30_000
+      | readonly ["app", "rpc", "events", "watch", "streamed"]
+      | readonly ["app", "rpc", "events", "watch", "streamed", ...JsonValue[]];
+    return 30_000;
   },
-})
+});
 conditionalStreamOptions.queryFn satisfies
-  | QueryFunction<ReadonlyArray<string>, typeof conditionalStreamOptions.queryKey>
-  | SkipToken
-const conditionalStreamHook = useQuery(conditionalStreamOptions)
-true satisfies Assert<Equal<typeof conditionalStreamHook.data, string | undefined>>
-true satisfies Assert<Equal<typeof conditionalStreamHook.error, WatchStreamError | null>>
-new QueryObserver(queryClient, conditionalStreamOptions).getCurrentResult().data satisfies
-  | string
-  | undefined
+  | QueryFunction<
+      ReadonlyArray<string>,
+      typeof conditionalStreamOptions.queryKey
+    >
+  | SkipToken;
+const conditionalStreamHook = useQuery(conditionalStreamOptions);
+true satisfies Assert<
+  Equal<typeof conditionalStreamHook.data, string | undefined>
+>;
+true satisfies Assert<
+  Equal<typeof conditionalStreamHook.error, WatchStreamError | null>
+>;
+new QueryObserver(queryClient, conditionalStreamOptions).getCurrentResult()
+  .data satisfies string | undefined;
 // @ts-expect-error accumulated-stream policy is consumed for conditional inputs
-conditionalStreamOptions.maxChunks
+conditionalStreamOptions.maxChunks;
 // @ts-expect-error request-local options are consumed for conditional inputs
-conditionalStreamOptions.rpcOptions
+conditionalStreamOptions.rpcOptions;
 // @ts-expect-error suspense requires an executable query function
-useSuspenseQuery(conditionalStreamOptions)
+useSuspenseQuery(conditionalStreamOptions);
 // @ts-expect-error prefetch-only hooks require an executable query function
-usePrefetchQuery(conditionalStreamOptions)
+usePrefetchQuery(conditionalStreamOptions);
 
 const conditionalLiveOptions = utils.events.watch.liveOptions({
   input: conditionalStreamInput,
-  rpcOptions: { headers: { 'x-request-id': 'fixture' }, streamBufferSize: 8 },
+  rpcOptions: { headers: { "x-request-id": "fixture" }, streamBufferSize: 8 },
   select: (value) => value.length,
-})
+});
 conditionalLiveOptions.queryFn satisfies
   | QueryFunction<string, typeof conditionalLiveOptions.queryKey>
-  | SkipToken
-const conditionalLiveHook = useQuery(conditionalLiveOptions)
-true satisfies Assert<Equal<typeof conditionalLiveHook.data, number | undefined>>
+  | SkipToken;
+const conditionalLiveHook = useQuery(conditionalLiveOptions);
 true satisfies Assert<
-  Equal<typeof conditionalLiveHook.error, EffectRpcQueryEmptyStreamError | WatchStreamError | null>
->
+  Equal<typeof conditionalLiveHook.data, number | undefined>
+>;
+true satisfies Assert<
+  Equal<
+    typeof conditionalLiveHook.error,
+    EffectRpcQueryEmptyStreamError | WatchStreamError | null
+  >
+>;
 // @ts-expect-error conditional live queries do not accept accumulation policy
-utils.events.watch.liveOptions({ input: conditionalStreamInput, maxChunks: 2 })
+utils.events.watch.liveOptions({ input: conditionalStreamInput, maxChunks: 2 });
 // @ts-expect-error suspense requires an executable query function
-useSuspenseQuery(conditionalLiveOptions)
+useSuspenseQuery(conditionalLiveOptions);
 // @ts-expect-error prefetch-only hooks require an executable query function
-usePrefetchQuery(conditionalLiveOptions)
+usePrefetchQuery(conditionalLiveOptions);
 
 const initializedConditionalStreamOptions = utils.events.watch.streamedOptions({
   input: conditionalStreamInput,
-  initialData: ['initial'],
-  select: (values) => values.join(', '),
-})
+  initialData: ["initial"],
+  select: (values) => values.join(", "),
+});
 initializedConditionalStreamOptions.initialData satisfies
   | ReadonlyArray<string>
-  | (() => ReadonlyArray<string>)
-const initializedConditionalStreamHook = useQuery(initializedConditionalStreamOptions)
-true satisfies Assert<Equal<typeof initializedConditionalStreamHook.data, string | undefined>>
+  | (() => ReadonlyArray<string>);
+const initializedConditionalStreamHook = useQuery(
+  initializedConditionalStreamOptions
+);
+true satisfies Assert<
+  Equal<typeof initializedConditionalStreamHook.data, string | undefined>
+>;
 const initializedConditionalLiveOptions = utils.events.watch.liveOptions({
   input: conditionalStreamInput,
-  initialData: () => 'initial',
+  initialData: () => "initial",
   select: (value) => value.length,
-})
-initializedConditionalLiveOptions.initialData satisfies string | (() => string)
-const initializedConditionalLiveHook = useQuery(initializedConditionalLiveOptions)
-true satisfies Assert<Equal<typeof initializedConditionalLiveHook.data, number | undefined>>
+});
+initializedConditionalLiveOptions.initialData satisfies string | (() => string);
+const initializedConditionalLiveHook = useQuery(
+  initializedConditionalLiveOptions
+);
+true satisfies Assert<
+  Equal<typeof initializedConditionalLiveHook.data, number | undefined>
+>;
 const optionalConditionalStreamedValue = useQuery(
   utils.events.watch.streamedOptions({
     input: conditionalStreamInput,
     initialData: optionalStreamedInitialValue,
     select: (values) => values.length,
-  }),
-)
-true satisfies Assert<Equal<typeof optionalConditionalStreamedValue.data, number | undefined>>
+  })
+);
+true satisfies Assert<
+  Equal<typeof optionalConditionalStreamedValue.data, number | undefined>
+>;
 const optionalConditionalLiveValue = useQuery(
   utils.events.watch.liveOptions({
     input: conditionalStreamInput,
     initialData: optionalLiveInitialValue,
     select: (value) => value.length,
-  }),
-)
-true satisfies Assert<Equal<typeof optionalConditionalLiveValue.data, number | undefined>>
+  })
+);
+true satisfies Assert<
+  Equal<typeof optionalConditionalLiveValue.data, number | undefined>
+>;
 
-declare const conditionalUserId: number | undefined
+declare const conditionalUserId: number | undefined;
 const conditionalUserOptions = utils.users.get.queryOptions({
-  input: conditionalUserId === undefined ? skipToken : { id: conditionalUserId },
+  input:
+    conditionalUserId === undefined ? skipToken : { id: conditionalUserId },
   refetchInterval: (query) => {
     query.queryKey satisfies
-      | readonly ['app', 'rpc', 'users', 'get', 'query']
-      | readonly ['app', 'rpc', 'users', 'get', 'query', JsonValue]
-    return false
+      | readonly ["app", "rpc", "users", "get", "query"]
+      | readonly ["app", "rpc", "users", "get", "query", JsonValue];
+    return false;
   },
   select: (user) => user.name,
   staleTime: 30_000,
-})
-useQuery(conditionalUserOptions).data satisfies string | undefined
-new QueryObserver(queryClient, conditionalUserOptions).getCurrentResult().data satisfies
-  | string
-  | undefined
+});
+useQuery(conditionalUserOptions).data satisfies string | undefined;
+new QueryObserver(queryClient, conditionalUserOptions).getCurrentResult()
+  .data satisfies string | undefined;
 // @ts-expect-error conditional query functions may be skipped
-useSuspenseQuery(conditionalUserOptions)
+useSuspenseQuery(conditionalUserOptions);
 // @ts-expect-error conditional query functions may be skipped
-usePrefetchQuery(conditionalUserOptions)
+usePrefetchQuery(conditionalUserOptions);
 
 // @ts-expect-error package input is consumed for conditional options
-conditionalUserOptions.input
-useQuery(conditionalUserOptions).error satisfies EffectRpcQueryError<'not-found'> | null
+conditionalUserOptions.input;
+useQuery(conditionalUserOptions)
+  .error satisfies EffectRpcQueryError<"not-found"> | null;
 const initializedConditionalUser = utils.users.get.queryOptions({
-  input: conditionalUserId === undefined ? skipToken : { id: conditionalUserId },
-  initialData: { id: 1, name: 'Ada' },
+  input:
+    conditionalUserId === undefined ? skipToken : { id: conditionalUserId },
+  initialData: { id: 1, name: "Ada" },
   select: (user) => user.name,
-})
+});
 initializedConditionalUser.initialData satisfies
   | { readonly id: number; readonly name: string }
-  | (() => { readonly id: number; readonly name: string })
-useQuery(initializedConditionalUser).data satisfies string | undefined
+  | (() => { readonly id: number; readonly name: string });
+useQuery(initializedConditionalUser).data satisfies string | undefined;
 const optionalConditionalUser = useQuery(
   utils.users.get.queryOptions({
-    input: conditionalUserId === undefined ? skipToken : { id: conditionalUserId },
+    input:
+      conditionalUserId === undefined ? skipToken : { id: conditionalUserId },
     initialData: optionalQueryInitialValue,
     select: (user) => user.name,
-  }),
-)
-true satisfies Assert<Equal<typeof optionalConditionalUser.data, string | undefined>>
+  })
+);
+true satisfies Assert<
+  Equal<typeof optionalConditionalUser.data, string | undefined>
+>;
 
 const unaryRpcOptions = {
-  headers: { 'x-request-id': 'fixture' },
+  headers: { "x-request-id": "fixture" },
   context: Context.empty(),
-} satisfies import('@ueberbrot/effect-api-query').UnaryRpcOptions
+} satisfies import("@ueberbrot/effect-api-query").UnaryRpcOptions;
 const streamingRpcOptions = {
   ...unaryRpcOptions,
   streamBufferSize: 8,
-} satisfies import('@ueberbrot/effect-api-query').StreamingRpcOptions
+} satisfies import("@ueberbrot/effect-api-query").StreamingRpcOptions;
 const requestQuery = utils.users.get.queryOptions({
   input: { id: 1 },
   rpcOptions: unaryRpcOptions,
   select: (user) => user.name,
-})
-useQuery(requestQuery).data satisfies string | undefined
+});
+useQuery(requestQuery).data satisfies string | undefined;
 const requestDefined = utils.users.get.queryOptions({
   input: { id: 1 },
   rpcOptions: unaryRpcOptions,
-  initialData: { id: 1, name: 'Ada' },
+  initialData: { id: 1, name: "Ada" },
   select: (user) => user.name,
-})
-useQuery(requestDefined).data satisfies string
+});
+useQuery(requestDefined).data satisfies string;
 const requestInfinite = utils.users.pages.infiniteOptions({
   input: (cursor: number) => ({ cursor }),
   initialPageParam: 0,
   getNextPageParam: (page) => page.nextCursor,
   rpcOptions: unaryRpcOptions,
-})
+});
 useInfiniteQuery(requestInfinite).data satisfies
   | InfiniteData<
       {
-        readonly nextCursor: number | null
-        readonly users: readonly { readonly id: number; readonly name: string }[]
+        readonly nextCursor: number | null;
+        readonly users: readonly {
+          readonly id: number;
+          readonly name: string;
+        }[];
       },
       number
     >
-  | undefined
+  | undefined;
 const requestMutation = utils.users.get.mutationOptions({
   rpcOptions: unaryRpcOptions,
   onMutate: (user) => user.id,
-})
+});
 requestMutation.mutationFn({ id: 1 }) satisfies Promise<{
-  readonly id: number
-  readonly name: string
-}>
+  readonly id: number;
+  readonly name: string;
+}>;
 const requestStreamed = utils.events.watch.streamedOptions({
-  input: { channel: 'news' },
+  input: { channel: "news" },
   rpcOptions: streamingRpcOptions,
   select: (values) => values.length,
-})
-useQuery(requestStreamed).data satisfies number | undefined
+});
+useQuery(requestStreamed).data satisfies number | undefined;
 const requestLive = utils.events.watch.liveOptions({
-  input: { channel: 'news' },
+  input: { channel: "news" },
   rpcOptions: streamingRpcOptions,
-  initialData: 'ready',
+  initialData: "ready",
   select: (value) => value.length,
-})
-useQuery(requestLive).data satisfies number
-utils.health.ping.queryOptions({ rpcOptions: unaryRpcOptions })
+});
+useQuery(requestLive).data satisfies number;
+utils.health.ping.queryOptions({ rpcOptions: unaryRpcOptions });
 utils.health.ping.infiniteOptions({
   rpcOptions: unaryRpcOptions,
   initialPageParam: 0,
   getNextPageParam: () => undefined,
-})
-utils.health.ping.mutationOptions({ rpcOptions: unaryRpcOptions })
-utils.events.audit.watch.streamedOptions({ rpcOptions: streamingRpcOptions })
-utils.events.audit.watch.liveOptions({ rpcOptions: streamingRpcOptions })
+});
+utils.health.ping.mutationOptions({ rpcOptions: unaryRpcOptions });
+utils.events.audit.watch.streamedOptions({ rpcOptions: streamingRpcOptions });
+utils.events.audit.watch.liveOptions({ rpcOptions: streamingRpcOptions });
 const requestSkipped = utils.users.get.queryOptions({
   input: skipToken,
   rpcOptions: unaryRpcOptions,
-})
+});
 const requestSkippedInfinite = utils.users.pages.infiniteOptions({
   input: skipToken,
   rpcOptions: unaryRpcOptions,
   initialPageParam: 0,
   getNextPageParam: () => undefined,
-})
+});
 const requestSkippedStreamed = utils.events.watch.streamedOptions({
   input: skipToken,
   rpcOptions: streamingRpcOptions,
-})
+});
 const requestSkippedLive = utils.events.watch.liveOptions({
   input: skipToken,
   rpcOptions: streamingRpcOptions,
-})
+});
 type RequestOutputs =
   | typeof requestQuery
   | typeof requestInfinite
@@ -1527,44 +1833,57 @@ type RequestOutputs =
   | typeof requestSkipped
   | typeof requestSkippedInfinite
   | typeof requestSkippedStreamed
-  | typeof requestSkippedLive
-type OutputKeys<T> = T extends unknown ? keyof T : never
-true satisfies Assert<Equal<Extract<OutputKeys<RequestOutputs>, 'rpcOptions'>, never>>
-// @ts-expect-error unary requests do not have a stream buffer
-utils.users.get.queryOptions({ input: { id: 1 }, rpcOptions: { streamBufferSize: 8 } })
+  | typeof requestSkippedLive;
+type OutputKeys<T> = T extends unknown ? keyof T : never;
+true satisfies Assert<
+  Equal<Extract<OutputKeys<RequestOutputs>, "rpcOptions">, never>
+>;
+utils.users.get.queryOptions({
+  input: { id: 1 },
+  // @ts-expect-error unary requests do not have a stream buffer
+  rpcOptions: { streamBufferSize: 8 },
+});
 const discardedInfiniteRequest = {
   input: (cursor: number) => ({ cursor }),
   initialPageParam: 0,
   getNextPageParam: () => undefined,
   rpcOptions: { discard: true },
-}
+};
 // @ts-expect-error infinite requests require the unary result
-utils.users.pages.infiniteOptions(discardedInfiniteRequest)
+utils.users.pages.infiniteOptions(discardedInfiniteRequest);
 // @ts-expect-error mutation results cannot be discarded
-utils.users.get.mutationOptions({ rpcOptions: { discard: true } })
-// @ts-expect-error stream adaptation owns queue conversion
-utils.events.watch.streamedOptions({ input: { channel: 'news' }, rpcOptions: { asQueue: true } })
-// @ts-expect-error live adaptation owns queue conversion even when skipped
-utils.events.watch.liveOptions({ input: skipToken, rpcOptions: { asQueue: true } })
-// @ts-expect-error request options are static, not variable callbacks
-utils.users.get.mutationOptions({ rpcOptions: (_variables: { id: number }) => unaryRpcOptions })
+utils.users.get.mutationOptions({ rpcOptions: { discard: true } });
+utils.events.watch.streamedOptions({
+  input: { channel: "news" },
+  // @ts-expect-error stream adaptation owns queue conversion
+  rpcOptions: { asQueue: true },
+});
+utils.events.watch.liveOptions({
+  input: skipToken,
+  // @ts-expect-error live adaptation owns queue conversion even when skipped
+  rpcOptions: { asQueue: true },
+});
+utils.users.get.mutationOptions({
+  // @ts-expect-error request options are static, not variable callbacks
+  rpcOptions: (_variables: { id: number }) => unaryRpcOptions,
+});
 // @ts-expect-error headers must use Effect's header input type
-utils.health.ping.queryOptions({ rpcOptions: { headers: 42 } })
+utils.health.ping.queryOptions({ rpcOptions: { headers: 42 } });
 // @ts-expect-error context must be an Effect Context
-utils.health.ping.mutationOptions({ rpcOptions: { context: {} } })
+utils.health.ping.mutationOptions({ rpcOptions: { context: {} } });
 // @ts-expect-error stream buffer sizes are numeric
-utils.events.audit.watch.liveOptions({ rpcOptions: { streamBufferSize: '8' } })
-const discardOptions = { ...unaryRpcOptions, discard: true }
+utils.events.audit.watch.liveOptions({ rpcOptions: { streamBufferSize: "8" } });
+const discardOptions = { ...unaryRpcOptions, discard: true };
 // @ts-expect-error variables cannot bypass the result control restriction
-utils.users.get.mutationOptions({ rpcOptions: discardOptions })
+utils.users.get.mutationOptions({ rpcOptions: discardOptions });
 
 // @ts-expect-error A caller hash cannot override generated RPC cache identity.
-utils.users.get.queryOptions({ input: skipToken, queryHash: 'shared' })
+utils.users.get.queryOptions({ input: skipToken, queryHash: "shared" });
 
 true satisfies Assert<
   Equal<
     Extract<
-      'queryKeyHashFn' | 'queryHash',
+      "queryKeyHashFn" | "queryHash",
       | keyof typeof infiniteOptions
       | keyof typeof skippedInfinite
       | keyof typeof conditionalInfiniteOptions
@@ -1573,53 +1892,62 @@ true satisfies Assert<
     >,
     never
   >
->
+>;
 
-// @ts-expect-error QueryClient defaults own hashing.
-utils.events.watch.streamedOptions({ input: { channel: 'news' }, queryHash: 'shared' })
-// @ts-expect-error QueryClient defaults own hashing.
-utils.events.watch.liveOptions({ input: { channel: 'news' }, queryKeyHashFn: JSON.stringify })
+utils.events.watch.streamedOptions({
+  input: { channel: "news" },
+  // @ts-expect-error QueryClient defaults own hashing.
+  queryHash: "shared",
+});
+utils.events.watch.liveOptions({
+  input: { channel: "news" },
+  // @ts-expect-error QueryClient defaults own hashing.
+  queryKeyHashFn: JSON.stringify,
+});
 utils.users.pages.infiniteOptions({
   initialPageParam: 0,
   input: (cursor) => ({ cursor }),
   getNextPageParam: () => undefined,
   // @ts-expect-error QueryClient defaults own hashing.
   queryKeyHashFn: JSON.stringify,
-})
+});
 
-const UnknownRead = Rpc.make('payload.unknown', {
+const UnknownRead = Rpc.make("payload.unknown", {
   payload: Schema.Unknown,
   success: Schema.String,
-})
-const AnyRead = Rpc.make('payload.any', { payload: Schema.Any, success: Schema.String })
-const OptionalRead = Rpc.make('payload.optional', {
+});
+const AnyRead = Rpc.make("payload.any", {
+  payload: Schema.Any,
+  success: Schema.String,
+});
+const OptionalRead = Rpc.make("payload.optional", {
   payload: Schema.Union([Schema.String, Schema.Void]),
   success: Schema.String,
-})
-const VoidRead = Rpc.make('payload.void', {
-  payload: Schema.Void.annotate({ title: 'Payloadless' }),
+});
+const VoidRead = Rpc.make("payload.void", {
+  payload: Schema.Void.annotate({ title: "Payloadless" }),
   success: Schema.String,
-})
-const UnknownWatch = Rpc.make('payload.unknownWatch', {
+});
+const UnknownWatch = Rpc.make("payload.unknownWatch", {
   payload: Schema.Unknown,
   success: Schema.String,
   stream: true,
-})
-const AnyWatch = Rpc.make('payload.anyWatch', {
+});
+const AnyWatch = Rpc.make("payload.anyWatch", {
   payload: Schema.Any,
   success: Schema.String,
   stream: true,
-})
-const OptionalWatch = Rpc.make('payload.optionalWatch', {
+});
+const OptionalWatch = Rpc.make("payload.optionalWatch", {
   payload: Schema.Union([Schema.String, Schema.Void]),
   success: Schema.String,
   stream: true,
-})
-const VoidWatch = Rpc.make('payload.voidWatch', {
+});
+const VoidWatch = Rpc.make("payload.voidWatch", {
   payload: Schema.Void,
   success: Schema.String,
   stream: true,
-})
+});
 const broadPayloadGroup = RpcGroup.make(
   UnknownRead,
   AnyRead,
@@ -1628,304 +1956,392 @@ const broadPayloadGroup = RpcGroup.make(
   UnknownWatch,
   AnyWatch,
   OptionalWatch,
-  VoidWatch,
-)
-declare const broadPayloadClient: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof broadPayloadGroup>>
+  VoidWatch
+);
+declare const broadPayloadClient: RpcClient.RpcClient.Flat<
+  RpcGroup.Rpcs<typeof broadPayloadGroup>
+>;
 const broadPayloadUtils = createRpcQueryUtils(broadPayloadGroup, {
   client: broadPayloadClient,
-  keyPrefix: ['payload'],
-})
+  keyPrefix: ["payload"],
+});
 createRpcQueryUtils(broadPayloadGroup, {
   client: broadPayloadClient,
-  keyPrefix: ['payload'],
+  keyPrefix: ["payload"],
   keyEncoders: {
-    'payload.unknown': (payload) => {
-      true satisfies Assert<Equal<typeof payload, unknown>>
-      return 'unknown'
+    "payload.unknown": (payload) => {
+      true satisfies Assert<Equal<typeof payload, unknown>>;
+      return "unknown";
     },
-    'payload.any': (payload) => {
-      true satisfies Assert<Equal<typeof payload, any>>
-      return 'any'
+    "payload.any": (payload) => {
+      true satisfies Assert<Equal<typeof payload, any>>;
+      return "any";
     },
-    'payload.optional': (payload) => {
-      true satisfies Assert<Equal<typeof payload, void | string>>
-      return payload ?? null
+    "payload.optional": (payload) => {
+      true satisfies Assert<Equal<typeof payload, void | string>>;
+      return payload ?? null;
     },
-    'payload.unknownWatch': (payload) => {
-      true satisfies Assert<Equal<typeof payload, unknown>>
-      return 'unknown'
+    "payload.unknownWatch": (payload) => {
+      true satisfies Assert<Equal<typeof payload, unknown>>;
+      return "unknown";
     },
-    'payload.anyWatch': (payload) => {
-      true satisfies Assert<Equal<typeof payload, any>>
-      return 'any'
+    "payload.anyWatch": (payload) => {
+      true satisfies Assert<Equal<typeof payload, any>>;
+      return "any";
     },
-    'payload.optionalWatch': (payload) => {
-      true satisfies Assert<Equal<typeof payload, void | string>>
-      return payload ?? null
+    "payload.optionalWatch": (payload) => {
+      true satisfies Assert<Equal<typeof payload, void | string>>;
+      return payload ?? null;
     },
     // @ts-expect-error Void declarations have no payload identity encoder
-    'payload.void': () => null,
+    "payload.void": () => null,
   },
-})
-const unknownKey = broadPayloadUtils.payload.unknown.queryKey({ id: 1 })
-const anyKey = broadPayloadUtils.payload.any.queryKey({ id: 1 })
-const optionalKey = broadPayloadUtils.payload.optional.queryKey('input')
-unknownKey satisfies readonly ['payload', 'rpc', 'payload', 'unknown', 'query', JsonValue]
-anyKey satisfies readonly ['payload', 'rpc', 'payload', 'any', 'query', JsonValue]
-optionalKey satisfies readonly ['payload', 'rpc', 'payload', 'optional', 'query', JsonValue]
-queryClient.getQueryData(unknownKey) satisfies string | undefined
-queryClient.getQueryData(anyKey) satisfies string | undefined
-queryClient.getQueryData(optionalKey) satisfies string | undefined
-broadPayloadUtils.payload.unknown.queryOptions({ input: { id: 1 } })
-broadPayloadUtils.payload.any.queryOptions({ input: { id: 1 } })
-broadPayloadUtils.payload.optional.queryOptions({ input: undefined })
+});
+const unknownKey = broadPayloadUtils.payload.unknown.queryKey({ id: 1 });
+const anyKey = broadPayloadUtils.payload.any.queryKey({ id: 1 });
+const optionalKey = broadPayloadUtils.payload.optional.queryKey("input");
+unknownKey satisfies readonly [
+  "payload",
+  "rpc",
+  "payload",
+  "unknown",
+  "query",
+  JsonValue,
+];
+anyKey satisfies readonly [
+  "payload",
+  "rpc",
+  "payload",
+  "any",
+  "query",
+  JsonValue,
+];
+optionalKey satisfies readonly [
+  "payload",
+  "rpc",
+  "payload",
+  "optional",
+  "query",
+  JsonValue,
+];
+queryClient.getQueryData(unknownKey) satisfies string | undefined;
+queryClient.getQueryData(anyKey) satisfies string | undefined;
+queryClient.getQueryData(optionalKey) satisfies string | undefined;
+broadPayloadUtils.payload.unknown.queryOptions({ input: { id: 1 } });
+broadPayloadUtils.payload.any.queryOptions({ input: { id: 1 } });
+broadPayloadUtils.payload.optional.queryOptions({ input: undefined });
 // @ts-expect-error Unknown declarations require an input field
-broadPayloadUtils.payload.unknown.queryOptions()
+broadPayloadUtils.payload.unknown.queryOptions();
 // @ts-expect-error Any declarations require an input field
-broadPayloadUtils.payload.any.queryOptions()
+broadPayloadUtils.payload.any.queryOptions();
 // @ts-expect-error void-containing declarations require an input field
-broadPayloadUtils.payload.optional.queryOptions()
+broadPayloadUtils.payload.optional.queryOptions();
 // @ts-expect-error Unknown declarations require constructor input for keys
-broadPayloadUtils.payload.unknown.queryKey()
+broadPayloadUtils.payload.unknown.queryKey();
 // @ts-expect-error Any declarations require constructor input for keys
-broadPayloadUtils.payload.any.queryKey()
+broadPayloadUtils.payload.any.queryKey();
 // @ts-expect-error void-containing unions retain their declared constructor type
-broadPayloadUtils.payload.optional.queryKey(1)
+broadPayloadUtils.payload.optional.queryKey(1);
 
 const unknownMutation = broadPayloadUtils.payload.unknown.mutationOptions({
   onMutate: (input) => {
-    true satisfies Assert<Equal<typeof input, unknown>>
-    return 'unknown'
+    true satisfies Assert<Equal<typeof input, unknown>>;
+    return "unknown";
   },
-})
+});
 const anyMutation = broadPayloadUtils.payload.any.mutationOptions({
   onMutate: (input) => {
-    true satisfies Assert<Equal<typeof input, any>>
-    return 'any'
+    true satisfies Assert<Equal<typeof input, any>>;
+    return "any";
   },
-})
+});
 const optionalMutation = broadPayloadUtils.payload.optional.mutationOptions({
   onMutate: (input) => {
-    true satisfies Assert<Equal<typeof input, void | string>>
-    return 'optional'
+    true satisfies Assert<Equal<typeof input, void | string>>;
+    return "optional";
   },
-})
-unknownMutation.mutationFn({ id: 1 }) satisfies Promise<string>
-anyMutation.mutationFn({ id: 1 }) satisfies Promise<string>
-optionalMutation.mutationFn('input') satisfies Promise<string>
-optionalMutation.mutationFn(undefined) satisfies Promise<string>
+});
+unknownMutation.mutationFn({ id: 1 }) satisfies Promise<string>;
+anyMutation.mutationFn({ id: 1 }) satisfies Promise<string>;
+optionalMutation.mutationFn("input") satisfies Promise<string>;
+optionalMutation.mutationFn(undefined) satisfies Promise<string>;
 // @ts-expect-error void-containing mutation variables retain their constructor type
-optionalMutation.mutationFn(1)
+optionalMutation.mutationFn(1);
 
 const broadUnknownPages = broadPayloadUtils.payload.unknown.infiniteOptions({
   input: (page: number) => ({ page }),
   initialPageParam: 0,
   getNextPageParam: () => undefined,
-})
+});
 const broadAnyPages = broadPayloadUtils.payload.any.infiniteOptions({
   input: (page: number) => ({ page }),
   initialPageParam: 0,
   getNextPageParam: () => undefined,
-})
+});
 const broadOptionalPages = broadPayloadUtils.payload.optional.infiniteOptions({
   input: (page: number) => String(page),
   initialPageParam: 0,
   getNextPageParam: () => undefined,
-})
-queryClient.infiniteQuery(broadUnknownPages) satisfies Promise<InfiniteData<string, number>>
-queryClient.infiniteQuery(broadAnyPages) satisfies Promise<InfiniteData<string, number>>
-queryClient.infiniteQuery(broadOptionalPages) satisfies Promise<InfiniteData<string, number>>
+});
+queryClient.infiniteQuery(broadUnknownPages) satisfies Promise<
+  InfiniteData<string, number>
+>;
+queryClient.infiniteQuery(broadAnyPages) satisfies Promise<
+  InfiniteData<string, number>
+>;
+queryClient.infiniteQuery(broadOptionalPages) satisfies Promise<
+  InfiniteData<string, number>
+>;
 broadPayloadUtils.payload.unknown.infiniteKey({ page: 0 }) satisfies readonly [
-  'payload',
-  'rpc',
-  'payload',
-  'unknown',
-  'infinite',
+  "payload",
+  "rpc",
+  "payload",
+  "unknown",
+  "infinite",
   JsonValue,
-]
+];
 broadPayloadUtils.payload.any.infiniteKey({ page: 0 }) satisfies readonly [
-  'payload',
-  'rpc',
-  'payload',
-  'any',
-  'infinite',
+  "payload",
+  "rpc",
+  "payload",
+  "any",
+  "infinite",
   JsonValue,
-]
-broadPayloadUtils.payload.optional.infiniteKey('0') satisfies readonly [
-  'payload',
-  'rpc',
-  'payload',
-  'optional',
-  'infinite',
+];
+broadPayloadUtils.payload.optional.infiniteKey("0") satisfies readonly [
+  "payload",
+  "rpc",
+  "payload",
+  "optional",
+  "infinite",
   JsonValue,
-]
+];
 // @ts-expect-error Unknown infinite queries require a page-input mapper
 broadPayloadUtils.payload.unknown.infiniteOptions({
   initialPageParam: 0,
   getNextPageParam: () => undefined,
-})
+});
 // @ts-expect-error Any infinite queries require a page-input mapper
 broadPayloadUtils.payload.any.infiniteOptions({
   initialPageParam: 0,
   getNextPageParam: () => undefined,
-})
+});
 // @ts-expect-error void-containing infinite queries require a page-input mapper
 broadPayloadUtils.payload.optional.infiniteOptions({
   initialPageParam: 0,
   getNextPageParam: () => undefined,
-})
+});
 
-const unknownStreamedKey = broadPayloadUtils.payload.unknownWatch.streamedKey({ id: 1 })
-const anyStreamedKey = broadPayloadUtils.payload.anyWatch.streamedKey({ id: 1 })
-const optionalStreamedKey = broadPayloadUtils.payload.optionalWatch.streamedKey('input')
-const unknownLiveKey = broadPayloadUtils.payload.unknownWatch.liveKey({ id: 1 })
-const anyLiveKey = broadPayloadUtils.payload.anyWatch.liveKey({ id: 1 })
-const broadOptionalLiveKey = broadPayloadUtils.payload.optionalWatch.liveKey('input')
+const unknownStreamedKey = broadPayloadUtils.payload.unknownWatch.streamedKey({
+  id: 1,
+});
+const anyStreamedKey = broadPayloadUtils.payload.anyWatch.streamedKey({
+  id: 1,
+});
+const optionalStreamedKey =
+  broadPayloadUtils.payload.optionalWatch.streamedKey("input");
+const unknownLiveKey = broadPayloadUtils.payload.unknownWatch.liveKey({
+  id: 1,
+});
+const anyLiveKey = broadPayloadUtils.payload.anyWatch.liveKey({ id: 1 });
+const broadOptionalLiveKey =
+  broadPayloadUtils.payload.optionalWatch.liveKey("input");
 unknownStreamedKey satisfies readonly [
-  'payload',
-  'rpc',
-  'payload',
-  'unknownWatch',
-  'streamed',
+  "payload",
+  "rpc",
+  "payload",
+  "unknownWatch",
+  "streamed",
   ...JsonValue[],
-]
+];
 anyStreamedKey satisfies readonly [
-  'payload',
-  'rpc',
-  'payload',
-  'anyWatch',
-  'streamed',
+  "payload",
+  "rpc",
+  "payload",
+  "anyWatch",
+  "streamed",
   ...JsonValue[],
-]
+];
 optionalStreamedKey satisfies readonly [
-  'payload',
-  'rpc',
-  'payload',
-  'optionalWatch',
-  'streamed',
+  "payload",
+  "rpc",
+  "payload",
+  "optionalWatch",
+  "streamed",
   ...JsonValue[],
-]
-unknownLiveKey satisfies readonly ['payload', 'rpc', 'payload', 'unknownWatch', 'live', JsonValue]
-anyLiveKey satisfies readonly ['payload', 'rpc', 'payload', 'anyWatch', 'live', JsonValue]
-broadOptionalLiveKey satisfies readonly [
-  'payload',
-  'rpc',
-  'payload',
-  'optionalWatch',
-  'live',
+];
+unknownLiveKey satisfies readonly [
+  "payload",
+  "rpc",
+  "payload",
+  "unknownWatch",
+  "live",
   JsonValue,
-]
-queryClient.getQueryData(unknownStreamedKey) satisfies readonly string[] | undefined
-queryClient.getQueryData(anyStreamedKey) satisfies readonly string[] | undefined
-queryClient.getQueryData(optionalStreamedKey) satisfies readonly string[] | undefined
+];
+anyLiveKey satisfies readonly [
+  "payload",
+  "rpc",
+  "payload",
+  "anyWatch",
+  "live",
+  JsonValue,
+];
+broadOptionalLiveKey satisfies readonly [
+  "payload",
+  "rpc",
+  "payload",
+  "optionalWatch",
+  "live",
+  JsonValue,
+];
+queryClient.getQueryData(unknownStreamedKey) satisfies
+  | readonly string[]
+  | undefined;
+queryClient.getQueryData(anyStreamedKey) satisfies
+  | readonly string[]
+  | undefined;
+queryClient.getQueryData(optionalStreamedKey) satisfies
+  | readonly string[]
+  | undefined;
 const unknownBoundedStream = broadPayloadUtils.payload.unknownWatch.streamedKey(
   { id: 1 },
-  { maxChunks: 2, refetchMode: 'append' },
-)
-queryClient.getQueryData(unknownBoundedStream) satisfies readonly string[] | undefined
-broadPayloadUtils.payload.anyWatch.streamedKey({ id: 1 }, { maxChunks: 2 })
-broadPayloadUtils.payload.optionalWatch.streamedKey(undefined, { refetchMode: 'replace' })
+  { maxChunks: 2, refetchMode: "append" }
+);
+queryClient.getQueryData(unknownBoundedStream) satisfies
+  | readonly string[]
+  | undefined;
+broadPayloadUtils.payload.anyWatch.streamedKey({ id: 1 }, { maxChunks: 2 });
+broadPayloadUtils.payload.optionalWatch.streamedKey(undefined, {
+  refetchMode: "replace",
+});
 // @ts-expect-error Unknown accumulated keys require constructor input
-broadPayloadUtils.payload.unknownWatch.streamedKey()
+broadPayloadUtils.payload.unknownWatch.streamedKey();
 // @ts-expect-error Any accumulated keys require constructor input
-broadPayloadUtils.payload.anyWatch.streamedKey()
-queryClient.getQueryData(unknownLiveKey) satisfies string | undefined
-queryClient.getQueryData(anyLiveKey) satisfies string | undefined
-queryClient.getQueryData(broadOptionalLiveKey) satisfies string | undefined
-broadPayloadUtils.payload.unknownWatch.streamedOptions({ input: { id: 1 } })
-broadPayloadUtils.payload.anyWatch.streamedOptions({ input: { id: 1 } })
-broadPayloadUtils.payload.optionalWatch.streamedOptions({ input: undefined })
-broadPayloadUtils.payload.unknownWatch.liveOptions({ input: { id: 1 } })
-broadPayloadUtils.payload.anyWatch.liveOptions({ input: { id: 1 } })
-broadPayloadUtils.payload.optionalWatch.liveOptions({ input: undefined })
+broadPayloadUtils.payload.anyWatch.streamedKey();
+queryClient.getQueryData(unknownLiveKey) satisfies string | undefined;
+queryClient.getQueryData(anyLiveKey) satisfies string | undefined;
+queryClient.getQueryData(broadOptionalLiveKey) satisfies string | undefined;
+broadPayloadUtils.payload.unknownWatch.streamedOptions({ input: { id: 1 } });
+broadPayloadUtils.payload.anyWatch.streamedOptions({ input: { id: 1 } });
+broadPayloadUtils.payload.optionalWatch.streamedOptions({ input: undefined });
+broadPayloadUtils.payload.unknownWatch.liveOptions({ input: { id: 1 } });
+broadPayloadUtils.payload.anyWatch.liveOptions({ input: { id: 1 } });
+broadPayloadUtils.payload.optionalWatch.liveOptions({ input: undefined });
 // @ts-expect-error Unknown accumulated queries require an input field
-broadPayloadUtils.payload.unknownWatch.streamedOptions()
+broadPayloadUtils.payload.unknownWatch.streamedOptions();
 // @ts-expect-error Any accumulated queries require an input field
-broadPayloadUtils.payload.anyWatch.streamedOptions()
+broadPayloadUtils.payload.anyWatch.streamedOptions();
 // @ts-expect-error void-containing accumulated queries require an input field
-broadPayloadUtils.payload.optionalWatch.streamedOptions()
+broadPayloadUtils.payload.optionalWatch.streamedOptions();
 // @ts-expect-error Unknown live queries require an input field
-broadPayloadUtils.payload.unknownWatch.liveOptions()
+broadPayloadUtils.payload.unknownWatch.liveOptions();
 // @ts-expect-error Any live queries require an input field
-broadPayloadUtils.payload.anyWatch.liveOptions()
+broadPayloadUtils.payload.anyWatch.liveOptions();
 // @ts-expect-error void-containing live queries require an input field
-broadPayloadUtils.payload.optionalWatch.liveOptions()
+broadPayloadUtils.payload.optionalWatch.liveOptions();
 
-const unknownSkipped = broadPayloadUtils.payload.unknown.queryOptions({ input: skipToken })
-const anySkipped = broadPayloadUtils.payload.any.queryOptions({ input: skipToken })
-const optionalSkipped = broadPayloadUtils.payload.optional.queryOptions({ input: skipToken })
-const unknownStreamSkipped = broadPayloadUtils.payload.unknownWatch.streamedOptions({
+const unknownSkipped = broadPayloadUtils.payload.unknown.queryOptions({
   input: skipToken,
-})
-const anyStreamSkipped = broadPayloadUtils.payload.anyWatch.streamedOptions({ input: skipToken })
-const optionalStreamSkipped = broadPayloadUtils.payload.optionalWatch.streamedOptions({
+});
+const anySkipped = broadPayloadUtils.payload.any.queryOptions({
   input: skipToken,
-})
-const unknownLiveSkipped = broadPayloadUtils.payload.unknownWatch.liveOptions({ input: skipToken })
-const anyLiveSkipped = broadPayloadUtils.payload.anyWatch.liveOptions({ input: skipToken })
-const optionalLiveSkipped = broadPayloadUtils.payload.optionalWatch.liveOptions({
+});
+const optionalSkipped = broadPayloadUtils.payload.optional.queryOptions({
   input: skipToken,
-})
-true satisfies Assert<Equal<typeof unknownSkipped.queryFn, SkipToken>>
-true satisfies Assert<Equal<typeof anySkipped.queryFn, SkipToken>>
-true satisfies Assert<Equal<typeof optionalSkipped.queryFn, SkipToken>>
-true satisfies Assert<Equal<typeof unknownStreamSkipped.queryFn, SkipToken>>
-true satisfies Assert<Equal<typeof anyStreamSkipped.queryFn, SkipToken>>
-true satisfies Assert<Equal<typeof optionalStreamSkipped.queryFn, SkipToken>>
-true satisfies Assert<Equal<typeof unknownLiveSkipped.queryFn, SkipToken>>
-true satisfies Assert<Equal<typeof anyLiveSkipped.queryFn, SkipToken>>
-true satisfies Assert<Equal<typeof optionalLiveSkipped.queryFn, SkipToken>>
+});
+const unknownStreamSkipped =
+  broadPayloadUtils.payload.unknownWatch.streamedOptions({
+    input: skipToken,
+  });
+const anyStreamSkipped = broadPayloadUtils.payload.anyWatch.streamedOptions({
+  input: skipToken,
+});
+const optionalStreamSkipped =
+  broadPayloadUtils.payload.optionalWatch.streamedOptions({
+    input: skipToken,
+  });
+const unknownLiveSkipped = broadPayloadUtils.payload.unknownWatch.liveOptions({
+  input: skipToken,
+});
+const anyLiveSkipped = broadPayloadUtils.payload.anyWatch.liveOptions({
+  input: skipToken,
+});
+const optionalLiveSkipped = broadPayloadUtils.payload.optionalWatch.liveOptions(
+  {
+    input: skipToken,
+  }
+);
+true satisfies Assert<Equal<typeof unknownSkipped.queryFn, SkipToken>>;
+true satisfies Assert<Equal<typeof anySkipped.queryFn, SkipToken>>;
+true satisfies Assert<Equal<typeof optionalSkipped.queryFn, SkipToken>>;
+true satisfies Assert<Equal<typeof unknownStreamSkipped.queryFn, SkipToken>>;
+true satisfies Assert<Equal<typeof anyStreamSkipped.queryFn, SkipToken>>;
+true satisfies Assert<Equal<typeof optionalStreamSkipped.queryFn, SkipToken>>;
+true satisfies Assert<Equal<typeof unknownLiveSkipped.queryFn, SkipToken>>;
+true satisfies Assert<Equal<typeof anyLiveSkipped.queryFn, SkipToken>>;
+true satisfies Assert<Equal<typeof optionalLiveSkipped.queryFn, SkipToken>>;
 
-declare const broadUnknownInput: unknown
-declare const broadAnyInput: any
+declare const broadUnknownInput: unknown;
+declare const broadAnyInput: any;
 const broadUnknownOptions = broadPayloadUtils.payload.unknown.queryOptions({
   input: broadUnknownInput,
-})
-const broadAnyOptions = broadPayloadUtils.payload.any.queryOptions({ input: broadAnyInput })
-true satisfies Assert<Equal<typeof broadUnknownOptions.queryFn, QueryFunction<string> | SkipToken>>
-true satisfies Assert<Equal<typeof broadAnyOptions.queryFn, QueryFunction<string> | SkipToken>>
+});
+const broadAnyOptions = broadPayloadUtils.payload.any.queryOptions({
+  input: broadAnyInput,
+});
+true satisfies Assert<
+  Equal<typeof broadUnknownOptions.queryFn, QueryFunction<string> | SkipToken>
+>;
+true satisfies Assert<
+  Equal<typeof broadAnyOptions.queryFn, QueryFunction<string> | SkipToken>
+>;
 
 broadPayloadUtils.payload.void.queryKey() satisfies readonly [
-  'payload',
-  'rpc',
-  'payload',
-  'void',
-  'query',
-]
+  "payload",
+  "rpc",
+  "payload",
+  "void",
+  "query",
+];
 broadPayloadUtils.payload.void.infiniteKey() satisfies readonly [
-  'payload',
-  'rpc',
-  'payload',
-  'void',
-  'infinite',
-]
-broadPayloadUtils.payload.void.queryOptions()
+  "payload",
+  "rpc",
+  "payload",
+  "void",
+  "infinite",
+];
+broadPayloadUtils.payload.void.queryOptions();
 broadPayloadUtils.payload.void.infiniteOptions({
   initialPageParam: 0,
   getNextPageParam: () => undefined,
-})
-broadPayloadUtils.payload.void.mutationOptions().mutationFn() satisfies Promise<string>
+});
+broadPayloadUtils.payload.void
+  .mutationOptions()
+  .mutationFn() satisfies Promise<string>;
 broadPayloadUtils.payload.voidWatch.streamedKey() satisfies readonly [
-  'payload',
-  'rpc',
-  'payload',
-  'voidWatch',
-  'streamed',
+  "payload",
+  "rpc",
+  "payload",
+  "voidWatch",
+  "streamed",
   ...JsonValue[],
-]
-broadPayloadUtils.payload.voidWatch.streamedKey({ maxChunks: 2, refetchMode: 'append' })
+];
+broadPayloadUtils.payload.voidWatch.streamedKey({
+  maxChunks: 2,
+  refetchMode: "append",
+});
 broadPayloadUtils.payload.voidWatch.liveKey() satisfies readonly [
-  'payload',
-  'rpc',
-  'payload',
-  'voidWatch',
-  'live',
-]
-broadPayloadUtils.payload.voidWatch.streamedOptions()
-broadPayloadUtils.payload.voidWatch.liveOptions()
+  "payload",
+  "rpc",
+  "payload",
+  "voidWatch",
+  "live",
+];
+broadPayloadUtils.payload.voidWatch.streamedOptions();
+broadPayloadUtils.payload.voidWatch.liveOptions();
 // @ts-expect-error Void query declarations omit the input field
-broadPayloadUtils.payload.void.queryOptions({ input: undefined })
+broadPayloadUtils.payload.void.queryOptions({ input: undefined });
 // @ts-expect-error Void accumulated declarations omit the input field
-broadPayloadUtils.payload.voidWatch.streamedOptions({ input: undefined })
+broadPayloadUtils.payload.voidWatch.streamedOptions({ input: undefined });
 // @ts-expect-error Void live declarations omit the input field
-broadPayloadUtils.payload.voidWatch.liveOptions({ input: undefined })
+broadPayloadUtils.payload.voidWatch.liveOptions({ input: undefined });

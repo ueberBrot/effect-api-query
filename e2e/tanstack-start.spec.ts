@@ -1,192 +1,239 @@
-import { expect, test } from '@playwright/test'
-import { Schema } from 'effect'
-import { createServer, request as nodeRequest } from 'node:http'
+import { createServer, request as nodeRequest } from "node:http";
+
+import { expect, test } from "@playwright/test";
+import { Schema } from "effect";
 
 import {
   prepareExampleApplication,
   recordsRpc,
   tanStackStartApplication,
-} from './example-application.ts'
+} from "./example-application.ts";
 
-test('Start rejects an oversized upload before the sender ends the request', async () => {
+test("Start rejects an oversized upload before the sender ends the request", async () => {
   // oxlint-disable-next-line promise/avoid-new
   const status = await new Promise<number | undefined>((resolve, reject) => {
     const request = nodeRequest(
       `${tanStackStartApplication.url}/rpc`,
-      { method: 'POST' },
+      { method: "POST" },
       (response) => {
-        response.resume()
-        response.once('end', () => {
-          request.destroy()
-          resolve(response.statusCode)
-        })
-      },
-    )
-    request.once('error', reject)
+        response.resume();
+        response.once("end", () => {
+          request.destroy();
+          resolve(response.statusCode);
+        });
+      }
+    );
+    request.once("error", reject);
     request.setTimeout(1000, () => {
-      request.destroy(new Error('Request timed out'))
-    })
-    request.write(' '.repeat(1024 * 1024 + 1))
-  })
-  expect(status).toBe(413)
-})
+      request.destroy(new Error("Request timed out"));
+    });
+    request.write(" ".repeat(1024 * 1024 + 1));
+  });
+  expect(status).toBe(413);
+});
 
-test('SSR keeps its RPC destination independent of incoming host headers', async ({ request }) => {
-  let redirectedRequests = 0
+test("SSR keeps its RPC destination independent of incoming host headers", async ({
+  request,
+}) => {
+  let redirectedRequests = 0;
   const destination = createServer((_request, response) => {
-    redirectedRequests += 1
-    response.writeHead(500).end()
-  })
+    redirectedRequests += 1;
+    response.writeHead(500).end();
+  });
   // oxlint-disable-next-line promise/avoid-new
   await new Promise<void>((resolve) => {
-    destination.listen(0, '127.0.0.1', resolve)
-  })
+    destination.listen(0, "127.0.0.1", resolve);
+  });
   try {
-    const address = Schema.decodeUnknownSync(Schema.Struct({ port: Schema.Int }))(
-      destination.address(),
-    )
-    const host = `127.0.0.1:${String(address.port)}`
-    const response = await request.get(`${tanStackStartApplication.url}/details`, {
-      headers: { host, 'x-forwarded-host': host, 'x-forwarded-proto': 'http' },
-    })
-    expect(redirectedRequests).toBe(0)
-    expect(response.ok()).toBe(true)
-    expect(await response.text()).toContain('Ada Lovelace')
+    const address = Schema.decodeUnknownSync(
+      Schema.Struct({ port: Schema.Int })
+    )(destination.address());
+    const host = `127.0.0.1:${String(address.port)}`;
+    const response = await request.get(
+      `${tanStackStartApplication.url}/details`,
+      {
+        headers: {
+          host,
+          "x-forwarded-host": host,
+          "x-forwarded-proto": "http",
+        },
+      }
+    );
+    expect(redirectedRequests).toBe(0);
+    expect(response.ok()).toBe(true);
+    expect(await response.text()).toContain("Ada Lovelace");
   } finally {
-    destination.closeAllConnections()
+    destination.closeAllConnections();
     // oxlint-disable-next-line promise/avoid-new
     await new Promise<void>((resolve, reject) => {
       destination.close((error) => {
         if (error) {
-          reject(error)
+          reject(error);
         } else {
-          resolve()
+          resolve();
         }
-      })
-    })
+      });
+    });
   }
-})
+});
 
-test.describe('TanStack Start application', () => {
+test.describe("TanStack Start application", () => {
   test.beforeEach(async ({ page }) => {
-    await prepareExampleApplication(page, tanStackStartApplication)
-  })
+    await prepareExampleApplication(page, tanStackStartApplication);
+  });
 
-  test('server-renders and hydrates without a duplicate successful query', async ({
+  test("server-renders and hydrates without a duplicate successful query", async ({
     browser,
     page,
   }) => {
-    const serverRenderedContext = await browser.newContext({ javaScriptEnabled: false })
+    const serverRenderedContext = await browser.newContext({
+      javaScriptEnabled: false,
+    });
     try {
-      const serverRenderedPage = await serverRenderedContext.newPage()
-      const serverRenderedResponse = await serverRenderedPage.goto(tanStackStartApplication.url)
+      const serverRenderedPage = await serverRenderedContext.newPage();
+      const serverRenderedResponse = await serverRenderedPage.goto(
+        tanStackStartApplication.url
+      );
 
-      expect(serverRenderedResponse?.ok()).toBe(true)
-      await expect(serverRenderedPage.getByText('Ada Lovelace', { exact: true })).toBeVisible()
-      await expect(serverRenderedPage.getByText('Edsger Dijkstra', { exact: true })).toBeVisible()
-      await expect(serverRenderedPage.getByText('Connection opened', { exact: true })).toBeVisible()
-      await expect(serverRenderedPage.getByText('Current state: Connection opened')).toBeVisible()
+      expect(serverRenderedResponse?.ok()).toBe(true);
+      await expect(
+        serverRenderedPage.getByText("Ada Lovelace", { exact: true })
+      ).toBeVisible();
+      await expect(
+        serverRenderedPage.getByText("Edsger Dijkstra", { exact: true })
+      ).toBeVisible();
+      await expect(
+        serverRenderedPage.getByText("Connection opened", { exact: true })
+      ).toBeVisible();
+      await expect(
+        serverRenderedPage.getByText("Current state: Connection opened")
+      ).toBeVisible();
     } finally {
-      await serverRenderedContext.close()
+      await serverRenderedContext.close();
     }
 
-    let browserListRequests = 0
-    page.on('request', (request) => {
-      if (recordsRpc(request.postData(), 'users.list')) {
-        browserListRequests += 1
+    let browserListRequests = 0;
+    page.on("request", (request) => {
+      if (recordsRpc(request.postData(), "users.list")) {
+        browserListRequests += 1;
       }
-    })
+    });
 
-    const response = await page.reload()
+    const response = await page.reload();
 
-    expect(response?.ok()).toBe(true)
-    await expect(page.getByText('Ada Lovelace', { exact: true })).toBeVisible()
-    await expect(page.getByText('Edsger Dijkstra', { exact: true })).toBeVisible()
-    await page.getByRole('button', { name: 'Read cached directory' }).click()
-    await expect(page.getByText('Cached directory: 12 users')).toBeVisible()
-    expect(browserListRequests).toBe(0)
-  })
-
-  test('hydrates stream snapshots and refetches their remaining values', async ({ page }) => {
-    await expect(page.getByText('4 updates retained')).toBeVisible()
-    await expect(page.getByText('Current state: Ready')).toBeVisible()
-
-    const history = page.getByRole('region', { name: 'Accumulated stream history' })
-    await page.getByRole('button', { name: 'Replay newest 2' }).click()
-    await expect(history.getByRole('listitem')).toHaveText([/Workspace synchronized$/u, /Ready$/u])
-    await expect(page.getByText('2 updates retained')).toBeVisible()
-    await expect(page.getByText('Current state: Ready')).toBeVisible()
-
-    await page.getByRole('button', { name: 'Replay full history' }).click()
-    await expect(page.getByText('4 updates retained')).toBeVisible()
-    await expect(history.getByRole('listitem')).toHaveCount(4)
-  })
-
-  test('navigates on the client and reuses the hydrated cache', async ({ page }) => {
-    await page.getByRole('link', { name: 'Featured user' }).click()
-    await expect(page.getByRole('heading', { name: 'Featured user' })).toBeVisible()
-    await expect(page.getByText('Ada Lovelace', { exact: true })).toBeVisible()
-
-    await page.getByRole('link', { name: 'Users', exact: true }).click()
+    expect(response?.ok()).toBe(true);
+    await expect(page.getByText("Ada Lovelace", { exact: true })).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: 'Compare full queries, pages, and streams' }),
-    ).toBeVisible()
-    let browserListRequests = 0
-    page.on('request', (request) => {
-      if (recordsRpc(request.postData(), 'users.list')) {
-        browserListRequests += 1
-      }
-    })
-    await page.getByRole('button', { name: 'Read cached directory' }).click()
-    await expect(page.getByText('Cached directory: 12 users')).toBeVisible()
-    expect(browserListRequests).toBe(0)
-  })
+      page.getByText("Edsger Dijkstra", { exact: true })
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Read cached directory" }).click();
+    await expect(page.getByText("Cached directory: 12 users")).toBeVisible();
+    expect(browserListRequests).toBe(0);
+  });
 
-  test('hydrates and advances an infinite query', async ({ page }) => {
-    await expect(page.getByText('4 of 12 loaded')).toBeVisible()
-    await expect(page.getByText('Page 1: 4 users')).toBeVisible()
+  test("hydrates stream snapshots and refetches their remaining values", async ({
+    page,
+  }) => {
+    await expect(page.getByText("4 updates retained")).toBeVisible();
+    await expect(page.getByText("Current state: Ready")).toBeVisible();
+
+    const history = page.getByRole("region", {
+      name: "Accumulated stream history",
+    });
+    await page.getByRole("button", { name: "Replay newest 2" }).click();
+    await expect(history.getByRole("listitem")).toHaveText([
+      /Workspace synchronized$/u,
+      /Ready$/u,
+    ]);
+    await expect(page.getByText("2 updates retained")).toBeVisible();
+    await expect(page.getByText("Current state: Ready")).toBeVisible();
+
+    await page.getByRole("button", { name: "Replay full history" }).click();
+    await expect(page.getByText("4 updates retained")).toBeVisible();
+    await expect(history.getByRole("listitem")).toHaveCount(4);
+  });
+
+  test("navigates on the client and reuses the hydrated cache", async ({
+    page,
+  }) => {
+    await page.getByRole("link", { name: "Featured user" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Featured user" })
+    ).toBeVisible();
+    await expect(page.getByText("Ada Lovelace", { exact: true })).toBeVisible();
+
+    await page.getByRole("link", { name: "Users", exact: true }).click();
+    await expect(
+      page.getByRole("heading", {
+        name: "Compare full queries, pages, and streams",
+      })
+    ).toBeVisible();
+    let browserListRequests = 0;
+    page.on("request", (request) => {
+      if (recordsRpc(request.postData(), "users.list")) {
+        browserListRequests += 1;
+      }
+    });
+    await page.getByRole("button", { name: "Read cached directory" }).click();
+    await expect(page.getByText("Cached directory: 12 users")).toBeVisible();
+    expect(browserListRequests).toBe(0);
+  });
+
+  test("hydrates and advances an infinite query", async ({ page }) => {
+    await expect(page.getByText("4 of 12 loaded")).toBeVisible();
+    await expect(page.getByText("Page 1: 4 users")).toBeVisible();
 
     const nextPageResponse = page.waitForResponse(
-      (response) => response.ok() && recordsRpc(response.request().postData(), 'users.page'),
-    )
-    await page.getByRole('button', { name: 'Load next 4 users' }).click()
-    const rpcResponse = await nextPageResponse
+      (response) =>
+        response.ok() && recordsRpc(response.request().postData(), "users.page")
+    );
+    await page.getByRole("button", { name: "Load next 4 users" }).click();
+    const rpcResponse = await nextPageResponse;
 
-    const rpcUrl = new URL(rpcResponse.url())
-    expect(rpcResponse.request().method()).toBe('POST')
-    expect(rpcUrl.origin).toBe(new URL(tanStackStartApplication.url).origin)
-    expect(rpcUrl.pathname).toBe('/rpc/')
+    const rpcUrl = new URL(rpcResponse.url());
+    expect(rpcResponse.request().method()).toBe("POST");
+    expect(rpcUrl.origin).toBe(new URL(tanStackStartApplication.url).origin);
+    expect(rpcUrl.pathname).toBe("/rpc/");
 
-    await expect(page.getByText('Page 2: 4 users')).toBeVisible()
-    await expect(page.getByText('8 of 12 loaded')).toBeVisible()
-  })
+    await expect(page.getByText("Page 2: 4 users")).toBeVisible();
+    await expect(page.getByText("8 of 12 loaded")).toBeVisible();
+  });
 
-  test('mutates, invalidates and server-renders the shared directory', async ({ page }) => {
+  test("mutates, invalidates and server-renders the shared directory", async ({
+    page,
+  }) => {
     const listResponse = page.waitForResponse(
-      (response) => response.ok() && recordsRpc(response.request().postData(), 'users.list'),
-    )
-    await page.getByRole('button', { name: 'Add Grace Hopper' }).click()
-    await listResponse
+      (response) =>
+        response.ok() && recordsRpc(response.request().postData(), "users.list")
+    );
+    await page.getByRole("button", { name: "Add Grace Hopper" }).click();
+    await listResponse;
 
-    await expect(page.getByText('Grace Hopper', { exact: true })).toBeVisible()
-    await expect(page.getByText('13 users in one response')).toBeVisible()
-    await page.reload()
-    await expect(page.getByText('Grace Hopper', { exact: true })).toBeVisible()
-    await expect(page.getByText('13 users in one response')).toBeVisible()
-  })
+    await expect(page.getByText("Grace Hopper", { exact: true })).toBeVisible();
+    await expect(page.getByText("13 users in one response")).toBeVisible();
+    await page.reload();
+    await expect(page.getByText("Grace Hopper", { exact: true })).toBeVisible();
+    await expect(page.getByText("13 users in one response")).toBeVisible();
+  });
 
-  test('shows declared failures and externally visible cancellation', async ({ page }) => {
-    await page.getByRole('link', { name: 'Diagnostics' }).click()
-    await expect(page.getByRole('heading', { name: 'Failures and cancellation' })).toBeVisible()
+  test("shows declared failures and externally visible cancellation", async ({
+    page,
+  }) => {
+    await page.getByRole("link", { name: "Diagnostics" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Failures and cancellation" })
+    ).toBeVisible();
 
-    await page.getByRole('button', { name: 'Trigger declared failure' }).click()
-    const failure = page.getByRole('alert')
-    await expect(failure).toContainText('EffectRpcQueryError')
-    await expect(failure).toContainText('DiagnosticFailure')
+    await page
+      .getByRole("button", { name: "Trigger declared failure" })
+      .click();
+    const failure = page.getByRole("alert");
+    await expect(failure).toContainText("EffectRpcQueryError");
+    await expect(failure).toContainText("DiagnosticFailure");
 
-    await page.getByRole('button', { name: 'Start slow query' }).click()
-    await expect(page.getByText('Ready to cancel')).toBeVisible()
-    await page.getByRole('button', { name: 'Cancel query' }).click()
-    await expect(page.getByText('Server interruptions: 1')).toBeVisible()
-  })
-})
+    await page.getByRole("button", { name: "Start slow query" }).click();
+    await expect(page.getByText("Ready to cancel")).toBeVisible();
+    await page.getByRole("button", { name: "Cancel query" }).click();
+    await expect(page.getByText("Server interruptions: 1")).toBeVisible();
+  });
+});

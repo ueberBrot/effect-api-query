@@ -1,142 +1,177 @@
-import { startExampleRpcServer } from '@effect-api-query/server'
-import type { QueryKey } from '@tanstack/react-query'
-import { createMemoryHistory } from '@tanstack/react-router'
-import { attachRouterServerSsrUtils } from '@tanstack/react-start/server'
-import { Effect, Exit, Scope } from 'effect'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { startExampleRpcServer } from "@effect-api-query/server";
+import type { QueryKey } from "@tanstack/react-query";
+import { createMemoryHistory } from "@tanstack/react-router";
+import { attachRouterServerSsrUtils } from "@tanstack/react-start/server";
+import { Effect, Exit, Scope } from "effect";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vite-plus/test";
 
-import type { TanStackStartApplication } from '../src/lib/application.ts'
-import { createTanStackStartRouter } from '../src/router.tsx'
+import type { TanStackStartApplication } from "../src/lib/application.ts";
+import { createTanStackStartRouter } from "../src/router.tsx";
 
-describe('TanStack Start router dehydration', () => {
-  const applications: TanStackStartApplication[] = []
-  let serverScope: Scope.Closeable | undefined
+describe("TanStack Start router dehydration", () => {
+  const applications: TanStackStartApplication[] = [];
+  let serverScope: Scope.Closeable | undefined;
 
   beforeEach(async () => {
-    serverScope = await Effect.runPromise(Scope.make())
-  })
+    serverScope = await Effect.runPromise(Scope.make());
+  });
 
   afterEach(async () => {
-    await Promise.all(applications.splice(0).map(async ({ dispose }) => dispose()))
+    await Promise.all(
+      applications.splice(0).map(async ({ dispose }) => {
+        await dispose();
+      })
+    );
     if (serverScope !== undefined) {
-      await Effect.runPromise(Scope.close(serverScope, Exit.void))
+      await Effect.runPromise(Scope.close(serverScope, Exit.void));
     }
-    vi.unstubAllGlobals()
-  })
+    vi.unstubAllGlobals();
+  });
 
   it.each([
-    { route: '/', adapter: 'rpc' },
-    { route: '/http', adapter: 'http' },
+    { route: "/", adapter: "rpc" },
+    { route: "/http", adapter: "http" },
   ] as const)(
-    'round-trips $adapter query data through the router hooks without refetching',
+    "round-trips $adapter query data through the router hooks without refetching",
     async ({ route, adapter }) => {
       if (serverScope === undefined) {
-        throw new Error('Server scope was not initialized')
+        throw new Error("Server scope was not initialized");
       }
       const server = await Effect.runPromise(
-        startExampleRpcServer().pipe(Scope.provide(serverScope)),
-      )
+        startExampleRpcServer().pipe(Scope.provide(serverScope))
+      );
       const serverRouter = await createTanStackStartRouter({
         history: createMemoryHistory({ initialEntries: [route] }),
         rpcUrl: server.rpcUrl,
         scrollRestoration: false,
-      })
-      const serverApplication = serverRouter.options.context
-      applications.push(serverApplication)
-      attachRouterServerSsrUtils({ manifest: undefined, router: serverRouter })
+      });
+      const serverApplication = serverRouter.options.context;
+      applications.push(serverApplication);
+      attachRouterServerSsrUtils({ manifest: undefined, router: serverRouter });
 
-      await serverRouter.load()
-      const dehydrated = await serverRouter.options.dehydrate?.()
+      await serverRouter.load();
+      const dehydrated = await serverRouter.options.dehydrate?.();
       if (dehydrated === undefined) {
-        throw new Error('Router dehydration is not configured')
+        throw new Error("Router dehydration is not configured");
       }
-      serverRouter.serverSsr?.setRenderFinished()
+      serverRouter.serverSsr?.setRenderFinished();
 
-      const browserWindow = Object.assign(new EventTarget(), { origin: 'http://localhost' })
-      vi.stubGlobal('window', browserWindow)
+      const browserWindow = Object.assign(new EventTarget(), {
+        origin: "http://localhost",
+      });
+      vi.stubGlobal("window", browserWindow);
       const browserRouter = await createTanStackStartRouter({
         history: createMemoryHistory({ initialEntries: [route] }),
         isServer: false,
         rpcUrl: server.rpcUrl,
         scrollRestoration: false,
-      })
-      const browserApplication = browserRouter.options.context
-      applications.push(browserApplication)
+      });
+      const browserApplication = browserRouter.options.context;
+      applications.push(browserApplication);
       const usersKey =
-        adapter === 'http'
+        adapter === "http"
           ? browserApplication.httpQuery.users.list.queryKey()
-          : browserApplication.rpcQuery.users.list.queryKey()
+          : browserApplication.rpcQuery.users.list.queryKey();
       const pagesKey =
-        adapter === 'http'
+        adapter === "http"
           ? browserApplication.httpQuery.users.page.infiniteKey({
               query: { cursor: 0, pageSize: 4 },
             })
-          : browserApplication.rpcQuery.users.page.infiniteKey({ cursor: 0, pageSize: 4 })
-      const watchedKeys: readonly QueryKey[] = [usersKey, pagesKey]
-      let duplicateFetches = 0
-      const unsubscribe = browserApplication.queryClient.getQueryCache().subscribe((event) => {
-        if (
-          watchedKeys.some(
-            (queryKey) =>
-              event.query.queryHash ===
-              browserApplication.queryClient.getQueryCache().find({ queryKey })?.queryHash,
-          ) &&
-          event.query.state.fetchStatus === 'fetching'
-        ) {
-          duplicateFetches += 1
-        }
-      })
+          : browserApplication.rpcQuery.users.page.infiniteKey({
+              cursor: 0,
+              pageSize: 4,
+            });
+      const watchedKeys: readonly QueryKey[] = [usersKey, pagesKey];
+      let duplicateFetches = 0;
+      const unsubscribe = browserApplication.queryClient
+        .getQueryCache()
+        .subscribe((event) => {
+          if (
+            watchedKeys.some(
+              (queryKey) =>
+                event.query.queryHash ===
+                browserApplication.queryClient
+                  .getQueryCache()
+                  .find({ queryKey })?.queryHash
+            ) &&
+            event.query.state.fetchStatus === "fetching"
+          ) {
+            duplicateFetches += 1;
+          }
+        });
 
-      await browserRouter.options.hydrate?.(dehydrated)
-      await browserRouter.load()
+      await browserRouter.options.hydrate?.(dehydrated);
+      await browserRouter.load();
 
-      expect(browserApplication.queryClient.getQueryData(usersKey)).toStrictEqual(
-        expect.arrayContaining([expect.objectContaining({ name: 'Ada Lovelace' })]),
-      )
-      expect(browserApplication.queryClient.getQueryData(pagesKey)).toMatchObject({
+      expect(
+        browserApplication.queryClient.getQueryData(usersKey)
+      ).toStrictEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ name: "Ada Lovelace" }),
+        ])
+      );
+      expect(
+        browserApplication.queryClient.getQueryData(pagesKey)
+      ).toMatchObject({
         pageParams: [0],
-        pages: [{ total: 12, users: [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }] }],
-      })
-      expect(duplicateFetches).toBe(0)
-      unsubscribe()
-      serverRouter.serverSsr?.cleanup()
-    },
-  )
+        pages: [
+          { total: 12, users: [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }] },
+        ],
+      });
+      expect(duplicateFetches).toBe(0);
+      unsubscribe();
+      serverRouter.serverSsr?.cleanup();
+    }
+  );
 
   it.each([
-    { route: '/failure', adapter: 'rpc' },
-    { route: '/http-failure', adapter: 'http' },
+    { route: "/failure", adapter: "rpc" },
+    { route: "/http-failure", adapter: "http" },
   ] as const)(
-    'loads the $adapter failure route but omits its failed query from router dehydration',
+    "loads the $adapter failure route but omits its failed query from router dehydration",
     async ({ route, adapter }) => {
       if (serverScope === undefined) {
-        throw new Error('Server scope was not initialized')
+        throw new Error("Server scope was not initialized");
       }
       const server = await Effect.runPromise(
-        startExampleRpcServer().pipe(Scope.provide(serverScope)),
-      )
+        startExampleRpcServer().pipe(Scope.provide(serverScope))
+      );
       const router = await createTanStackStartRouter({
         history: createMemoryHistory({ initialEntries: [route] }),
         rpcUrl: server.rpcUrl,
         scrollRestoration: false,
-      })
-      const application = router.options.context
-      applications.push(application)
-      attachRouterServerSsrUtils({ manifest: undefined, router })
+      });
+      const application = router.options.context;
+      applications.push(application);
+      attachRouterServerSsrUtils({ manifest: undefined, router });
 
-      await router.load()
+      await router.load();
       const failureKey =
-        adapter === 'http'
+        adapter === "http"
           ? application.httpQuery.diagnostics.fail.queryKey()
-          : application.rpcQuery.diagnostics.fail.queryKey()
-      const dehydrated = await router.options.dehydrate?.()
+          : application.rpcQuery.diagnostics.fail.queryKey();
+      const dehydrated = await router.options.dehydrate?.();
 
-      expect(application.queryClient.getQueryState(failureKey)?.status).toBe('error')
-      expect(application.queryClient.getQueryState(failureKey)?.error).toMatchObject({
-        name: adapter === 'http' ? 'EffectHttpApiQueryError' : 'EffectRpcQueryError',
-      })
-      expect(dehydrated).not.toHaveProperty('query.initial')
-      router.serverSsr?.cleanup()
-    },
-  )
-})
+      expect(application.queryClient.getQueryState(failureKey)?.status).toBe(
+        "error"
+      );
+      expect(
+        application.queryClient.getQueryState(failureKey)?.error
+      ).toMatchObject({
+        name:
+          adapter === "http"
+            ? "EffectHttpApiQueryError"
+            : "EffectRpcQueryError",
+      });
+      expect(dehydrated).not.toHaveProperty("query.initial");
+      router.serverSsr?.cleanup();
+    }
+  );
+});

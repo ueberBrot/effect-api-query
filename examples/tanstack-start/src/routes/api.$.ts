@@ -1,13 +1,13 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
 
-import { handleApiRequest } from '../lib/api-server.ts'
+import { handleApiRequest } from "../lib/api-server.ts";
 
-export const Route = createFileRoute('/api/$')({
+export const Route = createFileRoute("/api/$")({
   server: {
     handlers: {
-      GET: async ({ request }) => handleApiRequest(request),
-      POST: async ({ request }) => handleApiRequest(request),
-      DELETE: async ({ request }) => handleApiRequest(request),
+      GET: async ({ request }) => await handleApiRequest(request),
+      POST: async ({ request }) => await handleApiRequest(request),
+      DELETE: async ({ request }) => await handleApiRequest(request),
     },
   },
-})
+});

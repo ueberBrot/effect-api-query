@@ -1,222 +1,405 @@
-import { startExampleRpcServer } from '@effect-api-query/server'
-import { QueryClient } from '@tanstack/react-query'
-import { createMemoryHistory, RouterProvider } from '@tanstack/react-router'
-import { createRpcQueryUtils, fetchStreamSnapshot } from '@ueberbrot/effect-api-query'
-import { Deferred, Effect, Exit, Schema, Scope, Stream } from 'effect'
-import { Rpc, RpcGroup } from 'effect/rpc'
-import type { RpcClient } from 'effect/rpc'
-import { renderToString } from 'react-dom/server'
-import { afterEach, beforeEach, describe, expect, it } from 'vite-plus/test'
+import { startExampleRpcServer } from "@effect-api-query/server";
+import { QueryClient } from "@tanstack/react-query";
+import { createMemoryHistory, RouterProvider } from "@tanstack/react-router";
+import {
+  createRpcQueryUtils,
+  fetchStreamSnapshot,
+} from "@ueberbrot/effect-api-query";
+import { Deferred, Effect, Exit, Schema, Scope, Stream } from "effect";
+import { Rpc, RpcGroup } from "effect/rpc";
+import type { RpcClient } from "effect/rpc";
+import { renderToString } from "react-dom/server";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vite-plus/test";
 
-import { fetchStreamSnapshot as captureStreamSnapshot } from '../../../src/index.ts'
-import type { StreamSnapshotOptions } from '../../../src/index.ts'
-import { createTanStackStartRouter } from '../src/router.tsx'
+import { fetchStreamSnapshot as captureStreamSnapshot } from "../../../src/index.ts";
+import type { StreamSnapshotOptions } from "../../../src/index.ts";
+import { createTanStackStartRouter } from "../src/router.tsx";
 
-describe('TanStack Start server rendering', () => {
-  let serverScope: Scope.Closeable | undefined
+const trackSnapshotSubscriptions = (queryClient: QueryClient) => {
+  const cache = queryClient.getQueryCache();
+  const originalSubscribe = cache.subscribe.bind(cache);
+  const subscribe = vi.spyOn(cache, "subscribe");
+  return {
+    subscribe,
+    capture: () => {
+      const callback = vi.fn<Parameters<typeof originalSubscribe>[0]>();
+      const unsubscribe = vi.fn<() => void>();
+      subscribe.mockImplementationOnce((listener) => {
+        callback.mockImplementation(listener);
+        unsubscribe.mockImplementation(originalSubscribe(callback));
+        return unsubscribe;
+      });
+      return { callback, unsubscribe };
+    },
+  };
+};
+
+describe("TanStack Start server rendering", () => {
+  let serverScope: Scope.Closeable | undefined;
 
   beforeEach(async () => {
-    serverScope = await Effect.runPromise(Scope.make())
-  })
+    serverScope = await Effect.runPromise(Scope.make());
+  });
 
   afterEach(async () => {
     if (serverScope !== undefined) {
-      await Effect.runPromise(Scope.close(serverScope, Exit.void))
+      await Effect.runPromise(Scope.close(serverScope, Exit.void));
     }
-  })
+  });
 
-  it('renders a cancelled server snapshot from generated query and stream options', async () => {
+  it("renders a cancelled server snapshot from generated query and stream options", async () => {
     if (serverScope === undefined) {
-      throw new Error('Server scope was not initialized')
+      throw new Error("Server scope was not initialized");
     }
-    const server = await Effect.runPromise(startExampleRpcServer().pipe(Scope.provide(serverScope)))
+    const server = await Effect.runPromise(
+      startExampleRpcServer().pipe(Scope.provide(serverScope))
+    );
     const router = await createTanStackStartRouter({
-      history: createMemoryHistory({ initialEntries: ['/'] }),
+      history: createMemoryHistory({ initialEntries: ["/"] }),
       rpcUrl: server.rpcUrl,
-    })
+    });
 
     try {
-      await router.load()
-      const html = renderToString(<RouterProvider router={router} />)
-      const { queryClient, rpcQuery } = router.options.context
+      await router.load();
+      const html = renderToString(<RouterProvider router={router} />);
+      const { queryClient, rpcQuery } = router.options.context;
 
-      expect(html).toContain('Ada Lovelace')
-      expect(html).toContain('Edsger Dijkstra')
-      expect(html).toMatch(/4.*of.*12.*loaded/su)
-      expect(html).toMatch(/Page.*1/su)
-      expect(html).toContain('Accumulated stream')
-      expect(html).toContain('Connection opened')
-      expect(html).toContain('Current state:')
-      expect(queryClient.getQueryData(rpcQuery.users.list.queryKey())).toHaveLength(12)
-      expect(
-        queryClient.getQueryData(rpcQuery.users.page.infiniteKey({ cursor: 0, pageSize: 4 })),
-      ).toMatchObject({
-        pageParams: [0],
-        pages: [
-          {
-            total: 12,
-            users: [
-              { id: 1, locale: 'en', name: 'Ada Lovelace' },
-              { id: 2, locale: 'nl', name: 'Edsger Dijkstra' },
-              { id: 3, locale: 'en', name: 'Alan Turing' },
-              { id: 4, locale: 'en', name: 'Barbara Liskov' },
-            ],
-          },
-        ],
-      })
-      expect(
-        queryClient.getQueryState(rpcQuery.diagnostics.stream.streamedKey())?.fetchStatus,
-      ).toBe('idle')
-      expect(queryClient.getQueryData(rpcQuery.diagnostics.stream.streamedKey())).toStrictEqual([
-        'Connection opened',
-      ])
-      expect(queryClient.getQueryState(rpcQuery.diagnostics.stream.liveKey())?.fetchStatus).toBe(
-        'idle',
-      )
-      expect(queryClient.getQueryData(rpcQuery.diagnostics.stream.liveKey())).toBe(
-        'Connection opened',
-      )
-    } finally {
-      await router.options.context.dispose()
-    }
-  })
-
-  it('renders generated HTTP directory and page queries in the server snapshot', async () => {
-    if (serverScope === undefined) {
-      throw new Error('Server scope was not initialized')
-    }
-    const server = await Effect.runPromise(startExampleRpcServer().pipe(Scope.provide(serverScope)))
-    const router = await createTanStackStartRouter({
-      history: createMemoryHistory({ initialEntries: ['/http'] }),
-      rpcUrl: server.rpcUrl,
-    })
-
-    try {
-      await router.load()
-      const html = renderToString(<RouterProvider router={router} />)
-      const { httpQuery, queryClient, rpcQuery } = router.options.context
-
-      expect(html).toContain('HTTP users')
-      expect(html).toMatch(/HTTP: (?:<!-- -->)?Ada Lovelace/u)
-      expect(html).toMatch(/HTTP: (?:<!-- -->)?Edsger Dijkstra/u)
-      expect(html).toMatch(/HTTP:.*4.*of.*12.*loaded/su)
-      expect(html).toContain('HTTP user query skipped')
-      expect(queryClient.getQueryData(httpQuery.users.list.queryKey())).toHaveLength(12)
-      expect(
-        queryClient.getQueryData(
-          httpQuery.users.page.infiniteKey({ query: { cursor: 0, pageSize: 4 } }),
+      expect(html).toMatch(/Ada Lovelace.*Edsger Dijkstra/su);
+      expect(html).toMatch(/4.*of.*12.*loaded.*Page.*1/su);
+      expect(html).toMatch(
+        /Accumulated stream.*Connection opened.*Current state:/su
+      );
+      expect({
+        directoryCount: queryClient.getQueryData(rpcQuery.users.list.queryKey())
+          ?.length,
+        page: queryClient.getQueryData(
+          rpcQuery.users.page.infiniteKey({ cursor: 0, pageSize: 4 })
         ),
-      ).toMatchObject({
-        pageParams: [0],
-        pages: [{ total: 12, users: [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }] }],
-      })
-      expect(queryClient.getQueryData(rpcQuery.users.list.queryKey())).toBeUndefined()
-      expect(queryClient.isFetching()).toBe(0)
+      }).toMatchObject({
+        directoryCount: 12,
+        page: {
+          pageParams: [0],
+          pages: [
+            {
+              total: 12,
+              users: [
+                { id: 1, locale: "en", name: "Ada Lovelace" },
+                { id: 2, locale: "nl", name: "Edsger Dijkstra" },
+                { id: 3, locale: "en", name: "Alan Turing" },
+                { id: 4, locale: "en", name: "Barbara Liskov" },
+              ],
+            },
+          ],
+        },
+      });
+      expect({
+        accumulatedStatus: queryClient.getQueryState(
+          rpcQuery.diagnostics.stream.streamedKey()
+        )?.fetchStatus,
+        accumulated: queryClient.getQueryData(
+          rpcQuery.diagnostics.stream.streamedKey()
+        ),
+        liveStatus: queryClient.getQueryState(
+          rpcQuery.diagnostics.stream.liveKey()
+        )?.fetchStatus,
+        live: queryClient.getQueryData(rpcQuery.diagnostics.stream.liveKey()),
+      }).toStrictEqual({
+        accumulatedStatus: "idle",
+        accumulated: ["Connection opened"],
+        liveStatus: "idle",
+        live: "Connection opened",
+      });
     } finally {
-      await router.options.context.dispose()
+      await router.options.context.dispose();
     }
-  })
+  });
+
+  it("renders generated HTTP directory and page queries in the server snapshot", async () => {
+    if (serverScope === undefined) {
+      throw new Error("Server scope was not initialized");
+    }
+    const server = await Effect.runPromise(
+      startExampleRpcServer().pipe(Scope.provide(serverScope))
+    );
+    const router = await createTanStackStartRouter({
+      history: createMemoryHistory({ initialEntries: ["/http"] }),
+      rpcUrl: server.rpcUrl,
+    });
+
+    try {
+      await router.load();
+      const html = renderToString(<RouterProvider router={router} />);
+      const { httpQuery, queryClient, rpcQuery } = router.options.context;
+
+      expect(html).toContain("HTTP users");
+      expect(html).toMatch(
+        /HTTP: (?:<!-- -->)?Ada Lovelace.*HTTP: (?:<!-- -->)?Edsger Dijkstra/su
+      );
+      expect(html).toMatch(/HTTP:.*4.*of.*12.*loaded/su);
+      expect(html).toContain("HTTP user query skipped");
+      expect({
+        directoryCount: queryClient.getQueryData(
+          httpQuery.users.list.queryKey()
+        )?.length,
+        page: queryClient.getQueryData(
+          httpQuery.users.page.infiniteKey({
+            query: { cursor: 0, pageSize: 4 },
+          })
+        ),
+        rpcDirectory: queryClient.getQueryData(rpcQuery.users.list.queryKey()),
+        fetching: queryClient.isFetching(),
+      }).toMatchObject({
+        directoryCount: 12,
+        page: {
+          pageParams: [0],
+          pages: [
+            { total: 12, users: [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }] },
+          ],
+        },
+        rpcDirectory: undefined,
+        fetching: 0,
+      });
+    } finally {
+      await router.options.context.dispose();
+    }
+  });
 
   it.each([false, true])(
-    'finalizes a stream after its first new snapshot (cached: %s)',
+    "finalizes a stream after its first new snapshot (cached: %s)",
     async (cached) => {
-      const Watch = Rpc.make('diagnostics.watch', { success: Schema.String, stream: true })
-      const group = RpcGroup.make(Watch)
-      // oxlint-disable-next-line typescript/no-invalid-void-type
-      const finalized = Deferred.makeUnsafe<void>()
-      const source = Stream.make('snapshot').pipe(
+      const Watch = Rpc.make("diagnostics.watch", {
+        success: Schema.String,
+        stream: true,
+      });
+      const group = RpcGroup.make(Watch);
+      const finalized = Deferred.makeUnsafe<boolean>();
+      const source = Stream.make("snapshot").pipe(
         Stream.concat(Stream.fromEffect(Effect.never)),
-        Stream.ensuring(Deferred.succeed(finalized, undefined).pipe(Effect.asVoid)),
-      )
-      // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-      const client = (() => source) as RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof group>>
-      const queryClient = new QueryClient()
+        Stream.ensuring(Deferred.succeed(finalized, true).pipe(Effect.asVoid))
+      );
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion
+      const client = (() => source) as RpcClient.RpcClient.Flat<
+        RpcGroup.Rpcs<typeof group>
+      >;
+      const queryClient = new QueryClient();
       const options = createRpcQueryUtils(group, {
         client,
-        keyPrefix: ['start'] as const,
-      }).diagnostics.watch.streamedOptions()
+        keyPrefix: ["start"] as const,
+      }).diagnostics.watch.streamedOptions();
       if (cached) {
-        queryClient.setQueryData(options.queryKey, ['previous'])
+        queryClient.setQueryData(options.queryKey, ["previous"]);
       }
+      const subscriptions = trackSnapshotSubscriptions(queryClient);
+      const capture = subscriptions.capture();
 
-      const controls: StreamSnapshotOptions = { mode: 'fresh', timeoutMs: 1000 }
-      const snapshot = await captureStreamSnapshot(queryClient, options, controls)
+      try {
+        const controls: StreamSnapshotOptions = {
+          mode: "fresh",
+          timeoutMs: 1000,
+        };
+        const snapshot = await captureStreamSnapshot(
+          queryClient,
+          options,
+          controls
+        );
 
-      expect(snapshot).toStrictEqual(['snapshot'])
-      expect(queryClient.getQueryState(options.queryKey)?.fetchStatus).toBe('idle')
-      expect(Deferred.isDoneUnsafe(finalized)).toBe(true)
-    },
-  )
+        expect({
+          snapshot,
+          fetchStatus: queryClient.getQueryState(options.queryKey)?.fetchStatus,
+          fetching: queryClient.isFetching(),
+          finalized: Deferred.isDoneUnsafe(finalized),
+        }).toStrictEqual({
+          snapshot: ["snapshot"],
+          fetchStatus: "idle",
+          fetching: 0,
+          finalized: true,
+        });
+        expect(capture.unsubscribe).toHaveBeenCalledOnce();
+        capture.callback.mockClear();
+        queryClient.setQueryData(options.queryKey, ["later"]);
+        expect(capture.callback).not.toHaveBeenCalled();
+      } finally {
+        queryClient.clear();
+        expect(queryClient.getQueryCache().hasListeners()).toBe(false);
+        subscriptions.subscribe.mockRestore();
+      }
+    }
+  );
 
-  it('settles and releases its listener when cancelled before the first streamed value', async () => {
-    const Watch = Rpc.make('watch', { success: Schema.String, stream: true })
-    const group = RpcGroup.make(Watch)
-    // oxlint-disable-next-line typescript/no-invalid-void-type
-    const started = Deferred.makeUnsafe<void>()
-    // oxlint-disable-next-line typescript/no-invalid-void-type
-    const finalized = Deferred.makeUnsafe<void>()
-    const source = Stream.fromEffect(
-      Deferred.succeed(started, undefined).pipe(Effect.andThen(Effect.never)),
-    ).pipe(Stream.ensuring(Deferred.succeed(finalized, undefined).pipe(Effect.asVoid)))
-    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-    const client = (() => source) as RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof group>>
-    const queryClient = new QueryClient()
+  it("reuses a cached snapshot without subscribing or executing the stream", async () => {
+    const Watch = Rpc.make("watch", { success: Schema.String, stream: true });
+    const group = RpcGroup.make(Watch);
+    const client = vi.fn<() => Stream.Stream<string>>(() =>
+      Stream.make("unexpected")
+    );
+    const queryClient = new QueryClient();
     const options = createRpcQueryUtils(group, {
-      client,
-      keyPrefix: ['cancel-snapshot'],
-    }).watch.streamedOptions()
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion
+      client: client as RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof group>>,
+      keyPrefix: ["cached-snapshot"],
+    }).watch.streamedOptions();
+    const previous = ["previous"];
+    queryClient.setQueryData(options.queryKey, previous);
+    const subscriptions = trackSnapshotSubscriptions(queryClient);
 
     try {
-      const snapshot = fetchStreamSnapshot(queryClient, options)
-      const rejected = (async () => {
-        await expect(snapshot).rejects.toMatchObject({ message: 'CancelledError', revert: true })
-      })()
-      await Effect.runPromise(Deferred.await(started))
-      expect(queryClient.getQueryCache().hasListeners()).toBe(true)
-      await queryClient.cancelQueries({ queryKey: options.queryKey, exact: true })
-      await rejected
-      await Effect.runPromise(Deferred.await(finalized))
-      expect(queryClient.getQueryCache().hasListeners()).toBe(false)
+      await expect(
+        fetchStreamSnapshot(queryClient, options, { mode: "cached" })
+      ).resolves.toBe(previous);
+      expect(subscriptions.subscribe).not.toHaveBeenCalled();
+      expect(client).not.toHaveBeenCalled();
+      expect({
+        fetchStatus: queryClient.getQueryState(options.queryKey)?.fetchStatus,
+        fetching: queryClient.isFetching(),
+      }).toStrictEqual({ fetchStatus: "idle", fetching: 0 });
     } finally {
-      queryClient.clear()
+      queryClient.clear();
+      expect(queryClient.getQueryCache().hasListeners()).toBe(false);
+      subscriptions.subscribe.mockRestore();
     }
-  }, 1500)
+  });
 
-  it('releases its listener on failure and can take a fresh snapshot after a cached error', async () => {
-    const Watch = Rpc.make('watch', { success: Schema.String, stream: true })
-    const group = RpcGroup.make(Watch)
-    // oxlint-disable-next-line typescript/no-invalid-void-type
-    const finalized = Deferred.makeUnsafe<void>()
-    const source = Stream.make('recovered').pipe(
-      Stream.concat(Stream.fromEffect(Effect.never)),
-      Stream.ensuring(Deferred.succeed(finalized, undefined).pipe(Effect.asVoid)),
-    )
-    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-    const client = (() => source) as RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof group>>
-    const queryClient = new QueryClient()
+  it("settles and releases its listener when cancelled before the first streamed value", async () => {
+    const Watch = Rpc.make("watch", { success: Schema.String, stream: true });
+    const group = RpcGroup.make(Watch);
+    const started = Deferred.makeUnsafe<boolean>();
+    const finalized = Deferred.makeUnsafe<boolean>();
+    const source = Stream.fromEffect(
+      Deferred.succeed(started, true).pipe(Effect.andThen(Effect.never))
+    ).pipe(
+      Stream.ensuring(Deferred.succeed(finalized, true).pipe(Effect.asVoid))
+    );
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion
+    const client = (() => source) as RpcClient.RpcClient.Flat<
+      RpcGroup.Rpcs<typeof group>
+    >;
+    const queryClient = new QueryClient();
     const options = createRpcQueryUtils(group, {
       client,
-      keyPrefix: ['recover-snapshot'],
-    }).watch.streamedOptions()
-    const failure = new Error('first request failed')
+      keyPrefix: ["cancel-snapshot"],
+    }).watch.streamedOptions();
+    const subscriptions = trackSnapshotSubscriptions(queryClient);
+    const capture = subscriptions.capture();
+
+    try {
+      const snapshot = fetchStreamSnapshot(queryClient, options);
+      const rejected = (async () => {
+        await expect(snapshot).rejects.toMatchObject({
+          message: "CancelledError",
+          revert: true,
+        });
+      })();
+      await Effect.runPromise(Deferred.await(started));
+      expect(capture.unsubscribe).not.toHaveBeenCalled();
+      await queryClient.cancelQueries({
+        queryKey: options.queryKey,
+        exact: true,
+      });
+      await rejected;
+      expect({
+        finalized: Deferred.isDoneUnsafe(finalized),
+        fetchStatus: queryClient.getQueryState(options.queryKey)?.fetchStatus,
+        fetching: queryClient.isFetching(),
+        unsubscribeCount: capture.unsubscribe.mock.calls.length,
+      }).toStrictEqual({
+        finalized: true,
+        fetchStatus: "idle",
+        fetching: 0,
+        unsubscribeCount: 1,
+      });
+      capture.callback.mockClear();
+      queryClient.setQueryData(options.queryKey, ["later"]);
+      expect(capture.callback).not.toHaveBeenCalled();
+    } finally {
+      queryClient.clear();
+      expect(queryClient.getQueryCache().hasListeners()).toBe(false);
+      subscriptions.subscribe.mockRestore();
+    }
+  }, 1500);
+
+  it("releases its listener on failure and can take a fresh snapshot after a cached error", async () => {
+    const Watch = Rpc.make("watch", { success: Schema.String, stream: true });
+    const group = RpcGroup.make(Watch);
+    const finalized = Deferred.makeUnsafe<boolean>();
+    const source = Stream.make("recovered").pipe(
+      Stream.concat(Stream.fromEffect(Effect.never)),
+      Stream.ensuring(Deferred.succeed(finalized, true).pipe(Effect.asVoid))
+    );
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion
+    const client = (() => source) as RpcClient.RpcClient.Flat<
+      RpcGroup.Rpcs<typeof group>
+    >;
+    const queryClient = new QueryClient();
+    const options = createRpcQueryUtils(group, {
+      client,
+      keyPrefix: ["recover-snapshot"],
+    }).watch.streamedOptions();
+    const failure = new Error("first request failed");
+    const subscriptions = trackSnapshotSubscriptions(queryClient);
+    const failedCapture = subscriptions.capture();
 
     try {
       await expect(
         fetchStreamSnapshot(queryClient, {
           ...options,
           queryFn: () => {
-            throw failure
+            throw failure;
           },
-        }),
-      ).rejects.toBe(failure)
-      expect(queryClient.getQueryCache().hasListeners()).toBe(false)
+        })
+      ).rejects.toBe(failure);
+      const failedSettlement = {
+        fetchStatus: queryClient.getQueryState(options.queryKey)?.fetchStatus,
+        fetching: queryClient.isFetching(),
+        unsubscribeCount: failedCapture.unsubscribe.mock.calls.length,
+      };
+      failedCapture.callback.mockClear();
+      await queryClient.invalidateQueries({
+        queryKey: options.queryKey,
+        exact: true,
+        refetchType: "none",
+      });
+      expect({
+        ...failedSettlement,
+        callbackCount: failedCapture.callback.mock.calls.length,
+      }).toStrictEqual({
+        fetchStatus: "idle",
+        fetching: 0,
+        unsubscribeCount: 1,
+        callbackCount: 0,
+      });
 
-      await expect(fetchStreamSnapshot(queryClient, options)).resolves.toStrictEqual(['recovered'])
-      await Effect.runPromise(Deferred.await(finalized))
-      expect(queryClient.getQueryCache().hasListeners()).toBe(false)
-      expect(queryClient.isFetching()).toBe(0)
+      const recoveredCapture = subscriptions.capture();
+      const snapshot = await fetchStreamSnapshot(queryClient, options);
+      expect({
+        snapshot,
+        finalized: Deferred.isDoneUnsafe(finalized),
+        fetchStatus: queryClient.getQueryState(options.queryKey)?.fetchStatus,
+        fetching: queryClient.isFetching(),
+        unsubscribeCount: recoveredCapture.unsubscribe.mock.calls.length,
+      }).toStrictEqual({
+        snapshot: ["recovered"],
+        finalized: true,
+        fetchStatus: "idle",
+        fetching: 0,
+        unsubscribeCount: 1,
+      });
+      recoveredCapture.callback.mockClear();
+      queryClient.setQueryData(options.queryKey, ["later"]);
+      expect({
+        recoveredCallbacks: recoveredCapture.callback.mock.calls.length,
+        failedCallbacks: failedCapture.callback.mock.calls.length,
+      }).toStrictEqual({ recoveredCallbacks: 0, failedCallbacks: 0 });
     } finally {
-      queryClient.clear()
+      queryClient.clear();
+      expect(queryClient.getQueryCache().hasListeners()).toBe(false);
+      subscriptions.subscribe.mockRestore();
     }
-  }, 1500)
-})
+  }, 1500);
+});

@@ -1,18 +1,26 @@
-import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
-import type { ReactNode } from 'react'
+import {
+  createRootRouteWithContext,
+  HeadContent,
+  Outlet,
+  Scripts,
+} from "@tanstack/react-router";
+import type { ReactNode } from "react";
 
-import { NavigationLink } from '../components/navigation-link.tsx'
-import type { TanStackStartApplication } from '../lib/application.ts'
+import { NavigationLink } from "../components/navigation-link.tsx";
+import type { TanStackStartApplication } from "../lib/application.ts";
 
-import stylesheet from '../styles.css?url'
+import stylesheet from "../styles.css?url";
 
 const Root = () => (
   <Document>
-    <div className="app-backdrop grid min-h-screen grid-rows-[auto_1fr_auto] text-text-secondary">
-      <header className="border-b border-border bg-background/95 backdrop-blur">
+    <div className="app-backdrop text-text-secondary grid min-h-screen grid-rows-[auto_1fr_auto]">
+      <header className="border-border bg-background/95 border-b backdrop-blur">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <NavigationLink to="/" variant="brand">
-            <span aria-hidden="true" className="size-2 rounded-full bg-brand-600" />
+            <span
+              aria-hidden="true"
+              className="bg-brand-600 size-2 rounded-full"
+            />
             effect-api-query
           </NavigationLink>
           <nav aria-label="Primary">
@@ -20,7 +28,8 @@ const Root = () => (
               <li className="list-none">
                 <NavigationLink
                   activeProps={{
-                    className: 'border-brand-800 bg-brand-950/60 text-brand-200',
+                    className:
+                      "border-brand-800 bg-brand-950/60 text-brand-200",
                   }}
                   to="/"
                 >
@@ -30,7 +39,8 @@ const Root = () => (
               <li className="list-none">
                 <NavigationLink
                   activeProps={{
-                    className: 'border-brand-800 bg-brand-950/60 text-brand-200',
+                    className:
+                      "border-brand-800 bg-brand-950/60 text-brand-200",
                   }}
                   to="/http"
                 >
@@ -40,7 +50,8 @@ const Root = () => (
               <li className="list-none">
                 <NavigationLink
                   activeProps={{
-                    className: 'border-brand-800 bg-brand-950/60 text-brand-200',
+                    className:
+                      "border-brand-800 bg-brand-950/60 text-brand-200",
                   }}
                   to="/http-failure"
                 >
@@ -50,7 +61,8 @@ const Root = () => (
               <li className="list-none">
                 <NavigationLink
                   activeProps={{
-                    className: 'border-brand-800 bg-brand-950/60 text-brand-200',
+                    className:
+                      "border-brand-800 bg-brand-950/60 text-brand-200",
                   }}
                   to="/details"
                 >
@@ -60,7 +72,8 @@ const Root = () => (
               <li className="list-none">
                 <NavigationLink
                   activeProps={{
-                    className: 'border-brand-800 bg-brand-950/60 text-brand-200',
+                    className:
+                      "border-brand-800 bg-brand-950/60 text-brand-200",
                   }}
                   to="/diagnostics"
                 >
@@ -70,7 +83,8 @@ const Root = () => (
               <li className="list-none">
                 <NavigationLink
                   activeProps={{
-                    className: 'border-brand-800 bg-brand-950/60 text-brand-200',
+                    className:
+                      "border-brand-800 bg-brand-950/60 text-brand-200",
                   }}
                   to="/failure"
                 >
@@ -82,12 +96,12 @@ const Root = () => (
         </div>
       </header>
       <Outlet />
-      <footer className="mx-auto w-full max-w-7xl border-t border-border-subtle px-4 py-6 text-sm text-text-subtle sm:px-6">
+      <footer className="border-border-subtle text-text-subtle mx-auto w-full max-w-7xl border-t px-4 py-6 text-sm sm:px-6">
         Generated Effect RPC and HTTP options with the TanStack Query lifecycle.
       </footer>
     </div>
   </Document>
-)
+);
 
 const Document = ({ children }: { readonly children: ReactNode }) => (
   <html lang="en">
@@ -99,16 +113,16 @@ const Document = ({ children }: { readonly children: ReactNode }) => (
       <Scripts />
     </body>
   </html>
-)
+);
 
 export const Route = createRootRouteWithContext<TanStackStartApplication>()({
   component: Root,
   head: () => ({
-    links: [{ href: stylesheet, rel: 'stylesheet' }],
+    links: [{ href: stylesheet, rel: "stylesheet" }],
     meta: [
-      { charSet: 'utf-8' },
-      { content: 'width=device-width, initial-scale=1', name: 'viewport' },
-      { title: 'Effect API Query with TanStack Start' },
+      { charSet: "utf-8" },
+      { content: "width=device-width, initial-scale=1", name: "viewport" },
+      { title: "Effect API Query with TanStack Start" },
     ],
   }),
-})
+});

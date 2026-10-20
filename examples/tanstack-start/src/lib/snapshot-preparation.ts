@@ -1,122 +1,107 @@
-import { CommandStatus, DiagnosticStatus, User, UserPage } from '@effect-api-query/contracts'
-import { hashKey } from '@tanstack/react-query'
-import type { DehydratedState, QueryKey } from '@tanstack/react-query'
-import { Context, Effect, Schema } from 'effect'
+import {
+  CommandStatus,
+  DiagnosticStatus,
+  User,
+  UserPage,
+} from "@effect-api-query/contracts";
+import type { DehydratedState } from "@tanstack/react-query";
+import {
+  createHydrationRegistry,
+  infiniteQueryCodec,
+  queryViewCodec,
+} from "@ueberbrot/effect-api-query";
+import { Context, Effect, Schema } from "effect";
 
-import type { TanStackStartApplication } from './application.ts'
+import type { TanStackStartApplication } from "./application.ts";
 
 export interface SnapshotPreparation {
-  readonly beforeEncode: Effect.Effect<void>
-  readonly beforeDecode: Effect.Effect<void>
+  readonly beforeEncode: Effect.Effect<void>;
+  readonly beforeDecode: Effect.Effect<void>;
 }
 
-type SnapshotEncodingService = Pick<SnapshotPreparation, 'beforeEncode'>
-const SnapshotEncoding = Context.Service<SnapshotEncodingService>('Start/SnapshotEncoding')
-type SnapshotDecodingService = Pick<SnapshotPreparation, 'beforeDecode'>
-const SnapshotDecoding = Context.Service<SnapshotDecodingService>('Start/SnapshotDecoding')
+type SnapshotEncodingService = Pick<SnapshotPreparation, "beforeEncode">;
+const SnapshotEncoding = Context.Service<SnapshotEncodingService>(
+  "Start/SnapshotEncoding"
+);
+type SnapshotDecodingService = Pick<SnapshotPreparation, "beforeDecode">;
+const SnapshotDecoding = Context.Service<SnapshotDecodingService>(
+  "Start/SnapshotDecoding"
+);
 
 const prepared = <S extends Schema.Codec<unknown, unknown>>(schema: S) =>
   schema.pipe(
     Schema.middlewareEncoding<S, SnapshotEncodingService>((encoding) =>
       SnapshotEncoding.pipe(
-        Effect.flatMap(({ beforeEncode }) => beforeEncode.pipe(Effect.andThen(encoding))),
-      ),
+        Effect.flatMap(({ beforeEncode }) =>
+          beforeEncode.pipe(Effect.andThen(encoding))
+        )
+      )
     ),
     Schema.middlewareDecoding((decoding) =>
       SnapshotDecoding.pipe(
-        Effect.flatMap(({ beforeDecode }) => beforeDecode.pipe(Effect.andThen(decoding))),
-      ),
-    ),
-  )
+        Effect.flatMap(({ beforeDecode }) =>
+          beforeDecode.pipe(Effect.andThen(decoding))
+        )
+      )
+    )
+  );
 
-const Users = prepared(Schema.Array(User))
-const SingleUser = prepared(User)
-const Pages = prepared(
-  Schema.Struct({ pages: Schema.Array(UserPage), pageParams: Schema.Array(Schema.Int) }),
-)
-const Status = prepared(DiagnosticStatus)
-const Command = prepared(Schema.NullOr(CommandStatus))
-const Text = prepared(Schema.String)
-const History = prepared(Schema.Array(Schema.String))
+const Users = prepared(Schema.Array(User));
+const SingleUser = prepared(User);
+const Page = prepared(UserPage);
+const Status = prepared(DiagnosticStatus);
+const Command = prepared(Schema.NullOr(CommandStatus));
+const Text = prepared(Schema.String);
+const History = prepared(Schema.Array(Schema.String));
 
 export interface SnapshotCodecs {
-  readonly encode: (queries: DehydratedState['queries']) => Promise<DehydratedState['queries']>
-  readonly decode: (queries: DehydratedState['queries']) => Promise<DehydratedState['queries']>
+  readonly encode: (
+    queries: DehydratedState["queries"]
+  ) => Promise<DehydratedState["queries"]>;
+  readonly decode: (
+    queries: DehydratedState["queries"]
+  ) => Promise<DehydratedState["queries"]>;
 }
 
 export const makeSnapshotPreparation = (
   { rpcQuery, httpQuery, runPreparation }: TanStackStartApplication,
-  services: SnapshotPreparation,
+  services: SnapshotPreparation
 ): SnapshotCodecs => {
-  const codecs = [
-    { prefix: rpcQuery.users.list.queryKey(), codec: Users },
-    { prefix: httpQuery.users.list.queryKey(), codec: Users },
-    { prefix: [...rpcQuery.users.get.key(), 'query'], codec: SingleUser },
-    { prefix: [...httpQuery.users.get.key(), 'query'], codec: SingleUser },
-    { prefix: [...rpcQuery.users.page.key(), 'infinite'], codec: Pages },
-    { prefix: [...httpQuery.users.page.key(), 'infinite'], codec: Pages },
-    { prefix: rpcQuery.diagnostics.status.queryKey(), codec: Status },
-    { prefix: httpQuery.diagnostics.status.queryKey(), codec: Status },
-    { prefix: [...rpcQuery.diagnostics.operationStatus.key(), 'query'], codec: Status },
-    { prefix: [...httpQuery.diagnostics.operationStatus.key(), 'query'], codec: Status },
-    { prefix: [...rpcQuery.commands.status.key(), 'query'], codec: Command },
-    { prefix: [...rpcQuery.diagnostics.slow.key(), 'query'], codec: Text },
-    { prefix: [...httpQuery.diagnostics.slow.key(), 'query'], codec: Text },
-    { prefix: [...rpcQuery.diagnostics.stream.key(), 'live'], codec: Text },
-    { prefix: [...rpcQuery.diagnostics.stream.key(), 'streamed'], codec: History },
-  ].map(({ prefix, codec }) => ({
-    length: prefix.length,
-    hash: hashKey(prefix),
-    encode: Schema.encodeUnknownEffect(codec),
-    decode: Schema.decodeUnknownEffect(codec),
-  }))
-  type ViewCodec = (typeof codecs)[number]
-  const codecsByLength = new Map<number, Map<string, ViewCodec>>()
-  for (const codec of codecs) {
-    const lengthCodecs = codecsByLength.get(codec.length) ?? new Map<string, ViewCodec>()
-    lengthCodecs.set(codec.hash, codec)
-    codecsByLength.set(codec.length, lengthCodecs)
-  }
-  const codecFor = (key: QueryKey) => {
-    let codec: ViewCodec | undefined
-    for (const [length, lengthCodecs] of codecsByLength) {
-      codec = lengthCodecs.get(hashKey(key.slice(0, length)))
-      if (codec !== undefined) {
-        break
-      }
-    }
-    return codec
-  }
-  type SnapshotData = DehydratedState['queries'][number]['state']['data']
-  const transform = <R>(
-    queries: DehydratedState['queries'],
-    convert: (
-      codec: ViewCodec,
-      data: SnapshotData,
-    ) => Effect.Effect<SnapshotData, Schema.SchemaError, R>,
-  ) =>
-    Effect.forEach(
-      Effect.fnUntraced(function* (query: DehydratedState['queries'][number]) {
-        const codec = codecFor(query.queryKey)
-        if (codec === undefined) {
-          return yield* Effect.die(new TypeError('No Start snapshot codec for query'))
-        }
-        const data = yield* convert(codec, query.state.data)
-        return { ...query, state: { ...query.state, data } }
-      }),
-    )(queries)
+  const registry = createHydrationRegistry([
+    queryViewCodec(rpcQuery.users.list, "query", Users),
+    queryViewCodec(httpQuery.users.list, "query", Users),
+    queryViewCodec(rpcQuery.users.get, "query", SingleUser),
+    queryViewCodec(httpQuery.users.get, "query", SingleUser),
+    infiniteQueryCodec(rpcQuery.users.page, {
+      page: Page,
+      pageParam: Schema.Int,
+    }),
+    infiniteQueryCodec(httpQuery.users.page, {
+      page: Page,
+      pageParam: Schema.Int,
+    }),
+    queryViewCodec(rpcQuery.diagnostics.status, "query", Status),
+    queryViewCodec(httpQuery.diagnostics.status, "query", Status),
+    queryViewCodec(rpcQuery.diagnostics.operationStatus, "query", Status),
+    queryViewCodec(httpQuery.diagnostics.operationStatus, "query", Status),
+    queryViewCodec(rpcQuery.commands.status, "query", Command),
+    queryViewCodec(rpcQuery.diagnostics.slow, "query", Text),
+    queryViewCodec(httpQuery.diagnostics.slow, "query", Text),
+    queryViewCodec(rpcQuery.diagnostics.stream, "live", Text),
+    queryViewCodec(rpcQuery.diagnostics.stream, "streamed", History),
+  ]);
   return {
-    encode: async (queries: DehydratedState['queries']) =>
-      runPreparation(
-        transform(queries, (codec, data) => codec.encode(data)).pipe(
-          Effect.provideService(SnapshotEncoding, services),
-        ),
+    encode: async (queries: DehydratedState["queries"]) =>
+      await runPreparation(
+        registry
+          .encodeQueries(queries)
+          .pipe(Effect.provideService(SnapshotEncoding, services))
       ),
-    decode: async (queries: DehydratedState['queries']) =>
-      runPreparation(
-        transform(queries, (codec, data) => codec.decode(data)).pipe(
-          Effect.provideService(SnapshotDecoding, services),
-        ),
+    decode: async (queries: DehydratedState["queries"]) =>
+      await runPreparation(
+        registry
+          .decodeQueries(queries)
+          .pipe(Effect.provideService(SnapshotDecoding, services))
       ),
-  }
-}
+  };
+};

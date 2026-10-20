@@ -1,145 +1,200 @@
-import { SchemaAST } from 'effect'
-import type { Rpc, RpcClient, RpcGroup } from 'effect/rpc'
-import { RpcSchema } from 'effect/rpc'
+import { Predicate, SchemaAST } from "effect";
+import type { Effect, Stream } from "effect";
+import type { RpcClient, RpcGroup } from "effect/rpc";
+import { Rpc, RpcSchema } from "effect/rpc";
 
-import type { OperationDescription, OperationInput, TreeErrors } from '../core/operation'
-import { createSchemaKeyEncoding } from '../core/schema-key'
-import { EffectRpcQueryConfigError, EffectRpcQueryError, EffectRpcQueryKeyError } from './errors'
-import { createStreamPreparation } from './streamed-query'
+import type {
+  OperationDescription,
+  OperationInput,
+  TreeErrors,
+} from "../core/operation";
+import { createSchemaKeyEncoding } from "../core/schema-key";
+import {
+  EffectRpcQueryConfigError,
+  EffectRpcQueryError,
+  EffectRpcQueryKeyError,
+} from "./errors";
+import { createStreamPreparation } from "./streamed-query";
 
-const createRpcInput = (definition: Rpc.AnyWithProps): OperationInput => {
-  const { payloadSchema, _tag: rpcTag } = definition
+type RpcRequest = Pick<
+  Rpc.AnyWithProps,
+  "_tag" | "payloadSchema" | "successSchema"
+>;
+
+type RpcClientInvocation<Result> = (
+  tag: string,
+  // oxlint-disable-next-line anti-slop/no-unknown-parameters
+  input: unknown,
+  // oxlint-disable-next-line anti-slop/no-unknown-parameters
+  options: unknown
+) => Result;
+
+const rpcInputs = new WeakMap<RpcRequest, OperationInput>();
+
+const compileRpcInput = (definition: RpcRequest): OperationInput => {
+  const { payloadSchema, _tag: rpcTag } = definition;
   if (SchemaAST.isVoid(payloadSchema.ast)) {
-    return { _tag: 'Inputless' }
+    return { _tag: "Inputless" };
   }
-  const keyEncoding = createSchemaKeyEncoding(payloadSchema)
+  const keyEncoding = createSchemaKeyEncoding(payloadSchema);
 
   return {
-    _tag: 'Input',
+    _tag: "Input",
     requiresEncoder: keyEncoding.requiresEncoder,
+    cacheable: keyEncoding.cacheable,
     pageInput: (input) => payloadSchema.make(input),
     invalidKey: (cause) =>
       new EffectRpcQueryKeyError(
-        'InvalidKeyValue',
+        "InvalidKeyValue",
         rpcTag,
         `The key payload for RPC ${rpcTag} is not JSON-safe`,
-        cause,
+        cause
       ),
     prepare: (input, encoder) => {
-      let normalized: unknown
+      let normalized: unknown;
       try {
-        normalized = payloadSchema.make(input)
+        normalized = payloadSchema.make(input);
       } catch (error) {
         throw new EffectRpcQueryKeyError(
-          'PayloadConstructionFailed',
+          "PayloadConstructionFailed",
           rpcTag,
           `Could not construct the payload for RPC ${rpcTag}`,
-          error,
-        )
+          error
+        );
       }
-      let keyValue: unknown
+      let keyValue: unknown;
       try {
-        keyValue = encoder ? encoder(normalized) : keyEncoding.encode(normalized)
+        keyValue = encoder
+          ? encoder(normalized)
+          : keyEncoding.encode(normalized);
       } catch (error) {
         throw new EffectRpcQueryKeyError(
-          encoder ? 'KeyEncoderFailed' : 'PayloadEncodingFailed',
+          encoder ? "KeyEncoderFailed" : "PayloadEncodingFailed",
           rpcTag,
           `Could not encode the key payload for RPC ${rpcTag}`,
-          error,
-        )
+          error
+        );
       }
-      return { input: normalized, keyValue }
+      return { input: normalized, keyValue };
     },
-  }
-}
+  };
+};
 
-const takeRpcOptions = (options: Record<string, unknown>) => {
-  const { rpcOptions } = options
-  delete options['rpcOptions']
-  return rpcOptions
-}
-
-const describeRpc = <Rpcs extends Rpc.Any, ClientError>(
-  definition: Rpc.AnyWithProps,
-  client: RpcClient.RpcClient.Flat<Rpcs, ClientError>,
-): OperationDescription => {
-  const rpcTag = definition._tag
-  const identity = {
-    id: rpcTag,
-    path: rpcTag.split('.'),
-    input: createRpcInput(definition),
-    unsupportedQueryHash: (option: 'queryKeyHashFn' | 'queryHash') =>
-      new EffectRpcQueryConfigError(
-        'UnsupportedQueryHash',
-        `${option} must be configured through QueryClient defaults`,
-        { rpcTag },
-      ),
-    takeOptions: takeRpcOptions,
-  }
-  if (!RpcSchema.isStreamSchema(definition.successSchema)) {
-    return {
-      ...identity,
-      kind: 'Unary',
-      invoke: (input, options) =>
-        // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-        client(rpcTag as never, input as never, options as never),
-      executionError: (operation, cause) => new EffectRpcQueryError(rpcTag, operation, cause),
+const createRpcInput = (definition: RpcRequest): OperationInput => {
+  let input = rpcInputs.get(definition);
+  if (input === undefined) {
+    input = compileRpcInput(definition);
+    if (input._tag === "Inputless" || input.cacheable) {
+      rpcInputs.set(definition, input);
     }
   }
+  return input;
+};
+
+// oxlint-disable-next-line anti-slop/no-unsafe-dictionary-type
+const takeRpcOptions = (options: Record<string, unknown>) => {
+  const { rpcOptions } = options;
+  delete options["rpcOptions"];
+  return rpcOptions;
+};
+
+const describeRpc = (
+  definition: RpcRequest,
+  // oxlint-disable-next-line anti-slop/no-unknown-parameters
+  client: unknown
+): OperationDescription => {
+  const rpcTag = definition._tag;
+  const identity = {
+    id: rpcTag,
+    path: rpcTag.split("."),
+    input: createRpcInput(definition),
+    unsupportedQueryHash: (option: "queryKeyHashFn" | "queryHash") =>
+      new EffectRpcQueryConfigError(
+        "UnsupportedQueryHash",
+        `${option} must be configured through QueryClient defaults`,
+        { rpcTag }
+      ),
+    takeOptions: takeRpcOptions,
+  };
+  if (!RpcSchema.isStreamSchema(definition.successSchema)) {
+    // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
+    const invoke = client as RpcClientInvocation<
+      Effect.Effect<unknown, unknown, unknown>
+    >;
+    return {
+      ...identity,
+      kind: "Unary",
+      // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
+      invoke: (input, options) => invoke(rpcTag, input, options),
+      executionError: (operation, cause) =>
+        new EffectRpcQueryError(rpcTag, operation, cause),
+    };
+  }
+  // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
+  const invoke = client as RpcClientInvocation<
+    Stream.Stream<unknown, unknown, unknown>
+  >;
   return {
     ...identity,
-    kind: 'Streaming',
+    kind: "Streaming",
     prepareStream: createStreamPreparation({
       tag: rpcTag,
-      invoke: (input, options) =>
-        // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-        client(rpcTag as never, input as never, options as never) as never,
+      invoke: (input, options) => invoke(rpcTag, input, options),
     }),
-  }
-}
+  };
+};
 
 export const extractRpcs = <Rpcs extends Rpc.Any, ClientError>(
-  group: RpcGroup.RpcGroup<Rpcs>,
-  client: RpcClient.RpcClient.Flat<Rpcs, ClientError>,
-): readonly OperationDescription[] =>
-  Array.from(group.requests.values(), (value) =>
-    // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/no-chained-type-assertions
-    describeRpc(value as unknown as Rpc.AnyWithProps, client),
-  )
+  group: RpcGroup.Any,
+  client: RpcClient.RpcClient.Flat<Rpcs, ClientError>
+): readonly OperationDescription[] => {
+  if (
+    !Predicate.hasProperty(group, "requests") ||
+    !Predicate.isMap(group.requests)
+  ) {
+    throw new TypeError("Expected an Effect RPC group with a request map");
+  }
+  return Array.from(group.requests.values(), (value) => {
+    if (!Rpc.isRpc(value)) {
+      throw new TypeError("Expected an Effect RPC declaration");
+    }
+    return describeRpc(value, client);
+  });
+};
 
 export const rpcTreeErrors: TreeErrors = {
   invalidPrefix: (reason, cause) =>
     new EffectRpcQueryConfigError(
-      'InvalidKeyPrefix',
-      reason === 'Shape'
-        ? 'keyPrefix must be a non-empty readonly tuple of JSON-safe values'
-        : 'keyPrefix must contain only JSON-safe values',
-      { cause },
+      "InvalidKeyPrefix",
+      reason === "Shape"
+        ? "keyPrefix must be a non-empty readonly tuple of JSON-safe values"
+        : "keyPrefix must contain only JSON-safe values",
+      { cause }
     ),
   invalidPath: (rpcTag) =>
     new EffectRpcQueryConfigError(
-      'InvalidRpcPath',
+      "InvalidRpcPath",
       `RPC tag ${rpcTag} cannot be projected into a utility path`,
-      { rpcTag },
+      { rpcTag }
     ),
   pathCollision: (rpcTag, segments, relation) => {
-    const path = segments.join('.')
+    const path = segments.join(".");
     return new EffectRpcQueryConfigError(
-      'RpcPathCollision',
+      "RpcPathCollision",
       `RPC tag ${rpcTag} ${relation} utility path ${path}`,
-      { path, rpcTag },
-    )
+      { path, rpcTag }
+    );
   },
   unknownEncoder: (rpcTag) =>
     new EffectRpcQueryConfigError(
-      'UnknownKeyEncoder',
+      "UnknownKeyEncoder",
       `No payload-bearing RPC exists for key encoder ${rpcTag}`,
-      { rpcTag },
+      { rpcTag }
     ),
   missingEncoder: (rpcTag) =>
     new EffectRpcQueryConfigError(
-      'MissingKeyEncoder',
+      "MissingKeyEncoder",
       `RPC ${rpcTag} requires a safe custom key encoder`,
-      { rpcTag },
+      { rpcTag }
     ),
-}
+};

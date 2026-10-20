@@ -488,52 +488,39 @@
       ]
     },
     "source:vite.config.ts": {
-      "fingerprint": "d576078cc04562d7f5a269719b8972d3ea1fa635c2f1158d77d4076d6768447b",
+      "fingerprint": "92208e4059214922b00a2343d0e6f9a6e6d77e989e68f59ad6cdb64ffd96cc1b",
       "snapshot": {
-        "vite.config.ts": "c80777cab0d8424c6c71e219479574b545d58c7401002d0a26170dea0f0712b1"
+        "vite.config.ts": "e57d0184c770b18ff2df59019bcb716256cb84a668da95536a611e83a9a22913"
       },
-      "head": "fac2c2ffbf72b1b17e425c238a74089a68e9c1ab",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "No consumer-guidance change is needed. Removed two null fallbacks because Ultracite 7.12.3+ guarantees anti-slop and shadcn jsPlugins arrays. The same plugin lists remain enabled. Typed lint, public fixtures, packaging and example builds pass.",
+      "reason": "Adopt the full Ultracite Oxfmt preset with the library import group, retain the applicable lint presets, and scope verified exceptions to Effect idioms and erased contract boundaries. Move documentation excerpts to Vitest and enable lint for docs JS/TS. No additional consumer skill is needed.",
       "evidence": [
-        "Reviewed actual uncommitted diff against HEAD fac2c2ffbf72b1b17e425c238a74089a68e9c1ab on chore/update-dependencies-release-age. Native frozen installation with pnpm 12.11.2 verified all 1013 lockfile entries against unchanged strict seven-day, missing-time and trust policies. Independent npm timestamp audit passed all 157 introduced registry versions.",
-        "Package/declaration build with attw and publint passed. Public API and server-local compiler fixtures passed TypeScript 7.0.2 and 5.9.3. Exact inputless query option return keys are asserted in tests/types/public-contract.ts.",
-        "All 509 runtime tests across 46 files passed, including new singleton GET/form-urlencoded array, full WebSocket buffer cancellation, and request-local stream Schema decoding failure regressions. Full typed lint and checking, formatting, strict Effect diagnostics, both Fallow dead-code modes, duplicate reporting and health checks passed with cache disabled for the existing WSL2 fspy EBUSY limitation.",
-        "Both application production builds passed. Documentation excerpt verifier, Astro check, 56-page build and internal link validation passed. Intent structural validation passed one skill and its six references; maintainer sync found no metadata changes.",
-        "No activation-description, API-recommendation, task-coverage or package-export changes. Fresh isolated consumer and skill-discovery exercises were not repeated; runtime/compiler integration checks provide the evidence for this dependency update."
+        "vite.config.ts diff reviewed; all preset format options match except operational ignores/import grouping. Import/test spacing rules remain enabled. Typed lint passes 168 files, formatting passes, and 599 runtime cases include all 20 docs excerpts."
       ]
     },
     "source:.github/workflows/release.yml": {
-      "fingerprint": "e5102eba69e14f52d5e2e29a3656ca873aebb2afc32fd5e717e6f5af37a88280",
+      "fingerprint": "819e40f40aeed2c4316f70f73f655b5fc292f18cf0799d1cfd0834d7d6a8e791",
       "snapshot": {
-        ".github/workflows/release.yml": "36c3973760a93b8647b1e374d88cf194c818ddb39c4c6a66725be2a2a1bab713"
+        ".github/workflows/release.yml": "d3ba5be7cab79a5bb53615b0b0f23ecb7a6b97e52e9bc0dfad17cfcb5ee4ad35"
       },
-      "head": "c2982f3ade1140f82940a97685ca44b21fb65879",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "The publish job now additionally requires repository variable NPM_PUBLISH_ENABLED=true, preventing CI publication during the explicitly authorized local bootstrap. Release validation, version pull requests, packing, docs deployment, OIDC permissions and action pins are unchanged. This affects maintainer activation only; the shipped API/skill and _artifacts/domain_map.yaml, _artifacts/skill_spec.md, _artifacts/skill_tree.yaml remain accurate with the same developer tasks, references and package-only distribution.",
+      "reason": "Only YAML quoting and folded-line formatting changed. Triggers, permissions, action pins, commands and publication conditions retain their meaning; no performance gate was added.",
       "evidence": [
-        ".github/workflows/release.yml: existing publish-mode and push conditions retained; new repository-variable condition applies only to the publish job.",
-        "GitHub repository variables listing empty: CI publication defaults to disabled until trusted publishing is configured and enabled.",
-        "Installed yaml parser accepted the final workflow; 27 mode/event/flag combinations passed; parsed workflow otherwise deeply equals HEAD.",
-        "vp run --no-cache format and git diff --check passed.",
-        "Independent review found no release blockers; final tarball retains14unique files including exact README, LICENSE and CHANGELOG, correct version and resolved peers."
+        ".github/workflows/release.yml diff reviewed against HEAD; the existing maintainer and release workflow remains accurate."
       ]
     },
     "source:e2e/browser-test-config.ts": {
-      "fingerprint": "7f044710dcd47c87c51384327d1e78696cd6286d91a3d102a8345096303f507b",
+      "fingerprint": "ebf3147c51a190121960ebba39a4e74fc653a1052405207b133cea661980cbe3",
       "snapshot": {
-        "e2e/browser-test-config.ts": "d2678060fc23a55740e276b850a918f5f2847e0b4208135ff9fcacea5f8b7186"
+        "e2e/browser-test-config.ts": "a8034aa538137402ad484bf85e41852d81cf11a28d0ccae8b552aca9c18032b3"
       },
-      "head": "4ea1e4329da229c4c9853ddc2f6a50a6309afe9e",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Config reads preserve missing versus empty CI values and the existing browser project, retry and reporter behavior. This repository-only configuration adds no library capability or developer guidance task.",
+      "reason": "Preset formatting and repository test setup preserve the existing browser scenarios and native library usage. No new integration task or recommendation is introduced.",
       "evidence": [
-        "Base 4ea1e4329da229c4c9853ddc2f6a50a6309afe9e; actual changed sources and native review fingerprints in this report.",
-        "Uncached typecheck: 135 files, zero lint/type errors; strict Effect diagnostics:146 files, zero diagnostics; runtime:262 tests/34 files and both server compilers.",
-        "Fresh packed-package matrix:26 compiler validations,21 runtime fixtures per peer,4 frameworks,12 diagnostic cells,18 construction cases and6 bundles. Selected archive SHA512 437c863fbae5d097d5947330524c004f1bf10e33cb1334fc245818be36ccd1d969458c7ba1a0eb135326f4f7c4030cb22518bc8aa08d8b03e8d543353f9b2876.",
-        "Chromium/Firefox packed Window/Worker:4 tests pass; native app/docs production builds and docs parity pass.",
-        "Finite command probes:11 real-host cases pass, every owned child exits and temp directory is removed; six actual bundle gzip outputs match complete prior native level9 bytes and exclude platform-node.",
-        "Fallow, formatting and native skills validation pass. Native sync reports nothing to synchronize; guidance and all three planning documents remain byte-identical to the reviewed base. Root owns final managed all-engine and Release provenance acceptance."
+        "e2e/browser-test-config.ts diff reviewed; final compiler checks and app builds pass. Earlier Chromium/Firefox application/docs checks passed; latest docs Chromium run passes 7 cases. WebKit is blocked at launch by missing host libraries."
       ]
     },
     "source:e2e/packed-hosts.spec.ts": {
@@ -549,70 +536,51 @@
       ]
     },
     "source:playwright.docs.config.ts": {
-      "fingerprint": "f66c846d0924902b33bbc055ad0972bff368f4d48059f552f48a5096ae3be496",
+      "fingerprint": "5d293ebef367c5afcfd6af66790af3378c05736557bc8b44f343f4581ceec4ff",
       "snapshot": {
-        "playwright.docs.config.ts": "3578d202bd05154db9e17f412fad7e2a7bfd707e1ea997fa0017cf5693498181"
+        "playwright.docs.config.ts": "1f4791431d660d98565f041e51d6e3b34d3ee123326fbe1baeec181ac0bf5a11"
       },
-      "head": "f3ba2a62cdb0b28eaa6e592b010bb6879466cda2",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "The local documentation preview serves its prepared site. The native docs-e2e task owns the local build, and hosted DOCS_BASE_URL checks still omit a local server and build. Existing documentation acceptance cases are unchanged.",
+      "reason": "Preset formatting and repository test setup preserve the existing browser scenarios and native library usage. No new integration task or recommendation is introduced.",
       "evidence": [
-        "Diff reviewed against f3ba2a62cdb0b28eaa6e592b010bb6879466cda2; actual PR base 5b91ddb1de13970365669c887b9d767ea417fbd4. Public library source, compiler fixtures, runtime cases, README, documentation pages and skills were not changed in this batch.",
-        "Native uncached typecheck passed 141 files and native pack attw/publint. Scoped native format passed seven affected configuration files; final YAML parsed and browser/trigger/publication prerequisite expressions were inspected.",
-        "Four existing application Chromium acceptance cases and all seven existing documentation Chromium cases passed against prepared outputs. Their preview logs contain no pack or build invocation. Hosted docs Playwright list mode listed seven cases without building a local site. Receipts: /tmp/effect-api-query-ci-audit/.",
-        "All three shared planning documents were read: _artifacts/domain_map.yaml retains the same ten consumer tasks/failure modes, _artifacts/skill_spec.md retains accurate source-backed coverage and boundaries, and _artifacts/skill_tree.yaml retains the same owned skill, six references, source mappings, prerequisites and distribution. CI-only orchestration requires no guidance or planning rewrite.",
-        "The first hosted run of artifact reuse and the reusable release/deployment workflows remains unverified locally. No package publication or Pages deployment was performed."
+        "playwright.docs.config.ts diff reviewed; final compiler checks and app builds pass. Earlier Chromium/Firefox application/docs checks passed; latest docs Chromium run passes 7 cases. WebKit is blocked at launch by missing host libraries."
       ]
     },
     "source:tsconfig.json": {
-      "fingerprint": "569f6fa9a3e5b25153a975a75bd1663eac3f46b8edbc92bbe49df2a18cb92d9e",
+      "fingerprint": "406ec060dd051255fbcbbb2abe977af2f691252d7f2ec6a43fc0c7c132bcfcb0",
       "snapshot": {
-        "tsconfig.json": "a415ebb9ffc3cdb8706e58e035d0f826a66c3c513d3dba205e38e208bdc2a206"
+        "tsconfig.json": "b3dcd0cc5f1e290dab254c2cd3fe6fb2bd5d3af59f0252e908389ce0859db95a"
       },
-      "head": "fac2c2ffbf72b1b17e425c238a74089a68e9c1ab",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "No consumer-guidance change is needed. Added only examples/server/src/main.ts and examples/server/tests/web-handler.test.ts to the existing unstableApiUsage boundary override, matching intentional NodeRuntime and Effect test helper use after upstream annotations changed. Strict Effect diagnostics remain enabled elsewhere and pass with zero errors or warnings.",
+      "reason": "Extend the existing unstable-Effect diagnostic scope to the tests that use the supported protocols. Compiler strictness and public integration instructions remain unchanged.",
       "evidence": [
-        "Reviewed actual uncommitted diff against HEAD fac2c2ffbf72b1b17e425c238a74089a68e9c1ab on chore/update-dependencies-release-age. Native frozen installation with pnpm 12.11.2 verified all 1013 lockfile entries against unchanged strict seven-day, missing-time and trust policies. Independent npm timestamp audit passed all 157 introduced registry versions.",
-        "Package/declaration build with attw and publint passed. Public API and server-local compiler fixtures passed TypeScript 7.0.2 and 5.9.3. Exact inputless query option return keys are asserted in tests/types/public-contract.ts.",
-        "All 509 runtime tests across 46 files passed, including new singleton GET/form-urlencoded array, full WebSocket buffer cancellation, and request-local stream Schema decoding failure regressions. Full typed lint and checking, formatting, strict Effect diagnostics, both Fallow dead-code modes, duplicate reporting and health checks passed with cache disabled for the existing WSL2 fspy EBUSY limitation.",
-        "Both application production builds passed. Documentation excerpt verifier, Astro check, 56-page build and internal link validation passed. Intent structural validation passed one skill and its six references; maintainer sync found no metadata changes.",
-        "No activation-description, API-recommendation, task-coverage or package-export changes. Fresh isolated consumer and skill-discovery exercises were not repeated; runtime/compiler integration checks provide the evidence for this dependency update."
+        "tsconfig.json diff reviewed; native TS7 and TS5.9 fixtures pass; strict Effect diagnostics report 0 errors and 0 warnings."
       ]
     },
     "source:.fallowrc.jsonc": {
-      "fingerprint": "14a8e73eaa5a80303b1c84dbe6ece11a3462922a99a24c7e981a4abee7d3ae67",
+      "fingerprint": "a6f69e527d54bf82814b0089bc0b84ad072b2d36050839486a9c4541a9489e3c",
       "snapshot": {
-        ".fallowrc.jsonc": "bec396faa342f67101597d02a823ae2b89bbc4d2f70f907d7a504a343f4237e6"
+        ".fallowrc.jsonc": "2fb6b1c76f02509da90c6a4af10e9334175febb7fd2b097c67a7609709bd157f"
       },
-      "head": "c62ae6817c5bccb010a32f665d0fb8d8ce22f75d",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Retargeted the existing narrow Fallow workspace-dependency ignore to the scoped root package. This only aligns tooling with the renamed dependency and changes no public usage guidance. Fallow audits passed without changing their rules.",
+      "reason": "Remove the entry for the documentation script moved into Vitest and apply preset formatting. Static-analysis configuration adds no consumer workflow.",
       "evidence": [
-        "Base origin/main c62ae6817c5bccb010a32f665d0fb8d8ce22f75d; git diff has no src runtime, release-workflow, Changeset or changelog changes.",
-        "vp install --frozen-lockfile verified1013 supply-chain entries; lockfile differs only in two renamed workspace importer keys.",
-        "vp run --no-cache pack passed ATTW/publint; final @ueberbrot/effect-api-query0.1.0 archive has14unique files and byte-identical runtime/declaration/map output to the unscoped tested archive.",
-        "Type-aware lint, publicAPI and server-local compiler fixtures on TypeScript7.0.2/5.9.3, Effect diagnostics and Fallow audits passed; all509 runtime tests passed.",
-        "Both application builds and final56page docsbuild passed; all7Chromium docs checks passed, including scoped registry/npm URLs, branding, unpublished/network/invalid-version fallbacks and generated LLM docs.",
-        "Fresh isolated scoped consumer: frozen nativepnpm12.11.2 install with25supply-chain checks and unchanged seven-day policy; strictNodeNext skipLibCheck:false TS7.0.2/5.9.3 and realRPC/HTTP runtime fixture passed.",
-        "Installed Intent list discovered @ueberbrot/effect-api-query#effect-api-query; load --path resolved the packagedskill; structural packagedskillvalidation passed and all16relative links resolve. Evidence: /tmp/eaq-scoped-release-0.1.0/consumer-evidence.json.",
-        "Packaged Intent snippet checking warns it requires Git-tracked declared files; installed dist/index.d.mts exists and both strictconsumer compiler checks passed independently."
+        ".fallowrc.jsonc diff reviewed; all four Fallow tasks and 20 documentation-excerpt tests pass."
       ]
     },
     "source:.github/workflows/ci.yml": {
-      "fingerprint": "cad5322457ab5941301e112617a26aee236fcae470a54f43881271389af5e9cf",
+      "fingerprint": "e264811852483654c44bbc6b57ede31b4765cfa4bd273770668e8dc081b82c04",
       "snapshot": {
-        ".github/workflows/ci.yml": "91175ea9b646dbacc092ab0860a721331cdc4e312bc5f3b41fd3c6f8e0201f04"
+        ".github/workflows/ci.yml": "86cc15d7872b4ce6f177999f00c0db22d48fd7dc74f0c531c9dfd13d48ef31bb"
       },
-      "head": "f3ba2a62cdb0b28eaa6e592b010bb6879466cda2",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Source formatting, skills, typed lint, compiler fixtures, Effect diagnostics, Fallow and runtime checks remain. Successful example and documentation builds feed the same three browser projects through current-run artifacts. This changes CI scheduling and reuse, not library behavior or consumer tasks.",
+      "reason": "Only YAML quoting and folded-line formatting changed. Triggers, permissions, action pins, commands and publication conditions retain their meaning; no performance gate was added.",
       "evidence": [
-        "Diff reviewed against f3ba2a62cdb0b28eaa6e592b010bb6879466cda2; actual PR base 5b91ddb1de13970365669c887b9d767ea417fbd4. Public library source, compiler fixtures, runtime cases, README, documentation pages and skills were not changed in this batch.",
-        "Native uncached typecheck passed 141 files and native pack attw/publint. Scoped native format passed seven affected configuration files; final YAML parsed and browser/trigger/publication prerequisite expressions were inspected.",
-        "Four existing application Chromium acceptance cases and all seven existing documentation Chromium cases passed against prepared outputs. Their preview logs contain no pack or build invocation. Hosted docs Playwright list mode listed seven cases without building a local site. Receipts: /tmp/effect-api-query-ci-audit/.",
-        "All three shared planning documents were read: _artifacts/domain_map.yaml retains the same ten consumer tasks/failure modes, _artifacts/skill_spec.md retains accurate source-backed coverage and boundaries, and _artifacts/skill_tree.yaml retains the same owned skill, six references, source mappings, prerequisites and distribution. CI-only orchestration requires no guidance or planning rewrite.",
-        "The first hosted run of artifact reuse and the reusable release/deployment workflows remains unverified locally. No package publication or Pages deployment was performed."
+        ".github/workflows/ci.yml diff reviewed against HEAD; the existing maintainer and release workflow remains accurate."
       ]
     },
     "source:tests/packed-consumer/construction-baseline.mts": {
@@ -1038,185 +1006,147 @@
       ]
     },
     "source:apps/docs/astro.config.mts": {
-      "fingerprint": "b31c51a3311761fc01566cc51a43bbb7ef4125957ed330f26f7fe3e047f850bf",
+      "fingerprint": "92b773dda7f26822b39a8ec7f20c4ea5bcf06b6f2fbb6c69decba0ab87726042",
       "snapshot": {
-        "apps/docs/astro.config.mts": "ceadaed16a840987f03ee87a198b252c3be78fbaa085c3ceadfb91e76a530387"
+        "apps/docs/astro.config.mts": "bb247fbff3080268f61832cd3d4ad0db22813a254bba40200793ef63ad664b1b"
       },
-      "head": "c62ae6817c5bccb010a32f665d0fb8d8ce22f75d",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Set the site title explicitly to effect-api-query so root package metadata can be scoped while the user-requested project branding and docs URLs stay stable. The npm link already derives from packageManifest.name. No library API/guidance behavior changes beyond the separately reviewed scoped imports.",
+      "reason": "The docs configuration/content exports retain their behavior; the package badge now parses its registry response at the I/O boundary. These site details require no additional library integration guidance.",
       "evidence": [
-        "Base origin/main c62ae6817c5bccb010a32f665d0fb8d8ce22f75d; git diff has no src runtime, release-workflow, Changeset or changelog changes.",
-        "vp install --frozen-lockfile verified1013 supply-chain entries; lockfile differs only in two renamed workspace importer keys.",
-        "vp run --no-cache pack passed ATTW/publint; final @ueberbrot/effect-api-query0.1.0 archive has14unique files and byte-identical runtime/declaration/map output to the unscoped tested archive.",
-        "Type-aware lint, publicAPI and server-local compiler fixtures on TypeScript7.0.2/5.9.3, Effect diagnostics and Fallow audits passed; all509 runtime tests passed.",
-        "Both application builds and final56page docsbuild passed; all7Chromium docs checks passed, including scoped registry/npm URLs, branding, unpublished/network/invalid-version fallbacks and generated LLM docs.",
-        "Fresh isolated scoped consumer: frozen nativepnpm12.11.2 install with25supply-chain checks and unchanged seven-day policy; strictNodeNext skipLibCheck:false TS7.0.2/5.9.3 and realRPC/HTTP runtime fixture passed.",
-        "Installed Intent list discovered @ueberbrot/effect-api-query#effect-api-query; load --path resolved the packagedskill; structural packagedskillvalidation passed and all16relative links resolve. Evidence: /tmp/eaq-scoped-release-0.1.0/consumer-evidence.json.",
-        "Packaged Intent snippet checking warns it requires Git-tracked declared files; installed dist/index.d.mts exists and both strictconsumer compiler checks passed independently."
+        "apps/docs/astro.config.mts diff reviewed; docs JS/TS now pass the lint presets, Astro check/build and 7 Chromium docs checks pass."
       ]
     },
     "source:docs/adr/0016-automate-releases-with-changesets.md": {
-      "fingerprint": "99e44eddadc67ecda0235acf591328ed3264f0aa7f2b1346a8d8dc79fcebf1df",
+      "fingerprint": "47845368840970a91892fa440995f7803c4733b20ef69c98584cafda2193c838",
       "snapshot": {
-        "docs/adr/0016-automate-releases-with-changesets.md": "7a92886b85012f8358538e76ed0bf27c2a2e2004f7cf7f9791e786341c8edb6c"
+        "docs/adr/0016-automate-releases-with-changesets.md": "71160f4eda9d2ae77ebc7d661586813c243c15917e451d321d8c9cff5c373750"
       },
-      "head": "0feea99e2469c98d60567fef8e0e7baf26f69625",
-      "outcome": "updated",
-      "reason": "Rewrote agent-facing release decision prose while retaining Changesets, review-controlled versioning, and release automation boundaries. No publishing workflow or library guidance change.",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "no-change",
+      "reason": "Only preset prose/table formatting changed in this existing document. New decisions live in ADRs 27\u201329; existing decisions and triage rules retain their substance.",
       "evidence": [
-        "Source HEAD 0feea99e2469c98d60567fef8e0e7baf26f69625, package effect-api-query 0.1.0, and actual uncommitted prose diff. Runtime source, public types, dependencies, examples, and activation metadata are unchanged.",
-        "Protected-content audit: all 92 in-scope Markdown/MDX documents revised; all 113 code blocks, Markdown link targets, and heading anchors preserved. No prose em/en dashes or semicolons remain. .agents/, docs/agents/, and AGENTS.md match HEAD.",
-        "vp run --no-cache api-types passed package build, attw, publint, and public API/documentation fixtures under TypeScript 7 and 5.9.",
-        "vp run --no-cache docs-build passed exact documentation excerpt verification and Astro checks, built 56 pages, and validated all internal links.",
-        "vp run --no-cache format, git diff --check, and vp exec intent validate skills --check passed. Intent maintainer sync reported nothing to synchronize.",
-        "Independent prose reviews covered technical conditions, cleanup ordering, key identity, shared callbacks, hydration, and agent-facing ADR/skill instructions. No runtime or recommended API behavior changed. A fresh consumer session and new discovery check were not repeated for this editorial revision.",
-        "Reviewed git diff HEAD -- docs/adr/0016-automate-releases-with-changesets.md and retained the original decision/policy facts."
+        "docs/adr/0016-automate-releases-with-changesets.md diff reviewed; docs build passes with valid links."
       ]
     },
     "source:docs/adr/0017-quarantine-new-dependency-releases-for-seven-days.md": {
-      "fingerprint": "1e35fd9426bd8e97df3425cea88853271ff33c13320ce7c549988b43d75523a3",
+      "fingerprint": "516610fcde46784527ab1ca8a4cec0ce6588407da3e4195392a1ed848f004951",
       "snapshot": {
-        "docs/adr/0017-quarantine-new-dependency-releases-for-seven-days.md": "e11273a9dcfac82d4c286c74bc7698b4d01c519504ba013ee54ec2870a7f926c"
+        "docs/adr/0017-quarantine-new-dependency-releases-for-seven-days.md": "5968bef0f1b26a0b854e2c814d646b53ffac4c0c91ee5255eee15a7de6be30d5"
       },
-      "head": "0feea99e2469c98d60567fef8e0e7baf26f69625",
-      "outcome": "updated",
-      "reason": "Rewrote agent-facing dependency-policy prose while preserving the seven-day quarantine decision and its stated consequences. No policy, dependency, or public usage change.",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "no-change",
+      "reason": "Only preset prose/table formatting changed in this existing document. New decisions live in ADRs 27\u201329; existing decisions and triage rules retain their substance.",
       "evidence": [
-        "Source HEAD 0feea99e2469c98d60567fef8e0e7baf26f69625, package effect-api-query 0.1.0, and actual uncommitted prose diff. Runtime source, public types, dependencies, examples, and activation metadata are unchanged.",
-        "Protected-content audit: all 92 in-scope Markdown/MDX documents revised; all 113 code blocks, Markdown link targets, and heading anchors preserved. No prose em/en dashes or semicolons remain. .agents/, docs/agents/, and AGENTS.md match HEAD.",
-        "vp run --no-cache api-types passed package build, attw, publint, and public API/documentation fixtures under TypeScript 7 and 5.9.",
-        "vp run --no-cache docs-build passed exact documentation excerpt verification and Astro checks, built 56 pages, and validated all internal links.",
-        "vp run --no-cache format, git diff --check, and vp exec intent validate skills --check passed. Intent maintainer sync reported nothing to synchronize.",
-        "Independent prose reviews covered technical conditions, cleanup ordering, key identity, shared callbacks, hydration, and agent-facing ADR/skill instructions. No runtime or recommended API behavior changed. A fresh consumer session and new discovery check were not repeated for this editorial revision.",
-        "Reviewed git diff HEAD -- docs/adr/0017-quarantine-new-dependency-releases-for-seven-days.md and retained the original decision/policy facts."
+        "docs/adr/0017-quarantine-new-dependency-releases-for-seven-days.md diff reviewed; docs build passes with valid links."
       ]
     },
     "source:e2e/tanstack-start.spec.ts": {
-      "fingerprint": "326d8bf63a3852af4e5b276be477e3af235569ab15d12ed975e65c1507baed43",
+      "fingerprint": "3ec9e1a42a6008a4d2903357ecfcdc3ac0e7eddff0ead865093c26f62186976c",
       "snapshot": {
-        "e2e/tanstack-start.spec.ts": "ea1e5469e782796d5ab68b443b6d21bd460691d413ba15bb83fae5024fd1981e"
+        "e2e/tanstack-start.spec.ts": "5b1e50cb99fe02afdd6df55c901b21377d7ce37fce5be7ad3ba5248b2e591301"
       },
-      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
+      "reason": "Preset formatting and repository test setup preserve the existing browser scenarios and native library usage. No new integration task or recommendation is introduced.",
       "evidence": [
-        "Reviewed the actual diff and current source at e2e/tanstack-start.spec.ts against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
-        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+        "e2e/tanstack-start.spec.ts diff reviewed; final compiler checks and app builds pass. Earlier Chromium/Firefox application/docs checks passed; latest docs Chromium run passes 7 cases. WebKit is blocked at launch by missing host libraries."
       ]
     },
     "source:e2e/vite-react.spec.ts": {
-      "fingerprint": "cb02aba2d2d073025a375e34532f922c265466c21416ffa95a64a605afdb252e",
+      "fingerprint": "211e737cd0dc7b124a704c919158851949f36bace649b5fdf027fde071b18161",
       "snapshot": {
-        "e2e/vite-react.spec.ts": "e730e19cebf8ac11895bff4b466e9882f707666d1417ff6aaaef2df78aa30f64"
+        "e2e/vite-react.spec.ts": "a033b85e0303e95c35f0c10ee034fd2ff3e965006ecb0aa463492752f95654c0"
       },
-      "head": "6893603eab70bd9d67e9848414eccc8a3421d870",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "The pagehide storage-failure case verifies one handled disposal rejection, resource cleanup, and no page error. Existing cache-owner guidance already tells lifecycle callbacks to handle rejected disposal while completing cleanup.",
+      "reason": "Preset formatting and repository test setup preserve the existing browser scenarios and native library usage. No new integration task or recommendation is introduced.",
       "evidence": [
-        "Reviewed the complete test diff from 5b91ddb to 6893603 against the disposal policy in skills/effect-api-query/references/cache-workflows.md.",
-        "Source 6893603: CI 38085762210 passed source quality, both example builds, documentation, and Chromium/Firefox/WebKit acceptance; saved final-mts-ci.json and final-mts-ci.log."
+        "e2e/vite-react.spec.ts diff reviewed; final compiler checks and app builds pass. Earlier Chromium/Firefox application/docs checks passed; latest docs Chromium run passes 7 cases. WebKit is blocked at launch by missing host libraries."
       ]
     },
     "source:examples/tanstack-start/src/routes/index.tsx": {
-      "fingerprint": "a04a3037d3d997eff9b0aa1ec7c5915f79c7d28dcfbea1588338553b3e41d733",
+      "fingerprint": "2483ac9813d8f38dc037d84a6305fabd529becee56467086634a2e108055bb0d",
       "snapshot": {
-        "examples/tanstack-start/src/routes/index.tsx": "3118b095cfdde95ce04dd63f92a5213007e052d2fa0886ca0966ec0e7d6afcca"
+        "examples/tanstack-start/src/routes/index.tsx": "937a50402437997f773912e9270c557981804762dbadcf8fa1ae08a5cd0a4e4f"
       },
-      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Count loaded users directly across pages without allocating a flattened array; query data, ownership and displayed counts are unchanged, and existing framework guidance remains accurate.",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
       "evidence": [
-        "Reviewed the actual diff and current source at examples/tanstack-start/src/routes/index.tsx against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
-        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+        "examples/tanstack-start/src/routes/index.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
       ]
     },
     "source:examples/vite-react/src/components/sections/commands-section.tsx": {
-      "fingerprint": "59bb7e6fcf3553d5b5fc3b98b159aef67071397c70ad59892a746f826d74194d",
+      "fingerprint": "de96abbe8b02a6b42a268a3bf583439d20c081b5f92ae5d354027b2eb2ff401d",
       "snapshot": {
-        "examples/vite-react/src/components/sections/commands-section.tsx": "990c75cdfacc4391267e8b25948cddf12a0ae241a5444f02685c8f84a9f2aa39"
+        "examples/vite-react/src/components/sections/commands-section.tsx": "a719ecf82a3773175ed7989bd5185232c3849eefe4b752632a47b8b300fd8671"
       },
-      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
-      "outcome": "updated",
-      "reason": "Command starts can retry after failed transport and reconcile accepted operations through status polling. The cancellation guide now covers this behavior and same-ID retries.",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "no-change",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
       "evidence": [
-        "Reviewed the actual diff and current source at examples/vite-react/src/components/sections/commands-section.tsx against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
-        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+        "examples/vite-react/src/components/sections/commands-section.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
       ]
     },
     "source:examples/vite-react/src/components/sections/diagnostics-section.tsx": {
-      "fingerprint": "869448ce3494e402e1b55144b195d6d2c1c6b50fab1229e7e2080c3392a6e8c1",
+      "fingerprint": "eda508f4ff87d1bc3eed83cf7f8e71bb3a1b93d4573521bb03bfe2157265f5d5",
       "snapshot": {
-        "examples/vite-react/src/components/sections/diagnostics-section.tsx": "d1ee213fd9ddac0b8f6be014a73bc14451ff71275d2f3c630e559f38462e416b"
+        "examples/vite-react/src/components/sections/diagnostics-section.tsx": "afdcae9314eb458b6ce21d94740f35a6f886f747c02e2922d509f04e5f19ea59"
       },
-      "head": "d870776a5f37835467beb611c6ca6a51fe3933eb",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Update direct example imports to the shared cancellation module, preserving rendered diagnostics and HTTP routes. Both application runtime suites and builds pass. This wiring adds no new library-consumer workflow and leaves existing guidance accurate.",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
       "evidence": [
-        "Compared the task working tree with d870776a5f37835467beb611c6ca6a51fe3933eb; three independent architecture passes and an additional independent check of the final diff found no remaining actionable findings.",
-        "Full runtime suite passed: 506 tests in 46 files, including 5 new hook-lifetime cases for RPC/HTTP operation isolation, pending status cancellation and post-await retired-owner guards. Independent pass 2 additionally verified 191 snapshot/lifecycle/hash cases.",
-        "Direct vp pack passed declaration emission, attw and publint. Published-contract fixtures passed installed TypeScript 7.0.2 and 5.9.3. Full type-aware lint passed with no errors or warnings; strict Effect diagnostics passed with 0 errors and 0 warnings (one pre-existing suggestion).",
-        "Both example application builds passed. Expanded shared CSS has exactly the original rules for both apps, ignoring whitespace. Documentation snippet and Astro checks passed.",
-        "All four uncached Fallow analyses passed: both dead-code modes have no issues, semantic near-duplicate groups decreased from 67 to 61. Existing workspace-discovery advisory for the explicitly excluded source-only shared examples remains visible.",
-        "The native task supervisor sometimes fails with spawn EBUSY or sandbox process initialization errors; identical installed commands ran directly after completing their package prerequisites. No checks or source rules were bypassed to obtain these results.",
-        "No shipped guidance, activation description or public interface changed. Fresh consumer and discovery sessions were not repeated for this internal refactor; executable published-contract and rendered-application checks provide this batch evidence."
+        "examples/vite-react/src/components/sections/diagnostics-section.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
       ]
     },
     "source:examples/vite-react/src/components/sections/http-section.tsx": {
-      "fingerprint": "d7fab68b2be0d629142416ac457ca5e5c0927e93cf3fd1b9f8e07116dd582778",
+      "fingerprint": "93c1856cb2440dda14479174846c23ae760d68c7f58b934c86c6a820ee18259a",
       "snapshot": {
-        "examples/vite-react/src/components/sections/http-section.tsx": "a705dee9fd6b87071c37e718d86183e7376690826f085a1e19814a9b1eb14563"
+        "examples/vite-react/src/components/sections/http-section.tsx": "21a175887d2bc3c244da13c68e912cbbb0779376805b416d4a2e820238f6a198"
       },
-      "head": "d870776a5f37835467beb611c6ca6a51fe3933eb",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Update direct example imports to the shared cancellation module, preserving rendered diagnostics and HTTP routes. Both application runtime suites and builds pass. This wiring adds no new library-consumer workflow and leaves existing guidance accurate.",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
       "evidence": [
-        "Compared the task working tree with d870776a5f37835467beb611c6ca6a51fe3933eb; three independent architecture passes and an additional independent check of the final diff found no remaining actionable findings.",
-        "Full runtime suite passed: 506 tests in 46 files, including 5 new hook-lifetime cases for RPC/HTTP operation isolation, pending status cancellation and post-await retired-owner guards. Independent pass 2 additionally verified 191 snapshot/lifecycle/hash cases.",
-        "Direct vp pack passed declaration emission, attw and publint. Published-contract fixtures passed installed TypeScript 7.0.2 and 5.9.3. Full type-aware lint passed with no errors or warnings; strict Effect diagnostics passed with 0 errors and 0 warnings (one pre-existing suggestion).",
-        "Both example application builds passed. Expanded shared CSS has exactly the original rules for both apps, ignoring whitespace. Documentation snippet and Astro checks passed.",
-        "All four uncached Fallow analyses passed: both dead-code modes have no issues, semantic near-duplicate groups decreased from 67 to 61. Existing workspace-discovery advisory for the explicitly excluded source-only shared examples remains visible.",
-        "The native task supervisor sometimes fails with spawn EBUSY or sandbox process initialization errors; identical installed commands ran directly after completing their package prerequisites. No checks or source rules were bypassed to obtain these results.",
-        "No shipped guidance, activation description or public interface changed. Fresh consumer and discovery sessions were not repeated for this internal refactor; executable published-contract and rendered-application checks provide this batch evidence."
+        "examples/vite-react/src/components/sections/http-section.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
       ]
     },
     "source:examples/vite-react/src/components/sections/mutations-section.tsx": {
-      "fingerprint": "d8883900b79077c3da3a9567125caa509d1982a184fe0d5c1ccafb5b5514e4e1",
+      "fingerprint": "79f864f66c99df0da6f2877555b98940ded91e6ab0310aaa10543474659be051",
       "snapshot": {
-        "examples/vite-react/src/components/sections/mutations-section.tsx": "c2bf278014950f0e4a8d66d0cf397811858fae00f8284cb1ed01168c766a7b6a"
+        "examples/vite-react/src/components/sections/mutations-section.tsx": "b9aa43714bc2fc72f9b8d7b043f7b086c299875b8cdfbae21c2bee97c6f00fc1"
       },
-      "head": "6893603eab70bd9d67e9848414eccc8a3421d870",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Seed/reset mutations enter the application tracker while existing application-owned invalidation remains in place. Existing guidance already requires every participating write and reconciliation to follow the owner lifecycle.",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
       "evidence": [
-        "Reviewed the complete component diff from 5b91ddb to 6893603 and skills/effect-api-query/references/cache-workflows.md.",
-        "Source 6893603: CI 38085762210 passed source quality, both example builds, documentation, and Chromium/Firefox/WebKit acceptance; saved final-mts-ci.json and final-mts-ci.log."
+        "examples/vite-react/src/components/sections/mutations-section.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
       ]
     },
     "source:examples/vite-react/src/components/users/create-user-form.tsx": {
-      "fingerprint": "1768011de182927bc8d5a0341f65f7e323cfccf6f76152578bc25d877a54ded3",
+      "fingerprint": "722858e63a24238c0bfbeb914d36ddb59006a221317c7506b6db0cd6e961c143",
       "snapshot": {
-        "examples/vite-react/src/components/users/create-user-form.tsx": "1c89f7235da5c16d6a2f3c3dc0bf81d33234a8d65c1e2c687e54255b10017690"
+        "examples/vite-react/src/components/users/create-user-form.tsx": "8bed108740b2e678edb7ec1f176e87bdb13fa5bfbd2752b2550f5938a4cf9de9"
       },
-      "head": "6893603eab70bd9d67e9848414eccc8a3421d870",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Creation delegates to the shared RPC write coordinator instead of invalidating from the form. Existing optimistic-write guidance already assigns entity reservation, commit, rollback, and final reconciliation to application-owned actions.",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
       "evidence": [
-        "Reviewed the complete component diff from 5b91ddb to 6893603 against skills/effect-api-query/references/cache-workflows.md.",
-        "Source 6893603: CI 38085762210 passed source quality, both example builds, documentation, and Chromium/Firefox/WebKit acceptance; saved final-mts-ci.json and final-mts-ci.log."
+        "examples/vite-react/src/components/users/create-user-form.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
       ]
     },
     "source:examples/vite-react/src/components/users/user-list.tsx": {
-      "fingerprint": "74b615716653bc7b6ce5ec65939f0e0749bf3a7c470c9635c42878bc7af3d789",
+      "fingerprint": "e0a9483ce730176ebd0f6fe732139f37f771552440699f0ca97054f0e87af961",
       "snapshot": {
-        "examples/vite-react/src/components/users/user-list.tsx": "4bff61d9e094f94f720f1351d206bf3d2d31fb9a8c0d0f3cdec904db701c434a"
+        "examples/vite-react/src/components/users/user-list.tsx": "aa5f02359d9b6dc8a0c9f0616536ce66957c459cca21226b77dae0c633e41f11"
       },
-      "head": "6893603eab70bd9d67e9848414eccc8a3421d870",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Deletion delegates to the shared RPC write coordinator; pending temporary users display their state and cannot be deleted. Existing guidance already allocates temporary IDs per write and preserves neighboring optimistic entities, with no public API change.",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
       "evidence": [
-        "Reviewed the complete component diff from 5b91ddb to 6893603 against skills/effect-api-query/references/cache-workflows.md.",
-        "Source 6893603: CI 38085762210 passed source quality, both example builds, documentation, and Chromium/Firefox/WebKit acceptance; saved final-mts-ci.json and final-mts-ci.log."
+        "examples/vite-react/src/components/users/user-list.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
       ]
     },
     "source:examples/vite-react/src/hooks/use-slow-query-cancellation.ts": {
@@ -1278,150 +1208,123 @@
       ]
     },
     "source:apps/docs/public/package-version.js": {
-      "fingerprint": "c1c0e3a66f6a4e6fa1b8885d6d59bae64a53c88e357cb22a8bd11ed3e6dca97e",
+      "fingerprint": "a1788eb65c51a2eccc4712f0daf2228cdbfdf4ba3cb8ee7705aa017b436ce352",
       "snapshot": {
-        "apps/docs/public/package-version.js": "08f12790c3bd678ff40cd1a0b5a3270c4b21e6b8fdeaeb7b9575162ed025a659"
+        "apps/docs/public/package-version.js": "e9954ec7e5502d46d710c5df26bb6cea3be964efa38d33b348889d881df7b8bb"
       },
-      "head": "c62ae6817c5bccb010a32f665d0fb8d8ce22f75d",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Changed only the npm href and percent-encoded scoped registry endpoint. Existing badge branding, version validation, rendering and fallback behavior stay intact, as the seven existing docsbrowserchecks verify. No additional library skill is needed.",
+      "reason": "The docs configuration/content exports retain their behavior; the package badge now parses its registry response at the I/O boundary. These site details require no additional library integration guidance.",
       "evidence": [
-        "Base origin/main c62ae6817c5bccb010a32f665d0fb8d8ce22f75d; git diff has no src runtime, release-workflow, Changeset or changelog changes.",
-        "vp install --frozen-lockfile verified1013 supply-chain entries; lockfile differs only in two renamed workspace importer keys.",
-        "vp run --no-cache pack passed ATTW/publint; final @ueberbrot/effect-api-query0.1.0 archive has14unique files and byte-identical runtime/declaration/map output to the unscoped tested archive.",
-        "Type-aware lint, publicAPI and server-local compiler fixtures on TypeScript7.0.2/5.9.3, Effect diagnostics and Fallow audits passed; all509 runtime tests passed.",
-        "Both application builds and final56page docsbuild passed; all7Chromium docs checks passed, including scoped registry/npm URLs, branding, unpublished/network/invalid-version fallbacks and generated LLM docs.",
-        "Fresh isolated scoped consumer: frozen nativepnpm12.11.2 install with25supply-chain checks and unchanged seven-day policy; strictNodeNext skipLibCheck:false TS7.0.2/5.9.3 and realRPC/HTTP runtime fixture passed.",
-        "Installed Intent list discovered @ueberbrot/effect-api-query#effect-api-query; load --path resolved the packagedskill; structural packagedskillvalidation passed and all16relative links resolve. Evidence: /tmp/eaq-scoped-release-0.1.0/consumer-evidence.json.",
-        "Packaged Intent snippet checking warns it requires Git-tracked declared files; installed dist/index.d.mts exists and both strictconsumer compiler checks passed independently."
+        "apps/docs/public/package-version.js diff reviewed; docs JS/TS now pass the lint presets, Astro check/build and 7 Chromium docs checks pass."
       ]
     },
     "source:docs/adr/0013-use-a-vite-plus-workspace-with-a-root-package.md": {
-      "fingerprint": "cf12cc4f4d496c1e1afb2a852c1bb4c8105123c39fe5dec0c7eb80091638c1c8",
+      "fingerprint": "b1767d7f3a513826a839feb521912d4a2078e6dd20e3a527eab4a76d20756821",
       "snapshot": {
-        "docs/adr/0013-use-a-vite-plus-workspace-with-a-root-package.md": "f1e7e8c340b0ce74e73ae931451cb7e825fafced4900322fe28ad9371205d1fa"
+        "docs/adr/0013-use-a-vite-plus-workspace-with-a-root-package.md": "51047ae74f952806109ff935819d3c24fe9b668671ec52f01dbabfde6ab7b4d4"
       },
-      "head": "0feea99e2469c98d60567fef8e0e7baf26f69625",
-      "outcome": "updated",
-      "reason": "Rewrote agent-facing decision prose while retaining the Vite+ workspace and root-package ownership model. No workspace, packaging, or supported usage change.",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "no-change",
+      "reason": "Only preset prose/table formatting changed in this existing document. New decisions live in ADRs 27\u201329; existing decisions and triage rules retain their substance.",
       "evidence": [
-        "Source HEAD 0feea99e2469c98d60567fef8e0e7baf26f69625, package effect-api-query 0.1.0, and actual uncommitted prose diff. Runtime source, public types, dependencies, examples, and activation metadata are unchanged.",
-        "Protected-content audit: all 92 in-scope Markdown/MDX documents revised; all 113 code blocks, Markdown link targets, and heading anchors preserved. No prose em/en dashes or semicolons remain. .agents/, docs/agents/, and AGENTS.md match HEAD.",
-        "vp run --no-cache api-types passed package build, attw, publint, and public API/documentation fixtures under TypeScript 7 and 5.9.",
-        "vp run --no-cache docs-build passed exact documentation excerpt verification and Astro checks, built 56 pages, and validated all internal links.",
-        "vp run --no-cache format, git diff --check, and vp exec intent validate skills --check passed. Intent maintainer sync reported nothing to synchronize.",
-        "Independent prose reviews covered technical conditions, cleanup ordering, key identity, shared callbacks, hydration, and agent-facing ADR/skill instructions. No runtime or recommended API behavior changed. A fresh consumer session and new discovery check were not repeated for this editorial revision.",
-        "Reviewed git diff HEAD -- docs/adr/0013-use-a-vite-plus-workspace-with-a-root-package.md and retained the original decision/policy facts."
+        "docs/adr/0013-use-a-vite-plus-workspace-with-a-root-package.md diff reviewed; docs build passes with valid links."
       ]
     },
     "source:e2e-docs/docs.spec.ts": {
-      "fingerprint": "b75aaa67c3d5b084f28d952c1c433d3d176721001ba019ca94c110e6559b6971",
+      "fingerprint": "dd5ab183d38fded6c03801c6031f3769c0912313c93e7ef16a42925a6e22967a",
       "snapshot": {
-        "e2e-docs/docs.spec.ts": "92bdc951bf6587ed9a55ad64dfdbcef6e5b8c31dd9131635dc3c1c1e10ce0a44"
+        "e2e-docs/docs.spec.ts": "35eb82bbb628456a69d777d6430c138f58a57f42dd028b5c2c6631a8052dbd59"
       },
-      "head": "c62ae6817c5bccb010a32f665d0fb8d8ce22f75d",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Updated the two existing npm/registry testURL constants to the scoped package. Branding assertions and existing scenarios are unchanged; allseven Chromium cases passed, verifying scoped requests without broadening test or guidance scope.",
+      "reason": "Preset formatting and repository test setup preserve the existing browser scenarios and native library usage. No new integration task or recommendation is introduced.",
       "evidence": [
-        "Base origin/main c62ae6817c5bccb010a32f665d0fb8d8ce22f75d; git diff has no src runtime, release-workflow, Changeset or changelog changes.",
-        "vp install --frozen-lockfile verified1013 supply-chain entries; lockfile differs only in two renamed workspace importer keys.",
-        "vp run --no-cache pack passed ATTW/publint; final @ueberbrot/effect-api-query0.1.0 archive has14unique files and byte-identical runtime/declaration/map output to the unscoped tested archive.",
-        "Type-aware lint, publicAPI and server-local compiler fixtures on TypeScript7.0.2/5.9.3, Effect diagnostics and Fallow audits passed; all509 runtime tests passed.",
-        "Both application builds and final56page docsbuild passed; all7Chromium docs checks passed, including scoped registry/npm URLs, branding, unpublished/network/invalid-version fallbacks and generated LLM docs.",
-        "Fresh isolated scoped consumer: frozen nativepnpm12.11.2 install with25supply-chain checks and unchanged seven-day policy; strictNodeNext skipLibCheck:false TS7.0.2/5.9.3 and realRPC/HTTP runtime fixture passed.",
-        "Installed Intent list discovered @ueberbrot/effect-api-query#effect-api-query; load --path resolved the packagedskill; structural packagedskillvalidation passed and all16relative links resolve. Evidence: /tmp/eaq-scoped-release-0.1.0/consumer-evidence.json.",
-        "Packaged Intent snippet checking warns it requires Git-tracked declared files; installed dist/index.d.mts exists and both strictconsumer compiler checks passed independently."
+        "e2e-docs/docs.spec.ts diff reviewed; final compiler checks and app builds pass. Earlier Chromium/Firefox application/docs checks passed; latest docs Chromium run passes 7 cases. WebKit is blocked at launch by missing host libraries."
       ]
     },
     "source:e2e/conditional-query.spec.ts": {
-      "fingerprint": "6f0ab418799c94ae6ba540a6e12ca8a3115a5335418ee92b73af61b68e64798c",
+      "fingerprint": "42ffb9bd68f6b5758715c01228b4d31b9dec232cf4b5d7dda5da2aeab43e920c",
       "snapshot": {
-        "e2e/conditional-query.spec.ts": "cbcf8bd4084cada24635c7839a5bdf83e59115ad1175134d5d65eb37f0dcffa4"
+        "e2e/conditional-query.spec.ts": "538fb2db336f1e990a389b7faa39fbccd7284e2b957e88f729502126e014856d"
       },
-      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
+      "reason": "Preset formatting and repository test setup preserve the existing browser scenarios and native library usage. No new integration task or recommendation is introduced.",
       "evidence": [
-        "Reviewed the actual diff and current source at e2e/conditional-query.spec.ts against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
-        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+        "e2e/conditional-query.spec.ts diff reviewed; final compiler checks and app builds pass. Earlier Chromium/Firefox application/docs checks passed; latest docs Chromium run passes 7 cases. WebKit is blocked at launch by missing host libraries."
       ]
     },
     "source:e2e/example-application.ts": {
-      "fingerprint": "7aa0cef9f7e89bc6264535884d5e3d1bcd4bafdd701b3d78124768b1cd82f262",
+      "fingerprint": "4156a68669ccd4316e7d79d67cd695f5ae99bf5cf204df3112a086bb71e28ca8",
       "snapshot": {
-        "e2e/example-application.ts": "3ce3024b409c7c28e9e159fce2b724009dd846fbe6fba75ef3d7ab95dc507e99"
+        "e2e/example-application.ts": "ad28eaea7c7cb23b99b02c41000490210d5a004d0a67357ed2446512f1ba8909"
       },
-      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
+      "reason": "Preset formatting and repository test setup preserve the existing browser scenarios and native library usage. No new integration task or recommendation is introduced.",
       "evidence": [
-        "Reviewed the actual diff and current source at e2e/example-application.ts against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
-        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+        "e2e/example-application.ts diff reviewed; final compiler checks and app builds pass. Earlier Chromium/Firefox application/docs checks passed; latest docs Chromium run passes 7 cases. WebKit is blocked at launch by missing host libraries."
       ]
     },
     "source:examples/contracts/src/client.ts": {
-      "fingerprint": "edb8d760d8523f285a099edd65375f23a0bcab7321cddef564acd58d89f43241",
+      "fingerprint": "2b17d4c8e5f6feed1b5f12fbe778e5ce058a5a2d9a1c97094bbb932f1364e75e",
       "snapshot": {
-        "examples/contracts/src/client.ts": "f645f690571d6f8d571ec8496607778c423fbc4b45848bf3cf725739e981953e"
+        "examples/contracts/src/client.ts": "fdf559bf0a798c7ea7f7aee01967837e720f7727a1bd11978aec51aad59f00f2"
       },
-      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
+      "reason": "Nominal schema brands and typed ready-client handling preserve the example protocol and library inputs. Shipped RPC/HTTP setup guidance remains accurate.",
       "evidence": [
-        "Reviewed the actual diff and current source at examples/contracts/src/client.ts against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
-        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+        "examples/contracts/src/client.ts diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
       ]
     },
     "source:examples/contracts/src/contracts.ts": {
-      "fingerprint": "347cc797a64e13c1476d2f2aaa027a5a23f6ea56d9695b88750fe83b1c3c5ed9",
+      "fingerprint": "0ee3861eaf20b911cd0c3eca6810e14094ba884069826494a7ada563a2360a63",
       "snapshot": {
-        "examples/contracts/src/contracts.ts": "11ba2f683cfeaa16947864a12c3bccc96104dbe0f6139efcd81e6fc865482641"
+        "examples/contracts/src/contracts.ts": "74d69e1a07c0b32c2a48b8fed8cfceaac8844ead860fbd00b9e357657b39d88e"
       },
-      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "RPC pagination now enforces the same integer cursor and 1..100 page-size bounds as the HTTP example. Existing ready-client/query-pattern guidance remains sufficient; server-local regression tests cover rejection.",
+      "reason": "Nominal schema brands and typed ready-client handling preserve the example protocol and library inputs. Shipped RPC/HTTP setup guidance remains accurate.",
       "evidence": [
-        "Reviewed the actual diff and current source at examples/contracts/src/contracts.ts against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
-        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+        "examples/contracts/src/contracts.ts diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
       ]
     },
     "source:examples/tanstack-start/src/components/action-button.tsx": {
-      "fingerprint": "d0b70e406fe9c1eadf6da4c873a867c67dd0704778b0025afe2570fe957053e6",
+      "fingerprint": "c2e18ef4fd56d4e83cc88611043e6a3517ecde691843b80c41b5db090536f0de",
       "snapshot": {
-        "examples/tanstack-start/src/components/action-button.tsx": "79c37de2669992148e645a70f1b783a1dd7d85ac8e5a9ec267843550eafd3926"
+        "examples/tanstack-start/src/components/action-button.tsx": "44ab38ecfcde9a202eb6dfa409c4860e00535246d89c8685b583725ef102d84c"
       },
-      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
       "evidence": [
-        "Reviewed the actual diff and current source at examples/tanstack-start/src/components/action-button.tsx against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
-        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+        "examples/tanstack-start/src/components/action-button.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
       ]
     },
     "source:examples/tanstack-start/src/components/navigation-link.tsx": {
-      "fingerprint": "b54ce1620db2d94ed8d2f71f4900c2d8c17985ccca14093d9f419a353f67bd13",
+      "fingerprint": "8946f70b65c27f24be0a2b249edbcb67fd56892c13ad6003e76d5fe8f107cf9c",
       "snapshot": {
-        "examples/tanstack-start/src/components/navigation-link.tsx": "a7d037126c9a648b3aa20ecb8af5f416982522f9da5703460b141bfb53124cf3"
+        "examples/tanstack-start/src/components/navigation-link.tsx": "7f77cb10b9616cf9d79210842abf83733e4163773bbb8f1344fc294ab8524813"
       },
-      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
       "evidence": [
-        "Reviewed the actual diff and current source at examples/tanstack-start/src/components/navigation-link.tsx against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
-        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+        "examples/tanstack-start/src/components/navigation-link.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
       ]
     },
     "source:examples/tanstack-start/src/components/router-status.tsx": {
-      "fingerprint": "0fd4520270cc3cdedb23abb639bf655c538744fc11ae2ca2771b4b81b6025a3a",
+      "fingerprint": "f44d01018549acea83dc89517bf6b28efa48b00b6980dbb14c5fa53efd2b8df8",
       "snapshot": {
-        "examples/tanstack-start/src/components/router-status.tsx": "6e9b8fb3bcd3397aa1d447d12f000b264b214463327ac03319dd59d6f229e99d"
+        "examples/tanstack-start/src/components/router-status.tsx": "72b2caf6d669d2fd920c660accd96e1e749effa2d020e5e6c585519699bd8297"
       },
-      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Loading queries labels both RPC and HTTP work accurately. This UI text change adds no developer task or skill requirement.",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
       "evidence": [
-        "Reviewed the actual diff and current source at examples/tanstack-start/src/components/router-status.tsx against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
-        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+        "examples/tanstack-start/src/components/router-status.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
       ]
     },
     "source:examples/tanstack-start/src/hooks/use-slow-query-cancellation.ts": {
@@ -1443,122 +1346,99 @@
       ]
     },
     "source:examples/tanstack-start/src/routes/failure.tsx": {
-      "fingerprint": "5df8fdee6f55e2b69313237e1cadae26ec40dd05eff106d23fc0ef2752679c6b",
+      "fingerprint": "3b7ebb231d7ba085dc4e8c87f73b0d4960317941bf1214c4a339e844d78ee64d",
       "snapshot": {
-        "examples/tanstack-start/src/routes/failure.tsx": "690a26c3ef52a28f5c89617a385de23d920840b591ea3b22f060673dd0d262d6"
+        "examples/tanstack-start/src/routes/failure.tsx": "151cb567ff03786cd8412834ebd806f89b815ef6f5f7c455b0bb471aad75ca09"
       },
-      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
       "evidence": [
-        "Reviewed the actual diff and current source at examples/tanstack-start/src/routes/failure.tsx against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
-        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+        "examples/tanstack-start/src/routes/failure.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
       ]
     },
     "source:examples/tanstack-start/src/routes/http-failure.tsx": {
-      "fingerprint": "5947742b2cc9d79e14228e7429d5ecc9dd71963448c8fec0e4bd0978705767d9",
+      "fingerprint": "ffb8d93bdb3b6028850cd4fef7605dab625b6b656450c8682432367ceb891c48",
       "snapshot": {
-        "examples/tanstack-start/src/routes/http-failure.tsx": "a7ade1d3bd9973903ab7e49461f82cdf413766e3ff1c194a50be21423b5e2de1"
+        "examples/tanstack-start/src/routes/http-failure.tsx": "5065f13bedb6105ea45b8ca21842ecbc86fc142c9a59baff4eda028ed1a468fc"
       },
-      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
       "evidence": [
-        "Reviewed the actual diff and current source at examples/tanstack-start/src/routes/http-failure.tsx against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
-        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+        "examples/tanstack-start/src/routes/http-failure.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
       ]
     },
     "source:examples/tanstack-start/src/routes/http.tsx": {
-      "fingerprint": "5bf6d229917158997ecae159648fa740b1183ca537bd7eaefa005ef7c806805e",
+      "fingerprint": "6ab4a551ca2f2f7134f130dd8dd0a92c50e823842ee7763666caba39b8dabb7c",
       "snapshot": {
-        "examples/tanstack-start/src/routes/http.tsx": "af8b13103d7813a8143db021731e232fb8078170b573eb5fccbbe03c79e61480"
+        "examples/tanstack-start/src/routes/http.tsx": "88c5514ad26aba2367829fd950af8feafe2ec2a00f0538567befc0e4adf251b2"
       },
-      "head": "d870776a5f37835467beb611c6ca6a51fe3933eb",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Update direct example imports to the shared cancellation module, preserving rendered diagnostics and HTTP routes. Both application runtime suites and builds pass. This wiring adds no new library-consumer workflow and leaves existing guidance accurate.",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
       "evidence": [
-        "Compared the task working tree with d870776a5f37835467beb611c6ca6a51fe3933eb; three independent architecture passes and an additional independent check of the final diff found no remaining actionable findings.",
-        "Full runtime suite passed: 506 tests in 46 files, including 5 new hook-lifetime cases for RPC/HTTP operation isolation, pending status cancellation and post-await retired-owner guards. Independent pass 2 additionally verified 191 snapshot/lifecycle/hash cases.",
-        "Direct vp pack passed declaration emission, attw and publint. Published-contract fixtures passed installed TypeScript 7.0.2 and 5.9.3. Full type-aware lint passed with no errors or warnings; strict Effect diagnostics passed with 0 errors and 0 warnings (one pre-existing suggestion).",
-        "Both example application builds passed. Expanded shared CSS has exactly the original rules for both apps, ignoring whitespace. Documentation snippet and Astro checks passed.",
-        "All four uncached Fallow analyses passed: both dead-code modes have no issues, semantic near-duplicate groups decreased from 67 to 61. Existing workspace-discovery advisory for the explicitly excluded source-only shared examples remains visible.",
-        "The native task supervisor sometimes fails with spawn EBUSY or sandbox process initialization errors; identical installed commands ran directly after completing their package prerequisites. No checks or source rules were bypassed to obtain these results.",
-        "No shipped guidance, activation description or public interface changed. Fresh consumer and discovery sessions were not repeated for this internal refactor; executable published-contract and rendered-application checks provide this batch evidence."
+        "examples/tanstack-start/src/routes/http.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
       ]
     },
     "source:examples/tanstack-start/src/styles.css": {
-      "fingerprint": "e175f79bb10f4c0e3e2625dd8785537b1f1ffe8f43318559c0519bc4f457290d",
+      "fingerprint": "42f1ab02e08911ec56906c692156c65c31455e4bd7f5ef0aaee2c1ac52b10efd",
       "snapshot": {
-        "examples/tanstack-start/src/styles.css": "7bca484171da0b685a1af733ae15669004e5adbde4bc8073d07faea65da103ee"
+        "examples/tanstack-start/src/styles.css": "d537fd0cc8256fc13b663aa86228ac4de601272280c21f642b39d69cc1af11b3"
       },
-      "head": "d870776a5f37835467beb611c6ca6a51fe3933eb",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Move identical example theme declarations to examples/shared/theme.css while retaining Tailwind imports at both original entries and the Vite-specific grid locally. Expanded CSS preserves the original rules exactly and both builds pass. This is private example presentation reuse, with no query-library guidance or public-interface change.",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
       "evidence": [
-        "Compared the task working tree with d870776a5f37835467beb611c6ca6a51fe3933eb; three independent architecture passes and an additional independent check of the final diff found no remaining actionable findings.",
-        "Full runtime suite passed: 506 tests in 46 files, including 5 new hook-lifetime cases for RPC/HTTP operation isolation, pending status cancellation and post-await retired-owner guards. Independent pass 2 additionally verified 191 snapshot/lifecycle/hash cases.",
-        "Direct vp pack passed declaration emission, attw and publint. Published-contract fixtures passed installed TypeScript 7.0.2 and 5.9.3. Full type-aware lint passed with no errors or warnings; strict Effect diagnostics passed with 0 errors and 0 warnings (one pre-existing suggestion).",
-        "Both example application builds passed. Expanded shared CSS has exactly the original rules for both apps, ignoring whitespace. Documentation snippet and Astro checks passed.",
-        "All four uncached Fallow analyses passed: both dead-code modes have no issues, semantic near-duplicate groups decreased from 67 to 61. Existing workspace-discovery advisory for the explicitly excluded source-only shared examples remains visible.",
-        "The native task supervisor sometimes fails with spawn EBUSY or sandbox process initialization errors; identical installed commands ran directly after completing their package prerequisites. No checks or source rules were bypassed to obtain these results.",
-        "No shipped guidance, activation description or public interface changed. Fresh consumer and discovery sessions were not repeated for this internal refactor; executable published-contract and rendered-application checks provide this batch evidence."
+        "examples/tanstack-start/src/styles.css diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
       ]
     },
     "source:examples/tanstack-start/vite.config.ts": {
-      "fingerprint": "c2f207176f82c378faf65195877ae337a8c4ed7b0d62ba4eb16356327e8766e8",
+      "fingerprint": "ff1e01b28c8c50f6ec7a17b95b94d9d079b1f920a0f0f50796fa5eeb32a83f36",
       "snapshot": {
-        "examples/tanstack-start/vite.config.ts": "e33ed6de04e21fd8b43f95e2a29fdf5adae9007b24faf307ac85b5f51fbb4180"
+        "examples/tanstack-start/vite.config.ts": "e88225ba2b41c412ed8cbf0c6564d67469e8e4f264071a348611e1e103dff362"
       },
-      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
       "evidence": [
-        "Reviewed the actual diff and current source at examples/tanstack-start/vite.config.ts against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
-        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+        "examples/tanstack-start/vite.config.ts diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
       ]
     },
     "source:examples/vite-react/src/components/sections/queries-section.tsx": {
-      "fingerprint": "6a00123ad89af1b93a07f046f5e3a8d06c9232996dfe15038468201d5d556064",
+      "fingerprint": "bd3f5f42b456c10f1da96c47bbede6b3f385ab6fdae47cd63d989d40d0a2f95a",
       "snapshot": {
-        "examples/vite-react/src/components/sections/queries-section.tsx": "2f6d771e217f415d570a4483e44a398b49f3a1fb0afae7f7a9caebc8c6a2d41d"
+        "examples/vite-react/src/components/sections/queries-section.tsx": "f69eb675894f935c7e6409ee831c283d03e672666ee3991ac7668cd3b6cb89ca"
       },
-      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Count loaded users directly across pages without allocating a flattened array; query data, ownership and displayed counts are unchanged, and existing framework guidance remains accurate.",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
       "evidence": [
-        "Reviewed the actual diff and current source at examples/vite-react/src/components/sections/queries-section.tsx against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
-        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+        "examples/vite-react/src/components/sections/queries-section.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
       ]
     },
     "source:examples/vite-react/src/components/ui/action-button.tsx": {
-      "fingerprint": "1b0278c83a2efe4939ff4f81fb4cf741e3e65a0b5316df77dd14d7872b5df4f8",
+      "fingerprint": "782fa62187ed8ae1d0ac1adb4f57dd33ed0efa09ca4ca43cd2ccd0f53a805ea5",
       "snapshot": {
-        "examples/vite-react/src/components/ui/action-button.tsx": "bdacb6e84d72e4e454c5a0062355a53062db3ebeb56873eb8bd5f5b7b0766fbf"
+        "examples/vite-react/src/components/ui/action-button.tsx": "4fffe2813ef95433f4c70b991707b52201598b2f0a262e9f64187c08d3bfe5a0"
       },
-      "head": "54b6521f3e37f9cb3ca4cd3812ab3c960eb2168a",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Removed private narrative and assertion commentary while retaining functional tool directives and the existing runtime behavior. The affected example or test continues to use the documented query, ownership and cancellation workflow; no additional skill task is needed.",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
       "evidence": [
-        "Reviewed the actual diff and current source at examples/vite-react/src/components/ui/action-button.tsx against 54b6521 and the supplied PR base; relevant native task receipts are under /tmp/effect-api-query-audit-2026-10-11/.",
-        "Final uncached native tasks passed: typecheck (142 files), Effect diagnostics (162 files, zero errors/warnings), Fallow, test (41 files / 474 runtime cases), public API and server-local fixtures with TypeScript 7.0.2 and 5.9.3, native pack with attw/publint, both example builds, docs-check and 46-page docs-build with internal links. Chromium passed all 31 application and 7 documentation checks. Firefox/WebKit browser launches are unavailable locally because their installed binaries are missing; their HTTP-only documentation checks passed. Fresh installed-consumer activation/task evaluation was not performed; compiler and application evidence comes from this workspace."
+        "examples/vite-react/src/components/ui/action-button.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
       ]
     },
     "source:examples/vite-react/src/styles/tailwind.css": {
-      "fingerprint": "ef9ab398e901958bc40a3dc2b73bd4f529b6066580714f8a61123aed96b2c9a3",
+      "fingerprint": "856806fb74e36491b2a07b5f8057f09566f29f855e84013a1fcdb725f62cd670",
       "snapshot": {
-        "examples/vite-react/src/styles/tailwind.css": "51c4b3e6464deaf25b330dc651ab0b6a6ba277bc660cc45f128e1461eeb8daaa"
+        "examples/vite-react/src/styles/tailwind.css": "24f8e0acbf80deddefc50c13ab4a6ad08c90bcee5ddd16701e97022295657d99"
       },
-      "head": "d870776a5f37835467beb611c6ca6a51fe3933eb",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Move identical example theme declarations to examples/shared/theme.css while retaining Tailwind imports at both original entries and the Vite-specific grid locally. Expanded CSS preserves the original rules exactly and both builds pass. This is private example presentation reuse, with no query-library guidance or public-interface change.",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
       "evidence": [
-        "Compared the task working tree with d870776a5f37835467beb611c6ca6a51fe3933eb; three independent architecture passes and an additional independent check of the final diff found no remaining actionable findings.",
-        "Full runtime suite passed: 506 tests in 46 files, including 5 new hook-lifetime cases for RPC/HTTP operation isolation, pending status cancellation and post-await retired-owner guards. Independent pass 2 additionally verified 191 snapshot/lifecycle/hash cases.",
-        "Direct vp pack passed declaration emission, attw and publint. Published-contract fixtures passed installed TypeScript 7.0.2 and 5.9.3. Full type-aware lint passed with no errors or warnings; strict Effect diagnostics passed with 0 errors and 0 warnings (one pre-existing suggestion).",
-        "Both example application builds passed. Expanded shared CSS has exactly the original rules for both apps, ignoring whitespace. Documentation snippet and Astro checks passed.",
-        "All four uncached Fallow analyses passed: both dead-code modes have no issues, semantic near-duplicate groups decreased from 67 to 61. Existing workspace-discovery advisory for the explicitly excluded source-only shared examples remains visible.",
-        "The native task supervisor sometimes fails with spawn EBUSY or sandbox process initialization errors; identical installed commands ran directly after completing their package prerequisites. No checks or source rules were bypassed to obtain these results.",
-        "No shipped guidance, activation description or public interface changed. Fresh consumer and discovery sessions were not repeated for this internal refactor; executable published-contract and rendered-application checks provide this batch evidence."
+        "examples/vite-react/src/styles/tailwind.css diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
       ]
     },
     "source:.github/actions/setup-repository/action.yml": {
@@ -1578,144 +1458,99 @@
       ]
     },
     "source:.github/workflows/deploy-docs.yml": {
-      "fingerprint": "2fce940a1dd4c1299b6060dda7c2d905207ca7c170a5ae75bb6829cb29a51976",
+      "fingerprint": "5c61fc3238155518f499b683f439b5dc5604e464e6c0db7a7edc0c516a7acb19",
       "snapshot": {
-        ".github/workflows/deploy-docs.yml": "31a953c832f5a0e68b71c19ece0fdedc43c80a6c6300e45c8ee5997b31ab46c7"
+        ".github/workflows/deploy-docs.yml": "ca3ed0c09c592b77302fb48790ed74487154d2836d276422a3442f30c73f6f3e"
       },
-      "head": "cb14a01c995cd9dfac5a3c5dc752ea5d71da862f",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Reviewed the deployment dependency, main branch guards and artifact reuse. This maintainer CI change lets validated documentation deploy without npm publication and leaves publishing behavior intact. No consumer guidance or additional independent library skill is required.",
+      "reason": "Only YAML quoting and folded-line formatting changed. Triggers, permissions, action pins, commands and publication conditions retain their meaning; no performance gate was added.",
       "evidence": [
-        "Source cb14a01c995cd9dfac5a3c5dc752ea5d71da862f plus current local diff. No public library behavior, types, dependencies, package version, or publishing setup changes.",
-        "Fresh vp run --no-cache api-types passed package/declaration construction, attw, publint, and actual importing compiler fixtures under TypeScript 7 and 5.9.3. Exact documentation excerpt verification and Astro checks passed; docs-build produced 56 pages with valid internal links.",
-        "Type-aware lint and checking passed 150 files; repository formatting passed 310 files. The two existing React mounting and stream tracing runtime recipe tests passed after real module extraction.",
-        "Seven Chromium documentation checks passed against the fresh local build: navigation/search/assets, published registry version, unpublished/network/invalid-version fallbacks, and generated LLM documentation links. Collaborative browser inspection confirmed separate quick-start and React modules, preserved React anchor, and the correct October 11 page-change date.",
-        "Workflow YAML 1.2 parsing and dependency/branch/artifact inspection passed. Documentation now depends on successful validation on main, reuses its browser-tested artifact, and has no publish dependency; standalone manual main builds check compiler fixtures. No live workflow was dispatched and npm publication remains unconfigured as confirmed by the maintainer.",
-        "Intent sync reported Nothing to synchronize. Reviewed the owned skill, RPC/HTTP and framework references, and all three planning records against the actual diff. Existing source patterns cover every new fixture and changed canonical guide. Fresh consumer/discovery sessions were not repeated because recommendations and library behavior are unchanged."
+        ".github/workflows/deploy-docs.yml diff reviewed against HEAD; the existing maintainer and release workflow remains accurate."
       ]
     },
     "source:playwright.config.ts": {
-      "fingerprint": "0acc85c38e3fdfd4e5887ca39bc139a54cdbee979d61aefd21b66d3780b5d1f9",
+      "fingerprint": "49f484ab5d7349e2e4392bdcabd5a70f515dcf77611d4f4ee22b4f483b4cadf8",
       "snapshot": {
-        "playwright.config.ts": "fe31f0f28ff40bd607e7b39b71426dd91ad1c51121bd2bed018bd7b83675b614"
+        "playwright.config.ts": "c445ca846b00fe388083e62daddbd1048e1921fabd953dca3b34dabf040e37db"
       },
-      "head": "f3ba2a62cdb0b28eaa6e592b010bb6879466cda2",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Application previews serve prepared outputs. Native browser tasks own their build prerequisites; CI skips them only after successful current-run artifact restoration. Existing acceptance cases and tested application behavior are unchanged.",
+      "reason": "Preset formatting and repository test setup preserve the existing browser scenarios and native library usage. No new integration task or recommendation is introduced.",
       "evidence": [
-        "Diff reviewed against f3ba2a62cdb0b28eaa6e592b010bb6879466cda2; actual PR base 5b91ddb1de13970365669c887b9d767ea417fbd4. Public library source, compiler fixtures, runtime cases, README, documentation pages and skills were not changed in this batch.",
-        "Native uncached typecheck passed 141 files and native pack attw/publint. Scoped native format passed seven affected configuration files; final YAML parsed and browser/trigger/publication prerequisite expressions were inspected.",
-        "Four existing application Chromium acceptance cases and all seven existing documentation Chromium cases passed against prepared outputs. Their preview logs contain no pack or build invocation. Hosted docs Playwright list mode listed seven cases without building a local site. Receipts: /tmp/effect-api-query-ci-audit/.",
-        "All three shared planning documents were read: _artifacts/domain_map.yaml retains the same ten consumer tasks/failure modes, _artifacts/skill_spec.md retains accurate source-backed coverage and boundaries, and _artifacts/skill_tree.yaml retains the same owned skill, six references, source mappings, prerequisites and distribution. CI-only orchestration requires no guidance or planning rewrite.",
-        "The first hosted run of artifact reuse and the reusable release/deployment workflows remains unverified locally. No package publication or Pages deployment was performed."
+        "playwright.config.ts diff reviewed; final compiler checks and app builds pass. Earlier Chromium/Firefox application/docs checks passed; latest docs Chromium run passes 7 cases. WebKit is blocked at launch by missing host libraries."
       ]
     },
     "source:examples/shared/theme.css": {
-      "fingerprint": "8d029321671dc85cbf712e9165c283c5bd8a1b9835174d8c79023453c07681f0",
+      "fingerprint": "05b70e00bc28662c15d69a2b25f9df4de625f247cf2c0f3a87bfb60b6ea65da2",
       "snapshot": {
-        "examples/shared/theme.css": "b48a2896fe934311ef529e62ee4a90e7c59e9e6202f6ee2bb571fd0e2fbab8eb"
+        "examples/shared/theme.css": "a43cf80d79ffd0a3e5859b07e04ab019e338788622c4989cc5512478a318e8d8"
       },
-      "head": "d870776a5f37835467beb611c6ca6a51fe3933eb",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Move identical example theme declarations to examples/shared/theme.css while retaining Tailwind imports at both original entries and the Vite-specific grid locally. Expanded CSS preserves the original rules exactly and both builds pass. This is private example presentation reuse, with no query-library guidance or public-interface change.",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
       "evidence": [
-        "Compared the task working tree with d870776a5f37835467beb611c6ca6a51fe3933eb; three independent architecture passes and an additional independent check of the final diff found no remaining actionable findings.",
-        "Full runtime suite passed: 506 tests in 46 files, including 5 new hook-lifetime cases for RPC/HTTP operation isolation, pending status cancellation and post-await retired-owner guards. Independent pass 2 additionally verified 191 snapshot/lifecycle/hash cases.",
-        "Direct vp pack passed declaration emission, attw and publint. Published-contract fixtures passed installed TypeScript 7.0.2 and 5.9.3. Full type-aware lint passed with no errors or warnings; strict Effect diagnostics passed with 0 errors and 0 warnings (one pre-existing suggestion).",
-        "Both example application builds passed. Expanded shared CSS has exactly the original rules for both apps, ignoring whitespace. Documentation snippet and Astro checks passed.",
-        "All four uncached Fallow analyses passed: both dead-code modes have no issues, semantic near-duplicate groups decreased from 67 to 61. Existing workspace-discovery advisory for the explicitly excluded source-only shared examples remains visible.",
-        "The native task supervisor sometimes fails with spawn EBUSY or sandbox process initialization errors; identical installed commands ran directly after completing their package prerequisites. No checks or source rules were bypassed to obtain these results.",
-        "No shipped guidance, activation description or public interface changed. Fresh consumer and discovery sessions were not repeated for this internal refactor; executable published-contract and rendered-application checks provide this batch evidence."
+        "examples/shared/theme.css diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
       ]
     },
     "source:examples/tanstack-start/src/routes/diagnostics.tsx": {
-      "fingerprint": "d7df381eb6eb247f0cfc9940181740b6fb1691dc94f4d93d2f6f1084aa4ecaf4",
+      "fingerprint": "7bfe64e8012e3f7377d9056646161583d860799aaffd9281ca8d3e085574a778",
       "snapshot": {
-        "examples/tanstack-start/src/routes/diagnostics.tsx": "76e54e5f6834b75fd47f3f751414782daa5a9d5eb0472c0b466b8fb133418bc3"
+        "examples/tanstack-start/src/routes/diagnostics.tsx": "9ab1b870797ae7482973d31f6ba094bc4c2759d635bea91bf791cf0b6d511cf1"
       },
-      "head": "d870776a5f37835467beb611c6ca6a51fe3933eb",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Update direct example imports to the shared cancellation module, preserving rendered diagnostics and HTTP routes. Both application runtime suites and builds pass. This wiring adds no new library-consumer workflow and leaves existing guidance accurate.",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
       "evidence": [
-        "Compared the task working tree with d870776a5f37835467beb611c6ca6a51fe3933eb; three independent architecture passes and an additional independent check of the final diff found no remaining actionable findings.",
-        "Full runtime suite passed: 506 tests in 46 files, including 5 new hook-lifetime cases for RPC/HTTP operation isolation, pending status cancellation and post-await retired-owner guards. Independent pass 2 additionally verified 191 snapshot/lifecycle/hash cases.",
-        "Direct vp pack passed declaration emission, attw and publint. Published-contract fixtures passed installed TypeScript 7.0.2 and 5.9.3. Full type-aware lint passed with no errors or warnings; strict Effect diagnostics passed with 0 errors and 0 warnings (one pre-existing suggestion).",
-        "Both example application builds passed. Expanded shared CSS has exactly the original rules for both apps, ignoring whitespace. Documentation snippet and Astro checks passed.",
-        "All four uncached Fallow analyses passed: both dead-code modes have no issues, semantic near-duplicate groups decreased from 67 to 61. Existing workspace-discovery advisory for the explicitly excluded source-only shared examples remains visible.",
-        "The native task supervisor sometimes fails with spawn EBUSY or sandbox process initialization errors; identical installed commands ran directly after completing their package prerequisites. No checks or source rules were bypassed to obtain these results.",
-        "No shipped guidance, activation description or public interface changed. Fresh consumer and discovery sessions were not repeated for this internal refactor; executable published-contract and rendered-application checks provide this batch evidence."
+        "examples/tanstack-start/src/routes/diagnostics.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
       ]
     },
     "source:.changeset/README.md": {
-      "fingerprint": "44eb2527578c9cf4989dc93ae235e91e8c56abbc8194d362caed42190ad9ac86",
+      "fingerprint": "e578a73b15a7cf155ed383b79ecf43fec4ab5b2d29451f0dbcd009c5b5361814",
       "snapshot": {
-        ".changeset/README.md": "e5d46bbaa2e9e5c229c16f5be8c327b6b19bfd6c35948c573480152b3e49a243"
+        ".changeset/README.md": "de7b1323862f20fdf1ab5d7fc10e06a1c31376f5517c702fc1e6e1a372bdef95"
       },
-      "head": "0feea99e2469c98d60567fef8e0e7baf26f69625",
-      "outcome": "updated",
-      "reason": "Rewrote release guidance in plain English. Retained the non-empty Changeset requirement for runtime behavior, types, exports, peer/runtime dependency ranges, and installation metadata; retained exemptions and root-only publishing. No new library skill or source mapping is needed.",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "no-change",
+      "reason": "Formatter-only prose reflow preserves the release workflow; no shipped consumer guidance changes are needed.",
       "evidence": [
-        "Source HEAD 0feea99e2469c98d60567fef8e0e7baf26f69625, package effect-api-query 0.1.0, and actual uncommitted prose diff. Runtime source, public types, dependencies, examples, and activation metadata are unchanged.",
-        "Protected-content audit: all 92 in-scope Markdown/MDX documents revised; all 113 code blocks, Markdown link targets, and heading anchors preserved. No prose em/en dashes or semicolons remain. .agents/, docs/agents/, and AGENTS.md match HEAD.",
-        "vp run --no-cache api-types passed package build, attw, publint, and public API/documentation fixtures under TypeScript 7 and 5.9.",
-        "vp run --no-cache docs-build passed exact documentation excerpt verification and Astro checks, built 56 pages, and validated all internal links.",
-        "vp run --no-cache format, git diff --check, and vp exec intent validate skills --check passed. Intent maintainer sync reported nothing to synchronize.",
-        "Independent prose reviews covered technical conditions, cleanup ordering, key identity, shared callbacks, hydration, and agent-facing ADR/skill instructions. No runtime or recommended API behavior changed. A fresh consumer session and new discovery check were not repeated for this editorial revision.",
-        "Reviewed git diff HEAD -- .changeset/README.md and retained the original decision/policy facts."
+        ".changeset/README.md diff reviewed; full Oxfmt check passes."
       ]
     },
     "source:docs/adr/0011-publish-esm-only.md": {
-      "fingerprint": "d3fd2442fce92c8c4c7fb2f9467cccfe2b3da631768e94b37dd78845915e37d9",
+      "fingerprint": "053c698d07d94609a92d304af45398b7757a7973d8618ed68d50b529c349f2f2",
       "snapshot": {
-        "docs/adr/0011-publish-esm-only.md": "1b7237e42710b643dd6616409cd72ef938819a1d5f71e932ee4b9947b32bb9a4"
+        "docs/adr/0011-publish-esm-only.md": "79b1f1e68ab56b88be60d58ad2a199f7ddd556bcfc4300666b845cbb2c497b6d"
       },
-      "head": "0feea99e2469c98d60567fef8e0e7baf26f69625",
-      "outcome": "updated",
-      "reason": "Rewrote agent-facing decision prose while retaining the ESM-only decision, supported runtime/compiler boundary, and application responsibility for transforming dependencies. No runtime or consumer recommendation change.",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "no-change",
+      "reason": "Only preset prose/table formatting changed in this existing document. New decisions live in ADRs 27\u201329; existing decisions and triage rules retain their substance.",
       "evidence": [
-        "Source HEAD 0feea99e2469c98d60567fef8e0e7baf26f69625, package effect-api-query 0.1.0, and actual uncommitted prose diff. Runtime source, public types, dependencies, examples, and activation metadata are unchanged.",
-        "Protected-content audit: all 92 in-scope Markdown/MDX documents revised; all 113 code blocks, Markdown link targets, and heading anchors preserved. No prose em/en dashes or semicolons remain. .agents/, docs/agents/, and AGENTS.md match HEAD.",
-        "vp run --no-cache api-types passed package build, attw, publint, and public API/documentation fixtures under TypeScript 7 and 5.9.",
-        "vp run --no-cache docs-build passed exact documentation excerpt verification and Astro checks, built 56 pages, and validated all internal links.",
-        "vp run --no-cache format, git diff --check, and vp exec intent validate skills --check passed. Intent maintainer sync reported nothing to synchronize.",
-        "Independent prose reviews covered technical conditions, cleanup ordering, key identity, shared callbacks, hydration, and agent-facing ADR/skill instructions. No runtime or recommended API behavior changed. A fresh consumer session and new discovery check were not repeated for this editorial revision.",
-        "Reviewed git diff HEAD -- docs/adr/0011-publish-esm-only.md and retained the original decision/policy facts."
+        "docs/adr/0011-publish-esm-only.md diff reviewed; docs build passes with valid links."
       ]
     },
     "source:docs/adr/0018-add-infinite-query-builders-for-unary-rpcs.md": {
-      "fingerprint": "8614969c976daf63bb254b46c82bb81b4e5e48c72dcd3a1122906a2f8cdb78bf",
+      "fingerprint": "e9476dd20ed463f05981b521203951b5aafe015d6a0bc7342bf8e259fa3ca5c5",
       "snapshot": {
-        "docs/adr/0018-add-infinite-query-builders-for-unary-rpcs.md": "fbd51214b36a9fca8f9a7327be6fbe83662af16d1eb1ed4581b1123e8f3dbf86"
+        "docs/adr/0018-add-infinite-query-builders-for-unary-rpcs.md": "056cbc5ed4c528323d035224a81ffa6eb06c40099ed54cfcf1e8ce36d916eeb6"
       },
-      "head": "0feea99e2469c98d60567fef8e0e7baf26f69625",
-      "outcome": "updated",
-      "reason": "Rewrote agent-facing pagination decision prose while preserving unary-only infinite builders, page-to-input mapping, base identity, and error semantics. No API or recommended pagination change.",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "no-change",
+      "reason": "Only preset prose/table formatting changed in this existing document. New decisions live in ADRs 27\u201329; existing decisions and triage rules retain their substance.",
       "evidence": [
-        "Source HEAD 0feea99e2469c98d60567fef8e0e7baf26f69625, package effect-api-query 0.1.0, and actual uncommitted prose diff. Runtime source, public types, dependencies, examples, and activation metadata are unchanged.",
-        "Protected-content audit: all 92 in-scope Markdown/MDX documents revised; all 113 code blocks, Markdown link targets, and heading anchors preserved. No prose em/en dashes or semicolons remain. .agents/, docs/agents/, and AGENTS.md match HEAD.",
-        "vp run --no-cache api-types passed package build, attw, publint, and public API/documentation fixtures under TypeScript 7 and 5.9.",
-        "vp run --no-cache docs-build passed exact documentation excerpt verification and Astro checks, built 56 pages, and validated all internal links.",
-        "vp run --no-cache format, git diff --check, and vp exec intent validate skills --check passed. Intent maintainer sync reported nothing to synchronize.",
-        "Independent prose reviews covered technical conditions, cleanup ordering, key identity, shared callbacks, hydration, and agent-facing ADR/skill instructions. No runtime or recommended API behavior changed. A fresh consumer session and new discovery check were not repeated for this editorial revision.",
-        "Reviewed git diff HEAD -- docs/adr/0018-add-infinite-query-builders-for-unary-rpcs.md and retained the original decision/policy facts."
+        "docs/adr/0018-add-infinite-query-builders-for-unary-rpcs.md diff reviewed; docs build passes with valid links."
       ]
     },
     "source:docs/adr/0019-host-effect-rpc-inside-tanstack-start.md": {
-      "fingerprint": "1774ef38bbb6162ef15be7fce5dbba4ba781ba8fcf8b746cdf4adf0c41d54550",
+      "fingerprint": "280d547c1029920fc873f6dad46c5af672d73c2034a3cf7563b0ed8fde6345d6",
       "snapshot": {
-        "docs/adr/0019-host-effect-rpc-inside-tanstack-start.md": "dc498450821a420811533705e405d3ae8d6b5cd167e752452b6c2e721632b32b"
+        "docs/adr/0019-host-effect-rpc-inside-tanstack-start.md": "bd9900634cb81de8d8bf0ff9d22d35c6e18712d16cdcf59bd4231508adcdef48"
       },
-      "head": "0feea99e2469c98d60567fef8e0e7baf26f69625",
-      "outcome": "updated",
-      "reason": "Rewrote agent-facing hosting decision prose while preserving TanStack Start hosting and application-owned request/browser resources. No host implementation, lifetime, or client-construction change.",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "no-change",
+      "reason": "Only preset prose/table formatting changed in this existing document. New decisions live in ADRs 27\u201329; existing decisions and triage rules retain their substance.",
       "evidence": [
-        "Source HEAD 0feea99e2469c98d60567fef8e0e7baf26f69625, package effect-api-query 0.1.0, and actual uncommitted prose diff. Runtime source, public types, dependencies, examples, and activation metadata are unchanged.",
-        "Protected-content audit: all 92 in-scope Markdown/MDX documents revised; all 113 code blocks, Markdown link targets, and heading anchors preserved. No prose em/en dashes or semicolons remain. .agents/, docs/agents/, and AGENTS.md match HEAD.",
-        "vp run --no-cache api-types passed package build, attw, publint, and public API/documentation fixtures under TypeScript 7 and 5.9.",
-        "vp run --no-cache docs-build passed exact documentation excerpt verification and Astro checks, built 56 pages, and validated all internal links.",
-        "vp run --no-cache format, git diff --check, and vp exec intent validate skills --check passed. Intent maintainer sync reported nothing to synchronize.",
-        "Independent prose reviews covered technical conditions, cleanup ordering, key identity, shared callbacks, hydration, and agent-facing ADR/skill instructions. No runtime or recommended API behavior changed. A fresh consumer session and new discovery check were not repeated for this editorial revision.",
-        "Reviewed git diff HEAD -- docs/adr/0019-host-effect-rpc-inside-tanstack-start.md and retained the original decision/policy facts."
+        "docs/adr/0019-host-effect-rpc-inside-tanstack-start.md diff reviewed; docs build passes with valid links."
       ]
     },
     "source:CHANGELOG.md": {
@@ -1737,41 +1572,325 @@
       ]
     },
     "source:examples/tanstack-start/src/components/conditional-user-query.tsx": {
-      "fingerprint": "698ee6f404676bacb051249bbb15e482a034dc1f34be54e187e975042416d4b6",
+      "fingerprint": "f150dbcf751720d11b6275f5343e56673dcd68ff7204c1d74740945da3739cda",
       "snapshot": {
-        "examples/tanstack-start/src/components/conditional-user-query.tsx": "806c22652c90c0ba97266ba5b10adf8ad9b6405450906b4bedaa4b02763d5163"
+        "examples/tanstack-start/src/components/conditional-user-query.tsx": "49bf719b8ba8db2c8b32d2674b2f7c5e5071346f8aab24f081de30a5013eacc1"
       },
-      "head": "c62ae6817c5bccb010a32f665d0fb8d8ce22f75d",
-      "outcome": "updated",
-      "reason": "Changed only the skipToken public import to @ueberbrot/effect-api-query. Existing shipped guidance was updated to the same public root. Internal aliases, private workspace names, function/API behavior and runtime identity are unchanged; compiler, runtime and application build checks passed.",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "no-change",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
       "evidence": [
-        "Base origin/main c62ae6817c5bccb010a32f665d0fb8d8ce22f75d; git diff has no src runtime, release-workflow, Changeset or changelog changes.",
-        "vp install --frozen-lockfile verified1013 supply-chain entries; lockfile differs only in two renamed workspace importer keys.",
-        "vp run --no-cache pack passed ATTW/publint; final @ueberbrot/effect-api-query0.1.0 archive has14unique files and byte-identical runtime/declaration/map output to the unscoped tested archive.",
-        "Type-aware lint, publicAPI and server-local compiler fixtures on TypeScript7.0.2/5.9.3, Effect diagnostics and Fallow audits passed; all509 runtime tests passed.",
-        "Both application builds and final56page docsbuild passed; all7Chromium docs checks passed, including scoped registry/npm URLs, branding, unpublished/network/invalid-version fallbacks and generated LLM docs.",
-        "Fresh isolated scoped consumer: frozen nativepnpm12.11.2 install with25supply-chain checks and unchanged seven-day policy; strictNodeNext skipLibCheck:false TS7.0.2/5.9.3 and realRPC/HTTP runtime fixture passed.",
-        "Installed Intent list discovered @ueberbrot/effect-api-query#effect-api-query; load --path resolved the packagedskill; structural packagedskillvalidation passed and all16relative links resolve. Evidence: /tmp/eaq-scoped-release-0.1.0/consumer-evidence.json.",
-        "Packaged Intent snippet checking warns it requires Git-tracked declared files; installed dist/index.d.mts exists and both strictconsumer compiler checks passed independently."
+        "examples/tanstack-start/src/components/conditional-user-query.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
       ]
     },
     "source:examples/vite-react/src/components/conditional-user-query.tsx": {
-      "fingerprint": "f11c9d71699f0633e6c9e7af3fdb3f24649b1c13fe26c8d19e4182711f30f8eb",
+      "fingerprint": "444ccc76540686b9874bc8d99d47a5a7234908f919762965fcff8cff95940dc7",
       "snapshot": {
-        "examples/vite-react/src/components/conditional-user-query.tsx": "cd98b64ccfe63e0864ef3853066c1028640cd9b041701412cd85826517fa6685"
+        "examples/vite-react/src/components/conditional-user-query.tsx": "fa82e5cd4b3637d6d9feb7b48fe09db9ec43b1569efd25ff4aa60ef6c0fd21b1"
       },
-      "head": "c62ae6817c5bccb010a32f665d0fb8d8ce22f75d",
-      "outcome": "updated",
-      "reason": "Changed only the skipToken public import to @ueberbrot/effect-api-query. Existing shipped guidance was updated to the same public root. Internal aliases, private workspace names, function/API behavior and runtime identity are unchanged; compiler, runtime and application build checks passed.",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "no-change",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
       "evidence": [
-        "Base origin/main c62ae6817c5bccb010a32f665d0fb8d8ce22f75d; git diff has no src runtime, release-workflow, Changeset or changelog changes.",
-        "vp install --frozen-lockfile verified1013 supply-chain entries; lockfile differs only in two renamed workspace importer keys.",
-        "vp run --no-cache pack passed ATTW/publint; final @ueberbrot/effect-api-query0.1.0 archive has14unique files and byte-identical runtime/declaration/map output to the unscoped tested archive.",
-        "Type-aware lint, publicAPI and server-local compiler fixtures on TypeScript7.0.2/5.9.3, Effect diagnostics and Fallow audits passed; all509 runtime tests passed.",
-        "Both application builds and final56page docsbuild passed; all7Chromium docs checks passed, including scoped registry/npm URLs, branding, unpublished/network/invalid-version fallbacks and generated LLM docs.",
-        "Fresh isolated scoped consumer: frozen nativepnpm12.11.2 install with25supply-chain checks and unchanged seven-day policy; strictNodeNext skipLibCheck:false TS7.0.2/5.9.3 and realRPC/HTTP runtime fixture passed.",
-        "Installed Intent list discovered @ueberbrot/effect-api-query#effect-api-query; load --path resolved the packagedskill; structural packagedskillvalidation passed and all16relative links resolve. Evidence: /tmp/eaq-scoped-release-0.1.0/consumer-evidence.json.",
-        "Packaged Intent snippet checking warns it requires Git-tracked declared files; installed dist/index.d.mts exists and both strictconsumer compiler checks passed independently."
+        "examples/vite-react/src/components/conditional-user-query.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
+      ]
+    },
+    "source:.changeset/01-http-metadata-race.md": {
+      "fingerprint": "d0ee45f7bf15bd0a6dbf93eb0e11678a1663881cd05c1eee6b66dacbb7492437",
+      "snapshot": {
+        ".changeset/01-http-metadata-race.md": "a1ce499b72e56cccbcefc1686927f52093ac997fae4adce5284d687fd2a53842"
+      },
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "updated",
+      "reason": "Fetched metadata retains sharing and freezing across rebuilt options and intercepted results. The HTTP metadata guide and shipped HTTP reference describe the fetched-snapshot contract.",
+      "evidence": [
+        ".changeset/01-http-metadata-race.md; README, affected guides and skills/effect-api-query/references were compared with the implemented contract.",
+        "Final package build, ATTW and publint pass; public fixtures pass native TypeScript 7 and TypeScript 5.9; 599 runtime cases pass."
+      ]
+    },
+    "source:.changeset/02-typed-partial-filters.md": {
+      "fingerprint": "a8154e8eebe05486163a5193e5e801ceb440cd5775e452bd449cafdcceb583a2",
+      "snapshot": {
+        ".changeset/02-typed-partial-filters.md": "8840b905b98cde261492cec0cbe25dafb5126753500cafc1950041b8c26bd811"
+      },
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "updated",
+      "reason": "The cache-filter guide and shipped cache workflows now cover typed partial projections and required ordinary filter keys without promising homogeneous bulk results.",
+      "evidence": [
+        ".changeset/02-typed-partial-filters.md; README, affected guides and skills/effect-api-query/references were compared with the implemented contract.",
+        "Final package build, ATTW and publint pass; public fixtures pass native TypeScript 7 and TypeScript 5.9; 599 runtime cases pass."
+      ]
+    },
+    "source:.changeset/03-policy-composition.md": {
+      "fingerprint": "0a26e34bfc0cfe2901c6094272f3eceedac7d3301b40a97582eb4e8fb02a9f17",
+      "snapshot": {
+        ".changeset/03-policy-composition.md": "2291024ab62ca96f8c49eafd3cd48800e78e15791b7ef2e2bb0cf36e397a7e2e"
+      },
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "updated",
+      "reason": "The policy guide and shipped cache workflows cover opt-in awaited callback composition and query/mutation interception, including optional direct-call mutation context.",
+      "evidence": [
+        ".changeset/03-policy-composition.md; README, affected guides and skills/effect-api-query/references were compared with the implemented contract.",
+        "Final package build, ATTW and publint pass; public fixtures pass native TypeScript 7 and TypeScript 5.9; 599 runtime cases pass."
+      ]
+    },
+    "source:.changeset/04-stream-publication.md": {
+      "fingerprint": "f9226be0d789cf814f39a3bdb9b15765d829cae53a0f4d462d063ce89ee427dc",
+      "snapshot": {
+        ".changeset/04-stream-publication.md": "7554bcf8b5327650d7bc9c5035521df80dd33d4ab343ee0b6216c0cc9d0dc1f1"
+      },
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "updated",
+      "reason": "Streaming guidance covers ordered count-based publication, immediate first values, tail flushing, cancellation, and indefinite latency below the configured count.",
+      "evidence": [
+        ".changeset/04-stream-publication.md; README, affected guides and skills/effect-api-query/references were compared with the implemented contract.",
+        "Final package build, ATTW and publint pass; public fixtures pass native TypeScript 7 and TypeScript 5.9; 599 runtime cases pass."
+      ]
+    },
+    "source:.changeset/05-stream-hash-index.md": {
+      "fingerprint": "6f5edb235c61d9b45916799f6421a22327d01f343c201b7bac243303751c44ff",
+      "snapshot": {
+        ".changeset/05-stream-hash-index.md": "d7b0af8fcc4c8e5174f11799e7be252f44de0002e5cc4548e891f933a116c737"
+      },
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "no-change",
+      "reason": "The cache index preserves the existing stable-hash and collision-rejection contract. Native Query lookup and application resource ownership remain unchanged; implementation indexing needs no additional consumer instructions.",
+      "evidence": [
+        ".changeset/05-stream-hash-index.md; README, affected guides and skills/effect-api-query/references were compared with the implemented contract.",
+        "Final package build, ATTW and publint pass; public fixtures pass native TypeScript 7 and TypeScript 5.9; 599 runtime cases pass."
+      ]
+    },
+    "source:.changeset/06-typed-hydration-codecs.md": {
+      "fingerprint": "89116e2476c88dcf783f13aace01ce81efef3869468b7436adf82c0c0bc7ffb4",
+      "snapshot": {
+        ".changeset/06-typed-hydration-codecs.md": "329b2c0689171c8cf2a8b926cc6688722dd2d06a4d38dd1d1ac8875056fde9ea"
+      },
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "updated",
+      "reason": "Hydration guides and the shipped hydration reference cover leaf/view registration, explicit infinite page parameters, codec services, complete batch preparation, and application-owned serialization and hydration.",
+      "evidence": [
+        ".changeset/06-typed-hydration-codecs.md; README, affected guides and skills/effect-api-query/references were compared with the implemented contract.",
+        "Final package build, ATTW and publint pass; public fixtures pass native TypeScript 7 and TypeScript 5.9; 599 runtime cases pass."
+      ]
+    },
+    "source:.changeset/07-reuse-contract-analysis.md": {
+      "fingerprint": "c86885d372caf91e8881105c2b4bd10d9e2576049a1fb6dc069414ec910feeb3",
+      "snapshot": {
+        ".changeset/07-reuse-contract-analysis.md": "579f09261e339d7d5549cfbc1608f178c58a3135afa584ef93eafe5e924a7f4d"
+      },
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "no-change",
+      "reason": "Immutable declaration analysis preserves eager frozen trees and independent ready clients, runners, prefixes, and encoders. Existing factory and lifetime guidance remains accurate.",
+      "evidence": [
+        ".changeset/07-reuse-contract-analysis.md; README, affected guides and skills/effect-api-query/references were compared with the implemented contract.",
+        "Final package build, ATTW and publint pass; public fixtures pass native TypeScript 7 and TypeScript 5.9; 599 runtime cases pass."
+      ]
+    },
+    "source:.changeset/08-stream-recovery.md": {
+      "fingerprint": "8998b1e5898549adcf671dd2a2d921ee6233f2bcfc0f37d07224283dbe16ac43",
+      "snapshot": {
+        ".changeset/08-stream-recovery.md": "a1541377a31d0858a0bf32328b1c7fec16b99ba5962255a7240ea37d0903edb5"
+      },
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "updated",
+      "reason": "The reconnect guide and shipped query patterns cover numeric cursors, duplicate suppression, cancellable delays, replay/gap hooks, and application-owned recovery protocol and lifetime.",
+      "evidence": [
+        ".changeset/08-stream-recovery.md; README, affected guides and skills/effect-api-query/references were compared with the implemented contract.",
+        "Final package build, ATTW and publint pass; public fixtures pass native TypeScript 7 and TypeScript 5.9; 599 runtime cases pass."
+      ]
+    },
+    "source:.changeset/09-stream-cleanup-contract.md": {
+      "fingerprint": "08100c9213b7a51f26898d334546bdda8d55b8936257e6d402a76065a0a8a6e4",
+      "snapshot": {
+        ".changeset/09-stream-cleanup-contract.md": "a8cad6e2ce6c4540cd8780f5b173e7727c22b0e064176f407b38cfc5d2f2679c"
+      },
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "updated",
+      "reason": "Cancellation and streaming guidance now state that native replacement may overlap an old asynchronous finalizer and explain application coordination for exclusive resources.",
+      "evidence": [
+        ".changeset/09-stream-cleanup-contract.md; README, affected guides and skills/effect-api-query/references were compared with the implemented contract.",
+        "Final package build, ATTW and publint pass; public fixtures pass native TypeScript 7 and TypeScript 5.9; 599 runtime cases pass."
+      ]
+    },
+    "source:.changeset/runtime-dependencies-2026-10.md": {
+      "fingerprint": "6e76b1921245b0a01e7b31dab2a8c6fce4ace9708ecba864f851be1625d37b9d",
+      "snapshot": {
+        ".changeset/runtime-dependencies-2026-10.md": "d331e53e5300c6955bc97e75974713483883197de83f514e5346ae159d5044f0"
+      },
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "updated",
+      "reason": "The runtime update has its own minor changeset. The entry skill and compatibility guidance identify the coordinated Effect set and supported Query peer range; the release note stays concise.",
+      "evidence": [
+        ".changeset/runtime-dependencies-2026-10.md; package.json; pnpm-workspace.yaml; skills/effect-api-query/SKILL.md; getting-started/compatibility-and-stability.md.",
+        "Final package build, ATTW and publint pass; public fixtures pass native TypeScript 7 and TypeScript 5.9; 599 runtime cases pass. Frozen installation and peer validation passed without changing the seven-day release quarantine."
+      ]
+    },
+    "source:apps/docs/src/content.config.ts": {
+      "fingerprint": "317f762b2c663b629c1df30170bfd8252d86b71ecca5869ef81d4edc1c06be06",
+      "snapshot": {
+        "apps/docs/src/content.config.ts": "6821dfe329b42956c9cb7bbfe9fde583909c15453f216b726fce130e265781ac"
+      },
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "no-change",
+      "reason": "The docs configuration/content exports retain their behavior; the package badge now parses its registry response at the I/O boundary. These site details require no additional library integration guidance.",
+      "evidence": [
+        "apps/docs/src/content.config.ts diff reviewed; docs JS/TS now pass the lint presets, Astro check/build and 7 Chromium docs checks pass."
+      ]
+    },
+    "source:docs/agents/triage-labels.md": {
+      "fingerprint": "6a7a79d5fa355ba8110801a4c0de3b27ef37ac7b38fae6f057d9e192db2aa6df",
+      "snapshot": {
+        "docs/agents/triage-labels.md": "c3d871158935afd72d332b46ace95e9687192f2af91da9c324ac0d6833b25bbc"
+      },
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "no-change",
+      "reason": "Only preset prose/table formatting changed in this existing document. New decisions live in ADRs 27\u201329; existing decisions and triage rules retain their substance.",
+      "evidence": [
+        "docs/agents/triage-labels.md diff reviewed; docs build passes with valid links."
+      ]
+    },
+    "source:e2e/tanstack-start-http.spec.ts": {
+      "fingerprint": "d392dd916f88c4844f34cffedf3a9ef4a01aae7f5904beadc706e2a42c100189",
+      "snapshot": {
+        "e2e/tanstack-start-http.spec.ts": "0baea37506ed8e382b3ad6f1ede7a324d72051352d719bd0fecc19900c839e8d"
+      },
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "no-change",
+      "reason": "Preset formatting and repository test setup preserve the existing browser scenarios and native library usage. No new integration task or recommendation is introduced.",
+      "evidence": [
+        "e2e/tanstack-start-http.spec.ts diff reviewed; final compiler checks and app builds pass. Earlier Chromium/Firefox application/docs checks passed; latest docs Chromium run passes 7 cases. WebKit is blocked at launch by missing host libraries."
+      ]
+    },
+    "source:e2e/vite-http.spec.ts": {
+      "fingerprint": "d777adf90364da793bee92db31ad489de5aef4276cf93bb430eec22653196f52",
+      "snapshot": {
+        "e2e/vite-http.spec.ts": "ce2919980ab238f9b2a4c0ed58fd5b0fa1ab1c51f343f7c5648de56ed1eaaca7"
+      },
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "no-change",
+      "reason": "Preset formatting and repository test setup preserve the existing browser scenarios and native library usage. No new integration task or recommendation is introduced.",
+      "evidence": [
+        "e2e/vite-http.spec.ts diff reviewed; final compiler checks and app builds pass. Earlier Chromium/Firefox application/docs checks passed; latest docs Chromium run passes 7 cases. WebKit is blocked at launch by missing host libraries."
+      ]
+    },
+    "source:examples/contracts/src/http-api.ts": {
+      "fingerprint": "fdb7274a863cd6f0c482c91d75e751dc48bc275cb95b97862e006e1cc0d4cfe6",
+      "snapshot": {
+        "examples/contracts/src/http-api.ts": "bcecd0611e4bdeac0dad04159cc73db3165aca20ac1f89e597e6c73a76d99cef"
+      },
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "no-change",
+      "reason": "Nominal schema brands and typed ready-client handling preserve the example protocol and library inputs. Shipped RPC/HTTP setup guidance remains accurate.",
+      "evidence": [
+        "examples/contracts/src/http-api.ts diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
+      ]
+    },
+    "source:examples/contracts/src/index.ts": {
+      "fingerprint": "c1a8171de1bdbe9f23ea116af64abcb2d142f1fe6f946bc30efd788576380992",
+      "snapshot": {
+        "examples/contracts/src/index.ts": "6fb9032c127d2fa870653a16a50beda1baa1792029c80c58aa231385390849cd"
+      },
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "no-change",
+      "reason": "Nominal schema brands and typed ready-client handling preserve the example protocol and library inputs. Shipped RPC/HTTP setup guidance remains accurate.",
+      "evidence": [
+        "examples/contracts/src/index.ts diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
+      ]
+    },
+    "source:examples/tanstack-start/src/components/page-layout.tsx": {
+      "fingerprint": "d4a40f07606d4464a4a16b2571c947b9cebe50986f78afafa15d4a14de669df0",
+      "snapshot": {
+        "examples/tanstack-start/src/components/page-layout.tsx": "1cb159f263b79b5aab09d3d33fadce5636166353f11c176b59081728a4d9afbd"
+      },
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "no-change",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
+      "evidence": [
+        "examples/tanstack-start/src/components/page-layout.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
+      ]
+    },
+    "source:examples/tanstack-start/src/routes/__root.tsx": {
+      "fingerprint": "9482a1a22aea9660cd8044b938dcbe020a5f6b5b59ec67fcaf61f572950b68d9",
+      "snapshot": {
+        "examples/tanstack-start/src/routes/__root.tsx": "2528ce53594d2f6408fd732ef12ef6b125f0de7c8c3a17e8cb60ba0ac72ed860"
+      },
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "no-change",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
+      "evidence": [
+        "examples/tanstack-start/src/routes/__root.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
+      ]
+    },
+    "source:examples/tanstack-start/src/routes/api.$.ts": {
+      "fingerprint": "a48d64acba6f54eac749971a98673e588d54618bfa815163ff7214674bc38df9",
+      "snapshot": {
+        "examples/tanstack-start/src/routes/api.$.ts": "5b5092fb9bb74037d07e3a43aa3b86334d4d198be1ef755dbd4393eab3e04400"
+      },
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "no-change",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
+      "evidence": [
+        "examples/tanstack-start/src/routes/api.$.ts diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
+      ]
+    },
+    "source:examples/tanstack-start/src/routes/details.tsx": {
+      "fingerprint": "f500f587e217a356cf8260d8baead8b3839749bc40ac40965aea5561c7b5d619",
+      "snapshot": {
+        "examples/tanstack-start/src/routes/details.tsx": "b58d7de1e5f69354e9c2782f1719eee2161dee01ca61687822bdc1f1dc18061c"
+      },
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "no-change",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
+      "evidence": [
+        "examples/tanstack-start/src/routes/details.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
+      ]
+    },
+    "source:examples/tanstack-start/src/routes/rpc.ts": {
+      "fingerprint": "61c1e92762de40d1a3ac5f33794437b5c15d755c0168abafdfa928860fedbf3d",
+      "snapshot": {
+        "examples/tanstack-start/src/routes/rpc.ts": "8ab6854c6e9c7300f6b6d96dfd39d3fe2c1f2fa0bbd8a47a379252f880d5da9e"
+      },
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "no-change",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
+      "evidence": [
+        "examples/tanstack-start/src/routes/rpc.ts diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
+      ]
+    },
+    "source:examples/vite-react/index.html": {
+      "fingerprint": "4be413711c6846b7d969f850d559fe5843ff869d700c15e8ee980f8cdec5d7e2",
+      "snapshot": {
+        "examples/vite-react/index.html": "0cfcf5dd943398b94559954094a17d74a8ac2c4dbfd4dfbfa0085989f882cd0b"
+      },
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "no-change",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
+      "evidence": [
+        "examples/vite-react/index.html diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
+      ]
+    },
+    "source:examples/vite-react/src/vite-env.d.ts": {
+      "fingerprint": "37c2415a78a4d4645a1073c6926527952db2e31a4e4abc4d0bd11920b2822596",
+      "snapshot": {
+        "examples/vite-react/src/vite-env.d.ts": "19b633cb00dbe7d2d8110597f206f9329c0111631044604bce2d352f5d88f9bd"
+      },
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "no-change",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
+      "evidence": [
+        "examples/vite-react/src/vite-env.d.ts diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
+      ]
+    },
+    "source:examples/vite-react/vite.config.ts": {
+      "fingerprint": "de4597a3c678af51faca7693400d8e367ce75e7ff499124f0b0beb2b1c99fb34",
+      "snapshot": {
+        "examples/vite-react/vite.config.ts": "0afbdd6e066fd55cff161668553663158e9aaa2fe0e4054eedf7e960972fceb0"
+      },
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "outcome": "no-change",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
+      "evidence": [
+        "examples/vite-react/vite.config.ts diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
       ]
     }
   }

@@ -1,74 +1,99 @@
-import { Function, Predicate, Schema, SchemaAST } from 'effect'
+import { Function, Predicate, Schema, SchemaAST } from "effect";
 
 export interface SchemaKeyEncoding {
-  readonly requiresEncoder: boolean
-  readonly encode: (input: unknown) => unknown
+  readonly requiresEncoder: boolean;
+  readonly cacheable: boolean;
+  // oxlint-disable-next-line anti-slop/no-unknown-parameters, anti-slop/no-unknown-returns
+  readonly encode: (input: unknown) => unknown;
 }
 
-const safeAsts = new WeakSet()
+const safeAsts = new WeakSet();
+const encodings = new WeakMap<Schema.Top, SchemaKeyEncoding>();
+type SchemaKeyAnalysis = "Safe" | "RequiresEncoder" | "Retry";
 
-const containsUnsafeKeyEncoding = (value: unknown, seen: Set<object>): boolean => {
-  if (!Predicate.isObjectOrArray(value) || seen.has(value) || safeAsts.has(value)) {
-    return false
+const inspectKeyEncoding = (
+  // oxlint-disable-next-line anti-slop/no-unknown-parameters
+  value: unknown,
+  seen: Set<object>
+): SchemaKeyAnalysis => {
+  if (
+    !Predicate.isObjectOrArray(value) ||
+    seen.has(value) ||
+    safeAsts.has(value)
+  ) {
+    return "Safe";
   }
-  seen.add(value)
+  seen.add(value);
 
-  if (Predicate.hasProperty(value, '_tag') && value._tag === 'Middleware') {
-    return !Predicate.hasProperty(value, 'encode') || value.encode !== Function.identity
+  if (Predicate.hasProperty(value, "_tag") && value._tag === "Middleware") {
+    return !Predicate.hasProperty(value, "encode") ||
+      value.encode !== Function.identity
+      ? "RequiresEncoder"
+      : "Safe";
   }
 
   if (SchemaAST.isAST(value)) {
-    const representation = value.annotations?.['representation']
+    const representation = value.annotations?.["representation"];
     if (
-      Predicate.hasProperty(representation, 'id') &&
-      representation.id === 'effect/schema/Redacted'
+      Predicate.hasProperty(representation, "id") &&
+      representation.id === "effect/schema/Redacted"
     ) {
-      return true
+      return "RequiresEncoder";
     }
     if (SchemaAST.isSuspend(value)) {
       try {
-        if (containsUnsafeKeyEncoding(value.thunk(), seen)) {
-          return true
+        const analysis = inspectKeyEncoding(value.thunk(), seen);
+        if (analysis !== "Safe") {
+          return analysis;
         }
       } catch {
-        return true
+        return "Retry";
       }
     }
   }
 
-  return Object.values(value).some((child) =>
-    Array.isArray(child)
-      ? child.some((element) => containsUnsafeKeyEncoding(element, seen))
-      : containsUnsafeKeyEncoding(child, seen),
-  )
-}
+  for (const child of Object.values(value)) {
+    const analysis = inspectKeyEncoding(child, seen);
+    if (analysis !== "Safe") {
+      return analysis;
+    }
+  }
+  return "Safe";
+};
 
-export const createSchemaKeyEncoding = (schema: Schema.Top): SchemaKeyEncoding => {
-  let requiresEncoder: boolean | undefined
-  let defaultEncode: SchemaKeyEncoding['encode'] | undefined
+export const createSchemaKeyEncoding = (
+  schema: Schema.Top
+): SchemaKeyEncoding => {
+  const cached = encodings.get(schema);
+  if (cached !== undefined) {
+    return cached;
+  }
+  const seen = new Set<object>();
+  const analysis = inspectKeyEncoding(schema.ast, seen);
+  let defaultEncode: SchemaKeyEncoding["encode"] | undefined;
 
-  return {
-    get requiresEncoder() {
-      if (requiresEncoder === undefined) {
-        const seen = new Set<object>()
-        requiresEncoder = containsUnsafeKeyEncoding(schema.ast, seen)
-        if (!requiresEncoder) {
-          for (const node of seen) {
-            if (SchemaAST.isAST(node)) {
-              safeAsts.add(node)
-            }
-          }
-        }
-      }
-      return requiresEncoder
-    },
+  const encoding: SchemaKeyEncoding = {
+    requiresEncoder: analysis !== "Safe",
+    cacheable: analysis !== "Retry",
     encode: (input) => {
       if (defaultEncode === undefined) {
-        // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/no-chained-type-assertions
-        const encodingSchema = schema as unknown as Schema.ConstraintEncoder<unknown>
-        defaultEncode = Schema.encodeUnknownSync(encodingSchema)
+        const encodingSchema =
+          // oxlint-disable-next-line anti-slop/no-chained-type-assertions, anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
+          schema as unknown as Schema.ConstraintEncoder<unknown>;
+        defaultEncode = Schema.encodeUnknownSync(encodingSchema);
       }
-      return defaultEncode(input)
+      return defaultEncode(input);
     },
+  };
+  if (analysis === "Safe") {
+    for (const node of seen) {
+      if (SchemaAST.isAST(node)) {
+        safeAsts.add(node);
+      }
+    }
   }
-}
+  if (encoding.cacheable) {
+    encodings.set(schema, encoding);
+  }
+  return encoding;
+};

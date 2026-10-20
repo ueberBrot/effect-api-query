@@ -1,13 +1,13 @@
-import type { DataTag } from '@tanstack/query-core'
-import type { Brand, Effect, Schema, Stream } from 'effect'
-import type { Sse } from 'effect/encoding'
+import type { DataTag } from "@tanstack/query-core";
+import type { Brand, Effect, Schema, Stream } from "effect";
+import type { Sse } from "effect/encoding";
 import type {
   HttpApi,
   HttpApiClient,
   HttpApiEndpoint,
   HttpApiGroup,
   HttpApiSchema,
-} from 'effect/http-api'
+} from "effect/http-api";
 
 import type {
   ContainsRedacted,
@@ -21,51 +21,71 @@ import type {
   QueryData,
   RunnerRequirement,
   StreamedPolicyOptions,
-} from '../core/types'
+} from "../core/types";
 import type {
   EffectHttpApiQueryConfigError,
   EffectHttpApiQueryEmptyStreamError,
   EffectHttpApiQueryError,
-} from './errors'
+} from "./errors";
 
 export type Groups<Api extends HttpApi.Constraint> =
-  Api extends HttpApi.HttpApi<infer _Id, infer Group> ? Group : never
+  Api extends HttpApi.HttpApi<infer _Id, infer Group> ? Group : never;
 export type ApiIdentifier<Api extends HttpApi.Constraint> =
-  Api extends HttpApi.HttpApi<infer Id, infer _Group> ? Id : never
+  Api extends HttpApi.HttpApi<infer Id, infer _Group> ? Id : never;
 export type Endpoints<Group> = Extract<
   HttpApiGroup.Endpoints<Group>,
   HttpApiEndpoint.ConstraintRequest
->
-export type ResponseBody<S> = S extends HttpApiSchema.WithHeaders<infer Body, Schema.Top> ? Body : S
+>;
+export type SuccessSchema<Endpoint extends HttpApiEndpoint.ConstraintRequest> =
+  [Endpoint["~Success"]] extends [never]
+    ? typeof HttpApiSchema.NoContent
+    : Endpoint["~Success"];
+export type ResponseBody<S> =
+  S extends HttpApiSchema.WithHeaders<infer Body, Schema.Top> ? Body : S;
 export type MultipartPayload =
   | Brand.Brand<HttpApiSchema.MultipartTypeId>
-  | Brand.Brand<HttpApiSchema.MultipartStreamTypeId>
+  | Brand.Brand<HttpApiSchema.MultipartStreamTypeId>;
 
-export type SseEndpoint<Endpoint> = Endpoint extends HttpApiEndpoint.ConstraintRequest
-  ? [ResponseBody<Endpoint['~Success']>] extends [{ readonly _tag: 'StreamSse' }]
-    ? Endpoint
-    : never
-  : never
-
-export type Supported<Endpoint> = Endpoint extends HttpApiEndpoint.ConstraintRequest
-  ? [
-      Extract<Endpoint['~Payload']['Type'], Brand.Brand<HttpApiSchema.MultipartStreamTypeId>>,
-    ] extends [never]
-    ? [Extract<ResponseBody<Endpoint['~Success']>, HttpApiSchema.StreamSchema>] extends [never]
+export type SseEndpoint<Endpoint> =
+  Endpoint extends HttpApiEndpoint.ConstraintRequest
+    ? [ResponseBody<SuccessSchema<Endpoint>>] extends [
+        { readonly _tag: "StreamSse" },
+      ]
       ? Endpoint
-      : [SseEndpoint<Endpoint>] extends [never]
-        ? never
-        : [Extract<Endpoint['~Payload']['Type'], MultipartPayload>] extends [never]
-          ? Endpoint
-          : never
-    : never
-  : never
+      : never
+    : never;
 
-export type Queryable<Endpoint> = Endpoint extends HttpApiEndpoint.ConstraintRequest
-  ? [Extract<Endpoint['~Payload']['Type'], MultipartPayload>] extends [never]
-    ? Endpoint
-    : never
-  : never
+export type Supported<Endpoint> =
+  Endpoint extends HttpApiEndpoint.ConstraintRequest
+    ? [
+        Extract<
+          Endpoint["~Payload"]["Type"],
+          Brand.Brand<HttpApiSchema.MultipartStreamTypeId>
+        >,
+      ] extends [never]
+      ? [
+          Extract<
+            ResponseBody<SuccessSchema<Endpoint>>,
+            HttpApiSchema.StreamSchema
+          >,
+        ] extends [never]
+        ? Endpoint
+        : [SseEndpoint<Endpoint>] extends [never]
+          ? never
+          : [Extract<Endpoint["~Payload"]["Type"], MultipartPayload>] extends [
+                never,
+              ]
+            ? Endpoint
+            : never
+      : never
+    : never;
+
+export type Queryable<Endpoint> =
+  Endpoint extends HttpApiEndpoint.ConstraintRequest
+    ? [Extract<Endpoint["~Payload"]["Type"], MultipartPayload>] extends [never]
+      ? Endpoint
+      : never
+    : never;
 
 export type SupportedGroups<Api extends HttpApi.Constraint> =
   Groups<Api> extends infer Group
@@ -74,46 +94,56 @@ export type SupportedGroups<Api extends HttpApi.Constraint> =
         ? never
         : Group
       : never
-    : never
+    : never;
 
-export type RequestFields<Endpoint extends HttpApiEndpoint.ConstraintRequest> = Omit<
-  Exclude<
-    HttpApiEndpoint.ClientRequest<
-      Endpoint['~Params'],
-      Endpoint['~Query'],
-      Endpoint['~Payload'],
-      Endpoint['~Headers'],
-      'decoded-only'
+export type RequestFields<Endpoint extends HttpApiEndpoint.ConstraintRequest> =
+  Omit<
+    Exclude<
+      HttpApiEndpoint.ClientRequest<
+        Endpoint["~Params"],
+        Endpoint["~Query"],
+        Endpoint["~Payload"],
+        Endpoint["~Headers"],
+        "decoded-only"
+      >,
+      void
     >,
-    void
-  >,
-  'responseMode' | 'sseOptions'
->
+    "responseMode" | "sseOptions"
+  >;
 
 export type Request<Endpoint extends HttpApiEndpoint.ConstraintRequest> =
   keyof RequestFields<Endpoint> extends never
     ? void
-    : RequestFields<Endpoint> & { readonly responseMode?: never; readonly sseOptions?: never }
+    : RequestFields<Endpoint> & {
+        readonly responseMode?: never;
+        readonly sseOptions?: never;
+      };
 
 export type Success<Endpoint extends HttpApiEndpoint.ConstraintRequest> =
-  Endpoint['~Success']['Type']
-export type Failure<ClientError> = EffectHttpApiQueryError<ClientError>
-export type Member<Value, Key extends PropertyKey> = Key extends keyof Value ? Value[Key] : never
-export type ClientGroup<Group, Client> = Group extends { readonly topLevel: true }
+  SuccessSchema<Endpoint>["Type"];
+export type Failure<ClientError> = EffectHttpApiQueryError<ClientError>;
+export type Member<Value, Key extends PropertyKey> = Key extends keyof Value
+  ? Value[Key]
+  : never;
+export type ClientGroup<Group, Client> = Group extends {
+  readonly topLevel: true;
+}
   ? Client
   : Group extends HttpApiGroup.Constraint
-    ? Member<Client, Group['identifier']>
-    : never
-/* oxlint-disable typescript/no-unnecessary-type-parameters */
-export type SeenMethod<Method, Seen extends readonly unknown[]> = Seen extends readonly [
-  infer First,
-  ...infer Rest,
-]
-  ? (<Value>() => Value extends Method ? 1 : 2) extends <Value>() => Value extends First ? 1 : 2
+    ? Member<Client, Group["identifier"]>
+    : never;
+
+export type SeenMethod<
+  Method,
+  Seen extends readonly unknown[],
+> = Seen extends readonly [infer First, ...infer Rest]
+  ? (<Value>() => Value extends Method ? 1 : 2) extends <
+      Value,
+    >() => Value extends First ? 1 : 2
     ? true
     : SeenMethod<Method, Rest>
-  : false
-/* oxlint-enable typescript/no-unnecessary-type-parameters */
+  : false;
+
 export type MethodSignatures<
   Method,
   Partial = unknown,
@@ -128,26 +158,26 @@ export type MethodSignatures<
             Partial & ((...args: Args) => Result),
             [...Seen, (...args: Args) => Result]
           >
-  : never
+  : never;
 export type DecodedEffect<
   Method,
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
-  Mode extends 'decoded-only' | 'decoded-and-response' = 'decoded-only',
+  Mode extends "decoded-only" | "decoded-and-response" = "decoded-only",
 > = Method extends (
-  request: RequestFields<Endpoint> & { readonly responseMode: Mode },
+  request: RequestFields<Endpoint> & { readonly responseMode: Mode }
 ) => infer Result
   ? Result
-  : never
+  : never;
 export type ClientEffect<
   Group,
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Client,
-  Mode extends 'decoded-only' | 'decoded-and-response' = 'decoded-only',
+  Mode extends "decoded-only" | "decoded-and-response" = "decoded-only",
 > = DecodedEffect<
-  MethodSignatures<Member<ClientGroup<Group, Client>, Endpoint['identifier']>>,
+  MethodSignatures<Member<ClientGroup<Group, Client>, Endpoint["identifier"]>>,
   Endpoint,
   Mode
->
+>;
 export type ExposedEffects<Api extends HttpApi.Constraint, Client> =
   SupportedGroups<Api> extends infer Group
     ? Group extends HttpApiGroup.Constraint
@@ -158,36 +188,44 @@ export type ExposedEffects<Api extends HttpApi.Constraint, Client> =
               | ([Queryable<Endpoint>] extends [never]
                   ? never
                   : [SseEndpoint<Endpoint>] extends [never]
-                    ? ClientEffect<Group, Endpoint, Client, 'decoded-and-response'>
+                    ? ClientEffect<
+                        Group,
+                        Endpoint,
+                        Client,
+                        "decoded-and-response"
+                      >
                     : never)
           : never
         : never
       : never
-    : never
-export type Root<Api extends HttpApi.Constraint, Prefix extends readonly JsonValue[]> = readonly [
-  ...Prefix,
-  'http',
-  ApiIdentifier<Api>,
-]
+    : never;
+export type Root<
+  Api extends HttpApi.Constraint,
+  Prefix extends readonly JsonValue[],
+> = readonly [...Prefix, "http", ApiIdentifier<Api>];
 export type EndpointKey<
   Api extends HttpApi.Constraint,
   Prefix extends readonly JsonValue[],
   Group extends HttpApiGroup.Constraint,
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
 > = Group extends { readonly topLevel: true }
-  ? readonly [...Root<Api, Prefix>, Endpoint['identifier']]
-  : readonly [...Root<Api, Prefix>, Group['identifier'], Endpoint['identifier']]
+  ? readonly [...Root<Api, Prefix>, Endpoint["identifier"]]
+  : readonly [
+      ...Root<Api, Prefix>,
+      Group["identifier"],
+      Endpoint["identifier"],
+    ];
 export type ConcreteKey<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Key extends readonly JsonValue[],
   ClientError,
 > = DataTag<
   void extends Request<Endpoint>
-    ? readonly [...Key, 'query']
-    : readonly [...Key, 'query', JsonValue],
+    ? readonly [...Key, "query"]
+    : readonly [...Key, "query", JsonValue],
   QueryData<Success<Endpoint>>,
   Failure<ClientError>
->
+>;
 export type QueryBuilder<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Key extends readonly JsonValue[],
@@ -197,14 +235,14 @@ export type QueryBuilder<
   QueryData<Success<Endpoint>>,
   Failure<ClientError>,
   ConcreteKey<Endpoint, Key, ClientError>,
-  readonly [...Key, 'query']
->
+  readonly [...Key, "query"]
+>;
 
 export type MetadataData<Endpoint extends HttpApiEndpoint.ConstraintRequest> = {
-  readonly data: QueryData<Success<Endpoint>>
-  readonly status: number
-  readonly headers: Readonly<Record<string, string>>
-}
+  readonly data: QueryData<Success<Endpoint>>;
+  readonly status: number;
+  readonly headers: Readonly<Record<string, string>>;
+};
 
 export type ConcreteMetadataKey<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
@@ -212,11 +250,11 @@ export type ConcreteMetadataKey<
   ClientError,
 > = DataTag<
   void extends Request<Endpoint>
-    ? readonly [...Key, 'metadata']
-    : readonly [...Key, 'metadata', JsonValue],
+    ? readonly [...Key, "metadata"]
+    : readonly [...Key, "metadata", JsonValue],
   MetadataData<Endpoint>,
   Failure<ClientError>
->
+>;
 
 export type MetadataBuilder<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
@@ -227,8 +265,8 @@ export type MetadataBuilder<
   MetadataData<Endpoint>,
   Failure<ClientError>,
   ConcreteMetadataKey<Endpoint, Key, ClientError>,
-  readonly [...Key, 'metadata']
->
+  readonly [...Key, "metadata"]
+>;
 
 export type ConcreteInfiniteKey<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
@@ -239,9 +277,9 @@ export type ConcreteInfiniteKey<
   Request<Endpoint>,
   QueryData<Success<Endpoint>>,
   Failure<ClientError>,
-  readonly [...Key, 'infinite'],
+  readonly [...Key, "infinite"],
   PageParam
->
+>;
 
 export type InfiniteBuilder<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
@@ -251,23 +289,23 @@ export type InfiniteBuilder<
   Request<Endpoint>,
   QueryData<Success<Endpoint>>,
   Failure<ClientError>,
-  readonly [...Key, 'infinite']
->
+  readonly [...Key, "infinite"]
+>;
 
 export type MutationLeaf<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Key extends readonly JsonValue[],
   ClientError,
 > = {
-  readonly key: () => Key
-  readonly mutationKey: () => readonly [...Key, 'mutation']
+  readonly key: () => Key;
+  readonly mutationKey: () => readonly [...Key, "mutation"];
   readonly mutationOptions: MutationBuilder<
     Success<Endpoint>,
     Failure<ClientError>,
     Request<Endpoint>,
-    readonly [...Key, 'mutation']
-  >
-}
+    readonly [...Key, "mutation"]
+  >;
+};
 
 export type BufferedLeaf<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
@@ -282,21 +320,25 @@ export type BufferedLeaf<
           Request<Endpoint>,
           ConcreteKey<Endpoint, Key, ClientError>,
           void extends Request<Endpoint> ? true : false
-        >
-        readonly queryOptions: QueryBuilder<Endpoint, Key, ClientError>
+        >;
+        readonly queryOptions: QueryBuilder<Endpoint, Key, ClientError>;
         readonly metadataKey: KeyBuilder<
           Request<Endpoint>,
           ConcreteMetadataKey<Endpoint, Key, MetadataClientError>,
           void extends Request<Endpoint> ? true : false
-        >
-        readonly metadataOptions: MetadataBuilder<Endpoint, Key, MetadataClientError>
+        >;
+        readonly metadataOptions: MetadataBuilder<
+          Endpoint,
+          Key,
+          MetadataClientError
+        >;
         readonly infiniteKey: KeyBuilder<
           Request<Endpoint>,
           ConcreteInfiniteKey<Endpoint, Key, ClientError>,
           void extends Request<Endpoint> ? true : false
-        >
-        readonly infiniteOptions: InfiniteBuilder<Endpoint, Key, ClientError>
-      })
+        >;
+        readonly infiniteOptions: InfiniteBuilder<Endpoint, Key, ClientError>;
+      });
 
 export type StreamChunk<Value> =
   Value extends HttpApiSchema.withHeaders<infer Body, infer Headers>
@@ -305,72 +347,79 @@ export type StreamChunk<Value> =
       : never
     : Value extends Stream.Stream<infer Chunk, infer _Error, infer _Services>
       ? Chunk
-      : never
+      : never;
 
 export type StreamFailure<Value> =
   Value extends HttpApiSchema.withHeaders<infer Body, infer _Headers>
     ? StreamFailure<Body>
     : Value extends Stream.Stream<infer _Chunk, infer Error, infer _Services>
       ? Error
-      : never
+      : never;
 
 export type HttpStreamPolicy = StreamedPolicyOptions & {
-  readonly sseOptions?: Sse.DecodeOptions | undefined
-}
+  readonly sseOptions?: Sse.DecodeOptions | undefined;
+};
 
-export type HttpStreamQueryError<Endpoint extends HttpApiEndpoint.ConstraintRequest, ClientError> =
+export type HttpStreamQueryError<
+  Endpoint extends HttpApiEndpoint.ConstraintRequest,
+  ClientError,
+> =
   | EffectHttpApiQueryConfigError
-  | Failure<ClientError | StreamFailure<Success<Endpoint>>>
+  | Failure<ClientError | StreamFailure<Success<Endpoint>>>;
 
 export type StreamedKey<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Key extends readonly JsonValue[],
   ClientError,
 > = DataTag<
-  readonly [...Key, 'streamed', ...JsonValue[]],
+  readonly [...Key, "streamed", ...JsonValue[]],
   readonly StreamChunk<Success<Endpoint>>[],
   HttpStreamQueryError<Endpoint, ClientError>
->
+>;
 
 export type StreamedLeaf<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Key extends readonly JsonValue[],
   ClientError,
 > = {
-  readonly key: () => Key
+  readonly key: () => Key;
+
   readonly streamedKey: void extends Request<Endpoint>
     ? (policy?: HttpStreamPolicy) => StreamedKey<Endpoint, Key, ClientError>
     : (
         input: Request<Endpoint>,
-        policy?: HttpStreamPolicy,
-      ) => StreamedKey<Endpoint, Key, ClientError>
+        policy?: HttpStreamPolicy
+      ) => StreamedKey<Endpoint, Key, ClientError>;
   readonly streamedOptions: UnaryQueryBuilder<
     Request<Endpoint>,
     readonly StreamChunk<Success<Endpoint>>[],
     HttpStreamQueryError<Endpoint, ClientError>,
     StreamedKey<Endpoint, Key, ClientError>,
-    readonly [...Key, 'streamed'],
+    readonly [...Key, "streamed"],
     HttpStreamPolicy
-  >
+  >;
+};
+
+export interface HttpLivePolicy {
+  readonly sseOptions?: Sse.DecodeOptions | undefined;
 }
 
-export type HttpLivePolicy = {
-  readonly sseOptions?: Sse.DecodeOptions | undefined
-}
-
-export type LiveFailure<Endpoint extends HttpApiEndpoint.ConstraintRequest, ClientError> =
+export type LiveFailure<
+  Endpoint extends HttpApiEndpoint.ConstraintRequest,
+  ClientError,
+> =
   | HttpStreamQueryError<Endpoint, ClientError>
-  | EffectHttpApiQueryEmptyStreamError
+  | EffectHttpApiQueryEmptyStreamError;
 
 export type LiveKey<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Key extends readonly JsonValue[],
   ClientError,
 > = DataTag<
-  readonly [...Key, 'live', ...JsonValue[]],
+  readonly [...Key, "live", ...JsonValue[]],
   QueryData<StreamChunk<Success<Endpoint>>>,
   LiveFailure<Endpoint, ClientError>
->
+>;
 
 export type LiveLeaf<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
@@ -379,16 +428,19 @@ export type LiveLeaf<
 > = {
   readonly liveKey: void extends Request<Endpoint>
     ? (policy?: HttpLivePolicy) => LiveKey<Endpoint, Key, ClientError>
-    : (input: Request<Endpoint>, policy?: HttpLivePolicy) => LiveKey<Endpoint, Key, ClientError>
+    : (
+        input: Request<Endpoint>,
+        policy?: HttpLivePolicy
+      ) => LiveKey<Endpoint, Key, ClientError>;
   readonly liveOptions: UnaryQueryBuilder<
     Request<Endpoint>,
     QueryData<StreamChunk<Success<Endpoint>>>,
     LiveFailure<Endpoint, ClientError>,
     LiveKey<Endpoint, Key, ClientError>,
-    readonly [...Key, 'live'],
+    readonly [...Key, "live"],
     HttpLivePolicy
-  >
-}
+  >;
+};
 
 export type Leaf<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
@@ -397,7 +449,8 @@ export type Leaf<
   MetadataClientError = ClientError,
 > = [SseEndpoint<Endpoint>] extends [never]
   ? BufferedLeaf<Endpoint, Key, ClientError, MetadataClientError>
-  : StreamedLeaf<Endpoint, Key, ClientError> & LiveLeaf<Endpoint, Key, ClientError>
+  : StreamedLeaf<Endpoint, Key, ClientError> &
+      LiveLeaf<Endpoint, Key, ClientError>;
 
 /** An eager utility tree mirroring the ready HTTP client's literal properties. */
 export type HttpApiQueryUtils<
@@ -405,41 +458,57 @@ export type HttpApiQueryUtils<
   Prefix extends readonly [JsonValue, ...JsonValue[]],
   Client = HttpApiClient.ForApi<Api>,
 > = {
-  readonly key: () => Root<Api, Prefix>
+  readonly key: () => Root<Api, Prefix>;
 } & {
   readonly [
-    Group in Extract<SupportedGroups<Api>, { readonly topLevel: false }> as Group['identifier']
+    Group in Extract<
+      SupportedGroups<Api>,
+      { readonly topLevel: false }
+    > as Group["identifier"]
   ]: {
-    readonly key: () => readonly [...Root<Api, Prefix>, Group['identifier']]
+    readonly key: () => readonly [...Root<Api, Prefix>, Group["identifier"]];
   } & {
-    readonly [Endpoint in Supported<Endpoints<Group>> as Endpoint['identifier']]: Leaf<
+    readonly [
+      Endpoint in Supported<Endpoints<Group>> as Endpoint["identifier"]
+    ]: Leaf<
       Endpoint,
       EndpointKey<Api, Prefix, Group, Endpoint>,
       | Effect.Error<ClientEffect<Group, Endpoint, Client>>
       | StreamFailure<Effect.Success<ClientEffect<Group, Endpoint, Client>>>,
-      Effect.Error<ClientEffect<Group, Endpoint, Client, 'decoded-and-response'>>
-    >
-  }
+      Effect.Error<
+        ClientEffect<Group, Endpoint, Client, "decoded-and-response">
+      >
+    >;
+  };
 } & {
   readonly [
     Endpoint in Supported<
       Endpoints<Extract<SupportedGroups<Api>, { readonly topLevel: true }>>
-    > as Endpoint['identifier']
+    > as Endpoint["identifier"]
   ]: Leaf<
     Endpoint,
-    readonly [...Root<Api, Prefix>, Endpoint['identifier']],
+    readonly [...Root<Api, Prefix>, Endpoint["identifier"]],
     | Effect.Error<ClientEffect<{ readonly topLevel: true }, Endpoint, Client>>
-    | StreamFailure<Effect.Success<ClientEffect<{ readonly topLevel: true }, Endpoint, Client>>>,
+    | StreamFailure<
+        Effect.Success<
+          ClientEffect<{ readonly topLevel: true }, Endpoint, Client>
+        >
+      >,
     Effect.Error<
-      ClientEffect<{ readonly topLevel: true }, Endpoint, Client, 'decoded-and-response'>
+      ClientEffect<
+        { readonly topLevel: true },
+        Endpoint,
+        Client,
+        "decoded-and-response"
+      >
     >
-  >
-}
+  >;
+};
 
 /** Projects a complete decoded HTTP request into safe, synchronous cache identity. */
-export type HttpApiKeyEncoder<Endpoint extends HttpApiEndpoint.ConstraintRequest> = (
-  input: Request<Endpoint>,
-) => JsonValue
+export type HttpApiKeyEncoder<
+  Endpoint extends HttpApiEndpoint.ConstraintRequest,
+> = (input: Request<Endpoint>) => JsonValue;
 
 export type InputEndpoints<Group> =
   Queryable<Supported<Endpoints<Group>>> extends infer Endpoint
@@ -448,41 +517,48 @@ export type InputEndpoints<Group> =
         ? never
         : Endpoint
       : never
-    : never
-export type EncodingServices<Endpoint extends HttpApiEndpoint.ConstraintRequest> =
-  | Endpoint['~Params']['EncodingServices']
-  | Endpoint['~Query']['EncodingServices']
-  | Endpoint['~Payload']['EncodingServices']
-  | Endpoint['~Headers']['EncodingServices']
+    : never;
+export type EncodingServices<
+  Endpoint extends HttpApiEndpoint.ConstraintRequest,
+> =
+  | Endpoint["~Params"]["EncodingServices"]
+  | Endpoint["~Query"]["EncodingServices"]
+  | Endpoint["~Payload"]["EncodingServices"]
+  | Endpoint["~Headers"]["EncodingServices"];
 export type IsUnion<Value, Whole = Value> = Value extends Whole
   ? [Whole] extends [Value]
     ? false
     : true
-  : never
-export type PayloadSchemas<S> = S extends { readonly schema: infer Inner extends Schema.Constraint }
+  : never;
+export type PayloadSchemas<S> = S extends {
+  readonly schema: infer Inner extends Schema.Constraint;
+}
   ? Inner
-  : S
+  : S;
 export type RequiredEncoders<Group> =
   InputEndpoints<Group> extends infer Endpoint
     ? Endpoint extends HttpApiEndpoint.ConstraintRequest
       ? [EncodingServices<Endpoint>] extends [never]
         ? true extends
             | ContainsRedacted<Request<Endpoint>>
-            | IsUnion<PayloadSchemas<Endpoint['~Payload']>>
+            | IsUnion<PayloadSchemas<Endpoint["~Payload"]>>
           ? Endpoint
           : never
         : Endpoint
       : never
-    : never
+    : never;
 export type GroupEncoders<Group> = {
   readonly [
-    Endpoint in RequiredEncoders<Group> as Endpoint['identifier']
-  ]: HttpApiKeyEncoder<Endpoint>
+    Endpoint in RequiredEncoders<Group> as Endpoint["identifier"]
+  ]: HttpApiKeyEncoder<Endpoint>;
 } & {
   readonly [
-    Endpoint in Exclude<InputEndpoints<Group>, RequiredEncoders<Group>> as Endpoint['identifier']
-  ]?: HttpApiKeyEncoder<Endpoint>
-}
+    Endpoint in Exclude<
+      InputEndpoints<Group>,
+      RequiredEncoders<Group>
+    > as Endpoint["identifier"]
+  ]?: HttpApiKeyEncoder<Endpoint>;
+};
 export type EncoderGroups<Api extends HttpApi.Constraint> =
   SupportedGroups<Api> extends infer Group
     ? Group extends HttpApiGroup.Constraint
@@ -490,7 +566,7 @@ export type EncoderGroups<Api extends HttpApi.Constraint> =
         ? never
         : Group
       : never
-    : never
+    : never;
 export type RequiredEncoderGroups<Api extends HttpApi.Constraint> =
   EncoderGroups<Api> extends infer Group
     ? Group extends HttpApiGroup.Constraint
@@ -498,34 +574,41 @@ export type RequiredEncoderGroups<Api extends HttpApi.Constraint> =
         ? never
         : Group
       : never
-    : never
+    : never;
 export type Encoders<Api extends HttpApi.Constraint> = {
-  readonly [Group in RequiredEncoderGroups<Api> as Group['identifier']]: GroupEncoders<Group>
+  readonly [
+    Group in RequiredEncoderGroups<Api> as Group["identifier"]
+  ]: GroupEncoders<Group>;
 } & {
   readonly [
-    Group in Exclude<EncoderGroups<Api>, RequiredEncoderGroups<Api>> as Group['identifier']
-  ]?: GroupEncoders<Group>
-}
-export type EncoderOption<Api extends HttpApi.Constraint> = KeyEncoderRequirement<
-  EncoderGroups<Api>,
-  RequiredEncoderGroups<Api>,
-  Encoders<Api>
->
+    Group in Exclude<
+      EncoderGroups<Api>,
+      RequiredEncoderGroups<Api>
+    > as Group["identifier"]
+  ]?: GroupEncoders<Group>;
+};
+export type EncoderOption<Api extends HttpApi.Constraint> =
+  KeyEncoderRequirement<
+    EncoderGroups<Api>,
+    RequiredEncoderGroups<Api>,
+    Encoders<Api>
+  >;
 export type StreamServices<Value> =
   Value extends HttpApiSchema.withHeaders<infer Body, infer _Headers>
     ? StreamServices<Body>
     : Value extends Stream.Stream<infer _Chunk, infer _Error, infer Services>
       ? Services
-      : never
+      : never;
 
 export type ClientServices<Api extends HttpApi.Constraint, Client> =
   | HttpApiEndpoint.ClientServices<Supported<Endpoints<Groups<Api>>>>
   | HttpApiEndpoint.ErrorServicesDecode<Supported<Endpoints<Groups<Api>>>>
   | Effect.Services<ExposedEffects<Api, Client>>
-  | StreamServices<Effect.Success<ExposedEffects<Api, Client>>>
-export type RunnerOption<Api extends HttpApi.Constraint, Client> = RunnerRequirement<
-  ClientServices<Api, Client>
->
+  | StreamServices<Effect.Success<ExposedEffects<Api, Client>>>;
+export type RunnerOption<
+  Api extends HttpApi.Constraint,
+  Client,
+> = RunnerRequirement<ClientServices<Api, Client>>;
 
 /** Derives HTTP utilities while the caller retains client and runtime ownership. */
 export type CreateHttpApiQueryUtilsOptions<
@@ -533,7 +616,7 @@ export type CreateHttpApiQueryUtilsOptions<
   Prefix extends readonly [JsonValue, ...JsonValue[]],
   Client = HttpApiClient.ForApi<Api>,
 > = {
-  readonly client: Client & HttpApiClient.ForApi<Api, unknown, unknown>
-  readonly keyPrefix: Prefix
+  readonly client: Client & HttpApiClient.ForApi<Api, unknown, unknown>;
+  readonly keyPrefix: Prefix;
 } & EncoderOption<Api> &
-  RunnerOption<Api, NoInfer<Client>>
+  RunnerOption<Api, NoInfer<Client>>;

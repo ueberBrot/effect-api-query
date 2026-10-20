@@ -1,41 +1,41 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation } from "@tanstack/react-query";
 
 import {
   describeSlowQueryCancellation,
   useSlowQueryCancellation,
-} from '../../../../shared/use-slow-query-cancellation.ts'
-import type { ViteReactApplication } from '../../lib/application.ts'
-import { ActionButton } from '../ui/action-button.tsx'
-import { EffectErrorDetails } from '../ui/effect-error-details.tsx'
+} from "../../../../shared/use-slow-query-cancellation.ts";
+import type { ViteReactApplication } from "../../lib/application.ts";
+import { ActionButton } from "../ui/action-button.tsx";
+import { EffectErrorDetails } from "../ui/effect-error-details.tsx";
 
 export const DiagnosticsSection = ({
   application,
 }: {
-  readonly application: ViteReactApplication
+  readonly application: ViteReactApplication;
 }) => {
   const declaredFailure = useMutation(
     application.trackMutationOptions(
       application.rpcQuery.diagnostics.fail.mutationOptions({
-        rpcOptions: { headers: { 'x-request-source': 'diagnostics-panel' } },
-      }),
-    ),
-  )
-  const slowQuery = useSlowQueryCancellation(application)
-  const message = describeSlowQueryCancellation(slowQuery.state)
+        rpcOptions: { headers: { "x-request-source": "diagnostics-panel" } },
+      })
+    )
+  );
+  const slowQuery = useSlowQueryCancellation(application);
+  const message = describeSlowQueryCancellation(slowQuery.state);
 
   return (
-    <section className="space-y-4 border border-border bg-card p-6 shadow-2xl shadow-shadow/40">
-      <h2 className="display-heading text-2xl font-bold text-foreground">
+    <section className="border-border bg-card shadow-shadow/40 space-y-4 border p-6 shadow-2xl">
+      <h2 className="display-heading text-foreground text-2xl font-bold">
         Failures and cancellation
       </h2>
-      <p className="text-sm leading-6 text-muted-foreground">
-        Generated errors preserve their Effect causes. Cancelling the query interrupts its RPC
-        Effect on the server.
+      <p className="text-muted-foreground text-sm leading-6">
+        Generated errors preserve their Effect causes. Cancelling the query
+        interrupts its RPC Effect on the server.
       </p>
       <div className="flex flex-wrap gap-3">
         <ActionButton
           onClick={() => {
-            declaredFailure.mutate()
+            declaredFailure.mutate();
           }}
           type="button"
           variant="danger"
@@ -45,7 +45,7 @@ export const DiagnosticsSection = ({
         <ActionButton
           disabled={!slowQuery.canStart}
           onClick={() => {
-            void slowQuery.start()
+            void slowQuery.start();
           }}
           type="button"
           variant="secondary"
@@ -55,7 +55,7 @@ export const DiagnosticsSection = ({
         <ActionButton
           disabled={!slowQuery.canCancel}
           onClick={() => {
-            void slowQuery.cancel()
+            void slowQuery.cancel();
           }}
           type="button"
           variant="secondary"
@@ -64,10 +64,10 @@ export const DiagnosticsSection = ({
         </ActionButton>
       </div>
       <EffectErrorDetails error={declaredFailure.error} />
-      {slowQuery.state._tag === 'Failed' ? (
+      {slowQuery.state._tag === "Failed" ? (
         <EffectErrorDetails error={slowQuery.state.error} />
       ) : null}
       {message === undefined ? null : <p className="text-sm">{message}</p>}
     </section>
-  )
-}
+  );
+};

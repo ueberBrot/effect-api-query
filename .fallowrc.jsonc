@@ -3,10 +3,9 @@
 
   "entry": [
     "scripts/measure-construction.mts",
-    "scripts/verify-docs-examples.mts",
-    "apps/docs/public/package-version.js",
+    "scripts/resolve-docs-release.mts",
     "playwright.docs.config.ts",
-    "tests/types/*.{ts,tsx}"
+    "tests/types/*.{ts,tsx}",
   ],
 
   "ignorePatterns": ["examples/tanstack-start/src/routeTree.gen.ts"],
@@ -14,25 +13,25 @@
   "ignoreExports": [
     {
       "file": "apps/docs/astro.config.mts",
-      "exports": ["default"]
+      "exports": ["default"],
     },
     {
       "file": "playwright.config.ts",
-      "exports": ["default"]
+      "exports": ["default"],
     },
     {
       "file": "playwright.docs.config.ts",
-      "exports": ["default"]
+      "exports": ["default"],
     },
     {
       "file": "examples/tanstack-start/src/router.tsx",
-      "exports": ["getRouter"]
-    }
+      "exports": ["getRouter"],
+    },
   ],
 
   "duplicates": {
     "mode": "semantic",
-    "near": true
+    "near": true,
   },
 
   "ignoreDependencies": [
@@ -49,7 +48,7 @@
     // React belongs to the private apps; Fallow attributes shared example sources to the root.
     "react",
     "typescript-5.9",
-    "unplugin-unused"
+    "unplugin-unused",
   ],
 
   "health": {
@@ -61,20 +60,20 @@
       "examples/**",
       "scripts/**",
       "tests/**",
-      "*.config.*"
-    ]
+      "*.config.*",
+    ],
   },
 
   "rules": {
     "private-type-leaks": "error",
 
-    "stale-suppressions": "off"
+    "stale-suppressions": "off",
   },
 
   "overrides": [
     {
       "files": ["src/index.ts"],
-      "rules": { "unused-types": "off" }
-    }
-  ]
+      "rules": { "unused-types": "off" },
+    },
+  ],
 }
