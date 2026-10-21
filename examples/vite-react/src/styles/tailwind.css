@@ -1,5 +1,5 @@
-@import 'tailwindcss';
-@import '../../../shared/theme.css';
+@import "tailwindcss";
+@import "../../../shared/theme.css";
 
 @media (width >= 48rem) {
   .user-form-grid {

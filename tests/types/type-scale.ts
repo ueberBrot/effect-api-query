@@ -1,12 +1,16 @@
-import { QueryClient, type InfiniteData } from '@tanstack/query-core'
-import { createRpcQueryUtils, type RpcQueryUtils } from '@ueberbrot/effect-api-query'
-import { Schema } from 'effect'
-import { Rpc, RpcClient, RpcGroup } from 'effect/rpc'
+import { QueryClient, type InfiniteData } from "@tanstack/query-core";
+import {
+  createRpcQueryUtils,
+  type RpcQueryUtils,
+} from "@ueberbrot/effect-api-query";
+import { Schema } from "effect";
+import { Rpc, RpcClient, RpcGroup } from "effect/rpc";
 
 const indexes = [
-  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
-  27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
-] as const
+  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+  22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+  41, 42, 43, 44, 45, 46, 47, 48, 49,
+] as const;
 
 const generatedRpcs = indexes.flatMap((index) => [
   Rpc.make(`scale.rpc-${index}` as const, {
@@ -29,43 +33,49 @@ const generatedRpcs = indexes.flatMap((index) => [
     payload: { id: Schema.String },
     success: Schema.String,
   }),
-])
+]);
 
-const group = RpcGroup.make(...generatedRpcs)
-type Rpcs = RpcGroup.Rpcs<typeof group>
+const group = RpcGroup.make(...generatedRpcs);
+type Rpcs = RpcGroup.Rpcs<typeof group>;
 
-type Index = (typeof indexes)[number]
+type Index = (typeof indexes)[number];
 type ExpectedTag =
   | `scale.rpc-${Index}`
   | `scale.group-${Index}.get`
   | `scale.region-${Index}.users.get`
   | `scale.zone-${Index}.accounts.users.get`
-  | `scale.cluster-${Index}.organizations.accounts.users.get`
+  | `scale.cluster-${Index}.organizations.accounts.users.get`;
 type Equal<Left, Right> =
-  (<Value>() => Value extends Left ? 1 : 2) extends <Value>() => Value extends Right ? 1 : 2
+  (<Value>() => Value extends Left ? 1 : 2) extends <
+    Value,
+  >() => Value extends Right ? 1 : 2
     ? true
-    : false
-type Assert<Condition extends true> = Condition
+    : false;
+type Assert<Condition extends true> = Condition;
 
-const allTagsPreserved: Assert<Equal<Rpcs['_tag'], ExpectedTag>> = true
+const allTagsPreserved: Assert<Equal<Rpcs["_tag"], ExpectedTag>> = true;
 
-declare const client: RpcClient.RpcClient.Flat<Rpcs>
+declare const client: RpcClient.RpcClient.Flat<Rpcs>;
 
-const keyPrefix = ['type-scale'] as const
-const utils = createRpcQueryUtils(group, { client, keyPrefix })
-const typedUtils: RpcQueryUtils<typeof group, typeof keyPrefix> = utils
+const keyPrefix = ["type-scale"] as const;
+const utils = createRpcQueryUtils(group, { client, keyPrefix });
+const typedUtils: RpcQueryUtils<typeof group, typeof keyPrefix> = utils;
 
-utils.scale['rpc-0'].queryOptions({ input: { id: 'rpc-0' } })
-utils.scale['group-12'].get.mutationOptions()
-utils.scale['region-24'].users.get.queryKey({ id: 'user-24' })
-utils.scale['zone-36'].accounts.users.get.queryOptions({ input: { id: 'user-36' } })
-utils.scale['cluster-49'].organizations.accounts.users.get.mutationOptions()
-const pages = utils.scale['zone-36'].accounts.users.get.infiniteOptions({
+utils.scale["rpc-0"].queryOptions({ input: { id: "rpc-0" } });
+utils.scale["group-12"].get.mutationOptions();
+utils.scale["region-24"].users.get.queryKey({ id: "user-24" });
+utils.scale["zone-36"].accounts.users.get.queryOptions({
+  input: { id: "user-36" },
+});
+utils.scale["cluster-49"].organizations.accounts.users.get.mutationOptions();
+const pages = utils.scale["zone-36"].accounts.users.get.infiniteOptions({
   initialPageParam: 0,
   input: (page) => ({ id: `user-${page}` }),
   getNextPageParam: (_page, _pages, cursor) => cursor + 1,
-})
-const cachedPages = new QueryClient().getQueryData(pages.queryKey)
-true satisfies Assert<Equal<typeof cachedPages, InfiniteData<string, number> | undefined>>
+});
+const cachedPages = new QueryClient().getQueryData(pages.queryKey);
+true satisfies Assert<
+  Equal<typeof cachedPages, InfiniteData<string, number> | undefined>
+>;
 
-void [allTagsPreserved, typedUtils]
+void [allTagsPreserved, typedUtils];

@@ -64,6 +64,12 @@
               "tests/cache-recipes.test.ts",
               "tests/query-policy.test.ts",
               "tests/query-view-prefix.test.ts",
+              "tests/contract-reuse.test.ts",
+              "tests/execution-interceptor.test.ts",
+              "tests/hydration-codecs.test.ts",
+              "tests/query-filter.test.ts",
+              "tests/stream-publication.test.ts",
+              "tests/stream-recovery.test.ts",
               "scripts/measure-construction.mts",
               "tests/types/**/*.ts",
               "tests/types/**/*.tsx"

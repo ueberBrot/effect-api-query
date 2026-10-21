@@ -106,9 +106,7 @@ jobs:
   publish:
     name: Publish release artifact
     if: >-
-      needs.select-mode.outputs.mode == 'publish' &&
-      github.event_name == 'push' &&
-      vars.NPM_PUBLISH_ENABLED == 'true'
+      needs.select-mode.outputs.mode == 'publish' && github.event_name == 'push' && vars.NPM_PUBLISH_ENABLED == 'true'
     needs:
       - select-mode
       - quality-and-pack
@@ -118,12 +116,16 @@ jobs:
     permissions:
       contents: write
       id-token: write
+    outputs:
+      published: ${{ steps.publish.outputs.published }}
+      published-packages: ${{ steps.publish.outputs.published-packages }}
 
     steps:
       - *checkout
       - *setup_repository
 
       - name: Publish release artifact to npm
+        id: publish
         uses: changesets/action/publish@8488615a623b1b9c987934bb89eae8af6a946ac1 # v2.1.1
         with:
           create-github-releases: false
@@ -132,11 +134,13 @@ jobs:
           NPM_CONFIG_ACCESS: public
           NPM_CONFIG_PROVENANCE: true
 
-  # Docs-only merges deploy after validation without requiring npm publication.
   deploy-docs:
     name: Deploy documentation
-    if: github.ref == 'refs/heads/main' && needs.validation.result == 'success'
-    needs: validation
+    if: >-
+      github.ref == 'refs/heads/main' && needs.validation.result == 'success' && needs.publish.result == 'success' && needs.publish.outputs.published == 'true' && contains(fromJSON(needs.publish.outputs.published-packages).*.name, '@ueberbrot/effect-api-query')
+    needs:
+      - validation
+      - publish
     permissions:
       contents: read
       id-token: write
@@ -144,3 +148,4 @@ jobs:
     uses: ./.github/workflows/deploy-docs.yml
     with:
       build-artifact: documentation-build
+      published-packages: ${{ needs.publish.outputs.published-packages }}

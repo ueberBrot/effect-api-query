@@ -36,7 +36,8 @@
     --app-purple: #7c3aed;
     --app-text: #fafafa;
     color-scheme: dark;
-    font-family: 'Avenir Next', Avenir, 'Segoe UI Variable', 'Segoe UI', sans-serif;
+    font-family:
+      "Avenir Next", Avenir, "Segoe UI Variable", "Segoe UI", sans-serif;
   }
 
   body {
@@ -55,7 +56,8 @@
   }
 
   .display-heading {
-    font-family: 'Avenir Next', Avenir, 'Segoe UI Variable', 'Segoe UI', sans-serif;
+    font-family:
+      "Avenir Next", Avenir, "Segoe UI Variable", "Segoe UI", sans-serif;
     text-wrap: balance;
   }
 }

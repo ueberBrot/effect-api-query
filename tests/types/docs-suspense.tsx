@@ -2,72 +2,84 @@ import {
   QueryErrorResetBoundary,
   useSuspenseQueries,
   useSuspenseQuery,
-} from '@tanstack/react-query'
-import { createRpcQueryUtils, isEffectRpcQueryError } from '@ueberbrot/effect-api-query'
-import type { InferQueryData, InferQueryError } from '@ueberbrot/effect-api-query'
-import { Cause, Result, Schema } from 'effect'
-import { Rpc, RpcGroup } from 'effect/rpc'
-import type { RpcClient } from 'effect/rpc'
-import { Component, Suspense } from 'react'
-import type { ReactNode } from 'react'
+} from "@tanstack/react-query";
+import {
+  createRpcQueryUtils,
+  isEffectRpcQueryError,
+} from "@ueberbrot/effect-api-query";
+import type {
+  InferQueryData,
+  InferQueryError,
+} from "@ueberbrot/effect-api-query";
+import { Cause, Result, Schema } from "effect";
+import { Rpc, RpcGroup } from "effect/rpc";
+import type { RpcClient } from "effect/rpc";
+import { Component, Suspense } from "react";
+import type { ReactNode } from "react";
 
-export class UserUnavailable extends Schema.TaggedError<UserUnavailable>()('UserUnavailable', {
+export class UserUnavailable extends Schema.TaggedError<
+  UserUnavailable,
+  { readonly brand: unique symbol }
+>()("UserUnavailable", {
   message: Schema.String,
 }) {}
 
 export const suspenseGroup = RpcGroup.make(
-  Rpc.make('users.get', {
+  Rpc.make("users.get", {
     payload: { id: Schema.Int },
     success: Schema.Struct({ id: Schema.Int, name: Schema.String }),
     error: UserUnavailable,
-  }),
-)
+  })
+);
 
 export const makeSuspenseQueries = <E,>(
-  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof suspenseGroup>, E>,
+  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof suspenseGroup>, E>
 ) =>
-  createRpcQueryUtils<typeof suspenseGroup, readonly ['suspense-users'], E>(suspenseGroup, {
-    client,
-    keyPrefix: ['suspense-users'],
-  })
+  createRpcQueryUtils<typeof suspenseGroup, readonly ["suspense-users"], E>(
+    suspenseGroup,
+    {
+      client,
+      keyPrefix: ["suspense-users"],
+    }
+  );
 
-export type Queries<E> = ReturnType<typeof makeSuspenseQueries<E>>
+export type Queries<E> = ReturnType<typeof makeSuspenseQueries<E>>;
 
 export const failureMessage = (error: unknown): string => {
   if (isEffectRpcQueryError(error)) {
-    const failure = Cause.findError(error.cause)
+    const failure = Cause.findError(error.cause);
     if (
       error.cause.reasons.length === 1 &&
       Result.isSuccess(failure) &&
       Schema.is(UserUnavailable)(failure.success)
     ) {
-      return failure.success.message
+      return failure.success.message;
     }
   }
-  return 'The request failed. Please try again.'
-}
+  return "The request failed. Please try again.";
+};
 
 interface BoundaryProps {
-  readonly children: ReactNode
-  readonly onReset: () => void
+  readonly children: ReactNode;
+  readonly onReset: () => void;
 }
 
 interface BoundaryState {
-  readonly failed: boolean
-  readonly error: unknown
+  readonly failed: boolean;
+  readonly error: unknown;
 }
 
 class RequestErrorBoundary extends Component<BoundaryProps, BoundaryState> {
-  override state: BoundaryState = { failed: false, error: undefined }
+  override state: BoundaryState = { failed: false, error: undefined };
 
   static getDerivedStateFromError(error: unknown): BoundaryState {
-    return { failed: true, error }
+    return { failed: true, error };
   }
 
   reset = () => {
-    this.props.onReset()
-    this.setState({ failed: false, error: undefined })
-  }
+    this.props.onReset();
+    this.setState({ failed: false, error: undefined });
+  };
 
   override render() {
     if (this.state.failed) {
@@ -78,28 +90,36 @@ class RequestErrorBoundary extends Component<BoundaryProps, BoundaryState> {
             Try again
           </button>
         </div>
-      )
+      );
     }
-    return this.props.children
+    return this.props.children;
   }
 }
 
 const UserDetails = <E,>({ rpc }: { readonly rpc: Queries<E> }) => {
   const user = useSuspenseQuery(
-    rpc.users.get.queryOptions({ input: { id: 1 }, retry: false, staleTime: 30_000 }),
-  )
+    rpc.users.get.queryOptions({
+      input: { id: 1 },
+      retry: false,
+      staleTime: 30_000,
+    })
+  );
   return (
     <>
       <h2>{user.data.name}</h2>
       {user.error !== null && !user.isFetching ? (
         <p role="alert">{failureMessage(user.error)}</p>
       ) : null}
-      <button type="button" onClick={() => void user.refetch()} disabled={user.isFetching}>
+      <button
+        type="button"
+        onClick={() => void user.refetch()}
+        disabled={user.isFetching}
+      >
         Refresh
       </button>
     </>
-  )
-}
+  );
+};
 
 export const UserScreen = <E,>({ rpc }: { readonly rpc: Queries<E> }) => (
   <QueryErrorResetBoundary>
@@ -111,22 +131,30 @@ export const UserScreen = <E,>({ rpc }: { readonly rpc: Queries<E> }) => (
       </RequestErrorBoundary>
     )}
   </QueryErrorResetBoundary>
-)
+);
 
 export const TwoUsers = <E,>({ rpc }: { readonly rpc: Queries<E> }) => {
   type UserQuery = {
-    queryFnData: InferQueryData<typeof rpc.users.get>
-    error: InferQueryError<typeof rpc.users.get>
-  }
+    queryFnData: InferQueryData<typeof rpc.users.get>;
+    error: InferQueryError<typeof rpc.users.get>;
+  };
   const [ada, grace] = useSuspenseQueries<[UserQuery, UserQuery]>({
     queries: [
-      rpc.users.get.queryOptions({ input: { id: 1 }, retry: false, staleTime: 30_000 }),
-      rpc.users.get.queryOptions({ input: { id: 2 }, retry: false, staleTime: 30_000 }),
+      rpc.users.get.queryOptions({
+        input: { id: 1 },
+        retry: false,
+        staleTime: 30_000,
+      }),
+      rpc.users.get.queryOptions({
+        input: { id: 2 },
+        retry: false,
+        staleTime: 30_000,
+      }),
     ],
-  })
+  });
   return (
     <p>
       {ada.data.name} and {grace.data.name}
     </p>
-  )
-}
+  );
+};

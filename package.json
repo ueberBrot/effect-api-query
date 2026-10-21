@@ -61,10 +61,10 @@
     "@effect-api-query/contracts": "workspace:*",
     "@effect-api-query/server": "workspace:*",
     "@effect/platform-node": "catalog:",
-    "@effect/tsgo": "0.51.1",
-    "@effect/vitest": "4.0.2",
+    "@effect/tsgo": "0.52.0",
+    "@effect/vitest": "4.0.4",
     "@playwright/test": "1.64.0",
-    "@shadcn/lint": "0.2.0",
+    "@shadcn/lint": "0.2.1",
     "@tanstack/intent": "0.5.5",
     "@tanstack/query-core": "catalog:",
     "@tanstack/react-query": "catalog:",
@@ -83,7 +83,7 @@
     "tsx": "catalog:",
     "typescript": "catalog:",
     "typescript-5.9": "npm:typescript@5.9.3",
-    "ultracite": "7.12.4",
+    "ultracite": "8.0.0",
     "unplugin-unused": "0.6.0",
     "vite": "catalog:",
     "vite-plus": "catalog:",
@@ -93,5 +93,5 @@
     "@tanstack/query-core": ">=5.103.1 <6",
     "effect": "catalog:"
   },
-  "packageManager": "pnpm@12.11.2"
+  "packageManager": "pnpm@12.13.0"
 }

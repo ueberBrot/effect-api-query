@@ -1,27 +1,33 @@
-import type { QueryClient } from '@tanstack/query-core'
-import { createRpcQueryUtils, fetchStreamSnapshot } from '@ueberbrot/effect-api-query'
-import { Schema } from 'effect'
-import { Rpc, RpcGroup } from 'effect/rpc'
-import type { RpcClient } from 'effect/rpc'
+import type { QueryClient } from "@tanstack/query-core";
+import {
+  createRpcQueryUtils,
+  fetchStreamSnapshot,
+} from "@ueberbrot/effect-api-query";
+import { Schema } from "effect";
+import { Rpc, RpcGroup } from "effect/rpc";
+import type { RpcClient } from "effect/rpc";
 
 const updates = RpcGroup.make(
-  Rpc.make('updates.watch', {
+  Rpc.make("updates.watch", {
     payload: { channel: Schema.String },
     success: Schema.String,
     stream: true,
-  }),
-)
+  })
+);
 
 async function captureUpdates<E>(
   queryClient: QueryClient,
   client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof updates>, E>,
-  signal: AbortSignal,
+  signal: AbortSignal
 ) {
-  const rpc = createRpcQueryUtils<typeof updates, readonly ['updates'], E>(updates, {
-    client,
-    keyPrefix: ['updates'],
-  })
-  const input = { channel: 'announcements' }
+  const rpc = createRpcQueryUtils<typeof updates, readonly ["updates"], E>(
+    updates,
+    {
+      client,
+      keyPrefix: ["updates"],
+    }
+  );
+  const input = { channel: "announcements" };
   const history = await fetchStreamSnapshot(
     queryClient,
     rpc.updates.watch.streamedOptions({
@@ -29,15 +35,15 @@ async function captureUpdates<E>(
       retry: false,
       maxChunks: 20,
     }),
-    { signal, timeoutMs: 5_000 },
-  )
+    { signal, timeoutMs: 5_000 }
+  );
   const latest = await fetchStreamSnapshot(
     queryClient,
     rpc.updates.watch.liveOptions({
       input,
       retry: false,
     }),
-    { signal, timeoutMs: 5_000 },
-  )
-  return { history, latest }
+    { signal, timeoutMs: 5_000 }
+  );
+  return { history, latest };
 }

@@ -1,79 +1,102 @@
-import { useInfiniteQuery, useMutation, useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import {
+  useInfiniteQuery,
+  useMutation,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 
-import { ActionButton } from '../components/action-button.tsx'
-import { ConditionalUserQuery } from '../components/conditional-user-query.tsx'
-import { PageLayout, Panel } from '../components/page-layout.tsx'
-import type { TanStackStartApplication } from '../lib/application.ts'
+import { ActionButton } from "../components/action-button.tsx";
+import { ConditionalUserQuery } from "../components/conditional-user-query.tsx";
+import { PageLayout, Panel } from "../components/page-layout.tsx";
+import type { TanStackStartApplication } from "../lib/application.ts";
 
-const PAGE_SIZE = 4
+const PAGE_SIZE = 4;
 
-const userPagesOptions = (rpcQuery: TanStackStartApplication['rpcQuery']) =>
+const userPagesOptions = (rpcQuery: TanStackStartApplication["rpcQuery"]) =>
   rpcQuery.users.page.infiniteOptions({
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
     initialPageParam: 0,
     input: (cursor: number) => ({ cursor, pageSize: PAGE_SIZE }),
-  })
+  });
 
 const streamedDiagnosticsOptions = (
-  rpcQuery: TanStackStartApplication['rpcQuery'],
-  bounded = false,
+  rpcQuery: TanStackStartApplication["rpcQuery"],
+  bounded = false
 ) => {
   const options = {
-    refetchOnMount: 'always',
+    refetchOnMount: "always",
     staleTime: 0,
-  } satisfies NonNullable<Parameters<typeof rpcQuery.diagnostics.stream.streamedOptions>[0]>
+  } satisfies NonNullable<
+    Parameters<typeof rpcQuery.diagnostics.stream.streamedOptions>[0]
+  >;
   if (bounded) {
-    return rpcQuery.diagnostics.stream.streamedOptions({ ...options, maxChunks: 2 })
+    return rpcQuery.diagnostics.stream.streamedOptions({
+      ...options,
+      maxChunks: 2,
+    });
   }
-  return rpcQuery.diagnostics.stream.streamedOptions(options)
-}
+  return rpcQuery.diagnostics.stream.streamedOptions(options);
+};
 
-const liveDiagnosticOptions = (rpcQuery: TanStackStartApplication['rpcQuery']) =>
-  rpcQuery.diagnostics.stream.liveOptions({ refetchOnMount: 'always', staleTime: 0 })
+const liveDiagnosticOptions = (
+  rpcQuery: TanStackStartApplication["rpcQuery"]
+) =>
+  rpcQuery.diagnostics.stream.liveOptions({
+    refetchOnMount: "always",
+    staleTime: 0,
+  });
 
 const UsersPage = () => {
-  const { invalidateUsers, queryClient, rpcQuery } = Route.useRouteContext()
-  const users = useSuspenseQuery(rpcQuery.users.list.queryOptions())
-  const [boundedHistory, setBoundedHistory] = useState(false)
-  const diagnostics = useSuspenseQuery(streamedDiagnosticsOptions(rpcQuery, boundedHistory))
+  const { invalidateUsers, queryClient, rpcQuery } = Route.useRouteContext();
+  const users = useSuspenseQuery(rpcQuery.users.list.queryOptions());
+  const [boundedHistory, setBoundedHistory] = useState(false);
+  const diagnostics = useSuspenseQuery(
+    streamedDiagnosticsOptions(rpcQuery, boundedHistory)
+  );
   const replayStream = async (bounded: boolean) => {
-    setBoundedHistory(bounded)
+    setBoundedHistory(bounded);
     try {
-      await queryClient.query(streamedDiagnosticsOptions(rpcQuery, bounded))
-    } catch {}
-  }
-  const liveDiagnostic = useSuspenseQuery(liveDiagnosticOptions(rpcQuery))
-  const userPages = useInfiniteQuery(userPagesOptions(rpcQuery))
-  const loaded = userPages.data?.pages.reduce((count, page) => count + page.users.length, 0) ?? 0
-  const totalUsers = userPages.data?.pages[0]?.total ?? 0
-  const pageCount = userPages.data?.pages.length ?? 0
-  const remainingUsers = Math.max(0, totalUsers - loaded)
-  const nextPageSize = Math.min(PAGE_SIZE, remainingUsers)
-  let nextPageLabel = 'All users loaded'
+      await queryClient.query(streamedDiagnosticsOptions(rpcQuery, bounded));
+    } catch {
+      // oxlint-disable-next-line eslint/no-useless-return
+      return;
+    }
+  };
+  const liveDiagnostic = useSuspenseQuery(liveDiagnosticOptions(rpcQuery));
+  const userPages = useInfiniteQuery(userPagesOptions(rpcQuery));
+  const loaded =
+    userPages.data?.pages.reduce(
+      (count, page) => count + page.users.length,
+      0
+    ) ?? 0;
+  const totalUsers = userPages.data?.pages[0]?.total ?? 0;
+  const pageCount = userPages.data?.pages.length ?? 0;
+  const remainingUsers = Math.max(0, totalUsers - loaded);
+  const nextPageSize = Math.min(PAGE_SIZE, remainingUsers);
+  let nextPageLabel = "All users loaded";
   if (userPages.hasNextPage) {
-    nextPageLabel = `Load next ${String(nextPageSize)} users`
+    nextPageLabel = `Load next ${String(nextPageSize)} users`;
   }
   if (userPages.isFetchingNextPage) {
-    nextPageLabel = 'Loading next page…'
+    nextPageLabel = "Loading next page…";
   }
-  const [message, setMessage] = useState<string>()
+  const [message, setMessage] = useState<string>();
   const addGrace = useMutation(
     rpcQuery.users.create.mutationOptions({
       onSuccess: invalidateUsers,
-    }),
-  )
+    })
+  );
   const resetUsers = useMutation(
-    rpcQuery.testing.reset.mutationOptions({ onSuccess: invalidateUsers }),
-  )
+    rpcQuery.testing.reset.mutationOptions({ onSuccess: invalidateUsers })
+  );
   const reuseCachedUsers = async () => {
     const cached = await queryClient.query({
       ...rpcQuery.users.list.queryOptions(),
       staleTime: Infinity,
-    })
-    setMessage(`Cached directory: ${String(cached.length)} users`)
-  }
+    });
+    setMessage(`Cached directory: ${String(cached.length)} users`);
+  };
 
   return (
     <PageLayout
@@ -83,22 +106,22 @@ const UsersPage = () => {
       <div className="mt-8 grid gap-5 xl:grid-cols-2">
         <Panel title="Ordinary query: the complete directory">
           <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-            <p className="max-w-xl text-sm leading-6 text-muted-foreground">
-              The loader fetched every record in one request and dehydrated the result for the
-              browser.
+            <p className="text-muted-foreground max-w-xl text-sm leading-6">
+              The loader fetched every record in one request and dehydrated the
+              result for the browser.
             </p>
-            <span className="border border-border-strong bg-muted px-3 py-1 text-sm font-bold text-text-tertiary">
+            <span className="border-border-strong bg-muted text-text-tertiary border px-3 py-1 text-sm font-bold">
               {String(users.data.length)} users in one response
             </span>
           </div>
           <ul className="mt-4 grid gap-3 sm:grid-cols-2">
             {users.data.map((user) => (
               <li
-                className="grid list-none gap-1 border border-border bg-background p-4"
+                className="border-border bg-background grid list-none gap-1 border p-4"
                 key={user.id}
               >
                 <strong>{user.name}</strong>
-                <span className="text-sm text-text-subtle">
+                <span className="text-text-subtle text-sm">
                   User {user.id}, locale {user.locale}
                 </span>
               </li>
@@ -107,7 +130,7 @@ const UsersPage = () => {
           <div className="mt-5 flex flex-wrap gap-3">
             <ActionButton
               onClick={() => {
-                void reuseCachedUsers()
+                void reuseCachedUsers();
               }}
               variant="secondary"
             >
@@ -116,7 +139,7 @@ const UsersPage = () => {
             <ActionButton
               disabled={addGrace.isPending}
               onClick={() => {
-                addGrace.mutate({ name: 'Grace Hopper' })
+                addGrace.mutate({ name: "Grace Hopper" });
               }}
               type="button"
             >
@@ -124,43 +147,48 @@ const UsersPage = () => {
             </ActionButton>
             <ActionButton
               onClick={() => {
-                resetUsers.mutate()
+                resetUsers.mutate();
               }}
               variant="secondary"
             >
               Reset directory
             </ActionButton>
           </div>
-          {message === undefined ? null : <p className="mt-4 text-sm">{message}</p>}
+          {message === undefined ? null : (
+            <p className="mt-4 text-sm">{message}</p>
+          )}
           {addGrace.isSuccess ? (
             <p className="mt-4 text-sm">Added user {addGrace.data.name}.</p>
           ) : null}
-          {resetUsers.isSuccess ? <p className="mt-4 text-sm">Directory reset.</p> : null}
+          {resetUsers.isSuccess ? (
+            <p className="mt-4 text-sm">Directory reset.</p>
+          ) : null}
         </Panel>
 
         <Panel title="Infinite query: four users at a time">
           <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-            <p className="max-w-xl text-sm leading-6 text-muted-foreground">
-              Each bordered block is one RPC response. A click appends the next page without
-              replacing the pages already in the cache.
+            <p className="text-muted-foreground max-w-xl text-sm leading-6">
+              Each bordered block is one RPC response. A click appends the next
+              page without replacing the pages already in the cache.
             </p>
-            <span className="border border-brand-800 bg-brand-950/80 px-3 py-1 text-sm font-bold text-brand-200">
+            <span className="border-brand-800 bg-brand-950/80 text-brand-200 border px-3 py-1 text-sm font-bold">
               {String(loaded)} of {String(totalUsers)} loaded
             </span>
           </div>
           <ol className="mt-4 grid gap-3 p-0">
             {userPages.data?.pages.map((page, pageIndex) => (
               <li
-                className="list-none border border-border bg-background p-4"
+                className="border-border bg-background list-none border p-4"
                 key={userPages.data.pageParams[pageIndex]}
               >
-                <p className="display-heading text-sm font-bold text-brand-300">
-                  Page {String(pageIndex + 1)}: {String(page.users.length)} users
+                <p className="display-heading text-brand-300 text-sm font-bold">
+                  Page {String(pageIndex + 1)}: {String(page.users.length)}{" "}
+                  users
                 </p>
                 <ul className="mt-3 grid gap-2 sm:grid-cols-2">
                   {page.users.map((user, userIndex) => (
                     <li
-                      className="border-l-2 border-brand-800 bg-muted/80 px-3 py-2 text-sm text-text-secondary"
+                      className="border-brand-800 bg-muted/80 text-text-secondary border-l-2 px-3 py-2 text-sm"
                       key={user.id}
                     >
                       <strong>{`#${String(pageIndex * PAGE_SIZE + userIndex + 1)} ${user.name}`}</strong>
@@ -174,14 +202,15 @@ const UsersPage = () => {
             <ActionButton
               disabled={!userPages.hasNextPage || userPages.isFetchingNextPage}
               onClick={() => {
-                void userPages.fetchNextPage()
+                void userPages.fetchNextPage();
               }}
               type="button"
             >
               {nextPageLabel}
             </ActionButton>
-            <span className="text-sm font-medium text-muted-foreground">
-              {String(pageCount)} {pageCount === 1 ? 'page' : 'pages'} in the cache
+            <span className="text-muted-foreground text-sm font-medium">
+              {String(pageCount)} {pageCount === 1 ? "page" : "pages"} in the
+              cache
             </span>
           </div>
         </Panel>
@@ -190,33 +219,36 @@ const UsersPage = () => {
           <ConditionalUserQuery rpcQuery={rpcQuery} users={users.data} />
         </div>
 
-        <section className="border border-l-2 border-border border-l-brand-600 bg-brand-950/10 p-6 shadow-2xl shadow-shadow/40 xl:col-span-2">
-          <h2 className="display-heading text-2xl font-black text-foreground">
+        <section className="border-border border-l-brand-600 bg-brand-950/10 shadow-shadow/40 border border-l-2 p-6 shadow-2xl xl:col-span-2">
+          <h2 className="display-heading text-foreground text-2xl font-black">
             One stream, two cache models
           </h2>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
-            The server emits four states over time. Keep the full timeline or replay with room for
-            only the newest two updates. The live query shows only the newest state.
+          <p className="text-muted-foreground mt-3 max-w-3xl text-sm leading-6">
+            The server emits four states over time. Keep the full timeline or
+            replay with room for only the newest two updates. The live query
+            shows only the newest state.
           </p>
           <div className="mt-5 grid gap-4 md:grid-cols-2">
             <section
               aria-label="Accumulated stream history"
-              className="border border-border bg-background p-5"
+              className="border-border bg-background border p-5"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="display-heading text-sm font-bold text-brand-300">
-                  Accumulated stream: {boundedHistory ? 'newest 2 updates' : 'keeps history'}
+                <p className="display-heading text-brand-300 text-sm font-bold">
+                  Accumulated stream:{" "}
+                  {boundedHistory ? "newest 2 updates" : "keeps history"}
                 </p>
-                <span className="border border-brand-900 bg-brand-950/80 px-3 py-1 text-xs font-bold text-brand-200">
-                  {String(diagnostics.data.length)}{' '}
-                  {diagnostics.data.length === 1 ? 'update' : 'updates'} retained
+                <span className="border-brand-900 bg-brand-950/80 text-brand-200 border px-3 py-1 text-xs font-bold">
+                  {String(diagnostics.data.length)}{" "}
+                  {diagnostics.data.length === 1 ? "update" : "updates"}{" "}
+                  retained
                 </span>
               </div>
               <div className="mt-4 flex flex-wrap gap-2">
                 <ActionButton
                   disabled={diagnostics.isFetching}
                   onClick={() => {
-                    void replayStream(false)
+                    void replayStream(false);
                   }}
                   type="button"
                   variant="secondary"
@@ -226,7 +258,7 @@ const UsersPage = () => {
                 <ActionButton
                   disabled={diagnostics.isFetching}
                   onClick={() => {
-                    void replayStream(true)
+                    void replayStream(true);
                   }}
                   type="button"
                   variant="secondary"
@@ -234,15 +266,15 @@ const UsersPage = () => {
                   Replay newest 2
                 </ActionButton>
               </div>
-              <p className="mt-3 text-sm text-muted-foreground">
+              <p className="text-muted-foreground mt-3 text-sm">
                 {boundedHistory
-                  ? 'Older updates are discarded as new ones arrive.'
-                  : 'Every update is retained.'}
+                  ? "Older updates are discarded as new ones arrive."
+                  : "Every update is retained."}
               </p>
               <ol className="mt-4 grid gap-2">
                 {diagnostics.data.map((status, index) => (
                   <li className="flex items-center gap-3 text-sm" key={status}>
-                    <span className="grid size-7 place-items-center border border-brand-900 bg-brand-950 font-bold text-brand-200">
+                    <span className="border-brand-900 bg-brand-950 text-brand-200 grid size-7 place-items-center border font-bold">
                       {String(index + 1)}
                     </span>
                     <span>{status}</span>
@@ -250,36 +282,44 @@ const UsersPage = () => {
                 ))}
               </ol>
             </section>
-            <div className="border border-border bg-background p-5">
-              <p className="display-heading text-sm font-bold text-brand-300">
+            <div className="border-border bg-background border p-5">
+              <p className="display-heading text-brand-300 text-sm font-bold">
                 Live query: latest only
               </p>
-              <p className="display-heading mt-6 text-3xl font-black text-foreground">
+              <p className="display-heading text-foreground mt-6 text-3xl font-black">
                 Current state: {liveDiagnostic.data}
               </p>
-              <p className="mt-2 text-sm text-text-subtle">Earlier states are replaced.</p>
+              <p className="text-text-subtle mt-2 text-sm">
+                Earlier states are replaced.
+              </p>
             </div>
           </div>
         </section>
       </div>
     </PageLayout>
-  )
-}
+  );
+};
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute("/")({
   component: UsersPage,
   loader: async ({ context }) => {
     await Promise.all([
       context.queryClient.query({
         ...context.rpcQuery.users.list.queryOptions(),
-        staleTime: 'static',
+        staleTime: "static",
       }),
       context.queryClient.infiniteQuery({
         ...userPagesOptions(context.rpcQuery),
-        staleTime: 'static',
+        staleTime: "static",
       }),
-      context.captureSnapshot(context.queryClient, streamedDiagnosticsOptions(context.rpcQuery)),
-      context.captureSnapshot(context.queryClient, liveDiagnosticOptions(context.rpcQuery)),
-    ])
+      context.captureSnapshot(
+        context.queryClient,
+        streamedDiagnosticsOptions(context.rpcQuery)
+      ),
+      context.captureSnapshot(
+        context.queryClient,
+        liveDiagnosticOptions(context.rpcQuery)
+      ),
+    ]);
   },
-})
+});

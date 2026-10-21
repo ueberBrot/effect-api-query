@@ -1,26 +1,31 @@
-import { skipToken, useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
-import type { SubmitEvent } from 'react'
+import {
+  skipToken,
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+} from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import type { SubmitEvent } from "react";
 
 import {
   describeSlowQueryCancellation,
   useSlowQueryCancellation,
-} from '../../../shared/use-slow-query-cancellation.ts'
-import { ActionButton } from '../components/action-button.tsx'
-import { EffectErrorDetails } from '../components/effect-error-details.tsx'
-import { PageLayout } from '../components/page-layout.tsx'
-import type { TanStackStartApplication } from '../lib/application.ts'
+} from "../../../shared/use-slow-query-cancellation.ts";
+import { ActionButton } from "../components/action-button.tsx";
+import { EffectErrorDetails } from "../components/effect-error-details.tsx";
+import { PageLayout } from "../components/page-layout.tsx";
+import type { TanStackStartApplication } from "../lib/application.ts";
 
-const userPagesOptions = (httpQuery: TanStackStartApplication['httpQuery']) =>
+const userPagesOptions = (httpQuery: TanStackStartApplication["httpQuery"]) =>
   httpQuery.users.page.infiniteOptions({
     initialPageParam: 0,
     input: (cursor: number) => ({ query: { cursor, pageSize: 4 } }),
     getNextPageParam: (page) => page.nextCursor ?? undefined,
-  })
+  });
 
 const HttpPage = () => {
-  const application = Route.useRouteContext()
+  const application = Route.useRouteContext();
   return (
     <PageLayout
       title="HTTP users"
@@ -33,30 +38,34 @@ const HttpPage = () => {
         <HttpDiagnostics application={application} />
       </div>
     </PageLayout>
-  )
-}
+  );
+};
 
-const HttpDirectory = ({ application }: { readonly application: TanStackStartApplication }) => {
-  const { httpQuery, invalidateUsers, queryClient } = application
-  const users = useQuery(httpQuery.users.list.queryOptions())
-  const [cacheMessage, setCacheMessage] = useState<string>()
+const HttpDirectory = ({
+  application,
+}: {
+  readonly application: TanStackStartApplication;
+}) => {
+  const { httpQuery, invalidateUsers, queryClient } = application;
+  const users = useQuery(httpQuery.users.list.queryOptions());
+  const [cacheMessage, setCacheMessage] = useState<string>();
   const deleteUser = useMutation(
-    httpQuery.users.delete.mutationOptions({ onSuccess: invalidateUsers }),
-  )
+    httpQuery.users.delete.mutationOptions({ onSuccess: invalidateUsers })
+  );
   const readCache = async () => {
     const cached = await queryClient.query({
       ...httpQuery.users.list.queryOptions(),
       staleTime: Infinity,
-    })
-    setCacheMessage(`HTTP cached directory: ${String(cached.length)} users`)
-  }
+    });
+    setCacheMessage(`HTTP cached directory: ${String(cached.length)} users`);
+  };
   const refresh = async () => {
-    await invalidateUsers()
-    setCacheMessage('HTTP and RPC user queries invalidated and refetched')
-  }
+    await invalidateUsers();
+    setCacheMessage("HTTP and RPC user queries invalidated and refetched");
+  };
 
   return (
-    <div className="space-y-4 border border-border bg-background p-5">
+    <div className="border-border bg-background space-y-4 border p-5">
       <h2 className="text-xl font-bold">HTTP directory</h2>
       <p>HTTP directory: {String(users.data?.length ?? 0)} users</p>
       <ul className="grid gap-2">
@@ -67,7 +76,7 @@ const HttpDirectory = ({ application }: { readonly application: TanStackStartApp
               aria-label={`Delete HTTP ${user.name}`}
               disabled={deleteUser.isPending}
               onClick={() => {
-                deleteUser.mutate({ params: { id: user.id } })
+                deleteUser.mutate({ params: { id: user.id } });
               }}
               type="button"
               variant="danger"
@@ -80,7 +89,7 @@ const HttpDirectory = ({ application }: { readonly application: TanStackStartApp
       <div className="flex flex-wrap gap-3">
         <ActionButton
           onClick={() => {
-            void readCache()
+            void readCache();
           }}
           type="button"
           variant="secondary"
@@ -89,7 +98,7 @@ const HttpDirectory = ({ application }: { readonly application: TanStackStartApp
         </ActionButton>
         <ActionButton
           onClick={() => {
-            void refresh()
+            void refresh();
           }}
           type="button"
           variant="secondary"
@@ -98,73 +107,84 @@ const HttpDirectory = ({ application }: { readonly application: TanStackStartApp
         </ActionButton>
       </div>
       {cacheMessage === undefined ? null : <p>{cacheMessage}</p>}
-      {deleteUser.isSuccess ? <p>HTTP delete result: {String(deleteUser.data)}</p> : null}
+      {deleteUser.isSuccess ? (
+        <p>HTTP delete result: {String(deleteUser.data)}</p>
+      ) : null}
       <EffectErrorDetails error={users.error ?? deleteUser.error} />
     </div>
-  )
-}
+  );
+};
 
-const HttpRequestInputs = ({ application }: { readonly application: TanStackStartApplication }) => {
-  const { httpQuery, invalidateUsers } = application
-  const users = useQuery(httpQuery.users.list.queryOptions())
-  const [chosenId, setChosenId] = useState<number>()
+const HttpRequestInputs = ({
+  application,
+}: {
+  readonly application: TanStackStartApplication;
+}) => {
+  const { httpQuery, invalidateUsers } = application;
+  const users = useQuery(httpQuery.users.list.queryOptions());
+  const [chosenId, setChosenId] = useState<number>();
   const selectedId =
-    users.data?.some((user) => user.id === chosenId) === true ? chosenId : undefined
+    users.data?.some((user) => user.id === chosenId) === true
+      ? chosenId
+      : undefined;
   const selectedUser = useQuery(
     httpQuery.users.get.queryOptions({
       staleTime: 30_000,
       input:
         selectedId === undefined
           ? skipToken
-          : { params: { id: selectedId }, query: { locale: 'fr' } },
-    }),
-  )
-  const [name, setName] = useState('')
-  const [locale, setLocale] = useState('')
+          : { params: { id: selectedId }, query: { locale: "fr" } },
+    })
+  );
+  const [name, setName] = useState("");
+  const [locale, setLocale] = useState("");
   const createUser = useMutation(
-    httpQuery.users.create.mutationOptions({ onSuccess: invalidateUsers }),
-  )
+    httpQuery.users.create.mutationOptions({ onSuccess: invalidateUsers })
+  );
   const submit = (event: SubmitEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const userName = name.trim()
+    event.preventDefault();
+    const userName = name.trim();
     if (userName.length === 0) {
-      return
+      return;
     }
-    const userLocale = locale.trim()
-    const payload = userLocale === '' ? { name: userName } : { name: userName, locale: userLocale }
+    const userLocale = locale.trim();
+    const payload =
+      userLocale === ""
+        ? { name: userName }
+        : { name: userName, locale: userLocale };
     createUser.mutate(
       { payload },
       {
         onSuccess: () => {
-          setName('')
-          setLocale('')
+          setName("");
+          setLocale("");
         },
-      },
-    )
-  }
+      }
+    );
+  };
 
   return (
-    <div className="space-y-4 border border-border bg-background p-5">
+    <div className="border-border bg-background space-y-4 border p-5">
       <h2 className="text-xl font-bold">HTTP request inputs</h2>
       <form className="grid gap-3" onSubmit={submit}>
         <label className="grid gap-1">
           HTTP name
           <input
-            className="border border-border-strong bg-muted p-2"
+            className="border-border-strong bg-muted border p-2"
             required
             value={name}
             onChange={(event) => {
-              setName(event.currentTarget.value)
+              setName(event.currentTarget.value);
             }}
           />
         </label>
         <label className="grid gap-1">
           HTTP locale (optional)
           <input
-            className="border border-border-strong bg-muted p-2"
+            className="border-border-strong bg-muted border p-2"
             value={locale}
             onChange={(event) => {
-              setLocale(event.currentTarget.value)
+              setLocale(event.currentTarget.value);
             }}
           />
         </label>
@@ -172,17 +192,21 @@ const HttpRequestInputs = ({ application }: { readonly application: TanStackStar
           Add HTTP user
         </ActionButton>
       </form>
-      {createUser.data === undefined ? null : <p>HTTP added {createUser.data.name}</p>}
+      {createUser.data === undefined ? null : (
+        <p>HTTP added {createUser.data.name}</p>
+      )}
       <EffectErrorDetails error={createUser.error} />
       <label className="grid gap-1">
         HTTP user details
         <select
-          className="border border-border-strong bg-muted p-2"
-          value={selectedId ?? ''}
+          className="border-border-strong bg-muted border p-2"
+          value={selectedId ?? ""}
           onChange={(event) => {
             setChosenId(
-              event.currentTarget.value === '' ? undefined : Number(event.currentTarget.value),
-            )
+              event.currentTarget.value === ""
+                ? undefined
+                : Number(event.currentTarget.value)
+            );
           }}
         >
           <option value="">Choose an HTTP user</option>
@@ -194,39 +218,48 @@ const HttpRequestInputs = ({ application }: { readonly application: TanStackStar
         </select>
       </label>
       {selectedId === undefined && <p>HTTP user query skipped</p>}
-      {selectedId !== undefined && selectedUser.data === undefined && <p>Loading HTTP user…</p>}
+      {selectedId !== undefined && selectedUser.data === undefined && (
+        <p>Loading HTTP user…</p>
+      )}
       {selectedId !== undefined && selectedUser.data !== undefined && (
         <p>
-          HTTP selected: {selectedUser.data.name}, locale {selectedUser.data.locale}
+          HTTP selected: {selectedUser.data.name}, locale{" "}
+          {selectedUser.data.locale}
         </p>
       )}
       <EffectErrorDetails error={selectedUser.error} />
     </div>
-  )
-}
+  );
+};
 
 const HttpPagination = ({
   httpQuery,
 }: {
-  readonly httpQuery: TanStackStartApplication['httpQuery']
+  readonly httpQuery: TanStackStartApplication["httpQuery"];
 }) => {
-  const pages = useInfiniteQuery(userPagesOptions(httpQuery))
-  const loaded = pages.data?.pages.reduce((count, page) => count + page.users.length, 0) ?? 0
+  const pages = useInfiniteQuery(userPagesOptions(httpQuery));
+  const loaded =
+    pages.data?.pages.reduce((count, page) => count + page.users.length, 0) ??
+    0;
 
   return (
-    <div className="space-y-4 border border-border bg-background p-5">
+    <div className="border-border bg-background space-y-4 border p-5">
       <h2 className="text-xl font-bold">HTTP pagination</h2>
       <p>
-        HTTP: {String(loaded)} of {String(pages.data?.pages[0]?.total ?? 0)} loaded
+        HTTP: {String(loaded)} of {String(pages.data?.pages[0]?.total ?? 0)}{" "}
+        loaded
       </p>
       <ol className="grid gap-3">
         {pages.data?.pages.map((page, index) => (
-          <li key={pages.data.pageParams[index]} className="border border-border-strong p-3">
+          <li
+            key={pages.data.pageParams[index]}
+            className="border-border-strong border p-3"
+          >
             <p>
               HTTP page {String(index + 1)}: {String(page.users.length)} users
             </p>
-            <p className="text-sm text-muted-foreground">
-              {page.users.map((user) => user.name).join(', ')}
+            <p className="text-muted-foreground text-sm">
+              {page.users.map((user) => user.name).join(", ")}
             </p>
           </li>
         ))}
@@ -234,7 +267,7 @@ const HttpPagination = ({
       <ActionButton
         disabled={!pages.hasNextPage || pages.isFetchingNextPage}
         onClick={() => {
-          void pages.fetchNextPage()
+          void pages.fetchNextPage();
         }}
         type="button"
       >
@@ -242,24 +275,31 @@ const HttpPagination = ({
       </ActionButton>
       <EffectErrorDetails error={pages.error} />
     </div>
-  )
-}
+  );
+};
 
-const HttpDiagnostics = ({ application }: { readonly application: TanStackStartApplication }) => {
-  const failure = useMutation(application.httpQuery.diagnostics.fail.mutationOptions())
-  const slowQuery = useSlowQueryCancellation(application, 'http')
-  const slowMessage = describeSlowQueryCancellation(slowQuery.state)
+const HttpDiagnostics = ({
+  application,
+}: {
+  readonly application: TanStackStartApplication;
+}) => {
+  const failure = useMutation(
+    application.httpQuery.diagnostics.fail.mutationOptions()
+  );
+  const slowQuery = useSlowQueryCancellation(application, "http");
+  const slowMessage = describeSlowQueryCancellation(slowQuery.state);
 
   return (
-    <div className="space-y-4 border border-border bg-background p-5">
+    <div className="border-border bg-background space-y-4 border p-5">
       <h2 className="text-xl font-bold">HTTP failures and cancellation</h2>
-      <p className="text-sm text-muted-foreground">
-        Cancel the browser request, then read the server&apos;s interruption count.
+      <p className="text-muted-foreground text-sm">
+        Cancel the browser request, then read the server&apos;s interruption
+        count.
       </p>
       <div className="flex flex-wrap gap-3">
         <ActionButton
           onClick={() => {
-            failure.mutate()
+            failure.mutate();
           }}
           type="button"
           variant="danger"
@@ -269,7 +309,7 @@ const HttpDiagnostics = ({ application }: { readonly application: TanStackStartA
         <ActionButton
           disabled={!slowQuery.canStart}
           onClick={() => {
-            void slowQuery.start()
+            void slowQuery.start();
           }}
           type="button"
           variant="secondary"
@@ -279,7 +319,7 @@ const HttpDiagnostics = ({ application }: { readonly application: TanStackStartA
         <ActionButton
           disabled={!slowQuery.canCancel}
           onClick={() => {
-            void slowQuery.cancel()
+            void slowQuery.cancel();
           }}
           type="button"
           variant="secondary"
@@ -288,26 +328,26 @@ const HttpDiagnostics = ({ application }: { readonly application: TanStackStartA
         </ActionButton>
       </div>
       <EffectErrorDetails error={failure.error} />
-      {slowQuery.state._tag === 'Failed' ? (
+      {slowQuery.state._tag === "Failed" ? (
         <EffectErrorDetails error={slowQuery.state.error} />
       ) : null}
       {slowMessage === undefined ? null : <p>HTTP: {slowMessage}</p>}
     </div>
-  )
-}
+  );
+};
 
-export const Route = createFileRoute('/http')({
+export const Route = createFileRoute("/http")({
   component: HttpPage,
   loader: async ({ context }) => {
     await Promise.all([
       context.queryClient.query({
         ...context.httpQuery.users.list.queryOptions(),
-        staleTime: 'static',
+        staleTime: "static",
       }),
       context.queryClient.infiniteQuery({
         ...userPagesOptions(context.httpQuery),
-        staleTime: 'static',
+        staleTime: "static",
       }),
-    ])
+    ]);
   },
-})
+});

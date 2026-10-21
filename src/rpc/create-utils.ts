@@ -1,9 +1,9 @@
-import type { Rpc, RpcClient, RpcGroup } from 'effect/rpc'
+import type { RpcGroup } from "effect/rpc";
 
-import type { JsonValue, RunPromiseExit } from '../core/types'
-import { createUtilityTree } from '../core/utility-tree'
-import { extractRpcs, rpcTreeErrors } from './operation'
-import type { CreateRpcQueryUtilsOptions, RpcQueryUtils } from './types'
+import type { JsonValue, RunPromiseExit } from "../core/types";
+import { createUtilityTree } from "../core/utility-tree";
+import { extractRpcs, rpcTreeErrors } from "./operation";
+import type { CreateRpcQueryUtilsOptions, RpcQueryUtils } from "./types";
 
 /**
  * Derives an eager, frozen TanStack Query utility tree from an Effect RPC group.
@@ -19,21 +19,20 @@ export const createRpcQueryUtils = <
   ClientError = never,
 >(
   group: Group,
-  options: CreateRpcQueryUtilsOptions<Group, Prefix, ClientError>,
+  options: CreateRpcQueryUtilsOptions<Group, Prefix, ClientError>
 ): RpcQueryUtils<Group, Prefix, ClientError> => {
-  // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/no-chained-type-assertions
-  const runtimeGroup = group as unknown as RpcGroup.RpcGroup<Rpc.Any>
-  const client = options.client as RpcClient.RpcClient.Flat<Rpc.Any, ClientError>
-  const rpcs = extractRpcs(runtimeGroup, client)
-  // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-  const runPromiseExit = options.runPromiseExit as RunPromiseExit<unknown> | undefined
+  const rpcs = extractRpcs(group, options.client);
+  // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
+  const runPromiseExit = options.runPromiseExit as
+    | RunPromiseExit<unknown>
+    | undefined;
   const tree = createUtilityTree(rpcs, {
     keyPrefix: options.keyPrefix,
-    keyNamespace: ['rpc'],
+    keyNamespace: ["rpc"],
     keyEncoders: new Map(Object.entries(options.keyEncoders ?? {})),
     runPromiseExit,
     errors: rpcTreeErrors,
-  })
-  // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-  return tree as RpcQueryUtils<Group, Prefix, ClientError>
-}
+  });
+  // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
+  return tree as RpcQueryUtils<Group, Prefix, ClientError>;
+};

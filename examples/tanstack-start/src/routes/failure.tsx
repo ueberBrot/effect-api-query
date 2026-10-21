@@ -1,12 +1,12 @@
-import { useQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 
-import { EffectErrorDetails } from '../components/effect-error-details.tsx'
-import { PageLayout, Panel } from '../components/page-layout.tsx'
+import { EffectErrorDetails } from "../components/effect-error-details.tsx";
+import { PageLayout, Panel } from "../components/page-layout.tsx";
 
 const FailurePage = () => {
-  const { rpcQuery } = Route.useRouteContext()
-  const failure = useQuery(rpcQuery.diagnostics.fail.queryOptions())
+  const { rpcQuery } = Route.useRouteContext();
+  const failure = useQuery(rpcQuery.diagnostics.fail.queryOptions());
 
   return (
     <PageLayout
@@ -16,20 +16,27 @@ const FailurePage = () => {
       <div className="mt-8">
         <Panel title="Declared query failure">
           {failure.isPending ? (
-            <p className="mt-3 text-muted-foreground">Refetching in the browser…</p>
+            <p className="text-muted-foreground mt-3">
+              Refetching in the browser…
+            </p>
           ) : null}
           <EffectErrorDetails error={failure.error} />
         </Panel>
       </div>
     </PageLayout>
-  )
-}
+  );
+};
 
-export const Route = createFileRoute('/failure')({
+export const Route = createFileRoute("/failure")({
   component: FailurePage,
   loader: async ({ context }) => {
     try {
-      await context.queryClient.query(context.rpcQuery.diagnostics.fail.queryOptions())
-    } catch {}
+      await context.queryClient.query(
+        context.rpcQuery.diagnostics.fail.queryOptions()
+      );
+    } catch {
+      // oxlint-disable-next-line eslint/no-useless-return
+      return;
+    }
   },
-})
+});

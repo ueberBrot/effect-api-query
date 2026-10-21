@@ -1,12 +1,12 @@
-import { useQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 
-import { EffectErrorDetails } from '../components/effect-error-details.tsx'
-import { PageLayout, Panel } from '../components/page-layout.tsx'
+import { EffectErrorDetails } from "../components/effect-error-details.tsx";
+import { PageLayout, Panel } from "../components/page-layout.tsx";
 
 const HttpFailurePage = () => {
-  const { httpQuery } = Route.useRouteContext()
-  const failure = useQuery(httpQuery.diagnostics.fail.queryOptions())
+  const { httpQuery } = Route.useRouteContext();
+  const failure = useQuery(httpQuery.diagnostics.fail.queryOptions());
 
   return (
     <PageLayout
@@ -16,20 +16,27 @@ const HttpFailurePage = () => {
       <div className="mt-8">
         <Panel title="Declared HTTP query failure">
           {failure.isPending ? (
-            <p className="mt-3 text-muted-foreground">Refetching in the browser…</p>
+            <p className="text-muted-foreground mt-3">
+              Refetching in the browser…
+            </p>
           ) : null}
           <EffectErrorDetails error={failure.error} />
         </Panel>
       </div>
     </PageLayout>
-  )
-}
+  );
+};
 
-export const Route = createFileRoute('/http-failure')({
+export const Route = createFileRoute("/http-failure")({
   component: HttpFailurePage,
   loader: async ({ context }) => {
     try {
-      await context.queryClient.query(context.httpQuery.diagnostics.fail.queryOptions())
-    } catch {}
+      await context.queryClient.query(
+        context.httpQuery.diagnostics.fail.queryOptions()
+      );
+    } catch {
+      // oxlint-disable-next-line eslint/no-useless-return
+      return;
+    }
   },
-})
+});
