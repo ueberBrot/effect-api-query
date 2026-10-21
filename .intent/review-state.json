@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "c050ba08867c11a34783e8688917bbec489d444b14ce625eb81d93c8d6e33c1c",
+      "fingerprint": "262ed73e8c41bdaf5fbfa55b6f3c2d37f419312df5c80a3775d179342a0b7337",
       "snapshot": {
         "GLOSSARY.md": "30735ffbfe603da64cd31b83fa0b1640efff919be4393fe5cd035d2b49cc6e1c",
         "README.md": "25d40b1a9d2d33b786a1ba1ceb5689031333154d1c21e33b6d0f90f09cfde00a",
@@ -137,12 +137,11 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "580a97b76652156fd87be7934f7e658127776e5c36a7dcc3a364ec2892766d89",
+        "package.json": "4fed204dc27d1a02d57728d27e631883601546829daeaa9f8d7ba2fcd3172aaf",
         "pnpm-workspace.yaml": "06e5538204d1602f3926f4e0666e8331959bb51e75b6c6ce0be2e2f77d4a15a7",
-        "scripts/decode-utf8.mts": null,
         "scripts/measure-construction.mts": "1f73d4d82591b71ad86cf03f0d893206635efdbd04c2190f025d47a1b0cf0534",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
-        "scripts/verify-docs-examples.mts": null,
+        "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "cc740662ba686354299b173a1e0aad68ab506ccc471819fcb1aeadcff459bc09",
         "skills/effect-api-query/references/cache-workflows.md": "3bd54c87fb92af4c7e7f0e911b90c14e1812219f3f53185a316d1e6369798411",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "5b452d73bb4c3fe54b7b495c38feb88e90165022bfd123335b9ef88e6f21b8bc",
@@ -263,19 +262,24 @@
         "tests/types/stream-publication-contract.ts": "97e67ddd1d4610b1f64a06eb5da9981bf509df113be877a03191e120c774f96c",
         "tests/types/stream-recovery-contract.ts": "c14e32cd42ff046a50e65282afd97b63d6388fa7d61cafb39ed38eacd51efdaf",
         "tests/types/tanstack-start-contract.ts": "eb4d8ef40082bea5169107c78d19ab4f105cfdd1d09b3f8df46c013d1a20d14f",
-        "tests/types/type-scale.ts": "03bcc9eca13fb59054b8f047a70183cd33cdb9ba7acc73d6e8061c9eb271d546"
+        "tests/types/type-scale.ts": "03bcc9eca13fb59054b8f047a70183cd33cdb9ba7acc73d6e8061c9eb271d546",
+        "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "33df3355f25c2391b87ce80a60a8c34db84ed481",
-      "outcome": "updated",
-      "reason": "Existing HTTP, query-pattern, hydration, and framework references now explain buffered empty-success declarations, complete stream and recovery cleanup Causes, and selecting documentation for the installed package. The existing skill remains the owner of these developer tasks; client and runtime ownership remain application responsibilities.",
+      "head": "fbe75ad98978df3df1b34f19e3af1971309fcec8",
+      "outcome": "no-change",
+      "reason": "The manifest script and its new tested wrapper only prepare release metadata and revision-bound Intent records. Public source, declarations, shipped guidance, exports, dependencies and installation metadata are unchanged; the existing consumer tasks remain accurate.",
       "evidence": [
-        "Reviewed the actual origin/main..HEAD source, published declarations, examples, and affected references. The final runtime suite passes 708 tests; native TypeScript 7 and TypeScript 5.9 published fixtures pass, including empty HTTP successes.",
-        "A fresh isolated published consumer passes 35 runtime checks plus strict TypeScript 7 and 5.9 checks for NoContent and stream cleanup/recovery behavior. This exercises explicit skill use; automatic discovery remains unverified. Evidence: /tmp/effect-api-query-architecture-final-consumer-runtime.log, /tmp/effect-api-query-architecture-final-consumer-ts7.log, /tmp/effect-api-query-architecture-final-consumer-ts59.log.",
-        "Documentation checks pass all 20 excerpts with zero Astro diagnostics, all 57 pages build with valid internal links, and four Chromium cases verify the built version badge and metadata. The release resolver passes 76 behavior/wiring tests. Installed Intent structural validation and skills-check passed during the owned guidance updates."
+        "Original real 0.2.0 Changesets generation at 916478e: skills-check passes, then maintainer check --base main fails with 17 pending items (skill/planning manifest version, 14 consumed Changesets, changelog).",
+        "vp run test passes all 720 cases, including 12 native Changesets/Intent integration cases. The final test-helper edit also passes all 12 scoped cases and vp run typecheck.",
+        "Regression cases verify explicit main and default checks before/after committing generated records; dirty, mapped/unmapped source, skill, export and unexpected generated edits remain blocked.",
+        "vp run typecheck (including package ATTW/publint), vp run fallow, formatting, maintainer sync and skills-check pass. Both public compiler suites and server-local fixtures pass through the test task.",
+        "actionlint passes. Zizmor reports exactly the same six existing low self-repository advisories as origin/main. Standard yamllint diagnostics are pre-existing; repository-style relaxed YAML validation passes.",
+        "No shipped behavior or guidance changed, so no new consumer/discovery session was required. ADR 0016 exempts CI and internal tooling from Changesets.",
+        "A native 450-module source snapshot reproduces Intent 0.5.5 JSON truncation at exactly 65,536 bytes when piped. Direct-to-file report capture fixes that regression; the >64 KiB case and all other 11 release cases pass."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "fb2cee3967814d8f1b5bc528ddf22148e7302b6a15733fd394a8451539496880",
+      "fingerprint": "13d659a49f78e788c97b1a5a7048465f0db066d41bc19260a7794a3b52c398c3",
       "snapshot": {
         "GLOSSARY.md": "30735ffbfe603da64cd31b83fa0b1640efff919be4393fe5cd035d2b49cc6e1c",
         "README.md": "25d40b1a9d2d33b786a1ba1ceb5689031333154d1c21e33b6d0f90f09cfde00a",
@@ -412,12 +416,11 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "580a97b76652156fd87be7934f7e658127776e5c36a7dcc3a364ec2892766d89",
+        "package.json": "4fed204dc27d1a02d57728d27e631883601546829daeaa9f8d7ba2fcd3172aaf",
         "pnpm-workspace.yaml": "06e5538204d1602f3926f4e0666e8331959bb51e75b6c6ce0be2e2f77d4a15a7",
-        "scripts/decode-utf8.mts": null,
         "scripts/measure-construction.mts": "1f73d4d82591b71ad86cf03f0d893206635efdbd04c2190f025d47a1b0cf0534",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
-        "scripts/verify-docs-examples.mts": null,
+        "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "cc740662ba686354299b173a1e0aad68ab506ccc471819fcb1aeadcff459bc09",
         "skills/effect-api-query/references/cache-workflows.md": "3bd54c87fb92af4c7e7f0e911b90c14e1812219f3f53185a316d1e6369798411",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "5b452d73bb4c3fe54b7b495c38feb88e90165022bfd123335b9ef88e6f21b8bc",
@@ -538,14 +541,20 @@
         "tests/types/stream-publication-contract.ts": "97e67ddd1d4610b1f64a06eb5da9981bf509df113be877a03191e120c774f96c",
         "tests/types/stream-recovery-contract.ts": "c14e32cd42ff046a50e65282afd97b63d6388fa7d61cafb39ed38eacd51efdaf",
         "tests/types/tanstack-start-contract.ts": "eb4d8ef40082bea5169107c78d19ab4f105cfdd1d09b3f8df46c013d1a20d14f",
-        "tests/types/type-scale.ts": "03bcc9eca13fb59054b8f047a70183cd33cdb9ba7acc73d6e8061c9eb271d546"
+        "tests/types/type-scale.ts": "03bcc9eca13fb59054b8f047a70183cd33cdb9ba7acc73d6e8061c9eb271d546",
+        "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "33df3355f25c2391b87ce80a60a8c34db84ed481",
-      "outcome": "updated",
-      "reason": "Reconciled all three planning records with both architecture passes and released-documentation selection. The domain map includes matching documentation to the installed version; the existing one-skill/six-reference tree maps ADR 0030; the specification records the decisions, task checks, and explicit-consumer limitation without expanding the approved taxonomy.",
+      "head": "fbe75ad98978df3df1b34f19e3af1971309fcec8",
+      "outcome": "no-change",
+      "reason": "Reviewed _artifacts/domain_map.yaml, skill_spec.md and skill_tree.yaml against this release-tooling change. The same library task inventory, skill identity, six references, prerequisites and source mappings remain accurate; no planning or consumer guidance update is required.",
       "evidence": [
-        "Reviewed _artifacts/domain_map.yaml, _artifacts/skill_spec.md, and _artifacts/skill_tree.yaml against the existing skill and its six references. Prior scope, maintainer decisions, and future work are preserved.",
-        "Both architecture passes are complete; all grounded correctness fixes have separate patch changesets. Final checks: 708 runtime tests, both published compiler suites, 35 isolated consumer checks, docs checks/build, and 76 release-validator tests. No research reports or HTML artifacts were added."
+        "Original real 0.2.0 Changesets generation at 916478e: skills-check passes, then maintainer check --base main fails with 17 pending items (skill/planning manifest version, 14 consumed Changesets, changelog).",
+        "vp run test passes all 720 cases, including 12 native Changesets/Intent integration cases. The final test-helper edit also passes all 12 scoped cases and vp run typecheck.",
+        "Regression cases verify explicit main and default checks before/after committing generated records; dirty, mapped/unmapped source, skill, export and unexpected generated edits remain blocked.",
+        "vp run typecheck (including package ATTW/publint), vp run fallow, formatting, maintainer sync and skills-check pass. Both public compiler suites and server-local fixtures pass through the test task.",
+        "actionlint passes. Zizmor reports exactly the same six existing low self-repository advisories as origin/main. Standard yamllint diagnostics are pre-existing; repository-style relaxed YAML validation passes.",
+        "No shipped behavior or guidance changed, so no new consumer/discovery session was required. ADR 0016 exempts CI and internal tooling from Changesets.",
+        "A native 450-module source snapshot reproduces Intent 0.5.5 JSON truncation at exactly 65,536 bytes when piped. Direct-to-file report capture fixes that regression; the >64 KiB case and all other 11 release cases pass."
       ]
     },
     "source:vite.config.ts": {
@@ -564,17 +573,20 @@
       ]
     },
     "source:.github/workflows/release.yml": {
-      "fingerprint": "00a09d4358539079d049d432c423fcb91f3a69c2c2195cb1e8c6989cf7870cfb",
+      "fingerprint": "7aafbb8f75ce1e8e845f44791225e94340fff75d3c21b53506dcc2349b1076c0",
       "snapshot": {
-        ".github/workflows/release.yml": "09f8c2126971c5454d0eeb4970f25743b11f0cb55c610e3b4be92ccbc7d4763c"
+        ".github/workflows/release.yml": "3716d1051ee92aa79fc24720be1840a6c9e2bcffef9b52f0dfb7edbf5c5dbae4"
       },
-      "head": "33df3355f25c2391b87ce80a60a8c34db84ed481",
-      "outcome": "updated",
-      "reason": "The existing version-selection guidance and ADR 0030 now match automatic deployment after successful root publication, optional manual docs-only corrections for an exact released version, and a static built version badge/JSON marker. Applications can identify the documented package version without a live npm lookup.",
+      "head": "916478e6f0dc80b3f6bcfd3ab21a76f590feb87f",
+      "outcome": "no-change",
+      "reason": "Full checkout history makes the existing Intent review baseline available to Changesets version generation. Triggers, permissions, action pins, publication behavior and consumer guidance are unchanged.",
       "evidence": [
-        "Reviewed .github/workflows/release.yml with .github/workflows/release.yml, .github/workflows/deploy-docs.yml, scripts/resolve-docs-release.mts, the compatibility guide, and skills/effect-api-query/references/frameworks-and-hosts.md.",
-        "The resolver passes 76 tests, including publication gating, docs-only revisions, legacy-release refusal, and built metadata validation. Four Chromium cases pass for static version HTML, JSON metadata, navigation, and zero registry requests. Final docs checks/build pass.",
-        "Git/npm read-only smoke checks validate the existing release identity and expected legacy/current-main refusal. A live npm publication or Pages deployment was not performed."
+        "Original real 0.2.0 Changesets generation at 916478e: skills-check passes, then maintainer check --base main fails with 17 pending items (skill/planning manifest version, 14 consumed Changesets, changelog).",
+        "vp run test passes all 719 cases, including 11 native Changesets/Intent integration cases. The final test-helper edit also passes all 11 scoped cases and vp run typecheck.",
+        "Regression cases verify explicit main and default checks before/after committing generated records; dirty, mapped/unmapped source, skill, export and unexpected generated edits remain blocked.",
+        "vp run typecheck (including package ATTW/publint), vp run fallow, formatting, maintainer sync and skills-check pass. Both public compiler suites and server-local fixtures pass through the test task.",
+        "actionlint passes. Zizmor reports exactly the same six existing low self-repository advisories as origin/main. Standard yamllint diagnostics are pre-existing; repository-style relaxed YAML validation passes.",
+        "No shipped behavior or guidance changed, so no new consumer/discovery session was required. ADR 0016 exempts CI and internal tooling from Changesets."
       ]
     },
     "source:e2e/browser-test-config.ts": {
