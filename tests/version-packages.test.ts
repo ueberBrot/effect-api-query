@@ -237,6 +237,28 @@ describe("Changesets Intent review integration", () => {
     });
   }, 30_000);
 
+  it("records review reports larger than the CLI pipe buffer", () => {
+    withCheckout((cwd) => {
+      for (let index = 0; index < 450; index += 1) {
+        write(cwd, `src/value-${index}.ts`, "export const value = 1;\n");
+      }
+      commit(cwd);
+      intent(
+        cwd,
+        "review",
+        "--unchanged",
+        "The additional fixture modules export the same constant; guidance and planning still cover the fixture task."
+      );
+      run(cwd, "vp", ["fmt", ".intent/review-state.json"]);
+      commit(cwd);
+      run(cwd, "vp", ["run", "version-packages"]);
+      expect(intent(cwd, "check", "--base", "main")).toContain(
+        "0 pending review item(s)"
+      );
+      expect(intent(cwd, "check")).toContain("0 pending review item(s)");
+    });
+  }, 30_000);
+
   it.each([
     "package.json",
     "src/index.ts",

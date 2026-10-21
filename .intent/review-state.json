@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "1651b965b86ce7a4d82adbc4b337c980ca3ac9bc817292d494d6bb58b1e225c5",
+      "fingerprint": "262ed73e8c41bdaf5fbfa55b6f3c2d37f419312df5c80a3775d179342a0b7337",
       "snapshot": {
         "GLOSSARY.md": "30735ffbfe603da64cd31b83fa0b1640efff919be4393fe5cd035d2b49cc6e1c",
         "README.md": "25d40b1a9d2d33b786a1ba1ceb5689031333154d1c21e33b6d0f90f09cfde00a",
@@ -141,7 +141,7 @@
         "pnpm-workspace.yaml": "06e5538204d1602f3926f4e0666e8331959bb51e75b6c6ce0be2e2f77d4a15a7",
         "scripts/measure-construction.mts": "1f73d4d82591b71ad86cf03f0d893206635efdbd04c2190f025d47a1b0cf0534",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
-        "scripts/version-packages.mts": "80bf2f4da6ba38d9454ad8d0555f036436caa6c1833d2f520ffe9135d243edee",
+        "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "cc740662ba686354299b173a1e0aad68ab506ccc471819fcb1aeadcff459bc09",
         "skills/effect-api-query/references/cache-workflows.md": "3bd54c87fb92af4c7e7f0e911b90c14e1812219f3f53185a316d1e6369798411",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "5b452d73bb4c3fe54b7b495c38feb88e90165022bfd123335b9ef88e6f21b8bc",
@@ -263,22 +263,23 @@
         "tests/types/stream-recovery-contract.ts": "c14e32cd42ff046a50e65282afd97b63d6388fa7d61cafb39ed38eacd51efdaf",
         "tests/types/tanstack-start-contract.ts": "eb4d8ef40082bea5169107c78d19ab4f105cfdd1d09b3f8df46c013d1a20d14f",
         "tests/types/type-scale.ts": "03bcc9eca13fb59054b8f047a70183cd33cdb9ba7acc73d6e8061c9eb271d546",
-        "tests/version-packages.test.ts": "4782c416e09244a3eabfa166744e91dfe56fadaa7da0ec71a29ec7604957a982"
+        "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "916478e6f0dc80b3f6bcfd3ab21a76f590feb87f",
+      "head": "fbe75ad98978df3df1b34f19e3af1971309fcec8",
       "outcome": "no-change",
       "reason": "The manifest script and its new tested wrapper only prepare release metadata and revision-bound Intent records. Public source, declarations, shipped guidance, exports, dependencies and installation metadata are unchanged; the existing consumer tasks remain accurate.",
       "evidence": [
         "Original real 0.2.0 Changesets generation at 916478e: skills-check passes, then maintainer check --base main fails with 17 pending items (skill/planning manifest version, 14 consumed Changesets, changelog).",
-        "vp run test passes all 719 cases, including 11 native Changesets/Intent integration cases. The final test-helper edit also passes all 11 scoped cases and vp run typecheck.",
+        "vp run test passes all 720 cases, including 12 native Changesets/Intent integration cases. The final test-helper edit also passes all 12 scoped cases and vp run typecheck.",
         "Regression cases verify explicit main and default checks before/after committing generated records; dirty, mapped/unmapped source, skill, export and unexpected generated edits remain blocked.",
         "vp run typecheck (including package ATTW/publint), vp run fallow, formatting, maintainer sync and skills-check pass. Both public compiler suites and server-local fixtures pass through the test task.",
         "actionlint passes. Zizmor reports exactly the same six existing low self-repository advisories as origin/main. Standard yamllint diagnostics are pre-existing; repository-style relaxed YAML validation passes.",
-        "No shipped behavior or guidance changed, so no new consumer/discovery session was required. ADR 0016 exempts CI and internal tooling from Changesets."
+        "No shipped behavior or guidance changed, so no new consumer/discovery session was required. ADR 0016 exempts CI and internal tooling from Changesets.",
+        "A native 450-module source snapshot reproduces Intent 0.5.5 JSON truncation at exactly 65,536 bytes when piped. Direct-to-file report capture fixes that regression; the >64 KiB case and all other 11 release cases pass."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "ffb7384ae1739830bcf0d197ed91123a424fba8181ac50d13daf94649c01191a",
+      "fingerprint": "13d659a49f78e788c97b1a5a7048465f0db066d41bc19260a7794a3b52c398c3",
       "snapshot": {
         "GLOSSARY.md": "30735ffbfe603da64cd31b83fa0b1640efff919be4393fe5cd035d2b49cc6e1c",
         "README.md": "25d40b1a9d2d33b786a1ba1ceb5689031333154d1c21e33b6d0f90f09cfde00a",
@@ -419,7 +420,7 @@
         "pnpm-workspace.yaml": "06e5538204d1602f3926f4e0666e8331959bb51e75b6c6ce0be2e2f77d4a15a7",
         "scripts/measure-construction.mts": "1f73d4d82591b71ad86cf03f0d893206635efdbd04c2190f025d47a1b0cf0534",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
-        "scripts/version-packages.mts": "80bf2f4da6ba38d9454ad8d0555f036436caa6c1833d2f520ffe9135d243edee",
+        "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "cc740662ba686354299b173a1e0aad68ab506ccc471819fcb1aeadcff459bc09",
         "skills/effect-api-query/references/cache-workflows.md": "3bd54c87fb92af4c7e7f0e911b90c14e1812219f3f53185a316d1e6369798411",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "5b452d73bb4c3fe54b7b495c38feb88e90165022bfd123335b9ef88e6f21b8bc",
@@ -541,18 +542,19 @@
         "tests/types/stream-recovery-contract.ts": "c14e32cd42ff046a50e65282afd97b63d6388fa7d61cafb39ed38eacd51efdaf",
         "tests/types/tanstack-start-contract.ts": "eb4d8ef40082bea5169107c78d19ab4f105cfdd1d09b3f8df46c013d1a20d14f",
         "tests/types/type-scale.ts": "03bcc9eca13fb59054b8f047a70183cd33cdb9ba7acc73d6e8061c9eb271d546",
-        "tests/version-packages.test.ts": "4782c416e09244a3eabfa166744e91dfe56fadaa7da0ec71a29ec7604957a982"
+        "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "916478e6f0dc80b3f6bcfd3ab21a76f590feb87f",
+      "head": "fbe75ad98978df3df1b34f19e3af1971309fcec8",
       "outcome": "no-change",
       "reason": "Reviewed _artifacts/domain_map.yaml, skill_spec.md and skill_tree.yaml against this release-tooling change. The same library task inventory, skill identity, six references, prerequisites and source mappings remain accurate; no planning or consumer guidance update is required.",
       "evidence": [
         "Original real 0.2.0 Changesets generation at 916478e: skills-check passes, then maintainer check --base main fails with 17 pending items (skill/planning manifest version, 14 consumed Changesets, changelog).",
-        "vp run test passes all 719 cases, including 11 native Changesets/Intent integration cases. The final test-helper edit also passes all 11 scoped cases and vp run typecheck.",
+        "vp run test passes all 720 cases, including 12 native Changesets/Intent integration cases. The final test-helper edit also passes all 12 scoped cases and vp run typecheck.",
         "Regression cases verify explicit main and default checks before/after committing generated records; dirty, mapped/unmapped source, skill, export and unexpected generated edits remain blocked.",
         "vp run typecheck (including package ATTW/publint), vp run fallow, formatting, maintainer sync and skills-check pass. Both public compiler suites and server-local fixtures pass through the test task.",
         "actionlint passes. Zizmor reports exactly the same six existing low self-repository advisories as origin/main. Standard yamllint diagnostics are pre-existing; repository-style relaxed YAML validation passes.",
-        "No shipped behavior or guidance changed, so no new consumer/discovery session was required. ADR 0016 exempts CI and internal tooling from Changesets."
+        "No shipped behavior or guidance changed, so no new consumer/discovery session was required. ADR 0016 exempts CI and internal tooling from Changesets.",
+        "A native 450-module source snapshot reproduces Intent 0.5.5 JSON truncation at exactly 65,536 bytes when piped. Direct-to-file report capture fixes that regression; the >64 KiB case and all other 11 release cases pass."
       ]
     },
     "source:vite.config.ts": {
