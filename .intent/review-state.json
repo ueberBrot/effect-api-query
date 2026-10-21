@@ -549,15 +549,18 @@
       ]
     },
     "source:vite.config.ts": {
-      "fingerprint": "889232e3d1ba7714c809d64fd1b20ffc3fe4b733a013b60a84e587b1e5594cf9",
+      "fingerprint": "73d198871599edccca6fe1fff6685454d5b0e3846dfb3d88b8a0e17367208ac9",
       "snapshot": {
-        "vite.config.ts": "f3896627254f20c12df0e967e5fd993332813d561561a1d5d999126d653e7f27"
+        "vite.config.ts": "bcf17b98bf2011d06c4303e2f43668ea4d9e6cf9d0edd1236938e18160ecfe6e"
       },
-      "head": "33df3355f25c2391b87ce80a60a8c34db84ed481",
+      "head": "df005b417542736a2059da76aef5d18621398549",
       "outcome": "no-change",
-      "reason": "The added exception permits native JSON type guards only in the release resolver, which runs before dependency installation. Existing Ultracite presets, library import grouping, and justified Effect/type-boundary exceptions remain in effect. No new consumer guidance is needed.",
+      "reason": "Generate Astro ambient modules before root typed linting. This changes only repository task prerequisites and preserves the current docs lint coverage; public APIs and shipped consumer guidance are unchanged.",
       "evidence": [
-        "Reviewed the exact scripts/resolve-docs-release.mts anti-slop/no-runtime-typeof override and its dependency-free JSON validation. Full typed lint passes 170 files; formatting and Fallow checks pass."
+        "With apps/docs/.astro temporarily absent, vp run --no-cache typecheck reproduced TS2307 for astro:content before the fix and passed after adding docs-sync as a prerequisite.",
+        "vp run typecheck passed with generated outputs absent and caching enabled; docs-sync regenerated the missing outputs.",
+        "vp run --no-cache docs-check passed all 20 documentation example tests and Astro diagnostics with zero errors or warnings.",
+        "vp run format and git diff --check passed."
       ]
     },
     "source:.github/workflows/release.yml": {

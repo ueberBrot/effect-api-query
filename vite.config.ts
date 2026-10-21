@@ -336,7 +336,7 @@ export default defineConfig({
     tasks: {
       check: {
         command: "vp check",
-        dependsOn: ["pack"],
+        dependsOn: ["pack", "docs-sync"],
         cache: {
           output: [],
         },
@@ -349,14 +349,14 @@ export default defineConfig({
       },
       lint: {
         command: "vp lint",
-        dependsOn: ["pack"],
+        dependsOn: ["pack", "docs-sync"],
         cache: {
           output: [],
         },
       },
       typecheck: {
         command: "vp check --no-fmt",
-        dependsOn: ["pack"],
+        dependsOn: ["pack", "docs-sync"],
         cache: {
           output: [],
         },
@@ -484,6 +484,13 @@ export default defineConfig({
       docs: {
         command: "vp run --filter @effect-api-query/docs dev",
         cache: false,
+      },
+      "docs-sync": {
+        // Root typed linting includes docs files that import Astro's generated modules.
+        command: "vp -C apps/docs exec astro sync",
+        cache: {
+          output: ["apps/docs/.astro/**"],
+        },
       },
       "docs-build": {
         command: "vp run --filter @effect-api-query/docs build",
