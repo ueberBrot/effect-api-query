@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "262ed73e8c41bdaf5fbfa55b6f3c2d37f419312df5c80a3775d179342a0b7337",
+      "fingerprint": "26fdd38e6b654d0e38a8d43986674369bfe9bcb55752c2d51feafaac4d7a1fc7",
       "snapshot": {
         "GLOSSARY.md": "30735ffbfe603da64cd31b83fa0b1640efff919be4393fe5cd035d2b49cc6e1c",
         "README.md": "25d40b1a9d2d33b786a1ba1ceb5689031333154d1c21e33b6d0f90f09cfde00a",
@@ -137,7 +137,7 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "4fed204dc27d1a02d57728d27e631883601546829daeaa9f8d7ba2fcd3172aaf",
+        "package.json": "906236a6a7120b022a554d3fcc4917d9a71707818da66f3a9a04d69bbb6faf67",
         "pnpm-workspace.yaml": "06e5538204d1602f3926f4e0666e8331959bb51e75b6c6ce0be2e2f77d4a15a7",
         "scripts/measure-construction.mts": "1f73d4d82591b71ad86cf03f0d893206635efdbd04c2190f025d47a1b0cf0534",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
@@ -265,21 +265,18 @@
         "tests/types/type-scale.ts": "03bcc9eca13fb59054b8f047a70183cd33cdb9ba7acc73d6e8061c9eb271d546",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "fbe75ad98978df3df1b34f19e3af1971309fcec8",
+      "head": "a166d173a089fb2fed304093dc22adc0a0c228f8",
       "outcome": "no-change",
-      "reason": "The manifest script and its new tested wrapper only prepare release metadata and revision-bound Intent records. Public source, declarations, shipped guidance, exports, dependencies and installation metadata are unchanged; the existing consumer tasks remain accurate.",
+      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
       "evidence": [
-        "Original real 0.2.0 Changesets generation at 916478e: skills-check passes, then maintainer check --base main fails with 17 pending items (skill/planning manifest version, 14 consumed Changesets, changelog).",
-        "vp run test passes all 720 cases, including 12 native Changesets/Intent integration cases. The final test-helper edit also passes all 12 scoped cases and vp run typecheck.",
-        "Regression cases verify explicit main and default checks before/after committing generated records; dirty, mapped/unmapped source, skill, export and unexpected generated edits remain blocked.",
-        "vp run typecheck (including package ATTW/publint), vp run fallow, formatting, maintainer sync and skills-check pass. Both public compiler suites and server-local fixtures pass through the test task.",
-        "actionlint passes. Zizmor reports exactly the same six existing low self-repository advisories as origin/main. Standard yamllint diagnostics are pre-existing; repository-style relaxed YAML validation passes.",
-        "No shipped behavior or guidance changed, so no new consumer/discovery session was required. ADR 0016 exempts CI and internal tooling from Changesets.",
-        "A native 450-module source snapshot reproduces Intent 0.5.5 JSON truncation at exactly 65,536 bytes when piped. Direct-to-file report capture fixes that regression; the >64 KiB case and all other 11 release cases pass."
+        "Before versioning: intent maintainer check passed at a166d173a089fb2fed304093dc22adc0a0c228f8.",
+        "changeset version and vp fmt generated 0.1.0 -> 0.2.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: package.json."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "13d659a49f78e788c97b1a5a7048465f0db066d41bc19260a7794a3b52c398c3",
+      "fingerprint": "29ad46da94a2998dce797658ea5d9ab890f3002c23a52109058584208b1719f4",
       "snapshot": {
         "GLOSSARY.md": "30735ffbfe603da64cd31b83fa0b1640efff919be4393fe5cd035d2b49cc6e1c",
         "README.md": "25d40b1a9d2d33b786a1ba1ceb5689031333154d1c21e33b6d0f90f09cfde00a",
@@ -416,7 +413,7 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "4fed204dc27d1a02d57728d27e631883601546829daeaa9f8d7ba2fcd3172aaf",
+        "package.json": "906236a6a7120b022a554d3fcc4917d9a71707818da66f3a9a04d69bbb6faf67",
         "pnpm-workspace.yaml": "06e5538204d1602f3926f4e0666e8331959bb51e75b6c6ce0be2e2f77d4a15a7",
         "scripts/measure-construction.mts": "1f73d4d82591b71ad86cf03f0d893206635efdbd04c2190f025d47a1b0cf0534",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
@@ -544,17 +541,14 @@
         "tests/types/type-scale.ts": "03bcc9eca13fb59054b8f047a70183cd33cdb9ba7acc73d6e8061c9eb271d546",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "fbe75ad98978df3df1b34f19e3af1971309fcec8",
+      "head": "a166d173a089fb2fed304093dc22adc0a0c228f8",
       "outcome": "no-change",
-      "reason": "Reviewed _artifacts/domain_map.yaml, skill_spec.md and skill_tree.yaml against this release-tooling change. The same library task inventory, skill identity, six references, prerequisites and source mappings remain accurate; no planning or consumer guidance update is required.",
+      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
       "evidence": [
-        "Original real 0.2.0 Changesets generation at 916478e: skills-check passes, then maintainer check --base main fails with 17 pending items (skill/planning manifest version, 14 consumed Changesets, changelog).",
-        "vp run test passes all 720 cases, including 12 native Changesets/Intent integration cases. The final test-helper edit also passes all 12 scoped cases and vp run typecheck.",
-        "Regression cases verify explicit main and default checks before/after committing generated records; dirty, mapped/unmapped source, skill, export and unexpected generated edits remain blocked.",
-        "vp run typecheck (including package ATTW/publint), vp run fallow, formatting, maintainer sync and skills-check pass. Both public compiler suites and server-local fixtures pass through the test task.",
-        "actionlint passes. Zizmor reports exactly the same six existing low self-repository advisories as origin/main. Standard yamllint diagnostics are pre-existing; repository-style relaxed YAML validation passes.",
-        "No shipped behavior or guidance changed, so no new consumer/discovery session was required. ADR 0016 exempts CI and internal tooling from Changesets.",
-        "A native 450-module source snapshot reproduces Intent 0.5.5 JSON truncation at exactly 65,536 bytes when piped. Direct-to-file report capture fixes that regression; the >64 KiB case and all other 11 release cases pass."
+        "Before versioning: intent maintainer check passed at a166d173a089fb2fed304093dc22adc0a0c228f8.",
+        "changeset version and vp fmt generated 0.1.0 -> 0.2.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: package.json."
       ]
     },
     "source:vite.config.ts": {
@@ -1640,21 +1634,18 @@
       ]
     },
     "source:CHANGELOG.md": {
-      "fingerprint": "678cc226c8e1b6b1a78f9b2f21dc2912d3e3cf3485c572e7dbfc46ab490fda25",
+      "fingerprint": "dc8c3be84b4e2ce5c4749e4530db6048f6a62e86eda80c1965ff219b846c7947",
       "snapshot": {
-        "CHANGELOG.md": "422bc4a05a60a4c9075e6f4b0a43af59d3e037a02ae97f11bf9c129ae6384dc1"
+        "CHANGELOG.md": "0c065f65c8c38fb238f7533553b12b7d4829fc2518982cece916d1262384096d"
       },
-      "head": "c2982f3ade1140f82940a97685ca44b21fb65879",
+      "head": "a166d173a089fb2fed304093dc22adc0a0c228f8",
       "outcome": "no-change",
-      "reason": "Native Changesets output summarizes existing query, mutation, streaming, metadata, policy, filter and SSR capabilities. Source-grounded independent review confirmed each claim. It introduces no new behavior or guidance requirement.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "CHANGELOG.md: three flat bullets, first begins Initial release; no author mentions or thanks.",
-        ".changeset/config.json already sets disableThanks:true; installed GitHub changelog plugin verified to suppress automatic author mentions.",
-        "vp run --no-cache format passed; git diff --check passed.",
-        "vp run --no-cache pack passed ATTW and publint.",
-        "Final 14-file native pnpm tarball verified: README, LICENSE, CHANGELOG and seven skill files match source; all 16 relative skill links resolve.",
-        "Tarball dist and all other non-manifest preexisting files are byte-identical to the previously tested 13-file release archive; isolated consumer compiler and runtime checks from that archive remain applicable.",
-        "Final archive SHA256: 4dace3d66666e3bd92cbb97bd477204632efae205f1842774d24c3c0ce860e29"
+        "Before versioning: intent maintainer check passed at a166d173a089fb2fed304093dc22adc0a0c228f8.",
+        "changeset version and vp fmt generated 0.1.0 -> 0.2.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: CHANGELOG.md."
       ]
     },
     "source:examples/tanstack-start/src/components/conditional-user-query.tsx": {
@@ -1682,132 +1673,153 @@
       ]
     },
     "source:.changeset/01-http-metadata-race.md": {
-      "fingerprint": "d0ee45f7bf15bd0a6dbf93eb0e11678a1663881cd05c1eee6b66dacbb7492437",
+      "fingerprint": "74424b8828fd8e0959b25649c39bacf3f684319428e80d51f8b9d5b252600bc2",
       "snapshot": {
-        ".changeset/01-http-metadata-race.md": "a1ce499b72e56cccbcefc1686927f52093ac997fae4adce5284d687fd2a53842"
+        ".changeset/01-http-metadata-race.md": null
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
-      "outcome": "updated",
-      "reason": "Fetched metadata retains sharing and freezing across rebuilt options and intercepted results. The HTTP metadata guide and shipped HTTP reference describe the fetched-snapshot contract.",
+      "head": "a166d173a089fb2fed304093dc22adc0a0c228f8",
+      "outcome": "no-change",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/01-http-metadata-race.md; README, affected guides and skills/effect-api-query/references were compared with the implemented contract.",
-        "Final package build, ATTW and publint pass; public fixtures pass native TypeScript 7 and TypeScript 5.9; 599 runtime cases pass."
+        "Before versioning: intent maintainer check passed at a166d173a089fb2fed304093dc22adc0a0c228f8.",
+        "changeset version and vp fmt generated 0.1.0 -> 0.2.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/01-http-metadata-race.md."
       ]
     },
     "source:.changeset/02-typed-partial-filters.md": {
-      "fingerprint": "a8154e8eebe05486163a5193e5e801ceb440cd5775e452bd449cafdcceb583a2",
+      "fingerprint": "0cd8335f906a15d1e1f125f4e28f0d8b9d35432abdce36a8a3be31b9959aae40",
       "snapshot": {
-        ".changeset/02-typed-partial-filters.md": "8840b905b98cde261492cec0cbe25dafb5126753500cafc1950041b8c26bd811"
+        ".changeset/02-typed-partial-filters.md": null
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
-      "outcome": "updated",
-      "reason": "The cache-filter guide and shipped cache workflows now cover typed partial projections and required ordinary filter keys without promising homogeneous bulk results.",
+      "head": "a166d173a089fb2fed304093dc22adc0a0c228f8",
+      "outcome": "no-change",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/02-typed-partial-filters.md; README, affected guides and skills/effect-api-query/references were compared with the implemented contract.",
-        "Final package build, ATTW and publint pass; public fixtures pass native TypeScript 7 and TypeScript 5.9; 599 runtime cases pass."
+        "Before versioning: intent maintainer check passed at a166d173a089fb2fed304093dc22adc0a0c228f8.",
+        "changeset version and vp fmt generated 0.1.0 -> 0.2.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/02-typed-partial-filters.md."
       ]
     },
     "source:.changeset/03-policy-composition.md": {
-      "fingerprint": "0a26e34bfc0cfe2901c6094272f3eceedac7d3301b40a97582eb4e8fb02a9f17",
+      "fingerprint": "dfc5681e8d64e3b0a043884009662e70c29a84ce1f91abb8a91b8c6f5a493f58",
       "snapshot": {
-        ".changeset/03-policy-composition.md": "2291024ab62ca96f8c49eafd3cd48800e78e15791b7ef2e2bb0cf36e397a7e2e"
+        ".changeset/03-policy-composition.md": null
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
-      "outcome": "updated",
-      "reason": "The policy guide and shipped cache workflows cover opt-in awaited callback composition and query/mutation interception, including optional direct-call mutation context.",
+      "head": "a166d173a089fb2fed304093dc22adc0a0c228f8",
+      "outcome": "no-change",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/03-policy-composition.md; README, affected guides and skills/effect-api-query/references were compared with the implemented contract.",
-        "Final package build, ATTW and publint pass; public fixtures pass native TypeScript 7 and TypeScript 5.9; 599 runtime cases pass."
+        "Before versioning: intent maintainer check passed at a166d173a089fb2fed304093dc22adc0a0c228f8.",
+        "changeset version and vp fmt generated 0.1.0 -> 0.2.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/03-policy-composition.md."
       ]
     },
     "source:.changeset/04-stream-publication.md": {
-      "fingerprint": "f9226be0d789cf814f39a3bdb9b15765d829cae53a0f4d462d063ce89ee427dc",
+      "fingerprint": "07bcea6b7c8d91efa4e05bdf6c53db417f24126b3237aee08ef7aaa4194407ed",
       "snapshot": {
-        ".changeset/04-stream-publication.md": "7554bcf8b5327650d7bc9c5035521df80dd33d4ab343ee0b6216c0cc9d0dc1f1"
+        ".changeset/04-stream-publication.md": null
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
-      "outcome": "updated",
-      "reason": "Streaming guidance covers ordered count-based publication, immediate first values, tail flushing, cancellation, and indefinite latency below the configured count.",
+      "head": "a166d173a089fb2fed304093dc22adc0a0c228f8",
+      "outcome": "no-change",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/04-stream-publication.md; README, affected guides and skills/effect-api-query/references were compared with the implemented contract.",
-        "Final package build, ATTW and publint pass; public fixtures pass native TypeScript 7 and TypeScript 5.9; 599 runtime cases pass."
+        "Before versioning: intent maintainer check passed at a166d173a089fb2fed304093dc22adc0a0c228f8.",
+        "changeset version and vp fmt generated 0.1.0 -> 0.2.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/04-stream-publication.md."
       ]
     },
     "source:.changeset/05-stream-hash-index.md": {
-      "fingerprint": "6f5edb235c61d9b45916799f6421a22327d01f343c201b7bac243303751c44ff",
+      "fingerprint": "2bccc927e329843e3c5429586236c49e52707149b6c4160ce74762cc6f20a960",
       "snapshot": {
-        ".changeset/05-stream-hash-index.md": "d7b0af8fcc4c8e5174f11799e7be252f44de0002e5cc4548e891f933a116c737"
+        ".changeset/05-stream-hash-index.md": null
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "head": "a166d173a089fb2fed304093dc22adc0a0c228f8",
       "outcome": "no-change",
-      "reason": "The cache index preserves the existing stable-hash and collision-rejection contract. Native Query lookup and application resource ownership remain unchanged; implementation indexing needs no additional consumer instructions.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/05-stream-hash-index.md; README, affected guides and skills/effect-api-query/references were compared with the implemented contract.",
-        "Final package build, ATTW and publint pass; public fixtures pass native TypeScript 7 and TypeScript 5.9; 599 runtime cases pass."
+        "Before versioning: intent maintainer check passed at a166d173a089fb2fed304093dc22adc0a0c228f8.",
+        "changeset version and vp fmt generated 0.1.0 -> 0.2.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/05-stream-hash-index.md."
       ]
     },
     "source:.changeset/06-typed-hydration-codecs.md": {
-      "fingerprint": "89116e2476c88dcf783f13aace01ce81efef3869468b7436adf82c0c0bc7ffb4",
+      "fingerprint": "776613893ac75527ccb3533bc8fc78ba8d4afbf8785559ba2c695e156ac612f7",
       "snapshot": {
-        ".changeset/06-typed-hydration-codecs.md": "329b2c0689171c8cf2a8b926cc6688722dd2d06a4d38dd1d1ac8875056fde9ea"
+        ".changeset/06-typed-hydration-codecs.md": null
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
-      "outcome": "updated",
-      "reason": "Hydration guides and the shipped hydration reference cover leaf/view registration, explicit infinite page parameters, codec services, complete batch preparation, and application-owned serialization and hydration.",
+      "head": "a166d173a089fb2fed304093dc22adc0a0c228f8",
+      "outcome": "no-change",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/06-typed-hydration-codecs.md; README, affected guides and skills/effect-api-query/references were compared with the implemented contract.",
-        "Final package build, ATTW and publint pass; public fixtures pass native TypeScript 7 and TypeScript 5.9; 599 runtime cases pass."
+        "Before versioning: intent maintainer check passed at a166d173a089fb2fed304093dc22adc0a0c228f8.",
+        "changeset version and vp fmt generated 0.1.0 -> 0.2.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/06-typed-hydration-codecs.md."
       ]
     },
     "source:.changeset/07-reuse-contract-analysis.md": {
-      "fingerprint": "a7cfa4e6eb6921a59287110ad4837226157e340b8814c8c4b0af9fa6948ea9b9",
+      "fingerprint": "7a8c55216581a86c739017ebe1da919a5d5456780873b267125383060707dd7d",
       "snapshot": {
-        ".changeset/07-reuse-contract-analysis.md": "b4949a33c37abecf0116fd3595cd89a83abbe2119425de1df44fbb784542ce77"
+        ".changeset/07-reuse-contract-analysis.md": null
       },
-      "head": "33df3355f25c2391b87ce80a60a8c34db84ed481",
+      "head": "a166d173a089fb2fed304093dc22adc0a0c228f8",
       "outcome": "no-change",
-      "reason": "This release note describes the corresponding implemented contract-analysis or correctness fix. The existing HTTP and stream guidance already covers the resulting behavior; the changeset does not introduce a separate developer task or require another skill.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Reviewed .changeset/07-reuse-contract-analysis.md against its source fix, regression coverage, and the affected HTTP/query-pattern references. Final runtime and public compiler suites pass."
+        "Before versioning: intent maintainer check passed at a166d173a089fb2fed304093dc22adc0a0c228f8.",
+        "changeset version and vp fmt generated 0.1.0 -> 0.2.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/07-reuse-contract-analysis.md."
       ]
     },
     "source:.changeset/08-stream-recovery.md": {
-      "fingerprint": "8998b1e5898549adcf671dd2a2d921ee6233f2bcfc0f37d07224283dbe16ac43",
+      "fingerprint": "9483d54ff0a4f96028ad8b525ca8fd27040a2a17c28134c7ac2d9230d680e94b",
       "snapshot": {
-        ".changeset/08-stream-recovery.md": "a1541377a31d0858a0bf32328b1c7fec16b99ba5962255a7240ea37d0903edb5"
+        ".changeset/08-stream-recovery.md": null
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
-      "outcome": "updated",
-      "reason": "The reconnect guide and shipped query patterns cover numeric cursors, duplicate suppression, cancellable delays, replay/gap hooks, and application-owned recovery protocol and lifetime.",
+      "head": "a166d173a089fb2fed304093dc22adc0a0c228f8",
+      "outcome": "no-change",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/08-stream-recovery.md; README, affected guides and skills/effect-api-query/references were compared with the implemented contract.",
-        "Final package build, ATTW and publint pass; public fixtures pass native TypeScript 7 and TypeScript 5.9; 599 runtime cases pass."
+        "Before versioning: intent maintainer check passed at a166d173a089fb2fed304093dc22adc0a0c228f8.",
+        "changeset version and vp fmt generated 0.1.0 -> 0.2.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/08-stream-recovery.md."
       ]
     },
     "source:.changeset/09-stream-cleanup-contract.md": {
-      "fingerprint": "08100c9213b7a51f26898d334546bdda8d55b8936257e6d402a76065a0a8a6e4",
+      "fingerprint": "bbf5dd9e9aebe9878279bfecd91336162ed897d2f941f2b86617ce1e3ab354b8",
       "snapshot": {
-        ".changeset/09-stream-cleanup-contract.md": "a8cad6e2ce6c4540cd8780f5b173e7727c22b0e064176f407b38cfc5d2f2679c"
+        ".changeset/09-stream-cleanup-contract.md": null
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
-      "outcome": "updated",
-      "reason": "Cancellation and streaming guidance now state that native replacement may overlap an old asynchronous finalizer and explain application coordination for exclusive resources.",
+      "head": "a166d173a089fb2fed304093dc22adc0a0c228f8",
+      "outcome": "no-change",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/09-stream-cleanup-contract.md; README, affected guides and skills/effect-api-query/references were compared with the implemented contract.",
-        "Final package build, ATTW and publint pass; public fixtures pass native TypeScript 7 and TypeScript 5.9; 599 runtime cases pass."
+        "Before versioning: intent maintainer check passed at a166d173a089fb2fed304093dc22adc0a0c228f8.",
+        "changeset version and vp fmt generated 0.1.0 -> 0.2.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/09-stream-cleanup-contract.md."
       ]
     },
     "source:.changeset/runtime-dependencies-2026-10.md": {
-      "fingerprint": "6e76b1921245b0a01e7b31dab2a8c6fce4ace9708ecba864f851be1625d37b9d",
+      "fingerprint": "e703a71ad20d66f517b6f0de0e50f8a724b9610d5df145efc15dac21ea7f1dac",
       "snapshot": {
-        ".changeset/runtime-dependencies-2026-10.md": "d331e53e5300c6955bc97e75974713483883197de83f514e5346ae159d5044f0"
+        ".changeset/runtime-dependencies-2026-10.md": null
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
-      "outcome": "updated",
-      "reason": "The runtime update has its own minor changeset. The entry skill and compatibility guidance identify the coordinated Effect set and supported Query peer range; the release note stays concise.",
+      "head": "a166d173a089fb2fed304093dc22adc0a0c228f8",
+      "outcome": "no-change",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/runtime-dependencies-2026-10.md; package.json; pnpm-workspace.yaml; skills/effect-api-query/SKILL.md; getting-started/compatibility-and-stability.md.",
-        "Final package build, ATTW and publint pass; public fixtures pass native TypeScript 7 and TypeScript 5.9; 599 runtime cases pass. Frozen installation and peer validation passed without changing the seven-day release quarantine."
+        "Before versioning: intent maintainer check passed at a166d173a089fb2fed304093dc22adc0a0c228f8.",
+        "changeset version and vp fmt generated 0.1.0 -> 0.2.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/runtime-dependencies-2026-10.md."
       ]
     },
     "source:apps/docs/src/content.config.ts": {
@@ -1979,51 +1991,63 @@
       ]
     },
     "source:.changeset/http-empty-success.md": {
-      "fingerprint": "048565397675f92489e1d7fbd442af6f70a4bf6ac57a7c1b9ddaa57bab8f8086",
+      "fingerprint": "927a06643809a03be6d8888e177a0376fe86339d11c5c897c58f073755c4b8e5",
       "snapshot": {
-        ".changeset/http-empty-success.md": "5539ee40f3886ca728253b5422e54bd8f16e9ca62c2a6688a962214172074ebb"
+        ".changeset/http-empty-success.md": null
       },
-      "head": "33df3355f25c2391b87ce80a60a8c34db84ed481",
+      "head": "a166d173a089fb2fed304093dc22adc0a0c228f8",
       "outcome": "no-change",
-      "reason": "This release note describes the corresponding implemented contract-analysis or correctness fix. The existing HTTP and stream guidance already covers the resulting behavior; the changeset does not introduce a separate developer task or require another skill.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Reviewed .changeset/http-empty-success.md against its source fix, regression coverage, and the affected HTTP/query-pattern references. Final runtime and public compiler suites pass."
+        "Before versioning: intent maintainer check passed at a166d173a089fb2fed304093dc22adc0a0c228f8.",
+        "changeset version and vp fmt generated 0.1.0 -> 0.2.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/http-empty-success.md."
       ]
     },
     "source:.changeset/stream-finalizer-causes.md": {
-      "fingerprint": "9d8cd3e71775050d061ac84c93549dc9a9323a6e0524f61452f39cb1ec1529d0",
+      "fingerprint": "e34cf5674b86939beab2f8b3974722006e122c6dcf1df969a7a284b151139735",
       "snapshot": {
-        ".changeset/stream-finalizer-causes.md": "5eb1dd1f3014027ccfbc444250f95e81172bd45e3e272f484282dc2963d71b84"
+        ".changeset/stream-finalizer-causes.md": null
       },
-      "head": "33df3355f25c2391b87ce80a60a8c34db84ed481",
+      "head": "a166d173a089fb2fed304093dc22adc0a0c228f8",
       "outcome": "no-change",
-      "reason": "This release note describes the corresponding implemented contract-analysis or correctness fix. The existing HTTP and stream guidance already covers the resulting behavior; the changeset does not introduce a separate developer task or require another skill.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Reviewed .changeset/stream-finalizer-causes.md against its source fix, regression coverage, and the affected HTTP/query-pattern references. Final runtime and public compiler suites pass."
+        "Before versioning: intent maintainer check passed at a166d173a089fb2fed304093dc22adc0a0c228f8.",
+        "changeset version and vp fmt generated 0.1.0 -> 0.2.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/stream-finalizer-causes.md."
       ]
     },
     "source:.changeset/stream-pending-pull-causes.md": {
-      "fingerprint": "7e78bb4a660fcd7a28c238bd94423a5bf84917c1a427c48725a088b0c1fa2ae2",
+      "fingerprint": "11f2f7990841533f622420d2c88fcc6b3a030c5b7edd31299422a07754dc46e2",
       "snapshot": {
-        ".changeset/stream-pending-pull-causes.md": "7a18d1ae2923efed3a5b0eaed182e23d8b66f36bf203c7d5674fba997f7c59b7"
+        ".changeset/stream-pending-pull-causes.md": null
       },
-      "head": "33df3355f25c2391b87ce80a60a8c34db84ed481",
+      "head": "a166d173a089fb2fed304093dc22adc0a0c228f8",
       "outcome": "no-change",
-      "reason": "This release note describes the corresponding implemented contract-analysis or correctness fix. The existing HTTP and stream guidance already covers the resulting behavior; the changeset does not introduce a separate developer task or require another skill.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Reviewed .changeset/stream-pending-pull-causes.md against its source fix, regression coverage, and the affected HTTP/query-pattern references. Final runtime and public compiler suites pass."
+        "Before versioning: intent maintainer check passed at a166d173a089fb2fed304093dc22adc0a0c228f8.",
+        "changeset version and vp fmt generated 0.1.0 -> 0.2.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/stream-pending-pull-causes.md."
       ]
     },
     "source:.changeset/stream-recovery-cleanup-causes.md": {
-      "fingerprint": "d544a4e5e75e2693271ce2210e218284256d30d05df6e071d02995c91dee03bc",
+      "fingerprint": "15fc0f51f75ca475a8de533fda2978688bad7b2943c7fa13cb90d276907f0e73",
       "snapshot": {
-        ".changeset/stream-recovery-cleanup-causes.md": "d9942e53f58f7e02cdc615d8e09f07f5dc67522e5b62cf5b69c9e100edc0c9c4"
+        ".changeset/stream-recovery-cleanup-causes.md": null
       },
-      "head": "33df3355f25c2391b87ce80a60a8c34db84ed481",
+      "head": "a166d173a089fb2fed304093dc22adc0a0c228f8",
       "outcome": "no-change",
-      "reason": "This release note describes the corresponding implemented contract-analysis or correctness fix. The existing HTTP and stream guidance already covers the resulting behavior; the changeset does not introduce a separate developer task or require another skill.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Reviewed .changeset/stream-recovery-cleanup-causes.md against its source fix, regression coverage, and the affected HTTP/query-pattern references. Final runtime and public compiler suites pass."
+        "Before versioning: intent maintainer check passed at a166d173a089fb2fed304093dc22adc0a0c228f8.",
+        "changeset version and vp fmt generated 0.1.0 -> 0.2.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/stream-recovery-cleanup-causes.md."
       ]
     },
     "source:apps/docs/src/pages/package-version.json.ts": {
