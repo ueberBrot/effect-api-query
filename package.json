@@ -51,7 +51,7 @@
   "scripts": {
     "changeset": "changeset",
     "prepare": "vp config --no-agent && effect-tsgo patch --typescript --oxlint",
-    "version-packages": "changeset version && vp fmt"
+    "version-packages": "node scripts/version-packages.mts"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "0.18.5",
