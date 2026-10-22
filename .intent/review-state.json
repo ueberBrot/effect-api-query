@@ -3,10 +3,10 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "26fdd38e6b654d0e38a8d43986674369bfe9bcb55752c2d51feafaac4d7a1fc7",
+      "fingerprint": "8f44cf9cab7778487d295cb26fe107235c6c8817dac29d413ab1224e521942f5",
       "snapshot": {
         "GLOSSARY.md": "30735ffbfe603da64cd31b83fa0b1640efff919be4393fe5cd035d2b49cc6e1c",
-        "README.md": "25d40b1a9d2d33b786a1ba1ceb5689031333154d1c21e33b6d0f90f09cfde00a",
+        "README.md": "f774436da37f70ebd8603661b3e90f6f4492d17a788fa15704ad61239891c660",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "bc035d79c362da5d8279115598b3d4bbe10073a0798eb75054c53e2922afdc35",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "36087588f413acfde2566fe7b8f0baeb04061a2b6fc1487ac81c4cc99a90f0e6",
         "apps/docs/src/content/docs/concepts/http-utility-tree.md": "a1c682ccbfaeaf44e9e4a9cf507d3504a9acfce57aa6b41e074590c67f6d6542",
@@ -265,21 +265,20 @@
         "tests/types/type-scale.ts": "03bcc9eca13fb59054b8f047a70183cd33cdb9ba7acc73d6e8061c9eb271d546",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "a166d173a089fb2fed304093dc22adc0a0c228f8",
+      "head": "a81c9091132f8d59243db4f1b504f1b858b77247",
       "outcome": "no-change",
-      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
+      "reason": "README.md adds a pre-stable release warning. APIs, examples, dependency requirements, and integration recommendations are unchanged. The shipped skill already directs consumers to the installed package version and declarations; its guidance remains accurate.",
       "evidence": [
-        "Before versioning: intent maintainer check passed at a166d173a089fb2fed304093dc22adc0a0c228f8.",
-        "changeset version and vp fmt generated 0.1.0 -> 0.2.0.",
-        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
-        "Scoped generated changes: package.json."
+        "Reviewed git diff f35d2949b09bd7de2f89147c16e523b79240d9ce..a81c9091132f8d59243db4f1b504f1b858b77247: only the README.md Important callout was added.",
+        "Compared skills/effect-api-query/SKILL.md and references/frameworks-and-hosts.md with README.md, package.json, and ADR 0001, which already permits breaking public changes before 1.0.",
+        "vp exec intent maintainer sync made no changes; vp run format and vp run skills-check passed. No recommended behavior changed, so runtime, compiler, and fresh consumer checks were not repeated."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "29ad46da94a2998dce797658ea5d9ab890f3002c23a52109058584208b1719f4",
+      "fingerprint": "48d1e6d24ad91d9c7e54829440a64328e21e6363cdccd3322084fa39aa0b3910",
       "snapshot": {
         "GLOSSARY.md": "30735ffbfe603da64cd31b83fa0b1640efff919be4393fe5cd035d2b49cc6e1c",
-        "README.md": "25d40b1a9d2d33b786a1ba1ceb5689031333154d1c21e33b6d0f90f09cfde00a",
+        "README.md": "f774436da37f70ebd8603661b3e90f6f4492d17a788fa15704ad61239891c660",
         "_artifacts/domain_map.yaml": "41b789dc24f7f9e29f9e76ac04cce02ce303603209f36dd15e04263129072b3c",
         "_artifacts/skill_spec.md": "78389a667fee7dfc6c32cdc009aed2ecc43655f0fb446db38f8e44db761dfed8",
         "_artifacts/skill_tree.yaml": "a53089f650bada7e2576483823b87871ee018a51d65a71943e38c172ae899224",
@@ -541,14 +540,13 @@
         "tests/types/type-scale.ts": "03bcc9eca13fb59054b8f047a70183cd33cdb9ba7acc73d6e8061c9eb271d546",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "a166d173a089fb2fed304093dc22adc0a0c228f8",
+      "head": "a81c9091132f8d59243db4f1b504f1b858b77247",
       "outcome": "no-change",
-      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
+      "reason": "The release warning changes no developer task, failure mode, integration boundary, skill identity, prerequisite, or source mapping. _artifacts/domain_map.yaml, _artifacts/skill_spec.md, and _artifacts/skill_tree.yaml remain accurate; this no-op needs no planning history entry.",
       "evidence": [
-        "Before versioning: intent maintainer check passed at a166d173a089fb2fed304093dc22adc0a0c228f8.",
-        "changeset version and vp fmt generated 0.1.0 -> 0.2.0.",
-        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
-        "Scoped generated changes: package.json."
+        "Reviewed all three planning records against the README-only diff from f35d2949b09bd7de2f89147c16e523b79240d9ce to a81c9091132f8d59243db4f1b504f1b858b77247 and the shipped skill with six references.",
+        "The domain map already covers matching documentation to the installed package; the spec retains the existing task coverage and decisions; the tree already maps README.md to the existing effect-api-query skill.",
+        "vp exec intent maintainer sync made no changes. Maintainer check parsed the records with no authoring issues or stale metadata; vp run format and vp run skills-check passed."
       ]
     },
     "source:vite.config.ts": {
