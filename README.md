@@ -2,6 +2,9 @@
 
 `effect-api-query` builds typed TanStack Query options and cache keys from Effect RPC and HttpApi contracts. Pass these options to QueryClient or your framework's Query hooks. The contract defines the inputs and results. Your application controls transport, client lifetime, and cache policy.
 
+> [!IMPORTANT]
+> This library is in pre stable release. Expect breaking changes.
+
 ## Install
 
 Install the package and TanStack Query Core:
