@@ -3,10 +3,10 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "b843c9f8dd88fa7818b8edc8fb2d844d312750fd0a30e0b1d0496b147e1db7b6",
+      "fingerprint": "843e66d0bac39d427a5362eba6ac4a77930dc0a296ae103841a7e930b273055d",
       "snapshot": {
         "GLOSSARY.md": "9f7734ff552aa9a5c2b112f7948b5001ca82341a7acbc787ee5f7131b7be340a",
-        "README.md": "25d40b1a9d2d33b786a1ba1ceb5689031333154d1c21e33b6d0f90f09cfde00a",
+        "README.md": "f774436da37f70ebd8603661b3e90f6f4492d17a788fa15704ad61239891c660",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "bc035d79c362da5d8279115598b3d4bbe10073a0798eb75054c53e2922afdc35",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "36087588f413acfde2566fe7b8f0baeb04061a2b6fc1487ac81c4cc99a90f0e6",
         "apps/docs/src/content/docs/concepts/http-utility-tree.md": "a1c682ccbfaeaf44e9e4a9cf507d3504a9acfce57aa6b41e074590c67f6d6542",
@@ -277,22 +277,23 @@
         "tests/types/type-scale.ts": "03bcc9eca13fb59054b8f047a70183cd33cdb9ba7acc73d6e8061c9eb271d546",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "f35d2949b09bd7de2f89147c16e523b79240d9ce",
-      "outcome": "updated",
-      "reason": "The new opt-in helpers change reusable query composition, preparation, branch filtering, failure matching, and stream workflows. Updated the existing cache/query references and retained one skill with six references. Metadata now matches the tested 0.2.0 package; existing keys, defaults, and application ownership are preserved.",
+      "head": "f9c930b3c97bafce8f18e5c85c4a118d80511ce5",
+      "outcome": "no-change",
+      "reason": "The merged README warning changes no API, example, dependency requirement, or integration recommendation. Retained the PR query-usability guidance and upstream warning; the existing skill and six references remain accurate.",
       "evidence": [
-        "vp run quality passed: 731 runtime tests in 59 files, published contracts and server-local fixtures on TS7/TS5.9, typed lint, Effect diagnostics, package checks, and all four fallow commands. Existing duplication/hotspot advisories remain; no dead-code findings.",
-        "vp run docs-check passed: 20 excerpt checks and Astro diagnostics; intent validate skills --check passed.",
-        "Fresh delegated consumer used the installed 0.2.0 candidate skill and implemented tests/skills/query-usability/task.md in isolation. Its solution passed TS7, TS5.9, and the unchanged runtime grader. Broad invalidation failed the negative control. Automatic discovery was not tested.",
-        "Three architecture review rounds completed. Fixed exact policy checking and cancellation/deadline cleanup propagation; the latter regression fails twice against the unfixed implementation and passes for both finalizer forms.",
-        "Reviewed src/core/{configure,prepared-input,branch-filter,declared-error,consume-events,stream-publication}.ts and public compiler fixtures against origin/main."
+        "Merged origin/main f00e624 into PR #145 at f9c930b. The only conflicting file was .intent/review-state.json; retained the PR skill/planning snapshots and the upstream CI source review before regenerating current fingerprints.",
+        "git diff HEAD -- src tests skills _artifacts is empty; README.md and .github/workflows/ci.yml match origin/main exactly. The README addition warns of pre-stable breaking changes, consistent with ADR 0001.",
+        "vp run typecheck passed: typed lint and type checking in 182 files, Astro sync, package build, attw and publint. vp run test passed all 731 tests in 59 files; TS7/TS5.9 public and server-local compiler fixtures passed via unchanged-content cache hits. The runtime suite was rerun with localhost access after the sandbox blocked listeners.",
+        "vp run format passed for 361 files; actionlint passed for .github/workflows/ci.yml. Zizmor reports four existing low-severity self-repository advisories; default yamllint reports existing formatting findings. The workflow is byte-for-byte origin/main; no workflow changes were authored in this resolution.",
+        "The merge changes no recommended behavior or activation description. The earlier PR consumer evidence remains in f9c930b and _artifacts/skill_spec.md; a fresh consumer/discovery session was not repeated for this metadata resolution.",
+        "Reviewed skills/effect-api-query/SKILL.md and references/frameworks-and-hosts.md against README.md, package.json, ADR 0001 and ADR 0031. intent maintainer sync reports nothing to synchronize."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "ef66362a1b1f84518fc14bc9bd131eddbe6acd4525e460c7f832ffdfd0cc9f2e",
+      "fingerprint": "5c0e56455b63976ab74874529d8ffcd4d8aa2103d619faac485aecb0d4ecb87c",
       "snapshot": {
         "GLOSSARY.md": "9f7734ff552aa9a5c2b112f7948b5001ca82341a7acbc787ee5f7131b7be340a",
-        "README.md": "25d40b1a9d2d33b786a1ba1ceb5689031333154d1c21e33b6d0f90f09cfde00a",
+        "README.md": "f774436da37f70ebd8603661b3e90f6f4492d17a788fa15704ad61239891c660",
         "_artifacts/domain_map.yaml": "43ed55ae57488fd3b8bca366e67992c18a4b271c75278071af04652555c08509",
         "_artifacts/skill_spec.md": "c041b4912d6d95025de2de10b5ec66e66aa97c8d3ccbf607040cca0af3ae47d4",
         "_artifacts/skill_tree.yaml": "4a504970bfa4592197f689716386002261d149e610423d8dd1d5d30a0ee70935",
@@ -566,15 +567,16 @@
         "tests/types/type-scale.ts": "03bcc9eca13fb59054b8f047a70183cd33cdb9ba7acc73d6e8061c9eb271d546",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "f35d2949b09bd7de2f89147c16e523b79240d9ce",
-      "outcome": "updated",
-      "reason": "Reconciled all three records: domain_map covers the new tasks and failure modes, skill_spec records behavior and independent validation, and skill_tree retains the existing skill/references with ADR31 coverage and the verified package version.",
+      "head": "f9c930b3c97bafce8f18e5c85c4a118d80511ce5",
+      "outcome": "no-change",
+      "reason": "The merged README warning adds no developer task, failure mode, prerequisite, source mapping, or skill boundary. All three planning records retain the PR query-usability coverage and validation history; no content rewrite or new history entry is needed.",
       "evidence": [
-        "vp run quality passed: 731 runtime tests in 59 files, published contracts and server-local fixtures on TS7/TS5.9, typed lint, Effect diagnostics, package checks, and all four fallow commands. Existing duplication/hotspot advisories remain; no dead-code findings.",
-        "vp run docs-check passed: 20 excerpt checks and Astro diagnostics; intent validate skills --check passed.",
-        "Fresh delegated consumer used the installed 0.2.0 candidate skill and implemented tests/skills/query-usability/task.md in isolation. Its solution passed TS7, TS5.9, and the unchanged runtime grader. Broad invalidation failed the negative control. Automatic discovery was not tested.",
-        "Three architecture review rounds completed. Fixed exact policy checking and cancellation/deadline cleanup propagation; the latter regression fails twice against the unfixed implementation and passes for both finalizer forms.",
-        "YAML validation passed for _artifacts/domain_map.yaml and _artifacts/skill_tree.yaml; maintainer sync reports no stale metadata."
+        "Merged origin/main f00e624 into PR #145 at f9c930b. The only conflicting file was .intent/review-state.json; retained the PR skill/planning snapshots and the upstream CI source review before regenerating current fingerprints.",
+        "git diff HEAD -- src tests skills _artifacts is empty; README.md and .github/workflows/ci.yml match origin/main exactly. The README addition warns of pre-stable breaking changes, consistent with ADR 0001.",
+        "vp run typecheck passed: typed lint and type checking in 182 files, Astro sync, package build, attw and publint. vp run test passed all 731 tests in 59 files; TS7/TS5.9 public and server-local compiler fixtures passed via unchanged-content cache hits. The runtime suite was rerun with localhost access after the sandbox blocked listeners.",
+        "vp run format passed for 361 files; actionlint passed for .github/workflows/ci.yml. Zizmor reports four existing low-severity self-repository advisories; default yamllint reports existing formatting findings. The workflow is byte-for-byte origin/main; no workflow changes were authored in this resolution.",
+        "The merge changes no recommended behavior or activation description. The earlier PR consumer evidence remains in f9c930b and _artifacts/skill_spec.md; a fresh consumer/discovery session was not repeated for this metadata resolution.",
+        "Reviewed _artifacts/domain_map.yaml, _artifacts/skill_spec.md and _artifacts/skill_tree.yaml. The domain map already covers matching installed-package documentation, the spec retains the query-usability batch, and the tree maps README.md to the single skill with six references. Maintainer check parsed the records with zero authoring or metadata-sync issues."
       ]
     },
     "source:vite.config.ts": {
@@ -671,15 +673,17 @@
       ]
     },
     "source:.github/workflows/ci.yml": {
-      "fingerprint": "e264811852483654c44bbc6b57ede31b4765cfa4bd273770668e8dc081b82c04",
+      "fingerprint": "5de39a05c16bf2b3bccb16c1f13da0ca30ddd170259f11915f0f740973a98dee",
       "snapshot": {
-        ".github/workflows/ci.yml": "86cc15d7872b4ce6f177999f00c0db22d48fd7dc74f0c531c9dfd13d48ef31bb"
+        ".github/workflows/ci.yml": "3656400d7eb88eeff47771de54945790cf35b994c31426cd7c7683cbf22d9226"
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
-      "outcome": "no-change",
-      "reason": "Only YAML quoting and folded-line formatting changed. Triggers, permissions, action pins, commands and publication conditions retain their meaning; no performance gate was added.",
+      "head": "67c5a01436f8bf3d2e1549bed76b3ad83f23ab18",
+      "outcome": "out-of-scope",
+      "reason": "Browser CI environment only; shipped library guidance is unaffected.",
       "evidence": [
-        ".github/workflows/ci.yml diff reviewed against HEAD; the existing maintainer and release workflow remains accurate."
+        ".github/workflows/ci.yml pins the matching Playwright image and sets mounted home ownership to the container user before setup.",
+        "Reproduced Firefox launch failure with GitHub HOME owned by uid 1001. All three browsers launched and rendered after the workflow ownership command in the same linux/amd64 image.",
+        "actionlint, yamllint and formatting passed; zizmor reports only the four existing self-repository findings."
       ]
     },
     "source:tests/packed-consumer/construction-baseline.mts": {
