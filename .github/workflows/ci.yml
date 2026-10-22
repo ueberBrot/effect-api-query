@@ -122,6 +122,12 @@ jobs:
       - documentation
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.0-noble@sha256:06a9939e57531807f8d5fd76ce44b53165ffb7d7501d87ab10e285c20b1e971f
+      options: --ipc=host
+    defaults:
+      run:
+        shell: bash
 
     strategy:
       fail-fast: true
@@ -133,6 +139,10 @@ jobs:
 
     steps:
       - *checkout
+
+      - name: Set container home ownership
+        run: chown "$(id -u):$(id -g)" "$HOME"
+
       - *setup_repository
 
       - name: Restore application builds
@@ -145,9 +155,6 @@ jobs:
         with:
           name: documentation-build
           path: apps/docs/dist
-
-      - name: Install ${{ matrix.browser }}
-        run: vp exec playwright install --with-deps ${{ matrix.browser }}
 
       - name: Check documentation in ${{ matrix.browser }}
         run: vp run --ignore-depends-on docs-e2e --project=${{ matrix.browser }}

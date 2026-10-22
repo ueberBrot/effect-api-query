@@ -644,15 +644,17 @@
       ]
     },
     "source:.github/workflows/ci.yml": {
-      "fingerprint": "e264811852483654c44bbc6b57ede31b4765cfa4bd273770668e8dc081b82c04",
+      "fingerprint": "5de39a05c16bf2b3bccb16c1f13da0ca30ddd170259f11915f0f740973a98dee",
       "snapshot": {
-        ".github/workflows/ci.yml": "86cc15d7872b4ce6f177999f00c0db22d48fd7dc74f0c531c9dfd13d48ef31bb"
+        ".github/workflows/ci.yml": "3656400d7eb88eeff47771de54945790cf35b994c31426cd7c7683cbf22d9226"
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
-      "outcome": "no-change",
-      "reason": "Only YAML quoting and folded-line formatting changed. Triggers, permissions, action pins, commands and publication conditions retain their meaning; no performance gate was added.",
+      "head": "67c5a01436f8bf3d2e1549bed76b3ad83f23ab18",
+      "outcome": "out-of-scope",
+      "reason": "Browser CI environment only; shipped library guidance is unaffected.",
       "evidence": [
-        ".github/workflows/ci.yml diff reviewed against HEAD; the existing maintainer and release workflow remains accurate."
+        ".github/workflows/ci.yml pins the matching Playwright image and sets mounted home ownership to the container user before setup.",
+        "Reproduced Firefox launch failure with GitHub HOME owned by uid 1001. All three browsers launched and rendered after the workflow ownership command in the same linux/amd64 image.",
+        "actionlint, yamllint and formatting passed; zizmor reports only the four existing self-repository findings."
       ]
     },
     "source:tests/packed-consumer/construction-baseline.mts": {
