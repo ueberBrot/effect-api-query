@@ -1,5 +1,21 @@
 # effect-api-query
 
+## 0.3.0
+
+### Minor Changes
+
+- [#145](https://github.com/ueberBrot/effect-api-query/pull/145) [`95a3c31`](https://github.com/ueberBrot/effect-api-query/commit/95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9) - Add `createBranchQueryFilter` to select one query view across a generated root, branch, or leaf. It combines descendant view matching with native filter conditions and caller predicates without changing cache keys.
+
+- [#145](https://github.com/ueberBrot/effect-api-query/pull/145) [`95a3c31`](https://github.com/ueberBrot/effect-api-query/commit/95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9) - Add `configureQuery` and `configureMutation` to combine typed defaults and ordered interceptors on a frozen leaf while preserving every builder's inference. Local options override defaults, and mutation callback composition remains explicit.
+
+- [#145](https://github.com/ueberBrot/effect-api-query/pull/145) [`95a3c31`](https://github.com/ueberBrot/effect-api-query/commit/95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9) - Add `consumeEvents` to consume a native Effect Stream sequentially without caching history. It supports startup and exit callbacks, preserves handler failures, and runs the exit callback after stream cleanup. The application owns execution and resource lifetime.
+
+- [#145](https://github.com/ueberBrot/effect-api-query/pull/145) [`95a3c31`](https://github.com/ueberBrot/effect-api-query/commit/95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9) - Add `findDeclaredError` to return an Effect `Option` narrowed to one tagged failure. Defects, interruptions, composite Causes, and non-wrapper errors do not match; the original error and complete Cause remain available.
+
+- [#145](https://github.com/ueberBrot/effect-api-query/pull/145) [`95a3c31`](https://github.com/ueberBrot/effect-api-query/commit/95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9) - Add `prepareInput` to reuse construction, encoding, and canonicalization across repeated keys and query options on the same leaf. Retained execution inputs must remain unchanged. Handles cannot cross utility owners or replace mutation variables or infinite page mapper results.
+
+- [#145](https://github.com/ueberBrot/effect-api-query/pull/145) [`95a3c31`](https://github.com/ueberBrot/effect-api-query/commit/95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9) - Add `publicationMaxWaitMs` to accumulated streamed queries. Partial batches flush after the deadline even when the stream stays quiet, while cancellation awaits cleanup and preserves failures. An explicit deadline contributes to the stream key; omitted deadlines preserve existing keys and count-only behavior.
+
 ## 0.2.0
 
 ### Minor Changes

@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "843e66d0bac39d427a5362eba6ac4a77930dc0a296ae103841a7e930b273055d",
+      "fingerprint": "6ea0e4883683c21f690e8d5ec2a166ea37a2113af34754233cff70ccea17f10b",
       "snapshot": {
         "GLOSSARY.md": "9f7734ff552aa9a5c2b112f7948b5001ca82341a7acbc787ee5f7131b7be340a",
         "README.md": "f774436da37f70ebd8603661b3e90f6f4492d17a788fa15704ad61239891c660",
@@ -138,7 +138,7 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "906236a6a7120b022a554d3fcc4917d9a71707818da66f3a9a04d69bbb6faf67",
+        "package.json": "cae4a74b79e3c64eac7d698f354b1922e7211f2fa302d1117004d33ac3b895c8",
         "pnpm-workspace.yaml": "c55847022106dd11f2b32990131c248d9851a4672486cd70fba63536da4d4051",
         "scripts/measure-construction.mts": "fa7f8bf47d2f642df04be94f2f9f2253b9f5208272fbeb5be9ae79b4c3fb86a8",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
@@ -277,20 +277,18 @@
         "tests/types/type-scale.ts": "03bcc9eca13fb59054b8f047a70183cd33cdb9ba7acc73d6e8061c9eb271d546",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "f9c930b3c97bafce8f18e5c85c4a118d80511ce5",
+      "head": "95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9",
       "outcome": "no-change",
-      "reason": "The merged README warning changes no API, example, dependency requirement, or integration recommendation. Retained the PR query-usability guidance and upstream warning; the existing skill and six references remain accurate.",
+      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
       "evidence": [
-        "Merged origin/main f00e624 into PR #145 at f9c930b. The only conflicting file was .intent/review-state.json; retained the PR skill/planning snapshots and the upstream CI source review before regenerating current fingerprints.",
-        "git diff HEAD -- src tests skills _artifacts is empty; README.md and .github/workflows/ci.yml match origin/main exactly. The README addition warns of pre-stable breaking changes, consistent with ADR 0001.",
-        "vp run typecheck passed: typed lint and type checking in 182 files, Astro sync, package build, attw and publint. vp run test passed all 731 tests in 59 files; TS7/TS5.9 public and server-local compiler fixtures passed via unchanged-content cache hits. The runtime suite was rerun with localhost access after the sandbox blocked listeners.",
-        "vp run format passed for 361 files; actionlint passed for .github/workflows/ci.yml. Zizmor reports four existing low-severity self-repository advisories; default yamllint reports existing formatting findings. The workflow is byte-for-byte origin/main; no workflow changes were authored in this resolution.",
-        "The merge changes no recommended behavior or activation description. The earlier PR consumer evidence remains in f9c930b and _artifacts/skill_spec.md; a fresh consumer/discovery session was not repeated for this metadata resolution.",
-        "Reviewed skills/effect-api-query/SKILL.md and references/frameworks-and-hosts.md against README.md, package.json, ADR 0001 and ADR 0031. intent maintainer sync reports nothing to synchronize."
+        "Before versioning: intent maintainer check passed at 95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9.",
+        "changeset version and vp fmt generated 0.2.0 -> 0.3.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: package.json."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "5c0e56455b63976ab74874529d8ffcd4d8aa2103d619faac485aecb0d4ecb87c",
+      "fingerprint": "f343eb5906bf4687aca440ab76fdf48b801b0cfc91f8b43a86cdbc0ecd3babfa",
       "snapshot": {
         "GLOSSARY.md": "9f7734ff552aa9a5c2b112f7948b5001ca82341a7acbc787ee5f7131b7be340a",
         "README.md": "f774436da37f70ebd8603661b3e90f6f4492d17a788fa15704ad61239891c660",
@@ -428,7 +426,7 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "906236a6a7120b022a554d3fcc4917d9a71707818da66f3a9a04d69bbb6faf67",
+        "package.json": "cae4a74b79e3c64eac7d698f354b1922e7211f2fa302d1117004d33ac3b895c8",
         "pnpm-workspace.yaml": "c55847022106dd11f2b32990131c248d9851a4672486cd70fba63536da4d4051",
         "scripts/measure-construction.mts": "fa7f8bf47d2f642df04be94f2f9f2253b9f5208272fbeb5be9ae79b4c3fb86a8",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
@@ -567,16 +565,14 @@
         "tests/types/type-scale.ts": "03bcc9eca13fb59054b8f047a70183cd33cdb9ba7acc73d6e8061c9eb271d546",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "f9c930b3c97bafce8f18e5c85c4a118d80511ce5",
+      "head": "95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9",
       "outcome": "no-change",
-      "reason": "The merged README warning adds no developer task, failure mode, prerequisite, source mapping, or skill boundary. All three planning records retain the PR query-usability coverage and validation history; no content rewrite or new history entry is needed.",
+      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
       "evidence": [
-        "Merged origin/main f00e624 into PR #145 at f9c930b. The only conflicting file was .intent/review-state.json; retained the PR skill/planning snapshots and the upstream CI source review before regenerating current fingerprints.",
-        "git diff HEAD -- src tests skills _artifacts is empty; README.md and .github/workflows/ci.yml match origin/main exactly. The README addition warns of pre-stable breaking changes, consistent with ADR 0001.",
-        "vp run typecheck passed: typed lint and type checking in 182 files, Astro sync, package build, attw and publint. vp run test passed all 731 tests in 59 files; TS7/TS5.9 public and server-local compiler fixtures passed via unchanged-content cache hits. The runtime suite was rerun with localhost access after the sandbox blocked listeners.",
-        "vp run format passed for 361 files; actionlint passed for .github/workflows/ci.yml. Zizmor reports four existing low-severity self-repository advisories; default yamllint reports existing formatting findings. The workflow is byte-for-byte origin/main; no workflow changes were authored in this resolution.",
-        "The merge changes no recommended behavior or activation description. The earlier PR consumer evidence remains in f9c930b and _artifacts/skill_spec.md; a fresh consumer/discovery session was not repeated for this metadata resolution.",
-        "Reviewed _artifacts/domain_map.yaml, _artifacts/skill_spec.md and _artifacts/skill_tree.yaml. The domain map already covers matching installed-package documentation, the spec retains the query-usability batch, and the tree maps README.md to the single skill with six references. Maintainer check parsed the records with zero authoring or metadata-sync issues."
+        "Before versioning: intent maintainer check passed at 95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9.",
+        "changeset version and vp fmt generated 0.2.0 -> 0.3.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: package.json."
       ]
     },
     "source:vite.config.ts": {
@@ -1665,16 +1661,16 @@
       ]
     },
     "source:CHANGELOG.md": {
-      "fingerprint": "dc8c3be84b4e2ce5c4749e4530db6048f6a62e86eda80c1965ff219b846c7947",
+      "fingerprint": "96c1e3177ff87402a1e54f702f2119a1742d83af53c532929deaaafab3d979c9",
       "snapshot": {
-        "CHANGELOG.md": "0c065f65c8c38fb238f7533553b12b7d4829fc2518982cece916d1262384096d"
+        "CHANGELOG.md": "4a41584465038feae9cd8656c32189a2ea6e921452825dcf8fb29772ae0ab367"
       },
-      "head": "a166d173a089fb2fed304093dc22adc0a0c228f8",
+      "head": "95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9",
       "outcome": "no-change",
       "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Before versioning: intent maintainer check passed at a166d173a089fb2fed304093dc22adc0a0c228f8.",
-        "changeset version and vp fmt generated 0.1.0 -> 0.2.0.",
+        "Before versioning: intent maintainer check passed at 95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9.",
+        "changeset version and vp fmt generated 0.2.0 -> 0.3.0.",
         "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
         "Scoped generated changes: CHANGELOG.md."
       ]
@@ -2124,75 +2120,93 @@
       ]
     },
     "source:.changeset/branch-query-filters.md": {
-      "fingerprint": "f4d099d732ae9b3d37ced21c274bfd852e8d7a63c8ba2aa8b78b6bf19d95dc58",
+      "fingerprint": "98d9377ddd188c3caf1e54a34a3e2f2d494f6da845edda6d765781d3ad6b4ec4",
       "snapshot": {
-        ".changeset/branch-query-filters.md": "fb77eb57a0ae7e398ddeb46dc1533ba10a1ea144c9e6633cc734e506f4a9d9ac"
+        ".changeset/branch-query-filters.md": null
       },
-      "head": "c2bcc3d36835061bca3d9772f60ef7382bae7259",
+      "head": "95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9",
       "outcome": "no-change",
-      "reason": "Commit c2bcc3d removes only the redundant Breaking changes: none sentence from six previously reviewed minor changesets. Feature descriptions and release classifications are unchanged, so the shipped skill, references, domain map, skill spec, and skill tree remain accurate. Changeset status passed; no runtime or consumer behavior changed.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Changed: .changeset/branch-query-filters.md at c2bcc3d36835061bca3d9772f60ef7382bae7259"
+        "Before versioning: intent maintainer check passed at 95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9.",
+        "changeset version and vp fmt generated 0.2.0 -> 0.3.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/branch-query-filters.md."
       ]
     },
     "source:.changeset/configured-query-leaves.md": {
-      "fingerprint": "a7e4ba8a3ce687bf3657f52639d06e954ae8484ffe8a848602e346eb9e4f7d47",
+      "fingerprint": "2eb9475a1627f66d8f8a2cd4c3e61d1871d6538662afb3a3d1de44a5b56767fc",
       "snapshot": {
-        ".changeset/configured-query-leaves.md": "221d3f035426f2a40247a1a6755748c2386ddc37c933654fc4b54013489dbc09"
+        ".changeset/configured-query-leaves.md": null
       },
-      "head": "c2bcc3d36835061bca3d9772f60ef7382bae7259",
+      "head": "95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9",
       "outcome": "no-change",
-      "reason": "Commit c2bcc3d removes only the redundant Breaking changes: none sentence from six previously reviewed minor changesets. Feature descriptions and release classifications are unchanged, so the shipped skill, references, domain map, skill spec, and skill tree remain accurate. Changeset status passed; no runtime or consumer behavior changed.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Changed: .changeset/configured-query-leaves.md at c2bcc3d36835061bca3d9772f60ef7382bae7259"
+        "Before versioning: intent maintainer check passed at 95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9.",
+        "changeset version and vp fmt generated 0.2.0 -> 0.3.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/configured-query-leaves.md."
       ]
     },
     "source:.changeset/consume-events.md": {
-      "fingerprint": "432cccf57025f874a3f88aa4d432a0c4fbf85a2d0b4dd1c6c2fcb97fd3a92ee6",
+      "fingerprint": "cc5da982ea86024afb8842a77d151ddac1a450cce434c658a7ba09a6a9596dee",
       "snapshot": {
-        ".changeset/consume-events.md": "84547f2566f47a55b7dd08c08dd20d1abf00e1a53348e69847f6e6f0cfdfa026"
+        ".changeset/consume-events.md": null
       },
-      "head": "c2bcc3d36835061bca3d9772f60ef7382bae7259",
+      "head": "95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9",
       "outcome": "no-change",
-      "reason": "Commit c2bcc3d removes only the redundant Breaking changes: none sentence from six previously reviewed minor changesets. Feature descriptions and release classifications are unchanged, so the shipped skill, references, domain map, skill spec, and skill tree remain accurate. Changeset status passed; no runtime or consumer behavior changed.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Changed: .changeset/consume-events.md at c2bcc3d36835061bca3d9772f60ef7382bae7259"
+        "Before versioning: intent maintainer check passed at 95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9.",
+        "changeset version and vp fmt generated 0.2.0 -> 0.3.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/consume-events.md."
       ]
     },
     "source:.changeset/declared-error-lookup.md": {
-      "fingerprint": "47246958236a64df043a4674cddd2ac9ccd286c5013e5b8765feb1a9e65c7596",
+      "fingerprint": "b2917060372a26ea7d431e99b6470f1a442ade857169a3afdafc43018e5a89e2",
       "snapshot": {
-        ".changeset/declared-error-lookup.md": "d32d191f340d0258d6bd5797b5a498aa565dd094e3132e94eca19c0679e8d52f"
+        ".changeset/declared-error-lookup.md": null
       },
-      "head": "c2bcc3d36835061bca3d9772f60ef7382bae7259",
+      "head": "95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9",
       "outcome": "no-change",
-      "reason": "Commit c2bcc3d removes only the redundant Breaking changes: none sentence from six previously reviewed minor changesets. Feature descriptions and release classifications are unchanged, so the shipped skill, references, domain map, skill spec, and skill tree remain accurate. Changeset status passed; no runtime or consumer behavior changed.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Changed: .changeset/declared-error-lookup.md at c2bcc3d36835061bca3d9772f60ef7382bae7259"
+        "Before versioning: intent maintainer check passed at 95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9.",
+        "changeset version and vp fmt generated 0.2.0 -> 0.3.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/declared-error-lookup.md."
       ]
     },
     "source:.changeset/prepared-query-inputs.md": {
-      "fingerprint": "940646c833a479707dc548e012bc5a18ec0f3d178d7cbc64927846fc1a10b8c0",
+      "fingerprint": "a0250b8d5b0ec1ef5f8a8bc92992380d5990d9877a621c2224d5ffdd1fa96540",
       "snapshot": {
-        ".changeset/prepared-query-inputs.md": "30a53b3d4cb9536c0f2ae59325af4e999548b6c9dc870ed4ecd40ea757e24b60"
+        ".changeset/prepared-query-inputs.md": null
       },
-      "head": "c2bcc3d36835061bca3d9772f60ef7382bae7259",
+      "head": "95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9",
       "outcome": "no-change",
-      "reason": "Commit c2bcc3d removes only the redundant Breaking changes: none sentence from six previously reviewed minor changesets. Feature descriptions and release classifications are unchanged, so the shipped skill, references, domain map, skill spec, and skill tree remain accurate. Changeset status passed; no runtime or consumer behavior changed.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Changed: .changeset/prepared-query-inputs.md at c2bcc3d36835061bca3d9772f60ef7382bae7259"
+        "Before versioning: intent maintainer check passed at 95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9.",
+        "changeset version and vp fmt generated 0.2.0 -> 0.3.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/prepared-query-inputs.md."
       ]
     },
     "source:.changeset/publication-deadlines.md": {
-      "fingerprint": "b09dec87dda063bf936efc41d4f740f66cd766fc80698aabaee0cda99d118fa6",
+      "fingerprint": "1903eca86981ffefa5c74c1a35b555ccc1fb617e2acec7ee92dd2fdb9e992b6c",
       "snapshot": {
-        ".changeset/publication-deadlines.md": "c7e577d7cdce80dce12eae764dea2e547feb5ef9c81e2fc548a2fa9747947a6a"
+        ".changeset/publication-deadlines.md": null
       },
-      "head": "c2bcc3d36835061bca3d9772f60ef7382bae7259",
+      "head": "95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9",
       "outcome": "no-change",
-      "reason": "Commit c2bcc3d removes only the redundant Breaking changes: none sentence from six previously reviewed minor changesets. Feature descriptions and release classifications are unchanged, so the shipped skill, references, domain map, skill spec, and skill tree remain accurate. Changeset status passed; no runtime or consumer behavior changed.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Changed: .changeset/publication-deadlines.md at c2bcc3d36835061bca3d9772f60ef7382bae7259"
+        "Before versioning: intent maintainer check passed at 95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9.",
+        "changeset version and vp fmt generated 0.2.0 -> 0.3.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/publication-deadlines.md."
       ]
     }
   }
