@@ -30,6 +30,8 @@ These terms describe how the package builds TanStack Query utilities from Effect
 
 **Key prefix**: A non-empty tuple of JSON-safe values that the caller supplies to namespace a utility tree. Generated roots append an adapter discriminator. HTTP roots also append the API identifier. _Avoid_: Automatic namespace, client identity
 
+**Prepared input**: An opaque handle that reuses one utility leaf's normalized execution input and canonical key payload. The caller keeps retained values unchanged. Configured copies share the owner; other leaves and utility trees cannot use the handle. _Avoid_: Input snapshot, global memoization
+
 **Filter projection**: A typed conversion from application filter input to the partial canonical key payload to match. Omitted fields place no constraint on the matched entries. _Avoid_: Partial payload constructor, decoded partial key
 
 **Hydration codec**: A paired encoding and decoding for the cached data of one generated leaf and query view. Infinite data also requires an explicit page-parameter encoding and decoding. _Avoid_: Result schema, universal serializer

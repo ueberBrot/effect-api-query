@@ -41,3 +41,19 @@ The package adds only declaration identity to execution-error metadata. The pres
 Mutations encode their request inside the ready client's Effect. Their encoding failures therefore become `EffectHttpApiQueryError`. Runner rejections and user or TanStack callback failures pass through unchanged when they produce no failed Exit.
 
 See the [HTTP factory reference](/effect-api-query/reference/http-builders/#cache-identity-and-failures) for key-error codes.
+
+## Match a tagged typed failure
+
+Import `findDeclaredError` and use it with a typed execution error. It returns an Effect `Option` whose value is narrowed to the selected tag:
+
+```ts
+import { findDeclaredError } from "@ueberbrot/effect-api-query";
+import { Option } from "effect";
+
+const missing = findDeclaredError(error, "Missing");
+if (Option.isSome(missing)) {
+  console.log(missing.value.id);
+}
+```
+
+Here `error` is a typed query or mutation error whose failure union includes `{ _tag: 'Missing', id: number }`. Only tags present in that union are accepted. A single matching failure returns `Some`; other tags, defects, interruptions, composite Causes, and non-wrapper errors return `None`. The original wrapper and complete Cause remain available. Typed transport failures can also belong to the union; matching a tag does not validate untrusted data or replace application retry policy.

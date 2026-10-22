@@ -145,7 +145,7 @@ The refetch modes control how the next execution updates history:
 - `append` adds new emissions to the cached history.
 - `replace` keeps cached history until the refetch stream completes, then replaces it. For this policy, use a stream that completes.
 
-Set `publicationBatchSize` to a positive safe integer to publish an accumulated history in count-based batches. The first event publishes immediately. Later batches preserve every event in order; completion or failure flushes a pending tail, while cancellation discards it. A partial batch on an open feed can wait indefinitely. The default is `1`; nondefault values participate in history key identity. `replace` still waits for successful completion. Batching controls publication, while `maxChunks` controls retention and transport buffering remains separate.
+Set `publicationBatchSize` to a positive safe integer to publish an accumulated history in count-based batches. The first event publishes immediately. Later batches preserve every event in order; completion or failure flushes a pending tail, while cancellation discards it. Without `publicationMaxWaitMs`, a partial batch on an open feed can wait indefinitely. Set a positive integer deadline in milliseconds, at most 2,147,483,647, to flush from the first buffered event; later events do not reset the timer. Explicit deadlines participate in key identity. The default batch size is `1`; nondefault sizes participate in history key identity. `replace` still waits for successful completion. Batching controls publication, while `maxChunks` controls retention and transport buffering remains separate.
 
 Live queries cache only the latest value. They accept no history or publication batch option. Without cached data, an empty accumulated stream resolves to `[]`. An empty append refetch preserves existing history. Empty reset and replace refetches finish with `[]`. Empty live completion raises `EffectRpcQueryEmptyStreamError`.
 
@@ -176,3 +176,11 @@ A span or retry around the runner's iterable-creation Effect ends before consump
 For a complete example with an HTTP SSE client, Otlp layer, and drained snapshot, use [the stream lifetime tracing recipe](https://ueberbrot.github.io/effect-api-query/guides/trace-streams/). To preserve decoded header wrappers, use the client's response transformation before response-mode wrapping. Applications own span attributes and disclosure policy.
 
 Sources: [builders](https://ueberbrot.github.io/effect-api-query/reference/generated-builders/), [stream history](https://ueberbrot.github.io/effect-api-query/guides/choose-stream-history/).
+
+## Prepare a reused input
+
+For repeated large inputs, call `prepareInput(leaf, input)` once and pass the opaque handle to that leaf's key builders and ordinary, metadata, live, or streamed options. HTTP uses decoded request containers. Construction, encoding, and canonicalization run once. Keep the retained execution input and nested values unchanged; this is not a deep snapshot. Construct a new handle when input changes. Handles belong to one leaf and factory owner, including its configured copies. They cannot be serialized or passed as mutation variables or infinite page mapper results. `InferInput` remains the raw input type. Create factories once per owner, outside component renders.
+
+## Consume events without cache history
+
+Use `consumeEvents(source, { onEvent, onStart?, onExit? })` with a native decoded Effect Stream for notifications or invalidation. It returns an Effect; run it in the application's Scope. `onEvent` returns an Effect and is awaited sequentially. Its failure stops consumption. `onStart` is an Effect signalling local startup, not a transport acknowledgement. `onExit` receives the Exit after stream cleanup, including interruption, and returns a finalization Effect. Interrupt and await consumption before disposing the runtime. The helper owns no cache, retained history, or reconnection policy. Compose `recoverStream` upstream when recovery is needed.

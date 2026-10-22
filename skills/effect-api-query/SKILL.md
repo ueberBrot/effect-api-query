@@ -8,7 +8,7 @@ metadata:
     Derive typed TanStack Query keys and options from ready Effect RPC and HTTP clients, preserving cache identity, typed filters and execution policies, decoded query views, registered hydration codecs, stream recovery, native framework behavior, and application-owned resource lifetime.
   type: core
   library: "@ueberbrot/effect-api-query"
-  library_version: "0.1.0"
+  library_version: "0.2.0"
 sources:
   - "src/**/*.ts"
   - "tests/**/*.ts"
@@ -36,7 +36,7 @@ sources:
   - "docs/adr/0014-*.md"
   - "docs/adr/0015-*.md"
   - "docs/adr/002*.md"
-  - "docs/adr/0030-*.md"
+  - "docs/adr/003*.md"
   - "**/apps/docs/src/content/docs/**/*.md"
   - "**/apps/docs/src/content/docs/**/*.mdx"
 ---
@@ -77,7 +77,7 @@ Read only the branch needed for the task:
 
 | Task | Read |
 | --- | --- |
-| Infer operation types, skip input, paginate, batch history, or recover streams | [Query patterns](references/query-patterns.md) |
+| Infer operation types, prepare repeated input, skip, paginate, batch history, consume events, or recover streams | [Query patterns](references/query-patterns.md) |
 | Reuse policies or interceptors, filter caches, apply writes or events, replace owners | [Cache workflows](references/cache-workflows.md) |
 | Capture streams, register view codecs, hydrate, or dispose request work | [Hydration and SSR](references/hydration-and-ssr.md) |
 | Mount native providers, recover Suspense, choose a transport, host, or versions | [Frameworks and hosts](references/frameworks-and-hosts.md) |

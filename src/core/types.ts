@@ -12,6 +12,8 @@ import type {
 } from "@tanstack/query-core";
 import type { Effect, Exit, Redacted } from "effect";
 
+import type { PreparedInput } from "./prepared-input";
+
 export type JsonPrimitive = boolean | null | number | string;
 
 /** An immutable JSON value accepted in cache keys. */
@@ -61,7 +63,7 @@ export type KeyBuilder<Input, Key, Inputless extends boolean> = [
   Inputless,
 ] extends [true]
   ? () => Key
-  : (input: Input) => Key;
+  : (input: Input | PreparedInput<Input>) => Key;
 
 export type OwnedQueryOption =
   | "queryFn"
@@ -79,6 +81,8 @@ export type StreamedPolicyOptions = {
   readonly maxChunks?: number | undefined;
   /** Publishes the first element immediately, then ordered batches; defaults to one. */
   readonly publicationBatchSize?: number | undefined;
+  /** Flushes a partial batch after this many milliseconds; omitted means count-only. */
+  readonly publicationMaxWaitMs?: number | undefined;
 };
 
 export type WithDefinedInitialData<Options, Data> = Omit<
@@ -266,6 +270,24 @@ export interface InputQueryBuilder<
 }
 
 export type UnaryQueryBuilder<
+  Input,
+  Data,
+  Error,
+  Key extends QueryKey,
+  SkippedKey extends QueryKey,
+  AdapterOptions = unknown,
+  Inputless extends boolean = void extends Input ? true : false,
+> = UnaryQueryBuilderImpl<
+  Input | PreparedInput<Input>,
+  Data,
+  Error,
+  Key,
+  SkippedKey,
+  AdapterOptions,
+  Inputless
+>;
+
+export type UnaryQueryBuilderImpl<
   Input,
   Data,
   Error,

@@ -118,3 +118,16 @@ A custom encoder replaces the default encoded shape. If it returns `{ entity: { 
 Applications that need partial matching can define an explicit JSON object projection in their encoder and build filters against that projection. Preserve every safe value that distinguishes results. If the projection changes, update cache identity, including version busters for persisted caches. For opaque or noninvertible projections, use generated broad prefixes or a generated exact key. A custom predicate can inspect only information retained in the key or application-owned query metadata. It cannot reconstruct omitted input.
 
 Concrete builders retain DataTags for typed `getQueryData` and `setQueryData`. `viewPrefix` returns an immutable ordinary key for supported leaf views. That key has no DataTag. Manually composed prefixes and partial keys carry no query-data tag. Native `getQueriesData` does not infer a homogeneous result from its filter. Keep broad reads as `unknown` until the application establishes the matched representation. An explicit generic or cast does not validate cached values.
+
+## Select a view across a branch
+
+To invalidate ordinary reads while keeping live streams open, bind a branch view filter:
+
+```ts
+import { createBranchQueryFilter } from "@ueberbrot/effect-api-query";
+
+const userReads = createBranchQueryFilter(rpc.users, "query");
+await queryClient.invalidateQueries(userReads());
+```
+
+The helper accepts a generated root, branch, or leaf and one of `query`, `infinite`, `metadata`, `streamed`, or `live`. It indexes supported descendant leaves once. A view absent from the branch matches nothing. Native conditions such as `stale`, `fetchStatus`, and `predicate` still apply; a supplied predicate is combined with the view match. The result is a native filter, not a query key for exact cache access or defaults. Bulk reads remain heterogeneous. Leave `exact` omitted for descendant matching.

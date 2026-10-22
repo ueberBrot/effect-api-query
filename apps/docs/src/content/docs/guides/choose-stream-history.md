@@ -46,8 +46,38 @@ const history = rpc.diagnostics.stream.streamedOptions({
 
 It accepts a positive safe integer and defaults to one. The first event publishes immediately; later publications append the next batch in order. Completion or failure flushes a partial batch. A `replace` refetch keeps the old history until successful completion, as usual. Cancellation discards unpublished events and follows native cancellation and cache reversion.
 
-Batching counts events and sets no deadline. After the first publication, a slow or paused stream can leave a partial batch unpublished indefinitely. For example, a batch size of 32 leaves the next ten events unpublished until another 22 arrive or the stream ends. Choose one when each event must appear promptly.
+By default, batching counts events without a deadline. After the first publication, a slow or paused stream can leave a partial batch unpublished indefinitely. For example, a batch size of 32 leaves the next ten events unpublished until another 22 arrive or the stream ends. Choose a batch size of one when each event must appear promptly, or set a publication deadline as shown below.
 
 Transport consumption continues as the batch fills. The pending batch uses memory alongside cached history. Every event contributes in order, subject to the configured retention bound. If a batch exceeds `maxChunks`, only its newest retained elements remain visible. Earlier publications keep their own arrays. Live queries continue publishing each latest value.
 
 Reuse the options' `queryKey` for exact cache access, or pass the same policy to `streamedKey`. Nondefault batch sizes create separate accumulated cache entries. An explicit one shares the default key. Endpoint and branch prefixes still select every publication policy.
+
+## Flush a quiet publication batch
+
+For uneven event traffic, combine a count limit with a deadline:
+
+```ts
+const options = rpc.events.watch.streamedOptions({
+  publicationBatchSize: 10,
+  publicationMaxWaitMs: 50,
+});
+```
+
+The first event publishes immediately. Later events publish in ordered batches when the count reaches ten or the oldest buffered event has waited fifty milliseconds. Omit the deadline to keep count-only behavior. Browser scheduling can delay timers; this is not a real-time guarantee.
+
+## Consume events without cached history
+
+Use `consumeEvents` for notifications or invalidation signals that do not need a query cache entry:
+
+```ts
+import { consumeEvents } from "@ueberbrot/effect-api-query";
+import { Effect, Stream } from "effect";
+
+const consumption = consumeEvents(Stream.make(1, 2, 3), {
+  onStart: Effect.log("Starting event consumption"),
+  onEvent: (event) => Effect.log(event),
+  onExit: (exit) => Effect.log(exit._tag),
+});
+```
+
+Pass a native decoded stream from your ready client in an application. The returned Effect starts only when run. Event callbacks run sequentially and apply backpressure. A callback failure stops consumption and remains in the error channel. `onExit` runs after stream cleanup, including failure and interruption; its finalization must finish before the Effect settles. `onStart` signals local startup, not transport connection. The helper stores no history and owns no runtime or cache. Run it in your application's Scope, interrupt it before disposing resources, and apply `recoverStream` when replay and reconnection are needed.

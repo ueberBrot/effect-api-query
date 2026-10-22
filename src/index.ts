@@ -85,3 +85,11 @@ export type {
 
 /** The type of Query Core's exact skip sentinel. @api public */
 export type { SkipToken } from "@tanstack/query-core";
+
+export { configureQuery, configureMutation } from "./core/configure";
+export { createBranchQueryFilter } from "./core/branch-filter";
+export { findDeclaredError } from "./core/declared-error";
+export { prepareInput } from "./core/prepared-input";
+export type { PreparedInput } from "./core/prepared-input";
+export { consumeEvents } from "./core/consume-events";
+export type { ConsumeEventsOptions } from "./core/consume-events";

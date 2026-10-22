@@ -14,6 +14,7 @@ import type {
   UnaryOperation,
   UnaryQueryOperation,
 } from "./operation";
+import { readPreparedInput, registerInputOwner } from "./prepared-input";
 import type { JsonValue, RunPromiseExit } from "./types";
 
 const reservedPathSegments = new Set([
@@ -161,13 +162,16 @@ const prepareQuery = (
           : freezeKey([...operationKey, ...identity]),
     };
   }
-  const prepared = description.input.prepare(input, keyEncoder);
+  const reused = readPreparedInput(description.input, input);
+  const prepared = reused ?? description.input.prepare(input, keyEncoder);
   try {
     return {
       input: prepared.input,
       key: freezeKey([
         ...operationKey,
-        canonicalize(prepared.keyValue),
+        reused === undefined
+          ? canonicalize(prepared.keyValue)
+          : reused.keyValue,
         ...identity,
       ]),
     };
@@ -499,7 +503,11 @@ const insertLeaf = (
   keyEncoder: RuntimeKeyEncoder | undefined,
   runPromiseExit: RunPromiseExit<unknown>
 ) => {
-  const { operation, segments } = path;
+  const { segments } = path;
+  const operation =
+    path.operation.kind === "Mutation"
+      ? path.operation
+      : { ...path.operation, input: { ...path.operation.input } };
   let branch = tree;
   for (let index = 0; index < segments.length - 1; index += 1) {
     const segment = segments[index];
@@ -543,7 +551,11 @@ const insertLeaf = (
       runPromiseExit
     );
   }
-  branch[leafName] = { key: () => operationKey, ...builders };
+  const leaf = { key: () => operationKey, ...builders };
+  if (operation.kind !== "Mutation") {
+    registerInputOwner(leaf.key, operation.input, keyEncoder);
+  }
+  branch[leafName] = leaf;
 };
 
 const createTree = (

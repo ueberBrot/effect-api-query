@@ -149,3 +149,31 @@ const interceptedCreateUser = withMutationInterceptor(
 Here, `authorizeCreation` is an application function. Import the interceptor helpers from the package root. The returned builders preserve selection, initial-data, skipped-input, and page-parameter inference. For infinite queries, `next` returns one page. Local lifecycle callbacks cannot replace an execution interceptor.
 
 Interceptors run once per native execution attempt, including retries. Each attempt permits at most one call to `next`. Exceptions follow native query or mutation error handling. Query context retains the abort signal; application work around `next` must also honor that signal. Interceptors preserve generated keys and skipped queries. Keep transport setup in the ready client.
+
+## Combine policies and interceptors
+
+Use `configureQuery` and `configureMutation` when several behaviors belong to the same leaf. Each helper returns a frozen leaf with all of its existing views. The original leaf stays unchanged. Build the configured leaf once per cache owner:
+
+```ts
+import { configureMutation, configureQuery } from "@ueberbrot/effect-api-query";
+
+const configuredUser = configureMutation(
+  configureQuery(rpc.users.get, "query", {
+    policy: { staleTime: 30_000 },
+    interceptors: [async ({ next }) => await next()],
+  }),
+  {
+    callbacks: "compose",
+    policy: {
+      onSuccess: () =>
+        queryClient.invalidateQueries({ queryKey: rpc.users.key() }),
+    },
+  }
+);
+const options = configuredUser.queryOptions({
+  input: { id: 1 },
+  staleTime: 5_000,
+});
+```
+
+The first interceptor is outermost. Each interceptor may call its continuation once per attempt. Policies apply before call-site options. Mutation callback composition still runs shared callbacks before local callbacks; `onMutate` stays local. Repeated configuration wraps the previously configured leaf. Existing `withQueryPolicy`, `withMutationPolicy`, and interceptor helpers remain useful when only a builder is needed.
