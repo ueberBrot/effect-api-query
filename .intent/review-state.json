@@ -644,15 +644,17 @@
       ]
     },
     "source:.github/workflows/ci.yml": {
-      "fingerprint": "e264811852483654c44bbc6b57ede31b4765cfa4bd273770668e8dc081b82c04",
+      "fingerprint": "4f1135eb92034b3a656c7f9f3f27237b33a3bf798b10f411fe008e25d194746e",
       "snapshot": {
-        ".github/workflows/ci.yml": "86cc15d7872b4ce6f177999f00c0db22d48fd7dc74f0c531c9dfd13d48ef31bb"
+        ".github/workflows/ci.yml": "7a0164c4d5fcc63a35f30c4aeb02021fc3c225d684b70d7d3fafaf900247bf76"
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
-      "outcome": "no-change",
-      "reason": "Only YAML quoting and folded-line formatting changed. Triggers, permissions, action pins, commands and publication conditions retain their meaning; no performance gate was added.",
+      "head": "f35d2949b09bd7de2f89147c16e523b79240d9ce",
+      "outcome": "out-of-scope",
+      "reason": "Browser CI environment only; shipped library guidance is unaffected.",
       "evidence": [
-        ".github/workflows/ci.yml diff reviewed against HEAD; the existing maintainer and release workflow remains accurate."
+        ".github/workflows/ci.yml uses the Playwright 1.64.0 image matching package.json and removes live browser dependency installation.",
+        "actionlint, yamllint and vp run format passed; zizmor reports the same four existing self-repository findings as the base.",
+        "Chromium, Firefox and WebKit launched and rendered successfully in the pinned linux/amd64 container without apt installation."
       ]
     },
     "source:tests/packed-consumer/construction-baseline.mts": {
