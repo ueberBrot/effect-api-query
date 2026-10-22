@@ -670,9 +670,18 @@ describe("createRpcQueryUtils streaming execution", () => {
         }
       );
 
-      it.each(["live", "streamed"] as const)(
-        "preserves interruption and cleanup defects when cancelling a pending %s pull",
-        async (operation) => {
+      it.each([
+        ["live", undefined],
+        ["streamed", undefined],
+        ["streamed", 20],
+      ] as const)(
+        "preserves interruption and cleanup defects when cancelling a pending %s pull with deadline %s",
+        async (operation, publicationMaxWaitMs) => {
+          const timed = publicationMaxWaitMs !== undefined;
+          if (timed) {
+            vi.useFakeTimers();
+          }
+          const releaseGate = Deferred.makeUnsafe<boolean>();
           const group = RpcGroup.make(
             Rpc.make("watch", { success: Schema.Int, stream: true })
           );
@@ -692,13 +701,18 @@ describe("createRpcQueryUtils streaming execution", () => {
               )
             )
           );
-          const release = Effect.failCause(cleanupCause);
+          const release = Deferred.await(releaseGate).pipe(
+            Effect.andThen(Effect.failCause(cleanupCause))
+          );
+          const events = timed
+            ? Stream.concat(Stream.make(1, 2), values)
+            : values;
           const source =
             finalizer === "ensuring"
-              ? values.pipe(Stream.ensuring(release))
+              ? events.pipe(Stream.ensuring(release))
               : Stream.unwrap(
                   Effect.acquireRelease(Effect.void, () => release).pipe(
-                    Effect.as(values)
+                    Effect.as(events)
                   )
                 );
           /* oxlint-disable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
@@ -713,26 +727,42 @@ describe("createRpcQueryUtils streaming execution", () => {
           const options =
             operation === "live"
               ? rpc.watch.liveOptions()
-              : rpc.watch.streamedOptions();
+              : rpc.watch.streamedOptions({
+                  publicationBatchSize: 10,
+                  publicationMaxWaitMs,
+                });
           const { queryFn } = options;
           if (!Predicate.isFunction(queryFn)) {
             throw new TypeError("Expected a callable stream query function");
           }
           const queryClient = new QueryClient();
           const controller = new AbortController();
-          const pending = captureFailure(
-            Promise.resolve(
-              queryFn({
-                client: queryClient,
-                queryKey: options.queryKey,
-                signal: controller.signal,
-                meta: undefined,
-              })
-            )
-          );
+          let settled = false;
+          const pending = (async () => {
+            const result = await captureFailure(
+              Promise.resolve(
+                queryFn({
+                  client: queryClient,
+                  queryKey: options.queryKey,
+                  signal: controller.signal,
+                  meta: undefined,
+                })
+              )
+            );
+            settled = true;
+            return result;
+          })();
           try {
             await Effect.runPromise(Deferred.await(entered));
             controller.abort();
+            if (timed) {
+              await vi.advanceTimersByTimeAsync(50);
+            }
+            expect(settled).toBe(false);
+            expect(queryClient.getQueryData(options.queryKey)).toStrictEqual(
+              timed ? [1] : undefined
+            );
+            await Effect.runPromise(Deferred.succeed(releaseGate, true));
             const error = await pending;
             expect(error).toMatchObject({
               _tag: "EffectRpcQueryError",
@@ -753,7 +783,11 @@ describe("createRpcQueryUtils streaming execution", () => {
             ).toBe(true);
           } finally {
             controller.abort();
+            await Effect.runPromise(Deferred.succeed(releaseGate, true));
             await pending;
+            if (timed) {
+              vi.useRealTimers();
+            }
             queryClient.clear();
           }
         }

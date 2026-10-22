@@ -184,3 +184,11 @@ For reload persistence, allowlist a validated DTO view. Repeat the safe owner tu
 During explicit disposal, expose storage failures while completing resource cleanup. Lifecycle callbacks such as pagehide or HMR must handle a rejected disposal Promise. Otherwise, it becomes an unhandled rejection. Preserve the chosen reload-persistence policy and cleanup order.
 
 Sources: [defaults and policies](https://ueberbrot.github.io/effect-api-query/guides/query-defaults/), [cache keys and filters](https://ueberbrot.github.io/effect-api-query/guides/cache-filters/), [optimistic writes](https://ueberbrot.github.io/effect-api-query/guides/optimistic-writes/), [owner replacement](https://ueberbrot.github.io/effect-api-query/guides/switch-cache-owners/), [event refresh](https://ueberbrot.github.io/effect-api-query/guides/refresh-from-events/).
+
+## Combine leaf configuration
+
+Use `configureQuery(leaf, view, { policy?, interceptors? })` and `configureMutation(leaf, { policy?, interceptors?, callbacks? })` when defaults and interception belong together. Both return a frozen leaf retaining every view and key function, so configure another view on the result directly. The first interceptor is outermost. Defaults apply before local options. Shared mutation callbacks compose only with `callbacks: 'compose'`; `onMutate` remains local. Build configurations once per owner. The original leaf is unchanged, and configured copies share prepared-input ownership.
+
+Use `createBranchQueryFilter(branch, view)` when only one view across a namespace should refresh. Its returned native filter combines supported descendant view prefixes with any caller predicate. Missing views match nothing, and bulk results remain heterogeneous. Leave `exact` omitted to match descendants. This helper preserves existing key layouts; do not use the filter's branch key alone when view isolation matters.
+
+For a typed error union, `findDeclaredError(error, tag)` returns an Effect Option for exactly one tagged failure. Only tags in the typed union are accepted. Composite Causes, defects, interruptions and non-wrapper errors return None. Preserve the original wrapper for diagnostics and retry decisions; tag matching does not validate unknown values or imply that transport failures are retryable.

@@ -164,3 +164,25 @@ const interceptedCreateUser = withMutationInterceptor(
     return await next();
   }
 );
+
+import { configureMutation, configureQuery } from "@ueberbrot/effect-api-query";
+
+const configuredUser = configureMutation(
+  configureQuery(rpc.users.get, "query", {
+    policy: { staleTime: 30_000 },
+    interceptors: [async ({ next }) => await next()],
+  }),
+  {
+    callbacks: "compose",
+    policy: {
+      onSuccess: () =>
+        queryClient.invalidateQueries({ queryKey: rpc.users.key() }),
+    },
+  }
+);
+const options = configuredUser.queryOptions({
+  input: { id: 1 },
+  staleTime: 5_000,
+});
+
+void options;

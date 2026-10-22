@@ -13,6 +13,7 @@ import { Rpc, RpcGroup, RpcTest } from "effect/rpc";
 import {
   createHttpApiQueryUtils,
   createRpcQueryUtils,
+  prepareInput,
 } from "#effect-api-query";
 
 const Payload = Schema.Struct({
@@ -143,18 +144,29 @@ const program = Effect.gen(function* () {
         })),
       };
       const request = { payload: Payload.make(input) };
-      measure("rpc", "query-key", 1, records, 500, () => {
-        rpc.queryKey(input);
-      });
-      measure("rpc", "query-options", 1, records, 500, () => {
-        rpc.queryOptions({ input });
-      });
-      measure("http", "query-key", 1, records, 500, () => {
-        http.queryKey(request);
-      });
-      measure("http", "query-options", 1, records, 500, () => {
-        http.queryOptions({ input: request });
-      });
+      const preparedRpc = prepareInput(rpc, input);
+      const preparedHttp = prepareInput(http, request);
+      const workloads = [
+        ["rpc", "query-key", () => rpc.queryKey(input)],
+        ["rpc", "query-options", () => rpc.queryOptions({ input })],
+        ["http", "query-key", () => http.queryKey(request)],
+        ["http", "query-options", () => http.queryOptions({ input: request })],
+        [
+          "rpc",
+          "prepared-query-options",
+          () => rpc.queryOptions({ input: preparedRpc }),
+        ],
+        [
+          "http",
+          "prepared-query-options",
+          () => http.queryOptions({ input: preparedHttp }),
+        ],
+      ] as const;
+      for (const [adapter, stage, operation] of workloads) {
+        measure(adapter, stage, 1, records, 500, () => {
+          operation();
+        });
+      }
     }
   }
   console.log(

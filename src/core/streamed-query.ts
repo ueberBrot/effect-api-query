@@ -21,8 +21,26 @@ export type StreamQueryPolicy =
       readonly _tag: "Accumulated";
       readonly refetchMode: StreamRefetchMode;
       readonly publicationBatchSize: number;
+      readonly publicationMaxWaitMs: number | undefined;
     }
   | { readonly _tag: "Live" };
+
+// oxlint-disable-next-line anti-slop/no-unknown-parameters
+const validatePublicationDeadline: (
+  value: unknown
+) => asserts value is number | undefined = (publicationMaxWaitMs) => {
+  if (
+    publicationMaxWaitMs !== undefined &&
+    (!Predicate.isNumber(publicationMaxWaitMs) ||
+      !Number.isSafeInteger(publicationMaxWaitMs) ||
+      publicationMaxWaitMs <= 0 ||
+      publicationMaxWaitMs > 2_147_483_647)
+  ) {
+    throw new RangeError(
+      "publicationMaxWaitMs must be an integer from 1 to 2147483647"
+    );
+  }
+};
 
 export const prepareStreamPolicy = (
   // oxlint-disable-next-line anti-slop/no-unsafe-dictionary-type
@@ -39,6 +57,7 @@ export const prepareStreamPolicy = (
       maxChunks,
       refetchMode = "reset",
       publicationBatchSize = 1,
+      publicationMaxWaitMs,
     } = options;
     if (
       maxChunks !== undefined &&
@@ -70,11 +89,13 @@ export const prepareStreamPolicy = (
         "publicationBatchSize must be a positive safe integer"
       );
     }
+    validatePublicationDeadline(publicationMaxWaitMs);
     policy = {
       _tag: "Accumulated",
       maxChunks,
       refetchMode,
       publicationBatchSize,
+      publicationMaxWaitMs,
     };
   } else {
     policy = { _tag: "Live" };
@@ -82,6 +103,7 @@ export const prepareStreamPolicy = (
   delete options["refetchMode"];
   delete options["maxChunks"];
   delete options["publicationBatchSize"];
+  delete options["publicationMaxWaitMs"];
   return {
     policy,
     history:
@@ -93,6 +115,9 @@ export const prepareStreamPolicy = (
             ...(policy.publicationBatchSize === 1
               ? undefined
               : { publicationBatchSize: policy.publicationBatchSize }),
+            ...(policy.publicationMaxWaitMs === undefined
+              ? undefined
+              : { publicationMaxWaitMs: policy.publicationMaxWaitMs }),
           },
   };
 };
@@ -247,7 +272,8 @@ export const makeStreamQuery = ({
     };
   }
 
-  const { maxChunks, refetchMode, publicationBatchSize } = policy;
+  const { maxChunks, refetchMode, publicationBatchSize, publicationMaxWaitMs } =
+    policy;
   return async (context: QueryFunctionContext) => {
     const query = validateHash(context);
     const reset = refetchMode === "reset" && query?.isFetched() === true;
@@ -281,7 +307,8 @@ export const makeStreamQuery = ({
         streamPublicationBatches(
           await streamFn(streamContext),
           publicationBatchSize,
-          streamContext.signal
+          streamContext.signal,
+          publicationMaxWaitMs
         ),
     });
     const result = await queryFn(context);

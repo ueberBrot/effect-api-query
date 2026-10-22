@@ -1,8 +1,10 @@
 packages:
   - .
   - apps/*
-  - examples/*
-  - "!examples/shared"
+  - examples/contracts
+  - examples/server
+  - examples/tanstack-start
+  - examples/vite-react
 
 catalog:
   "@effect/platform-node": 4.0.4

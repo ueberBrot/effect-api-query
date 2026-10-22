@@ -69,17 +69,18 @@ The cache retains the decoded value and metadata snapshot. It contains no respon
 | `maxChunks` | Positive safe integer that limits retained events. Omitted means unlimited. |
 | `refetchMode` | `reset` (default), `append`, or `replace`. |
 | `publicationBatchSize` | Positive safe integer for ordered publication batches; defaults to one. |
+| `publicationMaxWaitMs` | Integer from 1 through 2,147,483,647; flushes a partial batch from its first buffered event. Omitted means no deadline. |
 | `sseOptions.maxEventSize` | Positive safe integer that limits pending parser text. The default is 10 MiB of JavaScript string code units. |
 
 Decoded data is an ordered readonly array. Accumulated elements keep `undefined`. Decoded header wrappers surround each emitted body. Empty completion succeeds. Acquisition and consumption errors use `EffectHttpApiQueryError` with operation `streamed`. They preserve declared event failures, `Sse.Retry`, `Sse.SseError`, HTTP and Schema errors, and additional client channels.
 
 The caller's runner supplies acquisition and consumption services and receives Query's abort signal. Cancellation closes the iterator and follows native Query cache reversion.
 
-The first event publishes immediately. Later events publish in batches of `publicationBatchSize`. Completion or failure flushes a partial batch. A `replace` refetch still publishes only on successful completion. Cancellation discards unpublished events. Batching sets no deadline, so partial batches can remain unpublished while a stream stays open. Invalid publication batch sizes synchronously throw `RangeError`, including for skipped input. Builders remove publication controls from the returned Query options.
+The first event publishes immediately. Later events publish in batches of `publicationBatchSize`. Completion or failure flushes a partial batch. A `replace` refetch still publishes only on successful completion. Cancellation discards unpublished events. Without `publicationMaxWaitMs`, partial batches can remain unpublished while a stream stays open. Invalid publication batch sizes or deadlines synchronously throw `RangeError`, including for skipped input. Builders remove publication controls from the returned Query options.
 
-`streamedKey(input, policy)` accepts the same decoder, retention, refetch, and publication policy. Inputless endpoints use `streamedKey(policy)`. Equivalent defaults have equal keys. Omitted or explicit batch size one has the same identity. Nondefault sizes have separate entries. Different effective policies occupy separate entries. Endpoint `key()` selects them all. Decoded request input and custom encoders exclude decoder controls. Declared resume headers remain part of request identity.
+`streamedKey(input, policy)` accepts the same decoder, retention, refetch, and publication policy. Inputless endpoints use `streamedKey(policy)`. Equivalent defaults have equal keys. Omitted or explicit batch size one has the same identity. Nondefault sizes and explicit deadlines have separate entries. Endpoint `key()` selects them all. Decoded request input and custom encoders exclude decoder controls. Declared resume headers remain part of request identity.
 
-See [Accumulate Values](/effect-api-query/guides/streaming/#accumulate-values). See [Batch Accumulated Publications](/effect-api-query/guides/choose-stream-history/#batch-accumulated-publications) for count-based latency and retention.
+See [Accumulate Values](/effect-api-query/guides/streaming/#accumulate-values). See [Batch Accumulated Publications](/effect-api-query/guides/choose-stream-history/#batch-accumulated-publications) for count and deadline behavior.
 
 ## Live SSE options
 
@@ -87,7 +88,7 @@ See [Accumulate Values](/effect-api-query/guides/streaming/#accumulate-values). 
 
 The first emission makes the query successful. Later emissions replace the cached value. Completion preserves the latest value. Only a top-level `undefined` becomes `null`. Declared header wrappers retain their decoded body and headers.
 
-An empty live completion fails with declaration metadata. Live queries accept no `maxChunks`, accumulated `refetchMode`, or `publicationBatchSize`.
+An empty live completion fails with declaration metadata. Live queries accept no `maxChunks`, accumulated `refetchMode`, `publicationBatchSize`, or `publicationMaxWaitMs`.
 
 Live and accumulated SSE queries have the same acquisition and consumption errors and services, decoder limit validation, iterator cleanup, and caller-owned reconnection contract. Input-bearing builders validate decoder policy even when skipped. Endpoint prefixes match both representations and every concrete decoder policy. See [Keep the Latest Value](/effect-api-query/guides/streaming/#keep-the-latest-value).
 

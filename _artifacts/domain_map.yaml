@@ -1,6 +1,6 @@
 library:
   name: "@ueberbrot/effect-api-query"
-  version: 0.1.0
+  version: 0.2.0
   repository: https://github.com/ueberBrot/effect-api-query
   description: TanStack Query utilities derived from ready Effect RPC and HTTP clients.
   primary_framework: framework-agnostic
@@ -17,10 +17,10 @@ skills:
     packages:
       - "@ueberbrot/effect-api-query"
     covers:
-      - RPC construction and canonical identity
+      - RPC construction, explicit prepared inputs, and canonical identity
       - HTTP decoded requests, SSE, multipart mutations, and metadata
       - Inferred operation types, typed policy composition, execution interception, native defaults, and view filters
-      - Input-field skipping, pagination, publication batches, recovery, and lifetime tracing
+      - Input-field skipping, pagination, publication deadlines, uncached event consumption, recovery, and lifetime tracing
       - Stream snapshots and request cleanup
       - Optimistic overlap, event refresh, and owner replacement
       - DTO and rich-value hydration with typed view registration
@@ -29,6 +29,8 @@ skills:
       - Derive buffered, paginated, accumulated, live, and metadata options from a ready client.
       - Address exact stream policy keys, select supported view prefixes, and compose encoded partial native filters with explicit typed projections.
       - Reuse inferred input, cached query data, and mutation types in application modules.
+      - Compose configured leaves and ordered interceptors across views; select a branch view without changing key layouts.
+      - Reuse owner-bound prepared inputs and match single tagged failures without flattening composite Causes.
       - Apply native defaults and typed reusable policies without losing call-site selection, conditional input, or explicitly undefined seed behavior; compose required mutation callbacks or intercept native execution attempts.
       - Capture open streams and drain queries, preparation, and accepted writes before request disposal.
       - Hydrate every selected view into its normal decoded cache representation.
@@ -58,6 +60,20 @@ skills:
       - topic: Frameworks and hosts
         reason: Native providers, Suspense recovery, hook overloads, and transport boundaries depend on the integration. The package does not provide these services.
     failure_modes:
+      - mistake: Mutate or transfer a prepared input
+        mechanism: A handle retains execution input and belongs to one leaf; mutating it can make execution disagree with its frozen key.
+        wrong_pattern: Reuse a handle after changing nested request values or replacing the utility tree.
+        correct_pattern: Keep retained values unchanged and prepare a new handle for each input and owner.
+        source: src/core/prepared-input.ts
+        priority: HIGH
+        status: active
+      - mistake: Assume count-based publication flushes a quiet stream
+        mechanism: Without a deadline, pending events wait for the count, completion, or failure.
+        wrong_pattern: Use a large publicationBatchSize for infrequent updates without a deadline.
+        correct_pattern: Set publicationMaxWaitMs or use a batch size of one.
+        source: src/core/stream-publication.ts
+        priority: HIGH
+        status: active
       - mistake: Reuse an accumulated key across incompatible policies
         mechanism: Retention and refetch policy change representation and normalized identity.
         wrong_pattern: rpc.events.watch.streamedKey(input)

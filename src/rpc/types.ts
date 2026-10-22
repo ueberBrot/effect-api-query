@@ -3,6 +3,7 @@ import type { Context, Schema, SchemaAST } from "effect";
 import type { Headers } from "effect/http";
 import type { Rpc, RpcClient, RpcGroup, RpcSchema } from "effect/rpc";
 
+import type { PreparedInput } from "../core/prepared-input";
 import type {
   ContainsRedacted,
   InfiniteQueryBuilder,
@@ -301,7 +302,12 @@ export type StreamKeyBuilder<R extends Rpc.Any, Key> = KeyBuilder<
 export type StreamedKeyBuilder<R extends Rpc.Any, Key> =
   PayloadlessRpc<R> extends true
     ? (policy?: StreamedPolicyOptions) => Key
-    : (input: Rpc.PayloadConstructor<R>, policy?: StreamedPolicyOptions) => Key;
+    : (
+        input:
+          | Rpc.PayloadConstructor<R>
+          | PreparedInput<Rpc.PayloadConstructor<R>>,
+        policy?: StreamedPolicyOptions
+      ) => Key;
 
 /** The key and option builders exposed at one streaming RPC path. */
 export interface RpcStreamLeaf<

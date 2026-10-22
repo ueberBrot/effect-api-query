@@ -65,8 +65,14 @@ describe.each(["rpc", "http"] as const)("publication adapter %s", (adapter) => {
         const leaf = adapter === "rpc" ? rpc.watch : http.events.watch;
         const options =
           adapter === "rpc"
-            ? rpc.watch.streamedOptions({ publicationBatchSize: 3 })
-            : http.events.watch.streamedOptions({ publicationBatchSize: 3 });
+            ? rpc.watch.streamedOptions({
+                publicationBatchSize: 3,
+                publicationMaxWaitMs: 50,
+              })
+            : http.events.watch.streamedOptions({
+                publicationBatchSize: 3,
+                publicationMaxWaitMs: 50,
+              });
         const queryClient = new QueryClient();
         const publications: unknown[] = [];
         const stop = queryClient.getQueryCache().subscribe((event) => {
@@ -82,10 +88,16 @@ describe.each(["rpc", "http"] as const)("publication adapter %s", (adapter) => {
           const result = yield* Effect.promise(async () =>
             adapter === "rpc"
               ? await queryClient.query(
-                  rpc.watch.streamedOptions({ publicationBatchSize: 3 })
+                  rpc.watch.streamedOptions({
+                    publicationBatchSize: 3,
+                    publicationMaxWaitMs: 50,
+                  })
                 )
               : await queryClient.query(
-                  http.events.watch.streamedOptions({ publicationBatchSize: 3 })
+                  http.events.watch.streamedOptions({
+                    publicationBatchSize: 3,
+                    publicationMaxWaitMs: 50,
+                  })
                 )
           );
           expect({ result, publications }).toStrictEqual({
@@ -93,7 +105,10 @@ describe.each(["rpc", "http"] as const)("publication adapter %s", (adapter) => {
             publications: [[1], [1, 2, 3, 4], [1, 2, 3, 4, 5, 6]],
           });
           expect(options.queryKey).toStrictEqual(
-            leaf.streamedKey({ publicationBatchSize: 3 })
+            leaf.streamedKey({
+              publicationBatchSize: 3,
+              publicationMaxWaitMs: 50,
+            })
           );
           expect(leaf.streamedKey({ publicationBatchSize: 1 })).toStrictEqual(
             leaf.streamedKey()
@@ -271,4 +286,72 @@ it.effect("rejects invalid publication batch sizes during preparation", () =>
       );
     }
   })
+);
+
+it.effect(
+  "publishes a quiet RPC batch at its deadline and closes the open stream",
+  () =>
+    Effect.gen(function* publishesQuietBatch() {
+      const group = RpcGroup.make(
+        Rpc.make("watch", { success: Schema.Int, stream: true })
+      );
+      const finalized = yield* Deferred.make<boolean>();
+      const client = yield* makeRpcTestClient(group, {
+        watch: () =>
+          Stream.make(1, 2).pipe(
+            Stream.concat(Stream.never),
+            Stream.ensuring(Deferred.succeed(finalized, true))
+          ),
+      });
+      const rpc = createRpcQueryUtils(group, {
+        client,
+        keyPrefix: ["deadline"],
+      });
+      const options = rpc.watch.streamedOptions({
+        publicationBatchSize: 10,
+        publicationMaxWaitMs: 5,
+      });
+      expect(options.queryKey).toStrictEqual(
+        rpc.watch.streamedKey({
+          publicationBatchSize: 10,
+          publicationMaxWaitMs: 5,
+        })
+      );
+      expect(options.queryKey).not.toStrictEqual(
+        rpc.watch.streamedKey({ publicationBatchSize: 10 })
+      );
+      expect(options).not.toHaveProperty("publicationMaxWaitMs");
+      const queryClient = new QueryClient();
+      const observer = new QueryObserver(queryClient, options);
+      const stop = observer.subscribe(() => {});
+      try {
+        yield* waitForQueryState(
+          queryClient,
+          () => observer.getCurrentResult().data?.length === 2
+        );
+        expect(observer.getCurrentResult().data).toStrictEqual([1, 2]);
+        yield* Effect.promise(async () => {
+          await queryClient.cancelQueries(
+            { queryKey: options.queryKey },
+            { revert: false }
+          );
+        });
+        yield* Deferred.await(finalized);
+        for (const publicationMaxWaitMs of [
+          0,
+          -1,
+          1.5,
+          Infinity,
+          Number.NaN,
+          2_147_483_648,
+        ]) {
+          expect(() =>
+            rpc.watch.streamedOptions({ publicationMaxWaitMs })
+          ).toThrow(RangeError);
+        }
+      } finally {
+        stop();
+        queryClient.clear();
+      }
+    })
 );

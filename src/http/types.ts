@@ -9,6 +9,7 @@ import type {
   HttpApiSchema,
 } from "effect/http-api";
 
+import type { PreparedInput } from "../core/prepared-input";
 import type {
   ContainsRedacted,
   InfiniteQueryBuilder,
@@ -387,7 +388,7 @@ export type StreamedLeaf<
   readonly streamedKey: void extends Request<Endpoint>
     ? (policy?: HttpStreamPolicy) => StreamedKey<Endpoint, Key, ClientError>
     : (
-        input: Request<Endpoint>,
+        input: Request<Endpoint> | PreparedInput<Request<Endpoint>>,
         policy?: HttpStreamPolicy
       ) => StreamedKey<Endpoint, Key, ClientError>;
   readonly streamedOptions: UnaryQueryBuilder<
@@ -429,7 +430,7 @@ export type LiveLeaf<
   readonly liveKey: void extends Request<Endpoint>
     ? (policy?: HttpLivePolicy) => LiveKey<Endpoint, Key, ClientError>
     : (
-        input: Request<Endpoint>,
+        input: Request<Endpoint> | PreparedInput<Request<Endpoint>>,
         policy?: HttpLivePolicy
       ) => LiveKey<Endpoint, Key, ClientError>;
   readonly liveOptions: UnaryQueryBuilder<

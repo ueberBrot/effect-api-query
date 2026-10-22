@@ -5,6 +5,8 @@ import type {
   SkipToken,
 } from "@tanstack/query-core";
 
+import type { PreparedInput } from "./prepared-input";
+
 export type QueryView = "query" | "infinite" | "metadata" | "live" | "streamed";
 
 export type SupportedQueryView<Leaf> = {
@@ -60,12 +62,12 @@ export type OptionsInput<Leaf> = Leaf extends {
   readonly streamedOptions: (...args: infer Args) => unknown;
 }
   ? NonNullable<Args[0]> extends { readonly input: infer Input }
-    ? Exclude<Input, SkipToken>
+    ? Exclude<Input, SkipToken | PreparedInput<unknown>>
     : void
   : Leaf extends { readonly queryKey: (...args: infer Args) => unknown }
     ? Args extends []
       ? void
-      : Args[0]
+      : Exclude<Args[0], PreparedInput<unknown>>
     : never;
 
 /** The RPC payload constructor input or decoded HTTP request accepted by a leaf. */
