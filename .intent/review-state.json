@@ -2118,6 +2118,90 @@
         "vp run docs-check passed: 20 excerpt checks and Astro diagnostics; intent validate skills --check passed.",
         "Fresh delegated consumer used the installed 0.2.0 candidate skill and implemented tests/skills/query-usability/task.md in isolation. Its solution passed TS7, TS5.9, and the unchanged runtime grader. Broad invalidation failed the negative control. Automatic discovery was not tested."
       ]
+    },
+    "source:.changeset/branch-query-filters.md": {
+      "fingerprint": "1ea20004a73d79e2562a3f9f5b0d155a83e9d11746f801d230538db689724641",
+      "snapshot": {
+        ".changeset/branch-query-filters.md": "098f93c52afd4f0f8650852fbaec350d1fc31c80072d34f9cbd6114f13f41d21"
+      },
+      "head": "e657b7a508fc29975da3bd5517d0ac7d3126a8f4",
+      "outcome": "no-change",
+      "reason": "Split the previously reviewed combined release note into one changeset per improvement at the user's request. Each entry explicitly states that it has no breaking changes. Library behavior and shipped guidance are unchanged.",
+      "evidence": [
+        "Six separate minor changesets replace query-usability-and-stream-controls.md; each covers one of the six existing feature groups.",
+        "vp run changeset status --since origin/main passes and reports a minor release for @ueberbrot/effect-api-query.",
+        "vp fmt .changeset completed; no runtime, public types, or skill guidance changed."
+      ]
+    },
+    "source:.changeset/configured-query-leaves.md": {
+      "fingerprint": "e3c2bbbabd17f1c7a2e2b8cc89d5b216a8888fcd0e8fdbad45c64d17ae12777f",
+      "snapshot": {
+        ".changeset/configured-query-leaves.md": "57450fc6fc985cdfc45c51393719c107e800897f48fe057c592c5fc0765b75ad"
+      },
+      "head": "e657b7a508fc29975da3bd5517d0ac7d3126a8f4",
+      "outcome": "no-change",
+      "reason": "Split the previously reviewed combined release note into one changeset per improvement at the user's request. Each entry explicitly states that it has no breaking changes. Library behavior and shipped guidance are unchanged.",
+      "evidence": [
+        "Six separate minor changesets replace query-usability-and-stream-controls.md; each covers one of the six existing feature groups.",
+        "vp run changeset status --since origin/main passes and reports a minor release for @ueberbrot/effect-api-query.",
+        "vp fmt .changeset completed; no runtime, public types, or skill guidance changed."
+      ]
+    },
+    "source:.changeset/consume-events.md": {
+      "fingerprint": "770a3b2a5e4ae5cd300b8be67d3c3c243bab72d5f28039f326c589de6c0aad9b",
+      "snapshot": {
+        ".changeset/consume-events.md": "9bafbf8fb1275dff6c78ea1e3711d71048e8e686d922b657f84aefc88bc8467b"
+      },
+      "head": "e657b7a508fc29975da3bd5517d0ac7d3126a8f4",
+      "outcome": "no-change",
+      "reason": "Split the previously reviewed combined release note into one changeset per improvement at the user's request. Each entry explicitly states that it has no breaking changes. Library behavior and shipped guidance are unchanged.",
+      "evidence": [
+        "Six separate minor changesets replace query-usability-and-stream-controls.md; each covers one of the six existing feature groups.",
+        "vp run changeset status --since origin/main passes and reports a minor release for @ueberbrot/effect-api-query.",
+        "vp fmt .changeset completed; no runtime, public types, or skill guidance changed."
+      ]
+    },
+    "source:.changeset/declared-error-lookup.md": {
+      "fingerprint": "a59b9010f358402f63215fe36376a0e8347821879b48cd994683b90687b0533f",
+      "snapshot": {
+        ".changeset/declared-error-lookup.md": "6443ee489daa56f5a3188fbad63e1c8c5041494c6c05f2580ad6129026f9137a"
+      },
+      "head": "e657b7a508fc29975da3bd5517d0ac7d3126a8f4",
+      "outcome": "no-change",
+      "reason": "Split the previously reviewed combined release note into one changeset per improvement at the user's request. Each entry explicitly states that it has no breaking changes. Library behavior and shipped guidance are unchanged.",
+      "evidence": [
+        "Six separate minor changesets replace query-usability-and-stream-controls.md; each covers one of the six existing feature groups.",
+        "vp run changeset status --since origin/main passes and reports a minor release for @ueberbrot/effect-api-query.",
+        "vp fmt .changeset completed; no runtime, public types, or skill guidance changed."
+      ]
+    },
+    "source:.changeset/prepared-query-inputs.md": {
+      "fingerprint": "aa83367c7fb171217291509fe23fe3aaa7a9a004cbc2b188ddfce978aa4a54f6",
+      "snapshot": {
+        ".changeset/prepared-query-inputs.md": "0f3a04d8677cd545da2022c0b89221d8da63df38953e15a29e5b79d7e8b633cd"
+      },
+      "head": "e657b7a508fc29975da3bd5517d0ac7d3126a8f4",
+      "outcome": "no-change",
+      "reason": "Split the previously reviewed combined release note into one changeset per improvement at the user's request. Each entry explicitly states that it has no breaking changes. Library behavior and shipped guidance are unchanged.",
+      "evidence": [
+        "Six separate minor changesets replace query-usability-and-stream-controls.md; each covers one of the six existing feature groups.",
+        "vp run changeset status --since origin/main passes and reports a minor release for @ueberbrot/effect-api-query.",
+        "vp fmt .changeset completed; no runtime, public types, or skill guidance changed."
+      ]
+    },
+    "source:.changeset/publication-deadlines.md": {
+      "fingerprint": "5ab7c1db9e95edd4a48cade1ed6008617b32f9dbfdf60b1370793e4d4f5296a2",
+      "snapshot": {
+        ".changeset/publication-deadlines.md": "a79964cf827af1eb4cc3f2b45b84182b6a5abd99cc4e22f304ac9137f23e4d0c"
+      },
+      "head": "e657b7a508fc29975da3bd5517d0ac7d3126a8f4",
+      "outcome": "no-change",
+      "reason": "Split the previously reviewed combined release note into one changeset per improvement at the user's request. Each entry explicitly states that it has no breaking changes. Library behavior and shipped guidance are unchanged.",
+      "evidence": [
+        "Six separate minor changesets replace query-usability-and-stream-controls.md; each covers one of the six existing feature groups.",
+        "vp run changeset status --since origin/main passes and reports a minor release for @ueberbrot/effect-api-query.",
+        "vp fmt .changeset completed; no runtime, public types, or skill guidance changed."
+      ]
     }
   }
 }
