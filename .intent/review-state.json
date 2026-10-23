@@ -2260,6 +2260,36 @@
         "shellcheck and shfmt pass for scripts/check-skills.sh and .vite-hooks/pre-push; actionlint passes for ci.yml; zizmor reports no medium/high findings; default yamllint has no new findings and one pre-existing line-length finding was removed.",
         "vp exec intent maintainer sync reported Nothing to synchronize. Independent wiring audit found no objections. No consumer guidance or activation description changed, so consumer task and discovery sessions were not repeated."
       ]
+    },
+    "source:.devcontainer/Dockerfile": {
+      "fingerprint": "c5a0edac83cee8c4be366870e2d33766555e86c91a7fd494dc72b338bcd52449",
+      "snapshot": {
+        ".devcontainer/Dockerfile": "b578ed28d6c712e22d8e4b878d74ac78e272514013f2dbc274ddd260509e71e7"
+      },
+      "head": "bab425e1a932801bc89aebba84c5dad83de02acd",
+      "outcome": "no-change",
+      "reason": "Copy Node 24.22.1 from an official digest-pinned Bookworm image into the existing devcontainer so it matches the repository pin. Docker handles architecture selection; existing development setup and consumer guidance remain accurate.",
+      "evidence": [
+        "Reviewed the final PR diff against 61fe6b0. It contains only .node-version, .devcontainer/Dockerfile and this maintenance record. .github/workflows/deploy-docs.yml is identical to the PR base; manual historical-release deployment behavior is outside this update.",
+        "Node 24.22.1 passed all 738 tests, TypeScript 7/5.9 public and server-local fixtures, typed lint/type checks in 183 files, attw/publint and the 57-page docs build earlier in this PR. No library source or dependencies changed afterward. After removing the workflow override, all 76 docs-release tests and actionlint pass.",
+        "The final Dockerfile passed Hadolint and built on linux/arm64 and linux/amd64. Interactive node-user shells select /usr/local/bin/node v24.22.1 matching .node-version. npm 11.19.1, Corepack 0.36.0, Yarn 1.22.22, TypeScript 7.0.2 and Corepack pnpm shim provisioning work on both platforms. Official image index: sha256:6449e19d8184d84062525b6a7524def03146c2cb04a7f08b076680d0e8e4240a.",
+        "The owned skill and all three planning records (_artifacts/domain_map.yaml, _artifacts/skill_spec.md, _artifacts/skill_tree.yaml) retain accurate tasks, failure modes, boundaries, source mappings, prerequisites and six references. Runtime provisioning changes require no guidance or planning rewrite; no unrelated reviews were resolved."
+      ]
+    },
+    "source:.node-version": {
+      "fingerprint": "5c862587348232d6a3ed7bee0a635de9ed3bb612602dc6f50d85e34ee8453f7c",
+      "snapshot": {
+        ".node-version": "d9f318747a126ce2247661af67852b185def7789492eabfad7bba322be087c33"
+      },
+      "head": "bab425e1a932801bc89aebba84c5dad83de02acd",
+      "outcome": "no-change",
+      "reason": "Upgrade the repository Node pin from 24.19.0 to the October security release 24.22.1. Existing CI and release setup already read this pin; public library behavior and consumer guidance are unchanged.",
+      "evidence": [
+        "Reviewed the final PR diff against 61fe6b0. It contains only .node-version, .devcontainer/Dockerfile and this maintenance record. .github/workflows/deploy-docs.yml is identical to the PR base; manual historical-release deployment behavior is outside this update.",
+        "Node 24.22.1 passed all 738 tests, TypeScript 7/5.9 public and server-local fixtures, typed lint/type checks in 183 files, attw/publint and the 57-page docs build earlier in this PR. No library source or dependencies changed afterward. After removing the workflow override, all 76 docs-release tests and actionlint pass.",
+        "The final Dockerfile passed Hadolint and built on linux/arm64 and linux/amd64. Interactive node-user shells select /usr/local/bin/node v24.22.1 matching .node-version. npm 11.19.1, Corepack 0.36.0, Yarn 1.22.22, TypeScript 7.0.2 and Corepack pnpm shim provisioning work on both platforms. Official image index: sha256:6449e19d8184d84062525b6a7524def03146c2cb04a7f08b076680d0e8e4240a.",
+        "The owned skill and all three planning records (_artifacts/domain_map.yaml, _artifacts/skill_spec.md, _artifacts/skill_tree.yaml) retain accurate tasks, failure modes, boundaries, source mappings, prerequisites and six references. Runtime provisioning changes require no guidance or planning rewrite; no unrelated reviews were resolved."
+      ]
     }
   }
 }
