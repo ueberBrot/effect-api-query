@@ -2290,6 +2290,120 @@
         "The final Dockerfile passed Hadolint and built on linux/arm64 and linux/amd64. Interactive node-user shells select /usr/local/bin/node v24.22.1 matching .node-version. npm 11.19.1, Corepack 0.36.0, Yarn 1.22.22, TypeScript 7.0.2 and Corepack pnpm shim provisioning work on both platforms. Official image index: sha256:6449e19d8184d84062525b6a7524def03146c2cb04a7f08b076680d0e8e4240a.",
         "The owned skill and all three planning records (_artifacts/domain_map.yaml, _artifacts/skill_spec.md, _artifacts/skill_tree.yaml) retain accurate tasks, failure modes, boundaries, source mappings, prerequisites and six references. Runtime provisioning changes require no guidance or planning rewrite; no unrelated reviews were resolved."
       ]
+    },
+    "source:.agents/skills/effect-ts/SKILL.md": {
+      "fingerprint": "39219537203eec7bb6d51147d961838f24ed74b275c0335f3fa3ca35fad5c82d",
+      "snapshot": {
+        ".agents/skills/effect-ts/SKILL.md": "30acc24da779cb4e530732bc74cca172adb372f24f42f2d1af18370c27938bff"
+      },
+      "head": "56adc4234e728f3f7e47c80066b55b3af019f1d7",
+      "outcome": "no-change",
+      "reason": "Both generic Effect repository-setup examples now install effect@latest instead of effect@rc. This repository-local setup instruction changes no package dependency, adapter contract, or consumer guidance; the shipped effect-api-query skill remains accurate.",
+      "evidence": [
+        "Compared origin/main (49278c5d94daac512dc91ec75a101e777ee99eb4) with 56adc4234e728f3f7e47c80066b55b3af019f1d7 and reviewed all seven changed files. git diff --check passes.",
+        "No changes under src, tests, examples, apps/docs, skills, or _artifacts. Reviewed _artifacts/domain_map.yaml, _artifacts/skill_spec.md, and _artifacts/skill_tree.yaml: library domains, tasks, prerequisites, six references, and source mappings remain accurate; all three records require no edits.",
+        "vp exec intent maintainer sync reports Nothing to synchronize. vp run skills-check passes (one shipped skill), and vp run format passes (356 files).",
+        "Activation metadata and Effect install examples were checked directly; removal agrees with skills-lock.json. No fresh agent discovery or external-service setup session was run for the local authoring skills.",
+        "Before recording, vp run skills-maintenance-check exits 1 with exactly these seven pending source reviews; structural validation and synchronization already pass."
+      ]
+    },
+    "source:.agents/skills/resolving-merge-conflicts/SKILL.md": {
+      "fingerprint": "d76fa31c127724f6a7733261cfb28e7dfa54bc491cd9ca1f0af300196b094dd7",
+      "snapshot": {
+        ".agents/skills/resolving-merge-conflicts/SKILL.md": null
+      },
+      "head": "56adc4234e728f3f7e47c80066b55b3af019f1d7",
+      "outcome": "no-change",
+      "reason": "The repository-local merge-conflict workflow is removed. It was not registered in the library skill tree or required by the shipped skill, so its removal creates no missing library task or prerequisite.",
+      "evidence": [
+        "Compared origin/main (49278c5d94daac512dc91ec75a101e777ee99eb4) with 56adc4234e728f3f7e47c80066b55b3af019f1d7 and reviewed all seven changed files. git diff --check passes.",
+        "No changes under src, tests, examples, apps/docs, skills, or _artifacts. Reviewed _artifacts/domain_map.yaml, _artifacts/skill_spec.md, and _artifacts/skill_tree.yaml: library domains, tasks, prerequisites, six references, and source mappings remain accurate; all three records require no edits.",
+        "vp exec intent maintainer sync reports Nothing to synchronize. vp run skills-check passes (one shipped skill), and vp run format passes (356 files).",
+        "Activation metadata and Effect install examples were checked directly; removal agrees with skills-lock.json. No fresh agent discovery or external-service setup session was run for the local authoring skills.",
+        "Before recording, vp run skills-maintenance-check exits 1 with exactly these seven pending source reviews; structural validation and synchronization already pass."
+      ]
+    },
+    "source:.agents/skills/resolving-merge-conflicts/agents/openai.yaml": {
+      "fingerprint": "190e021f3e6a281e199f42a1257239fad91f1dcc6112076a082c01b7f0438be9",
+      "snapshot": {
+        ".agents/skills/resolving-merge-conflicts/agents/openai.yaml": null
+      },
+      "head": "56adc4234e728f3f7e47c80066b55b3af019f1d7",
+      "outcome": "no-change",
+      "reason": "The removed interface metadata belongs only to the deleted repository-local merge-conflict skill. No shipped library skill metadata or prerequisite references it.",
+      "evidence": [
+        "Compared origin/main (49278c5d94daac512dc91ec75a101e777ee99eb4) with 56adc4234e728f3f7e47c80066b55b3af019f1d7 and reviewed all seven changed files. git diff --check passes.",
+        "No changes under src, tests, examples, apps/docs, skills, or _artifacts. Reviewed _artifacts/domain_map.yaml, _artifacts/skill_spec.md, and _artifacts/skill_tree.yaml: library domains, tasks, prerequisites, six references, and source mappings remain accurate; all three records require no edits.",
+        "vp exec intent maintainer sync reports Nothing to synchronize. vp run skills-check passes (one shipped skill), and vp run format passes (356 files).",
+        "Activation metadata and Effect install examples were checked directly; removal agrees with skills-lock.json. No fresh agent discovery or external-service setup session was run for the local authoring skills.",
+        "Before recording, vp run skills-maintenance-check exits 1 with exactly these seven pending source reviews; structural validation and synchronization already pass."
+      ]
+    },
+    "source:.agents/skills/show-me/SKILL.md": {
+      "fingerprint": "455683c00fc0c1adce97154ed07277544bd1cd94c0c1ef8f0874b8d9352cf994",
+      "snapshot": {
+        ".agents/skills/show-me/SKILL.md": "434a2346cc95e313b0d367d477dda2e23ba642dd2181757415a09500664af100"
+      },
+      "head": "56adc4234e728f3f7e47c80066b55b3af019f1d7",
+      "outcome": "no-change",
+      "reason": "The visualization authoring skill now disables model invocation. This limits activation of a repository-local tool and does not change the shipped library skill activation or any consumer workflow.",
+      "evidence": [
+        "Compared origin/main (49278c5d94daac512dc91ec75a101e777ee99eb4) with 56adc4234e728f3f7e47c80066b55b3af019f1d7 and reviewed all seven changed files. git diff --check passes.",
+        "No changes under src, tests, examples, apps/docs, skills, or _artifacts. Reviewed _artifacts/domain_map.yaml, _artifacts/skill_spec.md, and _artifacts/skill_tree.yaml: library domains, tasks, prerequisites, six references, and source mappings remain accurate; all three records require no edits.",
+        "vp exec intent maintainer sync reports Nothing to synchronize. vp run skills-check passes (one shipped skill), and vp run format passes (356 files).",
+        "Activation metadata and Effect install examples were checked directly; removal agrees with skills-lock.json. No fresh agent discovery or external-service setup session was run for the local authoring skills.",
+        "Before recording, vp run skills-maintenance-check exits 1 with exactly these seven pending source reviews; structural validation and synchronization already pass."
+      ]
+    },
+    "source:.agents/skills/show-me/agents/openai.yaml": {
+      "fingerprint": "454b2d5735a7c11462ddddd66d540467bedf9d11e0c530dd75d466bfa46a6a31",
+      "snapshot": {
+        ".agents/skills/show-me/agents/openai.yaml": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94"
+      },
+      "head": "56adc4234e728f3f7e47c80066b55b3af019f1d7",
+      "outcome": "no-change",
+      "reason": "The new allow_implicit_invocation=false policy agrees with the show-me frontmatter and makes that repository-local tool explicitly invoked. It does not alter the shipped library skill or its metadata.",
+      "evidence": [
+        "Compared origin/main (49278c5d94daac512dc91ec75a101e777ee99eb4) with 56adc4234e728f3f7e47c80066b55b3af019f1d7 and reviewed all seven changed files. git diff --check passes.",
+        "No changes under src, tests, examples, apps/docs, skills, or _artifacts. Reviewed _artifacts/domain_map.yaml, _artifacts/skill_spec.md, and _artifacts/skill_tree.yaml: library domains, tasks, prerequisites, six references, and source mappings remain accurate; all three records require no edits.",
+        "vp exec intent maintainer sync reports Nothing to synchronize. vp run skills-check passes (one shipped skill), and vp run format passes (356 files).",
+        "Activation metadata and Effect install examples were checked directly; removal agrees with skills-lock.json. No fresh agent discovery or external-service setup session was run for the local authoring skills.",
+        "Before recording, vp run skills-maintenance-check exits 1 with exactly these seven pending source reviews; structural validation and synchronization already pass."
+      ]
+    },
+    "source:.agents/skills/wizard/template.sh": {
+      "fingerprint": "5943508c8605a5a03c4b8f510b1dfe9b4ed8920f1e27909580d108fe039540de",
+      "snapshot": {
+        ".agents/skills/wizard/template.sh": "6566f147299bc6f1d941e64591ed04385416d543e11f96f564c7228f5018d0ed"
+      },
+      "head": "56adc4234e728f3f7e47c80066b55b3af019f1d7",
+      "outcome": "no-change",
+      "reason": "The local setup-wizard template strips safe double quotes from saved dotenv values, assigns persisted values in the current shell, falls back when terminal clearing fails, and parses stages before prompting. These human setup helpers do not change library APIs, ownership rules, or shipped consumer guidance.",
+      "evidence": [
+        "Compared origin/main (49278c5d94daac512dc91ec75a101e777ee99eb4) with 56adc4234e728f3f7e47c80066b55b3af019f1d7 and reviewed all seven changed files. git diff --check passes.",
+        "No changes under src, tests, examples, apps/docs, skills, or _artifacts. Reviewed _artifacts/domain_map.yaml, _artifacts/skill_spec.md, and _artifacts/skill_tree.yaml: library domains, tasks, prerequisites, six references, and source mappings remain accurate; all three records require no edits.",
+        "vp exec intent maintainer sync reports Nothing to synchronize. vp run skills-check passes (one shipped skill), and vp run format passes (356 files).",
+        "Activation metadata and Effect install examples were checked directly; removal agrees with skills-lock.json. No fresh agent discovery or external-service setup session was run for the local authoring skills.",
+        "Before recording, vp run skills-maintenance-check exits 1 with exactly these seven pending source reviews; structural validation and synchronization already pass.",
+        "bash -n passes. Independent isolated helper checks against origin/main confirm safe double-quoted defaults lose their quotes, write_env sets the shell variable and round-trips apostrophes/dollars/backslashes with idempotent mode-0600 writes, tput failure falls back, and stage parsing occurs before prompts.",
+        "Known local-wizard limitation: an undecodable double-quoted saved value is not offered as a default; ask and ask_secret still accept empty input, which write_env can persist. A full interactive setup session was not run. ShellCheck has a pre-existing SC1087 prompt-expression failure in both versions."
+      ]
+    },
+    "source:skills-lock.json": {
+      "fingerprint": "8267ba91f8acee61c9a1b206551949117937acda7f4b6ca20d4ce0e5be17284f",
+      "snapshot": {
+        "skills-lock.json": "7b398602aca39c1d2d41cad12dff006aa81cb5e880b06604cb4c87a745cbd7f2"
+      },
+      "head": "56adc4234e728f3f7e47c80066b55b3af019f1d7",
+      "outcome": "no-change",
+      "reason": "The lock record refreshes imported Effect, show-me, and wizard skill hashes and removes resolving-merge-conflicts, matching the local skill changes. This is authoring-tool provenance rather than a library dependency, source mapping, or consumer recommendation.",
+      "evidence": [
+        "Compared origin/main (49278c5d94daac512dc91ec75a101e777ee99eb4) with 56adc4234e728f3f7e47c80066b55b3af019f1d7 and reviewed all seven changed files. git diff --check passes.",
+        "No changes under src, tests, examples, apps/docs, skills, or _artifacts. Reviewed _artifacts/domain_map.yaml, _artifacts/skill_spec.md, and _artifacts/skill_tree.yaml: library domains, tasks, prerequisites, six references, and source mappings remain accurate; all three records require no edits.",
+        "vp exec intent maintainer sync reports Nothing to synchronize. vp run skills-check passes (one shipped skill), and vp run format passes (356 files).",
+        "Activation metadata and Effect install examples were checked directly; removal agrees with skills-lock.json. No fresh agent discovery or external-service setup session was run for the local authoring skills.",
+        "Before recording, vp run skills-maintenance-check exits 1 with exactly these seven pending source reviews; structural validation and synchronization already pass."
+      ]
     }
   }
 }
