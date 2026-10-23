@@ -129,7 +129,7 @@ jobs:
         id: publish
         uses: changesets/action/publish@8488615a623b1b9c987934bb89eae8af6a946ac1 # v2.1.1
         with:
-          create-github-releases: false
+          create-github-releases: true
           pack-dir-artifact-id: ${{ needs.quality-and-pack.outputs.pack-dir-artifact-id }}
         env:
           NPM_CONFIG_ACCESS: public
