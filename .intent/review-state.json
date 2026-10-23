@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "6ea0e4883683c21f690e8d5ec2a166ea37a2113af34754233cff70ccea17f10b",
+      "fingerprint": "b58b1410f38e72eccc9ac1b4855961a2290a6dcb20cda255171f049bc9b51714",
       "snapshot": {
         "GLOSSARY.md": "9f7734ff552aa9a5c2b112f7948b5001ca82341a7acbc787ee5f7131b7be340a",
         "README.md": "f774436da37f70ebd8603661b3e90f6f4492d17a788fa15704ad61239891c660",
@@ -227,6 +227,7 @@
         "tests/query-policy.test.ts": "474fe27017c24fc1377868a198d1bd97697b27921ff54ec4191625ead5f9cda9",
         "tests/query-usability.test.ts": "e9386885e50a37b121112442067f1226e96c6a1cabb73d353ff1331228082abc",
         "tests/query-view-prefix.test.ts": "fd94e3d01f52a0978242246f02a3e989bddd1e055f828f48d7a41187f696dd69",
+        "tests/skills-maintenance.test.ts": "682faa16982a90614b2fbee84a5da5a4de361f6a3f732099d9fcbc266fca3ec8",
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
         "tests/skills/query-usability/grade.test.ts": "e2c86ac0d05d4ae273e3867ac8b809336f6a8e8f043d1bccf4157aa801df4864",
         "tests/skills/query-usability/solution.ts": "ec525ee12bb1203eafd8537dbf496a17d0f5d34845c0394cf0ddf27eceba95d0",
@@ -277,18 +278,21 @@
         "tests/types/type-scale.ts": "03bcc9eca13fb59054b8f047a70183cd33cdb9ba7acc73d6e8061c9eb271d546",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9",
+      "head": "e45bf4ff4ae84af54b1ae4cab3dd11964bb68512",
       "outcome": "no-change",
-      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
+      "reason": "The new integration tests exercise repository maintenance commands and Git hooks, not package APIs or consumer integration. The existing effect-api-query skill and its six references retain accurate behavior, tasks, version-selection advice, and ownership rules.",
       "evidence": [
-        "Before versioning: intent maintainer check passed at 95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9.",
-        "changeset version and vp fmt generated 0.2.0 -> 0.3.0.",
-        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
-        "Scoped generated changes: package.json."
+        "Reviewed the full automation diff from e45bf4ff4ae84af54b1ae4cab3dd11964bb68512, the existing library skill and references, all three _artifacts planning records, and ADRs 0015/0016. AGENTS.md remains unchanged.",
+        "Before recording, vp run skills-maintenance-check, sh .vite-hooks/pre-push, and vp run validate each exited 1 for the same unreviewed workflow/hook/script/config changes; automatic checks did not modify .intent/review-state.json.",
+        "Seven real Intent integration cases pass in disposable Git repositories: unreviewed workflow failure, explicit recording and success, validate/pre-push enforcement, summary generation, explicit and local bases, diverged origin/main, CI default baseline, and missing-base recovery.",
+        "vp run test passed all 738 tests across 60 files, including 12 release-generation integration cases and both public compiler versions plus server-local fixtures. The initial sandbox attempt could not bind localhost; rerunning with local listener access passed.",
+        "vp run typecheck, vp run effect-check, vp run format, and vp run fallow passed. Package declaration validation, ATTW, and publint passed through the task dependencies.",
+        "shellcheck and shfmt pass for scripts/check-skills.sh and .vite-hooks/pre-push; actionlint passes for ci.yml; zizmor reports no medium/high findings; default yamllint has no new findings and one pre-existing line-length finding was removed.",
+        "vp exec intent maintainer sync reported Nothing to synchronize. Independent wiring audit found no objections. No consumer guidance or activation description changed, so consumer task and discovery sessions were not repeated."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "f343eb5906bf4687aca440ab76fdf48b801b0cfc91f8b43a86cdbc0ecd3babfa",
+      "fingerprint": "37e061f3d7816db3bf0fde2c6a5ecaa49d19399acc9a9171cb5dc1c3b1be8158",
       "snapshot": {
         "GLOSSARY.md": "9f7734ff552aa9a5c2b112f7948b5001ca82341a7acbc787ee5f7131b7be340a",
         "README.md": "f774436da37f70ebd8603661b3e90f6f4492d17a788fa15704ad61239891c660",
@@ -515,6 +519,7 @@
         "tests/query-policy.test.ts": "474fe27017c24fc1377868a198d1bd97697b27921ff54ec4191625ead5f9cda9",
         "tests/query-usability.test.ts": "e9386885e50a37b121112442067f1226e96c6a1cabb73d353ff1331228082abc",
         "tests/query-view-prefix.test.ts": "fd94e3d01f52a0978242246f02a3e989bddd1e055f828f48d7a41187f696dd69",
+        "tests/skills-maintenance.test.ts": "682faa16982a90614b2fbee84a5da5a4de361f6a3f732099d9fcbc266fca3ec8",
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
         "tests/skills/query-usability/grade.test.ts": "e2c86ac0d05d4ae273e3867ac8b809336f6a8e8f043d1bccf4157aa801df4864",
         "tests/skills/query-usability/solution.ts": "ec525ee12bb1203eafd8537dbf496a17d0f5d34845c0394cf0ddf27eceba95d0",
@@ -565,45 +570,52 @@
         "tests/types/type-scale.ts": "03bcc9eca13fb59054b8f047a70183cd33cdb9ba7acc73d6e8061c9eb271d546",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9",
+      "head": "e45bf4ff4ae84af54b1ae4cab3dd11964bb68512",
       "outcome": "no-change",
-      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
+      "reason": "Reviewed _artifacts/domain_map.yaml, _artifacts/skill_spec.md, and _artifacts/skill_tree.yaml. Shared maintenance automation introduces no library domain, consumer task, dependency, skill identity, or recommendation. The existing tests/**/*.ts mapping covers the added integration tests; all three planning records remain accurate and need no rewrite.",
       "evidence": [
-        "Before versioning: intent maintainer check passed at 95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9.",
-        "changeset version and vp fmt generated 0.2.0 -> 0.3.0.",
-        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
-        "Scoped generated changes: package.json."
+        "Reviewed the full automation diff from e45bf4ff4ae84af54b1ae4cab3dd11964bb68512, the existing library skill and references, all three _artifacts planning records, and ADRs 0015/0016. AGENTS.md remains unchanged.",
+        "Before recording, vp run skills-maintenance-check, sh .vite-hooks/pre-push, and vp run validate each exited 1 for the same unreviewed workflow/hook/script/config changes; automatic checks did not modify .intent/review-state.json.",
+        "Seven real Intent integration cases pass in disposable Git repositories: unreviewed workflow failure, explicit recording and success, validate/pre-push enforcement, summary generation, explicit and local bases, diverged origin/main, CI default baseline, and missing-base recovery.",
+        "vp run test passed all 738 tests across 60 files, including 12 release-generation integration cases and both public compiler versions plus server-local fixtures. The initial sandbox attempt could not bind localhost; rerunning with local listener access passed.",
+        "vp run typecheck, vp run effect-check, vp run format, and vp run fallow passed. Package declaration validation, ATTW, and publint passed through the task dependencies.",
+        "shellcheck and shfmt pass for scripts/check-skills.sh and .vite-hooks/pre-push; actionlint passes for ci.yml; zizmor reports no medium/high findings; default yamllint has no new findings and one pre-existing line-length finding was removed.",
+        "vp exec intent maintainer sync reported Nothing to synchronize. Independent wiring audit found no objections. No consumer guidance or activation description changed, so consumer task and discovery sessions were not repeated."
       ]
     },
     "source:vite.config.ts": {
-      "fingerprint": "5876eb195ee7517414564cb564944555fdc0edb21df08ebcaccdb0e9d01c01b1",
+      "fingerprint": "ca80d6117500e5f963b4c50a2cf5157135a594557785dd7827dea4357c53defd",
       "snapshot": {
-        "vite.config.ts": "6fb9c725f0e4b8f529325a5c77c27bae8e023e18b6ac1b226d349f59409857b3"
+        "vite.config.ts": "4da0a74f0314c13e369c310674bb6d8373aad3717e6db42640e7fa23d1b80b6e"
       },
-      "head": "f35d2949b09bd7de2f89147c16e523b79240d9ce",
+      "head": "e45bf4ff4ae84af54b1ae4cab3dd11964bb68512",
       "outcome": "no-change",
-      "reason": "Added only new RPC/HTTP consumer fixture paths to the existing unstable API lint exceptions. All configured checks pass; shipped guidance is unaffected.",
+      "reason": "An uncached skills-maintenance-check task centralizes the full maintenance gate. The uncached validate wrapper runs it first for early failure. The structural-only skills-check task remains available to release generation; existing consumer task and planning guidance is unchanged.",
       "evidence": [
-        "vp run quality passed: 731 runtime tests in 59 files, published contracts and server-local fixtures on TS7/TS5.9, typed lint, Effect diagnostics, package checks, and all four fallow commands. Existing duplication/hotspot advisories remain; no dead-code findings.",
-        "vp run docs-check passed: 20 excerpt checks and Astro diagnostics; intent validate skills --check passed.",
-        "Fresh delegated consumer used the installed 0.2.0 candidate skill and implemented tests/skills/query-usability/task.md in isolation. Its solution passed TS7, TS5.9, and the unchanged runtime grader. Broad invalidation failed the negative control. Automatic discovery was not tested."
+        "Reviewed the full automation diff from e45bf4ff4ae84af54b1ae4cab3dd11964bb68512, the existing library skill and references, all three _artifacts planning records, and ADRs 0015/0016. AGENTS.md remains unchanged.",
+        "Before recording, vp run skills-maintenance-check, sh .vite-hooks/pre-push, and vp run validate each exited 1 for the same unreviewed workflow/hook/script/config changes; automatic checks did not modify .intent/review-state.json.",
+        "Seven real Intent integration cases pass in disposable Git repositories: unreviewed workflow failure, explicit recording and success, validate/pre-push enforcement, summary generation, explicit and local bases, diverged origin/main, CI default baseline, and missing-base recovery.",
+        "vp run test passed all 738 tests across 60 files, including 12 release-generation integration cases and both public compiler versions plus server-local fixtures. The initial sandbox attempt could not bind localhost; rerunning with local listener access passed.",
+        "vp run typecheck, vp run effect-check, vp run format, and vp run fallow passed. Package declaration validation, ATTW, and publint passed through the task dependencies.",
+        "shellcheck and shfmt pass for scripts/check-skills.sh and .vite-hooks/pre-push; actionlint passes for ci.yml; zizmor reports no medium/high findings; default yamllint has no new findings and one pre-existing line-length finding was removed.",
+        "vp exec intent maintainer sync reported Nothing to synchronize. Independent wiring audit found no objections. No consumer guidance or activation description changed, so consumer task and discovery sessions were not repeated."
       ]
     },
     "source:.github/workflows/release.yml": {
-      "fingerprint": "7aafbb8f75ce1e8e845f44791225e94340fff75d3c21b53506dcc2349b1076c0",
+      "fingerprint": "d11fd35dd2cab3219d309e6df446c2202b4d85e6d4ffbae8ee57722b633527ab",
       "snapshot": {
-        ".github/workflows/release.yml": "3716d1051ee92aa79fc24720be1840a6c9e2bcffef9b52f0dfb7edbf5c5dbae4"
+        ".github/workflows/release.yml": "1dc455f9c16561b17daa9064109b1c52cd8a7a9dc78683cae3b89c79d2e02e01"
       },
-      "head": "916478e6f0dc80b3f6bcfd3ab21a76f590feb87f",
+      "head": "0075e01d454139343660b214a0d7d7e528e3f95d",
       "outcome": "no-change",
-      "reason": "Full checkout history makes the existing Intent review baseline available to Changesets version generation. Triggers, permissions, action pins, publication behavior and consumer guidance are unchanged.",
+      "reason": "The workflow now creates GitHub Releases from the existing version changelog after npm publication. It changes no package API, dependency, installed guidance, or consumer task. The effect-api-query skill and _artifacts/domain_map.yaml, _artifacts/skill_spec.md, and _artifacts/skill_tree.yaml retain accurate coverage, recommendations, and source mappings; no guidance or planning rewrite is needed.",
       "evidence": [
-        "Original real 0.2.0 Changesets generation at 916478e: skills-check passes, then maintainer check --base main fails with 17 pending items (skill/planning manifest version, 14 consumed Changesets, changelog).",
-        "vp run test passes all 719 cases, including 11 native Changesets/Intent integration cases. The final test-helper edit also passes all 11 scoped cases and vp run typecheck.",
-        "Regression cases verify explicit main and default checks before/after committing generated records; dirty, mapped/unmapped source, skill, export and unexpected generated edits remain blocked.",
-        "vp run typecheck (including package ATTW/publint), vp run fallow, formatting, maintainer sync and skills-check pass. Both public compiler suites and server-local fixtures pass through the test task.",
-        "actionlint passes. Zizmor reports exactly the same six existing low self-repository advisories as origin/main. Standard yamllint diagnostics are pre-existing; repository-style relaxed YAML validation passes.",
-        "No shipped behavior or guidance changed, so no new consumer/discovery session was required. ADR 0016 exempts CI and internal tooling from Changesets."
+        "Reviewed the full diff from PR base 654d0dbd007d37d36e99c74a21ba09523798bde1 to 0075e01d454139343660b214a0d7d7e528e3f95d: only create-github-releases changes from false to true in .github/workflows/release.yml.",
+        "Read skills/effect-api-query/SKILL.md, its frameworks-and-hosts version guidance, all three _artifacts planning records, and ADRs 0016 and 0030; consumer integration and documentation revision guidance remain accurate.",
+        "Pinned changesets/action 8488615a623b1b9c987934bb89eae8af6a946ac1 supports the option with the existing contents:write permission and default tag pushing. GitHub Release name and tag use package@version; the body is the trimmed changelog section.",
+        "Before recording: vp exec intent maintainer check --base 654d0dbd007d37d36e99c74a21ba09523798bde1 --github-summary failed with exactly one pending source review for .github/workflows/release.yml, matching CI run 39907131391.",
+        "actionlint .github/workflows/release.yml and zizmor --min-severity medium .github/workflows/release.yml passed on the unchanged workflow content; default yamllint findings matched the pre-change workflow.",
+        "vp run skills-check passed for the current skill. vp exec intent maintainer sync reported Nothing to synchronize. No skill behavior or activation description changed, so consumer task and discovery checks were not repeated."
       ]
     },
     "source:e2e/browser-test-config.ts": {
@@ -669,17 +681,21 @@
       ]
     },
     "source:.github/workflows/ci.yml": {
-      "fingerprint": "5de39a05c16bf2b3bccb16c1f13da0ca30ddd170259f11915f0f740973a98dee",
+      "fingerprint": "824b8e9f8e998fb7307616f6e1c6194d630cb88e7e24abb790dd78588d28785e",
       "snapshot": {
-        ".github/workflows/ci.yml": "3656400d7eb88eeff47771de54945790cf35b994c31426cd7c7683cbf22d9226"
+        ".github/workflows/ci.yml": "7e9a3b09293849573600b463ab42191ce550af47368ddb9ca93c63f1ce19c21d"
       },
-      "head": "67c5a01436f8bf3d2e1549bed76b3ad83f23ab18",
-      "outcome": "out-of-scope",
-      "reason": "Browser CI environment only; shipped library guidance is unaffected.",
+      "head": "e45bf4ff4ae84af54b1ae4cab3dd11964bb68512",
+      "outcome": "no-change",
+      "reason": "CI now invokes the same uncached skills-maintenance-check task as local validation and pre-push. It still supplies the actual PR base through INTENT_REVIEW_BASE and emits the GitHub summary; non-PR Actions runs preserve the existing Intent recorded-baseline check. Consumer guidance is unaffected.",
       "evidence": [
-        ".github/workflows/ci.yml pins the matching Playwright image and sets mounted home ownership to the container user before setup.",
-        "Reproduced Firefox launch failure with GitHub HOME owned by uid 1001. All three browsers launched and rendered after the workflow ownership command in the same linux/amd64 image.",
-        "actionlint, yamllint and formatting passed; zizmor reports only the four existing self-repository findings."
+        "Reviewed the full automation diff from e45bf4ff4ae84af54b1ae4cab3dd11964bb68512, the existing library skill and references, all three _artifacts planning records, and ADRs 0015/0016. AGENTS.md remains unchanged.",
+        "Before recording, vp run skills-maintenance-check, sh .vite-hooks/pre-push, and vp run validate each exited 1 for the same unreviewed workflow/hook/script/config changes; automatic checks did not modify .intent/review-state.json.",
+        "Seven real Intent integration cases pass in disposable Git repositories: unreviewed workflow failure, explicit recording and success, validate/pre-push enforcement, summary generation, explicit and local bases, diverged origin/main, CI default baseline, and missing-base recovery.",
+        "vp run test passed all 738 tests across 60 files, including 12 release-generation integration cases and both public compiler versions plus server-local fixtures. The initial sandbox attempt could not bind localhost; rerunning with local listener access passed.",
+        "vp run typecheck, vp run effect-check, vp run format, and vp run fallow passed. Package declaration validation, ATTW, and publint passed through the task dependencies.",
+        "shellcheck and shfmt pass for scripts/check-skills.sh and .vite-hooks/pre-push; actionlint passes for ci.yml; zizmor reports no medium/high findings; default yamllint has no new findings and one pre-existing line-length finding was removed.",
+        "vp exec intent maintainer sync reported Nothing to synchronize. Independent wiring audit found no objections. No consumer guidance or activation description changed, so consumer task and discovery sessions were not repeated."
       ]
     },
     "source:tests/packed-consumer/construction-baseline.mts": {
@@ -2207,6 +2223,42 @@
         "changeset version and vp fmt generated 0.2.0 -> 0.3.0.",
         "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
         "Scoped generated changes: .changeset/publication-deadlines.md."
+      ]
+    },
+    "source:.vite-hooks/pre-push": {
+      "fingerprint": "7b56837ccb1513f43f3ca3bf6ca27474537d2bb5fa76382b2f3e14e262f7b909",
+      "snapshot": {
+        ".vite-hooks/pre-push": "cde6ea5f7f8cd6fd57cf4a345bf68e4444542c2bc29385471f1f6e0485252ce5"
+      },
+      "head": "e45bf4ff4ae84af54b1ae4cab3dd11964bb68512",
+      "outcome": "no-change",
+      "reason": "The Vite+ pre-push hook invokes the shared maintenance task and propagates its exit status, rejecting missing reviews before a push. It performs validation only and records no review outcomes. This changes repository tooling without changing shipped guidance.",
+      "evidence": [
+        "Reviewed the full automation diff from e45bf4ff4ae84af54b1ae4cab3dd11964bb68512, the existing library skill and references, all three _artifacts planning records, and ADRs 0015/0016. AGENTS.md remains unchanged.",
+        "Before recording, vp run skills-maintenance-check, sh .vite-hooks/pre-push, and vp run validate each exited 1 for the same unreviewed workflow/hook/script/config changes; automatic checks did not modify .intent/review-state.json.",
+        "Seven real Intent integration cases pass in disposable Git repositories: unreviewed workflow failure, explicit recording and success, validate/pre-push enforcement, summary generation, explicit and local bases, diverged origin/main, CI default baseline, and missing-base recovery.",
+        "vp run test passed all 738 tests across 60 files, including 12 release-generation integration cases and both public compiler versions plus server-local fixtures. The initial sandbox attempt could not bind localhost; rerunning with local listener access passed.",
+        "vp run typecheck, vp run effect-check, vp run format, and vp run fallow passed. Package declaration validation, ATTW, and publint passed through the task dependencies.",
+        "shellcheck and shfmt pass for scripts/check-skills.sh and .vite-hooks/pre-push; actionlint passes for ci.yml; zizmor reports no medium/high findings; default yamllint has no new findings and one pre-existing line-length finding was removed.",
+        "vp exec intent maintainer sync reported Nothing to synchronize. Independent wiring audit found no objections. No consumer guidance or activation description changed, so consumer task and discovery sessions were not repeated."
+      ]
+    },
+    "source:scripts/check-skills.sh": {
+      "fingerprint": "3cbf5a08fcef002988a9a55f9f0c0019ee3f3415447dd4a42cd9f7753ddd30d4",
+      "snapshot": {
+        "scripts/check-skills.sh": "8c7b5982ba6607b8430e43eeb05c157b7d5d37f222fa7aed3f92624bd987c96a"
+      },
+      "head": "e45bf4ff4ae84af54b1ae4cab3dd11964bb68512",
+      "outcome": "no-change",
+      "reason": "The shared command runs structural skill validation and revision-aware Intent maintenance validation. Explicit PR bases take precedence; local runs use the merge-base with origin/main and fail with recovery instructions if unavailable; Actions without a PR base retain the recorded baseline. It never auto-approves reviews and changes no consumer workflow.",
+      "evidence": [
+        "Reviewed the full automation diff from e45bf4ff4ae84af54b1ae4cab3dd11964bb68512, the existing library skill and references, all three _artifacts planning records, and ADRs 0015/0016. AGENTS.md remains unchanged.",
+        "Before recording, vp run skills-maintenance-check, sh .vite-hooks/pre-push, and vp run validate each exited 1 for the same unreviewed workflow/hook/script/config changes; automatic checks did not modify .intent/review-state.json.",
+        "Seven real Intent integration cases pass in disposable Git repositories: unreviewed workflow failure, explicit recording and success, validate/pre-push enforcement, summary generation, explicit and local bases, diverged origin/main, CI default baseline, and missing-base recovery.",
+        "vp run test passed all 738 tests across 60 files, including 12 release-generation integration cases and both public compiler versions plus server-local fixtures. The initial sandbox attempt could not bind localhost; rerunning with local listener access passed.",
+        "vp run typecheck, vp run effect-check, vp run format, and vp run fallow passed. Package declaration validation, ATTW, and publint passed through the task dependencies.",
+        "shellcheck and shfmt pass for scripts/check-skills.sh and .vite-hooks/pre-push; actionlint passes for ci.yml; zizmor reports no medium/high findings; default yamllint has no new findings and one pre-existing line-length finding was removed.",
+        "vp exec intent maintainer sync reported Nothing to synchronize. Independent wiring audit found no objections. No consumer guidance or activation description changed, so consumer task and discovery sessions were not repeated."
       ]
     }
   }

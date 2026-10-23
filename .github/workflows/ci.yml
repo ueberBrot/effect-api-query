@@ -36,16 +36,10 @@ jobs:
       - name: Verify formatting
         run: vp run format
 
-      - name: Check shipped skills
+      - name: Check shipped skills and maintenance reviews
         env:
           INTENT_REVIEW_BASE: ${{ github.event.pull_request.base.sha }}
-        run: |
-          vp run skills-check
-          if [ -n "$INTENT_REVIEW_BASE" ]; then
-            vp exec intent maintainer check --base "$INTENT_REVIEW_BASE" --github-summary
-          else
-            vp exec intent maintainer check --github-summary
-          fi
+        run: vp run skills-maintenance-check
 
       - name: Run type-aware linting and TypeScript checking
         run: vp run typecheck

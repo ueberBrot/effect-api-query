@@ -382,6 +382,10 @@ export default defineConfig({
         command: "intent validate skills --check",
         cache: false,
       },
+      "skills-maintenance-check": {
+        command: "sh scripts/check-skills.sh",
+        cache: false,
+      },
       fallow: {
         command: [
           "fallow dead-code --no-cache --include-entry-exports",
@@ -536,14 +540,15 @@ export default defineConfig({
       },
       validate: {
         command: [
+          "vp run skills-maintenance-check",
           "vp run quality",
-          "vp run skills-check",
           "vp run vite-react-build",
           "vp run tanstack-start-build",
           "vp run docs-build",
           "vp run docs-e2e",
           "vp run e2e",
         ],
+        cache: false,
       },
     },
   },
