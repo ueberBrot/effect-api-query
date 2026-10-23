@@ -98,12 +98,6 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Use verified Node version for released documentation
-        if: inputs.build-artifact == ''
-        env:
-          DOCS_NODE_VERSION: ${{ needs.resolve.outputs.node-version }}
-        run: printf '%s\n' "$DOCS_NODE_VERSION" > .node-version
-
       - name: Set up repository
         if: inputs.build-artifact == ''
         uses: ./.github/actions/setup-repository

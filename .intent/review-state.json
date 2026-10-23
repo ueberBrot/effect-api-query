@@ -1579,20 +1579,17 @@
       ]
     },
     "source:.github/workflows/deploy-docs.yml": {
-      "fingerprint": "dfcc570b113e4d2e124c6ecbb377d83840fb8d4606db46df2d8ba8ed42e1baee",
+      "fingerprint": "b5498f4a7c128ef9fc336b67de5c3ea8918a5472a16c567968f97d0c7acd7655",
       "snapshot": {
-        ".github/workflows/deploy-docs.yml": "6ea29f5dfdca8b97880edd4c87f7b539d969c87be8f24b8b92ed91402a544f3f"
+        ".github/workflows/deploy-docs.yml": "3c60bce9216ecc890e9a26e75d089a6d19316403f2b344c7501f7644bc5f9f99"
       },
-      "head": "61fe6b0619153611aac4a8514e648e7eebc08b51",
-      "outcome": "no-change",
-      "reason": "Historical documentation builds now apply the trusted workflow Node version before the released checkout runs repository setup. Released source selection, documentation-only validation, permissions, and artifact verification retain their existing behavior; consumer guidance remains accurate.",
+      "head": "33df3355f25c2391b87ce80a60a8c34db84ed481",
+      "outcome": "updated",
+      "reason": "The existing version-selection guidance and ADR 0030 now match automatic deployment after successful root publication, optional manual docs-only corrections for an exact released version, and a static built version badge/JSON marker. Applications can identify the documented package version without a live npm lookup.",
       "evidence": [
-        "Diff reviewed against origin/main at 61fe6b0619153611aac4a8514e648e7eebc08b51. Node 24.22.1 security release: https://nodejs.org/en/blog/release/v24.22.1.",
-        "On Node 24.22.1, uncached vp run test passed all 738 runtime tests in 60 files and public/server-local compiler fixtures on TypeScript 7 and 5.9; uncached vp run typecheck passed typed lint and type checks in 183 files; native pack passed attw and publint; uncached docs-build generated 57 pages with valid internal links.",
-        "Both linux/arm64 and linux/amd64 Docker builds passed checksum validation and asserted Node v24.22.1. Interactive login shells as the node user selected /usr/local/bin/node v24.22.1 with working npm 11.19.1 and Corepack 0.36.0.",
-        "A temporary historical-checkout fixture executes the workflow shell step: repository setup selects 24.19.0 before and 24.22.1 after. All 76 existing docs-release tests passed. actionlint, hadolint, repository formatting, and yamllint with repository-compatible formatting rules passed; zizmor reports only the existing low self-repository finding also present on origin/main, with no medium/high findings.",
-        "Read the owned skill, frameworks-and-hosts reference, and all three planning documents. _artifacts/domain_map.yaml retains its consumer tasks and failure modes; _artifacts/skill_spec.md retains accurate coverage and boundaries; _artifacts/skill_tree.yaml retains the same owned skill, six references, sources, prerequisites, and package-only distribution. Tooling-only runtime changes require no guidance or planning content update. No unrelated skills were resolved.",
-        "Hosted CI and actual historical manual documentation deployment remain unverified locally. No library source, package dependencies, shipped guidance, npm publication, or Pages deployment changed."
+        "Reviewed .github/workflows/deploy-docs.yml with .github/workflows/release.yml, .github/workflows/deploy-docs.yml, scripts/resolve-docs-release.mts, the compatibility guide, and skills/effect-api-query/references/frameworks-and-hosts.md.",
+        "The resolver passes 76 tests, including publication gating, docs-only revisions, legacy-release refusal, and built metadata validation. Four Chromium cases pass for static version HTML, JSON metadata, navigation, and zero registry requests. Final docs checks/build pass.",
+        "Git/npm read-only smoke checks validate the existing release identity and expected legacy/current-main refusal. A live npm publication or Pages deployment was not performed."
       ]
     },
     "source:playwright.config.ts": {
@@ -2269,15 +2266,14 @@
       "snapshot": {
         ".devcontainer/Dockerfile": "b578ed28d6c712e22d8e4b878d74ac78e272514013f2dbc274ddd260509e71e7"
       },
-      "head": "85d38a0b27ae83adeab4d340916e05e5124a45ff",
+      "head": "bab425e1a932801bc89aebba84c5dad83de02acd",
       "outcome": "no-change",
-      "reason": "Replace the manual archive installer with a digest-pinned official Node 24.22.1 Bookworm image stage and copy its runtime into the existing devcontainer. Docker handles platform selection and content verification. Existing setup and consumer guidance remain accurate.",
+      "reason": "Copy Node 24.22.1 from an official digest-pinned Bookworm image into the existing devcontainer so it matches the repository pin. Docker handles architecture selection; existing development setup and consumer guidance remain accurate.",
       "evidence": [
-        "Reviewed the diff against 85d38a0 and the PR base 61fe6b0. Official image index sha256:6449e19d8184d84062525b6a7524def03146c2cb04a7f08b076680d0e8e4240a includes linux/arm64/v8 and linux/amd64, and is pinned in the Dockerfile.",
-        "Built the final Dockerfile successfully for linux/arm64 and linux/amd64. Interactive login shells as node selected /usr/local/bin/node v24.22.1 matching the mounted project .node-version; npm 11.19.1, Corepack 0.36.0, Yarn 1.22.22 and global TypeScript 7.0.2 work, and sudo corepack enable pnpm creates an executable pnpm shim.",
-        "Hadolint and git diff --check passed. The prior 738-test suite, both public compiler versions, typed lint and documentation build results remain applicable: only container runtime acquisition changed and the Node version is unchanged. No library tests were repeated for this Dockerfile-only simplification.",
-        "A focused independent check found no blockers; its open Yarn-target check was resolved by executing Yarn on both final images. Existing NVM and devcontainer startup continue to select the copied runtime.",
-        "The owned skill and _artifacts/domain_map.yaml, _artifacts/skill_spec.md and _artifacts/skill_tree.yaml retain the same consumer tasks, boundaries, sources, prerequisites and six references. No guidance, planning, package dependencies or public library behavior changed. No unrelated review item was resolved."
+        "Reviewed the final PR diff against 61fe6b0. It contains only .node-version, .devcontainer/Dockerfile and this maintenance record. .github/workflows/deploy-docs.yml is identical to the PR base; manual historical-release deployment behavior is outside this update.",
+        "Node 24.22.1 passed all 738 tests, TypeScript 7/5.9 public and server-local fixtures, typed lint/type checks in 183 files, attw/publint and the 57-page docs build earlier in this PR. No library source or dependencies changed afterward. After removing the workflow override, all 76 docs-release tests and actionlint pass.",
+        "The final Dockerfile passed Hadolint and built on linux/arm64 and linux/amd64. Interactive node-user shells select /usr/local/bin/node v24.22.1 matching .node-version. npm 11.19.1, Corepack 0.36.0, Yarn 1.22.22, TypeScript 7.0.2 and Corepack pnpm shim provisioning work on both platforms. Official image index: sha256:6449e19d8184d84062525b6a7524def03146c2cb04a7f08b076680d0e8e4240a.",
+        "The owned skill and all three planning records (_artifacts/domain_map.yaml, _artifacts/skill_spec.md, _artifacts/skill_tree.yaml) retain accurate tasks, failure modes, boundaries, source mappings, prerequisites and six references. Runtime provisioning changes require no guidance or planning rewrite; no unrelated reviews were resolved."
       ]
     },
     "source:.node-version": {
@@ -2285,16 +2281,14 @@
       "snapshot": {
         ".node-version": "d9f318747a126ce2247661af67852b185def7789492eabfad7bba322be087c33"
       },
-      "head": "61fe6b0619153611aac4a8514e648e7eebc08b51",
+      "head": "bab425e1a932801bc89aebba84c5dad83de02acd",
       "outcome": "no-change",
-      "reason": "Upgrade repository tooling from Node 24.19.0 to the October security release 24.22.1. The library remains runtime-neutral and its public API, peers, and consumer tasks are unchanged.",
+      "reason": "Upgrade the repository Node pin from 24.19.0 to the October security release 24.22.1. Existing CI and release setup already read this pin; public library behavior and consumer guidance are unchanged.",
       "evidence": [
-        "Diff reviewed against origin/main at 61fe6b0619153611aac4a8514e648e7eebc08b51. Node 24.22.1 security release: https://nodejs.org/en/blog/release/v24.22.1.",
-        "On Node 24.22.1, uncached vp run test passed all 738 runtime tests in 60 files and public/server-local compiler fixtures on TypeScript 7 and 5.9; uncached vp run typecheck passed typed lint and type checks in 183 files; native pack passed attw and publint; uncached docs-build generated 57 pages with valid internal links.",
-        "Both linux/arm64 and linux/amd64 Docker builds passed checksum validation and asserted Node v24.22.1. Interactive login shells as the node user selected /usr/local/bin/node v24.22.1 with working npm 11.19.1 and Corepack 0.36.0.",
-        "A temporary historical-checkout fixture executes the workflow shell step: repository setup selects 24.19.0 before and 24.22.1 after. All 76 existing docs-release tests passed. actionlint, hadolint, repository formatting, and yamllint with repository-compatible formatting rules passed; zizmor reports only the existing low self-repository finding also present on origin/main, with no medium/high findings.",
-        "Read the owned skill, frameworks-and-hosts reference, and all three planning documents. _artifacts/domain_map.yaml retains its consumer tasks and failure modes; _artifacts/skill_spec.md retains accurate coverage and boundaries; _artifacts/skill_tree.yaml retains the same owned skill, six references, sources, prerequisites, and package-only distribution. Tooling-only runtime changes require no guidance or planning content update. No unrelated skills were resolved.",
-        "Hosted CI and actual historical manual documentation deployment remain unverified locally. No library source, package dependencies, shipped guidance, npm publication, or Pages deployment changed."
+        "Reviewed the final PR diff against 61fe6b0. It contains only .node-version, .devcontainer/Dockerfile and this maintenance record. .github/workflows/deploy-docs.yml is identical to the PR base; manual historical-release deployment behavior is outside this update.",
+        "Node 24.22.1 passed all 738 tests, TypeScript 7/5.9 public and server-local fixtures, typed lint/type checks in 183 files, attw/publint and the 57-page docs build earlier in this PR. No library source or dependencies changed afterward. After removing the workflow override, all 76 docs-release tests and actionlint pass.",
+        "The final Dockerfile passed Hadolint and built on linux/arm64 and linux/amd64. Interactive node-user shells select /usr/local/bin/node v24.22.1 matching .node-version. npm 11.19.1, Corepack 0.36.0, Yarn 1.22.22, TypeScript 7.0.2 and Corepack pnpm shim provisioning work on both platforms. Official image index: sha256:6449e19d8184d84062525b6a7524def03146c2cb04a7f08b076680d0e8e4240a.",
+        "The owned skill and all three planning records (_artifacts/domain_map.yaml, _artifacts/skill_spec.md, _artifacts/skill_tree.yaml) retain accurate tasks, failure modes, boundaries, source mappings, prerequisites and six references. Runtime provisioning changes require no guidance or planning rewrite; no unrelated reviews were resolved."
       ]
     }
   }
