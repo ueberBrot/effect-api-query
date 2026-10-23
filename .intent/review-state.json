@@ -590,20 +590,20 @@
       ]
     },
     "source:.github/workflows/release.yml": {
-      "fingerprint": "7aafbb8f75ce1e8e845f44791225e94340fff75d3c21b53506dcc2349b1076c0",
+      "fingerprint": "d11fd35dd2cab3219d309e6df446c2202b4d85e6d4ffbae8ee57722b633527ab",
       "snapshot": {
-        ".github/workflows/release.yml": "3716d1051ee92aa79fc24720be1840a6c9e2bcffef9b52f0dfb7edbf5c5dbae4"
+        ".github/workflows/release.yml": "1dc455f9c16561b17daa9064109b1c52cd8a7a9dc78683cae3b89c79d2e02e01"
       },
-      "head": "916478e6f0dc80b3f6bcfd3ab21a76f590feb87f",
+      "head": "0075e01d454139343660b214a0d7d7e528e3f95d",
       "outcome": "no-change",
-      "reason": "Full checkout history makes the existing Intent review baseline available to Changesets version generation. Triggers, permissions, action pins, publication behavior and consumer guidance are unchanged.",
+      "reason": "The workflow now creates GitHub Releases from the existing version changelog after npm publication. It changes no package API, dependency, installed guidance, or consumer task. The effect-api-query skill and _artifacts/domain_map.yaml, _artifacts/skill_spec.md, and _artifacts/skill_tree.yaml retain accurate coverage, recommendations, and source mappings; no guidance or planning rewrite is needed.",
       "evidence": [
-        "Original real 0.2.0 Changesets generation at 916478e: skills-check passes, then maintainer check --base main fails with 17 pending items (skill/planning manifest version, 14 consumed Changesets, changelog).",
-        "vp run test passes all 719 cases, including 11 native Changesets/Intent integration cases. The final test-helper edit also passes all 11 scoped cases and vp run typecheck.",
-        "Regression cases verify explicit main and default checks before/after committing generated records; dirty, mapped/unmapped source, skill, export and unexpected generated edits remain blocked.",
-        "vp run typecheck (including package ATTW/publint), vp run fallow, formatting, maintainer sync and skills-check pass. Both public compiler suites and server-local fixtures pass through the test task.",
-        "actionlint passes. Zizmor reports exactly the same six existing low self-repository advisories as origin/main. Standard yamllint diagnostics are pre-existing; repository-style relaxed YAML validation passes.",
-        "No shipped behavior or guidance changed, so no new consumer/discovery session was required. ADR 0016 exempts CI and internal tooling from Changesets."
+        "Reviewed the full diff from PR base 654d0dbd007d37d36e99c74a21ba09523798bde1 to 0075e01d454139343660b214a0d7d7e528e3f95d: only create-github-releases changes from false to true in .github/workflows/release.yml.",
+        "Read skills/effect-api-query/SKILL.md, its frameworks-and-hosts version guidance, all three _artifacts planning records, and ADRs 0016 and 0030; consumer integration and documentation revision guidance remain accurate.",
+        "Pinned changesets/action 8488615a623b1b9c987934bb89eae8af6a946ac1 supports the option with the existing contents:write permission and default tag pushing. GitHub Release name and tag use package@version; the body is the trimmed changelog section.",
+        "Before recording: vp exec intent maintainer check --base 654d0dbd007d37d36e99c74a21ba09523798bde1 --github-summary failed with exactly one pending source review for .github/workflows/release.yml, matching CI run 39907131391.",
+        "actionlint .github/workflows/release.yml and zizmor --min-severity medium .github/workflows/release.yml passed on the unchanged workflow content; default yamllint findings matched the pre-change workflow.",
+        "vp run skills-check passed for the current skill. vp exec intent maintainer sync reported Nothing to synchronize. No skill behavior or activation description changed, so consumer task and discovery checks were not repeated."
       ]
     },
     "source:e2e/browser-test-config.ts": {
