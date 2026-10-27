@@ -4,6 +4,9 @@
   "entry": [
     "scripts/measure-construction.mts",
     "scripts/check-framework-consumers.mts",
+    "scripts/measure-bundles.mts",
+    "scripts/measure-streams.mts",
+    "scripts/measure-types.mts",
     "scripts/resolve-docs-release.mts",
     "playwright.docs.config.ts",
     "tests/types/*.{ts,tsx}",

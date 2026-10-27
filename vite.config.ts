@@ -145,6 +145,7 @@ export default defineConfig({
           "examples/contracts/src/client.ts",
           "examples/server/src/**/*.ts",
           "scripts/measure-construction.mts",
+          "scripts/measure-streams.mts",
         ],
         rules: {
           "eslint/func-names": ["error", "always", { generators: "never" }],
@@ -227,6 +228,7 @@ export default defineConfig({
           "examples/tanstack-start/tests/server-render.test.tsx",
           "examples/vite-react/src/lib/application.ts",
           "scripts/measure-construction.mts",
+          "scripts/measure-streams.mts",
           "tests/utility-configuration.test.ts",
           "tests/configuration-composition.test.ts",
           "src/http/create-utils.ts",
@@ -413,6 +415,21 @@ export default defineConfig({
       },
       "framework-types": {
         command: "node --import tsx scripts/check-framework-consumers.mts",
+        dependsOn: ["pack"],
+        cache: false,
+      },
+      "type-baseline": {
+        command: "node --import tsx scripts/measure-types.mts",
+        dependsOn: ["pack"],
+        cache: false,
+      },
+      "bundle-baseline": {
+        command: "node --import tsx scripts/measure-bundles.mts",
+        dependsOn: ["pack"],
+        cache: false,
+      },
+      "stream-baseline": {
+        command: "node --import tsx scripts/measure-streams.mts",
         dependsOn: ["pack"],
         cache: false,
       },

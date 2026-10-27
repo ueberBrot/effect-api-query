@@ -74,6 +74,7 @@
               "tests/stream-publication.test.ts",
               "tests/stream-recovery.test.ts",
               "scripts/measure-construction.mts",
+              "scripts/measure-streams.mts",
               "tests/utility-configuration.test.ts",
               "tests/configuration-composition.test.ts",
               "tests/types/**/*.ts",
