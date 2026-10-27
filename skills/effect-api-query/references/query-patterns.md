@@ -135,7 +135,7 @@ export function eventOptions(
 
 Pass either result to `useQuery` or a query observer. The history and latest views have distinct cache entries. Observing both starts independent executions.
 
-Accumulated queries retain emitted elements in order. `maxChunks` is a positive safe integer that limits element count. It does not limit bytes. Omitting it leaves history unbounded. Both `maxChunks` and `refetchMode` contribute to normalized cache identity. Omitted policy and explicit unlimited/reset policy share an identity. Different bounds or refetch modes use different entries.
+Accumulated queries retain emitted elements in order. `maxChunks` is a required positive safe integer or the literal `"unbounded"`. A finite bound limits element count, not bytes. Share the choice through `configureUtils` with `streamed.policy`, or supply it in each raw key and options builder. Both `maxChunks` and `refetchMode` contribute to normalized cache identity. Explicit unbounded retention with reset refetches retains the unlimited-history identity. Different bounds or refetch modes use different entries.
 
 Use `streamedKey(input, policy)` or the matching options' `queryKey`. Inputless operations take the policy first. HTTP accumulated and live views also include SSE decoder policy.
 

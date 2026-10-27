@@ -25,9 +25,9 @@ Key objects cannot contain `__proto__` or `constructor` properties at any depth.
 
 RPC keys begin with the caller prefix followed by `rpc`. HTTP keys begin with the caller prefix, `http`, and the HttpApi identifier. A factory's `key()` includes these generated segments.
 
-Every RPC operation adds a segment after the RPC path: `query`, `infinite`, `streamed`, `live`, or `mutation`. Concrete query keys append the canonical payload when the RPC has one. The operation segments keep different cache shapes from colliding. Root, branch, and RPC prefixes still match all descendant operations.
+Every RPC operation adds a segment after the RPC path: `query`, `infinite`, `streamed`, `live`, or `mutation`. Concrete query keys append the canonical payload when the RPC has one. Its public TypeScript slot is `unknown`; build exact keys with the leaf helpers and partial filters with an explicit projection. Runtime payloads remain validated, copied, and frozen JSON. The operation segments keep different cache shapes from colliding. Root, branch, and RPC prefixes still match all descendant operations.
 
-Accumulated-stream keys also include normalized retention and refetch policy. Unlimited retention with reset refetches is the default identity. Different bounds or modes have separate cache entries. For exact cache access, supply the same policy to `streamedKey` and `streamedOptions`. Broad prefixes still match all views. Treat the concrete suffix as opaque.
+Accumulated-stream keys also include normalized retention and refetch policy. Choose a finite `maxChunks` bound or `"unbounded"`; configured utilities can supply this choice. Unbounded retention with reset refetches retains the existing unlimited-history identity. Different bounds or modes have separate cache entries. For exact cache access, supply the same policy to `streamedKey` and `streamedOptions`. Broad prefixes still match all views. Treat the concrete suffix as opaque.
 
 Applications that persist query data choose schema and key-version busters as described in [Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/).
 

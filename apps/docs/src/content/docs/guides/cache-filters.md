@@ -60,7 +60,7 @@ Partial matching compares stored canonical key payloads. Here `FiniteFromString`
 
 Use the concrete builder for complete constructor input. Calling `queryKey({ id: 1 })` materializes the default `locale: "en"`. That key cannot express every locale for user 1. Passing only `{ locale: "en" }` rejects the missing required `id`. Do not cast partial constructor input into a key builder or run it through the full payload constructor to derive a broad filter.
 
-`[...viewPrefix(rpc.users.watch, 'streamed'), { id: '1' }]` stops before the stream-policy suffix. It matches every retention bound and refetch mode for that encoded user. For one history, use `rpc.users.watch.streamedKey({ id: 1 }, { maxChunks: 2, refetchMode: 'append' })` with `exact: true`. The omitted policy and explicit unlimited reset policy share the same normalized identity. Keep the remaining concrete suffix opaque. Root, branch, leaf, and operation filters survive policy changes.
+`[...viewPrefix(rpc.users.watch, 'streamed'), { id: '1' }]` stops before the stream-policy suffix. It matches every retention bound and refetch mode for that encoded user. For one history, use `rpc.users.watch.streamedKey({ id: 1 }, { maxChunks: 2, refetchMode: 'append' })` with `exact: true`. Explicit `maxChunks: 'unbounded'` with reset refetches retains the unlimited-history identity. Keep the remaining concrete suffix opaque. Root, branch, leaf, and operation filters survive policy changes.
 
 ## Reuse a typed partial filter
 

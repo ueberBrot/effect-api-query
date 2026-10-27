@@ -13,7 +13,7 @@ Query key builders return immutable, data-tagged keys. Option builders return fr
 | `metadataKey(input?)`, `metadataOptions(options?)` | Decoded data, status, and raw headers. |
 | `infiniteKey(input?)`, `infiniteOptions(options)` | Native `InfiniteData` for paginated responses. |
 | `mutationKey()`, `mutationOptions(options?)` | Mutation options whose variables are supplied at execution. |
-| `streamedKey(input?, policy?)`, `streamedOptions(options?)` | Accumulated SSE emissions with retention and decoder policy. |
+| `streamedKey(input, policy)`, `streamedOptions(options)` | Accumulated SSE emissions with retention and decoder policy. |
 | `liveKey(input?, policy?)`, `liveOptions(options?)` | Latest SSE emission with decoder policy. |
 
 Input-bearing key builders require the complete request. Inputless streamed and live key builders take their policy as the first argument. Buffered multipart endpoints expose only mutation builders. SSE endpoints expose only accumulated and live builders.
@@ -66,7 +66,7 @@ The cache retains the decoded value and metadata snapshot. It contains no respon
 
 | Option | Contract |
 | --- | --- |
-| `maxChunks` | Positive safe integer that limits retained events. Omitted means unlimited. |
+| `maxChunks` | Required positive safe integer that limits retained events, or `"unbounded"`. A configured leaf can inherit this choice. |
 | `refetchMode` | `reset` (default), `append`, or `replace`. |
 | `publicationBatchSize` | Positive safe integer for ordered publication batches; defaults to one. |
 | `publicationMaxWaitMs` | Integer from 1 through 2,147,483,647; flushes a partial batch from its first buffered event. Omitted means no deadline. |
@@ -78,7 +78,7 @@ The caller's runner supplies acquisition and consumption services and receives Q
 
 The first event publishes immediately. Later events publish in batches of `publicationBatchSize`. Completion or failure flushes a partial batch. A `replace` refetch still publishes only on successful completion. Cancellation discards unpublished events. Without `publicationMaxWaitMs`, partial batches can remain unpublished while a stream stays open. Invalid publication batch sizes or deadlines synchronously throw `RangeError`, including for skipped input. Builders remove publication controls from the returned Query options.
 
-`streamedKey(input, policy)` accepts the same decoder, retention, refetch, and publication policy. Inputless endpoints use `streamedKey(policy)`. Equivalent defaults have equal keys. Omitted or explicit batch size one has the same identity. Nondefault sizes and explicit deadlines have separate entries. Endpoint `key()` selects them all. Decoded request input and custom encoders exclude decoder controls. Declared resume headers remain part of request identity.
+`streamedKey(input, policy)` accepts the same decoder, retention, refetch, and publication policy. Inputless endpoints use `streamedKey(policy)`. Supply `maxChunks` explicitly or inherit it through `configureUtils`. Equivalent policies have equal keys. Omitted or explicit batch size one has the same identity. Nondefault sizes and explicit deadlines have separate entries. Endpoint `key()` selects them all. Decoded request input and custom encoders exclude decoder controls. Declared resume headers remain part of request identity.
 
 See [Accumulate Values](/effect-api-query/guides/streaming/#accumulate-values). See [Batch Accumulated Publications](/effect-api-query/guides/choose-stream-history/#batch-accumulated-publications) for count and deadline behavior.
 

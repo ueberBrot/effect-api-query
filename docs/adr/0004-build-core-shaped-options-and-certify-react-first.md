@@ -1,6 +1,6 @@
 # Build core-shaped options and certify React first
 
-Status: Accepted.
+Status: Partially superseded by [ADR 0032](0032-configure-utility-trees-and-require-stream-retention.md) for shared configuration and published key payload types.
 
 ## Context
 

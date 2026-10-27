@@ -13,7 +13,7 @@ One `effect-api-query` skill covers the library. Its activation description supp
 | Query patterns | Inference, skipping, pages, publication batches, recovery and tracing |
 | Cache workflows | Typed policies, interceptors, partial filters, writes and owners |
 | Hydration and SSR | Snapshots, typed view registration, preparation and cleanup |
-| Frameworks and hosts | Provider setup, Suspense, reactive accessors, versions, transports and hosts |
+| Frameworks and hosts | Provider setup, Suspense, reactive accessors, declared peers and checked combinations, transports and hosts |
 
 Consumers load the guidance from installed `@ueberbrot/effect-api-query` without repository-local authoring skills. Planning records remain outside the shipped package.
 
@@ -29,20 +29,29 @@ Native Intent maintenance detects source changes and records justified outcomes 
 
 Strict compiler fixtures check public declarations and documentation examples. Runtime tests and application examples cover cache views, cancellation, hydration, and ownership. Native builds validate package declarations and exports.
 
+The compatibility reference owns the version table. Framework guidance links to it and distinguishes library peers, wrapper framework peers, and exact checked combinations. Native framework consumer fixtures check TypeScript hook inference against a packed package. Framework component compilers and application builds follow their own tooling requirements.
+
 The usability batch reuses the existing executable consumer fixtures:
 
 | Task | Checks |
 | --- | --- |
+| Configure tree, branch, and leaf policies with local inference | `tests/types/utility-configuration-contract.ts`, `tests/types/rpc-large-contract.ts`, `tests/utility-configuration.test.ts`, `tests/configuration-composition.test.ts` |
+| Choose explicit or configured accumulated retention | `tests/types/stream-retention-contract.ts`, `tests/utility-configuration.test.ts`, `tests/http-cached-views.test.ts` |
+| Consume public options through native reactive framework hooks | `tests/framework-consumers/`, `tests/types/generic-client-error-contract.tsx`, `scripts/check-framework-consumers.mts` |
 | Infer operation inputs, views, and failures with local policy inference | `tests/types/helper-contract.ts`, `tests/types/docs-policies.ts`, `tests/query-policy.test.ts` |
 | Select every input of a supported view and preserve exact tagged reads | `tests/query-view-prefix.test.ts`, `tests/types/helper-contract.ts` |
 | Share typed RPC and HTTP retry decisions | `tests/types/docs-retry.ts` |
 | Acquire, provide, render, and dispose a minimal React application | `tests/types/docs-react-setup.tsx`, `tests/types/docs-react-entry.ts`, `examples/vite-react/tests/minimal-setup.test.tsx` |
-| Reset initial Suspense errors, retain failed-refetch data, start reads together | `tests/types/docs-suspense.tsx`, `examples/vite-react/tests/suspense-recovery.test.tsx` |
+| Reset initial Suspense errors, retain failed-refetch data, start reads together | `tests/types/docs-suspense.tsx`, `tests/types/react-queries-contract.tsx`, `examples/vite-react/tests/suspense-recovery.test.tsx` |
 | Trace lazy stream emissions and awaited cleanup | `tests/types/docs-stream-tracing.ts`, `examples/vite-react/tests/stream-tracing.test.ts` |
 
 These checks verify the recommended APIs and observable behavior. A fresh isolated consumer session supplies separate evidence. This authoring session does not establish skill discovery or consumer reliability.
 
 ## Coverage and batch history
+
+- **Developer experience review, 2026-10-27, candidate `0.3.0`:** Complete three architecture loops and a deep review with GPT-6 Astra, GPT-6.1 Terra, GPT-6 Sol, and Argon. Preserve configuration scope order, merge repeated mutation settings within each scope, and honor explicit JavaScript callback clearing. Correct HTTP empty named SSE decoding and identity, stored mutation-field exclusions, and 1,000-operation scoped configuration. Restore React parallel-hook inference, retain Vue stream inference, and preserve configured-stream assignability and generic HTTP client errors. Keep the existing public interface and concentrate configuration runtime behavior behind private builders. Retain one skill, fourteen tasks, six references, and application-owned lifetimes. Guide reusable configurations with `satisfies` and remove obsolete parallel-hook descriptors. All 755 runtime tests, both public compilers, four packaged framework consumers, 36 type cases, and 35 Chromium checks pass on Node 24.22.1. The compiler workload preserves reports and exits nonzero on errors. A fresh explicit Intent consumer passes both compilers and the dashboard grader; broad invalidation fails the negative control. Automatic discovery remains unverified.
+
+- **Utility configuration, 2026-10-27, candidate package `0.3.0`, base `8636508`:** Replace separate policy, interceptor, and leaf-configuration entry points with `configureUtils` across trees, branches, and leaves. Require explicit finite or unbounded accumulated retention, including configured key defaults. Keep canonical payload slots opaque while preserving typed cache data and full errors. ADR 32 updates those public contracts. Retain the owning skill and six references; update configuration, stream, framework, migration, and performance guidance with matching source mappings. An isolated installed tarball passes Vue, Solid, Svelte, and Angular fixtures on both supported compilers. A fresh consumer loaded the installed skill through Intent, compiled on TypeScript 7 and 5.9, and passed the dashboard grader. Broad invalidation failed its negative control. Automatic discovery remains unverified.
 
 - **2026-10-10, `6893603`:** Establish one skill and six references covering ten tasks: cache owners, overlapping writes, stream capture, preparation drain, view codecs, and host limits. CI `38085762210` and release validation `38085762195` passed; publication remained separate.
 - **Maintainer alignment, `6893603`:** Pin Intent 0.5.3 under the seven-day policy and add revision-aware CI checks. Keep package-only distribution and hidden authoring skills outside default discovery. Skills CLI 1.7.0 copied all seven files with 13 valid relative links. Scoped checks passed with default and PR bases. Guidance was unchanged, so API tasks were not repeated.

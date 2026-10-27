@@ -44,6 +44,7 @@ If your RPC group also declares `events.watch` with a string `channel` input and
 
 ```ts
 rpcQuery.events.watch.streamedOptions({
+  maxChunks: 100,
   input: channel === undefined ? skipToken : { channel },
   refetchMode: "append",
   staleTime: 30_000,

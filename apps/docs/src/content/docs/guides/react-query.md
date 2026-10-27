@@ -5,6 +5,8 @@ description: Acquire a ready client and use generated options with native React 
 
 Pass generated options to React Query's native hooks. Build the utility tree once for its ready client and cache owner. When component input changes, rebuild the options. Builders capture plain input for each execution.
 
+See [Requirements and tested integrations](/effect-api-query/reference/compatibility-and-limits/#requirements-and-tested-integrations) for React Query's framework requirements and this guide's checked versions.
+
 ## Acquire and mount the client
 
 Put the shared contract, client lifetime, and React UI in separate modules. Mount the application once from the entry point.

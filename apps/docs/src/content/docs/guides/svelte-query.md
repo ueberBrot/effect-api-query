@@ -5,7 +5,7 @@ description: Rebuild generated options from Svelte reactive input and keep clien
 
 Build options inside Svelte's reactive accessor. When input changes, the accessor creates a new key and query function. Use this pattern with either factory and every generated query view.
 
-The examples target Svelte 5.57.1 with Svelte Query 6.3.0 and Query Core 5.104.0.
+See [Requirements and tested integrations](/effect-api-query/reference/compatibility-and-limits/#requirements-and-tested-integrations) for Svelte Query's framework requirements and this guide's checked versions.
 
 Keep [captured inputs unchanged](/effect-api-query/concepts/data-normalization/#keep-captured-inputs-unchanged) while their options can execute.
 
@@ -36,10 +36,10 @@ Use the same accessor for `streamedOptions`, `liveOptions`, and HTTP `metadataOp
 
 A skipped query retains the defined-data type when it has defined `initialData`. An initial-data function that can return `undefined` produces optional result data.
 
-Compile the Svelte application with `module: "ESNext"` and `moduleResolution: "Bundler"`. Svelte Query 6 requires this resolution for its emitted `.svelte` declarations. Strict NodeNext declaration checking reports an upstream `Box` import error.
+Compile the Svelte application with `module: "ESNext"` and `moduleResolution: "Bundler"`. The checked Svelte Query version requires this resolution for its emitted `.svelte` declarations. Strict NodeNext declaration checking reports an upstream `Box` import error.
 
 ## Own the native integration
 
-Follow the [shared integration lifetime](/effect-api-query/integrations/#own-the-cache-and-client-lifetime) for providers, observer removal, stream finalizers, and accepted mutations. Match the native wrapper to the application's Query Core. Use a compiler and tooling that Svelte supports.
+Follow the [shared integration lifetime](/effect-api-query/integrations/#own-the-cache-and-client-lifetime) for providers, observer removal, stream finalizers, and accepted mutations. Keep Svelte Query and the application on one resolved Query Core version. Use a package-manager override when needed to align them, as described in the compatibility table. Use a compiler and tooling that Svelte supports.
 
 The application owns server rendering and hydration.

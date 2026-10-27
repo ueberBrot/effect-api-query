@@ -1,6 +1,6 @@
 library:
   name: "@ueberbrot/effect-api-query"
-  version: 0.2.0
+  version: 0.3.0
 generated_from:
   domain_map: _artifacts/domain_map.yaml
   skill_spec: _artifacts/skill_spec.md
@@ -38,6 +38,7 @@ skills:
       - package.json
       - pnpm-workspace.yaml
       - scripts/*.mts
+      - scripts/performance/*.mts
       - docs/adr/000*.md
       - docs/adr/0010-*.md
       - docs/adr/0012-*.md

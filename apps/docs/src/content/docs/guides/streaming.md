@@ -26,7 +26,7 @@ const sseHistory = http.events.watch.streamedOptions({
 });
 ```
 
-The first emission makes the query successful while fetching continues. `maxChunks` bounds cached elements after each publication. If you omit it, history is unlimited. It does not bound bytes or transport buffering.
+The first emission makes the query successful while fetching continues. A finite `maxChunks` bounds cached elements after each publication. Choose `"unbounded"` explicitly to retain every emission, or inherit retention through `configureUtils` with `streamed.policy`. It does not bound bytes or transport buffering.
 
 Refetch mode `reset` starts a new history, `append` adds to it, and `replace` keeps the old history until successful completion. An indefinitely open replacement keeps showing that old history. Accumulated streams can succeed without emissions.
 
@@ -55,5 +55,7 @@ For exact cache access, reuse the options' `queryKey`. Accumulated history polic
 Cancellation closes the stream iterator. Your application owns reconnection, resume policy, and client lifetime. Use [Reconnect Streams](/effect-api-query/guides/reconnect-streams/) to add `recoverStream` to application-owned delivery when the server supports ordered cursor replay. A replacement stream can start while the old iterator's asynchronous finalizer is still pending. See [Release Resources after Local Cleanup](/effect-api-query/guides/cancellation/#release-resources-after-local-cleanup) when streams share exclusive resources.
 
 HTTP `sseOptions.maxEventSize` bounds pending parser text in JavaScript string code units. Its default is 10 × 1024 × 1024 code units. Put declared resume headers in `input.headers`.
+
+Set `sseOptions.dispatchEmptyNamedEvents` to `true` for named events without a `data:` line, when the endpoint's SSE declaration accepts them. It defaults to `false`. Changing this option selects a different cache entry.
 
 See [Choose Stream History](/effect-api-query/guides/choose-stream-history/) for retention and buffering, [Stream Snapshots](/effect-api-query/guides/stream-snapshots/) for finite server captures, and [Client Lifecycle](/effect-api-query/concepts/client-lifecycle/) for cleanup ownership.

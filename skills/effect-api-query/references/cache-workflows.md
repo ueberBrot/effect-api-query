@@ -68,16 +68,20 @@ Root, branch, leaf, and `viewPrefix(leaf, view)` prefixes support native `invali
 
 Selection changes hook, observer, and `queryClient.query` results. The cache retains full decoded data. Configure hashing through QueryClient global or prefix `queryKeyHashFn` and keep it stable. Builders reject per-call hashing. During execution, streams reject inconsistent default `queryHash` values and conflicting cached identity with `UnsupportedQueryHash`. Before changing the hash policy, retire the old cache. Mutation defaults and keys use the separate native mutation cache.
 
-## Reuse typed query and mutation policies
+Use `createBranchQueryFilter(branch, view)` when only one view across a namespace should refresh. Its returned native filter combines supported descendant views with a caller predicate. Missing views match nothing, and bulk results remain heterogeneous. Leave `exact` omitted to match descendants. Pass the returned filter to native QueryClient methods when view isolation matters.
 
-To bind common freshness, retry, or observer callbacks to a leaf's original options builder, use `withQueryPolicy(leaf, view, policy)`. For typed mutation callbacks and retry settings, use `withMutationPolicy(leaf, policy)`. Create these bound builders once per owner. Reuse them at call sites. The following factory shares a freshness decision and mutation invalidation:
+For a typed error union, `findDeclaredError(error, tag)` returns an Effect Option for exactly one tagged failure. Only tags in the typed union are accepted. Composite Causes, defects, interruptions, and non-wrapper errors return None. Preserve the original wrapper for diagnostics and retry decisions. Tag matching does not validate unknown values or establish that a failure is retryable.
+
+## Configure shared behavior
+
+Use `configureUtils(treeOrLeaf, configuration)` once per cache owner. Configure a query view with `{ policy, interceptors }`; configure a mutation with `{ policy, interceptors, callbacks }`. Use `scoped` to select named children of a tree or branch. The returned utilities are frozen and retain generated identity and prepared-input ownership. Keep the supplied tree for any consumers that need its original behavior.
+
+The following factory configures typed freshness and mutation invalidation:
 
 ```ts
 import {
+  configureUtils,
   createRpcQueryUtils,
-  withMutationInterceptor,
-  withMutationPolicy,
-  withQueryPolicy,
 } from "@ueberbrot/effect-api-query";
 import type { QueryPolicy } from "@ueberbrot/effect-api-query";
 import { Schema } from "effect";
@@ -106,25 +110,29 @@ export function userPolicies(
     staleTime: (query) => (query.state.data === undefined ? 0 : 60_000),
     retry: false,
   } satisfies QueryPolicy<typeof rpc.users.get>;
-  const read = withQueryPolicy(rpc.users.get, "query", policy);
-  const rename = withMutationPolicy(
-    rpc.users.rename,
-    {
-      onSuccess: (_data, _variables, _result, context) =>
-        context.client.invalidateQueries({ queryKey: rpc.users.key() }),
+  const read = configureUtils(rpc.users.get, { query: { policy } });
+  const rename = configureUtils(rpc.users.rename, {
+    mutation: {
+      callbacks: "compose",
+      policy: {
+        onSuccess: (_data, _variables, _result, context) =>
+          context.client.invalidateQueries({ queryKey: rpc.users.key() }),
+      },
     },
-    { callbacks: "compose" }
-  );
+  });
   return {
     read,
     rename,
-    selected: read({ input: { id: 1 }, select: (user) => user.name }),
-    refreshed: read({ input: { id: 2 }, staleTime: 0 }),
+    selected: read.queryOptions({
+      input: { id: 1 },
+      select: (user) => user.name,
+    }),
+    refreshed: read.queryOptions({ input: { id: 2 }, staleTime: 0 }),
   };
 }
 ```
 
-An execution wrapper can require an application authorization check before a write. Use the same `directory` contract and imports above, adding `withMutationInterceptor` from the package root:
+Use the same `directory` contract to require an application authorization check before a write:
 
 ```ts
 export function authorizedRename(
@@ -135,20 +143,38 @@ export function authorizedRename(
     client,
     keyPrefix: ["directory-app"],
   });
-  return withMutationInterceptor(rpc.users.rename, async ({ input, next }) => {
-    await authorize(input.id);
-    return await next();
+  return configureUtils(rpc.users.rename, {
+    mutation: {
+      interceptors: [
+        async ({ input, next }) => {
+          await authorize(input.id);
+          return await next();
+        },
+      ],
+    },
   });
 }
 ```
 
-To retain contextual callback types in a stored policy, use `satisfies QueryPolicy<typeof leaf, View>` or `MutationPolicy<typeof leaf>`. Query callbacks receive the view's cached data and error. Mutation callbacks receive its data and complete variables. Input, projection, initial and placeholder data, page mapping, stream identity, and adapter request controls stay local to each bound builder invocation. QueryClient still owns hashing. The library still owns generated functions and keys.
+Leaf callbacks receive the view's typed data and errors, or the mutation's typed result and variables. Stored policy objects can use `satisfies QueryPolicy<typeof leaf, View>` or `MutationPolicy<typeof leaf>`. Shared tree and branch policy callbacks receive unknown data, errors, and variables. Configure a leaf when a callback needs its concrete contract.
 
-Mutation policies exclude `onMutate` to preserve inference for local optimistic context. Shared callbacks receive that local result as `unknown`. Call-site options replace matching defaults, including whole callbacks. To await both, pass `{ callbacks: 'compose' }` as the third argument to `withMutationPolicy`. For `onSuccess`, `onError`, and `onSettled`, shared runs before local; a rejection stops that pair and follows native mutation handling. Keep `onMutate` local.
+Apply policies from broad to specific: QueryClient defaults, configured tree, branch, leaf, then call-site options. Preserve input, selection, initial and placeholder data, page mapping, adapter controls, and optimistic context at the call site. Stream configuration may supply `streamed.policy.maxChunks` and publication controls; matching key builders inherit the same policy.
 
-For behavior around execution, use `withQueryInterceptor(leaf, view, interceptor)` or `withMutationInterceptor(leaf, interceptor)`. Interceptors receive `next` and native context; mutations also receive input. Mutation context is undefined for direct calls without a native observer. Each native attempt, including retries, permits at most one `next` call. Infinite-query continuations return one page. Preserve the query abort signal in surrounding application work. Skipped queries stay disabled. Local callbacks cannot replace execution interception. Returned builders preserve their original overloads.
+More specific and call-site mutation callbacks replace corresponding broader callbacks by default. Set `mutation.callbacks: "compose"` when shared and more specific callbacks must both run. Composition awaits shared before specific for `onSuccess`, `onError`, and `onSettled`. A rejection stops that pair and follows native mutation handling. Keep `onMutate` local; shared policy callbacks receive its result as unknown.
 
-Keep checks of the originating owner and coordination of overlapping writes in the application workflow below. For typed domain failure classification and shared RPC/HTTP retry decisions, use [the retry recipe](https://ueberbrot.github.io/effect-api-query/guides/retry-queries/).
+Composition applies to the callbacks added by that scope. Broader composed callbacks remain active when narrower scopes use replacement.
+
+An explicit JavaScript `undefined` callback override clears that callback's composed defaults. Preserve native TypeScript callback types.
+
+Interceptors run from tree to branch to leaf, with the first entry outermost. Each native attempt, including retries, permits at most one `next` call per interceptor. Infinite-query continuations return one page. Mutations also receive input; native context is undefined for direct calls without an observer. Honor the query signal in surrounding application work. Skipped queries stay disabled. Local callbacks cannot replace execution interception.
+
+Repeated configuration preserves scope order. Within one scope, later policies replace earlier values and earlier interceptors remain outermost.
+
+Within one mutation scope, later callbacks replace earlier callbacks and the latest supplied callback mode applies to the merged policy. Configured trees remain assignable to their original utility types.
+
+Check reusable configurations with `satisfies UtilsConfiguration<typeof tree>`. A type annotation widens optional settings and can prevent builders from inferring that stream retention has already been supplied.
+
+After configuration, type-check a representative call with selection, conditional input, or local optimistic context. Keep checks of the originating owner and coordination of overlapping writes in the application workflow below. For typed failure classification and shared RPC/HTTP retry decisions, use [the retry recipe](https://ueberbrot.github.io/effect-api-query/guides/retry-queries/).
 
 ## Coordinate overlapping optimistic writes
 
@@ -184,11 +210,3 @@ For reload persistence, allowlist a validated DTO view. Repeat the safe owner tu
 During explicit disposal, expose storage failures while completing resource cleanup. Lifecycle callbacks such as pagehide or HMR must handle a rejected disposal Promise. Otherwise, it becomes an unhandled rejection. Preserve the chosen reload-persistence policy and cleanup order.
 
 Sources: [defaults and policies](https://ueberbrot.github.io/effect-api-query/guides/query-defaults/), [cache keys and filters](https://ueberbrot.github.io/effect-api-query/guides/cache-filters/), [optimistic writes](https://ueberbrot.github.io/effect-api-query/guides/optimistic-writes/), [owner replacement](https://ueberbrot.github.io/effect-api-query/guides/switch-cache-owners/), [event refresh](https://ueberbrot.github.io/effect-api-query/guides/refresh-from-events/).
-
-## Combine leaf configuration
-
-Use `configureQuery(leaf, view, { policy?, interceptors? })` and `configureMutation(leaf, { policy?, interceptors?, callbacks? })` when defaults and interception belong together. Both return a frozen leaf retaining every view and key function, so configure another view on the result directly. The first interceptor is outermost. Defaults apply before local options. Shared mutation callbacks compose only with `callbacks: 'compose'`; `onMutate` remains local. Build configurations once per owner. The original leaf is unchanged, and configured copies share prepared-input ownership.
-
-Use `createBranchQueryFilter(branch, view)` when only one view across a namespace should refresh. Its returned native filter combines supported descendant view prefixes with any caller predicate. Missing views match nothing, and bulk results remain heterogeneous. Leave `exact` omitted to match descendants. This helper preserves existing key layouts; do not use the filter's branch key alone when view isolation matters.
-
-For a typed error union, `findDeclaredError(error, tag)` returns an Effect Option for exactly one tagged failure. Only tags in the typed union are accepted. Composite Causes, defects, interruptions and non-wrapper errors return None. Preserve the original wrapper for diagnostics and retry decisions; tag matching does not validate unknown values or imply that transport failures are retryable.

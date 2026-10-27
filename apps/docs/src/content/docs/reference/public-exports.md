@@ -7,7 +7,8 @@ The package root, `@ueberbrot/effect-api-query`, exports all supported values an
 
 | Export | Purpose |
 | --- | --- |
-| `configureQuery`, `configureMutation` | Combine policies and ordered interceptors while retaining the leaf. |
+| `configureUtils` | Configure policies and ordered interceptors on a tree, branch, or leaf. |
+| `UtilsConfiguration`, `ConfiguredUtils` | Type scoped configuration and the configured utility tree. |
 | `createBranchQueryFilter` | Select one view across all descendant leaves. |
 | `prepareInput`, `PreparedInput` | Reuse owner-bound input preparation explicitly. |
 | `findDeclaredError` | Match one tagged typed failure without flattening its Cause. |
@@ -16,10 +17,7 @@ The package root, `@ueberbrot/effect-api-query`, exports all supported values an
 | `viewPrefix` | Selects every input of one supported leaf view. |
 | `createQueryFilter` | Binds a supported view and an explicit partial-input projection to native filters. |
 | `QueryFilterEncoder`, `QueryFilterOptions` | Types partial projections and native filter conditions. |
-| `withQueryPolicy` | Binds typed defaults to an existing query options builder. |
-| `withMutationPolicy` | Binds typed defaults to an existing mutation options builder. |
 | `MutationPolicyOptions` | Selects callback replacement or shared-before-local composition. |
-| `withQueryInterceptor`, `withMutationInterceptor` | Wrap generated execution while preserving builder inference. |
 | `QueryInterceptor`, `MutationInterceptor` | Type native execution context, input, and continuation. |
 | `queryViewCodec`, `infiniteQueryCodec` | Bind paired Schema codecs to a leaf view or infinite pages and page parameters. |
 | `createHydrationRegistry`, `hydrationCallbacks` | Prepare heterogeneous snapshots or one view with native serialization callbacks. |
@@ -85,8 +83,14 @@ Every outcome detaches listeners and the timer. Local cleanup must cooperate wit
 
 `viewPrefix(leaf, view)` returns an immutable ordinary key for every input and stream policy of a supported leaf view. Native query filters and `setQueryDefaults` accept that key. It carries no DataTag, so broad cache reads remain `unknown`. Concrete generated keys provide typed exact cache access. [Cache Filters](/effect-api-query/guides/cache-filters/) describes encoded partial input.
 
-## Reuse typed policies
+## Configure shared behavior
 
-`withQueryPolicy(leaf, view, defaults)` and `withMutationPolicy(leaf, defaults)` return the leaf's original options builder with shared policy fields applied first. Call-site fields replace matching defaults, including callbacks. `QueryPolicy<Leaf, View>` and `MutationPolicy<Leaf>` annotate reusable objects. Inputs, projections, initial data, pagination setup, and adapter controls remain local. Shared mutation callbacks have an unknown optimistic result. The call site supplies `onMutate` and callbacks that use its result. See [Defaults and Policies](/effect-api-query/guides/query-defaults/).
+`configureUtils(treeOrLeaf, configuration)` returns frozen configured utilities with the same generated keys. Each view accepts `{ policy, interceptors }`. Mutation configuration also accepts `callbacks: "replace" | "compose"`. A tree or branch uses `scoped` to configure named children.
+
+Policies apply from tree to branch to leaf, followed by call-site options. Explicit configured options override QueryClient defaults. Interceptors run from broad to specific, with the first entry outermost. Leaf callbacks retain their contract's types; shared tree and branch policy callbacks receive unknown data, errors, and variables.
+
+`QueryPolicy<Leaf, View>` and `MutationPolicy<Leaf>` type reusable native policies. Keep inputs, selection, initial data, page mapping, and local optimistic context at the call site. Stream configuration can supply `maxChunks` and other publication controls through `streamed.policy`. A configured retention choice applies to both its keys and options.
+
+See [Defaults and Policies](/effect-api-query/guides/query-defaults/) for typed examples, callback composition, and precedence.
 
 See [Cache Keys and Filters](/effect-api-query/guides/cache-filters/) for partial projections, [Defaults and Policies](/effect-api-query/guides/query-defaults/) for composition and interception, and [Hydrate Query Views](/effect-api-query/guides/hydrate-query-views/) for codec registration.
