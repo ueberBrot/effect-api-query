@@ -177,7 +177,10 @@ export const exerciseSocketDecodeIsolation = async () =>
           view === "streamed"
             ? await settle(
                 queryClient.query(
-                  rpc.values.watch.streamedOptions({ input: { channel: view } })
+                  rpc.values.watch.streamedOptions({
+                    maxChunks: "unbounded",
+                    input: { channel: view },
+                  })
                 )
               )
             : await settle(
@@ -258,6 +261,7 @@ export const exerciseSocketConcurrency = async () =>
           )
       );
       const historyOptions = rpc.values.watch.streamedOptions({
+        maxChunks: "unbounded",
         input: { channel: "history" },
         rpcOptions: { streamBufferSize: 16 },
       });
@@ -405,6 +409,7 @@ export const exerciseSocketInterruption = async () =>
           const options =
             view === "streamed"
               ? rpc.values.watch.streamedOptions({
+                  maxChunks: "unbounded",
                   input,
                   rpcOptions: { streamBufferSize: 16 },
                 })
@@ -418,6 +423,7 @@ export const exerciseSocketInterruption = async () =>
                 view === "streamed"
                   ? queryClient.query(
                       rpc.values.watch.streamedOptions({
+                        maxChunks: "unbounded",
                         input,
                         rpcOptions: { streamBufferSize: 16 },
                       })

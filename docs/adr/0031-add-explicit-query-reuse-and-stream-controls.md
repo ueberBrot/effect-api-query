@@ -1,6 +1,6 @@
 # Add explicit query reuse and stream controls
 
-Status: Accepted. Extends ADRs 0008, 0009, 0020, 0027, 0028 and 0029.
+Status: Partially superseded by [ADR 0032](0032-configure-utility-trees-and-require-stream-retention.md) for configuration helpers, required retention, and published key payload types. Extends ADRs 0008, 0009, 0020, 0027, 0028 and 0029.
 
 Generated cache keys and existing defaults remain stable. Branch view filters index the generated leaves and combine native prefix matching with a view predicate. They do not infer operation positions from arbitrary strings in keys.
 

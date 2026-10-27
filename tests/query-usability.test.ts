@@ -11,8 +11,7 @@ import {
 import { Rpc, RpcGroup } from "effect/rpc";
 
 import {
-  configureMutation,
-  configureQuery,
+  configureUtils,
   consumeEvents,
   createBranchQueryFilter,
   createRpcQueryUtils,
@@ -41,7 +40,6 @@ const handlers = group.of({
   "users.nested.read": ({ id }) => Effect.succeed(id),
   "users.watch": ({ id }) => Stream.make(id),
 });
-
 describe("query usability", () => {
   it.effect("reuses preparation across views and rejects another owner", () =>
     Effect.gen(function* reusesPreparation() {
@@ -81,8 +79,10 @@ describe("query usability", () => {
         expect(() => rpc.users.nested.read.queryKey(input)).toThrow(
           "another utility leaf"
         );
-        const configured = configureQuery(rpc.users.read, "query", {
-          policy: { staleTime: 100 },
+        const configured = configureUtils(rpc.users.read, {
+          query: {
+            policy: { staleTime: 100 },
+          },
         });
         const again = prepareInput(configured, { id: 8 });
         expect(
@@ -96,7 +96,10 @@ describe("query usability", () => {
           yield* Effect.promise(
             async () =>
               await queryClient.query(
-                rpc.users.watch.streamedOptions({ input: watch })
+                rpc.users.watch.streamedOptions({
+                  maxChunks: "unbounded",
+                  input: watch,
+                })
               )
           )
         ).toStrictEqual([9]);
@@ -105,7 +108,6 @@ describe("query usability", () => {
       }
     })
   );
-
   it.effect(
     "configures query and mutation views together with ordered interception",
     () =>
@@ -116,8 +118,8 @@ describe("query usability", () => {
           keyPrefix: ["composition"],
         });
         const calls: string[] = [];
-        const leaf = configureMutation(
-          configureQuery(rpc.users.read, "query", {
+        const leaf = configureUtils(rpc.users.read, {
+          query: {
             policy: { staleTime: 1000 },
             interceptors: [
               async ({ next: execute }) => {
@@ -131,8 +133,8 @@ describe("query usability", () => {
                 return await next();
               },
             ],
-          }),
-          {
+          },
+          mutation: {
             policy: {
               onSuccess: () => {
                 calls.push("shared success");
@@ -145,8 +147,8 @@ describe("query usability", () => {
                 return await next();
               },
             ],
-          }
-        );
+          },
+        });
         const options = leaf.queryOptions({
           input: { id: 1 },
           staleTime: 2000,
@@ -184,7 +186,6 @@ describe("query usability", () => {
         }
       })
   );
-
   it.effect(
     "filters a branch view across nested leaves and composes native predicates",
     () =>
@@ -231,7 +232,6 @@ describe("query usability", () => {
       })
   );
 });
-
 describe("typed failures", () => {
   it("matches typed failures without hiding compound causes or defects", () => {
     const failure = { _tag: "NotFound", id: 1 } as const;
@@ -255,7 +255,6 @@ describe("typed failures", () => {
     );
   });
 });
-
 it.effect(
   "consumes sequentially, awaits cleanup, and preserves handler failure",
   () =>
@@ -291,7 +290,6 @@ it.effect(
       expect(events).toStrictEqual(["start", "1", "2", "cleanup", "exit"]);
     })
 );
-
 it.effect("reuses HTTP preparation for buffered and metadata views", () =>
   Effect.gen(function* preparesHttp() {
     const api = HttpApi.make("prepared").add(
@@ -340,8 +338,10 @@ it.effect("reuses HTTP preparation for buffered and metadata views", () =>
       const metadata = yield* Effect.promise(
         async () =>
           await queryClient.query(
-            configureQuery(http.users.read, "metadata", {
-              interceptors: [async ({ next }) => await next()],
+            configureUtils(http.users.read, {
+              metadata: {
+                interceptors: [async ({ next }) => await next()],
+              },
             }).metadataOptions({ input })
           )
       );

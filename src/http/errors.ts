@@ -27,7 +27,8 @@ export type EffectHttpApiQueryConfigErrorCode =
   | "UnsupportedQueryHash"
   | "InvalidMaxChunks"
   | "InvalidRefetchMode"
-  | "InvalidMaxEventSize";
+  | "InvalidMaxEventSize"
+  | "InvalidSseOptions";
 
 /** Stable codes for synchronous HTTP key failures. */
 export type EffectHttpApiQueryKeyErrorCode =

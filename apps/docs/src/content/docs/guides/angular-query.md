@@ -5,7 +5,7 @@ description: Rebuild generated options from Angular signals and keep client life
 
 Build options inside Angular's reactive accessor. When input changes, the accessor creates a new key and query function. Use this pattern with either factory and every generated query view.
 
-The examples target Angular 22.2.1 with Angular Query experimental 5.104.0 and Query Core 5.104.0.
+See [Requirements and tested integrations](/effect-api-query/reference/compatibility-and-limits/#requirements-and-tested-integrations) for Angular Query's framework requirements and this guide's checked versions.
 
 Keep [captured inputs unchanged](/effect-api-query/concepts/data-normalization/#keep-captured-inputs-unchanged) while their options can execute.
 

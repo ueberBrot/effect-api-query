@@ -21,7 +21,7 @@ const unusedClientFor =
   };
 
 const captureKeyError = (
-  run: () => readonly JsonValue[]
+  run: () => readonly unknown[]
 ): EffectRpcQueryKeyError => {
   try {
     run();

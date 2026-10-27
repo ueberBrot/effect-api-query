@@ -66,10 +66,12 @@ describe.each(["rpc", "http"] as const)("publication adapter %s", (adapter) => {
         const options =
           adapter === "rpc"
             ? rpc.watch.streamedOptions({
+                maxChunks: "unbounded",
                 publicationBatchSize: 3,
                 publicationMaxWaitMs: 50,
               })
             : http.events.watch.streamedOptions({
+                maxChunks: "unbounded",
                 publicationBatchSize: 3,
                 publicationMaxWaitMs: 50,
               });
@@ -89,12 +91,14 @@ describe.each(["rpc", "http"] as const)("publication adapter %s", (adapter) => {
             adapter === "rpc"
               ? await queryClient.query(
                   rpc.watch.streamedOptions({
+                    maxChunks: "unbounded",
                     publicationBatchSize: 3,
                     publicationMaxWaitMs: 50,
                   })
                 )
               : await queryClient.query(
                   http.events.watch.streamedOptions({
+                    maxChunks: "unbounded",
                     publicationBatchSize: 3,
                     publicationMaxWaitMs: 50,
                   })
@@ -106,14 +110,20 @@ describe.each(["rpc", "http"] as const)("publication adapter %s", (adapter) => {
           });
           expect(options.queryKey).toStrictEqual(
             leaf.streamedKey({
+              maxChunks: "unbounded",
               publicationBatchSize: 3,
               publicationMaxWaitMs: 50,
             })
           );
-          expect(leaf.streamedKey({ publicationBatchSize: 1 })).toStrictEqual(
-            leaf.streamedKey()
+          expect(
+            leaf.streamedKey({
+              maxChunks: "unbounded",
+              publicationBatchSize: 1,
+            })
+          ).toStrictEqual(leaf.streamedKey({ maxChunks: "unbounded" }));
+          expect(options.queryKey).not.toStrictEqual(
+            leaf.streamedKey({ maxChunks: "unbounded" })
           );
-          expect(options.queryKey).not.toStrictEqual(leaf.streamedKey());
           expect(options).not.toHaveProperty("publicationBatchSize");
         } finally {
           stop();
@@ -198,7 +208,10 @@ it.effect("flushes a partial batch before propagating a stream failure", () =>
     const queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false } },
     });
-    const options = rpc.watch.streamedOptions({ publicationBatchSize: 10 });
+    const options = rpc.watch.streamedOptions({
+      maxChunks: "unbounded",
+      publicationBatchSize: 10,
+    });
     try {
       const error = yield* Effect.promise(
         async () => await captureFailure(queryClient.query(options))
@@ -240,7 +253,10 @@ it.effect(
         keyPrefix: ["publication-cancel"],
       });
       const queryClient = new QueryClient();
-      const options = rpc.watch.streamedOptions({ publicationBatchSize: 10 });
+      const options = rpc.watch.streamedOptions({
+        maxChunks: "unbounded",
+        publicationBatchSize: 10,
+      });
       const observer = new QueryObserver(queryClient, options);
       const stop = observer.subscribe(() => {});
       try {
@@ -281,9 +297,12 @@ it.effect("rejects invalid publication batch sizes during preparation", () =>
       keyPrefix: ["publication-validation"],
     });
     for (const publicationBatchSize of [0, -1, 1.5, Infinity, Number.NaN]) {
-      expect(() => rpc.watch.streamedOptions({ publicationBatchSize })).toThrow(
-        RangeError
-      );
+      expect(() =>
+        rpc.watch.streamedOptions({
+          maxChunks: "unbounded",
+          publicationBatchSize,
+        })
+      ).toThrow(RangeError);
     }
   })
 );
@@ -308,17 +327,22 @@ it.effect(
         keyPrefix: ["deadline"],
       });
       const options = rpc.watch.streamedOptions({
+        maxChunks: "unbounded",
         publicationBatchSize: 10,
         publicationMaxWaitMs: 5,
       });
       expect(options.queryKey).toStrictEqual(
         rpc.watch.streamedKey({
+          maxChunks: "unbounded",
           publicationBatchSize: 10,
           publicationMaxWaitMs: 5,
         })
       );
       expect(options.queryKey).not.toStrictEqual(
-        rpc.watch.streamedKey({ publicationBatchSize: 10 })
+        rpc.watch.streamedKey({
+          maxChunks: "unbounded",
+          publicationBatchSize: 10,
+        })
       );
       expect(options).not.toHaveProperty("publicationMaxWaitMs");
       const queryClient = new QueryClient();
@@ -346,7 +370,10 @@ it.effect(
           2_147_483_648,
         ]) {
           expect(() =>
-            rpc.watch.streamedOptions({ publicationMaxWaitMs })
+            rpc.watch.streamedOptions({
+              maxChunks: "unbounded",
+              publicationMaxWaitMs,
+            })
           ).toThrow(RangeError);
         }
       } finally {

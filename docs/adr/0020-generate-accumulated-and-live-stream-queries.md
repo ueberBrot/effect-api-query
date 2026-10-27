@@ -1,6 +1,6 @@
 # Generate accumulated and live stream queries
 
-Status: Accepted. Partially supersedes ADR 0002 and ADR 0003. Extended to HTTP SSE views by [ADR 0024](0024-project-http-streams-and-buffered-metadata.md).
+Status: Accepted. Partially supersedes ADR 0002 and ADR 0003. Extended to HTTP SSE views by [ADR 0024](0024-project-http-streams-and-buffered-metadata.md). Retention configuration is updated by [ADR 0032](0032-configure-utility-trees-and-require-stream-retention.md).
 
 Streams support two cached representations: ordered accumulated history and the latest live value. Keep these representations separate. Include retention and refetch policies in accumulated cache identity because incompatible histories cannot safely share an entry. Broad key prefixes still support invalidation across views and policies.
 

@@ -24,11 +24,6 @@ export type QueryViewKey<Leaf, View extends QueryView> =
     ? Key
     : never;
 
-export type ViewBuilder<Leaf, View extends QueryView> = Leaf[Extract<
-  `${View}Options`,
-  keyof Leaf
->];
-
 export type QueryPageData<
   Data,
   View extends QueryView,

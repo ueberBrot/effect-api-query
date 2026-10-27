@@ -20,10 +20,6 @@ Use the same pattern for infinite, metadata, accumulated, and live options. The 
 import { useQuery as useSolidQuery } from "@tanstack/solid-query";
 import { useQuery as useVueQuery } from "@tanstack/vue-query";
 import { createRpcQueryUtils, skipToken } from "@ueberbrot/effect-api-query";
-import type {
-  InferQueryData,
-  InferQueryError,
-} from "@ueberbrot/effect-api-query";
 import { Schema } from "effect";
 import { Rpc, RpcGroup } from "effect/rpc";
 import type { RpcClient } from "effect/rpc";
@@ -49,11 +45,7 @@ export function makeUserHooks(
           select: (user) => user.name,
         })
       );
-      const user = useVueQuery<
-        InferQueryData<typeof rpc.users.read>,
-        InferQueryError<typeof rpc.users.read>,
-        string
-      >(options);
+      const user = useVueQuery(options);
       return { id, user };
     },
     useSolidUser(id: () => number | undefined) {
@@ -69,9 +61,9 @@ export function makeUserHooks(
 }
 ```
 
-Vue's explicit hook generics preserve tagged data and error types. They avoid deep recursive unwrapping of Effect Causes. Let builders infer their arguments. In Vue, function-valued `enabled` is a zero-argument getter. Use a boolean or `() => boolean`. Vue does not use Core's `enabled(query)` callback. Solid accepts that Core callback.
+Let builders and native hooks infer their arguments. Vue options retain selected data and full error inference without explicit hook generics. In Vue, function-valued `enabled` is a zero-argument getter. Use a boolean or `() => boolean`. Vue does not use Core's `enabled(query)` callback. Solid accepts that Core callback.
 
-Solid Query 5.104.0 query and infinite overloads require a defined seed or no seed. A possibly undefined value or initializer does not match. Vue accepts that initializer. Explicit `initialData: undefined` overrides inherited seeds. Angular's skipped query keeps optional `data()` even with defined initial data. Svelte preserves defined data for that combination. Angular and Svelte both accept possibly undefined initializers with optional data.
+With the checked versions in the compatibility table, Solid Query's query and infinite overloads require a defined seed or no seed. A possibly undefined value or initializer does not match. Vue accepts that initializer. Plain Vue options with a defined seed retain defined data; computed options can keep data optional under the native overload. Explicit `initialData: undefined` overrides inherited seeds. Angular's skipped query keeps optional `data()` even with defined initial data. Svelte preserves defined data for that combination. Angular and Svelte both accept possibly undefined initializers with optional data.
 
 Compile Svelte with `module: 'ESNext'` and `moduleResolution: 'Bundler'`. NodeNext checking exposes an upstream limitation with imports in `.svelte` declarations. Angular results are signals such as `data()`. Register `provideTanStackQuery(queryClient)` and use an injection context. Use native infinite and mutation hooks with their matching builders.
 
@@ -83,11 +75,13 @@ For a first React integration, acquire one client. Create the utility tree and Q
 
 Put `QueryErrorResetBoundary` around a component error boundary and Suspense. On retry, reset both error boundaries before rendering the component's queries again. With cached data, a failed refetch normally keeps rendering that data. When fetching stops, show the local error. If the application wants boundary recovery, explicitly throw the error.
 
-For independent reads that need to start together, use `useSuspenseQueries`. Its native overload can require explicit `{ queryFnData, error }` type descriptors derived with the inference helpers. For the boundary and parallel-query signatures, follow [the complete Suspense recipe](https://ueberbrot.github.io/effect-api-query/guides/suspense-and-recovery/). Native Suspense query hooks do not support cancellation. If abort and open-stream cleanup are required, use ordinary Query hooks or observers. Suspense hooks do not accept skipped query options.
+For independent reads that need to start together, pass generated options directly to `useSuspenseQueries`; data and errors infer without explicit descriptors. For error recovery and parallel reads, follow [the complete Suspense recipe](https://ueberbrot.github.io/effect-api-query/guides/suspense-and-recovery/). Native Suspense query hooks do not support cancellation. If abort and open-stream cleanup are required, use ordinary Query hooks or observers. Suspense hooks do not accept skipped query options.
 
 ## Match application dependencies
 
-Keep Effect packages coordinated with the exact package peer. Match each native Query wrapper to the application's Query Core. Use a compiler that its framework tooling supports. Keep Angular core, common, compiler, and platform-browser on the same release.
+Before selecting or upgrading dependencies, read [Requirements and tested integrations](https://ueberbrot.github.io/effect-api-query/reference/compatibility-and-limits/#requirements-and-tested-integrations). Distinguish the library's peers, the listed wrapper's framework peers, and the exact checked combination. Native TypeScript hook-inference checks establish consumer types; use component compilers and build tooling supported by the framework.
+
+Keep Effect packages coordinated with the exact package peer. Pin Query packages to the checked versions and keep each native wrapper on the application's resolved Query Core. For Svelte, use a package-manager override when its declared Core dependency differs, as described in the table. Keep Angular core, common, compiler, and platform-browser on the same release.
 
 Check the website's header version before applying its examples. When it differs from the installed package, use that package's declarations and shipped guidance. The repository's `main` branch can contain unreleased behavior.
 

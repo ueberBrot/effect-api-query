@@ -1,6 +1,6 @@
 library:
   name: "@ueberbrot/effect-api-query"
-  version: 0.2.0
+  version: 0.3.0
   repository: https://github.com/ueberBrot/effect-api-query
   description: TanStack Query utilities derived from ready Effect RPC and HTTP clients.
   primary_framework: framework-agnostic
@@ -19,8 +19,8 @@ skills:
     covers:
       - RPC construction, explicit prepared inputs, and canonical identity
       - HTTP decoded requests, SSE, multipart mutations, and metadata
-      - Inferred operation types, typed policy composition, execution interception, native defaults, and view filters
-      - Input-field skipping, pagination, publication deadlines, uncached event consumption, recovery, and lifetime tracing
+      - Inferred operation types, tree/branch/leaf policy configuration, execution interception, native defaults, and view filters
+      - Input-field skipping, pagination, explicit stream retention, publication deadlines, uncached event consumption, recovery, and lifetime tracing
       - Stream snapshots and request cleanup
       - Optimistic overlap, event refresh, and owner replacement
       - DTO and rich-value hydration with typed view registration
@@ -29,9 +29,9 @@ skills:
       - Derive buffered, paginated, accumulated, live, and metadata options from a ready client.
       - Address exact stream policy keys, select supported view prefixes, and compose encoded partial native filters with explicit typed projections.
       - Reuse inferred input, cached query data, and mutation types in application modules.
-      - Compose configured leaves and ordered interceptors across views; select a branch view without changing key layouts.
+      - Configure utility trees, branches, and leaves with ordered interceptors across views; select a branch view without changing key layouts.
       - Reuse owner-bound prepared inputs and match single tagged failures without flattening composite Causes.
-      - Apply native defaults and typed reusable policies without losing call-site selection, conditional input, or explicitly undefined seed behavior; compose required mutation callbacks or intercept native execution attempts.
+      - Apply native defaults and scoped policies without losing call-site selection, conditional input, or explicitly undefined seed behavior; compose mutation callbacks or intercept native execution attempts.
       - Capture open streams and drain queries, preparation, and accepted writes before request disposal.
       - Hydrate every selected view into its normal decoded cache representation.
       - Preserve neighboring writes and originating ownership during mutation overlap.
@@ -42,7 +42,7 @@ skills:
       - Recover ordered stream delivery with application-owned cursors, gap refresh, and cancellable backoff.
       - Trace the consumed Stream and its cleanup while its owning runtime remains alive.
       - Rebuild options inside native reactive framework accessors.
-      - Match documentation to the installed package and choose an application-owned transport within documented version and host boundaries.
+      - Match documentation to the installed package, distinguish declared peer requirements from checked native hook combinations, and choose an application-owned transport within documented host boundaries.
     subsystems:
       - name: RPC
         package: "@ueberbrot/effect-api-query"
@@ -60,6 +60,34 @@ skills:
       - topic: Frameworks and hosts
         reason: Native providers, Suspense recovery, hook overloads, and transport boundaries depend on the integration. The package does not provide these services.
     failure_modes:
+      - mistake: Rely on call order to determine configuration specificity
+        mechanism: Configuration layers retain their tree, branch, or leaf scope across repeated calls.
+        wrong_pattern: Expect a later tree policy to replace an existing leaf policy.
+        correct_pattern: Configure the intended scope; later values replace earlier ones within that same scope.
+        source: src/core/configure-utils.ts
+        priority: HIGH
+        status: active
+      - mistake: Drop a protocol's empty named SSE events
+        mechanism: The decoder drops named events without data by default; enabling them changes cached results and decoder identity.
+        wrong_pattern: Consume an empty completion event without enabling its decoder option.
+        correct_pattern: Set dispatchEmptyNamedEvents when the declared event Schema accepts empty data.
+        source: src/http/streamed-query.ts
+        priority: HIGH
+        status: active
+      - mistake: Leave accumulated retention implicit
+        mechanism: Raw accumulated key and options builders require maxChunks; configured descendants may inherit it.
+        wrong_pattern: rpc.events.watch.streamedOptions({ input })
+        correct_pattern: Choose a finite maxChunks bound or the unbounded literal, locally or through configureUtils.
+        source: src/core/configure-utils.ts
+        priority: HIGH
+        status: active
+      - mistake: Assume shared callbacks have one leaf contract
+        mechanism: Root and branch policies span heterogeneous descendants and receive unknown contract values.
+        wrong_pattern: Read a specific result field from a root policy callback.
+        correct_pattern: Move contract-dependent callbacks into the leaf scoped configuration.
+        source: src/core/configure-utils.ts
+        priority: HIGH
+        status: active
       - mistake: Mutate or transfer a prepared input
         mechanism: A handle retains execution input and belongs to one leaf; mutating it can make execution disagree with its frozen key.
         wrong_pattern: Reuse a handle after changing nested request values or replacing the utility tree.
@@ -75,9 +103,9 @@ skills:
         priority: HIGH
         status: active
       - mistake: Reuse an accumulated key across incompatible policies
-        mechanism: Retention and refetch policy change representation and normalized identity.
+        mechanism: Retention and refetch policy change representation and normalized identity; raw builders require an explicit retention choice.
         wrong_pattern: rpc.events.watch.streamedKey(input)
-        correct_pattern: rpc.events.watch.streamedKey(input, policy)
+        correct_pattern: Use the options queryKey or streamedKey(input, policy) with matching explicit or configured retention.
         source: src/rpc/streamed-query.ts
         priority: HIGH
         status: active
@@ -116,6 +144,13 @@ skills:
         source: apps/docs/src/content/docs/guides/solid-query.md
         priority: HIGH
         status: active
+      - mistake: Treat a native wrapper's peer range as the library's tested framework range
+        mechanism: Wrappers declare broader framework peers, while the consumer checks cover exact dependency versions and native TypeScript hook inference.
+        wrong_pattern: Claim support for every Svelte, Vue, or Angular version accepted by its Query wrapper.
+        correct_pattern: Use the canonical compatibility table to distinguish declared peers from checked combinations; select component compilers and build tooling under the framework's own requirements.
+        source: apps/docs/src/content/docs/reference/compatibility-and-limits.md
+        priority: HIGH
+        status: active
       - mistake: Rely on changed metadata options after a fresh hit
         mechanism: An imperative fresh cache hit retains the existing Query options.
         wrong_pattern: await queryClient.query(newOptions); queryClient.setQueryData(key, value)
@@ -125,7 +160,7 @@ skills:
         status: active
       - mistake: Assume shared mutation callbacks compose automatically
         mechanism: Call-site callbacks replace policy callbacks by default, and shared callbacks cannot assume the local optimistic context's shape.
-        wrong_pattern: "write({ onSuccess: localSuccess })"
+        wrong_pattern: "configured.write.mutationOptions({ onSuccess: localSuccess })"
         correct_pattern: Opt into shared-before-local composition and keep onMutate at the call site.
         source: tests/query-policy.test.ts
         priority: HIGH
@@ -167,6 +202,6 @@ tensions:
     skills:
       - effect-api-query
     description: Shared endpoint-aware defaults reduce repetition while selected data and optimistic context depend on each invocation.
-    implication: Bind typed policies once per owner. Keep projections, seeds, identity, and optimistic context at the call site. Choose callback composition explicitly and preserve native execution attempts.
+    implication: Configure utilities once per owner. Use leaf scopes for typed callbacks; shared tree and branch callbacks receive unknown contract values. Keep projections, seeds, identity, and optimistic context at the call site. Choose callback composition explicitly and preserve native execution attempts.
 cross_references: []
 gaps: []

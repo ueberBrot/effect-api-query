@@ -76,7 +76,9 @@ function StartPage() {
   useQuery(rpcQuery.users.get.queryOptions({ input: { id: 1 } }));
   useMutation(rpcQuery.users.get.mutationOptions());
   useInfiniteQuery(userPagesOptions(rpcQuery));
-  useSuspenseQuery(rpcQuery.events.audit.watch.streamedOptions());
+  useSuspenseQuery(
+    rpcQuery.events.audit.watch.streamedOptions({ maxChunks: "unbounded" })
+  );
   useSuspenseQuery(rpcQuery.projects.watch.liveOptions());
   const httpUser = useSuspenseQuery(
     httpQuery.users.get.queryOptions({ input: { params: { id: 1 } } })
@@ -117,7 +119,9 @@ const indexRoute = createRoute({
         staleTime: "static",
       }),
       context.queryClient.query({
-        ...context.rpcQuery.events.audit.watch.streamedOptions(),
+        ...context.rpcQuery.events.audit.watch.streamedOptions({
+          maxChunks: "unbounded",
+        }),
         staleTime: "static",
       }),
       context.queryClient.query({

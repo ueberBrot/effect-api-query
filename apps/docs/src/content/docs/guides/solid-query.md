@@ -5,7 +5,7 @@ description: Rebuild generated options with a Solid accessor and keep client res
 
 Pass options from either factory to Solid Query's native hooks. Before creating the utilities, configure `QueryClientProvider` and acquire the ready client.
 
-The examples target Solid 1.9.15 with Solid Query 5.104.0 and Query Core 5.104.0.
+See [Requirements and tested integrations](/effect-api-query/reference/compatibility-and-limits/#requirements-and-tested-integrations) for Solid Query's framework requirements and this guide's checked versions.
 
 ## Rebuild options when input changes
 
@@ -36,7 +36,7 @@ Read the selected value from `user.data`. When input changes, use the same acces
 
 ## Choose native options carefully
 
-Solid accepts Core's `enabled(query)` callback. Solid Query 5.104.0 query and infinite-query overloads accept defined initial data or absent initial data. A value or initializer that can return `undefined` does not match those overloads. Omit `initialData` or supply a defined seed. An explicit `initialData: undefined` overrides inherited QueryClient initial data.
+Solid accepts Core's `enabled(query)` callback. With the checked versions, Solid Query's query and infinite-query overloads accept defined initial data or absent initial data. A value or initializer that can return `undefined` does not match those overloads. Omit `initialData` or supply a defined seed. An explicit `initialData: undefined` overrides inherited QueryClient initial data.
 
 ## Own the native integration
 

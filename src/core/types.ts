@@ -77,8 +77,8 @@ export type StreamRefetchMode = "append" | "replace" | "reset";
 export type StreamedPolicyOptions = {
   /** Controls whether a refetch clears, appends to, or replaces accumulated data. */
   readonly refetchMode?: StreamRefetchMode | undefined;
-  /** Retains at most this many newest elements; must be a positive safe integer. */
-  readonly maxChunks?: number | undefined;
+  /** Keeps the newest elements, or retains the complete history when explicitly unbounded. */
+  readonly maxChunks: number | "unbounded";
   /** Publishes the first element immediately, then ordered batches; defaults to one. */
   readonly publicationBatchSize?: number | undefined;
   /** Flushes a partial batch after this many milliseconds; omitted means count-only. */
@@ -116,12 +116,18 @@ export type QueryInput<
 > &
   AdapterOptions;
 
+// The broad signature supports native direct calls; hooks infer the final key signature.
+export type GeneratedQueryFunction<
+  Data,
+  Key extends QueryKey,
+> = QueryFunction<Data> & QueryFunction<Data, Key>;
+
 export type QueryOptions<
   Data,
   Error,
   Selected,
   Key extends QueryKey,
-  Fn = QueryFunction<Data>,
+  Fn = GeneratedQueryFunction<Data, Key>,
 > = QueryInput<Data, Error, Selected, Key> & {
   readonly queryFn: Fn;
   readonly queryKey: Key;
@@ -132,7 +138,13 @@ export type ConditionalQueryOptions<
   Error,
   Selected,
   Key extends QueryKey,
-> = QueryOptions<Data, Error, Selected, Key, QueryFunction<Data> | SkipToken>;
+> = QueryOptions<
+  Data,
+  Error,
+  Selected,
+  Key,
+  GeneratedQueryFunction<Data, Key> | SkipToken
+>;
 
 export type InputQueryOptions<
   Input,
@@ -149,17 +161,28 @@ export type InputQueryOptions<
       ? ConditionalQueryOptions<Data, Error, Selected, Key | SkippedKey>
       : QueryOptions<Data, Error, Selected, Key>;
 
+export type KeysOfUnion<Value> = Value extends unknown ? keyof Value : never;
+
+export type UnionProperty<
+  Value,
+  Key extends PropertyKey,
+> = Value extends unknown
+  ? Key extends keyof Value
+    ? Value[Key]
+    : never
+  : never;
+
 export type ExactBuilderOptions<Expected, Supplied> = Expected &
   Supplied & {
     readonly [
       Key in Exclude<
-        keyof Supplied,
+        KeysOfUnion<Supplied>,
         keyof Expected | typeof uninferredBuilderOptions
       >
     ]: string extends Key
-      ? Supplied[Key]
+      ? UnionProperty<Supplied, Key>
       : number extends Key
-        ? Supplied[Key]
+        ? UnionProperty<Supplied, Key>
         : never;
   };
 
@@ -185,6 +208,7 @@ export type RetainedQueryOptions<Options> = Pick<
     | "select"
     | "retry"
     | "retryDelay"
+    | "throwOnError"
     | "initialPageParam"
     | "getNextPageParam"
   >
@@ -269,6 +293,25 @@ export interface InputQueryBuilder<
   >;
 }
 
+declare const unaryQueryBuilderTypes: unique symbol;
+
+export type UnaryQueryBuilderDescriptor<Builder> =
+  typeof unaryQueryBuilderTypes extends keyof Builder
+    ? NonNullable<Builder[typeof unaryQueryBuilderTypes]>
+    : never;
+
+export type RequiredAdapterKeys<Options> = {
+  [Key in keyof Options]-?: Options extends Readonly<Record<Key, Options[Key]>>
+    ? Key
+    : never;
+}[keyof Options];
+
+export type BuilderArguments<Options, AdapterOptions> = [
+  RequiredAdapterKeys<AdapterOptions>,
+] extends [never]
+  ? [options?: Options]
+  : [options: Options];
+
 export type UnaryQueryBuilder<
   Input,
   Data,
@@ -285,7 +328,18 @@ export type UnaryQueryBuilder<
   SkippedKey,
   AdapterOptions,
   Inputless
->;
+> & {
+  readonly [unaryQueryBuilderTypes]?: {
+    readonly input: Input;
+    readonly data: Data;
+    readonly error: Error;
+    readonly key: Key;
+    readonly skippedKey: SkippedKey;
+    // Configured builders accept more options, preserving assignment to the original builder.
+    readonly adapterOptions: (options: AdapterOptions) => void;
+    readonly inputless: Inputless;
+  };
+};
 
 export type UnaryQueryBuilderImpl<
   Input,
@@ -298,7 +352,9 @@ export type UnaryQueryBuilderImpl<
 > = Inputless extends true
   ? {
       <Selected = Data>(
-        options?: undefined
+        ...args: [RequiredAdapterKeys<AdapterOptions>] extends [never]
+          ? [options?: undefined]
+          : [options: never]
       ): RetainedQueryOptions<QueryOptions<Data, Error, Selected, Key>>;
       <Selected = Data, Supplied extends object = UninferredBuilderOptions>(
         options: ExactBuilderOptions<
@@ -317,12 +373,15 @@ export type UnaryQueryBuilderImpl<
         Data
       >;
       <Selected = Data, Supplied extends object = UninferredBuilderOptions>(
-        options?: ExactBuilderOptions<
-          WithUndefinedInitialData<
-            QueryInput<Data, Error, Selected, Key, AdapterOptions>,
-            Data
+        ...args: BuilderArguments<
+          ExactBuilderOptions<
+            WithUndefinedInitialData<
+              QueryInput<Data, Error, Selected, Key, AdapterOptions>,
+              Data
+            >,
+            Supplied
           >,
-          Supplied
+          AdapterOptions
         >
       ): SuppliedQueryOptions<
         QueryOptions<Data, Error, Selected, Key>,
@@ -414,7 +473,7 @@ export type InfiniteQueryKey<
   PageParam = unknown,
   Inputless extends boolean = void extends Input ? true : false,
 > = DataTag<
-  Inputless extends true ? OperationKey : readonly [...OperationKey, JsonValue],
+  Inputless extends true ? OperationKey : readonly [...OperationKey, unknown],
   InfiniteData<Data, PageParam>,
   Error
 >;
@@ -726,8 +785,7 @@ export type MutationBuilder<
   options?: Omit<
     MutationObserverOptions<Data, Error, Input, OnMutateResult>,
     OwnedMutationOption
-  > &
-    AdapterOptions
+  > & { readonly [Key in OwnedMutationOption]?: never } & AdapterOptions
 ) => MutationOptions<Data, Error, Input, Key, OnMutateResult>;
 
 export type HasSeenType<A, Seen> = Seen extends unknown

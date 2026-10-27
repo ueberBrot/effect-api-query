@@ -152,7 +152,7 @@ export type ConcreteQueryKey<
 > = DataTag<
   PayloadlessRpc<R> extends true
     ? QueryOperationKey<Prefix, R>
-    : readonly [...QueryOperationKey<Prefix, R>, JsonValue],
+    : readonly [...QueryOperationKey<Prefix, R>, unknown],
   QueryData<Rpc.Success<R>>,
   EffectRpcQueryError<RpcFailure<R, ClientError>>
 >;
@@ -230,7 +230,9 @@ export type ConcreteStreamedKey<
   R extends Rpc.Any,
   ClientError,
 > = DataTag<
-  readonly [...StreamedOperationKey<Prefix, R>, ...JsonValue[]],
+  PayloadlessRpc<R> extends true
+    ? readonly [...StreamedOperationKey<Prefix, R>, unknown]
+    : readonly [...StreamedOperationKey<Prefix, R>, unknown, unknown],
   StreamedData<R>,
   RpcStreamQueryError<R, ClientError>
 >;
@@ -242,7 +244,7 @@ export type ConcreteLiveKey<
 > = DataTag<
   PayloadlessRpc<R> extends true
     ? LiveOperationKey<Prefix, R>
-    : readonly [...LiveOperationKey<Prefix, R>, JsonValue],
+    : readonly [...LiveOperationKey<Prefix, R>, unknown],
   QueryData<Rpc.SuccessChunk<R>>,
   RpcLiveError<R, ClientError>
 >;
@@ -301,12 +303,12 @@ export type StreamKeyBuilder<R extends Rpc.Any, Key> = KeyBuilder<
 
 export type StreamedKeyBuilder<R extends Rpc.Any, Key> =
   PayloadlessRpc<R> extends true
-    ? (policy?: StreamedPolicyOptions) => Key
+    ? (policy: StreamedPolicyOptions) => Key
     : (
         input:
           | Rpc.PayloadConstructor<R>
           | PreparedInput<Rpc.PayloadConstructor<R>>,
-        policy?: StreamedPolicyOptions
+        policy: StreamedPolicyOptions
       ) => Key;
 
 /** The key and option builders exposed at one streaming RPC path. */
@@ -370,35 +372,53 @@ export interface RpcQueryLeaf<
   readonly queryOptions: QueryOptionsBuilder<R, Prefix, ClientError>;
 }
 
-export type PathTree<
-  Tag extends string,
+export type RpcTagEntry<
   R extends Rpc.Any,
+  Tag extends string,
+> = Tag extends string
+  ? { readonly path: Tag; readonly rpc: R & { readonly _tag: Tag } }
+  : never;
+
+export type RpcPathEntry<R extends Rpc.Any> = R extends Rpc.Any
+  ? RpcTagEntry<R, R["_tag"]>
+  : never;
+
+export type PathHead<Path extends string> =
+  Path extends `${infer Head}.${string}` ? Head : Path;
+
+export type PathDescendants<Entry, Head extends string> = Entry extends {
+  readonly path: `${Head}.${infer Tail}`;
+  readonly rpc: infer R extends Rpc.Any;
+}
+  ? { readonly path: Tail; readonly rpc: R }
+  : never;
+
+export type PathTree<
+  Entry extends { readonly path: string; readonly rpc: Rpc.Any },
   Prefix extends readonly JsonValue[],
   ClientError,
   Path extends readonly string[] = readonly [],
-> = Tag extends `${infer Head}.${infer Tail}`
-  ? Readonly<
-      Record<
-        Head,
-        {
-          readonly key: () => readonly [...Prefix, "rpc", ...Path, Head];
-        } & PathTree<Tail, R, Prefix, ClientError, readonly [...Path, Head]>
-      >
-    >
-  : Readonly<
-      Record<
-        Tag,
-        StreamingRpc<R> extends never
-          ? RpcQueryLeaf<R, Prefix, ClientError>
-          : RpcStreamLeaf<R, Prefix, ClientError>
-      >
-    >;
+> = {
+  readonly [Head in PathHead<Entry["path"]>]: [
+    PathDescendants<Entry, Head>,
+  ] extends [never]
+    ? Extract<Entry, { readonly path: Head }>["rpc"] extends infer R extends
+        Rpc.Any
+      ? StreamingRpc<R> extends never
+        ? RpcQueryLeaf<R, Prefix, ClientError>
+        : RpcStreamLeaf<R, Prefix, ClientError>
+      : never
+    : {
+        readonly key: () => readonly [...Prefix, "rpc", ...Path, Head];
+      } & PathTree<
+        PathDescendants<Entry, Head>,
+        Prefix,
+        ClientError,
+        readonly [...Path, Head]
+      >;
+};
 
-export type UnionToIntersection<Union> = (
-  Union extends unknown ? (value: Union) => void : never
-) extends (value: infer Intersection) => void
-  ? Intersection
-  : never;
+declare const rpcQueryClientError: unique symbol;
 
 /** An eager utility tree projected from the group's dotted RPC tags. */
 export type RpcQueryUtils<
@@ -406,15 +426,10 @@ export type RpcQueryUtils<
   Prefix extends readonly [JsonValue, ...JsonValue[]],
   ClientError = never,
 > = {
+  readonly [rpcQueryClientError]?: ClientError;
   /** Returns the immutable root key, including the RPC discriminator. */
   readonly key: () => readonly [...Prefix, "rpc"];
-} & UnionToIntersection<
-  RpcsOf<Group> extends infer R
-    ? R extends Rpc.Any
-      ? PathTree<R["_tag"], R, Prefix, ClientError>
-      : never
-    : never
->;
+} & PathTree<RpcPathEntry<RpcsOf<Group>>, Prefix, ClientError>;
 
 export type NeedsKeyEncoder<R extends Rpc.Any> = [
   PayloadSchema<R>["EncodingServices"],

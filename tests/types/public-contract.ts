@@ -281,7 +281,7 @@ const projectPing = utils.projects.health.ping.queryOptions();
 true satisfies Assert<
   Equal<
     keyof typeof projectPing,
-    "queryFn" | "queryKey" | "select" | "retry" | "retryDelay"
+    "queryFn" | "queryKey" | "select" | "retry" | "retryDelay" | "throwOnError"
   >
 >;
 const omittedInputlessArguments: Parameters<
@@ -395,17 +395,23 @@ const streamedHook = useQuery(streamedOptions);
 const streamedHookData: string | undefined = streamedHook.data;
 streamedHook.error satisfies WatchStreamError | null;
 const streamedResult: Promise<string> = queryClient.query(streamedOptions);
-const streamedKey = utils.events.watch.streamedKey({ channel: "news" });
+const streamedKey = utils.events.watch.streamedKey(
+  { channel: "news" },
+  { maxChunks: "unbounded" }
+);
 streamedKey satisfies readonly [
   "app",
   "rpc",
   "events",
   "watch",
   "streamed",
-  ...JsonValue[],
+  ...unknown[],
 ];
 const cachedStream = queryClient.getQueryData(
-  utils.events.watch.streamedKey({ channel: "news" })
+  utils.events.watch.streamedKey(
+    { channel: "news" },
+    { maxChunks: "unbounded" }
+  )
 );
 cachedStream satisfies ReadonlyArray<string> | undefined;
 const boundedStreamKey = utils.events.watch.streamedKey(
@@ -421,23 +427,26 @@ queryClient.getQueryState(boundedStreamKey)?.error satisfies
   | undefined;
 utils.events.watch.streamedKey(
   { channel: "news" },
-  { maxChunks: undefined, refetchMode: "reset" }
+  { maxChunks: "unbounded", refetchMode: "reset" }
 );
-utils.events.audit.watch.streamedKey();
+utils.events.audit.watch.streamedKey({ maxChunks: "unbounded" });
 utils.events.audit.watch.streamedKey({ maxChunks: 2, refetchMode: "replace" });
 utils.events.audit.watch.streamedKey({
-  maxChunks: undefined,
+  maxChunks: "unbounded",
   refetchMode: undefined,
 });
 queryClient.getQueryData(
   utils.events.audit.watch.streamedKey({ maxChunks: 2 })
 ) satisfies ReadonlyArray<string> | undefined;
-// @ts-expect-error refetch policy is one of the declared modes
-utils.events.watch.streamedKey({ channel: "news" }, { refetchMode: "unknown" });
+utils.events.watch.streamedKey(
+  { channel: "news" },
+  // @ts-expect-error refetch policy is one of the declared modes
+  { maxChunks: "unbounded", refetchMode: "unknown" }
+);
 // @ts-expect-error accumulation bounds are numeric
 utils.events.audit.watch.streamedKey({ maxChunks: "2" });
 // @ts-expect-error a payload-bearing key still requires constructor input
-utils.events.watch.streamedKey({ maxChunks: 2 });
+utils.events.watch.streamedKey({ maxChunks: 2 }, { maxChunks: "unbounded" });
 // @ts-expect-error live keys have no accumulation policy
 utils.events.watch.liveKey({ channel: "news" }, { maxChunks: 2 });
 queryClient.invalidateQueries({ queryKey: streamedKey });
@@ -461,13 +470,14 @@ liveHook.error satisfies
   | null;
 const liveResult: Promise<number> = queryClient.query(liveOptions);
 const liveKey = utils.events.watch.liveKey({ channel: "news" });
-liveKey satisfies readonly ["app", "rpc", "events", "watch", "live", JsonValue];
+liveKey satisfies readonly ["app", "rpc", "events", "watch", "live", unknown];
 const cachedLive = queryClient.getQueryData(liveKey);
 cachedLive satisfies string | undefined;
 void [liveHookData, liveResult];
 
 const initializedStream = useQuery(
   utils.events.watch.streamedOptions({
+    maxChunks: "unbounded",
     initialData: ["initial"],
     input: { channel: "news" },
     select: (values) => values.join(", "),
@@ -553,6 +563,7 @@ true satisfies Assert<
 >;
 const accumulatedUndefined = queryClient.query(
   normalizedLiveUtils.values.undefined.streamedOptions({
+    maxChunks: "unbounded",
     initialData: [undefined],
   })
 );
@@ -570,6 +581,7 @@ const clientFailureUtils = createRpcQueryUtils<
   "client-failure"
 >(group, { client: clientFailureClient, keyPrefix });
 clientFailureUtils.events.watch.streamedOptions({
+  maxChunks: "unbounded",
   input: { channel: "news" },
   retry: (_count, error) => {
     error satisfies
@@ -585,6 +597,7 @@ clientFailureUtils.events.watch.streamedOptions({
 });
 
 const skippedStreamed = utils.events.watch.streamedOptions({
+  maxChunks: "unbounded",
   input: skipToken,
 });
 skippedStreamed.queryFn satisfies typeof queryCoreSkipToken;
@@ -597,20 +610,27 @@ useSuspenseQuery(skippedStreamed);
 // @ts-expect-error suspense queries cannot use a skipped live stream
 useSuspenseQuery(skippedLive);
 
-const payloadlessStreamed = utils.events.audit.watch.streamedOptions();
+const payloadlessStreamed = utils.events.audit.watch.streamedOptions({
+  maxChunks: "unbounded",
+});
 const payloadlessLive = utils.events.audit.watch.liveOptions();
 queryClient.query(payloadlessStreamed);
 queryClient.query(payloadlessLive);
 
 // @ts-expect-error payload-bearing streaming queries require input or skipToken
-utils.events.watch.streamedOptions({});
+utils.events.watch.streamedOptions({ maxChunks: "unbounded" });
 // @ts-expect-error payload-bearing live queries require input or skipToken
 utils.events.watch.liveOptions({});
+const payloadlessStreamInput = {
+  maxChunks: "unbounded" as const,
+  input: undefined,
+};
 // @ts-expect-error payloadless streaming queries omit input
-utils.events.audit.watch.streamedOptions({ input: undefined });
+utils.events.audit.watch.streamedOptions(payloadlessStreamInput);
 // @ts-expect-error payloadless live queries omit input
 utils.events.audit.watch.liveOptions({ input: undefined });
 utils.events.watch.streamedOptions({
+  maxChunks: "unbounded",
   input: { channel: "news" },
   // @ts-expect-error the package owns the streamed query function
   queryFn: async () => [],
@@ -727,7 +747,7 @@ infiniteKey satisfies readonly [
   "users",
   "pages",
   "infinite",
-  JsonValue,
+  unknown,
 ];
 const cachedPages = queryClient.getQueryData(fetchableInfiniteOptions.queryKey);
 cachedPages?.pageParams satisfies ReadonlyArray<number> | undefined;
@@ -786,7 +806,7 @@ const conditionalInfiniteOptions = utils.users.pages.infiniteOptions({
   staleTime: (query) => {
     query.queryKey satisfies
       | readonly ["app", "rpc", "users", "pages", "infinite"]
-      | readonly ["app", "rpc", "users", "pages", "infinite", JsonValue];
+      | readonly ["app", "rpc", "users", "pages", "infinite", unknown];
     return 30_000;
   },
   select: (data) => data.pages.length,
@@ -1108,7 +1128,7 @@ concreteQueryKey satisfies readonly [
   "users",
   "get",
   "query",
-  JsonValue,
+  unknown,
 ];
 const cachedState = queryClient.getQueryState(concreteQueryKey);
 cachedState?.error satisfies
@@ -1274,7 +1294,7 @@ utils.users.get.queryOptions({
   // @ts-expect-error QueryClient defaults own hashing.
   queryKeyHashFn: JSON.stringify,
 });
-void utils.projects.watch.streamedOptions({});
+void utils.projects.watch.streamedOptions({ maxChunks: "unbounded" });
 // @ts-expect-error streaming leaves do not expose unary query builders
 void utils.projects.watch.queryOptions;
 // @ts-expect-error unary leaves do not expose streaming query builders
@@ -1431,6 +1451,7 @@ true satisfies Assert<
 >;
 useQuery(
   utils.events.watch.streamedOptions({
+    maxChunks: "unbounded",
     input: skipToken,
     initialData: ["first"],
     select: (values) => values.join(", "),
@@ -1438,6 +1459,7 @@ useQuery(
 ).data satisfies string | undefined;
 useQuery(
   utils.events.watch.streamedOptions({
+    maxChunks: "unbounded",
     input: skipToken,
     initialData: () => ["first"],
     select: (values) => values.join(", "),
@@ -1446,6 +1468,7 @@ useQuery(
 declare const optionalStreamedInitial: () => ReadonlyArray<string> | undefined;
 const optionalStreamedResult = useQuery(
   utils.events.watch.streamedOptions({
+    maxChunks: "unbounded",
     input: skipToken,
     initialData: optionalStreamedInitial,
   })
@@ -1455,6 +1478,7 @@ optionalStreamedResult.data satisfies ReadonlyArray<string>;
 declare const optionalStreamedInitialValue: ReadonlyArray<string> | undefined;
 const optionalSkippedStreamedValue = useQuery(
   utils.events.watch.streamedOptions({
+    maxChunks: "unbounded",
     input: skipToken,
     initialData: optionalStreamedInitialValue,
   })
@@ -1506,8 +1530,12 @@ utils.health.ping.infiniteOptions({
   initialPageParam: 0,
   getNextPageParam: () => undefined,
 });
+const payloadlessSkippedInput = {
+  maxChunks: "unbounded" as const,
+  input: skipToken,
+};
 // @ts-expect-error skipping does not widen the supported builder inputs
-utils.events.audit.watch.streamedOptions({ input: skipToken });
+utils.events.audit.watch.streamedOptions(payloadlessSkippedInput);
 // @ts-expect-error skipping does not widen the supported builder inputs
 utils.events.audit.watch.liveOptions({ input: skipToken });
 // @ts-expect-error skipping does not widen the supported builder inputs
@@ -1517,15 +1545,19 @@ utils.events.audit.watch.liveOptions(skipToken);
 // @ts-expect-error skipping does not widen the supported builder inputs
 utils.users.get.infiniteKey(skipToken);
 // @ts-expect-error skipping does not widen the supported builder inputs
-utils.events.watch.streamedKey(skipToken);
+utils.events.watch.streamedKey(skipToken, { maxChunks: "unbounded" });
 // @ts-expect-error skipping does not widen the supported builder inputs
 utils.events.watch.liveKey(skipToken);
 // @ts-expect-error skipping does not widen the supported builder inputs
 utils.events.watch.liveOptions({ input: skipToken, refetchMode: "append" });
 // @ts-expect-error skipping does not widen the supported builder inputs
 utils.users.get.queryOptions({ input: skipToken, queryKey: [] });
-// @ts-expect-error skipping does not widen the supported builder inputs
-utils.events.watch.streamedOptions({ input: skipToken, queryFn: skipToken });
+utils.events.watch.streamedOptions({
+  maxChunks: "unbounded",
+  input: skipToken,
+  // @ts-expect-error skipping does not widen the supported builder inputs
+  queryFn: skipToken,
+});
 // @ts-expect-error skipping does not widen the supported builder inputs
 utils.events.watch.liveOptions({ input: skipToken, queryKeyHashFn: () => "" });
 
@@ -1537,6 +1569,7 @@ initializedSkippedQuery.initialData satisfies
   | { readonly id: number; readonly name: string }
   | (() => { readonly id: number; readonly name: string });
 const initializedSkippedStream = utils.events.watch.streamedOptions({
+  maxChunks: "unbounded",
   input: skipToken,
   initialData: () => ["first"],
 });
@@ -1566,11 +1599,12 @@ skippedStreamObject.maxChunks;
 utils.events.watch.liveOptions({ input: { channel: "news" }, maxChunks: 2 });
 // @ts-expect-error skipped live queries have no accumulation policy
 utils.events.watch.liveOptions({ input: skipToken, maxChunks: 2 });
-utils.events.watch.streamedOptions({
+const invalidHistoryBound = {
   input: { channel: "news" },
-  // @ts-expect-error accumulation bounds are numeric
-  maxChunks: "2",
-});
+  maxChunks: "2" as const,
+};
+// @ts-expect-error accumulation bounds are numeric or explicitly unbounded
+utils.events.watch.streamedOptions(invalidHistoryBound);
 utils.events.audit.watch.streamedOptions({ maxChunks: 2, initialData: [] });
 utils.events.watch.streamedOptions({
   input: skipToken,
@@ -1590,7 +1624,7 @@ const conditionalStreamOptions = utils.events.watch.streamedOptions({
   staleTime: (query) => {
     query.queryKey satisfies
       | readonly ["app", "rpc", "events", "watch", "streamed"]
-      | readonly ["app", "rpc", "events", "watch", "streamed", ...JsonValue[]];
+      | readonly ["app", "rpc", "events", "watch", "streamed", ...unknown[]];
     return 30_000;
   },
 });
@@ -1644,6 +1678,7 @@ useSuspenseQuery(conditionalLiveOptions);
 usePrefetchQuery(conditionalLiveOptions);
 
 const initializedConditionalStreamOptions = utils.events.watch.streamedOptions({
+  maxChunks: "unbounded",
   input: conditionalStreamInput,
   initialData: ["initial"],
   select: (values) => values.join(", "),
@@ -1671,6 +1706,7 @@ true satisfies Assert<
 >;
 const optionalConditionalStreamedValue = useQuery(
   utils.events.watch.streamedOptions({
+    maxChunks: "unbounded",
     input: conditionalStreamInput,
     initialData: optionalStreamedInitialValue,
     select: (values) => values.length,
@@ -1697,7 +1733,7 @@ const conditionalUserOptions = utils.users.get.queryOptions({
   refetchInterval: (query) => {
     query.queryKey satisfies
       | readonly ["app", "rpc", "users", "get", "query"]
-      | readonly ["app", "rpc", "users", "get", "query", JsonValue];
+      | readonly ["app", "rpc", "users", "get", "query", unknown];
     return false;
   },
   select: (user) => user.name,
@@ -1785,6 +1821,7 @@ requestMutation.mutationFn({ id: 1 }) satisfies Promise<{
   readonly name: string;
 }>;
 const requestStreamed = utils.events.watch.streamedOptions({
+  maxChunks: "unbounded",
   input: { channel: "news" },
   rpcOptions: streamingRpcOptions,
   select: (values) => values.length,
@@ -1804,7 +1841,10 @@ utils.health.ping.infiniteOptions({
   getNextPageParam: () => undefined,
 });
 utils.health.ping.mutationOptions({ rpcOptions: unaryRpcOptions });
-utils.events.audit.watch.streamedOptions({ rpcOptions: streamingRpcOptions });
+utils.events.audit.watch.streamedOptions({
+  maxChunks: "unbounded",
+  rpcOptions: streamingRpcOptions,
+});
 utils.events.audit.watch.liveOptions({ rpcOptions: streamingRpcOptions });
 const requestSkipped = utils.users.get.queryOptions({
   input: skipToken,
@@ -1817,6 +1857,7 @@ const requestSkippedInfinite = utils.users.pages.infiniteOptions({
   getNextPageParam: () => undefined,
 });
 const requestSkippedStreamed = utils.events.watch.streamedOptions({
+  maxChunks: "unbounded",
   input: skipToken,
   rpcOptions: streamingRpcOptions,
 });
@@ -1854,6 +1895,7 @@ utils.users.pages.infiniteOptions(discardedInfiniteRequest);
 // @ts-expect-error mutation results cannot be discarded
 utils.users.get.mutationOptions({ rpcOptions: { discard: true } });
 utils.events.watch.streamedOptions({
+  maxChunks: "unbounded",
   input: { channel: "news" },
   // @ts-expect-error stream adaptation owns queue conversion
   rpcOptions: { asQueue: true },
@@ -1895,6 +1937,7 @@ true satisfies Assert<
 >;
 
 utils.events.watch.streamedOptions({
+  maxChunks: "unbounded",
   input: { channel: "news" },
   // @ts-expect-error QueryClient defaults own hashing.
   queryHash: "shared",
@@ -2006,7 +2049,7 @@ unknownKey satisfies readonly [
   "payload",
   "unknown",
   "query",
-  JsonValue,
+  unknown,
 ];
 anyKey satisfies readonly [
   "payload",
@@ -2014,7 +2057,7 @@ anyKey satisfies readonly [
   "payload",
   "any",
   "query",
-  JsonValue,
+  unknown,
 ];
 optionalKey satisfies readonly [
   "payload",
@@ -2022,7 +2065,7 @@ optionalKey satisfies readonly [
   "payload",
   "optional",
   "query",
-  JsonValue,
+  unknown,
 ];
 queryClient.getQueryData(unknownKey) satisfies string | undefined;
 queryClient.getQueryData(anyKey) satisfies string | undefined;
@@ -2098,7 +2141,7 @@ broadPayloadUtils.payload.unknown.infiniteKey({ page: 0 }) satisfies readonly [
   "payload",
   "unknown",
   "infinite",
-  JsonValue,
+  unknown,
 ];
 broadPayloadUtils.payload.any.infiniteKey({ page: 0 }) satisfies readonly [
   "payload",
@@ -2106,7 +2149,7 @@ broadPayloadUtils.payload.any.infiniteKey({ page: 0 }) satisfies readonly [
   "payload",
   "any",
   "infinite",
-  JsonValue,
+  unknown,
 ];
 broadPayloadUtils.payload.optional.infiniteKey("0") satisfies readonly [
   "payload",
@@ -2114,7 +2157,7 @@ broadPayloadUtils.payload.optional.infiniteKey("0") satisfies readonly [
   "payload",
   "optional",
   "infinite",
-  JsonValue,
+  unknown,
 ];
 // @ts-expect-error Unknown infinite queries require a page-input mapper
 broadPayloadUtils.payload.unknown.infiniteOptions({
@@ -2132,14 +2175,22 @@ broadPayloadUtils.payload.optional.infiniteOptions({
   getNextPageParam: () => undefined,
 });
 
-const unknownStreamedKey = broadPayloadUtils.payload.unknownWatch.streamedKey({
-  id: 1,
-});
-const anyStreamedKey = broadPayloadUtils.payload.anyWatch.streamedKey({
-  id: 1,
-});
-const optionalStreamedKey =
-  broadPayloadUtils.payload.optionalWatch.streamedKey("input");
+const unknownStreamedKey = broadPayloadUtils.payload.unknownWatch.streamedKey(
+  {
+    id: 1,
+  },
+  { maxChunks: "unbounded" }
+);
+const anyStreamedKey = broadPayloadUtils.payload.anyWatch.streamedKey(
+  {
+    id: 1,
+  },
+  { maxChunks: "unbounded" }
+);
+const optionalStreamedKey = broadPayloadUtils.payload.optionalWatch.streamedKey(
+  "input",
+  { maxChunks: "unbounded" }
+);
 const unknownLiveKey = broadPayloadUtils.payload.unknownWatch.liveKey({
   id: 1,
 });
@@ -2152,7 +2203,7 @@ unknownStreamedKey satisfies readonly [
   "payload",
   "unknownWatch",
   "streamed",
-  ...JsonValue[],
+  ...unknown[],
 ];
 anyStreamedKey satisfies readonly [
   "payload",
@@ -2160,7 +2211,7 @@ anyStreamedKey satisfies readonly [
   "payload",
   "anyWatch",
   "streamed",
-  ...JsonValue[],
+  ...unknown[],
 ];
 optionalStreamedKey satisfies readonly [
   "payload",
@@ -2168,7 +2219,7 @@ optionalStreamedKey satisfies readonly [
   "payload",
   "optionalWatch",
   "streamed",
-  ...JsonValue[],
+  ...unknown[],
 ];
 unknownLiveKey satisfies readonly [
   "payload",
@@ -2176,7 +2227,7 @@ unknownLiveKey satisfies readonly [
   "payload",
   "unknownWatch",
   "live",
-  JsonValue,
+  unknown,
 ];
 anyLiveKey satisfies readonly [
   "payload",
@@ -2184,7 +2235,7 @@ anyLiveKey satisfies readonly [
   "payload",
   "anyWatch",
   "live",
-  JsonValue,
+  unknown,
 ];
 broadOptionalLiveKey satisfies readonly [
   "payload",
@@ -2192,7 +2243,7 @@ broadOptionalLiveKey satisfies readonly [
   "payload",
   "optionalWatch",
   "live",
-  JsonValue,
+  unknown,
 ];
 queryClient.getQueryData(unknownStreamedKey) satisfies
   | readonly string[]
@@ -2212,6 +2263,7 @@ queryClient.getQueryData(unknownBoundedStream) satisfies
   | undefined;
 broadPayloadUtils.payload.anyWatch.streamedKey({ id: 1 }, { maxChunks: 2 });
 broadPayloadUtils.payload.optionalWatch.streamedKey(undefined, {
+  maxChunks: "unbounded",
   refetchMode: "replace",
 });
 // @ts-expect-error Unknown accumulated keys require constructor input
@@ -2221,18 +2273,31 @@ broadPayloadUtils.payload.anyWatch.streamedKey();
 queryClient.getQueryData(unknownLiveKey) satisfies string | undefined;
 queryClient.getQueryData(anyLiveKey) satisfies string | undefined;
 queryClient.getQueryData(broadOptionalLiveKey) satisfies string | undefined;
-broadPayloadUtils.payload.unknownWatch.streamedOptions({ input: { id: 1 } });
-broadPayloadUtils.payload.anyWatch.streamedOptions({ input: { id: 1 } });
-broadPayloadUtils.payload.optionalWatch.streamedOptions({ input: undefined });
+broadPayloadUtils.payload.unknownWatch.streamedOptions({
+  maxChunks: "unbounded",
+  input: { id: 1 },
+});
+broadPayloadUtils.payload.anyWatch.streamedOptions({
+  maxChunks: "unbounded",
+  input: { id: 1 },
+});
+broadPayloadUtils.payload.optionalWatch.streamedOptions({
+  maxChunks: "unbounded",
+  input: undefined,
+});
 broadPayloadUtils.payload.unknownWatch.liveOptions({ input: { id: 1 } });
 broadPayloadUtils.payload.anyWatch.liveOptions({ input: { id: 1 } });
 broadPayloadUtils.payload.optionalWatch.liveOptions({ input: undefined });
 // @ts-expect-error Unknown accumulated queries require an input field
-broadPayloadUtils.payload.unknownWatch.streamedOptions();
+broadPayloadUtils.payload.unknownWatch.streamedOptions({
+  maxChunks: "unbounded",
+});
 // @ts-expect-error Any accumulated queries require an input field
-broadPayloadUtils.payload.anyWatch.streamedOptions();
+broadPayloadUtils.payload.anyWatch.streamedOptions({ maxChunks: "unbounded" });
 // @ts-expect-error void-containing accumulated queries require an input field
-broadPayloadUtils.payload.optionalWatch.streamedOptions();
+broadPayloadUtils.payload.optionalWatch.streamedOptions({
+  maxChunks: "unbounded",
+});
 // @ts-expect-error Unknown live queries require an input field
 broadPayloadUtils.payload.unknownWatch.liveOptions();
 // @ts-expect-error Any live queries require an input field
@@ -2251,13 +2316,16 @@ const optionalSkipped = broadPayloadUtils.payload.optional.queryOptions({
 });
 const unknownStreamSkipped =
   broadPayloadUtils.payload.unknownWatch.streamedOptions({
+    maxChunks: "unbounded",
     input: skipToken,
   });
 const anyStreamSkipped = broadPayloadUtils.payload.anyWatch.streamedOptions({
+  maxChunks: "unbounded",
   input: skipToken,
 });
 const optionalStreamSkipped =
   broadPayloadUtils.payload.optionalWatch.streamedOptions({
+    maxChunks: "unbounded",
     input: skipToken,
   });
 const unknownLiveSkipped = broadPayloadUtils.payload.unknownWatch.liveOptions({
@@ -2290,10 +2358,20 @@ const broadAnyOptions = broadPayloadUtils.payload.any.queryOptions({
   input: broadAnyInput,
 });
 true satisfies Assert<
-  Equal<typeof broadUnknownOptions.queryFn, QueryFunction<string> | SkipToken>
+  Equal<
+    typeof broadUnknownOptions.queryFn,
+    | (QueryFunction<string> &
+        QueryFunction<string, typeof broadUnknownOptions.queryKey>)
+    | SkipToken
+  >
 >;
 true satisfies Assert<
-  Equal<typeof broadAnyOptions.queryFn, QueryFunction<string> | SkipToken>
+  Equal<
+    typeof broadAnyOptions.queryFn,
+    | (QueryFunction<string> &
+        QueryFunction<string, typeof broadAnyOptions.queryKey>)
+    | SkipToken
+  >
 >;
 
 broadPayloadUtils.payload.void.queryKey() satisfies readonly [
@@ -2318,13 +2396,15 @@ broadPayloadUtils.payload.void.infiniteOptions({
 broadPayloadUtils.payload.void
   .mutationOptions()
   .mutationFn() satisfies Promise<string>;
-broadPayloadUtils.payload.voidWatch.streamedKey() satisfies readonly [
+broadPayloadUtils.payload.voidWatch.streamedKey({
+  maxChunks: "unbounded",
+}) satisfies readonly [
   "payload",
   "rpc",
   "payload",
   "voidWatch",
   "streamed",
-  ...JsonValue[],
+  ...unknown[],
 ];
 broadPayloadUtils.payload.voidWatch.streamedKey({
   maxChunks: 2,
@@ -2337,11 +2417,15 @@ broadPayloadUtils.payload.voidWatch.liveKey() satisfies readonly [
   "voidWatch",
   "live",
 ];
-broadPayloadUtils.payload.voidWatch.streamedOptions();
+broadPayloadUtils.payload.voidWatch.streamedOptions({ maxChunks: "unbounded" });
 broadPayloadUtils.payload.voidWatch.liveOptions();
 // @ts-expect-error Void query declarations omit the input field
 broadPayloadUtils.payload.void.queryOptions({ input: undefined });
+const voidStreamInput = {
+  maxChunks: "unbounded" as const,
+  input: undefined,
+};
 // @ts-expect-error Void accumulated declarations omit the input field
-broadPayloadUtils.payload.voidWatch.streamedOptions({ input: undefined });
+broadPayloadUtils.payload.voidWatch.streamedOptions(voidStreamInput);
 // @ts-expect-error Void live declarations omit the input field
 broadPayloadUtils.payload.voidWatch.liveOptions({ input: undefined });

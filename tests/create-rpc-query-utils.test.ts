@@ -80,7 +80,9 @@ describe(createRpcQueryUtils, () => {
         query: utils.users.get.queryKey({ id: 1 }),
         prototypeName: utils.toString.child.key(),
         stream: utils.events.watch.key(),
-        streamed: utils.events.watch.streamedKey().slice(0, 5),
+        streamed: utils.events.watch
+          .streamedKey({ maxChunks: "unbounded" })
+          .slice(0, 5),
         live: utils.events.watch.liveKey(),
       }).toStrictEqual({
         root: ["app", "rpc"],
@@ -351,9 +353,13 @@ describe(createRpcQueryUtils, () => {
         );
         expect({
           unary: utils.reports.list.key(),
-          nestedStreamed: utils.events.audit.watch.streamedKey().slice(0, 6),
+          nestedStreamed: utils.events.audit.watch
+            .streamedKey({ maxChunks: "unbounded" })
+            .slice(0, 6),
           nestedLive: utils.events.audit.watch.liveKey(),
-          rootStreamed: utils.updates.watch.streamedKey().slice(0, 5),
+          rootStreamed: utils.updates.watch
+            .streamedKey({ maxChunks: "unbounded" })
+            .slice(0, 5),
         }).toStrictEqual({
           unary: ["app", "rpc", "reports", "list"],
           nestedStreamed: [
@@ -367,9 +373,9 @@ describe(createRpcQueryUtils, () => {
           nestedLive: ["app", "rpc", "events", "audit", "watch", "live"],
           rootStreamed: ["app", "rpc", "updates", "watch", "streamed"],
         });
-        expect(utils.events.audit.watch.streamedKey()).not.toStrictEqual(
-          utils.events.audit.watch.liveKey()
-        );
+        expect(
+          utils.events.audit.watch.streamedKey({ maxChunks: "unbounded" })
+        ).not.toStrictEqual(utils.events.audit.watch.liveKey());
       })
   );
 });

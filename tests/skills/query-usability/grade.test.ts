@@ -58,6 +58,7 @@ it.effect(
         ]);
         expect(result.watch.queryKey).toStrictEqual(
           rpc.users.watch.streamedKey({
+            maxChunks: "unbounded",
             publicationBatchSize: 10,
             publicationMaxWaitMs: 50,
           })

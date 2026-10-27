@@ -3,7 +3,7 @@ title: Retry Queries
 description: Reuse bounded read policies with typed Effect failures and native Query options.
 ---
 
-Bind a retry policy with `withQueryPolicy`. Use the returned options builder wherever you need that read. Each call keeps native `select`, input, and initial-data inference. Call-site options replace matching defaults.
+Bind a retry policy with `configureUtils`. Use the configured leaf's options wherever you need that read. Each call keeps native `select`, input, and initial-data inference. Call-site options replace matching defaults.
 
 The policy below permits two retries after the initial failure, for at most three executions. It allows a declared `RetryLater` or an application-approved transport failure. Use it for idempotent reads whose transport does not already own retries.
 
@@ -50,22 +50,23 @@ The helper rejects defects, interruptions, and Causes with multiple reasons. `Ca
 
 ## Bind a typed RPC policy
 
-Import `withQueryPolicy`, `isEffectRpcQueryError`, and the type `InferQueryError` from `@ueberbrot/effect-api-query`, plus `RpcClientError` from `effect/rpc`. After acquiring your ready client and creating `rpc`, bind the profile read:
+Import `configureUtils`, `isEffectRpcQueryError`, and the type `InferQueryError` from `@ueberbrot/effect-api-query`, plus `RpcClientError` from `effect/rpc`. After acquiring your ready client and creating `rpc`, bind the profile read:
 
 ```ts
 type Error = InferQueryError<typeof rpc.profile.read>;
-const read = withQueryPolicy(
-  rpc.profile.read,
-  "query",
-  retryPolicy(
-    (error: Error) => (isEffectRpcQueryError(error) ? error.cause : undefined),
-    (failure) =>
-      Schema.is(RpcClientError.RpcClientError)(failure) &&
-      failure.reason._tag === "HttpError" &&
-      failure.reason.kind === "TransportError"
-  )
-);
-return read();
+const read = configureUtils(rpc.profile.read, {
+  query: {
+    policy: retryPolicy(
+      (error: Error) =>
+        isEffectRpcQueryError(error) ? error.cause : undefined,
+      (failure) =>
+        Schema.is(RpcClientError.RpcClientError)(failure) &&
+        failure.reason._tag === "HttpError" &&
+        failure.reason.kind === "TransportError"
+    ),
+  },
+});
+return read.queryOptions();
 ```
 
 This application allows only RPC's HTTP transport failures. Socket and worker reconnect policy belongs to the application that owns those transports.
@@ -76,18 +77,18 @@ Import `isEffectHttpApiQueryError` from `@ueberbrot/effect-api-query` and `HttpC
 
 ```ts
 type Error = InferQueryError<typeof http.profile.read>;
-const read = withQueryPolicy(
-  http.profile.read,
-  "query",
-  retryPolicy(
-    (error: Error) =>
-      isEffectHttpApiQueryError(error) ? error.cause : undefined,
-    (failure) =>
-      HttpClientError.isHttpClientError(failure) &&
-      failure.reason._tag === "TransportError"
-  )
-);
-return read();
+const read = configureUtils(http.profile.read, {
+  query: {
+    policy: retryPolicy(
+      (error: Error) =>
+        isEffectHttpApiQueryError(error) ? error.cause : undefined,
+      (failure) =>
+        HttpClientError.isHttpClientError(failure) &&
+        failure.reason._tag === "TransportError"
+    ),
+  },
+});
+return read.queryOptions();
 ```
 
 Encoding, decoding, response, `NotFound`, and authentication failures receive no retry. Restore an expired session before invalidating its affected queries.

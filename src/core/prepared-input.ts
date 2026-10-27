@@ -33,6 +33,8 @@ export const registerInputOwner = (
   owners.set(key, { input, encoder });
 };
 
+export const inputKind = (key: () => QueryKey) => owners.get(key)?.input._tag;
+
 // oxlint-disable-next-line anti-slop/no-unknown-parameters
 export const readPreparedInput = (owner: OperationInput, input: unknown) => {
   const prepared = Predicate.isObject(input) ? values.get(input) : undefined;

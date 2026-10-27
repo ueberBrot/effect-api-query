@@ -25,6 +25,7 @@ const streamedDiagnosticsOptions = (
   bounded = false
 ) => {
   const options = {
+    maxChunks: "unbounded",
     refetchOnMount: "always",
     staleTime: 0,
   } satisfies NonNullable<

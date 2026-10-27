@@ -91,8 +91,8 @@ explicit.infiniteOptions({
 // @ts-expect-error Empty success declarations have no live view.
 empty.liveOptions();
 // @ts-expect-error Empty success declarations have no accumulated view.
-empty.streamedOptions();
+empty.streamedOptions({ maxChunks: "unbounded" });
 // @ts-expect-error Explicit NoContent declarations have no live view.
 explicit.liveOptions();
 // @ts-expect-error Explicit NoContent declarations have no accumulated view.
-explicit.streamedOptions();
+explicit.streamedOptions({ maxChunks: "unbounded" });

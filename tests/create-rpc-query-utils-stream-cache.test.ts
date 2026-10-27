@@ -56,7 +56,10 @@ it.effect(
         }
         expect(
           yield* Effect.promise(
-            async () => await queryClient.query(rpc.watch.streamedOptions())
+            async () =>
+              await queryClient.query(
+                rpc.watch.streamedOptions({ maxChunks: "unbounded" })
+              )
           )
         ).toStrictEqual(emissions);
         queryClient.clear();
@@ -116,7 +119,7 @@ describe.each(["global", "prefix"] as const)(
         const unsubscribe = observer.subscribe(() => {});
         const history = new QueryObserver(
           queryClient,
-          rpc.watch.streamedOptions()
+          rpc.watch.streamedOptions({ maxChunks: "unbounded" })
         );
         const stopHistory = history.subscribe(() => {});
         try {
@@ -136,7 +139,9 @@ describe.each(["global", "prefix"] as const)(
               data: history.getCurrentResult().data,
               fetchStatus: history.getCurrentResult().fetchStatus,
             },
-            historyCache: queryClient.getQueryData(rpc.watch.streamedKey()),
+            historyCache: queryClient.getQueryData(
+              rpc.watch.streamedKey({ maxChunks: "unbounded" })
+            ),
           }).toStrictEqual({
             live: { data: null, fetchStatus: "fetching" },
             liveCache: null,
@@ -144,12 +149,14 @@ describe.each(["global", "prefix"] as const)(
             historyCache: [undefined],
           });
           queryClient.setQueryData(rpc.watch.liveKey(), null);
-          queryClient.setQueryData(rpc.watch.streamedKey(), [
-            undefined,
-            undefined,
-          ]);
+          queryClient.setQueryData(
+            rpc.watch.streamedKey({ maxChunks: "unbounded" }),
+            [undefined, undefined]
+          );
           expect(
-            queryClient.getQueryData(rpc.watch.streamedKey())
+            queryClient.getQueryData(
+              rpc.watch.streamedKey({ maxChunks: "unbounded" })
+            )
           ).toStrictEqual([undefined, undefined]);
           const serverRead = yield* Effect.promise(
             async () => await queryClient.query(rpc.read.queryOptions())

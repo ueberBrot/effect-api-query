@@ -65,8 +65,8 @@ Streaming RPC leaves expose these builders:
 
 | Builder | Result |
 | --- | --- |
-| `streamedKey(input, policy?)` | Data-tagged key for accumulated data and its retention, refetch, and publication policy. |
-| `streamedOptions(options?)` | Fresh Query Core options that append each emitted value to an array. |
+| `streamedKey(input, policy)` | Data-tagged key for accumulated data and its retention, refetch, and publication policy. |
+| `streamedOptions(options)` | Fresh Query Core options that append each emitted value to an array. |
 | `liveKey(input?)` | Data-tagged key for the latest value. |
 | `liveOptions(options?)` | Fresh Query Core options that replace the cached value after each emission. |
 
@@ -76,7 +76,7 @@ Both option builders publish the query as successful after its first value. They
 
 Live queries convert emitted `undefined` to `null`. Explicit `null` stays `null`. Their keys, selectors, and initial-data options describe the normalized value. Accumulated arrays preserve `undefined` elements.
 
-For an inputless RPC, the key builder takes the form `streamedKey(policy?)`. Omitted policy means unlimited history, reset refetches, and publication after each event. Exact reads, seeding, cancellation, and refetches require the same policy in the key and options builders.
+For an inputless RPC, the key builder takes the form `streamedKey(policy)`. Supply `maxChunks` as a positive safe integer or `"unbounded"`. A configured leaf can inherit this choice from `streamed.policy`. Exact reads, seeding, cancellation, and refetches require the same policy in the key and options builders.
 
 Accumulated streams accept these values for TanStack's `refetchMode` option:
 
@@ -84,7 +84,7 @@ Accumulated streams accept these values for TanStack's `refetchMode` option:
 - `append` adds the new stream's values to the cached sequence.
 - `replace` retains the old sequence until the new stream ends, then replaces it atomically.
 
-A positive safe integer for `maxChunks` limits retention to the newest emitted elements in order.
+A positive safe integer for `maxChunks` limits retention to the newest emitted elements in order. Choose `maxChunks: "unbounded"` to retain every element. Raw streamed options and keys require this choice; [configured utilities](/effect-api-query/guides/query-defaults/) can supply it once for a tree, branch, or leaf.
 
 After each publication, the accumulated array contains at most `maxChunks` elements. On refetch:
 
@@ -98,9 +98,9 @@ Initial fetches and append refetches trim existing data on a publication. An emp
 
 `publicationMaxWaitMs` accepts an integer from 1 through 2,147,483,647. It flushes a partial batch after that many milliseconds from the first buffered event; later events do not reset the timer. Omit it for count-only publication. Cancellation clears the timer. Event-loop scheduling and finalizer time can delay completion.
 
-The bound discards older history and limits the number of elements. It does not limit byte size. Without a bound, accumulation remains unbounded. The `liveOptions` builder retains only the latest value.
+A finite bound discards older history and limits the number of elements. It does not limit byte size. Explicit unbounded retention grows with every event. The `liveOptions` builder retains only the latest value.
 
-`maxChunks`, `refetchMode`, nondefault `publicationBatchSize`, and explicit `publicationMaxWaitMs` contribute to concrete accumulated-stream identity. Omitted values mean unlimited retention, `reset`, and a batch size of one. Explicit `undefined`, explicit `reset`, and explicit one produce the corresponding default identity. Different policies have separate histories, including concurrent views of the same RPC payload. Root, branch, RPC, and streamed-operation prefixes still match every policy.
+`maxChunks`, `refetchMode`, nondefault `publicationBatchSize`, and explicit `publicationMaxWaitMs` contribute to concrete accumulated-stream identity. Choose retention explicitly. Omitted refetch and publication controls mean `reset` and a batch size of one; explicitly choosing those values produces the same identity. `"unbounded"` retains the existing unlimited-history key representation. Different policies have separate histories, including concurrent views of the same RPC payload. Root, branch, RPC, and streamed-operation prefixes still match every policy.
 
 Builders remove all four fields before they return options, including skipped options. Invalid bounds throw `EffectRpcQueryConfigError` with code `InvalidMaxChunks`. Invalid modes use `InvalidRefetchMode`. Invalid publication batch sizes or deadlines throw `RangeError`. These checks run synchronously, even when `input` is `skipToken`.
 

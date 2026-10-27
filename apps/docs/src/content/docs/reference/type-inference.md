@@ -54,7 +54,7 @@ const selectedName = await queryClient.query(selectedOptions);
 const cachedUser = queryClient.getQueryData(selectedOptions.queryKey);
 ```
 
-In this example, `selectedName` is a string, and `cachedUser` is the decoded user or `undefined`. The generated key retains the unselected cache type. Broad prefix or filter reads can contain different views. Their results remain `unknown` until the application establishes their representation.
+In this example, `selectedName` is a string, and `cachedUser` is the decoded user or `undefined`. The generated key retains the unselected cache type. Prefixes and view tags remain exact; canonical payload slots are typed as `unknown`. Use generated key builders for exact reads and explicit filter projections for partial matching. Broad prefix or filter reads can contain different views. Their results remain `unknown` until the application establishes their representation.
 
 Standalone infinite keys use `unknown` for page parameters, as does `InferQueryData<Leaf, 'infinite'>`. An `infiniteOptions(...)` result retains the page parameter inferred from that call.
 

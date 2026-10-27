@@ -1,26 +1,34 @@
 ---
 title: Compatibility and Limits
-description: Supported versions, RPC and HTTP operations, cache identity, and runtime limits.
+description: Peer requirements, tested integrations, RPC and HTTP operations, cache identity, and runtime limits.
 ---
 
-## Supported integrations
+## Requirements and tested integrations
 
-The package declares one exact Effect peer and Query Core `>=5.103.1 <6`. It is ESM-only and targets ES2022. The published TypeScript contract requires `strict: true`. The repository uses these versions:
+The package is ESM-only and targets ES2022. It declares Effect and Query Core as peers. Framework requirements come from the native Query wrappers. The table separates those declared requirements from the exact versions checked for this release. A wrapper's peer range can be broader than the combinations checked here.
 
-| Integration | Versions |
-| --- | --- |
-| Effect runtime, testing, and Node platform packages | 4.0.4 |
-| Query Core and React Query | 5.104.2, with matching versions |
-| Published TypeScript contract | 5.9.3 and 7.0.2 |
-| React | 19.3.0 |
-| TanStack Start | 1.169.1 |
-| TanStack Router and Router SSR Query | 1.170.44 and 1.167.3, respectively |
+| Component | Declared requirement | Exact versions checked |
+| --- | --- | --- |
+| Effect | Library peer: `4.0.4` | Runtime, testing, and Node platform packages: `4.0.4` |
+| Query Core | Library peer: `>=5.103.1 <6` | `5.104.2` |
+| TypeScript | Public declarations: 5.9 or newer, with `strict: true` | `5.9.3` and `7.0.2` |
+| React and React Query | React Query peer: React `^18 \|\| ^19` | React `19.3.0`, React Query `5.104.2` |
+| Vue and Vue Query | Vue Query peer: Vue `^2.6.0 \|\| ^3.3.0` | Vue `3.5.43`, Vue Query `5.104.2` |
+| Solid and Solid Query | Solid Query peer: Solid `^1.6.0` | Solid `1.9.15`, Solid Query `5.104.2` |
+| Svelte and Svelte Query | Svelte Query peer: Svelte `^5.25.0` | Svelte `5.57.1`, Svelte Query `6.3.0` |
+| Angular and Angular Query experimental | Angular Query peers: `@angular/core` and `@angular/common` `>=16.0.0` | Angular `22.2.1`, Angular Query experimental `5.104.2` |
+
+All listed Query wrappers resolve Query Core `5.104.2` in the checked combinations. Svelte Query `6.3.0` declares Core `5.104.0`; its checked combination uses a package-manager override to resolve `5.104.2`. Keep the application's Query Core and its wrapper's Core dependency on one resolved version.
+
+Vue Query also declares an optional `@vue/composition-api` peer of `^1.1.2` for Vue 2.6 applications. The checked Vue combination uses Vue 3.
+
+The application examples also use TanStack Start `1.169.1`, TanStack Router `1.170.44`, and Router SSR Query `1.167.3`.
 
 The stable Effect release contains unstable RPC and HTTP API modules. The application's Effect packages must stay coordinated with the exact peer. See [Compatibility and Stability](/effect-api-query/getting-started/compatibility-and-stability/).
 
-Generated Core options work with native reactive accessors. See [Vue Query](/effect-api-query/guides/vue-query/), [Solid Query](/effect-api-query/guides/solid-query/), [Svelte Query](/effect-api-query/guides/svelte-query/), and [Angular Query](/effect-api-query/guides/angular-query/) for option rebuilding, compiler resolution, hook overloads, and resource ownership.
+Generated Core options support native reactive accessors and retain each framework's hook overloads. The Vue, Solid, Svelte, and Angular combinations above are checked for native hook inference in TypeScript consumer modules. These checks use both listed TypeScript versions. Framework component compilers and application builds have their own tooling requirements. See [Vue Query](/effect-api-query/guides/vue-query/), [Solid Query](/effect-api-query/guides/solid-query/), [Svelte Query](/effect-api-query/guides/svelte-query/), and [Angular Query](/effect-api-query/guides/angular-query/) for option rebuilding, compiler resolution, hook overloads, and resource ownership.
 
-[Package metadata](https://github.com/ueberBrot/effect-api-query/blob/main/package.json) declares peer ranges. The [workspace catalog](https://github.com/ueberBrot/effect-api-query/blob/main/pnpm-workspace.yaml) pins the Effect release and example dependencies.
+[Package metadata](https://github.com/ueberBrot/effect-api-query/blob/main/package.json) declares library peers. The [workspace catalog](https://github.com/ueberBrot/effect-api-query/blob/main/pnpm-workspace.yaml) pins the Effect release and example dependencies. The [framework consumers](https://github.com/ueberBrot/effect-api-query/tree/main/tests/framework-consumers) pin the other native integrations and Core alignment.
 
 ## Capability matrix
 
@@ -50,7 +58,9 @@ WebSocket clients support unary calls, both stream views, and application-owned 
 
 ## Input and cache limits
 
-Cache identity must be strict JSON. For endpoints with query support, encoding services, redacted values, and multiple HTTP payload alternatives require safe [custom encoders](/effect-api-query/guides/custom-key-encoders/). Binary query input needs a JSON-safe projection. Multipart mutation-only endpoints require no encoder and reject encoder entries. Encoders are synchronous. Asynchronous and Effect-returning encoders are unsupported.
+Accumulated stream keys and options require a positive `maxChunks` bound or `"unbounded"`. A configured tree, branch, or leaf can supply this choice through `streamed.policy`.
+
+Cache identity must be strict JSON. Public canonical payload slots are typed as `unknown`; generated key helpers retain typed data and errors. For endpoints with query support, encoding services, redacted values, and multiple HTTP payload alternatives require safe [custom encoders](/effect-api-query/guides/custom-key-encoders/). Binary query input needs a JSON-safe projection. Multipart mutation-only endpoints require no encoder and reject encoder entries. Encoders are synchronous. Asynchronous and Effect-returning encoders are unsupported.
 
 RPC payload Schemas must be query-stable because preparation and ready-client execution construct the payload separately. HTTP builders accept decoded request input without RPC construction. Captured input must remain unchanged while its options can run. Frozen keys do not freeze arbitrary input or decoded data.
 

@@ -114,7 +114,11 @@ HTTP inputs use decoded `params`, `query`, `headers`, and `payload` containers. 
 | Buffered multipart HTTP | Mutation with explicit `FormData` |
 | RPC stream or unambiguous HTTP SSE | Accumulated streamed query, live query |
 
-Use generated keys to read, write, and invalidate cache entries. Queries forward cancellation to Effect. Use `createQueryFilter` for typed partial filters, `withQueryPolicy` and `withMutationPolicy` for shared defaults, and execution interceptors for reusable request behavior. Mutation policies can compose shared and local callbacks. Typed hydration codecs register each view's serialization policy. Stream recovery and publication controls preserve application ownership of transport and resume policy. Your application decides which queries to invalidate after mutations. See [feature support](https://ueberbrot.github.io/effect-api-query/getting-started/feature-support/) for supported contracts and limits.
+Use generated keys to read, write, and invalidate cache entries. Queries forward cancellation to Effect. Use `createQueryFilter` for typed partial filters and `configureUtils` for shared policies and ordered execution interceptors across a tree, branch, or leaf. Mutation policies can compose shared and local callbacks. Accumulated streams require a finite `maxChunks` bound or an explicit `"unbounded"` choice.
+
+Typed hydration codecs register each view's serialization policy. Stream recovery and publication controls preserve application ownership of transport and resume policy. Your application decides which queries to invalidate after mutations. See [feature support](https://ueberbrot.github.io/effect-api-query/getting-started/feature-support/) for supported contracts and limits.
+
+For the 0.4 upgrade, see [Migrate to 0.4](https://ueberbrot.github.io/effect-api-query/guides/migrate-to-0-4/).
 
 ## Documentation and examples
 

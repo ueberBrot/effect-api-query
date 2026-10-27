@@ -410,7 +410,7 @@ utils.upload.infiniteOptions({
 // @ts-expect-error Multipart leaves expose no infinite key builder.
 utils.upload.infiniteKey(completeUploadRequest);
 // @ts-expect-error HTTP uploads expose no accumulated streamed query builder.
-utils.upload.streamedOptions();
+utils.upload.streamedOptions({ maxChunks: "unbounded" });
 // @ts-expect-error HTTP uploads expose no live query builder.
 utils.upload.liveOptions();
 void [uploadData, mixedPlainData, mixedFormData];
@@ -600,7 +600,7 @@ const emptyUtils = createHttpApiQueryUtils(emptyApi, {
   client: emptyClient,
   keyPrefix: ["app"],
 });
-true satisfies Assert<Equal<keyof typeof emptyUtils, "key">>;
+true satisfies Assert<Equal<Extract<keyof typeof emptyUtils, string>, "key">>;
 createHttpApiQueryUtils(emptyApi, {
   client: emptyClient,
   keyPrefix: ["app"],

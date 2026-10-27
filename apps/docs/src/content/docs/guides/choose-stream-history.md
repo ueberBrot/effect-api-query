@@ -7,7 +7,7 @@ Choose a cached representation that fits the screen:
 
 | Need | Builder | Retained data |
 | --- | --- | --- |
-| Every emitted value in order | `streamedOptions` | Unlimited history by default. |
+| Every emitted value in order | `streamedOptions` with `maxChunks: 'unbounded'` | Every event until cache eviction. |
 | A recent event window | `streamedOptions` with `maxChunks` | Up to the specified number after publication. |
 | Current state | `liveOptions` | The latest emitted value. |
 
@@ -17,7 +17,7 @@ These choices apply to both RPC streams and supported HTTP SSE endpoints. Live q
 
 ## Set retention and buffering separately
 
-`maxChunks` limits cached elements after each publication. Seeded or hydrated history can exceed the bound until another publication. One element can contain a large object or array, so the bound does not limit bytes. The cache discards older elements and preserves the remaining order. Use the same retention, refetch, and publication policy when building an exact key and its options.
+A finite `maxChunks` limits cached elements after each publication. Supply a positive safe integer or choose `"unbounded"` explicitly. Use `configureUtils` with `streamed.policy` to share this choice across a tree, branch, or leaf. Seeded or hydrated history can exceed the bound until another publication. One element can contain a large object or array, so the bound does not limit bytes. The cache discards older elements and preserves the remaining order. Use the same retention, refetch, and publication policy when building an exact key and its options.
 
 RPC `rpcOptions.streamBufferSize` controls the ready client's transport buffer before consumption. It does not set cache history or the rate of cache writes. HTTP transport buffering belongs to the ready HTTP API client. Changing a history bound does not slow the producer.
 
@@ -57,7 +57,8 @@ Reuse the options' `queryKey` for exact cache access, or pass the same policy to
 For uneven event traffic, combine a count limit with a deadline:
 
 ```ts
-const options = rpc.events.watch.streamedOptions({
+const options = rpc.diagnostics.stream.streamedOptions({
+  maxChunks: 100,
   publicationBatchSize: 10,
   publicationMaxWaitMs: 50,
 });

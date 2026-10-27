@@ -157,7 +157,9 @@ describe("Start request-local execution", () => {
     try {
       const capture = application.captureSnapshot(
         application.queryClient,
-        application.rpcQuery.diagnostics.stream.streamedOptions()
+        application.rpcQuery.diagnostics.stream.streamedOptions({
+          maxChunks: "unbounded",
+        })
       );
       const failure = (async () => {
         try {

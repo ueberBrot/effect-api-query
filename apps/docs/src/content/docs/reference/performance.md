@@ -19,6 +19,18 @@ The optional construction workload measures repository sources:
 vp run construction-baseline
 ```
 
+Additional workloads report compiler diagnostics, consumer bundle sizes, and stream publication costs:
+
+```sh
+vp run type-baseline
+vp run bundle-baseline
+vp run stream-baseline
+```
+
+Type measurements compare contracts alone, raw utilities, and scoped configuration at 50, 250, and 1,000 operations on both supported compilers. Bundle measurements compare matching consumers with and without utilities, with peers included and external. Stream measurements include bounded and unbounded histories, count and deadline publication, live values, cache writes, observer notifications, and cleanup.
+
+Each workload prints JSON with its dependency and runtime versions. Set `PERFORMANCE_OUTPUT` to save the same report to a file. Compare matching workloads and versions before attributing a change to the adapter.
+
 The [stream workload](https://github.com/ueberBrot/effect-api-query/blob/main/tests/create-rpc-query-utils-stream-baseline.test.ts) and [transport workload](https://github.com/ueberBrot/effect-api-query/blob/main/examples/server/tests/rpc-transport-overhead.test.ts) measure publication and transport costs. Results are comparable only for the same workload and dependency versions. Elapsed time and memory depend on the machine.
 
 ## Adapter and application bundles

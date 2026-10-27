@@ -106,6 +106,7 @@ export default defineConfig({
       ...(ultraciteCore.ignorePatterns ?? []),
       ...ignoredPaths,
       "tests/types/**",
+      "tests/framework-consumers/**",
       "apps/docs/**/*.astro",
     ],
     options: {
@@ -144,6 +145,7 @@ export default defineConfig({
           "examples/contracts/src/client.ts",
           "examples/server/src/**/*.ts",
           "scripts/measure-construction.mts",
+          "scripts/measure-streams.mts",
         ],
         rules: {
           "eslint/func-names": ["error", "always", { generators: "never" }],
@@ -154,6 +156,7 @@ export default defineConfig({
           "src/core/operation.ts",
           "src/core/utility-tree.ts",
           "src/core/metadata-query.ts",
+          "src/core/configure-utils.ts",
         ],
         rules: {
           "anti-slop/no-unknown-parameters": "off",
@@ -225,6 +228,9 @@ export default defineConfig({
           "examples/tanstack-start/tests/server-render.test.tsx",
           "examples/vite-react/src/lib/application.ts",
           "scripts/measure-construction.mts",
+          "scripts/measure-streams.mts",
+          "tests/utility-configuration.test.ts",
+          "tests/configuration-composition.test.ts",
           "src/http/create-utils.ts",
           "src/http/operation.ts",
           "src/http/request.ts",
@@ -407,6 +413,26 @@ export default defineConfig({
         command: "tsx scripts/measure-construction.mts",
         cache: false,
       },
+      "framework-types": {
+        command: "node --import tsx scripts/check-framework-consumers.mts",
+        dependsOn: ["pack"],
+        cache: false,
+      },
+      "type-baseline": {
+        command: "node --import tsx scripts/measure-types.mts",
+        dependsOn: ["pack"],
+        cache: false,
+      },
+      "bundle-baseline": {
+        command: "node --import tsx scripts/measure-bundles.mts",
+        dependsOn: ["pack"],
+        cache: false,
+      },
+      "stream-baseline": {
+        command: "node --import tsx scripts/measure-streams.mts",
+        dependsOn: ["pack"],
+        cache: false,
+      },
       "api-types": {
         command: [
           "tsc --project tests/types/tsconfig.json",
@@ -450,6 +476,7 @@ export default defineConfig({
           "vp run effect-check",
           "vp run fallow",
           "vp run test",
+          "vp run framework-types",
         ],
       },
       server: {

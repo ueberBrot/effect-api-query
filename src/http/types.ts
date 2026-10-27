@@ -223,7 +223,7 @@ export type ConcreteKey<
 > = DataTag<
   void extends Request<Endpoint>
     ? readonly [...Key, "query"]
-    : readonly [...Key, "query", JsonValue],
+    : readonly [...Key, "query", unknown],
   QueryData<Success<Endpoint>>,
   Failure<ClientError>
 >;
@@ -252,7 +252,7 @@ export type ConcreteMetadataKey<
 > = DataTag<
   void extends Request<Endpoint>
     ? readonly [...Key, "metadata"]
-    : readonly [...Key, "metadata", JsonValue],
+    : readonly [...Key, "metadata", unknown],
   MetadataData<Endpoint>,
   Failure<ClientError>
 >;
@@ -373,7 +373,9 @@ export type StreamedKey<
   Key extends readonly JsonValue[],
   ClientError,
 > = DataTag<
-  readonly [...Key, "streamed", ...JsonValue[]],
+  void extends Request<Endpoint>
+    ? readonly [...Key, "streamed", unknown]
+    : readonly [...Key, "streamed", unknown, unknown],
   readonly StreamChunk<Success<Endpoint>>[],
   HttpStreamQueryError<Endpoint, ClientError>
 >;
@@ -386,10 +388,10 @@ export type StreamedLeaf<
   readonly key: () => Key;
 
   readonly streamedKey: void extends Request<Endpoint>
-    ? (policy?: HttpStreamPolicy) => StreamedKey<Endpoint, Key, ClientError>
+    ? (policy: HttpStreamPolicy) => StreamedKey<Endpoint, Key, ClientError>
     : (
         input: Request<Endpoint> | PreparedInput<Request<Endpoint>>,
-        policy?: HttpStreamPolicy
+        policy: HttpStreamPolicy
       ) => StreamedKey<Endpoint, Key, ClientError>;
   readonly streamedOptions: UnaryQueryBuilder<
     Request<Endpoint>,
@@ -417,7 +419,9 @@ export type LiveKey<
   Key extends readonly JsonValue[],
   ClientError,
 > = DataTag<
-  readonly [...Key, "live", ...JsonValue[]],
+  void extends Request<Endpoint>
+    ? readonly [...Key, "live", unknown]
+    : readonly [...Key, "live", unknown, unknown],
   QueryData<StreamChunk<Success<Endpoint>>>,
   LiveFailure<Endpoint, ClientError>
 >;
@@ -453,12 +457,15 @@ export type Leaf<
   : StreamedLeaf<Endpoint, Key, ClientError> &
       LiveLeaf<Endpoint, Key, ClientError>;
 
+declare const httpQueryClient: unique symbol;
+
 /** An eager utility tree mirroring the ready HTTP client's literal properties. */
 export type HttpApiQueryUtils<
   Api extends HttpApi.Constraint,
   Prefix extends readonly [JsonValue, ...JsonValue[]],
   Client = HttpApiClient.ForApi<Api>,
 > = {
+  readonly [httpQueryClient]?: Client;
   readonly key: () => Root<Api, Prefix>;
 } & {
   readonly [

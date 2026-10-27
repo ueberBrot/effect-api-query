@@ -30,7 +30,10 @@ const utils = createRpcQueryUtils(group, {
   client,
   keyPrefix: ["snapshot-types"],
 });
-const streamed = utils.watch.streamedOptions({ input: { channel: "owned" } });
+const streamed = utils.watch.streamedOptions({
+  maxChunks: "unbounded",
+  input: { channel: "owned" },
+});
 const live = utils.watch.liveOptions({ input: { channel: "owned" } });
 
 fetchStreamSnapshot(queryClient, streamed) satisfies Promise<
@@ -77,7 +80,7 @@ const http = createHttpApiQueryUtils(api, {
 });
 fetchStreamSnapshot(
   queryClient,
-  http.events.watch.streamedOptions()
+  http.events.watch.streamedOptions({ maxChunks: "unbounded" })
 ) satisfies Promise<readonly number[]>;
 fetchStreamSnapshot(
   queryClient,

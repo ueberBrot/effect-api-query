@@ -170,7 +170,10 @@ describe.each(cases)(
                 () => executions
               )
             : verifyHashGuard(
-                rpc.watch.streamedOptions({ refetchMode: view }),
+                rpc.watch.streamedOptions({
+                  maxChunks: "unbounded",
+                  refetchMode: view,
+                }),
                 [1],
                 [3],
                 view === "append" ? [3, 2] : [2],
@@ -310,8 +313,14 @@ describe.each(foreignCases)(
               )
             : verifyForeignHash(
                 adapter === "rpc"
-                  ? rpc.watch.streamedOptions({ refetchMode: view })
-                  : http.events.watch.streamedOptions({ refetchMode: view }),
+                  ? rpc.watch.streamedOptions({
+                      maxChunks: "unbounded",
+                      refetchMode: view,
+                    })
+                  : http.events.watch.streamedOptions({
+                      maxChunks: "unbounded",
+                      refetchMode: view,
+                    }),
                 experimental_streamedQuery({
                   refetchMode: view,
                   streamFn: nativeStreamFn,
@@ -379,7 +388,10 @@ describe.each(cases)(
                 () => executions
               )
             : verifyHashGuard(
-                http.events.watch.streamedOptions({ refetchMode: view }),
+                http.events.watch.streamedOptions({
+                  maxChunks: "unbounded",
+                  refetchMode: view,
+                }),
                 [1],
                 [3],
                 view === "append" ? [3, 2] : [2],
@@ -546,8 +558,14 @@ describe.each(defaultHashCases)(
                 )
               : verifyDefaultHash(
                   adapter === "rpc"
-                    ? rpc.watch.streamedOptions({ refetchMode: view })
-                    : http.events.watch.streamedOptions({ refetchMode: view }),
+                    ? rpc.watch.streamedOptions({
+                        maxChunks: "unbounded",
+                        refetchMode: view,
+                      })
+                    : http.events.watch.streamedOptions({
+                        maxChunks: "unbounded",
+                        refetchMode: view,
+                      }),
                   [1],
                   view === "append" ? [1, 2] : [2],
                   hashing,
@@ -597,7 +615,10 @@ it.effect(
       });
       try {
         yield* Effect.promise(
-          async () => await queryClient.query(rpc.watch.streamedOptions())
+          async () =>
+            await queryClient.query(
+              rpc.watch.streamedOptions({ maxChunks: "unbounded" })
+            )
         );
         queryClient.setQueryData(["foreign"], "original");
         queryClient.removeQueries({ queryKey: ["foreign"] });
@@ -658,7 +679,10 @@ it.effect(
       });
       try {
         yield* Effect.promise(
-          async () => await queryClient.query(rpc.watch.streamedOptions())
+          async () =>
+            await queryClient.query(
+              rpc.watch.streamedOptions({ maxChunks: "unbounded" })
+            )
         );
         queryClient.setQueryData(["foreign"], "original");
         queryClient.setQueryData(rpc.watch.liveKey(), 0);
@@ -704,7 +728,10 @@ it.effect(
       const cache = queryClient.getQueryCache();
       try {
         yield* Effect.promise(
-          async () => await queryClient.query(rpc.watch.streamedOptions())
+          async () =>
+            await queryClient.query(
+              rpc.watch.streamedOptions({ maxChunks: "unbounded" })
+            )
         );
         const listening = cache.hasListeners();
         queryClient.clear();
@@ -758,7 +785,7 @@ it.effect(
         client,
         keyPrefix: ["indexed-collisions"],
       });
-      const options = rpc.watch.streamedOptions();
+      const options = rpc.watch.streamedOptions({ maxChunks: "unbounded" });
       const queryClient = new QueryClient({
         defaultOptions: { queries: { retry: false } },
       });
@@ -810,7 +837,7 @@ it.effect(
         client,
         keyPrefix: ["indexed-scale"],
       });
-      const options = rpc.watch.streamedOptions();
+      const options = rpc.watch.streamedOptions({ maxChunks: "unbounded" });
       const queryClient = new QueryClient();
       for (let index = 0; index < 1000; index += 1) {
         queryClient.setQueryData(["unrelated", index], index);

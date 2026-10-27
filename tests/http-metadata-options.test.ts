@@ -16,10 +16,7 @@ import {
 } from "effect/http-api";
 import { describe, expect } from "vite-plus/test";
 
-import {
-  createHttpApiQueryUtils,
-  withQueryInterceptor,
-} from "#effect-api-query";
+import { configureUtils, createHttpApiQueryUtils } from "#effect-api-query";
 
 import { waitForQueryState } from "./fixtures/query-cache.ts";
 
@@ -30,7 +27,6 @@ const api = HttpApi.make("metadata-options").add(
     })
   )
 );
-
 it.effect(
   "keeps initial, hydrated, manual and selected metadata data application-owned",
   () =>
@@ -137,7 +133,6 @@ it.effect(
       }
     })
 );
-
 const metadataReplacements = (["global", "prefix", "local"] as const).flatMap(
   (defaults) =>
     (["builder", "tree"] as const).map((replacement) => ({
@@ -145,7 +140,6 @@ const metadataReplacements = (["global", "prefix", "local"] as const).flatMap(
       replacement,
     }))
 );
-
 describe.each(metadataReplacements)(
   "pending metadata $replacement replacement with $defaults sharing",
   ({ defaults, replacement }) => {
@@ -253,7 +247,6 @@ describe.each(metadataReplacements)(
     );
   }
 );
-
 it.effect(
   "preserves fetched metadata policy when an interceptor replaces the envelope",
   () =>
@@ -287,13 +280,15 @@ it.effect(
           },
         },
       });
-      const read = withQueryInterceptor(
-        http.documents.read,
-        "metadata",
-        async ({ next }) => ({
-          ...(await next()),
-        })
-      );
+      const read = configureUtils(http.documents.read, {
+        metadata: {
+          interceptors: [
+            async ({ next }) => ({
+              ...(await next()),
+            }),
+          ],
+        },
+      }).metadataOptions;
       try {
         yield* Effect.promise(async () => await queryClient.query(read()));
         const fetched = queryClient.getQueryData(

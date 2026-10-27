@@ -4,11 +4,9 @@ import { Effect, Schema } from "effect";
 import { Rpc, RpcGroup } from "effect/rpc";
 
 import {
+  configureUtils,
   createRpcQueryUtils,
   skipToken,
-  withMutationInterceptor,
-  withMutationPolicy,
-  withQueryInterceptor,
 } from "#effect-api-query";
 
 import { makeRpcTestClient } from "./fixtures/effect-rpc";
@@ -39,18 +37,20 @@ it.effect(
         keyPrefix: ["interceptors"],
       });
       const events: string[] = [];
-      const read = withQueryInterceptor(
-        rpc.read,
-        "query",
-        async ({ context, next }) => {
-          events.push(context.signal.aborted ? "aborted" : "start");
-          try {
-            return await next();
-          } finally {
-            events.push("finish");
-          }
-        }
-      );
+      const read = configureUtils(rpc.read, {
+        query: {
+          interceptors: [
+            async ({ context, next }) => {
+              events.push(context.signal.aborted ? "aborted" : "start");
+              try {
+                return await next();
+              } finally {
+                events.push("finish");
+              }
+            },
+          ],
+        },
+      }).queryOptions;
       const skipped = read({ input: skipToken });
       expect(skipped.queryFn).toBe(skipToken);
       const options = read({ input: { id: 42 }, retry: 1, retryDelay: 0 });
@@ -63,7 +63,6 @@ it.effect(
       queryClient.clear();
     })
 );
-
 it.effect(
   "composes awaited shared mutation callbacks before local optimistic callbacks",
   () =>
@@ -96,19 +95,20 @@ it.effect(
             rpc.read.queryOptions({ staleTime: Infinity })
           )
       );
-      const write = withMutationPolicy(
-        rpc.write,
-        {
-          onSuccess: async (_data, _input, _optimistic, context) => {
-            await context.client.invalidateQueries({
-              queryKey: rpc.read.key(),
-            });
-            events.push("shared success");
+      const write = configureUtils(rpc.write, {
+        mutation: {
+          policy: {
+            onSuccess: async (_data, _input, _optimistic, context) => {
+              await context.client.invalidateQueries({
+                queryKey: rpc.read.key(),
+              });
+              events.push("shared success");
+            },
+            onSettled: () => events.push("shared settled"),
           },
-          onSettled: () => events.push("shared settled"),
+          callbacks: "compose",
         },
-        { callbacks: "compose" }
-      );
+      }).mutationOptions;
       const observer = new MutationObserver(
         queryClient,
         write({
@@ -138,7 +138,6 @@ it.effect(
       queryClient.clear();
     })
 );
-
 it.effect(
   "keeps mutation interceptors active with local callbacks and optional native context",
   () =>
@@ -163,16 +162,19 @@ it.effect(
       });
       const events: string[] = [];
       const contexts: boolean[] = [];
-      const write = withMutationInterceptor(
-        rpc.write,
-        async ({ input, context, next: execute }) => {
-          const value = await execute();
-          contexts.push(context !== undefined);
-          context?.client.setQueryData(["written"], input.value);
-          events.push("interceptor");
-          return value;
-        }
-      );
+      const write = configureUtils(rpc.write, {
+        mutation: {
+          interceptors: [
+            async ({ input, context, next: execute }) => {
+              const value = await execute();
+              contexts.push(context !== undefined);
+              context?.client.setQueryData(["written"], input.value);
+              events.push("interceptor");
+              return value;
+            },
+          ],
+        },
+      }).mutationOptions;
       const queryClient = new QueryClient();
       const observer = new MutationObserver(
         queryClient,
@@ -195,7 +197,6 @@ it.effect(
       queryClient.clear();
     })
 );
-
 it.effect("rejects duplicate execution within one mutation attempt", () =>
   Effect.gen(function* rejectsDuplicateMutationExecution() {
     const group = RpcGroup.make(Rpc.make("write", { success: Schema.Int }));
@@ -211,13 +212,16 @@ it.effect("rejects duplicate execution within one mutation attempt", () =>
       client,
       keyPrefix: ["duplicate-interceptor"],
     });
-    const duplicate = withMutationInterceptor(
-      rpc.write,
-      async ({ next: execute }) => {
-        await execute();
-        return await execute();
-      }
-    );
+    const duplicate = configureUtils(rpc.write, {
+      mutation: {
+        interceptors: [
+          async ({ next: execute }) => {
+            await execute();
+            return await execute();
+          },
+        ],
+      },
+    }).mutationOptions;
     const queryClient = new QueryClient();
     try {
       const mutation = new MutationObserver(queryClient, duplicate());

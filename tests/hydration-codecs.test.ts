@@ -135,7 +135,10 @@ it.effect(
         yield* Effect.promise(async () => await server.query(ordinary));
         yield* Effect.promise(async () => await server.infiniteQuery(pages));
         yield* Effect.promise(
-          async () => await server.query(rpc.watch.streamedOptions())
+          async () =>
+            await server.query(
+              rpc.watch.streamedOptions({ maxChunks: "unbounded" })
+            )
         );
         yield* Effect.promise(
           async () =>
@@ -158,7 +161,9 @@ it.effect(
         hydrate(browser, { ...wire, queries: prepared });
         const restored = browser.getQueryData(ordinary.queryKey);
         const restoredPages = browser.getQueryData(pages.queryKey);
-        const history = browser.getQueryData(rpc.watch.streamedKey());
+        const history = browser.getQueryData(
+          rpc.watch.streamedKey({ maxChunks: "unbounded" })
+        );
         /* oxlint-disable typescript/no-unsafe-assignment */
         expect({
           ordinary: restored,

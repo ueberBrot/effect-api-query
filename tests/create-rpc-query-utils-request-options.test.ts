@@ -144,6 +144,7 @@ it.effect("forwards static request options to both stream views", () =>
       streamBufferSize: 3,
     } satisfies StreamingRpcOptions;
     const streamed = utils.watch.streamedOptions({
+      maxChunks: "unbounded",
       input: { page: 0 },
       rpcOptions: streamOptions,
     });
@@ -179,6 +180,7 @@ it.effect("consumes request options when skipping every query view", () =>
         getNextPageParam: () => 1,
       }),
       utils.watch.streamedOptions({
+        maxChunks: "unbounded",
         input: skipToken,
         rpcOptions: streamOptions,
       }),
