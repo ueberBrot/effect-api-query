@@ -116,12 +116,18 @@ export type QueryInput<
 > &
   AdapterOptions;
 
+// The broad signature supports native direct calls; hooks infer the final key signature.
+export type GeneratedQueryFunction<
+  Data,
+  Key extends QueryKey,
+> = QueryFunction<Data> & QueryFunction<Data, Key>;
+
 export type QueryOptions<
   Data,
   Error,
   Selected,
   Key extends QueryKey,
-  Fn = QueryFunction<Data>,
+  Fn = GeneratedQueryFunction<Data, Key>,
 > = QueryInput<Data, Error, Selected, Key> & {
   readonly queryFn: Fn;
   readonly queryKey: Key;
@@ -132,7 +138,13 @@ export type ConditionalQueryOptions<
   Error,
   Selected,
   Key extends QueryKey,
-> = QueryOptions<Data, Error, Selected, Key, QueryFunction<Data> | SkipToken>;
+> = QueryOptions<
+  Data,
+  Error,
+  Selected,
+  Key,
+  GeneratedQueryFunction<Data, Key> | SkipToken
+>;
 
 export type InputQueryOptions<
   Input,
@@ -149,17 +161,28 @@ export type InputQueryOptions<
       ? ConditionalQueryOptions<Data, Error, Selected, Key | SkippedKey>
       : QueryOptions<Data, Error, Selected, Key>;
 
+export type KeysOfUnion<Value> = Value extends unknown ? keyof Value : never;
+
+export type UnionProperty<
+  Value,
+  Key extends PropertyKey,
+> = Value extends unknown
+  ? Key extends keyof Value
+    ? Value[Key]
+    : never
+  : never;
+
 export type ExactBuilderOptions<Expected, Supplied> = Expected &
   Supplied & {
     readonly [
       Key in Exclude<
-        keyof Supplied,
+        KeysOfUnion<Supplied>,
         keyof Expected | typeof uninferredBuilderOptions
       >
     ]: string extends Key
-      ? Supplied[Key]
+      ? UnionProperty<Supplied, Key>
       : number extends Key
-        ? Supplied[Key]
+        ? UnionProperty<Supplied, Key>
         : never;
   };
 
@@ -185,6 +208,7 @@ export type RetainedQueryOptions<Options> = Pick<
     | "select"
     | "retry"
     | "retryDelay"
+    | "throwOnError"
     | "initialPageParam"
     | "getNextPageParam"
   >
@@ -414,7 +438,7 @@ export type InfiniteQueryKey<
   PageParam = unknown,
   Inputless extends boolean = void extends Input ? true : false,
 > = DataTag<
-  Inputless extends true ? OperationKey : readonly [...OperationKey, JsonValue],
+  Inputless extends true ? OperationKey : readonly [...OperationKey, unknown],
   InfiniteData<Data, PageParam>,
   Error
 >;
@@ -726,8 +750,7 @@ export type MutationBuilder<
   options?: Omit<
     MutationObserverOptions<Data, Error, Input, OnMutateResult>,
     OwnedMutationOption
-  > &
-    AdapterOptions
+  > & { readonly [Key in OwnedMutationOption]?: never } & AdapterOptions
 ) => MutationOptions<Data, Error, Input, Key, OnMutateResult>;
 
 export type HasSeenType<A, Seen> = Seen extends unknown

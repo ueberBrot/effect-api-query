@@ -152,7 +152,7 @@ export type ConcreteQueryKey<
 > = DataTag<
   PayloadlessRpc<R> extends true
     ? QueryOperationKey<Prefix, R>
-    : readonly [...QueryOperationKey<Prefix, R>, JsonValue],
+    : readonly [...QueryOperationKey<Prefix, R>, unknown],
   QueryData<Rpc.Success<R>>,
   EffectRpcQueryError<RpcFailure<R, ClientError>>
 >;
@@ -230,7 +230,9 @@ export type ConcreteStreamedKey<
   R extends Rpc.Any,
   ClientError,
 > = DataTag<
-  readonly [...StreamedOperationKey<Prefix, R>, ...JsonValue[]],
+  PayloadlessRpc<R> extends true
+    ? readonly [...StreamedOperationKey<Prefix, R>, unknown]
+    : readonly [...StreamedOperationKey<Prefix, R>, unknown, unknown],
   StreamedData<R>,
   RpcStreamQueryError<R, ClientError>
 >;
@@ -242,7 +244,7 @@ export type ConcreteLiveKey<
 > = DataTag<
   PayloadlessRpc<R> extends true
     ? LiveOperationKey<Prefix, R>
-    : readonly [...LiveOperationKey<Prefix, R>, JsonValue],
+    : readonly [...LiveOperationKey<Prefix, R>, unknown],
   QueryData<Rpc.SuccessChunk<R>>,
   RpcLiveError<R, ClientError>
 >;
@@ -400,12 +402,15 @@ export type UnionToIntersection<Union> = (
   ? Intersection
   : never;
 
+declare const rpcQueryClientError: unique symbol;
+
 /** An eager utility tree projected from the group's dotted RPC tags. */
 export type RpcQueryUtils<
   Group extends RpcGroup.Any,
   Prefix extends readonly [JsonValue, ...JsonValue[]],
   ClientError = never,
 > = {
+  readonly [rpcQueryClientError]?: ClientError;
   /** Returns the immutable root key, including the RPC discriminator. */
   readonly key: () => readonly [...Prefix, "rpc"];
 } & UnionToIntersection<

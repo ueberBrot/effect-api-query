@@ -281,7 +281,7 @@ const projectPing = utils.projects.health.ping.queryOptions();
 true satisfies Assert<
   Equal<
     keyof typeof projectPing,
-    "queryFn" | "queryKey" | "select" | "retry" | "retryDelay"
+    "queryFn" | "queryKey" | "select" | "retry" | "retryDelay" | "throwOnError"
   >
 >;
 const omittedInputlessArguments: Parameters<
@@ -402,7 +402,7 @@ streamedKey satisfies readonly [
   "events",
   "watch",
   "streamed",
-  ...JsonValue[],
+  ...unknown[],
 ];
 const cachedStream = queryClient.getQueryData(
   utils.events.watch.streamedKey({ channel: "news" })
@@ -461,7 +461,7 @@ liveHook.error satisfies
   | null;
 const liveResult: Promise<number> = queryClient.query(liveOptions);
 const liveKey = utils.events.watch.liveKey({ channel: "news" });
-liveKey satisfies readonly ["app", "rpc", "events", "watch", "live", JsonValue];
+liveKey satisfies readonly ["app", "rpc", "events", "watch", "live", unknown];
 const cachedLive = queryClient.getQueryData(liveKey);
 cachedLive satisfies string | undefined;
 void [liveHookData, liveResult];
@@ -727,7 +727,7 @@ infiniteKey satisfies readonly [
   "users",
   "pages",
   "infinite",
-  JsonValue,
+  unknown,
 ];
 const cachedPages = queryClient.getQueryData(fetchableInfiniteOptions.queryKey);
 cachedPages?.pageParams satisfies ReadonlyArray<number> | undefined;
@@ -786,7 +786,7 @@ const conditionalInfiniteOptions = utils.users.pages.infiniteOptions({
   staleTime: (query) => {
     query.queryKey satisfies
       | readonly ["app", "rpc", "users", "pages", "infinite"]
-      | readonly ["app", "rpc", "users", "pages", "infinite", JsonValue];
+      | readonly ["app", "rpc", "users", "pages", "infinite", unknown];
     return 30_000;
   },
   select: (data) => data.pages.length,
@@ -1108,7 +1108,7 @@ concreteQueryKey satisfies readonly [
   "users",
   "get",
   "query",
-  JsonValue,
+  unknown,
 ];
 const cachedState = queryClient.getQueryState(concreteQueryKey);
 cachedState?.error satisfies
@@ -1590,7 +1590,7 @@ const conditionalStreamOptions = utils.events.watch.streamedOptions({
   staleTime: (query) => {
     query.queryKey satisfies
       | readonly ["app", "rpc", "events", "watch", "streamed"]
-      | readonly ["app", "rpc", "events", "watch", "streamed", ...JsonValue[]];
+      | readonly ["app", "rpc", "events", "watch", "streamed", ...unknown[]];
     return 30_000;
   },
 });
@@ -1697,7 +1697,7 @@ const conditionalUserOptions = utils.users.get.queryOptions({
   refetchInterval: (query) => {
     query.queryKey satisfies
       | readonly ["app", "rpc", "users", "get", "query"]
-      | readonly ["app", "rpc", "users", "get", "query", JsonValue];
+      | readonly ["app", "rpc", "users", "get", "query", unknown];
     return false;
   },
   select: (user) => user.name,
@@ -2006,7 +2006,7 @@ unknownKey satisfies readonly [
   "payload",
   "unknown",
   "query",
-  JsonValue,
+  unknown,
 ];
 anyKey satisfies readonly [
   "payload",
@@ -2014,7 +2014,7 @@ anyKey satisfies readonly [
   "payload",
   "any",
   "query",
-  JsonValue,
+  unknown,
 ];
 optionalKey satisfies readonly [
   "payload",
@@ -2022,7 +2022,7 @@ optionalKey satisfies readonly [
   "payload",
   "optional",
   "query",
-  JsonValue,
+  unknown,
 ];
 queryClient.getQueryData(unknownKey) satisfies string | undefined;
 queryClient.getQueryData(anyKey) satisfies string | undefined;
@@ -2098,7 +2098,7 @@ broadPayloadUtils.payload.unknown.infiniteKey({ page: 0 }) satisfies readonly [
   "payload",
   "unknown",
   "infinite",
-  JsonValue,
+  unknown,
 ];
 broadPayloadUtils.payload.any.infiniteKey({ page: 0 }) satisfies readonly [
   "payload",
@@ -2106,7 +2106,7 @@ broadPayloadUtils.payload.any.infiniteKey({ page: 0 }) satisfies readonly [
   "payload",
   "any",
   "infinite",
-  JsonValue,
+  unknown,
 ];
 broadPayloadUtils.payload.optional.infiniteKey("0") satisfies readonly [
   "payload",
@@ -2114,7 +2114,7 @@ broadPayloadUtils.payload.optional.infiniteKey("0") satisfies readonly [
   "payload",
   "optional",
   "infinite",
-  JsonValue,
+  unknown,
 ];
 // @ts-expect-error Unknown infinite queries require a page-input mapper
 broadPayloadUtils.payload.unknown.infiniteOptions({
@@ -2152,7 +2152,7 @@ unknownStreamedKey satisfies readonly [
   "payload",
   "unknownWatch",
   "streamed",
-  ...JsonValue[],
+  ...unknown[],
 ];
 anyStreamedKey satisfies readonly [
   "payload",
@@ -2160,7 +2160,7 @@ anyStreamedKey satisfies readonly [
   "payload",
   "anyWatch",
   "streamed",
-  ...JsonValue[],
+  ...unknown[],
 ];
 optionalStreamedKey satisfies readonly [
   "payload",
@@ -2168,7 +2168,7 @@ optionalStreamedKey satisfies readonly [
   "payload",
   "optionalWatch",
   "streamed",
-  ...JsonValue[],
+  ...unknown[],
 ];
 unknownLiveKey satisfies readonly [
   "payload",
@@ -2176,7 +2176,7 @@ unknownLiveKey satisfies readonly [
   "payload",
   "unknownWatch",
   "live",
-  JsonValue,
+  unknown,
 ];
 anyLiveKey satisfies readonly [
   "payload",
@@ -2184,7 +2184,7 @@ anyLiveKey satisfies readonly [
   "payload",
   "anyWatch",
   "live",
-  JsonValue,
+  unknown,
 ];
 broadOptionalLiveKey satisfies readonly [
   "payload",
@@ -2192,7 +2192,7 @@ broadOptionalLiveKey satisfies readonly [
   "payload",
   "optionalWatch",
   "live",
-  JsonValue,
+  unknown,
 ];
 queryClient.getQueryData(unknownStreamedKey) satisfies
   | readonly string[]
@@ -2290,10 +2290,20 @@ const broadAnyOptions = broadPayloadUtils.payload.any.queryOptions({
   input: broadAnyInput,
 });
 true satisfies Assert<
-  Equal<typeof broadUnknownOptions.queryFn, QueryFunction<string> | SkipToken>
+  Equal<
+    typeof broadUnknownOptions.queryFn,
+    | (QueryFunction<string> &
+        QueryFunction<string, typeof broadUnknownOptions.queryKey>)
+    | SkipToken
+  >
 >;
 true satisfies Assert<
-  Equal<typeof broadAnyOptions.queryFn, QueryFunction<string> | SkipToken>
+  Equal<
+    typeof broadAnyOptions.queryFn,
+    | (QueryFunction<string> &
+        QueryFunction<string, typeof broadAnyOptions.queryKey>)
+    | SkipToken
+  >
 >;
 
 broadPayloadUtils.payload.void.queryKey() satisfies readonly [
@@ -2324,7 +2334,7 @@ broadPayloadUtils.payload.voidWatch.streamedKey() satisfies readonly [
   "payload",
   "voidWatch",
   "streamed",
-  ...JsonValue[],
+  ...unknown[],
 ];
 broadPayloadUtils.payload.voidWatch.streamedKey({
   maxChunks: 2,

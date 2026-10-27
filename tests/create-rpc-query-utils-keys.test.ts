@@ -9,7 +9,7 @@ import type { EffectRpcQueryConfigError, JsonValue } from "#effect-api-query";
 import { group, makeClient, makeRpcTestClient } from "./fixtures/effect-rpc";
 
 const captureKeyError = (
-  run: () => readonly JsonValue[]
+  run: () => readonly unknown[]
 ): EffectRpcQueryKeyError => {
   try {
     run();

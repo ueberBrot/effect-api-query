@@ -119,7 +119,7 @@ type Equal<Left, Right> =
 type Assert<Value extends true> = Value;
 type Endpoint = `read.${(typeof indexes)[number]}`;
 true satisfies Assert<
-  Equal<keyof typeof utils, "key" | (typeof groups)[number]>
+  Equal<Extract<keyof typeof utils, string>, "key" | (typeof groups)[number]>
 >;
 true satisfies Assert<Equal<keyof typeof utils.accounts, "key" | Endpoint>>;
 true satisfies Assert<Equal<keyof typeof utils.users, "key" | Endpoint>>;

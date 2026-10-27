@@ -600,7 +600,7 @@ const emptyUtils = createHttpApiQueryUtils(emptyApi, {
   client: emptyClient,
   keyPrefix: ["app"],
 });
-true satisfies Assert<Equal<keyof typeof emptyUtils, "key">>;
+true satisfies Assert<Equal<Extract<keyof typeof emptyUtils, string>, "key">>;
 createHttpApiQueryUtils(emptyApi, {
   client: emptyClient,
   keyPrefix: ["app"],

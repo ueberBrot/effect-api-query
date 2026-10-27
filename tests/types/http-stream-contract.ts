@@ -105,7 +105,9 @@ const utils = createHttpApiQueryUtils(api, {
   keyPrefix: ["consumer"],
   runPromiseExit,
 });
-true satisfies Assert<Equal<keyof typeof utils, "key" | "views" | "events">>;
+true satisfies Assert<
+  Equal<Extract<keyof typeof utils, string>, "key" | "views" | "events">
+>;
 true satisfies Assert<
   Equal<keyof typeof utils.views, "key" | "plain" | "wrapped">
 >;
@@ -150,6 +152,9 @@ const key = utils.views.plain.streamedKey(input, {
   maxChunks: 3,
   sseOptions: { maxEventSize: 1024 },
 });
+true satisfies Assert<Equal<(typeof key)["length"], 8>>;
+const inputlessHistoryKey = utils.views.wrapped.streamedKey({ maxChunks: 10 });
+true satisfies Assert<Equal<(typeof inputlessHistoryKey)["length"], 7>>;
 queryClient.setQueryData(key, [1, 2]);
 const skipped = utils.views.plain.streamedOptions({
   input: skipToken,
@@ -277,6 +282,9 @@ const liveOptions = utils.views.plain.liveOptions({
 const liveKey = utils.views.plain.liveKey(input, {
   sseOptions: { maxEventSize: 1024 },
 });
+true satisfies Assert<Equal<(typeof liveKey)["length"], 8>>;
+const inputlessLiveKey = utils.views.wrapped.liveKey();
+true satisfies Assert<Equal<(typeof inputlessLiveKey)["length"], 7>>;
 const liveData = queryClient.getQueryData(liveKey);
 true satisfies Assert<Equal<typeof liveData, number | undefined>>;
 const liveState = queryClient.getQueryState(liveOptions.queryKey);
