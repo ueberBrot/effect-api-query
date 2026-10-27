@@ -7,7 +7,7 @@ description: Configuration, key-generation, and execution errors for RPC and HTT
 
 Invalid factory or builder configuration throws this error synchronously. Stream execution also rejects incompatible QueryClient hashing. The error's `code` is one of:
 
-- `InvalidMaxChunks`: a streamed-query bound is not a positive safe integer.
+- `InvalidMaxChunks`: retention is neither a positive safe integer nor `"unbounded"`.
 - `InvalidRefetchMode`: a streamed-query mode is not `reset`, `append`, or `replace`.
 - `InvalidKeyPrefix`
 - `InvalidRpcPath`
@@ -43,9 +43,10 @@ A live query whose stream completes before it emits a value throws this error. T
 
 Invalid factory or builder configuration throws this error synchronously. Stream execution also rejects incompatible QueryClient hashing. The error's `code` is one of:
 
-- `InvalidMaxChunks`: a streamed-query bound is not a positive safe integer.
+- `InvalidMaxChunks`: retention is neither a positive safe integer nor `"unbounded"`.
 - `InvalidRefetchMode`: a streamed-query mode is not `reset`, `append`, or `replace`.
 - `InvalidMaxEventSize`: an SSE parser limit is not a positive safe integer.
+- `InvalidSseOptions`: `sseOptions.dispatchEmptyNamedEvents` is not a boolean.
 - `InvalidKeyPrefix`
 - `InvalidEndpointPath`
 - `EndpointPathCollision`

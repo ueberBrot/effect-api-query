@@ -17,9 +17,9 @@ const decoderOptions = (
   options: Record<string, unknown>
 ): Sse.DecodeOptions & { readonly maxEventSize: number } => {
   const { sseOptions } = options;
-  const maxEventSize = Predicate.isObject(sseOptions)
-    ? sseOptions["maxEventSize"]
-    : undefined;
+  const decoder = Predicate.isObject(sseOptions) ? sseOptions : undefined;
+  const maxEventSize = decoder?.["maxEventSize"];
+  const dispatchEmptyNamedEvents = decoder?.["dispatchEmptyNamedEvents"];
   const limit = maxEventSize === undefined ? 10 * 1024 * 1024 : maxEventSize;
   if (
     !Predicate.isNumber(limit) ||
@@ -32,7 +32,20 @@ const decoderOptions = (
       identity
     );
   }
-  return Object.freeze({ maxEventSize: limit });
+  if (
+    dispatchEmptyNamedEvents !== undefined &&
+    !Predicate.isBoolean(dispatchEmptyNamedEvents)
+  ) {
+    throw new EffectHttpApiQueryConfigError(
+      "InvalidSseOptions",
+      "sseOptions.dispatchEmptyNamedEvents must be a boolean",
+      identity
+    );
+  }
+  return Object.freeze({
+    maxEventSize: limit,
+    dispatchEmptyNamedEvents: dispatchEmptyNamedEvents ?? false,
+  });
 };
 
 export const createHttpStreamPreparation =
@@ -58,6 +71,9 @@ export const createHttpStreamPreparation =
         Object.freeze({
           ...history,
           maxEventSize: sseOptions.maxEventSize,
+          ...(sseOptions.dispatchEmptyNamedEvents === true
+            ? { dispatchEmptyNamedEvents: true }
+            : undefined),
         }),
       ],
       makeQuery: (input) =>

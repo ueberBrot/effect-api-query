@@ -20,6 +20,7 @@ import {
 import { describe, expect } from "vite-plus/test";
 
 import {
+  configureUtils,
   createHttpApiQueryUtils,
   isEffectHttpApiQueryError,
   skipToken,
@@ -154,6 +155,122 @@ it.effect("normalizes HTTP SSE decoder policies in cache keys", () =>
         sseOptions: { maxEventSize: 3 },
       })
     );
+  })
+);
+
+it.effect("dispatches empty named SSE events only when requested", () =>
+  Effect.gen(function* dispatchesEmptyNamedEvents() {
+    const eventApi = HttpApi.make("empty-named-events").add(
+      HttpApiGroup.make("events").add(
+        HttpApiEndpoint.get("watch", "/watch", {
+          success: HttpApiSchema.StreamSse({
+            events: Schema.Struct({
+              event: Schema.Literal("complete"),
+              data: Schema.String,
+            }),
+          }),
+        })
+      )
+    );
+    const client = yield* HttpApiClient.makeWith(eventApi, {
+      baseUrl: "https://example.test",
+      httpClient: HttpClient.make((request) =>
+        Effect.succeed(
+          HttpClientResponse.fromWeb(request, sse("event: complete\n\n"))
+        )
+      ),
+    });
+    const http = createHttpApiQueryUtils(eventApi, {
+      client,
+      keyPrefix: ["empty-named-events"],
+    });
+    const leaf = http.events.watch;
+    const defaultKey = leaf.streamedKey({ maxChunks: "unbounded" });
+    const enabledKey = leaf.streamedKey({
+      maxChunks: "unbounded",
+      sseOptions: { dispatchEmptyNamedEvents: true },
+    });
+    expect(defaultKey).toStrictEqual(
+      leaf.streamedKey({
+        maxChunks: "unbounded",
+        sseOptions: { dispatchEmptyNamedEvents: false },
+      })
+    );
+    expect(enabledKey).not.toStrictEqual(defaultKey);
+    expect(leaf.liveKey()).toStrictEqual(
+      leaf.liveKey({ sseOptions: { dispatchEmptyNamedEvents: false } })
+    );
+    expect(
+      leaf.liveKey({ sseOptions: { dispatchEmptyNamedEvents: true } })
+    ).not.toStrictEqual(leaf.liveKey());
+
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+    try {
+      expect(
+        yield* Effect.promise(
+          async () =>
+            await queryClient.query(
+              leaf.streamedOptions({ maxChunks: "unbounded" })
+            )
+        )
+      ).toStrictEqual([]);
+      expect(
+        yield* Effect.promise(
+          async () =>
+            await queryClient.query(
+              leaf.streamedOptions({
+                maxChunks: "unbounded",
+                sseOptions: { dispatchEmptyNamedEvents: true },
+              })
+            )
+        )
+      ).toMatchObject([{ event: "complete", data: "" }]);
+      expect(
+        yield* Effect.promise(
+          async () =>
+            await queryClient.query(
+              leaf.liveOptions({
+                sseOptions: { dispatchEmptyNamedEvents: true },
+              })
+            )
+        )
+      ).toMatchObject({ event: "complete", data: "" });
+    } finally {
+      queryClient.clear();
+    }
+
+    for (const order of ["root-first", "leaf-first"] as const) {
+      const root = { streamed: { policy: { maxChunks: 2 } } };
+      const specific = {
+        scoped: {
+          events: {
+            scoped: {
+              watch: { streamed: { policy: { maxChunks: 1 } } },
+            },
+          },
+        },
+      };
+      const configured =
+        order === "root-first"
+          ? configureUtils(configureUtils(http, root), specific)
+          : configureUtils(configureUtils(http, specific), root);
+      const options = configured.events.watch.streamedOptions({
+        sseOptions: { dispatchEmptyNamedEvents: true },
+      });
+      expect(
+        configured.events.watch.streamedKey({
+          sseOptions: { dispatchEmptyNamedEvents: true },
+        })
+      ).toStrictEqual(options.queryKey);
+      expect(options.queryKey).toStrictEqual(
+        leaf.streamedKey({
+          maxChunks: 1,
+          sseOptions: { dispatchEmptyNamedEvents: true },
+        })
+      );
+    }
   })
 );
 
