@@ -195,7 +195,9 @@ describe("TanStack Start execution settlement", () => {
           ? application.rpcQuery.diagnostics.slow.queryOptions({
               input: { durationMs: 60_000, operationId: "disposal" },
             })
-          : application.rpcQuery.diagnostics.stream.streamedOptions();
+          : application.rpcQuery.diagnostics.stream.streamedOptions({
+              maxChunks: "unbounded",
+            });
       const pending =
         view === "unary"
           ? application.queryClient.query(
@@ -204,7 +206,9 @@ describe("TanStack Start execution settlement", () => {
               })
             )
           : application.queryClient.query(
-              application.rpcQuery.diagnostics.stream.streamedOptions()
+              application.rpcQuery.diagnostics.stream.streamedOptions({
+                maxChunks: "unbounded",
+              })
             );
       const outcome = Promise.allSettled([pending]);
       try {

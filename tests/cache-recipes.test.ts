@@ -174,7 +174,7 @@ describe("cache recipes", () => {
         const history = createRpcQueryUtils(group, {
           client,
           keyPrefix: ["hydration-views", "history"],
-        }).watch.streamedOptions();
+        }).watch.streamedOptions({ maxChunks: "unbounded" });
         const infinite = createRpcQueryUtils(group, {
           client,
           keyPrefix: ["hydration-views", "infinite"],
@@ -211,7 +211,7 @@ describe("cache recipes", () => {
         const browserHistory = createRpcQueryUtils(group, {
           client: browserClient,
           keyPrefix: ["hydration-views", "history"],
-        }).watch.streamedOptions();
+        }).watch.streamedOptions({ maxChunks: "unbounded" });
         const browserLatest = createRpcQueryUtils(group, {
           client: browserClient,
           keyPrefix: ["hydration-views", "live"],

@@ -73,6 +73,7 @@ const utils = createRpcQueryUtils(Group, {
 utils.records.read.queryOptions({ input: { id: 1 } });
 utils.records.watch.liveOptions({ input: { id: "record" } });
 utils.records.watch.streamedOptions({
+  maxChunks: "unbounded",
   input: { id: "record" },
   rpcOptions: { streamBufferSize: 2 },
 });

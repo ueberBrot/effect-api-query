@@ -3,11 +3,7 @@ import { MutationObserver, QueryClient } from "@tanstack/query-core";
 import { Effect, Schema } from "effect";
 import { Rpc, RpcGroup } from "effect/rpc";
 
-import {
-  createRpcQueryUtils,
-  withMutationPolicy,
-  withQueryPolicy,
-} from "#effect-api-query";
+import { configureUtils, createRpcQueryUtils } from "#effect-api-query";
 
 import { makeRpcTestClient } from "./fixtures/effect-rpc";
 
@@ -28,9 +24,13 @@ it.effect(
         client,
         keyPrefix: ["query-policy"],
       });
-      const read = withQueryPolicy(utils.read, "query", {
-        staleTime: Infinity,
-      });
+      const read = configureUtils(utils.read, {
+        query: {
+          policy: {
+            staleTime: Infinity,
+          },
+        },
+      }).queryOptions;
       const queryClient = new QueryClient();
       expect(
         yield* Effect.promise(async () => await queryClient.query(read()))
@@ -45,7 +45,6 @@ it.effect(
       ).toBe(2);
     })
 );
-
 it.effect(
   "applies a reusable typed retry policy during native query execution",
   () =>
@@ -67,16 +66,19 @@ it.effect(
         client,
         keyPrefix: ["retry-policy"],
       });
-      const read = withQueryPolicy(utils.read, "query", {
-        retry: (count, error) => count === 0 && error.operation === "query",
-        retryDelay: 0,
-      });
+      const read = configureUtils(utils.read, {
+        query: {
+          policy: {
+            retry: (count, error) => count === 0 && error.operation === "query",
+            retryDelay: 0,
+          },
+        },
+      }).queryOptions;
       expect(
         yield* Effect.promise(async () => await new QueryClient().query(read()))
       ).toBe(42);
     })
 );
-
 it.effect(
   "shares mutation invalidation while call-site callbacks replace policy callbacks",
   () =>
@@ -102,16 +104,24 @@ it.effect(
         keyPrefix: ["mutation-policy"],
       });
       const queryClient = new QueryClient();
-      const read = withQueryPolicy(utils.read, "query", {
-        staleTime: Infinity,
-      });
-      const write = withMutationPolicy(utils.write, {
-        onSuccess: async (_data, _variables, _result, context) => {
-          await context.client.invalidateQueries({
-            queryKey: utils.read.key(),
-          });
+      const read = configureUtils(utils.read, {
+        query: {
+          policy: {
+            staleTime: Infinity,
+          },
         },
-      });
+      }).queryOptions;
+      const write = configureUtils(utils.write, {
+        mutation: {
+          policy: {
+            onSuccess: async (_data, _variables, _result, context) => {
+              await context.client.invalidateQueries({
+                queryKey: utils.read.key(),
+              });
+            },
+          },
+        },
+      }).mutationOptions;
       yield* Effect.promise(async () => await queryClient.query(read()));
       const shared = new MutationObserver(queryClient, write());
       expect(
@@ -120,7 +130,6 @@ it.effect(
       expect(
         yield* Effect.promise(async () => await queryClient.query(read()))
       ).toBe(2);
-
       let optimisticResult: number | undefined;
       const local = new MutationObserver(
         queryClient,

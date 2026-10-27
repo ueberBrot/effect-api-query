@@ -1,18 +1,15 @@
 ---
 title: Defaults and Policies
-description: Reuse native cache defaults and typed query or mutation policies.
+description: Configure shared defaults and execution behavior across a utility tree.
 ---
 
-Choose where to define each setting before reusing it across generated builders:
+Use `configureUtils` to share policies and interceptors across a utility tree, branch, or leaf. Build the configured utilities once per cache owner, then pass their generated options to native TanStack Query consumers.
 
 | Scope | Use | Suitable settings |
 | --- | --- | --- |
 | Cache owner or namespace | QueryClient defaults and generated prefixes | Common freshness, retry, garbage collection, and hashing |
-| One leaf and query view | `withQueryPolicy` | Freshness and typed data and error callbacks |
-| One mutation leaf | `withMutationPolicy` | Typed invalidation and other mutation callbacks |
-| One call | The options builder | Input, selection, initial data, pagination, and local overrides |
-
-Use your existing utility tree and application-owned QueryClient. Policies preserve the original builder's inference. The library supplies the generated keys and execution functions.
+| Tree, branch, or leaf | `configureUtils` | Shared policies, ordered execution interceptors, and stream retention |
+| One call | The options builder | Input, selection, initial data, pagination, optimistic context, and local overrides |
 
 ## Register native defaults
 
@@ -42,7 +39,7 @@ queryClient.setQueryDefaults(viewPrefix(rpc.users.get, "query"), {
 });
 ```
 
-TanStack merges global defaults, matching registered prefixes in registration order, and explicit builder options. It does not sort prefixes by specificity. Here, `users.get` inherits `gcTime: 600_000`, `retry: 2`, and `staleTime: 120_000`. Two retries allow at most three executions.
+TanStack merges matching prefixes in registration order. Here, `users.get` inherits `gcTime: 600_000`, `retry: 2`, and `staleTime: 120_000`. Two retries allow at most three executions.
 
 `rpc.key()` covers the tree, `rpc.users.key()` covers its branch, and the view prefix covers only ordinary queries of that leaf, for every input. HTTP uses the same native APIs:
 
@@ -53,13 +50,11 @@ queryClient.setQueryDefaults(viewPrefix(http.users.get, "metadata"), {
 });
 ```
 
-This five-second policy applies to metadata without changing the ordinary view's freshness. Register mutation defaults separately with native `setMutationDefaults` and `mutationKey()`. See [Cache Keys and Filters](/effect-api-query/guides/cache-filters/) for prefix scopes.
+Register mutation defaults separately with native `setMutationDefaults` and `mutationKey()`. Configure hashing through QueryClient defaults before using the cache, and keep it stable for the cache owner's lifetime. See [Cache Keys and Filters](/effect-api-query/guides/cache-filters/) for prefix scopes.
 
-Before using the cache, configure hashing through QueryClient defaults. Keep hashing stable for the cache owner's lifetime. Builders reject per-call hashing overrides. See [Semantic Keys](/effect-api-query/concepts/semantic-keys/) for the identity contract.
+## Configure a leaf
 
-## Bind a reusable query policy
-
-If a policy belongs to one leaf and view, use `withQueryPolicy`. `QueryPolicy` types reusable objects with that leaf's native options. Retry and refetch callbacks retain its data and error types. Import both from `@ueberbrot/effect-api-query`:
+Import `configureUtils` and the type `QueryPolicy` from `@ueberbrot/effect-api-query`. A leaf policy receives its view's cached data and error types:
 
 ```ts
 const policy = {
@@ -67,41 +62,85 @@ const policy = {
   refetchOnWindowFocus: false,
   retry: false,
 } satisfies QueryPolicy<typeof rpc.users.get>;
-const userOptions = withQueryPolicy(rpc.users.get, "query", policy);
-const user = userOptions({ input: { id: 1 }, select: (value) => value.name });
-const refreshUser = userOptions({
+const user = configureUtils(rpc.users.get, { query: { policy } });
+const selected = user.queryOptions({
+  input: { id: 1 },
+  select: (value) => value.name,
+});
+const refreshUser = user.queryOptions({
   input: { id: 1 },
   staleTime: 0,
   retry: false,
 });
 ```
 
-The returned builder keeps selected-data, defined-initial-data, skipped-input, and page-parameter inference. `QueryPolicy<Leaf, View>` supports only that leaf's query views: `query`, `infinite`, `metadata`, `live`, or `streamed`. Specify the view in the type when it is not `query`. See [Type Inference](/effect-api-query/reference/type-inference/) for cache and failure types, and [Retry Queries](/effect-api-query/guides/retry-queries/) for reusable domain-aware decisions.
+The configured leaf retains its supported query views, mutation builder, and key functions. `QueryPolicy<Leaf, View>` types a reusable native policy. Specify `"infinite"`, `"metadata"`, `"live"`, or `"streamed"` when the policy applies to that view.
 
-Policies accept applicable native freshness, retry, refetch, and cache settings. Keep input, `select`, initial and placeholder data, page parameters and mappers, and adapter controls at the call site. Stream retention and decoder policies determine cache identity and also stay local.
+Keep input, `select`, initial and placeholder data, page parameters and mappers, and adapter request controls at each call. Configure stream retention through `streamed.policy` or supply it locally.
 
-A bound policy supplies explicit builder options, so it overrides QueryClient defaults. Call-site options override the bound policy. To inherit a field, omit it. To replace an inherited setting, use a value such as `staleTime: 0` or `retry: false`.
+## Configure a tree or branch
 
-## Bind mutation invalidation
-
-Import `withMutationPolicy` from `@ueberbrot/effect-api-query`. Seed the returned user and invalidate affected reads once for every use of the creation builder:
+A tree or branch can supply view policies for every supported descendant leaf. Use `scoped` to configure specific children:
 
 ```ts
-const createUserOptions = withMutationPolicy(rpc.users.create, {
-  onSuccess: async (created) => {
-    queryClient.setQueryData(
-      rpc.users.get.queryKey({ id: created.id }),
-      created
-    );
-    await queryClient.invalidateQueries({ queryKey: rpc.users.key() });
+const configured = configureUtils(rpc, {
+  query: { policy: { retry: false } },
+  scoped: {
+    users: {
+      query: { policy: { staleTime: 30_000 } },
+      scoped: {
+        get: {
+          query: {
+            policy: {
+              staleTime: (query) =>
+                query.state.data === undefined ? 0 : 60_000,
+            },
+          },
+        },
+      },
+    },
   },
 });
 ```
 
-Shared callbacks infer data, variables, and execution errors. `MutationPolicy<Leaf>` can annotate a reusable object. Its optimistic result is `unknown`. To infer that result in local callbacks, supply `onMutate` at each call site. Here, `reportCreationFailure` notifies the application of a failure:
+The `get` callback above receives that leaf's data and errors. Shared tree and branch policy callbacks receive `unknown` for data, errors, and mutation variables because descendants can have different contracts.
+
+Settings apply from broad to specific: QueryClient defaults, configured tree defaults, branch defaults, leaf defaults, then call-site options. Omitted fields inherit. Options that accept `undefined` can use it to replace an inherited value. Native prefix defaults still merge in registration order.
+
+`configureUtils` returns frozen configured utilities and leaves the supplied tree unchanged. Existing keys and prepared inputs continue to work with the configured copies.
+
+Configured utilities also fit helpers and components typed for the original tree.
+
+Repeated calls preserve scope order. At the same scope, later policies replace earlier values, and earlier interceptors remain outermost.
+
+Within one mutation scope, later callbacks replace earlier callbacks. The latest supplied callback mode applies to the resulting policy.
+
+For reusable configuration objects, use `satisfies UtilsConfiguration<typeof rpc>` instead of a type annotation. This preserves specific settings such as required stream retention, so configured builders can infer that the default is present.
+
+## Share mutation behavior
+
+Configure `mutation.policy` to seed the returned user and invalidate affected reads:
 
 ```ts
-const createUser = createUserOptions({
+const createUser = configureUtils(rpc.users.create, {
+  mutation: {
+    policy: {
+      onSuccess: async (created) => {
+        queryClient.setQueryData(
+          rpc.users.get.queryKey({ id: created.id }),
+          created
+        );
+        await queryClient.invalidateQueries({ queryKey: rpc.users.key() });
+      },
+    },
+  },
+});
+```
+
+Leaf callbacks infer result data, variables, and execution errors. Keep `onMutate` at the call site so local callbacks infer its result. Shared policy callbacks receive that result as `unknown`:
+
+```ts
+const creation = createUser.mutationOptions({
   onMutate: (variables) => ({ submittedName: variables.name }),
   onError: (error, _variables, context) => {
     reportCreationFailure(context?.submittedName, error);
@@ -109,71 +148,45 @@ const createUser = createUserOptions({
 });
 ```
 
-A call-site callback replaces the corresponding shared callback by default. Opt in when both must run:
+By default, a more specific callback replaces the corresponding shared callback. To await shared and local callbacks, choose composition:
 
 ```ts
-const composedCreateUser = withMutationPolicy(
-  rpc.users.create,
-  {
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: rpc.users.key() }),
-  },
-  { callbacks: "compose" }
-);
-```
-
-Composition awaits the shared callback before the local callback for `onSuccess`, `onError`, and `onSettled`. A rejection stops that pair and follows native mutation error handling. `onMutate` remains local, preserving optimistic-context inference. The [complete example](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-policies.ts) includes ready-client types and the imports used here.
-
-## Intercept execution
-
-Use `withQueryInterceptor` or `withMutationInterceptor` when reusable behavior belongs around execution. An interceptor receives `next` and the native execution context. Mutation interceptors also receive typed input. Their context is undefined when the generated mutation function is called directly without a native observer:
-
-```ts
-const readUser = withQueryInterceptor(
-  rpc.users.get,
-  "query",
-  async ({ next }) => {
-    const user = await next();
-    return user;
-  }
-);
-const interceptedCreateUser = withMutationInterceptor(
-  rpc.users.create,
-  async ({ input, next }) => {
-    await authorizeCreation(input);
-    return await next();
-  }
-);
-```
-
-Here, `authorizeCreation` is an application function. Import the interceptor helpers from the package root. The returned builders preserve selection, initial-data, skipped-input, and page-parameter inference. For infinite queries, `next` returns one page. Local lifecycle callbacks cannot replace an execution interceptor.
-
-Interceptors run once per native execution attempt, including retries. Each attempt permits at most one call to `next`. Exceptions follow native query or mutation error handling. Query context retains the abort signal; application work around `next` must also honor that signal. Interceptors preserve generated keys and skipped queries. Keep transport setup in the ready client.
-
-## Combine policies and interceptors
-
-Use `configureQuery` and `configureMutation` when several behaviors belong to the same leaf. Each helper returns a frozen leaf with all of its existing views. The original leaf stays unchanged. Build the configured leaf once per cache owner:
-
-```ts
-import { configureMutation, configureQuery } from "@ueberbrot/effect-api-query";
-
-const configuredUser = configureMutation(
-  configureQuery(rpc.users.get, "query", {
-    policy: { staleTime: 30_000 },
-    interceptors: [async ({ next }) => await next()],
-  }),
-  {
+const composedCreateUser = configureUtils(rpc.users.create, {
+  mutation: {
     callbacks: "compose",
     policy: {
       onSuccess: () =>
         queryClient.invalidateQueries({ queryKey: rpc.users.key() }),
     },
-  }
-);
-const options = configuredUser.queryOptions({
-  input: { id: 1 },
-  staleTime: 5_000,
+  },
 });
 ```
 
-The first interceptor is outermost. Each interceptor may call its continuation once per attempt. Policies apply before call-site options. Mutation callback composition still runs shared callbacks before local callbacks; `onMutate` stays local. Repeated configuration wraps the previously configured leaf. Existing `withQueryPolicy`, `withMutationPolicy`, and interceptor helpers remain useful when only a builder is needed.
+Composition runs shared callbacks before more specific callbacks for `onSuccess`, `onError`, and `onSettled`. A rejection stops that pair and follows native mutation error handling. Each scope chooses replacement or composition for the callbacks it adds.
+
+A scope's composition setting keeps its own callbacks active when a narrower scope uses replacement.
+
+JavaScript callers can clear a composed callback by explicitly setting it to `undefined`.
+
+## Intercept execution
+
+Use an interceptor when application behavior must run around execution. This example calls the application's `authorizeCreation` function before the mutation:
+
+```ts
+const interceptedCreateUser = configureUtils(rpc.users.create, {
+  mutation: {
+    interceptors: [
+      async ({ input, next }) => {
+        await authorizeCreation(input);
+        return await next();
+      },
+    ],
+  },
+});
+```
+
+Query interceptors receive `next` and the native query context. Mutation interceptors also receive input; their context is undefined when the mutation function is called directly without a native observer. For infinite queries, `next` returns one page.
+
+Interceptors run from tree to branch to leaf, with the first entry outermost. They wrap every native execution attempt, including retries, and each may call `next` at most once. Local lifecycle callbacks cannot replace them. Preserve the query abort signal in application work around `next`. Skipped queries stay disabled.
+
+The [compiled recipe](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-policies.ts) includes the contracts and imports used here. For typed retry decisions, see [Retry Queries](/effect-api-query/guides/retry-queries/).

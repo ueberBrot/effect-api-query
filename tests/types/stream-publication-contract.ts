@@ -22,12 +22,17 @@ const rpc = createRpcQueryUtils(group, {
   keyPrefix: ["publication-types"],
 });
 rpc.watch.streamedOptions({
+  maxChunks: "unbounded",
   publicationBatchSize: 8,
   select: (values) => values.length,
 });
-rpc.watch.streamedKey({ publicationBatchSize: 8 });
+rpc.watch.streamedKey({ maxChunks: "unbounded", publicationBatchSize: 8 });
+const invalidPublicationBatch = {
+  maxChunks: "unbounded" as const,
+  publicationBatchSize: "8",
+};
 // @ts-expect-error Publication batches count accumulated elements.
-rpc.watch.streamedOptions({ publicationBatchSize: "8" });
+rpc.watch.streamedOptions(invalidPublicationBatch);
 // @ts-expect-error Live views publish the latest individual value.
 rpc.watch.liveOptions({ publicationBatchSize: 8 });
 
@@ -43,7 +48,13 @@ const http = createHttpApiQueryUtils(api, {
   client: httpClient,
   keyPrefix: ["publication-types"],
 });
-http.events.watch.streamedOptions({ publicationBatchSize: 8 });
-http.events.watch.streamedKey({ publicationBatchSize: 8 });
+http.events.watch.streamedOptions({
+  maxChunks: "unbounded",
+  publicationBatchSize: 8,
+});
+http.events.watch.streamedKey({
+  maxChunks: "unbounded",
+  publicationBatchSize: 8,
+});
 // @ts-expect-error Live views do not accept accumulated publication policy.
 http.events.watch.liveOptions({ publicationBatchSize: 8 });

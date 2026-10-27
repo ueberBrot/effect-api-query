@@ -403,11 +403,17 @@ it.effect(
       const serverHistory = createHttpApiQueryUtils(api, {
         client: serverClient,
         keyPrefix: ["hydration-views", "wrapped-history"],
-      }).profiles.watch.streamedOptions({ retry: false });
+      }).profiles.watch.streamedOptions({
+        maxChunks: "unbounded",
+        retry: false,
+      });
       const browserHistory = createHttpApiQueryUtils(api, {
         client: browserClient,
         keyPrefix: ["hydration-views", "wrapped-history"],
-      }).profiles.watch.streamedOptions({ retry: false });
+      }).profiles.watch.streamedOptions({
+        maxChunks: "unbounded",
+        retry: false,
+      });
       const serverLiveCapture = serverSubscriptions.capture();
       const initial = yield* Effect.promise(
         async () => await fetchStreamSnapshot(server, serverOptions)

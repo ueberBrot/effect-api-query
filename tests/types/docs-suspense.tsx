@@ -7,10 +7,6 @@ import {
   createRpcQueryUtils,
   isEffectRpcQueryError,
 } from "@ueberbrot/effect-api-query";
-import type {
-  InferQueryData,
-  InferQueryError,
-} from "@ueberbrot/effect-api-query";
 import { Cause, Result, Schema } from "effect";
 import { Rpc, RpcGroup } from "effect/rpc";
 import type { RpcClient } from "effect/rpc";
@@ -134,11 +130,7 @@ export const UserScreen = <E,>({ rpc }: { readonly rpc: Queries<E> }) => (
 );
 
 export const TwoUsers = <E,>({ rpc }: { readonly rpc: Queries<E> }) => {
-  type UserQuery = {
-    queryFnData: InferQueryData<typeof rpc.users.get>;
-    error: InferQueryError<typeof rpc.users.get>;
-  };
-  const [ada, grace] = useSuspenseQueries<[UserQuery, UserQuery]>({
+  const [ada, grace] = useSuspenseQueries({
     queries: [
       rpc.users.get.queryOptions({
         input: { id: 1 },

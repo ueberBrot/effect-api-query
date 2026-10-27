@@ -75,7 +75,10 @@ describe("createRpcQueryUtils streaming execution", () => {
         const streamed = yield* Effect.promise(
           async () =>
             await queryClient.query(
-              utils.events.watch.streamedOptions({ input: { channel: "news" } })
+              utils.events.watch.streamedOptions({
+                maxChunks: "unbounded",
+                input: { channel: "news" },
+              })
             )
         );
         const live = yield* Effect.promise(
@@ -88,15 +91,29 @@ describe("createRpcQueryUtils streaming execution", () => {
         expect(streamed).toStrictEqual(["news:en:first", "news:en:second"]);
         expect(live).toBe("news:en:second");
         expect(
-          utils.events.watch.streamedKey({ channel: "news" })
+          utils.events.watch.streamedKey(
+            { channel: "news" },
+            { maxChunks: "unbounded" }
+          )
         ).toStrictEqual(
-          utils.events.watch.streamedKey({ channel: "news", locale: "en" })
+          utils.events.watch.streamedKey(
+            { channel: "news", locale: "en" },
+            { maxChunks: "unbounded" }
+          )
         );
         expect(
-          utils.events.watch.streamedKey({ channel: "news" })
+          utils.events.watch.streamedKey(
+            { channel: "news" },
+            { maxChunks: "unbounded" }
+          )
         ).not.toStrictEqual(utils.events.watch.liveKey({ channel: "news" }));
         expect(
-          Object.isFrozen(utils.events.watch.streamedKey({ channel: "news" }))
+          Object.isFrozen(
+            utils.events.watch.streamedKey(
+              { channel: "news" },
+              { maxChunks: "unbounded" }
+            )
+          )
         ).toBe(true);
       })
   );
@@ -412,7 +429,10 @@ describe("createRpcQueryUtils streaming execution", () => {
 
       const fetch = async (refetchMode: "append" | "replace" | "reset") =>
         await queryClient.query(
-          utils.events.watch.streamedOptions({ refetchMode })
+          utils.events.watch.streamedOptions({
+            maxChunks: "unbounded",
+            refetchMode,
+          })
         );
 
       const results = {
@@ -479,7 +499,9 @@ describe("createRpcQueryUtils streaming execution", () => {
             Stream.runCollect(client("events.declared", undefined))
           ),
           fetch: async () =>
-            await queryClient.query(utils.events.declared.streamedOptions()),
+            await queryClient.query(
+              utils.events.declared.streamedOptions({ maxChunks: "unbounded" })
+            ),
           operation: "streamed",
           tag: "events.declared",
         },
@@ -490,7 +512,9 @@ describe("createRpcQueryUtils streaming execution", () => {
           ),
           fetch: async () =>
             await queryClient.query(
-              utils.events["stream-failure"].streamedOptions()
+              utils.events["stream-failure"].streamedOptions({
+                maxChunks: "unbounded",
+              })
             ),
           operation: "streamed",
           tag: "events.stream-failure",
@@ -566,7 +590,11 @@ describe("createRpcQueryUtils streaming execution", () => {
                   await captureFailure(
                     operation === "live"
                       ? queryClient.query(utils.events.watch.liveOptions())
-                      : queryClient.query(utils.events.watch.streamedOptions())
+                      : queryClient.query(
+                          utils.events.watch.streamedOptions({
+                            maxChunks: "unbounded",
+                          })
+                        )
                   )
               );
               expect(error).toBeInstanceOf(EffectRpcQueryError);
@@ -647,7 +675,9 @@ describe("createRpcQueryUtils streaming execution", () => {
                 const error = await captureFailure(
                   operation === "live"
                     ? queryClient.query(rpc.watch.liveOptions())
-                    : queryClient.query(rpc.watch.streamedOptions())
+                    : queryClient.query(
+                        rpc.watch.streamedOptions({ maxChunks: "unbounded" })
+                      )
                 );
                 expect(error).toBeInstanceOf(EffectRpcQueryError);
                 expect(error).toMatchObject({ rpcTag: "watch", operation });
@@ -728,6 +758,7 @@ describe("createRpcQueryUtils streaming execution", () => {
             operation === "live"
               ? rpc.watch.liveOptions()
               : rpc.watch.streamedOptions({
+                  maxChunks: "unbounded",
                   publicationBatchSize: 10,
                   publicationMaxWaitMs,
                 });
@@ -853,7 +884,11 @@ describe("createRpcQueryUtils streaming execution", () => {
             const error = yield* Effect.promise(
               async () =>
                 await captureFailure(
-                  queryClient.query(http.events.watch.streamedOptions())
+                  queryClient.query(
+                    http.events.watch.streamedOptions({
+                      maxChunks: "unbounded",
+                    })
+                  )
                 )
             );
             expect(error).toBeInstanceOf(EffectHttpApiQueryError);
@@ -896,7 +931,9 @@ describe("createRpcQueryUtils streaming execution", () => {
 
       const result = yield* Effect.promise(
         async () =>
-          await new QueryClient().query(utils.events.watch.streamedOptions())
+          await new QueryClient().query(
+            utils.events.watch.streamedOptions({ maxChunks: "unbounded" })
+          )
       );
 
       expect(result).toStrictEqual(["first", "second"]);
@@ -936,7 +973,9 @@ describe("createRpcQueryUtils streaming execution", () => {
       client,
       keyPrefix: ["app"] as const,
     });
-    const options = utils.events.watch.streamedOptions();
+    const options = utils.events.watch.streamedOptions({
+      maxChunks: "unbounded",
+    });
 
     const query = captureFailure(queryClient.query(options));
     await Effect.runPromise(Deferred.await(waiting));
@@ -977,7 +1016,9 @@ describe("createRpcQueryUtils streaming execution", () => {
       keyPrefix: ["app"] as const,
       runPromiseExit,
     });
-    const options = utils.events.watch.streamedOptions();
+    const options = utils.events.watch.streamedOptions({
+      maxChunks: "unbounded",
+    });
     const { queryFn } = options;
     if (!Predicate.isFunction(queryFn)) {
       throw new TypeError("Expected a callable stream query function");
@@ -1049,7 +1090,7 @@ describe("createRpcQueryUtils streaming execution", () => {
         const options = createRpcQueryUtils(streamGroup, {
           client,
           keyPrefix: ["app"] as const,
-        }).events.watch.streamedOptions();
+        }).events.watch.streamedOptions({ maxChunks: "unbounded" });
 
         const firstFetch = captureFailure(queryClient.query(options));
         yield* Deferred.await(firstStarted);
@@ -1104,7 +1145,7 @@ describe("createRpcQueryUtils streaming execution", () => {
         const options = createRpcQueryUtils(streamGroup, {
           client,
           keyPrefix: ["app"] as const,
-        }).events.watch.streamedOptions();
+        }).events.watch.streamedOptions({ maxChunks: "unbounded" });
         const observer = new QueryObserver(queryClient, options);
         const unsubscribe = observer.subscribe(() => {});
 
@@ -1158,6 +1199,7 @@ describe("createRpcQueryUtils streaming execution", () => {
               : new QueryObserver(
                   queryClient,
                   utils.events.watch.streamedOptions({
+                    maxChunks: "unbounded",
                     ...callerOptions,
                     input: skipToken,
                     refetchMode: "append",
@@ -1215,7 +1257,10 @@ describe("createRpcQueryUtils streaming execution", () => {
       });
 
       expect(
-        utils.events.watch.streamedOptions({ input: skipToken })
+        utils.events.watch.streamedOptions({
+          maxChunks: "unbounded",
+          input: skipToken,
+        })
       ).toMatchObject({
         queryFn: skipToken,
         queryKey: ["app", "rpc", "events", "watch", "streamed"],

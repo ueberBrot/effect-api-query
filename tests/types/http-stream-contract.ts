@@ -163,16 +163,21 @@ const skipped = utils.views.plain.streamedOptions({
 });
 skipped.queryFn satisfies typeof skipToken;
 const conditional = utils.views.plain.streamedOptions({
+  maxChunks: "unbounded",
   input: Math.random() > 0.5 ? input : skipToken,
 });
 new QueryObserver(queryClient, conditional);
 const initial = utils.views.plain.streamedOptions({
+  maxChunks: "unbounded",
   input,
   initialData: [1],
   select: (values) => values.length,
 });
 const wrapped = queryClient.getQueryData(
-  utils.views.wrapped.streamedKey({ refetchMode: "replace" })
+  utils.views.wrapped.streamedKey({
+    maxChunks: "unbounded",
+    refetchMode: "replace",
+  })
 );
 true satisfies Assert<
   Equal<
@@ -184,7 +189,9 @@ true satisfies Assert<
     | undefined
   >
 >;
-const events = queryClient.getQueryData(utils.events.streamedKey());
+const events = queryClient.getQueryData(
+  utils.events.streamedKey({ maxChunks: "unbounded" })
+);
 true satisfies Assert<
   Equal<
     typeof events,
@@ -198,8 +205,9 @@ true satisfies Assert<
 >;
 const captured = { params: { id: 1 }, sseOptions: { maxEventSize: 1024 } };
 // @ts-expect-error Decoder controls remain separate from request input.
-utils.views.plain.streamedKey(captured);
+utils.views.plain.streamedKey(captured, { maxChunks: "unbounded" });
 utils.views.plain.streamedOptions({
+  maxChunks: "unbounded",
   // @ts-expect-error The adapter owns response mode.
   input: { ...input, responseMode: "response-only" },
 });
@@ -207,10 +215,19 @@ utils.views.plain.streamedOptions({
 utils.views.plain.queryOptions({ input });
 // @ts-expect-error SSE endpoints expose accumulated query builders.
 utils.views.plain.mutationOptions();
+const skippedInputlessStream = {
+  maxChunks: "unbounded" as const,
+  input: skipToken,
+};
 // @ts-expect-error Inputless endpoints do not accept skipToken.
-utils.views.wrapped.streamedOptions({ input: skipToken });
+utils.views.wrapped.streamedOptions(skippedInputlessStream);
+const hashedStream = {
+  maxChunks: "unbounded" as const,
+  input,
+  queryHash: "shared",
+};
 // @ts-expect-error Caller hashes belong in QueryClient defaults.
-utils.views.plain.streamedOptions({ input, queryHash: "shared" });
+utils.views.plain.streamedOptions(hashedStream);
 // @ts-expect-error The acquisition decoding services require a runner.
 createHttpApiQueryUtils(api, { client, keyPrefix: ["missing"] });
 const custom = createHttpApiQueryUtils(api, {
@@ -219,7 +236,7 @@ const custom = createHttpApiQueryUtils(api, {
   runPromiseExit,
   keyEncoders: { views: { plain: (request) => request.params.id } },
 });
-custom.views.plain.streamedKey(input);
+custom.views.plain.streamedKey(input, { maxChunks: "unbounded" });
 initial.queryKey satisfies typeof key;
 
 declare const extraStream: Stream.Stream<
@@ -245,12 +262,12 @@ const extra = createHttpApiQueryUtils(api, {
   keyPrefix: ["extra"],
   runPromiseExit: extraRunner,
 });
-queryClient.getQueryData(extra.views.plain.streamedKey(input)) satisfies
-  | readonly number[]
-  | undefined;
+queryClient.getQueryData(
+  extra.views.plain.streamedKey(input, { maxChunks: "unbounded" })
+) satisfies readonly number[] | undefined;
 
 const extraState = queryClient.getQueryState(
-  extra.views.plain.streamedKey(input)
+  extra.views.plain.streamedKey(input, { maxChunks: "unbounded" })
 );
 type ExtraFailure =
   Exclude<

@@ -21,10 +21,6 @@ import {
   createRpcQueryUtils,
   isEffectRpcQueryError,
 } from "@ueberbrot/effect-api-query";
-import type {
-  InferQueryData,
-  InferQueryError,
-} from "@ueberbrot/effect-api-query";
 import { Cause, Result, Schema } from "effect";
 import { Rpc, RpcGroup } from "effect/rpc";
 import type { RpcClient } from "effect/rpc";
@@ -164,15 +160,11 @@ By default, Suspense throws query failures only when cached data is absent. If f
 
 ## Start independent reads together
 
-Sequential `useSuspenseQuery` calls in one component can delay later reads. The first hook suspends before the later hook runs. To start independent requests together, pass them to `useSuspenseQueries`. Explicit query descriptors retain generated data and error types through TanStack's parallel-hook overloads. Derive the descriptors from the leaf so contract changes update every consumer.
+Sequential `useSuspenseQuery` calls in one component can delay later reads. The first hook suspends before the later hook runs. To start independent requests together, pass their generated options to `useSuspenseQueries`.
 
 ```tsx
 export const TwoUsers = <E,>({ rpc }: { readonly rpc: Queries<E> }) => {
-  type UserQuery = {
-    queryFnData: InferQueryData<typeof rpc.users.get>;
-    error: InferQueryError<typeof rpc.users.get>;
-  };
-  const [ada, grace] = useSuspenseQueries<[UserQuery, UserQuery]>({
+  const [ada, grace] = useSuspenseQueries({
     queries: [
       rpc.users.get.queryOptions({
         input: { id: 1 },

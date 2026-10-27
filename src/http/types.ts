@@ -388,10 +388,10 @@ export type StreamedLeaf<
   readonly key: () => Key;
 
   readonly streamedKey: void extends Request<Endpoint>
-    ? (policy?: HttpStreamPolicy) => StreamedKey<Endpoint, Key, ClientError>
+    ? (policy: HttpStreamPolicy) => StreamedKey<Endpoint, Key, ClientError>
     : (
         input: Request<Endpoint> | PreparedInput<Request<Endpoint>>,
-        policy?: HttpStreamPolicy
+        policy: HttpStreamPolicy
       ) => StreamedKey<Endpoint, Key, ClientError>;
   readonly streamedOptions: UnaryQueryBuilder<
     Request<Endpoint>,

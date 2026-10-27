@@ -1,5 +1,8 @@
 import { QueryClient } from "@tanstack/query-core";
-import { createRpcQueryUtils } from "@ueberbrot/effect-api-query";
+import {
+  configureUtils,
+  createRpcQueryUtils,
+} from "@ueberbrot/effect-api-query";
 import { Schema } from "effect";
 import { Rpc, RpcGroup } from "effect/rpc";
 import type { RpcClient } from "effect/rpc";
@@ -68,4 +71,42 @@ utils.scale["read-99-9"].queryOptions({ input: { id: "2" } });
 // @ts-expect-error The tree contains only declared operation names.
 utils.scale["read-100-0"];
 
-void [first, id, selected];
+const configured = configureUtils(utils, {
+  query: { policy: { retry: false } },
+  scoped: {
+    scale: {
+      scoped: {
+        "read-99-9": {
+          query: {
+            policy: { staleTime: 1000 },
+            interceptors: [
+              async ({ next }) => {
+                const user = await next();
+                user.id satisfies number;
+                user.name satisfies string;
+                return user;
+              },
+            ],
+          },
+        },
+      },
+    },
+  },
+});
+const configuredLast = configured.scale["read-99-9"].queryOptions({
+  input: { id: 2 },
+  select: (user) => user.name,
+});
+const configuredCached = new QueryClient().getQueryData(
+  configuredLast.queryKey
+);
+const configuredId: number | undefined = configuredCached?.id;
+const configuredSelected: string | undefined = configuredLast.select?.({
+  id: 2,
+  name: "Ada",
+});
+// @ts-expect-error Scoped configuration preserves the generated input type.
+configured.scale["read-99-9"].queryOptions({ input: { id: "2" } });
+// @ts-expect-error Scoped configuration only accepts declared child names.
+configureUtils(utils.scale, { scoped: { "read-100-0": {} } });
+void [first, id, selected, configuredId, configuredSelected];

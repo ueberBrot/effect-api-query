@@ -77,8 +77,8 @@ export type StreamRefetchMode = "append" | "replace" | "reset";
 export type StreamedPolicyOptions = {
   /** Controls whether a refetch clears, appends to, or replaces accumulated data. */
   readonly refetchMode?: StreamRefetchMode | undefined;
-  /** Retains at most this many newest elements; must be a positive safe integer. */
-  readonly maxChunks?: number | undefined;
+  /** Keeps the newest elements, or retains the complete history when explicitly unbounded. */
+  readonly maxChunks: number | "unbounded";
   /** Publishes the first element immediately, then ordered batches; defaults to one. */
   readonly publicationBatchSize?: number | undefined;
   /** Flushes a partial batch after this many milliseconds; omitted means count-only. */
@@ -293,6 +293,25 @@ export interface InputQueryBuilder<
   >;
 }
 
+declare const unaryQueryBuilderTypes: unique symbol;
+
+export type UnaryQueryBuilderDescriptor<Builder> =
+  typeof unaryQueryBuilderTypes extends keyof Builder
+    ? NonNullable<Builder[typeof unaryQueryBuilderTypes]>
+    : never;
+
+export type RequiredAdapterKeys<Options> = {
+  [Key in keyof Options]-?: Options extends Readonly<Record<Key, Options[Key]>>
+    ? Key
+    : never;
+}[keyof Options];
+
+export type BuilderArguments<Options, AdapterOptions> = [
+  RequiredAdapterKeys<AdapterOptions>,
+] extends [never]
+  ? [options?: Options]
+  : [options: Options];
+
 export type UnaryQueryBuilder<
   Input,
   Data,
@@ -309,7 +328,18 @@ export type UnaryQueryBuilder<
   SkippedKey,
   AdapterOptions,
   Inputless
->;
+> & {
+  readonly [unaryQueryBuilderTypes]?: {
+    readonly input: Input;
+    readonly data: Data;
+    readonly error: Error;
+    readonly key: Key;
+    readonly skippedKey: SkippedKey;
+    // Configured builders accept more options, preserving assignment to the original builder.
+    readonly adapterOptions: (options: AdapterOptions) => void;
+    readonly inputless: Inputless;
+  };
+};
 
 export type UnaryQueryBuilderImpl<
   Input,
@@ -322,7 +352,9 @@ export type UnaryQueryBuilderImpl<
 > = Inputless extends true
   ? {
       <Selected = Data>(
-        options?: undefined
+        ...args: [RequiredAdapterKeys<AdapterOptions>] extends [never]
+          ? [options?: undefined]
+          : [options: never]
       ): RetainedQueryOptions<QueryOptions<Data, Error, Selected, Key>>;
       <Selected = Data, Supplied extends object = UninferredBuilderOptions>(
         options: ExactBuilderOptions<
@@ -341,12 +373,15 @@ export type UnaryQueryBuilderImpl<
         Data
       >;
       <Selected = Data, Supplied extends object = UninferredBuilderOptions>(
-        options?: ExactBuilderOptions<
-          WithUndefinedInitialData<
-            QueryInput<Data, Error, Selected, Key, AdapterOptions>,
-            Data
+        ...args: BuilderArguments<
+          ExactBuilderOptions<
+            WithUndefinedInitialData<
+              QueryInput<Data, Error, Selected, Key, AdapterOptions>,
+              Data
+            >,
+            Supplied
           >,
-          Supplied
+          AdapterOptions
         >
       ): SuppliedQueryOptions<
         QueryOptions<Data, Error, Selected, Key>,

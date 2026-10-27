@@ -209,7 +209,9 @@ describe.each(["ensuring", "acquireRelease"] as const)(
                 const error = await captureFailure(
                   operation === "live"
                     ? queryClient.query(rpc.watch.liveOptions())
-                    : queryClient.query(rpc.watch.streamedOptions())
+                    : queryClient.query(
+                        rpc.watch.streamedOptions({ maxChunks: "unbounded" })
+                      )
                 );
                 if (!isEffectRpcQueryError(error)) {
                   throw new TypeError("Expected an RPC execution error");
@@ -391,6 +393,7 @@ it.effect(
         keyPrefix: ["recovered-feed"],
       });
       const options = rpc.watch.streamedOptions({
+        maxChunks: "unbounded",
         input: { feed: "news" },
         retry: false,
       });
@@ -405,7 +408,9 @@ it.effect(
             .getQueryCache()
             .getAll()
             .map((query) => query.queryKey)
-        ).toStrictEqual([rpc.watch.streamedKey({ feed: "news" })]);
+        ).toStrictEqual([
+          rpc.watch.streamedKey({ feed: "news" }, { maxChunks: "unbounded" }),
+        ]);
       } finally {
         queryClient.clear();
       }

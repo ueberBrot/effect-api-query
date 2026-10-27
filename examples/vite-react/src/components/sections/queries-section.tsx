@@ -17,7 +17,9 @@ const streamedDiagnosticsOptions = (
   rpcQuery: ViteReactApplication["rpcQuery"],
   bounded: boolean
 ) =>
-  rpcQuery.diagnostics.stream.streamedOptions(bounded ? { maxChunks: 2 } : {});
+  rpcQuery.diagnostics.stream.streamedOptions({
+    maxChunks: bounded ? 2 : "unbounded",
+  });
 
 const FeaturedUser = ({
   application,

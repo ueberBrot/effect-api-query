@@ -303,12 +303,12 @@ export type StreamKeyBuilder<R extends Rpc.Any, Key> = KeyBuilder<
 
 export type StreamedKeyBuilder<R extends Rpc.Any, Key> =
   PayloadlessRpc<R> extends true
-    ? (policy?: StreamedPolicyOptions) => Key
+    ? (policy: StreamedPolicyOptions) => Key
     : (
         input:
           | Rpc.PayloadConstructor<R>
           | PreparedInput<Rpc.PayloadConstructor<R>>,
-        policy?: StreamedPolicyOptions
+        policy: StreamedPolicyOptions
       ) => Key;
 
 /** The key and option builders exposed at one streaming RPC path. */

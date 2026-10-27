@@ -101,10 +101,10 @@ describe("TanStack Start server rendering", () => {
       });
       expect({
         accumulatedStatus: queryClient.getQueryState(
-          rpcQuery.diagnostics.stream.streamedKey()
+          rpcQuery.diagnostics.stream.streamedKey({ maxChunks: "unbounded" })
         )?.fetchStatus,
         accumulated: queryClient.getQueryData(
-          rpcQuery.diagnostics.stream.streamedKey()
+          rpcQuery.diagnostics.stream.streamedKey({ maxChunks: "unbounded" })
         ),
         liveStatus: queryClient.getQueryState(
           rpcQuery.diagnostics.stream.liveKey()
@@ -192,7 +192,7 @@ describe("TanStack Start server rendering", () => {
       const options = createRpcQueryUtils(group, {
         client,
         keyPrefix: ["start"] as const,
-      }).diagnostics.watch.streamedOptions();
+      }).diagnostics.watch.streamedOptions({ maxChunks: "unbounded" });
       if (cached) {
         queryClient.setQueryData(options.queryKey, ["previous"]);
       }
@@ -244,7 +244,7 @@ describe("TanStack Start server rendering", () => {
       // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion
       client: client as RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof group>>,
       keyPrefix: ["cached-snapshot"],
-    }).watch.streamedOptions();
+    }).watch.streamedOptions({ maxChunks: "unbounded" });
     const previous = ["previous"];
     queryClient.setQueryData(options.queryKey, previous);
     const subscriptions = trackSnapshotSubscriptions(queryClient);
@@ -284,7 +284,7 @@ describe("TanStack Start server rendering", () => {
     const options = createRpcQueryUtils(group, {
       client,
       keyPrefix: ["cancel-snapshot"],
-    }).watch.streamedOptions();
+    }).watch.streamedOptions({ maxChunks: "unbounded" });
     const subscriptions = trackSnapshotSubscriptions(queryClient);
     const capture = subscriptions.capture();
 
@@ -340,7 +340,7 @@ describe("TanStack Start server rendering", () => {
     const options = createRpcQueryUtils(group, {
       client,
       keyPrefix: ["recover-snapshot"],
-    }).watch.streamedOptions();
+    }).watch.streamedOptions({ maxChunks: "unbounded" });
     const failure = new Error("first request failed");
     const subscriptions = trackSnapshotSubscriptions(queryClient);
     const failedCapture = subscriptions.capture();

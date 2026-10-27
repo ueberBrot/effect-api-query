@@ -1,8 +1,7 @@
 import { QueryClient } from "@tanstack/query-core";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
-  configureMutation,
-  configureQuery,
+  configureUtils,
   consumeEvents,
   createBranchQueryFilter,
   createHttpApiQueryUtils,
@@ -17,7 +16,6 @@ import { HttpApi, HttpApiEndpoint, HttpApiGroup } from "effect/http-api";
 import type { HttpApiClient } from "effect/http-api";
 import { Rpc, RpcGroup } from "effect/rpc";
 import type { RpcClient } from "effect/rpc";
-
 const group = RpcGroup.make(
   Rpc.make("read", {
     payload: { id: Schema.Int },
@@ -33,8 +31,8 @@ const group = RpcGroup.make(
 declare const client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof group>>;
 const rpc = createRpcQueryUtils(group, { client, keyPrefix: ["usability"] });
 const queryClient = new QueryClient();
-const leaf = configureMutation(
-  configureQuery(rpc.read, "query", {
+const leaf = configureUtils(rpc.read, {
+  query: {
     policy: { staleTime: 1000 },
     interceptors: [
       async ({ next }) => {
@@ -42,8 +40,8 @@ const leaf = configureMutation(
         return data;
       },
     ],
-  }),
-  {
+  },
+  mutation: {
     policy: {
       onSuccess: (data, input) => {
         const result: number = data + input.id;
@@ -51,8 +49,8 @@ const leaf = configureMutation(
       },
     },
     callbacks: "compose",
-  }
-);
+  },
+});
 const prepared = prepareInput(leaf, { id: 1 });
 const query = useQuery(
   leaf.queryOptions({
@@ -92,25 +90,33 @@ rpc.read.infiniteOptions({
 // @ts-expect-error A live stream has no publication batching policy.
 rpc.watch.liveOptions({ input: plain, publicationMaxWaitMs: 10 });
 rpc.watch.streamedOptions({
+  maxChunks: "unbounded",
   input: prepareInput(rpc.watch, plain),
   publicationBatchSize: 10,
   publicationMaxWaitMs: 50,
 });
 // @ts-expect-error Read leaves have no live view.
-configureQuery(rpc.read, "live", {});
+configureUtils(rpc.read, {
+  live: {},
+});
 // @ts-expect-error Policies cannot replace generated identity.
-configureQuery(rpc.read, "query", { policy: { queryKey: [] } });
+configureUtils(rpc.read, {
+  query: { policy: { queryKey: [] } },
+});
 const projectedPolicy = {
   staleTime: 100,
   select: (value: number) => String(value),
 };
-// @ts-expect-error Variable-supplied projections must remain local to preserve result types.
-configureQuery(rpc.read, "query", { policy: projectedPolicy });
+configureUtils(rpc.read, {
+  // @ts-expect-error Variable-supplied projections must remain local to preserve result types.
+  query: { policy: projectedPolicy },
+});
 const optimisticPolicy = { retry: false, onMutate: () => ({ previous: 1 }) };
-// @ts-expect-error Variable-supplied optimistic context must remain local to the mutation.
-configureMutation(rpc.read, { policy: optimisticPolicy });
+configureUtils(rpc.read, {
+  // @ts-expect-error Variable-supplied optimistic context must remain local to the mutation.
+  mutation: { policy: optimisticPolicy },
+});
 queryClient.invalidateQueries(createBranchQueryFilter(rpc, "query")());
-
 declare const failure: InferQueryError<typeof rpc.read>;
 const found = findDeclaredError(failure, "Missing");
 if (Option.isSome(found)) {
@@ -119,7 +125,6 @@ if (Option.isSome(found)) {
 }
 // @ts-expect-error Only tags in the typed failure union are accepted.
 findDeclaredError(failure, "Other");
-
 const api = HttpApi.make("usability").add(
   HttpApiGroup.make("users").add(
     HttpApiEndpoint.get("read", "/users/:id", {
@@ -135,8 +140,10 @@ const http = createHttpApiQueryUtils(api, {
 });
 const request = prepareInput(http.users.read, { params: { id: 1 } });
 const metadata = useQuery(
-  configureQuery(http.users.read, "metadata", {
-    policy: { staleTime: 1000 },
+  configureUtils(http.users.read, {
+    metadata: {
+      policy: { staleTime: 1000 },
+    },
   }).metadataOptions({ input: request, select: (value) => value.data })
 );
 const data: number | undefined = metadata.data;

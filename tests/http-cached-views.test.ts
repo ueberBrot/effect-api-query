@@ -90,7 +90,9 @@ it.effect(
       expect(
         yield* Effect.promise(
           async () =>
-            await queryClient.query(http.items.watch.streamedOptions())
+            await queryClient.query(
+              http.items.watch.streamedOptions({ maxChunks: "unbounded" })
+            )
         )
       ).toStrictEqual([1, undefined]);
       expect(
@@ -108,7 +110,11 @@ it.effect(
       expect(
         yield* Effect.promise(
           async () =>
-            await queryClient.query(wrappedHttp.items.wrapped.streamedOptions())
+            await queryClient.query(
+              wrappedHttp.items.wrapped.streamedOptions({
+                maxChunks: "unbounded",
+              })
+            )
         )
       ).toStrictEqual([
         HttpApiSchema.withHeaders({ body: 3, headers: { "x-version": 4 } }),
@@ -132,13 +138,21 @@ it.effect("normalizes HTTP SSE decoder policies in cache keys", () =>
       client,
       keyPrefix: ["decoder-keys"],
     });
-    expect(http.items.watch.streamedKey()).toStrictEqual(
+    expect(
+      http.items.watch.streamedKey({ maxChunks: "unbounded" })
+    ).toStrictEqual(
       http.items.watch.streamedKey({
+        maxChunks: "unbounded",
         sseOptions: { maxEventSize: 10 * 1024 * 1024 },
       })
     );
-    expect(http.items.watch.streamedKey()).not.toStrictEqual(
-      http.items.watch.streamedKey({ sseOptions: { maxEventSize: 3 } })
+    expect(
+      http.items.watch.streamedKey({ maxChunks: "unbounded" })
+    ).not.toStrictEqual(
+      http.items.watch.streamedKey({
+        maxChunks: "unbounded",
+        sseOptions: { maxEventSize: 3 },
+      })
     );
   })
 );
@@ -163,7 +177,10 @@ it.effect(
         })
       );
       yield* Effect.promise(
-        async () => await queryClient.query(http.items.watch.streamedOptions())
+        async () =>
+          await queryClient.query(
+            http.items.watch.streamedOptions({ maxChunks: "unbounded" })
+          )
       );
       const decoderClient = yield* makeClient(
         () =>
@@ -187,6 +204,7 @@ it.effect(
           await captureFailure(
             queryClient.query(
               decoderHttp.items.watch.streamedOptions({
+                maxChunks: "unbounded",
                 sseOptions: { maxEventSize: 3 },
               })
             )
@@ -205,7 +223,9 @@ it.effect(
         error: { _tag: "SseError" },
       });
       expect(
-        queryClient.getQueryData(http.items.watch.streamedKey())
+        queryClient.getQueryData(
+          http.items.watch.streamedKey({ maxChunks: "unbounded" })
+        )
       ).toStrictEqual([1, undefined]);
     })
 );
@@ -238,7 +258,9 @@ describe.each(["live", "streamed"] as const)(
             await captureFailure(
               view === "live"
                 ? queryClient.query(http.items.watch.liveOptions())
-                : queryClient.query(http.items.watch.streamedOptions())
+                : queryClient.query(
+                    http.items.watch.streamedOptions({ maxChunks: "unbounded" })
+                  )
             )
         );
         expect(error).toMatchObject({
@@ -300,7 +322,9 @@ describe.each(
             await captureFailure(
               view === "live"
                 ? queryClient.query(http.items.watch.liveOptions())
-                : queryClient.query(http.items.watch.streamedOptions())
+                : queryClient.query(
+                    http.items.watch.streamedOptions({ maxChunks: "unbounded" })
+                  )
             )
         );
         if (!isEffectHttpApiQueryError(error)) {
@@ -315,7 +339,7 @@ describe.each(
           queryClient.getQueryData(
             view === "live"
               ? http.items.watch.liveKey()
-              : http.items.watch.streamedKey()
+              : http.items.watch.streamedKey({ maxChunks: "unbounded" })
           )
         ).toStrictEqual(published ? publishedData : undefined);
       })
@@ -366,11 +390,13 @@ describe.each(["live", "streamed"] as const)(
         const queryKey =
           view === "live"
             ? http.items.watch.liveKey()
-            : http.items.watch.streamedKey();
+            : http.items.watch.streamedKey({ maxChunks: "unbounded" });
         const pending =
           view === "live"
             ? queryClient.query(http.items.watch.liveOptions())
-            : queryClient.query(http.items.watch.streamedOptions());
+            : queryClient.query(
+                http.items.watch.streamedOptions({ maxChunks: "unbounded" })
+              );
         try {
           yield* waitForQueryState(
             queryClient,
@@ -579,7 +605,7 @@ describe.each(["global", "prefix"] as const)(
         }
         const history = new QueryObserver(
           queryClient,
-          http.items.watch.streamedOptions()
+          http.items.watch.streamedOptions({ maxChunks: "unbounded" })
         );
         const latest = new QueryObserver(
           queryClient,
@@ -601,10 +627,15 @@ describe.each(["global", "prefix"] as const)(
             history: { data: [1], fetchStatus: "fetching" },
             latest: { data: 1, fetchStatus: "fetching" },
           });
-          queryClient.setQueryData(http.items.watch.streamedKey(), [2]);
+          queryClient.setQueryData(
+            http.items.watch.streamedKey({ maxChunks: "unbounded" }),
+            [2]
+          );
           queryClient.setQueryData(http.items.watch.liveKey(), 2);
           expect({
-            history: queryClient.getQueryData(http.items.watch.streamedKey()),
+            history: queryClient.getQueryData(
+              http.items.watch.streamedKey({ maxChunks: "unbounded" })
+            ),
             latest: queryClient.getQueryData(http.items.watch.liveKey()),
           }).toStrictEqual({ history: [2], latest: 2 });
           const unary = http.items.read.queryOptions();

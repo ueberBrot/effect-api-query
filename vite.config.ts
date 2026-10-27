@@ -154,6 +154,7 @@ export default defineConfig({
           "src/core/operation.ts",
           "src/core/utility-tree.ts",
           "src/core/metadata-query.ts",
+          "src/core/configure-utils.ts",
         ],
         rules: {
           "anti-slop/no-unknown-parameters": "off",
@@ -225,6 +226,8 @@ export default defineConfig({
           "examples/tanstack-start/tests/server-render.test.tsx",
           "examples/vite-react/src/lib/application.ts",
           "scripts/measure-construction.mts",
+          "tests/utility-configuration.test.ts",
+          "tests/configuration-composition.test.ts",
           "src/http/create-utils.ts",
           "src/http/operation.ts",
           "src/http/request.ts",

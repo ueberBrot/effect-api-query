@@ -322,7 +322,10 @@ describe("stream snapshots", () => {
           const pending =
             operation === "live"
               ? fetchStreamSnapshot(queryClient, rpc.watch.liveOptions())
-              : fetchStreamSnapshot(queryClient, rpc.watch.streamedOptions());
+              : fetchStreamSnapshot(
+                  queryClient,
+                  rpc.watch.streamedOptions({ maxChunks: "unbounded" })
+                );
           let settled = false;
           const outcome = captureFailure(pending).then((result) => {
             settled = true;

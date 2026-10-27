@@ -13,16 +13,11 @@ export type {
   QueryFilterEncoder,
   QueryFilterOptions,
 } from "./core/query-filter";
-export { withMutationPolicy, withQueryPolicy } from "./core/policy";
 export type {
   MutationPolicy,
   MutationPolicyOptions,
   QueryPolicy,
 } from "./core/policy";
-export {
-  withMutationInterceptor,
-  withQueryInterceptor,
-} from "./core/interceptor";
 export type { MutationInterceptor, QueryInterceptor } from "./core/interceptor";
 export {
   createHydrationRegistry,
@@ -86,7 +81,11 @@ export type {
 /** The type of Query Core's exact skip sentinel. @api public */
 export type { SkipToken } from "@tanstack/query-core";
 
-export { configureQuery, configureMutation } from "./core/configure";
+export { configureUtils } from "./core/configure-utils";
+export type {
+  ConfiguredUtils,
+  UtilsConfiguration,
+} from "./core/configure-utils";
 export { createBranchQueryFilter } from "./core/branch-filter";
 export { findDeclaredError } from "./core/declared-error";
 export { prepareInput } from "./core/prepared-input";

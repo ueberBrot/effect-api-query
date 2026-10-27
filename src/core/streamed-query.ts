@@ -60,14 +60,14 @@ export const prepareStreamPolicy = (
       publicationMaxWaitMs,
     } = options;
     if (
-      maxChunks !== undefined &&
+      maxChunks !== "unbounded" &&
       (!Predicate.isNumber(maxChunks) ||
         !Number.isSafeInteger(maxChunks) ||
         maxChunks <= 0)
     ) {
       throw invalid(
         "InvalidMaxChunks",
-        "maxChunks must be a positive safe integer"
+        "maxChunks must be a positive safe integer or 'unbounded'"
       );
     }
     if (
@@ -92,7 +92,7 @@ export const prepareStreamPolicy = (
     validatePublicationDeadline(publicationMaxWaitMs);
     policy = {
       _tag: "Accumulated",
-      maxChunks,
+      maxChunks: maxChunks === "unbounded" ? undefined : maxChunks,
       refetchMode,
       publicationBatchSize,
       publicationMaxWaitMs,

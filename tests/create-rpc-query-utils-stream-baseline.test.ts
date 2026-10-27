@@ -142,7 +142,9 @@ const measure = Effect.fnUntraced(function* measure(scenario: Case) {
   const queryKey =
     scenario.view === "live"
       ? leaf.liveKey(input)
-      : leaf.streamedKey(input, { maxChunks: scenario.maxChunks });
+      : leaf.streamedKey(input, {
+          maxChunks: scenario.maxChunks ?? "unbounded",
+        });
   const objects = observedObjects();
   let cacheNotifications = 0;
   let cacheUpdates = 0;
@@ -201,7 +203,7 @@ const measure = Effect.fnUntraced(function* measure(scenario: Case) {
         : await queryClient.query(
             leaf.streamedOptions({
               input,
-              maxChunks: scenario.maxChunks,
+              maxChunks: scenario.maxChunks ?? "unbounded",
               structuralSharing: scenario.structuralSharing,
             })
           )
