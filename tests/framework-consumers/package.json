@@ -1,0 +1,22 @@
+{
+  "name": "effect-api-query-framework-consumers",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "@angular/common": "22.2.1",
+    "@angular/core": "22.2.1",
+    "@tanstack/angular-query-experimental": "5.104.2",
+    "@tanstack/query-core": "5.104.2",
+    "@tanstack/solid-query": "5.104.2",
+    "@tanstack/svelte-query": "6.3.0",
+    "@tanstack/vue-query": "5.104.2",
+    "effect": "4.0.4",
+    "rxjs": "7.8.2",
+    "solid-js": "1.9.15",
+    "svelte": "5.57.1",
+    "typescript": "7.0.2",
+    "typescript-5.9": "npm:typescript@5.9.3",
+    "vue": "3.5.43"
+  },
+  "packageManager": "pnpm@12.13.0"
+}

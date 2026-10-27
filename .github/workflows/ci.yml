@@ -47,6 +47,9 @@ jobs:
       - name: Check public API compiler fixtures
         run: vp run api-types
 
+      - name: Check native framework consumers
+        run: vp run framework-types
+
       - name: Run Effect diagnostics
         run: vp run effect-check
 

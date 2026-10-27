@@ -3,12 +3,16 @@
 
   "entry": [
     "scripts/measure-construction.mts",
+    "scripts/check-framework-consumers.mts",
     "scripts/resolve-docs-release.mts",
     "playwright.docs.config.ts",
     "tests/types/*.{ts,tsx}",
   ],
 
-  "ignorePatterns": ["examples/tanstack-start/src/routeTree.gen.ts"],
+  "ignorePatterns": [
+    "examples/tanstack-start/src/routeTree.gen.ts",
+    "tests/framework-consumers/**",
+  ],
 
   "ignoreExports": [
     {

@@ -106,6 +106,7 @@ export default defineConfig({
       ...(ultraciteCore.ignorePatterns ?? []),
       ...ignoredPaths,
       "tests/types/**",
+      "tests/framework-consumers/**",
       "apps/docs/**/*.astro",
     ],
     options: {
@@ -410,6 +411,11 @@ export default defineConfig({
         command: "tsx scripts/measure-construction.mts",
         cache: false,
       },
+      "framework-types": {
+        command: "node --import tsx scripts/check-framework-consumers.mts",
+        dependsOn: ["pack"],
+        cache: false,
+      },
       "api-types": {
         command: [
           "tsc --project tests/types/tsconfig.json",
@@ -453,6 +459,7 @@ export default defineConfig({
           "vp run effect-check",
           "vp run fallow",
           "vp run test",
+          "vp run framework-types",
         ],
       },
       server: {
