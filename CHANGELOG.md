@@ -1,5 +1,23 @@
 # effect-api-query
 
+## 0.4.0
+
+### Minor Changes
+
+- [#151](https://github.com/ueberBrot/effect-api-query/pull/151) [`9b3565f`](https://github.com/ueberBrot/effect-api-query/commit/9b3565f84f25b96887f3589caf346076edc437d0) - Require accumulated stream keys and options to choose a positive `maxChunks` bound or `"unbounded"`. Set shared retention through `configureUtils` to omit it at call sites. Configured streams remain assignable to their original tree and leaf types.
+
+- [#151](https://github.com/ueberBrot/effect-api-query/pull/151) [`9b3565f`](https://github.com/ueberBrot/effect-api-query/commit/9b3565f84f25b96887f3589caf346076edc437d0) - Infer native Vue results and React parallel-query selections and errors without explicit hook descriptors. Keep generic HTTP client errors and typed cache reads. Canonical payload slots are now opaque `unknown` values, and stream keys retain their fixed tuple shape.
+
+  Reject generated mutation functions and keys in stored options and unions, and check extra builder options across every union member.
+
+- [#151](https://github.com/ueberBrot/effect-api-query/pull/151) [`9b3565f`](https://github.com/ueberBrot/effect-api-query/commit/9b3565f84f25b96887f3589caf346076edc437d0) - Replace the separate policy, interceptor, and leaf-configuration helpers with `configureUtils` for trees, branches, and leaves. Preserve callback inference, scope specificity, and interceptor order across repeated configuration. Repeated mutation settings merge within their scope, and explicit `undefined` clears an inherited callback.
+
+### Patch Changes
+
+- [#151](https://github.com/ueberBrot/effect-api-query/pull/151) [`9b3565f`](https://github.com/ueberBrot/effect-api-query/commit/9b3565f84f25b96887f3589caf346076edc437d0) - Honor `sseOptions.dispatchEmptyNamedEvents` for HTTP streams. Validate its value and give enabled empty-event decoding a separate cache identity.
+
+- [#151](https://github.com/ueberBrot/effect-api-query/pull/151) [`9b3565f`](https://github.com/ueberBrot/effect-api-query/commit/9b3565f84f25b96887f3589caf346076edc437d0) - Keep generated RPC utility trees and scoped configuration usable on large contracts without excessive TypeScript instantiation.
+
 ## 0.3.0
 
 ### Minor Changes

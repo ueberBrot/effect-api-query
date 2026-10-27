@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "d44f790c27a830dbb5eae0e0a49af8038ff459e8568009a325bdcd4f53a86c41",
+      "fingerprint": "5f1df64e512821c6caf8c23a05696e3bbdf04161e640959f80b3119d9687acae",
       "snapshot": {
         "GLOSSARY.md": "9f7734ff552aa9a5c2b112f7948b5001ca82341a7acbc787ee5f7131b7be340a",
         "README.md": "d026d347122dbdf67569951c58f8ee35fd7130ded3fe5fedcbdf29aa3183d8c7",
@@ -140,7 +140,7 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "cae4a74b79e3c64eac7d698f354b1922e7211f2fa302d1117004d33ac3b895c8",
+        "package.json": "9ef089cb4dee4b1b7cf5bf1d44e1a54d358e9a250bfaf9b4a7875146f90b5d81",
         "pnpm-workspace.yaml": "c55847022106dd11f2b32990131c248d9851a4672486cd70fba63536da4d4051",
         "scripts/check-framework-consumers.mts": "37fc0fc0006c2b1f35c5cff85754612e0b74d89eed608e353ef5f18f05fce051",
         "scripts/measure-bundles.mts": "5a033ce9f9a4cf414632b6f2781a50c0354f1cf9996791a547a5d53dbef66d7a",
@@ -299,15 +299,18 @@
         "tests/utility-configuration.test.ts": "a1ba1df1e174a6d8e8224a65483b961d2185c774fd84de78c1482626a5f78edd",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "f04396fa0dcb24f0a35db07a813db5af498d332e",
-      "outcome": "updated",
-      "reason": "Framework guidance separates declared library peers, wrapper framework requirements, exact checked combinations, and framework component compiler support. The packed-consumer installer can fetch missing publication metadata without changing the seven-day dependency policy or the existing TypeScript 5.9/7.0 checks.",
+      "head": "9b3565f84f25b96887f3589caf346076edc437d0",
+      "outcome": "no-change",
+      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
       "evidence": [
-        "Reviewed the actual 8636508..HEAD and staged diffs against package.json, pnpm-workspace.yaml, the framework manifests/lockfile and consumer fixtures, and the compatibility reference. All four packed framework consumers pass TypeScript 7.0.2 and 5.9.3; both public compiler suites pass. Documentation checks pass 20 excerpts and zero Astro diagnostics; the 58-page build and internal links pass. The isolated TypeScript missing-time install fails offline and passes prefer-offline with strict age checks. Runtime source and fixtures retain the validated 69c9d13 tree (755 runtime cases); prior fresh installed-skill consumer evidence remains valid for unchanged configuration behavior, while automatic discovery remains unverified."
+        "Before versioning: intent maintainer check passed at 9b3565f84f25b96887f3589caf346076edc437d0.",
+        "changeset version and vp fmt generated 0.3.0 -> 0.4.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: package.json."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "ca2702d045ed83f2ad2a8c0f012d949de9b9a98dcf9a4cb1cfce180ee2ad32bb",
+      "fingerprint": "2225851887c4ca69b7bd9c26eedebcdcb4a99e87eba80e3e5661eab7348696f0",
       "snapshot": {
         "GLOSSARY.md": "9f7734ff552aa9a5c2b112f7948b5001ca82341a7acbc787ee5f7131b7be340a",
         "README.md": "d026d347122dbdf67569951c58f8ee35fd7130ded3fe5fedcbdf29aa3183d8c7",
@@ -447,7 +450,7 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "cae4a74b79e3c64eac7d698f354b1922e7211f2fa302d1117004d33ac3b895c8",
+        "package.json": "9ef089cb4dee4b1b7cf5bf1d44e1a54d358e9a250bfaf9b4a7875146f90b5d81",
         "pnpm-workspace.yaml": "c55847022106dd11f2b32990131c248d9851a4672486cd70fba63536da4d4051",
         "scripts/check-framework-consumers.mts": "37fc0fc0006c2b1f35c5cff85754612e0b74d89eed608e353ef5f18f05fce051",
         "scripts/measure-bundles.mts": "5a033ce9f9a4cf414632b6f2781a50c0354f1cf9996791a547a5d53dbef66d7a",
@@ -606,11 +609,14 @@
         "tests/utility-configuration.test.ts": "a1ba1df1e174a6d8e8224a65483b961d2185c774fd84de78c1482626a5f78edd",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "f04396fa0dcb24f0a35db07a813db5af498d332e",
-      "outcome": "updated",
-      "reason": "Updated the domain map version-selection failure mode and skill specification to distinguish declared constraints from exact tested combinations. Preserved one owning skill, fourteen tasks, six references, existing history and source mappings; the skill tree remains accurate. The compiler/toolchain and dependency-age policy remain unchanged.",
+      "head": "9b3565f84f25b96887f3589caf346076edc437d0",
+      "outcome": "no-change",
+      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
       "evidence": [
-        "Reconciled _artifacts/domain_map.yaml, _artifacts/skill_spec.md and _artifacts/skill_tree.yaml with the canonical compatibility table and shipped frameworks-and-hosts reference. Intent sync reports nothing to synchronize. YAML, formatting, public compiler fixtures, native framework fixtures and documentation checks pass. Verified package.json, pnpm-lock.yaml, pnpm-workspace.yaml, the editor setup, docs checker, and ADRs0015/0017 match the original policy tree."
+        "Before versioning: intent maintainer check passed at 9b3565f84f25b96887f3589caf346076edc437d0.",
+        "changeset version and vp fmt generated 0.3.0 -> 0.4.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: package.json."
       ]
     },
     "source:vite.config.ts": {
@@ -1693,16 +1699,16 @@
       ]
     },
     "source:CHANGELOG.md": {
-      "fingerprint": "96c1e3177ff87402a1e54f702f2119a1742d83af53c532929deaaafab3d979c9",
+      "fingerprint": "1a5bd9ebd41bf239b6fce09beec9014fd2202588216ee26340ba1d2ed53fc9b7",
       "snapshot": {
-        "CHANGELOG.md": "4a41584465038feae9cd8656c32189a2ea6e921452825dcf8fb29772ae0ab367"
+        "CHANGELOG.md": "300ba0228ee7586013bb9e43c2626f89d50e0eff718f528e4716703288935da9"
       },
-      "head": "95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9",
+      "head": "9b3565f84f25b96887f3589caf346076edc437d0",
       "outcome": "no-change",
       "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Before versioning: intent maintainer check passed at 95a3c31b70e1e1a21fa9c4fcc54975b95182c7a9.",
-        "changeset version and vp fmt generated 0.2.0 -> 0.3.0.",
+        "Before versioning: intent maintainer check passed at 9b3565f84f25b96887f3589caf346076edc437d0.",
+        "changeset version and vp fmt generated 0.3.0 -> 0.4.0.",
         "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
         "Scoped generated changes: CHANGELOG.md."
       ]
@@ -2470,63 +2476,78 @@
       ]
     },
     "source:.changeset/explicit-stream-retention.md": {
-      "fingerprint": "19d3cd7f9929ca835b8cb753b313dc6245aa7dc888dfbc4bc893d9cde4d14988",
+      "fingerprint": "5982337612652f044f4f10579e379c958227606507aa946dedd06067942a3bf5",
       "snapshot": {
-        ".changeset/explicit-stream-retention.md": "7f50e94a456ae151308a9d6d2c3589a44952290bc25a865be0221ef0d9ec92db"
+        ".changeset/explicit-stream-retention.md": null
       },
-      "head": "f04396fa0dcb24f0a35db07a813db5af498d332e",
+      "head": "9b3565f84f25b96887f3589caf346076edc437d0",
       "outcome": "no-change",
-      "reason": "This focused release note describes existing configuration, retention, inference, large-contract or SSE guidance. Splitting release notes adds no developer task or public behavior beyond the reviewed implementation.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Compared .changeset/explicit-stream-retention.md with src/core/configure-utils.ts, src/core/types.ts, src/rpc/types.ts, src/http/streamed-query.ts, runtime/type regressions, migration guide and shipped references. The preserved final tree matches the original-policy backup; both public compiler suites, four packed framework consumers and documentation checks pass. Existing 755-case runtime and independent installed-skill consumer evidence covers the unchanged behavior."
+        "Before versioning: intent maintainer check passed at 9b3565f84f25b96887f3589caf346076edc437d0.",
+        "changeset version and vp fmt generated 0.3.0 -> 0.4.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/explicit-stream-retention.md."
       ]
     },
     "source:.changeset/http-empty-named-events.md": {
-      "fingerprint": "9431318894485ca099d5f3d5467e0f90522d69d8d36e19e8debfe38776b336ad",
+      "fingerprint": "fc90fa162940cac17f1b79878261254f594000b67bef4514bc533e03429a0b31",
       "snapshot": {
-        ".changeset/http-empty-named-events.md": "288f1e45c0ae55cebeb69716d049111070320ca153cda8321ca4d4849f599e2d"
+        ".changeset/http-empty-named-events.md": null
       },
-      "head": "f04396fa0dcb24f0a35db07a813db5af498d332e",
+      "head": "9b3565f84f25b96887f3589caf346076edc437d0",
       "outcome": "no-change",
-      "reason": "This focused release note describes existing configuration, retention, inference, large-contract or SSE guidance. Splitting release notes adds no developer task or public behavior beyond the reviewed implementation.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Compared .changeset/http-empty-named-events.md with src/core/configure-utils.ts, src/core/types.ts, src/rpc/types.ts, src/http/streamed-query.ts, runtime/type regressions, migration guide and shipped references. The preserved final tree matches the original-policy backup; both public compiler suites, four packed framework consumers and documentation checks pass. Existing 755-case runtime and independent installed-skill consumer evidence covers the unchanged behavior."
+        "Before versioning: intent maintainer check passed at 9b3565f84f25b96887f3589caf346076edc437d0.",
+        "changeset version and vp fmt generated 0.3.0 -> 0.4.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/http-empty-named-events.md."
       ]
     },
     "source:.changeset/large-rpc-contracts.md": {
-      "fingerprint": "b3b5df32668e574361259736fde6707d6c369312115b8347e49ccc472e585124",
+      "fingerprint": "4e354d2293316e2a7d095929528de6edc476ecaaae9ac9681ca6cd6dd62d9438",
       "snapshot": {
-        ".changeset/large-rpc-contracts.md": "7e4e1f7203cfc567757cac02b61002d48d868559ce2fc72b55e31475e95101b5"
+        ".changeset/large-rpc-contracts.md": null
       },
-      "head": "f04396fa0dcb24f0a35db07a813db5af498d332e",
+      "head": "9b3565f84f25b96887f3589caf346076edc437d0",
       "outcome": "no-change",
-      "reason": "This focused release note describes existing configuration, retention, inference, large-contract or SSE guidance. Splitting release notes adds no developer task or public behavior beyond the reviewed implementation.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Compared .changeset/large-rpc-contracts.md with src/core/configure-utils.ts, src/core/types.ts, src/rpc/types.ts, src/http/streamed-query.ts, runtime/type regressions, migration guide and shipped references. The preserved final tree matches the original-policy backup; both public compiler suites, four packed framework consumers and documentation checks pass. Existing 755-case runtime and independent installed-skill consumer evidence covers the unchanged behavior."
+        "Before versioning: intent maintainer check passed at 9b3565f84f25b96887f3589caf346076edc437d0.",
+        "changeset version and vp fmt generated 0.3.0 -> 0.4.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/large-rpc-contracts.md."
       ]
     },
     "source:.changeset/native-query-inference.md": {
-      "fingerprint": "e7451baa8935e808ad270212337a98f666d82092ea9a165d3d2d8c450560be0b",
+      "fingerprint": "1007f75c6367842376dca7f954b59f12ad730091103ec80a3b70adf5550d2e97",
       "snapshot": {
-        ".changeset/native-query-inference.md": "ad06948ed936a91af94db8a880e7b62ade281a5166120303b5f12ed509f631d7"
+        ".changeset/native-query-inference.md": null
       },
-      "head": "f04396fa0dcb24f0a35db07a813db5af498d332e",
+      "head": "9b3565f84f25b96887f3589caf346076edc437d0",
       "outcome": "no-change",
-      "reason": "This focused release note describes existing configuration, retention, inference, large-contract or SSE guidance. Splitting release notes adds no developer task or public behavior beyond the reviewed implementation.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Compared .changeset/native-query-inference.md with src/core/configure-utils.ts, src/core/types.ts, src/rpc/types.ts, src/http/streamed-query.ts, runtime/type regressions, migration guide and shipped references. The preserved final tree matches the original-policy backup; both public compiler suites, four packed framework consumers and documentation checks pass. Existing 755-case runtime and independent installed-skill consumer evidence covers the unchanged behavior."
+        "Before versioning: intent maintainer check passed at 9b3565f84f25b96887f3589caf346076edc437d0.",
+        "changeset version and vp fmt generated 0.3.0 -> 0.4.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/native-query-inference.md."
       ]
     },
     "source:.changeset/scoped-utility-configuration.md": {
-      "fingerprint": "7c41df0669720630c3ad9f16c26cfa77c85fe35b96f5cff8478dcf4e0f8b7497",
+      "fingerprint": "dea50d196162b88ac1e2afa9dd19a168bb9ac3906b7d9201db34f4345d63450e",
       "snapshot": {
-        ".changeset/scoped-utility-configuration.md": "9c830185b3029f411c6243b0febfd9d817a41225c697f2227adc5e298270dfcc"
+        ".changeset/scoped-utility-configuration.md": null
       },
-      "head": "f04396fa0dcb24f0a35db07a813db5af498d332e",
+      "head": "9b3565f84f25b96887f3589caf346076edc437d0",
       "outcome": "no-change",
-      "reason": "This focused release note describes existing configuration, retention, inference, large-contract or SSE guidance. Splitting release notes adds no developer task or public behavior beyond the reviewed implementation.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Compared .changeset/scoped-utility-configuration.md with src/core/configure-utils.ts, src/core/types.ts, src/rpc/types.ts, src/http/streamed-query.ts, runtime/type regressions, migration guide and shipped references. The preserved final tree matches the original-policy backup; both public compiler suites, four packed framework consumers and documentation checks pass. Existing 755-case runtime and independent installed-skill consumer evidence covers the unchanged behavior."
+        "Before versioning: intent maintainer check passed at 9b3565f84f25b96887f3589caf346076edc437d0.",
+        "changeset version and vp fmt generated 0.3.0 -> 0.4.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/scoped-utility-configuration.md."
       ]
     }
   }
