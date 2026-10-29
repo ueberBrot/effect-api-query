@@ -2412,19 +2412,15 @@
       ]
     },
     "source:skills-lock.json": {
-      "fingerprint": "8267ba91f8acee61c9a1b206551949117937acda7f4b6ca20d4ce0e5be17284f",
+      "fingerprint": "978505ca5d29874bc4d601c6ae140bff74ab1aebabb89c9b2c3830fb3bcbcad7",
       "snapshot": {
-        "skills-lock.json": "7b398602aca39c1d2d41cad12dff006aa81cb5e880b06604cb4c87a745cbd7f2"
+        "skills-lock.json": "f2c1a9958c5938e305abc7f268310b078a4f525aa555504be890f5b2fa8c9352"
       },
-      "head": "56adc4234e728f3f7e47c80066b55b3af019f1d7",
-      "outcome": "no-change",
-      "reason": "The lock record refreshes imported Effect, show-me, and wizard skill hashes and removes resolving-merge-conflicts, matching the local skill changes. This is authoring-tool provenance rather than a library dependency, source mapping, or consumer recommendation.",
+      "head": "a25f72a2a4a16b27ade7bec904535262d71ff267",
+      "outcome": "out-of-scope",
+      "reason": "Lockfile hashes track updates to repository authoring skills, not the shipped effect-api-query skill or library behavior.",
       "evidence": [
-        "Compared origin/main (49278c5d94daac512dc91ec75a101e777ee99eb4) with 56adc4234e728f3f7e47c80066b55b3af019f1d7 and reviewed all seven changed files. git diff --check passes.",
-        "No changes under src, tests, examples, apps/docs, skills, or _artifacts. Reviewed _artifacts/domain_map.yaml, _artifacts/skill_spec.md, and _artifacts/skill_tree.yaml: library domains, tasks, prerequisites, six references, and source mappings remain accurate; all three records require no edits.",
-        "vp exec intent maintainer sync reports Nothing to synchronize. vp run skills-check passes (one shipped skill), and vp run format passes (356 files).",
-        "Activation metadata and Effect install examples were checked directly; removal agrees with skills-lock.json. No fresh agent discovery or external-service setup session was run for the local authoring skills.",
-        "Before recording, vp run skills-maintenance-check exits 1 with exactly these seven pending source reviews; structural validation and synchronization already pass."
+        "Reviewed skills-lock.json in git diff origin/main...a25f72a; _artifacts/skill_spec.md scopes the shipped skill to library consumer tasks. vp run skills-check passed."
       ]
     },
     "source:.changeset/unified-utility-configuration.md": {
@@ -2548,6 +2544,126 @@
         "changeset version and vp fmt generated 0.3.0 -> 0.4.0.",
         "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
         "Scoped generated changes: .changeset/scoped-utility-configuration.md."
+      ]
+    },
+    "source:.agents/skills/code-review/SKILL.md": {
+      "fingerprint": "ce87e469db9a10ff7caa9d4fbc56a05d4764bcb545ecf4e3f934c1d95d316379",
+      "snapshot": {
+        ".agents/skills/code-review/SKILL.md": "9c921a8d88138a41401d8897ca1bb852088ab1b7b605cdd04edc13e3e8aab6dd"
+      },
+      "head": "a25f72a2a4a16b27ade7bec904535262d71ff267",
+      "outcome": "out-of-scope",
+      "reason": "This update changes repository authoring workflow instructions, not effect-api-query library behavior or its shipped consumer guidance.",
+      "evidence": [
+        "Reviewed .agents/skills/code-review/SKILL.md in git diff origin/main...a25f72a; _artifacts/skill_spec.md scopes the shipped skill to library consumer tasks. vp run skills-check passed."
+      ]
+    },
+    "source:.agents/skills/codebase-design/DESIGN-IT-TWICE.md": {
+      "fingerprint": "ae8ff04b756b1d169b5d25dd99726bcbcc2aa7b4d5f6b6735b8291d6293c71e1",
+      "snapshot": {
+        ".agents/skills/codebase-design/DESIGN-IT-TWICE.md": "c222ab5a82e0405672eb9062d62496139a08828e45d07fc5f18e4952c10fac1a"
+      },
+      "head": "a25f72a2a4a16b27ade7bec904535262d71ff267",
+      "outcome": "out-of-scope",
+      "reason": "This update changes repository authoring workflow instructions, not effect-api-query library behavior or its shipped consumer guidance.",
+      "evidence": [
+        "Reviewed .agents/skills/codebase-design/DESIGN-IT-TWICE.md in git diff origin/main...a25f72a; _artifacts/skill_spec.md scopes the shipped skill to library consumer tasks. vp run skills-check passed."
+      ]
+    },
+    "source:.agents/skills/grilling/SKILL.md": {
+      "fingerprint": "2a7528988a94b7d25a3342c740209916ecbdb02057a9546df155fd732a9df01f",
+      "snapshot": {
+        ".agents/skills/grilling/SKILL.md": "a146842ed93ca43d833550fa9adf02e58cb63c83fea9d4b4522995b82242d4e2"
+      },
+      "head": "a25f72a2a4a16b27ade7bec904535262d71ff267",
+      "outcome": "out-of-scope",
+      "reason": "This update changes repository authoring workflow instructions, not effect-api-query library behavior or its shipped consumer guidance.",
+      "evidence": [
+        "Reviewed .agents/skills/grilling/SKILL.md in git diff origin/main...a25f72a; _artifacts/skill_spec.md scopes the shipped skill to library consumer tasks. vp run skills-check passed."
+      ]
+    },
+    "source:.agents/skills/implement-spec/SKILL.md": {
+      "fingerprint": "338db21759d3260b7b2a2d109167b0c3849eb1d0c40e3dd6ef982afc2ade59b8",
+      "snapshot": {
+        ".agents/skills/implement-spec/SKILL.md": "1993a473cec40ac85d081c112cdffdc63ec3267c2e412055ad09e013a2f623d1"
+      },
+      "head": "a25f72a2a4a16b27ade7bec904535262d71ff267",
+      "outcome": "out-of-scope",
+      "reason": "This update changes repository authoring workflow instructions, not effect-api-query library behavior or its shipped consumer guidance.",
+      "evidence": [
+        "Reviewed .agents/skills/implement-spec/SKILL.md in git diff origin/main...a25f72a; _artifacts/skill_spec.md scopes the shipped skill to library consumer tasks. vp run skills-check passed."
+      ]
+    },
+    "source:.agents/skills/improve-codebase-architecture/SKILL.md": {
+      "fingerprint": "d81bd3003b4c2763cf0c3d631ece7af7e3707920bdecfe51e73b5375620e00d2",
+      "snapshot": {
+        ".agents/skills/improve-codebase-architecture/SKILL.md": "35b03a3db61e0f5aa333ea59b54963e45a3d2ace6649b2ef4f9576603e2582a6"
+      },
+      "head": "a25f72a2a4a16b27ade7bec904535262d71ff267",
+      "outcome": "out-of-scope",
+      "reason": "This update changes repository authoring workflow instructions, not effect-api-query library behavior or its shipped consumer guidance.",
+      "evidence": [
+        "Reviewed .agents/skills/improve-codebase-architecture/SKILL.md in git diff origin/main...a25f72a; _artifacts/skill_spec.md scopes the shipped skill to library consumer tasks. vp run skills-check passed."
+      ]
+    },
+    "source:.agents/skills/research/SKILL.md": {
+      "fingerprint": "ac5f6f50bf0e20023541b00fa7aad13fd35ea98a56d3c8a95c30494735214d17",
+      "snapshot": {
+        ".agents/skills/research/SKILL.md": "1f629e18ab899412683bc6a1c4efb4339999e27c2fdac328f26ee10a8c031d33"
+      },
+      "head": "a25f72a2a4a16b27ade7bec904535262d71ff267",
+      "outcome": "out-of-scope",
+      "reason": "This update changes repository authoring workflow instructions, not effect-api-query library behavior or its shipped consumer guidance.",
+      "evidence": [
+        "Reviewed .agents/skills/research/SKILL.md in git diff origin/main...a25f72a; _artifacts/skill_spec.md scopes the shipped skill to library consumer tasks. vp run skills-check passed."
+      ]
+    },
+    "source:.agents/skills/setup-matt-pocock-skills/SKILL.md": {
+      "fingerprint": "7988c7c91fbf55abc41e98767c1b72446dcc0e99929ff3a3e0be65887e902e51",
+      "snapshot": {
+        ".agents/skills/setup-matt-pocock-skills/SKILL.md": "b01e05bfe8c323171275c6ceec78b12f1bd4c62dfd26c2cfe8be806d3883f1ed"
+      },
+      "head": "a25f72a2a4a16b27ade7bec904535262d71ff267",
+      "outcome": "out-of-scope",
+      "reason": "This update changes repository authoring workflow instructions, not effect-api-query library behavior or its shipped consumer guidance.",
+      "evidence": [
+        "Reviewed .agents/skills/setup-matt-pocock-skills/SKILL.md in git diff origin/main...a25f72a; _artifacts/skill_spec.md scopes the shipped skill to library consumer tasks. vp run skills-check passed."
+      ]
+    },
+    "source:.agents/skills/setup-matt-pocock-skills/issue-tracker-github.md": {
+      "fingerprint": "e8525d08234036ec9acc01672297105b8c7d581e8988a970f980192e3c0004f8",
+      "snapshot": {
+        ".agents/skills/setup-matt-pocock-skills/issue-tracker-github.md": "6fdb3e9b00b7b0b115ecac3b1c00e3790f637f190abf598815368722c0a94692"
+      },
+      "head": "a25f72a2a4a16b27ade7bec904535262d71ff267",
+      "outcome": "out-of-scope",
+      "reason": "This update changes repository authoring workflow instructions, not effect-api-query library behavior or its shipped consumer guidance.",
+      "evidence": [
+        "Reviewed .agents/skills/setup-matt-pocock-skills/issue-tracker-github.md in git diff origin/main...a25f72a; _artifacts/skill_spec.md scopes the shipped skill to library consumer tasks. vp run skills-check passed."
+      ]
+    },
+    "source:.agents/skills/setup-matt-pocock-skills/issue-tracker-gitlab.md": {
+      "fingerprint": "b203122a8a31b10dfac9a426663eaa3b292f5294ec4d002740ae006b5824e894",
+      "snapshot": {
+        ".agents/skills/setup-matt-pocock-skills/issue-tracker-gitlab.md": "947602d33a80f98f939fb990995b8f95a3459b114b919c4221d08bd75d7cffe0"
+      },
+      "head": "a25f72a2a4a16b27ade7bec904535262d71ff267",
+      "outcome": "out-of-scope",
+      "reason": "This update changes repository authoring workflow instructions, not effect-api-query library behavior or its shipped consumer guidance.",
+      "evidence": [
+        "Reviewed .agents/skills/setup-matt-pocock-skills/issue-tracker-gitlab.md in git diff origin/main...a25f72a; _artifacts/skill_spec.md scopes the shipped skill to library consumer tasks. vp run skills-check passed."
+      ]
+    },
+    "source:.agents/skills/wayfinder/SKILL.md": {
+      "fingerprint": "9b5f7461ba51d81c0e069edb3ce3e42dcaa8bbc6190c195b7c8ba9fca4ae6a8d",
+      "snapshot": {
+        ".agents/skills/wayfinder/SKILL.md": "0c9fa96791aebf3b7d654cf35c6aadde97d81f57c17b07d13b27c14d9c46561f"
+      },
+      "head": "a25f72a2a4a16b27ade7bec904535262d71ff267",
+      "outcome": "out-of-scope",
+      "reason": "This update changes repository authoring workflow instructions, not effect-api-query library behavior or its shipped consumer guidance.",
+      "evidence": [
+        "Reviewed .agents/skills/wayfinder/SKILL.md in git diff origin/main...a25f72a; _artifacts/skill_spec.md scopes the shipped skill to library consumer tasks. vp run skills-check passed."
       ]
     }
   }
