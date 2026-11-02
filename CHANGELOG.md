@@ -1,5 +1,19 @@
 # effect-api-query
 
+## 0.5.0
+
+### Minor Changes
+
+- [#154](https://github.com/ueberBrot/effect-api-query/pull/154) [`2e586d9`](https://github.com/ueberBrot/effect-api-query/commit/2e586d9fddaebe1b58a938a702ce0f2920baada0) - Require Query Core >=5.104.4 <6 so infinite-query refetches preserve a cached null first page parameter.
+
+### Patch Changes
+
+- [#154](https://github.com/ueberBrot/effect-api-query/pull/154) [`2e586d9`](https://github.com/ueberBrot/effect-api-query/commit/2e586d9fddaebe1b58a938a702ce0f2920baada0) - Omit HTTP streaming request payloads and protocol upgrades from generated utility trees and their inferred types.
+
+- [#154](https://github.com/ueberBrot/effect-api-query/pull/154) [`2e586d9`](https://github.com/ueberBrot/effect-api-query/commit/2e586d9fddaebe1b58a938a702ce0f2920baada0) - Preserve HTTP client service and error inference with Effect's streaming-payload generic. Service-free clients still need no runner; clients requiring services retain their runner requirement.
+
+- [#154](https://github.com/ueberBrot/effect-api-query/pull/154) [`2e586d9`](https://github.com/ueberBrot/effect-api-query/commit/2e586d9fddaebe1b58a938a702ce0f2920baada0) - Update the exact Effect peer to 4.0.6. Applications must use the coordinated Effect 4.0.6 packages.
+
 ## 0.4.0
 
 ### Minor Changes
