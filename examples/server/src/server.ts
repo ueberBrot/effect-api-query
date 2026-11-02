@@ -78,7 +78,9 @@ export const startExampleRpcServer = Effect.fn(
     );
     const app = Effect.gen(function* () {
       const request = yield* HttpServerRequest.HttpServerRequest;
-      const url = HttpServerRequest.toURL(request);
+      const url = HttpServerRequest.toURL(
+        request.modify({ url: request.originalUrl })
+      );
       if (
         Option.isNone(url) ||
         url.value.username !== "" ||

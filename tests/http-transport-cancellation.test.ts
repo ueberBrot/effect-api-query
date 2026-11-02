@@ -35,7 +35,9 @@ describe("HTTP transport cancellation", () => {
           const requestReceived = yield* Deferred.make<boolean>();
           const requestDisconnected = yield* Deferred.make<boolean>();
           const interruption = yield* Deferred.make<Cause.Cause<unknown>>();
-          const runSync = Effect.runSyncWith(yield* Effect.context());
+          const context = yield* Effect.context();
+          const runSync = Effect.runSyncWith(context);
+          const runExit = Effect.runPromiseExitWith(context);
           const paths: string[] = [];
           const server = createServer((request, response) => {
             paths.push(request.url ?? "");
@@ -75,7 +77,7 @@ describe("HTTP transport cancellation", () => {
           let requestSignal: AbortSignal | undefined;
           const runPromiseExit: RunPromiseExit = async (effect, options) => {
             requestSignal = options?.signal;
-            const exit = await Effect.runPromiseExit(effect, options);
+            const exit = await runExit(effect, options);
             if (Exit.isFailure(exit)) {
               runSync(Deferred.succeed(interruption, exit.cause));
             }

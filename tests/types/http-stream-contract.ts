@@ -67,6 +67,53 @@ const WrappedBytes = HttpApiEndpoint.get("wrappedBytes", "/wrapped-bytes", {
     etag: Schema.String,
   }),
 });
+const Ndjson = HttpApiEndpoint.get("ndjson", "/ndjson", {
+  success: HttpApiSchema.StreamNdjson({ schema: Schema.String }),
+});
+const WrappedNdjson = HttpApiEndpoint.get("wrappedNdjson", "/wrapped-ndjson", {
+  success: HttpApiSchema.WithHeaders(
+    HttpApiSchema.StreamNdjson({ schema: Schema.String }),
+    { etag: Schema.String }
+  ),
+});
+const MixedNdjson = HttpApiEndpoint.get("mixedNdjson", "/mixed-ndjson", {
+  success: [
+    Schema.String,
+    HttpApiSchema.StreamNdjson({ schema: Schema.String }),
+  ],
+});
+const Upgrade = HttpApiEndpoint.get("upgrade", "/upgrade", {
+  success: HttpApiSchema.Upgrade({ protocol: "tcp" }),
+});
+const UploadBytes = HttpApiEndpoint.post("uploadBytes", "/upload-bytes", {
+  payload: HttpApiSchema.StreamUint8Array(),
+  success: Schema.String,
+});
+const UploadNdjson = HttpApiEndpoint.post("uploadNdjson", "/upload-ndjson", {
+  payload: HttpApiSchema.StreamNdjson({ schema: Schema.String }),
+  success: Schema.String,
+});
+const MixedUpload = HttpApiEndpoint.post("mixedUpload", "/mixed-upload", {
+  payload: [
+    Schema.Struct({ name: Schema.String }),
+    HttpApiSchema.StreamNdjson({ schema: Schema.String }),
+  ],
+  success: Schema.String,
+});
+const MultipartUpload = HttpApiEndpoint.post(
+  "multipartUpload",
+  "/multipart-upload",
+  {
+    payload: [
+      Schema.Struct({ file: Schema.String }).pipe(HttpApiSchema.asMultipart()),
+      HttpApiSchema.StreamNdjson({ schema: Schema.String }),
+    ],
+  }
+);
+const Duplex = HttpApiEndpoint.post("duplex", "/duplex", {
+  payload: HttpApiSchema.StreamUint8Array(),
+  success: HttpApiSchema.StreamSse({ data: Schema.String }),
+});
 const Multipart = HttpApiEndpoint.post("multipart", "/multipart", {
   payload: Schema.Struct({ name: Schema.String }).pipe(
     HttpApiSchema.asMultipart()
@@ -89,10 +136,19 @@ const api = HttpApi.make("stream-contract").add(
     Mixed,
     Bytes,
     WrappedBytes,
+    Ndjson,
+    WrappedNdjson,
+    MixedNdjson,
+    Upgrade,
+    UploadBytes,
+    UploadNdjson,
+    MixedUpload,
+    MultipartUpload,
+    Duplex,
     Multipart
   ),
   HttpApiGroup.make("system", { topLevel: true }).add(Events),
-  HttpApiGroup.make("omitted").add(Bytes)
+  HttpApiGroup.make("omitted").add(Bytes, UploadBytes, UploadNdjson, Upgrade)
 );
 declare const client: HttpApiClient.ForApi<
   typeof api,

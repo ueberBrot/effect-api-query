@@ -9,20 +9,20 @@ The package is ESM-only and targets ES2022. It declares Effect and Query Core as
 
 | Component | Declared requirement | Exact versions checked |
 | --- | --- | --- |
-| Effect | Library peer: `4.0.4` | Runtime, testing, and Node platform packages: `4.0.4` |
-| Query Core | Library peer: `>=5.103.1 <6` | `5.104.2` |
+| Effect | Library peer: `4.0.6` | Runtime, testing, and Node platform packages: `4.0.6` |
+| Query Core | Library peer: `>=5.104.4 <6` | `5.104.5` |
 | TypeScript | Public declarations: 5.9 or newer, with `strict: true` | `5.9.3` and `7.0.2` |
-| React and React Query | React Query peer: React `^18 \|\| ^19` | React `19.3.0`, React Query `5.104.2` |
-| Vue and Vue Query | Vue Query peer: Vue `^2.6.0 \|\| ^3.3.0` | Vue `3.5.43`, Vue Query `5.104.2` |
-| Solid and Solid Query | Solid Query peer: Solid `^1.6.0` | Solid `1.9.15`, Solid Query `5.104.2` |
-| Svelte and Svelte Query | Svelte Query peer: Svelte `^5.25.0` | Svelte `5.57.1`, Svelte Query `6.3.0` |
-| Angular and Angular Query experimental | Angular Query peers: `@angular/core` and `@angular/common` `>=16.0.0` | Angular `22.2.1`, Angular Query experimental `5.104.2` |
+| React and React Query | React Query peer: React `^18 \|\| ^19` | React `19.3.1`, React Query `5.104.5` |
+| Vue and Vue Query | Vue Query peer: Vue `^2.6.0 \|\| ^3.3.0` | Vue `3.5.44`, Vue Query `5.104.5` |
+| Solid and Solid Query | Solid Query peer: Solid `^1.6.0` | Solid `1.9.17`, Solid Query `5.104.5` |
+| Svelte and Svelte Query | Svelte Query peer: Svelte `^5.25.0` | Svelte `5.57.2`, Svelte Query `6.3.5` |
+| Angular and Angular Query experimental | Angular Query peers: `@angular/core` and `@angular/common` `>=16.0.0` | Angular `22.2.3`, Angular Query experimental `5.104.5` |
 
-All listed Query wrappers resolve Query Core `5.104.2` in the checked combinations. Svelte Query `6.3.0` declares Core `5.104.0`; its checked combination uses a package-manager override to resolve `5.104.2`. Keep the application's Query Core and its wrapper's Core dependency on one resolved version.
+All listed Query wrappers resolve Query Core `5.104.5` in the checked combinations without package-manager overrides. Keep the application's Query Core and its wrapper's Core dependency on one resolved version. The `5.104.4` minimum preserves a cached `null` first page parameter during infinite-query refetches.
 
 Vue Query also declares an optional `@vue/composition-api` peer of `^1.1.2` for Vue 2.6 applications. The checked Vue combination uses Vue 3.
 
-The application examples also use TanStack Start `1.169.1`, TanStack Router `1.170.44`, and Router SSR Query `1.167.3`.
+The application examples also use TanStack Start `1.169.4`, TanStack Router `1.170.46`, and Router SSR Query `1.167.3`.
 
 The stable Effect release contains unstable RPC and HTTP API modules. The application's Effect packages must stay coordinated with the exact peer. See [Compatibility and Stability](/effect-api-query/getting-started/compatibility-and-stability/).
 
@@ -37,7 +37,7 @@ Generated Core options support native reactive accessors and retain each framewo
 | Ordinary queries, pagination, mutations | Unary RPCs | Buffered endpoints without multipart, regardless of method |
 | Accumulated and live streams | Streaming RPCs | One unambiguous SSE success without multipart |
 | Buffered multipart uploads | Client and payload contract owned by the application | Mutation-only, with `FormData` supplied by the application |
-| Streaming multipart and raw byte streams | Client transport contract | Omitted endpoints |
+| Streaming request payloads, raw or NDJSON responses, and HTTP upgrades | Client transport contract | Omitted endpoints |
 | Response metadata | Declared RPC result | Buffered decoded data with plain snapshots of status and headers |
 | Conditional reads | `skipToken` for input-bearing query builders | Same, including buffered metadata |
 | Query cancellation | Signal forwarding and iterator cleanup, with server interruption determined by transport | Same, with fetch able to abort the pending request |

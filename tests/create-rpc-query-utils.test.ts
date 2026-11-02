@@ -19,13 +19,14 @@ describe(createRpcQueryUtils, () => {
     () =>
       Effect.gen(function* skipPayloadQuery() {
         const client = yield* makeClient();
+        const runExit = Effect.runPromiseExitWith(yield* Effect.context());
         let executions = 0;
         const utils = createRpcQueryUtils(group, {
           client,
           keyPrefix: ["app"] as const,
           runPromiseExit: async (effect, options) => {
             executions += 1;
-            return await Effect.runPromiseExit(effect, options);
+            return await runExit(effect, options);
           },
         });
         const supplied = Object.freeze({

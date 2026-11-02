@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "5f1df64e512821c6caf8c23a05696e3bbdf04161e640959f80b3119d9687acae",
+      "fingerprint": "b8ac7e474a87dc135c2f6606b04b107850b52d04f973d01a9e75a96651938720",
       "snapshot": {
         "GLOSSARY.md": "9f7734ff552aa9a5c2b112f7948b5001ca82341a7acbc787ee5f7131b7be340a",
         "README.md": "d026d347122dbdf67569951c58f8ee35fd7130ded3fe5fedcbdf29aa3183d8c7",
@@ -16,12 +16,13 @@
         "apps/docs/src/content/docs/examples.md": "4043a5febebac1f55cb80e8f9c4214c6c03b9b11e3599ab77bc9ab6a4b99d204",
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "022014147e137abdac686d6d3c58f4eff1e8098dd2241a3cccd96abe5051cd26",
         "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "2d5a1e2b2693858be02cece01dca1bbaaa68a256a00beeab9066d37a30801abe",
-        "apps/docs/src/content/docs/getting-started/feature-support.md": "28acb9ebb8472a2b4d11fbfa6ab99c913033a79c84abfa4f4248382434fb6db0",
+        "apps/docs/src/content/docs/getting-started/feature-support.md": "858891f5093cd32d2d278be7780cd25a75c97ca77306668f368860f20aff106e",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "d8887c6d4180d60a1127957e073c180528474258c697c1305b6a7bb846e27671",
         "apps/docs/src/content/docs/getting-started/installation.md": "6c71b6132f8c61c26fc466e23bed9a44dac45c441cbc491997d62a43dfda9d5f",
         "apps/docs/src/content/docs/getting-started/quick-start.md": "91ddca16ad5c0f484d88a9d3b42d37065ee3a3bfd088bd6f1b25a45e96283788",
         "apps/docs/src/content/docs/guides/angular-query.md": "beb279a2ef34d1e69e685bcd8dbeddb0fafb0228ede9107dd9f95d86f9e5c72c",
         "apps/docs/src/content/docs/guides/cache-filters.md": "b0b8a08b6e2f3484a2565b6bd6d080cd1e95b3e9aefcb5aaf121cd7a96ad2591",
+        "apps/docs/src/content/docs/guides/cache-management.md": null,
         "apps/docs/src/content/docs/guides/cancellation.md": "7af74ddcb64ddc5454e3d8b4326a79b9683f1d744537c2b2f267e61a9447274b",
         "apps/docs/src/content/docs/guides/choose-stream-history.md": "9b3456e54724adb1480984fbb294454b68e8d4b80d8e7a2385940cf96dd81a05",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "cb941076de91c32bc0a1a5e8f6463ea521457210c00ccf4ef4e7de7c5fd135e9",
@@ -45,7 +46,7 @@
         "apps/docs/src/content/docs/guides/stream-snapshots.md": "cba3b0d2de49c59d3abacabde4c594ce93158a408c8621f72101ea203d110cab",
         "apps/docs/src/content/docs/guides/streaming.md": "1c15b217f6d485739a57c720bea7f05a648cd5c50efe58086bf16cb35967e457",
         "apps/docs/src/content/docs/guides/suspense-and-recovery.md": "927149842d56dd9432cedea9bccc17c69b5debc869eb3c50aefb366f07019714",
-        "apps/docs/src/content/docs/guides/svelte-query.md": "bec1e54885429b88b78aedf538171322f751d7f8497e6ad7faa131345b30c4c6",
+        "apps/docs/src/content/docs/guides/svelte-query.md": "0d9cca47e1ba9dec49af772d860ffa2723968ae7ad90de7a19bd00821ad33bbe",
         "apps/docs/src/content/docs/guides/switch-cache-owners.md": "5291d4e7ef519ecda12eec08eddbb4e3af7c9f06c2c8baa42d4fbc777d34368d",
         "apps/docs/src/content/docs/guides/tanstack-start.md": "36a09d74aa451cdca5eb30c2bae04223cecac57a4900317023ad0125f74f020d",
         "apps/docs/src/content/docs/guides/trace-streams.md": "0e671596f180c092f79460a83ba5a48549843a681f7b9e7301280122b04e0945",
@@ -54,13 +55,13 @@
         "apps/docs/src/content/docs/index.mdx": "ef6dbddd50fb3c5fff33944435d7b394a5852a1f71846f0a19ea204c3f415f5b",
         "apps/docs/src/content/docs/integrations/index.md": "027d9c9a2a06946be8771f3d33718e9097e59b689050d3ba51df05aa95ea6bda",
         "apps/docs/src/content/docs/reference/browser-and-worker-hosts.md": "400abc16a961005b5234f061861af70e6cf6199e9ea2a71b6c034e45fab54cb6",
-        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "3573d133f7d5d36faeeb4816d34161ea2e449bc4e6602d00f74252a16fbc21cb",
+        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "ed0b85e5d1edbccad9add329276d1d6de8d674c1f2155e3b1e0a83fe47171136",
         "apps/docs/src/content/docs/reference/errors.md": "8e1708ec387f57fe80de89f9e8e8367cf7b62f53fd52968910469b8a9db79092",
-        "apps/docs/src/content/docs/reference/external-http-clients.md": "3932c41cd3694f1fb66c4267dcb7e60be839c15ebd838945cca2222d4aa75f8e",
+        "apps/docs/src/content/docs/reference/external-http-clients.md": "3589aca0e2cf488b8f7f5978c8ecdee8f29a4f7bbb959f8cb25ae04536cec839",
         "apps/docs/src/content/docs/reference/factory.md": "9a2c6c1b76b484cfda17b32d0e6bc21af60689b8dae2400f0c559354dad09653",
         "apps/docs/src/content/docs/reference/generated-builders.md": "e56a363220dc887f84278dd5076b6fb352a317c1b423d56a1c90bd6f08948ff6",
         "apps/docs/src/content/docs/reference/http-builders.md": "c60400e0416974e92436f050500cf0cf6ca423eb08d6a2f17b2f53dac2d54dfe",
-        "apps/docs/src/content/docs/reference/http-factory.md": "68e37af13dcbfb2dca4c431a3b5eb2e29e7683dc8068770de59ae5885071350f",
+        "apps/docs/src/content/docs/reference/http-factory.md": "83c92343a1516c58dbc8adaa077e0a83e5ec8e9cf4953bec75b1a42190364730",
         "apps/docs/src/content/docs/reference/performance.md": "43c17a9e6159c97bde08c2ed191ccd0035c5574faf7a4b52f6eec2b5c08fa725",
         "apps/docs/src/content/docs/reference/public-exports.md": "42a8b78390655ed291576557435e8d610ee7fabe05223e27840c553580d7f9ea",
         "apps/docs/src/content/docs/reference/type-inference.md": "a60819bcd3b5f7887efe97c1e6aabfdcf1822197abdd209b9d3820d33f4428b5",
@@ -73,7 +74,7 @@
         "docs/adr/0007-keep-the-core-factory-lifecycle-neutral.md": "243527d723753f8c31fd2484130af5af663cbfd03a3709178b7af7ba47c93079",
         "docs/adr/0008-use-flat-prefix-matchable-key-tuples.md": "959563881314648542065683d90989d0cf14c7c5585065a2b6fba32fcbec76d0",
         "docs/adr/0009-build-an-eager-frozen-utility-tree.md": "6490cf58890014f3e50d1b67ba88d4fdd9cbecc578e1788234b4fe193e2e14c7",
-        "docs/adr/0010-reuse-tanstack-query-core-as-a-peer.md": "3045be2068a757fe97611f7f92863895a0b43857666da70e2c40635963e4aefc",
+        "docs/adr/0010-reuse-tanstack-query-core-as-a-peer.md": "43cf265b5b080b863ab936056ca40b5d83379bf70b425fffc88178b06ec3b84e",
         "docs/adr/0012-normalize-undefined-query-success-to-null.md": "e07335454852d9ac3c8b2529ad414dbee59d57f2265ccf86b595e65092feb309",
         "docs/adr/0014-require-query-stable-payload-construction.md": "2c0a2fefeb20197712e85ca598e18c8a7d74b55f9cfbb74a0cfaf532f18aec04",
         "docs/adr/0015-centralize-the-toolchain-in-vite-plus.md": "8daa6120ef9f4095c74d132ae6bd69ebd85ac9ee9dea4d6c9b238ebee66c692c",
@@ -98,14 +99,14 @@
         "examples/server/src/main.ts": "a207ef4208f09ae04f4fececb76750ceecf7e48a5ce237787fd3c9e537167382",
         "examples/server/src/rpc-handlers.ts": "53dfae7c99caea1e40991e72a15d3bc608037ba6174d0044706908090219e203",
         "examples/server/src/server-local-rpc.ts": "f6098b0f17ae1cab08620c31eac7ff698c7ac170847e88c3c7b6b92858ca2e56",
-        "examples/server/src/server.ts": "91e49c0a99accdf962d2f09ad2fe10bcddfe5ad693ec451630e14cf786b44390",
+        "examples/server/src/server.ts": "4363f437b79ce650fd35f2951ea20aa73ce12fdde5496da836ebb50dd0e4b60d",
         "examples/server/src/users.ts": "1e33093f76a3b46461e1c41a067d10483fd0bf6b8d8e840ed15ceafdf32728b3",
         "examples/server/src/web-handler.ts": "d9b38d8b14f243fdf7652407e230d4fde07413d345e6e1a528c2f7a1e81adcee",
         "examples/server/tests/fixtures/websocket-server.ts": "e3797d32b50ed5aae5cf07e4d0d3617e7dbfc7ef7404d032c7abde8f49de5249",
         "examples/server/tests/http-api.test.ts": "3d341c3a2d370562d7a04413adc179eed6aa822eb808a058deae09d6791ba0d4",
         "examples/server/tests/rpc-transport-overhead.test.ts": "adbd2e30e9a9f0d85badd22eddc9585c193c09949c179a03536441e46320547d",
         "examples/server/tests/rpc-websocket-consumer.test.ts": "e5092fd7e402a0010c2d6c6426e09c407622528c9a0cd0dd41d0f3c826d1fed1",
-        "examples/server/tests/server.test.ts": "d53460785d03c5692c71185a03f4cbc93c028054136d3397d722ad8c40059199",
+        "examples/server/tests/server.test.ts": "5c9c176fcccf73c0c610502dd6b0f3c21946b1681538a6e033ee593b9bfa4934",
         "examples/server/tests/web-handler.test.ts": "50fdbcacf42c64315356864adc530c4e99e50e65447187d9ce55424372b741c1",
         "examples/shared/error-description.ts": "713eaabd91110a7b9fe64d022b9b22e6488a50905587582c111f38cdb04787bc",
         "examples/shared/use-slow-query-cancellation.ts": "872ea8e5ef8b97b2d6def07a8cc5c79a885099ffb6e60ebf6db6e39b9aa628f1",
@@ -140,8 +141,8 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "9ef089cb4dee4b1b7cf5bf1d44e1a54d358e9a250bfaf9b4a7875146f90b5d81",
-        "pnpm-workspace.yaml": "c55847022106dd11f2b32990131c248d9851a4672486cd70fba63536da4d4051",
+        "package.json": "262244bdf1d582898e42c2d0727551de351fb435b2f9294eac97a0f4796bfa54",
+        "pnpm-workspace.yaml": "084718189418309a74c475346ff68d07efce92048f0254121a535126a74c7150",
         "scripts/check-framework-consumers.mts": "37fc0fc0006c2b1f35c5cff85754612e0b74d89eed608e353ef5f18f05fce051",
         "scripts/measure-bundles.mts": "5a033ce9f9a4cf414632b6f2781a50c0354f1cf9996791a547a5d53dbef66d7a",
         "scripts/measure-construction.mts": "fa7f8bf47d2f642df04be94f2f9f2253b9f5208272fbeb5be9ae79b4c3fb86a8",
@@ -149,11 +150,13 @@
         "scripts/measure-types.mts": "c6d92caa7ba074970bce28c268cbf49e70b57f6dbdc2755d38d33961b2afc2fc",
         "scripts/performance/common.mts": "57a2003d9769d884d1a0884cab5449cfce79c40300de8d0202d3f1780d51c4f5",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
+        "scripts/verify-docs-examples.mts": null,
+        "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
-        "skills/effect-api-query/SKILL.md": "a1bd64affe7212683b33afebf00fc860a50563cb8c8b3f02bd5750aac8108027",
+        "skills/effect-api-query/SKILL.md": "6cb3209b2207caf3b3bb8fc015836a94394b7dfc50b7c462ca329a286923a4a5",
         "skills/effect-api-query/references/cache-workflows.md": "47391e59a11e2adb946470872a5585be8bbcbf4765292e87117382aa99df1379",
-        "skills/effect-api-query/references/frameworks-and-hosts.md": "78ca653a453a11e17438cf59e46226d13dbc5fce761fc6ef70de7e398b209774",
-        "skills/effect-api-query/references/http.md": "1c1a6301b43010f7032b27d15757a37e35cb4f07c44fff68f77b3a851a8eefd2",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "13481aaf265896bddaaf5e908ffed945e3719fe1cd60ca638e3dd47329d07d4d",
+        "skills/effect-api-query/references/http.md": "73eb5febbe01ba10e6b954c17c80df9eff5343feca37be516f44e85761fb3cd0",
         "skills/effect-api-query/references/hydration-and-ssr.md": "7e8c6566a6f5e46f2f7711e7745bef84be58f5354bb797ed411c05b819d601d2",
         "skills/effect-api-query/references/query-patterns.md": "867ee139dec9a61f7f0a75192df9ba88c46a04e8251d0c25f4be7653c1fd5d39",
         "skills/effect-api-query/references/rpc.md": "7bfc134371d723b24da15a0bc07b1022daaddf6e0b47cb281900c147f78e9c59",
@@ -183,9 +186,9 @@
         "src/http/create-utils.ts": "8d128bb9646e095456d3dcf696f1aa6e365d0de328df571c64eea7421935c9f5",
         "src/http/errors.ts": "afa6e7a015a257683ec8d96d5d5da1ffc25a79b0ff498fddb538e059af7643b3",
         "src/http/operation.ts": "65649385d028c2949a5846c816abedcd4cf33cb29440d71cbd1fce159eca8c43",
-        "src/http/request.ts": "f7045e0fce72c566528191c215334cd6062e47e451b68da69cc16e325ce2af48",
+        "src/http/request.ts": "8e83f98a0878899e5e7a03a0db9e3b9f0024d902110947b80b55b527165c96e7",
         "src/http/streamed-query.ts": "7db210acc1e4406d6ef2c77d2f9722793681ee083706271b427aa7ae876fb473",
-        "src/http/types.ts": "b0021804eb179a5d020273f70890d45a0b10ad6f00e8daa2f68422fbb0e1514e",
+        "src/http/types.ts": "7747a0f50d33a712111b6def057b94fe58f2d7495ae79ff62eccd555cf65107d",
         "src/index.ts": "f863d2df2403dd7fb92deabd2448f392fa9b0eb7bb283e837d091967b324fe89",
         "src/rpc/create-utils.ts": "8ebf030b0f76f91c248434c169d789d6328d2ba43c07afe15e04db0a02f05c2c",
         "src/rpc/errors.ts": "8e1fbcc7843b2bf99e9d80bfd365dc118d52351909d5c8f48c46ba9d39fdedd3",
@@ -194,19 +197,19 @@
         "src/rpc/types.ts": "3d113d88ba6fbf6277eb86eb760283eac51107d91901e2b88f67a9a36fee839c",
         "tests/cache-recipes.test.ts": "fb95bbbba35f8bcf9661c993a61385f3186d935bb5626da6181d8ce9e6a9a49e",
         "tests/configuration-composition.test.ts": "f904dc41d7f084cbf06b6e7c1b57a4154aec53b6736b9602b2b50accfd0c21dd",
-        "tests/contract-reuse.test.ts": "93c39828169192fa4364a782224f8598cbb11f2b8b2f0a36458cd413a53da299",
-        "tests/create-http-api-query-utils.test.ts": "efc1b3840a4daf284aa82d787f05f8a14f9d79bde01f5eb6e34ff0feb588c67a",
+        "tests/contract-reuse.test.ts": "ef45d0a7116c56bdff46decb93cb4cd8f55baa1836edc0382434742f27249747",
+        "tests/create-http-api-query-utils.test.ts": "da5759a5e06dc83054c731aa9ff4e5b8724b9d7e78fc1cafb5298937d014644d",
         "tests/create-rpc-query-utils-configuration.test.ts": "8745f2b561882bd4789e79cf8132e214959beaa6c053974f4b7a6de61d803778",
-        "tests/create-rpc-query-utils-execution.test.ts": "5c35b980a01a6a4cfee91f0adef5580d45d00df9dd329934b3cb0b2e8a4423f1",
-        "tests/create-rpc-query-utils-keys.test.ts": "c7195f94a388dcc00d3f794994a45b67e5c577db1d35c663bd72ecbbfeb7acf4",
+        "tests/create-rpc-query-utils-execution.test.ts": "9166e4de93bb762b6ef00c1bc14ba3c35bfb507469adc176a35e0bebfa74a3d6",
+        "tests/create-rpc-query-utils-keys.test.ts": "4aafc6adf8364088882cbe3b918c8992cfcc35643c3b53f8eb425afbacad5321",
         "tests/create-rpc-query-utils-request-options.test.ts": "548e1c87ad52f2a7ea73704624e6b5ea06a64dfe696da6a6e05f4a832783223b",
         "tests/create-rpc-query-utils-server-local.test.ts": "281d15e89cc0e13a846a03165069c54e733d77d4985bb246aa42034f67d4ed0d",
         "tests/create-rpc-query-utils-stream-baseline.test.ts": "0b0797be419e51a09c63f06c03f42a2538a37bf2d9838871952da071fe9483b4",
         "tests/create-rpc-query-utils-stream-cache.test.ts": "d4e2e57da0ff1993f8e47082414a994f762c48a8bd38c6f7e75a809956dbbea3",
         "tests/create-rpc-query-utils-stream-hashing.test.ts": "3ec2de67c2f447b7f8ee003e9d8c1c0d19f1c9a787440a64c21df103ab9c044b",
         "tests/create-rpc-query-utils-stream-publication.test.ts": "f0f6919a98e3c4efd59ab39a7c8f2a2efb817c0b55913cd82c034126c8d5e459",
-        "tests/create-rpc-query-utils-streaming.test.ts": "a5cc91c668ab56f3712bbe07d2eb3c76a36cfad1a8417077650258bd5d4b140a",
-        "tests/create-rpc-query-utils.test.ts": "f811363b51ee1cd8d22ef36010d04e21da3389316a83bbc31f0dd7ead54bcfa4",
+        "tests/create-rpc-query-utils-streaming.test.ts": "6f0fccd52258df72d1bb471bd04873426708209fa48e0b9c3a0c831d9002f5a1",
+        "tests/create-rpc-query-utils.test.ts": "b6ccee687718bbd528819f497ba2ac09acfe06a1400c5bb38b863eb082f0776f",
         "tests/docs-examples.test.ts": "7db41e628f07e9ec6aa15b5629b95b004f9949c29f320e91875acbec1f3a3fb6",
         "tests/docs-release.test.ts": "089218597c9c8c9fdce5037b0537426a232ef7466e697d683bc32fb7d4492ae8",
         "tests/execution-interceptor.test.ts": "9c8a26e24cdd5807a4dca68bfdd88663246b3a5632483581ec3cbd4cdcf69b9a",
@@ -227,14 +230,14 @@
         "tests/framework-consumers/svelte.ts": "652f8d97d781803239ca667497768077167fffaabec851d5a076f692c376223c",
         "tests/framework-consumers/vue.ts": "e23859e5fe8f8e24a55d8e782dd2880d1a6d88859bdf40ff7b60e8b0c150ab50",
         "tests/http-cached-views.test.ts": "c885510d4b14084a28b5a5389d30a5dbd01949705e7f0163552f8bd2ef3060db",
-        "tests/http-execution.test.ts": "3f8f15333ead419d5ae9e0502bc4d7359f9ceed83cf926917398213bd79e64c3",
+        "tests/http-execution.test.ts": "064730968e39333e717a08dab15c9cb2455974c8d0f06cdbcd6768bf992c1d53",
         "tests/http-hydration.test.ts": "51da967534267d49dc91f577f43a54fc88045cce8f89623c1106df8c88c21570",
         "tests/http-live-query.test.ts": "e4ed31b68185eba7e80587815ee9bd2ca0573639c2695edf2af0532aa42ac269",
         "tests/http-metadata-options.test.ts": "702a73eb9e005d038d35c233806a065ab4da7d35fa1255df336711bd09be96d4",
         "tests/http-multipart.test.ts": "331f18bf9730579f05513d3ab93734b8118e313b219604e8c0276c07110476ae",
         "tests/http-query-options.test.ts": "e7b2ca44c44cd8402ca688960458e1190c54c68845556fc4ea5d131ab8649891",
         "tests/http-semantic-keys.test.ts": "c43a3d43b2224d64c1eb11ac2877c4c4a2c866efd67c1781bb1992439a85b5fb",
-        "tests/http-transport-cancellation.test.ts": "38c9805b9feb5e35af235ec4ea1ffdc0430e5453c1f2b2a6c8378968853f90b8",
+        "tests/http-transport-cancellation.test.ts": "0ba26a9bae56b26605fc03009c1f50fe90930356d0fa0c4ec4ddc5c120430f00",
         "tests/hydration-codecs.test.ts": "58d641238310a23fbcce9620a9ec65377f69a98746fbf2a45b87f8f49cd46465",
         "tests/publication-deadline.test.ts": "2797557ff14bf8527ea446cec1e1d7c61cd3666f11f127e640c53ce5d7e30868",
         "tests/query-filter.test.ts": "ff531a86816872cd2cadf01d79bd9d9ff5be1895bab150330a90aa8375508004",
@@ -275,9 +278,9 @@
         "tests/types/example-owner-contract.ts": "ed58343a4a7da9606e07703d19f3c0470e25923c81de357c0dbfd1258c3fc439",
         "tests/types/generic-client-error-contract.tsx": "f0b2f55deffde27ff745209485f9f8b817e4e537e8c60efd345946b77cf54bd9",
         "tests/types/helper-contract.ts": "0021a5b845c65f608ed5dd429227752ceb32784e75c198b01868f017120a7aa1",
-        "tests/types/http-contract.ts": "0b145ff73820cb8f5adf8c72df9d2e116fd0f2edebf52ddf128173cb1da939ba",
+        "tests/types/http-contract.ts": "aec3b157d4f6a3a22e8e2cf39333caa8b9e41b01dac16c11f1f6c40a681ea1e3",
         "tests/types/http-empty-success-contract.ts": "00ccdb360edc598b9bc6c8a7708dab6b7ca85cf267ce7caa9a81a6b52f2868d5",
-        "tests/types/http-stream-contract.ts": "cb596e26cc668ec1d78bd38cbdabd2c32044479a4ea7dbb204762d8ea197e77a",
+        "tests/types/http-stream-contract.ts": "deb4d7766f1a140a511fb137b9a6d834a992abc8257498e2b3349fcc6e746b85",
         "tests/types/http-type-scale.ts": "447d34e1fa952c843a866fd4dcde80dd32390f7ff14ba701b1960f45bc1292ce",
         "tests/types/http-view-proof.ts": "0b66f30863c5451d47144980af9cf5517637c8f7ca7866b64d1a704cea089413",
         "tests/types/hydration-contract.ts": "a95471deb61aab482a8fd8189980cd87e94de733ff2bee1d89bb8ca1f7ba30f4",
@@ -299,24 +302,24 @@
         "tests/utility-configuration.test.ts": "a1ba1df1e174a6d8e8224a65483b961d2185c774fd84de78c1482626a5f78edd",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "9b3565f84f25b96887f3589caf346076edc437d0",
-      "outcome": "no-change",
-      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
+      "head": "848ea4bfa501ec60d65c83bd801b4e16f121807d",
+      "outcome": "updated",
+      "reason": "Updated exact Effect and minimum Query requirements, omitted resource-bearing HTTP endpoints, and removed the obsolete Svelte override recommendation. Existing task boundaries and activation remain unchanged.",
       "evidence": [
-        "Before versioning: intent maintainer check passed at 9b3565f84f25b96887f3589caf346076edc437d0.",
-        "changeset version and vp fmt generated 0.3.0 -> 0.4.0.",
-        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
-        "Scoped generated changes: package.json."
+        "vp run --no-cache quality:17/17 tasks passed,761 runtime tests, public TS7/5.9 fixtures, packed Vue/Solid/Svelte/Angular consumers, Effect diagnostics and Fallow audits.",
+        "Vite React, TanStack Start and documentation builds passed.",
+        "Fresh isolated consumer loaded the packaged skill via Intent and passed nullable pagination, service-free HTTP and omitted-endpoint behavior at Query5.104.4 on TS7.0.2 and TS5.9.3. Automatic discovery was not evaluated.",
+        "Static review found no concrete issues. Chromium/Firefox documentation checks passed; local WebKit lacks system libraries."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "2225851887c4ca69b7bd9c26eedebcdcb4a99e87eba80e3e5661eab7348696f0",
+      "fingerprint": "59454eb30ca0fee4aa768f303223c8cf85b4301a8198bb4eac7bf64598c3199f",
       "snapshot": {
         "GLOSSARY.md": "9f7734ff552aa9a5c2b112f7948b5001ca82341a7acbc787ee5f7131b7be340a",
         "README.md": "d026d347122dbdf67569951c58f8ee35fd7130ded3fe5fedcbdf29aa3183d8c7",
-        "_artifacts/domain_map.yaml": "f78d7ce4a0046d41189ea078b367e3ba291ae859cb068b1526f14e28363e6973",
+        "_artifacts/domain_map.yaml": "be33e4cc6c721f5aa4824586dc7bf0cfd734ee030812992dc7c31ccae1ed3162",
         "_artifacts/skill_spec.md": "9cd1c27e11af845ad7630c880c9c851637253af71cb690b2b8bc5d81e4013277",
-        "_artifacts/skill_tree.yaml": "1719e9ac0e145adbe333288d98f80183536b36e92af307eacf69af9491b230d6",
+        "_artifacts/skill_tree.yaml": "5dbd3651a9290d6f1ea5fc369233ffdeca25925936bf1a40573fe1e712cd7925",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "bc035d79c362da5d8279115598b3d4bbe10073a0798eb75054c53e2922afdc35",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "36087588f413acfde2566fe7b8f0baeb04061a2b6fc1487ac81c4cc99a90f0e6",
         "apps/docs/src/content/docs/concepts/http-utility-tree.md": "a1c682ccbfaeaf44e9e4a9cf507d3504a9acfce57aa6b41e074590c67f6d6542",
@@ -326,12 +329,13 @@
         "apps/docs/src/content/docs/examples.md": "4043a5febebac1f55cb80e8f9c4214c6c03b9b11e3599ab77bc9ab6a4b99d204",
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "022014147e137abdac686d6d3c58f4eff1e8098dd2241a3cccd96abe5051cd26",
         "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "2d5a1e2b2693858be02cece01dca1bbaaa68a256a00beeab9066d37a30801abe",
-        "apps/docs/src/content/docs/getting-started/feature-support.md": "28acb9ebb8472a2b4d11fbfa6ab99c913033a79c84abfa4f4248382434fb6db0",
+        "apps/docs/src/content/docs/getting-started/feature-support.md": "858891f5093cd32d2d278be7780cd25a75c97ca77306668f368860f20aff106e",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "d8887c6d4180d60a1127957e073c180528474258c697c1305b6a7bb846e27671",
         "apps/docs/src/content/docs/getting-started/installation.md": "6c71b6132f8c61c26fc466e23bed9a44dac45c441cbc491997d62a43dfda9d5f",
         "apps/docs/src/content/docs/getting-started/quick-start.md": "91ddca16ad5c0f484d88a9d3b42d37065ee3a3bfd088bd6f1b25a45e96283788",
         "apps/docs/src/content/docs/guides/angular-query.md": "beb279a2ef34d1e69e685bcd8dbeddb0fafb0228ede9107dd9f95d86f9e5c72c",
         "apps/docs/src/content/docs/guides/cache-filters.md": "b0b8a08b6e2f3484a2565b6bd6d080cd1e95b3e9aefcb5aaf121cd7a96ad2591",
+        "apps/docs/src/content/docs/guides/cache-management.md": null,
         "apps/docs/src/content/docs/guides/cancellation.md": "7af74ddcb64ddc5454e3d8b4326a79b9683f1d744537c2b2f267e61a9447274b",
         "apps/docs/src/content/docs/guides/choose-stream-history.md": "9b3456e54724adb1480984fbb294454b68e8d4b80d8e7a2385940cf96dd81a05",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "cb941076de91c32bc0a1a5e8f6463ea521457210c00ccf4ef4e7de7c5fd135e9",
@@ -355,7 +359,7 @@
         "apps/docs/src/content/docs/guides/stream-snapshots.md": "cba3b0d2de49c59d3abacabde4c594ce93158a408c8621f72101ea203d110cab",
         "apps/docs/src/content/docs/guides/streaming.md": "1c15b217f6d485739a57c720bea7f05a648cd5c50efe58086bf16cb35967e457",
         "apps/docs/src/content/docs/guides/suspense-and-recovery.md": "927149842d56dd9432cedea9bccc17c69b5debc869eb3c50aefb366f07019714",
-        "apps/docs/src/content/docs/guides/svelte-query.md": "bec1e54885429b88b78aedf538171322f751d7f8497e6ad7faa131345b30c4c6",
+        "apps/docs/src/content/docs/guides/svelte-query.md": "0d9cca47e1ba9dec49af772d860ffa2723968ae7ad90de7a19bd00821ad33bbe",
         "apps/docs/src/content/docs/guides/switch-cache-owners.md": "5291d4e7ef519ecda12eec08eddbb4e3af7c9f06c2c8baa42d4fbc777d34368d",
         "apps/docs/src/content/docs/guides/tanstack-start.md": "36a09d74aa451cdca5eb30c2bae04223cecac57a4900317023ad0125f74f020d",
         "apps/docs/src/content/docs/guides/trace-streams.md": "0e671596f180c092f79460a83ba5a48549843a681f7b9e7301280122b04e0945",
@@ -364,13 +368,13 @@
         "apps/docs/src/content/docs/index.mdx": "ef6dbddd50fb3c5fff33944435d7b394a5852a1f71846f0a19ea204c3f415f5b",
         "apps/docs/src/content/docs/integrations/index.md": "027d9c9a2a06946be8771f3d33718e9097e59b689050d3ba51df05aa95ea6bda",
         "apps/docs/src/content/docs/reference/browser-and-worker-hosts.md": "400abc16a961005b5234f061861af70e6cf6199e9ea2a71b6c034e45fab54cb6",
-        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "3573d133f7d5d36faeeb4816d34161ea2e449bc4e6602d00f74252a16fbc21cb",
+        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "ed0b85e5d1edbccad9add329276d1d6de8d674c1f2155e3b1e0a83fe47171136",
         "apps/docs/src/content/docs/reference/errors.md": "8e1708ec387f57fe80de89f9e8e8367cf7b62f53fd52968910469b8a9db79092",
-        "apps/docs/src/content/docs/reference/external-http-clients.md": "3932c41cd3694f1fb66c4267dcb7e60be839c15ebd838945cca2222d4aa75f8e",
+        "apps/docs/src/content/docs/reference/external-http-clients.md": "3589aca0e2cf488b8f7f5978c8ecdee8f29a4f7bbb959f8cb25ae04536cec839",
         "apps/docs/src/content/docs/reference/factory.md": "9a2c6c1b76b484cfda17b32d0e6bc21af60689b8dae2400f0c559354dad09653",
         "apps/docs/src/content/docs/reference/generated-builders.md": "e56a363220dc887f84278dd5076b6fb352a317c1b423d56a1c90bd6f08948ff6",
         "apps/docs/src/content/docs/reference/http-builders.md": "c60400e0416974e92436f050500cf0cf6ca423eb08d6a2f17b2f53dac2d54dfe",
-        "apps/docs/src/content/docs/reference/http-factory.md": "68e37af13dcbfb2dca4c431a3b5eb2e29e7683dc8068770de59ae5885071350f",
+        "apps/docs/src/content/docs/reference/http-factory.md": "83c92343a1516c58dbc8adaa077e0a83e5ec8e9cf4953bec75b1a42190364730",
         "apps/docs/src/content/docs/reference/performance.md": "43c17a9e6159c97bde08c2ed191ccd0035c5574faf7a4b52f6eec2b5c08fa725",
         "apps/docs/src/content/docs/reference/public-exports.md": "42a8b78390655ed291576557435e8d610ee7fabe05223e27840c553580d7f9ea",
         "apps/docs/src/content/docs/reference/type-inference.md": "a60819bcd3b5f7887efe97c1e6aabfdcf1822197abdd209b9d3820d33f4428b5",
@@ -383,7 +387,7 @@
         "docs/adr/0007-keep-the-core-factory-lifecycle-neutral.md": "243527d723753f8c31fd2484130af5af663cbfd03a3709178b7af7ba47c93079",
         "docs/adr/0008-use-flat-prefix-matchable-key-tuples.md": "959563881314648542065683d90989d0cf14c7c5585065a2b6fba32fcbec76d0",
         "docs/adr/0009-build-an-eager-frozen-utility-tree.md": "6490cf58890014f3e50d1b67ba88d4fdd9cbecc578e1788234b4fe193e2e14c7",
-        "docs/adr/0010-reuse-tanstack-query-core-as-a-peer.md": "3045be2068a757fe97611f7f92863895a0b43857666da70e2c40635963e4aefc",
+        "docs/adr/0010-reuse-tanstack-query-core-as-a-peer.md": "43cf265b5b080b863ab936056ca40b5d83379bf70b425fffc88178b06ec3b84e",
         "docs/adr/0012-normalize-undefined-query-success-to-null.md": "e07335454852d9ac3c8b2529ad414dbee59d57f2265ccf86b595e65092feb309",
         "docs/adr/0014-require-query-stable-payload-construction.md": "2c0a2fefeb20197712e85ca598e18c8a7d74b55f9cfbb74a0cfaf532f18aec04",
         "docs/adr/0015-centralize-the-toolchain-in-vite-plus.md": "8daa6120ef9f4095c74d132ae6bd69ebd85ac9ee9dea4d6c9b238ebee66c692c",
@@ -408,14 +412,14 @@
         "examples/server/src/main.ts": "a207ef4208f09ae04f4fececb76750ceecf7e48a5ce237787fd3c9e537167382",
         "examples/server/src/rpc-handlers.ts": "53dfae7c99caea1e40991e72a15d3bc608037ba6174d0044706908090219e203",
         "examples/server/src/server-local-rpc.ts": "f6098b0f17ae1cab08620c31eac7ff698c7ac170847e88c3c7b6b92858ca2e56",
-        "examples/server/src/server.ts": "91e49c0a99accdf962d2f09ad2fe10bcddfe5ad693ec451630e14cf786b44390",
+        "examples/server/src/server.ts": "4363f437b79ce650fd35f2951ea20aa73ce12fdde5496da836ebb50dd0e4b60d",
         "examples/server/src/users.ts": "1e33093f76a3b46461e1c41a067d10483fd0bf6b8d8e840ed15ceafdf32728b3",
         "examples/server/src/web-handler.ts": "d9b38d8b14f243fdf7652407e230d4fde07413d345e6e1a528c2f7a1e81adcee",
         "examples/server/tests/fixtures/websocket-server.ts": "e3797d32b50ed5aae5cf07e4d0d3617e7dbfc7ef7404d032c7abde8f49de5249",
         "examples/server/tests/http-api.test.ts": "3d341c3a2d370562d7a04413adc179eed6aa822eb808a058deae09d6791ba0d4",
         "examples/server/tests/rpc-transport-overhead.test.ts": "adbd2e30e9a9f0d85badd22eddc9585c193c09949c179a03536441e46320547d",
         "examples/server/tests/rpc-websocket-consumer.test.ts": "e5092fd7e402a0010c2d6c6426e09c407622528c9a0cd0dd41d0f3c826d1fed1",
-        "examples/server/tests/server.test.ts": "d53460785d03c5692c71185a03f4cbc93c028054136d3397d722ad8c40059199",
+        "examples/server/tests/server.test.ts": "5c9c176fcccf73c0c610502dd6b0f3c21946b1681538a6e033ee593b9bfa4934",
         "examples/server/tests/web-handler.test.ts": "50fdbcacf42c64315356864adc530c4e99e50e65447187d9ce55424372b741c1",
         "examples/shared/error-description.ts": "713eaabd91110a7b9fe64d022b9b22e6488a50905587582c111f38cdb04787bc",
         "examples/shared/use-slow-query-cancellation.ts": "872ea8e5ef8b97b2d6def07a8cc5c79a885099ffb6e60ebf6db6e39b9aa628f1",
@@ -450,8 +454,8 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "9ef089cb4dee4b1b7cf5bf1d44e1a54d358e9a250bfaf9b4a7875146f90b5d81",
-        "pnpm-workspace.yaml": "c55847022106dd11f2b32990131c248d9851a4672486cd70fba63536da4d4051",
+        "package.json": "262244bdf1d582898e42c2d0727551de351fb435b2f9294eac97a0f4796bfa54",
+        "pnpm-workspace.yaml": "084718189418309a74c475346ff68d07efce92048f0254121a535126a74c7150",
         "scripts/check-framework-consumers.mts": "37fc0fc0006c2b1f35c5cff85754612e0b74d89eed608e353ef5f18f05fce051",
         "scripts/measure-bundles.mts": "5a033ce9f9a4cf414632b6f2781a50c0354f1cf9996791a547a5d53dbef66d7a",
         "scripts/measure-construction.mts": "fa7f8bf47d2f642df04be94f2f9f2253b9f5208272fbeb5be9ae79b4c3fb86a8",
@@ -459,11 +463,13 @@
         "scripts/measure-types.mts": "c6d92caa7ba074970bce28c268cbf49e70b57f6dbdc2755d38d33961b2afc2fc",
         "scripts/performance/common.mts": "57a2003d9769d884d1a0884cab5449cfce79c40300de8d0202d3f1780d51c4f5",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
+        "scripts/verify-docs-examples.mts": null,
+        "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
-        "skills/effect-api-query/SKILL.md": "a1bd64affe7212683b33afebf00fc860a50563cb8c8b3f02bd5750aac8108027",
+        "skills/effect-api-query/SKILL.md": "6cb3209b2207caf3b3bb8fc015836a94394b7dfc50b7c462ca329a286923a4a5",
         "skills/effect-api-query/references/cache-workflows.md": "47391e59a11e2adb946470872a5585be8bbcbf4765292e87117382aa99df1379",
-        "skills/effect-api-query/references/frameworks-and-hosts.md": "78ca653a453a11e17438cf59e46226d13dbc5fce761fc6ef70de7e398b209774",
-        "skills/effect-api-query/references/http.md": "1c1a6301b43010f7032b27d15757a37e35cb4f07c44fff68f77b3a851a8eefd2",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "13481aaf265896bddaaf5e908ffed945e3719fe1cd60ca638e3dd47329d07d4d",
+        "skills/effect-api-query/references/http.md": "73eb5febbe01ba10e6b954c17c80df9eff5343feca37be516f44e85761fb3cd0",
         "skills/effect-api-query/references/hydration-and-ssr.md": "7e8c6566a6f5e46f2f7711e7745bef84be58f5354bb797ed411c05b819d601d2",
         "skills/effect-api-query/references/query-patterns.md": "867ee139dec9a61f7f0a75192df9ba88c46a04e8251d0c25f4be7653c1fd5d39",
         "skills/effect-api-query/references/rpc.md": "7bfc134371d723b24da15a0bc07b1022daaddf6e0b47cb281900c147f78e9c59",
@@ -493,9 +499,9 @@
         "src/http/create-utils.ts": "8d128bb9646e095456d3dcf696f1aa6e365d0de328df571c64eea7421935c9f5",
         "src/http/errors.ts": "afa6e7a015a257683ec8d96d5d5da1ffc25a79b0ff498fddb538e059af7643b3",
         "src/http/operation.ts": "65649385d028c2949a5846c816abedcd4cf33cb29440d71cbd1fce159eca8c43",
-        "src/http/request.ts": "f7045e0fce72c566528191c215334cd6062e47e451b68da69cc16e325ce2af48",
+        "src/http/request.ts": "8e83f98a0878899e5e7a03a0db9e3b9f0024d902110947b80b55b527165c96e7",
         "src/http/streamed-query.ts": "7db210acc1e4406d6ef2c77d2f9722793681ee083706271b427aa7ae876fb473",
-        "src/http/types.ts": "b0021804eb179a5d020273f70890d45a0b10ad6f00e8daa2f68422fbb0e1514e",
+        "src/http/types.ts": "7747a0f50d33a712111b6def057b94fe58f2d7495ae79ff62eccd555cf65107d",
         "src/index.ts": "f863d2df2403dd7fb92deabd2448f392fa9b0eb7bb283e837d091967b324fe89",
         "src/rpc/create-utils.ts": "8ebf030b0f76f91c248434c169d789d6328d2ba43c07afe15e04db0a02f05c2c",
         "src/rpc/errors.ts": "8e1fbcc7843b2bf99e9d80bfd365dc118d52351909d5c8f48c46ba9d39fdedd3",
@@ -504,19 +510,19 @@
         "src/rpc/types.ts": "3d113d88ba6fbf6277eb86eb760283eac51107d91901e2b88f67a9a36fee839c",
         "tests/cache-recipes.test.ts": "fb95bbbba35f8bcf9661c993a61385f3186d935bb5626da6181d8ce9e6a9a49e",
         "tests/configuration-composition.test.ts": "f904dc41d7f084cbf06b6e7c1b57a4154aec53b6736b9602b2b50accfd0c21dd",
-        "tests/contract-reuse.test.ts": "93c39828169192fa4364a782224f8598cbb11f2b8b2f0a36458cd413a53da299",
-        "tests/create-http-api-query-utils.test.ts": "efc1b3840a4daf284aa82d787f05f8a14f9d79bde01f5eb6e34ff0feb588c67a",
+        "tests/contract-reuse.test.ts": "ef45d0a7116c56bdff46decb93cb4cd8f55baa1836edc0382434742f27249747",
+        "tests/create-http-api-query-utils.test.ts": "da5759a5e06dc83054c731aa9ff4e5b8724b9d7e78fc1cafb5298937d014644d",
         "tests/create-rpc-query-utils-configuration.test.ts": "8745f2b561882bd4789e79cf8132e214959beaa6c053974f4b7a6de61d803778",
-        "tests/create-rpc-query-utils-execution.test.ts": "5c35b980a01a6a4cfee91f0adef5580d45d00df9dd329934b3cb0b2e8a4423f1",
-        "tests/create-rpc-query-utils-keys.test.ts": "c7195f94a388dcc00d3f794994a45b67e5c577db1d35c663bd72ecbbfeb7acf4",
+        "tests/create-rpc-query-utils-execution.test.ts": "9166e4de93bb762b6ef00c1bc14ba3c35bfb507469adc176a35e0bebfa74a3d6",
+        "tests/create-rpc-query-utils-keys.test.ts": "4aafc6adf8364088882cbe3b918c8992cfcc35643c3b53f8eb425afbacad5321",
         "tests/create-rpc-query-utils-request-options.test.ts": "548e1c87ad52f2a7ea73704624e6b5ea06a64dfe696da6a6e05f4a832783223b",
         "tests/create-rpc-query-utils-server-local.test.ts": "281d15e89cc0e13a846a03165069c54e733d77d4985bb246aa42034f67d4ed0d",
         "tests/create-rpc-query-utils-stream-baseline.test.ts": "0b0797be419e51a09c63f06c03f42a2538a37bf2d9838871952da071fe9483b4",
         "tests/create-rpc-query-utils-stream-cache.test.ts": "d4e2e57da0ff1993f8e47082414a994f762c48a8bd38c6f7e75a809956dbbea3",
         "tests/create-rpc-query-utils-stream-hashing.test.ts": "3ec2de67c2f447b7f8ee003e9d8c1c0d19f1c9a787440a64c21df103ab9c044b",
         "tests/create-rpc-query-utils-stream-publication.test.ts": "f0f6919a98e3c4efd59ab39a7c8f2a2efb817c0b55913cd82c034126c8d5e459",
-        "tests/create-rpc-query-utils-streaming.test.ts": "a5cc91c668ab56f3712bbe07d2eb3c76a36cfad1a8417077650258bd5d4b140a",
-        "tests/create-rpc-query-utils.test.ts": "f811363b51ee1cd8d22ef36010d04e21da3389316a83bbc31f0dd7ead54bcfa4",
+        "tests/create-rpc-query-utils-streaming.test.ts": "6f0fccd52258df72d1bb471bd04873426708209fa48e0b9c3a0c831d9002f5a1",
+        "tests/create-rpc-query-utils.test.ts": "b6ccee687718bbd528819f497ba2ac09acfe06a1400c5bb38b863eb082f0776f",
         "tests/docs-examples.test.ts": "7db41e628f07e9ec6aa15b5629b95b004f9949c29f320e91875acbec1f3a3fb6",
         "tests/docs-release.test.ts": "089218597c9c8c9fdce5037b0537426a232ef7466e697d683bc32fb7d4492ae8",
         "tests/execution-interceptor.test.ts": "9c8a26e24cdd5807a4dca68bfdd88663246b3a5632483581ec3cbd4cdcf69b9a",
@@ -537,14 +543,14 @@
         "tests/framework-consumers/svelte.ts": "652f8d97d781803239ca667497768077167fffaabec851d5a076f692c376223c",
         "tests/framework-consumers/vue.ts": "e23859e5fe8f8e24a55d8e782dd2880d1a6d88859bdf40ff7b60e8b0c150ab50",
         "tests/http-cached-views.test.ts": "c885510d4b14084a28b5a5389d30a5dbd01949705e7f0163552f8bd2ef3060db",
-        "tests/http-execution.test.ts": "3f8f15333ead419d5ae9e0502bc4d7359f9ceed83cf926917398213bd79e64c3",
+        "tests/http-execution.test.ts": "064730968e39333e717a08dab15c9cb2455974c8d0f06cdbcd6768bf992c1d53",
         "tests/http-hydration.test.ts": "51da967534267d49dc91f577f43a54fc88045cce8f89623c1106df8c88c21570",
         "tests/http-live-query.test.ts": "e4ed31b68185eba7e80587815ee9bd2ca0573639c2695edf2af0532aa42ac269",
         "tests/http-metadata-options.test.ts": "702a73eb9e005d038d35c233806a065ab4da7d35fa1255df336711bd09be96d4",
         "tests/http-multipart.test.ts": "331f18bf9730579f05513d3ab93734b8118e313b219604e8c0276c07110476ae",
         "tests/http-query-options.test.ts": "e7b2ca44c44cd8402ca688960458e1190c54c68845556fc4ea5d131ab8649891",
         "tests/http-semantic-keys.test.ts": "c43a3d43b2224d64c1eb11ac2877c4c4a2c866efd67c1781bb1992439a85b5fb",
-        "tests/http-transport-cancellation.test.ts": "38c9805b9feb5e35af235ec4ea1ffdc0430e5453c1f2b2a6c8378968853f90b8",
+        "tests/http-transport-cancellation.test.ts": "0ba26a9bae56b26605fc03009c1f50fe90930356d0fa0c4ec4ddc5c120430f00",
         "tests/hydration-codecs.test.ts": "58d641238310a23fbcce9620a9ec65377f69a98746fbf2a45b87f8f49cd46465",
         "tests/publication-deadline.test.ts": "2797557ff14bf8527ea446cec1e1d7c61cd3666f11f127e640c53ce5d7e30868",
         "tests/query-filter.test.ts": "ff531a86816872cd2cadf01d79bd9d9ff5be1895bab150330a90aa8375508004",
@@ -585,9 +591,9 @@
         "tests/types/example-owner-contract.ts": "ed58343a4a7da9606e07703d19f3c0470e25923c81de357c0dbfd1258c3fc439",
         "tests/types/generic-client-error-contract.tsx": "f0b2f55deffde27ff745209485f9f8b817e4e537e8c60efd345946b77cf54bd9",
         "tests/types/helper-contract.ts": "0021a5b845c65f608ed5dd429227752ceb32784e75c198b01868f017120a7aa1",
-        "tests/types/http-contract.ts": "0b145ff73820cb8f5adf8c72df9d2e116fd0f2edebf52ddf128173cb1da939ba",
+        "tests/types/http-contract.ts": "aec3b157d4f6a3a22e8e2cf39333caa8b9e41b01dac16c11f1f6c40a681ea1e3",
         "tests/types/http-empty-success-contract.ts": "00ccdb360edc598b9bc6c8a7708dab6b7ca85cf267ce7caa9a81a6b52f2868d5",
-        "tests/types/http-stream-contract.ts": "cb596e26cc668ec1d78bd38cbdabd2c32044479a4ea7dbb204762d8ea197e77a",
+        "tests/types/http-stream-contract.ts": "deb4d7766f1a140a511fb137b9a6d834a992abc8257498e2b3349fcc6e746b85",
         "tests/types/http-type-scale.ts": "447d34e1fa952c843a866fd4dcde80dd32390f7ff14ba701b1960f45bc1292ce",
         "tests/types/http-view-proof.ts": "0b66f30863c5451d47144980af9cf5517637c8f7ca7866b64d1a704cea089413",
         "tests/types/hydration-contract.ts": "a95471deb61aab482a8fd8189980cd87e94de733ff2bee1d89bb8ca1f7ba30f4",
@@ -609,14 +615,12 @@
         "tests/utility-configuration.test.ts": "a1ba1df1e174a6d8e8224a65483b961d2185c774fd84de78c1482626a5f78edd",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "9b3565f84f25b96887f3589caf346076edc437d0",
-      "outcome": "no-change",
-      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
+      "head": "848ea4bfa501ec60d65c83bd801b4e16f121807d",
+      "outcome": "updated",
+      "reason": "Aligned domain_map.yaml and skill_tree.yaml with the current0.4.0 package and resource-bearing HTTP exclusions. skill_spec.md retains accurate existing task coverage and validation procedures; no additional narrative is needed.",
       "evidence": [
-        "Before versioning: intent maintainer check passed at 9b3565f84f25b96887f3589caf346076edc437d0.",
-        "changeset version and vp fmt generated 0.3.0 -> 0.4.0.",
-        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
-        "Scoped generated changes: package.json."
+        "Reviewed all three planning documents against the source and focused guidance diff. One skill and six references remain; source mappings and task ownership are unchanged.",
+        "Intent synchronization reports no metadata changes. Public compiler fixtures, packed native framework checks and an isolated packaged-skill consumer passed."
       ]
     },
     "source:vite.config.ts": {
@@ -709,15 +713,16 @@
       ]
     },
     "source:.github/workflows/ci.yml": {
-      "fingerprint": "0564a99a05b8cf3600d579c8d48edc3596c2cc6cb855e047752d6fa72854cbed",
+      "fingerprint": "900e024ff7470245b8680c6cca11cb9da6c5ce43b66413e4806a34e8f9dda71c",
       "snapshot": {
-        ".github/workflows/ci.yml": "a74f0efcfd367892909d3e04b033b3eb3da3ccd1572556c973591ffd21da799a"
+        ".github/workflows/ci.yml": "a6c50faebcfc82dbf766f86e9f24ca42c1b0495339c6731c1d6071de9a4c75af"
       },
-      "head": "86365084f08c30a0dc1211ad450412195060de5c",
+      "head": "848ea4bfa501ec60d65c83bd801b4e16f121807d",
       "outcome": "no-change",
-      "reason": "CI now executes the native-framework fixture task. The owning skill already describes the checked native consumers; CI wiring requires no further library guidance.",
+      "reason": "Only the Playwright container tag and immutable digest change to match the eligible1.64.1 test package; no developer workflow or skill changes are required.",
       "evidence": [
-        "actionlint and yamllint pass. Zizmor retains the same four existing low-severity self-repository findings and adds none. vp run framework-types passes for all four frameworks on both compilers."
+        "MCR v1.64.1-noble OCI index digest verified:sha256:2f05f8a734509a7b3f26a912639488ee08f58a7b292d14d62271bcff9038768f.",
+        "Existing workflow permissions and triggers remain unchanged."
       ]
     },
     "source:tests/packed-consumer/construction-baseline.mts": {
@@ -2436,27 +2441,29 @@
       ]
     },
     "source:tests/framework-consumers/pnpm-lock.yaml": {
-      "fingerprint": "7dd4b86fd16076aff2b39195e5c11d539552af9c56bd5b2176b56371a81703cd",
+      "fingerprint": "d5a0cbeabac0a07d14b49ea7bd8728c8216d8a0759b5568f6b0dc8d5d15ae57c",
       "snapshot": {
-        "tests/framework-consumers/pnpm-lock.yaml": "07646e16453d04fa6d0040cc3ebb9da65975230bdb9670935c6678004488e6cf"
+        "tests/framework-consumers/pnpm-lock.yaml": "dfe2c619415885063e0dd61b2b25abaf4c408e1dc20c7c896483733034de1a85"
       },
-      "head": "86365084f08c30a0dc1211ad450412195060de5c",
+      "head": "848ea4bfa501ec60d65c83bd801b4e16f121807d",
       "outcome": "no-change",
-      "reason": "The lockfile pins the standalone native-framework compiler fixtures. Consumer API guidance is covered by the existing framework reference; dependency-resolution data needs no additional skill.",
+      "reason": "Updated native integration lockfile and removed the obsolete Core override; the compatibility table now describes the verified aligned versions.",
       "evidence": [
-        "Frozen installation and compilation of the final packed package pass for Vue, Solid, Svelte, and Angular on TypeScript 7.0.2 and 5.9.3; yamllint passes."
+        "vp run --no-cache quality: packed Vue/Solid/Svelte/Angular consumers passed on TS7 and TS5.9.",
+        "vp -C tests/framework-consumers install --frozen-lockfile --ignore-scripts passed with unchanged strict seven-day policy."
       ]
     },
     "source:tests/framework-consumers/pnpm-workspace.yaml": {
-      "fingerprint": "fef1e6e2c58c3f0c74c81c6a5f9c89cbb040e3ee4bbc9cef14970f3282ee1107",
+      "fingerprint": "6263478e1bae26c5271dd6573e7e3b76cee1756003b105895b3cd72528a0cef8",
       "snapshot": {
-        "tests/framework-consumers/pnpm-workspace.yaml": "b95e1228fe0cec8e1378d2a6851a1de0bf2ab8ce198561ae11f0d460a53a858f"
+        "tests/framework-consumers/pnpm-workspace.yaml": "abaf5c17531d2f7d0cc07f34ce3383a2eabf7492a012f8c3fce609df8d6e3896"
       },
-      "head": "86365084f08c30a0dc1211ad450412195060de5c",
+      "head": "848ea4bfa501ec60d65c83bd801b4e16f121807d",
       "outcome": "no-change",
-      "reason": "The standalone workspace keeps fixture dependencies isolated from the library workspace. It changes validation setup without changing package consumers' ownership or APIs.",
+      "reason": "Updated native integration lockfile and removed the obsolete Core override; the compatibility table now describes the verified aligned versions.",
       "evidence": [
-        "Reviewed the standalone workspace, scripts/check-framework-consumers.mts, and framework reference; frozen install and both compiler passes succeed; yamllint passes."
+        "vp run --no-cache quality: packed Vue/Solid/Svelte/Angular consumers passed on TS7 and TS5.9.",
+        "vp -C tests/framework-consumers install --frozen-lockfile --ignore-scripts passed with unchanged strict seven-day policy."
       ]
     },
     "source:tests/framework-consumers/tsconfig.json": {
@@ -2664,6 +2671,58 @@
       "reason": "This update changes repository authoring workflow instructions, not effect-api-query library behavior or its shipped consumer guidance.",
       "evidence": [
         "Reviewed .agents/skills/wayfinder/SKILL.md in git diff origin/main...a25f72a; _artifacts/skill_spec.md scopes the shipped skill to library consumer tasks. vp run skills-check passed."
+      ]
+    },
+    "source:.changeset/omit-resource-bearing-http-endpoints.md": {
+      "fingerprint": "a6ec9168404f1224dbdf0a8f526d285c59fca0de0c80d87485f8cf28623eb602",
+      "snapshot": {
+        ".changeset/omit-resource-bearing-http-endpoints.md": "de19fbfb59cf42f065d80416e17e51698e76603eb5d463a56fadd6a231f3c37a"
+      },
+      "head": "848ea4bfa501ec60d65c83bd801b4e16f121807d",
+      "outcome": "no-change",
+      "reason": "Separate release entry for a published peer or HTTP compatibility change; existing compatibility guidance covers the affected task.",
+      "evidence": [
+        ".changeset/omit-resource-bearing-http-endpoints.md",
+        "Minor Query minimum change and separate patch entries for the Effect pin, HTTP runner inference and endpoint omission."
+      ]
+    },
+    "source:.changeset/preserve-http-runner-inference.md": {
+      "fingerprint": "273b8760fe4d0bbb0a6f562e24cf50413c3fde4266c358060d29ba6e31d26b40",
+      "snapshot": {
+        ".changeset/preserve-http-runner-inference.md": "2260a22730f51aabd8b3d26563d0d4166004358781edf999ae86e41cb9d2644a"
+      },
+      "head": "848ea4bfa501ec60d65c83bd801b4e16f121807d",
+      "outcome": "no-change",
+      "reason": "Separate release entry for a published peer or HTTP compatibility change; existing compatibility guidance covers the affected task.",
+      "evidence": [
+        ".changeset/preserve-http-runner-inference.md",
+        "Minor Query minimum change and separate patch entries for the Effect pin, HTTP runner inference and endpoint omission."
+      ]
+    },
+    "source:.changeset/preserve-null-pagination-cursors.md": {
+      "fingerprint": "3b548d84cfcda709fdc5681951159701ed7e1fedafd451a8a3554720bf54f365",
+      "snapshot": {
+        ".changeset/preserve-null-pagination-cursors.md": "76eb3c4657d4ae0a140a1b55c1c654fa9bf9ee99047a794a3a53ace98a6bf53c"
+      },
+      "head": "848ea4bfa501ec60d65c83bd801b4e16f121807d",
+      "outcome": "no-change",
+      "reason": "Separate release entry for a published peer or HTTP compatibility change; existing compatibility guidance covers the affected task.",
+      "evidence": [
+        ".changeset/preserve-null-pagination-cursors.md",
+        "Minor Query minimum change and separate patch entries for the Effect pin, HTTP runner inference and endpoint omission."
+      ]
+    },
+    "source:.changeset/update-effect-peer.md": {
+      "fingerprint": "e7d6c5f436cee6da71c453aa49b630097141b76e202218cd2b1d4c1255cf4536",
+      "snapshot": {
+        ".changeset/update-effect-peer.md": "6105c8053c1cc89efa8dc125465d2a13d9cfb1046920fe5c438ca01abfe45151"
+      },
+      "head": "848ea4bfa501ec60d65c83bd801b4e16f121807d",
+      "outcome": "no-change",
+      "reason": "Separate release entry for a published peer or HTTP compatibility change; existing compatibility guidance covers the affected task.",
+      "evidence": [
+        ".changeset/update-effect-peer.md",
+        "Minor Query minimum change and separate patch entries for the Effect pin, HTTP runner inference and endpoint omission."
       ]
     }
   }

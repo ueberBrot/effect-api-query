@@ -49,6 +49,9 @@ const classifyEndpoint = (
   let multipart = false;
   let multipartStream = false;
   for (const { encoding, schemas } of endpoint.payload.values()) {
+    if (encoding._tag === "Stream") {
+      return undefined;
+    }
     for (const schema of schemas) {
       const brands = multipartBrands(schema);
       const buffered = brands.has(HttpApiSchema.MultipartTypeId);
@@ -75,17 +78,21 @@ const classifyEndpoint = (
     return undefined;
   }
   const successes = [...endpoint.success];
-  const streams = successes.filter((schema) =>
-    Predicate.hasProperty(
-      HttpApiSchema.isWithHeaders(schema) ? schema.schema : schema,
-      "~effect/http-api/HttpApiSchema/Stream"
+  const bodies = successes.map((schema) =>
+    HttpApiSchema.isWithHeaders(schema) ? schema.schema : schema
+  );
+  if (
+    bodies.some((body) =>
+      Predicate.hasProperty(body, "~effect/http-api/HttpApiSchema/Upgrade")
     )
+  ) {
+    return undefined;
+  }
+  const streams = bodies.filter((body) =>
+    Predicate.hasProperty(body, "~effect/http-api/HttpApiSchema/Stream")
   );
   if (streams.length > 0) {
-    const [success] = successes;
-    const body = HttpApiSchema.isWithHeaders(success)
-      ? success.schema
-      : success;
+    const [body] = bodies;
     if (
       multipart ||
       successes.length !== 1 ||

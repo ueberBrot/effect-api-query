@@ -120,11 +120,16 @@ describe("example RPC server", () => {
   );
 
   it.live(
-    "rejects malformed request targets and continues serving requests",
+    "keeps origin-form paths local and rejects invalid request targets",
     () =>
       Effect.gen(function* rejectMalformedTargets() {
         const server = yield* startExampleRpcServer();
-        for (const path of ["//[", "http://user:password@localhost/rpc"]) {
+        for (const [path, expectedStatus] of [
+          ["//[", 404],
+          ["//localhost/rpc", 404],
+          ["http://[", 400],
+          ["http://user:password@localhost/rpc", 400],
+        ] as const) {
           const status = yield* Effect.promise(
             async () =>
               // oxlint-disable-next-line promise/avoid-new
@@ -146,7 +151,10 @@ describe("example RPC server", () => {
                 request.end();
               })
           );
-          expect(status).toBe(400);
+          expect({ path, status }).toStrictEqual({
+            path,
+            status: expectedStatus,
+          });
         }
         expect(
           (yield* Effect.promise(

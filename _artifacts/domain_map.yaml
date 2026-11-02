@@ -1,6 +1,6 @@
 library:
   name: "@ueberbrot/effect-api-query"
-  version: 0.3.0
+  version: 0.4.0
   repository: https://github.com/ueberBrot/effect-api-query
   description: TanStack Query utilities derived from ready Effect RPC and HTTP clients.
   primary_framework: framework-agnostic
@@ -18,7 +18,7 @@ skills:
       - "@ueberbrot/effect-api-query"
     covers:
       - RPC construction, explicit prepared inputs, and canonical identity
-      - HTTP decoded requests, SSE, multipart mutations, and metadata
+      - HTTP decoded requests, SSE, multipart mutations, metadata, and omitted streaming uploads or upgrades
       - Inferred operation types, tree/branch/leaf policy configuration, execution interception, native defaults, and view filters
       - Input-field skipping, pagination, explicit stream retention, publication deadlines, uncached event consumption, recovery, and lifetime tracing
       - Stream snapshots and request cleanup

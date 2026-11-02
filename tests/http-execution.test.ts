@@ -194,7 +194,7 @@ describe("HTTP execution", () => {
         }
       ) {
         receivers.push(this);
-        return this.delegate(request);
+        return this.delegate<Mode>(request);
       },
     };
     const client = {
@@ -208,7 +208,7 @@ describe("HTTP execution", () => {
         }
       ) {
         receivers.push(this);
-        return this.delegate(request);
+        return this.delegate<Mode>(request);
       },
     } satisfies HttpApiClient.ForApi<typeof api> & Receiver;
     const utils = createHttpApiQueryUtils(api, { client, keyPrefix: ["test"] });

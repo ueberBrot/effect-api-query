@@ -156,6 +156,9 @@ const configuration: CreateHttpApiQueryUtilsOptions<typeof api, typeof prefix> =
     client,
     keyPrefix: prefix,
   };
+true satisfies Assert<
+  Equal<typeof configuration.runPromiseExit, RunPromiseExit | undefined>
+>;
 const utils = createHttpApiQueryUtils(api, configuration);
 const annotated: HttpApiQueryUtils<typeof api, typeof prefix> = utils;
 
@@ -522,6 +525,26 @@ declare const extraClient: HttpApiClient.ForApi<
   ExtraClientService
 >;
 declare const extraRunner: RunPromiseExit<ExtraClientService>;
+true satisfies Assert<
+  Equal<
+    CreateHttpApiQueryUtilsOptions<
+      typeof extraApi,
+      readonly ["app"],
+      typeof extraClient
+    >["runPromiseExit"],
+    typeof extraRunner
+  >
+>;
+true satisfies Assert<
+  Equal<
+    CreateHttpApiQueryUtilsOptions<
+      typeof extraApi,
+      readonly ["app"],
+      HttpApiClient.ForApi<typeof extraApi, never, unknown>
+    >["runPromiseExit"],
+    RunPromiseExit<unknown>
+  >
+>;
 // @ts-expect-error Additional ready-client services alone still require a runner.
 createHttpApiQueryUtils(extraApi, { client: extraClient, keyPrefix: ["app"] });
 const extraUtils = createHttpApiQueryUtils(extraApi, {

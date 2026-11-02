@@ -104,7 +104,7 @@ An endpoint with `success: []` uses Effect's no-content response and exposes buf
 
 An endpoint with exactly one SSE success exposes `streamedKey` and `streamedOptions` for ordered history. It exposes `liveKey` and `liveOptions` for the latest decoded value. Declared response-header wrappers surround each emission. Keep `sseOptions` beside decoded `input`. Accumulated keys and options require a positive `maxChunks` bound or `"unbounded"`, unless the configured leaf inherits retention. Live keys include decoder policy. Accumulated keys also include retention and refetch policy. Applications own reconnect and resume controls. Empty live completion raises `EffectHttpApiQueryEmptyStreamError`. A top-level `undefined` emission becomes `null`.
 
-The adapter omits endpoints with raw byte streams, mixed buffered/SSE successes, multipart SSE payloads, or streaming multipart request alternatives. Empty groups disappear. To consume unsupported streams, use the underlying Effect client.
+The adapter omits endpoints with raw byte or NDJSON response streams, HTTP upgrades, mixed buffered/SSE successes, multipart SSE payloads, or any streaming request payload alternative. Empty groups disappear. To consume unsupported streams, use the underlying Effect client.
 
 For protocols that send named events without a data line, set `sseOptions.dispatchEmptyNamedEvents: true` when the declared event Schema accepts empty data. Omission and false share the default identity; true selects a separate cache entry in both SSE views.
 

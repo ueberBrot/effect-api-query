@@ -8,7 +8,7 @@ metadata:
     Derive typed TanStack Query keys and options from ready Effect RPC and HTTP clients, preserving cache identity, typed filters and execution policies, decoded query views, registered hydration codecs, stream recovery, native framework behavior, and application-owned resource lifetime.
   type: core
   library: "@ueberbrot/effect-api-query"
-  library_version: "0.3.0"
+  library_version: "0.4.0"
 sources:
   - "src/**/*.ts"
   - "tests/**/*.ts"
@@ -48,7 +48,7 @@ Derive options from the application's contract and ready client. Pass those opti
 
 ## Choose the adapter
 
-Read the installed package manifest to find its version and peers. This version uses the coordinated Effect 4.0.4 set. Its Query Core peer range is `>=5.103.1 <6`. Use the installed declarations and keep contracts literal. For reactive options, version constraints, and transport ownership, read [frameworks and hosts](references/frameworks-and-hosts.md).
+Read the installed package manifest to find its version and peers. This version uses the coordinated Effect 4.0.6 set. Its Query Core peer range is `>=5.104.4 <6`. Use the installed declarations and keep contracts literal. For reactive options, version constraints, and transport ownership, read [frameworks and hosts](references/frameworks-and-hosts.md).
 
 Read the reference for the contract you are integrating:
 

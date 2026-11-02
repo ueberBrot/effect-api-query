@@ -282,6 +282,72 @@ describe(createHttpApiQueryUtils, () => {
     }
   });
 
+  it("omits streaming request bodies, NDJSON responses, and protocol upgrades", () => {
+    const unsupported = [
+      HttpApiEndpoint.post("uploadBytes", "/upload-bytes", {
+        payload: HttpApiSchema.StreamUint8Array(),
+        success: Schema.String,
+      }),
+      HttpApiEndpoint.post("uploadNdjson", "/upload-ndjson", {
+        payload: HttpApiSchema.StreamNdjson({ schema: Schema.String }),
+        success: Schema.String,
+      }),
+      HttpApiEndpoint.post("mixedUpload", "/mixed-upload", {
+        payload: [
+          Schema.Struct({ name: Schema.String }),
+          HttpApiSchema.StreamNdjson({ schema: Schema.String }),
+        ],
+        success: Schema.String,
+      }),
+      HttpApiEndpoint.post("multipartUpload", "/multipart-upload", {
+        payload: [
+          Schema.Struct({ file: Schema.String }).pipe(
+            HttpApiSchema.asMultipart()
+          ),
+          HttpApiSchema.StreamNdjson({ schema: Schema.String }),
+        ],
+      }),
+      HttpApiEndpoint.post("duplex", "/duplex", {
+        payload: HttpApiSchema.StreamUint8Array(),
+        success: HttpApiSchema.StreamSse({ data: Schema.String }),
+      }),
+      HttpApiEndpoint.get("ndjson", "/ndjson", {
+        success: HttpApiSchema.StreamNdjson({ schema: Schema.String }),
+      }),
+      HttpApiEndpoint.get("wrappedNdjson", "/wrapped-ndjson", {
+        success: HttpApiSchema.WithHeaders(
+          HttpApiSchema.StreamNdjson({ schema: Schema.String }),
+          { etag: Schema.String }
+        ),
+      }),
+      HttpApiEndpoint.get("mixedNdjson", "/mixed-ndjson", {
+        success: [
+          Schema.String,
+          HttpApiSchema.StreamNdjson({ schema: Schema.String }),
+        ],
+      }),
+      HttpApiEndpoint.get("upgrade", "/upgrade", {
+        success: HttpApiSchema.Upgrade({ protocol: "tcp" }),
+      }),
+    ] as const;
+    const api = HttpApi.make("resource-bodies").add(
+      HttpApiGroup.make("views").add(
+        HttpApiEndpoint.get("read", "/read", { success: Schema.String }),
+        HttpApiEndpoint.get("events", "/events", {
+          success: HttpApiSchema.StreamSse({ data: Schema.String }),
+        }),
+        ...unsupported
+      ),
+      HttpApiGroup.make("omitted").add(...unsupported)
+    );
+    const utils = createHttpApiQueryUtils(api, {
+      client: Effect.runSync(makeUnusedHttpClient(api)),
+      keyPrefix: ["test"],
+    });
+    expect(Object.keys(utils)).toStrictEqual(["key", "views"]);
+    expect(Object.keys(utils.views)).toStrictEqual(["key", "read", "events"]);
+  });
+
   it("projects literal identifiers and top-level inputless endpoints without splitting dots", async () => {
     const api = HttpApi.make("literal.api").add(
       HttpApiGroup.make("users.v1").add(
