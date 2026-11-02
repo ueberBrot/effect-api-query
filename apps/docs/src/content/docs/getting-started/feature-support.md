@@ -16,7 +16,7 @@ Use your native Effect declarations and ready clients. Effect and your applicati
 | Buffered multipart HTTP | Mutation with explicit `FormData` | [Upload](/effect-api-query/guides/http-queries-and-mutations/#upload-a-file) |
 | RPC stream / unambiguous HTTP SSE | Accumulated history or latest value | [Choose Stream History](/effect-api-query/guides/choose-stream-history/) |
 
-Use queries for cached reads and mutations for commands. Writes refresh reads only when your application invalidates the affected queries. The package omits raw byte streams, mixed buffered and SSE successes, streaming multipart endpoints, and raw-response modes. It also omits SSE endpoints with multipart payloads. See [Compatibility and Limits](/effect-api-query/reference/compatibility-and-limits/).
+Use queries for cached reads and mutations for commands. Writes refresh reads only when your application invalidates the affected queries. The package omits raw byte and NDJSON response streams, HTTP upgrades, mixed buffered and SSE successes, streaming request payloads, and raw-response modes. It also omits SSE endpoints with multipart payloads. See [Compatibility and Limits](/effect-api-query/reference/compatibility-and-limits/).
 
 ## Plan application ownership
 

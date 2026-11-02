@@ -5,6 +5,3 @@ minimumReleaseAge: 10080
 minimumReleaseAgeStrict: true
 minimumReleaseAgeIgnoreMissingTime: false
 trustLockfile: false
-
-overrides:
-  "@tanstack/query-core": 5.104.2

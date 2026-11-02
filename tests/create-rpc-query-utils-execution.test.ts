@@ -116,6 +116,51 @@ describe("createRpcQueryUtils execution boundaries", () => {
     })
   );
 
+  it.effect("preserves a cached null page cursor when refetching", () =>
+    Effect.gen(function* refetchNullPageCursor() {
+      const pagesGroup = RpcGroup.make(
+        Rpc.make("pages.list", {
+          payload: { cursor: Schema.NullOr(Schema.Int) },
+          success: Schema.Struct({ cursor: Schema.NullOr(Schema.Int) }),
+        })
+      );
+      const executedCursors: (number | null)[] = [];
+      const client = yield* makeRpcTestClient(pagesGroup, {
+        "pages.list": ({ cursor }) =>
+          Effect.sync(() => {
+            executedCursors.push(cursor);
+            return { cursor };
+          }),
+      });
+      const queryClient = new QueryClient();
+      const utils = createRpcQueryUtils(pagesGroup, {
+        client,
+        keyPrefix: ["null-cursor"],
+      });
+      const options = utils.pages.list.infiniteOptions<number | null>({
+        initialPageParam: 0,
+        input: (cursor) => ({ cursor }),
+        getNextPageParam: () => null,
+      });
+      queryClient.setQueryData(options.queryKey, {
+        pages: [{ cursor: null }],
+        pageParams: [null],
+      });
+      try {
+        const result = yield* Effect.promise(
+          async () => await queryClient.infiniteQuery(options)
+        );
+        expect(result).toStrictEqual({
+          pages: [{ cursor: null }],
+          pageParams: [null],
+        });
+        expect(executedCursors).toStrictEqual([null]);
+      } finally {
+        queryClient.clear();
+      }
+    })
+  );
+
   it.effect(
     "executes mutation variables without invalidating cached queries",
     () =>
@@ -216,13 +261,14 @@ describe("createRpcQueryUtils execution boundaries", () => {
             Effect.succeed(value)
           ),
         });
+        const runExit = Effect.runPromiseExitWith(yield* Effect.context());
         let runnerUsed = false;
         const runPromiseExit: RunPromiseExit<MutationEncodingService> = async (
           effect,
           options
         ) => {
           runnerUsed = true;
-          return await Effect.runPromiseExit(
+          return await runExit(
             Effect.provideService(effect, MutationEncodingService, {
               suffix: "provided",
             }),
@@ -735,7 +781,7 @@ describe("createRpcQueryUtils execution boundaries", () => {
       expect(error).not.toHaveProperty("input");
       expect(error).not.toHaveProperty("payload");
       if (!(error instanceof Error)) {
-        throw new Error("Expected an execution error");
+        throw new TypeError("Expected an execution error");
       }
       expect(error.message).not.toContain("do-not-retain");
       expect(JSON.stringify(error)).not.toContain("do-not-retain");
@@ -774,10 +820,11 @@ describe("createRpcQueryUtils execution boundaries", () => {
   it.effect("passes mutation callback errors through untouched", () =>
     Effect.gen(function* propagateMutationCallbackFailure() {
       const callbackError = new Error("onMutate failed");
+      const runExit = Effect.runPromiseExitWith(yield* Effect.context());
       let executed = false;
       const runPromiseExit: RunPromiseExit = async (effect, options) => {
         executed = true;
-        return await Effect.runPromiseExit(effect, options);
+        return await runExit(effect, options);
       };
       const client = yield* makeClient();
       const utils = createRpcQueryUtils(group, {
@@ -805,7 +852,9 @@ describe("createRpcQueryUtils execution boundaries", () => {
     Effect.gen(function* forwardQueryAbortSignal() {
       let querySignal: AbortSignal | undefined;
       let mutationReceivedOptions: boolean | undefined;
-      const runPromise = Effect.runPromiseWith(yield* Effect.context());
+      const context = yield* Effect.context();
+      const runPromise = Effect.runPromiseWith(context);
+      const runExit = Effect.runPromiseExitWith(context);
       const runPromiseExit: RunPromiseExit = async (effect, options) => {
         if (options?.signal === undefined) {
           mutationReceivedOptions = options !== undefined;
@@ -827,7 +876,7 @@ describe("createRpcQueryUtils execution boundaries", () => {
             })
           );
         }
-        return await Effect.runPromiseExit(effect, options);
+        return await runExit(effect, options);
       };
       const client = yield* makeClient();
       const queryClient = new QueryClient();

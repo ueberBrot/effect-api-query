@@ -35,15 +35,16 @@ it.effect(
       const second = yield* makeRpcTestClient(group, {
         read: () => Effect.succeed("second"),
       });
+      const runExit = Effect.runPromiseExitWith(yield* Effect.context());
       let firstRuns = 0;
       let secondRuns = 0;
       const firstRunner: RunPromiseExit = async (effect, options) => {
         firstRuns += 1;
-        return await Effect.runPromiseExit(effect, options);
+        return await runExit(effect, options);
       };
       const secondRunner: RunPromiseExit = async (effect, options) => {
         secondRuns += 1;
-        return await Effect.runPromiseExit(effect, options);
+        return await runExit(effect, options);
       };
       const a = createRpcQueryUtils(group, {
         client: first,

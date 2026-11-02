@@ -59,10 +59,12 @@ export type SseEndpoint<Endpoint> =
 export type Supported<Endpoint> =
   Endpoint extends HttpApiEndpoint.ConstraintRequest
     ? [
-        Extract<
-          Endpoint["~Payload"]["Type"],
-          Brand.Brand<HttpApiSchema.MultipartStreamTypeId>
-        >,
+        | Extract<Endpoint["~Payload"], HttpApiSchema.StreamSchema>
+        | Extract<
+            Endpoint["~Payload"]["Type"],
+            Brand.Brand<HttpApiSchema.MultipartStreamTypeId>
+          >
+        | Extract<ResponseBody<SuccessSchema<Endpoint>>, HttpApiSchema.Upgrade>,
       ] extends [never]
       ? [
           Extract<
@@ -147,19 +149,41 @@ export type SeenMethod<
 
 export type MethodSignatures<
   Method,
+  Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Partial = unknown,
   Seen extends readonly unknown[] = [],
 > = Method extends (...args: infer Args) => infer Result
   ? SeenMethod<(...args: Args) => Result, Seen> extends true
     ? never
     :
-        | ((...args: Args) => Result)
+        | ((...args: Args) => MethodResult<Method, Endpoint, Result>)
         | MethodSignatures<
             ((...args: Args) => Result) & Partial & Method,
+            Endpoint,
             Partial & ((...args: Args) => Result),
             [...Seen, (...args: Args) => Result]
           >
   : never;
+export type MethodResult<
+  Method,
+  Endpoint extends HttpApiEndpoint.ConstraintRequest,
+  Result,
+> =
+  Result extends Effect.Effect<infer Data, infer Error, infer Services>
+    ? unknown extends Services
+      ? Method extends HttpApiClient.Client.Method<
+          Endpoint,
+          infer _Error,
+          infer ResidualServices
+        >
+        ? Effect.Effect<
+            Data,
+            Error,
+            ResidualServices | HttpApiEndpoint.ClientServices<Endpoint>
+          >
+        : Result
+      : Result
+    : Result;
 export type DecodedEffect<
   Method,
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
@@ -175,7 +199,10 @@ export type ClientEffect<
   Client,
   Mode extends "decoded-only" | "decoded-and-response" = "decoded-only",
 > = DecodedEffect<
-  MethodSignatures<Member<ClientGroup<Group, Client>, Endpoint["identifier"]>>,
+  MethodSignatures<
+    Member<ClientGroup<Group, Client>, Endpoint["identifier"]>,
+    Endpoint
+  >,
   Endpoint,
   Mode
 >;

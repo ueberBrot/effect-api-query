@@ -1,6 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
 import { dehydrate, hydrate, QueryClient } from "@tanstack/query-core";
-import { Effect, Predicate, Schema, SchemaTransformation } from "effect";
+import { Cause, Effect, Predicate, Schema, SchemaTransformation } from "effect";
 import { Rpc, RpcGroup } from "effect/rpc";
 
 import { createRpcQueryUtils, EffectRpcQueryKeyError } from "#effect-api-query";
@@ -437,7 +437,13 @@ describe("createRpcQueryUtils semantic keys", () => {
           code: "PayloadEncodingFailed",
           rpcTag: "errors.encoding",
         });
-        expect(encoding.cause).toBe(encodingFailure);
+        if (
+          !(encoding.cause instanceof Error) ||
+          !Cause.isCause(encoding.cause.cause)
+        ) {
+          throw new Error("Expected the upstream schema failure Cause");
+        }
+        expect(Cause.squash(encoding.cause.cause)).toBe(encodingFailure);
         for (const property of ["encoded", "payload"]) {
           expect(encoding).not.toHaveProperty(property);
         }

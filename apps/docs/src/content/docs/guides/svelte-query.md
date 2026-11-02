@@ -40,6 +40,6 @@ Compile the Svelte application with `module: "ESNext"` and `moduleResolution: "B
 
 ## Own the native integration
 
-Follow the [shared integration lifetime](/effect-api-query/integrations/#own-the-cache-and-client-lifetime) for providers, observer removal, stream finalizers, and accepted mutations. Keep Svelte Query and the application on one resolved Query Core version. Use a package-manager override when needed to align them, as described in the compatibility table. Use a compiler and tooling that Svelte supports.
+Follow the [shared integration lifetime](/effect-api-query/integrations/#own-the-cache-and-client-lifetime) for providers, observer removal, stream finalizers, and accepted mutations. Keep Svelte Query and the application on one resolved Query Core version. Use a compiler and tooling that Svelte supports.
 
 The application owns server rendering and hydration.

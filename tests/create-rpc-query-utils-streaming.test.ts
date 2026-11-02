@@ -618,9 +618,13 @@ describe("createRpcQueryUtils streaming execution", () => {
   describe.each(["ensuring", "acquireRelease"] as const)(
     "client-side %s finalization",
     (finalizer) => {
-      describe.each(["completion", "failure"] as const)(
-        "after stream %s",
-        (ending) => {
+      describe.each([
+        { ending: "completion", cleanup: "failure" },
+        { ending: "failure", cleanup: "failure" },
+        { ending: "failure", cleanup: "success" },
+      ] as const)(
+        "after stream $ending and cleanup $cleanup",
+        ({ ending, cleanup }) => {
           it.each(["live", "streamed"] as const)(
             "preserves complete stream and finalizer Causes in %s queries",
             async (operation) => {
@@ -645,7 +649,10 @@ describe("createRpcQueryUtils streaming execution", () => {
                   : Stream.succeed(1).pipe(
                       Stream.concat(Stream.failCause(streamCause))
                     );
-              const release = Effect.failCause(cleanupCause);
+              const release =
+                cleanup === "failure"
+                  ? Effect.failCause(cleanupCause)
+                  : Effect.void;
               const source =
                 finalizer === "ensuring"
                   ? values.pipe(Stream.ensuring(release))
@@ -654,6 +661,12 @@ describe("createRpcQueryUtils streaming execution", () => {
                         Effect.as(values)
                       )
                     );
+              const nativeExit = await Effect.runPromiseExit(
+                Stream.runDrain(source)
+              );
+              if (Exit.isSuccess(nativeExit)) {
+                throw new TypeError("Expected a native stream failure");
+              }
               /* oxlint-disable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
               const client = (() => source) as RpcClient.RpcClient.Flat<
                 RpcGroup.Rpcs<typeof group>
@@ -666,6 +679,7 @@ describe("createRpcQueryUtils streaming execution", () => {
                   finalizer,
                   operation,
                   ending,
+                  cleanup,
                 ],
               });
               const queryClient = new QueryClient({
@@ -684,14 +698,35 @@ describe("createRpcQueryUtils streaming execution", () => {
                 if (!isEffectRpcQueryError(error)) {
                   throw new TypeError("Expected an RPC execution error");
                 }
-                expect(
-                  Equal.equals(
-                    error.cause,
-                    ending === "completion"
-                      ? cleanupCause
-                      : Cause.combine(streamCause, cleanupCause)
-                  )
-                ).toBe(true);
+                expect(Equal.equals(error.cause, nativeExit.cause)).toBe(true);
+                const streamFailureReasons =
+                  cleanup === "success"
+                    ? streamCause.reasons
+                    : [
+                        Cause.makeDieReason("stream failed"),
+                        ...streamCause.reasons.slice(1),
+                        ...cleanupCause.reasons,
+                      ];
+                const expectedReasons =
+                  ending === "completion"
+                    ? cleanupCause.reasons
+                    : streamFailureReasons;
+                expect(error.cause.reasons).toStrictEqual(expectedReasons);
+                for (const [index, reason] of error.cause.reasons.entries()) {
+                  const expected = expectedReasons[index];
+                  if (expected === undefined) {
+                    throw new TypeError("Unexpected stream failure reason");
+                  }
+                  const [actualValue, expectedValue] = [reason, expected].map(
+                    (value) => {
+                      if (Cause.isDieReason(value)) {
+                        return value.defect;
+                      }
+                      return Cause.isFailReason(value) ? value.error : value;
+                    }
+                  );
+                  expect(actualValue).toBe(expectedValue);
+                }
               } finally {
                 queryClient.clear();
               }
@@ -1170,13 +1205,14 @@ describe("createRpcQueryUtils streaming execution", () => {
           const client = yield* makeRpcTestClient(streamGroup, {
             "events.watch": () => Stream.empty,
           });
+          const runExit = Effect.runPromiseExitWith(yield* Effect.context());
           let executions = 0;
           const utils = createRpcQueryUtils(streamGroup, {
             client,
             keyPrefix: ["app"] as const,
             runPromiseExit: async (effect, options) => {
               executions += 1;
-              return await Effect.runPromiseExit(effect, options);
+              return await runExit(effect, options);
             },
           });
           const callerOptions = Object.freeze({

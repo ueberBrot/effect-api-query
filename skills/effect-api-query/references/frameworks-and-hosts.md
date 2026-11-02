@@ -81,7 +81,7 @@ For independent reads that need to start together, pass generated options direct
 
 Before selecting or upgrading dependencies, read [Requirements and tested integrations](https://ueberbrot.github.io/effect-api-query/reference/compatibility-and-limits/#requirements-and-tested-integrations). Distinguish the library's peers, the listed wrapper's framework peers, and the exact checked combination. Native TypeScript hook-inference checks establish consumer types; use component compilers and build tooling supported by the framework.
 
-Keep Effect packages coordinated with the exact package peer. Pin Query packages to the checked versions and keep each native wrapper on the application's resolved Query Core. For Svelte, use a package-manager override when its declared Core dependency differs, as described in the table. Keep Angular core, common, compiler, and platform-browser on the same release.
+Keep Effect packages coordinated with the exact package peer. Pin Query packages to the checked versions and keep each native wrapper on the application's resolved Query Core. Keep Angular core, common, compiler, and platform-browser on the same release.
 
 Check the website's header version before applying its examples. When it differs from the installed package, use that package's declarations and shipped guidance. The repository's `main` branch can contain unreleased behavior.
 
