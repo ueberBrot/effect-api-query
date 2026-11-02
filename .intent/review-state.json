@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "b8ac7e474a87dc135c2f6606b04b107850b52d04f973d01a9e75a96651938720",
+      "fingerprint": "01a74b180c75a7d7cccdee06a6ebc59e0f619307a7f4f455df30a7d8bf16f4be",
       "snapshot": {
         "GLOSSARY.md": "9f7734ff552aa9a5c2b112f7948b5001ca82341a7acbc787ee5f7131b7be340a",
         "README.md": "d026d347122dbdf67569951c58f8ee35fd7130ded3fe5fedcbdf29aa3183d8c7",
@@ -22,7 +22,6 @@
         "apps/docs/src/content/docs/getting-started/quick-start.md": "91ddca16ad5c0f484d88a9d3b42d37065ee3a3bfd088bd6f1b25a45e96283788",
         "apps/docs/src/content/docs/guides/angular-query.md": "beb279a2ef34d1e69e685bcd8dbeddb0fafb0228ede9107dd9f95d86f9e5c72c",
         "apps/docs/src/content/docs/guides/cache-filters.md": "b0b8a08b6e2f3484a2565b6bd6d080cd1e95b3e9aefcb5aaf121cd7a96ad2591",
-        "apps/docs/src/content/docs/guides/cache-management.md": null,
         "apps/docs/src/content/docs/guides/cancellation.md": "7af74ddcb64ddc5454e3d8b4326a79b9683f1d744537c2b2f267e61a9447274b",
         "apps/docs/src/content/docs/guides/choose-stream-history.md": "9b3456e54724adb1480984fbb294454b68e8d4b80d8e7a2385940cf96dd81a05",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "cb941076de91c32bc0a1a5e8f6463ea521457210c00ccf4ef4e7de7c5fd135e9",
@@ -141,7 +140,7 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "262244bdf1d582898e42c2d0727551de351fb435b2f9294eac97a0f4796bfa54",
+        "package.json": "81082882065197fdc5eebc4e8df8549c00be98bb90be5c21b4ad4625262a4c11",
         "pnpm-workspace.yaml": "084718189418309a74c475346ff68d07efce92048f0254121a535126a74c7150",
         "scripts/check-framework-consumers.mts": "37fc0fc0006c2b1f35c5cff85754612e0b74d89eed608e353ef5f18f05fce051",
         "scripts/measure-bundles.mts": "5a033ce9f9a4cf414632b6f2781a50c0354f1cf9996791a547a5d53dbef66d7a",
@@ -150,8 +149,6 @@
         "scripts/measure-types.mts": "c6d92caa7ba074970bce28c268cbf49e70b57f6dbdc2755d38d33961b2afc2fc",
         "scripts/performance/common.mts": "57a2003d9769d884d1a0884cab5449cfce79c40300de8d0202d3f1780d51c4f5",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
-        "scripts/verify-docs-examples.mts": null,
-        "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "6cb3209b2207caf3b3bb8fc015836a94394b7dfc50b7c462ca329a286923a4a5",
         "skills/effect-api-query/references/cache-workflows.md": "47391e59a11e2adb946470872a5585be8bbcbf4765292e87117382aa99df1379",
@@ -302,18 +299,18 @@
         "tests/utility-configuration.test.ts": "a1ba1df1e174a6d8e8224a65483b961d2185c774fd84de78c1482626a5f78edd",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "848ea4bfa501ec60d65c83bd801b4e16f121807d",
-      "outcome": "updated",
-      "reason": "Updated exact Effect and minimum Query requirements, omitted resource-bearing HTTP endpoints, and removed the obsolete Svelte override recommendation. Existing task boundaries and activation remain unchanged.",
+      "head": "2e586d9fddaebe1b58a938a702ce0f2920baada0",
+      "outcome": "no-change",
+      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
       "evidence": [
-        "vp run --no-cache quality:17/17 tasks passed,761 runtime tests, public TS7/5.9 fixtures, packed Vue/Solid/Svelte/Angular consumers, Effect diagnostics and Fallow audits.",
-        "Vite React, TanStack Start and documentation builds passed.",
-        "Fresh isolated consumer loaded the packaged skill via Intent and passed nullable pagination, service-free HTTP and omitted-endpoint behavior at Query5.104.4 on TS7.0.2 and TS5.9.3. Automatic discovery was not evaluated.",
-        "Static review found no concrete issues. Chromium/Firefox documentation checks passed; local WebKit lacks system libraries."
+        "Before versioning: intent maintainer check passed at 2e586d9fddaebe1b58a938a702ce0f2920baada0.",
+        "changeset version and vp fmt generated 0.4.0 -> 0.5.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: package.json."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "59454eb30ca0fee4aa768f303223c8cf85b4301a8198bb4eac7bf64598c3199f",
+      "fingerprint": "fe6b404e073ddfdaea4511174d9940e9b7cfeac7005ba400b12776eae02b70bb",
       "snapshot": {
         "GLOSSARY.md": "9f7734ff552aa9a5c2b112f7948b5001ca82341a7acbc787ee5f7131b7be340a",
         "README.md": "d026d347122dbdf67569951c58f8ee35fd7130ded3fe5fedcbdf29aa3183d8c7",
@@ -335,7 +332,6 @@
         "apps/docs/src/content/docs/getting-started/quick-start.md": "91ddca16ad5c0f484d88a9d3b42d37065ee3a3bfd088bd6f1b25a45e96283788",
         "apps/docs/src/content/docs/guides/angular-query.md": "beb279a2ef34d1e69e685bcd8dbeddb0fafb0228ede9107dd9f95d86f9e5c72c",
         "apps/docs/src/content/docs/guides/cache-filters.md": "b0b8a08b6e2f3484a2565b6bd6d080cd1e95b3e9aefcb5aaf121cd7a96ad2591",
-        "apps/docs/src/content/docs/guides/cache-management.md": null,
         "apps/docs/src/content/docs/guides/cancellation.md": "7af74ddcb64ddc5454e3d8b4326a79b9683f1d744537c2b2f267e61a9447274b",
         "apps/docs/src/content/docs/guides/choose-stream-history.md": "9b3456e54724adb1480984fbb294454b68e8d4b80d8e7a2385940cf96dd81a05",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "cb941076de91c32bc0a1a5e8f6463ea521457210c00ccf4ef4e7de7c5fd135e9",
@@ -454,7 +450,7 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "262244bdf1d582898e42c2d0727551de351fb435b2f9294eac97a0f4796bfa54",
+        "package.json": "81082882065197fdc5eebc4e8df8549c00be98bb90be5c21b4ad4625262a4c11",
         "pnpm-workspace.yaml": "084718189418309a74c475346ff68d07efce92048f0254121a535126a74c7150",
         "scripts/check-framework-consumers.mts": "37fc0fc0006c2b1f35c5cff85754612e0b74d89eed608e353ef5f18f05fce051",
         "scripts/measure-bundles.mts": "5a033ce9f9a4cf414632b6f2781a50c0354f1cf9996791a547a5d53dbef66d7a",
@@ -463,8 +459,6 @@
         "scripts/measure-types.mts": "c6d92caa7ba074970bce28c268cbf49e70b57f6dbdc2755d38d33961b2afc2fc",
         "scripts/performance/common.mts": "57a2003d9769d884d1a0884cab5449cfce79c40300de8d0202d3f1780d51c4f5",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
-        "scripts/verify-docs-examples.mts": null,
-        "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "6cb3209b2207caf3b3bb8fc015836a94394b7dfc50b7c462ca329a286923a4a5",
         "skills/effect-api-query/references/cache-workflows.md": "47391e59a11e2adb946470872a5585be8bbcbf4765292e87117382aa99df1379",
@@ -615,12 +609,14 @@
         "tests/utility-configuration.test.ts": "a1ba1df1e174a6d8e8224a65483b961d2185c774fd84de78c1482626a5f78edd",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "848ea4bfa501ec60d65c83bd801b4e16f121807d",
-      "outcome": "updated",
-      "reason": "Aligned domain_map.yaml and skill_tree.yaml with the current0.4.0 package and resource-bearing HTTP exclusions. skill_spec.md retains accurate existing task coverage and validation procedures; no additional narrative is needed.",
+      "head": "2e586d9fddaebe1b58a938a702ce0f2920baada0",
+      "outcome": "no-change",
+      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
       "evidence": [
-        "Reviewed all three planning documents against the source and focused guidance diff. One skill and six references remain; source mappings and task ownership are unchanged.",
-        "Intent synchronization reports no metadata changes. Public compiler fixtures, packed native framework checks and an isolated packaged-skill consumer passed."
+        "Before versioning: intent maintainer check passed at 2e586d9fddaebe1b58a938a702ce0f2920baada0.",
+        "changeset version and vp fmt generated 0.4.0 -> 0.5.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: package.json."
       ]
     },
     "source:vite.config.ts": {
@@ -1704,16 +1700,16 @@
       ]
     },
     "source:CHANGELOG.md": {
-      "fingerprint": "1a5bd9ebd41bf239b6fce09beec9014fd2202588216ee26340ba1d2ed53fc9b7",
+      "fingerprint": "59c33a543a05a86ccef457fe15f8091f73b1bd084ef413bcd9a925400c07bb2e",
       "snapshot": {
-        "CHANGELOG.md": "300ba0228ee7586013bb9e43c2626f89d50e0eff718f528e4716703288935da9"
+        "CHANGELOG.md": "5550ce0dd285e3353adb8a48612046654b1666504691d2882cb1036b4b855041"
       },
-      "head": "9b3565f84f25b96887f3589caf346076edc437d0",
+      "head": "2e586d9fddaebe1b58a938a702ce0f2920baada0",
       "outcome": "no-change",
       "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Before versioning: intent maintainer check passed at 9b3565f84f25b96887f3589caf346076edc437d0.",
-        "changeset version and vp fmt generated 0.3.0 -> 0.4.0.",
+        "Before versioning: intent maintainer check passed at 2e586d9fddaebe1b58a938a702ce0f2920baada0.",
+        "changeset version and vp fmt generated 0.4.0 -> 0.5.0.",
         "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
         "Scoped generated changes: CHANGELOG.md."
       ]
@@ -2674,55 +2670,63 @@
       ]
     },
     "source:.changeset/omit-resource-bearing-http-endpoints.md": {
-      "fingerprint": "a6ec9168404f1224dbdf0a8f526d285c59fca0de0c80d87485f8cf28623eb602",
+      "fingerprint": "2d7b29f70b4cea09e7f31c51ac7bdb28f27ae6765029e450f08648a2591d2464",
       "snapshot": {
-        ".changeset/omit-resource-bearing-http-endpoints.md": "de19fbfb59cf42f065d80416e17e51698e76603eb5d463a56fadd6a231f3c37a"
+        ".changeset/omit-resource-bearing-http-endpoints.md": null
       },
-      "head": "848ea4bfa501ec60d65c83bd801b4e16f121807d",
+      "head": "2e586d9fddaebe1b58a938a702ce0f2920baada0",
       "outcome": "no-change",
-      "reason": "Separate release entry for a published peer or HTTP compatibility change; existing compatibility guidance covers the affected task.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/omit-resource-bearing-http-endpoints.md",
-        "Minor Query minimum change and separate patch entries for the Effect pin, HTTP runner inference and endpoint omission."
+        "Before versioning: intent maintainer check passed at 2e586d9fddaebe1b58a938a702ce0f2920baada0.",
+        "changeset version and vp fmt generated 0.4.0 -> 0.5.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/omit-resource-bearing-http-endpoints.md."
       ]
     },
     "source:.changeset/preserve-http-runner-inference.md": {
-      "fingerprint": "273b8760fe4d0bbb0a6f562e24cf50413c3fde4266c358060d29ba6e31d26b40",
+      "fingerprint": "f52e5d368555974fbd32f0d4f725cfa6c1a92a3df91cbbd1187321b2b0ea0585",
       "snapshot": {
-        ".changeset/preserve-http-runner-inference.md": "2260a22730f51aabd8b3d26563d0d4166004358781edf999ae86e41cb9d2644a"
+        ".changeset/preserve-http-runner-inference.md": null
       },
-      "head": "848ea4bfa501ec60d65c83bd801b4e16f121807d",
+      "head": "2e586d9fddaebe1b58a938a702ce0f2920baada0",
       "outcome": "no-change",
-      "reason": "Separate release entry for a published peer or HTTP compatibility change; existing compatibility guidance covers the affected task.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/preserve-http-runner-inference.md",
-        "Minor Query minimum change and separate patch entries for the Effect pin, HTTP runner inference and endpoint omission."
+        "Before versioning: intent maintainer check passed at 2e586d9fddaebe1b58a938a702ce0f2920baada0.",
+        "changeset version and vp fmt generated 0.4.0 -> 0.5.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/preserve-http-runner-inference.md."
       ]
     },
     "source:.changeset/preserve-null-pagination-cursors.md": {
-      "fingerprint": "3b548d84cfcda709fdc5681951159701ed7e1fedafd451a8a3554720bf54f365",
+      "fingerprint": "a41b0cb50357cce7d08ac6db89b8237973140f9aa5d20683f83402549670781b",
       "snapshot": {
-        ".changeset/preserve-null-pagination-cursors.md": "76eb3c4657d4ae0a140a1b55c1c654fa9bf9ee99047a794a3a53ace98a6bf53c"
+        ".changeset/preserve-null-pagination-cursors.md": null
       },
-      "head": "848ea4bfa501ec60d65c83bd801b4e16f121807d",
+      "head": "2e586d9fddaebe1b58a938a702ce0f2920baada0",
       "outcome": "no-change",
-      "reason": "Separate release entry for a published peer or HTTP compatibility change; existing compatibility guidance covers the affected task.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/preserve-null-pagination-cursors.md",
-        "Minor Query minimum change and separate patch entries for the Effect pin, HTTP runner inference and endpoint omission."
+        "Before versioning: intent maintainer check passed at 2e586d9fddaebe1b58a938a702ce0f2920baada0.",
+        "changeset version and vp fmt generated 0.4.0 -> 0.5.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/preserve-null-pagination-cursors.md."
       ]
     },
     "source:.changeset/update-effect-peer.md": {
-      "fingerprint": "e7d6c5f436cee6da71c453aa49b630097141b76e202218cd2b1d4c1255cf4536",
+      "fingerprint": "882854be446fb6b33262211b23f758a322e2b1b3da332b1c05eb298c33fd3fe5",
       "snapshot": {
-        ".changeset/update-effect-peer.md": "6105c8053c1cc89efa8dc125465d2a13d9cfb1046920fe5c438ca01abfe45151"
+        ".changeset/update-effect-peer.md": null
       },
-      "head": "848ea4bfa501ec60d65c83bd801b4e16f121807d",
+      "head": "2e586d9fddaebe1b58a938a702ce0f2920baada0",
       "outcome": "no-change",
-      "reason": "Separate release entry for a published peer or HTTP compatibility change; existing compatibility guidance covers the affected task.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/update-effect-peer.md",
-        "Minor Query minimum change and separate patch entries for the Effect pin, HTTP runner inference and endpoint omission."
+        "Before versioning: intent maintainer check passed at 2e586d9fddaebe1b58a938a702ce0f2920baada0.",
+        "changeset version and vp fmt generated 0.4.0 -> 0.5.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/update-effect-peer.md."
       ]
     }
   }
