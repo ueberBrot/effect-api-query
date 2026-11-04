@@ -625,15 +625,16 @@
       ]
     },
     "source:vite.config.ts": {
-      "fingerprint": "c335e3a5dbf2b18d4ff23aded6776651b26d8f5b0b29d440862dbd24dbcaf94e",
+      "fingerprint": "b75ff6d1e329b03ec9307be2100fa702337573e2a52a0d995462e8159972f3d8",
       "snapshot": {
-        "vite.config.ts": "214b26d9dc8c2ab34ae5cc863716b846c5e98edbb92b80aaca553bb326ce1e28"
+        "vite.config.ts": "88c68da88d34378234381acc37a126c378ee37a6ae7f05bbf7b38e8e8b325d5c"
       },
-      "head": "86365084f08c30a0dc1211ad450412195060de5c",
+      "head": "2c965bf74076389db1815bfcc21d1e163fb0c6a7",
       "outcome": "no-change",
-      "reason": "The changed test-path override applies the established Effect warning scope to the configuration composition fixture. Existing framework/performance task guidance remains current.",
+      "reason": "Only the repository check, lint, and typecheck task commands now select the installed checker-affinity scheduler. This keeps each file on its semantic checker and addresses reproduced moving false-any lint diagnostics without changing rules, compiler settings, public behavior, or usage guidance. The domain map, skill spec, and skill tree remain accurate for the existing task coverage, dependencies, source mappings, and migration cleanup.",
       "evidence": [
-        "Reviewed the exact override diff and fixture usage. Full typed lint, both public compilers, native framework fixtures, runtime regressions, formatting and Fallow checks pass."
+        "Inspected the vite.config.ts diff and empty CI changeset against HEAD 2c965bf. Controlled Linux A/B/A testing reproduced false-any diagnostics with baseline scheduling, passed four stressed affinity runs with all 751 rules, and reproduced failures again after restoring baseline. Rust --threads=1 still failed. Evidence: /tmp/eaq-lint-results/reproduction.md and eaq-native-lint-results.jsonl.",
+        "The exact updated named vp run --no-cache typecheck passed on Linux, including package and Astro prerequisites: /tmp/eaq-lint-results/named-typecheck.log. vp run quality passed locally: all four Fallow phases, 761 runtime tests, both public compilers, package validation, framework consumers, formatting, typed lint, and Effect diagnostics. Log: /tmp/eaq-ci-quality-pr156-affinity.log. No consumer recommendation or discovery metadata changed; a new consumer-agent task was not required."
       ]
     },
     "source:.github/workflows/release.yml": {
@@ -2767,6 +2768,19 @@
         "Scoped vp fmt --check, yamllint for both planning YAML files, git diff --check and intent validate skills --check passed. All 73 local links across the research record and shipped skill resolve.",
         "The full runtime suite is reserved for parent integration. No fresh consumer, independent upstream re-fetch, wider dependency compatibility matrix or benchmark was run.",
         "cmp confirms docs/research/2026-11-04-rpc-comparison.md is byte-for-byte equal to the parent original at /Users/debruyn/Code/privates/effect-api-query/docs/research/2026-11-04-rpc-comparison.md."
+      ]
+    },
+    "source:.changeset/stable-native-checker.md": {
+      "fingerprint": "513c17de76a0775fdf40515e67878a105cb1fd5f94a908810763ab984b0f09ce",
+      "snapshot": {
+        ".changeset/stable-native-checker.md": "9ef17a91cc3b60d4a0f1a1af8c17cca56c96da5a5946b51a3a718a870ec98b33"
+      },
+      "head": "2c965bf74076389db1815bfcc21d1e163fb0c6a7",
+      "outcome": "no-change",
+      "reason": "Only the repository check, lint, and typecheck task commands now select the installed checker-affinity scheduler. This keeps each file on its semantic checker and addresses reproduced moving false-any lint diagnostics without changing rules, compiler settings, public behavior, or usage guidance. The domain map, skill spec, and skill tree remain accurate for the existing task coverage, dependencies, source mappings, and migration cleanup.",
+      "evidence": [
+        "Inspected the vite.config.ts diff and empty CI changeset against HEAD 2c965bf. Controlled Linux A/B/A testing reproduced false-any diagnostics with baseline scheduling, passed four stressed affinity runs with all 751 rules, and reproduced failures again after restoring baseline. Rust --threads=1 still failed. Evidence: /tmp/eaq-lint-results/reproduction.md and eaq-native-lint-results.jsonl.",
+        "The exact updated named vp run --no-cache typecheck passed on Linux, including package and Astro prerequisites: /tmp/eaq-lint-results/named-typecheck.log. vp run quality passed locally: all four Fallow phases, 761 runtime tests, both public compilers, package validation, framework consumers, formatting, typed lint, and Effect diagnostics. Log: /tmp/eaq-ci-quality-pr156-affinity.log. No consumer recommendation or discovery metadata changed; a new consumer-agent task was not required."
       ]
     }
   }
