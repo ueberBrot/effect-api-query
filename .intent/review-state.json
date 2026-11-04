@@ -312,12 +312,12 @@
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "0ea74a78a9a6f17d9a44d455d5fb8f67c80d11b595c43f3d14328af17db62264",
+      "fingerprint": "d9ae7fbf34899e879f0114e9e0a4806e58f71e83633804fd289f63ed6323a60f",
       "snapshot": {
         "GLOSSARY.md": "9f7734ff552aa9a5c2b112f7948b5001ca82341a7acbc787ee5f7131b7be340a",
         "README.md": "22c3457347dec25e8fb3ed800b7900c18afd7f56c78aafb10fc1e90e59add514",
         "_artifacts/domain_map.yaml": "5ceb5de625f7b43ae4155a9b487419f7fd39ffde9f664d110c63d7522e9d2a2c",
-        "_artifacts/skill_spec.md": "61d9e8a0f46ba33c47436da13ceefdaed255b080c60818a88e8a3cbc6c7399c7",
+        "_artifacts/skill_spec.md": "fd021b09f6187bbef9b95b45be95afcdb96a1cceda92b235390020793f457ae0",
         "_artifacts/skill_tree.yaml": "0e4ae2f7d0b38244984cac636f5d304fcc30c41dfee2535c2a5d26a85c55c19f",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "bc035d79c362da5d8279115598b3d4bbe10073a0798eb75054c53e2922afdc35",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "36087588f413acfde2566fe7b8f0baeb04061a2b6fc1487ac81c4cc99a90f0e6",
@@ -612,13 +612,13 @@
         "tests/utility-configuration.test.ts": "a1ba1df1e174a6d8e8224a65483b961d2185c774fd84de78c1482626a5f78edd",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "3411f589a0793e23a594b2dc91531ac7a6b8adca",
+      "head": "8e11342565d9b77576e10fc84c2252c49b1e4540",
       "outcome": "updated",
-      "reason": "Extend only the current ADR-correction batch entry with the clarified release-note scope: retain the two pending consumer-facing patch summaries and omit a maintenance-only release entry. The domain map still points to ADR 0033 and the unchanged skill tree still covers one skill, six references and version 0.5.0.",
+      "reason": "Remove the temporary RPC research report and its planning reference at the maintainer request. Keep accepted ADR restoration, ADR 0033, reciprocal links, agent maintenance guidance, and the two consumer-facing pending summaries. The domain map points to ADR 0033; the skill spec records report removal; the skill tree and shipped guidance remain accurate.",
       "evidence": [
-        "Reviewed actual diff against c00e43cc17733fcc486d8ae08a9584ad014c5f16 and follow-up diff against 3411f589a0793e23a594b2dc91531ac7a6b8adca. Both summary strings exactly match the user request; frontmatter comparison confirms unchanged patch declarations. .changeset/preserve-accepted-adr-history.md is removed, leaving no new maintenance changeset in the PR diff.",
-        "vp run format and vp run changeset status pass. Runtime/source, tests, shipped skill and six references, dependency manifests and lockfile, version 0.5.0, peer range, README and website have no changes against the PR base. Prior historical-text, link, documentation and native Intent validation results remain applicable to unchanged content.",
-        "Native Intent sync requires no edits. Prior generic skill-creator sources-schema limitation and documentation build font/i18n/404 warnings remain reported. No new runtime matrix or fresh consumer/discovery claim is made for release-note prose."
+        "Inspected the actual working diff and _artifacts/domain_map.yaml, skill_spec.md, and skill_tree.yaml. Changesets CLI parses the existing release entries with unchanged package and bump declarations. No runtime code, public declarations, or dependency requirements changed. Formatting and git diff --check pass. Prior required CI passed on the unchanged implementation; full checks will run again after rebase before merge.",
+        "Compared historical ADR bodies against 604d820 after excluding status lines; body text matches exactly. All local links in changed ADRs resolve. Applied writing-for-agents and skill-creator principles with native Intent source review; unchanged skill content needs no new consumer exercise. The generic skill-creator validator has a known baseline incompatibility with the required Intent sources field; retain that metadata and use native validation. Fresh consumer-agent evidence was not added for this documentation correction.",
+        "vp run docs-check passes with zero Astro errors/warnings/hints; report path is deleted and active references are removed. Source changes stay within documentation, planning/review records and pending release-summary text."
       ]
     },
     "source:vite.config.ts": {
@@ -2747,19 +2747,17 @@
       ]
     },
     "source:docs/research/2026-11-04-rpc-comparison.md": {
-      "fingerprint": "83a2285fcf3a93c6460630bc8845c070d699938651fbe61b409814f23ba5a46a",
+      "fingerprint": "2421f7ec7015602887c9e95da7f18a4f1337d353c560cd07462f05a83b0390c6",
       "snapshot": {
-        "docs/research/2026-11-04-rpc-comparison.md": "5301f052064a7a6762cb1b757be959f1e4c494c44cd70b20b005ba8a40365600"
+        "docs/research/2026-11-04-rpc-comparison.md": null
       },
-      "head": "c00e43cc17733fcc486d8ae08a9584ad014c5f16",
-      "outcome": "updated",
-      "reason": "Add one follow-up pointer to the implemented ADR 0033 policy and evidence. Preserve the dated research baseline, alternatives and findings so historical exact-peer references no longer masquerade as the current accepted decision.",
+      "head": "8e11342565d9b77576e10fc84c2252c49b1e4540",
+      "outcome": "no-change",
+      "reason": "Remove the temporary RPC research report and its planning reference at the maintainer request. Keep accepted ADR restoration, ADR 0033, reciprocal links, agent maintenance guidance, and the two consumer-facing pending summaries. The domain map points to ADR 0033; the skill spec records report removal; the skill tree and shipped guidance remain accurate.",
       "evidence": [
-        "Source comparison: git diff c00e43cc17733fcc486d8ae08a9584ad014c5f16, original ADR bodies from 604d8204e12861edc70d5996a873ff3d26919262; status-only normalization confirms ADRs 0001/0025/0032 retain that historical text.",
-        "Audit: skills/effect-api-query/SKILL.md and references/frameworks-and-hosts.md remain accurate for package 0.5.0; package.json, pnpm-workspace.yaml, scripts/check-effect-compatibility.mts, README.md and current website compatibility guidance are unchanged.",
-        "Checks passed: frozen install; 120 local Markdown links across 43 documents; YAML validation; vp run format; vp run docs-check (20 excerpt cases, Astro diagnostics); vp run docs-build (57 pages, all internal links); vp exec intent validate skills --check; native maintainer sync reports nothing to synchronize.",
-        "Existing CI evidence: https://github.com/ueberBrot/effect-api-query/actions/runs/41833854445, head f5402cd5eac0222e6b82dffe5579a6ad59c13a55; packed consumers with Effect 4.0.6 and 4.0.7 each pass TypeScript 7/5.9 compiler fixtures and 109 selected runtime cases. The prose-only correction does not rerun the runtime matrix.",
-        "Limitations: system skill-creator quick_validate rejects the baseline Intent top-level sources field; native Intent accepts the original skill. Docs build succeeds with fontsource DNS and existing i18n/404 warnings. No fresh consumer-agent or discovery evidence was added; recommendations and activation metadata are unchanged."
+        "Inspected the actual working diff and _artifacts/domain_map.yaml, skill_spec.md, and skill_tree.yaml. Changesets CLI parses the existing release entries with unchanged package and bump declarations. No runtime code, public declarations, or dependency requirements changed. Formatting and git diff --check pass. Prior required CI passed on the unchanged implementation; full checks will run again after rebase before merge.",
+        "Compared historical ADR bodies against 604d820 after excluding status lines; body text matches exactly. All local links in changed ADRs resolve. Applied writing-for-agents and skill-creator principles with native Intent source review; unchanged skill content needs no new consumer exercise. The generic skill-creator validator has a known baseline incompatibility with the required Intent sources field; retain that metadata and use native validation. Fresh consumer-agent evidence was not added for this documentation correction.",
+        "vp run docs-check passes with zero Astro errors/warnings/hints; report path is deleted and active references are removed. Source changes stay within documentation, planning/review records and pending release-summary text."
       ]
     },
     "source:.changeset/stable-native-checker.md": {
