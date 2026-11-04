@@ -118,8 +118,6 @@ Use generated keys to read, write, and invalidate cache entries. Queries forward
 
 Typed hydration codecs register each view's serialization policy. Stream recovery and publication controls preserve application ownership of transport and resume policy. Your application decides which queries to invalidate after mutations. See [feature support](https://ueberbrot.github.io/effect-api-query/getting-started/feature-support/) for supported contracts and limits.
 
-For the 0.4 upgrade, see [Migrate to 0.4](https://ueberbrot.github.io/effect-api-query/guides/migrate-to-0-4/).
-
 ## Documentation and examples
 
 - [Documentation](https://ueberbrot.github.io/effect-api-query/): queries, mutations, pagination, streaming, policies, and caching.

@@ -5,8 +5,6 @@ description: Check dependency requirements, tested integrations, module format, 
 
 Import both factories from the `@ueberbrot/effect-api-query` package root. They use the same peer dependencies. Check your installed package's manifest for its peer requirements. See [Requirements and tested integrations](/effect-api-query/reference/compatibility-and-limits/#requirements-and-tested-integrations) for library peers, native framework requirements, and exact checked versions.
 
-For the 0.4 upgrade, follow [Migrate to 0.4](/effect-api-query/guides/migrate-to-0-4/).
-
 This website documents the package version shown in its header. The repository's `main` branch can contain unreleased changes.
 
 The package is ESM-only and targets ES2022. Enable strict TypeScript checking.
