@@ -703,15 +703,15 @@
       ]
     },
     "source:.fallowrc.jsonc": {
-      "fingerprint": "9ded238df541ee24681ac350d6c30f79f585964261764f67c2c16a18e003a9c3",
+      "fingerprint": "4c1c5206b637efdc736ae667bdb385871f21b83ea3ec616b527a3df1e2dd14d1",
       "snapshot": {
-        ".fallowrc.jsonc": "6915c92ac5c9b831192df087f38445bf3446cb407a16149f2d660a7c521f60bc"
+        ".fallowrc.jsonc": "a19a438946e316ced0601fdecd189698f5bb07ff90e872706c2a50f9b6ef6ce4"
       },
-      "head": "86365084f08c30a0dc1211ad450412195060de5c",
+      "head": "ebdfe980bd9646f34fe302e758928a07b847ddcd",
       "outcome": "no-change",
-      "reason": "The configuration registers executable measurement/check scripts and excludes the separately compiled framework fixture project. It changes repository analysis coverage without adding package behavior or consumer guidance.",
+      "reason": "Fallow entry-point registration only: the existing Effect compatibility command is invoked by its Vite+ task, including CI, and must be reachable in production dead-code analysis. No library behavior or guidance changed. The domain map, skill spec, and skill tree remain accurate; their scope, source mappings, dependency guidance, and task checks are unchanged.",
       "evidence": [
-        "vp run fallow passes all four tasks; final maintainability is 91.5. The isolated framework compiler task passes on TypeScript 7 and 5.9."
+        "PR 157: inspected the working diff against HEAD and all three _artifacts planning documents. vp run quality passed: formatting, typed lint, Effect diagnostics, both published compilers, package validation, full Fallow task (general and production dead code, duplication, health), runtime suite, and framework consumer compilers. Log: /tmp/eaq-ci-quality-pr157.log. No recommended consumer behavior or discovery description changed, so no new consumer-agent check was required."
       ]
     },
     "source:.github/workflows/ci.yml": {
@@ -2781,6 +2781,18 @@
       "evidence": [
         "Inspected the vite.config.ts diff and empty CI changeset against HEAD 2c965bf. Controlled Linux A/B/A testing reproduced false-any diagnostics with baseline scheduling, passed four stressed affinity runs with all 751 rules, and reproduced failures again after restoring baseline. Rust --threads=1 still failed. Evidence: /tmp/eaq-lint-results/reproduction.md and eaq-native-lint-results.jsonl.",
         "The exact updated named vp run --no-cache typecheck passed on Linux, including package and Astro prerequisites: /tmp/eaq-lint-results/named-typecheck.log. vp run quality passed locally: all four Fallow phases, 761 runtime tests, both public compilers, package validation, framework consumers, formatting, typed lint, and Effect diagnostics. Log: /tmp/eaq-ci-quality-pr156-affinity.log. No consumer recommendation or discovery metadata changed; a new consumer-agent task was not required."
+      ]
+    },
+    "source:.changeset/register-effect-audit-entry.md": {
+      "fingerprint": "6adfca0f1b67a08be4ef5af17acb942d487749cf9b78dc356fabe67447db26c5",
+      "snapshot": {
+        ".changeset/register-effect-audit-entry.md": "df71b3424357a136e5f06edaa3ddc4664252987d195eaabcfee4113582323ce4"
+      },
+      "head": "ebdfe980bd9646f34fe302e758928a07b847ddcd",
+      "outcome": "no-change",
+      "reason": "Fallow entry-point registration only: the existing Effect compatibility command is invoked by its Vite+ task, including CI, and must be reachable in production dead-code analysis. No library behavior or guidance changed. The domain map, skill spec, and skill tree remain accurate; their scope, source mappings, dependency guidance, and task checks are unchanged.",
+      "evidence": [
+        "PR 157: inspected the working diff against HEAD and all three _artifacts planning documents. vp run quality passed: formatting, typed lint, Effect diagnostics, both published compilers, package validation, full Fallow task (general and production dead code, duplication, health), runtime suite, and framework consumer compilers. Log: /tmp/eaq-ci-quality-pr157.log. No recommended consumer behavior or discovery description changed, so no new consumer-agent check was required."
       ]
     }
   }
