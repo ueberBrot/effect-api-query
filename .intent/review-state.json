@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "fd2a20f7d0cbe0ac4c2480a96670ddf9418a18b3a1f5c5b852a8dae4ebad3c9d",
+      "fingerprint": "a4f542695578e248731cdff0006d4e272f1a744656703204cdf7721754158e64",
       "snapshot": {
         "GLOSSARY.md": "9f7734ff552aa9a5c2b112f7948b5001ca82341a7acbc787ee5f7131b7be340a",
         "README.md": "22c3457347dec25e8fb3ed800b7900c18afd7f56c78aafb10fc1e90e59add514",
@@ -29,7 +29,7 @@
         "apps/docs/src/content/docs/guides/handle-failures.md": "337c0146b06c6ee5d2a551af7cabf543dfaaa0b8bb13704bde77186d0d3ff571",
         "apps/docs/src/content/docs/guides/http-metadata.md": "fdbe2191e477bc82ed2542277a44e7e5d7513f5eeea2cad3ab8c594c4eb354cb",
         "apps/docs/src/content/docs/guides/http-queries-and-mutations.md": "6986c0a13febe76c0d9433336c567b3336df54ed480d05d25e053abf54d97d69",
-        "apps/docs/src/content/docs/guides/hydrate-query-views.md": "a06ba615e7173c75ba4191dec97a82b02d33a793fe399f66b749a8a56d40b672",
+        "apps/docs/src/content/docs/guides/hydrate-query-views.md": "5afe7566eb36187c613a58e272de32383027e7765b3f19d9c1bbb5894cc606af",
         "apps/docs/src/content/docs/guides/hydrate-unary-data.md": "37d4ff8c5f6fc0b687c01685657d64dc4d136622c51e03a6b9c015bf1f00dc07",
         "apps/docs/src/content/docs/guides/mutations.md": "14eab9a6ef28b6cdb4368766e543d83abcb59b50008ba570d1a3092851ee368d",
         "apps/docs/src/content/docs/guides/optimistic-writes.md": "309964011fd58b301387c485eba621d06a3a73f3ddd0114918fd94f8d654e17d",
@@ -155,7 +155,7 @@
         "skills/effect-api-query/references/cache-workflows.md": "42c0ce61abfa508bae0045b99a56b01b316dca93f1b17b2e27f25b5d876bbd92",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "8afb9f6c9f4756ce654c0c7e2fa542896585d8d46f3449544b16baeb58678bce",
         "skills/effect-api-query/references/http.md": "73eb5febbe01ba10e6b954c17c80df9eff5343feca37be516f44e85761fb3cd0",
-        "skills/effect-api-query/references/hydration-and-ssr.md": "7e8c6566a6f5e46f2f7711e7745bef84be58f5354bb797ed411c05b819d601d2",
+        "skills/effect-api-query/references/hydration-and-ssr.md": "30aeb844f4b4f7c3c6a5a70f4ecbfabbdfb7b332c62105b4ecad182238d38705",
         "skills/effect-api-query/references/query-patterns.md": "867ee139dec9a61f7f0a75192df9ba88c46a04e8251d0c25f4be7653c1fd5d39",
         "skills/effect-api-query/references/rpc.md": "7bfc134371d723b24da15a0bc07b1022daaddf6e0b47cb281900c147f78e9c59",
         "src/core/branch-filter.ts": "71a8c6039f1775881bbc00d92e14e2ef823bf7150721307a74f16a1579bccc86",
@@ -281,7 +281,7 @@
         "tests/types/http-stream-contract.ts": "deb4d7766f1a140a511fb137b9a6d834a992abc8257498e2b3349fcc6e746b85",
         "tests/types/http-type-scale.ts": "447d34e1fa952c843a866fd4dcde80dd32390f7ff14ba701b1960f45bc1292ce",
         "tests/types/http-view-proof.ts": "0b66f30863c5451d47144980af9cf5517637c8f7ca7866b64d1a704cea089413",
-        "tests/types/hydration-contract.ts": "a95471deb61aab482a8fd8189980cd87e94de733ff2bee1d89bb8ca1f7ba30f4",
+        "tests/types/hydration-contract.ts": "fade858552c1b04fd45f48e86a42668a6132918196eca9089d56f1948551cd64",
         "tests/types/interceptor-contract.ts": "14814393d97b03b55b8a8e84014e24f0f6fc1003e71c2d832a8d643320c5ea18",
         "tests/types/public-contract.ts": "595d38c2029d8d0d15d8d8d735653cc6a11f8ecaddd108fbc652097b55c015d8",
         "tests/types/query-filter-contract.ts": "89977942cf8942af10535fb2ec4a4ab679d920a7d226ef26616faaf518b9a6e9",
@@ -300,16 +300,17 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "593c2ecee002d8bfbc5c05e11573369c1d3f9b1d",
+      "head": "01082803c9a93d32156b9d129d8af90b35fd9ebb",
       "outcome": "updated",
-      "reason": "Reconcile the configuration performance feature with merged main, preserving its indexed validation, omitted empty settings, frozen-subtree reuse, ownership and scope semantics. Keep the updated cache/performance guidance and all three planning records consistent with the existing one-skill/six-reference scope. Retain main version metadata, ADR 0033, concise user-facing release notes and removal of internal research reports; measurement evidence lives in the PR.",
+      "reason": "Reorganized hydrate-query-views.md to recommend the existing typed registry and native dehydrate -> encode/decode -> hydrate sequence before representation details; removed duplicated manual codec-ID dispatch instructions. Added only a navigation/recommended-workflow section in the owning hydration-and-ssr reference. Simplified the existing compiled registry excerpt while retaining infinite/history registrations elsewhere in that fixture and all runtime/manual fixtures. No library interface, behavior, dependency, discovery description, or lifetime ownership changed. Replayed the PR on current main, preserving its source and guidance edits and main's existing records; only generated Intent review-state conflicts were resolved during rebase. The existing domain map, skill spec and skill tree retain the combined task coverage, source mappings, peer bounds and prior decisions.",
       "evidence": [
-        "Base origin/main=ca30c60bfc09085f0ee781a129672fc84965699b. The prepared parent f244bb2 has the identical file tree as its squash merge. After reparenting the feature commits, git diff against tested head 74c5feba5b1a89fb8069817243d371f7f486988b is empty; performance source/scripts/tests also match the reviewed c1904f1 implementation.",
-        "Frozen lockfile installation and vp run quality passed on the identical prepared tree: 764 tests, published compilers on TypeScript 7 and 5.9, package checks, framework consumers, Effect diagnostics, typed lint/formatting and all Fallow audits. Log /tmp/eaq-merge-quality-pr158.log. Native Intent review preserves domain_map.yaml, skill_spec.md and skill_tree.yaml; writing-for-agents and skill-creator principles apply without a new discovery surface. No new consumer-agent evidence is claimed for the rebase. GitHub CI will run on the pushed head before merge."
+        "Source base 604d8204e12861edc70d5996a873ff3d26919262 (package 0.5.0). vp run docs-check passed: 20 excerpt checks and Astro with 0 errors/warnings/hints. vp run api-types passed both TypeScript 7.0.2 and 5.9.3 compiler fixtures and its pack/attw/publint prerequisite. Existing focused hydration/runtime checks passed 29 tests in tests/hydration-codecs.test.ts, tests/http-hydration.test.ts, tests/stream-snapshot.test.ts, and tests/cache-recipes.test.ts after the package build completed. Scoped vp run format passed; intent validate skills --check passed; git diff --check passed. Inspected src/core/hydration.ts, the hydration contract/view fixtures, and the owning shipped reference. Separate encoding/decoding requirements, whole-batch preparation, page-parameter ownership, undefined elements, HTTP wrapper/header safety, and open-stream cleanup remain documented and covered by existing checks. No new runtime tests were added for prose. Fresh-consumer/discovery evaluation was not run: this implementation is restricted to one agent, and activation metadata is unchanged; authoring checks are not independent consumer evidence.",
+        "GitHub Actions https://github.com/ueberBrot/effect-api-query/actions/runs/41876593283: vp run quality and vp run docs-check passed on the rebased tree; quality includes formatting/linting, Effect diagnostics, four Fallow audits, public type fixtures, runtime tests and framework consumers.",
+        "Main coverage boundary affa6a2e3e68a5096c0256a2a9f78f74474c3c24. Reviewed the replay diff and all three planning records. Existing author evidence retained; this replay adds no independent consumer-agent or discovery validation."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "9734a21f8c3518894ffa638818db5c6822b929296e7970904953f41b2d5211ca",
+      "fingerprint": "5a1028d9e7a856eaab767653bb7209525524cdaeb9999d31b0ccfa0f45321f67",
       "snapshot": {
         "GLOSSARY.md": "9f7734ff552aa9a5c2b112f7948b5001ca82341a7acbc787ee5f7131b7be340a",
         "README.md": "22c3457347dec25e8fb3ed800b7900c18afd7f56c78aafb10fc1e90e59add514",
@@ -338,7 +339,7 @@
         "apps/docs/src/content/docs/guides/handle-failures.md": "337c0146b06c6ee5d2a551af7cabf543dfaaa0b8bb13704bde77186d0d3ff571",
         "apps/docs/src/content/docs/guides/http-metadata.md": "fdbe2191e477bc82ed2542277a44e7e5d7513f5eeea2cad3ab8c594c4eb354cb",
         "apps/docs/src/content/docs/guides/http-queries-and-mutations.md": "6986c0a13febe76c0d9433336c567b3336df54ed480d05d25e053abf54d97d69",
-        "apps/docs/src/content/docs/guides/hydrate-query-views.md": "a06ba615e7173c75ba4191dec97a82b02d33a793fe399f66b749a8a56d40b672",
+        "apps/docs/src/content/docs/guides/hydrate-query-views.md": "5afe7566eb36187c613a58e272de32383027e7765b3f19d9c1bbb5894cc606af",
         "apps/docs/src/content/docs/guides/hydrate-unary-data.md": "37d4ff8c5f6fc0b687c01685657d64dc4d136622c51e03a6b9c015bf1f00dc07",
         "apps/docs/src/content/docs/guides/mutations.md": "14eab9a6ef28b6cdb4368766e543d83abcb59b50008ba570d1a3092851ee368d",
         "apps/docs/src/content/docs/guides/optimistic-writes.md": "309964011fd58b301387c485eba621d06a3a73f3ddd0114918fd94f8d654e17d",
@@ -464,7 +465,7 @@
         "skills/effect-api-query/references/cache-workflows.md": "42c0ce61abfa508bae0045b99a56b01b316dca93f1b17b2e27f25b5d876bbd92",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "8afb9f6c9f4756ce654c0c7e2fa542896585d8d46f3449544b16baeb58678bce",
         "skills/effect-api-query/references/http.md": "73eb5febbe01ba10e6b954c17c80df9eff5343feca37be516f44e85761fb3cd0",
-        "skills/effect-api-query/references/hydration-and-ssr.md": "7e8c6566a6f5e46f2f7711e7745bef84be58f5354bb797ed411c05b819d601d2",
+        "skills/effect-api-query/references/hydration-and-ssr.md": "30aeb844f4b4f7c3c6a5a70f4ecbfabbdfb7b332c62105b4ecad182238d38705",
         "skills/effect-api-query/references/query-patterns.md": "867ee139dec9a61f7f0a75192df9ba88c46a04e8251d0c25f4be7653c1fd5d39",
         "skills/effect-api-query/references/rpc.md": "7bfc134371d723b24da15a0bc07b1022daaddf6e0b47cb281900c147f78e9c59",
         "src/core/branch-filter.ts": "71a8c6039f1775881bbc00d92e14e2ef823bf7150721307a74f16a1579bccc86",
@@ -590,7 +591,7 @@
         "tests/types/http-stream-contract.ts": "deb4d7766f1a140a511fb137b9a6d834a992abc8257498e2b3349fcc6e746b85",
         "tests/types/http-type-scale.ts": "447d34e1fa952c843a866fd4dcde80dd32390f7ff14ba701b1960f45bc1292ce",
         "tests/types/http-view-proof.ts": "0b66f30863c5451d47144980af9cf5517637c8f7ca7866b64d1a704cea089413",
-        "tests/types/hydration-contract.ts": "a95471deb61aab482a8fd8189980cd87e94de733ff2bee1d89bb8ca1f7ba30f4",
+        "tests/types/hydration-contract.ts": "fade858552c1b04fd45f48e86a42668a6132918196eca9089d56f1948551cd64",
         "tests/types/interceptor-contract.ts": "14814393d97b03b55b8a8e84014e24f0f6fc1003e71c2d832a8d643320c5ea18",
         "tests/types/public-contract.ts": "595d38c2029d8d0d15d8d8d735653cc6a11f8ecaddd108fbc652097b55c015d8",
         "tests/types/query-filter-contract.ts": "89977942cf8942af10535fb2ec4a4ab679d920a7d226ef26616faaf518b9a6e9",
@@ -609,12 +610,13 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "593c2ecee002d8bfbc5c05e11573369c1d3f9b1d",
-      "outcome": "updated",
-      "reason": "Reconcile the configuration performance feature with merged main, preserving its indexed validation, omitted empty settings, frozen-subtree reuse, ownership and scope semantics. Keep the updated cache/performance guidance and all three planning records consistent with the existing one-skill/six-reference scope. Retain main version metadata, ADR 0033, concise user-facing release notes and removal of internal research reports; measurement evidence lives in the PR.",
+      "head": "01082803c9a93d32156b9d129d8af90b35fd9ebb",
+      "outcome": "no-change",
+      "reason": "All three existing planning records remain accurate for this documentation locality change. domain_map.yaml already covers rich-value hydration with typed view registration, selected-view decoding, and request cleanup, including rich page parameters and undefined elements. skill_spec.md already assigns snapshots, typed view registration, preparation, and cleanup to the existing hydration reference. skill_tree.yaml already maps the affected docs and compiler fixtures to the same skill and lists the existing hydration reference. No task, domain, skill, prerequisite, source mapping, distribution choice, or verified version claim changes; a new history entry or metadata bump would add no new coverage. Replayed the PR on current main, preserving its source and guidance edits and main's existing records; only generated Intent review-state conflicts were resolved during rebase. The existing domain map, skill spec and skill tree retain the combined task coverage, source mappings, peer bounds and prior decisions.",
       "evidence": [
-        "Base origin/main=ca30c60bfc09085f0ee781a129672fc84965699b. The prepared parent f244bb2 has the identical file tree as its squash merge. After reparenting the feature commits, git diff against tested head 74c5feba5b1a89fb8069817243d371f7f486988b is empty; performance source/scripts/tests also match the reviewed c1904f1 implementation.",
-        "Frozen lockfile installation and vp run quality passed on the identical prepared tree: 764 tests, published compilers on TypeScript 7 and 5.9, package checks, framework consumers, Effect diagnostics, typed lint/formatting and all Fallow audits. Log /tmp/eaq-merge-quality-pr158.log. Native Intent review preserves domain_map.yaml, skill_spec.md and skill_tree.yaml; writing-for-agents and skill-creator principles apply without a new discovery surface. No new consumer-agent evidence is claimed for the rebase. GitHub CI will run on the pushed head before merge."
+        "Source base 604d8204e12861edc70d5996a873ff3d26919262 (package 0.5.0). vp run docs-check passed: 20 excerpt checks and Astro with 0 errors/warnings/hints. vp run api-types passed both TypeScript 7.0.2 and 5.9.3 compiler fixtures and its pack/attw/publint prerequisite. Existing focused hydration/runtime checks passed 29 tests in tests/hydration-codecs.test.ts, tests/http-hydration.test.ts, tests/stream-snapshot.test.ts, and tests/cache-recipes.test.ts after the package build completed. Scoped vp run format passed; intent validate skills --check passed; git diff --check passed. Read _artifacts/domain_map.yaml, _artifacts/skill_spec.md, and _artifacts/skill_tree.yaml in full, compared their hydration coverage and mappings with the scoped diff, and confirmed intent maintainer sync reported Nothing to synchronize. The generated planning review reports no problems. Historical version records are left untouched, consistent with this branch excluding unrelated migration edits.",
+        "GitHub Actions https://github.com/ueberBrot/effect-api-query/actions/runs/41876593283: vp run quality and vp run docs-check passed on the rebased tree; quality includes formatting/linting, Effect diagnostics, four Fallow audits, public type fixtures, runtime tests and framework consumers.",
+        "Main coverage boundary affa6a2e3e68a5096c0256a2a9f78f74474c3c24. Reviewed the replay diff and all three planning records. Existing author evidence retained; this replay adds no independent consumer-agent or discovery validation."
       ]
     },
     "source:vite.config.ts": {
@@ -2838,6 +2840,20 @@
       "evidence": [
         "Base origin/main=ca30c60bfc09085f0ee781a129672fc84965699b. The prepared parent f244bb2 has the identical file tree as its squash merge. After reparenting the feature commits, git diff against tested head 74c5feba5b1a89fb8069817243d371f7f486988b is empty; performance source/scripts/tests also match the reviewed c1904f1 implementation.",
         "Frozen lockfile installation and vp run quality passed on the identical prepared tree: 764 tests, published compilers on TypeScript 7 and 5.9, package checks, framework consumers, Effect diagnostics, typed lint/formatting and all Fallow audits. Log /tmp/eaq-merge-quality-pr158.log. Native Intent review preserves domain_map.yaml, skill_spec.md and skill_tree.yaml; writing-for-agents and skill-creator principles apply without a new discovery surface. No new consumer-agent evidence is claimed for the rebase. GitHub CI will run on the pushed head before merge."
+      ]
+    },
+    "source:.changeset/typed-hydration-guide.md": {
+      "fingerprint": "d0264e07b0267afa99181fa9ef0a7cf1cc7bc579d4d0ab9337a9d12f39ac5d7a",
+      "snapshot": {
+        ".changeset/typed-hydration-guide.md": "b321b68cde20b72fbd5318037ef5666912b630901879b1d24a5a23b64ac3752b"
+      },
+      "head": "01082803c9a93d32156b9d129d8af90b35fd9ebb",
+      "outcome": "no-change",
+      "reason": "The requested focused patch Changeset describes the guide workflow/navigation improvement and does not add a developer task or change runtime/type contracts. Existing hydration guidance owns its subject; no additional skill or planning change is needed. Replayed the PR on current main, preserving its source and guidance edits and main's existing records; only generated Intent review-state conflicts were resolved during rebase. The existing domain map, skill spec and skill tree retain the combined task coverage, source mappings, peer bounds and prior decisions.",
+      "evidence": [
+        "Source base 604d8204e12861edc70d5996a873ff3d26919262 (package 0.5.0). vp run docs-check passed: 20 excerpt checks and Astro with 0 errors/warnings/hints. vp run api-types passed both TypeScript 7.0.2 and 5.9.3 compiler fixtures and its pack/attw/publint prerequisite. Existing focused hydration/runtime checks passed 29 tests in tests/hydration-codecs.test.ts, tests/http-hydration.test.ts, tests/stream-snapshot.test.ts, and tests/cache-recipes.test.ts after the package build completed. Scoped vp run format passed; intent validate skills --check passed; git diff --check passed. .changeset/typed-hydration-guide.md names only @ueberbrot/effect-api-query and describes typed registration/native preparation plus the retained ownership and safety details.",
+        "GitHub Actions https://github.com/ueberBrot/effect-api-query/actions/runs/41876593283: vp run quality and vp run docs-check passed on the rebased tree; quality includes formatting/linting, Effect diagnostics, four Fallow audits, public type fixtures, runtime tests and framework consumers.",
+        "Main coverage boundary affa6a2e3e68a5096c0256a2a9f78f74474c3c24. Reviewed the replay diff and all three planning records. Existing author evidence retained; this replay adds no independent consumer-agent or discovery validation."
       ]
     }
   }
