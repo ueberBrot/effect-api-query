@@ -4,6 +4,7 @@
   "entry": [
     "scripts/check-effect-compatibility.mts",
     "scripts/measure-construction.mts",
+    "scripts/measure-structural-sharing.mts",
     "scripts/check-framework-consumers.mts",
     "scripts/measure-bundles.mts",
     "scripts/measure-streams.mts",

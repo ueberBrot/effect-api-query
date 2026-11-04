@@ -33,7 +33,7 @@ const api = HttpApi.make("readings").add(
   )
 );
 
-export function readingQueries<E>(
+function readingQueries<E>(
   client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof group>, E>,
   httpClient: HttpApiClient.ForApi<typeof api>,
   queryClient: QueryClient
@@ -88,3 +88,5 @@ export function readingQueries<E>(
     | undefined;
   return { read, metadata };
 }
+
+void readingQueries;
