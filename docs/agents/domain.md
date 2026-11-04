@@ -15,6 +15,10 @@ When your output names a domain concept (in an issue title, a refactor proposal,
 
 If a concept is missing from the glossary, check whether an existing term covers it. If none does, note the gap for `/domain-modeling`.
 
-## Flag ADR conflicts
+## Maintain ADR history
 
 If a proposal contradicts an existing ADR, link to that decision and explain why it should be revisited. Preserve the decision until a replacement is agreed.
+
+Preserve an accepted ADR's recorded context, decision, and consequences. Record a replacement decision in the next numbered ADR, with reciprocal supersession links. For a partial amendment, identify the changed constraint and link both records; retain accepted status for the decision that still applies.
+
+Update statuses, links, and editorial wording when the recorded meaning is preserved.
