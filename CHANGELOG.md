@@ -1,5 +1,23 @@
 # effect-api-query
 
+## 0.6.0
+
+### Minor Changes
+
+- [#161](https://github.com/ueberBrot/effect-api-query/pull/161) [`260fa51`](https://github.com/ueberBrot/effect-api-query/commit/260fa5164f18a2aae3577a121518095a78bb371b) - Expose accumulated and live query builders for a single decoded HTTP `StreamNdjson` success, including declared response headers. Reuse stream retention, publication, snapshots, cancellation, and complete ready-client error and service inference. NDJSON uses the Effect declaration's decoder limits and has no SSE-specific options or key fields.
+
+### Patch Changes
+
+- [#158](https://github.com/ueberBrot/effect-api-query/pull/158) [`affa6a2`](https://github.com/ueberBrot/effect-api-query/commit/affa6a2e3e68a5096c0256a2a9f78f74474c3c24) - Reduce `configureUtils` overhead when applying sparse or repeated configuration to large utility trees.
+
+- [#157](https://github.com/ueberBrot/effect-api-query/pull/157) [`c00e43c`](https://github.com/ueberBrot/effect-api-query/commit/c00e43cc17733fcc486d8ae08a9584ad014c5f16) - Allow newer Effect 4.0.x releases without peer-dependency conflicts. Effect 4.0.6 remains supported.
+
+- [#160](https://github.com/ueberBrot/effect-api-query/pull/160) [`10075f5`](https://github.com/ueberBrot/effect-api-query/commit/10075f5c3a24eb7ce81c4dd54a91035e38fdd523) - Document and check opt-in structural sharing for immutable decoded Date, collection, Effect Option, and Schema class values using native Schema equivalence and Query policies. Cover nested reference reuse, explicit reference-only custom values, and frozen HTTP metadata without adding an export or changing defaults.
+
+- [#156](https://github.com/ueberBrot/effect-api-query/pull/156) [`5d6e569`](https://github.com/ueberBrot/effect-api-query/commit/5d6e56909ff64f734d49ceaf93229769b7798034) - Remove obsolete pre-release migration instructions and links.
+
+- [#159](https://github.com/ueberBrot/effect-api-query/pull/159) [`ee3d33e`](https://github.com/ueberBrot/effect-api-query/commit/ee3d33ef50ffe88519648f3876d917c032d8973d) - Lead the query-view hydration guide with typed codec registration and native snapshot preparation. Keep page-parameter codecs, stream cleanup, and metadata safety beside the workflows that need them.
+
 ## 0.5.0
 
 ### Minor Changes

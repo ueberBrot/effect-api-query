@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "38589bc9f1c1c2a1abff4cd913bcc379f6a11ff8afccda96fa052f728607012b",
+      "fingerprint": "e7c23d268a0d210f06551358f72ccaf1e86881301e181af0932eaa7a0572f8de",
       "snapshot": {
         "GLOSSARY.md": "294f016460f575c7ee634a33c7b45c825f67a0501c31d42a5c42d681bacebd83",
         "README.md": "7ea8f698beafeeea732241f263a9a1bd1935c4fbe075c3e245e42d4e27b4542d",
@@ -142,7 +142,7 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "47eec5f3a7d7564909e46109c3633086df5ab18874f54bc189caad71f33c246f",
+        "package.json": "54fd643a7822941104d83d21f462591e3e712cb1962387c988e937efecfc4118",
         "pnpm-workspace.yaml": "b34c4d2efc1a0beedfcb759902f8c8c3ebdbddc0997a791a22f4b03136911b31",
         "scripts/check-effect-compatibility.mts": "e481369343d669222dea14de8d0ac95c5c3e996669da5595ee20d00dffe4bcff",
         "scripts/check-framework-consumers.mts": "37fc0fc0006c2b1f35c5cff85754612e0b74d89eed608e353ef5f18f05fce051",
@@ -310,18 +310,18 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "20ca24e389da021e3125197668482db8704f114d",
-      "outcome": "updated",
-      "reason": "The HTTP and query-pattern guidance now covers exactly one decoded NDJSON success through accumulated/live query views, including decoded header wrappers, Effect-owned framing and limits, and exclusion of SSE-only policy options. Existing retention, publication, cleanup, peer bounds, configuration sharing, and decoded-value sharing guidance remain accurate after rebase. ADR 0034 captures the same bounded extension without rewriting ADR 0024.",
+      "head": "260fa5164f18a2aae3577a121518095a78bb371b",
+      "outcome": "no-change",
+      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
       "evidence": [
-        "Locally rebased on main 10075f5c3a24eb7ce81c4dd54a91035e38fdd523 after squash merging PRs 159 and 160. HTTP implementation matches the original PR byte-for-byte; inspected the combined HTTP, type, documentation, skill, and planning diffs.",
-        "57 focused runtime tests passed across NDJSON queries (17), HTTP factories (12), cached views (20), and decoded-value sharing (8). vp run docs-check passed 21 excerpt tests and Astro with 0 errors, warnings, or hints. vp run format passed.",
-        "Verified ADR 0024 retains its original body exactly and both amendment links resolve. ADR 0034 records only the NDJSON extension. Existing domain-map task coverage and all skill-spec history entries remain; skill-tree wildcard sources cover ADR 0034 without a tree change.",
-        "vp run pack failed locally with compiler startup error spawn EBUSY, so packaged public compiler/full quality checks remain unverified locally and must pass in fresh GitHub CI before merge. No independent consumer-agent or skill discovery validation was run."
+        "Before versioning: intent maintainer check passed at 260fa5164f18a2aae3577a121518095a78bb371b.",
+        "changeset version and vp fmt generated 0.5.0 -> 0.6.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: package.json."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "54029db387a3f6446859bb7597dc6cb0b384bbec462cf447247dda4bd63f1426",
+      "fingerprint": "007b631e8db454d0f8f56027b40fd9b6872ef427c732062c962da30ed52be45d",
       "snapshot": {
         "GLOSSARY.md": "294f016460f575c7ee634a33c7b45c825f67a0501c31d42a5c42d681bacebd83",
         "README.md": "7ea8f698beafeeea732241f263a9a1bd1935c4fbe075c3e245e42d4e27b4542d",
@@ -463,7 +463,7 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "47eec5f3a7d7564909e46109c3633086df5ab18874f54bc189caad71f33c246f",
+        "package.json": "54fd643a7822941104d83d21f462591e3e712cb1962387c988e937efecfc4118",
         "pnpm-workspace.yaml": "b34c4d2efc1a0beedfcb759902f8c8c3ebdbddc0997a791a22f4b03136911b31",
         "scripts/check-effect-compatibility.mts": "e481369343d669222dea14de8d0ac95c5c3e996669da5595ee20d00dffe4bcff",
         "scripts/check-framework-consumers.mts": "37fc0fc0006c2b1f35c5cff85754612e0b74d89eed608e353ef5f18f05fce051",
@@ -631,14 +631,14 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "20ca24e389da021e3125197668482db8704f114d",
-      "outcome": "updated",
-      "reason": "The domain map retains decoded-value sharing and adds NDJSON stream coverage and its SSE-option failure mode. The skill spec preserves all main history alongside the NDJSON batch and links its ADR 0034 amendment. The unchanged skill tree retains one skill, six references, correct metadata, and wildcard mappings covering the extension and new ADR; no new skill or prerequisite is required.",
+      "head": "260fa5164f18a2aae3577a121518095a78bb371b",
+      "outcome": "no-change",
+      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
       "evidence": [
-        "Locally rebased on main 10075f5c3a24eb7ce81c4dd54a91035e38fdd523 after squash merging PRs 159 and 160. HTTP implementation matches the original PR byte-for-byte; inspected the combined HTTP, type, documentation, skill, and planning diffs.",
-        "57 focused runtime tests passed across NDJSON queries (17), HTTP factories (12), cached views (20), and decoded-value sharing (8). vp run docs-check passed 21 excerpt tests and Astro with 0 errors, warnings, or hints. vp run format passed.",
-        "Verified ADR 0024 retains its original body exactly and both amendment links resolve. ADR 0034 records only the NDJSON extension. Existing domain-map task coverage and all skill-spec history entries remain; skill-tree wildcard sources cover ADR 0034 without a tree change.",
-        "vp run pack failed locally with compiler startup error spawn EBUSY, so packaged public compiler/full quality checks remain unverified locally and must pass in fresh GitHub CI before merge. No independent consumer-agent or skill discovery validation was run."
+        "Before versioning: intent maintainer check passed at 260fa5164f18a2aae3577a121518095a78bb371b.",
+        "changeset version and vp fmt generated 0.5.0 -> 0.6.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: package.json."
       ]
     },
     "source:vite.config.ts": {
@@ -1729,16 +1729,16 @@
       ]
     },
     "source:CHANGELOG.md": {
-      "fingerprint": "59c33a543a05a86ccef457fe15f8091f73b1bd084ef413bcd9a925400c07bb2e",
+      "fingerprint": "2f977f80336fbca9c078294f0e57147ee55c905fdcb498588cf02b55f90a0707",
       "snapshot": {
-        "CHANGELOG.md": "5550ce0dd285e3353adb8a48612046654b1666504691d2882cb1036b4b855041"
+        "CHANGELOG.md": "916c8251b690a77deec0951ac51683d2ce7aba352181933aac222389404a5dcd"
       },
-      "head": "2e586d9fddaebe1b58a938a702ce0f2920baada0",
+      "head": "260fa5164f18a2aae3577a121518095a78bb371b",
       "outcome": "no-change",
       "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Before versioning: intent maintainer check passed at 2e586d9fddaebe1b58a938a702ce0f2920baada0.",
-        "changeset version and vp fmt generated 0.4.0 -> 0.5.0.",
+        "Before versioning: intent maintainer check passed at 260fa5164f18a2aae3577a121518095a78bb371b.",
+        "changeset version and vp fmt generated 0.5.0 -> 0.6.0.",
         "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
         "Scoped generated changes: CHANGELOG.md."
       ]
@@ -2759,17 +2759,18 @@
       ]
     },
     "source:.changeset/remove-obsolete-migration-guidance.md": {
-      "fingerprint": "2fe23ebfada44d8d0166e4f78ba259fc3e515b71c0817ac21912e389902d391d",
+      "fingerprint": "6dc9e27fa839095f3e69b31dafefbe3fdad333bd9d33385bba4143323c31d277",
       "snapshot": {
-        ".changeset/remove-obsolete-migration-guidance.md": "0627a23275b62422c5ecbcc116d4b7cc9995ed8e1f8bce42c4b02727549a0b34"
+        ".changeset/remove-obsolete-migration-guidance.md": null
       },
-      "head": "3411f589a0793e23a594b2dc91531ac7a6b8adca",
+      "head": "260fa5164f18a2aae3577a121518095a78bb371b",
       "outcome": "no-change",
-      "reason": "Rewrite the pending release summary to describe removal of obsolete pre-release migration instructions and links. Keep the patch frontmatter unchanged. This wording correction adds no consumer workflow; active migration guides remain deleted and restored ADR history remains separate.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Reviewed actual diff against c00e43cc17733fcc486d8ae08a9584ad014c5f16 and follow-up diff against 3411f589a0793e23a594b2dc91531ac7a6b8adca. Both summary strings exactly match the user request; frontmatter comparison confirms unchanged patch declarations. .changeset/preserve-accepted-adr-history.md is removed, leaving no new maintenance changeset in the PR diff.",
-        "vp run format and vp run changeset status pass. Runtime/source, tests, shipped skill and six references, dependency manifests and lockfile, version 0.5.0, peer range, README and website have no changes against the PR base. Prior historical-text, link, documentation and native Intent validation results remain applicable to unchanged content.",
-        "Native Intent sync requires no edits. Prior generic skill-creator sources-schema limitation and documentation build font/i18n/404 warnings remain reported. No new runtime matrix or fresh consumer/discovery claim is made for release-note prose."
+        "Before versioning: intent maintainer check passed at 260fa5164f18a2aae3577a121518095a78bb371b.",
+        "changeset version and vp fmt generated 0.5.0 -> 0.6.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/remove-obsolete-migration-guidance.md."
       ]
     },
     "source:docs/research/2026-11-04-rpc-comparison.md": {
@@ -2812,17 +2813,18 @@
       ]
     },
     "source:.changeset/quiet-pandas-relate.md": {
-      "fingerprint": "72497881a5e85eb3dde6ba403a8d6aa69de504d186074ff6e7a9268c6e14c9bf",
+      "fingerprint": "f5746d38cfbd32f28e6aac31d6ef24ff4295052dc740e308f7284653aee3cdfd",
       "snapshot": {
-        ".changeset/quiet-pandas-relate.md": "fb82d801d438537bc8d94c2424302756199238075946774e59ba294226464c66"
+        ".changeset/quiet-pandas-relate.md": null
       },
-      "head": "3411f589a0793e23a594b2dc91531ac7a6b8adca",
+      "head": "260fa5164f18a2aae3577a121518095a78bb371b",
       "outcome": "no-change",
-      "reason": "Rewrite the pending release summary to explain that newer Effect 4.0.x releases avoid peer-dependency conflicts while Effect 4.0.6 stays supported. The patch frontmatter and already-implemented >=4.0.6 <4.1.0 peer are unchanged; existing shipped dependency guidance remains accurate.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Reviewed actual diff against c00e43cc17733fcc486d8ae08a9584ad014c5f16 and follow-up diff against 3411f589a0793e23a594b2dc91531ac7a6b8adca. Both summary strings exactly match the user request; frontmatter comparison confirms unchanged patch declarations. .changeset/preserve-accepted-adr-history.md is removed, leaving no new maintenance changeset in the PR diff.",
-        "vp run format and vp run changeset status pass. Runtime/source, tests, shipped skill and six references, dependency manifests and lockfile, version 0.5.0, peer range, README and website have no changes against the PR base. Prior historical-text, link, documentation and native Intent validation results remain applicable to unchanged content.",
-        "Native Intent sync requires no edits. Prior generic skill-creator sources-schema limitation and documentation build font/i18n/404 warnings remain reported. No new runtime matrix or fresh consumer/discovery claim is made for release-note prose."
+        "Before versioning: intent maintainer check passed at 260fa5164f18a2aae3577a121518095a78bb371b.",
+        "changeset version and vp fmt generated 0.5.0 -> 0.6.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/quiet-pandas-relate.md."
       ]
     },
     "source:.changeset/preserve-accepted-adr-history.md": {
@@ -2858,59 +2860,63 @@
       ]
     },
     "source:.changeset/quick-scoped-configuration.md": {
-      "fingerprint": "48b5b40ce9f84b3cd9efa39faa49bbf8abc990f46e1b2e6eb83dde227e69d8d1",
+      "fingerprint": "b7fd345efe25872b4416cc46b012c386db70b971073b2d2ef67ea05855621b08",
       "snapshot": {
-        ".changeset/quick-scoped-configuration.md": "bf719527c861d0d31b48455308395e347147d0ace39ab0680022dee03e823297"
+        ".changeset/quick-scoped-configuration.md": null
       },
-      "head": "593c2ecee002d8bfbc5c05e11573369c1d3f9b1d",
+      "head": "260fa5164f18a2aae3577a121518095a78bb371b",
       "outcome": "no-change",
-      "reason": "Reconcile the configuration performance feature with merged main, preserving its indexed validation, omitted empty settings, frozen-subtree reuse, ownership and scope semantics. Keep the updated cache/performance guidance and all three planning records consistent with the existing one-skill/six-reference scope. Retain main version metadata, ADR 0033, concise user-facing release notes and removal of internal research reports; measurement evidence lives in the PR.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Base origin/main=ca30c60bfc09085f0ee781a129672fc84965699b. The prepared parent f244bb2 has the identical file tree as its squash merge. After reparenting the feature commits, git diff against tested head 74c5feba5b1a89fb8069817243d371f7f486988b is empty; performance source/scripts/tests also match the reviewed c1904f1 implementation.",
-        "Frozen lockfile installation and vp run quality passed on the identical prepared tree: 764 tests, published compilers on TypeScript 7 and 5.9, package checks, framework consumers, Effect diagnostics, typed lint/formatting and all Fallow audits. Log /tmp/eaq-merge-quality-pr158.log. Native Intent review preserves domain_map.yaml, skill_spec.md and skill_tree.yaml; writing-for-agents and skill-creator principles apply without a new discovery surface. No new consumer-agent evidence is claimed for the rebase. GitHub CI will run on the pushed head before merge."
+        "Before versioning: intent maintainer check passed at 260fa5164f18a2aae3577a121518095a78bb371b.",
+        "changeset version and vp fmt generated 0.5.0 -> 0.6.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/quick-scoped-configuration.md."
       ]
     },
     "source:.changeset/typed-hydration-guide.md": {
-      "fingerprint": "d0264e07b0267afa99181fa9ef0a7cf1cc7bc579d4d0ab9337a9d12f39ac5d7a",
+      "fingerprint": "c3af6f0ee6f670ac2ce6a978c9557b8fd702213874d65237ad6c4aa30c016ae0",
       "snapshot": {
-        ".changeset/typed-hydration-guide.md": "b321b68cde20b72fbd5318037ef5666912b630901879b1d24a5a23b64ac3752b"
+        ".changeset/typed-hydration-guide.md": null
       },
-      "head": "01082803c9a93d32156b9d129d8af90b35fd9ebb",
+      "head": "260fa5164f18a2aae3577a121518095a78bb371b",
       "outcome": "no-change",
-      "reason": "The requested focused patch Changeset describes the guide workflow/navigation improvement and does not add a developer task or change runtime/type contracts. Existing hydration guidance owns its subject; no additional skill or planning change is needed. Replayed the PR on current main, preserving its source and guidance edits and main's existing records; only generated Intent review-state conflicts were resolved during rebase. The existing domain map, skill spec and skill tree retain the combined task coverage, source mappings, peer bounds and prior decisions.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Source base 604d8204e12861edc70d5996a873ff3d26919262 (package 0.5.0). vp run docs-check passed: 20 excerpt checks and Astro with 0 errors/warnings/hints. vp run api-types passed both TypeScript 7.0.2 and 5.9.3 compiler fixtures and its pack/attw/publint prerequisite. Existing focused hydration/runtime checks passed 29 tests in tests/hydration-codecs.test.ts, tests/http-hydration.test.ts, tests/stream-snapshot.test.ts, and tests/cache-recipes.test.ts after the package build completed. Scoped vp run format passed; intent validate skills --check passed; git diff --check passed. .changeset/typed-hydration-guide.md names only @ueberbrot/effect-api-query and describes typed registration/native preparation plus the retained ownership and safety details.",
-        "GitHub Actions https://github.com/ueberBrot/effect-api-query/actions/runs/41876593283: vp run quality and vp run docs-check passed on the rebased tree; quality includes formatting/linting, Effect diagnostics, four Fallow audits, public type fixtures, runtime tests and framework consumers.",
-        "Main coverage boundary affa6a2e3e68a5096c0256a2a9f78f74474c3c24. Reviewed the replay diff and all three planning records. Existing author evidence retained; this replay adds no independent consumer-agent or discovery validation."
+        "Before versioning: intent maintainer check passed at 260fa5164f18a2aae3577a121518095a78bb371b.",
+        "changeset version and vp fmt generated 0.5.0 -> 0.6.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/typed-hydration-guide.md."
       ]
     },
     "source:.changeset/quiet-readings-share.md": {
-      "fingerprint": "04c01dd68b8ac7d3b41c17ee361283e5ccae7224fcb4f43b4419b683a703d60a",
+      "fingerprint": "7987defaaa1d000a60261bbf1b64d31842a8ef264a6bf0660b0ab4f07be2a9c4",
       "snapshot": {
-        ".changeset/quiet-readings-share.md": "0ebfd7703a067d28536acf66f973ad8680b2f4965e0363777060ed2745f92918"
+        ".changeset/quiet-readings-share.md": null
       },
-      "head": "e619aeb7e7b003e3b42ce2a4d143d24cbbf72a5f",
+      "head": "260fa5164f18a2aae3577a121518095a78bb371b",
       "outcome": "no-change",
-      "reason": "The focused patch changeset describes the checked opt-in recipe and unchanged defaults/exports; the owning skill and reference cover the usage, so this release note needs no additional skill.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Local rebase onto main ee3d33ef50ffe88519648f3876d917c032d8973d; reviewed the replay diff, preserving main peer bounds, configuration sharing guidance, and all previous planning entries.",
-        "vp run format passed; vp run docs-check passed 21 documentation excerpt tests and Astro with 0 errors, warnings, or hints; vp run skills-check passed; git diff --check passed.",
-        "vp run quality could not complete: its package declaration-build prerequisite failed to start the compiler with spawn EBUSY. This is unverified locally; require fresh GitHub CI on the pushed head before merging. No fresh consumer-agent or discovery validation was run."
+        "Before versioning: intent maintainer check passed at 260fa5164f18a2aae3577a121518095a78bb371b.",
+        "changeset version and vp fmt generated 0.5.0 -> 0.6.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/quiet-readings-share.md."
       ]
     },
     "source:.changeset/fresh-ndjson-views.md": {
-      "fingerprint": "fb9bab0cd5716b7356a2a968eff374ef04e8181491b77446578e7dae7b740eb5",
+      "fingerprint": "ba1b57008723c121d5c5293d42e650245e6187a39b124f0c82e0f95dbe084ef6",
       "snapshot": {
-        ".changeset/fresh-ndjson-views.md": "204c3ee5c3d65389a75850881c77b23433cf300f1d11d97a01bbcd857c7c78f1"
+        ".changeset/fresh-ndjson-views.md": null
       },
-      "head": "20ca24e389da021e3125197668482db8704f114d",
+      "head": "260fa5164f18a2aae3577a121518095a78bb371b",
       "outcome": "no-change",
-      "reason": "The single minor changeset describes the same scoped NDJSON feature documented by the updated owning HTTP guidance. It adds no independent developer task or further guidance requirement.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Locally rebased on main 10075f5c3a24eb7ce81c4dd54a91035e38fdd523 after squash merging PRs 159 and 160. HTTP implementation matches the original PR byte-for-byte; inspected the combined HTTP, type, documentation, skill, and planning diffs.",
-        "57 focused runtime tests passed across NDJSON queries (17), HTTP factories (12), cached views (20), and decoded-value sharing (8). vp run docs-check passed 21 excerpt tests and Astro with 0 errors, warnings, or hints. vp run format passed.",
-        "Verified ADR 0024 retains its original body exactly and both amendment links resolve. ADR 0034 records only the NDJSON extension. Existing domain-map task coverage and all skill-spec history entries remain; skill-tree wildcard sources cover ADR 0034 without a tree change.",
-        "vp run pack failed locally with compiler startup error spawn EBUSY, so packaged public compiler/full quality checks remain unverified locally and must pass in fresh GitHub CI before merge. No independent consumer-agent or skill discovery validation was run."
+        "Before versioning: intent maintainer check passed at 260fa5164f18a2aae3577a121518095a78bb371b.",
+        "changeset version and vp fmt generated 0.5.0 -> 0.6.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/fresh-ndjson-views.md."
       ]
     }
   }
