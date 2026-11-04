@@ -2,6 +2,8 @@
 
 Research date: **2026-11-04, 10:43–10:52 Europe/Berlin (09:43–09:52 UTC)**. Repository revision: `604d8204e12861edc70d5996a873ff3d26919262`, package `0.5.0`. This is a research record, not a compatibility certification or implementation plan accepted by the project.
 
+Follow-up: [ADR 0033](../adr/0033-bound-effect-support-to-a-patch-line.md) records the implemented bounded patch-line policy and its compatibility evidence. The findings below retain the research-time baseline and alternatives.
+
 ## Findings
 
 The comparison boundary is the **Query adapter**, specifically `@orpc/tanstack-query`, tRPC's TanStack integration and equivalent contract-to-Query adapters. Effect owns RPC, HTTP, schemas, transports, server behavior and runtime services. Missing adapter convenience and upstream dependency benefits are separate categories below; infrastructure features are not missing responsibilities of this package.
