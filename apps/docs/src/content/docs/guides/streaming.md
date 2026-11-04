@@ -63,7 +63,7 @@ import {
 } from "effect/http-api";
 import type { HttpApiClient } from "effect/http-api";
 
-export const recordsApi = HttpApi.make("records-api").add(
+const recordsApi = HttpApi.make("records-api").add(
   HttpApiGroup.make("records").add(
     HttpApiEndpoint.get("watch", "/records", {
       success: HttpApiSchema.StreamNdjson({
@@ -74,7 +74,7 @@ export const recordsApi = HttpApi.make("records-api").add(
   )
 );
 
-export function recordOptions(client: HttpApiClient.ForApi<typeof recordsApi>) {
+function recordOptions(client: HttpApiClient.ForApi<typeof recordsApi>) {
   const http = createHttpApiQueryUtils(recordsApi, {
     client,
     keyPrefix: ["records-app"],
