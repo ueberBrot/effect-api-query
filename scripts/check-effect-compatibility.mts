@@ -38,6 +38,7 @@ const tests = [
   "http-execution",
   "http-transport-cancellation",
   "http-hydration",
+  "http-semantic-keys",
   "stream-snapshot",
 ].map((name) => `tests/${name}.test.ts`);
 const run = (args: string[], cwd: string) =>

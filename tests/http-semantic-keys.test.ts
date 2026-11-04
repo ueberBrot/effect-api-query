@@ -29,7 +29,7 @@ const api = HttpApi.make("keys").add(
   HttpApiGroup.make("requests").add(
     HttpApiEndpoint.post("save", "/save", {
       query: { filter: Schema.optional(Schema.String) },
-      headers: Schema.Record(Schema.String, Schema.optional(Schema.String)),
+      headers: Schema.Record(Schema.String, Schema.UndefinedOr(Schema.String)),
       payload: Schema.NullOr(
         Schema.Struct({
           nested: Schema.Struct({
@@ -114,7 +114,10 @@ describe("HTTP semantic keys", () => {
         HttpApiEndpoint.post("read", "/:id", {
           params: { id: Schema.FiniteFromString },
           query: { filter: Schema.optional(Schema.String) },
-          headers: Schema.Record(Schema.String, Schema.optional(Schema.String)),
+          headers: Schema.Record(
+            Schema.String,
+            Schema.UndefinedOr(Schema.String)
+          ),
           payload: Schema.Struct({ name: Schema.String }),
           success: Schema.String,
         })
