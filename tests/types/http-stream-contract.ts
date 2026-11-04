@@ -165,7 +165,10 @@ true satisfies Assert<
   Equal<Extract<keyof typeof utils, string>, "key" | "views" | "events">
 >;
 true satisfies Assert<
-  Equal<keyof typeof utils.views, "key" | "plain" | "wrapped">
+  Equal<
+    keyof typeof utils.views,
+    "key" | "plain" | "wrapped" | "ndjson" | "wrappedNdjson"
+  >
 >;
 true satisfies Assert<
   Equal<

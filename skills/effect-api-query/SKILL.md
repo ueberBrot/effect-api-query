@@ -67,12 +67,12 @@ Import both factories and error guards from `@ueberbrot/effect-api-query`, the p
 | Write | `mutationOptions({ ...callbacks })` | `useMutation`, `MutationObserver`, with variables passed to `mutate` |
 | Cursor pagination | `infiniteOptions({ initialPageParam, input, getNextPageParam })` | `useInfiniteQuery`, `queryClient.infiniteQuery` |
 | HTTP data, status, and headers | `metadataOptions({ input, ...options })` | Ordinary query hooks or observers |
-| Ordered RPC or SSE history | `streamedOptions({ input, maxChunks, refetchMode })` | Ordinary query hooks or observers |
-| Latest RPC or SSE value | `liveOptions({ input })` | Ordinary query hooks or observers |
+| Ordered RPC or HTTP SSE/NDJSON history | `streamedOptions({ input, maxChunks, refetchMode })` | Ordinary query hooks or observers |
+| Latest RPC or HTTP SSE/NDJSON value | `liveOptions({ input })` | Ordinary query hooks or observers |
 
 Unary RPCs and buffered HTTP endpoints without multipart expose read, write, and pagination builders. Choose the builder for the application's intent. Neither the HTTP method nor the RPC name restricts that choice.
 
-Buffered multipart HTTP endpoints expose only mutation builders and accept explicit `FormData`. For upload input and encoder configuration, follow the [HTTP rules](references/http.md). Streaming RPCs and supported HTTP SSE endpoints expose accumulated and live builders. Choose a positive `maxChunks` bound or `"unbounded"` for accumulated history, locally or through `configureUtils` with `streamed.policy`. Metadata provides a separate buffered HTTP query view. Inputless operations omit `input`.
+Buffered multipart HTTP endpoints expose only mutation builders and accept explicit `FormData`. For upload input and encoder configuration, follow the [HTTP rules](references/http.md). Streaming RPCs and supported HTTP SSE and NDJSON endpoints expose accumulated and live builders. Choose a positive `maxChunks` bound or `"unbounded"` for accumulated history, locally or through `configureUtils` with `streamed.policy`. Metadata provides a separate buffered HTTP query view. Inputless operations omit `input`.
 
 Read only the branch needed for the task:
 
@@ -88,7 +88,7 @@ Read only the branch needed for the task:
 - Supply a non-empty JSON tuple as `keyPrefix`. If safe user, tenant, or backend identifiers distinguish results, include them. The factory cannot infer identity from a client, URL, middleware, or RPC request options.
 - Pass options such as `staleTime`, `select`, and callbacks into the builder. Preserve its `queryFn` and `queryKey`. For shared policies and execution behavior, use `configureUtils` as described in [cache workflows](references/cache-workflows.md). To customize hashing, use QueryClient global or prefix `queryKeyHashFn`. Builders reject per-call hashing. Keep hashing stable while cache entries remain. Streams reject a default `queryHash` inconsistent with the key hasher or a conflicting cached identity with `UnsupportedQueryHash`. Before changing the hash policy, retire the old cache. Mutation builders own `mutationFn` and `mutationKey`.
 - Treat captured inputs as immutable. When inputs change, build new options. Keys are frozen snapshots, but request inputs are not necessarily copied or frozen. Mutating an input later can make execution disagree with its key.
-- Use the generated concrete key for its cache shape. Accumulated keys include normalized retention and refetch policy: `streamedKey(input, policy)`. HTTP stream keys also include decoder policy. Inputless stream keys take policy first. Concrete keys retain exact prefixes and the unselected data and error tags. Canonical payload slots are typed as unknown; use key builders and explicit filter projections instead of reading their structure. Hooks, observers, and `queryClient.query` apply `select`. `getQueryData` reads the decoded cache value. If matching options already exist, use their `queryKey`.
+- Use the generated concrete key for its cache shape. Accumulated keys include normalized retention and refetch policy: `streamedKey(input, policy)`. HTTP SSE stream keys also include decoder policy. NDJSON keys carry no SSE decoder fields. Inputless stream keys take policy first. Concrete keys retain exact prefixes and the unselected data and error tags. Canonical payload slots are typed as unknown; use key builders and explicit filter projections instead of reading their structure. Hooks, observers, and `queryClient.query` apply `select`. `getQueryData` reads the decoded cache value. If matching options already exist, use their `queryKey`.
 - For prefix invalidation, use `key()` on a tree, branch, or leaf. After mutations, explicitly invalidate affected reads. RPC and HTTP roots are distinct. Use the original caller prefix only for deliberate invalidation across adapters.
 
 ## Own execution and cleanup

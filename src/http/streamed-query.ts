@@ -51,10 +51,11 @@ const decoderOptions = (
 export const createHttpStreamPreparation =
   (
     identity: HttpApiEndpointIdentity,
+    stream: "StreamSse" | "StreamNdjson",
     invoke: (
       // oxlint-disable-next-line anti-slop/no-unknown-parameters
       input: unknown,
-      sseOptions: Sse.DecodeOptions
+      sseOptions: Sse.DecodeOptions | undefined
     ) => Effect.Effect<unknown, unknown, unknown>
   ): StreamingOperation["prepareStream"] =>
   (options, operation, runPromiseExit) => {
@@ -64,14 +65,17 @@ export const createHttpStreamPreparation =
       (code, message) =>
         new EffectHttpApiQueryConfigError(code, message, identity)
     );
-    const sseOptions = decoderOptions(identity, options);
+    const sseOptions =
+      stream === "StreamSse" ? decoderOptions(identity, options) : undefined;
     delete options["sseOptions"];
     return {
       identity: [
         Object.freeze({
           ...history,
-          maxEventSize: sseOptions.maxEventSize,
-          ...(sseOptions.dispatchEmptyNamedEvents === true
+          ...(sseOptions === undefined
+            ? undefined
+            : { maxEventSize: sseOptions.maxEventSize }),
+          ...(sseOptions?.dispatchEmptyNamedEvents === true
             ? { dispatchEmptyNamedEvents: true }
             : undefined),
         }),
@@ -98,7 +102,9 @@ export const createHttpStreamPreparation =
                   );
                 }
                 if (!Stream.isStream(response)) {
-                  throw new TypeError("HTTP SSE clients must return a Stream");
+                  throw new TypeError(
+                    `HTTP ${stream === "StreamSse" ? "SSE" : "NDJSON"} clients must return a Stream`
+                  );
                 }
                 return response;
               })

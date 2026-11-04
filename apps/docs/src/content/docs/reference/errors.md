@@ -75,4 +75,4 @@ The Cause preserves endpoint, middleware, Schema, and HTTP client errors, includ
 
 ## `EffectHttpApiQueryEmptyStreamError`
 
-An HTTP live SSE query that completes before it emits a value throws this error. The error exposes `apiId`, `groupId`, `endpoint`, `method`, and operation `live`. A decoded `undefined` emission counts as a value and becomes `null`. A declared header wrapper preserves its body. Accumulated streams complete with an empty or retained history according to their refetch mode.
+An HTTP live SSE or NDJSON query that completes before it emits a value throws this error. The error exposes `apiId`, `groupId`, `endpoint`, `method`, and operation `live`. A decoded `undefined` emission counts as a value and becomes `null`. A declared header wrapper preserves its body. Accumulated streams complete with an empty or retained history according to their refetch mode.

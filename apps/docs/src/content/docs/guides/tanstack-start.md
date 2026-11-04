@@ -67,7 +67,7 @@ If the page needs to render despite a loader failure, catch the loader rejection
 
 ## Capture a stream snapshot
 
-Use the package's `fetchStreamSnapshot` with generated accumulated or live options when an open RPC or HTTP SSE stream must provide data for SSR. It captures a new publication, cancels the exact query, and waits for local iterator cleanup before settling. Dehydrate the resulting successful cache, then dispose request-owned resources. The browser hydrates its own cache and reconnects through its own ready client and runner.
+Use the package's `fetchStreamSnapshot` with generated accumulated or live options when an open RPC or HTTP SSE/NDJSON stream must provide data for SSR. It captures a new publication, cancels the exact query, and waits for local iterator cleanup before settling. Dehydrate the resulting successful cache, then dispose request-owned resources. The browser hydrates its own cache and reconnects through its own ready client and runner.
 
 [Stream Snapshots](/effect-api-query/guides/stream-snapshots/) covers fresh and cached modes, timeouts, aborts, stream policies, and exclusive query ownership.
 

@@ -14,9 +14,9 @@ Use your native Effect declarations and ready clients. Effect and your applicati
 | Unary RPC / buffered nonmultipart HTTP | Query, infinite query, mutation | [RPC Builders](/effect-api-query/reference/generated-builders/), [HTTP Factory](/effect-api-query/reference/http-factory/) |
 | Buffered nonmultipart HTTP | Separate decoded data/status/header metadata | [ETag workflow](/effect-api-query/guides/http-metadata/#update-with-an-etag) |
 | Buffered multipart HTTP | Mutation with explicit `FormData` | [Upload](/effect-api-query/guides/http-queries-and-mutations/#upload-a-file) |
-| RPC stream / unambiguous HTTP SSE | Accumulated history or latest value | [Choose Stream History](/effect-api-query/guides/choose-stream-history/) |
+| RPC stream / unambiguous HTTP SSE or NDJSON | Accumulated history or latest value | [Choose Stream History](/effect-api-query/guides/choose-stream-history/) |
 
-Use queries for cached reads and mutations for commands. Writes refresh reads only when your application invalidates the affected queries. The package omits raw byte and NDJSON response streams, HTTP upgrades, mixed buffered and SSE successes, streaming request payloads, and raw-response modes. It also omits SSE endpoints with multipart payloads. See [Compatibility and Limits](/effect-api-query/reference/compatibility-and-limits/).
+Use queries for cached reads and mutations for commands. Writes refresh reads only when your application invalidates the affected queries. The package omits raw byte response streams, HTTP upgrades, mixed buffered and streamed successes, streaming request payloads, and raw-response modes. It also omits SSE or NDJSON endpoints with multipart payloads. See [Compatibility and Limits](/effect-api-query/reference/compatibility-and-limits/).
 
 ## Plan application ownership
 

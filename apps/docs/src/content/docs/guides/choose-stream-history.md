@@ -13,7 +13,7 @@ Choose a cached representation that fits the screen:
 
 For a long-running event display, choose a finite `maxChunks`. For current progress or a feed of complete state, choose a live query. Unlimited accumulation grows with each emission. Use it for finite histories or workloads that deliberately retain every emission. If history must survive cache eviction or application restarts, persist it outside the query cache.
 
-These choices apply to both RPC streams and supported HTTP SSE endpoints. Live queries normalize successful `undefined` to `null`. Accumulated histories preserve their emitted values.
+These choices apply to both RPC streams and supported HTTP SSE and NDJSON endpoints. Live queries normalize successful `undefined` to `null`. Accumulated histories preserve their emitted values.
 
 ## Set retention and buffering separately
 
@@ -35,7 +35,7 @@ If the producer outruns the interface, set a rate or sampling policy in the prod
 
 ## Batch accumulated publications
 
-Set `publicationBatchSize` on RPC or HTTP SSE `streamedOptions` to publish several events together:
+Set `publicationBatchSize` on RPC or HTTP SSE/NDJSON `streamedOptions` to publish several events together:
 
 ```ts
 const history = rpc.diagnostics.stream.streamedOptions({

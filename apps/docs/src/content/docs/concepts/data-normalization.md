@@ -29,6 +29,6 @@ An HTTP endpoint using `HttpApiSchema.NoContent` or `success: []` decodes its su
 
 Mutations keep the original success type. A mutation that succeeds with `undefined` still resolves to `undefined`.
 
-Live queries also convert each emitted `undefined` to `null`. If a stream emits a value followed by `undefined`, its latest query data is `null`. Live keys, selectors, and `initialData` use the same normalized type. The first emission makes an open live query successful while it remains fetching. Completion without an emission raises `EffectRpcQueryEmptyStreamError` for RPC or `EffectHttpApiQueryEmptyStreamError` for HTTP SSE.
+Live queries also convert each emitted `undefined` to `null`. If a stream emits a value followed by `undefined`, its latest query data is `null`. Live keys, selectors, and `initialData` use the same normalized type. The first emission makes an open live query successful while it remains fetching. Completion without an emission raises `EffectRpcQueryEmptyStreamError` for RPC or `EffectHttpApiQueryEmptyStreamError` for HTTP SSE or NDJSON.
 
 Accumulated streamed queries retain each emitted value as supplied. Their cached arrays can contain `undefined` elements.

@@ -101,7 +101,10 @@ describe("documentation excerpts", () => {
     ["guides/queries", ["tests/types/docs-functionality"]],
     ["guides/mutations", ["tests/types/docs-functionality"]],
     ["guides/pagination", ["tests/types/docs-functionality"]],
-    ["guides/streaming", ["tests/types/docs-functionality"]],
+    [
+      "guides/streaming",
+      ["tests/types/docs-functionality", "tests/types/docs-http-ndjson"],
+    ],
     ["guides/http-metadata", ["tests/types/docs-functionality"]],
     ["guides/http-queries-and-mutations", ["tests/types/docs-functionality"]],
     ["guides/retry-queries", ["tests/types/docs-retry"]],

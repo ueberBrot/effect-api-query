@@ -102,9 +102,9 @@ Buffered endpoints without multipart expose query, infinite-query, and mutation 
 
 An endpoint with `success: []` uses Effect's no-content response and exposes buffered builders. Ordinary and infinite queries cache `null`; metadata contains `data: null`. Mutations retain the decoded `undefined` result.
 
-An endpoint with exactly one SSE success exposes `streamedKey` and `streamedOptions` for ordered history. It exposes `liveKey` and `liveOptions` for the latest decoded value. Declared response-header wrappers surround each emission. Keep `sseOptions` beside decoded `input`. Accumulated keys and options require a positive `maxChunks` bound or `"unbounded"`, unless the configured leaf inherits retention. Live keys include decoder policy. Accumulated keys also include retention and refetch policy. Applications own reconnect and resume controls. Empty live completion raises `EffectHttpApiQueryEmptyStreamError`. A top-level `undefined` emission becomes `null`.
+An endpoint with exactly one SSE or NDJSON success exposes `streamedKey` and `streamedOptions` for ordered history. It exposes `liveKey` and `liveOptions` for the latest decoded value. Declared response-header wrappers surround each emission. For SSE, keep `sseOptions` beside decoded `input`. Accumulated keys and options require a positive `maxChunks` bound or `"unbounded"`, unless the configured leaf inherits retention. SSE live keys include decoder policy. Accumulated keys also include retention and refetch policy. Applications own reconnect and resume controls. Empty live completion raises `EffectHttpApiQueryEmptyStreamError`. A top-level `undefined` emission becomes `null`.
 
-The adapter omits endpoints with raw byte or NDJSON response streams, HTTP upgrades, mixed buffered/SSE successes, multipart SSE payloads, or any streaming request payload alternative. Empty groups disappear. To consume unsupported streams, use the underlying Effect client.
+The adapter omits endpoints with raw byte response streams, HTTP upgrades, mixed buffered/streamed successes, multipart payloads with streamed successes, or any streaming request payload alternative. Empty groups disappear. To consume unsupported streams, use the underlying Effect client.
 
 For protocols that send named events without a data line, set `sseOptions.dispatchEmptyNamedEvents: true` when the declared event Schema accepts empty data. Omission and false share the default identity; true selects a separate cache entry in both SSE views.
 
@@ -167,6 +167,46 @@ export function httpEventOptions(
 ```
 
 The accumulated key includes normalized `maxChunks`, `refetchMode`, and `sseOptions.maxEventSize`. The live key includes the decoder limit. That limit defaults to 10 MiB per SSE event, separately from the cache's element bound. Applications own reconnect, replay, and resume. For refetch visibility and retention, read [query patterns](query-patterns.md). For request capture, read [hydration and SSR](hydration-and-ssr.md).
+
+## Consume decoded NDJSON
+
+Use the same accumulated and live builders for exactly one `HttpApiSchema.StreamNdjson` success, including `WithHeaders`. Effect's ready client owns framing, Schema decoding, and declaration-level `maxElementBytes`. NDJSON has no per-call decoder controls: do not pass `sseOptions`. Its keys contain no SSE decoder fields.
+
+```ts
+import { createHttpApiQueryUtils } from "@ueberbrot/effect-api-query";
+import { Schema } from "effect";
+import {
+  HttpApi,
+  HttpApiEndpoint,
+  HttpApiGroup,
+  HttpApiSchema,
+} from "effect/http-api";
+import type { HttpApiClient } from "effect/http-api";
+
+export const recordsApi = HttpApi.make("records-api").add(
+  HttpApiGroup.make("records").add(
+    HttpApiEndpoint.get("watch", "/records", {
+      success: HttpApiSchema.StreamNdjson({
+        schema: Schema.Struct({ id: Schema.FiniteFromString }),
+        maxElementBytes: "1 MiB",
+      }),
+    })
+  )
+);
+
+export function recordOptions(client: HttpApiClient.ForApi<typeof recordsApi>) {
+  const http = createHttpApiQueryUtils(recordsApi, {
+    client,
+    keyPrefix: ["records-app"],
+  });
+  return {
+    history: http.records.watch.streamedOptions({ maxChunks: 100 }),
+    latest: http.records.watch.liveOptions(),
+  };
+}
+```
+
+Pass these options to native Query consumers. Records are decoded before caching: `{"id":"1"}` becomes `{ id: 1 }`. Header wrappers surround each record. HTTP and Schema decoding failures retain their complete Cause; NDJSON has no declared SSE event-error channel. Empty accumulated completion succeeds; empty live completion fails. Retention, publication, cancellation, recovery, and snapshots use the same existing stream behavior. Keep the ready client and runner alive until local cleanup completes.
 
 ## Multipart mutations
 

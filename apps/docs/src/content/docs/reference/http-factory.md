@@ -13,7 +13,7 @@ Ordinary groups project to `utils[groupIdentifier][endpointIdentifier]`. Top-lev
 | --- | --- |
 | Buffered without multipart | `queryKey/Options`, `metadataKey/Options`, `infiniteKey/Options`, `mutationKey/Options` |
 | Any buffered multipart payload alternative | `mutationKey`, `mutationOptions` |
-| Exactly one SSE success, no multipart | `streamedKey/Options`, `liveKey/Options` |
+| Exactly one SSE or NDJSON success, no multipart | `streamedKey/Options`, `liveKey/Options` |
 
 Any multipart alternative makes a buffered endpoint mutation-only, even if the endpoint also accepts plain payloads. For query-enabled endpoints, the HTTP method does not determine the builder.
 
@@ -46,6 +46,6 @@ The wrapped Cause's type retains declared endpoint errors, server and client mid
 
 Required services include those needed by request encoders, success and error decoders, and the ready client for exposed endpoints. Compatible custom clients retain the errors and remaining services from their decoded-only and decoded-and-response call signatures. Response-only overloads contribute neither errors nor service requirements. See [client lifecycle](/effect-api-query/concepts/client-lifecycle/#http-clients-and-execution-services) and [cancellation](/effect-api-query/guides/cancellation/#cancel-an-http-query) for runtime ownership.
 
-A single SSE success, including `WithHeaders(StreamSse(...), ...)`, supports accumulated and live queries. The factory omits endpoints with raw byte or NDJSON response streams, HTTP upgrades, or mixed buffered and SSE success alternatives. It also omits any endpoint with a streaming request payload alternative, including byte, NDJSON, and multipart streams, and SSE endpoints with buffered multipart payload alternatives. On buffered endpoints, multipart alternatives retain mutation builders. Groups with only omitted endpoints disappear.
+A single SSE or NDJSON success, including `WithHeaders(StreamSse(...), ...)` and `WithHeaders(StreamNdjson(...), ...)`, supports accumulated and live queries. Effect decodes the stream; each query view caches its decoded emissions. The factory omits endpoints with raw byte response streams, HTTP upgrades, or mixed buffered and streamed success alternatives. It also omits any endpoint with a streaming request payload alternative, including byte, NDJSON, and multipart streams, and streamed-success endpoints with buffered multipart payload alternatives. On buffered endpoints, multipart alternatives retain mutation builders. Groups with only omitted endpoints disappear.
 
 Factory construction rejects unsafe names, path collisions, and contradictory multipart metadata before it returns a tree. Literal declaration types let the inferred tree omit the same endpoints.

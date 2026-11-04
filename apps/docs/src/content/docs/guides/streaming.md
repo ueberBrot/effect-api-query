@@ -1,6 +1,6 @@
 ---
 title: Streaming
-description: Cache accumulated or latest values from RPC streams and HTTP SSE.
+description: Cache accumulated or latest values from RPC streams and HTTP SSE or NDJSON.
 ---
 
 Streaming leaves provide two views. An accumulated streamed query caches emissions in order. A live query caches the latest value. Use ordinary query hooks or `QueryObserver` for both. Start with a ready [RPC](/effect-api-query/getting-started/quick-start/) or [HTTP](/effect-api-query/getting-started/http-quick-start/) utility tree. Here, `diagnostics.stream` is an inputless RPC emitting strings, and `events.watch` is an HTTP SSE endpoint declaring `query.channel` and emitting strings.
@@ -48,9 +48,49 @@ const latestSse = http.events.watch.liveOptions({
 
 Each emission replaces cached data. Completion preserves that data. Live queries convert top-level `undefined` to `null`, while accumulated elements retain `undefined`. Empty live completion raises the adapter's empty-stream error. Live options accept no `maxChunks`, `refetchMode`, or `publicationBatchSize`.
 
+## Consume NDJSON records
+
+An endpoint with exactly one `HttpApiSchema.StreamNdjson` success supports both views, including a declared `WithHeaders` wrapper. Effect parses frames and decodes records. Pass a ready client for the same declaration:
+
+```ts
+import { createHttpApiQueryUtils } from "@ueberbrot/effect-api-query";
+import { Schema } from "effect";
+import {
+  HttpApi,
+  HttpApiEndpoint,
+  HttpApiGroup,
+  HttpApiSchema,
+} from "effect/http-api";
+import type { HttpApiClient } from "effect/http-api";
+
+const recordsApi = HttpApi.make("records-api").add(
+  HttpApiGroup.make("records").add(
+    HttpApiEndpoint.get("watch", "/records", {
+      success: HttpApiSchema.StreamNdjson({
+        schema: Schema.Struct({ id: Schema.FiniteFromString }),
+        maxElementBytes: "1 MiB",
+      }),
+    })
+  )
+);
+
+function recordOptions(client: HttpApiClient.ForApi<typeof recordsApi>) {
+  const http = createHttpApiQueryUtils(recordsApi, {
+    client,
+    keyPrefix: ["records-app"],
+  });
+  return {
+    history: http.records.watch.streamedOptions({ maxChunks: 100 }),
+    latest: http.records.watch.liveOptions(),
+  };
+}
+```
+
+Pass `history` or `latest` to a native query hook or QueryClient. A wire record `{"id":"1"}` becomes `{ id: 1 }`. NDJSON uses the same retention, publication, empty-completion, cancellation, and snapshot behavior as other decoded streams. It accepts no `sseOptions` and has no SSE decoder key fields. Configure `maxElementBytes` on the Effect declaration. Keep the client and runner alive through consumption and cleanup.
+
 ## Address and stop a view
 
-For exact cache access, reuse the options' `queryKey`. Accumulated history policies and HTTP decoder policies affect identity. Live and accumulated views remain separate. Endpoint prefixes match all their views.
+For exact cache access, reuse the options' `queryKey`. Accumulated history policies and SSE decoder policies affect identity. Live and accumulated views remain separate. Endpoint prefixes match all their views.
 
 Cancellation closes the stream iterator. Your application owns reconnection, resume policy, and client lifetime. Use [Reconnect Streams](/effect-api-query/guides/reconnect-streams/) to add `recoverStream` to application-owned delivery when the server supports ordered cursor replay. A replacement stream can start while the old iterator's asynchronous finalizer is still pending. See [Release Resources after Local Cleanup](/effect-api-query/guides/cancellation/#release-resources-after-local-cleanup) when streams share exclusive resources.
 

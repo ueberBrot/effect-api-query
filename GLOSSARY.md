@@ -6,13 +6,13 @@ These terms describe how the package builds TanStack Query utilities from Effect
 
 **RPC utility tree**: A nested object built from literal Effect RPC tags. Branches represent RPC namespaces. Unary and streaming leaves provide typed key and option builders. _Avoid_: Router, generated client
 
-**HTTP utility tree**: A nested object built from the literal group and endpoint identifiers in an Effect HttpApi. Supported buffered and SSE endpoints provide typed key and option builders. Multipart endpoints support buffered mutations only. Endpoints in top-level groups appear at the root. _Avoid_: RPC utility tree, generated client
+**HTTP utility tree**: A nested object built from the literal group and endpoint identifiers in an Effect HttpApi. Supported buffered, SSE, and NDJSON endpoints provide typed key and option builders. Multipart endpoints support buffered mutations only. Endpoints in top-level groups appear at the root. _Avoid_: RPC utility tree, generated client
 
 **Query data**: The successful decoded RPC or HTTP value that TanStack Query receives. Buffered queries and live queries convert successful `undefined` to `null`. Accumulated stream elements and mutation data keep their original values. _Avoid_: RPC success value when it is `undefined`
 
-**Accumulated streamed query**: A streaming RPC or HTTP SSE view that caches emitted values in order. It can limit the cache to a recent history. Refetches can reset, append to, or replace the cached sequence. _Avoid_: Live query, infinite query
+**Accumulated streamed query**: A streaming RPC or HTTP SSE/NDJSON view that caches emitted values in order. It can limit the cache to a recent history. Refetches can reset, append to, or replace the cached sequence. _Avoid_: Live query, infinite query
 
-**Live query**: A streaming RPC or HTTP SSE view that caches only the latest emitted value. It converts `undefined` to `null`. Stream completion preserves the latest value. Completion before the first emission produces a package error. _Avoid_: Accumulated streamed query, subscription
+**Live query**: A streaming RPC or HTTP SSE/NDJSON view that caches only the latest emitted value. It converts `undefined` to `null`. Stream completion preserves the latest value. Completion before the first emission produces a package error. _Avoid_: Accumulated streamed query, subscription
 
 **HTTP metadata view**: A buffered HTTP query view with decoded query data and an immutable snapshot of the response status and raw string headers. Declared decoded header wrappers remain part of the data. _Avoid_: Raw response, header-wrapped success
 

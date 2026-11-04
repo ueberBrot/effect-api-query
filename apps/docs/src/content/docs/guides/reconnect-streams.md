@@ -38,7 +38,7 @@ const delivery = recoverStream({
 const consume = delivery.pipe(Stream.runForEach(consumer.deliver));
 ```
 
-Run `consume` in the captured owner's runtime and interrupt it when that owner retires. For HTTP SSE, make `connect` unwrap the ready client's returned stream and supply resume headers or query fields on each attempt. Connection calls and hooks retain their Effect error and service requirements. The [public compiler fixture](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/stream-recovery-contract.ts) shows native RPC composition and service inference.
+Run `consume` in the captured owner's runtime and interrupt it when that owner retires. For HTTP SSE or NDJSON, make `connect` unwrap the ready client's returned stream and supply resume headers or query fields on each attempt. Connection calls and hooks retain their Effect error and service requirements. The [public compiler fixture](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/stream-recovery-contract.ts) shows native RPC composition and service inference.
 
 Keep resume state inside `connect`. Generated read keys continue to identify stable logical reads. Passing a changing cursor to a generated stream builder changes its canonical input and creates different cache entries. This recipe consumes domain delivery and refreshes the existing query cache. Choose cached [stream views](/effect-api-query/guides/streaming/) separately.
 
