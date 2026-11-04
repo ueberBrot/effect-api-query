@@ -48,8 +48,6 @@ hydrationCallbacks(pages);
 
 const viewRegistry = createHydrationRegistry([
   queryViewCodec(rpc.read, "query", Profile),
-  infiniteQueryCodec(rpc.read, { page: Profile, pageParam: Cursor }),
-  queryViewCodec(rpc.watch, "streamed", Schema.Array(HistoryElement)),
   queryViewCodec(rpc.watch, "live", Schema.NullOr(Profile)),
 ]);
 

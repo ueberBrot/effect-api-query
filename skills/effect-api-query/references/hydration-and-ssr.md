@@ -110,7 +110,11 @@ Choose codecs for the complete view:
 
 JSON turns undefined array elements into null. If accumulated history distinguishes them, use a tagged codec. A header wrapper with an undefined body remains a wrapper. Preserve that body separately. Encode all declared success alternatives and rich page parameters. The application supplies the codecs and serialization policy.
 
-To register generated leaves, use `queryViewCodec(leaf, view, schema)` for ordinary, metadata, live, or accumulated data. The decoded type must match the view's cache data before `select`, including normalized nulls. Use `infiniteQueryCodec(leaf, { page, pageParam })` for explicit page and page-parameter codecs. One registration covers all inputs and policies for that leaf/view.
+## Register query-view codecs and prepare the native snapshot
+
+For generated query views, use typed registration and registry batch preparation. Follow the [query-view hydration guide](https://ueberbrot.github.io/effect-api-query/guides/hydrate-query-views/) for the registration, native `dehydrate`, registry encode/decode, and native `hydrate` sequence, with codecs for each cached representation.
+
+Use `queryViewCodec(leaf, view, schema)` for ordinary, metadata, live, or accumulated data. The decoded type must match the view's cache data before `select`, including normalized nulls. Use `infiniteQueryCodec(leaf, { page, pageParam })` for explicit page and page-parameter codecs. One registration covers all inputs and policies for that leaf/view.
 
 For a unary `rpc.profiles.read` leaf whose success is the `Profile` class above, import `createHydrationRegistry` and `queryViewCodec` from the package root and `Effect` from `effect`. Register and prepare its native snapshot:
 
