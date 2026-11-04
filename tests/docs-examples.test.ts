@@ -90,6 +90,13 @@ describe("documentation excerpts", () => {
       ],
     ],
     ["guides/query-defaults", ["tests/types/docs-policies"]],
+    [
+      "guides/share-decoded-values",
+      [
+        "tests/types/docs-structural-sharing",
+        "tests/types/docs-structural-sharing-use",
+      ],
+    ],
     ["reference/type-inference", ["tests/types/docs-policies"]],
     ["guides/queries", ["tests/types/docs-functionality"]],
     ["guides/mutations", ["tests/types/docs-functionality"]],

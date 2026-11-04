@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "a4f542695578e248731cdff0006d4e272f1a744656703204cdf7721754158e64",
+      "fingerprint": "f3da9a870939ab8ee8f084aa17e3ea00a19691cb23d3f0c3cec7cdffe67d58b7",
       "snapshot": {
         "GLOSSARY.md": "9f7734ff552aa9a5c2b112f7948b5001ca82341a7acbc787ee5f7131b7be340a",
         "README.md": "22c3457347dec25e8fb3ed800b7900c18afd7f56c78aafb10fc1e90e59add514",
@@ -35,11 +35,12 @@
         "apps/docs/src/content/docs/guides/optimistic-writes.md": "309964011fd58b301387c485eba621d06a3a73f3ddd0114918fd94f8d654e17d",
         "apps/docs/src/content/docs/guides/pagination.md": "335599f80e8c311c3d755ee0d339a4f66738d7af5643168c4909d56ad003625d",
         "apps/docs/src/content/docs/guides/queries.md": "fe77556cd8bd7aaa59a96762d16f50d6523c255eb6ff8b5d2ebbfd146e13b004",
-        "apps/docs/src/content/docs/guides/query-defaults.md": "10def6c2e42d690a0bcd49bd518a3a2fed04c580edb5b0c2fc6d08f1c4545bc3",
+        "apps/docs/src/content/docs/guides/query-defaults.md": "45bac4f6f8cd760709e43160e6c25c2201deba4584280201d6336c67c2ca3f19",
         "apps/docs/src/content/docs/guides/react-query.md": "00845a38e1374da62ebae3349fda63f94aeb6a907f64efa751e82d306a75aa4a",
         "apps/docs/src/content/docs/guides/reconnect-streams.md": "18373909800cef7d54f78c43ea709b4fcf5e1bfaef5f91b52f4f1d78e372aada",
         "apps/docs/src/content/docs/guides/refresh-from-events.md": "5323233082a5fb0dfc26b80bb9aeaf363efe6ed77118bfa4a78c37079a9376ed",
         "apps/docs/src/content/docs/guides/retry-queries.md": "83fb94464b7031025b7a40b13dca8a7b9a9df7b75732875692048283f9591463",
+        "apps/docs/src/content/docs/guides/share-decoded-values.md": "fd978373c03a0f1229e3da50c22efdd40ef66b9518830c730037a224efb56e74",
         "apps/docs/src/content/docs/guides/solid-query.md": "f635ee4c0a33cf759d747d50331ca42589cabacfb728264863951a165253d4ac",
         "apps/docs/src/content/docs/guides/stream-snapshots.md": "cba3b0d2de49c59d3abacabde4c594ce93158a408c8621f72101ea203d110cab",
         "apps/docs/src/content/docs/guides/streaming.md": "1c15b217f6d485739a57c720bea7f05a648cd5c50efe58086bf16cb35967e457",
@@ -147,12 +148,13 @@
         "scripts/measure-bundles.mts": "5a033ce9f9a4cf414632b6f2781a50c0354f1cf9996791a547a5d53dbef66d7a",
         "scripts/measure-construction.mts": "2fbad4879fe77ff24234a6be5666047b41cc7c3fd5ce9143d640ef4b41a426bd",
         "scripts/measure-streams.mts": "5f066efb508621f58067e333be174c850ab1bc0f45242c7695965d514b27366d",
+        "scripts/measure-structural-sharing.mts": "d3e673fbebd3bc56e3c880b3387558963af59729f6ff2905c23a5845e8f95bf6",
         "scripts/measure-types.mts": "c6d92caa7ba074970bce28c268cbf49e70b57f6dbdc2755d38d33961b2afc2fc",
         "scripts/performance/common.mts": "57a2003d9769d884d1a0884cab5449cfce79c40300de8d0202d3f1780d51c4f5",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
-        "skills/effect-api-query/SKILL.md": "a1ea584f0e2cfd0850fe1377c349338bea81083e17bdd7f56ecde027b0b6f67d",
-        "skills/effect-api-query/references/cache-workflows.md": "42c0ce61abfa508bae0045b99a56b01b316dca93f1b17b2e27f25b5d876bbd92",
+        "skills/effect-api-query/SKILL.md": "29365a0ebc298b559ca582da3b2da2ed64b6be6dd2e9f5ecb9047843b09ec0b5",
+        "skills/effect-api-query/references/cache-workflows.md": "d9c6ddc9ab0b06b6577bfbe8542465fc4ebfc18d3fdd74c228a8bfbfd424a4dd",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "8afb9f6c9f4756ce654c0c7e2fa542896585d8d46f3449544b16baeb58678bce",
         "skills/effect-api-query/references/http.md": "73eb5febbe01ba10e6b954c17c80df9eff5343feca37be516f44e85761fb3cd0",
         "skills/effect-api-query/references/hydration-and-ssr.md": "30aeb844f4b4f7c3c6a5a70f4ecbfabbdfb7b332c62105b4ecad182238d38705",
@@ -207,8 +209,9 @@
         "tests/create-rpc-query-utils-stream-hashing.test.ts": "3ec2de67c2f447b7f8ee003e9d8c1c0d19f1c9a787440a64c21df103ab9c044b",
         "tests/create-rpc-query-utils-stream-publication.test.ts": "f0f6919a98e3c4efd59ab39a7c8f2a2efb817c0b55913cd82c034126c8d5e459",
         "tests/create-rpc-query-utils-streaming.test.ts": "6f0fccd52258df72d1bb471bd04873426708209fa48e0b9c3a0c831d9002f5a1",
+        "tests/create-rpc-query-utils-structural-sharing.test.ts": "1698a72dcfde4aaabac4161193fc0379c445f8a8be61d47d29797a315b66b06f",
         "tests/create-rpc-query-utils.test.ts": "b6ccee687718bbd528819f497ba2ac09acfe06a1400c5bb38b863eb082f0776f",
-        "tests/docs-examples.test.ts": "7db41e628f07e9ec6aa15b5629b95b004f9949c29f320e91875acbec1f3a3fb6",
+        "tests/docs-examples.test.ts": "9f9e3815cacb6a2ce8527092286b16aabbbcc82b713674b24bb2863a7abde6d4",
         "tests/docs-release.test.ts": "089218597c9c8c9fdce5037b0537426a232ef7466e697d683bc32fb7d4492ae8",
         "tests/execution-interceptor.test.ts": "9c8a26e24cdd5807a4dca68bfdd88663246b3a5632483581ec3cbd4cdcf69b9a",
         "tests/fixtures/async.ts": "c72af69141ce4f2dd4e9b63910ed20378e546dcd015a2d7befacd439ba4a006e",
@@ -235,6 +238,7 @@
         "tests/http-multipart.test.ts": "331f18bf9730579f05513d3ab93734b8118e313b219604e8c0276c07110476ae",
         "tests/http-query-options.test.ts": "e7b2ca44c44cd8402ca688960458e1190c54c68845556fc4ea5d131ab8649891",
         "tests/http-semantic-keys.test.ts": "4fa4efd4b8211e52560be80aecade363486372d06cb3eeca0c496a783ea21f8c",
+        "tests/http-structural-sharing.test.ts": "35ea74a2711f56cd2001cd5a1f3ffe58f10f4ecbf094c0d4ce7d9e9a62dead42",
         "tests/http-transport-cancellation.test.ts": "0ba26a9bae56b26605fc03009c1f50fe90930356d0fa0c4ec4ddc5c120430f00",
         "tests/hydration-codecs.test.ts": "58d641238310a23fbcce9620a9ec65377f69a98746fbf2a45b87f8f49cd46465",
         "tests/publication-deadline.test.ts": "2797557ff14bf8527ea446cec1e1d7c61cd3666f11f127e640c53ce5d7e30868",
@@ -270,6 +274,8 @@
         "tests/types/docs-stream-snapshot.ts": "4f518cee9b5145c8cca8b9573e7aa622c3e363a9c1744a19b5ea98fc1e65ef4a",
         "tests/types/docs-stream-tracing-contract.ts": "e7b5f3c74af15de1e22f78d3f44ce14678c83e9bd25dcc70430e36b8a493040a",
         "tests/types/docs-stream-tracing.ts": "fc2db4ce64b36ac3901b8ec59dbfef3c798bc52f05f591a97a5d2856c33dabf4",
+        "tests/types/docs-structural-sharing-use.ts": "8ab4283768f1136be41e4a52f329d06e8e8026078300a606164e55caf9900919",
+        "tests/types/docs-structural-sharing.ts": "d47a88e599f832490c9d2a14bf779c0d0eaeb903cafdff2aa161c038198a4a4c",
         "tests/types/docs-suspense.tsx": "68462e89795da98c15ea48a9a910f4f9d4ab58672c9b848ce3422d3caf983acc",
         "tests/types/docs-user-events.ts": "c743f2f2e2c206561f1a59bfac3065505aa652e9c3b95df1a101a2c2f3b5bfed",
         "tests/types/exact-options-union-contract.ts": "857e9596c241919f66a2befc2acb86ead3ab44b672e1e1425872a622366139b4",
@@ -300,22 +306,22 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "01082803c9a93d32156b9d129d8af90b35fd9ebb",
+      "head": "e619aeb7e7b003e3b42ce2a4d143d24cbbf72a5f",
       "outcome": "updated",
-      "reason": "Reorganized hydrate-query-views.md to recommend the existing typed registry and native dehydrate -> encode/decode -> hydrate sequence before representation details; removed duplicated manual codec-ID dispatch instructions. Added only a navigation/recommended-workflow section in the owning hydration-and-ssr reference. Simplified the existing compiled registry excerpt while retaining infinite/history registrations elsewhere in that fixture and all runtime/manual fixtures. No library interface, behavior, dependency, discovery description, or lifetime ownership changed. Replayed the PR on current main, preserving its source and guidance edits and main's existing records; only generated Intent review-state conflicts were resolved during rebase. The existing domain map, skill spec and skill tree retain the combined task coverage, source mappings, peer bounds and prior decisions.",
+      "reason": "The PR adds the opt-in decoded-value sharing recipe through Schema equivalence and native Query structuralSharing, preserving positional immutable record reuse, explicit custom-field reference semantics, metadata freezing, and the existing exports/defaults. The cache reference and skill routing cover that task after combining main configuration and dependency guidance.",
       "evidence": [
-        "Source base 604d8204e12861edc70d5996a873ff3d26919262 (package 0.5.0). vp run docs-check passed: 20 excerpt checks and Astro with 0 errors/warnings/hints. vp run api-types passed both TypeScript 7.0.2 and 5.9.3 compiler fixtures and its pack/attw/publint prerequisite. Existing focused hydration/runtime checks passed 29 tests in tests/hydration-codecs.test.ts, tests/http-hydration.test.ts, tests/stream-snapshot.test.ts, and tests/cache-recipes.test.ts after the package build completed. Scoped vp run format passed; intent validate skills --check passed; git diff --check passed. Inspected src/core/hydration.ts, the hydration contract/view fixtures, and the owning shipped reference. Separate encoding/decoding requirements, whole-batch preparation, page-parameter ownership, undefined elements, HTTP wrapper/header safety, and open-stream cleanup remain documented and covered by existing checks. No new runtime tests were added for prose. Fresh-consumer/discovery evaluation was not run: this implementation is restricted to one agent, and activation metadata is unchanged; authoring checks are not independent consumer evidence.",
-        "GitHub Actions https://github.com/ueberBrot/effect-api-query/actions/runs/41876593283: vp run quality and vp run docs-check passed on the rebased tree; quality includes formatting/linting, Effect diagnostics, four Fallow audits, public type fixtures, runtime tests and framework consumers.",
-        "Main coverage boundary affa6a2e3e68a5096c0256a2a9f78f74474c3c24. Reviewed the replay diff and all three planning records. Existing author evidence retained; this replay adds no independent consumer-agent or discovery validation."
+        "Local rebase onto main ee3d33ef50ffe88519648f3876d917c032d8973d; reviewed the replay diff, preserving main peer bounds, configuration sharing guidance, and all previous planning entries.",
+        "vp run format passed; vp run docs-check passed 21 documentation excerpt tests and Astro with 0 errors, warnings, or hints; vp run skills-check passed; git diff --check passed.",
+        "vp run quality could not complete: its package declaration-build prerequisite failed to start the compiler with spawn EBUSY. This is unverified locally; require fresh GitHub CI on the pushed head before merging. No fresh consumer-agent or discovery validation was run."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "5a1028d9e7a856eaab767653bb7209525524cdaeb9999d31b0ccfa0f45321f67",
+      "fingerprint": "61248f0ffb4a9e0058310062a8d39c21b0fbd4067ab043a52c1028703172e1c6",
       "snapshot": {
         "GLOSSARY.md": "9f7734ff552aa9a5c2b112f7948b5001ca82341a7acbc787ee5f7131b7be340a",
         "README.md": "22c3457347dec25e8fb3ed800b7900c18afd7f56c78aafb10fc1e90e59add514",
-        "_artifacts/domain_map.yaml": "deff7d3ef1caf52bd3b07b070d16de2106e52a0da48f175d693578ececdc67ef",
-        "_artifacts/skill_spec.md": "670286650cc27f5980a6ac59d6fa1ddcc93ec017dfec7c65077b4a3e1884de2f",
+        "_artifacts/domain_map.yaml": "2f84ba82cc8dc90f29a70fefe037f6da5d7ceed1a0a7856decc1af64bc724e8d",
+        "_artifacts/skill_spec.md": "7ce6fcb1f5f443709ff9de3c0587d4f534198fa4fb9abeaec8c83516a6d0c78e",
         "_artifacts/skill_tree.yaml": "0e4ae2f7d0b38244984cac636f5d304fcc30c41dfee2535c2a5d26a85c55c19f",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "bc035d79c362da5d8279115598b3d4bbe10073a0798eb75054c53e2922afdc35",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "36087588f413acfde2566fe7b8f0baeb04061a2b6fc1487ac81c4cc99a90f0e6",
@@ -345,11 +351,12 @@
         "apps/docs/src/content/docs/guides/optimistic-writes.md": "309964011fd58b301387c485eba621d06a3a73f3ddd0114918fd94f8d654e17d",
         "apps/docs/src/content/docs/guides/pagination.md": "335599f80e8c311c3d755ee0d339a4f66738d7af5643168c4909d56ad003625d",
         "apps/docs/src/content/docs/guides/queries.md": "fe77556cd8bd7aaa59a96762d16f50d6523c255eb6ff8b5d2ebbfd146e13b004",
-        "apps/docs/src/content/docs/guides/query-defaults.md": "10def6c2e42d690a0bcd49bd518a3a2fed04c580edb5b0c2fc6d08f1c4545bc3",
+        "apps/docs/src/content/docs/guides/query-defaults.md": "45bac4f6f8cd760709e43160e6c25c2201deba4584280201d6336c67c2ca3f19",
         "apps/docs/src/content/docs/guides/react-query.md": "00845a38e1374da62ebae3349fda63f94aeb6a907f64efa751e82d306a75aa4a",
         "apps/docs/src/content/docs/guides/reconnect-streams.md": "18373909800cef7d54f78c43ea709b4fcf5e1bfaef5f91b52f4f1d78e372aada",
         "apps/docs/src/content/docs/guides/refresh-from-events.md": "5323233082a5fb0dfc26b80bb9aeaf363efe6ed77118bfa4a78c37079a9376ed",
         "apps/docs/src/content/docs/guides/retry-queries.md": "83fb94464b7031025b7a40b13dca8a7b9a9df7b75732875692048283f9591463",
+        "apps/docs/src/content/docs/guides/share-decoded-values.md": "fd978373c03a0f1229e3da50c22efdd40ef66b9518830c730037a224efb56e74",
         "apps/docs/src/content/docs/guides/solid-query.md": "f635ee4c0a33cf759d747d50331ca42589cabacfb728264863951a165253d4ac",
         "apps/docs/src/content/docs/guides/stream-snapshots.md": "cba3b0d2de49c59d3abacabde4c594ce93158a408c8621f72101ea203d110cab",
         "apps/docs/src/content/docs/guides/streaming.md": "1c15b217f6d485739a57c720bea7f05a648cd5c50efe58086bf16cb35967e457",
@@ -457,12 +464,13 @@
         "scripts/measure-bundles.mts": "5a033ce9f9a4cf414632b6f2781a50c0354f1cf9996791a547a5d53dbef66d7a",
         "scripts/measure-construction.mts": "2fbad4879fe77ff24234a6be5666047b41cc7c3fd5ce9143d640ef4b41a426bd",
         "scripts/measure-streams.mts": "5f066efb508621f58067e333be174c850ab1bc0f45242c7695965d514b27366d",
+        "scripts/measure-structural-sharing.mts": "d3e673fbebd3bc56e3c880b3387558963af59729f6ff2905c23a5845e8f95bf6",
         "scripts/measure-types.mts": "c6d92caa7ba074970bce28c268cbf49e70b57f6dbdc2755d38d33961b2afc2fc",
         "scripts/performance/common.mts": "57a2003d9769d884d1a0884cab5449cfce79c40300de8d0202d3f1780d51c4f5",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
-        "skills/effect-api-query/SKILL.md": "a1ea584f0e2cfd0850fe1377c349338bea81083e17bdd7f56ecde027b0b6f67d",
-        "skills/effect-api-query/references/cache-workflows.md": "42c0ce61abfa508bae0045b99a56b01b316dca93f1b17b2e27f25b5d876bbd92",
+        "skills/effect-api-query/SKILL.md": "29365a0ebc298b559ca582da3b2da2ed64b6be6dd2e9f5ecb9047843b09ec0b5",
+        "skills/effect-api-query/references/cache-workflows.md": "d9c6ddc9ab0b06b6577bfbe8542465fc4ebfc18d3fdd74c228a8bfbfd424a4dd",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "8afb9f6c9f4756ce654c0c7e2fa542896585d8d46f3449544b16baeb58678bce",
         "skills/effect-api-query/references/http.md": "73eb5febbe01ba10e6b954c17c80df9eff5343feca37be516f44e85761fb3cd0",
         "skills/effect-api-query/references/hydration-and-ssr.md": "30aeb844f4b4f7c3c6a5a70f4ecbfabbdfb7b332c62105b4ecad182238d38705",
@@ -517,8 +525,9 @@
         "tests/create-rpc-query-utils-stream-hashing.test.ts": "3ec2de67c2f447b7f8ee003e9d8c1c0d19f1c9a787440a64c21df103ab9c044b",
         "tests/create-rpc-query-utils-stream-publication.test.ts": "f0f6919a98e3c4efd59ab39a7c8f2a2efb817c0b55913cd82c034126c8d5e459",
         "tests/create-rpc-query-utils-streaming.test.ts": "6f0fccd52258df72d1bb471bd04873426708209fa48e0b9c3a0c831d9002f5a1",
+        "tests/create-rpc-query-utils-structural-sharing.test.ts": "1698a72dcfde4aaabac4161193fc0379c445f8a8be61d47d29797a315b66b06f",
         "tests/create-rpc-query-utils.test.ts": "b6ccee687718bbd528819f497ba2ac09acfe06a1400c5bb38b863eb082f0776f",
-        "tests/docs-examples.test.ts": "7db41e628f07e9ec6aa15b5629b95b004f9949c29f320e91875acbec1f3a3fb6",
+        "tests/docs-examples.test.ts": "9f9e3815cacb6a2ce8527092286b16aabbbcc82b713674b24bb2863a7abde6d4",
         "tests/docs-release.test.ts": "089218597c9c8c9fdce5037b0537426a232ef7466e697d683bc32fb7d4492ae8",
         "tests/execution-interceptor.test.ts": "9c8a26e24cdd5807a4dca68bfdd88663246b3a5632483581ec3cbd4cdcf69b9a",
         "tests/fixtures/async.ts": "c72af69141ce4f2dd4e9b63910ed20378e546dcd015a2d7befacd439ba4a006e",
@@ -545,6 +554,7 @@
         "tests/http-multipart.test.ts": "331f18bf9730579f05513d3ab93734b8118e313b219604e8c0276c07110476ae",
         "tests/http-query-options.test.ts": "e7b2ca44c44cd8402ca688960458e1190c54c68845556fc4ea5d131ab8649891",
         "tests/http-semantic-keys.test.ts": "4fa4efd4b8211e52560be80aecade363486372d06cb3eeca0c496a783ea21f8c",
+        "tests/http-structural-sharing.test.ts": "35ea74a2711f56cd2001cd5a1f3ffe58f10f4ecbf094c0d4ce7d9e9a62dead42",
         "tests/http-transport-cancellation.test.ts": "0ba26a9bae56b26605fc03009c1f50fe90930356d0fa0c4ec4ddc5c120430f00",
         "tests/hydration-codecs.test.ts": "58d641238310a23fbcce9620a9ec65377f69a98746fbf2a45b87f8f49cd46465",
         "tests/publication-deadline.test.ts": "2797557ff14bf8527ea446cec1e1d7c61cd3666f11f127e640c53ce5d7e30868",
@@ -580,6 +590,8 @@
         "tests/types/docs-stream-snapshot.ts": "4f518cee9b5145c8cca8b9573e7aa622c3e363a9c1744a19b5ea98fc1e65ef4a",
         "tests/types/docs-stream-tracing-contract.ts": "e7b5f3c74af15de1e22f78d3f44ce14678c83e9bd25dcc70430e36b8a493040a",
         "tests/types/docs-stream-tracing.ts": "fc2db4ce64b36ac3901b8ec59dbfef3c798bc52f05f591a97a5d2856c33dabf4",
+        "tests/types/docs-structural-sharing-use.ts": "8ab4283768f1136be41e4a52f329d06e8e8026078300a606164e55caf9900919",
+        "tests/types/docs-structural-sharing.ts": "d47a88e599f832490c9d2a14bf779c0d0eaeb903cafdff2aa161c038198a4a4c",
         "tests/types/docs-suspense.tsx": "68462e89795da98c15ea48a9a910f4f9d4ab58672c9b848ce3422d3caf983acc",
         "tests/types/docs-user-events.ts": "c743f2f2e2c206561f1a59bfac3065505aa652e9c3b95df1a101a2c2f3b5bfed",
         "tests/types/exact-options-union-contract.ts": "857e9596c241919f66a2befc2acb86ead3ab44b672e1e1425872a622366139b4",
@@ -610,26 +622,27 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "01082803c9a93d32156b9d129d8af90b35fd9ebb",
-      "outcome": "no-change",
-      "reason": "All three existing planning records remain accurate for this documentation locality change. domain_map.yaml already covers rich-value hydration with typed view registration, selected-view decoding, and request cleanup, including rich page parameters and undefined elements. skill_spec.md already assigns snapshots, typed view registration, preparation, and cleanup to the existing hydration reference. skill_tree.yaml already maps the affected docs and compiler fixtures to the same skill and lists the existing hydration reference. No task, domain, skill, prerequisite, source mapping, distribution choice, or verified version claim changes; a new history entry or metadata bump would add no new coverage. Replayed the PR on current main, preserving its source and guidance edits and main's existing records; only generated Intent review-state conflicts were resolved during rebase. The existing domain map, skill spec and skill tree retain the combined task coverage, source mappings, peer bounds and prior decisions.",
+      "head": "e619aeb7e7b003e3b42ce2a4d143d24cbbf72a5f",
+      "outcome": "updated",
+      "reason": "The domain map adds decoded-value sharing coverage and its custom-field failure mode; the skill spec retains both the decoded-value batch and all existing main history. The skill tree remains accurate with one skill, six references, and source globs covering the recipe and fixtures. No new skill, source mapping, or prerequisite is needed.",
       "evidence": [
-        "Source base 604d8204e12861edc70d5996a873ff3d26919262 (package 0.5.0). vp run docs-check passed: 20 excerpt checks and Astro with 0 errors/warnings/hints. vp run api-types passed both TypeScript 7.0.2 and 5.9.3 compiler fixtures and its pack/attw/publint prerequisite. Existing focused hydration/runtime checks passed 29 tests in tests/hydration-codecs.test.ts, tests/http-hydration.test.ts, tests/stream-snapshot.test.ts, and tests/cache-recipes.test.ts after the package build completed. Scoped vp run format passed; intent validate skills --check passed; git diff --check passed. Read _artifacts/domain_map.yaml, _artifacts/skill_spec.md, and _artifacts/skill_tree.yaml in full, compared their hydration coverage and mappings with the scoped diff, and confirmed intent maintainer sync reported Nothing to synchronize. The generated planning review reports no problems. Historical version records are left untouched, consistent with this branch excluding unrelated migration edits.",
-        "GitHub Actions https://github.com/ueberBrot/effect-api-query/actions/runs/41876593283: vp run quality and vp run docs-check passed on the rebased tree; quality includes formatting/linting, Effect diagnostics, four Fallow audits, public type fixtures, runtime tests and framework consumers.",
-        "Main coverage boundary affa6a2e3e68a5096c0256a2a9f78f74474c3c24. Reviewed the replay diff and all three planning records. Existing author evidence retained; this replay adds no independent consumer-agent or discovery validation."
+        "Local rebase onto main ee3d33ef50ffe88519648f3876d917c032d8973d; reviewed the replay diff, preserving main peer bounds, configuration sharing guidance, and all previous planning entries.",
+        "vp run format passed; vp run docs-check passed 21 documentation excerpt tests and Astro with 0 errors, warnings, or hints; vp run skills-check passed; git diff --check passed.",
+        "vp run quality could not complete: its package declaration-build prerequisite failed to start the compiler with spawn EBUSY. This is unverified locally; require fresh GitHub CI on the pushed head before merging. No fresh consumer-agent or discovery validation was run."
       ]
     },
     "source:vite.config.ts": {
-      "fingerprint": "bfd69d28c3f314655068da2fa4ac578feb4194d02ab53455a391e42126cb5007",
+      "fingerprint": "a8340d8f70932d8d44cf91e850bf9d2665c89fdb52bca0c0af9c30ddaa4923dd",
       "snapshot": {
-        "vite.config.ts": "c87fb85173a58521920e2cd9d87da747c151d11abfaf00bb1629aa829f5589ba"
+        "vite.config.ts": "b4ab1151bc78264f8827969476fc1f2fe7b11c22c65e40f406d0ae1ce6c11c40"
       },
-      "head": "c991ea856a6fcffb31fd1941d65362b039b2b3d9",
-      "outcome": "no-change",
-      "reason": "Reconciled the Effect compatibility branch with main after squash merge #156. Retained the published >=4.0.6 <4.1.0 peer, coordinated 4.0.7 development pins, floor/current harness and header fixtures, and their guidance. Preserved migration removal, 0.5.0 skill/domain/tree metadata, both cumulative planning entries, and checker-affinity task commands. The existing skill and three planning records cover the combined scope; workflow/task/release bookkeeping adds no separate consumer workflow.",
+      "head": "e619aeb7e7b003e3b42ce2a4d143d24cbbf72a5f",
+      "outcome": "updated",
+      "reason": "The sharing-baseline task is documented in the new guide and recorded in skill_spec; scoped lint allowances match existing Effect RPC/HTTP tests and scripts without changing Query behavior.",
       "evidence": [
-        "Base origin/main=5d6e56909ff64f734d49ceaf93229769b7798034. Compared rebased source, tests, dependencies, workspace lock, scripts with reviewed pre-rebase head c57bbe6: identical; shipped entry metadata additionally retains main 0.5.0. Resolved only shared Intent and cumulative skill_spec conflicts, retaining both November 4 entries.",
-        "vp run quality passed after rebase: 761 tests, package validation, both public compilers, four native framework consumers, typed lint, formatting, Effect diagnostics, and all Fallow audits. Log /tmp/eaq-merge-quality-pr157.log. Prior packed compatibility evidence remains applicable to identical source: both Effect versions and compilers; fresh consumer-agent discovery was not repeated for this rebase. Remote CI will run on the pushed head before merge."
+        "Local rebase onto main ee3d33ef50ffe88519648f3876d917c032d8973d; reviewed the replay diff, preserving main peer bounds, configuration sharing guidance, and all previous planning entries.",
+        "vp run format passed; vp run docs-check passed 21 documentation excerpt tests and Astro with 0 errors, warnings, or hints; vp run skills-check passed; git diff --check passed.",
+        "vp run quality could not complete: its package declaration-build prerequisite failed to start the compiler with spawn EBUSY. This is unverified locally; require fresh GitHub CI on the pushed head before merging. No fresh consumer-agent or discovery validation was run."
       ]
     },
     "source:.github/workflows/release.yml": {
@@ -686,27 +699,31 @@
       ]
     },
     "source:tsconfig.json": {
-      "fingerprint": "fe01933ffa358f81c843a7d4d7c188a2529db3a71ffc3d68dca5d81f612e10f9",
+      "fingerprint": "094e5a6ffca82ea61bbeb288c413c9ee97bd8374d5db6e20b1ee819bd3279c1d",
       "snapshot": {
-        "tsconfig.json": "91e9fe7824e125215834845dbb13e0265944d4fc0af2fb9b5afb7b5ee5671d54"
+        "tsconfig.json": "1104d89074d7673e261a0958cd14740a875326e5ed01c23d8d626705d009da74"
       },
-      "head": "86365084f08c30a0dc1211ad450412195060de5c",
+      "head": "e619aeb7e7b003e3b42ce2a4d143d24cbbf72a5f",
       "outcome": "no-change",
-      "reason": "The additional fixture path scopes the existing Effect unstable-module diagnostic setting to configuration composition tests. This repository validation setting does not add a consumer task.",
+      "reason": "The new performance script uses the same unstable Effect RPC diagnostic allowance as existing measurement scripts. Compiler strictness, runtime behavior and consumer guidance are unchanged.",
       "evidence": [
-        "Full root typecheck/typed lint passes191 files; Effect diagnostics reports0 errors,0 warnings and one existing suggestion. Both public compiler suites and the runtime regressions pass."
+        "Local rebase onto main ee3d33ef50ffe88519648f3876d917c032d8973d; reviewed the replay diff, preserving main peer bounds, configuration sharing guidance, and all previous planning entries.",
+        "vp run format passed; vp run docs-check passed 21 documentation excerpt tests and Astro with 0 errors, warnings, or hints; vp run skills-check passed; git diff --check passed.",
+        "vp run quality could not complete: its package declaration-build prerequisite failed to start the compiler with spawn EBUSY. This is unverified locally; require fresh GitHub CI on the pushed head before merging. No fresh consumer-agent or discovery validation was run."
       ]
     },
     "source:.fallowrc.jsonc": {
-      "fingerprint": "4c1c5206b637efdc736ae667bdb385871f21b83ea3ec616b527a3df1e2dd14d1",
+      "fingerprint": "2db60a9ab36b6caaaf79483c797c403eb145cb0c6aa81dabc817f23e0bfbf2c8",
       "snapshot": {
-        ".fallowrc.jsonc": "a19a438946e316ced0601fdecd189698f5bb07ff90e872706c2a50f9b6ef6ce4"
+        ".fallowrc.jsonc": "895c9e977372b3aedac38ec2c52f4351b1542fde58223f26d3a9bac201e81bc4"
       },
-      "head": "ebdfe980bd9646f34fe302e758928a07b847ddcd",
+      "head": "e619aeb7e7b003e3b42ce2a4d143d24cbbf72a5f",
       "outcome": "no-change",
-      "reason": "Fallow entry-point registration only: the existing Effect compatibility command is invoked by its Vite+ task, including CI, and must be reachable in production dead-code analysis. No library behavior or guidance changed. The domain map, skill spec, and skill tree remain accurate; their scope, source mappings, dependency guidance, and task checks are unchanged.",
+      "reason": "The compiler-only recipe wrapper is now local, with a void reference preserving compile-time checking, and the measurement command is explicitly registered as a Fallow entry point. The decoded-value sharing recipe and public interface are unchanged. The domain map, skill spec, and skill tree still describe the same native Query seam, immutable-data constraints, task coverage, and source mappings.",
       "evidence": [
-        "PR 157: inspected the working diff against HEAD and all three _artifacts planning documents. vp run quality passed: formatting, typed lint, Effect diagnostics, both published compilers, package validation, full Fallow task (general and production dead code, duplication, health), runtime suite, and framework consumer compilers. Log: /tmp/eaq-ci-quality-pr157.log. No recommended consumer behavior or discovery description changed, so no new consumer-agent check was required."
+        "Local rebase onto main ee3d33ef50ffe88519648f3876d917c032d8973d; reviewed the replay diff, preserving main peer bounds, configuration sharing guidance, and all previous planning entries.",
+        "vp run format passed; vp run docs-check passed 21 documentation excerpt tests and Astro with 0 errors, warnings, or hints; vp run skills-check passed; git diff --check passed.",
+        "vp run quality could not complete: its package declaration-build prerequisite failed to start the compiler with spawn EBUSY. This is unverified locally; require fresh GitHub CI on the pushed head before merging. No fresh consumer-agent or discovery validation was run."
       ]
     },
     "source:.github/workflows/ci.yml": {
@@ -1145,17 +1162,17 @@
       ]
     },
     "source:apps/docs/astro.config.mts": {
-      "fingerprint": "774cf850d854613c7fdd068e5b9aa95f9ceaa49648089982391465178c1973ce",
+      "fingerprint": "ed61c54945fd27e178bf10377048302f018404892145e24f7af4f2157bf288c3",
       "snapshot": {
-        "apps/docs/astro.config.mts": "5e0cc92c247f827e6015aaa778fb569f725fbb466b0a3c43f979ad3d360fbdff"
+        "apps/docs/astro.config.mts": "27107d74328e0565dcae89daed40eb5a630d108e44c8b9bba5f5320f1b1ff81a"
       },
-      "head": "33df3355f25c2391b87ce80a60a8c34db84ed481",
-      "outcome": "updated",
-      "reason": "The existing version-selection guidance and ADR 0030 now match automatic deployment after successful root publication, optional manual docs-only corrections for an exact released version, and a static built version badge/JSON marker. Applications can identify the documented package version without a live npm lookup.",
+      "head": "e619aeb7e7b003e3b42ce2a4d143d24cbbf72a5f",
+      "outcome": "no-change",
+      "reason": "This source edit only adds the Share Decoded Values guide to existing navigation. The guide and owning skill contain usage guidance; docs-build validates the route and all internal links.",
       "evidence": [
-        "Reviewed apps/docs/astro.config.mts with .github/workflows/release.yml, .github/workflows/deploy-docs.yml, scripts/resolve-docs-release.mts, the compatibility guide, and skills/effect-api-query/references/frameworks-and-hosts.md.",
-        "The resolver passes 76 tests, including publication gating, docs-only revisions, legacy-release refusal, and built metadata validation. Four Chromium cases pass for static version HTML, JSON metadata, navigation, and zero registry requests. Final docs checks/build pass.",
-        "Git/npm read-only smoke checks validate the existing release identity and expected legacy/current-main refusal. A live npm publication or Pages deployment was not performed."
+        "Local rebase onto main ee3d33ef50ffe88519648f3876d917c032d8973d; reviewed the replay diff, preserving main peer bounds, configuration sharing guidance, and all previous planning entries.",
+        "vp run format passed; vp run docs-check passed 21 documentation excerpt tests and Astro with 0 errors, warnings, or hints; vp run skills-check passed; git diff --check passed.",
+        "vp run quality could not complete: its package declaration-build prerequisite failed to start the compiler with spawn EBUSY. This is unverified locally; require fresh GitHub CI on the pushed head before merging. No fresh consumer-agent or discovery validation was run."
       ]
     },
     "source:docs/adr/0016-automate-releases-with-changesets.md": {
@@ -2854,6 +2871,20 @@
         "Source base 604d8204e12861edc70d5996a873ff3d26919262 (package 0.5.0). vp run docs-check passed: 20 excerpt checks and Astro with 0 errors/warnings/hints. vp run api-types passed both TypeScript 7.0.2 and 5.9.3 compiler fixtures and its pack/attw/publint prerequisite. Existing focused hydration/runtime checks passed 29 tests in tests/hydration-codecs.test.ts, tests/http-hydration.test.ts, tests/stream-snapshot.test.ts, and tests/cache-recipes.test.ts after the package build completed. Scoped vp run format passed; intent validate skills --check passed; git diff --check passed. .changeset/typed-hydration-guide.md names only @ueberbrot/effect-api-query and describes typed registration/native preparation plus the retained ownership and safety details.",
         "GitHub Actions https://github.com/ueberBrot/effect-api-query/actions/runs/41876593283: vp run quality and vp run docs-check passed on the rebased tree; quality includes formatting/linting, Effect diagnostics, four Fallow audits, public type fixtures, runtime tests and framework consumers.",
         "Main coverage boundary affa6a2e3e68a5096c0256a2a9f78f74474c3c24. Reviewed the replay diff and all three planning records. Existing author evidence retained; this replay adds no independent consumer-agent or discovery validation."
+      ]
+    },
+    "source:.changeset/quiet-readings-share.md": {
+      "fingerprint": "04c01dd68b8ac7d3b41c17ee361283e5ccae7224fcb4f43b4419b683a703d60a",
+      "snapshot": {
+        ".changeset/quiet-readings-share.md": "0ebfd7703a067d28536acf66f973ad8680b2f4965e0363777060ed2745f92918"
+      },
+      "head": "e619aeb7e7b003e3b42ce2a4d143d24cbbf72a5f",
+      "outcome": "no-change",
+      "reason": "The focused patch changeset describes the checked opt-in recipe and unchanged defaults/exports; the owning skill and reference cover the usage, so this release note needs no additional skill.",
+      "evidence": [
+        "Local rebase onto main ee3d33ef50ffe88519648f3876d917c032d8973d; reviewed the replay diff, preserving main peer bounds, configuration sharing guidance, and all previous planning entries.",
+        "vp run format passed; vp run docs-check passed 21 documentation excerpt tests and Astro with 0 errors, warnings, or hints; vp run skills-check passed; git diff --check passed.",
+        "vp run quality could not complete: its package declaration-build prerequisite failed to start the compiler with spawn EBUSY. This is unverified locally; require fresh GitHub CI on the pushed head before merging. No fresh consumer-agent or discovery validation was run."
       ]
     }
   }

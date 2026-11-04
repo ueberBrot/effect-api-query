@@ -178,6 +178,14 @@ Check reusable configurations with `satisfies UtilsConfiguration<typeof tree>`. 
 
 After configuration, type-check a representative call with selection, conditional input, or local optimistic context. Keep checks of the originating owner and coordination of overlapping writes in the application workflow below. For typed failure classification and shared RPC/HTTP retry decisions, use [the retry recipe](https://ueberbrot.github.io/effect-api-query/guides/retry-queries/).
 
+## Share equivalent decoded values
+
+Keep native structural sharing as the default. For immutable rich query data, use `structuralSharing` in an existing builder or `configureUtils` policy. Follow the [checked decoded-value recipe](https://ueberbrot.github.io/effect-api-query/guides/share-decoded-values/) when dates, collections, or Schema classes need reference reuse. Compose `Schema.toEquivalence` for declared decoded records with native `replaceEqualDeep` for surrounding plain containers. No package helper is required.
+
+Compare records at the same array position. Reuse an equivalent class instance intact; retain a changed incoming instance intact. Compare Date timestamps, primitive Map/Set contents without insertion order, and Effect Option cases and values through the example Schema. Treat all compared data as immutable, since Effect equality can cache results. Do not equate encoded wire values or arbitrary custom objects. Give unknown/custom fields explicit reference equivalence with `Schema.overrideToEquivalence(() => Equivalence.strictEqual())`; plain `Schema.Unknown` does not imply reference semantics. Shapes outside the recipe pass through unchanged, including selected observer results.
+
+For a metadata view, share its decoded `data` before reconciling `{ data, status, headers }`. Fetched envelopes and raw headers remain frozen; decoded, initial, manual, hydrated, and selected values retain their ownership rules. Pair hydration codecs separately. Measure equal and changed inputs; retained references do not establish a speed improvement. Verify cache references with native `getQueryData` or an observer and retain generated data/error types.
+
 ## Coordinate overlapping optimistic writes
 
 The application owns this workflow. Make every participating write follow these steps:

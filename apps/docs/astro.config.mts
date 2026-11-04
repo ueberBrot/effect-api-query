@@ -166,6 +166,10 @@ export default defineConfig({
                   slug: "guides/query-defaults",
                 },
                 {
+                  label: "Share Decoded Values",
+                  slug: "guides/share-decoded-values",
+                },
+                {
                   label: "Custom Key Encoders",
                   slug: "guides/custom-key-encoders",
                 },
