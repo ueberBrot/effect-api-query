@@ -13,7 +13,7 @@ Install the package and TanStack Query Core:
 pnpm add @ueberbrot/effect-api-query @tanstack/query-core
 ```
 
-The package requires one exact Effect 4 release because its RPC and HTTP API modules are unstable. If automatic peer installation is enabled, pnpm installs that version. Existing applications must use the same version. Use TypeScript 5.9 or newer with `strict: true`, ESM, and ES2022 support. See [compatibility and stability](https://ueberbrot.github.io/effect-api-query/getting-started/compatibility-and-stability/).
+The Effect peer range is `>=4.0.6 <4.1.0`. Keep the application's Effect runtime, testing, and platform packages on a coordinated release within that range. The supported floor (`4.0.6`) and current development release (`4.0.7`) are checked separately. Use TypeScript 5.9 or newer with `strict: true`, ESM, and ES2022 support. See [compatibility and stability](https://ueberbrot.github.io/effect-api-query/getting-started/compatibility-and-stability/).
 
 ## RPC
 

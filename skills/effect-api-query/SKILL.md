@@ -48,7 +48,7 @@ Derive options from the application's contract and ready client. Pass those opti
 
 ## Choose the adapter
 
-Read the installed package manifest to find its version and peers. This version uses the coordinated Effect 4.0.6 set. Its Query Core peer range is `>=5.104.4 <6`. Use the installed declarations and keep contracts literal. For reactive options, version constraints, and transport ownership, read [frameworks and hosts](references/frameworks-and-hosts.md).
+Read the installed package manifest to find its version and peers. The Effect peer range is `>=4.0.6 <4.1.0`; its supported floor is `4.0.6` and current development pins are `4.0.7`. Its Query Core peer range is `>=5.104.4 <6`. Use the installed declarations and keep contracts literal. For reactive options, version constraints, and transport ownership, read [frameworks and hosts](references/frameworks-and-hosts.md).
 
 Read the reference for the contract you are integrating:
 

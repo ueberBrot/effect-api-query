@@ -3,7 +3,7 @@ title: External HTTP Clients
 description: Generated OpenAPI consumers, encoded request values, multipart uploads, and raw SSE limits.
 ---
 
-An external HTTP client can call an Effect HttpApi server through its declared HTTP contract. For example, `openapi-typescript` generates `paths` from the JSON document returned by native `OpenApi.fromApi(api)`. The generated types describe calls made with `openapi-fetch`. The examples target `openapi-fetch` 0.17.0, `openapi-typescript` 7.13.0, and Effect 4.0.6.
+An external HTTP client can call an Effect HttpApi server through its declared HTTP contract. For example, `openapi-typescript` generates `paths` from the JSON document returned by native `OpenApi.fromApi(api)`. The generated types describe calls made with `openapi-fetch`. The examples target `openapi-fetch` 0.17.0, `openapi-typescript` 7.13.0, and Effect 4.0.7.
 
 `createHttpApiQueryUtils` accepts a ready Effect HttpApiClient with a native Effect runner. An external Promise client calls HTTP independently. Compatibility with the declared HTTP contract does not establish compatibility with the Effect RPC wire protocol.
 

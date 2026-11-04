@@ -151,6 +151,13 @@ skills:
         source: apps/docs/src/content/docs/reference/compatibility-and-limits.md
         priority: HIGH
         status: active
+      - mistake: Treat exact development pins as the consumer Effect minimum
+        mechanism: Development uses a coordinated current release while consumers can retain the supported floor within the bounded patch line.
+        wrong_pattern: Require every consumer to upgrade whenever the development catalog changes.
+        correct_pattern: Read the published peer range, coordinate Effect integrations, and check the floor/current pair; raise the minimum only for required APIs, type contracts, or correctness fixes.
+        source: docs/adr/0001-target-effect-4-release-candidate.md
+        priority: HIGH
+        status: active
       - mistake: Rely on changed metadata options after a fresh hit
         mechanism: An imperative fresh cache hit retains the existing Query options.
         wrong_pattern: await queryClient.query(newOptions); queryClient.setQueryData(key, value)

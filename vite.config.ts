@@ -419,6 +419,11 @@ export default defineConfig({
         dependsOn: ["pack"],
         cache: false,
       },
+      "effect-compatibility": {
+        command: "node --import tsx scripts/check-effect-compatibility.mts",
+        dependsOn: ["pack"],
+        cache: false,
+      },
       "type-baseline": {
         command: "node --import tsx scripts/measure-types.mts",
         dependsOn: ["pack"],
