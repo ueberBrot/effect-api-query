@@ -9,7 +9,7 @@ Install the package and TanStack Query Core:
 pnpm add @ueberbrot/effect-api-query @tanstack/query-core
 ```
 
-With pnpm's default peer installation enabled, this command also installs the exact Effect release that the package requires. If your application already pins Effect or disables automatic peer installation, install the Effect version from the package's `peerDependencies`. Resolve peer mismatches before continuing. The [package manifest](https://github.com/ueberBrot/effect-api-query/blob/main/package.json) defines the peer requirements. The [workspace catalog](https://github.com/ueberBrot/effect-api-query/blob/main/pnpm-workspace.yaml) lists the versions used in this repository.
+With pnpm's default peer installation enabled, this command also installs Effect within the package's peer range, `>=4.0.6 <4.1.0`. If your application already pins Effect or disables automatic peer installation, choose a release within that range and keep its Effect testing and platform packages coordinated. Resolve peer mismatches before continuing. The [package manifest](https://github.com/ueberBrot/effect-api-query/blob/main/package.json) defines consumer requirements. The [workspace catalog](https://github.com/ueberBrot/effect-api-query/blob/main/pnpm-workspace.yaml) separately pins development dependencies.
 
 For React, install `@tanstack/react-query` with a version that matches your Query Core version:
 

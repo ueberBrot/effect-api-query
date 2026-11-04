@@ -50,6 +50,9 @@ jobs:
       - name: Check native framework consumers
         run: vp run framework-types
 
+      - name: Check supported Effect floor and current release
+        run: vp run effect-compatibility
+
       - name: Run Effect diagnostics
         run: vp run effect-check
 

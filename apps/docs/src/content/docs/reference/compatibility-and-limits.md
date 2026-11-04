@@ -9,7 +9,7 @@ The package is ESM-only and targets ES2022. It declares Effect and Query Core as
 
 | Component | Declared requirement | Exact versions checked |
 | --- | --- | --- |
-| Effect | Library peer: `4.0.6` | Runtime, testing, and Node platform packages: `4.0.6` |
+| Effect | Library peer: `>=4.0.6 <4.1.0` | Coordinated runtime, testing, and Node platform packages: floor `4.0.6`, development `4.0.7` |
 | Query Core | Library peer: `>=5.104.4 <6` | `5.104.5` |
 | TypeScript | Public declarations: 5.9 or newer, with `strict: true` | `5.9.3` and `7.0.2` |
 | React and React Query | React Query peer: React `^18 \|\| ^19` | React `19.3.1`, React Query `5.104.5` |
@@ -24,7 +24,7 @@ Vue Query also declares an optional `@vue/composition-api` peer of `^1.1.2` for 
 
 The application examples also use TanStack Start `1.169.4`, TanStack Router `1.170.46`, and Router SSR Query `1.167.3`.
 
-The stable Effect release contains unstable RPC and HTTP API modules. The application's Effect packages must stay coordinated with the exact peer. See [Compatibility and Stability](/effect-api-query/getting-started/compatibility-and-stability/).
+The stable Effect release contains unstable RPC and HTTP API modules. Keep the application's Effect packages coordinated within the peer range. The packed-consumer check runs public compiler fixtures and focused RPC/HTTP execution, cancellation, and hydration checks at the floor and current development release. It does not test every intermediate patch or establish support for future Effect minors. See [Compatibility and Stability](/effect-api-query/getting-started/compatibility-and-stability/).
 
 Generated Core options support native reactive accessors and retain each framework's hook overloads. The Vue, Solid, Svelte, and Angular combinations above are checked for native hook inference in TypeScript consumer modules. These checks use both listed TypeScript versions. Framework component compilers and application builds have their own tooling requirements. See [Vue Query](/effect-api-query/guides/vue-query/), [Solid Query](/effect-api-query/guides/solid-query/), [Svelte Query](/effect-api-query/guides/svelte-query/), and [Angular Query](/effect-api-query/guides/angular-query/) for option rebuilding, compiler resolution, hook overloads, and resource ownership.
 

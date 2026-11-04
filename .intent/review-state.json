@@ -3,10 +3,10 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "e7b6c60d4bc4ff0ef41b0a971e7b2eeae4c0d1fe5ff0abc8d7fe93f8a6a0f18f",
+      "fingerprint": "7d8812bd7ef331e496566e15ad6264228da2bf973666d7cf15a5e7a3a3989462",
       "snapshot": {
         "GLOSSARY.md": "9f7734ff552aa9a5c2b112f7948b5001ca82341a7acbc787ee5f7131b7be340a",
-        "README.md": "ed7f20c4c544004f4787360f7bd8b5d6ebe1d60934ac1d24b11cf06259e809f5",
+        "README.md": "22c3457347dec25e8fb3ed800b7900c18afd7f56c78aafb10fc1e90e59add514",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "bc035d79c362da5d8279115598b3d4bbe10073a0798eb75054c53e2922afdc35",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "36087588f413acfde2566fe7b8f0baeb04061a2b6fc1487ac81c4cc99a90f0e6",
         "apps/docs/src/content/docs/concepts/http-utility-tree.md": "a1c682ccbfaeaf44e9e4a9cf507d3504a9acfce57aa6b41e074590c67f6d6542",
@@ -15,10 +15,10 @@
         "apps/docs/src/content/docs/concepts/semantic-keys.md": "715b4e3103fa971748b45c5c8086e1ea4b95980dff0a69ee122635ed5fc998d2",
         "apps/docs/src/content/docs/examples.md": "4043a5febebac1f55cb80e8f9c4214c6c03b9b11e3599ab77bc9ab6a4b99d204",
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "022014147e137abdac686d6d3c58f4eff1e8098dd2241a3cccd96abe5051cd26",
-        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "a541d37b1b9400b0ed069babae2d584f32b5bef3e91177212e4a2297ee0ebaef",
+        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "e2d0c792fbdfe37e9f72c6cf56667b55ba95379e5ee150a2e861d9325a924319",
         "apps/docs/src/content/docs/getting-started/feature-support.md": "858891f5093cd32d2d278be7780cd25a75c97ca77306668f368860f20aff106e",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "d8887c6d4180d60a1127957e073c180528474258c697c1305b6a7bb846e27671",
-        "apps/docs/src/content/docs/getting-started/installation.md": "6c71b6132f8c61c26fc466e23bed9a44dac45c441cbc491997d62a43dfda9d5f",
+        "apps/docs/src/content/docs/getting-started/installation.md": "6d58ab82951ac2db4262716ffb70f877c7579c415943d7978860022e81198327",
         "apps/docs/src/content/docs/getting-started/quick-start.md": "91ddca16ad5c0f484d88a9d3b42d37065ee3a3bfd088bd6f1b25a45e96283788",
         "apps/docs/src/content/docs/guides/angular-query.md": "beb279a2ef34d1e69e685bcd8dbeddb0fafb0228ede9107dd9f95d86f9e5c72c",
         "apps/docs/src/content/docs/guides/cache-filters.md": "b0b8a08b6e2f3484a2565b6bd6d080cd1e95b3e9aefcb5aaf121cd7a96ad2591",
@@ -31,7 +31,6 @@
         "apps/docs/src/content/docs/guides/http-queries-and-mutations.md": "6986c0a13febe76c0d9433336c567b3336df54ed480d05d25e053abf54d97d69",
         "apps/docs/src/content/docs/guides/hydrate-query-views.md": "a06ba615e7173c75ba4191dec97a82b02d33a793fe399f66b749a8a56d40b672",
         "apps/docs/src/content/docs/guides/hydrate-unary-data.md": "37d4ff8c5f6fc0b687c01685657d64dc4d136622c51e03a6b9c015bf1f00dc07",
-        "apps/docs/src/content/docs/guides/migrate-to-0-4.md": null,
         "apps/docs/src/content/docs/guides/mutations.md": "14eab9a6ef28b6cdb4368766e543d83abcb59b50008ba570d1a3092851ee368d",
         "apps/docs/src/content/docs/guides/optimistic-writes.md": "309964011fd58b301387c485eba621d06a3a73f3ddd0114918fd94f8d654e17d",
         "apps/docs/src/content/docs/guides/pagination.md": "335599f80e8c311c3d755ee0d339a4f66738d7af5643168c4909d56ad003625d",
@@ -54,9 +53,9 @@
         "apps/docs/src/content/docs/index.mdx": "ef6dbddd50fb3c5fff33944435d7b394a5852a1f71846f0a19ea204c3f415f5b",
         "apps/docs/src/content/docs/integrations/index.md": "027d9c9a2a06946be8771f3d33718e9097e59b689050d3ba51df05aa95ea6bda",
         "apps/docs/src/content/docs/reference/browser-and-worker-hosts.md": "400abc16a961005b5234f061861af70e6cf6199e9ea2a71b6c034e45fab54cb6",
-        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "ed0b85e5d1edbccad9add329276d1d6de8d674c1f2155e3b1e0a83fe47171136",
+        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "c0cb4e7ef9b941a84b30ee75afd283f60ab630dfab11d33cf91a473e7f4b482d",
         "apps/docs/src/content/docs/reference/errors.md": "8e1708ec387f57fe80de89f9e8e8367cf7b62f53fd52968910469b8a9db79092",
-        "apps/docs/src/content/docs/reference/external-http-clients.md": "3589aca0e2cf488b8f7f5978c8ecdee8f29a4f7bbb959f8cb25ae04536cec839",
+        "apps/docs/src/content/docs/reference/external-http-clients.md": "20c035c038bbd6d845e22a0167bb6ca0d16844ed582535e77e0a4f8a30f92c0d",
         "apps/docs/src/content/docs/reference/factory.md": "9a2c6c1b76b484cfda17b32d0e6bc21af60689b8dae2400f0c559354dad09653",
         "apps/docs/src/content/docs/reference/generated-builders.md": "e56a363220dc887f84278dd5076b6fb352a317c1b423d56a1c90bd6f08948ff6",
         "apps/docs/src/content/docs/reference/http-builders.md": "c60400e0416974e92436f050500cf0cf6ca423eb08d6a2f17b2f53dac2d54dfe",
@@ -64,7 +63,7 @@
         "apps/docs/src/content/docs/reference/performance.md": "43c17a9e6159c97bde08c2ed191ccd0035c5574faf7a4b52f6eec2b5c08fa725",
         "apps/docs/src/content/docs/reference/public-exports.md": "42a8b78390655ed291576557435e8d610ee7fabe05223e27840c553580d7f9ea",
         "apps/docs/src/content/docs/reference/type-inference.md": "a60819bcd3b5f7887efe97c1e6aabfdcf1822197abdd209b9d3820d33f4428b5",
-        "docs/adr/0001-target-effect-4-release-candidate.md": "bf32702737631b1d9bf319ee37a45b9ba91bfe48309fa21b9ce44cea386815ae",
+        "docs/adr/0001-target-effect-4-release-candidate.md": "25c187bf0f5065c8eb4f16e689a94732b57a4dec8f50c19801cfbff22f915b01",
         "docs/adr/0002-let-call-sites-choose-query-or-mutation.md": "ac6c71c1ab7fec80e50d843e92ac1d1b00c573fe8bf4ede0c4914f1711198c4d",
         "docs/adr/0003-project-dotted-rpc-tags-into-utility-paths.md": "56c0f624290a66dcdaeda4742e085ad869c83118ad73520a79e569f882d2a6df",
         "docs/adr/0004-build-core-shaped-options-and-certify-react-first.md": "785981d2b8c9a43e253051d6a1a222de0a1f6915c266d17b517fab3e180ece87",
@@ -82,7 +81,7 @@
         "docs/adr/0022-add-buffered-http-utilities-with-separate-key-roots.md": "b1a8772e531b660925db6a1fe55942ee8c4c055a0d411271ce274954ca1c63be",
         "docs/adr/0023-expose-buffered-multipart-http-mutations.md": "74341a7ae3f1b22714280c27e511e0f2e9569e440987ed6e44f6b023b6514b1e",
         "docs/adr/0024-project-http-streams-and-buffered-metadata.md": "69a7239f9f74d60e665ee346d4f9215cd3c1e2bd68ccf19211f021c23aeeaab8",
-        "docs/adr/0025-use-public-decoded-message-clients-for-server-local-rpc.md": "56fcb7eecab5721524ece615e0378d7da64e4d51d150bd9b8273f1290d99a65a",
+        "docs/adr/0025-use-public-decoded-message-clients-for-server-local-rpc.md": "7718bddc1eb2c6411294ab1efdff10efd51e8aee511e954dcf52160351e98f15",
         "docs/adr/0026-keep-rpc-transport-aggregation-in-the-application.md": "a1cc3d3425432a86b02b78d84a3f3c90bab5254ac6d3f443ab82dbbb390dfc5b",
         "docs/adr/0027-opt-in-policy-composition-and-execution-interceptors.md": "b40e10553f3d366885ee549ff3544e3d52a2e4ad3d892448fa0825ad8e5196f7",
         "docs/adr/0028-bind-partial-filters-to-explicit-projections.md": "4cfd6b32ae3c259928b5e32e58e770212d257f191b59da2777f365b950b58e86",
@@ -140,8 +139,9 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "81082882065197fdc5eebc4e8df8549c00be98bb90be5c21b4ad4625262a4c11",
-        "pnpm-workspace.yaml": "084718189418309a74c475346ff68d07efce92048f0254121a535126a74c7150",
+        "package.json": "47eec5f3a7d7564909e46109c3633086df5ab18874f54bc189caad71f33c246f",
+        "pnpm-workspace.yaml": "b34c4d2efc1a0beedfcb759902f8c8c3ebdbddc0997a791a22f4b03136911b31",
+        "scripts/check-effect-compatibility.mts": "e481369343d669222dea14de8d0ac95c5c3e996669da5595ee20d00dffe4bcff",
         "scripts/check-framework-consumers.mts": "37fc0fc0006c2b1f35c5cff85754612e0b74d89eed608e353ef5f18f05fce051",
         "scripts/measure-bundles.mts": "5a033ce9f9a4cf414632b6f2781a50c0354f1cf9996791a547a5d53dbef66d7a",
         "scripts/measure-construction.mts": "fa7f8bf47d2f642df04be94f2f9f2253b9f5208272fbeb5be9ae79b4c3fb86a8",
@@ -150,9 +150,9 @@
         "scripts/performance/common.mts": "57a2003d9769d884d1a0884cab5449cfce79c40300de8d0202d3f1780d51c4f5",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
-        "skills/effect-api-query/SKILL.md": "178290aba0739c7f8305cc40fd116e1f963f1cdfe6c961bcfee7a60fc8f4dfc4",
+        "skills/effect-api-query/SKILL.md": "a1ea584f0e2cfd0850fe1377c349338bea81083e17bdd7f56ecde027b0b6f67d",
         "skills/effect-api-query/references/cache-workflows.md": "47391e59a11e2adb946470872a5585be8bbcbf4765292e87117382aa99df1379",
-        "skills/effect-api-query/references/frameworks-and-hosts.md": "13481aaf265896bddaaf5e908ffed945e3719fe1cd60ca638e3dd47329d07d4d",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "8afb9f6c9f4756ce654c0c7e2fa542896585d8d46f3449544b16baeb58678bce",
         "skills/effect-api-query/references/http.md": "73eb5febbe01ba10e6b954c17c80df9eff5343feca37be516f44e85761fb3cd0",
         "skills/effect-api-query/references/hydration-and-ssr.md": "7e8c6566a6f5e46f2f7711e7745bef84be58f5354bb797ed411c05b819d601d2",
         "skills/effect-api-query/references/query-patterns.md": "867ee139dec9a61f7f0a75192df9ba88c46a04e8251d0c25f4be7653c1fd5d39",
@@ -233,7 +233,7 @@
         "tests/http-metadata-options.test.ts": "702a73eb9e005d038d35c233806a065ab4da7d35fa1255df336711bd09be96d4",
         "tests/http-multipart.test.ts": "331f18bf9730579f05513d3ab93734b8118e313b219604e8c0276c07110476ae",
         "tests/http-query-options.test.ts": "e7b2ca44c44cd8402ca688960458e1190c54c68845556fc4ea5d131ab8649891",
-        "tests/http-semantic-keys.test.ts": "c43a3d43b2224d64c1eb11ac2877c4c4a2c866efd67c1781bb1992439a85b5fb",
+        "tests/http-semantic-keys.test.ts": "4fa4efd4b8211e52560be80aecade363486372d06cb3eeca0c496a783ea21f8c",
         "tests/http-transport-cancellation.test.ts": "0ba26a9bae56b26605fc03009c1f50fe90930356d0fa0c4ec4ddc5c120430f00",
         "tests/hydration-codecs.test.ts": "58d641238310a23fbcce9620a9ec65377f69a98746fbf2a45b87f8f49cd46465",
         "tests/publication-deadline.test.ts": "2797557ff14bf8527ea446cec1e1d7c61cd3666f11f127e640c53ce5d7e30868",
@@ -299,25 +299,21 @@
         "tests/utility-configuration.test.ts": "a1ba1df1e174a6d8e8224a65483b961d2185c774fd84de78c1482626a5f78edd",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "604d8204e12861edc70d5996a873ff3d26919262",
+      "head": "c991ea856a6fcffb31fd1941d65362b039b2b3d9",
       "outcome": "updated",
-      "reason": "Removed obsolete upgrade navigation and ADR 32 helper-import instructions. Corrected only the shipped skill library_version from stale 0.4.0 to current 0.5.0; activation, purpose, source globs and all six references keep their supported current behavior and application-owned lifetimes.",
+      "reason": "Reconciled the Effect compatibility branch with main after squash merge #156. Retained the published >=4.0.6 <4.1.0 peer, coordinated 4.0.7 development pins, floor/current harness and header fixtures, and their guidance. Preserved migration removal, 0.5.0 skill/domain/tree metadata, both cumulative planning entries, and checker-affinity task commands. The existing skill and three planning records cover the combined scope; workflow/task/release bookkeeping adds no separate consumer workflow.",
       "evidence": [
-        "Reviewed the actual diff against base 604d8204e12861edc70d5996a873ff3d26919262 and the current skill plus all six references; no library, manifest, lockfile, hydration-guide or historical changelog changes.",
-        "vp install --frozen-lockfile passed the unchanged strict seven-day policy and installed Effect 4.0.6, Query Core 5.104.5 and pinned pnpm 12.15.0.",
-        "vp run docs-build passed all 20 docs excerpt tests, Astro check with zero errors/warnings/hints, 57 generated pages and internal-link validation. Build emitted external font-fetch and i18n/404 content warnings.",
-        "vp run api-types passed TypeScript 7.0.2 and 5.9.3. Its pack prerequisite passed declaration generation, ATTW and publint; TypeScript 7 emitted an existing non-failing Schema.TaggedStruct suggestion.",
-        "Scoped vp fmt --check, yamllint for both planning YAML files, git diff --check and intent validate skills --check passed. All 73 local links across the research record and shipped skill resolve.",
-        "The full runtime suite is reserved for parent integration. No fresh consumer, independent upstream re-fetch, wider dependency compatibility matrix or benchmark was run."
+        "Base origin/main=5d6e56909ff64f734d49ceaf93229769b7798034. Compared rebased source, tests, dependencies, workspace lock, scripts with reviewed pre-rebase head c57bbe6: identical; shipped entry metadata additionally retains main 0.5.0. Resolved only shared Intent and cumulative skill_spec conflicts, retaining both November 4 entries.",
+        "vp run quality passed after rebase: 761 tests, package validation, both public compilers, four native framework consumers, typed lint, formatting, Effect diagnostics, and all Fallow audits. Log /tmp/eaq-merge-quality-pr157.log. Prior packed compatibility evidence remains applicable to identical source: both Effect versions and compilers; fresh consumer-agent discovery was not repeated for this rebase. Remote CI will run on the pushed head before merge."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "e139c813378759839ee79a6cbede0052eb77d1d7474ecd80b253eac17b974fbd",
+      "fingerprint": "17d27e1c6bf0e3841d8b7075d69bacc2ff17faea8e0d3f4be323ea076f30eeda",
       "snapshot": {
         "GLOSSARY.md": "9f7734ff552aa9a5c2b112f7948b5001ca82341a7acbc787ee5f7131b7be340a",
-        "README.md": "ed7f20c4c544004f4787360f7bd8b5d6ebe1d60934ac1d24b11cf06259e809f5",
-        "_artifacts/domain_map.yaml": "5c3f533bd39ee696b4afb5f27129d1dc51044ae8b9b3efa294ddf05a69fb6fd3",
-        "_artifacts/skill_spec.md": "f05b655570fecf4d35b6c7bf55fa6216039f7d24f6f571795e8b4ad3f63f478d",
+        "README.md": "22c3457347dec25e8fb3ed800b7900c18afd7f56c78aafb10fc1e90e59add514",
+        "_artifacts/domain_map.yaml": "0f74a9686630feda1861b9b5d90f1b9c2cdc1a0fd7e53b970e52c3481c5ac70b",
+        "_artifacts/skill_spec.md": "fabd3bedb251ede0ad1511cf3ec44d00867db27b81afe84b97154a1d874c13e1",
         "_artifacts/skill_tree.yaml": "0e4ae2f7d0b38244984cac636f5d304fcc30c41dfee2535c2a5d26a85c55c19f",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "bc035d79c362da5d8279115598b3d4bbe10073a0798eb75054c53e2922afdc35",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "36087588f413acfde2566fe7b8f0baeb04061a2b6fc1487ac81c4cc99a90f0e6",
@@ -327,10 +323,10 @@
         "apps/docs/src/content/docs/concepts/semantic-keys.md": "715b4e3103fa971748b45c5c8086e1ea4b95980dff0a69ee122635ed5fc998d2",
         "apps/docs/src/content/docs/examples.md": "4043a5febebac1f55cb80e8f9c4214c6c03b9b11e3599ab77bc9ab6a4b99d204",
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "022014147e137abdac686d6d3c58f4eff1e8098dd2241a3cccd96abe5051cd26",
-        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "a541d37b1b9400b0ed069babae2d584f32b5bef3e91177212e4a2297ee0ebaef",
+        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "e2d0c792fbdfe37e9f72c6cf56667b55ba95379e5ee150a2e861d9325a924319",
         "apps/docs/src/content/docs/getting-started/feature-support.md": "858891f5093cd32d2d278be7780cd25a75c97ca77306668f368860f20aff106e",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "d8887c6d4180d60a1127957e073c180528474258c697c1305b6a7bb846e27671",
-        "apps/docs/src/content/docs/getting-started/installation.md": "6c71b6132f8c61c26fc466e23bed9a44dac45c441cbc491997d62a43dfda9d5f",
+        "apps/docs/src/content/docs/getting-started/installation.md": "6d58ab82951ac2db4262716ffb70f877c7579c415943d7978860022e81198327",
         "apps/docs/src/content/docs/getting-started/quick-start.md": "91ddca16ad5c0f484d88a9d3b42d37065ee3a3bfd088bd6f1b25a45e96283788",
         "apps/docs/src/content/docs/guides/angular-query.md": "beb279a2ef34d1e69e685bcd8dbeddb0fafb0228ede9107dd9f95d86f9e5c72c",
         "apps/docs/src/content/docs/guides/cache-filters.md": "b0b8a08b6e2f3484a2565b6bd6d080cd1e95b3e9aefcb5aaf121cd7a96ad2591",
@@ -343,7 +339,6 @@
         "apps/docs/src/content/docs/guides/http-queries-and-mutations.md": "6986c0a13febe76c0d9433336c567b3336df54ed480d05d25e053abf54d97d69",
         "apps/docs/src/content/docs/guides/hydrate-query-views.md": "a06ba615e7173c75ba4191dec97a82b02d33a793fe399f66b749a8a56d40b672",
         "apps/docs/src/content/docs/guides/hydrate-unary-data.md": "37d4ff8c5f6fc0b687c01685657d64dc4d136622c51e03a6b9c015bf1f00dc07",
-        "apps/docs/src/content/docs/guides/migrate-to-0-4.md": null,
         "apps/docs/src/content/docs/guides/mutations.md": "14eab9a6ef28b6cdb4368766e543d83abcb59b50008ba570d1a3092851ee368d",
         "apps/docs/src/content/docs/guides/optimistic-writes.md": "309964011fd58b301387c485eba621d06a3a73f3ddd0114918fd94f8d654e17d",
         "apps/docs/src/content/docs/guides/pagination.md": "335599f80e8c311c3d755ee0d339a4f66738d7af5643168c4909d56ad003625d",
@@ -366,9 +361,9 @@
         "apps/docs/src/content/docs/index.mdx": "ef6dbddd50fb3c5fff33944435d7b394a5852a1f71846f0a19ea204c3f415f5b",
         "apps/docs/src/content/docs/integrations/index.md": "027d9c9a2a06946be8771f3d33718e9097e59b689050d3ba51df05aa95ea6bda",
         "apps/docs/src/content/docs/reference/browser-and-worker-hosts.md": "400abc16a961005b5234f061861af70e6cf6199e9ea2a71b6c034e45fab54cb6",
-        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "ed0b85e5d1edbccad9add329276d1d6de8d674c1f2155e3b1e0a83fe47171136",
+        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "c0cb4e7ef9b941a84b30ee75afd283f60ab630dfab11d33cf91a473e7f4b482d",
         "apps/docs/src/content/docs/reference/errors.md": "8e1708ec387f57fe80de89f9e8e8367cf7b62f53fd52968910469b8a9db79092",
-        "apps/docs/src/content/docs/reference/external-http-clients.md": "3589aca0e2cf488b8f7f5978c8ecdee8f29a4f7bbb959f8cb25ae04536cec839",
+        "apps/docs/src/content/docs/reference/external-http-clients.md": "20c035c038bbd6d845e22a0167bb6ca0d16844ed582535e77e0a4f8a30f92c0d",
         "apps/docs/src/content/docs/reference/factory.md": "9a2c6c1b76b484cfda17b32d0e6bc21af60689b8dae2400f0c559354dad09653",
         "apps/docs/src/content/docs/reference/generated-builders.md": "e56a363220dc887f84278dd5076b6fb352a317c1b423d56a1c90bd6f08948ff6",
         "apps/docs/src/content/docs/reference/http-builders.md": "c60400e0416974e92436f050500cf0cf6ca423eb08d6a2f17b2f53dac2d54dfe",
@@ -376,7 +371,7 @@
         "apps/docs/src/content/docs/reference/performance.md": "43c17a9e6159c97bde08c2ed191ccd0035c5574faf7a4b52f6eec2b5c08fa725",
         "apps/docs/src/content/docs/reference/public-exports.md": "42a8b78390655ed291576557435e8d610ee7fabe05223e27840c553580d7f9ea",
         "apps/docs/src/content/docs/reference/type-inference.md": "a60819bcd3b5f7887efe97c1e6aabfdcf1822197abdd209b9d3820d33f4428b5",
-        "docs/adr/0001-target-effect-4-release-candidate.md": "bf32702737631b1d9bf319ee37a45b9ba91bfe48309fa21b9ce44cea386815ae",
+        "docs/adr/0001-target-effect-4-release-candidate.md": "25c187bf0f5065c8eb4f16e689a94732b57a4dec8f50c19801cfbff22f915b01",
         "docs/adr/0002-let-call-sites-choose-query-or-mutation.md": "ac6c71c1ab7fec80e50d843e92ac1d1b00c573fe8bf4ede0c4914f1711198c4d",
         "docs/adr/0003-project-dotted-rpc-tags-into-utility-paths.md": "56c0f624290a66dcdaeda4742e085ad869c83118ad73520a79e569f882d2a6df",
         "docs/adr/0004-build-core-shaped-options-and-certify-react-first.md": "785981d2b8c9a43e253051d6a1a222de0a1f6915c266d17b517fab3e180ece87",
@@ -394,7 +389,7 @@
         "docs/adr/0022-add-buffered-http-utilities-with-separate-key-roots.md": "b1a8772e531b660925db6a1fe55942ee8c4c055a0d411271ce274954ca1c63be",
         "docs/adr/0023-expose-buffered-multipart-http-mutations.md": "74341a7ae3f1b22714280c27e511e0f2e9569e440987ed6e44f6b023b6514b1e",
         "docs/adr/0024-project-http-streams-and-buffered-metadata.md": "69a7239f9f74d60e665ee346d4f9215cd3c1e2bd68ccf19211f021c23aeeaab8",
-        "docs/adr/0025-use-public-decoded-message-clients-for-server-local-rpc.md": "56fcb7eecab5721524ece615e0378d7da64e4d51d150bd9b8273f1290d99a65a",
+        "docs/adr/0025-use-public-decoded-message-clients-for-server-local-rpc.md": "7718bddc1eb2c6411294ab1efdff10efd51e8aee511e954dcf52160351e98f15",
         "docs/adr/0026-keep-rpc-transport-aggregation-in-the-application.md": "a1cc3d3425432a86b02b78d84a3f3c90bab5254ac6d3f443ab82dbbb390dfc5b",
         "docs/adr/0027-opt-in-policy-composition-and-execution-interceptors.md": "b40e10553f3d366885ee549ff3544e3d52a2e4ad3d892448fa0825ad8e5196f7",
         "docs/adr/0028-bind-partial-filters-to-explicit-projections.md": "4cfd6b32ae3c259928b5e32e58e770212d257f191b59da2777f365b950b58e86",
@@ -452,8 +447,9 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "81082882065197fdc5eebc4e8df8549c00be98bb90be5c21b4ad4625262a4c11",
-        "pnpm-workspace.yaml": "084718189418309a74c475346ff68d07efce92048f0254121a535126a74c7150",
+        "package.json": "47eec5f3a7d7564909e46109c3633086df5ab18874f54bc189caad71f33c246f",
+        "pnpm-workspace.yaml": "b34c4d2efc1a0beedfcb759902f8c8c3ebdbddc0997a791a22f4b03136911b31",
+        "scripts/check-effect-compatibility.mts": "e481369343d669222dea14de8d0ac95c5c3e996669da5595ee20d00dffe4bcff",
         "scripts/check-framework-consumers.mts": "37fc0fc0006c2b1f35c5cff85754612e0b74d89eed608e353ef5f18f05fce051",
         "scripts/measure-bundles.mts": "5a033ce9f9a4cf414632b6f2781a50c0354f1cf9996791a547a5d53dbef66d7a",
         "scripts/measure-construction.mts": "fa7f8bf47d2f642df04be94f2f9f2253b9f5208272fbeb5be9ae79b4c3fb86a8",
@@ -462,9 +458,9 @@
         "scripts/performance/common.mts": "57a2003d9769d884d1a0884cab5449cfce79c40300de8d0202d3f1780d51c4f5",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
-        "skills/effect-api-query/SKILL.md": "178290aba0739c7f8305cc40fd116e1f963f1cdfe6c961bcfee7a60fc8f4dfc4",
+        "skills/effect-api-query/SKILL.md": "a1ea584f0e2cfd0850fe1377c349338bea81083e17bdd7f56ecde027b0b6f67d",
         "skills/effect-api-query/references/cache-workflows.md": "47391e59a11e2adb946470872a5585be8bbcbf4765292e87117382aa99df1379",
-        "skills/effect-api-query/references/frameworks-and-hosts.md": "13481aaf265896bddaaf5e908ffed945e3719fe1cd60ca638e3dd47329d07d4d",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "8afb9f6c9f4756ce654c0c7e2fa542896585d8d46f3449544b16baeb58678bce",
         "skills/effect-api-query/references/http.md": "73eb5febbe01ba10e6b954c17c80df9eff5343feca37be516f44e85761fb3cd0",
         "skills/effect-api-query/references/hydration-and-ssr.md": "7e8c6566a6f5e46f2f7711e7745bef84be58f5354bb797ed411c05b819d601d2",
         "skills/effect-api-query/references/query-patterns.md": "867ee139dec9a61f7f0a75192df9ba88c46a04e8251d0c25f4be7653c1fd5d39",
@@ -545,7 +541,7 @@
         "tests/http-metadata-options.test.ts": "702a73eb9e005d038d35c233806a065ab4da7d35fa1255df336711bd09be96d4",
         "tests/http-multipart.test.ts": "331f18bf9730579f05513d3ab93734b8118e313b219604e8c0276c07110476ae",
         "tests/http-query-options.test.ts": "e7b2ca44c44cd8402ca688960458e1190c54c68845556fc4ea5d131ab8649891",
-        "tests/http-semantic-keys.test.ts": "c43a3d43b2224d64c1eb11ac2877c4c4a2c866efd67c1781bb1992439a85b5fb",
+        "tests/http-semantic-keys.test.ts": "4fa4efd4b8211e52560be80aecade363486372d06cb3eeca0c496a783ea21f8c",
         "tests/http-transport-cancellation.test.ts": "0ba26a9bae56b26605fc03009c1f50fe90930356d0fa0c4ec4ddc5c120430f00",
         "tests/hydration-codecs.test.ts": "58d641238310a23fbcce9620a9ec65377f69a98746fbf2a45b87f8f49cd46465",
         "tests/publication-deadline.test.ts": "2797557ff14bf8527ea446cec1e1d7c61cd3666f11f127e640c53ce5d7e30868",
@@ -611,30 +607,25 @@
         "tests/utility-configuration.test.ts": "a1ba1df1e174a6d8e8224a65483b961d2185c774fd84de78c1482626a5f78edd",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "604d8204e12861edc70d5996a873ff3d26919262",
+      "head": "c991ea856a6fcffb31fd1941d65362b039b2b3d9",
       "outcome": "updated",
-      "reason": "domain_map.yaml and skill_tree.yaml now identify current package 0.5.0 while retaining task coverage, failure modes, one skill, six references and valid source globs. skill_spec.md removes the stale migration-guidance planning mention and records this bounded cleanup, preserved research and actual check results. No explicit active mapping or planning link targets the deleted guide.",
+      "reason": "Reconciled the Effect compatibility branch with main after squash merge #156. Retained the published >=4.0.6 <4.1.0 peer, coordinated 4.0.7 development pins, floor/current harness and header fixtures, and their guidance. Preserved migration removal, 0.5.0 skill/domain/tree metadata, both cumulative planning entries, and checker-affinity task commands. The existing skill and three planning records cover the combined scope; workflow/task/release bookkeeping adds no separate consumer workflow.",
       "evidence": [
-        "Reviewed the actual diff against base 604d8204e12861edc70d5996a873ff3d26919262 and the current skill plus all six references; no library, manifest, lockfile, hydration-guide or historical changelog changes.",
-        "vp install --frozen-lockfile passed the unchanged strict seven-day policy and installed Effect 4.0.6, Query Core 5.104.5 and pinned pnpm 12.15.0.",
-        "vp run docs-build passed all 20 docs excerpt tests, Astro check with zero errors/warnings/hints, 57 generated pages and internal-link validation. Build emitted external font-fetch and i18n/404 content warnings.",
-        "vp run api-types passed TypeScript 7.0.2 and 5.9.3. Its pack prerequisite passed declaration generation, ATTW and publint; TypeScript 7 emitted an existing non-failing Schema.TaggedStruct suggestion.",
-        "Scoped vp fmt --check, yamllint for both planning YAML files, git diff --check and intent validate skills --check passed. All 73 local links across the research record and shipped skill resolve.",
-        "The full runtime suite is reserved for parent integration. No fresh consumer, independent upstream re-fetch, wider dependency compatibility matrix or benchmark was run.",
-        "vp exec intent maintainer sync reported Nothing to synchronize. Native Intent snapshots retain a null deletion tombstone for the removed guide; it is review history rather than an active source mapping."
+        "Base origin/main=5d6e56909ff64f734d49ceaf93229769b7798034. Compared rebased source, tests, dependencies, workspace lock, scripts with reviewed pre-rebase head c57bbe6: identical; shipped entry metadata additionally retains main 0.5.0. Resolved only shared Intent and cumulative skill_spec conflicts, retaining both November 4 entries.",
+        "vp run quality passed after rebase: 761 tests, package validation, both public compilers, four native framework consumers, typed lint, formatting, Effect diagnostics, and all Fallow audits. Log /tmp/eaq-merge-quality-pr157.log. Prior packed compatibility evidence remains applicable to identical source: both Effect versions and compilers; fresh consumer-agent discovery was not repeated for this rebase. Remote CI will run on the pushed head before merge."
       ]
     },
     "source:vite.config.ts": {
-      "fingerprint": "b75ff6d1e329b03ec9307be2100fa702337573e2a52a0d995462e8159972f3d8",
+      "fingerprint": "bfd69d28c3f314655068da2fa4ac578feb4194d02ab53455a391e42126cb5007",
       "snapshot": {
-        "vite.config.ts": "88c68da88d34378234381acc37a126c378ee37a6ae7f05bbf7b38e8e8b325d5c"
+        "vite.config.ts": "c87fb85173a58521920e2cd9d87da747c151d11abfaf00bb1629aa829f5589ba"
       },
-      "head": "2c965bf74076389db1815bfcc21d1e163fb0c6a7",
+      "head": "c991ea856a6fcffb31fd1941d65362b039b2b3d9",
       "outcome": "no-change",
-      "reason": "Only the repository check, lint, and typecheck task commands now select the installed checker-affinity scheduler. This keeps each file on its semantic checker and addresses reproduced moving false-any lint diagnostics without changing rules, compiler settings, public behavior, or usage guidance. The domain map, skill spec, and skill tree remain accurate for the existing task coverage, dependencies, source mappings, and migration cleanup.",
+      "reason": "Reconciled the Effect compatibility branch with main after squash merge #156. Retained the published >=4.0.6 <4.1.0 peer, coordinated 4.0.7 development pins, floor/current harness and header fixtures, and their guidance. Preserved migration removal, 0.5.0 skill/domain/tree metadata, both cumulative planning entries, and checker-affinity task commands. The existing skill and three planning records cover the combined scope; workflow/task/release bookkeeping adds no separate consumer workflow.",
       "evidence": [
-        "Inspected the vite.config.ts diff and empty CI changeset against HEAD 2c965bf. Controlled Linux A/B/A testing reproduced false-any diagnostics with baseline scheduling, passed four stressed affinity runs with all 751 rules, and reproduced failures again after restoring baseline. Rust --threads=1 still failed. Evidence: /tmp/eaq-lint-results/reproduction.md and eaq-native-lint-results.jsonl.",
-        "The exact updated named vp run --no-cache typecheck passed on Linux, including package and Astro prerequisites: /tmp/eaq-lint-results/named-typecheck.log. vp run quality passed locally: all four Fallow phases, 761 runtime tests, both public compilers, package validation, framework consumers, formatting, typed lint, and Effect diagnostics. Log: /tmp/eaq-ci-quality-pr156-affinity.log. No consumer recommendation or discovery metadata changed; a new consumer-agent task was not required."
+        "Base origin/main=5d6e56909ff64f734d49ceaf93229769b7798034. Compared rebased source, tests, dependencies, workspace lock, scripts with reviewed pre-rebase head c57bbe6: identical; shipped entry metadata additionally retains main 0.5.0. Resolved only shared Intent and cumulative skill_spec conflicts, retaining both November 4 entries.",
+        "vp run quality passed after rebase: 761 tests, package validation, both public compilers, four native framework consumers, typed lint, formatting, Effect diagnostics, and all Fallow audits. Log /tmp/eaq-merge-quality-pr157.log. Prior packed compatibility evidence remains applicable to identical source: both Effect versions and compilers; fresh consumer-agent discovery was not repeated for this rebase. Remote CI will run on the pushed head before merge."
       ]
     },
     "source:.github/workflows/release.yml": {
@@ -703,28 +694,28 @@
       ]
     },
     "source:.fallowrc.jsonc": {
-      "fingerprint": "9ded238df541ee24681ac350d6c30f79f585964261764f67c2c16a18e003a9c3",
+      "fingerprint": "4c1c5206b637efdc736ae667bdb385871f21b83ea3ec616b527a3df1e2dd14d1",
       "snapshot": {
-        ".fallowrc.jsonc": "6915c92ac5c9b831192df087f38445bf3446cb407a16149f2d660a7c521f60bc"
+        ".fallowrc.jsonc": "a19a438946e316ced0601fdecd189698f5bb07ff90e872706c2a50f9b6ef6ce4"
       },
-      "head": "86365084f08c30a0dc1211ad450412195060de5c",
+      "head": "ebdfe980bd9646f34fe302e758928a07b847ddcd",
       "outcome": "no-change",
-      "reason": "The configuration registers executable measurement/check scripts and excludes the separately compiled framework fixture project. It changes repository analysis coverage without adding package behavior or consumer guidance.",
+      "reason": "Fallow entry-point registration only: the existing Effect compatibility command is invoked by its Vite+ task, including CI, and must be reachable in production dead-code analysis. No library behavior or guidance changed. The domain map, skill spec, and skill tree remain accurate; their scope, source mappings, dependency guidance, and task checks are unchanged.",
       "evidence": [
-        "vp run fallow passes all four tasks; final maintainability is 91.5. The isolated framework compiler task passes on TypeScript 7 and 5.9."
+        "PR 157: inspected the working diff against HEAD and all three _artifacts planning documents. vp run quality passed: formatting, typed lint, Effect diagnostics, both published compilers, package validation, full Fallow task (general and production dead code, duplication, health), runtime suite, and framework consumer compilers. Log: /tmp/eaq-ci-quality-pr157.log. No recommended consumer behavior or discovery description changed, so no new consumer-agent check was required."
       ]
     },
     "source:.github/workflows/ci.yml": {
-      "fingerprint": "900e024ff7470245b8680c6cca11cb9da6c5ce43b66413e4806a34e8f9dda71c",
+      "fingerprint": "4f4f4c9c4d37913905cc6406a42aab865133103cad22c20f4f3b300403330ede",
       "snapshot": {
-        ".github/workflows/ci.yml": "a6c50faebcfc82dbf766f86e9f24ca42c1b0495339c6731c1d6071de9a4c75af"
+        ".github/workflows/ci.yml": "5c41e0fa9ee0ab844d03216da76353a35eba4ccba4744b3d385a99335f40db55"
       },
-      "head": "848ea4bfa501ec60d65c83bd801b4e16f121807d",
+      "head": "c991ea856a6fcffb31fd1941d65362b039b2b3d9",
       "outcome": "no-change",
-      "reason": "Only the Playwright container tag and immutable digest change to match the eligible1.64.1 test package; no developer workflow or skill changes are required.",
+      "reason": "Reconciled the Effect compatibility branch with main after squash merge #156. Retained the published >=4.0.6 <4.1.0 peer, coordinated 4.0.7 development pins, floor/current harness and header fixtures, and their guidance. Preserved migration removal, 0.5.0 skill/domain/tree metadata, both cumulative planning entries, and checker-affinity task commands. The existing skill and three planning records cover the combined scope; workflow/task/release bookkeeping adds no separate consumer workflow.",
       "evidence": [
-        "MCR v1.64.1-noble OCI index digest verified:sha256:2f05f8a734509a7b3f26a912639488ee08f58a7b292d14d62271bcff9038768f.",
-        "Existing workflow permissions and triggers remain unchanged."
+        "Base origin/main=5d6e56909ff64f734d49ceaf93229769b7798034. Compared rebased source, tests, dependencies, workspace lock, scripts with reviewed pre-rebase head c57bbe6: identical; shipped entry metadata additionally retains main 0.5.0. Resolved only shared Intent and cumulative skill_spec conflicts, retaining both November 4 entries.",
+        "vp run quality passed after rebase: 761 tests, package validation, both public compilers, four native framework consumers, typed lint, formatting, Effect diagnostics, and all Fallow audits. Log /tmp/eaq-merge-quality-pr157.log. Prior packed compatibility evidence remains applicable to identical source: both Effect versions and compilers; fresh consumer-agent discovery was not repeated for this rebase. Remote CI will run on the pushed head before merge."
       ]
     },
     "source:tests/packed-consumer/construction-baseline.mts": {
@@ -2781,6 +2772,31 @@
       "evidence": [
         "Inspected the vite.config.ts diff and empty CI changeset against HEAD 2c965bf. Controlled Linux A/B/A testing reproduced false-any diagnostics with baseline scheduling, passed four stressed affinity runs with all 751 rules, and reproduced failures again after restoring baseline. Rust --threads=1 still failed. Evidence: /tmp/eaq-lint-results/reproduction.md and eaq-native-lint-results.jsonl.",
         "The exact updated named vp run --no-cache typecheck passed on Linux, including package and Astro prerequisites: /tmp/eaq-lint-results/named-typecheck.log. vp run quality passed locally: all four Fallow phases, 761 runtime tests, both public compilers, package validation, framework consumers, formatting, typed lint, and Effect diagnostics. Log: /tmp/eaq-ci-quality-pr156-affinity.log. No consumer recommendation or discovery metadata changed; a new consumer-agent task was not required."
+      ]
+    },
+    "source:.changeset/register-effect-audit-entry.md": {
+      "fingerprint": "6adfca0f1b67a08be4ef5af17acb942d487749cf9b78dc356fabe67447db26c5",
+      "snapshot": {
+        ".changeset/register-effect-audit-entry.md": "df71b3424357a136e5f06edaa3ddc4664252987d195eaabcfee4113582323ce4"
+      },
+      "head": "ebdfe980bd9646f34fe302e758928a07b847ddcd",
+      "outcome": "no-change",
+      "reason": "Fallow entry-point registration only: the existing Effect compatibility command is invoked by its Vite+ task, including CI, and must be reachable in production dead-code analysis. No library behavior or guidance changed. The domain map, skill spec, and skill tree remain accurate; their scope, source mappings, dependency guidance, and task checks are unchanged.",
+      "evidence": [
+        "PR 157: inspected the working diff against HEAD and all three _artifacts planning documents. vp run quality passed: formatting, typed lint, Effect diagnostics, both published compilers, package validation, full Fallow task (general and production dead code, duplication, health), runtime suite, and framework consumer compilers. Log: /tmp/eaq-ci-quality-pr157.log. No recommended consumer behavior or discovery description changed, so no new consumer-agent check was required."
+      ]
+    },
+    "source:.changeset/quiet-pandas-relate.md": {
+      "fingerprint": "bc057b64dc533cafaede764406fdd7f9bedb38272392764a086e2d5527bf2844",
+      "snapshot": {
+        ".changeset/quiet-pandas-relate.md": "6f5c912eba3a849821b06e9b34b7d7729ce0a20598395e74761d6154d4f2c7a5"
+      },
+      "head": "c991ea856a6fcffb31fd1941d65362b039b2b3d9",
+      "outcome": "no-change",
+      "reason": "Reconciled the Effect compatibility branch with main after squash merge #156. Retained the published >=4.0.6 <4.1.0 peer, coordinated 4.0.7 development pins, floor/current harness and header fixtures, and their guidance. Preserved migration removal, 0.5.0 skill/domain/tree metadata, both cumulative planning entries, and checker-affinity task commands. The existing skill and three planning records cover the combined scope; workflow/task/release bookkeeping adds no separate consumer workflow.",
+      "evidence": [
+        "Base origin/main=5d6e56909ff64f734d49ceaf93229769b7798034. Compared rebased source, tests, dependencies, workspace lock, scripts with reviewed pre-rebase head c57bbe6: identical; shipped entry metadata additionally retains main 0.5.0. Resolved only shared Intent and cumulative skill_spec conflicts, retaining both November 4 entries.",
+        "vp run quality passed after rebase: 761 tests, package validation, both public compilers, four native framework consumers, typed lint, formatting, Effect diagnostics, and all Fallow audits. Log /tmp/eaq-merge-quality-pr157.log. Prior packed compatibility evidence remains applicable to identical source: both Effect versions and compilers; fresh consumer-agent discovery was not repeated for this rebase. Remote CI will run on the pushed head before merge."
       ]
     }
   }
