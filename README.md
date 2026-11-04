@@ -112,7 +112,7 @@ HTTP inputs use decoded `params`, `query`, `headers`, and `payload` containers. 
 | Unary RPC or buffered nonmultipart HTTP | Query, infinite query, mutation |
 | Buffered nonmultipart HTTP | Separate view of response status and headers |
 | Buffered multipart HTTP | Mutation with explicit `FormData` |
-| RPC stream or unambiguous HTTP SSE | Accumulated streamed query, live query |
+| RPC stream or unambiguous HTTP SSE/NDJSON | Accumulated streamed query, live query |
 
 Use generated keys to read, write, and invalidate cache entries. Queries forward cancellation to Effect. Use `createQueryFilter` for typed partial filters and `configureUtils` for shared policies and ordered execution interceptors across a tree, branch, or leaf. Mutation policies can compose shared and local callbacks. Accumulated streams require a finite `maxChunks` bound or an explicit `"unbounded"` choice.
 

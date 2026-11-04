@@ -32,7 +32,11 @@ const multipartBrands = (schema: Schema.Top): ReadonlySet<string> => {
 
 export type HttpRequestDescription =
   | { readonly kind: "Unary"; readonly input: OperationInput }
-  | { readonly kind: "Streaming"; readonly input: OperationInput }
+  | {
+      readonly kind: "Streaming";
+      readonly stream: "StreamSse" | "StreamNdjson";
+      readonly input: OperationInput;
+    }
   | { readonly kind: "Mutation" };
 
 const classifyEndpoint = (
@@ -40,7 +44,12 @@ const classifyEndpoint = (
   identity: HttpApiEndpointIdentity
 ):
   | {
-      readonly kind: "Unary" | "Streaming";
+      readonly kind: "Unary";
+      readonly schemas: readonly Schema.Top[];
+    }
+  | {
+      readonly kind: "Streaming";
+      readonly stream: "StreamSse" | "StreamNdjson";
       readonly schemas: readonly Schema.Top[];
     }
   | { readonly kind: "Mutation" }
@@ -97,11 +106,11 @@ const classifyEndpoint = (
       multipart ||
       successes.length !== 1 ||
       !Predicate.hasProperty(body, "_tag") ||
-      body._tag !== "StreamSse"
+      (body._tag !== "StreamSse" && body._tag !== "StreamNdjson")
     ) {
       return undefined;
     }
-    return { kind: "Streaming", schemas: payloads };
+    return { kind: "Streaming", stream: body._tag, schemas: payloads };
   }
   return multipart
     ? { kind: "Mutation" }
@@ -192,6 +201,10 @@ export const createHttpRequest = (
     return classified;
   }
   const payloads = classified.schemas;
+  const description =
+    classified.kind === "Streaming"
+      ? { kind: classified.kind, stream: classified.stream }
+      : { kind: classified.kind };
   const fields: Record<string, Schema.Top> = {};
   if (endpoint.params !== undefined) {
     fields["params"] = endpoint.params;
@@ -206,7 +219,7 @@ export const createHttpRequest = (
     fields["payload"] = Schema.Union(payloads);
   }
   if (Object.keys(fields).length === 0) {
-    return { kind: classified.kind, input: { _tag: "Inputless" } };
+    return { ...description, input: { _tag: "Inputless" } };
   }
   const schema = Schema.Struct(fields);
   const keyEncoding = createSchemaKeyEncoding(schema);
@@ -218,7 +231,7 @@ export const createHttpRequest = (
       cause
     );
   return {
-    kind: classified.kind,
+    ...description,
     input: {
       _tag: "Input",
       requiresEncoder: payloads.length > 1 || keyEncoding.requiresEncoder,

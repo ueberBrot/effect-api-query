@@ -3,7 +3,7 @@ title: HTTP Utility Tree
 description: Understand literal HTTP identifiers, top-level groups, and omitted endpoints.
 ---
 
-`createHttpApiQueryUtils` builds and freezes an HTTP utility tree from a literal Effect HttpApi declaration. Buffered endpoints without multipart expose ordinary query, infinite-query, and mutation builders. Buffered multipart endpoints expose mutation builders only, regardless of HTTP method. Endpoints with one SSE success expose builders for accumulated streamed queries and live queries.
+`createHttpApiQueryUtils` builds and freezes an HTTP utility tree from a literal Effect HttpApi declaration. Buffered endpoints without multipart expose ordinary query, infinite-query, and mutation builders. Buffered multipart endpoints expose mutation builders only, regardless of HTTP method. Endpoints with one SSE or NDJSON success expose builders for accumulated streamed queries and live queries.
 
 | Declaration | Generated path |
 | --- | --- |
@@ -19,12 +19,12 @@ Every retained branch and endpoint has `key()`. A top-level group has no branch 
 | --- | --- |
 | Buffered without multipart | Ordinary, infinite, and mutation builders, plus buffered metadata |
 | Any buffered multipart payload alternative | Mutations only, including mixed plain and multipart alternatives |
-| Single SSE success without multipart | Accumulated history and latest-value views |
+| Single SSE or NDJSON success without multipart | Accumulated history and latest-value views |
 
-SSE events retain decoded response-header wrappers. Decoder policy contributes to both view keys. Accumulated keys also include retention and refetch policy. Endpoint prefixes select all policies. The [HTTP Factory](/effect-api-query/reference/http-factory/) lists the exact builders.
+SSE and NDJSON emissions retain decoded response-header wrappers. SSE decoder policy contributes to both view keys. NDJSON uses declaration-level decoder limits and has no SSE-specific key fields. Accumulated keys also include retention and refetch policy. Endpoint prefixes select all policies. The [HTTP Factory](/effect-api-query/reference/http-factory/) lists the exact builders.
 
-The factory omits endpoints with raw byte streams, mixed buffered and SSE successes, multipart SSE payloads, or streaming multipart requests. Groups with only omitted endpoints disappear. Contradictory multipart metadata causes factory construction to fail. Unsupported streams require direct use of the ready client. Applications own byte sinks, reconnection, and resume policy.
+The factory omits endpoints with raw byte streams, mixed buffered and streamed successes, multipart payloads with streamed successes, or any streaming request payload. Groups with only omitted endpoints disappear. Contradictory multipart metadata causes factory construction to fail. Unsupported streams require direct use of the ready client. Applications own byte sinks, reconnection, and resume policy.
 
 Any buffered multipart payload alternative makes an endpoint mutation-only, even if the endpoint also accepts ordinary payloads. Its leaf exposes `key()`, `mutationKey()`, and `mutationOptions()`. Files and other mutation variables do not contribute to cache identity. These leaves require no key encoder and reject encoder entries. The [file upload guide](/effect-api-query/guides/http-queries-and-mutations/#upload-a-file) shows how to supply multipart input.
 
-Raw response objects remain omitted. Ordinary queries, mutations, and SSE views use decoded-only responses. Buffered metadata views copy status and headers alongside decoded data. Request input excludes response controls. The [HTTP factory](/effect-api-query/reference/http-factory/) defines request, response, and builder contracts. [Semantic Keys](/effect-api-query/concepts/semantic-keys/) explains the `http` namespace.
+Raw response objects remain omitted. Ordinary queries, mutations, and SSE or NDJSON views use decoded-only responses. Buffered metadata views copy status and headers alongside decoded data. Request input excludes response controls. The [HTTP factory](/effect-api-query/reference/http-factory/) defines request, response, and builder contracts. [Semantic Keys](/effect-api-query/concepts/semantic-keys/) explains the `http` namespace.

@@ -271,6 +271,7 @@ export default defineConfig({
           "tests/http-live-query.test.ts",
           "tests/http-metadata-options.test.ts",
           "tests/http-multipart.test.ts",
+          "tests/http-ndjson-query.test.ts",
           "tests/http-query-options.test.ts",
           "tests/http-structural-sharing.test.ts",
           "tests/http-semantic-keys.test.ts",

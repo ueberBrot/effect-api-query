@@ -3,7 +3,7 @@ title: Stream Snapshots
 description: Capture an accumulated or live stream for server rendering and hydrate an independent browser cache.
 ---
 
-Use `fetchStreamSnapshot` when server rendering needs data from an open RPC or HTTP SSE query. The helper waits for the first new cache publication or normal completion. It cancels the exact query and awaits local iterator cleanup. Ordinary `queryClient.query` waits for an open stream to finish.
+Use `fetchStreamSnapshot` when server rendering needs data from an open RPC or HTTP SSE/NDJSON query. The helper waits for the first new cache publication or normal completion. It cancels the exact query and awaits local iterator cleanup. Ordinary `queryClient.query` waits for an open stream to finish.
 
 ## Capture data before dehydration
 
@@ -35,7 +35,7 @@ const latest = await fetchStreamSnapshot(
 );
 ```
 
-Dehydrate successful data with your application's serializer. After cleanup, dispose the request resources. HTTP SSE accepts the same helper with its generated options. The [complete typed recipe](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-stream-snapshot.ts) includes the contract and client setup. [Hydrate Query Views](/effect-api-query/guides/hydrate-query-views/) covers history, live values, and paired codecs.
+Dehydrate successful data with your application's serializer. After cleanup, dispose the request resources. HTTP SSE and NDJSON accept the same helper with its generated options. The [complete typed recipe](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-stream-snapshot.ts) includes the contract and client setup. [Hydrate Query Views](/effect-api-query/guides/hydrate-query-views/) covers history, live values, and paired codecs.
 
 The default `fresh` mode starts a new attempt even when cached or initial data has a future timestamp. Old data cannot settle that attempt. Native stream policies still apply: `append` includes existing history, and `replace` on a previously fetched query publishes only at completion. An open replacement stream therefore needs to complete or reach the timeout.
 

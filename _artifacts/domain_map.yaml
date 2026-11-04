@@ -18,7 +18,7 @@ skills:
       - "@ueberbrot/effect-api-query"
     covers:
       - RPC construction, explicit prepared inputs, and canonical identity
-      - HTTP decoded requests, SSE, multipart mutations, metadata, and omitted streaming uploads or upgrades
+      - HTTP decoded requests, SSE and NDJSON, multipart mutations, metadata, and omitted streaming uploads or upgrades
       - Inferred operation types, tree/branch/leaf policy configuration, execution interception, native defaults, and view filters
       - Opt-in decoded-value sharing through native Schema equivalence and Query policies, with explicit reference semantics for custom fields
       - Input-field skipping, pagination, explicit stream retention, publication deadlines, uncached event consumption, recovery, and lifetime tracing
@@ -67,6 +67,16 @@ skills:
         wrong_pattern: Use generic Equal.equals or encoded JSON to reuse arbitrary mutable or custom cached objects.
         correct_pattern: Compose Schema.toEquivalence for immutable declared records with native replaceEqualDeep; give unknown/custom fields explicit reference equivalence and reconcile HTTP metadata around its decoded data.
         source: tests/types/docs-structural-sharing.ts
+        priority: HIGH
+        status: active
+      - mistake: Apply SSE decoder controls to NDJSON views
+        mechanism: >-
+          NDJSON framing and element limits belong to the Effect declaration; its ready client supplies decoded records without SSE policy.
+        wrong_pattern: >-
+          http.records.watch.liveOptions({ sseOptions: { maxEventSize: 1024 } })
+        correct_pattern: >-
+          Declare maxElementBytes on StreamNdjson and use the ordinary accumulated or live builder without sseOptions.
+        source: src/http/types.ts
         priority: HIGH
         status: active
       - mistake: Rely on call order to determine configuration specificity

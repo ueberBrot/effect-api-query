@@ -1,6 +1,6 @@
 ---
 title: HTTP Builders
-description: HTTP query, metadata, mutation, pagination, and SSE option contracts.
+description: HTTP query, metadata, mutation, pagination, and decoded stream option contracts.
 ---
 
 Every retained branch and endpoint provides `key()` for prefix filters. The [HTTP Factory](/effect-api-query/reference/http-factory/) defines construction, supported endpoint shapes, and the decoded request contract.
@@ -13,10 +13,10 @@ Query key builders return immutable, data-tagged keys. Option builders return fr
 | `metadataKey(input?)`, `metadataOptions(options?)` | Decoded data, status, and raw headers. |
 | `infiniteKey(input?)`, `infiniteOptions(options)` | Native `InfiniteData` for paginated responses. |
 | `mutationKey()`, `mutationOptions(options?)` | Mutation options whose variables are supplied at execution. |
-| `streamedKey(input, policy)`, `streamedOptions(options)` | Accumulated SSE emissions with retention and decoder policy. |
-| `liveKey(input?, policy?)`, `liveOptions(options?)` | Latest SSE emission with decoder policy. |
+| `streamedKey(input, policy)`, `streamedOptions(options)` | Accumulated SSE or NDJSON emissions with retention and publication policy. |
+| `liveKey(input?, policy?)`, `liveOptions(options?)` | Latest SSE or NDJSON emission. |
 
-Input-bearing key builders require the complete request. Inputless streamed and live key builders take their policy as the first argument. Buffered multipart endpoints expose only mutation builders. SSE endpoints expose only accumulated and live builders.
+Input-bearing key builders require the complete request. Inputless streamed and live key builders take their policy as the first argument. Buffered multipart endpoints expose only mutation builders. SSE and NDJSON endpoints expose only accumulated and live builders.
 
 ## Query options
 
@@ -60,7 +60,7 @@ Metadata keys use a `metadata` discriminator and the ordinary request identity. 
 
 The cache retains the decoded value and metadata snapshot. It contains no response object or open body. See [Update with an ETag](/effect-api-query/guides/http-metadata/#update-with-an-etag) for conditional writes.
 
-## Accumulated SSE options
+## Accumulated stream options
 
 `streamedOptions` accepts native query options, decoded `input` when declared, and these controls:
 
@@ -70,9 +70,9 @@ The cache retains the decoded value and metadata snapshot. It contains no respon
 | `refetchMode` | `reset` (default), `append`, or `replace`. |
 | `publicationBatchSize` | Positive safe integer for ordered publication batches; defaults to one. |
 | `publicationMaxWaitMs` | Integer from 1 through 2,147,483,647; flushes a partial batch from its first buffered event. Omitted means no deadline. |
-| `sseOptions.maxEventSize` | Positive safe integer that limits pending parser text. The default is 10 MiB of JavaScript string code units. |
+| `sseOptions.maxEventSize` (SSE only) | Positive safe integer that limits pending parser text. The default is 10 MiB of JavaScript string code units. |
 
-Decoded data is an ordered readonly array. Accumulated elements keep `undefined`. Decoded header wrappers surround each emitted body. Empty completion succeeds. Acquisition and consumption errors use `EffectHttpApiQueryError` with operation `streamed`. They preserve declared event failures, `Sse.Retry`, `Sse.SseError`, HTTP and Schema errors, and additional client channels.
+Decoded data is an ordered readonly array. Accumulated elements keep `undefined`. Decoded header wrappers surround each emitted body. Empty completion succeeds. Acquisition and consumption errors use `EffectHttpApiQueryError` with operation `streamed`. They preserve HTTP and Schema errors and additional ready-client channels. SSE also preserves declared event failures, `Sse.Retry`, and `Sse.SseError`. NDJSON framing and element decoding failures follow the ready client's HTTP or Schema error channel.
 
 The caller's runner supplies acquisition and consumption services and receives Query's abort signal. Cancellation closes the iterator and follows native Query cache reversion.
 
@@ -80,17 +80,19 @@ The first event publishes immediately. Later events publish in batches of `publi
 
 `streamedKey(input, policy)` accepts the same decoder, retention, refetch, and publication policy. Inputless endpoints use `streamedKey(policy)`. Supply `maxChunks` explicitly or inherit it through `configureUtils`. Equivalent policies have equal keys. Omitted or explicit batch size one has the same identity. Nondefault sizes and explicit deadlines have separate entries. Endpoint `key()` selects them all. Decoded request input and custom encoders exclude decoder controls. Declared resume headers remain part of request identity.
 
+NDJSON accepts no `sseOptions` and adds no SSE decoder fields to its keys. Declare `maxElementBytes` on `HttpApiSchema.StreamNdjson`; Effect owns framing, decoding, limits, and decoding services. Stream endpoints have no metadata view; a declared `WithHeaders` wrapper is projected around each decoded record.
+
 See [Accumulate Values](/effect-api-query/guides/streaming/#accumulate-values). See [Batch Accumulated Publications](/effect-api-query/guides/choose-stream-history/#batch-accumulated-publications) for count and deadline behavior.
 
-## Live SSE options
+## Live stream options
 
-`liveOptions` accepts native query options, declared decoded `input`, and `sseOptions`. The key builder is `liveKey(input, { sseOptions })`, or `liveKey({ sseOptions })` for inputless endpoints. It includes normalized decoder policy in the separate `live` identity. Live keys carry the latest decoded value and the execution error union, including `EffectHttpApiQueryEmptyStreamError`. Live builders preserve selection, initial-data, and skipped-input inference.
+`liveOptions` accepts native query options and declared decoded `input`. NDJSON uses `liveKey(input)` or inputless `liveKey()`. SSE also accepts `sseOptions`, with `liveKey(input, { sseOptions })` or inputless `liveKey({ sseOptions })`. SSE includes normalized decoder policy in the separate `live` identity. Live keys carry the latest decoded value and the execution error union, including `EffectHttpApiQueryEmptyStreamError`. Live builders preserve selection, initial-data, and skipped-input inference.
 
 The first emission makes the query successful. Later emissions replace the cached value. Completion preserves the latest value. Only a top-level `undefined` becomes `null`. Declared header wrappers retain their decoded body and headers.
 
 An empty live completion fails with declaration metadata. Live queries accept no `maxChunks`, accumulated `refetchMode`, `publicationBatchSize`, or `publicationMaxWaitMs`.
 
-Live and accumulated SSE queries have the same acquisition and consumption errors and services, decoder limit validation, iterator cleanup, and caller-owned reconnection contract. Input-bearing builders validate decoder policy even when skipped. Endpoint prefixes match both representations and every concrete decoder policy. See [Keep the Latest Value](/effect-api-query/guides/streaming/#keep-the-latest-value).
+Live and accumulated views have the same acquisition and consumption errors and services, iterator cleanup, and caller-owned reconnection contract. SSE builders validate decoder policy even when skipped. Endpoint prefixes match both representations and every concrete decoder policy. See [Keep the Latest Value](/effect-api-query/guides/streaming/#keep-the-latest-value).
 
 ## Pagination
 

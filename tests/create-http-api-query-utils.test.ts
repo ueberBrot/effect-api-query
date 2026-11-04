@@ -282,7 +282,7 @@ describe(createHttpApiQueryUtils, () => {
     }
   });
 
-  it("omits streaming request bodies, NDJSON responses, and protocol upgrades", () => {
+  it("omits streaming request bodies, ambiguous stream responses, and protocol upgrades", () => {
     const unsupported = [
       HttpApiEndpoint.post("uploadBytes", "/upload-bytes", {
         payload: HttpApiSchema.StreamUint8Array(),
@@ -311,20 +311,17 @@ describe(createHttpApiQueryUtils, () => {
         payload: HttpApiSchema.StreamUint8Array(),
         success: HttpApiSchema.StreamSse({ data: Schema.String }),
       }),
-      HttpApiEndpoint.get("ndjson", "/ndjson", {
-        success: HttpApiSchema.StreamNdjson({ schema: Schema.String }),
-      }),
-      HttpApiEndpoint.get("wrappedNdjson", "/wrapped-ndjson", {
-        success: HttpApiSchema.WithHeaders(
-          HttpApiSchema.StreamNdjson({ schema: Schema.String }),
-          { etag: Schema.String }
-        ),
-      }),
       HttpApiEndpoint.get("mixedNdjson", "/mixed-ndjson", {
         success: [
           Schema.String,
           HttpApiSchema.StreamNdjson({ schema: Schema.String }),
         ],
+      }),
+      HttpApiEndpoint.post("multipartNdjson", "/multipart-ndjson", {
+        payload: Schema.Struct({ name: Schema.String }).pipe(
+          HttpApiSchema.asMultipart()
+        ),
+        success: HttpApiSchema.StreamNdjson({ schema: Schema.String }),
       }),
       HttpApiEndpoint.get("upgrade", "/upgrade", {
         success: HttpApiSchema.Upgrade({ protocol: "tcp" }),

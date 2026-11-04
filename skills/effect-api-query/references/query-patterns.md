@@ -137,7 +137,7 @@ Pass either result to `useQuery` or a query observer. The history and latest vie
 
 Accumulated queries retain emitted elements in order. `maxChunks` is a required positive safe integer or the literal `"unbounded"`. A finite bound limits element count, not bytes. Share the choice through `configureUtils` with `streamed.policy`, or supply it in each raw key and options builder. Both `maxChunks` and `refetchMode` contribute to normalized cache identity. Explicit unbounded retention with reset refetches retains the unlimited-history identity. Different bounds or refetch modes use different entries.
 
-Use `streamedKey(input, policy)` or the matching options' `queryKey`. Inputless operations take the policy first. HTTP accumulated and live views also include SSE decoder policy.
+Use `streamedKey(input, policy)` or the matching options' `queryKey`. Inputless operations take the policy first. HTTP SSE accumulated and live views also include SSE decoder policy. NDJSON views use the same history policies without SSE decoder fields.
 
 The refetch modes control how the next execution updates history:
 

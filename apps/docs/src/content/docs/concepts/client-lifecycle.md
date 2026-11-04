@@ -26,7 +26,7 @@ Your application client and runtime manage authentication, middleware, transport
 
 ## Stream creation and consumption
 
-For accumulated and live queries over RPC or HTTP SSE, the runner executes `Stream.toAsyncIterableEffect`. That Effect creates an iterable and captures its Effect `Context`. The runner returns a successful `Exit` before Query Core pulls values. Those pulls use the captured Context while the query remains fetching. Keep the Context's services and the ready client's Scope alive until consumption finishes.
+For accumulated and live queries over RPC or HTTP SSE/NDJSON, the runner executes `Stream.toAsyncIterableEffect`. That Effect creates an iterable and captures its Effect `Context`. The runner returns a successful `Exit` before Query Core pulls values. Those pulls use the captured Context while the query remains fetching. Keep the Context's services and the ready client's Scope alive until consumption finishes.
 
 If work must cover consumption, transform or instrument the ready-client stream. Preserve its request options, declared value and error types, and HTTP response-mode contract. A stream finalizer handles cleanup after completion or cancellation.
 

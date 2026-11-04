@@ -19,14 +19,14 @@ hero:
 
 import { CardGrid, LinkCard } from "@astrojs/starlight/components";
 
-`effect-api-query` builds a typed utility tree from an Effect declaration, a ready client, and your cache prefix. Each leaf builds options that native TanStack Query consumers accept. These options cover buffered reads, mutations, pages, RPC streams, HTTP SSE, and buffered HTTP metadata.
+`effect-api-query` builds a typed utility tree from an Effect declaration, a ready client, and your cache prefix. Each leaf builds options that native TanStack Query consumers accept. These options cover buffered reads, mutations, pages, RPC streams, HTTP SSE/NDJSON, and buffered HTTP metadata.
 
 ## Choose your contract
 
 <CardGrid>
   <LinkCard
     title="HTTP API"
-    description="Use an Effect HttpApi declaration and a ready HttpApiClient to build typed reads, writes, pages, SSE views, and response metadata."
+    description="Use an Effect HttpApi declaration and a ready HttpApiClient to build typed reads, writes, pages, SSE and NDJSON views, and response metadata."
     href="/effect-api-query/getting-started/http-quick-start/"
   />
   <LinkCard

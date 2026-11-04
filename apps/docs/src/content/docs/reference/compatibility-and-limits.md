@@ -35,9 +35,9 @@ Generated Core options support native reactive accessors and retain each framewo
 | Operation | RPC | HTTP |
 | --- | --- | --- |
 | Ordinary queries, pagination, mutations | Unary RPCs | Buffered endpoints without multipart, regardless of method |
-| Accumulated and live streams | Streaming RPCs | One unambiguous SSE success without multipart |
+| Accumulated and live streams | Streaming RPCs | One unambiguous SSE or NDJSON success without multipart |
 | Buffered multipart uploads | Client and payload contract owned by the application | Mutation-only, with `FormData` supplied by the application |
-| Streaming request payloads, raw or NDJSON responses, and HTTP upgrades | Client transport contract | Omitted endpoints |
+| Streaming request payloads, raw byte responses, and HTTP upgrades | Client transport contract | Omitted endpoints |
 | Response metadata | Declared RPC result | Buffered decoded data with plain snapshots of status and headers |
 | Conditional reads | `skipToken` for input-bearing query builders | Same, including buffered metadata |
 | Query cancellation | Signal forwarding and iterator cleanup, with server interruption determined by transport | Same, with fetch able to abort the pending request |

@@ -170,6 +170,7 @@ const extractHttpEndpoints = (
         kind: "Streaming",
         prepareStream: createHttpStreamPreparation(
           identity,
+          request.stream,
           (requestInput, sseOptions) =>
             // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
             invoke(requestInput, "decoded-only", sseOptions)

@@ -56,6 +56,17 @@ export type SseEndpoint<Endpoint> =
       : never
     : never;
 
+export type StreamingEndpoint<Endpoint> =
+  Endpoint extends HttpApiEndpoint.ConstraintRequest
+    ? [ResponseBody<SuccessSchema<Endpoint>>] extends [
+        { readonly _tag: "StreamSse" | "StreamNdjson" },
+      ]
+      ? true extends IsUnion<SuccessSchema<Endpoint>>
+        ? never
+        : Endpoint
+      : never
+    : never;
+
 export type Supported<Endpoint> =
   Endpoint extends HttpApiEndpoint.ConstraintRequest
     ? [
@@ -73,7 +84,7 @@ export type Supported<Endpoint> =
           >,
         ] extends [never]
         ? Endpoint
-        : [SseEndpoint<Endpoint>] extends [never]
+        : [StreamingEndpoint<Endpoint>] extends [never]
           ? never
           : [Extract<Endpoint["~Payload"]["Type"], MultipartPayload>] extends [
                 never,
@@ -123,7 +134,7 @@ export type Request<Endpoint extends HttpApiEndpoint.ConstraintRequest> =
       };
 
 export type Success<Endpoint extends HttpApiEndpoint.ConstraintRequest> =
-  SuccessSchema<Endpoint>["Type"];
+  HttpApiClient.SuccessType<SuccessSchema<Endpoint>>;
 export type Failure<ClientError> = EffectHttpApiQueryError<ClientError>;
 export type Member<Value, Key extends PropertyKey> = Key extends keyof Value
   ? Value[Key]
@@ -215,7 +226,7 @@ export type ExposedEffects<Api extends HttpApi.Constraint, Client> =
               | ClientEffect<Group, Endpoint, Client>
               | ([Queryable<Endpoint>] extends [never]
                   ? never
-                  : [SseEndpoint<Endpoint>] extends [never]
+                  : [StreamingEndpoint<Endpoint>] extends [never]
                     ? ClientEffect<
                         Group,
                         Endpoint,
@@ -384,9 +395,14 @@ export type StreamFailure<Value> =
       ? Error
       : never;
 
-export type HttpStreamPolicy = StreamedPolicyOptions & {
-  readonly sseOptions?: Sse.DecodeOptions | undefined;
-};
+export type HttpDecoderPolicy<Endpoint> = [SseEndpoint<Endpoint>] extends [
+  never,
+]
+  ? { readonly sseOptions?: never }
+  : { readonly sseOptions?: Sse.DecodeOptions | undefined };
+
+export type HttpStreamPolicy<Endpoint> = StreamedPolicyOptions &
+  HttpDecoderPolicy<Endpoint>;
 
 export type HttpStreamQueryError<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
@@ -415,10 +431,12 @@ export type StreamedLeaf<
   readonly key: () => Key;
 
   readonly streamedKey: void extends Request<Endpoint>
-    ? (policy: HttpStreamPolicy) => StreamedKey<Endpoint, Key, ClientError>
+    ? (
+        policy: HttpStreamPolicy<Endpoint>
+      ) => StreamedKey<Endpoint, Key, ClientError>
     : (
         input: Request<Endpoint> | PreparedInput<Request<Endpoint>>,
-        policy: HttpStreamPolicy
+        policy: HttpStreamPolicy<Endpoint>
       ) => StreamedKey<Endpoint, Key, ClientError>;
   readonly streamedOptions: UnaryQueryBuilder<
     Request<Endpoint>,
@@ -426,13 +444,9 @@ export type StreamedLeaf<
     HttpStreamQueryError<Endpoint, ClientError>,
     StreamedKey<Endpoint, Key, ClientError>,
     readonly [...Key, "streamed"],
-    HttpStreamPolicy
+    HttpStreamPolicy<Endpoint>
   >;
 };
-
-export interface HttpLivePolicy {
-  readonly sseOptions?: Sse.DecodeOptions | undefined;
-}
 
 export type LiveFailure<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
@@ -459,10 +473,12 @@ export type LiveLeaf<
   ClientError,
 > = {
   readonly liveKey: void extends Request<Endpoint>
-    ? (policy?: HttpLivePolicy) => LiveKey<Endpoint, Key, ClientError>
+    ? (
+        policy?: HttpDecoderPolicy<Endpoint>
+      ) => LiveKey<Endpoint, Key, ClientError>
     : (
         input: Request<Endpoint> | PreparedInput<Request<Endpoint>>,
-        policy?: HttpLivePolicy
+        policy?: HttpDecoderPolicy<Endpoint>
       ) => LiveKey<Endpoint, Key, ClientError>;
   readonly liveOptions: UnaryQueryBuilder<
     Request<Endpoint>,
@@ -470,7 +486,7 @@ export type LiveLeaf<
     LiveFailure<Endpoint, ClientError>,
     LiveKey<Endpoint, Key, ClientError>,
     readonly [...Key, "live"],
-    HttpLivePolicy
+    HttpDecoderPolicy<Endpoint>
   >;
 };
 
@@ -479,7 +495,7 @@ export type Leaf<
   Key extends readonly JsonValue[],
   ClientError,
   MetadataClientError = ClientError,
-> = [SseEndpoint<Endpoint>] extends [never]
+> = [StreamingEndpoint<Endpoint>] extends [never]
   ? BufferedLeaf<Endpoint, Key, ClientError, MetadataClientError>
   : StreamedLeaf<Endpoint, Key, ClientError> &
       LiveLeaf<Endpoint, Key, ClientError>;
