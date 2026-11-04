@@ -79,7 +79,7 @@ Read only the branch needed for the task:
 | Task | Read |
 | --- | --- |
 | Infer operation types, prepare repeated input, skip, paginate, batch history, consume events, or recover streams | [Query patterns](references/query-patterns.md) |
-| Reuse policies or interceptors, filter caches, apply writes or events, replace owners | [Cache workflows](references/cache-workflows.md) |
+| Reuse policies or interceptors, share equivalent decoded values, filter caches, apply writes or events, replace owners | [Cache workflows](references/cache-workflows.md) |
 | Capture streams, register view codecs, hydrate, or dispose request work | [Hydration and SSR](references/hydration-and-ssr.md) |
 | Mount native providers, recover Suspense, choose a transport, host, or versions | [Frameworks and hosts](references/frameworks-and-hosts.md) |
 

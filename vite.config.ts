@@ -145,6 +145,7 @@ export default defineConfig({
           "examples/contracts/src/client.ts",
           "examples/server/src/**/*.ts",
           "scripts/measure-construction.mts",
+          "scripts/measure-structural-sharing.mts",
           "scripts/measure-streams.mts",
         ],
         rules: {
@@ -228,6 +229,7 @@ export default defineConfig({
           "examples/tanstack-start/tests/server-render.test.tsx",
           "examples/vite-react/src/lib/application.ts",
           "scripts/measure-construction.mts",
+          "scripts/measure-structural-sharing.mts",
           "scripts/measure-streams.mts",
           "tests/utility-configuration.test.ts",
           "tests/configuration-composition.test.ts",
@@ -248,6 +250,7 @@ export default defineConfig({
           "tests/create-rpc-query-utils-request-options.test.ts",
           "tests/create-rpc-query-utils-server-local.test.ts",
           "tests/create-rpc-query-utils-stream-baseline.test.ts",
+          "tests/create-rpc-query-utils-structural-sharing.test.ts",
           "tests/create-rpc-query-utils-stream-cache.test.ts",
           "tests/create-rpc-query-utils-stream-hashing.test.ts",
           "tests/create-rpc-query-utils-stream-publication.test.ts",
@@ -269,6 +272,7 @@ export default defineConfig({
           "tests/http-metadata-options.test.ts",
           "tests/http-multipart.test.ts",
           "tests/http-query-options.test.ts",
+          "tests/http-structural-sharing.test.ts",
           "tests/http-semantic-keys.test.ts",
           "tests/http-transport-cancellation.test.ts",
           "tests/hydration-codecs.test.ts",
@@ -437,6 +441,10 @@ export default defineConfig({
       "stream-baseline": {
         command: "node --import tsx scripts/measure-streams.mts",
         dependsOn: ["pack"],
+        cache: false,
+      },
+      "sharing-baseline": {
+        command: "node --import tsx scripts/measure-structural-sharing.mts",
         cache: false,
       },
       "api-types": {

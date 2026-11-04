@@ -20,6 +20,7 @@ skills:
       - RPC construction, explicit prepared inputs, and canonical identity
       - HTTP decoded requests, SSE, multipart mutations, metadata, and omitted streaming uploads or upgrades
       - Inferred operation types, tree/branch/leaf policy configuration, execution interception, native defaults, and view filters
+      - Opt-in decoded-value sharing through native Schema equivalence and Query policies, with explicit reference semantics for custom fields
       - Input-field skipping, pagination, explicit stream retention, publication deadlines, uncached event consumption, recovery, and lifetime tracing
       - Stream snapshots and request cleanup
       - Optimistic overlap, event refresh, and owner replacement
@@ -32,6 +33,7 @@ skills:
       - Configure utility trees, branches, and leaves with ordered interceptors across views; reuse unchanged frozen subtrees while preserving policy snapshots and prepared-input ownership; select a branch view without changing key layouts.
       - Reuse owner-bound prepared inputs and match single tagged failures without flattening composite Causes.
       - Apply native defaults and scoped policies without losing call-site selection, conditional input, or explicitly undefined seed behavior; compose mutation callbacks or intercept native execution attempts.
+      - Reuse equivalent immutable decoded records and nested containers with a schema-specific structuralSharing policy while preserving metadata freezing and generated types.
       - Capture open streams and drain queries, preparation, and accepted writes before request disposal.
       - Hydrate every selected view into its normal decoded cache representation.
       - Preserve neighboring writes and originating ownership during mutation overlap.
@@ -60,6 +62,13 @@ skills:
       - topic: Frameworks and hosts
         reason: Native providers, Suspense recovery, hook overloads, and transport boundaries depend on the integration. The package does not provide these services.
     failure_modes:
+      - mistake: Treat generic equality or wire serialization as decoded-value equality
+        mechanism: Effect equality can cache comparisons and inspect custom objects, while Schema equivalence follows declared fields and annotations.
+        wrong_pattern: Use generic Equal.equals or encoded JSON to reuse arbitrary mutable or custom cached objects.
+        correct_pattern: Compose Schema.toEquivalence for immutable declared records with native replaceEqualDeep; give unknown/custom fields explicit reference equivalence and reconcile HTTP metadata around its decoded data.
+        source: tests/types/docs-structural-sharing.ts
+        priority: HIGH
+        status: active
       - mistake: Rely on call order to determine configuration specificity
         mechanism: Configuration layers retain their tree, branch, or leaf scope across repeated calls.
         wrong_pattern: Expect a later tree policy to replace an existing leaf policy.

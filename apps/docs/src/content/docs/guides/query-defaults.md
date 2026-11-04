@@ -5,6 +5,8 @@ description: Configure shared defaults and execution behavior across a utility t
 
 Use `configureUtils` to share policies and interceptors across a utility tree, branch, or leaf. Build the configured utilities once per cache owner, then pass their generated options to native TanStack Query consumers.
 
+For immutable decoded dates, collections, and Schema classes, use the opt-in [structural sharing recipe](/effect-api-query/guides/share-decoded-values/). Native Query defaults remain unchanged.
+
 | Scope | Use | Suitable settings |
 | --- | --- | --- |
 | Cache owner or namespace | QueryClient defaults and generated prefixes | Common freshness, retry, garbage collection, and hashing |
