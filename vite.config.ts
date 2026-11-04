@@ -344,7 +344,7 @@ export default defineConfig({
   run: {
     tasks: {
       check: {
-        command: "vp check",
+        command: "OXLINT_TSGOLINT_CHECKER_SCHEDULING=affinity vp check",
         dependsOn: ["pack", "docs-sync"],
         cache: {
           output: [],
@@ -357,14 +357,15 @@ export default defineConfig({
         },
       },
       lint: {
-        command: "vp lint",
+        command: "OXLINT_TSGOLINT_CHECKER_SCHEDULING=affinity vp lint",
         dependsOn: ["pack", "docs-sync"],
         cache: {
           output: [],
         },
       },
       typecheck: {
-        command: "vp check --no-fmt",
+        command:
+          "OXLINT_TSGOLINT_CHECKER_SCHEDULING=affinity vp check --no-fmt",
         dependsOn: ["pack", "docs-sync"],
         cache: {
           output: [],

@@ -20,4 +20,4 @@ Publish canonical key payload slots as unknown values. Retain exact prefixes and
 
 ## Consequences
 
-Callers migrate removed helper imports to `configureUtils` and choose accumulated retention explicitly. Native framework consumers keep their own providers and reactive accessors. Complete Effect Causes, prepared-input ownership, ready-client lifetime, and application-owned transport remain unchanged.
+Native framework consumers keep their own providers and reactive accessors. Complete Effect Causes, prepared-input ownership, ready-client lifetime, and application-owned transport remain unchanged.

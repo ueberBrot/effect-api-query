@@ -8,7 +8,7 @@ metadata:
     Derive typed TanStack Query keys and options from ready Effect RPC and HTTP clients, preserving cache identity, typed filters and execution policies, decoded query views, registered hydration codecs, stream recovery, native framework behavior, and application-owned resource lifetime.
   type: core
   library: "@ueberbrot/effect-api-query"
-  library_version: "0.4.0"
+  library_version: "0.5.0"
 sources:
   - "src/**/*.ts"
   - "tests/**/*.ts"
