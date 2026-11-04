@@ -218,3 +218,87 @@ it.effect("runs inherited interceptors outside leaf interceptors", () =>
     }
   })
 );
+
+it.effect("reuses unaffected configured branches in a sparse snapshot", () =>
+  Effect.gen(function* reusesBranches() {
+    const client = yield* makeClient();
+    const base = configureUtils(
+      createRpcQueryUtils(group, { client, keyPrefix: ["sparse-snapshot"] }),
+      { query: { policy: { staleTime: 100 } } }
+    );
+    const input = prepareInput(base.users.get, { id: 9 });
+    const settings = { query: { policy: { staleTime: 200 } } };
+    const configured = configureUtils(base, {
+      scoped: { users: { scoped: { get: settings } } },
+    });
+    settings.query.policy.staleTime = 999;
+    const later = configureUtils(configured, {
+      query: { policy: { gcTime: 500 } },
+    });
+    const queryClient = new QueryClient();
+    try {
+      expect({
+        sameHealth: configured.health === base.health,
+        sameEvents: configured.events === base.events,
+        sameUsers: configured.users === base.users,
+        laterSameHealth: later.health === configured.health,
+        frozen: [configured, configured.users, configured.users.get].every(
+          Object.isFrozen
+        ),
+      }).toStrictEqual({
+        sameHealth: true,
+        sameEvents: true,
+        sameUsers: false,
+        laterSameHealth: false,
+        frozen: true,
+      });
+      expect(later.users.get.queryOptions({ input })).toMatchObject({
+        staleTime: 200,
+        gcTime: 500,
+      });
+      expect(
+        queryClient.defaultQueryOptions(base.users.get.queryOptions({ input }))
+          .staleTime
+      ).toBe(100);
+      expect(
+        yield* Effect.promise(
+          async () =>
+            await queryClient.query(later.users.get.queryOptions({ input }))
+        )
+      ).toStrictEqual({ id: 9, locale: "en", name: "Ada" });
+      expect(
+        yield* Effect.promise(
+          async () => await queryClient.query(later.health.ping.queryOptions())
+        )
+      ).toBeNull();
+    } finally {
+      queryClient.clear();
+    }
+  })
+);
+
+it.effect("keeps the frozen tree for empty configuration scopes", () =>
+  Effect.gen(function* keepsEmptyConfiguration() {
+    const client = yield* makeClient();
+    const base = createRpcQueryUtils(group, {
+      client,
+      keyPrefix: ["empty-configuration"],
+    });
+    const configured = configureUtils(base, {
+      query: { policy: {}, interceptors: [] },
+      scoped: { users: { scoped: { get: {} } } },
+    });
+    expect(configured).toBe(base);
+    const queryClient = new QueryClient();
+    try {
+      expect(
+        yield* Effect.promise(
+          async () =>
+            await queryClient.query(configured.health.ping.queryOptions())
+        )
+      ).toBeNull();
+    } finally {
+      queryClient.clear();
+    }
+  })
+);

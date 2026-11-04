@@ -290,28 +290,34 @@ const views: readonly QueryView[] = [
   "live",
   "streamed",
 ];
+const configurationViews = [...views, "mutation"] as const;
 
 const snapshotConfiguration = (
-  configuration: RuntimeConfiguration
-): RuntimeConfiguration => {
-  const snapshot: RuntimeConfiguration = {};
-  for (const view of [...views, "mutation"] as const) {
-    const entry = configuration[view];
-    if (entry !== undefined) {
-      snapshot[view] = Object.freeze({
-        ...entry,
-        policy:
-          entry.policy === undefined
-            ? undefined
-            : Object.freeze({ ...entry.policy }),
-        interceptors:
-          entry.interceptors === undefined
-            ? undefined
-            : Object.freeze([...entry.interceptors]),
-      });
+  configuration: RuntimeConfiguration | undefined
+): RuntimeConfiguration | undefined => {
+  let snapshot: RuntimeConfiguration | undefined;
+  for (const view of configurationViews) {
+    const entry = configuration?.[view];
+    if (entry === undefined) {
+      continue;
     }
+    const { policy, interceptors, callbacks } = entry;
+    const hasPolicy = policy !== undefined && Object.keys(policy).length > 0;
+    const hasInterceptors =
+      interceptors !== undefined && interceptors.length > 0;
+    if (!hasPolicy && !hasInterceptors && callbacks === undefined) {
+      continue;
+    }
+    snapshot ??= {};
+    snapshot[view] = Object.freeze({
+      policy: hasPolicy ? Object.freeze({ ...policy }) : undefined,
+      interceptors: hasInterceptors
+        ? Object.freeze([...interceptors])
+        : undefined,
+      callbacks,
+    });
   }
-  return Object.freeze(snapshot);
+  return snapshot === undefined ? undefined : Object.freeze(snapshot);
 };
 
 const scopeConfigurations = (
@@ -320,7 +326,7 @@ const scopeConfigurations = (
   const scopes = new Map<number, RuntimeConfiguration>();
   for (const { depth, options } of layers) {
     const scope = scopes.get(depth) ?? {};
-    for (const view of [...views, "mutation"] as const) {
+    for (const view of configurationViews) {
       const entry = options[view];
       if (entry === undefined) {
         continue;
@@ -428,26 +434,33 @@ const configureLeaf = (
 const configureNode = (
   node: RuntimeNode,
   inherited: readonly ConfigurationLayer[],
-  configuration: RuntimeConfiguration
+  configuration: RuntimeConfiguration | undefined
 ): RuntimeNode => {
-  const configurations = [
-    ...inherited,
-    {
-      depth: node.key().length,
-      options: snapshotConfiguration(configuration),
-    },
-  ];
-  const children = Object.entries(node).filter(
-    (entry): entry is [string, RuntimeNode] =>
-      Predicate.hasProperty(entry[1], "key") &&
-      Predicate.isFunction(entry[1].key)
+  const snapshot = snapshotConfiguration(configuration);
+  const configurations =
+    snapshot === undefined
+      ? inherited
+      : [...inherited, { depth: node.key().length, options: snapshot }];
+  const scoped = configuration?.scoped;
+  const scopeNames = Object.keys(scoped ?? {});
+  if (configurations.length === 0 && scopeNames.length === 0) {
+    return node;
+  }
+  const children = new Map(
+    Object.entries(node).filter(
+      (entry): entry is [string, RuntimeNode] =>
+        Predicate.hasProperty(entry[1], "key") &&
+        Predicate.isFunction(entry[1].key)
+    )
   );
-  for (const name of Object.keys(configuration.scoped ?? {})) {
-    if (!children.some(([key]) => key === name)) {
+  const scopedChildren = scopeNames.map((name) => {
+    const child = children.get(name);
+    if (child === undefined) {
       throw new TypeError(`Unknown utility scope: ${name}`);
     }
-  }
-  if (children.length === 0) {
+    return [name, child] as const;
+  });
+  if (children.size === 0) {
     const previous = configuredLeaves.get(node);
     const original = previous?.original ?? node;
     const layers = EffectArray.sortWith(
@@ -455,28 +468,28 @@ const configureNode = (
       (layer) => layer.depth,
       Order.Number
     );
-    const configured = Object.freeze({
-      ...configureLeaf(original, scopeConfigurations(layers)),
-    });
+    const configured = Object.freeze(
+      configureLeaf(original, scopeConfigurations(layers))
+    );
     configuredLeaves.set(configured, { original, layers });
     return configured;
   }
-  return Object.freeze({
-    ...node,
-    ...Object.fromEntries(
-      children.map(([key, child]) => [
-        key,
-        configureNode(
-          child,
-          configurations,
-          configuration.scoped !== undefined &&
-            Object.hasOwn(configuration.scoped, key)
-            ? (configuration.scoped[key] ?? {})
-            : {}
-        ),
-      ])
-    ),
-  });
+  let configured: RuntimeNode | undefined;
+  const entries = configurations.length === 0 ? scopedChildren : children;
+  for (const [name, child] of entries) {
+    const next = configureNode(
+      child,
+      configurations,
+      scoped !== undefined && Object.hasOwn(scoped, name)
+        ? scoped[name]
+        : undefined
+    );
+    if (next !== child) {
+      configured ??= { ...node };
+      configured[name] = next;
+    }
+  }
+  return configured === undefined ? node : Object.freeze(configured);
 };
 
 /** Applies root, branch, and leaf configuration while preserving generated cache identity. */
