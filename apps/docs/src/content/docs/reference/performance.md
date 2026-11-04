@@ -11,6 +11,8 @@ Payload-bearing keys prepare a fresh immutable canonical payload. RPC preparatio
 
 A custom RPC key encoder replaces Schema encoding. Payload construction, JSON validation, canonical copying, and freezing still run. The encoder must preserve every input field that can change the result so cache identity remains correct.
 
+`configureUtils` snapshots policy properties and interceptor lists when called. Sparse scoped settings reuse frozen subtrees that receive no new inherited settings; a shared policy or interceptor still applies across its descendants. Empty policy objects and interceptor lists add no configuration work. Callback mode settings and explicitly undefined policy properties remain meaningful across repeated calls. Configured copies retain cache identity and prepared-input ownership. Configure utilities once per owner and reuse them across renders.
+
 ## Repeatable measurements
 
 The optional construction workload measures repository sources:
@@ -18,6 +20,8 @@ The optional construction workload measures repository sources:
 ```sh
 vp run construction-baseline
 ```
+
+The construction workload covers RPC and HTTP factories with 1, 250, and 1,000 operations. At each size it measures empty configuration, one scoped leaf, all scoped leaves, and three successive configurations (sparse, shared root policy, sparse). Each configuration sample applies 50 iterations to an already constructed tree, excluding contract and client acquisition. Key and ordinary/prepared option workloads use one operation with 1 or 100 payload records. All workloads use 20 warmup iterations and five samples.
 
 Additional workloads report compiler diagnostics, consumer bundle sizes, and stream publication costs:
 
@@ -29,7 +33,7 @@ vp run stream-baseline
 
 Type measurements compare contracts alone, raw utilities, and scoped configuration at 50, 250, and 1,000 operations on both supported compilers. Bundle measurements compare matching consumers with and without utilities, with peers included and external. Stream measurements include bounded and unbounded histories, count and deadline publication, live values, cache writes, observer notifications, and cleanup.
 
-Each workload prints JSON with its dependency and runtime versions. Set `PERFORMANCE_OUTPUT` to save the same report to a file. Compare matching workloads and versions before attributing a change to the adapter.
+Each workload prints JSON with its dependency and runtime versions. Set `PERFORMANCE_OUTPUT` to save the same report to a file. Construction reports also fingerprint the configuration source and workload script. Compare matching workloads and versions before attributing a change to the adapter.
 
 The [stream workload](https://github.com/ueberBrot/effect-api-query/blob/main/tests/create-rpc-query-utils-stream-baseline.test.ts) and [transport workload](https://github.com/ueberBrot/effect-api-query/blob/main/examples/server/tests/rpc-transport-overhead.test.ts) measure publication and transport costs. Results are comparable only for the same workload and dependency versions. Elapsed time and memory depend on the machine.
 

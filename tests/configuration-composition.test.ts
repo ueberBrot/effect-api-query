@@ -467,3 +467,57 @@ for (const overrideScope of [false, true]) {
       })
   );
 }
+
+it.effect("retains callback-only scopes for later mutation policies", () =>
+  Effect.gen(function* retainsCallbackMode() {
+    const client = yield* makeRpcTestClient(rpcGroup, {
+      "users.get": () => Effect.succeed(42),
+    });
+    const first = configureUtils(
+      createRpcQueryUtils(rpcGroup, {
+        client,
+        keyPrefix: ["callback-only-scope"],
+      }),
+      {
+        scoped: {
+          users: { scoped: { get: { mutation: { callbacks: "compose" } } } },
+        },
+      }
+    );
+    const calls: string[] = [];
+    const second = configureUtils(first, {
+      scoped: {
+        users: {
+          scoped: {
+            get: {
+              mutation: {
+                policy: {
+                  onSuccess: () => {
+                    calls.push("shared");
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    const queryClient = new QueryClient();
+    try {
+      yield* Effect.promise(
+        async () =>
+          await new MutationObserver(
+            queryClient,
+            second.users.get.mutationOptions({
+              onSuccess: () => {
+                calls.push("local");
+              },
+            })
+          ).mutate()
+      );
+      expect(calls).toStrictEqual(["shared", "local"]);
+    } finally {
+      queryClient.clear();
+    }
+  })
+);

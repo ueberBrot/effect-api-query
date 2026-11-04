@@ -1,3 +1,7 @@
+import { createHash } from "node:crypto";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import path from "node:path";
+
 import { NodeRuntime } from "@effect/platform-node";
 import { Clock, Effect, Layer, Schema } from "effect";
 import { HttpServer } from "effect/http";
@@ -11,10 +15,13 @@ import {
 import { Rpc, RpcGroup, RpcTest } from "effect/rpc";
 
 import {
+  configureUtils,
   createHttpApiQueryUtils,
   createRpcQueryUtils,
   prepareInput,
 } from "#effect-api-query";
+
+import { packageVersion } from "./performance/common.mts";
 
 const Payload = Schema.Struct({
   id: Schema.Int,
@@ -60,9 +67,12 @@ const program = Effect.gen(function* () {
       milliseconds,
     });
   };
-  for (const operationCount of [1, 250]) {
+  for (const operationCount of [1, 250, 1000]) {
     const rpcs = Array.from({ length: operationCount }, (_, index) =>
-      Rpc.make(`read-${index}`, { payload: Payload, success: Schema.Int })
+      Rpc.make(`records.read-${index}`, {
+        payload: Payload,
+        success: Schema.Int,
+      })
     );
     const group = RpcGroup.make(...rpcs);
     const rpcClient = yield* RpcTest.makeClient(group, { flatten: true }).pipe(
@@ -127,10 +137,60 @@ const program = Effect.gen(function* () {
     measure("http", "factory", operationCount, 0, 50, () => {
       httpFactory();
     });
+    const rpcTree = rpcFactory();
+    const httpTree = httpFactory();
+    const sparse = {
+      scoped: {
+        records: {
+          scoped: {
+            "read-0": { query: { policy: { staleTime: 30_000 } } },
+          },
+        },
+      },
+    };
+    const denseScopes: Readonly<
+      Record<
+        `read-${number}`,
+        { readonly query: { readonly policy: { readonly staleTime: number } } }
+      >
+    > = Object.fromEntries(
+      Array.from({ length: operationCount }, (_, index) => [
+        `read-${index}`,
+        { query: { policy: { staleTime: index } } },
+      ])
+    );
+    const dense = {
+      scoped: {
+        records: {
+          scoped: denseScopes,
+        },
+      },
+    };
+    const broad = { query: { policy: { retry: false } } } as const;
+    for (const [adapter, tree] of [
+      ["rpc", rpcTree],
+      ["http", httpTree],
+    ] as const) {
+      measure(adapter, "configure-empty", operationCount, 0, 50, () => {
+        configureUtils(tree, {});
+      });
+      measure(adapter, "configure-sparse", operationCount, 0, 50, () => {
+        configureUtils(tree, sparse);
+      });
+      measure(adapter, "configure-dense", operationCount, 0, 50, () => {
+        configureUtils(tree, dense);
+      });
+      measure(adapter, "configure-repeated", operationCount, 0, 50, () => {
+        configureUtils(
+          configureUtils(configureUtils(tree, sparse), broad),
+          sparse
+        );
+      });
+    }
     if (operationCount !== 1) {
       continue;
     }
-    const rpc = rpcFactory()["read-0"];
+    const rpc = rpcTree.records["read-0"];
     const http = httpFactory().records["read-0"];
     if (rpc === undefined || http === undefined) {
       throw new TypeError("Missing workload operation");
@@ -169,8 +229,33 @@ const program = Effect.gen(function* () {
       }
     }
   }
-  console.log(
-    JSON.stringify({ samples: 5, warmupIterations: 20, measurements })
-  );
+  const report = JSON.stringify({
+    context: {
+      node: process.version,
+      platform: process.platform,
+      architecture: process.arch,
+      effect: packageVersion("effect"),
+      queryCore: packageVersion("@tanstack/query-core"),
+      configureUtilsSha256: createHash("sha256")
+        .update(
+          readFileSync(
+            new URL("../src/core/configure-utils.ts", import.meta.url)
+          )
+        )
+        .digest("hex"),
+      workloadSha256: createHash("sha256")
+        .update(readFileSync(new URL(import.meta.url)))
+        .digest("hex"),
+    },
+    samples: 5,
+    warmupIterations: 20,
+    measurements,
+  });
+  const output = process.env["PERFORMANCE_OUTPUT"];
+  if (output !== undefined && output.length > 0) {
+    mkdirSync(path.dirname(output), { recursive: true });
+    writeFileSync(output, `${report}\n`);
+  }
+  console.log(report);
 });
 NodeRuntime.runMain(program.pipe(Effect.scoped));

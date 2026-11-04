@@ -76,6 +76,8 @@ For a typed error union, `findDeclaredError(error, tag)` returns an Effect Optio
 
 Use `configureUtils(treeOrLeaf, configuration)` once per cache owner. Configure a query view with `{ policy, interceptors }`; configure a mutation with `{ policy, interceptors, callbacks }`. Use `scoped` to select named children of a tree or branch. The returned utilities are frozen and retain generated identity and prepared-input ownership. Keep the supplied tree for any consumers that need its original behavior.
 
+Policy properties and interceptor lists are snapshotted when configuration is applied. Sparse scopes may share unchanged frozen subtrees with the supplied tree. Reuse configured utilities across renders. Empty policies and interceptor lists add no settings; callback modes and explicitly undefined policy properties still participate in repeated configuration.
+
 The following factory configures typed freshness and mutation invalidation:
 
 ```ts

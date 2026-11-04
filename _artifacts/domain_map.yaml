@@ -29,7 +29,7 @@ skills:
       - Derive buffered, paginated, accumulated, live, and metadata options from a ready client.
       - Address exact stream policy keys, select supported view prefixes, and compose encoded partial native filters with explicit typed projections.
       - Reuse inferred input, cached query data, and mutation types in application modules.
-      - Configure utility trees, branches, and leaves with ordered interceptors across views; select a branch view without changing key layouts.
+      - Configure utility trees, branches, and leaves with ordered interceptors across views; reuse unchanged frozen subtrees while preserving policy snapshots and prepared-input ownership; select a branch view without changing key layouts.
       - Reuse owner-bound prepared inputs and match single tagged failures without flattening composite Causes.
       - Apply native defaults and scoped policies without losing call-site selection, conditional input, or explicitly undefined seed behavior; compose mutation callbacks or intercept native execution attempts.
       - Capture open streams and drain queries, preparation, and accepted writes before request disposal.
