@@ -119,6 +119,20 @@ export default defineConfig({
     },
     overrides: [
       {
+        files: ["examples/vite-react/src/workflows/sharing.ts"],
+        rules: {
+          "anti-slop/no-unknown-parameters": "off",
+          "anti-slop/no-unknown-returns": "off",
+        },
+      },
+      {
+        files: ["examples/contracts/src/workflows.ts"],
+        rules: {
+          "eslint/max-classes-per-file": ["error", 6],
+          "unicorn/throw-new-error": "off",
+        },
+      },
+      {
         files: ["scripts/resolve-docs-release.mts"],
         rules: {
           "anti-slop/no-runtime-typeof": "off",
@@ -214,6 +228,11 @@ export default defineConfig({
           "examples/contracts/src/client.ts",
           "examples/contracts/src/contracts.ts",
           "examples/contracts/src/http-api.ts",
+          "examples/contracts/src/workflows.ts",
+          "examples/server/src/workflow-handlers.ts",
+          "examples/vite-react/tests/http-workflows.test.ts",
+          "examples/vite-react/src/workflows/application.ts",
+          "examples/vite-react/src/workflows/recovery.ts",
           "examples/server/src/http-handlers.ts",
           "examples/server/src/main.ts",
           "examples/server/src/server-local-rpc.ts",

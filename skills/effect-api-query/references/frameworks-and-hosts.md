@@ -71,6 +71,8 @@ For ordinary Query hooks and observers, removing the last observer cancels abort
 
 ## Mount a provider and recover Suspense
 
+For runnable HTTP setup, streams, uploads, typed errors, sharing, and recovery, use [HTTP Workflows](https://ueberbrot.github.io/effect-api-query/examples/http-workflows/).
+
 For a first React integration, acquire one client. Create the utility tree and QueryClient once, then mount `QueryClientProvider`. Before disposing the application's client resources, unmount consumers. For one acquired HTTP client, one component, and an awaited cleanup function, use [the React client setup](https://ueberbrot.github.io/effect-api-query/guides/react-query/#acquire-and-mount-the-client).
 
 Put `QueryErrorResetBoundary` around a component error boundary and Suspense. On retry, reset both error boundaries before rendering the component's queries again. With cached data, a failed refetch normally keeps rendering that data. When fetching stops, show the local error. If the application wants boundary recovery, explicitly throw the error.

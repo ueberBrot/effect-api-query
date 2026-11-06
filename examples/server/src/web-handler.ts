@@ -3,7 +3,8 @@ import {
   ExampleAuthorization,
   ExampleAuthorizationError,
 } from "@effect-api-query/contracts";
-import { Context, Effect, Layer, Scope } from "effect";
+import { NodeFileSystem } from "@effect/platform-node";
+import { Context, Effect, Layer, Path, Scope } from "effect";
 import type { HttpServerRequest } from "effect/http";
 import {
   HttpEffect,
@@ -17,6 +18,7 @@ import { ExampleDomain } from "./domain.ts";
 import { exampleHttpRoutes } from "./http-handlers.ts";
 import { exampleRpcHandlersLayer } from "./rpc-handlers.ts";
 import { makeServerLocalRpcClient } from "./server-local-rpc.ts";
+import { workflowRoutes } from "./workflow-handlers.ts";
 
 const rpcLayer = Layer.mergeAll(
   exampleRpcHandlersLayer,
@@ -130,9 +132,13 @@ export const makeExampleRpcWebHandler = Effect.fn(
 const makeHostWebHandler = Effect.fn("ExampleServer.makeHostWebHandler")(
   function* () {
     const rpc = yield* makeRpcWebHandler();
-    const httpEffect = yield* HttpRouter.toHttpEffect(
-      exampleHttpRoutes.pipe(Layer.provide(HttpServer.layerServices))
-    );
+    const httpEffect = (yield* HttpRouter.toHttpEffect(
+      Layer.mergeAll(exampleHttpRoutes, workflowRoutes).pipe(
+        Layer.provide(
+          Layer.mergeAll(HttpServer.layerServices, NodeFileSystem.layer)
+        )
+      )
+    )).pipe(Effect.provide(Layer.mergeAll(NodeFileSystem.layer, Path.layer)));
     const runtimeContext = yield* Effect.context<Scope.Scope>();
     const http = withRequestBodyLimit(
       HttpEffect.toWebHandlerWith<

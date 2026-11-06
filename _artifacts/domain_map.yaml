@@ -1,6 +1,6 @@
 library:
   name: "@ueberbrot/effect-api-query"
-  version: 0.5.0
+  version: 0.6.0
   repository: https://github.com/ueberBrot/effect-api-query
   description: TanStack Query utilities derived from ready Effect RPC and HTTP clients.
   primary_framework: framework-agnostic
@@ -171,10 +171,10 @@ skills:
         priority: HIGH
         status: active
       - mistake: Treat exact development pins as the consumer Effect minimum
-        mechanism: Development uses a coordinated current release while consumers can retain the supported floor within the bounded patch line.
+        mechanism: Development uses a coordinated current release while consumers can retain the supported floor within the reviewed minor range.
         wrong_pattern: Require every consumer to upgrade whenever the development catalog changes.
         correct_pattern: Read the published peer range, coordinate Effect integrations, and check the floor/current pair; raise the minimum only for required APIs, type contracts, or correctness fixes.
-        source: docs/adr/0033-bound-effect-support-to-a-patch-line.md
+        source: apps/docs/src/content/docs/getting-started/compatibility-and-stability.md
         priority: HIGH
         status: active
       - mistake: Rely on changed metadata options after a fresh hit

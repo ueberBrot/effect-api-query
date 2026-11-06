@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 import { NodeServices } from "@effect/platform-node";
 import { describe, expect, it } from "@effect/vitest";
 import { QueryClient } from "@tanstack/query-core";
@@ -5,7 +7,6 @@ import {
   Array as EffectArray,
   Config,
   ConfigProvider,
-  Crypto,
   Effect,
   FileSystem,
   Option,
@@ -15,7 +16,6 @@ import {
   Schema,
   Stream,
 } from "effect";
-import { Hex } from "effect/encoding";
 import { Rpc, RpcGroup, RpcTest } from "effect/rpc";
 import { afterAll } from "vitest";
 
@@ -269,7 +269,6 @@ const manifestVersion = Effect.fnUntraced(function* manifestVersion(
 const context = Effect.fnUntraced(function* context() {
   const fs = yield* FileSystem.FileSystem;
   const path = yield* Path.Path;
-  const crypto = yield* Crypto.Crypto;
   const directory = yield* path.fromFileUrl(
     new URL("../src/", import.meta.url)
   );
@@ -301,13 +300,12 @@ const context = Effect.fnUntraced(function* context() {
     effect: yield* manifestVersion("effect"),
     queryCore: yield* manifestVersion("@tanstack/query-core"),
     vitest: yield* manifestVersion("vitest"),
-    sourceSha256: Hex.encode(yield* crypto.digest("SHA-256", bytes)),
-    fixtureSha256: Hex.encode(
-      yield* crypto.digest(
-        "SHA-256",
+    sourceSha256: createHash("sha256").update(bytes).digest("hex"),
+    fixtureSha256: createHash("sha256")
+      .update(
         yield* fs.readFile(yield* path.fromFileUrl(new URL(import.meta.url)))
       )
-    ),
+      .digest("hex"),
     readyClient:
       "RpcTest.makeClient, in-memory no-serialization, default stream buffer",
     execution:

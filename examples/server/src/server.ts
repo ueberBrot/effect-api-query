@@ -25,12 +25,12 @@ class ExampleRpcServerError extends Schema.TaggedError<
 }) {}
 
 const corsHeaders = (httpApi: boolean) => ({
-  "access-control-allow-headers":
-    "baggage,content-type,traceparent,tracestate,x-example-authorization",
+  "access-control-allow-headers": `baggage,content-type,${httpApi ? "if-match," : ""}traceparent,tracestate,x-example-authorization`,
   "access-control-allow-methods": httpApi
     ? "GET,POST,DELETE,OPTIONS"
     : "POST,OPTIONS",
   "access-control-allow-origin": "*",
+  "access-control-expose-headers": "etag",
 });
 
 export interface RunningExampleRpcServer {

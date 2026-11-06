@@ -10,6 +10,8 @@ The repository includes two complete applications. Each has separate RPC and HTT
 | [Vite React](https://github.com/ueberBrot/effect-api-query/tree/main/examples/vite-react) | RPC queries and streams beside buffered HTTP reads, writes, pagination, failures, and cancellation | Standalone server on port `3001`, proxied by Vite | `http://127.0.0.1:5173` |
 | [TanStack Start](https://github.com/ueberBrot/effect-api-query/tree/main/examples/tanstack-start) | RPC and HTTP loaders, server rendering, hydration, navigation, mutations, and cancellation | Same-origin `/rpc` and `/api/$` server routes | `http://127.0.0.1:3000` |
 
+For smaller examples of reads and writes, metadata, streams, uploads, sharing, and recovery, use the [HTTP workflows](/effect-api-query/examples/http-workflows/).
+
 ## Set up locally
 
 Clone the repository and change to its root directory:

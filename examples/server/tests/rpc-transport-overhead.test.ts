@@ -2,7 +2,7 @@ import { createServer } from "node:http";
 import type { IncomingMessage } from "node:http";
 import type { Socket as TcpSocket } from "node:net";
 
-import { NodeHttpServer, NodeSocket, NodeStdio } from "@effect/platform-node";
+import { NodeHttpServer, NodeWS, NodeStdio } from "@effect/platform-node";
 import { describe, expect, it } from "@effect/vitest";
 import {
   Config,
@@ -145,7 +145,7 @@ const measureWebSocketCalls = Effect.fn(
   );
   yield* server.serve(app);
   const makeWebSocket = yield* Socket.WebSocketConstructor.pipe(
-    Effect.provide(NodeSocket.layerWebSocketConstructorWS)
+    Effect.provide(NodeWS.layerWebSocketConstructor)
   );
   const socket = yield* Socket.makeWebSocket(
     `ws://127.0.0.1:${String(server.address.port)}/rpc`
@@ -322,7 +322,7 @@ const settleSharedStream = Effect.fn("settleSharedStream")(
       );
       yield* server.serve(app);
       const makeWebSocket = yield* Socket.WebSocketConstructor.pipe(
-        Effect.provide(NodeSocket.layerWebSocketConstructorWS)
+        Effect.provide(NodeWS.layerWebSocketConstructor)
       );
       const runSync = Effect.runSyncWith(yield* Effect.context());
       const clientScope = yield* Scope.fork(yield* Effect.scope, "sequential");

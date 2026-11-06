@@ -9,9 +9,9 @@ This website documents the package version shown in its header. The repository's
 
 The package is ESM-only and targets ES2022. Enable strict TypeScript checking.
 
-Effect is stable, while its RPC and HTTP API modules declare unstable APIs. The published Effect peer range is `>=4.0.6 <4.1.0`. Keep the application's Effect runtime, testing, and platform packages on a coordinated release within that range. Exact development pins are separate: this repository uses `4.0.7` and checks it alongside the supported `4.0.6` floor.
+Effect is stable, while its RPC and HTTP API modules declare unstable APIs. The published Effect peer range is `>=4.0.6 <4.2.0`. Keep the application's Effect runtime, testing, and platform packages on a coordinated release within that range. Exact development pins are separate: this repository uses `4.1.0` and checks it alongside the supported `4.0.6` floor.
 
-The package raises its minimum when it needs a newer API, type contract, or correctness fix. Otherwise it retains the floor and widens support only after checking upstream changes, public types, execution, cancellation, hydration, builds, and relevant consumers. Checks cover the floor and current development release rather than every intermediate patch. Future Effect minors require another compatibility review. Supporting an older release does not backport upstream transport fixes.
+The package raises its minimum when it needs a newer API, type contract, or correctness fix. Otherwise it retains the floor and widens support only after checking upstream changes, public types, execution, cancellation, hydration, builds, and relevant consumers. Checks cover the floor and current development release rather than every intermediate patch. Effect 4.2 and later minors require another compatibility review. Supporting an older release does not backport upstream transport fixes.
 
 Query Core's streamed-query interface is experimental and can change between v5 releases. Pin Query packages to the checked versions and keep the native wrapper's resolved Core version aligned with the application. Consult the compatibility table before upgrading.
 
