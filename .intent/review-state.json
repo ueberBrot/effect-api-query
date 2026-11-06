@@ -3,22 +3,23 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "e7c23d268a0d210f06551358f72ccaf1e86881301e181af0932eaa7a0572f8de",
+      "fingerprint": "f5f349eb854fe309efcd1d796087b9d7090a2afed9fd7ed9d6d4c263c79b3793",
       "snapshot": {
         "GLOSSARY.md": "294f016460f575c7ee634a33c7b45c825f67a0501c31d42a5c42d681bacebd83",
-        "README.md": "7ea8f698beafeeea732241f263a9a1bd1935c4fbe075c3e245e42d4e27b4542d",
+        "README.md": "9cc3275039f58de12efe6a19ea5ec5e23a56126cfeb81cf35480ae5ac147f1da",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "8cf2b005fd05a799118c262ecda121c4468cc023b5a666b7f46501e49f1b3099",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "a5447c052af2b2bbe119fd5ff2eab8d616016fe9e703a35718fd5b568f246329",
         "apps/docs/src/content/docs/concepts/http-utility-tree.md": "03f01c27b051a3fdd8c373749d61cf62d35c2734ff1f651ad3805b14886ba45b",
         "apps/docs/src/content/docs/concepts/queries-and-mutations.md": "e50098de81ed28be976a4c5e1224f61dc116f022dd50d553835e2775f0b63882",
         "apps/docs/src/content/docs/concepts/rpc-utility-tree.md": "5d9f0d254d1df588c2df70bc568ba430ae8db8dc22a47688835e74ce27fc1ca0",
         "apps/docs/src/content/docs/concepts/semantic-keys.md": "715b4e3103fa971748b45c5c8086e1ea4b95980dff0a69ee122635ed5fc998d2",
-        "apps/docs/src/content/docs/examples.md": "4043a5febebac1f55cb80e8f9c4214c6c03b9b11e3599ab77bc9ab6a4b99d204",
+        "apps/docs/src/content/docs/examples.md": "eb907ab16341d00789e7862cbf7e40b12f514a243876dd0075f1a297acd642a3",
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "022014147e137abdac686d6d3c58f4eff1e8098dd2241a3cccd96abe5051cd26",
-        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "e2d0c792fbdfe37e9f72c6cf56667b55ba95379e5ee150a2e861d9325a924319",
+        "apps/docs/src/content/docs/examples/http-workflows.md": "fa96c43f494764685e64c050b10be6e3dc63fd44cc05b5d354bd44d5dac77a86",
+        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "9bc41621f29a48badc7b26eb287d1f3071ce8cca86697fc80099301f4a6029df",
         "apps/docs/src/content/docs/getting-started/feature-support.md": "ac3ebd5c192272f7d4d1a236a5878d1d51a76fc514e874cbb51f17eb31809125",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "d8887c6d4180d60a1127957e073c180528474258c697c1305b6a7bb846e27671",
-        "apps/docs/src/content/docs/getting-started/installation.md": "6d58ab82951ac2db4262716ffb70f877c7579c415943d7978860022e81198327",
+        "apps/docs/src/content/docs/getting-started/installation.md": "63ebd6eddf603465b5c1203f6587ae5c6c7fba1a1e59069c929f44eaa645823d",
         "apps/docs/src/content/docs/getting-started/quick-start.md": "91ddca16ad5c0f484d88a9d3b42d37065ee3a3bfd088bd6f1b25a45e96283788",
         "apps/docs/src/content/docs/guides/angular-query.md": "beb279a2ef34d1e69e685bcd8dbeddb0fafb0228ede9107dd9f95d86f9e5c72c",
         "apps/docs/src/content/docs/guides/cache-filters.md": "b0b8a08b6e2f3484a2565b6bd6d080cd1e95b3e9aefcb5aaf121cd7a96ad2591",
@@ -54,9 +55,9 @@
         "apps/docs/src/content/docs/index.mdx": "c8015d3ea0e9f96d81558183249cde65a3cb8d087fa3934f2446af5c6db9a845",
         "apps/docs/src/content/docs/integrations/index.md": "027d9c9a2a06946be8771f3d33718e9097e59b689050d3ba51df05aa95ea6bda",
         "apps/docs/src/content/docs/reference/browser-and-worker-hosts.md": "400abc16a961005b5234f061861af70e6cf6199e9ea2a71b6c034e45fab54cb6",
-        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "d042f22ecd4f966b7d0dfc64d49a980d7acff5a965d8b0900d997f4df6f36027",
+        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "e41083333fe156b7367c6290d1b9ee7f10ada4f724a35302bd73982955918877",
         "apps/docs/src/content/docs/reference/errors.md": "2fc5cfd1c1402bc6e8763088cec0b1ef86566dab25a29d98f157e35abd2a7f16",
-        "apps/docs/src/content/docs/reference/external-http-clients.md": "20c035c038bbd6d845e22a0167bb6ca0d16844ed582535e77e0a4f8a30f92c0d",
+        "apps/docs/src/content/docs/reference/external-http-clients.md": "d55be8650662c1f4978dd2b0ca34e5ccafad596db97371cd69681b574b407860",
         "apps/docs/src/content/docs/reference/factory.md": "9a2c6c1b76b484cfda17b32d0e6bc21af60689b8dae2400f0c559354dad09653",
         "apps/docs/src/content/docs/reference/generated-builders.md": "e56a363220dc887f84278dd5076b6fb352a317c1b423d56a1c90bd6f08948ff6",
         "apps/docs/src/content/docs/reference/http-builders.md": "34d2fb026e5620878d21211f97dedfa7bec376e2267b9aab1088e759b5a20e9b",
@@ -90,8 +91,15 @@
         "docs/adr/0030-publish-documentation-from-released-revisions.md": "0088082ffe753ecc6e5cec31d8e9882fae42c323af10e011f76372852a524a1c",
         "docs/adr/0031-add-explicit-query-reuse-and-stream-controls.md": "984b9e0da315eb23a79f170d84f4725e54bfa521be8d03bad5f518ba7f1afece",
         "docs/adr/0032-configure-utility-trees-and-require-stream-retention.md": "e46238f04f3213d2c32dcb64fb2c17d38d033699d08b3b9d7986bbbe1d2f1ff7",
-        "docs/adr/0033-bound-effect-support-to-a-patch-line.md": "34209a3700272113c64ff39baf15e19bc5745b73b5a28157207c1c592df8fcd0",
+        "docs/adr/0033-bound-effect-support-to-a-patch-line.md": "cc48ddadc8fe161dfa1dcc77305e580b62c8b308a3acd515fd46db1c49304e2c",
         "docs/adr/0034-extend-http-stream-views-to-decoded-ndjson.md": "445ed1f9a4cb3a74938f2d01579e50c046a681aaa2dcd856ef9587c62aaa7cf2",
+        "docs/adr/0035-extend-reviewed-effect-support-through-41.md": "7cb921e880ac63cfa266ea25de359346bdae18217a1786b1906eefbd7a75f010",
+        "e2e/http-workflows.spec.ts": "f5729fd3707758508d85506a93a1f2560edfe1aad89c9bd200ec0c80a2ecb7cb",
+        "examples/contracts/src/client.ts": "fdf559bf0a798c7ea7f7aee01967837e720f7727a1bd11978aec51aad59f00f2",
+        "examples/contracts/src/contracts.ts": "74d69e1a07c0b32c2a48b8fed8cfceaac8844ead860fbd00b9e357657b39d88e",
+        "examples/contracts/src/http-api.ts": "bcecd0611e4bdeac0dad04159cc73db3165aca20ac1f89e597e6c73a76d99cef",
+        "examples/contracts/src/index.ts": "2b086282b7fc1c4ddcf1bfdaf30268fcc6373873e31de58ecde8d14d766deb6c",
+        "examples/contracts/src/workflows.ts": "079a2cf2ac5ccf1492ee918a465e9cb553ed866895cf853bf6c90eb6785b6ff9",
         "examples/server/src/commands.ts": "8e13627dcbda071716cdd539e6f1124ace4375f878038ca970534901ac6c5aba",
         "examples/server/src/diagnostic-operations.ts": "33ec6ef8931e4e2a39692a7b72574756791946161894f0733751748fd48d1998",
         "examples/server/src/domain.ts": "256b4e4f908ddb8d4564d51528866c470d4fed332ec69ce2e13bef915b68e97e",
@@ -100,12 +108,13 @@
         "examples/server/src/main.ts": "a207ef4208f09ae04f4fececb76750ceecf7e48a5ce237787fd3c9e537167382",
         "examples/server/src/rpc-handlers.ts": "53dfae7c99caea1e40991e72a15d3bc608037ba6174d0044706908090219e203",
         "examples/server/src/server-local-rpc.ts": "f6098b0f17ae1cab08620c31eac7ff698c7ac170847e88c3c7b6b92858ca2e56",
-        "examples/server/src/server.ts": "4363f437b79ce650fd35f2951ea20aa73ce12fdde5496da836ebb50dd0e4b60d",
+        "examples/server/src/server.ts": "33b049cb2881ecb7cb7577f2386ba8720e6feb1f821fca55cd17cc0e9088941f",
         "examples/server/src/users.ts": "1e33093f76a3b46461e1c41a067d10483fd0bf6b8d8e840ed15ceafdf32728b3",
-        "examples/server/src/web-handler.ts": "d9b38d8b14f243fdf7652407e230d4fde07413d345e6e1a528c2f7a1e81adcee",
-        "examples/server/tests/fixtures/websocket-server.ts": "e3797d32b50ed5aae5cf07e4d0d3617e7dbfc7ef7404d032c7abde8f49de5249",
+        "examples/server/src/web-handler.ts": "df76905670800bd27b419727a7e962c749bf6756b5f533c986186887b122eaeb",
+        "examples/server/src/workflow-handlers.ts": "49d9abf85b7088417ae393ef7d8de328142b37b961b7114e95a0a42bc6991972",
+        "examples/server/tests/fixtures/websocket-server.ts": "468801a4f5c50ccdc9855d8a8ef24cb1915f30f857625a99f4dfc20106fc2f53",
         "examples/server/tests/http-api.test.ts": "3d341c3a2d370562d7a04413adc179eed6aa822eb808a058deae09d6791ba0d4",
-        "examples/server/tests/rpc-transport-overhead.test.ts": "adbd2e30e9a9f0d85badd22eddc9585c193c09949c179a03536441e46320547d",
+        "examples/server/tests/rpc-transport-overhead.test.ts": "3fd291dc98127cd4a976efd3eca1beb04e9e50a7139d6fd6ab03290380005b18",
         "examples/server/tests/rpc-websocket-consumer.test.ts": "e5092fd7e402a0010c2d6c6426e09c407622528c9a0cd0dd41d0f3c826d1fed1",
         "examples/server/tests/server.test.ts": "5c9c176fcccf73c0c610502dd6b0f3c21946b1681538a6e033ee593b9bfa4934",
         "examples/server/tests/web-handler.test.ts": "50fdbcacf42c64315356864adc530c4e99e50e65447187d9ce55424372b741c1",
@@ -125,15 +134,25 @@
         "examples/tanstack-start/tests/failure-dehydration.test.ts": "5a132899aeb7727f53a30bfffc0c1ee7ac5d59ff96a752077f7169d0df4b4581",
         "examples/tanstack-start/tests/server-local.test.ts": "6d04b85b3e584deb8e4b6f847235ceab8a811eb2d3837dc209f89cf87cf0d291",
         "examples/tanstack-start/tests/server-render.test.tsx": "e46b15c02fc7b5fc76d52f9d64dfc5b88d4d36e0151908138de9babe7a5d53a3",
-        "examples/vite-react/src/app.tsx": "82611f4ed7f1723afefc611a205c0c85b24bccefacbb04bef4a5e890e7bdac32",
+        "examples/vite-react/src/app.tsx": "96f17567f1a4c387c30ba64bfadd8cc2d8260dde7699269951e26197e29ecd42",
         "examples/vite-react/src/components/ui/effect-error-details.tsx": "5c14c07465cd1f382a71c7e5b35b0adbc29cc3b5fc75bf3138824bd1d28b3821",
         "examples/vite-react/src/lib/application.ts": "2c2e63a84779fc32e87e4970cb3442e6c4596d251ad66df2f37a96c9099c5d00",
         "examples/vite-react/src/lib/owner-cache.ts": "e9eaa783cce49e7905027ae93ef1c525e2713187e83ffa4ecf726ba7235a420d",
         "examples/vite-react/src/lib/user-writes.ts": "999277fa02ff9c1439186b59636f7078458a5cbc3c84bed06514867b270a3b5e",
-        "examples/vite-react/src/main.tsx": "c05e1d7a4fc70c01bbc130107dc337a49fda90a097096dffe44320c4e44619bf",
+        "examples/vite-react/src/main.tsx": "9129bf323b8763d540df1ba4d7660739065d3f417cd287125292b51b56f4e02d",
+        "examples/vite-react/src/workflows/app.tsx": "0002ffa61317a639bc0bbea63ec934db84f92476093ea173abe0aea6f265c07f",
+        "examples/vite-react/src/workflows/application.ts": "e95c396af52c638aec8a48383df697bf131390d7ce5c68818403e502572f4b5f",
+        "examples/vite-react/src/workflows/document.tsx": "4fdeeaf20904d2568c827f80d0c1fd957edb19de9a3eb487077888f5edf7fe32",
+        "examples/vite-react/src/workflows/events.tsx": "e6db96f91484d19fa2f6321788629b8556e1c35c4241cd6bbd0a857aa0287ea0",
+        "examples/vite-react/src/workflows/readings.tsx": "45a9fe929cf43bf9d6a85b80be18859f52a810f81fbd653013ff0ed64c2bf423",
+        "examples/vite-react/src/workflows/recovery.ts": "3d5737673315bc5cbbf946b7119b4c192e305722d68b6c39f109b708ba4f7cdb",
+        "examples/vite-react/src/workflows/sharing.ts": "cd220f53774161e3824833c71ddd0fd879b8ccbba100b980a06932f4a15cc7f9",
+        "examples/vite-react/src/workflows/streams.tsx": "94071d054a2837755ba36e0b7736ed333de6e541739a38e67b36de2a94725796",
+        "examples/vite-react/src/workflows/upload.tsx": "9780404fa098e0626fd45815bede351ce97b8d96fa855249ca21a864cfdb32ad",
         "examples/vite-react/tests/app.test.tsx": "29597cde134da8e236466ce403d1898796c1ffb883a8c35f8d4c3e542aa779d8",
         "examples/vite-react/tests/commands-ui.test.tsx": "d24bafc224efa769efeb1a2c0398a86b0dbef6c63cd19ba73d3b3bede921a1fd",
         "examples/vite-react/tests/commands.test.ts": "1bd076ba62d754e323beedb7bfb9c2e2ce75f2eee117003a5f5bb55350610386",
+        "examples/vite-react/tests/http-workflows.test.ts": "4cca862bdedf0ab54f870b2906458d2d177e22807330edfddbbbfe093d8be5ba",
         "examples/vite-react/tests/minimal-setup.test.tsx": "fb5cb0465320068d8bc37bfab0cf1c4579e82a9c318243ad15424d0f35661281",
         "examples/vite-react/tests/owner-boundary.test.tsx": "f8fc6b26f24884d87d364a9b07f16ba912a7e92efbb96b0c815a62be22ac6bab",
         "examples/vite-react/tests/owner-cache.test.ts": "1ac4bebb04b973fa11e26f4b684fe6b217a075a255ac1828d9ed109c359c9ed9",
@@ -142,9 +161,9 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "54fd643a7822941104d83d21f462591e3e712cb1962387c988e937efecfc4118",
-        "pnpm-workspace.yaml": "b34c4d2efc1a0beedfcb759902f8c8c3ebdbddc0997a791a22f4b03136911b31",
-        "scripts/check-effect-compatibility.mts": "e481369343d669222dea14de8d0ac95c5c3e996669da5595ee20d00dffe4bcff",
+        "package.json": "3be2ea939718e59014c1ca06695bc66f0d570a1e909729c81e321c18af9dbcdb",
+        "pnpm-workspace.yaml": "a3f5d6cc5e21a4a8c01fe3e06ae01792a9de038c10d5d379e970485d69fab462",
+        "scripts/check-effect-compatibility.mts": "bf33fb74595e05c889d7b17aa3cbbe9bd72752e43f2db3fe3f21ea9841ea314b",
         "scripts/check-framework-consumers.mts": "37fc0fc0006c2b1f35c5cff85754612e0b74d89eed608e353ef5f18f05fce051",
         "scripts/measure-bundles.mts": "5a033ce9f9a4cf414632b6f2781a50c0354f1cf9996791a547a5d53dbef66d7a",
         "scripts/measure-construction.mts": "2fbad4879fe77ff24234a6be5666047b41cc7c3fd5ce9143d640ef4b41a426bd",
@@ -154,9 +173,9 @@
         "scripts/performance/common.mts": "57a2003d9769d884d1a0884cab5449cfce79c40300de8d0202d3f1780d51c4f5",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
-        "skills/effect-api-query/SKILL.md": "b3674e95620bc2ded520147af7e7d8ed7ba855e5743bc619dc1b8399f21b80cf",
+        "skills/effect-api-query/SKILL.md": "0997b75a672579f256310a13ca70392a55264657a67e2b17f2f2ca023e1c6901",
         "skills/effect-api-query/references/cache-workflows.md": "d9c6ddc9ab0b06b6577bfbe8542465fc4ebfc18d3fdd74c228a8bfbfd424a4dd",
-        "skills/effect-api-query/references/frameworks-and-hosts.md": "8afb9f6c9f4756ce654c0c7e2fa542896585d8d46f3449544b16baeb58678bce",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "2b3ee79dd253e1ebe56d85cfdb832822bd973f4fa07d386b7953f21deecfb6cc",
         "skills/effect-api-query/references/http.md": "7acbee387c671c6ed8a512ca94a29a0278c6e062c68f660a82e825ad95fbe336",
         "skills/effect-api-query/references/hydration-and-ssr.md": "30aeb844f4b4f7c3c6a5a70f4ecbfabbdfb7b332c62105b4ecad182238d38705",
         "skills/effect-api-query/references/query-patterns.md": "dba62054a68418e5ce9482864e938682847811d04e22e8ecb3176cb15c6ab50b",
@@ -205,7 +224,7 @@
         "tests/create-rpc-query-utils-keys.test.ts": "4aafc6adf8364088882cbe3b918c8992cfcc35643c3b53f8eb425afbacad5321",
         "tests/create-rpc-query-utils-request-options.test.ts": "548e1c87ad52f2a7ea73704624e6b5ea06a64dfe696da6a6e05f4a832783223b",
         "tests/create-rpc-query-utils-server-local.test.ts": "281d15e89cc0e13a846a03165069c54e733d77d4985bb246aa42034f67d4ed0d",
-        "tests/create-rpc-query-utils-stream-baseline.test.ts": "0b0797be419e51a09c63f06c03f42a2538a37bf2d9838871952da071fe9483b4",
+        "tests/create-rpc-query-utils-stream-baseline.test.ts": "b5181377776cc0e08b269213da6a7dbe8cafc97d63c5e240e311658ae2cce039",
         "tests/create-rpc-query-utils-stream-cache.test.ts": "d4e2e57da0ff1993f8e47082414a994f762c48a8bd38c6f7e75a809956dbbea3",
         "tests/create-rpc-query-utils-stream-hashing.test.ts": "3ec2de67c2f447b7f8ee003e9d8c1c0d19f1c9a787440a64c21df103ab9c044b",
         "tests/create-rpc-query-utils-stream-publication.test.ts": "f0f6919a98e3c4efd59ab39a7c8f2a2efb817c0b55913cd82c034126c8d5e459",
@@ -242,7 +261,7 @@
         "tests/http-semantic-keys.test.ts": "4fa4efd4b8211e52560be80aecade363486372d06cb3eeca0c496a783ea21f8c",
         "tests/http-structural-sharing.test.ts": "35ea74a2711f56cd2001cd5a1f3ffe58f10f4ecbf094c0d4ce7d9e9a62dead42",
         "tests/http-transport-cancellation.test.ts": "0ba26a9bae56b26605fc03009c1f50fe90930356d0fa0c4ec4ddc5c120430f00",
-        "tests/hydration-codecs.test.ts": "58d641238310a23fbcce9620a9ec65377f69a98746fbf2a45b87f8f49cd46465",
+        "tests/hydration-codecs.test.ts": "67a0a8e1e7ab78ba4cfb2f44b188a4001669584134ac21f0eb8bc03f993ee4ad",
         "tests/publication-deadline.test.ts": "2797557ff14bf8527ea446cec1e1d7c61cd3666f11f127e640c53ce5d7e30868",
         "tests/query-filter.test.ts": "ff531a86816872cd2cadf01d79bd9d9ff5be1895bab150330a90aa8375508004",
         "tests/query-policy.test.ts": "19b1d0fde232b4af9e041197a1aa6726f30e4fb7118533e5b3f7af08cbbe4002",
@@ -310,36 +329,40 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "260fa5164f18a2aae3577a121518095a78bb371b",
-      "outcome": "no-change",
-      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
+      "head": "e09d5b6ac16e290c63d752a4e8d91083a06dfcbe",
+      "outcome": "updated",
+      "reason": "Update the verified peer range and development release, link the runnable owner/workflows from the framework reference, and track workflow contracts/modules/browser cases. Preserve one skill, six references, all existing API procedures, and description/purpose. Metadata names the tested 0.6.0 source package.",
       "evidence": [
-        "Before versioning: intent maintainer check passed at 260fa5164f18a2aae3577a121518095a78bb371b.",
-        "changeset version and vp fmt generated 0.5.0 -> 0.6.0.",
-        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
-        "Scoped generated changes: package.json."
+        "Reviewed the diff from e09d5b6, the six focused Vite screens, shared contracts/handlers, callback draining, seven changesets, the compatibility reference, and ADRs 0033/0035.",
+        "800 runtime tests passed, including 10 real HTTP workflow cases and mutation-callback disposal regression.",
+        "Packed public fixtures passed on TypeScript 7.0.2 and 5.9.3 with 163 runtime cases at each Effect 4.0.6/4.1.0; four native framework consumers passed on both compilers.",
+        "Package declaration build, attw/publint, typed lint, strict Effect diagnostics (0 errors/0 warnings), both application builds, Fallow, 21 docs excerpt tests, 59-page docs build and internal links passed.",
+        "40 Chromium and 40 Firefox cases passed; WebKit could not launch because the host lacks GTK/ICU/GStreamer libraries, so CI must supply WebKit evidence. Local startup probes were replaced with stdout readiness without changing committed browser assertions.",
+        "Frozen install and peer check passed with unchanged seven-day policy; official registry times make coordinated 4.1.0 eligible. 4.1.1/4.1.2 were not installed.",
+        "Fresh consuming-agent behavior and comparative performance were not checked. Existing ownership and full-Cause semantics remain; no runtime adapter implementation changed."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "007b631e8db454d0f8f56027b40fd9b6872ef427c732062c962da30ed52be45d",
+      "fingerprint": "dc7356901fe70de0f9a86d434adf46d8fd1f26b33ea70b15ce8e84325326abce",
       "snapshot": {
         "GLOSSARY.md": "294f016460f575c7ee634a33c7b45c825f67a0501c31d42a5c42d681bacebd83",
-        "README.md": "7ea8f698beafeeea732241f263a9a1bd1935c4fbe075c3e245e42d4e27b4542d",
-        "_artifacts/domain_map.yaml": "fd95be306993b126c0dcf99ac156b29ce673191ae0866ccf797897102d1f7e2b",
-        "_artifacts/skill_spec.md": "96c32ef776e42ccdfd5c81314fa95fcee13faa157a9887d7eb51fea054435984",
-        "_artifacts/skill_tree.yaml": "0e4ae2f7d0b38244984cac636f5d304fcc30c41dfee2535c2a5d26a85c55c19f",
+        "README.md": "9cc3275039f58de12efe6a19ea5ec5e23a56126cfeb81cf35480ae5ac147f1da",
+        "_artifacts/domain_map.yaml": "ed0990defad3b3b0b402c2b0cb9c90de0a4ca813a2deab4978698f0c2728f309",
+        "_artifacts/skill_spec.md": "2b9e4c0ffda45f04102d2efbf01685c319a7cb21c922f8c861f243193ee893a0",
+        "_artifacts/skill_tree.yaml": "ce59cb7d97ff4f1cc36c4723ef889ccb37a96c24ed31a084be3a9fea620be07a",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "8cf2b005fd05a799118c262ecda121c4468cc023b5a666b7f46501e49f1b3099",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "a5447c052af2b2bbe119fd5ff2eab8d616016fe9e703a35718fd5b568f246329",
         "apps/docs/src/content/docs/concepts/http-utility-tree.md": "03f01c27b051a3fdd8c373749d61cf62d35c2734ff1f651ad3805b14886ba45b",
         "apps/docs/src/content/docs/concepts/queries-and-mutations.md": "e50098de81ed28be976a4c5e1224f61dc116f022dd50d553835e2775f0b63882",
         "apps/docs/src/content/docs/concepts/rpc-utility-tree.md": "5d9f0d254d1df588c2df70bc568ba430ae8db8dc22a47688835e74ce27fc1ca0",
         "apps/docs/src/content/docs/concepts/semantic-keys.md": "715b4e3103fa971748b45c5c8086e1ea4b95980dff0a69ee122635ed5fc998d2",
-        "apps/docs/src/content/docs/examples.md": "4043a5febebac1f55cb80e8f9c4214c6c03b9b11e3599ab77bc9ab6a4b99d204",
+        "apps/docs/src/content/docs/examples.md": "eb907ab16341d00789e7862cbf7e40b12f514a243876dd0075f1a297acd642a3",
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "022014147e137abdac686d6d3c58f4eff1e8098dd2241a3cccd96abe5051cd26",
-        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "e2d0c792fbdfe37e9f72c6cf56667b55ba95379e5ee150a2e861d9325a924319",
+        "apps/docs/src/content/docs/examples/http-workflows.md": "fa96c43f494764685e64c050b10be6e3dc63fd44cc05b5d354bd44d5dac77a86",
+        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "9bc41621f29a48badc7b26eb287d1f3071ce8cca86697fc80099301f4a6029df",
         "apps/docs/src/content/docs/getting-started/feature-support.md": "ac3ebd5c192272f7d4d1a236a5878d1d51a76fc514e874cbb51f17eb31809125",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "d8887c6d4180d60a1127957e073c180528474258c697c1305b6a7bb846e27671",
-        "apps/docs/src/content/docs/getting-started/installation.md": "6d58ab82951ac2db4262716ffb70f877c7579c415943d7978860022e81198327",
+        "apps/docs/src/content/docs/getting-started/installation.md": "63ebd6eddf603465b5c1203f6587ae5c6c7fba1a1e59069c929f44eaa645823d",
         "apps/docs/src/content/docs/getting-started/quick-start.md": "91ddca16ad5c0f484d88a9d3b42d37065ee3a3bfd088bd6f1b25a45e96283788",
         "apps/docs/src/content/docs/guides/angular-query.md": "beb279a2ef34d1e69e685bcd8dbeddb0fafb0228ede9107dd9f95d86f9e5c72c",
         "apps/docs/src/content/docs/guides/cache-filters.md": "b0b8a08b6e2f3484a2565b6bd6d080cd1e95b3e9aefcb5aaf121cd7a96ad2591",
@@ -375,9 +398,9 @@
         "apps/docs/src/content/docs/index.mdx": "c8015d3ea0e9f96d81558183249cde65a3cb8d087fa3934f2446af5c6db9a845",
         "apps/docs/src/content/docs/integrations/index.md": "027d9c9a2a06946be8771f3d33718e9097e59b689050d3ba51df05aa95ea6bda",
         "apps/docs/src/content/docs/reference/browser-and-worker-hosts.md": "400abc16a961005b5234f061861af70e6cf6199e9ea2a71b6c034e45fab54cb6",
-        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "d042f22ecd4f966b7d0dfc64d49a980d7acff5a965d8b0900d997f4df6f36027",
+        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "e41083333fe156b7367c6290d1b9ee7f10ada4f724a35302bd73982955918877",
         "apps/docs/src/content/docs/reference/errors.md": "2fc5cfd1c1402bc6e8763088cec0b1ef86566dab25a29d98f157e35abd2a7f16",
-        "apps/docs/src/content/docs/reference/external-http-clients.md": "20c035c038bbd6d845e22a0167bb6ca0d16844ed582535e77e0a4f8a30f92c0d",
+        "apps/docs/src/content/docs/reference/external-http-clients.md": "d55be8650662c1f4978dd2b0ca34e5ccafad596db97371cd69681b574b407860",
         "apps/docs/src/content/docs/reference/factory.md": "9a2c6c1b76b484cfda17b32d0e6bc21af60689b8dae2400f0c559354dad09653",
         "apps/docs/src/content/docs/reference/generated-builders.md": "e56a363220dc887f84278dd5076b6fb352a317c1b423d56a1c90bd6f08948ff6",
         "apps/docs/src/content/docs/reference/http-builders.md": "34d2fb026e5620878d21211f97dedfa7bec376e2267b9aab1088e759b5a20e9b",
@@ -411,8 +434,15 @@
         "docs/adr/0030-publish-documentation-from-released-revisions.md": "0088082ffe753ecc6e5cec31d8e9882fae42c323af10e011f76372852a524a1c",
         "docs/adr/0031-add-explicit-query-reuse-and-stream-controls.md": "984b9e0da315eb23a79f170d84f4725e54bfa521be8d03bad5f518ba7f1afece",
         "docs/adr/0032-configure-utility-trees-and-require-stream-retention.md": "e46238f04f3213d2c32dcb64fb2c17d38d033699d08b3b9d7986bbbe1d2f1ff7",
-        "docs/adr/0033-bound-effect-support-to-a-patch-line.md": "34209a3700272113c64ff39baf15e19bc5745b73b5a28157207c1c592df8fcd0",
+        "docs/adr/0033-bound-effect-support-to-a-patch-line.md": "cc48ddadc8fe161dfa1dcc77305e580b62c8b308a3acd515fd46db1c49304e2c",
         "docs/adr/0034-extend-http-stream-views-to-decoded-ndjson.md": "445ed1f9a4cb3a74938f2d01579e50c046a681aaa2dcd856ef9587c62aaa7cf2",
+        "docs/adr/0035-extend-reviewed-effect-support-through-41.md": "7cb921e880ac63cfa266ea25de359346bdae18217a1786b1906eefbd7a75f010",
+        "e2e/http-workflows.spec.ts": "f5729fd3707758508d85506a93a1f2560edfe1aad89c9bd200ec0c80a2ecb7cb",
+        "examples/contracts/src/client.ts": "fdf559bf0a798c7ea7f7aee01967837e720f7727a1bd11978aec51aad59f00f2",
+        "examples/contracts/src/contracts.ts": "74d69e1a07c0b32c2a48b8fed8cfceaac8844ead860fbd00b9e357657b39d88e",
+        "examples/contracts/src/http-api.ts": "bcecd0611e4bdeac0dad04159cc73db3165aca20ac1f89e597e6c73a76d99cef",
+        "examples/contracts/src/index.ts": "2b086282b7fc1c4ddcf1bfdaf30268fcc6373873e31de58ecde8d14d766deb6c",
+        "examples/contracts/src/workflows.ts": "079a2cf2ac5ccf1492ee918a465e9cb553ed866895cf853bf6c90eb6785b6ff9",
         "examples/server/src/commands.ts": "8e13627dcbda071716cdd539e6f1124ace4375f878038ca970534901ac6c5aba",
         "examples/server/src/diagnostic-operations.ts": "33ec6ef8931e4e2a39692a7b72574756791946161894f0733751748fd48d1998",
         "examples/server/src/domain.ts": "256b4e4f908ddb8d4564d51528866c470d4fed332ec69ce2e13bef915b68e97e",
@@ -421,12 +451,13 @@
         "examples/server/src/main.ts": "a207ef4208f09ae04f4fececb76750ceecf7e48a5ce237787fd3c9e537167382",
         "examples/server/src/rpc-handlers.ts": "53dfae7c99caea1e40991e72a15d3bc608037ba6174d0044706908090219e203",
         "examples/server/src/server-local-rpc.ts": "f6098b0f17ae1cab08620c31eac7ff698c7ac170847e88c3c7b6b92858ca2e56",
-        "examples/server/src/server.ts": "4363f437b79ce650fd35f2951ea20aa73ce12fdde5496da836ebb50dd0e4b60d",
+        "examples/server/src/server.ts": "33b049cb2881ecb7cb7577f2386ba8720e6feb1f821fca55cd17cc0e9088941f",
         "examples/server/src/users.ts": "1e33093f76a3b46461e1c41a067d10483fd0bf6b8d8e840ed15ceafdf32728b3",
-        "examples/server/src/web-handler.ts": "d9b38d8b14f243fdf7652407e230d4fde07413d345e6e1a528c2f7a1e81adcee",
-        "examples/server/tests/fixtures/websocket-server.ts": "e3797d32b50ed5aae5cf07e4d0d3617e7dbfc7ef7404d032c7abde8f49de5249",
+        "examples/server/src/web-handler.ts": "df76905670800bd27b419727a7e962c749bf6756b5f533c986186887b122eaeb",
+        "examples/server/src/workflow-handlers.ts": "49d9abf85b7088417ae393ef7d8de328142b37b961b7114e95a0a42bc6991972",
+        "examples/server/tests/fixtures/websocket-server.ts": "468801a4f5c50ccdc9855d8a8ef24cb1915f30f857625a99f4dfc20106fc2f53",
         "examples/server/tests/http-api.test.ts": "3d341c3a2d370562d7a04413adc179eed6aa822eb808a058deae09d6791ba0d4",
-        "examples/server/tests/rpc-transport-overhead.test.ts": "adbd2e30e9a9f0d85badd22eddc9585c193c09949c179a03536441e46320547d",
+        "examples/server/tests/rpc-transport-overhead.test.ts": "3fd291dc98127cd4a976efd3eca1beb04e9e50a7139d6fd6ab03290380005b18",
         "examples/server/tests/rpc-websocket-consumer.test.ts": "e5092fd7e402a0010c2d6c6426e09c407622528c9a0cd0dd41d0f3c826d1fed1",
         "examples/server/tests/server.test.ts": "5c9c176fcccf73c0c610502dd6b0f3c21946b1681538a6e033ee593b9bfa4934",
         "examples/server/tests/web-handler.test.ts": "50fdbcacf42c64315356864adc530c4e99e50e65447187d9ce55424372b741c1",
@@ -446,15 +477,25 @@
         "examples/tanstack-start/tests/failure-dehydration.test.ts": "5a132899aeb7727f53a30bfffc0c1ee7ac5d59ff96a752077f7169d0df4b4581",
         "examples/tanstack-start/tests/server-local.test.ts": "6d04b85b3e584deb8e4b6f847235ceab8a811eb2d3837dc209f89cf87cf0d291",
         "examples/tanstack-start/tests/server-render.test.tsx": "e46b15c02fc7b5fc76d52f9d64dfc5b88d4d36e0151908138de9babe7a5d53a3",
-        "examples/vite-react/src/app.tsx": "82611f4ed7f1723afefc611a205c0c85b24bccefacbb04bef4a5e890e7bdac32",
+        "examples/vite-react/src/app.tsx": "96f17567f1a4c387c30ba64bfadd8cc2d8260dde7699269951e26197e29ecd42",
         "examples/vite-react/src/components/ui/effect-error-details.tsx": "5c14c07465cd1f382a71c7e5b35b0adbc29cc3b5fc75bf3138824bd1d28b3821",
         "examples/vite-react/src/lib/application.ts": "2c2e63a84779fc32e87e4970cb3442e6c4596d251ad66df2f37a96c9099c5d00",
         "examples/vite-react/src/lib/owner-cache.ts": "e9eaa783cce49e7905027ae93ef1c525e2713187e83ffa4ecf726ba7235a420d",
         "examples/vite-react/src/lib/user-writes.ts": "999277fa02ff9c1439186b59636f7078458a5cbc3c84bed06514867b270a3b5e",
-        "examples/vite-react/src/main.tsx": "c05e1d7a4fc70c01bbc130107dc337a49fda90a097096dffe44320c4e44619bf",
+        "examples/vite-react/src/main.tsx": "9129bf323b8763d540df1ba4d7660739065d3f417cd287125292b51b56f4e02d",
+        "examples/vite-react/src/workflows/app.tsx": "0002ffa61317a639bc0bbea63ec934db84f92476093ea173abe0aea6f265c07f",
+        "examples/vite-react/src/workflows/application.ts": "e95c396af52c638aec8a48383df697bf131390d7ce5c68818403e502572f4b5f",
+        "examples/vite-react/src/workflows/document.tsx": "4fdeeaf20904d2568c827f80d0c1fd957edb19de9a3eb487077888f5edf7fe32",
+        "examples/vite-react/src/workflows/events.tsx": "e6db96f91484d19fa2f6321788629b8556e1c35c4241cd6bbd0a857aa0287ea0",
+        "examples/vite-react/src/workflows/readings.tsx": "45a9fe929cf43bf9d6a85b80be18859f52a810f81fbd653013ff0ed64c2bf423",
+        "examples/vite-react/src/workflows/recovery.ts": "3d5737673315bc5cbbf946b7119b4c192e305722d68b6c39f109b708ba4f7cdb",
+        "examples/vite-react/src/workflows/sharing.ts": "cd220f53774161e3824833c71ddd0fd879b8ccbba100b980a06932f4a15cc7f9",
+        "examples/vite-react/src/workflows/streams.tsx": "94071d054a2837755ba36e0b7736ed333de6e541739a38e67b36de2a94725796",
+        "examples/vite-react/src/workflows/upload.tsx": "9780404fa098e0626fd45815bede351ce97b8d96fa855249ca21a864cfdb32ad",
         "examples/vite-react/tests/app.test.tsx": "29597cde134da8e236466ce403d1898796c1ffb883a8c35f8d4c3e542aa779d8",
         "examples/vite-react/tests/commands-ui.test.tsx": "d24bafc224efa769efeb1a2c0398a86b0dbef6c63cd19ba73d3b3bede921a1fd",
         "examples/vite-react/tests/commands.test.ts": "1bd076ba62d754e323beedb7bfb9c2e2ce75f2eee117003a5f5bb55350610386",
+        "examples/vite-react/tests/http-workflows.test.ts": "4cca862bdedf0ab54f870b2906458d2d177e22807330edfddbbbfe093d8be5ba",
         "examples/vite-react/tests/minimal-setup.test.tsx": "fb5cb0465320068d8bc37bfab0cf1c4579e82a9c318243ad15424d0f35661281",
         "examples/vite-react/tests/owner-boundary.test.tsx": "f8fc6b26f24884d87d364a9b07f16ba912a7e92efbb96b0c815a62be22ac6bab",
         "examples/vite-react/tests/owner-cache.test.ts": "1ac4bebb04b973fa11e26f4b684fe6b217a075a255ac1828d9ed109c359c9ed9",
@@ -463,9 +504,9 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "54fd643a7822941104d83d21f462591e3e712cb1962387c988e937efecfc4118",
-        "pnpm-workspace.yaml": "b34c4d2efc1a0beedfcb759902f8c8c3ebdbddc0997a791a22f4b03136911b31",
-        "scripts/check-effect-compatibility.mts": "e481369343d669222dea14de8d0ac95c5c3e996669da5595ee20d00dffe4bcff",
+        "package.json": "3be2ea939718e59014c1ca06695bc66f0d570a1e909729c81e321c18af9dbcdb",
+        "pnpm-workspace.yaml": "a3f5d6cc5e21a4a8c01fe3e06ae01792a9de038c10d5d379e970485d69fab462",
+        "scripts/check-effect-compatibility.mts": "bf33fb74595e05c889d7b17aa3cbbe9bd72752e43f2db3fe3f21ea9841ea314b",
         "scripts/check-framework-consumers.mts": "37fc0fc0006c2b1f35c5cff85754612e0b74d89eed608e353ef5f18f05fce051",
         "scripts/measure-bundles.mts": "5a033ce9f9a4cf414632b6f2781a50c0354f1cf9996791a547a5d53dbef66d7a",
         "scripts/measure-construction.mts": "2fbad4879fe77ff24234a6be5666047b41cc7c3fd5ce9143d640ef4b41a426bd",
@@ -475,9 +516,9 @@
         "scripts/performance/common.mts": "57a2003d9769d884d1a0884cab5449cfce79c40300de8d0202d3f1780d51c4f5",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
-        "skills/effect-api-query/SKILL.md": "b3674e95620bc2ded520147af7e7d8ed7ba855e5743bc619dc1b8399f21b80cf",
+        "skills/effect-api-query/SKILL.md": "0997b75a672579f256310a13ca70392a55264657a67e2b17f2f2ca023e1c6901",
         "skills/effect-api-query/references/cache-workflows.md": "d9c6ddc9ab0b06b6577bfbe8542465fc4ebfc18d3fdd74c228a8bfbfd424a4dd",
-        "skills/effect-api-query/references/frameworks-and-hosts.md": "8afb9f6c9f4756ce654c0c7e2fa542896585d8d46f3449544b16baeb58678bce",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "2b3ee79dd253e1ebe56d85cfdb832822bd973f4fa07d386b7953f21deecfb6cc",
         "skills/effect-api-query/references/http.md": "7acbee387c671c6ed8a512ca94a29a0278c6e062c68f660a82e825ad95fbe336",
         "skills/effect-api-query/references/hydration-and-ssr.md": "30aeb844f4b4f7c3c6a5a70f4ecbfabbdfb7b332c62105b4ecad182238d38705",
         "skills/effect-api-query/references/query-patterns.md": "dba62054a68418e5ce9482864e938682847811d04e22e8ecb3176cb15c6ab50b",
@@ -526,7 +567,7 @@
         "tests/create-rpc-query-utils-keys.test.ts": "4aafc6adf8364088882cbe3b918c8992cfcc35643c3b53f8eb425afbacad5321",
         "tests/create-rpc-query-utils-request-options.test.ts": "548e1c87ad52f2a7ea73704624e6b5ea06a64dfe696da6a6e05f4a832783223b",
         "tests/create-rpc-query-utils-server-local.test.ts": "281d15e89cc0e13a846a03165069c54e733d77d4985bb246aa42034f67d4ed0d",
-        "tests/create-rpc-query-utils-stream-baseline.test.ts": "0b0797be419e51a09c63f06c03f42a2538a37bf2d9838871952da071fe9483b4",
+        "tests/create-rpc-query-utils-stream-baseline.test.ts": "b5181377776cc0e08b269213da6a7dbe8cafc97d63c5e240e311658ae2cce039",
         "tests/create-rpc-query-utils-stream-cache.test.ts": "d4e2e57da0ff1993f8e47082414a994f762c48a8bd38c6f7e75a809956dbbea3",
         "tests/create-rpc-query-utils-stream-hashing.test.ts": "3ec2de67c2f447b7f8ee003e9d8c1c0d19f1c9a787440a64c21df103ab9c044b",
         "tests/create-rpc-query-utils-stream-publication.test.ts": "f0f6919a98e3c4efd59ab39a7c8f2a2efb817c0b55913cd82c034126c8d5e459",
@@ -563,7 +604,7 @@
         "tests/http-semantic-keys.test.ts": "4fa4efd4b8211e52560be80aecade363486372d06cb3eeca0c496a783ea21f8c",
         "tests/http-structural-sharing.test.ts": "35ea74a2711f56cd2001cd5a1f3ffe58f10f4ecbf094c0d4ce7d9e9a62dead42",
         "tests/http-transport-cancellation.test.ts": "0ba26a9bae56b26605fc03009c1f50fe90930356d0fa0c4ec4ddc5c120430f00",
-        "tests/hydration-codecs.test.ts": "58d641238310a23fbcce9620a9ec65377f69a98746fbf2a45b87f8f49cd46465",
+        "tests/hydration-codecs.test.ts": "67a0a8e1e7ab78ba4cfb2f44b188a4001669584134ac21f0eb8bc03f993ee4ad",
         "tests/publication-deadline.test.ts": "2797557ff14bf8527ea446cec1e1d7c61cd3666f11f127e640c53ce5d7e30868",
         "tests/query-filter.test.ts": "ff531a86816872cd2cadf01d79bd9d9ff5be1895bab150330a90aa8375508004",
         "tests/query-policy.test.ts": "19b1d0fde232b4af9e041197a1aa6726f30e4fb7118533e5b3f7af08cbbe4002",
@@ -631,29 +672,35 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "260fa5164f18a2aae3577a121518095a78bb371b",
-      "outcome": "no-change",
-      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
+      "head": "e09d5b6ac16e290c63d752a4e8d91083a06dfcbe",
+      "outcome": "updated",
+      "reason": "Reconcile all three records: resolve the runnable-example gap with actual screens, record reviewed Effect 4.1 support and limitations, extend source mappings while preserving previous history/tasks/prerequisites, and align verified package metadata. Both YAML files parse and maintainer sync is current.",
       "evidence": [
-        "Before versioning: intent maintainer check passed at 260fa5164f18a2aae3577a121518095a78bb371b.",
-        "changeset version and vp fmt generated 0.5.0 -> 0.6.0.",
-        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
-        "Scoped generated changes: package.json."
+        "Reviewed the diff from e09d5b6, the six focused Vite screens, shared contracts/handlers, callback draining, seven changesets, the compatibility reference, and ADRs 0033/0035.",
+        "800 runtime tests passed, including 10 real HTTP workflow cases and mutation-callback disposal regression.",
+        "Packed public fixtures passed on TypeScript 7.0.2 and 5.9.3 with 163 runtime cases at each Effect 4.0.6/4.1.0; four native framework consumers passed on both compilers.",
+        "Package declaration build, attw/publint, typed lint, strict Effect diagnostics (0 errors/0 warnings), both application builds, Fallow, 21 docs excerpt tests, 59-page docs build and internal links passed.",
+        "40 Chromium and 40 Firefox cases passed; WebKit could not launch because the host lacks GTK/ICU/GStreamer libraries, so CI must supply WebKit evidence. Local startup probes were replaced with stdout readiness without changing committed browser assertions.",
+        "Frozen install and peer check passed with unchanged seven-day policy; official registry times make coordinated 4.1.0 eligible. 4.1.1/4.1.2 were not installed.",
+        "Fresh consuming-agent behavior and comparative performance were not checked. Existing ownership and full-Cause semantics remain; no runtime adapter implementation changed."
       ]
     },
     "source:vite.config.ts": {
-      "fingerprint": "2c6aa5596e3a32dd18c544d564f3a325f44e778edc0e255062e7bd5a6b4d7eea",
+      "fingerprint": "7b325bf8a05c19b3f503148ea93f285d38295f89057fdc913908eb91044f73b5",
       "snapshot": {
-        "vite.config.ts": "d2ed487913e4a528195b4a4752a12faaffbf2b466ed415273e14a0ced31ddfc7"
+        "vite.config.ts": "a5d7a47743f4542ec4d2aeddb79a4550ffec288db9d2ee5551a197433a0d8dfc"
       },
-      "head": "20ca24e389da021e3125197668482db8704f114d",
+      "head": "e09d5b6ac16e290c63d752a4e8d91083a06dfcbe",
       "outcome": "no-change",
-      "reason": "The NDJSON runtime test is added to the existing unstable Effect API lint allowance. Main configuration and structural-sharing allowances remain present; no build command or consumer workflow changes.",
+      "reason": "Extend existing unstable-API allowances only to the new native HTTP workflow files. Vite additionally scopes the Schema.TaggedError constructor/class-count exception to the contract and unknown-value sharing callback exceptions to sharing.ts. Core checks and defaults remain enabled; typed lint and strict Effect diagnostics pass.",
       "evidence": [
-        "Locally rebased on main 10075f5c3a24eb7ce81c4dd54a91035e38fdd523 after squash merging PRs 159 and 160. HTTP implementation matches the original PR byte-for-byte; inspected the combined HTTP, type, documentation, skill, and planning diffs.",
-        "57 focused runtime tests passed across NDJSON queries (17), HTTP factories (12), cached views (20), and decoded-value sharing (8). vp run docs-check passed 21 excerpt tests and Astro with 0 errors, warnings, or hints. vp run format passed.",
-        "Verified ADR 0024 retains its original body exactly and both amendment links resolve. ADR 0034 records only the NDJSON extension. Existing domain-map task coverage and all skill-spec history entries remain; skill-tree wildcard sources cover ADR 0034 without a tree change.",
-        "vp run pack failed locally with compiler startup error spawn EBUSY, so packaged public compiler/full quality checks remain unverified locally and must pass in fresh GitHub CI before merge. No independent consumer-agent or skill discovery validation was run."
+        "Reviewed the diff from e09d5b6, the six focused Vite screens, shared contracts/handlers, callback draining, seven changesets, the compatibility reference, and ADRs 0033/0035.",
+        "800 runtime tests passed, including 10 real HTTP workflow cases and mutation-callback disposal regression.",
+        "Packed public fixtures passed on TypeScript 7.0.2 and 5.9.3 with 163 runtime cases at each Effect 4.0.6/4.1.0; four native framework consumers passed on both compilers.",
+        "Package declaration build, attw/publint, typed lint, strict Effect diagnostics (0 errors/0 warnings), both application builds, Fallow, 21 docs excerpt tests, 59-page docs build and internal links passed.",
+        "40 Chromium and 40 Firefox cases passed; WebKit could not launch because the host lacks GTK/ICU/GStreamer libraries, so CI must supply WebKit evidence. Local startup probes were replaced with stdout readiness without changing committed browser assertions.",
+        "Frozen install and peer check passed with unchanged seven-day policy; official registry times make coordinated 4.1.0 eligible. 4.1.1/4.1.2 were not installed.",
+        "Fresh consuming-agent behavior and comparative performance were not checked. Existing ownership and full-Cause semantics remain; no runtime adapter implementation changed."
       ]
     },
     "source:.github/workflows/release.yml": {
@@ -710,17 +757,21 @@
       ]
     },
     "source:tsconfig.json": {
-      "fingerprint": "094e5a6ffca82ea61bbeb288c413c9ee97bd8374d5db6e20b1ee819bd3279c1d",
+      "fingerprint": "fb7ef686d133b6ef915152374e845633e71e93ec8a0ee3e6bd851cd380254ff5",
       "snapshot": {
-        "tsconfig.json": "1104d89074d7673e261a0958cd14740a875326e5ed01c23d8d626705d009da74"
+        "tsconfig.json": "be6f5d67764ed5e9d7d8978c1e10a25e67b0c425ca4ad5234f807357ecb9551c"
       },
-      "head": "e619aeb7e7b003e3b42ce2a4d143d24cbbf72a5f",
+      "head": "e09d5b6ac16e290c63d752a4e8d91083a06dfcbe",
       "outcome": "no-change",
-      "reason": "The new performance script uses the same unstable Effect RPC diagnostic allowance as existing measurement scripts. Compiler strictness, runtime behavior and consumer guidance are unchanged.",
+      "reason": "Extend existing unstable-API allowances only to the new native HTTP workflow files. Vite additionally scopes the Schema.TaggedError constructor/class-count exception to the contract and unknown-value sharing callback exceptions to sharing.ts. Core checks and defaults remain enabled; typed lint and strict Effect diagnostics pass.",
       "evidence": [
-        "Local rebase onto main ee3d33ef50ffe88519648f3876d917c032d8973d; reviewed the replay diff, preserving main peer bounds, configuration sharing guidance, and all previous planning entries.",
-        "vp run format passed; vp run docs-check passed 21 documentation excerpt tests and Astro with 0 errors, warnings, or hints; vp run skills-check passed; git diff --check passed.",
-        "vp run quality could not complete: its package declaration-build prerequisite failed to start the compiler with spawn EBUSY. This is unverified locally; require fresh GitHub CI on the pushed head before merging. No fresh consumer-agent or discovery validation was run."
+        "Reviewed the diff from e09d5b6, the six focused Vite screens, shared contracts/handlers, callback draining, seven changesets, the compatibility reference, and ADRs 0033/0035.",
+        "800 runtime tests passed, including 10 real HTTP workflow cases and mutation-callback disposal regression.",
+        "Packed public fixtures passed on TypeScript 7.0.2 and 5.9.3 with 163 runtime cases at each Effect 4.0.6/4.1.0; four native framework consumers passed on both compilers.",
+        "Package declaration build, attw/publint, typed lint, strict Effect diagnostics (0 errors/0 warnings), both application builds, Fallow, 21 docs excerpt tests, 59-page docs build and internal links passed.",
+        "40 Chromium and 40 Firefox cases passed; WebKit could not launch because the host lacks GTK/ICU/GStreamer libraries, so CI must supply WebKit evidence. Local startup probes were replaced with stdout readiness without changing committed browser assertions.",
+        "Frozen install and peer check passed with unchanged seven-day policy; official registry times make coordinated 4.1.0 eligible. 4.1.1/4.1.2 were not installed.",
+        "Fresh consuming-agent behavior and comparative performance were not checked. Existing ownership and full-Cause semantics remain; no runtime adapter implementation changed."
       ]
     },
     "source:.fallowrc.jsonc": {
@@ -2466,16 +2517,20 @@
       ]
     },
     "source:tests/framework-consumers/pnpm-lock.yaml": {
-      "fingerprint": "d5a0cbeabac0a07d14b49ea7bd8728c8216d8a0759b5568f6b0dc8d5d15ae57c",
+      "fingerprint": "bb67ca03ce54b91437bad4aea898492e00d6950a01f2f6ebe9f2c424c0b90a8d",
       "snapshot": {
-        "tests/framework-consumers/pnpm-lock.yaml": "dfe2c619415885063e0dd61b2b25abaf4c408e1dc20c7c896483733034de1a85"
+        "tests/framework-consumers/pnpm-lock.yaml": "a955e3cc1594d93bb27357ca41ace0b8f3d0d15356de2727dda78d8750a9acdd"
       },
-      "head": "848ea4bfa501ec60d65c83bd801b4e16f121807d",
+      "head": "e09d5b6ac16e290c63d752a4e8d91083a06dfcbe",
       "outcome": "no-change",
-      "reason": "Updated native integration lockfile and removed the obsolete Core override; the compatibility table now describes the verified aligned versions.",
+      "reason": "Isolated lockfile reflects eligible native framework patch updates and Query 5.105.0 alignment. The intentional Effect 4.0.6 and TypeScript 5.9.3 fixtures remain; wrapper-specific guidance remains accurate and the canonical exact-version table was updated.",
       "evidence": [
-        "vp run --no-cache quality: packed Vue/Solid/Svelte/Angular consumers passed on TS7 and TS5.9.",
-        "vp -C tests/framework-consumers install --frozen-lockfile --ignore-scripts passed with unchanged strict seven-day policy."
+        "Baseline e09d5b6 (0.6.0); inspected actual dependency, documentation, harness, and test-import diffs.",
+        "Frozen installation and pnpm peers check passed; unchanged seven-day policy and Effect peer >=4.0.6 <4.1.0.",
+        "790 runtime tests; 163 packed runtime cases per Effect 4.0.6/4.0.7 and both public compilers; four packed framework consumers on TypeScript 7.0.2/5.9.3 passed.",
+        "Direct native package build, attw/publint, typed checks, strict Effect diagnostics, both application builds, Fallow, 21 docs excerpt tests, and linked 58-page docs build passed.",
+        "Vite+-supervised native tools hit host spawn EBUSY; direct equivalent commands passed without weakened configuration. Fresh consuming-agent behavior and comparative performance were not checked.",
+        "scripts/check-framework-consumers.mts passed packed Vue/Solid/Svelte/Angular native hook fixtures on both compilers with the updated lockfile."
       ]
     },
     "source:tests/framework-consumers/pnpm-workspace.yaml": {
@@ -2917,6 +2972,161 @@
         "changeset version and vp fmt generated 0.5.0 -> 0.6.0.",
         "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
         "Scoped generated changes: .changeset/fresh-ndjson-views.md."
+      ]
+    },
+    "source:.changeset/checked-feature-coverage.md": {
+      "fingerprint": "dd37aa688a41ee46f47fc72d980536bd8c672575382d39660604a57a176c2b2c",
+      "snapshot": {
+        ".changeset/checked-feature-coverage.md": "55170a28de91368b19c829e1704300b39598b01bb1521494fdd5ed56a2bc3fab"
+      },
+      "head": "e09d5b6ac16e290c63d752a4e8d91083a06dfcbe",
+      "outcome": "no-change",
+      "reason": ".changeset/checked-feature-coverage.md describes one shipped change in the final diff. Its consumer instructions are covered by the updated owning skill and canonical workflow/compatibility docs; no separate skill or additional guidance is needed.",
+      "evidence": [
+        "Reviewed the diff from e09d5b6, the six focused Vite screens, shared contracts/handlers, callback draining, seven changesets, the compatibility reference, and ADRs 0033/0035.",
+        "800 runtime tests passed, including 10 real HTTP workflow cases and mutation-callback disposal regression.",
+        "Packed public fixtures passed on TypeScript 7.0.2 and 5.9.3 with 163 runtime cases at each Effect 4.0.6/4.1.0; four native framework consumers passed on both compilers.",
+        "Package declaration build, attw/publint, typed lint, strict Effect diagnostics (0 errors/0 warnings), both application builds, Fallow, 21 docs excerpt tests, 59-page docs build and internal links passed.",
+        "40 Chromium and 40 Firefox cases passed; WebKit could not launch because the host lacks GTK/ICU/GStreamer libraries, so CI must supply WebKit evidence. Local startup probes were replaced with stdout readiness without changing committed browser assertions.",
+        "Frozen install and peer check passed with unchanged seven-day policy; official registry times make coordinated 4.1.0 eligible. 4.1.1/4.1.2 were not installed.",
+        "Fresh consuming-agent behavior and comparative performance were not checked. Existing ownership and full-Cause semantics remain; no runtime adapter implementation changed."
+      ]
+    },
+    "source:_artifacts/competitor-ux-research-2026-11-06.md": {
+      "fingerprint": "295a43cc604518a9de5e8c53a6643c1faf296d1024a9fc303901a03b1ab01136",
+      "snapshot": {
+        "_artifacts/competitor-ux-research-2026-11-06.md": "77de56491e9bd204397093c3bb51948214b78dbecc729399af454082944f1970"
+      },
+      "head": "e09d5b6ac16e290c63d752a4e8d91083a06dfcbe",
+      "outcome": "no-change",
+      "reason": "Internal dated primary-source comparison separates verified competitor capabilities, adapter boundaries, and proposals. It changes no shipped usage guidance or library scope; proposed work remains explicitly unimplemented.",
+      "evidence": [
+        "Inspected cited npm metadata, official tagged sources and docs, and local public exports/ADRs. Research agent completed only this note; no consuming-agent or benchmark evidence is claimed."
+      ]
+    },
+    "source:_artifacts/ux-and-dependency-audit-2026-11-06.md": {
+      "fingerprint": "b77394359f9e954e4e0bb0af19cfeda8f7d184733abb07e0ba641d15725cba8e",
+      "snapshot": {
+        "_artifacts/ux-and-dependency-audit-2026-11-06.md": "225694fc343b29739dc12018abca3125b6adc7fd2f0ef04a3a54a4c547e184bf"
+      },
+      "head": "e09d5b6ac16e290c63d752a4e8d91083a06dfcbe",
+      "outcome": "no-change",
+      "reason": "Internal audit inventories concrete runnable gaps, justifies dependency selections and held updates, and records verified checks and their limits. It preserves the existing skill boundary and explicitly distinguishes proposals from implemented changes.",
+      "evidence": [
+        "Baseline e09d5b6 (0.6.0); inspected actual dependency, documentation, harness, and test-import diffs.",
+        "Frozen installation and pnpm peers check passed; unchanged seven-day policy and Effect peer >=4.0.6 <4.1.0.",
+        "790 runtime tests; 163 packed runtime cases per Effect 4.0.6/4.0.7 and both public compilers; four packed framework consumers on TypeScript 7.0.2/5.9.3 passed.",
+        "Direct native package build, attw/publint, typed checks, strict Effect diagnostics, both application builds, Fallow, 21 docs excerpt tests, and linked 58-page docs build passed.",
+        "Vite+-supervised native tools hit host spawn EBUSY; direct equivalent commands passed without weakened configuration. Fresh consuming-agent behavior and comparative performance were not checked.",
+        "Verified example imports/shared HTTP declarations, the packed runtime selection, npm publication dates, upstream Effect/tooling release notes, and final local files."
+      ]
+    },
+    "source:.changeset/decoded-sharing-workflow.md": {
+      "fingerprint": "da05cfd30e0d4cc56e1f7ccd77d71949d28ce62564edb37562e08742421d0625",
+      "snapshot": {
+        ".changeset/decoded-sharing-workflow.md": "1fd07f55e20b0fcfeefb4fc0d66081fd0b4f50fb50f04df549bb44ee9c5ab3c8"
+      },
+      "head": "e09d5b6ac16e290c63d752a4e8d91083a06dfcbe",
+      "outcome": "no-change",
+      "reason": ".changeset/decoded-sharing-workflow.md describes one shipped change in the final diff. Its consumer instructions are covered by the updated owning skill and canonical workflow/compatibility docs; no separate skill or additional guidance is needed.",
+      "evidence": [
+        "Reviewed the diff from e09d5b6, the six focused Vite screens, shared contracts/handlers, callback draining, seven changesets, the compatibility reference, and ADRs 0033/0035.",
+        "800 runtime tests passed, including 10 real HTTP workflow cases and mutation-callback disposal regression.",
+        "Packed public fixtures passed on TypeScript 7.0.2 and 5.9.3 with 163 runtime cases at each Effect 4.0.6/4.1.0; four native framework consumers passed on both compilers.",
+        "Package declaration build, attw/publint, typed lint, strict Effect diagnostics (0 errors/0 warnings), both application builds, Fallow, 21 docs excerpt tests, 59-page docs build and internal links passed.",
+        "40 Chromium and 40 Firefox cases passed; WebKit could not launch because the host lacks GTK/ICU/GStreamer libraries, so CI must supply WebKit evidence. Local startup probes were replaced with stdout readiness without changing committed browser assertions.",
+        "Frozen install and peer check passed with unchanged seven-day policy; official registry times make coordinated 4.1.0 eligible. 4.1.1/4.1.2 were not installed.",
+        "Fresh consuming-agent behavior and comparative performance were not checked. Existing ownership and full-Cause semantics remain; no runtime adapter implementation changed."
+      ]
+    },
+    "source:.changeset/effect-41-support.md": {
+      "fingerprint": "97454cf597f4aa97e2245efe3bf447ec8f16c2483978b6261067483b343a67e8",
+      "snapshot": {
+        ".changeset/effect-41-support.md": "a27a3e9194e03ed5115d251c94e01e90d62defe8a60ccaa0c74e6f1b45454efc"
+      },
+      "head": "e09d5b6ac16e290c63d752a4e8d91083a06dfcbe",
+      "outcome": "no-change",
+      "reason": ".changeset/effect-41-support.md describes one shipped change in the final diff. Its consumer instructions are covered by the updated owning skill and canonical workflow/compatibility docs; no separate skill or additional guidance is needed.",
+      "evidence": [
+        "Reviewed the diff from e09d5b6, the six focused Vite screens, shared contracts/handlers, callback draining, seven changesets, the compatibility reference, and ADRs 0033/0035.",
+        "800 runtime tests passed, including 10 real HTTP workflow cases and mutation-callback disposal regression.",
+        "Packed public fixtures passed on TypeScript 7.0.2 and 5.9.3 with 163 runtime cases at each Effect 4.0.6/4.1.0; four native framework consumers passed on both compilers.",
+        "Package declaration build, attw/publint, typed lint, strict Effect diagnostics (0 errors/0 warnings), both application builds, Fallow, 21 docs excerpt tests, 59-page docs build and internal links passed.",
+        "40 Chromium and 40 Firefox cases passed; WebKit could not launch because the host lacks GTK/ICU/GStreamer libraries, so CI must supply WebKit evidence. Local startup probes were replaced with stdout readiness without changing committed browser assertions.",
+        "Frozen install and peer check passed with unchanged seven-day policy; official registry times make coordinated 4.1.0 eligible. 4.1.1/4.1.2 were not installed.",
+        "Fresh consuming-agent behavior and comparative performance were not checked. Existing ownership and full-Cause semantics remain; no runtime adapter implementation changed."
+      ]
+    },
+    "source:.changeset/event-recovery-workflow.md": {
+      "fingerprint": "5b06b8dbd7ba586c590a6ca0947ff00a5dc0bb8f84061f69454590a358b49621",
+      "snapshot": {
+        ".changeset/event-recovery-workflow.md": "4aa8d7eb7b406c02e24ac5b44a157bcf027c094775c861385f6d093e986a39b6"
+      },
+      "head": "e09d5b6ac16e290c63d752a4e8d91083a06dfcbe",
+      "outcome": "no-change",
+      "reason": ".changeset/event-recovery-workflow.md describes one shipped change in the final diff. Its consumer instructions are covered by the updated owning skill and canonical workflow/compatibility docs; no separate skill or additional guidance is needed.",
+      "evidence": [
+        "Reviewed the diff from e09d5b6, the six focused Vite screens, shared contracts/handlers, callback draining, seven changesets, the compatibility reference, and ADRs 0033/0035.",
+        "800 runtime tests passed, including 10 real HTTP workflow cases and mutation-callback disposal regression.",
+        "Packed public fixtures passed on TypeScript 7.0.2 and 5.9.3 with 163 runtime cases at each Effect 4.0.6/4.1.0; four native framework consumers passed on both compilers.",
+        "Package declaration build, attw/publint, typed lint, strict Effect diagnostics (0 errors/0 warnings), both application builds, Fallow, 21 docs excerpt tests, 59-page docs build and internal links passed.",
+        "40 Chromium and 40 Firefox cases passed; WebKit could not launch because the host lacks GTK/ICU/GStreamer libraries, so CI must supply WebKit evidence. Local startup probes were replaced with stdout readiness without changing committed browser assertions.",
+        "Frozen install and peer check passed with unchanged seven-day policy; official registry times make coordinated 4.1.0 eligible. 4.1.1/4.1.2 were not installed.",
+        "Fresh consuming-agent behavior and comparative performance were not checked. Existing ownership and full-Cause semantics remain; no runtime adapter implementation changed."
+      ]
+    },
+    "source:.changeset/http-metadata-workflow.md": {
+      "fingerprint": "a1f4165d165a1d5ce99a2f81edcbfb2c2242853968a5e3326a15ef9e185d33a8",
+      "snapshot": {
+        ".changeset/http-metadata-workflow.md": "5ef87129b9896dd47b32eefd2d7754d9a711d5a974c2cc1e825f290b74fd86b4"
+      },
+      "head": "e09d5b6ac16e290c63d752a4e8d91083a06dfcbe",
+      "outcome": "no-change",
+      "reason": ".changeset/http-metadata-workflow.md describes one shipped change in the final diff. Its consumer instructions are covered by the updated owning skill and canonical workflow/compatibility docs; no separate skill or additional guidance is needed.",
+      "evidence": [
+        "Reviewed the diff from e09d5b6, the six focused Vite screens, shared contracts/handlers, callback draining, seven changesets, the compatibility reference, and ADRs 0033/0035.",
+        "800 runtime tests passed, including 10 real HTTP workflow cases and mutation-callback disposal regression.",
+        "Packed public fixtures passed on TypeScript 7.0.2 and 5.9.3 with 163 runtime cases at each Effect 4.0.6/4.1.0; four native framework consumers passed on both compilers.",
+        "Package declaration build, attw/publint, typed lint, strict Effect diagnostics (0 errors/0 warnings), both application builds, Fallow, 21 docs excerpt tests, 59-page docs build and internal links passed.",
+        "40 Chromium and 40 Firefox cases passed; WebKit could not launch because the host lacks GTK/ICU/GStreamer libraries, so CI must supply WebKit evidence. Local startup probes were replaced with stdout readiness without changing committed browser assertions.",
+        "Frozen install and peer check passed with unchanged seven-day policy; official registry times make coordinated 4.1.0 eligible. 4.1.1/4.1.2 were not installed.",
+        "Fresh consuming-agent behavior and comparative performance were not checked. Existing ownership and full-Cause semantics remain; no runtime adapter implementation changed."
+      ]
+    },
+    "source:.changeset/http-stream-workflows.md": {
+      "fingerprint": "4e757f793390fbb368f99bd5f4ec8f9504cc4fc957dc00f90f62dbfb05829035",
+      "snapshot": {
+        ".changeset/http-stream-workflows.md": "e86cd8c594a7d034ad16b9c244a53454a7400b340d6f3cd3f6de0b4f2703e847"
+      },
+      "head": "e09d5b6ac16e290c63d752a4e8d91083a06dfcbe",
+      "outcome": "no-change",
+      "reason": ".changeset/http-stream-workflows.md describes one shipped change in the final diff. Its consumer instructions are covered by the updated owning skill and canonical workflow/compatibility docs; no separate skill or additional guidance is needed.",
+      "evidence": [
+        "Reviewed the diff from e09d5b6, the six focused Vite screens, shared contracts/handlers, callback draining, seven changesets, the compatibility reference, and ADRs 0033/0035.",
+        "800 runtime tests passed, including 10 real HTTP workflow cases and mutation-callback disposal regression.",
+        "Packed public fixtures passed on TypeScript 7.0.2 and 5.9.3 with 163 runtime cases at each Effect 4.0.6/4.1.0; four native framework consumers passed on both compilers.",
+        "Package declaration build, attw/publint, typed lint, strict Effect diagnostics (0 errors/0 warnings), both application builds, Fallow, 21 docs excerpt tests, 59-page docs build and internal links passed.",
+        "40 Chromium and 40 Firefox cases passed; WebKit could not launch because the host lacks GTK/ICU/GStreamer libraries, so CI must supply WebKit evidence. Local startup probes were replaced with stdout readiness without changing committed browser assertions.",
+        "Frozen install and peer check passed with unchanged seven-day policy; official registry times make coordinated 4.1.0 eligible. 4.1.1/4.1.2 were not installed.",
+        "Fresh consuming-agent behavior and comparative performance were not checked. Existing ownership and full-Cause semantics remain; no runtime adapter implementation changed."
+      ]
+    },
+    "source:.changeset/multipart-upload-workflow.md": {
+      "fingerprint": "bfe62f73676de1089ac691756c5cba7cd9fa777a875c7b602619ec629be7613e",
+      "snapshot": {
+        ".changeset/multipart-upload-workflow.md": "54f7933cb7d89fe25988ef20aa01292dec46dce7397e9d4c45021a5332f55408"
+      },
+      "head": "e09d5b6ac16e290c63d752a4e8d91083a06dfcbe",
+      "outcome": "no-change",
+      "reason": ".changeset/multipart-upload-workflow.md describes one shipped change in the final diff. Its consumer instructions are covered by the updated owning skill and canonical workflow/compatibility docs; no separate skill or additional guidance is needed.",
+      "evidence": [
+        "Reviewed the diff from e09d5b6, the six focused Vite screens, shared contracts/handlers, callback draining, seven changesets, the compatibility reference, and ADRs 0033/0035.",
+        "800 runtime tests passed, including 10 real HTTP workflow cases and mutation-callback disposal regression.",
+        "Packed public fixtures passed on TypeScript 7.0.2 and 5.9.3 with 163 runtime cases at each Effect 4.0.6/4.1.0; four native framework consumers passed on both compilers.",
+        "Package declaration build, attw/publint, typed lint, strict Effect diagnostics (0 errors/0 warnings), both application builds, Fallow, 21 docs excerpt tests, 59-page docs build and internal links passed.",
+        "40 Chromium and 40 Firefox cases passed; WebKit could not launch because the host lacks GTK/ICU/GStreamer libraries, so CI must supply WebKit evidence. Local startup probes were replaced with stdout readiness without changing committed browser assertions.",
+        "Frozen install and peer check passed with unchanged seven-day policy; official registry times make coordinated 4.1.0 eligible. 4.1.1/4.1.2 were not installed.",
+        "Fresh consuming-agent behavior and comparative performance were not checked. Existing ownership and full-Cause semantics remain; no runtime adapter implementation changed."
       ]
     }
   }

@@ -40,7 +40,7 @@ export const runSocketCase = async <A, E>(
 ) =>
   await Effect.runPromise(
     effect.pipe(
-      Effect.provide(NodeSocket.layerWebSocketConstructorWS),
+      Effect.provide(NodeSocket.layerWebSocketConstructor),
       Effect.scoped
     )
   );

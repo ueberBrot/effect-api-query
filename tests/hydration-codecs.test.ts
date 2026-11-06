@@ -22,15 +22,13 @@ import { expect } from "vite-plus/test";
 
 import {
   createHttpApiQueryUtils,
+  createHydrationRegistry,
   createRpcQueryUtils,
   HydrationCodecError,
-} from "#effect-api-query";
-import {
-  createHydrationRegistry,
   hydrationCallbacks,
   infiniteQueryCodec,
   queryViewCodec,
-} from "#effect-api-query/core/hydration";
+} from "#effect-api-query";
 
 import { makeRpcTestClient } from "./fixtures/effect-rpc.ts";
 import { Profile } from "./types/docs-hydration-rich.ts";

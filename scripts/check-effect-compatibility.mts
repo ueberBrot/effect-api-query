@@ -38,7 +38,13 @@ const tests = [
   "http-execution",
   "http-transport-cancellation",
   "http-hydration",
+  "http-cached-views",
+  "http-live-query",
+  "http-metadata-options",
+  "http-ndjson-query",
   "http-semantic-keys",
+  "http-structural-sharing",
+  "hydration-codecs",
   "stream-snapshot",
 ].map((name) => `tests/${name}.test.ts`);
 const run = (args: string[], cwd: string) =>

@@ -1,8 +1,11 @@
+import { Result, Schema } from "effect";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
 import { ViteReactExample } from "./app.tsx";
 import { startViteReactApplication } from "./lib/application.ts";
+import { HttpWorkflowsExample, WorkflowPage } from "./workflows/app.tsx";
+import { startHttpWorkflows } from "./workflows/application.ts";
 
 import "./styles/tailwind.css";
 
@@ -13,17 +16,34 @@ if (container === null) {
   throw new Error("The Vite React root element is missing");
 }
 
-const application = await startViteReactApplication({
-  rpcUrl,
-  httpBaseUrl: import.meta.env.VITE_HTTP_BASE_URL ?? globalThis.location.origin,
-  directoryStorage: globalThis.sessionStorage,
-});
+const startSelectedExample = async () => {
+  const page = Schema.decodeUnknownResult(WorkflowPage)(
+    new URL(globalThis.location.href).searchParams.get("example")
+  );
+  const httpBaseUrl =
+    import.meta.env.VITE_HTTP_BASE_URL ?? globalThis.location.origin;
+  if (Result.isSuccess(page)) {
+    const application = await startHttpWorkflows(httpBaseUrl);
+    return {
+      content: (
+        <HttpWorkflowsExample application={application} page={page.success} />
+      ),
+      dispose: application.dispose,
+    };
+  }
+  const application = await startViteReactApplication({
+    rpcUrl,
+    httpBaseUrl,
+    directoryStorage: globalThis.sessionStorage,
+  });
+  return {
+    content: <ViteReactExample application={application} />,
+    dispose: async () => application.dispose({ discardPersistence: false }),
+  };
+};
+const application = await startSelectedExample();
 const root = createRoot(container);
-root.render(
-  <StrictMode>
-    <ViteReactExample application={application} />
-  </StrictMode>
-);
+root.render(<StrictMode>{application.content}</StrictMode>);
 
 let disposed = false;
 const dispose = () => {
@@ -34,7 +54,7 @@ const dispose = () => {
   root.unmount();
   void (async () => {
     try {
-      await application.dispose({ discardPersistence: false });
+      await application.dispose();
     } catch (error) {
       console.error("Vite resource cleanup failed", error);
     }

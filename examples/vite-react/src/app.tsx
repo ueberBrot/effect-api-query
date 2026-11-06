@@ -7,6 +7,7 @@ import { HttpSection } from "./components/sections/http-section.tsx";
 import { MutationsSection } from "./components/sections/mutations-section.tsx";
 import { QueriesSection } from "./components/sections/queries-section.tsx";
 import type { ViteReactApplication } from "./lib/application.ts";
+import { WorkflowNavigation } from "./workflows/app.tsx";
 
 const ExampleContent = ({
   application,
@@ -16,6 +17,7 @@ const ExampleContent = ({
   <div className="app-backdrop text-text-secondary min-h-screen antialiased">
     <main className="mx-auto grid max-w-7xl gap-5 px-5 py-12 md:grid-cols-2">
       <header className="border-border border-l-brand-600 bg-card shadow-shadow/50 border p-6 shadow-2xl md:col-span-2 md:border-l-4 md:p-8">
+        <WorkflowNavigation />
         <h1 className="display-heading tracking-display text-foreground max-w-4xl text-3xl font-black sm:text-5xl">
           Compare full queries, pages, and streams
         </h1>

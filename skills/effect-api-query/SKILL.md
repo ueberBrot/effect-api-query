@@ -8,8 +8,11 @@ metadata:
     Derive typed TanStack Query keys and options from ready Effect RPC and HTTP clients, preserving cache identity, typed filters and execution policies, decoded query views, registered hydration codecs, stream recovery, native framework behavior, and application-owned resource lifetime.
   type: core
   library: "@ueberbrot/effect-api-query"
-  library_version: "0.5.0"
+  library_version: "0.6.0"
 sources:
+  - "**/examples/contracts/src/*.ts"
+  - "**/examples/vite-react/src/workflows/*.ts*"
+  - "e2e/http-workflows.spec.ts"
   - "src/**/*.ts"
   - "tests/**/*.ts"
   - "tests/**/*.tsx"
@@ -48,7 +51,7 @@ Derive options from the application's contract and ready client. Pass those opti
 
 ## Choose the adapter
 
-Read the installed package manifest to find its version and peers. The Effect peer range is `>=4.0.6 <4.1.0`; its supported floor is `4.0.6` and current development pins are `4.0.7`. Its Query Core peer range is `>=5.104.4 <6`. Use the installed declarations and keep contracts literal. For reactive options, version constraints, and transport ownership, read [frameworks and hosts](references/frameworks-and-hosts.md).
+Read the installed package manifest to find its version and peers. The Effect peer range is `>=4.0.6 <4.2.0`; its supported floor is `4.0.6` and current development pins are `4.1.0`. Its Query Core peer range is `>=5.104.4 <6`. Use the installed declarations and keep contracts literal. For reactive options, version constraints, and transport ownership, read [frameworks and hosts](references/frameworks-and-hosts.md).
 
 Read the reference for the contract you are integrating:
 
