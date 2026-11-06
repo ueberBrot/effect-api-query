@@ -343,12 +343,12 @@
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "dc7356901fe70de0f9a86d434adf46d8fd1f26b33ea70b15ce8e84325326abce",
+      "fingerprint": "4c2e5014aeeab31ce092b6b07311895c608e45b642ae21f22952232745d28bfb",
       "snapshot": {
         "GLOSSARY.md": "294f016460f575c7ee634a33c7b45c825f67a0501c31d42a5c42d681bacebd83",
         "README.md": "9cc3275039f58de12efe6a19ea5ec5e23a56126cfeb81cf35480ae5ac147f1da",
         "_artifacts/domain_map.yaml": "ed0990defad3b3b0b402c2b0cb9c90de0a4ca813a2deab4978698f0c2728f309",
-        "_artifacts/skill_spec.md": "2b9e4c0ffda45f04102d2efbf01685c319a7cb21c922f8c861f243193ee893a0",
+        "_artifacts/skill_spec.md": "526c4151d853df5367cdc0dd649383f9b7c994aaede2384c6e6fb6afd9b4ce98",
         "_artifacts/skill_tree.yaml": "ce59cb7d97ff4f1cc36c4723ef889ccb37a96c24ed31a084be3a9fea620be07a",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "8cf2b005fd05a799118c262ecda121c4468cc023b5a666b7f46501e49f1b3099",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "a5447c052af2b2bbe119fd5ff2eab8d616016fe9e703a35718fd5b568f246329",
@@ -672,17 +672,13 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "e09d5b6ac16e290c63d752a4e8d91083a06dfcbe",
+      "head": "d88ac33afea3ac72845d4c92a5e27bb6dd311fd9",
       "outcome": "updated",
-      "reason": "Reconcile all three records: resolve the runnable-example gap with actual screens, record reviewed Effect 4.1 support and limitations, extend source mappings while preserving previous history/tasks/prerequisites, and align verified package metadata. Both YAML files parse and maintainer sync is current.",
+      "reason": "The batch history now records the maintainer’s release boundary: changesets cover runtime changes to the published package. All seven non-runtime changesets were removed; no src/ runtime implementation changed. The domain map and skill tree still accurately map the same runnable workflows and guidance, so they need no edits.",
       "evidence": [
-        "Reviewed the diff from e09d5b6, the six focused Vite screens, shared contracts/handlers, callback draining, seven changesets, the compatibility reference, and ADRs 0033/0035.",
-        "800 runtime tests passed, including 10 real HTTP workflow cases and mutation-callback disposal regression.",
-        "Packed public fixtures passed on TypeScript 7.0.2 and 5.9.3 with 163 runtime cases at each Effect 4.0.6/4.1.0; four native framework consumers passed on both compilers.",
-        "Package declaration build, attw/publint, typed lint, strict Effect diagnostics (0 errors/0 warnings), both application builds, Fallow, 21 docs excerpt tests, 59-page docs build and internal links passed.",
-        "40 Chromium and 40 Firefox cases passed; WebKit could not launch because the host lacks GTK/ICU/GStreamer libraries, so CI must supply WebKit evidence. Local startup probes were replaced with stdout readiness without changing committed browser assertions.",
-        "Frozen install and peer check passed with unchanged seven-day policy; official registry times make coordinated 4.1.0 eligible. 4.1.1/4.1.2 were not installed.",
-        "Fresh consuming-agent behavior and comparative performance were not checked. Existing ownership and full-Cause semantics remain; no runtime adapter implementation changed."
+        "Compared the branch with origin/main at e09d5b6: no src/ changes and no remaining .changeset changes. All four examples/*/package.json manifests are private at version 0.0.0.",
+        "Reviewed _artifacts/domain_map.yaml, _artifacts/skill_spec.md, and _artifacts/skill_tree.yaml. Only the latest batch decision in the spec changes; task coverage, source mappings, and prerequisites remain accurate.",
+        "vp exec intent maintainer sync reported nothing to synchronize. Scoped vp fmt and git diff --check passed. Existing runtime and packed-consumer results remain applicable because this correction deletes release entries and updates the planning record only."
       ]
     },
     "source:vite.config.ts": {
