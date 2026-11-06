@@ -1,4 +1,5 @@
 import tailwindcss from "@tailwindcss/vite";
+import { redact } from "@tanstack/redact/vite";
 import { defineConfig } from "vite-plus";
 
 const apiProxy = {
@@ -7,7 +8,7 @@ const apiProxy = {
 };
 
 export default defineConfig({
-  plugins: [tailwindcss()],
+  plugins: [tailwindcss(), redact()],
   build: {
     target: "es2022",
   },

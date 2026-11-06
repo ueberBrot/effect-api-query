@@ -4,7 +4,7 @@ import {
   useSuspenseQuery,
 } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { startTransition, useState } from "react";
 
 import { ActionButton } from "../components/action-button.tsx";
 import { ConditionalUserQuery } from "../components/conditional-user-query.tsx";
@@ -56,7 +56,9 @@ const UsersPage = () => {
     streamedDiagnosticsOptions(rpcQuery, boundedHistory)
   );
   const replayStream = async (bounded: boolean) => {
-    setBoundedHistory(bounded);
+    startTransition(() => {
+      setBoundedHistory(bounded);
+    });
     try {
       await queryClient.query(streamedDiagnosticsOptions(rpcQuery, bounded));
     } catch {

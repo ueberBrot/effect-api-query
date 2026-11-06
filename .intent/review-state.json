@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "f5f349eb854fe309efcd1d796087b9d7090a2afed9fd7ed9d6d4c263c79b3793",
+      "fingerprint": "c019bb7dcc71210db697dd6ecadf7fcbc76090ee292970f342195ede1f5855c9",
       "snapshot": {
         "GLOSSARY.md": "294f016460f575c7ee634a33c7b45c825f67a0501c31d42a5c42d681bacebd83",
         "README.md": "9cc3275039f58de12efe6a19ea5ec5e23a56126cfeb81cf35480ae5ac147f1da",
@@ -13,9 +13,9 @@
         "apps/docs/src/content/docs/concepts/queries-and-mutations.md": "e50098de81ed28be976a4c5e1224f61dc116f022dd50d553835e2775f0b63882",
         "apps/docs/src/content/docs/concepts/rpc-utility-tree.md": "5d9f0d254d1df588c2df70bc568ba430ae8db8dc22a47688835e74ce27fc1ca0",
         "apps/docs/src/content/docs/concepts/semantic-keys.md": "715b4e3103fa971748b45c5c8086e1ea4b95980dff0a69ee122635ed5fc998d2",
-        "apps/docs/src/content/docs/examples.md": "eb907ab16341d00789e7862cbf7e40b12f514a243876dd0075f1a297acd642a3",
+        "apps/docs/src/content/docs/examples.md": "31a8c5d3f923b87552f48d7dab569e71fb656f6012df9232578f1a387f4267bd",
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "022014147e137abdac686d6d3c58f4eff1e8098dd2241a3cccd96abe5051cd26",
-        "apps/docs/src/content/docs/examples/http-workflows.md": "fa96c43f494764685e64c050b10be6e3dc63fd44cc05b5d354bd44d5dac77a86",
+        "apps/docs/src/content/docs/examples/http-workflows.md": "f7b41e1e63fda1e4c44e0886b29f5c796f3f51e1b3bf227947423194f6cc39b0",
         "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "9bc41621f29a48badc7b26eb287d1f3071ce8cca86697fc80099301f4a6029df",
         "apps/docs/src/content/docs/getting-started/feature-support.md": "ac3ebd5c192272f7d4d1a236a5878d1d51a76fc514e874cbb51f17eb31809125",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "d8887c6d4180d60a1127957e073c180528474258c697c1305b6a7bb846e27671",
@@ -91,9 +91,8 @@
         "docs/adr/0030-publish-documentation-from-released-revisions.md": "0088082ffe753ecc6e5cec31d8e9882fae42c323af10e011f76372852a524a1c",
         "docs/adr/0031-add-explicit-query-reuse-and-stream-controls.md": "984b9e0da315eb23a79f170d84f4725e54bfa521be8d03bad5f518ba7f1afece",
         "docs/adr/0032-configure-utility-trees-and-require-stream-retention.md": "e46238f04f3213d2c32dcb64fb2c17d38d033699d08b3b9d7986bbbe1d2f1ff7",
-        "docs/adr/0033-bound-effect-support-to-a-patch-line.md": "cc48ddadc8fe161dfa1dcc77305e580b62c8b308a3acd515fd46db1c49304e2c",
+        "docs/adr/0033-bound-effect-support-to-a-patch-line.md": "34209a3700272113c64ff39baf15e19bc5745b73b5a28157207c1c592df8fcd0",
         "docs/adr/0034-extend-http-stream-views-to-decoded-ndjson.md": "445ed1f9a4cb3a74938f2d01579e50c046a681aaa2dcd856ef9587c62aaa7cf2",
-        "docs/adr/0035-extend-reviewed-effect-support-through-41.md": "7cb921e880ac63cfa266ea25de359346bdae18217a1786b1906eefbd7a75f010",
         "e2e/http-workflows.spec.ts": "f5729fd3707758508d85506a93a1f2560edfe1aad89c9bd200ec0c80a2ecb7cb",
         "examples/contracts/src/client.ts": "fdf559bf0a798c7ea7f7aee01967837e720f7727a1bd11978aec51aad59f00f2",
         "examples/contracts/src/contracts.ts": "74d69e1a07c0b32c2a48b8fed8cfceaac8844ead860fbd00b9e357657b39d88e",
@@ -175,7 +174,7 @@
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "0997b75a672579f256310a13ca70392a55264657a67e2b17f2f2ca023e1c6901",
         "skills/effect-api-query/references/cache-workflows.md": "d9c6ddc9ab0b06b6577bfbe8542465fc4ebfc18d3fdd74c228a8bfbfd424a4dd",
-        "skills/effect-api-query/references/frameworks-and-hosts.md": "2b3ee79dd253e1ebe56d85cfdb832822bd973f4fa07d386b7953f21deecfb6cc",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "6304d782143d2a38c2b574b37148f6ef189b1095ce55e43b535057b4f63065d3",
         "skills/effect-api-query/references/http.md": "7acbee387c671c6ed8a512ca94a29a0278c6e062c68f660a82e825ad95fbe336",
         "skills/effect-api-query/references/hydration-and-ssr.md": "30aeb844f4b4f7c3c6a5a70f4ecbfabbdfb7b332c62105b4ecad182238d38705",
         "skills/effect-api-query/references/query-patterns.md": "dba62054a68418e5ce9482864e938682847811d04e22e8ecb3176cb15c6ab50b",
@@ -329,26 +328,25 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "e09d5b6ac16e290c63d752a4e8d91083a06dfcbe",
+      "head": "f2d6ccb8a1b19845205b9db3950fa6fe95ef33d9",
       "outcome": "updated",
-      "reason": "Update the verified peer range and development release, link the runnable owner/workflows from the framework reference, and track workflow contracts/modules/browser cases. Preserve one skill, six references, all existing API procedures, and description/purpose. Metadata names the tested 0.6.0 source package.",
+      "reason": "Keep the existing skill and six references. Shorten its runnable-workflow pointer and retain the reviewed Effect range. The focused example guide still covers setup, workflows, and ownership constraints; renderer selection belongs to the private applications.",
       "evidence": [
-        "Reviewed the diff from e09d5b6, the six focused Vite screens, shared contracts/handlers, callback draining, seven changesets, the compatibility reference, and ADRs 0033/0035.",
-        "800 runtime tests passed, including 10 real HTTP workflow cases and mutation-callback disposal regression.",
-        "Packed public fixtures passed on TypeScript 7.0.2 and 5.9.3 with 163 runtime cases at each Effect 4.0.6/4.1.0; four native framework consumers passed on both compilers.",
-        "Package declaration build, attw/publint, typed lint, strict Effect diagnostics (0 errors/0 warnings), both application builds, Fallow, 21 docs excerpt tests, 59-page docs build and internal links passed.",
-        "40 Chromium and 40 Firefox cases passed; WebKit could not launch because the host lacks GTK/ICU/GStreamer libraries, so CI must supply WebKit evidence. Local startup probes were replaced with stdout readiness without changing committed browser assertions.",
-        "Frozen install and peer check passed with unchanged seven-day policy; official registry times make coordinated 4.1.0 eligible. 4.1.1/4.1.2 were not installed.",
-        "Fresh consuming-agent behavior and comparative performance were not checked. Existing ownership and full-Cause semantics remain; no runtime adapter implementation changed."
+        "Inspected the actual diff from origin/main e09d5b6, the contracts and handlers, both Vite configs, the Start button and stream-view changes, and all three planning records. No src/ runtime implementation or ADR changes remain in the PR.",
+        "Final Redact 0.2.3 runs passed all 80 production Chromium/Firefox cases and all 40 development Chromium cases with the existing browser assertions. Local startup checks use stdout readiness because unbound localhost URL probes hang on this host. WebKit remains unverified locally because host libraries are missing.",
+        "The native React client-navigation suite passed both cases after the final hydration safeguard. Both application production builds and typed lint/typechecking passed. Documentation checks and the 59-page build passed with valid internal links.",
+        "The existing packed compatibility results cover Effect 4.0.6/4.1.0, TypeScript 7.0.2/5.9.3, 163 runtime cases per release, and four framework consumers. No public runtime source changed in this follow-up.",
+        "Frozen installation with strict peer validation passed. Redact 0.2.3 was published 2026-10-28 and clears the unchanged seven-day policy. Changeset status plans only the published package patch 0.6.0 -> 0.6.1; private example versions remain 0.0.0.",
+        "Intent synchronization is current and skills-check passed. Fresh consumer-agent behavior and comparative performance were not checked."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "4c2e5014aeeab31ce092b6b07311895c608e45b642ae21f22952232745d28bfb",
+      "fingerprint": "9336bf8139ee9a052f3f3167279d8cf89c5eab7fecfd69922de584b66971e2d7",
       "snapshot": {
         "GLOSSARY.md": "294f016460f575c7ee634a33c7b45c825f67a0501c31d42a5c42d681bacebd83",
         "README.md": "9cc3275039f58de12efe6a19ea5ec5e23a56126cfeb81cf35480ae5ac147f1da",
-        "_artifacts/domain_map.yaml": "ed0990defad3b3b0b402c2b0cb9c90de0a4ca813a2deab4978698f0c2728f309",
-        "_artifacts/skill_spec.md": "526c4151d853df5367cdc0dd649383f9b7c994aaede2384c6e6fb6afd9b4ce98",
+        "_artifacts/domain_map.yaml": "70f88c23e1d93ee73320f12b53221b406fcca8a3c2cd5559a5aecec7f01af912",
+        "_artifacts/skill_spec.md": "908eb22c616ec670129b4fa8d9a91c7382c85f1f3e8c9807799aa4c9041cf9f5",
         "_artifacts/skill_tree.yaml": "ce59cb7d97ff4f1cc36c4723ef889ccb37a96c24ed31a084be3a9fea620be07a",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "8cf2b005fd05a799118c262ecda121c4468cc023b5a666b7f46501e49f1b3099",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "a5447c052af2b2bbe119fd5ff2eab8d616016fe9e703a35718fd5b568f246329",
@@ -356,9 +354,9 @@
         "apps/docs/src/content/docs/concepts/queries-and-mutations.md": "e50098de81ed28be976a4c5e1224f61dc116f022dd50d553835e2775f0b63882",
         "apps/docs/src/content/docs/concepts/rpc-utility-tree.md": "5d9f0d254d1df588c2df70bc568ba430ae8db8dc22a47688835e74ce27fc1ca0",
         "apps/docs/src/content/docs/concepts/semantic-keys.md": "715b4e3103fa971748b45c5c8086e1ea4b95980dff0a69ee122635ed5fc998d2",
-        "apps/docs/src/content/docs/examples.md": "eb907ab16341d00789e7862cbf7e40b12f514a243876dd0075f1a297acd642a3",
+        "apps/docs/src/content/docs/examples.md": "31a8c5d3f923b87552f48d7dab569e71fb656f6012df9232578f1a387f4267bd",
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "022014147e137abdac686d6d3c58f4eff1e8098dd2241a3cccd96abe5051cd26",
-        "apps/docs/src/content/docs/examples/http-workflows.md": "fa96c43f494764685e64c050b10be6e3dc63fd44cc05b5d354bd44d5dac77a86",
+        "apps/docs/src/content/docs/examples/http-workflows.md": "f7b41e1e63fda1e4c44e0886b29f5c796f3f51e1b3bf227947423194f6cc39b0",
         "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "9bc41621f29a48badc7b26eb287d1f3071ce8cca86697fc80099301f4a6029df",
         "apps/docs/src/content/docs/getting-started/feature-support.md": "ac3ebd5c192272f7d4d1a236a5878d1d51a76fc514e874cbb51f17eb31809125",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "d8887c6d4180d60a1127957e073c180528474258c697c1305b6a7bb846e27671",
@@ -434,9 +432,8 @@
         "docs/adr/0030-publish-documentation-from-released-revisions.md": "0088082ffe753ecc6e5cec31d8e9882fae42c323af10e011f76372852a524a1c",
         "docs/adr/0031-add-explicit-query-reuse-and-stream-controls.md": "984b9e0da315eb23a79f170d84f4725e54bfa521be8d03bad5f518ba7f1afece",
         "docs/adr/0032-configure-utility-trees-and-require-stream-retention.md": "e46238f04f3213d2c32dcb64fb2c17d38d033699d08b3b9d7986bbbe1d2f1ff7",
-        "docs/adr/0033-bound-effect-support-to-a-patch-line.md": "cc48ddadc8fe161dfa1dcc77305e580b62c8b308a3acd515fd46db1c49304e2c",
+        "docs/adr/0033-bound-effect-support-to-a-patch-line.md": "34209a3700272113c64ff39baf15e19bc5745b73b5a28157207c1c592df8fcd0",
         "docs/adr/0034-extend-http-stream-views-to-decoded-ndjson.md": "445ed1f9a4cb3a74938f2d01579e50c046a681aaa2dcd856ef9587c62aaa7cf2",
-        "docs/adr/0035-extend-reviewed-effect-support-through-41.md": "7cb921e880ac63cfa266ea25de359346bdae18217a1786b1906eefbd7a75f010",
         "e2e/http-workflows.spec.ts": "f5729fd3707758508d85506a93a1f2560edfe1aad89c9bd200ec0c80a2ecb7cb",
         "examples/contracts/src/client.ts": "fdf559bf0a798c7ea7f7aee01967837e720f7727a1bd11978aec51aad59f00f2",
         "examples/contracts/src/contracts.ts": "74d69e1a07c0b32c2a48b8fed8cfceaac8844ead860fbd00b9e357657b39d88e",
@@ -518,7 +515,7 @@
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "0997b75a672579f256310a13ca70392a55264657a67e2b17f2f2ca023e1c6901",
         "skills/effect-api-query/references/cache-workflows.md": "d9c6ddc9ab0b06b6577bfbe8542465fc4ebfc18d3fdd74c228a8bfbfd424a4dd",
-        "skills/effect-api-query/references/frameworks-and-hosts.md": "2b3ee79dd253e1ebe56d85cfdb832822bd973f4fa07d386b7953f21deecfb6cc",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "6304d782143d2a38c2b574b37148f6ef189b1095ce55e43b535057b4f63065d3",
         "skills/effect-api-query/references/http.md": "7acbee387c671c6ed8a512ca94a29a0278c6e062c68f660a82e825ad95fbe336",
         "skills/effect-api-query/references/hydration-and-ssr.md": "30aeb844f4b4f7c3c6a5a70f4ecbfabbdfb7b332c62105b4ecad182238d38705",
         "skills/effect-api-query/references/query-patterns.md": "dba62054a68418e5ce9482864e938682847811d04e22e8ecb3176cb15c6ab50b",
@@ -672,13 +669,16 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "d88ac33afea3ac72845d4c92a5e27bb6dd311fd9",
+      "head": "f2d6ccb8a1b19845205b9db3950fa6fe95ef33d9",
       "outcome": "updated",
-      "reason": "The batch history now records the maintainer’s release boundary: changesets cover runtime changes to the published package. All seven non-runtime changesets were removed; no src/ runtime implementation changed. The domain map and skill tree still accurately map the same runnable workflows and guidance, so they need no edits.",
+      "reason": "Condense this branch’s batch history, retain earlier history, point the dependency failure mode to the existing compatibility guide, and preserve skill identities, prerequisites, and workflow source mappings. Remove the temporary reports and support-range ADR. Record Redact validation and one patch changeset for published Effect compatibility; private examples, documentation, and tooling have no release entries.",
       "evidence": [
-        "Compared the branch with origin/main at e09d5b6: no src/ changes and no remaining .changeset changes. All four examples/*/package.json manifests are private at version 0.0.0.",
-        "Reviewed _artifacts/domain_map.yaml, _artifacts/skill_spec.md, and _artifacts/skill_tree.yaml. Only the latest batch decision in the spec changes; task coverage, source mappings, and prerequisites remain accurate.",
-        "vp exec intent maintainer sync reported nothing to synchronize. Scoped vp fmt and git diff --check passed. Existing runtime and packed-consumer results remain applicable because this correction deletes release entries and updates the planning record only."
+        "Inspected the actual diff from origin/main e09d5b6, the contracts and handlers, both Vite configs, the Start button and stream-view changes, and all three planning records. No src/ runtime implementation or ADR changes remain in the PR.",
+        "Final Redact 0.2.3 runs passed all 80 production Chromium/Firefox cases and all 40 development Chromium cases with the existing browser assertions. Local startup checks use stdout readiness because unbound localhost URL probes hang on this host. WebKit remains unverified locally because host libraries are missing.",
+        "The native React client-navigation suite passed both cases after the final hydration safeguard. Both application production builds and typed lint/typechecking passed. Documentation checks and the 59-page build passed with valid internal links.",
+        "The existing packed compatibility results cover Effect 4.0.6/4.1.0, TypeScript 7.0.2/5.9.3, 163 runtime cases per release, and four framework consumers. No public runtime source changed in this follow-up.",
+        "Frozen installation with strict peer validation passed. Redact 0.2.3 was published 2026-10-28 and clears the unchanged seven-day policy. Changeset status plans only the published package patch 0.6.0 -> 0.6.1; private example versions remain 0.0.0.",
+        "Intent synchronization is current and skills-check passed. Fresh consumer-agent behavior and comparative performance were not checked."
       ]
     },
     "source:vite.config.ts": {
@@ -1282,15 +1282,20 @@
       ]
     },
     "source:examples/tanstack-start/src/routes/index.tsx": {
-      "fingerprint": "4c6a4e6991f6d4a7079f7c9ac09993d1e7074c14c803a18ae9d106a1ac629c6a",
+      "fingerprint": "4eec00581de4be5a3ba82b42a0d62793392a72f660067a10153b9eb527d53516",
       "snapshot": {
-        "examples/tanstack-start/src/routes/index.tsx": "58557e15457f5d08b0a507cd5cf40d90dd1ddf193c769823e7e52ff556de0c6f"
+        "examples/tanstack-start/src/routes/index.tsx": "3a1ce31344a1c9750f85027b670fa4dcb99b107f6e4d7c1fe0d22995fa18caa1"
       },
-      "head": "86365084f08c30a0dc1211ad450412195060de5c",
+      "head": "f2d6ccb8a1b19845205b9db3950fa6fe95ef33d9",
       "outcome": "no-change",
-      "reason": "The example now explicitly retains unbounded stream history, matching the revised retention guidance. Its application workflow and ownership remain unchanged.",
+      "reason": "Switch the Suspense stream view inside a native transition so the current screen survives loading. The existing native Suspense guidance remains accurate; generated stream keys, retention, and execution semantics are unchanged.",
       "evidence": [
-        "Reviewed the explicit maxChunks call, choose-stream-history guide, and query-patterns skill reference. Start build, runtime suite, and Chromium example cases pass."
+        "Inspected the actual diff from origin/main e09d5b6, the contracts and handlers, both Vite configs, the Start button and stream-view changes, and all three planning records. No src/ runtime implementation or ADR changes remain in the PR.",
+        "Final Redact 0.2.3 runs passed all 80 production Chromium/Firefox cases and all 40 development Chromium cases with the existing browser assertions. Local startup checks use stdout readiness because unbound localhost URL probes hang on this host. WebKit remains unverified locally because host libraries are missing.",
+        "The native React client-navigation suite passed both cases after the final hydration safeguard. Both application production builds and typed lint/typechecking passed. Documentation checks and the 59-page build passed with valid internal links.",
+        "The existing packed compatibility results cover Effect 4.0.6/4.1.0, TypeScript 7.0.2/5.9.3, 163 runtime cases per release, and four framework consumers. No public runtime source changed in this follow-up.",
+        "Frozen installation with strict peer validation passed. Redact 0.2.3 was published 2026-10-28 and clears the unchanged seven-day policy. Changeset status plans only the published package patch 0.6.0 -> 0.6.1; private example versions remain 0.0.0.",
+        "Intent synchronization is current and skills-check passed. Fresh consumer-agent behavior and comparative performance were not checked."
       ]
     },
     "source:examples/vite-react/src/components/sections/commands-section.tsx": {
@@ -1512,15 +1517,20 @@
       ]
     },
     "source:examples/tanstack-start/src/components/action-button.tsx": {
-      "fingerprint": "c2e18ef4fd56d4e83cc88611043e6a3517ecde691843b80c41b5db090536f0de",
+      "fingerprint": "1feb4eaff48571cd9ab13612ad068d2e5542557122bbf1dee1878dce784dd6f1",
       "snapshot": {
-        "examples/tanstack-start/src/components/action-button.tsx": "44ab38ecfcde9a202eb6dfa409c4860e00535246d89c8685b583725ef102d84c"
+        "examples/tanstack-start/src/components/action-button.tsx": "feca11e9b1e883267a49eb41e246e745adb7b00c7caf88378e886807396bc512"
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "head": "f2d6ccb8a1b19845205b9db3950fa6fe95ef33d9",
       "outcome": "no-change",
-      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
+      "reason": "Action buttons now wait for the client hydration snapshot while preserving caller disablement. This application UI safeguard changes no generated utility or native Query contract; existing provider and ownership guidance remains accurate.",
       "evidence": [
-        "examples/tanstack-start/src/components/action-button.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
+        "Inspected the actual diff from origin/main e09d5b6, the contracts and handlers, both Vite configs, the Start button and stream-view changes, and all three planning records. No src/ runtime implementation or ADR changes remain in the PR.",
+        "Final Redact 0.2.3 runs passed all 80 production Chromium/Firefox cases and all 40 development Chromium cases with the existing browser assertions. Local startup checks use stdout readiness because unbound localhost URL probes hang on this host. WebKit remains unverified locally because host libraries are missing.",
+        "The native React client-navigation suite passed both cases after the final hydration safeguard. Both application production builds and typed lint/typechecking passed. Documentation checks and the 59-page build passed with valid internal links.",
+        "The existing packed compatibility results cover Effect 4.0.6/4.1.0, TypeScript 7.0.2/5.9.3, 163 runtime cases per release, and four framework consumers. No public runtime source changed in this follow-up.",
+        "Frozen installation with strict peer validation passed. Redact 0.2.3 was published 2026-10-28 and clears the unchanged seven-day policy. Changeset status plans only the published package patch 0.6.0 -> 0.6.1; private example versions remain 0.0.0.",
+        "Intent synchronization is current and skills-check passed. Fresh consumer-agent behavior and comparative performance were not checked."
       ]
     },
     "source:examples/tanstack-start/src/components/navigation-link.tsx": {
@@ -1614,15 +1624,20 @@
       ]
     },
     "source:examples/tanstack-start/vite.config.ts": {
-      "fingerprint": "ff1e01b28c8c50f6ec7a17b95b94d9d079b1f920a0f0f50796fa5eeb32a83f36",
+      "fingerprint": "aee9f978dfd91a1a7d77c27cf7e020cfcf266684586ad9cadb62174e36ae54d1",
       "snapshot": {
-        "examples/tanstack-start/vite.config.ts": "e88225ba2b41c412ed8cbf0c6564d67469e8e4f264071a348611e1e103dff362"
+        "examples/tanstack-start/vite.config.ts": "d3320aa0d3e4709e5335c558c26e23628253c0a83ea9bdf602d986941ddc5095"
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "head": "f2d6ccb8a1b19845205b9db3950fa6fe95ef33d9",
       "outcome": "no-change",
-      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
+      "reason": "The private Start build uses Redact with ordinary React imports and bundles the React-dependent TanStack packages. Keeping Node platform dependencies external fixes CommonJS loading in development. The examples page identifies the renderer; no new library integration guide is needed.",
       "evidence": [
-        "examples/tanstack-start/vite.config.ts diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
+        "Inspected the actual diff from origin/main e09d5b6, the contracts and handlers, both Vite configs, the Start button and stream-view changes, and all three planning records. No src/ runtime implementation or ADR changes remain in the PR.",
+        "Final Redact 0.2.3 runs passed all 80 production Chromium/Firefox cases and all 40 development Chromium cases with the existing browser assertions. Local startup checks use stdout readiness because unbound localhost URL probes hang on this host. WebKit remains unverified locally because host libraries are missing.",
+        "The native React client-navigation suite passed both cases after the final hydration safeguard. Both application production builds and typed lint/typechecking passed. Documentation checks and the 59-page build passed with valid internal links.",
+        "The existing packed compatibility results cover Effect 4.0.6/4.1.0, TypeScript 7.0.2/5.9.3, 163 runtime cases per release, and four framework consumers. No public runtime source changed in this follow-up.",
+        "Frozen installation with strict peer validation passed. Redact 0.2.3 was published 2026-10-28 and clears the unchanged seven-day policy. Changeset status plans only the published package patch 0.6.0 -> 0.6.1; private example versions remain 0.0.0.",
+        "Intent synchronization is current and skills-check passed. Fresh consumer-agent behavior and comparative performance were not checked."
       ]
     },
     "source:examples/vite-react/src/components/sections/queries-section.tsx": {
@@ -2121,15 +2136,20 @@
       ]
     },
     "source:examples/vite-react/vite.config.ts": {
-      "fingerprint": "de4597a3c678af51faca7693400d8e367ce75e7ff499124f0b0beb2b1c99fb34",
+      "fingerprint": "b4205cde1efbddae0bc4a3ef2a7a3ee44a5cb12a9f9b285c111ceae442ac5e55",
       "snapshot": {
-        "examples/vite-react/vite.config.ts": "0afbdd6e066fd55cff161668553663158e9aaa2fe0e4054eedf7e960972fceb0"
+        "examples/vite-react/vite.config.ts": "e21c849e6f9f8b2284d86b28eecd5726bbc4f119ae7a4114d4ad99002c64bafc"
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "head": "f2d6ccb8a1b19845205b9db3950fa6fe95ef33d9",
       "outcome": "no-change",
-      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
+      "reason": "The private Vite application uses the default Redact plugin without changing its generated options or React imports. Existing framework guidance remains accurate, and the examples page records the renderer choice.",
       "evidence": [
-        "examples/vite-react/vite.config.ts diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
+        "Inspected the actual diff from origin/main e09d5b6, the contracts and handlers, both Vite configs, the Start button and stream-view changes, and all three planning records. No src/ runtime implementation or ADR changes remain in the PR.",
+        "Final Redact 0.2.3 runs passed all 80 production Chromium/Firefox cases and all 40 development Chromium cases with the existing browser assertions. Local startup checks use stdout readiness because unbound localhost URL probes hang on this host. WebKit remains unverified locally because host libraries are missing.",
+        "The native React client-navigation suite passed both cases after the final hydration safeguard. Both application production builds and typed lint/typechecking passed. Documentation checks and the 59-page build passed with valid internal links.",
+        "The existing packed compatibility results cover Effect 4.0.6/4.1.0, TypeScript 7.0.2/5.9.3, 163 runtime cases per release, and four framework consumers. No public runtime source changed in this follow-up.",
+        "Frozen installation with strict peer validation passed. Redact 0.2.3 was published 2026-10-28 and clears the unchanged seven-day policy. Changeset status plans only the published package patch 0.6.0 -> 0.6.1; private example versions remain 0.0.0.",
+        "Intent synchronization is current and skills-check passed. Fresh consumer-agent behavior and comparative performance were not checked."
       ]
     },
     "source:.changeset/http-empty-success.md": {
@@ -2970,159 +2990,21 @@
         "Scoped generated changes: .changeset/fresh-ndjson-views.md."
       ]
     },
-    "source:.changeset/checked-feature-coverage.md": {
-      "fingerprint": "dd37aa688a41ee46f47fc72d980536bd8c672575382d39660604a57a176c2b2c",
-      "snapshot": {
-        ".changeset/checked-feature-coverage.md": "55170a28de91368b19c829e1704300b39598b01bb1521494fdd5ed56a2bc3fab"
-      },
-      "head": "e09d5b6ac16e290c63d752a4e8d91083a06dfcbe",
-      "outcome": "no-change",
-      "reason": ".changeset/checked-feature-coverage.md describes one shipped change in the final diff. Its consumer instructions are covered by the updated owning skill and canonical workflow/compatibility docs; no separate skill or additional guidance is needed.",
-      "evidence": [
-        "Reviewed the diff from e09d5b6, the six focused Vite screens, shared contracts/handlers, callback draining, seven changesets, the compatibility reference, and ADRs 0033/0035.",
-        "800 runtime tests passed, including 10 real HTTP workflow cases and mutation-callback disposal regression.",
-        "Packed public fixtures passed on TypeScript 7.0.2 and 5.9.3 with 163 runtime cases at each Effect 4.0.6/4.1.0; four native framework consumers passed on both compilers.",
-        "Package declaration build, attw/publint, typed lint, strict Effect diagnostics (0 errors/0 warnings), both application builds, Fallow, 21 docs excerpt tests, 59-page docs build and internal links passed.",
-        "40 Chromium and 40 Firefox cases passed; WebKit could not launch because the host lacks GTK/ICU/GStreamer libraries, so CI must supply WebKit evidence. Local startup probes were replaced with stdout readiness without changing committed browser assertions.",
-        "Frozen install and peer check passed with unchanged seven-day policy; official registry times make coordinated 4.1.0 eligible. 4.1.1/4.1.2 were not installed.",
-        "Fresh consuming-agent behavior and comparative performance were not checked. Existing ownership and full-Cause semantics remain; no runtime adapter implementation changed."
-      ]
-    },
-    "source:_artifacts/competitor-ux-research-2026-11-06.md": {
-      "fingerprint": "295a43cc604518a9de5e8c53a6643c1faf296d1024a9fc303901a03b1ab01136",
-      "snapshot": {
-        "_artifacts/competitor-ux-research-2026-11-06.md": "77de56491e9bd204397093c3bb51948214b78dbecc729399af454082944f1970"
-      },
-      "head": "e09d5b6ac16e290c63d752a4e8d91083a06dfcbe",
-      "outcome": "no-change",
-      "reason": "Internal dated primary-source comparison separates verified competitor capabilities, adapter boundaries, and proposals. It changes no shipped usage guidance or library scope; proposed work remains explicitly unimplemented.",
-      "evidence": [
-        "Inspected cited npm metadata, official tagged sources and docs, and local public exports/ADRs. Research agent completed only this note; no consuming-agent or benchmark evidence is claimed."
-      ]
-    },
-    "source:_artifacts/ux-and-dependency-audit-2026-11-06.md": {
-      "fingerprint": "b77394359f9e954e4e0bb0af19cfeda8f7d184733abb07e0ba641d15725cba8e",
-      "snapshot": {
-        "_artifacts/ux-and-dependency-audit-2026-11-06.md": "225694fc343b29739dc12018abca3125b6adc7fd2f0ef04a3a54a4c547e184bf"
-      },
-      "head": "e09d5b6ac16e290c63d752a4e8d91083a06dfcbe",
-      "outcome": "no-change",
-      "reason": "Internal audit inventories concrete runnable gaps, justifies dependency selections and held updates, and records verified checks and their limits. It preserves the existing skill boundary and explicitly distinguishes proposals from implemented changes.",
-      "evidence": [
-        "Baseline e09d5b6 (0.6.0); inspected actual dependency, documentation, harness, and test-import diffs.",
-        "Frozen installation and pnpm peers check passed; unchanged seven-day policy and Effect peer >=4.0.6 <4.1.0.",
-        "790 runtime tests; 163 packed runtime cases per Effect 4.0.6/4.0.7 and both public compilers; four packed framework consumers on TypeScript 7.0.2/5.9.3 passed.",
-        "Direct native package build, attw/publint, typed checks, strict Effect diagnostics, both application builds, Fallow, 21 docs excerpt tests, and linked 58-page docs build passed.",
-        "Vite+-supervised native tools hit host spawn EBUSY; direct equivalent commands passed without weakened configuration. Fresh consuming-agent behavior and comparative performance were not checked.",
-        "Verified example imports/shared HTTP declarations, the packed runtime selection, npm publication dates, upstream Effect/tooling release notes, and final local files."
-      ]
-    },
-    "source:.changeset/decoded-sharing-workflow.md": {
-      "fingerprint": "da05cfd30e0d4cc56e1f7ccd77d71949d28ce62564edb37562e08742421d0625",
-      "snapshot": {
-        ".changeset/decoded-sharing-workflow.md": "1fd07f55e20b0fcfeefb4fc0d66081fd0b4f50fb50f04df549bb44ee9c5ab3c8"
-      },
-      "head": "e09d5b6ac16e290c63d752a4e8d91083a06dfcbe",
-      "outcome": "no-change",
-      "reason": ".changeset/decoded-sharing-workflow.md describes one shipped change in the final diff. Its consumer instructions are covered by the updated owning skill and canonical workflow/compatibility docs; no separate skill or additional guidance is needed.",
-      "evidence": [
-        "Reviewed the diff from e09d5b6, the six focused Vite screens, shared contracts/handlers, callback draining, seven changesets, the compatibility reference, and ADRs 0033/0035.",
-        "800 runtime tests passed, including 10 real HTTP workflow cases and mutation-callback disposal regression.",
-        "Packed public fixtures passed on TypeScript 7.0.2 and 5.9.3 with 163 runtime cases at each Effect 4.0.6/4.1.0; four native framework consumers passed on both compilers.",
-        "Package declaration build, attw/publint, typed lint, strict Effect diagnostics (0 errors/0 warnings), both application builds, Fallow, 21 docs excerpt tests, 59-page docs build and internal links passed.",
-        "40 Chromium and 40 Firefox cases passed; WebKit could not launch because the host lacks GTK/ICU/GStreamer libraries, so CI must supply WebKit evidence. Local startup probes were replaced with stdout readiness without changing committed browser assertions.",
-        "Frozen install and peer check passed with unchanged seven-day policy; official registry times make coordinated 4.1.0 eligible. 4.1.1/4.1.2 were not installed.",
-        "Fresh consuming-agent behavior and comparative performance were not checked. Existing ownership and full-Cause semantics remain; no runtime adapter implementation changed."
-      ]
-    },
     "source:.changeset/effect-41-support.md": {
-      "fingerprint": "97454cf597f4aa97e2245efe3bf447ec8f16c2483978b6261067483b343a67e8",
+      "fingerprint": "308ed518601e383df873138d7bdf7ff337772a5ce042d9ceeb816805f8a6ea83",
       "snapshot": {
-        ".changeset/effect-41-support.md": "a27a3e9194e03ed5115d251c94e01e90d62defe8a60ccaa0c74e6f1b45454efc"
+        ".changeset/effect-41-support.md": "79f60a2c2733458d71d9aeb6780d726161f6fc31945c5ad74bb329bf40bd580f"
       },
-      "head": "e09d5b6ac16e290c63d752a4e8d91083a06dfcbe",
+      "head": "f2d6ccb8a1b19845205b9db3950fa6fe95ef33d9",
       "outcome": "no-change",
-      "reason": ".changeset/effect-41-support.md describes one shipped change in the final diff. Its consumer instructions are covered by the updated owning skill and canonical workflow/compatibility docs; no separate skill or additional guidance is needed.",
+      "reason": "The sole patch changeset describes the published Effect peer-range widening. Installation, compatibility, and shipped guidance already match >=4.0.6 <4.2.0, so release metadata needs no additional guidance.",
       "evidence": [
-        "Reviewed the diff from e09d5b6, the six focused Vite screens, shared contracts/handlers, callback draining, seven changesets, the compatibility reference, and ADRs 0033/0035.",
-        "800 runtime tests passed, including 10 real HTTP workflow cases and mutation-callback disposal regression.",
-        "Packed public fixtures passed on TypeScript 7.0.2 and 5.9.3 with 163 runtime cases at each Effect 4.0.6/4.1.0; four native framework consumers passed on both compilers.",
-        "Package declaration build, attw/publint, typed lint, strict Effect diagnostics (0 errors/0 warnings), both application builds, Fallow, 21 docs excerpt tests, 59-page docs build and internal links passed.",
-        "40 Chromium and 40 Firefox cases passed; WebKit could not launch because the host lacks GTK/ICU/GStreamer libraries, so CI must supply WebKit evidence. Local startup probes were replaced with stdout readiness without changing committed browser assertions.",
-        "Frozen install and peer check passed with unchanged seven-day policy; official registry times make coordinated 4.1.0 eligible. 4.1.1/4.1.2 were not installed.",
-        "Fresh consuming-agent behavior and comparative performance were not checked. Existing ownership and full-Cause semantics remain; no runtime adapter implementation changed."
-      ]
-    },
-    "source:.changeset/event-recovery-workflow.md": {
-      "fingerprint": "5b06b8dbd7ba586c590a6ca0947ff00a5dc0bb8f84061f69454590a358b49621",
-      "snapshot": {
-        ".changeset/event-recovery-workflow.md": "4aa8d7eb7b406c02e24ac5b44a157bcf027c094775c861385f6d093e986a39b6"
-      },
-      "head": "e09d5b6ac16e290c63d752a4e8d91083a06dfcbe",
-      "outcome": "no-change",
-      "reason": ".changeset/event-recovery-workflow.md describes one shipped change in the final diff. Its consumer instructions are covered by the updated owning skill and canonical workflow/compatibility docs; no separate skill or additional guidance is needed.",
-      "evidence": [
-        "Reviewed the diff from e09d5b6, the six focused Vite screens, shared contracts/handlers, callback draining, seven changesets, the compatibility reference, and ADRs 0033/0035.",
-        "800 runtime tests passed, including 10 real HTTP workflow cases and mutation-callback disposal regression.",
-        "Packed public fixtures passed on TypeScript 7.0.2 and 5.9.3 with 163 runtime cases at each Effect 4.0.6/4.1.0; four native framework consumers passed on both compilers.",
-        "Package declaration build, attw/publint, typed lint, strict Effect diagnostics (0 errors/0 warnings), both application builds, Fallow, 21 docs excerpt tests, 59-page docs build and internal links passed.",
-        "40 Chromium and 40 Firefox cases passed; WebKit could not launch because the host lacks GTK/ICU/GStreamer libraries, so CI must supply WebKit evidence. Local startup probes were replaced with stdout readiness without changing committed browser assertions.",
-        "Frozen install and peer check passed with unchanged seven-day policy; official registry times make coordinated 4.1.0 eligible. 4.1.1/4.1.2 were not installed.",
-        "Fresh consuming-agent behavior and comparative performance were not checked. Existing ownership and full-Cause semantics remain; no runtime adapter implementation changed."
-      ]
-    },
-    "source:.changeset/http-metadata-workflow.md": {
-      "fingerprint": "a1f4165d165a1d5ce99a2f81edcbfb2c2242853968a5e3326a15ef9e185d33a8",
-      "snapshot": {
-        ".changeset/http-metadata-workflow.md": "5ef87129b9896dd47b32eefd2d7754d9a711d5a974c2cc1e825f290b74fd86b4"
-      },
-      "head": "e09d5b6ac16e290c63d752a4e8d91083a06dfcbe",
-      "outcome": "no-change",
-      "reason": ".changeset/http-metadata-workflow.md describes one shipped change in the final diff. Its consumer instructions are covered by the updated owning skill and canonical workflow/compatibility docs; no separate skill or additional guidance is needed.",
-      "evidence": [
-        "Reviewed the diff from e09d5b6, the six focused Vite screens, shared contracts/handlers, callback draining, seven changesets, the compatibility reference, and ADRs 0033/0035.",
-        "800 runtime tests passed, including 10 real HTTP workflow cases and mutation-callback disposal regression.",
-        "Packed public fixtures passed on TypeScript 7.0.2 and 5.9.3 with 163 runtime cases at each Effect 4.0.6/4.1.0; four native framework consumers passed on both compilers.",
-        "Package declaration build, attw/publint, typed lint, strict Effect diagnostics (0 errors/0 warnings), both application builds, Fallow, 21 docs excerpt tests, 59-page docs build and internal links passed.",
-        "40 Chromium and 40 Firefox cases passed; WebKit could not launch because the host lacks GTK/ICU/GStreamer libraries, so CI must supply WebKit evidence. Local startup probes were replaced with stdout readiness without changing committed browser assertions.",
-        "Frozen install and peer check passed with unchanged seven-day policy; official registry times make coordinated 4.1.0 eligible. 4.1.1/4.1.2 were not installed.",
-        "Fresh consuming-agent behavior and comparative performance were not checked. Existing ownership and full-Cause semantics remain; no runtime adapter implementation changed."
-      ]
-    },
-    "source:.changeset/http-stream-workflows.md": {
-      "fingerprint": "4e757f793390fbb368f99bd5f4ec8f9504cc4fc957dc00f90f62dbfb05829035",
-      "snapshot": {
-        ".changeset/http-stream-workflows.md": "e86cd8c594a7d034ad16b9c244a53454a7400b340d6f3cd3f6de0b4f2703e847"
-      },
-      "head": "e09d5b6ac16e290c63d752a4e8d91083a06dfcbe",
-      "outcome": "no-change",
-      "reason": ".changeset/http-stream-workflows.md describes one shipped change in the final diff. Its consumer instructions are covered by the updated owning skill and canonical workflow/compatibility docs; no separate skill or additional guidance is needed.",
-      "evidence": [
-        "Reviewed the diff from e09d5b6, the six focused Vite screens, shared contracts/handlers, callback draining, seven changesets, the compatibility reference, and ADRs 0033/0035.",
-        "800 runtime tests passed, including 10 real HTTP workflow cases and mutation-callback disposal regression.",
-        "Packed public fixtures passed on TypeScript 7.0.2 and 5.9.3 with 163 runtime cases at each Effect 4.0.6/4.1.0; four native framework consumers passed on both compilers.",
-        "Package declaration build, attw/publint, typed lint, strict Effect diagnostics (0 errors/0 warnings), both application builds, Fallow, 21 docs excerpt tests, 59-page docs build and internal links passed.",
-        "40 Chromium and 40 Firefox cases passed; WebKit could not launch because the host lacks GTK/ICU/GStreamer libraries, so CI must supply WebKit evidence. Local startup probes were replaced with stdout readiness without changing committed browser assertions.",
-        "Frozen install and peer check passed with unchanged seven-day policy; official registry times make coordinated 4.1.0 eligible. 4.1.1/4.1.2 were not installed.",
-        "Fresh consuming-agent behavior and comparative performance were not checked. Existing ownership and full-Cause semantics remain; no runtime adapter implementation changed."
-      ]
-    },
-    "source:.changeset/multipart-upload-workflow.md": {
-      "fingerprint": "bfe62f73676de1089ac691756c5cba7cd9fa777a875c7b602619ec629be7613e",
-      "snapshot": {
-        ".changeset/multipart-upload-workflow.md": "54f7933cb7d89fe25988ef20aa01292dec46dce7397e9d4c45021a5332f55408"
-      },
-      "head": "e09d5b6ac16e290c63d752a4e8d91083a06dfcbe",
-      "outcome": "no-change",
-      "reason": ".changeset/multipart-upload-workflow.md describes one shipped change in the final diff. Its consumer instructions are covered by the updated owning skill and canonical workflow/compatibility docs; no separate skill or additional guidance is needed.",
-      "evidence": [
-        "Reviewed the diff from e09d5b6, the six focused Vite screens, shared contracts/handlers, callback draining, seven changesets, the compatibility reference, and ADRs 0033/0035.",
-        "800 runtime tests passed, including 10 real HTTP workflow cases and mutation-callback disposal regression.",
-        "Packed public fixtures passed on TypeScript 7.0.2 and 5.9.3 with 163 runtime cases at each Effect 4.0.6/4.1.0; four native framework consumers passed on both compilers.",
-        "Package declaration build, attw/publint, typed lint, strict Effect diagnostics (0 errors/0 warnings), both application builds, Fallow, 21 docs excerpt tests, 59-page docs build and internal links passed.",
-        "40 Chromium and 40 Firefox cases passed; WebKit could not launch because the host lacks GTK/ICU/GStreamer libraries, so CI must supply WebKit evidence. Local startup probes were replaced with stdout readiness without changing committed browser assertions.",
-        "Frozen install and peer check passed with unchanged seven-day policy; official registry times make coordinated 4.1.0 eligible. 4.1.1/4.1.2 were not installed.",
-        "Fresh consuming-agent behavior and comparative performance were not checked. Existing ownership and full-Cause semantics remain; no runtime adapter implementation changed."
+        "Inspected the actual diff from origin/main e09d5b6, the contracts and handlers, both Vite configs, the Start button and stream-view changes, and all three planning records. No src/ runtime implementation or ADR changes remain in the PR.",
+        "Final Redact 0.2.3 runs passed all 80 production Chromium/Firefox cases and all 40 development Chromium cases with the existing browser assertions. Local startup checks use stdout readiness because unbound localhost URL probes hang on this host. WebKit remains unverified locally because host libraries are missing.",
+        "The native React client-navigation suite passed both cases after the final hydration safeguard. Both application production builds and typed lint/typechecking passed. Documentation checks and the 59-page build passed with valid internal links.",
+        "The existing packed compatibility results cover Effect 4.0.6/4.1.0, TypeScript 7.0.2/5.9.3, 163 runtime cases per release, and four framework consumers. No public runtime source changed in this follow-up.",
+        "Frozen installation with strict peer validation passed. Redact 0.2.3 was published 2026-10-28 and clears the unchanged seven-day policy. Changeset status plans only the published package patch 0.6.0 -> 0.6.1; private example versions remain 0.0.0.",
+        "Intent synchronization is current and skills-check passed. Fresh consumer-agent behavior and comparative performance were not checked."
       ]
     }
   }

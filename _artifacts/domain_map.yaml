@@ -174,7 +174,7 @@ skills:
         mechanism: Development uses a coordinated current release while consumers can retain the supported floor within the reviewed minor range.
         wrong_pattern: Require every consumer to upgrade whenever the development catalog changes.
         correct_pattern: Read the published peer range, coordinate Effect integrations, and check the floor/current pair; raise the minimum only for required APIs, type contracts, or correctness fixes.
-        source: docs/adr/0035-extend-reviewed-effect-support-through-41.md
+        source: apps/docs/src/content/docs/getting-started/compatibility-and-stability.md
         priority: HIGH
         status: active
       - mistake: Rely on changed metadata options after a fresh hit
@@ -230,8 +230,4 @@ tensions:
     description: Shared endpoint-aware defaults reduce repetition while selected data and optimistic context depend on each invocation.
     implication: Configure utilities once per owner. Use leaf scopes for typed callbacks; shared tree and branch callbacks receive unknown contract values. Keep projections, seeds, identity, and optimistic context at the call site. Choose callback composition explicitly and preserve native execution attempts.
 cross_references: []
-gaps:
-  - skill: effect-api-query
-    question: Which advanced workflows should gain dedicated runnable demonstrations?
-    context: Focused Vite screens now cover HTTP SSE/NDJSON, metadata, uploads, configuration, prepared inputs, projected filters, recovery, and decoded sharing. WebSocket ownership intentionally remains a guide and native transport-test workflow.
-    status: resolved
+gaps: []

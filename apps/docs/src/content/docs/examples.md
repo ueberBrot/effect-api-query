@@ -10,31 +10,9 @@ The repository includes two complete applications. Each has separate RPC and HTT
 | [Vite React](https://github.com/ueberBrot/effect-api-query/tree/main/examples/vite-react) | RPC queries and streams beside buffered HTTP reads, writes, pagination, failures, and cancellation | Standalone server on port `3001`, proxied by Vite | `http://127.0.0.1:5173` |
 | [TanStack Start](https://github.com/ueberBrot/effect-api-query/tree/main/examples/tanstack-start) | RPC and HTTP loaders, server rendering, hydration, navigation, mutations, and cancellation | Same-origin `/rpc` and `/api/$` server routes | `http://127.0.0.1:3000` |
 
-The [focused HTTP workflows](/effect-api-query/examples/http-workflows/) add a smaller first integration, SSE/NDJSON delivery, metadata and ETag writes, multipart upload, decoded-value sharing, and event recovery. Use the Vite application navigation to open each screen.
+Both apps use [TanStack Redact](https://tanstack.com/redact) in development and production, with standard React imports.
 
-## Feature coverage
-
-The runnable applications demonstrate the core workflows. The focused screens extend the directory examples. WebSocket ownership remains a checked guide and transport-test workflow:
-
-| Workflow | Runnable application or checked recipe |
-| --- | --- |
-| Buffered RPC and HTTP queries, conditional reads, pages, mutations, failures, and cancellation | Both applications |
-| Accumulated RPC history, bounded retention, and latest-value queries | Both applications |
-| Optimistic writes across RPC and HTTP caches, persistence, and cache-owner replacement | Vite React; [Optimistic Writes](/effect-api-query/guides/optimistic-writes/) |
-| Request-local caches, typed hydration registration, and stream snapshots | TanStack Start; [Hydrate Query Views](/effect-api-query/guides/hydrate-query-views/) |
-| HTTP SSE and NDJSON query views | Vite HTTP streaming screen; [Streaming](/effect-api-query/guides/streaming/) |
-| HTTP response metadata and ETag writes | Vite metadata screen; [HTTP Metadata](/effect-api-query/guides/http-metadata/) |
-| Multipart uploads | Vite upload screen; [HTTP Queries and Mutations](/effect-api-query/guides/http-queries-and-mutations/#upload-a-file) |
-| Shared policies and execution interceptors | Vite HTTP workflow setup; [Query Defaults](/effect-api-query/guides/query-defaults/) |
-| Partial filters and branch-view filters | Vite sharing and metadata screens; [Cache Filters](/effect-api-query/guides/cache-filters/) |
-| Prepared inputs | Vite sharing screen; [Performance and Bundling](/effect-api-query/reference/performance/) |
-| Tagged declared-error lookup | Vite metadata screen; [Handle Failures](/effect-api-query/guides/handle-failures/) |
-| Publication batches, deadlines, and uncached event consumption | Vite streaming and event screens; [Choose Stream History](/effect-api-query/guides/choose-stream-history/) |
-| Cursor recovery, replay expiry, and gap refresh | Vite event screen; [Reconnect Streams](/effect-api-query/guides/reconnect-streams/) |
-| Schema-defined sharing of rich decoded values | Vite sharing screen; [Share Decoded Values](/effect-api-query/guides/share-decoded-values/) |
-| WebSocket client ownership | [WebSocket Clients](/effect-api-query/guides/websocket-clients/) |
-
-The [feature support reference](/effect-api-query/getting-started/feature-support/) lists supported contracts and exclusions. Guide recipes and compiler fixtures establish different evidence from a complete running application.
+For smaller examples of reads and writes, metadata, streams, uploads, sharing, and recovery, use the [HTTP workflows](/effect-api-query/examples/http-workflows/).
 
 ## Set up locally
 

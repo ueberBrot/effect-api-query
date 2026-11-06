@@ -71,7 +71,7 @@ For ordinary Query hooks and observers, removing the last observer cancels abort
 
 ## Mount a provider and recover Suspense
 
-For a runnable HTTP read/write owner and focused streams, uploads, errors, sharing, or recovery, use [HTTP Workflows](https://ueberbrot.github.io/effect-api-query/examples/http-workflows/). Its application tracks complete execution attempts and drains them before runtime disposal.
+For runnable HTTP setup, streams, uploads, typed errors, sharing, and recovery, use [HTTP Workflows](https://ueberbrot.github.io/effect-api-query/examples/http-workflows/).
 
 For a first React integration, acquire one client. Create the utility tree and QueryClient once, then mount `QueryClientProvider`. Before disposing the application's client resources, unmount consumers. For one acquired HTTP client, one component, and an awaited cleanup function, use [the React client setup](https://ueberbrot.github.io/effect-api-query/guides/react-query/#acquire-and-mount-the-client).
 

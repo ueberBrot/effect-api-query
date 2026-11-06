@@ -1,6 +1,6 @@
 # Bound Effect support to a patch line
 
-Status: Accepted. Amended by [ADR 0035](0035-extend-reviewed-effect-support-through-41.md) for the reviewed Effect 4.1 range. Supersedes the exact-peer policy in [ADR 0001](0001-target-effect-4-release-candidate.md) and amends the peer constraint in [ADR 0025](0025-use-public-decoded-message-clients-for-server-local-rpc.md). ADR 0025's lifecycle and authority decision remains accepted.
+Status: Accepted. Supersedes the exact-peer policy in [ADR 0001](0001-target-effect-4-release-candidate.md) and amends the peer constraint in [ADR 0025](0025-use-public-decoded-message-clients-for-server-local-rpc.md). ADR 0025's lifecycle and authority decision remains accepted.
 
 ## Context
 
