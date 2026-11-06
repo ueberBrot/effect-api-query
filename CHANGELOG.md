@@ -1,5 +1,11 @@
 # effect-api-query
 
+## 0.6.1
+
+### Patch Changes
+
+- [#164](https://github.com/ueberBrot/effect-api-query/pull/164) [`56d6476`](https://github.com/ueberBrot/effect-api-query/commit/56d6476c6d69c35c371df6928ddeafa03f0649fe) - Support Effect 4.1 while retaining the 4.0.6 minimum. The Effect peer range is now `>=4.0.6 <4.2.0`.
+
 ## 0.6.0
 
 ### Minor Changes

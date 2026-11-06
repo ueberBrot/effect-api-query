@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "65ef4b150a4d0d362f407e6310721bab13d1e45c396c29e777e58884c18e6f39",
+      "fingerprint": "04e73b692edd720d1bbda0dc37acdd01f0d9f8b72ebb8f38b060f96993c861b6",
       "snapshot": {
         "GLOSSARY.md": "294f016460f575c7ee634a33c7b45c825f67a0501c31d42a5c42d681bacebd83",
         "README.md": "9cc3275039f58de12efe6a19ea5ec5e23a56126cfeb81cf35480ae5ac147f1da",
@@ -160,7 +160,7 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "3be2ea939718e59014c1ca06695bc66f0d570a1e909729c81e321c18af9dbcdb",
+        "package.json": "41133cf78a738b59157aeb778775619e02952fbf66a947445bfc5c211d11d1c2",
         "pnpm-workspace.yaml": "a3f5d6cc5e21a4a8c01fe3e06ae01792a9de038c10d5d379e970485d69fab462",
         "scripts/check-effect-compatibility.mts": "bf33fb74595e05c889d7b17aa3cbbe9bd72752e43f2db3fe3f21ea9841ea314b",
         "scripts/check-framework-consumers.mts": "37fc0fc0006c2b1f35c5cff85754612e0b74d89eed608e353ef5f18f05fce051",
@@ -328,17 +328,18 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "369a06679f47de44d02da13fa2ab445c44aa771a",
+      "head": "56d6476c6d69c35c371df6928ddeafa03f0649fe",
       "outcome": "no-change",
-      "reason": "Remove the alternate-renderer sentence from the examples page. The existing skill and framework reference already describe ordinary React imports, native Query hooks, and application-owned clients; no shipped skill content or version change is needed.",
+      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
       "evidence": [
-        "Compared both application manifests, Vite configs, the Start action button and stream page, and pnpm-lock.yaml with pre-trial f2d6ccb: they are identical. No Redact dependency or plugin remains in source or lockfiles.",
-        "Both production builds, typed lint/typechecking, documentation checks and the 59-page linked docs build pass. All 80 production Chromium/Firefox cases pass with standard React.",
-        "The Effect peer range and its single patch changeset are unchanged. Fresh consumer-agent behavior and comparative performance remain unverified."
+        "Before versioning: intent maintainer check passed at 56d6476c6d69c35c371df6928ddeafa03f0649fe.",
+        "changeset version and vp fmt generated 0.6.0 -> 0.6.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: package.json."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "2ddf3639a858ae4d23c5e184891b17b362a1864824d64520404a8654c9f8209f",
+      "fingerprint": "3e0d5356e059bd79e237edae72169a8cd4881de2d4d1b6df2286dd5cc30a61c5",
       "snapshot": {
         "GLOSSARY.md": "294f016460f575c7ee634a33c7b45c825f67a0501c31d42a5c42d681bacebd83",
         "README.md": "9cc3275039f58de12efe6a19ea5ec5e23a56126cfeb81cf35480ae5ac147f1da",
@@ -498,7 +499,7 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "3be2ea939718e59014c1ca06695bc66f0d570a1e909729c81e321c18af9dbcdb",
+        "package.json": "41133cf78a738b59157aeb778775619e02952fbf66a947445bfc5c211d11d1c2",
         "pnpm-workspace.yaml": "a3f5d6cc5e21a4a8c01fe3e06ae01792a9de038c10d5d379e970485d69fab462",
         "scripts/check-effect-compatibility.mts": "bf33fb74595e05c889d7b17aa3cbbe9bd72752e43f2db3fe3f21ea9841ea314b",
         "scripts/check-framework-consumers.mts": "37fc0fc0006c2b1f35c5cff85754612e0b74d89eed608e353ef5f18f05fce051",
@@ -666,13 +667,14 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "369a06679f47de44d02da13fa2ab445c44aa771a",
-      "outcome": "updated",
-      "reason": "Record the decision to keep standard React after a trial with no measured development-speed benefit. Remove trial-only runtime/configuration claims and retain the focused examples and one published Effect compatibility patch. Domain coverage and tree source mappings remain accurate without edits; prior batch history and future work are preserved.",
+      "head": "56d6476c6d69c35c371df6928ddeafa03f0649fe",
+      "outcome": "no-change",
+      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
       "evidence": [
-        "Reviewed _artifacts/domain_map.yaml, _artifacts/skill_spec.md, and _artifacts/skill_tree.yaml. Only the current batch decision and validation evidence need updating.",
-        "Scoped restoration matches pre-trial f2d6ccb exactly. Restored baseline review records for the four unchanged application files; left unrelated review records intact.",
-        "Standard React passes 80 production Chromium/Firefox cases. Both builds, typed checks, documentation/internal links, frozen installation with strict peers, and git diff --check pass. Intent synchronization is current. WebKit still needs CI on the updated head."
+        "Before versioning: intent maintainer check passed at 56d6476c6d69c35c371df6928ddeafa03f0649fe.",
+        "changeset version and vp fmt generated 0.6.0 -> 0.6.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: package.json."
       ]
     },
     "source:vite.config.ts": {
@@ -1770,16 +1772,16 @@
       ]
     },
     "source:CHANGELOG.md": {
-      "fingerprint": "2f977f80336fbca9c078294f0e57147ee55c905fdcb498588cf02b55f90a0707",
+      "fingerprint": "77559724d93c124bcd05fb88cda744ea8e2829f4f1a9bc98fd0eebf8aa970edb",
       "snapshot": {
-        "CHANGELOG.md": "916c8251b690a77deec0951ac51683d2ce7aba352181933aac222389404a5dcd"
+        "CHANGELOG.md": "16fea9e8bbb5654c88625d3bce1f560fd22ad41a8569332b5d0187927119c424"
       },
-      "head": "260fa5164f18a2aae3577a121518095a78bb371b",
+      "head": "56d6476c6d69c35c371df6928ddeafa03f0649fe",
       "outcome": "no-change",
       "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Before versioning: intent maintainer check passed at 260fa5164f18a2aae3577a121518095a78bb371b.",
-        "changeset version and vp fmt generated 0.5.0 -> 0.6.0.",
+        "Before versioning: intent maintainer check passed at 56d6476c6d69c35c371df6928ddeafa03f0649fe.",
+        "changeset version and vp fmt generated 0.6.0 -> 0.6.1.",
         "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
         "Scoped generated changes: CHANGELOG.md."
       ]
@@ -2965,20 +2967,18 @@
       ]
     },
     "source:.changeset/effect-41-support.md": {
-      "fingerprint": "308ed518601e383df873138d7bdf7ff337772a5ce042d9ceeb816805f8a6ea83",
+      "fingerprint": "f38753fda00eccbc2b96e43773ab2009f2ec9a13c699b04b7d2c8b5dbbadfd6f",
       "snapshot": {
-        ".changeset/effect-41-support.md": "79f60a2c2733458d71d9aeb6780d726161f6fc31945c5ad74bb329bf40bd580f"
+        ".changeset/effect-41-support.md": null
       },
-      "head": "f2d6ccb8a1b19845205b9db3950fa6fe95ef33d9",
+      "head": "56d6476c6d69c35c371df6928ddeafa03f0649fe",
       "outcome": "no-change",
-      "reason": "The sole patch changeset describes the published Effect peer-range widening. Installation, compatibility, and shipped guidance already match >=4.0.6 <4.2.0, so release metadata needs no additional guidance.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Inspected the actual diff from origin/main e09d5b6, the contracts and handlers, both Vite configs, the Start button and stream-view changes, and all three planning records. No src/ runtime implementation or ADR changes remain in the PR.",
-        "Final Redact 0.2.3 runs passed all 80 production Chromium/Firefox cases and all 40 development Chromium cases with the existing browser assertions. Local startup checks use stdout readiness because unbound localhost URL probes hang on this host. WebKit remains unverified locally because host libraries are missing.",
-        "The native React client-navigation suite passed both cases after the final hydration safeguard. Both application production builds and typed lint/typechecking passed. Documentation checks and the 59-page build passed with valid internal links.",
-        "The existing packed compatibility results cover Effect 4.0.6/4.1.0, TypeScript 7.0.2/5.9.3, 163 runtime cases per release, and four framework consumers. No public runtime source changed in this follow-up.",
-        "Frozen installation with strict peer validation passed. Redact 0.2.3 was published 2026-10-28 and clears the unchanged seven-day policy. Changeset status plans only the published package patch 0.6.0 -> 0.6.1; private example versions remain 0.0.0.",
-        "Intent synchronization is current and skills-check passed. Fresh consumer-agent behavior and comparative performance were not checked."
+        "Before versioning: intent maintainer check passed at 56d6476c6d69c35c371df6928ddeafa03f0649fe.",
+        "changeset version and vp fmt generated 0.6.0 -> 0.6.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/effect-41-support.md."
       ]
     }
   }
