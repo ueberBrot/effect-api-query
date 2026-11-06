@@ -1,5 +1,3 @@
-import { constVoid } from "effect/Function";
-import { useSyncExternalStore } from "react";
 import type { ButtonHTMLAttributes } from "react";
 
 export interface ActionButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -15,33 +13,24 @@ const variants = {
     "border-brand-800 bg-background text-brand-200 hover:bg-brand-950/70",
 } as const;
 
-const subscribe = () => constVoid;
-const clientReady = () => true;
-const serverReady = () => false;
-
 export const ActionButton = ({
   className,
-  disabled = false,
   variant = "primary",
   type = "button",
   ...props
-}: ActionButtonProps) => {
-  const ready = useSyncExternalStore(subscribe, clientReady, serverReady);
-  return (
-    <button
-      // oxlint-disable-next-line react/button-has-type
-      type={type}
-      className={[
-        "rounded-sm border px-4 py-2 text-sm font-bold transition-colors",
-        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-400",
-        "disabled:cursor-not-allowed disabled:opacity-50",
-        variants[variant],
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
-      {...props}
-      disabled={!ready || disabled}
-    />
-  );
-};
+}: ActionButtonProps) => (
+  <button
+    // oxlint-disable-next-line react/button-has-type
+    type={type}
+    className={[
+      "rounded-sm border px-4 py-2 text-sm font-bold transition-colors",
+      "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-400",
+      "disabled:cursor-not-allowed disabled:opacity-50",
+      variants[variant],
+      className,
+    ]
+      .filter(Boolean)
+      .join(" ")}
+    {...props}
+  />
+);

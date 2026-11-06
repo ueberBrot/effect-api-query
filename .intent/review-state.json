@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "c019bb7dcc71210db697dd6ecadf7fcbc76090ee292970f342195ede1f5855c9",
+      "fingerprint": "65ef4b150a4d0d362f407e6310721bab13d1e45c396c29e777e58884c18e6f39",
       "snapshot": {
         "GLOSSARY.md": "294f016460f575c7ee634a33c7b45c825f67a0501c31d42a5c42d681bacebd83",
         "README.md": "9cc3275039f58de12efe6a19ea5ec5e23a56126cfeb81cf35480ae5ac147f1da",
@@ -13,7 +13,7 @@
         "apps/docs/src/content/docs/concepts/queries-and-mutations.md": "e50098de81ed28be976a4c5e1224f61dc116f022dd50d553835e2775f0b63882",
         "apps/docs/src/content/docs/concepts/rpc-utility-tree.md": "5d9f0d254d1df588c2df70bc568ba430ae8db8dc22a47688835e74ce27fc1ca0",
         "apps/docs/src/content/docs/concepts/semantic-keys.md": "715b4e3103fa971748b45c5c8086e1ea4b95980dff0a69ee122635ed5fc998d2",
-        "apps/docs/src/content/docs/examples.md": "31a8c5d3f923b87552f48d7dab569e71fb656f6012df9232578f1a387f4267bd",
+        "apps/docs/src/content/docs/examples.md": "08c014b01c49123ee871ddb7427d69b4dcf1791fa907ba2fe535ebf6c522d282",
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "022014147e137abdac686d6d3c58f4eff1e8098dd2241a3cccd96abe5051cd26",
         "apps/docs/src/content/docs/examples/http-workflows.md": "f7b41e1e63fda1e4c44e0886b29f5c796f3f51e1b3bf227947423194f6cc39b0",
         "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "9bc41621f29a48badc7b26eb287d1f3071ce8cca86697fc80099301f4a6029df",
@@ -328,25 +328,22 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "f2d6ccb8a1b19845205b9db3950fa6fe95ef33d9",
-      "outcome": "updated",
-      "reason": "Keep the existing skill and six references. Shorten its runnable-workflow pointer and retain the reviewed Effect range. The focused example guide still covers setup, workflows, and ownership constraints; renderer selection belongs to the private applications.",
+      "head": "369a06679f47de44d02da13fa2ab445c44aa771a",
+      "outcome": "no-change",
+      "reason": "Remove the alternate-renderer sentence from the examples page. The existing skill and framework reference already describe ordinary React imports, native Query hooks, and application-owned clients; no shipped skill content or version change is needed.",
       "evidence": [
-        "Inspected the actual diff from origin/main e09d5b6, the contracts and handlers, both Vite configs, the Start button and stream-view changes, and all three planning records. No src/ runtime implementation or ADR changes remain in the PR.",
-        "Final Redact 0.2.3 runs passed all 80 production Chromium/Firefox cases and all 40 development Chromium cases with the existing browser assertions. Local startup checks use stdout readiness because unbound localhost URL probes hang on this host. WebKit remains unverified locally because host libraries are missing.",
-        "The native React client-navigation suite passed both cases after the final hydration safeguard. Both application production builds and typed lint/typechecking passed. Documentation checks and the 59-page build passed with valid internal links.",
-        "The existing packed compatibility results cover Effect 4.0.6/4.1.0, TypeScript 7.0.2/5.9.3, 163 runtime cases per release, and four framework consumers. No public runtime source changed in this follow-up.",
-        "Frozen installation with strict peer validation passed. Redact 0.2.3 was published 2026-10-28 and clears the unchanged seven-day policy. Changeset status plans only the published package patch 0.6.0 -> 0.6.1; private example versions remain 0.0.0.",
-        "Intent synchronization is current and skills-check passed. Fresh consumer-agent behavior and comparative performance were not checked."
+        "Compared both application manifests, Vite configs, the Start action button and stream page, and pnpm-lock.yaml with pre-trial f2d6ccb: they are identical. No Redact dependency or plugin remains in source or lockfiles.",
+        "Both production builds, typed lint/typechecking, documentation checks and the 59-page linked docs build pass. All 80 production Chromium/Firefox cases pass with standard React.",
+        "The Effect peer range and its single patch changeset are unchanged. Fresh consumer-agent behavior and comparative performance remain unverified."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "9336bf8139ee9a052f3f3167279d8cf89c5eab7fecfd69922de584b66971e2d7",
+      "fingerprint": "2ddf3639a858ae4d23c5e184891b17b362a1864824d64520404a8654c9f8209f",
       "snapshot": {
         "GLOSSARY.md": "294f016460f575c7ee634a33c7b45c825f67a0501c31d42a5c42d681bacebd83",
         "README.md": "9cc3275039f58de12efe6a19ea5ec5e23a56126cfeb81cf35480ae5ac147f1da",
         "_artifacts/domain_map.yaml": "70f88c23e1d93ee73320f12b53221b406fcca8a3c2cd5559a5aecec7f01af912",
-        "_artifacts/skill_spec.md": "908eb22c616ec670129b4fa8d9a91c7382c85f1f3e8c9807799aa4c9041cf9f5",
+        "_artifacts/skill_spec.md": "8660e97375e7a12314db1ad515947f46397a1153460a16e74f77c73d64a9c659",
         "_artifacts/skill_tree.yaml": "ce59cb7d97ff4f1cc36c4723ef889ccb37a96c24ed31a084be3a9fea620be07a",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "8cf2b005fd05a799118c262ecda121c4468cc023b5a666b7f46501e49f1b3099",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "a5447c052af2b2bbe119fd5ff2eab8d616016fe9e703a35718fd5b568f246329",
@@ -354,7 +351,7 @@
         "apps/docs/src/content/docs/concepts/queries-and-mutations.md": "e50098de81ed28be976a4c5e1224f61dc116f022dd50d553835e2775f0b63882",
         "apps/docs/src/content/docs/concepts/rpc-utility-tree.md": "5d9f0d254d1df588c2df70bc568ba430ae8db8dc22a47688835e74ce27fc1ca0",
         "apps/docs/src/content/docs/concepts/semantic-keys.md": "715b4e3103fa971748b45c5c8086e1ea4b95980dff0a69ee122635ed5fc998d2",
-        "apps/docs/src/content/docs/examples.md": "31a8c5d3f923b87552f48d7dab569e71fb656f6012df9232578f1a387f4267bd",
+        "apps/docs/src/content/docs/examples.md": "08c014b01c49123ee871ddb7427d69b4dcf1791fa907ba2fe535ebf6c522d282",
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "022014147e137abdac686d6d3c58f4eff1e8098dd2241a3cccd96abe5051cd26",
         "apps/docs/src/content/docs/examples/http-workflows.md": "f7b41e1e63fda1e4c44e0886b29f5c796f3f51e1b3bf227947423194f6cc39b0",
         "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "9bc41621f29a48badc7b26eb287d1f3071ce8cca86697fc80099301f4a6029df",
@@ -669,16 +666,13 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "f2d6ccb8a1b19845205b9db3950fa6fe95ef33d9",
+      "head": "369a06679f47de44d02da13fa2ab445c44aa771a",
       "outcome": "updated",
-      "reason": "Condense this branch’s batch history, retain earlier history, point the dependency failure mode to the existing compatibility guide, and preserve skill identities, prerequisites, and workflow source mappings. Remove the temporary reports and support-range ADR. Record Redact validation and one patch changeset for published Effect compatibility; private examples, documentation, and tooling have no release entries.",
+      "reason": "Record the decision to keep standard React after a trial with no measured development-speed benefit. Remove trial-only runtime/configuration claims and retain the focused examples and one published Effect compatibility patch. Domain coverage and tree source mappings remain accurate without edits; prior batch history and future work are preserved.",
       "evidence": [
-        "Inspected the actual diff from origin/main e09d5b6, the contracts and handlers, both Vite configs, the Start button and stream-view changes, and all three planning records. No src/ runtime implementation or ADR changes remain in the PR.",
-        "Final Redact 0.2.3 runs passed all 80 production Chromium/Firefox cases and all 40 development Chromium cases with the existing browser assertions. Local startup checks use stdout readiness because unbound localhost URL probes hang on this host. WebKit remains unverified locally because host libraries are missing.",
-        "The native React client-navigation suite passed both cases after the final hydration safeguard. Both application production builds and typed lint/typechecking passed. Documentation checks and the 59-page build passed with valid internal links.",
-        "The existing packed compatibility results cover Effect 4.0.6/4.1.0, TypeScript 7.0.2/5.9.3, 163 runtime cases per release, and four framework consumers. No public runtime source changed in this follow-up.",
-        "Frozen installation with strict peer validation passed. Redact 0.2.3 was published 2026-10-28 and clears the unchanged seven-day policy. Changeset status plans only the published package patch 0.6.0 -> 0.6.1; private example versions remain 0.0.0.",
-        "Intent synchronization is current and skills-check passed. Fresh consumer-agent behavior and comparative performance were not checked."
+        "Reviewed _artifacts/domain_map.yaml, _artifacts/skill_spec.md, and _artifacts/skill_tree.yaml. Only the current batch decision and validation evidence need updating.",
+        "Scoped restoration matches pre-trial f2d6ccb exactly. Restored baseline review records for the four unchanged application files; left unrelated review records intact.",
+        "Standard React passes 80 production Chromium/Firefox cases. Both builds, typed checks, documentation/internal links, frozen installation with strict peers, and git diff --check pass. Intent synchronization is current. WebKit still needs CI on the updated head."
       ]
     },
     "source:vite.config.ts": {
@@ -1282,20 +1276,15 @@
       ]
     },
     "source:examples/tanstack-start/src/routes/index.tsx": {
-      "fingerprint": "4eec00581de4be5a3ba82b42a0d62793392a72f660067a10153b9eb527d53516",
+      "fingerprint": "4c6a4e6991f6d4a7079f7c9ac09993d1e7074c14c803a18ae9d106a1ac629c6a",
       "snapshot": {
-        "examples/tanstack-start/src/routes/index.tsx": "3a1ce31344a1c9750f85027b670fa4dcb99b107f6e4d7c1fe0d22995fa18caa1"
+        "examples/tanstack-start/src/routes/index.tsx": "58557e15457f5d08b0a507cd5cf40d90dd1ddf193c769823e7e52ff556de0c6f"
       },
-      "head": "f2d6ccb8a1b19845205b9db3950fa6fe95ef33d9",
+      "head": "86365084f08c30a0dc1211ad450412195060de5c",
       "outcome": "no-change",
-      "reason": "Switch the Suspense stream view inside a native transition so the current screen survives loading. The existing native Suspense guidance remains accurate; generated stream keys, retention, and execution semantics are unchanged.",
+      "reason": "The example now explicitly retains unbounded stream history, matching the revised retention guidance. Its application workflow and ownership remain unchanged.",
       "evidence": [
-        "Inspected the actual diff from origin/main e09d5b6, the contracts and handlers, both Vite configs, the Start button and stream-view changes, and all three planning records. No src/ runtime implementation or ADR changes remain in the PR.",
-        "Final Redact 0.2.3 runs passed all 80 production Chromium/Firefox cases and all 40 development Chromium cases with the existing browser assertions. Local startup checks use stdout readiness because unbound localhost URL probes hang on this host. WebKit remains unverified locally because host libraries are missing.",
-        "The native React client-navigation suite passed both cases after the final hydration safeguard. Both application production builds and typed lint/typechecking passed. Documentation checks and the 59-page build passed with valid internal links.",
-        "The existing packed compatibility results cover Effect 4.0.6/4.1.0, TypeScript 7.0.2/5.9.3, 163 runtime cases per release, and four framework consumers. No public runtime source changed in this follow-up.",
-        "Frozen installation with strict peer validation passed. Redact 0.2.3 was published 2026-10-28 and clears the unchanged seven-day policy. Changeset status plans only the published package patch 0.6.0 -> 0.6.1; private example versions remain 0.0.0.",
-        "Intent synchronization is current and skills-check passed. Fresh consumer-agent behavior and comparative performance were not checked."
+        "Reviewed the explicit maxChunks call, choose-stream-history guide, and query-patterns skill reference. Start build, runtime suite, and Chromium example cases pass."
       ]
     },
     "source:examples/vite-react/src/components/sections/commands-section.tsx": {
@@ -1517,20 +1506,15 @@
       ]
     },
     "source:examples/tanstack-start/src/components/action-button.tsx": {
-      "fingerprint": "1feb4eaff48571cd9ab13612ad068d2e5542557122bbf1dee1878dce784dd6f1",
+      "fingerprint": "c2e18ef4fd56d4e83cc88611043e6a3517ecde691843b80c41b5db090536f0de",
       "snapshot": {
-        "examples/tanstack-start/src/components/action-button.tsx": "feca11e9b1e883267a49eb41e246e745adb7b00c7caf88378e886807396bc512"
+        "examples/tanstack-start/src/components/action-button.tsx": "44ab38ecfcde9a202eb6dfa409c4860e00535246d89c8685b583725ef102d84c"
       },
-      "head": "f2d6ccb8a1b19845205b9db3950fa6fe95ef33d9",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "Action buttons now wait for the client hydration snapshot while preserving caller disablement. This application UI safeguard changes no generated utility or native Query contract; existing provider and ownership guidance remains accurate.",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
       "evidence": [
-        "Inspected the actual diff from origin/main e09d5b6, the contracts and handlers, both Vite configs, the Start button and stream-view changes, and all three planning records. No src/ runtime implementation or ADR changes remain in the PR.",
-        "Final Redact 0.2.3 runs passed all 80 production Chromium/Firefox cases and all 40 development Chromium cases with the existing browser assertions. Local startup checks use stdout readiness because unbound localhost URL probes hang on this host. WebKit remains unverified locally because host libraries are missing.",
-        "The native React client-navigation suite passed both cases after the final hydration safeguard. Both application production builds and typed lint/typechecking passed. Documentation checks and the 59-page build passed with valid internal links.",
-        "The existing packed compatibility results cover Effect 4.0.6/4.1.0, TypeScript 7.0.2/5.9.3, 163 runtime cases per release, and four framework consumers. No public runtime source changed in this follow-up.",
-        "Frozen installation with strict peer validation passed. Redact 0.2.3 was published 2026-10-28 and clears the unchanged seven-day policy. Changeset status plans only the published package patch 0.6.0 -> 0.6.1; private example versions remain 0.0.0.",
-        "Intent synchronization is current and skills-check passed. Fresh consumer-agent behavior and comparative performance were not checked."
+        "examples/tanstack-start/src/components/action-button.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
       ]
     },
     "source:examples/tanstack-start/src/components/navigation-link.tsx": {
@@ -1624,20 +1608,15 @@
       ]
     },
     "source:examples/tanstack-start/vite.config.ts": {
-      "fingerprint": "aee9f978dfd91a1a7d77c27cf7e020cfcf266684586ad9cadb62174e36ae54d1",
+      "fingerprint": "ff1e01b28c8c50f6ec7a17b95b94d9d079b1f920a0f0f50796fa5eeb32a83f36",
       "snapshot": {
-        "examples/tanstack-start/vite.config.ts": "d3320aa0d3e4709e5335c558c26e23628253c0a83ea9bdf602d986941ddc5095"
+        "examples/tanstack-start/vite.config.ts": "e88225ba2b41c412ed8cbf0c6564d67469e8e4f264071a348611e1e103dff362"
       },
-      "head": "f2d6ccb8a1b19845205b9db3950fa6fe95ef33d9",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "The private Start build uses Redact with ordinary React imports and bundles the React-dependent TanStack packages. Keeping Node platform dependencies external fixes CommonJS loading in development. The examples page identifies the renderer; no new library integration guide is needed.",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
       "evidence": [
-        "Inspected the actual diff from origin/main e09d5b6, the contracts and handlers, both Vite configs, the Start button and stream-view changes, and all three planning records. No src/ runtime implementation or ADR changes remain in the PR.",
-        "Final Redact 0.2.3 runs passed all 80 production Chromium/Firefox cases and all 40 development Chromium cases with the existing browser assertions. Local startup checks use stdout readiness because unbound localhost URL probes hang on this host. WebKit remains unverified locally because host libraries are missing.",
-        "The native React client-navigation suite passed both cases after the final hydration safeguard. Both application production builds and typed lint/typechecking passed. Documentation checks and the 59-page build passed with valid internal links.",
-        "The existing packed compatibility results cover Effect 4.0.6/4.1.0, TypeScript 7.0.2/5.9.3, 163 runtime cases per release, and four framework consumers. No public runtime source changed in this follow-up.",
-        "Frozen installation with strict peer validation passed. Redact 0.2.3 was published 2026-10-28 and clears the unchanged seven-day policy. Changeset status plans only the published package patch 0.6.0 -> 0.6.1; private example versions remain 0.0.0.",
-        "Intent synchronization is current and skills-check passed. Fresh consumer-agent behavior and comparative performance were not checked."
+        "examples/tanstack-start/vite.config.ts diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
       ]
     },
     "source:examples/vite-react/src/components/sections/queries-section.tsx": {
@@ -2136,20 +2115,15 @@
       ]
     },
     "source:examples/vite-react/vite.config.ts": {
-      "fingerprint": "b4205cde1efbddae0bc4a3ef2a7a3ee44a5cb12a9f9b285c111ceae442ac5e55",
+      "fingerprint": "de4597a3c678af51faca7693400d8e367ce75e7ff499124f0b0beb2b1c99fb34",
       "snapshot": {
-        "examples/vite-react/vite.config.ts": "e21c849e6f9f8b2284d86b28eecd5726bbc4f119ae7a4114d4ad99002c64bafc"
+        "examples/vite-react/vite.config.ts": "0afbdd6e066fd55cff161668553663158e9aaa2fe0e4054eedf7e960972fceb0"
       },
-      "head": "f2d6ccb8a1b19845205b9db3950fa6fe95ef33d9",
+      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
       "outcome": "no-change",
-      "reason": "The private Vite application uses the default Redact plugin without changing its generated options or React imports. Existing framework guidance remains accurate, and the examples page records the renderer choice.",
+      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
       "evidence": [
-        "Inspected the actual diff from origin/main e09d5b6, the contracts and handlers, both Vite configs, the Start button and stream-view changes, and all three planning records. No src/ runtime implementation or ADR changes remain in the PR.",
-        "Final Redact 0.2.3 runs passed all 80 production Chromium/Firefox cases and all 40 development Chromium cases with the existing browser assertions. Local startup checks use stdout readiness because unbound localhost URL probes hang on this host. WebKit remains unverified locally because host libraries are missing.",
-        "The native React client-navigation suite passed both cases after the final hydration safeguard. Both application production builds and typed lint/typechecking passed. Documentation checks and the 59-page build passed with valid internal links.",
-        "The existing packed compatibility results cover Effect 4.0.6/4.1.0, TypeScript 7.0.2/5.9.3, 163 runtime cases per release, and four framework consumers. No public runtime source changed in this follow-up.",
-        "Frozen installation with strict peer validation passed. Redact 0.2.3 was published 2026-10-28 and clears the unchanged seven-day policy. Changeset status plans only the published package patch 0.6.0 -> 0.6.1; private example versions remain 0.0.0.",
-        "Intent synchronization is current and skills-check passed. Fresh consumer-agent behavior and comparative performance were not checked."
+        "examples/vite-react/vite.config.ts diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
       ]
     },
     "source:.changeset/http-empty-success.md": {
