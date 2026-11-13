@@ -178,6 +178,10 @@ export default defineConfig({
                   slug: "guides/optimistic-writes",
                 },
                 {
+                  label: "QueryClient in Effect",
+                  slug: "guides/query-effects",
+                },
+                {
                   label: "Refresh from Events",
                   slug: "guides/refresh-from-events",
                 },

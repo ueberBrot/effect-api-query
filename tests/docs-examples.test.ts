@@ -49,6 +49,7 @@ const syntaxNodes = (
 
 describe("documentation excerpts", () => {
   it.each([
+    ["guides/query-effects", ["examples/shared/query-effects"]],
     [
       "README.md",
       [

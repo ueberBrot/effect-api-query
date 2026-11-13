@@ -303,6 +303,8 @@ export default defineConfig({
           "tests/skills/query-usability/fixture.ts",
           "tests/skills/query-usability/grade.test.ts",
           "tests/query-policy.test.ts",
+          "tests/query-effects.test.ts",
+          "examples/shared/query-effects.ts",
           "tests/query-view-prefix.test.ts",
           "tests/stream-publication.test.ts",
           "tests/stream-recovery.test.ts",
