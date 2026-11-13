@@ -470,7 +470,15 @@ liveHook.error satisfies
   | null;
 const liveResult: Promise<number> = queryClient.query(liveOptions);
 const liveKey = utils.events.watch.liveKey({ channel: "news" });
-liveKey satisfies readonly ["app", "rpc", "events", "watch", "live", unknown];
+liveKey satisfies readonly [
+  "app",
+  "rpc",
+  "events",
+  "watch",
+  "live",
+  unknown,
+  unknown?,
+];
 const cachedLive = queryClient.getQueryData(liveKey);
 cachedLive satisfies string | undefined;
 void [liveHookData, liveResult];
@@ -2228,6 +2236,7 @@ unknownLiveKey satisfies readonly [
   "unknownWatch",
   "live",
   unknown,
+  unknown?,
 ];
 anyLiveKey satisfies readonly [
   "payload",
@@ -2236,6 +2245,7 @@ anyLiveKey satisfies readonly [
   "anyWatch",
   "live",
   unknown,
+  unknown?,
 ];
 broadOptionalLiveKey satisfies readonly [
   "payload",
@@ -2244,6 +2254,7 @@ broadOptionalLiveKey satisfies readonly [
   "optionalWatch",
   "live",
   unknown,
+  unknown?,
 ];
 queryClient.getQueryData(unknownStreamedKey) satisfies
   | readonly string[]
@@ -2416,6 +2427,7 @@ broadPayloadUtils.payload.voidWatch.liveKey() satisfies readonly [
   "payload",
   "voidWatch",
   "live",
+  unknown?,
 ];
 broadPayloadUtils.payload.voidWatch.streamedOptions({ maxChunks: "unbounded" });
 broadPayloadUtils.payload.voidWatch.liveOptions();

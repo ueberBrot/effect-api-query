@@ -16,6 +16,7 @@ import type {
   RunnerRequirement,
   MutationBuilder,
   StreamedPolicyOptions,
+  LivePolicyOptions,
 } from "../core/types";
 import type {
   EffectRpcQueryConfigError,
@@ -243,8 +244,8 @@ export type ConcreteLiveKey<
   ClientError,
 > = DataTag<
   PayloadlessRpc<R> extends true
-    ? LiveOperationKey<Prefix, R>
-    : readonly [...LiveOperationKey<Prefix, R>, unknown],
+    ? readonly [...LiveOperationKey<Prefix, R>, unknown?]
+    : readonly [...LiveOperationKey<Prefix, R>, unknown, unknown?],
   QueryData<Rpc.SuccessChunk<R>>,
   RpcLiveError<R, ClientError>
 >;
@@ -291,15 +292,19 @@ export type LiveOptionsBuilder<
   RpcLiveError<R, ClientError>,
   ConcreteLiveKey<Prefix, R, ClientError>,
   LiveOperationKey<Prefix, R>,
-  unknown,
+  LivePolicyOptions,
   PayloadlessRpc<R>
 >;
 
-export type StreamKeyBuilder<R extends Rpc.Any, Key> = KeyBuilder<
-  Rpc.PayloadConstructor<R>,
-  Key,
-  PayloadlessRpc<R>
->;
+export type StreamKeyBuilder<R extends Rpc.Any, Key> =
+  PayloadlessRpc<R> extends true
+    ? (policy?: LivePolicyOptions) => Key
+    : (
+        input:
+          | Rpc.PayloadConstructor<R>
+          | PreparedInput<Rpc.PayloadConstructor<R>>,
+        policy?: LivePolicyOptions
+      ) => Key;
 
 export type StreamedKeyBuilder<R extends Rpc.Any, Key> =
   PayloadlessRpc<R> extends true

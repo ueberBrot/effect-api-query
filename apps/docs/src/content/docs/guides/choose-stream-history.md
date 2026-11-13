@@ -48,7 +48,7 @@ It accepts a positive safe integer and defaults to one. The first event publishe
 
 By default, batching counts events without a deadline. After the first publication, a slow or paused stream can leave a partial batch unpublished indefinitely. For example, a batch size of 32 leaves the next ten events unpublished until another 22 arrive or the stream ends. Choose a batch size of one when each event must appear promptly, or set a publication deadline as shown below.
 
-Transport consumption continues as the batch fills. The pending batch uses memory alongside cached history. Every event contributes in order, subject to the configured retention bound. If a batch exceeds `maxChunks`, only its newest retained elements remain visible. Earlier publications keep their own arrays. Live queries continue publishing each latest value.
+Transport consumption continues as the batch fills. The pending batch uses memory alongside cached history. Every event contributes in order, subject to the configured retention bound. If a batch exceeds `maxChunks`, only its newest retained elements remain visible. Earlier publications keep their own arrays. Live queries publish each latest value unless coalescing is explicitly enabled.
 
 Reuse the options' `queryKey` for exact cache access, or pass the same policy to `streamedKey`. Nondefault batch sizes create separate accumulated cache entries. An explicit one shares the default key. Endpoint and branch prefixes still select every publication policy.
 
@@ -82,3 +82,15 @@ const consumption = consumeEvents(Stream.make(1, 2, 3), {
 ```
 
 Pass a native decoded stream from your ready client in an application. The returned Effect starts only when run. Event callbacks run sequentially and apply backpressure. A callback failure stops consumption and remains in the error channel. `onExit` runs after stream cleanup, including failure and interruption; its finalization must finish before the Effect settles. `onStart` signals local startup, not transport connection. The helper stores no history and owns no runtime or cache. Run it in your application's Scope, interrupt it before disposing resources, and apply `recoverStream` when replay and reconnection are needed.
+
+## Coalesce complete live snapshots
+
+Use `liveOptions({ coalesceMs: 50 })` on RPC or HTTP SSE/NDJSON when every emission is complete state and intermediate snapshots may be skipped. Omit it to publish every value. Choose an integer from 1 to 2,147,483,647 milliseconds.
+
+The first value of each fetch publishes immediately. The next value starts a deadline; subsequent values replace the single pending snapshot without moving that deadline. At the deadline, publish the latest pending value even if the next pull is blocked. A later value starts another deadline. Completion or failure flushes the pending value before settling; failures retain their full Cause. Empty completion remains an empty-live-stream error. Successful `undefined` becomes `null`.
+
+Refetch resets the view and starts a fresh cycle. Cancellation drops pending values, clears the timer and closes the iterator; native cancellation/reversion still applies. Native cancellation can settle before local finalizers finish. This adds no cleanup timeout or remote acknowledgement.
+
+Share defaults with `configureUtils(leaf, { live: { policy: { coalesceMs: 50 } } })`. Configured keys inherit the same policy as options. Direct exact keys take the same policy: `liveKey(input, { coalesceMs: 50 })`, or `liveKey({ coalesceMs: 50 })` for inputless operations. Explicit deadlines have separate cache identity; omitted and `undefined` preserve the default key. Prefer the options' `queryKey` for cache access.
+
+Raw `consumeEvents` still processes every event sequentially. For deltas and ordered history, use accumulated retention and publication batches/deadlines, which preserve accepted event order. Treat all published values as immutable.

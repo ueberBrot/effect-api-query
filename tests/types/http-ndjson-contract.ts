@@ -297,3 +297,6 @@ true satisfies Assert<
     typeof extraRunner
   >
 >;
+
+http.records.watch.liveOptions({ input, coalesceMs: 25 });
+http.records.watch.liveKey(input, { coalesceMs: 25 });

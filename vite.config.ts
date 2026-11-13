@@ -305,6 +305,7 @@ export default defineConfig({
           "tests/query-policy.test.ts",
           "tests/query-view-prefix.test.ts",
           "tests/stream-publication.test.ts",
+          "tests/live-coalescing.test.ts",
           "tests/stream-recovery.test.ts",
           "tests/stream-snapshot.test.ts",
         ],

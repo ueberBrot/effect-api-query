@@ -1,6 +1,6 @@
 # Own stream publication through Query Core
 
-Status: Accepted. Partially amends [ADR 0010](0010-reuse-tanstack-query-core-as-a-peer.md). Clarifies implementation of [ADR 0020](0020-generate-accumulated-and-live-stream-queries.md), [ADR 0031](0031-add-explicit-query-reuse-and-stream-controls.md), and [ADR 0034](0034-extend-http-stream-views-to-decoded-ndjson.md).
+Status: Accepted. Partially amends [ADR 0010](0010-reuse-tanstack-query-core-as-a-peer.md). Clarifies implementation of [ADR 0020](0020-generate-accumulated-and-live-stream-queries.md), [ADR 0031](0031-add-explicit-query-reuse-and-stream-controls.md), and [ADR 0034](0034-extend-http-stream-views-to-decoded-ndjson.md). Extended by [ADR 0039](0039-coalesce-live-snapshots-explicitly.md) for opt-in live snapshot coalescing.
 
 ## Context
 

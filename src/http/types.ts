@@ -22,6 +22,7 @@ import type {
   QueryData,
   RunnerRequirement,
   StreamedPolicyOptions,
+  LivePolicyOptions,
 } from "../core/types";
 import type {
   EffectHttpApiQueryConfigError,
@@ -474,11 +475,11 @@ export type LiveLeaf<
 > = {
   readonly liveKey: void extends Request<Endpoint>
     ? (
-        policy?: HttpDecoderPolicy<Endpoint>
+        policy?: HttpDecoderPolicy<Endpoint> & LivePolicyOptions
       ) => LiveKey<Endpoint, Key, ClientError>
     : (
         input: Request<Endpoint> | PreparedInput<Request<Endpoint>>,
-        policy?: HttpDecoderPolicy<Endpoint>
+        policy?: HttpDecoderPolicy<Endpoint> & LivePolicyOptions
       ) => LiveKey<Endpoint, Key, ClientError>;
   readonly liveOptions: UnaryQueryBuilder<
     Request<Endpoint>,
@@ -486,7 +487,7 @@ export type LiveLeaf<
     LiveFailure<Endpoint, ClientError>,
     LiveKey<Endpoint, Key, ClientError>,
     readonly [...Key, "live"],
-    HttpDecoderPolicy<Endpoint>
+    HttpDecoderPolicy<Endpoint> & LivePolicyOptions
   >;
 };
 
