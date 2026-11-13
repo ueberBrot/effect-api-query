@@ -35,3 +35,5 @@ A timer, span, finalizer, or retry schedule around the runner's creation Effect 
 Native `cancelQueries` can settle before asynchronous iterator cleanup finishes. Await the resource's completion signal before you release its services. Mutations settle separately because they have no query abort signal.
 
 To capture an open stream on the server, await [fetchStreamSnapshot](/effect-api-query/guides/stream-snapshots/) before dehydration or client disposal. The helper waits for local iterator cleanup. Remote completion still requires an application acknowledgement.
+
+Use the optional [query owner setup helper](/effect-api-query/guides/switch-cache-owners/#opt-in-owner-helper) to register acquired or borrowed resources and coordinate local drains outside the factories. The [native React provider example](/effect-api-query/guides/react-query/) demonstrates the complete setup and unmount path.

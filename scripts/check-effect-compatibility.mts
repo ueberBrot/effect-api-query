@@ -69,6 +69,8 @@ const tests = [
   "http-structural-sharing",
   "hydration-codecs",
   "stream-snapshot",
+  "query-effects",
+  "query-owner",
 ].map((name) => `tests/${name}.test.ts`);
 const run = (args: string[], cwd: string) =>
   execFileSync("vp", args, { cwd, stdio: "inherit" });
