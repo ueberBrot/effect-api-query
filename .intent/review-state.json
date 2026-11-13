@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "087ed739d8ff3b29de0a35a8ded1f3cdbe84ea9d33fc7095c6aafe045635e39f",
+      "fingerprint": "5aa90535527aec05d34f7e5ff9d147fcc278bc61f33025661764f65e984d54ec",
       "snapshot": {
         "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -194,7 +194,7 @@
         "skills/effect-api-query/references/frameworks-and-hosts.md": "89ba2337eedb94f8697c50d2251a7afe5f68f55f9bdecc0f69b96db4d1be0191",
         "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
         "skills/effect-api-query/references/hydration-and-ssr.md": "cb64d4d2622cff1e7be1fb5b6b67e6bc67cbb1cca3e49e657ef8d2e641a26de1",
-        "skills/effect-api-query/references/query-patterns.md": "e185957045c9a1ac07e102112a3390e30becf917c378573788b95c73cc3b013b",
+        "skills/effect-api-query/references/query-patterns.md": "b83a9b5047f2f43333b92afbf17e645fb6eef141c13f3e60b1404a0433121e82",
         "skills/effect-api-query/references/rpc.md": "cdbc026d1d29c486b28a2b9fc6a330bcc8855b5887f0f454f73ce261734e8e7e",
         "src/core/branch-filter.ts": "71a8c6039f1775881bbc00d92e14e2ef823bf7150721307a74f16a1579bccc86",
         "src/core/canonical-key.ts": "84e91000876a6795557aab39dcc5d44e328250bf9b30ad02fd67afd02f5003e9",
@@ -366,24 +366,15 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "d1078edf93579405eb3686381bc2949e77c389ce",
+      "head": "7459ca343c6b8543253cbd5870ca8f29177864f2",
       "outcome": "updated",
-      "reason": "The measured PURE wrapper reduction preserves public behavior; public error and performance guidance now explains original causes, descriptor errors, retained-capability deltas and deterministic budgets. Existing package version 0.6.1 is verified; activation text and the six-reference structure are unchanged.",
+      "reason": "Split the existing live-query paragraph into timing, cache identity, tuple migration and event-contract paragraphs as recommended by Astra architecture recheck. Words and supported behavior unchanged.",
       "evidence": [
-        "src/core/query-effects.ts",
-        "scripts/measure-bundles.mts",
-        "_artifacts/query-performance-180.md",
-        "180-last-check.log: formatting and typed lint pass",
-        "180-accepted-runtime.log: 864 tests",
-        "180-accepted-matrix.log: eight pairs, 402 tests each and both compilers",
-        "180-accepted-frameworks.log",
-        "180-accepted-docs-check.log",
-        "180-accepted-measurements.json: all budgets pass",
-        "Fresh independent consumer discovery remains unverified because agents are prohibited."
+        "skills/effect-api-query/references/query-patterns.md diff against7459ca; paragraph breaks only. Formatting and skills-check pass; no runtime/type code or example changed, so no runtime rerun warranted. Fresh consumer/discovery not claimed."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "2a9fd22769de7ef7ae07dfe9698ca2c92b14c4af59f89e876461617c29282041",
+      "fingerprint": "773ec052d658b4aa4e2ce8302cb1e5f516af9c712c75201cda671358f8abc897",
       "snapshot": {
         "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -577,7 +568,7 @@
         "skills/effect-api-query/references/frameworks-and-hosts.md": "89ba2337eedb94f8697c50d2251a7afe5f68f55f9bdecc0f69b96db4d1be0191",
         "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
         "skills/effect-api-query/references/hydration-and-ssr.md": "cb64d4d2622cff1e7be1fb5b6b67e6bc67cbb1cca3e49e657ef8d2e641a26de1",
-        "skills/effect-api-query/references/query-patterns.md": "e185957045c9a1ac07e102112a3390e30becf917c378573788b95c73cc3b013b",
+        "skills/effect-api-query/references/query-patterns.md": "b83a9b5047f2f43333b92afbf17e645fb6eef141c13f3e60b1404a0433121e82",
         "skills/effect-api-query/references/rpc.md": "cdbc026d1d29c486b28a2b9fc6a330bcc8855b5887f0f454f73ce261734e8e7e",
         "src/core/branch-filter.ts": "71a8c6039f1775881bbc00d92e14e2ef823bf7150721307a74f16a1579bccc86",
         "src/core/canonical-key.ts": "84e91000876a6795557aab39dcc5d44e328250bf9b30ad02fd67afd02f5003e9",
@@ -749,18 +740,11 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "d1078edf93579405eb3686381bc2949e77c389ce",
-      "outcome": "updated",
-      "reason": "The cumulative spec and domain map retain every feature/follow-up, explain bundle attribution and the bounded wrapper reduction, and preserve Fallow/GUI/platform limitations. The tree still maps one skill and six references with valid source globs and prerequisites; metadata names the tested existing version 0.6.1. No new release version or schedule is selected.",
+      "head": "7459ca343c6b8543253cbd5870ca8f29177864f2",
+      "outcome": "no-change",
+      "reason": "All three planning records remain accurate: paragraph separation adds no behavior, task, source mapping, skill, prerequisite or coverage. Existing live coalescing, tuple migration and ownership constraints are preserved verbatim.",
       "evidence": [
-        "_artifacts/domain_map.yaml",
-        "_artifacts/skill_spec.md",
-        "_artifacts/skill_tree.yaml",
-        "_artifacts/query-fallow-180.md",
-        "_artifacts/query-performance-180.md",
-        "180-last-check.log",
-        "180-accepted-measurements.json",
-        "Fresh consumer discovery and GUI verification remain unverified."
+        "_artifacts/domain_map.yaml, _artifacts/skill_spec.md and _artifacts/skill_tree.yaml previously reviewed with complete180delta; current diff changes only paragraph breaks in the existing query-patterns reference. One skill/six references unchanged, sync no-op, formatter and skills-check pass."
       ]
     },
     "source:vite.config.ts": {
