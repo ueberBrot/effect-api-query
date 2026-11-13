@@ -69,6 +69,12 @@ Pass a ready flat client: `RpcClient.make(group, { flatten: true })`. Dotted RPC
 
 RPC builders accept payload constructor input. Query preparation applies Schema constructor defaults, then derives canonical identity. With a constructor default of `locale: 'en'`, `{ id: 1 }` and `{ id: 1, locale: 'en' }` address the same query. Queries require query-stable payload construction. The ready client must reconstruct the normalized payload without changing its encoded meaning. Use standard struct-shaped payloads and materialized defaults. If reconstruction changes existing values, expose a stable query-facing RPC.
 
+Keep ordinary and prepared execution inputs unchanged, including retained nested mutable values. Canonical keys copy and freeze identity, not execution input. Rebuild input and options when request values change. Defaults must be deterministic across builds; materialize time-dependent or random values explicitly.
+
+A constructor that increments an existing `id` can key `id: 2` from input `id: 1`, then execute `id: 3` when the ready client reconstructs it. A custom key encoder or prepared handle cannot repair this mismatch. Use a struct-shaped query-facing RPC and apply the domain conversion in its handler. This query-facing RPC uses the existing ready-client boundary; no decoded execution API is needed for this case.
+
+Preparation failures throw synchronously before execution, including from `prepareInput`. RPC construction failures keep `PayloadConstructionFailed`; Schema encoding, custom encoding, and invalid canonical values retain their separate key-error stages. These are not failed query Exits.
+
 Mutations pass constructor input directly to the ready client, which constructs the payload at execution time. Mutation keys contain no variables and invoke no key encoder. Mutations can use constructor-sensitive Schemas.
 
 ## Request-local options

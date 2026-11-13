@@ -18,6 +18,8 @@ skills:
       - "@ueberbrot/effect-api-query"
     covers:
       - RPC construction, explicit prepared inputs, and canonical identity
+      - Query-stable RPC construction and deterministic defaults
+      - Immutable captured input and nontransferable prepared-input ownership
       - HTTP decoded requests, SSE and NDJSON, multipart mutations, metadata, and omitted streaming uploads or upgrades
       - Inferred operation types, tree/branch/leaf policy configuration, execution interception, native defaults, and view filters
       - Opt-in decoded-value sharing through native Schema equivalence and Query policies, with explicit reference semantics for custom fields
@@ -108,7 +110,7 @@ skills:
         priority: HIGH
         status: active
       - mistake: Mutate or transfer a prepared input
-        mechanism: A handle retains execution input and belongs to one leaf; mutating it can make execution disagree with its frozen key.
+        mechanism: Prepared input retains mutable values and a leaf owner.
         wrong_pattern: Reuse a handle after changing nested request values or replacing the utility tree.
         correct_pattern: Keep retained values unchanged and prepare a new handle for each input and owner.
         source: src/core/prepared-input.ts
