@@ -14,6 +14,7 @@ import {
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import sharedManifest from "../examples/shared/package.json" with { type: "json" };
 import manifest from "../package.json" with { type: "json" };
 import { compilerCommand, currentCompiler } from "./compiler.mts";
 
@@ -144,6 +145,16 @@ try {
           devDependencies: {
             ...manifest.devDependencies,
             "@effect/vitest": version,
+          },
+        })
+      );
+      writeFileSync(
+        path.join(consumer, "examples/shared/package.json"),
+        JSON.stringify({
+          ...sharedManifest,
+          dependencies: {
+            ...sharedManifest.dependencies,
+            [manifest.name]: `file:${path.join(directory, tarball)}`,
           },
         })
       );
