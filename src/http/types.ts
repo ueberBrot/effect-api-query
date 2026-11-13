@@ -137,7 +137,6 @@ export type Request<Endpoint extends HttpApiEndpoint.ConstraintRequest> =
 export type Success<Endpoint extends HttpApiEndpoint.ConstraintRequest> =
   HttpApiClient.SuccessType<SuccessSchema<Endpoint>>;
 export type Failure<ClientError> = EffectHttpApiQueryError<ClientError>;
-// Index once instead of distributing a membership conditional for each client key.
 export type Member<Value, Key extends PropertyKey> = Value[Key & keyof Value];
 export type ClientGroup<Group, Client> = Group extends {
   readonly topLevel: true;
@@ -651,7 +650,6 @@ export type StreamServices<Value> =
       ? Services
       : never;
 
-// Infer both channels together; decoded and metadata effects still contribute.
 type ExecutionServices<Value> =
   Value extends Effect.Effect<infer Data, infer _Error, infer Services>
     ? Services | StreamServices<Data>

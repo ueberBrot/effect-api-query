@@ -1,4 +1,4 @@
-# HTTP type work — #178
+# HTTP type work for #178
 
 Base: `c1662be32cc26149203cfecb7ed93863997e668c` (latest local spec/166 integration at measurement). Only `src/http/types.ts` changes compiler behavior. No workload, dependency or fixture changes.
 
@@ -10,7 +10,7 @@ Lockfile SHA256: `b3f47c05de7cf8ad9650fa0df285ae437445c99055c4b21f588fbc9f2b6363
 
 Run `TYPE_ADAPTERS=http PERFORMANCE_OUTPUT=<file> vp run type-baseline` sequentially on base and candidate. Each run builds the package, copies built public exports into a disposable consumer (no repository source imports), then compiles identical literal 50/250/1,000-operation contracts and contract/raw/scoped-configured consumers. Strict ES2022/Bundler/noEmit with skipLibCheck; unchanged options. Native packed-framework checks separately install the actual tarball.
 
-One complete run per version was warmup (before.json / candidate3.json); two subsequent sample runs per version use fresh compiler processes. No overlapping build/pack or compiler-check task in these retained samples. Raw reports/logs are in `/tmp/effect-api-query-spec-166/178-{before,after}-sample{2,3}.{json,log}`. Reports include built-package hashes, exact dependencies, compiler identity, memory and separate check/total/wall times. Before sample 1 is clean base; later before samples have guidance edits only. Candidate reports correctly mark the worktree changed. Timings are observations, not statistical speedup evidence.
+Each version has one warmup run (before.json / candidate3.json) and two later sample runs in fresh compiler processes. No overlapping build/pack or compiler-check task in these retained samples. Raw reports/logs are in `/tmp/effect-api-query-spec-166/178-{before,after}-sample{2,3}.{json,log}`. Reports include built-package hashes, exact dependencies, compiler identity, memory and separate check/total/wall times. Before sample 1 is clean base; later before samples have guidance edits only. Candidate reports mark the worktree changed. Timings are observations, not statistical speedup evidence.
 
 ## Investigation
 
@@ -18,7 +18,7 @@ One complete run per version was warmup (before.json / candidate3.json); two sub
 - Replace distributive `Key extends keyof Value` client-member lookup with `Value[Key & keyof Value]`. Supported finite keys still resolve precisely; missing keys still resolve to never. This removes repeated membership conditionals without bypassing client overload analysis (candidate2.json).
 - Extract an exposed Effect's service and success channels in one conditional, then include stream services from that success. This preserves the previous union of Effect services and stream services, including metadata-only overload services. Leave MethodSignatures, endpoint eligibility, requests, errors and builder overloads intact.
 
-Existing compile-time fixtures are the public contract seam (including native React); existing expected-error cases remain unchanged. The performance workload is the deterministic acceptance seam; its base count is the red baseline and reduced count is the green result. No runtime implementation changes or internal-helper tests are needed for these type reductions.
+Unchanged public compile-time fixtures, including native React and expected-error cases, verify the type contract. The unchanged performance workload measures the reduction. Runtime implementation is unchanged.
 
 ## Instantiations
 
@@ -45,7 +45,7 @@ Both retained samples reproduce every count exactly. Contract-only controls are 
 | minimum  |       1000 | raw        | 4,741,000 | 4,724,859 |
 | minimum  |       1000 | configured | 4,832,028 | 4,815,884 |
 
-At 1,000 operations the reduction is 16,141 raw / 16,144 configured instantiations on each compiler (about 0.34% / 0.33% on TSRS). This is a small linear reduction, not elimination of the larger scaling cost. No type broadening or relaxed fixtures justify it.
+At 1,000 operations the reduction is 16,141 raw / 16,144 configured instantiations on each compiler (about 0.34% / 0.33% on TSRS). This is a small linear reduction, not elimination of the larger scaling cost. Public types and negative fixtures retain their precision.
 
 ## Environment-sensitive diagnostics
 
@@ -67,3 +67,7 @@ All 18 workloads pass each retained run, including the 1,000-operation raw/confi
 ## Post-integration verification
 
 Merged local integration `c23eeca` (scoped owner lifecycle) into the ticket at `e4c6560`; preserved both planning history entries. Fresh merged public/server-local fixtures pass TSRS and TS5.9.3; installed tarball Vue/Solid/Svelte/Angular consumers pass both compilers. All 18 post-merge HTTP workloads pass with exactly the same instantiation counts as the candidate samples. This post-merge run is validation, not an additional matched speed comparison. Package declaration emission/ATTW/publint, 26 reuse/configuration cases, 217-file strict typed check, Effect diagnostics, 22 docs excerpt cases and Astro checks pass. Scoped formatting and YAML validation pass. Fresh-agent discovery, full combined/browser acceptance and parent Astra reviews remain outside this check.
+
+## Prose and comment audit
+
+Applied the writing policy to the ticket diff using clear-writing, readability, writing-clearly-and-concisely, and writing-for-agents. Removed both added source comments because they restated the implementation. Ordered the shipped reference by owner setup, preparation, and input changes. Shortened comparison instructions and retained compiler versions, conditions, ownership, measurements, and limits. Reviewed readability for TypeScript library consumers and maintainers without changing technical terms or targeting a reading grade. Public signatures, directives, fixtures, and compiler checks remain unchanged.
