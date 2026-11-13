@@ -102,3 +102,7 @@ See [Cache Keys and Filters](/effect-api-query/guides/cache-filters/) for partia
 ## QueryClient operations in Effect
 
 [Compose QueryClient Operations in Effect](/effect-api-query/guides/query-effects/) covers typed cache reads, ensure/fetch, updates, generated filters, error channels, and interruption of one waiter without cancelling shared work.
+
+## Loader selections
+
+`createQueryDescriptor` registers one generated leaf and view for typed capture and receiving-owner rebinding. `QueryDescriptor` describes the transferable selection; `QueryDescriptorError` reports synchronous malformed, compatibility, input and semantic identity failures. See [Transfer Loader Selections](/effect-api-query/guides/loader-descriptors/) for the complete native hydration example.

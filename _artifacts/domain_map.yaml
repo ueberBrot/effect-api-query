@@ -29,6 +29,7 @@ skills:
       - Stream snapshots and request cleanup
       - Optimistic overlap, event refresh, and owner replacement
       - DTO and rich-value hydration with typed view registration
+      - Loader selections with explicit input codecs and owner validation
       - Native provider setup, Suspense recovery, reactive accessors, and host boundaries
     tasks:
       - Assemble application-owned policy maps against contract-derived utility types before client acquisition; apply them through configureUtils with existing scope, interceptor and callback semantics.

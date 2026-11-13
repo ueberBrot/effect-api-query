@@ -305,6 +305,7 @@ export default defineConfig({
           "tests/skills/query-usability/grade.test.ts",
           "tests/query-policy.test.ts",
           "tests/query-effects.test.ts",
+          "tests/query-descriptor.test.ts",
           "examples/shared/query-effects.ts",
           "examples/shared/query-events.ts",
           "examples/shared/application-policy.ts",
