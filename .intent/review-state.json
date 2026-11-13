@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "a18cfb906f680daf0d788de6719317e5bdc0fa6f0e1082ae4dec3d7973721243",
+      "fingerprint": "340e0018809064283ae759b27cda02c3656eb3e70a6860bd29e2cc0a97059496",
       "snapshot": {
         "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -16,7 +16,7 @@
         "apps/docs/src/content/docs/examples.md": "08c014b01c49123ee871ddb7427d69b4dcf1791fa907ba2fe535ebf6c522d282",
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "022014147e137abdac686d6d3c58f4eff1e8098dd2241a3cccd96abe5051cd26",
         "apps/docs/src/content/docs/examples/http-workflows.md": "f7b41e1e63fda1e4c44e0886b29f5c796f3f51e1b3bf227947423194f6cc39b0",
-        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "44468d76d2d2ebf411a08ff86467c6376b42e3f7f8f5632b0bc890602a5093d5",
+        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "f8e9add225959d6a84ebd1987072218c28305bdff0356f3b87540536a0b4c3a9",
         "apps/docs/src/content/docs/getting-started/feature-support.md": "ac3ebd5c192272f7d4d1a236a5878d1d51a76fc514e874cbb51f17eb31809125",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "4c68eaf1d2df4b1dcebf24b8f84ef291dd503a2049eb6802b74e8e52b7e6a948",
         "apps/docs/src/content/docs/getting-started/installation.md": "63ebd6eddf603465b5c1203f6587ae5c6c7fba1a1e59069c929f44eaa645823d",
@@ -39,7 +39,7 @@
         "apps/docs/src/content/docs/guides/pagination.md": "335599f80e8c311c3d755ee0d339a4f66738d7af5643168c4909d56ad003625d",
         "apps/docs/src/content/docs/guides/queries.md": "fe77556cd8bd7aaa59a96762d16f50d6523c255eb6ff8b5d2ebbfd146e13b004",
         "apps/docs/src/content/docs/guides/query-defaults.md": "c49dd8a464ba2cdbcf272e9f3a24cec88a1c8b22a6f60a9d2a337b1ed995b753",
-        "apps/docs/src/content/docs/guides/query-effects.md": "80577be7dbdd910ea9931a444ed1f0b56d2953f192e3429405731d725643accc",
+        "apps/docs/src/content/docs/guides/query-effects.md": "49b128dd423a5125361a0a48a09515dcb1e5a96c62805e220b59b84ccc793a22",
         "apps/docs/src/content/docs/guides/react-query.md": "8f75933a959c0ab1bbea40a1083ae469a0132a53ab2ec3608ff73d1c3eacccf2",
         "apps/docs/src/content/docs/guides/reconnect-streams.md": "6fa1d0e53d234e4ab03a5446d537c29c5e114bcb6d232e490b3a5e5210f96b30",
         "apps/docs/src/content/docs/guides/refresh-from-events.md": "1118061232fc4eb859133e01bb4ae9734ea0312c0df94243cd9c091a7089e587",
@@ -67,7 +67,7 @@
         "apps/docs/src/content/docs/reference/http-builders.md": "34d2fb026e5620878d21211f97dedfa7bec376e2267b9aab1088e759b5a20e9b",
         "apps/docs/src/content/docs/reference/http-factory.md": "676cad558cef9c5bb53c4c0626a1d67a6430d92f7a48fb6322821b4ac1bd686b",
         "apps/docs/src/content/docs/reference/performance.md": "2eaba86c748907cb8a1900b9a0cd38b51fe2c0239141ecc310375b0b5f1c46d6",
-        "apps/docs/src/content/docs/reference/public-exports.md": "6d5510db934a6facd284136d9a9f00f6c6cafe596bd751bda15e86423b2e59f2",
+        "apps/docs/src/content/docs/reference/public-exports.md": "26c40ff67a967cd9ce1f11748906437c83f189f0f3fc0ebc0246b11182619ce4",
         "apps/docs/src/content/docs/reference/type-inference.md": "a60819bcd3b5f7887efe97c1e6aabfdcf1822197abdd209b9d3820d33f4428b5",
         "docs/adr/0001-target-effect-4-release-candidate.md": "631600624a40a66951f8dd509618530973e34a6f373f2e4841edd5e1bca23b46",
         "docs/adr/0002-let-call-sites-choose-query-or-mutation.md": "ac6c71c1ab7fec80e50d843e92ac1d1b00c573fe8bf4ede0c4914f1711198c4d",
@@ -189,7 +189,7 @@
         "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "961b6c5e3a0a0334e3c3d8ecebf68b678682806ca9e945911924f047e5803d19",
-        "skills/effect-api-query/references/cache-workflows.md": "1c515170b34a46279eb2509a3c5b40f4e65529076895ccfcb7c0ccb0fd9c2e0e",
+        "skills/effect-api-query/references/cache-workflows.md": "1d80a087881094a7d50dbf7ce20c7ab8a2800f05aae432523645d4cba82b98e3",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "89ba2337eedb94f8697c50d2251a7afe5f68f55f9bdecc0f69b96db4d1be0191",
         "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
         "skills/effect-api-query/references/hydration-and-ssr.md": "cb64d4d2622cff1e7be1fb5b6b67e6bc67cbb1cca3e49e657ef8d2e641a26de1",
@@ -209,7 +209,7 @@
         "src/core/policy.ts": "ced3a6fdf1ab7e273eb518700a42d68b4823abdb1088fae6855424e4e479ded4",
         "src/core/prepared-input.ts": "bb445d76482c47d88e67cc0862470415dec30f72ccdd2ffa15e77d988377c3c9",
         "src/core/query-descriptor.ts": "a23e937f8ff9856ee867131539a8c3f943871cbac18e1243dbdf4c5bd8537546",
-        "src/core/query-effects.ts": "af269881229597833776919a2227f7ed03748fb7deb0e4df39dedb1668728584",
+        "src/core/query-effects.ts": "7243f8b6b0d2b984f10d276cce76902fb5e826cf0ef470b30a5b573bfb4c78ec",
         "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
         "src/core/query-owner.ts": "3a7e1072a568da26a3622225ca5723f4fbf62facb4796bc3ffb1a19a2c5196c5",
@@ -285,7 +285,7 @@
         "tests/live-coalescing.test.ts": "e5456fa321374e61dfef6992ebc706c9c558803795393b55da10e33c926bf413",
         "tests/publication-deadline.test.ts": "2797557ff14bf8527ea446cec1e1d7c61cd3666f11f127e640c53ce5d7e30868",
         "tests/query-descriptor.test.ts": "06d75566bf89bf30bbac8bddacd0b6eccedc9b054b2fd5c00ca1323156274e50",
-        "tests/query-effects.test.ts": "007793129802f9adb3547446d6f70a8885a80050e5b728d907ae47abe0446db6",
+        "tests/query-effects.test.ts": "68c85372b5417be8073e3c117ee55a3f77e270f30edc55cdbf3144e6aa86b47e",
         "tests/query-events.test.ts": "27c913c8ff1d65384a70695ef891e156f99ac122bc36e5be10f195b568b5e7b5",
         "tests/query-filter.test.ts": "ff531a86816872cd2cadf01d79bd9d9ff5be1895bab150330a90aa8375508004",
         "tests/query-owner.test.ts": "0c46e34994c81de588e9b470b698a2c232729992676faa2c4595f9f9f3086c99",
@@ -345,7 +345,7 @@
         "tests/types/live-coalescing-contract.ts": "c476bfec4ff03244a35938e0bc168894e917ab9e723536e2b759e0002a3ce836",
         "tests/types/public-contract.ts": "4bd0b76f7fe62a2e52de29c81061487a18b71aa3920ae824d8f48b0f71f749c4",
         "tests/types/query-descriptor-contract.tsx": "933101b6a3696d07a757a10560a25ebd0b1077e1542d9cc330e73cf114aa33b4",
-        "tests/types/query-effects-contract.ts": "8fefb99b919529cc3608f2c043d4f3e486a4f75471d0f1d4a054a7a96184b2a8",
+        "tests/types/query-effects-contract.ts": "3272505e389cfb15712e9060394f52d2db5f20dd6dce3cf866d2dfe57f8f4cc0",
         "tests/types/query-events-contract.ts": "1e2b891e352304785c6ae6cf4d31b0d8b277f1a98a6193f6f254614e7c4c0b0e",
         "tests/types/query-filter-contract.ts": "89977942cf8942af10535fb2ec4a4ab679d920a7d226ef26616faaf518b9a6e9",
         "tests/types/query-owner-contract.ts": "ee2e9b80bc711832e708796a4588a81ae65983cecaf0ddfd2d2f443f236f0a34",
@@ -364,20 +364,20 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "ba971952d6e118d094d60483f8dc1e464a6b60fa",
+      "head": "a8840fad03c38ad11e2c25f55983fed1c3b4fc6e",
       "outcome": "updated",
-      "reason": "Hydration reference now covers strict-JSON loader selections and receiver-local prepared input, explicit codecs, compatibility and identity rejection while retaining native hydration and exclusive stream capture. Policy/owner/event guidance and prior Schema fix remain intact.",
+      "reason": "Merged #174 S1 conservative rejection contract: cache-workflows, bridge/compatibility guides and public exports retain exact native rejection objects with unknown payloads. Native options remain precise; data/services and waiter-only interruption are unchanged. Descriptor/policy/event behavior and owner lifecycle JSDoc remain intact.",
       "evidence": [
-        "Reviewed composed source, docs and guidance against ba971952 and f6d164f3. 79 scoped tests/11 files, published and server-local fixtures on TSRS and TS5.9.3, strict 226 files, Effect and 24 docs excerpts/Astro pass. Fresh consumer/discovery and final Astra acceptance unverified; no agents authorized."
+        "Compared a8840fad and 7030e826 with actual combined source, tests and guidance. 174-fix-merge-tests.log: 120 tests/12 files, package/ATTW/publint, public and server-local fixtures on TSRS 0.21.0 TypeScript 7.1 beta and TypeScript 5.9.3 pass. Includes foreign HTTP wrapper and same-tag wrong-payload runner rejection through fetch/ensure, actual failed Exit composite Cause identity, concurrent observers and owner/event/descriptor/policy composition. Strict 226 files, Effect check, docs excerpts/Astro, scoped format/YAML pass. Fresh consumer/discovery and independent Astra acceptance not verified; agents prohibited."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "a7a7ad725423c41cb0eb6d2b0d4945e229030914d5e8d1bac174d1a40e5ded3d",
+      "fingerprint": "31ff8590e74cff2e08051e9a505322ec5cdc912d6ba34d3862b899a45409baaf",
       "snapshot": {
         "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
-        "_artifacts/domain_map.yaml": "f39ad805de6d8022b41b1a3072239522719fee28702670ff17d181dd30bdc837",
-        "_artifacts/skill_spec.md": "14cf357a98b91cfbb82efb0ed0d8c249f709b4e718e115789023617c14565b84",
+        "_artifacts/domain_map.yaml": "5090979f12c737226f1defa77c465627ff1a75469b36924da0b9994002cc6049",
+        "_artifacts/skill_spec.md": "af241eccd4b33235df3b6ff8e5f55e50235cead9fb01c781903c0d8e65bc2b15",
         "_artifacts/skill_tree.yaml": "aab2f3819f3c8380066a1ee416ef351b535aa10d9941b00bcdefdff4b6691f63",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "83a6aab512d66893237aa3ba45bf52b23712b88d829d83992509c2f3c822c18b",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "eb226d096cee825aa2a7c2e49370208d6110662c3acf681fa4b95f8b6caca0d7",
@@ -388,7 +388,7 @@
         "apps/docs/src/content/docs/examples.md": "08c014b01c49123ee871ddb7427d69b4dcf1791fa907ba2fe535ebf6c522d282",
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "022014147e137abdac686d6d3c58f4eff1e8098dd2241a3cccd96abe5051cd26",
         "apps/docs/src/content/docs/examples/http-workflows.md": "f7b41e1e63fda1e4c44e0886b29f5c796f3f51e1b3bf227947423194f6cc39b0",
-        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "44468d76d2d2ebf411a08ff86467c6376b42e3f7f8f5632b0bc890602a5093d5",
+        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "f8e9add225959d6a84ebd1987072218c28305bdff0356f3b87540536a0b4c3a9",
         "apps/docs/src/content/docs/getting-started/feature-support.md": "ac3ebd5c192272f7d4d1a236a5878d1d51a76fc514e874cbb51f17eb31809125",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "4c68eaf1d2df4b1dcebf24b8f84ef291dd503a2049eb6802b74e8e52b7e6a948",
         "apps/docs/src/content/docs/getting-started/installation.md": "63ebd6eddf603465b5c1203f6587ae5c6c7fba1a1e59069c929f44eaa645823d",
@@ -411,7 +411,7 @@
         "apps/docs/src/content/docs/guides/pagination.md": "335599f80e8c311c3d755ee0d339a4f66738d7af5643168c4909d56ad003625d",
         "apps/docs/src/content/docs/guides/queries.md": "fe77556cd8bd7aaa59a96762d16f50d6523c255eb6ff8b5d2ebbfd146e13b004",
         "apps/docs/src/content/docs/guides/query-defaults.md": "c49dd8a464ba2cdbcf272e9f3a24cec88a1c8b22a6f60a9d2a337b1ed995b753",
-        "apps/docs/src/content/docs/guides/query-effects.md": "80577be7dbdd910ea9931a444ed1f0b56d2953f192e3429405731d725643accc",
+        "apps/docs/src/content/docs/guides/query-effects.md": "49b128dd423a5125361a0a48a09515dcb1e5a96c62805e220b59b84ccc793a22",
         "apps/docs/src/content/docs/guides/react-query.md": "8f75933a959c0ab1bbea40a1083ae469a0132a53ab2ec3608ff73d1c3eacccf2",
         "apps/docs/src/content/docs/guides/reconnect-streams.md": "6fa1d0e53d234e4ab03a5446d537c29c5e114bcb6d232e490b3a5e5210f96b30",
         "apps/docs/src/content/docs/guides/refresh-from-events.md": "1118061232fc4eb859133e01bb4ae9734ea0312c0df94243cd9c091a7089e587",
@@ -439,7 +439,7 @@
         "apps/docs/src/content/docs/reference/http-builders.md": "34d2fb026e5620878d21211f97dedfa7bec376e2267b9aab1088e759b5a20e9b",
         "apps/docs/src/content/docs/reference/http-factory.md": "676cad558cef9c5bb53c4c0626a1d67a6430d92f7a48fb6322821b4ac1bd686b",
         "apps/docs/src/content/docs/reference/performance.md": "2eaba86c748907cb8a1900b9a0cd38b51fe2c0239141ecc310375b0b5f1c46d6",
-        "apps/docs/src/content/docs/reference/public-exports.md": "6d5510db934a6facd284136d9a9f00f6c6cafe596bd751bda15e86423b2e59f2",
+        "apps/docs/src/content/docs/reference/public-exports.md": "26c40ff67a967cd9ce1f11748906437c83f189f0f3fc0ebc0246b11182619ce4",
         "apps/docs/src/content/docs/reference/type-inference.md": "a60819bcd3b5f7887efe97c1e6aabfdcf1822197abdd209b9d3820d33f4428b5",
         "docs/adr/0001-target-effect-4-release-candidate.md": "631600624a40a66951f8dd509618530973e34a6f373f2e4841edd5e1bca23b46",
         "docs/adr/0002-let-call-sites-choose-query-or-mutation.md": "ac6c71c1ab7fec80e50d843e92ac1d1b00c573fe8bf4ede0c4914f1711198c4d",
@@ -561,7 +561,7 @@
         "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "961b6c5e3a0a0334e3c3d8ecebf68b678682806ca9e945911924f047e5803d19",
-        "skills/effect-api-query/references/cache-workflows.md": "1c515170b34a46279eb2509a3c5b40f4e65529076895ccfcb7c0ccb0fd9c2e0e",
+        "skills/effect-api-query/references/cache-workflows.md": "1d80a087881094a7d50dbf7ce20c7ab8a2800f05aae432523645d4cba82b98e3",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "89ba2337eedb94f8697c50d2251a7afe5f68f55f9bdecc0f69b96db4d1be0191",
         "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
         "skills/effect-api-query/references/hydration-and-ssr.md": "cb64d4d2622cff1e7be1fb5b6b67e6bc67cbb1cca3e49e657ef8d2e641a26de1",
@@ -581,7 +581,7 @@
         "src/core/policy.ts": "ced3a6fdf1ab7e273eb518700a42d68b4823abdb1088fae6855424e4e479ded4",
         "src/core/prepared-input.ts": "bb445d76482c47d88e67cc0862470415dec30f72ccdd2ffa15e77d988377c3c9",
         "src/core/query-descriptor.ts": "a23e937f8ff9856ee867131539a8c3f943871cbac18e1243dbdf4c5bd8537546",
-        "src/core/query-effects.ts": "af269881229597833776919a2227f7ed03748fb7deb0e4df39dedb1668728584",
+        "src/core/query-effects.ts": "7243f8b6b0d2b984f10d276cce76902fb5e826cf0ef470b30a5b573bfb4c78ec",
         "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
         "src/core/query-owner.ts": "3a7e1072a568da26a3622225ca5723f4fbf62facb4796bc3ffb1a19a2c5196c5",
@@ -657,7 +657,7 @@
         "tests/live-coalescing.test.ts": "e5456fa321374e61dfef6992ebc706c9c558803795393b55da10e33c926bf413",
         "tests/publication-deadline.test.ts": "2797557ff14bf8527ea446cec1e1d7c61cd3666f11f127e640c53ce5d7e30868",
         "tests/query-descriptor.test.ts": "06d75566bf89bf30bbac8bddacd0b6eccedc9b054b2fd5c00ca1323156274e50",
-        "tests/query-effects.test.ts": "007793129802f9adb3547446d6f70a8885a80050e5b728d907ae47abe0446db6",
+        "tests/query-effects.test.ts": "68c85372b5417be8073e3c117ee55a3f77e270f30edc55cdbf3144e6aa86b47e",
         "tests/query-events.test.ts": "27c913c8ff1d65384a70695ef891e156f99ac122bc36e5be10f195b568b5e7b5",
         "tests/query-filter.test.ts": "ff531a86816872cd2cadf01d79bd9d9ff5be1895bab150330a90aa8375508004",
         "tests/query-owner.test.ts": "0c46e34994c81de588e9b470b698a2c232729992676faa2c4595f9f9f3086c99",
@@ -717,7 +717,7 @@
         "tests/types/live-coalescing-contract.ts": "c476bfec4ff03244a35938e0bc168894e917ab9e723536e2b759e0002a3ce836",
         "tests/types/public-contract.ts": "4bd0b76f7fe62a2e52de29c81061487a18b71aa3920ae824d8f48b0f71f749c4",
         "tests/types/query-descriptor-contract.tsx": "933101b6a3696d07a757a10560a25ebd0b1077e1542d9cc330e73cf114aa33b4",
-        "tests/types/query-effects-contract.ts": "8fefb99b919529cc3608f2c043d4f3e486a4f75471d0f1d4a054a7a96184b2a8",
+        "tests/types/query-effects-contract.ts": "3272505e389cfb15712e9060394f52d2db5f20dd6dce3cf866d2dfe57f8f4cc0",
         "tests/types/query-events-contract.ts": "1e2b891e352304785c6ae6cf4d31b0d8b277f1a98a6193f6f254614e7c4c0b0e",
         "tests/types/query-filter-contract.ts": "89977942cf8942af10535fb2ec4a4ab679d920a7d226ef26616faaf518b9a6e9",
         "tests/types/query-owner-contract.ts": "ee2e9b80bc711832e708796a4588a81ae65983cecaf0ddfd2d2f443f236f0a34",
@@ -736,11 +736,11 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "ba971952d6e118d094d60483f8dc1e464a6b60fa",
+      "head": "a8840fad03c38ad11e2c25f55983fed1c3b4fc6e",
       "outcome": "updated",
-      "reason": "Domain map and cumulative skill_spec retain policy, events, owners and all prior coverage and add loader capture/rebind boundaries. Existing one-skill/six-reference tree and wildcard sources cover descriptor source/tests/docs; skill_tree needs no change.",
+      "reason": "Domain map adds promise-rejection provenance tension and cumulative skill_spec records the conservative #174 correction while retaining loader, policy, event and prior coverage. Existing one-skill/six-reference tree, prerequisites and wildcard source mappings already cover all affected files; skill_tree is a justified no-op. Sync reports nothing to synchronize.",
       "evidence": [
-        "Read all three planning files, composed guidance and actual source diffs. Intent sync no-op; scoped YAML/format, compiler/runtime/docs checks pass. Infinite descriptors explicitly excluded; independent consumer, Astra and final #180 gates remain pending."
+        "Read all three planning records and composed source/guidance against a8840fad and 7030e826. Executable task checks and both compilers pass (174-fix-merge-tests.log), strict/docs/Effect/format/YAML pass. Final eight-pair matrix and fresh Astra174/168 reviews remain parent gates; unrelated 21 pending research items left unannotated."
       ]
     },
     "source:vite.config.ts": {
@@ -3254,6 +3254,20 @@
       "evidence": [
         "Actual staged source diff inspected",
         "Package validation, strict typed check, Effect check and docs-check pass"
+      ]
+    },
+    "source:.changeset/sound-query-effects-rejections.md": {
+      "fingerprint": "9bf264fabef3ab5a47e9fdd13cf1af1f977084644de581b7b27d3abe22b5ef6c",
+      "snapshot": {
+        ".changeset/sound-query-effects-rejections.md": "14d252512690f2d99eceefaf6bb95c87872cb2ce3b31b7b149fea771e7b71b5f"
+      },
+      "head": "62cee6d2f7bd6842b62af39778c22e93fa8f6a0c",
+      "outcome": "updated",
+      "reason": "Correct #174 S1: native rejection has no proof of the current failed Exit. Fetch/ensure now retain every exact rejected object in QueryClientOperationError.cause; reconcile bridge, compatibility and exports guidance without changing support ranges/versioning/matrix claims. Preserve native declared option types, data/services and waiter interruption. Planning extends existing cache task; source globs/one skill/six references remain accurate.",
+      "evidence": [
+        "src/core/query-effects.ts; tests/query-effects.test.ts: four foreign/same-family rejection cases failed before fix (/tmp/174-fix-red.log); post-merge 105 runtime tests in nine files pass (/tmp/174-fix-merged-tests.log), including full Cause identity and shared observer interruption.",
+        "Published fixtures pass pinned TSRS 0.21.0/Effect tsgo 0.67.3 and TS5.9.3, including exact conservative bridge channel, unknown cause, preserved native declared failure/data/services; package ATTW/publint pass in serial task prerequisites.",
+        "Merged strict typecheck, Effect check and 23 documentation excerpt tests/Astro pass; scoped formatting and YAML parse pass (existing line-length warnings). domain_map and skill_spec updated; skill_tree source mappings remain accurate with sync no-op. Fresh consumer discovery and parent Astra two-axis/168 acceptance rechecks and final combined matrix remain unverified."
       ]
     }
   }

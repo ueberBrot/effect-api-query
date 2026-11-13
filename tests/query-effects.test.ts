@@ -9,6 +9,7 @@ import {
   createRpcQueryUtils,
   createQueryFilter,
   EffectRpcQueryError,
+  EffectHttpApiQueryError,
   queryEffects,
   QueryClientService,
   QueryClientOperationError,
@@ -97,66 +98,69 @@ it.effect(
     })
 );
 
-it.effect(
-  "preserves the complete failed Exit and distinguishes runner rejection",
-  () =>
-    Effect.gen(function* scenario4() {
-      const group = RpcGroup.make(
-        Rpc.make("read", { success: Schema.Int, error: Schema.String })
-      );
-      const ready = yield* makeRpcTestClient(group, {
-        read: () => Effect.fail("denied"),
-      });
-      const run = Effect.runPromiseExitWith(yield* Effect.context());
-      let observedCause: unknown;
-      const client = new QueryClient();
-      const utils = createRpcQueryUtils(group, {
-        client: ready,
-        keyPrefix: ["failure"],
-        runPromiseExit: async (effect, options) => {
-          const exit = await run(effect, options);
-          if (Exit.isFailure(exit)) {
-            const cause = Cause.combine(
-              exit.cause,
-              Cause.die(new Error("defect"))
-            );
-            observedCause = cause;
-            return Exit.failCause(cause);
-          }
-          return exit;
-        },
-      });
-      const failure = yield* queryEffects
-        .fetch(utils.read.queryOptions())
-        .pipe(Effect.flip, Effect.provideService(QueryClientService, client));
-      expect(failure).toBeInstanceOf(EffectRpcQueryError);
-      if (failure instanceof EffectRpcQueryError) {
-        expect(failure.cause).toBe(observedCause);
-        expect(failure.cause.reasons).toHaveLength(2);
-        expect(client.getQueryState(utils.read.queryKey())?.error).toBe(
-          failure
+for (const operation of ["fetch", "ensure"] as const) {
+  it.effect(
+    `${operation} preserves the complete failed Exit and distinguishes runner rejection`,
+    () =>
+      Effect.gen(function* scenario4() {
+        const group = RpcGroup.make(
+          Rpc.make("read", { success: Schema.Int, error: Schema.String })
         );
-      }
-      const rejection = new Error("runner rejected without Exit");
-      const rejecting = createRpcQueryUtils(group, {
-        client: ready,
-        keyPrefix: ["rejection"],
-        runPromiseExit: async () => await Promise.reject(rejection),
-      });
-      const runnerFailure = yield* queryEffects
-        .ensure(rejecting.read.queryOptions())
-        .pipe(Effect.flip, Effect.provideService(QueryClientService, client));
-      expect(runnerFailure).toBeInstanceOf(QueryClientOperationError);
-      expect(runnerFailure.cause).toBe(rejection);
-      const callbackFailure = yield* queryEffects
-        .setData(utils.read.queryKey(), () => {
-          throw rejection;
-        })
-        .pipe(Effect.flip, Effect.provideService(QueryClientService, client));
-      expect(callbackFailure.cause).toBe(rejection);
-      client.clear();
-    })
-);
+        const ready = yield* makeRpcTestClient(group, {
+          read: () => Effect.fail("denied"),
+        });
+        const run = Effect.runPromiseExitWith(yield* Effect.context());
+        let observedCause: unknown;
+        const client = new QueryClient();
+        const utils = createRpcQueryUtils(group, {
+          client: ready,
+          keyPrefix: ["failure"],
+          runPromiseExit: async (effect, options) => {
+            const exit = await run(effect, options);
+            if (Exit.isFailure(exit)) {
+              const cause = Cause.combine(
+                exit.cause,
+                Cause.die(new Error("defect"))
+              );
+              observedCause = cause;
+              return Exit.failCause(cause);
+            }
+            return exit;
+          },
+        });
+        const failure = yield* queryEffects[operation](
+          utils.read.queryOptions()
+        ).pipe(Effect.flip, Effect.provideService(QueryClientService, client));
+        expect(failure).toBeInstanceOf(QueryClientOperationError);
+        expect(failure.cause).toBeInstanceOf(EffectRpcQueryError);
+        if (failure.cause instanceof EffectRpcQueryError) {
+          expect(failure.cause.cause).toBe(observedCause);
+          expect(failure.cause.cause.reasons).toHaveLength(2);
+          expect(client.getQueryState(utils.read.queryKey())?.error).toBe(
+            failure.cause
+          );
+        }
+        const rejection = new Error("runner rejected without Exit");
+        const rejecting = createRpcQueryUtils(group, {
+          client: ready,
+          keyPrefix: ["rejection"],
+          runPromiseExit: async () => await Promise.reject(rejection),
+        });
+        const runnerFailure = yield* queryEffects
+          .ensure(rejecting.read.queryOptions())
+          .pipe(Effect.flip, Effect.provideService(QueryClientService, client));
+        expect(runnerFailure).toBeInstanceOf(QueryClientOperationError);
+        expect(runnerFailure.cause).toBe(rejection);
+        const callbackFailure = yield* queryEffects
+          .setData(utils.read.queryKey(), () => {
+            throw rejection;
+          })
+          .pipe(Effect.flip, Effect.provideService(QueryClientService, client));
+        expect(callbackFailure.cause).toBe(rejection);
+        client.clear();
+      })
+  );
+}
 
 it.effect(
   "invalidates generated filters with native active refetch behavior",
@@ -304,3 +308,48 @@ it.effect(
       }
     })
 );
+
+for (const operation of ["fetch", "ensure"] as const) {
+  for (const rejection of [
+    new EffectHttpApiQueryError(
+      { apiId: "foreign", groupId: "users", endpoint: "read", method: "GET" },
+      "query",
+      Cause.fail(123)
+    ),
+    new EffectRpcQueryError("read", "query", Cause.fail(123)),
+  ]) {
+    it.effect(
+      `${operation} retains a runner rejection with ${rejection._tag} as an unknown cause`,
+      () =>
+        Effect.gen(function* foreignRunnerFailure() {
+          const group = RpcGroup.make(
+            Rpc.make("read", {
+              success: Schema.Int,
+              error: Schema.Literal("missing"),
+            })
+          );
+          const ready = yield* makeRpcTestClient(group, {
+            read: () => Effect.fail("missing"),
+          });
+          const utils = createRpcQueryUtils(group, {
+            client: ready,
+            keyPrefix: ["foreign-rejection", operation, rejection._tag],
+            runPromiseExit: async () => await Promise.reject(rejection),
+          });
+          const client = new QueryClient();
+          const failure = yield* queryEffects[operation](
+            utils.read.queryOptions({ retry: false })
+          ).pipe(
+            Effect.flip,
+            Effect.provideService(QueryClientService, client)
+          );
+          expect(failure).toBeInstanceOf(QueryClientOperationError);
+          expect(failure.cause).toBe(rejection);
+          expect(client.getQueryState(utils.read.queryKey())?.error).toBe(
+            rejection
+          );
+          client.clear();
+        })
+    );
+  }
+}

@@ -6,10 +6,6 @@ import {
   createRpcQueryUtils,
   createHttpApiQueryUtils,
 } from "@ueberbrot/effect-api-query";
-import type {
-  EffectRpcQueryError,
-  InferQueryError,
-} from "@ueberbrot/effect-api-query";
 import { Context, Effect, Schema } from "effect";
 import { HttpApi, HttpApiEndpoint, HttpApiGroup } from "effect/http-api";
 import type { HttpApiClient } from "effect/http-api";
@@ -49,10 +45,7 @@ export type UpdateData = Assert<
   Equal<Effect.Success<typeof updated>, number | null | undefined>
 >;
 export type FetchError = Assert<
-  Equal<
-    Effect.Error<typeof fetched>,
-    EffectRpcQueryError<"missing"> | QueryClientOperationError
-  >
+  Equal<Effect.Error<typeof fetched>, QueryClientOperationError>
 >;
 export type FetchServices = Assert<
   Equal<Effect.Services<typeof fetched>, QueryClientService>
@@ -85,10 +78,7 @@ const httpEffect = queryEffects.ensure(
 );
 export type HttpData = Assert<Equal<Effect.Success<typeof httpEffect>, number>>;
 export type HttpError = Assert<
-  Equal<
-    Effect.Error<typeof httpEffect>,
-    InferQueryError<typeof http.users.read> | QueryClientOperationError
-  >
+  Equal<Effect.Error<typeof httpEffect>, QueryClientOperationError>
 >;
 
 class Domain extends Context.Service<Domain, { readonly name: string }>()(
@@ -100,4 +90,27 @@ const composed = Effect.gen(function* () {
 });
 export type ComposedServices = Assert<
   Equal<Effect.Services<typeof composed>, Domain | QueryClientService>
+>;
+
+export type EnsureError = Assert<
+  Equal<Effect.Error<typeof ensured>, QueryClientOperationError>
+>;
+export type RejectionCause = Assert<
+  Equal<Effect.Error<typeof fetched>["cause"], unknown>
+>;
+export type NoDeclaredPayloadClaim = Assert<
+  Equal<
+    Effect.Error<
+      typeof fetched
+    > extends import("@ueberbrot/effect-api-query").EffectRpcQueryError<"missing">
+      ? true
+      : false,
+    false
+  >
+>;
+export type NativeDeclaredError = Assert<
+  Equal<
+    import("@ueberbrot/effect-api-query").InferQueryError<typeof utils.read>,
+    import("@ueberbrot/effect-api-query").EffectRpcQueryError<"missing">
+  >
 >;
