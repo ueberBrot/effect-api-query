@@ -365,7 +365,7 @@
       "evidence": [
         "src/core/query-effects.ts; tests/query-effects.test.ts: four foreign/same-family rejection cases failed before fix (/tmp/174-fix-red.log); post-merge 105 runtime tests in nine files pass (/tmp/174-fix-merged-tests.log), including full Cause identity and shared observer interruption.",
         "Published fixtures pass pinned TSRS 0.21.0/Effect tsgo 0.67.3 and TS5.9.3, including exact conservative bridge channel, unknown cause, preserved native declared failure/data/services; package ATTW/publint pass in serial task prerequisites.",
-        "Merged strict typecheck, Effect check and 24 documentation excerpt tests/Astro pass; scoped formatting and YAML parse pass (existing line-length warnings). domain_map and skill_spec updated; skill_tree source mappings remain accurate with sync no-op. Fresh consumer discovery and parent Astra two-axis/168 acceptance rechecks and final combined matrix remain unverified."
+        "Merged strict typecheck, Effect check and 23 documentation excerpt tests/Astro pass; scoped formatting and YAML parse pass (existing line-length warnings). domain_map and skill_spec updated; skill_tree source mappings remain accurate with sync no-op. Fresh consumer discovery and parent Astra two-axis/168 acceptance rechecks and final combined matrix remain unverified."
       ]
     },
     "planning:_artifacts": {
@@ -734,7 +734,7 @@
       "evidence": [
         "src/core/query-effects.ts; tests/query-effects.test.ts: four foreign/same-family rejection cases failed before fix (/tmp/174-fix-red.log); post-merge 105 runtime tests in nine files pass (/tmp/174-fix-merged-tests.log), including full Cause identity and shared observer interruption.",
         "Published fixtures pass pinned TSRS 0.21.0/Effect tsgo 0.67.3 and TS5.9.3, including exact conservative bridge channel, unknown cause, preserved native declared failure/data/services; package ATTW/publint pass in serial task prerequisites.",
-        "Merged strict typecheck, Effect check and 24 documentation excerpt tests/Astro pass; scoped formatting and YAML parse pass (existing line-length warnings). domain_map and skill_spec updated; skill_tree source mappings remain accurate with sync no-op. Fresh consumer discovery and parent Astra two-axis/168 acceptance rechecks and final combined matrix remain unverified."
+        "Merged strict typecheck, Effect check and 23 documentation excerpt tests/Astro pass; scoped formatting and YAML parse pass (existing line-length warnings). domain_map and skill_spec updated; skill_tree source mappings remain accurate with sync no-op. Fresh consumer discovery and parent Astra two-axis/168 acceptance rechecks and final combined matrix remain unverified."
       ]
     },
     "source:vite.config.ts": {
@@ -3252,7 +3252,7 @@
       "evidence": [
         "src/core/query-effects.ts; tests/query-effects.test.ts: four foreign/same-family rejection cases failed before fix (/tmp/174-fix-red.log); post-merge 105 runtime tests in nine files pass (/tmp/174-fix-merged-tests.log), including full Cause identity and shared observer interruption.",
         "Published fixtures pass pinned TSRS 0.21.0/Effect tsgo 0.67.3 and TS5.9.3, including exact conservative bridge channel, unknown cause, preserved native declared failure/data/services; package ATTW/publint pass in serial task prerequisites.",
-        "Merged strict typecheck, Effect check and 24 documentation excerpt tests/Astro pass; scoped formatting and YAML parse pass (existing line-length warnings). domain_map and skill_spec updated; skill_tree source mappings remain accurate with sync no-op. Fresh consumer discovery and parent Astra two-axis/168 acceptance rechecks and final combined matrix remain unverified."
+        "Merged strict typecheck, Effect check and 23 documentation excerpt tests/Astro pass; scoped formatting and YAML parse pass (existing line-length warnings). domain_map and skill_spec updated; skill_tree source mappings remain accurate with sync no-op. Fresh consumer discovery and parent Astra two-axis/168 acceptance rechecks and final combined matrix remain unverified."
       ]
     }
   }
