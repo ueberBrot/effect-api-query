@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "9c35f0b351fbeec4a4e4567d65275d9497a79943f367b7229bb84eac74ae0b01",
+      "fingerprint": "bc5fdef0caff8cb7730f3ab71223080ec14dc637ea76079217a630615e3539ef",
       "snapshot": {
         "GLOSSARY.md": "1793065c2d29eabcba180a7c86539a6550a0dede8fe093a758a8ba4b8588bbf0",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -210,7 +210,7 @@
         "src/core/query-effects.ts": "af269881229597833776919a2227f7ed03748fb7deb0e4df39dedb1668728584",
         "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
-        "src/core/query-owner.ts": "5d40933e8a08a9f418c85990cc9be42bbdd5861136d1e501afa137daf49cabbf",
+        "src/core/query-owner.ts": "3a7e1072a568da26a3622225ca5723f4fbf62facb4796bc3ffb1a19a2c5196c5",
         "src/core/schema-key.ts": "7dad2749d30f2ab828dbc7e96d6e1e2b32b6733450cb6dc734de607629d925f8",
         "src/core/schema-structural-sharing.ts": "1a961c521aaf02c00689bee654ff428bb9d519ebf87651f7faedb9dfd1a06ccc",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
@@ -359,17 +359,15 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "c48da54420cda5afac44f9d27214032d1b0950c8",
-      "outcome": "updated",
-      "reason": "Reconciled #177 policy-map guidance with integrated #175 scoped event consumption. Identity helper checks exact existing configuration types; configureUtils still owns application, snapshots and execution. Required execution stays in interceptors; callback failures retain native order.",
+      "head": "42443ad21ca69c8743025352518444e8de78a2ed",
+      "outcome": "no-change",
+      "reason": "Public method documentation now distinguishes complete query-function cleanup registration from runner calls; stream iteration needs complementary runQuery registration. Existing guides and shipped reference already state this contract. Runtime/typing unchanged; all three planning records and existing mappings remain accurate, so no artificial rewrite/history entry.",
       "evidence": [
-        "Compared c48da54420cda5afac44f9d27214032d1b0950c8 and full incoming 7620eda1a1c43c081d4637f2df814f6b3c31d674 with composed tree. Source/guidance/comments reviewed; ADR0027/0032 semantics unchanged. Schema guard/regressions, ADR0010 status, owner method JSDoc and query-effects.ts remain byte-identical to integration parent.",
-        "177-merge-tests.log: 91 public/native cases pass in 9 files; includes final options, scope/interceptor/callback order, callback failures, event-cache retirement and Schema prototype regressions. 177-merge-api-types.log: packed declarations/ATTW/publint and TSRS + TS5.9.3 public fixtures pass; test task also passes both server-local compilers.",
-        "177-merge-typecheck.log: 224 strict files pass. 177-merge-effect.log passes with existing nonfatal suggestion; 177-merge-docs.log: 23 excerpt cases and Astro zero diagnostics. Scoped formatting/YAML/whitespace pass. Sync no-op. Fresh consumer/discovery unverified: agents prohibited. Full combined #180 and individual Astra/architecture/final gates remain; #174 criteria 2/4 remain failed pending separate fixer."
+        "src/core/query-owner.ts; emitted dist/index.d.mts shows complete runQuery/native-signal boundary and complementary streamed-query registration. vp run pack passes declarations/ATTW/publint; scoped formatting passes. No runtime tests added for comments; existing native owner/bridge/stream regression evidence retained. Final combined browser and consumer/discovery evidence remains unverified."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "0179b9dc8087f4b6a2f5301faff294f3ada60d9ba7e9f427f51fb730512e958e",
+      "fingerprint": "4fda4c582ee9f8cad6dd7bfd87c37231fc2003c665fc28ad01c24f5f6c2ccce9",
       "snapshot": {
         "GLOSSARY.md": "1793065c2d29eabcba180a7c86539a6550a0dede8fe093a758a8ba4b8588bbf0",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -579,7 +577,7 @@
         "src/core/query-effects.ts": "af269881229597833776919a2227f7ed03748fb7deb0e4df39dedb1668728584",
         "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
-        "src/core/query-owner.ts": "5d40933e8a08a9f418c85990cc9be42bbdd5861136d1e501afa137daf49cabbf",
+        "src/core/query-owner.ts": "3a7e1072a568da26a3622225ca5723f4fbf62facb4796bc3ffb1a19a2c5196c5",
         "src/core/schema-key.ts": "7dad2749d30f2ab828dbc7e96d6e1e2b32b6733450cb6dc734de607629d925f8",
         "src/core/schema-structural-sharing.ts": "1a961c521aaf02c00689bee654ff428bb9d519ebf87651f7faedb9dfd1a06ccc",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
@@ -728,13 +726,11 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "c48da54420cda5afac44f9d27214032d1b0950c8",
-      "outcome": "updated",
-      "reason": "Combined domain_map policy assembly and event-cache tasks; retained both skill_spec histories and earlier review corrections. Existing skill_tree globs cover helper/example/fixtures and event workflow: one skill/six references unchanged, no structural tree edit needed.",
+      "head": "42443ad21ca69c8743025352518444e8de78a2ed",
+      "outcome": "no-change",
+      "reason": "Public method documentation now distinguishes complete query-function cleanup registration from runner calls; stream iteration needs complementary runQuery registration. Existing guides and shipped reference already state this contract. Runtime/typing unchanged; all three planning records and existing mappings remain accurate, so no artificial rewrite/history entry.",
       "evidence": [
-        "Compared c48da54420cda5afac44f9d27214032d1b0950c8 and full incoming 7620eda1a1c43c081d4637f2df814f6b3c31d674 with composed tree. Source/guidance/comments reviewed; ADR0027/0032 semantics unchanged. Schema guard/regressions, ADR0010 status, owner method JSDoc and query-effects.ts remain byte-identical to integration parent.",
-        "177-merge-tests.log: 91 public/native cases pass in 9 files; includes final options, scope/interceptor/callback order, callback failures, event-cache retirement and Schema prototype regressions. 177-merge-api-types.log: packed declarations/ATTW/publint and TSRS + TS5.9.3 public fixtures pass; test task also passes both server-local compilers.",
-        "177-merge-typecheck.log: 224 strict files pass. 177-merge-effect.log passes with existing nonfatal suggestion; 177-merge-docs.log: 23 excerpt cases and Astro zero diagnostics. Scoped formatting/YAML/whitespace pass. Sync no-op. Fresh consumer/discovery unverified: agents prohibited. Full combined #180 and individual Astra/architecture/final gates remain; #174 criteria 2/4 remain failed pending separate fixer."
+        "src/core/query-owner.ts; emitted dist/index.d.mts shows complete runQuery/native-signal boundary and complementary streamed-query registration. vp run pack passes declarations/ATTW/publint; scoped formatting passes. No runtime tests added for comments; existing native owner/bridge/stream regression evidence retained. Final combined browser and consumer/discovery evidence remains unverified."
       ]
     },
     "source:vite.config.ts": {
