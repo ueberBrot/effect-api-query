@@ -3,9 +3,9 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "0b475ca8d5ad83bcbc12ccc80c162894239819b907fd7e5b5ac53918c204f2c1",
+      "fingerprint": "fd7e8aef0be1bc95efd1a6e132a9902d1aae1baeb1185f8579543b8b8cebc036",
       "snapshot": {
-        "GLOSSARY.md": "294f016460f575c7ee634a33c7b45c825f67a0501c31d42a5c42d681bacebd83",
+        "GLOSSARY.md": "761f45c329b7a0ad74a0e067d123eec6118aab1d233abf98938fe42f44b4ae06",
         "README.md": "9cc3275039f58de12efe6a19ea5ec5e23a56126cfeb81cf35480ae5ac147f1da",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "8cf2b005fd05a799118c262ecda121c4468cc023b5a666b7f46501e49f1b3099",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "eb226d096cee825aa2a7c2e49370208d6110662c3acf681fa4b95f8b6caca0d7",
@@ -39,7 +39,7 @@
         "apps/docs/src/content/docs/guides/queries.md": "fe77556cd8bd7aaa59a96762d16f50d6523c255eb6ff8b5d2ebbfd146e13b004",
         "apps/docs/src/content/docs/guides/query-defaults.md": "45bac4f6f8cd760709e43160e6c25c2201deba4584280201d6336c67c2ca3f19",
         "apps/docs/src/content/docs/guides/react-query.md": "00845a38e1374da62ebae3349fda63f94aeb6a907f64efa751e82d306a75aa4a",
-        "apps/docs/src/content/docs/guides/reconnect-streams.md": "5812fb3bfd0dae74fce9f2510d095551a92231bff18dfef2fe7be1d178599186",
+        "apps/docs/src/content/docs/guides/reconnect-streams.md": "6fa1d0e53d234e4ab03a5446d537c29c5e114bcb6d232e490b3a5e5210f96b30",
         "apps/docs/src/content/docs/guides/refresh-from-events.md": "5323233082a5fb0dfc26b80bb9aeaf363efe6ed77118bfa4a78c37079a9376ed",
         "apps/docs/src/content/docs/guides/retry-queries.md": "83fb94464b7031025b7a40b13dca8a7b9a9df7b75732875692048283f9591463",
         "apps/docs/src/content/docs/guides/share-decoded-values.md": "fd978373c03a0f1229e3da50c22efdd40ef66b9518830c730037a224efb56e74",
@@ -64,7 +64,7 @@
         "apps/docs/src/content/docs/reference/http-builders.md": "34d2fb026e5620878d21211f97dedfa7bec376e2267b9aab1088e759b5a20e9b",
         "apps/docs/src/content/docs/reference/http-factory.md": "676cad558cef9c5bb53c4c0626a1d67a6430d92f7a48fb6322821b4ac1bd686b",
         "apps/docs/src/content/docs/reference/performance.md": "e7809f71ac9d4dfc7ed55f16a3049dbb7331e73728b7ec20f9ffff3a5c77a7ae",
-        "apps/docs/src/content/docs/reference/public-exports.md": "42a8b78390655ed291576557435e8d610ee7fabe05223e27840c553580d7f9ea",
+        "apps/docs/src/content/docs/reference/public-exports.md": "a8d7ab711e2e47db3a39ee4e4d45ba1219679c2d69dc6cc40716159e7df5c27e",
         "apps/docs/src/content/docs/reference/type-inference.md": "a60819bcd3b5f7887efe97c1e6aabfdcf1822197abdd209b9d3820d33f4428b5",
         "docs/adr/0001-target-effect-4-release-candidate.md": "f8152332adf7278911e3b4e119d6079a444b01db840f225b62b1a05cd5ecf4f2",
         "docs/adr/0002-let-call-sites-choose-query-or-mutation.md": "ac6c71c1ab7fec80e50d843e92ac1d1b00c573fe8bf4ede0c4914f1711198c4d",
@@ -177,11 +177,11 @@
         "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "0997b75a672579f256310a13ca70392a55264657a67e2b17f2f2ca023e1c6901",
-        "skills/effect-api-query/references/cache-workflows.md": "d9c6ddc9ab0b06b6577bfbe8542465fc4ebfc18d3fdd74c228a8bfbfd424a4dd",
+        "skills/effect-api-query/references/cache-workflows.md": "f5518f7c626f86b7295b764464c4abce4ca6a8a5fd76cb0f7c51c59d491fdffa",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "6304d782143d2a38c2b574b37148f6ef189b1095ce55e43b535057b4f63065d3",
         "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
         "skills/effect-api-query/references/hydration-and-ssr.md": "30aeb844f4b4f7c3c6a5a70f4ecbfabbdfb7b332c62105b4ecad182238d38705",
-        "skills/effect-api-query/references/query-patterns.md": "a19125415a1f66507e449498a3bd1cb856f23e24812d2acb6abf44ff31373c58",
+        "skills/effect-api-query/references/query-patterns.md": "345355f40a521e7c3e6a43e3b8a0dd97694188459bc20929de85f5062c71b75a",
         "skills/effect-api-query/references/rpc.md": "cdbc026d1d29c486b28a2b9fc6a330bcc8855b5887f0f454f73ce261734e8e7e",
         "src/core/branch-filter.ts": "71a8c6039f1775881bbc00d92e14e2ef823bf7150721307a74f16a1579bccc86",
         "src/core/canonical-key.ts": "84e91000876a6795557aab39dcc5d44e328250bf9b30ad02fd67afd02f5003e9",
@@ -200,7 +200,7 @@
         "src/core/schema-key.ts": "7dad2749d30f2ab828dbc7e96d6e1e2b32b6733450cb6dc734de607629d925f8",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
         "src/core/stream-publication.ts": "5c0f53bc84e3bb53337b9e76ea7dcd2269f080e9b2a35ad9d3f4ecce341fa61d",
-        "src/core/stream-recovery.ts": "358a585cb59195f39f429a7736eb21c3ceed5b52b229768d681ff84239a6d622",
+        "src/core/stream-recovery.ts": "c2c53ed24c042c24a18b2379995107a09e3145080cc97597d7bb41d3a616d37e",
         "src/core/stream-snapshot.ts": "97fbb56308b2e2decacd86a02b3f0a3ced76692444ba25a7abaae05b442c233a",
         "src/core/streamed-query.ts": "8188a6501a0dc5450b09098058f5e6a9bb2a8bc1427bd78cec5f447baba3ca59",
         "src/core/types.ts": "8e20c35e9a4ad9193622359e10660b65d03b8bee51e685d75f2e29ac40bfae59",
@@ -212,7 +212,7 @@
         "src/http/request.ts": "4dced85460db56cb83514486417e17dd4a35629ad28749a2ac01dadbe45113b3",
         "src/http/streamed-query.ts": "27d1f5418009216d960816485cfd7f1760a8e3f638ccb9ac8dfa5fc040b1564a",
         "src/http/types.ts": "f6b248adf2c8705bfd2d9c6d301d4748a4c3cb66ad706b90ae6743540448f5c3",
-        "src/index.ts": "f863d2df2403dd7fb92deabd2448f392fa9b0eb7bb283e837d091967b324fe89",
+        "src/index.ts": "adb74c5c857b05fd810e08f6e510a9dd5fec71a721f2a682f649ba0e5ab9f0b1",
         "src/rpc/create-utils.ts": "8ebf030b0f76f91c248434c169d789d6328d2ba43c07afe15e04db0a02f05c2c",
         "src/rpc/errors.ts": "8e1fbcc7843b2bf99e9d80bfd365dc118d52351909d5c8f48c46ba9d39fdedd3",
         "src/rpc/operation.ts": "ac10df77707045d22c2d58ff0f776362a7fb5ce03e179c10238c42320ad6f719",
@@ -275,7 +275,7 @@
         "tests/skills/query-usability/grade.test.ts": "f3c2650deba0d887f66fb3b3afd284cd9baf562296f2984e5c84b014ecec8cbd",
         "tests/skills/query-usability/solution.ts": "38583676eaa2d33e8ca56c07a430e3a28787feae9d84c6d3612e01d6d7f1d80f",
         "tests/stream-publication.test.ts": "c5176b80e4fdd4bd361b0675f599e8604b6f09582ec82b7569dd4fe28901953f",
-        "tests/stream-recovery.test.ts": "2935df14d5b4d03a3baf939cabc34dc4d73417fcf16ae36379e5af636fd1aca4",
+        "tests/stream-recovery.test.ts": "93e68be6631e0335129d9459e9989aff56e3431e8ece9540104278a8b5cc1cb1",
         "tests/stream-snapshot.test.ts": "78d203b3e92b930122920824f4874876c3d16046e08c8d811f20953310c94fb7",
         "tests/types/docs-functionality.ts": "065ff9eac091e4a25c814e3e49b49d0f6258fffb7c5ed0661a1ec960b41ac0c0",
         "tests/types/docs-http-ndjson.ts": "a86513c1047b700ce27fc49b3d1fb31004cf745096d8403a0bdc780d95a448a3",
@@ -285,6 +285,7 @@
         "tests/types/docs-hydration-dto.ts": "65b61e5a18619aa600ade5626a83112c04608c08adcdd147f743bc6ae724f1ef",
         "tests/types/docs-hydration-rich.ts": "af96271b8d9516c5ad6e55a6742fba02b487910fce7906af92bee813e14f267b",
         "tests/types/docs-hydration-views.ts": "4c6e04cd4c5266bf9b0a78adabc36fa78aac956752faaa3e6a5dce912b962c47",
+        "tests/types/docs-opaque-recovery.ts": "88e2c2764ccd8195f65c4f46ff891a8487fe8b3740376239d5385fa9b7aea8ce",
         "tests/types/docs-policies.ts": "416116e0f87d8c5a3e2b3b32c89df84f2ca73d155b3c1c1c67e981e45280eec5",
         "tests/types/docs-react-client.ts": "ac129f0e8e160655b8fe2465e2ef0bb990ff29feccdea6eccb792b68e0e940c7",
         "tests/types/docs-react-entry.ts": "f2aec2af1d2723452d875f90c2427f732d865ebdf299d0b864f0683475269474",
@@ -324,7 +325,7 @@
         "tests/types/server-local-client-contract.ts": "4b150665dbcb3022fd90149c9c70cbd8a07322b3739e80ee712b80bd735f110b",
         "tests/types/snapshot-contract.ts": "7eb7b28d2ef7e8348992ca69d52d6cb557d3e4a119f33b0a26c61a5da4f211e4",
         "tests/types/stream-publication-contract.ts": "7ada8016ddbbc7a3068c69d36a8cc83cc6f6875b28b5aa1acc4887eb6038b189",
-        "tests/types/stream-recovery-contract.ts": "c14e32cd42ff046a50e65282afd97b63d6388fa7d61cafb39ed38eacd51efdaf",
+        "tests/types/stream-recovery-contract.ts": "cd9ad0a63edb515f1ff17ca64bbd9e5dd2484637e199aa2cbaa6cebf3e01527f",
         "tests/types/stream-retention-contract.ts": "f9e780657769e8354d0ef7f357fe82df100fc3c11ecdd75d28680416e6ffb1a9",
         "tests/types/tanstack-start-contract.ts": "fdfb1043660a634e5d43eab80d60b254f03db8c35c85940e8bfc8f23adb4d350",
         "tests/types/type-scale.ts": "03bcc9eca13fb59054b8f047a70183cd33cdb9ba7acc73d6e8061c9eb271d546",
@@ -332,24 +333,22 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "dbb64e8e2fc4fa3420403e87b0a30d2ff2c4f657",
+      "head": "296e650f55f067f660207ab8a3c3ff02b7a0f807",
       "outcome": "updated",
-      "reason": "Serial integration of #169 at 720c4f6e with #170 at dbb64e8e preserves both input ownership and stable stream publication outcomes. RPC/HTTP guidance and checked examples now cover retained immutable input, deterministic/query-stable construction, owner-bound prepared handles and synchronous errors. ADR 0014 remains applicable; ADR 0037 stream guarantees remain intact. Both domain-map extensions and cumulative history entries are retained. Existing skill tree paths, prerequisites, reference inventory and source globs already cover the combined changes; no tree edit needed.",
+      "reason": "Reviewed ticket #171 source diff dbb64e8..03b273b and combined branch 296e650. Query-patterns and cache-workflows now describe explicit cursor acceptance and optional gap detection, preserving numeric convenience, consumption-local checkpoints, failure/service inference and cleanup. Existing activation, purpose and source mappings remain accurate.",
       "evidence": [
-        "Inspected complete #169 ticket diff against integration, both ticket handoffs, all three planning records and shipped entry/reference changes. Retained #170 guidance, source and regression changes unchanged; no runtime API changes in #169.",
-        "Uncached vp run test: 88 cases / 8 files pass for query usability/preparation/ownership, RPC keys/execution, HTTP options/semantic keys, stream baseline/cache and snapshots. Dependencies reran package/declaration build, attw, publint and public/server-local fixtures on TypeScript 7.0.2 and 5.9.3.",
-        "Uncached docs-check: 21 excerpt tests pass and Astro 0 errors/warnings/hints. Uncached typecheck (strict typed lint/check) and changed-file format pass. Broad check blocked only by formatting of two preserved unrelated .scratch JSON files.",
-        "Intent sync no-op. Combined domain map parses in Intent; default yamllint reports 84 pre-existing errors / 1 warning vs integration baseline 85 errors / 1 warning, no new violations. Skill tree structure, mappings and six-reference inventory remain accurate.",
-        "Prior stream evidence remains in 170-result.md/170-merge-result.md and prior input evidence in 169-result.md; no contradictory guarantees discarded. Fresh consumer-agent/discovery evaluation unverified because delegation is prohibited. Full browser/build/compatibility integration remains parent scope."
+        "24 public recovery cases cover numeric/opaque/structured cursors, duplicate rejection, gaps, expiry, refresh failure, interruption and complete cleanup Causes; combined 62 public runtime/doc/workflow cases pass after merging local spec tip 2c88aa4.",
+        "vp run api-types passes TypeScript 7.0.2 and 5.9.3 against built declarations, including independent hook failure/environment negative fixtures and complete opaque documentation example. Package attw/publint pass.",
+        "vp run typecheck, effect-check, docs-check, format and skills-check pass. Fresh consumer-agent/discovery check unverified: task prohibits delegation. No exactly-once or remote acknowledgement guarantee."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "e0e476ad88edec60170ff663e73dea029f5c3bf0405c68e38321f10aceed4d9d",
+      "fingerprint": "ca87f5854731de62067ea77a9d38b7a73e9403aad6b91c5a7a7c3c5ffc3e30c6",
       "snapshot": {
-        "GLOSSARY.md": "294f016460f575c7ee634a33c7b45c825f67a0501c31d42a5c42d681bacebd83",
+        "GLOSSARY.md": "761f45c329b7a0ad74a0e067d123eec6118aab1d233abf98938fe42f44b4ae06",
         "README.md": "9cc3275039f58de12efe6a19ea5ec5e23a56126cfeb81cf35480ae5ac147f1da",
-        "_artifacts/domain_map.yaml": "022bbb3aea992026451a008e54061c59878519f2c29c7916d7b3ef1ba2c74318",
-        "_artifacts/skill_spec.md": "4e37cb0a6c9fe0074bec9dea3164f73ec1b13e1a84a5e5bb27439e7a63b943ba",
+        "_artifacts/domain_map.yaml": "66e6c1fbeb6055b007f310dc11e970d03517f7822d2638bef133cec701a505c6",
+        "_artifacts/skill_spec.md": "7610abfcbfc28173df54f9ce1e1a072a3fb39958a1b5ee9e6c578e3b3df826e1",
         "_artifacts/skill_tree.yaml": "ce59cb7d97ff4f1cc36c4723ef889ccb37a96c24ed31a084be3a9fea620be07a",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "8cf2b005fd05a799118c262ecda121c4468cc023b5a666b7f46501e49f1b3099",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "eb226d096cee825aa2a7c2e49370208d6110662c3acf681fa4b95f8b6caca0d7",
@@ -383,7 +382,7 @@
         "apps/docs/src/content/docs/guides/queries.md": "fe77556cd8bd7aaa59a96762d16f50d6523c255eb6ff8b5d2ebbfd146e13b004",
         "apps/docs/src/content/docs/guides/query-defaults.md": "45bac4f6f8cd760709e43160e6c25c2201deba4584280201d6336c67c2ca3f19",
         "apps/docs/src/content/docs/guides/react-query.md": "00845a38e1374da62ebae3349fda63f94aeb6a907f64efa751e82d306a75aa4a",
-        "apps/docs/src/content/docs/guides/reconnect-streams.md": "5812fb3bfd0dae74fce9f2510d095551a92231bff18dfef2fe7be1d178599186",
+        "apps/docs/src/content/docs/guides/reconnect-streams.md": "6fa1d0e53d234e4ab03a5446d537c29c5e114bcb6d232e490b3a5e5210f96b30",
         "apps/docs/src/content/docs/guides/refresh-from-events.md": "5323233082a5fb0dfc26b80bb9aeaf363efe6ed77118bfa4a78c37079a9376ed",
         "apps/docs/src/content/docs/guides/retry-queries.md": "83fb94464b7031025b7a40b13dca8a7b9a9df7b75732875692048283f9591463",
         "apps/docs/src/content/docs/guides/share-decoded-values.md": "fd978373c03a0f1229e3da50c22efdd40ef66b9518830c730037a224efb56e74",
@@ -408,7 +407,7 @@
         "apps/docs/src/content/docs/reference/http-builders.md": "34d2fb026e5620878d21211f97dedfa7bec376e2267b9aab1088e759b5a20e9b",
         "apps/docs/src/content/docs/reference/http-factory.md": "676cad558cef9c5bb53c4c0626a1d67a6430d92f7a48fb6322821b4ac1bd686b",
         "apps/docs/src/content/docs/reference/performance.md": "e7809f71ac9d4dfc7ed55f16a3049dbb7331e73728b7ec20f9ffff3a5c77a7ae",
-        "apps/docs/src/content/docs/reference/public-exports.md": "42a8b78390655ed291576557435e8d610ee7fabe05223e27840c553580d7f9ea",
+        "apps/docs/src/content/docs/reference/public-exports.md": "a8d7ab711e2e47db3a39ee4e4d45ba1219679c2d69dc6cc40716159e7df5c27e",
         "apps/docs/src/content/docs/reference/type-inference.md": "a60819bcd3b5f7887efe97c1e6aabfdcf1822197abdd209b9d3820d33f4428b5",
         "docs/adr/0001-target-effect-4-release-candidate.md": "f8152332adf7278911e3b4e119d6079a444b01db840f225b62b1a05cd5ecf4f2",
         "docs/adr/0002-let-call-sites-choose-query-or-mutation.md": "ac6c71c1ab7fec80e50d843e92ac1d1b00c573fe8bf4ede0c4914f1711198c4d",
@@ -521,11 +520,11 @@
         "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "0997b75a672579f256310a13ca70392a55264657a67e2b17f2f2ca023e1c6901",
-        "skills/effect-api-query/references/cache-workflows.md": "d9c6ddc9ab0b06b6577bfbe8542465fc4ebfc18d3fdd74c228a8bfbfd424a4dd",
+        "skills/effect-api-query/references/cache-workflows.md": "f5518f7c626f86b7295b764464c4abce4ca6a8a5fd76cb0f7c51c59d491fdffa",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "6304d782143d2a38c2b574b37148f6ef189b1095ce55e43b535057b4f63065d3",
         "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
         "skills/effect-api-query/references/hydration-and-ssr.md": "30aeb844f4b4f7c3c6a5a70f4ecbfabbdfb7b332c62105b4ecad182238d38705",
-        "skills/effect-api-query/references/query-patterns.md": "a19125415a1f66507e449498a3bd1cb856f23e24812d2acb6abf44ff31373c58",
+        "skills/effect-api-query/references/query-patterns.md": "345355f40a521e7c3e6a43e3b8a0dd97694188459bc20929de85f5062c71b75a",
         "skills/effect-api-query/references/rpc.md": "cdbc026d1d29c486b28a2b9fc6a330bcc8855b5887f0f454f73ce261734e8e7e",
         "src/core/branch-filter.ts": "71a8c6039f1775881bbc00d92e14e2ef823bf7150721307a74f16a1579bccc86",
         "src/core/canonical-key.ts": "84e91000876a6795557aab39dcc5d44e328250bf9b30ad02fd67afd02f5003e9",
@@ -544,7 +543,7 @@
         "src/core/schema-key.ts": "7dad2749d30f2ab828dbc7e96d6e1e2b32b6733450cb6dc734de607629d925f8",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
         "src/core/stream-publication.ts": "5c0f53bc84e3bb53337b9e76ea7dcd2269f080e9b2a35ad9d3f4ecce341fa61d",
-        "src/core/stream-recovery.ts": "358a585cb59195f39f429a7736eb21c3ceed5b52b229768d681ff84239a6d622",
+        "src/core/stream-recovery.ts": "c2c53ed24c042c24a18b2379995107a09e3145080cc97597d7bb41d3a616d37e",
         "src/core/stream-snapshot.ts": "97fbb56308b2e2decacd86a02b3f0a3ced76692444ba25a7abaae05b442c233a",
         "src/core/streamed-query.ts": "8188a6501a0dc5450b09098058f5e6a9bb2a8bc1427bd78cec5f447baba3ca59",
         "src/core/types.ts": "8e20c35e9a4ad9193622359e10660b65d03b8bee51e685d75f2e29ac40bfae59",
@@ -556,7 +555,7 @@
         "src/http/request.ts": "4dced85460db56cb83514486417e17dd4a35629ad28749a2ac01dadbe45113b3",
         "src/http/streamed-query.ts": "27d1f5418009216d960816485cfd7f1760a8e3f638ccb9ac8dfa5fc040b1564a",
         "src/http/types.ts": "f6b248adf2c8705bfd2d9c6d301d4748a4c3cb66ad706b90ae6743540448f5c3",
-        "src/index.ts": "f863d2df2403dd7fb92deabd2448f392fa9b0eb7bb283e837d091967b324fe89",
+        "src/index.ts": "adb74c5c857b05fd810e08f6e510a9dd5fec71a721f2a682f649ba0e5ab9f0b1",
         "src/rpc/create-utils.ts": "8ebf030b0f76f91c248434c169d789d6328d2ba43c07afe15e04db0a02f05c2c",
         "src/rpc/errors.ts": "8e1fbcc7843b2bf99e9d80bfd365dc118d52351909d5c8f48c46ba9d39fdedd3",
         "src/rpc/operation.ts": "ac10df77707045d22c2d58ff0f776362a7fb5ce03e179c10238c42320ad6f719",
@@ -619,7 +618,7 @@
         "tests/skills/query-usability/grade.test.ts": "f3c2650deba0d887f66fb3b3afd284cd9baf562296f2984e5c84b014ecec8cbd",
         "tests/skills/query-usability/solution.ts": "38583676eaa2d33e8ca56c07a430e3a28787feae9d84c6d3612e01d6d7f1d80f",
         "tests/stream-publication.test.ts": "c5176b80e4fdd4bd361b0675f599e8604b6f09582ec82b7569dd4fe28901953f",
-        "tests/stream-recovery.test.ts": "2935df14d5b4d03a3baf939cabc34dc4d73417fcf16ae36379e5af636fd1aca4",
+        "tests/stream-recovery.test.ts": "93e68be6631e0335129d9459e9989aff56e3431e8ece9540104278a8b5cc1cb1",
         "tests/stream-snapshot.test.ts": "78d203b3e92b930122920824f4874876c3d16046e08c8d811f20953310c94fb7",
         "tests/types/docs-functionality.ts": "065ff9eac091e4a25c814e3e49b49d0f6258fffb7c5ed0661a1ec960b41ac0c0",
         "tests/types/docs-http-ndjson.ts": "a86513c1047b700ce27fc49b3d1fb31004cf745096d8403a0bdc780d95a448a3",
@@ -629,6 +628,7 @@
         "tests/types/docs-hydration-dto.ts": "65b61e5a18619aa600ade5626a83112c04608c08adcdd147f743bc6ae724f1ef",
         "tests/types/docs-hydration-rich.ts": "af96271b8d9516c5ad6e55a6742fba02b487910fce7906af92bee813e14f267b",
         "tests/types/docs-hydration-views.ts": "4c6e04cd4c5266bf9b0a78adabc36fa78aac956752faaa3e6a5dce912b962c47",
+        "tests/types/docs-opaque-recovery.ts": "88e2c2764ccd8195f65c4f46ff891a8487fe8b3740376239d5385fa9b7aea8ce",
         "tests/types/docs-policies.ts": "416116e0f87d8c5a3e2b3b32c89df84f2ca73d155b3c1c1c67e981e45280eec5",
         "tests/types/docs-react-client.ts": "ac129f0e8e160655b8fe2465e2ef0bb990ff29feccdea6eccb792b68e0e940c7",
         "tests/types/docs-react-entry.ts": "f2aec2af1d2723452d875f90c2427f732d865ebdf299d0b864f0683475269474",
@@ -668,7 +668,7 @@
         "tests/types/server-local-client-contract.ts": "4b150665dbcb3022fd90149c9c70cbd8a07322b3739e80ee712b80bd735f110b",
         "tests/types/snapshot-contract.ts": "7eb7b28d2ef7e8348992ca69d52d6cb557d3e4a119f33b0a26c61a5da4f211e4",
         "tests/types/stream-publication-contract.ts": "7ada8016ddbbc7a3068c69d36a8cc83cc6f6875b28b5aa1acc4887eb6038b189",
-        "tests/types/stream-recovery-contract.ts": "c14e32cd42ff046a50e65282afd97b63d6388fa7d61cafb39ed38eacd51efdaf",
+        "tests/types/stream-recovery-contract.ts": "cd9ad0a63edb515f1ff17ca64bbd9e5dd2484637e199aa2cbaa6cebf3e01527f",
         "tests/types/stream-retention-contract.ts": "f9e780657769e8354d0ef7f357fe82df100fc3c11ecdd75d28680416e6ffb1a9",
         "tests/types/tanstack-start-contract.ts": "fdfb1043660a634e5d43eab80d60b254f03db8c35c85940e8bfc8f23adb4d350",
         "tests/types/type-scale.ts": "03bcc9eca13fb59054b8f047a70183cd33cdb9ba7acc73d6e8061c9eb271d546",
@@ -676,15 +676,13 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "dbb64e8e2fc4fa3420403e87b0a30d2ff2c4f657",
+      "head": "296e650f55f067f660207ab8a3c3ff02b7a0f807",
       "outcome": "updated",
-      "reason": "Serial integration of #169 at 720c4f6e with #170 at dbb64e8e preserves both input ownership and stable stream publication outcomes. RPC/HTTP guidance and checked examples now cover retained immutable input, deterministic/query-stable construction, owner-bound prepared handles and synchronous errors. ADR 0014 remains applicable; ADR 0037 stream guarantees remain intact. Both domain-map extensions and cumulative history entries are retained. Existing skill tree paths, prerequisites, reference inventory and source globs already cover the combined changes; no tree edit needed.",
+      "reason": "Extended domain_map recovery task and skill_spec batch history for application-defined acceptance/order, optional gap detection and hook inference. Reviewed skill_tree: its existing src/tests/docs/ADR globs and one-skill six-reference structure already cover all changed guidance, requiring no edit. Preserved integrated #169/#170 history. ADR 0031 already assigns recovery policy to applications; no accepted numeric-only decision needs ADR 0038.",
       "evidence": [
-        "Inspected complete #169 ticket diff against integration, both ticket handoffs, all three planning records and shipped entry/reference changes. Retained #170 guidance, source and regression changes unchanged; no runtime API changes in #169.",
-        "Uncached vp run test: 88 cases / 8 files pass for query usability/preparation/ownership, RPC keys/execution, HTTP options/semantic keys, stream baseline/cache and snapshots. Dependencies reran package/declaration build, attw, publint and public/server-local fixtures on TypeScript 7.0.2 and 5.9.3.",
-        "Uncached docs-check: 21 excerpt tests pass and Astro 0 errors/warnings/hints. Uncached typecheck (strict typed lint/check) and changed-file format pass. Broad check blocked only by formatting of two preserved unrelated .scratch JSON files.",
-        "Intent sync no-op. Combined domain map parses in Intent; default yamllint reports 84 pre-existing errors / 1 warning vs integration baseline 85 errors / 1 warning, no new violations. Skill tree structure, mappings and six-reference inventory remain accurate.",
-        "Prior stream evidence remains in 170-result.md/170-merge-result.md and prior input evidence in 169-result.md; no contradictory guarantees discarded. Fresh consumer-agent/discovery evaluation unverified because delegation is prohibited. Full browser/build/compatibility integration remains parent scope."
+        "_artifacts/domain_map.yaml; _artifacts/skill_spec.md; _artifacts/skill_tree.yaml; intent maintainer sync reports nothing to synchronize.",
+        "YAML syntax/style validation passes with document-start and line-length disabled to match existing planning prose style; default yamllint flags those existing style conventions.",
+        "62 post-merge public tests; both public compiler fixtures; typecheck, effect-check, docs-check, format, skills-check pass. Fresh consumer-agent behavior unverified by task constraint."
       ]
     },
     "source:vite.config.ts": {
@@ -3001,6 +2999,18 @@
       "reason": "Patch release note describes internal stable Query Core integration and unchanged stream semantics. Existing query-patterns guidance was reconciled in the owning skill review; the release note requires no independently discoverable skill.",
       "evidence": [
         ".changeset/tidy-stream-execution.md; src/core/streamed-query.ts; 801 runtime tests and 301 post-merge stream cases pass; package validation passes"
+      ]
+    },
+    "source:.changeset/opaque-recovery-cursors.md": {
+      "fingerprint": "061ce7cd5b508fa0685fd9276b1e16957a3bb48df9fd527996fdb96b9bdbb8c9",
+      "snapshot": {
+        ".changeset/opaque-recovery-cursors.md": "31c9f43c071b47389a42cc7ef527e58a5040fd0fd7d0578067a1d6763633909a"
+      },
+      "head": "296e650f55f067f660207ab8a3c3ff02b7a0f807",
+      "outcome": "no-change",
+      "reason": "Minor release note accurately describes the additive cursor policy and preserved inference/cleanup behavior. The existing query-patterns and cache-workflows references already own this guidance; no separate skill is warranted.",
+      "evidence": [
+        ".changeset/opaque-recovery-cursors.md compared with src/core/stream-recovery.ts and passing public recovery/compiler regressions."
       ]
     }
   }
