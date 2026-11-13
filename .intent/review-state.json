@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "b66f3e80beb10fae10224d81995ce10ac73a407d9a3b6a4cadfb9787cf0c7643",
+      "fingerprint": "c18526752da45dfeb14dcf0588f359951911218621c9da3c948d00fea20e8c38",
       "snapshot": {
         "GLOSSARY.md": "1caf855a606847e46e31200b90df6077d7a84de114e213b011bf27e432989252",
         "README.md": "9cc3275039f58de12efe6a19ea5ec5e23a56126cfeb81cf35480ae5ac147f1da",
@@ -64,7 +64,7 @@
         "apps/docs/src/content/docs/reference/generated-builders.md": "e56a363220dc887f84278dd5076b6fb352a317c1b423d56a1c90bd6f08948ff6",
         "apps/docs/src/content/docs/reference/http-builders.md": "34d2fb026e5620878d21211f97dedfa7bec376e2267b9aab1088e759b5a20e9b",
         "apps/docs/src/content/docs/reference/http-factory.md": "676cad558cef9c5bb53c4c0626a1d67a6430d92f7a48fb6322821b4ac1bd686b",
-        "apps/docs/src/content/docs/reference/performance.md": "e7809f71ac9d4dfc7ed55f16a3049dbb7331e73728b7ec20f9ffff3a5c77a7ae",
+        "apps/docs/src/content/docs/reference/performance.md": "27d6bd088e7e1a86be81557ffc969ea92ca82444d96bc75c4b031e6ac8d81dda",
         "apps/docs/src/content/docs/reference/public-exports.md": "81497bd0c491d293dff1def4b8f9c2194370a583ea34772b7cb57ac63375e646",
         "apps/docs/src/content/docs/reference/type-inference.md": "a60819bcd3b5f7887efe97c1e6aabfdcf1822197abdd209b9d3820d33f4428b5",
         "docs/adr/0001-target-effect-4-release-candidate.md": "f8152332adf7278911e3b4e119d6079a444b01db840f225b62b1a05cd5ecf4f2",
@@ -188,7 +188,7 @@
         "skills/effect-api-query/references/frameworks-and-hosts.md": "0b693d32832b1a5d742ee33eab7e6769be81deaa614f216bb9a547c4cde48335",
         "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
         "skills/effect-api-query/references/hydration-and-ssr.md": "30aeb844f4b4f7c3c6a5a70f4ecbfabbdfb7b332c62105b4ecad182238d38705",
-        "skills/effect-api-query/references/query-patterns.md": "00b09057dfaed46a3129f9f88312d77c5965be48d5e7b1ed586a39ef526d9f24",
+        "skills/effect-api-query/references/query-patterns.md": "f36eedbe6f1467189dc02513220a628d8cf6718741891daf52caf1d4234b20d3",
         "skills/effect-api-query/references/rpc.md": "cdbc026d1d29c486b28a2b9fc6a330bcc8855b5887f0f454f73ce261734e8e7e",
         "src/core/branch-filter.ts": "71a8c6039f1775881bbc00d92e14e2ef823bf7150721307a74f16a1579bccc86",
         "src/core/canonical-key.ts": "84e91000876a6795557aab39dcc5d44e328250bf9b30ad02fd67afd02f5003e9",
@@ -220,7 +220,7 @@
         "src/http/operation.ts": "4a3651be65fee9fc039c38c0f191ba6a79347a5bd45c3f233de7d90c12d8bf9c",
         "src/http/request.ts": "4dced85460db56cb83514486417e17dd4a35629ad28749a2ac01dadbe45113b3",
         "src/http/streamed-query.ts": "27d1f5418009216d960816485cfd7f1760a8e3f638ccb9ac8dfa5fc040b1564a",
-        "src/http/types.ts": "37be5b08898b0f12c460f7954f243b1ae12c1d903376428c77c34b8b2ca90b4f",
+        "src/http/types.ts": "15fc23c7faaa186fef3d841e5ebf3ac4ea0109ae5c0c2f5bb1ffb9f1516b39fe",
         "src/index.ts": "d4ce613a2b8ce9e8b76457c941d04c7dbddd61a2de92def327c7f21510cb0605",
         "src/rpc/create-utils.ts": "8ebf030b0f76f91c248434c169d789d6328d2ba43c07afe15e04db0a02f05c2c",
         "src/rpc/errors.ts": "8e1fbcc7843b2bf99e9d80bfd365dc118d52351909d5c8f48c46ba9d39fdedd3",
@@ -348,20 +348,23 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "c1662be32cc26149203cfecb7ed93863997e668c",
+      "head": "e4c6560fdcd99f8d4fae09f65a4cbcdc0b0920e3",
       "outcome": "updated",
-      "reason": "Merged lifecycle setup/retirement guidance with the existing Effect cache bridge guidance, retaining both public exports and failure/ownership contracts. Native owner code and application match c210c613; bridge runtime matches c1662be. Combined public regression verifies interrupted bridge waiter leaves observer work alive until owner retirement drains coalesced source before release.",
+      "reason": "Reviewed actual HTTP types diff: indexed member lookup and combined Effect/stream service extraction retain builder overloads and endpoint eligibility. Clarified existing prepared-input reference to configure once per owner while retaining reactive option rebuilding and immutable inputs.",
       "evidence": [
-        "85 scoped tests/11 files pass (/tmp/173-merge-tests-final.log), public and server-local TSRS+TS5.9 fixtures and package/ATTW/publint pass; strict typed check 217 files, Effect check and 22 docs examples/Astro pass. Scoped format/YAML pass. Reuse ticket 823 runtime and 8 Chromium results; fresh consumer discovery and other browsers unverified; independent Astra audit remains parent-owned."
+        "src/http/types.ts",
+        "skills/effect-api-query/references/query-patterns.md",
+        "apps/docs/src/content/docs/reference/performance.md",
+        "Both public compiler suites and installed tarball native Vue/Solid/Svelte/Angular fixtures pass TSRS 0.21.0 and TS5.9.3; 26 reuse/configuration tests pass; 22 docs cases and Astro pass. Fresh consumer-agent discovery unverified; no description change."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "a4526e1f226e620f24a4175caafb78e09a6b32f60974c54055c118b4d3125e6e",
+      "fingerprint": "b1460e5e5e34be237735aa3c4d01580644970decd016892176d1fd67d47545fe",
       "snapshot": {
         "GLOSSARY.md": "1caf855a606847e46e31200b90df6077d7a84de114e213b011bf27e432989252",
         "README.md": "9cc3275039f58de12efe6a19ea5ec5e23a56126cfeb81cf35480ae5ac147f1da",
-        "_artifacts/domain_map.yaml": "df35540ce5bdf9501be70ddc195d6ed7efbbbc44402252c663d8a0ca9e34beb0",
-        "_artifacts/skill_spec.md": "fcb2a047f2ecf93dac4a82837ec3b3def8b26fdaf9108203cc3865a731e3c92f",
+        "_artifacts/domain_map.yaml": "4b435395b45bdb709060d16c6fb25a987dddbdf7089173ef551a3f3daf58426e",
+        "_artifacts/skill_spec.md": "e0cdce0fa98516fbfb7885d1c13d31f97b062c7dccb9b2a049df0c73ad9fef71",
         "_artifacts/skill_tree.yaml": "cab1e054da917dfb6b8990f53abe0535d1dd69ba76311ec0fcc503a52f1d308d",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "83a6aab512d66893237aa3ba45bf52b23712b88d829d83992509c2f3c822c18b",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "eb226d096cee825aa2a7c2e49370208d6110662c3acf681fa4b95f8b6caca0d7",
@@ -420,7 +423,7 @@
         "apps/docs/src/content/docs/reference/generated-builders.md": "e56a363220dc887f84278dd5076b6fb352a317c1b423d56a1c90bd6f08948ff6",
         "apps/docs/src/content/docs/reference/http-builders.md": "34d2fb026e5620878d21211f97dedfa7bec376e2267b9aab1088e759b5a20e9b",
         "apps/docs/src/content/docs/reference/http-factory.md": "676cad558cef9c5bb53c4c0626a1d67a6430d92f7a48fb6322821b4ac1bd686b",
-        "apps/docs/src/content/docs/reference/performance.md": "e7809f71ac9d4dfc7ed55f16a3049dbb7331e73728b7ec20f9ffff3a5c77a7ae",
+        "apps/docs/src/content/docs/reference/performance.md": "27d6bd088e7e1a86be81557ffc969ea92ca82444d96bc75c4b031e6ac8d81dda",
         "apps/docs/src/content/docs/reference/public-exports.md": "81497bd0c491d293dff1def4b8f9c2194370a583ea34772b7cb57ac63375e646",
         "apps/docs/src/content/docs/reference/type-inference.md": "a60819bcd3b5f7887efe97c1e6aabfdcf1822197abdd209b9d3820d33f4428b5",
         "docs/adr/0001-target-effect-4-release-candidate.md": "f8152332adf7278911e3b4e119d6079a444b01db840f225b62b1a05cd5ecf4f2",
@@ -544,7 +547,7 @@
         "skills/effect-api-query/references/frameworks-and-hosts.md": "0b693d32832b1a5d742ee33eab7e6769be81deaa614f216bb9a547c4cde48335",
         "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
         "skills/effect-api-query/references/hydration-and-ssr.md": "30aeb844f4b4f7c3c6a5a70f4ecbfabbdfb7b332c62105b4ecad182238d38705",
-        "skills/effect-api-query/references/query-patterns.md": "00b09057dfaed46a3129f9f88312d77c5965be48d5e7b1ed586a39ef526d9f24",
+        "skills/effect-api-query/references/query-patterns.md": "f36eedbe6f1467189dc02513220a628d8cf6718741891daf52caf1d4234b20d3",
         "skills/effect-api-query/references/rpc.md": "cdbc026d1d29c486b28a2b9fc6a330bcc8855b5887f0f454f73ce261734e8e7e",
         "src/core/branch-filter.ts": "71a8c6039f1775881bbc00d92e14e2ef823bf7150721307a74f16a1579bccc86",
         "src/core/canonical-key.ts": "84e91000876a6795557aab39dcc5d44e328250bf9b30ad02fd67afd02f5003e9",
@@ -576,7 +579,7 @@
         "src/http/operation.ts": "4a3651be65fee9fc039c38c0f191ba6a79347a5bd45c3f233de7d90c12d8bf9c",
         "src/http/request.ts": "4dced85460db56cb83514486417e17dd4a35629ad28749a2ac01dadbe45113b3",
         "src/http/streamed-query.ts": "27d1f5418009216d960816485cfd7f1760a8e3f638ccb9ac8dfa5fc040b1564a",
-        "src/http/types.ts": "37be5b08898b0f12c460f7954f243b1ae12c1d903376428c77c34b8b2ca90b4f",
+        "src/http/types.ts": "15fc23c7faaa186fef3d841e5ebf3ac4ea0109ae5c0c2f5bb1ffb9f1516b39fe",
         "src/index.ts": "d4ce613a2b8ce9e8b76457c941d04c7dbddd61a2de92def327c7f21510cb0605",
         "src/rpc/create-utils.ts": "8ebf030b0f76f91c248434c169d789d6328d2ba43c07afe15e04db0a02f05c2c",
         "src/rpc/errors.ts": "8e1fbcc7843b2bf99e9d80bfd365dc118d52351909d5c8f48c46ba9d39fdedd3",
@@ -704,11 +707,14 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "c1662be32cc26149203cfecb7ed93863997e668c",
+      "head": "e4c6560fdcd99f8d4fae09f65a4cbcdc0b0920e3",
       "outcome": "updated",
-      "reason": "Reconciled domain_map owner lifecycle and bridge tasks; skill_spec retains cumulative #173 and #174 entries; skill_tree includes ADR0040 source mapping and retains one skill/six references. No additional skills or changed activation metadata warranted.",
+      "reason": "domain_map extends existing owner-bound preparation/configuration task; skill_spec preserves prior history and records limited compiler reduction and check limits. skill_tree already maps changed source/docs/scripts and retains one skill/six references, prerequisites, package placement and new integrated ADR0040; sync no-op.",
       "evidence": [
-        "_artifacts/domain_map.yaml, _artifacts/skill_spec.md, _artifacts/skill_tree.yaml compared with c1662be and c210c613; Intent sync no-op; YAML and scoped formatting pass; 85 combined scoped tests and both compiler suites pass. Exactly21 unrelated research review items left unannotated."
+        "_artifacts/domain_map.yaml",
+        "_artifacts/skill_spec.md",
+        "_artifacts/skill_tree.yaml",
+        "Matched reports and final merged 18-workload validation pass; YAML parsing/lint passes; no ADR0044 because accepted architecture is unchanged."
       ]
     },
     "source:vite.config.ts": {
@@ -3164,6 +3170,20 @@
       "reason": "Release note describes only the additive optional bridge and minor classification already covered by the updated cache-workflows guidance; no additional skill or planning task is warranted.",
       "evidence": [
         ".changeset/effect-query-client-operations.md agrees with tested public API and new Query Effects guide. No version or publication performed."
+      ]
+    },
+    "source:_artifacts/http-type-performance-178.md": {
+      "fingerprint": "087a9d473ecde7f2cdec015223f73dd34ec0bc121ec00244d0bba6ea14e9e770",
+      "snapshot": {
+        "_artifacts/http-type-performance-178.md": "5c4b58d87de21d6cf3d69d28c99c6e55b3ad20572fbcb1fc1fcd99f623e72b25"
+      },
+      "head": "e4c6560fdcd99f8d4fae09f65a4cbcdc0b0920e3",
+      "outcome": "no-change",
+      "reason": "Owned contributor measurement evidence records matched provenance, rejected candidate, modest deterministic reduction, variable diagnostics and integration verification. Existing performance guide and query-patterns reference already own consumer advice; no additional skill needed.",
+      "evidence": [
+        "_artifacts/http-type-performance-178.md",
+        "178-before-sample2/3.json and 178-after-sample2/3.json: identical contracts/options/dependencies/engine/language; all counts reproducible, contract controls unchanged; no timing improvement claim.",
+        "178-merged-validation.json: all 18 workloads pass and candidate instantiations unchanged."
       ]
     }
   }
