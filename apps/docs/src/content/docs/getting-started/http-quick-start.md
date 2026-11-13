@@ -43,7 +43,11 @@ Client integration in `client.ts`:
 
 ```ts
 import { MutationObserver, QueryClient } from "@tanstack/query-core";
-import { createHttpApiQueryUtils } from "@ueberbrot/effect-api-query";
+import {
+  configureUtils,
+  createHttpApiQueryUtils,
+  prepareInput,
+} from "@ueberbrot/effect-api-query";
 import { ManagedRuntime } from "effect";
 import { FetchHttpClient } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
@@ -70,6 +74,18 @@ try {
   );
   console.log(user.name);
 
+  const read = configureUtils(http.users.get, {
+    query: { policy: { staleTime: 30_000 } },
+  });
+  const prepared = prepareInput(http.users.get, {
+    params: { id: 1 },
+    query: { locale: "en" },
+  });
+  const sameUser = await queryClient.query(
+    read.queryOptions({ input: prepared })
+  );
+  console.log(sameUser.name);
+
   const createUser = new MutationObserver(
     queryClient,
     http.users.create.mutationOptions()
@@ -92,6 +108,16 @@ HTTP input is the decoded request. Supply the endpoint's declared `params`, `que
 The runtime provides the HTTP transport and forwards TanStack's signal through `runPromiseExit`. Keep the runtime and client resources alive while queries and mutations use them. Your application decides which queries to invalidate. This example refreshes the `users` endpoint prefix after creation.
 
 Buffered nonmultipart endpoints provide query and mutation builders for every HTTP method. Buffered multipart endpoints provide mutations only. Literal group and endpoint names become utility paths. Use bracket access for names that contain dots. With `topLevel: true`, endpoints appear at the root. See [HTTP Factory](/effect-api-query/reference/http-factory/).
+
+## Own the captured input
+
+Ordinary options prepare their key synchronously and retain execution input for later requests and retries. Keep that input, including nested arrays, Dates, Maps, and class state, unchanged while the options can run. A frozen key protects cache identity; it does not freeze or deeply clone execution input. Changing retained values can send a different request under the old key. Create new input and rebuild options when values change.
+
+The example configures the read once, then reuses a prepared input with the configured copy. `prepareInput` performs normalization, key encoding, and canonicalization once for repeated builders. It retains the execution values under the same immutability rule. A handle belongs to that leaf and utility-tree owner; configured copies share the owner. Other leaves or independently created trees reject it. Do not serialize handles for hydration or transfer them to a browser owner. Hydrate query data with the appropriate codec, then prepare fresh input on the receiving owner.
+
+Preparation errors throw synchronously from `queryKey`, `queryOptions`, or `prepareInput`, before a request starts. They are key-generation errors rather than failed query executions. A custom key encoder changes identity only; it cannot change execution input or repair an unstable constructor.
+
+HTTP takes **decoded request input**, not RPC payload constructor input. Constructor defaults in an HTTP declaration do not fill missing request fields here. Supply `locale: "en"` explicitly, as both ordinary and prepared examples do. The ready client separately encodes the retained decoded containers for transport. The RPC query-stable payload constructor requirement concerns RPC reconstruction; HTTP requires unchanged decoded input and deterministic identity encoding.
 
 ## Keep a browser client alive
 
