@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "2534e593ef8ff5abf6d87040f5bf200bdaa22346ac4441ba0471f7146c651823",
+      "fingerprint": "ca25f36b28c05bca9dc475684a755bbb3e5237e0aad236b83a24bf3d141814a1",
       "snapshot": {
         "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -23,7 +23,6 @@
         "apps/docs/src/content/docs/getting-started/quick-start.md": "ade6edb93d713046dc19d01c7c4c93e0bf09c81fa0abbe80234668699698cc5f",
         "apps/docs/src/content/docs/guides/angular-query.md": "beb279a2ef34d1e69e685bcd8dbeddb0fafb0228ede9107dd9f95d86f9e5c72c",
         "apps/docs/src/content/docs/guides/cache-filters.md": "b0b8a08b6e2f3484a2565b6bd6d080cd1e95b3e9aefcb5aaf121cd7a96ad2591",
-        "apps/docs/src/content/docs/guides/cache-management.md": null,
         "apps/docs/src/content/docs/guides/cancellation.md": "7af74ddcb64ddc5454e3d8b4326a79b9683f1d744537c2b2f267e61a9447274b",
         "apps/docs/src/content/docs/guides/choose-stream-history.md": "9aefb63f50a3b020db5cd678d43b3ca0374c82bc9dce61a1cb429ecde313d438",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "cb941076de91c32bc0a1a5e8f6463ea521457210c00ccf4ef4e7de7c5fd135e9",
@@ -97,11 +96,12 @@
         "docs/adr/0032-configure-utility-trees-and-require-stream-retention.md": "e46238f04f3213d2c32dcb64fb2c17d38d033699d08b3b9d7986bbbe1d2f1ff7",
         "docs/adr/0033-bound-effect-support-to-a-patch-line.md": "aa1919cc8dedca1cc3439ec13a0f96f012f56a5e425887f3c4ddc92e47063cfc",
         "docs/adr/0034-extend-http-stream-views-to-decoded-ndjson.md": "445ed1f9a4cb3a74938f2d01579e50c046a681aaa2dcd856ef9587c62aaa7cf2",
-        "docs/adr/0035-use-effect-enhanced-tsrs-for-development.md": "72eb1319e49d0626899de8017f5e14c36093c2cfdb9770e4469bd45cf3d28bf5",
+        "docs/adr/0035-use-effect-enhanced-tsrs-for-development.md": "be8bde3dc27e5095c286fb9150d167c8e8950fc7bc8d92108a12f550db7995e9",
         "docs/adr/0037-own-stream-publication-through-query-core.md": "a7800a9b941557bc34d3a3102e94d4227f8e5f31ff852b6830a33e12ac2ec553",
         "docs/adr/0039-coalesce-live-snapshots-explicitly.md": "4d95533f87474e8a55a9a6a0f0339f375a7e5d242195e26e99c2d7e895171f02",
         "docs/adr/0040-add-opt-in-query-owner-retirement.md": "5e5f0a05577c779ed22a62a3e99a8abd509c241fa9949e9fb50a9aec068472fc",
         "docs/adr/0042-define-the-compatibility-promise.md": "2e2ae6512eb714ed8601daee80fe3852fdb62614602be5ad54ffd5e58f0beb99",
+        "docs/adr/0043-keep-editor-selection-contributor-owned.md": "3ccd02edb9d41b09bf112b64cc335bfcc3e981f9986a9f704b376532ef5798ac",
         "e2e/http-workflows.spec.ts": "8e7f7622ea481a56dc3f0ebceabe61691f8f34e3489ef1945ff3e929a1e6b2e0",
         "examples/contracts/src/client.ts": "fdf559bf0a798c7ea7f7aee01967837e720f7727a1bd11978aec51aad59f00f2",
         "examples/contracts/src/contracts.ts": "74d69e1a07c0b32c2a48b8fed8cfceaac8844ead860fbd00b9e357657b39d88e",
@@ -188,10 +188,8 @@
         "scripts/performance/budgets.mts": "a97ce19167bda55891a66daa14263549643757dd5db309c367e4be766637b957",
         "scripts/performance/common.mts": "507d45618fbaf2c7be6f986a5f958d1958cdddc95e42a77ff1d50d8225538a3d",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
-        "scripts/verify-docs-examples.mts": null,
-        "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
-        "skills/effect-api-query/SKILL.md": "6a106a626226b29fac1057d0ed9d8ddd9cbbccabb6c62fecf080139769f98c48",
+        "skills/effect-api-query/SKILL.md": "788dcfa211e8a51b2bbf50df1c513157a21d726a4fb18f3c31822d9eb174454d",
         "skills/effect-api-query/references/cache-workflows.md": "1d80a087881094a7d50dbf7ce20c7ab8a2800f05aae432523645d4cba82b98e3",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "444e359b9b4fe577c691546cba652422dce6821d80feebf7a8bbd8ef55dd0415",
         "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
@@ -369,23 +367,23 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "0142e48c3ffc2e9b3c0ee7f0b485fa66944ab6c0",
-      "outcome": "no-change",
-      "reason": "Maintainer requested removal of custom editor SDK integration. Deleted both launchers and forced native-server settings; declaration emission resolves the exact installed platform compiler independently of editors. Current contributor guidance and the unmerged tooling decision now make editor selection optional. Shipped consumer compiler roles and public behavior remain unchanged. All three planning records retain one skill/six references; skill_spec records the correction, domain_map and skill_tree remain accurate without structural edits.",
+      "head": "8f3464be38ea14aef0b371e7d4315767f2b45946",
+      "outcome": "updated",
+      "reason": "The cleanup is now a separate follow-up to merged main d14f7b4. Both custom editor launchers and forced SDK settings are removed; direct pinned declaration compiler resolution and its identity check preserve CLI behavior. ADR 0043 amends editor routing while ADR 0035 retains its recorded decision. The skill source mapping/tree include the new amendment; skill_spec records the maintainer direction and the domain map remains accurate. Deleted SDK locations need no separate skill.",
       "evidence": [
-        "Actual .vscode/settings.json, removed .vscode/tsdk launchers, scripts/compiler.mts, scripts/check-toolchain.mts, vite.config.ts and docs diff; source mapping/metadata preserved. No new compiler launcher, package pin or public root export.",
-        "New direct declaration path passes package/ATTW/publint, strict checks, both public compilers, exact CLI/native identity and TypeScript/Effect/lint rejection checks. All four Fallow audits pass after removing now-unused app Tailwind declarations.",
-        "870 runtime tests, eight packed pairs of 403 cases and 150 app browser cases passed for unchanged runtime source; hosted CI 43432706834 passes every job at 0142e48. New cleanup CI will rerun checks. GUI/editor integration remains unverified and optional; no fresh agent discovery claim."
+        "Cleanup branch contains only the editor/compiler-path and unused private Tailwind declaration cleanup relative to d14f7b4. Exact installed native compiler identity equals the explicit CLI; pack/ATTW/publint, both public compilers, strict checks, rejection checks and Fallow all pass.",
+        "Merged main has the same tree as 0142e48, whose hosted CI 43432706834 passed Source quality, both builds/docs and all three browser jobs. Runtime evidence remains 870 tests, eight peer pairs of 403 cases and 150 application browser cases; the cleanup changes no library runtime or public contract.",
+        "All three planning records reconciled, one skill/six references retained, current contributor instructions updated. Editor and Windows/container integration remain unverified and contributor-owned; no new graphical or discovery claim."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "c8f730803c479da00bccbc160e37d221dfda5d25885d8a2ceff1e799b88e354e",
+      "fingerprint": "fc3261f348aff82460d5a874642fb182a2b90dd2c417f4c03428f6f1bab03ad9",
       "snapshot": {
         "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
         "_artifacts/domain_map.yaml": "cc7bc13b277005ac6d413df2ab1d3f9cea17988b7ec74451df6c85a2817a176c",
-        "_artifacts/skill_spec.md": "29be5c7219b62cea7719d1e31695c29840fe7237b44d51ee81369c6252d9d79b",
-        "_artifacts/skill_tree.yaml": "68e1199093f0ac17fc9851568960956b4b65ffc8435daba6c310376fc7fe4097",
+        "_artifacts/skill_spec.md": "e317ef98b07e0aec28d0744b9616490563457f0d77dbe67d24247c6ac179ec11",
+        "_artifacts/skill_tree.yaml": "da0b9b01df9c8b36158b7151c6e8f7e13bd7097b4ebec823804a95f57727a6a5",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "83a6aab512d66893237aa3ba45bf52b23712b88d829d83992509c2f3c822c18b",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "eb226d096cee825aa2a7c2e49370208d6110662c3acf681fa4b95f8b6caca0d7",
         "apps/docs/src/content/docs/concepts/http-utility-tree.md": "03f01c27b051a3fdd8c373749d61cf62d35c2734ff1f651ad3805b14886ba45b",
@@ -402,7 +400,6 @@
         "apps/docs/src/content/docs/getting-started/quick-start.md": "ade6edb93d713046dc19d01c7c4c93e0bf09c81fa0abbe80234668699698cc5f",
         "apps/docs/src/content/docs/guides/angular-query.md": "beb279a2ef34d1e69e685bcd8dbeddb0fafb0228ede9107dd9f95d86f9e5c72c",
         "apps/docs/src/content/docs/guides/cache-filters.md": "b0b8a08b6e2f3484a2565b6bd6d080cd1e95b3e9aefcb5aaf121cd7a96ad2591",
-        "apps/docs/src/content/docs/guides/cache-management.md": null,
         "apps/docs/src/content/docs/guides/cancellation.md": "7af74ddcb64ddc5454e3d8b4326a79b9683f1d744537c2b2f267e61a9447274b",
         "apps/docs/src/content/docs/guides/choose-stream-history.md": "9aefb63f50a3b020db5cd678d43b3ca0374c82bc9dce61a1cb429ecde313d438",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "cb941076de91c32bc0a1a5e8f6463ea521457210c00ccf4ef4e7de7c5fd135e9",
@@ -476,11 +473,12 @@
         "docs/adr/0032-configure-utility-trees-and-require-stream-retention.md": "e46238f04f3213d2c32dcb64fb2c17d38d033699d08b3b9d7986bbbe1d2f1ff7",
         "docs/adr/0033-bound-effect-support-to-a-patch-line.md": "aa1919cc8dedca1cc3439ec13a0f96f012f56a5e425887f3c4ddc92e47063cfc",
         "docs/adr/0034-extend-http-stream-views-to-decoded-ndjson.md": "445ed1f9a4cb3a74938f2d01579e50c046a681aaa2dcd856ef9587c62aaa7cf2",
-        "docs/adr/0035-use-effect-enhanced-tsrs-for-development.md": "72eb1319e49d0626899de8017f5e14c36093c2cfdb9770e4469bd45cf3d28bf5",
+        "docs/adr/0035-use-effect-enhanced-tsrs-for-development.md": "be8bde3dc27e5095c286fb9150d167c8e8950fc7bc8d92108a12f550db7995e9",
         "docs/adr/0037-own-stream-publication-through-query-core.md": "a7800a9b941557bc34d3a3102e94d4227f8e5f31ff852b6830a33e12ac2ec553",
         "docs/adr/0039-coalesce-live-snapshots-explicitly.md": "4d95533f87474e8a55a9a6a0f0339f375a7e5d242195e26e99c2d7e895171f02",
         "docs/adr/0040-add-opt-in-query-owner-retirement.md": "5e5f0a05577c779ed22a62a3e99a8abd509c241fa9949e9fb50a9aec068472fc",
         "docs/adr/0042-define-the-compatibility-promise.md": "2e2ae6512eb714ed8601daee80fe3852fdb62614602be5ad54ffd5e58f0beb99",
+        "docs/adr/0043-keep-editor-selection-contributor-owned.md": "3ccd02edb9d41b09bf112b64cc335bfcc3e981f9986a9f704b376532ef5798ac",
         "e2e/http-workflows.spec.ts": "8e7f7622ea481a56dc3f0ebceabe61691f8f34e3489ef1945ff3e929a1e6b2e0",
         "examples/contracts/src/client.ts": "fdf559bf0a798c7ea7f7aee01967837e720f7727a1bd11978aec51aad59f00f2",
         "examples/contracts/src/contracts.ts": "74d69e1a07c0b32c2a48b8fed8cfceaac8844ead860fbd00b9e357657b39d88e",
@@ -567,10 +565,8 @@
         "scripts/performance/budgets.mts": "a97ce19167bda55891a66daa14263549643757dd5db309c367e4be766637b957",
         "scripts/performance/common.mts": "507d45618fbaf2c7be6f986a5f958d1958cdddc95e42a77ff1d50d8225538a3d",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
-        "scripts/verify-docs-examples.mts": null,
-        "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
-        "skills/effect-api-query/SKILL.md": "6a106a626226b29fac1057d0ed9d8ddd9cbbccabb6c62fecf080139769f98c48",
+        "skills/effect-api-query/SKILL.md": "788dcfa211e8a51b2bbf50df1c513157a21d726a4fb18f3c31822d9eb174454d",
         "skills/effect-api-query/references/cache-workflows.md": "1d80a087881094a7d50dbf7ce20c7ab8a2800f05aae432523645d4cba82b98e3",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "444e359b9b4fe577c691546cba652422dce6821d80feebf7a8bbd8ef55dd0415",
         "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
@@ -748,13 +744,13 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "0142e48c3ffc2e9b3c0ee7f0b485fa66944ab6c0",
+      "head": "8f3464be38ea14aef0b371e7d4315767f2b45946",
       "outcome": "updated",
-      "reason": "Maintainer requested removal of custom editor SDK integration. Deleted both launchers and forced native-server settings; declaration emission resolves the exact installed platform compiler independently of editors. Current contributor guidance and the unmerged tooling decision now make editor selection optional. Shipped consumer compiler roles and public behavior remain unchanged. All three planning records retain one skill/six references; skill_spec records the correction, domain_map and skill_tree remain accurate without structural edits.",
+      "reason": "The cleanup is now a separate follow-up to merged main d14f7b4. Both custom editor launchers and forced SDK settings are removed; direct pinned declaration compiler resolution and its identity check preserve CLI behavior. ADR 0043 amends editor routing while ADR 0035 retains its recorded decision. The skill source mapping/tree include the new amendment; skill_spec records the maintainer direction and the domain map remains accurate. Deleted SDK locations need no separate skill.",
       "evidence": [
-        "Actual .vscode/settings.json, removed .vscode/tsdk launchers, scripts/compiler.mts, scripts/check-toolchain.mts, vite.config.ts and docs diff; source mapping/metadata preserved. No new compiler launcher, package pin or public root export.",
-        "New direct declaration path passes package/ATTW/publint, strict checks, both public compilers, exact CLI/native identity and TypeScript/Effect/lint rejection checks. All four Fallow audits pass after removing now-unused app Tailwind declarations.",
-        "870 runtime tests, eight packed pairs of 403 cases and 150 app browser cases passed for unchanged runtime source; hosted CI 43432706834 passes every job at 0142e48. New cleanup CI will rerun checks. GUI/editor integration remains unverified and optional; no fresh agent discovery claim."
+        "Cleanup branch contains only the editor/compiler-path and unused private Tailwind declaration cleanup relative to d14f7b4. Exact installed native compiler identity equals the explicit CLI; pack/ATTW/publint, both public compilers, strict checks, rejection checks and Fallow all pass.",
+        "Merged main has the same tree as 0142e48, whose hosted CI 43432706834 passed Source quality, both builds/docs and all three browser jobs. Runtime evidence remains 870 tests, eight peer pairs of 403 cases and 150 application browser cases; the cleanup changes no library runtime or public contract.",
+        "All three planning records reconciled, one skill/six references retained, current contributor instructions updated. Editor and Windows/container integration remain unverified and contributor-owned; no new graphical or discovery claim."
       ]
     },
     "source:vite.config.ts": {
@@ -3173,51 +3169,45 @@
       ]
     },
     "source:.vscode/tsdk/tsgo": {
-      "fingerprint": "e08dda1391449fc7f3e09c97e472874854c9121b74d35968443c2f62f9033ed2",
+      "fingerprint": "8f3efd3513480dac33fede89da9ad73b75c64b39c1f999496ceeb29bf49c524b",
       "snapshot": {
-        ".vscode/tsdk/tsgo": "744fe9cc21b3d4720bd0cd9c7cbaedf097c287d08de8c80211259fb49c8ed548"
+        ".vscode/tsdk/tsgo": null
       },
-      "head": "3a0d99ccb798198ad0c29f234ed763bc30ad37b1",
+      "head": "8f3464be38ea14aef0b371e7d4315767f2b45946",
       "outcome": "no-change",
-      "reason": "Owned #167 contributor tooling/configuration source implements the explicit pinned TSRS launcher, source-only declarations, editor SDK or isolated compiler install. It introduces no independent consumer task needing a new shipped skill; compiler-role guidance is reconciled in the existing framework reference and planning record.",
+      "reason": "The cleanup is now a separate follow-up to merged main d14f7b4. Both custom editor launchers and forced SDK settings are removed; direct pinned declaration compiler resolution and its identity check preserve CLI behavior. ADR 0043 amends editor routing while ADR 0035 retains its recorded decision. The skill source mapping/tree include the new amendment; skill_spec records the maintainer direction and the domain map remains accurate. Deleted SDK locations need no separate skill.",
       "evidence": [
-        "Base 15a618a; implementation e92d584; latest integration dbb64e8 merged at 3a0d99c.",
-        "Post-merge vp run check and effect-check pass; vp run test passes 801 tests including both public/server-local compilers.",
-        "vp run toolchain-check rejects TS2322, floatingEffect and require-await; TSRS identity 0.21.0 / TypeScript 7.1.0-beta / @effect/tsgo 0.67.3.",
-        "Packed four-framework and Effect floor/current checks pass on TSRS and TypeScript 5.9; declarations pass ATTW/publint. Application and docs checks/build pass before merge; repeated affected checks recorded in /tmp/effect-api-query-spec-166/167-result.md.",
-        "macOS arm64 LSP protocol initialization, unsaved didOpen/didChange diagnostics, hover, definition, Effect actions pass. Graphical VS Code, Linux/Windows/container and fresh consumer-agent discovery remain unverified.",
-        "shellcheck and shfmt -i 2 -sr pass; YAML relaxed style with existing long-line convention passes. Fallow optional dependency retains upstream TypeScript 7.0.2."
+        "Cleanup branch contains only the editor/compiler-path and unused private Tailwind declaration cleanup relative to d14f7b4. Exact installed native compiler identity equals the explicit CLI; pack/ATTW/publint, both public compilers, strict checks, rejection checks and Fallow all pass.",
+        "Merged main has the same tree as 0142e48, whose hosted CI 43432706834 passed Source quality, both builds/docs and all three browser jobs. Runtime evidence remains 870 tests, eight peer pairs of 403 cases and 150 application browser cases; the cleanup changes no library runtime or public contract.",
+        "All three planning records reconciled, one skill/six references retained, current contributor instructions updated. Editor and Windows/container integration remain unverified and contributor-owned; no new graphical or discovery claim."
       ]
     },
     "source:.vscode/tsdk/tsgo.cmd": {
-      "fingerprint": "167654a77c9a26eea63271ea93a914477ae3a1fc45f134664b79b85f2aacac6a",
+      "fingerprint": "52a88ca21e7a7d9f3c3139688db11f0a7c6edc84983605c3a3a5b98a0737f792",
       "snapshot": {
-        ".vscode/tsdk/tsgo.cmd": "44dc3392a8ed7a2ff51d830f9050807529217274b18b39bd9b3f07972fcc73c5"
+        ".vscode/tsdk/tsgo.cmd": null
       },
-      "head": "3a0d99ccb798198ad0c29f234ed763bc30ad37b1",
+      "head": "8f3464be38ea14aef0b371e7d4315767f2b45946",
       "outcome": "no-change",
-      "reason": "Owned #167 contributor tooling/configuration source implements the explicit pinned TSRS launcher, source-only declarations, editor SDK or isolated compiler install. It introduces no independent consumer task needing a new shipped skill; compiler-role guidance is reconciled in the existing framework reference and planning record.",
+      "reason": "The cleanup is now a separate follow-up to merged main d14f7b4. Both custom editor launchers and forced SDK settings are removed; direct pinned declaration compiler resolution and its identity check preserve CLI behavior. ADR 0043 amends editor routing while ADR 0035 retains its recorded decision. The skill source mapping/tree include the new amendment; skill_spec records the maintainer direction and the domain map remains accurate. Deleted SDK locations need no separate skill.",
       "evidence": [
-        "Base 15a618a; implementation e92d584; latest integration dbb64e8 merged at 3a0d99c.",
-        "Post-merge vp run check and effect-check pass; vp run test passes 801 tests including both public/server-local compilers.",
-        "vp run toolchain-check rejects TS2322, floatingEffect and require-await; TSRS identity 0.21.0 / TypeScript 7.1.0-beta / @effect/tsgo 0.67.3.",
-        "Packed four-framework and Effect floor/current checks pass on TSRS and TypeScript 5.9; declarations pass ATTW/publint. Application and docs checks/build pass before merge; repeated affected checks recorded in /tmp/effect-api-query-spec-166/167-result.md.",
-        "macOS arm64 LSP protocol initialization, unsaved didOpen/didChange diagnostics, hover, definition, Effect actions pass. Graphical VS Code, Linux/Windows/container and fresh consumer-agent discovery remain unverified.",
-        "shellcheck and shfmt -i 2 -sr pass; YAML relaxed style with existing long-line convention passes. Fallow optional dependency retains upstream TypeScript 7.0.2."
+        "Cleanup branch contains only the editor/compiler-path and unused private Tailwind declaration cleanup relative to d14f7b4. Exact installed native compiler identity equals the explicit CLI; pack/ATTW/publint, both public compilers, strict checks, rejection checks and Fallow all pass.",
+        "Merged main has the same tree as 0142e48, whose hosted CI 43432706834 passed Source quality, both builds/docs and all three browser jobs. Runtime evidence remains 870 tests, eight peer pairs of 403 cases and 150 application browser cases; the cleanup changes no library runtime or public contract.",
+        "All three planning records reconciled, one skill/six references retained, current contributor instructions updated. Editor and Windows/container integration remain unverified and contributor-owned; no new graphical or discovery claim."
       ]
     },
     "source:docs/agents/toolchain.md": {
-      "fingerprint": "17912915e73e667205c2574971dab4f49432ab741a2ff49be698a63df717efb2",
+      "fingerprint": "d236c3a8759f011e5289691fb063a1adbd93eb3c8e7eff094eb21c595cfd68ca",
       "snapshot": {
-        "docs/agents/toolchain.md": "45b344a1f52faab75d0ff181206c3363a959b1aa4160feda8c2169fad05bf232"
+        "docs/agents/toolchain.md": "ab6f8871841838201d3d2927e02fbbffbda33494caa01a6556b029497debeca5"
       },
-      "head": "0142e48c3ffc2e9b3c0ee7f0b485fa66944ab6c0",
+      "head": "8f3464be38ea14aef0b371e7d4315767f2b45946",
       "outcome": "updated",
-      "reason": "Maintainer requested removal of custom editor SDK integration. Deleted both launchers and forced native-server settings; declaration emission resolves the exact installed platform compiler independently of editors. Current contributor guidance and the unmerged tooling decision now make editor selection optional. Shipped consumer compiler roles and public behavior remain unchanged. All three planning records retain one skill/six references; skill_spec records the correction, domain_map and skill_tree remain accurate without structural edits.",
+      "reason": "The cleanup is now a separate follow-up to merged main d14f7b4. Both custom editor launchers and forced SDK settings are removed; direct pinned declaration compiler resolution and its identity check preserve CLI behavior. ADR 0043 amends editor routing while ADR 0035 retains its recorded decision. The skill source mapping/tree include the new amendment; skill_spec records the maintainer direction and the domain map remains accurate. Deleted SDK locations need no separate skill.",
       "evidence": [
-        "Actual .vscode/settings.json, removed .vscode/tsdk launchers, scripts/compiler.mts, scripts/check-toolchain.mts, vite.config.ts and docs diff; source mapping/metadata preserved. No new compiler launcher, package pin or public root export.",
-        "New direct declaration path passes package/ATTW/publint, strict checks, both public compilers, exact CLI/native identity and TypeScript/Effect/lint rejection checks. All four Fallow audits pass after removing now-unused app Tailwind declarations.",
-        "870 runtime tests, eight packed pairs of 403 cases and 150 app browser cases passed for unchanged runtime source; hosted CI 43432706834 passes every job at 0142e48. New cleanup CI will rerun checks. GUI/editor integration remains unverified and optional; no fresh agent discovery claim."
+        "Cleanup branch contains only the editor/compiler-path and unused private Tailwind declaration cleanup relative to d14f7b4. Exact installed native compiler identity equals the explicit CLI; pack/ATTW/publint, both public compilers, strict checks, rejection checks and Fallow all pass.",
+        "Merged main has the same tree as 0142e48, whose hosted CI 43432706834 passed Source quality, both builds/docs and all three browser jobs. Runtime evidence remains 870 tests, eight peer pairs of 403 cases and 150 application browser cases; the cleanup changes no library runtime or public contract.",
+        "All three planning records reconciled, one skill/six references retained, current contributor instructions updated. Editor and Windows/container integration remain unverified and contributor-owned; no new graphical or discovery claim."
       ]
     },
     "source:tsconfig.declarations.json": {
