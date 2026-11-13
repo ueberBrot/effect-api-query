@@ -13,7 +13,7 @@ declare const owner: QueryOwner<unknown>;
 declare const rpc: ReturnType<typeof directoryEffects>["rpc"];
 const reads = createQueryFilter(rpc.users.read, "query");
 const events = Stream.make({ id: 1, name: "Ada" });
-export const completion = runQueryEvents(
+const completion = runQueryEvents(
   owner,
   events,
   {
@@ -33,12 +33,12 @@ const wrong = queryEffects.setData(
   // @ts-expect-error Generated keys retain decoded user data in event mappings
   { id: 1, name: 123 }
 );
-export { wrong };
+
 class Domain extends Context.Service<Domain, { readonly name: string }>()(
   "Events/Domain"
 ) {}
 const needsDomain = { onEvent: () => Effect.asVoid(Domain) };
-export const withDomain = runQueryEvents(
+const withDomain = runQueryEvents(
   owner,
   events,
   needsDomain,
@@ -49,7 +49,7 @@ export const withDomain = runQueryEvents(
     )
 );
 type Assert<T extends true> = T;
-export type ErrorContract = Assert<
+type ErrorContract = Assert<
   typeof completion extends Promise<
     import("effect").Exit.Exit<void, QueryClientOperationError>
   >

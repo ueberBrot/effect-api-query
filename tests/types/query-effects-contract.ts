@@ -32,27 +32,23 @@ const read = queryEffects.getData(options.queryKey);
 const updated = queryEffects.setData(options.queryKey, (old) =>
   old === undefined ? 1 : old
 );
-export type FetchData = Assert<
-  Equal<Effect.Success<typeof fetched>, number | null>
->;
-export type EnsureData = Assert<
-  Equal<Effect.Success<typeof ensured>, number | null>
->;
-export type ReadData = Assert<
+type FetchData = Assert<Equal<Effect.Success<typeof fetched>, number | null>>;
+type EnsureData = Assert<Equal<Effect.Success<typeof ensured>, number | null>>;
+type ReadData = Assert<
   Equal<Effect.Success<typeof read>, number | null | undefined>
 >;
-export type UpdateData = Assert<
+type UpdateData = Assert<
   Equal<Effect.Success<typeof updated>, number | null | undefined>
 >;
-export type FetchError = Assert<
+type FetchError = Assert<
   Equal<Effect.Error<typeof fetched>, QueryClientOperationError>
 >;
-export type FetchServices = Assert<
+type FetchServices = Assert<
   Equal<Effect.Services<typeof fetched>, QueryClientService>
 >;
 // @ts-expect-error Selected strings are not cache data
-export const wrongValue = queryEffects.setData(options.queryKey, "selected");
-export const wrongUpdater = queryEffects.setData(
+const wrongValue = queryEffects.setData(options.queryKey, "selected");
+const wrongUpdater = queryEffects.setData(
   options.queryKey,
   // @ts-expect-error Updaters cannot replace decoded cache values with selection
   () => "selected"
@@ -61,7 +57,7 @@ declare const queryClient: QueryClient;
 const supplied = fetched.pipe(
   Effect.provideService(QueryClientService, queryClient)
 );
-export type Supplied = Assert<Equal<Effect.Services<typeof supplied>, never>>;
+type Supplied = Assert<Equal<Effect.Services<typeof supplied>, never>>;
 
 const api = HttpApi.make("bridge").add(
   HttpApiGroup.make("users").add(
@@ -76,8 +72,8 @@ const http = createHttpApiQueryUtils(api, {
 const httpEffect = queryEffects.ensure(
   http.users.read.queryOptions({ select: String })
 );
-export type HttpData = Assert<Equal<Effect.Success<typeof httpEffect>, number>>;
-export type HttpError = Assert<
+type HttpData = Assert<Equal<Effect.Success<typeof httpEffect>, number>>;
+type HttpError = Assert<
   Equal<Effect.Error<typeof httpEffect>, QueryClientOperationError>
 >;
 
@@ -88,17 +84,17 @@ const composed = Effect.gen(function* () {
   yield* Domain;
   return yield* ensured;
 });
-export type ComposedServices = Assert<
+type ComposedServices = Assert<
   Equal<Effect.Services<typeof composed>, Domain | QueryClientService>
 >;
 
-export type EnsureError = Assert<
+type EnsureError = Assert<
   Equal<Effect.Error<typeof ensured>, QueryClientOperationError>
 >;
-export type RejectionCause = Assert<
+type RejectionCause = Assert<
   Equal<Effect.Error<typeof fetched>["cause"], unknown>
 >;
-export type NoDeclaredPayloadClaim = Assert<
+type NoDeclaredPayloadClaim = Assert<
   Equal<
     Effect.Error<
       typeof fetched
@@ -108,7 +104,7 @@ export type NoDeclaredPayloadClaim = Assert<
     false
   >
 >;
-export type NativeDeclaredError = Assert<
+type NativeDeclaredError = Assert<
   Equal<
     import("@ueberbrot/effect-api-query").InferQueryError<typeof utils.read>,
     import("@ueberbrot/effect-api-query").EffectRpcQueryError<"missing">
