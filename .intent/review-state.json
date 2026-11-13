@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "34c410b715f2472306f567551e5d3e5404be1c2f2ddaf7bee6a8c7bcda6eeda3",
+      "fingerprint": "e0165d0958455025d4db9c2e0e0dcb600d359b9f5c498482399018fa91b2071a",
       "snapshot": {
         "GLOSSARY.md": "1793065c2d29eabcba180a7c86539a6550a0dede8fe093a758a8ba4b8588bbf0",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -210,7 +210,7 @@
         "src/core/query-effects.ts": "7243f8b6b0d2b984f10d276cce76902fb5e826cf0ef470b30a5b573bfb4c78ec",
         "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
-        "src/core/query-owner.ts": "5d40933e8a08a9f418c85990cc9be42bbdd5861136d1e501afa137daf49cabbf",
+        "src/core/query-owner.ts": "3a7e1072a568da26a3622225ca5723f4fbf62facb4796bc3ffb1a19a2c5196c5",
         "src/core/schema-key.ts": "7dad2749d30f2ab828dbc7e96d6e1e2b32b6733450cb6dc734de607629d925f8",
         "src/core/schema-structural-sharing.ts": "1a961c521aaf02c00689bee654ff428bb9d519ebf87651f7faedb9dfd1a06ccc",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
@@ -359,17 +359,16 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "62cee6d2f7bd6842b62af39778c22e93fa8f6a0c",
-      "outcome": "updated",
-      "reason": "Correct #174 S1: native rejection has no proof of the current failed Exit. Fetch/ensure now retain every exact rejected object in QueryClientOperationError.cause; reconcile bridge, compatibility and exports guidance without changing support ranges/versioning/matrix claims. Preserve native declared option types, data/services and waiter interruption. Planning extends existing cache task; source globs/one skill/six references remain accurate.",
+      "head": "b44afbdf6acabdc08ac09efbfd1fcae8f529adf2",
+      "outcome": "no-change",
+      "reason": "Reconciled latest integration ba971952 into the #174 fix: incoming owner JSDoc clarifies complete query-function registration for stream cleanup and makes no bridge rejection change. Existing owner guidance already requires runQuery plus wrapped runner. Retain the updated #174 conservative error guidance, domain-map failure coverage, cumulative planning entries and accurate one-skill/six-reference tree. No further guidance/planning change is necessary for this combined tree; independent #173 acceptance remains parent-owned.",
       "evidence": [
-        "src/core/query-effects.ts; tests/query-effects.test.ts: four foreign/same-family rejection cases failed before fix (/tmp/174-fix-red.log); post-merge 105 runtime tests in nine files pass (/tmp/174-fix-merged-tests.log), including full Cause identity and shared observer interruption.",
-        "Published fixtures pass pinned TSRS 0.21.0/Effect tsgo 0.67.3 and TS5.9.3, including exact conservative bridge channel, unknown cause, preserved native declared failure/data/services; package ATTW/publint pass in serial task prerequisites.",
-        "Merged strict typecheck, Effect check and 23 documentation excerpt tests/Astro pass; scoped formatting and YAML parse pass (existing line-length warnings). domain_map and skill_spec updated; skill_tree source mappings remain accurate with sync no-op. Fresh consumer discovery and parent Astra two-axis/168 acceptance rechecks and final combined matrix remain unverified."
+        "Actual src/core/query-owner.ts diff 42443ad..ba971952 is JSDoc-only; #174 query-effects implementation and all exact rejection contracts unchanged.",
+        "/tmp/174-fix-latest-tests.log: 112 runtime tests across ten files, package/declarations/ATTW/publint and current TSRS/minimum TS5.9.3 public and server-local fixtures pass. /tmp/174-fix-latest-typecheck.log: strict check passes. /tmp/174-fix-latest-docs.log: 23 excerpts/Astro pass. Existing one-skill/six-reference source globs and all three planning records inspected; sync is a no-op. Fresh consumer discovery and Astra axes/final combined matrix remain unverified."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "309b244cd6d36122b7410eb7672fd3dd542e448c9cb5ca54ecbe02eea7d1a5c8",
+      "fingerprint": "2a48da3623095912d4cd628e610947b492dbe9d7aa385e5beea9aec8ba184c69",
       "snapshot": {
         "GLOSSARY.md": "1793065c2d29eabcba180a7c86539a6550a0dede8fe093a758a8ba4b8588bbf0",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -579,7 +578,7 @@
         "src/core/query-effects.ts": "7243f8b6b0d2b984f10d276cce76902fb5e826cf0ef470b30a5b573bfb4c78ec",
         "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
-        "src/core/query-owner.ts": "5d40933e8a08a9f418c85990cc9be42bbdd5861136d1e501afa137daf49cabbf",
+        "src/core/query-owner.ts": "3a7e1072a568da26a3622225ca5723f4fbf62facb4796bc3ffb1a19a2c5196c5",
         "src/core/schema-key.ts": "7dad2749d30f2ab828dbc7e96d6e1e2b32b6733450cb6dc734de607629d925f8",
         "src/core/schema-structural-sharing.ts": "1a961c521aaf02c00689bee654ff428bb9d519ebf87651f7faedb9dfd1a06ccc",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
@@ -728,13 +727,12 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "62cee6d2f7bd6842b62af39778c22e93fa8f6a0c",
-      "outcome": "updated",
-      "reason": "Correct #174 S1: native rejection has no proof of the current failed Exit. Fetch/ensure now retain every exact rejected object in QueryClientOperationError.cause; reconcile bridge, compatibility and exports guidance without changing support ranges/versioning/matrix claims. Preserve native declared option types, data/services and waiter interruption. Planning extends existing cache task; source globs/one skill/six references remain accurate.",
+      "head": "b44afbdf6acabdc08ac09efbfd1fcae8f529adf2",
+      "outcome": "no-change",
+      "reason": "Reconciled latest integration ba971952 into the #174 fix: incoming owner JSDoc clarifies complete query-function registration for stream cleanup and makes no bridge rejection change. Existing owner guidance already requires runQuery plus wrapped runner. Retain the updated #174 conservative error guidance, domain-map failure coverage, cumulative planning entries and accurate one-skill/six-reference tree. No further guidance/planning change is necessary for this combined tree; independent #173 acceptance remains parent-owned.",
       "evidence": [
-        "src/core/query-effects.ts; tests/query-effects.test.ts: four foreign/same-family rejection cases failed before fix (/tmp/174-fix-red.log); post-merge 105 runtime tests in nine files pass (/tmp/174-fix-merged-tests.log), including full Cause identity and shared observer interruption.",
-        "Published fixtures pass pinned TSRS 0.21.0/Effect tsgo 0.67.3 and TS5.9.3, including exact conservative bridge channel, unknown cause, preserved native declared failure/data/services; package ATTW/publint pass in serial task prerequisites.",
-        "Merged strict typecheck, Effect check and 23 documentation excerpt tests/Astro pass; scoped formatting and YAML parse pass (existing line-length warnings). domain_map and skill_spec updated; skill_tree source mappings remain accurate with sync no-op. Fresh consumer discovery and parent Astra two-axis/168 acceptance rechecks and final combined matrix remain unverified."
+        "Actual src/core/query-owner.ts diff 42443ad..ba971952 is JSDoc-only; #174 query-effects implementation and all exact rejection contracts unchanged.",
+        "/tmp/174-fix-latest-tests.log: 112 runtime tests across ten files, package/declarations/ATTW/publint and current TSRS/minimum TS5.9.3 public and server-local fixtures pass. /tmp/174-fix-latest-typecheck.log: strict check passes. /tmp/174-fix-latest-docs.log: 23 excerpts/Astro pass. Existing one-skill/six-reference source globs and all three planning records inspected; sync is a no-op. Fresh consumer discovery and Astra axes/final combined matrix remain unverified."
       ]
     },
     "source:vite.config.ts": {
