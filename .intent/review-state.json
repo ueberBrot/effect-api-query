@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "e77cc9e8ca93a9fe3d0fb8a7c1d0a4e73cd3a473d473a53a1e115d843cc2991c",
+      "fingerprint": "41636471e5838eec9671761ef9833cc1af1ef49e4703149ffcb267e754948876",
       "snapshot": {
         "GLOSSARY.md": "1793065c2d29eabcba180a7c86539a6550a0dede8fe093a758a8ba4b8588bbf0",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -76,7 +76,7 @@
         "docs/adr/0007-keep-the-core-factory-lifecycle-neutral.md": "4a04a4878debb08219364face005462e7dd4bc751a10e8bff9b24be9f4351c9e",
         "docs/adr/0008-use-flat-prefix-matchable-key-tuples.md": "959563881314648542065683d90989d0cf14c7c5585065a2b6fba32fcbec76d0",
         "docs/adr/0009-build-an-eager-frozen-utility-tree.md": "6490cf58890014f3e50d1b67ba88d4fdd9cbecc578e1788234b4fe193e2e14c7",
-        "docs/adr/0010-reuse-tanstack-query-core-as-a-peer.md": "fc25c133e013da2f934d55f98a8a749a4f1b77355d2489da171545d017eab837",
+        "docs/adr/0010-reuse-tanstack-query-core-as-a-peer.md": "42faf296c945e29940bc464d4d9f89a1dbac322b12e8041f0b0a2489deb6d0d0",
         "docs/adr/0012-normalize-undefined-query-success-to-null.md": "e07335454852d9ac3c8b2529ad414dbee59d57f2265ccf86b595e65092feb309",
         "docs/adr/0014-require-query-stable-payload-construction.md": "2c0a2fefeb20197712e85ca598e18c8a7d74b55f9cfbb74a0cfaf532f18aec04",
         "docs/adr/0015-centralize-the-toolchain-in-vite-plus.md": "038000cc6209bdde90aefbe55b238c69a71588d03335f9a9918645b834851491",
@@ -209,7 +209,7 @@
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
         "src/core/query-owner.ts": "da9715879195454960142fb6a7a92bf96e754b5241a73fbbf2c8b6d0b13e5bcb",
         "src/core/schema-key.ts": "7dad2749d30f2ab828dbc7e96d6e1e2b32b6733450cb6dc734de607629d925f8",
-        "src/core/schema-structural-sharing.ts": "5d65caa6c2dbfe498be12396e95ff58329237bea807f3d6eaf5a1118aa6f10df",
+        "src/core/schema-structural-sharing.ts": "1a961c521aaf02c00689bee654ff428bb9d519ebf87651f7faedb9dfd1a06ccc",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
         "src/core/stream-publication.ts": "e6a2fbded6ead8351c83fa3adabf84fb0d1b52d559e3d209a2831aca69d58e21",
         "src/core/stream-recovery.ts": "c2c53ed24c042c24a18b2379995107a09e3145080cc97597d7bb41d3a616d37e",
@@ -285,6 +285,7 @@
         "tests/query-policy.test.ts": "19b1d0fde232b4af9e041197a1aa6726f30e4fb7118533e5b3f7af08cbbe4002",
         "tests/query-usability.test.ts": "313e6c03b560b4c20ffc32ed8e2bd96ce94fc2fb3977489f311324b6988e190f",
         "tests/query-view-prefix.test.ts": "fd94e3d01f52a0978242246f02a3e989bddd1e055f828f48d7a41187f696dd69",
+        "tests/schema-sharing-prototypes.test.ts": "628a6622656b9b53e686d14b9efbd3abc13c61a13db1546001b0689b491f6022",
         "tests/schema-structural-sharing.test.ts": "577e0ac004db61c5778bf2362b8d208fca6fd6e830a3eaa6496a4c534d3a6e57",
         "tests/skills-maintenance.test.ts": "682faa16982a90614b2fbee84a5da5a4de361f6a3f732099d9fcbc266fca3ec8",
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
@@ -353,23 +354,24 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "7300a670251804da5ce35fe3492aed0baea7e271",
+      "head": "14c8787d4f69ca8bc8c0e1e523ef82b6ef7e27a8",
       "outcome": "updated",
-      "reason": "Added contract-derived defineUtilsPolicy assembly feeding unchanged configureUtils. Cache-workflows now documents client-free maps, exact scopes/options, local context and native failures; public contracts remain runtime/framework-free. Re-reviewed after merging local spec/166-query-improvements at a6c1110; retained compatibility decisions, ADR0042 and both batches of planning/guidance.",
+      "reason": "Added contract-derived defineUtilsPolicy assembly feeding unchanged configureUtils. Cache-workflows now documents client-free maps, exact scopes/options, local context and native failures; public contracts remain runtime/framework-free. Re-reviewed after merging local spec/166-query-improvements at a6c1110; retained compatibility decisions, ADR0042 and both batches of planning/guidance. Reconciled the subsequent 0ce55e0 integration preserving its custom-array passthrough fix and accepted ADR0010 status.",
       "evidence": [
         "src/core/configure-utils.ts and src/index.ts actual diff against 0b02e05; examples/shared/application-policy.ts complete application example",
         "tests/types/utility-configuration-contract.ts and http-contract.ts pass TSRS 7.1 beta and TypeScript 5.9.3; application-policy-contract.ts checks the example with both",
         "51 scoped native runtime/docs cases pass; docs-check and typecheck pass; intent validate skills passes; fresh independent consumer evaluation unavailable: task prohibits agents",
-        "Post-merge public compilers, strict typed lint, Effect checks, 51 scoped runtime/docs cases, docs-check and 60-page docs build pass; actionlint passes, inherited CI zizmor low suggestions/YAML warnings reported separately."
+        "Post-merge public compilers, strict typed lint, Effect checks, 51 scoped runtime/docs cases, docs-check and 60-page docs build pass; actionlint passes, inherited CI zizmor low suggestions/YAML warnings reported separately.",
+        "Final merged source diff reviewed; final-api-types, final-typecheck, final-effect logs pass; scoped formatting passes. Full runtime rerun pending separately at recording time."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "626277eca8171ed5940d62cd9fd31dfc851fbf6c226a19259a8a8611d7e1c308",
+      "fingerprint": "7c0ad30aabe7461553bb163798d4c7ba695e1f88aabadc35749f1dd284e55fca",
       "snapshot": {
         "GLOSSARY.md": "1793065c2d29eabcba180a7c86539a6550a0dede8fe093a758a8ba4b8588bbf0",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
-        "_artifacts/domain_map.yaml": "877fe29a1faab559b5be57f38636a2978fcd7ca1ebc17910061689c5ba0b60a8",
-        "_artifacts/skill_spec.md": "6f2de982c60cb1e06c5c30a699c6ef870e9c2c740aa34c24518a7fe85fcd8c97",
+        "_artifacts/domain_map.yaml": "aef25a9c387174b5ba867d32c456af7438d454d53dc873a160d6e1a03d4fdeb9",
+        "_artifacts/skill_spec.md": "e2a84c2183d603022af82aa7c69e7603a2384fd04bf40a522d0f6f668b14bfa2",
         "_artifacts/skill_tree.yaml": "aab2f3819f3c8380066a1ee416ef351b535aa10d9941b00bcdefdff4b6691f63",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "83a6aab512d66893237aa3ba45bf52b23712b88d829d83992509c2f3c822c18b",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "eb226d096cee825aa2a7c2e49370208d6110662c3acf681fa4b95f8b6caca0d7",
@@ -440,7 +442,7 @@
         "docs/adr/0007-keep-the-core-factory-lifecycle-neutral.md": "4a04a4878debb08219364face005462e7dd4bc751a10e8bff9b24be9f4351c9e",
         "docs/adr/0008-use-flat-prefix-matchable-key-tuples.md": "959563881314648542065683d90989d0cf14c7c5585065a2b6fba32fcbec76d0",
         "docs/adr/0009-build-an-eager-frozen-utility-tree.md": "6490cf58890014f3e50d1b67ba88d4fdd9cbecc578e1788234b4fe193e2e14c7",
-        "docs/adr/0010-reuse-tanstack-query-core-as-a-peer.md": "fc25c133e013da2f934d55f98a8a749a4f1b77355d2489da171545d017eab837",
+        "docs/adr/0010-reuse-tanstack-query-core-as-a-peer.md": "42faf296c945e29940bc464d4d9f89a1dbac322b12e8041f0b0a2489deb6d0d0",
         "docs/adr/0012-normalize-undefined-query-success-to-null.md": "e07335454852d9ac3c8b2529ad414dbee59d57f2265ccf86b595e65092feb309",
         "docs/adr/0014-require-query-stable-payload-construction.md": "2c0a2fefeb20197712e85ca598e18c8a7d74b55f9cfbb74a0cfaf532f18aec04",
         "docs/adr/0015-centralize-the-toolchain-in-vite-plus.md": "038000cc6209bdde90aefbe55b238c69a71588d03335f9a9918645b834851491",
@@ -573,7 +575,7 @@
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
         "src/core/query-owner.ts": "da9715879195454960142fb6a7a92bf96e754b5241a73fbbf2c8b6d0b13e5bcb",
         "src/core/schema-key.ts": "7dad2749d30f2ab828dbc7e96d6e1e2b32b6733450cb6dc734de607629d925f8",
-        "src/core/schema-structural-sharing.ts": "5d65caa6c2dbfe498be12396e95ff58329237bea807f3d6eaf5a1118aa6f10df",
+        "src/core/schema-structural-sharing.ts": "1a961c521aaf02c00689bee654ff428bb9d519ebf87651f7faedb9dfd1a06ccc",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
         "src/core/stream-publication.ts": "e6a2fbded6ead8351c83fa3adabf84fb0d1b52d559e3d209a2831aca69d58e21",
         "src/core/stream-recovery.ts": "c2c53ed24c042c24a18b2379995107a09e3145080cc97597d7bb41d3a616d37e",
@@ -649,6 +651,7 @@
         "tests/query-policy.test.ts": "19b1d0fde232b4af9e041197a1aa6726f30e4fb7118533e5b3f7af08cbbe4002",
         "tests/query-usability.test.ts": "313e6c03b560b4c20ffc32ed8e2bd96ce94fc2fb3977489f311324b6988e190f",
         "tests/query-view-prefix.test.ts": "fd94e3d01f52a0978242246f02a3e989bddd1e055f828f48d7a41187f696dd69",
+        "tests/schema-sharing-prototypes.test.ts": "628a6622656b9b53e686d14b9efbd3abc13c61a13db1546001b0689b491f6022",
         "tests/schema-structural-sharing.test.ts": "577e0ac004db61c5778bf2362b8d208fca6fd6e830a3eaa6496a4c534d3a6e57",
         "tests/skills-maintenance.test.ts": "682faa16982a90614b2fbee84a5da5a4de361f6a3f732099d9fcbc266fca3ec8",
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
@@ -717,13 +720,14 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "7300a670251804da5ce35fe3492aed0baea7e271",
+      "head": "14c8787d4f69ca8bc8c0e1e523ef82b6ef7e27a8",
       "outcome": "updated",
-      "reason": "Extended domain map and skill spec for policy assembly; reviewed skill_tree.yaml as a justified no-op: existing src/tests/examples/docs mappings and cache-workflows reference already cover the helper. Preserved historical batches and all six references. Re-reviewed after merging local spec/166-query-improvements at a6c1110; retained compatibility decisions, ADR0042 and both batches of planning/guidance.",
+      "reason": "Extended domain map and skill spec for policy assembly; reviewed skill_tree.yaml as a justified no-op: existing src/tests/examples/docs mappings and cache-workflows reference already cover the helper. Preserved historical batches and all six references. Re-reviewed after merging local spec/166-query-improvements at a6c1110; retained compatibility decisions, ADR0042 and both batches of planning/guidance. Reconciled the subsequent 0ce55e0 integration preserving its custom-array passthrough fix and accepted ADR0010 status.",
       "evidence": [
         "_artifacts/domain_map.yaml, _artifacts/skill_spec.md, _artifacts/skill_tree.yaml reviewed with actual source/guidance diff",
         "intent maintainer sync reports no changes; intent validate skills passes; scoped yamllint passes with existing long-line/document-start conventions; 51 runtime/docs cases and both public compilers pass",
-        "Post-merge public compilers, strict typed lint, Effect checks, 51 scoped runtime/docs cases, docs-check and 60-page docs build pass; actionlint passes, inherited CI zizmor low suggestions/YAML warnings reported separately."
+        "Post-merge public compilers, strict typed lint, Effect checks, 51 scoped runtime/docs cases, docs-check and 60-page docs build pass; actionlint passes, inherited CI zizmor low suggestions/YAML warnings reported separately.",
+        "Final merged source diff reviewed; final-api-types, final-typecheck, final-effect logs pass; scoped formatting passes. Full runtime rerun pending separately at recording time."
       ]
     },
     "source:vite.config.ts": {
@@ -731,13 +735,14 @@
       "snapshot": {
         "vite.config.ts": "21d163a6beda57c14f9e5293de99d1b3a01aca913cab7280ac024631a8e13011"
       },
-      "head": "7300a670251804da5ce35fe3492aed0baea7e271",
+      "head": "14c8787d4f69ca8bc8c0e1e523ef82b6ef7e27a8",
       "outcome": "no-change",
-      "reason": "Added only the application-policy example to the existing unstable Effect RPC API allowlist, matching query-effects. No diagnostic severity, tooling pin or consumer contract changes; existing tooling guidance remains accurate. Re-reviewed after merging local spec/166-query-improvements at a6c1110; retained compatibility decisions, ADR0042 and both batches of planning/guidance.",
+      "reason": "Added only the application-policy example to the existing unstable Effect RPC API allowlist, matching query-effects. No diagnostic severity, tooling pin or consumer contract changes; existing tooling guidance remains accurate. Re-reviewed after merging local spec/166-query-improvements at a6c1110; retained compatibility decisions, ADR0042 and both batches of planning/guidance. Reconciled the subsequent 0ce55e0 integration preserving its custom-array passthrough fix and accepted ADR0010 status.",
       "evidence": [
         "Actual one-line additions in tsconfig.json and vite.config.ts against 0b02e05",
         "vp run typecheck passes strict typed lint and all compiler checks; vp run effect-check passes",
-        "Post-merge public compilers, strict typed lint, Effect checks, 51 scoped runtime/docs cases, docs-check and 60-page docs build pass; actionlint passes, inherited CI zizmor low suggestions/YAML warnings reported separately."
+        "Post-merge public compilers, strict typed lint, Effect checks, 51 scoped runtime/docs cases, docs-check and 60-page docs build pass; actionlint passes, inherited CI zizmor low suggestions/YAML warnings reported separately.",
+        "Final merged source diff reviewed; final-api-types, final-typecheck, final-effect logs pass; scoped formatting passes. Full runtime rerun pending separately at recording time."
       ]
     },
     "source:.github/workflows/release.yml": {
@@ -798,13 +803,14 @@
       "snapshot": {
         "tsconfig.json": "4907177a020fd5cee48836bd9d7e08a0fdf5da4402e970510e86331641068fdb"
       },
-      "head": "7300a670251804da5ce35fe3492aed0baea7e271",
+      "head": "14c8787d4f69ca8bc8c0e1e523ef82b6ef7e27a8",
       "outcome": "no-change",
-      "reason": "Added only the application-policy example to the existing unstable Effect RPC API allowlist, matching query-effects. No diagnostic severity, tooling pin or consumer contract changes; existing tooling guidance remains accurate. Re-reviewed after merging local spec/166-query-improvements at a6c1110; retained compatibility decisions, ADR0042 and both batches of planning/guidance.",
+      "reason": "Added only the application-policy example to the existing unstable Effect RPC API allowlist, matching query-effects. No diagnostic severity, tooling pin or consumer contract changes; existing tooling guidance remains accurate. Re-reviewed after merging local spec/166-query-improvements at a6c1110; retained compatibility decisions, ADR0042 and both batches of planning/guidance. Reconciled the subsequent 0ce55e0 integration preserving its custom-array passthrough fix and accepted ADR0010 status.",
       "evidence": [
         "Actual one-line additions in tsconfig.json and vite.config.ts against 0b02e05",
         "vp run typecheck passes strict typed lint and all compiler checks; vp run effect-check passes",
-        "Post-merge public compilers, strict typed lint, Effect checks, 51 scoped runtime/docs cases, docs-check and 60-page docs build pass; actionlint passes, inherited CI zizmor low suggestions/YAML warnings reported separately."
+        "Post-merge public compilers, strict typed lint, Effect checks, 51 scoped runtime/docs cases, docs-check and 60-page docs build pass; actionlint passes, inherited CI zizmor low suggestions/YAML warnings reported separately.",
+        "Final merged source diff reviewed; final-api-types, final-typecheck, final-effect logs pass; scoped formatting passes. Full runtime rerun pending separately at recording time."
       ]
     },
     "source:.fallowrc.jsonc": {

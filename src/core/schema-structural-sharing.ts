@@ -14,7 +14,10 @@ const containerKeys = (
   value: SharingContainer
 ): readonly string[] | undefined => {
   const array = Array.isArray(value);
-  if (!array && Object.getPrototypeOf(value) !== Object.prototype) {
+  if (
+    Object.getPrototypeOf(value) !==
+    (array ? Array.prototype : Object.prototype)
+  ) {
     return undefined;
   }
   const keys: string[] = [];
