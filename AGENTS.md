@@ -12,6 +12,10 @@ Before reading or updating GitHub issues, read [the issue tracker workflow](docs
 
 When triaging issues, use [the five triage roles](docs/agents/triage-labels.md).
 
+### Repository files
+
+Before creating tracked documentation or reports, follow [file placement](docs/agents/domain.md#file-placement).
+
 ### Domain docs
 
 Before exploring the codebase, read [the domain documentation guide](docs/agents/domain.md) for `GLOSSARY.md` vocabulary and relevant ADRs.

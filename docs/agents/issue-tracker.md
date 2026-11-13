@@ -5,7 +5,7 @@ Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all o
 ## Conventions
 
 - **Create an issue**: `gh issue create --title "..." --body "..."`. Use a heredoc for multi-line bodies.
-- **Read an issue**: `gh issue view <number> --comments`, filtering comments by `jq` and also fetching labels.
+- **Read an issue**: `gh issue view <number> --json number,title,body,labels,comments,state,url`. JSON mode includes comments; use `--comments` only for plain terminal output.
 - **List issues**: `gh issue list --state open --json number,title,body,labels,comments --jq '[.[] | {number, title, body, labels: [.labels[].name], comments: [.comments[].body]}]'` with appropriate `--label` and `--state` filters.
 - **Comment on an issue**: `gh issue comment <number> --body "..."`
 - **Apply / remove labels**: `gh issue edit <number> --add-label "..."` / `--remove-label "..."`
@@ -31,7 +31,7 @@ Create a GitHub issue.
 
 ## When a skill says "fetch the relevant ticket"
 
-Run `gh issue view <number> --comments`.
+Run `gh issue view <number> --json number,title,body,labels,comments,state,url`.
 
 ## Wayfinding operations
 
@@ -43,3 +43,11 @@ Used by `/wayfinder`. The **map** is a single issue with **child** issues as tic
 - **Frontier query**: list the map's open children (`gh issue list --state open`, scoped to the map's sub-issues / task list), drop any with an open blocker (`issue_dependencies_summary.blocked_by > 0`, or an open issue in the `Blocked by` line) or an assignee; first in map order wins.
 - **Claim**: `gh issue edit <n> --add-assignee @me`, the session's first write.
 - **Resolve**: `gh issue comment <n> --body "<answer>"`, then `gh issue close <n>`, then append a context pointer (gist + link) to the map's Decisions-so-far.
+
+## Review and completion
+
+Give reviewers a fixed base/head and bounded scope. Record coverage as complete, partial or failed separately from findings. Assess findings against source and requirements before fixing them; an incomplete review with zero findings is not approval.
+
+Before handoff, verify required checks against the final commit and update acceptance checkboxes only where evidence supports them. Record unverified criteria and explicit waivers separately. Link evidence from the issue or PR rather than committing session reports. Check the existing release policy in ADR 0001 before assigning a changeset category.
+
+Mark a draft ready when its applicable checks and requested reviews are complete. Re-read PR state immediately before a push: after a merge, start follow-up work from updated main on a new branch. The pre-push guard rejects a previously merged branch without an open replacement PR; it needs working GitHub CLI access. It also runs maintenance checkout tests for configuration changes and packed compatibility checks for workspace changes. Push from a clean checkout of that branch so checks cover the pushed commit.

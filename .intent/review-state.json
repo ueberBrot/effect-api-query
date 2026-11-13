@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "a7525050b3b2f7611f298db90ee11974c74715bb79e9c687cab9cfb064537134",
+      "fingerprint": "edf97d7a83f312a7ac8e6a5c0b0bc6073819a35019aa93ea52929e0ec7499182",
       "snapshot": {
         "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -179,6 +179,7 @@
         "scripts/check-effect-compatibility.mts": "3911f16301e90bd466f2c7fe4b1637b6a653eb23140c6bf57eb7d329ede0d50b",
         "scripts/check-framework-consumers.mts": "f0111ac9ed84996f722f656358b810da0b9ecc8c6c0219a2019d1076b5d50cbc",
         "scripts/check-toolchain.mts": "4e401073f141efdcf81c40ca1bc9825f805711576118b830ed63484ea7795cac",
+        "scripts/check-workflow.mts": "c3a760a6b111d3f1dc7570a510ee09aabfc048786ef8c6dd1c9fe7b26cecd00c",
         "scripts/compiler.mts": "9212aaa7f819948f73c7a75c42575bcf935cbd2811493fbc6edc5f4e73448668",
         "scripts/measure-bundles.mts": "f00e0cfc803f3a951cb41f140ae8bfee7136ae7e486b13467a2009288aaa8350",
         "scripts/measure-construction.mts": "2fbad4879fe77ff24234a6be5666047b41cc7c3fd5ce9143d640ef4b41a426bd",
@@ -296,7 +297,7 @@
         "tests/query-view-prefix.test.ts": "fd94e3d01f52a0978242246f02a3e989bddd1e055f828f48d7a41187f696dd69",
         "tests/schema-sharing-prototypes.test.ts": "628a6622656b9b53e686d14b9efbd3abc13c61a13db1546001b0689b491f6022",
         "tests/schema-structural-sharing.test.ts": "577e0ac004db61c5778bf2362b8d208fca6fd6e830a3eaa6496a4c534d3a6e57",
-        "tests/skills-maintenance.test.ts": "d21daa2fd0098782aed2ff4f71fb6dc400a380da3b8e6d3de4804179fdb341a1",
+        "tests/skills-maintenance.test.ts": "7bbf6bee1c9867ba314cd3cadf86db603a4aa9959a863c6e908b7401d767d9d4",
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
         "tests/skills/query-usability/grade.test.ts": "f3c2650deba0d887f66fb3b3afd284cd9baf562296f2984e5c84b014ecec8cbd",
         "tests/skills/query-usability/solution.ts": "38583676eaa2d33e8ca56c07a430e3a28787feae9d84c6d3612e01d6d7f1d80f",
@@ -365,20 +366,20 @@
         "tests/types/type-scale.ts": "03bcc9eca13fb59054b8f047a70183cd33cdb9ba7acc73d6e8061c9eb271d546",
         "tests/types/utility-configuration-contract.ts": "b8c5db14d17c2fd549f70c6fbad8d21234ca5859f0c69e53b0b8504ef8cb5b17",
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
-        "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
+        "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6",
+        "tests/workflow-guards.test.ts": "d338d2d7aafc355c5f4e69c29ea7daa89b9e80a19ac07a9d06cbe51e12f66db4"
       },
-      "head": "9306d07d1bcd767bbf6d3f56107028c62f107c85",
+      "head": "d0ad100b587dd1b6be3e7bcecc9f0dd1572fac4d",
       "outcome": "no-change",
-      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
+      "reason": "Compared the change with origin/main 9e0afbe: repository artifact placement, PR completion guidance and local hook/import checks affect contributor workflow; public query behavior and shipped consumer guidance are unchanged. Repository-specific instructions remain in owned docs; external skills are preserved.",
       "evidence": [
-        "Before versioning: intent maintainer check passed at 9306d07d1bcd767bbf6d3f56107028c62f107c85.",
-        "changeset version and vp fmt generated 0.6.1 -> 0.7.0.",
-        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
-        "Scoped generated changes: package.json."
+        "Base 9e0afbe141435d8e79c8c0c1305142daf0d66031; inspected changed script, hooks, Vite configuration and agent docs.",
+        "vp test -- tests/skills-maintenance.test.ts tests/workflow-guards.test.ts: 21 passed after rebase.",
+        "vp run --no-cache check: passed after rebase; prior Fallow checks and shellcheck/shfmt passed. No fresh consumer/discovery evaluation: shipped guidance unchanged."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "4506e967aa0af44c6201e324edc2f118c168580eebcdf98423f8b61ead9e247f",
+      "fingerprint": "7c47210b1f2d01bf6cb8d6808775e1fe08ff6dfcb1270420864ef546042f1b3e",
       "snapshot": {
         "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -557,6 +558,7 @@
         "scripts/check-effect-compatibility.mts": "3911f16301e90bd466f2c7fe4b1637b6a653eb23140c6bf57eb7d329ede0d50b",
         "scripts/check-framework-consumers.mts": "f0111ac9ed84996f722f656358b810da0b9ecc8c6c0219a2019d1076b5d50cbc",
         "scripts/check-toolchain.mts": "4e401073f141efdcf81c40ca1bc9825f805711576118b830ed63484ea7795cac",
+        "scripts/check-workflow.mts": "c3a760a6b111d3f1dc7570a510ee09aabfc048786ef8c6dd1c9fe7b26cecd00c",
         "scripts/compiler.mts": "9212aaa7f819948f73c7a75c42575bcf935cbd2811493fbc6edc5f4e73448668",
         "scripts/measure-bundles.mts": "f00e0cfc803f3a951cb41f140ae8bfee7136ae7e486b13467a2009288aaa8350",
         "scripts/measure-construction.mts": "2fbad4879fe77ff24234a6be5666047b41cc7c3fd5ce9143d640ef4b41a426bd",
@@ -674,7 +676,7 @@
         "tests/query-view-prefix.test.ts": "fd94e3d01f52a0978242246f02a3e989bddd1e055f828f48d7a41187f696dd69",
         "tests/schema-sharing-prototypes.test.ts": "628a6622656b9b53e686d14b9efbd3abc13c61a13db1546001b0689b491f6022",
         "tests/schema-structural-sharing.test.ts": "577e0ac004db61c5778bf2362b8d208fca6fd6e830a3eaa6496a4c534d3a6e57",
-        "tests/skills-maintenance.test.ts": "d21daa2fd0098782aed2ff4f71fb6dc400a380da3b8e6d3de4804179fdb341a1",
+        "tests/skills-maintenance.test.ts": "7bbf6bee1c9867ba314cd3cadf86db603a4aa9959a863c6e908b7401d767d9d4",
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
         "tests/skills/query-usability/grade.test.ts": "f3c2650deba0d887f66fb3b3afd284cd9baf562296f2984e5c84b014ecec8cbd",
         "tests/skills/query-usability/solution.ts": "38583676eaa2d33e8ca56c07a430e3a28787feae9d84c6d3612e01d6d7f1d80f",
@@ -743,30 +745,30 @@
         "tests/types/type-scale.ts": "03bcc9eca13fb59054b8f047a70183cd33cdb9ba7acc73d6e8061c9eb271d546",
         "tests/types/utility-configuration-contract.ts": "b8c5db14d17c2fd549f70c6fbad8d21234ca5859f0c69e53b0b8504ef8cb5b17",
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
-        "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
+        "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6",
+        "tests/workflow-guards.test.ts": "d338d2d7aafc355c5f4e69c29ea7daa89b9e80a19ac07a9d06cbe51e12f66db4"
       },
-      "head": "9306d07d1bcd767bbf6d3f56107028c62f107c85",
+      "head": "d0ad100b587dd1b6be3e7bcecc9f0dd1572fac4d",
       "outcome": "no-change",
-      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
+      "reason": "Reviewed domain_map.yaml, skill_spec.md and skill_tree.yaml: these internal file-placement, Git-hook and example-import guards do not change the shipped query task, its domain boundaries or one-skill/six-reference structure. Existing scripts/tests source globs cover the added checks.",
       "evidence": [
-        "Before versioning: intent maintainer check passed at 9306d07d1bcd767bbf6d3f56107028c62f107c85.",
-        "changeset version and vp fmt generated 0.6.1 -> 0.7.0.",
-        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
-        "Scoped generated changes: package.json."
+        "Base 9e0afbe141435d8e79c8c0c1305142daf0d66031; inspected changed script, hooks, Vite configuration and agent docs.",
+        "vp test -- tests/skills-maintenance.test.ts tests/workflow-guards.test.ts: 21 passed after rebase.",
+        "vp run --no-cache check: passed after rebase; prior Fallow checks and shellcheck/shfmt passed. No fresh consumer/discovery evaluation: shipped guidance unchanged."
       ]
     },
     "source:vite.config.ts": {
-      "fingerprint": "79925c8ff0defbdfbf11faaea53d618db69eb7cdcccdb52c2d31ccab25cc00c0",
+      "fingerprint": "d3258dff93bd88315f3247e3760ba2b5cb53881570ed32582cf21e61358b5922",
       "snapshot": {
-        "vite.config.ts": "c6206df4f95ae57527038b90674811725e38f9668016501ce21fe19728048dce"
+        "vite.config.ts": "ac8fd6fcf49d42a688cb68a1fee0db71602207f6d6a1d4134d0e918cb7923eaa"
       },
-      "head": "0142e48c3ffc2e9b3c0ee7f0b485fa66944ab6c0",
+      "head": "d0ad100b587dd1b6be3e7bcecc9f0dd1572fac4d",
       "outcome": "no-change",
-      "reason": "Maintainer requested removal of custom editor SDK integration. Deleted both launchers and forced native-server settings; declaration emission resolves the exact installed platform compiler independently of editors. Current contributor guidance and the unmerged tooling decision now make editor selection optional. Shipped consumer compiler roles and public behavior remain unchanged. All three planning records retain one skill/six references; skill_spec records the correction, domain_map and skill_tree remain accurate without structural edits.",
+      "reason": "Compared the change with origin/main 9e0afbe: repository artifact placement, PR completion guidance and local hook/import checks affect contributor workflow; public query behavior and shipped consumer guidance are unchanged. Repository-specific instructions remain in owned docs; external skills are preserved.",
       "evidence": [
-        "Actual .vscode/settings.json, removed .vscode/tsdk launchers, scripts/compiler.mts, scripts/check-toolchain.mts, vite.config.ts and docs diff; source mapping/metadata preserved. No new compiler launcher, package pin or public root export.",
-        "New direct declaration path passes package/ATTW/publint, strict checks, both public compilers, exact CLI/native identity and TypeScript/Effect/lint rejection checks. All four Fallow audits pass after removing now-unused app Tailwind declarations.",
-        "870 runtime tests, eight packed pairs of 403 cases and 150 app browser cases passed for unchanged runtime source; hosted CI 43432706834 passes every job at 0142e48. New cleanup CI will rerun checks. GUI/editor integration remains unverified and optional; no fresh agent discovery claim."
+        "Base 9e0afbe141435d8e79c8c0c1305142daf0d66031; inspected changed script, hooks, Vite configuration and agent docs.",
+        "vp test -- tests/skills-maintenance.test.ts tests/workflow-guards.test.ts: 21 passed after rebase.",
+        "vp run --no-cache check: passed after rebase; prior Fallow checks and shellcheck/shfmt passed. No fresh consumer/discovery evaluation: shipped guidance unchanged."
       ]
     },
     "source:.github/workflows/release.yml": {
@@ -840,20 +842,17 @@
       ]
     },
     "source:.fallowrc.jsonc": {
-      "fingerprint": "4294b1aae57396f1e98b85a692ad42a2bc0a6ad8683863f4203d0d5556bdb1c2",
+      "fingerprint": "1ca255dbb2a37782b3bf94c47216518ae78e7c62b1c61c76f35d344fce1f1db8",
       "snapshot": {
-        ".fallowrc.jsonc": "ed7cd5801ce54c9d834e428dd159715a4396fa62dbd2e1109dac9bc8e643db23"
+        ".fallowrc.jsonc": "8dffc5b2ab80cfa97bc758f5d34f5f7e813d9ad13d43418cc8ef59a0e92dd05d"
       },
-      "head": "90ca0e6ac412cf97f62854b7e29d4438e2d6ffb0",
+      "head": "d0ad100b587dd1b6be3e7bcecc9f0dd1572fac4d",
       "outcome": "no-change",
-      "reason": "Inspected actual owned diff: host imports now name the private shared package, common stylesheet scanning follows shared ownership, exact lint/type path exceptions follow moved modules, the real toolchain command is a Fallow entry, and the existing minor changeset describes corrected registration. These implementation and tooling details require no additional shipped guidance.",
+      "reason": "Compared the change with origin/main 9e0afbe: repository artifact placement, PR completion guidance and local hook/import checks affect contributor workflow; public query behavior and shipped consumer guidance are unchanged. Repository-specific instructions remain in owned docs; external skills are preserved.",
       "evidence": [
-        "Source base 90ca0e6; actual src/core/query-owner.ts and examples/shared/http-workflows/application.ts diff; native public application and owner regressions.",
-        "architecture-raw-finalizer-red.log and architecture-same-turn-red.log reproduce prior failures; corresponding GREEN evidence and final 870 runtime tests pass.",
-        "Both pinned public/server compilers, strict 231-file checking/457-file formatting, package/ATTW/publint, native framework compilers, Effect diagnostics and toolchain rejection checks pass.",
-        "Both final production builds and docs checks pass; all four Fallow audits pass with clean development/production dead-code scans and no new suppressions/threshold changes.",
-        "150 browser cases passed before private workspace packaging; final 150-case browser rerun running. Eight packed peer pairs passed 403 cases each before internal type-export/consumer-fixture cleanup; final CI will rerun the matrix.",
-        "Fresh Astra architecture/fix source rechecks found no remaining actionable admission finding. No fresh consumer/discovery or GUI/platform claim; default yamllint retains repository line-length/document-start issues."
+        "Base 9e0afbe141435d8e79c8c0c1305142daf0d66031; inspected changed script, hooks, Vite configuration and agent docs.",
+        "vp test -- tests/skills-maintenance.test.ts tests/workflow-guards.test.ts: 21 passed after rebase.",
+        "vp run --no-cache check: passed after rebase; prior Fallow checks and shellcheck/shfmt passed. No fresh consumer/discovery evaluation: shipped guidance unchanged."
       ]
     },
     "source:.github/workflows/ci.yml": {
@@ -2467,21 +2466,17 @@
       ]
     },
     "source:.vite-hooks/pre-push": {
-      "fingerprint": "7b56837ccb1513f43f3ca3bf6ca27474537d2bb5fa76382b2f3e14e262f7b909",
+      "fingerprint": "216dba08e30a331ee26d86851848d5ae2da67f56f929b7d8dd2a9cb2e0c47e5f",
       "snapshot": {
-        ".vite-hooks/pre-push": "cde6ea5f7f8cd6fd57cf4a345bf68e4444542c2bc29385471f1f6e0485252ce5"
+        ".vite-hooks/pre-push": "61c112605da64ff9d2c99b17bf4b3f01b1bee57c6e81840d0370d353d644781f"
       },
-      "head": "e45bf4ff4ae84af54b1ae4cab3dd11964bb68512",
+      "head": "d0ad100b587dd1b6be3e7bcecc9f0dd1572fac4d",
       "outcome": "no-change",
-      "reason": "The Vite+ pre-push hook invokes the shared maintenance task and propagates its exit status, rejecting missing reviews before a push. It performs validation only and records no review outcomes. This changes repository tooling without changing shipped guidance.",
+      "reason": "Compared the change with origin/main 9e0afbe: repository artifact placement, PR completion guidance and local hook/import checks affect contributor workflow; public query behavior and shipped consumer guidance are unchanged. Repository-specific instructions remain in owned docs; external skills are preserved.",
       "evidence": [
-        "Reviewed the full automation diff from e45bf4ff4ae84af54b1ae4cab3dd11964bb68512, the existing library skill and references, all three _artifacts planning records, and ADRs 0015/0016. AGENTS.md remains unchanged.",
-        "Before recording, vp run skills-maintenance-check, sh .vite-hooks/pre-push, and vp run validate each exited 1 for the same unreviewed workflow/hook/script/config changes; automatic checks did not modify .intent/review-state.json.",
-        "Seven real Intent integration cases pass in disposable Git repositories: unreviewed workflow failure, explicit recording and success, validate/pre-push enforcement, summary generation, explicit and local bases, diverged origin/main, CI default baseline, and missing-base recovery.",
-        "vp run test passed all 738 tests across 60 files, including 12 release-generation integration cases and both public compiler versions plus server-local fixtures. The initial sandbox attempt could not bind localhost; rerunning with local listener access passed.",
-        "vp run typecheck, vp run effect-check, vp run format, and vp run fallow passed. Package declaration validation, ATTW, and publint passed through the task dependencies.",
-        "shellcheck and shfmt pass for scripts/check-skills.sh and .vite-hooks/pre-push; actionlint passes for ci.yml; zizmor reports no medium/high findings; default yamllint has no new findings and one pre-existing line-length finding was removed.",
-        "vp exec intent maintainer sync reported Nothing to synchronize. Independent wiring audit found no objections. No consumer guidance or activation description changed, so consumer task and discovery sessions were not repeated."
+        "Base 9e0afbe141435d8e79c8c0c1305142daf0d66031; inspected changed script, hooks, Vite configuration and agent docs.",
+        "vp test -- tests/skills-maintenance.test.ts tests/workflow-guards.test.ts: 21 passed after rebase.",
+        "vp run --no-cache check: passed after rebase; prior Fallow checks and shellcheck/shfmt passed. No fresh consumer/discovery evaluation: shipped guidance unchanged."
       ]
     },
     "source:scripts/check-skills.sh": {
@@ -3037,19 +3032,17 @@
       ]
     },
     "source:docs/agents/domain.md": {
-      "fingerprint": "c87303b6c3f902490b89c77947c5cd3a5ae636d24e9b600aa600da742261c39b",
+      "fingerprint": "fa8346994bc37eca8746444532545b54d6489924fd8b192b8d27d3c41a9757c7",
       "snapshot": {
-        "docs/agents/domain.md": "ab02da610079f7459263abe5774214f4228edb7b4edfe2fb6005fbe868ee900d"
+        "docs/agents/domain.md": "5a2bb59d68360c694a3f995663262526e02d10f5e0f470d328c12d8bd4467c0e"
       },
-      "head": "c00e43cc17733fcc486d8ae08a9584ad014c5f16",
-      "outcome": "updated",
-      "reason": "The existing domain guide now owns concise accepted-ADR maintenance instructions: retain the recorded decision text, create the next numbered ADR for a replacement, add reciprocal supersession/amendment links, and allow status/link/editorial changes that preserve meaning. The guide remains reached through the existing AGENTS.md pointer; vendor skills are untouched.",
+      "head": "d0ad100b587dd1b6be3e7bcecc9f0dd1572fac4d",
+      "outcome": "no-change",
+      "reason": "Compared the change with origin/main 9e0afbe: repository artifact placement, PR completion guidance and local hook/import checks affect contributor workflow; public query behavior and shipped consumer guidance are unchanged. Repository-specific instructions remain in owned docs; external skills are preserved.",
       "evidence": [
-        "Source comparison: git diff c00e43cc17733fcc486d8ae08a9584ad014c5f16, original ADR bodies from 604d8204e12861edc70d5996a873ff3d26919262; status-only normalization confirms ADRs 0001/0025/0032 retain that historical text.",
-        "Audit: skills/effect-api-query/SKILL.md and references/frameworks-and-hosts.md remain accurate for package 0.5.0; package.json, pnpm-workspace.yaml, scripts/check-effect-compatibility.mts, README.md and current website compatibility guidance are unchanged.",
-        "Checks passed: frozen install; 120 local Markdown links across 43 documents; YAML validation; vp run format; vp run docs-check (20 excerpt cases, Astro diagnostics); vp run docs-build (57 pages, all internal links); vp exec intent validate skills --check; native maintainer sync reports nothing to synchronize.",
-        "Existing CI evidence: https://github.com/ueberBrot/effect-api-query/actions/runs/41833854445, head f5402cd5eac0222e6b82dffe5579a6ad59c13a55; packed consumers with Effect 4.0.6 and 4.0.7 each pass TypeScript 7/5.9 compiler fixtures and 109 selected runtime cases. The prose-only correction does not rerun the runtime matrix.",
-        "Limitations: system skill-creator quick_validate rejects the baseline Intent top-level sources field; native Intent accepts the original skill. Docs build succeeds with fontsource DNS and existing i18n/404 warnings. No fresh consumer-agent or discovery evidence was added; recommendations and activation metadata are unchanged."
+        "Base 9e0afbe141435d8e79c8c0c1305142daf0d66031; inspected changed script, hooks, Vite configuration and agent docs.",
+        "vp test -- tests/skills-maintenance.test.ts tests/workflow-guards.test.ts: 21 passed after rebase.",
+        "vp run --no-cache check: passed after rebase; prior Fallow checks and shellcheck/shfmt passed. No fresh consumer/discovery evaluation: shipped guidance unchanged."
       ]
     },
     "source:.changeset/quick-scoped-configuration.md": {
@@ -3576,6 +3569,34 @@
       "evidence": [
         "a007486 exact rename/source diff and shared module callers; public app/owner regressions, 870 runtime tests, both public/server compilers, strict checks and both final builds pass.",
         "All four Fallow audits and source rechecks pass; updated skill source mapping, domain failure mode and retained one-skill/six-reference planning cover the moved implementation. No pending source content remains at the deleted paths."
+      ]
+    },
+    "source:.vite-hooks/pre-commit": {
+      "fingerprint": "5f9209be4240af28ec1a0909d655891d9854975d7ae220654997713c6906b681",
+      "snapshot": {
+        ".vite-hooks/pre-commit": "7786b17fe2ccb09a4ea8434c914db229fac1853a638588b66949d1722ca909de"
+      },
+      "head": "d0ad100b587dd1b6be3e7bcecc9f0dd1572fac4d",
+      "outcome": "no-change",
+      "reason": "Compared the change with origin/main 9e0afbe: repository artifact placement, PR completion guidance and local hook/import checks affect contributor workflow; public query behavior and shipped consumer guidance are unchanged. Repository-specific instructions remain in owned docs; external skills are preserved.",
+      "evidence": [
+        "Base 9e0afbe141435d8e79c8c0c1305142daf0d66031; inspected changed script, hooks, Vite configuration and agent docs.",
+        "vp test -- tests/skills-maintenance.test.ts tests/workflow-guards.test.ts: 21 passed after rebase.",
+        "vp run --no-cache check: passed after rebase; prior Fallow checks and shellcheck/shfmt passed. No fresh consumer/discovery evaluation: shipped guidance unchanged."
+      ]
+    },
+    "source:docs/agents/issue-tracker.md": {
+      "fingerprint": "50554d809013d68f84773335a22457c016bdc606c1b8c25702cc4b3a7ca5bd8f",
+      "snapshot": {
+        "docs/agents/issue-tracker.md": "465183455503fe3d7773275f14b7e0e25ad8e835f1a4878d971dfae6f8fdf5e9"
+      },
+      "head": "d0ad100b587dd1b6be3e7bcecc9f0dd1572fac4d",
+      "outcome": "no-change",
+      "reason": "Compared the change with origin/main 9e0afbe: repository artifact placement, PR completion guidance and local hook/import checks affect contributor workflow; public query behavior and shipped consumer guidance are unchanged. Repository-specific instructions remain in owned docs; external skills are preserved.",
+      "evidence": [
+        "Base 9e0afbe141435d8e79c8c0c1305142daf0d66031; inspected changed script, hooks, Vite configuration and agent docs.",
+        "vp test -- tests/skills-maintenance.test.ts tests/workflow-guards.test.ts: 21 passed after rebase.",
+        "vp run --no-cache check: passed after rebase; prior Fallow checks and shellcheck/shfmt passed. No fresh consumer/discovery evaluation: shipped guidance unchanged."
       ]
     }
   }
