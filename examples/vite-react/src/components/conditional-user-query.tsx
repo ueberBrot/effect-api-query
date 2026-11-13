@@ -1,10 +1,10 @@
 import type { User } from "@effect-api-query/contracts";
+import { EffectErrorDetails } from "@effect-api-query/shared/ui/effect-error-details.tsx";
 import { useQuery } from "@tanstack/react-query";
 import { skipToken } from "@ueberbrot/effect-api-query";
 import { useState } from "react";
 
 import type { ViteReactApplication } from "../lib/application.ts";
-import { EffectErrorDetails } from "./ui/effect-error-details.tsx";
 
 const displayOptions = {
   select: (user: User) => `${user.name} (${user.locale})`,

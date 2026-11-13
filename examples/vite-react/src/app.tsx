@@ -1,3 +1,4 @@
+import { WorkflowNavigation } from "@effect-api-query/shared/http-workflows/app.tsx";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useMemo } from "react";
 
@@ -7,7 +8,6 @@ import { HttpSection } from "./components/sections/http-section.tsx";
 import { MutationsSection } from "./components/sections/mutations-section.tsx";
 import { QueriesSection } from "./components/sections/queries-section.tsx";
 import type { ViteReactApplication } from "./lib/application.ts";
-import { WorkflowNavigation } from "./workflows/app.tsx";
 
 const ExampleContent = ({
   application,

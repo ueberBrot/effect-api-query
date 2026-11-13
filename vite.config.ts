@@ -121,7 +121,7 @@ export default defineConfig({
     },
     overrides: [
       {
-        files: ["examples/vite-react/src/workflows/sharing.ts"],
+        files: ["examples/shared/http-workflows/sharing.ts"],
         rules: {
           "anti-slop/no-unknown-parameters": "off",
           "anti-slop/no-unknown-returns": "off",
@@ -216,10 +216,6 @@ export default defineConfig({
       },
       {
         files: ["examples/**/components/ui/**/*.{ts,tsx}"],
-        excludeFiles: [
-          "examples/vite-react/src/components/ui/action-button.tsx",
-          "examples/vite-react/src/components/ui/effect-error-details.tsx",
-        ],
         rules: {
           "shadcn/no-arbitrary-values": "off",
           "shadcn/no-restyle": "off",
@@ -234,8 +230,8 @@ export default defineConfig({
           "examples/contracts/src/workflows.ts",
           "examples/server/src/workflow-handlers.ts",
           "examples/vite-react/tests/http-workflows.test.ts",
-          "examples/vite-react/src/workflows/application.ts",
-          "examples/vite-react/src/workflows/recovery.ts",
+          "examples/shared/http-workflows/application.ts",
+          "examples/shared/http-workflows/recovery.ts",
           "examples/server/src/http-handlers.ts",
           "examples/server/src/main.ts",
           "examples/server/src/server-local-rpc.ts",

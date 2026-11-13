@@ -58,7 +58,7 @@ export class Reading extends Schema.Class<
   value: Schema.Int,
 }) {}
 export const Room = Schema.Literals(["lab", "office"]);
-export const Readings = Schema.Struct({ readings: Schema.Array(Reading) });
+const Readings = Schema.Struct({ readings: Schema.Array(Reading) });
 
 export const uploadLimits = {
   maxFileSize: "64 KiB",

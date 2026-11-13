@@ -1,3 +1,5 @@
+import { ActionButton } from "@effect-api-query/shared/ui/action-button.tsx";
+import { EffectErrorDetails } from "@effect-api-query/shared/ui/effect-error-details.tsx";
 import {
   useInfiniteQuery,
   useQuery,
@@ -7,8 +9,6 @@ import { Suspense, useState } from "react";
 
 import type { ViteReactApplication } from "../../lib/application.ts";
 import { ConditionalUserQuery } from "../conditional-user-query.tsx";
-import { ActionButton } from "../ui/action-button.tsx";
-import { EffectErrorDetails } from "../ui/effect-error-details.tsx";
 import { UserList } from "../users/user-list.tsx";
 
 const PAGE_SIZE = 4;

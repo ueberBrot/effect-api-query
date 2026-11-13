@@ -1,10 +1,10 @@
+import { ActionButton } from "@effect-api-query/shared/ui/action-button.tsx";
+import { EffectErrorDetails } from "@effect-api-query/shared/ui/effect-error-details.tsx";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import type { SubmitEvent } from "react";
 
 import type { ViteReactApplication } from "../../lib/application.ts";
-import { ActionButton } from "../ui/action-button.tsx";
-import { EffectErrorDetails } from "../ui/effect-error-details.tsx";
 
 export const CreateUserForm = ({
   application,

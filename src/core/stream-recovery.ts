@@ -43,7 +43,7 @@ export interface StreamCursorPolicy<C> {
   readonly isGap?: ((previous: C, next: C) => boolean) | undefined;
 }
 
-interface RecoveryHooks<A, E, R, C, EG, RG, EF, RF, RS> {
+export interface RecoveryHooks<A, E, R, C, EG, RG, EF, RF, RS> {
   readonly connect: (cursor: C) => Stream.Stream<A, E, R>;
   readonly cursor: (value: A) => C;
   /** One-based retry count across this consumption. Undefined preserves the Cause. */

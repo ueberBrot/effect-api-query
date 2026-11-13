@@ -1,10 +1,10 @@
-import { useMutation } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
-
 import {
   describeSlowQueryCancellation,
   useSlowQueryCancellation,
-} from "../../../shared/use-slow-query-cancellation.ts";
+} from "@effect-api-query/shared/use-slow-query-cancellation.ts";
+import { useMutation } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+
 import { ActionButton } from "../components/action-button.tsx";
 import { EffectErrorDetails } from "../components/effect-error-details.tsx";
 import { PageLayout, Panel } from "../components/page-layout.tsx";

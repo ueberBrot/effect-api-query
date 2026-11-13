@@ -643,14 +643,14 @@ export type EncoderOption<Api extends HttpApi.Constraint> =
     RequiredEncoderGroups<Api>,
     Encoders<Api>
   >;
-type StreamServices<Value> =
+export type StreamServices<Value> =
   Value extends HttpApiSchema.withHeaders<infer Body, infer _Headers>
     ? StreamServices<Body>
     : Value extends Stream.Stream<infer _Chunk, infer _Error, infer Services>
       ? Services
       : never;
 
-type ExecutionServices<Value> =
+export type ExecutionServices<Value> =
   Value extends Effect.Effect<infer Data, infer _Error, infer Services>
     ? Services | StreamServices<Data>
     : never;

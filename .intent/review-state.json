@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "05e981c0c708f84ab8b18483fada792249420edb4d55b566dcf423a6d2741908",
+      "fingerprint": "9613b90d79db9fbbcabcfd1f52dd8af978ca18974fb21ee7f6fb4aa15385f964",
       "snapshot": {
         "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -15,7 +15,7 @@
         "apps/docs/src/content/docs/concepts/semantic-keys.md": "715b4e3103fa971748b45c5c8086e1ea4b95980dff0a69ee122635ed5fc998d2",
         "apps/docs/src/content/docs/examples.md": "08c014b01c49123ee871ddb7427d69b4dcf1791fa907ba2fe535ebf6c522d282",
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "022014147e137abdac686d6d3c58f4eff1e8098dd2241a3cccd96abe5051cd26",
-        "apps/docs/src/content/docs/examples/http-workflows.md": "4f668dcd9a22dc456d7ec9d285d4cb813d2c0ecc3450d07389cc0dae169ac9a4",
+        "apps/docs/src/content/docs/examples/http-workflows.md": "6cb2bc822a31f417963b42b48bcbeaa878f3579e446e89c97a8fee958f8704db",
         "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "9de7c0138e82b6471f6517f293975c29462cdbfa84ef4fd1d683b030e262b5bc",
         "apps/docs/src/content/docs/getting-started/feature-support.md": "ac3ebd5c192272f7d4d1a236a5878d1d51a76fc514e874cbb51f17eb31809125",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "4c68eaf1d2df4b1dcebf24b8f84ef291dd503a2049eb6802b74e8e52b7e6a948",
@@ -33,7 +33,7 @@
         "apps/docs/src/content/docs/guides/http-queries-and-mutations.md": "6986c0a13febe76c0d9433336c567b3336df54ed480d05d25e053abf54d97d69",
         "apps/docs/src/content/docs/guides/hydrate-query-views.md": "5afe7566eb36187c613a58e272de32383027e7765b3f19d9c1bbb5894cc606af",
         "apps/docs/src/content/docs/guides/hydrate-unary-data.md": "37d4ff8c5f6fc0b687c01685657d64dc4d136622c51e03a6b9c015bf1f00dc07",
-        "apps/docs/src/content/docs/guides/loader-descriptors.md": "7a7713f08b307a6d12b6ebc7a654f21ab9162c26fe8045fdc41eacb936521630",
+        "apps/docs/src/content/docs/guides/loader-descriptors.md": "06c9cb5e8248305cb4302ec20fa240d5f9a503a6e07d273148c62b62b47a3fc4",
         "apps/docs/src/content/docs/guides/mutations.md": "14eab9a6ef28b6cdb4368766e543d83abcb59b50008ba570d1a3092851ee368d",
         "apps/docs/src/content/docs/guides/optimistic-writes.md": "309964011fd58b301387c485eba621d06a3a73f3ddd0114918fd94f8d654e17d",
         "apps/docs/src/content/docs/guides/pagination.md": "335599f80e8c311c3d755ee0d339a4f66738d7af5643168c4909d56ad003625d",
@@ -106,8 +106,8 @@
         "examples/contracts/src/client.ts": "fdf559bf0a798c7ea7f7aee01967837e720f7727a1bd11978aec51aad59f00f2",
         "examples/contracts/src/contracts.ts": "74d69e1a07c0b32c2a48b8fed8cfceaac8844ead860fbd00b9e357657b39d88e",
         "examples/contracts/src/http-api.ts": "bcecd0611e4bdeac0dad04159cc73db3165aca20ac1f89e597e6c73a76d99cef",
-        "examples/contracts/src/index.ts": "2b086282b7fc1c4ddcf1bfdaf30268fcc6373873e31de58ecde8d14d766deb6c",
-        "examples/contracts/src/workflows.ts": "079a2cf2ac5ccf1492ee918a465e9cb553ed866895cf853bf6c90eb6785b6ff9",
+        "examples/contracts/src/index.ts": "c33fab4003401bb603897353250ebcc834a7916d4e3a696f384bf98e329420d1",
+        "examples/contracts/src/workflows.ts": "86fa0e9061afb98634e96c7e08a9c1805cdc5e25bf30b0d7cba44a5bc661c5a9",
         "examples/server/src/commands.ts": "8e13627dcbda071716cdd539e6f1124ace4375f878038ca970534901ac6c5aba",
         "examples/server/src/diagnostic-operations.ts": "33ec6ef8931e4e2a39692a7b72574756791946161894f0733751748fd48d1998",
         "examples/server/src/domain.ts": "256b4e4f908ddb8d4564d51528866c470d4fed332ec69ce2e13bef915b68e97e",
@@ -128,10 +128,20 @@
         "examples/server/tests/web-handler.test.ts": "50fdbcacf42c64315356864adc530c4e99e50e65447187d9ce55424372b741c1",
         "examples/shared/application-policy.ts": "cd88bd5533ed8dad03e4f5919a584be3aa307130b83b6a54c3161ebef3117ec8",
         "examples/shared/error-description.ts": "713eaabd91110a7b9fe64d022b9b22e6488a50905587582c111f38cdb04787bc",
+        "examples/shared/http-workflows/app.tsx": "452cec00a71934b2547a4cc62b48eb26a71795c7d37be84d1fd64a32dd2218d1",
+        "examples/shared/http-workflows/application.ts": "0135a54f42d9b88f0ab9967993f0c006876dfc9b5f1c1762d0e7fe0c50795667",
+        "examples/shared/http-workflows/document.tsx": "3612394eb3cdce6883831abd835d433009b839113356a2c6707ee89c0211f76e",
+        "examples/shared/http-workflows/events.tsx": "5d24c115015439fb6d8d0441b657a19966eba482002d6ca46327a0588f25bf7c",
+        "examples/shared/http-workflows/readings.tsx": "18eb70dbd521fa48689fa061e9f6dc67fdeced33657ef0bf849db9994fdb3e2d",
+        "examples/shared/http-workflows/recovery.ts": "b4d4264844869447a42cbbb515529ef511f99c8c16c457521a0835a0823df65d",
+        "examples/shared/http-workflows/sharing.ts": "b23cc3b8327b1bc9e6d1fe4252d82eda9e817434105312cfaf0fabc03c4d6e39",
+        "examples/shared/http-workflows/streams.tsx": "f78576b1fb979db15771a4a4c12a57be7a7bdcd55dad1183590925982f65769a",
+        "examples/shared/http-workflows/upload.tsx": "e6e307ae67c58d52a9d56e898b31cde8c384491abe46203da1e7cfc631572184",
         "examples/shared/query-effects.ts": "f99c03d84176f7c720c37dbe49fe3b515418ee3504e18f3469e504bc196d1eed",
         "examples/shared/query-events.ts": "253a554acee724b8e087cdbbd6f2bccc633e539a00396fdade428231b4f0f0f8",
+        "examples/shared/ui/effect-error-details.tsx": "13527eb9de23e517de0b66d6949f2e1f15e92b886d9feae312b1aa60b4e80c12",
         "examples/shared/use-slow-query-cancellation.ts": "872ea8e5ef8b97b2d6def07a8cc5c79a885099ffb6e60ebf6db6e39b9aa628f1",
-        "examples/tanstack-start/src/components/effect-error-details.tsx": "d3bf0975507f9784f49b12a468baade10177209c5a1fa51e6de1e86f0daa770a",
+        "examples/tanstack-start/src/components/effect-error-details.tsx": "843d359788306199d2f206d445d512f2798dda9c1625d09650ac7a09a26c4a29",
         "examples/tanstack-start/src/lib/api-server.ts": "3ab4000ee28dc8f73237b4508e0f0a0a1b1e4baf865ae501348487a978e19f23",
         "examples/tanstack-start/src/lib/application.ts": "4456944d1ded48ac041dce627201111ac05936ed57263b9ca674a877a21dec38",
         "examples/tanstack-start/src/lib/featured-user.ts": "8c9b33056cd2e4c2c19a95de3fad5b93e326b654117c75086b55f44630ad599d",
@@ -147,35 +157,25 @@
         "examples/tanstack-start/tests/featured-selection.test.ts": "3a6e1db27843a392d354cb58ab7b8d7bfaf327ffe42910118d426d42875f1123",
         "examples/tanstack-start/tests/server-local.test.ts": "6d04b85b3e584deb8e4b6f847235ceab8a811eb2d3837dc209f89cf87cf0d291",
         "examples/tanstack-start/tests/server-render.test.tsx": "e46b15c02fc7b5fc76d52f9d64dfc5b88d4d36e0151908138de9babe7a5d53a3",
-        "examples/vite-react/src/app.tsx": "96f17567f1a4c387c30ba64bfadd8cc2d8260dde7699269951e26197e29ecd42",
-        "examples/vite-react/src/components/ui/effect-error-details.tsx": "5c14c07465cd1f382a71c7e5b35b0adbc29cc3b5fc75bf3138824bd1d28b3821",
+        "examples/vite-react/src/app.tsx": "ca8282f2d2adc59fe62d19253e8f395d2585cdc4dae2209bab134b01cb701d7c",
         "examples/vite-react/src/lib/application.ts": "da2b2fa16d237e6fcc49b4ffbd99d2aa8a402a861f78cf71634a07172bd12bd3",
         "examples/vite-react/src/lib/owner-cache.ts": "e9eaa783cce49e7905027ae93ef1c525e2713187e83ffa4ecf726ba7235a420d",
         "examples/vite-react/src/lib/user-writes.ts": "999277fa02ff9c1439186b59636f7078458a5cbc3c84bed06514867b270a3b5e",
-        "examples/vite-react/src/main.tsx": "9129bf323b8763d540df1ba4d7660739065d3f417cd287125292b51b56f4e02d",
-        "examples/vite-react/src/workflows/app.tsx": "452cec00a71934b2547a4cc62b48eb26a71795c7d37be84d1fd64a32dd2218d1",
-        "examples/vite-react/src/workflows/application.ts": "856d37c001b37125865e29cbb2d4bc83a136219c324c91f47eb5cdc0315d1b46",
-        "examples/vite-react/src/workflows/document.tsx": "4fdeeaf20904d2568c827f80d0c1fd957edb19de9a3eb487077888f5edf7fe32",
-        "examples/vite-react/src/workflows/events.tsx": "e9fd798a6b72162ab369a82492104810bb0dbb64834fb2152e6298b56c2ee44a",
-        "examples/vite-react/src/workflows/readings.tsx": "45a9fe929cf43bf9d6a85b80be18859f52a810f81fbd653013ff0ed64c2bf423",
-        "examples/vite-react/src/workflows/recovery.ts": "b4d4264844869447a42cbbb515529ef511f99c8c16c457521a0835a0823df65d",
-        "examples/vite-react/src/workflows/sharing.ts": "b23cc3b8327b1bc9e6d1fe4252d82eda9e817434105312cfaf0fabc03c4d6e39",
-        "examples/vite-react/src/workflows/streams.tsx": "286691746068b82fb0a6d61f4c5f1d92cdd841ede624532d6f3cbc8b18ef8dbd",
-        "examples/vite-react/src/workflows/upload.tsx": "9780404fa098e0626fd45815bede351ce97b8d96fa855249ca21a864cfdb32ad",
+        "examples/vite-react/src/main.tsx": "6672a5685f0ccbdbc982676056bdb60d8f63b33987e319a146e42c3a0013a56b",
         "examples/vite-react/tests/app.test.tsx": "29597cde134da8e236466ce403d1898796c1ffb883a8c35f8d4c3e542aa779d8",
         "examples/vite-react/tests/commands-ui.test.tsx": "d24bafc224efa769efeb1a2c0398a86b0dbef6c63cd19ba73d3b3bede921a1fd",
         "examples/vite-react/tests/commands.test.ts": "1bd076ba62d754e323beedb7bfb9c2e2ce75f2eee117003a5f5bb55350610386",
-        "examples/vite-react/tests/http-workflows.test.ts": "d82eec181e12af57cc5a36fa5908ceba15030f4b8341225bdd3a4dd3d4042f13",
+        "examples/vite-react/tests/http-workflows.test.ts": "ab29cb1530f41ca4739d734084d2cd19ea40058f8531399dbeecdb0ebb7276e8",
         "examples/vite-react/tests/minimal-setup.test.tsx": "fb5cb0465320068d8bc37bfab0cf1c4579e82a9c318243ad15424d0f35661281",
         "examples/vite-react/tests/owner-boundary.test.tsx": "f8fc6b26f24884d87d364a9b07f16ba912a7e92efbb96b0c815a62be22ac6bab",
         "examples/vite-react/tests/owner-cache.test.ts": "1ac4bebb04b973fa11e26f4b684fe6b217a075a255ac1828d9ed109c359c9ed9",
         "examples/vite-react/tests/owner-switch.test.ts": "0f16f2ac4023dfedd525a76e03d374d62e2289aace71eb688ce43fd367c147ce",
-        "examples/vite-react/tests/slow-query-cancellation.test.tsx": "ebfc2db2f1f49e5768b2235a34fa7c9e4d2f3a4a1a7ae41ac55a70ef3b96cad9",
+        "examples/vite-react/tests/slow-query-cancellation.test.tsx": "827e3a4cdec1dca4e8dfdf6ef48ba449f6e69bcfc6c67660ae8f4648e9556042",
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
         "package.json": "88899a47ccd31569a2e95cba153cf1b95f471243f58ccb3e18c6d18d42e03fe6",
-        "pnpm-workspace.yaml": "a1b81004fce351551877a21b03c2c277af591610ea3a49e79e54b2ad3e19f103",
+        "pnpm-workspace.yaml": "c7ceebab8301785f74932daaf1b16f2b09cbc5d7f030868659857724e71b8956",
         "scripts/check-effect-compatibility.mts": "7089d56cb5c0c0ffe63e9358c55dc122ad8d15f58b353c0c4fde3a27c463bd87",
         "scripts/check-framework-consumers.mts": "f0111ac9ed84996f722f656358b810da0b9ecc8c6c0219a2019d1076b5d50cbc",
         "scripts/check-toolchain.mts": "113386f8e7c3352dcefa745207d96783678939b07d0a18a8cdfbe55e08e9b60a",
@@ -191,7 +191,7 @@
         "scripts/verify-docs-examples.mts": null,
         "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
-        "skills/effect-api-query/SKILL.md": "6bf36be7173bf06e69232b5ac3024b9e7fc3fa51be8d5c9904acad840cab39e9",
+        "skills/effect-api-query/SKILL.md": "6a106a626226b29fac1057d0ed9d8ddd9cbbccabb6c62fecf080139769f98c48",
         "skills/effect-api-query/references/cache-workflows.md": "1d80a087881094a7d50dbf7ce20c7ab8a2800f05aae432523645d4cba82b98e3",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "444e359b9b4fe577c691546cba652422dce6821d80feebf7a8bbd8ef55dd0415",
         "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
@@ -215,12 +215,12 @@
         "src/core/query-effects.ts": "ec7044353bb6f531986cf9fcd43479ff33c954b404ed56acfcbed459dda3b8a0",
         "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
-        "src/core/query-owner.ts": "fd2f7ceb7bf29a5e5456ef908c1330b4b829a0fcfaaed33474a1c80e71e361b9",
+        "src/core/query-owner.ts": "3338cd9dac985870417a46b8c40c0ec73e6b7963ae2f9198691fee663c3a41b7",
         "src/core/schema-key.ts": "7dad2749d30f2ab828dbc7e96d6e1e2b32b6733450cb6dc734de607629d925f8",
         "src/core/schema-structural-sharing.ts": "1a961c521aaf02c00689bee654ff428bb9d519ebf87651f7faedb9dfd1a06ccc",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
         "src/core/stream-publication.ts": "e6a2fbded6ead8351c83fa3adabf84fb0d1b52d559e3d209a2831aca69d58e21",
-        "src/core/stream-recovery.ts": "c2c53ed24c042c24a18b2379995107a09e3145080cc97597d7bb41d3a616d37e",
+        "src/core/stream-recovery.ts": "2287649cd64adfbe8cb069b66d338d178ad1239492cf7530e2ea5addbfd1fd81",
         "src/core/stream-snapshot.ts": "97fbb56308b2e2decacd86a02b3f0a3ced76692444ba25a7abaae05b442c233a",
         "src/core/streamed-query.ts": "a44dbb1a17a0d266f9e38e6b819dff7dbc417821e14f089e8ed2825dfe763b23",
         "src/core/types.ts": "ded3b620e25ab5def0a96dbafead82398f7f7a43572a434cc30b0c505ee2409b",
@@ -231,7 +231,7 @@
         "src/http/operation.ts": "4a3651be65fee9fc039c38c0f191ba6a79347a5bd45c3f233de7d90c12d8bf9c",
         "src/http/request.ts": "4dced85460db56cb83514486417e17dd4a35629ad28749a2ac01dadbe45113b3",
         "src/http/streamed-query.ts": "27d1f5418009216d960816485cfd7f1760a8e3f638ccb9ac8dfa5fc040b1564a",
-        "src/http/types.ts": "2fd2d9985211426d224462ae87a667a5ddf136b873f6d539033ef01a36dd2bcc",
+        "src/http/types.ts": "aff8b44ee5ab3013fd34172f0e425fc272b95f4ca096ec5ee66e514bc4be4e1e",
         "src/index.ts": "85ed201a88913658d6d55d780e33f549444c1bbb591e593d22f842e70199c9c0",
         "src/rpc/create-utils.ts": "8ebf030b0f76f91c248434c169d789d6328d2ba43c07afe15e04db0a02f05c2c",
         "src/rpc/errors.ts": "8e1fbcc7843b2bf99e9d80bfd365dc118d52351909d5c8f48c46ba9d39fdedd3",
@@ -292,7 +292,7 @@
         "tests/query-effects.test.ts": "68c85372b5417be8073e3c117ee55a3f77e270f30edc55cdbf3144e6aa86b47e",
         "tests/query-events.test.ts": "27c913c8ff1d65384a70695ef891e156f99ac122bc36e5be10f195b568b5e7b5",
         "tests/query-filter.test.ts": "ff531a86816872cd2cadf01d79bd9d9ff5be1895bab150330a90aa8375508004",
-        "tests/query-owner.test.ts": "0c46e34994c81de588e9b470b698a2c232729992676faa2c4595f9f9f3086c99",
+        "tests/query-owner.test.ts": "e6ec5f2cd7ca7404da235c11f30249b1f769a9c5902c24f681d23f0e0ef64705",
         "tests/query-policy.test.ts": "19b1d0fde232b4af9e041197a1aa6726f30e4fb7118533e5b3f7af08cbbe4002",
         "tests/query-usability.test.ts": "313e6c03b560b4c20ffc32ed8e2bd96ce94fc2fb3977489f311324b6988e190f",
         "tests/query-view-prefix.test.ts": "fd94e3d01f52a0978242246f02a3e989bddd1e055f828f48d7a41187f696dd69",
@@ -305,7 +305,7 @@
         "tests/stream-publication.test.ts": "57db2c6db5273a5c6789bb65dee2eeff5293eb98ee472fec102dffca984a65a6",
         "tests/stream-recovery.test.ts": "93e68be6631e0335129d9459e9989aff56e3431e8ece9540104278a8b5cc1cb1",
         "tests/stream-snapshot.test.ts": "c001d7ad4dfbded79e2ee66b5595c2f23ea42c5a814c451d3ca154cc7ef07a67",
-        "tests/types/application-policy-contract.ts": "e84427137e4827cd711a1061c8a1b374f73743bd6e861a24a5f028585f9cd974",
+        "tests/types/application-policy-contract.ts": "ac6c4b852a201269c5a8837cc4410abff593645530f274a097208eb45ad40ccd",
         "tests/types/docs-functionality.ts": "065ff9eac091e4a25c814e3e49b49d0f6258fffb7c5ed0661a1ec960b41ac0c0",
         "tests/types/docs-http-ndjson.ts": "a86513c1047b700ce27fc49b3d1fb31004cf745096d8403a0bdc780d95a448a3",
         "tests/types/docs-http-quick-start-contract.ts": "e034175f607fc9414e4919c6762a859e03908b0ee7ba77cb5dc6556b746ec26c",
@@ -314,7 +314,8 @@
         "tests/types/docs-hydration-dto.ts": "65b61e5a18619aa600ade5626a83112c04608c08adcdd147f743bc6ae724f1ef",
         "tests/types/docs-hydration-rich.ts": "af96271b8d9516c5ad6e55a6742fba02b487910fce7906af92bee813e14f267b",
         "tests/types/docs-hydration-views.ts": "4c6e04cd4c5266bf9b0a78adabc36fa78aac956752faaa3e6a5dce912b962c47",
-        "tests/types/docs-loader-descriptors.tsx": "09a68ff742feba106e2e66ddfc34bdea66b71be37d83e642bd632c61797ef1e7",
+        "tests/types/docs-loader-descriptors-use.tsx": "fe7b9e05ffef588c0178090c25ef80c7ff16f0134d0774f94d649807be4cccf7",
+        "tests/types/docs-loader-descriptors.tsx": "a904c561cdafd3ede4e4b17155f3392aff2497b9ea3d0d7a2a2c6a05a270e680",
         "tests/types/docs-opaque-recovery.ts": "88e2c2764ccd8195f65c4f46ff891a8487fe8b3740376239d5385fa9b7aea8ce",
         "tests/types/docs-policies.ts": "416116e0f87d8c5a3e2b3b32c89df84f2ca73d155b3c1c1c67e981e45280eec5",
         "tests/types/docs-react-client.ts": "1960f15857fc260324a4c1b20cd8830af4dad73e9b7952e6181ad7228fabcbd7",
@@ -368,21 +369,26 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "3f742441d9d6aaf187af51678881781f1ab2e95a",
-      "outcome": "no-change",
-      "reason": "Sol optional duplication finding: one private generic query-retirement configuration helper replaces eight identical arrow functions across the existing RPC/HTTP constructors, preserving the same explicit query/infinite/live/streamed views, native signal and complete-promise drain. Public contracts, current guidance and all three planning records remain accurate; no new feature, ownership, task, export or source mapping.",
+      "head": "90ca0e6ac412cf97f62854b7e29d4438e2d6ffb0",
+      "outcome": "updated",
+      "reason": "Updated moved workflow and shared error UI source mappings. Existing guidance already requires wrapped runners, complete query registration, native mutation callback drainage, and complete cleanup Causes. Private workspace ownership and internal type exports do not change the public root contract.",
       "evidence": [
-        "examples/vite-react/src/lib/application.ts diff against3f74244; both public compiler suites pass, strict lint/typecheck231files pass, all127existing app tests across19files pass, scoped formatter/whitespace and skills-check pass. Existing skill/domain/spec/tree records inspected through the preceding owned example maintenance; this source-only factoring adds no coverage or changed recommendation. No private-helper mirror test or consumer/discovery claim."
+        "Source base 90ca0e6; actual src/core/query-owner.ts and examples/shared/http-workflows/application.ts diff; native public application and owner regressions.",
+        "architecture-raw-finalizer-red.log and architecture-same-turn-red.log reproduce prior failures; corresponding GREEN evidence and final 870 runtime tests pass.",
+        "Both pinned public/server compilers, strict 231-file checking/457-file formatting, package/ATTW/publint, native framework compilers, Effect diagnostics and toolchain rejection checks pass.",
+        "Both final production builds and docs checks pass; all four Fallow audits pass with clean development/production dead-code scans and no new suppressions/threshold changes.",
+        "150 browser cases passed before private workspace packaging; final 150-case browser rerun running. Eight packed peer pairs passed 403 cases each before internal type-export/consumer-fixture cleanup; final CI will rerun the matrix.",
+        "Fresh Astra architecture/fix source rechecks found no remaining actionable admission finding. No fresh consumer/discovery or GUI/platform claim; default yamllint retains repository line-length/document-start issues."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "aec90bb7631e8789a90b778219278e670e573b7c40b0daa424ec10db086a8277",
+      "fingerprint": "ebeb99a10c18a00e231a35fe27ba364b722a351d0fffb6d628c545b336df73ea",
       "snapshot": {
         "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
-        "_artifacts/domain_map.yaml": "ae40f07fa480ca48c207157c73b05c5f57d167d3b80c5987875591c9015bde5a",
-        "_artifacts/skill_spec.md": "f9001aef36c9f9b417d093e0093f8fcba4e8b6cc85543f8961938a341eceb458",
-        "_artifacts/skill_tree.yaml": "8205464b58a223251be240261d382ce4120adf328315f3352977e157a634a4f7",
+        "_artifacts/domain_map.yaml": "cc7bc13b277005ac6d413df2ab1d3f9cea17988b7ec74451df6c85a2817a176c",
+        "_artifacts/skill_spec.md": "5dbd23e5c268781ad59ed2cf5d1f6a1c51c0d5e61a47e2ef0803c3596caa29db",
+        "_artifacts/skill_tree.yaml": "68e1199093f0ac17fc9851568960956b4b65ffc8435daba6c310376fc7fe4097",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "83a6aab512d66893237aa3ba45bf52b23712b88d829d83992509c2f3c822c18b",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "eb226d096cee825aa2a7c2e49370208d6110662c3acf681fa4b95f8b6caca0d7",
         "apps/docs/src/content/docs/concepts/http-utility-tree.md": "03f01c27b051a3fdd8c373749d61cf62d35c2734ff1f651ad3805b14886ba45b",
@@ -391,7 +397,7 @@
         "apps/docs/src/content/docs/concepts/semantic-keys.md": "715b4e3103fa971748b45c5c8086e1ea4b95980dff0a69ee122635ed5fc998d2",
         "apps/docs/src/content/docs/examples.md": "08c014b01c49123ee871ddb7427d69b4dcf1791fa907ba2fe535ebf6c522d282",
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "022014147e137abdac686d6d3c58f4eff1e8098dd2241a3cccd96abe5051cd26",
-        "apps/docs/src/content/docs/examples/http-workflows.md": "4f668dcd9a22dc456d7ec9d285d4cb813d2c0ecc3450d07389cc0dae169ac9a4",
+        "apps/docs/src/content/docs/examples/http-workflows.md": "6cb2bc822a31f417963b42b48bcbeaa878f3579e446e89c97a8fee958f8704db",
         "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "9de7c0138e82b6471f6517f293975c29462cdbfa84ef4fd1d683b030e262b5bc",
         "apps/docs/src/content/docs/getting-started/feature-support.md": "ac3ebd5c192272f7d4d1a236a5878d1d51a76fc514e874cbb51f17eb31809125",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "4c68eaf1d2df4b1dcebf24b8f84ef291dd503a2049eb6802b74e8e52b7e6a948",
@@ -409,7 +415,7 @@
         "apps/docs/src/content/docs/guides/http-queries-and-mutations.md": "6986c0a13febe76c0d9433336c567b3336df54ed480d05d25e053abf54d97d69",
         "apps/docs/src/content/docs/guides/hydrate-query-views.md": "5afe7566eb36187c613a58e272de32383027e7765b3f19d9c1bbb5894cc606af",
         "apps/docs/src/content/docs/guides/hydrate-unary-data.md": "37d4ff8c5f6fc0b687c01685657d64dc4d136622c51e03a6b9c015bf1f00dc07",
-        "apps/docs/src/content/docs/guides/loader-descriptors.md": "7a7713f08b307a6d12b6ebc7a654f21ab9162c26fe8045fdc41eacb936521630",
+        "apps/docs/src/content/docs/guides/loader-descriptors.md": "06c9cb5e8248305cb4302ec20fa240d5f9a503a6e07d273148c62b62b47a3fc4",
         "apps/docs/src/content/docs/guides/mutations.md": "14eab9a6ef28b6cdb4368766e543d83abcb59b50008ba570d1a3092851ee368d",
         "apps/docs/src/content/docs/guides/optimistic-writes.md": "309964011fd58b301387c485eba621d06a3a73f3ddd0114918fd94f8d654e17d",
         "apps/docs/src/content/docs/guides/pagination.md": "335599f80e8c311c3d755ee0d339a4f66738d7af5643168c4909d56ad003625d",
@@ -482,8 +488,8 @@
         "examples/contracts/src/client.ts": "fdf559bf0a798c7ea7f7aee01967837e720f7727a1bd11978aec51aad59f00f2",
         "examples/contracts/src/contracts.ts": "74d69e1a07c0b32c2a48b8fed8cfceaac8844ead860fbd00b9e357657b39d88e",
         "examples/contracts/src/http-api.ts": "bcecd0611e4bdeac0dad04159cc73db3165aca20ac1f89e597e6c73a76d99cef",
-        "examples/contracts/src/index.ts": "2b086282b7fc1c4ddcf1bfdaf30268fcc6373873e31de58ecde8d14d766deb6c",
-        "examples/contracts/src/workflows.ts": "079a2cf2ac5ccf1492ee918a465e9cb553ed866895cf853bf6c90eb6785b6ff9",
+        "examples/contracts/src/index.ts": "c33fab4003401bb603897353250ebcc834a7916d4e3a696f384bf98e329420d1",
+        "examples/contracts/src/workflows.ts": "86fa0e9061afb98634e96c7e08a9c1805cdc5e25bf30b0d7cba44a5bc661c5a9",
         "examples/server/src/commands.ts": "8e13627dcbda071716cdd539e6f1124ace4375f878038ca970534901ac6c5aba",
         "examples/server/src/diagnostic-operations.ts": "33ec6ef8931e4e2a39692a7b72574756791946161894f0733751748fd48d1998",
         "examples/server/src/domain.ts": "256b4e4f908ddb8d4564d51528866c470d4fed332ec69ce2e13bef915b68e97e",
@@ -504,10 +510,20 @@
         "examples/server/tests/web-handler.test.ts": "50fdbcacf42c64315356864adc530c4e99e50e65447187d9ce55424372b741c1",
         "examples/shared/application-policy.ts": "cd88bd5533ed8dad03e4f5919a584be3aa307130b83b6a54c3161ebef3117ec8",
         "examples/shared/error-description.ts": "713eaabd91110a7b9fe64d022b9b22e6488a50905587582c111f38cdb04787bc",
+        "examples/shared/http-workflows/app.tsx": "452cec00a71934b2547a4cc62b48eb26a71795c7d37be84d1fd64a32dd2218d1",
+        "examples/shared/http-workflows/application.ts": "0135a54f42d9b88f0ab9967993f0c006876dfc9b5f1c1762d0e7fe0c50795667",
+        "examples/shared/http-workflows/document.tsx": "3612394eb3cdce6883831abd835d433009b839113356a2c6707ee89c0211f76e",
+        "examples/shared/http-workflows/events.tsx": "5d24c115015439fb6d8d0441b657a19966eba482002d6ca46327a0588f25bf7c",
+        "examples/shared/http-workflows/readings.tsx": "18eb70dbd521fa48689fa061e9f6dc67fdeced33657ef0bf849db9994fdb3e2d",
+        "examples/shared/http-workflows/recovery.ts": "b4d4264844869447a42cbbb515529ef511f99c8c16c457521a0835a0823df65d",
+        "examples/shared/http-workflows/sharing.ts": "b23cc3b8327b1bc9e6d1fe4252d82eda9e817434105312cfaf0fabc03c4d6e39",
+        "examples/shared/http-workflows/streams.tsx": "f78576b1fb979db15771a4a4c12a57be7a7bdcd55dad1183590925982f65769a",
+        "examples/shared/http-workflows/upload.tsx": "e6e307ae67c58d52a9d56e898b31cde8c384491abe46203da1e7cfc631572184",
         "examples/shared/query-effects.ts": "f99c03d84176f7c720c37dbe49fe3b515418ee3504e18f3469e504bc196d1eed",
         "examples/shared/query-events.ts": "253a554acee724b8e087cdbbd6f2bccc633e539a00396fdade428231b4f0f0f8",
+        "examples/shared/ui/effect-error-details.tsx": "13527eb9de23e517de0b66d6949f2e1f15e92b886d9feae312b1aa60b4e80c12",
         "examples/shared/use-slow-query-cancellation.ts": "872ea8e5ef8b97b2d6def07a8cc5c79a885099ffb6e60ebf6db6e39b9aa628f1",
-        "examples/tanstack-start/src/components/effect-error-details.tsx": "d3bf0975507f9784f49b12a468baade10177209c5a1fa51e6de1e86f0daa770a",
+        "examples/tanstack-start/src/components/effect-error-details.tsx": "843d359788306199d2f206d445d512f2798dda9c1625d09650ac7a09a26c4a29",
         "examples/tanstack-start/src/lib/api-server.ts": "3ab4000ee28dc8f73237b4508e0f0a0a1b1e4baf865ae501348487a978e19f23",
         "examples/tanstack-start/src/lib/application.ts": "4456944d1ded48ac041dce627201111ac05936ed57263b9ca674a877a21dec38",
         "examples/tanstack-start/src/lib/featured-user.ts": "8c9b33056cd2e4c2c19a95de3fad5b93e326b654117c75086b55f44630ad599d",
@@ -523,35 +539,25 @@
         "examples/tanstack-start/tests/featured-selection.test.ts": "3a6e1db27843a392d354cb58ab7b8d7bfaf327ffe42910118d426d42875f1123",
         "examples/tanstack-start/tests/server-local.test.ts": "6d04b85b3e584deb8e4b6f847235ceab8a811eb2d3837dc209f89cf87cf0d291",
         "examples/tanstack-start/tests/server-render.test.tsx": "e46b15c02fc7b5fc76d52f9d64dfc5b88d4d36e0151908138de9babe7a5d53a3",
-        "examples/vite-react/src/app.tsx": "96f17567f1a4c387c30ba64bfadd8cc2d8260dde7699269951e26197e29ecd42",
-        "examples/vite-react/src/components/ui/effect-error-details.tsx": "5c14c07465cd1f382a71c7e5b35b0adbc29cc3b5fc75bf3138824bd1d28b3821",
+        "examples/vite-react/src/app.tsx": "ca8282f2d2adc59fe62d19253e8f395d2585cdc4dae2209bab134b01cb701d7c",
         "examples/vite-react/src/lib/application.ts": "da2b2fa16d237e6fcc49b4ffbd99d2aa8a402a861f78cf71634a07172bd12bd3",
         "examples/vite-react/src/lib/owner-cache.ts": "e9eaa783cce49e7905027ae93ef1c525e2713187e83ffa4ecf726ba7235a420d",
         "examples/vite-react/src/lib/user-writes.ts": "999277fa02ff9c1439186b59636f7078458a5cbc3c84bed06514867b270a3b5e",
-        "examples/vite-react/src/main.tsx": "9129bf323b8763d540df1ba4d7660739065d3f417cd287125292b51b56f4e02d",
-        "examples/vite-react/src/workflows/app.tsx": "452cec00a71934b2547a4cc62b48eb26a71795c7d37be84d1fd64a32dd2218d1",
-        "examples/vite-react/src/workflows/application.ts": "856d37c001b37125865e29cbb2d4bc83a136219c324c91f47eb5cdc0315d1b46",
-        "examples/vite-react/src/workflows/document.tsx": "4fdeeaf20904d2568c827f80d0c1fd957edb19de9a3eb487077888f5edf7fe32",
-        "examples/vite-react/src/workflows/events.tsx": "e9fd798a6b72162ab369a82492104810bb0dbb64834fb2152e6298b56c2ee44a",
-        "examples/vite-react/src/workflows/readings.tsx": "45a9fe929cf43bf9d6a85b80be18859f52a810f81fbd653013ff0ed64c2bf423",
-        "examples/vite-react/src/workflows/recovery.ts": "b4d4264844869447a42cbbb515529ef511f99c8c16c457521a0835a0823df65d",
-        "examples/vite-react/src/workflows/sharing.ts": "b23cc3b8327b1bc9e6d1fe4252d82eda9e817434105312cfaf0fabc03c4d6e39",
-        "examples/vite-react/src/workflows/streams.tsx": "286691746068b82fb0a6d61f4c5f1d92cdd841ede624532d6f3cbc8b18ef8dbd",
-        "examples/vite-react/src/workflows/upload.tsx": "9780404fa098e0626fd45815bede351ce97b8d96fa855249ca21a864cfdb32ad",
+        "examples/vite-react/src/main.tsx": "6672a5685f0ccbdbc982676056bdb60d8f63b33987e319a146e42c3a0013a56b",
         "examples/vite-react/tests/app.test.tsx": "29597cde134da8e236466ce403d1898796c1ffb883a8c35f8d4c3e542aa779d8",
         "examples/vite-react/tests/commands-ui.test.tsx": "d24bafc224efa769efeb1a2c0398a86b0dbef6c63cd19ba73d3b3bede921a1fd",
         "examples/vite-react/tests/commands.test.ts": "1bd076ba62d754e323beedb7bfb9c2e2ce75f2eee117003a5f5bb55350610386",
-        "examples/vite-react/tests/http-workflows.test.ts": "d82eec181e12af57cc5a36fa5908ceba15030f4b8341225bdd3a4dd3d4042f13",
+        "examples/vite-react/tests/http-workflows.test.ts": "ab29cb1530f41ca4739d734084d2cd19ea40058f8531399dbeecdb0ebb7276e8",
         "examples/vite-react/tests/minimal-setup.test.tsx": "fb5cb0465320068d8bc37bfab0cf1c4579e82a9c318243ad15424d0f35661281",
         "examples/vite-react/tests/owner-boundary.test.tsx": "f8fc6b26f24884d87d364a9b07f16ba912a7e92efbb96b0c815a62be22ac6bab",
         "examples/vite-react/tests/owner-cache.test.ts": "1ac4bebb04b973fa11e26f4b684fe6b217a075a255ac1828d9ed109c359c9ed9",
         "examples/vite-react/tests/owner-switch.test.ts": "0f16f2ac4023dfedd525a76e03d374d62e2289aace71eb688ce43fd367c147ce",
-        "examples/vite-react/tests/slow-query-cancellation.test.tsx": "ebfc2db2f1f49e5768b2235a34fa7c9e4d2f3a4a1a7ae41ac55a70ef3b96cad9",
+        "examples/vite-react/tests/slow-query-cancellation.test.tsx": "827e3a4cdec1dca4e8dfdf6ef48ba449f6e69bcfc6c67660ae8f4648e9556042",
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
         "package.json": "88899a47ccd31569a2e95cba153cf1b95f471243f58ccb3e18c6d18d42e03fe6",
-        "pnpm-workspace.yaml": "a1b81004fce351551877a21b03c2c277af591610ea3a49e79e54b2ad3e19f103",
+        "pnpm-workspace.yaml": "c7ceebab8301785f74932daaf1b16f2b09cbc5d7f030868659857724e71b8956",
         "scripts/check-effect-compatibility.mts": "7089d56cb5c0c0ffe63e9358c55dc122ad8d15f58b353c0c4fde3a27c463bd87",
         "scripts/check-framework-consumers.mts": "f0111ac9ed84996f722f656358b810da0b9ecc8c6c0219a2019d1076b5d50cbc",
         "scripts/check-toolchain.mts": "113386f8e7c3352dcefa745207d96783678939b07d0a18a8cdfbe55e08e9b60a",
@@ -567,7 +573,7 @@
         "scripts/verify-docs-examples.mts": null,
         "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
-        "skills/effect-api-query/SKILL.md": "6bf36be7173bf06e69232b5ac3024b9e7fc3fa51be8d5c9904acad840cab39e9",
+        "skills/effect-api-query/SKILL.md": "6a106a626226b29fac1057d0ed9d8ddd9cbbccabb6c62fecf080139769f98c48",
         "skills/effect-api-query/references/cache-workflows.md": "1d80a087881094a7d50dbf7ce20c7ab8a2800f05aae432523645d4cba82b98e3",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "444e359b9b4fe577c691546cba652422dce6821d80feebf7a8bbd8ef55dd0415",
         "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
@@ -591,12 +597,12 @@
         "src/core/query-effects.ts": "ec7044353bb6f531986cf9fcd43479ff33c954b404ed56acfcbed459dda3b8a0",
         "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
-        "src/core/query-owner.ts": "fd2f7ceb7bf29a5e5456ef908c1330b4b829a0fcfaaed33474a1c80e71e361b9",
+        "src/core/query-owner.ts": "3338cd9dac985870417a46b8c40c0ec73e6b7963ae2f9198691fee663c3a41b7",
         "src/core/schema-key.ts": "7dad2749d30f2ab828dbc7e96d6e1e2b32b6733450cb6dc734de607629d925f8",
         "src/core/schema-structural-sharing.ts": "1a961c521aaf02c00689bee654ff428bb9d519ebf87651f7faedb9dfd1a06ccc",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
         "src/core/stream-publication.ts": "e6a2fbded6ead8351c83fa3adabf84fb0d1b52d559e3d209a2831aca69d58e21",
-        "src/core/stream-recovery.ts": "c2c53ed24c042c24a18b2379995107a09e3145080cc97597d7bb41d3a616d37e",
+        "src/core/stream-recovery.ts": "2287649cd64adfbe8cb069b66d338d178ad1239492cf7530e2ea5addbfd1fd81",
         "src/core/stream-snapshot.ts": "97fbb56308b2e2decacd86a02b3f0a3ced76692444ba25a7abaae05b442c233a",
         "src/core/streamed-query.ts": "a44dbb1a17a0d266f9e38e6b819dff7dbc417821e14f089e8ed2825dfe763b23",
         "src/core/types.ts": "ded3b620e25ab5def0a96dbafead82398f7f7a43572a434cc30b0c505ee2409b",
@@ -607,7 +613,7 @@
         "src/http/operation.ts": "4a3651be65fee9fc039c38c0f191ba6a79347a5bd45c3f233de7d90c12d8bf9c",
         "src/http/request.ts": "4dced85460db56cb83514486417e17dd4a35629ad28749a2ac01dadbe45113b3",
         "src/http/streamed-query.ts": "27d1f5418009216d960816485cfd7f1760a8e3f638ccb9ac8dfa5fc040b1564a",
-        "src/http/types.ts": "2fd2d9985211426d224462ae87a667a5ddf136b873f6d539033ef01a36dd2bcc",
+        "src/http/types.ts": "aff8b44ee5ab3013fd34172f0e425fc272b95f4ca096ec5ee66e514bc4be4e1e",
         "src/index.ts": "85ed201a88913658d6d55d780e33f549444c1bbb591e593d22f842e70199c9c0",
         "src/rpc/create-utils.ts": "8ebf030b0f76f91c248434c169d789d6328d2ba43c07afe15e04db0a02f05c2c",
         "src/rpc/errors.ts": "8e1fbcc7843b2bf99e9d80bfd365dc118d52351909d5c8f48c46ba9d39fdedd3",
@@ -668,7 +674,7 @@
         "tests/query-effects.test.ts": "68c85372b5417be8073e3c117ee55a3f77e270f30edc55cdbf3144e6aa86b47e",
         "tests/query-events.test.ts": "27c913c8ff1d65384a70695ef891e156f99ac122bc36e5be10f195b568b5e7b5",
         "tests/query-filter.test.ts": "ff531a86816872cd2cadf01d79bd9d9ff5be1895bab150330a90aa8375508004",
-        "tests/query-owner.test.ts": "0c46e34994c81de588e9b470b698a2c232729992676faa2c4595f9f9f3086c99",
+        "tests/query-owner.test.ts": "e6ec5f2cd7ca7404da235c11f30249b1f769a9c5902c24f681d23f0e0ef64705",
         "tests/query-policy.test.ts": "19b1d0fde232b4af9e041197a1aa6726f30e4fb7118533e5b3f7af08cbbe4002",
         "tests/query-usability.test.ts": "313e6c03b560b4c20ffc32ed8e2bd96ce94fc2fb3977489f311324b6988e190f",
         "tests/query-view-prefix.test.ts": "fd94e3d01f52a0978242246f02a3e989bddd1e055f828f48d7a41187f696dd69",
@@ -681,7 +687,7 @@
         "tests/stream-publication.test.ts": "57db2c6db5273a5c6789bb65dee2eeff5293eb98ee472fec102dffca984a65a6",
         "tests/stream-recovery.test.ts": "93e68be6631e0335129d9459e9989aff56e3431e8ece9540104278a8b5cc1cb1",
         "tests/stream-snapshot.test.ts": "c001d7ad4dfbded79e2ee66b5595c2f23ea42c5a814c451d3ca154cc7ef07a67",
-        "tests/types/application-policy-contract.ts": "e84427137e4827cd711a1061c8a1b374f73743bd6e861a24a5f028585f9cd974",
+        "tests/types/application-policy-contract.ts": "ac6c4b852a201269c5a8837cc4410abff593645530f274a097208eb45ad40ccd",
         "tests/types/docs-functionality.ts": "065ff9eac091e4a25c814e3e49b49d0f6258fffb7c5ed0661a1ec960b41ac0c0",
         "tests/types/docs-http-ndjson.ts": "a86513c1047b700ce27fc49b3d1fb31004cf745096d8403a0bdc780d95a448a3",
         "tests/types/docs-http-quick-start-contract.ts": "e034175f607fc9414e4919c6762a859e03908b0ee7ba77cb5dc6556b746ec26c",
@@ -690,7 +696,8 @@
         "tests/types/docs-hydration-dto.ts": "65b61e5a18619aa600ade5626a83112c04608c08adcdd147f743bc6ae724f1ef",
         "tests/types/docs-hydration-rich.ts": "af96271b8d9516c5ad6e55a6742fba02b487910fce7906af92bee813e14f267b",
         "tests/types/docs-hydration-views.ts": "4c6e04cd4c5266bf9b0a78adabc36fa78aac956752faaa3e6a5dce912b962c47",
-        "tests/types/docs-loader-descriptors.tsx": "09a68ff742feba106e2e66ddfc34bdea66b71be37d83e642bd632c61797ef1e7",
+        "tests/types/docs-loader-descriptors-use.tsx": "fe7b9e05ffef588c0178090c25ef80c7ff16f0134d0774f94d649807be4cccf7",
+        "tests/types/docs-loader-descriptors.tsx": "a904c561cdafd3ede4e4b17155f3392aff2497b9ea3d0d7a2a2c6a05a270e680",
         "tests/types/docs-opaque-recovery.ts": "88e2c2764ccd8195f65c4f46ff891a8487fe8b3740376239d5385fa9b7aea8ce",
         "tests/types/docs-policies.ts": "416116e0f87d8c5a3e2b3b32c89df84f2ca73d155b3c1c1c67e981e45280eec5",
         "tests/types/docs-react-client.ts": "1960f15857fc260324a4c1b20cd8830af4dad73e9b7952e6181ad7228fabcbd7",
@@ -744,26 +751,33 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "3f742441d9d6aaf187af51678881781f1ab2e95a",
-      "outcome": "no-change",
-      "reason": "Sol optional duplication finding: one private generic query-retirement configuration helper replaces eight identical arrow functions across the existing RPC/HTTP constructors, preserving the same explicit query/infinite/live/streamed views, native signal and complete-promise drain. Public contracts, current guidance and all three planning records remain accurate; no new feature, ownership, task, export or source mapping.",
+      "head": "90ca0e6ac412cf97f62854b7e29d4438e2d6ffb0",
+      "outcome": "updated",
+      "reason": "Reconciled all three records: domain_map adds the independently reproduced raw-finalizer failure mode; skill_spec retains previous scope and records shared module ownership, admission fix, Fallow cleanup and limits; skill_tree matches moved source mappings while retaining one skill and six references.",
       "evidence": [
-        "examples/vite-react/src/lib/application.ts diff against3f74244; both public compiler suites pass, strict lint/typecheck231files pass, all127existing app tests across19files pass, scoped formatter/whitespace and skills-check pass. Existing skill/domain/spec/tree records inspected through the preceding owned example maintenance; this source-only factoring adds no coverage or changed recommendation. No private-helper mirror test or consumer/discovery claim."
+        "Source base 90ca0e6; actual src/core/query-owner.ts and examples/shared/http-workflows/application.ts diff; native public application and owner regressions.",
+        "architecture-raw-finalizer-red.log and architecture-same-turn-red.log reproduce prior failures; corresponding GREEN evidence and final 870 runtime tests pass.",
+        "Both pinned public/server compilers, strict 231-file checking/457-file formatting, package/ATTW/publint, native framework compilers, Effect diagnostics and toolchain rejection checks pass.",
+        "Both final production builds and docs checks pass; all four Fallow audits pass with clean development/production dead-code scans and no new suppressions/threshold changes.",
+        "150 browser cases passed before private workspace packaging; final 150-case browser rerun running. Eight packed peer pairs passed 403 cases each before internal type-export/consumer-fixture cleanup; final CI will rerun the matrix.",
+        "Fresh Astra architecture/fix source rechecks found no remaining actionable admission finding. No fresh consumer/discovery or GUI/platform claim; default yamllint retains repository line-length/document-start issues."
       ]
     },
     "source:vite.config.ts": {
-      "fingerprint": "ff965b644c85f7fffd1a67ab3a7fa3fa9696f093b9fe4f7d2c5a3ba68bad80ea",
+      "fingerprint": "67a59f52aaa67bfab8edbdf841971b711b5dec28d949f3c8acfbc71bf73ede20",
       "snapshot": {
-        "vite.config.ts": "f78ec742a0b3f467083e90572e30ac9a363ad0c344f006a4ca082bb053d32447"
+        "vite.config.ts": "3536ee9cbece9daafd84a1ade4e06e25941abb0d9058667349cceb38b6fad672"
       },
-      "head": "d1078edf93579405eb3686381bc2949e77c389ce",
+      "head": "90ca0e6ac412cf97f62854b7e29d4438e2d6ffb0",
       "outcome": "no-change",
-      "reason": "Add the new public combined workflow test to existing scoped unstable Effect API exceptions. Strict settings, rule coverage/severities and compiler selection are unchanged; the test uses the same spec-authorized native/compiler seams.",
+      "reason": "Inspected actual owned diff: host imports now name the private shared package, common stylesheet scanning follows shared ownership, exact lint/type path exceptions follow moved modules, the real toolchain command is a Fallow entry, and the existing minor changeset describes corrected registration. These implementation and tooling details require no additional shipped guidance.",
       "evidence": [
-        "tests/integrated-workflows.test.ts",
-        "180-accepted-check.log",
-        "180-accepted-effect.log",
-        "180-accepted-toolchain.log"
+        "Source base 90ca0e6; actual src/core/query-owner.ts and examples/shared/http-workflows/application.ts diff; native public application and owner regressions.",
+        "architecture-raw-finalizer-red.log and architecture-same-turn-red.log reproduce prior failures; corresponding GREEN evidence and final 870 runtime tests pass.",
+        "Both pinned public/server compilers, strict 231-file checking/457-file formatting, package/ATTW/publint, native framework compilers, Effect diagnostics and toolchain rejection checks pass.",
+        "Both final production builds and docs checks pass; all four Fallow audits pass with clean development/production dead-code scans and no new suppressions/threshold changes.",
+        "150 browser cases passed before private workspace packaging; final 150-case browser rerun running. Eight packed peer pairs passed 403 cases each before internal type-export/consumer-fixture cleanup; final CI will rerun the matrix.",
+        "Fresh Astra architecture/fix source rechecks found no remaining actionable admission finding. No fresh consumer/discovery or GUI/platform claim; default yamllint retains repository line-length/document-start issues."
       ]
     },
     "source:.github/workflows/release.yml": {
@@ -820,32 +834,37 @@
       ]
     },
     "source:tsconfig.json": {
-      "fingerprint": "e6567f394a989d181053115726511c6365915f171ce7e6ad16814bf1fc08d879",
+      "fingerprint": "587ebd0a95ab504eaf39e30181670682f68a322aaec35c3e81775f445dc1119a",
       "snapshot": {
-        "tsconfig.json": "f038ca94e2f02df0710225c47e9e9b2e48463f6f9d85445500afcc7e36b88b98"
+        "tsconfig.json": "22cb5049d6a8a8a9f3980d55bad0a3d00ccd5713940544b2fa8ccb89fb98f2b3"
       },
-      "head": "d1078edf93579405eb3686381bc2949e77c389ce",
+      "head": "90ca0e6ac412cf97f62854b7e29d4438e2d6ffb0",
       "outcome": "no-change",
-      "reason": "Add the new public combined workflow test to existing scoped unstable Effect API exceptions. Strict settings, rule coverage/severities and compiler selection are unchanged; the test uses the same spec-authorized native/compiler seams.",
+      "reason": "Inspected actual owned diff: host imports now name the private shared package, common stylesheet scanning follows shared ownership, exact lint/type path exceptions follow moved modules, the real toolchain command is a Fallow entry, and the existing minor changeset describes corrected registration. These implementation and tooling details require no additional shipped guidance.",
       "evidence": [
-        "tests/integrated-workflows.test.ts",
-        "180-accepted-check.log",
-        "180-accepted-effect.log",
-        "180-accepted-toolchain.log"
+        "Source base 90ca0e6; actual src/core/query-owner.ts and examples/shared/http-workflows/application.ts diff; native public application and owner regressions.",
+        "architecture-raw-finalizer-red.log and architecture-same-turn-red.log reproduce prior failures; corresponding GREEN evidence and final 870 runtime tests pass.",
+        "Both pinned public/server compilers, strict 231-file checking/457-file formatting, package/ATTW/publint, native framework compilers, Effect diagnostics and toolchain rejection checks pass.",
+        "Both final production builds and docs checks pass; all four Fallow audits pass with clean development/production dead-code scans and no new suppressions/threshold changes.",
+        "150 browser cases passed before private workspace packaging; final 150-case browser rerun running. Eight packed peer pairs passed 403 cases each before internal type-export/consumer-fixture cleanup; final CI will rerun the matrix.",
+        "Fresh Astra architecture/fix source rechecks found no remaining actionable admission finding. No fresh consumer/discovery or GUI/platform claim; default yamllint retains repository line-length/document-start issues."
       ]
     },
     "source:.fallowrc.jsonc": {
-      "fingerprint": "2db60a9ab36b6caaaf79483c797c403eb145cb0c6aa81dabc817f23e0bfbf2c8",
+      "fingerprint": "4294b1aae57396f1e98b85a692ad42a2bc0a6ad8683863f4203d0d5556bdb1c2",
       "snapshot": {
-        ".fallowrc.jsonc": "895c9e977372b3aedac38ec2c52f4351b1542fde58223f26d3a9bac201e81bc4"
+        ".fallowrc.jsonc": "ed7cd5801ce54c9d834e428dd159715a4396fa62dbd2e1109dac9bc8e643db23"
       },
-      "head": "e619aeb7e7b003e3b42ce2a4d143d24cbbf72a5f",
+      "head": "90ca0e6ac412cf97f62854b7e29d4438e2d6ffb0",
       "outcome": "no-change",
-      "reason": "The compiler-only recipe wrapper is now local, with a void reference preserving compile-time checking, and the measurement command is explicitly registered as a Fallow entry point. The decoded-value sharing recipe and public interface are unchanged. The domain map, skill spec, and skill tree still describe the same native Query seam, immutable-data constraints, task coverage, and source mappings.",
+      "reason": "Inspected actual owned diff: host imports now name the private shared package, common stylesheet scanning follows shared ownership, exact lint/type path exceptions follow moved modules, the real toolchain command is a Fallow entry, and the existing minor changeset describes corrected registration. These implementation and tooling details require no additional shipped guidance.",
       "evidence": [
-        "Local rebase onto main ee3d33ef50ffe88519648f3876d917c032d8973d; reviewed the replay diff, preserving main peer bounds, configuration sharing guidance, and all previous planning entries.",
-        "vp run format passed; vp run docs-check passed 21 documentation excerpt tests and Astro with 0 errors, warnings, or hints; vp run skills-check passed; git diff --check passed.",
-        "vp run quality could not complete: its package declaration-build prerequisite failed to start the compiler with spawn EBUSY. This is unverified locally; require fresh GitHub CI on the pushed head before merging. No fresh consumer-agent or discovery validation was run."
+        "Source base 90ca0e6; actual src/core/query-owner.ts and examples/shared/http-workflows/application.ts diff; native public application and owner regressions.",
+        "architecture-raw-finalizer-red.log and architecture-same-turn-red.log reproduce prior failures; corresponding GREEN evidence and final 870 runtime tests pass.",
+        "Both pinned public/server compilers, strict 231-file checking/457-file formatting, package/ATTW/publint, native framework compilers, Effect diagnostics and toolchain rejection checks pass.",
+        "Both final production builds and docs checks pass; all four Fallow audits pass with clean development/production dead-code scans and no new suppressions/threshold changes.",
+        "150 browser cases passed before private workspace packaging; final 150-case browser rerun running. Eight packed peer pairs passed 403 cases each before internal type-export/consumer-fixture cleanup; final CI will rerun the matrix.",
+        "Fresh Astra architecture/fix source rechecks found no remaining actionable admission finding. No fresh consumer/discovery or GUI/platform claim; default yamllint retains repository line-length/document-start issues."
       ]
     },
     "source:.github/workflows/ci.yml": {
@@ -1358,75 +1377,105 @@
       ]
     },
     "source:examples/vite-react/src/components/sections/commands-section.tsx": {
-      "fingerprint": "de96abbe8b02a6b42a268a3bf583439d20c081b5f92ae5d354027b2eb2ff401d",
+      "fingerprint": "185768f19c65954fc57fe896fa3acea3f1e6d788826593ef84d8d8d17cdd6f4e",
       "snapshot": {
-        "examples/vite-react/src/components/sections/commands-section.tsx": "a719ecf82a3773175ed7989bd5185232c3849eefe4b752632a47b8b300fd8671"
+        "examples/vite-react/src/components/sections/commands-section.tsx": "5279f773621473c22c8fbb29e90b7ff7b40a2df855973354576f0c2ab2faac31"
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "head": "90ca0e6ac412cf97f62854b7e29d4438e2d6ffb0",
       "outcome": "no-change",
-      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
+      "reason": "Inspected actual owned diff: host imports now name the private shared package, common stylesheet scanning follows shared ownership, exact lint/type path exceptions follow moved modules, the real toolchain command is a Fallow entry, and the existing minor changeset describes corrected registration. These implementation and tooling details require no additional shipped guidance.",
       "evidence": [
-        "examples/vite-react/src/components/sections/commands-section.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
+        "Source base 90ca0e6; actual src/core/query-owner.ts and examples/shared/http-workflows/application.ts diff; native public application and owner regressions.",
+        "architecture-raw-finalizer-red.log and architecture-same-turn-red.log reproduce prior failures; corresponding GREEN evidence and final 870 runtime tests pass.",
+        "Both pinned public/server compilers, strict 231-file checking/457-file formatting, package/ATTW/publint, native framework compilers, Effect diagnostics and toolchain rejection checks pass.",
+        "Both final production builds and docs checks pass; all four Fallow audits pass with clean development/production dead-code scans and no new suppressions/threshold changes.",
+        "150 browser cases passed before private workspace packaging; final 150-case browser rerun running. Eight packed peer pairs passed 403 cases each before internal type-export/consumer-fixture cleanup; final CI will rerun the matrix.",
+        "Fresh Astra architecture/fix source rechecks found no remaining actionable admission finding. No fresh consumer/discovery or GUI/platform claim; default yamllint retains repository line-length/document-start issues."
       ]
     },
     "source:examples/vite-react/src/components/sections/diagnostics-section.tsx": {
-      "fingerprint": "eda508f4ff87d1bc3eed83cf7f8e71bb3a1b93d4573521bb03bfe2157265f5d5",
+      "fingerprint": "aa334bf419257e1e1d80528e5b28c63f6133d9066efc26a9c4d982765266f468",
       "snapshot": {
-        "examples/vite-react/src/components/sections/diagnostics-section.tsx": "afdcae9314eb458b6ce21d94740f35a6f886f747c02e2922d509f04e5f19ea59"
+        "examples/vite-react/src/components/sections/diagnostics-section.tsx": "3a71a0609ccb1fcba719147a7c760c1ad0f13254568418a5b166cb6a13fa8a1a"
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "head": "90ca0e6ac412cf97f62854b7e29d4438e2d6ffb0",
       "outcome": "no-change",
-      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
+      "reason": "Inspected actual owned diff: host imports now name the private shared package, common stylesheet scanning follows shared ownership, exact lint/type path exceptions follow moved modules, the real toolchain command is a Fallow entry, and the existing minor changeset describes corrected registration. These implementation and tooling details require no additional shipped guidance.",
       "evidence": [
-        "examples/vite-react/src/components/sections/diagnostics-section.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
+        "Source base 90ca0e6; actual src/core/query-owner.ts and examples/shared/http-workflows/application.ts diff; native public application and owner regressions.",
+        "architecture-raw-finalizer-red.log and architecture-same-turn-red.log reproduce prior failures; corresponding GREEN evidence and final 870 runtime tests pass.",
+        "Both pinned public/server compilers, strict 231-file checking/457-file formatting, package/ATTW/publint, native framework compilers, Effect diagnostics and toolchain rejection checks pass.",
+        "Both final production builds and docs checks pass; all four Fallow audits pass with clean development/production dead-code scans and no new suppressions/threshold changes.",
+        "150 browser cases passed before private workspace packaging; final 150-case browser rerun running. Eight packed peer pairs passed 403 cases each before internal type-export/consumer-fixture cleanup; final CI will rerun the matrix.",
+        "Fresh Astra architecture/fix source rechecks found no remaining actionable admission finding. No fresh consumer/discovery or GUI/platform claim; default yamllint retains repository line-length/document-start issues."
       ]
     },
     "source:examples/vite-react/src/components/sections/http-section.tsx": {
-      "fingerprint": "93c1856cb2440dda14479174846c23ae760d68c7f58b934c86c6a820ee18259a",
+      "fingerprint": "231844e0b2274115e43c3e47b5297ead693793b53cef835071d318b895ec4a43",
       "snapshot": {
-        "examples/vite-react/src/components/sections/http-section.tsx": "21a175887d2bc3c244da13c68e912cbbb0779376805b416d4a2e820238f6a198"
+        "examples/vite-react/src/components/sections/http-section.tsx": "fc0bf1e07e89a4bcf804f64b94760848448112f869fb730c5542c02d2831160f"
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "head": "90ca0e6ac412cf97f62854b7e29d4438e2d6ffb0",
       "outcome": "no-change",
-      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
+      "reason": "Inspected actual owned diff: host imports now name the private shared package, common stylesheet scanning follows shared ownership, exact lint/type path exceptions follow moved modules, the real toolchain command is a Fallow entry, and the existing minor changeset describes corrected registration. These implementation and tooling details require no additional shipped guidance.",
       "evidence": [
-        "examples/vite-react/src/components/sections/http-section.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
+        "Source base 90ca0e6; actual src/core/query-owner.ts and examples/shared/http-workflows/application.ts diff; native public application and owner regressions.",
+        "architecture-raw-finalizer-red.log and architecture-same-turn-red.log reproduce prior failures; corresponding GREEN evidence and final 870 runtime tests pass.",
+        "Both pinned public/server compilers, strict 231-file checking/457-file formatting, package/ATTW/publint, native framework compilers, Effect diagnostics and toolchain rejection checks pass.",
+        "Both final production builds and docs checks pass; all four Fallow audits pass with clean development/production dead-code scans and no new suppressions/threshold changes.",
+        "150 browser cases passed before private workspace packaging; final 150-case browser rerun running. Eight packed peer pairs passed 403 cases each before internal type-export/consumer-fixture cleanup; final CI will rerun the matrix.",
+        "Fresh Astra architecture/fix source rechecks found no remaining actionable admission finding. No fresh consumer/discovery or GUI/platform claim; default yamllint retains repository line-length/document-start issues."
       ]
     },
     "source:examples/vite-react/src/components/sections/mutations-section.tsx": {
-      "fingerprint": "79f864f66c99df0da6f2877555b98940ded91e6ab0310aaa10543474659be051",
+      "fingerprint": "3e5aafecb65c4e0c432e04ce440eadcf019ad6da6aadc7e85db456878b5e7a4d",
       "snapshot": {
-        "examples/vite-react/src/components/sections/mutations-section.tsx": "b9aa43714bc2fc72f9b8d7b043f7b086c299875b8cdfbae21c2bee97c6f00fc1"
+        "examples/vite-react/src/components/sections/mutations-section.tsx": "54bce3f89cc6f5207e11fc3df919ab799c0fb1976ff48bffe26f7f5450559cda"
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "head": "90ca0e6ac412cf97f62854b7e29d4438e2d6ffb0",
       "outcome": "no-change",
-      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
+      "reason": "Inspected actual owned diff: host imports now name the private shared package, common stylesheet scanning follows shared ownership, exact lint/type path exceptions follow moved modules, the real toolchain command is a Fallow entry, and the existing minor changeset describes corrected registration. These implementation and tooling details require no additional shipped guidance.",
       "evidence": [
-        "examples/vite-react/src/components/sections/mutations-section.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
+        "Source base 90ca0e6; actual src/core/query-owner.ts and examples/shared/http-workflows/application.ts diff; native public application and owner regressions.",
+        "architecture-raw-finalizer-red.log and architecture-same-turn-red.log reproduce prior failures; corresponding GREEN evidence and final 870 runtime tests pass.",
+        "Both pinned public/server compilers, strict 231-file checking/457-file formatting, package/ATTW/publint, native framework compilers, Effect diagnostics and toolchain rejection checks pass.",
+        "Both final production builds and docs checks pass; all four Fallow audits pass with clean development/production dead-code scans and no new suppressions/threshold changes.",
+        "150 browser cases passed before private workspace packaging; final 150-case browser rerun running. Eight packed peer pairs passed 403 cases each before internal type-export/consumer-fixture cleanup; final CI will rerun the matrix.",
+        "Fresh Astra architecture/fix source rechecks found no remaining actionable admission finding. No fresh consumer/discovery or GUI/platform claim; default yamllint retains repository line-length/document-start issues."
       ]
     },
     "source:examples/vite-react/src/components/users/create-user-form.tsx": {
-      "fingerprint": "722858e63a24238c0bfbeb914d36ddb59006a221317c7506b6db0cd6e961c143",
+      "fingerprint": "6c82f36020483065513b380def08791b43a3e3a478e0d076e38d6b6d1e72285f",
       "snapshot": {
-        "examples/vite-react/src/components/users/create-user-form.tsx": "8bed108740b2e678edb7ec1f176e87bdb13fa5bfbd2752b2550f5938a4cf9de9"
+        "examples/vite-react/src/components/users/create-user-form.tsx": "9584d270fad2d2ec3c51001248ee6af4d211e66cd5c8fb3880fc65b0a614ec33"
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "head": "90ca0e6ac412cf97f62854b7e29d4438e2d6ffb0",
       "outcome": "no-change",
-      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
+      "reason": "Inspected actual owned diff: host imports now name the private shared package, common stylesheet scanning follows shared ownership, exact lint/type path exceptions follow moved modules, the real toolchain command is a Fallow entry, and the existing minor changeset describes corrected registration. These implementation and tooling details require no additional shipped guidance.",
       "evidence": [
-        "examples/vite-react/src/components/users/create-user-form.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
+        "Source base 90ca0e6; actual src/core/query-owner.ts and examples/shared/http-workflows/application.ts diff; native public application and owner regressions.",
+        "architecture-raw-finalizer-red.log and architecture-same-turn-red.log reproduce prior failures; corresponding GREEN evidence and final 870 runtime tests pass.",
+        "Both pinned public/server compilers, strict 231-file checking/457-file formatting, package/ATTW/publint, native framework compilers, Effect diagnostics and toolchain rejection checks pass.",
+        "Both final production builds and docs checks pass; all four Fallow audits pass with clean development/production dead-code scans and no new suppressions/threshold changes.",
+        "150 browser cases passed before private workspace packaging; final 150-case browser rerun running. Eight packed peer pairs passed 403 cases each before internal type-export/consumer-fixture cleanup; final CI will rerun the matrix.",
+        "Fresh Astra architecture/fix source rechecks found no remaining actionable admission finding. No fresh consumer/discovery or GUI/platform claim; default yamllint retains repository line-length/document-start issues."
       ]
     },
     "source:examples/vite-react/src/components/users/user-list.tsx": {
-      "fingerprint": "e0a9483ce730176ebd0f6fe732139f37f771552440699f0ca97054f0e87af961",
+      "fingerprint": "02878a35b73d2767ab31c8c0f6c60536c75196765a341d4c28607e7b8b15f983",
       "snapshot": {
-        "examples/vite-react/src/components/users/user-list.tsx": "aa5f02359d9b6dc8a0c9f0616536ce66957c459cca21226b77dae0c633e41f11"
+        "examples/vite-react/src/components/users/user-list.tsx": "fe78f185fb5b288144fa1777d3dd944565c4d1b8b0fe8c7c5a919715bb926916"
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "head": "90ca0e6ac412cf97f62854b7e29d4438e2d6ffb0",
       "outcome": "no-change",
-      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
+      "reason": "Inspected actual owned diff: host imports now name the private shared package, common stylesheet scanning follows shared ownership, exact lint/type path exceptions follow moved modules, the real toolchain command is a Fallow entry, and the existing minor changeset describes corrected registration. These implementation and tooling details require no additional shipped guidance.",
       "evidence": [
-        "examples/vite-react/src/components/users/user-list.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
+        "Source base 90ca0e6; actual src/core/query-owner.ts and examples/shared/http-workflows/application.ts diff; native public application and owner regressions.",
+        "architecture-raw-finalizer-red.log and architecture-same-turn-red.log reproduce prior failures; corresponding GREEN evidence and final 870 runtime tests pass.",
+        "Both pinned public/server compilers, strict 231-file checking/457-file formatting, package/ATTW/publint, native framework compilers, Effect diagnostics and toolchain rejection checks pass.",
+        "Both final production builds and docs checks pass; all four Fallow audits pass with clean development/production dead-code scans and no new suppressions/threshold changes.",
+        "150 browser cases passed before private workspace packaging; final 150-case browser rerun running. Eight packed peer pairs passed 403 cases each before internal type-export/consumer-fixture cleanup; final CI will rerun the matrix.",
+        "Fresh Astra architecture/fix source rechecks found no remaining actionable admission finding. No fresh consumer/discovery or GUI/platform claim; default yamllint retains repository line-length/document-start issues."
       ]
     },
     "source:examples/vite-react/src/hooks/use-slow-query-cancellation.ts": {
@@ -1476,15 +1525,20 @@
       ]
     },
     "source:examples/vite-react/src/components/ui/effect-error-details.tsx": {
-      "fingerprint": "82dda7c7b3d779819cd09ae80a8ac64320f96db657f3ec5a1fd41838dd7ca064",
+      "fingerprint": "e22531202b3dc0bccd089c0d7a925df051f676d855ee6c7f185452c3f05d5065",
       "snapshot": {
-        "examples/vite-react/src/components/ui/effect-error-details.tsx": "da7e89579ebd7bc6d56d4dde19ea871673f6f441452d9ba6786e41956be66a1f"
+        "examples/vite-react/src/components/ui/effect-error-details.tsx": null
       },
-      "head": "bf38d8556744d8e45d459208cab6fe9d1b78b356",
+      "head": "90ca0e6ac412cf97f62854b7e29d4438e2d6ffb0",
       "outcome": "no-change",
-      "reason": "A private class-name constant replaces two identical alert style strings; rendered error labels, Cause detail and alert semantics are unchanged. This presentation-only deduplication does not change any developer integration task or shipped guidance.",
+      "reason": "Inspected actual owned diff: host imports now name the private shared package, common stylesheet scanning follows shared ownership, exact lint/type path exceptions follow moved modules, the real toolchain command is a Fallow entry, and the existing minor changeset describes corrected registration. These implementation and tooling details require no additional shipped guidance.",
       "evidence": [
-        "Reviewed both render branches and their bf38d855 diff. Final uncached typecheck passes 140 files; scoped formatting passed. No application-wide UI sharing or dependency change."
+        "Source base 90ca0e6; actual src/core/query-owner.ts and examples/shared/http-workflows/application.ts diff; native public application and owner regressions.",
+        "architecture-raw-finalizer-red.log and architecture-same-turn-red.log reproduce prior failures; corresponding GREEN evidence and final 870 runtime tests pass.",
+        "Both pinned public/server compilers, strict 231-file checking/457-file formatting, package/ATTW/publint, native framework compilers, Effect diagnostics and toolchain rejection checks pass.",
+        "Both final production builds and docs checks pass; all four Fallow audits pass with clean development/production dead-code scans and no new suppressions/threshold changes.",
+        "150 browser cases passed before private workspace packaging; final 150-case browser rerun running. Eight packed peer pairs passed 403 cases each before internal type-export/consumer-fixture cleanup; final CI will rerun the matrix.",
+        "Fresh Astra architecture/fix source rechecks found no remaining actionable admission finding. No fresh consumer/discovery or GUI/platform claim; default yamllint retains repository line-length/document-start issues."
       ]
     },
     "source:apps/docs/public/package-version.js": {
@@ -1654,27 +1708,37 @@
       ]
     },
     "source:examples/tanstack-start/src/routes/http.tsx": {
-      "fingerprint": "6ab4a551ca2f2f7134f130dd8dd0a92c50e823842ee7763666caba39b8dabb7c",
+      "fingerprint": "f4d00c4ca09bbade20dde1db919f1129c538be62828e9774f2413e7a52caf131",
       "snapshot": {
-        "examples/tanstack-start/src/routes/http.tsx": "88c5514ad26aba2367829fd950af8feafe2ec2a00f0538567befc0e4adf251b2"
+        "examples/tanstack-start/src/routes/http.tsx": "9dd20255c850958c36ceeec28178076e8a6f67f6bb39c0b42ea8a0a9ee5af5e9"
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "head": "90ca0e6ac412cf97f62854b7e29d4438e2d6ffb0",
       "outcome": "no-change",
-      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
+      "reason": "Inspected actual owned diff: host imports now name the private shared package, common stylesheet scanning follows shared ownership, exact lint/type path exceptions follow moved modules, the real toolchain command is a Fallow entry, and the existing minor changeset describes corrected registration. These implementation and tooling details require no additional shipped guidance.",
       "evidence": [
-        "examples/tanstack-start/src/routes/http.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
+        "Source base 90ca0e6; actual src/core/query-owner.ts and examples/shared/http-workflows/application.ts diff; native public application and owner regressions.",
+        "architecture-raw-finalizer-red.log and architecture-same-turn-red.log reproduce prior failures; corresponding GREEN evidence and final 870 runtime tests pass.",
+        "Both pinned public/server compilers, strict 231-file checking/457-file formatting, package/ATTW/publint, native framework compilers, Effect diagnostics and toolchain rejection checks pass.",
+        "Both final production builds and docs checks pass; all four Fallow audits pass with clean development/production dead-code scans and no new suppressions/threshold changes.",
+        "150 browser cases passed before private workspace packaging; final 150-case browser rerun running. Eight packed peer pairs passed 403 cases each before internal type-export/consumer-fixture cleanup; final CI will rerun the matrix.",
+        "Fresh Astra architecture/fix source rechecks found no remaining actionable admission finding. No fresh consumer/discovery or GUI/platform claim; default yamllint retains repository line-length/document-start issues."
       ]
     },
     "source:examples/tanstack-start/src/styles.css": {
-      "fingerprint": "42f1ab02e08911ec56906c692156c65c31455e4bd7f5ef0aaee2c1ac52b10efd",
+      "fingerprint": "53365669765f5a17e526ebac52ebf04c58e57055ce15bb5ff6881ae689ad4d45",
       "snapshot": {
-        "examples/tanstack-start/src/styles.css": "d537fd0cc8256fc13b663aa86228ac4de601272280c21f642b39d69cc1af11b3"
+        "examples/tanstack-start/src/styles.css": "199a35d6e6e542150e1e6a73734286332eae08cf3472a35bb172ef9af8fb9a44"
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "head": "90ca0e6ac412cf97f62854b7e29d4438e2d6ffb0",
       "outcome": "no-change",
-      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
+      "reason": "Inspected actual owned diff: host imports now name the private shared package, common stylesheet scanning follows shared ownership, exact lint/type path exceptions follow moved modules, the real toolchain command is a Fallow entry, and the existing minor changeset describes corrected registration. These implementation and tooling details require no additional shipped guidance.",
       "evidence": [
-        "examples/tanstack-start/src/styles.css diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
+        "Source base 90ca0e6; actual src/core/query-owner.ts and examples/shared/http-workflows/application.ts diff; native public application and owner regressions.",
+        "architecture-raw-finalizer-red.log and architecture-same-turn-red.log reproduce prior failures; corresponding GREEN evidence and final 870 runtime tests pass.",
+        "Both pinned public/server compilers, strict 231-file checking/457-file formatting, package/ATTW/publint, native framework compilers, Effect diagnostics and toolchain rejection checks pass.",
+        "Both final production builds and docs checks pass; all four Fallow audits pass with clean development/production dead-code scans and no new suppressions/threshold changes.",
+        "150 browser cases passed before private workspace packaging; final 150-case browser rerun running. Eight packed peer pairs passed 403 cases each before internal type-export/consumer-fixture cleanup; final CI will rerun the matrix.",
+        "Fresh Astra architecture/fix source rechecks found no remaining actionable admission finding. No fresh consumer/discovery or GUI/platform claim; default yamllint retains repository line-length/document-start issues."
       ]
     },
     "source:examples/tanstack-start/vite.config.ts": {
@@ -1690,39 +1754,54 @@
       ]
     },
     "source:examples/vite-react/src/components/sections/queries-section.tsx": {
-      "fingerprint": "5d4f8849f3f8b17c44fad68d08466f21941f215f9f7fb69b8b22433d34450d2a",
+      "fingerprint": "8afec0ea460b158e618cdc08af25cfd029d5b80e3db4ccf2aece40c9a58203c9",
       "snapshot": {
-        "examples/vite-react/src/components/sections/queries-section.tsx": "f9e03400b2ff5355378515441302b2b4a1ea198b7e119f8ec65ce93883f8f294"
+        "examples/vite-react/src/components/sections/queries-section.tsx": "09e619b19d605e7241cdb6e2c49891470d4f13464bdf56d37d01de0801cd8edb"
       },
-      "head": "86365084f08c30a0dc1211ad450412195060de5c",
+      "head": "90ca0e6ac412cf97f62854b7e29d4438e2d6ffb0",
       "outcome": "no-change",
-      "reason": "The example now explicitly retains unbounded stream history, matching the revised retention guidance. Its rendering and cleanup workflow remain unchanged.",
+      "reason": "Inspected actual owned diff: host imports now name the private shared package, common stylesheet scanning follows shared ownership, exact lint/type path exceptions follow moved modules, the real toolchain command is a Fallow entry, and the existing minor changeset describes corrected registration. These implementation and tooling details require no additional shipped guidance.",
       "evidence": [
-        "Reviewed both maxChunks additions and the revised stream guidance. Vite React build, runtime suite, and Chromium example cases pass."
+        "Source base 90ca0e6; actual src/core/query-owner.ts and examples/shared/http-workflows/application.ts diff; native public application and owner regressions.",
+        "architecture-raw-finalizer-red.log and architecture-same-turn-red.log reproduce prior failures; corresponding GREEN evidence and final 870 runtime tests pass.",
+        "Both pinned public/server compilers, strict 231-file checking/457-file formatting, package/ATTW/publint, native framework compilers, Effect diagnostics and toolchain rejection checks pass.",
+        "Both final production builds and docs checks pass; all four Fallow audits pass with clean development/production dead-code scans and no new suppressions/threshold changes.",
+        "150 browser cases passed before private workspace packaging; final 150-case browser rerun running. Eight packed peer pairs passed 403 cases each before internal type-export/consumer-fixture cleanup; final CI will rerun the matrix.",
+        "Fresh Astra architecture/fix source rechecks found no remaining actionable admission finding. No fresh consumer/discovery or GUI/platform claim; default yamllint retains repository line-length/document-start issues."
       ]
     },
     "source:examples/vite-react/src/components/ui/action-button.tsx": {
-      "fingerprint": "782fa62187ed8ae1d0ac1adb4f57dd33ed0efa09ca4ca43cd2ccd0f53a805ea5",
+      "fingerprint": "554374cd07a78196357f22b153b54fdd71ca94f86135fa222c4ba9bc400c06ac",
       "snapshot": {
-        "examples/vite-react/src/components/ui/action-button.tsx": "4fffe2813ef95433f4c70b991707b52201598b2f0a262e9f64187c08d3bfe5a0"
+        "examples/vite-react/src/components/ui/action-button.tsx": null
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "head": "90ca0e6ac412cf97f62854b7e29d4438e2d6ffb0",
       "outcome": "no-change",
-      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
+      "reason": "Inspected actual owned diff: host imports now name the private shared package, common stylesheet scanning follows shared ownership, exact lint/type path exceptions follow moved modules, the real toolchain command is a Fallow entry, and the existing minor changeset describes corrected registration. These implementation and tooling details require no additional shipped guidance.",
       "evidence": [
-        "examples/vite-react/src/components/ui/action-button.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
+        "Source base 90ca0e6; actual src/core/query-owner.ts and examples/shared/http-workflows/application.ts diff; native public application and owner regressions.",
+        "architecture-raw-finalizer-red.log and architecture-same-turn-red.log reproduce prior failures; corresponding GREEN evidence and final 870 runtime tests pass.",
+        "Both pinned public/server compilers, strict 231-file checking/457-file formatting, package/ATTW/publint, native framework compilers, Effect diagnostics and toolchain rejection checks pass.",
+        "Both final production builds and docs checks pass; all four Fallow audits pass with clean development/production dead-code scans and no new suppressions/threshold changes.",
+        "150 browser cases passed before private workspace packaging; final 150-case browser rerun running. Eight packed peer pairs passed 403 cases each before internal type-export/consumer-fixture cleanup; final CI will rerun the matrix.",
+        "Fresh Astra architecture/fix source rechecks found no remaining actionable admission finding. No fresh consumer/discovery or GUI/platform claim; default yamllint retains repository line-length/document-start issues."
       ]
     },
     "source:examples/vite-react/src/styles/tailwind.css": {
-      "fingerprint": "856806fb74e36491b2a07b5f8057f09566f29f855e84013a1fcdb725f62cd670",
+      "fingerprint": "0cf4e3f8264a6868cad030628a34aadcb001c56faf0c283c3c6a7d34d390c9da",
       "snapshot": {
-        "examples/vite-react/src/styles/tailwind.css": "24f8e0acbf80deddefc50c13ab4a6ad08c90bcee5ddd16701e97022295657d99"
+        "examples/vite-react/src/styles/tailwind.css": "0d17c4eebf6457b4cb33be08ec4e15045eb90cb4d4ccbc7747acbb186c428c98"
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "head": "90ca0e6ac412cf97f62854b7e29d4438e2d6ffb0",
       "outcome": "no-change",
-      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
+      "reason": "Inspected actual owned diff: host imports now name the private shared package, common stylesheet scanning follows shared ownership, exact lint/type path exceptions follow moved modules, the real toolchain command is a Fallow entry, and the existing minor changeset describes corrected registration. These implementation and tooling details require no additional shipped guidance.",
       "evidence": [
-        "examples/vite-react/src/styles/tailwind.css diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
+        "Source base 90ca0e6; actual src/core/query-owner.ts and examples/shared/http-workflows/application.ts diff; native public application and owner regressions.",
+        "architecture-raw-finalizer-red.log and architecture-same-turn-red.log reproduce prior failures; corresponding GREEN evidence and final 870 runtime tests pass.",
+        "Both pinned public/server compilers, strict 231-file checking/457-file formatting, package/ATTW/publint, native framework compilers, Effect diagnostics and toolchain rejection checks pass.",
+        "Both final production builds and docs checks pass; all four Fallow audits pass with clean development/production dead-code scans and no new suppressions/threshold changes.",
+        "150 browser cases passed before private workspace packaging; final 150-case browser rerun running. Eight packed peer pairs passed 403 cases each before internal type-export/consumer-fixture cleanup; final CI will rerun the matrix.",
+        "Fresh Astra architecture/fix source rechecks found no remaining actionable admission finding. No fresh consumer/discovery or GUI/platform claim; default yamllint retains repository line-length/document-start issues."
       ]
     },
     "source:.github/actions/setup-repository/action.yml": {
@@ -1780,15 +1859,20 @@
       ]
     },
     "source:examples/tanstack-start/src/routes/diagnostics.tsx": {
-      "fingerprint": "7bfe64e8012e3f7377d9056646161583d860799aaffd9281ca8d3e085574a778",
+      "fingerprint": "c1844ed728631a4cdc80d3bdffea58bad9b7dbb6da7c851cc77b9062ceccdcb7",
       "snapshot": {
-        "examples/tanstack-start/src/routes/diagnostics.tsx": "9ab1b870797ae7482973d31f6ba094bc4c2759d635bea91bf791cf0b6d511cf1"
+        "examples/tanstack-start/src/routes/diagnostics.tsx": "0eee0472042b7ba761d088967c8e97aa68316931ccbb56201211de4593fe9e74"
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "head": "90ca0e6ac412cf97f62854b7e29d4438e2d6ffb0",
       "outcome": "no-change",
-      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
+      "reason": "Inspected actual owned diff: host imports now name the private shared package, common stylesheet scanning follows shared ownership, exact lint/type path exceptions follow moved modules, the real toolchain command is a Fallow entry, and the existing minor changeset describes corrected registration. These implementation and tooling details require no additional shipped guidance.",
       "evidence": [
-        "examples/tanstack-start/src/routes/diagnostics.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
+        "Source base 90ca0e6; actual src/core/query-owner.ts and examples/shared/http-workflows/application.ts diff; native public application and owner regressions.",
+        "architecture-raw-finalizer-red.log and architecture-same-turn-red.log reproduce prior failures; corresponding GREEN evidence and final 870 runtime tests pass.",
+        "Both pinned public/server compilers, strict 231-file checking/457-file formatting, package/ATTW/publint, native framework compilers, Effect diagnostics and toolchain rejection checks pass.",
+        "Both final production builds and docs checks pass; all four Fallow audits pass with clean development/production dead-code scans and no new suppressions/threshold changes.",
+        "150 browser cases passed before private workspace packaging; final 150-case browser rerun running. Eight packed peer pairs passed 403 cases each before internal type-export/consumer-fixture cleanup; final CI will rerun the matrix.",
+        "Fresh Astra architecture/fix source rechecks found no remaining actionable admission finding. No fresh consumer/discovery or GUI/platform claim; default yamllint retains repository line-length/document-start issues."
       ]
     },
     "source:.changeset/README.md": {
@@ -1867,15 +1951,20 @@
       ]
     },
     "source:examples/vite-react/src/components/conditional-user-query.tsx": {
-      "fingerprint": "444ccc76540686b9874bc8d99d47a5a7234908f919762965fcff8cff95940dc7",
+      "fingerprint": "f98a623132047cd9cf48fd4959c1de6efce8b6031d04c1c47e1b83fd096b813b",
       "snapshot": {
-        "examples/vite-react/src/components/conditional-user-query.tsx": "fa82e5cd4b3637d6d9feb7b48fe09db9ec43b1569efd25ff4aa60ef6c0fd21b1"
+        "examples/vite-react/src/components/conditional-user-query.tsx": "cd74848de080aa4ef1c0f7bf6eadb7d89fb24d6172b43e9ada85e3f27dd029d8"
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "head": "90ca0e6ac412cf97f62854b7e29d4438e2d6ffb0",
       "outcome": "no-change",
-      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
+      "reason": "Inspected actual owned diff: host imports now name the private shared package, common stylesheet scanning follows shared ownership, exact lint/type path exceptions follow moved modules, the real toolchain command is a Fallow entry, and the existing minor changeset describes corrected registration. These implementation and tooling details require no additional shipped guidance.",
       "evidence": [
-        "examples/vite-react/src/components/conditional-user-query.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
+        "Source base 90ca0e6; actual src/core/query-owner.ts and examples/shared/http-workflows/application.ts diff; native public application and owner regressions.",
+        "architecture-raw-finalizer-red.log and architecture-same-turn-red.log reproduce prior failures; corresponding GREEN evidence and final 870 runtime tests pass.",
+        "Both pinned public/server compilers, strict 231-file checking/457-file formatting, package/ATTW/publint, native framework compilers, Effect diagnostics and toolchain rejection checks pass.",
+        "Both final production builds and docs checks pass; all four Fallow audits pass with clean development/production dead-code scans and no new suppressions/threshold changes.",
+        "150 browser cases passed before private workspace packaging; final 150-case browser rerun running. Eight packed peer pairs passed 403 cases each before internal type-export/consumer-fixture cleanup; final CI will rerun the matrix.",
+        "Fresh Astra architecture/fix source rechecks found no remaining actionable admission finding. No fresh consumer/discovery or GUI/platform claim; default yamllint retains repository line-length/document-start issues."
       ]
     },
     "source:.changeset/01-http-metadata-race.md": {
@@ -3189,15 +3278,20 @@
       ]
     },
     "source:.changeset/scoped-query-owner.md": {
-      "fingerprint": "736f90ed2e8f49ff9707641e95effb149eb152a3d85bb9b0c2aaf9b4b9e6ea64",
+      "fingerprint": "56cdcf674306523345f4e593edcb0550a0837f544635d8cde759ca739a46cedb",
       "snapshot": {
-        ".changeset/scoped-query-owner.md": "9871e06d488c08c2616e771d7fd1ce917cc50f1aeb29f1b685bfac4245fe523f"
+        ".changeset/scoped-query-owner.md": "29739b1d8c2ab848949681099338ee8fc7d85d156edf9b397db9c5cc9fb83635"
       },
-      "head": "6ba2b930d953b20e9f7f0a6f16c1276cfc32b980",
+      "head": "90ca0e6ac412cf97f62854b7e29d4438e2d6ffb0",
       "outcome": "no-change",
-      "reason": "Add optional acquired/borrowed query owner setup outside factories, complete query-function plus runner cleanup tracking, accepted native mutation promise draining and originating-cache guards. Preserve native hooks, reactive rebuilding and domain/remote limits. Reconcile existing owner task in domain map/spec and ADR 0040 source mapping in tree; changeset only describes this addition.",
+      "reason": "Inspected actual owned diff: host imports now name the private shared package, common stylesheet scanning follows shared ownership, exact lint/type path exceptions follow moved modules, the real toolchain command is a Fallow entry, and the existing minor changeset describes corrected registration. These implementation and tooling details require no additional shipped guidance.",
       "evidence": [
-        "src/core/query-owner.ts; tests/query-owner.test.ts (7 public/native regressions); tests/types/query-owner-contract.ts; checked React provider fixture and real Vite application. At merged local spec tip d7b9746: full vp run test, api-types TSRS 7.1 / TS5.9 and server-local fixtures pass; typecheck 214 files, effect-check, docs-check, framework-types and serialized application builds pass; scoped Vite Chromium 8 tests pass. YAML and diff checks pass. Fresh consumer/discovery unverified (agents prohibited); descriptions unchanged. Structural skills-check follows this recording."
+        "Source base 90ca0e6; actual src/core/query-owner.ts and examples/shared/http-workflows/application.ts diff; native public application and owner regressions.",
+        "architecture-raw-finalizer-red.log and architecture-same-turn-red.log reproduce prior failures; corresponding GREEN evidence and final 870 runtime tests pass.",
+        "Both pinned public/server compilers, strict 231-file checking/457-file formatting, package/ATTW/publint, native framework compilers, Effect diagnostics and toolchain rejection checks pass.",
+        "Both final production builds and docs checks pass; all four Fallow audits pass with clean development/production dead-code scans and no new suppressions/threshold changes.",
+        "150 browser cases passed before private workspace packaging; final 150-case browser rerun running. Eight packed peer pairs passed 403 cases each before internal type-export/consumer-fixture cleanup; final CI will rerun the matrix.",
+        "Fresh Astra architecture/fix source rechecks found no remaining actionable admission finding. No fresh consumer/discovery or GUI/platform claim; default yamllint retains repository line-length/document-start issues."
       ]
     },
     "source:.changeset/effect-query-client-operations.md": {
@@ -3325,15 +3419,54 @@
       ]
     },
     "source:examples/tanstack-start/src/routes/workflows.tsx": {
-      "fingerprint": "ffb2eec31f5721b6f5feff8dfefbdd3b1884bf01298da9083151dd0e8fb34338",
+      "fingerprint": "5fdf5cbc4f09144db1f06da041beb819048aa240b9c11f0ad638eb1db1b0f66d",
       "snapshot": {
-        "examples/tanstack-start/src/routes/workflows.tsx": "3ada140a987ecb3619eaac4a29e6845e9dd2f0b59af4ac596a13e15efe48b89d"
+        "examples/tanstack-start/src/routes/workflows.tsx": "c2c11ca26342bf866a7e0724e0cee1283485c7df3a17b88d5c2cfc2b44598dd6"
       },
-      "head": "bc4e899e8f9ae5cfb4c23870870a59e0b659f805",
-      "outcome": "updated",
-      "reason": "Actual native route consumes the documented descriptor or HTTP workflow provider. The existing framework guidance now covers the route and its lifetime; it does not justify another skill.",
+      "head": "90ca0e6ac412cf97f62854b7e29d4438e2d6ffb0",
+      "outcome": "no-change",
+      "reason": "Inspected actual owned diff: host imports now name the private shared package, common stylesheet scanning follows shared ownership, exact lint/type path exceptions follow moved modules, the real toolchain command is a Fallow entry, and the existing minor changeset describes corrected registration. These implementation and tooling details require no additional shipped guidance.",
       "evidence": [
-        "Compared own diff against required base 3e70c51 and merged parent bc4e899. Fresh checks: 127 app runtime tests; 150 CLI Playwright cases across Chromium/Firefox/WebKit; both app production builds; strict/typed lint/format and Effect checks; public/server-local fixtures and packed framework consumers under TSRS and TS5.9; 24 executable docs tests and Astro check. Intent structural skills validation passes. Fallow retains 13 untouched findings; default YAML lint retains inherited style findings (93 to 92 line-length findings). Logs and coverage matrix: /tmp/effect-api-query-spec-166/pre1-examples-result.md. Independent consumer/discovery evidence is unverified because agents are prohibited. No library API, release policy or dependency change."
+        "Source base 90ca0e6; actual src/core/query-owner.ts and examples/shared/http-workflows/application.ts diff; native public application and owner regressions.",
+        "architecture-raw-finalizer-red.log and architecture-same-turn-red.log reproduce prior failures; corresponding GREEN evidence and final 870 runtime tests pass.",
+        "Both pinned public/server compilers, strict 231-file checking/457-file formatting, package/ATTW/publint, native framework compilers, Effect diagnostics and toolchain rejection checks pass.",
+        "Both final production builds and docs checks pass; all four Fallow audits pass with clean development/production dead-code scans and no new suppressions/threshold changes.",
+        "150 browser cases passed before private workspace packaging; final 150-case browser rerun running. Eight packed peer pairs passed 403 cases each before internal type-export/consumer-fixture cleanup; final CI will rerun the matrix.",
+        "Fresh Astra architecture/fix source rechecks found no remaining actionable admission finding. No fresh consumer/discovery or GUI/platform claim; default yamllint retains repository line-length/document-start issues."
+      ]
+    },
+    "source:examples/shared/styles.css": {
+      "fingerprint": "bd7baafe0c5b7e65f5c1aa649dde34bd6e40c9df07442c7b0afbf2cd4d75fa31",
+      "snapshot": {
+        "examples/shared/styles.css": "83d28e30de30d63f233618209a50f7acbf103bac37852727cca82af49e696da0"
+      },
+      "head": "90ca0e6ac412cf97f62854b7e29d4438e2d6ffb0",
+      "outcome": "no-change",
+      "reason": "Inspected actual owned diff: host imports now name the private shared package, common stylesheet scanning follows shared ownership, exact lint/type path exceptions follow moved modules, the real toolchain command is a Fallow entry, and the existing minor changeset describes corrected registration. These implementation and tooling details require no additional shipped guidance.",
+      "evidence": [
+        "Source base 90ca0e6; actual src/core/query-owner.ts and examples/shared/http-workflows/application.ts diff; native public application and owner regressions.",
+        "architecture-raw-finalizer-red.log and architecture-same-turn-red.log reproduce prior failures; corresponding GREEN evidence and final 870 runtime tests pass.",
+        "Both pinned public/server compilers, strict 231-file checking/457-file formatting, package/ATTW/publint, native framework compilers, Effect diagnostics and toolchain rejection checks pass.",
+        "Both final production builds and docs checks pass; all four Fallow audits pass with clean development/production dead-code scans and no new suppressions/threshold changes.",
+        "150 browser cases passed before private workspace packaging; final 150-case browser rerun running. Eight packed peer pairs passed 403 cases each before internal type-export/consumer-fixture cleanup; final CI will rerun the matrix.",
+        "Fresh Astra architecture/fix source rechecks found no remaining actionable admission finding. No fresh consumer/discovery or GUI/platform claim; default yamllint retains repository line-length/document-start issues."
+      ]
+    },
+    "source:examples/shared/ui/action-button.tsx": {
+      "fingerprint": "00429c3d7eede88a645c1b3b8c06b9fd63c75c152b5c4cf37f4aae153abc2c8d",
+      "snapshot": {
+        "examples/shared/ui/action-button.tsx": "4fffe2813ef95433f4c70b991707b52201598b2f0a262e9f64187c08d3bfe5a0"
+      },
+      "head": "90ca0e6ac412cf97f62854b7e29d4438e2d6ffb0",
+      "outcome": "no-change",
+      "reason": "Inspected actual owned diff: host imports now name the private shared package, common stylesheet scanning follows shared ownership, exact lint/type path exceptions follow moved modules, the real toolchain command is a Fallow entry, and the existing minor changeset describes corrected registration. These implementation and tooling details require no additional shipped guidance.",
+      "evidence": [
+        "Source base 90ca0e6; actual src/core/query-owner.ts and examples/shared/http-workflows/application.ts diff; native public application and owner regressions.",
+        "architecture-raw-finalizer-red.log and architecture-same-turn-red.log reproduce prior failures; corresponding GREEN evidence and final 870 runtime tests pass.",
+        "Both pinned public/server compilers, strict 231-file checking/457-file formatting, package/ATTW/publint, native framework compilers, Effect diagnostics and toolchain rejection checks pass.",
+        "Both final production builds and docs checks pass; all four Fallow audits pass with clean development/production dead-code scans and no new suppressions/threshold changes.",
+        "150 browser cases passed before private workspace packaging; final 150-case browser rerun running. Eight packed peer pairs passed 403 cases each before internal type-export/consumer-fixture cleanup; final CI will rerun the matrix.",
+        "Fresh Astra architecture/fix source rechecks found no remaining actionable admission finding. No fresh consumer/discovery or GUI/platform claim; default yamllint retains repository line-length/document-start issues."
       ]
     }
   }

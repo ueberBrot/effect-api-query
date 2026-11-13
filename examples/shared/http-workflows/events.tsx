@@ -3,8 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Schema } from "effect";
 import { useEffect, useState } from "react";
 
-import { ActionButton } from "../components/ui/action-button.tsx";
-import { EffectErrorDetails } from "../components/ui/effect-error-details.tsx";
+import { ActionButton } from "../ui/action-button.tsx";
+import { EffectErrorDetails } from "../ui/effect-error-details.tsx";
 import type { HttpWorkflows } from "./application.ts";
 import { recoveredEvents } from "./recovery.ts";
 

@@ -80,14 +80,19 @@ export const acquireQueryOwner = async <A>(
     signal?: AbortSignal
   ): Promise<T> => {
     assertActive();
-    // Register before invoking user code, including synchronous retirement/reentrancy.
-    // Assignment completes before the first awaited microtask resumes.
-    // oxlint-disable-next-line eslint/prefer-const
-    let result!: Promise<T>;
-    result = (async () => {
-      await Promise.resolve();
+    let complete!: (value: T | PromiseLike<T>) => void;
+    // oxlint-disable-next-line anti-slop/no-unknown-parameters
+    let fail!: (error: unknown) => void;
+    // Register before executing so synchronous retirement sees all accepted work.
+    // oxlint-disable-next-line promise/avoid-new
+    const result = new Promise<T>((resolve, reject) => {
+      complete = resolve;
+      fail = reject;
+    });
+    pending.add(result);
+    void (async () => {
       try {
-        return await execute();
+        complete(await execute());
       } catch (error) {
         if (
           signal?.aborted === true &&
@@ -100,10 +105,9 @@ export const acquireQueryOwner = async <A>(
         ) {
           cancelled.add(result);
         }
-        throw error;
+        fail(error);
       }
     })();
-    pending.add(result);
     try {
       return await result;
     } finally {

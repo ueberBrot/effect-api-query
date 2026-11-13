@@ -1,14 +1,13 @@
 import { Reading } from "@effect-api-query/contracts";
 import { startExampleRpcServer } from "@effect-api-query/server";
+import { startHttpWorkflows } from "@effect-api-query/shared/http-workflows/application.ts";
+import type { HttpWorkflows } from "@effect-api-query/shared/http-workflows/application.ts";
+import { recoveredEvents } from "@effect-api-query/shared/http-workflows/recovery.ts";
+import { shareReadings } from "@effect-api-query/shared/http-workflows/sharing.ts";
 import { MutationObserver } from "@tanstack/query-core";
 import { findDeclaredError } from "@ueberbrot/effect-api-query";
-import { Deferred, Effect, Exit, Option, Scope } from "effect";
+import { Cause, Deferred, Effect, Exit, Option, Result, Scope } from "effect";
 import { describe, expect, it } from "vite-plus/test";
-
-import { startHttpWorkflows } from "../src/workflows/application.ts";
-import type { HttpWorkflows } from "../src/workflows/application.ts";
-import { recoveredEvents } from "../src/workflows/recovery.ts";
-import { shareReadings } from "../src/workflows/sharing.ts";
 
 const withApplication = async (
   run: (application: HttpWorkflows, baseUrl: string) => Promise<void>
@@ -228,6 +227,97 @@ describe("runnable HTTP workflows", () => {
       await expect(completion).resolves.toBe("stopped");
       expect(() => application.consume(Effect.void)).toThrow("closed");
     });
+  });
+
+  it("cancels a query accepted in the same turn as disposal", async () => {
+    const application = await startHttpWorkflows("http://127.0.0.1");
+    const reading = application.queryClient.query(
+      application.http.documents.read.queryOptions()
+    );
+    const completion = reading.catch(() => null);
+    await application.dispose();
+    await completion;
+    expect(application.queryClient.getQueryCache().getAll()).toHaveLength(0);
+  });
+
+  it("retires synchronously and drains raw consumer cleanup once", async () => {
+    const application = await startHttpWorkflows("http://127.0.0.1");
+    const entered = Deferred.makeUnsafe<boolean>();
+    const finalizing = Deferred.makeUnsafe<boolean>();
+    const release = Deferred.makeUnsafe<boolean>();
+    let finalized = 0;
+    const consumer = application.consume(
+      Deferred.succeed(entered, true).pipe(
+        Effect.andThen(Effect.never),
+        Effect.ensuring(
+          Deferred.succeed(finalizing, true).pipe(
+            Effect.andThen(Deferred.await(release)),
+            Effect.andThen(
+              Effect.sync(() => {
+                finalized += 1;
+              })
+            )
+          )
+        )
+      )
+    );
+    const completion = consumer.done.catch(() => null);
+    try {
+      await Effect.runPromise(Deferred.await(entered));
+      const disposal = application.dispose();
+      expect(application.dispose()).toBe(disposal);
+      expect(() => application.consume(Effect.void)).toThrow("closed");
+      let disposed = false;
+      const completedDisposal = disposal.then(() => {
+        disposed = true;
+      });
+      await Effect.runPromise(Deferred.await(finalizing));
+      expect(disposed).toBe(false);
+      expect(finalized).toBe(0);
+      Effect.runSync(Deferred.succeed(release, true));
+      await completedDisposal;
+      await completion;
+      expect(finalized).toBe(1);
+    } finally {
+      Effect.runSync(Deferred.succeed(release, true));
+      await application.dispose();
+      await completion;
+    }
+  });
+
+  it("preserves a raw consumer finalizer failure during disposal", async () => {
+    const application = await startHttpWorkflows("http://127.0.0.1");
+    const entered = Deferred.makeUnsafe<boolean>();
+    const failure = new Error("Raw consumer cleanup failed");
+    try {
+      const consumer = application.consume(
+        Deferred.succeed(entered, true).pipe(
+          Effect.andThen(Effect.never),
+          Effect.ensuring(Effect.die(failure))
+        )
+      );
+      const completion = consumer.done.catch(() => null);
+      await Effect.runPromise(Deferred.await(entered));
+      await expect(application.dispose()).rejects.toSatisfy(
+        // oxlint-disable-next-line anti-slop/no-unknown-parameters
+        (error: unknown) => {
+          if (!(error instanceof AggregateError)) {
+            return false;
+          }
+          return error.errors.some((cause: unknown) => {
+            if (!Cause.isCause(cause)) {
+              return false;
+            }
+            const defect = Cause.findDefect(cause);
+            return Result.isSuccess(defect) && defect.success === failure;
+          });
+        }
+      );
+      await completion;
+      expect(application.queryClient.getQueryCache().getAll()).toHaveLength(0);
+    } finally {
+      await application.dispose().catch(() => null);
+    }
   });
 
   it("drains mutation callbacks before clearing the retired cache", async () => {

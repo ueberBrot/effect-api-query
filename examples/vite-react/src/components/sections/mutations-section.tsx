@@ -1,9 +1,9 @@
 import { SeedUser } from "@effect-api-query/contracts";
+import { ActionButton } from "@effect-api-query/shared/ui/action-button.tsx";
+import { EffectErrorDetails } from "@effect-api-query/shared/ui/effect-error-details.tsx";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import type { ViteReactApplication } from "../../lib/application.ts";
-import { ActionButton } from "../ui/action-button.tsx";
-import { EffectErrorDetails } from "../ui/effect-error-details.tsx";
 import { CreateUserForm } from "../users/create-user-form.tsx";
 
 export const MutationsSection = ({

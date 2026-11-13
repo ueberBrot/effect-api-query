@@ -3,6 +3,7 @@ packages:
   - apps/*
   - examples/contracts
   - examples/server
+  - examples/shared
   - examples/tanstack-start
   - examples/vite-react
 

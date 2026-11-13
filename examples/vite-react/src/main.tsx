@@ -1,11 +1,14 @@
+import {
+  HttpWorkflowsExample,
+  WorkflowPage,
+} from "@effect-api-query/shared/http-workflows/app.tsx";
+import { startHttpWorkflows } from "@effect-api-query/shared/http-workflows/application.ts";
 import { Result, Schema } from "effect";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
 import { ViteReactExample } from "./app.tsx";
 import { startViteReactApplication } from "./lib/application.ts";
-import { HttpWorkflowsExample, WorkflowPage } from "./workflows/app.tsx";
-import { startHttpWorkflows } from "./workflows/application.ts";
 
 import "./styles/tailwind.css";
 

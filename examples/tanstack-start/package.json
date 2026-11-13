@@ -10,6 +10,7 @@
   "dependencies": {
     "@effect-api-query/contracts": "workspace:*",
     "@effect-api-query/server": "workspace:*",
+    "@effect-api-query/shared": "workspace:*",
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-router-ssr-query": "catalog:",

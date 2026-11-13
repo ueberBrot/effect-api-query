@@ -11,7 +11,7 @@ metadata:
   library_version: "0.6.1"
 sources:
   - "**/examples/contracts/src/*.ts"
-  - "**/examples/vite-react/src/workflows/*.ts*"
+  - "**/examples/shared/http-workflows/*.ts*"
   - "e2e/http-workflows.spec.ts"
   - "src/**/*.ts"
   - "tests/**/*.ts"
@@ -20,7 +20,7 @@ sources:
   - "**/examples/vite-react/src/lib/*.ts"
   - "**/examples/vite-react/src/main.tsx"
   - "**/examples/vite-react/src/app.tsx"
-  - "**/examples/vite-react/src/components/ui/effect-error-details.tsx"
+  - "**/examples/shared/ui/effect-error-details.tsx"
   - "**/examples/vite-react/tests/*.ts*"
   - "**/examples/tanstack-start/src/lib/*.ts"
   - "**/examples/tanstack-start/src/router.tsx"

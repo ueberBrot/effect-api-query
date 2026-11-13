@@ -28,15 +28,15 @@ import { Rpc, RpcGroup } from "effect/rpc";
 import type { RpcClient } from "effect/rpc";
 
 const input = Schema.Struct({ id: Schema.Int });
-export const users = RpcGroup.make(
+const users = RpcGroup.make(
   Rpc.make("read", {
     payload: input,
     success: Schema.Struct({ name: Schema.String }),
   })
 );
-type Client = RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof users>>;
+export type Client = RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof users>>;
 
-export const makeSelection = (client: Client) => {
+const makeSelection = (client: Client) => {
   const rpc = createRpcQueryUtils(users, { client, keyPrefix: ["users"] });
   return createQueryDescriptor(rpc.read, "query", {
     contract: "users/read-v1",

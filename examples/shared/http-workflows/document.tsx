@@ -10,8 +10,8 @@ import { Option } from "effect";
 import { useMemo, useState } from "react";
 import type { SubmitEvent } from "react";
 
-import { ActionButton } from "../components/ui/action-button.tsx";
-import { EffectErrorDetails } from "../components/ui/effect-error-details.tsx";
+import { ActionButton } from "../ui/action-button.tsx";
+import { EffectErrorDetails } from "../ui/effect-error-details.tsx";
 import type { HttpWorkflows } from "./application.ts";
 
 const DocumentEditor = ({

@@ -18,7 +18,6 @@ export {
   FeedScenario,
   Reading,
   Room,
-  Readings,
   ReplayExpired,
   RevisionConflict,
   TitleRejected,

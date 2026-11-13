@@ -111,6 +111,31 @@ describe("query owners", () => {
     await next.dispose();
   });
 
+  it("drains work that synchronously retires its own owner", async () => {
+    const finish = gate();
+    const released: string[] = [];
+    const owner = await acquireQueryOwner(
+      async (setup) =>
+        await setup.acquire(
+          () => "transport",
+          (value) => {
+            released.push(value);
+          }
+        )
+    );
+    const accepted = owner.runMutation(async () => {
+      void owner.dispose();
+      await finish.promise;
+      return "finished";
+    });
+    expect(owner.isActive()).toBe(false);
+    expect(released).toStrictEqual([]);
+    finish.open();
+    await expect(accepted).resolves.toBe("finished");
+    await owner.dispose();
+    expect(released).toStrictEqual(["transport"]);
+  });
+
   it("waits for local query cleanup before releasing resources", async () => {
     const started = gate();
     const finalizing = gate();

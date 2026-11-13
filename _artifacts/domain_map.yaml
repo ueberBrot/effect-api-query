@@ -144,6 +144,13 @@ skills:
         source: examples/tanstack-start/src/lib/application.ts
         priority: HIGH
         status: active
+      - mistake: Track raw consumers beside their query owner and discard settled failures
+        mechanism: Parallel lifetime registries can drain work while losing its finalizer Cause.
+        wrong_pattern: await Promise.allSettled(consumers); await owner.dispose()
+        correct_pattern: Register raw effects through the owner's signal-aware runner and drain native mutation callbacks before retirement.
+        source: examples/shared/http-workflows/application.ts
+        priority: HIGH
+        status: active
       - mistake: Roll back an overlapping write with an old snapshot
         mechanism: Whole-list replacement erases intervening writes. Restoring a stale entity can overwrite a newer authoritative cache revision.
         wrong_pattern: queryClient.setQueryData(key, oldList)

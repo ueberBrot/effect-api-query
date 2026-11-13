@@ -1,13 +1,13 @@
+import {
+  HttpWorkflowsExample,
+  WorkflowPage,
+} from "@effect-api-query/shared/http-workflows/app.tsx";
+import { startHttpWorkflows } from "@effect-api-query/shared/http-workflows/application.ts";
+import type { HttpWorkflows } from "@effect-api-query/shared/http-workflows/application.ts";
 import { createFileRoute } from "@tanstack/react-router";
 import { Result, Schema } from "effect";
 import { useEffect, useState } from "react";
 
-import {
-  HttpWorkflowsExample,
-  WorkflowPage,
-} from "../../../vite-react/src/workflows/app.tsx";
-import { startHttpWorkflows } from "../../../vite-react/src/workflows/application.ts";
-import type { HttpWorkflows } from "../../../vite-react/src/workflows/application.ts";
 import { EffectErrorDetails } from "../components/effect-error-details.tsx";
 import { reportCleanupFailure } from "../lib/application.ts";
 
