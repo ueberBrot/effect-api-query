@@ -41,7 +41,7 @@ The [stream workload](https://github.com/ueberBrot/effect-api-query/blob/main/te
 
 ### Regression budgets
 
-The default bundle and compiler workloads enforce the ceilings in `scripts/performance/budgets.mts`. Bundle ceilings cover the added minified and gzip bytes for each consumer and peer mode. Compiler ceilings cover instantiations separately for each compiler, adapter, operation count and contract/raw/configured consumer. They allow about 10% above the spec #166 combined baseline to catch substantial regressions while allowing small implementation changes. Custom operation counts outside that table have no compiler budget.
+The default bundle and compiler workloads enforce the ceilings in `scripts/performance/budgets.mts`. Bundle ceilings cover the added minified and gzip bytes for each consumer and peer mode. Compiler ceilings cover instantiations separately for each compiler, adapter, operation count and contract/raw/configured consumer. They allow about 10% above the spec #166 combined baseline as a review threshold for substantial growth. This headroom is a maintenance policy, not measured compiler variability. Smaller increases still need review. The included-peer RPC ceiling is tighter: restoring the previously retained unused Effect cache wrappers exceeds it. Custom operation counts outside that table have no compiler budget.
 
 Run the complete default workloads when changing these ceilings. Keep compiler engine, language target, dependencies, contracts and consumed leaves equal across comparisons. Record why the added capability warrants the cost before raising a ceiling. Timing and heap snapshots are observations, never pass/fail limits.
 
@@ -55,7 +55,7 @@ The native consumers model successful reads and ordered unbounded stream publica
 
 ## Adapter and application bundles
 
-The package marks its exports as free of side effects and keeps Effect and Query Core as peers. An application can import one factory or an error guard from the package root. Unused factories and the stream snapshot helper can then be removed by the bundler.
+The package marks its exports as free of side effects and keeps Effect and Query Core as peers. Pure annotations on lazy Effect cache wrapper construction let bundlers remove unused wrapper bodies; they do not change service identity or execute cache work. An application can import one factory or an error guard from the package root. Unused factories and the stream snapshot helper can then be removed by the bundler.
 
 An adapter-only bundle with external peers excludes dependency code. The application's contract Schemas, transport, QueryClient, framework, and other imports contribute to the final bundle. Attributing a size change to the adapter requires a comparison with the same imports and dependency versions.
 

@@ -1,6 +1,6 @@
 library:
   name: "@ueberbrot/effect-api-query"
-  version: 0.6.0
+  version: 0.6.1
   repository: https://github.com/ueberBrot/effect-api-query
   description: TanStack Query utilities derived from ready Effect RPC and HTTP clients.
   primary_framework: framework-agnostic

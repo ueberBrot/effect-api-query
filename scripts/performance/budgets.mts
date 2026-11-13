@@ -9,7 +9,7 @@ export const assertBudget = (
 };
 
 export const bundleBudgets = {
-  rpc: { included: [37_300, 12_200], external: [20_200, 7100] },
+  rpc: { included: [33_500, 12_200], external: [20_200, 7100] },
   http: { included: [45_500, 14_500], external: [26_200, 8800] },
   streamed: { included: [27_800, 8900], external: [20_200, 7100] },
   hydration: { included: [39_600, 12_900], external: [21_900, 7700] },

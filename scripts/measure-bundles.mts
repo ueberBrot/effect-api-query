@@ -3,13 +3,13 @@ import path from "node:path";
 import { gzipSync } from "node:zlib";
 
 import { Effect } from "effect";
+import viteManifest from "vite/package.json" with { type: "json" };
 import { rolldown, VERSION } from "vite/rolldown";
 
 import manifest from "../package.json" with { type: "json" };
 import { currentCompiler } from "./compiler.mts";
 import { assertBudget, bundleBudgets } from "./performance/budgets.mts";
 import {
-  packageVersion,
   packageName,
   prepareConsumer,
   repositoryRoot,
@@ -185,7 +185,11 @@ try {
       comparisonLimits:
         "Successful decoded scalar/object workloads only. Native stream helper has no adapter cleanup/error/key guarantees; hydration registry adds schema codecs. Deltas measure retained capability cost, not runtime equivalence or optimization gains.",
       compiler: currentCompiler,
-      vite: packageVersion("vite"),
+      vite: {
+        importedAs: "vite",
+        package: viteManifest.name,
+        version: viteManifest.version,
+      },
       packageVersion: manifest.version,
       compression: "gzip per generated consumer",
     },
