@@ -3,12 +3,12 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "c3bc45b0cd67dddb18db12b3d5838f0cdb728ea82786cd14c1f80a86adf4b33b",
+      "fingerprint": "a031411954c8edc8af8e2ac6e1f6d5937934e75d2380ea70259478fd2b826416",
       "snapshot": {
         "GLOSSARY.md": "294f016460f575c7ee634a33c7b45c825f67a0501c31d42a5c42d681bacebd83",
         "README.md": "9cc3275039f58de12efe6a19ea5ec5e23a56126cfeb81cf35480ae5ac147f1da",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "8cf2b005fd05a799118c262ecda121c4468cc023b5a666b7f46501e49f1b3099",
-        "apps/docs/src/content/docs/concepts/data-normalization.md": "a5447c052af2b2bbe119fd5ff2eab8d616016fe9e703a35718fd5b568f246329",
+        "apps/docs/src/content/docs/concepts/data-normalization.md": "eb226d096cee825aa2a7c2e49370208d6110662c3acf681fa4b95f8b6caca0d7",
         "apps/docs/src/content/docs/concepts/http-utility-tree.md": "03f01c27b051a3fdd8c373749d61cf62d35c2734ff1f651ad3805b14886ba45b",
         "apps/docs/src/content/docs/concepts/queries-and-mutations.md": "e50098de81ed28be976a4c5e1224f61dc116f022dd50d553835e2775f0b63882",
         "apps/docs/src/content/docs/concepts/rpc-utility-tree.md": "5d9f0d254d1df588c2df70bc568ba430ae8db8dc22a47688835e74ce27fc1ca0",
@@ -18,11 +18,12 @@
         "apps/docs/src/content/docs/examples/http-workflows.md": "f7b41e1e63fda1e4c44e0886b29f5c796f3f51e1b3bf227947423194f6cc39b0",
         "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "9bc41621f29a48badc7b26eb287d1f3071ce8cca86697fc80099301f4a6029df",
         "apps/docs/src/content/docs/getting-started/feature-support.md": "ac3ebd5c192272f7d4d1a236a5878d1d51a76fc514e874cbb51f17eb31809125",
-        "apps/docs/src/content/docs/getting-started/http-quick-start.md": "d8887c6d4180d60a1127957e073c180528474258c697c1305b6a7bb846e27671",
+        "apps/docs/src/content/docs/getting-started/http-quick-start.md": "4c68eaf1d2df4b1dcebf24b8f84ef291dd503a2049eb6802b74e8e52b7e6a948",
         "apps/docs/src/content/docs/getting-started/installation.md": "63ebd6eddf603465b5c1203f6587ae5c6c7fba1a1e59069c929f44eaa645823d",
-        "apps/docs/src/content/docs/getting-started/quick-start.md": "91ddca16ad5c0f484d88a9d3b42d37065ee3a3bfd088bd6f1b25a45e96283788",
+        "apps/docs/src/content/docs/getting-started/quick-start.md": "0c54114c78107abed4e3483d01c7e9df232125ab2a3e38298f374ab468a659f1",
         "apps/docs/src/content/docs/guides/angular-query.md": "beb279a2ef34d1e69e685bcd8dbeddb0fafb0228ede9107dd9f95d86f9e5c72c",
         "apps/docs/src/content/docs/guides/cache-filters.md": "b0b8a08b6e2f3484a2565b6bd6d080cd1e95b3e9aefcb5aaf121cd7a96ad2591",
+        "apps/docs/src/content/docs/guides/cache-management.md": null,
         "apps/docs/src/content/docs/guides/cancellation.md": "7af74ddcb64ddc5454e3d8b4326a79b9683f1d744537c2b2f267e61a9447274b",
         "apps/docs/src/content/docs/guides/choose-stream-history.md": "015ecea83c4d31c210be07ad35e528349d3e952c53f1e8a17e9f425ec949cc6e",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "cb941076de91c32bc0a1a5e8f6463ea521457210c00ccf4ef4e7de7c5fd135e9",
@@ -55,7 +56,7 @@
         "apps/docs/src/content/docs/index.mdx": "c8015d3ea0e9f96d81558183249cde65a3cb8d087fa3934f2446af5c6db9a845",
         "apps/docs/src/content/docs/integrations/index.md": "027d9c9a2a06946be8771f3d33718e9097e59b689050d3ba51df05aa95ea6bda",
         "apps/docs/src/content/docs/reference/browser-and-worker-hosts.md": "400abc16a961005b5234f061861af70e6cf6199e9ea2a71b6c034e45fab54cb6",
-        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "e41083333fe156b7367c6290d1b9ee7f10ada4f724a35302bd73982955918877",
+        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "204aacf8d1ee59ba9e420fb75170670dd8dfb512192491f453d4f813274492bc",
         "apps/docs/src/content/docs/reference/errors.md": "2fc5cfd1c1402bc6e8763088cec0b1ef86566dab25a29d98f157e35abd2a7f16",
         "apps/docs/src/content/docs/reference/external-http-clients.md": "d55be8650662c1f4978dd2b0ca34e5ccafad596db97371cd69681b574b407860",
         "apps/docs/src/content/docs/reference/factory.md": "9a2c6c1b76b484cfda17b32d0e6bc21af60689b8dae2400f0c559354dad09653",
@@ -77,7 +78,7 @@
         "docs/adr/0010-reuse-tanstack-query-core-as-a-peer.md": "fc25c133e013da2f934d55f98a8a749a4f1b77355d2489da171545d017eab837",
         "docs/adr/0012-normalize-undefined-query-success-to-null.md": "e07335454852d9ac3c8b2529ad414dbee59d57f2265ccf86b595e65092feb309",
         "docs/adr/0014-require-query-stable-payload-construction.md": "2c0a2fefeb20197712e85ca598e18c8a7d74b55f9cfbb74a0cfaf532f18aec04",
-        "docs/adr/0015-centralize-the-toolchain-in-vite-plus.md": "8daa6120ef9f4095c74d132ae6bd69ebd85ac9ee9dea4d6c9b238ebee66c692c",
+        "docs/adr/0015-centralize-the-toolchain-in-vite-plus.md": "038000cc6209bdde90aefbe55b238c69a71588d03335f9a9918645b834851491",
         "docs/adr/0020-generate-accumulated-and-live-stream-queries.md": "e63962e33664722c53c87dab73c712df1a4fe3dcab27de340e1f212ff26796b3",
         "docs/adr/0021-share-utility-construction-through-private-modules.md": "ad7db905318eea6b797d3295a0f3ab754a61f43df68f8503ce35b36068230578",
         "docs/adr/0022-add-buffered-http-utilities-with-separate-key-roots.md": "b1a8772e531b660925db6a1fe55942ee8c4c055a0d411271ce274954ca1c63be",
@@ -93,6 +94,7 @@
         "docs/adr/0032-configure-utility-trees-and-require-stream-retention.md": "e46238f04f3213d2c32dcb64fb2c17d38d033699d08b3b9d7986bbbe1d2f1ff7",
         "docs/adr/0033-bound-effect-support-to-a-patch-line.md": "34209a3700272113c64ff39baf15e19bc5745b73b5a28157207c1c592df8fcd0",
         "docs/adr/0034-extend-http-stream-views-to-decoded-ndjson.md": "445ed1f9a4cb3a74938f2d01579e50c046a681aaa2dcd856ef9587c62aaa7cf2",
+        "docs/adr/0035-use-effect-enhanced-tsrs-for-development.md": "1e1d668584239981375db7d4ff9722e53fd781e3a4b464be87bb64fb7258b69f",
         "docs/adr/0037-own-stream-publication-through-query-core.md": "50033124148c7da78da23a9b4aa08241a66a6168d79319998534af8e0a38074b",
         "e2e/http-workflows.spec.ts": "f5729fd3707758508d85506a93a1f2560edfe1aad89c9bd200ec0c80a2ecb7cb",
         "examples/contracts/src/client.ts": "fdf559bf0a798c7ea7f7aee01967837e720f7727a1bd11978aec51aad59f00f2",
@@ -161,25 +163,29 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "41133cf78a738b59157aeb778775619e02952fbf66a947445bfc5c211d11d1c2",
-        "pnpm-workspace.yaml": "a3f5d6cc5e21a4a8c01fe3e06ae01792a9de038c10d5d379e970485d69fab462",
-        "scripts/check-effect-compatibility.mts": "bf33fb74595e05c889d7b17aa3cbbe9bd72752e43f2db3fe3f21ea9841ea314b",
-        "scripts/check-framework-consumers.mts": "37fc0fc0006c2b1f35c5cff85754612e0b74d89eed608e353ef5f18f05fce051",
+        "package.json": "88899a47ccd31569a2e95cba153cf1b95f471243f58ccb3e18c6d18d42e03fe6",
+        "pnpm-workspace.yaml": "a1b81004fce351551877a21b03c2c277af591610ea3a49e79e54b2ad3e19f103",
+        "scripts/check-effect-compatibility.mts": "da0254371e7a3e8afb93c012661d00c3857d5c7de881bb0f3e81054caf4c024e",
+        "scripts/check-framework-consumers.mts": "f0111ac9ed84996f722f656358b810da0b9ecc8c6c0219a2019d1076b5d50cbc",
+        "scripts/check-toolchain.mts": "113386f8e7c3352dcefa745207d96783678939b07d0a18a8cdfbe55e08e9b60a",
+        "scripts/compiler.mts": "c803e4897b4e07ef10fb9d216518aeeb9fc709e4e1559140dcb89c82b4bf35a2",
         "scripts/measure-bundles.mts": "5a033ce9f9a4cf414632b6f2781a50c0354f1cf9996791a547a5d53dbef66d7a",
         "scripts/measure-construction.mts": "2fbad4879fe77ff24234a6be5666047b41cc7c3fd5ce9143d640ef4b41a426bd",
         "scripts/measure-streams.mts": "5f066efb508621f58067e333be174c850ab1bc0f45242c7695965d514b27366d",
         "scripts/measure-structural-sharing.mts": "d3e673fbebd3bc56e3c880b3387558963af59729f6ff2905c23a5845e8f95bf6",
-        "scripts/measure-types.mts": "c6d92caa7ba074970bce28c268cbf49e70b57f6dbdc2755d38d33961b2afc2fc",
+        "scripts/measure-types.mts": "ca3f257b497eb23e748e54dc4e5ba36cb0fde1e55eb33c361fbb48f6fe3246e5",
         "scripts/performance/common.mts": "57a2003d9769d884d1a0884cab5449cfce79c40300de8d0202d3f1780d51c4f5",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
+        "scripts/verify-docs-examples.mts": null,
+        "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "0997b75a672579f256310a13ca70392a55264657a67e2b17f2f2ca023e1c6901",
         "skills/effect-api-query/references/cache-workflows.md": "d9c6ddc9ab0b06b6577bfbe8542465fc4ebfc18d3fdd74c228a8bfbfd424a4dd",
-        "skills/effect-api-query/references/frameworks-and-hosts.md": "6304d782143d2a38c2b574b37148f6ef189b1095ce55e43b535057b4f63065d3",
-        "skills/effect-api-query/references/http.md": "7acbee387c671c6ed8a512ca94a29a0278c6e062c68f660a82e825ad95fbe336",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "17a04c2326fce96f4a9ec1c7415dd2e6ac05dc9a4ad854228c6d3132da262bc8",
+        "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
         "skills/effect-api-query/references/hydration-and-ssr.md": "30aeb844f4b4f7c3c6a5a70f4ecbfabbdfb7b332c62105b4ecad182238d38705",
         "skills/effect-api-query/references/query-patterns.md": "a19125415a1f66507e449498a3bd1cb856f23e24812d2acb6abf44ff31373c58",
-        "skills/effect-api-query/references/rpc.md": "7bfc134371d723b24da15a0bc07b1022daaddf6e0b47cb281900c147f78e9c59",
+        "skills/effect-api-query/references/rpc.md": "cdbc026d1d29c486b28a2b9fc6a330bcc8855b5887f0f454f73ce261734e8e7e",
         "src/core/branch-filter.ts": "71a8c6039f1775881bbc00d92e14e2ef823bf7150721307a74f16a1579bccc86",
         "src/core/canonical-key.ts": "84e91000876a6795557aab39dcc5d44e328250bf9b30ad02fd67afd02f5003e9",
         "src/core/configure-utils.ts": "31afe707e9ef3194f6b3a0ac888bb24583199a98e69ad1fcdaba4c76dea2ed60",
@@ -265,7 +271,7 @@
         "tests/publication-deadline.test.ts": "2797557ff14bf8527ea446cec1e1d7c61cd3666f11f127e640c53ce5d7e30868",
         "tests/query-filter.test.ts": "ff531a86816872cd2cadf01d79bd9d9ff5be1895bab150330a90aa8375508004",
         "tests/query-policy.test.ts": "19b1d0fde232b4af9e041197a1aa6726f30e4fb7118533e5b3f7af08cbbe4002",
-        "tests/query-usability.test.ts": "0f8c7d9c81ecff81c626c94657ae354ebcfbf8acf73470c48cfb0d069768cd21",
+        "tests/query-usability.test.ts": "313e6c03b560b4c20ffc32ed8e2bd96ce94fc2fb3977489f311324b6988e190f",
         "tests/query-view-prefix.test.ts": "fd94e3d01f52a0978242246f02a3e989bddd1e055f828f48d7a41187f696dd69",
         "tests/skills-maintenance.test.ts": "682faa16982a90614b2fbee84a5da5a4de361f6a3f732099d9fcbc266fca3ec8",
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
@@ -277,7 +283,7 @@
         "tests/types/docs-functionality.ts": "065ff9eac091e4a25c814e3e49b49d0f6258fffb7c5ed0661a1ec960b41ac0c0",
         "tests/types/docs-http-ndjson.ts": "a86513c1047b700ce27fc49b3d1fb31004cf745096d8403a0bdc780d95a448a3",
         "tests/types/docs-http-quick-start-contract.ts": "e034175f607fc9414e4919c6762a859e03908b0ee7ba77cb5dc6556b746ec26c",
-        "tests/types/docs-http-quick-start.ts": "2699f4f59b39cc857ab165d1a2a6881ffc53b4e28bb229900913db259c68c0db",
+        "tests/types/docs-http-quick-start.ts": "e2b22ac66c988a5385060bf854a82b87c1d4e6a089e37844c1479551976057fd",
         "tests/types/docs-hydration-async.ts": "7ede8b1e3356d575bbe40f552464853e333fa1233e6651fece0eda6a9007686b",
         "tests/types/docs-hydration-dto.ts": "65b61e5a18619aa600ade5626a83112c04608c08adcdd147f743bc6ae724f1ef",
         "tests/types/docs-hydration-rich.ts": "af96271b8d9516c5ad6e55a6742fba02b487910fce7906af92bee813e14f267b",
@@ -292,7 +298,7 @@
         "tests/types/docs-readme-rpc.ts": "8d6bf80030979f7b8172df06a22a5e0e8c0eda58280d234cdfe560f47d977ce7",
         "tests/types/docs-retry.ts": "587dfdc7810c12b73330527d187103003bb3f3959c9dcd154be81fce7ce6b672",
         "tests/types/docs-rpc-quick-start-contract.ts": "5015829dd4679f6b2561f148a098b8b892ccf11cc3dd0ffa052c2ddf0c3656c9",
-        "tests/types/docs-rpc-quick-start.ts": "2d14138c4195c5fdb067f18a0ad9ec6fa9e4f09a235cad4f677e664569161a5a",
+        "tests/types/docs-rpc-quick-start.ts": "2befbccaf42baed7ef1cb4e4bf9d1506a24607d28d1e76a4763ec78760d14e61",
         "tests/types/docs-stream-snapshot.ts": "4f518cee9b5145c8cca8b9573e7aa622c3e363a9c1744a19b5ea98fc1e65ef4a",
         "tests/types/docs-stream-tracing-contract.ts": "e7b5f3c74af15de1e22f78d3f44ce14678c83e9bd25dcc70430e36b8a493040a",
         "tests/types/docs-stream-tracing.ts": "fc2db4ce64b36ac3901b8ec59dbfef3c798bc52f05f591a97a5d2856c33dabf4",
@@ -329,26 +335,28 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "16c1fe41498b2ee6ea70644bead0623973449aa7",
+      "head": "2c88aa4e8d17fbebf58c339d350bfe7e73b60669",
       "outcome": "updated",
-      "reason": "Query-patterns guidance now identifies stable Query Core stream publication; accumulated/live policies, native cache access/sharing, normalization, HTTP decoded headers, and cancellation/cleanup contracts remain intact. Existing skill entry and other references remain accurate.",
+      "reason": "Serial #167 integration preserves all #169 input and #170 stream outcomes while updating compiler-role guidance and combined planning snapshots. Both compiler roles and unverified acceptance limits remain explicit; the existing one-skill/six-reference tree needs no structural change.",
       "evidence": [
-        "src/core/streamed-query.ts; docs/adr/0037-own-stream-publication-through-query-core.md; skills/effect-api-query/references/query-patterns.md",
-        "vp run test: 801 passed; post-merge selected stream tests: 301 passed; regression requiring zero subsequent cache enumeration failed on original source and passes on replacement",
-        "vp run check and effect-check pass; framework-types passes both compilers; effect-compatibility passes packed Effect 4.0.6 and 4.1.0, both compilers and 163 runtime cases each; docs-check passes",
-        "Fresh consumer-agent discovery unverified (no delegation authorized); packed consumer processes verified."
+        "Combined tree from 2c88aa4e (#169 plus #170) and b53f94fa (#167). Compared all source, RPC/HTTP/query-pattern guidance and query-usability regressions against 2c88aa4e: unchanged. Both input ownership and stream guarantees retained; ADR 0014 remains accepted and ADR 0037 intact.",
+        "Frozen pnpm 12.15.0 installation and preparation passed; actual SDK launcher reports @effect/tsgo 0.67.3, TSRS 0.21.0-ts7.1.0-beta, TypeScript 7.1.0-beta, revision 3e9236361fa9; --listFilesOnly locates bundled matching TSRS standard libraries. Root compiler API/minimum is TypeScript 5.9.3; Astro retains 6.0.3.",
+        "vp run toolchain-check passes identity and nonzero TS2322, floatingEffect and type-aware require-await rejection. Uncached strict typecheck passes 211 files; effect-check passes. Scoped test passes 343 cases in 15 files plus current/minimum public and server-local fixtures. Package TSRS declaration production, ATTW and publint pass.",
+        "Packed framework-types passes Vue/Solid/Svelte/Angular on both compilers. Packed effect-compatibility passes public compiler fixtures and 163 runtime cases each at Effect 4.0.6 and 4.1.0. Sequential vite-react-build, tanstack-start-build and docs-build pass; docs check includes 21 excerpt cases, Astro 0 errors/warnings/hints, 59 pages and valid internal links.",
+        "Inspected skill entry, six references and all three planning documents: domain map retains input and stream coverage plus compiler-role clarification; skill_spec retains #167/#169/#170 cumulative histories. Existing skill_tree paths, source globs, prerequisites and reference inventory remain accurate without changes. Intent sync no-op; one skill structurally validates. Scoped format, shellcheck, shfmt and relaxed YAML validation pass.",
+        "Prior #167 macOS arm64 LSP protocol evidence retained in 167-result.md; GUI SDK attachment/extension exclusivity, Windows/Linux/running container, fresh consumer-agent discovery and browser E2E remain unverified. Optional Fallow transitive TypeScript 7.0.2 remains an upstream limitation; no active repository compiler selection uses it. Full architecture review and integrated browser/performance acceptance remain parent scope. No research review outcome recorded."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "d3bd0d71b1025b650526db26d8efad2339cbb6f629565e89801fd59c3caa709a",
+      "fingerprint": "ecb54c44bfdbc0eb26d9946528f7cf0b6b34f0c665ab88178f808b24a583bebe",
       "snapshot": {
         "GLOSSARY.md": "294f016460f575c7ee634a33c7b45c825f67a0501c31d42a5c42d681bacebd83",
         "README.md": "9cc3275039f58de12efe6a19ea5ec5e23a56126cfeb81cf35480ae5ac147f1da",
-        "_artifacts/domain_map.yaml": "2c225d0648d971b47ade87f4d810159abe28701bb1b00eb22917bc02530a0081",
-        "_artifacts/skill_spec.md": "c38a19f8d75675df18c9f1d3f5ac6294188eef1bb4b0e4c2aad2d68f11f9148b",
+        "_artifacts/domain_map.yaml": "0ce2b4489d49f81378634b83bee8b2a7b2de81b39fad4a57c42a44a268e6c081",
+        "_artifacts/skill_spec.md": "0aa1fe9e23c179b547568c10fc021c36c1756a1daf3f50d16378b642b31f78ca",
         "_artifacts/skill_tree.yaml": "ce59cb7d97ff4f1cc36c4723ef889ccb37a96c24ed31a084be3a9fea620be07a",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "8cf2b005fd05a799118c262ecda121c4468cc023b5a666b7f46501e49f1b3099",
-        "apps/docs/src/content/docs/concepts/data-normalization.md": "a5447c052af2b2bbe119fd5ff2eab8d616016fe9e703a35718fd5b568f246329",
+        "apps/docs/src/content/docs/concepts/data-normalization.md": "eb226d096cee825aa2a7c2e49370208d6110662c3acf681fa4b95f8b6caca0d7",
         "apps/docs/src/content/docs/concepts/http-utility-tree.md": "03f01c27b051a3fdd8c373749d61cf62d35c2734ff1f651ad3805b14886ba45b",
         "apps/docs/src/content/docs/concepts/queries-and-mutations.md": "e50098de81ed28be976a4c5e1224f61dc116f022dd50d553835e2775f0b63882",
         "apps/docs/src/content/docs/concepts/rpc-utility-tree.md": "5d9f0d254d1df588c2df70bc568ba430ae8db8dc22a47688835e74ce27fc1ca0",
@@ -358,11 +366,12 @@
         "apps/docs/src/content/docs/examples/http-workflows.md": "f7b41e1e63fda1e4c44e0886b29f5c796f3f51e1b3bf227947423194f6cc39b0",
         "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "9bc41621f29a48badc7b26eb287d1f3071ce8cca86697fc80099301f4a6029df",
         "apps/docs/src/content/docs/getting-started/feature-support.md": "ac3ebd5c192272f7d4d1a236a5878d1d51a76fc514e874cbb51f17eb31809125",
-        "apps/docs/src/content/docs/getting-started/http-quick-start.md": "d8887c6d4180d60a1127957e073c180528474258c697c1305b6a7bb846e27671",
+        "apps/docs/src/content/docs/getting-started/http-quick-start.md": "4c68eaf1d2df4b1dcebf24b8f84ef291dd503a2049eb6802b74e8e52b7e6a948",
         "apps/docs/src/content/docs/getting-started/installation.md": "63ebd6eddf603465b5c1203f6587ae5c6c7fba1a1e59069c929f44eaa645823d",
-        "apps/docs/src/content/docs/getting-started/quick-start.md": "91ddca16ad5c0f484d88a9d3b42d37065ee3a3bfd088bd6f1b25a45e96283788",
+        "apps/docs/src/content/docs/getting-started/quick-start.md": "0c54114c78107abed4e3483d01c7e9df232125ab2a3e38298f374ab468a659f1",
         "apps/docs/src/content/docs/guides/angular-query.md": "beb279a2ef34d1e69e685bcd8dbeddb0fafb0228ede9107dd9f95d86f9e5c72c",
         "apps/docs/src/content/docs/guides/cache-filters.md": "b0b8a08b6e2f3484a2565b6bd6d080cd1e95b3e9aefcb5aaf121cd7a96ad2591",
+        "apps/docs/src/content/docs/guides/cache-management.md": null,
         "apps/docs/src/content/docs/guides/cancellation.md": "7af74ddcb64ddc5454e3d8b4326a79b9683f1d744537c2b2f267e61a9447274b",
         "apps/docs/src/content/docs/guides/choose-stream-history.md": "015ecea83c4d31c210be07ad35e528349d3e952c53f1e8a17e9f425ec949cc6e",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "cb941076de91c32bc0a1a5e8f6463ea521457210c00ccf4ef4e7de7c5fd135e9",
@@ -395,7 +404,7 @@
         "apps/docs/src/content/docs/index.mdx": "c8015d3ea0e9f96d81558183249cde65a3cb8d087fa3934f2446af5c6db9a845",
         "apps/docs/src/content/docs/integrations/index.md": "027d9c9a2a06946be8771f3d33718e9097e59b689050d3ba51df05aa95ea6bda",
         "apps/docs/src/content/docs/reference/browser-and-worker-hosts.md": "400abc16a961005b5234f061861af70e6cf6199e9ea2a71b6c034e45fab54cb6",
-        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "e41083333fe156b7367c6290d1b9ee7f10ada4f724a35302bd73982955918877",
+        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "204aacf8d1ee59ba9e420fb75170670dd8dfb512192491f453d4f813274492bc",
         "apps/docs/src/content/docs/reference/errors.md": "2fc5cfd1c1402bc6e8763088cec0b1ef86566dab25a29d98f157e35abd2a7f16",
         "apps/docs/src/content/docs/reference/external-http-clients.md": "d55be8650662c1f4978dd2b0ca34e5ccafad596db97371cd69681b574b407860",
         "apps/docs/src/content/docs/reference/factory.md": "9a2c6c1b76b484cfda17b32d0e6bc21af60689b8dae2400f0c559354dad09653",
@@ -417,7 +426,7 @@
         "docs/adr/0010-reuse-tanstack-query-core-as-a-peer.md": "fc25c133e013da2f934d55f98a8a749a4f1b77355d2489da171545d017eab837",
         "docs/adr/0012-normalize-undefined-query-success-to-null.md": "e07335454852d9ac3c8b2529ad414dbee59d57f2265ccf86b595e65092feb309",
         "docs/adr/0014-require-query-stable-payload-construction.md": "2c0a2fefeb20197712e85ca598e18c8a7d74b55f9cfbb74a0cfaf532f18aec04",
-        "docs/adr/0015-centralize-the-toolchain-in-vite-plus.md": "8daa6120ef9f4095c74d132ae6bd69ebd85ac9ee9dea4d6c9b238ebee66c692c",
+        "docs/adr/0015-centralize-the-toolchain-in-vite-plus.md": "038000cc6209bdde90aefbe55b238c69a71588d03335f9a9918645b834851491",
         "docs/adr/0020-generate-accumulated-and-live-stream-queries.md": "e63962e33664722c53c87dab73c712df1a4fe3dcab27de340e1f212ff26796b3",
         "docs/adr/0021-share-utility-construction-through-private-modules.md": "ad7db905318eea6b797d3295a0f3ab754a61f43df68f8503ce35b36068230578",
         "docs/adr/0022-add-buffered-http-utilities-with-separate-key-roots.md": "b1a8772e531b660925db6a1fe55942ee8c4c055a0d411271ce274954ca1c63be",
@@ -433,6 +442,7 @@
         "docs/adr/0032-configure-utility-trees-and-require-stream-retention.md": "e46238f04f3213d2c32dcb64fb2c17d38d033699d08b3b9d7986bbbe1d2f1ff7",
         "docs/adr/0033-bound-effect-support-to-a-patch-line.md": "34209a3700272113c64ff39baf15e19bc5745b73b5a28157207c1c592df8fcd0",
         "docs/adr/0034-extend-http-stream-views-to-decoded-ndjson.md": "445ed1f9a4cb3a74938f2d01579e50c046a681aaa2dcd856ef9587c62aaa7cf2",
+        "docs/adr/0035-use-effect-enhanced-tsrs-for-development.md": "1e1d668584239981375db7d4ff9722e53fd781e3a4b464be87bb64fb7258b69f",
         "docs/adr/0037-own-stream-publication-through-query-core.md": "50033124148c7da78da23a9b4aa08241a66a6168d79319998534af8e0a38074b",
         "e2e/http-workflows.spec.ts": "f5729fd3707758508d85506a93a1f2560edfe1aad89c9bd200ec0c80a2ecb7cb",
         "examples/contracts/src/client.ts": "fdf559bf0a798c7ea7f7aee01967837e720f7727a1bd11978aec51aad59f00f2",
@@ -501,25 +511,29 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "41133cf78a738b59157aeb778775619e02952fbf66a947445bfc5c211d11d1c2",
-        "pnpm-workspace.yaml": "a3f5d6cc5e21a4a8c01fe3e06ae01792a9de038c10d5d379e970485d69fab462",
-        "scripts/check-effect-compatibility.mts": "bf33fb74595e05c889d7b17aa3cbbe9bd72752e43f2db3fe3f21ea9841ea314b",
-        "scripts/check-framework-consumers.mts": "37fc0fc0006c2b1f35c5cff85754612e0b74d89eed608e353ef5f18f05fce051",
+        "package.json": "88899a47ccd31569a2e95cba153cf1b95f471243f58ccb3e18c6d18d42e03fe6",
+        "pnpm-workspace.yaml": "a1b81004fce351551877a21b03c2c277af591610ea3a49e79e54b2ad3e19f103",
+        "scripts/check-effect-compatibility.mts": "da0254371e7a3e8afb93c012661d00c3857d5c7de881bb0f3e81054caf4c024e",
+        "scripts/check-framework-consumers.mts": "f0111ac9ed84996f722f656358b810da0b9ecc8c6c0219a2019d1076b5d50cbc",
+        "scripts/check-toolchain.mts": "113386f8e7c3352dcefa745207d96783678939b07d0a18a8cdfbe55e08e9b60a",
+        "scripts/compiler.mts": "c803e4897b4e07ef10fb9d216518aeeb9fc709e4e1559140dcb89c82b4bf35a2",
         "scripts/measure-bundles.mts": "5a033ce9f9a4cf414632b6f2781a50c0354f1cf9996791a547a5d53dbef66d7a",
         "scripts/measure-construction.mts": "2fbad4879fe77ff24234a6be5666047b41cc7c3fd5ce9143d640ef4b41a426bd",
         "scripts/measure-streams.mts": "5f066efb508621f58067e333be174c850ab1bc0f45242c7695965d514b27366d",
         "scripts/measure-structural-sharing.mts": "d3e673fbebd3bc56e3c880b3387558963af59729f6ff2905c23a5845e8f95bf6",
-        "scripts/measure-types.mts": "c6d92caa7ba074970bce28c268cbf49e70b57f6dbdc2755d38d33961b2afc2fc",
+        "scripts/measure-types.mts": "ca3f257b497eb23e748e54dc4e5ba36cb0fde1e55eb33c361fbb48f6fe3246e5",
         "scripts/performance/common.mts": "57a2003d9769d884d1a0884cab5449cfce79c40300de8d0202d3f1780d51c4f5",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
+        "scripts/verify-docs-examples.mts": null,
+        "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "0997b75a672579f256310a13ca70392a55264657a67e2b17f2f2ca023e1c6901",
         "skills/effect-api-query/references/cache-workflows.md": "d9c6ddc9ab0b06b6577bfbe8542465fc4ebfc18d3fdd74c228a8bfbfd424a4dd",
-        "skills/effect-api-query/references/frameworks-and-hosts.md": "6304d782143d2a38c2b574b37148f6ef189b1095ce55e43b535057b4f63065d3",
-        "skills/effect-api-query/references/http.md": "7acbee387c671c6ed8a512ca94a29a0278c6e062c68f660a82e825ad95fbe336",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "17a04c2326fce96f4a9ec1c7415dd2e6ac05dc9a4ad854228c6d3132da262bc8",
+        "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
         "skills/effect-api-query/references/hydration-and-ssr.md": "30aeb844f4b4f7c3c6a5a70f4ecbfabbdfb7b332c62105b4ecad182238d38705",
         "skills/effect-api-query/references/query-patterns.md": "a19125415a1f66507e449498a3bd1cb856f23e24812d2acb6abf44ff31373c58",
-        "skills/effect-api-query/references/rpc.md": "7bfc134371d723b24da15a0bc07b1022daaddf6e0b47cb281900c147f78e9c59",
+        "skills/effect-api-query/references/rpc.md": "cdbc026d1d29c486b28a2b9fc6a330bcc8855b5887f0f454f73ce261734e8e7e",
         "src/core/branch-filter.ts": "71a8c6039f1775881bbc00d92e14e2ef823bf7150721307a74f16a1579bccc86",
         "src/core/canonical-key.ts": "84e91000876a6795557aab39dcc5d44e328250bf9b30ad02fd67afd02f5003e9",
         "src/core/configure-utils.ts": "31afe707e9ef3194f6b3a0ac888bb24583199a98e69ad1fcdaba4c76dea2ed60",
@@ -605,7 +619,7 @@
         "tests/publication-deadline.test.ts": "2797557ff14bf8527ea446cec1e1d7c61cd3666f11f127e640c53ce5d7e30868",
         "tests/query-filter.test.ts": "ff531a86816872cd2cadf01d79bd9d9ff5be1895bab150330a90aa8375508004",
         "tests/query-policy.test.ts": "19b1d0fde232b4af9e041197a1aa6726f30e4fb7118533e5b3f7af08cbbe4002",
-        "tests/query-usability.test.ts": "0f8c7d9c81ecff81c626c94657ae354ebcfbf8acf73470c48cfb0d069768cd21",
+        "tests/query-usability.test.ts": "313e6c03b560b4c20ffc32ed8e2bd96ce94fc2fb3977489f311324b6988e190f",
         "tests/query-view-prefix.test.ts": "fd94e3d01f52a0978242246f02a3e989bddd1e055f828f48d7a41187f696dd69",
         "tests/skills-maintenance.test.ts": "682faa16982a90614b2fbee84a5da5a4de361f6a3f732099d9fcbc266fca3ec8",
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
@@ -617,7 +631,7 @@
         "tests/types/docs-functionality.ts": "065ff9eac091e4a25c814e3e49b49d0f6258fffb7c5ed0661a1ec960b41ac0c0",
         "tests/types/docs-http-ndjson.ts": "a86513c1047b700ce27fc49b3d1fb31004cf745096d8403a0bdc780d95a448a3",
         "tests/types/docs-http-quick-start-contract.ts": "e034175f607fc9414e4919c6762a859e03908b0ee7ba77cb5dc6556b746ec26c",
-        "tests/types/docs-http-quick-start.ts": "2699f4f59b39cc857ab165d1a2a6881ffc53b4e28bb229900913db259c68c0db",
+        "tests/types/docs-http-quick-start.ts": "e2b22ac66c988a5385060bf854a82b87c1d4e6a089e37844c1479551976057fd",
         "tests/types/docs-hydration-async.ts": "7ede8b1e3356d575bbe40f552464853e333fa1233e6651fece0eda6a9007686b",
         "tests/types/docs-hydration-dto.ts": "65b61e5a18619aa600ade5626a83112c04608c08adcdd147f743bc6ae724f1ef",
         "tests/types/docs-hydration-rich.ts": "af96271b8d9516c5ad6e55a6742fba02b487910fce7906af92bee813e14f267b",
@@ -632,7 +646,7 @@
         "tests/types/docs-readme-rpc.ts": "8d6bf80030979f7b8172df06a22a5e0e8c0eda58280d234cdfe560f47d977ce7",
         "tests/types/docs-retry.ts": "587dfdc7810c12b73330527d187103003bb3f3959c9dcd154be81fce7ce6b672",
         "tests/types/docs-rpc-quick-start-contract.ts": "5015829dd4679f6b2561f148a098b8b892ccf11cc3dd0ffa052c2ddf0c3656c9",
-        "tests/types/docs-rpc-quick-start.ts": "2d14138c4195c5fdb067f18a0ad9ec6fa9e4f09a235cad4f677e664569161a5a",
+        "tests/types/docs-rpc-quick-start.ts": "2befbccaf42baed7ef1cb4e4bf9d1506a24607d28d1e76a4763ec78760d14e61",
         "tests/types/docs-stream-snapshot.ts": "4f518cee9b5145c8cca8b9573e7aa622c3e363a9c1744a19b5ea98fc1e65ef4a",
         "tests/types/docs-stream-tracing-contract.ts": "e7b5f3c74af15de1e22f78d3f44ce14678c83e9bd25dcc70430e36b8a493040a",
         "tests/types/docs-stream-tracing.ts": "fc2db4ce64b36ac3901b8ec59dbfef3c798bc52f05f591a97a5d2856c33dabf4",
@@ -669,30 +683,33 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "16c1fe41498b2ee6ea70644bead0623973449aa7",
+      "head": "2c88aa4e8d17fbebf58c339d350bfe7e73b60669",
       "outcome": "updated",
-      "reason": "Preserved all existing planning scope; domain_map adds stable stream publication and independent observer/Cause coverage, skill_spec records ticket 170 and ADR 0037; skill_tree existing src/test/docs/003*.md globs cover the change and need no structural edit. No new skill or dependency support claim.",
+      "reason": "Serial #167 integration preserves all #169 input and #170 stream outcomes while updating compiler-role guidance and combined planning snapshots. Both compiler roles and unverified acceptance limits remain explicit; the existing one-skill/six-reference tree needs no structural change.",
       "evidence": [
-        "_artifacts/domain_map.yaml; _artifacts/skill_spec.md; _artifacts/skill_tree.yaml reviewed against source/guidance diff",
-        "Intent sync reports no changes; yamllint passes both YAML records with existing long-line/document-start style allowed; check/docs-check pass; fresh consumer discovery remains unverified."
+        "Combined tree from 2c88aa4e (#169 plus #170) and b53f94fa (#167). Compared all source, RPC/HTTP/query-pattern guidance and query-usability regressions against 2c88aa4e: unchanged. Both input ownership and stream guarantees retained; ADR 0014 remains accepted and ADR 0037 intact.",
+        "Frozen pnpm 12.15.0 installation and preparation passed; actual SDK launcher reports @effect/tsgo 0.67.3, TSRS 0.21.0-ts7.1.0-beta, TypeScript 7.1.0-beta, revision 3e9236361fa9; --listFilesOnly locates bundled matching TSRS standard libraries. Root compiler API/minimum is TypeScript 5.9.3; Astro retains 6.0.3.",
+        "vp run toolchain-check passes identity and nonzero TS2322, floatingEffect and type-aware require-await rejection. Uncached strict typecheck passes 211 files; effect-check passes. Scoped test passes 343 cases in 15 files plus current/minimum public and server-local fixtures. Package TSRS declaration production, ATTW and publint pass.",
+        "Packed framework-types passes Vue/Solid/Svelte/Angular on both compilers. Packed effect-compatibility passes public compiler fixtures and 163 runtime cases each at Effect 4.0.6 and 4.1.0. Sequential vite-react-build, tanstack-start-build and docs-build pass; docs check includes 21 excerpt cases, Astro 0 errors/warnings/hints, 59 pages and valid internal links.",
+        "Inspected skill entry, six references and all three planning documents: domain map retains input and stream coverage plus compiler-role clarification; skill_spec retains #167/#169/#170 cumulative histories. Existing skill_tree paths, source globs, prerequisites and reference inventory remain accurate without changes. Intent sync no-op; one skill structurally validates. Scoped format, shellcheck, shfmt and relaxed YAML validation pass.",
+        "Prior #167 macOS arm64 LSP protocol evidence retained in 167-result.md; GUI SDK attachment/extension exclusivity, Windows/Linux/running container, fresh consumer-agent discovery and browser E2E remain unverified. Optional Fallow transitive TypeScript 7.0.2 remains an upstream limitation; no active repository compiler selection uses it. Full architecture review and integrated browser/performance acceptance remain parent scope. No research review outcome recorded."
       ]
     },
     "source:vite.config.ts": {
-      "fingerprint": "7b325bf8a05c19b3f503148ea93f285d38295f89057fdc913908eb91044f73b5",
+      "fingerprint": "fa14d3215dee1f24908e81e255dc2030dabd98a788d9316c0f66799d00324302",
       "snapshot": {
-        "vite.config.ts": "a5d7a47743f4542ec4d2aeddb79a4550ffec288db9d2ee5551a197433a0d8dfc"
+        "vite.config.ts": "4a02304fd3f331bba6274666bdd7238f54b85439a46d7456ed99e6421196aaa1"
       },
-      "head": "e09d5b6ac16e290c63d752a4e8d91083a06dfcbe",
+      "head": "2c88aa4e8d17fbebf58c339d350bfe7e73b60669",
       "outcome": "no-change",
-      "reason": "Extend existing unstable-API allowances only to the new native HTTP workflow files. Vite additionally scopes the Schema.TaggedError constructor/class-count exception to the contract and unknown-value sharing callback exceptions to sharing.ts. Core checks and defaults remain enabled; typed lint and strict Effect diagnostics pass.",
+      "reason": "Inspected actual source diff: pinned TSRS replaces the active current compiler in native Vite+ and isolated packed fixtures; strict rules, public TypeScript 5.9 minimum and runtime contracts remain unchanged. ADR 0035, contributor toolchain guidance and the updated framework reference already cover this tooling distinction; no additional shipped guidance is warranted.",
       "evidence": [
-        "Reviewed the diff from e09d5b6, the six focused Vite screens, shared contracts/handlers, callback draining, seven changesets, the compatibility reference, and ADRs 0033/0035.",
-        "800 runtime tests passed, including 10 real HTTP workflow cases and mutation-callback disposal regression.",
-        "Packed public fixtures passed on TypeScript 7.0.2 and 5.9.3 with 163 runtime cases at each Effect 4.0.6/4.1.0; four native framework consumers passed on both compilers.",
-        "Package declaration build, attw/publint, typed lint, strict Effect diagnostics (0 errors/0 warnings), both application builds, Fallow, 21 docs excerpt tests, 59-page docs build and internal links passed.",
-        "40 Chromium and 40 Firefox cases passed; WebKit could not launch because the host lacks GTK/ICU/GStreamer libraries, so CI must supply WebKit evidence. Local startup probes were replaced with stdout readiness without changing committed browser assertions.",
-        "Frozen install and peer check passed with unchanged seven-day policy; official registry times make coordinated 4.1.0 eligible. 4.1.1/4.1.2 were not installed.",
-        "Fresh consuming-agent behavior and comparative performance were not checked. Existing ownership and full-Cause semantics remain; no runtime adapter implementation changed."
+        "Combined tree from 2c88aa4e (#169 plus #170) and b53f94fa (#167). Compared all source, RPC/HTTP/query-pattern guidance and query-usability regressions against 2c88aa4e: unchanged. Both input ownership and stream guarantees retained; ADR 0014 remains accepted and ADR 0037 intact.",
+        "Frozen pnpm 12.15.0 installation and preparation passed; actual SDK launcher reports @effect/tsgo 0.67.3, TSRS 0.21.0-ts7.1.0-beta, TypeScript 7.1.0-beta, revision 3e9236361fa9; --listFilesOnly locates bundled matching TSRS standard libraries. Root compiler API/minimum is TypeScript 5.9.3; Astro retains 6.0.3.",
+        "vp run toolchain-check passes identity and nonzero TS2322, floatingEffect and type-aware require-await rejection. Uncached strict typecheck passes 211 files; effect-check passes. Scoped test passes 343 cases in 15 files plus current/minimum public and server-local fixtures. Package TSRS declaration production, ATTW and publint pass.",
+        "Packed framework-types passes Vue/Solid/Svelte/Angular on both compilers. Packed effect-compatibility passes public compiler fixtures and 163 runtime cases each at Effect 4.0.6 and 4.1.0. Sequential vite-react-build, tanstack-start-build and docs-build pass; docs check includes 21 excerpt cases, Astro 0 errors/warnings/hints, 59 pages and valid internal links.",
+        "Inspected skill entry, six references and all three planning documents: domain map retains input and stream coverage plus compiler-role clarification; skill_spec retains #167/#169/#170 cumulative histories. Existing skill_tree paths, source globs, prerequisites and reference inventory remain accurate without changes. Intent sync no-op; one skill structurally validates. Scoped format, shellcheck, shfmt and relaxed YAML validation pass.",
+        "Prior #167 macOS arm64 LSP protocol evidence retained in 167-result.md; GUI SDK attachment/extension exclusivity, Windows/Linux/running container, fresh consumer-agent discovery and browser E2E remain unverified. Optional Fallow transitive TypeScript 7.0.2 remains an upstream limitation; no active repository compiler selection uses it. Full architecture review and integrated browser/performance acceptance remain parent scope. No research review outcome recorded."
       ]
     },
     "source:.github/workflows/release.yml": {
@@ -2509,20 +2526,20 @@
       ]
     },
     "source:tests/framework-consumers/pnpm-lock.yaml": {
-      "fingerprint": "bb67ca03ce54b91437bad4aea898492e00d6950a01f2f6ebe9f2c424c0b90a8d",
+      "fingerprint": "d74c395f505cca7554216d116dc658f45f5fe73719cd79d2bc6487707676bf08",
       "snapshot": {
-        "tests/framework-consumers/pnpm-lock.yaml": "a955e3cc1594d93bb27357ca41ace0b8f3d0d15356de2727dda78d8750a9acdd"
+        "tests/framework-consumers/pnpm-lock.yaml": "8b5adbca70ed770f575a2f2a8c654e45f03fb99d5fecbd0e0d3627481f06c866"
       },
-      "head": "e09d5b6ac16e290c63d752a4e8d91083a06dfcbe",
+      "head": "2c88aa4e8d17fbebf58c339d350bfe7e73b60669",
       "outcome": "no-change",
-      "reason": "Isolated lockfile reflects eligible native framework patch updates and Query 5.105.0 alignment. The intentional Effect 4.0.6 and TypeScript 5.9.3 fixtures remain; wrapper-specific guidance remains accurate and the canonical exact-version table was updated.",
+      "reason": "Inspected actual source diff: pinned TSRS replaces the active current compiler in native Vite+ and isolated packed fixtures; strict rules, public TypeScript 5.9 minimum and runtime contracts remain unchanged. ADR 0035, contributor toolchain guidance and the updated framework reference already cover this tooling distinction; no additional shipped guidance is warranted.",
       "evidence": [
-        "Baseline e09d5b6 (0.6.0); inspected actual dependency, documentation, harness, and test-import diffs.",
-        "Frozen installation and pnpm peers check passed; unchanged seven-day policy and Effect peer >=4.0.6 <4.1.0.",
-        "790 runtime tests; 163 packed runtime cases per Effect 4.0.6/4.0.7 and both public compilers; four packed framework consumers on TypeScript 7.0.2/5.9.3 passed.",
-        "Direct native package build, attw/publint, typed checks, strict Effect diagnostics, both application builds, Fallow, 21 docs excerpt tests, and linked 58-page docs build passed.",
-        "Vite+-supervised native tools hit host spawn EBUSY; direct equivalent commands passed without weakened configuration. Fresh consuming-agent behavior and comparative performance were not checked.",
-        "scripts/check-framework-consumers.mts passed packed Vue/Solid/Svelte/Angular native hook fixtures on both compilers with the updated lockfile."
+        "Combined tree from 2c88aa4e (#169 plus #170) and b53f94fa (#167). Compared all source, RPC/HTTP/query-pattern guidance and query-usability regressions against 2c88aa4e: unchanged. Both input ownership and stream guarantees retained; ADR 0014 remains accepted and ADR 0037 intact.",
+        "Frozen pnpm 12.15.0 installation and preparation passed; actual SDK launcher reports @effect/tsgo 0.67.3, TSRS 0.21.0-ts7.1.0-beta, TypeScript 7.1.0-beta, revision 3e9236361fa9; --listFilesOnly locates bundled matching TSRS standard libraries. Root compiler API/minimum is TypeScript 5.9.3; Astro retains 6.0.3.",
+        "vp run toolchain-check passes identity and nonzero TS2322, floatingEffect and type-aware require-await rejection. Uncached strict typecheck passes 211 files; effect-check passes. Scoped test passes 343 cases in 15 files plus current/minimum public and server-local fixtures. Package TSRS declaration production, ATTW and publint pass.",
+        "Packed framework-types passes Vue/Solid/Svelte/Angular on both compilers. Packed effect-compatibility passes public compiler fixtures and 163 runtime cases each at Effect 4.0.6 and 4.1.0. Sequential vite-react-build, tanstack-start-build and docs-build pass; docs check includes 21 excerpt cases, Astro 0 errors/warnings/hints, 59 pages and valid internal links.",
+        "Inspected skill entry, six references and all three planning documents: domain map retains input and stream coverage plus compiler-role clarification; skill_spec retains #167/#169/#170 cumulative histories. Existing skill_tree paths, source globs, prerequisites and reference inventory remain accurate without changes. Intent sync no-op; one skill structurally validates. Scoped format, shellcheck, shfmt and relaxed YAML validation pass.",
+        "Prior #167 macOS arm64 LSP protocol evidence retained in 167-result.md; GUI SDK attachment/extension exclusivity, Windows/Linux/running container, fresh consumer-agent discovery and browser E2E remain unverified. Optional Fallow transitive TypeScript 7.0.2 remains an upstream limitation; no active repository compiler selection uses it. Full architecture review and integrated browser/performance acceptance remain parent scope. No research review outcome recorded."
       ]
     },
     "source:tests/framework-consumers/pnpm-workspace.yaml": {
@@ -2991,6 +3008,108 @@
       "reason": "Patch release note describes internal stable Query Core integration and unchanged stream semantics. Existing query-patterns guidance was reconciled in the owning skill review; the release note requires no independently discoverable skill.",
       "evidence": [
         ".changeset/tidy-stream-execution.md; src/core/streamed-query.ts; 801 runtime tests and 301 post-merge stream cases pass; package validation passes"
+      ]
+    },
+    "source:.devcontainer/setup.sh": {
+      "fingerprint": "ab462642d75b0bdb6cb22447898bc1042215ddb972bb1e3757170cd32123b0dd",
+      "snapshot": {
+        ".devcontainer/setup.sh": "59adc905479a134b250e9ce1b103ff5de3f4401e394c0eec69afb69469a9abf1"
+      },
+      "head": "3a0d99ccb798198ad0c29f234ed763bc30ad37b1",
+      "outcome": "no-change",
+      "reason": "Owned #167 contributor tooling/configuration source implements the explicit pinned TSRS launcher, source-only declarations, editor SDK or isolated compiler install. It introduces no independent consumer task needing a new shipped skill; compiler-role guidance is reconciled in the existing framework reference and planning record.",
+      "evidence": [
+        "Base 15a618a; implementation e92d584; latest integration dbb64e8 merged at 3a0d99c.",
+        "Post-merge vp run check and effect-check pass; vp run test passes 801 tests including both public/server-local compilers.",
+        "vp run toolchain-check rejects TS2322, floatingEffect and require-await; TSRS identity 0.21.0 / TypeScript 7.1.0-beta / @effect/tsgo 0.67.3.",
+        "Packed four-framework and Effect floor/current checks pass on TSRS and TypeScript 5.9; declarations pass ATTW/publint. Application and docs checks/build pass before merge; repeated affected checks recorded in /tmp/effect-api-query-spec-166/167-result.md.",
+        "macOS arm64 LSP protocol initialization, unsaved didOpen/didChange diagnostics, hover, definition, Effect actions pass. Graphical VS Code, Linux/Windows/container and fresh consumer-agent discovery remain unverified.",
+        "shellcheck and shfmt -i 2 -sr pass; YAML relaxed style with existing long-line convention passes. Fallow optional dependency retains upstream TypeScript 7.0.2."
+      ]
+    },
+    "source:.vscode/settings.json": {
+      "fingerprint": "76e481e56d228b0b0c8dce4045c5256a83d1216839b0ddc70dbc8bed4a7ec7b7",
+      "snapshot": {
+        ".vscode/settings.json": "aa8f95a691d9437e380f926b7602435664d05c8944ff66792fbe9e3ebfa56017"
+      },
+      "head": "3a0d99ccb798198ad0c29f234ed763bc30ad37b1",
+      "outcome": "no-change",
+      "reason": "Owned #167 contributor tooling/configuration source implements the explicit pinned TSRS launcher, source-only declarations, editor SDK or isolated compiler install. It introduces no independent consumer task needing a new shipped skill; compiler-role guidance is reconciled in the existing framework reference and planning record.",
+      "evidence": [
+        "Base 15a618a; implementation e92d584; latest integration dbb64e8 merged at 3a0d99c.",
+        "Post-merge vp run check and effect-check pass; vp run test passes 801 tests including both public/server-local compilers.",
+        "vp run toolchain-check rejects TS2322, floatingEffect and require-await; TSRS identity 0.21.0 / TypeScript 7.1.0-beta / @effect/tsgo 0.67.3.",
+        "Packed four-framework and Effect floor/current checks pass on TSRS and TypeScript 5.9; declarations pass ATTW/publint. Application and docs checks/build pass before merge; repeated affected checks recorded in /tmp/effect-api-query-spec-166/167-result.md.",
+        "macOS arm64 LSP protocol initialization, unsaved didOpen/didChange diagnostics, hover, definition, Effect actions pass. Graphical VS Code, Linux/Windows/container and fresh consumer-agent discovery remain unverified.",
+        "shellcheck and shfmt -i 2 -sr pass; YAML relaxed style with existing long-line convention passes. Fallow optional dependency retains upstream TypeScript 7.0.2."
+      ]
+    },
+    "source:.vscode/tsdk/tsgo": {
+      "fingerprint": "e08dda1391449fc7f3e09c97e472874854c9121b74d35968443c2f62f9033ed2",
+      "snapshot": {
+        ".vscode/tsdk/tsgo": "744fe9cc21b3d4720bd0cd9c7cbaedf097c287d08de8c80211259fb49c8ed548"
+      },
+      "head": "3a0d99ccb798198ad0c29f234ed763bc30ad37b1",
+      "outcome": "no-change",
+      "reason": "Owned #167 contributor tooling/configuration source implements the explicit pinned TSRS launcher, source-only declarations, editor SDK or isolated compiler install. It introduces no independent consumer task needing a new shipped skill; compiler-role guidance is reconciled in the existing framework reference and planning record.",
+      "evidence": [
+        "Base 15a618a; implementation e92d584; latest integration dbb64e8 merged at 3a0d99c.",
+        "Post-merge vp run check and effect-check pass; vp run test passes 801 tests including both public/server-local compilers.",
+        "vp run toolchain-check rejects TS2322, floatingEffect and require-await; TSRS identity 0.21.0 / TypeScript 7.1.0-beta / @effect/tsgo 0.67.3.",
+        "Packed four-framework and Effect floor/current checks pass on TSRS and TypeScript 5.9; declarations pass ATTW/publint. Application and docs checks/build pass before merge; repeated affected checks recorded in /tmp/effect-api-query-spec-166/167-result.md.",
+        "macOS arm64 LSP protocol initialization, unsaved didOpen/didChange diagnostics, hover, definition, Effect actions pass. Graphical VS Code, Linux/Windows/container and fresh consumer-agent discovery remain unverified.",
+        "shellcheck and shfmt -i 2 -sr pass; YAML relaxed style with existing long-line convention passes. Fallow optional dependency retains upstream TypeScript 7.0.2."
+      ]
+    },
+    "source:.vscode/tsdk/tsgo.cmd": {
+      "fingerprint": "167654a77c9a26eea63271ea93a914477ae3a1fc45f134664b79b85f2aacac6a",
+      "snapshot": {
+        ".vscode/tsdk/tsgo.cmd": "44dc3392a8ed7a2ff51d830f9050807529217274b18b39bd9b3f07972fcc73c5"
+      },
+      "head": "3a0d99ccb798198ad0c29f234ed763bc30ad37b1",
+      "outcome": "no-change",
+      "reason": "Owned #167 contributor tooling/configuration source implements the explicit pinned TSRS launcher, source-only declarations, editor SDK or isolated compiler install. It introduces no independent consumer task needing a new shipped skill; compiler-role guidance is reconciled in the existing framework reference and planning record.",
+      "evidence": [
+        "Base 15a618a; implementation e92d584; latest integration dbb64e8 merged at 3a0d99c.",
+        "Post-merge vp run check and effect-check pass; vp run test passes 801 tests including both public/server-local compilers.",
+        "vp run toolchain-check rejects TS2322, floatingEffect and require-await; TSRS identity 0.21.0 / TypeScript 7.1.0-beta / @effect/tsgo 0.67.3.",
+        "Packed four-framework and Effect floor/current checks pass on TSRS and TypeScript 5.9; declarations pass ATTW/publint. Application and docs checks/build pass before merge; repeated affected checks recorded in /tmp/effect-api-query-spec-166/167-result.md.",
+        "macOS arm64 LSP protocol initialization, unsaved didOpen/didChange diagnostics, hover, definition, Effect actions pass. Graphical VS Code, Linux/Windows/container and fresh consumer-agent discovery remain unverified.",
+        "shellcheck and shfmt -i 2 -sr pass; YAML relaxed style with existing long-line convention passes. Fallow optional dependency retains upstream TypeScript 7.0.2."
+      ]
+    },
+    "source:docs/agents/toolchain.md": {
+      "fingerprint": "7342ef4cbe669ddf2f3c0d71e771801506716d3ed991dfa91bdecd92eb6a21a2",
+      "snapshot": {
+        "docs/agents/toolchain.md": "1c5f95c8a489b75cd5f9582f1e5b6ad5fe2413070dbc84984ec21cd5dbb063d6"
+      },
+      "head": "3a0d99ccb798198ad0c29f234ed763bc30ad37b1",
+      "outcome": "no-change",
+      "reason": "Owned #167 contributor tooling/configuration source implements the explicit pinned TSRS launcher, source-only declarations, editor SDK or isolated compiler install. It introduces no independent consumer task needing a new shipped skill; compiler-role guidance is reconciled in the existing framework reference and planning record.",
+      "evidence": [
+        "Base 15a618a; implementation e92d584; latest integration dbb64e8 merged at 3a0d99c.",
+        "Post-merge vp run check and effect-check pass; vp run test passes 801 tests including both public/server-local compilers.",
+        "vp run toolchain-check rejects TS2322, floatingEffect and require-await; TSRS identity 0.21.0 / TypeScript 7.1.0-beta / @effect/tsgo 0.67.3.",
+        "Packed four-framework and Effect floor/current checks pass on TSRS and TypeScript 5.9; declarations pass ATTW/publint. Application and docs checks/build pass before merge; repeated affected checks recorded in /tmp/effect-api-query-spec-166/167-result.md.",
+        "macOS arm64 LSP protocol initialization, unsaved didOpen/didChange diagnostics, hover, definition, Effect actions pass. Graphical VS Code, Linux/Windows/container and fresh consumer-agent discovery remain unverified.",
+        "shellcheck and shfmt -i 2 -sr pass; YAML relaxed style with existing long-line convention passes. Fallow optional dependency retains upstream TypeScript 7.0.2."
+      ]
+    },
+    "source:tsconfig.declarations.json": {
+      "fingerprint": "047b6a7c1393d49b95b82bdff4ec22f9751494bbd213a0b244889beb9392d8e4",
+      "snapshot": {
+        "tsconfig.declarations.json": "9f1f89980e0c0033533c64fbb111a52169e9b7a63be0af2c6d55f8c2035bf150"
+      },
+      "head": "3a0d99ccb798198ad0c29f234ed763bc30ad37b1",
+      "outcome": "no-change",
+      "reason": "Owned #167 contributor tooling/configuration source implements the explicit pinned TSRS launcher, source-only declarations, editor SDK or isolated compiler install. It introduces no independent consumer task needing a new shipped skill; compiler-role guidance is reconciled in the existing framework reference and planning record.",
+      "evidence": [
+        "Base 15a618a; implementation e92d584; latest integration dbb64e8 merged at 3a0d99c.",
+        "Post-merge vp run check and effect-check pass; vp run test passes 801 tests including both public/server-local compilers.",
+        "vp run toolchain-check rejects TS2322, floatingEffect and require-await; TSRS identity 0.21.0 / TypeScript 7.1.0-beta / @effect/tsgo 0.67.3.",
+        "Packed four-framework and Effect floor/current checks pass on TSRS and TypeScript 5.9; declarations pass ATTW/publint. Application and docs checks/build pass before merge; repeated affected checks recorded in /tmp/effect-api-query-spec-166/167-result.md.",
+        "macOS arm64 LSP protocol initialization, unsaved didOpen/didChange diagnostics, hover, definition, Effect actions pass. Graphical VS Code, Linux/Windows/container and fresh consumer-agent discovery remain unverified.",
+        "shellcheck and shfmt -i 2 -sr pass; YAML relaxed style with existing long-line convention passes. Fallow optional dependency retains upstream TypeScript 7.0.2."
       ]
     }
   }

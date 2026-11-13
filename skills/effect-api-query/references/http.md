@@ -225,3 +225,5 @@ Return strict synchronous `JsonValue`. Preserve differences in body and content 
 Sources: [HTTP factory](https://ueberbrot.github.io/effect-api-query/reference/http-factory/), [HTTP builders](https://ueberbrot.github.io/effect-api-query/reference/http-builders/).
 
 Metadata fetched through the generated query retains its sharing and freezing guarantees when observers rebuild options during a pending fetch. Manual cache writes and hydrated envelopes follow the documented local policy and remain application-owned. Do not assume a fresh imperative cache hit installs new options.
+
+Ordinary and prepared options retain decoded request input for later execution. Keep nested mutable values unchanged; frozen canonical keys do not freeze execution input. Rebuild options when input changes. HTTP builders do not apply RPC constructor defaults: supply decoded defaults explicitly. Preparation errors throw synchronously before execution. For repeated builders and configured copies, read [prepared-input ownership](query-patterns.md#prepare-a-reused-input).

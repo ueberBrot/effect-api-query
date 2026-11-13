@@ -15,6 +15,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import manifest from "../package.json" with { type: "json" };
+import { compilerCommand, currentCompiler } from "./compiler.mts";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const workspace = readFileSync(path.join(root, "pnpm-workspace.yaml"), "utf-8");
@@ -181,14 +182,14 @@ try {
       resolvedEffect.includes(`/effect@${version}/`),
       "The packed library must resolve the selected Effect peer."
     );
-    for (const compiler of ["typescript", "typescript-5.9"]) {
+    for (const compiler of ["current", "minimum"] as const) {
       console.log(
-        `Checking public compiler fixtures: Effect ${version}, ${compiler}`
+        `Checking public compiler fixtures: Effect ${version}, ${compiler} ${compiler === "current" ? JSON.stringify(currentCompiler) : "TypeScript 5.9.3"}`
       );
       execFileSync(
         process.execPath,
         [
-          path.join(consumer, "node_modules", compiler, "bin/tsc"),
+          ...compilerCommand(consumer, compiler),
           "--project",
           "tests/types/tsconfig.json",
           "--pretty",
