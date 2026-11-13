@@ -15,16 +15,13 @@ import type {
 } from "@tanstack/query-core";
 import { Context, Effect } from "effect";
 
-import { isEffectHttpApiQueryError } from "../http/errors";
-import { isEffectRpcQueryError } from "../rpc/errors";
-
 /** The existing application cache; providing it does not acquire or dispose resources. */
 export class QueryClientService extends Context.Service<
   QueryClientService,
   QueryClient
 >()("@ueberbrot/effect-api-query/QueryClientService") {}
 
-/** A callback, runner or native QueryClient failure without a generated failed Exit. */
+/** A native QueryClient failure retaining the exact rejected value. */
 export class QueryClientOperationError extends Error {
   readonly _tag = "QueryClientOperationError";
   override readonly cause: unknown;
@@ -35,21 +32,14 @@ export class QueryClientOperationError extends Error {
   }
 }
 
-const wait = <A, E>(
+const wait = <A>(
   run: () => Promise<A>
-): Effect.Effect<A, E | QueryClientOperationError> =>
+): Effect.Effect<A, QueryClientOperationError> =>
   Effect.tryPromise({
-    // Deliberately ignore the waiter's AbortSignal: QueryClient owns shared execution.
+    // QueryClient owns shared execution; interruption stops only this wait.
     try: run,
-    catch: (error) => {
-      if (isEffectRpcQueryError(error) || isEffectHttpApiQueryError(error)) {
-        // SAFETY: Generated options declare these failed-Exit wrappers as TError.
-        // As with native QueryClient, callers must preserve the options' error contract.
-        // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-        return error as E;
-      }
-      return new QueryClientOperationError(error);
-    },
+    // Promise rejection carries no proof of the current options' declared error type.
+    catch: (cause) => new QueryClientOperationError(cause),
   });
 
 const getData = Effect.fnUntraced(function* getData<
@@ -97,9 +87,9 @@ const fetch = Effect.fnUntraced(function* fetch<
   K extends QueryKey = QueryKey,
 >(
   options: FetchQueryOptions<A, E, A, K>
-): Effect.fn.Return<A, E | QueryClientOperationError, QueryClientService> {
+): Effect.fn.Return<A, QueryClientOperationError, QueryClientService> {
   const client = yield* QueryClientService;
-  return yield* wait<A, E>(async () => await client.fetchQuery(options));
+  return yield* wait<A>(async () => await client.fetchQuery(options));
 });
 
 const ensure = Effect.fnUntraced(function* ensure<
@@ -108,9 +98,9 @@ const ensure = Effect.fnUntraced(function* ensure<
   K extends QueryKey = QueryKey,
 >(
   options: EnsureQueryDataOptions<A, E, A, K>
-): Effect.fn.Return<A, E | QueryClientOperationError, QueryClientService> {
+): Effect.fn.Return<A, QueryClientOperationError, QueryClientService> {
   const client = yield* QueryClientService;
-  return yield* wait<A, E>(async () => await client.ensureQueryData(options));
+  return yield* wait<A>(async () => await client.ensureQueryData(options));
 });
 
 const invalidate = Effect.fnUntraced(function* invalidate(

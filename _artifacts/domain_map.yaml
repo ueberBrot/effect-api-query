@@ -216,6 +216,11 @@ skills:
       - library: TanStack Query
       - library: Effect
 tensions:
+  - name: Declared failures and native promise rejection
+    skills:
+      - effect-api-query
+    description: Generated options declare native error types, but Promise rejections and deduplicated execution do not establish the current failed Exit or its payload.
+    implication: Handle queryEffects failures through QueryClientOperationError and preserve its unknown original cause, including complete execution wrappers.
   - name: Library contracts and application workflows
     skills:
       - effect-api-query

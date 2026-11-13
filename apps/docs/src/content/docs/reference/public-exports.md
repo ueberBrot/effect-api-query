@@ -8,7 +8,7 @@ The package root, `@ueberbrot/effect-api-query`, exports all supported values an
 | Export | Purpose |
 | --- | --- |
 | `queryEffects`, `QueryClientService` | Compose native cache operations in Effect with the existing application QueryClient. |
-| `QueryClientOperationError` | Retains runner, callback and native failures without a generated failed Exit. |
+| `QueryClientOperationError` | Retains exact native rejections, including execution wrappers, as an unknown cause. |
 | `acquireQueryOwner`, `QueryOwner`, `QueryOwnerSetup` | Opt in to acquired/borrowed resource setup, guarded cache callbacks and local query/mutation retirement. |
 | `configureUtils` | Configure policies and ordered interceptors on a tree, branch, or leaf. |
 | `UtilsConfiguration`, `ConfiguredUtils` | Type scoped configuration and the configured utility tree. |
