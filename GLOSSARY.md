@@ -57,3 +57,5 @@ These terms describe how the package builds TanStack Query utilities from Effect
 **Query owner**: An opt-in application lifetime with an independent native QueryClient, explicitly acquired resources, and registered work. Retirement stops admission, aborts queries, drains registered local work, and releases acquired resources. Borrowed resources remain caller-owned. _Avoid_: Generated client, mutation cancellation
 
 **Recovery cursor**: The last locally accepted event position in one stream consumption. Numeric convenience uses increasing nonnegative safe integers; an application cursor policy defines acceptance and optional gap detection for other protocols. It is attempt-local resume state outside semantic query identity, not a durable acknowledgement or downstream processing checkpoint.
+
+**Loader descriptor**: A transferable strict-JSON selection of one generated operation, query view, compatibility identifier and explicitly encoded input, with canonical input identity. Rebinding validates it and prepares the input for the receiving ready-client owner. It contains no query data or prepared-input token. _Avoid_: Hydration snapshot, authorization token

@@ -68,3 +68,34 @@ export const prepareInput = <Leaf extends { readonly key: () => QueryKey }>(
   values.set(token, { owner: owner.input, input: prepared.input, keyValue });
   return token;
 };
+
+/** Descriptor rebinding creates a fresh token owned only by the receiving leaf. */
+export const descriptorInput = (
+  key: () => QueryKey,
+  // oxlint-disable-next-line anti-slop/no-unknown-parameters
+  input: unknown
+) => {
+  if (Predicate.isObject(input) && values.has(input)) {
+    throw new TypeError(
+      "Descriptors require input values, not prepared tokens"
+    );
+  }
+  const owner = owners.get(key);
+  if (owner === undefined) {
+    throw new TypeError("Descriptors require a generated query leaf");
+  }
+  if (owner.input._tag === "Inputless") {
+    return { token: undefined, identity: null };
+  }
+  const prepared = owner.input.prepare(input, owner.encoder);
+  const identity = canonicalize(prepared.keyValue);
+  const token = Object.freeze({
+    "~effect-api-query/PreparedInput": Object.freeze({}),
+  });
+  values.set(token, {
+    owner: owner.input,
+    input: prepared.input,
+    keyValue: identity,
+  });
+  return { token, identity };
+};

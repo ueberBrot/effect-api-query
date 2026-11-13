@@ -274,6 +274,10 @@ export default defineConfig({
                   slug: "guides/hydrate-query-views",
                 },
                 {
+                  label: "Transfer Loader Selections",
+                  slug: "guides/loader-descriptors",
+                },
+                {
                   label: "Stream Snapshots",
                   slug: "guides/stream-snapshots",
                 },

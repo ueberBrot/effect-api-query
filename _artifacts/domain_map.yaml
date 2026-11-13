@@ -29,6 +29,7 @@ skills:
       - Stream snapshots and request cleanup
       - Optimistic overlap, event refresh, and owner replacement
       - DTO and rich-value hydration with typed view registration
+      - Loader selections with explicit input codecs and owner validation
       - Native provider setup, Suspense recovery, reactive accessors, and host boundaries
     tasks:
       - Compose typed reads, ensure, cache updates and generated filter invalidation in Effect using an explicit existing QueryClient service; interrupt waiters without cancelling shared execution.

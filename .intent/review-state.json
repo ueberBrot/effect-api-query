@@ -3,9 +3,9 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "dbe1fc968f9d5994c6b0e63838b97ff805de300c47056a08e18a1e8ff8368a36",
+      "fingerprint": "fb3c0c822cc1cbe89388ad0cbd004a6d9ebc2a89239aa4b5ac5a816ee8c686ab",
       "snapshot": {
-        "GLOSSARY.md": "1caf855a606847e46e31200b90df6077d7a84de114e213b011bf27e432989252",
+        "GLOSSARY.md": "46dbb34263cba0eed072a74dad59b635ff339758dd9ef3c18da51be4fb10b328",
         "README.md": "9cc3275039f58de12efe6a19ea5ec5e23a56126cfeb81cf35480ae5ac147f1da",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "83a6aab512d66893237aa3ba45bf52b23712b88d829d83992509c2f3c822c18b",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "eb226d096cee825aa2a7c2e49370208d6110662c3acf681fa4b95f8b6caca0d7",
@@ -33,6 +33,7 @@
         "apps/docs/src/content/docs/guides/http-queries-and-mutations.md": "6986c0a13febe76c0d9433336c567b3336df54ed480d05d25e053abf54d97d69",
         "apps/docs/src/content/docs/guides/hydrate-query-views.md": "5afe7566eb36187c613a58e272de32383027e7765b3f19d9c1bbb5894cc606af",
         "apps/docs/src/content/docs/guides/hydrate-unary-data.md": "37d4ff8c5f6fc0b687c01685657d64dc4d136622c51e03a6b9c015bf1f00dc07",
+        "apps/docs/src/content/docs/guides/loader-descriptors.md": "163c74f04f595350b4067ffec5659def6ad22e1adc93cb0de5d8c84620625509",
         "apps/docs/src/content/docs/guides/mutations.md": "14eab9a6ef28b6cdb4368766e543d83abcb59b50008ba570d1a3092851ee368d",
         "apps/docs/src/content/docs/guides/optimistic-writes.md": "309964011fd58b301387c485eba621d06a3a73f3ddd0114918fd94f8d654e17d",
         "apps/docs/src/content/docs/guides/pagination.md": "335599f80e8c311c3d755ee0d339a4f66738d7af5643168c4909d56ad003625d",
@@ -65,7 +66,7 @@
         "apps/docs/src/content/docs/reference/http-builders.md": "34d2fb026e5620878d21211f97dedfa7bec376e2267b9aab1088e759b5a20e9b",
         "apps/docs/src/content/docs/reference/http-factory.md": "676cad558cef9c5bb53c4c0626a1d67a6430d92f7a48fb6322821b4ac1bd686b",
         "apps/docs/src/content/docs/reference/performance.md": "e7809f71ac9d4dfc7ed55f16a3049dbb7331e73728b7ec20f9ffff3a5c77a7ae",
-        "apps/docs/src/content/docs/reference/public-exports.md": "81497bd0c491d293dff1def4b8f9c2194370a583ea34772b7cb57ac63375e646",
+        "apps/docs/src/content/docs/reference/public-exports.md": "76174fb0b1dc2130d20e6b4387426fa54389cca7a81cd10e2c2179f84088ddd9",
         "apps/docs/src/content/docs/reference/type-inference.md": "a60819bcd3b5f7887efe97c1e6aabfdcf1822197abdd209b9d3820d33f4428b5",
         "docs/adr/0001-target-effect-4-release-candidate.md": "f8152332adf7278911e3b4e119d6079a444b01db840f225b62b1a05cd5ecf4f2",
         "docs/adr/0002-let-call-sites-choose-query-or-mutation.md": "ac6c71c1ab7fec80e50d843e92ac1d1b00c573fe8bf4ede0c4914f1711198c4d",
@@ -187,7 +188,7 @@
         "skills/effect-api-query/references/cache-workflows.md": "12d9fe16435efc62a371298495af63403e80e86afc1bfc7a21c479d6597c5f4c",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "0b693d32832b1a5d742ee33eab7e6769be81deaa614f216bb9a547c4cde48335",
         "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
-        "skills/effect-api-query/references/hydration-and-ssr.md": "30aeb844f4b4f7c3c6a5a70f4ecbfabbdfb7b332c62105b4ecad182238d38705",
+        "skills/effect-api-query/references/hydration-and-ssr.md": "84afe3e53b268d5313e5b9e97485da9c47b9e159d84b15b2dad4c34ad1791be4",
         "skills/effect-api-query/references/query-patterns.md": "00b09057dfaed46a3129f9f88312d77c5965be48d5e7b1ed586a39ef526d9f24",
         "skills/effect-api-query/references/rpc.md": "cdbc026d1d29c486b28a2b9fc6a330bcc8855b5887f0f454f73ce261734e8e7e",
         "src/core/branch-filter.ts": "71a8c6039f1775881bbc00d92e14e2ef823bf7150721307a74f16a1579bccc86",
@@ -202,7 +203,8 @@
         "src/core/metadata-query.ts": "b7cc903f800a3723d931623d420abcfec6ef65bf757fddbf2cf5a36c4c52ded9",
         "src/core/operation.ts": "166ed139d6a6be3a3df0ce6b60ed01e71dcfa6075091a18f1869808355838cfc",
         "src/core/policy.ts": "ced3a6fdf1ab7e273eb518700a42d68b4823abdb1088fae6855424e4e479ded4",
-        "src/core/prepared-input.ts": "0f09acf6e7c52ac24f586e22013758927b930d05f7a966708238efceb0a909f4",
+        "src/core/prepared-input.ts": "bb445d76482c47d88e67cc0862470415dec30f72ccdd2ffa15e77d988377c3c9",
+        "src/core/query-descriptor.ts": "93d639a2c2a4a0be8c5e9ff4ce3c4b4fcb0044222b9ae719c05f318012da9dcc",
         "src/core/query-effects.ts": "af269881229597833776919a2227f7ed03748fb7deb0e4df39dedb1668728584",
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
         "src/core/query-owner.ts": "da9715879195454960142fb6a7a92bf96e754b5241a73fbbf2c8b6d0b13e5bcb",
@@ -222,7 +224,7 @@
         "src/http/request.ts": "4dced85460db56cb83514486417e17dd4a35629ad28749a2ac01dadbe45113b3",
         "src/http/streamed-query.ts": "27d1f5418009216d960816485cfd7f1760a8e3f638ccb9ac8dfa5fc040b1564a",
         "src/http/types.ts": "37be5b08898b0f12c460f7954f243b1ae12c1d903376428c77c34b8b2ca90b4f",
-        "src/index.ts": "7478bc6cb4ab3715c1ac8b606bd5064a492fc14ff6cc0e635041261ed32c3c10",
+        "src/index.ts": "4031cd9b2e90b87fb4c4967348f82c38e0f0c5cc1800b719f0f56a237886b1eb",
         "src/rpc/create-utils.ts": "8ebf030b0f76f91c248434c169d789d6328d2ba43c07afe15e04db0a02f05c2c",
         "src/rpc/errors.ts": "8e1fbcc7843b2bf99e9d80bfd365dc118d52351909d5c8f48c46ba9d39fdedd3",
         "src/rpc/operation.ts": "ac10df77707045d22c2d58ff0f776362a7fb5ce03e179c10238c42320ad6f719",
@@ -244,7 +246,7 @@
         "tests/create-rpc-query-utils-streaming.test.ts": "6f0fccd52258df72d1bb471bd04873426708209fa48e0b9c3a0c831d9002f5a1",
         "tests/create-rpc-query-utils-structural-sharing.test.ts": "1698a72dcfde4aaabac4161193fc0379c445f8a8be61d47d29797a315b66b06f",
         "tests/create-rpc-query-utils.test.ts": "b6ccee687718bbd528819f497ba2ac09acfe06a1400c5bb38b863eb082f0776f",
-        "tests/docs-examples.test.ts": "5fed140e40ea6bd5d9ddbcc0aeedbd8cc0cd9ad9035e5178410e7727da0455bf",
+        "tests/docs-examples.test.ts": "7ccd7f6a44ce065a230818e2c30d9e36a3268b1781099bbb9d698c4f21a174af",
         "tests/docs-release.test.ts": "089218597c9c8c9fdce5037b0537426a232ef7466e697d683bc32fb7d4492ae8",
         "tests/execution-interceptor.test.ts": "9c8a26e24cdd5807a4dca68bfdd88663246b3a5632483581ec3cbd4cdcf69b9a",
         "tests/fixtures/async.ts": "c72af69141ce4f2dd4e9b63910ed20378e546dcd015a2d7befacd439ba4a006e",
@@ -277,6 +279,7 @@
         "tests/hydration-codecs.test.ts": "67a0a8e1e7ab78ba4cfb2f44b188a4001669584134ac21f0eb8bc03f993ee4ad",
         "tests/live-coalescing.test.ts": "e5456fa321374e61dfef6992ebc706c9c558803795393b55da10e33c926bf413",
         "tests/publication-deadline.test.ts": "2797557ff14bf8527ea446cec1e1d7c61cd3666f11f127e640c53ce5d7e30868",
+        "tests/query-descriptor.test.ts": "06d75566bf89bf30bbac8bddacd0b6eccedc9b054b2fd5c00ca1323156274e50",
         "tests/query-effects.test.ts": "007793129802f9adb3547446d6f70a8885a80050e5b728d907ae47abe0446db6",
         "tests/query-filter.test.ts": "ff531a86816872cd2cadf01d79bd9d9ff5be1895bab150330a90aa8375508004",
         "tests/query-owner.test.ts": "0c46e34994c81de588e9b470b698a2c232729992676faa2c4595f9f9f3086c99",
@@ -299,6 +302,7 @@
         "tests/types/docs-hydration-dto.ts": "65b61e5a18619aa600ade5626a83112c04608c08adcdd147f743bc6ae724f1ef",
         "tests/types/docs-hydration-rich.ts": "af96271b8d9516c5ad6e55a6742fba02b487910fce7906af92bee813e14f267b",
         "tests/types/docs-hydration-views.ts": "4c6e04cd4c5266bf9b0a78adabc36fa78aac956752faaa3e6a5dce912b962c47",
+        "tests/types/docs-loader-descriptors.tsx": "09a68ff742feba106e2e66ddfc34bdea66b71be37d83e642bd632c61797ef1e7",
         "tests/types/docs-opaque-recovery.ts": "88e2c2764ccd8195f65c4f46ff891a8487fe8b3740376239d5385fa9b7aea8ce",
         "tests/types/docs-policies.ts": "416116e0f87d8c5a3e2b3b32c89df84f2ca73d155b3c1c1c67e981e45280eec5",
         "tests/types/docs-react-client.ts": "1960f15857fc260324a4c1b20cd8830af4dad73e9b7952e6181ad7228fabcbd7",
@@ -332,6 +336,7 @@
         "tests/types/interceptor-contract.ts": "14814393d97b03b55b8a8e84014e24f0f6fc1003e71c2d832a8d643320c5ea18",
         "tests/types/live-coalescing-contract.ts": "c476bfec4ff03244a35938e0bc168894e917ab9e723536e2b759e0002a3ce836",
         "tests/types/public-contract.ts": "4bd0b76f7fe62a2e52de29c81061487a18b71aa3920ae824d8f48b0f71f749c4",
+        "tests/types/query-descriptor-contract.tsx": "69778926de40f7c16db2d8a699edd29e6631d87ae32127487b0b62bdadc36bb9",
         "tests/types/query-effects-contract.ts": "8fefb99b919529cc3608f2c043d4f3e486a4f75471d0f1d4a054a7a96184b2a8",
         "tests/types/query-filter-contract.ts": "89977942cf8942af10535fb2ec4a4ab679d920a7d226ef26616faaf518b9a6e9",
         "tests/types/query-owner-contract.ts": "ee2e9b80bc711832e708796a4588a81ae65983cecaf0ddfd2d2f443f236f0a34",
@@ -350,23 +355,23 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "c23eecab4a337c7c75e19f382d98b143fe679f8b",
+      "head": "d33ef99fadf38eb3822701f6747b7314e97b34d3",
       "outcome": "updated",
-      "reason": "Integrated opt-in Schema sharing with explicit immutable decoded-atom equivalence and native overrides; preserved lifecycle/Effect bridge exports, guidance and histories. Audited full #172 prose/comments; removed two redundant source comments and one repeated guide sentence, preserving contracts and compiler directives.",
+      "reason": "Extend existing hydration owner guidance for transferable loader selections and receiving-owner prepared input; retain one skill and six references.",
       "evidence": [
-        "Expected integration c23eecab and ticket 219ccd1; actual full ticket diff and merged source/guidance/planning inspected.",
-        "172-merge-tests.log: 34 native cached-reference/rich/class-state/override/metadata plus owner/bridge tests pass; serial package/declarations/ATTW/publint and public/server-local fixtures pass pinned TSRS and TS5.9.3.",
-        "172-merge-typecheck.log: strict typed check passes 219 files. 172-merge-effect-check.log passes; 172-merge-docs-check.log: 22 excerpts/Astro zero errors/warnings/hints. Scoped format/YAML pass.",
-        "Writing-policy and clear-writing/readability/writing-clearly-and-concisely/writing-for-agents applied; runtime code unchanged by prose corrections. Fresh consumer discovery, independent Astra acceptance/architecture/final review remain unverified and parent-owned. Machine-local original measurements inspected; no speed/end-to-end claim."
+        "d33ef99 base; src/core/query-descriptor.ts and src/core/prepared-input.ts actual diff reviewed",
+        "45 scoped public/native hydration tests pass; TSRS 0.21.0 and TypeScript5.9.3 public/server-local fixtures pass",
+        "Strict typed check 221 files, Effect check, 23 matched documentation excerpts/Astro, package attw/publint pass",
+        "skills validation passes; fresh consumer discovery unverified because agents prohibited"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "b0774a5ca3dd8617736d2f642cc976f04d09c2a361a576241af8d33625f1135a",
+      "fingerprint": "4c68b18e0401301321720881d038e843ab596ba4b14a8ac47c8c638043fe3b0b",
       "snapshot": {
-        "GLOSSARY.md": "1caf855a606847e46e31200b90df6077d7a84de114e213b011bf27e432989252",
+        "GLOSSARY.md": "46dbb34263cba0eed072a74dad59b635ff339758dd9ef3c18da51be4fb10b328",
         "README.md": "9cc3275039f58de12efe6a19ea5ec5e23a56126cfeb81cf35480ae5ac147f1da",
-        "_artifacts/domain_map.yaml": "2f036555f54606934b365004acdb8529df4e1bee89258b94b1b407a3bd84d95a",
-        "_artifacts/skill_spec.md": "ab54dd6a0e003ee9cb9103e42bf4b802a46d0395b629cecd6c7ae1b70e91d8db",
+        "_artifacts/domain_map.yaml": "9650580324d85787fdba9301ccf735a10f1822804f5d1fe759f0b419f9199855",
+        "_artifacts/skill_spec.md": "f0d5617f28a5bd8f2027be26ffddab1c814c63537435c968f9bb53e31afb7edf",
         "_artifacts/skill_tree.yaml": "cab1e054da917dfb6b8990f53abe0535d1dd69ba76311ec0fcc503a52f1d308d",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "83a6aab512d66893237aa3ba45bf52b23712b88d829d83992509c2f3c822c18b",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "eb226d096cee825aa2a7c2e49370208d6110662c3acf681fa4b95f8b6caca0d7",
@@ -394,6 +399,7 @@
         "apps/docs/src/content/docs/guides/http-queries-and-mutations.md": "6986c0a13febe76c0d9433336c567b3336df54ed480d05d25e053abf54d97d69",
         "apps/docs/src/content/docs/guides/hydrate-query-views.md": "5afe7566eb36187c613a58e272de32383027e7765b3f19d9c1bbb5894cc606af",
         "apps/docs/src/content/docs/guides/hydrate-unary-data.md": "37d4ff8c5f6fc0b687c01685657d64dc4d136622c51e03a6b9c015bf1f00dc07",
+        "apps/docs/src/content/docs/guides/loader-descriptors.md": "163c74f04f595350b4067ffec5659def6ad22e1adc93cb0de5d8c84620625509",
         "apps/docs/src/content/docs/guides/mutations.md": "14eab9a6ef28b6cdb4368766e543d83abcb59b50008ba570d1a3092851ee368d",
         "apps/docs/src/content/docs/guides/optimistic-writes.md": "309964011fd58b301387c485eba621d06a3a73f3ddd0114918fd94f8d654e17d",
         "apps/docs/src/content/docs/guides/pagination.md": "335599f80e8c311c3d755ee0d339a4f66738d7af5643168c4909d56ad003625d",
@@ -426,7 +432,7 @@
         "apps/docs/src/content/docs/reference/http-builders.md": "34d2fb026e5620878d21211f97dedfa7bec376e2267b9aab1088e759b5a20e9b",
         "apps/docs/src/content/docs/reference/http-factory.md": "676cad558cef9c5bb53c4c0626a1d67a6430d92f7a48fb6322821b4ac1bd686b",
         "apps/docs/src/content/docs/reference/performance.md": "e7809f71ac9d4dfc7ed55f16a3049dbb7331e73728b7ec20f9ffff3a5c77a7ae",
-        "apps/docs/src/content/docs/reference/public-exports.md": "81497bd0c491d293dff1def4b8f9c2194370a583ea34772b7cb57ac63375e646",
+        "apps/docs/src/content/docs/reference/public-exports.md": "76174fb0b1dc2130d20e6b4387426fa54389cca7a81cd10e2c2179f84088ddd9",
         "apps/docs/src/content/docs/reference/type-inference.md": "a60819bcd3b5f7887efe97c1e6aabfdcf1822197abdd209b9d3820d33f4428b5",
         "docs/adr/0001-target-effect-4-release-candidate.md": "f8152332adf7278911e3b4e119d6079a444b01db840f225b62b1a05cd5ecf4f2",
         "docs/adr/0002-let-call-sites-choose-query-or-mutation.md": "ac6c71c1ab7fec80e50d843e92ac1d1b00c573fe8bf4ede0c4914f1711198c4d",
@@ -548,7 +554,7 @@
         "skills/effect-api-query/references/cache-workflows.md": "12d9fe16435efc62a371298495af63403e80e86afc1bfc7a21c479d6597c5f4c",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "0b693d32832b1a5d742ee33eab7e6769be81deaa614f216bb9a547c4cde48335",
         "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
-        "skills/effect-api-query/references/hydration-and-ssr.md": "30aeb844f4b4f7c3c6a5a70f4ecbfabbdfb7b332c62105b4ecad182238d38705",
+        "skills/effect-api-query/references/hydration-and-ssr.md": "84afe3e53b268d5313e5b9e97485da9c47b9e159d84b15b2dad4c34ad1791be4",
         "skills/effect-api-query/references/query-patterns.md": "00b09057dfaed46a3129f9f88312d77c5965be48d5e7b1ed586a39ef526d9f24",
         "skills/effect-api-query/references/rpc.md": "cdbc026d1d29c486b28a2b9fc6a330bcc8855b5887f0f454f73ce261734e8e7e",
         "src/core/branch-filter.ts": "71a8c6039f1775881bbc00d92e14e2ef823bf7150721307a74f16a1579bccc86",
@@ -563,7 +569,8 @@
         "src/core/metadata-query.ts": "b7cc903f800a3723d931623d420abcfec6ef65bf757fddbf2cf5a36c4c52ded9",
         "src/core/operation.ts": "166ed139d6a6be3a3df0ce6b60ed01e71dcfa6075091a18f1869808355838cfc",
         "src/core/policy.ts": "ced3a6fdf1ab7e273eb518700a42d68b4823abdb1088fae6855424e4e479ded4",
-        "src/core/prepared-input.ts": "0f09acf6e7c52ac24f586e22013758927b930d05f7a966708238efceb0a909f4",
+        "src/core/prepared-input.ts": "bb445d76482c47d88e67cc0862470415dec30f72ccdd2ffa15e77d988377c3c9",
+        "src/core/query-descriptor.ts": "93d639a2c2a4a0be8c5e9ff4ce3c4b4fcb0044222b9ae719c05f318012da9dcc",
         "src/core/query-effects.ts": "af269881229597833776919a2227f7ed03748fb7deb0e4df39dedb1668728584",
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
         "src/core/query-owner.ts": "da9715879195454960142fb6a7a92bf96e754b5241a73fbbf2c8b6d0b13e5bcb",
@@ -583,7 +590,7 @@
         "src/http/request.ts": "4dced85460db56cb83514486417e17dd4a35629ad28749a2ac01dadbe45113b3",
         "src/http/streamed-query.ts": "27d1f5418009216d960816485cfd7f1760a8e3f638ccb9ac8dfa5fc040b1564a",
         "src/http/types.ts": "37be5b08898b0f12c460f7954f243b1ae12c1d903376428c77c34b8b2ca90b4f",
-        "src/index.ts": "7478bc6cb4ab3715c1ac8b606bd5064a492fc14ff6cc0e635041261ed32c3c10",
+        "src/index.ts": "4031cd9b2e90b87fb4c4967348f82c38e0f0c5cc1800b719f0f56a237886b1eb",
         "src/rpc/create-utils.ts": "8ebf030b0f76f91c248434c169d789d6328d2ba43c07afe15e04db0a02f05c2c",
         "src/rpc/errors.ts": "8e1fbcc7843b2bf99e9d80bfd365dc118d52351909d5c8f48c46ba9d39fdedd3",
         "src/rpc/operation.ts": "ac10df77707045d22c2d58ff0f776362a7fb5ce03e179c10238c42320ad6f719",
@@ -605,7 +612,7 @@
         "tests/create-rpc-query-utils-streaming.test.ts": "6f0fccd52258df72d1bb471bd04873426708209fa48e0b9c3a0c831d9002f5a1",
         "tests/create-rpc-query-utils-structural-sharing.test.ts": "1698a72dcfde4aaabac4161193fc0379c445f8a8be61d47d29797a315b66b06f",
         "tests/create-rpc-query-utils.test.ts": "b6ccee687718bbd528819f497ba2ac09acfe06a1400c5bb38b863eb082f0776f",
-        "tests/docs-examples.test.ts": "5fed140e40ea6bd5d9ddbcc0aeedbd8cc0cd9ad9035e5178410e7727da0455bf",
+        "tests/docs-examples.test.ts": "7ccd7f6a44ce065a230818e2c30d9e36a3268b1781099bbb9d698c4f21a174af",
         "tests/docs-release.test.ts": "089218597c9c8c9fdce5037b0537426a232ef7466e697d683bc32fb7d4492ae8",
         "tests/execution-interceptor.test.ts": "9c8a26e24cdd5807a4dca68bfdd88663246b3a5632483581ec3cbd4cdcf69b9a",
         "tests/fixtures/async.ts": "c72af69141ce4f2dd4e9b63910ed20378e546dcd015a2d7befacd439ba4a006e",
@@ -638,6 +645,7 @@
         "tests/hydration-codecs.test.ts": "67a0a8e1e7ab78ba4cfb2f44b188a4001669584134ac21f0eb8bc03f993ee4ad",
         "tests/live-coalescing.test.ts": "e5456fa321374e61dfef6992ebc706c9c558803795393b55da10e33c926bf413",
         "tests/publication-deadline.test.ts": "2797557ff14bf8527ea446cec1e1d7c61cd3666f11f127e640c53ce5d7e30868",
+        "tests/query-descriptor.test.ts": "06d75566bf89bf30bbac8bddacd0b6eccedc9b054b2fd5c00ca1323156274e50",
         "tests/query-effects.test.ts": "007793129802f9adb3547446d6f70a8885a80050e5b728d907ae47abe0446db6",
         "tests/query-filter.test.ts": "ff531a86816872cd2cadf01d79bd9d9ff5be1895bab150330a90aa8375508004",
         "tests/query-owner.test.ts": "0c46e34994c81de588e9b470b698a2c232729992676faa2c4595f9f9f3086c99",
@@ -660,6 +668,7 @@
         "tests/types/docs-hydration-dto.ts": "65b61e5a18619aa600ade5626a83112c04608c08adcdd147f743bc6ae724f1ef",
         "tests/types/docs-hydration-rich.ts": "af96271b8d9516c5ad6e55a6742fba02b487910fce7906af92bee813e14f267b",
         "tests/types/docs-hydration-views.ts": "4c6e04cd4c5266bf9b0a78adabc36fa78aac956752faaa3e6a5dce912b962c47",
+        "tests/types/docs-loader-descriptors.tsx": "09a68ff742feba106e2e66ddfc34bdea66b71be37d83e642bd632c61797ef1e7",
         "tests/types/docs-opaque-recovery.ts": "88e2c2764ccd8195f65c4f46ff891a8487fe8b3740376239d5385fa9b7aea8ce",
         "tests/types/docs-policies.ts": "416116e0f87d8c5a3e2b3b32c89df84f2ca73d155b3c1c1c67e981e45280eec5",
         "tests/types/docs-react-client.ts": "1960f15857fc260324a4c1b20cd8830af4dad73e9b7952e6181ad7228fabcbd7",
@@ -693,6 +702,7 @@
         "tests/types/interceptor-contract.ts": "14814393d97b03b55b8a8e84014e24f0f6fc1003e71c2d832a8d643320c5ea18",
         "tests/types/live-coalescing-contract.ts": "c476bfec4ff03244a35938e0bc168894e917ab9e723536e2b759e0002a3ce836",
         "tests/types/public-contract.ts": "4bd0b76f7fe62a2e52de29c81061487a18b71aa3920ae824d8f48b0f71f749c4",
+        "tests/types/query-descriptor-contract.tsx": "69778926de40f7c16db2d8a699edd29e6631d87ae32127487b0b62bdadc36bb9",
         "tests/types/query-effects-contract.ts": "8fefb99b919529cc3608f2c043d4f3e486a4f75471d0f1d4a054a7a96184b2a8",
         "tests/types/query-filter-contract.ts": "89977942cf8942af10535fb2ec4a4ab679d920a7d226ef26616faaf518b9a6e9",
         "tests/types/query-owner-contract.ts": "ee2e9b80bc711832e708796a4588a81ae65983cecaf0ddfd2d2f443f236f0a34",
@@ -711,27 +721,26 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "c23eecab4a337c7c75e19f382d98b143fe679f8b",
+      "head": "d33ef99fadf38eb3822701f6747b7314e97b34d3",
       "outcome": "updated",
-      "reason": "Domain map and cumulative skill_spec retain Schema-sharing, lifecycle and Effect bridge coverage/history. Existing one-skill/six-reference tree and source globs cover every addition; tree unchanged and Intent sync no-op. Prose audit preserves technical conditions and existing directives.",
+      "reason": "Domain map adds loader selection coverage and skill spec records the feature and limits. Existing skill tree globs cover runtime, tests, guide and reference; no new reference or skill is necessary. Prior history retained.",
       "evidence": [
-        "Expected integration c23eecab and ticket 219ccd1; actual full ticket diff and merged source/guidance/planning inspected.",
-        "172-merge-tests.log: 34 native cached-reference/rich/class-state/override/metadata plus owner/bridge tests pass; serial package/declarations/ATTW/publint and public/server-local fixtures pass pinned TSRS and TS5.9.3.",
-        "172-merge-typecheck.log: strict typed check passes 219 files. 172-merge-effect-check.log passes; 172-merge-docs-check.log: 22 excerpts/Astro zero errors/warnings/hints. Scoped format/YAML pass.",
-        "Writing-policy and clear-writing/readability/writing-clearly-and-concisely/writing-for-agents applied; runtime code unchanged by prose corrections. Fresh consumer discovery, independent Astra acceptance/architecture/final review remain unverified and parent-owned. Machine-local original measurements inspected; no speed/end-to-end claim."
+        "_artifacts/domain_map.yaml",
+        "_artifacts/skill_spec.md",
+        "_artifacts/skill_tree.yaml inspected; intent sync no-op; skill validation passes"
       ]
     },
     "source:vite.config.ts": {
-      "fingerprint": "f469045498131d122a9dc1899fc0475bb3ef08ec668d0e0e816725a41d899f34",
+      "fingerprint": "344467f40466937bb00706b8d44eea331cd189eb4acc98fd445c0ca8e6e7dc91",
       "snapshot": {
-        "vite.config.ts": "4225aa62cc74ceb707fd5554e7029492c2d93bac9b9dda1dcaf29e87885465d3"
+        "vite.config.ts": "5719d6581c917287d6e9223cdd110266395a43d4cb495eaa8255a809b791a613"
       },
-      "head": "e781e664066e816588650d35bbef808d512c160f",
+      "head": "d33ef99fadf38eb3822701f6747b7314e97b34d3",
       "outcome": "no-change",
-      "reason": "Extend the existing unknown-boundary lint exemption only to the native unknown-to-unknown sharing callback; no Vite+ task or consumer guidance changes.",
+      "reason": "Release note declares additive behavior, navigation exposes the complete guide, and pinned compiler/lint configs admit the new RPC/HTTP integration test under the existing unstable API allowance. Owning hydration reference covers the behavior; these files need no separate skill.",
       "evidence": [
-        "git diff c1662be -- vite.config.ts",
-        "Strict type-aware lint and Effect check pass; frozen dependency pins unchanged."
+        "Actual staged source diff inspected",
+        "Package validation, strict typed check, Effect check and docs-check pass"
       ]
     },
     "source:.github/workflows/release.yml": {
@@ -788,15 +797,16 @@
       ]
     },
     "source:tsconfig.json": {
-      "fingerprint": "560ba298020cb41d598231ddaac3c92285465505cf45d3659bbd263512f8659b",
+      "fingerprint": "34667ca3ec4539ad78d57c1faf95867f2cf998bc27bbdafb1f514c6dac21d599",
       "snapshot": {
-        "tsconfig.json": "f617d9af39f7eb0bbdeefd61d646735d5447fad545d58831b8d3aab76152343b"
+        "tsconfig.json": "7daf16bb8853b9e2f163ff292492737fad217070d23e00d77b2edfbf7d9e340f"
       },
-      "head": "97a8cc5e722a0b94c1241b28f8ac7f4d202a2321",
+      "head": "d33ef99fadf38eb3822701f6747b7314e97b34d3",
       "outcome": "no-change",
-      "reason": "Reviewed combined config: guide navigation plus exact unstable RPC example/test exclusions, including accepted live-coalescing test. Existing compiler engine, correctness diagnostics and task interfaces remain unchanged.",
+      "reason": "Release note declares additive behavior, navigation exposes the complete guide, and pinned compiler/lint configs admit the new RPC/HTTP integration test under the existing unstable API allowance. Owning hydration reference covers the behavior; these files need no separate skill.",
       "evidence": [
-        "git diff HEAD -- apps/docs/astro.config.mts tsconfig.json vite.config.ts; post-merge typecheck/Effect check/docs build pass; framework/tooling guidance remains accurate."
+        "Actual staged source diff inspected",
+        "Package validation, strict typed check, Effect check and docs-check pass"
       ]
     },
     "source:.fallowrc.jsonc": {
@@ -1249,15 +1259,16 @@
       ]
     },
     "source:apps/docs/astro.config.mts": {
-      "fingerprint": "355d54fe2e35b22cdabed05bc1eaeb21e3789fb91ab967c6373a07c66a322273",
+      "fingerprint": "f26328c12116cb5e127dc2619dcdba57ac87ccd3e8e5aadf8b104b1e2f5af008",
       "snapshot": {
-        "apps/docs/astro.config.mts": "4e694ec8e9d3c84bde9f119166be8b8152c39c3cf674923e5b2bda38042a3142"
+        "apps/docs/astro.config.mts": "ef64c84db7e611b1c469631871ea91d2570ef2aa38425ad03bf000ef1de5691f"
       },
-      "head": "97a8cc5e722a0b94c1241b28f8ac7f4d202a2321",
+      "head": "d33ef99fadf38eb3822701f6747b7314e97b34d3",
       "outcome": "no-change",
-      "reason": "Reviewed combined config: guide navigation plus exact unstable RPC example/test exclusions, including accepted live-coalescing test. Existing compiler engine, correctness diagnostics and task interfaces remain unchanged.",
+      "reason": "Release note declares additive behavior, navigation exposes the complete guide, and pinned compiler/lint configs admit the new RPC/HTTP integration test under the existing unstable API allowance. Owning hydration reference covers the behavior; these files need no separate skill.",
       "evidence": [
-        "git diff HEAD -- apps/docs/astro.config.mts tsconfig.json vite.config.ts; post-merge typecheck/Effect check/docs build pass; framework/tooling guidance remains accurate."
+        "Actual staged source diff inspected",
+        "Package validation, strict typed check, Effect check and docs-check pass"
       ]
     },
     "source:docs/adr/0016-automate-releases-with-changesets.md": {
@@ -3188,6 +3199,19 @@
       "evidence": [
         ".changeset/schema-reference-sharing.md",
         "No package publication or version mutation performed."
+      ]
+    },
+    "source:.changeset/typed-loader-selections.md": {
+      "fingerprint": "ec417855968209334823e924f969999b74a7a11d95c4294f7ba8cf604bfc9ab4",
+      "snapshot": {
+        ".changeset/typed-loader-selections.md": "06a1ed6e2e16ebb5a8b0b27db47be7ab97f49b6cd9e432b96d035cc0261ba5b3"
+      },
+      "head": "d33ef99fadf38eb3822701f6747b7314e97b34d3",
+      "outcome": "no-change",
+      "reason": "Release note declares additive behavior, navigation exposes the complete guide, and pinned compiler/lint configs admit the new RPC/HTTP integration test under the existing unstable API allowance. Owning hydration reference covers the behavior; these files need no separate skill.",
+      "evidence": [
+        "Actual staged source diff inspected",
+        "Package validation, strict typed check, Effect check and docs-check pass"
       ]
     }
   }
