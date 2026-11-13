@@ -311,7 +311,7 @@ it.effect(
         Number.NaN,
         2_147_483_648,
       ]) {
-        expect(() => leaf.liveKey({ coalesceMs })).toThrow(RangeError);
+        expect(() => leaf.liveKey({ coalesceMs })).toThrow("coalesceMs");
         expect(() => leaf.liveOptions({ coalesceMs })).toThrow(RangeError);
       }
       expect(leaf.liveKey({ coalesceMs: undefined })).toStrictEqual(

@@ -29,8 +29,12 @@ export type StreamQueryPolicy =
 
 // oxlint-disable-next-line anti-slop/no-unknown-parameters
 const validatePublicationDeadline: (
-  value: unknown
-) => asserts value is number | undefined = (publicationMaxWaitMs) => {
+  value: unknown,
+  option?: string
+) => asserts value is number | undefined = (
+  publicationMaxWaitMs,
+  option = "publicationMaxWaitMs"
+) => {
   if (
     publicationMaxWaitMs !== undefined &&
     (!Predicate.isNumber(publicationMaxWaitMs) ||
@@ -38,9 +42,7 @@ const validatePublicationDeadline: (
       publicationMaxWaitMs <= 0 ||
       publicationMaxWaitMs > 2_147_483_647)
   ) {
-    throw new RangeError(
-      "publicationMaxWaitMs must be an integer from 1 to 2147483647"
-    );
+    throw new RangeError(`${option} must be an integer from 1 to 2147483647`);
   }
 };
 
@@ -100,7 +102,7 @@ export const prepareStreamPolicy = (
       publicationMaxWaitMs,
     };
   } else {
-    validatePublicationDeadline(options["coalesceMs"]);
+    validatePublicationDeadline(options["coalesceMs"], "coalesceMs");
     policy = { _tag: "Live", coalesceMs: options["coalesceMs"] };
   }
   delete options["coalesceMs"];
