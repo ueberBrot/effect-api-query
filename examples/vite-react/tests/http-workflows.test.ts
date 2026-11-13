@@ -133,6 +133,24 @@ describe("runnable HTTP workflows", () => {
     }
   );
 
+  it("marks a cached document stale after recovered notifications", async () => {
+    await withApplication(async (application) => {
+      const { http, queryClient } = application;
+      await queryClient.query(http.documents.read.queryOptions());
+      const consumption = application.consume(
+        recoveredEvents(application, "normal", {
+          event: () => {},
+          state: () => {},
+          refresh: () => {},
+        })
+      );
+      await consumption.done;
+      expect(
+        queryClient.getQueryState(http.documents.read.queryKey())?.isInvalidated
+      ).toBe(true);
+    });
+  });
+
   it("receives multipart files and enforces the server-side file limit", async () => {
     await withApplication(async ({ http, queryClient }, baseUrl) => {
       const mutation = new MutationObserver(

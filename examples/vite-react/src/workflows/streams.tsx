@@ -47,7 +47,7 @@ export const StreamsExample = ({
       <p>
         Both formats carry the same eight decoded updates. History retains four
         values and publishes batches of three or after 180 ms. The latest-value
-        view updates on each event.
+        view publishes immediately, then coalesces updates for 250 ms.
       </p>
       <label className="grid gap-1">
         HTTP stream format

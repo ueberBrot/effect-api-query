@@ -9,6 +9,25 @@ import {
   tanStackStartApplication,
 } from "./example-application.ts";
 
+test("the featured loader descriptor hydrates without a browser RPC", async ({
+  page,
+}) => {
+  const browserReads: string[] = [];
+  page.on("request", (request) => {
+    if (recordsRpc(request.postData(), "users.get")) {
+      browserReads.push(request.url());
+    }
+  });
+  await page.goto(`${tanStackStartApplication.url}/details`);
+  await expect(
+    page.getByRole("heading", { name: "Featured user" })
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Ada Lovelace" })
+  ).toBeVisible();
+  expect(browserReads).toStrictEqual([]);
+});
+
 test("Start rejects an oversized upload before the sender ends the request", async () => {
   // oxlint-disable-next-line promise/avoid-new
   const status = await new Promise<number | undefined>((resolve, reject) => {

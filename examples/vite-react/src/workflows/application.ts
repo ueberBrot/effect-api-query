@@ -1,6 +1,7 @@
 import { workflowsApi } from "@effect-api-query/contracts";
-import { QueryClient } from "@tanstack/react-query";
 import {
+  acquireQueryOwner,
+  defineUtilsPolicy,
   configureUtils,
   createHttpApiQueryUtils,
 } from "@ueberbrot/effect-api-query";
@@ -9,10 +10,20 @@ import { FetchHttpClient } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
 
 export const startHttpWorkflows = async (baseUrl: string) => {
-  const runtime = ManagedRuntime.make(FetchHttpClient.layer);
-  const queryClient = new QueryClient({
-    defaultOptions: { mutations: { networkMode: "always" } },
-  });
+  const owner = await acquireQueryOwner(
+    async (setup) => {
+      const runtime = await setup.acquire(
+        () => ManagedRuntime.make(FetchHttpClient.layer),
+        async (acquired) => acquired.dispose()
+      );
+      return { runtime };
+    },
+    {
+      defaultOptions: { mutations: { networkMode: "always" } },
+    }
+  );
+  const { queryClient } = owner;
+  const { runtime } = owner.resources;
   const pending = new Set<Promise<unknown>>();
   const consumers = new Set<AbortController>();
   let closing = false;
@@ -39,29 +50,31 @@ export const startHttpWorkflows = async (baseUrl: string) => {
     const client = await runtime.runPromise(
       HttpApiClient.make(workflowsApi, { baseUrl })
     );
-    const http = configureUtils(
-      createHttpApiQueryUtils(workflowsApi, {
-        client,
-        keyPrefix: ["http-workflows"],
-        runPromiseExit: runtime.runPromiseExit,
-      }),
-      {
-        query: { policy: { retry: false }, interceptors: [intercept] },
-        metadata: { policy: { retry: false }, interceptors: [intercept] },
-        infinite: { policy: { retry: false }, interceptors: [intercept] },
-        live: { policy: { retry: false }, interceptors: [intercept] },
-        streamed: {
-          policy: {
-            retry: false,
-            maxChunks: 4,
-            publicationBatchSize: 3,
-            publicationMaxWaitMs: 180,
-          },
-          interceptors: [intercept],
+    const base = createHttpApiQueryUtils(workflowsApi, {
+      client,
+      keyPrefix: ["http-workflows"],
+      runPromiseExit: owner.wrapRunner(runtime.runPromiseExit),
+    });
+    const policy = defineUtilsPolicy<typeof base>()({
+      query: { policy: { retry: false }, interceptors: [intercept] },
+      metadata: { policy: { retry: false }, interceptors: [intercept] },
+      infinite: { policy: { retry: false }, interceptors: [intercept] },
+      live: {
+        policy: { retry: false, coalesceMs: 250 },
+        interceptors: [intercept],
+      },
+      streamed: {
+        policy: {
+          retry: false,
+          maxChunks: 4,
+          publicationBatchSize: 3,
+          publicationMaxWaitMs: 180,
         },
-        mutation: { policy: { retry: false }, interceptors: [intercept] },
-      }
-    );
+        interceptors: [intercept],
+      },
+      mutation: { policy: { retry: false }, interceptors: [intercept] },
+    });
+    const http = configureUtils(base, policy);
     const drainMutations = Effect.callback<boolean>((resume) => {
       const cache = queryClient.getMutationCache();
       const check = () => {
@@ -78,6 +91,7 @@ export const startHttpWorkflows = async (baseUrl: string) => {
       return Effect.sync(unsubscribe);
     });
     return {
+      owner,
       client,
       http,
       queryClient,
@@ -115,14 +129,14 @@ export const startHttpWorkflows = async (baseUrl: string) => {
             await runtime.runPromise(drainMutations);
           } finally {
             queryClient.clear();
-            await runtime.dispose();
+            await owner.dispose();
           }
         })();
         return disposal;
       },
     };
   } catch (error) {
-    await runtime.dispose();
+    await owner.dispose();
     throw error;
   }
 };

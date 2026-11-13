@@ -16,6 +16,7 @@ import { Route as FailureRouteImport } from './routes/failure'
 import { Route as HttpRouteImport } from './routes/http'
 import { Route as HttpFailureRouteImport } from './routes/http-failure'
 import { Route as RpcRouteImport } from './routes/rpc'
+import { Route as WorkflowsRouteImport } from './routes/workflows'
 import { Route as ApiSplatRouteImport } from './routes/api.$'
 
 const IndexRoute = IndexRouteImport.update({
@@ -53,6 +54,11 @@ const RpcRoute = RpcRouteImport.update({
   path: '/rpc',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WorkflowsRoute = WorkflowsRouteImport.update({
+  id: '/workflows',
+  path: '/workflows',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiSplatRoute = ApiSplatRouteImport.update({
   id: '/api/$',
   path: '/api/$',
@@ -67,6 +73,7 @@ export interface FileRoutesByFullPath {
   '/http': typeof HttpRoute
   '/http-failure': typeof HttpFailureRoute
   '/rpc': typeof RpcRoute
+  '/workflows': typeof WorkflowsRoute
   '/api/$': typeof ApiSplatRoute
 }
 export interface FileRoutesByTo {
@@ -77,6 +84,7 @@ export interface FileRoutesByTo {
   '/http': typeof HttpRoute
   '/http-failure': typeof HttpFailureRoute
   '/rpc': typeof RpcRoute
+  '/workflows': typeof WorkflowsRoute
   '/api/$': typeof ApiSplatRoute
 }
 export interface FileRoutesById {
@@ -88,6 +96,7 @@ export interface FileRoutesById {
   '/http': typeof HttpRoute
   '/http-failure': typeof HttpFailureRoute
   '/rpc': typeof RpcRoute
+  '/workflows': typeof WorkflowsRoute
   '/api/$': typeof ApiSplatRoute
 }
 export interface FileRouteTypes {
@@ -100,6 +109,7 @@ export interface FileRouteTypes {
     | '/http'
     | '/http-failure'
     | '/rpc'
+    | '/workflows'
     | '/api/$'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -110,6 +120,7 @@ export interface FileRouteTypes {
     | '/http'
     | '/http-failure'
     | '/rpc'
+    | '/workflows'
     | '/api/$'
   id:
     | '__root__'
@@ -120,6 +131,7 @@ export interface FileRouteTypes {
     | '/http'
     | '/http-failure'
     | '/rpc'
+    | '/workflows'
     | '/api/$'
   fileRoutesById: FileRoutesById
 }
@@ -131,6 +143,7 @@ export interface RootRouteChildren {
   HttpRoute: typeof HttpRoute
   HttpFailureRoute: typeof HttpFailureRoute
   RpcRoute: typeof RpcRoute
+  WorkflowsRoute: typeof WorkflowsRoute
   ApiSplatRoute: typeof ApiSplatRoute
 }
 
@@ -185,6 +198,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RpcRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/workflows': {
+      id: '/workflows'
+      path: '/workflows'
+      fullPath: '/workflows'
+      preLoaderRoute: typeof WorkflowsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$': {
       id: '/api/$'
       path: '/api/$'
@@ -203,6 +223,7 @@ const rootRouteChildren: RootRouteChildren = {
   HttpRoute: HttpRoute,
   HttpFailureRoute: HttpFailureRoute,
   RpcRoute: RpcRoute,
+  WorkflowsRoute: WorkflowsRoute,
   ApiSplatRoute: ApiSplatRoute,
 }
 export const routeTree = rootRouteImport
