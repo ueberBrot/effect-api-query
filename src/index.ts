@@ -92,3 +92,5 @@ export { prepareInput } from "./core/prepared-input";
 export type { PreparedInput } from "./core/prepared-input";
 export { consumeEvents } from "./core/consume-events";
 export type { ConsumeEventsOptions } from "./core/consume-events";
+export { acquireQueryOwner } from "./core/query-owner";
+export type { QueryOwner, QueryOwnerSetup } from "./core/query-owner";

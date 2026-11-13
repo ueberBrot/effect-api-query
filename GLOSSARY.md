@@ -53,3 +53,5 @@ These terms describe how the package builds TanStack Query utilities from Effect
 **Configuration error**: An error that rejects invalid utility configuration during preparation or execution. _Avoid_: RPC execution error
 
 **Key-generation error**: A synchronous error that occurs while the package derives canonical cache identity from RPC payload constructor input or HTTP request input. _Avoid_: RPC execution error, configuration error
+
+**Query owner**: An opt-in application lifetime with an independent native QueryClient, explicitly acquired resources, and registered work. Retirement stops admission, aborts queries, drains registered local work, and releases acquired resources. Borrowed resources remain caller-owned. _Avoid_: Generated client, mutation cancellation

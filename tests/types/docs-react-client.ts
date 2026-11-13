@@ -1,6 +1,8 @@
-import { QueryClient } from "@tanstack/react-query";
-import { createHttpApiQueryUtils } from "@ueberbrot/effect-api-query";
-import type { RunPromiseExit } from "@ueberbrot/effect-api-query";
+import {
+  acquireQueryOwner,
+  createHttpApiQueryUtils,
+  configureUtils,
+} from "@ueberbrot/effect-api-query";
 import { ManagedRuntime } from "effect";
 import { FetchHttpClient } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
@@ -8,47 +10,35 @@ import { HttpApiClient } from "effect/http-api";
 import { usersApi } from "./docs-readme-http-contract.ts";
 
 export const startUsersApplication = async (baseUrl: string) => {
-  const runtime = ManagedRuntime.make(FetchHttpClient.layer);
-  const running = new Set<Promise<unknown>>();
-  const runPromiseExit: RunPromiseExit = (effect, options) => {
-    const pending = runtime.runPromiseExit(effect, options);
-    running.add(pending);
-    void pending.then(
-      () => running.delete(pending),
-      () => running.delete(pending)
-    );
-    return pending;
-  };
-  try {
-    const client = await runtime.runPromise(
-      HttpApiClient.make(usersApi, { baseUrl })
-    );
-    const queryClient = new QueryClient();
-    const http = createHttpApiQueryUtils(usersApi, {
-      client,
-      keyPrefix: ["users-app"],
-      runPromiseExit,
-    });
-    return {
-      http,
-      queryClient,
-      dispose: async () => {
-        try {
-          await queryClient.cancelQueries();
-        } finally {
-          try {
-            await Promise.allSettled([...running]);
-          } finally {
-            queryClient.clear();
-            await runtime.dispose();
-          }
+  const owner = await acquireQueryOwner(
+    async (setup) => {
+      const runtime = await setup.acquire(
+        () => ManagedRuntime.make(FetchHttpClient.layer),
+        async (acquired) => acquired.dispose()
+      );
+      const client = await runtime.runPromise(
+        HttpApiClient.make(usersApi, { baseUrl })
+      );
+      return configureUtils(
+        createHttpApiQueryUtils(usersApi, {
+          client,
+          keyPrefix: ["users-app"],
+          runPromiseExit: setup.wrapRunner(runtime.runPromiseExit),
+        }),
+        {
+          query: {
+            interceptors: [async ({ next }) => await setup.runQuery(next)],
+          },
         }
-      },
-    };
-  } catch (error) {
-    await runtime.dispose();
-    throw error;
-  }
+      );
+    },
+    { defaultOptions: { queries: { retry: false } } }
+  );
+  return {
+    http: owner.resources,
+    queryClient: owner.queryClient,
+    dispose: owner.dispose,
+  };
 };
 
 export type UsersApplication = Awaited<
