@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "925cb5b14ad0bce8df560ef9e38e1319f67fbffaffa396e365690e7eef147bb3",
+      "fingerprint": "c4b1967b07e6e8118d51c5a23fc251d7875ee37a88e7a1f2ba3efc0812b720a6",
       "snapshot": {
         "GLOSSARY.md": "761f45c329b7a0ad74a0e067d123eec6118aab1d233abf98938fe42f44b4ae06",
         "README.md": "9cc3275039f58de12efe6a19ea5ec5e23a56126cfeb81cf35480ae5ac147f1da",
@@ -25,7 +25,7 @@
         "apps/docs/src/content/docs/guides/cache-filters.md": "b0b8a08b6e2f3484a2565b6bd6d080cd1e95b3e9aefcb5aaf121cd7a96ad2591",
         "apps/docs/src/content/docs/guides/cache-management.md": null,
         "apps/docs/src/content/docs/guides/cancellation.md": "7af74ddcb64ddc5454e3d8b4326a79b9683f1d744537c2b2f267e61a9447274b",
-        "apps/docs/src/content/docs/guides/choose-stream-history.md": "015ecea83c4d31c210be07ad35e528349d3e952c53f1e8a17e9f425ec949cc6e",
+        "apps/docs/src/content/docs/guides/choose-stream-history.md": "b87b3b305e4c524291afdfd532cc60de7e62b452e1b41a6e83de8651813ecfd3",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "cb941076de91c32bc0a1a5e8f6463ea521457210c00ccf4ef4e7de7c5fd135e9",
         "apps/docs/src/content/docs/guides/custom-key-encoders.md": "f1c27e412da1669b9c96c61c1a4fc882ce23516f254ed4d2a1766f017033148c",
         "apps/docs/src/content/docs/guides/handle-failures.md": "337c0146b06c6ee5d2a551af7cabf543dfaaa0b8bb13704bde77186d0d3ff571",
@@ -80,7 +80,7 @@
         "docs/adr/0012-normalize-undefined-query-success-to-null.md": "e07335454852d9ac3c8b2529ad414dbee59d57f2265ccf86b595e65092feb309",
         "docs/adr/0014-require-query-stable-payload-construction.md": "2c0a2fefeb20197712e85ca598e18c8a7d74b55f9cfbb74a0cfaf532f18aec04",
         "docs/adr/0015-centralize-the-toolchain-in-vite-plus.md": "038000cc6209bdde90aefbe55b238c69a71588d03335f9a9918645b834851491",
-        "docs/adr/0020-generate-accumulated-and-live-stream-queries.md": "e63962e33664722c53c87dab73c712df1a4fe3dcab27de340e1f212ff26796b3",
+        "docs/adr/0020-generate-accumulated-and-live-stream-queries.md": "26ae6c48dbeb80149816bb8d9fbd2edeea9d6aee15e105db6d830e4308915765",
         "docs/adr/0021-share-utility-construction-through-private-modules.md": "ad7db905318eea6b797d3295a0f3ab754a61f43df68f8503ce35b36068230578",
         "docs/adr/0022-add-buffered-http-utilities-with-separate-key-roots.md": "b1a8772e531b660925db6a1fe55942ee8c4c055a0d411271ce274954ca1c63be",
         "docs/adr/0023-expose-buffered-multipart-http-mutations.md": "74341a7ae3f1b22714280c27e511e0f2e9569e440987ed6e44f6b023b6514b1e",
@@ -96,7 +96,8 @@
         "docs/adr/0033-bound-effect-support-to-a-patch-line.md": "34209a3700272113c64ff39baf15e19bc5745b73b5a28157207c1c592df8fcd0",
         "docs/adr/0034-extend-http-stream-views-to-decoded-ndjson.md": "445ed1f9a4cb3a74938f2d01579e50c046a681aaa2dcd856ef9587c62aaa7cf2",
         "docs/adr/0035-use-effect-enhanced-tsrs-for-development.md": "1e1d668584239981375db7d4ff9722e53fd781e3a4b464be87bb64fb7258b69f",
-        "docs/adr/0037-own-stream-publication-through-query-core.md": "50033124148c7da78da23a9b4aa08241a66a6168d79319998534af8e0a38074b",
+        "docs/adr/0037-own-stream-publication-through-query-core.md": "a7800a9b941557bc34d3a3102e94d4227f8e5f31ff852b6830a33e12ac2ec553",
+        "docs/adr/0039-coalesce-live-snapshots-explicitly.md": "4d95533f87474e8a55a9a6a0f0339f375a7e5d242195e26e99c2d7e895171f02",
         "e2e/http-workflows.spec.ts": "f5729fd3707758508d85506a93a1f2560edfe1aad89c9bd200ec0c80a2ecb7cb",
         "examples/contracts/src/client.ts": "fdf559bf0a798c7ea7f7aee01967837e720f7727a1bd11978aec51aad59f00f2",
         "examples/contracts/src/contracts.ts": "74d69e1a07c0b32c2a48b8fed8cfceaac8844ead860fbd00b9e357657b39d88e",
@@ -173,7 +174,7 @@
         "scripts/compiler.mts": "c803e4897b4e07ef10fb9d216518aeeb9fc709e4e1559140dcb89c82b4bf35a2",
         "scripts/measure-bundles.mts": "5a033ce9f9a4cf414632b6f2781a50c0354f1cf9996791a547a5d53dbef66d7a",
         "scripts/measure-construction.mts": "2fbad4879fe77ff24234a6be5666047b41cc7c3fd5ce9143d640ef4b41a426bd",
-        "scripts/measure-streams.mts": "5f066efb508621f58067e333be174c850ab1bc0f45242c7695965d514b27366d",
+        "scripts/measure-streams.mts": "7416a13fe14c49d25f1b646c7f1d6c5a7bac7796dcfe71b15860d667a992326e",
         "scripts/measure-structural-sharing.mts": "d3e673fbebd3bc56e3c880b3387558963af59729f6ff2905c23a5845e8f95bf6",
         "scripts/measure-types.mts": "ca3f257b497eb23e748e54dc4e5ba36cb0fde1e55eb33c361fbb48f6fe3246e5",
         "scripts/performance/common.mts": "57a2003d9769d884d1a0884cab5449cfce79c40300de8d0202d3f1780d51c4f5",
@@ -186,11 +187,11 @@
         "skills/effect-api-query/references/frameworks-and-hosts.md": "17a04c2326fce96f4a9ec1c7415dd2e6ac05dc9a4ad854228c6d3132da262bc8",
         "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
         "skills/effect-api-query/references/hydration-and-ssr.md": "30aeb844f4b4f7c3c6a5a70f4ecbfabbdfb7b332c62105b4ecad182238d38705",
-        "skills/effect-api-query/references/query-patterns.md": "345355f40a521e7c3e6a43e3b8a0dd97694188459bc20929de85f5062c71b75a",
+        "skills/effect-api-query/references/query-patterns.md": "00b09057dfaed46a3129f9f88312d77c5965be48d5e7b1ed586a39ef526d9f24",
         "skills/effect-api-query/references/rpc.md": "cdbc026d1d29c486b28a2b9fc6a330bcc8855b5887f0f454f73ce261734e8e7e",
         "src/core/branch-filter.ts": "71a8c6039f1775881bbc00d92e14e2ef823bf7150721307a74f16a1579bccc86",
         "src/core/canonical-key.ts": "84e91000876a6795557aab39dcc5d44e328250bf9b30ad02fd67afd02f5003e9",
-        "src/core/configure-utils.ts": "31afe707e9ef3194f6b3a0ac888bb24583199a98e69ad1fcdaba4c76dea2ed60",
+        "src/core/configure-utils.ts": "885c67a94a49e01866eec22e1a1b125e90c169cfba299d5379b0e6ce7834b584",
         "src/core/configure.ts": "ea0d4073e4965198343a96498e7e55cf78f31c8af0ac30c23a82c4df0314576b",
         "src/core/consume-events.ts": "648144582c4bdbf4a9cb0d35ddc54327abbefc654f2d37b6154232bcd09a1752",
         "src/core/declared-error.ts": "a051225762704a9ae02bcc8f5559f5e9b45a29fcb48f25dde03be28e0abfe9a4",
@@ -205,11 +206,11 @@
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
         "src/core/schema-key.ts": "7dad2749d30f2ab828dbc7e96d6e1e2b32b6733450cb6dc734de607629d925f8",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
-        "src/core/stream-publication.ts": "5c0f53bc84e3bb53337b9e76ea7dcd2269f080e9b2a35ad9d3f4ecce341fa61d",
+        "src/core/stream-publication.ts": "e6a2fbded6ead8351c83fa3adabf84fb0d1b52d559e3d209a2831aca69d58e21",
         "src/core/stream-recovery.ts": "c2c53ed24c042c24a18b2379995107a09e3145080cc97597d7bb41d3a616d37e",
         "src/core/stream-snapshot.ts": "97fbb56308b2e2decacd86a02b3f0a3ced76692444ba25a7abaae05b442c233a",
-        "src/core/streamed-query.ts": "8188a6501a0dc5450b09098058f5e6a9bb2a8bc1427bd78cec5f447baba3ca59",
-        "src/core/types.ts": "8e20c35e9a4ad9193622359e10660b65d03b8bee51e685d75f2e29ac40bfae59",
+        "src/core/streamed-query.ts": "a44dbb1a17a0d266f9e38e6b819dff7dbc417821e14f089e8ed2825dfe763b23",
+        "src/core/types.ts": "422490951153897e129a2b79386f8c3aa56777926466cf57dc36ebfe5193c0c6",
         "src/core/utility-tree.ts": "7b113d01c672c1148d022556f72c6e8f49c5afc0170fc88dcff74008abed28f1",
         "src/core/view-prefix.ts": "dfc0d74a07c8afe3f63952d59c29088ba4afb45e11a402ef8b72c5e2282cb063",
         "src/http/create-utils.ts": "8d128bb9646e095456d3dcf696f1aa6e365d0de328df571c64eea7421935c9f5",
@@ -217,13 +218,13 @@
         "src/http/operation.ts": "4a3651be65fee9fc039c38c0f191ba6a79347a5bd45c3f233de7d90c12d8bf9c",
         "src/http/request.ts": "4dced85460db56cb83514486417e17dd4a35629ad28749a2ac01dadbe45113b3",
         "src/http/streamed-query.ts": "27d1f5418009216d960816485cfd7f1760a8e3f638ccb9ac8dfa5fc040b1564a",
-        "src/http/types.ts": "f6b248adf2c8705bfd2d9c6d301d4748a4c3cb66ad706b90ae6743540448f5c3",
+        "src/http/types.ts": "37be5b08898b0f12c460f7954f243b1ae12c1d903376428c77c34b8b2ca90b4f",
         "src/index.ts": "2aea6ce580b567a224fbd720c3743d1c57f172ee4856873dde4fec6896f4e2af",
         "src/rpc/create-utils.ts": "8ebf030b0f76f91c248434c169d789d6328d2ba43c07afe15e04db0a02f05c2c",
         "src/rpc/errors.ts": "8e1fbcc7843b2bf99e9d80bfd365dc118d52351909d5c8f48c46ba9d39fdedd3",
         "src/rpc/operation.ts": "ac10df77707045d22c2d58ff0f776362a7fb5ce03e179c10238c42320ad6f719",
         "src/rpc/streamed-query.ts": "cf80fac99983903e6ab60aeecc5fe3cf1a0208b26143cc6f588c615d728f2ee7",
-        "src/rpc/types.ts": "3d113d88ba6fbf6277eb86eb760283eac51107d91901e2b88f67a9a36fee839c",
+        "src/rpc/types.ts": "5c77358187150d34209bdbffda162b3a5ecd3108662e0e29aeee6ddd23dbfd80",
         "tests/cache-recipes.test.ts": "fb95bbbba35f8bcf9661c993a61385f3186d935bb5626da6181d8ce9e6a9a49e",
         "tests/configuration-composition.test.ts": "0ffea269ad7701576f9e882c28ec602eb9714d72f7a3898aa0192376d5f59be0",
         "tests/contract-reuse.test.ts": "ef45d0a7116c56bdff46decb93cb4cd8f55baa1836edc0382434742f27249747",
@@ -271,6 +272,7 @@
         "tests/http-structural-sharing.test.ts": "35ea74a2711f56cd2001cd5a1f3ffe58f10f4ecbf094c0d4ce7d9e9a62dead42",
         "tests/http-transport-cancellation.test.ts": "0ba26a9bae56b26605fc03009c1f50fe90930356d0fa0c4ec4ddc5c120430f00",
         "tests/hydration-codecs.test.ts": "67a0a8e1e7ab78ba4cfb2f44b188a4001669584134ac21f0eb8bc03f993ee4ad",
+        "tests/live-coalescing.test.ts": "e5456fa321374e61dfef6992ebc706c9c558803795393b55da10e33c926bf413",
         "tests/publication-deadline.test.ts": "2797557ff14bf8527ea446cec1e1d7c61cd3666f11f127e640c53ce5d7e30868",
         "tests/query-effects.test.ts": "b95b283dd4cfa2f26f383301a379e0c8edc520d89eb4863b1675a1a3e75b3f2a",
         "tests/query-filter.test.ts": "ff531a86816872cd2cadf01d79bd9d9ff5be1895bab150330a90aa8375508004",
@@ -281,9 +283,9 @@
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
         "tests/skills/query-usability/grade.test.ts": "f3c2650deba0d887f66fb3b3afd284cd9baf562296f2984e5c84b014ecec8cbd",
         "tests/skills/query-usability/solution.ts": "38583676eaa2d33e8ca56c07a430e3a28787feae9d84c6d3612e01d6d7f1d80f",
-        "tests/stream-publication.test.ts": "c5176b80e4fdd4bd361b0675f599e8604b6f09582ec82b7569dd4fe28901953f",
+        "tests/stream-publication.test.ts": "57db2c6db5273a5c6789bb65dee2eeff5293eb98ee472fec102dffca984a65a6",
         "tests/stream-recovery.test.ts": "93e68be6631e0335129d9459e9989aff56e3431e8ece9540104278a8b5cc1cb1",
-        "tests/stream-snapshot.test.ts": "78d203b3e92b930122920824f4874876c3d16046e08c8d811f20953310c94fb7",
+        "tests/stream-snapshot.test.ts": "c001d7ad4dfbded79e2ee66b5595c2f23ea42c5a814c451d3ca154cc7ef07a67",
         "tests/types/docs-functionality.ts": "065ff9eac091e4a25c814e3e49b49d0f6258fffb7c5ed0661a1ec960b41ac0c0",
         "tests/types/docs-http-ndjson.ts": "a86513c1047b700ce27fc49b3d1fb31004cf745096d8403a0bdc780d95a448a3",
         "tests/types/docs-http-quick-start-contract.ts": "e034175f607fc9414e4919c6762a859e03908b0ee7ba77cb5dc6556b746ec26c",
@@ -317,13 +319,14 @@
         "tests/types/helper-contract.ts": "0021a5b845c65f608ed5dd429227752ceb32784e75c198b01868f017120a7aa1",
         "tests/types/http-contract.ts": "aec3b157d4f6a3a22e8e2cf39333caa8b9e41b01dac16c11f1f6c40a681ea1e3",
         "tests/types/http-empty-success-contract.ts": "00ccdb360edc598b9bc6c8a7708dab6b7ca85cf267ce7caa9a81a6b52f2868d5",
-        "tests/types/http-ndjson-contract.ts": "b2926d07a0d02c1575ba8c8de3425be1f6b058aa0b04ec2f2302862f4d74e695",
+        "tests/types/http-ndjson-contract.ts": "47d62788b90fb0f08faabe59646f10fc53fe54ef740cc4aaae9fb1c73e49f5f0",
         "tests/types/http-stream-contract.ts": "1bfaa95c6237341b8137e81f1b1ffa17e5374dca2407328b324d86b3080fd815",
         "tests/types/http-type-scale.ts": "447d34e1fa952c843a866fd4dcde80dd32390f7ff14ba701b1960f45bc1292ce",
         "tests/types/http-view-proof.ts": "0b66f30863c5451d47144980af9cf5517637c8f7ca7866b64d1a704cea089413",
         "tests/types/hydration-contract.ts": "fade858552c1b04fd45f48e86a42668a6132918196eca9089d56f1948551cd64",
         "tests/types/interceptor-contract.ts": "14814393d97b03b55b8a8e84014e24f0f6fc1003e71c2d832a8d643320c5ea18",
-        "tests/types/public-contract.ts": "595d38c2029d8d0d15d8d8d735653cc6a11f8ecaddd108fbc652097b55c015d8",
+        "tests/types/live-coalescing-contract.ts": "c476bfec4ff03244a35938e0bc168894e917ab9e723536e2b759e0002a3ce836",
+        "tests/types/public-contract.ts": "4bd0b76f7fe62a2e52de29c81061487a18b71aa3920ae824d8f48b0f71f749c4",
         "tests/types/query-effects-contract.ts": "8fefb99b919529cc3608f2c043d4f3e486a4f75471d0f1d4a054a7a96184b2a8",
         "tests/types/query-filter-contract.ts": "89977942cf8942af10535fb2ec4a4ab679d920a7d226ef26616faaf518b9a6e9",
         "tests/types/query-usability-contract.ts": "b84fb1045eb3f25d5b1fa68001e342a644faf41a6f753890e619f1322b4f2d7f",
@@ -341,21 +344,21 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "7d03b36793d2fb73fd64f9c0b3374c856050f415",
+      "head": "97a8cc5e722a0b94c1241b28f8ac7f4d202a2321",
       "outcome": "updated",
-      "reason": "Added optional Effect cache composition guidance with explicit QueryClient service, unselected data, full execution Causes and wait-only interruption. Existing six references still own these workflows.",
+      "reason": "Reviewed combined #174 bridge and #179 live-coalescing source after merging d7b9746. Cache-workflows adds explicit service, typed native cache operations, full error preservation and caller-only interruption; existing query-patterns preserves #179 publication/retention guidance. No cancellation of shared work or second runtime/cache introduced.",
       "evidence": [
-        "src/core/query-effects.ts; examples/shared/query-effects.ts; tests/query-effects.test.ts: 5 public behavior cases pass, concurrent fetch/ensure and observer sharing; cancel-on-interruption mutant rejected.",
-        "Published TSRS and TS5.9 contracts pass; 42 focused tests, strict typed check and Effect diagnostics pass; docs build has 60 pages and valid links. Fresh consumer session unverified: delegation prohibited."
+        "74 focused public runtime tests pass after merge, including shared fetch/ensure and selected observer, active filter invalidation, runner/Cause failures and application example; cancel-on-interruption mutant fails the concurrency assertion.",
+        "Packed declarations/ATTW/publint and public TSRS + TS5.9 fixtures pass. Strict typed lint and Effect checks pass; docs has 22 excerpt tests, Astro zero diagnostics, 60 pages and valid links. Fresh consumer discovery and browser acceptance unverified; no delegation permitted."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "912187d565a7aafbcbed7a40d470947571cdaf4eba7a6a0c92e3e7f4e3f9a6f6",
+      "fingerprint": "f84965ea7f9ee82e144f25d24d67dc449b627664a2c175b4e9665ba9b79d6429",
       "snapshot": {
         "GLOSSARY.md": "761f45c329b7a0ad74a0e067d123eec6118aab1d233abf98938fe42f44b4ae06",
         "README.md": "9cc3275039f58de12efe6a19ea5ec5e23a56126cfeb81cf35480ae5ac147f1da",
-        "_artifacts/domain_map.yaml": "6051642229883ae1234ab76dd070ff0fa617503d1d6fd75fee563a481e997ca9",
-        "_artifacts/skill_spec.md": "f43158f25ee35e99a3ca6beabe24ea668ac1170641709e336263df763d8a0595",
+        "_artifacts/domain_map.yaml": "b4093cdc377c0ecc4da64bdd9273364535f99bd6b6fc5916e83fa893ae9fd546",
+        "_artifacts/skill_spec.md": "0bbb591f304ff1c9a58f145632f41562f6e8438e7db6ef3f01b6ec64bc60959a",
         "_artifacts/skill_tree.yaml": "ce59cb7d97ff4f1cc36c4723ef889ccb37a96c24ed31a084be3a9fea620be07a",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "8cf2b005fd05a799118c262ecda121c4468cc023b5a666b7f46501e49f1b3099",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "eb226d096cee825aa2a7c2e49370208d6110662c3acf681fa4b95f8b6caca0d7",
@@ -375,7 +378,7 @@
         "apps/docs/src/content/docs/guides/cache-filters.md": "b0b8a08b6e2f3484a2565b6bd6d080cd1e95b3e9aefcb5aaf121cd7a96ad2591",
         "apps/docs/src/content/docs/guides/cache-management.md": null,
         "apps/docs/src/content/docs/guides/cancellation.md": "7af74ddcb64ddc5454e3d8b4326a79b9683f1d744537c2b2f267e61a9447274b",
-        "apps/docs/src/content/docs/guides/choose-stream-history.md": "015ecea83c4d31c210be07ad35e528349d3e952c53f1e8a17e9f425ec949cc6e",
+        "apps/docs/src/content/docs/guides/choose-stream-history.md": "b87b3b305e4c524291afdfd532cc60de7e62b452e1b41a6e83de8651813ecfd3",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "cb941076de91c32bc0a1a5e8f6463ea521457210c00ccf4ef4e7de7c5fd135e9",
         "apps/docs/src/content/docs/guides/custom-key-encoders.md": "f1c27e412da1669b9c96c61c1a4fc882ce23516f254ed4d2a1766f017033148c",
         "apps/docs/src/content/docs/guides/handle-failures.md": "337c0146b06c6ee5d2a551af7cabf543dfaaa0b8bb13704bde77186d0d3ff571",
@@ -430,7 +433,7 @@
         "docs/adr/0012-normalize-undefined-query-success-to-null.md": "e07335454852d9ac3c8b2529ad414dbee59d57f2265ccf86b595e65092feb309",
         "docs/adr/0014-require-query-stable-payload-construction.md": "2c0a2fefeb20197712e85ca598e18c8a7d74b55f9cfbb74a0cfaf532f18aec04",
         "docs/adr/0015-centralize-the-toolchain-in-vite-plus.md": "038000cc6209bdde90aefbe55b238c69a71588d03335f9a9918645b834851491",
-        "docs/adr/0020-generate-accumulated-and-live-stream-queries.md": "e63962e33664722c53c87dab73c712df1a4fe3dcab27de340e1f212ff26796b3",
+        "docs/adr/0020-generate-accumulated-and-live-stream-queries.md": "26ae6c48dbeb80149816bb8d9fbd2edeea9d6aee15e105db6d830e4308915765",
         "docs/adr/0021-share-utility-construction-through-private-modules.md": "ad7db905318eea6b797d3295a0f3ab754a61f43df68f8503ce35b36068230578",
         "docs/adr/0022-add-buffered-http-utilities-with-separate-key-roots.md": "b1a8772e531b660925db6a1fe55942ee8c4c055a0d411271ce274954ca1c63be",
         "docs/adr/0023-expose-buffered-multipart-http-mutations.md": "74341a7ae3f1b22714280c27e511e0f2e9569e440987ed6e44f6b023b6514b1e",
@@ -446,7 +449,8 @@
         "docs/adr/0033-bound-effect-support-to-a-patch-line.md": "34209a3700272113c64ff39baf15e19bc5745b73b5a28157207c1c592df8fcd0",
         "docs/adr/0034-extend-http-stream-views-to-decoded-ndjson.md": "445ed1f9a4cb3a74938f2d01579e50c046a681aaa2dcd856ef9587c62aaa7cf2",
         "docs/adr/0035-use-effect-enhanced-tsrs-for-development.md": "1e1d668584239981375db7d4ff9722e53fd781e3a4b464be87bb64fb7258b69f",
-        "docs/adr/0037-own-stream-publication-through-query-core.md": "50033124148c7da78da23a9b4aa08241a66a6168d79319998534af8e0a38074b",
+        "docs/adr/0037-own-stream-publication-through-query-core.md": "a7800a9b941557bc34d3a3102e94d4227f8e5f31ff852b6830a33e12ac2ec553",
+        "docs/adr/0039-coalesce-live-snapshots-explicitly.md": "4d95533f87474e8a55a9a6a0f0339f375a7e5d242195e26e99c2d7e895171f02",
         "e2e/http-workflows.spec.ts": "f5729fd3707758508d85506a93a1f2560edfe1aad89c9bd200ec0c80a2ecb7cb",
         "examples/contracts/src/client.ts": "fdf559bf0a798c7ea7f7aee01967837e720f7727a1bd11978aec51aad59f00f2",
         "examples/contracts/src/contracts.ts": "74d69e1a07c0b32c2a48b8fed8cfceaac8844ead860fbd00b9e357657b39d88e",
@@ -523,7 +527,7 @@
         "scripts/compiler.mts": "c803e4897b4e07ef10fb9d216518aeeb9fc709e4e1559140dcb89c82b4bf35a2",
         "scripts/measure-bundles.mts": "5a033ce9f9a4cf414632b6f2781a50c0354f1cf9996791a547a5d53dbef66d7a",
         "scripts/measure-construction.mts": "2fbad4879fe77ff24234a6be5666047b41cc7c3fd5ce9143d640ef4b41a426bd",
-        "scripts/measure-streams.mts": "5f066efb508621f58067e333be174c850ab1bc0f45242c7695965d514b27366d",
+        "scripts/measure-streams.mts": "7416a13fe14c49d25f1b646c7f1d6c5a7bac7796dcfe71b15860d667a992326e",
         "scripts/measure-structural-sharing.mts": "d3e673fbebd3bc56e3c880b3387558963af59729f6ff2905c23a5845e8f95bf6",
         "scripts/measure-types.mts": "ca3f257b497eb23e748e54dc4e5ba36cb0fde1e55eb33c361fbb48f6fe3246e5",
         "scripts/performance/common.mts": "57a2003d9769d884d1a0884cab5449cfce79c40300de8d0202d3f1780d51c4f5",
@@ -536,11 +540,11 @@
         "skills/effect-api-query/references/frameworks-and-hosts.md": "17a04c2326fce96f4a9ec1c7415dd2e6ac05dc9a4ad854228c6d3132da262bc8",
         "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
         "skills/effect-api-query/references/hydration-and-ssr.md": "30aeb844f4b4f7c3c6a5a70f4ecbfabbdfb7b332c62105b4ecad182238d38705",
-        "skills/effect-api-query/references/query-patterns.md": "345355f40a521e7c3e6a43e3b8a0dd97694188459bc20929de85f5062c71b75a",
+        "skills/effect-api-query/references/query-patterns.md": "00b09057dfaed46a3129f9f88312d77c5965be48d5e7b1ed586a39ef526d9f24",
         "skills/effect-api-query/references/rpc.md": "cdbc026d1d29c486b28a2b9fc6a330bcc8855b5887f0f454f73ce261734e8e7e",
         "src/core/branch-filter.ts": "71a8c6039f1775881bbc00d92e14e2ef823bf7150721307a74f16a1579bccc86",
         "src/core/canonical-key.ts": "84e91000876a6795557aab39dcc5d44e328250bf9b30ad02fd67afd02f5003e9",
-        "src/core/configure-utils.ts": "31afe707e9ef3194f6b3a0ac888bb24583199a98e69ad1fcdaba4c76dea2ed60",
+        "src/core/configure-utils.ts": "885c67a94a49e01866eec22e1a1b125e90c169cfba299d5379b0e6ce7834b584",
         "src/core/configure.ts": "ea0d4073e4965198343a96498e7e55cf78f31c8af0ac30c23a82c4df0314576b",
         "src/core/consume-events.ts": "648144582c4bdbf4a9cb0d35ddc54327abbefc654f2d37b6154232bcd09a1752",
         "src/core/declared-error.ts": "a051225762704a9ae02bcc8f5559f5e9b45a29fcb48f25dde03be28e0abfe9a4",
@@ -555,11 +559,11 @@
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
         "src/core/schema-key.ts": "7dad2749d30f2ab828dbc7e96d6e1e2b32b6733450cb6dc734de607629d925f8",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
-        "src/core/stream-publication.ts": "5c0f53bc84e3bb53337b9e76ea7dcd2269f080e9b2a35ad9d3f4ecce341fa61d",
+        "src/core/stream-publication.ts": "e6a2fbded6ead8351c83fa3adabf84fb0d1b52d559e3d209a2831aca69d58e21",
         "src/core/stream-recovery.ts": "c2c53ed24c042c24a18b2379995107a09e3145080cc97597d7bb41d3a616d37e",
         "src/core/stream-snapshot.ts": "97fbb56308b2e2decacd86a02b3f0a3ced76692444ba25a7abaae05b442c233a",
-        "src/core/streamed-query.ts": "8188a6501a0dc5450b09098058f5e6a9bb2a8bc1427bd78cec5f447baba3ca59",
-        "src/core/types.ts": "8e20c35e9a4ad9193622359e10660b65d03b8bee51e685d75f2e29ac40bfae59",
+        "src/core/streamed-query.ts": "a44dbb1a17a0d266f9e38e6b819dff7dbc417821e14f089e8ed2825dfe763b23",
+        "src/core/types.ts": "422490951153897e129a2b79386f8c3aa56777926466cf57dc36ebfe5193c0c6",
         "src/core/utility-tree.ts": "7b113d01c672c1148d022556f72c6e8f49c5afc0170fc88dcff74008abed28f1",
         "src/core/view-prefix.ts": "dfc0d74a07c8afe3f63952d59c29088ba4afb45e11a402ef8b72c5e2282cb063",
         "src/http/create-utils.ts": "8d128bb9646e095456d3dcf696f1aa6e365d0de328df571c64eea7421935c9f5",
@@ -567,13 +571,13 @@
         "src/http/operation.ts": "4a3651be65fee9fc039c38c0f191ba6a79347a5bd45c3f233de7d90c12d8bf9c",
         "src/http/request.ts": "4dced85460db56cb83514486417e17dd4a35629ad28749a2ac01dadbe45113b3",
         "src/http/streamed-query.ts": "27d1f5418009216d960816485cfd7f1760a8e3f638ccb9ac8dfa5fc040b1564a",
-        "src/http/types.ts": "f6b248adf2c8705bfd2d9c6d301d4748a4c3cb66ad706b90ae6743540448f5c3",
+        "src/http/types.ts": "37be5b08898b0f12c460f7954f243b1ae12c1d903376428c77c34b8b2ca90b4f",
         "src/index.ts": "2aea6ce580b567a224fbd720c3743d1c57f172ee4856873dde4fec6896f4e2af",
         "src/rpc/create-utils.ts": "8ebf030b0f76f91c248434c169d789d6328d2ba43c07afe15e04db0a02f05c2c",
         "src/rpc/errors.ts": "8e1fbcc7843b2bf99e9d80bfd365dc118d52351909d5c8f48c46ba9d39fdedd3",
         "src/rpc/operation.ts": "ac10df77707045d22c2d58ff0f776362a7fb5ce03e179c10238c42320ad6f719",
         "src/rpc/streamed-query.ts": "cf80fac99983903e6ab60aeecc5fe3cf1a0208b26143cc6f588c615d728f2ee7",
-        "src/rpc/types.ts": "3d113d88ba6fbf6277eb86eb760283eac51107d91901e2b88f67a9a36fee839c",
+        "src/rpc/types.ts": "5c77358187150d34209bdbffda162b3a5ecd3108662e0e29aeee6ddd23dbfd80",
         "tests/cache-recipes.test.ts": "fb95bbbba35f8bcf9661c993a61385f3186d935bb5626da6181d8ce9e6a9a49e",
         "tests/configuration-composition.test.ts": "0ffea269ad7701576f9e882c28ec602eb9714d72f7a3898aa0192376d5f59be0",
         "tests/contract-reuse.test.ts": "ef45d0a7116c56bdff46decb93cb4cd8f55baa1836edc0382434742f27249747",
@@ -621,6 +625,7 @@
         "tests/http-structural-sharing.test.ts": "35ea74a2711f56cd2001cd5a1f3ffe58f10f4ecbf094c0d4ce7d9e9a62dead42",
         "tests/http-transport-cancellation.test.ts": "0ba26a9bae56b26605fc03009c1f50fe90930356d0fa0c4ec4ddc5c120430f00",
         "tests/hydration-codecs.test.ts": "67a0a8e1e7ab78ba4cfb2f44b188a4001669584134ac21f0eb8bc03f993ee4ad",
+        "tests/live-coalescing.test.ts": "e5456fa321374e61dfef6992ebc706c9c558803795393b55da10e33c926bf413",
         "tests/publication-deadline.test.ts": "2797557ff14bf8527ea446cec1e1d7c61cd3666f11f127e640c53ce5d7e30868",
         "tests/query-effects.test.ts": "b95b283dd4cfa2f26f383301a379e0c8edc520d89eb4863b1675a1a3e75b3f2a",
         "tests/query-filter.test.ts": "ff531a86816872cd2cadf01d79bd9d9ff5be1895bab150330a90aa8375508004",
@@ -631,9 +636,9 @@
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
         "tests/skills/query-usability/grade.test.ts": "f3c2650deba0d887f66fb3b3afd284cd9baf562296f2984e5c84b014ecec8cbd",
         "tests/skills/query-usability/solution.ts": "38583676eaa2d33e8ca56c07a430e3a28787feae9d84c6d3612e01d6d7f1d80f",
-        "tests/stream-publication.test.ts": "c5176b80e4fdd4bd361b0675f599e8604b6f09582ec82b7569dd4fe28901953f",
+        "tests/stream-publication.test.ts": "57db2c6db5273a5c6789bb65dee2eeff5293eb98ee472fec102dffca984a65a6",
         "tests/stream-recovery.test.ts": "93e68be6631e0335129d9459e9989aff56e3431e8ece9540104278a8b5cc1cb1",
-        "tests/stream-snapshot.test.ts": "78d203b3e92b930122920824f4874876c3d16046e08c8d811f20953310c94fb7",
+        "tests/stream-snapshot.test.ts": "c001d7ad4dfbded79e2ee66b5595c2f23ea42c5a814c451d3ca154cc7ef07a67",
         "tests/types/docs-functionality.ts": "065ff9eac091e4a25c814e3e49b49d0f6258fffb7c5ed0661a1ec960b41ac0c0",
         "tests/types/docs-http-ndjson.ts": "a86513c1047b700ce27fc49b3d1fb31004cf745096d8403a0bdc780d95a448a3",
         "tests/types/docs-http-quick-start-contract.ts": "e034175f607fc9414e4919c6762a859e03908b0ee7ba77cb5dc6556b746ec26c",
@@ -667,13 +672,14 @@
         "tests/types/helper-contract.ts": "0021a5b845c65f608ed5dd429227752ceb32784e75c198b01868f017120a7aa1",
         "tests/types/http-contract.ts": "aec3b157d4f6a3a22e8e2cf39333caa8b9e41b01dac16c11f1f6c40a681ea1e3",
         "tests/types/http-empty-success-contract.ts": "00ccdb360edc598b9bc6c8a7708dab6b7ca85cf267ce7caa9a81a6b52f2868d5",
-        "tests/types/http-ndjson-contract.ts": "b2926d07a0d02c1575ba8c8de3425be1f6b058aa0b04ec2f2302862f4d74e695",
+        "tests/types/http-ndjson-contract.ts": "47d62788b90fb0f08faabe59646f10fc53fe54ef740cc4aaae9fb1c73e49f5f0",
         "tests/types/http-stream-contract.ts": "1bfaa95c6237341b8137e81f1b1ffa17e5374dca2407328b324d86b3080fd815",
         "tests/types/http-type-scale.ts": "447d34e1fa952c843a866fd4dcde80dd32390f7ff14ba701b1960f45bc1292ce",
         "tests/types/http-view-proof.ts": "0b66f30863c5451d47144980af9cf5517637c8f7ca7866b64d1a704cea089413",
         "tests/types/hydration-contract.ts": "fade858552c1b04fd45f48e86a42668a6132918196eca9089d56f1948551cd64",
         "tests/types/interceptor-contract.ts": "14814393d97b03b55b8a8e84014e24f0f6fc1003e71c2d832a8d643320c5ea18",
-        "tests/types/public-contract.ts": "595d38c2029d8d0d15d8d8d735653cc6a11f8ecaddd108fbc652097b55c015d8",
+        "tests/types/live-coalescing-contract.ts": "c476bfec4ff03244a35938e0bc168894e917ab9e723536e2b759e0002a3ce836",
+        "tests/types/public-contract.ts": "4bd0b76f7fe62a2e52de29c81061487a18b71aa3920ae824d8f48b0f71f749c4",
         "tests/types/query-effects-contract.ts": "8fefb99b919529cc3608f2c043d4f3e486a4f75471d0f1d4a054a7a96184b2a8",
         "tests/types/query-filter-contract.ts": "89977942cf8942af10535fb2ec4a4ab679d920a7d226ef26616faaf518b9a6e9",
         "tests/types/query-usability-contract.ts": "b84fb1045eb3f25d5b1fa68001e342a644faf41a6f753890e619f1322b4f2d7f",
@@ -691,24 +697,23 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "7d03b36793d2fb73fd64f9c0b3374c856050f415",
+      "head": "97a8cc5e722a0b94c1241b28f8ac7f4d202a2321",
       "outcome": "updated",
-      "reason": "Extended domain task and cumulative spec for #174; existing tree source globs include all new bridge/test/example/guide paths, so tree structure stays unchanged. Prior histories preserved; no ADR amendment needed.",
+      "reason": "Combined domain map and cumulative spec retain #167/#169/#170/#171/#179 history and add #174 explicit QueryClient Effect composition. Existing skill tree source globs cover new code/tests/example/docs, so no structural tree edit is necessary; one skill and six references remain sufficient.",
       "evidence": [
-        "_artifacts/domain_map.yaml; _artifacts/skill_spec.md; _artifacts/skill_tree.yaml reviewed against actual diff and ADRs 0005/0007/0010.",
-        "YAML parse/lint and skill validation pass."
+        "Reviewed all three _artifacts records with merged source and guidance. YAML validation passes. Existing ownership/failure ADRs remain accepted; ADR 0041 not needed."
       ]
     },
     "source:vite.config.ts": {
-      "fingerprint": "0242cb1580f23a88f99c1054f4329843227bc05c3184dedb18bffe94b23640b6",
+      "fingerprint": "e7803ca0d414758eafc6f22b91ae633d5ece5c8b25f5da15a50e737ad3ea1772",
       "snapshot": {
-        "vite.config.ts": "e96501991264622c183b667ca81bd1de31ef42a27626e45361f7c9e7fc6d57ee"
+        "vite.config.ts": "0094917b89b7ca114763ff1d8e460e360ad88355c342b00427829721c5220d98"
       },
-      "head": "7d03b36793d2fb73fd64f9c0b3374c856050f415",
+      "head": "97a8cc5e722a0b94c1241b28f8ac7f4d202a2321",
       "outcome": "no-change",
-      "reason": "Configuration only adds the new RPC example/test to existing unstable API exclusions or adds guide navigation; no change to compiler engine, severities elsewhere, task interfaces or shipped setup instructions.",
+      "reason": "Reviewed combined config: guide navigation plus exact unstable RPC example/test exclusions, including accepted live-coalescing test. Existing compiler engine, correctness diagnostics and task interfaces remain unchanged.",
       "evidence": [
-        "git diff -- tsconfig.json vite.config.ts apps/docs/astro.config.mts; strict typecheck and Effect check pass; docs build/excerpts pass."
+        "git diff HEAD -- apps/docs/astro.config.mts tsconfig.json vite.config.ts; post-merge typecheck/Effect check/docs build pass; framework/tooling guidance remains accurate."
       ]
     },
     "source:.github/workflows/release.yml": {
@@ -765,15 +770,15 @@
       ]
     },
     "source:tsconfig.json": {
-      "fingerprint": "b849924247b165d440a00bbd11ba5bca45af6e6e71920fcdffcee043c3b0898e",
+      "fingerprint": "560ba298020cb41d598231ddaac3c92285465505cf45d3659bbd263512f8659b",
       "snapshot": {
-        "tsconfig.json": "be0197f0fad8073d395530fbd57cb8e0d5a683bc1ff6dbaffd1ca1e2fc15e8ee"
+        "tsconfig.json": "f617d9af39f7eb0bbdeefd61d646735d5447fad545d58831b8d3aab76152343b"
       },
-      "head": "7d03b36793d2fb73fd64f9c0b3374c856050f415",
+      "head": "97a8cc5e722a0b94c1241b28f8ac7f4d202a2321",
       "outcome": "no-change",
-      "reason": "Configuration only adds the new RPC example/test to existing unstable API exclusions or adds guide navigation; no change to compiler engine, severities elsewhere, task interfaces or shipped setup instructions.",
+      "reason": "Reviewed combined config: guide navigation plus exact unstable RPC example/test exclusions, including accepted live-coalescing test. Existing compiler engine, correctness diagnostics and task interfaces remain unchanged.",
       "evidence": [
-        "git diff -- tsconfig.json vite.config.ts apps/docs/astro.config.mts; strict typecheck and Effect check pass; docs build/excerpts pass."
+        "git diff HEAD -- apps/docs/astro.config.mts tsconfig.json vite.config.ts; post-merge typecheck/Effect check/docs build pass; framework/tooling guidance remains accurate."
       ]
     },
     "source:.fallowrc.jsonc": {
@@ -1230,11 +1235,11 @@
       "snapshot": {
         "apps/docs/astro.config.mts": "4e694ec8e9d3c84bde9f119166be8b8152c39c3cf674923e5b2bda38042a3142"
       },
-      "head": "7d03b36793d2fb73fd64f9c0b3374c856050f415",
+      "head": "97a8cc5e722a0b94c1241b28f8ac7f4d202a2321",
       "outcome": "no-change",
-      "reason": "Configuration only adds the new RPC example/test to existing unstable API exclusions or adds guide navigation; no change to compiler engine, severities elsewhere, task interfaces or shipped setup instructions.",
+      "reason": "Reviewed combined config: guide navigation plus exact unstable RPC example/test exclusions, including accepted live-coalescing test. Existing compiler engine, correctness diagnostics and task interfaces remain unchanged.",
       "evidence": [
-        "git diff -- tsconfig.json vite.config.ts apps/docs/astro.config.mts; strict typecheck and Effect check pass; docs build/excerpts pass."
+        "git diff HEAD -- apps/docs/astro.config.mts tsconfig.json vite.config.ts; post-merge typecheck/Effect check/docs build pass; framework/tooling guidance remains accurate."
       ]
     },
     "source:docs/adr/0016-automate-releases-with-changesets.md": {
@@ -3113,6 +3118,33 @@
       "reason": "Minor release note accurately describes the additive cursor policy and preserved inference/cleanup behavior. The existing query-patterns and cache-workflows references already own this guidance; no separate skill is warranted.",
       "evidence": [
         ".changeset/opaque-recovery-cursors.md compared with src/core/stream-recovery.ts and passing public recovery/compiler regressions."
+      ]
+    },
+    "source:.changeset/live-snapshot-coalescing.md": {
+      "fingerprint": "4d6e2214c699024c3b9739642369e9257a81161eb8ec4ba832e9e9fd29f9406f",
+      "snapshot": {
+        ".changeset/live-snapshot-coalescing.md": "9815e2dda8ce14878da7fc13fd1c75ef4b647d8b978b601d59ded52e9de0088e"
+      },
+      "head": "de73ef2a03a2a896a09b18c61f2eefac66f48e1b",
+      "outcome": "no-change",
+      "reason": "Minor changeset accurately describes additive opt-in live snapshot behavior; task guide and shipped reference own detailed semantics. No separate skill required.",
+      "evidence": [
+        "Reviewed actual #179 diff from dbb64e8 and subsequent local integration merges through 7d03b36; no published values mutated. First red test rejected per-emission publication, then passed with coalescing; diagnostic red/green also recorded.",
+        "Post-merge vp run check, test (816 cases / 67 files, both public compilers TSRS/TS7.1 beta and TS5.9.3), effect-check, framework-types, docs-check all pass. Stronger fixed-deadline replacement test passes; commit hook repeats typed checks. Package attw/publint pass.",
+        "Three samples each at 1000 and 10000 emissions: live cache writes 1000/10000, notifications 1002/10002; coalesced writes 2, notifications 4, one retained final value, all emissions consumed and finalizers complete. Full report /tmp/effect-api-query-spec-166/179-measurements.json.",
+        "Intent sync no-op; YAML validation passes; skills-check passes. Fresh consumer-agent discovery unverified because no agents are authorized; broad architecture review and browser/full integration acceptance remain parent work. No new dependency-support or remote-cleanup claims."
+      ]
+    },
+    "source:.changeset/effect-query-client-operations.md": {
+      "fingerprint": "fe25d9bd55c4577f6ecf4da3d60edc0f32f289c80a162ab6c6879e9e31eeeabb",
+      "snapshot": {
+        ".changeset/effect-query-client-operations.md": "7be24ea7f71eabf207718a975c0b6d7281e7a36cbdbbfef343302109857960ed"
+      },
+      "head": "97a8cc5e722a0b94c1241b28f8ac7f4d202a2321",
+      "outcome": "no-change",
+      "reason": "Release note describes only the additive optional bridge and minor classification already covered by the updated cache-workflows guidance; no additional skill or planning task is warranted.",
+      "evidence": [
+        ".changeset/effect-query-client-operations.md agrees with tested public API and new Query Effects guide. No version or publication performed."
       ]
     }
   }

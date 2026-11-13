@@ -24,6 +24,7 @@ const views = choices("STREAM_VIEWS", [
   "batch-32",
   "batch-deadline",
   "live",
+  "live-coalesced",
 ]);
 const scenarios = [
   { view: "unbounded", maxChunks: "unbounded", publicationBatchSize: 1 },
@@ -31,6 +32,7 @@ const scenarios = [
   { view: "batch-32", maxChunks: "unbounded", publicationBatchSize: 32 },
   { view: "batch-deadline", maxChunks: "unbounded", publicationBatchSize: 32 },
   { view: "live", maxChunks: "unbounded", publicationBatchSize: 1 },
+  { view: "live-coalesced", maxChunks: "unbounded", publicationBatchSize: 1 },
 ] as const;
 type Scenario = (typeof scenarios)[number];
 
@@ -81,8 +83,11 @@ const measure = Effect.fnUntraced(function* (
           maxChunks: scenario.maxChunks,
           publicationBatchSize: scenario.publicationBatchSize,
         };
-  const queryKey =
-    scenario.view === "live" ? leaf.liveKey() : leaf.streamedKey(policy);
+  const queryKey = scenario.view.startsWith("live")
+    ? leaf.liveKey({
+        coalesceMs: scenario.view === "live-coalesced" ? 50 : undefined,
+      })
+    : leaf.streamedKey(policy);
   const observer = new QueryObserver(queryClient, { queryKey, enabled: false });
   let observerNotifications = 0;
   let cachePublications = 0;
@@ -107,9 +112,12 @@ const measure = Effect.fnUntraced(function* (
   });
   try {
     const data = yield* Effect.promise(async () =>
-      scenario.view === "live"
+      scenario.view.startsWith("live")
         ? await queryClient.query(
-            leaf.liveOptions({ rpcOptions: { streamBufferSize: 1 } })
+            leaf.liveOptions({
+              coalesceMs: scenario.view === "live-coalesced" ? 50 : undefined,
+              rpcOptions: { streamBufferSize: 1 },
+            })
           )
         : await queryClient.query(
             leaf.streamedOptions({
@@ -119,13 +127,12 @@ const measure = Effect.fnUntraced(function* (
           )
     );
     const retainedValues = EffectArray.isArray(data) ? data.length : 1;
-    const expected =
-      scenario.view === "live"
-        ? 1
-        : Math.min(
-            count,
-            scenario.maxChunks === "unbounded" ? count : scenario.maxChunks
-          );
+    const expected = scenario.view.startsWith("live")
+      ? 1
+      : Math.min(
+          count,
+          scenario.maxChunks === "unbounded" ? count : scenario.maxChunks
+        );
     const latest = EffectArray.isArray(data) ? data.at(-1) : data;
     if (
       emissions !== count ||
