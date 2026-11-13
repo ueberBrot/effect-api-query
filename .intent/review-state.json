@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "378364b89082e9c9dc4e6cf5fbed5e10eaf52895728b4ade84af0348427c4e92",
+      "fingerprint": "d6b5f88664f1b60f6bde46bc4d2c47cf9a6dd0287528036de2cab068c04a28aa",
       "snapshot": {
         "GLOSSARY.md": "1caf855a606847e46e31200b90df6077d7a84de114e213b011bf27e432989252",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -16,7 +16,7 @@
         "apps/docs/src/content/docs/examples.md": "08c014b01c49123ee871ddb7427d69b4dcf1791fa907ba2fe535ebf6c522d282",
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "022014147e137abdac686d6d3c58f4eff1e8098dd2241a3cccd96abe5051cd26",
         "apps/docs/src/content/docs/examples/http-workflows.md": "f7b41e1e63fda1e4c44e0886b29f5c796f3f51e1b3bf227947423194f6cc39b0",
-        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "bf320b4f57b3e2aa2d24b355ed6a6f76a96490f2accb6eca0d7c725e6019636c",
+        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "bf6eb6daa1663f4e300566aae59c937324e3c8430bb6169efdc50a987ca532c1",
         "apps/docs/src/content/docs/getting-started/feature-support.md": "ac3ebd5c192272f7d4d1a236a5878d1d51a76fc514e874cbb51f17eb31809125",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "4c68eaf1d2df4b1dcebf24b8f84ef291dd503a2049eb6802b74e8e52b7e6a948",
         "apps/docs/src/content/docs/getting-started/installation.md": "63ebd6eddf603465b5c1203f6587ae5c6c7fba1a1e59069c929f44eaa645823d",
@@ -99,7 +99,7 @@
         "docs/adr/0037-own-stream-publication-through-query-core.md": "a7800a9b941557bc34d3a3102e94d4227f8e5f31ff852b6830a33e12ac2ec553",
         "docs/adr/0039-coalesce-live-snapshots-explicitly.md": "4d95533f87474e8a55a9a6a0f0339f375a7e5d242195e26e99c2d7e895171f02",
         "docs/adr/0040-add-opt-in-query-owner-retirement.md": "5e5f0a05577c779ed22a62a3e99a8abd509c241fa9949e9fb50a9aec068472fc",
-        "docs/adr/0042-define-the-compatibility-promise.md": "9ed6cc1a75f46eca2d98737a7b3a6bbe212fc4f8b463e05a462ebbd690f72c42",
+        "docs/adr/0042-define-the-compatibility-promise.md": "695dc597b82b6b9a5a09c7df810f5c28a42fd691efe0df689627ae3c54ca5d02",
         "e2e/http-workflows.spec.ts": "f5729fd3707758508d85506a93a1f2560edfe1aad89c9bd200ec0c80a2ecb7cb",
         "examples/contracts/src/client.ts": "fdf559bf0a798c7ea7f7aee01967837e720f7727a1bd11978aec51aad59f00f2",
         "examples/contracts/src/contracts.ts": "74d69e1a07c0b32c2a48b8fed8cfceaac8844ead860fbd00b9e357657b39d88e",
@@ -170,7 +170,7 @@
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
         "package.json": "88899a47ccd31569a2e95cba153cf1b95f471243f58ccb3e18c6d18d42e03fe6",
         "pnpm-workspace.yaml": "a1b81004fce351551877a21b03c2c277af591610ea3a49e79e54b2ad3e19f103",
-        "scripts/check-effect-compatibility.mts": "0013f391d443028a18a371d367062a3873686408ed70d8c4ddcfe32da82ee6c4",
+        "scripts/check-effect-compatibility.mts": "c8e1f3d6c09ae33139a87dac4135613054141aba8cd1e8944d27c1f459b4951b",
         "scripts/check-framework-consumers.mts": "f0111ac9ed84996f722f656358b810da0b9ecc8c6c0219a2019d1076b5d50cbc",
         "scripts/check-toolchain.mts": "113386f8e7c3352dcefa745207d96783678939b07d0a18a8cdfbe55e08e9b60a",
         "scripts/compiler.mts": "c803e4897b4e07ef10fb9d216518aeeb9fc709e4e1559140dcb89c82b4bf35a2",
@@ -186,7 +186,7 @@
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "961b6c5e3a0a0334e3c3d8ecebf68b678682806ca9e945911924f047e5803d19",
         "skills/effect-api-query/references/cache-workflows.md": "ba58a0ed429c3af43b8142437ad3ef6e2b879017f06cf7d186ca48044fa52964",
-        "skills/effect-api-query/references/frameworks-and-hosts.md": "fa58f76c22093e33a665fde2576a4cbba9b4ef1e6ba83132176d3e14fad9f979",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "89ba2337eedb94f8697c50d2251a7afe5f68f55f9bdecc0f69b96db4d1be0191",
         "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
         "skills/effect-api-query/references/hydration-and-ssr.md": "30aeb844f4b4f7c3c6a5a70f4ecbfabbdfb7b332c62105b4ecad182238d38705",
         "skills/effect-api-query/references/query-patterns.md": "00b09057dfaed46a3129f9f88312d77c5965be48d5e7b1ed586a39ef526d9f24",
@@ -349,17 +349,17 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "5d1d48ca7e14e80078daa7c04f41d9fb6e57e147",
+      "head": "5acd03a09fe86e04fc8267f2ec5498174d07f045",
       "outcome": "updated",
-      "reason": "Reviewed combined #168 diff and latest #173/#174 integration. Preserved all 186 review identities and cumulative compatibility, owner and bridge guidance/history. Retained both ADR0040/0042 source mappings and unchanged owning skill/six-reference structure; matrix now includes existing owner/bridge regressions.",
+      "reason": "Applied the requested writing policy to the full ticket-owned diff. Split dense dependency/versioning prose, retained all ranges, checked versions, ownership rules and failure conditions, and reduced comments to necessary constraints. Existing domain map, skill spec and tree remain accurate: no task, meaning, source mapping, activation or prerequisite changes.",
       "evidence": [
-        "Final eight-combination matrix passes TSRS 0.21.0/TypeScript7.1 beta plus TypeScript5.9.3 public fixtures and 369 runtime cases per combination (21 files), including query-owner/query-effects. Packed runtime/declaration artifacts and intended shared peers verified (/tmp/168-latest-matrix.log).",
-        "217-file typed lint/check, Effect diagnostics, packed Vue/Solid/Svelte/Angular fixtures on both compilers, 22 docs excerpt tests, Astro checks and 60-page build pass. Scoped formatter/YAML/actionlint pass. Zizmor reports only pre-existing low self-repository suggestions.",
-        "ADR0042 prospectively amends historical versioning while preserving accepted history and bounded peers. Negative artifact probes reject missing declarations with both compilers and restore them. Fresh consumer-agent/discovery, browser, #167 GUI/platform and optional Fallow transitive TypeScript7.0.2 evidence remain unverified; no release or publication."
+        "Read clear-writing with technical/messages references, readability, writing-clearly-and-concisely and its Elements of Style, writing-for-agents and SKILL-MECHANICS. Assessed technical prose for TypeScript consumers/maintainers; checked readers can find supported peers, exact combinations, upgrade classification and cancellation limits without losing conditions.",
+        "Parser-based TypeScript emit comparison with comments removed confirms executable code unchanged (/tmp/168-comment-audit.log). Docs-check passes 22 excerpt tests and Astro diagnostics (/tmp/168-writing-docs.log). Existing final matrix remains applicable: eight combinations, both compilers, 369 runtime cases each (/tmp/168-latest-matrix.log).",
+        "Scope and checks unchanged; no German prose. Fresh consumer-agent/discovery and parent Astra/browser/#167 GUI/platform/Fallow limits remain unverified."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "9e75ee5630ac17f6aa106b8c08a9f1e393806ff907470b39b1ff73d1e6242089",
+      "fingerprint": "ceddac144b872242f1bf9c24be72db07fc09044500bd0ef5fea85de4a106255b",
       "snapshot": {
         "GLOSSARY.md": "1caf855a606847e46e31200b90df6077d7a84de114e213b011bf27e432989252",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -375,7 +375,7 @@
         "apps/docs/src/content/docs/examples.md": "08c014b01c49123ee871ddb7427d69b4dcf1791fa907ba2fe535ebf6c522d282",
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "022014147e137abdac686d6d3c58f4eff1e8098dd2241a3cccd96abe5051cd26",
         "apps/docs/src/content/docs/examples/http-workflows.md": "f7b41e1e63fda1e4c44e0886b29f5c796f3f51e1b3bf227947423194f6cc39b0",
-        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "bf320b4f57b3e2aa2d24b355ed6a6f76a96490f2accb6eca0d7c725e6019636c",
+        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "bf6eb6daa1663f4e300566aae59c937324e3c8430bb6169efdc50a987ca532c1",
         "apps/docs/src/content/docs/getting-started/feature-support.md": "ac3ebd5c192272f7d4d1a236a5878d1d51a76fc514e874cbb51f17eb31809125",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "4c68eaf1d2df4b1dcebf24b8f84ef291dd503a2049eb6802b74e8e52b7e6a948",
         "apps/docs/src/content/docs/getting-started/installation.md": "63ebd6eddf603465b5c1203f6587ae5c6c7fba1a1e59069c929f44eaa645823d",
@@ -458,7 +458,7 @@
         "docs/adr/0037-own-stream-publication-through-query-core.md": "a7800a9b941557bc34d3a3102e94d4227f8e5f31ff852b6830a33e12ac2ec553",
         "docs/adr/0039-coalesce-live-snapshots-explicitly.md": "4d95533f87474e8a55a9a6a0f0339f375a7e5d242195e26e99c2d7e895171f02",
         "docs/adr/0040-add-opt-in-query-owner-retirement.md": "5e5f0a05577c779ed22a62a3e99a8abd509c241fa9949e9fb50a9aec068472fc",
-        "docs/adr/0042-define-the-compatibility-promise.md": "9ed6cc1a75f46eca2d98737a7b3a6bbe212fc4f8b463e05a462ebbd690f72c42",
+        "docs/adr/0042-define-the-compatibility-promise.md": "695dc597b82b6b9a5a09c7df810f5c28a42fd691efe0df689627ae3c54ca5d02",
         "e2e/http-workflows.spec.ts": "f5729fd3707758508d85506a93a1f2560edfe1aad89c9bd200ec0c80a2ecb7cb",
         "examples/contracts/src/client.ts": "fdf559bf0a798c7ea7f7aee01967837e720f7727a1bd11978aec51aad59f00f2",
         "examples/contracts/src/contracts.ts": "74d69e1a07c0b32c2a48b8fed8cfceaac8844ead860fbd00b9e357657b39d88e",
@@ -529,7 +529,7 @@
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
         "package.json": "88899a47ccd31569a2e95cba153cf1b95f471243f58ccb3e18c6d18d42e03fe6",
         "pnpm-workspace.yaml": "a1b81004fce351551877a21b03c2c277af591610ea3a49e79e54b2ad3e19f103",
-        "scripts/check-effect-compatibility.mts": "0013f391d443028a18a371d367062a3873686408ed70d8c4ddcfe32da82ee6c4",
+        "scripts/check-effect-compatibility.mts": "c8e1f3d6c09ae33139a87dac4135613054141aba8cd1e8944d27c1f459b4951b",
         "scripts/check-framework-consumers.mts": "f0111ac9ed84996f722f656358b810da0b9ecc8c6c0219a2019d1076b5d50cbc",
         "scripts/check-toolchain.mts": "113386f8e7c3352dcefa745207d96783678939b07d0a18a8cdfbe55e08e9b60a",
         "scripts/compiler.mts": "c803e4897b4e07ef10fb9d216518aeeb9fc709e4e1559140dcb89c82b4bf35a2",
@@ -545,7 +545,7 @@
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "961b6c5e3a0a0334e3c3d8ecebf68b678682806ca9e945911924f047e5803d19",
         "skills/effect-api-query/references/cache-workflows.md": "ba58a0ed429c3af43b8142437ad3ef6e2b879017f06cf7d186ca48044fa52964",
-        "skills/effect-api-query/references/frameworks-and-hosts.md": "fa58f76c22093e33a665fde2576a4cbba9b4ef1e6ba83132176d3e14fad9f979",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "89ba2337eedb94f8697c50d2251a7afe5f68f55f9bdecc0f69b96db4d1be0191",
         "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
         "skills/effect-api-query/references/hydration-and-ssr.md": "30aeb844f4b4f7c3c6a5a70f4ecbfabbdfb7b332c62105b4ecad182238d38705",
         "skills/effect-api-query/references/query-patterns.md": "00b09057dfaed46a3129f9f88312d77c5965be48d5e7b1ed586a39ef526d9f24",
@@ -708,13 +708,13 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "5d1d48ca7e14e80078daa7c04f41d9fb6e57e147",
-      "outcome": "updated",
-      "reason": "Reviewed combined #168 diff and latest #173/#174 integration. Preserved all 186 review identities and cumulative compatibility, owner and bridge guidance/history. Retained both ADR0040/0042 source mappings and unchanged owning skill/six-reference structure; matrix now includes existing owner/bridge regressions.",
+      "head": "5acd03a09fe86e04fc8267f2ec5498174d07f045",
+      "outcome": "no-change",
+      "reason": "Applied the requested writing policy to the full ticket-owned diff. Split dense dependency/versioning prose, retained all ranges, checked versions, ownership rules and failure conditions, and reduced comments to necessary constraints. Existing domain map, skill spec and tree remain accurate: no task, meaning, source mapping, activation or prerequisite changes.",
       "evidence": [
-        "Final eight-combination matrix passes TSRS 0.21.0/TypeScript7.1 beta plus TypeScript5.9.3 public fixtures and 369 runtime cases per combination (21 files), including query-owner/query-effects. Packed runtime/declaration artifacts and intended shared peers verified (/tmp/168-latest-matrix.log).",
-        "217-file typed lint/check, Effect diagnostics, packed Vue/Solid/Svelte/Angular fixtures on both compilers, 22 docs excerpt tests, Astro checks and 60-page build pass. Scoped formatter/YAML/actionlint pass. Zizmor reports only pre-existing low self-repository suggestions.",
-        "ADR0042 prospectively amends historical versioning while preserving accepted history and bounded peers. Negative artifact probes reject missing declarations with both compilers and restore them. Fresh consumer-agent/discovery, browser, #167 GUI/platform and optional Fallow transitive TypeScript7.0.2 evidence remain unverified; no release or publication."
+        "Read clear-writing with technical/messages references, readability, writing-clearly-and-concisely and its Elements of Style, writing-for-agents and SKILL-MECHANICS. Assessed technical prose for TypeScript consumers/maintainers; checked readers can find supported peers, exact combinations, upgrade classification and cancellation limits without losing conditions.",
+        "Parser-based TypeScript emit comparison with comments removed confirms executable code unchanged (/tmp/168-comment-audit.log). Docs-check passes 22 excerpt tests and Astro diagnostics (/tmp/168-writing-docs.log). Existing final matrix remains applicable: eight combinations, both compilers, 369 runtime cases each (/tmp/168-latest-matrix.log).",
+        "Scope and checks unchanged; no German prose. Fresh consumer-agent/discovery and parent Astra/browser/#167 GUI/platform/Fallow limits remain unverified."
       ]
     },
     "source:vite.config.ts": {

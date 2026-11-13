@@ -8,11 +8,16 @@ Spec #166 ticket #168 requires a complete public contract and reproducible evide
 
 ## Decision
 
-Retain `effect >=4.0.6 <4.2.0` and `@tanstack/query-core >=5.104.4 <6`. Check the Cartesian product of Effect minimum 4.0.6, 4.0 representative 4.0.7, development 4.1.0 and 4.1 representative 4.1.2 with Query Core minimum 5.104.4 and development 5.105.0. Pinned representatives are refreshed through explicit review, not dynamic latest selection. Keep strict seven-day age enforcement. [Effect registry metadata](https://registry.npmjs.org/effect) and [Query Core registry metadata](https://registry.npmjs.org/@tanstack%2fquery-core) verify these versions are eligible; Effect 4.1.3/4.1.4 are too young at the 2026-11-13 review. This does not update development pins or promise upstream backports.
+Retain `effect >=4.0.6 <4.2.0` and `@tanstack/query-core >=5.104.4 <6`. Check each Effect version against both Query Core versions:
+
+- Effect: minimum 4.0.6, 4.0 representative 4.0.7, development 4.1.0 and 4.1 representative 4.1.2.
+- Query Core: minimum 5.104.4 and development 5.105.0.
+
+Refresh pinned representatives through explicit review. CI uses exact pins. Keep strict seven-day age enforcement. [Effect registry metadata](https://registry.npmjs.org/effect) and [Query Core registry metadata](https://registry.npmjs.org/@tanstack%2fquery-core) verify these versions are eligible. Effect 4.1.3/4.1.4 are too young at the 2026-11-13 review. This does not update development pins or promise upstream backports.
 
 Packed consumers run public fixtures under pinned TSRS and minimum TypeScript 5.9.3, plus selected execution, stream, cancellation and hydration regressions. Verify artifact imports and the packed library's peers against consumer resolution. Framework consumers/builds remain separate evidence for the selected development combination. Support ranges admit untested intermediate versions; exact combinations are evidence rather than exhaustive certification. Review future Effect minors and TypeScript majors explicitly. Applications coordinate their Effect packages and native Query wrappers.
 
-For future changes, compatible fixes/internal tooling are patch changes; additive capabilities/verified range extensions are minor changes; breaking contracts or dropping supported dependency/compiler versions are major changes, even below 1.0. Raising a floor is a support drop. Preserve historical release classifications. This decision authorizes no publication or release scheduling.
+For future changes, classify compatible fixes and internal tooling as patch changes. Classify additive capabilities and verified range extensions as minor changes. Classify breaking contracts and supported dependency/compiler drops as major changes, even below 1.0. Raising a floor is a support drop. Preserve historical release classifications. This decision authorizes no publication or release scheduling.
 
 ## Consequences
 

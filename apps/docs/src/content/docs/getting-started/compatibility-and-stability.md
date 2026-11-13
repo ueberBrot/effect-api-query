@@ -31,4 +31,8 @@ Hydration uses explicitly registered paired codecs for decoded views; infinite d
 
 ## Versioning
 
-Compatible fixes and internal tooling changes are patch changes. Additive capabilities and verified dependency-range extensions are minor changes. Breaking public contracts, or dropping any supported dependency or compiler version, are major changes, including while this package is below 1.0. A development pin update within an unchanged supported range is internal tooling when it changes no public behavior; it does not itself extend support. A newly required upstream API or fix that raises the floor drops support and therefore requires a major change. These rules classify future changes; they do not relabel historical releases or schedule publication. See [ADR 0042](https://github.com/ueberBrot/effect-api-query/blob/main/docs/adr/0042-define-the-compatibility-promise.md).
+- **Patch:** Compatible fixes and internal tooling changes.
+- **Minor:** Additive capabilities and verified dependency-range extensions.
+- **Major:** Breaking public contracts or dropping any supported dependency or compiler version, including while this package is below 1.0.
+
+A development pin update within an unchanged supported range is internal tooling when it changes no public behavior; it does not itself extend support. A newly required upstream API or fix that raises the floor drops support and therefore requires a major change. These rules apply to future changes. Historical release classifications remain unchanged; publication requires separate authorization. See [ADR 0042](https://github.com/ueberBrot/effect-api-query/blob/main/docs/adr/0042-define-the-compatibility-promise.md).
