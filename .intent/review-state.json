@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "74d3d293d45400509d7f7f82b1dbbaad3bb29db703134b08eab47d67fcbd058f",
+      "fingerprint": "a7525050b3b2f7611f298db90ee11974c74715bb79e9c687cab9cfb064537134",
       "snapshot": {
         "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -23,7 +23,6 @@
         "apps/docs/src/content/docs/getting-started/quick-start.md": "ade6edb93d713046dc19d01c7c4c93e0bf09c81fa0abbe80234668699698cc5f",
         "apps/docs/src/content/docs/guides/angular-query.md": "beb279a2ef34d1e69e685bcd8dbeddb0fafb0228ede9107dd9f95d86f9e5c72c",
         "apps/docs/src/content/docs/guides/cache-filters.md": "b0b8a08b6e2f3484a2565b6bd6d080cd1e95b3e9aefcb5aaf121cd7a96ad2591",
-        "apps/docs/src/content/docs/guides/cache-management.md": null,
         "apps/docs/src/content/docs/guides/cancellation.md": "7af74ddcb64ddc5454e3d8b4326a79b9683f1d744537c2b2f267e61a9447274b",
         "apps/docs/src/content/docs/guides/choose-stream-history.md": "9aefb63f50a3b020db5cd678d43b3ca0374c82bc9dce61a1cb429ecde313d438",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "cb941076de91c32bc0a1a5e8f6463ea521457210c00ccf4ef4e7de7c5fd135e9",
@@ -175,7 +174,7 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "88899a47ccd31569a2e95cba153cf1b95f471243f58ccb3e18c6d18d42e03fe6",
+        "package.json": "f601fc8c8c5139f4da2805d2faddc2a61085782d32c4929e7920a3e27e0ba71d",
         "pnpm-workspace.yaml": "c7ceebab8301785f74932daaf1b16f2b09cbc5d7f030868659857724e71b8956",
         "scripts/check-effect-compatibility.mts": "3911f16301e90bd466f2c7fe4b1637b6a653eb23140c6bf57eb7d329ede0d50b",
         "scripts/check-framework-consumers.mts": "f0111ac9ed84996f722f656358b810da0b9ecc8c6c0219a2019d1076b5d50cbc",
@@ -189,8 +188,6 @@
         "scripts/performance/budgets.mts": "a97ce19167bda55891a66daa14263549643757dd5db309c367e4be766637b957",
         "scripts/performance/common.mts": "507d45618fbaf2c7be6f986a5f958d1958cdddc95e42a77ff1d50d8225538a3d",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
-        "scripts/verify-docs-examples.mts": null,
-        "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "788dcfa211e8a51b2bbf50df1c513157a21d726a4fb18f3c31822d9eb174454d",
         "skills/effect-api-query/references/cache-workflows.md": "1d80a087881094a7d50dbf7ce20c7ab8a2800f05aae432523645d4cba82b98e3",
@@ -370,16 +367,18 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "d56b6eaebbf844c67b03f3b4781974347c106154",
+      "head": "9306d07d1bcd767bbf6d3f56107028c62f107c85",
       "outcome": "no-change",
-      "reason": "The isolated maintenance checkout must copy scripts/compiler.mts because its copied real Vite config now imports that module. This fixes fixture completeness without changing assertions, command behavior or shipped guidance. Existing domain map, skill spec and skill tree already cover the compiler integration, editor cleanup and tests; no planning rewrite or new skill is needed.",
+      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
       "evidence": [
-        "Hosted cleanup CI43435588575 reproduced seven existing maintenance failures from an unresolved config import. All seven pass after adding the real compiler module to the fixture copy list.",
-        "Complete uncached test task passes all 870 runtime cases plus current/minimum public and server compiler fixtures; direct declaration emission, ATTW/publint pass. Existing editor/platform/discovery limits remain explicit."
+        "Before versioning: intent maintainer check passed at 9306d07d1bcd767bbf6d3f56107028c62f107c85.",
+        "changeset version and vp fmt generated 0.6.1 -> 0.7.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: package.json."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "b705fb53ca0ea22b12f82bd4804f81d9ff06cf7b1049df4b17d9cdc6192f9df3",
+      "fingerprint": "4506e967aa0af44c6201e324edc2f118c168580eebcdf98423f8b61ead9e247f",
       "snapshot": {
         "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -402,7 +401,6 @@
         "apps/docs/src/content/docs/getting-started/quick-start.md": "ade6edb93d713046dc19d01c7c4c93e0bf09c81fa0abbe80234668699698cc5f",
         "apps/docs/src/content/docs/guides/angular-query.md": "beb279a2ef34d1e69e685bcd8dbeddb0fafb0228ede9107dd9f95d86f9e5c72c",
         "apps/docs/src/content/docs/guides/cache-filters.md": "b0b8a08b6e2f3484a2565b6bd6d080cd1e95b3e9aefcb5aaf121cd7a96ad2591",
-        "apps/docs/src/content/docs/guides/cache-management.md": null,
         "apps/docs/src/content/docs/guides/cancellation.md": "7af74ddcb64ddc5454e3d8b4326a79b9683f1d744537c2b2f267e61a9447274b",
         "apps/docs/src/content/docs/guides/choose-stream-history.md": "9aefb63f50a3b020db5cd678d43b3ca0374c82bc9dce61a1cb429ecde313d438",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "cb941076de91c32bc0a1a5e8f6463ea521457210c00ccf4ef4e7de7c5fd135e9",
@@ -554,7 +552,7 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "88899a47ccd31569a2e95cba153cf1b95f471243f58ccb3e18c6d18d42e03fe6",
+        "package.json": "f601fc8c8c5139f4da2805d2faddc2a61085782d32c4929e7920a3e27e0ba71d",
         "pnpm-workspace.yaml": "c7ceebab8301785f74932daaf1b16f2b09cbc5d7f030868659857724e71b8956",
         "scripts/check-effect-compatibility.mts": "3911f16301e90bd466f2c7fe4b1637b6a653eb23140c6bf57eb7d329ede0d50b",
         "scripts/check-framework-consumers.mts": "f0111ac9ed84996f722f656358b810da0b9ecc8c6c0219a2019d1076b5d50cbc",
@@ -568,8 +566,6 @@
         "scripts/performance/budgets.mts": "a97ce19167bda55891a66daa14263549643757dd5db309c367e4be766637b957",
         "scripts/performance/common.mts": "507d45618fbaf2c7be6f986a5f958d1958cdddc95e42a77ff1d50d8225538a3d",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
-        "scripts/verify-docs-examples.mts": null,
-        "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "788dcfa211e8a51b2bbf50df1c513157a21d726a4fb18f3c31822d9eb174454d",
         "skills/effect-api-query/references/cache-workflows.md": "1d80a087881094a7d50dbf7ce20c7ab8a2800f05aae432523645d4cba82b98e3",
@@ -749,12 +745,14 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "d56b6eaebbf844c67b03f3b4781974347c106154",
+      "head": "9306d07d1bcd767bbf6d3f56107028c62f107c85",
       "outcome": "no-change",
-      "reason": "The isolated maintenance checkout must copy scripts/compiler.mts because its copied real Vite config now imports that module. This fixes fixture completeness without changing assertions, command behavior or shipped guidance. Existing domain map, skill spec and skill tree already cover the compiler integration, editor cleanup and tests; no planning rewrite or new skill is needed.",
+      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
       "evidence": [
-        "Hosted cleanup CI43435588575 reproduced seven existing maintenance failures from an unresolved config import. All seven pass after adding the real compiler module to the fixture copy list.",
-        "Complete uncached test task passes all 870 runtime cases plus current/minimum public and server compiler fixtures; direct declaration emission, ATTW/publint pass. Existing editor/platform/discovery limits remain explicit."
+        "Before versioning: intent maintainer check passed at 9306d07d1bcd767bbf6d3f56107028c62f107c85.",
+        "changeset version and vp fmt generated 0.6.1 -> 0.7.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: package.json."
       ]
     },
     "source:vite.config.ts": {
@@ -1915,16 +1913,16 @@
       ]
     },
     "source:CHANGELOG.md": {
-      "fingerprint": "77559724d93c124bcd05fb88cda744ea8e2829f4f1a9bc98fd0eebf8aa970edb",
+      "fingerprint": "53b025f494fad4e142fcb693ad8d2a16c7732297457748386affb489136bedd4",
       "snapshot": {
-        "CHANGELOG.md": "16fea9e8bbb5654c88625d3bce1f560fd22ad41a8569332b5d0187927119c424"
+        "CHANGELOG.md": "348df5bb4b6e0bd36822dd8bf62fbac7cd66c7a930a285da1f12723c977049ca"
       },
-      "head": "56d6476c6d69c35c371df6928ddeafa03f0649fe",
+      "head": "9306d07d1bcd767bbf6d3f56107028c62f107c85",
       "outcome": "no-change",
       "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Before versioning: intent maintainer check passed at 56d6476c6d69c35c371df6928ddeafa03f0649fe.",
-        "changeset version and vp fmt generated 0.6.0 -> 0.6.1.",
+        "Before versioning: intent maintainer check passed at 9306d07d1bcd767bbf6d3f56107028c62f107c85.",
+        "changeset version and vp fmt generated 0.6.1 -> 0.7.0.",
         "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
         "Scoped generated changes: CHANGELOG.md."
       ]
@@ -3130,15 +3128,18 @@
       ]
     },
     "source:.changeset/tidy-stream-execution.md": {
-      "fingerprint": "d5d9a3fee8ceaf4c778b3c76fea3031fbff98f15fb3439dae514815624e066f2",
+      "fingerprint": "343c84789e560286f9e0b06daa6242865e4ff2247ce03856003a2df16346cd25",
       "snapshot": {
-        ".changeset/tidy-stream-execution.md": "94358228f4c7c66fe3b705b180491fb90d4e68c886bf4b7308db218b2eb40167"
+        ".changeset/tidy-stream-execution.md": null
       },
-      "head": "16c1fe41498b2ee6ea70644bead0623973449aa7",
+      "head": "9306d07d1bcd767bbf6d3f56107028c62f107c85",
       "outcome": "no-change",
-      "reason": "Patch release note describes internal stable Query Core integration and unchanged stream semantics. Existing query-patterns guidance was reconciled in the owning skill review; the release note requires no independently discoverable skill.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/tidy-stream-execution.md; src/core/streamed-query.ts; 801 runtime tests and 301 post-merge stream cases pass; package validation passes"
+        "Before versioning: intent maintainer check passed at 9306d07d1bcd767bbf6d3f56107028c62f107c85.",
+        "changeset version and vp fmt generated 0.6.1 -> 0.7.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/tidy-stream-execution.md."
       ]
     },
     "source:.devcontainer/setup.sh": {
@@ -3232,70 +3233,78 @@
       ]
     },
     "source:.changeset/opaque-recovery-cursors.md": {
-      "fingerprint": "061ce7cd5b508fa0685fd9276b1e16957a3bb48df9fd527996fdb96b9bdbb8c9",
+      "fingerprint": "d5c3e1fe4bf429201f4367d3fb4d8fd25cace734ac9f895c2013a0dab75d6152",
       "snapshot": {
-        ".changeset/opaque-recovery-cursors.md": "31c9f43c071b47389a42cc7ef527e58a5040fd0fd7d0578067a1d6763633909a"
+        ".changeset/opaque-recovery-cursors.md": null
       },
-      "head": "296e650f55f067f660207ab8a3c3ff02b7a0f807",
+      "head": "9306d07d1bcd767bbf6d3f56107028c62f107c85",
       "outcome": "no-change",
-      "reason": "Minor release note accurately describes the additive cursor policy and preserved inference/cleanup behavior. The existing query-patterns and cache-workflows references already own this guidance; no separate skill is warranted.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/opaque-recovery-cursors.md compared with src/core/stream-recovery.ts and passing public recovery/compiler regressions."
+        "Before versioning: intent maintainer check passed at 9306d07d1bcd767bbf6d3f56107028c62f107c85.",
+        "changeset version and vp fmt generated 0.6.1 -> 0.7.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/opaque-recovery-cursors.md."
       ]
     },
     "source:.changeset/live-snapshot-coalescing.md": {
-      "fingerprint": "739b4bd64a56aec93d711fd5c2c54a2a6b2c8ba4eae1284c50042558cbd7b7b9",
+      "fingerprint": "89d1e848dcb29c465bb3d43715857e952dbea21e836782acda6319709e117062",
       "snapshot": {
-        ".changeset/live-snapshot-coalescing.md": "faae7c5d4959b2b95d67692596ceebfe944ce8521eb957a64f7f4669fbf9877c"
+        ".changeset/live-snapshot-coalescing.md": null
       },
-      "head": "3e70c515feb8f89a2b9a3aa8086404436a3d1efb",
-      "outcome": "updated",
-      "reason": "Maintainer explicitly retains pre-1.0 minor breaking changes and removes the erroneous unreleased168major rule and version-migration wording. Reconcile ADR0001/0042 and current consumer/agent guidance. Delete the three requested one-off reports, retain tools/budgets and the existing Intent planning inputs, and point retained evidence to PR181.",
+      "head": "9306d07d1bcd767bbf6d3f56107028c62f107c85",
+      "outcome": "no-change",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Diff against3e70c515: changeset minor, current behavior guidance, ADR0001 history restored and unreleased0042rule withdrawn under explicit maintainer direction. _artifacts/skill_spec records the correction; domain_map and skill_tree remain accurate with existing one-skill/six-reference ownership and sources. Three report files removed; no runtime/type/measurement implementation changed.",
-        "Scoped formatter and whitespace pass; vp run --no-cache docs-check passes24excerpts and Astro zero errors/warnings/hints. Changesets status reports minor, no package version file changed. skills-check passes. No fresh consumer/discovery or runtime rerun claimed for release/guidance-only edits."
+        "Before versioning: intent maintainer check passed at 9306d07d1bcd767bbf6d3f56107028c62f107c85.",
+        "changeset version and vp fmt generated 0.6.1 -> 0.7.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/live-snapshot-coalescing.md."
       ]
     },
     "source:.changeset/scoped-query-owner.md": {
-      "fingerprint": "56cdcf674306523345f4e593edcb0550a0837f544635d8cde759ca739a46cedb",
+      "fingerprint": "6473e6fe58dc9b966f2cb6292515ad6ca32016b8eee861cfa34fc7bda02c4693",
       "snapshot": {
-        ".changeset/scoped-query-owner.md": "29739b1d8c2ab848949681099338ee8fc7d85d156edf9b397db9c5cc9fb83635"
+        ".changeset/scoped-query-owner.md": null
       },
-      "head": "90ca0e6ac412cf97f62854b7e29d4438e2d6ffb0",
+      "head": "9306d07d1bcd767bbf6d3f56107028c62f107c85",
       "outcome": "no-change",
-      "reason": "Inspected actual owned diff: host imports now name the private shared package, common stylesheet scanning follows shared ownership, exact lint/type path exceptions follow moved modules, the real toolchain command is a Fallow entry, and the existing minor changeset describes corrected registration. These implementation and tooling details require no additional shipped guidance.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Source base 90ca0e6; actual src/core/query-owner.ts and examples/shared/http-workflows/application.ts diff; native public application and owner regressions.",
-        "architecture-raw-finalizer-red.log and architecture-same-turn-red.log reproduce prior failures; corresponding GREEN evidence and final 870 runtime tests pass.",
-        "Both pinned public/server compilers, strict 231-file checking/457-file formatting, package/ATTW/publint, native framework compilers, Effect diagnostics and toolchain rejection checks pass.",
-        "Both final production builds and docs checks pass; all four Fallow audits pass with clean development/production dead-code scans and no new suppressions/threshold changes.",
-        "150 browser cases passed before private workspace packaging; final 150-case browser rerun running. Eight packed peer pairs passed 403 cases each before internal type-export/consumer-fixture cleanup; final CI will rerun the matrix.",
-        "Fresh Astra architecture/fix source rechecks found no remaining actionable admission finding. No fresh consumer/discovery or GUI/platform claim; default yamllint retains repository line-length/document-start issues."
+        "Before versioning: intent maintainer check passed at 9306d07d1bcd767bbf6d3f56107028c62f107c85.",
+        "changeset version and vp fmt generated 0.6.1 -> 0.7.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/scoped-query-owner.md."
       ]
     },
     "source:.changeset/effect-query-client-operations.md": {
-      "fingerprint": "fe25d9bd55c4577f6ecf4da3d60edc0f32f289c80a162ab6c6879e9e31eeeabb",
+      "fingerprint": "66bdb0ecca2eb5a43846f7cd3e3dfdfec5ee5dd4415728489a2da6b8dda823ac",
       "snapshot": {
-        ".changeset/effect-query-client-operations.md": "7be24ea7f71eabf207718a975c0b6d7281e7a36cbdbbfef343302109857960ed"
+        ".changeset/effect-query-client-operations.md": null
       },
-      "head": "97a8cc5e722a0b94c1241b28f8ac7f4d202a2321",
+      "head": "9306d07d1bcd767bbf6d3f56107028c62f107c85",
       "outcome": "no-change",
-      "reason": "Release note describes only the additive optional bridge and minor classification already covered by the updated cache-workflows guidance; no additional skill or planning task is warranted.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/effect-query-client-operations.md agrees with tested public API and new Query Effects guide. No version or publication performed."
+        "Before versioning: intent maintainer check passed at 9306d07d1bcd767bbf6d3f56107028c62f107c85.",
+        "changeset version and vp fmt generated 0.6.1 -> 0.7.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/effect-query-client-operations.md."
       ]
     },
     "source:.changeset/schema-reference-sharing.md": {
-      "fingerprint": "5d46ff43aaacd4f4c9b1f10369168c15655b9b89846af449acca574aa1c8b3fc",
+      "fingerprint": "dd641ee7249478c24fa96ba819aefdfce193fb085f303b24047a192315aae2e7",
       "snapshot": {
-        ".changeset/schema-reference-sharing.md": "a7e77d09fd6f4c978bd2605511746c341a36e3751225d2ecb24a88974339177e"
+        ".changeset/schema-reference-sharing.md": null
       },
-      "head": "e781e664066e816588650d35bbef808d512c160f",
+      "head": "9306d07d1bcd767bbf6d3f56107028c62f107c85",
       "outcome": "no-change",
-      "reason": "Minor changeset records the new opt-in helper; consumer usage and constraints are already covered by the owned cache-workflows reference.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/schema-reference-sharing.md",
-        "No package publication or version mutation performed."
+        "Before versioning: intent maintainer check passed at 9306d07d1bcd767bbf6d3f56107028c62f107c85.",
+        "changeset version and vp fmt generated 0.6.1 -> 0.7.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/schema-reference-sharing.md."
       ]
     },
     "source:_artifacts/http-type-performance-178.md": {
@@ -3315,44 +3324,48 @@
       ]
     },
     "source:.changeset/scoped-event-cache.md": {
-      "fingerprint": "f52009047fc22c9743b1af22feb32fd50ccf33a263f95f917a966d0a272079e7",
+      "fingerprint": "115a6d66c76da8eb8aa370daaf7edda83bbebb590bd99177cb2d446a1d069174",
       "snapshot": {
-        ".changeset/scoped-event-cache.md": "a9041135d3e9795f5946b73f59cb9eee317c9c7c000ea797327544be0086c5af"
+        ".changeset/scoped-event-cache.md": null
       },
-      "head": "c23eecab4a337c7c75e19f382d98b143fe679f8b",
+      "head": "9306d07d1bcd767bbf6d3f56107028c62f107c85",
       "outcome": "no-change",
-      "reason": "Reviewed ticket-owned addition/configuration: changeset describes additive workflow; sidebar exposes its guide; compiler/lint allowlists extend only the existing RPC unstable-API exception to the new recipe. No additional skill is needed.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "src/core/query-events.ts; examples/shared/query-events.ts; tests/query-events.test.ts; tests/types/query-events-contract.ts",
-        "53 public runtime cases pass; public compiler fixtures pass TSRS 7.1 beta and TS5.9.3; strict typed check passes 220 files; Effect and docs checks pass; formatting and YAML pass.",
-        "Writing/comment audit applied; fresh consumer discovery unverified because agents are prohibited. Existing ADR0031/0040 preserve these contracts."
+        "Before versioning: intent maintainer check passed at 9306d07d1bcd767bbf6d3f56107028c62f107c85.",
+        "changeset version and vp fmt generated 0.6.1 -> 0.7.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/scoped-event-cache.md."
       ]
     },
     "source:.changeset/typed-loader-selections.md": {
-      "fingerprint": "ec417855968209334823e924f969999b74a7a11d95c4294f7ba8cf604bfc9ab4",
+      "fingerprint": "8d1ba497eb3c9a428c7efb4091c37e53e327dcdee00251ab3b01d47fcc6bbc2e",
       "snapshot": {
-        ".changeset/typed-loader-selections.md": "06a1ed6e2e16ebb5a8b0b27db47be7ab97f49b6cd9e432b96d035cc0261ba5b3"
+        ".changeset/typed-loader-selections.md": null
       },
-      "head": "d33ef99fadf38eb3822701f6747b7314e97b34d3",
+      "head": "9306d07d1bcd767bbf6d3f56107028c62f107c85",
       "outcome": "no-change",
-      "reason": "Release note declares additive behavior, navigation exposes the complete guide, and pinned compiler/lint configs admit the new RPC/HTTP integration test under the existing unstable API allowance. Owning hydration reference covers the behavior; these files need no separate skill.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Actual staged source diff inspected",
-        "Package validation, strict typed check, Effect check and docs-check pass"
+        "Before versioning: intent maintainer check passed at 9306d07d1bcd767bbf6d3f56107028c62f107c85.",
+        "changeset version and vp fmt generated 0.6.1 -> 0.7.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/typed-loader-selections.md."
       ]
     },
     "source:.changeset/sound-query-effects-rejections.md": {
-      "fingerprint": "9bf264fabef3ab5a47e9fdd13cf1af1f977084644de581b7b27d3abe22b5ef6c",
+      "fingerprint": "3bce6aaa704ac8c65b0318f8d2a25a6bd5f162e1de84d0fec8533d08483c86a2",
       "snapshot": {
-        ".changeset/sound-query-effects-rejections.md": "14d252512690f2d99eceefaf6bb95c87872cb2ce3b31b7b149fea771e7b71b5f"
+        ".changeset/sound-query-effects-rejections.md": null
       },
-      "head": "62cee6d2f7bd6842b62af39778c22e93fa8f6a0c",
-      "outcome": "updated",
-      "reason": "Correct #174 S1: native rejection has no proof of the current failed Exit. Fetch/ensure now retain every exact rejected object in QueryClientOperationError.cause; reconcile bridge, compatibility and exports guidance without changing support ranges/versioning/matrix claims. Preserve native declared option types, data/services and waiter interruption. Planning extends existing cache task; source globs/one skill/six references remain accurate.",
+      "head": "9306d07d1bcd767bbf6d3f56107028c62f107c85",
+      "outcome": "no-change",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "src/core/query-effects.ts; tests/query-effects.test.ts: four foreign/same-family rejection cases failed before fix (/tmp/174-fix-red.log); post-merge 105 runtime tests in nine files pass (/tmp/174-fix-merged-tests.log), including full Cause identity and shared observer interruption.",
-        "Published fixtures pass pinned TSRS 0.21.0/Effect tsgo 0.67.3 and TS5.9.3, including exact conservative bridge channel, unknown cause, preserved native declared failure/data/services; package ATTW/publint pass in serial task prerequisites.",
-        "Merged strict typecheck, Effect check and 23 documentation excerpt tests/Astro pass; scoped formatting and YAML parse pass (existing line-length warnings). domain_map and skill_spec updated; skill_tree source mappings remain accurate with sync no-op. Fresh consumer discovery and parent Astra two-axis/168 acceptance rechecks and final combined matrix remain unverified."
+        "Before versioning: intent maintainer check passed at 9306d07d1bcd767bbf6d3f56107028c62f107c85.",
+        "changeset version and vp fmt generated 0.6.1 -> 0.7.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/sound-query-effects-rejections.md."
       ]
     },
     "source:_artifacts/query-fallow-180.md": {

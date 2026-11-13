@@ -1,5 +1,31 @@
 # effect-api-query
 
+## 0.7.0
+
+### Minor Changes
+
+- [#181](https://github.com/ueberBrot/effect-api-query/pull/181) [`d14f7b4`](https://github.com/ueberBrot/effect-api-query/commit/d14f7b45179222ea8e4e0d17f3870961c52826f8) - Add optional typed Effect operations over an application-supplied QueryClient, preserving shared fetching, unselected cache data, full execution Causes, and caller-only interruption.
+
+- [#181](https://github.com/ueberBrot/effect-api-query/pull/181) [`d14f7b4`](https://github.com/ueberBrot/effect-api-query/commit/d14f7b45179222ea8e4e0d17f3870961c52826f8) - Add opt-in live snapshot coalescing with immediate first publication, fixed pending deadlines, final flush, and consistent configured cache identity.
+
+  RPC live key types include an optional trailing policy tuple slot. This is a breaking type change released as a minor version below 1.0. Literal operation paths and query data/error tags remain intact.
+
+- [#181](https://github.com/ueberBrot/effect-api-query/pull/181) [`d14f7b4`](https://github.com/ueberBrot/effect-api-query/commit/d14f7b45179222ea8e4e0d17f3870961c52826f8) - Support application-defined recovery cursors with explicit acceptance and gap policies while retaining numeric sequence convenience. Preserve connection and hook failure/service inference, scoped cleanup, retry and authoritative refresh behavior.
+
+- [#181](https://github.com/ueberBrot/effect-api-query/pull/181) [`d14f7b4`](https://github.com/ueberBrot/effect-api-query/commit/d14f7b45179222ea8e4e0d17f3870961c52826f8) - Add opt-in Schema-defined reference sharing for immutable decoded atoms inside plain query-data containers, with explicit equivalence and native structural-sharing policies.
+
+- [#181](https://github.com/ueberBrot/effect-api-query/pull/181) [`d14f7b4`](https://github.com/ueberBrot/effect-api-query/commit/d14f7b45179222ea8e4e0d17f3870961c52826f8) - Add `runQueryEvents` to consume application events against a query owner's native cache. Compose cursor recovery, typed updates and invalidation while retirement interrupts and drains consumption.
+
+- [#181](https://github.com/ueberBrot/effect-api-query/pull/181) [`d14f7b4`](https://github.com/ueberBrot/effect-api-query/commit/d14f7b45179222ea8e4e0d17f3870961c52826f8) - Add optional acquired/borrowed query owner setup, precise accepted-work draining, guarded cache callbacks and idempotent retirement outside lifecycle-neutral factories. Register accepted work before starting it so immediate retirement still drains nested query runners and synchronous callbacks.
+
+- [#181](https://github.com/ueberBrot/effect-api-query/pull/181) [`d14f7b4`](https://github.com/ueberBrot/effect-api-query/commit/d14f7b45179222ea8e4e0d17f3870961c52826f8) - Add typed loader descriptors with explicit input codecs and receiving-owner validation. Reuse selected input across independent server and browser owners with native hydration, providers and hooks.
+
+### Patch Changes
+
+- [#181](https://github.com/ueberBrot/effect-api-query/pull/181) [`d14f7b4`](https://github.com/ueberBrot/effect-api-query/commit/d14f7b45179222ea8e4e0d17f3870961c52826f8) - Make fetch/ensure Effects report QueryClientOperationError with the exact native rejection in cause. Foreign runner wrappers can no longer masquerade as the current query's declared failure. Generated wrappers and complete Effect Causes remain intact inside cause.
+
+- [#181](https://github.com/ueberBrot/effect-api-query/pull/181) [`d14f7b4`](https://github.com/ueberBrot/effect-api-query/commit/d14f7b45179222ea8e4e0d17f3870961c52826f8) - Implement accumulated and live stream publication through stable Query Core cache operations, preserving existing stream policies, cancellation, and cleanup Causes while avoiding repeated full-cache scans.
+
 ## 0.6.1
 
 ### Patch Changes
