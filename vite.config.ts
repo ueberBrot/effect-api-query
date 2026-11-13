@@ -1,5 +1,3 @@
-import { fileURLToPath } from "node:url";
-
 import { strict as effectStrict } from "@effect/tsgo/oxlint-presets";
 import { ConfigProvider, Effect, Predicate } from "effect";
 import ultraciteOxfmt from "ultracite/oxfmt";
@@ -11,6 +9,8 @@ import ultraciteTanstack from "ultracite/oxlint/tanstack";
 import ultraciteVitest from "ultracite/oxlint/vitest";
 import { defineConfig } from "vite-plus";
 import type { OxlintConfig } from "vite-plus/lint";
+
+import { compilerExecutable } from "./scripts/compiler.mts";
 
 const ignoredPaths = [
   ".agents/**",
@@ -359,7 +359,7 @@ export default defineConfig({
       generator: "tsgo",
       tsconfig: "tsconfig.declarations.json",
       tsgo: {
-        path: fileURLToPath(new URL(".vscode/tsdk/tsgo", import.meta.url)),
+        path: compilerExecutable(),
       },
     },
     entry: ["src/index.ts"],

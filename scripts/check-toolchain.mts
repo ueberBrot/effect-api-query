@@ -4,7 +4,11 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { compilerCommand, currentCompiler } from "./compiler.mts";
+import {
+  compilerCommand,
+  compilerExecutable,
+  currentCompiler,
+} from "./compiler.mts";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 mkdirSync(path.join(root, ".artifacts"), { recursive: true });
@@ -29,6 +33,16 @@ try {
       version.output.includes("7.1.0-beta+effect-tsgo.0.67.3") &&
       version.output.includes("tsrs 0.21.0"),
     version.output
+  );
+  const declarationCompiler = spawnSync(compilerExecutable(), ["--version"], {
+    cwd: root,
+    encoding: "utf-8",
+    timeout: 60_000,
+  });
+  ok(
+    declarationCompiler.status === 0 &&
+      declarationCompiler.stdout === version.output,
+    declarationCompiler.error?.message ?? declarationCompiler.stderr
   );
   writeFileSync(
     config,
