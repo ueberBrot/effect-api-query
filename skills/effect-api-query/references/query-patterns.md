@@ -183,7 +183,11 @@ Sources: [builders](https://ueberbrot.github.io/effect-api-query/reference/gener
 
 ## Prepare a reused input
 
-For repeated large inputs, call `prepareInput(leaf, input)` once and pass the opaque handle to that leaf's key builders and ordinary, metadata, live, or streamed options. HTTP uses decoded request containers. Construction, encoding, and canonicalization run once. Keep the retained execution input and nested values unchanged; this is not a deep snapshot. Construct a new handle when input changes. Handles belong to one leaf and factory owner, including its configured copies. They cannot be serialized or passed as mutation variables or infinite page mapper results. `InferInput` remains the raw input type. Create factories once per owner, outside component renders.
+Create factories and apply shared `configureUtils` policies once per owner, outside component renders.
+
+For repeated large inputs, call `prepareInput(leaf, input)` once. Pass the opaque handle to that leaf's key builders and ordinary, metadata, live, or streamed options. HTTP uses decoded request containers. Preparation runs construction, encoding, and canonicalization once. Keep retained execution input and nested values unchanged; the handle is not a deep snapshot. When input changes, construct a new handle and rebuild options. In reactive frameworks, rebuild them inside the framework's accessor.
+
+Handles belong to one leaf and factory owner, including its configured copies. They cannot be serialized or passed as mutation variables or infinite page mapper results. `InferInput` remains the raw input type. Reusing utilities and handles saves runtime work; the compiler still checks literal contracts and native hook inference.
 
 ## Consume events without cache history
 

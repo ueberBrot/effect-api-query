@@ -65,3 +65,6 @@ createQueryDescriptor(rpc.read, "query", {
   // @ts-expect-error Descriptor codecs must be service-free for synchronous rebinding.
   input: serviceCodec,
 });
+
+// @ts-expect-error Infinite views require a local page mapper, not a single captured input.
+createQueryDescriptor(rpc.read, "infinite", { contract: "v1", input });

@@ -12,7 +12,10 @@ import { viewPrefix } from "./view-prefix";
 declare const descriptorType: unique symbol;
 
 /** A JSON selection. Contract revisions are application-owned compatibility identifiers. */
-export interface QueryDescriptor<Leaf, View extends SupportedQueryView<Leaf>> {
+export interface QueryDescriptor<
+  Leaf,
+  View extends Exclude<SupportedQueryView<Leaf>, "infinite">,
+> {
   readonly [descriptorType]?: { readonly leaf: Leaf };
   readonly version: 1;
   readonly contract: string;
@@ -44,7 +47,7 @@ const envelope = Schema.Struct({
 /** Binds one explicit operation/view to each receiving ready-client owner. */
 export const createQueryDescriptor = <
   Leaf extends { readonly key: () => QueryKey },
-  View extends SupportedQueryView<Leaf>,
+  View extends Exclude<SupportedQueryView<Leaf>, "infinite">,
   Encoded,
 >(
   leaf: Leaf,
@@ -57,7 +60,11 @@ export const createQueryDescriptor = <
   const operation = canonicalizeArray(leaf.key());
   const { contract } = options;
   const prefix = viewPrefix(leaf, view);
-  if (!(`${view}Options` in leaf) || !(`${view}Key` in leaf)) {
+  if (
+    !["query", "metadata", "streamed", "live"].includes(view) ||
+    !(`${view}Options` in leaf) ||
+    !(`${view}Key` in leaf)
+  ) {
     throw new QueryDescriptorError("Incompatible");
   }
   const encode = Schema.encodeUnknownSync(options.input);
