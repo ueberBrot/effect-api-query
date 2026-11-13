@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "e2d3a82c06fdfcd2df3ddf186ea683b4cfaca477674c01d945609a065b5eae30",
+      "fingerprint": "05e981c0c708f84ab8b18483fada792249420edb4d55b566dcf423a6d2741908",
       "snapshot": {
         "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -149,7 +149,7 @@
         "examples/tanstack-start/tests/server-render.test.tsx": "e46b15c02fc7b5fc76d52f9d64dfc5b88d4d36e0151908138de9babe7a5d53a3",
         "examples/vite-react/src/app.tsx": "96f17567f1a4c387c30ba64bfadd8cc2d8260dde7699269951e26197e29ecd42",
         "examples/vite-react/src/components/ui/effect-error-details.tsx": "5c14c07465cd1f382a71c7e5b35b0adbc29cc3b5fc75bf3138824bd1d28b3821",
-        "examples/vite-react/src/lib/application.ts": "e4e6cad524b8742cb41ffea95e6b6a27f28fea8cf6f37b7fbb5f5e4446e199d0",
+        "examples/vite-react/src/lib/application.ts": "da2b2fa16d237e6fcc49b4ffbd99d2aa8a402a861f78cf71634a07172bd12bd3",
         "examples/vite-react/src/lib/owner-cache.ts": "e9eaa783cce49e7905027ae93ef1c525e2713187e83ffa4ecf726ba7235a420d",
         "examples/vite-react/src/lib/user-writes.ts": "999277fa02ff9c1439186b59636f7078458a5cbc3c84bed06514867b270a3b5e",
         "examples/vite-react/src/main.tsx": "9129bf323b8763d540df1ba4d7660739065d3f417cd287125292b51b56f4e02d",
@@ -368,15 +368,15 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "bc4e899e8f9ae5cfb4c23870870a59e0b659f805",
-      "outcome": "updated",
-      "reason": "The frameworks reference and HTTP workflow guide now describe actual Start browser-owned workflows and loader descriptor rebinding. Existing skill activation and six-reference structure still cover the task.",
+      "head": "3f742441d9d6aaf187af51678881781f1ab2e95a",
+      "outcome": "no-change",
+      "reason": "Sol optional duplication finding: one private generic query-retirement configuration helper replaces eight identical arrow functions across the existing RPC/HTTP constructors, preserving the same explicit query/infinite/live/streamed views, native signal and complete-promise drain. Public contracts, current guidance and all three planning records remain accurate; no new feature, ownership, task, export or source mapping.",
       "evidence": [
-        "Compared own diff against required base 3e70c51 and merged parent bc4e899. Fresh checks: 127 app runtime tests; 150 CLI Playwright cases across Chromium/Firefox/WebKit; both app production builds; strict/typed lint/format and Effect checks; public/server-local fixtures and packed framework consumers under TSRS and TS5.9; 24 executable docs tests and Astro check. Intent structural skills validation passes. Fallow retains 13 untouched findings; default YAML lint retains inherited style findings (93 to 92 line-length findings). Logs and coverage matrix: /tmp/effect-api-query-spec-166/pre1-examples-result.md. Independent consumer/discovery evidence is unverified because agents are prohibited. No library API, release policy or dependency change."
+        "examples/vite-react/src/lib/application.ts diff against3f74244; both public compiler suites pass, strict lint/typecheck231files pass, all127existing app tests across19files pass, scoped formatter/whitespace and skills-check pass. Existing skill/domain/spec/tree records inspected through the preceding owned example maintenance; this source-only factoring adds no coverage or changed recommendation. No private-helper mirror test or consumer/discovery claim."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "71b5a83b6fc405a1fcfc37bccb5240a4b375e52f3aad0175f6631eedbf97c876",
+      "fingerprint": "aec90bb7631e8789a90b778219278e670e573b7c40b0daa424ec10db086a8277",
       "snapshot": {
         "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -525,7 +525,7 @@
         "examples/tanstack-start/tests/server-render.test.tsx": "e46b15c02fc7b5fc76d52f9d64dfc5b88d4d36e0151908138de9babe7a5d53a3",
         "examples/vite-react/src/app.tsx": "96f17567f1a4c387c30ba64bfadd8cc2d8260dde7699269951e26197e29ecd42",
         "examples/vite-react/src/components/ui/effect-error-details.tsx": "5c14c07465cd1f382a71c7e5b35b0adbc29cc3b5fc75bf3138824bd1d28b3821",
-        "examples/vite-react/src/lib/application.ts": "e4e6cad524b8742cb41ffea95e6b6a27f28fea8cf6f37b7fbb5f5e4446e199d0",
+        "examples/vite-react/src/lib/application.ts": "da2b2fa16d237e6fcc49b4ffbd99d2aa8a402a861f78cf71634a07172bd12bd3",
         "examples/vite-react/src/lib/owner-cache.ts": "e9eaa783cce49e7905027ae93ef1c525e2713187e83ffa4ecf726ba7235a420d",
         "examples/vite-react/src/lib/user-writes.ts": "999277fa02ff9c1439186b59636f7078458a5cbc3c84bed06514867b270a3b5e",
         "examples/vite-react/src/main.tsx": "9129bf323b8763d540df1ba4d7660739065d3f417cd287125292b51b56f4e02d",
@@ -744,11 +744,11 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "bc4e899e8f9ae5cfb4c23870870a59e0b659f805",
-      "outcome": "updated",
-      "reason": "Domain map and batch history now cover both native applications, browser/request ownership, recovered Effect/cache updates and the host-specific loader transfer. Existing skill tree source mappings, identity and six references remain accurate; no tree structural change is needed. Prior records are preserved.",
+      "head": "3f742441d9d6aaf187af51678881781f1ab2e95a",
+      "outcome": "no-change",
+      "reason": "Sol optional duplication finding: one private generic query-retirement configuration helper replaces eight identical arrow functions across the existing RPC/HTTP constructors, preserving the same explicit query/infinite/live/streamed views, native signal and complete-promise drain. Public contracts, current guidance and all three planning records remain accurate; no new feature, ownership, task, export or source mapping.",
       "evidence": [
-        "Compared own diff against required base 3e70c51 and merged parent bc4e899. Fresh checks: 127 app runtime tests; 150 CLI Playwright cases across Chromium/Firefox/WebKit; both app production builds; strict/typed lint/format and Effect checks; public/server-local fixtures and packed framework consumers under TSRS and TS5.9; 24 executable docs tests and Astro check. Intent structural skills validation passes. Fallow retains 13 untouched findings; default YAML lint retains inherited style findings (93 to 92 line-length findings). Logs and coverage matrix: /tmp/effect-api-query-spec-166/pre1-examples-result.md. Independent consumer/discovery evidence is unverified because agents are prohibited. No library API, release policy or dependency change."
+        "examples/vite-react/src/lib/application.ts diff against3f74244; both public compiler suites pass, strict lint/typecheck231files pass, all127existing app tests across19files pass, scoped formatter/whitespace and skills-check pass. Existing skill/domain/spec/tree records inspected through the preceding owned example maintenance; this source-only factoring adds no coverage or changed recommendation. No private-helper mirror test or consumer/discovery claim."
       ]
     },
     "source:vite.config.ts": {

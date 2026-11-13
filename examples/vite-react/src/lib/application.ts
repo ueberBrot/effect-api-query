@@ -21,6 +21,20 @@ import type {
 } from "./owner-cache.ts";
 import { makeUsersInvalidator, makeUserWrites } from "./user-writes.ts";
 
+const queryRetirementConfiguration = (
+  runQuery: QueryOwner<unknown>["runQuery"]
+) => {
+  const intercept = async <T>({
+    next,
+    context,
+  }: {
+    readonly next: () => Promise<T>;
+    readonly context: { readonly signal: AbortSignal };
+  }) => await runQuery(next, context.signal);
+  const query = { interceptors: [intercept] };
+  return { query, infinite: query, live: query, streamed: query };
+};
+
 const makeExampleRpcQueryUtils = (
   client: ExampleRpcClient,
   runPromiseExit: RunPromiseExit,
@@ -37,28 +51,7 @@ const makeExampleRpcQueryUtils = (
       keyPrefix,
       runPromiseExit,
     }),
-    {
-      query: {
-        interceptors: [
-          async ({ next, context }) => await runQuery(next, context.signal),
-        ],
-      },
-      infinite: {
-        interceptors: [
-          async ({ next, context }) => await runQuery(next, context.signal),
-        ],
-      },
-      live: {
-        interceptors: [
-          async ({ next, context }) => await runQuery(next, context.signal),
-        ],
-      },
-      streamed: {
-        interceptors: [
-          async ({ next, context }) => await runQuery(next, context.signal),
-        ],
-      },
-    }
+    queryRetirementConfiguration(runQuery)
   );
 
 export type ExampleRpcQueryUtils = ReturnType<typeof makeExampleRpcQueryUtils>;
@@ -75,28 +68,7 @@ const makeExampleHttpQueryUtils = (
       keyPrefix,
       runPromiseExit,
     }),
-    {
-      query: {
-        interceptors: [
-          async ({ next, context }) => await runQuery(next, context.signal),
-        ],
-      },
-      infinite: {
-        interceptors: [
-          async ({ next, context }) => await runQuery(next, context.signal),
-        ],
-      },
-      live: {
-        interceptors: [
-          async ({ next, context }) => await runQuery(next, context.signal),
-        ],
-      },
-      streamed: {
-        interceptors: [
-          async ({ next, context }) => await runQuery(next, context.signal),
-        ],
-      },
-    }
+    queryRetirementConfiguration(runQuery)
   );
 
 export type ExampleHttpQueryUtils = ReturnType<
