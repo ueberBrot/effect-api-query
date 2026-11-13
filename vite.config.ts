@@ -306,6 +306,7 @@ export default defineConfig({
           "tests/query-policy.test.ts",
           "tests/query-effects.test.ts",
           "tests/query-descriptor.test.ts",
+          "tests/integrated-workflows.test.ts",
           "examples/shared/query-effects.ts",
           "examples/shared/query-events.ts",
           "examples/shared/application-policy.ts",

@@ -70,6 +70,11 @@ const tests = [
   "stream-snapshot",
   "query-effects",
   "query-owner",
+  "integrated-workflows",
+  "query-events",
+  "query-descriptor",
+  "query-policy",
+  "live-coalescing",
 ].map((name) => `tests/${name}.test.ts`);
 const run = (args: string[], cwd: string) =>
   execFileSync("vp", args, { cwd, stdio: "inherit" });

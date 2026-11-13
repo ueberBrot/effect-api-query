@@ -6,6 +6,7 @@ import { performance } from "node:perf_hooks";
 import { Schema } from "effect";
 
 import { compilerCommand, currentCompiler } from "./compiler.mts";
+import { assertBudget, compilerBudgets } from "./performance/budgets.mts";
 import {
   choices,
   packageName,
@@ -208,6 +209,13 @@ try {
     },
     measurements,
   });
+  for (const measurement of measurements) {
+    const key = `${measurement.compiler}/${measurement.adapter}/${measurement.operations}/${measurement.consumer}`;
+    const budget = compilerBudgets.get(key);
+    if (budget !== undefined) {
+      assertBudget(key, measurement.diagnostics.instantiations, budget);
+    }
+  }
   const failures = measurements.filter((entry) => entry.exitCode !== 0);
   if (failures.length > 0) {
     process.exitCode = 1;

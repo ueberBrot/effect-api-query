@@ -243,5 +243,10 @@ tensions:
       - effect-api-query
     description: Shared endpoint-aware defaults reduce repetition while selected data and optimistic context depend on each invocation.
     implication: Configure utilities once per owner. Use leaf scopes for typed callbacks; shared tree and branch callbacks receive unknown contract values. Keep projections, seeds, identity, and optimistic context at the call site. Choose callback composition explicitly and preserve native execution attempts.
+  - name: Measured cost and retained guarantees
+    skills:
+      - effect-api-query
+    description: Native bundle consumers omit adapter failure, cleanup and codec guarantees. Compiler work depends on the exact language engine and workload.
+    implication: Inspect retained modules and compare identical compiler workloads; enforce byte, instantiation and publication budgets without timing gates.
 cross_references: []
 gaps: []
