@@ -25,7 +25,7 @@ skills:
       - Opt-in schemaStructuralSharing for immutable decoded atoms in plain containers, with explicit equivalence for custom fields and meaningful class state
       - Input-field skipping, pagination, explicit stream retention, publication deadlines, uncached event consumption, owner-scoped event-to-cache recovery, and lifetime tracing
       - Stable Query Core stream publication, native cache writes, independent observer lifetimes, and complete cleanup Causes
-      - Opt-in live snapshot coalescing, fixed pending deadlines, terminal flush, cancellation discard, and policy identity
+      - Opt-in live snapshot coalescing, fixed pending timers with event-loop delay, terminal flush, cancellation discard, configured HTTP decoder identity, and RPC tuple compatibility
       - Stream snapshots and request cleanup
       - Optimistic overlap, event refresh, and owner replacement
       - DTO and rich-value hydration with typed view registration
