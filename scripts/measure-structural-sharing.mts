@@ -9,6 +9,7 @@ import { configureUtils, createRpcQueryUtils } from "#effect-api-query";
 import {
   Reading,
   shareSnapshot,
+  shareSnapshotRecipe,
   Snapshot,
 } from "../tests/types/docs-structural-sharing.ts";
 
@@ -42,13 +43,22 @@ const program = Effect.gen(function* () {
   const measurements = [];
   for (const records of [10, 1000]) {
     for (const workload of ["equal", "one-changed", "all-changed"] as const) {
-      for (const policy of ["native", "recipe", "disabled"] as const) {
+      for (const policy of [
+        "native",
+        "recipe",
+        "helper",
+        "disabled",
+      ] as const) {
         const queryClient = new QueryClient();
         const read = configureUtils(rpc.read, {
           query: {
             policy: {
-              structuralSharing:
-                policy === "recipe" ? shareSnapshot : policy === "native",
+              structuralSharing: {
+                helper: shareSnapshot,
+                recipe: shareSnapshotRecipe,
+                native: true,
+                disabled: false,
+              }[policy],
             },
           },
         });

@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "b66f3e80beb10fae10224d81995ce10ac73a407d9a3b6a4cadfb9787cf0c7643",
+      "fingerprint": "dbe1fc968f9d5994c6b0e63838b97ff805de300c47056a08e18a1e8ff8368a36",
       "snapshot": {
         "GLOSSARY.md": "1caf855a606847e46e31200b90df6077d7a84de114e213b011bf27e432989252",
         "README.md": "9cc3275039f58de12efe6a19ea5ec5e23a56126cfeb81cf35480ae5ac147f1da",
@@ -43,7 +43,7 @@
         "apps/docs/src/content/docs/guides/reconnect-streams.md": "6fa1d0e53d234e4ab03a5446d537c29c5e114bcb6d232e490b3a5e5210f96b30",
         "apps/docs/src/content/docs/guides/refresh-from-events.md": "5323233082a5fb0dfc26b80bb9aeaf363efe6ed77118bfa4a78c37079a9376ed",
         "apps/docs/src/content/docs/guides/retry-queries.md": "83fb94464b7031025b7a40b13dca8a7b9a9df7b75732875692048283f9591463",
-        "apps/docs/src/content/docs/guides/share-decoded-values.md": "fd978373c03a0f1229e3da50c22efdd40ef66b9518830c730037a224efb56e74",
+        "apps/docs/src/content/docs/guides/share-decoded-values.md": "2a7e8f903d797a48513c6a084276c79453ca46ae219056f43c3079a3ee71be94",
         "apps/docs/src/content/docs/guides/solid-query.md": "f635ee4c0a33cf759d747d50331ca42589cabacfb728264863951a165253d4ac",
         "apps/docs/src/content/docs/guides/stream-snapshots.md": "6fd85823a19b27ae0a2377680e77f0fa5fb67de19b22ff11571bc7d4a2af6923",
         "apps/docs/src/content/docs/guides/streaming.md": "383845ebb5a92cdc4d9dff1c080167422b67bfee854218667d22c014e8d41c7d",
@@ -152,7 +152,7 @@
         "examples/vite-react/src/workflows/events.tsx": "e6db96f91484d19fa2f6321788629b8556e1c35c4241cd6bbd0a857aa0287ea0",
         "examples/vite-react/src/workflows/readings.tsx": "45a9fe929cf43bf9d6a85b80be18859f52a810f81fbd653013ff0ed64c2bf423",
         "examples/vite-react/src/workflows/recovery.ts": "3d5737673315bc5cbbf946b7119b4c192e305722d68b6c39f109b708ba4f7cdb",
-        "examples/vite-react/src/workflows/sharing.ts": "cd220f53774161e3824833c71ddd0fd879b8ccbba100b980a06932f4a15cc7f9",
+        "examples/vite-react/src/workflows/sharing.ts": "b23cc3b8327b1bc9e6d1fe4252d82eda9e817434105312cfaf0fabc03c4d6e39",
         "examples/vite-react/src/workflows/streams.tsx": "94071d054a2837755ba36e0b7736ed333de6e541739a38e67b36de2a94725796",
         "examples/vite-react/src/workflows/upload.tsx": "9780404fa098e0626fd45815bede351ce97b8d96fa855249ca21a864cfdb32ad",
         "examples/vite-react/tests/app.test.tsx": "29597cde134da8e236466ce403d1898796c1ffb883a8c35f8d4c3e542aa779d8",
@@ -176,7 +176,7 @@
         "scripts/measure-bundles.mts": "5a033ce9f9a4cf414632b6f2781a50c0354f1cf9996791a547a5d53dbef66d7a",
         "scripts/measure-construction.mts": "2fbad4879fe77ff24234a6be5666047b41cc7c3fd5ce9143d640ef4b41a426bd",
         "scripts/measure-streams.mts": "7416a13fe14c49d25f1b646c7f1d6c5a7bac7796dcfe71b15860d667a992326e",
-        "scripts/measure-structural-sharing.mts": "d3e673fbebd3bc56e3c880b3387558963af59729f6ff2905c23a5845e8f95bf6",
+        "scripts/measure-structural-sharing.mts": "ca3d41f08706749f56ebb40173f04f98bf70e6492f04ecc1460400fb5b69f748",
         "scripts/measure-types.mts": "ca3f257b497eb23e748e54dc4e5ba36cb0fde1e55eb33c361fbb48f6fe3246e5",
         "scripts/performance/common.mts": "57a2003d9769d884d1a0884cab5449cfce79c40300de8d0202d3f1780d51c4f5",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
@@ -184,7 +184,7 @@
         "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "e913ab5cbc4c6e2b4f69a17b6a5c8454eb36f857c40e87f5aba91a8a38053888",
-        "skills/effect-api-query/references/cache-workflows.md": "ba58a0ed429c3af43b8142437ad3ef6e2b879017f06cf7d186ca48044fa52964",
+        "skills/effect-api-query/references/cache-workflows.md": "12d9fe16435efc62a371298495af63403e80e86afc1bfc7a21c479d6597c5f4c",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "0b693d32832b1a5d742ee33eab7e6769be81deaa614f216bb9a547c4cde48335",
         "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
         "skills/effect-api-query/references/hydration-and-ssr.md": "30aeb844f4b4f7c3c6a5a70f4ecbfabbdfb7b332c62105b4ecad182238d38705",
@@ -207,6 +207,7 @@
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
         "src/core/query-owner.ts": "da9715879195454960142fb6a7a92bf96e754b5241a73fbbf2c8b6d0b13e5bcb",
         "src/core/schema-key.ts": "7dad2749d30f2ab828dbc7e96d6e1e2b32b6733450cb6dc734de607629d925f8",
+        "src/core/schema-structural-sharing.ts": "5d65caa6c2dbfe498be12396e95ff58329237bea807f3d6eaf5a1118aa6f10df",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
         "src/core/stream-publication.ts": "e6a2fbded6ead8351c83fa3adabf84fb0d1b52d559e3d209a2831aca69d58e21",
         "src/core/stream-recovery.ts": "c2c53ed24c042c24a18b2379995107a09e3145080cc97597d7bb41d3a616d37e",
@@ -221,7 +222,7 @@
         "src/http/request.ts": "4dced85460db56cb83514486417e17dd4a35629ad28749a2ac01dadbe45113b3",
         "src/http/streamed-query.ts": "27d1f5418009216d960816485cfd7f1760a8e3f638ccb9ac8dfa5fc040b1564a",
         "src/http/types.ts": "37be5b08898b0f12c460f7954f243b1ae12c1d903376428c77c34b8b2ca90b4f",
-        "src/index.ts": "d4ce613a2b8ce9e8b76457c941d04c7dbddd61a2de92def327c7f21510cb0605",
+        "src/index.ts": "7478bc6cb4ab3715c1ac8b606bd5064a492fc14ff6cc0e635041261ed32c3c10",
         "src/rpc/create-utils.ts": "8ebf030b0f76f91c248434c169d789d6328d2ba43c07afe15e04db0a02f05c2c",
         "src/rpc/errors.ts": "8e1fbcc7843b2bf99e9d80bfd365dc118d52351909d5c8f48c46ba9d39fdedd3",
         "src/rpc/operation.ts": "ac10df77707045d22c2d58ff0f776362a7fb5ce03e179c10238c42320ad6f719",
@@ -282,6 +283,7 @@
         "tests/query-policy.test.ts": "19b1d0fde232b4af9e041197a1aa6726f30e4fb7118533e5b3f7af08cbbe4002",
         "tests/query-usability.test.ts": "313e6c03b560b4c20ffc32ed8e2bd96ce94fc2fb3977489f311324b6988e190f",
         "tests/query-view-prefix.test.ts": "fd94e3d01f52a0978242246f02a3e989bddd1e055f828f48d7a41187f696dd69",
+        "tests/schema-structural-sharing.test.ts": "577e0ac004db61c5778bf2362b8d208fca6fd6e830a3eaa6496a4c534d3a6e57",
         "tests/skills-maintenance.test.ts": "682faa16982a90614b2fbee84a5da5a4de361f6a3f732099d9fcbc266fca3ec8",
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
         "tests/skills/query-usability/grade.test.ts": "f3c2650deba0d887f66fb3b3afd284cd9baf562296f2984e5c84b014ecec8cbd",
@@ -312,8 +314,8 @@
         "tests/types/docs-stream-snapshot.ts": "4f518cee9b5145c8cca8b9573e7aa622c3e363a9c1744a19b5ea98fc1e65ef4a",
         "tests/types/docs-stream-tracing-contract.ts": "e7b5f3c74af15de1e22f78d3f44ce14678c83e9bd25dcc70430e36b8a493040a",
         "tests/types/docs-stream-tracing.ts": "fc2db4ce64b36ac3901b8ec59dbfef3c798bc52f05f591a97a5d2856c33dabf4",
-        "tests/types/docs-structural-sharing-use.ts": "8ab4283768f1136be41e4a52f329d06e8e8026078300a606164e55caf9900919",
-        "tests/types/docs-structural-sharing.ts": "d47a88e599f832490c9d2a14bf779c0d0eaeb903cafdff2aa161c038198a4a4c",
+        "tests/types/docs-structural-sharing-use.ts": "500a37dd8f5bb090743582a43ea98912950e87639ed6ef0d3fe53a1d69bb4b97",
+        "tests/types/docs-structural-sharing.ts": "a39cb2948738c34eb31352269ed81688e96a793586efdd1e49094162df883a29",
         "tests/types/docs-suspense.tsx": "68462e89795da98c15ea48a9a910f4f9d4ab58672c9b848ce3422d3caf983acc",
         "tests/types/docs-user-events.ts": "c743f2f2e2c206561f1a59bfac3065505aa652e9c3b95df1a101a2c2f3b5bfed",
         "tests/types/exact-options-union-contract.ts": "857e9596c241919f66a2befc2acb86ead3ab44b672e1e1425872a622366139b4",
@@ -348,20 +350,23 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "c1662be32cc26149203cfecb7ed93863997e668c",
+      "head": "c23eecab4a337c7c75e19f382d98b143fe679f8b",
       "outcome": "updated",
-      "reason": "Merged lifecycle setup/retirement guidance with the existing Effect cache bridge guidance, retaining both public exports and failure/ownership contracts. Native owner code and application match c210c613; bridge runtime matches c1662be. Combined public regression verifies interrupted bridge waiter leaves observer work alive until owner retirement drains coalesced source before release.",
+      "reason": "Integrated opt-in Schema sharing with explicit immutable decoded-atom equivalence and native overrides; preserved lifecycle/Effect bridge exports, guidance and histories. Audited full #172 prose/comments; removed two redundant source comments and one repeated guide sentence, preserving contracts and compiler directives.",
       "evidence": [
-        "85 scoped tests/11 files pass (/tmp/173-merge-tests-final.log), public and server-local TSRS+TS5.9 fixtures and package/ATTW/publint pass; strict typed check 217 files, Effect check and 22 docs examples/Astro pass. Scoped format/YAML pass. Reuse ticket 823 runtime and 8 Chromium results; fresh consumer discovery and other browsers unverified; independent Astra audit remains parent-owned."
+        "Expected integration c23eecab and ticket 219ccd1; actual full ticket diff and merged source/guidance/planning inspected.",
+        "172-merge-tests.log: 34 native cached-reference/rich/class-state/override/metadata plus owner/bridge tests pass; serial package/declarations/ATTW/publint and public/server-local fixtures pass pinned TSRS and TS5.9.3.",
+        "172-merge-typecheck.log: strict typed check passes 219 files. 172-merge-effect-check.log passes; 172-merge-docs-check.log: 22 excerpts/Astro zero errors/warnings/hints. Scoped format/YAML pass.",
+        "Writing-policy and clear-writing/readability/writing-clearly-and-concisely/writing-for-agents applied; runtime code unchanged by prose corrections. Fresh consumer discovery, independent Astra acceptance/architecture/final review remain unverified and parent-owned. Machine-local original measurements inspected; no speed/end-to-end claim."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "a4526e1f226e620f24a4175caafb78e09a6b32f60974c54055c118b4d3125e6e",
+      "fingerprint": "b0774a5ca3dd8617736d2f642cc976f04d09c2a361a576241af8d33625f1135a",
       "snapshot": {
         "GLOSSARY.md": "1caf855a606847e46e31200b90df6077d7a84de114e213b011bf27e432989252",
         "README.md": "9cc3275039f58de12efe6a19ea5ec5e23a56126cfeb81cf35480ae5ac147f1da",
-        "_artifacts/domain_map.yaml": "df35540ce5bdf9501be70ddc195d6ed7efbbbc44402252c663d8a0ca9e34beb0",
-        "_artifacts/skill_spec.md": "fcb2a047f2ecf93dac4a82837ec3b3def8b26fdaf9108203cc3865a731e3c92f",
+        "_artifacts/domain_map.yaml": "2f036555f54606934b365004acdb8529df4e1bee89258b94b1b407a3bd84d95a",
+        "_artifacts/skill_spec.md": "ab54dd6a0e003ee9cb9103e42bf4b802a46d0395b629cecd6c7ae1b70e91d8db",
         "_artifacts/skill_tree.yaml": "cab1e054da917dfb6b8990f53abe0535d1dd69ba76311ec0fcc503a52f1d308d",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "83a6aab512d66893237aa3ba45bf52b23712b88d829d83992509c2f3c822c18b",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "eb226d096cee825aa2a7c2e49370208d6110662c3acf681fa4b95f8b6caca0d7",
@@ -399,7 +404,7 @@
         "apps/docs/src/content/docs/guides/reconnect-streams.md": "6fa1d0e53d234e4ab03a5446d537c29c5e114bcb6d232e490b3a5e5210f96b30",
         "apps/docs/src/content/docs/guides/refresh-from-events.md": "5323233082a5fb0dfc26b80bb9aeaf363efe6ed77118bfa4a78c37079a9376ed",
         "apps/docs/src/content/docs/guides/retry-queries.md": "83fb94464b7031025b7a40b13dca8a7b9a9df7b75732875692048283f9591463",
-        "apps/docs/src/content/docs/guides/share-decoded-values.md": "fd978373c03a0f1229e3da50c22efdd40ef66b9518830c730037a224efb56e74",
+        "apps/docs/src/content/docs/guides/share-decoded-values.md": "2a7e8f903d797a48513c6a084276c79453ca46ae219056f43c3079a3ee71be94",
         "apps/docs/src/content/docs/guides/solid-query.md": "f635ee4c0a33cf759d747d50331ca42589cabacfb728264863951a165253d4ac",
         "apps/docs/src/content/docs/guides/stream-snapshots.md": "6fd85823a19b27ae0a2377680e77f0fa5fb67de19b22ff11571bc7d4a2af6923",
         "apps/docs/src/content/docs/guides/streaming.md": "383845ebb5a92cdc4d9dff1c080167422b67bfee854218667d22c014e8d41c7d",
@@ -508,7 +513,7 @@
         "examples/vite-react/src/workflows/events.tsx": "e6db96f91484d19fa2f6321788629b8556e1c35c4241cd6bbd0a857aa0287ea0",
         "examples/vite-react/src/workflows/readings.tsx": "45a9fe929cf43bf9d6a85b80be18859f52a810f81fbd653013ff0ed64c2bf423",
         "examples/vite-react/src/workflows/recovery.ts": "3d5737673315bc5cbbf946b7119b4c192e305722d68b6c39f109b708ba4f7cdb",
-        "examples/vite-react/src/workflows/sharing.ts": "cd220f53774161e3824833c71ddd0fd879b8ccbba100b980a06932f4a15cc7f9",
+        "examples/vite-react/src/workflows/sharing.ts": "b23cc3b8327b1bc9e6d1fe4252d82eda9e817434105312cfaf0fabc03c4d6e39",
         "examples/vite-react/src/workflows/streams.tsx": "94071d054a2837755ba36e0b7736ed333de6e541739a38e67b36de2a94725796",
         "examples/vite-react/src/workflows/upload.tsx": "9780404fa098e0626fd45815bede351ce97b8d96fa855249ca21a864cfdb32ad",
         "examples/vite-react/tests/app.test.tsx": "29597cde134da8e236466ce403d1898796c1ffb883a8c35f8d4c3e542aa779d8",
@@ -532,7 +537,7 @@
         "scripts/measure-bundles.mts": "5a033ce9f9a4cf414632b6f2781a50c0354f1cf9996791a547a5d53dbef66d7a",
         "scripts/measure-construction.mts": "2fbad4879fe77ff24234a6be5666047b41cc7c3fd5ce9143d640ef4b41a426bd",
         "scripts/measure-streams.mts": "7416a13fe14c49d25f1b646c7f1d6c5a7bac7796dcfe71b15860d667a992326e",
-        "scripts/measure-structural-sharing.mts": "d3e673fbebd3bc56e3c880b3387558963af59729f6ff2905c23a5845e8f95bf6",
+        "scripts/measure-structural-sharing.mts": "ca3d41f08706749f56ebb40173f04f98bf70e6492f04ecc1460400fb5b69f748",
         "scripts/measure-types.mts": "ca3f257b497eb23e748e54dc4e5ba36cb0fde1e55eb33c361fbb48f6fe3246e5",
         "scripts/performance/common.mts": "57a2003d9769d884d1a0884cab5449cfce79c40300de8d0202d3f1780d51c4f5",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
@@ -540,7 +545,7 @@
         "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "e913ab5cbc4c6e2b4f69a17b6a5c8454eb36f857c40e87f5aba91a8a38053888",
-        "skills/effect-api-query/references/cache-workflows.md": "ba58a0ed429c3af43b8142437ad3ef6e2b879017f06cf7d186ca48044fa52964",
+        "skills/effect-api-query/references/cache-workflows.md": "12d9fe16435efc62a371298495af63403e80e86afc1bfc7a21c479d6597c5f4c",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "0b693d32832b1a5d742ee33eab7e6769be81deaa614f216bb9a547c4cde48335",
         "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
         "skills/effect-api-query/references/hydration-and-ssr.md": "30aeb844f4b4f7c3c6a5a70f4ecbfabbdfb7b332c62105b4ecad182238d38705",
@@ -563,6 +568,7 @@
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
         "src/core/query-owner.ts": "da9715879195454960142fb6a7a92bf96e754b5241a73fbbf2c8b6d0b13e5bcb",
         "src/core/schema-key.ts": "7dad2749d30f2ab828dbc7e96d6e1e2b32b6733450cb6dc734de607629d925f8",
+        "src/core/schema-structural-sharing.ts": "5d65caa6c2dbfe498be12396e95ff58329237bea807f3d6eaf5a1118aa6f10df",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
         "src/core/stream-publication.ts": "e6a2fbded6ead8351c83fa3adabf84fb0d1b52d559e3d209a2831aca69d58e21",
         "src/core/stream-recovery.ts": "c2c53ed24c042c24a18b2379995107a09e3145080cc97597d7bb41d3a616d37e",
@@ -577,7 +583,7 @@
         "src/http/request.ts": "4dced85460db56cb83514486417e17dd4a35629ad28749a2ac01dadbe45113b3",
         "src/http/streamed-query.ts": "27d1f5418009216d960816485cfd7f1760a8e3f638ccb9ac8dfa5fc040b1564a",
         "src/http/types.ts": "37be5b08898b0f12c460f7954f243b1ae12c1d903376428c77c34b8b2ca90b4f",
-        "src/index.ts": "d4ce613a2b8ce9e8b76457c941d04c7dbddd61a2de92def327c7f21510cb0605",
+        "src/index.ts": "7478bc6cb4ab3715c1ac8b606bd5064a492fc14ff6cc0e635041261ed32c3c10",
         "src/rpc/create-utils.ts": "8ebf030b0f76f91c248434c169d789d6328d2ba43c07afe15e04db0a02f05c2c",
         "src/rpc/errors.ts": "8e1fbcc7843b2bf99e9d80bfd365dc118d52351909d5c8f48c46ba9d39fdedd3",
         "src/rpc/operation.ts": "ac10df77707045d22c2d58ff0f776362a7fb5ce03e179c10238c42320ad6f719",
@@ -638,6 +644,7 @@
         "tests/query-policy.test.ts": "19b1d0fde232b4af9e041197a1aa6726f30e4fb7118533e5b3f7af08cbbe4002",
         "tests/query-usability.test.ts": "313e6c03b560b4c20ffc32ed8e2bd96ce94fc2fb3977489f311324b6988e190f",
         "tests/query-view-prefix.test.ts": "fd94e3d01f52a0978242246f02a3e989bddd1e055f828f48d7a41187f696dd69",
+        "tests/schema-structural-sharing.test.ts": "577e0ac004db61c5778bf2362b8d208fca6fd6e830a3eaa6496a4c534d3a6e57",
         "tests/skills-maintenance.test.ts": "682faa16982a90614b2fbee84a5da5a4de361f6a3f732099d9fcbc266fca3ec8",
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
         "tests/skills/query-usability/grade.test.ts": "f3c2650deba0d887f66fb3b3afd284cd9baf562296f2984e5c84b014ecec8cbd",
@@ -668,8 +675,8 @@
         "tests/types/docs-stream-snapshot.ts": "4f518cee9b5145c8cca8b9573e7aa622c3e363a9c1744a19b5ea98fc1e65ef4a",
         "tests/types/docs-stream-tracing-contract.ts": "e7b5f3c74af15de1e22f78d3f44ce14678c83e9bd25dcc70430e36b8a493040a",
         "tests/types/docs-stream-tracing.ts": "fc2db4ce64b36ac3901b8ec59dbfef3c798bc52f05f591a97a5d2856c33dabf4",
-        "tests/types/docs-structural-sharing-use.ts": "8ab4283768f1136be41e4a52f329d06e8e8026078300a606164e55caf9900919",
-        "tests/types/docs-structural-sharing.ts": "d47a88e599f832490c9d2a14bf779c0d0eaeb903cafdff2aa161c038198a4a4c",
+        "tests/types/docs-structural-sharing-use.ts": "500a37dd8f5bb090743582a43ea98912950e87639ed6ef0d3fe53a1d69bb4b97",
+        "tests/types/docs-structural-sharing.ts": "a39cb2948738c34eb31352269ed81688e96a793586efdd1e49094162df883a29",
         "tests/types/docs-suspense.tsx": "68462e89795da98c15ea48a9a910f4f9d4ab58672c9b848ce3422d3caf983acc",
         "tests/types/docs-user-events.ts": "c743f2f2e2c206561f1a59bfac3065505aa652e9c3b95df1a101a2c2f3b5bfed",
         "tests/types/exact-options-union-contract.ts": "857e9596c241919f66a2befc2acb86ead3ab44b672e1e1425872a622366139b4",
@@ -704,23 +711,27 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "c1662be32cc26149203cfecb7ed93863997e668c",
+      "head": "c23eecab4a337c7c75e19f382d98b143fe679f8b",
       "outcome": "updated",
-      "reason": "Reconciled domain_map owner lifecycle and bridge tasks; skill_spec retains cumulative #173 and #174 entries; skill_tree includes ADR0040 source mapping and retains one skill/six references. No additional skills or changed activation metadata warranted.",
+      "reason": "Domain map and cumulative skill_spec retain Schema-sharing, lifecycle and Effect bridge coverage/history. Existing one-skill/six-reference tree and source globs cover every addition; tree unchanged and Intent sync no-op. Prose audit preserves technical conditions and existing directives.",
       "evidence": [
-        "_artifacts/domain_map.yaml, _artifacts/skill_spec.md, _artifacts/skill_tree.yaml compared with c1662be and c210c613; Intent sync no-op; YAML and scoped formatting pass; 85 combined scoped tests and both compiler suites pass. Exactly21 unrelated research review items left unannotated."
+        "Expected integration c23eecab and ticket 219ccd1; actual full ticket diff and merged source/guidance/planning inspected.",
+        "172-merge-tests.log: 34 native cached-reference/rich/class-state/override/metadata plus owner/bridge tests pass; serial package/declarations/ATTW/publint and public/server-local fixtures pass pinned TSRS and TS5.9.3.",
+        "172-merge-typecheck.log: strict typed check passes 219 files. 172-merge-effect-check.log passes; 172-merge-docs-check.log: 22 excerpts/Astro zero errors/warnings/hints. Scoped format/YAML pass.",
+        "Writing-policy and clear-writing/readability/writing-clearly-and-concisely/writing-for-agents applied; runtime code unchanged by prose corrections. Fresh consumer discovery, independent Astra acceptance/architecture/final review remain unverified and parent-owned. Machine-local original measurements inspected; no speed/end-to-end claim."
       ]
     },
     "source:vite.config.ts": {
-      "fingerprint": "e7803ca0d414758eafc6f22b91ae633d5ece5c8b25f5da15a50e737ad3ea1772",
+      "fingerprint": "f469045498131d122a9dc1899fc0475bb3ef08ec668d0e0e816725a41d899f34",
       "snapshot": {
-        "vite.config.ts": "0094917b89b7ca114763ff1d8e460e360ad88355c342b00427829721c5220d98"
+        "vite.config.ts": "4225aa62cc74ceb707fd5554e7029492c2d93bac9b9dda1dcaf29e87885465d3"
       },
-      "head": "97a8cc5e722a0b94c1241b28f8ac7f4d202a2321",
+      "head": "e781e664066e816588650d35bbef808d512c160f",
       "outcome": "no-change",
-      "reason": "Reviewed combined config: guide navigation plus exact unstable RPC example/test exclusions, including accepted live-coalescing test. Existing compiler engine, correctness diagnostics and task interfaces remain unchanged.",
+      "reason": "Extend the existing unknown-boundary lint exemption only to the native unknown-to-unknown sharing callback; no Vite+ task or consumer guidance changes.",
       "evidence": [
-        "git diff HEAD -- apps/docs/astro.config.mts tsconfig.json vite.config.ts; post-merge typecheck/Effect check/docs build pass; framework/tooling guidance remains accurate."
+        "git diff c1662be -- vite.config.ts",
+        "Strict type-aware lint and Effect check pass; frozen dependency pins unchanged."
       ]
     },
     "source:.github/workflows/release.yml": {
@@ -3164,6 +3175,19 @@
       "reason": "Release note describes only the additive optional bridge and minor classification already covered by the updated cache-workflows guidance; no additional skill or planning task is warranted.",
       "evidence": [
         ".changeset/effect-query-client-operations.md agrees with tested public API and new Query Effects guide. No version or publication performed."
+      ]
+    },
+    "source:.changeset/schema-reference-sharing.md": {
+      "fingerprint": "5d46ff43aaacd4f4c9b1f10369168c15655b9b89846af449acca574aa1c8b3fc",
+      "snapshot": {
+        ".changeset/schema-reference-sharing.md": "a7e77d09fd6f4c978bd2605511746c341a36e3751225d2ecb24a88974339177e"
+      },
+      "head": "e781e664066e816588650d35bbef808d512c160f",
+      "outcome": "no-change",
+      "reason": "Minor changeset records the new opt-in helper; consumer usage and constraints are already covered by the owned cache-workflows reference.",
+      "evidence": [
+        ".changeset/schema-reference-sharing.md",
+        "No package publication or version mutation performed."
       ]
     }
   }

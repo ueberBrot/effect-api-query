@@ -1,4 +1,5 @@
 import { replaceEqualDeep } from "@tanstack/query-core";
+import { schemaStructuralSharing } from "@ueberbrot/effect-api-query";
 import { Equivalence, Schema } from "effect";
 
 export class Reading extends Schema.Class<
@@ -22,14 +23,11 @@ export const Snapshot = Schema.Struct({
 
 const isSnapshot = Schema.is(Snapshot);
 const equivalentReading = Schema.toEquivalence(Reading);
-
-export const shareSnapshot = (
+export const shareSnapshotRecipe = (
   previous: unknown,
   incoming: unknown
 ): unknown => {
-  if (!isSnapshot(previous) || !isSnapshot(incoming)) {
-    return incoming;
-  }
+  if (!isSnapshot(previous) || !isSnapshot(incoming)) return incoming;
   const readings = incoming.readings.map((reading, index) => {
     const old = previous.readings[index];
     return old !== undefined && equivalentReading(old, reading) ? old : reading;
@@ -37,23 +35,8 @@ export const shareSnapshot = (
   return replaceEqualDeep(previous, { ...incoming, readings });
 };
 
-const isMetadataSnapshot = Schema.is(
-  Schema.Struct({
-    data: Snapshot,
-    status: Schema.Int,
-    headers: Schema.Record(Schema.String, Schema.String),
-  })
-);
+export const shareSnapshot = schemaStructuralSharing(Reading, {
+  equivalence: Schema.toEquivalence(Reading),
+});
 
-export const shareMetadataSnapshot = (
-  previous: unknown,
-  incoming: unknown
-): unknown => {
-  if (!isMetadataSnapshot(previous) || !isMetadataSnapshot(incoming)) {
-    return incoming;
-  }
-  return replaceEqualDeep(previous, {
-    ...incoming,
-    data: shareSnapshot(previous.data, incoming.data),
-  });
-};
+export const shareMetadataSnapshot = shareSnapshot;

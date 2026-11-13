@@ -1,5 +1,6 @@
 import type { QueryClient } from "@tanstack/query-core";
 import {
+  schemaStructuralSharing,
   configureUtils,
   createHttpApiQueryUtils,
   createRpcQueryUtils,
@@ -90,3 +91,14 @@ function readingQueries<E>(
 }
 
 void readingQueries;
+
+// @ts-expect-error Equivalence is mandatory; encoded equality is never inferred.
+schemaStructuralSharing(Reading, {});
+schemaStructuralSharing(Reading, {
+  // @ts-expect-error The equivalence must accept decoded Reading values.
+  equivalence: (a: string, b: string) => a === b,
+});
+// @ts-expect-error Sharing must be synchronous.
+schemaStructuralSharing(Reading, { equivalence: async () => true });
+// @ts-expect-error A schema is required.
+schemaStructuralSharing({}, { equivalence: () => true });
