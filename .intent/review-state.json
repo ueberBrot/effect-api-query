@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "04e73b692edd720d1bbda0dc37acdd01f0d9f8b72ebb8f38b060f96993c861b6",
+      "fingerprint": "c3bc45b0cd67dddb18db12b3d5838f0cdb728ea82786cd14c1f80a86adf4b33b",
       "snapshot": {
         "GLOSSARY.md": "294f016460f575c7ee634a33c7b45c825f67a0501c31d42a5c42d681bacebd83",
         "README.md": "9cc3275039f58de12efe6a19ea5ec5e23a56126cfeb81cf35480ae5ac147f1da",
@@ -44,7 +44,7 @@
         "apps/docs/src/content/docs/guides/share-decoded-values.md": "fd978373c03a0f1229e3da50c22efdd40ef66b9518830c730037a224efb56e74",
         "apps/docs/src/content/docs/guides/solid-query.md": "f635ee4c0a33cf759d747d50331ca42589cabacfb728264863951a165253d4ac",
         "apps/docs/src/content/docs/guides/stream-snapshots.md": "6fd85823a19b27ae0a2377680e77f0fa5fb67de19b22ff11571bc7d4a2af6923",
-        "apps/docs/src/content/docs/guides/streaming.md": "1b1730ee864b2bbda63e2c35ca43c2ff970b762f071ba2369af9ebbd31694413",
+        "apps/docs/src/content/docs/guides/streaming.md": "383845ebb5a92cdc4d9dff1c080167422b67bfee854218667d22c014e8d41c7d",
         "apps/docs/src/content/docs/guides/suspense-and-recovery.md": "927149842d56dd9432cedea9bccc17c69b5debc869eb3c50aefb366f07019714",
         "apps/docs/src/content/docs/guides/svelte-query.md": "0d9cca47e1ba9dec49af772d860ffa2723968ae7ad90de7a19bd00821ad33bbe",
         "apps/docs/src/content/docs/guides/switch-cache-owners.md": "5291d4e7ef519ecda12eec08eddbb4e3af7c9f06c2c8baa42d4fbc777d34368d",
@@ -74,7 +74,7 @@
         "docs/adr/0007-keep-the-core-factory-lifecycle-neutral.md": "243527d723753f8c31fd2484130af5af663cbfd03a3709178b7af7ba47c93079",
         "docs/adr/0008-use-flat-prefix-matchable-key-tuples.md": "959563881314648542065683d90989d0cf14c7c5585065a2b6fba32fcbec76d0",
         "docs/adr/0009-build-an-eager-frozen-utility-tree.md": "6490cf58890014f3e50d1b67ba88d4fdd9cbecc578e1788234b4fe193e2e14c7",
-        "docs/adr/0010-reuse-tanstack-query-core-as-a-peer.md": "43cf265b5b080b863ab936056ca40b5d83379bf70b425fffc88178b06ec3b84e",
+        "docs/adr/0010-reuse-tanstack-query-core-as-a-peer.md": "fc25c133e013da2f934d55f98a8a749a4f1b77355d2489da171545d017eab837",
         "docs/adr/0012-normalize-undefined-query-success-to-null.md": "e07335454852d9ac3c8b2529ad414dbee59d57f2265ccf86b595e65092feb309",
         "docs/adr/0014-require-query-stable-payload-construction.md": "2c0a2fefeb20197712e85ca598e18c8a7d74b55f9cfbb74a0cfaf532f18aec04",
         "docs/adr/0015-centralize-the-toolchain-in-vite-plus.md": "8daa6120ef9f4095c74d132ae6bd69ebd85ac9ee9dea4d6c9b238ebee66c692c",
@@ -93,6 +93,7 @@
         "docs/adr/0032-configure-utility-trees-and-require-stream-retention.md": "e46238f04f3213d2c32dcb64fb2c17d38d033699d08b3b9d7986bbbe1d2f1ff7",
         "docs/adr/0033-bound-effect-support-to-a-patch-line.md": "34209a3700272113c64ff39baf15e19bc5745b73b5a28157207c1c592df8fcd0",
         "docs/adr/0034-extend-http-stream-views-to-decoded-ndjson.md": "445ed1f9a4cb3a74938f2d01579e50c046a681aaa2dcd856ef9587c62aaa7cf2",
+        "docs/adr/0037-own-stream-publication-through-query-core.md": "50033124148c7da78da23a9b4aa08241a66a6168d79319998534af8e0a38074b",
         "e2e/http-workflows.spec.ts": "f5729fd3707758508d85506a93a1f2560edfe1aad89c9bd200ec0c80a2ecb7cb",
         "examples/contracts/src/client.ts": "fdf559bf0a798c7ea7f7aee01967837e720f7727a1bd11978aec51aad59f00f2",
         "examples/contracts/src/contracts.ts": "74d69e1a07c0b32c2a48b8fed8cfceaac8844ead860fbd00b9e357657b39d88e",
@@ -177,7 +178,7 @@
         "skills/effect-api-query/references/frameworks-and-hosts.md": "6304d782143d2a38c2b574b37148f6ef189b1095ce55e43b535057b4f63065d3",
         "skills/effect-api-query/references/http.md": "7acbee387c671c6ed8a512ca94a29a0278c6e062c68f660a82e825ad95fbe336",
         "skills/effect-api-query/references/hydration-and-ssr.md": "30aeb844f4b4f7c3c6a5a70f4ecbfabbdfb7b332c62105b4ecad182238d38705",
-        "skills/effect-api-query/references/query-patterns.md": "dba62054a68418e5ce9482864e938682847811d04e22e8ecb3176cb15c6ab50b",
+        "skills/effect-api-query/references/query-patterns.md": "a19125415a1f66507e449498a3bd1cb856f23e24812d2acb6abf44ff31373c58",
         "skills/effect-api-query/references/rpc.md": "7bfc134371d723b24da15a0bc07b1022daaddf6e0b47cb281900c147f78e9c59",
         "src/core/branch-filter.ts": "71a8c6039f1775881bbc00d92e14e2ef823bf7150721307a74f16a1579bccc86",
         "src/core/canonical-key.ts": "84e91000876a6795557aab39dcc5d44e328250bf9b30ad02fd67afd02f5003e9",
@@ -198,7 +199,7 @@
         "src/core/stream-publication.ts": "5c0f53bc84e3bb53337b9e76ea7dcd2269f080e9b2a35ad9d3f4ecce341fa61d",
         "src/core/stream-recovery.ts": "358a585cb59195f39f429a7736eb21c3ceed5b52b229768d681ff84239a6d622",
         "src/core/stream-snapshot.ts": "97fbb56308b2e2decacd86a02b3f0a3ced76692444ba25a7abaae05b442c233a",
-        "src/core/streamed-query.ts": "4cdbad1d48db1be7e0a93205c0d79a2adb4867b1dbf657ad632defa4650ec9ad",
+        "src/core/streamed-query.ts": "8188a6501a0dc5450b09098058f5e6a9bb2a8bc1427bd78cec5f447baba3ca59",
         "src/core/types.ts": "8e20c35e9a4ad9193622359e10660b65d03b8bee51e685d75f2e29ac40bfae59",
         "src/core/utility-tree.ts": "7b113d01c672c1148d022556f72c6e8f49c5afc0170fc88dcff74008abed28f1",
         "src/core/view-prefix.ts": "dfc0d74a07c8afe3f63952d59c29088ba4afb45e11a402ef8b72c5e2282cb063",
@@ -224,8 +225,8 @@
         "tests/create-rpc-query-utils-request-options.test.ts": "548e1c87ad52f2a7ea73704624e6b5ea06a64dfe696da6a6e05f4a832783223b",
         "tests/create-rpc-query-utils-server-local.test.ts": "281d15e89cc0e13a846a03165069c54e733d77d4985bb246aa42034f67d4ed0d",
         "tests/create-rpc-query-utils-stream-baseline.test.ts": "b5181377776cc0e08b269213da6a7dbe8cafc97d63c5e240e311658ae2cce039",
-        "tests/create-rpc-query-utils-stream-cache.test.ts": "d4e2e57da0ff1993f8e47082414a994f762c48a8bd38c6f7e75a809956dbbea3",
-        "tests/create-rpc-query-utils-stream-hashing.test.ts": "3ec2de67c2f447b7f8ee003e9d8c1c0d19f1c9a787440a64c21df103ab9c044b",
+        "tests/create-rpc-query-utils-stream-cache.test.ts": "c2aea3349503b5bfe9abfd445a2e6a54a939843f8d00b6bf4d75ad607b2d99e7",
+        "tests/create-rpc-query-utils-stream-hashing.test.ts": "417f45c4fd7584d164fe5ecc9e354bdf52a1117a5a46f7729c2ffb5791eaf068",
         "tests/create-rpc-query-utils-stream-publication.test.ts": "f0f6919a98e3c4efd59ab39a7c8f2a2efb817c0b55913cd82c034126c8d5e459",
         "tests/create-rpc-query-utils-streaming.test.ts": "6f0fccd52258df72d1bb471bd04873426708209fa48e0b9c3a0c831d9002f5a1",
         "tests/create-rpc-query-utils-structural-sharing.test.ts": "1698a72dcfde4aaabac4161193fc0379c445f8a8be61d47d29797a315b66b06f",
@@ -328,23 +329,23 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "56d6476c6d69c35c371df6928ddeafa03f0649fe",
-      "outcome": "no-change",
-      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
+      "head": "16c1fe41498b2ee6ea70644bead0623973449aa7",
+      "outcome": "updated",
+      "reason": "Query-patterns guidance now identifies stable Query Core stream publication; accumulated/live policies, native cache access/sharing, normalization, HTTP decoded headers, and cancellation/cleanup contracts remain intact. Existing skill entry and other references remain accurate.",
       "evidence": [
-        "Before versioning: intent maintainer check passed at 56d6476c6d69c35c371df6928ddeafa03f0649fe.",
-        "changeset version and vp fmt generated 0.6.0 -> 0.6.1.",
-        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
-        "Scoped generated changes: package.json."
+        "src/core/streamed-query.ts; docs/adr/0037-own-stream-publication-through-query-core.md; skills/effect-api-query/references/query-patterns.md",
+        "vp run test: 801 passed; post-merge selected stream tests: 301 passed; regression requiring zero subsequent cache enumeration failed on original source and passes on replacement",
+        "vp run check and effect-check pass; framework-types passes both compilers; effect-compatibility passes packed Effect 4.0.6 and 4.1.0, both compilers and 163 runtime cases each; docs-check passes",
+        "Fresh consumer-agent discovery unverified (no delegation authorized); packed consumer processes verified."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "3e0d5356e059bd79e237edae72169a8cd4881de2d4d1b6df2286dd5cc30a61c5",
+      "fingerprint": "d3bd0d71b1025b650526db26d8efad2339cbb6f629565e89801fd59c3caa709a",
       "snapshot": {
         "GLOSSARY.md": "294f016460f575c7ee634a33c7b45c825f67a0501c31d42a5c42d681bacebd83",
         "README.md": "9cc3275039f58de12efe6a19ea5ec5e23a56126cfeb81cf35480ae5ac147f1da",
-        "_artifacts/domain_map.yaml": "70f88c23e1d93ee73320f12b53221b406fcca8a3c2cd5559a5aecec7f01af912",
-        "_artifacts/skill_spec.md": "8660e97375e7a12314db1ad515947f46397a1153460a16e74f77c73d64a9c659",
+        "_artifacts/domain_map.yaml": "2c225d0648d971b47ade87f4d810159abe28701bb1b00eb22917bc02530a0081",
+        "_artifacts/skill_spec.md": "c38a19f8d75675df18c9f1d3f5ac6294188eef1bb4b0e4c2aad2d68f11f9148b",
         "_artifacts/skill_tree.yaml": "ce59cb7d97ff4f1cc36c4723ef889ccb37a96c24ed31a084be3a9fea620be07a",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "8cf2b005fd05a799118c262ecda121c4468cc023b5a666b7f46501e49f1b3099",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "a5447c052af2b2bbe119fd5ff2eab8d616016fe9e703a35718fd5b568f246329",
@@ -383,7 +384,7 @@
         "apps/docs/src/content/docs/guides/share-decoded-values.md": "fd978373c03a0f1229e3da50c22efdd40ef66b9518830c730037a224efb56e74",
         "apps/docs/src/content/docs/guides/solid-query.md": "f635ee4c0a33cf759d747d50331ca42589cabacfb728264863951a165253d4ac",
         "apps/docs/src/content/docs/guides/stream-snapshots.md": "6fd85823a19b27ae0a2377680e77f0fa5fb67de19b22ff11571bc7d4a2af6923",
-        "apps/docs/src/content/docs/guides/streaming.md": "1b1730ee864b2bbda63e2c35ca43c2ff970b762f071ba2369af9ebbd31694413",
+        "apps/docs/src/content/docs/guides/streaming.md": "383845ebb5a92cdc4d9dff1c080167422b67bfee854218667d22c014e8d41c7d",
         "apps/docs/src/content/docs/guides/suspense-and-recovery.md": "927149842d56dd9432cedea9bccc17c69b5debc869eb3c50aefb366f07019714",
         "apps/docs/src/content/docs/guides/svelte-query.md": "0d9cca47e1ba9dec49af772d860ffa2723968ae7ad90de7a19bd00821ad33bbe",
         "apps/docs/src/content/docs/guides/switch-cache-owners.md": "5291d4e7ef519ecda12eec08eddbb4e3af7c9f06c2c8baa42d4fbc777d34368d",
@@ -413,7 +414,7 @@
         "docs/adr/0007-keep-the-core-factory-lifecycle-neutral.md": "243527d723753f8c31fd2484130af5af663cbfd03a3709178b7af7ba47c93079",
         "docs/adr/0008-use-flat-prefix-matchable-key-tuples.md": "959563881314648542065683d90989d0cf14c7c5585065a2b6fba32fcbec76d0",
         "docs/adr/0009-build-an-eager-frozen-utility-tree.md": "6490cf58890014f3e50d1b67ba88d4fdd9cbecc578e1788234b4fe193e2e14c7",
-        "docs/adr/0010-reuse-tanstack-query-core-as-a-peer.md": "43cf265b5b080b863ab936056ca40b5d83379bf70b425fffc88178b06ec3b84e",
+        "docs/adr/0010-reuse-tanstack-query-core-as-a-peer.md": "fc25c133e013da2f934d55f98a8a749a4f1b77355d2489da171545d017eab837",
         "docs/adr/0012-normalize-undefined-query-success-to-null.md": "e07335454852d9ac3c8b2529ad414dbee59d57f2265ccf86b595e65092feb309",
         "docs/adr/0014-require-query-stable-payload-construction.md": "2c0a2fefeb20197712e85ca598e18c8a7d74b55f9cfbb74a0cfaf532f18aec04",
         "docs/adr/0015-centralize-the-toolchain-in-vite-plus.md": "8daa6120ef9f4095c74d132ae6bd69ebd85ac9ee9dea4d6c9b238ebee66c692c",
@@ -432,6 +433,7 @@
         "docs/adr/0032-configure-utility-trees-and-require-stream-retention.md": "e46238f04f3213d2c32dcb64fb2c17d38d033699d08b3b9d7986bbbe1d2f1ff7",
         "docs/adr/0033-bound-effect-support-to-a-patch-line.md": "34209a3700272113c64ff39baf15e19bc5745b73b5a28157207c1c592df8fcd0",
         "docs/adr/0034-extend-http-stream-views-to-decoded-ndjson.md": "445ed1f9a4cb3a74938f2d01579e50c046a681aaa2dcd856ef9587c62aaa7cf2",
+        "docs/adr/0037-own-stream-publication-through-query-core.md": "50033124148c7da78da23a9b4aa08241a66a6168d79319998534af8e0a38074b",
         "e2e/http-workflows.spec.ts": "f5729fd3707758508d85506a93a1f2560edfe1aad89c9bd200ec0c80a2ecb7cb",
         "examples/contracts/src/client.ts": "fdf559bf0a798c7ea7f7aee01967837e720f7727a1bd11978aec51aad59f00f2",
         "examples/contracts/src/contracts.ts": "74d69e1a07c0b32c2a48b8fed8cfceaac8844ead860fbd00b9e357657b39d88e",
@@ -516,7 +518,7 @@
         "skills/effect-api-query/references/frameworks-and-hosts.md": "6304d782143d2a38c2b574b37148f6ef189b1095ce55e43b535057b4f63065d3",
         "skills/effect-api-query/references/http.md": "7acbee387c671c6ed8a512ca94a29a0278c6e062c68f660a82e825ad95fbe336",
         "skills/effect-api-query/references/hydration-and-ssr.md": "30aeb844f4b4f7c3c6a5a70f4ecbfabbdfb7b332c62105b4ecad182238d38705",
-        "skills/effect-api-query/references/query-patterns.md": "dba62054a68418e5ce9482864e938682847811d04e22e8ecb3176cb15c6ab50b",
+        "skills/effect-api-query/references/query-patterns.md": "a19125415a1f66507e449498a3bd1cb856f23e24812d2acb6abf44ff31373c58",
         "skills/effect-api-query/references/rpc.md": "7bfc134371d723b24da15a0bc07b1022daaddf6e0b47cb281900c147f78e9c59",
         "src/core/branch-filter.ts": "71a8c6039f1775881bbc00d92e14e2ef823bf7150721307a74f16a1579bccc86",
         "src/core/canonical-key.ts": "84e91000876a6795557aab39dcc5d44e328250bf9b30ad02fd67afd02f5003e9",
@@ -537,7 +539,7 @@
         "src/core/stream-publication.ts": "5c0f53bc84e3bb53337b9e76ea7dcd2269f080e9b2a35ad9d3f4ecce341fa61d",
         "src/core/stream-recovery.ts": "358a585cb59195f39f429a7736eb21c3ceed5b52b229768d681ff84239a6d622",
         "src/core/stream-snapshot.ts": "97fbb56308b2e2decacd86a02b3f0a3ced76692444ba25a7abaae05b442c233a",
-        "src/core/streamed-query.ts": "4cdbad1d48db1be7e0a93205c0d79a2adb4867b1dbf657ad632defa4650ec9ad",
+        "src/core/streamed-query.ts": "8188a6501a0dc5450b09098058f5e6a9bb2a8bc1427bd78cec5f447baba3ca59",
         "src/core/types.ts": "8e20c35e9a4ad9193622359e10660b65d03b8bee51e685d75f2e29ac40bfae59",
         "src/core/utility-tree.ts": "7b113d01c672c1148d022556f72c6e8f49c5afc0170fc88dcff74008abed28f1",
         "src/core/view-prefix.ts": "dfc0d74a07c8afe3f63952d59c29088ba4afb45e11a402ef8b72c5e2282cb063",
@@ -563,8 +565,8 @@
         "tests/create-rpc-query-utils-request-options.test.ts": "548e1c87ad52f2a7ea73704624e6b5ea06a64dfe696da6a6e05f4a832783223b",
         "tests/create-rpc-query-utils-server-local.test.ts": "281d15e89cc0e13a846a03165069c54e733d77d4985bb246aa42034f67d4ed0d",
         "tests/create-rpc-query-utils-stream-baseline.test.ts": "b5181377776cc0e08b269213da6a7dbe8cafc97d63c5e240e311658ae2cce039",
-        "tests/create-rpc-query-utils-stream-cache.test.ts": "d4e2e57da0ff1993f8e47082414a994f762c48a8bd38c6f7e75a809956dbbea3",
-        "tests/create-rpc-query-utils-stream-hashing.test.ts": "3ec2de67c2f447b7f8ee003e9d8c1c0d19f1c9a787440a64c21df103ab9c044b",
+        "tests/create-rpc-query-utils-stream-cache.test.ts": "c2aea3349503b5bfe9abfd445a2e6a54a939843f8d00b6bf4d75ad607b2d99e7",
+        "tests/create-rpc-query-utils-stream-hashing.test.ts": "417f45c4fd7584d164fe5ecc9e354bdf52a1117a5a46f7729c2ffb5791eaf068",
         "tests/create-rpc-query-utils-stream-publication.test.ts": "f0f6919a98e3c4efd59ab39a7c8f2a2efb817c0b55913cd82c034126c8d5e459",
         "tests/create-rpc-query-utils-streaming.test.ts": "6f0fccd52258df72d1bb471bd04873426708209fa48e0b9c3a0c831d9002f5a1",
         "tests/create-rpc-query-utils-structural-sharing.test.ts": "1698a72dcfde4aaabac4161193fc0379c445f8a8be61d47d29797a315b66b06f",
@@ -667,14 +669,12 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "56d6476c6d69c35c371df6928ddeafa03f0649fe",
-      "outcome": "no-change",
-      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
+      "head": "16c1fe41498b2ee6ea70644bead0623973449aa7",
+      "outcome": "updated",
+      "reason": "Preserved all existing planning scope; domain_map adds stable stream publication and independent observer/Cause coverage, skill_spec records ticket 170 and ADR 0037; skill_tree existing src/test/docs/003*.md globs cover the change and need no structural edit. No new skill or dependency support claim.",
       "evidence": [
-        "Before versioning: intent maintainer check passed at 56d6476c6d69c35c371df6928ddeafa03f0649fe.",
-        "changeset version and vp fmt generated 0.6.0 -> 0.6.1.",
-        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
-        "Scoped generated changes: package.json."
+        "_artifacts/domain_map.yaml; _artifacts/skill_spec.md; _artifacts/skill_tree.yaml reviewed against source/guidance diff",
+        "Intent sync reports no changes; yamllint passes both YAML records with existing long-line/document-start style allowed; check/docs-check pass; fresh consumer discovery remains unverified."
       ]
     },
     "source:vite.config.ts": {
@@ -2979,6 +2979,18 @@
         "changeset version and vp fmt generated 0.6.0 -> 0.6.1.",
         "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
         "Scoped generated changes: .changeset/effect-41-support.md."
+      ]
+    },
+    "source:.changeset/tidy-stream-execution.md": {
+      "fingerprint": "d5d9a3fee8ceaf4c778b3c76fea3031fbff98f15fb3439dae514815624e066f2",
+      "snapshot": {
+        ".changeset/tidy-stream-execution.md": "94358228f4c7c66fe3b705b180491fb90d4e68c886bf4b7308db218b2eb40167"
+      },
+      "head": "16c1fe41498b2ee6ea70644bead0623973449aa7",
+      "outcome": "no-change",
+      "reason": "Patch release note describes internal stable Query Core integration and unchanged stream semantics. Existing query-patterns guidance was reconciled in the owning skill review; the release note requires no independently discoverable skill.",
+      "evidence": [
+        ".changeset/tidy-stream-execution.md; src/core/streamed-query.ts; 801 runtime tests and 301 post-merge stream cases pass; package validation passes"
       ]
     }
   }
