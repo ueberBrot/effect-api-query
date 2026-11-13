@@ -25,11 +25,15 @@ const pages = {
   events: { title: "Event recovery", component: EventsExample },
 };
 
-export const WorkflowNavigation = () => (
+export const WorkflowNavigation = ({
+  basePath = "/",
+}: {
+  readonly basePath?: string;
+}) => (
   <nav aria-label="Examples" className="flex flex-wrap gap-4 text-sm">
     <a href="/">Directory</a>
     {WorkflowPage.literals.map((page) => (
-      <a href={`/?example=${page}`} key={page}>
+      <a href={`${basePath}?example=${page}`} key={page}>
         {pages[page].title}
       </a>
     ))}
@@ -39,15 +43,17 @@ export const WorkflowNavigation = () => (
 export const HttpWorkflowsExample = ({
   application,
   page,
+  basePath = "/",
 }: {
   readonly application: HttpWorkflows;
   readonly page: typeof WorkflowPage.Type;
+  readonly basePath?: string;
 }) => {
   const { title, component: Example } = pages[page];
   return (
     <QueryClientProvider client={application.queryClient}>
       <main className="mx-auto grid max-w-4xl gap-8 px-5 py-12">
-        <WorkflowNavigation />
+        <WorkflowNavigation basePath={basePath} />
         <h1 className="display-heading text-foreground text-3xl font-bold">
           {title}
         </h1>

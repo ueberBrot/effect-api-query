@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "957bcdec3e80bbb1fe76033ecf47bdad2c8888306f09b0ba2747ea916f590adc",
+      "fingerprint": "e2d3a82c06fdfcd2df3ddf186ea683b4cfaca477674c01d945609a065b5eae30",
       "snapshot": {
         "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -15,7 +15,7 @@
         "apps/docs/src/content/docs/concepts/semantic-keys.md": "715b4e3103fa971748b45c5c8086e1ea4b95980dff0a69ee122635ed5fc998d2",
         "apps/docs/src/content/docs/examples.md": "08c014b01c49123ee871ddb7427d69b4dcf1791fa907ba2fe535ebf6c522d282",
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "022014147e137abdac686d6d3c58f4eff1e8098dd2241a3cccd96abe5051cd26",
-        "apps/docs/src/content/docs/examples/http-workflows.md": "f7b41e1e63fda1e4c44e0886b29f5c796f3f51e1b3bf227947423194f6cc39b0",
+        "apps/docs/src/content/docs/examples/http-workflows.md": "4f668dcd9a22dc456d7ec9d285d4cb813d2c0ecc3450d07389cc0dae169ac9a4",
         "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "9de7c0138e82b6471f6517f293975c29462cdbfa84ef4fd1d683b030e262b5bc",
         "apps/docs/src/content/docs/getting-started/feature-support.md": "ac3ebd5c192272f7d4d1a236a5878d1d51a76fc514e874cbb51f17eb31809125",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "4c68eaf1d2df4b1dcebf24b8f84ef291dd503a2049eb6802b74e8e52b7e6a948",
@@ -102,7 +102,7 @@
         "docs/adr/0039-coalesce-live-snapshots-explicitly.md": "4d95533f87474e8a55a9a6a0f0339f375a7e5d242195e26e99c2d7e895171f02",
         "docs/adr/0040-add-opt-in-query-owner-retirement.md": "5e5f0a05577c779ed22a62a3e99a8abd509c241fa9949e9fb50a9aec068472fc",
         "docs/adr/0042-define-the-compatibility-promise.md": "2e2ae6512eb714ed8601daee80fe3852fdb62614602be5ad54ffd5e58f0beb99",
-        "e2e/http-workflows.spec.ts": "f5729fd3707758508d85506a93a1f2560edfe1aad89c9bd200ec0c80a2ecb7cb",
+        "e2e/http-workflows.spec.ts": "8e7f7622ea481a56dc3f0ebceabe61691f8f34e3489ef1945ff3e929a1e6b2e0",
         "examples/contracts/src/client.ts": "fdf559bf0a798c7ea7f7aee01967837e720f7727a1bd11978aec51aad59f00f2",
         "examples/contracts/src/contracts.ts": "74d69e1a07c0b32c2a48b8fed8cfceaac8844ead860fbd00b9e357657b39d88e",
         "examples/contracts/src/http-api.ts": "bcecd0611e4bdeac0dad04159cc73db3165aca20ac1f89e597e6c73a76d99cef",
@@ -134,6 +134,7 @@
         "examples/tanstack-start/src/components/effect-error-details.tsx": "d3bf0975507f9784f49b12a468baade10177209c5a1fa51e6de1e86f0daa770a",
         "examples/tanstack-start/src/lib/api-server.ts": "3ab4000ee28dc8f73237b4508e0f0a0a1b1e4baf865ae501348487a978e19f23",
         "examples/tanstack-start/src/lib/application.ts": "4456944d1ded48ac041dce627201111ac05936ed57263b9ca674a877a21dec38",
+        "examples/tanstack-start/src/lib/featured-user.ts": "8c9b33056cd2e4c2c19a95de3fad5b93e326b654117c75086b55f44630ad599d",
         "examples/tanstack-start/src/lib/query-ssr.ts": "30042b98b74d2fcc241a2d752d0ed388555082047098b9ca17e3a6fc2727f4e8",
         "examples/tanstack-start/src/lib/server-application.ts": "84a8be06a20a2777023a00599f1bad7f6db1018f247aff6818d08c1fc933655b",
         "examples/tanstack-start/src/lib/server-host.ts": "20eb1a8538720b8cba9df3011d48974f286a44921fe641096985be533f687dad",
@@ -143,6 +144,7 @@
         "examples/tanstack-start/tests/async-hydration.test.ts": "2915fdf8dd1ef9737404d76aa9045176593a5b9ee21ef84beca20759e6b8a9e5",
         "examples/tanstack-start/tests/client-navigation.test.tsx": "084a8c42a1312e12720098d985a8796a534ddc07aa12f18a9b5595ed94a1c507",
         "examples/tanstack-start/tests/failure-dehydration.test.ts": "5a132899aeb7727f53a30bfffc0c1ee7ac5d59ff96a752077f7169d0df4b4581",
+        "examples/tanstack-start/tests/featured-selection.test.ts": "3a6e1db27843a392d354cb58ab7b8d7bfaf327ffe42910118d426d42875f1123",
         "examples/tanstack-start/tests/server-local.test.ts": "6d04b85b3e584deb8e4b6f847235ceab8a811eb2d3837dc209f89cf87cf0d291",
         "examples/tanstack-start/tests/server-render.test.tsx": "e46b15c02fc7b5fc76d52f9d64dfc5b88d4d36e0151908138de9babe7a5d53a3",
         "examples/vite-react/src/app.tsx": "96f17567f1a4c387c30ba64bfadd8cc2d8260dde7699269951e26197e29ecd42",
@@ -151,19 +153,19 @@
         "examples/vite-react/src/lib/owner-cache.ts": "e9eaa783cce49e7905027ae93ef1c525e2713187e83ffa4ecf726ba7235a420d",
         "examples/vite-react/src/lib/user-writes.ts": "999277fa02ff9c1439186b59636f7078458a5cbc3c84bed06514867b270a3b5e",
         "examples/vite-react/src/main.tsx": "9129bf323b8763d540df1ba4d7660739065d3f417cd287125292b51b56f4e02d",
-        "examples/vite-react/src/workflows/app.tsx": "0002ffa61317a639bc0bbea63ec934db84f92476093ea173abe0aea6f265c07f",
-        "examples/vite-react/src/workflows/application.ts": "e95c396af52c638aec8a48383df697bf131390d7ce5c68818403e502572f4b5f",
+        "examples/vite-react/src/workflows/app.tsx": "452cec00a71934b2547a4cc62b48eb26a71795c7d37be84d1fd64a32dd2218d1",
+        "examples/vite-react/src/workflows/application.ts": "856d37c001b37125865e29cbb2d4bc83a136219c324c91f47eb5cdc0315d1b46",
         "examples/vite-react/src/workflows/document.tsx": "4fdeeaf20904d2568c827f80d0c1fd957edb19de9a3eb487077888f5edf7fe32",
-        "examples/vite-react/src/workflows/events.tsx": "e6db96f91484d19fa2f6321788629b8556e1c35c4241cd6bbd0a857aa0287ea0",
+        "examples/vite-react/src/workflows/events.tsx": "e9fd798a6b72162ab369a82492104810bb0dbb64834fb2152e6298b56c2ee44a",
         "examples/vite-react/src/workflows/readings.tsx": "45a9fe929cf43bf9d6a85b80be18859f52a810f81fbd653013ff0ed64c2bf423",
-        "examples/vite-react/src/workflows/recovery.ts": "3d5737673315bc5cbbf946b7119b4c192e305722d68b6c39f109b708ba4f7cdb",
+        "examples/vite-react/src/workflows/recovery.ts": "b4d4264844869447a42cbbb515529ef511f99c8c16c457521a0835a0823df65d",
         "examples/vite-react/src/workflows/sharing.ts": "b23cc3b8327b1bc9e6d1fe4252d82eda9e817434105312cfaf0fabc03c4d6e39",
-        "examples/vite-react/src/workflows/streams.tsx": "94071d054a2837755ba36e0b7736ed333de6e541739a38e67b36de2a94725796",
+        "examples/vite-react/src/workflows/streams.tsx": "286691746068b82fb0a6d61f4c5f1d92cdd841ede624532d6f3cbc8b18ef8dbd",
         "examples/vite-react/src/workflows/upload.tsx": "9780404fa098e0626fd45815bede351ce97b8d96fa855249ca21a864cfdb32ad",
         "examples/vite-react/tests/app.test.tsx": "29597cde134da8e236466ce403d1898796c1ffb883a8c35f8d4c3e542aa779d8",
         "examples/vite-react/tests/commands-ui.test.tsx": "d24bafc224efa769efeb1a2c0398a86b0dbef6c63cd19ba73d3b3bede921a1fd",
         "examples/vite-react/tests/commands.test.ts": "1bd076ba62d754e323beedb7bfb9c2e2ce75f2eee117003a5f5bb55350610386",
-        "examples/vite-react/tests/http-workflows.test.ts": "4cca862bdedf0ab54f870b2906458d2d177e22807330edfddbbbfe093d8be5ba",
+        "examples/vite-react/tests/http-workflows.test.ts": "d82eec181e12af57cc5a36fa5908ceba15030f4b8341225bdd3a4dd3d4042f13",
         "examples/vite-react/tests/minimal-setup.test.tsx": "fb5cb0465320068d8bc37bfab0cf1c4579e82a9c318243ad15424d0f35661281",
         "examples/vite-react/tests/owner-boundary.test.tsx": "f8fc6b26f24884d87d364a9b07f16ba912a7e92efbb96b0c815a62be22ac6bab",
         "examples/vite-react/tests/owner-cache.test.ts": "1ac4bebb04b973fa11e26f4b684fe6b217a075a255ac1828d9ed109c359c9ed9",
@@ -191,7 +193,7 @@
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "6bf36be7173bf06e69232b5ac3024b9e7fc3fa51be8d5c9904acad840cab39e9",
         "skills/effect-api-query/references/cache-workflows.md": "1d80a087881094a7d50dbf7ce20c7ab8a2800f05aae432523645d4cba82b98e3",
-        "skills/effect-api-query/references/frameworks-and-hosts.md": "ecf542ef7b4f0b636c905123d4a7d98c3c45170df14e890e9d69a56ad37ec5f5",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "444e359b9b4fe577c691546cba652422dce6821d80feebf7a8bbd8ef55dd0415",
         "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
         "skills/effect-api-query/references/hydration-and-ssr.md": "cb64d4d2622cff1e7be1fb5b6b67e6bc67cbb1cca3e49e657ef8d2e641a26de1",
         "skills/effect-api-query/references/query-patterns.md": "883e20f2e7d37b296c3626d94bb60c2e8b399fd814b4c6fe643ad8abd6ccd788",
@@ -366,21 +368,20 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "3e70c515feb8f89a2b9a3aa8086404436a3d1efb",
+      "head": "bc4e899e8f9ae5cfb4c23870870a59e0b659f805",
       "outcome": "updated",
-      "reason": "Maintainer explicitly retains pre-1.0 minor breaking changes and removes the erroneous unreleased168major rule and version-migration wording. Reconcile ADR0001/0042 and current consumer/agent guidance. Delete the three requested one-off reports, retain tools/budgets and the existing Intent planning inputs, and point retained evidence to PR181.",
+      "reason": "The frameworks reference and HTTP workflow guide now describe actual Start browser-owned workflows and loader descriptor rebinding. Existing skill activation and six-reference structure still cover the task.",
       "evidence": [
-        "Diff against3e70c515: changeset minor, current behavior guidance, ADR0001 history restored and unreleased0042rule withdrawn under explicit maintainer direction. _artifacts/skill_spec records the correction; domain_map and skill_tree remain accurate with existing one-skill/six-reference ownership and sources. Three report files removed; no runtime/type/measurement implementation changed.",
-        "Scoped formatter and whitespace pass; vp run --no-cache docs-check passes24excerpts and Astro zero errors/warnings/hints. Changesets status reports minor, no package version file changed. skills-check passes. No fresh consumer/discovery or runtime rerun claimed for release/guidance-only edits."
+        "Compared own diff against required base 3e70c51 and merged parent bc4e899. Fresh checks: 127 app runtime tests; 150 CLI Playwright cases across Chromium/Firefox/WebKit; both app production builds; strict/typed lint/format and Effect checks; public/server-local fixtures and packed framework consumers under TSRS and TS5.9; 24 executable docs tests and Astro check. Intent structural skills validation passes. Fallow retains 13 untouched findings; default YAML lint retains inherited style findings (93 to 92 line-length findings). Logs and coverage matrix: /tmp/effect-api-query-spec-166/pre1-examples-result.md. Independent consumer/discovery evidence is unverified because agents are prohibited. No library API, release policy or dependency change."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "dc41f7980017a810c97272549e10788a13b375184f2346c3f3b090f949703303",
+      "fingerprint": "71b5a83b6fc405a1fcfc37bccb5240a4b375e52f3aad0175f6631eedbf97c876",
       "snapshot": {
         "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
-        "_artifacts/domain_map.yaml": "33f4581f4534d49a4612c4bc9e65db0ed3537de8772a71e5d499349e6fbb6c85",
-        "_artifacts/skill_spec.md": "b55f5232ea2c4f4e32e82a98c8c0099b8b7ec156a244f8ae70827b2768f0c0bd",
+        "_artifacts/domain_map.yaml": "ae40f07fa480ca48c207157c73b05c5f57d167d3b80c5987875591c9015bde5a",
+        "_artifacts/skill_spec.md": "f9001aef36c9f9b417d093e0093f8fcba4e8b6cc85543f8961938a341eceb458",
         "_artifacts/skill_tree.yaml": "8205464b58a223251be240261d382ce4120adf328315f3352977e157a634a4f7",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "83a6aab512d66893237aa3ba45bf52b23712b88d829d83992509c2f3c822c18b",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "eb226d096cee825aa2a7c2e49370208d6110662c3acf681fa4b95f8b6caca0d7",
@@ -390,7 +391,7 @@
         "apps/docs/src/content/docs/concepts/semantic-keys.md": "715b4e3103fa971748b45c5c8086e1ea4b95980dff0a69ee122635ed5fc998d2",
         "apps/docs/src/content/docs/examples.md": "08c014b01c49123ee871ddb7427d69b4dcf1791fa907ba2fe535ebf6c522d282",
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "022014147e137abdac686d6d3c58f4eff1e8098dd2241a3cccd96abe5051cd26",
-        "apps/docs/src/content/docs/examples/http-workflows.md": "f7b41e1e63fda1e4c44e0886b29f5c796f3f51e1b3bf227947423194f6cc39b0",
+        "apps/docs/src/content/docs/examples/http-workflows.md": "4f668dcd9a22dc456d7ec9d285d4cb813d2c0ecc3450d07389cc0dae169ac9a4",
         "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "9de7c0138e82b6471f6517f293975c29462cdbfa84ef4fd1d683b030e262b5bc",
         "apps/docs/src/content/docs/getting-started/feature-support.md": "ac3ebd5c192272f7d4d1a236a5878d1d51a76fc514e874cbb51f17eb31809125",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "4c68eaf1d2df4b1dcebf24b8f84ef291dd503a2049eb6802b74e8e52b7e6a948",
@@ -477,7 +478,7 @@
         "docs/adr/0039-coalesce-live-snapshots-explicitly.md": "4d95533f87474e8a55a9a6a0f0339f375a7e5d242195e26e99c2d7e895171f02",
         "docs/adr/0040-add-opt-in-query-owner-retirement.md": "5e5f0a05577c779ed22a62a3e99a8abd509c241fa9949e9fb50a9aec068472fc",
         "docs/adr/0042-define-the-compatibility-promise.md": "2e2ae6512eb714ed8601daee80fe3852fdb62614602be5ad54ffd5e58f0beb99",
-        "e2e/http-workflows.spec.ts": "f5729fd3707758508d85506a93a1f2560edfe1aad89c9bd200ec0c80a2ecb7cb",
+        "e2e/http-workflows.spec.ts": "8e7f7622ea481a56dc3f0ebceabe61691f8f34e3489ef1945ff3e929a1e6b2e0",
         "examples/contracts/src/client.ts": "fdf559bf0a798c7ea7f7aee01967837e720f7727a1bd11978aec51aad59f00f2",
         "examples/contracts/src/contracts.ts": "74d69e1a07c0b32c2a48b8fed8cfceaac8844ead860fbd00b9e357657b39d88e",
         "examples/contracts/src/http-api.ts": "bcecd0611e4bdeac0dad04159cc73db3165aca20ac1f89e597e6c73a76d99cef",
@@ -509,6 +510,7 @@
         "examples/tanstack-start/src/components/effect-error-details.tsx": "d3bf0975507f9784f49b12a468baade10177209c5a1fa51e6de1e86f0daa770a",
         "examples/tanstack-start/src/lib/api-server.ts": "3ab4000ee28dc8f73237b4508e0f0a0a1b1e4baf865ae501348487a978e19f23",
         "examples/tanstack-start/src/lib/application.ts": "4456944d1ded48ac041dce627201111ac05936ed57263b9ca674a877a21dec38",
+        "examples/tanstack-start/src/lib/featured-user.ts": "8c9b33056cd2e4c2c19a95de3fad5b93e326b654117c75086b55f44630ad599d",
         "examples/tanstack-start/src/lib/query-ssr.ts": "30042b98b74d2fcc241a2d752d0ed388555082047098b9ca17e3a6fc2727f4e8",
         "examples/tanstack-start/src/lib/server-application.ts": "84a8be06a20a2777023a00599f1bad7f6db1018f247aff6818d08c1fc933655b",
         "examples/tanstack-start/src/lib/server-host.ts": "20eb1a8538720b8cba9df3011d48974f286a44921fe641096985be533f687dad",
@@ -518,6 +520,7 @@
         "examples/tanstack-start/tests/async-hydration.test.ts": "2915fdf8dd1ef9737404d76aa9045176593a5b9ee21ef84beca20759e6b8a9e5",
         "examples/tanstack-start/tests/client-navigation.test.tsx": "084a8c42a1312e12720098d985a8796a534ddc07aa12f18a9b5595ed94a1c507",
         "examples/tanstack-start/tests/failure-dehydration.test.ts": "5a132899aeb7727f53a30bfffc0c1ee7ac5d59ff96a752077f7169d0df4b4581",
+        "examples/tanstack-start/tests/featured-selection.test.ts": "3a6e1db27843a392d354cb58ab7b8d7bfaf327ffe42910118d426d42875f1123",
         "examples/tanstack-start/tests/server-local.test.ts": "6d04b85b3e584deb8e4b6f847235ceab8a811eb2d3837dc209f89cf87cf0d291",
         "examples/tanstack-start/tests/server-render.test.tsx": "e46b15c02fc7b5fc76d52f9d64dfc5b88d4d36e0151908138de9babe7a5d53a3",
         "examples/vite-react/src/app.tsx": "96f17567f1a4c387c30ba64bfadd8cc2d8260dde7699269951e26197e29ecd42",
@@ -526,19 +529,19 @@
         "examples/vite-react/src/lib/owner-cache.ts": "e9eaa783cce49e7905027ae93ef1c525e2713187e83ffa4ecf726ba7235a420d",
         "examples/vite-react/src/lib/user-writes.ts": "999277fa02ff9c1439186b59636f7078458a5cbc3c84bed06514867b270a3b5e",
         "examples/vite-react/src/main.tsx": "9129bf323b8763d540df1ba4d7660739065d3f417cd287125292b51b56f4e02d",
-        "examples/vite-react/src/workflows/app.tsx": "0002ffa61317a639bc0bbea63ec934db84f92476093ea173abe0aea6f265c07f",
-        "examples/vite-react/src/workflows/application.ts": "e95c396af52c638aec8a48383df697bf131390d7ce5c68818403e502572f4b5f",
+        "examples/vite-react/src/workflows/app.tsx": "452cec00a71934b2547a4cc62b48eb26a71795c7d37be84d1fd64a32dd2218d1",
+        "examples/vite-react/src/workflows/application.ts": "856d37c001b37125865e29cbb2d4bc83a136219c324c91f47eb5cdc0315d1b46",
         "examples/vite-react/src/workflows/document.tsx": "4fdeeaf20904d2568c827f80d0c1fd957edb19de9a3eb487077888f5edf7fe32",
-        "examples/vite-react/src/workflows/events.tsx": "e6db96f91484d19fa2f6321788629b8556e1c35c4241cd6bbd0a857aa0287ea0",
+        "examples/vite-react/src/workflows/events.tsx": "e9fd798a6b72162ab369a82492104810bb0dbb64834fb2152e6298b56c2ee44a",
         "examples/vite-react/src/workflows/readings.tsx": "45a9fe929cf43bf9d6a85b80be18859f52a810f81fbd653013ff0ed64c2bf423",
-        "examples/vite-react/src/workflows/recovery.ts": "3d5737673315bc5cbbf946b7119b4c192e305722d68b6c39f109b708ba4f7cdb",
+        "examples/vite-react/src/workflows/recovery.ts": "b4d4264844869447a42cbbb515529ef511f99c8c16c457521a0835a0823df65d",
         "examples/vite-react/src/workflows/sharing.ts": "b23cc3b8327b1bc9e6d1fe4252d82eda9e817434105312cfaf0fabc03c4d6e39",
-        "examples/vite-react/src/workflows/streams.tsx": "94071d054a2837755ba36e0b7736ed333de6e541739a38e67b36de2a94725796",
+        "examples/vite-react/src/workflows/streams.tsx": "286691746068b82fb0a6d61f4c5f1d92cdd841ede624532d6f3cbc8b18ef8dbd",
         "examples/vite-react/src/workflows/upload.tsx": "9780404fa098e0626fd45815bede351ce97b8d96fa855249ca21a864cfdb32ad",
         "examples/vite-react/tests/app.test.tsx": "29597cde134da8e236466ce403d1898796c1ffb883a8c35f8d4c3e542aa779d8",
         "examples/vite-react/tests/commands-ui.test.tsx": "d24bafc224efa769efeb1a2c0398a86b0dbef6c63cd19ba73d3b3bede921a1fd",
         "examples/vite-react/tests/commands.test.ts": "1bd076ba62d754e323beedb7bfb9c2e2ce75f2eee117003a5f5bb55350610386",
-        "examples/vite-react/tests/http-workflows.test.ts": "4cca862bdedf0ab54f870b2906458d2d177e22807330edfddbbbfe093d8be5ba",
+        "examples/vite-react/tests/http-workflows.test.ts": "d82eec181e12af57cc5a36fa5908ceba15030f4b8341225bdd3a4dd3d4042f13",
         "examples/vite-react/tests/minimal-setup.test.tsx": "fb5cb0465320068d8bc37bfab0cf1c4579e82a9c318243ad15424d0f35661281",
         "examples/vite-react/tests/owner-boundary.test.tsx": "f8fc6b26f24884d87d364a9b07f16ba912a7e92efbb96b0c815a62be22ac6bab",
         "examples/vite-react/tests/owner-cache.test.ts": "1ac4bebb04b973fa11e26f4b684fe6b217a075a255ac1828d9ed109c359c9ed9",
@@ -566,7 +569,7 @@
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "6bf36be7173bf06e69232b5ac3024b9e7fc3fa51be8d5c9904acad840cab39e9",
         "skills/effect-api-query/references/cache-workflows.md": "1d80a087881094a7d50dbf7ce20c7ab8a2800f05aae432523645d4cba82b98e3",
-        "skills/effect-api-query/references/frameworks-and-hosts.md": "ecf542ef7b4f0b636c905123d4a7d98c3c45170df14e890e9d69a56ad37ec5f5",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "444e359b9b4fe577c691546cba652422dce6821d80feebf7a8bbd8ef55dd0415",
         "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
         "skills/effect-api-query/references/hydration-and-ssr.md": "cb64d4d2622cff1e7be1fb5b6b67e6bc67cbb1cca3e49e657ef8d2e641a26de1",
         "skills/effect-api-query/references/query-patterns.md": "883e20f2e7d37b296c3626d94bb60c2e8b399fd814b4c6fe643ad8abd6ccd788",
@@ -741,12 +744,11 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "3e70c515feb8f89a2b9a3aa8086404436a3d1efb",
+      "head": "bc4e899e8f9ae5cfb4c23870870a59e0b659f805",
       "outcome": "updated",
-      "reason": "Maintainer explicitly retains pre-1.0 minor breaking changes and removes the erroneous unreleased168major rule and version-migration wording. Reconcile ADR0001/0042 and current consumer/agent guidance. Delete the three requested one-off reports, retain tools/budgets and the existing Intent planning inputs, and point retained evidence to PR181.",
+      "reason": "Domain map and batch history now cover both native applications, browser/request ownership, recovered Effect/cache updates and the host-specific loader transfer. Existing skill tree source mappings, identity and six references remain accurate; no tree structural change is needed. Prior records are preserved.",
       "evidence": [
-        "Diff against3e70c515: changeset minor, current behavior guidance, ADR0001 history restored and unreleased0042rule withdrawn under explicit maintainer direction. _artifacts/skill_spec records the correction; domain_map and skill_tree remain accurate with existing one-skill/six-reference ownership and sources. Three report files removed; no runtime/type/measurement implementation changed.",
-        "Scoped formatter and whitespace pass; vp run --no-cache docs-check passes24excerpts and Astro zero errors/warnings/hints. Changesets status reports minor, no package version file changed. skills-check passes. No fresh consumer/discovery or runtime rerun claimed for release/guidance-only edits."
+        "Compared own diff against required base 3e70c51 and merged parent bc4e899. Fresh checks: 127 app runtime tests; 150 CLI Playwright cases across Chromium/Firefox/WebKit; both app production builds; strict/typed lint/format and Effect checks; public/server-local fixtures and packed framework consumers under TSRS and TS5.9; 24 executable docs tests and Astro check. Intent structural skills validation passes. Fallow retains 13 untouched findings; default YAML lint retains inherited style findings (93 to 92 line-length findings). Logs and coverage matrix: /tmp/effect-api-query-spec-166/pre1-examples-result.md. Independent consumer/discovery evidence is unverified because agents are prohibited. No library API, release policy or dependency change."
       ]
     },
     "source:vite.config.ts": {
@@ -1320,15 +1322,15 @@
       ]
     },
     "source:e2e/tanstack-start.spec.ts": {
-      "fingerprint": "3ec9e1a42a6008a4d2903357ecfcdc3ac0e7eddff0ead865093c26f62186976c",
+      "fingerprint": "5bfbc12436298086ffad834fad9e69d7278c4850b4d049f0e19882ae9045bd4f",
       "snapshot": {
-        "e2e/tanstack-start.spec.ts": "5b1e50cb99fe02afdd6df55c901b21377d7ce37fce5be7ad3ba5248b2e591301"
+        "e2e/tanstack-start.spec.ts": "aa7013e8af3f308991d89e7a8c9b4cad5cbe48595d7b742261fb36a24b3563b0"
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "head": "bc4e899e8f9ae5cfb4c23870870a59e0b659f805",
       "outcome": "no-change",
-      "reason": "Preset formatting and repository test setup preserve the existing browser scenarios and native library usage. No new integration task or recommendation is introduced.",
+      "reason": "Generated registration, navigation and browser acceptance wire the already documented native application task. They add no independent developer workflow requiring another guidance file.",
       "evidence": [
-        "e2e/tanstack-start.spec.ts diff reviewed; final compiler checks and app builds pass. Earlier Chromium/Firefox application/docs checks passed; latest docs Chromium run passes 7 cases. WebKit is blocked at launch by missing host libraries."
+        "Compared own diff against required base 3e70c51 and merged parent bc4e899. Fresh checks: 127 app runtime tests; 150 CLI Playwright cases across Chromium/Firefox/WebKit; both app production builds; strict/typed lint/format and Effect checks; public/server-local fixtures and packed framework consumers under TSRS and TS5.9; 24 executable docs tests and Astro check. Intent structural skills validation passes. Fallow retains 13 untouched findings; default YAML lint retains inherited style findings (93 to 92 line-length findings). Logs and coverage matrix: /tmp/effect-api-query-spec-166/pre1-examples-result.md. Independent consumer/discovery evidence is unverified because agents are prohibited. No library API, release policy or dependency change."
       ]
     },
     "source:e2e/vite-react.spec.ts": {
@@ -2111,15 +2113,15 @@
       ]
     },
     "source:examples/tanstack-start/src/routes/__root.tsx": {
-      "fingerprint": "9482a1a22aea9660cd8044b938dcbe020a5f6b5b59ec67fcaf61f572950b68d9",
+      "fingerprint": "f662278fd76b5fcf0de0d3ae4c385e2188cb0fb3c8318898c7cf312d92af60a1",
       "snapshot": {
-        "examples/tanstack-start/src/routes/__root.tsx": "2528ce53594d2f6408fd732ef12ef6b125f0de7c8c3a17e8cb60ba0ac72ed860"
+        "examples/tanstack-start/src/routes/__root.tsx": "ea73c0bd7701f38aa3450c331f8cde75b2cb34ca3e427678a1c13c724ae85d7e"
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "head": "bc4e899e8f9ae5cfb4c23870870a59e0b659f805",
       "outcome": "no-change",
-      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
+      "reason": "Generated registration, navigation and browser acceptance wire the already documented native application task. They add no independent developer workflow requiring another guidance file.",
       "evidence": [
-        "examples/tanstack-start/src/routes/__root.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
+        "Compared own diff against required base 3e70c51 and merged parent bc4e899. Fresh checks: 127 app runtime tests; 150 CLI Playwright cases across Chromium/Firefox/WebKit; both app production builds; strict/typed lint/format and Effect checks; public/server-local fixtures and packed framework consumers under TSRS and TS5.9; 24 executable docs tests and Astro check. Intent structural skills validation passes. Fallow retains 13 untouched findings; default YAML lint retains inherited style findings (93 to 92 line-length findings). Logs and coverage matrix: /tmp/effect-api-query-spec-166/pre1-examples-result.md. Independent consumer/discovery evidence is unverified because agents are prohibited. No library API, release policy or dependency change."
       ]
     },
     "source:examples/tanstack-start/src/routes/api.$.ts": {
@@ -2135,15 +2137,15 @@
       ]
     },
     "source:examples/tanstack-start/src/routes/details.tsx": {
-      "fingerprint": "f500f587e217a356cf8260d8baead8b3839749bc40ac40965aea5561c7b5d619",
+      "fingerprint": "2b5bf05d019524913122cfb4def121fecb4bd765100aa5db4c499e37c5b8e8ae",
       "snapshot": {
-        "examples/tanstack-start/src/routes/details.tsx": "b58d7de1e5f69354e9c2782f1719eee2161dee01ca61687822bdc1f1dc18061c"
+        "examples/tanstack-start/src/routes/details.tsx": "efb3afdb4284244f761bad8d75637d0be14b8abe08f2d91374a39da088079e42"
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
-      "outcome": "no-change",
-      "reason": "Preset formatting, typed seed construction and narrowed callback handling preserve the documented example workflows and application ownership. Existing framework/host guidance remains accurate.",
+      "head": "bc4e899e8f9ae5cfb4c23870870a59e0b659f805",
+      "outcome": "updated",
+      "reason": "Actual native route consumes the documented descriptor or HTTP workflow provider. The existing framework guidance now covers the route and its lifetime; it does not justify another skill.",
       "evidence": [
-        "examples/tanstack-start/src/routes/details.tsx diff reviewed; 599 runtime cases, both public compiler suites and both app builds pass."
+        "Compared own diff against required base 3e70c51 and merged parent bc4e899. Fresh checks: 127 app runtime tests; 150 CLI Playwright cases across Chromium/Firefox/WebKit; both app production builds; strict/typed lint/format and Effect checks; public/server-local fixtures and packed framework consumers under TSRS and TS5.9; 24 executable docs tests and Astro check. Intent structural skills validation passes. Fallow retains 13 untouched findings; default YAML lint retains inherited style findings (93 to 92 line-length findings). Logs and coverage matrix: /tmp/effect-api-query-spec-166/pre1-examples-result.md. Independent consumer/discovery evidence is unverified because agents are prohibited. No library API, release policy or dependency change."
       ]
     },
     "source:examples/tanstack-start/src/routes/rpc.ts": {
@@ -3308,6 +3310,30 @@
         "180-fallow-original-matched-config.json",
         "180-fallow-accepted.json",
         "180-accepted-measurements.json"
+      ]
+    },
+    "source:examples/tanstack-start/src/routeTree.gen.ts": {
+      "fingerprint": "ca49967650df9f751fea719e33ef3d77f327f65b7de7225a67cc9c688bbc397b",
+      "snapshot": {
+        "examples/tanstack-start/src/routeTree.gen.ts": "4a94a2612e37048e8396faf670b7438155ef5d5ab446f7ced4685e14425f61ab"
+      },
+      "head": "bc4e899e8f9ae5cfb4c23870870a59e0b659f805",
+      "outcome": "no-change",
+      "reason": "Generated registration, navigation and browser acceptance wire the already documented native application task. They add no independent developer workflow requiring another guidance file.",
+      "evidence": [
+        "Compared own diff against required base 3e70c51 and merged parent bc4e899. Fresh checks: 127 app runtime tests; 150 CLI Playwright cases across Chromium/Firefox/WebKit; both app production builds; strict/typed lint/format and Effect checks; public/server-local fixtures and packed framework consumers under TSRS and TS5.9; 24 executable docs tests and Astro check. Intent structural skills validation passes. Fallow retains 13 untouched findings; default YAML lint retains inherited style findings (93 to 92 line-length findings). Logs and coverage matrix: /tmp/effect-api-query-spec-166/pre1-examples-result.md. Independent consumer/discovery evidence is unverified because agents are prohibited. No library API, release policy or dependency change."
+      ]
+    },
+    "source:examples/tanstack-start/src/routes/workflows.tsx": {
+      "fingerprint": "ffb2eec31f5721b6f5feff8dfefbdd3b1884bf01298da9083151dd0e8fb34338",
+      "snapshot": {
+        "examples/tanstack-start/src/routes/workflows.tsx": "3ada140a987ecb3619eaac4a29e6845e9dd2f0b59af4ac596a13e15efe48b89d"
+      },
+      "head": "bc4e899e8f9ae5cfb4c23870870a59e0b659f805",
+      "outcome": "updated",
+      "reason": "Actual native route consumes the documented descriptor or HTTP workflow provider. The existing framework guidance now covers the route and its lifetime; it does not justify another skill.",
+      "evidence": [
+        "Compared own diff against required base 3e70c51 and merged parent bc4e899. Fresh checks: 127 app runtime tests; 150 CLI Playwright cases across Chromium/Firefox/WebKit; both app production builds; strict/typed lint/format and Effect checks; public/server-local fixtures and packed framework consumers under TSRS and TS5.9; 24 executable docs tests and Astro check. Intent structural skills validation passes. Fallow retains 13 untouched findings; default YAML lint retains inherited style findings (93 to 92 line-length findings). Logs and coverage matrix: /tmp/effect-api-query-spec-166/pre1-examples-result.md. Independent consumer/discovery evidence is unverified because agents are prohibited. No library API, release policy or dependency change."
       ]
     }
   }

@@ -26,6 +26,11 @@ const Root = () => (
           <nav aria-label="Primary">
             <ul className="flex flex-wrap gap-1 p-0">
               <li className="list-none">
+                <NavigationLink to="/workflows" search={{ example: "events" }}>
+                  HTTP workflows
+                </NavigationLink>
+              </li>
+              <li className="list-none">
                 <NavigationLink
                   activeProps={{
                     className:

@@ -227,7 +227,12 @@ tensions:
     skills:
       - effect-api-query
     description: The package defines generated options, keys, inference, and policy binding. The application owns native providers, transports, and domain protocols.
-    implication: Explain package behavior in library guidance, native consumers in integrations, and concrete protocols such as cancellable commands in runnable examples.
+    implication: |-
+      Explain package behavior in library guidance, native consumers in
+      integrations, and concrete protocols such as cancellable commands in
+      runnable examples. Both apps run browser-owned HTTP recovery, sharing
+      and stream workflows; Start also transfers loader descriptors into its
+      hydrated request/browser boundary.
   - name: Exact identity and broad refresh
     skills:
       - effect-api-query
