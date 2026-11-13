@@ -1,4 +1,5 @@
 import {
+  configureUtils,
   createHttpApiQueryUtils,
   createRpcQueryUtils,
 } from "@ueberbrot/effect-api-query";
@@ -58,3 +59,22 @@ http.events.watch.streamedKey({
 });
 // @ts-expect-error Live views do not accept accumulated publication policy.
 http.events.watch.liveOptions({ publicationBatchSize: 8 });
+
+const configuredSse = configureUtils(http.events.watch, {
+  live: { policy: { coalesceMs: 1000 } },
+});
+configuredSse.liveOptions({
+  sseOptions: { maxEventSize: 128, dispatchEmptyNamedEvents: true },
+});
+configuredSse.liveKey({
+  coalesceMs: undefined,
+  sseOptions: { maxEventSize: 64, dispatchEmptyNamedEvents: false },
+});
+// @ts-expect-error RPC streams have no SSE decoder policy.
+configureUtils(rpc.watch, {
+  live: {
+    policy: {
+      sseOptions: { maxEventSize: 128 },
+    },
+  },
+});

@@ -479,6 +479,18 @@ liveKey satisfies readonly [
   unknown,
   unknown?,
 ];
+// @ts-expect-error the optional policy slot breaks the previous exact-length RPC tuple
+liveKey satisfies readonly ["app", "rpc", "events", "watch", "live", unknown];
+const inputlessCompatibilityKey = utils.events.audit.watch.liveKey();
+// @ts-expect-error inputless default keys also expose the optional policy slot
+inputlessCompatibilityKey satisfies readonly [
+  "app",
+  "rpc",
+  "events",
+  "audit",
+  "watch",
+  "live",
+];
 const cachedLive = queryClient.getQueryData(liveKey);
 cachedLive satisfies string | undefined;
 void [liveHookData, liveResult];
