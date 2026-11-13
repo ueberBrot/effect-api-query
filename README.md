@@ -13,7 +13,7 @@ Install the package and TanStack Query Core:
 pnpm add @ueberbrot/effect-api-query @tanstack/query-core
 ```
 
-The Effect peer range is `>=4.0.6 <4.2.0`. Keep the application's Effect runtime, testing, and platform packages on a coordinated release within that range. The supported floor (`4.0.6`) and current development release (`4.1.0`) are checked separately. Use TypeScript 5.9 or newer with `strict: true`, ESM, and ES2022 support. See [compatibility and stability](https://ueberbrot.github.io/effect-api-query/getting-started/compatibility-and-stability/).
+The Effect peer range is `>=4.0.6 <4.2.0`. Keep the application's Effect runtime, testing, and platform packages on a coordinated release within that range. Packed checks cover Effect `4.0.6`, `4.0.7`, `4.1.0` and `4.1.2`, each with Query Core `5.104.4` and `5.105.0`. These exact checked combinations are distinct from the supported ranges. Use TypeScript 5.9 through the reviewed 7.1 beta with `strict: true`, ESM, and ES2022 support. See [compatibility and stability](https://ueberbrot.github.io/effect-api-query/getting-started/compatibility-and-stability/).
 
 ## RPC
 

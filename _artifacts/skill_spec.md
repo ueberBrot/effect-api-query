@@ -31,7 +31,7 @@ Strict compiler fixtures check public declarations and documentation examples. R
 
 The compatibility reference owns the version table. Framework guidance links to it and distinguishes library peers, wrapper framework peers, and exact checked combinations. Native framework consumer fixtures check TypeScript hook inference against a packed package. Framework component compilers and application builds follow their own tooling requirements.
 
-Exact coordinated Effect development pins are separate from the bounded consumer peer range. `vp run effect-compatibility` checks the supported floor and current release using the existing public compiler fixtures and focused execution, cancellation, and hydration tests against a packed package. Required APIs, type contracts, or correctness fixes raise the minimum; other range changes require compatibility evidence. Future minors require review. The existing skill, six references, and source mappings cover this dependency-selection task.
+Exact coordinated Effect development pins are separate from the bounded consumer peer range. `vp run effect-compatibility` checks Effect minimum/development/maintained minor representatives against Query Core minimum/development using the existing public compiler fixtures and focused execution, cancellation, and hydration tests against a packed package. Required APIs, type contracts, or correctness fixes raise the minimum; other range changes require compatibility evidence. Future minors require review. The existing skill, six references, and source mappings cover this dependency-selection task.
 
 The usability batch reuses the existing executable consumer fixtures:
 
@@ -51,6 +51,8 @@ The usability batch reuses the existing executable consumer fixtures:
 These checks verify the recommended APIs and observable behavior. A fresh isolated consumer session supplies separate evidence. This authoring session does not establish skill discovery or consumer reliability.
 
 ## Coverage and batch history
+
+- **Dependency compatibility, spec #166 ticket #168, base `d7b97464`:** Retain one skill/six references and existing source globs, adding ADR 0042 to the tree. The framework reference distinguishes supported ranges from eight packed Effect/Query Core combinations under both pinned compilers. ADR 0042 prospectively amends historical pre-1.0 versioning; supported version drops are major changes. Preserve peer bounds, seven-day age enforcement, application coordination, local cancellation limits and historical evidence. Existing public execution, cancellation, stream, hydration and compiler fixtures are the task checks. Fresh consumer-agent/discovery evidence is unverified because delegation is excluded. #167 GUI/platform/Fallow limits remain unresolved.
 
 - **Live coalescing, spec #166 ticket #179, base dbb64e8:** Add live-only coalesceMs across RPC and HTTP, direct/configured keys and options. Reuse publication deadlines and cleanup; retain one pending snapshot without mutating published values. Preserve accumulated/raw contracts. Extend existing query-patterns guidance and domain map. Existing skill-tree globs cover additions; tree structure is unchanged. Public cache timing/terminal/identity tests and published compiler fixtures verify this task. Fresh consumer-agent discovery is unverified because delegation is prohibited. Workload and final validation evidence accompany the ticket handoff.
 
