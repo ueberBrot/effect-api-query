@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "b66f3e80beb10fae10224d81995ce10ac73a407d9a3b6a4cadfb9787cf0c7643",
+      "fingerprint": "6f5e47394d310312e2e4c4e9285fabb156ba366aadcea28b3234760f203dae30",
       "snapshot": {
         "GLOSSARY.md": "1caf855a606847e46e31200b90df6077d7a84de114e213b011bf27e432989252",
         "README.md": "9cc3275039f58de12efe6a19ea5ec5e23a56126cfeb81cf35480ae5ac147f1da",
@@ -41,8 +41,9 @@
         "apps/docs/src/content/docs/guides/query-effects.md": "80577be7dbdd910ea9931a444ed1f0b56d2953f192e3429405731d725643accc",
         "apps/docs/src/content/docs/guides/react-query.md": "8f75933a959c0ab1bbea40a1083ae469a0132a53ab2ec3608ff73d1c3eacccf2",
         "apps/docs/src/content/docs/guides/reconnect-streams.md": "6fa1d0e53d234e4ab03a5446d537c29c5e114bcb6d232e490b3a5e5210f96b30",
-        "apps/docs/src/content/docs/guides/refresh-from-events.md": "5323233082a5fb0dfc26b80bb9aeaf363efe6ed77118bfa4a78c37079a9376ed",
+        "apps/docs/src/content/docs/guides/refresh-from-events.md": "1118061232fc4eb859133e01bb4ae9734ea0312c0df94243cd9c091a7089e587",
         "apps/docs/src/content/docs/guides/retry-queries.md": "83fb94464b7031025b7a40b13dca8a7b9a9df7b75732875692048283f9591463",
+        "apps/docs/src/content/docs/guides/scoped-event-cache.md": "81934c42876eafbf7615a674c1fbe442a22015d2d20b159075f302dffcf27c4d",
         "apps/docs/src/content/docs/guides/share-decoded-values.md": "fd978373c03a0f1229e3da50c22efdd40ef66b9518830c730037a224efb56e74",
         "apps/docs/src/content/docs/guides/solid-query.md": "f635ee4c0a33cf759d747d50331ca42589cabacfb728264863951a165253d4ac",
         "apps/docs/src/content/docs/guides/stream-snapshots.md": "6fd85823a19b27ae0a2377680e77f0fa5fb67de19b22ff11571bc7d4a2af6923",
@@ -65,7 +66,7 @@
         "apps/docs/src/content/docs/reference/http-builders.md": "34d2fb026e5620878d21211f97dedfa7bec376e2267b9aab1088e759b5a20e9b",
         "apps/docs/src/content/docs/reference/http-factory.md": "676cad558cef9c5bb53c4c0626a1d67a6430d92f7a48fb6322821b4ac1bd686b",
         "apps/docs/src/content/docs/reference/performance.md": "e7809f71ac9d4dfc7ed55f16a3049dbb7331e73728b7ec20f9ffff3a5c77a7ae",
-        "apps/docs/src/content/docs/reference/public-exports.md": "81497bd0c491d293dff1def4b8f9c2194370a583ea34772b7cb57ac63375e646",
+        "apps/docs/src/content/docs/reference/public-exports.md": "7dadfc8cd23639c2e9c13cac71ee56b9bfcde8e53fd59e97100d6b398fb27e90",
         "apps/docs/src/content/docs/reference/type-inference.md": "a60819bcd3b5f7887efe97c1e6aabfdcf1822197abdd209b9d3820d33f4428b5",
         "docs/adr/0001-target-effect-4-release-candidate.md": "f8152332adf7278911e3b4e119d6079a444b01db840f225b62b1a05cd5ecf4f2",
         "docs/adr/0002-let-call-sites-choose-query-or-mutation.md": "ac6c71c1ab7fec80e50d843e92ac1d1b00c573fe8bf4ede0c4914f1711198c4d",
@@ -125,6 +126,7 @@
         "examples/server/tests/web-handler.test.ts": "50fdbcacf42c64315356864adc530c4e99e50e65447187d9ce55424372b741c1",
         "examples/shared/error-description.ts": "713eaabd91110a7b9fe64d022b9b22e6488a50905587582c111f38cdb04787bc",
         "examples/shared/query-effects.ts": "f99c03d84176f7c720c37dbe49fe3b515418ee3504e18f3469e504bc196d1eed",
+        "examples/shared/query-events.ts": "253a554acee724b8e087cdbbd6f2bccc633e539a00396fdade428231b4f0f0f8",
         "examples/shared/use-slow-query-cancellation.ts": "872ea8e5ef8b97b2d6def07a8cc5c79a885099ffb6e60ebf6db6e39b9aa628f1",
         "examples/tanstack-start/src/components/effect-error-details.tsx": "d3bf0975507f9784f49b12a468baade10177209c5a1fa51e6de1e86f0daa770a",
         "examples/tanstack-start/src/lib/api-server.ts": "3ab4000ee28dc8f73237b4508e0f0a0a1b1e4baf865ae501348487a978e19f23",
@@ -184,7 +186,7 @@
         "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "e913ab5cbc4c6e2b4f69a17b6a5c8454eb36f857c40e87f5aba91a8a38053888",
-        "skills/effect-api-query/references/cache-workflows.md": "ba58a0ed429c3af43b8142437ad3ef6e2b879017f06cf7d186ca48044fa52964",
+        "skills/effect-api-query/references/cache-workflows.md": "9c633ce325028533e4ac10165dfec837d675119d0a403bb536d9a5d0c39e1ab2",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "0b693d32832b1a5d742ee33eab7e6769be81deaa614f216bb9a547c4cde48335",
         "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
         "skills/effect-api-query/references/hydration-and-ssr.md": "30aeb844f4b4f7c3c6a5a70f4ecbfabbdfb7b332c62105b4ecad182238d38705",
@@ -204,6 +206,7 @@
         "src/core/policy.ts": "ced3a6fdf1ab7e273eb518700a42d68b4823abdb1088fae6855424e4e479ded4",
         "src/core/prepared-input.ts": "0f09acf6e7c52ac24f586e22013758927b930d05f7a966708238efceb0a909f4",
         "src/core/query-effects.ts": "af269881229597833776919a2227f7ed03748fb7deb0e4df39dedb1668728584",
+        "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
         "src/core/query-owner.ts": "da9715879195454960142fb6a7a92bf96e754b5241a73fbbf2c8b6d0b13e5bcb",
         "src/core/schema-key.ts": "7dad2749d30f2ab828dbc7e96d6e1e2b32b6733450cb6dc734de607629d925f8",
@@ -221,7 +224,7 @@
         "src/http/request.ts": "4dced85460db56cb83514486417e17dd4a35629ad28749a2ac01dadbe45113b3",
         "src/http/streamed-query.ts": "27d1f5418009216d960816485cfd7f1760a8e3f638ccb9ac8dfa5fc040b1564a",
         "src/http/types.ts": "37be5b08898b0f12c460f7954f243b1ae12c1d903376428c77c34b8b2ca90b4f",
-        "src/index.ts": "d4ce613a2b8ce9e8b76457c941d04c7dbddd61a2de92def327c7f21510cb0605",
+        "src/index.ts": "b68adac6c3834b2abe6fcccb9d1f3b1f21945e42e8eb36e69c874141fc553b4d",
         "src/rpc/create-utils.ts": "8ebf030b0f76f91c248434c169d789d6328d2ba43c07afe15e04db0a02f05c2c",
         "src/rpc/errors.ts": "8e1fbcc7843b2bf99e9d80bfd365dc118d52351909d5c8f48c46ba9d39fdedd3",
         "src/rpc/operation.ts": "ac10df77707045d22c2d58ff0f776362a7fb5ce03e179c10238c42320ad6f719",
@@ -243,7 +246,7 @@
         "tests/create-rpc-query-utils-streaming.test.ts": "6f0fccd52258df72d1bb471bd04873426708209fa48e0b9c3a0c831d9002f5a1",
         "tests/create-rpc-query-utils-structural-sharing.test.ts": "1698a72dcfde4aaabac4161193fc0379c445f8a8be61d47d29797a315b66b06f",
         "tests/create-rpc-query-utils.test.ts": "b6ccee687718bbd528819f497ba2ac09acfe06a1400c5bb38b863eb082f0776f",
-        "tests/docs-examples.test.ts": "5fed140e40ea6bd5d9ddbcc0aeedbd8cc0cd9ad9035e5178410e7727da0455bf",
+        "tests/docs-examples.test.ts": "37debdc943c55cb656b057ae82d08b8ef285ade271ee39070b47f54fa13bec94",
         "tests/docs-release.test.ts": "089218597c9c8c9fdce5037b0537426a232ef7466e697d683bc32fb7d4492ae8",
         "tests/execution-interceptor.test.ts": "9c8a26e24cdd5807a4dca68bfdd88663246b3a5632483581ec3cbd4cdcf69b9a",
         "tests/fixtures/async.ts": "c72af69141ce4f2dd4e9b63910ed20378e546dcd015a2d7befacd439ba4a006e",
@@ -277,6 +280,7 @@
         "tests/live-coalescing.test.ts": "e5456fa321374e61dfef6992ebc706c9c558803795393b55da10e33c926bf413",
         "tests/publication-deadline.test.ts": "2797557ff14bf8527ea446cec1e1d7c61cd3666f11f127e640c53ce5d7e30868",
         "tests/query-effects.test.ts": "007793129802f9adb3547446d6f70a8885a80050e5b728d907ae47abe0446db6",
+        "tests/query-events.test.ts": "27c913c8ff1d65384a70695ef891e156f99ac122bc36e5be10f195b568b5e7b5",
         "tests/query-filter.test.ts": "ff531a86816872cd2cadf01d79bd9d9ff5be1895bab150330a90aa8375508004",
         "tests/query-owner.test.ts": "0c46e34994c81de588e9b470b698a2c232729992676faa2c4595f9f9f3086c99",
         "tests/query-policy.test.ts": "19b1d0fde232b4af9e041197a1aa6726f30e4fb7118533e5b3f7af08cbbe4002",
@@ -331,6 +335,7 @@
         "tests/types/live-coalescing-contract.ts": "c476bfec4ff03244a35938e0bc168894e917ab9e723536e2b759e0002a3ce836",
         "tests/types/public-contract.ts": "4bd0b76f7fe62a2e52de29c81061487a18b71aa3920ae824d8f48b0f71f749c4",
         "tests/types/query-effects-contract.ts": "8fefb99b919529cc3608f2c043d4f3e486a4f75471d0f1d4a054a7a96184b2a8",
+        "tests/types/query-events-contract.ts": "1e2b891e352304785c6ae6cf4d31b0d8b277f1a98a6193f6f254614e7c4c0b0e",
         "tests/types/query-filter-contract.ts": "89977942cf8942af10535fb2ec4a4ab679d920a7d226ef26616faaf518b9a6e9",
         "tests/types/query-owner-contract.ts": "ee2e9b80bc711832e708796a4588a81ae65983cecaf0ddfd2d2f443f236f0a34",
         "tests/types/query-usability-contract.ts": "b84fb1045eb3f25d5b1fa68001e342a644faf41a6f753890e619f1322b4f2d7f",
@@ -348,20 +353,22 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "c1662be32cc26149203cfecb7ed93863997e668c",
+      "head": "c23eecab4a337c7c75e19f382d98b143fe679f8b",
       "outcome": "updated",
-      "reason": "Merged lifecycle setup/retirement guidance with the existing Effect cache bridge guidance, retaining both public exports and failure/ownership contracts. Native owner code and application match c210c613; bridge runtime matches c1662be. Combined public regression verifies interrupted bridge waiter leaves observer work alive until owner retirement drains coalesced source before release.",
+      "reason": "Extend cache-workflows with the native owner/recovery/cache composition, failure and checkpoint boundaries; keep the existing skill identity and references.",
       "evidence": [
-        "85 scoped tests/11 files pass (/tmp/173-merge-tests-final.log), public and server-local TSRS+TS5.9 fixtures and package/ATTW/publint pass; strict typed check 217 files, Effect check and 22 docs examples/Astro pass. Scoped format/YAML pass. Reuse ticket 823 runtime and 8 Chromium results; fresh consumer discovery and other browsers unverified; independent Astra audit remains parent-owned."
+        "src/core/query-events.ts; examples/shared/query-events.ts; tests/query-events.test.ts; tests/types/query-events-contract.ts",
+        "53 public runtime cases pass; public compiler fixtures pass TSRS 7.1 beta and TS5.9.3; strict typed check passes 220 files; Effect and docs checks pass; formatting and YAML pass.",
+        "Writing/comment audit applied; fresh consumer discovery unverified because agents are prohibited. Existing ADR0031/0040 preserve these contracts."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "a4526e1f226e620f24a4175caafb78e09a6b32f60974c54055c118b4d3125e6e",
+      "fingerprint": "2b791261eb7041fc2b3675cd9761c30544e5c179d3ed9491b410ad6562999d4e",
       "snapshot": {
         "GLOSSARY.md": "1caf855a606847e46e31200b90df6077d7a84de114e213b011bf27e432989252",
         "README.md": "9cc3275039f58de12efe6a19ea5ec5e23a56126cfeb81cf35480ae5ac147f1da",
-        "_artifacts/domain_map.yaml": "df35540ce5bdf9501be70ddc195d6ed7efbbbc44402252c663d8a0ca9e34beb0",
-        "_artifacts/skill_spec.md": "fcb2a047f2ecf93dac4a82837ec3b3def8b26fdaf9108203cc3865a731e3c92f",
+        "_artifacts/domain_map.yaml": "c132e0626bc84cfd90ed63330d88a8d16829c070ac8dec7cdf41d1d4eee7d482",
+        "_artifacts/skill_spec.md": "53ac0725a3c23d069197b789361a64814f24b04ba294a6a24899a17f24cede63",
         "_artifacts/skill_tree.yaml": "cab1e054da917dfb6b8990f53abe0535d1dd69ba76311ec0fcc503a52f1d308d",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "83a6aab512d66893237aa3ba45bf52b23712b88d829d83992509c2f3c822c18b",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "eb226d096cee825aa2a7c2e49370208d6110662c3acf681fa4b95f8b6caca0d7",
@@ -397,8 +404,9 @@
         "apps/docs/src/content/docs/guides/query-effects.md": "80577be7dbdd910ea9931a444ed1f0b56d2953f192e3429405731d725643accc",
         "apps/docs/src/content/docs/guides/react-query.md": "8f75933a959c0ab1bbea40a1083ae469a0132a53ab2ec3608ff73d1c3eacccf2",
         "apps/docs/src/content/docs/guides/reconnect-streams.md": "6fa1d0e53d234e4ab03a5446d537c29c5e114bcb6d232e490b3a5e5210f96b30",
-        "apps/docs/src/content/docs/guides/refresh-from-events.md": "5323233082a5fb0dfc26b80bb9aeaf363efe6ed77118bfa4a78c37079a9376ed",
+        "apps/docs/src/content/docs/guides/refresh-from-events.md": "1118061232fc4eb859133e01bb4ae9734ea0312c0df94243cd9c091a7089e587",
         "apps/docs/src/content/docs/guides/retry-queries.md": "83fb94464b7031025b7a40b13dca8a7b9a9df7b75732875692048283f9591463",
+        "apps/docs/src/content/docs/guides/scoped-event-cache.md": "81934c42876eafbf7615a674c1fbe442a22015d2d20b159075f302dffcf27c4d",
         "apps/docs/src/content/docs/guides/share-decoded-values.md": "fd978373c03a0f1229e3da50c22efdd40ef66b9518830c730037a224efb56e74",
         "apps/docs/src/content/docs/guides/solid-query.md": "f635ee4c0a33cf759d747d50331ca42589cabacfb728264863951a165253d4ac",
         "apps/docs/src/content/docs/guides/stream-snapshots.md": "6fd85823a19b27ae0a2377680e77f0fa5fb67de19b22ff11571bc7d4a2af6923",
@@ -421,7 +429,7 @@
         "apps/docs/src/content/docs/reference/http-builders.md": "34d2fb026e5620878d21211f97dedfa7bec376e2267b9aab1088e759b5a20e9b",
         "apps/docs/src/content/docs/reference/http-factory.md": "676cad558cef9c5bb53c4c0626a1d67a6430d92f7a48fb6322821b4ac1bd686b",
         "apps/docs/src/content/docs/reference/performance.md": "e7809f71ac9d4dfc7ed55f16a3049dbb7331e73728b7ec20f9ffff3a5c77a7ae",
-        "apps/docs/src/content/docs/reference/public-exports.md": "81497bd0c491d293dff1def4b8f9c2194370a583ea34772b7cb57ac63375e646",
+        "apps/docs/src/content/docs/reference/public-exports.md": "7dadfc8cd23639c2e9c13cac71ee56b9bfcde8e53fd59e97100d6b398fb27e90",
         "apps/docs/src/content/docs/reference/type-inference.md": "a60819bcd3b5f7887efe97c1e6aabfdcf1822197abdd209b9d3820d33f4428b5",
         "docs/adr/0001-target-effect-4-release-candidate.md": "f8152332adf7278911e3b4e119d6079a444b01db840f225b62b1a05cd5ecf4f2",
         "docs/adr/0002-let-call-sites-choose-query-or-mutation.md": "ac6c71c1ab7fec80e50d843e92ac1d1b00c573fe8bf4ede0c4914f1711198c4d",
@@ -481,6 +489,7 @@
         "examples/server/tests/web-handler.test.ts": "50fdbcacf42c64315356864adc530c4e99e50e65447187d9ce55424372b741c1",
         "examples/shared/error-description.ts": "713eaabd91110a7b9fe64d022b9b22e6488a50905587582c111f38cdb04787bc",
         "examples/shared/query-effects.ts": "f99c03d84176f7c720c37dbe49fe3b515418ee3504e18f3469e504bc196d1eed",
+        "examples/shared/query-events.ts": "253a554acee724b8e087cdbbd6f2bccc633e539a00396fdade428231b4f0f0f8",
         "examples/shared/use-slow-query-cancellation.ts": "872ea8e5ef8b97b2d6def07a8cc5c79a885099ffb6e60ebf6db6e39b9aa628f1",
         "examples/tanstack-start/src/components/effect-error-details.tsx": "d3bf0975507f9784f49b12a468baade10177209c5a1fa51e6de1e86f0daa770a",
         "examples/tanstack-start/src/lib/api-server.ts": "3ab4000ee28dc8f73237b4508e0f0a0a1b1e4baf865ae501348487a978e19f23",
@@ -540,7 +549,7 @@
         "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "e913ab5cbc4c6e2b4f69a17b6a5c8454eb36f857c40e87f5aba91a8a38053888",
-        "skills/effect-api-query/references/cache-workflows.md": "ba58a0ed429c3af43b8142437ad3ef6e2b879017f06cf7d186ca48044fa52964",
+        "skills/effect-api-query/references/cache-workflows.md": "9c633ce325028533e4ac10165dfec837d675119d0a403bb536d9a5d0c39e1ab2",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "0b693d32832b1a5d742ee33eab7e6769be81deaa614f216bb9a547c4cde48335",
         "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
         "skills/effect-api-query/references/hydration-and-ssr.md": "30aeb844f4b4f7c3c6a5a70f4ecbfabbdfb7b332c62105b4ecad182238d38705",
@@ -560,6 +569,7 @@
         "src/core/policy.ts": "ced3a6fdf1ab7e273eb518700a42d68b4823abdb1088fae6855424e4e479ded4",
         "src/core/prepared-input.ts": "0f09acf6e7c52ac24f586e22013758927b930d05f7a966708238efceb0a909f4",
         "src/core/query-effects.ts": "af269881229597833776919a2227f7ed03748fb7deb0e4df39dedb1668728584",
+        "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
         "src/core/query-owner.ts": "da9715879195454960142fb6a7a92bf96e754b5241a73fbbf2c8b6d0b13e5bcb",
         "src/core/schema-key.ts": "7dad2749d30f2ab828dbc7e96d6e1e2b32b6733450cb6dc734de607629d925f8",
@@ -577,7 +587,7 @@
         "src/http/request.ts": "4dced85460db56cb83514486417e17dd4a35629ad28749a2ac01dadbe45113b3",
         "src/http/streamed-query.ts": "27d1f5418009216d960816485cfd7f1760a8e3f638ccb9ac8dfa5fc040b1564a",
         "src/http/types.ts": "37be5b08898b0f12c460f7954f243b1ae12c1d903376428c77c34b8b2ca90b4f",
-        "src/index.ts": "d4ce613a2b8ce9e8b76457c941d04c7dbddd61a2de92def327c7f21510cb0605",
+        "src/index.ts": "b68adac6c3834b2abe6fcccb9d1f3b1f21945e42e8eb36e69c874141fc553b4d",
         "src/rpc/create-utils.ts": "8ebf030b0f76f91c248434c169d789d6328d2ba43c07afe15e04db0a02f05c2c",
         "src/rpc/errors.ts": "8e1fbcc7843b2bf99e9d80bfd365dc118d52351909d5c8f48c46ba9d39fdedd3",
         "src/rpc/operation.ts": "ac10df77707045d22c2d58ff0f776362a7fb5ce03e179c10238c42320ad6f719",
@@ -599,7 +609,7 @@
         "tests/create-rpc-query-utils-streaming.test.ts": "6f0fccd52258df72d1bb471bd04873426708209fa48e0b9c3a0c831d9002f5a1",
         "tests/create-rpc-query-utils-structural-sharing.test.ts": "1698a72dcfde4aaabac4161193fc0379c445f8a8be61d47d29797a315b66b06f",
         "tests/create-rpc-query-utils.test.ts": "b6ccee687718bbd528819f497ba2ac09acfe06a1400c5bb38b863eb082f0776f",
-        "tests/docs-examples.test.ts": "5fed140e40ea6bd5d9ddbcc0aeedbd8cc0cd9ad9035e5178410e7727da0455bf",
+        "tests/docs-examples.test.ts": "37debdc943c55cb656b057ae82d08b8ef285ade271ee39070b47f54fa13bec94",
         "tests/docs-release.test.ts": "089218597c9c8c9fdce5037b0537426a232ef7466e697d683bc32fb7d4492ae8",
         "tests/execution-interceptor.test.ts": "9c8a26e24cdd5807a4dca68bfdd88663246b3a5632483581ec3cbd4cdcf69b9a",
         "tests/fixtures/async.ts": "c72af69141ce4f2dd4e9b63910ed20378e546dcd015a2d7befacd439ba4a006e",
@@ -633,6 +643,7 @@
         "tests/live-coalescing.test.ts": "e5456fa321374e61dfef6992ebc706c9c558803795393b55da10e33c926bf413",
         "tests/publication-deadline.test.ts": "2797557ff14bf8527ea446cec1e1d7c61cd3666f11f127e640c53ce5d7e30868",
         "tests/query-effects.test.ts": "007793129802f9adb3547446d6f70a8885a80050e5b728d907ae47abe0446db6",
+        "tests/query-events.test.ts": "27c913c8ff1d65384a70695ef891e156f99ac122bc36e5be10f195b568b5e7b5",
         "tests/query-filter.test.ts": "ff531a86816872cd2cadf01d79bd9d9ff5be1895bab150330a90aa8375508004",
         "tests/query-owner.test.ts": "0c46e34994c81de588e9b470b698a2c232729992676faa2c4595f9f9f3086c99",
         "tests/query-policy.test.ts": "19b1d0fde232b4af9e041197a1aa6726f30e4fb7118533e5b3f7af08cbbe4002",
@@ -687,6 +698,7 @@
         "tests/types/live-coalescing-contract.ts": "c476bfec4ff03244a35938e0bc168894e917ab9e723536e2b759e0002a3ce836",
         "tests/types/public-contract.ts": "4bd0b76f7fe62a2e52de29c81061487a18b71aa3920ae824d8f48b0f71f749c4",
         "tests/types/query-effects-contract.ts": "8fefb99b919529cc3608f2c043d4f3e486a4f75471d0f1d4a054a7a96184b2a8",
+        "tests/types/query-events-contract.ts": "1e2b891e352304785c6ae6cf4d31b0d8b277f1a98a6193f6f254614e7c4c0b0e",
         "tests/types/query-filter-contract.ts": "89977942cf8942af10535fb2ec4a4ab679d920a7d226ef26616faaf518b9a6e9",
         "tests/types/query-owner-contract.ts": "ee2e9b80bc711832e708796a4588a81ae65983cecaf0ddfd2d2f443f236f0a34",
         "tests/types/query-usability-contract.ts": "b84fb1045eb3f25d5b1fa68001e342a644faf41a6f753890e619f1322b4f2d7f",
@@ -704,23 +716,27 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "c1662be32cc26149203cfecb7ed93863997e668c",
+      "head": "c23eecab4a337c7c75e19f382d98b143fe679f8b",
       "outcome": "updated",
-      "reason": "Reconciled domain_map owner lifecycle and bridge tasks; skill_spec retains cumulative #173 and #174 entries; skill_tree includes ADR0040 source mapping and retains one skill/six references. No additional skills or changed activation metadata warranted.",
+      "reason": "Extend domain task and cumulative history for #175. Existing tree globs cover all source, example, runtime/compiler and guide additions; one skill and six references remain accurate.",
       "evidence": [
-        "_artifacts/domain_map.yaml, _artifacts/skill_spec.md, _artifacts/skill_tree.yaml compared with c1662be and c210c613; Intent sync no-op; YAML and scoped formatting pass; 85 combined scoped tests and both compiler suites pass. Exactly21 unrelated research review items left unannotated."
+        "src/core/query-events.ts; examples/shared/query-events.ts; tests/query-events.test.ts; tests/types/query-events-contract.ts",
+        "53 public runtime cases pass; public compiler fixtures pass TSRS 7.1 beta and TS5.9.3; strict typed check passes 220 files; Effect and docs checks pass; formatting and YAML pass.",
+        "Writing/comment audit applied; fresh consumer discovery unverified because agents are prohibited. Existing ADR0031/0040 preserve these contracts."
       ]
     },
     "source:vite.config.ts": {
-      "fingerprint": "e7803ca0d414758eafc6f22b91ae633d5ece5c8b25f5da15a50e737ad3ea1772",
+      "fingerprint": "174ef78e591ffbe7971d178b98efe37f0649a656ee97a3dd0a994d8c0c1dedb9",
       "snapshot": {
-        "vite.config.ts": "0094917b89b7ca114763ff1d8e460e360ad88355c342b00427829721c5220d98"
+        "vite.config.ts": "04bec4e882a5b6cc10ffe73c595948c300f6c8ebf0d4dc99788cc64d6afca0e5"
       },
-      "head": "97a8cc5e722a0b94c1241b28f8ac7f4d202a2321",
+      "head": "c23eecab4a337c7c75e19f382d98b143fe679f8b",
       "outcome": "no-change",
-      "reason": "Reviewed combined config: guide navigation plus exact unstable RPC example/test exclusions, including accepted live-coalescing test. Existing compiler engine, correctness diagnostics and task interfaces remain unchanged.",
+      "reason": "Reviewed ticket-owned addition/configuration: changeset describes additive workflow; sidebar exposes its guide; compiler/lint allowlists extend only the existing RPC unstable-API exception to the new recipe. No additional skill is needed.",
       "evidence": [
-        "git diff HEAD -- apps/docs/astro.config.mts tsconfig.json vite.config.ts; post-merge typecheck/Effect check/docs build pass; framework/tooling guidance remains accurate."
+        "src/core/query-events.ts; examples/shared/query-events.ts; tests/query-events.test.ts; tests/types/query-events-contract.ts",
+        "53 public runtime cases pass; public compiler fixtures pass TSRS 7.1 beta and TS5.9.3; strict typed check passes 220 files; Effect and docs checks pass; formatting and YAML pass.",
+        "Writing/comment audit applied; fresh consumer discovery unverified because agents are prohibited. Existing ADR0031/0040 preserve these contracts."
       ]
     },
     "source:.github/workflows/release.yml": {
@@ -777,15 +793,17 @@
       ]
     },
     "source:tsconfig.json": {
-      "fingerprint": "560ba298020cb41d598231ddaac3c92285465505cf45d3659bbd263512f8659b",
+      "fingerprint": "3ec440312077e0521eb507973e43064dcf2c5b5c01fe05992b9840c30585fea3",
       "snapshot": {
-        "tsconfig.json": "f617d9af39f7eb0bbdeefd61d646735d5447fad545d58831b8d3aab76152343b"
+        "tsconfig.json": "6946104dd297af83544178de6f8fe1f7e6cee8eae9ddf08f7abcedb032e1999c"
       },
-      "head": "97a8cc5e722a0b94c1241b28f8ac7f4d202a2321",
+      "head": "c23eecab4a337c7c75e19f382d98b143fe679f8b",
       "outcome": "no-change",
-      "reason": "Reviewed combined config: guide navigation plus exact unstable RPC example/test exclusions, including accepted live-coalescing test. Existing compiler engine, correctness diagnostics and task interfaces remain unchanged.",
+      "reason": "Reviewed ticket-owned addition/configuration: changeset describes additive workflow; sidebar exposes its guide; compiler/lint allowlists extend only the existing RPC unstable-API exception to the new recipe. No additional skill is needed.",
       "evidence": [
-        "git diff HEAD -- apps/docs/astro.config.mts tsconfig.json vite.config.ts; post-merge typecheck/Effect check/docs build pass; framework/tooling guidance remains accurate."
+        "src/core/query-events.ts; examples/shared/query-events.ts; tests/query-events.test.ts; tests/types/query-events-contract.ts",
+        "53 public runtime cases pass; public compiler fixtures pass TSRS 7.1 beta and TS5.9.3; strict typed check passes 220 files; Effect and docs checks pass; formatting and YAML pass.",
+        "Writing/comment audit applied; fresh consumer discovery unverified because agents are prohibited. Existing ADR0031/0040 preserve these contracts."
       ]
     },
     "source:.fallowrc.jsonc": {
@@ -1238,15 +1256,17 @@
       ]
     },
     "source:apps/docs/astro.config.mts": {
-      "fingerprint": "355d54fe2e35b22cdabed05bc1eaeb21e3789fb91ab967c6373a07c66a322273",
+      "fingerprint": "ac5dbbfda8f9456161ae7f812b6fb46f27fde724cc6ba215501e22590bf59a8d",
       "snapshot": {
-        "apps/docs/astro.config.mts": "4e694ec8e9d3c84bde9f119166be8b8152c39c3cf674923e5b2bda38042a3142"
+        "apps/docs/astro.config.mts": "6e4a4a7794decab0df916360a5b6ef21ea418c4a94550b096422f6001706fca5"
       },
-      "head": "97a8cc5e722a0b94c1241b28f8ac7f4d202a2321",
+      "head": "c23eecab4a337c7c75e19f382d98b143fe679f8b",
       "outcome": "no-change",
-      "reason": "Reviewed combined config: guide navigation plus exact unstable RPC example/test exclusions, including accepted live-coalescing test. Existing compiler engine, correctness diagnostics and task interfaces remain unchanged.",
+      "reason": "Reviewed ticket-owned addition/configuration: changeset describes additive workflow; sidebar exposes its guide; compiler/lint allowlists extend only the existing RPC unstable-API exception to the new recipe. No additional skill is needed.",
       "evidence": [
-        "git diff HEAD -- apps/docs/astro.config.mts tsconfig.json vite.config.ts; post-merge typecheck/Effect check/docs build pass; framework/tooling guidance remains accurate."
+        "src/core/query-events.ts; examples/shared/query-events.ts; tests/query-events.test.ts; tests/types/query-events-contract.ts",
+        "53 public runtime cases pass; public compiler fixtures pass TSRS 7.1 beta and TS5.9.3; strict typed check passes 220 files; Effect and docs checks pass; formatting and YAML pass.",
+        "Writing/comment audit applied; fresh consumer discovery unverified because agents are prohibited. Existing ADR0031/0040 preserve these contracts."
       ]
     },
     "source:docs/adr/0016-automate-releases-with-changesets.md": {
@@ -3164,6 +3184,20 @@
       "reason": "Release note describes only the additive optional bridge and minor classification already covered by the updated cache-workflows guidance; no additional skill or planning task is warranted.",
       "evidence": [
         ".changeset/effect-query-client-operations.md agrees with tested public API and new Query Effects guide. No version or publication performed."
+      ]
+    },
+    "source:.changeset/scoped-event-cache.md": {
+      "fingerprint": "f52009047fc22c9743b1af22feb32fd50ccf33a263f95f917a966d0a272079e7",
+      "snapshot": {
+        ".changeset/scoped-event-cache.md": "a9041135d3e9795f5946b73f59cb9eee317c9c7c000ea797327544be0086c5af"
+      },
+      "head": "c23eecab4a337c7c75e19f382d98b143fe679f8b",
+      "outcome": "no-change",
+      "reason": "Reviewed ticket-owned addition/configuration: changeset describes additive workflow; sidebar exposes its guide; compiler/lint allowlists extend only the existing RPC unstable-API exception to the new recipe. No additional skill is needed.",
+      "evidence": [
+        "src/core/query-events.ts; examples/shared/query-events.ts; tests/query-events.test.ts; tests/types/query-events-contract.ts",
+        "53 public runtime cases pass; public compiler fixtures pass TSRS 7.1 beta and TS5.9.3; strict typed check passes 220 files; Effect and docs checks pass; formatting and YAML pass.",
+        "Writing/comment audit applied; fresh consumer discovery unverified because agents are prohibited. Existing ADR0031/0040 preserve these contracts."
       ]
     }
   }

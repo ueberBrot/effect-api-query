@@ -182,6 +182,10 @@ export default defineConfig({
                   slug: "guides/query-effects",
                 },
                 {
+                  label: "Scoped Event Cache",
+                  slug: "guides/scoped-event-cache",
+                },
+                {
                   label: "Refresh from Events",
                   slug: "guides/refresh-from-events",
                 },

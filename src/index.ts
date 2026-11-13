@@ -101,3 +101,5 @@ export {
 } from "./core/query-effects";
 export { acquireQueryOwner } from "./core/query-owner";
 export type { QueryOwner, QueryOwnerSetup } from "./core/query-owner";
+
+export { runQueryEvents } from "./core/query-events";
