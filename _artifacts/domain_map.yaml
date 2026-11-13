@@ -44,7 +44,7 @@ skills:
       - Retire consumers and accepted work before acquiring a replacement owner.
       - Acquire a ready client and mount native providers with awaited cleanup.
       - Recover initial Suspense failures, retain cached data after failed refetches, and start independent reads together with native cancellation limits.
-      - Recover ordered stream delivery with application-owned cursors, gap refresh, and cancellable backoff.
+      - Recover stream delivery with numeric convenience or explicit application cursor acceptance/order and gap detection, authoritative replay refresh, full hook inference, and cancellable backoff.
       - Trace the consumed Stream and its cleanup while its owning runtime remains alive.
       - Rebuild options inside native reactive framework accessors.
       - Match documentation to the installed package, distinguish declared peer requirements from checked native hook combinations, and choose an application-owned transport within documented host boundaries.

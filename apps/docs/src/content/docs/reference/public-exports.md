@@ -23,7 +23,7 @@ The package root, `@ueberbrot/effect-api-query`, exports all supported values an
 | `createHydrationRegistry`, `hydrationCallbacks` | Prepare heterogeneous snapshots or one view with native serialization callbacks. |
 | `HydrationCodec`, `HydrationRegistry`, `HydrationCodecError` | Type codec registration, snapshot preparation, and registration failures. |
 | `recoverStream` | Reconnect a decoded stream with application-supplied cursor and recovery policy. |
-| `RecoverStreamOptions`, `StreamConnectionState` | Type recovery hooks and local connection states. |
+| `RecoverStreamOptions`, `StreamConnectionState`, `StreamCursorPolicy` | Type recovery hooks and local connection states. |
 | `QueryPolicy`, `MutationPolicy` | Types for reusable native policies specific to a leaf. |
 | `InferInput` | Derives operation input from a generated leaf. |
 | `InferQueryData`, `InferQueryError` | Derive cached data and failures for a supported query view. |
