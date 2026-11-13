@@ -15,6 +15,7 @@ The package root, `@ueberbrot/effect-api-query`, exports all supported values an
 | `createBranchQueryFilter` | Select one view across all descendant leaves. |
 | `prepareInput`, `PreparedInput` | Reuse owner-bound input preparation explicitly. |
 | `findDeclaredError` | Match one tagged typed failure without flattening its Cause. |
+| `runQueryEvents` | Run sequential event handlers and recovery against a retiring query owner’s native cache. |
 | `consumeEvents`, `ConsumeEventsOptions` | Consume events sequentially with start and exit callbacks. |
 | `createRpcQueryUtils` | Builds the RPC utility tree. |
 | `viewPrefix` | Selects every input of one supported leaf view. |

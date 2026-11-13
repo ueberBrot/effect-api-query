@@ -65,3 +65,5 @@ Keep cursor ownership explicit. `recoverStream` advances its cursor before downs
 ## Choose a visible stream view
 
 Use a live query for complete snapshots or bounded history for recent events. The latest delta alone does not reconstruct state. An indefinitely open `replace` stream does not publish a replacement before completion. See [Choose Stream History](/effect-api-query/guides/choose-stream-history/).
+
+For acquired connections, application cursor recovery and typed cache writes in one owner lifetime, use [Apply Events to a Scoped Cache](/effect-api-query/guides/scoped-event-cache/).

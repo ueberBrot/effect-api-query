@@ -23,7 +23,7 @@ skills:
       - HTTP decoded requests, SSE and NDJSON, multipart mutations, metadata, and omitted streaming uploads or upgrades
       - Inferred operation types, tree/branch/leaf policy configuration, execution interception, native defaults, and view filters
       - Opt-in schemaStructuralSharing for immutable decoded atoms in plain containers, with explicit equivalence for custom fields and meaningful class state
-      - Input-field skipping, pagination, explicit stream retention, publication deadlines, uncached event consumption, recovery, and lifetime tracing
+      - Input-field skipping, pagination, explicit stream retention, publication deadlines, uncached event consumption, owner-scoped event-to-cache recovery, and lifetime tracing
       - Stable Query Core stream publication, native cache writes, independent observer lifetimes, and complete cleanup Causes
       - Opt-in live snapshot coalescing, fixed pending deadlines, terminal flush, cancellation discard, and policy identity
       - Stream snapshots and request cleanup
@@ -48,6 +48,7 @@ skills:
       - Acquire a ready client and mount native providers with awaited cleanup.
       - Recover initial Suspense failures, retain cached data after failed refetches, and start independent reads together with native cancellation limits.
       - Recover stream delivery with numeric convenience or explicit application cursor acceptance/order and gap detection, authoritative replay refresh, full hook inference, and cancellable backoff.
+      - Map recovered events explicitly to generated-key updates and filter invalidation in one query owner; await sequential handlers and retirement cleanup, and keep durable checkpoints and retained history under application policy.
       - Trace the consumed Stream and its cleanup while its owning runtime remains alive.
       - Rebuild options inside native reactive framework accessors.
       - Match documentation to the installed package, distinguish declared peer requirements from checked native hook combinations, and choose an application-owned transport within documented host boundaries.

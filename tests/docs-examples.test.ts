@@ -50,6 +50,7 @@ const syntaxNodes = (
 describe("documentation excerpts", () => {
   it.each([
     ["guides/query-effects", ["examples/shared/query-effects"]],
+    ["guides/scoped-event-cache", ["examples/shared/query-events"]],
     [
       "README.md",
       [
