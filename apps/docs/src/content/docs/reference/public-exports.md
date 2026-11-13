@@ -7,6 +7,8 @@ The package root, `@ueberbrot/effect-api-query`, exports all supported values an
 
 | Export | Purpose |
 | --- | --- |
+| `queryEffects`, `QueryClientService` | Compose native cache operations in Effect with the existing application QueryClient. |
+| `QueryClientOperationError` | Retains runner, callback and native failures without a generated failed Exit. |
 | `configureUtils` | Configure policies and ordered interceptors on a tree, branch, or leaf. |
 | `UtilsConfiguration`, `ConfiguredUtils` | Type scoped configuration and the configured utility tree. |
 | `createBranchQueryFilter` | Select one view across all descendant leaves. |
@@ -94,3 +96,7 @@ Policies apply from tree to branch to leaf, followed by call-site options. Expli
 See [Defaults and Policies](/effect-api-query/guides/query-defaults/) for typed examples, callback composition, and precedence.
 
 See [Cache Keys and Filters](/effect-api-query/guides/cache-filters/) for partial projections, [Defaults and Policies](/effect-api-query/guides/query-defaults/) for composition and interception, and [Hydrate Query Views](/effect-api-query/guides/hydrate-query-views/) for codec registration.
+
+## QueryClient operations in Effect
+
+[Compose QueryClient Operations in Effect](/effect-api-query/guides/query-effects/) covers typed cache reads, ensure/fetch, updates, generated filters, error channels, and interruption of one waiter without cancelling shared work.
