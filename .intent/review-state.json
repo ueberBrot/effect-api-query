@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "ca25f36b28c05bca9dc475684a755bbb3e5237e0aad236b83a24bf3d141814a1",
+      "fingerprint": "74d3d293d45400509d7f7f82b1dbbaad3bb29db703134b08eab47d67fcbd058f",
       "snapshot": {
         "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -23,6 +23,7 @@
         "apps/docs/src/content/docs/getting-started/quick-start.md": "ade6edb93d713046dc19d01c7c4c93e0bf09c81fa0abbe80234668699698cc5f",
         "apps/docs/src/content/docs/guides/angular-query.md": "beb279a2ef34d1e69e685bcd8dbeddb0fafb0228ede9107dd9f95d86f9e5c72c",
         "apps/docs/src/content/docs/guides/cache-filters.md": "b0b8a08b6e2f3484a2565b6bd6d080cd1e95b3e9aefcb5aaf121cd7a96ad2591",
+        "apps/docs/src/content/docs/guides/cache-management.md": null,
         "apps/docs/src/content/docs/guides/cancellation.md": "7af74ddcb64ddc5454e3d8b4326a79b9683f1d744537c2b2f267e61a9447274b",
         "apps/docs/src/content/docs/guides/choose-stream-history.md": "9aefb63f50a3b020db5cd678d43b3ca0374c82bc9dce61a1cb429ecde313d438",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "cb941076de91c32bc0a1a5e8f6463ea521457210c00ccf4ef4e7de7c5fd135e9",
@@ -188,6 +189,8 @@
         "scripts/performance/budgets.mts": "a97ce19167bda55891a66daa14263549643757dd5db309c367e4be766637b957",
         "scripts/performance/common.mts": "507d45618fbaf2c7be6f986a5f958d1958cdddc95e42a77ff1d50d8225538a3d",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
+        "scripts/verify-docs-examples.mts": null,
+        "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "788dcfa211e8a51b2bbf50df1c513157a21d726a4fb18f3c31822d9eb174454d",
         "skills/effect-api-query/references/cache-workflows.md": "1d80a087881094a7d50dbf7ce20c7ab8a2800f05aae432523645d4cba82b98e3",
@@ -296,7 +299,7 @@
         "tests/query-view-prefix.test.ts": "fd94e3d01f52a0978242246f02a3e989bddd1e055f828f48d7a41187f696dd69",
         "tests/schema-sharing-prototypes.test.ts": "628a6622656b9b53e686d14b9efbd3abc13c61a13db1546001b0689b491f6022",
         "tests/schema-structural-sharing.test.ts": "577e0ac004db61c5778bf2362b8d208fca6fd6e830a3eaa6496a4c534d3a6e57",
-        "tests/skills-maintenance.test.ts": "682faa16982a90614b2fbee84a5da5a4de361f6a3f732099d9fcbc266fca3ec8",
+        "tests/skills-maintenance.test.ts": "d21daa2fd0098782aed2ff4f71fb6dc400a380da3b8e6d3de4804179fdb341a1",
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
         "tests/skills/query-usability/grade.test.ts": "f3c2650deba0d887f66fb3b3afd284cd9baf562296f2984e5c84b014ecec8cbd",
         "tests/skills/query-usability/solution.ts": "38583676eaa2d33e8ca56c07a430e3a28787feae9d84c6d3612e01d6d7f1d80f",
@@ -367,17 +370,16 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "8f3464be38ea14aef0b371e7d4315767f2b45946",
-      "outcome": "updated",
-      "reason": "The cleanup is now a separate follow-up to merged main d14f7b4. Both custom editor launchers and forced SDK settings are removed; direct pinned declaration compiler resolution and its identity check preserve CLI behavior. ADR 0043 amends editor routing while ADR 0035 retains its recorded decision. The skill source mapping/tree include the new amendment; skill_spec records the maintainer direction and the domain map remains accurate. Deleted SDK locations need no separate skill.",
+      "head": "d56b6eaebbf844c67b03f3b4781974347c106154",
+      "outcome": "no-change",
+      "reason": "The isolated maintenance checkout must copy scripts/compiler.mts because its copied real Vite config now imports that module. This fixes fixture completeness without changing assertions, command behavior or shipped guidance. Existing domain map, skill spec and skill tree already cover the compiler integration, editor cleanup and tests; no planning rewrite or new skill is needed.",
       "evidence": [
-        "Cleanup branch contains only the editor/compiler-path and unused private Tailwind declaration cleanup relative to d14f7b4. Exact installed native compiler identity equals the explicit CLI; pack/ATTW/publint, both public compilers, strict checks, rejection checks and Fallow all pass.",
-        "Merged main has the same tree as 0142e48, whose hosted CI 43432706834 passed Source quality, both builds/docs and all three browser jobs. Runtime evidence remains 870 tests, eight peer pairs of 403 cases and 150 application browser cases; the cleanup changes no library runtime or public contract.",
-        "All three planning records reconciled, one skill/six references retained, current contributor instructions updated. Editor and Windows/container integration remain unverified and contributor-owned; no new graphical or discovery claim."
+        "Hosted cleanup CI43435588575 reproduced seven existing maintenance failures from an unresolved config import. All seven pass after adding the real compiler module to the fixture copy list.",
+        "Complete uncached test task passes all 870 runtime cases plus current/minimum public and server compiler fixtures; direct declaration emission, ATTW/publint pass. Existing editor/platform/discovery limits remain explicit."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "fc3261f348aff82460d5a874642fb182a2b90dd2c417f4c03428f6f1bab03ad9",
+      "fingerprint": "b705fb53ca0ea22b12f82bd4804f81d9ff06cf7b1049df4b17d9cdc6192f9df3",
       "snapshot": {
         "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -400,6 +402,7 @@
         "apps/docs/src/content/docs/getting-started/quick-start.md": "ade6edb93d713046dc19d01c7c4c93e0bf09c81fa0abbe80234668699698cc5f",
         "apps/docs/src/content/docs/guides/angular-query.md": "beb279a2ef34d1e69e685bcd8dbeddb0fafb0228ede9107dd9f95d86f9e5c72c",
         "apps/docs/src/content/docs/guides/cache-filters.md": "b0b8a08b6e2f3484a2565b6bd6d080cd1e95b3e9aefcb5aaf121cd7a96ad2591",
+        "apps/docs/src/content/docs/guides/cache-management.md": null,
         "apps/docs/src/content/docs/guides/cancellation.md": "7af74ddcb64ddc5454e3d8b4326a79b9683f1d744537c2b2f267e61a9447274b",
         "apps/docs/src/content/docs/guides/choose-stream-history.md": "9aefb63f50a3b020db5cd678d43b3ca0374c82bc9dce61a1cb429ecde313d438",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "cb941076de91c32bc0a1a5e8f6463ea521457210c00ccf4ef4e7de7c5fd135e9",
@@ -565,6 +568,8 @@
         "scripts/performance/budgets.mts": "a97ce19167bda55891a66daa14263549643757dd5db309c367e4be766637b957",
         "scripts/performance/common.mts": "507d45618fbaf2c7be6f986a5f958d1958cdddc95e42a77ff1d50d8225538a3d",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
+        "scripts/verify-docs-examples.mts": null,
+        "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "788dcfa211e8a51b2bbf50df1c513157a21d726a4fb18f3c31822d9eb174454d",
         "skills/effect-api-query/references/cache-workflows.md": "1d80a087881094a7d50dbf7ce20c7ab8a2800f05aae432523645d4cba82b98e3",
@@ -673,7 +678,7 @@
         "tests/query-view-prefix.test.ts": "fd94e3d01f52a0978242246f02a3e989bddd1e055f828f48d7a41187f696dd69",
         "tests/schema-sharing-prototypes.test.ts": "628a6622656b9b53e686d14b9efbd3abc13c61a13db1546001b0689b491f6022",
         "tests/schema-structural-sharing.test.ts": "577e0ac004db61c5778bf2362b8d208fca6fd6e830a3eaa6496a4c534d3a6e57",
-        "tests/skills-maintenance.test.ts": "682faa16982a90614b2fbee84a5da5a4de361f6a3f732099d9fcbc266fca3ec8",
+        "tests/skills-maintenance.test.ts": "d21daa2fd0098782aed2ff4f71fb6dc400a380da3b8e6d3de4804179fdb341a1",
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
         "tests/skills/query-usability/grade.test.ts": "f3c2650deba0d887f66fb3b3afd284cd9baf562296f2984e5c84b014ecec8cbd",
         "tests/skills/query-usability/solution.ts": "38583676eaa2d33e8ca56c07a430e3a28787feae9d84c6d3612e01d6d7f1d80f",
@@ -744,13 +749,12 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "8f3464be38ea14aef0b371e7d4315767f2b45946",
-      "outcome": "updated",
-      "reason": "The cleanup is now a separate follow-up to merged main d14f7b4. Both custom editor launchers and forced SDK settings are removed; direct pinned declaration compiler resolution and its identity check preserve CLI behavior. ADR 0043 amends editor routing while ADR 0035 retains its recorded decision. The skill source mapping/tree include the new amendment; skill_spec records the maintainer direction and the domain map remains accurate. Deleted SDK locations need no separate skill.",
+      "head": "d56b6eaebbf844c67b03f3b4781974347c106154",
+      "outcome": "no-change",
+      "reason": "The isolated maintenance checkout must copy scripts/compiler.mts because its copied real Vite config now imports that module. This fixes fixture completeness without changing assertions, command behavior or shipped guidance. Existing domain map, skill spec and skill tree already cover the compiler integration, editor cleanup and tests; no planning rewrite or new skill is needed.",
       "evidence": [
-        "Cleanup branch contains only the editor/compiler-path and unused private Tailwind declaration cleanup relative to d14f7b4. Exact installed native compiler identity equals the explicit CLI; pack/ATTW/publint, both public compilers, strict checks, rejection checks and Fallow all pass.",
-        "Merged main has the same tree as 0142e48, whose hosted CI 43432706834 passed Source quality, both builds/docs and all three browser jobs. Runtime evidence remains 870 tests, eight peer pairs of 403 cases and 150 application browser cases; the cleanup changes no library runtime or public contract.",
-        "All three planning records reconciled, one skill/six references retained, current contributor instructions updated. Editor and Windows/container integration remain unverified and contributor-owned; no new graphical or discovery claim."
+        "Hosted cleanup CI43435588575 reproduced seven existing maintenance failures from an unresolved config import. All seven pass after adding the real compiler module to the fixture copy list.",
+        "Complete uncached test task passes all 870 runtime cases plus current/minimum public and server compiler fixtures; direct declaration emission, ATTW/publint pass. Existing editor/platform/discovery limits remain explicit."
       ]
     },
     "source:vite.config.ts": {
