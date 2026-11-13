@@ -27,7 +27,10 @@ export const startUsersApplication = async (baseUrl: string) => {
         }),
         {
           query: {
-            interceptors: [async ({ next }) => await setup.runQuery(next)],
+            interceptors: [
+              async ({ next, context }) =>
+                await setup.runQuery(next, context.signal),
+            ],
           },
         }
       );

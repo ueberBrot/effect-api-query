@@ -38,10 +38,26 @@ const makeExampleRpcQueryUtils = (
       runPromiseExit,
     }),
     {
-      query: { interceptors: [async ({ next }) => await runQuery(next)] },
-      infinite: { interceptors: [async ({ next }) => await runQuery(next)] },
-      live: { interceptors: [async ({ next }) => await runQuery(next)] },
-      streamed: { interceptors: [async ({ next }) => await runQuery(next)] },
+      query: {
+        interceptors: [
+          async ({ next, context }) => await runQuery(next, context.signal),
+        ],
+      },
+      infinite: {
+        interceptors: [
+          async ({ next, context }) => await runQuery(next, context.signal),
+        ],
+      },
+      live: {
+        interceptors: [
+          async ({ next, context }) => await runQuery(next, context.signal),
+        ],
+      },
+      streamed: {
+        interceptors: [
+          async ({ next, context }) => await runQuery(next, context.signal),
+        ],
+      },
     }
   );
 
@@ -60,10 +76,26 @@ const makeExampleHttpQueryUtils = (
       runPromiseExit,
     }),
     {
-      query: { interceptors: [async ({ next }) => await runQuery(next)] },
-      infinite: { interceptors: [async ({ next }) => await runQuery(next)] },
-      live: { interceptors: [async ({ next }) => await runQuery(next)] },
-      streamed: { interceptors: [async ({ next }) => await runQuery(next)] },
+      query: {
+        interceptors: [
+          async ({ next, context }) => await runQuery(next, context.signal),
+        ],
+      },
+      infinite: {
+        interceptors: [
+          async ({ next, context }) => await runQuery(next, context.signal),
+        ],
+      },
+      live: {
+        interceptors: [
+          async ({ next, context }) => await runQuery(next, context.signal),
+        ],
+      },
+      streamed: {
+        interceptors: [
+          async ({ next, context }) => await runQuery(next, context.signal),
+        ],
+      },
     }
   );
 

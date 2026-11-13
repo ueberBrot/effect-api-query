@@ -7,6 +7,7 @@ The package root, `@ueberbrot/effect-api-query`, exports all supported values an
 
 | Export | Purpose |
 | --- | --- |
+| `acquireQueryOwner`, `QueryOwner`, `QueryOwnerSetup` | Opt in to acquired/borrowed resource setup, guarded cache callbacks and local query/mutation retirement. |
 | `configureUtils` | Configure policies and ordered interceptors on a tree, branch, or leaf. |
 | `UtilsConfiguration`, `ConfiguredUtils` | Type scoped configuration and the configured utility tree. |
 | `createBranchQueryFilter` | Select one view across all descendant leaves. |

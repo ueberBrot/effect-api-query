@@ -265,7 +265,8 @@ describe("query owners", () => {
                 {
                   streamed: {
                     interceptors: [
-                      async ({ next }) => await setup.runQuery(next),
+                      async ({ next, context }) =>
+                        await setup.runQuery(next, context.signal),
                     ],
                   },
                 }

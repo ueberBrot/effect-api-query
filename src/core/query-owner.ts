@@ -1,7 +1,15 @@
-import { QueryClient } from "@tanstack/query-core";
+import { CancelledError, QueryClient } from "@tanstack/query-core";
 import type { QueryClientConfig } from "@tanstack/query-core";
 import { Cause, Exit } from "effect";
 
+import {
+  isEffectHttpApiQueryError,
+  EffectHttpApiQueryEmptyStreamError,
+} from "../http/errors";
+import {
+  isEffectRpcQueryError,
+  EffectRpcQueryEmptyStreamError,
+} from "../rpc/errors";
 import type { RunPromiseExit } from "./types";
 
 /** Registers only resources whose lifetime is explicitly transferred to the owner. */
@@ -24,7 +32,10 @@ export interface QueryOwner<A> {
   /** Runs a synchronous cache callback only while active. Never capture a replacement cache. */
   readonly commit: (update: (client: QueryClient) => void) => void;
   /** Accepts one complete application mutation promise, including awaited native callbacks. */
-  readonly runQuery: <T>(execute: () => Promise<T>) => Promise<T>;
+  readonly runQuery: <T>(
+    execute: () => Promise<T>,
+    signal: AbortSignal
+  ) => Promise<T>;
   readonly runMutation: <T>(execute: () => Promise<T>) => Promise<T>;
   /** Wrap every utility runner so retirement can await local Effect/stream finalizers. */
   readonly wrapRunner: <R>(runner: RunPromiseExit<R>) => RunPromiseExit<R>;
@@ -42,6 +53,7 @@ export const acquireQueryOwner = async <A>(
 ): Promise<QueryOwner<A>> => {
   const releases: (() => void | Promise<void>)[] = [];
   const pending = new Set<Promise<unknown>>();
+  const cancelled = new WeakSet<Promise<unknown>>();
   const queries = new Set<AbortController>();
   const drainFailures: unknown[] = [];
   const queryClient = new QueryClient(cacheConfig);
@@ -52,12 +64,33 @@ export const acquireQueryOwner = async <A>(
       throw new Error("Query owner is retired");
     }
   };
-  const track = async <T>(execute: () => Promise<T>): Promise<T> => {
+  const track = async <T>(
+    execute: () => Promise<T>,
+    signal?: AbortSignal
+  ): Promise<T> => {
     assertActive();
     // Register before invoking user code, including synchronous retirement/reentrancy.
-    const result = (async () => {
+    // Assignment completes before the first awaited microtask resumes.
+    // oxlint-disable-next-line eslint/prefer-const
+    let result!: Promise<T>;
+    result = (async () => {
       await Promise.resolve();
-      return await execute();
+      try {
+        return await execute();
+      } catch (error) {
+        if (
+          signal?.aborted === true &&
+          (error instanceof CancelledError ||
+            ((isEffectRpcQueryError(error) ||
+              isEffectHttpApiQueryError(error)) &&
+              Cause.hasInterruptsOnly(error.cause)) ||
+            error instanceof EffectRpcQueryEmptyStreamError ||
+            error instanceof EffectHttpApiQueryEmptyStreamError)
+        ) {
+          cancelled.add(result);
+        }
+        throw error;
+      }
     })();
     pending.add(result);
     try {
@@ -73,7 +106,8 @@ export const acquireQueryOwner = async <A>(
       return disposal;
     }
     active = false;
-    const draining = Promise.allSettled(pending);
+    const accepted = [...pending];
+    const draining = Promise.allSettled(accepted);
     // Defer cleanup so reentrant calls see the same promise.
     disposal = (async () => {
       await Promise.resolve();
@@ -87,13 +121,21 @@ export const acquireQueryOwner = async <A>(
         failures.push(error);
       }
       const drained = await draining;
-      for (const result of drained) {
-        if (result.status === "rejected") {
+      for (const [index, result] of drained.entries()) {
+        const promise = accepted[index];
+        if (
+          result.status === "rejected" &&
+          (promise === undefined || !cancelled.has(promise))
+        ) {
           failures.push(result.reason);
         }
       }
       failures.push(...drainFailures);
-      queryClient.clear();
+      try {
+        queryClient.clear();
+      } catch (error) {
+        failures.push(error);
+      }
       while (releases.length > 0) {
         const release = releases.pop();
         if (release === undefined) {
