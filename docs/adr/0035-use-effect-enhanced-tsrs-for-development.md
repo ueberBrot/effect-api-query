@@ -1,6 +1,6 @@
 # Use Effect-enhanced TSRS for development
 
-Status: Accepted. Amends the development compiler selection in [ADR 0015](0015-centralize-the-toolchain-in-vite-plus.md); its Vite+ task boundary remains accepted.
+Status: Accepted. Editor SDK routing is partially superseded by [ADR 0043](0043-keep-editor-selection-contributor-owned.md). Amends the development compiler selection in [ADR 0015](0015-centralize-the-toolchain-in-vite-plus.md); its Vite+ task boundary remains accepted.
 
 ## Decision
 
