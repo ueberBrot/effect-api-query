@@ -1,3 +1,15 @@
+const retainPending = <A>(
+  pending: A[],
+  value: A,
+  latestOnly: boolean | undefined
+): A[] => {
+  if (latestOnly === true) {
+    return [value];
+  }
+  pending.push(value);
+  return pending;
+};
+
 type PullResult<A> =
   | { readonly kind: "value"; readonly result: IteratorResult<A> }
   | { readonly kind: "error"; readonly error: unknown };
@@ -7,7 +19,8 @@ export const streamPublicationBatches =
     source: AsyncIterable<A>,
     batchSize: number,
     signal: AbortSignal,
-    maxWaitMs?: number
+    maxWaitMs?: number,
+    latestOnly?: boolean
   ): AsyncIterable<readonly A[]> {
     const iterator = source[Symbol.asyncIterator]();
     let first = true;
@@ -75,7 +88,7 @@ export const streamPublicationBatches =
         if (result.result.done === true) {
           break;
         }
-        pending.push(result.result.value);
+        pending = retainPending(pending, result.result.value, latestOnly);
         if (first || pending.length === batchSize) {
           first = false;
           const batch = pending;
@@ -109,3 +122,21 @@ export const streamPublicationBatches =
       yield pending;
     }
   };
+
+// Reuse the ordered consumer's deadline, single pull, and cleanup contract,
+// retaining only one unpublished complete-state snapshot.
+export const streamLiveSnapshots = async function* streamLiveSnapshots<A>(
+  source: AsyncIterable<A>,
+  signal: AbortSignal,
+  coalesceMs: number
+): AsyncIterable<A | undefined> {
+  for await (const batch of streamPublicationBatches(
+    source,
+    Infinity,
+    signal,
+    coalesceMs,
+    true
+  )) {
+    yield batch[0];
+  }
+};

@@ -11,7 +11,10 @@ import {
 } from "effect";
 
 import { validateStreamHash } from "./stream-hash-index";
-import { streamPublicationBatches } from "./stream-publication";
+import {
+  streamLiveSnapshots,
+  streamPublicationBatches,
+} from "./stream-publication";
 import type { RunPromiseExit, StreamRefetchMode } from "./types";
 
 export type StreamQueryPolicy =
@@ -22,12 +25,16 @@ export type StreamQueryPolicy =
       readonly publicationBatchSize: number;
       readonly publicationMaxWaitMs: number | undefined;
     }
-  | { readonly _tag: "Live" };
+  | { readonly _tag: "Live"; readonly coalesceMs: number | undefined };
 
 // oxlint-disable-next-line anti-slop/no-unknown-parameters
 const validatePublicationDeadline: (
-  value: unknown
-) => asserts value is number | undefined = (publicationMaxWaitMs) => {
+  value: unknown,
+  option?: string
+) => asserts value is number | undefined = (
+  publicationMaxWaitMs,
+  option = "publicationMaxWaitMs"
+) => {
   if (
     publicationMaxWaitMs !== undefined &&
     (!Predicate.isNumber(publicationMaxWaitMs) ||
@@ -35,9 +42,7 @@ const validatePublicationDeadline: (
       publicationMaxWaitMs <= 0 ||
       publicationMaxWaitMs > 2_147_483_647)
   ) {
-    throw new RangeError(
-      "publicationMaxWaitMs must be an integer from 1 to 2147483647"
-    );
+    throw new RangeError(`${option} must be an integer from 1 to 2147483647`);
   }
 };
 
@@ -97,27 +102,35 @@ export const prepareStreamPolicy = (
       publicationMaxWaitMs,
     };
   } else {
-    policy = { _tag: "Live" };
+    validatePublicationDeadline(options["coalesceMs"], "coalesceMs");
+    policy = { _tag: "Live", coalesceMs: options["coalesceMs"] };
   }
+  delete options["coalesceMs"];
   delete options["refetchMode"];
   delete options["maxChunks"];
   delete options["publicationBatchSize"];
   delete options["publicationMaxWaitMs"];
+  if (policy._tag === "Live") {
+    return {
+      policy,
+      history:
+        policy.coalesceMs === undefined
+          ? undefined
+          : { coalesceMs: policy.coalesceMs },
+    };
+  }
   return {
     policy,
-    history:
-      policy._tag === "Live"
+    history: {
+      maxChunks: policy.maxChunks ?? null,
+      refetchMode: policy.refetchMode,
+      ...(policy.publicationBatchSize === 1
         ? undefined
-        : {
-            maxChunks: policy.maxChunks ?? null,
-            refetchMode: policy.refetchMode,
-            ...(policy.publicationBatchSize === 1
-              ? undefined
-              : { publicationBatchSize: policy.publicationBatchSize }),
-            ...(policy.publicationMaxWaitMs === undefined
-              ? undefined
-              : { publicationMaxWaitMs: policy.publicationMaxWaitMs }),
-          },
+        : { publicationBatchSize: policy.publicationBatchSize }),
+      ...(policy.publicationMaxWaitMs === undefined
+        ? undefined
+        : { publicationMaxWaitMs: policy.publicationMaxWaitMs }),
+    },
   };
 };
 
@@ -297,7 +310,13 @@ export const makeStreamQuery = ({
       }
       return await consumeQueryStream(
         context,
-        await streamFn(context),
+        policy.coalesceMs === undefined
+          ? await streamFn(context)
+          : streamLiveSnapshots(
+              await streamFn(context),
+              context.signal,
+              policy.coalesceMs
+            ),
         null,
         // oxlint-disable-next-line anti-slop/no-unknown-parameters
         (_latest: unknown, value: unknown) =>

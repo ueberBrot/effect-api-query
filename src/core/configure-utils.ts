@@ -25,6 +25,7 @@ import { inputKind } from "./prepared-input";
 import type {
   OwnedMutationOption,
   StreamedPolicyOptions,
+  LivePolicyOptions,
   KeysOfUnion,
   UnaryQueryBuilder,
   UnaryQueryBuilderDescriptor,
@@ -39,7 +40,11 @@ export interface QueryConfiguration<
   View extends SupportedQueryView<Leaf>,
 > {
   readonly policy?: QueryPolicy<Leaf, View> &
-    (View extends "streamed" ? Partial<StreamedPolicyOptions> : unknown);
+    (View extends "streamed"
+      ? Partial<StreamedPolicyOptions>
+      : View extends "live"
+        ? LivePolicyOptions
+        : unknown);
   readonly interceptors?: readonly QueryInterceptor<Leaf, View>[];
 }
 
@@ -67,7 +72,11 @@ export interface SharedQueryConfiguration<View extends QueryView> {
     QueryObserverOptions<unknown, unknown>,
     LocalQueryOption
   > &
-    (View extends "streamed" ? Partial<StreamedPolicyOptions> : unknown);
+    (View extends "streamed"
+      ? Partial<StreamedPolicyOptions>
+      : View extends "live"
+        ? LivePolicyOptions
+        : unknown);
   readonly interceptors?: readonly SharedQueryInterceptor<View>[];
 }
 
@@ -376,8 +385,8 @@ const configureLeaf = (
       policy,
       interceptors: inherited.flatMap((entry) => entry.interceptors ?? []),
     });
-    if (view === "streamed") {
-      const { streamedKey } = node;
+    if (view === "streamed" || view === "live") {
+      const streamedKey = node[view === "live" ? "liveKey" : "streamedKey"];
       if (!Predicate.isFunction(streamedKey)) {
         throw new TypeError("Streamed queries require a key builder");
       }
@@ -390,10 +399,12 @@ const configureLeaf = (
             "refetchMode",
             "publicationBatchSize",
             "publicationMaxWaitMs",
+            "coalesceMs",
+            "sseOptions",
           ].includes(option)
         )
       );
-      configured["streamedKey"] =
+      configured[view === "live" ? "liveKey" : "streamedKey"] =
         inputKind(node.key) === "Inputless"
           ? (options?: Partial<StreamedPolicyOptions>) =>
               buildKey({ ...history, ...options })
