@@ -3,14 +3,14 @@ title: Share Decoded Values
 description: Opt in to schema-defined reference reuse through native structural sharing.
 ---
 
-Use native `structuralSharing` when repeated decoded results contain rich values that the application treats as immutable. The adapter keeps TanStack's default behavior. This recipe composes Effect Schema equivalence with Query's `replaceEqualDeep`; it needs no package helper or serialization step.
+Use native `structuralSharing` when repeated decoded results contain rich values that the application treats as immutable. The adapter keeps TanStack's default behavior. The opt-in `schemaStructuralSharing` helper reconciles plain containers around Schema-defined decoded atoms. It never compares encoded wire values.
 
 ## Define the decoded semantics
 
 This snapshot contains Schema class instances with dates, maps, sets, and Effect Options. The `attachment` field deliberately compares by reference, including custom objects. Import the model and callbacks below into the application's cache module.
 
 ```ts
-import { replaceEqualDeep } from "@tanstack/query-core";
+import { schemaStructuralSharing } from "@ueberbrot/effect-api-query";
 import { Equivalence, Schema } from "effect";
 
 export class Reading extends Schema.Class<
@@ -39,28 +39,19 @@ Use schema-defined fields only. Extra instance state, getters, mutable objects, 
 
 ## Reuse equivalent records
 
-Derive the guard and equivalence once. Match readings at the same array position, then let native Query sharing reconcile the plain snapshot and array:
+Choose the schema for an **atomic record**, not the surrounding snapshot. Derive its equivalence once and pass it explicitly:
 
 ```ts
-const isSnapshot = Schema.is(Snapshot);
-const equivalentReading = Schema.toEquivalence(Reading);
-
-export const shareSnapshot = (
-  previous: unknown,
-  incoming: unknown
-): unknown => {
-  if (!isSnapshot(previous) || !isSnapshot(incoming)) {
-    return incoming;
-  }
-  const readings = incoming.readings.map((reading, index) => {
-    const old = previous.readings[index];
-    return old !== undefined && equivalentReading(old, reading) ? old : reading;
-  });
-  return replaceEqualDeep(previous, { ...incoming, readings });
-};
+export const shareSnapshot = schemaStructuralSharing(Reading, {
+  equivalence: Schema.toEquivalence(Reading),
+});
 ```
 
-An equivalent reading keeps its class instance and all nested references. A changed reading uses the incoming instance intact; this recipe does not rebuild classes or merge their individual fields. When only `revision` changes, the readings array can retain its reference. Reordering is positional, not an ID-based entity merge. Values outside this snapshot shape, including an observer's selected result, pass through unchanged.
+The callback accepts unknown values, so it also works in native QueryClient defaults and for selected observer values. Schema-valid atoms compare only through the supplied equivalence. Invalid atoms and unsupported rich objects pass through unchanged. Plain objects and dense arrays reconcile recursively by property or index; primitive values compare by reference/value identity. Use finite acyclic containers with enumerable string data properties only. Sparse arrays, symbol properties, accessors, and custom container prototypes are unsupported and pass through unchanged. Cyclic traversed containers throw a TypeError.
+
+Schema type-side validation and equivalence must be synchronous and require no services; decoding/encoding services are never used. Validation defects, async checks, missing services and equivalence exceptions propagate synchronously. The helper neither decodes nor freezes data. Never mutate either input after caching.
+
+An equivalent reading keeps its class instance and all nested references. A changed reading uses the incoming instance intact; the helper does not rebuild classes or merge their individual fields. When only `revision` changes, the readings array can retain its reference. Reordering is positional, not an ID-based entity merge. Unsupported rich values pass through unchanged. Selected plain containers follow the same rules.
 
 In the module that owns `rpc`, import `configureUtils` from `@ueberbrot/effect-api-query` and opt in at the leaf:
 
@@ -75,29 +66,10 @@ The same callback works in a buffered HTTP `queryOptions` builder, or as a call-
 
 ## Include HTTP metadata
 
-A metadata view caches `{ data, status, headers }`. Reconcile its decoded snapshot separately, then share the envelope and raw string headers:
+A metadata view caches `{ data, status, headers }`. The same helper traverses that envelope around the decoded atoms:
 
 ```ts
-const isMetadataSnapshot = Schema.is(
-  Schema.Struct({
-    data: Snapshot,
-    status: Schema.Int,
-    headers: Schema.Record(Schema.String, Schema.String),
-  })
-);
-
-export const shareMetadataSnapshot = (
-  previous: unknown,
-  incoming: unknown
-): unknown => {
-  if (!isMetadataSnapshot(previous) || !isMetadataSnapshot(incoming)) {
-    return incoming;
-  }
-  return replaceEqualDeep(previous, {
-    ...incoming,
-    data: shareSnapshot(previous.data, incoming.data),
-  });
-};
+export const shareMetadataSnapshot = shareSnapshot;
 ```
 
 Configure that callback for the metadata view:
@@ -114,6 +86,6 @@ The [compiled model and callbacks](https://github.com/ueberBrot/effect-api-query
 
 ## Measure the application workload
 
-Rich-value comparison adds guards, equivalence checks, and a mapped array. Use it when retained references help consumers; it is not a general speed improvement. Measure both equivalent and changed results, including selection and rendering when those matter.
+Rich-value comparison adds validation, equivalence checks, and container traversal. Use it when retained references help consumers; it is not a general speed improvement. Measure both equivalent and changed results, including selection and rendering when those matter. For meaningful private or extra class state, supply an equivalence that compares that state as well as declared fields; Schema-derived equivalence alone cannot see it.
 
-`vp run sharing-baseline` measures native cache writes after installing generated RPC options. It reports five samples of 50 writes for 10 and 1,000 readings, with equal, one-record-changed, and all-records-changed inputs, comparing native sharing, this recipe, and disabled sharing. Inputs are freshly allocated outside each timed sample. The measurement excludes decoding, transport, rendering, and consumer savings, so it cannot establish end-to-end performance.
+`vp run sharing-baseline` measures native cache writes after installing generated RPC options. It reports five samples of 50 writes for 10 and 1,000 readings, with equal, one-record-changed, and all-records-changed inputs, comparing native sharing, the original hand-written recipe, the helper, and disabled sharing. Inputs are freshly allocated outside each timed sample. The measurement excludes decoding, transport, rendering, and consumer savings, so it cannot establish end-to-end performance.

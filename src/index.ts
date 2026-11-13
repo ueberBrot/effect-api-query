@@ -99,3 +99,6 @@ export {
   QueryClientService,
   QueryClientOperationError,
 } from "./core/query-effects";
+
+export { schemaStructuralSharing } from "./core/schema-structural-sharing";
+export type { SchemaStructuralSharingOptions } from "./core/schema-structural-sharing";
