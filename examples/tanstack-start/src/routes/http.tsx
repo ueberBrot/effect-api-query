@@ -1,4 +1,8 @@
 import {
+  describeSlowQueryCancellation,
+  useSlowQueryCancellation,
+} from "@effect-api-query/shared/use-slow-query-cancellation.ts";
+import {
   skipToken,
   useInfiniteQuery,
   useMutation,
@@ -8,10 +12,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import type { SubmitEvent } from "react";
 
-import {
-  describeSlowQueryCancellation,
-  useSlowQueryCancellation,
-} from "../../../shared/use-slow-query-cancellation.ts";
 import { ActionButton } from "../components/action-button.tsx";
 import { EffectErrorDetails } from "../components/effect-error-details.tsx";
 import { PageLayout } from "../components/page-layout.tsx";

@@ -70,3 +70,80 @@ const delivery = recoverStream({
     attempt <= 3 ? Math.min(250 * 2 ** (attempt - 1), 5_000) : undefined,
 });
 const nativeDelivery = delivery satisfies Stream.Stream<Event>;
+
+class GapService extends Context.Service<GapService, {}>()("GapService") {}
+class RefreshService extends Context.Service<RefreshService, {}>()(
+  "RefreshService"
+) {}
+class StateService extends Context.Service<StateService, {}>()(
+  "StateService"
+) {}
+declare const opaqueConnect: (
+  cursor: string
+) => Stream.Stream<Event, "offline", RecoveryService>;
+const opaque = recoverStream({
+  connect: opaqueConnect,
+  initialCursor: "start",
+  cursor: (event) => event.message,
+  cursorPolicy: {
+    accept: (previous, next) => previous !== next,
+    isGap: (previous, next) => previous === "a" && next === "c",
+  },
+  retryDelay: (cause) => {
+    cause satisfies import("effect").Cause.Cause<"offline" | "gap" | "refresh">;
+    return undefined;
+  },
+  onGap: () => GapService.pipe(Effect.andThen(Effect.fail("gap" as const))),
+  onReplayExpired: () =>
+    RefreshService.pipe(Effect.andThen(Effect.fail("refresh" as const))),
+  onState: (state) => {
+    state satisfies StreamConnectionState<
+      "offline" | "gap" | "refresh",
+      string
+    >;
+    return StateService.pipe(Effect.asVoid);
+  },
+});
+const completeOpaque = opaque satisfies Stream.Stream<
+  Event,
+  "offline" | "gap" | "refresh",
+  RecoveryService | GapService | RefreshService | StateService
+>;
+// @ts-expect-error Gap and refresh failures remain in the public failure channel.
+const missingHookFailure = opaque satisfies Stream.Stream<
+  Event,
+  "offline",
+  RecoveryService | GapService | RefreshService | StateService
+>;
+// @ts-expect-error State callback requirements remain in the public environment.
+const missingStateService = opaque satisfies Stream.Stream<
+  Event,
+  "offline" | "gap" | "refresh",
+  RecoveryService | GapService | RefreshService
+>;
+// @ts-expect-error Opaque cursors require an explicit initial cursor and acceptance policy.
+const missingOpaquePolicy = recoverStream({
+  connect: opaqueConnect,
+  cursor: (event: Event) => event.message,
+  retryDelay: () => undefined,
+});
+
+declare const annotatedNumeric: RecoverStreamOptions<
+  Event,
+  Error,
+  RecoveryService
+>;
+const numericAnnotation = recoverStream(
+  annotatedNumeric
+) satisfies Stream.Stream<Event, Error, RecoveryService>;
+declare const annotatedOpaque: RecoverStreamOptions<
+  Event,
+  Error,
+  RecoveryService,
+  string
+>;
+const opaqueAnnotation = recoverStream(annotatedOpaque) satisfies Stream.Stream<
+  Event,
+  Error,
+  RecoveryService
+>;

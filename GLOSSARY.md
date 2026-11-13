@@ -16,6 +16,8 @@ These terms describe how the package builds TanStack Query utilities from Effect
 
 **HTTP metadata view**: A buffered HTTP query view with decoded query data and an immutable snapshot of the response status and raw string headers. Declared decoded header wrappers remain part of the data. _Avoid_: Raw response, header-wrapped success
 
+**Policy map**: An application-owned tree, branch, or leaf configuration checked against a contract-derived utility type by `defineUtilsPolicy`. It feeds `configureUtils` without adding callbacks or runtime values to the shared Effect declaration. _Avoid_: Plugin registry, contract annotation
+
 ## Payloads and keys
 
 **HTTP request input**: The decoded request parts that a ready HTTP API client accepts: declared params, query, headers, and payload. Response controls are excluded. RPC payload constructors do not apply to HTTP request input. _Avoid_: Payload constructor input, wire request
@@ -53,3 +55,9 @@ These terms describe how the package builds TanStack Query utilities from Effect
 **Configuration error**: An error that rejects invalid utility configuration during preparation or execution. _Avoid_: RPC execution error
 
 **Key-generation error**: A synchronous error that occurs while the package derives canonical cache identity from RPC payload constructor input or HTTP request input. _Avoid_: RPC execution error, configuration error
+
+**Query owner**: An opt-in application lifetime with an independent native QueryClient, explicitly acquired resources, and registered work. Retirement stops admission, aborts queries, drains registered local work, and releases acquired resources. Borrowed resources remain caller-owned. _Avoid_: Generated client, mutation cancellation
+
+**Recovery cursor**: The last locally accepted event position in one stream consumption. Numeric convenience uses increasing nonnegative safe integers; an application cursor policy defines acceptance and optional gap detection for other protocols. It is attempt-local resume state outside semantic query identity, not a durable acknowledgement or downstream processing checkpoint.
+
+**Loader descriptor**: A transferable strict-JSON selection of one generated operation, query view, compatibility identifier and explicitly encoded input, with canonical input identity. Rebinding validates it and prepares the input for the receiving ready-client owner. It contains no query data or prepared-input token. _Avoid_: Hydration snapshot, authorization token

@@ -284,7 +284,7 @@ describe("stream snapshots", () => {
   describe.each(["ensuring", "acquireRelease"] as const)(
     "client-side %s snapshot cleanup",
     (finalizer) => {
-      test.each(["live", "streamed"] as const)(
+      test.each(["live", "coalesced", "streamed"] as const)(
         "waits for cleanup and preserves its complete Cause in %s queries",
         async (operation) => {
           const group = RpcGroup.make(
@@ -320,11 +320,16 @@ describe("stream snapshots", () => {
           });
           const queryClient = new QueryClient();
           const pending =
-            operation === "live"
-              ? fetchStreamSnapshot(queryClient, rpc.watch.liveOptions())
-              : fetchStreamSnapshot(
+            operation === "streamed"
+              ? fetchStreamSnapshot(
                   queryClient,
                   rpc.watch.streamedOptions({ maxChunks: "unbounded" })
+                )
+              : fetchStreamSnapshot(
+                  queryClient,
+                  rpc.watch.liveOptions({
+                    coalesceMs: operation === "coalesced" ? 50 : undefined,
+                  })
                 );
           let settled = false;
           const outcome = captureFailure(pending).then((result) => {
@@ -339,7 +344,7 @@ describe("stream snapshots", () => {
             expect(error).toMatchObject({
               _tag: "EffectRpcQueryError",
               rpcTag: "watch",
-              operation,
+              operation: operation === "coalesced" ? "live" : operation,
             });
             if (!isEffectRpcQueryError(error)) {
               throw new TypeError("Expected an RPC execution error");

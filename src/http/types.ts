@@ -22,6 +22,7 @@ import type {
   QueryData,
   RunnerRequirement,
   StreamedPolicyOptions,
+  LivePolicyOptions,
 } from "../core/types";
 import type {
   EffectHttpApiQueryConfigError,
@@ -136,9 +137,7 @@ export type Request<Endpoint extends HttpApiEndpoint.ConstraintRequest> =
 export type Success<Endpoint extends HttpApiEndpoint.ConstraintRequest> =
   HttpApiClient.SuccessType<SuccessSchema<Endpoint>>;
 export type Failure<ClientError> = EffectHttpApiQueryError<ClientError>;
-export type Member<Value, Key extends PropertyKey> = Key extends keyof Value
-  ? Value[Key]
-  : never;
+export type Member<Value, Key extends PropertyKey> = Value[Key & keyof Value];
 export type ClientGroup<Group, Client> = Group extends {
   readonly topLevel: true;
 }
@@ -474,11 +473,11 @@ export type LiveLeaf<
 > = {
   readonly liveKey: void extends Request<Endpoint>
     ? (
-        policy?: HttpDecoderPolicy<Endpoint>
+        policy?: HttpDecoderPolicy<Endpoint> & LivePolicyOptions
       ) => LiveKey<Endpoint, Key, ClientError>
     : (
         input: Request<Endpoint> | PreparedInput<Request<Endpoint>>,
-        policy?: HttpDecoderPolicy<Endpoint>
+        policy?: HttpDecoderPolicy<Endpoint> & LivePolicyOptions
       ) => LiveKey<Endpoint, Key, ClientError>;
   readonly liveOptions: UnaryQueryBuilder<
     Request<Endpoint>,
@@ -486,7 +485,7 @@ export type LiveLeaf<
     LiveFailure<Endpoint, ClientError>,
     LiveKey<Endpoint, Key, ClientError>,
     readonly [...Key, "live"],
-    HttpDecoderPolicy<Endpoint>
+    HttpDecoderPolicy<Endpoint> & LivePolicyOptions
   >;
 };
 
@@ -651,11 +650,15 @@ export type StreamServices<Value> =
       ? Services
       : never;
 
+export type ExecutionServices<Value> =
+  Value extends Effect.Effect<infer Data, infer _Error, infer Services>
+    ? Services | StreamServices<Data>
+    : never;
+
 export type ClientServices<Api extends HttpApi.Constraint, Client> =
   | HttpApiEndpoint.ClientServices<Supported<Endpoints<Groups<Api>>>>
   | HttpApiEndpoint.ErrorServicesDecode<Supported<Endpoints<Groups<Api>>>>
-  | Effect.Services<ExposedEffects<Api, Client>>
-  | StreamServices<Effect.Success<ExposedEffects<Api, Client>>>;
+  | ExecutionServices<ExposedEffects<Api, Client>>;
 export type RunnerOption<
   Api extends HttpApi.Constraint,
   Client,

@@ -148,3 +148,11 @@ Track query execution, accepted mutations, preparation, and snapshot captures in
 When adding query persistence to the Start example, compose its application-owned persister. A replacement bypasses tracking of query and iterator cleanup.
 
 Sources: [stream snapshots](https://ueberbrot.github.io/effect-api-query/guides/stream-snapshots/), [unary hydration](https://ueberbrot.github.io/effect-api-query/guides/hydrate-unary-data/), [query-view codecs](https://ueberbrot.github.io/effect-api-query/guides/hydrate-query-views/).
+
+## Transfer loader selections across owners
+
+Use `createQueryDescriptor(leaf, view, { contract, input: codec })` when a component must reuse a loader's selected input on an independent owner. Read the complete [loader/component example](https://ueberbrot.github.io/effect-api-query/guides/loader-descriptors/) before adding the transfer. `capture(input)` copies encoded strict JSON; `bind(unknown)` validates compatibility and semantic identity and returns the receiving leaf/view and its fresh prepared input. Pass that input to the matching native builder. The registration stays local, and the descriptor contains no data, clients, functions or prepared tokens.
+
+Supply a synchronous service-free input codec, including explicit encodings for bigint, classes or other rich inputs. Preserve every execution-relevant field; equal encoded keys do not prove that a codec preserves hidden decoded state. Choose a public input DTO and safe keys; keep credentials in owner middleware. Version the application compatibility identifier when contract, codec or key meaning changes. Mismatched operation prefixes/views/contracts and changed canonical identities throw `QueryDescriptorError` before execution. Treat transferred selections as untrusted input, never authorization.
+
+Reuse native providers, hooks and hydration. Configure matching stream policies on both owners, keep exclusive stream snapshot capture, and encode rich cached data separately. Inputless operations need an explicit void-to-JSON codec. Infinite queries use native options directly because their input is a page mapper, which cannot be transferred. Serialization, snapshot validation, script escaping, client lifetime and stale/refetch policy remain application-owned.

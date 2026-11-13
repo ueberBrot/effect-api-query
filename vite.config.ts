@@ -1,3 +1,5 @@
+import { fileURLToPath } from "node:url";
+
 import { strict as effectStrict } from "@effect/tsgo/oxlint-presets";
 import { ConfigProvider, Effect, Predicate } from "effect";
 import ultraciteOxfmt from "ultracite/oxfmt";
@@ -119,7 +121,7 @@ export default defineConfig({
     },
     overrides: [
       {
-        files: ["examples/vite-react/src/workflows/sharing.ts"],
+        files: ["examples/shared/http-workflows/sharing.ts"],
         rules: {
           "anti-slop/no-unknown-parameters": "off",
           "anti-slop/no-unknown-returns": "off",
@@ -171,6 +173,7 @@ export default defineConfig({
           "src/core/operation.ts",
           "src/core/utility-tree.ts",
           "src/core/metadata-query.ts",
+          "src/core/schema-structural-sharing.ts",
           "src/core/configure-utils.ts",
         ],
         rules: {
@@ -213,10 +216,6 @@ export default defineConfig({
       },
       {
         files: ["examples/**/components/ui/**/*.{ts,tsx}"],
-        excludeFiles: [
-          "examples/vite-react/src/components/ui/action-button.tsx",
-          "examples/vite-react/src/components/ui/effect-error-details.tsx",
-        ],
         rules: {
           "shadcn/no-arbitrary-values": "off",
           "shadcn/no-restyle": "off",
@@ -231,8 +230,8 @@ export default defineConfig({
           "examples/contracts/src/workflows.ts",
           "examples/server/src/workflow-handlers.ts",
           "examples/vite-react/tests/http-workflows.test.ts",
-          "examples/vite-react/src/workflows/application.ts",
-          "examples/vite-react/src/workflows/recovery.ts",
+          "examples/shared/http-workflows/application.ts",
+          "examples/shared/http-workflows/recovery.ts",
           "examples/server/src/http-handlers.ts",
           "examples/server/src/main.ts",
           "examples/server/src/server-local-rpc.ts",
@@ -301,8 +300,15 @@ export default defineConfig({
           "tests/skills/query-usability/fixture.ts",
           "tests/skills/query-usability/grade.test.ts",
           "tests/query-policy.test.ts",
+          "tests/query-effects.test.ts",
+          "tests/query-descriptor.test.ts",
+          "tests/integrated-workflows.test.ts",
+          "examples/shared/query-effects.ts",
+          "examples/shared/query-events.ts",
+          "examples/shared/application-policy.ts",
           "tests/query-view-prefix.test.ts",
           "tests/stream-publication.test.ts",
+          "tests/live-coalescing.test.ts",
           "tests/stream-recovery.test.ts",
           "tests/stream-snapshot.test.ts",
         ],
@@ -349,7 +355,13 @@ export default defineConfig({
       neverBundle: ["effect", "@tanstack/query-core"],
       onlyImport: ["effect", "@tanstack/query-core"],
     },
-    dts: true,
+    dts: {
+      generator: "tsgo",
+      tsconfig: "tsconfig.declarations.json",
+      tsgo: {
+        path: fileURLToPath(new URL(".vscode/tsdk/tsgo", import.meta.url)),
+      },
+    },
     entry: ["src/index.ts"],
     format: ["esm"],
     publint: {
@@ -368,7 +380,7 @@ export default defineConfig({
   run: {
     tasks: {
       check: {
-        command: "OXLINT_TSGOLINT_CHECKER_SCHEDULING=affinity vp check",
+        command: "effect-tsgo --tsrs-lint=0.21.0-ts7.1.0-beta vp check",
         dependsOn: ["pack", "docs-sync"],
         cache: {
           output: [],
@@ -381,7 +393,7 @@ export default defineConfig({
         },
       },
       lint: {
-        command: "OXLINT_TSGOLINT_CHECKER_SCHEDULING=affinity vp lint",
+        command: "effect-tsgo --tsrs-lint=0.21.0-ts7.1.0-beta vp lint",
         dependsOn: ["pack", "docs-sync"],
         cache: {
           output: [],
@@ -389,14 +401,18 @@ export default defineConfig({
       },
       typecheck: {
         command:
-          "OXLINT_TSGOLINT_CHECKER_SCHEDULING=affinity vp check --no-fmt",
+          "effect-tsgo --tsrs-lint=0.21.0-ts7.1.0-beta vp check --no-fmt",
         dependsOn: ["pack", "docs-sync"],
         cache: {
           output: [],
         },
       },
+      "toolchain-check": {
+        command: "node --import tsx scripts/check-toolchain.mts",
+        cache: false,
+      },
       "effect-check": {
-        command: "effect-tsgo diagnostics --project tsconfig.json --strict",
+        command: "effect-tsgo tsrs@0.21.0-ts7.1.0-beta --project tsconfig.json",
         dependsOn: ["pack"],
         cache: {
           output: [],
@@ -469,7 +485,7 @@ export default defineConfig({
       },
       "api-types": {
         command: [
-          "tsc --project tests/types/tsconfig.json",
+          "effect-tsgo tsrs@0.21.0-ts7.1.0-beta --project tests/types/tsconfig.json",
           "node node_modules/typescript-5.9/bin/tsc --project tests/types/tsconfig.json",
         ],
         dependsOn: ["pack"],
@@ -477,7 +493,7 @@ export default defineConfig({
       },
       "server-local-types": {
         command: [
-          "tsc --project tests/fixtures/tsconfig.server-local.json",
+          "effect-tsgo tsrs@0.21.0-ts7.1.0-beta --project tests/fixtures/tsconfig.server-local.json",
           "node node_modules/typescript-5.9/bin/tsc --project tests/fixtures/tsconfig.server-local.json",
         ],
         cache: {
@@ -508,6 +524,7 @@ export default defineConfig({
         command: [
           "vp run check",
           "vp run effect-check",
+          "vp run toolchain-check",
           "vp run fallow",
           "vp run test",
           "vp run framework-types",

@@ -11,56 +11,88 @@ import {
 } from "effect";
 
 /** Local delivery state; it does not acknowledge server-side persistence or cleanup. */
-export type StreamConnectionState<E> =
+export type StreamConnectionState<E, C = number> =
   | {
       readonly status: "connecting" | "connected";
-      readonly cursor: number;
+      readonly cursor: C;
       readonly attempt: number;
     }
   | {
       readonly status: "backing-off";
-      readonly cursor: number;
+      readonly cursor: C;
       readonly attempt: number;
       readonly delay: Duration.Duration;
       readonly cause: Cause.Cause<E>;
     }
   | {
       readonly status: "refreshing";
-      readonly cursor: number;
+      readonly cursor: C;
       readonly attempt: number;
       readonly cause: Cause.Cause<E>;
     }
-  | { readonly status: "completed" | "stopped"; readonly cursor: number }
+  | { readonly status: "completed" | "stopped"; readonly cursor: C }
   | {
       readonly status: "failed";
-      readonly cursor: number;
+      readonly cursor: C;
       readonly cause: Cause.Cause<E>;
     };
 
-export interface RecoverStreamOptions<A, E, R = never> {
-  /** Acquires an application-owned native stream using the last accepted cursor. */
-  readonly connect: (cursor: number) => Stream.Stream<A, E, R>;
-  /** One nonnegative safe-integer sequence per owner; older cursors are discarded. */
-  readonly cursor: (value: A) => number;
-  readonly initialCursor?: number | undefined;
-  /** One-based retry count across this consumption. Undefined stops with the original Cause. */
+/** Application policy over decoded cursors; no order or gap semantics are inferred. */
+export interface StreamCursorPolicy<C> {
+  readonly accept: (previous: C, next: C) => boolean;
+  readonly isGap?: ((previous: C, next: C) => boolean) | undefined;
+}
+
+export interface RecoveryHooks<A, E, R, C, EG, RG, EF, RF, RS> {
+  readonly connect: (cursor: C) => Stream.Stream<A, E, R>;
+  readonly cursor: (value: A) => C;
+  /** One-based retry count across this consumption. Undefined preserves the Cause. */
   readonly retryDelay: (
-    cause: Cause.Cause<E>,
+    cause: Cause.Cause<E | EG | EF>,
     attempt: number
   ) => Duration.Input | undefined;
-  readonly isReplayExpired?: ((cause: Cause.Cause<E>) => boolean) | undefined;
-  /** Refreshes authoritative reads and returns their replay cursor before reconnecting. */
-  readonly onReplayExpired?:
-    | ((cause: Cause.Cause<E>) => Effect.Effect<number, E, R>)
+  readonly isReplayExpired?:
+    | ((cause: Cause.Cause<E | EG | EF>) => boolean)
     | undefined;
-  /** Runs before accepting a gap; applications can refresh affected reads here. */
+  /** Return the replay cursor matching the authoritative refreshed state. */
+  readonly onReplayExpired?:
+    | ((cause: Cause.Cause<E | EG | EF>) => Effect.Effect<C, EF, RF>)
+    | undefined;
+  /** Runs before advancing the cursor or delivering an accepted gap. */
   readonly onGap?:
-    | ((previous: number, next: number) => Effect.Effect<void, E, R>)
+    | ((previous: C, next: C) => Effect.Effect<void, EG, RG>)
     | undefined;
   readonly onState?:
-    | ((state: StreamConnectionState<E>) => Effect.Effect<void, never, R>)
+    | ((
+        state: StreamConnectionState<E | EG | EF, C>
+      ) => Effect.Effect<void, never, RS>)
     | undefined;
 }
+
+/** Existing annotations retain their numeric cursor and shared error/service contract. */
+export type RecoverStreamOptions<
+  A,
+  E,
+  R = never,
+  C = number,
+  EG = E,
+  RG = R,
+  EF = E,
+  RF = R,
+  RS = R,
+> = RecoveryHooks<A, E, R, C, EG, RG, EF, RF, RS> &
+  (
+    | {
+        readonly initialCursor: C;
+        readonly cursorPolicy: StreamCursorPolicy<C>;
+      }
+    | (C extends number
+        ? {
+            readonly initialCursor?: number | undefined;
+            readonly cursorPolicy?: undefined;
+          }
+        : never)
+  );
 
 const checkedCursor = (cursor: number): number => {
   if (!Number.isSafeInteger(cursor) || cursor < 0) {
@@ -71,15 +103,19 @@ const checkedCursor = (cursor: number): number => {
   return cursor;
 };
 
-/** Restarts a decoded stream without putting attempt-specific resume state in a query key. */
-export const recoverStream = <A, E, R = never>(
-  options: RecoverStreamOptions<A, E, R>
-): Stream.Stream<A, E, R> =>
-  Stream.suspend(() => {
-    let cursor = checkedCursor(options.initialCursor ?? 0);
-    const state = (value: StreamConnectionState<E>) =>
-      options.onState?.(value) ?? Effect.void;
-    const connect = (attempt: number): Stream.Stream<A, E, R> =>
+const recoverWithPolicy = <A, E, R, C, EG, RG, EF, RF, RS>(
+  options: RecoveryHooks<A, E, R, C, EG, RG, EF, RF, RS>,
+  initialCursor: C,
+  policy: StreamCursorPolicy<C>,
+  check: (cursor: C) => C
+): Stream.Stream<A, E | EG | EF, R | RG | RF | RS> => {
+  const state = (value: StreamConnectionState<E | EG | EF, C>) =>
+    options.onState?.(value) ?? Effect.void;
+  return Stream.suspend(() => {
+    let cursor = check(initialCursor);
+    const connect = (
+      attempt: number
+    ): Stream.Stream<A, E | EG | EF, R | RG | RF | RS> =>
       Stream.unwrap(
         Effect.gen(function* connectStream() {
           yield* state({ status: "connecting", cursor, attempt });
@@ -89,11 +125,11 @@ export const recoverStream = <A, E, R = never>(
             Stream.rechunk(1),
             Stream.mapEffect(
               Effect.fnUntraced(function* trackCursor(value: A) {
-                const next = checkedCursor(options.cursor(value));
-                if (next <= cursor) {
+                const next = check(options.cursor(value));
+                if (!policy.accept(cursor, next)) {
                   return Option.none<A>();
                 }
-                if (next > cursor + 1) {
+                if (policy.isGap?.(cursor, next) === true) {
                   yield* options.onGap?.(cursor, next) ?? Effect.void;
                 }
                 cursor = next;
@@ -155,7 +191,7 @@ export const recoverStream = <A, E, R = never>(
                   attempt: nextAttempt,
                   cause,
                 });
-                cursor = checkedCursor(yield* options.onReplayExpired(cause));
+                cursor = check(yield* options.onReplayExpired(cause));
               }
               return connect(nextAttempt);
             })
@@ -175,3 +211,81 @@ export const recoverStream = <A, E, R = never>(
       })
     );
   });
+};
+
+/** Restarts a decoded stream with consumption-local state outside query identity. */
+export function recoverStream<
+  A,
+  E,
+  R = never,
+  EG = never,
+  RG = never,
+  EF = never,
+  RF = never,
+  RS = never,
+>(
+  options: RecoveryHooks<A, E, R, number, EG, RG, EF, RF, RS> & {
+    readonly initialCursor?: number | undefined;
+    readonly cursorPolicy?: undefined;
+  }
+): Stream.Stream<A, NoInfer<E | EG | EF>, NoInfer<R | RG | RF | RS>>;
+export function recoverStream<
+  A,
+  E,
+  R,
+  C,
+  EG = never,
+  RG = never,
+  EF = never,
+  RF = never,
+  RS = never,
+>(
+  options: RecoveryHooks<A, E, R, C, EG, RG, EF, RF, RS> & {
+    readonly initialCursor: C;
+    readonly cursorPolicy: StreamCursorPolicy<C>;
+  }
+): Stream.Stream<A, NoInfer<E | EG | EF>, NoInfer<R | RG | RF | RS>>;
+export function recoverStream<
+  A,
+  E,
+  R = never,
+  C = number,
+  EG = E,
+  RG = R,
+  EF = E,
+  RF = R,
+  RS = R,
+>(
+  // Preserve union-typed annotations separately from direct callback inference.
+  // oxlint-disable-next-line typescript/unified-signatures
+  options: RecoverStreamOptions<A, E, R, C, EG, RG, EF, RF, RS>
+): Stream.Stream<A, NoInfer<E | EG | EF>, NoInfer<R | RG | RF | RS>>;
+export function recoverStream<A, E, R, C, EG, RG, EF, RF, RS>(
+  options:
+    | (RecoveryHooks<A, E, R, C, EG, RG, EF, RF, RS> & {
+        readonly initialCursor: C;
+        readonly cursorPolicy: StreamCursorPolicy<C>;
+      })
+    | (RecoveryHooks<A, E, R, number, EG, RG, EF, RF, RS> & {
+        readonly initialCursor?: number | undefined;
+        readonly cursorPolicy?: undefined;
+      })
+): Stream.Stream<A, E | EG | EF, R | RG | RF | RS> {
+  if (options.cursorPolicy !== undefined) {
+    return recoverWithPolicy(
+      options,
+      options.initialCursor,
+      options.cursorPolicy,
+      (cursor) => cursor
+    );
+  }
+  return recoverWithPolicy(
+    options,
+    options.initialCursor ?? 0,
+    {
+      accept: (previous, next) => next > previous,
+      isGap: (previous, next) => next > previous + 1,
+    },
+    checkedCursor
+  );
+}

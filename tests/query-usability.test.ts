@@ -41,6 +41,87 @@ const handlers = group.of({
   "users.watch": ({ id }) => Stream.make(id),
 });
 describe("query usability", () => {
+  it.effect(
+    "keeps constructor-sensitive operations behind a query-stable RPC",
+    () =>
+      Effect.gen(function* constructorOwnership() {
+        class Advancing extends Schema.Class<
+          Advancing,
+          { readonly brand: unique symbol }
+        >("Advancing")({
+          id: Schema.Int,
+        }) {
+          static override make(input: { readonly id: number }): Advancing {
+            return super.make({ id: input.id + 1 });
+          }
+        }
+        const contract = RpcGroup.make(
+          Rpc.make("sensitive", { payload: Advancing, success: Schema.Int }),
+          Rpc.make("stable", {
+            payload: {
+              id: Schema.Int,
+              locale: Schema.String.pipe(
+                Schema.withConstructorDefault(Effect.succeed("en"))
+              ),
+            },
+            success: Schema.String,
+          })
+        );
+        const client = yield* makeRpcTestClient(contract, {
+          sensitive: ({ id }) => Effect.succeed(id),
+          stable: ({ id, locale }) => Effect.succeed(`${id}:${locale}`),
+        });
+        const rpc = createRpcQueryUtils(contract, {
+          client,
+          keyPrefix: ["construction"],
+        });
+        const queryClient = new QueryClient();
+        try {
+          const unsafe = rpc.sensitive.queryOptions({ input: { id: 1 } });
+          expect({
+            key: unsafe.queryKey.at(-1),
+            result: yield* Effect.promise(
+              async () => await queryClient.query(unsafe)
+            ),
+          }).toStrictEqual({ key: { id: 2 }, result: 3 });
+          const mutation = queryClient
+            .getMutationCache()
+            .build(queryClient, rpc.sensitive.mutationOptions());
+          expect(
+            yield* Effect.promise(async () => await mutation.execute({ id: 1 }))
+          ).toBe(2);
+          const input = prepareInput(rpc.stable, { id: 2 });
+          const configured = configureUtils(rpc.stable, {
+            query: { policy: { staleTime: 1000 } },
+          });
+          const options = configured.queryOptions({ input });
+          expect(options.queryKey).toStrictEqual(
+            rpc.stable.queryKey({ id: 2, locale: "en" })
+          );
+          const preparedResult = yield* Effect.promise(
+            async () => await queryClient.query(options)
+          );
+          const ordinaryResult = yield* Effect.promise(
+            async () =>
+              await queryClient.query(
+                rpc.stable.queryOptions({
+                  input: { id: 2, locale: "en" },
+                  staleTime: 0,
+                })
+              )
+          );
+          expect([preparedResult, ordinaryResult]).toStrictEqual([
+            "2:en",
+            "2:en",
+          ]);
+          expect(() => prepareInput(rpc.stable, { id: 1.5 })).toThrow(
+            expect.objectContaining({ code: "PayloadConstructionFailed" })
+          );
+        } finally {
+          queryClient.clear();
+        }
+      })
+  );
   it.effect("reuses preparation across views and rejects another owner", () =>
     Effect.gen(function* reusesPreparation() {
       const client = yield* makeRpcTestClient(group, handlers);
@@ -306,7 +387,7 @@ it.effect("reuses HTTP preparation for buffered and metadata views", () =>
         Effect.succeed(
           HttpClientResponse.fromWeb(
             request,
-            new Response("7", {
+            new Response(request.url.split("/").at(-1), {
               headers: { "content-type": "application/json" },
             })
           )
@@ -348,6 +429,9 @@ it.effect("reuses HTTP preparation for buffered and metadata views", () =>
       expect(metadata.data).toBe(7);
       expect(Object.isFrozen(metadata)).toBe(true);
       expect(encoded).toBe(1);
+      expect(http.users.read.queryKey(input)).toStrictEqual(
+        http.users.read.queryKey({ params: { id: 7 } })
+      );
     } finally {
       queryClient.clear();
     }

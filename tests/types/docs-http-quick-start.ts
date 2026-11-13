@@ -1,5 +1,9 @@
 import { MutationObserver, QueryClient } from "@tanstack/query-core";
-import { createHttpApiQueryUtils } from "@ueberbrot/effect-api-query";
+import {
+  configureUtils,
+  createHttpApiQueryUtils,
+  prepareInput,
+} from "@ueberbrot/effect-api-query";
 import { ManagedRuntime } from "effect";
 import { FetchHttpClient } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
@@ -25,6 +29,18 @@ try {
     })
   );
   console.log(user.name);
+
+  const read = configureUtils(http.users.get, {
+    query: { policy: { staleTime: 30_000 } },
+  });
+  const prepared = prepareInput(http.users.get, {
+    params: { id: 1 },
+    query: { locale: "en" },
+  });
+  const sameUser = await queryClient.query(
+    read.queryOptions({ input: prepared })
+  );
+  console.log(sameUser.name);
 
   const createUser = new MutationObserver(
     queryClient,

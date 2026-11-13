@@ -8,10 +8,10 @@ metadata:
     Derive typed TanStack Query keys and options from ready Effect RPC and HTTP clients, preserving cache identity, typed filters and execution policies, decoded query views, registered hydration codecs, stream recovery, native framework behavior, and application-owned resource lifetime.
   type: core
   library: "@ueberbrot/effect-api-query"
-  library_version: "0.6.0"
+  library_version: "0.6.1"
 sources:
   - "**/examples/contracts/src/*.ts"
-  - "**/examples/vite-react/src/workflows/*.ts*"
+  - "**/examples/shared/http-workflows/*.ts*"
   - "e2e/http-workflows.spec.ts"
   - "src/**/*.ts"
   - "tests/**/*.ts"
@@ -20,7 +20,7 @@ sources:
   - "**/examples/vite-react/src/lib/*.ts"
   - "**/examples/vite-react/src/main.tsx"
   - "**/examples/vite-react/src/app.tsx"
-  - "**/examples/vite-react/src/components/ui/effect-error-details.tsx"
+  - "**/examples/shared/ui/effect-error-details.tsx"
   - "**/examples/vite-react/tests/*.ts*"
   - "**/examples/tanstack-start/src/lib/*.ts"
   - "**/examples/tanstack-start/src/router.tsx"
@@ -41,6 +41,8 @@ sources:
   - "docs/adr/0015-*.md"
   - "docs/adr/002*.md"
   - "docs/adr/003*.md"
+  - "docs/adr/0040-*.md"
+  - "docs/adr/0042-*.md"
   - "**/apps/docs/src/content/docs/**/*.md"
   - "**/apps/docs/src/content/docs/**/*.mdx"
 ---
@@ -82,7 +84,7 @@ Read only the branch needed for the task:
 | Task | Read |
 | --- | --- |
 | Infer operation types, prepare repeated input, skip, paginate, batch history, consume events, or recover streams | [Query patterns](references/query-patterns.md) |
-| Reuse policies or interceptors, share equivalent decoded values, filter caches, apply writes or events, replace owners | [Cache workflows](references/cache-workflows.md) |
+| Reuse policies or interceptors, share equivalent decoded values, filter caches, compose cache operations in Effect, apply writes or events, replace owners | [Cache workflows](references/cache-workflows.md) |
 | Capture streams, register view codecs, hydrate, or dispose request work | [Hydration and SSR](references/hydration-and-ssr.md) |
 | Mount native providers, recover Suspense, choose a transport, host, or versions | [Frameworks and hosts](references/frameworks-and-hosts.md) |
 
@@ -99,6 +101,8 @@ Read only the branch needed for the task:
 Keep the client's Scope or ManagedRuntime alive through every operation that uses it. An RPC client returned from a completed `Effect.scoped` region is unusable. During client setup, create utilities and reuse them across component renders.
 
 If execution requires client or Schema services, pass a `runPromiseExit` runner that provides them. The runner must return an Effect `Exit` and forward the `signal` from its second argument. `runtime.runPromiseExit` has this shape. Service-free calls can use the factory default. A custom key encoder supplies cache identity. The runner still supplies execution services.
+
+For optional acquired/borrowed setup and precise query/mutation drains, read [query owner setup](references/cache-workflows.md#opt-in-to-query-owner-setup). Keep query-function interceptors as well as runner tracking for streams.
 
 Ordinary queries forward TanStack cancellation to Effect. For Suspense hooks, read the cancellation limitation in [frameworks and hosts](references/frameworks-and-hosts.md). Before disposing resources, stop consumers, cancel queries, and drain local streams, pending preparation, and accepted mutations. Native cancellation can settle before finalizers finish. `fetchStreamSnapshot` drains its own capture. Mutations receive no query abort signal. A cancellable command needs an application operation identified before work starts. Owner retirement leaves completed remote work intact.
 

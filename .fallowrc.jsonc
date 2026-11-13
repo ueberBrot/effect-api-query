@@ -2,6 +2,7 @@
   "$schema": "./node_modules/fallow/schema.json",
 
   "entry": [
+    "scripts/check-toolchain.mts",
     "scripts/check-effect-compatibility.mts",
     "scripts/measure-construction.mts",
     "scripts/measure-structural-sharing.mts",

@@ -12,6 +12,7 @@ import {
 import { Rpc, RpcGroup } from "effect/rpc";
 
 import {
+  configureUtils,
   createHttpApiQueryUtils,
   createRpcQueryUtils,
 } from "#effect-api-query";
@@ -124,7 +125,38 @@ describe.each(["rpc", "http"] as const)("publication adapter %s", (adapter) => {
           expect(options.queryKey).not.toStrictEqual(
             leaf.streamedKey({ maxChunks: "unbounded" })
           );
-          expect(options).not.toHaveProperty("publicationBatchSize");
+
+          publications.length = 0;
+          const configured = configureUtils(leaf, {
+            live: { policy: { coalesceMs: 100 } },
+          });
+          const live =
+            adapter === "rpc"
+              ? configureUtils(rpc.watch, {
+                  live: { policy: { coalesceMs: 100 } },
+                }).liveOptions()
+              : configureUtils(http.events.watch, {
+                  live: { policy: { coalesceMs: 100 } },
+                }).liveOptions();
+          expect({
+            key: live.queryKey,
+            configuredKey: configured.liveKey(),
+            result: yield* Effect.promise(async () =>
+              adapter === "rpc"
+                ? await queryClient.query(
+                    rpc.watch.liveOptions({ coalesceMs: 100 })
+                  )
+                : await queryClient.query(
+                    http.events.watch.liveOptions({ coalesceMs: 100 })
+                  )
+            ),
+            publications,
+          }).toStrictEqual({
+            key: leaf.liveKey({ coalesceMs: 100 }),
+            configuredKey: leaf.liveKey({ coalesceMs: 100 }),
+            result: 6,
+            publications: [1, 6],
+          });
         } finally {
           stop();
           queryClient.clear();

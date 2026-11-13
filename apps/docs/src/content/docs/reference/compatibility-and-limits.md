@@ -9,9 +9,9 @@ The package is ESM-only and targets ES2022. It declares Effect and Query Core as
 
 | Component | Declared requirement | Exact versions checked |
 | --- | --- | --- |
-| Effect | Library peer: `>=4.0.6 <4.2.0` | Coordinated runtime, testing, and Node platform packages: floor `4.0.6`, development `4.1.0` |
-| Query Core | Library peer: `>=5.104.4 <6` | `5.105.0` |
-| TypeScript | Public declarations: 5.9 or newer, with `strict: true` | `5.9.3` and `7.0.2` |
+| Effect | Library peer: `>=4.0.6 <4.2.0` | Coordinated runtime, testing, and Node platform packages: minimum `4.0.6`, 4.0 representative `4.0.7`, development `4.1.0`, 4.1 representative `4.1.2` |
+| Query Core | Library peer: `>=5.104.4 <6` | `5.104.4` and `5.105.0` |
+| TypeScript | Public declarations: 5.9 through reviewed 7.1 beta, with `strict: true` | `5.9.3` and Effect-enhanced TSRS `0.21.0` (TypeScript `7.1.0-beta`) |
 | React and React Query | React Query peer: React `^18 \|\| ^19` | React `19.3.1`, React Query `5.105.0` |
 | Vue and Vue Query | Vue Query peer: Vue `^2.6.0 \|\| ^3.3.0` | Vue `3.5.44`, Vue Query `5.105.0` |
 | Solid and Solid Query | Solid Query peer: Solid `^1.6.0` | Solid `1.9.18`, Solid Query `5.105.0` |
@@ -24,7 +24,7 @@ Vue Query also declares an optional `@vue/composition-api` peer of `^1.1.2` for 
 
 The application examples also use TanStack Start `1.169.4`, TanStack Router `1.170.46`, and Router SSR Query `1.167.3`.
 
-The stable Effect release contains unstable RPC and HTTP API modules. Keep the application's Effect packages coordinated within the peer range. The packed-consumer check runs public compiler fixtures and focused RPC/HTTP execution, cancellation, and hydration checks at the floor and current development release. It does not test every intermediate patch or establish support for future Effect minors. See [Compatibility and Stability](/effect-api-query/getting-started/compatibility-and-stability/).
+The stable Effect release contains unstable RPC and HTTP API modules. Keep the application's Effect packages coordinated within the peer range. The packed-consumer check runs public compiler fixtures and focused RPC/HTTP execution, cancellation, and hydration checks for Effect `4.0.6`, `4.0.7`, `4.1.0` and `4.1.2`, each with Query Core `5.104.4` and `5.105.0`. All eight combinations run both pinned compilers; native framework/build evidence in this reference remains scoped to the development combination. It does not test every intermediate patch or establish support for future Effect minors. See [Compatibility and Stability](/effect-api-query/getting-started/compatibility-and-stability/).
 
 Generated Core options support native reactive accessors and retain each framework's hook overloads. The Vue, Solid, Svelte, and Angular combinations above are checked for native hook inference in TypeScript consumer modules. These checks use both listed TypeScript versions. Framework component compilers and application builds have their own tooling requirements. See [Vue Query](/effect-api-query/guides/vue-query/), [Solid Query](/effect-api-query/guides/solid-query/), [Svelte Query](/effect-api-query/guides/svelte-query/), and [Angular Query](/effect-api-query/guides/angular-query/) for option rebuilding, compiler resolution, hook overloads, and resource ownership.
 

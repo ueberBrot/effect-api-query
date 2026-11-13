@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
-import { ActionButton } from "../components/ui/action-button.tsx";
-import { EffectErrorDetails } from "../components/ui/effect-error-details.tsx";
+import { ActionButton } from "../ui/action-button.tsx";
+import { EffectErrorDetails } from "../ui/effect-error-details.tsx";
 import type { HttpWorkflows } from "./application.ts";
 
 export const StreamsExample = ({
@@ -47,7 +47,7 @@ export const StreamsExample = ({
       <p>
         Both formats carry the same eight decoded updates. History retains four
         values and publishes batches of three or after 180 ms. The latest-value
-        view updates on each event.
+        view publishes immediately, then coalesces updates for 250 ms.
       </p>
       <label className="grid gap-1">
         HTTP stream format

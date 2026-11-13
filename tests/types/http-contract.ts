@@ -18,6 +18,8 @@ import {
 } from "@tanstack/react-query";
 import {
   createHttpApiQueryUtils,
+  configureUtils,
+  defineUtilsPolicy,
   EffectHttpApiQueryError,
   type CreateHttpApiQueryUtilsOptions,
   type EffectHttpApiQueryConfigErrorCode,
@@ -1973,3 +1975,43 @@ getUser.infiniteOptions({
   // @ts-expect-error QueryClient defaults own hashing.
   queryKeyHashFn: JSON.stringify,
 });
+
+const httpPolicy = defineUtilsPolicy<
+  HttpApiQueryUtils<typeof api, typeof prefix>
+>()({
+  scoped: {
+    "user.accounts": {
+      scoped: {
+        "get.user": {
+          metadata: {
+            interceptors: [
+              async ({ next }) => {
+                const result = await next();
+                result.data.id satisfies number;
+                result.status satisfies number;
+                // @ts-expect-error Metadata data retains its decoded shape.
+                result.data satisfies string;
+                return result;
+              },
+            ],
+          },
+          mutation: {
+            policy: {
+              onSuccess: (data, variables) => {
+                data.id satisfies number;
+                variables.params.id satisfies number;
+                // @ts-expect-error Variables retain decoded request parts.
+                variables.id;
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+});
+configureUtils(utils, httpPolicy);
+// @ts-expect-error HTTP policy scopes use literal group identifiers.
+defineUtilsPolicy<typeof utils>()({ scoped: { users: {} } });
+// @ts-expect-error A buffered HTTP leaf does not support a live view.
+defineUtilsPolicy<(typeof utils)["user.accounts"]["get.user"]>()({ live: {} });

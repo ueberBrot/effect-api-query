@@ -1,6 +1,6 @@
 library:
   name: "@ueberbrot/effect-api-query"
-  version: 0.6.0
+  version: 0.6.1
 generated_from:
   domain_map: _artifacts/domain_map.yaml
   skill_spec: _artifacts/skill_spec.md
@@ -19,7 +19,7 @@ skills:
     description: "Use when integrating effect-api-query with ready Effect RPC or HttpApi clients: derive TanStack Query keys and options, select views or pagination, reuse policies or intercept execution, filter caches, recover streams, or prepare SSR hydration. Also use to diagnose execution errors, cancellation, or client lifetime, and to rebuild native framework options from reactive input."
     sources:
       - "**/examples/contracts/src/*.ts"
-      - "**/examples/vite-react/src/workflows/*.ts*"
+      - "**/examples/shared/http-workflows/*.ts*"
       - e2e/http-workflows.spec.ts
       - src/**/*.ts
       - tests/**/*.ts
@@ -28,7 +28,7 @@ skills:
       - "**/examples/vite-react/src/lib/*.ts"
       - "**/examples/vite-react/src/main.tsx"
       - "**/examples/vite-react/src/app.tsx"
-      - "**/examples/vite-react/src/components/ui/effect-error-details.tsx"
+      - "**/examples/shared/ui/effect-error-details.tsx"
       - "**/examples/vite-react/tests/*.ts*"
       - "**/examples/tanstack-start/src/lib/*.ts"
       - "**/examples/tanstack-start/src/router.tsx"
@@ -49,6 +49,8 @@ skills:
       - docs/adr/0015-*.md
       - docs/adr/002*.md
       - docs/adr/003*.md
+      - docs/adr/0040-*.md
+      - docs/adr/0042-*.md
       - "**/apps/docs/src/content/docs/**/*.md"
       - "**/apps/docs/src/content/docs/**/*.mdx"
     requires: []

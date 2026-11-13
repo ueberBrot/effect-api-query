@@ -1,4 +1,10 @@
 import type { User } from "@effect-api-query/contracts";
+import { ActionButton } from "@effect-api-query/shared/ui/action-button.tsx";
+import { EffectErrorDetails } from "@effect-api-query/shared/ui/effect-error-details.tsx";
+import {
+  describeSlowQueryCancellation,
+  useSlowQueryCancellation,
+} from "@effect-api-query/shared/use-slow-query-cancellation.ts";
 import {
   skipToken,
   useInfiniteQuery,
@@ -8,13 +14,7 @@ import {
 import { useState } from "react";
 import type { SubmitEvent } from "react";
 
-import {
-  describeSlowQueryCancellation,
-  useSlowQueryCancellation,
-} from "../../../../shared/use-slow-query-cancellation.ts";
 import type { ViteReactApplication } from "../../lib/application.ts";
-import { ActionButton } from "../ui/action-button.tsx";
-import { EffectErrorDetails } from "../ui/effect-error-details.tsx";
 
 const HttpSelectionResult = ({
   selectedId,

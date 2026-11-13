@@ -49,6 +49,9 @@ const syntaxNodes = (
 
 describe("documentation excerpts", () => {
   it.each([
+    ["guides/loader-descriptors", ["tests/types/docs-loader-descriptors.tsx"]],
+    ["guides/query-effects", ["examples/shared/query-effects"]],
+    ["guides/scoped-event-cache", ["examples/shared/query-events"]],
     [
       "README.md",
       [
@@ -89,7 +92,10 @@ describe("documentation excerpts", () => {
         "tests/types/docs-stream-tracing",
       ],
     ],
-    ["guides/query-defaults", ["tests/types/docs-policies"]],
+    [
+      "guides/query-defaults",
+      ["tests/types/docs-policies", "examples/shared/application-policy"],
+    ],
     [
       "guides/share-decoded-values",
       [

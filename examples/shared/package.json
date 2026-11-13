@@ -1,0 +1,21 @@
+{
+  "name": "@effect-api-query/shared",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./*": "./*"
+  },
+  "dependencies": {
+    "@effect-api-query/contracts": "workspace:*",
+    "@tanstack/query-core": "catalog:",
+    "@tanstack/react-query": "catalog:",
+    "@ueberbrot/effect-api-query": "workspace:*",
+    "effect": "catalog:",
+    "react": "catalog:"
+  },
+  "devDependencies": {
+    "@types/react": "catalog:",
+    "tailwindcss": "catalog:"
+  }
+}

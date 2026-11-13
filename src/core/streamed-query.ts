@@ -1,4 +1,3 @@
-import { experimental_streamedQuery } from "@tanstack/query-core";
 import type { QueryFunctionContext } from "@tanstack/query-core";
 import {
   Cause,
@@ -12,7 +11,10 @@ import {
 } from "effect";
 
 import { validateStreamHash } from "./stream-hash-index";
-import { streamPublicationBatches } from "./stream-publication";
+import {
+  streamLiveSnapshots,
+  streamPublicationBatches,
+} from "./stream-publication";
 import type { RunPromiseExit, StreamRefetchMode } from "./types";
 
 export type StreamQueryPolicy =
@@ -23,12 +25,16 @@ export type StreamQueryPolicy =
       readonly publicationBatchSize: number;
       readonly publicationMaxWaitMs: number | undefined;
     }
-  | { readonly _tag: "Live" };
+  | { readonly _tag: "Live"; readonly coalesceMs: number | undefined };
 
 // oxlint-disable-next-line anti-slop/no-unknown-parameters
 const validatePublicationDeadline: (
-  value: unknown
-) => asserts value is number | undefined = (publicationMaxWaitMs) => {
+  value: unknown,
+  option?: string
+) => asserts value is number | undefined = (
+  publicationMaxWaitMs,
+  option = "publicationMaxWaitMs"
+) => {
   if (
     publicationMaxWaitMs !== undefined &&
     (!Predicate.isNumber(publicationMaxWaitMs) ||
@@ -36,9 +42,7 @@ const validatePublicationDeadline: (
       publicationMaxWaitMs <= 0 ||
       publicationMaxWaitMs > 2_147_483_647)
   ) {
-    throw new RangeError(
-      "publicationMaxWaitMs must be an integer from 1 to 2147483647"
-    );
+    throw new RangeError(`${option} must be an integer from 1 to 2147483647`);
   }
 };
 
@@ -98,27 +102,35 @@ export const prepareStreamPolicy = (
       publicationMaxWaitMs,
     };
   } else {
-    policy = { _tag: "Live" };
+    validatePublicationDeadline(options["coalesceMs"], "coalesceMs");
+    policy = { _tag: "Live", coalesceMs: options["coalesceMs"] };
   }
+  delete options["coalesceMs"];
   delete options["refetchMode"];
   delete options["maxChunks"];
   delete options["publicationBatchSize"];
   delete options["publicationMaxWaitMs"];
+  if (policy._tag === "Live") {
+    return {
+      policy,
+      history:
+        policy.coalesceMs === undefined
+          ? undefined
+          : { coalesceMs: policy.coalesceMs },
+    };
+  }
   return {
     policy,
-    history:
-      policy._tag === "Live"
+    history: {
+      maxChunks: policy.maxChunks ?? null,
+      refetchMode: policy.refetchMode,
+      ...(policy.publicationBatchSize === 1
         ? undefined
-        : {
-            maxChunks: policy.maxChunks ?? null,
-            refetchMode: policy.refetchMode,
-            ...(policy.publicationBatchSize === 1
-              ? undefined
-              : { publicationBatchSize: policy.publicationBatchSize }),
-            ...(policy.publicationMaxWaitMs === undefined
-              ? undefined
-              : { publicationMaxWaitMs: policy.publicationMaxWaitMs }),
-          },
+        : { publicationBatchSize: policy.publicationBatchSize }),
+      ...(policy.publicationMaxWaitMs === undefined
+        ? undefined
+        : { publicationMaxWaitMs: policy.publicationMaxWaitMs }),
+    },
   };
 };
 
@@ -197,6 +209,38 @@ const streamQueryIterable = <A>(
   },
 });
 
+// Query Core owns fetch/retry/observer state; this consumer owns stream publication.
+const consumeQueryStream = async <A, Data>(
+  context: QueryFunctionContext,
+  stream: AsyncIterable<A>,
+  initialValue: Data,
+  reducer: (previous: Data, value: A) => Data,
+  replace: boolean
+): Promise<Data> => {
+  const { client, queryKey, signal } = context;
+  let result = initialValue;
+  for await (const value of stream) {
+    if (signal.aborted) {
+      break;
+    }
+    if (replace) {
+      result = reducer(result, value);
+    } else {
+      client.setQueryData<Data>(queryKey, (previous) =>
+        // Cached null is a value, not an absent entry.
+        // oxlint-disable-next-line typescript/prefer-nullish-coalescing
+        reducer(previous === undefined ? initialValue : previous, value)
+      );
+    }
+  }
+  if (replace && !signal.aborted) {
+    client.setQueryData<Data>(queryKey, result);
+  }
+  const data = client.getQueryData<Data>(queryKey);
+  // oxlint-disable-next-line typescript/prefer-nullish-coalescing
+  return data === undefined ? initialValue : data;
+};
+
 export const makeStreamQuery = ({
   policy,
   source,
@@ -259,16 +303,26 @@ export const makeStreamQuery = ({
   };
 
   if (policy._tag === "Live") {
-    const queryFn = experimental_streamedQuery({
-      initialValue: null,
-      // oxlint-disable-next-line anti-slop/no-unknown-parameters
-      reducer: (_latest: unknown, value: unknown) =>
-        value === undefined ? null : value,
-      streamFn,
-    });
     return async (context: QueryFunctionContext) => {
-      validateHash(context);
-      return await queryFn(context);
+      const query = validateHash(context);
+      if (query?.isFetched() === true) {
+        query.setState({ ...query.resetState, fetchStatus: "fetching" });
+      }
+      return await consumeQueryStream(
+        context,
+        policy.coalesceMs === undefined
+          ? await streamFn(context)
+          : streamLiveSnapshots(
+              await streamFn(context),
+              context.signal,
+              policy.coalesceMs
+            ),
+        null,
+        // oxlint-disable-next-line anti-slop/no-unknown-parameters
+        (_latest: unknown, value: unknown) =>
+          value === undefined ? null : value,
+        false
+      );
     };
   }
 
@@ -276,12 +330,23 @@ export const makeStreamQuery = ({
     policy;
   return async (context: QueryFunctionContext) => {
     const query = validateHash(context);
-    const reset = refetchMode === "reset" && query?.isFetched() === true;
+    const isRefetch = query?.isFetched() === true;
+    const reset = refetchMode === "reset" && isRefetch;
+    if (reset) {
+      query.setState({ ...query.resetState, fetchStatus: "fetching" });
+    }
     let emitted = false;
     const initialValue: unknown[] = [];
-    const queryFn = experimental_streamedQuery({
+    const result = await consumeQueryStream(
+      context,
+      streamPublicationBatches(
+        await streamFn(context),
+        publicationBatchSize,
+        context.signal,
+        publicationMaxWaitMs
+      ),
       initialValue,
-      reducer: (values: unknown[], batch: readonly unknown[]) => {
+      (values: unknown[], batch: readonly unknown[]) => {
         const history = reset && !emitted ? [] : values;
         emitted = true;
         if (maxChunks === undefined) {
@@ -302,16 +367,8 @@ export const makeStreamQuery = ({
         }
         return next;
       },
-      refetchMode,
-      streamFn: async (streamContext) =>
-        streamPublicationBatches(
-          await streamFn(streamContext),
-          publicationBatchSize,
-          streamContext.signal,
-          publicationMaxWaitMs
-        ),
-    });
-    const result = await queryFn(context);
+      isRefetch && refetchMode === "replace"
+    );
     return reset && !emitted ? [] : result;
   };
 };

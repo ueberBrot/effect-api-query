@@ -7,7 +7,9 @@ description: Understand RPC payload defaults, decoded HTTP inputs, and undefined
 
 A payload-bearing query constructs and normalizes its payload before it builds the key. The ready RPC client constructs that value again during execution. The payload Schema must therefore be query-stable: construction must preserve every field that affects the RPC result when repeated. Constructor defaults affect both execution and cache identity.
 
-Inputs that normalize to the same payload share a cache entry. Custom key encoders also receive the normalized payload.
+Inputs that normalize to the same payload share a cache entry. Custom key encoders also receive the normalized payload. Defaults must be deterministic across independently built options; supply time-dependent or random values explicitly.
+
+A constructor that increments an existing `id` illustrates the restriction: preparation turns `1` into `2`, then a ready client reconstructs `2` as `3`. Preparation has succeeded, but the key no longer describes execution. A custom encoder or prepared handle cannot fix this. Expose a stable struct-shaped query-facing RPC and move the domain conversion into its handler. Mutations pass the original constructor input to the ready client and remain suitable for constructor-sensitive operations. The existing ready-client boundary supports this path without a separate decoded execution API.
 
 ## Decoded HTTP inputs
 
@@ -20,6 +22,10 @@ Every declared request container remains required, even when its fields are opti
 Query options retain the normalized RPC payload or decoded HTTP request for later execution. Keep the retained input and any nested mutable values unchanged while the options can run. When input changes, create new input and options. Do not modify the captured values.
 
 Canonical keys copy and deeply freeze the encoded identity. They do not clone or freeze arbitrary execution inputs or decoded query data. RPC construction can retain nested values from the caller. HTTP preparation retains the decoded request. In reactive frameworks, rebuild options inside the framework's computed value or accessor.
+
+Prepared inputs retain the same execution values and immutable canonical identity. Configured copies of a leaf share its owner; another leaf or tree cannot accept the handle. Handles are process-local, cannot be serialized for hydration, and cannot cross server/browser owners. Transfer data through hydration codecs and prepare new input on the receiving owner.
+
+Construction, encoding, and canonicalization failures throw synchronously during ordinary or prepared key creation. RPC construction failures use `PayloadConstructionFailed`; encoding and custom encoder failures keep their distinct key-error codes. Execution failures occur later through the runner and preserve their Effect Cause. Preparation does not acquire or dispose the ready client.
 
 ## No-content and undefined query results
 

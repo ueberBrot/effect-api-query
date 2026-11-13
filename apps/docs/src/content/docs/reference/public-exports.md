@@ -7,11 +7,15 @@ The package root, `@ueberbrot/effect-api-query`, exports all supported values an
 
 | Export | Purpose |
 | --- | --- |
+| `queryEffects`, `QueryClientService` | Compose native cache operations in Effect with the existing application QueryClient. |
+| `QueryClientOperationError` | Retains exact native rejections, including execution wrappers, as an unknown cause. |
+| `acquireQueryOwner`, `QueryOwner`, `QueryOwnerSetup` | Opt in to acquired/borrowed resource setup, guarded cache callbacks and local query/mutation retirement. |
 | `configureUtils` | Configure policies and ordered interceptors on a tree, branch, or leaf. |
 | `UtilsConfiguration`, `ConfiguredUtils` | Type scoped configuration and the configured utility tree. |
 | `createBranchQueryFilter` | Select one view across all descendant leaves. |
 | `prepareInput`, `PreparedInput` | Reuse owner-bound input preparation explicitly. |
 | `findDeclaredError` | Match one tagged typed failure without flattening its Cause. |
+| `runQueryEvents` | Run sequential event handlers and recovery against a retiring query owner’s native cache. |
 | `consumeEvents`, `ConsumeEventsOptions` | Consume events sequentially with start and exit callbacks. |
 | `createRpcQueryUtils` | Builds the RPC utility tree. |
 | `viewPrefix` | Selects every input of one supported leaf view. |
@@ -23,7 +27,7 @@ The package root, `@ueberbrot/effect-api-query`, exports all supported values an
 | `createHydrationRegistry`, `hydrationCallbacks` | Prepare heterogeneous snapshots or one view with native serialization callbacks. |
 | `HydrationCodec`, `HydrationRegistry`, `HydrationCodecError` | Type codec registration, snapshot preparation, and registration failures. |
 | `recoverStream` | Reconnect a decoded stream with application-supplied cursor and recovery policy. |
-| `RecoverStreamOptions`, `StreamConnectionState` | Type recovery hooks and local connection states. |
+| `RecoverStreamOptions`, `StreamConnectionState`, `StreamCursorPolicy` | Type recovery hooks and local connection states. |
 | `QueryPolicy`, `MutationPolicy` | Types for reusable native policies specific to a leaf. |
 | `InferInput` | Derives operation input from a generated leaf. |
 | `InferQueryData`, `InferQueryError` | Derive cached data and failures for a supported query view. |
@@ -94,3 +98,11 @@ Policies apply from tree to branch to leaf, followed by call-site options. Expli
 See [Defaults and Policies](/effect-api-query/guides/query-defaults/) for typed examples, callback composition, and precedence.
 
 See [Cache Keys and Filters](/effect-api-query/guides/cache-filters/) for partial projections, [Defaults and Policies](/effect-api-query/guides/query-defaults/) for composition and interception, and [Hydrate Query Views](/effect-api-query/guides/hydrate-query-views/) for codec registration.
+
+## QueryClient operations in Effect
+
+[Compose QueryClient Operations in Effect](/effect-api-query/guides/query-effects/) covers typed cache reads, ensure/fetch, updates, generated filters, error channels, and interruption of one waiter without cancelling shared work.
+
+## Loader selections
+
+`createQueryDescriptor` registers one generated leaf and view for typed capture and receiving-owner rebinding. `QueryDescriptor` describes the transferable selection; `QueryDescriptorError` reports synchronous malformed, compatibility, input and semantic identity failures. See [Transfer Loader Selections](/effect-api-query/guides/loader-descriptors/) for the complete native hydration example.

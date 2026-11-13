@@ -1,13 +1,12 @@
 // @vitest-environment jsdom
 
 import type { DiagnosticStatus } from "@effect-api-query/contracts";
+import { useSlowQueryCancellation } from "@effect-api-query/shared/use-slow-query-cancellation.ts";
 import { QueryClient } from "@tanstack/react-query";
 import type { QueryFunctionContext } from "@tanstack/react-query";
 import { act, cleanup, renderHook, waitFor } from "@testing-library/react";
 import { Deferred, Effect } from "effect";
 import { afterEach, describe, expect, it } from "vite-plus/test";
-
-import { useSlowQueryCancellation } from "../../shared/use-slow-query-cancellation.ts";
 
 interface SlowInput {
   readonly durationMs: number;

@@ -178,6 +178,14 @@ export default defineConfig({
                   slug: "guides/optimistic-writes",
                 },
                 {
+                  label: "QueryClient in Effect",
+                  slug: "guides/query-effects",
+                },
+                {
+                  label: "Scoped Event Cache",
+                  slug: "guides/scoped-event-cache",
+                },
+                {
                   label: "Refresh from Events",
                   slug: "guides/refresh-from-events",
                 },
@@ -268,6 +276,10 @@ export default defineConfig({
                 {
                   label: "Hydrate Query Views",
                   slug: "guides/hydrate-query-views",
+                },
+                {
+                  label: "Transfer Loader Selections",
+                  slug: "guides/loader-descriptors",
                 },
                 {
                   label: "Stream Snapshots",

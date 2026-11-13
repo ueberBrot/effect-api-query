@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@effect-api-query/contracts": "workspace:*",
+    "@effect-api-query/shared": "workspace:*",
     "@tanstack/react-query": "catalog:",
     "@ueberbrot/effect-api-query": "workspace:*",
     "effect": "catalog:",

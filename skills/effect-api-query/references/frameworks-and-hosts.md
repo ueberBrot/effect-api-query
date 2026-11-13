@@ -71,7 +71,7 @@ For ordinary Query hooks and observers, removing the last observer cancels abort
 
 ## Mount a provider and recover Suspense
 
-For runnable HTTP setup, streams, uploads, typed errors, sharing, and recovery, use [HTTP Workflows](https://ueberbrot.github.io/effect-api-query/examples/http-workflows/).
+Both example apps run the HTTP workflows. Start mounts the browser-owned workflow separately from its request owner, and its featured-user loader transfers a descriptor for rebinding before the native query hook reads hydrated data. For runnable HTTP setup, streams, uploads, typed errors, sharing, and recovery, use [HTTP Workflows](https://ueberbrot.github.io/effect-api-query/examples/http-workflows/).
 
 For a first React integration, acquire one client. Create the utility tree and QueryClient once, then mount `QueryClientProvider`. Before disposing the application's client resources, unmount consumers. For one acquired HTTP client, one component, and an awaited cleanup function, use [the React client setup](https://ueberbrot.github.io/effect-api-query/guides/react-query/#acquire-and-mount-the-client).
 
@@ -83,7 +83,13 @@ For independent reads that need to start together, pass generated options direct
 
 Before selecting or upgrading dependencies, read [Requirements and tested integrations](https://ueberbrot.github.io/effect-api-query/reference/compatibility-and-limits/#requirements-and-tested-integrations). Distinguish the library's peers, the listed wrapper's framework peers, and the exact checked combination. Native TypeScript hook-inference checks establish consumer types; use component compilers and build tooling supported by the framework.
 
-Keep Effect runtime, testing, and platform packages on a coordinated release within the installed package's peer range. Exact development pins are separate from consumer peers. The package checks its supported Effect floor and current development release rather than every intermediate patch; future Effect minors require another review. A newly required API, type contract, or correctness fix raises the minimum; otherwise support widens only after compatibility checks. Supporting an older release does not backport upstream transport fixes. Pin Query packages to the checked versions and keep each native wrapper on the application's resolved Query Core. Keep Angular core, common, compiler, and platform-browser on the same release.
+Keep Effect runtime, testing, and platform packages on a coordinated release within the installed package's peer range. Exact development pins are separate from consumer peers. The repository uses Effect-enhanced TSRS targeting TypeScript 7.1 beta; consumers retain TypeScript 5.9 support and use their framework’s supported compiler tooling.
+
+The packed matrix checks Effect 4.0.6, 4.0.7, 4.1.0 and 4.1.2 with Query Core 5.104.4 and 5.105.0, using TSRS and TypeScript 5.9.3. These exact combinations are evidence within the supported ranges, not exhaustive patch coverage. Review future Effect minors and TypeScript majors explicitly.
+
+Before 1.0, breaking contracts and supported dependency or compiler drops are minor changes, as are additive capabilities and verified range extensions. Compatible fixes and internal tooling changes are patch changes. A required API, type contract or correctness fix can require raising the minimum. Extend support only after compatibility checks. Supporting older releases does not backport upstream transport fixes.
+
+Pin Query packages to the checked versions and keep each native wrapper on the application's resolved Query Core. Keep Angular core, common, compiler, and platform-browser on the same release.
 
 Check the website's header version before applying its examples. When it differs from the installed package, use that package's declarations and shipped guidance. The repository's `main` branch can contain unreleased behavior.
 
@@ -100,3 +106,5 @@ The application owns the transport and host resources in each integration:
 The factories preserve the ready client's actual execution contract. They supply no transport batching, platform services, or framework providers. Error guards use same-realm `instanceof`. Across realms, explicitly transfer safe error DTOs.
 
 Sources: [Vue Query](https://ueberbrot.github.io/effect-api-query/guides/vue-query/), [Solid Query](https://ueberbrot.github.io/effect-api-query/guides/solid-query/), [Svelte Query](https://ueberbrot.github.io/effect-api-query/guides/svelte-query/), [Angular Query](https://ueberbrot.github.io/effect-api-query/guides/angular-query/), [host boundaries](https://ueberbrot.github.io/effect-api-query/reference/browser-and-worker-hosts/), [WebSocket clients](https://ueberbrot.github.io/effect-api-query/guides/websocket-clients/).
+
+For optional acquired/borrowed setup with native providers, read [query owner setup](cache-workflows.md#opt-in-to-query-owner-setup). It preserves native hooks and reactive option rebuilding. For tagged declared errors and full Cause inspection, use [failure handling](https://ueberbrot.github.io/effect-api-query/guides/handle-failures/); choose [one retry owner](https://ueberbrot.github.io/effect-api-query/guides/retry-queries/), and use [native Suspense reset and recovery](https://ueberbrot.github.io/effect-api-query/guides/suspense-and-recovery/) for initial rendering failures.

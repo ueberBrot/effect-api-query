@@ -74,6 +74,15 @@ export type OwnedMutationOption = "mutationFn" | "mutationKey";
 
 export type StreamRefetchMode = "append" | "replace" | "reset";
 
+export type LivePolicyOptions = {
+  /**
+   * Publish the first snapshot immediately. The first pending snapshot starts a fixed
+   * timer in milliseconds; replacements do not restart it. Publish the latest pending
+   * snapshot when the timer runs. Event-loop scheduling can delay publication.
+   */
+  readonly coalesceMs?: number | undefined;
+};
+
 export type StreamedPolicyOptions = {
   /** Controls whether a refetch clears, appends to, or replaces accumulated data. */
   readonly refetchMode?: StreamRefetchMode | undefined;

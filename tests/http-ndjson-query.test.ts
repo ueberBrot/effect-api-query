@@ -503,3 +503,74 @@ it.effect("caches decoded NDJSON records in accumulated and live views", () =>
     }
   })
 );
+
+it.effect(
+  "coalesces configured NDJSON snapshots with local key policy overrides",
+  () =>
+    Effect.gen(function* configuredNdjsonCoalescing() {
+      const client = yield* makeClient(() =>
+        ndjson(['{"id":"1"}\n{"id":"2"}\n{"id":"3"}\n'])
+      );
+      const http = createHttpApiQueryUtils(api, {
+        client,
+        keyPrefix: ["coalesced"],
+      });
+      const leaf = http.records.watch;
+      const configured = configureUtils(leaf, {
+        live: { policy: { coalesceMs: 1000 } },
+      });
+      const input = { query: { channel: "news" } };
+      const queryClient = new QueryClient();
+      const publications: unknown[] = [];
+      const stop = queryClient.getQueryCache().subscribe((event) => {
+        if (
+          event.type === "updated" &&
+          event.action.type === "success" &&
+          event.action.manual === true
+        ) {
+          publications.push(event.query.state.data);
+        }
+      });
+      try {
+        const options = configured.liveOptions({ input });
+        const result = yield* Effect.promise(
+          async () => await queryClient.query(options)
+        );
+        expect({
+          key: options.queryKey,
+          configuredKey: configured.liveKey(input),
+          result,
+          publications,
+          cached: queryClient.getQueryData(configured.liveKey(input)),
+        }).toStrictEqual({
+          key: leaf.liveKey(input, { coalesceMs: 1000 }),
+          configuredKey: leaf.liveKey(input, { coalesceMs: 1000 }),
+          result: { id: 3 },
+          publications: [{ id: 1 }, { id: 3 }],
+          cached: { id: 3 },
+        });
+        expect(options.queryKey).not.toStrictEqual(leaf.liveKey(input));
+        publications.length = 0;
+        const local = configured.liveOptions({ input, coalesceMs: undefined });
+        const localResult = yield* Effect.promise(
+          async () => await queryClient.query(local)
+        );
+        expect({
+          key: local.queryKey,
+          configuredKey: configured.liveKey(input, { coalesceMs: undefined }),
+          result: localResult,
+          publications,
+          original: queryClient.getQueryData(options.queryKey),
+        }).toStrictEqual({
+          key: leaf.liveKey(input),
+          configuredKey: leaf.liveKey(input),
+          result: { id: 3 },
+          publications: [{ id: 1 }, { id: 2 }, { id: 3 }],
+          original: { id: 3 },
+        });
+      } finally {
+        stop();
+        queryClient.clear();
+      }
+    })
+);

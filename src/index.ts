@@ -31,6 +31,7 @@ export { recoverStream } from "./core/stream-recovery";
 export type {
   RecoverStreamOptions,
   StreamConnectionState,
+  StreamCursorPolicy,
 } from "./core/stream-recovery";
 export type {
   InferInput,
@@ -81,7 +82,7 @@ export type {
 /** The type of Query Core's exact skip sentinel. @api public */
 export type { SkipToken } from "@tanstack/query-core";
 
-export { configureUtils } from "./core/configure-utils";
+export { configureUtils, defineUtilsPolicy } from "./core/configure-utils";
 export type {
   ConfiguredUtils,
   UtilsConfiguration,
@@ -92,3 +93,22 @@ export { prepareInput } from "./core/prepared-input";
 export type { PreparedInput } from "./core/prepared-input";
 export { consumeEvents } from "./core/consume-events";
 export type { ConsumeEventsOptions } from "./core/consume-events";
+
+export {
+  queryEffects,
+  QueryClientService,
+  QueryClientOperationError,
+} from "./core/query-effects";
+
+export { schemaStructuralSharing } from "./core/schema-structural-sharing";
+export type { SchemaStructuralSharingOptions } from "./core/schema-structural-sharing";
+export { acquireQueryOwner } from "./core/query-owner";
+export type { QueryOwner, QueryOwnerSetup } from "./core/query-owner";
+
+export {
+  createQueryDescriptor,
+  QueryDescriptorError,
+} from "./core/query-descriptor";
+export type { QueryDescriptor } from "./core/query-descriptor";
+
+export { runQueryEvents } from "./core/query-events";

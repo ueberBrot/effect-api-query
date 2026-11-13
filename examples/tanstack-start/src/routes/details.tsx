@@ -2,13 +2,14 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { PageLayout, Panel } from "../components/page-layout.tsx";
-
-const featuredUserInput = { id: 1 } as const;
+import { featuredUserDescriptor } from "../lib/featured-user.ts";
 
 const FeaturedUserPage = () => {
   const { rpcQuery } = Route.useRouteContext();
+  const selection = Route.useLoaderData();
+  const bound = featuredUserDescriptor(rpcQuery).bind(selection);
   const featured = useSuspenseQuery(
-    rpcQuery.users.get.queryOptions({ input: featuredUserInput })
+    bound.leaf.queryOptions({ input: bound.input })
   );
 
   return (
@@ -30,9 +31,13 @@ const FeaturedUserPage = () => {
 export const Route = createFileRoute("/details")({
   component: FeaturedUserPage,
   loader: async ({ context }) => {
+    const descriptor = featuredUserDescriptor(context.rpcQuery);
+    const selection = descriptor.capture({ id: 1 });
+    const bound = descriptor.bind(selection);
     await context.queryClient.query({
-      ...context.rpcQuery.users.get.queryOptions({ input: featuredUserInput }),
+      ...bound.leaf.queryOptions({ input: bound.input }),
       staleTime: "static",
     });
+    return selection;
   },
 });

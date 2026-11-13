@@ -1,5 +1,9 @@
 import { MutationObserver, QueryClient } from "@tanstack/query-core";
-import { createRpcQueryUtils } from "@ueberbrot/effect-api-query";
+import {
+  configureUtils,
+  createRpcQueryUtils,
+  prepareInput,
+} from "@ueberbrot/effect-api-query";
 import { Effect, Exit, Layer, Scope } from "effect";
 import { FetchHttpClient } from "effect/http";
 import { RpcClient, RpcSerialization } from "effect/rpc";
@@ -31,6 +35,15 @@ try {
     rpc.users.get.queryOptions({ input: { id: 1 } })
   );
   console.log(user.name);
+
+  const read = configureUtils(rpc.users.get, {
+    query: { policy: { staleTime: 30_000 } },
+  });
+  const prepared = prepareInput(rpc.users.get, { id: 1 });
+  const sameUser = await queryClient.query(
+    read.queryOptions({ input: prepared })
+  );
+  console.log(sameUser.name);
 
   const createUser = new MutationObserver(
     queryClient,

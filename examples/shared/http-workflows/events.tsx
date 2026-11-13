@@ -1,9 +1,10 @@
 import { FeedScenario } from "@effect-api-query/contracts";
+import { useQuery } from "@tanstack/react-query";
 import { Schema } from "effect";
 import { useEffect, useState } from "react";
 
-import { ActionButton } from "../components/ui/action-button.tsx";
-import { EffectErrorDetails } from "../components/ui/effect-error-details.tsx";
+import { ActionButton } from "../ui/action-button.tsx";
+import { EffectErrorDetails } from "../ui/effect-error-details.tsx";
 import type { HttpWorkflows } from "./application.ts";
 import { recoveredEvents } from "./recovery.ts";
 
@@ -12,6 +13,7 @@ export const EventsExample = ({
 }: {
   readonly application: HttpWorkflows;
 }) => {
+  const document = useQuery(application.http.documents.read.queryOptions());
   const [scenario, setScenario] =
     useState<typeof FeedScenario.Type>("disconnect");
   const [run, setRun] = useState(0);
@@ -60,7 +62,7 @@ export const EventsExample = ({
   return (
     <section className="grid gap-5">
       <p>
-        Consume notifications without storing stream history in Query. The
+        Notifications refresh the document in the native query cache. The
         application owns replay cursors, retry delays, and authoritative
         refreshes.
       </p>
@@ -105,6 +107,10 @@ export const EventsExample = ({
           Stop event consumer
         </ActionButton>
       </div>
+      <p>Current document: {document.data?.title ?? "Loading…"}</p>
+      <output aria-label="Document refreshed at">
+        {String(document.dataUpdatedAt)}
+      </output>
       <output>Connection: {state}</output>
       <p>Delivered sequences: {events.join(", ")}</p>
       <p>Authoritative refreshes: {String(refreshes)}</p>

@@ -1,12 +1,14 @@
 import { exampleHttpApi, exampleRpcGroup } from "@effect-api-query/contracts";
 import { startExampleRpcClient } from "@effect-api-query/contracts/client";
 import type { ExampleRpcClient } from "@effect-api-query/contracts/client";
-import { QueryClient } from "@tanstack/react-query";
+import type { QueryClient } from "@tanstack/react-query";
 import {
+  acquireQueryOwner,
+  configureUtils,
   createHttpApiQueryUtils,
   createRpcQueryUtils,
 } from "@ueberbrot/effect-api-query";
-import type { RunPromiseExit } from "@ueberbrot/effect-api-query";
+import type { QueryOwner, RunPromiseExit } from "@ueberbrot/effect-api-query";
 import { ManagedRuntime } from "effect";
 import { FetchHttpClient, HttpClient, HttpClientRequest } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
@@ -19,33 +21,55 @@ import type {
 } from "./owner-cache.ts";
 import { makeUsersInvalidator, makeUserWrites } from "./user-writes.ts";
 
+const queryRetirementConfiguration = (
+  runQuery: QueryOwner<unknown>["runQuery"]
+) => {
+  const intercept = async <T>({
+    next,
+    context,
+  }: {
+    readonly next: () => Promise<T>;
+    readonly context: { readonly signal: AbortSignal };
+  }) => await runQuery(next, context.signal);
+  const query = { interceptors: [intercept] };
+  return { query, infinite: query, live: query, streamed: query };
+};
+
 const makeExampleRpcQueryUtils = (
   client: ExampleRpcClient,
   runPromiseExit: RunPromiseExit,
-  keyPrefix: ReturnType<typeof ownerKeyPrefix>
+  keyPrefix: ReturnType<typeof ownerKeyPrefix>,
+  runQuery: QueryOwner<unknown>["runQuery"]
 ) =>
-  createRpcQueryUtils<
-    typeof exampleRpcGroup,
-    ReturnType<typeof ownerKeyPrefix>,
-    RpcClientError.RpcClientError
-  >(exampleRpcGroup, {
-    client,
-    keyPrefix,
-    runPromiseExit,
-  });
+  configureUtils(
+    createRpcQueryUtils<
+      typeof exampleRpcGroup,
+      ReturnType<typeof ownerKeyPrefix>,
+      RpcClientError.RpcClientError
+    >(exampleRpcGroup, {
+      client,
+      keyPrefix,
+      runPromiseExit,
+    }),
+    queryRetirementConfiguration(runQuery)
+  );
 
 export type ExampleRpcQueryUtils = ReturnType<typeof makeExampleRpcQueryUtils>;
 
 const makeExampleHttpQueryUtils = (
   client: HttpApiClient.ForApi<typeof exampleHttpApi>,
   runPromiseExit: RunPromiseExit,
-  keyPrefix: ReturnType<typeof ownerKeyPrefix>
+  keyPrefix: ReturnType<typeof ownerKeyPrefix>,
+  runQuery: QueryOwner<unknown>["runQuery"]
 ) =>
-  createHttpApiQueryUtils(exampleHttpApi, {
-    client,
-    keyPrefix,
-    runPromiseExit,
-  });
+  configureUtils(
+    createHttpApiQueryUtils(exampleHttpApi, {
+      client,
+      keyPrefix,
+      runPromiseExit,
+    }),
+    queryRetirementConfiguration(runQuery)
+  );
 
 export type ExampleHttpQueryUtils = ReturnType<
   typeof makeExampleHttpQueryUtils
@@ -94,14 +118,35 @@ export const startViteReactApplication = async ({
     sessionGeneration: keyPrefix[3],
     permissionGeneration: keyPrefix[4],
   });
-  const rpcClient = await startExampleRpcClient(rpcUrl);
-  const httpRuntime = ManagedRuntime.make(FetchHttpClient.layer);
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      mutations: { retry: false, networkMode: "always" },
-      queries: { retry: false },
+  const lifecycle = await acquireQueryOwner(
+    async (setup) => {
+      const rpcClient = await setup.acquire(
+        async () => startExampleRpcClient(rpcUrl),
+        async (acquired) => acquired.dispose()
+      );
+      const httpRuntime = await setup.acquire(
+        () => ManagedRuntime.make(FetchHttpClient.layer),
+        async (acquired) => acquired.dispose()
+      );
+      const httpClient = await httpRuntime.runPromise(
+        HttpApiClient.make(exampleHttpApi, {
+          baseUrl: httpBaseUrl,
+          transformClient: HttpClient.mapRequest(
+            HttpClientRequest.setHeader("x-example-authorization", "allowed")
+          ),
+        })
+      );
+      return { rpcClient, httpRuntime, httpClient };
     },
-  });
+    {
+      defaultOptions: {
+        mutations: { retry: false, networkMode: "always" },
+        queries: { retry: false },
+      },
+    }
+  );
+  const { rpcClient, httpRuntime, httpClient } = lifecycle.resources;
+  const { queryClient } = lifecycle;
   let owner: ReturnType<typeof makeOwnerCache> | undefined;
   let disposal: Promise<void> | undefined;
   const dispose = async (options?: {
@@ -121,35 +166,24 @@ export const startViteReactApplication = async ({
       try {
         await retirement;
       } finally {
-        queryClient.clear();
-        try {
-          await httpRuntime.dispose();
-        } finally {
-          await rpcClient.dispose();
-        }
+        await lifecycle.dispose();
       }
     })();
     await disposal;
   };
 
   try {
-    const httpClient = await httpRuntime.runPromise(
-      HttpApiClient.make(exampleHttpApi, {
-        baseUrl: httpBaseUrl,
-        transformClient: HttpClient.mapRequest(
-          HttpClientRequest.setHeader("x-example-authorization", "allowed")
-        ),
-      })
-    );
     const httpQuery = makeExampleHttpQueryUtils(
       httpClient,
-      httpRuntime.runPromiseExit,
-      keyPrefix
+      lifecycle.wrapRunner(httpRuntime.runPromiseExit),
+      keyPrefix,
+      lifecycle.runQuery
     );
     const rpcQuery = makeExampleRpcQueryUtils(
       rpcClient.client,
-      rpcClient.runPromiseExit,
-      keyPrefix
+      lifecycle.wrapRunner(rpcClient.runPromiseExit),
+      keyPrefix,
+      lifecycle.runQuery
     );
     owner = makeOwnerCache({
       identity: capturedIdentity,
@@ -173,7 +207,8 @@ export const startViteReactApplication = async ({
       identity: capturedOwner.identity,
       isActive: capturedOwner.isActive,
       persistDirectory: capturedOwner.persistDirectory,
-      runMutation: capturedOwner.runMutation,
+      runMutation: async (execute) =>
+        lifecycle.runMutation(async () => capturedOwner.runMutation(execute)),
       trackMutationOptions: capturedOwner.trackMutationOptions,
       userWrites: makeUserWrites({
         queryClient,

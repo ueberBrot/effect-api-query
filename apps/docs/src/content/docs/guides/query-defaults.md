@@ -48,7 +48,7 @@ TanStack merges matching prefixes in registration order. Here, `users.get` inher
 ```ts
 queryClient.setQueryDefaults(http.users.key(), { retry: 1 });
 queryClient.setQueryDefaults(viewPrefix(http.users.get, "metadata"), {
-  staleTime: 5_000,
+  staleTime: 5000,
 });
 ```
 
@@ -192,3 +192,93 @@ Query interceptors receive `next` and the native query context. Mutation interce
 Interceptors run from tree to branch to leaf, with the first entry outermost. They wrap every native execution attempt, including retries, and each may call `next` at most once. Local lifecycle callbacks cannot replace them. Preserve the query abort signal in application work around `next`. Skipped queries stay disabled.
 
 The [compiled recipe](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-policies.ts) includes the contracts and imports used here. For typed retry decisions, see [Retry Queries](/effect-api-query/guides/retry-queries/).
+
+## Assemble policies in the application
+
+Use `defineUtilsPolicy<Node>()` to check a reusable map before a ready client exists. Derive `Node` from `RpcQueryUtils<Group, Prefix, ClientError>` or `HttpApiQueryUtils<Api, Prefix, Client>`. Include the actual client error type when transport or middleware adds failures. Choose a branch or leaf type to assemble that scope instead.
+
+Keep the Effect declaration in the shared contract package. Put policy values, callbacks, QueryClient access, and runtime choices in application modules. Assembly returns the supplied configuration with its literals intact; it neither configures utilities nor acquires resources. Pass the map to `configureUtils`, which snapshots policies and interceptor arrays. Keep retained values and callback dependencies unchanged while using them.
+
+This example uses `exampleRpcGroup` from the example contracts package. It exports defaults that need no ready client, applies them to application-owned utilities, and adds a typed mutation policy. The application supplies the same QueryClient used by its provider and a notification callback:
+
+```ts
+import { exampleRpcGroup } from "@effect-api-query/contracts";
+import type { QueryClient } from "@tanstack/query-core";
+import {
+  configureUtils,
+  createRpcQueryUtils,
+  defineUtilsPolicy,
+} from "@ueberbrot/effect-api-query";
+import type { RpcQueryUtils } from "@ueberbrot/effect-api-query";
+import type { RpcClient, RpcGroup } from "effect/rpc";
+
+type ApplicationUtils = RpcQueryUtils<
+  typeof exampleRpcGroup,
+  readonly ["policy-app"]
+>;
+
+export const applicationPolicy = defineUtilsPolicy<ApplicationUtils>()({
+  query: { policy: { retry: false } },
+  scoped: {
+    users: {
+      query: { policy: { staleTime: 30_000 } },
+      scoped: {
+        get: { query: { policy: { staleTime: 60_000 } } },
+      },
+    },
+  },
+});
+
+export const applicationQueries = (
+  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof exampleRpcGroup>>,
+  queryClient: QueryClient,
+  notifyCreated: (name: string, requestedName: string) => void
+) => {
+  const base = createRpcQueryUtils(exampleRpcGroup, {
+    client,
+    keyPrefix: ["policy-app"],
+  });
+  const writes = defineUtilsPolicy<ApplicationUtils["users"]["create"]>()({
+    mutation: {
+      callbacks: "compose",
+      policy: {
+        onSuccess: async (user) => {
+          queryClient.setQueryData(
+            base.users.get.queryKey({ id: user.id, locale: user.locale }),
+            user
+          );
+          await queryClient.invalidateQueries({
+            queryKey: base.users.list.key(),
+          });
+        },
+      },
+    },
+  });
+  const configured = configureUtils(base, applicationPolicy);
+  const create = configureUtils(configured.users.create, writes);
+  return {
+    rpc: configured,
+    selectedUser: (id: number) =>
+      configured.users.get.queryOptions({
+        input: { id },
+        staleTime: 5000,
+        select: (user) => user.name,
+      }),
+    pages: configured.users.page.infiniteOptions({
+      initialPageParam: 0,
+      input: (cursor) => ({ cursor, pageSize: 10 }),
+      getNextPageParam: (page) => page.nextCursor,
+    }),
+    createUser: create.mutationOptions({
+      onMutate: (input) => ({ requestedName: input.name }),
+      onSuccess: (user, _input, optimistic) => {
+        notifyCreated(user.name, optimistic.requestedName);
+      },
+    }),
+  };
+};
+```
+
+Call `applicationQueries` once per owner. Pass `selectedUser(id)` to the native query hook, `pages` to its infinite hook, and `createUser` to its mutation hook. Rebuild input-dependent options when reactive input changes. Selection and pagination stay local. The mutation policy seeds the exact read and invalidates the list before the local notification callback. Its local `onMutate` result remains typed only at that call site.
+
+The map uses the existing tree, branch, and leaf precedence and explicit callback modes described above. Required execution behavior still belongs in interceptors. Callback failures retain native handling; composition does not guarantee that later callbacks run after an earlier callback throws.
