@@ -173,6 +173,7 @@ export default defineConfig({
           "src/core/operation.ts",
           "src/core/utility-tree.ts",
           "src/core/metadata-query.ts",
+          "src/core/schema-structural-sharing.ts",
           "src/core/configure-utils.ts",
         ],
         rules: {
