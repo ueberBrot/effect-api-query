@@ -93,3 +93,9 @@ export { prepareInput } from "./core/prepared-input";
 export type { PreparedInput } from "./core/prepared-input";
 export { consumeEvents } from "./core/consume-events";
 export type { ConsumeEventsOptions } from "./core/consume-events";
+
+export {
+  queryEffects,
+  QueryClientService,
+  QueryClientOperationError,
+} from "./core/query-effects";

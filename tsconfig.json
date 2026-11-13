@@ -68,6 +68,8 @@
               "tests/stream-snapshot.test.ts",
               "tests/cache-recipes.test.ts",
               "tests/query-policy.test.ts",
+              "tests/query-effects.test.ts",
+              "examples/shared/query-effects.ts",
               "tests/query-view-prefix.test.ts",
               "tests/contract-reuse.test.ts",
               "tests/execution-interceptor.test.ts",

@@ -31,6 +31,7 @@ skills:
       - DTO and rich-value hydration with typed view registration
       - Native provider setup, Suspense recovery, reactive accessors, and host boundaries
     tasks:
+      - Compose typed reads, ensure, cache updates and generated filter invalidation in Effect using an explicit existing QueryClient service; interrupt waiters without cancelling shared execution.
       - Derive buffered, paginated, accumulated, live, and metadata options from a ready client.
       - Address exact stream policy keys, select supported view prefixes, and compose encoded partial native filters with explicit typed projections.
       - Reuse inferred input, cached query data, and mutation types in application modules.
