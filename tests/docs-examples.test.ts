@@ -90,7 +90,10 @@ describe("documentation excerpts", () => {
         "tests/types/docs-stream-tracing",
       ],
     ],
-    ["guides/query-defaults", ["tests/types/docs-policies"]],
+    [
+      "guides/query-defaults",
+      ["tests/types/docs-policies", "examples/shared/application-policy"],
+    ],
     [
       "guides/share-decoded-values",
       [

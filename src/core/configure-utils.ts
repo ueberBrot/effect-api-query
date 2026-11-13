@@ -523,3 +523,17 @@ export const configureUtils = <
     Configuration
   >;
 };
+
+/**
+ * Checks a reusable policy map against a contract-derived utility type without a ready client.
+ * Pass the result to configureUtils at the same tree, branch, or leaf scope.
+ * Assembly retains literals such as stream retention; configuration snapshots the values.
+ */
+export const defineUtilsPolicy =
+  <Node extends UtilityNode>() =>
+  <const Configuration extends object>(
+    configuration: Configuration &
+      NoInfer<UtilsConfiguration<Node>> &
+      NoInfer<ExactConfiguration<Node, Configuration>>
+  ): Configuration =>
+    configuration;
