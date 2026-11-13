@@ -31,11 +31,12 @@ export interface QueryOwner<A> {
   readonly isActive: () => boolean;
   /** Runs a synchronous cache callback only while active. Never capture a replacement cache. */
   readonly commit: (update: (client: QueryClient) => void) => void;
-  /** Accepts one complete application mutation promise, including awaited native callbacks. */
+  /** Tracks query execution and cleanup; the signal identifies native cancellation. */
   readonly runQuery: <T>(
     execute: () => Promise<T>,
     signal: AbortSignal
   ) => Promise<T>;
+  /** Accepts one complete application mutation promise, including awaited native callbacks. */
   readonly runMutation: <T>(execute: () => Promise<T>) => Promise<T>;
   /** Wrap every utility runner so retirement can await local Effect/stream finalizers. */
   readonly wrapRunner: <R>(runner: RunPromiseExit<R>) => RunPromiseExit<R>;

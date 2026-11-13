@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "a22531359248e7ec0066c4ece2909eb2982fffdb26b34278dca5d8bfd7f1e8c1",
+      "fingerprint": "442faebf381bdfcfcdba9def00c2f5deac014964b83881708718c0b0d30a15f0",
       "snapshot": {
         "GLOSSARY.md": "1caf855a606847e46e31200b90df6077d7a84de114e213b011bf27e432989252",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -209,7 +209,7 @@
         "src/core/query-effects.ts": "af269881229597833776919a2227f7ed03748fb7deb0e4df39dedb1668728584",
         "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
-        "src/core/query-owner.ts": "da9715879195454960142fb6a7a92bf96e754b5241a73fbbf2c8b6d0b13e5bcb",
+        "src/core/query-owner.ts": "5d40933e8a08a9f418c85990cc9be42bbdd5861136d1e501afa137daf49cabbf",
         "src/core/schema-key.ts": "7dad2749d30f2ab828dbc7e96d6e1e2b32b6733450cb6dc734de607629d925f8",
         "src/core/schema-structural-sharing.ts": "1a961c521aaf02c00689bee654ff428bb9d519ebf87651f7faedb9dfd1a06ccc",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
@@ -357,18 +357,15 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "0ce55e0e380d8b566d6254b7721ad6fda79a2fd2",
-      "outcome": "updated",
-      "reason": "Integrate #175 scoped event-to-cache guidance and cumulative planning with compiler, compatibility, owner and Schema prototype corrections retained. Existing one-skill/six-reference tree and source globs cover additions without metadata changes.",
+      "head": "b215f904a4e957fc7fff46bb85c2f9481710a401",
+      "outcome": "no-change",
+      "reason": "Move mutation-drain JSDoc to runMutation and describe runQuery execution/cleanup and cancellation signal accurately. Runtime code and existing guides/references remain unchanged. Existing domain_map, skill_spec and skill_tree accurately cover owner lifecycle and source mappings; no taxonomy/history change warranted for corrected method documentation.",
       "evidence": [
-        "Verified incoming d9303ae and integration 0ce55e0; actual source, guide, reference and three planning documents reviewed.",
-        "175-merge-tests.log: 60 native workflow/owner/bridge/recovery/sharing regressions, both public and server-local compilers, serial package ATTW/publint pass.",
-        "175-merge-typecheck.log: 223 files strict typed check; 175-merge-effect.log passes; 175-merge-docs.log: 23 excerpts and Astro pass; scoped formatting/YAML pass.",
-        "Fresh consumer discovery unverified: user prohibits agents. Separate Astra acceptance/architecture/final gates and full #180 validation remain pending."
+        "src/core/query-owner.ts; emitted dist/index.d.mts lines885-888 show correct method contracts; vp run pack passes declarations/ATTW/publint; scoped formatting passes. Existing owner runtime/compiler evidence remains valid; no runtime test added for JSDoc. Fresh consumer/discovery and final integrated validation unverified."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "d45753f12e5611ea86a267d098675aa774bbd37584f2698990b4c1811bc1d9ad",
+      "fingerprint": "3f1a7bb3d6b309795cccd9231d861dab19c0f83d4243bacde50506eec4cdd3e7",
       "snapshot": {
         "GLOSSARY.md": "1caf855a606847e46e31200b90df6077d7a84de114e213b011bf27e432989252",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -577,7 +574,7 @@
         "src/core/query-effects.ts": "af269881229597833776919a2227f7ed03748fb7deb0e4df39dedb1668728584",
         "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
-        "src/core/query-owner.ts": "da9715879195454960142fb6a7a92bf96e754b5241a73fbbf2c8b6d0b13e5bcb",
+        "src/core/query-owner.ts": "5d40933e8a08a9f418c85990cc9be42bbdd5861136d1e501afa137daf49cabbf",
         "src/core/schema-key.ts": "7dad2749d30f2ab828dbc7e96d6e1e2b32b6733450cb6dc734de607629d925f8",
         "src/core/schema-structural-sharing.ts": "1a961c521aaf02c00689bee654ff428bb9d519ebf87651f7faedb9dfd1a06ccc",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
@@ -725,14 +722,11 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "0ce55e0e380d8b566d6254b7721ad6fda79a2fd2",
-      "outcome": "updated",
-      "reason": "Integrate #175 scoped event-to-cache guidance and cumulative planning with compiler, compatibility, owner and Schema prototype corrections retained. Existing one-skill/six-reference tree and source globs cover additions without metadata changes.",
+      "head": "b215f904a4e957fc7fff46bb85c2f9481710a401",
+      "outcome": "no-change",
+      "reason": "Move mutation-drain JSDoc to runMutation and describe runQuery execution/cleanup and cancellation signal accurately. Runtime code and existing guides/references remain unchanged. Existing domain_map, skill_spec and skill_tree accurately cover owner lifecycle and source mappings; no taxonomy/history change warranted for corrected method documentation.",
       "evidence": [
-        "Verified incoming d9303ae and integration 0ce55e0; actual source, guide, reference and three planning documents reviewed.",
-        "175-merge-tests.log: 60 native workflow/owner/bridge/recovery/sharing regressions, both public and server-local compilers, serial package ATTW/publint pass.",
-        "175-merge-typecheck.log: 223 files strict typed check; 175-merge-effect.log passes; 175-merge-docs.log: 23 excerpts and Astro pass; scoped formatting/YAML pass.",
-        "Fresh consumer discovery unverified: user prohibits agents. Separate Astra acceptance/architecture/final gates and full #180 validation remain pending."
+        "src/core/query-owner.ts; emitted dist/index.d.mts lines885-888 show correct method contracts; vp run pack passes declarations/ATTW/publint; scoped formatting passes. Existing owner runtime/compiler evidence remains valid; no runtime test added for JSDoc. Fresh consumer/discovery and final integrated validation unverified."
       ]
     },
     "source:vite.config.ts": {
