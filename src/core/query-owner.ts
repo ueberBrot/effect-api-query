@@ -17,6 +17,10 @@ export interface QueryOwnerSetup extends Omit<
   QueryOwner<never>,
   "resources" | "dispose"
 > {
+  /**
+   * Await each acquisition sequentially within setup.
+   * Keep the setup registrar inside the callback; detached acquisitions are unsupported.
+   */
   readonly acquire: <A>(
     acquire: () => A | Promise<A>,
     release: (resource: A) => void | Promise<void>

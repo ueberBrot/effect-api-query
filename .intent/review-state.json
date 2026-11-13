@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "c6a57d6373fae72891a3812da3aeb5ddf075fdcdf5ee9757ce48c580bd13e602",
+      "fingerprint": "def1368d662bd3ca8314252a2994f04a8057efa4b6fc67959fcef02528b21cda",
       "snapshot": {
         "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -51,7 +51,7 @@
         "apps/docs/src/content/docs/guides/streaming.md": "383845ebb5a92cdc4d9dff1c080167422b67bfee854218667d22c014e8d41c7d",
         "apps/docs/src/content/docs/guides/suspense-and-recovery.md": "927149842d56dd9432cedea9bccc17c69b5debc869eb3c50aefb366f07019714",
         "apps/docs/src/content/docs/guides/svelte-query.md": "0d9cca47e1ba9dec49af772d860ffa2723968ae7ad90de7a19bd00821ad33bbe",
-        "apps/docs/src/content/docs/guides/switch-cache-owners.md": "7e2b664cbacb8d6c39acdf00bf6c12d6984aea6ceed366c39a8dda58987b9bfe",
+        "apps/docs/src/content/docs/guides/switch-cache-owners.md": "493ec03765eafe92d53be93f08e768363c6b4c10617e3c3d1b902edea07d6747",
         "apps/docs/src/content/docs/guides/tanstack-start.md": "3676db2efef396420e3e3c1deeb3e2b2b39a314cb1e5ab9b0b0a1b0cd9fc58b8",
         "apps/docs/src/content/docs/guides/trace-streams.md": "0e671596f180c092f79460a83ba5a48549843a681f7b9e7301280122b04e0945",
         "apps/docs/src/content/docs/guides/vue-query.md": "3cb3237cea16c56282eee43ce5ecf26a1ed845f6df319c4ff8914a313ce4bf65",
@@ -207,12 +207,12 @@
         "src/core/metadata-query.ts": "b7cc903f800a3723d931623d420abcfec6ef65bf757fddbf2cf5a36c4c52ded9",
         "src/core/operation.ts": "166ed139d6a6be3a3df0ce6b60ed01e71dcfa6075091a18f1869808355838cfc",
         "src/core/policy.ts": "ced3a6fdf1ab7e273eb518700a42d68b4823abdb1088fae6855424e4e479ded4",
-        "src/core/prepared-input.ts": "bb445d76482c47d88e67cc0862470415dec30f72ccdd2ffa15e77d988377c3c9",
+        "src/core/prepared-input.ts": "4fd806b273f95ad2aafb382e89df1d0443f8c270a0e575f1690d7e6564e443c7",
         "src/core/query-descriptor.ts": "a23e937f8ff9856ee867131539a8c3f943871cbac18e1243dbdf4c5bd8537546",
         "src/core/query-effects.ts": "7243f8b6b0d2b984f10d276cce76902fb5e826cf0ef470b30a5b573bfb4c78ec",
         "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
-        "src/core/query-owner.ts": "3a7e1072a568da26a3622225ca5723f4fbf62facb4796bc3ffb1a19a2c5196c5",
+        "src/core/query-owner.ts": "fd2f7ceb7bf29a5e5456ef908c1330b4b829a0fcfaaed33474a1c80e71e361b9",
         "src/core/schema-key.ts": "7dad2749d30f2ab828dbc7e96d6e1e2b32b6733450cb6dc734de607629d925f8",
         "src/core/schema-structural-sharing.ts": "1a961c521aaf02c00689bee654ff428bb9d519ebf87651f7faedb9dfd1a06ccc",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
@@ -364,15 +364,16 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "cd8b644758fdfd7011a20fad3e3f3a4034a216c2",
-      "outcome": "updated",
-      "reason": "Clarify fixed timer scheduling, local HTTP decoder/key policy, and breaking RPC tuple assignment compatibility in the existing query-patterns task. No new task or activation description.",
+      "head": "93e576606bf4cac3dbe9739601730b5b2344ed58",
+      "outcome": "no-change",
+      "reason": "Architecture A1 exposes the existing sequential awaited acquisition constraint in public JSDoc; cache-workflows already requires it. A2 centralizes private token allocation and WeakMap registration while preserving caller-specific error translation, ownership and immutable handle semantics. The guide changes only sentence capitalization. Existing domain tasks, failure modes, skill_spec decisions and one-skill/six-reference source mappings remain accurate; no new behavior, coverage or skill is introduced.",
       "evidence": [
-        "79 public cache/stream/snapshot tests pass; published fixtures pass pinned TSRS and TS5.9, retaining all negative contracts. docs-check and skills-check pass. Runtime behavior unchanged; fresh consumer discovery unverified because agents are prohibited."
+        "Integration base 93e576606bf4cac3dbe9739601730b5b2344ed58; src/core/query-owner.ts and src/core/prepared-input.ts diff; apps/docs/src/content/docs/guides/switch-cache-owners.md; skills/effect-api-query/references/cache-workflows.md:244; _artifacts/domain_map.yaml, _artifacts/skill_spec.md and _artifacts/skill_tree.yaml inspected.",
+        "Fresh package/declaration/ATTW/publint pass, emitted acquisition JSDoc inspected; both public compiler suites pass; 19 existing owner/descriptor/usability tests pass; strict lint/typecheck 226 files pass; 24 executable docs and Astro check pass. Logs architecture-fix-{pack,types,tests,strict,docs}.log in /tmp/effect-api-query-spec-166. No new independent consumer or discovery evaluation claimed."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "e1706f8a23d695d00c83fba4e2904f5cf020fed6e02c85be5b5f181d60f6623a",
+      "fingerprint": "f58f12669020304130d9889a296ab0e9eb6fd8531e19b4adf01a6292ea245af5",
       "snapshot": {
         "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -423,7 +424,7 @@
         "apps/docs/src/content/docs/guides/streaming.md": "383845ebb5a92cdc4d9dff1c080167422b67bfee854218667d22c014e8d41c7d",
         "apps/docs/src/content/docs/guides/suspense-and-recovery.md": "927149842d56dd9432cedea9bccc17c69b5debc869eb3c50aefb366f07019714",
         "apps/docs/src/content/docs/guides/svelte-query.md": "0d9cca47e1ba9dec49af772d860ffa2723968ae7ad90de7a19bd00821ad33bbe",
-        "apps/docs/src/content/docs/guides/switch-cache-owners.md": "7e2b664cbacb8d6c39acdf00bf6c12d6984aea6ceed366c39a8dda58987b9bfe",
+        "apps/docs/src/content/docs/guides/switch-cache-owners.md": "493ec03765eafe92d53be93f08e768363c6b4c10617e3c3d1b902edea07d6747",
         "apps/docs/src/content/docs/guides/tanstack-start.md": "3676db2efef396420e3e3c1deeb3e2b2b39a314cb1e5ab9b0b0a1b0cd9fc58b8",
         "apps/docs/src/content/docs/guides/trace-streams.md": "0e671596f180c092f79460a83ba5a48549843a681f7b9e7301280122b04e0945",
         "apps/docs/src/content/docs/guides/vue-query.md": "3cb3237cea16c56282eee43ce5ecf26a1ed845f6df319c4ff8914a313ce4bf65",
@@ -579,12 +580,12 @@
         "src/core/metadata-query.ts": "b7cc903f800a3723d931623d420abcfec6ef65bf757fddbf2cf5a36c4c52ded9",
         "src/core/operation.ts": "166ed139d6a6be3a3df0ce6b60ed01e71dcfa6075091a18f1869808355838cfc",
         "src/core/policy.ts": "ced3a6fdf1ab7e273eb518700a42d68b4823abdb1088fae6855424e4e479ded4",
-        "src/core/prepared-input.ts": "bb445d76482c47d88e67cc0862470415dec30f72ccdd2ffa15e77d988377c3c9",
+        "src/core/prepared-input.ts": "4fd806b273f95ad2aafb382e89df1d0443f8c270a0e575f1690d7e6564e443c7",
         "src/core/query-descriptor.ts": "a23e937f8ff9856ee867131539a8c3f943871cbac18e1243dbdf4c5bd8537546",
         "src/core/query-effects.ts": "7243f8b6b0d2b984f10d276cce76902fb5e826cf0ef470b30a5b573bfb4c78ec",
         "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
-        "src/core/query-owner.ts": "3a7e1072a568da26a3622225ca5723f4fbf62facb4796bc3ffb1a19a2c5196c5",
+        "src/core/query-owner.ts": "fd2f7ceb7bf29a5e5456ef908c1330b4b829a0fcfaaed33474a1c80e71e361b9",
         "src/core/schema-key.ts": "7dad2749d30f2ab828dbc7e96d6e1e2b32b6733450cb6dc734de607629d925f8",
         "src/core/schema-structural-sharing.ts": "1a961c521aaf02c00689bee654ff428bb9d519ebf87651f7faedb9dfd1a06ccc",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
@@ -736,11 +737,12 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "cd8b644758fdfd7011a20fad3e3f3a4034a216c2",
-      "outcome": "updated",
-      "reason": "Domain map and cumulative spec now cover timer limits, configured HTTP identity coverage and major RPC tuple compatibility classification. Existing one-skill/six-reference tree, prerequisites and wildcard source mappings cover these edits; skill_tree.yaml is an evidence-backed no-op.",
+      "head": "93e576606bf4cac3dbe9739601730b5b2344ed58",
+      "outcome": "no-change",
+      "reason": "Architecture A1 exposes the existing sequential awaited acquisition constraint in public JSDoc; cache-workflows already requires it. A2 centralizes private token allocation and WeakMap registration while preserving caller-specific error translation, ownership and immutable handle semantics. The guide changes only sentence capitalization. Existing domain tasks, failure modes, skill_spec decisions and one-skill/six-reference source mappings remain accurate; no new behavior, coverage or skill is introduced.",
       "evidence": [
-        "_artifacts/domain_map.yaml, skill_spec.md and skill_tree.yaml reviewed against source/guidance; yamllint and skills-check pass. Public task checks: 79 tests plus both published compilers and docs-check. Fresh consumer discovery and Astra acceptance remain parent work."
+        "Integration base 93e576606bf4cac3dbe9739601730b5b2344ed58; src/core/query-owner.ts and src/core/prepared-input.ts diff; apps/docs/src/content/docs/guides/switch-cache-owners.md; skills/effect-api-query/references/cache-workflows.md:244; _artifacts/domain_map.yaml, _artifacts/skill_spec.md and _artifacts/skill_tree.yaml inspected.",
+        "Fresh package/declaration/ATTW/publint pass, emitted acquisition JSDoc inspected; both public compiler suites pass; 19 existing owner/descriptor/usability tests pass; strict lint/typecheck 226 files pass; 24 executable docs and Astro check pass. Logs architecture-fix-{pack,types,tests,strict,docs}.log in /tmp/effect-api-query-spec-166. No new independent consumer or discovery evaluation claimed."
       ]
     },
     "source:vite.config.ts": {
