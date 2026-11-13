@@ -17,6 +17,13 @@ interface PreparedValue {
   readonly keyValue: JsonValue;
 }
 const values = new WeakMap<object, PreparedValue>();
+const registerPreparedInput = (value: PreparedValue) => {
+  const token = Object.freeze({
+    "~effect-api-query/PreparedInput": Object.freeze({}),
+  });
+  values.set(token, value);
+  return token;
+};
 const owners = new WeakMap<
   () => QueryKey,
   {
@@ -62,11 +69,11 @@ export const prepareInput = <Leaf extends { readonly key: () => QueryKey }>(
   } catch (error) {
     throw owner.input.invalidKey(error);
   }
-  const token = Object.freeze({
-    "~effect-api-query/PreparedInput": Object.freeze({}),
+  return registerPreparedInput({
+    owner: owner.input,
+    input: prepared.input,
+    keyValue,
   });
-  values.set(token, { owner: owner.input, input: prepared.input, keyValue });
-  return token;
 };
 
 /** Descriptor rebinding creates a fresh token owned only by the receiving leaf. */
@@ -89,10 +96,7 @@ export const descriptorInput = (
   }
   const prepared = owner.input.prepare(input, owner.encoder);
   const identity = canonicalize(prepared.keyValue);
-  const token = Object.freeze({
-    "~effect-api-query/PreparedInput": Object.freeze({}),
-  });
-  values.set(token, {
+  const token = registerPreparedInput({
     owner: owner.input,
     input: prepared.input,
     keyValue: identity,
