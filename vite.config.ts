@@ -207,6 +207,40 @@ export default defineConfig({
         },
       },
       {
+        files: ["examples/tanstack-start/**/*.{ts,tsx}"],
+        rules: {
+          "eslint/no-restricted-imports": [
+            "error",
+            {
+              patterns: [
+                {
+                  group: ["**/vite-react/src/**"],
+                  message:
+                    "Import shared implementation from @effect-api-query/shared.",
+                },
+              ],
+            },
+          ],
+        },
+      },
+      {
+        files: ["examples/vite-react/**/*.{ts,tsx}"],
+        rules: {
+          "eslint/no-restricted-imports": [
+            "error",
+            {
+              patterns: [
+                {
+                  group: ["**/tanstack-start/src/**"],
+                  message:
+                    "Import shared implementation from @effect-api-query/shared.",
+                },
+              ],
+            },
+          ],
+        },
+      },
+      {
         ...ultraciteReact,
         files: ["examples/**/*.{ts,tsx}"],
       },
@@ -381,7 +415,7 @@ export default defineConfig({
     tasks: {
       check: {
         command: "effect-tsgo --tsrs-lint=0.21.0-ts7.1.0-beta vp check",
-        dependsOn: ["pack", "docs-sync"],
+        dependsOn: ["pack", "docs-sync", "repository-check"],
         cache: {
           output: [],
         },
@@ -394,7 +428,7 @@ export default defineConfig({
       },
       lint: {
         command: "effect-tsgo --tsrs-lint=0.21.0-ts7.1.0-beta vp lint",
-        dependsOn: ["pack", "docs-sync"],
+        dependsOn: ["pack", "docs-sync", "repository-check"],
         cache: {
           output: [],
         },
@@ -402,10 +436,14 @@ export default defineConfig({
       typecheck: {
         command:
           "effect-tsgo --tsrs-lint=0.21.0-ts7.1.0-beta vp check --no-fmt",
-        dependsOn: ["pack", "docs-sync"],
+        dependsOn: ["pack", "docs-sync", "repository-check"],
         cache: {
           output: [],
         },
+      },
+      "repository-check": {
+        command: "node --import tsx scripts/check-workflow.mts",
+        cache: false,
       },
       "toolchain-check": {
         command: "node --import tsx scripts/check-toolchain.mts",

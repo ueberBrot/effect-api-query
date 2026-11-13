@@ -1,3 +1,5 @@
 #!/bin/sh
+set -eu
 
+node --import tsx scripts/check-workflow.mts --staged
 vp staged

@@ -22,3 +22,11 @@ If a proposal contradicts an existing ADR, link to that decision and explain why
 Preserve an accepted ADR's recorded context, decision, and consequences. Record a replacement decision in the next numbered ADR, with reciprocal supersession links. For a partial amendment, identify the changed constraint and link both records; retain accepted status for the decision that still applies.
 
 Update statuses, links, and editorial wording when the recorded meaning is preserved.
+
+## File placement
+
+Put session plans, review reports, handoffs and measurement output in the OS temporary directory or ignored `.artifacts/`. Commit maintained user guidance in the existing documentation sections and executable tooling in `scripts/` with its checks in `tests/`.
+
+`_artifacts/` contains only Intent's domain map, skill specification and skill tree. The repository check enforces those paths, rejects tracked scratch/report directories, and limits root Markdown to project entry documents. Change the allowlist deliberately when a new maintained entry document is needed; do not rename temporary output to bypass it.
+
+Before adding documentation, identify its recurring reader or the tool that consumes it. Prefer an existing section. Preserve externally supplied skills; put repository-specific additions in owned documentation or checks.
