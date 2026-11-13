@@ -22,7 +22,7 @@ skills:
       - Immutable captured input and nontransferable prepared-input ownership
       - HTTP decoded requests, SSE and NDJSON, multipart mutations, metadata, and omitted streaming uploads or upgrades
       - Inferred operation types, tree/branch/leaf policy configuration, execution interception, native defaults, and view filters
-      - Opt-in decoded-value sharing through native Schema equivalence and Query policies, with explicit reference semantics for custom fields
+      - Opt-in schemaStructuralSharing for immutable decoded atoms in plain containers, with explicit equivalence for custom fields and meaningful class state
       - Input-field skipping, pagination, explicit stream retention, publication deadlines, uncached event consumption, recovery, and lifetime tracing
       - Stable Query Core stream publication, native cache writes, independent observer lifetimes, and complete cleanup Causes
       - Opt-in live snapshot coalescing, fixed pending deadlines, terminal flush, cancellation discard, and policy identity
@@ -70,7 +70,7 @@ skills:
       - mistake: Treat generic equality or wire serialization as decoded-value equality
         mechanism: Effect equality can cache comparisons and inspect custom objects, while Schema equivalence follows declared fields and annotations.
         wrong_pattern: Use generic Equal.equals or encoded JSON to reuse arbitrary mutable or custom cached objects.
-        correct_pattern: Compose Schema.toEquivalence for immutable declared records with native replaceEqualDeep; give unknown/custom fields explicit reference equivalence and reconcile HTTP metadata around its decoded data.
+        correct_pattern: Use schemaStructuralSharing with an explicit decoded atom equivalence; include private/extra state, retain custom reference semantics, and require synchronous service-free validation over acyclic plain containers. Preserve HTTP metadata freezing.
         source: tests/types/docs-structural-sharing.ts
         priority: HIGH
         status: active
