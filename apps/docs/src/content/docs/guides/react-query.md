@@ -40,9 +40,11 @@ In `client.ts`, `startUsersApplication` acquires the ready HTTP API client. It k
 Client integration in `client.ts`:
 
 ```ts
-import { QueryClient } from "@tanstack/react-query";
-import { createHttpApiQueryUtils } from "@ueberbrot/effect-api-query";
-import type { RunPromiseExit } from "@ueberbrot/effect-api-query";
+import {
+  acquireQueryOwner,
+  createHttpApiQueryUtils,
+  configureUtils,
+} from "@ueberbrot/effect-api-query";
 import { ManagedRuntime } from "effect";
 import { FetchHttpClient } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
@@ -50,47 +52,38 @@ import { HttpApiClient } from "effect/http-api";
 import { usersApi } from "./http-contract.ts";
 
 export const startUsersApplication = async (baseUrl: string) => {
-  const runtime = ManagedRuntime.make(FetchHttpClient.layer);
-  const running = new Set<Promise<unknown>>();
-  const runPromiseExit: RunPromiseExit = (effect, options) => {
-    const pending = runtime.runPromiseExit(effect, options);
-    running.add(pending);
-    void pending.then(
-      () => running.delete(pending),
-      () => running.delete(pending)
-    );
-    return pending;
-  };
-  try {
-    const client = await runtime.runPromise(
-      HttpApiClient.make(usersApi, { baseUrl })
-    );
-    const queryClient = new QueryClient();
-    const http = createHttpApiQueryUtils(usersApi, {
-      client,
-      keyPrefix: ["users-app"],
-      runPromiseExit,
-    });
-    return {
-      http,
-      queryClient,
-      dispose: async () => {
-        try {
-          await queryClient.cancelQueries();
-        } finally {
-          try {
-            await Promise.allSettled([...running]);
-          } finally {
-            queryClient.clear();
-            await runtime.dispose();
-          }
+  const owner = await acquireQueryOwner(
+    async (setup) => {
+      const runtime = await setup.acquire(
+        () => ManagedRuntime.make(FetchHttpClient.layer),
+        async (acquired) => acquired.dispose()
+      );
+      const client = await runtime.runPromise(
+        HttpApiClient.make(usersApi, { baseUrl })
+      );
+      return configureUtils(
+        createHttpApiQueryUtils(usersApi, {
+          client,
+          keyPrefix: ["users-app"],
+          runPromiseExit: setup.wrapRunner(runtime.runPromiseExit),
+        }),
+        {
+          query: {
+            interceptors: [
+              async ({ next, context }) =>
+                await setup.runQuery(next, context.signal),
+            ],
+          },
         }
-      },
-    };
-  } catch (error) {
-    await runtime.dispose();
-    throw error;
-  }
+      );
+    },
+    { defaultOptions: { queries: { retry: false } } }
+  );
+  return {
+    http: owner.resources,
+    queryClient: owner.queryClient,
+    dispose: owner.dispose,
+  };
 };
 
 export type UsersApplication = Awaited<
@@ -98,7 +91,7 @@ export type UsersApplication = Awaited<
 >;
 ```
 
-The supplied runner forwards TanStack's abort options and tracks reads in progress. After cancellation, disposal waits for their Effect finalizers before releasing the runtime. Client acquisition finishes before React renders. If acquisition fails, the application disposes the runtime.
+`acquireQueryOwner` is optional. It owns an independent native QueryClient and only the resources registered with `setup.acquire`. Use `setup.borrow(client)` for existing application resources; the helper never disposes them. Acquisition finishes before mounting. A failed acquisition releases previously registered resources in reverse order. Wrap every utility runner and track each query function with the existing `configureUtils` interceptor so disposal can abort queries and await their local Effect finalizers before releasing the runtime. See [owner retirement](/effect-api-query/guides/switch-cache-owners/#opt-in-owner-helper) for mutation acceptance, callback guards, and failure semantics.
 
 ### Component and provider
 
@@ -194,3 +187,7 @@ Ordinary hooks can show stream data while fetching continues. Choose [history re
 TanStack documents that cancellation does not work with its Suspense hooks. Use ordinary query hooks when cancelling reads or stopping open stream work is part of the screen's lifecycle. For buffered reads with Suspense, use [Suspense and Error Recovery](/effect-api-query/guides/suspense-and-recovery/) for reset and retry, cached-data refetch failures, and independent loading with `useSuspenseQueries`.
 
 For router loaders and server rendering, continue with [Router and Start](/effect-api-query/guides/tanstack-start/). The [Vite React example](/effect-api-query/examples/#run-vite-react) is a complete application with reads, writes, streams, private cache owners, and resource disposal.
+
+## Handle failures and retries
+
+Use [tagged failure handling and full Cause inspection](/effect-api-query/guides/handle-failures/) for declared errors, defects and interruption. Choose [one layer to own retries](/effect-api-query/guides/retry-queries/) rather than multiplying Effect and Query retry loops. For initial rendering failures, follow [native Suspense recovery](/effect-api-query/guides/suspense-and-recovery/); reset both the error boundary and Query error state. These patterns also apply without the lifecycle helper.

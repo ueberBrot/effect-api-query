@@ -99,3 +99,5 @@ export {
   QueryClientService,
   QueryClientOperationError,
 } from "./core/query-effects";
+export { acquireQueryOwner } from "./core/query-owner";
+export type { QueryOwner, QueryOwnerSetup } from "./core/query-owner";
