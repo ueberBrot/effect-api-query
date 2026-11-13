@@ -72,6 +72,14 @@ Use `createBranchQueryFilter(branch, view)` when only one view across a namespac
 
 For a typed error union, `findDeclaredError(error, tag)` returns an Effect Option for exactly one tagged failure. Only tags in the typed union are accepted. Composite Causes, defects, interruptions, and non-wrapper errors return None. Preserve the original wrapper for diagnostics and retry decisions. Tag matching does not validate unknown values or establish that a failure is retryable.
 
+## Assemble contract-associated policies
+
+When defaults must be reusable before client acquisition, import `defineUtilsPolicy` and the `RpcQueryUtils` or `HttpApiQueryUtils` type from the package root. Derive the utility type from the shared declaration, application key prefix, and actual client error type. Call `defineUtilsPolicy<UtilityType>()(configuration)`, then pass its result to `configureUtils` at the matching tree, branch, or leaf scope. Literal retention defaults remain available to configured builders.
+
+Keep shared declarations free of framework callbacks, QueryClient instances, and runtimes. Assemble values in application modules. Use the same `scoped` child names, view policies, interceptors, and explicit mutation callback modes as direct configuration. Assembly checks types and returns the supplied map; `configureUtils` snapshots its policy values and interceptor arrays. Keep callback dependencies and retained values unchanged. Unknown scopes, unsupported leaf views, and options reserved for local calls fail compiler checks. Leaf callbacks retain their data, error, and variable types; optimistic context stays local.
+
+See the complete application policy example in the library's Defaults and Policies guide. Required execution belongs in interceptors; native callback failure handling can skip later composed callbacks after a throw.
+
 ## Configure shared behavior
 
 Use `configureUtils(treeOrLeaf, configuration)` once per cache owner. Configure a query view with `{ policy, interceptors }`; configure a mutation with `{ policy, interceptors, callbacks }`. Use `scoped` to select named children of a tree or branch. The returned utilities are frozen and retain generated identity and prepared-input ownership. Keep the supplied tree for any consumers that need its original behavior.

@@ -1,6 +1,8 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   configureUtils,
+  defineUtilsPolicy,
+  type RpcQueryUtils,
   createRpcQueryUtils,
   prepareInput,
   skipToken,
@@ -39,7 +41,8 @@ const savedScope: UtilsConfiguration<typeof base> = {
 configureUtils(base, savedScope);
 // @ts-expect-error A named scope requires a configuration object.
 configureUtils(base, { scoped: { toString: () => "configuration" } });
-const rpc = configureUtils(base, {
+type ContractUtils = RpcQueryUtils<typeof group, readonly ["configuration"]>;
+const assembled = defineUtilsPolicy<ContractUtils>()({
   query: { policy: { retry: false } },
   scoped: {
     users: {
@@ -84,6 +87,7 @@ const rpc = configureUtils(base, {
     },
   },
 });
+const rpc = configureUtils(base, assembled);
 const result = useQuery(
   rpc.users.read.queryOptions({
     input: prepareInput(rpc.users.read, { id: 1 }),
@@ -216,3 +220,64 @@ configureUtils(base, {
     ],
   },
 });
+
+const leafPolicy = defineUtilsPolicy<ContractUtils["users"]["read"]>();
+leafPolicy({
+  query: {
+    policy: {
+      retry: (_count, error) => {
+        error.cause satisfies import("effect").Cause.Cause<"missing">;
+        // @ts-expect-error This leaf does not declare a numeric failure.
+        error.cause satisfies import("effect").Cause.Cause<number>;
+        return false;
+      },
+    },
+    interceptors: [
+      async ({ next }) => {
+        const data = await next();
+        data.name satisfies string;
+        // @ts-expect-error Query data is the decoded object.
+        data satisfies number;
+        return data;
+      },
+    ],
+  },
+  mutation: {
+    policy: {
+      onSuccess: (data, variables, optimistic) => {
+        data.name satisfies string;
+        variables.id satisfies number;
+        // @ts-expect-error Variables are leaf-specific.
+        variables.id satisfies string;
+        // @ts-expect-error Optimistic context stays local.
+        optimistic.previous;
+      },
+      onError: (error) => {
+        error.cause satisfies import("effect").Cause.Cause<"missing">;
+      },
+    },
+  },
+});
+// @ts-expect-error Unknown scopes fail during assembly.
+defineUtilsPolicy<ContractUtils>()({ scoped: { unknown: {} } });
+// @ts-expect-error A unary leaf has no live view.
+leafPolicy({ live: { policy: { retry: false } } });
+// @ts-expect-error Assembly rejects invalid native options.
+leafPolicy({ query: { policy: { staleTime: "forever" } } });
+// @ts-expect-error Inputs remain local.
+leafPolicy({ query: { policy: { input: { id: 1 } } } });
+// @ts-expect-error Optimistic preparation remains local.
+leafPolicy({ mutation: { policy: { onMutate: () => ({ previous: 1 }) } } });
+// @ts-expect-error Exact checks include assigned options.
+leafPolicy({ query: { policy: invalidPolicy } });
+// @ts-expect-error Exact checks include union members.
+leafPolicy({ query: { policy: invalidUnionPolicy } });
+const streamAssembly = defineUtilsPolicy<ContractUtils["users"]>()({
+  scoped: { watch: { streamed: { policy: { maxChunks: 3 } } } },
+});
+const assembledBranch = configureUtils(base.users, streamAssembly);
+assembledBranch.watch.streamedOptions({ input: { id: 1 } });
+// @ts-expect-error The policy does not change the stream's input contract.
+assembledBranch.watch.streamedOptions({ input: { id: "1" } });
+// @ts-expect-error Stream leaves do not have buffered query views.
+defineUtilsPolicy<ContractUtils["users"]["watch"]>()({ query: {} });

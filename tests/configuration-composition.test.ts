@@ -13,6 +13,7 @@ import { Rpc, RpcGroup } from "effect/rpc";
 
 import {
   configureUtils,
+  defineUtilsPolicy,
   createHttpApiQueryUtils,
   createRpcQueryUtils,
 } from "#effect-api-query";
@@ -52,7 +53,7 @@ for (const order of ["root-first", "leaf-first"] as const) {
           keyPrefix: ["composition"],
         });
         const calls: string[] = [];
-        const root = {
+        const root = defineUtilsPolicy<typeof base>()({
           query: {
             policy: { staleTime: 100 },
             interceptors: [around(calls, "root")],
@@ -61,8 +62,8 @@ for (const order of ["root-first", "leaf-first"] as const) {
             policy: { retry: 1 },
             interceptors: [around(calls, "root")],
           },
-        };
-        const leaf = {
+        });
+        const leaf = defineUtilsPolicy<typeof base>()({
           scoped: {
             users: {
               scoped: {
@@ -79,7 +80,7 @@ for (const order of ["root-first", "leaf-first"] as const) {
               },
             },
           },
-        };
+        });
         const configured =
           order === "root-first"
             ? configureUtils(configureUtils(base, root), leaf)
@@ -123,7 +124,7 @@ for (const order of ["root-first", "leaf-first"] as const) {
           keyPrefix: ["composition"],
         });
         const calls: string[] = [];
-        const root = {
+        const root = defineUtilsPolicy<typeof base>()({
           query: {
             policy: { staleTime: 100 },
             interceptors: [around(calls, "root")],
@@ -132,8 +133,8 @@ for (const order of ["root-first", "leaf-first"] as const) {
             policy: { retry: 1 },
             interceptors: [around(calls, "root")],
           },
-        };
-        const leaf = {
+        });
+        const leaf = defineUtilsPolicy<typeof base>()({
           scoped: {
             users: {
               scoped: {
@@ -150,7 +151,7 @@ for (const order of ["root-first", "leaf-first"] as const) {
               },
             },
           },
-        };
+        });
         const configured =
           order === "root-first"
             ? configureUtils(configureUtils(base, root), leaf)
@@ -293,38 +294,37 @@ for (const composeRoot of [false, true]) {
           "users.get": () => Effect.succeed(42),
         });
         const calls: string[] = [];
-        const configured = configureUtils(
-          createRpcQueryUtils(rpcGroup, {
-            client,
-            keyPrefix: ["scope-callbacks"],
-          }),
-          {
-            mutation: {
-              callbacks: composeRoot ? "compose" : "replace",
-              policy: {
-                onSuccess: () => {
-                  calls.push("root");
-                },
+        const base = createRpcQueryUtils(rpcGroup, {
+          client,
+          keyPrefix: ["scope-callbacks"],
+        });
+        const policy = defineUtilsPolicy<typeof base>()({
+          mutation: {
+            callbacks: composeRoot ? "compose" : "replace",
+            policy: {
+              onSuccess: () => {
+                calls.push("root");
               },
             },
-            scoped: {
-              users: {
-                scoped: {
-                  get: {
-                    mutation: {
-                      callbacks: composeRoot ? "replace" : "compose",
-                      policy: {
-                        onSuccess: () => {
-                          calls.push("leaf");
-                        },
+          },
+          scoped: {
+            users: {
+              scoped: {
+                get: {
+                  mutation: {
+                    callbacks: composeRoot ? "replace" : "compose",
+                    policy: {
+                      onSuccess: () => {
+                        calls.push("leaf");
                       },
                     },
                   },
                 },
               },
             },
-          }
-        );
+          },
+        });
+        const configured = configureUtils(base, policy);
         const queryClient = new QueryClient();
         try {
           const mutation = new MutationObserver(
@@ -516,6 +516,193 @@ it.effect("retains callback-only scopes for later mutation policies", () =>
           ).mutate()
       );
       expect(calls).toStrictEqual(["shared", "local"]);
+    } finally {
+      queryClient.clear();
+    }
+  })
+);
+
+it.effect("preserves native failures from assembled mutation callbacks", () =>
+  Effect.gen(function* callbackFailures() {
+    const client = yield* makeRpcTestClient(rpcGroup, {
+      "users.get": () => Effect.succeed(42),
+    });
+    const base = createRpcQueryUtils(rpcGroup, {
+      client,
+      keyPrefix: ["failure-policy"],
+    });
+    const calls: string[] = [];
+    const failure = new Error("application callback failed");
+    const policy = defineUtilsPolicy<typeof base.users.get>()({
+      mutation: {
+        callbacks: "compose",
+        interceptors: [around(calls, "required")],
+        policy: {
+          onSuccess: () => {
+            calls.push("shared success");
+            throw failure;
+          },
+        },
+      },
+    });
+    const leaf = configureUtils(base.users.get, policy);
+    const queryClient = new QueryClient();
+    try {
+      const mutation = new MutationObserver(
+        queryClient,
+        leaf.mutationOptions({
+          onMutate: () => {
+            calls.push("local prepare");
+            return { previous: 7 };
+          },
+          onSuccess: () => {
+            calls.push("local success");
+          },
+          onError: (error, _input, optimistic) => {
+            expect(error).toBe(failure);
+            expect(optimistic?.previous).toBe(7);
+            calls.push("local error");
+          },
+          onSettled: () => {
+            calls.push("local settled");
+          },
+        })
+      );
+      yield* Effect.promise(async () => {
+        await expect(mutation.mutate()).rejects.toBe(failure);
+      });
+      expect(calls).toStrictEqual([
+        "local prepare",
+        "required start",
+        "required end",
+        "shared success",
+        "local error",
+        "local settled",
+      ]);
+      expect(mutation.getCurrentResult().status).toBe("error");
+    } finally {
+      queryClient.clear();
+    }
+  })
+);
+
+it.effect("applies assembled tree, branch, leaf and call-site defaults", () =>
+  Effect.gen(function* assembledOptions() {
+    const client = yield* makeRpcTestClient(rpcGroup, {
+      "users.get": () => Effect.succeed(42),
+    });
+    const base = createRpcQueryUtils(rpcGroup, {
+      client,
+      keyPrefix: ["assembled-options"],
+    });
+    const calls: string[] = [];
+    const policy = defineUtilsPolicy<typeof base>()({
+      query: {
+        policy: { staleTime: 100 },
+        interceptors: [around(calls, "tree")],
+      },
+      scoped: {
+        users: {
+          query: {
+            policy: { staleTime: 200, gcTime: 600 },
+            interceptors: [around(calls, "branch")],
+          },
+          scoped: {
+            get: {
+              query: {
+                policy: { staleTime: 300 },
+                interceptors: [around(calls, "leaf")],
+              },
+            },
+          },
+        },
+      },
+    });
+    const configured = configureUtils(base, policy);
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { staleTime: 50, retry: false } },
+    });
+    try {
+      const options = configured.users.get.queryOptions({
+        staleTime: 0,
+        initialData: 5,
+        select: (value) => `value ${value}`,
+      });
+      const final = queryClient.defaultQueryOptions(options);
+      expect({
+        staleTime: final.staleTime,
+        gcTime: final.gcTime,
+        retry: final.retry,
+        initialData: final.initialData,
+      }).toStrictEqual({
+        staleTime: 0,
+        gcTime: 600,
+        retry: false,
+        initialData: 5,
+      });
+      expect(options.queryKey).toStrictEqual(base.users.get.queryKey());
+      expect(
+        yield* Effect.promise(async () => await queryClient.query(options))
+      ).toBe("value 42");
+      expect(queryClient.getQueryData(options.queryKey)).toBe(42);
+      expect(calls).toStrictEqual([
+        "tree start",
+        "branch start",
+        "leaf start",
+        "leaf end",
+        "branch end",
+        "tree end",
+      ]);
+    } finally {
+      queryClient.clear();
+    }
+  })
+);
+
+it.effect("keeps local onMutate failures ahead of assembled execution", () =>
+  Effect.gen(function* localPreparationFailure() {
+    const client = yield* makeRpcTestClient(rpcGroup, {
+      "users.get": () => Effect.succeed(42),
+    });
+    const base = createRpcQueryUtils(rpcGroup, {
+      client,
+      keyPrefix: ["prepare-failure"],
+    });
+    const calls: string[] = [];
+    const policy = defineUtilsPolicy<typeof base.users.get>()({
+      mutation: {
+        callbacks: "compose",
+        interceptors: [around(calls, "execution")],
+        policy: {
+          onSuccess: () => {
+            calls.push("shared success");
+          },
+        },
+      },
+    });
+    const failure = new Error("optimistic preparation failed");
+    const queryClient = new QueryClient();
+    try {
+      const mutation = new MutationObserver(
+        queryClient,
+        configureUtils(base.users.get, policy).mutationOptions({
+          onMutate: () => {
+            calls.push("prepare");
+            throw failure;
+          },
+          onError: (_error, _input, optimistic) => {
+            expect(optimistic).toBeUndefined();
+            calls.push("error");
+          },
+          onSettled: () => {
+            calls.push("settled");
+          },
+        })
+      );
+      yield* Effect.promise(async () => {
+        await expect(mutation.mutate()).rejects.toBe(failure);
+      });
+      expect(calls).toStrictEqual(["prepare", "error", "settled"]);
     } finally {
       queryClient.clear();
     }
