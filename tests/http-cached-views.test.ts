@@ -948,3 +948,116 @@ it.effect(
       }
     })
 );
+
+it.effect(
+  "coalesces configured SSE snapshots with decoder and local policy identity",
+  () =>
+    Effect.gen(function* configuredSseCoalescing() {
+      const eventApi = HttpApi.make("coalesced-sse").add(
+        HttpApiGroup.make("events").add(
+          HttpApiEndpoint.get("watch", "/watch", {
+            success: HttpApiSchema.StreamSse({
+              events: Schema.Struct({
+                event: Schema.Literal("state"),
+                data: Schema.String,
+              }),
+            }),
+          })
+        )
+      );
+      const client = yield* HttpApiClient.makeWith(eventApi, {
+        baseUrl: "https://example.test",
+        httpClient: HttpClient.make((request) =>
+          Effect.succeed(
+            HttpClientResponse.fromWeb(
+              request,
+              sse(
+                "event: state\n\nevent: state\ndata: one\n\nevent: state\ndata: two\n\n"
+              )
+            )
+          )
+        ),
+      });
+      const http = createHttpApiQueryUtils(eventApi, {
+        client,
+        keyPrefix: ["coalesced"],
+      });
+      const leaf = http.events.watch;
+      const policy = {
+        coalesceMs: 1000,
+        sseOptions: { maxEventSize: 128, dispatchEmptyNamedEvents: true },
+      };
+      const configured = configureUtils(leaf, {
+        live: { policy: { coalesceMs: 1000 } },
+      });
+      const queryClient = new QueryClient();
+      const publications: unknown[] = [];
+      const stop = queryClient.getQueryCache().subscribe((event) => {
+        if (
+          event.type === "updated" &&
+          event.action.type === "success" &&
+          event.action.manual === true
+        ) {
+          publications.push(event.query.state.data);
+        }
+      });
+      try {
+        const options = configured.liveOptions({
+          sseOptions: policy.sseOptions,
+        });
+        const result = yield* Effect.promise(
+          async () => await queryClient.query(options)
+        );
+        expect({
+          key: options.queryKey,
+          configuredKey: configured.liveKey({ sseOptions: policy.sseOptions }),
+          result,
+          publications,
+          cached: queryClient.getQueryData(
+            configured.liveKey({ sseOptions: policy.sseOptions })
+          ),
+        }).toStrictEqual({
+          key: leaf.liveKey(policy),
+          configuredKey: leaf.liveKey(policy),
+          result: { event: "state", data: "two" },
+          publications: [
+            { event: "state", data: "" },
+            { event: "state", data: "two" },
+          ],
+          cached: { event: "state", data: "two" },
+        });
+        expect(options.queryKey).not.toStrictEqual(
+          leaf.liveKey({ coalesceMs: 1000 })
+        );
+        publications.length = 0;
+        const override = {
+          coalesceMs: undefined,
+          sseOptions: { maxEventSize: 64, dispatchEmptyNamedEvents: false },
+        };
+        const local = configured.liveOptions(override);
+        const localResult = yield* Effect.promise(
+          async () => await queryClient.query(local)
+        );
+        expect({
+          key: local.queryKey,
+          configuredKey: configured.liveKey(override),
+          result: localResult,
+          publications,
+          original: queryClient.getQueryData(options.queryKey),
+        }).toStrictEqual({
+          key: leaf.liveKey(override),
+          configuredKey: leaf.liveKey(override),
+          result: { event: "state", data: "two" },
+          publications: [
+            { event: "state", data: "one" },
+            { event: "state", data: "two" },
+          ],
+          original: { event: "state", data: "two" },
+        });
+        expect(local.queryKey).not.toStrictEqual(options.queryKey);
+      } finally {
+        stop();
+        queryClient.clear();
+      }
+    })
+);

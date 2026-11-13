@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "340e0018809064283ae759b27cda02c3656eb3e70a6860bd29e2cc0a97059496",
+      "fingerprint": "c6a57d6373fae72891a3812da3aeb5ddf075fdcdf5ee9757ce48c580bd13e602",
       "snapshot": {
         "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -16,7 +16,7 @@
         "apps/docs/src/content/docs/examples.md": "08c014b01c49123ee871ddb7427d69b4dcf1791fa907ba2fe535ebf6c522d282",
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "022014147e137abdac686d6d3c58f4eff1e8098dd2241a3cccd96abe5051cd26",
         "apps/docs/src/content/docs/examples/http-workflows.md": "f7b41e1e63fda1e4c44e0886b29f5c796f3f51e1b3bf227947423194f6cc39b0",
-        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "f8e9add225959d6a84ebd1987072218c28305bdff0356f3b87540536a0b4c3a9",
+        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "24e0b9805c1c85148806bd5ae7e1b7e1c33c03a3626dc2661b45b9eeea27f193",
         "apps/docs/src/content/docs/getting-started/feature-support.md": "ac3ebd5c192272f7d4d1a236a5878d1d51a76fc514e874cbb51f17eb31809125",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "4c68eaf1d2df4b1dcebf24b8f84ef291dd503a2049eb6802b74e8e52b7e6a948",
         "apps/docs/src/content/docs/getting-started/installation.md": "63ebd6eddf603465b5c1203f6587ae5c6c7fba1a1e59069c929f44eaa645823d",
@@ -25,7 +25,7 @@
         "apps/docs/src/content/docs/guides/cache-filters.md": "b0b8a08b6e2f3484a2565b6bd6d080cd1e95b3e9aefcb5aaf121cd7a96ad2591",
         "apps/docs/src/content/docs/guides/cache-management.md": null,
         "apps/docs/src/content/docs/guides/cancellation.md": "7af74ddcb64ddc5454e3d8b4326a79b9683f1d744537c2b2f267e61a9447274b",
-        "apps/docs/src/content/docs/guides/choose-stream-history.md": "b87b3b305e4c524291afdfd532cc60de7e62b452e1b41a6e83de8651813ecfd3",
+        "apps/docs/src/content/docs/guides/choose-stream-history.md": "8a63ae0729cf2d9c505e52ea2faf0ed7979932893fced17c147481b588b3c5ee",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "cb941076de91c32bc0a1a5e8f6463ea521457210c00ccf4ef4e7de7c5fd135e9",
         "apps/docs/src/content/docs/guides/custom-key-encoders.md": "f1c27e412da1669b9c96c61c1a4fc882ce23516f254ed4d2a1766f017033148c",
         "apps/docs/src/content/docs/guides/handle-failures.md": "337c0146b06c6ee5d2a551af7cabf543dfaaa0b8bb13704bde77186d0d3ff571",
@@ -193,7 +193,7 @@
         "skills/effect-api-query/references/frameworks-and-hosts.md": "89ba2337eedb94f8697c50d2251a7afe5f68f55f9bdecc0f69b96db4d1be0191",
         "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
         "skills/effect-api-query/references/hydration-and-ssr.md": "cb64d4d2622cff1e7be1fb5b6b67e6bc67cbb1cca3e49e657ef8d2e641a26de1",
-        "skills/effect-api-query/references/query-patterns.md": "bab905be6e63e90e3a67e3e3ac844d7f6347442ec90810cec99fba58eca0e781",
+        "skills/effect-api-query/references/query-patterns.md": "06b80a4b8de533f20d6b0fd07dae032c08a8f5879cb5334a1e1b04a4713a4532",
         "skills/effect-api-query/references/rpc.md": "cdbc026d1d29c486b28a2b9fc6a330bcc8855b5887f0f454f73ce261734e8e7e",
         "src/core/branch-filter.ts": "71a8c6039f1775881bbc00d92e14e2ef823bf7150721307a74f16a1579bccc86",
         "src/core/canonical-key.ts": "84e91000876a6795557aab39dcc5d44e328250bf9b30ad02fd67afd02f5003e9",
@@ -220,7 +220,7 @@
         "src/core/stream-recovery.ts": "c2c53ed24c042c24a18b2379995107a09e3145080cc97597d7bb41d3a616d37e",
         "src/core/stream-snapshot.ts": "97fbb56308b2e2decacd86a02b3f0a3ced76692444ba25a7abaae05b442c233a",
         "src/core/streamed-query.ts": "a44dbb1a17a0d266f9e38e6b819dff7dbc417821e14f089e8ed2825dfe763b23",
-        "src/core/types.ts": "422490951153897e129a2b79386f8c3aa56777926466cf57dc36ebfe5193c0c6",
+        "src/core/types.ts": "ded3b620e25ab5def0a96dbafead82398f7f7a43572a434cc30b0c505ee2409b",
         "src/core/utility-tree.ts": "7b113d01c672c1148d022556f72c6e8f49c5afc0170fc88dcff74008abed28f1",
         "src/core/view-prefix.ts": "dfc0d74a07c8afe3f63952d59c29088ba4afb45e11a402ef8b72c5e2282cb063",
         "src/http/create-utils.ts": "8d128bb9646e095456d3dcf696f1aa6e365d0de328df571c64eea7421935c9f5",
@@ -270,13 +270,13 @@
         "tests/framework-consumers/solid.ts": "0e0b261f0f80de83f799326cfa4fdd8cf14cb480909b69bb498b759467ec8bdb",
         "tests/framework-consumers/svelte.ts": "652f8d97d781803239ca667497768077167fffaabec851d5a076f692c376223c",
         "tests/framework-consumers/vue.ts": "e23859e5fe8f8e24a55d8e782dd2880d1a6d88859bdf40ff7b60e8b0c150ab50",
-        "tests/http-cached-views.test.ts": "c885510d4b14084a28b5a5389d30a5dbd01949705e7f0163552f8bd2ef3060db",
+        "tests/http-cached-views.test.ts": "8df1da4d541d18830da6bd14334d670589e55e6c4bfb50175dc198444a96f129",
         "tests/http-execution.test.ts": "064730968e39333e717a08dab15c9cb2455974c8d0f06cdbcd6768bf992c1d53",
         "tests/http-hydration.test.ts": "51da967534267d49dc91f577f43a54fc88045cce8f89623c1106df8c88c21570",
         "tests/http-live-query.test.ts": "e4ed31b68185eba7e80587815ee9bd2ca0573639c2695edf2af0532aa42ac269",
         "tests/http-metadata-options.test.ts": "702a73eb9e005d038d35c233806a065ab4da7d35fa1255df336711bd09be96d4",
         "tests/http-multipart.test.ts": "331f18bf9730579f05513d3ab93734b8118e313b219604e8c0276c07110476ae",
-        "tests/http-ndjson-query.test.ts": "be4e5c1f76ecf2a1a949dbe1ba0094e24f14f0f03ca7b2adf6c54807f365b06e",
+        "tests/http-ndjson-query.test.ts": "7a77db15f41389ea1ecdd38f85a73be5fc15e4916b94254d5e16f7ea923477bd",
         "tests/http-query-options.test.ts": "e7b2ca44c44cd8402ca688960458e1190c54c68845556fc4ea5d131ab8649891",
         "tests/http-semantic-keys.test.ts": "4fa4efd4b8211e52560be80aecade363486372d06cb3eeca0c496a783ea21f8c",
         "tests/http-structural-sharing.test.ts": "35ea74a2711f56cd2001cd5a1f3ffe58f10f4ecbf094c0d4ce7d9e9a62dead42",
@@ -343,7 +343,7 @@
         "tests/types/hydration-contract.ts": "fade858552c1b04fd45f48e86a42668a6132918196eca9089d56f1948551cd64",
         "tests/types/interceptor-contract.ts": "14814393d97b03b55b8a8e84014e24f0f6fc1003e71c2d832a8d643320c5ea18",
         "tests/types/live-coalescing-contract.ts": "c476bfec4ff03244a35938e0bc168894e917ab9e723536e2b759e0002a3ce836",
-        "tests/types/public-contract.ts": "4bd0b76f7fe62a2e52de29c81061487a18b71aa3920ae824d8f48b0f71f749c4",
+        "tests/types/public-contract.ts": "307d25cd97a652d64938c40c76c14b6f43cea69cd06b7b7d3bca194f22321b33",
         "tests/types/query-descriptor-contract.tsx": "933101b6a3696d07a757a10560a25ebd0b1077e1542d9cc330e73cf114aa33b4",
         "tests/types/query-effects-contract.ts": "3272505e389cfb15712e9060394f52d2db5f20dd6dce3cf866d2dfe57f8f4cc0",
         "tests/types/query-events-contract.ts": "1e2b891e352304785c6ae6cf4d31b0d8b277f1a98a6193f6f254614e7c4c0b0e",
@@ -355,7 +355,7 @@
         "tests/types/rpc-large-contract.ts": "a6187bb074b321cd2f8642b7ffcedbd92309e8a8709585fa1c3af1082ea97ef8",
         "tests/types/server-local-client-contract.ts": "4b150665dbcb3022fd90149c9c70cbd8a07322b3739e80ee712b80bd735f110b",
         "tests/types/snapshot-contract.ts": "7eb7b28d2ef7e8348992ca69d52d6cb557d3e4a119f33b0a26c61a5da4f211e4",
-        "tests/types/stream-publication-contract.ts": "7ada8016ddbbc7a3068c69d36a8cc83cc6f6875b28b5aa1acc4887eb6038b189",
+        "tests/types/stream-publication-contract.ts": "40fbfd6a71f8ff57a9158e8b12127cf4398732bed4af2cacaab291adc88f36b8",
         "tests/types/stream-recovery-contract.ts": "cd9ad0a63edb515f1ff17ca64bbd9e5dd2484637e199aa2cbaa6cebf3e01527f",
         "tests/types/stream-retention-contract.ts": "f9e780657769e8354d0ef7f357fe82df100fc3c11ecdd75d28680416e6ffb1a9",
         "tests/types/tanstack-start-contract.ts": "fdfb1043660a634e5d43eab80d60b254f03db8c35c85940e8bfc8f23adb4d350",
@@ -364,20 +364,20 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "a8840fad03c38ad11e2c25f55983fed1c3b4fc6e",
+      "head": "cd8b644758fdfd7011a20fad3e3f3a4034a216c2",
       "outcome": "updated",
-      "reason": "Merged #174 S1 conservative rejection contract: cache-workflows, bridge/compatibility guides and public exports retain exact native rejection objects with unknown payloads. Native options remain precise; data/services and waiter-only interruption are unchanged. Descriptor/policy/event behavior and owner lifecycle JSDoc remain intact.",
+      "reason": "Clarify fixed timer scheduling, local HTTP decoder/key policy, and breaking RPC tuple assignment compatibility in the existing query-patterns task. No new task or activation description.",
       "evidence": [
-        "Compared a8840fad and 7030e826 with actual combined source, tests and guidance. 174-fix-merge-tests.log: 120 tests/12 files, package/ATTW/publint, public and server-local fixtures on TSRS 0.21.0 TypeScript 7.1 beta and TypeScript 5.9.3 pass. Includes foreign HTTP wrapper and same-tag wrong-payload runner rejection through fetch/ensure, actual failed Exit composite Cause identity, concurrent observers and owner/event/descriptor/policy composition. Strict 226 files, Effect check, docs excerpts/Astro, scoped format/YAML pass. Fresh consumer/discovery and independent Astra acceptance not verified; agents prohibited."
+        "79 public cache/stream/snapshot tests pass; published fixtures pass pinned TSRS and TS5.9, retaining all negative contracts. docs-check and skills-check pass. Runtime behavior unchanged; fresh consumer discovery unverified because agents are prohibited."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "31ff8590e74cff2e08051e9a505322ec5cdc912d6ba34d3862b899a45409baaf",
+      "fingerprint": "e1706f8a23d695d00c83fba4e2904f5cf020fed6e02c85be5b5f181d60f6623a",
       "snapshot": {
         "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
-        "_artifacts/domain_map.yaml": "5090979f12c737226f1defa77c465627ff1a75469b36924da0b9994002cc6049",
-        "_artifacts/skill_spec.md": "af241eccd4b33235df3b6ff8e5f55e50235cead9fb01c781903c0d8e65bc2b15",
+        "_artifacts/domain_map.yaml": "b3146af947397dd840d4b58bde7446544589490ecf27921f995ea65c24727c77",
+        "_artifacts/skill_spec.md": "5fdceff1aee2e29a5d703a87a60cb9f1ec64f40bca3d1a29b8467fb3d4b61955",
         "_artifacts/skill_tree.yaml": "aab2f3819f3c8380066a1ee416ef351b535aa10d9941b00bcdefdff4b6691f63",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "83a6aab512d66893237aa3ba45bf52b23712b88d829d83992509c2f3c822c18b",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "eb226d096cee825aa2a7c2e49370208d6110662c3acf681fa4b95f8b6caca0d7",
@@ -388,7 +388,7 @@
         "apps/docs/src/content/docs/examples.md": "08c014b01c49123ee871ddb7427d69b4dcf1791fa907ba2fe535ebf6c522d282",
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "022014147e137abdac686d6d3c58f4eff1e8098dd2241a3cccd96abe5051cd26",
         "apps/docs/src/content/docs/examples/http-workflows.md": "f7b41e1e63fda1e4c44e0886b29f5c796f3f51e1b3bf227947423194f6cc39b0",
-        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "f8e9add225959d6a84ebd1987072218c28305bdff0356f3b87540536a0b4c3a9",
+        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "24e0b9805c1c85148806bd5ae7e1b7e1c33c03a3626dc2661b45b9eeea27f193",
         "apps/docs/src/content/docs/getting-started/feature-support.md": "ac3ebd5c192272f7d4d1a236a5878d1d51a76fc514e874cbb51f17eb31809125",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "4c68eaf1d2df4b1dcebf24b8f84ef291dd503a2049eb6802b74e8e52b7e6a948",
         "apps/docs/src/content/docs/getting-started/installation.md": "63ebd6eddf603465b5c1203f6587ae5c6c7fba1a1e59069c929f44eaa645823d",
@@ -397,7 +397,7 @@
         "apps/docs/src/content/docs/guides/cache-filters.md": "b0b8a08b6e2f3484a2565b6bd6d080cd1e95b3e9aefcb5aaf121cd7a96ad2591",
         "apps/docs/src/content/docs/guides/cache-management.md": null,
         "apps/docs/src/content/docs/guides/cancellation.md": "7af74ddcb64ddc5454e3d8b4326a79b9683f1d744537c2b2f267e61a9447274b",
-        "apps/docs/src/content/docs/guides/choose-stream-history.md": "b87b3b305e4c524291afdfd532cc60de7e62b452e1b41a6e83de8651813ecfd3",
+        "apps/docs/src/content/docs/guides/choose-stream-history.md": "8a63ae0729cf2d9c505e52ea2faf0ed7979932893fced17c147481b588b3c5ee",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "cb941076de91c32bc0a1a5e8f6463ea521457210c00ccf4ef4e7de7c5fd135e9",
         "apps/docs/src/content/docs/guides/custom-key-encoders.md": "f1c27e412da1669b9c96c61c1a4fc882ce23516f254ed4d2a1766f017033148c",
         "apps/docs/src/content/docs/guides/handle-failures.md": "337c0146b06c6ee5d2a551af7cabf543dfaaa0b8bb13704bde77186d0d3ff571",
@@ -565,7 +565,7 @@
         "skills/effect-api-query/references/frameworks-and-hosts.md": "89ba2337eedb94f8697c50d2251a7afe5f68f55f9bdecc0f69b96db4d1be0191",
         "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
         "skills/effect-api-query/references/hydration-and-ssr.md": "cb64d4d2622cff1e7be1fb5b6b67e6bc67cbb1cca3e49e657ef8d2e641a26de1",
-        "skills/effect-api-query/references/query-patterns.md": "bab905be6e63e90e3a67e3e3ac844d7f6347442ec90810cec99fba58eca0e781",
+        "skills/effect-api-query/references/query-patterns.md": "06b80a4b8de533f20d6b0fd07dae032c08a8f5879cb5334a1e1b04a4713a4532",
         "skills/effect-api-query/references/rpc.md": "cdbc026d1d29c486b28a2b9fc6a330bcc8855b5887f0f454f73ce261734e8e7e",
         "src/core/branch-filter.ts": "71a8c6039f1775881bbc00d92e14e2ef823bf7150721307a74f16a1579bccc86",
         "src/core/canonical-key.ts": "84e91000876a6795557aab39dcc5d44e328250bf9b30ad02fd67afd02f5003e9",
@@ -592,7 +592,7 @@
         "src/core/stream-recovery.ts": "c2c53ed24c042c24a18b2379995107a09e3145080cc97597d7bb41d3a616d37e",
         "src/core/stream-snapshot.ts": "97fbb56308b2e2decacd86a02b3f0a3ced76692444ba25a7abaae05b442c233a",
         "src/core/streamed-query.ts": "a44dbb1a17a0d266f9e38e6b819dff7dbc417821e14f089e8ed2825dfe763b23",
-        "src/core/types.ts": "422490951153897e129a2b79386f8c3aa56777926466cf57dc36ebfe5193c0c6",
+        "src/core/types.ts": "ded3b620e25ab5def0a96dbafead82398f7f7a43572a434cc30b0c505ee2409b",
         "src/core/utility-tree.ts": "7b113d01c672c1148d022556f72c6e8f49c5afc0170fc88dcff74008abed28f1",
         "src/core/view-prefix.ts": "dfc0d74a07c8afe3f63952d59c29088ba4afb45e11a402ef8b72c5e2282cb063",
         "src/http/create-utils.ts": "8d128bb9646e095456d3dcf696f1aa6e365d0de328df571c64eea7421935c9f5",
@@ -642,13 +642,13 @@
         "tests/framework-consumers/solid.ts": "0e0b261f0f80de83f799326cfa4fdd8cf14cb480909b69bb498b759467ec8bdb",
         "tests/framework-consumers/svelte.ts": "652f8d97d781803239ca667497768077167fffaabec851d5a076f692c376223c",
         "tests/framework-consumers/vue.ts": "e23859e5fe8f8e24a55d8e782dd2880d1a6d88859bdf40ff7b60e8b0c150ab50",
-        "tests/http-cached-views.test.ts": "c885510d4b14084a28b5a5389d30a5dbd01949705e7f0163552f8bd2ef3060db",
+        "tests/http-cached-views.test.ts": "8df1da4d541d18830da6bd14334d670589e55e6c4bfb50175dc198444a96f129",
         "tests/http-execution.test.ts": "064730968e39333e717a08dab15c9cb2455974c8d0f06cdbcd6768bf992c1d53",
         "tests/http-hydration.test.ts": "51da967534267d49dc91f577f43a54fc88045cce8f89623c1106df8c88c21570",
         "tests/http-live-query.test.ts": "e4ed31b68185eba7e80587815ee9bd2ca0573639c2695edf2af0532aa42ac269",
         "tests/http-metadata-options.test.ts": "702a73eb9e005d038d35c233806a065ab4da7d35fa1255df336711bd09be96d4",
         "tests/http-multipart.test.ts": "331f18bf9730579f05513d3ab93734b8118e313b219604e8c0276c07110476ae",
-        "tests/http-ndjson-query.test.ts": "be4e5c1f76ecf2a1a949dbe1ba0094e24f14f0f03ca7b2adf6c54807f365b06e",
+        "tests/http-ndjson-query.test.ts": "7a77db15f41389ea1ecdd38f85a73be5fc15e4916b94254d5e16f7ea923477bd",
         "tests/http-query-options.test.ts": "e7b2ca44c44cd8402ca688960458e1190c54c68845556fc4ea5d131ab8649891",
         "tests/http-semantic-keys.test.ts": "4fa4efd4b8211e52560be80aecade363486372d06cb3eeca0c496a783ea21f8c",
         "tests/http-structural-sharing.test.ts": "35ea74a2711f56cd2001cd5a1f3ffe58f10f4ecbf094c0d4ce7d9e9a62dead42",
@@ -715,7 +715,7 @@
         "tests/types/hydration-contract.ts": "fade858552c1b04fd45f48e86a42668a6132918196eca9089d56f1948551cd64",
         "tests/types/interceptor-contract.ts": "14814393d97b03b55b8a8e84014e24f0f6fc1003e71c2d832a8d643320c5ea18",
         "tests/types/live-coalescing-contract.ts": "c476bfec4ff03244a35938e0bc168894e917ab9e723536e2b759e0002a3ce836",
-        "tests/types/public-contract.ts": "4bd0b76f7fe62a2e52de29c81061487a18b71aa3920ae824d8f48b0f71f749c4",
+        "tests/types/public-contract.ts": "307d25cd97a652d64938c40c76c14b6f43cea69cd06b7b7d3bca194f22321b33",
         "tests/types/query-descriptor-contract.tsx": "933101b6a3696d07a757a10560a25ebd0b1077e1542d9cc330e73cf114aa33b4",
         "tests/types/query-effects-contract.ts": "3272505e389cfb15712e9060394f52d2db5f20dd6dce3cf866d2dfe57f8f4cc0",
         "tests/types/query-events-contract.ts": "1e2b891e352304785c6ae6cf4d31b0d8b277f1a98a6193f6f254614e7c4c0b0e",
@@ -727,7 +727,7 @@
         "tests/types/rpc-large-contract.ts": "a6187bb074b321cd2f8642b7ffcedbd92309e8a8709585fa1c3af1082ea97ef8",
         "tests/types/server-local-client-contract.ts": "4b150665dbcb3022fd90149c9c70cbd8a07322b3739e80ee712b80bd735f110b",
         "tests/types/snapshot-contract.ts": "7eb7b28d2ef7e8348992ca69d52d6cb557d3e4a119f33b0a26c61a5da4f211e4",
-        "tests/types/stream-publication-contract.ts": "7ada8016ddbbc7a3068c69d36a8cc83cc6f6875b28b5aa1acc4887eb6038b189",
+        "tests/types/stream-publication-contract.ts": "40fbfd6a71f8ff57a9158e8b12127cf4398732bed4af2cacaab291adc88f36b8",
         "tests/types/stream-recovery-contract.ts": "cd9ad0a63edb515f1ff17ca64bbd9e5dd2484637e199aa2cbaa6cebf3e01527f",
         "tests/types/stream-retention-contract.ts": "f9e780657769e8354d0ef7f357fe82df100fc3c11ecdd75d28680416e6ffb1a9",
         "tests/types/tanstack-start-contract.ts": "fdfb1043660a634e5d43eab80d60b254f03db8c35c85940e8bfc8f23adb4d350",
@@ -736,11 +736,11 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "a8840fad03c38ad11e2c25f55983fed1c3b4fc6e",
+      "head": "cd8b644758fdfd7011a20fad3e3f3a4034a216c2",
       "outcome": "updated",
-      "reason": "Domain map adds promise-rejection provenance tension and cumulative skill_spec records the conservative #174 correction while retaining loader, policy, event and prior coverage. Existing one-skill/six-reference tree, prerequisites and wildcard source mappings already cover all affected files; skill_tree is a justified no-op. Sync reports nothing to synchronize.",
+      "reason": "Domain map and cumulative spec now cover timer limits, configured HTTP identity coverage and major RPC tuple compatibility classification. Existing one-skill/six-reference tree, prerequisites and wildcard source mappings cover these edits; skill_tree.yaml is an evidence-backed no-op.",
       "evidence": [
-        "Read all three planning records and composed source/guidance against a8840fad and 7030e826. Executable task checks and both compilers pass (174-fix-merge-tests.log), strict/docs/Effect/format/YAML pass. Final eight-pair matrix and fresh Astra174/168 reviews remain parent gates; unrelated 21 pending research items left unannotated."
+        "_artifacts/domain_map.yaml, skill_spec.md and skill_tree.yaml reviewed against source/guidance; yamllint and skills-check pass. Public task checks: 79 tests plus both published compilers and docs-check. Fresh consumer discovery and Astra acceptance remain parent work."
       ]
     },
     "source:vite.config.ts": {
@@ -3162,18 +3162,15 @@
       ]
     },
     "source:.changeset/live-snapshot-coalescing.md": {
-      "fingerprint": "4d6e2214c699024c3b9739642369e9257a81161eb8ec4ba832e9e9fd29f9406f",
+      "fingerprint": "45097cc278ccead28181bd5a586181b32d1ffae3985db3be1d719cb374a785a6",
       "snapshot": {
-        ".changeset/live-snapshot-coalescing.md": "9815e2dda8ce14878da7fc13fd1c75ef4b647d8b978b601d59ded52e9de0088e"
+        ".changeset/live-snapshot-coalescing.md": "3382f057659fb416bbe9ad71dbe1c291fadb98ded6bb141d6ea67b3fd95a5eee"
       },
-      "head": "de73ef2a03a2a896a09b18c61f2eefac66f48e1b",
-      "outcome": "no-change",
-      "reason": "Minor changeset accurately describes additive opt-in live snapshot behavior; task guide and shipped reference own detailed semantics. No separate skill required.",
+      "head": "cd8b644758fdfd7011a20fad3e3f3a4034a216c2",
+      "outcome": "updated",
+      "reason": "Classify existing optional RPC live key tuple slot as a breaking public type change under ADR0042 and disclose migration, while retaining unchanged default runtime values. No release version prescribed.",
       "evidence": [
-        "Reviewed actual #179 diff from dbb64e8 and subsequent local integration merges through 7d03b36; no published values mutated. First red test rejected per-emission publication, then passed with coalescing; diagnostic red/green also recorded.",
-        "Post-merge vp run check, test (816 cases / 67 files, both public compilers TSRS/TS7.1 beta and TS5.9.3), effect-check, framework-types, docs-check all pass. Stronger fixed-deadline replacement test passes; commit hook repeats typed checks. Package attw/publint pass.",
-        "Three samples each at 1000 and 10000 emissions: live cache writes 1000/10000, notifications 1002/10002; coalesced writes 2, notifications 4, one retained final value, all emissions consumed and finalizers complete. Full report /tmp/effect-api-query-spec-166/179-measurements.json.",
-        "Intent sync no-op; YAML validation passes; skills-check passes. Fresh consumer-agent discovery unverified because no agents are authorized; broad architecture review and browser/full integration acceptance remain parent work. No new dependency-support or remote-cleanup claims."
+        "179-fix-tuple-red.log reproduces both input-bearing and inputless old tuple assignment failures. Final expected-error fixtures pass both compilers; literal prefixes and existing data/error assertions retained. No RPC runtime/type change in follow-up."
       ]
     },
     "source:.changeset/scoped-query-owner.md": {

@@ -36,3 +36,5 @@ Hydration uses explicitly registered paired codecs for decoded views; infinite d
 - **Major:** Breaking public contracts or dropping any supported dependency or compiler version, including while this package is below 1.0.
 
 A development pin update within an unchanged supported range is internal tooling when it changes no public behavior; it does not itself extend support. A newly required upstream API or fix that raises the floor drops support and therefore requires a major change. These rules apply to future changes. Historical release classifications remain unchanged. See [ADR 0042](https://github.com/ueberBrot/effect-api-query/blob/main/docs/adr/0042-define-the-compatibility-promise.md).
+
+The live snapshot coalescing change includes a breaking RPC key type change: live keys have an optional trailing policy tuple slot even when the option is omitted. Default runtime key values are unchanged. Old exact-length tuple assignments can fail; use the generated key type or the options' `queryKey` instead. This change requires major classification under the policy above, rather than purely additive classification. It does not change dependency support.
