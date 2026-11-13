@@ -82,7 +82,7 @@ export type {
 /** The type of Query Core's exact skip sentinel. @api public */
 export type { SkipToken } from "@tanstack/query-core";
 
-export { configureUtils } from "./core/configure-utils";
+export { configureUtils, defineUtilsPolicy } from "./core/configure-utils";
 export type {
   ConfiguredUtils,
   UtilsConfiguration,
