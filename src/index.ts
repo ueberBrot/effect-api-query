@@ -110,3 +110,5 @@ export {
   QueryDescriptorError,
 } from "./core/query-descriptor";
 export type { QueryDescriptor } from "./core/query-descriptor";
+
+export { runQueryEvents } from "./core/query-events";

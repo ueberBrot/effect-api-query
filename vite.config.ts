@@ -307,6 +307,7 @@ export default defineConfig({
           "tests/query-effects.test.ts",
           "tests/query-descriptor.test.ts",
           "examples/shared/query-effects.ts",
+          "examples/shared/query-events.ts",
           "tests/query-view-prefix.test.ts",
           "tests/stream-publication.test.ts",
           "tests/live-coalescing.test.ts",
