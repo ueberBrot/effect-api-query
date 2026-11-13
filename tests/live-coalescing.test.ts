@@ -64,6 +64,8 @@ it.effect(
   () =>
     Effect.gen(function* flushesDeadline() {
       vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+      const midReached = yield* Deferred.make<boolean>();
+      const midResume = yield* Deferred.make<boolean>();
       const reached = yield* Deferred.make<boolean>();
       const resume = yield* Deferred.make<boolean>();
       const finalPull = yield* Deferred.make<boolean>();
@@ -73,7 +75,15 @@ it.effect(
       );
       const client = yield* makeRpcTestClient(group, {
         watch: () =>
-          Stream.make(1, 2, 3).pipe(
+          Stream.make(1, 2).pipe(
+            Stream.concat(
+              Stream.fromEffect(
+                Deferred.succeed(midReached, true).pipe(
+                  Effect.andThen(Deferred.await(midResume)),
+                  Effect.as(3)
+                )
+              )
+            ),
             Stream.concat(
               Stream.fromEffect(
                 Deferred.succeed(reached, true).pipe(
@@ -111,13 +121,15 @@ it.effect(
       });
       const stop = observer.subscribe(() => {});
       try {
-        yield* Deferred.await(reached);
+        yield* Deferred.await(midReached);
         yield* Effect.promise(async () => await vi.advanceTimersByTimeAsync(0));
         expect(values).toStrictEqual([1]);
         yield* Effect.promise(
           async () => await vi.advanceTimersByTimeAsync(19)
         );
         expect(values).toStrictEqual([1]);
+        yield* Deferred.succeed(midResume, true);
+        yield* Deferred.await(reached);
         yield* Effect.promise(async () => await vi.advanceTimersByTimeAsync(1));
         expect(values).toStrictEqual([1, 3]);
         yield* Deferred.succeed(resume, true);
