@@ -33,6 +33,8 @@ vp run stream-baseline
 
 Type measurements compare contracts alone, raw utilities, and scoped configuration at 50, 250, and 1,000 operations on both supported compilers. Bundle measurements compare matching consumers with and without utilities, with peers included and external. Stream measurements include bounded and unbounded histories, count and deadline publication, live values, cache writes, observer notifications, and cleanup.
 
+For compiler comparisons, keep the operation counts, contract/raw/configured consumers, compiler engine and language target, dependency lockfile, and compiler options identical. The current development compiler is Effect-enhanced TSRS; the minimum consumer compiler is TypeScript 5.9.3. Compare each compiler with itself. Save a warmup run separately, then repeat samples in fresh compiler processes. Instantiation counts describe compiler work; report memory, check time, and wall time separately because they vary with the environment. A compiler upgrade is not evidence of an adapter improvement.
+
 Each workload prints JSON with its dependency and runtime versions. Set `PERFORMANCE_OUTPUT` to save the same report to a file. Construction reports also fingerprint the configuration source and workload script. Compare matching workloads and versions before attributing a change to the adapter.
 
 The [stream workload](https://github.com/ueberBrot/effect-api-query/blob/main/tests/create-rpc-query-utils-stream-baseline.test.ts) and [transport workload](https://github.com/ueberBrot/effect-api-query/blob/main/examples/server/tests/rpc-transport-overhead.test.ts) measure publication and transport costs. Results are comparable only for the same workload and dependency versions. Elapsed time and memory depend on the machine.
@@ -44,6 +46,8 @@ The package marks its exports as free of side effects and keeps Effect and Query
 An adapter-only bundle with external peers excludes dependency code. The application's contract Schemas, transport, QueryClient, framework, and other imports contribute to the final bundle. Attributing a size change to the adapter requires a comparison with the same imports and dependency versions.
 
 ## Reuse a stable input
+
+Create the utility tree and apply shared `configureUtils` policies once per client/cache owner. Reuse those utilities across renders; rebuild call-site options when reactive input changes. Configuration does not remove the compiler's need to retain the literal contract and native hook inference.
 
 When the same large input is used repeatedly, prepare it once:
 
