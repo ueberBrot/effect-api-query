@@ -74,6 +74,11 @@ export type OwnedMutationOption = "mutationFn" | "mutationKey";
 
 export type StreamRefetchMode = "append" | "replace" | "reset";
 
+export type LivePolicyOptions = {
+  /** Publish the first snapshot immediately, then the latest pending snapshot within this many milliseconds. */
+  readonly coalesceMs?: number | undefined;
+};
+
 export type StreamedPolicyOptions = {
   /** Controls whether a refetch clears, appends to, or replaces accumulated data. */
   readonly refetchMode?: StreamRefetchMode | undefined;
