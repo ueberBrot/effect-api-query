@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "9500eb54b84cbb5f2b81b013e703f624b8cc0773d3e489eafeb7bf1844f60b50",
+      "fingerprint": "b604267c8a92892c449ad9ba9cda923015f6d153efb87b958ae1c58e5c791d2c",
       "snapshot": {
         "GLOSSARY.md": "46dbb34263cba0eed072a74dad59b635ff339758dd9ef3c18da51be4fb10b328",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -211,7 +211,7 @@
         "src/core/query-effects.ts": "af269881229597833776919a2227f7ed03748fb7deb0e4df39dedb1668728584",
         "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
-        "src/core/query-owner.ts": "da9715879195454960142fb6a7a92bf96e754b5241a73fbbf2c8b6d0b13e5bcb",
+        "src/core/query-owner.ts": "5d40933e8a08a9f418c85990cc9be42bbdd5861136d1e501afa137daf49cabbf",
         "src/core/schema-key.ts": "7dad2749d30f2ab828dbc7e96d6e1e2b32b6733450cb6dc734de607629d925f8",
         "src/core/schema-structural-sharing.ts": "1a961c521aaf02c00689bee654ff428bb9d519ebf87651f7faedb9dfd1a06ccc",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
@@ -362,18 +362,17 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "087d85950f07b6f77d9d924b1107377f383d8f1d",
-      "outcome": "updated",
-      "reason": "Preserve incoming event/cache guidance and loader capture/rebind guidance together; root exports and native owner/cache/error boundaries compose without replacing transport, providers or hooks. Descriptor codecs validate operation/view/input and receiver semantic identity, excluding infinite page mappers.",
+      "head": "d5ae59142403daec379c5173d9b5197ad37573af",
+      "outcome": "no-change",
+      "reason": "Final integration c48da54 only corrects runQuery/runMutation method comments: query execution tracks cancellation/finalizers while mutation registration includes complete native callbacks. Runtime, types, loader guidance and all three planning records remain accurate; preserve both workflow histories and mappings.",
       "evidence": [
-        "Actual combined diff from b215f90 and #175 handoff/source inspected; both exports retained",
-        "62 public/native tests across9files plus both public/server-local compilers and package checks pass",
-        "225-file strict typed lint/typecheck passes; docs24/Astro pass; source-only comment audit completed",
-        "No fresh consumer/discovery, graphical browser or independent Astra evidence; parent owns final integrated checks"
+        "Comment-only src/core/query-owner.ts diff compared against d5ae591",
+        "62 combined public tests; both public/server-local compilers;225-file strict check;24 docs excerpts/Astro;Effect/package checks pass on identical runtime/types",
+        "All three planning records and shipped ownership/hydration references inspected; no new skill or mapping needed"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "245f53fa2119217f0c5aeb9d237d685ffd1608b184f3143563f198cddd98ed39",
+      "fingerprint": "4ce0ce03715e15db41581ed50481aed0f10c07771646bbefb47472bc777bf85d",
       "snapshot": {
         "GLOSSARY.md": "46dbb34263cba0eed072a74dad59b635ff339758dd9ef3c18da51be4fb10b328",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -584,7 +583,7 @@
         "src/core/query-effects.ts": "af269881229597833776919a2227f7ed03748fb7deb0e4df39dedb1668728584",
         "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
-        "src/core/query-owner.ts": "da9715879195454960142fb6a7a92bf96e754b5241a73fbbf2c8b6d0b13e5bcb",
+        "src/core/query-owner.ts": "5d40933e8a08a9f418c85990cc9be42bbdd5861136d1e501afa137daf49cabbf",
         "src/core/schema-key.ts": "7dad2749d30f2ab828dbc7e96d6e1e2b32b6733450cb6dc734de607629d925f8",
         "src/core/schema-structural-sharing.ts": "1a961c521aaf02c00689bee654ff428bb9d519ebf87651f7faedb9dfd1a06ccc",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
@@ -735,12 +734,13 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "087d85950f07b6f77d9d924b1107377f383d8f1d",
-      "outcome": "updated",
-      "reason": "Preserve #175 and #176 coverage/history plus all prior compatibility/compiler/sharing history. Domain map, skill spec and skill tree remain aligned with one skill/six references; existing wildcard mappings cover both helpers, fixtures and guides.",
+      "head": "d5ae59142403daec379c5173d9b5197ad37573af",
+      "outcome": "no-change",
+      "reason": "Final integration c48da54 only corrects runQuery/runMutation method comments: query execution tracks cancellation/finalizers while mutation registration includes complete native callbacks. Runtime, types, loader guidance and all three planning records remain accurate; preserve both workflow histories and mappings.",
       "evidence": [
-        "All three planning records inspected against combined source and shipped references",
-        "intent sync no-op; skill validation passes; only owned outcomes recorded"
+        "Comment-only src/core/query-owner.ts diff compared against d5ae591",
+        "62 combined public tests; both public/server-local compilers;225-file strict check;24 docs excerpts/Astro;Effect/package checks pass on identical runtime/types",
+        "All three planning records and shipped ownership/hydration references inspected; no new skill or mapping needed"
       ]
     },
     "source:vite.config.ts": {
