@@ -11,7 +11,7 @@ The package is ESM-only and targets ES2022. It declares Effect and Query Core as
 | --- | --- | --- |
 | Effect | Library peer: `>=4.0.6 <4.2.0` | Coordinated runtime, testing, and Node platform packages: floor `4.0.6`, development `4.1.0` |
 | Query Core | Library peer: `>=5.104.4 <6` | `5.105.0` |
-| TypeScript | Public declarations: 5.9 or newer, with `strict: true` | `5.9.3` and `7.0.2` |
+| TypeScript | Public declarations: 5.9 or newer, with `strict: true` | `5.9.3` and Effect-enhanced TSRS `0.21.0` (TypeScript `7.1.0-beta`) |
 | React and React Query | React Query peer: React `^18 \|\| ^19` | React `19.3.1`, React Query `5.105.0` |
 | Vue and Vue Query | Vue Query peer: Vue `^2.6.0 \|\| ^3.3.0` | Vue `3.5.44`, Vue Query `5.105.0` |
 | Solid and Solid Query | Solid Query peer: Solid `^1.6.0` | Solid `1.9.18`, Solid Query `5.105.0` |

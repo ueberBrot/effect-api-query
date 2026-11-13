@@ -1,0 +1,9 @@
+#!/usr/bin/env node
+import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+const result = spawnSync(process.execPath, [
+  fileURLToPath(new URL("../../node_modules/@effect/tsgo/dist/effect-tsgo.cjs", import.meta.url)),
+  "tsrs@0.21.0-ts7.1.0-beta", ...process.argv.slice(2),
+], { stdio: "inherit" });
+if (result.error) throw result.error;
+process.exit(result.status ?? 1);

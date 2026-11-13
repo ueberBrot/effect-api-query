@@ -1,6 +1,6 @@
 # Centralize the toolchain in Vite+
 
-Status: Accepted.
+Status: Accepted. Development compiler selection amended by [ADR 0035](0035-use-effect-enhanced-tsrs-for-development.md).
 
 ## Context
 

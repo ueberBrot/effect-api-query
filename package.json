@@ -50,7 +50,7 @@
   },
   "scripts": {
     "changeset": "changeset",
-    "prepare": "vp config --no-agent && effect-tsgo patch --typescript --oxlint",
+    "prepare": "vp config --no-agent && effect-tsgo tsrs@0.21.0-ts7.1.0-beta --version",
     "version-packages": "node scripts/version-packages.mts"
   },
   "devDependencies": {
@@ -61,7 +61,7 @@
     "@effect-api-query/contracts": "workspace:*",
     "@effect-api-query/server": "workspace:*",
     "@effect/platform-node": "catalog:",
-    "@effect/tsgo": "0.63.0",
+    "@effect/tsgo": "0.67.3",
     "@effect/vitest": "4.1.0",
     "@playwright/test": "1.64.1",
     "@shadcn/lint": "0.2.3",
