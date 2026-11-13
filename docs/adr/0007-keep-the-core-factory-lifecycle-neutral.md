@@ -15,3 +15,5 @@ The core factory accepts a ready flat Effect RPC client. It never constructs, sc
 The caller owns the protocol, middleware, lifetime, and resources. Queries forward TanStack's abort signal. Mutations omit that signal. Runner rejections propagate unchanged.
 
 [ADR 0026](0026-keep-rpc-transport-aggregation-in-the-application.md) preserves application ownership of transport aggregation.
+
+[ADR 0040](0040-add-opt-in-query-owner-retirement.md) adds a separate opt-in owner helper; it does not change factory ownership.

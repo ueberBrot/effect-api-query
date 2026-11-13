@@ -41,6 +41,7 @@ sources:
   - "docs/adr/0015-*.md"
   - "docs/adr/002*.md"
   - "docs/adr/003*.md"
+  - "docs/adr/0040-*.md"
   - "**/apps/docs/src/content/docs/**/*.md"
   - "**/apps/docs/src/content/docs/**/*.mdx"
 ---
@@ -99,6 +100,8 @@ Read only the branch needed for the task:
 Keep the client's Scope or ManagedRuntime alive through every operation that uses it. An RPC client returned from a completed `Effect.scoped` region is unusable. During client setup, create utilities and reuse them across component renders.
 
 If execution requires client or Schema services, pass a `runPromiseExit` runner that provides them. The runner must return an Effect `Exit` and forward the `signal` from its second argument. `runtime.runPromiseExit` has this shape. Service-free calls can use the factory default. A custom key encoder supplies cache identity. The runner still supplies execution services.
+
+For optional acquired/borrowed setup and precise query/mutation drains, read [query owner setup](references/cache-workflows.md#opt-in-to-query-owner-setup). Keep query-function interceptors as well as runner tracking for streams.
 
 Ordinary queries forward TanStack cancellation to Effect. For Suspense hooks, read the cancellation limitation in [frameworks and hosts](references/frameworks-and-hosts.md). Before disposing resources, stop consumers, cancel queries, and drain local streams, pending preparation, and accepted mutations. Native cancellation can settle before finalizers finish. `fetchStreamSnapshot` drains its own capture. Mutations receive no query abort signal. A cancellable command needs an application operation identified before work starts. Owner retirement leaves completed remote work intact.
 
