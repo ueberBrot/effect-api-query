@@ -95,4 +95,4 @@ Share defaults with `configureUtils(leaf, { live: { policy: { coalesceMs: 50 } }
 
 Raw `consumeEvents` still processes every event sequentially. For deltas and ordered history, use accumulated retention and publication batches/deadlines, which preserve accepted event order. Treat all published values as immutable.
 
-RPC live key types include an optional trailing policy slot even when coalescing is omitted. Default runtime keys remain unchanged, but the wider type cannot be assigned to the previous exact-length tuple. This is a breaking public type change under the [compatibility policy](/effect-api-query/getting-started/compatibility-and-stability/). Use generated keys or the options' `queryKey` directly for cache access; remove old exact-length annotations. Literal operation paths and data/error tags remain precise.
+RPC live key types include an optional trailing policy slot. Use generated keys or the options' `queryKey` for cache access. Literal operation paths and data/error tags remain precise.

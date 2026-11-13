@@ -1,10 +1,10 @@
 # Define the compatibility promise
 
-Status: Accepted. Prospectively amends the pre-1.0 versioning rule in [ADR 0001](0001-target-effect-4-release-candidate.md) and extends compatibility validation in [ADR 0033](0033-bound-effect-support-to-a-patch-line.md). Preserves their historical decisions and evidence.
+Status: Accepted. Extends compatibility validation in [ADR 0033](0033-bound-effect-support-to-a-patch-line.md). Versioning continues to follow [ADR 0001](0001-target-effect-4-release-candidate.md).
 
 ## Context
 
-Spec #166 ticket #168 requires a complete public contract and reproducible evidence for both bounded peers. The current manifest already admits Effect 4.0 and 4.1; ADR 0033 records the initial 4.0-only decision. Existing floor/current tests miss maintained 4.0 patches and Query Core's floor. Historical pre-1.0 versioning treats breaking changes as minor, which conflicts with the new support promise.
+Spec #166 ticket #168 requires a complete public contract and reproducible evidence for both bounded peers. The current manifest already admits Effect 4.0 and 4.1; ADR 0033 records the initial 4.0-only decision. Existing floor/current tests miss maintained 4.0 patches and Query Core's floor.
 
 ## Decision
 
@@ -17,7 +17,7 @@ Refresh pinned representatives through explicit review. CI uses exact pins. Keep
 
 Packed consumers run public fixtures under pinned TSRS and minimum TypeScript 5.9.3, plus selected execution, stream, cancellation and hydration regressions. Verify artifact imports and the packed library's peers against consumer resolution. Framework consumers/builds remain separate evidence for the selected development combination. Support ranges admit untested intermediate versions; exact combinations are evidence rather than exhaustive certification. Review future Effect minors and TypeScript majors explicitly. Applications coordinate their Effect packages and native Query wrappers.
 
-For future changes, classify compatible fixes and internal tooling as patch changes. Classify additive capabilities and verified range extensions as minor changes. Classify breaking contracts and supported dependency/compiler drops as major changes, even below 1.0. Raising a floor is a support drop. Preserve historical release classifications.
+Before 1.0, breaking public contracts and dropping supported dependency or compiler versions are minor changes. Compatible fixes and internal tooling changes are patch changes; additive capabilities and verified range extensions are minor changes. Raising a floor drops support and still requires compatibility checks.
 
 ## Consequences
 

@@ -87,7 +87,7 @@ Keep Effect runtime, testing, and platform packages on a coordinated release wit
 
 The packed matrix checks Effect 4.0.6, 4.0.7, 4.1.0 and 4.1.2 with Query Core 5.104.4 and 5.105.0, using TSRS and TypeScript 5.9.3. These exact combinations are evidence within the supported ranges, not exhaustive patch coverage. Review future Effect minors and TypeScript majors explicitly.
 
-Treat compatible fixes and internal tooling changes as patch changes. Treat additive capabilities and verified range extensions as minor changes. Treat breaking contracts and supported dependency/compiler drops as major changes, including below 1.0. A required API, type contract or correctness fix can force a major support drop by raising the minimum. Extend support only after compatibility checks. Supporting older releases does not backport upstream transport fixes.
+Before 1.0, breaking contracts and supported dependency or compiler drops are minor changes, as are additive capabilities and verified range extensions. Compatible fixes and internal tooling changes are patch changes. A required API, type contract or correctness fix can require raising the minimum. Extend support only after compatibility checks. Supporting older releases does not backport upstream transport fixes.
 
 Pin Query packages to the checked versions and keep each native wrapper on the application's resolved Query Core. Keep Angular core, common, compiler, and platform-browser on the same release.
 

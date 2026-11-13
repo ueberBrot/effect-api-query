@@ -1,6 +1,6 @@
 # Target one exact Effect 4 release
 
-Status: Versioning policy prospectively amended by [ADR 0042](0042-define-the-compatibility-promise.md). Superseded by [ADR 0033](0033-bound-effect-support-to-a-patch-line.md) for the exact-peer policy. Extended by [ADR 0022](0022-add-buffered-http-utilities-with-separate-key-roots.md).
+Status: Superseded by [ADR 0033](0033-bound-effect-support-to-a-patch-line.md) for the exact-peer policy. Extended by [ADR 0022](0022-add-buffered-http-utilities-with-separate-key-roots.md).
 
 ## Context
 

@@ -151,7 +151,7 @@ Live queries cache only the latest value. Opt into `coalesceMs` (integer millise
 
 Pass the same policy to `liveKey(input, { coalesceMs })` (inputless: `liveKey({ coalesceMs })`) or configure `live.policy` once for keys and options. Explicit deadlines have separate cache identity. A local `coalesceMs: undefined` clears the configured default; omission inherits it. HTTP SSE keys also include decoder policy. Keep `sseOptions` local and pass the same options to the configured key builder.
 
-RPC live key types include an optional trailing policy slot even without coalescing. Default runtime keys remain unchanged, but old exact-length tuple assignments can fail. Treat this as a breaking public type change under the compatibility policy; use generated keys or the options' `queryKey` without the old tuple annotation. Literal paths and data/error tags remain precise.
+RPC live key types include an optional trailing policy slot. Use generated keys or the options' `queryKey` for cache access. Literal paths and data/error tags remain precise.
 
 Raw consumption and accumulated publication keep their event contracts. Live queries accept no history or publication batch option. Without cached data, an empty accumulated stream resolves to `[]`. An empty append refetch preserves existing history. Empty reset and replace refetches finish with `[]`. Empty live completion raises `EffectRpcQueryEmptyStreamError`.
 

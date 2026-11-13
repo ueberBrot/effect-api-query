@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "5aa90535527aec05d34f7e5ff9d147fcc278bc61f33025661764f65e984d54ec",
+      "fingerprint": "957bcdec3e80bbb1fe76033ecf47bdad2c8888306f09b0ba2747ea916f590adc",
       "snapshot": {
         "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -16,7 +16,7 @@
         "apps/docs/src/content/docs/examples.md": "08c014b01c49123ee871ddb7427d69b4dcf1791fa907ba2fe535ebf6c522d282",
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "022014147e137abdac686d6d3c58f4eff1e8098dd2241a3cccd96abe5051cd26",
         "apps/docs/src/content/docs/examples/http-workflows.md": "f7b41e1e63fda1e4c44e0886b29f5c796f3f51e1b3bf227947423194f6cc39b0",
-        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "24e0b9805c1c85148806bd5ae7e1b7e1c33c03a3626dc2661b45b9eeea27f193",
+        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "9de7c0138e82b6471f6517f293975c29462cdbfa84ef4fd1d683b030e262b5bc",
         "apps/docs/src/content/docs/getting-started/feature-support.md": "ac3ebd5c192272f7d4d1a236a5878d1d51a76fc514e874cbb51f17eb31809125",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "4c68eaf1d2df4b1dcebf24b8f84ef291dd503a2049eb6802b74e8e52b7e6a948",
         "apps/docs/src/content/docs/getting-started/installation.md": "63ebd6eddf603465b5c1203f6587ae5c6c7fba1a1e59069c929f44eaa645823d",
@@ -25,7 +25,7 @@
         "apps/docs/src/content/docs/guides/cache-filters.md": "b0b8a08b6e2f3484a2565b6bd6d080cd1e95b3e9aefcb5aaf121cd7a96ad2591",
         "apps/docs/src/content/docs/guides/cache-management.md": null,
         "apps/docs/src/content/docs/guides/cancellation.md": "7af74ddcb64ddc5454e3d8b4326a79b9683f1d744537c2b2f267e61a9447274b",
-        "apps/docs/src/content/docs/guides/choose-stream-history.md": "8a63ae0729cf2d9c505e52ea2faf0ed7979932893fced17c147481b588b3c5ee",
+        "apps/docs/src/content/docs/guides/choose-stream-history.md": "9aefb63f50a3b020db5cd678d43b3ca0374c82bc9dce61a1cb429ecde313d438",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "cb941076de91c32bc0a1a5e8f6463ea521457210c00ccf4ef4e7de7c5fd135e9",
         "apps/docs/src/content/docs/guides/custom-key-encoders.md": "f1c27e412da1669b9c96c61c1a4fc882ce23516f254ed4d2a1766f017033148c",
         "apps/docs/src/content/docs/guides/handle-failures.md": "337c0146b06c6ee5d2a551af7cabf543dfaaa0b8bb13704bde77186d0d3ff571",
@@ -69,7 +69,7 @@
         "apps/docs/src/content/docs/reference/performance.md": "8648d5f26f94474a5352b359a7fba27c8460abd0e9b7e912fa8e6de87222f59f",
         "apps/docs/src/content/docs/reference/public-exports.md": "26c40ff67a967cd9ce1f11748906437c83f189f0f3fc0ebc0246b11182619ce4",
         "apps/docs/src/content/docs/reference/type-inference.md": "a60819bcd3b5f7887efe97c1e6aabfdcf1822197abdd209b9d3820d33f4428b5",
-        "docs/adr/0001-target-effect-4-release-candidate.md": "631600624a40a66951f8dd509618530973e34a6f373f2e4841edd5e1bca23b46",
+        "docs/adr/0001-target-effect-4-release-candidate.md": "f8152332adf7278911e3b4e119d6079a444b01db840f225b62b1a05cd5ecf4f2",
         "docs/adr/0002-let-call-sites-choose-query-or-mutation.md": "ac6c71c1ab7fec80e50d843e92ac1d1b00c573fe8bf4ede0c4914f1711198c4d",
         "docs/adr/0003-project-dotted-rpc-tags-into-utility-paths.md": "56c0f624290a66dcdaeda4742e085ad869c83118ad73520a79e569f882d2a6df",
         "docs/adr/0004-build-core-shaped-options-and-certify-react-first.md": "785981d2b8c9a43e253051d6a1a222de0a1f6915c266d17b517fab3e180ece87",
@@ -101,7 +101,7 @@
         "docs/adr/0037-own-stream-publication-through-query-core.md": "a7800a9b941557bc34d3a3102e94d4227f8e5f31ff852b6830a33e12ac2ec553",
         "docs/adr/0039-coalesce-live-snapshots-explicitly.md": "4d95533f87474e8a55a9a6a0f0339f375a7e5d242195e26e99c2d7e895171f02",
         "docs/adr/0040-add-opt-in-query-owner-retirement.md": "5e5f0a05577c779ed22a62a3e99a8abd509c241fa9949e9fb50a9aec068472fc",
-        "docs/adr/0042-define-the-compatibility-promise.md": "e4614a9c7ba0d7dc52216d18f0a372ba9b0426871141dc5f0e0ef76efc979f44",
+        "docs/adr/0042-define-the-compatibility-promise.md": "2e2ae6512eb714ed8601daee80fe3852fdb62614602be5ad54ffd5e58f0beb99",
         "e2e/http-workflows.spec.ts": "f5729fd3707758508d85506a93a1f2560edfe1aad89c9bd200ec0c80a2ecb7cb",
         "examples/contracts/src/client.ts": "fdf559bf0a798c7ea7f7aee01967837e720f7727a1bd11978aec51aad59f00f2",
         "examples/contracts/src/contracts.ts": "74d69e1a07c0b32c2a48b8fed8cfceaac8844ead860fbd00b9e357657b39d88e",
@@ -191,10 +191,10 @@
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "6bf36be7173bf06e69232b5ac3024b9e7fc3fa51be8d5c9904acad840cab39e9",
         "skills/effect-api-query/references/cache-workflows.md": "1d80a087881094a7d50dbf7ce20c7ab8a2800f05aae432523645d4cba82b98e3",
-        "skills/effect-api-query/references/frameworks-and-hosts.md": "89ba2337eedb94f8697c50d2251a7afe5f68f55f9bdecc0f69b96db4d1be0191",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "ecf542ef7b4f0b636c905123d4a7d98c3c45170df14e890e9d69a56ad37ec5f5",
         "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
         "skills/effect-api-query/references/hydration-and-ssr.md": "cb64d4d2622cff1e7be1fb5b6b67e6bc67cbb1cca3e49e657ef8d2e641a26de1",
-        "skills/effect-api-query/references/query-patterns.md": "b83a9b5047f2f43333b92afbf17e645fb6eef141c13f3e60b1404a0433121e82",
+        "skills/effect-api-query/references/query-patterns.md": "883e20f2e7d37b296c3626d94bb60c2e8b399fd814b4c6fe643ad8abd6ccd788",
         "skills/effect-api-query/references/rpc.md": "cdbc026d1d29c486b28a2b9fc6a330bcc8855b5887f0f454f73ce261734e8e7e",
         "src/core/branch-filter.ts": "71a8c6039f1775881bbc00d92e14e2ef823bf7150721307a74f16a1579bccc86",
         "src/core/canonical-key.ts": "84e91000876a6795557aab39dcc5d44e328250bf9b30ad02fd67afd02f5003e9",
@@ -366,20 +366,21 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "7459ca343c6b8543253cbd5870ca8f29177864f2",
+      "head": "3e70c515feb8f89a2b9a3aa8086404436a3d1efb",
       "outcome": "updated",
-      "reason": "Split the existing live-query paragraph into timing, cache identity, tuple migration and event-contract paragraphs as recommended by Astra architecture recheck. Words and supported behavior unchanged.",
+      "reason": "Maintainer explicitly retains pre-1.0 minor breaking changes and removes the erroneous unreleased168major rule and version-migration wording. Reconcile ADR0001/0042 and current consumer/agent guidance. Delete the three requested one-off reports, retain tools/budgets and the existing Intent planning inputs, and point retained evidence to PR181.",
       "evidence": [
-        "skills/effect-api-query/references/query-patterns.md diff against7459ca; paragraph breaks only. Formatting and skills-check pass; no runtime/type code or example changed, so no runtime rerun warranted. Fresh consumer/discovery not claimed."
+        "Diff against3e70c515: changeset minor, current behavior guidance, ADR0001 history restored and unreleased0042rule withdrawn under explicit maintainer direction. _artifacts/skill_spec records the correction; domain_map and skill_tree remain accurate with existing one-skill/six-reference ownership and sources. Three report files removed; no runtime/type/measurement implementation changed.",
+        "Scoped formatter and whitespace pass; vp run --no-cache docs-check passes24excerpts and Astro zero errors/warnings/hints. Changesets status reports minor, no package version file changed. skills-check passes. No fresh consumer/discovery or runtime rerun claimed for release/guidance-only edits."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "773ec052d658b4aa4e2ce8302cb1e5f516af9c712c75201cda671358f8abc897",
+      "fingerprint": "dc41f7980017a810c97272549e10788a13b375184f2346c3f3b090f949703303",
       "snapshot": {
         "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
         "_artifacts/domain_map.yaml": "33f4581f4534d49a4612c4bc9e65db0ed3537de8772a71e5d499349e6fbb6c85",
-        "_artifacts/skill_spec.md": "5509c8cc0a63b278da7589c7a3faa79fe1bb6b63c78171617e2fb8913b55c0c9",
+        "_artifacts/skill_spec.md": "b55f5232ea2c4f4e32e82a98c8c0099b8b7ec156a244f8ae70827b2768f0c0bd",
         "_artifacts/skill_tree.yaml": "8205464b58a223251be240261d382ce4120adf328315f3352977e157a634a4f7",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "83a6aab512d66893237aa3ba45bf52b23712b88d829d83992509c2f3c822c18b",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "eb226d096cee825aa2a7c2e49370208d6110662c3acf681fa4b95f8b6caca0d7",
@@ -390,7 +391,7 @@
         "apps/docs/src/content/docs/examples.md": "08c014b01c49123ee871ddb7427d69b4dcf1791fa907ba2fe535ebf6c522d282",
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "022014147e137abdac686d6d3c58f4eff1e8098dd2241a3cccd96abe5051cd26",
         "apps/docs/src/content/docs/examples/http-workflows.md": "f7b41e1e63fda1e4c44e0886b29f5c796f3f51e1b3bf227947423194f6cc39b0",
-        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "24e0b9805c1c85148806bd5ae7e1b7e1c33c03a3626dc2661b45b9eeea27f193",
+        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "9de7c0138e82b6471f6517f293975c29462cdbfa84ef4fd1d683b030e262b5bc",
         "apps/docs/src/content/docs/getting-started/feature-support.md": "ac3ebd5c192272f7d4d1a236a5878d1d51a76fc514e874cbb51f17eb31809125",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "4c68eaf1d2df4b1dcebf24b8f84ef291dd503a2049eb6802b74e8e52b7e6a948",
         "apps/docs/src/content/docs/getting-started/installation.md": "63ebd6eddf603465b5c1203f6587ae5c6c7fba1a1e59069c929f44eaa645823d",
@@ -399,7 +400,7 @@
         "apps/docs/src/content/docs/guides/cache-filters.md": "b0b8a08b6e2f3484a2565b6bd6d080cd1e95b3e9aefcb5aaf121cd7a96ad2591",
         "apps/docs/src/content/docs/guides/cache-management.md": null,
         "apps/docs/src/content/docs/guides/cancellation.md": "7af74ddcb64ddc5454e3d8b4326a79b9683f1d744537c2b2f267e61a9447274b",
-        "apps/docs/src/content/docs/guides/choose-stream-history.md": "8a63ae0729cf2d9c505e52ea2faf0ed7979932893fced17c147481b588b3c5ee",
+        "apps/docs/src/content/docs/guides/choose-stream-history.md": "9aefb63f50a3b020db5cd678d43b3ca0374c82bc9dce61a1cb429ecde313d438",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "cb941076de91c32bc0a1a5e8f6463ea521457210c00ccf4ef4e7de7c5fd135e9",
         "apps/docs/src/content/docs/guides/custom-key-encoders.md": "f1c27e412da1669b9c96c61c1a4fc882ce23516f254ed4d2a1766f017033148c",
         "apps/docs/src/content/docs/guides/handle-failures.md": "337c0146b06c6ee5d2a551af7cabf543dfaaa0b8bb13704bde77186d0d3ff571",
@@ -443,7 +444,7 @@
         "apps/docs/src/content/docs/reference/performance.md": "8648d5f26f94474a5352b359a7fba27c8460abd0e9b7e912fa8e6de87222f59f",
         "apps/docs/src/content/docs/reference/public-exports.md": "26c40ff67a967cd9ce1f11748906437c83f189f0f3fc0ebc0246b11182619ce4",
         "apps/docs/src/content/docs/reference/type-inference.md": "a60819bcd3b5f7887efe97c1e6aabfdcf1822197abdd209b9d3820d33f4428b5",
-        "docs/adr/0001-target-effect-4-release-candidate.md": "631600624a40a66951f8dd509618530973e34a6f373f2e4841edd5e1bca23b46",
+        "docs/adr/0001-target-effect-4-release-candidate.md": "f8152332adf7278911e3b4e119d6079a444b01db840f225b62b1a05cd5ecf4f2",
         "docs/adr/0002-let-call-sites-choose-query-or-mutation.md": "ac6c71c1ab7fec80e50d843e92ac1d1b00c573fe8bf4ede0c4914f1711198c4d",
         "docs/adr/0003-project-dotted-rpc-tags-into-utility-paths.md": "56c0f624290a66dcdaeda4742e085ad869c83118ad73520a79e569f882d2a6df",
         "docs/adr/0004-build-core-shaped-options-and-certify-react-first.md": "785981d2b8c9a43e253051d6a1a222de0a1f6915c266d17b517fab3e180ece87",
@@ -475,7 +476,7 @@
         "docs/adr/0037-own-stream-publication-through-query-core.md": "a7800a9b941557bc34d3a3102e94d4227f8e5f31ff852b6830a33e12ac2ec553",
         "docs/adr/0039-coalesce-live-snapshots-explicitly.md": "4d95533f87474e8a55a9a6a0f0339f375a7e5d242195e26e99c2d7e895171f02",
         "docs/adr/0040-add-opt-in-query-owner-retirement.md": "5e5f0a05577c779ed22a62a3e99a8abd509c241fa9949e9fb50a9aec068472fc",
-        "docs/adr/0042-define-the-compatibility-promise.md": "e4614a9c7ba0d7dc52216d18f0a372ba9b0426871141dc5f0e0ef76efc979f44",
+        "docs/adr/0042-define-the-compatibility-promise.md": "2e2ae6512eb714ed8601daee80fe3852fdb62614602be5ad54ffd5e58f0beb99",
         "e2e/http-workflows.spec.ts": "f5729fd3707758508d85506a93a1f2560edfe1aad89c9bd200ec0c80a2ecb7cb",
         "examples/contracts/src/client.ts": "fdf559bf0a798c7ea7f7aee01967837e720f7727a1bd11978aec51aad59f00f2",
         "examples/contracts/src/contracts.ts": "74d69e1a07c0b32c2a48b8fed8cfceaac8844ead860fbd00b9e357657b39d88e",
@@ -565,10 +566,10 @@
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "6bf36be7173bf06e69232b5ac3024b9e7fc3fa51be8d5c9904acad840cab39e9",
         "skills/effect-api-query/references/cache-workflows.md": "1d80a087881094a7d50dbf7ce20c7ab8a2800f05aae432523645d4cba82b98e3",
-        "skills/effect-api-query/references/frameworks-and-hosts.md": "89ba2337eedb94f8697c50d2251a7afe5f68f55f9bdecc0f69b96db4d1be0191",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "ecf542ef7b4f0b636c905123d4a7d98c3c45170df14e890e9d69a56ad37ec5f5",
         "skills/effect-api-query/references/http.md": "1a86c988fcbad5e5925a1cf8ace5ad212bb54c43d7d84fb5845342acf9565860",
         "skills/effect-api-query/references/hydration-and-ssr.md": "cb64d4d2622cff1e7be1fb5b6b67e6bc67cbb1cca3e49e657ef8d2e641a26de1",
-        "skills/effect-api-query/references/query-patterns.md": "b83a9b5047f2f43333b92afbf17e645fb6eef141c13f3e60b1404a0433121e82",
+        "skills/effect-api-query/references/query-patterns.md": "883e20f2e7d37b296c3626d94bb60c2e8b399fd814b4c6fe643ad8abd6ccd788",
         "skills/effect-api-query/references/rpc.md": "cdbc026d1d29c486b28a2b9fc6a330bcc8855b5887f0f454f73ce261734e8e7e",
         "src/core/branch-filter.ts": "71a8c6039f1775881bbc00d92e14e2ef823bf7150721307a74f16a1579bccc86",
         "src/core/canonical-key.ts": "84e91000876a6795557aab39dcc5d44e328250bf9b30ad02fd67afd02f5003e9",
@@ -740,11 +741,12 @@
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6"
       },
-      "head": "7459ca343c6b8543253cbd5870ca8f29177864f2",
-      "outcome": "no-change",
-      "reason": "All three planning records remain accurate: paragraph separation adds no behavior, task, source mapping, skill, prerequisite or coverage. Existing live coalescing, tuple migration and ownership constraints are preserved verbatim.",
+      "head": "3e70c515feb8f89a2b9a3aa8086404436a3d1efb",
+      "outcome": "updated",
+      "reason": "Maintainer explicitly retains pre-1.0 minor breaking changes and removes the erroneous unreleased168major rule and version-migration wording. Reconcile ADR0001/0042 and current consumer/agent guidance. Delete the three requested one-off reports, retain tools/budgets and the existing Intent planning inputs, and point retained evidence to PR181.",
       "evidence": [
-        "_artifacts/domain_map.yaml, _artifacts/skill_spec.md and _artifacts/skill_tree.yaml previously reviewed with complete180delta; current diff changes only paragraph breaks in the existing query-patterns reference. One skill/six references unchanged, sync no-op, formatter and skills-check pass."
+        "Diff against3e70c515: changeset minor, current behavior guidance, ADR0001 history restored and unreleased0042rule withdrawn under explicit maintainer direction. _artifacts/skill_spec records the correction; domain_map and skill_tree remain accurate with existing one-skill/six-reference ownership and sources. Three report files removed; no runtime/type/measurement implementation changed.",
+        "Scoped formatter and whitespace pass; vp run --no-cache docs-check passes24excerpts and Astro zero errors/warnings/hints. Changesets status reports minor, no package version file changed. skills-check passes. No fresh consumer/discovery or runtime rerun claimed for release/guidance-only edits."
       ]
     },
     "source:vite.config.ts": {
@@ -3172,15 +3174,16 @@
       ]
     },
     "source:.changeset/live-snapshot-coalescing.md": {
-      "fingerprint": "45097cc278ccead28181bd5a586181b32d1ffae3985db3be1d719cb374a785a6",
+      "fingerprint": "739b4bd64a56aec93d711fd5c2c54a2a6b2c8ba4eae1284c50042558cbd7b7b9",
       "snapshot": {
-        ".changeset/live-snapshot-coalescing.md": "3382f057659fb416bbe9ad71dbe1c291fadb98ded6bb141d6ea67b3fd95a5eee"
+        ".changeset/live-snapshot-coalescing.md": "faae7c5d4959b2b95d67692596ceebfe944ce8521eb957a64f7f4669fbf9877c"
       },
-      "head": "cd8b644758fdfd7011a20fad3e3f3a4034a216c2",
+      "head": "3e70c515feb8f89a2b9a3aa8086404436a3d1efb",
       "outcome": "updated",
-      "reason": "Classify existing optional RPC live key tuple slot as a breaking public type change under ADR0042 and disclose migration, while retaining unchanged default runtime values. No release version prescribed.",
+      "reason": "Maintainer explicitly retains pre-1.0 minor breaking changes and removes the erroneous unreleased168major rule and version-migration wording. Reconcile ADR0001/0042 and current consumer/agent guidance. Delete the three requested one-off reports, retain tools/budgets and the existing Intent planning inputs, and point retained evidence to PR181.",
       "evidence": [
-        "179-fix-tuple-red.log reproduces both input-bearing and inputless old tuple assignment failures. Final expected-error fixtures pass both compilers; literal prefixes and existing data/error assertions retained. No RPC runtime/type change in follow-up."
+        "Diff against3e70c515: changeset minor, current behavior guidance, ADR0001 history restored and unreleased0042rule withdrawn under explicit maintainer direction. _artifacts/skill_spec records the correction; domain_map and skill_tree remain accurate with existing one-skill/six-reference ownership and sources. Three report files removed; no runtime/type/measurement implementation changed.",
+        "Scoped formatter and whitespace pass; vp run --no-cache docs-check passes24excerpts and Astro zero errors/warnings/hints. Changesets status reports minor, no package version file changed. skills-check passes. No fresh consumer/discovery or runtime rerun claimed for release/guidance-only edits."
       ]
     },
     "source:.changeset/scoped-query-owner.md": {
