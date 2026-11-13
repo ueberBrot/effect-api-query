@@ -41,6 +41,7 @@ sources:
   - "docs/adr/0015-*.md"
   - "docs/adr/002*.md"
   - "docs/adr/003*.md"
+  - "docs/adr/0042-*.md"
   - "**/apps/docs/src/content/docs/**/*.md"
   - "**/apps/docs/src/content/docs/**/*.mdx"
 ---
