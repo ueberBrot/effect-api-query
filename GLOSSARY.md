@@ -53,3 +53,5 @@ These terms describe how the package builds TanStack Query utilities from Effect
 **Configuration error**: An error that rejects invalid utility configuration during preparation or execution. _Avoid_: RPC execution error
 
 **Key-generation error**: A synchronous error that occurs while the package derives canonical cache identity from RPC payload constructor input or HTTP request input. _Avoid_: RPC execution error, configuration error
+
+**Recovery cursor**: The last locally accepted event position in one stream consumption. Numeric convenience uses increasing nonnegative safe integers; an application cursor policy defines acceptance and optional gap detection for other protocols. It is attempt-local resume state outside semantic query identity, not a durable acknowledgement or downstream processing checkpoint.

@@ -3,11 +3,11 @@ title: Reconnect Streams
 description: Resume application-owned Effect streams with ordered cursors, bounded retries, and visible connection state.
 ---
 
-Use `recoverStream` when your server can replay decoded events after an accepted numeric cursor. It wraps an application-owned Effect Stream and reuses your ready RPC or HTTP API client. Keep one recovery consumption inside the captured owner's lifetime.
+Use `recoverStream` when your server can replay decoded events after an accepted cursor. It wraps an application-owned Effect Stream and reuses your ready RPC or HTTP API client. Keep one recovery consumption inside the captured owner's lifetime.
 
 ## Define the replay protocol
 
-Use one increasing safe-integer sequence for each owner and source epoch. `initialCursor` defaults to zero; accepted events must have a greater cursor. Decode and validate event envelopes and verify their owner before the helper accepts their cursors. The server must authorize the requested feed and define how long replay remains available.
+The numeric convenience path uses one increasing safe-integer sequence for each owner and source epoch. `initialCursor` defaults to zero; accepted events must have a greater cursor. Decode and validate event envelopes and verify their owner before the helper accepts their cursors. The server must authorize the requested feed and define how long replay remains available.
 
 Decide how a gap and expired replay refresh authoritative reads. A refresh must provide a cursor that matches the refreshed state. Merely invalidating queries does not prove that reads completed or establish their replay position. If the source resets its sequence, retire the old consumption and start a new one for that epoch.
 
@@ -42,6 +42,32 @@ Run `consume` in the captured owner's runtime and interrupt it when that owner r
 
 Keep resume state inside `connect`. Generated read keys continue to identify stable logical reads. Passing a changing cursor to a generated stream builder changes its canonical input and creates different cache entries. This recipe consumes domain delivery and refreshes the existing query cache. Choose cached [stream views](/effect-api-query/guides/streaming/) separately.
 
+## Use opaque replay IDs or another order
+
+Supply `initialCursor` and `cursorPolicy` together to select application-defined cursors. `accept(previous, next)` decides whether to deliver an event and advance the cursor. Only accepted events reach `isGap(previous, next)`; when it returns true, `onGap` runs before cursor advancement and delivery. Omit `isGap` when the protocol cannot detect gaps. No comparison, numeric validation, duplicate history, or gap rule is supplied in this mode. Decode untrusted cursors in your client before passing them here, and keep retained cursor objects immutable.
+
+This complete example models an ordered replay protocol that may repeat the last ID. IDs are opaque: `id-a` follows `id-z` according to the server protocol, not lexical order. Equality suppresses only repetitions of the current checkpoint; protocols that replay older IDs need their own acceptance/order policy.
+
+```ts
+import { recoverStream } from "@ueberbrot/effect-api-query";
+import { Effect, Stream } from "effect";
+
+const opaqueDelivery = recoverStream({
+  initialCursor: "start",
+  connect: (after: string) =>
+    after === "start"
+      ? Stream.succeed("id-z").pipe(Stream.concat(Stream.fail("offline")))
+      : Stream.make("id-z", "id-a"),
+  cursor: (id) => id,
+  cursorPolicy: { accept: (previous, next) => previous !== next },
+  retryDelay: (_cause, attempt) => (attempt === 1 ? 0 : undefined),
+});
+const ids = Effect.runPromise(Stream.runCollect(opaqueDelivery));
+// Resolves to ["id-z", "id-a"].
+```
+
+The same policy seam supports structured cursors and decreasing or fractional numeric positions. Supply `isGap` only using information your protocol defines. `StreamConnectionState<E, C>` retains the cursor type (default `number`). Connection, gap, refresh, and state callback services are all required by the returned stream; connection, gap, and refresh failures remain in its error channel. A gap hook failure leaves the previous cursor in place and follows the retry policy. A refresh failure terminates recovery with its complete Cause.
+
 ## Bound retries and show connection state
 
 `retryDelay(cause, attempt)` runs after local attempt cleanup and receives the complete Cause, including cleanup failures, and a one-based retry count across this consumption. The example allows three retries with capped exponential delay and stops on defects. Use your application's failure classifier to limit retries to recoverable failures. Return `undefined` to stop with the original Cause. Normal completion ends the stream.
@@ -52,7 +78,7 @@ Choose one retry owner. When an enclosing query uses recovery, set its native `r
 
 ## Recover gaps and expired replay
 
-Events at or below the accepted cursor are ignored. A newer cursor that skips a position calls `onGap(previous, next)` before acceptance, when that hook is supplied. Without the hook, the newer event is accepted. The helper advances its cursor before downstream event processing.
+Without `cursorPolicy`, events at or below the accepted numeric cursor are ignored. A newer cursor that skips a position calls `onGap(previous, next)` before acceptance, when that hook is supplied. Without the hook, the newer event is accepted. The helper advances its cursor before downstream event processing.
 
 When `isReplayExpired` returns true and a retry remains, the helper waits for the retry delay, calls `onReplayExpired`, and reconnects with the returned cursor. Expired replay without that hook stops with the original failure. A failed refresh ends recovery with the refresh failure. Hook side effects follow the application's own retry and idempotency policy.
 

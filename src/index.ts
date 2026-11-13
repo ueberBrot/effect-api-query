@@ -31,6 +31,7 @@ export { recoverStream } from "./core/stream-recovery";
 export type {
   RecoverStreamOptions,
   StreamConnectionState,
+  StreamCursorPolicy,
 } from "./core/stream-recovery";
 export type {
   InferInput,

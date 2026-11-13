@@ -416,3 +416,132 @@ it.effect(
       }
     })
 );
+
+it.effect(
+  "recovers opaque IDs with application acceptance and gap policy",
+  () =>
+    Effect.gen(function* opaqueRecovery() {
+      const connections: string[] = [];
+      const gaps: string[][] = [];
+      const values = yield* recoverStream({
+        initialCursor: "start",
+        cursorPolicy: {
+          accept: (previous, next) => previous !== next,
+          isGap: (previous, next) => previous === "id-z" && next === "id-a",
+        },
+        connect: (after) => {
+          connections.push(after);
+          return connections.length === 1
+            ? Stream.make("id-z").pipe(Stream.concat(Stream.fail("offline")))
+            : Stream.make("id-z", "id-a");
+        },
+        cursor: (value) => value,
+        retryDelay: (_cause, attempt) => (attempt === 1 ? 0 : undefined),
+        onGap: (previous, next) =>
+          Effect.sync(() => {
+            gaps.push([previous, next]);
+          }),
+      }).pipe(Stream.runCollect);
+      expect(values).toStrictEqual(["id-z", "id-a"]);
+      expect(connections).toStrictEqual(["start", "id-z"]);
+      expect(gaps).toStrictEqual([["id-z", "id-a"]]);
+    })
+);
+
+it.effect(
+  "preserves refresh failure after closing the opaque replay attempt",
+  () =>
+    Effect.gen(function* failedOpaqueRefresh() {
+      const order: string[] = [];
+      const failure = Cause.combine(
+        Cause.fail("refresh failed"),
+        Cause.die("refresh defect")
+      );
+      const exit = yield* recoverStream({
+        initialCursor: "checkpoint",
+        cursorPolicy: { accept: (previous, next) => previous !== next },
+        connect: () =>
+          Stream.fail("expired").pipe(
+            Stream.ensuring(
+              Effect.sync(() => {
+                order.push("closed");
+              })
+            )
+          ),
+        cursor: (value: string) => value,
+        retryDelay: () => {
+          order.push("retry");
+          return 0;
+        },
+        isReplayExpired: () => true,
+        onReplayExpired: () =>
+          Effect.sync(() => {
+            order.push("refresh");
+          }).pipe(Effect.andThen(Effect.failCause(failure))),
+        onState: (state) =>
+          Effect.sync(() => {
+            if (state.status === "failed") {
+              order.push("failed");
+            }
+          }),
+      }).pipe(Stream.runDrain, Effect.exit);
+      expect(order).toStrictEqual(["closed", "retry", "refresh", "failed"]);
+      expect(Exit.isFailure(exit) && Equal.equals(exit.cause, failure)).toBe(
+        true
+      );
+    })
+);
+
+it.effect(
+  "allows application ordering for negative fractional numeric cursors",
+  () =>
+    Effect.gen(function* customNumericOrder() {
+      const gaps: number[][] = [];
+      const values = yield* recoverStream({
+        initialCursor: -0.5,
+        cursorPolicy: {
+          accept: (previous, next) => next < previous,
+          isGap: (previous, next) => previous - next > 0.5,
+        },
+        connect: () => Stream.make(-1, -1, -0.5, -2),
+        cursor: (value) => value,
+        retryDelay: (): undefined => undefined,
+        onGap: (previous, next) =>
+          Effect.sync(() => {
+            gaps.push([previous, next]);
+          }),
+      }).pipe(Stream.runCollect);
+      expect(values).toStrictEqual([-1, -2]);
+      expect(gaps).toStrictEqual([[-1, -2]]);
+    })
+);
+
+it.effect("retries a rejected gap from the previous structured cursor", () =>
+  Effect.gen(function* retriesRejectedGap() {
+    const cursors: { readonly offset: number }[] = [];
+    const checkpoint = { offset: 10 };
+    let gaps = 0;
+    const source = recoverStream({
+      initialCursor: checkpoint,
+      cursorPolicy: {
+        accept: (previous, next) => next.offset > previous.offset,
+        isGap: (previous, next) => next.offset > previous.offset + 1,
+      },
+      connect: (cursor) => {
+        cursors.push(cursor);
+        return Stream.succeed({ offset: 12 });
+      },
+      cursor: (value) => value,
+      retryDelay: (_cause, attempt) => (attempt === 1 ? 0 : undefined),
+      onGap: () =>
+        Effect.suspend(() => {
+          gaps += 1;
+          return gaps === 1 ? Effect.fail("gap refresh failed") : Effect.void;
+        }),
+    });
+    expect(yield* Stream.runCollect(source)).toStrictEqual([{ offset: 12 }]);
+    expect(yield* Stream.runCollect(source)).toStrictEqual([{ offset: 12 }]);
+    expect(cursors).toStrictEqual([checkpoint, checkpoint, checkpoint]);
+    expect(gaps).toBe(3);
+  })
+);
