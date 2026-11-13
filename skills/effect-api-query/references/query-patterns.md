@@ -192,3 +192,7 @@ Handles belong to one leaf and factory owner, including its configured copies. T
 ## Consume events without cache history
 
 Use `consumeEvents(source, { onEvent, onStart?, onExit? })` with a native decoded Effect Stream for notifications or invalidation. It returns an Effect; run it in the application's Scope. `onEvent` returns an Effect and is awaited sequentially. Its failure stops consumption. `onStart` is an Effect signalling local startup, not a transport acknowledgement. `onExit` receives the Exit after stream cleanup, including interruption, and returns a finalization Effect. Interrupt and await consumption before disposing the runtime. The helper owns no cache, retained history, or reconnection policy. Compose `recoverStream` upstream when recovery is needed.
+
+## Check performance claims
+
+For bundle or compiler changes, use the repository's bundle/type/stream baseline tasks and read [Performance and Bundling](../../../apps/docs/src/content/docs/reference/performance.md). Keep contracts, consumed leaves, dependencies, compiler engine and language target equal. Inspect retained module attribution before changing entry points or eager construction. Native bundle consumers omit some adapter guarantees; their deltas measure retained capability cost. Use deterministic instantiation, byte and publication budgets; keep elapsed time observational. Reuse one configured tree per owner and prepared inputs only while their retained values remain unchanged.

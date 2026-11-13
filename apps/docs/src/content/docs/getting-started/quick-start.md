@@ -127,3 +127,9 @@ A constructor that increments `id` on every construction is not query-stable: `{
 This client module finishes each operation before disposing its resources. In an application, acquire the client once before mounting components and release it after unmounting them. Use the [React client setup](/effect-api-query/guides/react-query/#acquire-and-mount-the-client) for a provider, component, and cleanup callback. Its HTTP client setup can be replaced with the RPC acquisition above.
 
 Before disposing clients that serve streams or concurrent mutations, stop their consumers. Wait for queries, local stream cleanup, and accepted mutations to finish before releasing the clients. Follow [Client Lifecycle](/effect-api-query/concepts/client-lifecycle/). For hooks, continue with [React Query](/effect-api-query/guides/react-query/). For method and input contracts, use [RPC Builders](/effect-api-query/reference/generated-builders/).
+
+## Handle failures and live data
+
+Generated execution errors preserve the complete Effect Cause. Use [Errors](/effect-api-query/reference/errors/) to distinguish declared failures from defects and interruption, and choose one retry owner. The optional Effect cache bridge wraps native rejections in `QueryClientOperationError`; inspect its original `cause` without assuming a declared failure payload. Follow [Suspense and Recovery](/effect-api-query/guides/suspense-and-recovery/) for boundary resets and use ordinary abort-aware queries for open streams that need cancellation.
+
+For an SSR stream, capture an exclusive [stream snapshot](/effect-api-query/guides/stream-snapshots/) and await local cleanup before transferring data. Configure live coalescing only for complete snapshots; keep ordered events lossless. [Performance and Bundling](/effect-api-query/reference/performance/) explains measured costs and regression budgets.

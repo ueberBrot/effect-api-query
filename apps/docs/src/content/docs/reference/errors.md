@@ -76,3 +76,22 @@ The Cause preserves endpoint, middleware, Schema, and HTTP client errors, includ
 ## `EffectHttpApiQueryEmptyStreamError`
 
 An HTTP live SSE or NDJSON query that completes before it emits a value throws this error. The error exposes `apiId`, `groupId`, `endpoint`, `method`, and operation `live`. A decoded `undefined` emission counts as a value and becomes `null`. A declared header wrapper preserves its body. Accumulated streams complete with an empty or retained history according to their refetch mode.
+
+## `QueryClientOperationError`
+
+The optional Effect cache bridge reports native QueryClient rejections and synchronous cache callback failures through this error. Its `cause` is the exact original value, typed as `unknown`. A generated RPC or HTTP execution error and its complete Cause remain inside that value. A shared in-flight query or arbitrary Promise rejection cannot prove the current options' declared failure payload. Validate a recognized failure before reading domain fields. See [Query Effects](/effect-api-query/guides/query-effects/).
+
+Interrupting one bridge waiter stops that wait. It does not cancel shared cache execution or other observers. Cancel the native query explicitly when the application owns that decision.
+
+## `QueryDescriptorError`
+
+Descriptor capture and rebinding throw this error synchronously:
+
+| Code           | Meaning                                                    |
+| -------------- | ---------------------------------------------------------- |
+| `Malformed`    | The envelope does not match the descriptor format.         |
+| `Incompatible` | The contract identifier, operation prefix or view differs. |
+| `Input`        | Input encoding, decoding or preparation failed.            |
+| `Identity`     | Input no longer has the same canonical meaning.            |
+
+The descriptor transfers a selection; it transfers no credentials, clients or prepared-input token. See [Loader Descriptors](/effect-api-query/guides/loader-descriptors/).

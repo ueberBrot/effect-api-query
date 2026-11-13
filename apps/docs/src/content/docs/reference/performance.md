@@ -31,7 +31,7 @@ vp run bundle-baseline
 vp run stream-baseline
 ```
 
-Type measurements compare contracts alone, raw utilities, and scoped configuration at 50, 250, and 1,000 operations on both supported compilers. Bundle measurements compare matching consumers with and without utilities, with peers included and external. Stream measurements include bounded and unbounded histories, count and deadline publication, live values, cache writes, observer notifications, and cleanup.
+Type measurements compare contracts alone, raw utilities, and scoped configuration at 50, 250, and 1,000 operations on both supported compilers. Bundle measurements compare RPC, HTTP, stream and hydration consumers with native options or utilities, with peers included and external. Both variants retain the same exported contract and ready-client boundary. Stream measurements include bounded and unbounded histories, count and deadline publication, live values, cache writes, observer notifications, and cleanup.
 
 Compare compiler runs with identical operation counts, contract/raw/configured consumers, engine, language target, dependency lockfile, and compiler options. The development compiler is Effect-enhanced TSRS; the minimum consumer compiler is TypeScript 5.9.3. Compare each compiler with itself. Save a separate warmup run, then repeat samples in fresh compiler processes. Instantiation counts measure compiler work. Report memory, check time, and wall time separately because they vary with the environment. A compiler upgrade does not establish an adapter improvement.
 
@@ -39,9 +39,23 @@ Each workload prints JSON with its dependency and runtime versions. Set `PERFORM
 
 The [stream workload](https://github.com/ueberBrot/effect-api-query/blob/main/tests/create-rpc-query-utils-stream-baseline.test.ts) and [transport workload](https://github.com/ueberBrot/effect-api-query/blob/main/examples/server/tests/rpc-transport-overhead.test.ts) measure publication and transport costs. Results are comparable only for the same workload and dependency versions. Elapsed time and memory depend on the machine.
 
+### Regression budgets
+
+The default bundle and compiler workloads enforce the ceilings in `scripts/performance/budgets.mts`. Bundle ceilings cover the added minified and gzip bytes for each consumer and peer mode. Compiler ceilings cover instantiations separately for each compiler, adapter, operation count and contract/raw/configured consumer. They allow about 10% above the spec #166 combined baseline as a review threshold for substantial growth. This headroom is a maintenance policy, not measured compiler variability. Smaller increases still need review. The included-peer RPC ceiling is tighter: restoring the previously retained unused Effect cache wrappers exceeds it. Custom operation counts outside that table have no compiler budget.
+
+Run the complete default workloads when changing these ceilings. Keep compiler engine, language target, dependencies, contracts and consumed leaves equal across comparisons. Record why the added capability warrants the cost before raising a ceiling. Timing and heap snapshots are observations, never pass/fail limits.
+
+Stream budgets bound manual cache writes by the emission count, or by first-value plus batch flushes for count batching. Observer notifications allow the fetch and settlement transitions as well. Deadline and coalescing workloads use the emission bound because event-loop scheduling changes their write counts. Deterministic public tests separately check exact coalesced publications, fixed deadlines and final flushing. A fast local source producing two coalesced writes does not promise two writes on every machine.
+
+### Bundle attribution limits
+
+Reports list retained modules and their rendered bytes before final minification. The package is already one built module, so those bytes cannot identify the cost of an individual original source file. Gzip deltas also include compression interactions with peers; they are not additive module sizes.
+
+The native consumers model successful reads and ordered unbounded stream publication. They do not reproduce the adapter's complete Cause, cleanup, key preparation or view-policy guarantees. Native hydration handles JSON query data; the utility variant adds Schema codec registration. These deltas measure the cost of retained capabilities, not equivalent implementations or runtime speedups. The selected compiler is reported as build provenance; Rolldown performs the JavaScript consumer build.
+
 ## Adapter and application bundles
 
-The package marks its exports as free of side effects and keeps Effect and Query Core as peers. An application can import one factory or an error guard from the package root. Unused factories and the stream snapshot helper can then be removed by the bundler.
+The package marks its exports as free of side effects and keeps Effect and Query Core as peers. Pure annotations on lazy Effect cache wrapper construction let bundlers remove unused wrapper bodies; they do not change service identity or execute cache work. An application can import one factory or an error guard from the package root. Unused factories and the stream snapshot helper can then be removed by the bundler.
 
 An adapter-only bundle with external peers excludes dependency code. The application's contract Schemas, transport, QueryClient, framework, and other imports contribute to the final bundle. Attributing a size change to the adapter requires a comparison with the same imports and dependency versions.
 

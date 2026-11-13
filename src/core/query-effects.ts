@@ -42,80 +42,90 @@ const wait = <A>(
     catch: (cause) => new QueryClientOperationError(cause),
   });
 
-const getData = Effect.fnUntraced(function* getData<
-  A = unknown,
-  K extends QueryKey = QueryKey,
->(
-  key: K
-): Effect.fn.Return<
-  InferDataFromTag<A, K> | undefined,
-  QueryClientOperationError,
-  QueryClientService
-> {
-  const client = yield* QueryClientService;
-  return yield* Effect.try({
-    try: () => client.getQueryData<A, K>(key),
-    catch: (cause) => new QueryClientOperationError(cause),
+const getData =
+  /* @__PURE__ */
+  Effect.fnUntraced(function* getData<
+    A = unknown,
+    K extends QueryKey = QueryKey,
+  >(
+    key: K
+  ): Effect.fn.Return<
+    InferDataFromTag<A, K> | undefined,
+    QueryClientOperationError,
+    QueryClientService
+  > {
+    const client = yield* QueryClientService;
+    return yield* Effect.try({
+      try: () => client.getQueryData<A, K>(key),
+      catch: (cause) => new QueryClientOperationError(cause),
+    });
   });
-});
 
-const setData = Effect.fnUntraced(function* setData<
-  A = unknown,
-  K extends QueryKey = QueryKey,
->(
-  key: K,
-  updater: Updater<
-    NoInfer<InferDataFromTag<A, K>> | undefined,
-    NoInfer<InferDataFromTag<A, K>> | undefined
-  >,
-  options?: SetDataOptions
-): Effect.fn.Return<
-  InferDataFromTag<A, K> | undefined,
-  QueryClientOperationError,
-  QueryClientService
-> {
-  const client = yield* QueryClientService;
-  return yield* Effect.try({
-    try: () => client.setQueryData<A, K>(key, updater, options),
-    catch: (cause) => new QueryClientOperationError(cause),
+const setData =
+  /* @__PURE__ */
+  Effect.fnUntraced(function* setData<
+    A = unknown,
+    K extends QueryKey = QueryKey,
+  >(
+    key: K,
+    updater: Updater<
+      NoInfer<InferDataFromTag<A, K>> | undefined,
+      NoInfer<InferDataFromTag<A, K>> | undefined
+    >,
+    options?: SetDataOptions
+  ): Effect.fn.Return<
+    InferDataFromTag<A, K> | undefined,
+    QueryClientOperationError,
+    QueryClientService
+  > {
+    const client = yield* QueryClientService;
+    return yield* Effect.try({
+      try: () => client.setQueryData<A, K>(key, updater, options),
+      catch: (cause) => new QueryClientOperationError(cause),
+    });
   });
-});
 
-const fetch = Effect.fnUntraced(function* fetch<
-  A,
-  E = DefaultError,
-  K extends QueryKey = QueryKey,
->(
-  options: FetchQueryOptions<A, E, A, K>
-): Effect.fn.Return<A, QueryClientOperationError, QueryClientService> {
-  const client = yield* QueryClientService;
-  return yield* wait<A>(async () => await client.fetchQuery(options));
-});
-
-const ensure = Effect.fnUntraced(function* ensure<
-  A,
-  E = DefaultError,
-  K extends QueryKey = QueryKey,
->(
-  options: EnsureQueryDataOptions<A, E, A, K>
-): Effect.fn.Return<A, QueryClientOperationError, QueryClientService> {
-  const client = yield* QueryClientService;
-  return yield* wait<A>(async () => await client.ensureQueryData(options));
-});
-
-const invalidate = Effect.fnUntraced(function* invalidate(
-  filters?: InvalidateQueryFilters,
-  options?: InvalidateOptions
-): Effect.fn.Return<void, QueryClientOperationError, QueryClientService> {
-  const client = yield* QueryClientService;
-  // Broad filters may match unrelated error types; never claim a typed execution error.
-  return yield* Effect.tryPromise({
-    try: async () => {
-      await client.invalidateQueries(filters, options);
-    },
-    catch: (cause) => new QueryClientOperationError(cause),
+const fetch =
+  /* @__PURE__ */
+  Effect.fnUntraced(function* fetch<
+    A,
+    E = DefaultError,
+    K extends QueryKey = QueryKey,
+  >(
+    options: FetchQueryOptions<A, E, A, K>
+  ): Effect.fn.Return<A, QueryClientOperationError, QueryClientService> {
+    const client = yield* QueryClientService;
+    return yield* wait<A>(async () => await client.fetchQuery(options));
   });
-});
+
+const ensure =
+  /* @__PURE__ */
+  Effect.fnUntraced(function* ensure<
+    A,
+    E = DefaultError,
+    K extends QueryKey = QueryKey,
+  >(
+    options: EnsureQueryDataOptions<A, E, A, K>
+  ): Effect.fn.Return<A, QueryClientOperationError, QueryClientService> {
+    const client = yield* QueryClientService;
+    return yield* wait<A>(async () => await client.ensureQueryData(options));
+  });
+
+const invalidate =
+  /* @__PURE__ */
+  Effect.fnUntraced(function* invalidate(
+    filters?: InvalidateQueryFilters,
+    options?: InvalidateOptions
+  ): Effect.fn.Return<void, QueryClientOperationError, QueryClientService> {
+    const client = yield* QueryClientService;
+    // Broad filters may match unrelated error types; never claim a typed execution error.
+    return yield* Effect.tryPromise({
+      try: async () => {
+        await client.invalidateQueries(filters, options);
+      },
+      catch: (cause) => new QueryClientOperationError(cause),
+    });
+  });
 
 /** Lazy native cache operations. Interruption stops only this caller's wait. */
 export const queryEffects = { getData, setData, fetch, ensure, invalidate };

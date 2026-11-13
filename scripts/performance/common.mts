@@ -53,6 +53,9 @@ export const performanceContext = (
   buildDirectory = path.join(repositoryRoot, "dist")
 ) => ({
   node: process.version,
+  lockfileSha256: createHash("sha256")
+    .update(readFileSync(path.join(repositoryRoot, "pnpm-lock.yaml")))
+    .digest("hex"),
   platform: process.platform,
   architecture: process.arch,
   sourceRevision: execFileSync("git", ["rev-parse", "HEAD"], {

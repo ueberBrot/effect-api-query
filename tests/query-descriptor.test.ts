@@ -16,6 +16,7 @@ import { expect } from "vite-plus/test";
 import {
   createHttpApiQueryUtils,
   createQueryDescriptor,
+  QueryDescriptorError,
   createRpcQueryUtils,
   fetchStreamSnapshot,
 } from "#effect-api-query";
@@ -176,7 +177,9 @@ it.effect(
         { ...descriptor, data: "secret" },
         { ...descriptor, input: () => 7 },
       ]) {
-        expect(() => registration.bind(value)).toThrow("Malformed");
+        expect(() => registration.bind(value)).toThrow(
+          new QueryDescriptorError("Malformed")
+        );
       }
       for (const value of [
         { ...descriptor, contract: "v2" },

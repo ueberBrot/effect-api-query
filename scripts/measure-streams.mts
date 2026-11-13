@@ -5,6 +5,7 @@ import { createRpcQueryUtils } from "@ueberbrot/effect-api-query";
 import { Array as EffectArray, Effect, Order, Schema, Stream } from "effect";
 import { Rpc, RpcGroup, RpcTest } from "effect/rpc";
 
+import { assertBudget } from "./performance/budgets.mts";
 import {
   choices,
   performanceContext,
@@ -144,6 +145,14 @@ const measure = Effect.fnUntraced(function* (
         "The stream must finish with the requested retention and cleanup"
       );
     }
+    const maximum =
+      scenario.view === "batch-32" ? 1 + Math.ceil((count - 1) / 32) : count;
+    assertBudget(`${scenario.view} publications`, cachePublications, maximum);
+    assertBudget(
+      `${scenario.view} notifications`,
+      observerNotifications,
+      maximum + 2
+    );
     return {
       milliseconds: performance.now() - started,
       firstPublicationMilliseconds,
