@@ -5,6 +5,7 @@ import { performance } from "node:perf_hooks";
 
 import { Schema } from "effect";
 
+import { compilerCommand, currentCompiler } from "./compiler.mts";
 import {
   choices,
   packageName,
@@ -19,7 +20,7 @@ const counts = positiveIntegers("TYPE_COUNTS", [50, 250, 1000]);
 const selectedCompilers = choices("TYPE_COMPILERS", ["current", "minimum"]);
 const adapters = choices("TYPE_ADAPTERS", ["rpc", "http"]);
 const compilers = [
-  { name: "current", package: "typescript" },
+  { name: "current", package: "@effect/tsgo" },
   { name: "minimum", package: "typescript-5.9" },
 ] as const;
 const consumers = ["contract", "raw", "configured"] as const;
@@ -96,6 +97,10 @@ const context = prepareConsumer(directory);
 const measurements: {
   compiler: string;
   version: string;
+  engine: string;
+  engineVersion: string;
+  package: string;
+  languageVersion: string;
   adapter: string;
   operations: number;
   utilities: boolean;
@@ -137,13 +142,7 @@ try {
           const compilation = spawnSync(
             process.execPath,
             [
-              path.join(
-                repositoryRoot,
-                "node_modules",
-                compiler.package,
-                "bin",
-                "tsc"
-              ),
+              ...compilerCommand(repositoryRoot, compiler.name),
               "--project",
               config,
               "--extendedDiagnostics",
@@ -168,6 +167,19 @@ try {
           measurements.push({
             compiler: compiler.name,
             version: packageVersion(compiler.package),
+            package: compiler.package,
+            engineVersion:
+              compiler.name === "current"
+                ? currentCompiler.engineVersion
+                : packageVersion(compiler.package),
+            engine:
+              compiler.name === "current"
+                ? currentCompiler.engine
+                : "typescript",
+            languageVersion:
+              compiler.name === "current"
+                ? currentCompiler.languageVersion
+                : "5.9.3",
             adapter,
             operations: count,
             utilities: consumer !== "contract",

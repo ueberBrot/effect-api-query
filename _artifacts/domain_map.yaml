@@ -174,7 +174,7 @@ skills:
         priority: HIGH
         status: active
       - mistake: Treat exact development pins as the consumer Effect minimum
-        mechanism: Development uses a coordinated current release while consumers can retain the supported floor within the reviewed minor range.
+        mechanism: Development uses coordinated Effect pins and Effect-enhanced TSRS targeting TypeScript 7.1 beta; consumers retain TypeScript 5.9 and the supported Effect floor. ADR 0035 separates compiler roles.
         wrong_pattern: Require every consumer to upgrade whenever the development catalog changes.
         correct_pattern: Read the published peer range, coordinate Effect integrations, and check the floor/current pair; raise the minimum only for required APIs, type contracts, or correctness fixes.
         source: apps/docs/src/content/docs/getting-started/compatibility-and-stability.md

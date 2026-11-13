@@ -13,6 +13,8 @@ import {
 import nodePath from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { compilerCommand, currentCompiler } from "./compiler.mts";
+
 const root = fileURLToPath(new URL("../", import.meta.url));
 const fixtures = nodePath.join(root, "tests/framework-consumers");
 const frameworks = ["vue", "solid", "svelte", "angular"];
@@ -106,12 +108,12 @@ try {
     "Consumers must resolve the packed library without repository sources."
   );
 
-  for (const compiler of ["typescript", "typescript-5.9"]) {
+  for (const compiler of ["current", "minimum"] as const) {
     console.log(
-      `Checking ${selected.join(", ") || "all frameworks"}: ${compiler}`
+      `Checking ${selected.join(", ") || "all frameworks"}: ${compiler} ${compiler === "current" ? JSON.stringify(currentCompiler) : "TypeScript 5.9.3"}`
     );
     run(process.execPath, [
-      nodePath.join(directory, "node_modules", compiler, "bin/tsc"),
+      ...compilerCommand(directory, compiler),
       "--project",
       project,
       "--pretty",
