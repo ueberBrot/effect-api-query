@@ -824,7 +824,7 @@ it.effect(
 );
 
 it.effect(
-  "builds the conflict index once and leaves subsequent full-cache enumeration to native Query",
+  "does not enumerate the cache again after indexing stream hash conflicts",
   () =>
     Effect.gen(function* avoidRepeatedEnumeration() {
       const group = RpcGroup.make(
@@ -847,16 +847,8 @@ it.effect(
         yield* Effect.promise(async () => await queryClient.query(options));
         enumerate.mockClear();
         yield* Effect.promise(async () => await queryClient.query(options));
-        const adapterEnumerations = enumerate.mock.calls.length;
-        enumerate.mockClear();
-        yield* Effect.promise(
-          async () =>
-            await queryClient.query({
-              ...options,
-              queryFn: experimental_streamedQuery({ streamFn: nativeStreamFn }),
-            })
-        );
-        expect(adapterEnumerations).toBe(enumerate.mock.calls.length);
+        expect(enumerate).not.toHaveBeenCalled();
+        expect(queryClient.getQueryData(options.queryKey)).toStrictEqual([1]);
       } finally {
         enumerate.mockRestore();
         queryClient.clear();

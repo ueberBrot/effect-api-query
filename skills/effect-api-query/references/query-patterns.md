@@ -151,6 +151,8 @@ Live queries cache only the latest value. They accept no history or publication 
 
 Live queries normalize each emitted `undefined` to `null`, including emissions after a defined value. Live keys, selectors, and initial data use the normalized type. Accumulated chunks retain their original values, including `undefined`.
 
+The adapter publishes stream data through stable Query Core cache operations. Native cache reads, writes, structural-sharing policies, and observers use the same query entry.
+
 On an initial fetch, both views become successful after the first emission and keep fetching until completion. Ordinary-query cancellation closes the iterator and interrupts its Effect resources. Native cancellation can settle before local finalizers finish. For the native Suspense cancellation limitation, read [frameworks and hosts](frameworks-and-hosts.md).
 
 An awaited QueryClient call waits for stream completion. Hooks and observers see intermediate values. For SSR, read [hydration and SSR](hydration-and-ssr.md). Use `fetchStreamSnapshot` to capture and drain an open query.

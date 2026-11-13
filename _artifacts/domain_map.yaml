@@ -22,6 +22,7 @@ skills:
       - Inferred operation types, tree/branch/leaf policy configuration, execution interception, native defaults, and view filters
       - Opt-in decoded-value sharing through native Schema equivalence and Query policies, with explicit reference semantics for custom fields
       - Input-field skipping, pagination, explicit stream retention, publication deadlines, uncached event consumption, recovery, and lifetime tracing
+      - Stable Query Core stream publication, native cache writes, independent observer lifetimes, and complete cleanup Causes
       - Stream snapshots and request cleanup
       - Optimistic overlap, event refresh, and owner replacement
       - DTO and rich-value hydration with typed view registration

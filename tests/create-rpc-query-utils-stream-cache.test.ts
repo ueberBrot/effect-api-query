@@ -366,3 +366,76 @@ describe.each([{ order: [4, 2] }, { order: [2, 4] }] as const)(
     );
   }
 );
+
+it.effect("restarts an observer without cancelling another live query", () =>
+  Effect.gen(function* repeatObserverLifetime() {
+    const group = RpcGroup.make(
+      Rpc.make("watch", {
+        payload: { id: Schema.Int },
+        success: Schema.Int,
+        stream: true,
+      })
+    );
+    const firstClosed = yield* Deferred.make<boolean>();
+    const otherClosed = yield* Deferred.make<boolean>();
+    let firstRuns = 0;
+    const client = yield* makeRpcTestClient(group, {
+      watch: ({ id }) => {
+        if (id === 1) {
+          firstRuns += 1;
+        }
+        const value = id === 1 ? firstRuns : 100;
+        return Stream.succeed(value).pipe(
+          Stream.concat(Stream.never),
+          Stream.ensuring(
+            Deferred.succeed(id === 1 ? firstClosed : otherClosed, true)
+          )
+        );
+      },
+    });
+    const rpc = createRpcQueryUtils(group, {
+      client,
+      keyPrefix: ["observer-lifetimes"],
+    });
+    const queryClient = new QueryClient();
+    const first = new QueryObserver(
+      queryClient,
+      rpc.watch.liveOptions({ input: { id: 1 } })
+    );
+    const other = new QueryObserver(
+      queryClient,
+      rpc.watch.liveOptions({ input: { id: 2 } })
+    );
+    let stopFirst = first.subscribe(() => {});
+    const stopOther = other.subscribe(() => {});
+    try {
+      yield* waitForQueryState(
+        queryClient,
+        () =>
+          first.getCurrentResult().data === 1 &&
+          other.getCurrentResult().data === 100
+      );
+      stopFirst();
+      yield* Deferred.await(firstClosed);
+      stopFirst = first.subscribe(() => {});
+      yield* waitForQueryState(
+        queryClient,
+        () => first.getCurrentResult().data === 2
+      );
+      expect(other.getCurrentResult()).toMatchObject({
+        data: 100,
+        fetchStatus: "fetching",
+      });
+      expect(Deferred.isDoneUnsafe(otherClosed)).toBe(false);
+      expect(queryClient.getQueryData(rpc.watch.liveKey({ id: 1 }))).toBe(2);
+    } finally {
+      stopFirst();
+      stopOther();
+      yield* Effect.promise(async () => {
+        await queryClient.cancelQueries();
+      });
+      yield* Deferred.await(otherClosed);
+      queryClient.clear();
+    }
+  })
+);
