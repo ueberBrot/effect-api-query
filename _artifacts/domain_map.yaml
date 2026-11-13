@@ -43,7 +43,7 @@ skills:
       - Hydrate every selected view into its normal decoded cache representation.
       - Preserve neighboring writes and originating ownership during mutation overlap.
       - Defer event refresh until participating writes settle.
-      - Retire consumers and accepted work before acquiring a replacement owner.
+      - Retire consumers and accepted work before acquiring a replacement owner; opt in to acquired/borrowed setup, wrapped runners and complete query-function/mutation promise drains with guarded originating-cache callbacks.
       - Acquire a ready client and mount native providers with awaited cleanup.
       - Recover initial Suspense failures, retain cached data after failed refetches, and start independent reads together with native cancellation limits.
       - Recover stream delivery with numeric convenience or explicit application cursor acceptance/order and gap detection, authoritative replay refresh, full hook inference, and cancellable backoff.

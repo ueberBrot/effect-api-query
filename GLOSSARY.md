@@ -54,4 +54,6 @@ These terms describe how the package builds TanStack Query utilities from Effect
 
 **Key-generation error**: A synchronous error that occurs while the package derives canonical cache identity from RPC payload constructor input or HTTP request input. _Avoid_: RPC execution error, configuration error
 
+**Query owner**: An opt-in application lifetime with an independent native QueryClient, explicitly acquired resources, and registered work. Retirement stops admission, aborts queries, drains registered local work, and releases acquired resources. Borrowed resources remain caller-owned. _Avoid_: Generated client, mutation cancellation
+
 **Recovery cursor**: The last locally accepted event position in one stream consumption. Numeric convenience uses increasing nonnegative safe integers; an application cursor policy defines acceptance and optional gap detection for other protocols. It is attempt-local resume state outside semantic query identity, not a durable acknowledgement or downstream processing checkpoint.

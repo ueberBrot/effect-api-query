@@ -1,9 +1,11 @@
 import { expect, it } from "@effect/vitest";
 import { QueryClient, QueryObserver } from "@tanstack/query-core";
-import { Cause, Deferred, Effect, Exit, Fiber, Schema } from "effect";
+import { Cause, Deferred, Effect, Exit, Fiber, Schema, Stream } from "effect";
 import { Rpc, RpcGroup } from "effect/rpc";
 
 import {
+  acquireQueryOwner,
+  configureUtils,
   createRpcQueryUtils,
   createQueryFilter,
   EffectRpcQueryError,
@@ -14,6 +16,7 @@ import {
 
 import { directory, directoryEffects } from "../examples/shared/query-effects";
 import { makeRpcTestClient } from "./fixtures/effect-rpc";
+import { waitForQueryState } from "./fixtures/query-cache";
 
 it.effect(
   "shares ensured data with direct QueryClient consumers and typed updates",
@@ -207,5 +210,97 @@ it.effect(
       expect(client.getQueryData(key)).toStrictEqual({ id: 1, name: "Grace" });
       expect(client.getQueryState(key)?.isInvalidated).toBe(true);
       client.clear();
+    })
+);
+
+it.effect(
+  "retires owner-tracked coalesced work after a bridge waiter leaves its native observer",
+  () =>
+    Effect.gen(function* retiresSharedOwner() {
+      const pending = yield* Deferred.make<boolean>();
+      const events: string[] = [];
+      const group = RpcGroup.make(
+        Rpc.make("watch", { success: Schema.Int, stream: true })
+      );
+      const ready = yield* makeRpcTestClient(group, {
+        watch: () =>
+          Stream.make(1, 2).pipe(
+            Stream.concat(
+              Stream.fromEffect(
+                Deferred.succeed(pending, true).pipe(
+                  Effect.andThen(Effect.never)
+                )
+              )
+            ),
+            Stream.ensuring(
+              Effect.sync(() => {
+                events.push("cleaned");
+              })
+            )
+          ),
+      });
+      const owner = yield* Effect.promise(
+        async () =>
+          await acquireQueryOwner(async (setup) => {
+            await setup.acquire(
+              () => ready,
+              () => {
+                events.push("released");
+              }
+            );
+            return configureUtils(
+              createRpcQueryUtils(group, {
+                client: ready,
+                keyPrefix: ["bridge-owner"],
+                runPromiseExit: setup.wrapRunner(Effect.runPromiseExit),
+              }),
+              {
+                live: {
+                  interceptors: [
+                    async ({ next, context }) =>
+                      await setup.runQuery(next, context.signal),
+                  ],
+                },
+              }
+            );
+          })
+      );
+      const options = owner.resources.watch.liveOptions({
+        coalesceMs: 60_000,
+        retry: false,
+      });
+      const observer = new QueryObserver(owner.queryClient, options);
+      const stop = observer.subscribe(() => {});
+      try {
+        const waiter = yield* Effect.forkChild(
+          queryEffects
+            .fetch(options)
+            .pipe(Effect.provideService(QueryClientService, owner.queryClient))
+        );
+        yield* Deferred.await(pending);
+        yield* waitForQueryState(
+          owner.queryClient,
+          () => owner.queryClient.getQueryData(options.queryKey) === 1
+        );
+        yield* Fiber.interrupt(waiter);
+        expect(
+          owner.queryClient.getQueryState(options.queryKey)?.fetchStatus
+        ).toBe("fetching");
+        expect(owner.queryClient.getQueryData(options.queryKey)).toBe(1);
+        expect(events).toStrictEqual([]);
+        yield* Effect.promise(async () => {
+          await owner.dispose();
+        });
+        expect(events).toStrictEqual(["cleaned", "released"]);
+        expect({
+          queries: owner.queryClient.getQueryCache().getAll(),
+          active: owner.isActive(),
+        }).toStrictEqual({ queries: [], active: false });
+      } finally {
+        stop();
+        yield* Effect.promise(async () => {
+          await owner.dispose();
+        });
+      }
     })
 );
