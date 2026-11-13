@@ -3468,6 +3468,123 @@
         "150 browser cases passed before private workspace packaging; final 150-case browser rerun running. Eight packed peer pairs passed 403 cases each before internal type-export/consumer-fixture cleanup; final CI will rerun the matrix.",
         "Fresh Astra architecture/fix source rechecks found no remaining actionable admission finding. No fresh consumer/discovery or GUI/platform claim; default yamllint retains repository line-length/document-start issues."
       ]
+    },
+    "source:examples/vite-react/src/workflows/app.tsx": {
+      "fingerprint": "ab6d0b3912c945d2b7c8500f34e4e750fe8f30581b4d6cdea8cf612a923f5ee0",
+      "snapshot": {
+        "examples/vite-react/src/workflows/app.tsx": null
+      },
+      "head": "a00748698244a62e85022a3105424b67f5f2024d",
+      "outcome": "no-change",
+      "reason": "This former Vite-private workflow path is deleted by relocation to examples/shared/http-workflows. Both hosts import the private shared workspace package. Its implementation and owner behavior were reviewed under the updated shared source mapping; no separate skill is warranted for the deleted location.",
+      "evidence": [
+        "a007486 exact rename/source diff and shared module callers; public app/owner regressions, 870 runtime tests, both public/server compilers, strict checks and both final builds pass.",
+        "All four Fallow audits and source rechecks pass; updated skill source mapping, domain failure mode and retained one-skill/six-reference planning cover the moved implementation. No pending source content remains at the deleted paths."
+      ]
+    },
+    "source:examples/vite-react/src/workflows/application.ts": {
+      "fingerprint": "615656418491fa991e1d8ce3a3bae750d10776c4e83da37c6a4f0dbc298a0a2c",
+      "snapshot": {
+        "examples/vite-react/src/workflows/application.ts": null
+      },
+      "head": "a00748698244a62e85022a3105424b67f5f2024d",
+      "outcome": "no-change",
+      "reason": "This former Vite-private workflow path is deleted by relocation to examples/shared/http-workflows. Both hosts import the private shared workspace package. Its implementation and owner behavior were reviewed under the updated shared source mapping; no separate skill is warranted for the deleted location.",
+      "evidence": [
+        "a007486 exact rename/source diff and shared module callers; public app/owner regressions, 870 runtime tests, both public/server compilers, strict checks and both final builds pass.",
+        "All four Fallow audits and source rechecks pass; updated skill source mapping, domain failure mode and retained one-skill/six-reference planning cover the moved implementation. No pending source content remains at the deleted paths."
+      ]
+    },
+    "source:examples/vite-react/src/workflows/document.tsx": {
+      "fingerprint": "5c14700321d95ad97582d196467f5fe1d287f95e7bf7e7f03d74566c4460c944",
+      "snapshot": {
+        "examples/vite-react/src/workflows/document.tsx": null
+      },
+      "head": "a00748698244a62e85022a3105424b67f5f2024d",
+      "outcome": "no-change",
+      "reason": "This former Vite-private workflow path is deleted by relocation to examples/shared/http-workflows. Both hosts import the private shared workspace package. Its implementation and owner behavior were reviewed under the updated shared source mapping; no separate skill is warranted for the deleted location.",
+      "evidence": [
+        "a007486 exact rename/source diff and shared module callers; public app/owner regressions, 870 runtime tests, both public/server compilers, strict checks and both final builds pass.",
+        "All four Fallow audits and source rechecks pass; updated skill source mapping, domain failure mode and retained one-skill/six-reference planning cover the moved implementation. No pending source content remains at the deleted paths."
+      ]
+    },
+    "source:examples/vite-react/src/workflows/events.tsx": {
+      "fingerprint": "002b91acfeb283fa930db1f22dc9367145380342288a3b337cfdd604394e21a3",
+      "snapshot": {
+        "examples/vite-react/src/workflows/events.tsx": null
+      },
+      "head": "a00748698244a62e85022a3105424b67f5f2024d",
+      "outcome": "no-change",
+      "reason": "This former Vite-private workflow path is deleted by relocation to examples/shared/http-workflows. Both hosts import the private shared workspace package. Its implementation and owner behavior were reviewed under the updated shared source mapping; no separate skill is warranted for the deleted location.",
+      "evidence": [
+        "a007486 exact rename/source diff and shared module callers; public app/owner regressions, 870 runtime tests, both public/server compilers, strict checks and both final builds pass.",
+        "All four Fallow audits and source rechecks pass; updated skill source mapping, domain failure mode and retained one-skill/six-reference planning cover the moved implementation. No pending source content remains at the deleted paths."
+      ]
+    },
+    "source:examples/vite-react/src/workflows/readings.tsx": {
+      "fingerprint": "51b55d8e5c77fa559d326269998c67da7a44873ea39819c40ef3b8abbf15fbbb",
+      "snapshot": {
+        "examples/vite-react/src/workflows/readings.tsx": null
+      },
+      "head": "a00748698244a62e85022a3105424b67f5f2024d",
+      "outcome": "no-change",
+      "reason": "This former Vite-private workflow path is deleted by relocation to examples/shared/http-workflows. Both hosts import the private shared workspace package. Its implementation and owner behavior were reviewed under the updated shared source mapping; no separate skill is warranted for the deleted location.",
+      "evidence": [
+        "a007486 exact rename/source diff and shared module callers; public app/owner regressions, 870 runtime tests, both public/server compilers, strict checks and both final builds pass.",
+        "All four Fallow audits and source rechecks pass; updated skill source mapping, domain failure mode and retained one-skill/six-reference planning cover the moved implementation. No pending source content remains at the deleted paths."
+      ]
+    },
+    "source:examples/vite-react/src/workflows/recovery.ts": {
+      "fingerprint": "c9903fa567013b64884097baf437718ea432ed4a6f8e2119129c00b7ce907337",
+      "snapshot": {
+        "examples/vite-react/src/workflows/recovery.ts": null
+      },
+      "head": "a00748698244a62e85022a3105424b67f5f2024d",
+      "outcome": "no-change",
+      "reason": "This former Vite-private workflow path is deleted by relocation to examples/shared/http-workflows. Both hosts import the private shared workspace package. Its implementation and owner behavior were reviewed under the updated shared source mapping; no separate skill is warranted for the deleted location.",
+      "evidence": [
+        "a007486 exact rename/source diff and shared module callers; public app/owner regressions, 870 runtime tests, both public/server compilers, strict checks and both final builds pass.",
+        "All four Fallow audits and source rechecks pass; updated skill source mapping, domain failure mode and retained one-skill/six-reference planning cover the moved implementation. No pending source content remains at the deleted paths."
+      ]
+    },
+    "source:examples/vite-react/src/workflows/sharing.ts": {
+      "fingerprint": "68243c4bc33952b5f9d79b38659aa52692dc1236eab8ea4afce7516b72acafec",
+      "snapshot": {
+        "examples/vite-react/src/workflows/sharing.ts": null
+      },
+      "head": "a00748698244a62e85022a3105424b67f5f2024d",
+      "outcome": "no-change",
+      "reason": "This former Vite-private workflow path is deleted by relocation to examples/shared/http-workflows. Both hosts import the private shared workspace package. Its implementation and owner behavior were reviewed under the updated shared source mapping; no separate skill is warranted for the deleted location.",
+      "evidence": [
+        "a007486 exact rename/source diff and shared module callers; public app/owner regressions, 870 runtime tests, both public/server compilers, strict checks and both final builds pass.",
+        "All four Fallow audits and source rechecks pass; updated skill source mapping, domain failure mode and retained one-skill/six-reference planning cover the moved implementation. No pending source content remains at the deleted paths."
+      ]
+    },
+    "source:examples/vite-react/src/workflows/streams.tsx": {
+      "fingerprint": "f7479d584b40615f5ca33f2185bc6756d257d41b4d667fb30a33c97588a2c7cc",
+      "snapshot": {
+        "examples/vite-react/src/workflows/streams.tsx": null
+      },
+      "head": "a00748698244a62e85022a3105424b67f5f2024d",
+      "outcome": "no-change",
+      "reason": "This former Vite-private workflow path is deleted by relocation to examples/shared/http-workflows. Both hosts import the private shared workspace package. Its implementation and owner behavior were reviewed under the updated shared source mapping; no separate skill is warranted for the deleted location.",
+      "evidence": [
+        "a007486 exact rename/source diff and shared module callers; public app/owner regressions, 870 runtime tests, both public/server compilers, strict checks and both final builds pass.",
+        "All four Fallow audits and source rechecks pass; updated skill source mapping, domain failure mode and retained one-skill/six-reference planning cover the moved implementation. No pending source content remains at the deleted paths."
+      ]
+    },
+    "source:examples/vite-react/src/workflows/upload.tsx": {
+      "fingerprint": "de6562507ac903a0e1a81f5c3676149a4cfbe98f494c608d7c65035d3cebf6b4",
+      "snapshot": {
+        "examples/vite-react/src/workflows/upload.tsx": null
+      },
+      "head": "a00748698244a62e85022a3105424b67f5f2024d",
+      "outcome": "no-change",
+      "reason": "This former Vite-private workflow path is deleted by relocation to examples/shared/http-workflows. Both hosts import the private shared workspace package. Its implementation and owner behavior were reviewed under the updated shared source mapping; no separate skill is warranted for the deleted location.",
+      "evidence": [
+        "a007486 exact rename/source diff and shared module callers; public app/owner regressions, 870 runtime tests, both public/server compilers, strict checks and both final builds pass.",
+        "All four Fallow audits and source rechecks pass; updated skill source mapping, domain failure mode and retained one-skill/six-reference planning cover the moved implementation. No pending source content remains at the deleted paths."
+      ]
     }
   }
 }
