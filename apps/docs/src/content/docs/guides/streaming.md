@@ -92,6 +92,8 @@ Pass `history` or `latest` to a native query hook or QueryClient. A wire record 
 
 For exact cache access, reuse the options' `queryKey`. Accumulated history policies and SSE decoder policies affect identity. Live and accumulated views remain separate. Endpoint prefixes match all their views.
 
+The adapter publishes both views through stable Query Core cache operations. Native cache reads, writes, observers, and structural-sharing overrides use the same cache entry.
+
 Cancellation closes the stream iterator. Your application owns reconnection, resume policy, and client lifetime. Use [Reconnect Streams](/effect-api-query/guides/reconnect-streams/) to add `recoverStream` to application-owned delivery when the server supports ordered cursor replay. A replacement stream can start while the old iterator's asynchronous finalizer is still pending. See [Release Resources after Local Cleanup](/effect-api-query/guides/cancellation/#release-resources-after-local-cleanup) when streams share exclusive resources.
 
 HTTP `sseOptions.maxEventSize` bounds pending parser text in JavaScript string code units. Its default is 10 × 1024 × 1024 code units. Put declared resume headers in `input.headers`.

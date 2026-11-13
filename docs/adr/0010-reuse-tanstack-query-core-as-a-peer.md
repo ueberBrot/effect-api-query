@@ -1,6 +1,6 @@
 # Reuse TanStack Query Core as a peer
 
-Status: Accepted.
+Status: Partially amended by [ADR 0037](0037-own-stream-publication-through-query-core.md) for stream execution.
 
 ## Context
 
