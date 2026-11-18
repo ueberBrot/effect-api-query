@@ -3,17 +3,17 @@ title: Vue Query
 description: Rebuild generated options with Vue computed and keep client resources alive.
 ---
 
-Pass options from either factory to Vue Query's native hooks. Before creating the utilities, configure `VueQueryPlugin` and acquire the ready client.
+Install `VueQueryPlugin` and acquire your Effect client before passing generated options to Vue Query.
 
-See [Requirements and tested integrations](/effect-api-query/reference/compatibility-and-limits/#requirements-and-tested-integrations) for Vue Query's framework requirements and this guide's checked versions.
+See [compatibility](/effect-api-query/reference/compatibility-and-limits/#requirements-and-tested-integrations) for Vue requirements and tested versions.
 
 ## Rebuild options when input changes
 
-Builders capture plain input when you call them. Build options inside Vue `computed`. When input changes, the computed value contains a new key and query function. If you pass a builder's result once, the query keeps using the original input.
+Call the builder inside Vue `computed` so reactive changes produce a new key and function. An options object built once keeps its original input.
 
-Keep [captured inputs unchanged](/effect-api-query/concepts/data-normalization/#keep-captured-inputs-unchanged) while their options can execute.
+Keep [captured input](/effect-api-query/concepts/data-normalization/#keep-captured-inputs-unchanged) unchanged while options can run.
 
-In component setup, use the `rpc` tree from your [ready client](/effect-api-query/getting-started/quick-start/). Here `users.read` returns a user with a `name`:
+In component setup, use `rpc` from your [ready client](/effect-api-query/getting-started/quick-start/). Here `users.read` returns a user with a name.
 
 ```ts
 import { useQuery } from "@tanstack/vue-query";
@@ -31,22 +31,22 @@ const options = computed(() =>
 );
 ```
 
-Pass the computed options directly to the native hook:
+Pass the computed value to the hook.
 
 ```ts
 const user = useQuery(options);
 ```
 
-Read the selected value from `user.data.value`. Generated options infer the selected data and full execution-error union without explicit hook generics.
+Read the selected value from `user.data.value`. The hook infers the selected value and execution error types.
 
-When input changes, use the same computed pattern for `infiniteOptions`, `streamedOptions`, `liveOptions`, and `metadataOptions`. For writes, pass `rpc.users.write.mutationOptions()` to `useMutation`. Supply each execution's input through `mutate(variables)`. If mutation settings depend on reactive state, use `computed`.
+Use the same computed pattern for pages, streams, and HTTP metadata. For a write, pass `rpc.users.write.mutationOptions()` to `useMutation`. Pass each input to `mutate(variables)`. Use `computed` for mutation settings that depend on state.
 
 ## Choose native options carefully
 
-Vue evaluates a function-valued `enabled` as a getter with no arguments. Use a boolean inside computed options, or a zero-argument getter returning a boolean. A Core `enabled(query)` callback cannot be passed directly to Vue.
+Vue calls a function-valued `enabled` with no arguments. Set a boolean in computed options or use a zero-argument getter. Adapt Core's `enabled(query)` before using it in Vue.
 
-Vue accepts an initial-data initializer that can return `undefined`. Its result data is optional. Plain options with a defined seed preserve defined data. Vue's computed-options overload can keep data optional even with a defined seed; this follows the native hook's behavior. An explicit `initialData: undefined` overrides inherited QueryClient initial data.
+An initializer that can return `undefined` yields optional data. Plain options with a defined seed keep the data type defined. Vue's computed overload can keep the type optional even with a defined seed. Pass `initialData: undefined` to clear an inherited seed.
 
 ## Own the native integration
 
-Follow [the shared cache and client lifetime](/effect-api-query/integrations/#own-the-cache-and-client-lifetime) when disposing clients or replacing an owner. Match Vue Query to the application's Query Core and use a compiler supported by Vue's tooling.
+Use one resolved Query Core version and a compiler that Vue supports. Follow [cache and client lifetime](/effect-api-query/integrations/#own-the-cache-and-client-lifetime) when you dispose of the client or replace an owner.

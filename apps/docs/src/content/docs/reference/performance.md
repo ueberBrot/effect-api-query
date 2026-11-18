@@ -5,25 +5,25 @@ description: Factory and key construction costs, measurement workloads, and adap
 
 ## Construction
 
-Factories build and freeze the complete RPC or HTTP utility tree when called. Each tree belongs to one ready client and cache owner. A larger contract increases factory work, even when the application uses only a few leaves.
+Each factory builds and freezes the whole utility tree for one ready client. A larger contract takes more work even if the app uses few leaves.
 
-Payload-bearing keys prepare a fresh immutable canonical payload. RPC preparation constructs and Schema-encodes the normalized payload. HTTP preparation encodes the declared request parts. Larger payloads require more preparation work. Executable query options also capture the request and create a fresh query function. Ordinary calls do not memoize payloads or option objects. Explicit prepared inputs can reuse input preparation.
+A payload-bearing key needs freshly encoded, frozen JSON. RPC constructs and encodes the payload. HTTP encodes each declared request part. Options also retain input and create a query function. To reuse input preparation, use `prepareInput`.
 
-A custom RPC key encoder replaces Schema encoding. Payload construction, JSON validation, canonical copying, and freezing still run. The encoder must preserve every input field that can change the result so cache identity remains correct.
+A custom RPC encoder replaces Schema encoding. Payload construction, JSON validation, copying, and freezing still run. Preserve every safe input value that distinguishes responses.
 
-`configureUtils` snapshots policy properties and interceptor lists when called. Sparse scoped settings reuse frozen subtrees that receive no new inherited settings; a shared policy or interceptor still applies across its descendants. Empty policy objects and interceptor lists add no configuration work. Callback mode settings and explicitly undefined policy properties remain meaningful across repeated calls. Configured copies retain cache identity and prepared-input ownership. Configure utilities once per owner and reuse them across renders.
+`configureUtils` copies policies and interceptor lists. It reuses frozen subtrees when they get no new settings. Shared policy still applies to descendants. An empty policy adds no configuration work, but an explicit undefined field or callback mode can change behavior. Configure once per owner and reuse across renders.
 
 ## Repeatable measurements
 
-The optional construction workload measures repository sources:
+To measure factory construction, run the workload from the repository root.
 
 ```sh
 vp run construction-baseline
 ```
 
-The construction workload covers RPC and HTTP factories with 1, 250, and 1,000 operations. At each size it measures empty configuration, one scoped leaf, all scoped leaves, and three successive configurations (sparse, shared root policy, sparse). Each configuration sample applies 50 iterations to an already constructed tree, excluding contract and client acquisition. Key and ordinary/prepared option workloads use one operation with 1 or 100 payload records. All workloads use 20 warmup iterations and five samples.
+It tests contracts with 1, 250, and 1,000 operations. Each size covers empty configuration, one leaf, all leaves, and three successive configurations. Each configuration sample applies 50 iterations to a built tree. The key and option cases use 1 or 100 payload records. Each workload uses 20 warmups and five samples.
 
-Additional workloads report compiler diagnostics, consumer bundle sizes, and stream publication costs:
+Use the other workloads to measure compiler diagnostics, bundles, and stream publication.
 
 ```sh
 vp run type-baseline
@@ -31,39 +31,41 @@ vp run bundle-baseline
 vp run stream-baseline
 ```
 
-Type measurements compare contracts alone, raw utilities, and scoped configuration at 50, 250, and 1,000 operations on both supported compilers. Bundle measurements compare RPC, HTTP, stream and hydration consumers with native options or utilities, with peers included and external. Both variants retain the same exported contract and ready-client boundary. Stream measurements include bounded and unbounded histories, count and deadline publication, live values, cache writes, observer notifications, and cleanup.
+The type workload measures contracts, raw utilities, and configured utilities at 50, 250, and 1,000 operations on both compilers. The bundle workload compares consumers with included and external peers. The stream workload measures retention, batch size and deadlines, live values, cache writes, notifications, and cleanup.
 
-Compare compiler runs with identical operation counts, contract/raw/configured consumers, engine, language target, dependency lockfile, and compiler options. The development compiler is Effect-enhanced TSRS; the minimum consumer compiler is TypeScript 5.9.3. Compare each compiler with itself. Save a separate warmup run, then repeat samples in fresh compiler processes. Instantiation counts measure compiler work. Report memory, check time, and wall time separately because they vary with the environment. A compiler upgrade does not establish an adapter improvement.
+`vp run sharing-baseline` compares native sharing, a manual recipe, `schemaStructuralSharing`, and disabled sharing. It measures 50 cache writes per sample across five samples. It uses 10 or 1,000 readings with all, some, or no values changed. It allocates inputs before timing. Measure decoding, transport, and rendering separately.
 
-Each workload prints JSON with its dependency and runtime versions. Set `PERFORMANCE_OUTPUT` to save the same report to a file. Construction reports also fingerprint the configuration source and workload script. Compare matching workloads and versions before attributing a change to the adapter.
+Compare the same operation counts, consumer, compiler, target, lockfile, and options. Run warmup separately and sample fresh compiler processes. Use instantiations to compare compiler work. Report memory, check time, and elapsed time separately.
 
-The [stream workload](https://github.com/ueberBrot/effect-api-query/blob/main/tests/create-rpc-query-utils-stream-baseline.test.ts) and [transport workload](https://github.com/ueberBrot/effect-api-query/blob/main/examples/server/tests/rpc-transport-overhead.test.ts) measure publication and transport costs. Results are comparable only for the same workload and dependency versions. Elapsed time and memory depend on the machine.
+Each workload prints JSON with dependency and runtime versions. Set `PERFORMANCE_OUTPUT` to write it to a file. Construction reports include fingerprints of the configuration and workload script.
+
+See the [stream workload](https://github.com/ueberBrot/effect-api-query/blob/main/tests/create-rpc-query-utils-stream-baseline.test.ts) and [transport workload](https://github.com/ueberBrot/effect-api-query/blob/main/examples/server/tests/rpc-transport-overhead.test.ts). Compare matching workload and dependency versions. Time and memory vary by machine.
 
 ### Regression budgets
 
-The default bundle and compiler workloads enforce the ceilings in `scripts/performance/budgets.mts`. Bundle ceilings cover the added minified and gzip bytes for each consumer and peer mode. Compiler ceilings cover instantiations separately for each compiler, adapter, operation count and contract/raw/configured consumer. They allow about 10% above the spec #166 combined baseline as a review threshold for substantial growth. This headroom is a maintenance policy, not measured compiler variability. Smaller increases still need review. The included-peer RPC ceiling is tighter: restoring the previously retained unused Effect cache wrappers exceeds it. Custom operation counts outside that table have no compiler budget.
+The [bundle and compiler budgets](https://github.com/ueberBrot/effect-api-query/blob/main/scripts/performance/budgets.mts) set size and instantiation limits for the default workloads. Bundle limits differ by consumer and peer mode. Compiler limits differ by compiler, adapter, operation count, and consumer. Counts outside the default matrix have no compiler budget.
 
-Run the complete default workloads when changing these ceilings. Keep compiler engine, language target, dependencies, contracts and consumed leaves equal across comparisons. Record why the added capability warrants the cost before raising a ceiling. Timing and heap snapshots are observations, never pass/fail limits.
+Before changing a budget, run the default workloads with matching compilers, dependencies, contracts, and consumed leaves. Explain what accounts for the added cost. Timing and heap measurements are observations.
 
-Stream budgets bound manual cache writes by the emission count, or by first-value plus batch flushes for count batching. Observer notifications allow the fetch and settlement transitions as well. Deadline and coalescing workloads use the emission bound because event-loop scheduling changes their write counts. Deterministic public tests separately check exact coalesced publications, fixed deadlines and final flushing. A fast local source producing two coalesced writes does not promise two writes on every machine.
+Stream write limits follow event counts or batch flushes. Observer notifications also include fetch and settlement. Deadline and coalescing counts can vary with scheduling. Separate deterministic tests cover deadlines, coalescing, and final flushes.
 
 ### Bundle attribution limits
 
-Reports list retained modules and their rendered bytes before final minification. The package is already one built module, so those bytes cannot identify the cost of an individual original source file. Gzip deltas also include compression interactions with peers; they are not additive module sizes.
+Module reports show retained bytes before final minification. They measure the adapter as one built module. Gzip deltas depend on other bundled modules.
 
-The native consumers model successful reads and ordered unbounded stream publication. They do not reproduce the adapter's complete Cause, cleanup, key preparation or view-policy guarantees. Native hydration handles JSON query data; the utility variant adds Schema codec registration. These deltas measure the cost of retained capabilities, not equivalent implementations or runtime speedups. The selected compiler is reported as build provenance; Rolldown performs the JavaScript consumer build.
+The native examples measure successful reads, unbounded stream publication, and JSON hydration. Utility examples add key preparation, stream policies, error and cleanup handling, or codecs. Compare the resulting bundle sizes as costs for those capabilities. Rolldown builds both consumer variants.
 
 ## Adapter and application bundles
 
-The package marks its exports as free of side effects and keeps Effect and Query Core as peers. Pure annotations on lazy Effect cache wrapper construction let bundlers remove unused wrapper bodies; they do not change service identity or execute cache work. An application can import one factory or an error guard from the package root. Unused factories and the stream snapshot helper can then be removed by the bundler.
+Effect and Query Core are peers. The package marks exports as free of side effects and annotates lazy cache wrappers for tree shaking. A bundler can remove unused factories and helpers when you import only what you use.
 
-An adapter-only bundle with external peers excludes dependency code. The application's contract Schemas, transport, QueryClient, framework, and other imports contribute to the final bundle. Attributing a size change to the adapter requires a comparison with the same imports and dependency versions.
+External peers stay outside an adapter-only bundle. App bundles also include contract Schemas, transport, QueryClient, framework, and other imports. Compare the same imports and versions when measuring the adapter.
 
 ## Reuse a stable input
 
-Create the utility tree and apply shared `configureUtils` policies once per client/cache owner. Reuse those utilities across renders; rebuild call-site options when reactive input changes. The compiler still checks literal contracts and native hook inference.
+Create the utility tree and shared `configureUtils` settings once per owner. Rebuild call-site options when reactive input changes.
 
-When the same large input is used repeatedly, prepare it once:
+Prepare a large input once when several builders reuse it.
 
 ```ts
 import { prepareInput } from "@ueberbrot/effect-api-query";
@@ -76,10 +78,10 @@ const options = rpc.users.get.queryOptions({
 });
 ```
 
-Preparation runs RPC construction, encoding, and canonical copying once. HTTP accepts decoded request containers in the same helper. Later key and ordinary, metadata, live, or streamed option construction reuses the result. Concrete infinite keys also accept the handle; infinite page mappers continue to return raw input. Mutations accept raw variables only. `InferInput` continues to describe raw application input.
+`prepareInput` runs construction, encoding, and copying once. For HTTP, pass decoded request parts. Reuse the handle with exact keys and ordinary, metadata, live, or streamed builders. Infinite key builders also accept it. Infinite mappers and mutations still take raw input. `InferInput` describes that raw input.
 
-A handle belongs to its exact utility leaf. Using it on another leaf or a separately constructed utility tree throws before execution, even when their contract and prefix match. Configured copies of the original leaf share its owner. Handles are opaque, cannot be serialized for hydration, and retain execution input while reachable.
+A handle belongs to the leaf that prepared it and works with its configured copies. Other leaves and trees reject it before execution, even with the same contract and prefix. It retains execution input while reachable. Use hydration codecs for data transfer.
 
-Keep the retained input and all nested mutable values unchanged. Preparation does not deep-clone arbitrary decoded values. Build a new input and handle when parameters change. Inputless and mutation-only leaves have nothing to prepare. This API avoids automatic identity-based memoization of mutable application objects.
+Keep retained values unchanged, including nested mutable values. If parameters change, make new input and prepare it again. Inputless and mutation-only leaves have nothing to prepare.
 
-The construction workload reports ordinary and prepared option-building costs separately. Prepared measurements exclude the one-time preparation cost; compare them only when inputs are reused. Fresh option objects and query functions are still allocated.
+Use the ordinary and prepared construction measurements to compare repeated builds. The prepared measurements exclude the cost of the first preparation. Each call still allocates its options and function.

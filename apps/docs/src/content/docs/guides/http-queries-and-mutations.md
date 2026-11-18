@@ -3,11 +3,11 @@ title: HTTP Requests and Uploads
 description: Supply decoded request parts and execute buffered multipart mutations.
 ---
 
-Use the HTTP utility tree from the [HTTP quick start](/effect-api-query/getting-started/http-quick-start/). Configure the base URL, middleware, authentication, and execution services on your ready client and runner. For shared builders, see [Queries](/effect-api-query/guides/queries/), [Mutations](/effect-api-query/guides/mutations/), [Pagination](/effect-api-query/guides/pagination/), [Streaming](/effect-api-query/guides/streaming/), and [HTTP Metadata](/effect-api-query/guides/http-metadata/).
+Start with the utility tree from the [HTTP quick start](/effect-api-query/getting-started/http-quick-start/). Set the base URL, authentication, middleware, and required services on your Effect client and runner.
 
 ## Supply decoded request parts
 
-HTTP input contains the declared `params`, `query`, `headers`, and `payload` containers. Include each declared container, even when its fields are optional. This `users.get` endpoint declares `params.id` and `query.locale`:
+Pass the decoded `params`, `query`, `headers`, and `payload` that the endpoint declares. Supply each declared object, even if its fields are optional. This endpoint takes `params.id` and `query.locale`.
 
 ```ts
 const httpUserOptions = http.users.get.queryOptions({
@@ -17,11 +17,11 @@ const httpUserOptions = http.users.get.queryOptions({
 const httpUser = await queryClient.query(httpUserOptions);
 ```
 
-The ready client encodes decoded values. HTTP builders apply no RPC constructor defaults. Inputless endpoints use `queryOptions()`. Raw response controls are excluded from request input. You own the captured values. Keep them unchanged while the options can execute.
+The ready client encodes the request. Pass defaults explicitly. For an endpoint with no input, call `queryOptions()`. Keep response controls out of the input and keep request values unchanged while the options can run.
 
 ## Upload a file
 
-In the contract module, declare a buffered multipart payload. Import `Schema` from `effect`, `Multipart` from `effect/http`, and `HttpApiEndpoint` and `HttpApiSchema` from `effect/http-api`:
+In the contract module, declare a buffered multipart payload. Import `Schema` from `effect`, `Multipart` from `effect/http`, and `HttpApiEndpoint` and `HttpApiSchema` from `effect/http-api`.
 
 ```ts
 const upload = HttpApiEndpoint.post("upload", "/users/:id/files", {
@@ -33,7 +33,7 @@ const upload = HttpApiEndpoint.post("upload", "/users/:id/files", {
 });
 ```
 
-Add the endpoint to your API's `users` group and create its utility tree. In the mutation module, import `MutationObserver` from `@tanstack/query-core` and prepare the upload:
+Add the endpoint to the `users` group and create its utility tree. In the mutation module, import `MutationObserver` from `@tanstack/query-core`.
 
 ```ts
 const uploadFile = new MutationObserver(
@@ -45,7 +45,7 @@ const uploadFile = new MutationObserver(
 );
 ```
 
-In the event handler, build `FormData` and supply the other declared request containers:
+In the event handler, build `FormData` and supply the other request objects the endpoint declares.
 
 ```ts
 const payload = new FormData();
@@ -57,6 +57,6 @@ payload.set(
 const uploaded = await uploadFile.mutate({ params: { id: 1 }, payload });
 ```
 
-The ready client owns encoding. The adapter returns decoded success. Any buffered multipart payload alternative makes the endpoint mutation-only. Mutation keys exclude variables and files. Omit these endpoints from `keyEncoders`, because the factory rejects their encoder entries. Streaming successes or streaming multipart alternatives omit the endpoint entirely.
+The ready client encodes the request and returns decoded success. A buffered multipart alternative makes the endpoint mutation-only. Variables and files stay out of the cache key. The factory rejects `keyEncoders` entries for these endpoints. It omits endpoints with streaming successes or streaming multipart alternatives.
 
-See the [HTTP Factory](/effect-api-query/reference/http-factory/) for exact capability boundaries and the [multipart example](https://github.com/ueberBrot/effect-api-query/blob/main/tests/http-multipart.test.ts) for a complete contract and execution.
+See the [HTTP factory](/effect-api-query/reference/http-factory/) for supported request shapes and the [multipart test](https://github.com/ueberBrot/effect-api-query/blob/main/tests/http-multipart.test.ts) for a complete example.

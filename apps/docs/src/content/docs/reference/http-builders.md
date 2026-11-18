@@ -3,9 +3,9 @@ title: HTTP Builders
 description: HTTP query, metadata, mutation, pagination, and decoded stream option contracts.
 ---
 
-Every retained branch and endpoint provides `key()` for prefix filters. The [HTTP Factory](/effect-api-query/reference/http-factory/) defines construction, supported endpoint shapes, and the decoded request contract.
+Use `key()` on each retained branch and endpoint for prefix filters. See the [HTTP factory](/effect-api-query/reference/http-factory/) for supported endpoint and request shapes.
 
-Query key builders return immutable, data-tagged keys. Option builders return fresh native Query Core options for each view.
+Key builders return immutable keys tagged with cache data and error types. Option builders return fresh native options.
 
 | Builder | View |
 | --- | --- |
@@ -16,29 +16,29 @@ Query key builders return immutable, data-tagged keys. Option builders return fr
 | `streamedKey(input, policy)`, `streamedOptions(options)` | Accumulated SSE or NDJSON emissions with retention and publication policy. |
 | `liveKey(input?, policy?)`, `liveOptions(options?)` | Latest SSE or NDJSON emission. |
 
-Input-bearing key builders require the complete request. Inputless streamed and live key builders take their policy as the first argument. Buffered multipart endpoints expose only mutation builders. SSE and NDJSON endpoints expose only accumulated and live builders.
+Input-bearing keys take a complete request. Inputless stream keys take their policy as the first argument. Buffered multipart endpoints only build mutations. SSE and NDJSON endpoints only build accumulated and live queries.
 
 ## Query options
 
-[Queries](/effect-api-query/guides/queries/) shows how to use query options.
+See [queries](/effect-api-query/guides/queries/) for a read example.
 
-Ordinary options work with native query, suspense, and prefetch hooks, as well as QueryClient operations. Callbacks retain the decoded result, complete failure union, and request types. The `select` option changes consumer data. Data-tagged keys retain the underlying cache data and error types. Defined or possibly undefined `initialData` preserves the corresponding TanStack hook overload.
+Pass ordinary options to native query, Suspense, or prefetch hooks, or to QueryClient. `select` changes the consumer's data, while the key retains the full cached type. Callbacks infer result, error, and input types. The type of `initialData` determines the native hook overload.
 
-Applicable TanStack options pass through. The package owns the key and function. It removes `input` before it returns options. QueryClient global and prefix defaults own hashing. Builders reject per-call `queryKeyHashFn` and `queryHash` with `EffectHttpApiQueryConfigError` code `UnsupportedQueryHash`. Hash defaults must remain stable while entries are cached. If changed hashing conflicts with a matching cached entry, stream execution also rejects with that code.
+The builder supplies the key and function and removes `input`. Set hashing through QueryClient defaults and keep it stable. Per-call hash overrides and conflicting stream identities throw `EffectHttpApiQueryConfigError` with code `UnsupportedQueryHash`.
 
-Input-bearing `queryOptions` accepts either a complete request in `input` or `queryOptions({ input: skipToken, ...options })`. The `skipToken` binding is exported from `effect-api-query` and TanStack. Skipping preserves caller options and returns the exact sentinel as `queryFn`, with the operation-level key and no request identity. It performs no request encoding or client call. Supplied initial data remains available, but native skipped hook data stays possibly undefined.
+Pass a complete request or `input: skipToken`. Skipping preserves other options, returns the exact sentinel as `queryFn`, and uses the operation prefix. It encodes and sends no request. Native skipped hook data can be undefined even when initial data exists.
 
-Inputless builders, key builders, and mutations reject `skipToken`. A skipped function cannot run through manual refetch. Manual execution requires valid input or `enabled: false` with a complete request. Native suspense and prefetch-only hooks reject skipped options.
+Use a complete input before calling `refetch`. If input exists and you only want manual execution, set `enabled: false`. Inputless builders, key builders, mutations, and Suspense and prefetch-only hooks reject `skipToken`.
 
 ## Mutation options
 
-`mutationOptions(options?)` supplies `mutationKey` and `mutationFn`. A native mutation hook or observer receives the complete decoded request as variables at execution. Variables never enter the key. Callbacks retain result, request, and execution-error types. Successful `undefined` remains `undefined`.
+`mutationOptions(options?)` supplies `mutationKey` and `mutationFn`. Pass the decoded request as variables when the mutation runs. Variables stay out of the key. Callbacks infer result, request, and error types. A successful mutation can return `undefined`.
 
-Mutations have no query abort signal and no automatic relationship to cached reads. Native callbacks control invalidation, seeding, or optimistic updates. [Mutations](/effect-api-query/guides/mutations/) describes those choices.
+Mutations have no query abort signal. Use callbacks to invalidate, seed, or update reads. See [mutations](/effect-api-query/guides/mutations/).
 
 ## Buffered metadata
 
-Query-enabled buffered endpoints also provide `metadataKey(request)` and `metadataOptions({ input, ...options })`. Inputless endpoints omit the request. The ready client runs in decoded-and-response mode. The cache contains this envelope:
+Buffered query endpoints support `metadataKey(request)` and `metadataOptions({ input, ...options })`. Omit the request for inputless endpoints. The client runs in decoded-and-response mode. The cache holds this envelope.
 
 ```ts
 type Metadata<DecodedSuccess> = {
@@ -48,21 +48,21 @@ type Metadata<DecodedSuccess> = {
 };
 ```
 
-The adapter freezes the outer envelope and copied plain header record. The `data` field preserves the declared decoded value and its ownership, including decoded `WithHeaders` wrappers. Only top-level successful `undefined` becomes `null`. Raw headers retain their string values without Effect's inspection redaction. Applications decide which headers can be persisted or dehydrated.
+The adapter freezes the envelope and its copied header record. It keeps the decoded `data` reference, including any `WithHeaders` wrapper. Only a whole `undefined` becomes `null`. Raw headers retain their values without Effect inspection redaction. Select public headers before persistence or hydration.
 
-Fetched snapshots remain frozen after structural sharing. Global and prefix sharing policies apply to fetched data. A policy passed to `metadataOptions` overrides those policies. If sharing selects mutable envelopes or header records, the adapter copies and freezes them while retaining the selected decoded data reference. The adapter does not freeze decoded data, caller-supplied `initialData`, hydrated values, or manual cache writes.
+Global and prefix sharing policies apply to fetched metadata. A policy passed to `metadataOptions` overrides them. If sharing returns a mutable envelope or header record, the adapter copies and freezes it without replacing its decoded data. Initial data, hydrated values, manual writes, and decoded data retain their ownership.
 
-Selected observer results use the sharing policy explicitly passed to `metadataOptions`, or standard deep sharing if that policy is absent. After execution, manual cache writes use the same rule. Inherited global and prefix sharing policies apply only to fetched metadata snapshots.
+Selection and manual writes use the sharing policy set on `metadataOptions`, or standard deep sharing. Global and prefix policies apply only to fetched metadata.
 
-A fresh-cache hit from imperative `queryClient.query(newOptions)` retains the Query's existing options. A changed sharing policy applies to later manual writes only after an observer or an actual fetch installs it.
+A fresh-cache hit in `queryClient.query(newOptions)` keeps the installed options. An observer or a fetch must install a changed sharing policy before it applies to manual writes.
 
-Metadata keys use a `metadata` discriminator and the ordinary request identity. Endpoint prefixes match every view. Native `select`, `initialData`, skip-token inference, QueryClient hashing defaults, and cancellation apply to metadata options. Execution failures identify operation `metadata` and preserve that client mode's full error and service channels. Metadata adds no mutation or infinite builders. Multipart and streaming endpoints have no metadata view.
+Metadata keys use a `metadata` segment and the ordinary request identity. Endpoint prefixes match every view. Native selection, initial data, skipping, hashing, and cancellation apply. A failed metadata query preserves the error and service contract of its client mode. Metadata is a buffered query view, separate from mutations, infinite lists, multipart, and streams.
 
-The cache retains the decoded value and metadata snapshot. It contains no response object or open body. See [Update with an ETag](/effect-api-query/guides/http-metadata/#update-with-an-etag) for conditional writes.
+The cache stores decoded data and copied metadata. Use the [ETag example](/effect-api-query/guides/http-metadata/#update-with-an-etag) for a conditional write.
 
 ## Accumulated stream options
 
-`streamedOptions` accepts native query options, decoded `input` when declared, and these controls:
+Pass native options, decoded input if required, and these stream controls.
 
 | Option | Contract |
 | --- | --- |
@@ -70,53 +70,53 @@ The cache retains the decoded value and metadata snapshot. It contains no respon
 | `refetchMode` | `reset` (default), `append`, or `replace`. |
 | `publicationBatchSize` | Positive safe integer for ordered publication batches; defaults to one. |
 | `publicationMaxWaitMs` | Integer from 1 through 2,147,483,647; flushes a partial batch from its first buffered event. Omitted means no deadline. |
-| `sseOptions.maxEventSize` (SSE only) | Positive safe integer that limits pending parser text. The default is 10 MiB of JavaScript string code units. |
+| `sseOptions.maxEventSize` (SSE only) | Positive safe integer that limits pending parser text. Defaults to 10 × 1024 × 1024 JavaScript string code units. |
 
-Decoded data is an ordered readonly array. Accumulated elements keep `undefined`. Decoded header wrappers surround each emitted body. Empty completion succeeds. Acquisition and consumption errors use `EffectHttpApiQueryError` with operation `streamed`. They preserve HTTP and Schema errors and additional ready-client channels. SSE also preserves declared event failures, `Sse.Retry`, and `Sse.SseError`. NDJSON framing and element decoding failures follow the ready client's HTTP or Schema error channel.
+The query caches a readonly array in emission order. It preserves `undefined` elements and decoded header wrappers. An empty stream can succeed. Acquisition and consumption failures produce `EffectHttpApiQueryError` with operation `streamed`. Its Cause retains HTTP, Schema, and ready-client failures. SSE can also report declared failures, `Sse.Retry`, and `Sse.SseError`. NDJSON framing and decoding follow the client's error channel.
 
-The caller's runner supplies acquisition and consumption services and receives Query's abort signal. Cancellation closes the iterator and follows native Query cache reversion.
+The runner supplies stream services and receives the query abort signal. Cancellation closes the iterator and follows native cache reversion.
 
-The first event publishes immediately. Later events publish in batches of `publicationBatchSize`. Completion or failure flushes a partial batch. A `replace` refetch still publishes only on successful completion. Cancellation discards unpublished events. Without `publicationMaxWaitMs`, partial batches can remain unpublished while a stream stays open. Invalid publication batch sizes or deadlines synchronously throw `RangeError`, including for skipped input. Builders remove publication controls from the returned Query options.
+The first event publishes immediately. Later events publish by batch. Completion or failure flushes pending values, except that `replace` publishes only on success. Cancellation discards pending values. Set a deadline if a quiet stream must publish a partial batch. Invalid size or deadline throws `RangeError` before execution, even for skipped input. The builder strips the controls from native options.
 
-`streamedKey(input, policy)` accepts the same decoder, retention, refetch, and publication policy. Inputless endpoints use `streamedKey(policy)`. Supply `maxChunks` explicitly or inherit it through `configureUtils`. Equivalent policies have equal keys. Omitted or explicit batch size one has the same identity. Nondefault sizes and explicit deadlines have separate entries. Endpoint `key()` selects them all. Decoded request input and custom encoders exclude decoder controls. Declared resume headers remain part of request identity.
+Pass the same decoder and history settings to `streamedKey(input, policy)` or `streamedKey(policy)` if inputless. Set `maxChunks` explicitly or inherit it through `configureUtils`. Omitted batch size and size one share a key. Nondefault sizes and explicit deadlines have distinct keys. Endpoint prefixes match all policies. Resume headers declared on the endpoint affect request identity. Decoder controls belong to view policy.
 
-NDJSON accepts no `sseOptions` and adds no SSE decoder fields to its keys. Declare `maxElementBytes` on `HttpApiSchema.StreamNdjson`; Effect owns framing, decoding, limits, and decoding services. Stream endpoints have no metadata view; a declared `WithHeaders` wrapper is projected around each decoded record.
+Set NDJSON's `maxElementBytes` on `HttpApiSchema.StreamNdjson`. Effect frames and decodes the stream, including any declared header wrapper. Only SSE takes `sseOptions`. Streaming endpoints have no metadata view.
 
-See [Accumulate Values](/effect-api-query/guides/streaming/#accumulate-values). See [Batch Accumulated Publications](/effect-api-query/guides/choose-stream-history/#batch-accumulated-publications) for count and deadline behavior.
+See [accumulate values](/effect-api-query/guides/streaming/#accumulate-values) and [batch publication](/effect-api-query/guides/choose-stream-history/#batch-accumulated-publications) for examples.
 
 ## Live stream options
 
-`liveOptions` accepts native query options and declared decoded `input`. NDJSON uses `liveKey(input)` or inputless `liveKey()`. SSE also accepts `sseOptions`, with `liveKey(input, { sseOptions })` or inputless `liveKey({ sseOptions })`. SSE includes normalized decoder policy in the separate `live` identity. Live keys carry the latest decoded value and the execution error union, including `EffectHttpApiQueryEmptyStreamError`. Live builders preserve selection, initial-data, and skipped-input inference.
+Pass native options and decoded input if required to `liveOptions`. Use the options' `queryKey` or pass the same policy to `liveKey`. SSE adds `sseOptions` to the policy. Either transport can use [`coalesceMs`](/effect-api-query/guides/choose-stream-history/#coalesce-complete-live-snapshots). The tagged key describes the latest data and execution error union, including `EffectHttpApiQueryEmptyStreamError`. Selection, initial data, and skipped input retain native inference.
 
-The first emission makes the query successful. Later emissions replace the cached value. Completion preserves the latest value. Only a top-level `undefined` becomes `null`. Declared header wrappers retain their decoded body and headers.
+The first value makes the query successful. Later publications replace the cached value. Completion keeps the last value. Only a whole `undefined` becomes `null`. Decoded header wrappers retain their body and headers.
 
-An empty live completion fails with declaration metadata. Live queries accept no `maxChunks`, accumulated `refetchMode`, `publicationBatchSize`, or `publicationMaxWaitMs`.
+If the stream ends before its first value, the error includes endpoint metadata. Use retention, refetch mode, and publication batches only for accumulated history.
 
-Live and accumulated views have the same acquisition and consumption errors and services, iterator cleanup, and caller-owned reconnection contract. SSE builders validate decoder policy even when skipped. Endpoint prefixes match both representations and every concrete decoder policy. See [Keep the Latest Value](/effect-api-query/guides/streaming/#keep-the-latest-value).
+Both views share the underlying error, service, and cleanup contract. SSE validates decoder options even when skipped. The endpoint prefix matches all stream keys. See [keep the latest value](/effect-api-query/guides/streaming/#keep-the-latest-value).
 
 ## Pagination
 
-`infiniteOptions` requires `initialPageParam` and `getNextPageParam`. For an input-bearing endpoint, `input(pageParam)` returns the complete decoded HTTP request for that page. Inputless endpoints omit `input`. Input-bearing endpoints can pause with `input: skipToken` in the options object. The direct sentinel form is unavailable.
+Supply `initialPageParam` and `getNextPageParam`. If the endpoint takes input, use `input(pageParam)` to build each decoded request or use `input: skipToken` to pause. Omit `input` for inputless endpoints.
 
-The initial request determines cache identity. Infinite keys use an `infinite` discriminator to stay separate from ordinary queries for the same request. The `infiniteKey(request)` builder takes a complete initial request. The `infiniteKey()` form serves inputless endpoints. Keys returned by `infiniteOptions` also retain the inferred page-parameter type for cache reads.
+The first mapped request forms the infinite key. Use `infiniteKey(request)` or `infiniteKey()` if inputless. The `infinite` segment separates it from ordinary queries. Keys from `infiniteOptions` retain the inferred page parameter.
 
-Stable filters belong in both the initial request and every page. Changes to those filters require a changed initial request. The `getNextPageParam` callback advances cursors. The input mapper must be deterministic because the builder evaluates it for the initial key and execution evaluates it for every page.
+Use the same filters in the first request and each later page. Rebuild options if filters change. The mapper must be deterministic because key creation and page execution both call it.
 
-QueryClient stores native `InfiniteData` and owns invalidation and refetching. Selections can transform consumer data without changing cached pages. Every page preserves the ordinary HTTP execution contract, including `undefined`-to-`null` normalization, wrapped errors, and cancellation. See [Pagination](/effect-api-query/guides/pagination/).
+QueryClient stores `InfiniteData`. Use `select` to change the returned shape while keeping pages in the cache. Each page follows ordinary HTTP rules for normalization, errors, and cancellation. See [pagination](/effect-api-query/guides/pagination/).
 
 ## Cache identity and failures
 
-HTTP keys begin with `keyPrefix`, `http`, and the HttpApi identifier. The projected endpoint path and operation discriminator follow those root segments. Query keys append canonical request identity when the endpoint has input. The `utils.key()` prefix includes the generated root and matches every HTTP descendant. RPC utilities use a separate `rpc` discriminator. Cross-adapter invalidation uses the original caller prefix deliberately.
+HTTP roots include `keyPrefix`, `http`, and the HttpApi identifier. Keys then add the endpoint path, operation, and canonical request if present. Use `utils.key()` to target the HTTP tree. Use the original prefix if you intend to target RPC and HTTP together.
 
-Default query preparation synchronously encodes the declared `params`, `query`, `payload`, and `headers` schemas. The key retains these labels, even when a bodyless method sends its payload as URL parameters. Preparation uses the endpoint's effective schemas without constructing an HTTP request or body. JSON, text, form-urlencoded requests, and requests without bodies follow the same rule.
+The library synchronously encodes each declared request part and retains its label. A payload sent as URL parameters still uses `payload` in the key. Preparation uses the endpoint Schemas without building a request or body.
 
-Preparation omits encoded object members whose value is `undefined`. An encoded `null` stays `null`, including when Effect's JSON codec produces it from a decoded optional value. Arrays retain their order. Sparse arrays and encoded `undefined` items are rejected. Header field names become lowercase. Equal duplicates collapse, and conflicting duplicates fail.
+Encoded object members with value `undefined` are omitted. Encoded `null` stays `null`. Arrays stay ordered and reject holes or `undefined` entries. Header names become lowercase. Equal duplicates merge and conflicting duplicates fail.
 
-Other values follow strict canonical JSON: finite numbers, plain objects, copied arrays, sorted object properties, cycle rejection, and deep freezing.
+Other key values must be strict JSON. Preparation checks finite numbers, plain objects, and cycles. It copies arrays, sorts object properties, and freezes the result.
 
-For endpoints with query support, multiple effective payload schemas require a custom encoder, including alternatives with the same content type. Types enforce this requirement when declarations retain distinct schemas. Runtime validation also covers alternatives that the declaration types no longer distinguish. Buffered binary input needs an explicit JSON-safe projection because default keys cannot contain `Uint8Array`. See [custom key encoders](/effect-api-query/guides/custom-key-encoders/#http-requests).
+Use a custom encoder for multiple effective query payload Schemas, including those with the same content type. Factory validation checks alternatives even if TypeScript cannot distinguish them. For binary input, return a JSON-safe projection. See [HTTP custom encoders](/effect-api-query/guides/custom-key-encoders/#http-requests).
 
-`EffectHttpApiQueryKeyError` identifies the API, group, endpoint, and method and distinguishes:
+`EffectHttpApiQueryKeyError` identifies the API, group, endpoint, and method. Its code identifies the failure.
 
 | Code | Trigger |
 | --- | --- |
@@ -124,8 +124,8 @@ For endpoints with query support, multiple effective payload schemas require a c
 | `KeyEncoderFailed` | A custom encoder throws. |
 | `InvalidKeyValue` | Encoded identity violates canonical JSON or has conflicting header names. |
 
-These failures occur in `queryKey` or `queryOptions`, before the client runs. Mutation preparation does not encode a query key. Request encoding runs inside the ready client's Effect. Custom encoder output follows strict JSON. It bypasses the default HTTP rules that omit `undefined` members and normalize headers.
+Key errors throw before the client runs. Mutations encode input within the ready client's Effect. Custom encoder output must be strict JSON. It skips the default HTTP omission and header rules.
 
-Multipart mutation keys contain no request variables or files. The `mutationKey()` builder identifies the operation, and `key()` retains the endpoint's normal invalidation prefix. Mutation callbacks can invalidate affected read endpoints. Multipart leaves have no query or infinite-query builders.
+Multipart mutation keys identify the operation without its variables or files. Use `mutationKey()` for that key. After a write, use the affected reads' keys to invalidate their entries.
 
-`EffectHttpApiQueryError` wraps a failed execution `Exit` and preserves its complete Cause. It identifies the API, group, endpoint, method, and operation. The package adds no concrete request values to that metadata. Upstream Causes can still contain requests, responses, or Schema issue values. The `isEffectHttpApiQueryError` guard narrows execution errors. Configuration failures use `EffectHttpApiQueryConfigError`. Key preparation failures use `EffectHttpApiQueryKeyError`.
+`EffectHttpApiQueryError` wraps a failed execution Exit with the complete Cause. The wrapper includes API, group, endpoint, method, and operation. The Cause can still contain requests, responses, or Schema values. Use `isEffectHttpApiQueryError` to narrow it and check the [other error classes](/effect-api-query/reference/errors/) for configuration or key failures.

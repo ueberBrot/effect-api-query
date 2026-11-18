@@ -3,11 +3,11 @@ title: Streaming
 description: Cache accumulated or latest values from RPC streams and HTTP SSE or NDJSON.
 ---
 
-Streaming leaves provide two views. An accumulated streamed query caches emissions in order. A live query caches the latest value. Use ordinary query hooks or `QueryObserver` for both. Start with a ready [RPC](/effect-api-query/getting-started/quick-start/) or [HTTP](/effect-api-query/getting-started/http-quick-start/) utility tree. Here, `diagnostics.stream` is an inputless RPC emitting strings, and `events.watch` is an HTTP SSE endpoint declaring `query.channel` and emitting strings.
+Use an accumulated streamed query to cache events in order. Use a live query to cache only the latest value. Pass either to an ordinary query hook or a `QueryObserver`. Start with the utilities from the [RPC](/effect-api-query/getting-started/quick-start/) or [HTTP](/effect-api-query/getting-started/http-quick-start/) quick start.
 
 ## Accumulate values
 
-Choose a finite history for a long-running feed:
+This inputless RPC emits strings. Use a finite history for a long-running feed.
 
 ```ts
 const history = rpc.diagnostics.stream.streamedOptions({
@@ -16,7 +16,7 @@ const history = rpc.diagnostics.stream.streamedOptions({
 });
 ```
 
-HTTP SSE supports the same history controls and a separate decoder limit:
+This SSE endpoint takes `query.channel` and emits strings. Set its parser limit separately from history retention.
 
 ```ts
 const sseHistory = http.events.watch.streamedOptions({
@@ -26,17 +26,15 @@ const sseHistory = http.events.watch.streamedOptions({
 });
 ```
 
-The first emission makes the query successful while fetching continues. A finite `maxChunks` bounds cached elements after each publication. Choose `"unbounded"` explicitly to retain every emission, or inherit retention through `configureUtils` with `streamed.policy`. It does not bound bytes or transport buffering.
+The first value makes the query successful while fetching continues. A finite `maxChunks` limits how many elements remain after each publication. Set it directly or through `configureUtils` under `streamed.policy`. To keep every value, choose `"unbounded"`. The bound applies to cached elements. Configure byte limits and buffering separately.
 
-Refetch mode `reset` starts a new history, `append` adds to it, and `replace` keeps the old history until successful completion. An indefinitely open replacement keeps showing that old history. Accumulated streams can succeed without emissions.
+Choose `reset` to start a new history, `append` to add to the existing history, or `replace` to publish after successful completion. An open replacement keeps showing the old history. An accumulated stream can succeed without emitting a value.
 
-For a high-rate feed, set `publicationBatchSize` to a positive safe integer. The first event publishes immediately. Later events publish in ordered batches. Completion or failure flushes a partial batch; a `replace` refetch still publishes only after successful completion. Cancellation discards unpublished events and follows native cache reversion.
-
-The default of one publishes every event. Larger values count events without setting a timer, so a paused stream can leave a partial batch unpublished indefinitely. Use one when each event must appear promptly. See [Batch Accumulated Publications](/effect-api-query/guides/choose-stream-history/#batch-accumulated-publications) for an example and cache-identity rules.
+For a fast feed, set `publicationBatchSize` to publish groups of events. The first event publishes immediately. See [batch publications](/effect-api-query/guides/choose-stream-history/#batch-accumulated-publications) for deadlines, failure, and cancellation.
 
 ## Keep the latest value
 
-Choose live options for current state:
+Use live options for the latest state.
 
 ```ts
 const latest = rpc.diagnostics.stream.liveOptions();
@@ -46,11 +44,11 @@ const latestSse = http.events.watch.liveOptions({
 });
 ```
 
-Each emission replaces cached data. Completion preserves that data. Live queries convert top-level `undefined` to `null`, while accumulated elements retain `undefined`. Empty live completion raises the adapter's empty-stream error. Live options accept no `maxChunks`, `refetchMode`, or `publicationBatchSize`.
+Each emission replaces the cached value by default. To combine updates from complete snapshots, [set a coalescing interval](/effect-api-query/guides/choose-stream-history/#coalesce-complete-live-snapshots). Completion keeps the last value. A live stream that ends without emitting raises an [empty-stream error](/effect-api-query/reference/errors/). Live queries convert `undefined` to `null`. Accumulated streams retain the original value.
 
 ## Consume NDJSON records
 
-An endpoint with exactly one `HttpApiSchema.StreamNdjson` success supports both views, including a declared `WithHeaders` wrapper. Effect parses frames and decodes records. Pass a ready client for the same declaration:
+An endpoint with one `HttpApiSchema.StreamNdjson` success supports both views, including a declared `WithHeaders` wrapper. Effect parses and decodes each record. Acquire the client from the same declaration.
 
 ```ts
 import { createHttpApiQueryUtils } from "@ueberbrot/effect-api-query";
@@ -86,18 +84,18 @@ function recordOptions(client: HttpApiClient.ForApi<typeof recordsApi>) {
 }
 ```
 
-Pass `history` or `latest` to a native query hook or QueryClient. A wire record `{"id":"1"}` becomes `{ id: 1 }`. NDJSON uses the same retention, publication, empty-completion, cancellation, and snapshot behavior as other decoded streams. It accepts no `sseOptions` and has no SSE decoder key fields. Configure `maxElementBytes` on the Effect declaration. Keep the client and runner alive through consumption and cleanup.
+Pass `history` or `latest` to a native observer or QueryClient. The wire record `{"id":"1"}` becomes `{ id: 1 }`. NDJSON follows the same query and cleanup rules as other decoded streams. Set `maxElementBytes` on the declaration. Use `sseOptions` only for SSE.
 
 ## Address and stop a view
 
-For exact cache access, reuse the options' `queryKey`. Accumulated history policies and SSE decoder policies affect identity. Live and accumulated views remain separate. Endpoint prefixes match all their views.
+Use the options' `queryKey` for exact cache access. Accumulated and live views have separate keys. History and SSE decoder settings can also affect the key. The endpoint prefix matches every view.
 
-The adapter publishes both views through stable Query Core cache operations. Native cache reads, writes, observers, and structural-sharing overrides use the same cache entry.
+Native reads, writes, observers, and structural-sharing overrides use the same Query Core cache.
 
-Cancellation closes the stream iterator. Your application owns reconnection, resume policy, and client lifetime. Use [Reconnect Streams](/effect-api-query/guides/reconnect-streams/) to add `recoverStream` to application-owned delivery when the server supports ordered cursor replay. A replacement stream can start while the old iterator's asynchronous finalizer is still pending. See [Release Resources after Local Cleanup](/effect-api-query/guides/cancellation/#release-resources-after-local-cleanup) when streams share exclusive resources.
+Cancellation closes the iterator. Your app controls reconnection, resume, and disposal. If the server supports replay, see [reconnect streams](/effect-api-query/guides/reconnect-streams/). If old and new streams share a resource, see [local cleanup](/effect-api-query/guides/cancellation/#release-resources-after-local-cleanup) before replacing it.
 
-HTTP `sseOptions.maxEventSize` bounds pending parser text in JavaScript string code units. Its default is 10 × 1024 × 1024 code units. Put declared resume headers in `input.headers`.
+`sseOptions.maxEventSize` limits pending parser text in JavaScript string code units. It defaults to 10 × 1024 × 1024. Put declared resume headers in `input.headers`.
 
-Set `sseOptions.dispatchEmptyNamedEvents` to `true` for named events without a `data:` line, when the endpoint's SSE declaration accepts them. It defaults to `false`. Changing this option selects a different cache entry.
+If the SSE declaration accepts named events without a `data:` line, set `sseOptions.dispatchEmptyNamedEvents` to `true` to emit them. The default is `false`. Each setting has a different key.
 
-See [Choose Stream History](/effect-api-query/guides/choose-stream-history/) for retention and buffering, [Stream Snapshots](/effect-api-query/guides/stream-snapshots/) for finite server captures, and [Client Lifecycle](/effect-api-query/concepts/client-lifecycle/) for cleanup ownership.
+See [stream history](/effect-api-query/guides/choose-stream-history/) for retention and buffering, [stream snapshots](/effect-api-query/guides/stream-snapshots/) for server captures, and [client lifecycle](/effect-api-query/concepts/client-lifecycle/) for cleanup.

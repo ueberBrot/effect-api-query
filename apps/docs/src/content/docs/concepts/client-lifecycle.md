@@ -3,37 +3,35 @@ title: Client Lifecycle
 description: Keep RPC and HTTP clients, runtimes, and resources under caller ownership.
 ---
 
-Both factories use ready clients. Your application owns the transport, middleware, runtime, Scope, and QueryClient. Their lifetime follows this sequence:
+Your application acquires the Effect client and releases it when work is done. Use this order.
 
-1. Acquire the RPC or HTTP client and the services it requires.
-2. Create a QueryClient and utility tree for that owner.
-3. Keep those resources alive while queries, streams, and mutations run.
-4. Stop consumers and cancel queries. Await local stream cleanup and accepted mutations. Clear the cache, then release the client and runtime.
+1. Acquire the RPC or HTTP client and the services it needs.
+2. Create the QueryClient and utility tree for that owner.
+3. Keep these resources alive while queries, streams, or mutations use them.
+4. Stop consumers and cancel queries. Wait for local stream cleanup and accepted mutations. Clear the cache, then release the client and runtime.
 
-Each server request owns independent resources. A browser application keeps its resources alive for its lifetime.
+Give each server request its own resources. Keep browser resources alive for the lifetime of the app or cache owner.
 
 ## HTTP clients and execution services
 
-Calls that need no services default to `Effect.runPromiseExit`. An exposed endpoint can require services to encode requests or decode successes and errors. In that case, supply a `runPromiseExit` that provides those services and any services the ready client still requires. Forward the runner's `options` argument so query cancellation reaches Effect. Omitted endpoints add no requirements. A custom key encoder supplies cache identity. Execution still needs its own services.
+The factory defaults to `Effect.runPromiseExit` for Effects that need no services. If a supported endpoint needs services to encode requests or decode responses, supply a runner that provides them. Provide any services the client still needs. Forward the runner's `options` so query cancellation reaches Effect. A custom key encoder only builds cache identity. Supply execution services separately.
 
-Configure HTTP authentication and request middleware when you construct the ready client. HTTP builders have no `rpcOptions`. If middleware changes results for a user or tenant, include safe identifiers in `keyPrefix`. The [HTTP factory](/effect-api-query/reference/http-factory/) describes decoded request input and the separate contract for key encoders.
+Set authentication and request middleware on the HTTP client before passing it to the factory. If middleware changes results by user or tenant, include a safe identifier in `keyPrefix`. See the [HTTP factory](/effect-api-query/reference/http-factory/) for request input and key encoders.
 
 ## Request-local RPC configuration
 
-Use a builder's `rpcOptions` for metadata or configuration specific to one request, such as a request-source header or stream buffer size. The `context` value applies to local Effect RPC client processing. It is not a serialized server Context and does not replace the supplied Effect runner.
-
-Your application client and runtime manage authentication, middleware, transport setup, runtime services, and `Scope`.
+Pass `rpcOptions` for one RPC request, for example to set a header or the stream buffer size. Its `context` stays on the client. The supplied runner still provides execution services.
 
 ## Stream creation and consumption
 
-For accumulated and live queries over RPC or HTTP SSE/NDJSON, the runner executes `Stream.toAsyncIterableEffect`. That Effect creates an iterable and captures its Effect `Context`. The runner returns a successful `Exit` before Query Core pulls values. Those pulls use the captured Context while the query remains fetching. Keep the Context's services and the ready client's Scope alive until consumption finishes.
+The runner calls `Stream.toAsyncIterableEffect` for accumulated and live queries. It returns the iterable before Query Core starts pulling values. Those pulls use the Effect `Context` captured at creation. Keep its services and the client's Scope alive until consumption ends.
 
-If work must cover consumption, transform or instrument the ready-client stream. Preserve its request options, declared value and error types, and HTTP response-mode contract. A stream finalizer handles cleanup after completion or cancellation.
+To trace or retry consumption, wrap the ready client's stream. Preserve its request options, value and error types, and HTTP response mode. Use a stream finalizer for cleanup.
 
-A timer, span, finalizer, or retry schedule around the runner's creation Effect ends when it creates the iterable. It does not cover later pulls. Put instrumentation and recovery for the stream's lifetime on the stream itself. A retry in generated Query options reruns the query function and creates another iterable. Coordinate query retries with stream and transport schedules as described in [retry queries](/effect-api-query/guides/retry-queries/#set-defaults-deliberately).
+A timer, span, finalizer, or retry around iterable creation only covers setup. A retry in Query options reruns the query function and creates another iterable. See [retry queries](/effect-api-query/guides/retry-queries/#set-defaults-deliberately) to choose where retries belong.
 
-Native `cancelQueries` can settle before asynchronous iterator cleanup finishes. Await the resource's completion signal before you release its services. Mutations settle separately because they have no query abort signal.
+`cancelQueries` can settle while the iterator is still cleaning up. Wait for the resource's completion signal before you release it. Wait for mutations separately because they have no query abort signal.
 
-To capture an open stream on the server, await [fetchStreamSnapshot](/effect-api-query/guides/stream-snapshots/) before dehydration or client disposal. The helper waits for local iterator cleanup. Remote completion still requires an application acknowledgement.
+For server rendering, await [fetchStreamSnapshot](/effect-api-query/guides/stream-snapshots/) before you dehydrate the cache or dispose of the client. The helper waits for local iterator cleanup. Use an application acknowledgement if you need proof of remote completion.
 
-Use the optional [query owner setup helper](/effect-api-query/guides/switch-cache-owners/#opt-in-owner-helper) to register acquired or borrowed resources and coordinate local drains outside the factories. The [native React provider example](/effect-api-query/guides/react-query/) demonstrates the complete setup and unmount path.
+To register resources and wait for local work during retirement, use the optional [query owner helper](/effect-api-query/guides/switch-cache-owners/#opt-in-owner-helper). See the [React setup](/effect-api-query/guides/react-query/) for acquisition, mounting, and disposal.

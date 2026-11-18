@@ -3,7 +3,7 @@ title: HTTP Metadata
 description: Read decoded HTTP data, response status, and headers in a separate cache view.
 ---
 
-Buffered HTTP endpoints with query support expose `metadataOptions`. Start with the ready `http` utility tree and QueryClient from the [HTTP quick start](/effect-api-query/getting-started/http-quick-start/). In this example, `users.get` declares `params.id` and `query.locale`. It returns a user with `id` and `name`.
+Use `metadataOptions` when you need the HTTP status or headers alongside decoded data. Start with the [HTTP quick start](/effect-api-query/getting-started/http-quick-start/) utilities and QueryClient.
 
 ## Read status and headers
 
@@ -15,11 +15,11 @@ console.log(current.data.name, current.status);
 const etag = current.headers["etag"];
 ```
 
-The cache holds decoded `data`, numeric `status`, and raw string `headers` in a separate view. Fetched envelopes and copied headers are immutable, including when observer options are rebuilt while a request is pending. Global and prefix structural-sharing policies continue to apply to that fetched result; a local policy overrides inherited defaults. Decoded data retains its existing ownership, including declared response-header wrappers. Before persistence or hydration, choose safe headers. For exact access, use `metadataOptions.queryKey` or `metadataKey(input)`. The endpoint's `key()` matches ordinary and metadata views.
+This view caches decoded `data` with a numeric `status` and raw string `headers`. Each fetched envelope and header snapshot is frozen, even if you rebuild observer options during the request. A local structural-sharing callback overrides inherited defaults. Decoded data, including declared header wrappers, stays application-owned. Use `metadataKey(input)` or the options' `queryKey` for an exact match. The endpoint prefix matches both views.
 
 ## Update with an ETag
 
-If `users.get` supplies an ETag and `users.update` declares `params.id`, an `if-match` header, a `{ name }` payload, and its precondition failure, preserve the ETag for the write. Import `MutationObserver` from `@tanstack/query-core`:
+Use an ETag to update the version you read. This example assumes `users.update` declares `params.id`, an `if-match` header, a `{ name }` payload, and a precondition error. Import `MutationObserver` from `@tanstack/query-core`.
 
 ```ts
 if (etag === undefined) throw new Error("The server supplied no ETag");
@@ -33,7 +33,7 @@ const updateUser = new MutationObserver(
 );
 ```
 
-Send the raw ETag with its quotes. Before another write, read the refreshed metadata:
+Pass the ETag with its quotes. Fetch updated metadata before you write again.
 
 ```ts
 await updateUser.mutate({
@@ -44,8 +44,8 @@ await updateUser.mutate({
 const refreshed = await queryClient.query(metadataOptions);
 ```
 
-The server enforces the precondition. Inspect its declared failure through the [HTTP execution error](/effect-api-query/guides/handle-failures/#inspect-http-failures). The invalidation prefix refreshes data and metadata entries.
+The server enforces the precondition. Inspect rejection through the [HTTP execution error](/effect-api-query/guides/handle-failures/#inspect-http-failures). The invalidation prefix matches both data and metadata. Active matches refetch by default.
 
-Native selection, initial data, skipping, and cancellation also apply. For details of immutability and structural-sharing behavior, see [Buffered Metadata](/effect-api-query/reference/http-builders/#buffered-metadata).
+Metadata queries support native selection, initial data, skipping, and cancellation. See [buffered metadata](/effect-api-query/reference/http-builders/#buffered-metadata) for sharing and immutability.
 
-For SSR, register `queryViewCodec(http.users.get, 'metadata', MetadataCodec)` alongside the ordinary view's codec. `MetadataCodec` must describe the decoded `data`, numeric `status`, and raw string `headers`. Preserve any declared decoded header wrapper inside `data`. Select public headers before transfer. Hydrated envelopes keep application ownership; a later metadata fetch restores the frozen fetched snapshot. See [typed view registration](/effect-api-query/guides/hydrate-query-views/#register-generated-leaves-and-views).
+For server rendering, register `queryViewCodec(http.users.get, 'metadata', MetadataCodec)` alongside the ordinary codec. Describe decoded data, numeric status, and raw string headers. Preserve any decoded header wrapper inside `data`. Transfer only public headers. The app owns hydrated envelopes. The next metadata fetch produces a frozen snapshot. See [register a view codec](/effect-api-query/guides/hydrate-query-views/#register-generated-leaves-and-views).

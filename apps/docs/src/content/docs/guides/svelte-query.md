@@ -3,15 +3,15 @@ title: Svelte Query
 description: Rebuild generated options from Svelte reactive input and keep client lifetime in the application.
 ---
 
-Build options inside Svelte's reactive accessor. When input changes, the accessor creates a new key and query function. Use this pattern with either factory and every generated query view.
+Call the builder inside Svelte's reactive accessor. When input changes, the accessor creates a new key and query function. The pattern works for either adapter.
 
-See [Requirements and tested integrations](/effect-api-query/reference/compatibility-and-limits/#requirements-and-tested-integrations) for Svelte Query's framework requirements and this guide's checked versions.
+See [compatibility](/effect-api-query/reference/compatibility-and-limits/#requirements-and-tested-integrations) for Svelte requirements and tested versions.
 
-Keep [captured inputs unchanged](/effect-api-query/concepts/data-normalization/#keep-captured-inputs-unchanged) while their options can execute.
+Keep [captured input](/effect-api-query/concepts/data-normalization/#keep-captured-inputs-unchanged) unchanged while options can run.
 
 ## Create native queries
 
-Create the utility tree in your application module from an acquired ready client. Provide a QueryClient through Svelte Query's `QueryClientProvider`. Read reactive inputs inside the accessor passed to `createQuery`. Keep the client's `Scope` and any runner that supplies services alive while queries use them. Here, `users.read` accepts an ID and returns a user with `name`. Add the query to the Svelte component script:
+Create the utilities from your acquired client and pass the QueryClient to Svelte Query's `QueryClientProvider`. Read reactive values inside the `createQuery` accessor. Keep the client and runner alive while queries use them. This component's `users.read` takes an ID and returns a user.
 
 ```svelte
 <script lang="ts">
@@ -28,18 +28,16 @@ Create the utility tree in your application module from an acquired ready client
 </script>
 ```
 
-For pagination, use `createInfiniteQuery(() => rpc.users.list.infiniteOptions(...))`. For writes, use `createMutation(() => rpc.users.write.mutationOptions(...))`. A mutation's variables provide the input for each execution. Mutation options can be static when their callbacks and other settings do not depend on reactive state.
+For pages, use `createInfiniteQuery(() => rpc.users.list.infiniteOptions(...))`. For writes, use `createMutation(() => rpc.users.write.mutationOptions(...))`. Pass variables to each mutation. Keep mutation options static if their callbacks and settings do not depend on state.
 
 Use the same accessor for `streamedOptions`, `liveOptions`, and HTTP `metadataOptions`.
 
 ## Choose native options carefully
 
-A skipped query retains the defined-data type when it has defined `initialData`. An initial-data function that can return `undefined` produces optional result data.
+With defined `initialData`, a skipped query keeps the defined-data type. If the initializer can return `undefined`, the result data is optional.
 
-Compile the Svelte application with `module: "ESNext"` and `moduleResolution: "Bundler"`. The checked Svelte Query version requires this resolution for its emitted `.svelte` declarations. Strict NodeNext declaration checking reports an upstream `Box` import error.
+Use `module: "ESNext"` and `moduleResolution: "Bundler"` for the Svelte app. The tested Svelte Query declarations need Bundler resolution for `.svelte` files. Strict NodeNext checking reports an upstream `Box` import error.
 
 ## Own the native integration
 
-Follow the [shared integration lifetime](/effect-api-query/integrations/#own-the-cache-and-client-lifetime) for providers, observer removal, stream finalizers, and accepted mutations. Keep Svelte Query and the application on one resolved Query Core version. Use a compiler and tooling that Svelte supports.
-
-The application owns server rendering and hydration.
+Keep the app and Svelte Query on one resolved Query Core version. Use a compiler Svelte supports. See [cache and client lifetime](/effect-api-query/integrations/#own-the-cache-and-client-lifetime) for cleanup and [hydration](/effect-api-query/guides/hydrate-unary-data/) for server rendering.

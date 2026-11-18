@@ -5,9 +5,9 @@ description: Supply safe semantic identity for RPC payloads and HTTP requests.
 
 ## RPC payloads
 
-By default, the factory constructs the RPC payload and synchronously encodes it with its Schema. If encoding requires Effect services or uses opaque encoding middleware, supply a custom encoder. Payloads containing `Schema.Redacted` values also require one, including schemas reached through `Schema.suspend`. The runtime check treats middleware conservatively, even when it is synchronous and service-free.
+Use a custom encoder when default key encoding needs services or includes a `Schema.Redacted` value. This includes schemas reached through `Schema.suspend`. The factory also treats opaque encoding middleware as unsafe, even if it runs synchronously without services.
 
-In your application client module, configure the ready RPC client. This example uses `identifySecret` to synchronously produce a public identity:
+Configure the encoder where you create the utility tree. Here `identifySecret` returns a public identifier without revealing the secret.
 
 ```ts
 const rpcQuery = createRpcQueryUtils(rpcGroup, {
@@ -20,19 +20,19 @@ const rpcQuery = createRpcQueryUtils(rpcGroup, {
 });
 ```
 
-An encoder receives the normalized payload. It must synchronously return a strict `JsonValue` without revealing secrets. Return a stable public identifier, digest, or other safe semantic identity.
+The encoder receives the normalized payload. Return a stable, safe `JsonValue` synchronously, such as a public identifier or digest.
 
-Broad payload declarations such as `Schema.Unknown`, `Schema.Any`, and void-containing unions accept encoders too. Their default keys still require strict JSON. Accepted RPC inputs such as `undefined`, a bigint, or a class instance can require an encoder to supply JSON-safe identity.
+Broad declarations such as `Schema.Unknown`, `Schema.Any`, and void-containing unions can use encoders too. If a usable RPC input such as a bigint or class instance fails JSON validation, supply an encoder.
 
-Define encoders as own enumerable properties keyed by literal payload-bearing RPC tags. TypeScript requires entries for unsafe payloads. The factory also rejects missing or unknown entries at runtime.
+Use own enumerable properties keyed by literal payload-bearing RPC tags. TypeScript requires entries for unsafe payloads. The factory also rejects missing and unknown entries at runtime.
 
 Inputs that can produce different RPC results must produce different keys.
 
 ## HTTP requests
 
-HTTP encoders receive the complete decoded request input: the declared `params`, `query`, `payload`, and `headers` containers. RPC encoders receive the normalized payload after the constructor applies defaults. Configure each HTTP encoder in `createHttpApiQueryUtils` under its literal declaration group and endpoint identifier, even for a top-level group or an identifier containing dots.
+HTTP encoders receive the full decoded request. Configure them under the declaration's literal group and endpoint names. Use the original group name for top-level groups and keep dots in identifiers.
 
-Suppose the `forms` group's `submit` endpoint accepts a number encoded as text or a string encoded as JSON. Both schemas can encode to `"1"`, but the HTTP bodies differ. In your HTTP client module, configure the endpoint's request projection to preserve that distinction:
+This `forms.submit` endpoint accepts a number as text or a string as JSON. Both schemas can encode to `"1"`, so include a discriminator to keep their keys distinct.
 
 ```ts
 const http = createHttpApiQueryUtils(contract, {
@@ -49,12 +49,12 @@ const http = createHttpApiQueryUtils(contract, {
 });
 ```
 
-Multiple non-multipart buffered alternatives require an encoder, even when they share a content type. For buffered binary input, return a JSON-safe representation such as `{ bytes: Array.from(payload) }`. The ready client still receives the original `Uint8Array`.
+Supply an encoder for multiple buffered nonmultipart payload alternatives, even when they share a content type. For binary input, you can return `{ bytes: Array.from(payload) }`. Execution still uses the original `Uint8Array`.
 
-Encoding services or explicit `Redacted` values in any request part also require an encoder. The factory treats opaque encoding middleware conservatively at runtime. An encoder supplies identity only. If the ready client requires services, it still needs an execution runner. During construction, the factory synchronously rejects encoder entries for unknown, omitted, inputless, or mutation-only endpoints.
+HTTP input also needs an encoder if key encoding needs services or contains explicit `Redacted` values. Opaque encoding middleware follows the same conservative rule. Supply execution services through the runner separately. The factory rejects encoders for unknown, omitted, inputless, and mutation-only endpoints.
 
-Buffered multipart endpoints expose mutation builders only and require no query identity encoder, including endpoints with mixed plain and multipart payload alternatives. Keep these endpoints out of `keyEncoders`. Pass `FormData` directly to their mutation.
+Buffered multipart endpoints are mutation-only, including those that also accept plain payloads. Pass `FormData` to the mutation. Leave the endpoint out of `keyEncoders`.
 
-Keep ordinary authentication in client middleware. Partition the cache with safe tenant and user identifiers in `keyPrefix`, for example `['tenant', 'north', 'user', 'ada']`. The factory cannot infer identity from a client, base URL, or middleware. When excluding a secret, retain every safe value that distinguishes results.
+Keep authentication in the client. If identity changes the result, include safe identifiers in `keyPrefix`, such as `['tenant', 'north', 'user', 'ada']`. Preserve every safe value that distinguishes responses when you exclude a secret.
 
-Return strict `JsonValue` synchronously. The factory copies and freezes the result. It rejects undefined object members, undefined or sparse array entries, non-finite numbers, cycles, and non-JSON objects. Custom output bypasses the default HTTP rules for omitting `undefined` members and normalizing headers. See the [HTTP reference](/effect-api-query/reference/http-builders/#cache-identity-and-failures) for failure codes. Underlying error Causes remain intact and can contain values supplied by Effect.
+Return strict JSON synchronously. The factory copies and freezes it. It rejects `undefined`, sparse arrays, non-finite numbers, cycles, and non-JSON objects. With a custom encoder, omit optional members and normalize headers yourself if your key requires it. See [HTTP key errors](/effect-api-query/reference/http-builders/#cache-identity-and-failures). Effect Causes can include application values.

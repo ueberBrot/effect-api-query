@@ -1,14 +1,17 @@
 ---
 title: effect-api-query
-description: Typed TanStack Query options and semantic cache keys from ready Effect RPC and HttpApi clients.
+description: Typed TanStack Query options and cache keys from Effect RPC and HttpApi contracts.
 template: splash
 hero:
-  tagline: Derive typed TanStack Query options and cache keys from your Effect RPC or HttpApi contract.
+  tagline: Use your Effect RPC or HttpApi contract to build typed TanStack Query options and cache keys.
   actions:
+    - text: Install
+      link: /effect-api-query/getting-started/installation/
+      icon: right-arrow
+      variant: primary
     - text: HTTP API
       link: /effect-api-query/getting-started/http-quick-start/
       icon: right-arrow
-      variant: primary
     - text: RPC
       link: /effect-api-query/getting-started/quick-start/
       icon: right-arrow
@@ -17,49 +20,9 @@ hero:
       icon: external
 ---
 
-import { CardGrid, LinkCard } from "@astrojs/starlight/components";
+Pass the generated options to a QueryClient or your framework's Query hooks. Your application supplies the Effect client and keeps it alive while requests run.
 
-`effect-api-query` builds a typed utility tree from an Effect declaration, a ready client, and your cache prefix. Each leaf builds options that native TanStack Query consumers accept. These options cover buffered reads, mutations, pages, RPC streams, HTTP SSE/NDJSON, and buffered HTTP metadata.
-
-## Choose your contract
-
-<CardGrid>
-  <LinkCard
-    title="HTTP API"
-    description="Use an Effect HttpApi declaration and a ready HttpApiClient to build typed reads, writes, pages, SSE and NDJSON views, and response metadata."
-    href="/effect-api-query/getting-started/http-quick-start/"
-  />
-  <LinkCard
-    title="RPC"
-    description="Use an Effect RpcGroup and a ready RpcClient to build typed reads, writes, pages, and stream views."
-    href="/effect-api-query/getting-started/quick-start/"
-  />
-</CardGrid>
-
-[Install the package](/effect-api-query/getting-started/installation/), then follow the quick start for your adapter. Each quick start shows how to acquire a client, build options, run requests, and release resources. [Supported Operations](/effect-api-query/getting-started/feature-support/) lists the views that each contract exposes.
-
-## Learn the library contract
-
-| Goal | Read |
-| --- | --- |
-| Understand generated branches and leaves | [Generated Utility Model](/effect-api-query/concepts/queries-and-mutations/) |
-| Supply input and interpret decoded data | [Inputs and Query Data](/effect-api-query/concepts/data-normalization/) |
-| Choose a cached representation | [Queries](/effect-api-query/guides/queries/), [Pagination](/effect-api-query/guides/pagination/), [Streaming](/effect-api-query/guides/streaming/), [HTTP Metadata](/effect-api-query/guides/http-metadata/) |
-| Target reads and writes in the cache | [Cache Keys and Filters](/effect-api-query/guides/cache-filters/) |
-| Share typed retries and mutation callbacks | [Defaults and Policies](/effect-api-query/guides/query-defaults/) |
-| Reuse contract types in application code | [Type Inference](/effect-api-query/reference/type-inference/) |
-| Inspect failures and release resources | [Handle Failures](/effect-api-query/guides/handle-failures/), [Client Lifecycle](/effect-api-query/concepts/client-lifecycle/) |
-
-The library owns generated keys, functions, cache-view identity, and the conversion of Effect failures. TanStack owns the cache and its native consumers. Your application owns its ready client, transport, authentication, providers, runtime, and resource lifetime.
-
-## Connect your application
-
-Use the generated options with your existing native integration:
-
-- [React Query](/effect-api-query/guides/react-query/) shows how to set up the client and provider. Use [Suspense recovery](/effect-api-query/guides/suspense-and-recovery/) to handle Suspense failures.
-- [Vue](/effect-api-query/guides/vue-query/), [Solid](/effect-api-query/guides/solid-query/), [Svelte](/effect-api-query/guides/svelte-query/), and [Angular](/effect-api-query/guides/angular-query/) explain how to rebuild reactive options and use each wrapper's types.
-- [Router and Start](/effect-api-query/guides/tanstack-start/) covers loaders, request ownership, and server rendering. [Hydration](/effect-api-query/guides/hydrate-unary-data/) and [Stream Snapshots](/effect-api-query/guides/stream-snapshots/) preserve decoded cache data.
-
-The [integration overview](/effect-api-query/integrations/) explains how providers, reactivity, and client lifetime work together. [Run the examples](/effect-api-query/examples/) to use complete Vite React and TanStack Start applications.
-
-Use [API Reference](/effect-api-query/reference/public-exports/) for exported values and types, and [Compatibility and Limits](/effect-api-query/reference/compatibility-and-limits/) for the tested dependency contracts and runtime limits.
+- [Supported operations](/effect-api-query/getting-started/feature-support/) for reads, writes, pagination, and streams.
+- [Framework integrations](/effect-api-query/integrations/) for hooks, providers, and server rendering.
+- [Runnable examples](/effect-api-query/examples/) for Vite React and TanStack Start.
+- [API reference](/effect-api-query/reference/public-exports/) for package exports.

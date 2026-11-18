@@ -42,11 +42,19 @@ export default defineConfig({
       ],
       sidebar: [
         {
-          label: "Start Here",
+          label: "Get started",
           items: [
             {
               label: "Installation",
               slug: "getting-started/installation",
+            },
+            {
+              label: "HTTP quick start",
+              slug: "getting-started/http-quick-start",
+            },
+            {
+              label: "RPC quick start",
+              slug: "getting-started/quick-start",
             },
             {
               label: "Supported Operations",
@@ -57,10 +65,6 @@ export default defineConfig({
         {
           label: "HTTP API",
           items: [
-            {
-              label: "Quick Start",
-              slug: "getting-started/http-quick-start",
-            },
             {
               label: "Contract and Utility Tree",
               slug: "concepts/http-utility-tree",
@@ -86,10 +90,6 @@ export default defineConfig({
         {
           label: "RPC",
           items: [
-            {
-              label: "Quick Start",
-              slug: "getting-started/quick-start",
-            },
             {
               label: "Contract and Utility Tree",
               slug: "concepts/rpc-utility-tree",
