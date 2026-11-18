@@ -1,6 +1,6 @@
 library:
   name: "@ueberbrot/effect-api-query"
-  version: 0.6.1
+  version: 0.7.0
   repository: https://github.com/ueberBrot/effect-api-query
   description: TanStack Query utilities derived from ready Effect RPC and HTTP clients.
   primary_framework: framework-agnostic
@@ -71,6 +71,13 @@ skills:
       - topic: Frameworks and hosts
         reason: Native providers, Suspense recovery, hook overloads, and transport boundaries depend on the integration. The package does not provide these services.
     failure_modes:
+      - mistake: Assume invalidation immediately refetches inactive queries
+        mechanism: QueryClient marks matching entries stale and refetches active matches by default.
+        wrong_pattern: Invalidate an unobserved query after a write and read its cache as if the request has completed.
+        correct_pattern: Fetch the exact query if the caller needs a fresh result immediately.
+        source: apps/docs/src/content/docs/guides/mutations.md
+        priority: MEDIUM
+        status: active
       - mistake: Treat generic equality or wire serialization as decoded-value equality
         mechanism: Effect equality can cache comparisons and inspect custom objects, while Schema equivalence follows declared fields and annotations.
         wrong_pattern: Use generic Equal.equals or encoded JSON to reuse arbitrary mutable or custom cached objects.

@@ -5,7 +5,7 @@ description: Configuration, key-generation, and execution errors for RPC and HTT
 
 ## `EffectRpcQueryConfigError`
 
-Invalid factory or builder configuration throws this error synchronously. Stream execution also rejects incompatible QueryClient hashing. The error's `code` is one of:
+Factory or builder configuration failures throw synchronously. Incompatible hashing can also fail during stream execution. Read `code` to locate the problem.
 
 - `InvalidMaxChunks`: retention is neither a positive safe integer nor `"unbounded"`.
 - `InvalidRefetchMode`: a streamed-query mode is not `reset`, `append`, or `replace`.
@@ -20,7 +20,7 @@ The error can also expose `rpcTag`, `path`, and an underlying `cause`.
 
 ## `EffectRpcQueryKeyError`
 
-Payload-specific key preparation throws this error synchronously. The error exposes `rpcTag`, `cause`, and one of these codes:
+An RPC key preparation failure throws before execution. The error exposes `rpcTag`, `cause`, and a code.
 
 - `PayloadConstructionFailed`
 - `PayloadEncodingFailed`
@@ -29,19 +29,19 @@ Payload-specific key preparation throws this error synchronously. The error expo
 
 ## `EffectRpcQueryError<E>`
 
-This error wraps a failed `Exit` from the RPC runner. It exposes `rpcTag`, `operation`, and the full `Cause.Cause<E>`. The runtime guard `isEffectRpcQueryError(value)` uses `instanceof` within one JavaScript realm. The operation is `query`, `infinite`, or `mutation`.
+This error wraps a failed RPC `Exit`. It exposes `rpcTag`, `operation`, and the complete `Cause.Cause<E>`. Use `isEffectRpcQueryError(value)` in the same JavaScript realm. For unary calls, `operation` is `query`, `infinite`, or `mutation`.
 
-Streaming failures use the same class. They preserve RPC, stream, middleware, client, defect, and interruption Causes, with operation `streamed` or `live`.
+Streaming failures use `streamed` or `live` and retain the complete Cause, including cleanup failures.
 
-A runner promise rejection passes through unchanged because it has no Effect `Cause` to preserve.
+If the runner rejects without returning an Exit, its rejection passes through.
 
 ## `EffectRpcQueryEmptyStreamError`
 
-A live query whose stream completes before it emits a value throws this error. The error exposes the streaming RPC's `rpcTag`. Accumulated streams return an empty array instead.
+This error means a live stream ended before its first value. It exposes `rpcTag`. A new unseeded accumulated query can succeed with `[]`.
 
 ## `EffectHttpApiQueryConfigError`
 
-Invalid factory or builder configuration throws this error synchronously. Stream execution also rejects incompatible QueryClient hashing. The error's `code` is one of:
+HTTP factory and builder failures throw synchronously. Incompatible hashing can also fail during stream execution. Read `code` to locate the problem.
 
 - `InvalidMaxChunks`: retention is neither a positive safe integer nor `"unbounded"`.
 - `InvalidRefetchMode`: a streamed-query mode is not `reset`, `append`, or `replace`.
@@ -59,7 +59,7 @@ The error exposes `apiId`. When available, it also exposes `groupId`, `endpoint`
 
 ## `EffectHttpApiQueryKeyError`
 
-HTTP query key preparation throws this error synchronously, before client execution. The error exposes `apiId`, `groupId`, `endpoint`, `method`, `cause`, and one of these codes:
+This error throws during key preparation, before the client runs. It exposes `apiId`, `groupId`, `endpoint`, `method`, `cause`, and a code.
 
 - `RequestEncodingFailed`
 - `KeyEncoderFailed`
@@ -69,23 +69,23 @@ HTTP query key preparation throws this error synchronously, before client execut
 
 ## `EffectHttpApiQueryError<E>`
 
-This error wraps a failed `Exit` from the HTTP runner. It exposes `apiId`, `groupId`, `endpoint`, `method`, `operation`, and the full `Cause.Cause<E>`. The operation is `query`, `infinite`, `mutation`, `metadata`, `streamed`, or `live`. The guard `isEffectHttpApiQueryError(value)` narrows errors within the same JavaScript realm.
+This error wraps a failed HTTP `Exit`. It exposes `apiId`, `groupId`, `endpoint`, `method`, `operation`, and `Cause.Cause<E>`. Operations are `query`, `infinite`, `mutation`, `metadata`, `streamed`, and `live`. Use `isEffectHttpApiQueryError(value)` in the same JavaScript realm.
 
-The Cause preserves endpoint, middleware, Schema, and HTTP client errors, including defects and interruption. SSE failures also preserve declared event errors, `Sse.Retry`, and `Sse.SseError`. The Cause can contain upstream requests, responses, or sensitive input values. Those values need inspection before logging or exposure. Runner rejections pass through unchanged.
+The Cause retains endpoint, middleware, Schema, and transport failures, including defects and interruption. SSE can also report declared event errors, `Sse.Retry`, and `Sse.SseError`. Inspect the Cause for private values before logging it. Runner rejections without an Exit pass through.
 
 ## `EffectHttpApiQueryEmptyStreamError`
 
-An HTTP live SSE or NDJSON query that completes before it emits a value throws this error. The error exposes `apiId`, `groupId`, `endpoint`, `method`, and operation `live`. A decoded `undefined` emission counts as a value and becomes `null`. A declared header wrapper preserves its body. Accumulated streams complete with an empty or retained history according to their refetch mode.
+This error means a live HTTP stream ended before its first value. It exposes the API, group, endpoint, method, and operation `live`. A decoded `undefined` counts as an emission and becomes `null`. A header wrapper keeps its body. Empty accumulated streams follow their refetch policy.
 
 ## `QueryClientOperationError`
 
-The optional Effect cache bridge reports native QueryClient rejections and synchronous cache callback failures through this error. Its `cause` is the exact original value, typed as `unknown`. A generated RPC or HTTP execution error and its complete Cause remain inside that value. A shared in-flight query or arbitrary Promise rejection cannot prove the current options' declared failure payload. Validate a recognized failure before reading domain fields. See [Query Effects](/effect-api-query/guides/query-effects/).
+The Effect cache bridge wraps native rejections and synchronous callback failures in this class. Its `cause: unknown` contains the original value, including any adapter error and full Effect Cause. Shared query work can come from a different caller. Validate a recognized failure before reading its fields. See [query effects](/effect-api-query/guides/query-effects/).
 
-Interrupting one bridge waiter stops that wait. It does not cancel shared cache execution or other observers. Cancel the native query explicitly when the application owns that decision.
+Interrupt an Effect waiter to stop its wait. To stop shared work, cancel the native query explicitly.
 
 ## `QueryDescriptorError`
 
-Descriptor capture and rebinding throw this error synchronously:
+Capture or rebinding throws this error before execution.
 
 | Code           | Meaning                                                    |
 | -------------- | ---------------------------------------------------------- |
@@ -94,4 +94,4 @@ Descriptor capture and rebinding throw this error synchronously:
 | `Input`        | Input encoding, decoding or preparation failed.            |
 | `Identity`     | Input no longer has the same canonical meaning.            |
 
-The descriptor transfers a selection; it transfers no credentials, clients or prepared-input token. See [Loader Descriptors](/effect-api-query/guides/loader-descriptors/).
+See [loader descriptors](/effect-api-query/guides/loader-descriptors/) for capture, rebinding, and failure handling.

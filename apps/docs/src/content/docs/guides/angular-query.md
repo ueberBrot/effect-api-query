@@ -3,15 +3,15 @@ title: Angular Query
 description: Rebuild generated options from Angular signals and keep client lifetime in the application.
 ---
 
-Build options inside Angular's reactive accessor. When input changes, the accessor creates a new key and query function. Use this pattern with either factory and every generated query view.
+Build options in the accessor passed to `injectQuery`. When a signal changes, Angular can rebuild the key and function. This works for both factories.
 
-See [Requirements and tested integrations](/effect-api-query/reference/compatibility-and-limits/#requirements-and-tested-integrations) for Angular Query's framework requirements and this guide's checked versions.
+See [compatibility](/effect-api-query/reference/compatibility-and-limits/#requirements-and-tested-integrations) for supported Angular requirements and tested versions.
 
-Keep [captured inputs unchanged](/effect-api-query/concepts/data-normalization/#keep-captured-inputs-unchanged) while their options can execute.
+Keep [captured input](/effect-api-query/concepts/data-normalization/#keep-captured-inputs-unchanged) unchanged while the options can run.
 
 ## Create queries in an injection context
 
-Register `provideTanStackQuery(queryClient)` in your application providers. Create queries inside an Angular injection context. Read each signal inside the accessor passed to `injectQuery`. Create `rpc` from your [ready client](/effect-api-query/getting-started/quick-start/). In this example, `users.read` accepts `{ id: number }` and returns a user with `name`. Import `signal` from `@angular/core` and `injectQuery` from `@tanstack/angular-query-experimental`. Add these field initializers to an existing component:
+Register `provideTanStackQuery(queryClient)` in the app providers. Create `rpc` from your [ready client](/effect-api-query/getting-started/quick-start/). In an Angular injection context, read signals inside the `injectQuery` accessor. Import `signal` from `@angular/core` and `injectQuery` from `@tanstack/angular-query-experimental`. The example's `users.read` takes a numeric ID and returns a user. Use `select` to read the name.
 
 ```ts
 readonly id = signal(1)
@@ -23,16 +23,16 @@ readonly user = injectQuery(() =>
 )
 ```
 
-For pagination, use `injectInfiniteQuery` with `infiniteOptions`. For writes, use `injectMutation` with `mutationOptions`. Supply each mutation's input through its execution variables. Angular query results expose signals such as `data()`, `error()`, and `fetchStatus()`.
+Use `injectInfiniteQuery` with `infiniteOptions` for pages. Use `injectMutation` with `mutationOptions` for writes. Pass variables each time the mutation runs. Read query results with signals such as `data()`, `error()`, and `fetchStatus()`.
 
 Use the same accessor for `streamedOptions`, `liveOptions`, and HTTP `metadataOptions`.
 
 ## Choose native options carefully
 
-Angular's defined-data overload accepts a query function and excludes `skipToken`. A skipped query therefore retains `undefined` in its `data()` type, even with defined `initialData`. An initial-data function that can return `undefined` also produces optional result data.
+A query with `skipToken` can have `undefined` data in Angular even if it has defined `initialData`. The defined-data overload requires a function. An initializer that can return `undefined` also yields optional data.
 
 ## Own the native integration
 
-Follow the [shared integration lifetime](/effect-api-query/integrations/#own-the-cache-and-client-lifetime) for providers, observer removal, stream finalizers, and accepted mutations. Match the native wrapper to the application's Query Core. Use a compiler and tooling that Angular supports.
+Use one resolved Query Core version and a compiler Angular supports. Follow [cache and client lifetime](/effect-api-query/integrations/#own-the-cache-and-client-lifetime) when observers leave or the app shuts down.
 
-Use the same Angular release for core, common, compiler, and platform-browser. The application owns server rendering and hydration.
+Use the same Angular release for core, common, compiler, and platform-browser. Handle server rendering and hydration in the app.

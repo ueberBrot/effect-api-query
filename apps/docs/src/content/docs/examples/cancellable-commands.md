@@ -3,15 +3,15 @@ title: Cancellable Commands
 description: Run the example's explicit command protocol without treating mutation cancellation as rollback.
 ---
 
-This example runs long-running server work with an operation ID, progress updates, and an explicit cancellation request. Run the [Vite React example](/effect-api-query/examples/#run-vite-react) and use the **Cancellable commands** panel. The Start application serves the same contract and handlers.
+Open the **Cancellable commands** panel in the [Vite React app](/effect-api-query/examples/#run-vite-react). The Start app serves the same operations.
 
-The library supplies generated query and mutation options. The application defines the command protocol, owns the server workers, and decides how to report progress and retain records. For query signals and iterator cleanup, see the [Cancellation contract](/effect-api-query/guides/cancellation/).
+The app defines the command IDs, progress, workers, and records. The library builds query and mutation options. See [cancellation](/effect-api-query/guides/cancellation/) for local query signals and cleanup.
 
 ## Cancel a command while its mutation is pending
 
-Use an explicit cancel RPC for long-running commands. The Vite React example provides `commands.start`, `commands.status`, and `commands.cancel` in the shared contract. Each command has an operation ID that the client generates. The start mutation waits for a terminal result. A separate query observes progress, and a separate mutation requests cancellation.
+The client assigns an ID before starting each command. `commands.start` waits for the terminal result. `commands.status` shows progress. `commands.cancel` requests cancellation.
 
-In the React component, import `useState`, `useQuery`, and `useMutation` from their native packages. Use the example's ready `rpcQuery` and QueryClient:
+In the React component, use the app's `rpcQuery` and QueryClient. Import `useState`, `useQuery`, and `useMutation` from their native packages.
 
 ```ts
 const [operationId] = useState(() => crypto.randomUUID());
@@ -43,20 +43,20 @@ const status = useQuery(
 );
 ```
 
-In the start and cancel button handlers, call the corresponding mutation:
+Call the matching mutation from each button handler.
 
 ```ts
 start.mutate(input);
 cancel.mutate(input);
 ```
 
-Disable start while the start mutation is pending, after success, or when status confirms an accepted command. If start fails and no command was accepted, retry with the same operation ID. An uncertain response must not create a second command. Disable cancel before start, while cancellation is pending, or after a terminal status. The [complete command panel](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/components/sections/commands-section.tsx) includes the UI.
+Disable Start while it is pending or once the server accepts the command. If Start fails or the response is uncertain, reuse the same ID so a retry cannot create another command. Disable Cancel before Start, during cancellation, and after terminal status. See the [complete panel](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/components/sections/commands-section.tsx).
 
-The cancel handler signals the worker and waits until it stops. The cancel mutation's `onSettled` callback then invalidates the generated status key. The active query refetches the server's status even if the cancel request failed. Keep polling while a command runs or a status read remains unresolved or failed. Stop at a terminal status, or when a settled start has no corresponding command. The application chooses which status queries to invalidate.
+The cancel handler signals the worker and waits for it to stop. Its mutation invalidates the status key in `onSettled`, so the active query refetches even if cancellation failed. Poll while the command runs or status is unresolved. Stop at terminal status or when a settled Start has no command.
 
-A cancelled command returns `{ state: 'cancelled', ... }` successfully. TanStack therefore reports both mutations as `success` and runs their normal callbacks. The domain state does not add a `cancelled` MutationCache state. Each operation ID has its own query key and worker. Cancelling one command leaves another running.
+A cancelled command returns `{ state: 'cancelled', ... }` as a successful result. TanStack reports the mutations as `success`. Use the command state for the UI. Each ID has a separate query and worker, so cancelling one leaves the other running.
 
-The TanStack Start application hosts the same contract and handlers at `/rpc`. Its `application.rpcQuery.commands` exposes the same options for hooks, loaders, and QueryClient. Start can reuse this workflow with its own QueryClient.
+Start serves the same handlers at `/rpc`. Use `application.rpcQuery.commands` with the Start app's QueryClient.
 
 ## Choose what cancellation means
 
@@ -67,8 +67,8 @@ The TanStack Start application hosts the same contract and handlers at `/rpc`. I
 | Call `commands.cancel` | Requests cooperative server cancellation by operation ID and waits for a terminal state. |
 | Compensate committed work | Requires a separate application operation that reverses or offsets prior effects. |
 
-Transport interruption is cooperative and requires transport support. An explicit cancel RPC gives the application a contract for requesting server cancellation. When its local Effect is interrupted, the slow-query demo calls the transport-specific `diagnostics.cancel` operation. The package does not provide that behavior.
+Transport interruption requires transport support. The slow-query demo explicitly calls `diagnostics.cancel` when its local Effect is interrupted. Define an operation like this if the server needs an explicit cancellation request.
 
-The command example owns workers in the server Scope. Unmounting a view or interrupting the client's wait does not cancel these workers automatically. A cancel request stops future steps. Completed steps remain recorded. Cancellation after completion returns the completed result without rolling it back. Repeating a start with the same ID returns the existing result. If cancel arrives before start, the server reserves that ID as cancelled.
+The server Scope owns the workers, which can continue after a view unmounts. Cancelling stops future steps and keeps completed steps. If work already finished, cancel returns its completed result. A duplicate Start returns the existing result. If Cancel arrives first, the server reserves the ID as cancelled.
 
-This example stores operation records in memory until the example is reset or the server stops. If operations must survive restarts, production applications need authorization, durable storage, and a retention policy. The example's in-memory records do not provide a durable job queue.
+The demo keeps records in memory until reset or shutdown. If records must survive restarts, add authorization, durable storage, and a retention policy.

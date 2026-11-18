@@ -5,7 +5,7 @@ description: Peer requirements, tested integrations, RPC and HTTP operations, ca
 
 ## Requirements and tested integrations
 
-The package is ESM-only and targets ES2022. It declares Effect and Query Core as peers. Framework requirements come from the native Query wrappers. The table separates those declared requirements from the exact versions checked for this release. A wrapper's peer range can be broader than the combinations checked here.
+Use ESM and an environment that supports ES2022. The package declares Effect and Query Core as peers. Each Query wrapper declares its own framework requirements.
 
 | Component | Declared requirement | Exact versions checked |
 | --- | --- | --- |
@@ -18,17 +18,17 @@ The package is ESM-only and targets ES2022. It declares Effect and Query Core as
 | Svelte and Svelte Query | Svelte Query peer: Svelte `^5.25.0` | Svelte `5.57.3`, Svelte Query `6.3.6` |
 | Angular and Angular Query experimental | Angular Query peers: `@angular/core` and `@angular/common` `>=16.0.0` | Angular `22.2.4`, Angular Query experimental `5.105.0` |
 
-All listed Query wrappers resolve Query Core `5.105.0` in the checked combinations without package-manager overrides. Keep the application's Query Core and its wrapper's Core dependency on one resolved version. The `5.104.4` minimum preserves a cached `null` first page parameter during infinite-query refetches.
+The tested wrappers resolve Query Core `5.105.0` without overrides. Keep your app and wrapper on one resolved Core version. The minimum `5.104.4` preserves a cached `null` first page parameter on refetch.
 
-Vue Query also declares an optional `@vue/composition-api` peer of `^1.1.2` for Vue 2.6 applications. The checked Vue combination uses Vue 3.
+Vue Query declares an optional `@vue/composition-api` peer of `^1.1.2` for Vue 2.6. Tests use Vue 3.
 
-The application examples also use TanStack Start `1.169.4`, TanStack Router `1.170.46`, and Router SSR Query `1.167.3`.
+The example apps use TanStack Start `1.169.4`, TanStack Router `1.170.46`, and Router SSR Query `1.167.3`.
 
-The stable Effect release contains unstable RPC and HTTP API modules. Keep the application's Effect packages coordinated within the peer range. The packed-consumer check runs public compiler fixtures and focused RPC/HTTP execution, cancellation, and hydration checks for Effect `4.0.6`, `4.0.7`, `4.1.0` and `4.1.2`, each with Query Core `5.104.4` and `5.105.0`. All eight combinations run both pinned compilers; native framework/build evidence in this reference remains scoped to the development combination. It does not test every intermediate patch or establish support for future Effect minors. See [Compatibility and Stability](/effect-api-query/getting-started/compatibility-and-stability/).
+The packed tests pair each listed Effect version with both Query Core versions. They check public types, execution, cancellation, and hydration with both listed compilers. Framework and app build checks use the development combination. Supported ranges include intermediate versions that CI does not test individually. See [compatibility and stability](/effect-api-query/getting-started/compatibility-and-stability/) for upgrade policy.
 
-Generated Core options support native reactive accessors and retain each framework's hook overloads. The Vue, Solid, Svelte, and Angular combinations above are checked for native hook inference in TypeScript consumer modules. These checks use both listed TypeScript versions. Framework component compilers and application builds have their own tooling requirements. See [Vue Query](/effect-api-query/guides/vue-query/), [Solid Query](/effect-api-query/guides/solid-query/), [Svelte Query](/effect-api-query/guides/svelte-query/), and [Angular Query](/effect-api-query/guides/angular-query/) for option rebuilding, compiler resolution, hook overloads, and resource ownership.
+The Vue, Solid, Svelte, and Angular combinations check native hook inference in TypeScript consumer modules. Component compilers and app builds have their own requirements. See the [framework guides](/effect-api-query/integrations/) for accessors and tooling.
 
-[Package metadata](https://github.com/ueberBrot/effect-api-query/blob/main/package.json) declares library peers. The [workspace catalog](https://github.com/ueberBrot/effect-api-query/blob/main/pnpm-workspace.yaml) pins the Effect release and example dependencies. The [framework consumers](https://github.com/ueberBrot/effect-api-query/tree/main/tests/framework-consumers) pin the other native integrations and Core alignment.
+See the [package manifest](https://github.com/ueberBrot/effect-api-query/blob/main/package.json) for peers, the [workspace catalog](https://github.com/ueberBrot/effect-api-query/blob/main/pnpm-workspace.yaml) for development versions, and [framework consumers](https://github.com/ueberBrot/effect-api-query/tree/main/tests/framework-consumers) for test pins.
 
 ## Capability matrix
 
@@ -44,31 +44,31 @@ Generated Core options support native reactive accessors and retain each framewo
 | Mutation cancellation | Explicit application command | Explicit application operation |
 | Keys and failures | `rpc` namespace, dotted paths, full Cause | `http` namespace, literal paths, full Cause and declaration identity |
 
-Clients, authentication, middleware, residual services, framework providers, host routes, SSR, serialization, mutation invalidation, and disposal belong to the application. The generated Core options work with native framework wrappers. The framework guides describe their accessors and inference limits.
+Configure clients, providers, middleware, serialization, cache updates, and disposal in your app. Use the generated options with the native wrapper for your framework.
 
-The package executes calls through the ready client. TanStack provides query cancellation signals but has no corresponding mutation signal for the adapter to forward. Client middleware and transport construction control request interception. Observable server cancellation requires an explicit domain operation. Compensation is a separate operation.
+TanStack supplies an abort signal for queries. Mutations have no matching signal. Use an explicit domain operation to cancel server work. Undo completed work through a separate compensation operation.
 
-The [examples](/effect-api-query/examples/) provide complete integrations. Streaming RPC builders use TanStack's experimental `streamedQuery` helper. Calls that do not need TanStack Query can use the ready client directly.
+Stream queries publish through the public Query Core cache API. For complete integrations, see [examples](/effect-api-query/examples/). For calls without a cache, use the ready Effect client directly.
 
 [Browser and worker hosts](/effect-api-query/reference/browser-and-worker-hosts/) explains ready-client ownership and the worker transport boundary.
 
-WebSocket clients support unary calls, both stream views, and application-owned connection replacement. The [WebSocket recipe](/effect-api-query/guides/websocket-clients/) describes buffering and chunk-decoding limits. Local cancellation alone does not prove remote completion.
+Use the [WebSocket guide](/effect-api-query/guides/websocket-clients/) for buffering, chunk decoding, and connection replacement. Wait for a server acknowledgement if you need remote completion.
 
-[External HTTP clients](/effect-api-query/reference/external-http-clients/) describes generated OpenAPI consumption with `openapi-fetch` and `openapi-typescript`. Encoded DTOs, multipart serialization, and raw SSE access retain their own contracts. The external client does not replace a ready Effect client.
+Use [external HTTP clients](/effect-api-query/reference/external-http-clients/) for OpenAPI DTOs, multipart uploads, and raw SSE access. Pass an Effect HttpApiClient to the factory.
 
 ## Input and cache limits
 
-Accumulated stream keys and options require a positive `maxChunks` bound or `"unbounded"`. A configured tree, branch, or leaf can supply this choice through `streamed.policy`.
+Set a positive safe-integer `maxChunks` or choose `"unbounded"` for accumulated streams. You can set it through `streamed.policy` on a tree, branch, or leaf.
 
-Cache identity must be strict JSON. Public canonical payload slots are typed as `unknown`; generated key helpers retain typed data and errors. For endpoints with query support, encoding services, redacted values, and multiple HTTP payload alternatives require safe [custom encoders](/effect-api-query/guides/custom-key-encoders/). Binary query input needs a JSON-safe projection. Multipart mutation-only endpoints require no encoder and reject encoder entries. Encoders are synchronous. Asynchronous and Effect-returning encoders are unsupported.
+Keys require strict JSON. Use generated builders for typed exact access. Supply a synchronous [custom encoder](/effect-api-query/guides/custom-key-encoders/) for query input with encoding services, redacted values, binary data, or multiple HTTP payload alternatives. Leave mutation-only multipart endpoints out of the encoder map.
 
-RPC payload Schemas must be query-stable because preparation and ready-client execution construct the payload separately. HTTP builders accept decoded request input without RPC construction. Captured input must remain unchanged while its options can run. Frozen keys do not freeze arbitrary input or decoded data.
+Use a query-stable RPC Schema because query preparation and execution each construct the payload. HTTP uses decoded request parts. Keep captured input unchanged while its options can run.
 
-Buffered queries and live emissions normalize successful `undefined` to `null`. Accumulated stream elements and mutation results preserve it. [Data Normalization](/effect-api-query/concepts/data-normalization/) explains payload construction, input ownership, and query data. [Performance and Bundling](/effect-api-query/reference/performance/) describes construction costs.
+Buffered and live queries turn `undefined` into `null`. Mutations and accumulated streams keep it. See [inputs and query data](/effect-api-query/concepts/data-normalization/) for the full rules and [performance](/effect-api-query/reference/performance/) for construction costs.
 
 ## Server rendering and errors
 
-- The package does not serialize errors for SSR. Failed queries require an application error serializer, or exclusion from dehydration followed by a browser refetch.
-- [fetchStreamSnapshot](/effect-api-query/guides/stream-snapshots/) captures an open stream before dehydration. A fresh capture exclusively owns an idle, unobserved exact query and settles after local iterator cleanup. Its timeout limits the wait for data. It does not limit finalizer duration or acknowledge remote cancellation.
-- HTTP binary data and other domain values need an application serialization strategy.
-- Both execution-error guards use `instanceof` and recognize errors from the same JavaScript realm.
+- Exclude failed queries from dehydration and let the browser refetch, or define a safe error serializer.
+- Reserve an idle, unobserved key for a fresh [stream snapshot](/effect-api-query/guides/stream-snapshots/). The timeout limits the wait for data. The helper still awaits local cleanup.
+- Define how to serialize binary and other rich values.
+- Use the execution-error guards in the same JavaScript realm as the error because they use `instanceof`.

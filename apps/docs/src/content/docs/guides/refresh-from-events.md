@@ -3,13 +3,13 @@ title: Refresh Reads from Domain Events
 description: Map domain delivery and Effect Reactivity to scoped native Query invalidation.
 ---
 
-Use one application-owned consumer to map each domain event to the reads it changes. If RPC and HTTP represent the same domain, name both adapters in the mapping. Their generated cache roots remain separate.
+Map each delivered domain event to the reads it affects. If RPC and HTTP expose the same domain, map both because they use distinct cache roots.
 
-Copy [the user-event consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/fixtures/user-events.ts) next to your owner, write, and client modules. Adjust its local application imports. The consumer takes the captured owner and an application-owned Effect Reactivity service. Supply your own decoded network stream. The module creates no connection, broker, provider, or second cache.
+Adapt the [user-event consumer](https://github.com/ueberBrot/effect-api-query/blob/main/tests/fixtures/user-events.ts) beside your client and write modules. Supply the captured owner, an Effect Reactivity service, and a decoded network stream.
 
 ## Map events to reads
 
-The `users.v1` envelope includes the consumer's `ownerKey`, a positive safe-integer cursor, and one of these event kinds:
+The `users.v1` envelope includes the consumer's `ownerKey`, a positive safe-integer cursor, and an event kind.
 
 | Event | Reads invalidated |
 | --- | --- |
@@ -17,17 +17,17 @@ The `users.v1` envelope includes the consumer's `ownerKey`, a positive safe-inte
 | `user.changed`, with `id` and `locale` | Those directory prefixes and both exact user-detail keys. |
 | `users.reset` | Both complete user branches. |
 
-Other user IDs, locales, and diagnostic branches remain untouched by an ordinary detail event. Generated keys and native filters retain the owning QueryClient's global and prefix hash defaults. The mapping depends on the domain relationship, so the package does not infer it from mutation or event names.
+A detail event targets one user and locale. Other details and diagnostic queries stay untouched. Generated keys use the owner's QueryClient hashing defaults. Define the mapping from domain events to keys in the app.
 
-The `ownerKey` contains safe tenant, user, session, and permission-generation identity. It partitions event routing. The application must separately authenticate the transport and validate which owner can receive each event.
+Put safe tenant, user, session, and permission-generation values into `ownerKey`. Authenticate the transport and confirm who can receive each event separately.
 
 ## Register one consumer for the owner
 
-`makeUserEventConsumer`, `decodeUserEvent`, and `flush` are application helpers from the linked consumer module. Import `Effect` and `Stream` from `effect`. Provide the captured `owner` and application `reactivity` service. Acquire the consumer once inside the owner's Effect Scope.
+Import `makeUserEventConsumer`, `decodeUserEvent`, and `flush` from the example module. Import `Effect` and `Stream` from `effect`. Use the captured owner and its Reactivity service.
 
-Acquire `consumer` with `yield* makeUserEventConsumer(owner, reactivity, { observedUsers: [{ id: 1, locale: 'en' }] })`. This registers the owner's selected local detail mappings.
+Inside the owner's Scope, acquire `consumer` with `yield* makeUserEventConsumer(owner, reactivity, { observedUsers: [{ id: 1, locale: 'en' }] })`. The consumer registers those detail mappings locally.
 
-In that same scope, attach the supplied network stream with its existing service/error channels:
+Attach the network stream in the same Scope. Its error and service requirements stay in the returned Effect.
 
 ```ts
 const consume = <E, R>(events: Stream.Stream<unknown, E, R>) =>
@@ -38,32 +38,32 @@ const consume = <E, R>(events: Stream.Stream<unknown, E, R>) =>
   );
 ```
 
-Run `consume(events)` with the application's runtime. The [complete typed attachment](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-user-events.ts) shows composition. It rejects inactive or duplicate owners and unregisters listeners when the Scope closes. A retired consumer ignores late delivery and cannot redirect it to a replacement QueryClient. Close the consumer's Scope. Cancel and drain started reads. Release the clients before replacing the owner. See [Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/).
+Run `consume(events)` in the app runtime. The [typed example](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-user-events.ts) rejects inactive or duplicate owners. Closing the Scope unregisters listeners. Late events cannot write to a replacement cache. Close the Scope, then cancel and drain started reads before releasing the clients. See [switch cache owners](/effect-api-query/guides/switch-cache-owners/).
 
 ## Coalesce local invalidation
 
-Use the consumer's `reactivityKeys.directory`, `reactivityKeys.all`, or `reactivityKeys.user({ id, locale })` with Effect Reactivity. Exact local user mappings exist for the `observedUsers` registered when the consumer starts. Include every detail read your local writers must refresh. Delivered domain events can target any valid user.
+Use the consumer's `reactivityKeys.directory`, `reactivityKeys.all`, or `reactivityKeys.user({ id, locale })`. Include every detail your local writers refresh in `observedUsers`. Network events can target any valid user.
 
-These keys are stable application strings. Reactivity hashes its own keys. A TanStack query tuple has no implied Reactivity subscription or prefix relationship. Register an explicit mapping between the two systems.
+Reactivity uses its own application keys. Register the mapping to TanStack query keys explicitly.
 
-The consumer combines invalidation requests, and broad refreshes cover narrower work. It defers refresh while its captured QueryClient has pending mutations. This protects optimistic writes. Other refresh paths need the same application policy. `flush()` drains runnable batches and leaves requests queued during pending writes. Refresh-job errors go to `onRefreshError`. Query errors retain native Query retry and state behavior.
+The consumer combines pending invalidations and lets broad ones cover narrower reads. It waits while its QueryClient has pending mutations, which protects optimistic writes. Apply the same rule to other refresh paths. `flush()` drains runnable work. Jobs report errors to `onRefreshError`; queries keep their native retry and error state.
 
-See the linked consumer for its bookkeeping bounds and [Optimistic User Writes](/effect-api-query/guides/optimistic-writes/) for overlap rules.
+See [optimistic writes](/effect-api-query/guides/optimistic-writes/) for overlapping mutations.
 
 ## Resume delivery deliberately
 
-This recipe assumes one ordered, monotonically increasing cursor sequence per owner. It ignores cursors already accepted. A gap queues a full user-branch refresh and advances the accepted cursor. The cursor records accepted invalidation requests. It does not provide a durable acknowledgement or establish that a read succeeded.
+The example uses one increasing cursor per owner. It ignores previously accepted cursors. A gap queues a refresh of both user branches and advances the cursor. The cursor records an accepted invalidation request, which can precede a successful read.
 
-Reconnect using `consumer.cursor()` as the last accepted cursor. Call `consumer.resume(true)` when the transport can replay subsequent events in order. Replayed duplicates remain harmless. If replay is unavailable, call `consumer.resume(false)` before accepting the new sequence. That call resets the cursor and refreshes both user branches. Stop delivery from the old connection first.
+Reconnect from `consumer.cursor()`. If the server can replay later events in order, call `consumer.resume(true)`. If it cannot, stop the old delivery and call `consumer.resume(false)` before accepting new events. This resets the cursor and refreshes both user branches.
 
-The application owns reconnect backoff, replay retention, cursor storage, source epochs, schema migration, authorization, acknowledgements, and out-of-order delivery handling. A new owner Scope starts at cursor zero. Fetch its authoritative reads on startup. This recipe does not promise durable or exactly-once delivery. Invalid envelopes fail Schema decoding before changing the cursor.
+A new Scope starts at cursor zero. Fetch authoritative data on startup. Invalid envelopes fail Schema decoding before changing the cursor. Your app controls backoff, replay retention, persistence, source epochs, and delivery guarantees.
 
-Use [Reconnect Streams](/effect-api-query/guides/reconnect-streams/) to wrap application-owned native delivery with `recoverStream`. Keep `consumer.cursor()` as the initial checkpoint and deliver recovered events to the captured consumer. The helper can restart from accepted cursors, report connection state, and call application hooks for gaps or expired replay.
+If the server supports replay, [wrap the stream with recoverStream](/effect-api-query/guides/reconnect-streams/). Start from `consumer.cursor()` and deliver recovered events to the captured consumer.
 
-Keep cursor ownership explicit. `recoverStream` advances its cursor before downstream delivery; the consumer advances its own cursor when it accepts an invalidation request. Keep both in the same owner lifetime and persist checkpoints according to your application's delivery guarantees. When replay has expired, a recovery hook must refresh authoritative state and return a matching cursor. Queuing invalidation alone does not establish that cursor.
+`recoverStream` advances before downstream delivery. The consumer advances after accepting an invalidation request. Keep both under one owner. If replay expires, refresh state and return its matching cursor. A queued invalidation alone cannot establish that position.
 
 ## Choose a visible stream view
 
-Use a live query for complete snapshots or bounded history for recent events. The latest delta alone does not reconstruct state. An indefinitely open `replace` stream does not publish a replacement before completion. See [Choose Stream History](/effect-api-query/guides/choose-stream-history/).
+For complete state, use a live query. For recent changes, keep bounded history. An open `replace` stream keeps the previous history until it finishes. See [choose stream history](/effect-api-query/guides/choose-stream-history/).
 
-For acquired connections, application cursor recovery and typed cache writes in one owner lifetime, use [Apply Events to a Scoped Cache](/effect-api-query/guides/scoped-event-cache/).
+To acquire, recover, and apply events within one owner, see [apply events to a scoped cache](/effect-api-query/guides/scoped-event-cache/).

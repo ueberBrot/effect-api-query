@@ -3,11 +3,11 @@ title: Pagination
 description: Map page parameters to typed RPC payloads and HTTP requests.
 ---
 
-Use a ready [RPC](/effect-api-query/getting-started/quick-start/) or [HTTP](/effect-api-query/getting-started/http-quick-start/) utility tree. In these examples, `users.page` accepts numeric `cursor` and `pageSize` fields and returns `{ users, nextCursor }`, with `null` marking the last page.
+Use the utilities from the [RPC](/effect-api-query/getting-started/quick-start/) or [HTTP](/effect-api-query/getting-started/http-quick-start/) quick start. Here `users.page` takes a numeric `cursor` and `pageSize`. It returns `{ users, nextCursor }`, with `null` as the last page's cursor.
 
 ## Build page options
 
-Map each page parameter to RPC payload constructor input:
+Convert each page parameter to RPC payload input.
 
 ```ts
 const rpcPages = rpc.users.page.infiniteOptions({
@@ -18,7 +18,7 @@ const rpcPages = rpc.users.page.infiniteOptions({
 const pages = await queryClient.infiniteQuery(rpcPages);
 ```
 
-For HTTP, return every declared request container from the mapper:
+For HTTP, return all the endpoint's declared request objects from the mapper.
 
 ```ts
 const httpPages = http.users.page.infiniteOptions({
@@ -28,16 +28,16 @@ const httpPages = http.users.page.infiniteOptions({
 });
 ```
 
-Pass these options to the native infinite-query hook to load further pages with `fetchNextPage`. Inputless operations omit `input`. Input-bearing operations can pause with `input: skipToken`. See [Conditional Queries](/effect-api-query/guides/conditional-queries/).
+Pass the options to your framework's infinite-query hook. Use `fetchNextPage` for the next page. Omit `input` if the operation takes none. If required input is missing, [pause the query](/effect-api-query/guides/conditional-queries/) with `input: skipToken`.
 
 ## Keep page identity stable
 
-The mapped initial request determines cache identity. Include filters in that request and every page. When filters change, rebuild the options. The mapper runs during key construction and page execution, so keep it deterministic.
+The first mapped request determines the key. Include the same filters on every page and rebuild options when filters change. The mapper runs for the key and again for execution. Given the same page parameter, it must return equivalent input.
 
-TanStack stores `pages` and `pageParams`. A native `select` can flatten returned data. Cache reads retain the original pages and inferred page-parameter type:
+The cache holds `pages` and `pageParams`. Use `select` to flatten the result returned to the caller. Cache reads still return the original page structure and inferred page-parameter type.
 
 ```ts
 const cachedPages = queryClient.getQueryData(httpPages.queryKey);
 ```
 
-Infinite views have separate keys from ordinary queries. Every page uses the query runner and abort signal. See [RPC Builders](/effect-api-query/reference/generated-builders/#build-an-infinite-query) and [HTTP Builders](/effect-api-query/reference/http-builders/#pagination) for exact option contracts.
+Infinite and ordinary queries have distinct keys. Each page uses the query runner and abort signal. See [RPC options](/effect-api-query/reference/generated-builders/#build-an-infinite-query) and [HTTP options](/effect-api-query/reference/http-builders/#pagination).

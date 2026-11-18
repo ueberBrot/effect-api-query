@@ -3,11 +3,11 @@ title: Share Decoded Values
 description: Opt in to schema-defined reference reuse through native structural sharing.
 ---
 
-Use native `structuralSharing` when repeated decoded results contain rich values that the application treats as immutable. The adapter keeps TanStack's default behavior. The opt-in `schemaStructuralSharing` helper reconciles plain containers around Schema-defined decoded atoms. It never compares encoded wire values.
+Use `schemaStructuralSharing` when repeated responses contain immutable decoded values such as Schema class instances. The helper keeps equivalent values by reference and reuses plain containers around them. Without the helper, TanStack's default sharing applies.
 
 ## Define the decoded semantics
 
-This snapshot contains Schema class instances with dates, maps, sets, and Effect Options. The `attachment` field deliberately compares by reference, including custom objects. Import the model and callbacks below into the application's cache module.
+This snapshot contains Schema class instances, dates, maps, sets, and Effect Options. The model compares the `attachment` field by reference. Put the model and callbacks in your cache module.
 
 ```ts
 import { schemaStructuralSharing } from "@ueberbrot/effect-api-query";
@@ -33,13 +33,13 @@ export const Snapshot = Schema.Struct({
 });
 ```
 
-`Schema.toEquivalence(Reading)` compares the declared decoded fields. Dates compare by timestamp; these maps and sets compare their primitive contents without considering insertion order. Options compare their cases and values. Keep these values unchanged after caching or comparison: readonly types and frozen outer objects do not make Date, Map, Set, or their contents immutable. Effect equality may cache comparisons.
+`Schema.toEquivalence(Reading)` compares declared decoded fields. Dates compare by timestamp. These maps and sets compare primitive contents regardless of insertion order. Options compare their case and value. Keep cached values unchanged. A frozen outer object does not freeze a Date, Map, Set, or its contents, and Effect can cache comparisons.
 
-Use schema-defined fields only. Extra instance state, getters, mutable objects, and arbitrary custom classes need an explicit application equivalence or reference semantics such as `attachment`. `Schema.Unknown` alone does not promise reference equality. Do not use encoded wire values as a general definition of decoded equality.
+If an instance has extra state, getters, or mutable values, define how to compare them or use reference equality. `Schema.Unknown` alone does not give reference equality. Compare decoded values according to how your application uses them.
 
 ## Reuse equivalent records
 
-Choose the schema for an **atomic record**, not the surrounding snapshot. Derive its equivalence once and pass it explicitly:
+Derive the equivalence once for one reading. Pass it with the reading Schema.
 
 ```ts
 export const shareSnapshot = schemaStructuralSharing(Reading, {
@@ -47,13 +47,13 @@ export const shareSnapshot = schemaStructuralSharing(Reading, {
 });
 ```
 
-The callback accepts unknown values, so it also works in native QueryClient defaults and for selected observer values. Schema-valid atoms compare only through the supplied equivalence. Invalid atoms and unsupported rich objects pass through unchanged. Plain objects and dense arrays reconcile recursively by property or index; primitive values compare by reference/value identity. Use finite acyclic containers with enumerable string data properties only. Sparse arrays, symbol properties, accessors, and custom container prototypes are unsupported and pass through unchanged. Cyclic traversed containers throw a TypeError.
+The callback also works in QueryClient defaults and on selected values. It uses the supplied equivalence for Schema-valid atoms and recursively compares plain objects and dense arrays. Unsupported values pass through. Use finite containers with enumerable string data properties. Sparse arrays, symbol properties, accessors, and custom prototypes pass through. Traversing a cycle throws `TypeError`.
 
-Schema type-side validation and equivalence must be synchronous and require no services; decoding/encoding services are never used. Validation defects, async checks, missing services and equivalence exceptions propagate synchronously. The helper neither decodes nor freezes data. Never mutate either input after caching.
+Both Schema validation and equivalence must run synchronously without services. Defects, asynchronous checks, missing services, and thrown equivalence errors propagate. The helper compares decoded values and leaves them unfrozen. Keep both inputs unchanged.
 
-An equivalent reading keeps its class instance and all nested references. A changed reading uses the incoming instance intact; the helper does not rebuild classes or merge their individual fields. When only `revision` changes, the readings array can retain its reference. Reordering is positional, not an ID-based entity merge. Selected plain containers follow the same rules.
+An equivalent reading keeps the old instance and its references. A changed reading uses the entire incoming instance. If only `revision` changes, the array can keep its reference. Comparisons follow array positions, so a reorder does not match records by ID.
 
-In the module that owns `rpc`, import `configureUtils` from `@ueberbrot/effect-api-query` and opt in at the leaf:
+Import `configureUtils` from `@ueberbrot/effect-api-query` where you create `rpc`. Enable the callback for this leaf.
 
 ```ts
 const read = configureUtils(rpc.read, {
@@ -62,17 +62,17 @@ const read = configureUtils(rpc.read, {
 const options = read.queryOptions({ select: (data) => data.readings.length });
 ```
 
-The same callback works in a buffered HTTP `queryOptions` builder, or as a call-site `structuralSharing` option. Native defaults and more specific overrides retain their usual order. `structuralSharing: false` disables sharing. Selection and generated data/error types remain unchanged. Inspect cached references with `getQueryData` or an observer; in the checked Query version, an imperative fetch returns the fetched value before cache reconciliation.
+Pass the same callback to a buffered HTTP builder or set it on one call. Native defaults still apply unless you override them. Use `structuralSharing: false` to disable sharing. Inspect reconciled references with `getQueryData` or an observer. In the checked Query version, an imperative fetch returns the value before cache reconciliation.
 
 ## Include HTTP metadata
 
-A metadata view caches `{ data, status, headers }`. The same helper traverses that envelope around the decoded atoms:
+A metadata view caches `{ data, status, headers }`. The helper can traverse the envelope and compare its decoded values.
 
 ```ts
 export const shareMetadataSnapshot = shareSnapshot;
 ```
 
-Configure that callback for the metadata view:
+Set the callback on the metadata view.
 
 ```ts
 const metadata = configureUtils(http.readings.read, {
@@ -80,12 +80,12 @@ const metadata = configureUtils(http.readings.read, {
 });
 ```
 
-Fetched metadata envelopes and raw header snapshots remain frozen after the callback runs. Decoded data stays application-owned. Initial, manual, hydrated, and selected values retain their existing ownership rules. Sharing does not replace the paired [hydration codecs](/effect-api-query/guides/hydrate-query-views/).
+Fetched metadata envelopes and raw headers stay frozen after the callback. Decoded data stays application-owned. Manual values, initial values, hydration, and selection keep their existing ownership. For transfer, use paired [hydration codecs](/effect-api-query/guides/hydrate-query-views/).
 
-The [compiled model and callbacks](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-structural-sharing.ts) and [factory usage](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-structural-sharing-use.ts) cover the full recipe.
+See the compiled [model and callbacks](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-structural-sharing.ts) and [factory setup](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-structural-sharing-use.ts).
 
 ## Measure the application workload
 
-Rich-value comparison adds validation, equivalence checks, and container traversal. Use it when retained references help consumers; it is not a general speed improvement. Measure both equivalent and changed results, including selection and rendering when those matter. For meaningful private or extra class state, supply an equivalence that compares that state as well as declared fields; Schema-derived equivalence alone cannot see it.
+Compare equivalent and changed results using your actual cache and rendering workload. Validation and traversal add work, so measure what retained references save. Include extra or private state in the equivalence if it affects the result.
 
-`vp run sharing-baseline` measures native cache writes after installing generated RPC options. It reports five samples of 50 writes for 10 and 1,000 readings, with equal, one-record-changed, and all-records-changed inputs, comparing native sharing, the original hand-written recipe, the helper, and disabled sharing. Inputs are freshly allocated outside each timed sample. The measurement excludes decoding, transport, rendering, and consumer savings, so it cannot establish end-to-end performance.
+`vp run sharing-baseline` compares native sharing, the helper, a manual recipe, and disabled sharing on cache writes. See [performance](/effect-api-query/reference/performance/) for the measurement setup. Measure decoding, transport, and rendering separately for end-to-end costs.

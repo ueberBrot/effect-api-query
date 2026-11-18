@@ -3,15 +3,15 @@ title: Hydrate Query Views
 description: Register typed view codecs and prepare native snapshots for JSON hydration and refetch.
 ---
 
-Register each cached representation with `queryViewCodec` or `infiniteQueryCodec`, then pass the registrations to `createHydrationRegistry`. Use native `dehydrate`, await registry encoding, and send the JSON snapshot. In the browser, await registry decoding before one native `hydrate` call. Keep decoded values in both Query Clients.
+Register each cache view with `queryViewCodec` or `infiniteQueryCodec`. Pass the registrations to `createHydrationRegistry`. On the server, dehydrate the cache and await encoding. In the browser, await decoding before one native `hydrate` call. Both caches hold decoded data.
 
-This task extends the [paired Profile codec](/effect-api-query/guides/hydrate-unary-data/). The server and browser own independent ready clients, runtimes, Scopes, and Query Clients. Use the same contract, input, key prefix, and Query Client hashing defaults on both sides.
+This example extends the [Profile codec](/effect-api-query/guides/hydrate-unary-data/). Give server and browser separate clients, runtimes, Scopes, and QueryClients. Use the same contract, input, prefix, and hashing defaults.
 
 ## Register generated leaves and views
 
-Import `queryViewCodec`, `infiniteQueryCodec`, and `createHydrationRegistry` from `@ueberbrot/effect-api-query`, and `Schema` from `effect`. Registration checks that the view exists and the codec's decoded type matches its cached data before `select`. The registry matches each generated leaf and view within your application's normal key prefix. Include the owner identity in that prefix when data depends on an owner.
+Import `queryViewCodec`, `infiniteQueryCodec`, and `createHydrationRegistry` from `@ueberbrot/effect-api-query`. Import `Schema` from `effect`. The codec's decoded type must match the data cached before `select`. Include safe owner identity in the prefix if it affects results.
 
-The [typed registration recipe](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/hydration-contract.ts) includes imports, contracts, and encoding/decoding service inference. Its `read` leaf returns `Profile`, and its `watch` leaf emits `Profile`, undefined, or null. Register ordinary and live data with codecs for their respective cached representations:
+The [typed example](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/hydration-contract.ts) includes the contract and imports. Its `read` leaf returns `Profile` and its `watch` leaf emits `Profile`, `undefined`, or `null`. Register each view's cached type.
 
 ```ts
 const viewRegistry = createHydrationRegistry([
@@ -20,11 +20,11 @@ const viewRegistry = createHydrationRegistry([
 ]);
 ```
 
-Live queries normalize an entirely undefined emission to `null`, so their codec includes `null`. One registration matches every input and stream policy for that leaf and view. Register ordinary and metadata views separately. If application prefixes overlap, the most specific registered prefix selects the codec. Duplicate registrations throw `HydrationCodecError` with code `DuplicateCodec`.
+The live codec includes `null` because live queries convert whole `undefined` emissions. A registration covers every input and stream policy for that leaf and view. Register ordinary and metadata views separately. If prefixes overlap, the most specific one wins. A duplicate registration throws `HydrationCodecError` with code `DuplicateCodec`.
 
 ## Prepare the native snapshot
 
-Create equivalent registrations from the server's and browser's independently owned utility trees. After prefetching finite queries, dehydrate only successful registered queries and prepare the complete batch. Import `Effect` from `effect`, and `dehydrate`, `defaultShouldDehydrateQuery`, `hydrate`, and the `QueryClient` and `DehydratedState` types from `@tanstack/query-core` as shown in the typed recipe:
+Create matching registrations from the server and browser trees. Prefetch finite queries, then dehydrate only successful registered entries. Import `Effect` from `effect`. Import `dehydrate`, `defaultShouldDehydrateQuery`, `hydrate`, `QueryClient`, and `DehydratedState` from `@tanstack/query-core`.
 
 ```ts
 const prepareRegisteredSnapshot = Effect.fnUntraced(function* (
@@ -41,9 +41,9 @@ const prepareRegisteredSnapshot = Effect.fnUntraced(function* (
 });
 ```
 
-Run this Effect through the application's runner and await the returned JSON before publishing it through your framework. The original cache keeps decoded classes, bigint values, byte arrays, and page parameters.
+Run the Effect and await the JSON before publishing it. The server cache keeps decoded classes, bigint values, bytes, and page parameters.
 
-On the browser, prepare the full batch before the native cache write:
+Decode the entire batch before writing to the browser cache.
 
 ```ts
 const hydrateRegisteredSnapshot = Effect.fnUntraced(function* (
@@ -56,21 +56,21 @@ const hydrateRegisteredSnapshot = Effect.fnUntraced(function* (
 });
 ```
 
-Await this Effect before querying or mounting observers. Both registry methods return Effects. Required encoding and decoding services stay separate in their types; provide each through the application's runtime. Providing decoding services cannot satisfy encoding requirements, or vice versa. Codec failure or an unknown query prevents the prepared batch from reaching `hydrate`; the destination cache stays untouched. Successful earlier codec work can still have application effects. The registry performs no rollback of those effects.
+Await decoding before mounting observers. The registry returns Effects with separate encoding and decoding service requirements. Supply both through your runtime. An unknown query or failed codec stops preparation before `hydrate`. Earlier codec side effects can still take place.
 
-Registry preparation accepts successful queries without pending promises. Unknown keys fail with `UnknownQuery`; unsuccessful or promise-bearing entries fail with `UnsettledQuery`. Select the queries to transfer with native dehydration options. The example omits mutations and failed-query errors and Causes. An omitted failed query remains available for a new browser fetch. Error hydration needs its own application-safe representation.
+Prepare successful queries without pending promises. `UnknownQuery` means no codec matched the key. `UnsettledQuery` means the entry failed, is still pending, or carries a promise. Use native dehydration filters to omit mutations and failed queries. The browser can refetch omitted reads. Define your own safe representation if you transfer errors.
 
-The registry validates query data and preserves the native snapshot envelope. Use the matching trusted server's envelope; validate arbitrary external snapshots separately. JSON transport, public-header selection, and resource disposal remain application decisions. Handle malformed JSON and preparation failures in the application's rendering or hydration error path. Keep Effects and Promises outside query data.
+Use envelopes from the matching trusted server. The registry checks query data and preserves the native snapshot envelope. Validate arbitrary external envelopes separately. Handle malformed JSON or preparation errors in your hydration path. Keep Effects and Promises out of query data.
 
 ### Capture open streams before encoding
 
-For an open HTTP or RPC stream, first await [fetchStreamSnapshot](/effect-api-query/guides/stream-snapshots/) with its exact generated stream options. It captures the first visible value and awaits local iterator cleanup. Keep exclusive ownership of that idle, unobserved key during capture. Prepare JSON after capture settles. Dispose the server's ready-client resources and runtime only after encoding finishes. Local cleanup does not acknowledge remote cancellation.
+For an open stream, await [fetchStreamSnapshot](/effect-api-query/guides/stream-snapshots/) with its exact options. Reserve the idle, unobserved key until capture and local cleanup finish. Encode after capture, then dispose of the server client and runtime. If you need remote acknowledgement, request it separately.
 
-Choose native freshness defaults to control duplicate reads. A successful fresh hydrated query can reuse its reconstructed data. Later invalidation and refetch use the browser's independent ready client and the same decoded representation. For streams, explicit cached capture acquires no new work. Fresh capture starts the browser stream again.
+Use freshness defaults to control refetches after hydration. The next fetch uses the browser client and returns the same decoded data shape. Cached stream capture can reuse existing successful data. Fresh capture starts a new stream attempt.
 
 ## Choose codecs for the complete view
 
-A success Schema describes one decoded result. Each cached representation needs its own codec:
+Write the codec for what the cache holds. A success Schema describes one decoded result.
 
 | View | Preserve |
 | --- | --- |
@@ -82,7 +82,7 @@ A success Schema describes one decoded result. Each cached representation needs 
 
 ### Infinite pages and page parameters
 
-The application chooses the page-parameter representation. For example, this `Cursor` encodes its offset as a decimal string and regains its prototype and methods during hydration:
+Choose how to encode page parameters. This `Cursor` stores its offset as a decimal string and reconstructs its methods on decode.
 
 ```ts
 export class Cursor extends Schema.Class<
@@ -97,7 +97,7 @@ export class Cursor extends Schema.Class<
 }
 ```
 
-Register both the page and page-parameter codecs, and include the registration in your registry:
+Register the codec for each page and its parameter.
 
 ```ts
 const pages = infiniteQueryCodec(rpc.read, {
@@ -106,13 +106,13 @@ const pages = infiniteQueryCodec(rpc.read, {
 });
 ```
 
-The page codec must match the leaf's query data. If your leaf returns a page containing rows and a next-page marker, use a codec for that whole page. `infiniteQueryCodec` encodes both the `pages` and `pageParams` arrays.
+Match the page codec to the leaf's query data. If a page includes rows and a next-page marker, preserve both. `infiniteQueryCodec` encodes the `pages` and `pageParams` arrays.
 
-Use a `Cursor` as `infiniteOptions.initialPageParam` and return the next Cursor from `getNextPageParam`. Let the deterministic `input` mapper convert its offset into your contract's request input. Use the same page-parameter type in the options and registration. A result Schema alone cannot choose this representation, and registration cannot infer it.
+Set a `Cursor` in `infiniteOptions.initialPageParam` and return the next one from `getNextPageParam`. Convert the offset to request input in the mapper. The options and codec must agree on the parameter type.
 
 ### Accumulated history and undefined elements
 
-Accumulated history preserves decoded `undefined` elements. Ordinary JSON turns an undefined array element into `null`, so encode it as a distinct tagged value. A real `null` remains `null`. Import `SchemaTransformation` from `effect` alongside `Schema`:
+To preserve `undefined` in an accumulated history, give it a tagged encoding. JSON turns undefined array elements into `null`, so encode them separately from real `null`. Import `SchemaTransformation` and `Schema` from `effect`.
 
 ```ts
 const UndefinedElement = Schema.Struct({
@@ -134,7 +134,7 @@ export const HistoryElement = Schema.Union([
 ]);
 ```
 
-Register the array representation with the accumulated view and include it in your registry:
+Register the history array for the accumulated view.
 
 ```ts
 queryViewCodec(rpc.watch, "streamed", Schema.Array(HistoryElement));
@@ -142,9 +142,9 @@ queryViewCodec(rpc.watch, "streamed", Schema.Array(HistoryElement));
 
 ### HTTP wrappers and metadata
 
-For an HTTP header wrapper, normalization applies to the whole emitted value. A wrapper whose `body` is undefined remains a wrapper with an undefined body. The [wrapper codec definitions](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-hydration-views.ts) include `WrappedElement`, which preserves that body with the same tagged encoding and reconstructs the wrapper with `HttpApiSchema.withHeaders`. `WithHeaders` is an HTTP declaration. At the JSON boundary, use explicit codecs for the body and headers so rich body values and decoded numeric headers regain their types.
+An HTTP header wrapper with an undefined body stays a wrapper. The [wrapper example](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-hydration-views.ts) uses `WrappedElement` and `HttpApiSchema.withHeaders`. Encode body and headers explicitly so decoded values, such as numeric headers, regain their types.
 
-The same module's `BufferedProfile` codec includes both declared HTTP successes. Adapt that union to your endpoint and its status declarations. Register it for the ordinary query view. For metadata, encode the decoded response wrapper and the metadata envelope together:
+The example's `BufferedProfile` codec covers both declared HTTP successes. Match that union to your endpoint's successes and statuses. For metadata, encode both the decoded data and the status and header envelope.
 
 ```ts
 const ProfileMetadata = Schema.Struct({
@@ -154,10 +154,10 @@ const ProfileMetadata = Schema.Struct({
 });
 ```
 
-Register `ProfileMetadata` separately for the leaf's `metadata` view. For HTTP streams, register an array of `WrappedElement` for accumulated history or `WrappedElement` for the live view.
+Register `ProfileMetadata` for the `metadata` view. For HTTP streams, use an array of `WrappedElement` for accumulated history or one `WrappedElement` for live data.
 
-`ProfileMetadata` preserves decoded data, numeric status, and raw string headers. Hydrated envelopes belong to the application and remain unfrozen. A later metadata fetch produces the library's frozen envelope and raw headers again. Decoded data stays mutable. Before sending metadata that contains private values, select public response headers. Data codecs do not sanitize headers or error Causes.
+`ProfileMetadata` preserves decoded data, numeric status, and raw string headers. The app owns hydrated envelopes. A later fetch produces a frozen envelope and raw headers. Transfer only public headers and keep private values out of error Causes you serialize.
 
 ## Use native callbacks for one synchronous view
 
-For a single service-free registration whose codec completes synchronously, `hydrationCallbacks(codec)` provides native `serializeData` and `deserializeData` callbacks. Restrict dehydration to `codec.matches(query.queryKey)` and successful queries. Native callbacks receive only data, so use a registry batch for multiple representations. Synchronous hydration callbacks can fail after earlier cache writes; use `decodeQueries` before `hydrate` when the complete batch must pass validation first.
+For one synchronous, service-free codec, use `hydrationCallbacks(codec)` for native `serializeData` and `deserializeData`. Dehydrate only successful entries that match `codec.matches(query.queryKey)`. Use a registry for multiple views. A synchronous callback can fail after earlier writes. If the whole batch must pass first, call `decodeQueries` before `hydrate`.

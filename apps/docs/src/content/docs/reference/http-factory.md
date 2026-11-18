@@ -3,11 +3,11 @@ title: HTTP Factory
 description: HTTP factory options, decoded request input, response data, and cache keys.
 ---
 
-`createHttpApiQueryUtils(api, options)` builds and freezes an HTTP utility tree from an Effect HttpApi and a ready HttpApiClient. The application manages the client's lifetime. The factory is exported from `@ueberbrot/effect-api-query`.
+Import `createHttpApiQueryUtils` from `@ueberbrot/effect-api-query`. Pass the HttpApi declaration and its acquired HttpApiClient to build a frozen tree. Your app owns the client's lifetime.
 
-The [HTTP Quick Start](/effect-api-query/getting-started/http-quick-start/) shows factory setup. [HTTP Builders](/effect-api-query/reference/http-builders/) defines each generated option and key.
+Follow the [HTTP quick start](/effect-api-query/getting-started/http-quick-start/) for setup. See [HTTP builders](/effect-api-query/reference/http-builders/) for each key and option.
 
-Ordinary groups project to `utils[groupIdentifier][endpointIdentifier]`. Top-level groups project endpoints to `utils[endpointIdentifier]`. Dots remain literal properties. Every retained branch and endpoint has `key()`.
+Access an ordinary endpoint with `utils[groupIdentifier][endpointIdentifier]`. For a top-level group, use `utils[endpointIdentifier]`. Keep dots in names. Call `key()` on any retained branch or endpoint.
 
 | Endpoint | Builders beside `key()` |
 | --- | --- |
@@ -15,7 +15,7 @@ Ordinary groups project to `utils[groupIdentifier][endpointIdentifier]`. Top-lev
 | Any buffered multipart payload alternative | `mutationKey`, `mutationOptions` |
 | Exactly one SSE or NDJSON success, no multipart | `streamedKey/Options`, `liveKey/Options` |
 
-Any multipart alternative makes a buffered endpoint mutation-only, even if the endpoint also accepts plain payloads. For query-enabled endpoints, the HTTP method does not determine the builder.
+A buffered multipart alternative makes an endpoint mutation-only even if it also takes plain input. Other buffered endpoints can build queries and mutations regardless of HTTP method.
 
 ## Factory options
 
@@ -26,26 +26,26 @@ Any multipart alternative makes a buffered endpoint mutation-only, even if the e
 | `runPromiseExit` | Required when exposed endpoints or the ready client need execution services. Service-free calls default to Effect's runner. |
 | `keyEncoders` | Synchronous encoders keyed first by declaration group identifier, then endpoint identifier, including top-level groups. |
 
-A key encoder receives the complete decoded HTTP request input and returns `JsonValue`. For endpoints with query support, an encoder is required for request encoding services, opaque encoding middleware, explicit redacted values, or multiple payload alternatives. Opaque middleware requires an encoder even when it is synchronous and service-free. TypeScript cannot always detect that requirement, so factory construction also validates it at runtime. For payload alternatives, the encoder must preserve every body and content-type distinction that affects the result.
+An encoder receives the full decoded request and returns `JsonValue`. For a query-capable endpoint, supply one for encoding services, opaque middleware, redacted values, or multiple payload alternatives. Runtime validation catches opaque middleware that TypeScript misses, including synchronous middleware. Preserve every body and content-type difference that affects responses.
 
-An encoder does not provide execution services. The runner remains independently required. Multipart mutation-only endpoints require no encoder and reject configured encoder entries.
+Supply execution services through the runner. Leave buffered multipart endpoints out of the encoder map because they only support mutations.
 
 ## Request and result contract
 
-HTTP input contains the endpoint's declared `params`, `query`, `headers`, and `payload` parts in the ready client's request types. Params, query, headers, and ordinary payloads use decoded values. Multipart payloads use `FormData`. Mixed plain and buffered multipart alternatives preserve the upstream client request union. The caller explicitly builds multipart fields and files. The adapter forwards the supplied `FormData` to the ready client. HTTP builders do not apply RPC constructor defaults.
+Supply the declared decoded `params`, `query`, `headers`, and `payload`. If the payload is multipart, build `FormData` and pass it to the mutation. Mixed buffered alternatives keep the client's request union. Pass any HTTP defaults explicitly.
 
-Inputless queries need no input argument. Mutations receive the same complete request shape as their variables.
+Call an inputless query without input. Pass the full request as mutation variables.
 
-Each declared container stays required even if all its fields are optional. A declared optional query filter still needs `input: { query: {} }`. A `Schema.FiniteFromString` field accepts a number that the ready client encodes as a string. Query input, mutation variables, and encoder input exclude raw response controls.
+Supply every declared request object, even if its fields are optional. For no query filters, pass `input: { query: {} }`. A `Schema.FiniteFromString` field takes a decoded number. The client encodes it as a string. Keep response controls out of requests and encoder inputs.
 
-Query options retain the decoded request for execution. Captured values must stay unchanged. See [Data Normalization](/effect-api-query/concepts/data-normalization/#keep-captured-inputs-unchanged) for the distinction between immutable keys and caller-owned input.
+Keep retained request values unchanged. See [input ownership](/effect-api-query/concepts/data-normalization/#keep-captured-inputs-unchanged).
 
-Ordinary queries and mutations use decoded-only responses. Queries cache a successful `undefined` as `null`. Mutations retain `undefined`. Buffered text stays a string, and binary data stays a `Uint8Array`. Declared response-header wrappers retain their decoded body and headers. Applications own serialization for binary and other domain values. The package supplies no automatic SSR serializer.
+Ordinary queries and mutations return decoded data. A query caches `null` for successful `undefined`, while a mutation keeps `undefined`. Text stays a string and binary data stays a `Uint8Array`. Declared wrappers preserve decoded bodies and headers. Supply an app serializer for rich SSR values.
 
-The wrapped Cause's type retains declared endpoint errors, server and client middleware errors, Schema errors, HTTP client errors, and additional ready-client errors.
+The Effect Cause retains declared endpoint, middleware, Schema, transport, and additional ready-client errors.
 
-Required services include those needed by request encoders, success and error decoders, and the ready client for exposed endpoints. Compatible custom clients retain the errors and remaining services from their decoded-only and decoded-and-response call signatures. Response-only overloads contribute neither errors nor service requirements. See [client lifecycle](/effect-api-query/concepts/client-lifecycle/#http-clients-and-execution-services) and [cancellation](/effect-api-query/guides/cancellation/#cancel-an-http-query) for runtime ownership.
+Supply services used by endpoint request encoders, decoders, and the ready client. Compatible custom clients preserve remaining services and errors from decoded-only and decoded-and-response modes. Response-only modes do not contribute. See [execution services](/effect-api-query/concepts/client-lifecycle/#http-clients-and-execution-services) and [HTTP cancellation](/effect-api-query/guides/cancellation/#cancel-an-http-query).
 
-A single SSE or NDJSON success, including `WithHeaders(StreamSse(...), ...)` and `WithHeaders(StreamNdjson(...), ...)`, supports accumulated and live queries. Effect decodes the stream; each query view caches its decoded emissions. The factory omits endpoints with raw byte response streams, HTTP upgrades, or mixed buffered and streamed success alternatives. It also omits any endpoint with a streaming request payload alternative, including byte, NDJSON, and multipart streams, and streamed-success endpoints with buffered multipart payload alternatives. On buffered endpoints, multipart alternatives retain mutation builders. Groups with only omitted endpoints disappear.
+An endpoint with a single SSE or NDJSON success supports accumulated and live views, including a declared `WithHeaders` wrapper. Effect decodes emissions. The factory skips raw byte response streams, upgrades, mixed buffered and streamed successes, and any streaming request payload. It also skips streamed successes with buffered multipart input. Groups with no supported endpoints disappear.
 
-Factory construction rejects unsafe names, path collisions, and contradictory multipart metadata before it returns a tree. Literal declaration types let the inferred tree omit the same endpoints.
+The factory rejects unsafe names, collisions, and conflicting multipart metadata. Keep literal declaration types so TypeScript can infer supported paths.

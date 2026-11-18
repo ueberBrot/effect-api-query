@@ -3,20 +3,20 @@ title: Installation
 description: Install effect-api-query and its peer dependencies.
 ---
 
-Install the package and TanStack Query Core:
+Install the package and TanStack Query Core.
 
 ```sh
 pnpm add @ueberbrot/effect-api-query @tanstack/query-core
 ```
 
-With pnpm's default peer installation enabled, this command also installs Effect within the package's peer range, `>=4.0.6 <4.2.0`. If your application already pins Effect or disables automatic peer installation, choose a release within that range and keep its Effect testing and platform packages coordinated. Resolve peer mismatches before continuing. The [package manifest](https://github.com/ueberBrot/effect-api-query/blob/main/package.json) defines consumer requirements. The [workspace catalog](https://github.com/ueberBrot/effect-api-query/blob/main/pnpm-workspace.yaml) separately pins development dependencies.
+The package supports Effect `>=4.0.6 <4.2.0` and Query Core `>=5.104.4 <6`. With automatic peer installation enabled, pnpm installs a compatible Effect version. If your app pins Effect, keep its runtime, testing, and platform packages on matching versions in that range.
 
-For React, install `@tanstack/react-query` with a version that matches your Query Core version:
+Use ESM, an environment that supports ES2022, and TypeScript with `strict: true`. See [compatibility and limits](/effect-api-query/reference/compatibility-and-limits/#requirements-and-tested-integrations) for compiler and framework versions.
+
+If you use React, install React Query. Keep the app and wrapper on the same resolved Query Core version.
 
 ```sh
 pnpm add @tanstack/react-query
 ```
 
-Enable strict TypeScript checking and use ESM with ES2022 support. See the [compatibility reference](/effect-api-query/reference/compatibility-and-limits/) for compiler and framework versions.
-
-Continue with the [HTTP API quick start](/effect-api-query/getting-started/http-quick-start/) or [RPC quick start](/effect-api-query/getting-started/quick-start/).
+Follow the [HTTP quick start](/effect-api-query/getting-started/http-quick-start/) or the [RPC quick start](/effect-api-query/getting-started/quick-start/).

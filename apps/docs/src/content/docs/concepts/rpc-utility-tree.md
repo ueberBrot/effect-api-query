@@ -3,7 +3,7 @@ title: RPC Utility Tree
 description: Understand how RPC tags become nested query utilities.
 ---
 
-`createRpcQueryUtils` builds and freezes the complete RPC utility tree when called. Dots in unary and streaming RPC tags define nested paths:
+`createRpcQueryUtils` builds a frozen object with methods for each RPC. Dots in tags become nested properties.
 
 | RPC tag                    | Generated path                            |
 | -------------------------- | ----------------------------------------- |
@@ -11,6 +11,6 @@ description: Understand how RPC tags become nested query utilities.
 | `projects.by-id.find`      | `rpcQuery.projects['by-id'].find`         |
 | `billing-history.list all` | `rpcQuery['billing-history']['list all']` |
 
-Each branch has `key()`. Unary leaves add ordinary query, infinite-query, and mutation builders. Streaming leaves add builders for accumulated streamed queries and live queries. The factory builds the tree once. It rejects invalid tags, collisions, and invalid encoder configuration during construction.
+Each branch has `key()`. Unary RPCs add query, infinite query, and mutation builders. Streaming RPCs add accumulated and live query builders. The factory rejects invalid tags, collisions, and invalid key encoders.
 
-Reserved builder names cannot occupy paths that collide with generated members. [Generated Builders](/effect-api-query/reference/generated-builders/) describes the leaf interface.
+Choose tags that leave room for method names such as `key` and `queryOptions`. See [RPC builders](/effect-api-query/reference/generated-builders/) for the full list.

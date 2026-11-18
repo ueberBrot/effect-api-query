@@ -3,21 +3,17 @@ title: React Query
 description: Acquire a ready client and use generated options with native React Query hooks.
 ---
 
-Pass generated options to React Query's native hooks. Build the utility tree once for its ready client and cache owner. When component input changes, rebuild the options. Builders capture plain input for each execution.
+Pass the generated options to React Query hooks. Create the utilities once for the Effect client and QueryClient. Build options in the component so they pick up new input on render.
 
-See [Requirements and tested integrations](/effect-api-query/reference/compatibility-and-limits/#requirements-and-tested-integrations) for React Query's framework requirements and this guide's checked versions.
+See [compatibility](/effect-api-query/reference/compatibility-and-limits/#requirements-and-tested-integrations) for React requirements and tested versions.
 
 ## Acquire and mount the client
 
-Put the shared contract, client lifetime, and React UI in separate modules. Mount the application once from the entry point.
-
-This read-only example requires React, React DOM, `@tanstack/react-query`, Effect, and `effect-api-query`. The server must implement the shared contract below: `GET /users/:id` returns `{ id: number, name: string }`.
+Install React, React DOM, `@tanstack/react-query`, Effect, and `effect-api-query`. This example needs a server that implements the contract below. `GET /users/:id` returns an object with `id` and `name`.
 
 ### Shared contract
 
-Place `usersApi` in `http-contract.ts`. Both the server and client import this module.
-
-Shared contract in `http-contract.ts`:
+Save `usersApi` in `http-contract.ts` and import it on the server and client.
 
 ```ts
 import { Schema } from "effect";
@@ -35,9 +31,7 @@ export const usersApi = HttpApi.make("users-api").add(
 
 ### Client lifetime
 
-In `client.ts`, `startUsersApplication` acquires the ready HTTP API client. It keeps one runtime and QueryClient alive until `dispose` runs. Export the application type for the UI module.
-
-Client integration in `client.ts`:
+Save the client setup in `client.ts`. `startUsersApplication` acquires the HTTP client and keeps the runtime and QueryClient open until `dispose` runs.
 
 ```ts
 import {
@@ -91,13 +85,11 @@ export type UsersApplication = Awaited<
 >;
 ```
 
-`acquireQueryOwner` is optional. It owns an independent native QueryClient and only the resources registered with `setup.acquire`. Use `setup.borrow(client)` for existing application resources; the helper never disposes them. Acquisition finishes before mounting. A failed acquisition releases previously registered resources in reverse order. Wrap every utility runner and track each query function with the existing `configureUtils` interceptor so disposal can abort queries and await their local Effect finalizers before releasing the runtime. See [owner retirement](/effect-api-query/guides/switch-cache-owners/#opt-in-owner-helper) for mutation acceptance, callback guards, and failure semantics.
+This example uses the optional `acquireQueryOwner` helper. Register resources it must close with `setup.acquire`. Use `setup.borrow(client)` for resources your app closes itself. If acquisition fails, the helper releases previously acquired resources in reverse order. Track runners and query functions so disposal can await local finalizers. See [owner retirement](/effect-api-query/guides/switch-cache-owners/#opt-in-owner-helper) before adding writes.
 
 ### Component and provider
 
-In `users-app.tsx`, import the client setup and its application type. The component receives the ready utility tree through props. `QueryClientProvider` exposes the matching cache to React Query.
-
-React UI in `users-app.tsx`:
+In `users-app.tsx`, pass the ready utilities to the component. Give `QueryClientProvider` the QueryClient picked by the same setup.
 
 ```tsx
 import { QueryClientProvider, useQuery } from "@tanstack/react-query";
@@ -139,9 +131,7 @@ export const mountUsersApplication = async (
 
 ### Application entry point
 
-In `main.tsx`, mount into the root element supplied by your HTML page. Replace the base URL with your server's URL.
-
-Application entry point in `main.tsx`:
+In `main.tsx`, mount the app in the root element from your HTML. Set the base URL to your server.
 
 ```ts
 import { mountUsersApplication } from "./users-app.tsx";
@@ -157,13 +147,13 @@ export const stopUsers = await mountUsersApplication(
 );
 ```
 
-When tearing down the application, the host calls and awaits `stopUsers()`. That function unmounts React, cancels outstanding reads, awaits their local finalizers, clears the cache, and disposes the runtime. A browser's unload event cannot guarantee that asynchronous cleanup finishes.
+On teardown, call and await `stopUsers()`. It unmounts React, cancels reads, waits for local finalizers, clears the cache, and disposes of the runtime. A page unload can end before asynchronous cleanup finishes.
 
-This example has one buffered read. Before adding open streams or concurrent writes, use [Client Lifecycle](/effect-api-query/concepts/client-lifecycle/) to await their cleanup and settlement. For RPC, replace client acquisition with the Scope and protocol in [RPC Quick Start](/effect-api-query/getting-started/quick-start/) and pass the resulting RPC utility tree to the component. The provider and React hooks stay the same.
+See [client lifecycle](/effect-api-query/concepts/client-lifecycle/) before adding open streams or concurrent writes. For RPC, use the [RPC quick start](/effect-api-query/getting-started/quick-start/) to acquire the client and pass its utilities to the same pattern.
 
 ## Choose the native hook
 
-The provider and component above use a buffered HTTP query. RPC uses the same hooks with its [constructor input](/effect-api-query/concepts/data-normalization/#query-stable-rpc-payloads). HTTP takes [decoded request input](/effect-api-query/concepts/data-normalization/#decoded-http-inputs).
+Use these hooks with either adapter. RPC takes [payload constructor input](/effect-api-query/concepts/data-normalization/#query-stable-rpc-payloads). HTTP takes [decoded request input](/effect-api-query/concepts/data-normalization/#decoded-http-inputs).
 
 | Native consumer | Generated options | Cached representation |
 | --- | --- | --- |
@@ -172,22 +162,22 @@ The provider and component above use a buffered HTTP query. RPC uses the same ho
 | `useQuery` | `streamedOptions`, `liveOptions` | Retained history, or the latest emitted value |
 | `useMutation` | `mutationOptions` | Mutation result, with variables supplied when `mutate` runs |
 
-Pass `select`, `staleTime`, retry policy, and other native options through the builder. `select` changes observer data while the cache retains the generated view's query data. Configure hashing on QueryClient before cache use. The package owns the generated key and function. See [RPC Builders](/effect-api-query/reference/generated-builders/) and [HTTP Builders](/effect-api-query/reference/http-builders/) for each view's exact contract.
+Pass native options such as `select`, `staleTime`, and `retry` through the builder. `select` changes what the hook returns while the cache keeps the full query value. Set hashing on QueryClient. See [RPC builders](/effect-api-query/reference/generated-builders/) and [HTTP builders](/effect-api-query/reference/http-builders/) for keys and functions.
 
 ## Share policy and refresh affected reads
 
-Use [Defaults and Policies](/effect-api-query/guides/query-defaults/) to bind an endpoint-aware policy once, then reuse it in components, imperative queries, or route loaders. A call-site projection or callback keeps its native inference.
+To reuse endpoint-aware defaults across components and loaders, set [shared policies](/effect-api-query/guides/query-defaults/). Local projections and callbacks retain native inference.
 
-For writes, pass generated mutation options to `useMutation`. Supply variables through `mutate`. Choose which generated keys the write affects. Writes do not invalidate reads automatically. Use [Cache Keys and Filters](/effect-api-query/guides/cache-filters/) for broad or exact invalidation and [Optimistic Updates](/effect-api-query/guides/optimistic-writes/) for response seeding, rollback, and overlapping writes.
+Pass generated options to `useMutation` and supply variables through `mutate`. Choose which reads to mark stale with [cache keys and filters](/effect-api-query/guides/cache-filters/). See [optimistic updates](/effect-api-query/guides/optimistic-writes/) to seed a result or roll back a local change.
 
 ## Streams and Suspense
 
-Ordinary hooks can show stream data while fetching continues. Choose [history retention](/effect-api-query/guides/choose-stream-history/) for accumulated views and keep clients alive until local iterator finalizers finish.
+Ordinary hooks show stream data while fetching continues. Set [history retention](/effect-api-query/guides/choose-stream-history/) and wait for local stream finalizers before releasing clients.
 
-TanStack documents that cancellation does not work with its Suspense hooks. Use ordinary query hooks when cancelling reads or stopping open stream work is part of the screen's lifecycle. For buffered reads with Suspense, use [Suspense and Error Recovery](/effect-api-query/guides/suspense-and-recovery/) for reset and retry, cached-data refetch failures, and independent loading with `useSuspenseQueries`.
+Use ordinary hooks when the screen needs cancellation. For buffered reads with Suspense, see [reset boundaries, handle failed refetches, and start reads together](/effect-api-query/guides/suspense-and-recovery/).
 
-For router loaders and server rendering, continue with [Router and Start](/effect-api-query/guides/tanstack-start/). The [Vite React example](/effect-api-query/examples/#run-vite-react) is a complete application with reads, writes, streams, private cache owners, and resource disposal.
+For loaders and server rendering, see [Router and Start](/effect-api-query/guides/tanstack-start/). To try a complete client app, [run the Vite React example](/effect-api-query/examples/#run-vite-react).
 
 ## Handle failures and retries
 
-Use [tagged failure handling and full Cause inspection](/effect-api-query/guides/handle-failures/) for declared errors, defects and interruption. Choose [one layer to own retries](/effect-api-query/guides/retry-queries/) rather than multiplying Effect and Query retry loops. For initial rendering failures, follow [native Suspense recovery](/effect-api-query/guides/suspense-and-recovery/); reset both the error boundary and Query error state. These patterns also apply without the lifecycle helper.
+Inspect declared failures, defects, and interruption in the [Effect Cause](/effect-api-query/guides/handle-failures/). Choose [one retry layer](/effect-api-query/guides/retry-queries/) to keep attempt counts predictable.
