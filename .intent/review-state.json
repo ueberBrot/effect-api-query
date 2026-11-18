@@ -784,15 +784,15 @@
       ]
     },
     "source:e2e/browser-test-config.ts": {
-      "fingerprint": "ebf3147c51a190121960ebba39a4e74fc653a1052405207b133cea661980cbe3",
+      "fingerprint": "92000b46743971d044340fdb73cab0264c7fd85990bdaa741d89ce90f988bf04",
       "snapshot": {
-        "e2e/browser-test-config.ts": "a8034aa538137402ad484bf85e41852d81cf11a28d0ccae8b552aca9c18032b3"
+        "e2e/browser-test-config.ts": "253d695024b09913398d3bb837421da2782a4ba33e33a60aa6438991f6fd1a45"
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "head": "4eda2b2e9ab93c83d4a324e696ddd22887683e2b",
       "outcome": "no-change",
-      "reason": "Preset formatting and repository test setup preserve the existing browser scenarios and native library usage. No new integration task or recommendation is introduced.",
+      "reason": "The browser suites now fail on the first failed attempt. This CI test policy does not alter the library's retry behavior or shipped guidance.",
       "evidence": [
-        "e2e/browser-test-config.ts diff reviewed; final compiler checks and app builds pass. Earlier Chromium/Firefox application/docs checks passed; latest docs Chromium run passes 7 cases. WebKit is blocked at launch by missing host libraries."
+        "Loaded the shared Playwright config with CI=true and checked that retries resolves to zero. Both browser configs use these defaults."
       ]
     },
     "source:e2e/packed-hosts.spec.ts": {
@@ -851,15 +851,15 @@
       ]
     },
     "source:.github/workflows/ci.yml": {
-      "fingerprint": "a3665ea4cdb9d3e59a268c8d60746a51f18c25ad69666c5fa2cf292996037aab",
+      "fingerprint": "ac0c86382a465f4dabe87c77a6f7f85e3ac0e7b03bb370d3fa6a22d9aabbc16a",
       "snapshot": {
-        ".github/workflows/ci.yml": "6adba2a6334175d7c7cb9df0aa5e97ea05e217b5f6933674aaf522527e5d9028"
+        ".github/workflows/ci.yml": "23df1cd3b9fc9031946524994a87f86aa3dd67444e9b75da411e2091753705c7"
       },
-      "head": "12605b905cef953bbb73b3643928aae5f19dc4f4",
+      "head": "4eda2b2e9ab93c83d4a324e696ddd22887683e2b",
       "outcome": "no-change",
-      "reason": "The workflow runs the existing checks in parallel and preserves required check names. Both the Playwright tag and the running image version are verified against the package pin.",
+      "reason": "CI defaults to the measured fresh setup mode and retains cache restore as a manual comparison option. The job and test coverage stays the same.",
       "evidence": [
-        "actionlint passed, Microsoft Artifact Registry reported the configured digest, and the Playwright shard lists covered 28 plus 22 acceptance cases and four documentation cases per browser."
+        "Compared the follow-up with the previously verified 4eda2b2 workflow. actionlint and targeted yamllint passed."
       ]
     },
     "source:tests/packed-consumer/construction-baseline.mts": {
@@ -1785,15 +1785,16 @@
       ]
     },
     "source:.github/actions/setup-repository/action.yml": {
-      "fingerprint": "61ecd08ad76116464ef1ee16f1270c5fd83af33545fed8782e6d5e52b0b0b7d7",
+      "fingerprint": "b19520633ce1cd755a26ab834edc109893a50a3e35d40acf3baf4d51b9295664",
       "snapshot": {
-        ".github/actions/setup-repository/action.yml": "3e0c32715811bc4e0125a271546300ec743d76d05f643a2b65b3c42a73603104"
+        ".github/actions/setup-repository/action.yml": "586c7bda978a085357d9b1ecc5bdd3fccf8b0ce9d8beeeb85506650910f83536"
       },
-      "head": "12605b905cef953bbb73b3643928aae5f19dc4f4",
+      "head": "4eda2b2e9ab93c83d4a324e696ddd22887683e2b",
       "outcome": "no-change",
-      "reason": "The optional cache comparison toggles the setup action's cache with the pinned toolchain and frozen install retained.",
+      "reason": "Fresh frozen installs are the default for repository setup. Explicit cache restore remains available, and the package-manager pin and frozen lockfile checks still apply.",
       "evidence": [
-        "Inspected the composite action and its existing call sites. Targeted yamllint passed."
+        "GitHub Actions runs 44290463086 and 44290465748 on 4eda2b2 show median setup of 29 seconds cached and 20 seconds fresh across 11 matching jobs, with both workflows passing.",
+        "Targeted yamllint and medium-or-higher zizmor checks passed."
       ]
     },
     "source:.github/workflows/deploy-docs.yml": {

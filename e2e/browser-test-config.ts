@@ -20,7 +20,7 @@ export const browserTestDefaults = defineConfig({
     { name: "webkit", use: { ...devices["Desktop Safari"] } },
   ],
   reporter: ci === undefined ? "line" : [["github"], ["line"]],
-  retries: ci === undefined ? 0 : 1,
+  retries: 0,
   timeout: 30_000,
   use: {
     screenshot: "only-on-failure",

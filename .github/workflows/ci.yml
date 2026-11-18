@@ -10,10 +10,10 @@ on:
       dependency-cache:
         description: Package cache mode for comparing setup times
         type: choice
-        default: restore
+        default: fresh
         options:
-          - restore
           - fresh
+          - restore
 
 permissions:
   contents: read
@@ -41,7 +41,7 @@ jobs:
         name: Set up repository
         uses: ./.github/actions/setup-repository
         with:
-          dependency-cache: ${{ inputs.dependency-cache || 'restore' }}
+          dependency-cache: ${{ inputs.dependency-cache || 'fresh' }}
 
       - name: Verify formatting
         run: vp run format

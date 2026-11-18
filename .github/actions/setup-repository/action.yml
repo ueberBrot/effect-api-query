@@ -4,7 +4,7 @@ description: Install the pinned package manager, Vite+, and workspace dependenci
 inputs:
   dependency-cache:
     description: Restore the package cache or start with a fresh install.
-    default: restore
+    default: fresh
 
 runs:
   using: composite
@@ -16,6 +16,6 @@ runs:
       uses: voidzero-dev/setup-vp@1b32467adbe183473499fd9d5d372c3ed9641754 # v1.18.0
       with:
         node-version-file: .node-version
-        cache: ${{ inputs.dependency-cache != 'fresh' }}
+        cache: ${{ inputs.dependency-cache == 'restore' }}
         run-install: |
           args: ['--frozen-lockfile']
