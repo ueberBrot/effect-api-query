@@ -372,7 +372,11 @@ describe("documentation workflow boundaries", () => {
     new URL("../.github/workflows/deploy-docs.yml", import.meta.url),
     "utf-8"
   );
-  const [, deployment] = releaseWorkflow.split("\n  deploy-docs:\n");
+  const [releaseJobs, deployment] = releaseWorkflow.split("\n  deploy-docs:\n");
+  const [beforePublishing, publishing] = (releaseJobs ?? "").split(
+    "\n  publish:\n"
+  );
+  const [, packing] = (beforePublishing ?? "").split("\n  quality-and-pack:\n");
   const [, buildAndDeploy] = deploymentWorkflow.split("\n  build:\n");
   const [build, deploy] = (buildAndDeploy ?? "").split("\n  deploy:\n");
 
@@ -394,6 +398,13 @@ describe("documentation workflow boundaries", () => {
       /name: Publish release artifact to npm\n\s+id: publish/u
     );
     expect(releaseWorkflow).toContain("vars.NPM_PUBLISH_ENABLED == 'true'");
+  });
+
+  it("starts packing from the release plan and requires validation before publishing", () => {
+    expect(packing).toMatch(/^\s+needs: select-mode$/mu);
+    expect(publishing).toMatch(
+      /needs:\n\s+- select-mode\n\s+- quality-and-pack\n\s+- validation/u
+    );
   });
 
   it("restores automatic docs only from this run", () => {

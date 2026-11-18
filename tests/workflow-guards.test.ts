@@ -15,6 +15,7 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
+import manifest from "../package.json" with { type: "json" };
 import { currentCompiler } from "../scripts/compiler.mts";
 
 const script = path.resolve(
@@ -84,6 +85,18 @@ const push = (cwd: string, base: string, state?: string, deletion = false) =>
   );
 
 describe("repository workflow guards", () => {
+  it("pins the Playwright image to the package version and a digest", () => {
+    const workflow = readFileSync(
+      new URL("../.github/workflows/ci.yml", import.meta.url),
+      "utf-8"
+    );
+    const image =
+      /^\s+image: mcr\.microsoft\.com\/playwright:v(?<version>[^\s-]+)-noble@sha256:[\da-f]{64}$/mu.exec(
+        workflow
+      )?.groups?.["version"];
+    expect(image).toBe(manifest.devDependencies["@playwright/test"]);
+  });
+
   it.each([
     "_artifacts/review.md",
     ".artifacts/output.json",

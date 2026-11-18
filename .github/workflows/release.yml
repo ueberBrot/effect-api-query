@@ -81,9 +81,7 @@ jobs:
   quality-and-pack:
     name: Validate and pack release artifact
     if: needs.select-mode.outputs.mode == 'publish'
-    needs:
-      - select-mode
-      - validation
+    needs: select-mode
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -111,6 +109,7 @@ jobs:
     needs:
       - select-mode
       - quality-and-pack
+      - validation
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: npm

@@ -6,6 +6,14 @@ on:
     - cron: "17 4 1 * *"
   workflow_call:
   workflow_dispatch:
+    inputs:
+      dependency-cache:
+        description: Package cache mode for comparing setup times
+        type: choice
+        default: restore
+        options:
+          - restore
+          - fresh
 
 permissions:
   contents: read
@@ -16,8 +24,8 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  source-quality:
-    name: Source quality
+  source-checks:
+    name: Source checks
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -32,6 +40,8 @@ jobs:
       - &setup_repository
         name: Set up repository
         uses: ./.github/actions/setup-repository
+        with:
+          dependency-cache: ${{ inputs.dependency-cache || 'restore' }}
 
       - name: Verify formatting
         run: vp run format
@@ -50,9 +60,6 @@ jobs:
       - name: Check native framework consumers
         run: vp run framework-types
 
-      - name: Check packed Effect and Query Core compatibility matrix
-        run: vp run effect-compatibility
-
       - name: Run Effect diagnostics
         run: vp run effect-check
 
@@ -62,9 +69,40 @@ jobs:
       - name: Run Vitest
         run: vp run test
 
+  packed-compatibility:
+    name: Packed compatibility (${{ matrix.shard }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ["1/2", "2/2"]
+
+    steps:
+      - *checkout
+      - *setup_repository
+
+      - name: Check packed Effect and Query Core consumers
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: vp run effect-compatibility --shard="$SHARD"
+
+  source-quality:
+    name: Source quality
+    needs: [source-checks, packed-compatibility]
+    if: ${{ !cancelled() }}
+    permissions: {}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require all source checks
+        env:
+          SOURCE_RESULT: ${{ needs.source-checks.result }}
+          COMPATIBILITY_RESULT: ${{ needs.packed-compatibility.result }}
+        run: test "$SOURCE_RESULT" = success && test "$COMPATIBILITY_RESULT" = success
+
   example-builds:
     name: Example builds
-    needs: source-quality
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -92,7 +130,6 @@ jobs:
 
   documentation:
     name: Documentation
-    needs: source-quality
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -115,8 +152,8 @@ jobs:
           include-hidden-files: true
           retention-days: 7
 
-  browser:
-    name: Playwright (${{ matrix.browser }})
+  browser-shards:
+    name: Playwright (${{ matrix.browser }}, ${{ matrix.shard }})
     needs:
       - example-builds
       - documentation
@@ -130,18 +167,29 @@ jobs:
         shell: bash
 
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         browser:
           - chromium
           - firefox
           - webkit
+        shard: ["1/2", "2/2"]
 
     steps:
       - *checkout
 
       - name: Set container home ownership
         run: chown "$(id -u):$(id -g)" "$HOME"
+
+      - name: Verify Playwright image version
+        run: |
+          node <<'NODE'
+          const assert = require("node:assert/strict");
+          const { readFileSync } = require("node:fs");
+          const { driverVersion } = JSON.parse(readFileSync("/ms-playwright/.docker-info", "utf8"));
+          const expected = require("./package.json").devDependencies["@playwright/test"];
+          assert.equal(driverVersion, expected, "Update the Playwright image tag and digest with @playwright/test.");
+          NODE
 
       - *setup_repository
 
@@ -151,22 +199,47 @@ jobs:
           name: application-builds
 
       - name: Restore documentation build
+        if: matrix.shard == '2/2'
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: documentation-build
           path: apps/docs/dist
 
       - name: Check documentation in ${{ matrix.browser }}
-        run: vp run --ignore-depends-on docs-e2e --project=${{ matrix.browser }}
+        if: matrix.shard == '2/2'
+        env:
+          BROWSER: ${{ matrix.browser }}
+        run: vp run --ignore-depends-on docs-e2e --project="$BROWSER"
 
       - name: Run ${{ matrix.browser }} acceptance tests
-        run: vp run --ignore-depends-on e2e:${{ matrix.browser }}
+        env:
+          BROWSER: ${{ matrix.browser }}
+          SHARD: ${{ matrix.shard }}
+        run: vp run --ignore-depends-on "e2e:$BROWSER" --shard="$SHARD"
 
       - name: Preserve Playwright failure diagnostics
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: playwright-${{ matrix.browser }}-${{ github.sha }}
+          name: playwright-${{ matrix.browser }}-${{ strategy.job-index }}-${{ github.run_attempt }}
           path: test-results
           if-no-files-found: ignore
           retention-days: 7
+
+  browser:
+    name: Playwright (${{ matrix.browser }})
+    needs: browser-shards
+    if: ${{ !cancelled() }}
+    permissions: {}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+
+    steps:
+      - name: Require all Playwright shards
+        env:
+          SHARDS_RESULT: ${{ needs.browser-shards.result }}
+        run: test "$SHARDS_RESULT" = success
