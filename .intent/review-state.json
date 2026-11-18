@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "cd88475f4c232b7de67e8265fdf374e4b04a4d99fc026ac2cdbdcfc20573b01c",
+      "fingerprint": "e352622154e826c22c1fe0b7ba543b657457b9c9a3e0833c46cef74f98dcca54",
       "snapshot": {
         "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
         "README.md": "87db3a47ce666b408001c89b81b2133393eb2074c63ba1ac1786be8e20b96dfd",
@@ -368,18 +368,18 @@
         "tests/types/utility-configuration-contract.ts": "b8c5db14d17c2fd549f70c6fbad8d21234ca5859f0c69e53b0b8504ef8cb5b17",
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6",
-        "tests/workflow-guards.test.ts": "12553ae84b800071725c5754fc5f510c9baecb3f37c60ab88b036fd325420420"
+        "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca"
       },
-      "head": "12605b905cef953bbb73b3643928aae5f19dc4f4",
+      "head": "d997fa5ee2742d679a26e79322f1004bb60746a5",
       "outcome": "no-change",
-      "reason": "The packed compatibility runner partitions the same Effect and Query Core combinations and keeps both compilers and all existing fixtures. The other changes check the CI image and publication gate. The shipped guidance on peer selection, type checking, and released documentation still applies.",
+      "reason": "The workflow guard checks how the repository schedules browser validation and preserves the existing package and image version check. The library API, supported integrations and consumer guidance are unchanged.",
       "evidence": [
-        "Compared scripts/check-effect-compatibility.mts and the workflow guards with 741e2a9. The unsharded task still selects every case.",
-        "The two workflow and release test files passed, and vp run typecheck passed."
+        "Compared tests/workflow-guards.test.ts with d997fa5 and inspected the shared Playwright workflow.",
+        "All 93 focused workflow and release tests passed."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "aa7c9b685db34c0c36794a76daa3db00c76f106ca67380d53e0ef8687705f54a",
+      "fingerprint": "84c800c2298ce137449cef81cb47dfd8de3892f21a7d0260808f8ca845a55da5",
       "snapshot": {
         "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
         "README.md": "87db3a47ce666b408001c89b81b2133393eb2074c63ba1ac1786be8e20b96dfd",
@@ -747,14 +747,14 @@
         "tests/types/utility-configuration-contract.ts": "b8c5db14d17c2fd549f70c6fbad8d21234ca5859f0c69e53b0b8504ef8cb5b17",
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6",
-        "tests/workflow-guards.test.ts": "12553ae84b800071725c5754fc5f510c9baecb3f37c60ab88b036fd325420420"
+        "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca"
       },
-      "head": "12605b905cef953bbb73b3643928aae5f19dc4f4",
+      "head": "d997fa5ee2742d679a26e79322f1004bb60746a5",
       "outcome": "no-change",
-      "reason": "CI now schedules the existing verification in parallel. The developer tasks and compatibility limits in domain_map.yaml, validation coverage and local task in skill_spec.md, and the existing source mappings in skill_tree.yaml still apply.",
+      "reason": "The domain map, skill specification and skill tree still describe the same consumer tasks and test coverage. This change moves the browser build to the PR runner while retaining the tested release artifact path.",
       "evidence": [
-        "Inspected the three planning records and the workflow and compatibility runner diffs against 741e2a9.",
-        "The compatibility shard selector retains the same fixtures and compiler loop. Playwright lists all 50 acceptance cases and four docs cases in each browser."
+        "Compared ci.yml, playwright.yml and the workflow guard with d997fa5.",
+        "Both example builds, the docs build and the focused guards passed locally."
       ]
     },
     "source:vite.config.ts": {
@@ -851,15 +851,15 @@
       ]
     },
     "source:.github/workflows/ci.yml": {
-      "fingerprint": "ac0c86382a465f4dabe87c77a6f7f85e3ac0e7b03bb370d3fa6a22d9aabbc16a",
+      "fingerprint": "9d361ca5afcd3d69d575674e28f23ce588191ae2a8cfe554a42d54c675999079",
       "snapshot": {
-        ".github/workflows/ci.yml": "23df1cd3b9fc9031946524994a87f86aa3dd67444e9b75da411e2091753705c7"
+        ".github/workflows/ci.yml": "cb40d07dae55323f879792224e4fa4e9afe3a2540f461482d01ba1c86a12767e"
       },
-      "head": "4eda2b2e9ab93c83d4a324e696ddd22887683e2b",
+      "head": "d997fa5ee2742d679a26e79322f1004bb60746a5",
       "outcome": "no-change",
-      "reason": "CI defaults to the measured fresh setup mode and retains cache restore as a manual comparison option. The job and test coverage stays the same.",
+      "reason": "PR shards start independently. Release and other non-PR validation waits for both build artifacts, and all required browser checks depend on the selected shard workflow.",
       "evidence": [
-        "Compared the follow-up with the previously verified 4eda2b2 workflow. actionlint and targeted yamllint passed."
+        "The workflow guard verified both entry paths. actionlint and targeted yamllint passed."
       ]
     },
     "source:tests/packed-consumer/construction-baseline.mts": {
@@ -3586,6 +3586,18 @@
         "Base 9e0afbe141435d8e79c8c0c1305142daf0d66031; inspected changed script, hooks, Vite configuration and agent docs.",
         "vp test -- tests/skills-maintenance.test.ts tests/workflow-guards.test.ts: 21 passed after rebase.",
         "vp run --no-cache check: passed after rebase; prior Fallow checks and shellcheck/shfmt passed. No fresh consumer/discovery evaluation: shipped guidance unchanged."
+      ]
+    },
+    "source:.github/workflows/playwright.yml": {
+      "fingerprint": "b30d29c8db1280b1bae6b0fdfe843f58baf846d3e29d0a017a4a206689548576",
+      "snapshot": {
+        ".github/workflows/playwright.yml": "c64f6a59cd39e031fb15a8e268b11c5dcd73a3e0c8516d2a8b93a8623b29c405"
+      },
+      "head": "d997fa5ee2742d679a26e79322f1004bb60746a5",
+      "outcome": "no-change",
+      "reason": "The reusable workflow shares the pinned image, six shards and diagnostics for both paths. PR shards build the files they test, and release shards restore the CI artifacts.",
+      "evidence": [
+        "Verified the image pin in the focused guard. Both example build commands and the docs build passed locally. actionlint, targeted yamllint and medium-or-higher zizmor checks passed."
       ]
     }
   }

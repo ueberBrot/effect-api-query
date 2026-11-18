@@ -87,7 +87,7 @@ const push = (cwd: string, base: string, state?: string, deletion = false) =>
 describe("repository workflow guards", () => {
   it("pins the Playwright image to the package version and a digest", () => {
     const workflow = readFileSync(
-      new URL("../.github/workflows/ci.yml", import.meta.url),
+      new URL("../.github/workflows/playwright.yml", import.meta.url),
       "utf-8"
     );
     const image =
@@ -95,6 +95,26 @@ describe("repository workflow guards", () => {
         workflow
       )?.groups?.["version"];
     expect(image).toBe(manifest.devDependencies["@playwright/test"]);
+  });
+
+  it("starts PR browser jobs independently and tests the prepared artifacts for releases", () => {
+    const workflow = readFileSync(
+      new URL("../.github/workflows/ci.yml", import.meta.url),
+      "utf-8"
+    );
+    const [, browserJobs] = workflow.split("\n  browser-shards:\n");
+    const [pullRequest, artifactJobAndGate] = (browserJobs ?? "").split(
+      "\n  browser-shards-from-artifacts:\n"
+    );
+    const [artifacts] = (artifactJobAndGate ?? "").split("\n  browser:\n");
+
+    expect(pullRequest).toContain("if: github.event_name == 'pull_request'");
+    expect(pullRequest).toContain("build-locally: true");
+    expect(pullRequest).not.toContain("needs:");
+    expect(artifacts).toContain(
+      "if: github.event_name != 'pull_request'\n    needs: [example-builds, documentation]"
+    );
+    expect(artifacts).toContain("build-locally: false");
   });
 
   it.each([
