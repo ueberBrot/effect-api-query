@@ -1,13 +1,13 @@
 ---
 title: Mutations
-description: Build typed RPC and HTTP writes and refresh affected queries.
+description: Run a typed RPC or HTTP mutation and invalidate affected queries.
 ---
 
-Use your ready utility tree and QueryClient from the [RPC quick start](/effect-api-query/getting-started/quick-start/) or [HTTP quick start](/effect-api-query/getting-started/http-quick-start/). In these examples, `users.create` accepts a `name` and returns a user with `id` and `name`. Import `MutationObserver` from `@tanstack/query-core` for imperative execution.
+Use the utilities from the [RPC quick start](/effect-api-query/getting-started/quick-start/) or [HTTP quick start](/effect-api-query/getting-started/http-quick-start/). Here `users.create` takes a name and returns a user. To call it outside a component, import `MutationObserver` from `@tanstack/query-core`.
 
 ## Execute a write
 
-Build the options once. Supply each mutation's variables when it runs:
+Build the options once. Pass variables to each `mutate` call.
 
 ```ts
 const createUser = new MutationObserver(
@@ -20,7 +20,7 @@ const createUser = new MutationObserver(
 const created = await createUser.mutate({ name: "Ada" });
 ```
 
-HTTP variables contain the complete decoded request:
+For HTTP, pass the full decoded request as the mutation variables.
 
 ```ts
 const createHttpUser = new MutationObserver(
@@ -35,10 +35,10 @@ const createdHttpUser = await createHttpUser.mutate({
 });
 ```
 
-Native mutation hooks accept the same options. Callbacks infer the result, variables, and execution errors. Mutation keys identify the operation and exclude variables. Successful `undefined` remains `undefined`.
+Pass the same options to native mutation hooks. Callbacks infer the result, variables, and execution error types. Mutation keys identify the operation. They exclude variables. A successful mutation can return `undefined`.
 
 ## Choose cache updates
 
-Choose how your callbacks refresh reads after a write. Invalidate affected generated prefixes, seed a known result with `setQueryData`, or apply an [optimistic write](/effect-api-query/guides/optimistic-writes/). The library derives builders from the contract. The call site chooses read or write semantics. Buffered multipart endpoints support mutations only.
+The examples mark the affected user queries stale. TanStack Query refetches active matches by default. You can also use `setQueryData` with a known result, or apply an [optimistic write](/effect-api-query/guides/optimistic-writes/) before the response arrives.
 
-See [HTTP uploads](/effect-api-query/guides/http-queries-and-mutations/#upload-a-file), [Handle Failures](/effect-api-query/guides/handle-failures/), and [Cancellation](/effect-api-query/guides/cancellation/) for their execution boundaries.
+Use a mutation for [buffered HTTP uploads](/effect-api-query/guides/http-queries-and-mutations/#upload-a-file). See [handle failures](/effect-api-query/guides/handle-failures/) for errors and [cancellation](/effect-api-query/guides/cancellation/#request-server-cancellation-explicitly) for long-running writes.

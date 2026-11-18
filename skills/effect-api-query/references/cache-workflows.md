@@ -2,7 +2,7 @@
 
 ## Register native defaults and filters
 
-Create the QueryClient and utilities once per owner. Register global defaults, then matching prefixes from broad to specific. TanStack merges defaults in registration order without sorting by specificity. To inherit an option, omit it. Explicit `initialData: undefined` overrides an inherited seed. `staleTime: 0` overrides inherited freshness. Reuse endpoint-aware callbacks through typed policies. Keep selection and input at each builder call.
+Build the QueryClient and utilities once per owner. Register global defaults, then prefixes from broad to specific. TanStack merges them in registration order. Omit a field to inherit it. Explicit `initialData: undefined` clears an inherited seed. `staleTime: 0` overrides freshness. Keep selection and input at the call site.
 
 ```ts
 import { QueryClient } from "@tanstack/query-core";
@@ -60,33 +60,33 @@ export function userCache(
 }
 ```
 
-`createQueryFilter` binds a supported leaf view and an explicit typed projection into the canonical key shape. Its projection defaults to the leaf input type; an explicitly annotated parameter can select a scalar or partial application input. It must return strict JSON. It skips full constructors and their defaults. Filter values are copied and frozen; invalid projections fail during preparation. Omit the projection for native conditions across the whole view.
+Use `createQueryFilter` to bind a leaf and view to a projection into the actual key shape. By default, the projection takes the leaf's input. Annotate its parameter for a scalar or partial input. Return strict JSON. The helper copies and freezes it without running the constructor or filling defaults. Omit the projection to match the whole view with native conditions.
 
-`everyLocale` matches the encoded string ID across locales. The concrete key materializes `locale: 'en'` and addresses only that full input. Native partial filters must follow the actual canonical encoding, including custom projections. HTTP filters retain `params`, `query`, `headers`, and `payload` labels. With default encoding, header names are lowercase. An opaque scalar encoder cannot expose omitted fields to partial matching. In that case, use a broad prefix or an exact generated key.
+`everyLocale` matches the encoded string ID for all locales. The concrete key fills in `locale: 'en'`. Match the output of the active encoder. Default HTTP keys keep request labels and lowercase headers. If an encoder returns only a scalar, use a broad prefix or exact key.
 
-Root, branch, leaf, and `viewPrefix(leaf, view)` prefixes support native `invalidateQueries`, `cancelQueries`, and other filters. Exact stream keys include policy. A view prefix matches all inputs and stream policies for that view. `viewPrefix` accepts only supported query views and returns a frozen ordinary tuple without a DataTag. Only concrete generated query keys carry data and error tags. Broad reads remain `unknown` until the application establishes their representation.
+Pass generated prefixes to native `invalidateQueries` or `cancelQueries`. Invalidation marks matching entries stale and refetches active matches by default. A view prefix covers every input and policy in that view. It is frozen and has no DataTag. Use exact generated keys for typed reads and writes. Stream keys include policy.
 
-Selection changes hook, observer, and `queryClient.query` results. The cache retains full decoded data. Configure hashing through QueryClient global or prefix `queryKeyHashFn` and keep it stable. Builders reject per-call hashing. During execution, streams reject inconsistent default `queryHash` values and conflicting cached identity with `UnsupportedQueryHash`. Before changing the hash policy, retire the old cache. Mutation defaults and keys use the separate native mutation cache.
+Hooks, observers, and `queryClient.query` apply selection. The cache retains decoded data. Set hashing through QueryClient global or prefix defaults and keep it stable. Per-call hashes are rejected. Streams fail with `UnsupportedQueryHash` if a default hash or cached identity conflicts. Retire the cache before changing hashing. Mutation keys and defaults are separate.
 
-Use `createBranchQueryFilter(branch, view)` when only one view across a namespace should refresh. Its returned native filter combines supported descendant views with a caller predicate. Missing views match nothing, and bulk results remain heterogeneous. Leave `exact` omitted to match descendants. Pass the returned filter to native QueryClient methods when view isolation matters.
+Bind a branch and view with `const userReads = createBranchQueryFilter(rpc.users, "query")`. Then pass `userReads()` to `queryClient.invalidateQueries`. Pass native conditions to `userReads` to narrow the match. Omit `exact` to include descendants. Absent views match nothing.
 
-For a typed error union, `findDeclaredError(error, tag)` returns an Effect Option for exactly one tagged failure. Only tags in the typed union are accepted. Composite Causes, defects, interruptions, and non-wrapper errors return None. Preserve the original wrapper for diagnostics and retry decisions. Tag matching does not validate unknown values or establish that a failure is retryable.
+Use `findDeclaredError(error, tag)` for one tagged failure in a typed union. Composite Causes, defects, interruption, and unrelated errors return None. Keep the original wrapper and classify retry policy separately.
 
 ## Assemble contract-associated policies
 
-When defaults must be reusable before client acquisition, import `defineUtilsPolicy` and the `RpcQueryUtils` or `HttpApiQueryUtils` type from the package root. Derive the utility type from the shared declaration, application key prefix, and actual client error type. Call `defineUtilsPolicy<UtilityType>()(configuration)`, then pass its result to `configureUtils` at the matching tree, branch, or leaf scope. Literal retention defaults remain available to configured builders.
+Use `defineUtilsPolicy<UtilityType>()(configuration)` when reuse starts before client acquisition. Derive the type from `RpcQueryUtils` or `HttpApiQueryUtils` with the actual declaration, prefix, and client error information. Apply it to the matching scope with `configureUtils`. Literal defaults such as retention remain visible to builders.
 
-Keep shared declarations free of framework callbacks, QueryClient instances, and runtimes. Assemble values in application modules. Use the same `scoped` child names, view policies, interceptors, and explicit mutation callback modes as direct configuration. Assembly checks types and returns the supplied map; `configureUtils` snapshots its policy values and interceptor arrays. Keep callback dependencies and retained values unchanged. Unknown scopes, unsupported leaf views, and options reserved for local calls fail compiler checks. Leaf callbacks retain their data, error, and variable types; optimistic context stays local.
+Keep the declaration shared. Put policy values, callbacks, cache access, and runtime choices in the app. The policy map retains literals and checks paths, views, and fields. `configureUtils` copies policy values and interceptor arrays. Keep retained values and dependencies unchanged. Leaf callbacks keep concrete types. Optimistic context stays local.
 
-See the complete application policy example in the library's Defaults and Policies guide. Required execution belongs in interceptors; native callback failure handling can skip later composed callbacks after a throw.
+For the full example, see [defaults and policies](https://ueberbrot.github.io/effect-api-query/guides/query-defaults/).
 
 ## Configure shared behavior
 
-Use `configureUtils(treeOrLeaf, configuration)` once per cache owner. Configure a query view with `{ policy, interceptors }`; configure a mutation with `{ policy, interceptors, callbacks }`. Use `scoped` to select named children of a tree or branch. The returned utilities are frozen and retain generated identity and prepared-input ownership. Keep the supplied tree for any consumers that need its original behavior.
+Use `{ policy, interceptors }` for a query view. Add `callbacks` for mutations and `scoped` for specific children. `configureUtils` returns frozen copies with the same keys and prepared-input owner.
 
-Policy properties and interceptor lists are snapshotted when configuration is applied. Sparse scopes may share unchanged frozen subtrees with the supplied tree. Reuse configured utilities across renders. Empty policies and interceptor lists add no settings; callback modes and explicitly undefined policy properties still participate in repeated configuration.
+Configure once per owner and reuse across renders. Frozen subtrees can be shared when their settings stay the same. Empty policy and interceptor lists add nothing. Explicit undefined settings and callback modes still affect merging.
 
-The following factory configures typed freshness and mutation invalidation:
+This factory shares freshness and invalidates the affected reads after a mutation.
 
 ```ts
 import {
@@ -142,7 +142,7 @@ export function userPolicies(
 }
 ```
 
-Use the same `directory` contract to require an application authorization check before a write:
+Use the same contract to run an authorization check before writing.
 
 ```ts
 export function authorizedRename(
@@ -166,95 +166,95 @@ export function authorizedRename(
 }
 ```
 
-Leaf callbacks receive the view's typed data and errors, or the mutation's typed result and variables. Stored policy objects can use `satisfies QueryPolicy<typeof leaf, View>` or `MutationPolicy<typeof leaf>`. Shared tree and branch policy callbacks receive unknown data, errors, and variables. Configure a leaf when a callback needs its concrete contract.
+Leaf callbacks get the view's data and error types, or the mutation's result and variables. Use `QueryPolicy<typeof leaf, View>` or `MutationPolicy<typeof leaf>` for reusable policies. Shared tree and branch callbacks get `unknown` because their leaves can differ.
 
-Apply policies from broad to specific: QueryClient defaults, configured tree, branch, leaf, then call-site options. Preserve input, selection, initial and placeholder data, page mapping, adapter controls, and optimistic context at the call site. Stream configuration may supply `streamed.policy.maxChunks` and publication controls; matching key builders inherit the same policy.
+Defaults apply from QueryClient to tree, branch, leaf, and call site. Keep input, selection, initial and placeholder data, page mapping, adapter controls, and optimistic context local. Set history controls in `streamed.policy` to share them between options and keys.
 
-More specific and call-site mutation callbacks replace corresponding broader callbacks by default. Set `mutation.callbacks: "compose"` when shared and more specific callbacks must both run. Composition awaits shared before specific for `onSuccess`, `onError`, and `onSettled`. A rejection stops that pair and follows native mutation handling. Keep `onMutate` local; shared policy callbacks receive its result as unknown.
+More specific mutation callbacks replace broader callbacks by default. Set `mutation.callbacks: "compose"` to run the shared callback first, then the narrower one. This applies to `onSuccess`, `onError`, and `onSettled`. A rejection stops the pair and follows TanStack's error handling. Define `onMutate` at the call site to retain its result type.
 
-Composition applies to the callbacks added by that scope. Broader composed callbacks remain active when narrower scopes use replacement.
+A scope's composed callbacks remain active if a narrower scope uses replacement.
 
-An explicit JavaScript `undefined` callback override clears that callback's composed defaults. Preserve native TypeScript callback types.
+An explicit JavaScript `undefined` callback override clears that callback's composed defaults.
 
-Interceptors run from tree to branch to leaf, with the first entry outermost. Each native attempt, including retries, permits at most one `next` call per interceptor. Infinite-query continuations return one page. Mutations also receive input; native context is undefined for direct calls without an observer. Honor the query signal in surrounding application work. Skipped queries stay disabled. Local callbacks cannot replace execution interception.
+Interceptors wrap every execution attempt, including retries. They run tree, branch, then leaf, with the first entry outermost. Call `next` at most once. For pagination it returns one page. Mutation interceptors also receive input, and a direct call has no native context. Forward the query signal. Skipped queries stay disabled.
 
-Repeated configuration preserves scope order. Within one scope, later policies replace earlier values and earlier interceptors remain outermost.
+Repeated calls keep scope order. At the same scope, later policies win and earlier interceptors stay outermost.
 
-Within one mutation scope, later callbacks replace earlier callbacks and the latest supplied callback mode applies to the merged policy. Configured trees remain assignable to their original utility types.
+At one mutation scope, later callbacks replace earlier ones. The latest supplied mode applies to the merged policy. Configured trees still fit consumers of the original type.
 
-Check reusable configurations with `satisfies UtilsConfiguration<typeof tree>`. A type annotation widens optional settings and can prevent builders from inferring that stream retention has already been supplied.
+Use `satisfies UtilsConfiguration<typeof tree>` to keep literal settings such as required retention in the type.
 
-After configuration, type-check a representative call with selection, conditional input, or local optimistic context. Keep checks of the originating owner and coordination of overlapping writes in the application workflow below. For typed failure classification and shared RPC/HTTP retry decisions, use [the retry recipe](https://ueberbrot.github.io/effect-api-query/guides/retry-queries/).
+Type-check a call with selection, conditional input, or local optimistic context. For bounded typed retries, use the [retry recipe](https://ueberbrot.github.io/effect-api-query/guides/retry-queries/).
 
 ## Share equivalent decoded values
 
-Keep native structural sharing as the default. For immutable rich query data, use `structuralSharing` in an existing builder or `configureUtils` policy. Follow the [checked decoded-value recipe](https://ueberbrot.github.io/effect-api-query/guides/share-decoded-values/) when dates, collections, or Schema classes need reference reuse. Use `schemaStructuralSharing(Reading, { equivalence: Schema.toEquivalence(Reading) })` from the package for atomic decoded records inside plain containers. Equivalence is mandatory; include meaningful private or extra class state explicitly.
+Keep native sharing by default. For immutable decoded class instances, dates, or collections, follow [share decoded values](https://ueberbrot.github.io/effect-api-query/guides/share-decoded-values/). Use `schemaStructuralSharing(Reading, { equivalence: Schema.toEquivalence(Reading) })` for a single decoded record. Compare meaningful extra state in the equivalence.
 
-Compare records at the same array position. Reuse an equivalent class instance intact; retain a changed incoming instance intact. Compare Date timestamps, primitive Map/Set contents without insertion order, and Effect Option cases and values through the example Schema. Treat all compared data as immutable, since Effect equality can cache results. Do not equate encoded wire values or arbitrary custom objects. Give unknown/custom fields explicit reference equivalence with `Schema.overrideToEquivalence(() => Equivalence.strictEqual())`; plain `Schema.Unknown` does not imply reference semantics. Invalid atoms and unsupported rich objects pass through unchanged. Only finite acyclic plain objects and dense arrays with enumerable string data properties are traversed; unsupported container shapes pass through and cycles throw TypeError. Type-side validation and equivalence must be synchronous and service-free; defects propagate. No decoding or encoding runs. Selected values follow the same rules.
+The helper compares array positions and keeps whole class instances. Equivalent values reuse the previous reference. For unknown fields that need reference equality, use `Schema.overrideToEquivalence(() => Equivalence.strictEqual())`. Keep compared data unchanged. The helper traverses plain acyclic objects and dense arrays with enumerable string data properties. Unsupported values pass through. Traversed cycles throw. Validation and equivalence must run synchronously without services.
 
-For a metadata view, the same callback traverses `{ data, status, headers }` around the decoded atoms. Fetched envelopes and raw headers remain frozen; decoded, initial, manual, hydrated, and selected values retain their ownership rules. Pair hydration codecs separately. Measure equal and changed inputs; retained references do not establish a speed improvement. Verify cache references with native `getQueryData` or an observer and retain generated data/error types.
+The same callback works inside a metadata envelope. Fetched envelopes and raw headers stay frozen. Initial, manual, hydrated, and selected values keep their usual ownership. Check references through an observer or `getQueryData`. Measure both equal and changed data.
 
 ## Coordinate overlapping optimistic writes
 
-The application owns this workflow. Make every participating write follow these steps:
+Route each write through this app workflow.
 
-1. In `onMutate`, capture the originating owner and reserve this write before any await. Before publishing optimistic state, cancel older reconciliation reads.
-2. Snapshot only the affected entities and positions. Preserve unrelated list entries, infinite pages, and `pageParams`. Allocate temporary IDs per creation. After an authoritative refresh, each new deletion captures current fields and positions. Shared overlap snapshots retain ordering within the owned view.
-3. Return the original owner's commit, rollback, and settlement actions in mutation context. After every await and before any cache side effect, check that owner.
-4. On success, replace only this write's optimistic value. Seed exact generated detail keys with the response's locale and other identity fields.
-5. On failure, remove this write's temporary entry or restore its removed entity beside surviving original neighbors. Rolling back a whole stale snapshot can erase another write. Roll back only a cache revision that the optimistic write still owns. Preserve later authoritative updates even when structural sharing keeps the same data object. Explicitly coordinate repeated deletions of the same entity.
-6. When the final overlapping write settles, reconcile. Each new write cancels an earlier reconciliation before publishing its optimistic update.
+1. Capture the owner and reserve the write in `onMutate` before awaiting anything. Cancel affected reads before publishing.
+2. Save affected entities and positions. Keep unrelated entries, pages, and `pageParams`. Give each creation a temporary ID. After a refresh, use current positions for new deletions.
+3. Return the original owner's commit, rollback, and settlement actions. Check that owner after every await and before updating the cache.
+4. On success, replace only this write's optimistic value. Seed generated keys with the returned identity, such as locale.
+5. On failure, remove this write's temporary entry or restore the deleted entity beside surviving neighbors. Preserve later writes and authoritative revisions, even if the data reference matches. Coordinate overlapping deletions of one entity.
+6. Reconcile when the last overlapping write settles. Cancel an earlier reconciliation before publishing a new write.
 
-An observer's option update can replace pending callbacks or a mutation function that has not started. Context preserves originating actions. At an owner handoff, remount consumers. Cache rollback cannot undo accepted server work. External writes, manual replacement, and server ordering require an application conflict policy.
+An options update can replace pending callbacks or a mutation function that has yet to start. Capture the original actions in mutation context and remount consumers when owners change. For server ordering or external cache writes, define an app conflict policy.
 
 ## Refresh from application events
 
-Explicitly map authenticated, decoded domain events to native generated filters. If RPC and HTTP share a domain, name both roots. Capture the original owner in one scoped consumer. On closure, unregister event, Reactivity, and mutation listeners. Before queued invalidation and after awaits, check that owner.
+Map authenticated, decoded events to generated filters. Name both roots if RPC and HTTP share a domain. Capture one owner per consumer Scope. Unregister listeners on closure and check the owner again after awaits.
 
-While participating mutations are pending, defer refresh and retain the invalidation intent. After settlement, flush that intent. A branch refresh can cover narrower work. Effect Reactivity keys need an explicit application mapping. A Query tuple does not imply a Reactivity subscription. Native batching combines invalidations of the same Reactivity key. It does not guarantee one Query refresh across distinct keys.
+Queue invalidation during participating writes and flush after settlement. A broad refresh can cover narrower reads. Map Reactivity keys explicitly to Query filters. Reactivity batching for one key does not merge refreshes across keys.
 
-An accepted monotonic cursor records invalidation intent. It does not establish durable delivery or successful reads. If supported, replay ordered events with duplicate suppression. Otherwise, refresh authoritative reads and explicitly reset the sequence. The application owns authentication, reconnect, replay storage, epochs, acknowledgments, and out-of-order delivery. `recoverStream` supplies numeric sequence convenience or an explicit application cursor acceptance/gap policy, cancellable backoff, replay-expiry refresh, gap hooks, and local connection state. Provide the native `connect` stream and recovery decisions. See [query patterns](query-patterns.md).
+A cursor records local acceptance of an invalidation request. Replay ordered events with duplicate suppression if the server supports it. Otherwise refresh current state and reset the sequence explicitly. See [stream recovery](query-patterns.md#recover-an-application-owned-stream) for reconnect hooks and cursors.
 
 ## Replace an owner in order
 
-Partition results by safe tenant, user, backend, session, and permission-generation identity in `keyPrefix`. Keep credentials out of keys. Capture the retiring owner, then unmount its consumers. Mark it inactive and stop new work. Cancel queries and drain accepted mutations and local streams before releasing ready-client resources. Only then acquire and mount the replacement.
+Use safe identities in `keyPrefix`, including tenant, user, backend, session, or permission generation if they affect data. Keep credentials out of keys. Capture and unmount the old owner, stop admission, cancel queries, and wait for accepted mutations and local cleanup. Release resources before acquiring and mounting a replacement.
 
-Apply this sequence even when semantic identity stays the same. Changing a provider client prop alone does not replace hook ownership. Guard late commit, rollback, and settlement callbacks even after draining work.
+Remount consumers even when identity stays the same because hooks can retain the old QueryClient. Guard late commit, rollback, and settlement callbacks.
 
-An accepted command can finish remotely during retirement. Completed work persists. To stop future domain work, use an explicit application command-cancellation operation. Local retirement supplies neither rollback nor acknowledgment of remote cancellation. A hanging request or finalizer can delay handoff. For an operation-ID protocol with separate start, progress, and cancel calls, use the [cancellable commands example](https://ueberbrot.github.io/effect-api-query/examples/cancellable-commands/).
+Accepted commands can finish during retirement. Use an [explicit command operation](https://ueberbrot.github.io/effect-api-query/examples/cancellable-commands/) to stop future server work. A hanging request or finalizer delays handoff.
 
-For reload persistence, allowlist a validated DTO view. Repeat the safe owner tuple in its envelope and include version busters for schemas and keys. Restore only matching identities through freshly generated keys. Before writing, discard foreign or incompatible data. Avoid persisting pending optimistic values, arbitrary caches, errors, mutations, credentials, or class prototypes. For rich values, use paired codecs.
+Persist only approved DTO views. Include safe owner identity and separate schema and key versions in the saved envelope. Validate it before restoring with newly generated keys. Discard incompatible data. Leave out optimistic values, mutations, errors, credentials, and unrelated entries. Use paired codecs for rich values.
 
-During explicit disposal, expose storage failures while completing resource cleanup. Lifecycle callbacks such as pagehide or HMR must handle a rejected disposal Promise. Otherwise, it becomes an unhandled rejection. Preserve the chosen reload-persistence policy and cleanup order.
+Finish resource cleanup even if storage fails. Handle disposal rejections from explicit shutdown, pagehide, and HMR.
 
-Sources: [defaults and policies](https://ueberbrot.github.io/effect-api-query/guides/query-defaults/), [cache keys and filters](https://ueberbrot.github.io/effect-api-query/guides/cache-filters/), [optimistic writes](https://ueberbrot.github.io/effect-api-query/guides/optimistic-writes/), [owner replacement](https://ueberbrot.github.io/effect-api-query/guides/switch-cache-owners/), [event refresh](https://ueberbrot.github.io/effect-api-query/guides/refresh-from-events/).
+See [cache filters](https://ueberbrot.github.io/effect-api-query/guides/cache-filters/), [optimistic writes](https://ueberbrot.github.io/effect-api-query/guides/optimistic-writes/), [owner replacement](https://ueberbrot.github.io/effect-api-query/guides/switch-cache-owners/), and [event refresh](https://ueberbrot.github.io/effect-api-query/guides/refresh-from-events/) for complete examples.
 
 ## Compose cache operations in Effect
 
-Use `queryEffects` with `QueryClientService` provided by the application's existing QueryClient. Call `getData` and `setData` with concrete generated keys for cache-data inference; call `fetch` or `ensure` with generated options and `invalidate` with generated filters. These lazy Effects create no runtime, cache, client, or Scope. Other application services compose normally; provide QueryClientService with `Effect.provideService` or an application Layer.
+Provide the application's existing QueryClient as `QueryClientService`. Run `queryEffects.getData` and `setData` with exact keys, `fetch` or `ensure` with generated options, and `invalidate` with generated filters. Provide the service with `Effect.provideService` or a Layer.
 
-Fetch/ensure return unselected cache data, even if the options contain `select`. Selection remains with native hooks/observers. `fetch` uses native `fetchQuery` freshness; `ensure` uses native `ensureQueryData`, including optional stale background revalidation. Neither finite-waits an open stream; use the snapshot workflow for that task. Writes must be immutable; an undefined updater result skips the write. Invalidation retains native refetch and throwOnError policy.
+Fetch and ensure return the full cached data. `fetch` uses `fetchQuery` freshness. `ensure` uses `ensureQueryData`, including optional stale background refresh. Use a snapshot for open streams. Write immutably and return `undefined` to skip a write. Invalidation keeps native refetch and `throwOnError` behavior.
 
-Fetch/ensure fail with `QueryClientOperationError`, whose `cause` retains the exact rejected value, including generated execution wrappers and their complete Causes. Treat this cause as unknown. A runner may reject with a foreign wrapper, and native deduplication may share another caller's execution; neither the options nor a wrapper's class proves the failure payload's type. Narrow a wrapper to inspect its shape while keeping its payload unknown. Generated options retain their declared native error type; bridge data and service inference remain unchanged. Reads/updates and heterogeneous invalidation use the same fallback channel.
+On native failure, inspect `QueryClientOperationError.cause` as `unknown`. It preserves the original rejection, including any execution wrapper and full Cause. Shared work can come from another caller. The wrapper's class alone cannot prove the current options' declared failure type.
 
-Interruption stops only the caller's wait, never shared QueryClient work. Do not forward a waiter's abort signal or add automatic cancelQueries cleanup: another Effect or observer may still depend on that fetch. Work may publish after all waiters leave. The application owner explicitly cancels and drains shared work before disposing resources. The complete `examples/shared/query-effects.ts` module and QueryClient tests demonstrate native sharing, selected observers, updates and generated filter invalidation; the Query Effects guide supplies the full workflow.
+Interrupting an Effect stops its wait. QueryClient can finish shared work and publish for observers. Cancel native queries only when the owner wants to stop that shared work. See [query effects](https://ueberbrot.github.io/effect-api-query/guides/query-effects/) for examples.
 
 ## Opt in to query owner setup
 
-Use `acquireQueryOwner` for a resource registry and retirement boundary outside the factories. Each owner creates its own native QueryClient with application-supplied cache configuration. Await `setup.acquire(start, release)` for every transferred resource; `setup.borrow(value)` registers no disposal. Keep acquisitions awaited and sequential and do not retain the registrar. Startup failure releases registered resources in reverse order.
+Use `acquireQueryOwner` to create an independent cache and register resources. Await each `setup.acquire(start, release)` in order. Releases run in reverse order, even if setup fails. Use `setup.borrow(value)` when the caller retains ownership.
 
-Wrap each utility runner with `setup.wrapRunner`. Use `configureUtils` query interceptors `async ({ next, context }) => await setup.runQuery(next, context.signal)` for every used query view, including `streamed` and `live`: a stream's iterator outlives the runner that created it. See the [complete native setup and provider example](https://ueberbrot.github.io/effect-api-query/guides/react-query/) and [retirement contract](https://ueberbrot.github.io/effect-api-query/guides/switch-cache-owners/#opt-in-owner-helper).
+Wrap the runner with `setup.wrapRunner`. For each used view, configure an interceptor that calls `setup.runQuery(next, context.signal)`. This tracks the complete function because stream pulls outlast iterable creation. See [React setup](https://ueberbrot.github.io/effect-api-query/guides/react-query/) and [retirement](https://ueberbrot.github.io/effect-api-query/guides/switch-cache-owners/#opt-in-owner-helper).
 
-For native mutations, call `owner.runMutation(() => mutation.mutateAsync(input))` to drain the complete promise and awaited callbacks. Acceptance is the call while active; wrapping only mutationFn drains only the request attempt. Use immediate attempts (`networkMode: "always"`, `retry: false`); offline queues require application policy. A not-yet-started runner is rejected after retirement, even inside an accepted callback awaiting onMutate. Drain means settlement, not successful server execution.
+Use `owner.runMutation(() => mutation.mutateAsync(input))` to wait for the request and awaited callbacks. Wrapping `mutationFn` only tracks that attempt. Use `networkMode: "always"` and `retry: false` for immediate attempts. Offline queues need an app policy. A runner that starts after retirement rejects even inside an accepted mutation.
 
-Capture the originating owner in callbacks and use `owner.commit(cache => { /* synchronous update */ })` or `isActive()` guards. Unmount consumers, await disposal, then acquire and mount the replacement provider. Do not capture a mutable replacement cache. Disposal stops new work, aborts query runners, awaits registered local work, clears native caches and releases resources in reverse order. Repeated calls share the same outcome. Pending rejected work and finalizer Causes are reported alongside release failures in AggregateError; every release is attempted. Hanging work delays disposal without a hidden timeout. Borrowed resources remain open. Domain command cancellation and remote acknowledgment require application protocols; native mutation state does not provide either. Detached work and arbitrary external cache writes remain outside the helper's boundary.
+Use `owner.commit` for synchronous late writes and `isActive()` for other side effects. Unmount, dispose, then acquire and mount the replacement. Disposal stops admission, cancels queries, waits for tracked work, clears caches, and releases acquired resources. Repeated calls share the result. It reports pending failures and attempts all releases. Borrowed resources stay open. A stalled finalizer delays disposal.
 
-Normal aborted-query interruption (including an empty live query at cancellation) is excluded from drain failures; finalizer defects and typed failures remain visible. Pass the native query context signal to `runQuery` so this classification remains local to the cancelled query.
+Pass the native signal to `runQuery`. Disposal ignores ordinary interruption of that query, including an empty live query at cancellation. Typed failures and finalizer defects still surface.
 
 ## Scoped event consumption
 
-When domain events update an owner's cache, compose `recoverStream` with `runQueryEvents(owner, source, options, runPromiseExit)`. Map events explicitly to `queryEffects.setData` with generated keys and `queryEffects.invalidate` with generated filters. The helper provides the originating QueryClient to source hooks and handlers and registers consumption for owner retirement. Keep handlers sequential and await all work. Inspect the returned complete Exit; admission and runner failures reject the promise.
+Run `runQueryEvents(owner, source, options, runPromiseExit)` with your source and optional recovery. Map events to exact updates and filter invalidation. The helper supplies the owner's cache to the source and hooks. It awaits each handler. Inspect the complete Exit. Admission or runner rejection stays a rejected Promise.
 
-Read the installed package's [scoped event recipe](https://ueberbrot.github.io/effect-api-query/guides/scoped-event-cache/) for acquisition, refresh cursors and disposal. The runner must honor AbortSignal and drain Effect finalizers. Retirement interrupts consumption, backoff and refresh; capture the originating owner for external callbacks and guard synchronous writes with `owner.commit`. Wrap native query runners and execution when refresh starts shared Query work. Detached work remains application-owned.
+Keep the runner signal-aware and await its finalizers. Retirement stops consumption, backoff, and refresh. Use the original owner's guard for external writes. If refresh starts shared native queries, track both their runners and complete executions. See [scoped event consumption](https://ueberbrot.github.io/effect-api-query/guides/scoped-event-cache/).
 
-Recovery advances its local cursor before downstream handling. Handler failure stops consumption without retry or rollback; persist checkpoints only under explicit application policy. Return the authoritative snapshot's cursor after replay expiry. Retain bounded event history only when the UI needs it.
+Recovery advances before downstream handling. A handler failure stops delivery. Earlier writes remain. Persist processing checkpoints under app policy. After replay expiry, return the refreshed snapshot's cursor. Keep bounded event history only if the UI needs it.

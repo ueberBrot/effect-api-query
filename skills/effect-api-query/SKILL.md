@@ -1,14 +1,14 @@
 ---
 name: effect-api-query
 description: >-
-  Use when integrating effect-api-query with ready Effect RPC or HttpApi clients: derive TanStack Query keys and options, select views or pagination, reuse policies or intercept execution, filter caches, recover streams, or prepare SSR hydration. Also use to diagnose execution errors, cancellation, or client lifetime, and to rebuild native framework options from reactive input.
+  Use when integrating Effect RPC or HttpApi with TanStack Query through effect-api-query. Covers typed reads, writes, pagination, streams, cache filters and policies, and server-to-browser hydration. Use it to diagnose failures, cancellation, client lifetime, or reactive framework options.
 license: ISC
 metadata:
   purpose: >-
     Derive typed TanStack Query keys and options from ready Effect RPC and HTTP clients, preserving cache identity, typed filters and execution policies, decoded query views, registered hydration codecs, stream recovery, native framework behavior, and application-owned resource lifetime.
   type: core
   library: "@ueberbrot/effect-api-query"
-  library_version: "0.6.1"
+  library_version: "0.7.0"
 sources:
   - "**/examples/contracts/src/*.ts"
   - "**/examples/shared/http-workflows/*.ts*"
@@ -44,79 +44,58 @@ sources:
   - "docs/adr/0040-*.md"
   - "docs/adr/0042-*.md"
   - "docs/adr/0043-*.md"
+  - "apps/docs/astro.config.mts"
   - "**/apps/docs/src/content/docs/**/*.md"
   - "**/apps/docs/src/content/docs/**/*.mdx"
 ---
 
 # Use effect-api-query
 
-Derive options from the application's contract and ready client. Pass those options to TanStack Query. The package owns utility construction and query execution. The application owns transport, authentication, resources, and cache policy.
+## Set up the client
 
-## Choose the adapter
+1. Read the installed package manifest for the version and peer ranges. If you are choosing dependencies or connecting a framework, router, or worker, read [frameworks and hosts](references/frameworks-and-hosts.md).
+2. Acquire the Effect client before calling the factory. Use the matching reference for imports, setup, input, and custom key encoders.
 
-Read the installed package manifest to find its version and peers. The Effect peer range is `>=4.0.6 <4.2.0`; its supported floor is `4.0.6` and current development pins are `4.1.0`. Its Query Core peer range is `>=5.104.4 <6`. Use the installed declarations and keep contracts literal. For reactive options, version constraints, and transport ownership, read [frameworks and hosts](references/frameworks-and-hosts.md).
+   | Contract | Factory | Setup |
+   | --- | --- | --- |
+   | Effect RPC group | `createRpcQueryUtils` with a flat client | [RPC](references/rpc.md) |
+   | Effect HttpApi declaration | `createHttpApiQueryUtils` with an HttpApiClient | [HTTP](references/http.md) |
 
-Read the reference for the contract you are integrating:
+3. Import the factory from `@ueberbrot/effect-api-query`. Keep contract identifiers literal. Build the utility tree once per client and cache owner.
+4. Pass a non-empty JSON tuple as `keyPrefix`. Include safe values for any tenant, user, or backend identity that changes results. Keep credentials in the client.
 
-| Contract | Factory and input | Reference |
+The app owns the client, transport, authentication, runtime, and cache. Keep the client alive through requests and local cleanup. If execution needs Effect services, supply a `runPromiseExit` that provides them and forwards the `signal` in its second argument. Use the default runner for service-free requests.
+
+## Build the options
+
+| Task | Builder | Native consumer |
 | --- | --- | --- |
-| Effect RPC group | `createRpcQueryUtils` with payload constructor input | [RPC setup and rules](references/rpc.md) |
-| Effect HttpApi | `createHttpApiQueryUtils` with decoded request parts | [HTTP setup and rules](references/http.md) |
+| Read decoded data | `queryOptions` | `useQuery` or `queryClient.query` |
+| Run a write | `mutationOptions` | `useMutation` or `MutationObserver`. Pass variables to `mutate`. |
+| Load pages | `infiniteOptions` | `useInfiniteQuery` or `queryClient.infiniteQuery` |
+| Read HTTP status and headers with data | `metadataOptions` | Ordinary query hook or observer |
+| Keep ordered stream history | `streamedOptions` | Ordinary query hook or observer |
+| Keep the latest stream value | `liveOptions` | Ordinary query hook or observer |
 
-Import both factories and error guards from `@ueberbrot/effect-api-query`, the package's one public root export. Each factory accepts an already acquired client. It builds an eager, frozen utility tree without making a request.
+Unary RPC and buffered HTTP without multipart support reads, writes, and pages. Buffered multipart HTTP takes `FormData` through a mutation. Streaming RPC and supported HTTP SSE or NDJSON expose both stream views. Omit `input` for operations that take none. Set `maxChunks` to a positive safe integer or `"unbounded"` for accumulated history.
 
-## Choose the operation
+- Keep captured inputs unchanged. Mutating input can send a different request under the old key. Build new options when input changes.
+- Pass native settings to the builder and use the returned key and function together. Use a generated concrete key for typed cache reads and writes. Set hashing on QueryClient before use and keep it stable.
+- After writes, choose which reads to invalidate. Native invalidation marks entries stale and refetches active matches by default. Use a generated prefix to target one tree or the original prefix to target both adapters.
 
-| Need | Builder | TanStack consumer |
-| --- | --- | --- |
-| Buffered read | `queryOptions({ input, ...options })` | `useQuery`, `useSuspenseQuery`, `queryClient.query` |
-| Write | `mutationOptions({ ...callbacks })` | `useMutation`, `MutationObserver`, with variables passed to `mutate` |
-| Cursor pagination | `infiniteOptions({ initialPageParam, input, getNextPageParam })` | `useInfiniteQuery`, `queryClient.infiniteQuery` |
-| HTTP data, status, and headers | `metadataOptions({ input, ...options })` | Ordinary query hooks or observers |
-| Ordered RPC or HTTP SSE/NDJSON history | `streamedOptions({ input, maxChunks, refetchMode })` | Ordinary query hooks or observers |
-| Latest RPC or HTTP SSE/NDJSON value | `liveOptions({ input })` | Ordinary query hooks or observers |
+Read the reference for the task at hand.
 
-Unary RPCs and buffered HTTP endpoints without multipart expose read, write, and pagination builders. Choose the builder for the application's intent. Neither the HTTP method nor the RPC name restricts that choice.
-
-Buffered multipart HTTP endpoints expose only mutation builders and accept explicit `FormData`. For upload input and encoder configuration, follow the [HTTP rules](references/http.md). Streaming RPCs and supported HTTP SSE and NDJSON endpoints expose accumulated and live builders. Choose a positive `maxChunks` bound or `"unbounded"` for accumulated history, locally or through `configureUtils` with `streamed.policy`. Metadata provides a separate buffered HTTP query view. Inputless operations omit `input`.
-
-Read only the branch needed for the task:
-
-| Task | Read |
+| If you need to | Read |
 | --- | --- |
-| Infer operation types, prepare repeated input, skip, paginate, batch history, consume events, or recover streams | [Query patterns](references/query-patterns.md) |
-| Reuse policies or interceptors, share equivalent decoded values, filter caches, compose cache operations in Effect, apply writes or events, replace owners | [Cache workflows](references/cache-workflows.md) |
-| Capture streams, register view codecs, hydrate, or dispose request work | [Hydration and SSR](references/hydration-and-ssr.md) |
-| Mount native providers, recover Suspense, choose a transport, host, or versions | [Frameworks and hosts](references/frameworks-and-hosts.md) |
+| Infer types, wait for input, page, prepare input, batch or recover streams, or trace cleanup | [Query patterns](references/query-patterns.md) |
+| Filter or update the cache, share policies, intercept execution, or retire an owner | [Cache workflows](references/cache-workflows.md) |
+| Capture a stream for server rendering, register codecs, hydrate, or transfer a loader selection | [Hydration and SSR](references/hydration-and-ssr.md) |
+| Rebuild reactive options, mount providers, use Suspense, or choose transport and versions | [Frameworks and hosts](references/frameworks-and-hosts.md) |
 
-## Preserve generated cache identity
+## Handle failures and cleanup
 
-- Supply a non-empty JSON tuple as `keyPrefix`. If safe user, tenant, or backend identifiers distinguish results, include them. The factory cannot infer identity from a client, URL, middleware, or RPC request options.
-- Pass options such as `staleTime`, `select`, and callbacks into the builder. Preserve its `queryFn` and `queryKey`. For shared policies and execution behavior, use `configureUtils` as described in [cache workflows](references/cache-workflows.md). To customize hashing, use QueryClient global or prefix `queryKeyHashFn`. Builders reject per-call hashing. Keep hashing stable while cache entries remain. Streams reject a default `queryHash` inconsistent with the key hasher or a conflicting cached identity with `UnsupportedQueryHash`. Before changing the hash policy, retire the old cache. Mutation builders own `mutationFn` and `mutationKey`.
-- Treat captured inputs as immutable. When inputs change, build new options. Keys are frozen snapshots, but request inputs are not necessarily copied or frozen. Mutating an input later can make execution disagree with its key.
-- Use the generated concrete key for its cache shape. Accumulated keys include normalized retention and refetch policy: `streamedKey(input, policy)`. HTTP SSE stream keys also include decoder policy. NDJSON keys carry no SSE decoder fields. Inputless stream keys take policy first. Concrete keys retain exact prefixes and the unselected data and error tags. Canonical payload slots are typed as unknown; use key builders and explicit filter projections instead of reading their structure. Hooks, observers, and `queryClient.query` apply `select`. `getQueryData` reads the decoded cache value. If matching options already exist, use their `queryKey`.
-- For prefix invalidation, use `key()` on a tree, branch, or leaf. After mutations, explicitly invalidate affected reads. RPC and HTTP roots are distinct. Use the original caller prefix only for deliberate invalidation across adapters.
+- Catch configuration and key preparation failures where you build the tree or options. Incompatible hashing can also fail during stream execution.
+- Use `isEffectRpcQueryError` or `isEffectHttpApiQueryError` for failed Effect Exits. Inspect the full `cause` before deciding what to show, log, or retry. A runner that rejects without an Exit passes its rejection through.
+- Stop consumers and cancel queries before disposal. Wait for local stream cleanup, pending preparation, and accepted mutations. Native cancellation can settle before finalizers finish. To stop server work, use an application command protocol.
 
-## Own execution and cleanup
-
-Keep the client's Scope or ManagedRuntime alive through every operation that uses it. An RPC client returned from a completed `Effect.scoped` region is unusable. During client setup, create utilities and reuse them across component renders.
-
-If execution requires client or Schema services, pass a `runPromiseExit` runner that provides them. The runner must return an Effect `Exit` and forward the `signal` from its second argument. `runtime.runPromiseExit` has this shape. Service-free calls can use the factory default. A custom key encoder supplies cache identity. The runner still supplies execution services.
-
-For optional acquired/borrowed setup and precise query/mutation drains, read [query owner setup](references/cache-workflows.md#opt-in-to-query-owner-setup). Keep query-function interceptors as well as runner tracking for streams.
-
-Ordinary queries forward TanStack cancellation to Effect. For Suspense hooks, read the cancellation limitation in [frameworks and hosts](references/frameworks-and-hosts.md). Before disposing resources, stop consumers, cancel queries, and drain local streams, pending preparation, and accepted mutations. Native cancellation can settle before finalizers finish. `fetchStreamSnapshot` drains its own capture. Mutations receive no query abort signal. A cancellable command needs an application operation identified before work starts. Owner retirement leaves completed remote work intact.
-
-To trace spans and cleanup through stream consumption, follow the lifetime tracing recipe in [query patterns](references/query-patterns.md).
-
-## Interpret results and failures
-
-Buffered queries and live emissions normalize successful `undefined` to `null`. Accumulated stream elements and mutation results preserve `undefined`. For stream behavior, read the query patterns reference.
-
-Configuration and key-generation errors can fail preparation before a hook or query function runs. Incompatible stream cache hashing rejects execution with a configuration error. Failed execution Exits become `EffectRpcQueryError` or `EffectHttpApiQueryError`. Use `isEffectRpcQueryError` or `isEffectHttpApiQueryError` to narrow the error, then inspect its preserved Effect `cause`. Runner rejections pass through unchanged.
-
-The Cause can contain upstream request or Schema values and receives no sanitization. Expose error information that is safe for the application. Apply the application's logging policy to the Cause.
-
-## Verify the integration
-
-Type-check against the installed package with strict TypeScript settings. Make sure that the contract produces the intended utility path and input shape. Exercise the affected read or write and its cache behavior. For identity or lifetime changes, make sure that identities remain separate and disposal completes cleanup. Finish only when these checks pass.
+Type-check one call against the installed package with strict settings. Exercise its result and cache behavior. If you changed identity or lifetime, verify that entries stay separate and disposal finishes.

@@ -3,7 +3,7 @@ title: Handle Failures
 description: Inspect RPC and HTTP Causes and distinguish configuration and key errors.
 ---
 
-A failed RPC `Exit` becomes `EffectRpcQueryError`. The error records the RPC tag, the generated operation, and the complete Effect `Cause`. Inspect the error in your application handler:
+When an RPC returns a failed `Exit`, the query rejects with `EffectRpcQueryError`. Read the RPC tag, operation, and original Effect `Cause` from the error.
 
 ```ts
 import { isEffectRpcQueryError } from "@ueberbrot/effect-api-query";
@@ -17,34 +17,34 @@ const logRpcError = (error: unknown) => {
 };
 ```
 
-Review the Cause for private messages and transport values before logging it.
+Review the Cause for private messages or transport values before logging it.
 
-Stream execution errors also preserve failures from local finalizers. If consumption and cleanup both fail, the Cause retains both failures.
+If stream consumption and cleanup both fail, the Cause retains both failures.
 
-Use the error class to identify the failure stage:
+The error class tells you which stage failed.
 
-- `EffectRpcQueryConfigError` reports invalid configuration. It occurs synchronously during preparation, or during stream execution when QueryClient hashing is incompatible.
-- `EffectRpcQueryKeyError` reports synchronous payload construction, encoding, or JSON canonicalization failures.
-- `EffectRpcQueryError` reports a failed RPC execution and preserves its Effect `Cause`.
-- `EffectRpcQueryEmptyStreamError` reports a live stream that completed before emitting a value.
+- `EffectRpcQueryConfigError` reports invalid configuration during preparation or incompatible hashing during stream execution.
+- `EffectRpcQueryKeyError` reports synchronous payload construction, encoding, or JSON key failures.
+- `EffectRpcQueryError` wraps the failed RPC execution and its Cause.
+- `EffectRpcQueryEmptyStreamError` means a live stream ended before its first value.
 
-If a custom runner rejects instead of returning an `Exit`, its rejection passes through unchanged. See the [error reference](/effect-api-query/reference/errors/) for stable codes and metadata. Use [retry queries](/effect-api-query/guides/retry-queries/) for typed `Cause` and `Result` decisions, bounded attempt counts, and synchronous preparation errors.
+A runner that rejects without returning an `Exit` passes its rejection through. See [error codes](/effect-api-query/reference/errors/) for metadata, or [retry queries](/effect-api-query/guides/retry-queries/) to decide which failures to retry.
 
 ## Inspect HTTP failures
 
-Import `isEffectHttpApiQueryError` from `@ueberbrot/effect-api-query` to recognize a failed HTTP execution. The wrapper records `apiId`, `groupId`, `endpoint`, `method`, and `operation`. Its `cause` retains the complete original Effect Cause. Use `Cause.findError` to inspect declared endpoint errors, middleware errors, Schema errors, and HTTP client errors. Use `Cause.hasDies` and `Cause.hasInterrupts` to distinguish defects and interruption. A Cause can contain several reasons.
+Identify HTTP execution errors with `isEffectHttpApiQueryError` from `@ueberbrot/effect-api-query`. Read `apiId`, `groupId`, `endpoint`, `method`, and `operation` from the error. Use `Cause.findError` to inspect endpoint, middleware, Schema, or transport failures. Use `Cause.hasDies` and `Cause.hasInterrupts` for defects and interruption. A Cause can include several reasons.
 
-The package adds only declaration identity to execution-error metadata. The preserved Cause can contain upstream request headers, bodies, concrete URLs, responses, or Schema issue values. Review those values before logging or exposing them. The package does not sanitize the Cause.
+The wrapper adds declaration identifiers. The original Cause can still contain request headers, bodies, URLs, responses, or Schema issue values. Review it before logging or exposing it.
 
-`EffectHttpApiQueryConfigError` reports invalid configuration at the same stages as the RPC error: preparation or stream execution. `EffectHttpApiQueryKeyError` reports synchronous failures during query-key preparation, before HTTP execution.
+`EffectHttpApiQueryConfigError` reports configuration failures during preparation or stream execution. `EffectHttpApiQueryKeyError` reports synchronous key preparation failures before the request runs.
 
-Mutations encode their request inside the ready client's Effect. Their encoding failures therefore become `EffectHttpApiQueryError`. Runner rejections and user or TanStack callback failures pass through unchanged when they produce no failed Exit.
+The HTTP client encodes mutation input when the mutation runs. Its encoding failures become `EffectHttpApiQueryError`. Runner rejections and callback failures without a failed Exit pass through.
 
 See the [HTTP factory reference](/effect-api-query/reference/http-builders/#cache-identity-and-failures) for key-error codes.
 
 ## Match a tagged typed failure
 
-Import `findDeclaredError` and use it with a typed execution error. It returns an Effect `Option` whose value is narrowed to the selected tag:
+Use `findDeclaredError` to find a single tagged failure. It returns an Effect `Option` typed to the selected tag.
 
 ```ts
 import { findDeclaredError } from "@ueberbrot/effect-api-query";
@@ -56,4 +56,4 @@ if (Option.isSome(missing)) {
 }
 ```
 
-Here `error` is a typed query or mutation error whose failure union includes `{ _tag: 'Missing', id: number }`. Only tags present in that union are accepted. A single matching failure returns `Some`; other tags, defects, interruptions, composite Causes, and non-wrapper errors return `None`. The original wrapper and complete Cause remain available. Typed transport failures can also belong to the union; matching a tag does not validate untrusted data or replace application retry policy.
+The wrapper's failure union includes `{ _tag: 'Missing', id: number }` here. The helper accepts only tags in that union, including typed transport failures. It returns `Some` for a single match and `None` for other errors or a composite Cause. Keep the wrapper if you need the complete Cause. Validate untrusted input separately.

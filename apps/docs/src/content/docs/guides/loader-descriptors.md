@@ -3,13 +3,13 @@ title: Transfer Loader Selections
 description: Rebind a typed query selection to independent server and browser owners.
 ---
 
-A loader descriptor records one generated operation, view, and encoded input. It carries no query data or ready client. Register the same operation on the server and browser with `createQueryDescriptor`. Each registration binds to its own ready-client owner.
+Use `createQueryDescriptor` to transfer a loader's operation, view, and encoded input to the browser. Register the same operation on both sides. Each registration uses its own ready client.
 
-The application supplies a compatibility identifier and a synchronous, service-free input codec. Change the identifier when the contract, codec, custom key encoder, or execution meaning changes. The full generated leaf key, including the application prefix and adapter namespace, identifies the operation. The view identifies its cache representation.
+Supply a compatibility identifier and an input codec that runs synchronously without services. Change the identifier if the contract, codec, key encoder, or execution meaning changes. The leaf key identifies the operation. The view identifies what it caches.
 
 ## Load and render the selected user
 
-Acquire independent ready clients before calling `load` and `restore`. Keep each client's Scope and runtime alive while its queries run. The following module uses a JSON-safe result; the application owns JSON transport and script escaping. On the browser, mount the returned `App` and keep its cache for that owner. On teardown, unmount, cancel outstanding queries, await local cleanup, and dispose the client resources.
+Acquire separate clients before calling `load` and `restore`. The app transfers the JSON result and escapes it for the page. Mount the returned `App` with its browser cache. On teardown, unmount, cancel queries, wait for local cleanup, and release its resources.
 
 ```tsx
 import {
@@ -80,18 +80,18 @@ export function restore(client: Client, json: string) {
 }
 ```
 
-The browser uses the transferred input rather than reading a route or mutable form again. `bind` validates the descriptor and returns the receiving leaf, literal view, view prefix, and a fresh owner-bound prepared input. Pass that input to the matching native builder. Keep retained rich values immutable. Inputless registrations use a codec from `void` to a JSON value, such as `null`, and use their native inputless builders.
+Use the transferred selection to avoid reading the route or form again. `bind` checks the descriptor and returns the receiving leaf, view, view prefix, and prepared input. Pass that input to the matching builder and keep retained values unchanged. For an inputless leaf, use a codec from `void` to JSON, such as `null`, and call its inputless builder.
 
 ## Encode rich input explicitly
 
-For a decoded input `{ id: bigint }`, use `Schema.Struct({ id: Schema.BigIntFromString })` as the input codec. The descriptor carries a decimal string and `bind` reconstructs the bigint. Other rich values need equally explicit codecs. The codec's decoded type must match `InferInput<typeof leaf>`. `capture` accepts constructor input, never a prepared-input token. It copies and freezes the encoded JSON so later changes to the original object cannot change the selection.
+To transfer `{ id: bigint }`, use `Schema.Struct({ id: Schema.BigIntFromString })`. The descriptor stores a decimal string. `bind` reconstructs the bigint. Match the decoded type to `InferInput<typeof leaf>`. Pass constructor input to `capture`; it copies and freezes the encoded JSON.
 
-`capture` prepares the original input and its codec round trip and checks canonical identity. `bind` decodes and prepares again on the receiving leaf and checks that identity. RPC payloads must remain query-stable under reconstruction; defaults must be deterministic. This does not make constructor-sensitive queries safe. A codec must preserve all execution-relevant decoded state, including state omitted by a custom key encoder. Equal keys alone cannot prove that property.
+`capture` prepares the input before and after the codec round trip and compares canonical identity. `bind` checks the same identity on the receiving leaf. Use deterministic, query-stable RPC constructors. Preserve all values that affect execution, even fields your key encoder omits. Equal keys alone cannot verify those fields.
 
 ## Supported views and failures
 
-Register buffered RPC/HTTP queries, HTTP metadata, accumulated or live streams. Native options retain their original inference and behavior. Stream retention, publication policy and recovery stay local. Infinite views are excluded: use native infinite options and an application-owned page mapper instead. Configure equivalent policies on both owners when sharing a cache entry. A descriptor does not transport callbacks or select projections. For streams, pass rebuilt options to `fetchStreamSnapshot` on an exclusive idle, unobserved key; descriptors do not relax capture or cleanup requirements. For rich cached data, use the separate [query-view hydration codecs](/effect-api-query/guides/hydrate-query-views/) before application serialization and native hydration.
+Register a buffered query, HTTP metadata, or an accumulated or live stream. Use native infinite options and an application page mapper for infinite queries. Set the same local policies on both sides to share a cache entry. Callbacks, selection, retention, publication, and recovery stay local. Use an idle, unobserved key for [stream capture](/effect-api-query/guides/stream-snapshots/) and separate [view codecs](/effect-api-query/guides/hydrate-query-views/) for cached data.
 
-Failures throw `QueryDescriptorError` synchronously, before query execution. `Malformed` rejects invalid envelopes, extra envelope fields, unsupported versions and non-JSON values. `Incompatible` rejects a different compatibility identifier, operation prefix or view. `Input` rejects codec or input-preparation failure. `Identity` rejects a codec round trip or receiving encoder that changes canonical input identity. Error objects retain no descriptor or input. Handle rejection by loading a fresh authorized selection rather than hydrating an incompatible entry.
+`QueryDescriptorError` throws before execution. `Malformed` means the envelope, version, fields, or JSON are invalid. `Incompatible` means the compatibility ID, operation, or view differs. `Input` means the codec or preparation failed. `Identity` means a round trip or receiving encoder changed the key. Errors omit the descriptor and input. On rejection, load a fresh authorized selection.
 
-Descriptors carry no query results, clients, functions, credentials, or prepared tokens. Choose a public input DTO and safe custom key encoder when necessary; the library cannot identify arbitrary sensitive application fields. Keep authentication in the ready client's application-owned middleware. Neither the descriptor nor its identity is an authorization token, signature, schema fingerprint, or protection against hostile input. Validate authorization at execution. Validate the enclosing cache snapshot separately before hydration.
+Use a public input DTO and a safe key encoder. Keep credentials in client middleware. Authorize the request at execution and validate the enclosing cache snapshot before hydration. A descriptor carries only the selection and its input identity.

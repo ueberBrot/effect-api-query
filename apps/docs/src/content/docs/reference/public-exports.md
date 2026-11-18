@@ -3,7 +3,7 @@ title: Public Exports
 description: Package-root values and types.
 ---
 
-The package root, `@ueberbrot/effect-api-query`, exports all supported values and types.
+Import these values and types from `@ueberbrot/effect-api-query`.
 
 | Export | Purpose |
 | --- | --- |
@@ -50,13 +50,13 @@ The package root, `@ueberbrot/effect-api-query`, exports all supported values an
 | `EffectRpcQueryConfigErrorCode` | Stable configuration error-code union. |
 | `EffectRpcQueryKeyErrorCode` | Stable key error-code union. |
 
-The [HTTP factory](/effect-api-query/reference/http-factory/) exports `createHttpApiQueryUtils`, `HttpApiQueryUtils`, `CreateHttpApiQueryUtilsOptions`, and `HttpApiKeyEncoder`. Its error classes are `EffectHttpApiQueryError`, `EffectHttpApiQueryEmptyStreamError`, `EffectHttpApiQueryConfigError`, and `EffectHttpApiQueryKeyError`, with `isEffectHttpApiQueryError`, `EffectHttpApiQueryConfigErrorCode`, and `EffectHttpApiQueryKeyErrorCode` for narrowing and stable codes.
+See the [HTTP factory](/effect-api-query/reference/http-factory/) for HTTP types and [errors](/effect-api-query/reference/errors/) for error classes and codes.
 
-`UnaryRpcOptions` describes headers and Context local to a request for unary builders. `StreamingRpcOptions` also accepts the Effect client's stream buffer size. [Generated Builders](/effect-api-query/reference/generated-builders/#request-local-rpc-options) defines their behavior.
+Use `UnaryRpcOptions` for local headers and Context. `StreamingRpcOptions` adds the client's stream buffer size. See [request-local RPC options](/effect-api-query/reference/generated-builders/#request-local-rpc-options).
 
 ## fetchStreamSnapshot
 
-`fetchStreamSnapshot(queryClient, options, controls?)` returns `Promise<TData>` and preserves native `select` and its result type. It requires a callable query function, usually from generated `streamedOptions` or `liveOptions`. It excludes skipped queries and infinite-query options.
+`fetchStreamSnapshot(queryClient, options, controls?)` returns `Promise<TData>` and applies native `select`. Pass options with a callable query function, usually from `streamedOptions` or `liveOptions`. Skipped and infinite options are not accepted.
 
 | Control | Default | Meaning |
 | --- | --- | --- |
@@ -64,7 +64,7 @@ The [HTTP factory](/effect-api-query/reference/http-factory/) exports `createHtt
 | `signal` | Omitted | Rejects on request abort using `signal.reason`. An already aborted signal acquires no work. |
 | `timeoutMs` | `10_000` | Limits the wait for publication or completion to a finite positive value at most `2_147_483_647`. |
 
-Fresh capture requires an idle exact query without observers. It starts even if cached data is fresh or has a future timestamp. The `cached` mode preserves native selection, even when another owner fetches or observes the successful entry. If no successful entry exists, it uses fresh capture. QueryClient owns hashing. Helper options reject `queryHash` and `queryKeyHashFn`.
+Reserve an idle, unobserved exact key for fresh capture. A fresh capture starts despite a fresh cache entry. Use `cached` to select from existing successful data even if another observer is present. If there is none, the helper starts a fresh capture. Set hashing in QueryClient defaults.
 
 | Outcome | Result |
 | --- | --- |
@@ -77,32 +77,30 @@ Fresh capture requires an idle exact query without observers. It starts even if 
 | Request abort | Rejects with the abort reason after cancellation and local cleanup. |
 | External cancellation before publication | Rejects with Query Core's `CancelledError` after local cleanup. |
 
-Every outcome detaches listeners and the timer. Local cleanup must cooperate with cancellation and finish before the Promise settles. The timeout does not bound finalizers or acknowledge remote server cleanup. Capture requires exclusive ownership of the exact key, including manual writes. [Stream Snapshots](/effect-api-query/guides/stream-snapshots/) describes request disposal and independent browser reconnection.
+On settlement the helper removes its listeners and timer. Avoid other writes to the key during capture. The timeout bounds the wait for data. Local finalizers must still finish. Use an application acknowledgement for remote cleanup. See [stream snapshots](/effect-api-query/guides/stream-snapshots/).
 
 ## Type inference
 
-[Type Inference](/effect-api-query/reference/type-inference/) describes accepted inputs, supported query views, cached data before `select`, mutation results, and failure types.
+See [type inference](/effect-api-query/reference/type-inference/) for input, cached data before `select`, mutation results, and errors.
 
 ## Select a view prefix
 
-`viewPrefix(leaf, view)` returns an immutable ordinary key for every input and stream policy of a supported leaf view. Native query filters and `setQueryDefaults` accept that key. It carries no DataTag, so broad cache reads remain `unknown`. Concrete generated keys provide typed exact cache access. [Cache Filters](/effect-api-query/guides/cache-filters/) describes encoded partial input.
+`viewPrefix(leaf, view)` returns a frozen key prefix for every input and stream policy of one view. Use it with filters or `setQueryDefaults`. It has no data tag, so broad reads infer `unknown`. Use a concrete generated key for typed exact access. See [cache filters](/effect-api-query/guides/cache-filters/).
 
 ## Configure shared behavior
 
-`configureUtils(treeOrLeaf, configuration)` returns frozen configured utilities with the same generated keys. Each view accepts `{ policy, interceptors }`. Mutation configuration also accepts `callbacks: "replace" | "compose"`. A tree or branch uses `scoped` to configure named children.
+`configureUtils(treeOrLeaf, configuration)` returns frozen utilities and keeps their keys. Set `{ policy, interceptors }` per view. Mutations also take `callbacks: "replace" | "compose"`. Use `scoped` for named descendants.
 
-Policies apply from tree to branch to leaf, followed by call-site options. Explicit configured options override QueryClient defaults. Interceptors run from broad to specific, with the first entry outermost. Leaf callbacks retain their contract's types; shared tree and branch policy callbacks receive unknown data, errors, and variables.
+Policy precedence runs from QueryClient defaults to tree, branch, leaf, and call site. Interceptors wrap broad to specific, with the first entry outermost. Leaf callbacks infer contract types. Shared callbacks receive `unknown`.
 
-`QueryPolicy<Leaf, View>` and `MutationPolicy<Leaf>` type reusable native policies. Keep inputs, selection, initial data, page mapping, and local optimistic context at the call site. Stream configuration can supply `maxChunks` and other publication controls through `streamed.policy`. A configured retention choice applies to both its keys and options.
+Use `QueryPolicy<Leaf, View>` or `MutationPolicy<Leaf>` for reusable settings. Keep input, selection, initial data, page mapping, and optimistic context local. A `streamed.policy` retention setting applies to both keys and options.
 
-See [Defaults and Policies](/effect-api-query/guides/query-defaults/) for typed examples, callback composition, and precedence.
-
-See [Cache Keys and Filters](/effect-api-query/guides/cache-filters/) for partial projections, [Defaults and Policies](/effect-api-query/guides/query-defaults/) for composition and interception, and [Hydrate Query Views](/effect-api-query/guides/hydrate-query-views/) for codec registration.
+See [defaults and policies](/effect-api-query/guides/query-defaults/) for callback composition and examples.
 
 ## QueryClient operations in Effect
 
-[Compose QueryClient Operations in Effect](/effect-api-query/guides/query-effects/) covers typed cache reads, ensure/fetch, updates, generated filters, error channels, and interruption of one waiter without cancelling shared work.
+See [query effects](/effect-api-query/guides/query-effects/) to read, update, or invalidate the native cache from Effect and handle interruption.
 
 ## Loader selections
 
-`createQueryDescriptor` registers one generated leaf and view for typed capture and receiving-owner rebinding. `QueryDescriptor` describes the transferable selection; `QueryDescriptorError` reports synchronous malformed, compatibility, input and semantic identity failures. See [Transfer Loader Selections](/effect-api-query/guides/loader-descriptors/) for the complete native hydration example.
+Use `createQueryDescriptor` to register one leaf and view for transfer. `QueryDescriptor` describes the selection. `QueryDescriptorError` reports malformed, incompatible, input, and identity failures before execution. See [loader selections](/effect-api-query/guides/loader-descriptors/).

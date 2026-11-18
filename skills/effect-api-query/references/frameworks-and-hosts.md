@@ -1,10 +1,10 @@
 # Native frameworks, transports, and supported hosts
 
-To choose a framework, router, or host, read the [integration overview](https://ueberbrot.github.io/effect-api-query/integrations/). It describes native consumers and application lifetime boundaries.
+Use the [integration overview](https://ueberbrot.github.io/effect-api-query/integrations/) to choose a native framework hook or router setup.
 
 ## Rebuild captured options from reactive input
 
-During application setup, acquire clients and create utilities. Supply the native framework's Query provider. Builders capture plain input at each call. Invoke them inside the framework's reactive options computation. Input changes then produce a new key and query function. Mutations receive new variables at execution time.
+Acquire clients and build utilities during app setup. Give the provider the owning QueryClient. Call builders inside the framework's reactive options computation so changes create fresh input, key, and query function. Pass mutation variables when the mutation runs.
 
 | Framework | Native options construction |
 | --- | --- |
@@ -14,7 +14,7 @@ During application setup, acquire clients and create utilities. Supply the nativ
 | Svelte | `createQuery(() => rpc.users.read.queryOptions(...))` |
 | Angular | `injectQuery(() => rpc.users.read.queryOptions(...))` inside an injection context |
 
-Use the same pattern for infinite, metadata, accumulated, and live options. The following factory constructs utilities once and returns hooks for native component setup:
+Reuse the same pattern for pages, metadata, and streams. This factory builds utilities once and returns hooks for components.
 
 ```ts
 import { useQuery as useSolidQuery } from "@tanstack/solid-query";
@@ -61,50 +61,48 @@ export function makeUserHooks(
 }
 ```
 
-Let builders and native hooks infer their arguments. Vue options retain selected data and full error inference without explicit hook generics. In Vue, function-valued `enabled` is a zero-argument getter. Use a boolean or `() => boolean`. Vue does not use Core's `enabled(query)` callback. Solid accepts that Core callback.
+Let the builder and hook infer data and errors. For Vue, set `enabled` to a boolean or a zero-argument getter. Solid can use Core's `enabled(query)` callback.
 
-With the checked versions in the compatibility table, Solid Query's query and infinite overloads require a defined seed or no seed. A possibly undefined value or initializer does not match. Vue accepts that initializer. Plain Vue options with a defined seed retain defined data; computed options can keep data optional under the native overload. Explicit `initialData: undefined` overrides inherited seeds. Angular's skipped query keeps optional `data()` even with defined initial data. Svelte preserves defined data for that combination. Angular and Svelte both accept possibly undefined initializers with optional data.
+In the tested versions, Solid query and infinite hooks accept a defined seed or no seed. Vue accepts a possibly undefined initializer. Its computed overload can return optional data even with a defined seed. Use `initialData: undefined` to clear an inherited seed. With `skipToken` and defined initial data, Angular returns optional data and Svelte returns defined data. Both accept possibly undefined initializers and return optional data then.
 
-Compile Svelte with `module: 'ESNext'` and `moduleResolution: 'Bundler'`. NodeNext checking exposes an upstream limitation with imports in `.svelte` declarations. Angular results are signals such as `data()`. Register `provideTanStackQuery(queryClient)` and use an injection context. Use native infinite and mutation hooks with their matching builders.
+For Svelte, set `module: 'ESNext'` and `moduleResolution: 'Bundler'` for its `.svelte` declarations. In Angular, register `provideTanStackQuery(queryClient)` and call query hooks inside an injection context. Results are signals such as `data()`.
 
-For ordinary Query hooks and observers, removing the last observer cancels abort-aware open queries. Keep resources alive until local finalizers finish. When changing an owner, follow the ordered unmount, drain, dispose, and remount procedure in [cache workflows](cache-workflows.md).
+When the last ordinary observer leaves, TanStack can cancel an abort-aware query. Keep the client alive through local finalizers. To switch owners, follow [cache workflows](cache-workflows.md#replace-an-owner-in-order).
 
 ## Mount a provider and recover Suspense
 
-Both example apps run the HTTP workflows. Start mounts the browser-owned workflow separately from its request owner, and its featured-user loader transfers a descriptor for rebinding before the native query hook reads hydrated data. For runnable HTTP setup, streams, uploads, typed errors, sharing, and recovery, use [HTTP Workflows](https://ueberbrot.github.io/effect-api-query/examples/http-workflows/).
+Run the [HTTP workflows](https://ueberbrot.github.io/effect-api-query/examples/http-workflows/) for typed errors, uploads, stream sharing, and recovery. Start's browser workflow uses a separate owner from server rendering. Its featured-user loader transfers a selection that the browser rebinds before reading the cache.
 
-For a first React integration, acquire one client. Create the utility tree and QueryClient once, then mount `QueryClientProvider`. Before disposing the application's client resources, unmount consumers. For one acquired HTTP client, one component, and an awaited cleanup function, use [the React client setup](https://ueberbrot.github.io/effect-api-query/guides/react-query/#acquire-and-mount-the-client).
+For React, acquire one client, build the utilities and QueryClient, then mount `QueryClientProvider`. Unmount consumers and await disposal. See the [complete React setup](https://ueberbrot.github.io/effect-api-query/guides/react-query/#acquire-and-mount-the-client).
 
-Put `QueryErrorResetBoundary` around a component error boundary and Suspense. On retry, reset both error boundaries before rendering the component's queries again. With cached data, a failed refetch normally keeps rendering that data. When fetching stops, show the local error. If the application wants boundary recovery, explicitly throw the error.
+Wrap the React error boundary and Suspense in `QueryErrorResetBoundary`. On retry, reset both error states. If a background refetch fails while data exists, the screen can still render that data. Show the error locally after fetching stops, or explicitly throw it for boundary recovery.
 
-For independent reads that need to start together, pass generated options directly to `useSuspenseQueries`; data and errors infer without explicit descriptors. For error recovery and parallel reads, follow [the complete Suspense recipe](https://ueberbrot.github.io/effect-api-query/guides/suspense-and-recovery/). Native Suspense query hooks do not support cancellation. If abort and open-stream cleanup are required, use ordinary Query hooks or observers. Suspense hooks do not accept skipped query options.
+For independent reads, pass generated options to `useSuspenseQueries` to start them together. Use ordinary hooks or observers if cancellation matters. Suspense hooks reject skipped options. See [Suspense recovery](https://ueberbrot.github.io/effect-api-query/guides/suspense-and-recovery/).
 
 ## Match application dependencies
 
-Before selecting or upgrading dependencies, read [Requirements and tested integrations](https://ueberbrot.github.io/effect-api-query/reference/compatibility-and-limits/#requirements-and-tested-integrations). Distinguish the library's peers, the listed wrapper's framework peers, and the exact checked combination. Native TypeScript hook-inference checks establish consumer types; use component compilers and build tooling supported by the framework.
+Use the [compatibility table](https://ueberbrot.github.io/effect-api-query/reference/compatibility-and-limits/#requirements-and-tested-integrations) to select library peers and framework wrappers. It lists tested combinations separately. Use a compiler supported by the framework's tooling.
 
-Keep Effect runtime, testing, and platform packages on a coordinated release within the installed package's peer range. Exact development pins are separate from consumer peers. The repository uses Effect-enhanced TSRS targeting TypeScript 7.1 beta; consumers retain TypeScript 5.9 support and use their framework’s supported compiler tooling.
+Match Effect runtime, testing, and platform releases within the installed package's peer range. The repo uses Effect-enhanced TSRS for development. Consumer declarations support TypeScript 5.9 and later reviewed compilers.
 
-The packed matrix checks Effect 4.0.6, 4.0.7, 4.1.0 and 4.1.2 with Query Core 5.104.4 and 5.105.0, using TSRS and TypeScript 5.9.3. These exact combinations are evidence within the supported ranges, not exhaustive patch coverage. Review future Effect minors and TypeScript majors explicitly.
+Before 1.0, breaking contracts, new capabilities, and support changes can appear in minor releases. See [compatibility and stability](https://ueberbrot.github.io/effect-api-query/getting-started/compatibility-and-stability/) for the release policy.
 
-Before 1.0, breaking contracts and supported dependency or compiler drops are minor changes, as are additive capabilities and verified range extensions. Compatible fixes and internal tooling changes are patch changes. A required API, type contract or correctness fix can require raising the minimum. Extend support only after compatibility checks. Supporting older releases does not backport upstream transport fixes.
+Keep app and wrapper on one resolved Query Core version. Keep Angular core, common, compiler, and platform-browser on the same release.
 
-Pin Query packages to the checked versions and keep each native wrapper on the application's resolved Query Core. Keep Angular core, common, compiler, and platform-browser on the same release.
-
-Check the website's header version before applying its examples. When it differs from the installed package, use that package's declarations and shipped guidance. The repository's `main` branch can contain unreleased behavior.
+Match the site's version badge to the installed package before applying its examples. For another version, use the installed declarations and guidance.
 
 ## Keep transport and host ownership explicit
 
-The application owns the transport and host resources in each integration:
+Choose the transport your application already owns.
 
-- HTTP RPC requires a flat client in a live application Scope with matching protocol and serialization. Follow [RPC setup](rpc.md) to acquire it.
-- Shared WebSocket RPC lets concurrent unary and stream requests share the owned connection. They retain independent keys and cancellation. After retiring the prior owner, acquire replacement resources. The application owns reconnect, backoff, authentication, and replay policy. Local cancellation does not prove remote cleanup.
-- Server-local RPC can avoid a network round trip through a request-scoped public decoded-message client and server. Server-owned services determine authority. Caller services cannot override it. This path skips wire Schema codecs. If their validation or effects matter, retain a schema-aware protocol.
-- Browser and dedicated worker hosts each own their ready clients, runtime, Scope, and QueryClient. Worker-hosted operations do not establish cross-host `postMessage` transport, service or shared workers, authentication, or cache synchronization. Before terminating a worker, await cleanup.
-- External OpenAPI HTTP can use `openapi-typescript` to generate encoded DTO types from native `OpenApi.fromApi` for `openapi-fetch`. That client calls HTTP independently. It cannot replace the ready Effect HttpApiClient in the factory. Multipart needs explicit FormData serialization. Raw SSE bytes provide no event parsing, Schema decoding, or reserved-failure handling.
+- HTTP RPC needs a flat client in a live Scope and matching serialization. Follow [RPC setup](rpc.md).
+- With a shared WebSocket, unary and stream requests keep distinct keys and cancellation. Retire the old owner before replacing connections. Set reconnect, backoff, authentication, and replay in the app. Wait for a server acknowledgement if you need proof of cleanup.
+- Server-local RPC can use public decoded messages inside the request Scope. Server-owned services define authority. Use a schema-aware protocol when wire validation or codec effects matter.
+- A browser window or dedicated worker owns its client, runtime, Scope, and cache. Configure cross-host transport, authentication, and synchronization separately. Wait for worker cleanup before termination.
+- Use `openapi-typescript` with `OpenApi.fromApi` for encoded DTO types and `openapi-fetch` for direct HTTP. Supply multipart serialization and an SSE decoder if needed. Pass an Effect HttpApiClient to the factory.
 
-The factories preserve the ready client's actual execution contract. They supply no transport batching, platform services, or framework providers. Error guards use same-realm `instanceof`. Across realms, explicitly transfer safe error DTOs.
+The app supplies transport batching, platform services, and providers. Execution guards use same-realm `instanceof`. Across realms, transfer a safe error DTO.
 
-Sources: [Vue Query](https://ueberbrot.github.io/effect-api-query/guides/vue-query/), [Solid Query](https://ueberbrot.github.io/effect-api-query/guides/solid-query/), [Svelte Query](https://ueberbrot.github.io/effect-api-query/guides/svelte-query/), [Angular Query](https://ueberbrot.github.io/effect-api-query/guides/angular-query/), [host boundaries](https://ueberbrot.github.io/effect-api-query/reference/browser-and-worker-hosts/), [WebSocket clients](https://ueberbrot.github.io/effect-api-query/guides/websocket-clients/).
+See [Vue](https://ueberbrot.github.io/effect-api-query/guides/vue-query/), [Solid](https://ueberbrot.github.io/effect-api-query/guides/solid-query/), [Svelte](https://ueberbrot.github.io/effect-api-query/guides/svelte-query/), and [Angular](https://ueberbrot.github.io/effect-api-query/guides/angular-query/) for native hooks. See [worker hosts](https://ueberbrot.github.io/effect-api-query/reference/browser-and-worker-hosts/) and [WebSocket clients](https://ueberbrot.github.io/effect-api-query/guides/websocket-clients/) for transport setup.
 
-For optional acquired/borrowed setup with native providers, read [query owner setup](cache-workflows.md#opt-in-to-query-owner-setup). It preserves native hooks and reactive option rebuilding. For tagged declared errors and full Cause inspection, use [failure handling](https://ueberbrot.github.io/effect-api-query/guides/handle-failures/); choose [one retry owner](https://ueberbrot.github.io/effect-api-query/guides/retry-queries/), and use [native Suspense reset and recovery](https://ueberbrot.github.io/effect-api-query/guides/suspense-and-recovery/) for initial rendering failures.
+See [query owner setup](cache-workflows.md#opt-in-to-query-owner-setup) for acquired and borrowed resources. For execution errors, follow [failure handling](https://ueberbrot.github.io/effect-api-query/guides/handle-failures/) and [retry queries](https://ueberbrot.github.io/effect-api-query/guides/retry-queries/).

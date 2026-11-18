@@ -3,13 +3,13 @@ title: Retry Queries
 description: Reuse bounded read policies with typed Effect failures and native Query options.
 ---
 
-Bind a retry policy with `configureUtils`. Use the configured leaf's options wherever you need that read. Each call keeps native `select`, input, and initial-data inference. Call-site options replace matching defaults.
+Set a shared retry policy with `configureUtils`, then use the configured leaf at each call site. Options retain native input, `select`, and initial-data types. Local options override shared defaults.
 
-The policy below permits two retries after the initial failure, for at most three executions. It allows a declared `RetryLater` or an application-approved transport failure. Use it for idempotent reads whose transport does not already own retries.
+This policy allows two retries for `RetryLater` or an approved transport failure, for up to three executions. Use it for reads that are safe to repeat when the transport leaves retries to the app.
 
 ## Share the decision and delay
 
-Import `Cause`, `Result`, and `Schema` from `effect`. Define `RetryLater` with a finite `retryAfterMs` field in your contract, then reuse this application helper for RPC and HTTP:
+Import `Cause`, `Result`, and `Schema` from `effect`. Declare `RetryLater` with a finite `retryAfterMs` field and share the helper between RPC and HTTP.
 
 ```ts
 const retryPolicy = <Error, Failure>(
@@ -46,11 +46,11 @@ const retryPolicy = <Error, Failure>(
 });
 ```
 
-The helper rejects defects, interruptions, and Causes with multiple reasons. `Cause.findError` returns a `Result`. The successful value retains the typed failure union. Schema refinement also handles unknown values safely. The adapter guard rejects custom runner failures that pass through unchanged.
+The helper stops on defects, interruptions, and Causes with multiple reasons. `Cause.findError` returns a `Result` whose success keeps the typed failure union. Schema checks handle unknown values. The adapter guard excludes unwrapped runner failures.
 
 ## Bind a typed RPC policy
 
-Import `configureUtils`, `isEffectRpcQueryError`, and the type `InferQueryError` from `@ueberbrot/effect-api-query`, plus `RpcClientError` from `effect/rpc`. After acquiring your ready client and creating `rpc`, bind the profile read:
+Import `configureUtils`, `isEffectRpcQueryError`, and `InferQueryError` from `@ueberbrot/effect-api-query`. Import `RpcClientError` from `effect/rpc`. After you build `rpc`, attach the policy to the profile read.
 
 ```ts
 type Error = InferQueryError<typeof rpc.profile.read>;
@@ -69,11 +69,11 @@ const read = configureUtils(rpc.profile.read, {
 return read.queryOptions();
 ```
 
-This application allows only RPC's HTTP transport failures. Socket and worker reconnect policy belongs to the application that owns those transports.
+This example retries only RPC failures from HTTP transport. Configure WebSocket or worker reconnects where you own the transport.
 
 ## Bind the same decision to HTTP
 
-Import `isEffectHttpApiQueryError` from `@ueberbrot/effect-api-query` and `HttpClientError` from `effect/http`. Reuse the shared retry logic with HTTP's transport classifier:
+Import `isEffectHttpApiQueryError` from `@ueberbrot/effect-api-query` and `HttpClientError` from `effect/http`. Reuse the helper with HTTP's transport classifier.
 
 ```ts
 type Error = InferQueryError<typeof http.profile.read>;
@@ -91,9 +91,9 @@ const read = configureUtils(http.profile.read, {
 return read.queryOptions();
 ```
 
-Encoding, decoding, response, `NotFound`, and authentication failures receive no retry. Restore an expired session before invalidating its affected queries.
+The policy stops on encoding, decoding, response, `NotFound`, and authentication failures. Restore an expired session before invalidating its queries.
 
-The [complete compiled recipe](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-retry.ts) contains the contracts and both ready-client factories. See [Query Defaults](/effect-api-query/guides/query-defaults/) for policy types, mutation callbacks, and precedence.
+See the [compiled example](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-retry.ts) for both contracts and factories. See [defaults and policies](/effect-api-query/guides/query-defaults/) for precedence.
 
 ## Set defaults deliberately
 
@@ -104,14 +104,14 @@ The [complete compiled recipe](https://github.com/ueberBrot/effect-api-query/blo
 | Imperative `queryClient.query` and `queryClient.infiniteQuery` | Retries disabled |
 | Mutation | Retries disabled |
 
-QueryClient global and prefix defaults still apply. Set `retry` explicitly when attempt counts matter. `retry: 2` permits three executions. `retry: false` permits one.
+QueryClient defaults still apply. Set `retry: 2` for up to three runs or `retry: false` for one.
 
-Choose one layer to own retries. Two retries in TanStack combined with two retries per invocation in Effect can make nine client attempts. A retry around iterable creation does not retry later stream consumption. Restart a stream only when restarting is safe for that operation. Retention and refetch policies still govern cache publication. Mutation retries require application idempotency.
+Choose one layer to retry. Two retries in TanStack and two per run in Effect can make nine client attempts. If you need to retry a stream's pulls, attach recovery to consumption. Restart only operations that are safe to repeat. Stream policies still control cache writes. Retrying a mutation requires application idempotency.
 
-`retryDelay` receives a zero-based attempt index and returns milliseconds. Query Core can evaluate it for terminal failures, so keep it pure. This recipe clamps server delays and exponential backoff to 30 seconds.
+`retryDelay` takes a zero-based index and returns milliseconds. Keep it free of side effects because Query Core can evaluate it for the final failure. This recipe caps both server delays and exponential backoff at 30 seconds.
 
 ## Handle preparation before execution
 
-Factory, builder, and key-generation errors are synchronous. If input or custom encoders can fail, prepare options inside `try`. Pass successfully prepared options to Query Core. Preparation failures never enter execution retry. An infinite page-input mapper runs later. Its thrown errors pass through unchanged. Mutation encoding occurs inside the ready client's Effect and uses its Cause.
+Build options inside `try` if input or custom encoders can fail. Factory, builder, and key failures throw before execution and bypass retry. Page mappers run during execution and pass thrown errors through. The ready client encodes mutation input inside Effect, so failures carry a Cause.
 
-Keep QueryClient hashing stable while entries remain cached. `UnsupportedQueryHash` rejects an incompatible stream cache policy. Retries cannot repair it. Retire the cache before replacing its hasher. See [Failure Handling](/effect-api-query/guides/handle-failures/) for error-stage guards and [Client Lifecycle](/effect-api-query/concepts/client-lifecycle/#stream-creation-and-consumption) for stream execution boundaries.
+Keep hashing stable while entries are cached. Retrying `UnsupportedQueryHash` cannot fix incompatible hashing. Retire the cache before changing its hasher. See [error handling](/effect-api-query/guides/handle-failures/) and [stream execution](/effect-api-query/concepts/client-lifecycle/#stream-creation-and-consumption).

@@ -3,7 +3,7 @@ title: HTTP Workflows
 description: Try typed writes, streams, uploads, cache sharing, and event recovery.
 ---
 
-After [workspace setup](/effect-api-query/examples/#set-up-locally), run:
+Complete the [workspace setup](/effect-api-query/examples/#set-up-locally), then start the Vite app.
 
 ```sh
 vp run vite-react-dev
@@ -11,7 +11,7 @@ vp run vite-react-dev
 
 Open `http://127.0.0.1:5173` and choose a screen from the navigation.
 
-For TanStack Start, run `vp run tanstack-start-dev` and open `http://127.0.0.1:3000/workflows`. Both apps use the same workflow components and native Query provider. Start acquires the workflow owner in the browser; its SSR request owner remains separate. Leaving the route drains the workflow before releasing its runtime.
+For Start, run `vp run tanstack-start-dev` and open `http://127.0.0.1:3000/workflows`. Both apps use the same workflow components. Start opens the workflow's resources in the browser, separately from server rendering. Leaving the route waits for local work before disposal.
 
 | Screen | Try | Source |
 | --- | --- | --- |
@@ -24,9 +24,9 @@ For TanStack Start, run `vp run tanstack-start-dev` and open `http://127.0.0.1:3
 
 ## Adapt an example
 
-Start with the [contracts](https://github.com/ueberBrot/effect-api-query/blob/main/examples/contracts/src/workflows.ts), [handlers](https://github.com/ueberBrot/effect-api-query/blob/main/examples/server/src/workflow-handlers.ts), and [client setup](https://github.com/ueberBrot/effect-api-query/blob/main/examples/shared/http-workflows/application.ts). The setup acquires a query owner and binds a typed policy map with execution interceptors. Unmount consumers before awaiting disposal; it cancels reads, stops event consumers, and drains accepted mutations before releasing the runtime.
+Start with the [contracts](https://github.com/ueberBrot/effect-api-query/blob/main/examples/contracts/src/workflows.ts), [handlers](https://github.com/ueberBrot/effect-api-query/blob/main/examples/server/src/workflow-handlers.ts), and [client setup](https://github.com/ueberBrot/effect-api-query/blob/main/examples/shared/http-workflows/application.ts). The setup acquires a query owner and attaches typed policies and interceptors. Unmount consumers before disposal. Disposal cancels reads, stops event consumers, and drains accepted mutations before closing the runtime.
 
-- Send response ETags unchanged and keep the server's atomic precondition check. See [HTTP Metadata](/effect-api-query/guides/http-metadata/).
-- Keep shared cached values and dates immutable. See [Share Decoded Values](/effect-api-query/guides/share-decoded-values/).
-- Recovery uses application-defined decimal string cursors and maps them to the server’s numeric replay position. `runQueryEvents` supplies the owner’s cache to `queryEffects`; accepted notifications invalidate the document, while gaps and expired replay refresh it. Define replay and gap policies for your server; the event scenarios use a finite demonstration feed. See [Reconnect Streams](/effect-api-query/guides/reconnect-streams/).
-- Uploads use buffered mutations; byte-level progress and cancellation need an application workflow. See [HTTP Queries and Mutations](/effect-api-query/guides/http-queries-and-mutations/#upload-a-file).
+- Send ETags unchanged. Keep the server's atomic precondition check. See [HTTP metadata](/effect-api-query/guides/http-metadata/).
+- Keep shared values, including dates, unchanged after caching. See [share decoded values](/effect-api-query/guides/share-decoded-values/).
+- Map replay cursors to positions your server accepts. The demo uses decimal strings and a finite feed. `runQueryEvents` supplies the owner's cache. Notifications invalidate documents. Gaps and expired replay trigger a refresh. See [reconnect streams](/effect-api-query/guides/reconnect-streams/).
+- Upload files through buffered mutations. For progress or server cancellation, design an app workflow. See [upload a file](/effect-api-query/guides/http-queries-and-mutations/#upload-a-file).

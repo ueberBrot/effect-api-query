@@ -3,11 +3,11 @@ title: Compose QueryClient Operations in Effect
 description: Read, ensure, update, and invalidate the application's existing cache from Effects.
 ---
 
-Use `queryEffects` when application Effects need the same cache as native Query hooks and observers. Provide `QueryClientService` with the existing application QueryClient. The service creates no cache, runtime, transport, or Scope, and disposes nothing.
+Use `queryEffects` to read and update your application's QueryClient from Effect. Provide the same client your hooks use through `QueryClientService`. Keep ownership and cleanup in the app.
 
 ## Share the application cache
 
-This complete application module accepts the ready RPC client and QueryClient already owned by the application. Its event workflow ensures a user, applies an immutable typed update, and marks generated directory filters stale. Run the returned Effect in the application's existing runtime; keep the ready client alive until shared Query work has stopped.
+This module takes a ready RPC client and the app's QueryClient. It loads a user if needed, updates the cached value, and marks directory reads stale. Run the Effect in your app's runtime. Keep the ready client alive until shared query work stops.
 
 ```ts
 import type { QueryClient } from "@tanstack/query-core";
@@ -58,22 +58,22 @@ export const directoryEffects = (
 };
 ```
 
-The returned `rpc` utilities can also be passed directly to native hooks or QueryClient methods. Supplying a different QueryClient selects that cache explicitly. Authentication, tenant partitioning, event acceptance, and owner retirement remain application policy.
+You can pass the returned `rpc` options to native hooks and QueryClient methods too. Providing a different QueryClient selects that cache. The app controls authorization, tenant keys, and owner retirement.
 
 ## Choose the operation
 
-- `getData(key)` reads cache data or `undefined`; concrete generated keys infer the decoded data. Broad prefixes infer `unknown`.
-- `ensure(options)` delegates to native `ensureQueryData`: it returns cached data even when stale, fetching when absent. `revalidateIfStale` retains native background refresh behavior.
-- `fetch(options)` delegates to native `fetchQuery`: freshness, retry, deduplication, and cache writes remain native.
-- `setData(key, updater, options?)` delegates to native `setQueryData`; use an immutable value or updater. Returning `undefined` skips the write.
-- `invalidate(filters?, options?)` delegates to native `invalidateQueries`. Generated filters and prefixes work directly. Active queries refetch by default; `refetchType: "none"` only marks them stale. Refetch failures follow native `throwOnError` behavior.
+- `getData(key)` reads cached data or `undefined`. Exact generated keys infer data types. Broad prefixes infer `unknown`.
+- `ensure(options)` uses `ensureQueryData`. It returns cached data even when stale and fetches if absent. `revalidateIfStale` enables native background refresh.
+- `fetch(options)` uses `fetchQuery`, including its freshness, retries, deduplication, and cache writes.
+- `setData(key, updater, options?)` uses `setQueryData`. Pass a new value or update it immutably. Return `undefined` to skip the write.
+- `invalidate(filters?, options?)` uses `invalidateQueries`. Pass generated filters or prefixes. Active matches refetch by default. Use `refetchType: "none"` to mark them stale only. Refetch failures follow native `throwOnError`.
 
-These operations are lazy Effects requiring `QueryClientService` until provided. Fetch and ensure return **unselected query data**, matching the cache. A builder's `select` remains available to hooks and observers but does not transform these results. This differs from the newer native `queryClient.query`, which applies selection. A streaming fetch or ensure waits for native completion; for a finite capture of an open stream, use [Stream Snapshots](/effect-api-query/guides/stream-snapshots/).
+The Effects run when you provide `QueryClientService` and execute them. Fetch and ensure return the full cached data. Use `select` with native hooks, observers, or `queryClient.query` to project a result. Fetching a stream waits for completion. For the first visible data from an open stream, use a [stream snapshot](/effect-api-query/guides/stream-snapshots/).
 
 ## Handle failures and interruption
 
-Fetch and ensure fail with `QueryClientOperationError`. Its `cause` retains the exact original rejected value, including generated `EffectRpcQueryError` and `EffectHttpApiQueryError` objects with their complete Effect Causes. The bridge cannot infer the Cause's failure payload from the options: a runner can reject with any value, and native deduplication can share work started by another caller. A wrapper's class or tag does not prove that it came from the current query's failed Exit. Narrowing the wrapper identifies its shape; its failure payload remains `unknown`. The generated options still carry their declared error type for native consumers, while the bridge conservatively exposes the unknown rejection in `cause`. Reads, updates and invalidation use the same fallback channel. Data and service inference are unchanged.
+Each operation reports a native rejection as `QueryClientOperationError`. Its `cause` holds the original value, including any adapter error and its complete Effect Cause. Treat the rejection as `unknown`. A custom runner can reject with any value, and QueryClient can share work another caller started. Narrowing the wrapper does not establish the current query's declared failure type. Generated options retain that type for native consumers.
 
-Interrupting a caller stops **only its wait**. It does not call `cancelQueries`, forward the caller's abort signal to the query function, or unsubscribe unrelated observers. Shared work can complete and publish after every Effect waiter has left. Deduplication and QueryClient-owned abort signals remain native. The same rule applies while awaiting invalidation refetches; already-started invalidation is not rolled back.
+Interrupting an Effect stops that caller's wait. QueryClient retains its own abort signal and can continue running shared work after every waiter leaves. The same rule applies to already started invalidation.
 
-The cache owner may explicitly call native `cancelQueries` when it intends to cancel shared work. That action also affects other waiters and observers. Cancel and drain owned work before releasing the ready client or runtime; interrupting this bridge's waiter does not establish cleanup or remote acknowledgement. See [Cancellation](/effect-api-query/guides/cancellation/) and [Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/).
+Use native `cancelQueries` if the owner intends to stop shared work for all waiters and observers. Wait for local cleanup before releasing the client or runtime. See [cancellation](/effect-api-query/guides/cancellation/) and [switch cache owners](/effect-api-query/guides/switch-cache-owners/).

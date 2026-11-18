@@ -1,40 +1,40 @@
 ---
-title: Data Normalization
-description: Understand RPC payload defaults, decoded HTTP inputs, and undefined query results.
+title: Inputs and Query Data
+description: Use RPC payload defaults and decoded HTTP inputs, and understand which results become null.
 ---
 
 ## Query-stable RPC payloads
 
-A payload-bearing query constructs and normalizes its payload before it builds the key. The ready RPC client constructs that value again during execution. The payload Schema must therefore be query-stable: construction must preserve every field that affects the RPC result when repeated. Constructor defaults affect both execution and cache identity.
+An RPC query with a payload constructs it to build the key. The client constructs it again when it runs the request. Use a query-stable Schema so the second construction preserves the encoded meaning of the first.
 
-Inputs that normalize to the same payload share a cache entry. Custom key encoders also receive the normalized payload. Defaults must be deterministic across independently built options; supply time-dependent or random values explicitly.
+For example, an omitted locale and an explicit `"en"` share a cache entry if the constructor defaults to `"en"`. Use explicit values for time-dependent or random defaults. Custom key encoders receive the payload after construction.
 
-A constructor that increments an existing `id` illustrates the restriction: preparation turns `1` into `2`, then a ready client reconstructs `2` as `3`. Preparation has succeeded, but the key no longer describes execution. A custom encoder or prepared handle cannot fix this. Expose a stable struct-shaped query-facing RPC and move the domain conversion into its handler. Mutations pass the original constructor input to the ready client and remain suitable for constructor-sensitive operations. The existing ready-client boundary supports this path without a separate decoded execution API.
+If a constructor increments `id`, input `1` can build a key for `2` and send a request for `3`. Use a stable input Schema and do the conversion in the handler. A prepared input or key encoder cannot change how the client constructs the payload. Mutations pass the original input to the client, which constructs it once.
 
 ## Decoded HTTP inputs
 
-HTTP builders accept the endpoint's declared, decoded `params`, `query`, `headers`, and `payload` values. They do not apply RPC constructor defaults. Key preparation encodes those values with their schemas. The ready HttpApiClient encodes them separately for execution.
+Supply the decoded values for the endpoint's declared `params`, `query`, `headers`, and `payload`. Pass any needed defaults explicitly. Key preparation and the ready HttpApiClient encode the request parts separately.
 
-Every declared request container remains required, even when its fields are optional. An endpoint with optional query filters still takes `input: { query: {} }` when you select no filter.
+Supply each declared request object even if all its fields are optional. For a query with no filters, pass `input: { query: {} }`.
 
 ## Keep captured inputs unchanged
 
-Query options retain the normalized RPC payload or decoded HTTP request for later execution. Keep the retained input and any nested mutable values unchanged while the options can run. When input changes, create new input and options. Do not modify the captured values.
+Query options keep the request input for execution and retries. If the input changes, create new values and rebuild the options. A changed value can send a different request under the old key.
 
-Canonical keys copy and deeply freeze the encoded identity. They do not clone or freeze arbitrary execution inputs or decoded query data. RPC construction can retain nested values from the caller. HTTP preparation retains the decoded request. In reactive frameworks, rebuild options inside the framework's computed value or accessor.
+The factory freezes the encoded key. Nested values in the input can still be mutable. In a reactive framework, build new options inside the computed value or accessor.
 
-Prepared inputs retain the same execution values and immutable canonical identity. Configured copies of a leaf share its owner; another leaf or tree cannot accept the handle. Handles are process-local, cannot be serialized for hydration, and cannot cross server/browser owners. Transfer data through hydration codecs and prepare new input on the receiving owner.
+`prepareInput(leaf, input)` reuses the prepared request and its frozen key payload. Keep the retained input unchanged. Pass the handle to the same leaf or a configured copy of that leaf. Other leaves and trees reject it. To move data from server to browser, use a [hydration codec](/effect-api-query/guides/hydrate-query-views/) and prepare fresh input on the browser.
 
-Construction, encoding, and canonicalization failures throw synchronously during ordinary or prepared key creation. RPC construction failures use `PayloadConstructionFailed`; encoding and custom encoder failures keep their distinct key-error codes. Execution failures occur later through the runner and preserve their Effect Cause. Preparation does not acquire or dispose the ready client.
+`queryKey`, `queryOptions`, and `prepareInput` throw synchronously if construction or key encoding fails. An RPC constructor failure uses `PayloadConstructionFailed`. See [errors](/effect-api-query/reference/errors/) for key errors and the Effect Cause returned by failed execution.
 
 ## No-content and undefined query results
 
-TanStack Query rejects `undefined` as successful query data. If a buffered RPC or HTTP query succeeds with `undefined`, the generated query resolves to `null`. The exported `QueryData<A>` type models that rule.
+A buffered query that succeeds with `undefined` resolves to `null` because TanStack Query requires a value. The exported `QueryData<A>` type reflects that conversion.
 
-An HTTP endpoint using `HttpApiSchema.NoContent` or `success: []` decodes its successful 204 response to `undefined`, so its ordinary and infinite queries cache `null`. Its metadata view contains `data: null`.
+An endpoint with `HttpApiSchema.NoContent` or `success: []` decodes a 204 response to `undefined`. Its ordinary and infinite queries cache `null`. The metadata view contains `data: null`.
 
 Mutations keep the original success type. A mutation that succeeds with `undefined` still resolves to `undefined`.
 
-Live queries also convert each emitted `undefined` to `null`. If a stream emits a value followed by `undefined`, its latest query data is `null`. Live keys, selectors, and `initialData` use the same normalized type. The first emission makes an open live query successful while it remains fetching. Completion without an emission raises `EffectRpcQueryEmptyStreamError` for RPC or `EffectHttpApiQueryEmptyStreamError` for HTTP SSE or NDJSON.
+A live query converts each `undefined` emission to `null`. That type also applies to its keys, selectors, and `initialData`. The first value makes the query successful while the stream keeps fetching. If a stream ends before its first value, RPC raises `EffectRpcQueryEmptyStreamError`. HTTP SSE and NDJSON raise `EffectHttpApiQueryEmptyStreamError`.
 
 Accumulated streamed queries retain each emitted value as supplied. Their cached arrays can contain `undefined` elements.

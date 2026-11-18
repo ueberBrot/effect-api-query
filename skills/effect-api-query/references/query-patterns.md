@@ -2,7 +2,7 @@
 
 ## Reuse inferred operation types
 
-To infer operation types, import helpers from `@ueberbrot/effect-api-query` and apply them to a utility leaf:
+Import the inference helpers from `@ueberbrot/effect-api-query` and apply them to a leaf.
 
 | Helper | Representation |
 | --- | --- |
@@ -16,17 +16,17 @@ To infer operation types, import helpers from `@ueberbrot/effect-api-query` and 
 | `InferMutationData<typeof rpc.users.write>` | Successful mutation value, preserving `undefined` |
 | `InferMutationError<typeof rpc.users.write>` | Buffered mutation execution error type |
 
-To infer `InfiniteData` with an unknown page-parameter type, specify `'infinite'`. If the mapper establishes a more precise page-parameter type, use the actual options' tagged key. Query and live data normalize `undefined` to `null`. Accumulated elements and mutation data retain it.
+`'infinite'` gives `InfiniteData` with unknown page parameters. Use the options' tagged key to retain the parameter inferred from a mapper. Query and live views convert `undefined` to `null`. Accumulated elements and mutation data keep it.
 
-`InferQueryError` accepts the same view parameter as `InferQueryData`. Choose a view that the leaf supports. Stream leaves require an explicit `'live'` or `'streamed'` view. Branches and unsupported default views infer `never`. These types describe the contract. At runtime, runner rejections still pass through unchanged.
+Choose a supported view for `InferQueryData` or `InferQueryError`. Streams need explicit `'live'` or `'streamed'`. A branch or unsupported default view gives `never`. Runtime runner rejections can pass through outside the declared error union.
 
-For the complete contract for inputs, supported views, and cache representations, read [Type inference](https://ueberbrot.github.io/effect-api-query/reference/type-inference/).
+See [type inference](https://ueberbrot.github.io/effect-api-query/reference/type-inference/) for the view and input types.
 
 ## Conditional reads with React Query
 
-If required input is unavailable, use `input: skipToken`. `enabled: false` still constructs a concrete key and requires valid input. If you have valid input and intend to execute through manual refetch, use `enabled: false`.
+If required input is missing, use `input: skipToken`. If input is valid and the query should run only on manual refetch, use `enabled: false`.
 
-The following example exports a hook factory for an application-owned ready RPC client. During application setup, call the factory. Use its returned hook in components under the application's `QueryClientProvider`.
+Call this factory with the app's ready RPC client, then use the returned hook under its `QueryClientProvider`.
 
 ```ts
 import { useQuery } from "@tanstack/react-query";
@@ -56,11 +56,11 @@ export function makeUseUser(
 }
 ```
 
-HTTP uses the same conditional pattern with decoded request input. Unary, metadata, streamed, and live builders accept `input: skipToken` in the options object and preserve caller options. Inputless operations, key builders, and mutations do not accept it. Skipped options cannot execute through manual refetch. They are unsuitable for suspense or prefetch-only hooks.
+HTTP uses the same pattern with decoded input. Query, metadata, streamed, and live builders retain native options when skipped. Keep the sentinel out of key builders, mutations, and inputless operations. Supply real input before manual refetch. Use ordinary hooks because Suspense and prefetch-only hooks reject skipped options.
 
 ## Infinite queries
 
-Map each page parameter to a complete request. The initial mapped request sets cache identity. Include stable filters in that request and every page. Keep the mapper deterministic because it runs during key construction and again during execution.
+Map each page parameter to a complete input. The first mapped request sets the key. Include the same filters on each page. Key creation and execution both call the mapper, so keep it deterministic.
 
 ```ts
 import { QueryClient } from "@tanstack/query-core";
@@ -96,7 +96,7 @@ export async function loadPages(
 }
 ```
 
-For interactive pagination, pass the same options to `useInfiniteQuery`. The HTTP input mapper returns decoded request parts, such as `{ query: { cursor, category: 'books' } }`. For cache access, use `infiniteKey` with the complete initial input. Infinite data and ordinary query data have different keys and shapes. To pause an input-bearing infinite query, put `input: skipToken` inside the options object. Do not return the sentinel from a mapper.
+Pass the options to `useInfiniteQuery`. For HTTP, return the decoded request, such as `{ query: { cursor, category: 'books' } }`. Use `infiniteKey` with the complete first input for exact cache access. To pause pagination, set `input: skipToken` on the options object.
 
 ## RPC streams
 
@@ -133,72 +133,68 @@ export function eventOptions(
 }
 ```
 
-Pass either result to `useQuery` or a query observer. The history and latest views have distinct cache entries. Observing both starts independent executions.
+Use either set of options with an ordinary hook or observer. History and latest values have separate keys. Observing both starts two executions.
 
-Accumulated queries retain emitted elements in order. `maxChunks` is a required positive safe integer or the literal `"unbounded"`. A finite bound limits element count, not bytes. Share the choice through `configureUtils` with `streamed.policy`, or supply it in each raw key and options builder. Both `maxChunks` and `refetchMode` contribute to normalized cache identity. Explicit unbounded retention with reset refetches retains the unlimited-history identity. Different bounds or refetch modes use different entries.
+For accumulated history, set `maxChunks` to a positive safe integer or `"unbounded"`. Set it directly for each key and options builder, or configure `streamed.policy`. Different retention bounds and refetch modes use distinct entries. Unbounded retention with reset keeps the original unlimited-history key.
 
-Use `streamedKey(input, policy)` or the matching options' `queryKey`. Inputless operations take the policy first. HTTP SSE accumulated and live views also include SSE decoder policy. NDJSON views use the same history policies without SSE decoder fields.
+Reuse the options' `queryKey` or call `streamedKey(input, policy)`. For an inputless operation, use `streamedKey(policy)`. Include SSE decoder options for HTTP SSE. NDJSON uses its declaration's decoder limits.
 
-The refetch modes control how the next execution updates history:
+Choose a refetch mode for accumulated history.
 
-- `reset` (default) clears data and returns to pending when refetch starts.
-- `append` adds new emissions to the cached history.
-- `replace` keeps cached history until the refetch stream completes, then replaces it. For this policy, use a stream that completes.
+- `reset` clears data and sets the query to pending. This is the default.
+- `append` adds the new values to the cached sequence.
+- `replace` keeps the old history until the new stream finishes successfully.
 
-Set `publicationBatchSize` to a positive safe integer to publish an accumulated history in count-based batches. The first event publishes immediately. Later batches preserve every event in order; completion or failure flushes a pending tail, while cancellation discards it. Without `publicationMaxWaitMs`, a partial batch on an open feed can wait indefinitely. Set a positive integer deadline in milliseconds, at most 2,147,483,647, to flush from the first buffered event; later events do not reset the timer. Explicit deadlines participate in key identity. The default batch size is `1`; nondefault sizes participate in history key identity. `replace` still waits for successful completion. Batching controls publication, while `maxChunks` controls retention and transport buffering remains separate.
+Set `publicationBatchSize` to a positive safe integer. The first event publishes immediately. Later values publish in order by batch. Completion or failure flushes a partial batch, except that `replace` publishes only on success. Cancellation discards pending events. Set `publicationMaxWaitMs` from 1 to 2,147,483,647 to flush a quiet batch from its oldest pending event. Omit it for count-only batching. Explicit deadlines and sizes above one change the key.
 
-Live queries cache only the latest value. Opt into `coalesceMs` (integer milliseconds, 1 through 2,147,483,647) only for complete snapshots: first publication is immediate; retain one latest pending value and publish at a fixed deadline from the first pending value. Replacements do not reset it; event-loop scheduling can delay publication. Completion or failure flushes pending state; cancellation drops it and clears the timer. Each refetch resets the view and cycle.
+Use `coalesceMs` only when each live emission is complete state. Use a whole number from 1 to 2,147,483,647 milliseconds. Each fetch publishes the first value immediately. The next value starts a fixed timer and subsequent values replace the pending snapshot. Completion or failure flushes it. Cancellation drops it and clears the timer. Scheduling can delay publication.
 
-Pass the same policy to `liveKey(input, { coalesceMs })` (inputless: `liveKey({ coalesceMs })`) or configure `live.policy` once for keys and options. Explicit deadlines have separate cache identity. A local `coalesceMs: undefined` clears the configured default; omission inherits it. HTTP SSE keys also include decoder policy. Keep `sseOptions` local and pass the same options to the configured key builder.
+Pass matching policy to `liveKey(input, { coalesceMs })` or `liveKey({ coalesceMs })` if inputless. Set `live.policy` to share this across keys and options. Omit the local value to inherit it. Pass `coalesceMs: undefined` to clear it. Explicit deadlines change the key. Pass the same local `sseOptions` for keys and options.
 
-RPC live key types include an optional trailing policy slot. Use generated keys or the options' `queryKey` for cache access. Literal paths and data/error tags remain precise.
+An empty unseeded accumulated stream resolves to `[]`. An empty append keeps existing history. Empty reset and replace finish with `[]`. Empty live completion raises the adapter's empty-stream error.
 
-Raw consumption and accumulated publication keep their event contracts. Live queries accept no history or publication batch option. Without cached data, an empty accumulated stream resolves to `[]`. An empty append refetch preserves existing history. Empty reset and replace refetches finish with `[]`. Empty live completion raises `EffectRpcQueryEmptyStreamError`.
+A live query converts each emitted `undefined` to `null`. Its keys, selectors, and initial data use the normalized type. Accumulated history keeps the original elements.
 
-Live queries normalize each emitted `undefined` to `null`, including emissions after a defined value. Live keys, selectors, and initial data use the normalized type. Accumulated chunks retain their original values, including `undefined`.
+The adapter publishes through public Query Core cache operations. Native reads, writes, observers, and sharing policies address the same entry.
 
-The adapter publishes stream data through stable Query Core cache operations. Native cache reads, writes, structural-sharing policies, and observers use the same query entry.
+The first publication makes an initial fetch successful while fetching continues. Ordinary cancellation closes the iterator and interrupts Effect. Await local cleanup before disposal because native cancellation can settle first. See [frameworks and hosts](frameworks-and-hosts.md) for Suspense limits.
 
-On an initial fetch, both views become successful after the first emission and keep fetching until completion. Ordinary-query cancellation closes the iterator and interrupts its Effect resources. Native cancellation can settle before local finalizers finish. For the native Suspense cancellation limitation, read [frameworks and hosts](frameworks-and-hosts.md).
+Imperative queries wait for stream completion. Hooks and observers see intermediate values. For server rendering, use [stream capture](hydration-and-ssr.md#capture-an-open-stream) to get a finite result and wait for cleanup.
 
-An awaited QueryClient call waits for stream completion. Hooks and observers see intermediate values. For SSR, read [hydration and SSR](hydration-and-ssr.md). Use `fetchStreamSnapshot` to capture and drain an open query.
+The history bound counts elements after publication. An oversized seed can remain until new data publishes. Each publication uses a new array. Keep the values unchanged. Set byte and transport limits separately.
 
-Bounds take effect after a new emission. Until then, an oversized seed remains. Each publication uses a new array and leaves earlier histories unchanged. The arrays are not frozen at runtime. Treat cache values as immutable. A bound limits element count. It does not limit retained object size or bytes.
-
-By default, each consumed value contributes to cache writes. Native structural sharing does not suppress those writes or guarantee a renderer's update count. For complete current-state emissions, choose a live query. For recent events, choose bounded history. The latest delta alone cannot reconstruct state. Set the publication rate or sampling on the producer or an application-owned Stream transformation.
+Structural sharing can reuse references while writes still notify the cache. For complete state, use a live query. For ordered changes, use history. To change the producer's rate or sample events, transform the application stream.
 
 ## Recover an application-owned stream
 
-Use `recoverStream({ connect, cursor, retryDelay, ...hooks })` around a native Effect Stream with numeric or application-defined cursors. Without `cursorPolicy`, delivery uses a nonnegative safe-integer cursor. It starts from `initialCursor ?? 0` and discards events at or below the last accepted cursor. Use a positive first event cursor when the initial value is zero. Each consumption owns independent cursor state. Keep attempt-specific resume values inside `connect`; keep generated query input stable.
+Wrap a decoded Effect Stream with `recoverStream({ connect, cursor, retryDelay, ...hooks })`. The default accepts increasing nonnegative safe integers above `initialCursor ?? 0`. Each consumption has its own cursor. Keep resume state in `connect` so generated query input stays stable.
 
-For opaque or structured cursors, supply `initialCursor` and `cursorPolicy: { accept(previous, next), isGap? }`. Acceptance controls order and duplicate filtering; the helper infers neither. Gap detection runs only for accepted cursors, before `onGap` and cursor advancement. Without `isGap`, no gaps are inferred. Equality alone suppresses the current checkpoint, not arbitrary replay history. Custom numeric policies may use other numeric domains. Keep cursor objects immutable and validate untrusted cursors at the client boundary. `StreamConnectionState<E, C>` carries the cursor type; the default remains numeric. Connection and hook failures/services are inferred together. See the complete opaque-ID example in [Reconnect Streams](https://ueberbrot.github.io/effect-api-query/guides/reconnect-streams/).
+For opaque or structured cursors, supply `initialCursor` and `cursorPolicy: { accept(previous, next), isGap? }`. Define order and duplicate rules in `accept`. `isGap` runs for accepted events before advancement. Equality alone suppresses only the latest repeat. Decode and keep cursor objects unchanged. `StreamConnectionState<E, C>` carries the type. Hooks keep their inferred Effect requirements. See [reconnect streams](https://ueberbrot.github.io/effect-api-query/guides/reconnect-streams/).
 
-`retryDelay(cause, attempt)` receives the complete attempt Cause after local cleanup and a one-based count across the consumption; return undefined to preserve the terminal Cause. Backoff is cancellable. Pair `isReplayExpired` with `onReplayExpired` to refresh authoritative data and return its replay cursor before reconnecting. `onGap` runs before accepting a jump. `onState` reports local connection and delivery states. These hooks do not acknowledge remote persistence or cleanup. Authentication, replay storage, sequence epochs, and shared owner coordination remain application decisions.
+`retryDelay(cause, attempt)` receives the full Cause after cleanup and a one-based retry count. Return `undefined` to stop with that Cause. Pair `isReplayExpired` with `onReplayExpired` to refresh state and return a matching cursor. `onGap` runs before accepting a jump. `onState` reports local state. Keep authentication, replay storage, and acknowledgements in the app.
 
-Native cancellation can settle before old iterator finalization. Refetch can start the next stream during that cleanup. Coordinate exclusive resources in the application; keep clients and runtimes alive until their finalizers finish.
+A refetch can start while the previous stream cleans up. Coordinate exclusive resources in the app and keep the client and runtime alive until finalizers finish.
 
 ## Trace stream consumption and cleanup
 
-When `Stream.unwrap` begins consumption, acquire an `Effect.makeSpanScoped` span. Provide it as `Tracer.ParentSpan` for nested pull work. Update the captured span directly from emission instrumentation and `Stream.ensuring`. The span then stays open through asynchronous local cleanup. Supply telemetry services through the ready client or its runner. Keep the runtime alive through iterator cleanup.
+In `Stream.unwrap`, acquire an `Effect.makeSpanScoped` span. Provide it as `Tracer.ParentSpan` for pulls. Record events and finalization on the captured span. Keep telemetry services alive through local cleanup.
 
-A span or retry around the runner's iterable-creation Effect ends before consumption. It does not cover stream emissions or finalization.
+A span or retry around iterable creation covers setup only. Attach consumption policy to the stream.
 
-For a complete example with an HTTP SSE client, Otlp layer, and drained snapshot, use [the stream lifetime tracing recipe](https://ueberbrot.github.io/effect-api-query/guides/trace-streams/). To preserve decoded header wrappers, use the client's response transformation before response-mode wrapping. Applications own span attributes and disclosure policy.
+Use the [stream tracing example](https://ueberbrot.github.io/effect-api-query/guides/trace-streams/) for HTTP SSE, OTLP, and snapshot cleanup. If the endpoint has decoded header wrappers, preserve them when transforming the response.
 
-Sources: [builders](https://ueberbrot.github.io/effect-api-query/reference/generated-builders/), [stream history](https://ueberbrot.github.io/effect-api-query/guides/choose-stream-history/).
+See [RPC builders](https://ueberbrot.github.io/effect-api-query/reference/generated-builders/) for options and [stream history](https://ueberbrot.github.io/effect-api-query/guides/choose-stream-history/) for retention and publication.
 
 ## Prepare a reused input
 
-Create factories and apply shared `configureUtils` policies once per owner, outside component renders.
+For a reused input, call `prepareInput(leaf, input)`. Pass the handle to the same leaf's query keys or ordinary, metadata, live, and streamed options. For HTTP, supply decoded request parts. Keep retained inputs unchanged. Build a fresh handle if request values change.
 
-For repeated large inputs, call `prepareInput(leaf, input)` once. Pass the opaque handle to that leaf's key builders and ordinary, metadata, live, or streamed options. HTTP uses decoded request containers. Preparation runs construction, encoding, and canonicalization once. Keep retained execution input and nested values unchanged; the handle is not a deep snapshot. When input changes, construct a new handle and rebuild options. In reactive frameworks, rebuild them inside the framework's accessor.
-
-Handles belong to one leaf and factory owner, including its configured copies. They cannot be serialized or passed as mutation variables or infinite page mapper results. `InferInput` remains the raw input type. Reusing utilities and handles saves runtime work; the compiler still checks literal contracts and native hook inference.
+Configured copies of a leaf share its handle owner. Other leaves and factory instances reject the handle. Use raw inputs for mutations and infinite page mappers. `InferInput` also describes raw input. Use hydration codecs to transfer data.
 
 ## Consume events without cache history
 
-Use `consumeEvents(source, { onEvent, onStart?, onExit? })` with a native decoded Effect Stream for notifications or invalidation. It returns an Effect; run it in the application's Scope. `onEvent` returns an Effect and is awaited sequentially. Its failure stops consumption. `onStart` is an Effect signalling local startup, not a transport acknowledgement. `onExit` receives the Exit after stream cleanup, including interruption, and returns a finalization Effect. Interrupt and await consumption before disposing the runtime. The helper owns no cache, retained history, or reconnection policy. Compose `recoverStream` upstream when recovery is needed.
+Run `consumeEvents(source, { onEvent, onStart?, onExit? })` inside the app's Scope for notifications or invalidation without cache history. It awaits each event handler and stops on its failure. `onStart` signals local startup. `onExit` receives the Exit after cleanup and runs before settlement. Interrupt and await the Effect before disposing of the runtime. Add `recoverStream` upstream if replay is needed.
 
 ## Check performance claims
 
-For bundle or compiler changes, use the repository's bundle/type/stream baseline tasks and read [Performance and Bundling](../../../apps/docs/src/content/docs/reference/performance.md). Keep contracts, consumed leaves, dependencies, compiler engine and language target equal. Inspect retained module attribution before changing entry points or eager construction. Native bundle consumers omit some adapter guarantees; their deltas measure retained capability cost. Use deterministic instantiation, byte and publication budgets; keep elapsed time observational. Reuse one configured tree per owner and prepared inputs only while their retained values remain unchanged.
+For compiler, bundle, or stream cost comparisons, see [performance and bundling](https://ueberbrot.github.io/effect-api-query/reference/performance/). Compare the same contracts, leaves, dependencies, compiler, and target. Use byte, instantiation, and publication budgets. Report elapsed time separately. Native bundle comparisons measure the cost of retained capabilities.
