@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "edf97d7a83f312a7ac8e6a5c0b0bc6073819a35019aa93ea52929e0ec7499182",
+      "fingerprint": "1b37ae553fa20c4231e3d0c77f0c489dbd55133a1e2155830eb77ef9c4716e92",
       "snapshot": {
         "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -176,7 +176,7 @@
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
         "package.json": "f601fc8c8c5139f4da2805d2faddc2a61085782d32c4929e7920a3e27e0ba71d",
         "pnpm-workspace.yaml": "c7ceebab8301785f74932daaf1b16f2b09cbc5d7f030868659857724e71b8956",
-        "scripts/check-effect-compatibility.mts": "3911f16301e90bd466f2c7fe4b1637b6a653eb23140c6bf57eb7d329ede0d50b",
+        "scripts/check-effect-compatibility.mts": "7f0fdbadca7b11d118253cabfca201008c1f7680e42ebcdbfec05c65364d904b",
         "scripts/check-framework-consumers.mts": "f0111ac9ed84996f722f656358b810da0b9ecc8c6c0219a2019d1076b5d50cbc",
         "scripts/check-toolchain.mts": "4e401073f141efdcf81c40ca1bc9825f805711576118b830ed63484ea7795cac",
         "scripts/check-workflow.mts": "c3a760a6b111d3f1dc7570a510ee09aabfc048786ef8c6dd1c9fe7b26cecd00c",
@@ -254,7 +254,7 @@
         "tests/create-rpc-query-utils-structural-sharing.test.ts": "1698a72dcfde4aaabac4161193fc0379c445f8a8be61d47d29797a315b66b06f",
         "tests/create-rpc-query-utils.test.ts": "b6ccee687718bbd528819f497ba2ac09acfe06a1400c5bb38b863eb082f0776f",
         "tests/docs-examples.test.ts": "e181c2d34afb1ed761133c2b143ca26048ddab32be2bc5d7486af4355b5e5bde",
-        "tests/docs-release.test.ts": "089218597c9c8c9fdce5037b0537426a232ef7466e697d683bc32fb7d4492ae8",
+        "tests/docs-release.test.ts": "edb5be9b26b99339770f74ab188e67f30f4642afd19f91dc8e4c85163d71ccb4",
         "tests/execution-interceptor.test.ts": "9c8a26e24cdd5807a4dca68bfdd88663246b3a5632483581ec3cbd4cdcf69b9a",
         "tests/fixtures/async.ts": "c72af69141ce4f2dd4e9b63910ed20378e546dcd015a2d7befacd439ba4a006e",
         "tests/fixtures/decode-utf8.ts": "f0441c8aa2553ce2c1dccff7cac1bbaec2cdc668916278c7a0efff90482ace61",
@@ -367,19 +367,18 @@
         "tests/types/utility-configuration-contract.ts": "b8c5db14d17c2fd549f70c6fbad8d21234ca5859f0c69e53b0b8504ef8cb5b17",
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6",
-        "tests/workflow-guards.test.ts": "d338d2d7aafc355c5f4e69c29ea7daa89b9e80a19ac07a9d06cbe51e12f66db4"
+        "tests/workflow-guards.test.ts": "12553ae84b800071725c5754fc5f510c9baecb3f37c60ab88b036fd325420420"
       },
-      "head": "d0ad100b587dd1b6be3e7bcecc9f0dd1572fac4d",
+      "head": "22dd4747346691d860d745cc21e1aa5baeda3102",
       "outcome": "no-change",
-      "reason": "Compared the change with origin/main 9e0afbe: repository artifact placement, PR completion guidance and local hook/import checks affect contributor workflow; public query behavior and shipped consumer guidance are unchanged. Repository-specific instructions remain in owned docs; external skills are preserved.",
+      "reason": "The packed compatibility runner partitions the same Effect and Query Core combinations and keeps both compilers and all existing fixtures. The other changes check the CI image and publication gate. The shipped guidance on peer selection, type checking, and released documentation still applies.",
       "evidence": [
-        "Base 9e0afbe141435d8e79c8c0c1305142daf0d66031; inspected changed script, hooks, Vite configuration and agent docs.",
-        "vp test -- tests/skills-maintenance.test.ts tests/workflow-guards.test.ts: 21 passed after rebase.",
-        "vp run --no-cache check: passed after rebase; prior Fallow checks and shellcheck/shfmt passed. No fresh consumer/discovery evaluation: shipped guidance unchanged."
+        "Compared scripts/check-effect-compatibility.mts and the workflow guards with d6dc961. The unsharded task still selects every case.",
+        "The two workflow and release test files passed, and vp run typecheck passed."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "7c47210b1f2d01bf6cb8d6808775e1fe08ff6dfcb1270420864ef546042f1b3e",
+      "fingerprint": "6188c17a4f2641ebffcf935164510156a743a4d9eb6aaba4e9a2cb7850505145",
       "snapshot": {
         "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
         "README.md": "d98c9aa8455178e18c216556012ef8c413804ff0598637eea92108f8c8298cbc",
@@ -555,7 +554,7 @@
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
         "package.json": "f601fc8c8c5139f4da2805d2faddc2a61085782d32c4929e7920a3e27e0ba71d",
         "pnpm-workspace.yaml": "c7ceebab8301785f74932daaf1b16f2b09cbc5d7f030868659857724e71b8956",
-        "scripts/check-effect-compatibility.mts": "3911f16301e90bd466f2c7fe4b1637b6a653eb23140c6bf57eb7d329ede0d50b",
+        "scripts/check-effect-compatibility.mts": "7f0fdbadca7b11d118253cabfca201008c1f7680e42ebcdbfec05c65364d904b",
         "scripts/check-framework-consumers.mts": "f0111ac9ed84996f722f656358b810da0b9ecc8c6c0219a2019d1076b5d50cbc",
         "scripts/check-toolchain.mts": "4e401073f141efdcf81c40ca1bc9825f805711576118b830ed63484ea7795cac",
         "scripts/check-workflow.mts": "c3a760a6b111d3f1dc7570a510ee09aabfc048786ef8c6dd1c9fe7b26cecd00c",
@@ -633,7 +632,7 @@
         "tests/create-rpc-query-utils-structural-sharing.test.ts": "1698a72dcfde4aaabac4161193fc0379c445f8a8be61d47d29797a315b66b06f",
         "tests/create-rpc-query-utils.test.ts": "b6ccee687718bbd528819f497ba2ac09acfe06a1400c5bb38b863eb082f0776f",
         "tests/docs-examples.test.ts": "e181c2d34afb1ed761133c2b143ca26048ddab32be2bc5d7486af4355b5e5bde",
-        "tests/docs-release.test.ts": "089218597c9c8c9fdce5037b0537426a232ef7466e697d683bc32fb7d4492ae8",
+        "tests/docs-release.test.ts": "edb5be9b26b99339770f74ab188e67f30f4642afd19f91dc8e4c85163d71ccb4",
         "tests/execution-interceptor.test.ts": "9c8a26e24cdd5807a4dca68bfdd88663246b3a5632483581ec3cbd4cdcf69b9a",
         "tests/fixtures/async.ts": "c72af69141ce4f2dd4e9b63910ed20378e546dcd015a2d7befacd439ba4a006e",
         "tests/fixtures/decode-utf8.ts": "f0441c8aa2553ce2c1dccff7cac1bbaec2cdc668916278c7a0efff90482ace61",
@@ -746,15 +745,14 @@
         "tests/types/utility-configuration-contract.ts": "b8c5db14d17c2fd549f70c6fbad8d21234ca5859f0c69e53b0b8504ef8cb5b17",
         "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6",
-        "tests/workflow-guards.test.ts": "d338d2d7aafc355c5f4e69c29ea7daa89b9e80a19ac07a9d06cbe51e12f66db4"
+        "tests/workflow-guards.test.ts": "12553ae84b800071725c5754fc5f510c9baecb3f37c60ab88b036fd325420420"
       },
-      "head": "d0ad100b587dd1b6be3e7bcecc9f0dd1572fac4d",
+      "head": "22dd4747346691d860d745cc21e1aa5baeda3102",
       "outcome": "no-change",
-      "reason": "Reviewed domain_map.yaml, skill_spec.md and skill_tree.yaml: these internal file-placement, Git-hook and example-import guards do not change the shipped query task, its domain boundaries or one-skill/six-reference structure. Existing scripts/tests source globs cover the added checks.",
+      "reason": "CI now schedules the existing verification in parallel. The developer tasks and compatibility limits in domain_map.yaml, validation coverage and local task in skill_spec.md, and the existing source mappings in skill_tree.yaml still apply.",
       "evidence": [
-        "Base 9e0afbe141435d8e79c8c0c1305142daf0d66031; inspected changed script, hooks, Vite configuration and agent docs.",
-        "vp test -- tests/skills-maintenance.test.ts tests/workflow-guards.test.ts: 21 passed after rebase.",
-        "vp run --no-cache check: passed after rebase; prior Fallow checks and shellcheck/shfmt passed. No fresh consumer/discovery evaluation: shipped guidance unchanged."
+        "Inspected the three planning records and the workflow and compatibility runner diffs against d6dc961.",
+        "The compatibility shard selector retains the same fixtures and compiler loop. Playwright lists all 50 acceptance cases and four docs cases in each browser."
       ]
     },
     "source:vite.config.ts": {
@@ -772,20 +770,15 @@
       ]
     },
     "source:.github/workflows/release.yml": {
-      "fingerprint": "d11fd35dd2cab3219d309e6df446c2202b4d85e6d4ffbae8ee57722b633527ab",
+      "fingerprint": "07a534472bf31e21369f8c35796ee2048edbf753d16b03fe12068eb9bf4e84d5",
       "snapshot": {
-        ".github/workflows/release.yml": "1dc455f9c16561b17daa9064109b1c52cd8a7a9dc78683cae3b89c79d2e02e01"
+        ".github/workflows/release.yml": "16e1392601580cd685cd4a6bda818e34d2466931d216483f16463d6a0c8821b3"
       },
-      "head": "0075e01d454139343660b214a0d7d7e528e3f95d",
+      "head": "22dd4747346691d860d745cc21e1aa5baeda3102",
       "outcome": "no-change",
-      "reason": "The workflow now creates GitHub Releases from the existing version changelog after npm publication. It changes no package API, dependency, installed guidance, or consumer task. The effect-api-query skill and _artifacts/domain_map.yaml, _artifacts/skill_spec.md, and _artifacts/skill_tree.yaml retain accurate coverage, recommendations, and source mappings; no guidance or planning rewrite is needed.",
+      "reason": "Packing can start once the release plan exists. Publishing still requires successful validation and the packed artifact. Documentation deployment still requires confirmed publication.",
       "evidence": [
-        "Reviewed the full diff from PR base 654d0dbd007d37d36e99c74a21ba09523798bde1 to 0075e01d454139343660b214a0d7d7e528e3f95d: only create-github-releases changes from false to true in .github/workflows/release.yml.",
-        "Read skills/effect-api-query/SKILL.md, its frameworks-and-hosts version guidance, all three _artifacts planning records, and ADRs 0016 and 0030; consumer integration and documentation revision guidance remain accurate.",
-        "Pinned changesets/action 8488615a623b1b9c987934bb89eae8af6a946ac1 supports the option with the existing contents:write permission and default tag pushing. GitHub Release name and tag use package@version; the body is the trimmed changelog section.",
-        "Before recording: vp exec intent maintainer check --base 654d0dbd007d37d36e99c74a21ba09523798bde1 --github-summary failed with exactly one pending source review for .github/workflows/release.yml, matching CI run 39907131391.",
-        "actionlint .github/workflows/release.yml and zizmor --min-severity medium .github/workflows/release.yml passed on the unchanged workflow content; default yamllint findings matched the pre-change workflow.",
-        "vp run skills-check passed for the current skill. vp exec intent maintainer sync reported Nothing to synchronize. No skill behavior or activation description changed, so consumer task and discovery checks were not repeated."
+        "actionlint and the focused release workflow regression tests passed."
       ]
     },
     "source:e2e/browser-test-config.ts": {
@@ -856,18 +849,15 @@
       ]
     },
     "source:.github/workflows/ci.yml": {
-      "fingerprint": "534e43fa34102f38a38978d5753107a505074d935bc7aa7f518105e33f5a5c0e",
+      "fingerprint": "a3665ea4cdb9d3e59a268c8d60746a51f18c25ad69666c5fa2cf292996037aab",
       "snapshot": {
-        ".github/workflows/ci.yml": "f585d801634b59666997f210a32ee12ee2e7dd99d1271861fdf1ec286ece80cf"
+        ".github/workflows/ci.yml": "6adba2a6334175d7c7cb9df0aa5e97ea05e217b5f6933674aaf522527e5d9028"
       },
-      "head": "0b02e055781b90bffb598f71e7bbd2158a9c57d3",
+      "head": "22dd4747346691d860d745cc21e1aa5baeda3102",
       "outcome": "no-change",
-      "reason": "Only CI step display name changes to describe the expanded packed matrix; task, triggers, permissions and action pins remain identical. No separate shipped guidance change required.",
+      "reason": "The workflow runs the existing checks in parallel and preserves required check names. Both the Playwright tag and the running image version are verified against the package pin.",
       "evidence": [
-        "Inspected complete acf4fc0155bf8ca271ebde62eee40c65202b4185 diff against expected 0b02e055781b90bffb598f71e7bbd2158a9c57d3; combined src/tests/compiler pins/lockfile remain identical to integration.",
-        "168-merge-tests.log: serial package/declarations/ATTW/publint, both public/server-local compilers and 37 scoped native tests pass. 168-merge-matrix-network.log: floor/floor and development/development packed consumers pass both compilers, exact shared peers, installed dist/declarations and 369 runtime cases each. Full eight-combination combined rerun deferred to #180.",
-        "168-merge-typecheck.log: 219 files pass; 168-merge-effect.log and 168-merge-docs.log: Effect and 22 docs excerpts/Astro pass. Scoped formatting/actionlint/YAML pass; zizmor four low findings match pre-merge baseline.",
-        "Writing-policy with clear-writing, readability, writing-clearly-and-concisely and writing-for-agents applied. Independent consumer-agent discovery, Astra ticket/architecture/final acceptance and #167 GUI/platform/Fallow limits remain parent-owned; no independent acceptance claimed."
+        "actionlint passed, Microsoft Artifact Registry reported the configured digest, and the Playwright shard lists covered 28 plus 22 acceptance cases and four documentation cases per browser."
       ]
     },
     "source:tests/packed-consumer/construction-baseline.mts": {
@@ -1793,19 +1783,15 @@
       ]
     },
     "source:.github/actions/setup-repository/action.yml": {
-      "fingerprint": "ed0796c080ab8de729e657ad263c3df80c8170cac6ade354db92d97d5f85a4b8",
+      "fingerprint": "61ecd08ad76116464ef1ee16f1270c5fd83af33545fed8782e6d5e52b0b0b7d7",
       "snapshot": {
-        ".github/actions/setup-repository/action.yml": "1e48c3997b540b68b47e4dc5ef7bdb0ab6c9b19adc307f5a0a1280bef08a1fae"
+        ".github/actions/setup-repository/action.yml": "3e0c32715811bc4e0125a271546300ec743d76d05f643a2b65b3c42a73603104"
       },
-      "head": "f3ba2a62cdb0b28eaa6e592b010bb6879466cda2",
+      "head": "22dd4747346691d860d745cc21e1aa5baeda3102",
       "outcome": "no-change",
-      "reason": "The shared setup still provisions the pinned pnpm executable and runs one frozen workspace install. Every caller uses dependency caching, so the unused cache switch was removed. This changes repository provisioning only.",
+      "reason": "The optional cache comparison toggles the setup action's cache with the pinned toolchain and frozen install retained.",
       "evidence": [
-        "Diff reviewed against f3ba2a62cdb0b28eaa6e592b010bb6879466cda2; actual PR base 5b91ddb1de13970365669c887b9d767ea417fbd4. Public library source, compiler fixtures, runtime cases, README, documentation pages and skills were not changed in this batch.",
-        "Native uncached typecheck passed 141 files and native pack attw/publint. Scoped native format passed seven affected configuration files; final YAML parsed and browser/trigger/publication prerequisite expressions were inspected.",
-        "Four existing application Chromium acceptance cases and all seven existing documentation Chromium cases passed against prepared outputs. Their preview logs contain no pack or build invocation. Hosted docs Playwright list mode listed seven cases without building a local site. Receipts: /tmp/effect-api-query-ci-audit/.",
-        "All three shared planning documents were read: _artifacts/domain_map.yaml retains the same ten consumer tasks/failure modes, _artifacts/skill_spec.md retains accurate source-backed coverage and boundaries, and _artifacts/skill_tree.yaml retains the same owned skill, six references, source mappings, prerequisites and distribution. CI-only orchestration requires no guidance or planning rewrite.",
-        "The first hosted run of artifact reuse and the reusable release/deployment workflows remains unverified locally. No package publication or Pages deployment was performed."
+        "Inspected the composite action and its existing call sites. Targeted yamllint passed."
       ]
     },
     "source:.github/workflows/deploy-docs.yml": {
