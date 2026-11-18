@@ -5,7 +5,7 @@ description: Create an RPC utility tree from an RPC group and a ready client.
 
 ## `createRpcQueryUtils(group, options)`
 
-The factory builds and freezes a `RpcQueryUtils` tree for the group's unary and streaming RPCs when called.
+Pass an Effect RPC group and its ready client to build a frozen utility tree for unary and streaming RPCs.
 
 ### Options
 
@@ -24,6 +24,6 @@ const rpcQuery = createRpcQueryUtils(rpcGroup, {
 });
 ```
 
-An invalid prefix, RPC path collision, reserved path segment, or invalid encoder map causes `EffectRpcQueryConfigError`. Factory construction performs no network request.
+The factory validates prefixes, paths, and encoders without making a request. Invalid configuration throws `EffectRpcQueryConfigError`.
 
-Query options retain the normalized payload for execution. Captured values must stay unchanged. See [Data Normalization](/effect-api-query/concepts/data-normalization/#keep-captured-inputs-unchanged) for the distinction between immutable keys and caller-owned input.
+Keep the input retained by query options unchanged. See [input ownership](/effect-api-query/concepts/data-normalization/#keep-captured-inputs-unchanged) for the rules.

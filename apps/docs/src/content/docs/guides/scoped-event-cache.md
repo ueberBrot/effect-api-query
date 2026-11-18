@@ -3,11 +3,11 @@ title: Apply Events to a Scoped Cache
 description: Recover application events and update the active query owner's native cache.
 ---
 
-Use `runQueryEvents` to register sequential event consumption with a [query owner](/effect-api-query/guides/switch-cache-owners/). Pass a decoded source, handlers and an application runner. The helper provides that owner's `QueryClientService` to the source, recovery hooks and handlers. It creates no transport or cached event history.
+Use `runQueryEvents` to consume events in order inside a [query owner](/effect-api-query/guides/switch-cache-owners/). Pass a decoded source, handlers, and a runner. The helper supplies the owner's `QueryClientService` to the source, recovery hooks, and handlers.
 
 ## Acquire and consume
 
-This module reuses the directory contract from [Compose QueryClient Operations in Effect](/effect-api-query/guides/query-effects/). Supply a connection whose snapshot includes the replay cursor for those users. Its close function releases the acquired connection. The application protocol uses decimal string positions, complete user events and three reconnect attempts. Change these policies to match your server.
+This example uses the [directory contract](/effect-api-query/guides/query-effects/). Supply a connection that returns users with the matching replay cursor and can close itself. The example uses decimal string cursors, complete user events, and three reconnect attempts. Match those choices to your server.
 
 ```ts
 import {
@@ -114,18 +114,18 @@ export const acquireDirectoryEvents = async (
 };
 ```
 
-Call `await acquireDirectoryEvents(acquireConnection)` with your transport acquisition function. Provide the returned `owner.queryClient` to native Query hooks or observers and use `owner.resources.rpc` for generated options. Inspect the returned `completion` promise's complete Effect Exit for stream, handler or recovery failures. A failed consumption stops event delivery; dispose the owner when leaving the application boundary.
+Call `await acquireDirectoryEvents(acquireConnection)`. Give hooks the returned `owner.queryClient` and build options from `owner.resources.rpc`. Inspect `completion` for the complete Effect Exit. A stream, handler, or recovery failure stops delivery. Dispose of the owner when you leave the application boundary.
 
-On logout or replacement, call `await owner.dispose()`. Retirement stops admission, interrupts consumption, retry sleeps and refresh Effects, and waits for stream cleanup and the exit callback before releasing the connection. Keep the originating owner captured throughout the workflow. The runner must honor its AbortSignal and await Effect finalizers. Promise rejection from admission or the runner remains a rejection; it is not converted into an Effect failure.
+On logout or replacement, await `owner.dispose()`. Retirement stops new work, interrupts consumption, backoff, and refresh, then waits for cleanup and the exit callback before closing the connection. Keep the original owner captured. The runner must honor the abort signal and await finalizers. Admission or runner Promise rejections remain rejections.
 
 ## Choose recovery and cache policy
 
-Handlers run sequentially and apply backpressure. A handler failure stops consumption and retains its complete Cause. Recovery handles source failures; it does not retry downstream handlers. Cleanup completes before `onExit`. Supply additional Effect services through the runner; the helper supplies only the owner's QueryClient.
+The helper waits for each event handler before pulling the next event. A handler failure stops delivery and preserves its Cause. Recovery retries source failures; handlers run once per delivery. `onExit` follows cleanup. Provide any additional Effect services through the runner.
 
-The recipe replaces a user through its generated key and marks the generated read filter stale without starting refetches. A gap invalidates potentially missed users. Expired replay refreshes authoritative users and returns their matching cursor before reconnecting. Applications with deletions or partial snapshots must explicitly remove or refresh affected queries as well. Relationships between events and queries remain application policy.
+The example replaces one user by exact key and marks related reads stale without refetching. A gap invalidates potentially missed users. If replay expires, fetch authoritative data and return its matching cursor. For deletions or partial snapshots, decide which entries to remove or refresh.
 
-`recoverStream` advances its local cursor before delivering an event. This is neither a durable acknowledgement nor a downstream processing checkpoint. A failed update can leave earlier writes in place. Choose transaction, checkpoint and restart policies in the application. See [Reconnect Streams](/effect-api-query/guides/reconnect-streams/) for recovery semantics.
+`recoverStream` advances the cursor before downstream delivery. A failed update can leave earlier writes in place. Define transactions and durable processing checkpoints in the app. See [reconnect streams](/effect-api-query/guides/reconnect-streams/) for cursor behavior.
 
-Keep asynchronous work inside the awaited Effects. Detached work and uninterruptible callbacks can outlive retirement; capture the originating cache and use `owner.commit` for external synchronous writes. When refresh uses native Query fetches, wrap generated runners and query execution as described in [Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/), so disposal also drains shared Query execution after the refresh waiter is interrupted.
+Keep asynchronous work inside awaited Effects. Detached or uninterruptible work can outlast retirement. Use `owner.commit` for external synchronous writes. If recovery uses native fetches, [track runners and query functions](/effect-api-query/guides/switch-cache-owners/#opt-in-owner-helper) so disposal waits for shared work after the refresh waiter stops.
 
-Consume events without retention when they only update query data. If the UI needs recent event history, use an [accumulated streamed query with finite retention](/effect-api-query/guides/choose-stream-history/). Cache history separately only for that explicit requirement.
+If events only update queries, consume them directly. If the UI needs recent events, use an [accumulated stream with finite retention](/effect-api-query/guides/choose-stream-history/).

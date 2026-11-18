@@ -3,7 +3,7 @@ title: HTTP Utility Tree
 description: Understand literal HTTP identifiers, top-level groups, and omitted endpoints.
 ---
 
-`createHttpApiQueryUtils` builds and freezes an HTTP utility tree from a literal Effect HttpApi declaration. Buffered endpoints without multipart expose ordinary query, infinite-query, and mutation builders. Buffered multipart endpoints expose mutation builders only, regardless of HTTP method. Endpoints with one SSE or NDJSON success expose builders for accumulated streamed queries and live queries.
+`createHttpApiQueryUtils` builds a frozen object with methods for each supported endpoint. See [supported operations](/effect-api-query/getting-started/feature-support/) for the methods available for each response type, including streams and uploads.
 
 | Declaration | Generated path |
 | --- | --- |
@@ -11,9 +11,9 @@ description: Understand literal HTTP identifiers, top-level groups, and omitted 
 | Group `user.accounts`, endpoint `get.user` | `http['user.accounts']['get.user']` |
 | Top-level group `system`, endpoint `ping` | `http.ping` |
 
-HTTP identifiers remain literal properties. Unlike RPC tags, they do not split on dots. The API identifier is part of the key namespace. Group and endpoint identifiers determine the path through the tree. Literal declaration types let TypeScript preserve those paths and omissions.
+Use the group and endpoint names as written. If a name contains dots, use bracket access. The API identifier forms part of the cache prefix. Keep declaration identifiers literal so TypeScript can infer the paths.
 
-Every retained branch and endpoint has `key()`. A top-level group has no branch in the tree. Custom key encoders still use that group's declaration identifier. The factory rejects unsafe names, collisions, and invalid encoder configuration before it returns any utilities.
+Call `key()` on any retained branch or endpoint to select its cache entries. A top-level group's endpoints appear at the root. Use the declaration's group identifier in custom key encoders. The factory rejects unsafe names, collisions, and invalid encoders.
 
 | Endpoint success/payload | Generated cache views |
 | --- | --- |
@@ -21,10 +21,10 @@ Every retained branch and endpoint has `key()`. A top-level group has no branch 
 | Any buffered multipart payload alternative | Mutations only, including mixed plain and multipart alternatives |
 | Single SSE or NDJSON success without multipart | Accumulated history and latest-value views |
 
-SSE and NDJSON emissions retain decoded response-header wrappers. SSE decoder policy contributes to both view keys. NDJSON uses declaration-level decoder limits and has no SSE-specific key fields. Accumulated keys also include retention and refetch policy. Endpoint prefixes select all policies. The [HTTP Factory](/effect-api-query/reference/http-factory/) lists the exact builders.
+SSE and NDJSON keep declared decoded response headers in each emitted value. SSE decoder options contribute to both stream keys. NDJSON uses the limits in the declaration. Accumulated keys also include retention and refetch settings. Use the endpoint prefix to match every policy. See [HTTP builders](/effect-api-query/reference/http-builders/) for exact keys and options.
 
-The factory omits endpoints with raw byte streams, mixed buffered and streamed successes, multipart payloads with streamed successes, or any streaming request payload. Groups with only omitted endpoints disappear. Contradictory multipart metadata causes factory construction to fail. Unsupported streams require direct use of the ready client. Applications own byte sinks, reconnection, and resume policy.
+The factory skips unsupported endpoints and groups with no supported endpoints. It rejects conflicting multipart metadata. For raw byte streams, use the ready client and manage byte sinks and reconnection in your app. See [compatibility and limits](/effect-api-query/reference/compatibility-and-limits/) for unsupported shapes.
 
-Any buffered multipart payload alternative makes an endpoint mutation-only, even if the endpoint also accepts ordinary payloads. Its leaf exposes `key()`, `mutationKey()`, and `mutationOptions()`. Files and other mutation variables do not contribute to cache identity. These leaves require no key encoder and reject encoder entries. The [file upload guide](/effect-api-query/guides/http-queries-and-mutations/#upload-a-file) shows how to supply multipart input.
+Any buffered multipart alternative makes the endpoint mutation-only, regardless of HTTP method. Use `key()`, `mutationKey()`, or `mutationOptions()`. Mutation variables, including files, stay outside the key. The factory rejects a key encoder for these leaves. See [file uploads](/effect-api-query/guides/http-queries-and-mutations/#upload-a-file).
 
-Raw response objects remain omitted. Ordinary queries, mutations, and SSE or NDJSON views use decoded-only responses. Buffered metadata views copy status and headers alongside decoded data. Request input excludes response controls. The [HTTP factory](/effect-api-query/reference/http-factory/) defines request, response, and builder contracts. [Semantic Keys](/effect-api-query/concepts/semantic-keys/) explains the `http` namespace.
+Ordinary builders return decoded data. A buffered metadata view also copies the status and raw headers. Request input excludes response controls. See the [HTTP factory](/effect-api-query/reference/http-factory/) for input and response rules, and [semantic keys](/effect-api-query/concepts/semantic-keys/) for the namespace.

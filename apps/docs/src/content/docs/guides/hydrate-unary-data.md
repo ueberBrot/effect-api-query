@@ -3,15 +3,15 @@ title: Hydrate Unary Data
 description: Keep DTOs or rich Schema values consistent across JSON hydration and client refetch.
 ---
 
-Before connecting server rendering to TanStack Query, choose the cache representation. The server and browser must use the same contract, key prefix, and inputs. Each owns a Query Client, ready Effect client, and runtime. Before disposing a runtime, cancel outstanding queries.
+Choose a cache data shape before you add server rendering. Use the same contract, prefix, and inputs on both sides. Give server and browser separate QueryClients, Effect clients, and runtimes. Cancel outstanding queries before disposing of resources.
 
-The recipes cover unary profile reads through either factory. They keep only successful profile queries and omit mutations. Use the [query-view recipe](/effect-api-query/guides/hydrate-query-views/) for infinite pages, stream snapshots, and HTTP metadata.
+These examples transfer successful profile reads and omit mutations. For pages, stream data, and HTTP metadata, use [view codecs](/effect-api-query/guides/hydrate-query-views/).
 
 ## Keep DTOs in both caches
 
-Use a JSON-safe success schema when components need plain data. The contract below keeps credits as decimal strings and binary data as base64 strings. Return this DTO from the server operation. The ready RPC or HTTP client produces the same DTO on the server and browser.
+If components need plain data, return a JSON-safe data transfer object (DTO). This contract uses decimal strings for credits and base64 strings for binary data. The ready client returns the same shape on both sides.
 
-In the shared contract module, import `Schema` from `effect` and declare the DTO:
+Import `Schema` from `effect` and define the DTO in your shared contract.
 
 ```ts
 const ProfileDto = Schema.Struct({
@@ -21,17 +21,17 @@ const ProfileDto = Schema.Struct({
 });
 ```
 
-The [complete DTO recipe](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-hydration-dto.ts) connects this schema to both factories and provides `snapshotDto` and `hydrateDto`.
+The [complete DTO example](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-hydration-dto.ts) includes both factories, `snapshotDto`, and `hydrateDto`.
 
-Prefetch with `queryClient.query(dtoRpcOptions(rpcClient))` or the HTTP equivalent. Publish `snapshotDto(queryClient)` through your framework's JSON transport. Before the browser's first query, call `hydrateDto` on its Query Client. The 60-second freshness window avoids an immediate duplicate read. Later invalidation and refetch still produce DTOs.
+Prefetch with `queryClient.query(dtoRpcOptions(rpcClient))` or its HTTP equivalent. Send `snapshotDto(queryClient)` through your framework. Call `hydrateDto` on the browser cache before its first query. The example keeps data fresh for 60 seconds to prevent an immediate duplicate read. Refetches keep the same DTO shape.
 
-If your domain layer uses classes, convert them to this DTO in the operation or ready-client adapter on both sides. TanStack's `select` changes an observer's result. It does not change cached query data.
+If your domain uses classes, convert them to DTOs in the operation or ready-client adapter. A hook's `select` changes its return value while the cache keeps the full response.
 
 ## Reconstruct Schema classes with paired codecs
 
-Keep decoded domain objects in the cache when components need methods or rich values. Encode at the snapshot boundary and decode during hydration. This `Profile` encodes bigint credits as a string and its `Uint8Array` avatar as base64. Decoding reconstructs the class and its `summary` method.
+If components need methods or rich values, keep decoded objects in the cache. This `Profile` encodes bigint credits as a decimal string and its `Uint8Array` avatar as base64. Decoding restores the instance and its `summary` method.
 
-In the shared contract module, define the rich success schema:
+Define the rich success Schema in the contract.
 
 ```ts
 export class Profile extends Schema.Class<
@@ -48,19 +48,19 @@ export class Profile extends Schema.Class<
 }
 ```
 
-In the server snapshot and browser hydration modules, pair `serializeData: Schema.encodeUnknownSync(Profile)` with `defaultOptions: { deserializeData: Schema.decodeUnknownSync(Profile) }`. The [complete rich-value recipe](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-hydration-rich.ts) provides `snapshotProfile`, `hydrateProfile`, and options for both factories.
+Pair `serializeData: Schema.encodeUnknownSync(Profile)` on the server with `defaultOptions: { deserializeData: Schema.decodeUnknownSync(Profile) }` in the browser. See the [rich-value example](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-hydration-rich.ts) for `snapshotProfile`, `hydrateProfile`, and both factories.
 
-Prefetch with `profileRpcOptions` or `profileHttpOptions`. Publish `snapshotProfile`, then call `hydrateProfile` on the browser's Query Client. The hydrated value and a later browser refetch both have the `Profile` prototype, bigint credits, and byte array. Only the snapshot contains encoded strings. This recipe reserves the `'profile'` prefix for unary `Profile` data. Other query shapes need their own codec selection. To bind that selection to a generated leaf and view, use `queryViewCodec(leaf, 'query', Profile)` and `hydrationCallbacks(codec)`. The callbacks provide the same native `serializeData` and `deserializeData` functions for a service-free codec. Filter dehydration with `codec.matches(query.queryKey)` and the native success predicate. For multiple representations, use [a typed registry](/effect-api-query/guides/hydrate-query-views/#register-generated-leaves-and-views).
+Prefetch with `profileRpcOptions` or `profileHttpOptions`. Send `snapshotProfile` and then call `hydrateProfile` in the browser. Both the hydrated value and later refetch contain a `Profile` with bigint credits and bytes. The example reserves the `'profile'` prefix for this shape. You can bind a codec to a leaf with `queryViewCodec(leaf, 'query', Profile)`. Use `hydrationCallbacks(codec)` for a service-free codec and filter for matching successful queries. For multiple shapes, [register the views](/effect-api-query/guides/hydrate-query-views/#register-generated-leaves-and-views).
 
-`serializeData` and `deserializeData` are synchronous callbacks. The synchronous Schema functions must finish without asynchronous work or required services. A codec failure throws. Handle the failure through your rendering or hydration error path.
+Native serialization and deserialization callbacks must finish synchronously without required services. Handle a thrown codec error in your rendering or hydration code.
 
-`structuredClone` copies class properties without restoring the class prototype or methods. It preserves bigint and typed arrays in memory, but JSON still requires an encoding for those values. It does not provide a paired JSON codec. If you only clone the server class, hydration and a later class-valued refetch use different representations.
+`structuredClone` preserves bigint and typed arrays in memory. It copies class properties without their prototype and methods. Use a paired codec to send those values as JSON and restore the same representation as a later fetch.
 
 ## Finish effectful preparation before publishing or hydrating
 
-If a codec needs services or asynchronous work, prepare the entire snapshot outside TanStack's synchronous callbacks. This example adds a caller-owned preparation service to the same Profile codec. Its hooks can await application work before encoding or decoding.
+If a codec needs services or asynchronous work, prepare the whole snapshot before calling TanStack's synchronous APIs. The example adds an app service that runs before Profile encoding and decoding.
 
-The application's hydration module decodes all entries before changing the cache. Use `PreparedProfile` and its services from the [complete asynchronous recipe](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-hydration-async.ts) to define that boundary:
+Use `PreparedProfile` and its services from the [asynchronous example](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-hydration-async.ts). Its hydration function decodes all entries before changing the cache.
 
 ```ts
 const prepareProfileHydration = Effect.fnUntraced(function* (
@@ -77,18 +77,18 @@ const prepareProfileHydration = Effect.fnUntraced(function* (
 });
 ```
 
-Provide `HydrationPreparation` through your application Context or ManagedRuntime. Await the result of `prepareProfileSnapshot` before publishing its JSON. On the browser, await `prepareProfileHydration` before queries or components read the hydrated cache. The hydration function decodes every entry before calling `hydrate`. If decoding fails, the destination cache stays untouched.
+Provide `HydrationPreparation` through the app Context or ManagedRuntime. Await `prepareProfileSnapshot` before sending JSON. Await `prepareProfileHydration` before the browser reads the cache. A decoding failure leaves the destination cache untouched.
 
-Keep the preparation runtime alive until the Effect completes. Dispose it through the application's lifecycle.
+Keep the preparation runtime alive until the Effect completes, then dispose of it with your other resources.
 
-Neither preparation function puts an Effect or Promise into query data. The server cache keeps `Profile` values. The published snapshot contains encoded data, and the browser cache receives fully decoded `Profile` values. The Schema codec validates each profile. The surrounding snapshot must come from the matching application encoder. Query keys and metadata must also satisfy your JSON transport.
+Both caches keep decoded `Profile` values. Only the snapshot contains encoded data. Schema validates each profile. Use the matching app encoder for the snapshot and make sure query keys and metadata also survive JSON transport.
 
 ## Omit failed queries by default
 
-Retain `defaultShouldDehydrateQuery` so failed queries stay out of the snapshot. The browser can refetch them with its own client and receive a fresh `EffectRpcQueryError` or `EffectHttpApiQueryError` and Cause. The recipes above preserve this policy even when selecting a profile prefix.
+Keep `defaultShouldDehydrateQuery` so the browser refetches omitted failures with its own client. A new failure includes the generated error and its Cause. The examples keep this filter when selecting the profile prefix.
 
-If you deliberately transfer failed queries, define a safe application error representation. Encode and decode both `state.error` and `state.fetchFailureReason`. `serializeData` and `deserializeData` transform query data without transforming those error fields. Allowlist public failure tags and fields. Omit private messages, defects, and transport details. Reconstruct the error behavior your UI requires.
+To transfer a failure, encode and decode `state.error` and `state.fetchFailureReason` separately. Native data callbacks only transform data. Allowlist public tags and fields. Leave out private messages, defects, and transport details.
 
-JSON serialization of an Error or Cause does not supply that policy. A safe error DTO does not automatically become either package error class or pass its type guard.
+Restore the error behavior your UI needs. A plain DTO needs explicit reconstruction to pass a package error class guard.
 
-For normal retry and error handling, keep failures local to each client and follow [Handle Failures](/effect-api-query/guides/handle-failures/) and [Retry Queries](/effect-api-query/guides/retry-queries/). For router ownership and cleanup, see [TanStack Start](/effect-api-query/guides/tanstack-start/).
+See [handle failures](/effect-api-query/guides/handle-failures/) and [retry queries](/effect-api-query/guides/retry-queries/) for failures on each client. For router ownership and cleanup, see [TanStack Start](/effect-api-query/guides/tanstack-start/).

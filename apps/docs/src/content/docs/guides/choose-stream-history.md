@@ -3,7 +3,7 @@ title: Choose Stream History
 description: Choose retained history, transport buffering, and update rates for long-running streams.
 ---
 
-Choose a cached representation that fits the screen:
+Decide which values the screen needs to keep.
 
 | Need | Builder | Retained data |
 | --- | --- | --- |
@@ -11,31 +11,31 @@ Choose a cached representation that fits the screen:
 | A recent event window | `streamedOptions` with `maxChunks` | Up to the specified number after publication. |
 | Current state | `liveOptions` | The latest emitted value. |
 
-For a long-running event display, choose a finite `maxChunks`. For current progress or a feed of complete state, choose a live query. Unlimited accumulation grows with each emission. Use it for finite histories or workloads that deliberately retain every emission. If history must survive cache eviction or application restarts, persist it outside the query cache.
+For an event feed, keep a finite number of values. For current progress or complete state, use a live query. Unlimited history grows with every emission. If data must survive eviction or a restart, store it outside the query cache.
 
-These choices apply to both RPC streams and supported HTTP SSE and NDJSON endpoints. Live queries normalize successful `undefined` to `null`. Accumulated histories preserve their emitted values.
+Both RPC and supported HTTP SSE and NDJSON endpoints offer these views. Live queries convert `undefined` to `null`. Histories keep the original emissions.
 
 ## Set retention and buffering separately
 
-A finite `maxChunks` limits cached elements after each publication. Supply a positive safe integer or choose `"unbounded"` explicitly. Use `configureUtils` with `streamed.policy` to share this choice across a tree, branch, or leaf. Seeded or hydrated history can exceed the bound until another publication. One element can contain a large object or array, so the bound does not limit bytes. The cache discards older elements and preserves the remaining order. Use the same retention, refetch, and publication policy when building an exact key and its options.
+Set `maxChunks` to a positive safe integer or choose `"unbounded"`. You can share this choice with `configureUtils` under `streamed.policy`. After each publication, the cache keeps the newest elements in order. Seeded or hydrated history can exceed the bound until then. The bound counts elements, so a large object can still use substantial memory. Use the same policies for exact keys and options.
 
-RPC `rpcOptions.streamBufferSize` controls the ready client's transport buffer before consumption. It does not set cache history or the rate of cache writes. HTTP transport buffering belongs to the ready HTTP API client. Changing a history bound does not slow the producer.
+RPC `rpcOptions.streamBufferSize` controls the ready client's queue before consumption. HTTP buffering belongs to the HTTP client. Configure cache retention and publication separately. Changing the history bound leaves the producer's rate unchanged.
 
-An initial accumulated or live fetch exposes its first value while the stream remains open. An accumulated `replace` refetch publishes its replacement only after successful completion. If the replacement stream stays open indefinitely, the previous history remains visible. See [Stream Snapshots](/effect-api-query/guides/stream-snapshots/) for finite server captures.
+An initial fetch exposes its first value while the stream stays open. An accumulated `replace` refetch keeps the previous history until successful completion. For a finite server capture, see [stream snapshots](/effect-api-query/guides/stream-snapshots/).
 
 ## Assess writes and references separately
 
-Accumulated streams build new history arrays without changing previous publications. A history bound limits array length. By default, each consumed value contributes to a cache update. Live queries also accept each value, including repeated values. Native structural sharing can preserve equal data references without suppressing those cache writes.
+Accumulated streams publish new arrays and leave previous arrays intact. By default, each value contributes to a cache write, even if it repeats. Structural sharing can keep an equal reference while Query still publishes state changes.
 
-For JSON-compatible values, TanStack's default structural sharing can reuse unchanged objects and nested values. A moving window changes array positions, so sharing can produce more distinct references. Compare the data shape your application receives before choosing `structuralSharing: false` or a custom native policy.
+TanStack can reuse unchanged JSON-compatible objects and nested values. A moving window shifts array positions, which can reduce reuse. Measure your data before disabling sharing or supplying a custom policy.
 
-Cache notifications also include query creation and changes during fetching. Count data writes, data reference changes, and retained elements separately. Framework observer selection and render scheduling affect rendering. Cache notification counts do not count component renders.
+Count data writes, reference changes, and retained elements separately. Query creation and fetching also notify the cache. To measure renders, observe the framework because selection and scheduling affect when a component updates.
 
-If the producer outruns the interface, set a rate or sampling policy in the producer or an application-owned Effect Stream transformation. Sampling intentionally discards values. Retention, transport buffering, and publication rate have separate purposes.
+If the screen cannot keep up, set a rate or sampling policy in the producer or an Effect Stream transformation. Sampling drops values. Publication batches keep accepted values in order.
 
 ## Batch accumulated publications
 
-Set `publicationBatchSize` on RPC or HTTP SSE/NDJSON `streamedOptions` to publish several events together:
+Set `publicationBatchSize` to group events in an accumulated RPC, SSE, or NDJSON query.
 
 ```ts
 const history = rpc.diagnostics.stream.streamedOptions({
@@ -44,17 +44,17 @@ const history = rpc.diagnostics.stream.streamedOptions({
 });
 ```
 
-It accepts a positive safe integer and defaults to one. The first event publishes immediately; later publications append the next batch in order. Completion or failure flushes a partial batch. A `replace` refetch keeps the old history until successful completion, as usual. Cancellation discards unpublished events and follows native cancellation and cache reversion.
+The size must be a positive safe integer and defaults to one. The first event publishes immediately. Later events publish in order. Completion or failure flushes a partial batch. A `replace` refetch publishes only after success. Cancellation discards pending values and follows TanStack's cache reversion.
 
-By default, batching counts events without a deadline. After the first publication, a slow or paused stream can leave a partial batch unpublished indefinitely. For example, a batch size of 32 leaves the next ten events unpublished until another 22 arrive or the stream ends. Choose a batch size of one when each event must appear promptly, or set a publication deadline as shown below.
+With count-only batching, a quiet feed can leave values unpublished. For example, size 32 leaves the next ten events pending until 22 more arrive or the stream ends. Use size one for immediate updates, or add a deadline.
 
-Transport consumption continues as the batch fills. The pending batch uses memory alongside cached history. Every event contributes in order, subject to the configured retention bound. If a batch exceeds `maxChunks`, only its newest retained elements remain visible. Earlier publications keep their own arrays. Live queries publish each latest value unless coalescing is explicitly enabled.
+Transport consumption continues while the batch fills. The pending batch uses memory in addition to the history. If the batch exceeds `maxChunks`, the cache keeps only the newest values in the bound. Earlier publications keep their arrays.
 
-Reuse the options' `queryKey` for exact cache access, or pass the same policy to `streamedKey`. Nondefault batch sizes create separate accumulated cache entries. An explicit one shares the default key. Endpoint and branch prefixes still select every publication policy.
+Use the options' `queryKey` or pass the same policy to `streamedKey`. A nondefault batch size has its own key. Explicit size one shares the default key. Endpoint and branch prefixes match every size.
 
 ## Flush a quiet publication batch
 
-For uneven event traffic, combine a count limit with a deadline:
+Add a deadline if event traffic is uneven.
 
 ```ts
 const options = rpc.diagnostics.stream.streamedOptions({
@@ -64,11 +64,11 @@ const options = rpc.diagnostics.stream.streamedOptions({
 });
 ```
 
-The first event publishes immediately. Later events publish in ordered batches when the count reaches ten or the oldest buffered event has waited fifty milliseconds. Omit the deadline to keep count-only behavior. Browser scheduling can delay timers; this is not a real-time guarantee.
+After the first event, publish when ten events arrive or the oldest pending event reaches 50 milliseconds. Omit the deadline for count-only batching. Browser scheduling can delay the timer.
 
 ## Consume events without cached history
 
-Use `consumeEvents` for notifications or invalidation signals that do not need a query cache entry:
+Use `consumeEvents` to handle notifications or invalidation without storing a history.
 
 ```ts
 import { consumeEvents } from "@ueberbrot/effect-api-query";
@@ -81,18 +81,16 @@ const consumption = consumeEvents(Stream.make(1, 2, 3), {
 });
 ```
 
-Pass a native decoded stream from your ready client in an application. The returned Effect starts only when run. Event callbacks run sequentially and apply backpressure. A callback failure stops consumption and remains in the error channel. `onExit` runs after stream cleanup, including failure and interruption; its finalization must finish before the Effect settles. `onStart` signals local startup, not transport connection. The helper stores no history and owns no runtime or cache. Run it in your application's Scope, interrupt it before disposing resources, and apply `recoverStream` when replay and reconnection are needed.
+Pass a decoded stream from your ready client and run the returned Effect inside your app's Scope. The helper calls event handlers in order and waits for each one. A failed handler stops consumption and adds its failure to the Effect result. `onStart` signals local startup. `onExit` runs after cleanup and must finish before the Effect settles. Interrupt it before disposal. Use [recovery](/effect-api-query/guides/reconnect-streams/) for replay.
 
 ## Coalesce complete live snapshots
 
-Use `liveOptions({ coalesceMs: 50 })` on RPC or HTTP SSE/NDJSON when every emission is complete state and intermediate snapshots may be skipped. Omit it to publish every value. Choose an integer from 1 to 2,147,483,647 milliseconds.
+Use `liveOptions({ coalesceMs: 50 })` when each emission contains complete state and you can skip intermediate snapshots. Set a whole number from 1 to 2,147,483,647 milliseconds. Omit the setting to publish every value.
 
-The first value of each fetch publishes immediately. The next value starts a deadline; subsequent values replace the single pending snapshot without moving that deadline. When the deadline timer runs, publish the latest pending value even if the next pull is blocked. Event-loop scheduling can delay publication. A later value starts another deadline. Completion or failure flushes the pending value before settling; failures retain their full Cause. Empty completion remains an empty-live-stream error. Successful `undefined` becomes `null`.
+Each fetch publishes the first value immediately. The next value starts a timer. New arrivals replace the pending value without extending the deadline. The timer publishes the latest pending value even if the next pull is blocked. The event loop can delay the timer. Completion or failure publishes the pending value before settling. Empty completion still fails. Successful `undefined` becomes `null`.
 
-Refetch resets the view and starts a fresh cycle. Cancellation drops pending values, clears the timer and closes the iterator; native cancellation/reversion still applies. Native cancellation can settle before local finalizers finish. This adds no cleanup timeout or remote acknowledgement.
+A refetch starts a new cycle. Cancellation drops pending values, clears the timer, and closes the iterator. Native cache reversion still applies. Wait for [local cleanup](/effect-api-query/guides/cancellation/#release-resources-after-local-cleanup) before releasing shared resources.
 
-Share defaults with `configureUtils(leaf, { live: { policy: { coalesceMs: 50 } } })`. Configured keys inherit the same policy as options. Direct exact keys take the same policy: `liveKey(input, { coalesceMs: 50 })`, or `liveKey({ coalesceMs: 50 })` for inputless operations. Explicit deadlines have separate cache identity. On an unconfigured leaf, omitted and `undefined` preserve the default key. A local `coalesceMs: undefined` clears an inherited coalescing policy; omitting the local option inherits it. HTTP SSE keys also include decoder policy. Keep `sseOptions` local and pass the same options to the configured key builder. Prefer the options' `queryKey` for cache access.
+Set a default with `configureUtils(leaf, { live: { policy: { coalesceMs: 50 } } })`. Omit the local setting to inherit it. Pass `coalesceMs: undefined` to clear it. For exact access, reuse `queryKey` or pass the same policy to `liveKey(input, { coalesceMs: 50 })`. If the operation takes no input, use `liveKey({ coalesceMs: 50 })`. Explicit deadlines have distinct keys. For HTTP SSE, also pass the same local `sseOptions`.
 
-Raw `consumeEvents` still processes every event sequentially. For deltas and ordered history, use accumulated retention and publication batches/deadlines, which preserve accepted event order. Treat all published values as immutable.
-
-RPC live key types include an optional trailing policy slot. Use generated keys or the options' `queryKey` for cache access. Literal operation paths and data/error tags remain precise.
+For events that represent changes, use accumulated history or `consumeEvents` to preserve order. Keep published values unchanged.

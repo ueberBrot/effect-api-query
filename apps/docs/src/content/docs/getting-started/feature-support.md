@@ -3,9 +3,7 @@ title: Feature Support
 description: Choose the RPC or HTTP adapter and find its supported TanStack Query features.
 ---
 
-`effect-api-query` builds TanStack Query options and cache keys from Effect RPC groups and HttpApi definitions. Import `createRpcQueryUtils` for RPC or `createHttpApiQueryUtils` for HTTP from the package root.
-
-Use your native Effect declarations and ready clients. Effect and your application own the server, transport, authentication, and resource lifetime. This package builds the keys, functions, and options that TanStack Query consumes.
+Use `createRpcQueryUtils` with an Effect RPC group or `createHttpApiQueryUtils` with an HttpApi declaration. Both factories take a client your app already acquired.
 
 ## Pick the operation
 
@@ -16,12 +14,12 @@ Use your native Effect declarations and ready clients. Effect and your applicati
 | Buffered multipart HTTP | Mutation with explicit `FormData` | [Upload](/effect-api-query/guides/http-queries-and-mutations/#upload-a-file) |
 | RPC stream / unambiguous HTTP SSE or NDJSON | Accumulated history or latest value | [Choose Stream History](/effect-api-query/guides/choose-stream-history/) |
 
-Use queries for cached reads and mutations for commands. Writes refresh reads only when your application invalidates the affected queries. The package omits raw byte response streams, HTTP upgrades, mixed buffered and streamed successes, streaming request payloads, and raw-response modes. It also omits SSE or NDJSON endpoints with multipart payloads. See [Compatibility and Limits](/effect-api-query/reference/compatibility-and-limits/).
+Use queries for cached reads and mutations for writes. After a write, update affected entries or invalidate them to mark them stale. Active queries refetch by default. See [compatibility and limits](/effect-api-query/reference/compatibility-and-limits/) for unsupported HTTP shapes.
 
 ## Plan application ownership
 
-Before constructing utilities, configure transport and authentication, acquire the ready client, and create any required runtime. Keep those resources alive while queries and mutations use them. Your application configures TanStack providers, Devtools, persistence, broadcasting, and cache defaults.
+Keep your Effect client and runtime alive while requests use them. See [client lifecycle](/effect-api-query/concepts/client-lifecycle/) for cleanup.
 
-If client configuration changes the returned data, include a safe user or tenant identity in `keyPrefix`. Keep credentials out of keys. See [semantic keys](/effect-api-query/concepts/semantic-keys/) and [client lifecycle](/effect-api-query/concepts/client-lifecycle/).
+If results vary by user or tenant, include a safe identifier in `keyPrefix`. Keep credentials out of keys. See [semantic keys](/effect-api-query/concepts/semantic-keys/).
 
 Start with the [RPC Quick Start](/effect-api-query/getting-started/quick-start/) or [HTTP Quick Start](/effect-api-query/getting-started/http-quick-start/).

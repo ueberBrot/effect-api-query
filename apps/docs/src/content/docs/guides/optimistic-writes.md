@@ -3,56 +3,56 @@ title: Optimistic User Writes
 description: Seed typed entries, roll back individual writes, and reconcile overlapping mutations.
 ---
 
-Use generated concrete keys to update reads affected by a mutation. Define the write workflow in your application, which knows how a domain operation relates to its reads.
+An optimistic update changes cached data before the server replies. Use the generated keys to target the reads that a write affects.
 
-The Vite React example applies this workflow to its existing user forms and directory. Copy [the user-write module](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/lib/user-writes.ts) and compose it with your application's ready clients and QueryClient, as in [the application](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/lib/application.ts). Its RPC and HTTP forms use the same application workflow and maintain distinct cache entries.
+The Vite React example uses the same workflow for RPC and HTTP while keeping their cache entries distinct. See the [write module](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/lib/user-writes.ts) and [application setup](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/lib/application.ts).
 
 ## Seed the mutation response
 
-After creating a user, the example replaces that mutation's temporary entry in each cached list with the returned `User`. It also seeds these concrete detail keys:
+When the server returns the new user, replace that write's temporary list entry. Also seed the exact detail keys for the returned user.
 
 - `rpcQuery.users.get.queryKey({ id: user.id, locale: user.locale })`
 - `httpQuery.users.get.queryKey({ params: { id: user.id }, query: { locale: user.locale } })`
 
-The locale is part of the read input. A response with locale `fr` does not satisfy a detail query whose constructor supplies the default locale `en`.
+A French response belongs under a French detail key. An RPC detail query that uses the default English locale has a different key.
 
-Use generated DataTag keys directly with `getQueryData` and `setQueryData`. QueryClient owns the hash function, including global and prefix defaults. The generated keys also support native cancellation and invalidation. Do not hash keys independently.
+Pass generated keys to `getQueryData` and `setQueryData` to keep the types. Let QueryClient hash them with its configured defaults.
 
 ## Apply and reconcile an optimistic write
 
-The example's mutation options perform these actions:
+The example uses these steps for each write.
 
-1. Capture the original owner and reserve the write before awaiting anything.
-2. Cancel the related RPC and HTTP reads through their generated user branch prefixes.
-3. Snapshot the affected list and infinite entries. For deletion, keep the removed entity and its positions. For creation, allocate a temporary negative ID that belongs to this write.
-4. Publish the optimistic change. Pending users cannot be deleted through the forms.
-5. Replace a created user's temporary ID with the response, or roll back the failed write.
-6. Invalidate both user branches when the final overlapping write settles.
+1. Record the current cache owner and reserve the write before awaiting anything.
+2. Cancel RPC and HTTP reads under their user prefixes.
+3. Save affected list and infinite entries. For deletion, record the user and its positions. For creation, assign a temporary negative ID.
+4. Publish the change locally. The forms block deletion of pending users.
+5. Replace the temporary ID on success or roll back the failed write.
+6. Invalidate both user branches after the last overlapping write settles.
 
-Mutation responses remain ordinary Effect success values. An optimistic rollback restores the application's cache. It cannot undo work the server has accepted.
+Mutations return the original Effect success value. A rollback restores cached data. To reverse completed server work, use a separate server operation.
 
 ## Preserve infinite pages
 
-The example updates its existing four-user page views through their generated infinite keys. It retains every page, `pageParams`, and unrelated user. A failed deletion restores only the removed user at its former page position. Users created in the meantime remain in the cache.
+Update each affected page through its infinite key. Preserve `pageParams`, other users, and every page. If deletion fails, restore the user at its former position and keep users created in the meantime.
 
-Creation adjusts the total count on cached pages. It appends the new user to the last loaded page only when that page has no next cursor. A partial directory waits for reconciliation to determine where the user belongs. Each reconstructed page retains the `UserPage` representation.
+Update the total count when you add a user. Append the user to the final loaded page only if it has no next cursor. Otherwise wait for the server to place it. Preserve the `UserPage` shape.
 
-Offset pagination can change after deletion or insertion. Preserving the current page structure keeps the optimistic view usable until settlement invalidation refreshes the server's page boundaries and cursors. Add concrete keys for any other page sizes or filters your application uses. This example registers only its existing page size and initial cursor.
+Inserting or deleting a user can change offsets. Invalidate after settlement so the server can update page boundaries and cursors. The example covers one page size and initial cursor. Add exact keys for any other filters or sizes you use.
 
 ## Keep overlapping writes safe
 
-A full snapshot rollback can erase a later successful write. The example removes a failed creation's own temporary user or restores one deleted user without replacing the list. Overlapping deletions retain their original relative order, even when their failures finish in a different order. Rollback places the removed user beside surviving original neighbors and keeps newly created users.
+Roll back only the failed change. Remove its temporary user or restore its deleted user beside surviving original neighbors. This keeps later successful writes and preserves the relative order of overlapping deletions.
 
-An authoritative cache update supersedes the optimistic revision, even if its data is unchanged. A failed deletion leaves that newer update intact. Deletions started after a refresh capture the current user and position for rollback. Overlapping deletions of the same user share the first snapshot. One successful deletion prevents an older failure from restoring the user. If all deletions fail, rollback restores the original entity once.
+If a newer authoritative update replaces the optimistic revision, keep that update even if the data matches. Deletions after a refresh save the new position. Overlapping deletions of one user share their first snapshot. Restore the user once if every attempt fails. If any attempt succeeds, an older failure cannot restore it.
 
-Each new write cancels an earlier reconciliation fetch before publishing its optimistic change. Only the final pending write triggers refetches on settlement. An older settlement therefore does not refresh over a newer optimistic result. Success callbacks also cancel reads before seeding the returned value. Native cancellation prevents a cancelled query from publishing a late result.
+Cancel a previous reconciliation fetch before publishing a new write. Cancel reads again before seeding a response. TanStack prevents cancelled queries from publishing late results. Wait for the last pending write before triggering another refetch.
 
-All writes to these views must participate in the same application workflow. Background domain refreshes, manual cache replacement, and server-side write conflicts need their own coordination. The example does not infer server ordering or define a general conflict-resolution policy.
+Route writes to these views through the same workflow. Coordinate background refreshes, manual cache replacement, and server-side conflicts in your app.
 
 ## Retain the original owner
 
-The `onMutate` result carries the original owner's commit, rollback, and settlement actions. Callbacks invoke those actions and check that the owner is active. A late response cannot refill a cleared retired cache, seed a replacement client's entries, or invalidate those entries.
+Return the original owner's commit, rollback, and settlement actions from `onMutate`. Check that the owner is active before applying them. This keeps late responses out of retired and replacement caches.
 
-Native MutationObserver option updates can replace callbacks on a pending mutation. Carrying the transaction in `onMutate` prevents a later callback closure from redirecting a write already in progress. When replacing an application owner, remount mutation consumers. An options change while `onMutate` awaits cancellation can replace the mutation function before it starts.
+A native MutationObserver can replace callbacks while a mutation is pending. Carry the original transaction in `onMutate`. Remount mutation consumers when you replace the owner. If options change while `onMutate` awaits cancellation, the observer can replace the mutation function before it starts.
 
-Track mutation-function completion before releasing the application's ready clients. These writes use `networkMode: 'always'` and `retry: false`, so a retired owner does not retain paused mutation work. They do not use a native mutation scope queue. Mutations have no query abort signal. Retirement and cache clearing do not cancel an accepted server write.
+Wait for accepted mutation functions before releasing their clients. The example uses `networkMode: 'always'` and `retry: false` to avoid paused work. It leaves native mutation scope queues unused. An accepted server write can continue after cache retirement.

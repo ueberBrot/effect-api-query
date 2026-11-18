@@ -3,17 +3,17 @@ title: Solid Query
 description: Rebuild generated options with a Solid accessor and keep client resources alive.
 ---
 
-Pass options from either factory to Solid Query's native hooks. Before creating the utilities, configure `QueryClientProvider` and acquire the ready client.
+Configure `QueryClientProvider` and acquire your Effect client before passing generated options to Solid Query.
 
-See [Requirements and tested integrations](/effect-api-query/reference/compatibility-and-limits/#requirements-and-tested-integrations) for Solid Query's framework requirements and this guide's checked versions.
+See [compatibility](/effect-api-query/reference/compatibility-and-limits/#requirements-and-tested-integrations) for Solid requirements and tested versions.
 
 ## Rebuild options when input changes
 
-Builders capture plain input when you call them. Build options inside Solid's options accessor. When input changes, the accessor creates a new key and query function. If you pass a builder's result once, the query keeps using the original input.
+Call the builder from Solid's options accessor so input changes produce a new key and function. A previously built object keeps the input it captured.
 
-Keep [captured inputs unchanged](/effect-api-query/concepts/data-normalization/#keep-captured-inputs-unchanged) while their options can execute.
+Keep [captured input](/effect-api-query/concepts/data-normalization/#keep-captured-inputs-unchanged) unchanged while options can run.
 
-In component setup, use `rpc` from your [ready client](/effect-api-query/getting-started/quick-start/) and pass the builder call as an accessor. Here `users.read` accepts an ID and returns a user with `name`:
+Use `rpc` from your [ready client](/effect-api-query/getting-started/quick-start/) in component setup. Here `users.read` takes an ID and returns a user.
 
 ```ts
 import { useQuery } from "@tanstack/solid-query";
@@ -32,12 +32,12 @@ const user = useQuery(() => {
 });
 ```
 
-Read the selected value from `user.data`. When input changes, use the same accessor pattern for `infiniteOptions`, `streamedOptions`, `liveOptions`, and `metadataOptions`. For writes, use `useMutation(() => rpc.users.write.mutationOptions())`. Supply each execution's input through `mutate(variables)`. Read reactive mutation settings inside the accessor.
+Read the selected value from `user.data`. Use the same accessor for pages, streams, and metadata. For writes, use `useMutation(() => rpc.users.write.mutationOptions())` and pass variables to `mutate`. Read any reactive mutation settings inside the accessor.
 
 ## Choose native options carefully
 
-Solid accepts Core's `enabled(query)` callback. With the checked versions, Solid Query's query and infinite-query overloads accept defined initial data or absent initial data. A value or initializer that can return `undefined` does not match those overloads. Omit `initialData` or supply a defined seed. An explicit `initialData: undefined` overrides inherited QueryClient initial data.
+Solid accepts Core's `enabled(query)` callback. In the tested versions, omit `initialData` or supply a defined seed for query and infinite-query overloads. A value or initializer that can return `undefined` does not match. An explicit `initialData: undefined` clears inherited initial data.
 
 ## Own the native integration
 
-Follow the [shared integration lifetime](/effect-api-query/integrations/#own-the-cache-and-client-lifetime) for providers, observer removal, stream finalizers, and accepted mutations. Match the native wrapper to the application's Query Core. Use a compiler and tooling that Solid supports.
+Use one resolved Query Core version and a compiler that Solid supports. Follow [cache and client lifetime](/effect-api-query/integrations/#own-the-cache-and-client-lifetime) for observer removal and cleanup.

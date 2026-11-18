@@ -3,9 +3,9 @@ title: Conditional Queries
 description: Pause queries until their required input is available.
 ---
 
-In component setup, import the native `useQuery` hook. Use your application's ready utility tree, named `rpcQuery` here. Its `users.get` RPC takes a numeric `id` with a default locale and returns a user with an `id` and `name`. For factory setup, follow the [RPC quick start](/effect-api-query/getting-started/quick-start/).
+Pause a query while the user has no selection. Import your framework's `useQuery` hook. This example uses the utilities from the [RPC quick start](/effect-api-query/getting-started/quick-start/), named `rpcQuery` here.
 
-`userId` is the selected ID and can be undefined. If an input-bearing query has no valid input, use `{ input: skipToken }`. The builder still accepts TanStack options such as `staleTime`, `select`, or `initialData`:
+If `userId` is undefined, pass `input: skipToken`. Keep options such as `staleTime`, `select`, or `initialData` on the same builder call.
 
 ```ts
 import { skipToken } from "@ueberbrot/effect-api-query";
@@ -22,7 +22,7 @@ const userOptions = rpcQuery.users.get.queryOptions({
 const user = useQuery(userOptions);
 ```
 
-For an HTTP `users.get` endpoint that accepts only a numeric `id` param and returns a user, the complete decoded request contains only `params`:
+For an HTTP endpoint with only a numeric ID in its path, pass a decoded `params` object when the ID is available.
 
 ```ts
 const httpUserOptions = http.users.get.queryOptions({
@@ -32,15 +32,15 @@ const httpUserOptions = http.users.get.queryOptions({
 });
 ```
 
-The exported `skipToken` is Query Core's exact sentinel. A skipped query uses its operation prefix as its key, without payload or request identity. A skipped HTTP query does not encode a request or invoke the client. The builder preserves caller options and their selected-data types. It removes `input` before returning the options to TanStack.
+`skipToken` is the value exported by Query Core. The skipped key ends at the operation prefix. The builder leaves the caller's options and selected types intact and removes `input` before TanStack receives them. A skipped HTTP query never encodes or sends the request.
 
-Supplied `initialData` remains available. React Query's `useQuery` still types skipped hook data as possibly `undefined`, even with an initial value, because its defined-data overload excludes `skipToken`. `useInfiniteQuery` preserves its defined-data overload when `initialData` is a defined value or factory. This also applies to conditional and skipped inputs.
+TanStack still uses supplied `initialData`. React Query's `useQuery` types skipped data as possibly `undefined` because its defined-data overload excludes `skipToken`. With defined initial data or a factory that returns it, `useInfiniteQuery` retains its defined-data overload even for conditional input.
 
-Both adapters accept the sentinel in input-bearing `queryOptions`, `infiniteOptions`, `streamedOptions`, and `liveOptions`. Buffered HTTP `metadataOptions` also accepts it. Inputless operations run without input. Key and mutation builders do not accept `skipToken`. TanStack suspense and prefetch-only hooks reject skipped options at the type level.
+Pass `skipToken` to input-bearing query, infinite, streamed, live, and HTTP metadata option builders. Leave inputless operations without input. Key builders, mutations, and TanStack's Suspense and prefetch-only hooks reject the sentinel.
 
-`queryOptions`, `metadataOptions`, `streamedOptions`, and `liveOptions` accept concrete input, `skipToken`, or a conditional union of both. Keep conditional input inside one builder call so the observer has one consistent callback type. Concrete input and literal `skipToken` retain precise key and query-function types. Conditional input preserves both possibilities.
+Keep both branches of the condition inside one builder call so callbacks share a type. Literal inputs and a literal `skipToken` retain precise key and function types. A conditional input keeps both possibilities.
 
-If your RPC group also declares `events.watch` with a string `channel` input and string emissions, build either view in that consumer:
+For an RPC such as `events.watch` that takes a string `channel` and emits strings, choose an accumulated or live view in the same way.
 
 ```ts
 rpcQuery.events.watch.streamedOptions({
@@ -55,10 +55,10 @@ rpcQuery.events.watch.liveOptions({
 });
 ```
 
-`refetchMode` configures accumulation. The builder removes it from the returned options, even for skipped queries. Skipped streams still validate retention, refetch, and HTTP SSE decoder policies. Infinite queries accept a page-to-input mapper, `skipToken`, or a conditional union of both. They also require `initialPageParam` and `getNextPageParam`. Choose the mapper or sentinel in `input`. Each mapper result must be valid input.
+Skipped streams still validate retention, refetch mode, and HTTP SSE decoder options. The builder removes `refetchMode` from the options it returns. For infinite queries, pass the page mapper or sentinel in `input`. Supply `initialPageParam` and `getNextPageParam` in both cases.
 
-A skipped query has no executable query function, so manual `refetch()` cannot run it. Supply valid input to enable the query. If you have a complete request and need manual refetch, use `enabled: false`.
+Supply valid input before calling `refetch()` because a skipped query has no query function. If the request is complete and you want to run it manually, use `enabled: false`.
 
-For HTTP pagination, map each page parameter to the complete request and keep stable filters in every page. See [Load pages](/effect-api-query/guides/pagination/) for initial-request identity and cursor progression.
+For HTTP pagination, build the full request for each page. See [pagination](/effect-api-query/guides/pagination/) for stable filters and cursors.
 
-Try this in either [executable example](/effect-api-query/examples/#pause-a-query-until-a-user-is-selected). The **Choose before fetching** control pauses queries, selects a user, and reuses fresh cached data after clearing and reselecting the same user.
+In the [example apps](/effect-api-query/examples/#pause-a-query-until-a-user-is-selected), use **Choose before fetching**. Clear and reselect a user while the cached result is fresh to see it reused.

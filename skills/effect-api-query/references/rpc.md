@@ -1,6 +1,6 @@
 # RPC setup and rules
 
-Use the application's existing RPC group and protocol. This standalone example acquires and cleans up a client for a server at `http://localhost:3000/rpc`. The server must implement the same contract.
+Use the app's RPC group and protocol. The example needs a server at `http://localhost:3000/rpc` that implements the same contract. It reads a user, renames it, and closes the Scope.
 
 ```ts
 import { MutationObserver, QueryClient } from "@tanstack/query-core";
@@ -65,34 +65,32 @@ try {
 
 ## Tree and payload semantics
 
-Pass a ready flat client: `RpcClient.make(group, { flatten: true })`. Dotted RPC tags become nested paths. For example, `users.get` becomes `rpc.users.get`. If a tag segment contains a hyphen, use bracket access. The factory rejects path collisions and reserved builder names during construction.
+Acquire a flat client with `RpcClient.make(group, { flatten: true })`. Dotted tags become nested paths, so `users.get` becomes `rpc.users.get`. Use brackets for a segment with a hyphen. The factory rejects colliding paths and reserved names.
 
-RPC builders accept payload constructor input. Query preparation applies Schema constructor defaults, then derives canonical identity. With a constructor default of `locale: 'en'`, `{ id: 1 }` and `{ id: 1, locale: 'en' }` address the same query. Queries require query-stable payload construction. The ready client must reconstruct the normalized payload without changing its encoded meaning. Use standard struct-shaped payloads and materialized defaults. If reconstruction changes existing values, expose a stable query-facing RPC.
+Pass payload constructor input. Preparation applies Schema defaults before it builds the key. If the locale defaults to `'en'`, omitted and explicit English values match the same query. The client constructs the normalized payload again during execution. Use a query-stable Schema so both constructions have the same encoded meaning.
 
-Keep ordinary and prepared execution inputs unchanged, including retained nested mutable values. Canonical keys copy and freeze identity, not execution input. Rebuild input and options when request values change. Defaults must be deterministic across builds; materialize time-dependent or random values explicitly.
+Keep retained execution input and nested values unchanged. The library freezes the encoded key. Rebuild options with new values when the input changes. Supply time-dependent or random values explicitly.
 
-A constructor that increments an existing `id` can key `id: 2` from input `id: 1`, then execute `id: 3` when the ready client reconstructs it. A custom key encoder or prepared handle cannot repair this mismatch. Use a struct-shaped query-facing RPC and apply the domain conversion in its handler. This query-facing RPC uses the existing ready-client boundary; no decoded execution API is needed for this case.
+If a constructor increments `id`, input 1 can build a key for 2 and send a request for 3. Move the conversion to the handler of an RPC with a stable struct input. A key encoder or prepared input leaves client construction unchanged.
 
-Preparation failures throw synchronously before execution, including from `prepareInput`. RPC construction failures keep `PayloadConstructionFailed`; Schema encoding, custom encoding, and invalid canonical values retain their separate key-error stages. These are not failed query Exits.
+Preparation errors throw synchronously, including from `prepareInput`. `PayloadConstructionFailed` identifies the RPC constructor. Schema encoding, custom encoding, and invalid JSON have separate key error codes. Execution errors arrive later as failed Exits.
 
-Mutations pass constructor input directly to the ready client, which constructs the payload at execution time. Mutation keys contain no variables and invoke no key encoder. Mutations can use constructor-sensitive Schemas.
+Pass raw constructor input to a mutation. The client constructs it once at execution. A mutation key identifies the operation and skips variable encoding. Constructor-sensitive Schemas can still serve mutations.
 
 ## Request-local options
 
-To set an operation's `headers` and `context`, pass `rpcOptions` through its option builder. Stream builders also accept `streamBufferSize`. These options stay fixed for the builder result, including retries and all infinite pages. The adapter removes them from the returned TanStack options. They do not contribute to keys.
+Set local `headers` or `context` through `rpcOptions`. Streams also accept `streamBufferSize`. Each options object fixes these values for retries and pages. The builder strips them from Query options and leaves them out of the key.
 
-If these options carry identity, include that identity in the payload or a safe key prefix. `streamBufferSize` controls the client's stream buffer. `maxChunks` controls the accumulated cache. Unary `discard` and stream `asQueue` controls are unavailable.
-
-`maxChunks` bounds cached history after emissions. It does not resize the transport queue.
+If a header changes the result, include a safe identity in the payload or prefix. Set `streamBufferSize` for the client queue and `maxChunks` for cached history. Use the ready client's normal result or stream form. Leave out `discard` and `asQueue`.
 
 ## Custom key encoders
 
-Index `keyEncoders` by the original literal RPC tag, such as `'secrets.read'`. An encoder receives the normalized payload after constructor defaults apply. If payload encoding needs services, contains explicit redacted values, or uses opaque encoding middleware, provide an encoder. Runtime inspection treats middleware conservatively, including synchronous service-free middleware.
+Use the original literal tag as the key, for example `'secrets.read'`. The encoder receives the payload after defaults. Supply one if encoding needs services, contains redacted values, or uses opaque middleware. The runtime applies this rule even for synchronous, service-free middleware.
 
-Return a synchronous strict `JsonValue`. It can contain finite numbers, strings, booleans, null, dense arrays, and plain objects with defined JSON values. Default RPC encoding must also produce strict JSON. Dates and binary values need an encoding or projection. Undefined entries, cycles, and unsafe property names fail.
+Return a strict `JsonValue` synchronously. Use finite numbers, strings, booleans, null, dense arrays, and plain objects with defined values. Encode or project dates and bytes first. Undefined entries, cycles, and unsafe property names fail.
 
-Preserve every distinction that changes results. For secrets, use safe identifiers. Encoders affect only query identity. Execution input and service requirements stay unchanged.
+Preserve every difference that changes a result. Use safe identifiers for secrets. The ready client still uses the original input and its required services.
 
-Source: [RPC factory and builders](https://ueberbrot.github.io/effect-api-query/reference/generated-builders/).
+See [RPC builders](https://ueberbrot.github.io/effect-api-query/reference/generated-builders/).
 
-Repeated factories may reuse immutable declaration analysis. Each tree still binds its own ready client, runner, prefix, and encoders. Reuse a tree within its owner; never share a tree across owners merely because they use the same contract.
+Reuse the tree within one owner. Factories can reuse declaration analysis, but each tree binds its own client, runner, prefix, and encoders.

@@ -3,7 +3,7 @@ title: Semantic Keys
 description: Learn how normalized payloads produce stable cache identity.
 ---
 
-For a payload-bearing RPC query, the factory constructs the payload before it creates the key. Cache identity therefore includes constructor defaults:
+The library constructs an RPC payload before it builds the query key. The key includes values supplied by constructor defaults.
 
 ```ts
 rpcQuery.users.get.queryKey({ id: 1 });
@@ -12,27 +12,27 @@ rpcQuery.users.get.queryKey({ id: 1, locale: "en" });
 
 If the RPC payload Schema supplies `locale: 'en'` as a constructor default, both calls produce the same canonical key.
 
-Default key preparation follows these steps:
+The library builds the key in four steps.
 
-1. Construct the normalized payload from constructor input.
-2. Encode it synchronously with the payload Schema.
-3. Canonicalize strict JSON by sorting object keys recursively.
-4. Store the canonical key payload in a flat, prefix-matchable query key.
+1. Construct the payload from the input.
+2. Encode the payload synchronously with its Schema.
+3. Sort object keys at every level to get a consistent JSON value.
+4. Store that value at the end of the query key.
 
-QueryClient owns hashing through its global and prefix defaults. Generated options omit hash fields so fetches, stream publications, and native `getQueryData` and `setQueryData` calls address the same cache entry. Builders reject per-call `queryKeyHashFn` and `queryHash` overrides. Configure hashing before you use the cache, and keep it stable while entries remain. If changed hashing conflicts with a matching cached entry, stream execution rejects with `UnsupportedQueryHash`.
+Configure key hashing on QueryClient before adding cache entries. Generated builders reject individual `queryKeyHashFn` and `queryHash` overrides. Fetches, stream publications, and native cache reads and writes then use the same entry. If a change to hashing conflicts with an existing stream key, stream execution fails with `UnsupportedQueryHash`.
 
 Key objects cannot contain `__proto__` or `constructor` properties at any depth. Prefixes, Schema output, and custom encoder output all follow this restriction.
 
 RPC keys begin with the caller prefix followed by `rpc`. HTTP keys begin with the caller prefix, `http`, and the HttpApi identifier. A factory's `key()` includes these generated segments.
 
-Every RPC operation adds a segment after the RPC path: `query`, `infinite`, `streamed`, `live`, or `mutation`. Concrete query keys append the canonical payload when the RPC has one. Its public TypeScript slot is `unknown`; build exact keys with the leaf helpers and partial filters with an explicit projection. Runtime payloads remain validated, copied, and frozen JSON. The operation segments keep different cache shapes from colliding. Root, branch, and RPC prefixes still match all descendant operations.
+The operation follows the RPC path. It is `query`, `infinite`, `streamed`, `live`, or `mutation`. Exact query keys also include the encoded payload, if present. The public payload slot is `unknown`. Use builders for exact keys and explicit projections for partial filters. The library validates and freezes each payload. A root, branch, or RPC prefix matches the operations below it.
 
-Accumulated-stream keys also include normalized retention and refetch policy. Choose a finite `maxChunks` bound or `"unbounded"`; configured utilities can supply this choice. Unbounded retention with reset refetches retains the existing unlimited-history identity. Different bounds or modes have separate cache entries. For exact cache access, supply the same policy to `streamedKey` and `streamedOptions`. Broad prefixes still match all views. Treat the concrete suffix as opaque.
+An accumulated stream key includes the retention and refetch settings. Use a finite `maxChunks` or `"unbounded"`, either at the call site or through a policy. Unbounded retention with reset refetches uses the original unlimited-history key. Pass the same settings to `streamedKey` and `streamedOptions` for exact cache access. Use the endpoint prefix to match every view. Use builders to produce the suffix.
 
 Applications that persist query data choose schema and key-version busters as described in [Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/).
 
 Unsupported values, failed construction, and failed encoding raise `EffectRpcQueryKeyError` before network execution. Payloads that need encoding services or contain redacted values require a [custom key encoder](/effect-api-query/guides/custom-key-encoders/).
 
-HTTP keys use the endpoint's decoded request input without RPC construction. Default preparation encodes each labeled request part with its schema. It omits encoded `undefined` object members, normalizes header names, and freezes canonical JSON. Labels distinguish query and payload even when both contribute URL parameters. The key reflects the declared request. It does not infer every possible equivalence between HTTP requests.
+HTTP keys use decoded request input. The library encodes each declared part, drops `undefined` object members, normalizes header names, and freezes the JSON. Labels keep the query and payload distinct even if both add URL parameters. The key reflects the declared request and its encoding rules.
 
-Client middleware does not contribute to the declared identity. If user, tenant, or other identifiers affect results, include safe values in the caller prefix. The [HTTP factory reference](/effect-api-query/reference/http-builders/#cache-identity-and-failures) and [HTTP encoder guide](/effect-api-query/guides/custom-key-encoders/#http-requests) describe the complete rules.
+If middleware changes results by user, tenant, or another identity, include a safe identifier in the prefix. See [HTTP cache identity](/effect-api-query/reference/http-builders/#cache-identity-and-failures) and [HTTP key encoders](/effect-api-query/guides/custom-key-encoders/#http-requests).

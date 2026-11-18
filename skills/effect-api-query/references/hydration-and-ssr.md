@@ -2,7 +2,7 @@
 
 ## Capture an open stream
 
-Use a fresh request-owned QueryClient. Keep its ready clients, runner, and Scope alive until every capture and preparation settles. `queryClient.query` waits for stream completion. To capture the first new cache publication or normal completion, use `fetchStreamSnapshot`. It cancels that exact query and awaits local iterator cleanup.
+Give each server request a QueryClient and keep its Effect resources alive through capture and preparation. An imperative query waits for stream completion. Use `fetchStreamSnapshot` for the first new publication or normal completion. It cancels the exact query and waits for its iterator cleanup.
 
 ```ts
 import { dehydrate } from "@tanstack/query-core";
@@ -42,19 +42,19 @@ export async function captureUpdates(
 }
 ```
 
-The helper accepts RPC or HTTP accumulated and live options. Default `fresh` mode starts a new attempt even with initial or cached success. `append` retains existing history. A `replace` refetch of previously fetched data publishes only at completion. An indefinite replacement therefore needs completion or timeout. Explicit `mode: 'cached'` reuses successful data without starting or canceling work. If no successful entry exists, it falls back to fresh. Native `select` and QueryClient defaults apply.
+Use accumulated or live options for RPC, SSE, or NDJSON. The default `fresh` mode starts a new attempt even if initial or cached data exists. `append` includes prior history. A `replace` refetch publishes on completion. Use `mode: 'cached'` to reuse successful data without starting work. Without a success, it starts fresh. Native selection and defaults still apply.
 
-During fresh capture, reserve the exact key exclusively. The query must be idle and unobserved. Until settlement, avoid same-key writes, observers, and concurrent fetches. An external manual publication can otherwise appear to be a stream emission. Other keys keep running. Configure hashing through QueryClient defaults. The helper rejects per-call `queryHash` and `queryKeyHashFn`.
+Reserve an idle, unobserved exact key for fresh capture. Keep same-key writes, observers, and concurrent fetches away until it settles. Other keys keep running. Configure hashing on QueryClient.
 
-Abort and timeout stop the wait for data. The helper then awaits cleanup before resolving or rejecting. `timeoutMs` does not bound finalization. Local settlement does not await acknowledgment of remote cancellation. After the helper settles, dispose client resources.
+Abort and `timeoutMs` end the wait for data. Before settlement, the helper still waits for local cleanup. Await any remote acknowledgement separately. Dispose resources after capture settles.
 
-A local stream finalizer failure can reject capture after publication. Handle the adapter's execution error and preserved Cause before serializing the snapshot.
+A finalizer failure can reject capture even after data appears. Inspect the execution error and Cause before serialization.
 
 ## Choose a consistent cache representation
 
-The server and browser need equivalent contracts, inputs, safe prefixes, and hashing. Use independent QueryClients, clients, runners, and Scopes. To control the first browser refetch, choose `staleTime`. A new browser stream reconnects independently.
+Use equivalent declarations, inputs, safe prefixes, and hashing across server and browser. Give them separate clients, QueryClients, runtimes, and Scopes. Set `staleTime` for browser refetch behavior. A new browser stream uses its own client.
 
-Use JSON-safe success DTOs in both caches. Alternatively, encode decoded domain values at the snapshot boundary and decode them during hydration. `select` changes observer data while the cache stays unchanged. `structuredClone` neither restores class prototypes nor supplies JSON codecs for bigint and bytes. The following synchronous paired codec preserves rich values through hydration and later contract refetch:
+For JSON-safe values, cache the same DTO on both sides. For rich values, encode at transfer and decode before hydration. Selection leaves cached data intact. `structuredClone` copies data without the class prototype and is not a JSON codec. This codec restores the class and rich fields on hydration and refetch.
 
 ```ts
 import {
@@ -94,11 +94,11 @@ export const hydrateProfile = (queryClient: QueryClient, json: string): void =>
   });
 ```
 
-Reserve this recipe's prefix for unary `Profile` data. On both sides, declare `Profile` as the operation success. The enclosing snapshot must come from the matching application encoder. Synchronous callbacks require service-free synchronous codecs.
+Reserve this prefix for unary `Profile` data. Both clients must declare that result. Use a snapshot from your matching encoder. Run only service-free, synchronous codecs in native callbacks.
 
-For effectful or serviceful codecs, run application-owned preparation before native dehydration transport or hydration. Before publishing one snapshot, await all selected encodings. Before one native `hydrate` call, decode all selected entries. A failed decode then leaves the destination untouched. Keep preparation Effects and Promises out of query data. Supply codec services through the owning runtime.
+If a codec uses services or asynchronous work, await all encoding before publishing the snapshot. Decode all entries before a single native `hydrate` call. A failed decode keeps the destination cache untouched. Supply services through the owning runtime. Keep Effects and Promises out of query data.
 
-Choose codecs for the complete view:
+Choose the codec for the full cached shape.
 
 | View | Preserve |
 | --- | --- |
@@ -108,15 +108,15 @@ Choose codecs for the complete view:
 | HTTP decoded header wrapper | Body and decoded headers, reconstructing the wrapper |
 | HTTP metadata | Decoded data with any declared wrapper, status, and approved raw string headers |
 
-JSON turns undefined array elements into null. If accumulated history distinguishes them, use a tagged codec. A header wrapper with an undefined body remains a wrapper. Preserve that body separately. Encode all declared success alternatives and rich page parameters. The application supplies the codecs and serialization policy.
+Use a tagged codec for `undefined` history elements so JSON distinguishes them from `null`. An HTTP wrapper with an undefined body still contains the body field. Encode each declared success and rich page parameter.
 
 ## Register query-view codecs and prepare the native snapshot
 
-For generated query views, use typed registration and registry batch preparation. Follow the [query-view hydration guide](https://ueberbrot.github.io/effect-api-query/guides/hydrate-query-views/) for the registration, native `dehydrate`, registry encode/decode, and native `hydrate` sequence, with codecs for each cached representation.
+Use the [hydration guide](https://ueberbrot.github.io/effect-api-query/guides/hydrate-query-views/) for native dehydration and registry batch preparation.
 
-Use `queryViewCodec(leaf, view, schema)` for ordinary, metadata, live, or accumulated data. The decoded type must match the view's cache data before `select`, including normalized nulls. Use `infiniteQueryCodec(leaf, { page, pageParam })` for explicit page and page-parameter codecs. One registration covers all inputs and policies for that leaf/view.
+Register ordinary, metadata, live, or accumulated views with `queryViewCodec(leaf, view, schema)`. Match the cached data before `select`, including normalized nulls. Use `infiniteQueryCodec(leaf, { page, pageParam })` for pages. One registration covers all inputs and stream policies of that view.
 
-For a unary `rpc.profiles.read` leaf whose success is the `Profile` class above, import `createHydrationRegistry` and `queryViewCodec` from the package root and `Effect` from `effect`. Register and prepare its native snapshot:
+Import `createHydrationRegistry` and `queryViewCodec` from the library and `Effect` from `effect`. Register and prepare the unary `Profile` snapshot.
 
 ```ts
 const registry = createHydrationRegistry([
@@ -133,26 +133,26 @@ const encodeProfiles = Effect.fnUntraced(function* (queryClient: QueryClient) {
 });
 ```
 
-Use equivalent registration from the browser's independent utility tree. Parse the trusted snapshot, await `registry.decodeQueries(snapshot.queries)`, then pass its prepared queries to one native `hydrate`. The [complete registration recipe](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/hydration-contract.ts) includes imports, contracts, rich views, and encoding/decoding service inference.
+Create equivalent registrations from the browser tree. Parse the trusted snapshot, decode its queries with `registry.decodeQueries`, then pass the batch to native `hydrate`. See the [typed example](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/hydration-contract.ts).
 
-Pass registrations to `createHydrationRegistry`. Filter native dehydration with `registry.matches(query.queryKey)`, then await `registry.encodeQueries` on the snapshot's query array. On the browser, await `registry.decodeQueries` for the whole batch before calling native `hydrate` once. A failed preparation leaves the destination untouched; codec side effects are not rolled back. Encoding and decoding retain separate service requirements, supplied by the owning runtime.
+On the server, filter dehydration with `registry.matches(query.queryKey)` and await `registry.encodeQueries`. A preparation failure prevents the cache write. Earlier codec side effects can still occur. Supply the separate encoding and decoding services in the owning runtime.
 
-Duplicate registrations throw `HydrationCodecError('DuplicateCodec')`. Batch preparation fails with `UnknownQuery` for an unregistered key or `UnsettledQuery` for unsuccessful or promise-bearing entries. Select successful settled entries. Errors, mutations, external-envelope validation, JSON transport, approved headers, and disposal remain application policy. For one synchronous service-free codec, `hydrationCallbacks(codec)` supplies native serialize/deserialize callbacks; restrict the snapshot to that codec's matching view.
+A duplicate registration throws `HydrationCodecError` with `DuplicateCodec`. Preparation reports `UnknownQuery` for unmatched keys and `UnsettledQuery` for unsuccessful or promise-bearing entries. Select settled successes. For one synchronous service-free codec, use `hydrationCallbacks(codec)` on matching entries.
 
-To omit failed queries, retain `defaultShouldDehydrateQuery`. Custom error transfer must separately encode `state.error` and `state.fetchFailureReason`. Data codecs do not sanitize Causes, headers, or those fields. A safe error DTO does not automatically reconstruct package error classes. Before transport, apply the application's disclosure rules.
+Keep `defaultShouldDehydrateQuery` to omit failures. If you transfer them, encode `state.error` and `state.fetchFailureReason` separately. Allowlist public values and headers. Reconstruct error behavior explicitly on the browser.
 
 ## Drain request work before disposal
 
-Track query execution, accepted mutations, preparation, and snapshot captures in the request owner. On request completion or abort, stop accepting work. Abort pending preparation and captures, then cancel queries. Before closing clients or runtimes, drain accepted mutations and local finalizers. Canceling QueryClient work alone does not drain codec preparation or acknowledge finalization. Clear the request's private cache as part of its lifecycle. After hydration, the browser acquires independent resources.
+On request completion or abort, stop accepting work. Abort preparation and captures, then cancel queries. Await accepted mutations, preparation, and local finalizers before clearing the private cache and closing the client. Canceling native queries alone can finish too early.
 
-When adding query persistence to the Start example, compose its application-owned persister. A replacement bypasses tracking of query and iterator cleanup.
+When adding persistence to Start, compose the example's persister so it still tracks query and iterator cleanup.
 
-Sources: [stream snapshots](https://ueberbrot.github.io/effect-api-query/guides/stream-snapshots/), [unary hydration](https://ueberbrot.github.io/effect-api-query/guides/hydrate-unary-data/), [query-view codecs](https://ueberbrot.github.io/effect-api-query/guides/hydrate-query-views/).
+See [stream snapshots](https://ueberbrot.github.io/effect-api-query/guides/stream-snapshots/) and [unary hydration](https://ueberbrot.github.io/effect-api-query/guides/hydrate-unary-data/) for complete examples.
 
 ## Transfer loader selections across owners
 
-Use `createQueryDescriptor(leaf, view, { contract, input: codec })` when a component must reuse a loader's selected input on an independent owner. Read the complete [loader/component example](https://ueberbrot.github.io/effect-api-query/guides/loader-descriptors/) before adding the transfer. `capture(input)` copies encoded strict JSON; `bind(unknown)` validates compatibility and semantic identity and returns the receiving leaf/view and its fresh prepared input. Pass that input to the matching native builder. The registration stays local, and the descriptor contains no data, clients, functions or prepared tokens.
+Use `createQueryDescriptor(leaf, view, { contract, input: codec })` to transfer a loader selection across owners. `capture(input)` copies encoded JSON. `bind(unknown)` checks it and supplies the receiving leaf, view, and fresh prepared input. Pass that input to the native builder. Follow the [loader example](https://ueberbrot.github.io/effect-api-query/guides/loader-descriptors/).
 
-Supply a synchronous service-free input codec, including explicit encodings for bigint, classes or other rich inputs. Preserve every execution-relevant field; equal encoded keys do not prove that a codec preserves hidden decoded state. Choose a public input DTO and safe keys; keep credentials in owner middleware. Version the application compatibility identifier when contract, codec or key meaning changes. Mismatched operation prefixes/views/contracts and changed canonical identities throw `QueryDescriptorError` before execution. Treat transferred selections as untrusted input, never authorization.
+Use a synchronous, service-free codec and encode rich values explicitly. Preserve every value that affects execution, even if it stays outside the key. Change the compatibility ID when the contract, codec, or key meaning changes. Handle synchronous `QueryDescriptorError` by loading a fresh selection. Use public input and validate authorization at execution.
 
-Reuse native providers, hooks and hydration. Configure matching stream policies on both owners, keep exclusive stream snapshot capture, and encode rich cached data separately. Inputless operations need an explicit void-to-JSON codec. Infinite queries use native options directly because their input is a page mapper, which cannot be transferred. Serialization, snapshot validation, script escaping, client lifetime and stale/refetch policy remain application-owned.
+Match stream policy on both sides and reserve the exact key for capture. Encode cached data separately. For inputless operations, use a codec from void to JSON. For infinite queries, use native options with a local page mapper. Validate the snapshot envelope and escape it for the application transport.
