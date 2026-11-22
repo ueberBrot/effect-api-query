@@ -477,3 +477,44 @@ it.effect(
       }
     })
 );
+
+it.effect(
+  "matches object key prefixes and rejects non-matching views or short keys",
+  () =>
+    Effect.gen(function* matchesObjectKeyPrefixRegistry() {
+      const client = yield* makeRpcTestClient(group, {
+        read: () => Effect.succeed(profile),
+        watch: () => Stream.empty,
+      });
+      const rpc = createRpcQueryUtils(group, {
+        client,
+        keyPrefix: [{ tenant: "one" }],
+      });
+      const codec = queryViewCodec(rpc.read, "query", Profile);
+      const registry = createHydrationRegistry([codec]);
+      const key = rpc.read.queryKey({ id: 1 });
+      expect({
+        codecMatch: codec.matches(key),
+        codecWrongView: codec.matches(rpc.read.infiniteKey({ id: 1 })),
+        codecShort: codec.matches(["short"]),
+        registryMatch: registry.matches(key),
+        registryWrongView: registry.matches(rpc.read.infiniteKey({ id: 1 })),
+        registryShort: registry.matches(["short"]),
+        registryOtherTenant: registry.matches([
+          { tenant: "two" },
+          "rpc",
+          "read",
+          "query",
+          { id: 1 },
+        ]),
+      }).toStrictEqual({
+        codecMatch: true,
+        codecWrongView: false,
+        codecShort: false,
+        registryMatch: true,
+        registryWrongView: false,
+        registryShort: false,
+        registryOtherTenant: false,
+      });
+    })
+);

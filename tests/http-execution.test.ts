@@ -603,4 +603,49 @@ describe("HTTP execution", () => {
       queryClient.clear();
     }
   });
+
+  it("preserves receiver binding when invoking HTTP client endpoint methods", async () => {
+    const api = HttpApi.make("receiver").add(
+      HttpApiGroup.make("items").add(
+        HttpApiEndpoint.get("read", "/items", {
+          success: Schema.String,
+        })
+      )
+    );
+    const baseClient = await Effect.runPromise(
+      HttpApiClient.makeWith(api, {
+        baseUrl: "https://example.test",
+        httpClient: HttpClient.make((request) =>
+          Effect.succeed(
+            HttpClientResponse.fromWeb(request, Response.json("bound-receiver"))
+          )
+        ),
+      })
+    );
+    let observedReceiver: unknown;
+    const items = {
+      read: new Proxy(baseClient.items.read, {
+        apply(
+          target,
+          thisArg,
+          argArray: Parameters<typeof baseClient.items.read>
+        ) {
+          observedReceiver = thisArg;
+          return target(...argArray);
+        },
+      }),
+    };
+    const utils = createHttpApiQueryUtils(api, {
+      client: { items },
+      keyPrefix: ["receiver"],
+    });
+    const queryClient = new QueryClient();
+    try {
+      const value = await queryClient.query(utils.items.read.queryOptions());
+      expect(value).toBe("bound-receiver");
+      expect(observedReceiver).toBe(items);
+    } finally {
+      queryClient.clear();
+    }
+  });
 });

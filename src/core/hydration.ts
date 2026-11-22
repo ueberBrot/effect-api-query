@@ -1,9 +1,25 @@
 import { hashKey } from "@tanstack/query-core";
 import type { DehydratedState, QueryKey } from "@tanstack/query-core";
-import { Array as EffectArray, Effect, Order, Schema } from "effect";
+import { Array as EffectArray, Effect, Order, Predicate, Schema } from "effect";
 
 import type { InferQueryData, SupportedQueryView } from "./inference";
 import { viewPrefix } from "./view-prefix";
+
+type PrimitiveHashSegment = string | number | boolean;
+
+const isPrimitiveHashSegment = (
+  // oxlint-disable-next-line anti-slop/no-unknown-parameters
+  value: unknown
+): value is PrimitiveHashSegment =>
+  Predicate.isString(value) ||
+  Predicate.isBoolean(value) ||
+  (Predicate.isNumber(value) && Number.isFinite(value));
+
+const hasPrimitiveSegment = (
+  segments: ReadonlySet<PrimitiveHashSegment>,
+  // oxlint-disable-next-line anti-slop/no-unknown-parameters
+  value: unknown
+): boolean => isPrimitiveHashSegment(value) && segments.has(value);
 
 /** One generated leaf/view's cache-data codec, before observer selection. */
 export interface HydrationCodec<
@@ -27,12 +43,27 @@ const makeCodec = <S extends Schema.Codec<unknown, unknown, unknown, unknown>>(
   schema: S
 ) => {
   const hash = hashKey(prefix);
+  const prefixLength = prefix.length;
+  const lastIndex = prefixLength - 1;
+  const lastSegment = lastIndex >= 0 ? prefix[lastIndex] : undefined;
+  const checkLast = isPrimitiveHashSegment(lastSegment);
+  const firstSegment = prefixLength > 1 ? prefix[0] : undefined;
+  const checkFirst = isPrimitiveHashSegment(firstSegment);
   return Object.freeze({
     prefix,
     schema,
-    matches: (key: QueryKey) =>
-      key.length >= prefix.length &&
-      hashKey(key.slice(0, prefix.length)) === hash,
+    matches: (key: QueryKey) => {
+      if (key.length < prefixLength) {
+        return false;
+      }
+      if (checkLast && key[lastIndex] !== lastSegment) {
+        return false;
+      }
+      if (checkFirst && key[0] !== firstSegment) {
+        return false;
+      }
+      return hashKey(key.slice(0, prefixLength)) === hash;
+    },
   });
 };
 
@@ -152,26 +183,79 @@ export const createHydrationRegistry = <
   Entries[number]["schema"]["EncodingServices"]
 > => {
   type Entry = Entries[number];
-  const byLength = new Map<number, Map<string, Entry>>();
+  interface LengthBucket {
+    readonly length: number;
+    readonly byHash: Map<string, Entry>;
+    lastSegments: Set<PrimitiveHashSegment> | undefined;
+    firstSegments: Set<PrimitiveHashSegment> | undefined;
+  }
+  const byLength = new Map<number, LengthBucket>();
   const codecs: readonly Entry[] = entries;
   for (const codec of codecs) {
-    const lengthCodecs =
-      byLength.get(codec.prefix.length) ?? new Map<string, Entry>();
+    const { length } = codec.prefix;
+    let bucket = byLength.get(length);
+    if (bucket === undefined) {
+      bucket = {
+        length,
+        byHash: new Map<string, Entry>(),
+        lastSegments: length > 0 ? new Set<PrimitiveHashSegment>() : undefined,
+        firstSegments: length > 1 ? new Set<PrimitiveHashSegment>() : undefined,
+      };
+      byLength.set(length, bucket);
+    }
     const hash = hashKey(codec.prefix);
-    if (lengthCodecs.has(hash)) {
+    if (bucket.byHash.has(hash)) {
       throw new HydrationCodecError("DuplicateCodec");
     }
-    lengthCodecs.set(hash, codec);
-    byLength.set(codec.prefix.length, lengthCodecs);
+    bucket.byHash.set(hash, codec);
+    if (bucket.lastSegments !== undefined) {
+      const last = codec.prefix[length - 1];
+      if (isPrimitiveHashSegment(last)) {
+        bucket.lastSegments.add(last);
+      } else {
+        bucket.lastSegments = undefined;
+      }
+    }
+    if (bucket.firstSegments !== undefined) {
+      const [first] = codec.prefix;
+      if (isPrimitiveHashSegment(first)) {
+        bucket.firstSegments.add(first);
+      } else {
+        bucket.firstSegments = undefined;
+      }
+    }
   }
-  const lengths = EffectArray.sort(byLength.keys(), Order.flip(Order.Number));
+  const buckets = EffectArray.sort(
+    byLength.keys(),
+    Order.flip(Order.Number)
+  ).flatMap((length) => {
+    const bucket = byLength.get(length);
+    return bucket === undefined ? [] : [bucket];
+  });
+  const minLength = buckets.at(-1)?.length ?? Number.POSITIVE_INFINITY;
   const codecFor = (key: QueryKey): Entry | undefined => {
-    for (const length of lengths) {
-      if (key.length >= length) {
-        const codec = byLength.get(length)?.get(hashKey(key.slice(0, length)));
-        if (codec !== undefined) {
-          return codec;
-        }
+    if (key.length < minLength) {
+      return undefined;
+    }
+    for (const bucket of buckets) {
+      if (key.length < bucket.length) {
+        continue;
+      }
+      if (
+        bucket.lastSegments !== undefined &&
+        !hasPrimitiveSegment(bucket.lastSegments, key[bucket.length - 1])
+      ) {
+        continue;
+      }
+      if (
+        bucket.firstSegments !== undefined &&
+        !hasPrimitiveSegment(bucket.firstSegments, key[0])
+      ) {
+        continue;
+      }
+      const codec = bucket.byHash.get(hashKey(key.slice(0, bucket.length)));
+      if (codec !== undefined) {
+        return codec;
       }
     }
     return undefined;

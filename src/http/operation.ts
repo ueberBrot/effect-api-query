@@ -28,7 +28,9 @@ type HttpOperation = (
   readonly identity: HttpApiEndpointIdentity;
 };
 
-type RuntimeHttpMethod = <Mode extends "decoded-only" | "decoded-and-response">(
+type RuntimeHttpMethod<Mode extends "decoded-only" | "decoded-and-response"> = (
+  // oxlint-disable-next-line anti-slop/no-unknown-parameters
+  this: unknown,
   // oxlint-disable-next-line anti-slop/no-unsafe-dictionary-type
   request: Record<string, unknown> & { readonly responseMode: Mode }
 ) => Effect.Effect<
@@ -141,9 +143,9 @@ const extractHttpEndpoints = (
         );
       }
       // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
-      const call = method as RuntimeHttpMethod;
+      const call = method as RuntimeHttpMethod<Mode>;
       // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
-      return call.bind(target)({
+      return call.call(target, {
         ...(Predicate.isObject(requestInput) ? requestInput : undefined),
         responseMode,
         ...(sseOptions === undefined ? undefined : { sseOptions }),
