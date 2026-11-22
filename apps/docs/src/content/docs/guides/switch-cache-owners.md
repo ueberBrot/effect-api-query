@@ -92,4 +92,4 @@ Disposal reports pending Promise failures and non-interruption-only Effect Cause
 
 For server work, use an [explicit cancellation protocol](/effect-api-query/guides/cancellation/#request-server-cancellation-explicitly). Wait for an application acknowledgement if you need remote completion. You can also manage client lifetime yourself with the ordinary factories.
 
-Pass the native query signal to `runQuery` so only interruption of that cancelled query is ignored during drain. This includes empty live queries at cancellation. Typed failures and finalizer defects still surface.
+Pass the native query signal to `runQuery` so disposal can ignore ordinary interruption of the cancelled query. Include the HTTP metadata view if the owner uses it. Typed failures and finalizer defects still surface.

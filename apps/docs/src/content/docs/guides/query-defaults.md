@@ -197,6 +197,8 @@ Use `defineUtilsPolicy<Node>()` to type a policy map before acquiring a client. 
 
 Keep the Effect declaration in the shared contract package. Define callbacks, the cache, and the runtime in the app. `defineUtilsPolicy` returns the supplied map with its literal types. Pass it to `configureUtils` to copy settings and interceptors onto the utilities. Keep retained values and callback dependencies unchanged.
 
+For an HTTP SSE leaf, put decoder defaults in `streamed.policy.sseOptions` or `live.policy.sseOptions`. Use the configured builders to inherit those defaults in both keys and options.
+
 This example uses `exampleRpcGroup` to define reusable defaults before it has a client. The app supplies its provider's QueryClient and a notification callback.
 
 ```ts

@@ -63,8 +63,8 @@ You can pass the returned `rpc` options to native hooks and QueryClient methods 
 ## Choose the operation
 
 - `getData(key)` reads cached data or `undefined`. Exact generated keys infer data types. Broad prefixes infer `unknown`.
-- `ensure(options)` uses `ensureQueryData`. It returns cached data even when stale and fetches if absent. `revalidateIfStale` enables native background refresh.
-- `fetch(options)` uses `fetchQuery`, including its freshness, retries, deduplication, and cache writes.
+- `ensure(options)` returns cached data even when stale and fetches if absent. Set `revalidateIfStale` to refresh stale data in the background.
+- `fetch(options)` uses `queryClient.query` for freshness, retries, deduplication, and cache writes.
 - `setData(key, updater, options?)` uses `setQueryData`. Pass a new value or update it immutably. Return `undefined` to skip the write.
 - `invalidate(filters?, options?)` uses `invalidateQueries`. Pass generated filters or prefixes. Active matches refetch by default. Use `refetchType: "none"` to mark them stale only. Refetch failures follow native `throwOnError`.
 

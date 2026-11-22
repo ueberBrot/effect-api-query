@@ -32,7 +32,7 @@ skills:
       - Loader selections with explicit input codecs and owner validation
       - Native provider setup, Suspense recovery, reactive accessors, and host boundaries
     tasks:
-      - Assemble application-owned policy maps against contract-derived utility types before client acquisition; apply them through configureUtils with existing scope, interceptor and callback semantics.
+      - Assemble application-owned policy maps before client acquisition. Type-check SSE decoder settings at the SSE leaf, including through scoped maps. Apply policies through configureUtils.
       - Compose typed reads, ensure, cache updates and generated filter invalidation in Effect using an explicit existing QueryClient service; interrupt waiters without cancelling shared execution.
       - Derive buffered, paginated, accumulated, live, and metadata options from a ready client.
       - Address exact stream policy keys, select supported view prefixes, and compose encoded partial native filters with explicit typed projections.
@@ -93,6 +93,13 @@ skills:
         correct_pattern: >-
           Declare maxElementBytes on StreamNdjson and use the ordinary accumulated or live builder without sseOptions.
         source: src/http/types.ts
+        priority: HIGH
+        status: active
+      - mistake: Treat an abort before the first live value as empty completion
+        mechanism: Empty completion raises the adapter error only while the signal is active.
+        wrong_pattern: Suppress empty-stream errors when retiring a query owner.
+        correct_pattern: Pass the native signal to the owner and handle cancellation through Query Core. Keep empty completion visible as a failure.
+        source: src/core/streamed-query.ts
         priority: HIGH
         status: active
       - mistake: Rely on call order to determine configuration specificity

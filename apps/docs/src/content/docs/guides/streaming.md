@@ -44,7 +44,7 @@ const latestSse = http.events.watch.liveOptions({
 });
 ```
 
-Each emission replaces the cached value by default. To combine updates from complete snapshots, [set a coalescing interval](/effect-api-query/guides/choose-stream-history/#coalesce-complete-live-snapshots). Completion keeps the last value. A live stream that ends without emitting raises an [empty-stream error](/effect-api-query/reference/errors/). Live queries convert `undefined` to `null`. Accumulated streams retain the original value.
+Each emission replaces the cached value by default. To combine updates from complete snapshots, [set a coalescing interval](/effect-api-query/guides/choose-stream-history/#coalesce-complete-live-snapshots). Completion keeps the last value. A live stream that completes before its first value raises an [empty-stream error](/effect-api-query/reference/errors/). Aborting before the first value follows native cancellation. Live queries convert `undefined` to `null`. Accumulated streams retain the original value.
 
 ## Consume NDJSON records
 

@@ -78,6 +78,8 @@ Use `defineUtilsPolicy<UtilityType>()(configuration)` when reuse starts before c
 
 Keep the declaration shared. Put policy values, callbacks, cache access, and runtime choices in the app. The policy map retains literals and checks paths, views, and fields. `configureUtils` copies policy values and interceptor arrays. Keep retained values and dependencies unchanged. Leaf callbacks keep concrete types. Optimistic context stays local.
 
+Set SSE decoder defaults on the SSE leaf's `streamed.policy.sseOptions` or `live.policy.sseOptions`, including inside a `scoped` map. Use the configured builders so options and keys inherit the same decoder defaults.
+
 For the full example, see [defaults and policies](https://ueberbrot.github.io/effect-api-query/guides/query-defaults/).
 
 ## Configure shared behavior
@@ -233,7 +235,7 @@ See [cache filters](https://ueberbrot.github.io/effect-api-query/guides/cache-fi
 
 Provide the application's existing QueryClient as `QueryClientService`. Run `queryEffects.getData` and `setData` with exact keys, `fetch` or `ensure` with generated options, and `invalidate` with generated filters. Provide the service with `Effect.provideService` or a Layer.
 
-Fetch and ensure return the full cached data. `fetch` uses `fetchQuery` freshness. `ensure` uses `ensureQueryData`, including optional stale background refresh. Use a snapshot for open streams. Write immutably and return `undefined` to skip a write. Invalidation keeps native refetch and `throwOnError` behavior.
+Fetch and ensure use `queryClient.query` and return the full cached data. `fetch` follows native freshness rules. `ensure` returns cached data even when stale and fetches if absent. Set `revalidateIfStale` for background refresh. Use a snapshot for open streams. Write immutably and return `undefined` to skip a write. Invalidation keeps native refetch and `throwOnError` behavior.
 
 On native failure, inspect `QueryClientOperationError.cause` as `unknown`. It preserves the original rejection, including any execution wrapper and full Cause. Shared work can come from another caller. The wrapper's class alone cannot prove the current options' declared failure type.
 
@@ -249,7 +251,7 @@ Use `owner.runMutation(() => mutation.mutateAsync(input))` to wait for the reque
 
 Use `owner.commit` for synchronous late writes and `isActive()` for other side effects. Unmount, dispose, then acquire and mount the replacement. Disposal stops admission, cancels queries, waits for tracked work, clears caches, and releases acquired resources. Repeated calls share the result. It reports pending failures and attempts all releases. Borrowed resources stay open. A stalled finalizer delays disposal.
 
-Pass the native signal to `runQuery`. Disposal ignores ordinary interruption of that query, including an empty live query at cancellation. Typed failures and finalizer defects still surface.
+Pass the native signal to `runQuery` and track every view you use, including HTTP metadata. Disposal ignores ordinary interruption of cancelled work. Typed failures and finalizer defects still surface.
 
 ## Scoped event consumption
 
