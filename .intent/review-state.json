@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "7d73418881a66db768bf20ce34e84bcc664525fe0196fc4c6924a4850c681e97",
+      "fingerprint": "0e7f0184ba71084e821e9a2f1fdd0fd8cda055faf9a62de124c0d0ac9016e43d",
       "snapshot": {
         "GLOSSARY.md": "4532453f4efb696d95c66aabb9f62863e28984bb961f97ee288034af62d76f29",
         "README.md": "87db3a47ce666b408001c89b81b2133393eb2074c63ba1ac1786be8e20b96dfd",
@@ -51,7 +51,7 @@
         "apps/docs/src/content/docs/guides/streaming.md": "780ee11e776d204ffcd022b845686ab1012c2e325a9fbb99c51c720c0fd5f7cf",
         "apps/docs/src/content/docs/guides/suspense-and-recovery.md": "c4aeec1df383a9b4365a85d63ef1c345918b063ad35028431d0fed91f96ce21d",
         "apps/docs/src/content/docs/guides/svelte-query.md": "640d9d04953f4be453d686558d30f5ef83b4aea9489b1b4695760a82ff7a245b",
-        "apps/docs/src/content/docs/guides/switch-cache-owners.md": "37cbe983aa1bba9dbe7d2c71f67bef82c61ebe2d989e13dd46f09941c60c9670",
+        "apps/docs/src/content/docs/guides/switch-cache-owners.md": "892fbf32cc077b4a9bf1ad2846aa394d2c0d887bd12eeed96948ffc0d300eb40",
         "apps/docs/src/content/docs/guides/tanstack-start.md": "eaea3d51fa366f74e0bbcb2d159cb78a94254ff70860734181a1a9576b59953f",
         "apps/docs/src/content/docs/guides/trace-streams.md": "7e81de0d4d088d6ab316842c872ad4493e0554b309cad78566802701ad70fe33",
         "apps/docs/src/content/docs/guides/vue-query.md": "a2d8a91f749632bfdb79ac99ea7cd625e7907fb1c96e92a0af2c581f3b0b1025",
@@ -65,8 +65,8 @@
         "apps/docs/src/content/docs/reference/factory.md": "954a3416d3f8220a249fa883c83ec3ea068450b35fde5901107a609aab73fa41",
         "apps/docs/src/content/docs/reference/generated-builders.md": "9082369b9d1f9c44bed21356ffea5f3e6de58823df8ff13dc0c4f13b4432b15a",
         "apps/docs/src/content/docs/reference/http-builders.md": "df55394d799f1a709e997e54801b68a84170e58a165b6ffff323c3dc76e1a586",
-        "apps/docs/src/content/docs/reference/http-factory.md": "77db555d98f90e015cbefb12ef9a79a28d4a982fa9d31f8d9a181b76de4f81ff",
-        "apps/docs/src/content/docs/reference/performance.md": "1fa8ed73ff7e4994402be36dc79179797f150811fc06a30beed8ca04ac77f83e",
+        "apps/docs/src/content/docs/reference/http-factory.md": "2cd975b14754bb0283fbd5fe5c398281a9bbb82381e5efdef34f28eb961be02d",
+        "apps/docs/src/content/docs/reference/performance.md": "e99a4efe7b8326f0524af814d33f52f9bdb6e9c49598496d5a31b3696bcdcee5",
         "apps/docs/src/content/docs/reference/public-exports.md": "47b84dca065572179e24d9d99649c5025bb9b187f5963fc82e74e79b64b72954",
         "apps/docs/src/content/docs/reference/type-inference.md": "1531ba44c4965b8b0105b0157a1bcde8282c275e995d1e2a864548d198e56cb8",
         "docs/adr/0001-target-effect-4-release-candidate.md": "f8152332adf7278911e3b4e119d6079a444b01db840f225b62b1a05cd5ecf4f2",
@@ -144,14 +144,14 @@
         "examples/shared/use-slow-query-cancellation.ts": "872ea8e5ef8b97b2d6def07a8cc5c79a885099ffb6e60ebf6db6e39b9aa628f1",
         "examples/tanstack-start/src/components/effect-error-details.tsx": "843d359788306199d2f206d445d512f2798dda9c1625d09650ac7a09a26c4a29",
         "examples/tanstack-start/src/lib/api-server.ts": "3ab4000ee28dc8f73237b4508e0f0a0a1b1e4baf865ae501348487a978e19f23",
-        "examples/tanstack-start/src/lib/application.ts": "4456944d1ded48ac041dce627201111ac05936ed57263b9ca674a877a21dec38",
+        "examples/tanstack-start/src/lib/application.ts": "718c175eb3bbace8a5ad3e68c5feec5a5a83c7bd7203a592c615bf1662ff34a6",
         "examples/tanstack-start/src/lib/featured-user.ts": "8c9b33056cd2e4c2c19a95de3fad5b93e326b654117c75086b55f44630ad599d",
         "examples/tanstack-start/src/lib/query-ssr.ts": "30042b98b74d2fcc241a2d752d0ed388555082047098b9ca17e3a6fc2727f4e8",
         "examples/tanstack-start/src/lib/server-application.ts": "84a8be06a20a2777023a00599f1bad7f6db1018f247aff6818d08c1fc933655b",
         "examples/tanstack-start/src/lib/server-host.ts": "20eb1a8538720b8cba9df3011d48974f286a44921fe641096985be533f687dad",
         "examples/tanstack-start/src/lib/snapshot-preparation.ts": "0f261657058c6b480482b615a3009ce229276d6fc6785fdb258e3b3830f79311",
         "examples/tanstack-start/src/router.tsx": "be5fd785e1d43ef59af33aa9e4a2e9d4d688390265cdb6f65babfdf0da29c2fd",
-        "examples/tanstack-start/tests/application.test.ts": "cfe76770be9e66e9cb8c2ed8e531a46f5442c5721c023302586f85c97fc954df",
+        "examples/tanstack-start/tests/application.test.ts": "c035d4f446d922a438294e54113c98038f7ae72650a35837613979ecec75f8ea",
         "examples/tanstack-start/tests/async-hydration.test.ts": "2915fdf8dd1ef9737404d76aa9045176593a5b9ee21ef84beca20759e6b8a9e5",
         "examples/tanstack-start/tests/client-navigation.test.tsx": "084a8c42a1312e12720098d985a8796a534ddc07aa12f18a9b5595ed94a1c507",
         "examples/tanstack-start/tests/failure-dehydration.test.ts": "5a132899aeb7727f53a30bfffc0c1ee7ac5d59ff96a752077f7169d0df4b4581",
@@ -159,8 +159,8 @@
         "examples/tanstack-start/tests/server-local.test.ts": "6d04b85b3e584deb8e4b6f847235ceab8a811eb2d3837dc209f89cf87cf0d291",
         "examples/tanstack-start/tests/server-render.test.tsx": "4265e8d8508efce2bad73d54c74ec5603c783d18fbd6977b785a37bb48a1e722",
         "examples/vite-react/src/app.tsx": "ca8282f2d2adc59fe62d19253e8f395d2585cdc4dae2209bab134b01cb701d7c",
-        "examples/vite-react/src/lib/application.ts": "2dfe37027b0b186dc217d387259ce142573bfff6b5c11172e855645b8318ed39",
-        "examples/vite-react/src/lib/owner-cache.ts": "e9eaa783cce49e7905027ae93ef1c525e2713187e83ffa4ecf726ba7235a420d",
+        "examples/vite-react/src/lib/application.ts": "ad23667d7079509acdd0491366f6d1961c4b7029c00f977d433be41028ae0e87",
+        "examples/vite-react/src/lib/owner-cache.ts": "05e418ee7e05b237804e4ee920963d0b8e483614e7a80c0fe82ee10300c9066a",
         "examples/vite-react/src/lib/user-writes.ts": "999277fa02ff9c1439186b59636f7078458a5cbc3c84bed06514867b270a3b5e",
         "examples/vite-react/src/main.tsx": "6672a5685f0ccbdbc982676056bdb60d8f63b33987e319a146e42c3a0013a56b",
         "examples/vite-react/tests/app.test.tsx": "29597cde134da8e236466ce403d1898796c1ffb883a8c35f8d4c3e542aa779d8",
@@ -170,14 +170,14 @@
         "examples/vite-react/tests/minimal-setup.test.tsx": "fb5cb0465320068d8bc37bfab0cf1c4579e82a9c318243ad15424d0f35661281",
         "examples/vite-react/tests/owner-boundary.test.tsx": "f8fc6b26f24884d87d364a9b07f16ba912a7e92efbb96b0c815a62be22ac6bab",
         "examples/vite-react/tests/owner-cache.test.ts": "1ac4bebb04b973fa11e26f4b684fe6b217a075a255ac1828d9ed109c359c9ed9",
-        "examples/vite-react/tests/owner-switch.test.ts": "94d03a6c9fa48deb71d04a177de2e81628a557a498d666f9b022bcb93ed148e8",
+        "examples/vite-react/tests/owner-switch.test.ts": "89c15a93c959d393785ce0fa8088f7e00f3eece2c7fa353b7e78b2e4510e8eed",
         "examples/vite-react/tests/slow-query-cancellation.test.tsx": "827e3a4cdec1dca4e8dfdf6ef48ba449f6e69bcfc6c67660ae8f4648e9556042",
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
         "package.json": "5a6e851de9bed1a00a1054746189fddf375733ad7894c5e96cb6c362251eb206",
         "pnpm-workspace.yaml": "fc4bff1fa9ef4a4887691c6e004e02829736f93ee07efcb563f78f836a21a276",
-        "scripts/check-effect-compatibility.mts": "4fd616aadc3857ef011a53d8f1bb5afa1e56d0aa8015608ec8fd5a7bc1218678",
+        "scripts/check-effect-compatibility.mts": "bbb63ee11c2aed7bf50dd9dab1e303eb511e8efd7110f1c4ce9686a940421993",
         "scripts/check-framework-consumers.mts": "f0111ac9ed84996f722f656358b810da0b9ecc8c6c0219a2019d1076b5d50cbc",
         "scripts/check-toolchain.mts": "3c8efdb93594058ed78947bc65ad51c88ac4b26cab23b0b1fe6f8786a6d386e9",
         "scripts/check-workflow.mts": "c3a760a6b111d3f1dc7570a510ee09aabfc048786ef8c6dd1c9fe7b26cecd00c",
@@ -186,59 +186,59 @@
         "scripts/measure-construction.mts": "2fbad4879fe77ff24234a6be5666047b41cc7c3fd5ce9143d640ef4b41a426bd",
         "scripts/measure-streams.mts": "342a94723ee8fc92083ee346a5d7e36f96440a32510c61fefb4f81c17b64f273",
         "scripts/measure-structural-sharing.mts": "ca3d41f08706749f56ebb40173f04f98bf70e6492f04ecc1460400fb5b69f748",
-        "scripts/measure-types.mts": "eb15c41ee7773610312e3cd78d9311a13884a737cd5357fcd3083e868d083c5b",
-        "scripts/performance/budgets.mts": "faa632f75bf929db309370755e40ca1845a61ba82e1725393ef7de5aa8dab41c",
+        "scripts/measure-types.mts": "e4ce7e0ba0e8d910d7f34f5e74af3a51eae96ef12afacb36ca662d32e8b9858b",
+        "scripts/performance/budgets.mts": "ab7b9acdcc9ed4f8647a2766a98485e5b3521e01f2d945f78b7cf6eb03fc32ab",
         "scripts/performance/common.mts": "507d45618fbaf2c7be6f986a5f958d1958cdddc95e42a77ff1d50d8225538a3d",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "f98700277bbbfb035c03be5ed7cd0f3146990472ca949a8633f75f849ae14c55",
-        "skills/effect-api-query/references/cache-workflows.md": "821e7b67ecbf29c1cf7140aa37ac9d538dfeada68ee5e5ab659af82a57c6a3b6",
+        "skills/effect-api-query/references/cache-workflows.md": "304d13e671bbe4be6b04bdcd28b4ba4e9a5bf597ccf9e0c6a69d3f5a08518735",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "a134be8075588e30f28e2994462f3baa0733a2be28a9db826e0df8d91c69a4a5",
-        "skills/effect-api-query/references/http.md": "34d64d8399d242fbfb3c1bfb6458fc320e87b6cbc1d3fef115e5e3f13a9d5507",
+        "skills/effect-api-query/references/http.md": "4dcc63f909686f0f0e1b48f3f0c4238782bdbb6dc69ceebb838786271da09aa9",
         "skills/effect-api-query/references/hydration-and-ssr.md": "f127b348b421c596abdf5e3df97ed2bfe144fac37980226cfda23392c71ac2d7",
         "skills/effect-api-query/references/query-patterns.md": "064e36b3977ad372e7e340cc981f72a9539cec7ab36efed2337ffff257a4a9c3",
         "skills/effect-api-query/references/rpc.md": "cdebd0eb64309a1237c06b15ccb3cc906cce1957627dd9d057bcc2c6c29da089",
-        "src/core/branch-filter.ts": "4c92439f2ee1db05f2ddff3415a65a13fec9c4907b440fbc653e19425091224a",
+        "src/core/branch-filter.ts": "3b6273c347c060735cb054b2c5c653fd56c2df5571e4607c67e1c19037767312",
         "src/core/canonical-key.ts": "84e91000876a6795557aab39dcc5d44e328250bf9b30ad02fd67afd02f5003e9",
-        "src/core/configure-utils.ts": "a8ff06ea3f94243b722f415795fc3eb5e4cebee32b7bda03f0d36d51ea6d3bdd",
-        "src/core/configure.ts": "ea0d4073e4965198343a96498e7e55cf78f31c8af0ac30c23a82c4df0314576b",
+        "src/core/configure-utils.ts": "e47d9badd996596acdca5952a77e1aa59b166d2a4edc9a7d996755035d2e5af7",
+        "src/core/configure.ts": "277f1d1201be35962d6b75c3e9f4074e7f4798456d515ddbd23d7dc3bf6693cf",
         "src/core/consume-events.ts": "648144582c4bdbf4a9cb0d35ddc54327abbefc654f2d37b6154232bcd09a1752",
         "src/core/declared-error.ts": "a051225762704a9ae02bcc8f5559f5e9b45a29fcb48f25dde03be28e0abfe9a4",
-        "src/core/hydration.ts": "7a94081f7d20e3ec9c98ff0272c87cb9d5d3f5ce9b94cd44078c74d326b0d2f2",
-        "src/core/inference.ts": "af390ef595b30ed5ce6d73ccdd9ede07df0df46cc68ea36f9936e579652cb6a4",
+        "src/core/hydration.ts": "4041e3310a757e772c9b57931725049167bcf1f611aca32c4e778f9d06a51408",
+        "src/core/inference.ts": "6ad965a84bca31ff5c45c95514b0aeba469ff1b5e7866e8f32480bbf86b715a0",
         "src/core/interceptor.ts": "1bc8566c5669e1e797e8293b441a6ed175252a29c6eaa42999690cb835a5347f",
-        "src/core/metadata-query.ts": "b7cc903f800a3723d931623d420abcfec6ef65bf757fddbf2cf5a36c4c52ded9",
+        "src/core/metadata-query.ts": "88379aa77f2338eaa5349f06e736ff9acc9519fb3bd5cc6c2e43da9d46d76926",
         "src/core/operation.ts": "166ed139d6a6be3a3df0ce6b60ed01e71dcfa6075091a18f1869808355838cfc",
         "src/core/policy.ts": "ced3a6fdf1ab7e273eb518700a42d68b4823abdb1088fae6855424e4e479ded4",
-        "src/core/prepared-input.ts": "4fd806b273f95ad2aafb382e89df1d0443f8c270a0e575f1690d7e6564e443c7",
-        "src/core/query-descriptor.ts": "a23e937f8ff9856ee867131539a8c3f943871cbac18e1243dbdf4c5bd8537546",
+        "src/core/prepared-input.ts": "c0c24b6c3f0a7a99122a3c4ee627954ced2724aec1cdce9f965aa753aef0c087",
+        "src/core/query-descriptor.ts": "165cd4a9bed50a9619d9e0566a07b8533ac3fd572d1241e37b2b531c7c9b1c08",
         "src/core/query-effects.ts": "d57712c6a11f68889056db64652676584426e65af3b522b8dc30e3b7f67e8585",
         "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
-        "src/core/query-owner.ts": "6b3b3ae28b5f4de4b2beaefb3cfd34fd17b9fc8396542e0e2400347e4b563be4",
-        "src/core/query-prefix-index.ts": "2dbbd07e9bbd6f3eae06b80fdb839457020e7ccabb131801d1162c4df25f3634",
-        "src/core/schema-key.ts": "7dad2749d30f2ab828dbc7e96d6e1e2b32b6733450cb6dc734de607629d925f8",
+        "src/core/query-owner.ts": "0efde209652fcdf5fa7dc81393cfcd09adbaf431dc376ccd41dd7157e4759326",
+        "src/core/query-prefix-index.ts": "419a20fcf9bb28c5e7dbedb0c5af6f0e0dab52c0332773dbf39af638ac671cc2",
+        "src/core/schema-key.ts": "0d6c00371526085fe19689a7401dfd86cb6f6a96f6b351b4b31bb2648804d5df",
         "src/core/schema-structural-sharing.ts": "7ebd221a5730f652f0e88fbc52c418b8bba173172bf49971d6988e5a021b3ac0",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
-        "src/core/stream-publication.ts": "3bfd0ca909da29542701074d5943fd1e3a4c399206805b46280ea88a26047a33",
-        "src/core/stream-recovery.ts": "2287649cd64adfbe8cb069b66d338d178ad1239492cf7530e2ea5addbfd1fd81",
-        "src/core/stream-snapshot.ts": "97fbb56308b2e2decacd86a02b3f0a3ced76692444ba25a7abaae05b442c233a",
-        "src/core/streamed-query.ts": "c15e79f9e2d4efbaba2608385073920199afc0e61d0d2ea401d1e6dc917b6695",
+        "src/core/stream-publication.ts": "0ecae3160d553d5b9d2b940abab3ccb93c610c77a2baed2dd2a70704c6771b89",
+        "src/core/stream-recovery.ts": "ecc7fb61c6cb8b8f1617a2bfa69387b64e3e224c09f1f5f6f47964bd256f1bbd",
+        "src/core/stream-snapshot.ts": "6a7f2c896aa0a9b11150893861513004241b228e70922cfc429aba2c8ef854b6",
+        "src/core/streamed-query.ts": "b7b55cfca6e191aace14335a0c1833da4f36d19f95fa1bcf9e683472a580fe18",
         "src/core/types.ts": "ded3b620e25ab5def0a96dbafead82398f7f7a43572a434cc30b0c505ee2409b",
-        "src/core/utility-tree.ts": "e2b4c02eda436678db55920a89e1b64b56e4d9372af823d25a7e2c144cd728d0",
+        "src/core/utility-tree.ts": "57f0557e34d37ba9b808b20b51aeed7d46dea7c77a38b5e671f71fd5e00127b4",
         "src/core/view-prefix.ts": "dfc0d74a07c8afe3f63952d59c29088ba4afb45e11a402ef8b72c5e2282cb063",
         "src/http/create-utils.ts": "8d128bb9646e095456d3dcf696f1aa6e365d0de328df571c64eea7421935c9f5",
         "src/http/errors.ts": "afa6e7a015a257683ec8d96d5d5da1ffc25a79b0ff498fddb538e059af7643b3",
-        "src/http/operation.ts": "fd15d62695255c67b1a6ec8a5161260221637554b6e32038306cab5c905ca7f4",
-        "src/http/request.ts": "dd416c91cfdd4fcee80afd757600eafac90d0ebfd6db45c6187c26e6e5dafd53",
+        "src/http/operation.ts": "e105e250a2a85c0b6e19589bd7ef5fb613eec0c2802ba699d5f6ca3c9fda4263",
+        "src/http/request.ts": "0d82d523cc871fe25f475e8670009644aa924fbc4f8ead5ad0b1c9462bd20dfd",
         "src/http/streamed-query.ts": "be93ca8b11f2a165c8e9f2c45fea19253653e478e3746dd19ea3819997f8a937",
-        "src/http/types.ts": "f1d5bfe52c719b35cc460cc9b9e3b5eaf8e211194064331da4b1bfd00a19cba1",
+        "src/http/types.ts": "00c5696406525cec1a191f029581e129cc2b003933fb4362fa2994c30af22714",
         "src/index.ts": "85ed201a88913658d6d55d780e33f549444c1bbb591e593d22f842e70199c9c0",
         "src/rpc/create-utils.ts": "8ebf030b0f76f91c248434c169d789d6328d2ba43c07afe15e04db0a02f05c2c",
         "src/rpc/errors.ts": "8e1fbcc7843b2bf99e9d80bfd365dc118d52351909d5c8f48c46ba9d39fdedd3",
         "src/rpc/operation.ts": "ac10df77707045d22c2d58ff0f776362a7fb5ce03e179c10238c42320ad6f719",
         "src/rpc/streamed-query.ts": "cf80fac99983903e6ab60aeecc5fe3cf1a0208b26143cc6f588c615d728f2ee7",
-        "src/rpc/types.ts": "5c77358187150d34209bdbffda162b3a5ecd3108662e0e29aeee6ddd23dbfd80",
+        "src/rpc/types.ts": "1349a3de4f5238450d42d72cebb3b1a247ed196229b27ad15b9a7f0a5514cd4b",
         "tests/cache-recipes.test.ts": "fb95bbbba35f8bcf9661c993a61385f3186d935bb5626da6181d8ce9e6a9a49e",
         "tests/configuration-composition.test.ts": "2fc9ac3deaa514bd5221e89eaac8922905a896d937635c7a3bcc2de698519de4",
         "tests/contract-reuse.test.ts": "ef45d0a7116c56bdff46decb93cb4cd8f55baa1836edc0382434742f27249747",
@@ -252,7 +252,7 @@
         "tests/create-rpc-query-utils-stream-cache.test.ts": "c2aea3349503b5bfe9abfd445a2e6a54a939843f8d00b6bf4d75ad607b2d99e7",
         "tests/create-rpc-query-utils-stream-hashing.test.ts": "417f45c4fd7584d164fe5ecc9e354bdf52a1117a5a46f7729c2ffb5791eaf068",
         "tests/create-rpc-query-utils-stream-publication.test.ts": "f0f6919a98e3c4efd59ab39a7c8f2a2efb817c0b55913cd82c034126c8d5e459",
-        "tests/create-rpc-query-utils-streaming.test.ts": "a7d6837d903125555b7be44a06a5b50c81fee1c6f7ac2cd19362a7a79b003b46",
+        "tests/create-rpc-query-utils-streaming.test.ts": "016c22bd2eb46330d23e0c209b608ccaf99dede7a46553306a92bd1e429b14b5",
         "tests/create-rpc-query-utils-structural-sharing.test.ts": "1698a72dcfde4aaabac4161193fc0379c445f8a8be61d47d29797a315b66b06f",
         "tests/create-rpc-query-utils.test.ts": "b6ccee687718bbd528819f497ba2ac09acfe06a1400c5bb38b863eb082f0776f",
         "tests/docs-examples.test.ts": "e181c2d34afb1ed761133c2b143ca26048ddab32be2bc5d7486af4355b5e5bde",
@@ -276,25 +276,25 @@
         "tests/framework-consumers/svelte.ts": "652f8d97d781803239ca667497768077167fffaabec851d5a076f692c376223c",
         "tests/framework-consumers/vue.ts": "e23859e5fe8f8e24a55d8e782dd2880d1a6d88859bdf40ff7b60e8b0c150ab50",
         "tests/http-cached-views.test.ts": "8df1da4d541d18830da6bd14334d670589e55e6c4bfb50175dc198444a96f129",
-        "tests/http-execution.test.ts": "24eed09a6752e16b37ab6b702cf0d53b28f00616a8605518264de1bf36b2e0fb",
+        "tests/http-execution.test.ts": "7d43723e36108c190b138a13f2a1c70f7a03dcfe4235f3d9592e98b4c9ef657a",
         "tests/http-hydration.test.ts": "51da967534267d49dc91f577f43a54fc88045cce8f89623c1106df8c88c21570",
         "tests/http-live-query.test.ts": "43dece9673bf6aa381c11a49fbc9a3cdd471c55e446d5f0fb4c206bed9ed5eb8",
-        "tests/http-metadata-options.test.ts": "702a73eb9e005d038d35c233806a065ab4da7d35fa1255df336711bd09be96d4",
+        "tests/http-metadata-options.test.ts": "35923dbcebeddb4aafa299da1afb91a9124d0b25cc728bf05d19876bc4f4f6d9",
         "tests/http-multipart.test.ts": "331f18bf9730579f05513d3ab93734b8118e313b219604e8c0276c07110476ae",
         "tests/http-ndjson-query.test.ts": "7a77db15f41389ea1ecdd38f85a73be5fc15e4916b94254d5e16f7ea923477bd",
         "tests/http-query-options.test.ts": "e7b2ca44c44cd8402ca688960458e1190c54c68845556fc4ea5d131ab8649891",
-        "tests/http-semantic-keys.test.ts": "97b67fbe7e65fc78d11ecfe912bce3029c743be77a4cdd328701b42bbc53707e",
+        "tests/http-semantic-keys.test.ts": "00ab2f6ff02e9ca0b9b94a6e6e9ec70c437edbac23791f3f5d675de1dcacb706",
         "tests/http-structural-sharing.test.ts": "35ea74a2711f56cd2001cd5a1f3ffe58f10f4ecbf094c0d4ce7d9e9a62dead42",
         "tests/http-transport-cancellation.test.ts": "0ba26a9bae56b26605fc03009c1f50fe90930356d0fa0c4ec4ddc5c120430f00",
         "tests/hydration-codecs.test.ts": "3035d8b59997fc62823d7c6f3251041ce38824b0088775c3c4d1186c95e30d7d",
         "tests/integrated-workflows.test.ts": "0547cf36a5d172126c1241fa67c350a32f6549ed9dbca2b6007c71b72edf052b",
         "tests/live-coalescing.test.ts": "e5456fa321374e61dfef6992ebc706c9c558803795393b55da10e33c926bf413",
-        "tests/publication-deadline.test.ts": "2797557ff14bf8527ea446cec1e1d7c61cd3666f11f127e640c53ce5d7e30868",
+        "tests/publication-deadline.test.ts": "38f754f5d53e1781a0f1d3ae0102b3d90d7358485bb2b645bdf7b68076f21574",
         "tests/query-descriptor.test.ts": "8e23e94f2028c77f55887e0e0492213cbf5920de88b19a6933e1ea79e385a5ab",
         "tests/query-effects.test.ts": "247508f2c53dac4de5317769b9d7a55b818fb962df91d2232acc54711d5ddd2d",
         "tests/query-events.test.ts": "27c913c8ff1d65384a70695ef891e156f99ac122bc36e5be10f195b568b5e7b5",
         "tests/query-filter.test.ts": "ff531a86816872cd2cadf01d79bd9d9ff5be1895bab150330a90aa8375508004",
-        "tests/query-owner.test.ts": "624e6e54189f887d9c7311731440d52530e7a97b0aa5db4a2fb392f12d20c182",
+        "tests/query-owner.test.ts": "ee01002a83b3a5f787abb38919cf893a9cf0c73836bcef637ad9f44607a23bcc",
         "tests/query-policy.test.ts": "19b1d0fde232b4af9e041197a1aa6726f30e4fb7118533e5b3f7af08cbbe4002",
         "tests/query-usability.test.ts": "313e6c03b560b4c20ffc32ed8e2bd96ce94fc2fb3977489f311324b6988e190f",
         "tests/query-view-prefix.test.ts": "fd94e3d01f52a0978242246f02a3e989bddd1e055f828f48d7a41187f696dd69",
@@ -305,8 +305,8 @@
         "tests/skills/query-usability/grade.test.ts": "f3c2650deba0d887f66fb3b3afd284cd9baf562296f2984e5c84b014ecec8cbd",
         "tests/skills/query-usability/solution.ts": "38583676eaa2d33e8ca56c07a430e3a28787feae9d84c6d3612e01d6d7f1d80f",
         "tests/stream-publication.test.ts": "57db2c6db5273a5c6789bb65dee2eeff5293eb98ee472fec102dffca984a65a6",
-        "tests/stream-recovery.test.ts": "16bf1963f2f70f256e415ac97536ec152dae287308090c5706c5f1a61aa98c9e",
-        "tests/stream-snapshot.test.ts": "86f8116eba032a3872d0106df9911f926833410cac94bd603a23287652271335",
+        "tests/stream-recovery.test.ts": "f5ceb7a1503b60c072d00f235f7fb546b1ab046ec6aa5f4ad830b273afb74c59",
+        "tests/stream-snapshot.test.ts": "a59ce44e80854140184df0ba742b39c80a3dd0c4b691d2b4afdbd73d2e754ed8",
         "tests/types/application-policy-contract.ts": "ac6c4b852a201269c5a8837cc4410abff593645530f274a097208eb45ad40ccd",
         "tests/types/docs-functionality.ts": "065ff9eac091e4a25c814e3e49b49d0f6258fffb7c5ed0661a1ec960b41ac0c0",
         "tests/types/docs-http-ndjson.ts": "a86513c1047b700ce27fc49b3d1fb31004cf745096d8403a0bdc780d95a448a3",
@@ -341,17 +341,17 @@
         "tests/types/example-owner-contract.ts": "ed58343a4a7da9606e07703d19f3c0470e25923c81de357c0dbfd1258c3fc439",
         "tests/types/generic-client-error-contract.tsx": "f0b2f55deffde27ff745209485f9f8b817e4e537e8c60efd345946b77cf54bd9",
         "tests/types/helper-contract.ts": "c40e14a64a8429052bf64523abd0ac9f41c3ee38c707c5bd86f0809964307e52",
-        "tests/types/http-contract.ts": "a1e3d1507728adba64497881d75794adbc6a353f9a54ea588c9305bffe5ef361",
+        "tests/types/http-contract.ts": "bc88a4f2a239b0cba80a338c1ff420e814eb3fe3f0cb3eebfab0490345f80662",
         "tests/types/http-empty-success-contract.ts": "00ccdb360edc598b9bc6c8a7708dab6b7ca85cf267ce7caa9a81a6b52f2868d5",
         "tests/types/http-ndjson-contract.ts": "c44bf1d296958be46c35e97a7803a36141eb40d1346d6df9d5b3e7e428b8ac1a",
-        "tests/types/http-stream-contract.ts": "87cbb37707e2690105c82b9c78e867b0d0c0d82f3a7b4de5af6dc5dcdf59c4c1",
+        "tests/types/http-stream-contract.ts": "ffa424b9cf6aa92c079318e8ca26f888b73636ea66d9d2be670f744c5f74f4ce",
         "tests/types/http-type-scale.ts": "447d34e1fa952c843a866fd4dcde80dd32390f7ff14ba701b1960f45bc1292ce",
         "tests/types/http-view-proof.ts": "0b66f30863c5451d47144980af9cf5517637c8f7ca7866b64d1a704cea089413",
         "tests/types/hydration-contract.ts": "fade858552c1b04fd45f48e86a42668a6132918196eca9089d56f1948551cd64",
         "tests/types/interceptor-contract.ts": "14814393d97b03b55b8a8e84014e24f0f6fc1003e71c2d832a8d643320c5ea18",
         "tests/types/live-coalescing-contract.ts": "c476bfec4ff03244a35938e0bc168894e917ab9e723536e2b759e0002a3ce836",
         "tests/types/public-contract.ts": "307d25cd97a652d64938c40c76c14b6f43cea69cd06b7b7d3bca194f22321b33",
-        "tests/types/query-descriptor-contract.tsx": "933101b6a3696d07a757a10560a25ebd0b1077e1542d9cc330e73cf114aa33b4",
+        "tests/types/query-descriptor-contract.tsx": "38c5361e436f6f272b733cd049dccdf7f6964e6c4ff7c99a47288f5c50b92f64",
         "tests/types/query-effects-contract.ts": "188ea0f6ad1daf0a212f17a6f455b8cf1cd1f2d1fa5c652d32c83c2a5b476c8f",
         "tests/types/query-events-contract.ts": "b9576153175094b50bce0a7ae3d9285a843d2b91c714a5dfafff24a6be8cbda6",
         "tests/types/query-filter-contract.ts": "89977942cf8942af10535fb2ec4a4ab679d920a7d226ef26616faaf518b9a6e9",
@@ -372,21 +372,24 @@
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6",
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca"
       },
-      "head": "d040e66a26ce2a5bc4c4efffa6b9ca97a3eefffc",
-      "outcome": "no-change",
-      "reason": "HTTP overload resolution now includes a specialized SSE method when it appears before the generated method. The existing SSE guidance, domain map, skill specification, and tree cover the same declared interface and developer tasks.",
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "updated",
+      "reason": "HTTP default request keys use the effective parse options for each part. Query owners create independent caches from supplied callback configuration. The HTTP and cache workflow references describe these rules.",
       "evidence": [
-        "The public SSE fixture checks errors and required runner services in both overload orders and passes TSRS and TypeScript 5.9.3.",
-        "All 36 compiler baseline cases passed within the existing budgets."
+        "src/http/request.ts and src/core/query-owner.ts",
+        "tests/http-semantic-keys.test.ts and tests/query-owner.test.ts passed in the 113-test focused run",
+        "Both public compiler suites passed including the narrowed-overload, endpoint service, RPC path, and loader descriptor fixtures",
+        "The hydration runtime fixtures passed after binding each codec once",
+        "Default and SSE compiler workloads passed their instantiation budgets"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "c666731931678f4ab86b6904b7d09c5838c2909705c4993fb8976d08f94508b0",
+      "fingerprint": "7b13f476dec0e1eadfe036b1daa7c776220f284d9856e12a03939278e81fadf7",
       "snapshot": {
         "GLOSSARY.md": "4532453f4efb696d95c66aabb9f62863e28984bb961f97ee288034af62d76f29",
         "README.md": "87db3a47ce666b408001c89b81b2133393eb2074c63ba1ac1786be8e20b96dfd",
-        "_artifacts/domain_map.yaml": "11fc8f44d6286bfa833715ac5c931172b9be92bbd33cfc080c2b1556d4a1ce81",
-        "_artifacts/skill_spec.md": "8bdf003cab7c08bd34ecfec5176b95f392656813d54e2e1b5837af82f8d1871e",
+        "_artifacts/domain_map.yaml": "ac3046d1216793d438624283071f879c2660f15011b5e85c0d30260e2a1caa12",
+        "_artifacts/skill_spec.md": "75ca7ff6eaee2c54466fa171c29779c08c6100bfca3cc33c46f38059d554ee8c",
         "_artifacts/skill_tree.yaml": "42fff5ffa1e5ae1257af626f41c664597cfe6d44247a67aa16076d098241acec",
         "apps/docs/astro.config.mts": "35bd7d7706e004e3e708a82614e825c7fde0ee1aea6624843ba8cc57f70c2c5c",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "22ff578a9df30be697f12bdfeb5861b9d2b3e6956255387eaa4e1b18d0f33315",
@@ -432,7 +435,7 @@
         "apps/docs/src/content/docs/guides/streaming.md": "780ee11e776d204ffcd022b845686ab1012c2e325a9fbb99c51c720c0fd5f7cf",
         "apps/docs/src/content/docs/guides/suspense-and-recovery.md": "c4aeec1df383a9b4365a85d63ef1c345918b063ad35028431d0fed91f96ce21d",
         "apps/docs/src/content/docs/guides/svelte-query.md": "640d9d04953f4be453d686558d30f5ef83b4aea9489b1b4695760a82ff7a245b",
-        "apps/docs/src/content/docs/guides/switch-cache-owners.md": "37cbe983aa1bba9dbe7d2c71f67bef82c61ebe2d989e13dd46f09941c60c9670",
+        "apps/docs/src/content/docs/guides/switch-cache-owners.md": "892fbf32cc077b4a9bf1ad2846aa394d2c0d887bd12eeed96948ffc0d300eb40",
         "apps/docs/src/content/docs/guides/tanstack-start.md": "eaea3d51fa366f74e0bbcb2d159cb78a94254ff70860734181a1a9576b59953f",
         "apps/docs/src/content/docs/guides/trace-streams.md": "7e81de0d4d088d6ab316842c872ad4493e0554b309cad78566802701ad70fe33",
         "apps/docs/src/content/docs/guides/vue-query.md": "a2d8a91f749632bfdb79ac99ea7cd625e7907fb1c96e92a0af2c581f3b0b1025",
@@ -446,8 +449,8 @@
         "apps/docs/src/content/docs/reference/factory.md": "954a3416d3f8220a249fa883c83ec3ea068450b35fde5901107a609aab73fa41",
         "apps/docs/src/content/docs/reference/generated-builders.md": "9082369b9d1f9c44bed21356ffea5f3e6de58823df8ff13dc0c4f13b4432b15a",
         "apps/docs/src/content/docs/reference/http-builders.md": "df55394d799f1a709e997e54801b68a84170e58a165b6ffff323c3dc76e1a586",
-        "apps/docs/src/content/docs/reference/http-factory.md": "77db555d98f90e015cbefb12ef9a79a28d4a982fa9d31f8d9a181b76de4f81ff",
-        "apps/docs/src/content/docs/reference/performance.md": "1fa8ed73ff7e4994402be36dc79179797f150811fc06a30beed8ca04ac77f83e",
+        "apps/docs/src/content/docs/reference/http-factory.md": "2cd975b14754bb0283fbd5fe5c398281a9bbb82381e5efdef34f28eb961be02d",
+        "apps/docs/src/content/docs/reference/performance.md": "e99a4efe7b8326f0524af814d33f52f9bdb6e9c49598496d5a31b3696bcdcee5",
         "apps/docs/src/content/docs/reference/public-exports.md": "47b84dca065572179e24d9d99649c5025bb9b187f5963fc82e74e79b64b72954",
         "apps/docs/src/content/docs/reference/type-inference.md": "1531ba44c4965b8b0105b0157a1bcde8282c275e995d1e2a864548d198e56cb8",
         "docs/adr/0001-target-effect-4-release-candidate.md": "f8152332adf7278911e3b4e119d6079a444b01db840f225b62b1a05cd5ecf4f2",
@@ -525,14 +528,14 @@
         "examples/shared/use-slow-query-cancellation.ts": "872ea8e5ef8b97b2d6def07a8cc5c79a885099ffb6e60ebf6db6e39b9aa628f1",
         "examples/tanstack-start/src/components/effect-error-details.tsx": "843d359788306199d2f206d445d512f2798dda9c1625d09650ac7a09a26c4a29",
         "examples/tanstack-start/src/lib/api-server.ts": "3ab4000ee28dc8f73237b4508e0f0a0a1b1e4baf865ae501348487a978e19f23",
-        "examples/tanstack-start/src/lib/application.ts": "4456944d1ded48ac041dce627201111ac05936ed57263b9ca674a877a21dec38",
+        "examples/tanstack-start/src/lib/application.ts": "718c175eb3bbace8a5ad3e68c5feec5a5a83c7bd7203a592c615bf1662ff34a6",
         "examples/tanstack-start/src/lib/featured-user.ts": "8c9b33056cd2e4c2c19a95de3fad5b93e326b654117c75086b55f44630ad599d",
         "examples/tanstack-start/src/lib/query-ssr.ts": "30042b98b74d2fcc241a2d752d0ed388555082047098b9ca17e3a6fc2727f4e8",
         "examples/tanstack-start/src/lib/server-application.ts": "84a8be06a20a2777023a00599f1bad7f6db1018f247aff6818d08c1fc933655b",
         "examples/tanstack-start/src/lib/server-host.ts": "20eb1a8538720b8cba9df3011d48974f286a44921fe641096985be533f687dad",
         "examples/tanstack-start/src/lib/snapshot-preparation.ts": "0f261657058c6b480482b615a3009ce229276d6fc6785fdb258e3b3830f79311",
         "examples/tanstack-start/src/router.tsx": "be5fd785e1d43ef59af33aa9e4a2e9d4d688390265cdb6f65babfdf0da29c2fd",
-        "examples/tanstack-start/tests/application.test.ts": "cfe76770be9e66e9cb8c2ed8e531a46f5442c5721c023302586f85c97fc954df",
+        "examples/tanstack-start/tests/application.test.ts": "c035d4f446d922a438294e54113c98038f7ae72650a35837613979ecec75f8ea",
         "examples/tanstack-start/tests/async-hydration.test.ts": "2915fdf8dd1ef9737404d76aa9045176593a5b9ee21ef84beca20759e6b8a9e5",
         "examples/tanstack-start/tests/client-navigation.test.tsx": "084a8c42a1312e12720098d985a8796a534ddc07aa12f18a9b5595ed94a1c507",
         "examples/tanstack-start/tests/failure-dehydration.test.ts": "5a132899aeb7727f53a30bfffc0c1ee7ac5d59ff96a752077f7169d0df4b4581",
@@ -540,8 +543,8 @@
         "examples/tanstack-start/tests/server-local.test.ts": "6d04b85b3e584deb8e4b6f847235ceab8a811eb2d3837dc209f89cf87cf0d291",
         "examples/tanstack-start/tests/server-render.test.tsx": "4265e8d8508efce2bad73d54c74ec5603c783d18fbd6977b785a37bb48a1e722",
         "examples/vite-react/src/app.tsx": "ca8282f2d2adc59fe62d19253e8f395d2585cdc4dae2209bab134b01cb701d7c",
-        "examples/vite-react/src/lib/application.ts": "2dfe37027b0b186dc217d387259ce142573bfff6b5c11172e855645b8318ed39",
-        "examples/vite-react/src/lib/owner-cache.ts": "e9eaa783cce49e7905027ae93ef1c525e2713187e83ffa4ecf726ba7235a420d",
+        "examples/vite-react/src/lib/application.ts": "ad23667d7079509acdd0491366f6d1961c4b7029c00f977d433be41028ae0e87",
+        "examples/vite-react/src/lib/owner-cache.ts": "05e418ee7e05b237804e4ee920963d0b8e483614e7a80c0fe82ee10300c9066a",
         "examples/vite-react/src/lib/user-writes.ts": "999277fa02ff9c1439186b59636f7078458a5cbc3c84bed06514867b270a3b5e",
         "examples/vite-react/src/main.tsx": "6672a5685f0ccbdbc982676056bdb60d8f63b33987e319a146e42c3a0013a56b",
         "examples/vite-react/tests/app.test.tsx": "29597cde134da8e236466ce403d1898796c1ffb883a8c35f8d4c3e542aa779d8",
@@ -551,14 +554,14 @@
         "examples/vite-react/tests/minimal-setup.test.tsx": "fb5cb0465320068d8bc37bfab0cf1c4579e82a9c318243ad15424d0f35661281",
         "examples/vite-react/tests/owner-boundary.test.tsx": "f8fc6b26f24884d87d364a9b07f16ba912a7e92efbb96b0c815a62be22ac6bab",
         "examples/vite-react/tests/owner-cache.test.ts": "1ac4bebb04b973fa11e26f4b684fe6b217a075a255ac1828d9ed109c359c9ed9",
-        "examples/vite-react/tests/owner-switch.test.ts": "94d03a6c9fa48deb71d04a177de2e81628a557a498d666f9b022bcb93ed148e8",
+        "examples/vite-react/tests/owner-switch.test.ts": "89c15a93c959d393785ce0fa8088f7e00f3eece2c7fa353b7e78b2e4510e8eed",
         "examples/vite-react/tests/slow-query-cancellation.test.tsx": "827e3a4cdec1dca4e8dfdf6ef48ba449f6e69bcfc6c67660ae8f4648e9556042",
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
         "package.json": "5a6e851de9bed1a00a1054746189fddf375733ad7894c5e96cb6c362251eb206",
         "pnpm-workspace.yaml": "fc4bff1fa9ef4a4887691c6e004e02829736f93ee07efcb563f78f836a21a276",
-        "scripts/check-effect-compatibility.mts": "4fd616aadc3857ef011a53d8f1bb5afa1e56d0aa8015608ec8fd5a7bc1218678",
+        "scripts/check-effect-compatibility.mts": "bbb63ee11c2aed7bf50dd9dab1e303eb511e8efd7110f1c4ce9686a940421993",
         "scripts/check-framework-consumers.mts": "f0111ac9ed84996f722f656358b810da0b9ecc8c6c0219a2019d1076b5d50cbc",
         "scripts/check-toolchain.mts": "3c8efdb93594058ed78947bc65ad51c88ac4b26cab23b0b1fe6f8786a6d386e9",
         "scripts/check-workflow.mts": "c3a760a6b111d3f1dc7570a510ee09aabfc048786ef8c6dd1c9fe7b26cecd00c",
@@ -567,59 +570,59 @@
         "scripts/measure-construction.mts": "2fbad4879fe77ff24234a6be5666047b41cc7c3fd5ce9143d640ef4b41a426bd",
         "scripts/measure-streams.mts": "342a94723ee8fc92083ee346a5d7e36f96440a32510c61fefb4f81c17b64f273",
         "scripts/measure-structural-sharing.mts": "ca3d41f08706749f56ebb40173f04f98bf70e6492f04ecc1460400fb5b69f748",
-        "scripts/measure-types.mts": "eb15c41ee7773610312e3cd78d9311a13884a737cd5357fcd3083e868d083c5b",
-        "scripts/performance/budgets.mts": "faa632f75bf929db309370755e40ca1845a61ba82e1725393ef7de5aa8dab41c",
+        "scripts/measure-types.mts": "e4ce7e0ba0e8d910d7f34f5e74af3a51eae96ef12afacb36ca662d32e8b9858b",
+        "scripts/performance/budgets.mts": "ab7b9acdcc9ed4f8647a2766a98485e5b3521e01f2d945f78b7cf6eb03fc32ab",
         "scripts/performance/common.mts": "507d45618fbaf2c7be6f986a5f958d1958cdddc95e42a77ff1d50d8225538a3d",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "f98700277bbbfb035c03be5ed7cd0f3146990472ca949a8633f75f849ae14c55",
-        "skills/effect-api-query/references/cache-workflows.md": "821e7b67ecbf29c1cf7140aa37ac9d538dfeada68ee5e5ab659af82a57c6a3b6",
+        "skills/effect-api-query/references/cache-workflows.md": "304d13e671bbe4be6b04bdcd28b4ba4e9a5bf597ccf9e0c6a69d3f5a08518735",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "a134be8075588e30f28e2994462f3baa0733a2be28a9db826e0df8d91c69a4a5",
-        "skills/effect-api-query/references/http.md": "34d64d8399d242fbfb3c1bfb6458fc320e87b6cbc1d3fef115e5e3f13a9d5507",
+        "skills/effect-api-query/references/http.md": "4dcc63f909686f0f0e1b48f3f0c4238782bdbb6dc69ceebb838786271da09aa9",
         "skills/effect-api-query/references/hydration-and-ssr.md": "f127b348b421c596abdf5e3df97ed2bfe144fac37980226cfda23392c71ac2d7",
         "skills/effect-api-query/references/query-patterns.md": "064e36b3977ad372e7e340cc981f72a9539cec7ab36efed2337ffff257a4a9c3",
         "skills/effect-api-query/references/rpc.md": "cdebd0eb64309a1237c06b15ccb3cc906cce1957627dd9d057bcc2c6c29da089",
-        "src/core/branch-filter.ts": "4c92439f2ee1db05f2ddff3415a65a13fec9c4907b440fbc653e19425091224a",
+        "src/core/branch-filter.ts": "3b6273c347c060735cb054b2c5c653fd56c2df5571e4607c67e1c19037767312",
         "src/core/canonical-key.ts": "84e91000876a6795557aab39dcc5d44e328250bf9b30ad02fd67afd02f5003e9",
-        "src/core/configure-utils.ts": "a8ff06ea3f94243b722f415795fc3eb5e4cebee32b7bda03f0d36d51ea6d3bdd",
-        "src/core/configure.ts": "ea0d4073e4965198343a96498e7e55cf78f31c8af0ac30c23a82c4df0314576b",
+        "src/core/configure-utils.ts": "e47d9badd996596acdca5952a77e1aa59b166d2a4edc9a7d996755035d2e5af7",
+        "src/core/configure.ts": "277f1d1201be35962d6b75c3e9f4074e7f4798456d515ddbd23d7dc3bf6693cf",
         "src/core/consume-events.ts": "648144582c4bdbf4a9cb0d35ddc54327abbefc654f2d37b6154232bcd09a1752",
         "src/core/declared-error.ts": "a051225762704a9ae02bcc8f5559f5e9b45a29fcb48f25dde03be28e0abfe9a4",
-        "src/core/hydration.ts": "7a94081f7d20e3ec9c98ff0272c87cb9d5d3f5ce9b94cd44078c74d326b0d2f2",
-        "src/core/inference.ts": "af390ef595b30ed5ce6d73ccdd9ede07df0df46cc68ea36f9936e579652cb6a4",
+        "src/core/hydration.ts": "4041e3310a757e772c9b57931725049167bcf1f611aca32c4e778f9d06a51408",
+        "src/core/inference.ts": "6ad965a84bca31ff5c45c95514b0aeba469ff1b5e7866e8f32480bbf86b715a0",
         "src/core/interceptor.ts": "1bc8566c5669e1e797e8293b441a6ed175252a29c6eaa42999690cb835a5347f",
-        "src/core/metadata-query.ts": "b7cc903f800a3723d931623d420abcfec6ef65bf757fddbf2cf5a36c4c52ded9",
+        "src/core/metadata-query.ts": "88379aa77f2338eaa5349f06e736ff9acc9519fb3bd5cc6c2e43da9d46d76926",
         "src/core/operation.ts": "166ed139d6a6be3a3df0ce6b60ed01e71dcfa6075091a18f1869808355838cfc",
         "src/core/policy.ts": "ced3a6fdf1ab7e273eb518700a42d68b4823abdb1088fae6855424e4e479ded4",
-        "src/core/prepared-input.ts": "4fd806b273f95ad2aafb382e89df1d0443f8c270a0e575f1690d7e6564e443c7",
-        "src/core/query-descriptor.ts": "a23e937f8ff9856ee867131539a8c3f943871cbac18e1243dbdf4c5bd8537546",
+        "src/core/prepared-input.ts": "c0c24b6c3f0a7a99122a3c4ee627954ced2724aec1cdce9f965aa753aef0c087",
+        "src/core/query-descriptor.ts": "165cd4a9bed50a9619d9e0566a07b8533ac3fd572d1241e37b2b531c7c9b1c08",
         "src/core/query-effects.ts": "d57712c6a11f68889056db64652676584426e65af3b522b8dc30e3b7f67e8585",
         "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
-        "src/core/query-owner.ts": "6b3b3ae28b5f4de4b2beaefb3cfd34fd17b9fc8396542e0e2400347e4b563be4",
-        "src/core/query-prefix-index.ts": "2dbbd07e9bbd6f3eae06b80fdb839457020e7ccabb131801d1162c4df25f3634",
-        "src/core/schema-key.ts": "7dad2749d30f2ab828dbc7e96d6e1e2b32b6733450cb6dc734de607629d925f8",
+        "src/core/query-owner.ts": "0efde209652fcdf5fa7dc81393cfcd09adbaf431dc376ccd41dd7157e4759326",
+        "src/core/query-prefix-index.ts": "419a20fcf9bb28c5e7dbedb0c5af6f0e0dab52c0332773dbf39af638ac671cc2",
+        "src/core/schema-key.ts": "0d6c00371526085fe19689a7401dfd86cb6f6a96f6b351b4b31bb2648804d5df",
         "src/core/schema-structural-sharing.ts": "7ebd221a5730f652f0e88fbc52c418b8bba173172bf49971d6988e5a021b3ac0",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
-        "src/core/stream-publication.ts": "3bfd0ca909da29542701074d5943fd1e3a4c399206805b46280ea88a26047a33",
-        "src/core/stream-recovery.ts": "2287649cd64adfbe8cb069b66d338d178ad1239492cf7530e2ea5addbfd1fd81",
-        "src/core/stream-snapshot.ts": "97fbb56308b2e2decacd86a02b3f0a3ced76692444ba25a7abaae05b442c233a",
-        "src/core/streamed-query.ts": "c15e79f9e2d4efbaba2608385073920199afc0e61d0d2ea401d1e6dc917b6695",
+        "src/core/stream-publication.ts": "0ecae3160d553d5b9d2b940abab3ccb93c610c77a2baed2dd2a70704c6771b89",
+        "src/core/stream-recovery.ts": "ecc7fb61c6cb8b8f1617a2bfa69387b64e3e224c09f1f5f6f47964bd256f1bbd",
+        "src/core/stream-snapshot.ts": "6a7f2c896aa0a9b11150893861513004241b228e70922cfc429aba2c8ef854b6",
+        "src/core/streamed-query.ts": "b7b55cfca6e191aace14335a0c1833da4f36d19f95fa1bcf9e683472a580fe18",
         "src/core/types.ts": "ded3b620e25ab5def0a96dbafead82398f7f7a43572a434cc30b0c505ee2409b",
-        "src/core/utility-tree.ts": "e2b4c02eda436678db55920a89e1b64b56e4d9372af823d25a7e2c144cd728d0",
+        "src/core/utility-tree.ts": "57f0557e34d37ba9b808b20b51aeed7d46dea7c77a38b5e671f71fd5e00127b4",
         "src/core/view-prefix.ts": "dfc0d74a07c8afe3f63952d59c29088ba4afb45e11a402ef8b72c5e2282cb063",
         "src/http/create-utils.ts": "8d128bb9646e095456d3dcf696f1aa6e365d0de328df571c64eea7421935c9f5",
         "src/http/errors.ts": "afa6e7a015a257683ec8d96d5d5da1ffc25a79b0ff498fddb538e059af7643b3",
-        "src/http/operation.ts": "fd15d62695255c67b1a6ec8a5161260221637554b6e32038306cab5c905ca7f4",
-        "src/http/request.ts": "dd416c91cfdd4fcee80afd757600eafac90d0ebfd6db45c6187c26e6e5dafd53",
+        "src/http/operation.ts": "e105e250a2a85c0b6e19589bd7ef5fb613eec0c2802ba699d5f6ca3c9fda4263",
+        "src/http/request.ts": "0d82d523cc871fe25f475e8670009644aa924fbc4f8ead5ad0b1c9462bd20dfd",
         "src/http/streamed-query.ts": "be93ca8b11f2a165c8e9f2c45fea19253653e478e3746dd19ea3819997f8a937",
-        "src/http/types.ts": "f1d5bfe52c719b35cc460cc9b9e3b5eaf8e211194064331da4b1bfd00a19cba1",
+        "src/http/types.ts": "00c5696406525cec1a191f029581e129cc2b003933fb4362fa2994c30af22714",
         "src/index.ts": "85ed201a88913658d6d55d780e33f549444c1bbb591e593d22f842e70199c9c0",
         "src/rpc/create-utils.ts": "8ebf030b0f76f91c248434c169d789d6328d2ba43c07afe15e04db0a02f05c2c",
         "src/rpc/errors.ts": "8e1fbcc7843b2bf99e9d80bfd365dc118d52351909d5c8f48c46ba9d39fdedd3",
         "src/rpc/operation.ts": "ac10df77707045d22c2d58ff0f776362a7fb5ce03e179c10238c42320ad6f719",
         "src/rpc/streamed-query.ts": "cf80fac99983903e6ab60aeecc5fe3cf1a0208b26143cc6f588c615d728f2ee7",
-        "src/rpc/types.ts": "5c77358187150d34209bdbffda162b3a5ecd3108662e0e29aeee6ddd23dbfd80",
+        "src/rpc/types.ts": "1349a3de4f5238450d42d72cebb3b1a247ed196229b27ad15b9a7f0a5514cd4b",
         "tests/cache-recipes.test.ts": "fb95bbbba35f8bcf9661c993a61385f3186d935bb5626da6181d8ce9e6a9a49e",
         "tests/configuration-composition.test.ts": "2fc9ac3deaa514bd5221e89eaac8922905a896d937635c7a3bcc2de698519de4",
         "tests/contract-reuse.test.ts": "ef45d0a7116c56bdff46decb93cb4cd8f55baa1836edc0382434742f27249747",
@@ -633,7 +636,7 @@
         "tests/create-rpc-query-utils-stream-cache.test.ts": "c2aea3349503b5bfe9abfd445a2e6a54a939843f8d00b6bf4d75ad607b2d99e7",
         "tests/create-rpc-query-utils-stream-hashing.test.ts": "417f45c4fd7584d164fe5ecc9e354bdf52a1117a5a46f7729c2ffb5791eaf068",
         "tests/create-rpc-query-utils-stream-publication.test.ts": "f0f6919a98e3c4efd59ab39a7c8f2a2efb817c0b55913cd82c034126c8d5e459",
-        "tests/create-rpc-query-utils-streaming.test.ts": "a7d6837d903125555b7be44a06a5b50c81fee1c6f7ac2cd19362a7a79b003b46",
+        "tests/create-rpc-query-utils-streaming.test.ts": "016c22bd2eb46330d23e0c209b608ccaf99dede7a46553306a92bd1e429b14b5",
         "tests/create-rpc-query-utils-structural-sharing.test.ts": "1698a72dcfde4aaabac4161193fc0379c445f8a8be61d47d29797a315b66b06f",
         "tests/create-rpc-query-utils.test.ts": "b6ccee687718bbd528819f497ba2ac09acfe06a1400c5bb38b863eb082f0776f",
         "tests/docs-examples.test.ts": "e181c2d34afb1ed761133c2b143ca26048ddab32be2bc5d7486af4355b5e5bde",
@@ -657,25 +660,25 @@
         "tests/framework-consumers/svelte.ts": "652f8d97d781803239ca667497768077167fffaabec851d5a076f692c376223c",
         "tests/framework-consumers/vue.ts": "e23859e5fe8f8e24a55d8e782dd2880d1a6d88859bdf40ff7b60e8b0c150ab50",
         "tests/http-cached-views.test.ts": "8df1da4d541d18830da6bd14334d670589e55e6c4bfb50175dc198444a96f129",
-        "tests/http-execution.test.ts": "24eed09a6752e16b37ab6b702cf0d53b28f00616a8605518264de1bf36b2e0fb",
+        "tests/http-execution.test.ts": "7d43723e36108c190b138a13f2a1c70f7a03dcfe4235f3d9592e98b4c9ef657a",
         "tests/http-hydration.test.ts": "51da967534267d49dc91f577f43a54fc88045cce8f89623c1106df8c88c21570",
         "tests/http-live-query.test.ts": "43dece9673bf6aa381c11a49fbc9a3cdd471c55e446d5f0fb4c206bed9ed5eb8",
-        "tests/http-metadata-options.test.ts": "702a73eb9e005d038d35c233806a065ab4da7d35fa1255df336711bd09be96d4",
+        "tests/http-metadata-options.test.ts": "35923dbcebeddb4aafa299da1afb91a9124d0b25cc728bf05d19876bc4f4f6d9",
         "tests/http-multipart.test.ts": "331f18bf9730579f05513d3ab93734b8118e313b219604e8c0276c07110476ae",
         "tests/http-ndjson-query.test.ts": "7a77db15f41389ea1ecdd38f85a73be5fc15e4916b94254d5e16f7ea923477bd",
         "tests/http-query-options.test.ts": "e7b2ca44c44cd8402ca688960458e1190c54c68845556fc4ea5d131ab8649891",
-        "tests/http-semantic-keys.test.ts": "97b67fbe7e65fc78d11ecfe912bce3029c743be77a4cdd328701b42bbc53707e",
+        "tests/http-semantic-keys.test.ts": "00ab2f6ff02e9ca0b9b94a6e6e9ec70c437edbac23791f3f5d675de1dcacb706",
         "tests/http-structural-sharing.test.ts": "35ea74a2711f56cd2001cd5a1f3ffe58f10f4ecbf094c0d4ce7d9e9a62dead42",
         "tests/http-transport-cancellation.test.ts": "0ba26a9bae56b26605fc03009c1f50fe90930356d0fa0c4ec4ddc5c120430f00",
         "tests/hydration-codecs.test.ts": "3035d8b59997fc62823d7c6f3251041ce38824b0088775c3c4d1186c95e30d7d",
         "tests/integrated-workflows.test.ts": "0547cf36a5d172126c1241fa67c350a32f6549ed9dbca2b6007c71b72edf052b",
         "tests/live-coalescing.test.ts": "e5456fa321374e61dfef6992ebc706c9c558803795393b55da10e33c926bf413",
-        "tests/publication-deadline.test.ts": "2797557ff14bf8527ea446cec1e1d7c61cd3666f11f127e640c53ce5d7e30868",
+        "tests/publication-deadline.test.ts": "38f754f5d53e1781a0f1d3ae0102b3d90d7358485bb2b645bdf7b68076f21574",
         "tests/query-descriptor.test.ts": "8e23e94f2028c77f55887e0e0492213cbf5920de88b19a6933e1ea79e385a5ab",
         "tests/query-effects.test.ts": "247508f2c53dac4de5317769b9d7a55b818fb962df91d2232acc54711d5ddd2d",
         "tests/query-events.test.ts": "27c913c8ff1d65384a70695ef891e156f99ac122bc36e5be10f195b568b5e7b5",
         "tests/query-filter.test.ts": "ff531a86816872cd2cadf01d79bd9d9ff5be1895bab150330a90aa8375508004",
-        "tests/query-owner.test.ts": "624e6e54189f887d9c7311731440d52530e7a97b0aa5db4a2fb392f12d20c182",
+        "tests/query-owner.test.ts": "ee01002a83b3a5f787abb38919cf893a9cf0c73836bcef637ad9f44607a23bcc",
         "tests/query-policy.test.ts": "19b1d0fde232b4af9e041197a1aa6726f30e4fb7118533e5b3f7af08cbbe4002",
         "tests/query-usability.test.ts": "313e6c03b560b4c20ffc32ed8e2bd96ce94fc2fb3977489f311324b6988e190f",
         "tests/query-view-prefix.test.ts": "fd94e3d01f52a0978242246f02a3e989bddd1e055f828f48d7a41187f696dd69",
@@ -686,8 +689,8 @@
         "tests/skills/query-usability/grade.test.ts": "f3c2650deba0d887f66fb3b3afd284cd9baf562296f2984e5c84b014ecec8cbd",
         "tests/skills/query-usability/solution.ts": "38583676eaa2d33e8ca56c07a430e3a28787feae9d84c6d3612e01d6d7f1d80f",
         "tests/stream-publication.test.ts": "57db2c6db5273a5c6789bb65dee2eeff5293eb98ee472fec102dffca984a65a6",
-        "tests/stream-recovery.test.ts": "16bf1963f2f70f256e415ac97536ec152dae287308090c5706c5f1a61aa98c9e",
-        "tests/stream-snapshot.test.ts": "86f8116eba032a3872d0106df9911f926833410cac94bd603a23287652271335",
+        "tests/stream-recovery.test.ts": "f5ceb7a1503b60c072d00f235f7fb546b1ab046ec6aa5f4ad830b273afb74c59",
+        "tests/stream-snapshot.test.ts": "a59ce44e80854140184df0ba742b39c80a3dd0c4b691d2b4afdbd73d2e754ed8",
         "tests/types/application-policy-contract.ts": "ac6c4b852a201269c5a8837cc4410abff593645530f274a097208eb45ad40ccd",
         "tests/types/docs-functionality.ts": "065ff9eac091e4a25c814e3e49b49d0f6258fffb7c5ed0661a1ec960b41ac0c0",
         "tests/types/docs-http-ndjson.ts": "a86513c1047b700ce27fc49b3d1fb31004cf745096d8403a0bdc780d95a448a3",
@@ -722,17 +725,17 @@
         "tests/types/example-owner-contract.ts": "ed58343a4a7da9606e07703d19f3c0470e25923c81de357c0dbfd1258c3fc439",
         "tests/types/generic-client-error-contract.tsx": "f0b2f55deffde27ff745209485f9f8b817e4e537e8c60efd345946b77cf54bd9",
         "tests/types/helper-contract.ts": "c40e14a64a8429052bf64523abd0ac9f41c3ee38c707c5bd86f0809964307e52",
-        "tests/types/http-contract.ts": "a1e3d1507728adba64497881d75794adbc6a353f9a54ea588c9305bffe5ef361",
+        "tests/types/http-contract.ts": "bc88a4f2a239b0cba80a338c1ff420e814eb3fe3f0cb3eebfab0490345f80662",
         "tests/types/http-empty-success-contract.ts": "00ccdb360edc598b9bc6c8a7708dab6b7ca85cf267ce7caa9a81a6b52f2868d5",
         "tests/types/http-ndjson-contract.ts": "c44bf1d296958be46c35e97a7803a36141eb40d1346d6df9d5b3e7e428b8ac1a",
-        "tests/types/http-stream-contract.ts": "87cbb37707e2690105c82b9c78e867b0d0c0d82f3a7b4de5af6dc5dcdf59c4c1",
+        "tests/types/http-stream-contract.ts": "ffa424b9cf6aa92c079318e8ca26f888b73636ea66d9d2be670f744c5f74f4ce",
         "tests/types/http-type-scale.ts": "447d34e1fa952c843a866fd4dcde80dd32390f7ff14ba701b1960f45bc1292ce",
         "tests/types/http-view-proof.ts": "0b66f30863c5451d47144980af9cf5517637c8f7ca7866b64d1a704cea089413",
         "tests/types/hydration-contract.ts": "fade858552c1b04fd45f48e86a42668a6132918196eca9089d56f1948551cd64",
         "tests/types/interceptor-contract.ts": "14814393d97b03b55b8a8e84014e24f0f6fc1003e71c2d832a8d643320c5ea18",
         "tests/types/live-coalescing-contract.ts": "c476bfec4ff03244a35938e0bc168894e917ab9e723536e2b759e0002a3ce836",
         "tests/types/public-contract.ts": "307d25cd97a652d64938c40c76c14b6f43cea69cd06b7b7d3bca194f22321b33",
-        "tests/types/query-descriptor-contract.tsx": "933101b6a3696d07a757a10560a25ebd0b1077e1542d9cc330e73cf114aa33b4",
+        "tests/types/query-descriptor-contract.tsx": "38c5361e436f6f272b733cd049dccdf7f6964e6c4ff7c99a47288f5c50b92f64",
         "tests/types/query-effects-contract.ts": "188ea0f6ad1daf0a212f17a6f455b8cf1cd1f2d1fa5c652d32c83c2a5b476c8f",
         "tests/types/query-events-contract.ts": "b9576153175094b50bce0a7ae3d9285a843d2b91c714a5dfafff24a6be8cbda6",
         "tests/types/query-filter-contract.ts": "89977942cf8942af10535fb2ec4a4ab679d920a7d226ef26616faaf518b9a6e9",
@@ -753,12 +756,13 @@
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6",
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca"
       },
-      "head": "d040e66a26ce2a5bc4c4efffa6b9ca97a3eefffc",
-      "outcome": "no-change",
-      "reason": "HTTP overload resolution now includes a specialized SSE method when it appears before the generated method. The existing SSE guidance, domain map, skill specification, and tree cover the same declared interface and developer tasks.",
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "updated",
+      "reason": "The domain map records HTTP parse options and owner cache isolation. The skill specification records the review scope. The existing skill tree mappings cover the changed runtime, type fixtures, examples, and documentation.",
       "evidence": [
-        "The public SSE fixture checks errors and required runner services in both overload orders and passes TSRS and TypeScript 5.9.3.",
-        "All 36 compiler baseline cases passed within the existing budgets."
+        "_artifacts/domain_map.yaml",
+        "_artifacts/skill_spec.md",
+        "_artifacts/skill_tree.yaml"
       ]
     },
     "source:vite.config.ts": {
@@ -3753,6 +3757,242 @@
       "reason": "The patch note describes a verified SSE behavior already covered by the public fixture and the existing cache workflow. It introduces no new task for the skill.",
       "evidence": [
         "vp exec changeset status --since=main reported one patch bump."
+      ]
+    },
+    "source:.changeset/reduce-http-overload-type-checking.md": {
+      "fingerprint": "3b022e4fe8ca91b686691b70d5eaec1599c67648efc9513a663b7273cd33aefa",
+      "snapshot": {
+        ".changeset/reduce-http-overload-type-checking.md": "1ac838f5a7c82e0c41b5896ce44939c4278d214a91a336ce3d65fc01901870db"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "The patch release note describes a compiler optimization covered by existing guidance and adds no usage requirement.",
+      "evidence": [
+        ".changeset/reduce-http-overload-type-checking.md",
+        "Changesets selects patch release 0.7.1",
+        "vp run type-baseline passed on TSRS and TypeScript 5.9.3"
+      ]
+    },
+    "source:.changeset/reduce-scoped-configuration-type-checking.md": {
+      "fingerprint": "234a6953ae4a951f528b632ba9a1bdbd2f52d7a77ec52b1d4502754225f5f9e1",
+      "snapshot": {
+        ".changeset/reduce-scoped-configuration-type-checking.md": "a689ce76e7e0787416f8af62361277ae1384132ede4a43f9ce791413dcb4d4ee"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "The patch release note describes a compiler optimization covered by existing guidance and adds no usage requirement.",
+      "evidence": [
+        ".changeset/reduce-scoped-configuration-type-checking.md",
+        "Changesets selects patch release 0.7.1",
+        "vp run type-baseline passed on TSRS and TypeScript 5.9.3"
+      ]
+    },
+    "source:.changeset/buffer-replacement-stream-history.md": {
+      "fingerprint": "85afe8803771e0aedda7838d6fa8ef28f4ba3a72c062426c9c9995e59b4d6a9d",
+      "snapshot": {
+        ".changeset/buffer-replacement-stream-history.md": "f1e408cd00d1988248a85ff313d97f48374a1febc694049955ee60f15462c1c8"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/buffer-replacement-stream-history.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/close-vite-query-admission-on-retirement.md": {
+      "fingerprint": "d5b626d21906fef7708beb66e2f67f697f35a998616fd05ecab88cc2428ffc7f",
+      "snapshot": {
+        ".changeset/close-vite-query-admission-on-retirement.md": "d82e75622f16db7ab446fa5e6a44e6f3903c7816dff44bd85096928126da4948"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/close-vite-query-admission-on-retirement.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/flush-ready-stream-deadlines.md": {
+      "fingerprint": "51c00e0f61081f9ddcf2c8fd4e930a2896fc245790547aaa48952bf822029249",
+      "snapshot": {
+        ".changeset/flush-ready-stream-deadlines.md": "ab36efa0e32f3d374147d71c371db391a5315f3d4424cf5de587456d74b369ae"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/flush-ready-stream-deadlines.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/group-rpc-path-types.md": {
+      "fingerprint": "4bd54ee76638ab9a4520d0f8173246f0bc55aa579a27357ca3a5416a43e591e2",
+      "snapshot": {
+        ".changeset/group-rpc-path-types.md": "34d89a60d2926c13fb9a4059e16bb87693784ae7a4c8a86eff37b6931b692d78"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/group-rpc-path-types.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/honor-http-request-parse-options.md": {
+      "fingerprint": "ba1da39b02c57ef393f8e59bdc88b620608280b78a453bc030459fe8aa50fada",
+      "snapshot": {
+        ".changeset/honor-http-request-parse-options.md": "d93aa2f7ee0dc0b4a8a8b95c194e21820f1746d144d2c3e51324d104e642e266"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/honor-http-request-parse-options.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/infer-narrowed-http-overloads.md": {
+      "fingerprint": "b45ad1cdf0363f1b5bfd511fb8293e23b8380b2bb73bcd799cc642d996ed9e3f",
+      "snapshot": {
+        ".changeset/infer-narrowed-http-overloads.md": "7064aaf33c250fc7d5e345d769e5002b3c3767811a46f7b4a92d767b0462c638"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/infer-narrowed-http-overloads.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/isolate-query-owner-caches.md": {
+      "fingerprint": "706453cd9f9f02da5fa4b4a809770905dd017fd95f8410918cf98bf40bb6027f",
+      "snapshot": {
+        ".changeset/isolate-query-owner-caches.md": "2ca962e9c5e13d3901953b1254147dfa42203fed2cbb1cf8fc6ee2c8032b9fb2"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/isolate-query-owner-caches.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/preserve-http-request-parts.md": {
+      "fingerprint": "0602e9c6fa012bf836398897c76265f67fa0187227fddf2b72e7ac2f38de7fb8",
+      "snapshot": {
+        ".changeset/preserve-http-request-parts.md": "b972ba94ac2917a6bc04b1a79848db2c2654f131f6ba283e30e3b8014095198e"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/preserve-http-request-parts.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/preserve-metadata-fallback-sharing.md": {
+      "fingerprint": "c7bfad0a520faf5d89c6a8695ed9af4f0796e0a6e4d3ddfb69eaeadd4c1387b7",
+      "snapshot": {
+        ".changeset/preserve-metadata-fallback-sharing.md": "9936240e9eab6fdc5fd98284c9eba93a59a6f5baec429debcdcbcef04d966426"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/preserve-metadata-fallback-sharing.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/release-failed-stream-recovery-attempts.md": {
+      "fingerprint": "adf2472375a000aa924e979da21f20698246946daa53f999cf056cecb16f9077",
+      "snapshot": {
+        ".changeset/release-failed-stream-recovery-attempts.md": "6070517de294c5dd82e53941ab69a1257b9a103bd02a1420a2c3f5b53702612d"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/release-failed-stream-recovery-attempts.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/release-start-clients-after-cache-errors.md": {
+      "fingerprint": "15fac9f74b8d4a84389c9f49bfe33639c5729e3e79a768e3d7922d2089caaa8b",
+      "snapshot": {
+        ".changeset/release-start-clients-after-cache-errors.md": "9b61e8f12bb3d42aa37da20f31c9284a98f9d98b22b679ee851925696b364ad8"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/release-start-clients-after-cache-errors.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/retain-bound-descriptor-input.md": {
+      "fingerprint": "28b057bbbe31b69a0dfc873db1834d6b14b5ae7ba31859e66ffdccc370870408",
+      "snapshot": {
+        ".changeset/retain-bound-descriptor-input.md": "763ae47d7268e959e9d521e38d4404afbfbc6b3da90799474428d70057b0f64d"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/retain-bound-descriptor-input.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/reuse-hydration-codec-operations.md": {
+      "fingerprint": "f3429fff382454fe1ce2474e593629dca59527f56902cf83324f14f7115c34bd",
+      "snapshot": {
+        ".changeset/reuse-hydration-codec-operations.md": "a0b7d1563210914d64c32dbad19fa4917a53e63f168cde45d83f105541f5c873"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/reuse-hydration-codec-operations.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/speed-up-branch-query-filter-matching.md": {
+      "fingerprint": "19353244ba32d69c21e4ec79450a9b4ea9efc5726b493b967bf30c1fe91f562a",
+      "snapshot": {
+        ".changeset/speed-up-branch-query-filter-matching.md": "e207af1c2e5084923b8267f030deb316db8042642a4515ba088e364e0f25be91"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/speed-up-branch-query-filter-matching.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/support-native-snapshot-persisters.md": {
+      "fingerprint": "54c1ed2cc75488c5f0e7bdf7b943ce331a1ae4cf3963682669c0f4023e01edff",
+      "snapshot": {
+        ".changeset/support-native-snapshot-persisters.md": "b23eae40ca838e74dbdee7854978feeef67a198536c75aa02e36aec0a4e024b3"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/support-native-snapshot-persisters.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/visit-configured-utility-scopes.md": {
+      "fingerprint": "fd6ad3fd73b404a6e51b9936251d036b36e63d8ff19b22be1fb8bffdbfe27f70",
+      "snapshot": {
+        ".changeset/visit-configured-utility-scopes.md": "be4b401c8ec9b09474a5e6e9b128941f52430309022d9c39b2b89b80ace21d2b"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/visit-configured-utility-scopes.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
       ]
     }
   }

@@ -30,6 +30,64 @@ const trackSnapshotSubscription = (queryClient: QueryClient) => {
 };
 
 describe("stream snapshots", () => {
+  test("accepts a native persister result without executing the query function", async () => {
+    const client = new QueryClient();
+    const queryFn = vi.fn<() => number>(() => 1);
+    try {
+      await expect(
+        fetchStreamSnapshot(client, {
+          queryKey: ["persisted-snapshot"],
+          queryFn,
+          persister: async () => await Promise.resolve(42),
+          select: String,
+        })
+      ).resolves.toBe("42");
+      expect(queryFn).not.toHaveBeenCalled();
+    } finally {
+      client.clear();
+    }
+  });
+
+  test("blocks late work delegated by a persister after snapshot timeout", async () => {
+    vi.useFakeTimers();
+    const client = new QueryClient();
+    const queryFn = vi.fn<() => number>(() => 1);
+    const entered = Deferred.makeUnsafe<boolean>();
+    const release = Deferred.makeUnsafe<boolean>();
+    const finished = Deferred.makeUnsafe<boolean>();
+    try {
+      const snapshot = captureFailure(
+        fetchStreamSnapshot(
+          client,
+          {
+            queryKey: ["delayed-persister"],
+            queryFn,
+            persister: async (run, context) => {
+              await Effect.runPromise(Deferred.succeed(entered, true));
+              await Effect.runPromise(Deferred.await(release));
+              try {
+                return await run(context);
+              } finally {
+                await Effect.runPromise(Deferred.succeed(finished, true));
+              }
+            },
+          },
+          { timeoutMs: 10 }
+        )
+      );
+      await Effect.runPromise(Deferred.await(entered));
+      await vi.advanceTimersByTimeAsync(10);
+      await expect(snapshot).resolves.toMatchObject({ name: "TimeoutError" });
+      await Effect.runPromise(Deferred.succeed(release, true));
+      await Effect.runPromise(Deferred.await(finished));
+      expect(queryFn).not.toHaveBeenCalled();
+    } finally {
+      await Effect.runPromise(Deferred.succeed(release, true));
+      client.clear();
+      vi.useRealTimers();
+    }
+  });
+
   /* oxlint-disable vitest/max-expects */
   it.effect(
     "uses cached snapshots without acquiring a stream and requires ownership for fresh capture",

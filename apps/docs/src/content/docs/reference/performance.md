@@ -33,6 +33,12 @@ vp run stream-baseline
 
 The type workload measures contracts, raw utilities, and configured utilities at 50, 250, and 1,000 operations on both compilers. The bundle workload compares consumers with included and external peers. The stream workload measures retention, batch size and deadlines, live values, cache writes, notifications, and cleanup.
 
+To measure the cost of an SSE overload, run 1,000 buffered HTTP endpoints and one SSE endpoint. Compare the standard client with clients that have a specialized SSE overload, with and without a typed client error.
+
+```sh
+TYPE_ADAPTERS=http TYPE_COUNTS=1000 TYPE_HTTP_CLIENTS=sse,sse-overload,sse-overload-typed-error vp run type-baseline
+```
+
 `vp run sharing-baseline` compares native sharing, a manual recipe, `schemaStructuralSharing`, and disabled sharing. It measures 50 cache writes per sample across five samples. It uses 10 or 1,000 readings with all, some, or no values changed. It allocates inputs before timing. Measure decoding, transport, and rendering separately.
 
 Compare the same operation counts, consumer, compiler, target, lockfile, and options. Run warmup separately and sample fresh compiler processes. Use instantiations to compare compiler work. Report memory, check time, and elapsed time separately.
@@ -43,7 +49,7 @@ See the [stream workload](https://github.com/ueberBrot/effect-api-query/blob/mai
 
 ### Regression budgets
 
-The [bundle and compiler budgets](https://github.com/ueberBrot/effect-api-query/blob/main/scripts/performance/budgets.mts) set size and instantiation limits for the default workloads. Bundle limits differ by consumer and peer mode. Compiler limits differ by compiler, adapter, operation count, and consumer. Counts outside the default matrix have no compiler budget.
+The [bundle and compiler budgets](https://github.com/ueberBrot/effect-api-query/blob/main/scripts/performance/budgets.mts) set size and instantiation limits for the default workloads and the 1,001-operation SSE overload cases. Bundle limits differ by consumer and peer mode. Compiler limits differ by compiler, workload, operation count, and consumer.
 
 Before changing a budget, run the default workloads with matching compilers, dependencies, contracts, and consumed leaves. Explain what accounts for the added cost. Timing and heap measurements are observations.
 

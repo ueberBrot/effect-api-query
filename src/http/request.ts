@@ -1,10 +1,11 @@
-import { Predicate, Schema } from "effect";
-import { HttpApiSchema } from "effect/http-api";
+import { Context, Predicate, Schema } from "effect";
+import { HttpApi, HttpApiSchema } from "effect/http-api";
 import type { HttpApiEndpoint } from "effect/http-api";
 
 import { canonicalize } from "../core/canonical-key";
 import type { OperationInput } from "../core/operation";
 import { createSchemaKeyEncoding } from "../core/schema-key";
+import type { SchemaKeyEncoding } from "../core/schema-key";
 import type { JsonValue } from "../core/types";
 import {
   EffectHttpApiQueryConfigError,
@@ -32,14 +33,55 @@ const multipartBrands = (schema: Schema.Top): ReadonlySet<string> => {
   return brands;
 };
 
-export type HttpRequestDescription =
+export type HttpRequestDescription = (
   | { readonly kind: "Unary"; readonly input: OperationInput }
   | {
       readonly kind: "Streaming";
       readonly stream: "StreamSse" | "StreamNdjson";
       readonly input: OperationInput;
     }
-  | { readonly kind: "Mutation" };
+  | { readonly kind: "Mutation" }
+) & { readonly parts: readonly string[] };
+
+const requestParts = ["params", "query", "headers", "payload"] as const;
+type RequestFields = Partial<Record<(typeof requestParts)[number], Schema.Top>>;
+
+const requestKeyEncoding = (
+  fields: RequestFields,
+  annotations: Context.Context<never>
+): SchemaKeyEncoding => {
+  const fallback = Context.getOrUndefined(annotations, HttpApi.ParseOptions);
+  const overrides = {
+    params: Context.getOrUndefined(annotations, HttpApi.ParamsParseOptions),
+    query: Context.getOrUndefined(annotations, HttpApi.QueryParseOptions),
+    headers: Context.getOrUndefined(annotations, HttpApi.HeadersParseOptions),
+    payload: Context.getOrUndefined(annotations, HttpApi.PayloadParseOptions),
+  };
+  const parts = requestParts.flatMap((part) => {
+    const schema = fields[part];
+    const options = overrides[part] ?? fallback;
+    return schema === undefined ? [] : [{ part, schema, options }];
+  });
+  if (parts.every(({ options }) => options === undefined)) {
+    return createSchemaKeyEncoding(Schema.Struct(fields));
+  }
+  const encoders = parts.map(
+    ({ part, schema, options }) =>
+      [part, createSchemaKeyEncoding(schema, options)] as const
+  );
+  return {
+    requiresEncoder: encoders.some(([, encoding]) => encoding.requiresEncoder),
+    cacheable: encoders.every(([, encoding]) => encoding.cacheable),
+    encode: (input) => {
+      if (!Predicate.isObject(input)) {
+        throw new TypeError("HTTP request input must be an object");
+      }
+      return Object.fromEntries(
+        encoders.map(([part, encoding]) => [part, encoding.encode(input[part])])
+      );
+    },
+  };
+};
 
 const classifyEndpoint = (
   endpoint: HttpApiEndpoint.Top,
@@ -197,18 +239,14 @@ const normalizeRequestKey = (value: unknown) => {
 
 export const createHttpRequest = (
   endpoint: HttpApiEndpoint.Top,
-  identity: HttpApiEndpointIdentity
+  identity: HttpApiEndpointIdentity,
+  annotations: Context.Context<never>
 ): HttpRequestDescription | undefined => {
   const classified = classifyEndpoint(endpoint, identity);
-  if (classified === undefined || classified.kind === "Mutation") {
-    return classified;
+  if (classified === undefined) {
+    return undefined;
   }
-  const payloads = classified.schemas;
-  const description =
-    classified.kind === "Streaming"
-      ? { kind: classified.kind, stream: classified.stream }
-      : { kind: classified.kind };
-  const fields: Record<string, Schema.Top> = {};
+  const fields: RequestFields = {};
   if (endpoint.params !== undefined) {
     fields["params"] = endpoint.params;
   }
@@ -218,14 +256,25 @@ export const createHttpRequest = (
   if (endpoint.headers !== undefined) {
     fields["headers"] = endpoint.headers;
   }
+  if (classified.kind === "Mutation") {
+    return {
+      kind: classified.kind,
+      parts: [...Object.keys(fields), "payload"],
+    };
+  }
+  const payloads = classified.schemas;
   if (payloads.length > 0) {
     fields["payload"] = Schema.Union(payloads);
   }
-  if (Object.keys(fields).length === 0) {
+  const parts = Object.keys(fields);
+  const description =
+    classified.kind === "Streaming"
+      ? { kind: classified.kind, stream: classified.stream, parts }
+      : { kind: classified.kind, parts };
+  if (parts.length === 0) {
     return { ...description, input: { _tag: "Inputless" } };
   }
-  const schema = Schema.Struct(fields);
-  const keyEncoding = createSchemaKeyEncoding(schema);
+  const keyEncoding = requestKeyEncoding(fields, annotations);
   const invalidKey = (cause: unknown) =>
     new EffectHttpApiQueryKeyError(
       "InvalidKeyValue",

@@ -28,6 +28,8 @@ A buffered multipart alternative makes an endpoint mutation-only even if it also
 
 An encoder receives the full decoded request and returns `JsonValue`. For a query-capable endpoint, supply one for encoding services, opaque middleware, redacted values, or multiple payload alternatives. Runtime validation catches opaque middleware that TypeScript misses, including synchronous middleware. Preserve every body and content-type difference that affects responses.
 
+Some payload alternatives share one decoded type. If TypeScript merges those types, the factory still requires an encoder. Default key encoding follows the HTTP parse options for each request part.
+
 Supply execution services through the runner. Leave buffered multipart endpoints out of the encoder map because they only support mutations.
 
 ## Request and result contract

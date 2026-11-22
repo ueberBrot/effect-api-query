@@ -489,6 +489,39 @@ describe("createRpcQueryUtils streaming execution", () => {
     }
   );
 
+  it.effect("keeps bounded replacement history in emission order", () =>
+    Effect.gen(function* retainsReplacementHistory() {
+      const group = RpcGroup.make(
+        Rpc.make("watch", { success: Schema.Int, stream: true })
+      );
+      let start = 0;
+      const client = yield* makeRpcTestClient(group, {
+        watch: () => {
+          const values = [start, start + 1, start + 2, start + 3];
+          start += 4;
+          return Stream.fromIterable(values);
+        },
+      });
+      const tree = createRpcQueryUtils(group, {
+        client,
+        keyPrefix: ["replace-ordered"],
+      });
+      const cache = new QueryClient();
+      const options = tree.watch.streamedOptions({
+        maxChunks: 3,
+        refetchMode: "replace",
+      });
+      try {
+        yield* Effect.promise(async () => await cache.query(options));
+        expect(
+          yield* Effect.promise(async () => await cache.query(options))
+        ).toStrictEqual([5, 6, 7]);
+      } finally {
+        cache.clear();
+      }
+    })
+  );
+
   it.effect("supports reset, append, and replace refetch modes", () =>
     Effect.gen(function* refetchAcrossPolicies() {
       let run = 0;

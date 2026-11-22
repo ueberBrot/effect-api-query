@@ -1,4 +1,9 @@
-import { CancelledError, QueryClient } from "@tanstack/query-core";
+import {
+  CancelledError,
+  MutationCache,
+  QueryCache,
+  QueryClient,
+} from "@tanstack/query-core";
 import type { QueryClientConfig } from "@tanstack/query-core";
 import { Cause, Exit } from "effect";
 
@@ -61,7 +66,11 @@ export const acquireQueryOwner = async <A>(
   const cancelled = new WeakSet<Promise<unknown>>();
   const queries = new Set<AbortController>();
   const drainFailures: unknown[] = [];
-  const queryClient = new QueryClient(cacheConfig);
+  const queryClient = new QueryClient({
+    ...cacheConfig,
+    queryCache: new QueryCache({ ...cacheConfig?.queryCache?.config }),
+    mutationCache: new MutationCache({ ...cacheConfig?.mutationCache?.config }),
+  });
   let active = true;
   let disposal: Promise<void> | undefined;
   const assertActive = () => {

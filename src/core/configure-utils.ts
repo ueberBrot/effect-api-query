@@ -171,38 +171,43 @@ export type ExactChildConfiguration<Node, Key, Actual> =
     ? [Exclude<Actual, InheritedMethods[Key]>] extends [never]
       ? never
       :
-          | ExactConfiguration<Node, Exclude<Actual, InheritedMethods[Key]>>
+          | ExactConfigurationProperties<
+              Node,
+              Exclude<Actual, InheritedMethods[Key]>
+            >
           | Extract<Actual, InheritedMethods[Key]>
-    : ExactConfiguration<Node, Actual>;
+    : ExactConfigurationProperties<Node, Actual>;
 
 export type ExactConfiguration<Node, Actual> = [Actual] extends [
   UtilsConfiguration<Node>,
 ]
-  ? ExtraProperties<UtilsConfiguration<Node>, Actual> & {
-      readonly [
-        Key in KeysOfUnion<Actual> & keyof UtilsConfiguration<Node>
-      ]?: Key extends "scoped"
-        ? NonNullable<Property<Actual, Key>> extends object
-          ? ExtraProperties<
-              Children<Node>,
-              NonNullable<Property<Actual, Key>>
-            > & {
-              readonly [
-                Child in KeysOfUnion<NonNullable<Property<Actual, Key>>> &
-                  keyof Node
-              ]?: ExactChildConfiguration<
-                Node[Child],
-                Child,
-                NonNullable<Property<NonNullable<Property<Actual, Key>>, Child>>
-              >;
-            }
-          : unknown
-        : ExactView<
-            NonNullable<UtilsConfiguration<Node>[Key]>,
-            NonNullable<Property<Actual, Key>>
-          >;
-    }
+  ? ExactConfigurationProperties<Node, Actual>
   : never;
+
+export type ExactConfigurationProperties<Node, Actual> = ExtraProperties<
+  UtilsConfiguration<Node>,
+  Actual
+> & {
+  readonly [
+    Key in KeysOfUnion<Actual> & keyof UtilsConfiguration<Node>
+  ]?: Key extends "scoped"
+    ? NonNullable<Property<Actual, Key>> extends object
+      ? ExtraProperties<Children<Node>, NonNullable<Property<Actual, Key>>> & {
+          readonly [
+            Child in KeysOfUnion<NonNullable<Property<Actual, Key>>> &
+              keyof Node
+          ]?: ExactChildConfiguration<
+            Node[Child],
+            Child,
+            NonNullable<Property<NonNullable<Property<Actual, Key>>, Child>>
+          >;
+        }
+      : unknown
+    : ExactView<
+        NonNullable<UtilsConfiguration<Node>[Key]>,
+        NonNullable<Property<Actual, Key>>
+      >;
+};
 
 export type StreamPolicy<Configuration> = Configuration extends {
   readonly streamed: { readonly policy: infer Policy };
@@ -301,6 +306,9 @@ const configuredLeaves = new WeakMap<
     readonly layers: readonly ConfigurationLayer[];
   }
 >();
+
+const isUtilityChild = (child: RuntimeNode[string]): child is RuntimeNode =>
+  Predicate.hasProperty(child, "key") && Predicate.isFunction(child.key);
 
 const views: readonly QueryView[] = [
   "query",
@@ -474,21 +482,22 @@ const configureNode = (
   if (configurations.length === 0 && scopeNames.length === 0) {
     return node;
   }
-  const children = new Map(
-    Object.entries(node).filter(
-      (entry): entry is [string, RuntimeNode] =>
-        Predicate.hasProperty(entry[1], "key") &&
-        Predicate.isFunction(entry[1].key)
-    )
-  );
   const scopedChildren = scopeNames.map((name) => {
-    const child = children.get(name);
-    if (child === undefined) {
+    const child = Object.prototype.propertyIsEnumerable.call(node, name)
+      ? node[name]
+      : undefined;
+    if (!isUtilityChild(child)) {
       throw new TypeError(`Unknown utility scope: ${name}`);
     }
     return [name, child] as const;
   });
-  if (children.size === 0) {
+  const children =
+    configurations.length === 0
+      ? scopedChildren
+      : Object.entries(node).filter((entry): entry is [string, RuntimeNode] =>
+          isUtilityChild(entry[1])
+        );
+  if (children.length === 0) {
     const previous = configuredLeaves.get(node);
     const original = previous?.original ?? node;
     const layers = EffectArray.sortWith(
@@ -503,8 +512,7 @@ const configureNode = (
     return configured;
   }
   let configured: RuntimeNode | undefined;
-  const entries = configurations.length === 0 ? scopedChildren : children;
-  for (const [name, child] of entries) {
+  for (const [name, child] of children) {
     const next = configureNode(
       child,
       configurations,

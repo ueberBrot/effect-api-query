@@ -6,7 +6,10 @@ import type {
 } from "@tanstack/query-core";
 import { Array as EffectArray, Predicate } from "effect";
 
-import { preserveMetadataPolicy } from "./metadata-query";
+import {
+  preserveMetadataPolicy,
+  resolveMetadataPolicy,
+} from "./metadata-query";
 
 /* oxlint-disable anti-slop/no-unsafe-dictionary-type, anti-slop/no-unknown-parameters, anti-slop/no-unknown-returns */
 export type RuntimeOptions = Record<string, unknown>;
@@ -79,9 +82,12 @@ export const configureQuery = (
       if (queryFn === skipToken) {
         return built;
       }
+      const resolvePolicy =
+        view === "metadata" ? resolveMetadataPolicy(options) : undefined;
       return {
         ...built,
         queryFn: async (context: QueryFunctionContext) => {
+          const policy = resolvePolicy?.(context);
           let original: unknown;
           const result = await interceptor({
             context,
@@ -91,9 +97,9 @@ export const configureQuery = (
               return data;
             }),
           });
-          return view === "metadata"
-            ? preserveMetadataPolicy(original, result)
-            : result;
+          return resolvePolicy === undefined
+            ? result
+            : preserveMetadataPolicy(original, result, policy);
         },
       };
     };

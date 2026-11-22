@@ -54,6 +54,36 @@ const encodeTestKey = (encode: () => JsonValue) =>
   });
 
 describe("HTTP semantic keys", () => {
+  it("uses the same request parse options as the ready client", async () => {
+    const query = { id: Schema.String.check(Schema.isMinLength(2)) };
+    const contract = HttpApi.make("parse-options").add(
+      HttpApiGroup.make("requests")
+        .add(
+          HttpApiEndpoint.get("strict", "/strict", {
+            query,
+            success: Schema.String,
+          }),
+          HttpApiEndpoint.get("relaxed", "/relaxed", {
+            query,
+            success: Schema.String,
+          }).annotate(HttpApi.QueryParseOptions, { disableChecks: true })
+        )
+        .annotate(HttpApi.ParseOptions, { onExcessProperty: "error" })
+    );
+    const client = await Effect.runPromise(makeUnusedHttpClient(contract));
+    const http = createHttpApiQueryUtils(contract, {
+      client,
+      keyPrefix: ["parse-options"],
+    });
+    const invalid = { query: { id: "valid", extra: true } };
+    expect(() => http.requests.strict.queryKey(invalid)).toThrow(
+      "Could not encode the HTTP key"
+    );
+    expect(
+      http.requests.relaxed.queryKey({ query: { id: "x" } }).at(-1)
+    ).toStrictEqual({ query: { id: "x" } });
+  });
+
   it("preserves singleton and multi-value arrays in GET and form-urlencoded payloads", async () => {
     const fields = Schema.Struct({ values: Schema.Array(Schema.String) });
     const contract = HttpApi.make("array-payloads").add(

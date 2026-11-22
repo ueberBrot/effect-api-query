@@ -145,13 +145,23 @@ export const createHydrationRegistry = <
   type Entry = Entries[number];
   const codecs: readonly Entry[] = entries;
   const codecFor = indexQueryPrefixes(
-    codecs.map((codec) => [codec.prefix, codec] as const),
-    () => new HydrationCodecError("DuplicateCodec")
+    codecs.map(
+      ({ prefix, schema }) =>
+        [
+          prefix,
+          {
+            encode: Schema.encodeUnknownEffect(schema),
+            decode: Schema.decodeUnknownEffect(schema),
+          },
+        ] as const
+    ),
+    { duplicateError: () => new HydrationCodecError("DuplicateCodec") }
   );
+  type Codec = NonNullable<ReturnType<typeof codecFor>>;
   const transform = <R>(
     queries: DehydratedState["queries"],
     convert: (
-      codec: Entry,
+      codec: Codec,
       // oxlint-disable-next-line anti-slop/no-unknown-parameters
       data: unknown
     ) => Effect.Effect<unknown, Schema.SchemaError, R>
@@ -174,12 +184,12 @@ export const createHydrationRegistry = <
     encodeQueries: (queries) =>
       transform(queries, (codec, data) =>
         // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
-        Schema.encodeUnknownEffect(codec.schema)(data)
+        codec.encode(data)
       ),
     decodeQueries: (queries) =>
       transform(queries, (codec, data) =>
         // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
-        Schema.decodeUnknownEffect(codec.schema)(data)
+        codec.decode(data)
       ),
   };
 };

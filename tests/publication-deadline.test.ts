@@ -3,6 +3,33 @@ import { describe, expect, it, vi } from "vitest";
 import { streamPublicationBatches } from "../src/core/stream-publication";
 
 describe("publication deadlines", () => {
+  it("flushes a deadline while each pull is immediately ready", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    let elapsed = 0;
+    const now = vi.spyOn(performance, "now").mockImplementation(() => elapsed);
+    const source = (async function* readySource() {
+      for (const value of [1, 2, 3, 4]) {
+        elapsed += 30;
+        yield value;
+      }
+    })();
+    try {
+      const batches: (readonly number[])[] = [];
+      for await (const batch of streamPublicationBatches(
+        source,
+        10,
+        new AbortController().signal,
+        50
+      )) {
+        batches.push(batch);
+      }
+      expect(batches).toStrictEqual([[1], [2, 3], [4]]);
+    } finally {
+      now.mockRestore();
+      vi.useRealTimers();
+    }
+  });
+
   it("flushes quiet batches on a deadline without concurrent pulls", async () => {
     vi.useFakeTimers();
     let deliver!: (value: IteratorResult<number>) => void;

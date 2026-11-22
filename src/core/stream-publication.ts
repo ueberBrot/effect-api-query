@@ -111,11 +111,13 @@ export const streamPublicationBatches =
     let pending: A[] = [];
     let pull: Promise<PullResult<A>> | undefined;
     let timer: ReturnType<typeof setTimeout> | undefined;
-    let deadline: Promise<"deadline"> | undefined;
+    let wakeDeadline: (() => void) | undefined;
+    let deadlineAt: number | undefined;
     const clearDeadline = () => {
       clearTimeout(timer);
       timer = undefined;
-      deadline = undefined;
+      wakeDeadline = undefined;
+      deadlineAt = undefined;
     };
     const pullNext = async (): Promise<PullResult<A>> => {
       try {
@@ -125,21 +127,37 @@ export const streamPublicationBatches =
       }
     };
     const startDeadline = (milliseconds: number) => {
+      deadlineAt = performance.now() + milliseconds;
+      timer = setTimeout(() => wakeDeadline?.(), milliseconds);
+    };
+    const waitForPull = async (outstanding: Promise<PullResult<A>>) => {
+      if (deadlineAt === undefined) {
+        return await outstanding;
+      }
       // oxlint-disable-next-line promise/avoid-new
-      deadline = new Promise((resolve) => {
-        timer = setTimeout(() => {
-          resolve("deadline");
-        }, milliseconds);
-      });
+      const result = await new Promise<PullResult<A> | "deadline">(
+        (resolve) => {
+          wakeDeadline = () => {
+            resolve("deadline");
+          };
+          void (async () => {
+            resolve(await outstanding);
+          })();
+        }
+      );
+      wakeDeadline = undefined;
+      return result !== "deadline" &&
+        result.kind === "value" &&
+        performance.now() >= deadlineAt
+        ? ("deadline" as const)
+        : result;
     };
     try {
       while (!signal.aborted) {
         pull ??= pullNext();
         // Pull sequentially to preserve event order and bound in-flight work.
         // oxlint-disable-next-line eslint/no-await-in-loop
-        const result = await (deadline === undefined
-          ? pull
-          : Promise.race([pull, deadline]));
+        const result = await waitForPull(pull);
         if (result !== "deadline" && result.kind === "error") {
           throw result.error;
         }
@@ -168,7 +186,7 @@ export const streamPublicationBatches =
           pending = [];
           clearDeadline();
           yield batch;
-        } else if (deadline === undefined && maxWaitMs !== undefined) {
+        } else if (deadlineAt === undefined && maxWaitMs !== undefined) {
           startDeadline(maxWaitMs);
         }
       }

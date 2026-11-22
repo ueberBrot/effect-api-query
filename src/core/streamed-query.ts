@@ -148,31 +148,53 @@ const consumeQueryStream = async <A, Data>(
   context: QueryFunctionContext,
   stream: AsyncIterable<A>,
   initialValue: Data,
-  reducer: (previous: Data, value: A) => Data,
-  replace: boolean
+  reducer: (previous: Data, value: A) => Data
 ): Promise<Data> => {
   const { client, queryKey, signal } = context;
-  let result = initialValue;
   for await (const value of stream) {
     if (signal.aborted) {
       break;
     }
-    if (replace) {
-      result = reducer(result, value);
-    } else {
-      client.setQueryData<Data>(queryKey, (previous) =>
-        // Cached null is a value, not an absent entry.
-        // oxlint-disable-next-line typescript/prefer-nullish-coalescing
-        reducer(previous === undefined ? initialValue : previous, value)
-      );
-    }
-  }
-  if (replace && !signal.aborted) {
-    client.setQueryData<Data>(queryKey, result);
+    client.setQueryData<Data>(queryKey, (previous) =>
+      // Cached null is a value, not an absent entry.
+      // oxlint-disable-next-line typescript/prefer-nullish-coalescing
+      reducer(previous === undefined ? initialValue : previous, value)
+    );
   }
   const data = client.getQueryData<Data>(queryKey);
   // oxlint-disable-next-line typescript/prefer-nullish-coalescing
   return data === undefined ? initialValue : data;
+};
+
+const consumeReplacement = async <A>(
+  { client, queryKey, signal }: QueryFunctionContext,
+  batches: AsyncIterable<readonly A[]>,
+  maxChunks: number | undefined
+): Promise<A[]> => {
+  const history: A[] = [];
+  let start = 0;
+  for await (const batch of batches) {
+    if (signal.aborted) {
+      break;
+    }
+    for (const value of batch) {
+      if (maxChunks === undefined || history.length < maxChunks) {
+        history.push(value);
+      } else {
+        history[start] = value;
+        start = (start + 1) % maxChunks;
+      }
+    }
+  }
+  if (!signal.aborted) {
+    client.setQueryData<A[]>(
+      queryKey,
+      start === 0
+        ? history
+        : [...history.slice(start), ...history.slice(0, start)]
+    );
+  }
+  return client.getQueryData<A[]>(queryKey) ?? [];
 };
 
 export const makeStreamQuery = ({
@@ -249,8 +271,7 @@ export const makeStreamQuery = ({
         null,
         // oxlint-disable-next-line anti-slop/no-unknown-parameters
         (_latest: unknown, value: unknown) =>
-          value === undefined ? null : value,
-        false
+          value === undefined ? null : value
       );
     };
   }
@@ -264,16 +285,20 @@ export const makeStreamQuery = ({
     if (reset) {
       query.setState({ ...query.resetState, fetchStatus: "fetching" });
     }
+    const batches = streamPublicationBatches(
+      await streamFn(context),
+      publicationBatchSize,
+      context.signal,
+      publicationMaxWaitMs
+    );
+    if (isRefetch && refetchMode === "replace") {
+      return await consumeReplacement(context, batches, maxChunks);
+    }
     let emitted = false;
     const initialValue: unknown[] = [];
     const result = await consumeQueryStream(
       context,
-      streamPublicationBatches(
-        await streamFn(context),
-        publicationBatchSize,
-        context.signal,
-        publicationMaxWaitMs
-      ),
+      batches,
       initialValue,
       (values: unknown[], batch: readonly unknown[]) => {
         const history = reset && !emitted ? [] : values;
@@ -295,8 +320,7 @@ export const makeStreamQuery = ({
               : batch[index - history.length];
         }
         return next;
-      },
-      isRefetch && refetchMode === "replace"
+      }
     );
     return reset && !emitted ? [] : result;
   };

@@ -1,4 +1,9 @@
-import { MutationObserver, QueryClient } from "@tanstack/query-core";
+import {
+  MutationCache,
+  MutationObserver,
+  QueryCache,
+  QueryClient,
+} from "@tanstack/query-core";
 import { Effect, Exit, Stream } from "effect";
 import { describe, expect, it } from "vitest";
 
@@ -23,6 +28,46 @@ const gate = () => {
 };
 
 describe("query owners", () => {
+  it("uses supplied cache callbacks with fresh caches for each owner", async () => {
+    const observed: string[] = [];
+    const onSuccess = () => {
+      observed.push("fetched");
+    };
+    const caches = {
+      queryCache: new QueryCache({ onSuccess }),
+      mutationCache: new MutationCache(),
+    };
+    const old = await acquireQueryOwner(
+      async () => await Promise.resolve("old"),
+      caches
+    );
+    const next = await acquireQueryOwner(
+      async () => await Promise.resolve("next"),
+      caches
+    );
+    try {
+      old.queryClient.setQueryData(["private"], "old");
+      expect(next.queryClient.getQueryData(["private"])).toBeUndefined();
+      await next.queryClient.query({
+        queryKey: ["private"],
+        queryFn: () => "next",
+      });
+      await old.dispose();
+      expect({
+        value: next.queryClient.getQueryData(["private"]),
+        sharedMutationCache:
+          next.queryClient.getMutationCache() === caches.mutationCache,
+        observed,
+      }).toStrictEqual({
+        value: "next",
+        sharedMutationCache: false,
+        observed: ["fetched"],
+      });
+    } finally {
+      await Promise.all([old.dispose(), next.dispose()]);
+    }
+  });
+
   it("retires once, rejects new work and releases acquired resources but not borrowed ones", async () => {
     const released: string[] = [];
     const borrowed = { close: () => released.push("borrowed") };

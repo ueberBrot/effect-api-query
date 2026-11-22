@@ -9,10 +9,10 @@ export const assertBudget = (
 };
 
 export const bundleBudgets = {
-  rpc: { included: [33_200, 11_100], external: [17_900, 6500] },
-  http: { included: [40_800, 13_300], external: [23_400, 8100] },
-  streamed: { included: [24_300, 8100], external: [17_900, 6500] },
-  hydration: { included: [36_100, 12_000], external: [20_200, 7300] },
+  rpc: { included: [33_200, 11_100], external: [18_200, 6500] },
+  http: { included: [42_000, 13_500], external: [24_600, 8400] },
+  streamed: { included: [24_500, 8100], external: [18_200, 6500] },
+  hydration: { included: [36_100, 12_000], external: [20_500, 7300] },
 } as const;
 
 export const compilerBudgets = new Map(
@@ -35,6 +35,10 @@ export const compilerBudgets = new Map(
     "current/http/1000/contract": 131_296,
     "current/http/1000/raw": 566_708,
     "current/http/1000/configured": 638_335,
+    "current/sse-overload/1001/raw": 1_050_000,
+    "current/sse-overload/1001/configured": 1_115_000,
+    "current/sse-overload-typed-error/1001/raw": 1_050_000,
+    "current/sse-overload-typed-error/1001/configured": 1_115_000,
     "minimum/rpc/50/contract": 21_179,
     "minimum/rpc/50/raw": 47_882,
     "minimum/rpc/50/configured": 64_788,
@@ -53,5 +57,9 @@ export const compilerBudgets = new Map(
     "minimum/http/1000/contract": 131_309,
     "minimum/http/1000/raw": 566_737,
     "minimum/http/1000/configured": 638_350,
+    "minimum/sse-overload/1001/raw": 1_050_000,
+    "minimum/sse-overload/1001/configured": 1_115_000,
+    "minimum/sse-overload-typed-error/1001/raw": 1_050_000,
+    "minimum/sse-overload-typed-error/1001/configured": 1_115_000,
   })
 );

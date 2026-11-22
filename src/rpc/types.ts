@@ -398,17 +398,26 @@ export type PathDescendants<Entry, Head extends string> = Entry extends {
   ? { readonly path: Tail; readonly rpc: R }
   : never;
 
+export interface PathEntry {
+  readonly path: string;
+  readonly rpc: Rpc.Any;
+}
+
+export type GroupedPathEntries<Entry extends PathEntry> = {
+  [Item in Entry as PathHead<Item["path"]>]: Item;
+};
+
 export type PathTree<
-  Entry extends { readonly path: string; readonly rpc: Rpc.Any },
+  Entry extends PathEntry,
   Prefix extends readonly JsonValue[],
   ClientError,
   Path extends readonly string[] = readonly [],
+  Groups extends Record<string, PathEntry> = GroupedPathEntries<Entry>,
 > = {
-  readonly [Head in PathHead<Entry["path"]>]: [
-    PathDescendants<Entry, Head>,
+  readonly [Head in keyof Groups & string]: [
+    PathDescendants<Groups[Head], Head>,
   ] extends [never]
-    ? Extract<Entry, { readonly path: Head }>["rpc"] extends infer R extends
-        Rpc.Any
+    ? Groups[Head]["rpc"] extends infer R extends Rpc.Any
       ? StreamingRpc<R> extends never
         ? RpcQueryLeaf<R, Prefix, ClientError>
         : RpcStreamLeaf<R, Prefix, ClientError>
@@ -416,7 +425,7 @@ export type PathTree<
     : {
         readonly key: () => readonly [...Prefix, "rpc", ...Path, Head];
       } & PathTree<
-        PathDescendants<Entry, Head>,
+        PathDescendants<Groups[Head], Head>,
         Prefix,
         ClientError,
         readonly [...Path, Head]

@@ -243,7 +243,7 @@ Interrupting an Effect stops its wait. QueryClient can finish shared work and pu
 
 ## Opt in to query owner setup
 
-Use `acquireQueryOwner` to create an independent cache and register resources. Await each `setup.acquire(start, release)` in order. Releases run in reverse order, even if setup fails. Use `setup.borrow(value)` when the caller retains ownership.
+Use `acquireQueryOwner` to create independent query and mutation caches and register resources. Supplied caches contribute their callback configuration. Await each `setup.acquire(start, release)` in order. Releases run in reverse order, even if setup fails. Use `setup.borrow(value)` when the caller retains ownership.
 
 Wrap the runner with `setup.wrapRunner`. For each used view, configure an interceptor that calls `setup.runQuery(next, context.signal)`. This tracks the complete function because stream pulls outlast iterable creation. See [React setup](https://ueberbrot.github.io/effect-api-query/guides/react-query/) and [retirement](https://ueberbrot.github.io/effect-api-query/guides/switch-cache-owners/#opt-in-owner-helper).
 

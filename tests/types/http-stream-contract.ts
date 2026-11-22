@@ -429,6 +429,34 @@ true satisfies Assert<
   >
 >;
 
+const buffered = HttpApiEndpoint.get("read", "/read", {
+  success: Schema.Int,
+});
+const mixedApi = HttpApi.make("mixed-services").add(
+  HttpApiGroup.make("views").add(buffered, Plain)
+);
+type MixedClient = {
+  readonly views: {
+    readonly read: HttpApiClient.Client.Method<
+      typeof buffered,
+      never,
+      "buffered-service"
+    >;
+    readonly plain: HttpApiClient.ForApi<typeof mixedApi>["views"]["plain"] &
+      SseOverload;
+  };
+};
+true satisfies Assert<
+  Equal<
+    CreateHttpApiQueryUtilsOptions<
+      typeof mixedApi,
+      readonly ["mixed-services"],
+      MixedClient
+    >["runPromiseExit"],
+    RunPromiseExit<Scale | "stream-service" | "buffered-service">
+  >
+>;
+
 const liveOptions = utils.views.plain.liveOptions({
   input,
   sseOptions: { maxEventSize: 1024 },

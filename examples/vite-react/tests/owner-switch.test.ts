@@ -265,6 +265,11 @@ describe("existing Vite application owner handoff", () => {
       await vi.waitFor(() => {
         expect(application?.isActive()).toBe(false);
       });
+      await expect(
+        application.queryClient.query(
+          application.httpQuery.users.list.queryOptions()
+        )
+      ).rejects.toThrow("Query owner is retired");
       await Effect.runPromise(Effect.sleep("25 millis"));
       expect(disposed).toBe(false);
       await Effect.runPromise(Deferred.succeed(release, true));

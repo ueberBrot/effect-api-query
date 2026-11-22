@@ -216,9 +216,9 @@ The client receives the original `FormData`. Mutation types and failures follow 
 
 ## Key encoding
 
-Default encoding synchronously encodes each labeled request part. It omits encoded `undefined` members and keeps array order and `null`. It lowercases header names. Duplicate names must have equivalent encoded values. Object key order does not affect that comparison. A custom encoder defines its own shape.
+Default encoding uses the HTTP parse options for each labeled request part. It omits encoded `undefined` members and keeps array order and `null`. It lowercases header names. Duplicate names must have equivalent encoded values. Object key order does not affect that comparison. A custom encoder defines its own shape.
 
-Configure `keyEncoders: { groupId: { endpointId: encoder } }`, including for a top-level group. The encoder receives the complete decoded request. For queries, supply one for encoding services, opaque middleware, redacted input, or multiple payload alternatives. Even synchronous opaque middleware requires one. For binary values, project to JSON, for example an array of bytes.
+Configure `keyEncoders: { groupId: { endpointId: encoder } }`, including for a top-level group. The encoder receives the complete decoded request. For queries, supply one for encoding services, opaque middleware, redacted input, or multiple payload alternatives. Runtime validation also requires an encoder when TypeScript merges alternatives that share one decoded type. For binary values, project to JSON, for example an array of bytes.
 
 Return strict JSON synchronously. Preserve body and content-type differences that affect results. Supply execution services separately through the runner. Keep credentials in middleware and safe identity in the prefix.
 

@@ -34,7 +34,7 @@ skills:
     tasks:
       - Assemble application-owned policy maps before client acquisition. Type-check SSE decoder settings at the SSE leaf, including through scoped maps. Apply policies through configureUtils, which copies decoder settings for keys and options.
       - Compose typed reads, ensure, cache updates and generated filter invalidation in Effect using an explicit existing QueryClient service; interrupt waiters without cancelling shared execution.
-      - Derive buffered, paginated, accumulated, live, and metadata options from a ready client.
+      - Derive buffered, paginated, accumulated, live, and metadata options from a ready client. Use its HTTP request parse options when encoding default keys.
       - Address exact stream policy keys, select supported view prefixes, and compose encoded partial native filters with explicit typed projections.
       - Reuse inferred input, cached query data, and mutation types in application modules.
       - Configure utility trees, branches, and leaves with ordered interceptors across views; reuse unchanged frozen subtrees while preserving policy snapshots and prepared-input ownership; select a branch view without changing key layouts.
@@ -46,7 +46,7 @@ skills:
       - Hydrate every selected view into its normal decoded cache representation.
       - Preserve neighboring writes and originating ownership during mutation overlap.
       - Defer event refresh until participating writes settle.
-      - Retire consumers and accepted work before acquiring a replacement owner; opt in to acquired/borrowed setup, wrapped runners and complete query-function/mutation promise drains with guarded originating-cache callbacks.
+      - Retire consumers and accepted work before acquiring a replacement owner. Each owner creates its query and mutation caches from configuration and drains registered work before release.
       - Acquire a ready client and mount native providers with awaited cleanup.
       - Recover initial Suspense failures, retain cached data after failed refetches, and start independent reads together with native cancellation limits.
       - Recover stream delivery with numeric convenience or explicit application cursor acceptance/order and gap detection, authoritative replay refresh, full hook inference, and cancellable backoff.

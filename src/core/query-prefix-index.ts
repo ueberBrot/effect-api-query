@@ -54,7 +54,10 @@ const canMatchSegment = (
 
 export const indexQueryPrefixes = <Value>(
   entries: Iterable<readonly [QueryKey, Value]>,
-  duplicateError?: () => Error
+  options: {
+    readonly order?: "discovery" | "longest-first";
+    readonly duplicateError?: () => Error;
+  } = {}
 ) => {
   interface Bucket {
     readonly length: number;
@@ -64,6 +67,7 @@ export const indexQueryPrefixes = <Value>(
   }
 
   const byLength = new Map<number, Bucket>();
+  let minLength = Number.POSITIVE_INFINITY;
   for (const [prefix, value] of entries) {
     const { length } = prefix;
     let bucket = byLength.get(length);
@@ -75,27 +79,33 @@ export const indexQueryPrefixes = <Value>(
         last: length > 0 ? new Set() : undefined,
       };
       byLength.set(length, bucket);
+      minLength = Math.min(minLength, length);
     }
     const hash = hashKey(prefix);
-    if (bucket.values.has(hash) && duplicateError !== undefined) {
-      throw duplicateError();
+    if (options.duplicateError !== undefined && bucket.values.has(hash)) {
+      throw options.duplicateError();
     }
     bucket.values.set(hash, value);
     bucket.first = collectSegment(bucket.first, prefix[0]);
     bucket.last = collectSegment(bucket.last, prefix[length - 1]);
   }
 
-  const bySpecificity = EffectArray.sort(
-    byLength.values(),
-    Order.mapInput(Order.flip(Order.Number), (bucket: Bucket) => bucket.length)
-  );
-  const minLength = bySpecificity.at(-1)?.length ?? Number.POSITIVE_INFINITY;
+  const buckets =
+    options.order === "discovery"
+      ? [...byLength.values()]
+      : EffectArray.sort(
+          byLength.values(),
+          Order.mapInput(
+            Order.flip(Order.Number),
+            (bucket: Bucket) => bucket.length
+          )
+        );
 
   return (key: QueryKey): Value | undefined => {
     if (key.length < minLength) {
       return undefined;
     }
-    for (const { length, values, first, last } of bySpecificity) {
+    for (const { length, values, first, last } of buckets) {
       if (
         key.length >= length &&
         canMatchSegment(last, key[length - 1]) &&

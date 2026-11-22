@@ -6,6 +6,7 @@ import type {
 } from "@tanstack/query-core";
 
 import type { PreparedInput } from "./prepared-input";
+import type { UnaryQueryBuilderDescriptor, UnionProperty } from "./types";
 
 export type QueryView = "query" | "infinite" | "metadata" | "live" | "streamed";
 
@@ -73,6 +74,17 @@ export type InferInput<Leaf> = [MutationResult<Leaf>] extends [never]
       }
     ? Input
     : never;
+
+export type BoundDescriptorInput<Leaf, View extends string> = [
+  InferInput<Leaf>,
+] extends [void]
+  ? false extends UnionProperty<
+      UnaryQueryBuilderDescriptor<UnionProperty<Leaf, `${View}Options`>>,
+      "inputless"
+    >
+    ? PreparedInput<InferInput<Leaf>>
+    : InferInput<Leaf>
+  : PreparedInput<InferInput<Leaf>>;
 
 /** The cached data for a supported view, before an observer's select projection. */
 export type InferQueryData<

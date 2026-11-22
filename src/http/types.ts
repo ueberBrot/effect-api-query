@@ -20,6 +20,7 @@ import type {
   KeyEncoderRequirement,
   MutationBuilder,
   QueryData,
+  RequiredAdapterKeys,
   RunnerRequirement,
   StreamedPolicyOptions,
   LivePolicyOptions,
@@ -233,6 +234,27 @@ export type DecodedEffect<
   Mode extends "decoded-only" | "decoded-and-response" = "decoded-only",
 > = Method extends (request: DecodedRequest<Endpoint, Mode>) => infer Result
   ? Result
+  : NarrowedDecodedEffect<Method, DecodedRequest<Endpoint, Mode>, Mode>;
+
+export type NarrowedDecodedEffect<Method, Dispatched, Mode> = Method extends (
+  request: infer Accepted
+) => infer Result
+  ? Accepted extends object
+    ? [Exclude<RequiredAdapterKeys<Accepted>, keyof Dispatched>] extends [never]
+      ? Mode extends (
+          "responseMode" extends keyof Accepted
+            ? Accepted["responseMode"]
+            : unknown
+        )
+        ? Pick<
+            Accepted,
+            Exclude<keyof Accepted, "responseMode"> & keyof Dispatched
+          > extends Partial<Dispatched>
+          ? Result
+          : never
+        : never
+      : never
+    : never
   : never;
 export type StandardMethodEffect<
   Method,
@@ -283,16 +305,26 @@ export type ResolveMethodEffects<
         : never
       : readonly [Fast, HasMetadataView<Endpoint> extends true ? Fast : never]
     : never;
-export type ExposedEffects<Api extends HttpApi.Constraint, Client> =
+
+export type MethodServices<
+  Method,
+  Endpoint extends HttpApiEndpoint.ConstraintRequest,
+> =
+  StandardMethodEffect<Method, Endpoint> extends infer Standard
+    ? [Standard] extends [never]
+      ? ExecutionServices<ResolveMethodEffects<Method, Endpoint>[number]>
+      : ExecutionServices<Standard>
+    : never;
+export type ExposedClientServices<Api extends HttpApi.Constraint, Client> =
   SupportedGroups<Api> extends infer Group
     ? Group extends HttpApiGroup.Constraint
       ? ClientGroup<Group, Client> extends infer GroupClient
         ? Supported<Endpoints<Group>> extends infer Endpoint
           ? Endpoint extends HttpApiEndpoint.ConstraintRequest
-            ? ResolveMethodEffects<
+            ? MethodServices<
                 Member<GroupClient, Endpoint["identifier"]>,
                 Endpoint
-              >[number]
+              >
             : never
           : never
         : never
@@ -755,7 +787,7 @@ export type ClientServices<Api extends HttpApi.Constraint, Client> =
       :
           | HttpApiEndpoint.ClientServices<SupportedEndpoints>
           | HttpApiEndpoint.ErrorServicesDecode<SupportedEndpoints>
-          | ExecutionServices<ExposedEffects<Api, Client>>
+          | ExposedClientServices<Api, Client>
     : never;
 export type RunnerOption<
   Api extends HttpApi.Constraint,

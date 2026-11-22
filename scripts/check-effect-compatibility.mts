@@ -92,6 +92,7 @@ const tests = [
   "http-structural-sharing",
   "hydration-codecs",
   "stream-snapshot",
+  "stream-recovery",
   "query-effects",
   "query-owner",
   "integrated-workflows",

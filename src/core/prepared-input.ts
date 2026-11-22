@@ -11,7 +11,7 @@ export interface PreparedInput<Input> {
   readonly "~effect-api-query/PreparedInput": { readonly input?: Input };
 }
 
-interface PreparedValue {
+export interface PreparedValue {
   readonly owner: OperationInput;
   readonly input: unknown;
   readonly keyValue: JsonValue;
@@ -31,6 +31,19 @@ const owners = new WeakMap<
     readonly encoder: RuntimeKeyEncoder | undefined;
   }
 >();
+
+export const prepareQueryInput = (
+  owner: Extract<OperationInput, { readonly _tag: "Input" }>,
+  input: PreparedValue["input"],
+  encoder: RuntimeKeyEncoder | undefined
+) => {
+  const prepared = owner.prepare(input, encoder);
+  try {
+    return { input: prepared.input, keyValue: canonicalize(prepared.keyValue) };
+  } catch (error) {
+    throw owner.invalidKey(error);
+  }
+};
 
 export const registerInputOwner = (
   key: () => QueryKey,
@@ -62,17 +75,9 @@ export const prepareInput = <Leaf extends { readonly key: () => QueryKey }>(
       "Prepared inputs require a generated input-bearing query leaf"
     );
   }
-  const prepared = owner.input.prepare(input, owner.encoder);
-  let keyValue: JsonValue;
-  try {
-    keyValue = canonicalize(prepared.keyValue);
-  } catch (error) {
-    throw owner.input.invalidKey(error);
-  }
   return registerPreparedInput({
     owner: owner.input,
-    input: prepared.input,
-    keyValue,
+    ...prepareQueryInput(owner.input, input, owner.encoder),
   });
 };
 
@@ -94,12 +99,9 @@ export const descriptorInput = (
   if (owner.input._tag === "Inputless") {
     return { token: undefined, identity: null };
   }
-  const prepared = owner.input.prepare(input, owner.encoder);
-  const identity = canonicalize(prepared.keyValue);
-  const token = registerPreparedInput({
-    owner: owner.input,
-    input: prepared.input,
-    keyValue: identity,
-  });
-  return { token, identity };
+  const prepared = prepareQueryInput(owner.input, input, owner.encoder);
+  return {
+    token: () => registerPreparedInput({ owner: owner.input, ...prepared }),
+    identity: prepared.keyValue,
+  };
 };

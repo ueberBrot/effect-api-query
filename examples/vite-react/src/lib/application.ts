@@ -154,28 +154,10 @@ export const startViteReactApplication = async ({
   const { rpcClient, httpRuntime, httpClient } = lifecycle.resources;
   const { queryClient } = lifecycle;
   let owner: ReturnType<typeof makeOwnerCache> | undefined;
-  let disposal: Promise<void> | undefined;
   const dispose = async (options?: {
     readonly discardPersistence?: boolean;
   }) => {
-    const retirement =
-      owner === undefined ? queryClient.cancelQueries() : owner.retire(options);
-    if (disposal !== undefined) {
-      try {
-        await retirement;
-      } finally {
-        await disposal;
-      }
-      return;
-    }
-    disposal = (async () => {
-      try {
-        await retirement;
-      } finally {
-        await lifecycle.dispose();
-      }
-    })();
-    await disposal;
+    await (owner === undefined ? lifecycle.dispose() : owner.retire(options));
   };
 
   try {
@@ -199,6 +181,7 @@ export const startViteReactApplication = async ({
         http: httpQuery.users.list.queryKey(),
       },
       storage: directoryStorage,
+      lifecycle,
     });
     owner.restoreDirectory();
     const capturedOwner = owner;
@@ -213,8 +196,7 @@ export const startViteReactApplication = async ({
       identity: capturedOwner.identity,
       isActive: capturedOwner.isActive,
       persistDirectory: capturedOwner.persistDirectory,
-      runMutation: async (execute) =>
-        lifecycle.runMutation(async () => capturedOwner.runMutation(execute)),
+      runMutation: capturedOwner.runMutation,
       trackMutationOptions: capturedOwner.trackMutationOptions,
       userWrites: makeUserWrites({
         queryClient,

@@ -213,24 +213,30 @@ describe("HTTP execution", () => {
     } satisfies HttpApiClient.ForApi<typeof api> & Receiver;
     const utils = createHttpApiQueryUtils(api, { client, keyPrefix: ["test"] });
     const queryClient = new QueryClient();
+    const input = Object.defineProperty({ params: { id: "query" } }, "params", {
+      enumerable: false,
+      get: () => ({ id: "query" }),
+    });
+    const mutationInput = { params: { id: "mutation" } };
+    Object.defineProperty(mutationInput, "params", { enumerable: false });
     try {
       await expect(
-        queryClient.query(
-          utils.grouped.read.queryOptions({
-            input: { params: { id: "query" } },
-          })
-        )
+        queryClient.query(utils.grouped.read.queryOptions({ input }))
       ).resolves.toBe("https://example.test/grouped/query");
+      await expect(
+        queryClient.query(utils.grouped.read.metadataOptions({ input }))
+      ).resolves.toMatchObject({ data: "https://example.test/grouped/query" });
       await expect(
         new MutationObserver(
           queryClient,
           utils.readRoot.mutationOptions()
-        ).mutate({
-          params: { id: "mutation" },
-        })
+        ).mutate(mutationInput)
       ).resolves.toBe("https://example.test/root/mutation");
-      expect(receivers[0]).toBe(grouped);
-      expect(receivers[1]).toBe(client);
+      expect(
+        receivers.map(
+          (receiver, index) => receiver === (index === 2 ? client : grouped)
+        )
+      ).toStrictEqual([true, true, true]);
     } finally {
       queryClient.clear();
     }

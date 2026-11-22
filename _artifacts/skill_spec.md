@@ -52,6 +52,8 @@ These checks verify the recommended APIs and observable behavior. A fresh isolat
 
 ## Coverage and batch history
 
+- **Five-round architecture review, base `8007f00`:** Align HTTP key encoding with declared parse options and keep owner caches independent. Update the HTTP and cache workflow references. Existing source mappings cover the narrower overload fixture, prepared inputs, stream recovery and publication, and the example retirement checks. Verify through the public compiler and runtime suites.
+
 - **Architecture review, base `b92b37b`:** Keep the existing skill and references. The cache workflow now describes copied SSE decoder defaults. Existing source mappings cover the shared query-prefix index, stream cleanup, and HTTP overload inference. Verify these through the public cache and compiler fixtures.
 
 - **Patch release preparation, spec #187 ticket #206, integration base `eb7c0be`:** Keep one skill and six references. Document SSE decoder defaults on typed leaf policies, cancellation before the first live value, and metadata tracking during owner retirement. Update the Effect cache guide for Query Core's `query` API. Use the compatibility table for exact pins and keep the published peer bounds. The domain map records the distinction between abort and empty completion. The skill tree now tracks the framework fixture's dependency pins. Use the existing behavior tests, public compiler fixtures, and benchmark tasks as evidence. Fresh consumer-agent discovery remains unverified.

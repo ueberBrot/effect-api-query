@@ -247,70 +247,74 @@ describe.each(metadataReplacements)(
     );
   }
 );
-it.effect(
-  "preserves fetched metadata policy when an interceptor replaces the envelope",
-  () =>
-    Effect.gen(function* retainInterceptedMetadataPolicy() {
-      const client = yield* HttpApiClient.makeWith(api, {
-        baseUrl: "https://example.test",
-        httpClient: HttpClient.make((request) =>
-          Effect.succeed(
-            HttpClientResponse.fromWeb(
-              request,
-              Response.json({ title: "fetched" })
+describe.each(["replace", "fallback"] as const)(
+  "metadata interceptor %s envelope",
+  (mode) => {
+    it.effect("preserves the fetched metadata policy", () =>
+      Effect.gen(function* retainInterceptedMetadataPolicy() {
+        const client = yield* HttpApiClient.makeWith(api, {
+          baseUrl: "https://example.test",
+          httpClient: HttpClient.make((request) =>
+            Effect.succeed(
+              HttpClientResponse.fromWeb(
+                request,
+                Response.json({ title: "fetched" })
+              )
             )
-          )
-        ),
-      });
-      const http = createHttpApiQueryUtils(api, {
-        client,
-        keyPrefix: ["intercepted-metadata"],
-      });
-      let sharingCalls = 0;
-      const queryClient = new QueryClient({
-        defaultOptions: {
-          queries: {
-            structuralSharing: (_previous, data) => {
-              sharingCalls += 1;
-              if (!Predicate.isObject(data)) {
-                throw new TypeError("Expected metadata");
-              }
-              return { ...data, status: 211 };
+          ),
+        });
+        const http = createHttpApiQueryUtils(api, {
+          client,
+          keyPrefix: ["intercepted-metadata"],
+        });
+        let sharingCalls = 0;
+        const queryClient = new QueryClient({
+          defaultOptions: {
+            queries: {
+              structuralSharing: (_previous, data) => {
+                sharingCalls += 1;
+                if (!Predicate.isObject(data)) {
+                  throw new TypeError("Expected metadata");
+                }
+                return { ...data, status: 211 };
+              },
             },
           },
-        },
-      });
-      const read = configureUtils(http.documents.read, {
-        metadata: {
-          interceptors: [
-            async ({ next }) => ({
-              ...(await next()),
-            }),
-          ],
-        },
-      }).metadataOptions;
-      try {
-        yield* Effect.promise(async () => await queryClient.query(read()));
-        const fetched = queryClient.getQueryData(
-          http.documents.read.metadataKey()
-        );
-        expect(fetched?.status).toBe(211);
-        expect(sharingCalls).toBe(1);
-        expect(Object.isFrozen(fetched)).toBe(true);
-        expect(Object.isFrozen(fetched?.headers)).toBe(true);
-        queryClient.setQueryData(http.documents.read.metadataKey(), {
-          data: { title: "manual" },
-          status: 207,
-          headers: {},
         });
-        expect({
-          sharingCalls,
-          cachedFrozen: Object.isFrozen(
-            queryClient.getQueryData(http.documents.read.metadataKey())
-          ),
-        }).toStrictEqual({ sharingCalls: 1, cachedFrozen: false });
-      } finally {
-        queryClient.clear();
-      }
-    })
+        const read = configureUtils(http.documents.read, {
+          metadata: {
+            interceptors: [
+              async ({ next }) =>
+                mode === "replace"
+                  ? { ...(await next()) }
+                  : { data: { title: "fallback" }, status: 200, headers: {} },
+            ],
+          },
+        }).metadataOptions;
+        try {
+          yield* Effect.promise(async () => await queryClient.query(read()));
+          const fetched = queryClient.getQueryData(
+            http.documents.read.metadataKey()
+          );
+          expect(fetched?.status).toBe(211);
+          expect(sharingCalls).toBe(1);
+          expect(Object.isFrozen(fetched)).toBe(true);
+          expect(Object.isFrozen(fetched?.headers)).toBe(true);
+          queryClient.setQueryData(http.documents.read.metadataKey(), {
+            data: { title: "manual" },
+            status: 207,
+            headers: {},
+          });
+          expect({
+            sharingCalls,
+            cachedFrozen: Object.isFrozen(
+              queryClient.getQueryData(http.documents.read.metadataKey())
+            ),
+          }).toStrictEqual({ sharingCalls: 1, cachedFrozen: false });
+        } finally {
+          queryClient.clear();
+        }
+      })
+    );
+  }
 );

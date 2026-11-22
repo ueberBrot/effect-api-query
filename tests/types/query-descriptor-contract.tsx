@@ -5,20 +5,40 @@ import {
   createRpcQueryUtils,
   prepareInput,
   type InferInput,
+  type PreparedInput,
 } from "@ueberbrot/effect-api-query";
-import { Schema } from "effect";
+import { Schema, SchemaTransformation } from "effect";
 import { Rpc, RpcGroup } from "effect/rpc";
 import type { RpcClient } from "effect/rpc";
 
 const input = Schema.Struct({ id: Schema.Int });
+const undefinedInput = Schema.Null.pipe(
+  Schema.decodeTo(
+    Schema.Undefined,
+    SchemaTransformation.transform({
+      decode: () => undefined,
+      encode: () => null,
+    })
+  )
+);
 const group = RpcGroup.make(
   Rpc.make("read", {
     payload: input,
     success: Schema.Struct({ name: Schema.String }),
-  })
+  }),
+  Rpc.make("readUndefined", { payload: undefinedInput, success: Schema.String })
 );
 declare const client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof group>>;
 const rpc = createRpcQueryUtils(group, { client, keyPrefix: ["loader-types"] });
+const undefinedDescriptor = createQueryDescriptor(rpc.readUndefined, "query", {
+  contract: "v1",
+  input: undefinedInput,
+});
+const rebound = undefinedDescriptor.bind(
+  undefinedDescriptor.capture(undefined)
+);
+rebound.input satisfies PreparedInput<undefined>;
+rebound.leaf.queryOptions({ input: rebound.input });
 const registration = createQueryDescriptor(rpc.read, "query", {
   contract: "v1",
   input,

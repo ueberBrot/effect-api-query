@@ -37,7 +37,7 @@ export const createBranchQueryFilter = (
     }
   };
   visit(branch);
-  const match = indexQueryPrefixes(entries);
+  const match = indexQueryPrefixes(entries, { order: "discovery" });
   const queryKey = branch.key();
   return (options = {}) => ({
     ...options,

@@ -78,7 +78,7 @@ By default, disposal and owner switches erase persistence. The `pagehide` callba
 
 ## Opt-in owner helper
 
-Use `acquireQueryOwner` to register resources and wait for work at disposal. Each call creates a QueryClient. Pass cache configuration as the second argument. See the [React provider example](/effect-api-query/guides/react-query/) for acquisition, tracking, and unmounting.
+Use `acquireQueryOwner` to register resources and wait for work at disposal. Each call creates a QueryClient with its own query and mutation caches. If you pass a cache in the configuration, the owner copies its callbacks into a fresh cache. See the [React provider example](/effect-api-query/guides/react-query/) for acquisition, tracking, and unmounting.
 
 Await each `setup.acquire(start, release)` in order. Release handlers run once in reverse order, including after a later acquisition fails. With `setup.borrow(value)`, your app remains responsible for release. Finish acquiring resources during setup. Effect Scope still manages resources inside an acquired runtime or client.
 
