@@ -1,6 +1,6 @@
 # Define the compatibility promise
 
-Status: Accepted. Extends compatibility validation in [ADR 0033](0033-bound-effect-support-to-a-patch-line.md) and amended for the pre-1.0 `0.8.0` peer-floor bump (`effect >=4.1.4 <4.2.0`, `@tanstack/query-core >=5.107.1 <6`). Versioning continues to follow [ADR 0001](0001-target-effect-4-release-candidate.md).
+Status: Accepted. Extends compatibility validation in [ADR 0033](0033-bound-effect-support-to-a-patch-line.md). Peer floors amended for `0.8.0` by [ADR 0045](0045-raise-0-8-0-peer-floors.md). Versioning continues to follow [ADR 0001](0001-target-effect-4-release-candidate.md).
 
 ## Context
 
@@ -22,7 +22,3 @@ Before 1.0, breaking public contracts and dropping supported dependency or compi
 ## Consequences
 
 The [compatibility guide](../../apps/docs/src/content/docs/getting-started/compatibility-and-stability.md) defines builders/inference, identity, normalization, errors, hydration and local cancellation/cleanup guarantees. CI runs the same matrix as `vp run effect-compatibility`. No peer bound is widened and no runtime implementation changes. Future upstream failures require review and truthful reporting, not automatic range changes or weakened fixtures.
-
-## Amendment (0.8.0)
-
-For the pre-1.0 `0.8.0` minor release (spec #210, ticket #211), raise the published peer floors to `effect >=4.1.4 <4.2.0` and `@tanstack/query-core >=5.107.1 <6` while keeping the root entrypoint strictly framework-agnostic with no mandatory framework peers. Dropping Effect `4.0.x`, Effect `<4.1.4`, and Query Core `<5.107.1` follows the pre-1.0 minor-release policy in this ADR and [ADR 0001](0001-target-effect-4-release-candidate.md), and aligns with the floor-raising rule in [ADR 0033](0033-bound-effect-support-to-a-patch-line.md) because `0.8.0` adopts Effect `4.1.4` and Query Core `5.107.1` APIs. `vp run effect-compatibility` verifies the `effect@4.1.4` and `@tanstack/query-core@5.107.1` floors across pinned TSRS and TypeScript 5.9.3; future patches within each bounded range still require explicit compatibility review.

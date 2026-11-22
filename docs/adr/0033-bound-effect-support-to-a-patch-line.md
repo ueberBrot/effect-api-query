@@ -1,6 +1,6 @@
 # Bound Effect support to a patch line
 
-Status: Accepted. Validation, prospective versioning, and the pre-1.0 `0.8.0` floor bump (`effect >=4.1.4 <4.2.0`) are amended in [ADR 0042](0042-define-the-compatibility-promise.md); the bounded patch-line policy remains accepted. Supersedes the exact-peer policy in [ADR 0001](0001-target-effect-4-release-candidate.md) and amends the peer constraint in [ADR 0025](0025-use-public-decoded-message-clients-for-server-local-rpc.md). ADR 0025's lifecycle and authority decision remains accepted.
+Status: Accepted. Validation and prospective versioning extended by [ADR 0042](0042-define-the-compatibility-promise.md). Peer floor amended for `0.8.0` by [ADR 0045](0045-raise-0-8-0-peer-floors.md); the bounded patch-line policy remains accepted. Supersedes the exact-peer policy in [ADR 0001](0001-target-effect-4-release-candidate.md) and amends the peer constraint in [ADR 0025](0025-use-public-decoded-message-clients-for-server-local-rpc.md). ADR 0025's lifecycle and authority decision remains accepted.
 
 ## Context
 
