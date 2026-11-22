@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "d78bf027d843a8d626dc161ab0e08dc7b607044ec2e6260f8cada7341b8b8ec5",
+      "fingerprint": "5a7620c0fe0af055b35821e1e5b7ba35e67e3cdcf2e4c77a9ba2c2fab19251b1",
       "snapshot": {
         "GLOSSARY.md": "4532453f4efb696d95c66aabb9f62863e28984bb961f97ee288034af62d76f29",
         "README.md": "87db3a47ce666b408001c89b81b2133393eb2074c63ba1ac1786be8e20b96dfd",
@@ -175,7 +175,7 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "4393bad5be232b4f9aeff48dfba55a034a84538b2135780b863832fa0df29dc6",
+        "package.json": "5a6e851de9bed1a00a1054746189fddf375733ad7894c5e96cb6c362251eb206",
         "pnpm-workspace.yaml": "fc4bff1fa9ef4a4887691c6e004e02829736f93ee07efcb563f78f836a21a276",
         "scripts/check-effect-compatibility.mts": "4fd616aadc3857ef011a53d8f1bb5afa1e56d0aa8015608ec8fd5a7bc1218678",
         "scripts/check-framework-consumers.mts": "f0111ac9ed84996f722f656358b810da0b9ecc8c6c0219a2019d1076b5d50cbc",
@@ -371,15 +371,15 @@
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6",
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca"
       },
-      "head": "779879ead319ffc7a6761c7cf57cd9e740c9964c",
+      "head": "fe6814b243781c0a32ca21f37742b93fbfe45bb7",
       "outcome": "no-change",
-      "reason": "Removing the direct development dependency preserves Ultracite peer resolution and Vite+ linting. Consumer installation and shipped guidance remain accurate. The domain map, skill specification, and skill tree still cover the same developer tasks.",
+      "reason": "Only the redundant root development link to the example server was removed. Example applications retain their explicit server dependency. The shipped skill and the domain map, specification, and tree still describe the same tasks.",
       "evidence": [
-        "Frozen pnpm install and pnpm why oxlint confirmed a single Oxlint 1.93.0 resolution. vp run lint and vp run check passed."
+        "A fresh frozen install without the root link passed vp run check and all 909 tests. Diff inspection confirmed only the root dependency and its lockfile importer entry were removed."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "575a0b2bd1f5626183a0651ad208be8ea5d8ebe8043c610d644718a0773186db",
+      "fingerprint": "d5784c57affaeef0688f20c8923db6a2ec212543d8f478525cc2757354eda3bb",
       "snapshot": {
         "GLOSSARY.md": "4532453f4efb696d95c66aabb9f62863e28984bb961f97ee288034af62d76f29",
         "README.md": "87db3a47ce666b408001c89b81b2133393eb2074c63ba1ac1786be8e20b96dfd",
@@ -554,7 +554,7 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "4393bad5be232b4f9aeff48dfba55a034a84538b2135780b863832fa0df29dc6",
+        "package.json": "5a6e851de9bed1a00a1054746189fddf375733ad7894c5e96cb6c362251eb206",
         "pnpm-workspace.yaml": "fc4bff1fa9ef4a4887691c6e004e02829736f93ee07efcb563f78f836a21a276",
         "scripts/check-effect-compatibility.mts": "4fd616aadc3857ef011a53d8f1bb5afa1e56d0aa8015608ec8fd5a7bc1218678",
         "scripts/check-framework-consumers.mts": "f0111ac9ed84996f722f656358b810da0b9ecc8c6c0219a2019d1076b5d50cbc",
@@ -750,11 +750,11 @@
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6",
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca"
       },
-      "head": "779879ead319ffc7a6761c7cf57cd9e740c9964c",
+      "head": "fe6814b243781c0a32ca21f37742b93fbfe45bb7",
       "outcome": "no-change",
-      "reason": "Removing the direct development dependency preserves Ultracite peer resolution and Vite+ linting. Consumer installation and shipped guidance remain accurate. The domain map, skill specification, and skill tree still cover the same developer tasks.",
+      "reason": "Only the redundant root development link to the example server was removed. Example applications retain their explicit server dependency. The shipped skill and the domain map, specification, and tree still describe the same tasks.",
       "evidence": [
-        "Frozen pnpm install and pnpm why oxlint confirmed a single Oxlint 1.93.0 resolution. vp run lint and vp run check passed."
+        "A fresh frozen install without the root link passed vp run check and all 909 tests. Diff inspection confirmed only the root dependency and its lockfile importer entry were removed."
       ]
     },
     "source:vite.config.ts": {

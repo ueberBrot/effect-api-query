@@ -252,9 +252,6 @@ importers:
       '@effect-api-query/contracts':
         specifier: workspace:*
         version: link:examples/contracts
-      '@effect-api-query/server':
-        specifier: workspace:*
-        version: link:examples/server
       '@effect/platform-node':
         specifier: 'catalog:'
         version: 4.1.4(effect@4.1.4)(redis@6.3.0)

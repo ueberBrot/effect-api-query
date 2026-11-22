@@ -59,7 +59,6 @@
     "@changesets/cli": "3.0.3",
     "@changesets/config": "4.0.1",
     "@effect-api-query/contracts": "workspace:*",
-    "@effect-api-query/server": "workspace:*",
     "@effect/platform-node": "catalog:",
     "@effect/tsgo": "0.69.0",
     "@effect/vitest": "4.1.4",
