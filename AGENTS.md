@@ -24,6 +24,12 @@ Before exploring the codebase, read [the domain documentation guide](docs/agents
 
 Check `package.json` and `vite.config.ts` first, and run `vp run <name>` when the project defines a script or task with that name.
 
+### Contributor compiler
+
+Use the pinned Node and pnpm versions and install with `pnpm install --frozen-lockfile`. For compiler changes, run `vp run toolchain-check`, `vp run typecheck`, `vp run effect-check`, and `vp run pack`. Check public types with `vp run api-types`. The pinned Effect-enhanced TSRS handles development and declaration output. TypeScript 5.9 remains the consumer minimum. See [ADR 0035](docs/adr/0035-use-effect-enhanced-tsrs-for-development.md) for the compiler decision.
+
+Leave editor and language-server selection to contributors. Effect diagnostics require an Effect-enhanced server. See [ADR 0043](docs/adr/0043-keep-editor-selection-contributor-owned.md) for editor ownership.
+
 ### Testing
 
 Use compile-time fixtures to verify the published type contract. Reserve runtime tests for behavior that can fail at runtime; avoid testing guarantees already enforced by the type system.
