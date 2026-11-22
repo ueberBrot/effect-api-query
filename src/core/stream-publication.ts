@@ -1,3 +1,5 @@
+import { noop } from "@tanstack/query-core";
+
 const retainPending = <A>(
   pending: A[],
   value: A,
@@ -36,14 +38,11 @@ export const streamPublicationBatches =
       await closing;
     };
     const onAbort = () => {
-      void (async () => {
-        await Promise.resolve();
-        try {
-          await close();
-        } catch {
-          /* Awaited again in finally, which propagates the failure. */
-        }
-      })();
+      queueMicrotask(() => {
+        // The finally block awaits and propagates cleanup failures.
+        // oxlint-disable-next-line promise/prefer-await-to-then
+        void close().catch(noop);
+      });
     };
     signal.addEventListener("abort", onAbort, { once: true });
     const clearDeadline = () => {

@@ -56,9 +56,10 @@ export const createBranchQueryFilter = (
         return false;
       }
       for (const [length, prefixes] of groups) {
+        const discriminant = query.queryKey[length - 1];
         if (
           query.queryKey.length >= length &&
-          query.queryKey[length - 1] === view &&
+          (!Predicate.isString(discriminant) || discriminant === view) &&
           prefixes.has(hashKey(query.queryKey.slice(0, length)))
         ) {
           return options.predicate?.(query) ?? true;

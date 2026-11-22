@@ -8,18 +8,16 @@ import { viewPrefix } from "./view-prefix";
 type PrimitiveHashSegment = string | number | boolean;
 
 const isPrimitiveHashSegment = (
-  // oxlint-disable-next-line anti-slop/no-unknown-parameters
-  value: unknown
+  value: QueryKey[number]
 ): value is PrimitiveHashSegment =>
   Predicate.isString(value) ||
   Predicate.isBoolean(value) ||
   (Predicate.isNumber(value) && Number.isFinite(value));
 
-const hasPrimitiveSegment = (
+const canMatchSegment = (
   segments: ReadonlySet<PrimitiveHashSegment>,
-  // oxlint-disable-next-line anti-slop/no-unknown-parameters
-  value: unknown
-): boolean => isPrimitiveHashSegment(value) && segments.has(value);
+  value: QueryKey[number]
+): boolean => !isPrimitiveHashSegment(value) || segments.has(value);
 
 /** One generated leaf/view's cache-data codec, before observer selection. */
 export interface HydrationCodec<
@@ -56,10 +54,16 @@ const makeCodec = <S extends Schema.Codec<unknown, unknown, unknown, unknown>>(
       if (key.length < prefixLength) {
         return false;
       }
-      if (checkLast && key[lastIndex] !== lastSegment) {
+      const last = key[lastIndex];
+      if (checkLast && isPrimitiveHashSegment(last) && last !== lastSegment) {
         return false;
       }
-      if (checkFirst && key[0] !== firstSegment) {
+      const [first] = key;
+      if (
+        checkFirst &&
+        isPrimitiveHashSegment(first) &&
+        first !== firstSegment
+      ) {
         return false;
       }
       return hashKey(key.slice(0, prefixLength)) === hash;
@@ -243,13 +247,13 @@ export const createHydrationRegistry = <
       }
       if (
         bucket.lastSegments !== undefined &&
-        !hasPrimitiveSegment(bucket.lastSegments, key[bucket.length - 1])
+        !canMatchSegment(bucket.lastSegments, key[bucket.length - 1])
       ) {
         continue;
       }
       if (
         bucket.firstSegments !== undefined &&
-        !hasPrimitiveSegment(bucket.firstSegments, key[0])
+        !canMatchSegment(bucket.firstSegments, key[0])
       ) {
         continue;
       }

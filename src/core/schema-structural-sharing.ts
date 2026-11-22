@@ -54,7 +54,7 @@ const setOwnDataProperty = (
   key: string,
   value: unknown
 ): void => {
-  if (key === "__proto__") {
+  if (key in target) {
     Object.defineProperty(target, key, {
       configurable: true,
       enumerable: true,
@@ -265,5 +265,12 @@ export const schemaStructuralSharing = <T>(
     }
     return incoming;
   };
-  return (previous, incoming) => share(previous, incoming, new Set());
+  return (previous, incoming) => {
+    try {
+      return share(previous, incoming, new Set());
+    } catch (error) {
+      assertAcyclic(incoming, new Set());
+      throw error;
+    }
+  };
 };
