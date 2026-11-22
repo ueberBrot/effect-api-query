@@ -148,7 +148,9 @@ const http = createHttpApiQueryUtils(api, {
   keyPrefix: ["ndjson"],
   runtime: runPromiseExit,
 });
-true satisfies Assert<Equal<keyof typeof http.records, "key" | "watch">>;
+true satisfies Assert<
+  Equal<Extract<keyof typeof http.records, string>, "key" | "watch">
+>;
 true satisfies Assert<
   Equal<
     keyof typeof http.records.watch,
@@ -231,11 +233,11 @@ const configured = configureUtils(http, {
   streamed: { policy: { maxChunks: 2 } },
 });
 configured.records.watch.streamedOptions({ input });
-configured.records.watch.streamedKey(input);
-http.records.watch.liveKey(input);
-const ssePolicy = { maxChunks: 2, sseOptions: { maxEventSize: 100 } };
+configured.records.watch.streamedKey({ input });
+http.records.watch.liveKey({ input });
+const ssePolicy = { input, maxChunks: 2, sseOptions: { maxEventSize: 100 } };
 // @ts-expect-error NDJSON has no SSE decoder controls, including captured policies.
-http.records.watch.streamedKey(input, ssePolicy);
+http.records.watch.streamedKey(ssePolicy);
 // @ts-expect-error NDJSON has no SSE decoder controls.
 http.records.watch.liveOptions({ input, sseOptions: {} });
 // @ts-expect-error NDJSON has no SSE decoder controls on inputless views.
@@ -335,4 +337,4 @@ true satisfies Assert<
 >;
 
 http.records.watch.liveOptions({ input, coalesceMs: 25 });
-http.records.watch.liveKey(input, { coalesceMs: 25 });
+http.records.watch.liveKey({ input, coalesceMs: 25 });

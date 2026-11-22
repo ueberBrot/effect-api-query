@@ -79,8 +79,8 @@ describe("createRpcQueryUtils configuration", () => {
         keyEncoders === undefined
           ? createRpcQueryUtils(rpcGroup, options)
           : createRpcQueryUtils(rpcGroup, { ...options, keyEncoders });
-      expect(utils.toString.queryKey({ id: 1 })).not.toStrictEqual(
-        utils.toString.queryKey({ id: 2 })
+      expect(utils.toString.queryKey({ input: { id: 1 } })).not.toStrictEqual(
+        utils.toString.queryKey({ input: { id: 2 } })
       );
     }
     const utils = createRpcQueryUtils(rpcGroup, {
@@ -88,7 +88,7 @@ describe("createRpcQueryUtils configuration", () => {
       keyPrefix: ["app"],
       keyEncoders: { toString: ({ id }) => id },
     });
-    expect(utils.toString.queryKey({ id: 1 })).toStrictEqual([
+    expect(utils.toString.queryKey({ input: { id: 1 } })).toStrictEqual([
       "app",
       "rpc",
       "toString",
@@ -285,7 +285,7 @@ describe("createRpcQueryUtils configuration", () => {
       });
       /* oxlint-enable anti-slop/no-chained-type-assertions, typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
 
-      expect(() => utils.users.get.queryKey({ id: 1 })).toThrow(
+      expect(() => utils.users.get.queryKey({ input: { id: 1 } })).toThrow(
         expect.objectContaining<Partial<EffectRpcQueryKeyError>>({
           _tag: "EffectRpcQueryKeyError",
           code: "InvalidKeyValue",
@@ -312,7 +312,7 @@ describe("createRpcQueryUtils configuration", () => {
         keyPrefix: ["app"] as const,
       });
 
-      const key = utils.users.get.queryKey({ id: 1 });
+      const key = utils.users.get.queryKey({ input: { id: 1 } });
 
       expect(receivedPayload).toStrictEqual({ id: 1, locale: "en" });
       expect(key).toStrictEqual([
@@ -342,7 +342,7 @@ describe("createRpcQueryUtils configuration", () => {
       });
 
       const error = captureKeyError(() =>
-        utils.users.get.queryKey({ id: 1, locale: "do-not-retain" })
+        utils.users.get.queryKey({ input: { id: 1, locale: "do-not-retain" } })
       );
 
       expect(error).toMatchObject({
@@ -401,7 +401,7 @@ describe("createRpcQueryUtils configuration", () => {
           keyPrefix: ["app"] as const,
         });
         const key = utils.secrets.read.queryKey({
-          secret: Redacted.make("do-not-key"),
+          input: { secret: Redacted.make("do-not-key") },
         });
 
         expect(receivedRedacted).toBe(true);
@@ -474,7 +474,7 @@ describe("createRpcQueryUtils configuration", () => {
 
     ready = true;
     const utils = createRpcQueryUtils(rpcGroup, options);
-    expect(utils.read.queryKey({ id: 1 })).toStrictEqual([
+    expect(utils.read.queryKey({ input: { id: 1 } })).toStrictEqual([
       "app",
       "rpc",
       "read",
@@ -544,8 +544,10 @@ describe("createRpcQueryUtils configuration", () => {
     });
     expect(
       utils.read.queryKey({
-        name: "root",
-        children: [{ name: "leaf", children: [] }],
+        input: {
+          name: "root",
+          children: [{ name: "leaf", children: [] }],
+        },
       })
     ).toStrictEqual([
       "app",
@@ -614,7 +616,7 @@ describe("createRpcQueryUtils configuration", () => {
         const utils = createRpcQueryUtils(servicefulGroup, safeOptions);
 
         expect(
-          utils.encoding.serviceful.queryKey({ value: "safe" })
+          utils.encoding.serviceful.queryKey({ input: { value: "safe" } })
         ).toStrictEqual([
           "app",
           "rpc",
@@ -658,7 +660,9 @@ describe("createRpcQueryUtils configuration", () => {
 
         const utils = createRpcQueryUtils(decodingGroup, options);
 
-        expect(utils.decoding.only.queryKey({ value: "safe" })).toStrictEqual([
+        expect(
+          utils.decoding.only.queryKey({ input: { value: "safe" } })
+        ).toStrictEqual([
           "app",
           "rpc",
           "decoding",
@@ -695,7 +699,7 @@ describe("createRpcQueryUtils configuration", () => {
             keyEncoders === undefined
               ? createRpcQueryUtils(rpcGroup, options)
               : createRpcQueryUtils(rpcGroup, { ...options, keyEncoders });
-          expect(() => utils.read.queryKey({ value })).toThrow(
+          expect(() => utils.read.queryKey({ input: { value } })).toThrow(
             expect.objectContaining({ code: "InvalidKeyValue" })
           );
         }
@@ -716,7 +720,7 @@ describe("createRpcQueryUtils configuration", () => {
         keyPrefix: ["app"] as const,
       });
 
-      expect(() => utils.users.get.queryKey({ id: 1 })).toThrow(
+      expect(() => utils.users.get.queryKey({ input: { id: 1 } })).toThrow(
         expect.objectContaining({ code: "InvalidKeyValue" })
       );
     })

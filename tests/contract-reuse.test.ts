@@ -70,8 +70,12 @@ it.effect(
             await queryClient.query(b.read.queryOptions({ input: { id: 1 } }))
         )
       ).toBe("second");
-      expect(a.read.queryKey({ id: 1 }).at(-1)).toStrictEqual({ entity: 1 });
-      expect(b.read.queryKey({ id: 1 }).at(-1)).toStrictEqual({ id: "1" });
+      expect(a.read.queryKey({ input: { id: 1 } }).at(-1)).toStrictEqual({
+        entity: 1,
+      });
+      expect(b.read.queryKey({ input: { id: 1 } }).at(-1)).toStrictEqual({
+        id: "1",
+      });
       expect([firstRuns, secondRuns]).toStrictEqual([1, 1]);
       queryClient.clear();
     })
@@ -126,8 +130,8 @@ it.effect(
             await queryClient.query(second.users.read.queryOptions({ input }))
         )
       ).toBe("second");
-      expect(other.users.read.queryKey(input)).not.toStrictEqual(
-        second.users.read.queryKey(input)
+      expect(other.users.read.queryKey({ input })).not.toStrictEqual(
+        second.users.read.queryKey({ input })
       );
       queryClient.clear();
     })
@@ -182,8 +186,8 @@ it.effect("reuses completed encoder-required RPC analysis", () =>
     expect(inspections).toBe(firstInspections);
     const input = { secret: Redacted.make("private") };
     expect([
-      first.read.queryKey(input),
-      second.read.queryKey(input),
+      first.read.queryKey({ input }),
+      second.read.queryKey({ input }),
     ]).toStrictEqual([
       ["first", "rpc", "read", "query", "first-identity"],
       ["second", "rpc", "read", "query", "second-identity"],
@@ -240,10 +244,10 @@ it.effect("reuses HTTP analysis with required and ambiguous encoders", () =>
     expect(groupReads).toBe(firstGroupReads);
     const input = { payload: Redacted.make("private") };
     expect([
-      first.requests.secret.queryKey(input).at(-1),
-      second.requests.secret.queryKey(input).at(-1),
-      first.requests.multiple.queryKey({ payload: 1 }).at(-1),
-      second.requests.multiple.queryKey({ payload: 1 }).at(-1),
+      first.requests.secret.queryKey({ input }).at(-1),
+      second.requests.secret.queryKey({ input }).at(-1),
+      first.requests.multiple.queryKey({ input: { payload: 1 } }).at(-1),
+      second.requests.multiple.queryKey({ input: { payload: 1 } }).at(-1),
     ]).toStrictEqual([
       "first-secret",
       "second-secret",
@@ -305,8 +309,12 @@ it.effect(
       createHttpApiQueryUtils(api, { client, keyPrefix: ["cached"] });
       expect({
         inspections,
-        recoveredKey: recovered.requests.read.queryKey({ payload: { id: 1 } }),
-        customKey: custom.requests.read.queryKey({ payload: { id: 1 } }).at(-1),
+        recoveredKey: recovered.requests.read.queryKey({
+          input: { payload: { id: 1 } },
+        }),
+        customKey: custom.requests.read
+          .queryKey({ input: { payload: { id: 1 } } })
+          .at(-1),
       }).toStrictEqual({
         inspections: 3,
         recoveredKey: [

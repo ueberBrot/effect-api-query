@@ -90,9 +90,11 @@ describe("HTTP query options", () => {
       ]);
       expect([
         utils.users.list.infiniteKey({
-          query: { cursor: 0, filter: "archived" },
+          input: { query: { cursor: 0, filter: "archived" } },
         }),
-        utils.users.list.queryKey({ query: { cursor: 0, filter: "active" } }),
+        utils.users.list.queryKey({
+          input: { query: { cursor: 0, filter: "active" } },
+        }),
       ]).not.toContainEqual(options.queryKey);
       requests.length = 0;
       await queryClient.invalidateQueries({ queryKey: utils.users.list.key() });

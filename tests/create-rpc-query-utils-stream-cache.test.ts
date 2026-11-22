@@ -427,7 +427,9 @@ it.effect("restarts an observer without cancelling another live query", () =>
         fetchStatus: "fetching",
       });
       expect(Deferred.isDoneUnsafe(otherClosed)).toBe(false);
-      expect(queryClient.getQueryData(rpc.watch.liveKey({ id: 1 }))).toBe(2);
+      expect(
+        queryClient.getQueryData(rpc.watch.liveKey({ input: { id: 1 } }))
+      ).toBe(2);
     } finally {
       stopFirst();
       stopOther();

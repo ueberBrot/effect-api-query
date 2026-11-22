@@ -121,8 +121,12 @@ type Endpoint = `read.${(typeof indexes)[number]}`;
 true satisfies Assert<
   Equal<Extract<keyof typeof utils, string>, "key" | (typeof groups)[number]>
 >;
-true satisfies Assert<Equal<keyof typeof utils.accounts, "key" | Endpoint>>;
-true satisfies Assert<Equal<keyof typeof utils.users, "key" | Endpoint>>;
+true satisfies Assert<
+  Equal<Extract<keyof typeof utils.accounts, string>, "key" | Endpoint>
+>;
+true satisfies Assert<
+  Equal<Extract<keyof typeof utils.users, string>, "key" | Endpoint>
+>;
 
 const input = {
   params: { id: 1 },
@@ -171,7 +175,9 @@ true satisfies Assert<
     | undefined
   >
 >;
-const state = queryClient.getQueryState(utils.users["read.49"].queryKey(input));
+const state = queryClient.getQueryState(
+  utils.users["read.49"].queryKey({ input })
+);
 true satisfies Assert<
   Equal<
     NonNullable<typeof state>["error"],
@@ -183,5 +189,5 @@ true satisfies Assert<
 // @ts-expect-error Literal endpoint identifiers stay finite in large utility trees.
 utils.accounts["read.50"];
 // @ts-expect-error Large trees retain decoded request types.
-utils.users["read.49"].queryKey({ ...input, params: { id: "1" } });
+utils.users["read.49"].queryKey({ input: { ...input, params: { id: "1" } } });
 void [annotated, endpointKey];

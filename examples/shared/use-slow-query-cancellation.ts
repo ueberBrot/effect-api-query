@@ -8,7 +8,7 @@ import type {
 import { useEffect, useMemo, useRef, useState } from "react";
 
 export interface DiagnosticQuery<Input, Data> {
-  readonly queryKey: (input: Input) => QueryKey;
+  readonly queryKey: (options: { readonly input: Input }) => QueryKey;
   readonly queryOptions: (options: { readonly input: Input }) => {
     readonly queryKey: QueryKey;
     readonly queryFn: QueryFunction<Data> | SkipToken;
@@ -112,9 +112,11 @@ export const useSlowQueryCancellation = (
     () =>
       transport === "http"
         ? {
-            key: httpQuery.diagnostics.slow.queryKey({ query: slowInput }),
+            key: httpQuery.diagnostics.slow.queryKey({
+              input: { query: slowInput },
+            }),
             statusKey: httpQuery.diagnostics.operationStatus.queryKey({
-              params: { operationId: slowInput.operationId },
+              input: { params: { operationId: slowInput.operationId } },
             }),
             run: async () =>
               await queryClient.query(
@@ -131,9 +133,9 @@ export const useSlowQueryCancellation = (
               }),
           }
         : {
-            key: rpcQuery.diagnostics.slow.queryKey(slowInput),
+            key: rpcQuery.diagnostics.slow.queryKey({ input: slowInput }),
             statusKey: rpcQuery.diagnostics.operationStatus.queryKey({
-              operationId: slowInput.operationId,
+              input: { operationId: slowInput.operationId },
             }),
             run: async () =>
               await queryClient.query(

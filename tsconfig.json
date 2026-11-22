@@ -89,6 +89,7 @@
               "scripts/measure-structural-sharing.mts",
               "scripts/measure-streams.mts",
               "tests/utility-configuration.test.ts",
+              "tests/lazy-leaves-and-unified-keys.test.ts",
               "tests/configuration-composition.test.ts",
               "tests/types/**/*.ts",
               "tests/types/**/*.tsx"

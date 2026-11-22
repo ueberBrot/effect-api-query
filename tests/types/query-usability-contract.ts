@@ -61,7 +61,7 @@ const query = useQuery(
 );
 const selected: string = query.data;
 const cached: number | undefined = queryClient.getQueryData(
-  leaf.queryKey(prepared)
+  leaf.queryKey({ input: prepared })
 );
 const plain: InferInput<typeof rpc.watch> = { id: 1 };
 const skipped = leaf.queryOptions({

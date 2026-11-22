@@ -251,9 +251,11 @@ describe("User writes in the Vite application", () => {
       const ada = new User({ id: 1, name: "Ada", locale: "en" });
       const key =
         adapter === "rpc"
-          ? rpcQuery.users.page.infiniteKey({ cursor: 0, pageSize: 4 })
+          ? rpcQuery.users.page.infiniteKey({
+              input: { cursor: 0, pageSize: 4 },
+            })
           : httpQuery.users.page.infiniteKey({
-              query: { cursor: 0, pageSize: 4 },
+              input: { query: { cursor: 0, pageSize: 4 } },
             });
       fixture.seed([ada]);
       queryClient.setQueryData(key, {
@@ -305,11 +307,13 @@ describe("User writes in the Vite application", () => {
       const { queryClient, rpcQuery, httpQuery, userWrites } =
         fixture.application;
       const rpcPages = rpcQuery.users.page.infiniteKey({
-        cursor: 0,
-        pageSize: 4,
+        input: {
+          cursor: 0,
+          pageSize: 4,
+        },
       });
       const httpPages = httpQuery.users.page.infiniteKey({
-        query: { cursor: 0, pageSize: 4 },
+        input: { query: { cursor: 0, pageSize: 4 } },
       });
       for (const key of [rpcPages, httpPages]) {
         queryClient.setQueryData(key, {
@@ -380,11 +384,13 @@ describe("User writes in the Vite application", () => {
       const ada = new User({ id: 1, name: "Ada", locale: "en" });
       fixture.seed([ada]);
       const rpcPages = rpcQuery.users.page.infiniteKey({
-        cursor: 0,
-        pageSize: 4,
+        input: {
+          cursor: 0,
+          pageSize: 4,
+        },
       });
       const httpPages = httpQuery.users.page.infiniteKey({
-        query: { cursor: 0, pageSize: 4 },
+        input: { query: { cursor: 0, pageSize: 4 } },
       });
       for (const key of [rpcPages, httpPages]) {
         queryClient.setQueryData(key, {
@@ -517,14 +523,16 @@ describe("User writes in the Vite application", () => {
       await expect(result).resolves.toStrictEqual(grace);
       expect(
         queryClient.getQueryData(
-          rpcQuery.users.get.queryKey({ id: 2, locale: "fr" })
+          rpcQuery.users.get.queryKey({ input: { id: 2, locale: "fr" } })
         )
       ).toStrictEqual(grace);
       expect(
         queryClient.getQueryData(
           httpQuery.users.get.queryKey({
-            params: { id: 2 },
-            query: { locale: "fr" },
+            input: {
+              params: { id: 2 },
+              query: { locale: "fr" },
+            },
           })
         )
       ).toStrictEqual(grace);
@@ -546,11 +554,13 @@ describe("User writes in the Vite application", () => {
     const alan = new User({ id: 2, name: "Alan", locale: "en" });
     const grace = new User({ id: 3, name: "Grace", locale: "fr" });
     const rpcPages = rpcQuery.users.page.infiniteKey({
-      cursor: 0,
-      pageSize: 4,
+      input: {
+        cursor: 0,
+        pageSize: 4,
+      },
     });
     const httpPages = httpQuery.users.page.infiniteKey({
-      query: { cursor: 0, pageSize: 4 },
+      input: { query: { cursor: 0, pageSize: 4 } },
     });
     fixture.seed([ada, alan]);
     for (const key of [
@@ -711,8 +721,10 @@ describe("User writes in the Vite application", () => {
         httpQuery.users.list.queryKey(),
       ];
       const pages = [
-        rpcQuery.users.page.infiniteKey({ cursor: 0, pageSize: 4 }),
-        httpQuery.users.page.infiniteKey({ query: { cursor: 0, pageSize: 4 } }),
+        rpcQuery.users.page.infiniteKey({ input: { cursor: 0, pageSize: 4 } }),
+        httpQuery.users.page.infiniteKey({
+          input: { query: { cursor: 0, pageSize: 4 } },
+        }),
       ];
       for (const key of lists) {
         queryClient.setQueryData(key, [ada, alan]);
@@ -830,9 +842,11 @@ describe("User writes in the Vite application", () => {
         http: httpQuery.users.list.queryKey(),
       };
       const pages = {
-        rpc: rpcQuery.users.page.infiniteKey({ cursor: 0, pageSize: 4 }),
+        rpc: rpcQuery.users.page.infiniteKey({
+          input: { cursor: 0, pageSize: 4 },
+        }),
         http: httpQuery.users.page.infiniteKey({
-          query: { cursor: 0, pageSize: 4 },
+          input: { query: { cursor: 0, pageSize: 4 } },
         }),
       };
       fixture.seed(initial);
@@ -1120,7 +1134,9 @@ describe("User writes in the Vite application", () => {
     );
     const { queryClient, rpcQuery, userWrites } = fixture.application;
     queryClient.setQueryData(rpcQuery.users.list.queryKey(), []);
-    const pages = rpcQuery.users.page.infiniteKey({ cursor: 0, pageSize: 4 });
+    const pages = rpcQuery.users.page.infiniteKey({
+      input: { cursor: 0, pageSize: 4 },
+    });
     queryClient.setQueryData(pages, {
       pages: [new UserPage({ users: [], total: 0, nextCursor: null })],
       pageParams: [0],

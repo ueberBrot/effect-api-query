@@ -228,8 +228,8 @@ it.effect("transfers rich decoded input with an explicit codec", () =>
             await cache.query(bound.leaf.queryOptions({ input: bound.input }))
         )
       ).toBe("23");
-      expect(bound.leaf.queryKey(bound.input)).toStrictEqual(
-        rpc.read.queryKey({ id: 23n })
+      expect(bound.leaf.queryKey({ input: bound.input })).toStrictEqual(
+        rpc.read.queryKey({ input: { id: 23n } })
       );
     } finally {
       cache.clear();
@@ -323,8 +323,8 @@ it.effect(
         input,
       }).bind(descriptor);
       expect(descriptor.input).toStrictEqual({ query: { id: "7" } });
-      expect(bound.leaf.metadataKey(bound.input)).toStrictEqual(
-        server.users.read.metadataKey({ query: { id: 7 } })
+      expect(bound.leaf.metadataKey({ input: bound.input })).toStrictEqual(
+        server.users.read.metadataKey({ input: { query: { id: 7 } } })
       );
       expect(bound.prefix).toStrictEqual([
         "http-loader",

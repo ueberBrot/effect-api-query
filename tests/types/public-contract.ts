@@ -276,7 +276,9 @@ type ExactStreamLeafInterface = Assert<
   Equal<keyof (typeof utils)["events"]["watch"], ExpectedStreamLeafInterface>
 >;
 const exactStreamLeafInterface: ExactStreamLeafInterface = true;
-const projectKey = utils.projects["by-id"].find.queryKey({ id: "project-1" });
+const projectKey = utils.projects["by-id"].find.queryKey({
+  input: { id: "project-1" },
+});
 const projectPing = utils.projects.health.ping.queryOptions();
 true satisfies Assert<
   Equal<
@@ -395,10 +397,10 @@ const streamedHook = useQuery(streamedOptions);
 const streamedHookData: string | undefined = streamedHook.data;
 streamedHook.error satisfies WatchStreamError | null;
 const streamedResult: Promise<string> = queryClient.query(streamedOptions);
-const streamedKey = utils.events.watch.streamedKey(
-  { channel: "news" },
-  { maxChunks: "unbounded" }
-);
+const streamedKey = utils.events.watch.streamedKey({
+  input: { channel: "news" },
+  maxChunks: "unbounded",
+});
 streamedKey satisfies readonly [
   "app",
   "rpc",
@@ -408,16 +410,17 @@ streamedKey satisfies readonly [
   ...unknown[],
 ];
 const cachedStream = queryClient.getQueryData(
-  utils.events.watch.streamedKey(
-    { channel: "news" },
-    { maxChunks: "unbounded" }
-  )
+  utils.events.watch.streamedKey({
+    input: { channel: "news" },
+    maxChunks: "unbounded",
+  })
 );
 cachedStream satisfies ReadonlyArray<string> | undefined;
-const boundedStreamKey = utils.events.watch.streamedKey(
-  { channel: "news" },
-  { maxChunks: 2, refetchMode: "append" }
-);
+const boundedStreamKey = utils.events.watch.streamedKey({
+  input: { channel: "news" },
+  maxChunks: 2,
+  refetchMode: "append",
+});
 const boundedStreamData = queryClient.getQueryData(boundedStreamKey);
 boundedStreamData satisfies ReadonlyArray<string> | undefined;
 queryClient.setQueryData(boundedStreamKey, ["latest"]);
@@ -425,10 +428,11 @@ queryClient.getQueryState(boundedStreamKey)?.error satisfies
   | WatchStreamError
   | null
   | undefined;
-utils.events.watch.streamedKey(
-  { channel: "news" },
-  { maxChunks: "unbounded", refetchMode: "reset" }
-);
+utils.events.watch.streamedKey({
+  input: { channel: "news" },
+  maxChunks: "unbounded",
+  refetchMode: "reset",
+});
 utils.events.audit.watch.streamedKey({ maxChunks: "unbounded" });
 utils.events.audit.watch.streamedKey({ maxChunks: 2, refetchMode: "replace" });
 utils.events.audit.watch.streamedKey({
@@ -438,17 +442,18 @@ utils.events.audit.watch.streamedKey({
 queryClient.getQueryData(
   utils.events.audit.watch.streamedKey({ maxChunks: 2 })
 ) satisfies ReadonlyArray<string> | undefined;
-utils.events.watch.streamedKey(
-  { channel: "news" },
+utils.events.watch.streamedKey({
+  input: { channel: "news" },
+  maxChunks: "unbounded",
   // @ts-expect-error refetch policy is one of the declared modes
-  { maxChunks: "unbounded", refetchMode: "unknown" }
-);
+  refetchMode: "unknown",
+});
 // @ts-expect-error accumulation bounds are numeric
 utils.events.audit.watch.streamedKey({ maxChunks: "2" });
 // @ts-expect-error a payload-bearing key still requires constructor input
-utils.events.watch.streamedKey({ maxChunks: 2 }, { maxChunks: "unbounded" });
+utils.events.watch.streamedKey({ maxChunks: "unbounded" });
 // @ts-expect-error live keys have no accumulation policy
-utils.events.watch.liveKey({ channel: "news" }, { maxChunks: 2 });
+utils.events.watch.liveKey({ input: { channel: "news" }, maxChunks: 2 });
 queryClient.invalidateQueries({ queryKey: streamedKey });
 queryClient.refetchQueries({ queryKey: streamedKey });
 void [streamedHookData, streamedResult];
@@ -469,7 +474,7 @@ liveHook.error satisfies
   | WatchStreamError
   | null;
 const liveResult: Promise<number> = queryClient.query(liveOptions);
-const liveKey = utils.events.watch.liveKey({ channel: "news" });
+const liveKey = utils.events.watch.liveKey({ input: { channel: "news" } });
 liveKey satisfies readonly [
   "app",
   "rpc",
@@ -760,7 +765,7 @@ true satisfies Assert<
   Equal<typeof maybeInitializedInfiniteHook.data, number | undefined>
 >;
 
-const infiniteKey = utils.users.pages.infiniteKey({ cursor: 0 });
+const infiniteKey = utils.users.pages.infiniteKey({ input: { cursor: 0 } });
 infiniteKey satisfies readonly [
   "app",
   "rpc",
@@ -1138,10 +1143,10 @@ const missingSecretListEncoder: CreateRpcQueryUtilsOptions<
 void missingSecretListEncoder;
 
 const cachedUser: { readonly id: number; readonly name: string } | undefined =
-  queryClient.getQueryData(utils.users.get.queryKey({ id: 1 }));
+  queryClient.getQueryData(utils.users.get.queryKey({ input: { id: 1 } }));
 void cachedUser;
 
-const concreteQueryKey = utils.users.get.queryKey({ id: 1 });
+const concreteQueryKey = utils.users.get.queryKey({ input: { id: 1 } });
 concreteQueryKey satisfies readonly [
   "app",
   "rpc",
@@ -2060,9 +2065,13 @@ createRpcQueryUtils(broadPayloadGroup, {
     "payload.void": () => null,
   },
 });
-const unknownKey = broadPayloadUtils.payload.unknown.queryKey({ id: 1 });
-const anyKey = broadPayloadUtils.payload.any.queryKey({ id: 1 });
-const optionalKey = broadPayloadUtils.payload.optional.queryKey("input");
+const unknownKey = broadPayloadUtils.payload.unknown.queryKey({
+  input: { id: 1 },
+});
+const anyKey = broadPayloadUtils.payload.any.queryKey({ input: { id: 1 } });
+const optionalKey = broadPayloadUtils.payload.optional.queryKey({
+  input: "input",
+});
 unknownKey satisfies readonly [
   "payload",
   "rpc",
@@ -2104,7 +2113,7 @@ broadPayloadUtils.payload.unknown.queryKey();
 // @ts-expect-error Any declarations require constructor input for keys
 broadPayloadUtils.payload.any.queryKey();
 // @ts-expect-error void-containing unions retain their declared constructor type
-broadPayloadUtils.payload.optional.queryKey(1);
+broadPayloadUtils.payload.optional.queryKey({ input: 1 });
 
 const unknownMutation = broadPayloadUtils.payload.unknown.mutationOptions({
   onMutate: (input) => {
@@ -2155,7 +2164,9 @@ queryClient.infiniteQuery(broadAnyPages) satisfies Promise<
 queryClient.infiniteQuery(broadOptionalPages) satisfies Promise<
   InfiniteData<string, number>
 >;
-broadPayloadUtils.payload.unknown.infiniteKey({ page: 0 }) satisfies readonly [
+broadPayloadUtils.payload.unknown.infiniteKey({
+  input: { page: 0 },
+}) satisfies readonly [
   "payload",
   "rpc",
   "payload",
@@ -2163,15 +2174,12 @@ broadPayloadUtils.payload.unknown.infiniteKey({ page: 0 }) satisfies readonly [
   "infinite",
   unknown,
 ];
-broadPayloadUtils.payload.any.infiniteKey({ page: 0 }) satisfies readonly [
-  "payload",
-  "rpc",
-  "payload",
-  "any",
-  "infinite",
-  unknown,
-];
-broadPayloadUtils.payload.optional.infiniteKey("0") satisfies readonly [
+broadPayloadUtils.payload.any.infiniteKey({
+  input: { page: 0 },
+}) satisfies readonly ["payload", "rpc", "payload", "any", "infinite", unknown];
+broadPayloadUtils.payload.optional.infiniteKey({
+  input: "0",
+}) satisfies readonly [
   "payload",
   "rpc",
   "payload",
@@ -2195,28 +2203,29 @@ broadPayloadUtils.payload.optional.infiniteOptions({
   getNextPageParam: () => undefined,
 });
 
-const unknownStreamedKey = broadPayloadUtils.payload.unknownWatch.streamedKey(
-  {
-    id: 1,
-  },
-  { maxChunks: "unbounded" }
-);
-const anyStreamedKey = broadPayloadUtils.payload.anyWatch.streamedKey(
-  {
-    id: 1,
-  },
-  { maxChunks: "unbounded" }
-);
+const unknownStreamedKey = broadPayloadUtils.payload.unknownWatch.streamedKey({
+  input: { id: 1 },
+  maxChunks: "unbounded",
+});
+const anyStreamedKey = broadPayloadUtils.payload.anyWatch.streamedKey({
+  input: { id: 1 },
+  maxChunks: "unbounded",
+});
 const optionalStreamedKey = broadPayloadUtils.payload.optionalWatch.streamedKey(
-  "input",
-  { maxChunks: "unbounded" }
+  {
+    input: "input",
+    maxChunks: "unbounded",
+  }
 );
 const unknownLiveKey = broadPayloadUtils.payload.unknownWatch.liveKey({
-  id: 1,
+  input: { id: 1 },
 });
-const anyLiveKey = broadPayloadUtils.payload.anyWatch.liveKey({ id: 1 });
-const broadOptionalLiveKey =
-  broadPayloadUtils.payload.optionalWatch.liveKey("input");
+const anyLiveKey = broadPayloadUtils.payload.anyWatch.liveKey({
+  input: { id: 1 },
+});
+const broadOptionalLiveKey = broadPayloadUtils.payload.optionalWatch.liveKey({
+  input: "input",
+});
 unknownStreamedKey satisfies readonly [
   "payload",
   "rpc",
@@ -2278,14 +2287,17 @@ queryClient.getQueryData(optionalStreamedKey) satisfies
   | readonly string[]
   | undefined;
 const unknownBoundedStream = broadPayloadUtils.payload.unknownWatch.streamedKey(
-  { id: 1 },
-  { maxChunks: 2, refetchMode: "append" }
+  { input: { id: 1 }, maxChunks: 2, refetchMode: "append" }
 );
 queryClient.getQueryData(unknownBoundedStream) satisfies
   | readonly string[]
   | undefined;
-broadPayloadUtils.payload.anyWatch.streamedKey({ id: 1 }, { maxChunks: 2 });
-broadPayloadUtils.payload.optionalWatch.streamedKey(undefined, {
+broadPayloadUtils.payload.anyWatch.streamedKey({
+  input: { id: 1 },
+  maxChunks: 2,
+});
+broadPayloadUtils.payload.optionalWatch.streamedKey({
+  input: undefined,
   maxChunks: "unbounded",
   refetchMode: "replace",
 });

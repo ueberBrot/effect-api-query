@@ -145,7 +145,9 @@ describe(createHttpApiQueryUtils, () => {
           .build(queryClient, utils.users.remove.mutationOptions())
           .execute({ params: { id: 1 } })
       ).resolves.toBeUndefined();
-      expect(utils.users.get.queryKey({ params: { id: 1 } })).toStrictEqual([
+      expect(
+        utils.users.get.queryKey({ input: { params: { id: 1 } } })
+      ).toStrictEqual([
         "shared",
         "http",
         "test",
@@ -562,16 +564,16 @@ describe(createHttpApiQueryUtils, () => {
       keyPrefix: ["shared"],
     });
     const queryClient = new QueryClient();
-    const first = http.users.get.queryKey({ params: { id: 1 } });
-    const second = http.users.get.queryKey({ params: { id: 2 } });
+    const first = http.users.get.queryKey({ input: { params: { id: 1 } } });
+    const second = http.users.get.queryKey({ input: { params: { id: 2 } } });
     const other = http.users.list.queryKey();
-    const rpcKey = rpc.users.get.queryKey({ id: 1 });
+    const rpcKey = rpc.users.get.queryKey({ input: { id: 1 } });
     try {
       for (const key of [first, second, other, rpcKey]) {
         queryClient.setQueryData(key, "cached");
       }
       expect(http.users.get.mutationKey()).not.toStrictEqual(
-        http.users.get.queryKey({ params: { id: 1 } })
+        http.users.get.queryKey({ input: { params: { id: 1 } } })
       );
       await queryClient.invalidateQueries({ queryKey: http.users.get.key() });
       expect({
@@ -615,7 +617,7 @@ describe(createHttpApiQueryUtils, () => {
       keyPrefix: ["test"],
       keyEncoders: { forms: { submit: ({ payload }) => ({ payload }) } },
     });
-    expect(utils.submit.queryKey({ payload: "yes" })).toStrictEqual([
+    expect(utils.submit.queryKey({ input: { payload: "yes" } })).toStrictEqual([
       "test",
       "http",
       "keys",
@@ -635,14 +637,14 @@ describe(createHttpApiQueryUtils, () => {
         },
       },
     });
-    expect(() => invalid.submit.queryKey({ payload: 1 })).toThrow(
+    expect(() => invalid.submit.queryKey({ input: { payload: 1 } })).toThrow(
       expect.objectContaining({
         _tag: "EffectHttpApiQueryKeyError",
         code: "KeyEncoderFailed",
         cause,
       })
     );
-    expect(() => invalid.submit.queryKey({ payload: 1 })).toThrow(
+    expect(() => invalid.submit.queryKey({ input: { payload: 1 } })).toThrow(
       EffectHttpApiQueryKeyError
     );
   });
@@ -668,7 +670,7 @@ describe(createHttpApiQueryUtils, () => {
       headers: { "x-version": 3 },
       payload: { name: "Ada" },
     };
-    const key = utils.users.save.queryKey(input);
+    const key = utils.users.save.queryKey({ input });
     expect(key.at(-1)).toStrictEqual({
       params: { id: "1" },
       query: { page: "2" },
@@ -679,7 +681,9 @@ describe(createHttpApiQueryUtils, () => {
     expect(key.at(-1)).toMatchObject({ payload: { name: "Ada" } });
     /* oxlint-disable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
     expect(() =>
-      utils.users.save.queryKey({ ...input, params: { id: "raw" } } as never)
+      utils.users.save.queryKey({
+        input: { ...input, params: { id: "raw" } },
+      } as never)
     ).toThrow(
       expect.objectContaining({
         code: "RequestEncodingFailed",
@@ -692,7 +696,7 @@ describe(createHttpApiQueryUtils, () => {
       keyPrefix: ["test"],
       keyEncoders: { users: { save: () => Number.NaN } },
     });
-    expect(() => unsafe.users.save.queryKey(input)).toThrow(
+    expect(() => unsafe.users.save.queryKey({ input })).toThrow(
       expect.objectContaining({ code: "InvalidKeyValue" })
     );
   });
@@ -731,7 +735,9 @@ describe(createHttpApiQueryUtils, () => {
       );
       expect({
         rootKey: unprefixed.key(),
-        queryKey: unprefixed.users.get.queryKey({ params: { id: 5 } }),
+        queryKey: unprefixed.users.get.queryKey({
+          input: { params: { id: 5 } },
+        }),
         fetched,
       }).toStrictEqual({
         rootKey: ["http", "test"],

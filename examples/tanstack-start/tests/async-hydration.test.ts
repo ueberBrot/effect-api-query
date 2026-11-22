@@ -109,7 +109,9 @@ describe("Start snapshot preparation", () => {
       expect(users?.[0]?.name).toBe("Ada Lovelace");
       expect(
         browser.queryClient.getQueryData(
-          browser.rpcQuery.users.page.infiniteKey({ cursor: 0, pageSize: 4 })
+          browser.rpcQuery.users.page.infiniteKey({
+            input: { cursor: 0, pageSize: 4 },
+          })
         )
       ).toMatchObject({ pageParams: [0], pages: [{ total: 12 }] });
       serverRouter.serverSsr?.cleanup();

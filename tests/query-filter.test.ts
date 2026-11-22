@@ -37,9 +37,9 @@ describe("query filters", () => {
           keyPrefix: ["filters"],
         });
         const queryClient = new QueryClient();
-        const english = rpc.read.queryKey({ id: 1 });
-        const french = rpc.read.queryKey({ id: 1, locale: "fr" });
-        const otherUser = rpc.read.queryKey({ id: 2 });
+        const english = rpc.read.queryKey({ input: { id: 1 } });
+        const french = rpc.read.queryKey({ input: { id: 1, locale: "fr" } });
+        const otherUser = rpc.read.queryKey({ input: { id: 2 } });
         queryClient.setQueryData(english, "en");
         queryClient.setQueryData(french, "fr");
         queryClient.setQueryData(otherUser, "en");
@@ -77,8 +77,8 @@ describe("query filters", () => {
     });
     const input = { params: { id: 1 }, headers: { "X-Locale": "en" } };
     const queryClient = new QueryClient();
-    queryClient.setQueryData(http.users.read.queryKey(input), "one");
-    queryClient.setQueryData(http.users.read.metadataKey(input), {
+    queryClient.setQueryData(http.users.read.queryKey({ input }), "one");
+    queryClient.setQueryData(http.users.read.metadataKey({ input }), {
       data: "one",
       status: 200,
       headers: {},
@@ -127,7 +127,10 @@ describe("query filters", () => {
         )(null);
         projection.entity.id = 2;
         const queryClient = new QueryClient();
-        queryClient.setQueryData(rpc.read.queryKey({ id: 1, locale: "en" }), 1);
+        queryClient.setQueryData(
+          rpc.read.queryKey({ input: { id: 1, locale: "en" } }),
+          1
+        );
         expect(queryClient.getQueryCache().findAll(filter)).toHaveLength(1);
         expect(Object.isFrozen(filter.queryKey)).toBe(true);
         expect(Object.isFrozen(filter.queryKey?.at(-1))).toBe(true);

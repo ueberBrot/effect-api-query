@@ -69,12 +69,25 @@ export type RunnerRequirement<Services> = [Services] extends [never]
       readonly runtime: RuntimeInput<Services>;
     };
 
+export declare const utilityPaths: unique symbol;
+
+export type ParentPrefixes<
+  Path extends string,
+  Prefix extends string = "",
+> = Path extends `${infer Head}.${infer Tail}`
+  ?
+      | (Prefix extends "" ? Head : `${Prefix}.${Head}`)
+      | ParentPrefixes<Tail, Prefix extends "" ? Head : `${Prefix}.${Head}`>
+  : never;
+
+export type PathsFromTags<Tags extends string> = Tags | ParentPrefixes<Tags>;
+
 /** Uses the adapter's inputless proof to determine key-builder arguments. */
 export type KeyBuilder<Input, Key, Inputless extends boolean> = [
   Inputless,
 ] extends [true]
   ? () => Key
-  : (input: Input | PreparedInput<Input>) => Key;
+  : (options: { readonly input: Input | PreparedInput<Input> }) => Key;
 
 export type OwnedQueryOption =
   | "queryFn"

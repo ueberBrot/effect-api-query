@@ -26,7 +26,12 @@ import {
 import type { UtilityNode } from "./configure-utils";
 import { resolveRuntime } from "./runtime";
 import type { RunPromiseExit, RuntimeInput } from "./types";
-import { readLeafDescriptor } from "./utility-tree";
+import {
+  buildBranchFrom,
+  defineLazyLeafDescriptor,
+  readLazyLeafSlot,
+  readLeafDescriptor,
+} from "./utility-tree";
 
 type RuntimeUtilityNode = RuntimeOptions & UtilityNode;
 
@@ -275,25 +280,56 @@ export const acquireQueryOwner = async <A>(
       trackedOwners.set(trackedConfigured, ownerToken);
       return trackedConfigured;
     }
-    const children = Object.entries(node).filter(
-      (entry): entry is [string, RuntimeUtilityNode] => isUtilityChild(entry[1])
-    );
-    if (children.length === 0) {
+    let hasChildren = false;
+    const replacements = new Map<string, PropertyDescriptor>();
+    for (const name of Object.keys(node)) {
+      if (name === "key") {
+        continue;
+      }
+      const descriptor = Object.getOwnPropertyDescriptor(node, name);
+      if (descriptor === undefined) {
+        continue;
+      }
+      const slot = readLazyLeafSlot(descriptor);
+      if (slot !== undefined) {
+        hasChildren = true;
+        if (slot.ownerToken !== undefined) {
+          if (slot.ownerToken !== ownerToken) {
+            throw new Error(
+              "Utility node is already tracked by another query owner"
+            );
+          }
+          continue;
+        }
+        replacements.set(
+          name,
+          defineLazyLeafDescriptor(
+            () => trackNode(slot.materialize()),
+            ownerToken
+          )
+        );
+        continue;
+      }
+      if ("value" in descriptor && isUtilityChild(descriptor.value)) {
+        hasChildren = true;
+        const trackedChild = trackNode(descriptor.value);
+        if (trackedChild !== descriptor.value) {
+          replacements.set(name, {
+            value: trackedChild,
+            enumerable: true,
+            writable: false,
+            configurable: false,
+          });
+        }
+      }
+    }
+    if (!hasChildren) {
       return trackLeaf(node);
     }
-    let changed = false;
-    const nextBranch: RuntimeUtilityNode = { ...node };
-    for (const [name, child] of children) {
-      const trackedChild = trackNode(child);
-      if (trackedChild !== child) {
-        changed = true;
-      }
-      nextBranch[name] = trackedChild;
-    }
-    if (!changed) {
+    if (replacements.size === 0) {
       return node;
     }
-    const frozen = Object.freeze(nextBranch);
+    const frozen = buildBranchFrom(node, replacements);
     trackedOwners.set(frozen, ownerToken);
     return frozen;
   };

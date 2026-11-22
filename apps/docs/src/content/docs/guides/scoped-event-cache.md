@@ -84,7 +84,7 @@ export const acquireDirectoryEvents = async (
         const snapshot = yield* connection.refresh;
         for (const user of snapshot.users) {
           yield* queryEffects.setData(
-            rpc.users.read.queryKey({ id: user.id }),
+            rpc.users.read.queryKey({ input: { id: user.id } }),
             user
           );
         }
@@ -99,7 +99,7 @@ export const acquireDirectoryEvents = async (
       onEvent: (event) =>
         Effect.gen(function* onEvent() {
           yield* queryEffects.setData(
-            rpc.users.read.queryKey({ id: event.id }),
+            rpc.users.read.queryKey({ input: { id: event.id } }),
             {
               id: event.id,
               name: event.name,

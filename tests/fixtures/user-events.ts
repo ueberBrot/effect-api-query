@@ -109,13 +109,17 @@ export const makeUserEventConsumer = Effect.fnUntraced(
                 : []),
               ...[...users.values()].flatMap(({ id, locale }) => [
                 {
-                  queryKey: rpcQuery.users.get.queryKey({ id, locale }),
+                  queryKey: rpcQuery.users.get.queryKey({
+                    input: { id, locale },
+                  }),
                   exact: true,
                 },
                 {
                   queryKey: httpQuery.users.get.queryKey({
-                    params: { id },
-                    query: { locale },
+                    input: {
+                      params: { id },
+                      query: { locale },
+                    },
                   }),
                   exact: true,
                 },

@@ -59,7 +59,7 @@ describe("Cancellable command recovery", () => {
         expect(
           fixture.application.queryClient.getQueryState(
             fixture.application.rpcQuery.commands.status.queryKey({
-              operationId: starts[0] ?? "",
+              input: { operationId: starts[0] ?? "" },
             })
           )
         ).toMatchObject({ status: "success", data: null, fetchStatus: "idle" });

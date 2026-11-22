@@ -123,9 +123,9 @@ it.effect(
           async () =>
             await queryClient.query(rpc.users.get.queryOptions({ input }))
         );
-        expect(queryClient.getQueryData(base.users.get.queryKey(input))).toBe(
-          data
-        );
+        expect(
+          queryClient.getQueryData(base.users.get.queryKey({ input }))
+        ).toBe(data);
         expect(Object.isFrozen(rpc.users.get)).toBe(true);
       } finally {
         queryClient.clear();
@@ -492,37 +492,46 @@ it.effect(
             sseOptions: overrideSse,
           });
         expect({
-          streamedKey: configured.events.channel.streamedKey(channelInput),
+          streamedKey: configured.events.channel.streamedKey({
+            input: channelInput,
+          }),
           streamedOptionsKey: channelStreamedOptions.queryKey,
-          streamedOverrideKey: configured.events.channel.streamedKey(
-            channelInput,
-            { sseOptions: overrideSse }
-          ),
-          liveKey: configured.events.channel.liveKey(channelInput),
-          liveOverrideKey: configured.events.channel.liveKey(channelInput, {
+          streamedOverrideKey: configured.events.channel.streamedKey({
+            input: channelInput,
+            sseOptions: overrideSse,
+          }),
+          liveKey: configured.events.channel.liveKey({ input: channelInput }),
+          liveOverrideKey: configured.events.channel.liveKey({
+            input: channelInput,
             sseOptions: overrideSse,
           }),
           liveOverrideOptionsKey: channelOverrideLiveOptions.queryKey,
         }).toStrictEqual({
-          streamedKey: base.events.channel.streamedKey(channelInput, {
+          streamedKey: base.events.channel.streamedKey({
+            input: channelInput,
             maxChunks: 3,
             sseOptions: inheritedSse,
           }),
-          streamedOptionsKey: base.events.channel.streamedKey(channelInput, {
+          streamedOptionsKey: base.events.channel.streamedKey({
+            input: channelInput,
             maxChunks: 3,
             sseOptions: inheritedSse,
           }),
-          streamedOverrideKey: base.events.channel.streamedKey(channelInput, {
+          streamedOverrideKey: base.events.channel.streamedKey({
+            input: channelInput,
             maxChunks: 3,
             sseOptions: overrideSse,
           }),
-          liveKey: base.events.channel.liveKey(channelInput, {
+          liveKey: base.events.channel.liveKey({
+            input: channelInput,
             sseOptions: inheritedSse,
           }),
-          liveOverrideKey: base.events.channel.liveKey(channelInput, {
+          liveOverrideKey: base.events.channel.liveKey({
+            input: channelInput,
             sseOptions: overrideSse,
           }),
-          liveOverrideOptionsKey: base.events.channel.liveKey(channelInput, {
+          liveOverrideOptionsKey: base.events.channel.liveKey({
+            input: channelInput,
             sseOptions: overrideSse,
           }),
         });

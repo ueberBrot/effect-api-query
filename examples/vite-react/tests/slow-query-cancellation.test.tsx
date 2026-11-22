@@ -69,12 +69,14 @@ const makeApplication = ({
     rpcQuery: {
       diagnostics: {
         slow: {
-          queryKey: (input: SlowInput) => slowQuery("rpc", input).queryKey,
+          queryKey: ({ input }: { readonly input: SlowInput }) =>
+            slowQuery("rpc", input).queryKey,
           queryOptions: ({ input }: { readonly input: SlowInput }) =>
             slowQuery("rpc", input),
         },
         operationStatus: {
-          queryKey: (input: StatusInput) => statusQuery("rpc", input).queryKey,
+          queryKey: ({ input }: { readonly input: StatusInput }) =>
+            statusQuery("rpc", input).queryKey,
           queryOptions: ({ input }: { readonly input: StatusInput }) =>
             statusQuery("rpc", input),
         },
@@ -83,8 +85,11 @@ const makeApplication = ({
     httpQuery: {
       diagnostics: {
         slow: {
-          queryKey: ({ query }: { readonly query: SlowInput }) =>
-            slowQuery("http", query).queryKey,
+          queryKey: ({
+            input,
+          }: {
+            readonly input: { readonly query: SlowInput };
+          }) => slowQuery("http", input.query).queryKey,
           queryOptions: ({
             input,
           }: {
@@ -92,8 +97,11 @@ const makeApplication = ({
           }) => slowQuery("http", input.query),
         },
         operationStatus: {
-          queryKey: ({ params }: { readonly params: StatusInput }) =>
-            statusQuery("http", params).queryKey,
+          queryKey: ({
+            input,
+          }: {
+            readonly input: { readonly params: StatusInput };
+          }) => statusQuery("http", input.params).queryKey,
           queryOptions: ({
             input,
           }: {

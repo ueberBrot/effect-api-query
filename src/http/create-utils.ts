@@ -10,7 +10,7 @@ import type {
 } from "./types";
 
 /**
- * Derives an eager, frozen TanStack Query utility tree from an Effect HttpApi contract.
+ * Derives a frozen TanStack Query utility tree with lazy-memoized leaves from an Effect HttpApi contract.
  *
  * The caller retains ownership of the ready HTTP client, transport, and runtime lifecycle.
  *

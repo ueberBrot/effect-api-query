@@ -90,7 +90,7 @@ describe(createRpcQueryUtils, () => {
         branch: utils.users.key(),
         leaf: utils.users.get.key(),
         mutation: utils.users.get.mutationKey(),
-        query: utils.users.get.queryKey({ id: 1 }),
+        query: utils.users.get.queryKey({ input: { id: 1 } }),
         prototypeName: utils.toString.child.key(),
         stream: utils.events.watch.key(),
         streamed: utils.events.watch
@@ -111,8 +111,12 @@ describe(createRpcQueryUtils, () => {
       expect({
         root: Object.isFrozen(utils),
         branch: Object.isFrozen(utils.users),
-        queryKey: Object.isFrozen(utils.users.get.queryKey({ id: 1 })),
-        payload: Object.isFrozen(utils.users.get.queryKey({ id: 1 }).at(-1)),
+        queryKey: Object.isFrozen(
+          utils.users.get.queryKey({ input: { id: 1 } })
+        ),
+        payload: Object.isFrozen(
+          utils.users.get.queryKey({ input: { id: 1 } }).at(-1)
+        ),
       }).toStrictEqual({
         root: true,
         branch: true,
@@ -399,7 +403,7 @@ describe(createRpcQueryUtils, () => {
         const client = yield* makeClient();
         const utils = createRpcQueryUtils(group, { client });
         expect(utils.key()).toStrictEqual(["rpc"]);
-        expect(utils.users.get.queryKey({ id: 7 })).toStrictEqual([
+        expect(utils.users.get.queryKey({ input: { id: 7 } })).toStrictEqual([
           "rpc",
           "users",
           "get",

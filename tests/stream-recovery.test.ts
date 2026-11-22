@@ -448,7 +448,10 @@ it.effect(
             .getAll()
             .map((query) => query.queryKey)
         ).toStrictEqual([
-          rpc.watch.streamedKey({ feed: "news" }, { maxChunks: "unbounded" }),
+          rpc.watch.streamedKey({
+            input: { feed: "news" },
+            maxChunks: "unbounded",
+          }),
         ]);
       } finally {
         queryClient.clear();

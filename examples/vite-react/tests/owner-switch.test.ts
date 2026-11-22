@@ -158,7 +158,7 @@ describe("existing Vite application owner handoff", () => {
           await Effect.runPromise(Deferred.await(releaseCallback));
           if (captured.isActive()) {
             captured.queryClient.setQueryData(
-              captured.rpcQuery.users.get.queryKey({ id: user.id }),
+              captured.rpcQuery.users.get.queryKey({ input: { id: user.id } }),
               user
             );
           }

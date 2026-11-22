@@ -230,11 +230,28 @@ const createQueryBuilders = (
 
   prepareIdentity?: (options: Record<string, unknown>) => readonly JsonValue[]
 ) => ({
-  key: (input?: unknown, policy?: Record<string, unknown>) => {
-    const options = description.input._tag === "Inputless" ? input : policy;
-    const identity =
-      prepareIdentity?.(Predicate.isObject(options) ? { ...options } : {}) ??
-      [];
+  key: (argument?: unknown) => {
+    if (argument !== undefined && !Predicate.isObject(argument)) {
+      throw new TypeError("Query key options must be an object");
+    }
+    if (description.input._tag === "Inputless") {
+      const options = argument === undefined ? {} : { ...argument };
+      const identity = prepareIdentity?.(options) ?? [];
+      return prepareQuery(
+        description,
+        undefined,
+        operationKey,
+        keyEncoder,
+        identity
+      ).key;
+    }
+    if (argument === undefined) {
+      throw new TypeError("Query key options must be an object");
+    }
+    const options = { ...argument };
+    const { input } = options;
+    delete options["input"];
+    const identity = prepareIdentity?.(options) ?? [];
     return prepareQuery(description, input, operationKey, keyEncoder, identity)
       .key;
   },
@@ -275,8 +292,25 @@ const createInfiniteBuilders = (
 ) => {
   const infiniteOperationKey = freezeKey([...operationKey, "infinite"]);
 
-  const infiniteKey = (input?: unknown) =>
-    prepareQuery(description, input, infiniteOperationKey, keyEncoder).key;
+  const infiniteKey = (argument?: unknown) => {
+    if (description.input._tag === "Inputless") {
+      return prepareQuery(
+        description,
+        undefined,
+        infiniteOperationKey,
+        keyEncoder
+      ).key;
+    }
+    if (!Predicate.isObject(argument)) {
+      throw new TypeError("Query key options must be an object");
+    }
+    return prepareQuery(
+      description,
+      argument["input"],
+      infiniteOperationKey,
+      keyEncoder
+    ).key;
+  };
 
   const infiniteOptions = (argument: Record<string, unknown>) => {
     const { input, options, requestOptions } = prepareQueryOptions(
@@ -464,9 +498,14 @@ const createStreamingBuilders = (
 };
 
 const deepFreezeTree = (value: Record<string, unknown>) => {
-  for (const child of Object.values(value)) {
-    if (Predicate.isObject(child)) {
-      deepFreezeTree(child);
+  for (const key of Object.keys(value)) {
+    const descriptor = Object.getOwnPropertyDescriptor(value, key);
+    if (
+      descriptor !== undefined &&
+      "value" in descriptor &&
+      Predicate.isObject(descriptor.value)
+    ) {
+      deepFreezeTree(descriptor.value);
     }
   }
   return Object.freeze(value);
@@ -507,11 +546,58 @@ export interface LeafRuntimeDescriptor {
   ) => Record<string, unknown>;
 }
 
+export interface LazyLeafSlot {
+  readonly materialize: () => Record<string, unknown> & UtilityNode;
+  readonly ownerToken?: symbol | undefined;
+}
+
 const leafDescriptors = new WeakMap<UtilityNode, LeafRuntimeDescriptor>();
+const lazyLeafGetters = new WeakMap<() => unknown, LazyLeafSlot>();
 
 export const readLeafDescriptor = (
   node: UtilityNode
 ): LeafRuntimeDescriptor | undefined => leafDescriptors.get(node);
+
+export const defineLazyLeafDescriptor = (
+  materialize: () => Record<string, unknown> & UtilityNode,
+  ownerToken?: symbol
+): PropertyDescriptor => {
+  let cached: (Record<string, unknown> & UtilityNode) | undefined;
+  const get = () => {
+    cached ??= materialize();
+    return cached;
+  };
+  lazyLeafGetters.set(get, { materialize: get, ownerToken });
+  return {
+    enumerable: true,
+    configurable: false,
+    get,
+  };
+};
+
+export const readLazyLeafSlot = (
+  descriptor: PropertyDescriptor | undefined
+): LazyLeafSlot | undefined => {
+  // oxlint-disable-next-line typescript/unbound-method
+  const getter = descriptor?.get;
+  return getter === undefined ? undefined : lazyLeafGetters.get(getter);
+};
+
+export const buildBranchFrom = (
+  source: Record<string, unknown> & UtilityNode,
+  replacements: ReadonlyMap<string, PropertyDescriptor>
+): Record<string, unknown> & UtilityNode => {
+  const next: Record<string, unknown> = {};
+  for (const name of Object.keys(source)) {
+    const descriptor =
+      replacements.get(name) ?? Object.getOwnPropertyDescriptor(source, name);
+    if (descriptor !== undefined) {
+      Object.defineProperty(next, name, descriptor);
+    }
+  }
+  // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
+  return Object.freeze(next) as Record<string, unknown> & UtilityNode;
+};
 
 const insertLeaf = (
   tree: Record<string, unknown>,
@@ -572,12 +658,18 @@ const insertLeaf = (
     }
     return Object.freeze({ key: leafKey, ...builders });
   };
-  const leaf = buildLeaf(runPromiseExit);
-  leafDescriptors.set(leaf, { runner: runPromiseExit, rebuild: buildLeaf });
-  if (operation.kind !== "Mutation") {
-    registerInputOwner(leaf.key, operation.input, keyEncoder);
-  }
-  branch[leafName] = leaf;
+  Object.defineProperty(
+    branch,
+    leafName,
+    defineLazyLeafDescriptor(() => {
+      const leaf = buildLeaf(runPromiseExit);
+      leafDescriptors.set(leaf, { runner: runPromiseExit, rebuild: buildLeaf });
+      if (operation.kind !== "Mutation") {
+        registerInputOwner(leaf.key, operation.input, keyEncoder);
+      }
+      return leaf;
+    })
+  );
 };
 
 const createTree = (

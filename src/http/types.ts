@@ -25,6 +25,7 @@ import type {
   RunnerRequirement,
   StreamedPolicyOptions,
   LivePolicyOptions,
+  utilityPaths,
 } from "../core/types";
 import type {
   EffectHttpApiQueryConfigError,
@@ -523,8 +524,9 @@ export type StreamedLeaf<
         policy: HttpStreamPolicy<Endpoint>
       ) => StreamedKey<Endpoint, Key, ClientError>
     : (
-        input: Request<Endpoint> | PreparedInput<Request<Endpoint>>,
-        policy: HttpStreamPolicy<Endpoint>
+        options: {
+          readonly input: Request<Endpoint> | PreparedInput<Request<Endpoint>>;
+        } & HttpStreamPolicy<Endpoint>
       ) => StreamedKey<Endpoint, Key, ClientError>;
   readonly streamedOptions: UnaryQueryBuilder<
     Request<Endpoint>,
@@ -566,8 +568,10 @@ export type LiveLeaf<
         policy?: HttpDecoderPolicy<Endpoint> & LivePolicyOptions
       ) => LiveKey<Endpoint, Key, ClientError>
     : (
-        input: Request<Endpoint> | PreparedInput<Request<Endpoint>>,
-        policy?: HttpDecoderPolicy<Endpoint> & LivePolicyOptions
+        options: {
+          readonly input: Request<Endpoint> | PreparedInput<Request<Endpoint>>;
+        } & HttpDecoderPolicy<Endpoint> &
+          LivePolicyOptions
       ) => LiveKey<Endpoint, Key, ClientError>;
   readonly liveOptions: UnaryQueryBuilder<
     Request<Endpoint>,
@@ -611,11 +615,27 @@ export type EndpointLeaf<
         : never
     : never;
 
+export type HttpGroupPaths<Group extends HttpApiGroup.Constraint> = Supported<
+  Endpoints<Group>
+>["identifier"];
+
+export type HttpApiPaths<Api extends HttpApi.Constraint> =
+  SupportedGroups<Api> extends infer Group
+    ? Group extends HttpApiGroup.Constraint
+      ? Group extends { readonly topLevel: true }
+        ? HttpGroupPaths<Group>
+        :
+            | Group["identifier"]
+            | `${Group["identifier"]}.${HttpGroupPaths<Group>}`
+      : never
+    : never;
+
 export type GroupTree<
   RootKey extends readonly JsonValue[],
   Group extends HttpApiGroup.Constraint,
   GroupClient,
 > = {
+  readonly [utilityPaths]?: HttpGroupPaths<Group>;
   readonly key: () => readonly [...RootKey, Group["identifier"]];
 } & {
   readonly [
@@ -629,13 +649,14 @@ export type GroupTree<
 
 declare const httpQueryClient: unique symbol;
 
-/** An eager utility tree mirroring the ready HTTP client's literal properties. */
+/** A utility tree with lazy-memoized frozen leaves mirroring the ready HTTP client's literal properties. */
 export type HttpApiQueryUtils<
   Api extends HttpApi.Constraint,
   Prefix extends OptionalKeyPrefix = readonly [],
   Client = HttpApiClient.ForApi<Api>,
 > = {
   readonly [httpQueryClient]?: Client;
+  readonly [utilityPaths]?: HttpApiPaths<Api>;
   readonly key: () => Root<Api, Prefix>;
 } & {
   readonly [

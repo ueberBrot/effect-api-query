@@ -78,11 +78,13 @@ true satisfies Assert<Equal<(typeof suspense)[1]["data"], number>>;
 true satisfies Assert<Equal<(typeof suspense)[1]["error"], StreamError | null>>;
 
 const queryClient = new QueryClient();
-const cachedUser = queryClient.getQueryData(rpc.read.queryKey({ id: 1 }));
-const cachedHistory = queryClient.getQueryData(
-  rpc.watch.streamedKey({ id: 1 })
+const cachedUser = queryClient.getQueryData(
+  rpc.read.queryKey({ input: { id: 1 } })
 );
-const historyKey = rpc.watch.streamedKey({ id: 1 });
+const cachedHistory = queryClient.getQueryData(
+  rpc.watch.streamedKey({ input: { id: 1 } })
+);
+const historyKey = rpc.watch.streamedKey({ input: { id: 1 } });
 const inputlessHistoryKey = rpc.ticks.streamedKey();
 true satisfies Assert<Equal<(typeof historyKey)["length"], 6>>;
 true satisfies Assert<Equal<(typeof inputlessHistoryKey)["length"], 5>>;

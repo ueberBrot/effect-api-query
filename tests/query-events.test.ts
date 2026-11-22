@@ -283,7 +283,9 @@ describe("owner event consumption", () => {
                 })
             );
             const { owner } = app;
-            const key = owner.resources.rpc.users.read.queryKey({ id: 1 });
+            const key = owner.resources.rpc.users.read.queryKey({
+              input: { id: 1 },
+            });
             const values: unknown[] = [];
             const unsubscribe = owner.queryClient
               .getQueryCache()
@@ -300,7 +302,7 @@ describe("owner event consumption", () => {
             });
             expect(
               owner.queryClient.getQueryData(
-                owner.resources.rpc.users.read.queryKey({ id: 2 })
+                owner.resources.rpc.users.read.queryKey({ input: { id: 2 } })
               )
             ).toStrictEqual({ id: 2, name: "refreshed" });
             expect(owner.queryClient.getQueryState(key)?.isInvalidated).toBe(

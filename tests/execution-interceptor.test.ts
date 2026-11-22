@@ -54,7 +54,9 @@ it.effect(
       const skipped = read({ input: skipToken });
       expect(skipped.queryFn).toBe(skipToken);
       const options = read({ input: { id: 42 }, retry: 1, retryDelay: 0 });
-      expect(options.queryKey).toStrictEqual(rpc.read.queryKey({ id: 42 }));
+      expect(options.queryKey).toStrictEqual(
+        rpc.read.queryKey({ input: { id: 42 } })
+      );
       const queryClient = new QueryClient();
       expect(
         yield* Effect.promise(async () => await queryClient.query(options))

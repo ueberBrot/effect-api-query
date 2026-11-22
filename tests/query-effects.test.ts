@@ -210,7 +210,7 @@ it.effect(
         id: 1,
         name: "Grace",
       });
-      const key = application.rpc.users.read.queryKey({ id: 1 });
+      const key = application.rpc.users.read.queryKey({ input: { id: 1 } });
       expect(client.getQueryData(key)).toStrictEqual({ id: 1, name: "Grace" });
       expect(client.getQueryState(key)?.isInvalidated).toBe(true);
       client.clear();
