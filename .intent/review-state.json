@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "62d16c9e97d4d43567b2f38f8d8343934962e2f5688302c144e5801d2a288296",
+      "fingerprint": "0da44a506e3039207d198f023f0da5fa47ed46a5c70d4db1985dc6bccb8605f5",
       "snapshot": {
         "GLOSSARY.md": "4532453f4efb696d95c66aabb9f62863e28984bb961f97ee288034af62d76f29",
         "README.md": "87db3a47ce666b408001c89b81b2133393eb2074c63ba1ac1786be8e20b96dfd",
@@ -212,7 +212,7 @@
         "src/core/policy.ts": "ced3a6fdf1ab7e273eb518700a42d68b4823abdb1088fae6855424e4e479ded4",
         "src/core/prepared-input.ts": "4fd806b273f95ad2aafb382e89df1d0443f8c270a0e575f1690d7e6564e443c7",
         "src/core/query-descriptor.ts": "a23e937f8ff9856ee867131539a8c3f943871cbac18e1243dbdf4c5bd8537546",
-        "src/core/query-effects.ts": "3b8103de67a3a3802a34f54cdb61b85825872eb179398d20037aee1b49a14908",
+        "src/core/query-effects.ts": "d57712c6a11f68889056db64652676584426e65af3b522b8dc30e3b7f67e8585",
         "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
         "src/core/query-owner.ts": "6b3b3ae28b5f4de4b2beaefb3cfd34fd17b9fc8396542e0e2400347e4b563be4",
@@ -228,10 +228,10 @@
         "src/core/view-prefix.ts": "dfc0d74a07c8afe3f63952d59c29088ba4afb45e11a402ef8b72c5e2282cb063",
         "src/http/create-utils.ts": "8d128bb9646e095456d3dcf696f1aa6e365d0de328df571c64eea7421935c9f5",
         "src/http/errors.ts": "afa6e7a015a257683ec8d96d5d5da1ffc25a79b0ff498fddb538e059af7643b3",
-        "src/http/operation.ts": "257797a0e21686e1e3f9fb521f3a348648f328ed1751d68078717d801c82b4f1",
+        "src/http/operation.ts": "ec7259de890fa25ee7344bb529899ef9cf36b1c40c274a7586fd5eea8853cd0d",
         "src/http/request.ts": "dd416c91cfdd4fcee80afd757600eafac90d0ebfd6db45c6187c26e6e5dafd53",
         "src/http/streamed-query.ts": "27d1f5418009216d960816485cfd7f1760a8e3f638ccb9ac8dfa5fc040b1564a",
-        "src/http/types.ts": "83ea940359e9df011149bff868618d04075d88f334acb210fa0d418a052b408d",
+        "src/http/types.ts": "206ccdd93dab58764da543a8a3b0ea66fbbf353d894238d185786cb11251aaf4",
         "src/index.ts": "85ed201a88913658d6d55d780e33f549444c1bbb591e593d22f842e70199c9c0",
         "src/rpc/create-utils.ts": "8ebf030b0f76f91c248434c169d789d6328d2ba43c07afe15e04db0a02f05c2c",
         "src/rpc/errors.ts": "8e1fbcc7843b2bf99e9d80bfd365dc118d52351909d5c8f48c46ba9d39fdedd3",
@@ -275,7 +275,7 @@
         "tests/framework-consumers/svelte.ts": "652f8d97d781803239ca667497768077167fffaabec851d5a076f692c376223c",
         "tests/framework-consumers/vue.ts": "e23859e5fe8f8e24a55d8e782dd2880d1a6d88859bdf40ff7b60e8b0c150ab50",
         "tests/http-cached-views.test.ts": "8df1da4d541d18830da6bd14334d670589e55e6c4bfb50175dc198444a96f129",
-        "tests/http-execution.test.ts": "6028f24344ad7c8b60c564677a4b72faa12f030da6d7511f8b37adb337ebeace",
+        "tests/http-execution.test.ts": "24eed09a6752e16b37ab6b702cf0d53b28f00616a8605518264de1bf36b2e0fb",
         "tests/http-hydration.test.ts": "51da967534267d49dc91f577f43a54fc88045cce8f89623c1106df8c88c21570",
         "tests/http-live-query.test.ts": "43dece9673bf6aa381c11a49fbc9a3cdd471c55e446d5f0fb4c206bed9ed5eb8",
         "tests/http-metadata-options.test.ts": "702a73eb9e005d038d35c233806a065ab4da7d35fa1255df336711bd09be96d4",
@@ -290,7 +290,7 @@
         "tests/live-coalescing.test.ts": "e5456fa321374e61dfef6992ebc706c9c558803795393b55da10e33c926bf413",
         "tests/publication-deadline.test.ts": "2797557ff14bf8527ea446cec1e1d7c61cd3666f11f127e640c53ce5d7e30868",
         "tests/query-descriptor.test.ts": "8e23e94f2028c77f55887e0e0492213cbf5920de88b19a6933e1ea79e385a5ab",
-        "tests/query-effects.test.ts": "20fa4c208e8bdee1c95987c87419be519ed201a46770dbd8502c8bde5fc20677",
+        "tests/query-effects.test.ts": "247508f2c53dac4de5317769b9d7a55b818fb962df91d2232acc54711d5ddd2d",
         "tests/query-events.test.ts": "27c913c8ff1d65384a70695ef891e156f99ac122bc36e5be10f195b568b5e7b5",
         "tests/query-filter.test.ts": "ff531a86816872cd2cadf01d79bd9d9ff5be1895bab150330a90aa8375508004",
         "tests/query-owner.test.ts": "624e6e54189f887d9c7311731440d52530e7a97b0aa5db4a2fb392f12d20c182",
@@ -340,7 +340,7 @@
         "tests/types/example-owner-contract.ts": "ed58343a4a7da9606e07703d19f3c0470e25923c81de357c0dbfd1258c3fc439",
         "tests/types/generic-client-error-contract.tsx": "f0b2f55deffde27ff745209485f9f8b817e4e537e8c60efd345946b77cf54bd9",
         "tests/types/helper-contract.ts": "c40e14a64a8429052bf64523abd0ac9f41c3ee38c707c5bd86f0809964307e52",
-        "tests/types/http-contract.ts": "eae48b86aeced5dbf82e23f3053b28a99e5386a086d767f7739ede4037c15001",
+        "tests/types/http-contract.ts": "a1e3d1507728adba64497881d75794adbc6a353f9a54ea588c9305bffe5ef361",
         "tests/types/http-empty-success-contract.ts": "00ccdb360edc598b9bc6c8a7708dab6b7ca85cf267ce7caa9a81a6b52f2868d5",
         "tests/types/http-ndjson-contract.ts": "c44bf1d296958be46c35e97a7803a36141eb40d1346d6df9d5b3e7e428b8ac1a",
         "tests/types/http-stream-contract.ts": "1bfaa95c6237341b8137e81f1b1ffa17e5374dca2407328b324d86b3080fd815",
@@ -371,17 +371,16 @@
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6",
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca"
       },
-      "head": "6447731648f38d0aa3afeb5a315c5051aa8f0400",
+      "head": "691db78d79a84fffb27922c6c8b30ac77a69accd",
       "outcome": "no-change",
-      "reason": "The final integration fixes preserve the revised guidance. ensure returns unselected cached data and honors inherited initial data for optional refresh. Native key hashing remains the fallback. Structural sharing still rejects traversed cycles and leaves accessor-backed arrays intact. Aborted coalesced queries still wait for cleanup.",
+      "reason": "The review fixes preserve the published HTTP error types, method invocation contract, and queryEffects error behavior already covered by the skill and planning records.",
       "evidence": [
-        "Commit 6447731, compared with the reviewed release-preparation commit 2be58bf. Inspected source, guide, cache-workflows, HTTP and query-pattern guidance.",
-        "vp run skills-check passed. The eight focused query-effects, filter, hydration, structural sharing, RPC/HTTP live stream, and query owner test files passed 96 tests.",
-        "Independent skill discovery was not tested."
+        "Reviewed the cache workflow and HTTP references plus the existing domain map, specification, and tree. No new consumer steps or task mappings are needed.",
+        "The focused queryEffects and HTTP execution suites passed all 33 tests. The public overload fixture passed both compilers, and all 36 compiler baseline cases passed their existing budgets."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "084d946e039c8fb7c5cf25d058f2ad9a90d7a4fa6c2c89d5744d1fc6e5f35ed7",
+      "fingerprint": "2262b62e4af080324bbc23fac8f84942df24fa337059171c4dca00ed1e72d90d",
       "snapshot": {
         "GLOSSARY.md": "4532453f4efb696d95c66aabb9f62863e28984bb961f97ee288034af62d76f29",
         "README.md": "87db3a47ce666b408001c89b81b2133393eb2074c63ba1ac1786be8e20b96dfd",
@@ -593,7 +592,7 @@
         "src/core/policy.ts": "ced3a6fdf1ab7e273eb518700a42d68b4823abdb1088fae6855424e4e479ded4",
         "src/core/prepared-input.ts": "4fd806b273f95ad2aafb382e89df1d0443f8c270a0e575f1690d7e6564e443c7",
         "src/core/query-descriptor.ts": "a23e937f8ff9856ee867131539a8c3f943871cbac18e1243dbdf4c5bd8537546",
-        "src/core/query-effects.ts": "3b8103de67a3a3802a34f54cdb61b85825872eb179398d20037aee1b49a14908",
+        "src/core/query-effects.ts": "d57712c6a11f68889056db64652676584426e65af3b522b8dc30e3b7f67e8585",
         "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
         "src/core/query-owner.ts": "6b3b3ae28b5f4de4b2beaefb3cfd34fd17b9fc8396542e0e2400347e4b563be4",
@@ -609,10 +608,10 @@
         "src/core/view-prefix.ts": "dfc0d74a07c8afe3f63952d59c29088ba4afb45e11a402ef8b72c5e2282cb063",
         "src/http/create-utils.ts": "8d128bb9646e095456d3dcf696f1aa6e365d0de328df571c64eea7421935c9f5",
         "src/http/errors.ts": "afa6e7a015a257683ec8d96d5d5da1ffc25a79b0ff498fddb538e059af7643b3",
-        "src/http/operation.ts": "257797a0e21686e1e3f9fb521f3a348648f328ed1751d68078717d801c82b4f1",
+        "src/http/operation.ts": "ec7259de890fa25ee7344bb529899ef9cf36b1c40c274a7586fd5eea8853cd0d",
         "src/http/request.ts": "dd416c91cfdd4fcee80afd757600eafac90d0ebfd6db45c6187c26e6e5dafd53",
         "src/http/streamed-query.ts": "27d1f5418009216d960816485cfd7f1760a8e3f638ccb9ac8dfa5fc040b1564a",
-        "src/http/types.ts": "83ea940359e9df011149bff868618d04075d88f334acb210fa0d418a052b408d",
+        "src/http/types.ts": "206ccdd93dab58764da543a8a3b0ea66fbbf353d894238d185786cb11251aaf4",
         "src/index.ts": "85ed201a88913658d6d55d780e33f549444c1bbb591e593d22f842e70199c9c0",
         "src/rpc/create-utils.ts": "8ebf030b0f76f91c248434c169d789d6328d2ba43c07afe15e04db0a02f05c2c",
         "src/rpc/errors.ts": "8e1fbcc7843b2bf99e9d80bfd365dc118d52351909d5c8f48c46ba9d39fdedd3",
@@ -656,7 +655,7 @@
         "tests/framework-consumers/svelte.ts": "652f8d97d781803239ca667497768077167fffaabec851d5a076f692c376223c",
         "tests/framework-consumers/vue.ts": "e23859e5fe8f8e24a55d8e782dd2880d1a6d88859bdf40ff7b60e8b0c150ab50",
         "tests/http-cached-views.test.ts": "8df1da4d541d18830da6bd14334d670589e55e6c4bfb50175dc198444a96f129",
-        "tests/http-execution.test.ts": "6028f24344ad7c8b60c564677a4b72faa12f030da6d7511f8b37adb337ebeace",
+        "tests/http-execution.test.ts": "24eed09a6752e16b37ab6b702cf0d53b28f00616a8605518264de1bf36b2e0fb",
         "tests/http-hydration.test.ts": "51da967534267d49dc91f577f43a54fc88045cce8f89623c1106df8c88c21570",
         "tests/http-live-query.test.ts": "43dece9673bf6aa381c11a49fbc9a3cdd471c55e446d5f0fb4c206bed9ed5eb8",
         "tests/http-metadata-options.test.ts": "702a73eb9e005d038d35c233806a065ab4da7d35fa1255df336711bd09be96d4",
@@ -671,7 +670,7 @@
         "tests/live-coalescing.test.ts": "e5456fa321374e61dfef6992ebc706c9c558803795393b55da10e33c926bf413",
         "tests/publication-deadline.test.ts": "2797557ff14bf8527ea446cec1e1d7c61cd3666f11f127e640c53ce5d7e30868",
         "tests/query-descriptor.test.ts": "8e23e94f2028c77f55887e0e0492213cbf5920de88b19a6933e1ea79e385a5ab",
-        "tests/query-effects.test.ts": "20fa4c208e8bdee1c95987c87419be519ed201a46770dbd8502c8bde5fc20677",
+        "tests/query-effects.test.ts": "247508f2c53dac4de5317769b9d7a55b818fb962df91d2232acc54711d5ddd2d",
         "tests/query-events.test.ts": "27c913c8ff1d65384a70695ef891e156f99ac122bc36e5be10f195b568b5e7b5",
         "tests/query-filter.test.ts": "ff531a86816872cd2cadf01d79bd9d9ff5be1895bab150330a90aa8375508004",
         "tests/query-owner.test.ts": "624e6e54189f887d9c7311731440d52530e7a97b0aa5db4a2fb392f12d20c182",
@@ -721,7 +720,7 @@
         "tests/types/example-owner-contract.ts": "ed58343a4a7da9606e07703d19f3c0470e25923c81de357c0dbfd1258c3fc439",
         "tests/types/generic-client-error-contract.tsx": "f0b2f55deffde27ff745209485f9f8b817e4e537e8c60efd345946b77cf54bd9",
         "tests/types/helper-contract.ts": "c40e14a64a8429052bf64523abd0ac9f41c3ee38c707c5bd86f0809964307e52",
-        "tests/types/http-contract.ts": "eae48b86aeced5dbf82e23f3053b28a99e5386a086d767f7739ede4037c15001",
+        "tests/types/http-contract.ts": "a1e3d1507728adba64497881d75794adbc6a353f9a54ea588c9305bffe5ef361",
         "tests/types/http-empty-success-contract.ts": "00ccdb360edc598b9bc6c8a7708dab6b7ca85cf267ce7caa9a81a6b52f2868d5",
         "tests/types/http-ndjson-contract.ts": "c44bf1d296958be46c35e97a7803a36141eb40d1346d6df9d5b3e7e428b8ac1a",
         "tests/types/http-stream-contract.ts": "1bfaa95c6237341b8137e81f1b1ffa17e5374dca2407328b324d86b3080fd815",
@@ -752,12 +751,12 @@
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6",
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca"
       },
-      "head": "6447731648f38d0aa3afeb5a315c5051aa8f0400",
+      "head": "691db78d79a84fffb27922c6c8b30ac77a69accd",
       "outcome": "no-change",
-      "reason": "The domain map already covers pre-emission cancellation and SSE defaults. The specification records the patch coverage and its validation seams. The tree still maps the final source and budget edits to the same owning skill and six references.",
+      "reason": "The review fixes preserve the published HTTP error types, method invocation contract, and queryEffects error behavior already covered by the skill and planning records.",
       "evidence": [
-        "Reviewed _artifacts/domain_map.yaml, _artifacts/skill_spec.md, and _artifacts/skill_tree.yaml against 2be58bf and 6447731.",
-        "vp exec intent maintainer sync found nothing to synchronize. The focused public behavior suite passed 96 tests."
+        "Reviewed the cache workflow and HTTP references plus the existing domain map, specification, and tree. No new consumer steps or task mappings are needed.",
+        "The focused queryEffects and HTTP execution suites passed all 33 tests. The public overload fixture passed both compilers, and all 36 compiler baseline cases passed their existing budgets."
       ]
     },
     "source:vite.config.ts": {

@@ -26,6 +26,7 @@ import {
   type EffectHttpApiQueryKeyErrorCode,
   type HttpApiKeyEncoder,
   type HttpApiQueryUtils,
+  type InferQueryError,
   type RunPromiseExit,
 } from "@ueberbrot/effect-api-query";
 import { Context, Effect, Schema } from "effect";
@@ -1317,6 +1318,26 @@ const rawLast = createHttpApiQueryUtils(extraApi, {
 });
 const rawFirstState = queryClient.getQueryState(rawFirst.ping.queryKey());
 const rawLastState = queryClient.getQueryState(rawLast.ping.queryKey());
+type NativeRawPing = (request: {
+  readonly responseMode: "response-only";
+}) => ReturnType<typeof client.ping<"response-only", never>>;
+declare const nativeRawLastPing: typeof client.ping & NativeRawPing;
+const nativeRawLast = createHttpApiQueryUtils(extraApi, {
+  client: { ping: nativeRawLastPing },
+  keyPrefix: ["app"],
+});
+true satisfies Assert<
+  Equal<
+    InferQueryError<typeof nativeRawLast.ping, "query">,
+    InferQueryError<typeof rawFirst.ping, "query">
+  >
+>;
+true satisfies Assert<
+  Equal<
+    InferQueryError<typeof nativeRawLast.ping, "metadata">,
+    InferQueryError<typeof rawFirst.ping, "metadata">
+  >
+>;
 true satisfies Assert<
   Equal<
     NonNullable<typeof rawFirstState>["error"],

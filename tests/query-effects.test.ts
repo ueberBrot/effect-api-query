@@ -412,6 +412,31 @@ it.effect("revalidates stale initial data inherited from query defaults", () =>
 );
 
 it.effect(
+  "reports a staleTime callback failure while ensuring cached data",
+  () =>
+    Effect.gen(function* freshnessCallbackFailure() {
+      const client = new QueryClient();
+      const queryKey = ["freshness-callback-failure"];
+      const cause = new Error("Cannot resolve freshness");
+      client.setQueryData(queryKey, 1);
+      try {
+        const failure = yield* queryEffects
+          .ensure<number>({
+            queryKey,
+            revalidateIfStale: true,
+            staleTime: () => {
+              throw cause;
+            },
+          })
+          .pipe(Effect.flip, Effect.provideService(QueryClientService, client));
+        expect(failure.cause).toBe(cause);
+      } finally {
+        client.clear();
+      }
+    })
+);
+
+it.effect(
   "preserves stale/fresh reuse semantics for fetch, ensure, and revalidateIfStale",
   () =>
     Effect.gen(function* cacheReuseSemantics() {

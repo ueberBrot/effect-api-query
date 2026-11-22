@@ -624,16 +624,19 @@ describe("HTTP execution", () => {
     );
     let observedReceiver: unknown;
     const items = {
-      read: new Proxy(baseClient.items.read, {
-        apply(
-          target,
-          thisArg,
-          argArray: Parameters<typeof baseClient.items.read>
-        ) {
-          observedReceiver = thisArg;
-          return target(...argArray);
-        },
-      }),
+      read: Object.assign(
+        new Proxy(baseClient.items.read, {
+          apply(
+            target,
+            thisArg,
+            argArray: Parameters<typeof baseClient.items.read>
+          ) {
+            observedReceiver = thisArg;
+            return target(...argArray);
+          },
+        }),
+        { call: "wrapper metadata" }
+      ),
     };
     const utils = createHttpApiQueryUtils(api, {
       client: { items },

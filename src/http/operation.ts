@@ -144,12 +144,14 @@ const extractHttpEndpoints = (
       }
       // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
       const call = method as RuntimeHttpMethod<Mode>;
-      // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
-      return call.call(target, {
-        ...(Predicate.isObject(requestInput) ? requestInput : undefined),
-        responseMode,
-        ...(sseOptions === undefined ? undefined : { sseOptions }),
-      });
+      // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context, anti-slop/no-reflect-apply
+      return Reflect.apply(call, target, [
+        {
+          ...(Predicate.isObject(requestInput) ? requestInput : undefined),
+          responseMode,
+          ...(sseOptions === undefined ? undefined : { sseOptions }),
+        },
+      ]);
     };
     const common = {
       identity,

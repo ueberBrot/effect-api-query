@@ -11,7 +11,7 @@ import type {
   SetDataOptions,
   Updater,
 } from "@tanstack/query-core";
-import { Context, Effect } from "effect";
+import { Context, Effect, Predicate } from "effect";
 
 type QueryEffectFetchOptions<
   A,
@@ -146,7 +146,15 @@ const ensure =
         return await client.query(fetchOptions);
       }
       if (revalidateIfStale === true) {
-        void client.query(fetchOptions).catch(noop);
+        const { staleTime } = fetchOptions;
+        const resolved = Predicate.isFunction(staleTime)
+          ? staleTime(query)
+          : staleTime;
+        if (query.isStaleByTime(resolved)) {
+          void client
+            .query({ ...fetchOptions, staleTime: resolved ?? 0 })
+            .catch(noop);
+        }
       }
       return cachedData;
     });

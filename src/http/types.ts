@@ -219,7 +219,10 @@ export type StandardMethodEffect<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
 > =
   Method extends HttpApiClient.Client.Method<Endpoint, infer E, infer R>
-    ? HttpApiClient.Client.Method<Endpoint, E, R> extends Method
+    ? SeenMethod<
+        Method,
+        [HttpApiClient.Client.Method<Endpoint, E, R>]
+      > extends true
       ? MethodResult<
           Method,
           Endpoint,
