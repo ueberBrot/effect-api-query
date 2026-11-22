@@ -1,5 +1,6 @@
 import { startExampleRpcServer } from "@effect-api-query/server";
 import { MutationObserver } from "@tanstack/react-query";
+import { configureUtils } from "@ueberbrot/effect-api-query";
 import { Deferred, Effect, Exit, Scope } from "effect";
 import { describe, expect, it, vi } from "vite-plus/test";
 
@@ -221,6 +222,68 @@ describe("existing Vite application owner handoff", () => {
       await Effect.runPromise(Deferred.succeed(releaseCallback, true));
       await previous?.dispose();
       await current?.dispose();
+      await Effect.runPromise(Scope.close(serverScope, Exit.void));
+    }
+  });
+
+  it("drains in-flight HTTP metadata queries and blocks post-retirement metadata reads", async () => {
+    const serverScope = await Effect.runPromise(Scope.make());
+    const entered = Deferred.makeUnsafe<boolean>();
+    const release = Deferred.makeUnsafe<boolean>();
+    let application: ViteReactApplication | undefined;
+    try {
+      const server = await Effect.runPromise(
+        startExampleRpcServer().pipe(Scope.provide(serverScope))
+      );
+      application = await startViteReactApplication({
+        rpcUrl: server.rpcUrl,
+        identity,
+      });
+      let downstreamCalls = 0;
+      const trackedHttp = configureUtils(application.httpQuery, {
+        metadata: {
+          interceptors: [
+            async ({ next: execute }) => {
+              downstreamCalls += 1;
+              const result = await execute();
+              await Effect.runPromise(Deferred.succeed(entered, true));
+              await Effect.runPromise(Deferred.await(release));
+              return result;
+            },
+          ],
+        },
+      });
+      const inFlight = application.queryClient
+        .query(trackedHttp.users.list.metadataOptions())
+        .catch(() => null);
+      await Effect.runPromise(Deferred.await(entered));
+      let disposed = false;
+      const disposal = application.dispose().then(() => {
+        disposed = true;
+      });
+      await vi.waitFor(() => {
+        expect(application?.isActive()).toBe(false);
+      });
+      await Effect.runPromise(Effect.sleep("25 millis"));
+      expect(disposed).toBe(false);
+      await Effect.runPromise(Deferred.succeed(release, true));
+      await inFlight;
+      await disposal;
+      expect({
+        disposed,
+        queries: application.queryClient.getQueryCache().getAll(),
+      }).toStrictEqual({
+        disposed: true,
+        queries: [],
+      });
+      const callsBeforePostRetirement = downstreamCalls;
+      await expect(
+        application.queryClient.query(trackedHttp.users.list.metadataOptions())
+      ).rejects.toThrow("Query owner is retired");
+      expect(downstreamCalls).toBe(callsBeforePostRetirement);
+    } finally {
+      await Effect.runPromise(Deferred.succeed(release, true));
+      await application?.dispose();
       await Effect.runPromise(Scope.close(serverScope, Exit.void));
     }
   });

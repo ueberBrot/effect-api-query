@@ -32,7 +32,13 @@ const queryRetirementConfiguration = (
     readonly context: { readonly signal: AbortSignal };
   }) => await runQuery(next, context.signal);
   const query = { interceptors: [intercept] };
-  return { query, infinite: query, live: query, streamed: query };
+  return {
+    query,
+    metadata: query,
+    infinite: query,
+    live: query,
+    streamed: query,
+  };
 };
 
 const makeExampleRpcQueryUtils = (
