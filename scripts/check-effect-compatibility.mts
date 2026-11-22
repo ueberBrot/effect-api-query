@@ -98,6 +98,7 @@ const tests = [
   "stream-snapshot",
   "stream-recovery",
   "query-effects",
+  "reactivity-invalidation",
   "query-owner",
   "integrated-workflows",
   "query-events",

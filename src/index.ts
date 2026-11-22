@@ -141,3 +141,9 @@ export {
 export type { QueryDescriptor } from "./core/query-descriptor";
 
 export { runQueryEvents } from "./core/query-events";
+
+export { bindReactivityInvalidation } from "./core/reactivity-invalidation";
+export type {
+  ReactivityInvalidationBinding,
+  ReactivityInvalidationOptions,
+} from "./core/reactivity-invalidation";

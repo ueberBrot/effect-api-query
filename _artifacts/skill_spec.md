@@ -11,7 +11,7 @@ One `effect-api-query` skill covers the library. Its activation description supp
 | RPC | Payload construction, canonical identity, ready-client lifetime |
 | HTTP | Decoded requests, SSE and NDJSON, multipart mutations, metadata |
 | Query patterns | Inference, skipping, pages, publication batches, recovery and tracing |
-| Cache workflows | Typed policies, interceptors, partial filters, writes and owners |
+| Cache workflows | Typed policies, interceptors, partial filters, Reactivity invalidation, writes and owners |
 | Hydration and SSR | Snapshots, typed view registration, preparation and cleanup |
 | Frameworks and hosts | Provider setup, Suspense, reactive accessors, declared peers and checked combinations, transports and hosts |
 
@@ -51,6 +51,8 @@ The usability batch reuses the existing executable consumer fixtures:
 These checks verify the recommended APIs and observable behavior. A fresh isolated consumer session supplies separate evidence. This authoring session does not establish skill discovery or consumer reliability.
 
 ## Coverage and batch history
+
+- **Scoped Reactivity invalidation, #219, base `97b7860`:** The cache-workflows reference maps Reactivity keys to colocated filters, ties listeners to a Scope, and uses the query owner guard for retirement. The domain map records why record keys can trigger sibling bindings. The skill tree maps ADR 0053. Runtime tests exercise reactive writes, key prefix isolation, coalescing, disposal, flushing, and error delivery. Both public compilers accept the application-local key augmentation. Packed runtime checks and the docs check pass. Fresh consumer behavior remains unverified.
 
 - **Colocated query filters, #216, integrated at `7d5adcc`:** The cache-workflows reference uses generated filters on roots, branches, and queryable leaves. Branch view filters use path metadata and preserve lazy leaves. Full leaf filters share canonical encoding with concrete keys. Partial inputs use explicit projections. The domain map records these tasks, and the skill tree maps ADR 0051. Both public compiler suites, 192 focused runtime tests, and the docs check passed. Fresh consumer evidence is pending.
 
