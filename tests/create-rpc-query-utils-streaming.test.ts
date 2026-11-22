@@ -753,9 +753,9 @@ describe("createRpcQueryUtils streaming execution", () => {
                 throw new TypeError("Expected a native stream failure");
               }
               /* oxlint-disable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
-              const client = (() => source) as RpcClient.RpcClient.Flat<
+              const client: RpcClient.RpcClient.Flat<
                 RpcGroup.Rpcs<typeof group>
-              >;
+              > = (() => source) as never;
               /* oxlint-enable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
               const rpc = createRpcQueryUtils(group, {
                 client,
@@ -866,9 +866,8 @@ describe("createRpcQueryUtils streaming execution", () => {
                   )
                 );
           /* oxlint-disable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
-          const client = (() => source) as RpcClient.RpcClient.Flat<
-            RpcGroup.Rpcs<typeof group>
-          >;
+          const client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof group>> =
+            (() => source) as never;
           /* oxlint-enable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
           const rpc = createRpcQueryUtils(group, {
             client,
@@ -1084,9 +1083,8 @@ describe("createRpcQueryUtils streaming execution", () => {
       Stream.ensuring(Deferred.succeed(finalized, true).pipe(Effect.asVoid))
     );
     /* oxlint-disable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
-    const client = (() => source) as RpcClient.RpcClient.Flat<
-      RpcGroup.Rpcs<typeof streamGroup>
-    >;
+    const client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof streamGroup>> =
+      (() => source) as never;
     /* oxlint-enable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
     const queryClient = new QueryClient();
     const utils = createRpcQueryUtils(streamGroup, {
@@ -1181,7 +1179,9 @@ describe("createRpcQueryUtils streaming execution", () => {
         const secondFinalized = yield* Deferred.make<boolean>();
         let run = 0;
         /* oxlint-disable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
-        const client = (() => {
+        const client: RpcClient.RpcClient.Flat<
+          RpcGroup.Rpcs<typeof streamGroup>
+        > = (() => {
           run += 1;
           const started = run === 1 ? firstStarted : secondStarted;
           const finalized = run === 1 ? firstFinalized : secondFinalized;
@@ -1204,7 +1204,7 @@ describe("createRpcQueryUtils streaming execution", () => {
               })
             )
           );
-        }) as RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof streamGroup>>;
+        }) as never;
         /* oxlint-enable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
         const queryClient = new QueryClient();
         const options = createRpcQueryUtils(streamGroup, {

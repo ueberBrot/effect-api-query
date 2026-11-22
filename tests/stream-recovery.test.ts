@@ -194,9 +194,9 @@ describe.each(["ensuring", "acquireRelease"] as const)(
                 })
               );
               /* oxlint-disable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
-              const client = (() => recovered) as RpcClient.RpcClient.Flat<
+              const client: RpcClient.RpcClient.Flat<
                 RpcGroup.Rpcs<typeof group>
-              >;
+              > = (() => recovered) as never;
               /* oxlint-enable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
               const rpc = createRpcQueryUtils(group, {
                 client,

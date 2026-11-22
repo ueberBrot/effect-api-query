@@ -310,9 +310,8 @@ describe("stream snapshots", () => {
                   )
                 );
           /* oxlint-disable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
-          const client = (() => source) as RpcClient.RpcClient.Flat<
-            RpcGroup.Rpcs<typeof group>
-          >;
+          const client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof group>> =
+            (() => source) as never;
           /* oxlint-enable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
           const rpc = createRpcQueryUtils(group, {
             client,

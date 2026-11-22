@@ -184,10 +184,10 @@ describe("TanStack Start server rendering", () => {
         Stream.concat(Stream.fromEffect(Effect.never)),
         Stream.ensuring(Deferred.succeed(finalized, true).pipe(Effect.asVoid))
       );
-      // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion
-      const client = (() => source) as RpcClient.RpcClient.Flat<
-        RpcGroup.Rpcs<typeof group>
-      >;
+      /* oxlint-disable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
+      const client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof group>> =
+        (() => source) as never;
+      /* oxlint-enable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
       const queryClient = new QueryClient();
       const options = createRpcQueryUtils(group, {
         client,
@@ -242,7 +242,7 @@ describe("TanStack Start server rendering", () => {
     const queryClient = new QueryClient();
     const options = createRpcQueryUtils(group, {
       // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion
-      client: client as RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof group>>,
+      client: client as never,
       keyPrefix: ["cached-snapshot"],
     }).watch.streamedOptions({ maxChunks: "unbounded" });
     const previous = ["previous"];
@@ -276,10 +276,10 @@ describe("TanStack Start server rendering", () => {
     ).pipe(
       Stream.ensuring(Deferred.succeed(finalized, true).pipe(Effect.asVoid))
     );
-    // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion
-    const client = (() => source) as RpcClient.RpcClient.Flat<
-      RpcGroup.Rpcs<typeof group>
-    >;
+    /* oxlint-disable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
+    const client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof group>> = (() =>
+      source) as never;
+    /* oxlint-enable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
     const queryClient = new QueryClient();
     const options = createRpcQueryUtils(group, {
       client,
@@ -332,10 +332,10 @@ describe("TanStack Start server rendering", () => {
       Stream.concat(Stream.fromEffect(Effect.never)),
       Stream.ensuring(Deferred.succeed(finalized, true).pipe(Effect.asVoid))
     );
-    // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion
-    const client = (() => source) as RpcClient.RpcClient.Flat<
-      RpcGroup.Rpcs<typeof group>
-    >;
+    /* oxlint-disable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
+    const client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof group>> = (() =>
+      source) as never;
+    /* oxlint-enable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
     const queryClient = new QueryClient();
     const options = createRpcQueryUtils(group, {
       client,

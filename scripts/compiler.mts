@@ -5,8 +5,8 @@ import path from "node:path";
 export const currentCompiler = {
   engine: "tsrs",
   package: "@effect/tsgo",
-  packageVersion: "0.67.3",
-  engineVersion: "0.21.0-ts7.1.0-beta",
+  packageVersion: "0.69.0",
+  engineVersion: "0.25.0-ts7.1.0-beta",
   languageVersion: "7.1.0-beta",
 } as const;
 

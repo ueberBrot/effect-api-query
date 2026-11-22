@@ -31,15 +31,19 @@ export const makeExampleRpcClient = Effect.fn(
     Effect.provide(protocolLayer)
   );
   let nextSlowOperation = 1;
-  const forwardClient: (
-    ...args: Parameters<ExampleRpcClient>
-  ) => ReturnType<ExampleRpcClient> = client;
-
   type ClientArguments = {
     [Tag in Parameters<ExampleRpcClient>[0]]: Parameters<
       typeof client<Tag, boolean, unknown>
     >;
   }[Parameters<ExampleRpcClient>[0]];
+  type ClientResult = {
+    [Tag in Parameters<ExampleRpcClient>[0]]: ReturnType<
+      typeof client<Tag, boolean, unknown>
+    >;
+  }[Parameters<ExampleRpcClient>[0]];
+
+  const forwardClient: (...args: Parameters<ExampleRpcClient>) => ClientResult =
+    client;
 
   const cancellationAwareClient = (
     ...[tag, payload, options]: ClientArguments

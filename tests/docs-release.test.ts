@@ -471,9 +471,10 @@ describe("documentation workflow boundaries", () => {
       ...`${releaseWorkflow}\n${deploymentWorkflow}`.matchAll(
         /uses: (?<action>[^\s]+)/gu
       ),
-    ]
-      .map((match) => match[1])
-      .filter((action) => action !== undefined && !action.startsWith("./"));
+    ].flatMap((match) => {
+      const [, action] = match;
+      return action !== undefined && !action.startsWith("./") ? [action] : [];
+    });
     expect(actions.length).toBeGreaterThan(0);
     for (const action of actions) {
       expect(action).toMatch(/@[\da-f]{40}$/u);
