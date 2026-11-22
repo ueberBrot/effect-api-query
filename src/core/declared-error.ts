@@ -6,36 +6,38 @@ import type { EffectHttpApiQueryError } from "../http/errors";
 import { isEffectRpcQueryError } from "../rpc/errors";
 import type { EffectRpcQueryError } from "../rpc/errors";
 
-type ExecutionError<Failure> =
+export type ExecutionError<Failure> =
   | EffectRpcQueryError<Failure>
   | EffectHttpApiQueryError<Failure>;
 
-type ExecutionFailure<Error> =
+export type ExecutionFailure<Error> =
   ExecutionError<unknown> extends Error
     ? unknown
     : Error extends ExecutionError<infer Failure>
       ? Failure
       : never;
 
-type FailureOf<Error> = Error extends {
+export type FailureOf<Error> = Error extends {
   readonly cause: Cause.Cause<infer Failure>;
 }
   ? Failure
   : never;
 
-type Tagged<Failure> = Extract<Failure, { readonly _tag: string }>;
-type TaggedFailure<Error> = Tagged<ExecutionFailure<Error>>;
+export type Tagged<Failure> = Extract<Failure, { readonly _tag: string }>;
+export type TaggedFailure<Error> = Tagged<ExecutionFailure<Error>>;
 
-type DeclaredErrorHandler<Failure, Result> = (failure: Failure) => Result;
+export type DeclaredErrorHandler<Failure, Result> = (
+  failure: Failure
+) => Result;
 
-type DeclaredErrorHandlers<Error> = {
+export type DeclaredErrorHandlers<Error> = {
   readonly [Tag in TaggedFailure<Error>["_tag"]]?: DeclaredErrorHandler<
     Extract<TaggedFailure<Error>, { readonly _tag: Tag }>,
     unknown
   >;
 };
 
-type HandlerResult<Handlers> =
+export type HandlerResult<Handlers> =
   NonNullable<Handlers[keyof Handlers]> extends infer Handler
     ? Handler extends (...args: never[]) => infer Result
       ? Result

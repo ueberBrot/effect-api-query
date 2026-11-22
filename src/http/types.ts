@@ -423,11 +423,10 @@ export type InfiniteBuilder<
   HasRequest<Endpoint> extends false ? true : false
 >;
 
-type DirectRequest<Endpoint extends HttpApiEndpoint.ConstraintRequest> = [
-  Queryable<Endpoint>,
-] extends [never]
-  ? Request<Endpoint>
-  : Request<Endpoint> | PreparedInput<Request<Endpoint>>;
+export type DirectRequest<Endpoint extends HttpApiEndpoint.ConstraintRequest> =
+  [Queryable<Endpoint>] extends [never]
+    ? Request<Endpoint>
+    : Request<Endpoint> | PreparedInput<Request<Endpoint>>;
 
 export type MutationLeaf<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,

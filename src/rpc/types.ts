@@ -362,7 +362,7 @@ export interface RpcStreamLeaf<
   readonly streamedOptions: StreamedOptionsBuilder<R, Prefix, ClientError>;
 }
 
-type DirectPayload<R extends Rpc.Any> =
+export type DirectPayload<R extends Rpc.Any> =
   | Rpc.PayloadConstructor<R>
   | PreparedInput<Rpc.PayloadConstructor<R>>;
 
