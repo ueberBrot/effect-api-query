@@ -96,6 +96,7 @@ describe("query owners", () => {
     let released = false;
     void disposed.then(() => {
       released = true;
+      return true;
     });
     response.open();
     await entered.promise;

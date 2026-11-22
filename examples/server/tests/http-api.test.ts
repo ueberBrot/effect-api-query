@@ -127,10 +127,9 @@ describe("example HTTP API", () => {
         {
           signal: controller.signal,
         }
-      ).then(
-        () => "completed",
-        () => "aborted"
-      );
+      )
+        .then(() => "completed")
+        .catch(() => "aborted");
       yield* Effect.promise(async () => {
         await expect
           .poll(
@@ -265,10 +264,9 @@ describe("example HTTP API", () => {
       const context = yield* Effect.context();
       const pending = fetch(
         `${server.url}/api/diagnostics/slow?durationMs=60000&operationId=http-dispose`
-      ).then(
-        () => "completed",
-        () => "closed"
-      );
+      )
+        .then(() => "completed")
+        .catch(() => "closed");
       yield* Effect.promise(async () => {
         await expect
           .poll(
@@ -340,10 +338,9 @@ describe("example HTTP API", () => {
           {
             signal: controller.signal,
           }
-        ).then(
-          () => "completed",
-          () => "aborted"
-        );
+        )
+          .then(() => "completed")
+          .catch(() => "aborted");
         yield* Effect.promise(async () => {
           await expect
             .poll(async ({ signal }) => ({

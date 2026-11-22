@@ -47,6 +47,7 @@
 
   "ignoreDependencies": [
     "@arethetypeswrong/cli",
+    "@effect/language-service",
     "@effect/platform-node",
     "@effect/tsgo",
     "@effect/vitest",

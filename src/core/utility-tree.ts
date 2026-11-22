@@ -471,14 +471,12 @@ const validateKeyEncoders = (
   keyEncoders: ReadonlyMap<string, RuntimeKeyEncoder>,
   errors: TreeErrors
 ) => {
-  const supportedIds = new Set(
-    operations
-      .filter(
-        (operation) =>
-          operation.kind !== "Mutation" && operation.input._tag !== "Inputless"
-      )
-      .map((operation) => operation.id)
-  );
+  const supportedIds = new Set<string>();
+  for (const operation of operations) {
+    if (operation.kind !== "Mutation" && operation.input._tag !== "Inputless") {
+      supportedIds.add(operation.id);
+    }
+  }
   for (const id of keyEncoders.keys()) {
     if (!supportedIds.has(id)) {
       throw errors.unknownEncoder(id);

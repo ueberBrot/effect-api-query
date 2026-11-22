@@ -9,20 +9,20 @@ Use ESM and an environment that supports ES2022. The package declares Effect and
 
 | Component | Declared requirement | Exact versions checked |
 | --- | --- | --- |
-| Effect | Library peer: `>=4.0.6 <4.2.0` | Coordinated runtime, testing, and Node platform packages: minimum `4.0.6`, 4.0 representative `4.0.7`, development `4.1.0`, 4.1 representative `4.1.2` |
-| Query Core | Library peer: `>=5.104.4 <6` | `5.104.4` and `5.105.0` |
-| TypeScript | Public declarations: 5.9 through reviewed 7.1 beta, with `strict: true` | `5.9.3` and Effect-enhanced TSRS `0.21.0` (TypeScript `7.1.0-beta`) |
-| React and React Query | React Query peer: React `^18 \|\| ^19` | React `19.3.1`, React Query `5.105.0` |
-| Vue and Vue Query | Vue Query peer: Vue `^2.6.0 \|\| ^3.3.0` | Vue `3.5.44`, Vue Query `5.105.0` |
-| Solid and Solid Query | Solid Query peer: Solid `^1.6.0` | Solid `1.9.18`, Solid Query `5.105.0` |
-| Svelte and Svelte Query | Svelte Query peer: Svelte `^5.25.0` | Svelte `5.57.3`, Svelte Query `6.3.6` |
-| Angular and Angular Query experimental | Angular Query peers: `@angular/core` and `@angular/common` `>=16.0.0` | Angular `22.2.4`, Angular Query experimental `5.105.0` |
+| Effect | Library peer: `>=4.0.6 <4.2.0` | Coordinated runtime, testing, and Node platform packages: minimum `4.0.6`, 4.0 representative `4.0.7`, development `4.1.4` |
+| Query Core | Library peer: `>=5.104.4 <6` | `5.104.4` and `5.107.1` |
+| TypeScript | Public declarations: 5.9 through reviewed 7.1 beta, with `strict: true` | `5.9.3` and Effect-enhanced TSRS `0.25.0` (TypeScript `7.1.0-beta`) |
+| React and React Query | React Query peer: React `^18 \|\| ^19` | React `19.3.1`, React Query `5.107.1` |
+| Vue and Vue Query | Vue Query peer: Vue `^2.6.0 \|\| ^3.3.0` | Vue `3.5.44`, Vue Query `5.107.1` |
+| Solid and Solid Query | Solid Query peer: Solid `^1.6.0` | Solid `1.9.18`, Solid Query `5.107.1` |
+| Svelte and Svelte Query | Svelte Query peer: Svelte `^5.25.0` | Svelte `5.57.3`, Svelte Query `6.4.1` |
+| Angular and Angular Query experimental | Angular Query peers: `@angular/core` and `@angular/common` `>=16.0.0` | Angular `22.2.4`, Angular Query experimental `5.107.1` |
 
-The tested wrappers resolve Query Core `5.105.0` without overrides. Keep your app and wrapper on one resolved Core version. The minimum `5.104.4` preserves a cached `null` first page parameter on refetch.
+The tested wrappers resolve Query Core `5.107.1` without overrides. Keep your app and wrapper on one resolved Core version. The minimum `5.104.4` preserves a cached `null` first page parameter on refetch.
 
 Vue Query declares an optional `@vue/composition-api` peer of `^1.1.2` for Vue 2.6. Tests use Vue 3.
 
-The example apps use TanStack Start `1.169.4`, TanStack Router `1.170.46`, and Router SSR Query `1.167.3`.
+The example apps use TanStack Start `1.169.5`, TanStack Router `1.170.46`, and Router SSR Query `1.167.3`.
 
 The packed tests pair each listed Effect version with both Query Core versions. They check public types, execution, cancellation, and hydration with both listed compilers. Framework and app build checks use the development combination. Supported ranges include intermediate versions that CI does not test individually. See [compatibility and stability](/effect-api-query/getting-started/compatibility-and-stability/) for upgrade policy.
 

@@ -41,7 +41,7 @@ ok(
   "Expected explicit Query Core versions."
 );
 // Pin age-eligible representatives; review each admitted minor before changing support.
-const effectVersions = new Set([floor, "4.0.7", current, "4.1.2"]);
+const effectVersions = new Set([floor, "4.0.7", current]);
 ok(
   manifest.peerDependencies.effect === ">=4.0.6 <4.2.0",
   "Review the Effect minor matrix when changing support."
