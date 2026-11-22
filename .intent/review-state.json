@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "f70c99636226575d78b6d66b21ae2276c9d44d0b50ebacee02071bdde566ae34",
+      "fingerprint": "2e20b3b0b7e5e3ba01ae7bfb2beef3cd4c92223a8b789805dd2da5cad23229c8",
       "snapshot": {
         "GLOSSARY.md": "4532453f4efb696d95c66aabb9f62863e28984bb961f97ee288034af62d76f29",
         "README.md": "87db3a47ce666b408001c89b81b2133393eb2074c63ba1ac1786be8e20b96dfd",
@@ -97,7 +97,7 @@
         "docs/adr/0032-configure-utility-trees-and-require-stream-retention.md": "e46238f04f3213d2c32dcb64fb2c17d38d033699d08b3b9d7986bbbe1d2f1ff7",
         "docs/adr/0033-bound-effect-support-to-a-patch-line.md": "aa1919cc8dedca1cc3439ec13a0f96f012f56a5e425887f3c4ddc92e47063cfc",
         "docs/adr/0034-extend-http-stream-views-to-decoded-ndjson.md": "445ed1f9a4cb3a74938f2d01579e50c046a681aaa2dcd856ef9587c62aaa7cf2",
-        "docs/adr/0035-use-effect-enhanced-tsrs-for-development.md": "832636c72a9dd76e81f358e9e2fde62429d16b342073116f1802d99fa1d9f543",
+        "docs/adr/0035-use-effect-enhanced-tsrs-for-development.md": "ef20a8cb9211973e6b0d3dc59e752fe3861729c19c65e81fb4354d9db6e123df",
         "docs/adr/0037-own-stream-publication-through-query-core.md": "a7800a9b941557bc34d3a3102e94d4227f8e5f31ff852b6830a33e12ac2ec553",
         "docs/adr/0039-coalesce-live-snapshots-explicitly.md": "4d95533f87474e8a55a9a6a0f0339f375a7e5d242195e26e99c2d7e895171f02",
         "docs/adr/0040-add-opt-in-query-owner-retirement.md": "5e5f0a05577c779ed22a62a3e99a8abd509c241fa9949e9fb50a9aec068472fc",
@@ -371,15 +371,15 @@
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6",
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca"
       },
-      "head": "8d21ec65e0c734805fe969a6fdfca88b767601d8",
+      "head": "b495313da9082e39481e8964ee8717914ae1b33f",
       "outcome": "no-change",
-      "reason": "The compiler instructions moved to AGENTS.md and ADR 0035 points there. The compiler decision, public compatibility and shipped developer tasks remain the same.",
+      "reason": "The root agent instructions now point to existing task definitions and retain the public type testing rule. ADR 0035 points to the task definitions for validation. Shipped guidance and all three planning records still cover the same consumer tasks.",
       "evidence": [
-        "Verified the revised ADR target and checked the three planning records. The repository guard and shipped skill validation passed."
+        "Read the task definitions and verified the revised ADR link. Repository and shipped skill checks passed."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "45fa7e8a314bb47423fd8aae4585338132b3cc83b14f657f54eb38cc82e4f06a",
+      "fingerprint": "d73149929635697849328427809da9f58359fdb05b2788c03837f9bbdf9299d6",
       "snapshot": {
         "GLOSSARY.md": "4532453f4efb696d95c66aabb9f62863e28984bb961f97ee288034af62d76f29",
         "README.md": "87db3a47ce666b408001c89b81b2133393eb2074c63ba1ac1786be8e20b96dfd",
@@ -476,7 +476,7 @@
         "docs/adr/0032-configure-utility-trees-and-require-stream-retention.md": "e46238f04f3213d2c32dcb64fb2c17d38d033699d08b3b9d7986bbbe1d2f1ff7",
         "docs/adr/0033-bound-effect-support-to-a-patch-line.md": "aa1919cc8dedca1cc3439ec13a0f96f012f56a5e425887f3c4ddc92e47063cfc",
         "docs/adr/0034-extend-http-stream-views-to-decoded-ndjson.md": "445ed1f9a4cb3a74938f2d01579e50c046a681aaa2dcd856ef9587c62aaa7cf2",
-        "docs/adr/0035-use-effect-enhanced-tsrs-for-development.md": "832636c72a9dd76e81f358e9e2fde62429d16b342073116f1802d99fa1d9f543",
+        "docs/adr/0035-use-effect-enhanced-tsrs-for-development.md": "ef20a8cb9211973e6b0d3dc59e752fe3861729c19c65e81fb4354d9db6e123df",
         "docs/adr/0037-own-stream-publication-through-query-core.md": "a7800a9b941557bc34d3a3102e94d4227f8e5f31ff852b6830a33e12ac2ec553",
         "docs/adr/0039-coalesce-live-snapshots-explicitly.md": "4d95533f87474e8a55a9a6a0f0339f375a7e5d242195e26e99c2d7e895171f02",
         "docs/adr/0040-add-opt-in-query-owner-retirement.md": "5e5f0a05577c779ed22a62a3e99a8abd509c241fa9949e9fb50a9aec068472fc",
@@ -750,11 +750,11 @@
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6",
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca"
       },
-      "head": "8d21ec65e0c734805fe969a6fdfca88b767601d8",
+      "head": "b495313da9082e39481e8964ee8717914ae1b33f",
       "outcome": "no-change",
-      "reason": "The compiler instructions moved to AGENTS.md and ADR 0035 points there. The compiler decision, public compatibility and shipped developer tasks remain the same.",
+      "reason": "The root agent instructions now point to existing task definitions and retain the public type testing rule. ADR 0035 points to the task definitions for validation. Shipped guidance and all three planning records still cover the same consumer tasks.",
       "evidence": [
-        "Verified the revised ADR target and checked the three planning records. The repository guard and shipped skill validation passed."
+        "Read the task definitions and verified the revised ADR link. Repository and shipped skill checks passed."
       ]
     },
     "source:vite.config.ts": {
