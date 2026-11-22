@@ -9,6 +9,7 @@ export interface HttpApiEndpointIdentity {
 }
 
 export type HttpApiOperation =
+  | "call"
   | "query"
   | "infinite"
   | "mutation"

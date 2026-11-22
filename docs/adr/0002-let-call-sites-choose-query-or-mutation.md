@@ -1,6 +1,6 @@
 # Let call sites choose query or mutation
 
-Status: Amended by ADR 0018 and ADR 0020.
+Status: Amended by ADR 0018 and ADR 0020. Partially amended by [ADR 0050](0050-direct-leaf-execution-and-shared-error-handling.md).
 
 ## Context
 

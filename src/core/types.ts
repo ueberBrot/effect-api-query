@@ -89,6 +89,27 @@ export type KeyBuilder<Input, Key, Inputless extends boolean> = [
   ? () => Key
   : (options: { readonly input: Input | PreparedInput<Input> }) => Key;
 
+export type DirectArgs<
+  Input,
+  Inputless extends boolean,
+  AdapterOptions = unknown,
+> = [Inputless] extends [true]
+  ? [options?: AdapterOptions & { readonly input?: never }]
+  : [options: AdapterOptions & { readonly input: Input }];
+
+export type DirectCall<
+  Input,
+  Inputless extends boolean,
+  Success,
+  AdapterOptions = unknown,
+> = (
+  ...args: DirectArgs<
+    Input,
+    Inputless,
+    AdapterOptions & { readonly signal?: AbortSignal | undefined }
+  >
+) => Promise<Success>;
+
 export type OwnedQueryOption =
   | "queryFn"
   | "queryKey"

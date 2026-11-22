@@ -18,6 +18,7 @@ skills:
       - "@ueberbrot/effect-api-query"
     covers:
       - RPC construction, explicit prepared inputs, and canonical identity
+      - Direct execution on unary RPC and buffered HTTP leaves, plus shared classification of execution failures
       - Query-stable RPC construction and deterministic defaults
       - Immutable captured input and nontransferable prepared-input ownership
       - HTTP decoded requests, SSE and NDJSON, multipart mutations, metadata, and omitted streaming uploads or upgrades
@@ -39,7 +40,8 @@ skills:
       - Reuse inferred input, cached query data, and mutation types in application modules.
       - Configure utility trees, branches, and leaves with ordered interceptors across views; reuse unchanged frozen subtrees while preserving policy snapshots and prepared-input ownership; select a branch view without changing key layouts.
       - Reuse owner-bound prepared inputs and configure policies once per owner; rebuild reactive call-site options when input changes.
-      - Match single tagged failures without flattening composite Causes.
+      - Call buffered leaves through the inherited runtime or compose their client Effects. Reuse prepared input only on its owning leaf.
+      - Match single tagged failures and bound native retries without flattening composite Causes.
       - Apply native defaults and scoped policies without losing call-site selection, conditional input, or explicitly undefined seed behavior; compose mutation callbacks or intercept native execution attempts.
       - Reuse equivalent immutable decoded records and nested containers with a schema-specific structuralSharing policy while preserving metadata freezing and generated types.
       - Capture open streams and drain queries, preparation, and accepted writes before request disposal.

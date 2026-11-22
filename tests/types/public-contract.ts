@@ -251,6 +251,8 @@ type Equal<Left, Right> =
     : false;
 type Assert<Condition extends true> = Condition;
 type ExpectedLeafInterface =
+  | "call"
+  | "effect"
   | "infiniteKey"
   | "infiniteOptions"
   | "key"
@@ -1324,8 +1326,6 @@ void utils.projects.watch.streamedOptions({ maxChunks: "unbounded" });
 void utils.projects.watch.queryOptions;
 // @ts-expect-error unary leaves do not expose streaming query builders
 void utils.projects["by-id"].find.streamedOptions;
-// @ts-expect-error leaves expose no direct execution helper
-void utils.projects["by-id"].find.call;
 // @ts-expect-error leaves expose no mutation cancellation helper
 void utils.users.get.cancelMutation;
 

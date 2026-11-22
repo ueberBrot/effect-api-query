@@ -50,7 +50,7 @@ export function userCache(
       select: (user) => user.name,
     }),
     exact: {
-      queryKey: rpc.users.read.queryKey({ id: 1 }),
+      queryKey: rpc.users.read.queryKey({ input: { id: 1 } }),
       exact: true as const,
     },
     everyLocale: createQueryFilter(rpc.users.read, "query", (id: number) => ({
@@ -70,7 +70,19 @@ Hooks, observers, and `queryClient.query` apply selection. The cache retains dec
 
 Bind a branch and view with `const userReads = createBranchQueryFilter(rpc.users, "query")`. Then pass `userReads()` to `queryClient.invalidateQueries`. Pass native conditions to `userReads` to narrow the match. Omit `exact` to include descendants. Absent views match nothing.
 
-Use `findDeclaredError(error, tag)` for one tagged failure in a typed union. Composite Causes, defects, interruption, and unrelated errors return None. Keep the original wrapper and classify retry policy separately.
+## Run a leaf directly
+
+Use `leaf.call({ input, signal })` to run a unary RPC or buffered HTTP endpoint outside the cache. Omit input for an inputless leaf. Pass a prepared input only to its originating queryable leaf or a configured or tracked copy. For buffered multipart HTTP, pass the decoded request with its `FormData` payload.
+
+Use `rpcOptions` to pass headers or context to a unary RPC. `call` uses the leaf runtime and follows query-owner tracking. It preserves successful `undefined` and wraps a failed Exit with operation `"call"`. HTTP uses decoded-only mode.
+
+Use `leaf.effect({ input })` to compose the ready client's Effect. Provide any services and run it in the app. Both methods skip Query view policies. Use the stream views for streaming leaves.
+
+## Classify execution failures
+
+Use `findDeclaredError(error, tag)` to get an Effect Option for one tagged failure. Use `matchDeclaredError(error, handlers, orElse)` to handle selected tags. The fallback receives the original error for unmatched tags, defects, interruptions, composite Causes, and other errors.
+
+Pass `retryExecutionError({ shouldRetry, maxRetries })` as the TanStack `retry` predicate. `shouldRetry` receives the single typed failure and the zero-based failure count. The default limit is three retries. The predicate stops on defects, interrupts, composite Causes, and unwrapped errors.
 
 ## Assemble contract-associated policies
 

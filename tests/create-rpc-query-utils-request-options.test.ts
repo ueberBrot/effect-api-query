@@ -135,6 +135,17 @@ it.effect("forwards static request options to every mutation", () =>
   })
 );
 
+it.effect("forwards request options on direct RPC execution", () =>
+  Effect.gen(function* forwardDirectRequestOptions() {
+    const { rpcOptions, utils } = yield* makeExecutionFixture();
+    const options = { input: { page: 7 }, rpcOptions };
+    expect(
+      yield* Effect.promise(async () => await utils.read.call(options))
+    ).toBe("pages:7");
+    expect(yield* utils.read.effect(options)).toBe("pages:7");
+  })
+);
+
 it.effect("forwards static request options to both stream views", () =>
   Effect.gen(function* forwardStreamRequestOptions() {
     const { queryClient, requests, rpcOptions, utils } =

@@ -19,8 +19,9 @@ export type EffectRpcQueryKeyErrorCode =
   | "KeyEncoderFailed"
   | "InvalidKeyValue";
 
-/** The TanStack operation that executed an RPC. */
+/** The operation that executed an RPC. */
 export type RpcOperation =
+  | "call"
   | "infinite"
   | "live"
   | "mutation"
@@ -40,7 +41,7 @@ export interface EffectRpcQueryConfigErrorOptions {
 }
 
 /**
- * Wraps a failed RPC Exit for TanStack while preserving its complete Effect Cause.
+ * Wraps a failed RPC Exit while preserving its complete Effect Cause.
  *
  * Runner rejections pass through unchanged; this class wraps failed Exits.
  */

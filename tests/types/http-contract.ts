@@ -205,7 +205,7 @@ true satisfies Assert<
 true satisfies Assert<
   Equal<
     keyof (typeof utils)["user.accounts"]["upload"],
-    "key" | "mutationKey" | "mutationOptions"
+    "call" | "effect" | "key" | "mutationKey" | "mutationOptions"
   >
 >;
 true satisfies Assert<
@@ -227,6 +227,8 @@ void [uploadKey, uploadMutationKey];
 true satisfies Assert<
   Equal<
     keyof typeof utils.ping,
+    | "call"
+    | "effect"
     | "key"
     | "queryKey"
     | "queryOptions"
@@ -1290,6 +1292,15 @@ const overloadedServiceUtils = createHttpApiQueryUtils(serviceApi, {
   keyEncoders: { work: { serviceful: encoder } },
   runtime: metadataRunner,
 });
+const decodedEffect = overloadedServiceUtils.work.serviceful.effect({
+  input: { payload: { id: 1, name: "Ada" } },
+});
+true satisfies Assert<
+  Equal<
+    Effect.Services<typeof decodedEffect>,
+    EncodeRequest | DecodeSuccess | DecodeError | ExtraClientService
+  >
+>;
 type OverloadedRequirements = CreateHttpApiQueryUtilsOptions<
   typeof serviceApi,
   readonly ["app"],

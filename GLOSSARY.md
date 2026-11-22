@@ -4,9 +4,9 @@ These terms describe how the package builds TanStack Query utilities from Effect
 
 ## Generated API
 
-**RPC utility tree**: A nested object built from literal Effect RPC tags. Branches represent RPC namespaces. Unary and streaming leaves provide typed key and option builders. _Avoid_: Router, generated client
+**RPC utility tree**: A nested object built from literal Effect RPC tags. Branches represent RPC namespaces. Unary and streaming leaves provide typed key and option builders. Unary leaves also support direct execution. _Avoid_: Router, generated client
 
-**HTTP utility tree**: A nested object built from the literal group and endpoint identifiers in an Effect HttpApi. Supported buffered, SSE, and NDJSON endpoints provide typed key and option builders. Multipart endpoints support buffered mutations only. Endpoints in top-level groups appear at the root. _Avoid_: RPC utility tree, generated client
+**HTTP utility tree**: A nested object built from the literal group and endpoint identifiers in an Effect HttpApi. Supported buffered, SSE, and NDJSON endpoints provide typed key and option builders. Buffered multipart endpoints support mutations and direct execution. Endpoints in top-level groups appear at the root. _Avoid_: RPC utility tree, generated client
 
 **Query data**: The successful decoded RPC or HTTP value that TanStack Query receives. Buffered queries and live queries convert successful `undefined` to `null`. Accumulated stream elements and mutation data keep their original values. _Avoid_: RPC success value when it is `undefined`
 

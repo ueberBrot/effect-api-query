@@ -414,6 +414,28 @@ describe(createHttpApiQueryUtils, () => {
     }
   });
 
+  it.each(["call", "effect", "queryFilter"])(
+    "rejects %s as an HTTP group or endpoint",
+    (segment) => {
+      const nested = HttpApi.make("invalid").add(
+        HttpApiGroup.make(segment).add(HttpApiEndpoint.get("read", "/read"))
+      );
+      const topLevel = HttpApi.make("invalid").add(
+        HttpApiGroup.make("root", { topLevel: true }).add(
+          HttpApiEndpoint.get(segment, "/read")
+        )
+      );
+      const nestedClient = Effect.runSync(makeUnusedHttpClient(nested));
+      const topLevelClient = Effect.runSync(makeUnusedHttpClient(topLevel));
+      expect(() =>
+        createHttpApiQueryUtils(nested, { client: nestedClient })
+      ).toThrow(expect.objectContaining({ code: "InvalidEndpointPath" }));
+      expect(() =>
+        createHttpApiQueryUtils(topLevel, { client: topLevelClient })
+      ).toThrow(expect.objectContaining({ code: "InvalidEndpointPath" }));
+    }
+  );
+
   it("rejects reserved paths and top-level collisions before constructing utilities", () => {
     const reservedGroup = HttpApi.make("invalid").add(
       HttpApiGroup.make("key").add(HttpApiEndpoint.get("read", "/read"))

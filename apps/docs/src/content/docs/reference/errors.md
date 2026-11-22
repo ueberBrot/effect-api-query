@@ -29,7 +29,7 @@ An RPC key preparation failure throws before execution. The error exposes `rpcTa
 
 ## `EffectRpcQueryError<E>`
 
-This error wraps a failed RPC `Exit`. It exposes `rpcTag`, `operation`, and the complete `Cause.Cause<E>`. Use `isEffectRpcQueryError(value)` in the same JavaScript realm. For unary calls, `operation` is `query`, `infinite`, or `mutation`.
+This error wraps a failed RPC `Exit`. It exposes `rpcTag`, `operation`, and the complete `Cause.Cause<E>`. Use `isEffectRpcQueryError(value)` in the same JavaScript realm. For unary RPCs, `operation` is `call`, `query`, `infinite`, or `mutation`.
 
 Streaming failures use `streamed` or `live` and retain the complete Cause, including cleanup failures.
 
@@ -69,7 +69,7 @@ This error throws during key preparation, before the client runs. It exposes `ap
 
 ## `EffectHttpApiQueryError<E>`
 
-This error wraps a failed HTTP `Exit`. It exposes `apiId`, `groupId`, `endpoint`, `method`, `operation`, and `Cause.Cause<E>`. Operations are `query`, `infinite`, `mutation`, `metadata`, `streamed`, and `live`. Use `isEffectHttpApiQueryError(value)` in the same JavaScript realm.
+This error wraps a failed HTTP `Exit`. It exposes `apiId`, `groupId`, `endpoint`, `method`, `operation`, and `Cause.Cause<E>`. Operations are `call`, `query`, `infinite`, `mutation`, `metadata`, `streamed`, and `live`. Use `isEffectHttpApiQueryError(value)` in the same JavaScript realm.
 
 The Cause retains endpoint, middleware, Schema, and transport failures, including defects and interruption. SSE can also report declared event errors, `Sse.Retry`, and `Sse.SseError`. Inspect the Cause for private values before logging it. Runner rejections without an Exit pass through.
 

@@ -12,6 +12,8 @@ import type {
 import type { PreparedInput } from "../core/prepared-input";
 import type {
   ContainsRedacted,
+  DirectArgs,
+  DirectCall,
   InfiniteQueryBuilder,
   InfiniteQueryKey,
   UnaryQueryBuilder,
@@ -420,11 +422,33 @@ export type InfiniteBuilder<
   HasRequest<Endpoint> extends false ? true : false
 >;
 
+type DirectRequest<Endpoint extends HttpApiEndpoint.ConstraintRequest> = [
+  Queryable<Endpoint>,
+] extends [never]
+  ? Request<Endpoint>
+  : Request<Endpoint> | PreparedInput<Request<Endpoint>>;
+
 export type MutationLeaf<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Key extends readonly JsonValue[],
   ClientError,
+  Services,
 > = {
+  /** Runs the endpoint through the leaf's runtime and returns decoded success. */
+  readonly call: DirectCall<
+    DirectRequest<Endpoint>,
+    HasRequest<Endpoint> extends false ? true : false,
+    Success<Endpoint>
+  >;
+
+  /** Returns the decoded-only client Effect with its original errors and services. */
+  readonly effect: (
+    ...args: DirectArgs<
+      DirectRequest<Endpoint>,
+      HasRequest<Endpoint> extends false ? true : false
+    >
+  ) => Effect.Effect<Success<Endpoint>, ClientError, Services>;
+
   readonly key: () => Key;
   readonly mutationKey: () => readonly [...Key, "mutation"];
   readonly mutationOptions: MutationBuilder<
@@ -439,8 +463,9 @@ export type BufferedLeaf<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Key extends readonly JsonValue[],
   ClientError,
-  MetadataClientError = ClientError,
-> = MutationLeaf<Endpoint, Key, ClientError> &
+  MetadataClientError,
+  Services,
+> = MutationLeaf<Endpoint, Key, ClientError, Services> &
   ([Queryable<Endpoint>] extends [never]
     ? unknown
     : {
@@ -605,7 +630,8 @@ export type EndpointLeaf<
           Endpoint,
           Key,
           Effect.Error<Decoded>,
-          Effect.Error<Metadata>
+          Effect.Error<Metadata>,
+          Effect.Services<Decoded>
         >
       :
             | Effect.Error<Decoded>

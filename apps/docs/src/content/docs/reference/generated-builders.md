@@ -9,6 +9,8 @@ Unary RPCs provide these builders.
 
 | Builder | Result |
 | --- | --- |
+| `call(options?)` | Runs the RPC through the leaf's runtime and returns a promise. |
+| `effect(options?)` | Returns the ready client's Effect with its original error and service types. |
 | `queryKey(input?)` | Payload-specific, data-tagged query key. Payload-bearing RPCs require constructor input. |
 | `queryOptions(options?)` | Fresh Query Core options with generated `queryFn` and `queryKey`. |
 | `infiniteKey(input?)` | Data-tagged infinite-query key derived from the initial page's payload. |
@@ -30,13 +32,21 @@ Use `skipToken` on query option builders that take input. Key builders, mutation
 
 Set hashing through QueryClient defaults and keep it stable while entries exist. Per-call `queryKeyHashFn` and `queryHash` throw `EffectRpcQueryConfigError` with code `UnsupportedQueryHash`. Stream execution also uses this code if a hashing change conflicts with an existing key.
 
+## Run an RPC directly
+
+Pass the payload constructor input or prepared input as `{ input }`. For a payloadless RPC, call the method with no arguments.
+
+Use `call` for a promise. It accepts `signal` and uses the leaf's runtime, including tracking added by `QueryOwner.trackUtils`. A failed Exit rejects with `EffectRpcQueryError` and operation `"call"`. A successful call preserves `undefined`.
+
+Use `effect` to compose the RPC in an Effect program. The caller provides its services and runs it. Both methods bypass Query cache and view policies.
+
 ## Request-local RPC options
 
 All option builders accept `rpcOptions`. They pass it to the ready client at execution and omit it from the returned Query options.
 
 | Builders | Request options |
 | --- | --- |
-| `queryOptions`, `infiniteOptions`, `mutationOptions` | `UnaryRpcOptions`: `headers` and `context` |
+| `queryOptions`, `infiniteOptions`, `mutationOptions`, `call`, `effect` | `UnaryRpcOptions`: `headers` and `context` |
 | `streamedOptions`, `liveOptions` | `StreamingRpcOptions`: `headers`, `context`, and `streamBufferSize` |
 
 `headers` accepts Effect's `Headers.Input`. `context` accepts `Context.Context<never>`. Use `streamBufferSize` for the client's stream buffer and `maxChunks` for retained cache history.
