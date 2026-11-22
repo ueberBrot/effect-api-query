@@ -1,5 +1,69 @@
 # effect-api-query
 
+## 0.7.1
+
+### Patch Changes
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Accumulate replacement stream history in one private buffer and publish it once after successful completion.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Cancel RPC and HTTP live queries cleanly when they abort before the first value. A stream that ends without a value still raises an empty-stream error.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Stop the Vite example from admitting queries while the retiring owner drains accepted mutations.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Flush pending stream batches and live values when the publication deadline passes during continuously ready pulls.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Reduce TypeScript work when consumers access many leaves of a large RPC utility tree.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Apply the Effect HTTP request parse options when building default query keys.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Include the normalized decoder options when inferring errors and runner requirements for HTTP SSE queries.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Infer errors and runner services from HTTP overloads that handle a subset of the declared request.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Create separate query and mutation caches for each owner and carry over callbacks from supplied caches.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - When HTTP header names differ only in case, compare their structured values without relying on object key order. Conflicting values still raise a key-generation error.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Preserve declared HTTP request parts supplied through getters or non-enumerable properties.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Apply metadata structural sharing and freeze the cached envelope when an interceptor returns a fallback.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Call HTTP client methods with their original receiver and avoid allocating a bound function for each request.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Reduce TypeScript work when inferring runner requirements for HTTP clients that mix standard methods and custom overloads.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Reduce the number of types TypeScript must instantiate when checking large HTTP utility trees.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Reduce TypeScript work when checking policies nested under `configureUtils` or `defineUtilsPolicy` scopes.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Release failed connection attempts before reconnecting and keep subsequent stream pulls independent of retry count.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Release the TanStack Start example clients even when a cache subscriber throws during disposal.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Expose the prepared input from loader descriptors when an input-bearing RPC decodes to undefined.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Track HTTP metadata queries in the Vite React example so retiring a query owner cancels those queries too.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Reuse the encode and decode functions for each hydration codec across cache entries.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Skip hashing when a cache key is too short or its view segment cannot match the branch query filter.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Skip hashing when a cache key is too short or its segments rule out the registered hydration codecs.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Copy HTTP SSE decoder options when applying a policy map so later edits to the original options cannot change configured keys or decoding.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Restore early matches for branch query filters whose leaves have different key lengths.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Check for cycles while sharing references in `schemaStructuralSharing`. This reduces work when updating large arrays of decoded records.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Accept native persister results in stream snapshots and block late query execution after timeout or cancellation.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Accept `sseOptions` in policy maps for streamed and live HTTP SSE queries. Call-site options take precedence.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Use Query Core's `query` method for `queryEffects.fetch` and `queryEffects.ensure`.
+
+- [#222](https://github.com/ueberBrot/effect-api-query/pull/222) [`e544fa8`](https://github.com/ueberBrot/effect-api-query/commit/e544fa89ded66e8af1e5152c960fe73bbb485d6b) - Reduce the work needed to apply policies to selected branches or leaves of large utility trees.
+
 ## 0.7.0
 
 ### Minor Changes

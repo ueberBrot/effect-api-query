@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "0e7f0184ba71084e821e9a2f1fdd0fd8cda055faf9a62de124c0d0ac9016e43d",
+      "fingerprint": "c486da8c439eafd8f497eaa17694a83942c54328718ab7c0e0d571dd0f9ec4fb",
       "snapshot": {
         "GLOSSARY.md": "4532453f4efb696d95c66aabb9f62863e28984bb961f97ee288034af62d76f29",
         "README.md": "87db3a47ce666b408001c89b81b2133393eb2074c63ba1ac1786be8e20b96dfd",
@@ -175,7 +175,7 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "5a6e851de9bed1a00a1054746189fddf375733ad7894c5e96cb6c362251eb206",
+        "package.json": "d5ec78bbea61c95d8df59e00b672a9e13b1de9b3b368307776d016ef770e231d",
         "pnpm-workspace.yaml": "fc4bff1fa9ef4a4887691c6e004e02829736f93ee07efcb563f78f836a21a276",
         "scripts/check-effect-compatibility.mts": "bbb63ee11c2aed7bf50dd9dab1e303eb511e8efd7110f1c4ce9686a940421993",
         "scripts/check-framework-consumers.mts": "f0111ac9ed84996f722f656358b810da0b9ecc8c6c0219a2019d1076b5d50cbc",
@@ -372,19 +372,18 @@
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6",
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca"
       },
-      "head": "8007f00b1512cd52e3998b1068201096e7701104",
-      "outcome": "updated",
-      "reason": "HTTP default request keys use the effective parse options for each part. Query owners create independent caches from supplied callback configuration. The HTTP and cache workflow references describe these rules.",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
+      "outcome": "no-change",
+      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
       "evidence": [
-        "src/http/request.ts and src/core/query-owner.ts",
-        "tests/http-semantic-keys.test.ts and tests/query-owner.test.ts passed in the 113-test focused run",
-        "Both public compiler suites passed including the narrowed-overload, endpoint service, RPC path, and loader descriptor fixtures",
-        "The hydration runtime fixtures passed after binding each codec once",
-        "Default and SSE compiler workloads passed their instantiation budgets"
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: package.json."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "7b13f476dec0e1eadfe036b1daa7c776220f284d9856e12a03939278e81fadf7",
+      "fingerprint": "2f45aaaf5875dbef76fdc4c2c3b68e2f4314f86abc36a27f58a97091e8f6af25",
       "snapshot": {
         "GLOSSARY.md": "4532453f4efb696d95c66aabb9f62863e28984bb961f97ee288034af62d76f29",
         "README.md": "87db3a47ce666b408001c89b81b2133393eb2074c63ba1ac1786be8e20b96dfd",
@@ -559,7 +558,7 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "5a6e851de9bed1a00a1054746189fddf375733ad7894c5e96cb6c362251eb206",
+        "package.json": "d5ec78bbea61c95d8df59e00b672a9e13b1de9b3b368307776d016ef770e231d",
         "pnpm-workspace.yaml": "fc4bff1fa9ef4a4887691c6e004e02829736f93ee07efcb563f78f836a21a276",
         "scripts/check-effect-compatibility.mts": "bbb63ee11c2aed7bf50dd9dab1e303eb511e8efd7110f1c4ce9686a940421993",
         "scripts/check-framework-consumers.mts": "f0111ac9ed84996f722f656358b810da0b9ecc8c6c0219a2019d1076b5d50cbc",
@@ -756,13 +755,14 @@
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6",
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca"
       },
-      "head": "8007f00b1512cd52e3998b1068201096e7701104",
-      "outcome": "updated",
-      "reason": "The domain map records HTTP parse options and owner cache isolation. The skill specification records the review scope. The existing skill tree mappings cover the changed runtime, type fixtures, examples, and documentation.",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
+      "outcome": "no-change",
+      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
       "evidence": [
-        "_artifacts/domain_map.yaml",
-        "_artifacts/skill_spec.md",
-        "_artifacts/skill_tree.yaml"
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: package.json."
       ]
     },
     "source:vite.config.ts": {
@@ -1905,16 +1905,16 @@
       ]
     },
     "source:CHANGELOG.md": {
-      "fingerprint": "53b025f494fad4e142fcb693ad8d2a16c7732297457748386affb489136bedd4",
+      "fingerprint": "8f7143c6dabe14453c376e7ddf5b5d1adecc91ddd9f224349a050a8d11825c0a",
       "snapshot": {
-        "CHANGELOG.md": "348df5bb4b6e0bd36822dd8bf62fbac7cd66c7a930a285da1f12723c977049ca"
+        "CHANGELOG.md": "99141749861754cb4c5ce6b2b845d6472bfd3ed1c7e96e7caa47b51f369dc22c"
       },
-      "head": "9306d07d1bcd767bbf6d3f56107028c62f107c85",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
       "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Before versioning: intent maintainer check passed at 9306d07d1bcd767bbf6d3f56107028c62f107c85.",
-        "changeset version and vp fmt generated 0.6.1 -> 0.7.0.",
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
         "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
         "Scoped generated changes: CHANGELOG.md."
       ]
@@ -3604,63 +3604,78 @@
       ]
     },
     "source:.changeset/cancel-live-queries-before-first-value.md": {
-      "fingerprint": "4526d84747928a4aca1d0cd821319fa2d9dc779b056e8d5cd0a8c1de1b97ae3e",
+      "fingerprint": "47b9b55cbe3b55e43f529c84c0da5bebdbc267f25ec3a5f8ac5e2eeebf2740cc",
       "snapshot": {
-        ".changeset/cancel-live-queries-before-first-value.md": "aaa28a230d7b9770f4ac683011f260de663727bb9557970d7b7e1eb1a553a997"
+        ".changeset/cancel-live-queries-before-first-value.md": null
       },
-      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/cancel-live-queries-before-first-value.md."
       ]
     },
     "source:.changeset/normalize-structured-http-header-keys.md": {
-      "fingerprint": "a95b89bc6edac81049091b4ec7c174310aa2f68be5f7164def3dc2636685a4a4",
+      "fingerprint": "56380bc4062f3d1e95c52b5a1ee34c9b57e895502a159db60f4aa197afd32c1c",
       "snapshot": {
-        ".changeset/normalize-structured-http-header-keys.md": "a0f01314d55821ef392d07491684908b53e951c10772d17b3e8884775969433e"
+        ".changeset/normalize-structured-http-header-keys.md": null
       },
-      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/normalize-structured-http-header-keys.md."
       ]
     },
     "source:.changeset/reduce-http-call-allocations.md": {
-      "fingerprint": "d2b163cc33a3905269b15c2086e8278d2bab46223564255ae67d754bdc9a6f40",
+      "fingerprint": "6af420b979bee54b1677aad758cbfda4f826d8dcfa83a44789f0452b0be2e92f",
       "snapshot": {
-        ".changeset/reduce-http-call-allocations.md": "8be577429fb1c244ce47702f6b2449bace81ad87a135d42f7061cb67021850ce"
+        ".changeset/reduce-http-call-allocations.md": null
       },
-      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/reduce-http-call-allocations.md."
       ]
     },
     "source:.changeset/reduce-http-utility-type-checking.md": {
-      "fingerprint": "e963da8fd86c6e539a3341d3fe16fb503455aae53ea813c64cb188b984de18b5",
+      "fingerprint": "cbf700352e5a0dc48e5c7eeaf2f8597d437884a9eaf9a849fb9cb3519f63fd6c",
       "snapshot": {
-        ".changeset/reduce-http-utility-type-checking.md": "ae0189ac410400b530a49c507c6ec1c556da88e7fcff094a971586221fd57165"
+        ".changeset/reduce-http-utility-type-checking.md": null
       },
-      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/reduce-http-utility-type-checking.md."
       ]
     },
     "source:.changeset/retire-http-metadata-queries-in-vite-example.md": {
-      "fingerprint": "83f30637e7a8844ded9c05964b01d6ef6b78091fbbb20e6f2ec59a66c3bd038c",
+      "fingerprint": "97faad553b2952c60ae21b9dd174c371ba4cbbcd22c1ee5384b80e92d8fdd243",
       "snapshot": {
-        ".changeset/retire-http-metadata-queries-in-vite-example.md": "0f8b45da0f517a1d2221ea07c44425dcd048aac3bb42baacefd1943be5c9766a"
+        ".changeset/retire-http-metadata-queries-in-vite-example.md": null
       },
-      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/retire-http-metadata-queries-in-vite-example.md."
       ]
     },
     "source:.changeset/reuse-stream-policy-key-options.md": {
@@ -3676,323 +3691,378 @@
       ]
     },
     "source:.changeset/skip-unmatched-branch-query-keys.md": {
-      "fingerprint": "acf9e824346c1e45933f7adbea129eb0c6e081ccb63b15e29b5c4259d2fee0d0",
+      "fingerprint": "db5cbbd7662d8834b46e8d3a4f8f361d20cf7890f3a80118e95ae1e0378a1ad3",
       "snapshot": {
-        ".changeset/skip-unmatched-branch-query-keys.md": "090827b27171c1c9e4f12c4c7be9423afe0f470b0d58f0ed3569609d6952a8c0"
+        ".changeset/skip-unmatched-branch-query-keys.md": null
       },
-      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/skip-unmatched-branch-query-keys.md."
       ]
     },
     "source:.changeset/skip-unmatched-hydration-keys.md": {
-      "fingerprint": "cd406664d0d7bb7edd8e445c800989a437fc7c46c638037a0f08323f5088c55a",
+      "fingerprint": "feadca7b02b0da934373d0bacc046eff591b9ebd9c1d31f1808fe1d15ce5004d",
       "snapshot": {
-        ".changeset/skip-unmatched-hydration-keys.md": "9bc234390885e6a776358ba1f4638579c41b24050911c3e317a626099e324548"
+        ".changeset/skip-unmatched-hydration-keys.md": null
       },
-      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/skip-unmatched-hydration-keys.md."
       ]
     },
     "source:.changeset/speed-up-schema-structural-sharing.md": {
-      "fingerprint": "3a2dc00d0b2af1260b32e1ae1da8ac14c9a26640ddcf182a3eeb7f325543bca1",
+      "fingerprint": "6c95a467d57c0bf2803c7f80a8660cf80a66ff1d73bd9b371686edb396dc1216",
       "snapshot": {
-        ".changeset/speed-up-schema-structural-sharing.md": "f967624dbf3dc61cee4726e6cdf53d0cb7ee45c980aaa0ecc32b3b8a7f6f953d"
+        ".changeset/speed-up-schema-structural-sharing.md": null
       },
-      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/speed-up-schema-structural-sharing.md."
       ]
     },
     "source:.changeset/type-http-sse-policy-defaults.md": {
-      "fingerprint": "e25de3ec94432563c558c6513617485709c77252cf3de68c67e29f8f4aee1a70",
+      "fingerprint": "8381229c17f0e9afa8e6330e427dccc13e5a6d01da1f692c4b8c6b10c8ec7bd3",
       "snapshot": {
-        ".changeset/type-http-sse-policy-defaults.md": "461f2a5321f3c5354371eb39898749e71af3901aed107c71a713709168cf3f4f"
+        ".changeset/type-http-sse-policy-defaults.md": null
       },
-      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/type-http-sse-policy-defaults.md."
       ]
     },
     "source:.changeset/use-query-core-query-in-query-effects.md": {
-      "fingerprint": "79dbe5414f90dfafa18e25ef368a412e6d59ec2916e842e0208be3d09bed008d",
+      "fingerprint": "87721737efeb707deaf98e609c369e2e15184b53f7233dfa15389251d8dfe1eb",
       "snapshot": {
-        ".changeset/use-query-core-query-in-query-effects.md": "f0555f995cf8b9504e89a23b1a6674de722d0f8848d5a58372e0dc8443c99612"
+        ".changeset/use-query-core-query-in-query-effects.md": null
       },
-      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/use-query-core-query-in-query-effects.md."
       ]
     },
     "source:.changeset/infer-http-sse-overload-requirements.md": {
-      "fingerprint": "7daa6dfac6333dc75ecd71728494eb22d4adc8a9fbf1deab3c6d91962116aca0",
+      "fingerprint": "cb0df5c7e25e90c91242074c17158160ed6763b6e97b24a05ecf739019c3fc09",
       "snapshot": {
-        ".changeset/infer-http-sse-overload-requirements.md": "206fcc15cd3c7900287c405d8c3c9168fe850ee78d4e588b5eaf4ebdd4027258"
+        ".changeset/infer-http-sse-overload-requirements.md": null
       },
-      "head": "b92b37b08aaecd367175bea696d046692f94249f",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "The patch note describes a verified SSE behavior already covered by the public fixture and the existing cache workflow. It introduces no new task for the skill.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "vp exec changeset status --since=main reported one patch bump."
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/infer-http-sse-overload-requirements.md."
       ]
     },
     "source:.changeset/snapshot-configured-sse-options.md": {
-      "fingerprint": "e273b2a32571dd05db5e03255f33b29fcdce5bed9b65515234afaf964625f358",
+      "fingerprint": "eb5d26f6cc5b6abea759d9170d228cac8ee4b6d55ba971eb835340ac1754d0a9",
       "snapshot": {
-        ".changeset/snapshot-configured-sse-options.md": "fe7a9dc968110e0615dc1032eaa3eb54111c257956109e292ccc165fcbccebeb"
+        ".changeset/snapshot-configured-sse-options.md": null
       },
-      "head": "b92b37b08aaecd367175bea696d046692f94249f",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "The patch note describes a verified SSE behavior already covered by the public fixture and the existing cache workflow. It introduces no new task for the skill.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "vp exec changeset status --since=main reported one patch bump."
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/snapshot-configured-sse-options.md."
       ]
     },
     "source:.changeset/reduce-http-overload-type-checking.md": {
-      "fingerprint": "3b022e4fe8ca91b686691b70d5eaec1599c67648efc9513a663b7273cd33aefa",
+      "fingerprint": "7825251dab001cb1136b77e9fe09e51665869f334f389f48acdb794d1a66b10b",
       "snapshot": {
-        ".changeset/reduce-http-overload-type-checking.md": "1ac838f5a7c82e0c41b5896ce44939c4278d214a91a336ce3d65fc01901870db"
+        ".changeset/reduce-http-overload-type-checking.md": null
       },
-      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "The patch release note describes a compiler optimization covered by existing guidance and adds no usage requirement.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/reduce-http-overload-type-checking.md",
-        "Changesets selects patch release 0.7.1",
-        "vp run type-baseline passed on TSRS and TypeScript 5.9.3"
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/reduce-http-overload-type-checking.md."
       ]
     },
     "source:.changeset/reduce-scoped-configuration-type-checking.md": {
-      "fingerprint": "234a6953ae4a951f528b632ba9a1bdbd2f52d7a77ec52b1d4502754225f5f9e1",
+      "fingerprint": "717c2e45fa1a085cb385d591049b28a2bfd38c07b66280034b4e5cdfae121e79",
       "snapshot": {
-        ".changeset/reduce-scoped-configuration-type-checking.md": "a689ce76e7e0787416f8af62361277ae1384132ede4a43f9ce791413dcb4d4ee"
+        ".changeset/reduce-scoped-configuration-type-checking.md": null
       },
-      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "The patch release note describes a compiler optimization covered by existing guidance and adds no usage requirement.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/reduce-scoped-configuration-type-checking.md",
-        "Changesets selects patch release 0.7.1",
-        "vp run type-baseline passed on TSRS and TypeScript 5.9.3"
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/reduce-scoped-configuration-type-checking.md."
       ]
     },
     "source:.changeset/buffer-replacement-stream-history.md": {
-      "fingerprint": "85afe8803771e0aedda7838d6fa8ef28f4ba3a72c062426c9c9995e59b4d6a9d",
+      "fingerprint": "76b81fb9dc69a5d445b1f1f480cad87576adb833e2d4c45d2e17d3fdd216cf3e",
       "snapshot": {
-        ".changeset/buffer-replacement-stream-history.md": "f1e408cd00d1988248a85ff313d97f48374a1febc694049955ee60f15462c1c8"
+        ".changeset/buffer-replacement-stream-history.md": null
       },
-      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/buffer-replacement-stream-history.md",
-        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/buffer-replacement-stream-history.md."
       ]
     },
     "source:.changeset/close-vite-query-admission-on-retirement.md": {
-      "fingerprint": "d5b626d21906fef7708beb66e2f67f697f35a998616fd05ecab88cc2428ffc7f",
+      "fingerprint": "fc2633991a4fb2f786f02225c7f3b8bf9ae81b1e59e1a399065f6547b26f38e7",
       "snapshot": {
-        ".changeset/close-vite-query-admission-on-retirement.md": "d82e75622f16db7ab446fa5e6a44e6f3903c7816dff44bd85096928126da4948"
+        ".changeset/close-vite-query-admission-on-retirement.md": null
       },
-      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/close-vite-query-admission-on-retirement.md",
-        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/close-vite-query-admission-on-retirement.md."
       ]
     },
     "source:.changeset/flush-ready-stream-deadlines.md": {
-      "fingerprint": "51c00e0f61081f9ddcf2c8fd4e930a2896fc245790547aaa48952bf822029249",
+      "fingerprint": "bab018a27b13442e5b80230dc376c5a24a0396f4840931dff97827275b1750b5",
       "snapshot": {
-        ".changeset/flush-ready-stream-deadlines.md": "ab36efa0e32f3d374147d71c371db391a5315f3d4424cf5de587456d74b369ae"
+        ".changeset/flush-ready-stream-deadlines.md": null
       },
-      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/flush-ready-stream-deadlines.md",
-        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/flush-ready-stream-deadlines.md."
       ]
     },
     "source:.changeset/group-rpc-path-types.md": {
-      "fingerprint": "4bd54ee76638ab9a4520d0f8173246f0bc55aa579a27357ca3a5416a43e591e2",
+      "fingerprint": "346424c16a4713bd17956666e8128ef02bb0b4e7dabdfb7e47d1fcea456e16a8",
       "snapshot": {
-        ".changeset/group-rpc-path-types.md": "34d89a60d2926c13fb9a4059e16bb87693784ae7a4c8a86eff37b6931b692d78"
+        ".changeset/group-rpc-path-types.md": null
       },
-      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/group-rpc-path-types.md",
-        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/group-rpc-path-types.md."
       ]
     },
     "source:.changeset/honor-http-request-parse-options.md": {
-      "fingerprint": "ba1da39b02c57ef393f8e59bdc88b620608280b78a453bc030459fe8aa50fada",
+      "fingerprint": "5f93295a5bdc1a2a671268a84cfcd5b4cbfee0c4c2351a416197891801b50ca5",
       "snapshot": {
-        ".changeset/honor-http-request-parse-options.md": "d93aa2f7ee0dc0b4a8a8b95c194e21820f1746d144d2c3e51324d104e642e266"
+        ".changeset/honor-http-request-parse-options.md": null
       },
-      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/honor-http-request-parse-options.md",
-        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/honor-http-request-parse-options.md."
       ]
     },
     "source:.changeset/infer-narrowed-http-overloads.md": {
-      "fingerprint": "b45ad1cdf0363f1b5bfd511fb8293e23b8380b2bb73bcd799cc642d996ed9e3f",
+      "fingerprint": "3050717e63b82603fbe843f05bd6e7f1b3f75549f9c6ecd1fd240596cc0905b3",
       "snapshot": {
-        ".changeset/infer-narrowed-http-overloads.md": "7064aaf33c250fc7d5e345d769e5002b3c3767811a46f7b4a92d767b0462c638"
+        ".changeset/infer-narrowed-http-overloads.md": null
       },
-      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/infer-narrowed-http-overloads.md",
-        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/infer-narrowed-http-overloads.md."
       ]
     },
     "source:.changeset/isolate-query-owner-caches.md": {
-      "fingerprint": "706453cd9f9f02da5fa4b4a809770905dd017fd95f8410918cf98bf40bb6027f",
+      "fingerprint": "fc144228adb9d1cae9f129941f5eff2053fae7518f94a223ef7b2dbf89132684",
       "snapshot": {
-        ".changeset/isolate-query-owner-caches.md": "2ca962e9c5e13d3901953b1254147dfa42203fed2cbb1cf8fc6ee2c8032b9fb2"
+        ".changeset/isolate-query-owner-caches.md": null
       },
-      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/isolate-query-owner-caches.md",
-        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/isolate-query-owner-caches.md."
       ]
     },
     "source:.changeset/preserve-http-request-parts.md": {
-      "fingerprint": "0602e9c6fa012bf836398897c76265f67fa0187227fddf2b72e7ac2f38de7fb8",
+      "fingerprint": "187693da4f73fcf2780e18f0fc5a2edc79a84f666eb75e63b3c662424cdbe524",
       "snapshot": {
-        ".changeset/preserve-http-request-parts.md": "b972ba94ac2917a6bc04b1a79848db2c2654f131f6ba283e30e3b8014095198e"
+        ".changeset/preserve-http-request-parts.md": null
       },
-      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/preserve-http-request-parts.md",
-        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/preserve-http-request-parts.md."
       ]
     },
     "source:.changeset/preserve-metadata-fallback-sharing.md": {
-      "fingerprint": "c7bfad0a520faf5d89c6a8695ed9af4f0796e0a6e4d3ddfb69eaeadd4c1387b7",
+      "fingerprint": "a48638c5b8aeaf9ca3313fabee580ab88e34866f6752339da36fe6b9a73dd95f",
       "snapshot": {
-        ".changeset/preserve-metadata-fallback-sharing.md": "9936240e9eab6fdc5fd98284c9eba93a59a6f5baec429debcdcbcef04d966426"
+        ".changeset/preserve-metadata-fallback-sharing.md": null
       },
-      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/preserve-metadata-fallback-sharing.md",
-        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/preserve-metadata-fallback-sharing.md."
       ]
     },
     "source:.changeset/release-failed-stream-recovery-attempts.md": {
-      "fingerprint": "adf2472375a000aa924e979da21f20698246946daa53f999cf056cecb16f9077",
+      "fingerprint": "4391dae1f7d9aedb767f3a29019564f7646de380e322d1c44e2ced8bbc8a3ec4",
       "snapshot": {
-        ".changeset/release-failed-stream-recovery-attempts.md": "6070517de294c5dd82e53941ab69a1257b9a103bd02a1420a2c3f5b53702612d"
+        ".changeset/release-failed-stream-recovery-attempts.md": null
       },
-      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/release-failed-stream-recovery-attempts.md",
-        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/release-failed-stream-recovery-attempts.md."
       ]
     },
     "source:.changeset/release-start-clients-after-cache-errors.md": {
-      "fingerprint": "15fac9f74b8d4a84389c9f49bfe33639c5729e3e79a768e3d7922d2089caaa8b",
+      "fingerprint": "1801ce511bb1a01c51fe0346853fd6db6ee99747993e082cb66923a94cd40c27",
       "snapshot": {
-        ".changeset/release-start-clients-after-cache-errors.md": "9b61e8f12bb3d42aa37da20f31c9284a98f9d98b22b679ee851925696b364ad8"
+        ".changeset/release-start-clients-after-cache-errors.md": null
       },
-      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/release-start-clients-after-cache-errors.md",
-        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/release-start-clients-after-cache-errors.md."
       ]
     },
     "source:.changeset/retain-bound-descriptor-input.md": {
-      "fingerprint": "28b057bbbe31b69a0dfc873db1834d6b14b5ae7ba31859e66ffdccc370870408",
+      "fingerprint": "b1357cf5d151958afc033ad51000b9db4cf8be3426b00988ebf20f6096d76b5e",
       "snapshot": {
-        ".changeset/retain-bound-descriptor-input.md": "763ae47d7268e959e9d521e38d4404afbfbc6b3da90799474428d70057b0f64d"
+        ".changeset/retain-bound-descriptor-input.md": null
       },
-      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/retain-bound-descriptor-input.md",
-        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/retain-bound-descriptor-input.md."
       ]
     },
     "source:.changeset/reuse-hydration-codec-operations.md": {
-      "fingerprint": "f3429fff382454fe1ce2474e593629dca59527f56902cf83324f14f7115c34bd",
+      "fingerprint": "5695cf118fd7d2ad89116841385f5d750c30f7316e254cae12823427cfa70842",
       "snapshot": {
-        ".changeset/reuse-hydration-codec-operations.md": "a0b7d1563210914d64c32dbad19fa4917a53e63f168cde45d83f105541f5c873"
+        ".changeset/reuse-hydration-codec-operations.md": null
       },
-      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/reuse-hydration-codec-operations.md",
-        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/reuse-hydration-codec-operations.md."
       ]
     },
     "source:.changeset/speed-up-branch-query-filter-matching.md": {
-      "fingerprint": "19353244ba32d69c21e4ec79450a9b4ea9efc5726b493b967bf30c1fe91f562a",
+      "fingerprint": "8e866e8101cee4788a34cc221644e7da9e6c43f8ef96554ede6b189ac73ea095",
       "snapshot": {
-        ".changeset/speed-up-branch-query-filter-matching.md": "e207af1c2e5084923b8267f030deb316db8042642a4515ba088e364e0f25be91"
+        ".changeset/speed-up-branch-query-filter-matching.md": null
       },
-      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/speed-up-branch-query-filter-matching.md",
-        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/speed-up-branch-query-filter-matching.md."
       ]
     },
     "source:.changeset/support-native-snapshot-persisters.md": {
-      "fingerprint": "54c1ed2cc75488c5f0e7bdf7b943ce331a1ae4cf3963682669c0f4023e01edff",
+      "fingerprint": "80e668ada0707f9a153ffdef6b8fad420d33dc43d00c5c3ba64dd50d1440e0ae",
       "snapshot": {
-        ".changeset/support-native-snapshot-persisters.md": "b23eae40ca838e74dbdee7854978feeef67a198536c75aa02e36aec0a4e024b3"
+        ".changeset/support-native-snapshot-persisters.md": null
       },
-      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/support-native-snapshot-persisters.md",
-        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/support-native-snapshot-persisters.md."
       ]
     },
     "source:.changeset/visit-configured-utility-scopes.md": {
-      "fingerprint": "fd6ad3fd73b404a6e51b9936251d036b36e63d8ff19b22be1fb8bffdbfe27f70",
+      "fingerprint": "79a1f5bf6c083cc4105e39d2cf236b1252f971721228f04437069415bbe1b173",
       "snapshot": {
-        ".changeset/visit-configured-utility-scopes.md": "be4b401c8ec9b09474a5e6e9b128941f52430309022d9c39b2b89b80ace21d2b"
+        ".changeset/visit-configured-utility-scopes.md": null
       },
-      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
       "outcome": "no-change",
-      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/visit-configured-utility-scopes.md",
-        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
+        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/visit-configured-utility-scopes.md."
       ]
     }
   }
