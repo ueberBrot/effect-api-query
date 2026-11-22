@@ -250,13 +250,30 @@ export type StandardMethodEffect<
         >
       : never
     : never;
+export type AdditionalMethodSignatures<
+  Method,
+  Endpoint extends HttpApiEndpoint.ConstraintRequest,
+> =
+  Method extends HttpApiClient.Client.Method<Endpoint, infer E, infer R>
+    ? Method extends HttpApiClient.Client.Method<Endpoint, E, R> &
+        (infer Additional)
+      ? SeenMethod<Additional, [Method]> extends true
+        ? never
+        : MethodSignatures<Additional, Endpoint>
+      : never
+    : never;
 export type ResolveMethodEffects<
   Method,
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
 > =
   StandardMethodEffect<Method, Endpoint> extends infer Fast
     ? [Fast] extends [never]
-      ? MethodSignatures<Method, Endpoint> extends infer Signatures
+      ?
+          | MethodSignatures<Method, Endpoint>
+          | AdditionalMethodSignatures<
+              Method,
+              Endpoint
+            > extends infer Signatures
         ? readonly [
             DecodedEffect<Signatures, Endpoint>,
             HasMetadataView<Endpoint> extends true
@@ -532,7 +549,7 @@ export type LiveLeaf<
 
 export type StandardClientParts<Api extends HttpApi.Constraint, Client> =
   Client extends HttpApiClient.ForApi<Api, infer E, infer R>
-    ? HttpApiClient.ForApi<Api, E, R> extends Client
+    ? SeenMethod<Client, [HttpApiClient.ForApi<Api, E, R>]> extends true
       ? readonly [E, R]
       : false
     : false;

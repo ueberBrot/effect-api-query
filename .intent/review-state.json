@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "b180cdc5ad51d004d0a3e6f01ea873fb97ac3490100c6f752c363f845f1d9e5c",
+      "fingerprint": "7d73418881a66db768bf20ce34e84bcc664525fe0196fc4c6924a4850c681e97",
       "snapshot": {
         "GLOSSARY.md": "4532453f4efb696d95c66aabb9f62863e28984bb961f97ee288034af62d76f29",
         "README.md": "87db3a47ce666b408001c89b81b2133393eb2074c63ba1ac1786be8e20b96dfd",
@@ -232,7 +232,7 @@
         "src/http/operation.ts": "fd15d62695255c67b1a6ec8a5161260221637554b6e32038306cab5c905ca7f4",
         "src/http/request.ts": "dd416c91cfdd4fcee80afd757600eafac90d0ebfd6db45c6187c26e6e5dafd53",
         "src/http/streamed-query.ts": "be93ca8b11f2a165c8e9f2c45fea19253653e478e3746dd19ea3819997f8a937",
-        "src/http/types.ts": "a0414f6ab46674f5d8a064dbad6488f54e9f754c899c19fbcbb2602cb39312f8",
+        "src/http/types.ts": "f1d5bfe52c719b35cc460cc9b9e3b5eaf8e211194064331da4b1bfd00a19cba1",
         "src/index.ts": "85ed201a88913658d6d55d780e33f549444c1bbb591e593d22f842e70199c9c0",
         "src/rpc/create-utils.ts": "8ebf030b0f76f91c248434c169d789d6328d2ba43c07afe15e04db0a02f05c2c",
         "src/rpc/errors.ts": "8e1fbcc7843b2bf99e9d80bfd365dc118d52351909d5c8f48c46ba9d39fdedd3",
@@ -344,7 +344,7 @@
         "tests/types/http-contract.ts": "a1e3d1507728adba64497881d75794adbc6a353f9a54ea588c9305bffe5ef361",
         "tests/types/http-empty-success-contract.ts": "00ccdb360edc598b9bc6c8a7708dab6b7ca85cf267ce7caa9a81a6b52f2868d5",
         "tests/types/http-ndjson-contract.ts": "c44bf1d296958be46c35e97a7803a36141eb40d1346d6df9d5b3e7e428b8ac1a",
-        "tests/types/http-stream-contract.ts": "910ab7537c32d6a64ecb6f80e5f07beacb5b5e1307b3d9e260df79df8f1ca7ff",
+        "tests/types/http-stream-contract.ts": "87cbb37707e2690105c82b9c78e867b0d0c0d82f3a7b4de5af6dc5dcdf59c4c1",
         "tests/types/http-type-scale.ts": "447d34e1fa952c843a866fd4dcde80dd32390f7ff14ba701b1960f45bc1292ce",
         "tests/types/http-view-proof.ts": "0b66f30863c5451d47144980af9cf5517637c8f7ca7866b64d1a704cea089413",
         "tests/types/hydration-contract.ts": "fade858552c1b04fd45f48e86a42668a6132918196eca9089d56f1948551cd64",
@@ -372,16 +372,16 @@
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6",
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca"
       },
-      "head": "b92b37b08aaecd367175bea696d046692f94249f",
-      "outcome": "updated",
-      "reason": "The cache workflow now states that configureUtils copies SSE decoder settings for keys and options. The prefix index and single stream iterator owner preserve documented matching, publication, and cleanup behavior.",
+      "head": "d040e66a26ce2a5bc4c4efffa6b9ca97a3eefffc",
+      "outcome": "no-change",
+      "reason": "HTTP overload resolution now includes a specialized SSE method when it appears before the generated method. The existing SSE guidance, domain map, skill specification, and tree cover the same declared interface and developer tasks.",
       "evidence": [
-        "Public stream fixtures passed cancellation during a coalesced deadline flush with a pending pull and confirmed the complete cleanup Cause. Public policy fixtures passed after mutation of the original scoped SSE decoder settings.",
-        "vp run quality, docs-check and skills-check passed. Independent consumer skill discovery was not evaluated."
+        "The public SSE fixture checks errors and required runner services in both overload orders and passes TSRS and TypeScript 5.9.3.",
+        "All 36 compiler baseline cases passed within the existing budgets."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "1794c10bccf590f7214b01a0316ab11dad28ed8647e7d356f4166f0149c0f96d",
+      "fingerprint": "c666731931678f4ab86b6904b7d09c5838c2909705c4993fb8976d08f94508b0",
       "snapshot": {
         "GLOSSARY.md": "4532453f4efb696d95c66aabb9f62863e28984bb961f97ee288034af62d76f29",
         "README.md": "87db3a47ce666b408001c89b81b2133393eb2074c63ba1ac1786be8e20b96dfd",
@@ -613,7 +613,7 @@
         "src/http/operation.ts": "fd15d62695255c67b1a6ec8a5161260221637554b6e32038306cab5c905ca7f4",
         "src/http/request.ts": "dd416c91cfdd4fcee80afd757600eafac90d0ebfd6db45c6187c26e6e5dafd53",
         "src/http/streamed-query.ts": "be93ca8b11f2a165c8e9f2c45fea19253653e478e3746dd19ea3819997f8a937",
-        "src/http/types.ts": "a0414f6ab46674f5d8a064dbad6488f54e9f754c899c19fbcbb2602cb39312f8",
+        "src/http/types.ts": "f1d5bfe52c719b35cc460cc9b9e3b5eaf8e211194064331da4b1bfd00a19cba1",
         "src/index.ts": "85ed201a88913658d6d55d780e33f549444c1bbb591e593d22f842e70199c9c0",
         "src/rpc/create-utils.ts": "8ebf030b0f76f91c248434c169d789d6328d2ba43c07afe15e04db0a02f05c2c",
         "src/rpc/errors.ts": "8e1fbcc7843b2bf99e9d80bfd365dc118d52351909d5c8f48c46ba9d39fdedd3",
@@ -725,7 +725,7 @@
         "tests/types/http-contract.ts": "a1e3d1507728adba64497881d75794adbc6a353f9a54ea588c9305bffe5ef361",
         "tests/types/http-empty-success-contract.ts": "00ccdb360edc598b9bc6c8a7708dab6b7ca85cf267ce7caa9a81a6b52f2868d5",
         "tests/types/http-ndjson-contract.ts": "c44bf1d296958be46c35e97a7803a36141eb40d1346d6df9d5b3e7e428b8ac1a",
-        "tests/types/http-stream-contract.ts": "910ab7537c32d6a64ecb6f80e5f07beacb5b5e1307b3d9e260df79df8f1ca7ff",
+        "tests/types/http-stream-contract.ts": "87cbb37707e2690105c82b9c78e867b0d0c0d82f3a7b4de5af6dc5dcdf59c4c1",
         "tests/types/http-type-scale.ts": "447d34e1fa952c843a866fd4dcde80dd32390f7ff14ba701b1960f45bc1292ce",
         "tests/types/http-view-proof.ts": "0b66f30863c5451d47144980af9cf5517637c8f7ca7866b64d1a704cea089413",
         "tests/types/hydration-contract.ts": "fade858552c1b04fd45f48e86a42668a6132918196eca9089d56f1948551cd64",
@@ -753,11 +753,12 @@
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6",
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca"
       },
-      "head": "b92b37b08aaecd367175bea696d046692f94249f",
-      "outcome": "updated",
-      "reason": "The domain map records copied SSE options, and the planning record lists the architecture seams. Existing skill tree globs cover the added prefix module and affected fixtures.",
+      "head": "d040e66a26ce2a5bc4c4efffa6b9ca97a3eefffc",
+      "outcome": "no-change",
+      "reason": "HTTP overload resolution now includes a specialized SSE method when it appears before the generated method. The existing SSE guidance, domain map, skill specification, and tree cover the same declared interface and developer tasks.",
       "evidence": [
-        "Reviewed all three planning records against the staged source. Intent sync found no generated metadata changes."
+        "The public SSE fixture checks errors and required runner services in both overload orders and passes TSRS and TypeScript 5.9.3.",
+        "All 36 compiler baseline cases passed within the existing budgets."
       ]
     },
     "source:vite.config.ts": {

@@ -390,6 +390,45 @@ true satisfies Assert<
   >
 >;
 
+type StandardSseClient = HttpApiClient.ForApi<typeof api>;
+type SseOverload = (request: {
+  readonly params: { readonly id: number };
+  readonly responseMode: "decoded-only";
+  readonly sseOptions: {
+    readonly maxEventSize: number;
+    readonly dispatchEmptyNamedEvents: boolean;
+  };
+}) => Effect.Effect<typeof extraStream, never, Scale>;
+declare const sseFirstClient: Omit<StandardSseClient, "views"> & {
+  readonly views: Omit<StandardSseClient["views"], "plain"> & {
+    readonly plain: SseOverload & StandardSseClient["views"]["plain"];
+  };
+};
+const sseFirst = createHttpApiQueryUtils(api, {
+  client: sseFirstClient,
+  keyPrefix: ["sse-first"],
+  runPromiseExit: extraRunner,
+});
+type SseFirstFailure =
+  InferQueryError<typeof sseFirst.views.plain, "streamed"> extends infer Failure
+    ? Failure extends EffectHttpApiQueryError<infer Error>
+      ? Error
+      : never
+    : never;
+true satisfies Assert<
+  Equal<Extract<SseFirstFailure, "stream-error">, "stream-error">
+>;
+true satisfies Assert<
+  Equal<
+    CreateHttpApiQueryUtilsOptions<
+      typeof api,
+      readonly ["sse-first"],
+      typeof sseFirstClient
+    >["runPromiseExit"],
+    typeof extraRunner
+  >
+>;
+
 const liveOptions = utils.views.plain.liveOptions({
   input,
   sseOptions: { maxEventSize: 1024 },
