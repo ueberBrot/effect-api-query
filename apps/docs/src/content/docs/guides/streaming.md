@@ -26,7 +26,7 @@ const sseHistory = http.events.watch.streamedOptions({
 });
 ```
 
-The first value makes the query successful while fetching continues. A finite `maxChunks` limits how many elements remain after each publication. Set it directly or through `configureUtils` under `streamed.policy`. To keep every value, choose `"unbounded"`. The bound applies to cached elements. Configure byte limits and buffering separately.
+The first value makes the query successful while fetching continues. A finite `maxChunks` limits how many elements remain after each publication. Set it directly or through `configureUtils` under `streamed`. To keep every value, choose `"unbounded"`. The bound applies to cached elements. Configure byte limits and buffering separately.
 
 Choose `reset` to start a new history, `append` to add to the existing history, or `replace` to publish after successful completion. An open replacement keeps showing the old history. An accumulated stream can succeed without emitting a value.
 

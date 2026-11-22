@@ -1,6 +1,6 @@
 # Configure utility trees and require stream retention
 
-Status: Accepted. Partially supersedes ADRs 0004, 0020, 0027, and 0031 for configuration, retained history, and published key payload types.
+Status: Accepted. Partially supersedes ADRs 0004, 0020, 0027, and 0031 for configuration, retained history, and published key payload types. Partially amended by [ADR 0049](0049-flatten-utility-policy-maps.md) for configuration syntax.
 
 ## Context
 

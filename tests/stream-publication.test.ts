@@ -128,15 +128,15 @@ describe.each(["rpc", "http"] as const)("publication adapter %s", (adapter) => {
 
           publications.length = 0;
           const configured = configureUtils(leaf, {
-            live: { policy: { coalesceMs: 100 } },
+            live: { coalesceMs: 100 },
           });
           const live =
             adapter === "rpc"
               ? configureUtils(rpc.watch, {
-                  live: { policy: { coalesceMs: 100 } },
+                  live: { coalesceMs: 100 },
                 }).liveOptions()
               : configureUtils(http.events.watch, {
-                  live: { policy: { coalesceMs: 100 } },
+                  live: { coalesceMs: 100 },
                 }).liveOptions();
           expect({
             key: live.queryKey,

@@ -1,5 +1,6 @@
-import type { RpcGroup } from "effect/rpc";
+import type { RpcClientError, RpcGroup } from "effect/rpc";
 
+import type { CheckedConfiguration } from "../core/configure-utils";
 import type { RuntimeKeyEncoder } from "../core/operation";
 import type { KeyPrefix, OptionalKeyPrefix, RuntimeInput } from "../core/types";
 import { createUtilityTree } from "../core/utility-tree";
@@ -74,3 +75,41 @@ export function createRpcQueryUtils(
     errors: rpcTreeErrors,
   });
 }
+
+interface DefineRpcPolicy<ClientError> {
+  <const Group extends RpcGroup.Any, const Configuration extends object>(
+    group: Group,
+    configuration: CheckedConfiguration<
+      RpcQueryUtils<Group, readonly [], ClientError>,
+      Configuration
+    >
+  ): Configuration;
+  <
+    const Group extends RpcGroup.Any,
+    const Prefix extends KeyPrefix,
+    const Configuration extends object,
+  >(
+    group: Group,
+    configuration: CheckedConfiguration<
+      RpcQueryUtils<Group, Prefix, ClientError>,
+      Configuration
+    >,
+    options: { readonly keyPrefix: Prefix }
+  ): Configuration;
+}
+
+const rpcPolicy =
+  <ClientError>(): DefineRpcPolicy<ClientError> =>
+  <const Configuration extends object>(
+    _group: RpcGroup.Any,
+    configuration: Configuration
+  ) =>
+    configuration;
+
+/** Checks a reusable policy map against an RPC group without acquiring a client. */
+export const defineRpcPolicy = Object.assign(
+  rpcPolicy<RpcClientError.RpcClientError>(),
+  {
+    withClientError: rpcPolicy,
+  }
+);

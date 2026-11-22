@@ -17,7 +17,7 @@ Both RPC and supported HTTP SSE and NDJSON endpoints offer these views. Live que
 
 ## Set retention and buffering separately
 
-Set `maxChunks` to a positive safe integer or choose `"unbounded"`. You can share this choice with `configureUtils` under `streamed.policy`. After each publication, the cache keeps the newest elements in order. Seeded or hydrated history can exceed the bound until then. The bound counts elements, so a large object can still use substantial memory. Use the same policies for exact keys and options.
+Set `maxChunks` to a positive safe integer or choose `"unbounded"`. You can share this choice with `configureUtils` under `streamed`. After each publication, the cache keeps the newest elements in order. Seeded or hydrated history can exceed the bound until then. The bound counts elements, so a large object can still use substantial memory. Use the same policies for exact keys and options.
 
 RPC `rpcOptions.streamBufferSize` controls the ready client's queue before consumption. HTTP buffering belongs to the HTTP client. Configure cache retention and publication separately. Changing the history bound leaves the producer's rate unchanged.
 
@@ -91,6 +91,6 @@ Each fetch publishes the first value immediately. The next value starts a timer.
 
 A refetch starts a new cycle. Cancellation drops pending values, clears the timer, and closes the iterator. Native cache reversion still applies. Wait for [local cleanup](/effect-api-query/guides/cancellation/#release-resources-after-local-cleanup) before releasing shared resources.
 
-Set a default with `configureUtils(leaf, { live: { policy: { coalesceMs: 50 } } })`. Omit the local setting to inherit it. Pass `coalesceMs: undefined` to clear it. For exact access, reuse `queryKey` or pass the same policy to `liveKey(input, { coalesceMs: 50 })`. If the operation takes no input, use `liveKey({ coalesceMs: 50 })`. Explicit deadlines have distinct keys. For HTTP SSE, also pass the same local `sseOptions`.
+Set a default with `configureUtils(leaf, { live: { coalesceMs: 50 } })`. Omit the local setting to inherit it. Pass `coalesceMs: undefined` to clear it. For exact access, reuse `queryKey` or pass the same policy to `liveKey({ input, coalesceMs: 50 })`. If the operation takes no input, use `liveKey({ coalesceMs: 50 })`. Explicit deadlines have distinct keys. For HTTP SSE, also pass the same local `sseOptions`.
 
 For events that represent changes, use accumulated history or `consumeEvents` to preserve order. Keep published values unchanged.

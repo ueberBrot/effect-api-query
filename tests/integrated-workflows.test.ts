@@ -9,7 +9,7 @@ import {
   configureUtils,
   createQueryDescriptor,
   createRpcQueryUtils,
-  defineUtilsPolicy,
+  defineRpcPolicy,
   queryEffects,
   QueryClientService,
   recoverStream,
@@ -45,9 +45,13 @@ it.effect(
             keyPrefix: ["combined"],
             runtime: setup.wrapRunner(Effect.runPromiseExit),
           });
-          const policy = defineUtilsPolicy<typeof raw>()({
-            query: { policy: { staleTime: Infinity, retry: false } },
-          });
+          const policy = defineRpcPolicy.withClientError<never>()(
+            group,
+            {
+              query: { staleTime: Infinity, retry: false },
+            },
+            { keyPrefix: ["combined"] }
+          );
           return await Promise.resolve(configureUtils(raw, policy));
         });
       yield* Effect.promise(async () => {

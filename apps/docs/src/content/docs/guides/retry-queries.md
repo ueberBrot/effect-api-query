@@ -55,16 +55,13 @@ Import `configureUtils`, `isEffectRpcQueryError`, and `InferQueryError` from `@u
 ```ts
 type Error = InferQueryError<typeof rpc.profile.read>;
 const read = configureUtils(rpc.profile.read, {
-  query: {
-    policy: retryPolicy(
-      (error: Error) =>
-        isEffectRpcQueryError(error) ? error.cause : undefined,
-      (failure) =>
-        Schema.is(RpcClientError.RpcClientError)(failure) &&
-        failure.reason._tag === "HttpError" &&
-        failure.reason.kind === "TransportError"
-    ),
-  },
+  query: retryPolicy(
+    (error: Error) => (isEffectRpcQueryError(error) ? error.cause : undefined),
+    (failure) =>
+      Schema.is(RpcClientError.RpcClientError)(failure) &&
+      failure.reason._tag === "HttpError" &&
+      failure.reason.kind === "TransportError"
+  ),
 });
 return read.queryOptions();
 ```
@@ -78,15 +75,13 @@ Import `isEffectHttpApiQueryError` from `@ueberbrot/effect-api-query` and `HttpC
 ```ts
 type Error = InferQueryError<typeof http.profile.read>;
 const read = configureUtils(http.profile.read, {
-  query: {
-    policy: retryPolicy(
-      (error: Error) =>
-        isEffectHttpApiQueryError(error) ? error.cause : undefined,
-      (failure) =>
-        HttpClientError.isHttpClientError(failure) &&
-        failure.reason._tag === "TransportError"
-    ),
-  },
+  query: retryPolicy(
+    (error: Error) =>
+      isEffectHttpApiQueryError(error) ? error.cause : undefined,
+    (failure) =>
+      HttpClientError.isHttpClientError(failure) &&
+      failure.reason._tag === "TransportError"
+  ),
 });
 return read.queryOptions();
 ```

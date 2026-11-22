@@ -58,7 +58,7 @@ Use [external HTTP clients](/effect-api-query/reference/external-http-clients/) 
 
 ## Input and cache limits
 
-Set a positive safe-integer `maxChunks` or choose `"unbounded"` for accumulated streams. You can set it through `streamed.policy` on a tree, branch, or leaf.
+Set a positive safe-integer `maxChunks` or choose `"unbounded"` for accumulated streams. You can set it through `streamed` on a tree, branch, or leaf.
 
 Keys require strict JSON. Use generated builders for typed exact access. Supply a synchronous [custom encoder](/effect-api-query/guides/custom-key-encoders/) for query input with encoding services, redacted values, binary data, or multiple HTTP payload alternatives. Leave mutation-only multipart endpoints out of the encoder map.
 

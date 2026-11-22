@@ -13,7 +13,8 @@ import { Rpc, RpcGroup } from "effect/rpc";
 
 import {
   configureUtils,
-  defineUtilsPolicy,
+  defineHttpApiPolicy,
+  defineRpcPolicy,
   createHttpApiQueryUtils,
   createRpcQueryUtils,
 } from "#effect-api-query";
@@ -53,34 +54,38 @@ for (const order of ["root-first", "leaf-first"] as const) {
           keyPrefix: ["composition"],
         });
         const calls: string[] = [];
-        const root = defineUtilsPolicy<typeof base>()({
-          query: {
-            policy: { staleTime: 100 },
-            interceptors: [around(calls, "root")],
+        const root = defineRpcPolicy.withClientError<never>()(
+          rpcGroup,
+          {
+            query: {
+              staleTime: 100,
+              interceptors: [around(calls, "root")],
+            },
+            mutation: {
+              retry: 1,
+              interceptors: [around(calls, "root")],
+            },
           },
-          mutation: {
-            policy: { retry: 1 },
-            interceptors: [around(calls, "root")],
-          },
-        });
-        const leaf = defineUtilsPolicy<typeof base>()({
-          scoped: {
-            users: {
-              scoped: {
-                get: {
-                  query: {
-                    policy: { staleTime: 200 },
-                    interceptors: [around(calls, "leaf")],
-                  },
-                  mutation: {
-                    policy: { retry: 2 },
-                    interceptors: [around(calls, "leaf")],
-                  },
+          { keyPrefix: ["composition"] }
+        );
+        const leaf = defineRpcPolicy.withClientError<never>()(
+          rpcGroup,
+          {
+            paths: {
+              "users.get": {
+                query: {
+                  staleTime: 200,
+                  interceptors: [around(calls, "leaf")],
+                },
+                mutation: {
+                  retry: 2,
+                  interceptors: [around(calls, "leaf")],
                 },
               },
             },
           },
-        });
+          { keyPrefix: ["composition"] }
+        );
         const configured =
           order === "root-first"
             ? configureUtils(configureUtils(base, root), leaf)
@@ -124,34 +129,38 @@ for (const order of ["root-first", "leaf-first"] as const) {
           keyPrefix: ["composition"],
         });
         const calls: string[] = [];
-        const root = defineUtilsPolicy<typeof base>()({
-          query: {
-            policy: { staleTime: 100 },
-            interceptors: [around(calls, "root")],
+        const root = defineHttpApiPolicy(
+          httpApi,
+          {
+            query: {
+              staleTime: 100,
+              interceptors: [around(calls, "root")],
+            },
+            mutation: {
+              retry: 1,
+              interceptors: [around(calls, "root")],
+            },
           },
-          mutation: {
-            policy: { retry: 1 },
-            interceptors: [around(calls, "root")],
-          },
-        });
-        const leaf = defineUtilsPolicy<typeof base>()({
-          scoped: {
-            users: {
-              scoped: {
-                get: {
-                  query: {
-                    policy: { staleTime: 200 },
-                    interceptors: [around(calls, "leaf")],
-                  },
-                  mutation: {
-                    policy: { retry: 2 },
-                    interceptors: [around(calls, "leaf")],
-                  },
+          { keyPrefix: ["composition"] }
+        );
+        const leaf = defineHttpApiPolicy(
+          httpApi,
+          {
+            paths: {
+              "users.get": {
+                query: {
+                  staleTime: 200,
+                  interceptors: [around(calls, "leaf")],
+                },
+                mutation: {
+                  retry: 2,
+                  interceptors: [around(calls, "leaf")],
                 },
               },
             },
           },
-        });
+          { keyPrefix: ["composition"] }
+        );
         const configured =
           order === "root-first"
             ? configureUtils(configureUtils(base, root), leaf)
@@ -196,23 +205,24 @@ it.effect(
       const calls: string[] = [];
       const settings = {
         query: {
-          policy: { staleTime: 100, retry: 3 },
+          staleTime: 100,
+          retry: 3,
           interceptors: [around(calls, "original")],
         },
-        mutation: { policy: { retry: 3 } },
+        mutation: { retry: 3 },
       };
       const queryClient = new QueryClient();
       const first = configureUtils(base.users.get, settings);
-      settings.query.policy.staleTime = 999;
+      settings.query.staleTime = 999;
       settings.query.interceptors.push(around(calls, "later"));
-      settings.mutation.policy.retry = 999;
+      settings.mutation.retry = 999;
       expect({
         staleTime: queryClient.defaultQueryOptions(first.queryOptions())
           .staleTime,
         retry: first.mutationOptions().retry,
       }).toStrictEqual({ staleTime: 100, retry: 3 });
       const next = configureUtils(first, {
-        query: { policy: { staleTime: 200, retry: 1 } },
+        query: { staleTime: 200, retry: 1 },
       });
       expect({
         staleTime: queryClient.defaultQueryOptions(next.queryOptions())
@@ -252,17 +262,13 @@ it.effect(
       });
       const first = configureUtils(base, {
         streamed: {
-          policy: {
-            maxChunks: 2,
-            refetchMode: "append",
-            publicationMaxWaitMs: 50,
-          },
+          maxChunks: 2,
+          refetchMode: "append",
+          publicationMaxWaitMs: 50,
         },
       });
       const next = configureUtils(first.events, {
-        streamed: {
-          policy: { refetchMode: undefined, publicationMaxWaitMs: undefined },
-        },
+        streamed: { refetchMode: undefined, publicationMaxWaitMs: undefined },
       });
       const expected = base.events.streamedKey({
         maxChunks: 2,
@@ -298,32 +304,28 @@ for (const composeRoot of [false, true]) {
           client,
           keyPrefix: ["scope-callbacks"],
         });
-        const policy = defineUtilsPolicy<typeof base>()({
-          mutation: {
-            callbacks: composeRoot ? "compose" : "replace",
-            policy: {
+        const policy = defineRpcPolicy.withClientError<never>()(
+          rpcGroup,
+          {
+            mutation: {
+              callbacks: composeRoot ? "compose" : "replace",
               onSuccess: () => {
                 calls.push("root");
               },
             },
-          },
-          scoped: {
-            users: {
-              scoped: {
-                get: {
-                  mutation: {
-                    callbacks: composeRoot ? "replace" : "compose",
-                    policy: {
-                      onSuccess: () => {
-                        calls.push("leaf");
-                      },
-                    },
+            paths: {
+              "users.get": {
+                mutation: {
+                  callbacks: composeRoot ? "replace" : "compose",
+                  onSuccess: () => {
+                    calls.push("leaf");
                   },
                 },
               },
             },
           },
-        });
+          { keyPrefix: ["scope-callbacks"] }
+        );
         const configured = configureUtils(base, policy);
         const queryClient = new QueryClient();
         try {
@@ -366,10 +368,8 @@ for (const replaceCallback of [false, true]) {
         const first = configureUtils(base.users.get, {
           mutation: {
             callbacks: replaceCallback ? "compose" : "replace",
-            policy: {
-              onSuccess: () => {
-                calls.push("first");
-              },
+            onSuccess: () => {
+              calls.push("first");
             },
           },
         });
@@ -377,15 +377,13 @@ for (const replaceCallback of [false, true]) {
           ? configureUtils(first, {
               mutation: {
                 callbacks: "replace",
-                policy: {
-                  onSuccess: () => {
-                    calls.push("second");
-                  },
+                onSuccess: () => {
+                  calls.push("second");
                 },
               },
             })
           : configureUtils(first, {
-              mutation: { callbacks: "compose", policy: { retry: 1 } },
+              mutation: { callbacks: "compose", retry: 1 },
             });
         const queryClient = new QueryClient();
         try {
@@ -436,10 +434,8 @@ for (const overrideScope of [false, true]) {
           {
             mutation: {
               callbacks: "compose",
-              policy: {
-                onSuccess: () => {
-                  calls.push("root");
-                },
+              onSuccess: () => {
+                calls.push("root");
               },
             },
           }
@@ -451,7 +447,7 @@ for (const overrideScope of [false, true]) {
         };
         Object.defineProperty(override, "onSuccess", { value: undefined });
         const leaf = overrideScope
-          ? configureUtils(first.users.get, { mutation: { policy: override } })
+          ? configureUtils(first.users.get, { mutation: override })
           : first.users.get;
         const queryClient = new QueryClient();
         try {
@@ -479,24 +475,18 @@ it.effect("retains callback-only scopes for later mutation policies", () =>
         keyPrefix: ["callback-only-scope"],
       }),
       {
-        scoped: {
-          users: { scoped: { get: { mutation: { callbacks: "compose" } } } },
+        paths: {
+          "users.get": { mutation: { callbacks: "compose" } },
         },
       }
     );
     const calls: string[] = [];
     const second = configureUtils(first, {
-      scoped: {
-        users: {
-          scoped: {
-            get: {
-              mutation: {
-                policy: {
-                  onSuccess: () => {
-                    calls.push("shared");
-                  },
-                },
-              },
+      paths: {
+        "users.get": {
+          mutation: {
+            onSuccess: () => {
+              calls.push("shared");
             },
           },
         },
@@ -533,19 +523,16 @@ it.effect("preserves native failures from assembled mutation callbacks", () =>
     });
     const calls: string[] = [];
     const failure = new Error("application callback failed");
-    const policy = defineUtilsPolicy<typeof base.users.get>()({
+    const leaf = configureUtils(base.users.get, {
       mutation: {
         callbacks: "compose",
         interceptors: [around(calls, "required")],
-        policy: {
-          onSuccess: () => {
-            calls.push("shared success");
-            throw failure;
-          },
+        onSuccess: () => {
+          calls.push("shared success");
+          throw failure;
         },
       },
     });
-    const leaf = configureUtils(base.users.get, policy);
     const queryClient = new QueryClient();
     try {
       const mutation = new MutationObserver(
@@ -596,28 +583,31 @@ it.effect("applies assembled tree, branch, leaf and call-site defaults", () =>
       keyPrefix: ["assembled-options"],
     });
     const calls: string[] = [];
-    const policy = defineUtilsPolicy<typeof base>()({
-      query: {
-        policy: { staleTime: 100 },
-        interceptors: [around(calls, "tree")],
-      },
-      scoped: {
-        users: {
-          query: {
-            policy: { staleTime: 200, gcTime: 600 },
-            interceptors: [around(calls, "branch")],
+    const policy = defineRpcPolicy.withClientError<never>()(
+      rpcGroup,
+      {
+        query: {
+          staleTime: 100,
+          interceptors: [around(calls, "tree")],
+        },
+        paths: {
+          users: {
+            query: {
+              staleTime: 200,
+              gcTime: 600,
+              interceptors: [around(calls, "branch")],
+            },
           },
-          scoped: {
-            get: {
-              query: {
-                policy: { staleTime: 300 },
-                interceptors: [around(calls, "leaf")],
-              },
+          "users.get": {
+            query: {
+              staleTime: 300,
+              interceptors: [around(calls, "leaf")],
             },
           },
         },
       },
-    });
+      { keyPrefix: ["assembled-options"] }
+    );
     const configured = configureUtils(base, policy);
     const queryClient = new QueryClient({
       defaultOptions: { queries: { staleTime: 50, retry: false } },
@@ -669,14 +659,12 @@ it.effect("keeps local onMutate failures ahead of assembled execution", () =>
       keyPrefix: ["prepare-failure"],
     });
     const calls: string[] = [];
-    const policy = defineUtilsPolicy<typeof base.users.get>()({
+    const leaf = configureUtils(base.users.get, {
       mutation: {
         callbacks: "compose",
         interceptors: [around(calls, "execution")],
-        policy: {
-          onSuccess: () => {
-            calls.push("shared success");
-          },
+        onSuccess: () => {
+          calls.push("shared success");
         },
       },
     });
@@ -685,7 +673,7 @@ it.effect("keeps local onMutate failures ahead of assembled execution", () =>
     try {
       const mutation = new MutationObserver(
         queryClient,
-        configureUtils(base.users.get, policy).mutationOptions({
+        leaf.mutationOptions({
           onMutate: () => {
             calls.push("prepare");
             throw failure;

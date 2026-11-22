@@ -50,7 +50,7 @@ export function userCache(
       select: (user) => user.name,
     }),
     exact: {
-      queryKey: rpc.users.read.queryKey({ id: 1 }),
+      queryKey: rpc.users.read.queryKey({ input: { id: 1 } }),
       exact: true as const,
     },
     everyLocale: createQueryFilter(rpc.users.read, "query", (id: number) => ({
@@ -74,17 +74,17 @@ Use `findDeclaredError(error, tag)` for one tagged failure in a typed union. Com
 
 ## Assemble contract-associated policies
 
-Use `defineUtilsPolicy<UtilityType>()(configuration)` when reuse starts before client acquisition. Derive the type from `RpcQueryUtils` or `HttpApiQueryUtils` with the actual declaration, prefix, and client error information. Apply it to the matching scope with `configureUtils`. Literal defaults such as retention remain visible to builders.
+Use `defineRpcPolicy(group, configuration)` or `defineHttpApiPolicy(api, configuration)` before acquiring a client. Pass `{ keyPrefix }` as the third argument when the utility tree uses a prefix. For custom RPC client errors, use `defineRpcPolicy.withClientError<E>()(group, configuration)`. Apply the map to the utility tree with `configureUtils`. Literal retention values remain visible to builders.
 
 Keep the declaration shared. Put policy values, callbacks, cache access, and runtime choices in the app. The policy map retains literals and checks paths, views, and fields. `configureUtils` copies policy values and interceptor arrays. Keep retained values and dependencies unchanged. Leaf callbacks keep concrete types. Optimistic context stays local.
 
-Set SSE decoder defaults on the SSE leaf's `streamed.policy.sseOptions` or `live.policy.sseOptions`, including inside a `scoped` map. `configureUtils` copies those settings for both keys and options.
+Set SSE decoder defaults on the SSE leaf's `streamed.sseOptions` or `live.sseOptions`, including inside a `paths` entry. `configureUtils` copies those settings for both keys and options.
 
 For the full example, see [defaults and policies](https://ueberbrot.github.io/effect-api-query/guides/query-defaults/).
 
 ## Configure shared behavior
 
-Use `{ policy, interceptors }` for a query view. Add `callbacks` for mutations and `scoped` for specific children. `configureUtils` returns frozen copies with the same keys and prepared-input owner.
+Put view options beside `interceptors`. Mutations also accept `callbacks`. Use `paths` for descendants, such as `"users.get"` on the tree or `"get"` on the users branch. Configure a leaf directly when two HTTP nodes produce the same joined path. `configureUtils` returns frozen copies with the same keys and prepared-input owner.
 
 Configure once per owner and reuse across renders. Frozen subtrees can be shared when their settings stay the same. Empty policy and interceptor lists add nothing. Explicit undefined settings and callback modes still affect merging.
 
@@ -122,14 +122,12 @@ export function userPolicies(
     staleTime: (query) => (query.state.data === undefined ? 0 : 60_000),
     retry: false,
   } satisfies QueryPolicy<typeof rpc.users.get>;
-  const read = configureUtils(rpc.users.get, { query: { policy } });
+  const read = configureUtils(rpc.users.get, { query: policy });
   const rename = configureUtils(rpc.users.rename, {
     mutation: {
       callbacks: "compose",
-      policy: {
-        onSuccess: (_data, _variables, _result, context) =>
-          context.client.invalidateQueries({ queryKey: rpc.users.key() }),
-      },
+      onSuccess: (_data, _variables, _result, context) =>
+        context.client.invalidateQueries({ queryKey: rpc.users.key() }),
     },
   });
   return {
@@ -170,7 +168,7 @@ export function authorizedRename(
 
 Leaf callbacks get the view's data and error types, or the mutation's result and variables. Use `QueryPolicy<typeof leaf, View>` or `MutationPolicy<typeof leaf>` for reusable policies. Shared tree and branch callbacks get `unknown` because their leaves can differ.
 
-Defaults apply from QueryClient to tree, branch, leaf, and call site. Keep input, selection, initial and placeholder data, page mapping, adapter controls, and optimistic context local. Set history controls in `streamed.policy` to share them between options and keys.
+Defaults apply from QueryClient to tree, branch, leaf, and call site. Keep input, selection, initial and placeholder data, page mapping, adapter controls, and optimistic context local. Set history controls in `streamed` to share them between options and keys.
 
 More specific mutation callbacks replace broader callbacks by default. Set `mutation.callbacks: "compose"` to run the shared callback first, then the narrower one. This applies to `onSuccess`, `onError`, and `onSettled`. A rejection stops the pair and follows TanStack's error handling. Define `onMutate` at the call site to retain its result type.
 

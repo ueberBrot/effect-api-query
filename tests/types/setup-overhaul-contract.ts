@@ -355,11 +355,11 @@ const owner = await acquireQueryOwner(async (setup) => {
 
   const configuredFirst = setup.trackUtils(
     configureUtils(unprefixedObjectRpc, {
-      streamed: { policy: { maxChunks: 10 } },
+      streamed: { maxChunks: 10 },
     })
   );
   const trackedFirst = configureUtils(setup.trackUtils(unprefixedObjectRpc), {
-    streamed: { policy: { maxChunks: 10 } },
+    streamed: { maxChunks: 10 },
   });
   configuredFirst.events.watch.streamedOptions({ input: { channel: "a" } });
   trackedFirst.events.watch.streamedOptions({ input: { channel: "a" } });

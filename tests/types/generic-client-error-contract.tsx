@@ -51,26 +51,26 @@ declare const client: RpcClient.RpcClient.Flat<
 >;
 const rpc = createRpcQueryUtils(group, { client, keyPrefix: ["generic"] });
 const configured = configureUtils(rpc, {
-  query: { policy: { retry: false } },
-  streamed: { policy: { maxChunks: 20 } },
+  query: { retry: false },
+  streamed: { maxChunks: 20 },
 });
 configured satisfies typeof rpc;
 configured.events satisfies typeof rpc.events;
 configured.events.watch satisfies typeof rpc.events.watch;
 configured.ticks satisfies typeof rpc.ticks;
 const configuredBranch = configureUtils(rpc.events, {
-  streamed: { policy: { maxChunks: 20 } },
+  streamed: { maxChunks: 20 },
 });
 configuredBranch satisfies typeof rpc.events;
 const configuredLeaf = configureUtils(rpc.events.watch, {
-  streamed: { policy: { maxChunks: 20 } },
+  streamed: { maxChunks: 20 },
 });
 configuredLeaf satisfies typeof rpc.events.watch;
 // @ts-expect-error Raw builders still require a retention choice at each call.
 const missingRpcRetention: typeof configuredLeaf = rpc.events.watch;
 configuredLeaf.streamedOptions({ input: { id: 1 } });
 configureUtils(configuredLeaf, {
-  streamed: { policy: { publicationBatchSize: 2 } },
+  streamed: { publicationBatchSize: 2 },
 }).streamedOptions({ input: { id: 1 } });
 const ordinary = <Reader rpc={rpc} />;
 const configuredReader = <Reader rpc={configured} />;
@@ -115,25 +115,25 @@ const http = createHttpApiQueryUtils(api, {
   keyPrefix: ["generic-http"],
 });
 const configuredHttp = configureUtils(http, {
-  streamed: { policy: { maxChunks: 20 } },
+  streamed: { maxChunks: 20 },
 });
 configuredHttp satisfies typeof http;
 configuredHttp.users satisfies typeof http.users;
 configuredHttp.users.watch satisfies typeof http.users.watch;
 configuredHttp.users.ticks satisfies typeof http.users.ticks;
 const configuredHttpBranch = configureUtils(http.users, {
-  streamed: { policy: { maxChunks: 20 } },
+  streamed: { maxChunks: 20 },
 });
 configuredHttpBranch satisfies typeof http.users;
 const configuredHttpLeaf = configureUtils(http.users.watch, {
-  streamed: { policy: { maxChunks: 20 } },
+  streamed: { maxChunks: 20 },
 });
 configuredHttpLeaf satisfies typeof http.users.watch;
 // @ts-expect-error Raw builders still require a retention choice at each call.
 const missingHttpRetention: typeof configuredHttpLeaf = http.users.watch;
 configuredHttpLeaf.streamedOptions({ input: { params: { id: 1 } } });
 configureUtils(configuredHttpLeaf, {
-  streamed: { policy: { publicationBatchSize: 2 } },
+  streamed: { publicationBatchSize: 2 },
 }).streamedOptions({ input: { params: { id: 1 } } });
 const ordinaryHttpReader = <HttpReader http={http} />;
 const configuredHttpReader = <HttpReader http={configuredHttp} />;

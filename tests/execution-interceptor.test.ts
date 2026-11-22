@@ -99,15 +99,13 @@ it.effect(
       );
       const write = configureUtils(rpc.write, {
         mutation: {
-          policy: {
-            onSuccess: async (_data, _input, _optimistic, context) => {
-              await context.client.invalidateQueries({
-                queryKey: rpc.read.key(),
-              });
-              events.push("shared success");
-            },
-            onSettled: () => events.push("shared settled"),
+          onSuccess: async (_data, _input, _optimistic, context) => {
+            await context.client.invalidateQueries({
+              queryKey: rpc.read.key(),
+            });
+            events.push("shared success");
           },
+          onSettled: () => events.push("shared settled"),
           callbacks: "compose",
         },
       }).mutationOptions;

@@ -11,7 +11,8 @@ Import these values and types from `@ueberbrot/effect-api-query`.
 | `QueryClientOperationError` | Retains exact native rejections, including execution wrappers, as an unknown cause. |
 | `acquireQueryOwner`, `QueryOwner`, `QueryOwnerSetup` | Opt in to acquired/borrowed resource setup, guarded cache callbacks and local query/mutation retirement. |
 | `configureUtils` | Configure policies and ordered interceptors on a tree, branch, or leaf. |
-| `UtilsConfiguration`, `ConfiguredUtils` | Type scoped configuration and the configured utility tree. |
+| `defineRpcPolicy`, `defineHttpApiPolicy` | Check reusable policy maps against contracts before acquiring clients. |
+| `UtilsConfiguration`, `ConfiguredUtils` | Type configuration and the configured utility tree. |
 | `createBranchQueryFilter` | Select one view across all descendant leaves. |
 | `prepareInput`, `PreparedInput` | Reuse owner-bound input preparation explicitly. |
 | `findDeclaredError` | Match one tagged typed failure without flattening its Cause. |
@@ -89,11 +90,11 @@ See [type inference](/effect-api-query/reference/type-inference/) for input, cac
 
 ## Configure shared behavior
 
-`configureUtils(treeOrLeaf, configuration)` returns frozen utilities and keeps their keys. Set `{ policy, interceptors }` per view. Mutations also take `callbacks: "replace" | "compose"`. Use `scoped` for named descendants.
+`configureUtils(treeOrLeaf, configuration)` returns frozen utilities and keeps their keys. Set TanStack options and `interceptors` inside each view. Mutations also take `callbacks: "replace" | "compose"`. Use `paths` for named descendants.
 
 Policy precedence runs from QueryClient defaults to tree, branch, leaf, and call site. Interceptors wrap broad to specific, with the first entry outermost. Leaf callbacks infer contract types. Shared callbacks receive `unknown`.
 
-Use `QueryPolicy<Leaf, View>` or `MutationPolicy<Leaf>` for reusable settings. Keep input, selection, initial data, page mapping, and optimistic context local. A `streamed.policy` retention setting applies to both keys and options.
+Use `QueryPolicy<Leaf, View>` or `MutationPolicy<Leaf>` for reusable settings. Keep input, selection, initial data, page mapping, and optimistic context local. A `streamed` retention setting applies to both keys and options.
 
 See [defaults and policies](/effect-api-query/guides/query-defaults/) for callback composition and examples.
 

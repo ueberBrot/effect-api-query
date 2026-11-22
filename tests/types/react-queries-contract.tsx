@@ -41,8 +41,8 @@ const raw = createRpcQueryUtils(group, {
   keyPrefix: ["parallel-queries"],
 });
 const rpc = configureUtils(raw, {
-  streamed: { policy: { maxChunks: 20 } },
-  query: { policy: { retry: false } },
+  streamed: { maxChunks: 20 },
+  query: { retry: false },
 });
 type ReadError = InferQueryError<typeof rpc.read>;
 type StreamError = InferQueryError<typeof rpc.watch, "streamed">;

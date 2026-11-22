@@ -47,16 +47,12 @@ export const rawRpc = createRpcQueryUtils(group, {
   keyPrefix: ["framework-rpc"],
 });
 export const rpc = configureUtils(rawRpc, {
-  query: { policy: { retry: false } },
-  streamed: { policy: { maxChunks: 20 } },
-  scoped: {
-    users: {
-      scoped: {
-        read: {
-          query: {
-            interceptors: [async ({ next }) => await next()],
-          },
-        },
+  query: { retry: false },
+  streamed: { maxChunks: 20 },
+  paths: {
+    "users.read": {
+      query: {
+        interceptors: [async ({ next }) => await next()],
       },
     },
   },
@@ -82,7 +78,7 @@ export const rawHttp = createHttpApiQueryUtils(api, {
   keyPrefix: ["framework-http"],
 });
 export const http = configureUtils(rawHttp, {
-  query: { policy: { retry: false } },
+  query: { retry: false },
 });
 
 export type RpcError = InferQueryError<typeof rpc.users.read>;

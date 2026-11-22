@@ -101,7 +101,7 @@ rpc.events.watch.streamedKey({ input: { channel: "ch" } });
 rpc.events.audit.streamedKey();
 
 const configuredRpc = configureUtils(rpc, {
-  streamed: { policy: { maxChunks: 20 } },
+  streamed: { maxChunks: 20 },
 });
 configuredRpc.events.watch.streamedKey({ input: { channel: "ch" } });
 configuredRpc.events.watch.streamedKey({
@@ -201,7 +201,7 @@ http.items.get.metadataKey({ input: skipToken });
 http.items.stream.streamedKey({ input: { params: { id: "1" } } });
 
 const configuredHttp = configureUtils(http, {
-  streamed: { policy: { maxChunks: 15 } },
+  streamed: { maxChunks: 15 },
 });
 configuredHttp.items.stream.streamedKey({ input: { params: { id: "1" } } });
 configuredHttp.items.globalStream.streamedKey();

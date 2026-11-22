@@ -1,8 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   configureUtils,
-  defineUtilsPolicy,
-  type RpcQueryUtils,
+  defineRpcPolicy,
   createRpcQueryUtils,
   prepareInput,
   skipToken,
@@ -32,61 +31,62 @@ const base = createRpcQueryUtils(group, {
   keyPrefix: ["configuration"],
 });
 const savedConfiguration: UtilsConfiguration<typeof base> = {
-  query: { policy: { retry: false } },
+  query: { retry: false },
 };
 configureUtils(base, savedConfiguration);
 const savedScope: UtilsConfiguration<typeof base> = {
-  scoped: { toString: { query: { policy: { staleTime: 1000 } } } },
+  paths: {
+    toString: { query: { staleTime: 1000 } },
+  },
 };
 configureUtils(base, savedScope);
-// @ts-expect-error A named scope requires a configuration object.
-configureUtils(base, { scoped: { toString: () => "configuration" } });
-type ContractUtils = RpcQueryUtils<typeof group, readonly ["configuration"]>;
-const assembled = defineUtilsPolicy<ContractUtils>()({
-  query: { policy: { retry: false } },
-  scoped: {
-    users: {
-      scoped: {
-        read: {
-          query: {
-            policy: {
-              retry: (_count, error) => {
-                error.cause satisfies import("effect").Cause.Cause<"missing">;
-                return false;
-              },
-            },
-            interceptors: [
-              async ({ context, next }) => {
-                context.signal satisfies AbortSignal;
-                const data = await next();
-                data.name satisfies string;
-                return data;
-              },
-            ],
+configureUtils(base, {
+  paths: {
+    // @ts-expect-error A named scope requires a configuration object.
+    toString: () => "configuration",
+  },
+});
+const assembled = defineRpcPolicy.withClientError<never>()(
+  group,
+  {
+    query: { retry: false },
+    paths: {
+      "users.read": {
+        query: {
+          retry: (_count, error) => {
+            error.cause satisfies import("effect").Cause.Cause<"missing">;
+            return false;
           },
-          mutation: {
-            callbacks: "compose",
-            policy: {
-              onSuccess: (data, input, optimistic) => {
-                data.name satisfies string;
-                input.id satisfies number;
-                optimistic satisfies unknown;
-                // @ts-expect-error Shared callbacks do not know a call-site optimistic result.
-                optimistic.previous;
-              },
+          interceptors: [
+            async ({ context, next }) => {
+              context.signal satisfies AbortSignal;
+              const data = await next();
+              data.name satisfies string;
+              return data;
             },
-            interceptors: [
-              async ({ input, next }) => {
-                input.id satisfies number;
-                return await next();
-              },
-            ],
+          ],
+        },
+        mutation: {
+          callbacks: "compose",
+          onSuccess: (data, input, optimistic) => {
+            data.name satisfies string;
+            input.id satisfies number;
+            optimistic satisfies unknown;
+            // @ts-expect-error Shared callbacks do not know a call-site optimistic result.
+            optimistic.previous;
           },
+          interceptors: [
+            async ({ input, next }) => {
+              input.id satisfies number;
+              return await next();
+            },
+          ],
         },
       },
     },
   },
-});
+  { keyPrefix: ["configuration"] }
+);
 const rpc = configureUtils(base, assembled);
 const result = useQuery(
   rpc.users.read.queryOptions({
@@ -109,28 +109,32 @@ useMutation(
 );
 
 // @ts-expect-error A leaf only accepts its supported query views.
-configureUtils(base.users.read, { live: { policy: { retry: false } } });
-// @ts-expect-error Scope names come from the generated utility tree.
-configureUtils(base, { scoped: { missing: {} } });
+configureUtils(base.users.read, { live: { retry: false } });
+configureUtils(base, {
+  paths: {
+    // @ts-expect-error Scope names come from the generated utility tree.
+    missing: {},
+  },
+});
 // @ts-expect-error View options reject unknown configuration properties.
 configureUtils(base.users.read, { query: { retrry: false } });
-// @ts-expect-error Generated query functions remain owned by the library.
 configureUtils(base.users.read, {
-  query: { policy: { queryFn: async () => ({ name: "x" }) } },
+  // @ts-expect-error Generated query functions remain owned by the library.
+  query: { queryFn: async () => ({ name: "x" }) },
 });
 // @ts-expect-error Inputs remain local to the call site.
-configureUtils(base.users.read, { query: { policy: { input: { id: 1 } } } });
-// @ts-expect-error Shared defaults cannot determine observer selection.
+configureUtils(base.users.read, { query: { input: { id: 1 } } });
 configureUtils(base.users.read, {
-  query: { policy: { select: (data: { name: string }) => data.name } },
+  // @ts-expect-error Shared defaults cannot determine observer selection.
+  query: { select: (data: { name: string }) => data.name },
 });
 const invalidPolicy = { staleTime: 100, queryHash: "replacement" };
 // @ts-expect-error Exact policy checks also apply to assigned objects.
-configureUtils(base.users.read, { query: { policy: invalidPolicy } });
+configureUtils(base.users.read, { query: invalidPolicy });
 
 const historyConfiguration = {
   streamed: {
-    policy: { maxChunks: 20 },
+    maxChunks: 20,
     interceptors: [async ({ next }) => await next()],
   },
 } satisfies UtilsConfiguration<typeof base>;
@@ -147,12 +151,8 @@ history.users.watch.streamedOptions({
   initialData: ["seed"],
 });
 const localHistory = configureUtils(base, {
-  scoped: {
-    users: {
-      scoped: {
-        watch: { streamed: { policy: { maxChunks: "unbounded" } } },
-      },
-    },
+  paths: {
+    "users.watch": { streamed: { maxChunks: "unbounded" } },
   },
 });
 localHistory.users.watch.streamedOptions({ input: { id: 1 } });
@@ -162,45 +162,43 @@ localHistory.ticks.streamedOptions();
 history.users.watch.streamedOptions({ input: { id: "1" } });
 // @ts-expect-error Shared query interceptors must preserve every leaf's data type.
 configureUtils(base, { query: { interceptors: [async () => 1] } });
-// @ts-expect-error Shared mutation interceptors must preserve every leaf's data type.
 configureUtils(base, {
+  // @ts-expect-error Shared mutation interceptors must preserve every leaf's data type.
   mutation: { interceptors: [async () => ({ name: "replacement" })] },
 });
 // @ts-expect-error Native mutation policy callbacks exclude explicit undefined.
-configureUtils(base, { mutation: { policy: { onSuccess: undefined } } });
+configureUtils(base, { mutation: { onSuccess: undefined } });
 
 declare const invalidUnionPolicy:
   | { readonly staleTime: number }
   | { readonly staleTime: number; readonly queryHash: string };
 // @ts-expect-error A forbidden policy property in any union member is rejected.
-configureUtils(base.users.read, { query: { policy: invalidUnionPolicy } });
+configureUtils(base.users.read, { query: invalidUnionPolicy });
 declare const invalidUnionView:
-  | { readonly policy: { readonly staleTime: number } }
+  | { readonly staleTime: number }
   | {
-      readonly policy: {
-        readonly staleTime: number;
-        readonly queryHash: string;
-      };
+      readonly staleTime: number;
+      readonly queryHash: string;
     };
 // @ts-expect-error View unions retain exact policy checks.
 configureUtils(base.users.read, { query: invalidUnionView });
 declare const invalidUnionScope:
   | {
-      readonly read: {
-        readonly query: { readonly policy: { readonly retry: false } };
+      readonly "users.read": {
+        readonly query: { readonly retry: false };
       };
     }
   | {
-      readonly read: {
-        readonly query: { readonly policy: { readonly queryHash: string } };
+      readonly "users.read": {
+        readonly query: { readonly queryHash: string };
       };
     };
 // @ts-expect-error Scoped unions retain exact policy checks.
-configureUtils(base, { scoped: { users: { scoped: invalidUnionScope } } });
+configureUtils(base, { paths: invalidUnionScope });
 declare const validUnionPolicy:
   | { readonly staleTime: number }
   | { readonly retry: false };
-configureUtils(base.users.read, { query: { policy: validUnionPolicy } });
+configureUtils(base.users.read, { query: validUnionPolicy });
 configureUtils(base, {
   query: {
     interceptors: [
@@ -221,16 +219,13 @@ configureUtils(base, {
   },
 });
 
-const leafPolicy = defineUtilsPolicy<ContractUtils["users"]["read"]>();
-leafPolicy({
+configureUtils(base.users.read, {
   query: {
-    policy: {
-      retry: (_count, error) => {
-        error.cause satisfies import("effect").Cause.Cause<"missing">;
-        // @ts-expect-error This leaf does not declare a numeric failure.
-        error.cause satisfies import("effect").Cause.Cause<number>;
-        return false;
-      },
+    retry: (_count, error) => {
+      error.cause satisfies import("effect").Cause.Cause<"missing">;
+      // @ts-expect-error This leaf does not declare a numeric failure.
+      error.cause satisfies import("effect").Cause.Cause<number>;
+      return false;
     },
     interceptors: [
       async ({ next }) => {
@@ -243,41 +238,128 @@ leafPolicy({
     ],
   },
   mutation: {
-    policy: {
-      onSuccess: (data, variables, optimistic) => {
-        data.name satisfies string;
-        variables.id satisfies number;
-        // @ts-expect-error Variables are leaf-specific.
-        variables.id satisfies string;
-        // @ts-expect-error Optimistic context stays local.
-        optimistic.previous;
-      },
-      onError: (error) => {
-        error.cause satisfies import("effect").Cause.Cause<"missing">;
-      },
+    onSuccess: (data, variables, optimistic) => {
+      data.name satisfies string;
+      variables.id satisfies number;
+      // @ts-expect-error Variables are leaf-specific.
+      variables.id satisfies string;
+      // @ts-expect-error Optimistic context stays local.
+      optimistic.previous;
+    },
+    onError: (error) => {
+      error.cause satisfies import("effect").Cause.Cause<"missing">;
     },
   },
 });
-// @ts-expect-error Unknown scopes fail during assembly.
-defineUtilsPolicy<ContractUtils>()({ scoped: { unknown: {} } });
+defineRpcPolicy.withClientError<never>()(
+  group,
+  {
+    paths: {
+      // @ts-expect-error Unknown scopes fail during assembly.
+      unknown: {},
+    },
+  },
+  { keyPrefix: ["configuration"] }
+);
 // @ts-expect-error A unary leaf has no live view.
-leafPolicy({ live: { policy: { retry: false } } });
+configureUtils(base.users.read, { live: { retry: false } });
 // @ts-expect-error Assembly rejects invalid native options.
-leafPolicy({ query: { policy: { staleTime: "forever" } } });
+configureUtils(base.users.read, { query: { staleTime: "forever" } });
 // @ts-expect-error Inputs remain local.
-leafPolicy({ query: { policy: { input: { id: 1 } } } });
-// @ts-expect-error Optimistic preparation remains local.
-leafPolicy({ mutation: { policy: { onMutate: () => ({ previous: 1 }) } } });
-// @ts-expect-error Exact checks include assigned options.
-leafPolicy({ query: { policy: invalidPolicy } });
-// @ts-expect-error Exact checks include union members.
-leafPolicy({ query: { policy: invalidUnionPolicy } });
-const streamAssembly = defineUtilsPolicy<ContractUtils["users"]>()({
-  scoped: { watch: { streamed: { policy: { maxChunks: 3 } } } },
+configureUtils(base.users.read, { query: { input: { id: 1 } } });
+configureUtils(base.users.read, {
+  // @ts-expect-error Optimistic preparation remains local.
+  mutation: { onMutate: () => ({ previous: 1 }) },
 });
-const assembledBranch = configureUtils(base.users, streamAssembly);
+// @ts-expect-error Exact checks include assigned options.
+configureUtils(base.users.read, { query: invalidPolicy });
+// @ts-expect-error Exact checks include union members.
+configureUtils(base.users.read, { query: invalidUnionPolicy });
+const assembledBranch = configureUtils(base.users, {
+  paths: {
+    watch: { streamed: { maxChunks: 3 } },
+  },
+});
+
 assembledBranch.watch.streamedOptions({ input: { id: 1 } });
 // @ts-expect-error The policy does not change the stream's input contract.
 assembledBranch.watch.streamedOptions({ input: { id: "1" } });
 // @ts-expect-error Stream leaves do not have buffered query views.
-defineUtilsPolicy<ContractUtils["users"]["watch"]>()({ query: {} });
+configureUtils(base.users.watch, { query: {} });
+
+const standardPolicy = defineRpcPolicy(group, {
+  paths: {
+    "users.read": {
+      query: {
+        retry: (_count, error) => {
+          error.cause satisfies import("effect").Cause.Cause<
+            "missing" | import("effect/rpc").RpcClientError.RpcClientError
+          >;
+          return false;
+        },
+      },
+    },
+  },
+});
+standardPolicy.paths["users.read"].query.retry;
+
+const customPolicy = defineRpcPolicy.withClientError<"transport">()(
+  group,
+  {
+    paths: {
+      "users.read": {
+        query: {
+          enabled: (query) => query.queryKey[0].tenant === "test",
+          refetchInterval: (query) => {
+            query.queryKey[0].tenant satisfies "test";
+            return 1000;
+          },
+          retry: (_count, error) => {
+            error.cause satisfies import("effect").Cause.Cause<
+              "missing" | "transport"
+            >;
+            return false;
+          },
+        },
+      },
+      "users.watch": { streamed: { maxChunks: 7 } },
+    },
+  },
+  { keyPrefix: [{ tenant: "test" }] }
+);
+customPolicy.paths["users.watch"].streamed.maxChunks satisfies 7;
+declare const customClient: RpcClient.RpcClient.Flat<
+  RpcGroup.Rpcs<typeof group>,
+  "transport"
+>;
+const customBase = createRpcQueryUtils(group, {
+  client: customClient,
+  keyPrefix: [{ tenant: "test" }],
+});
+const chained = configureUtils(configureUtils(customBase, customPolicy), {
+  paths: {
+    "users.watch": { streamed: { publicationBatchSize: 2 } },
+    ticks: { streamed: { maxChunks: 2 } },
+  },
+});
+chained.users.watch.streamedKey({ input: { id: 1 } });
+chained.ticks.streamedOptions();
+
+declare const unionTag: "dual.left" | "dual.right";
+const unionGroup = RpcGroup.make(Rpc.make(unionTag, { success: Schema.Int }));
+declare const unionClient: RpcClient.RpcClient.Flat<
+  RpcGroup.Rpcs<typeof unionGroup>
+>;
+const unionUtils = createRpcQueryUtils(unionGroup, { client: unionClient });
+unionUtils.dual.left.queryKey() satisfies readonly [
+  "rpc",
+  "dual",
+  "left",
+  "query",
+];
+unionUtils.dual.right.queryKey() satisfies readonly [
+  "rpc",
+  "dual",
+  "right",
+  "query",
+];

@@ -45,6 +45,7 @@ sources:
   - "docs/adr/0040-*.md"
   - "docs/adr/0042-*.md"
   - "docs/adr/0043-*.md"
+  - "docs/adr/0049-*.md"
   - "apps/docs/astro.config.mts"
   - "**/apps/docs/src/content/docs/**/*.md"
   - "**/apps/docs/src/content/docs/**/*.mdx"
@@ -65,7 +66,7 @@ sources:
 3. Import the factory from `@ueberbrot/effect-api-query`. Keep contract identifiers literal. Build the utility tree once per client and cache owner.
 4. Pass a non-empty JSON tuple as `keyPrefix`. Include safe values for any tenant, user, or backend identity that changes results. Keep credentials in the client.
 
-The app owns the client, transport, authentication, runtime, and cache. Keep the client alive through requests and local cleanup. If execution needs Effect services, supply a `runPromiseExit` that provides them and forwards the `signal` in its second argument. Use the default runner for service-free requests.
+The app owns the client, transport, authentication, runtime, and cache. Keep the client alive through requests and local cleanup. If execution needs Effect services, pass a `runtime` that provides them and forwards the `signal` in its second argument. Use the default runner for service-free requests.
 
 ## Build the options
 

@@ -57,7 +57,7 @@ Import `configureUtils` from `@ueberbrot/effect-api-query` where you create `rpc
 
 ```ts
 const read = configureUtils(rpc.read, {
-  query: { policy: { structuralSharing: shareSnapshot } },
+  query: { structuralSharing: shareSnapshot },
 });
 const options = read.queryOptions({ select: (data) => data.readings.length });
 ```
@@ -76,7 +76,7 @@ Set the callback on the metadata view.
 
 ```ts
 const metadata = configureUtils(http.readings.read, {
-  metadata: { policy: { structuralSharing: shareMetadataSnapshot } },
+  metadata: { structuralSharing: shareMetadataSnapshot },
 });
 ```
 

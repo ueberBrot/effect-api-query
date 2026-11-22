@@ -1,7 +1,7 @@
 import { workflowsApi } from "@effect-api-query/contracts";
 import {
   acquireQueryOwner,
-  defineUtilsPolicy,
+  defineHttpApiPolicy,
   configureUtils,
   createHttpApiQueryUtils,
 } from "@ueberbrot/effect-api-query";
@@ -32,24 +32,23 @@ export const startHttpWorkflows = async (baseUrl: string) => {
         keyPrefix: ["http-workflows"],
         runtime: runPromiseExit,
       });
-      const policy = defineUtilsPolicy<typeof base>()({
-        query: { policy: { retry: false }, interceptors: [intercept] },
-        metadata: { policy: { retry: false }, interceptors: [intercept] },
-        infinite: { policy: { retry: false }, interceptors: [intercept] },
+      const policy = defineHttpApiPolicy(workflowsApi, {
+        query: { retry: false, interceptors: [intercept] },
+        metadata: { retry: false, interceptors: [intercept] },
+        infinite: { retry: false, interceptors: [intercept] },
         live: {
-          policy: { retry: false, coalesceMs: 250 },
+          retry: false,
+          coalesceMs: 250,
           interceptors: [intercept],
         },
         streamed: {
-          policy: {
-            retry: false,
-            maxChunks: 4,
-            publicationBatchSize: 3,
-            publicationMaxWaitMs: 180,
-          },
+          retry: false,
+          maxChunks: 4,
+          publicationBatchSize: 3,
+          publicationMaxWaitMs: 180,
           interceptors: [intercept],
         },
-        mutation: { policy: { retry: false } },
+        mutation: { retry: false },
       });
       return {
         runtime,
