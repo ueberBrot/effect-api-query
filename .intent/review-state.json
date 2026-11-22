@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "2e20b3b0b7e5e3ba01ae7bfb2beef3cd4c92223a8b789805dd2da5cad23229c8",
+      "fingerprint": "d78bf027d843a8d626dc161ab0e08dc7b607044ec2e6260f8cada7341b8b8ec5",
       "snapshot": {
         "GLOSSARY.md": "4532453f4efb696d95c66aabb9f62863e28984bb961f97ee288034af62d76f29",
         "README.md": "87db3a47ce666b408001c89b81b2133393eb2074c63ba1ac1786be8e20b96dfd",
@@ -175,7 +175,7 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "c45a52b87bb764fb22f97ab82e5d3c2b6afa8b67d1fa76d94003ce87278f00b5",
+        "package.json": "4393bad5be232b4f9aeff48dfba55a034a84538b2135780b863832fa0df29dc6",
         "pnpm-workspace.yaml": "fc4bff1fa9ef4a4887691c6e004e02829736f93ee07efcb563f78f836a21a276",
         "scripts/check-effect-compatibility.mts": "4fd616aadc3857ef011a53d8f1bb5afa1e56d0aa8015608ec8fd5a7bc1218678",
         "scripts/check-framework-consumers.mts": "f0111ac9ed84996f722f656358b810da0b9ecc8c6c0219a2019d1076b5d50cbc",
@@ -371,15 +371,15 @@
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6",
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca"
       },
-      "head": "b495313da9082e39481e8964ee8717914ae1b33f",
+      "head": "779879ead319ffc7a6761c7cf57cd9e740c9964c",
       "outcome": "no-change",
-      "reason": "The root agent instructions now point to existing task definitions and retain the public type testing rule. ADR 0035 points to the task definitions for validation. Shipped guidance and all three planning records still cover the same consumer tasks.",
+      "reason": "Removing the direct development dependency preserves Ultracite peer resolution and Vite+ linting. Consumer installation and shipped guidance remain accurate. The domain map, skill specification, and skill tree still cover the same developer tasks.",
       "evidence": [
-        "Read the task definitions and verified the revised ADR link. Repository and shipped skill checks passed."
+        "Frozen pnpm install and pnpm why oxlint confirmed a single Oxlint 1.93.0 resolution. vp run lint and vp run check passed."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "d73149929635697849328427809da9f58359fdb05b2788c03837f9bbdf9299d6",
+      "fingerprint": "575a0b2bd1f5626183a0651ad208be8ea5d8ebe8043c610d644718a0773186db",
       "snapshot": {
         "GLOSSARY.md": "4532453f4efb696d95c66aabb9f62863e28984bb961f97ee288034af62d76f29",
         "README.md": "87db3a47ce666b408001c89b81b2133393eb2074c63ba1ac1786be8e20b96dfd",
@@ -554,7 +554,7 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "c45a52b87bb764fb22f97ab82e5d3c2b6afa8b67d1fa76d94003ce87278f00b5",
+        "package.json": "4393bad5be232b4f9aeff48dfba55a034a84538b2135780b863832fa0df29dc6",
         "pnpm-workspace.yaml": "fc4bff1fa9ef4a4887691c6e004e02829736f93ee07efcb563f78f836a21a276",
         "scripts/check-effect-compatibility.mts": "4fd616aadc3857ef011a53d8f1bb5afa1e56d0aa8015608ec8fd5a7bc1218678",
         "scripts/check-framework-consumers.mts": "f0111ac9ed84996f722f656358b810da0b9ecc8c6c0219a2019d1076b5d50cbc",
@@ -750,11 +750,11 @@
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6",
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca"
       },
-      "head": "b495313da9082e39481e8964ee8717914ae1b33f",
+      "head": "779879ead319ffc7a6761c7cf57cd9e740c9964c",
       "outcome": "no-change",
-      "reason": "The root agent instructions now point to existing task definitions and retain the public type testing rule. ADR 0035 points to the task definitions for validation. Shipped guidance and all three planning records still cover the same consumer tasks.",
+      "reason": "Removing the direct development dependency preserves Ultracite peer resolution and Vite+ linting. Consumer installation and shipped guidance remain accurate. The domain map, skill specification, and skill tree still cover the same developer tasks.",
       "evidence": [
-        "Read the task definitions and verified the revised ADR link. Repository and shipped skill checks passed."
+        "Frozen pnpm install and pnpm why oxlint confirmed a single Oxlint 1.93.0 resolution. vp run lint and vp run check passed."
       ]
     },
     "source:vite.config.ts": {

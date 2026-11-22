@@ -76,7 +76,6 @@
     "@types/react-dom": "catalog:",
     "effect": "catalog:",
     "fallow": "3.43.0",
-    "oxlint": "1.93.0",
     "publint": "0.3.25",
     "react": "catalog:",
     "react-dom": "catalog:",
