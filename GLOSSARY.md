@@ -12,7 +12,7 @@ These terms describe how the package builds TanStack Query utilities from Effect
 
 **Accumulated streamed query**: A streaming RPC or HTTP SSE/NDJSON view that caches emitted values in order. It can limit the cache to a recent history. Refetches can reset, append to, or replace the cached sequence. _Avoid_: Live query, infinite query
 
-**Live query**: A streaming RPC or HTTP SSE/NDJSON view that caches only the latest emitted value. It converts `undefined` to `null`. Stream completion preserves the latest value. Completion before the first emission produces a package error. _Avoid_: Accumulated streamed query, subscription
+**Live query**: A streaming RPC or HTTP SSE/NDJSON view that caches only the latest emitted value. It converts `undefined` to `null`. Stream completion preserves the latest value. Completion before the first emission produces a package error. Aborting before the first emission follows native cancellation. _Avoid_: Accumulated streamed query, subscription
 
 **HTTP metadata view**: A buffered HTTP query view with decoded query data and an immutable snapshot of the response status and raw string headers. Declared decoded header wrappers remain part of the data. _Avoid_: Raw response, header-wrapped success
 

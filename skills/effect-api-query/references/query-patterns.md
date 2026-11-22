@@ -151,7 +151,7 @@ Use `coalesceMs` only when each live emission is complete state. Use a whole num
 
 Pass matching policy to `liveKey(input, { coalesceMs })` or `liveKey({ coalesceMs })` if inputless. Set `live.policy` to share this across keys and options. Omit the local value to inherit it. Pass `coalesceMs: undefined` to clear it. Explicit deadlines change the key. Pass the same local `sseOptions` for keys and options.
 
-An empty unseeded accumulated stream resolves to `[]`. An empty append keeps existing history. Empty reset and replace finish with `[]`. Empty live completion raises the adapter's empty-stream error.
+An empty unseeded accumulated stream resolves to `[]`. An empty append keeps existing history. Empty reset and replace finish with `[]`. A live stream that completes before its first value raises the adapter's empty-stream error. Aborting before the first value follows native cancellation.
 
 A live query converts each emitted `undefined` to `null`. Its keys, selectors, and initial data use the normalized type. Accumulated history keeps the original elements.
 

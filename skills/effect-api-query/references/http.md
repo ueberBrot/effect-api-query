@@ -102,7 +102,7 @@ Buffered endpoints without multipart support queries, pagination, and mutations.
 
 With `success: []`, ordinary and infinite queries cache `null`, metadata contains `data: null`, and mutations return the decoded `undefined`.
 
-For one SSE or NDJSON success, use `streamedOptions` for ordered history or `liveOptions` for the latest value. Each view has its own key and preserves decoded header wrappers. Set `maxChunks` for accumulated history or inherit it through policy. For SSE, place `sseOptions` beside `input`. Match it when building keys. An empty live stream raises `EffectHttpApiQueryEmptyStreamError`. Live queries convert a whole `undefined` to `null`.
+For one SSE or NDJSON success, use `streamedOptions` for ordered history or `liveOptions` for the latest value. Each view has its own key and preserves decoded header wrappers. Set `maxChunks` for accumulated history or inherit it through policy. For SSE, place `sseOptions` beside `input` or set [leaf policy defaults](cache-workflows.md#assemble-contract-associated-policies). Match local overrides when building keys. A live stream that completes before its first value raises `EffectHttpApiQueryEmptyStreamError`. An abort follows native cancellation. Live queries convert a whole `undefined` to `null`.
 
 Use the ready client for raw bytes, HTTP upgrades, mixed buffered and streamed successes, or streaming request payloads. The factory omits those endpoints, streamed successes with multipart inputs, and groups with no supported endpoints.
 
@@ -206,7 +206,7 @@ export function recordOptions(client: HttpApiClient.ForApi<typeof recordsApi>) {
 }
 ```
 
-Pass the options to native Query consumers. A record `{"id":"1"}` decodes to `{ id: 1 }`. HTTP and Schema failures keep their Cause. NDJSON uses the ready client's error channel. An empty accumulated query can succeed, and an empty live query fails. Keep the client alive until local cleanup completes.
+Pass the options to native Query consumers. A record `{"id":"1"}` decodes to `{ id: 1 }`. HTTP and Schema failures keep their Cause. NDJSON uses the ready client's error channel. An empty accumulated query can succeed. Keep the client alive until local cleanup completes.
 
 ## Multipart mutations
 
@@ -216,7 +216,7 @@ The client receives the original `FormData`. Mutation types and failures follow 
 
 ## Key encoding
 
-Default encoding synchronously encodes each labeled request part. It omits encoded `undefined` members and keeps array order and `null`. It lowercases headers and rejects conflicting duplicates. A custom encoder defines its own shape.
+Default encoding synchronously encodes each labeled request part. It omits encoded `undefined` members and keeps array order and `null`. It lowercases header names. Duplicate names must have equivalent encoded values. Object key order does not affect that comparison. A custom encoder defines its own shape.
 
 Configure `keyEncoders: { groupId: { endpointId: encoder } }`, including for a top-level group. The encoder receives the complete decoded request. For queries, supply one for encoding services, opaque middleware, redacted input, or multiple payload alternatives. Even synchronous opaque middleware requires one. For binary values, project to JSON, for example an array of bytes.
 
