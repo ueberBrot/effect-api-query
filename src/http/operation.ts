@@ -1,6 +1,5 @@
 import { Effect, Predicate } from "effect";
 import type { Cause } from "effect";
-import type { Sse } from "effect/encoding";
 import type { HttpClientResponse } from "effect/http";
 import type { HttpApi } from "effect/http-api";
 
@@ -19,6 +18,7 @@ import type { HttpApiEndpointIdentity } from "./errors";
 import { createHttpRequest } from "./request";
 import type { HttpRequestDescription } from "./request";
 import { createHttpStreamPreparation } from "./streamed-query";
+import type { HttpSseDecoderOptions } from "./types";
 
 type HttpOperation = (
   | UnaryOperation
@@ -132,7 +132,7 @@ const extractHttpEndpoints = (
       // oxlint-disable-next-line anti-slop/no-unknown-parameters
       requestInput: unknown,
       responseMode: Mode,
-      sseOptions?: Sse.DecodeOptions
+      sseOptions?: HttpSseDecoderOptions
     ) => {
       const method = Predicate.hasProperty(target, identity.endpoint)
         ? target[identity.endpoint]

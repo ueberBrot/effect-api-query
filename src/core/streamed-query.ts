@@ -143,72 +143,6 @@ export interface MakeStreamQueryOptions {
   readonly runPromiseExit: RunPromiseExit<unknown>;
 }
 
-const streamQueryIterable = <A>(
-  source: AsyncIterable<A>,
-  signal: AbortSignal,
-  emptyError: (() => Error) | undefined
-): AsyncIterable<A> => ({
-  [Symbol.asyncIterator]() {
-    const iterator = source[Symbol.asyncIterator]();
-    let closePromise: Promise<IteratorResult<A>> | undefined;
-    let emitted = false;
-    const detach = () => {
-      // oxlint-disable-next-line eslint/no-use-before-define
-      signal.removeEventListener("abort", onAbort);
-    };
-    const close = async () => {
-      closePromise ??= (async () => {
-        try {
-          return (
-            (await iterator.return?.()) ?? { done: true, value: undefined }
-          );
-        } finally {
-          detach();
-        }
-      })();
-      return await closePromise;
-    };
-    const onAbort = () => {
-      // oxlint-disable-next-line promise/prefer-await-to-then
-      void Promise.resolve().then(close).catch(detach);
-    };
-    signal.addEventListener("abort", onAbort, { once: true });
-
-    return {
-      async next() {
-        let result: IteratorResult<A>;
-        if (signal.aborted) {
-          result = await close();
-        } else {
-          try {
-            result = await iterator.next();
-          } catch (error) {
-            detach();
-            throw error;
-          }
-        }
-        if (result.done === true) {
-          detach();
-          if (!emitted && !signal.aborted && emptyError !== undefined) {
-            throw emptyError();
-          }
-        }
-        emitted = true;
-        return result;
-      },
-      return: close,
-      async throw(cause?: unknown) {
-        detach();
-        if (iterator.throw !== undefined) {
-          return await iterator.throw(cause);
-        }
-        await close();
-        throw cause;
-      },
-    };
-  },
-});
-
 // Query Core owns fetch/retry/observer state; this consumer owns stream publication.
 const consumeQueryStream = async <A, Data>(
   context: QueryFunctionContext,
@@ -295,11 +229,7 @@ export const makeStreamQuery = ({
     if (Exit.isFailure(exit)) {
       throw executionError(exit.cause);
     }
-    return streamQueryIterable(
-      exit.value,
-      signal,
-      policy._tag === "Live" ? emptyError : undefined
-    );
+    return exit.value;
   };
 
   if (policy._tag === "Live") {
@@ -310,13 +240,12 @@ export const makeStreamQuery = ({
       }
       return await consumeQueryStream(
         context,
-        policy.coalesceMs === undefined
-          ? await streamFn(context)
-          : streamLiveSnapshots(
-              await streamFn(context),
-              context.signal,
-              policy.coalesceMs
-            ),
+        streamLiveSnapshots(
+          await streamFn(context),
+          context.signal,
+          policy.coalesceMs,
+          emptyError
+        ),
         null,
         // oxlint-disable-next-line anti-slop/no-unknown-parameters
         (_latest: unknown, value: unknown) =>

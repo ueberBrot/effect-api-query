@@ -1,23 +1,9 @@
-import { hashKey } from "@tanstack/query-core";
 import type { DehydratedState, QueryKey } from "@tanstack/query-core";
-import { Array as EffectArray, Effect, Order, Predicate, Schema } from "effect";
+import { Effect, Schema } from "effect";
 
 import type { InferQueryData, SupportedQueryView } from "./inference";
+import { compileQueryPrefix, indexQueryPrefixes } from "./query-prefix-index";
 import { viewPrefix } from "./view-prefix";
-
-type PrimitiveHashSegment = string | number | boolean;
-
-const isPrimitiveHashSegment = (
-  value: QueryKey[number]
-): value is PrimitiveHashSegment =>
-  Predicate.isString(value) ||
-  Predicate.isBoolean(value) ||
-  (Predicate.isNumber(value) && Number.isFinite(value));
-
-const canMatchSegment = (
-  segments: ReadonlySet<PrimitiveHashSegment>,
-  value: QueryKey[number]
-): boolean => !isPrimitiveHashSegment(value) || segments.has(value);
 
 /** One generated leaf/view's cache-data codec, before observer selection. */
 export interface HydrationCodec<
@@ -39,37 +25,7 @@ export interface HydrationCodec<
 const makeCodec = <S extends Schema.Codec<unknown, unknown, unknown, unknown>>(
   prefix: QueryKey,
   schema: S
-) => {
-  const hash = hashKey(prefix);
-  const prefixLength = prefix.length;
-  const lastIndex = prefixLength - 1;
-  const lastSegment = prefix[lastIndex];
-  const checkLast = isPrimitiveHashSegment(lastSegment);
-  const firstSegment = prefixLength > 1 ? prefix[0] : undefined;
-  const checkFirst = isPrimitiveHashSegment(firstSegment);
-  return Object.freeze({
-    prefix,
-    schema,
-    matches: (key: QueryKey) => {
-      if (key.length < prefixLength) {
-        return false;
-      }
-      const last = key[lastIndex];
-      if (checkLast && isPrimitiveHashSegment(last) && last !== lastSegment) {
-        return false;
-      }
-      const [first] = key;
-      if (
-        checkFirst &&
-        isPrimitiveHashSegment(first) &&
-        first !== firstSegment
-      ) {
-        return false;
-      }
-      return hashKey(key.slice(0, prefixLength)) === hash;
-    },
-  });
-};
+) => Object.freeze({ prefix, schema, matches: compileQueryPrefix(prefix) });
 
 /** Registers a codec whose decoded type matches the generated cached representation. */
 export const queryViewCodec = <
@@ -187,83 +143,11 @@ export const createHydrationRegistry = <
   Entries[number]["schema"]["EncodingServices"]
 > => {
   type Entry = Entries[number];
-  interface LengthBucket {
-    readonly length: number;
-    readonly byHash: Map<string, Entry>;
-    lastSegments: Set<PrimitiveHashSegment> | undefined;
-    firstSegments: Set<PrimitiveHashSegment> | undefined;
-  }
-  const byLength = new Map<number, LengthBucket>();
   const codecs: readonly Entry[] = entries;
-  for (const codec of codecs) {
-    const { length } = codec.prefix;
-    let bucket = byLength.get(length);
-    if (bucket === undefined) {
-      bucket = {
-        length,
-        byHash: new Map<string, Entry>(),
-        lastSegments: length > 0 ? new Set<PrimitiveHashSegment>() : undefined,
-        firstSegments: length > 1 ? new Set<PrimitiveHashSegment>() : undefined,
-      };
-      byLength.set(length, bucket);
-    }
-    const hash = hashKey(codec.prefix);
-    if (bucket.byHash.has(hash)) {
-      throw new HydrationCodecError("DuplicateCodec");
-    }
-    bucket.byHash.set(hash, codec);
-    if (bucket.lastSegments !== undefined) {
-      const last = codec.prefix[length - 1];
-      if (isPrimitiveHashSegment(last)) {
-        bucket.lastSegments.add(last);
-      } else {
-        bucket.lastSegments = undefined;
-      }
-    }
-    if (bucket.firstSegments !== undefined) {
-      const [first] = codec.prefix;
-      if (isPrimitiveHashSegment(first)) {
-        bucket.firstSegments.add(first);
-      } else {
-        bucket.firstSegments = undefined;
-      }
-    }
-  }
-  const buckets = EffectArray.sort(
-    byLength.keys(),
-    Order.flip(Order.Number)
-  ).flatMap((length) => {
-    const bucket = byLength.get(length);
-    return bucket === undefined ? [] : [bucket];
-  });
-  const minLength = buckets.at(-1)?.length ?? Number.POSITIVE_INFINITY;
-  const codecFor = (key: QueryKey): Entry | undefined => {
-    if (key.length < minLength) {
-      return undefined;
-    }
-    for (const bucket of buckets) {
-      if (key.length < bucket.length) {
-        continue;
-      }
-      if (
-        bucket.lastSegments !== undefined &&
-        !canMatchSegment(bucket.lastSegments, key[bucket.length - 1])
-      ) {
-        continue;
-      }
-      if (
-        bucket.firstSegments !== undefined &&
-        !canMatchSegment(bucket.firstSegments, key[0])
-      ) {
-        continue;
-      }
-      const codec = bucket.byHash.get(hashKey(key.slice(0, bucket.length)));
-      if (codec !== undefined) {
-        return codec;
-      }
-    }
-    return undefined;
-  };
+  const codecFor = indexQueryPrefixes(
+    codecs.map((codec) => [codec.prefix, codec] as const),
+    () => new HydrationCodecError("DuplicateCodec")
+  );
   const transform = <R>(
     queries: DehydratedState["queries"],
     convert: (

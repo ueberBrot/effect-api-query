@@ -822,12 +822,14 @@ describe("createRpcQueryUtils streaming execution", () => {
 
       it.each([
         ["live", undefined],
+        ["live", 20],
         ["streamed", undefined],
         ["streamed", 20],
       ] as const)(
         "preserves interruption and cleanup defects when cancelling a pending %s pull with deadline %s",
         async (operation, publicationMaxWaitMs) => {
           const timed = publicationMaxWaitMs !== undefined;
+          const cancelOnPublication = timed && operation === "live";
           if (timed) {
             vi.useFakeTimers();
           }
@@ -875,7 +877,7 @@ describe("createRpcQueryUtils streaming execution", () => {
           });
           const options =
             operation === "live"
-              ? rpc.watch.liveOptions()
+              ? rpc.watch.liveOptions({ coalesceMs: publicationMaxWaitMs })
               : rpc.watch.streamedOptions({
                   maxChunks: "unbounded",
                   publicationBatchSize: 10,
@@ -887,6 +889,11 @@ describe("createRpcQueryUtils streaming execution", () => {
           }
           const queryClient = new QueryClient();
           const controller = new AbortController();
+          const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
+            if (cancelOnPublication && event.query.state.data === 2) {
+              controller.abort();
+            }
+          });
           let settled = false;
           const pending = (async () => {
             const result = await captureFailure(
@@ -904,14 +911,22 @@ describe("createRpcQueryUtils streaming execution", () => {
           })();
           try {
             await Effect.runPromise(Deferred.await(entered));
-            controller.abort();
+            if (!cancelOnPublication) {
+              controller.abort();
+            }
             if (timed) {
               await vi.advanceTimersByTimeAsync(50);
             }
-            expect(settled).toBe(false);
-            expect(queryClient.getQueryData(options.queryKey)).toStrictEqual(
-              timed ? [1] : undefined
-            );
+            const published = { live: 2, streamed: [1] };
+            expect({
+              aborted: controller.signal.aborted,
+              settled,
+              data: queryClient.getQueryData(options.queryKey),
+            }).toStrictEqual({
+              aborted: true,
+              settled: false,
+              data: timed ? published[operation] : undefined,
+            });
             await Effect.runPromise(Deferred.succeed(releaseGate, true));
             const error = await pending;
             expect(error).toMatchObject({
@@ -932,6 +947,7 @@ describe("createRpcQueryUtils streaming execution", () => {
               )
             ).toBe(true);
           } finally {
+            unsubscribe();
             controller.abort();
             await Effect.runPromise(Deferred.succeed(releaseGate, true));
             await pending;

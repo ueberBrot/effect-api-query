@@ -78,7 +78,7 @@ Use `defineUtilsPolicy<UtilityType>()(configuration)` when reuse starts before c
 
 Keep the declaration shared. Put policy values, callbacks, cache access, and runtime choices in the app. The policy map retains literals and checks paths, views, and fields. `configureUtils` copies policy values and interceptor arrays. Keep retained values and dependencies unchanged. Leaf callbacks keep concrete types. Optimistic context stays local.
 
-Set SSE decoder defaults on the SSE leaf's `streamed.policy.sseOptions` or `live.policy.sseOptions`, including inside a `scoped` map. Use the configured builders so options and keys inherit the same decoder defaults.
+Set SSE decoder defaults on the SSE leaf's `streamed.policy.sseOptions` or `live.policy.sseOptions`, including inside a `scoped` map. `configureUtils` copies those settings for both keys and options.
 
 For the full example, see [defaults and policies](https://ueberbrot.github.io/effect-api-query/guides/query-defaults/).
 

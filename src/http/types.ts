@@ -205,13 +205,33 @@ export type MethodResult<
         : Result
       : Result
     : Result;
+export type HttpSseDecoderOptions = Sse.DecodeOptions & {
+  readonly maxEventSize: number;
+  readonly dispatchEmptyNamedEvents: boolean;
+};
+
+export type DecodedRequest<
+  Endpoint extends HttpApiEndpoint.ConstraintRequest,
+  Mode extends "decoded-only" | "decoded-and-response",
+> = RequestFields<Endpoint> & { readonly responseMode: Mode } & ([
+    SseEndpoint<Endpoint>,
+  ] extends [never]
+    ? unknown
+    : { readonly sseOptions: HttpSseDecoderOptions });
+
+export type HasMetadataView<
+  Endpoint extends HttpApiEndpoint.ConstraintRequest,
+> = [StreamingEndpoint<Endpoint>] extends [never]
+  ? [Queryable<Endpoint>] extends [never]
+    ? false
+    : true
+  : false;
+
 export type DecodedEffect<
   Method,
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Mode extends "decoded-only" | "decoded-and-response" = "decoded-only",
-> = Method extends (
-  request: RequestFields<Endpoint> & { readonly responseMode: Mode }
-) => infer Result
+> = Method extends (request: DecodedRequest<Endpoint, Mode>) => infer Result
   ? Result
   : never;
 export type StandardMethodEffect<
@@ -233,19 +253,18 @@ export type StandardMethodEffect<
 export type ResolveMethodEffects<
   Method,
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
-  IncludeMetadata extends boolean,
 > =
   StandardMethodEffect<Method, Endpoint> extends infer Fast
     ? [Fast] extends [never]
       ? MethodSignatures<Method, Endpoint> extends infer Signatures
         ? readonly [
             DecodedEffect<Signatures, Endpoint>,
-            IncludeMetadata extends true
+            HasMetadataView<Endpoint> extends true
               ? DecodedEffect<Signatures, Endpoint, "decoded-and-response">
               : never,
           ]
         : never
-      : readonly [Fast, IncludeMetadata extends true ? Fast : never]
+      : readonly [Fast, HasMetadataView<Endpoint> extends true ? Fast : never]
     : never;
 export type ExposedEffects<Api extends HttpApi.Constraint, Client> =
   SupportedGroups<Api> extends infer Group
@@ -255,12 +274,7 @@ export type ExposedEffects<Api extends HttpApi.Constraint, Client> =
           ? Endpoint extends HttpApiEndpoint.ConstraintRequest
             ? ResolveMethodEffects<
                 Member<GroupClient, Endpoint["identifier"]>,
-                Endpoint,
-                [Queryable<Endpoint>] extends [never]
-                  ? false
-                  : [StreamingEndpoint<Endpoint>] extends [never]
-                    ? true
-                    : false
+                Endpoint
               >[number]
             : never
           : never
@@ -527,24 +541,24 @@ export type EndpointLeaf<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Key extends readonly JsonValue[],
   Method,
-> = [StreamingEndpoint<Endpoint>] extends [never]
-  ? ResolveMethodEffects<
-      Method,
-      Endpoint,
-      [Queryable<Endpoint>] extends [never] ? false : true
-    > extends readonly [infer Decoded, infer Metadata]
-    ? BufferedLeaf<Endpoint, Key, Effect.Error<Decoded>, Effect.Error<Metadata>>
-    : never
-  : ResolveMethodEffects<Method, Endpoint, false> extends readonly [
-        infer Decoded,
-        infer _Metadata,
-      ]
-    ?
-        | Effect.Error<Decoded>
-        | StreamFailure<Effect.Success<Decoded>> extends infer ClientError
-      ? StreamedLeaf<Endpoint, Key, ClientError> &
-          LiveLeaf<Endpoint, Key, ClientError>
-      : never
+> =
+  ResolveMethodEffects<Method, Endpoint> extends readonly [
+    infer Decoded,
+    infer Metadata,
+  ]
+    ? [StreamingEndpoint<Endpoint>] extends [never]
+      ? BufferedLeaf<
+          Endpoint,
+          Key,
+          Effect.Error<Decoded>,
+          Effect.Error<Metadata>
+        >
+      :
+            | Effect.Error<Decoded>
+            | StreamFailure<Effect.Success<Decoded>> extends infer ClientError
+        ? StreamedLeaf<Endpoint, Key, ClientError> &
+            LiveLeaf<Endpoint, Key, ClientError>
+        : never
     : never;
 
 export type GroupTree<

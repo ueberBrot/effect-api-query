@@ -360,6 +360,7 @@ it.effect(
         maxEventSize: 128,
         dispatchEmptyNamedEvents: true,
       };
+      const callerSse = { ...inheritedSse };
       const overrideSse = {
         maxEventSize: 64,
         dispatchEmptyNamedEvents: false,
@@ -370,18 +371,18 @@ it.effect(
             scoped: {
               watch: {
                 streamed: {
-                  policy: { maxChunks: 3, sseOptions: inheritedSse },
+                  policy: { maxChunks: 3, sseOptions: callerSse },
                 },
                 live: {
-                  policy: { sseOptions: inheritedSse },
+                  policy: { sseOptions: callerSse },
                 },
               },
               channel: {
                 streamed: {
-                  policy: { maxChunks: 3, sseOptions: inheritedSse },
+                  policy: { maxChunks: 3, sseOptions: callerSse },
                 },
                 live: {
-                  policy: { sseOptions: inheritedSse },
+                  policy: { sseOptions: callerSse },
                 },
               },
             },
@@ -389,6 +390,8 @@ it.effect(
         },
       });
       const configured = configureUtils(base, policy);
+      callerSse.maxEventSize = 256;
+      callerSse.dispatchEmptyNamedEvents = false;
       const channelInput = { params: { id: "alpha" } };
       const queryClient = new QueryClient();
       try {

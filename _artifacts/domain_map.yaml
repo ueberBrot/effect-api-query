@@ -32,7 +32,7 @@ skills:
       - Loader selections with explicit input codecs and owner validation
       - Native provider setup, Suspense recovery, reactive accessors, and host boundaries
     tasks:
-      - Assemble application-owned policy maps before client acquisition. Type-check SSE decoder settings at the SSE leaf, including through scoped maps. Apply policies through configureUtils.
+      - Assemble application-owned policy maps before client acquisition. Type-check SSE decoder settings at the SSE leaf, including through scoped maps. Apply policies through configureUtils, which copies decoder settings for keys and options.
       - Compose typed reads, ensure, cache updates and generated filter invalidation in Effect using an explicit existing QueryClient service; interrupt waiters without cancelling shared execution.
       - Derive buffered, paginated, accumulated, live, and metadata options from a ready client.
       - Address exact stream policy keys, select supported view prefixes, and compose encoded partial native filters with explicit typed projections.

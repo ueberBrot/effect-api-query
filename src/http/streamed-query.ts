@@ -1,5 +1,4 @@
 import { Effect, Predicate, Stream } from "effect";
-import type { Sse } from "effect/encoding";
 import { HttpApiSchema } from "effect/http-api";
 
 import type { StreamingOperation } from "../core/operation";
@@ -10,12 +9,13 @@ import {
   EffectHttpApiQueryError,
 } from "./errors";
 import type { HttpApiEndpointIdentity } from "./errors";
+import type { HttpSseDecoderOptions } from "./types";
 
 const decoderOptions = (
   identity: HttpApiEndpointIdentity,
   // oxlint-disable-next-line anti-slop/no-unsafe-dictionary-type
   options: Record<string, unknown>
-): Sse.DecodeOptions & { readonly maxEventSize: number } => {
+): HttpSseDecoderOptions => {
   const { sseOptions } = options;
   const decoder = Predicate.isObject(sseOptions) ? sseOptions : undefined;
   const maxEventSize = decoder?.["maxEventSize"];
@@ -55,7 +55,7 @@ export const createHttpStreamPreparation =
     invoke: (
       // oxlint-disable-next-line anti-slop/no-unknown-parameters
       input: unknown,
-      sseOptions: Sse.DecodeOptions | undefined
+      sseOptions: HttpSseDecoderOptions | undefined
     ) => Effect.Effect<unknown, unknown, unknown>
   ): StreamingOperation["prepareStream"] =>
   (options, operation, runPromiseExit) => {

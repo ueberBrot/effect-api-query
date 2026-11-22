@@ -10,6 +10,7 @@ import { Array as EffectArray, Order, Predicate } from "effect";
 import { configureMutation, configureQuery } from "./configure";
 import type {
   RuntimeMutationBuilder,
+  RuntimeOptions,
   RuntimeQueryBuilder,
   RuntimeViewConfiguration,
 } from "./configure";
@@ -309,14 +310,25 @@ const views: readonly QueryView[] = [
   "streamed",
 ];
 const configurationViews = [...views, "mutation"] as const;
-const streamKeyPolicyOptions: ReadonlySet<string> = new Set([
-  "maxChunks",
-  "refetchMode",
-  "publicationBatchSize",
-  "publicationMaxWaitMs",
-  "coalesceMs",
-  "sseOptions",
-]);
+
+const snapshotPolicy = (
+  view: QueryView | "mutation",
+  policy: RuntimeOptions
+): RuntimeOptions => {
+  const snapshot = { ...policy };
+  const { sseOptions } = snapshot;
+  if (
+    (view === "live" || view === "streamed") &&
+    Predicate.isObject(sseOptions)
+  ) {
+    const { maxEventSize, dispatchEmptyNamedEvents } = sseOptions;
+    snapshot["sseOptions"] = Object.freeze({
+      maxEventSize,
+      dispatchEmptyNamedEvents,
+    });
+  }
+  return Object.freeze(snapshot);
+};
 
 const snapshotConfiguration = (
   configuration: RuntimeConfiguration | undefined
@@ -336,7 +348,7 @@ const snapshotConfiguration = (
     }
     snapshot ??= {};
     snapshot[view] = Object.freeze({
-      policy: hasPolicy ? Object.freeze({ ...policy }) : undefined,
+      policy: hasPolicy ? snapshotPolicy(view, policy) : undefined,
       interceptors: hasInterceptors
         ? Object.freeze([...interceptors])
         : undefined,
@@ -409,17 +421,12 @@ const configureLeaf = (
       }
       // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
       const buildKey = streamedKey as RuntimeBuilder;
-      const history = Object.fromEntries(
-        Object.entries(policy).filter(([option]) =>
-          streamKeyPolicyOptions.has(option)
-        )
-      );
       configured[view === "live" ? "liveKey" : "streamedKey"] =
         inputKind(node.key) === "Inputless"
           ? (options?: Partial<StreamedPolicyOptions>) =>
-              buildKey({ ...history, ...options })
+              buildKey({ ...policy, ...options })
           : (input: unknown, options?: Partial<StreamedPolicyOptions>) =>
-              buildKey(input, { ...history, ...options });
+              buildKey(input, { ...policy, ...options });
     }
   }
   if (Object.hasOwn(node, "mutationOptions")) {
