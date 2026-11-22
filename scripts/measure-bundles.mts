@@ -1,3 +1,4 @@
+import { ok } from "node:assert/strict";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
@@ -134,6 +135,9 @@ try {
                       effectCache: code.includes(
                         "QueryClient operation failed"
                       ),
+                      reactivityBridge:
+                        code.includes(".registerUnsafe(") ||
+                        code.includes("effect/reactivity"),
                       sharing: code.includes("Schema sharing requires acyclic"),
                     },
                   };
@@ -147,6 +151,11 @@ try {
           if (baseline === undefined || adapter === undefined) {
             throw new Error("Both bundle variants must complete");
           }
+          ok(
+            !adapter.optionalDiagnosticMarkers.reactivityBridge ||
+              baseline.optionalDiagnosticMarkers.reactivityBridge,
+            `${name} retained an unused Reactivity bridge`
+          );
           const budget =
             bundleBudgets[name][externalPeers ? "external" : "included"];
           assertBudget(

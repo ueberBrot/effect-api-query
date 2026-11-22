@@ -35,6 +35,7 @@ skills:
     tasks:
       - Check application-owned policy maps against their RPC or HTTP contracts before client acquisition. Type-check SSE settings at the SSE leaf, including flat path entries. Apply policies through configureUtils, which copies decoder settings for keys and options.
       - Use QueryClientService to run queries, warm the cache, and apply cache operations in Effect. Use an exclusive stream snapshot to capture a stream that can stay open.
+      - Bind application Reactivity keys to explicit cache filters within a Scope. Retain key prefix isolation and stop invalidation at query owner retirement.
       - Derive buffered, paginated, accumulated, live, and metadata options from a ready client. Use its HTTP request parse options when encoding default keys.
       - Use colocated query filters for lazy-safe branch views and canonical leaf inputs. Use concrete keys for exact stream policies and explicit projections for encoded partial input.
       - Reuse inferred input, cached query data, and mutation types in application modules.
@@ -73,6 +74,13 @@ skills:
       - topic: Frameworks and hosts
         reason: Native providers, Suspense recovery, hook overloads, and transport boundaries depend on the integration. The package does not provide these services.
     failure_modes:
+      - mistake: Treat Reactivity record keys as per-entity subscriptions
+        mechanism: Effect matches both the record group and its IDs, so writes can trigger sibling bindings.
+        wrong_pattern: "Bind { users: [1] } and expect writes to { users: [2] } to skip that binding."
+        correct_pattern: Use a matching string array key for exact events and colocated filters for cache scope. Use distinct Reactivity services for independent owners.
+        source: apps/docs/src/content/docs/guides/query-effects.md
+        priority: HIGH
+        status: active
       - mistake: Assume invalidation immediately refetches inactive queries
         mechanism: QueryClient marks matching entries stale and refetches active matches by default.
         wrong_pattern: Invalidate an unobserved query after a write and read its cache as if the request has completed.

@@ -84,3 +84,28 @@ Fallible operations wrap the original failure in `QueryClientOperationError`. Tr
 Interrupting an Effect stops its wait for shared queries or refetches. Use `queryEffects.cancel` to cancel work for all waiters and observers. For a query owner, provide `owner.queryClient` and use `owner.trackUtils` so retirement waits for local cleanup. See [switch cache owners](/effect-api-query/guides/switch-cache-owners/).
 
 For an open stream, use `streamSnapshot` to capture data before the stream ends. Interrupting its fiber or aborting its optional caller signal cancels the capture and starts local cleanup. See [stream snapshots](/effect-api-query/guides/stream-snapshots/).
+
+## Invalidate queries from Effect Reactivity
+
+Use `bindReactivityInvalidation` to connect Reactivity keys to TanStack Query filters. Build the filters from the utility tree so they retain its key prefix. Import the bridge from `@ueberbrot/effect-api-query`. This example uses the `rpc` tree from `directoryEffects` above.
+
+```ts
+const bindDirectoryUser = (
+  rpc: ReturnType<typeof directoryEffects>["rpc"],
+  id: number
+) =>
+  bindReactivityInvalidation([
+    {
+      keys: [`users:${id}`],
+      filter: rpc.users.read.queryFilter({ view: "query", input: { id } }),
+    },
+  ]);
+```
+
+Run the binding inside the Scope that owns the subscription. Provide the same `Reactivity` service your writes use and the cache as `QueryClientService`. With a query owner, supply `owner.queryClient` and pass `{ isActive: owner.isActive }` as the binding options. For server rendering, keep Reactivity and the binding request-local.
+
+A binding accepts one filter or a readonly array of filters. Each binding runs once per microtask, even if multiple keys trigger it. Closing the Scope removes the listeners and drops queued work. Run `yield* bridge.flush` to wait for queued work and any native refetches that it starts.
+
+Effect matches record keys such as `{ users: [1] }` on both the group name and the ID. A write to that group can trigger a binding for another ID. Use array keys such as `["users:1"]` for an exact match and separate Reactivity instances for independent owners. The bridge drops `undefined` record entries and ignores empty bindings. Declare `Reactivity.Keys` in your application if you want stricter key types.
+
+Set `invalidateOptions` for default QueryClient options. A binding's own `options` replace that default. Supply `onError` to receive QueryClient failures, including refetch rejections with `throwOnError: true`. The bridge continues to invalidate while mutations are pending. Coordinate optimistic writes in the application.

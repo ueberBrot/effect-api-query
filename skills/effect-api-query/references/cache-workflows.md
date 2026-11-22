@@ -275,3 +275,13 @@ Run `runQueryEvents(owner, source, options, runPromiseExit)` with your source an
 Keep the runner signal-aware and await its finalizers. Retirement stops consumption, backoff, and refresh. Use the original owner's guard for external writes. If refresh starts shared native queries, track both their runners and complete executions. See [scoped event consumption](https://ueberbrot.github.io/effect-api-query/guides/scoped-event-cache/).
 
 Recovery advances before downstream handling. A handler failure stops delivery. Earlier writes remain. Persist processing checkpoints under app policy. After replay expiry, return the refreshed snapshot's cursor. Keep bounded event history only if the UI needs it.
+
+## Invalidate queries from Effect Reactivity
+
+Bind Reactivity keys to colocated `queryFilter` results with `bindReactivityInvalidation`. Use the filters from the target utility tree to preserve its key prefix. Provide the cache as `QueryClientService` and the Reactivity service used by the writer. Bind inside the request or browser owner's Scope.
+
+Use the same array key on both sides for exact matches, such as `["users:1"]`. A record like `{ users: [1] }` also matches the group name, so it can trigger other `users` bindings. Use separate Reactivity instances when owners need separate events. Declare `Reactivity.Keys` in application code.
+
+With a query owner, pass `{ isActive: owner.isActive }`. Closing the Scope removes listeners and discards queued work. Use `yield* bridge.flush` to wait for queued and in-flight work. Provide `onError` for native invalidation failures. Invalidation runs during pending mutations, so keep optimistic-write coordination in the app.
+
+See [Reactivity invalidation](https://ueberbrot.github.io/effect-api-query/guides/query-effects/#invalidate-queries-from-effect-reactivity) for the binding example and options.

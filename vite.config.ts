@@ -177,6 +177,7 @@ export default defineConfig({
           "src/core/schema-structural-sharing.ts",
           "src/core/configure-utils.ts",
           "src/core/contract-hydration.ts",
+          "src/core/reactivity-invalidation.ts",
         ],
         rules: {
           "anti-slop/no-unknown-parameters": "off",
@@ -264,6 +265,7 @@ export default defineConfig({
       },
       {
         files: [
+          "src/core/reactivity-invalidation.ts",
           "examples/contracts/src/client.ts",
           "examples/contracts/src/contracts.ts",
           "examples/contracts/src/http-api.ts",
@@ -345,6 +347,7 @@ export default defineConfig({
           "tests/skills/query-usability/grade.test.ts",
           "tests/query-policy.test.ts",
           "tests/query-effects.test.ts",
+          "tests/reactivity-invalidation.test.ts",
           "tests/query-descriptor.test.ts",
           "tests/integrated-workflows.test.ts",
           "examples/shared/query-effects.ts",

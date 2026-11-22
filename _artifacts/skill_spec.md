@@ -11,7 +11,7 @@ One `effect-api-query` skill covers the library. Its activation description supp
 | RPC | Payload construction, canonical identity, ready-client lifetime |
 | HTTP | Decoded requests, SSE and NDJSON, multipart mutations, metadata |
 | Query patterns | Inference, skipping, pages, publication batches, recovery and tracing |
-| Cache workflows | Typed policies, interceptors, partial filters, writes, Effect cache operations, and owners |
+| Cache workflows | Typed policies, interceptors, partial filters, writes, Effect cache operations, Reactivity invalidation, and owners |
 | Hydration and SSR | Snapshots, typed view registration, preparation and cleanup |
 | Frameworks and hosts | Provider setup, Suspense, reactive accessors, declared peers and checked combinations, transports and hosts |
 
@@ -51,6 +51,8 @@ The usability batch reuses the existing executable consumer fixtures:
 These checks verify the recommended APIs and observable behavior. A fresh isolated consumer session supplies separate evidence. This authoring session does not establish skill discovery or consumer reliability.
 
 ## Coverage and batch history
+
+- **Scoped Reactivity invalidation, #219, base `97b7860`:** The cache-workflows reference maps Reactivity keys to colocated filters, ties listeners to a Scope, and uses the query owner guard for retirement. The domain map records why record keys can trigger sibling bindings. The skill tree maps ADR 0053. Runtime tests exercise reactive writes, key prefix isolation, coalescing, disposal, flushing, and error delivery. On integration base `61d013f`, both public compilers accept the application-local key augmentation, all 25 focused Query Effects and Reactivity tests pass, and the docs check passes. The bridge branch also passed its packed runtime checks. Fresh consumer behavior remains unverified.
 
 - **Effect cache operations, spec #210 ticket #218, base `97b7860`:** The cache-workflows reference uses the 14 current Query Core operations. Selection affects returned data. Fiber interruption leaves shared queries running and aborts exclusive stream snapshots. The domain map records this interruption boundary, and the skill tree maps ADR 0052. The existing shared example and public fixtures exercise the new operations. Fresh consumer evidence is pending.
 
