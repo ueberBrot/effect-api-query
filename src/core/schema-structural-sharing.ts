@@ -14,15 +14,16 @@ const isPlainDenseArray = (value: readonly unknown[]): boolean => {
   if (Object.getPrototypeOf(value) !== Array.prototype) {
     return false;
   }
-  if (Object.getOwnPropertySymbols(value).length !== 0) {
-    return false;
-  }
   const { length } = value;
-  if (Object.keys(value).length !== length) {
+  if (Reflect.ownKeys(value).length !== length + 1) {
     return false;
   }
   for (let index = 0; index < length; index += 1) {
-    if (!Object.hasOwn(value, index)) {
+    const descriptor = Object.getOwnPropertyDescriptor(value, index);
+    if (
+      descriptor?.enumerable !== true ||
+      !Object.hasOwn(descriptor, "value")
+    ) {
       return false;
     }
   }
@@ -130,8 +131,7 @@ const shareArray = (
   let values: unknown[] | undefined;
   for (let index = 0; index < length; index += 1) {
     const next: unknown = incoming[index];
-    const prev: unknown =
-      index < previousArray.length ? previousArray[index] : undefined;
+    const prev: unknown = previousArray[index];
     const shared = share(prev, next, ancestors);
     if (values === undefined) {
       const matchesPrevious: boolean =
@@ -248,9 +248,11 @@ export const schemaStructuralSharing = <T>(
   const accepts = Schema.is(schema);
   const share: ShareNode = (previous, incoming, ancestors) => {
     if (Object.is(previous, incoming)) {
+      assertAcyclic(incoming, ancestors);
       return previous;
     }
     if (accepts(incoming)) {
+      assertAcyclic(incoming, ancestors);
       return accepts(previous) && options.equivalence(previous, incoming)
         ? previous
         : incoming;

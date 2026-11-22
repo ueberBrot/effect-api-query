@@ -45,7 +45,7 @@ const makeCodec = <S extends Schema.Codec<unknown, unknown, unknown, unknown>>(
   const hash = hashKey(prefix);
   const prefixLength = prefix.length;
   const lastIndex = prefixLength - 1;
-  const lastSegment = lastIndex >= 0 ? prefix[lastIndex] : undefined;
+  const lastSegment = prefix[lastIndex];
   const checkLast = isPrimitiveHashSegment(lastSegment);
   const firstSegment = prefixLength > 1 ? prefix[0] : undefined;
   const checkFirst = isPrimitiveHashSegment(firstSegment);

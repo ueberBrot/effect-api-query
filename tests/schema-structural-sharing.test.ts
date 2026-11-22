@@ -240,4 +240,25 @@ describe("Schema structural sharing", () => {
     expect(() => client.setQueryData(key, reading(1))).toThrow("policy defect");
     client.clear();
   });
+
+  it("passes through arrays with accessors without reading their elements", () => {
+    const share = schemaStructuralSharing(Reading, {
+      equivalence: Schema.toEquivalence(Reading),
+    });
+    const incoming = Object.defineProperty([reading(1)], "0", {
+      get: () => {
+        throw new Error("Unexpected getter invocation");
+      },
+    });
+    expect(share([reading(1)], incoming)).toBe(incoming);
+  });
+
+  it("rejects cycles when previous and incoming share the same reference", () => {
+    const share = schemaStructuralSharing(Reading, {
+      equivalence: Schema.toEquivalence(Reading),
+    });
+    const cyclic: unknown[] = [];
+    cyclic.push(cyclic);
+    expect(() => share(cyclic, cyclic)).toThrow(TypeError);
+  });
 });

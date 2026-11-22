@@ -260,6 +260,7 @@ describe("existing Vite application owner handoff", () => {
       let disposed = false;
       const disposal = application.dispose().then(() => {
         disposed = true;
+        return disposed;
       });
       await vi.waitFor(() => {
         expect(application?.isActive()).toBe(false);
