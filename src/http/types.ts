@@ -19,6 +19,7 @@ import type {
   KeyBuilder,
   KeyEncoderRequirement,
   MutationBuilder,
+  OptionalKeyPrefix,
   QueryData,
   RequiredAdapterKeys,
   RunnerRequirement,
@@ -631,7 +632,7 @@ declare const httpQueryClient: unique symbol;
 /** An eager utility tree mirroring the ready HTTP client's literal properties. */
 export type HttpApiQueryUtils<
   Api extends HttpApi.Constraint,
-  Prefix extends readonly [JsonValue, ...JsonValue[]],
+  Prefix extends OptionalKeyPrefix = readonly [],
   Client = HttpApiClient.ForApi<Api>,
 > = {
   readonly [httpQueryClient]?: Client;
@@ -794,13 +795,22 @@ export type RunnerOption<
   Client,
 > = RunnerRequirement<ClientServices<Api, Client>>;
 
+export type HttpKeyPrefixOption<Prefix extends OptionalKeyPrefix> = [
+  Prefix,
+] extends [readonly []]
+  ? { readonly keyPrefix?: never }
+  : {
+      /** A non-empty JSON-safe tuple that namespaces every generated key. */
+      readonly keyPrefix: Prefix;
+    };
+
 /** Derives HTTP utilities while the caller retains client and runtime ownership. */
 export type CreateHttpApiQueryUtilsOptions<
   Api extends HttpApi.Constraint,
-  Prefix extends readonly [JsonValue, ...JsonValue[]],
+  Prefix extends OptionalKeyPrefix = readonly [],
   Client = HttpApiClient.ForApi<Api>,
 > = {
   readonly client: Client & HttpApiClient.ForApi<Api, unknown, unknown>;
-  readonly keyPrefix: Prefix;
-} & EncoderOption<Api> &
+} & HttpKeyPrefixOption<Prefix> &
+  EncoderOption<Api> &
   RunnerOption<Api, NoInfer<Client>>;

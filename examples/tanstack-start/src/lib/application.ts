@@ -17,26 +17,26 @@ import { HttpApiClient } from "effect/http-api";
 
 const makeExampleRpcQueryUtils = (
   client: ExampleRpcClient,
-  runPromiseExit: RunPromiseExit,
+  runtime: RunPromiseExit,
   identity: string
 ) =>
   createRpcQueryUtils(exampleRpcGroup, {
     client,
     keyPrefix: ["tanstack-start", identity] as const,
-    runPromiseExit,
+    runtime,
   });
 
 export type ExampleRpcQueryUtils = ReturnType<typeof makeExampleRpcQueryUtils>;
 
 const makeExampleHttpQueryUtils = (
   client: HttpApiClient.ForApi<typeof exampleHttpApi>,
-  runPromiseExit: RunPromiseExit,
+  runtime: RunPromiseExit,
   identity: string
 ) =>
   createHttpApiQueryUtils(exampleHttpApi, {
     client,
     keyPrefix: ["tanstack-start", identity],
-    runPromiseExit,
+    runtime,
   });
 
 export interface TanStackStartApplication {

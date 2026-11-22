@@ -56,7 +56,7 @@ export const acquireDirectoryEvents = async (
     const rpc = createRpcQueryUtils(directory, {
       client: connection.client,
       keyPrefix: ["directory-events"],
-      runPromiseExit: setup.wrapRunner(Effect.runPromiseExit),
+      runtime: setup.wrapRunner(Effect.runPromiseExit),
     });
     return { connection, rpc };
   });

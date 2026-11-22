@@ -295,7 +295,7 @@ describe("HTTP execution", () => {
     const utils = createHttpApiQueryUtils(api, {
       client,
       keyPrefix: ["test"],
-      runPromiseExit,
+      runtime: runPromiseExit,
     });
     const queryClient = new QueryClient();
     try {
@@ -445,7 +445,7 @@ describe("HTTP execution", () => {
       const utils = createHttpApiQueryUtils(FailureApi, {
         client,
         keyPrefix: ["test"],
-        runPromiseExit,
+        runtime: runPromiseExit,
       });
       const queryClient = new QueryClient({
         defaultOptions: {
@@ -506,7 +506,7 @@ describe("HTTP execution", () => {
     const utils = createHttpApiQueryUtils(FailureApi, {
       client,
       keyPrefix: ["test"],
-      runPromiseExit,
+      runtime: runPromiseExit,
     });
     const queryClient = new QueryClient();
     const input = { params: { scenario: "success" } };
@@ -536,8 +536,7 @@ describe("HTTP execution", () => {
     const utils = createHttpApiQueryUtils(FailureApi, {
       client,
       keyPrefix: ["test"],
-      runPromiseExit: async (): Promise<never> =>
-        await Promise.reject(rejection),
+      runtime: async (): Promise<never> => await Promise.reject(rejection),
     });
     const queryClient = new QueryClient();
     const input = { params: { scenario: "success" } };

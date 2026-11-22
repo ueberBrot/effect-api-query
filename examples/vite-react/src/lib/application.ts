@@ -43,7 +43,7 @@ const queryRetirementConfiguration = (
 
 const makeExampleRpcQueryUtils = (
   client: ExampleRpcClient,
-  runPromiseExit: RunPromiseExit,
+  runtime: RunPromiseExit,
   keyPrefix: ReturnType<typeof ownerKeyPrefix>,
   runQuery: QueryOwner<unknown>["runQuery"]
 ) =>
@@ -55,7 +55,7 @@ const makeExampleRpcQueryUtils = (
     >(exampleRpcGroup, {
       client,
       keyPrefix,
-      runPromiseExit,
+      runtime,
     }),
     queryRetirementConfiguration(runQuery)
   );
@@ -64,7 +64,7 @@ export type ExampleRpcQueryUtils = ReturnType<typeof makeExampleRpcQueryUtils>;
 
 const makeExampleHttpQueryUtils = (
   client: HttpApiClient.ForApi<typeof exampleHttpApi>,
-  runPromiseExit: RunPromiseExit,
+  runtime: RunPromiseExit,
   keyPrefix: ReturnType<typeof ownerKeyPrefix>,
   runQuery: QueryOwner<unknown>["runQuery"]
 ) =>
@@ -72,7 +72,7 @@ const makeExampleHttpQueryUtils = (
     createHttpApiQueryUtils(exampleHttpApi, {
       client,
       keyPrefix,
-      runPromiseExit,
+      runtime,
     }),
     queryRetirementConfiguration(runQuery)
   );

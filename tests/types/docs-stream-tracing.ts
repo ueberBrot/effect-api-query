@@ -64,7 +64,7 @@ const captureTracedFeed = async (
     const http = createHttpApiQueryUtils(feedApi, {
       client,
       keyPrefix: ["feed-app"],
-      runPromiseExit,
+      runtime: runPromiseExit,
     });
     return await fetchStreamSnapshot(
       queryClient,

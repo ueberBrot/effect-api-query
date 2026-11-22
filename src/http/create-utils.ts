@@ -1,7 +1,7 @@
 import { HttpApi } from "effect/http-api";
 import type { HttpApiClient } from "effect/http-api";
 
-import type { JsonValue, RunPromiseExit } from "../core/types";
+import type { KeyPrefix, OptionalKeyPrefix, RuntimeInput } from "../core/types";
 import { createUtilityTree } from "../core/utility-tree";
 import { compileHttpOperations } from "./operation";
 import type {
@@ -9,14 +9,37 @@ import type {
   HttpApiQueryUtils,
 } from "./types";
 
-export const createHttpApiQueryUtils = <
+/**
+ * Derives an eager, frozen TanStack Query utility tree from an Effect HttpApi contract.
+ *
+ * The caller retains ownership of the ready HTTP client, transport, and runtime lifecycle.
+ *
+ * @throws {@link EffectHttpApiQueryConfigError} if the prefix, paths, or encoders are invalid.
+ */
+export function createHttpApiQueryUtils<
   const Api extends HttpApi.Constraint,
-  const Prefix extends readonly [JsonValue, ...JsonValue[]],
+  Client extends HttpApiClient.ForApi<Api, unknown, unknown>,
+>(
+  api: Api,
+  options: CreateHttpApiQueryUtilsOptions<Api, readonly [], Client>
+): HttpApiQueryUtils<Api, readonly [], Client>;
+export function createHttpApiQueryUtils<
+  const Api extends HttpApi.Constraint,
+  const Prefix extends KeyPrefix,
   Client extends HttpApiClient.ForApi<Api, unknown, unknown>,
 >(
   api: Api,
   options: CreateHttpApiQueryUtilsOptions<Api, Prefix, Client>
-): HttpApiQueryUtils<Api, Prefix, Client> => {
+): HttpApiQueryUtils<Api, Prefix, Client>;
+export function createHttpApiQueryUtils(
+  api: HttpApi.Constraint,
+  options: {
+    readonly client: object;
+    readonly keyPrefix?: OptionalKeyPrefix | undefined;
+    readonly keyEncoders?: object | undefined;
+    readonly runtime?: RuntimeInput | undefined;
+  }
+): object {
   if (!HttpApi.isHttpApi(api)) {
     throw new TypeError("Expected an Effect HttpApi declaration");
   }
@@ -25,17 +48,14 @@ export const createHttpApiQueryUtils = <
     options.client,
     options.keyEncoders
   );
-  // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
-  const runPromiseExit = options.runPromiseExit as
-    | RunPromiseExit<unknown>
-    | undefined;
-  const tree = createUtilityTree(operations, {
+  const hasKeyPrefix = Object.hasOwn(options, "keyPrefix");
+  return createUtilityTree(operations, {
+    hasKeyPrefix,
     keyPrefix: options.keyPrefix,
     keyNamespace: ["http", api.identifier],
     keyEncoders,
-    runPromiseExit,
+    // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
+    runtime: options.runtime as RuntimeInput<unknown> | undefined,
     errors,
   });
-  // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
-  return tree as HttpApiQueryUtils<Api, Prefix, Client>;
-};
+}

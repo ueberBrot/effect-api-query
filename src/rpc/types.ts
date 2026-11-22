@@ -1,5 +1,5 @@
 import type { DataTag, QueryKey } from "@tanstack/query-core";
-import type { Context, Schema, SchemaAST } from "effect";
+import type { Context, Effect, Schema, SchemaAST, Stream } from "effect";
 import type { Headers } from "effect/http";
 import type { Rpc, RpcClient, RpcGroup, RpcSchema } from "effect/rpc";
 
@@ -12,6 +12,7 @@ import type {
   JsonValue,
   KeyBuilder,
   KeyEncoderRequirement,
+  OptionalKeyPrefix,
   QueryData,
   RunnerRequirement,
   MutationBuilder,
@@ -88,12 +89,12 @@ export type PayloadBearingRpcs<Group extends RpcGroup.Any> =
 
 export type ClientMiddlewareError<R extends Rpc.Any> =
   R extends Rpc.Rpc<
-    string,
-    Schema.Top,
-    Schema.Top,
-    Schema.Top,
+    infer _Tag,
+    infer _Payload,
+    infer _Success,
+    infer _Error,
     infer Middleware,
-    unknown
+    infer _Requires
   >
     ? Middleware["~ClientError"]
     : never;
@@ -434,10 +435,70 @@ export type PathTree<
 
 declare const rpcQueryClientError: unique symbol;
 
+/** A ready tag-keyed or flattened Effect RPC client. */
+export type ReadyRpcClient<Rpcs extends Rpc.Any, ClientError = never> =
+  // oxlint-disable-next-line typescript/no-generated-empty-object-type
+  | RpcClient.RpcClient<Rpcs, ClientError>
+  | RpcClient.RpcClient.Flat<Rpcs, ClientError>;
+
+export type ReturnError<Res> =
+  Res extends Effect.Effect<infer _A, infer E, infer _R>
+    ? E
+    : Res extends Stream.Stream<infer _A, infer E, infer _R>
+      ? E
+      : never;
+
+export type DeclaredRpcError<R extends Rpc.Any> =
+  R extends Rpc.Rpc<
+    infer _Tag,
+    infer _Payload,
+    infer Success,
+    infer Error,
+    infer Middleware,
+    infer _Requires
+  >
+    ?
+        | Error["Type"]
+        | Middleware["error"]["Type"]
+        | Middleware["~ClientError"]
+        | (Success extends RpcSchema.Stream<infer _A, infer StreamError>
+            ? StreamError["Type"]
+            : never)
+    : never;
+
+export type ObjectMethodError<
+  Client,
+  Tag extends PropertyKey,
+> = Tag extends keyof Client
+  ? Client[Tag] extends (input: never) => infer Res
+    ? ReturnError<Res>
+    : never
+  : never;
+
+export type FlatMethodError<Client, Tag extends string> = Client extends (
+  tag: Tag,
+  payload: never
+) => infer Res
+  ? ReturnError<Res>
+  : never;
+
+export type ExtractRpcClientError<Group extends RpcGroup.Any, Client> =
+  Client extends RpcClient.RpcClient.Flat<RpcsOf<Group>, infer E>
+    ? E
+    : RpcsOf<Group> extends infer R
+      ? R extends Rpc.Any
+        ? Exclude<
+            | ObjectMethodError<Client, R["_tag"]>
+            | FlatMethodError<Client, R["_tag"]>,
+            DeclaredRpcError<R>
+          >
+        : never
+      : never;
+
 /** An eager utility tree projected from the group's dotted RPC tags. */
 export type RpcQueryUtils<
   Group extends RpcGroup.Any,
-  Prefix extends readonly [JsonValue, ...JsonValue[]],
+  Prefix extends OptionalKeyPrefix = readonly [],
   ClientError = never,
 > = {
   readonly [rpcQueryClientError]?: ClientError;
@@ -488,16 +549,34 @@ export type RunnerOption<Group extends RpcGroup.Any> = RunnerRequirement<
   Rpc.ServicesClient<RpcsOf<Group>>
 >;
 
+export type RpcKeyPrefixOption<Prefix extends OptionalKeyPrefix> = [
+  Prefix,
+] extends [readonly []]
+  ? { readonly keyPrefix?: never }
+  : {
+      /** A non-empty JSON-safe tuple that namespaces every generated key. */
+      readonly keyPrefix: Prefix;
+    };
+
 /** Configuration for deriving a utility tree from an Effect RPC group. */
 export type CreateRpcQueryUtilsOptions<
   Group extends RpcGroup.Any,
-  Prefix extends readonly [JsonValue, ...JsonValue[]],
+  Prefix extends OptionalKeyPrefix = readonly [],
   ClientError = never,
 > = {
-  /** A ready, flat RPC client whose Scope remains owned by the caller. */
-  readonly client: RpcClient.RpcClient.Flat<RpcsOf<Group>, ClientError>;
+  /** A ready tag-keyed or flat RPC client whose Scope remains owned by the caller. */
+  readonly client: ReadyRpcClient<RpcsOf<Group>, ClientError>;
+} & RpcKeyPrefixOption<Prefix> &
+  KeyEncoderOption<Group> &
+  RunnerOption<Group>;
 
-  /** A non-empty JSON-safe tuple that namespaces every generated key. */
-  readonly keyPrefix: Prefix;
-} & KeyEncoderOption<Group> &
+export type CreateRpcQueryUtilsClientOptions<
+  Group extends RpcGroup.Any,
+  Prefix extends OptionalKeyPrefix,
+  Client,
+> = {
+  /** A ready tag-keyed or flat RPC client whose Scope remains owned by the caller. */
+  readonly client: Client & ReadyRpcClient<RpcsOf<Group>, unknown>;
+} & RpcKeyPrefixOption<Prefix> &
+  KeyEncoderOption<Group> &
   RunnerOption<Group>;

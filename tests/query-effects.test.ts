@@ -115,7 +115,7 @@ for (const operation of ["fetch", "ensure"] as const) {
         const utils = createRpcQueryUtils(group, {
           client: ready,
           keyPrefix: ["failure"],
-          runPromiseExit: async (effect, options) => {
+          runtime: async (effect, options) => {
             const exit = await run(effect, options);
             if (Exit.isFailure(exit)) {
               const cause = Cause.combine(
@@ -144,7 +144,7 @@ for (const operation of ["fetch", "ensure"] as const) {
         const rejecting = createRpcQueryUtils(group, {
           client: ready,
           keyPrefix: ["rejection"],
-          runPromiseExit: async () => await Promise.reject(rejection),
+          runtime: async () => await Promise.reject(rejection),
         });
         const runnerFailure = yield* queryEffects
           .ensure(rejecting.read.queryOptions())
@@ -256,7 +256,7 @@ it.effect(
               createRpcQueryUtils(group, {
                 client: ready,
                 keyPrefix: ["bridge-owner"],
-                runPromiseExit: setup.wrapRunner(Effect.runPromiseExit),
+                runtime: setup.wrapRunner(Effect.runPromiseExit),
               }),
               {
                 live: {
@@ -334,7 +334,7 @@ for (const operation of ["fetch", "ensure"] as const) {
           const utils = createRpcQueryUtils(group, {
             client: ready,
             keyPrefix: ["foreign-rejection", operation, rejection._tag],
-            runPromiseExit: async () => await Promise.reject(rejection),
+            runtime: async () => await Promise.reject(rejection),
           });
           const client = new QueryClient();
           const failure = yield* queryEffects[operation](

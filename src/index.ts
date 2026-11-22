@@ -69,11 +69,19 @@ export type {
   EffectRpcQueryConfigErrorCode,
   EffectRpcQueryKeyErrorCode,
 } from "./rpc/errors";
-export type { JsonValue, QueryData, RunPromiseExit } from "./core/types";
+export type {
+  JsonValue,
+  KeyPrefix,
+  OptionalKeyPrefix,
+  QueryData,
+  RunPromiseExit,
+  RuntimeInput,
+} from "./core/types";
 /** Types for annotating generated utilities and custom adapters. @api public */
 export type {
   CreateRpcQueryUtilsOptions,
   KeyEncoder,
+  ReadyRpcClient,
   RpcQueryUtils,
   StreamingRpcOptions,
   UnaryRpcOptions,

@@ -30,7 +30,7 @@ These terms describe how the package builds TanStack Query utilities from Effect
 
 **Canonical key payload**: The immutable, JSON-safe representation of a normalized payload that identifies a cache entry. It is independent of the transport encoding for a protocol. _Avoid_: Wire payload, raw input
 
-**Key prefix**: A non-empty tuple of JSON-safe values that the caller supplies to namespace a utility tree. Generated roots append an adapter discriminator. HTTP roots also append the API identifier. _Avoid_: Automatic namespace, client identity
+**Key prefix**: An optional non-empty tuple of JSON-safe values that the caller supplies to namespace a utility tree. Omitting it defaults to `readonly []`. Generated roots append an adapter discriminator. HTTP roots also append the API identifier. _Avoid_: Automatic namespace, client identity
 
 **Prepared input**: An opaque handle that reuses one utility leaf's normalized execution input and canonical key payload. The caller keeps retained values unchanged. Configured copies share the owner; other leaves and utility trees cannot use the handle. _Avoid_: Input snapshot, global memoization
 
@@ -44,7 +44,7 @@ These terms describe how the package builds TanStack Query utilities from Effect
 
 **Cancellable command**: An application operation with an identifier assigned before work starts, observable progress, and an explicit cancellation request. Its terminal domain state is independent of the TanStack mutation state. Cancellation stops future work without undoing completed work. _Avoid_: Mutation cancellation, rollback
 
-**Ready RPC client**: A flat, tag-first Effect RPC client acquired within a Scope. The Scope stays alive while an RPC utility tree uses the client. The caller owns the Scope and disposal. _Avoid_: Client factory, owned client
+**Ready RPC client**: A tag-keyed (`RpcClient`) or flat (`RpcClient.Flat`) Effect RPC client acquired within a Scope. The default tag-keyed client is the primary shape. The Scope stays alive while an RPC utility tree uses the client. The caller owns the Scope and disposal. _Avoid_: Client factory, owned client
 
 **Ready HTTP API client**: An acquired Effect HttpApiClient. The caller owns its transport, middleware, runtime, and resource lifetime. _Avoid_: URL client, client factory, owned client
 

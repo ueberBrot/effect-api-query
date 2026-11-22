@@ -3,6 +3,7 @@ import { Array as EffectArray, Effect, Exit, Predicate } from "effect";
 import type { Cause } from "effect";
 
 import { canonicalizeArray } from "./canonical-key";
+import type { UtilityNode } from "./configure-utils";
 import { prepareMetadataExecution } from "./metadata-query";
 import type {
   BufferedOperation,
@@ -19,7 +20,13 @@ import {
   readPreparedInput,
   registerInputOwner,
 } from "./prepared-input";
-import type { JsonValue, RunPromiseExit } from "./types";
+import { resolveRuntime } from "./runtime";
+import type {
+  JsonValue,
+  OptionalKeyPrefix,
+  RunPromiseExit,
+  RuntimeInput,
+} from "./types";
 
 const reservedPathSegments = new Set([
   "__proto__",
@@ -53,9 +60,13 @@ interface ValidatedOperationPath {
 const freezeKey = (parts: JsonValue[]) => Object.freeze(parts);
 
 const normalizePrefix = (
-  prefix: readonly [JsonValue, ...JsonValue[]],
+  hasKeyPrefix: boolean,
+  prefix: OptionalKeyPrefix | undefined,
   errors: TreeErrors
 ): readonly JsonValue[] => {
+  if (!hasKeyPrefix) {
+    return [];
+  }
   if (!Array.isArray(prefix) || prefix.length === 0) {
     throw errors.invalidPrefix("Shape");
   }
@@ -489,6 +500,19 @@ const validateKeyEncoders = (
   }
 };
 
+export interface LeafRuntimeDescriptor {
+  readonly runner: RunPromiseExit<unknown>;
+  readonly rebuild: (
+    runner: RunPromiseExit<unknown>
+  ) => Record<string, unknown>;
+}
+
+const leafDescriptors = new WeakMap<UtilityNode, LeafRuntimeDescriptor>();
+
+export const readLeafDescriptor = (
+  node: UtilityNode
+): LeafRuntimeDescriptor | undefined => leafDescriptors.get(node);
+
 const insertLeaf = (
   tree: Record<string, unknown>,
   prefix: readonly JsonValue[],
@@ -526,25 +550,30 @@ const insertLeaf = (
     throw new TypeError("Validated operation paths must have a leaf");
   }
   const operationKey = freezeKey([...prefix, ...segments]);
-  let builders;
-  if (operation.kind === "Mutation") {
-    builders = createMutationBuilders(operation, operationKey, runPromiseExit);
-  } else if (operation.kind === "Streaming") {
-    builders = createStreamingBuilders(
-      operation,
-      operationKey,
-      keyEncoder,
-      runPromiseExit
-    );
-  } else {
-    builders = createUnaryBuilders(
-      operation,
-      operationKey,
-      keyEncoder,
-      runPromiseExit
-    );
-  }
-  const leaf = { key: () => operationKey, ...builders };
+  const leafKey = () => operationKey;
+  const buildLeaf = (leafRunner: RunPromiseExit<unknown>) => {
+    let builders;
+    if (operation.kind === "Mutation") {
+      builders = createMutationBuilders(operation, operationKey, leafRunner);
+    } else if (operation.kind === "Streaming") {
+      builders = createStreamingBuilders(
+        operation,
+        operationKey,
+        keyEncoder,
+        leafRunner
+      );
+    } else {
+      builders = createUnaryBuilders(
+        operation,
+        operationKey,
+        keyEncoder,
+        leafRunner
+      );
+    }
+    return Object.freeze({ key: leafKey, ...builders });
+  };
+  const leaf = buildLeaf(runPromiseExit);
+  leafDescriptors.set(leaf, { runner: runPromiseExit, rebuild: buildLeaf });
   if (operation.kind !== "Mutation") {
     registerInputOwner(leaf.key, operation.input, keyEncoder);
   }
@@ -574,22 +603,24 @@ const createTree = (
 export const createUtilityTree = (
   operations: readonly OperationDescription[],
   options: {
-    readonly keyPrefix: readonly [JsonValue, ...JsonValue[]];
+    readonly hasKeyPrefix: boolean;
+    readonly keyPrefix: OptionalKeyPrefix | undefined;
     readonly keyNamespace: readonly string[];
     readonly keyEncoders: ReadonlyMap<string, RuntimeKeyEncoder>;
-    readonly runPromiseExit: RunPromiseExit<unknown> | undefined;
+    readonly runtime: RuntimeInput<unknown> | undefined;
     readonly errors: TreeErrors;
   }
 ): Record<string, unknown> => {
   const prefix = freezeKey([
-    ...normalizePrefix(options.keyPrefix, options.errors),
+    ...normalizePrefix(options.hasKeyPrefix, options.keyPrefix, options.errors),
     ...options.keyNamespace,
   ]);
   const paths = planPaths(operations, options.errors);
   validateKeyEncoders(operations, options.keyEncoders, options.errors);
   const runner =
-    options.runPromiseExit ??
-    // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
-    (Effect.runPromiseExit as RunPromiseExit<unknown>);
+    options.runtime === undefined
+      ? // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
+        (Effect.runPromiseExit as RunPromiseExit<unknown>)
+      : resolveRuntime(options.runtime);
   return createTree(prefix, paths, options.keyEncoders, runner);
 };

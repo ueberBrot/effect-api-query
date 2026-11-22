@@ -88,9 +88,9 @@ type OverloadErrors = "acquisition-error" | "stream-error";
 true satisfies Equal<Extract<Payload<Failure>, OverloadErrors>, OverloadErrors>;
 type Runner = CreateHttpApiQueryUtilsOptions<
   typeof contract, readonly ["type-baseline"], typeof client
->["runPromiseExit"];
+>["runtime"];
 declare const expectedRunner: Runner;
-expectedRunner satisfies typeof runPromiseExit;`;
+expectedRunner satisfies RuntimeInput<"acquisition-service" | "stream-service">;`;
 
 interface CompilerDiagnostics {
   readonly files: number;
@@ -168,7 +168,7 @@ const fixture = (workload: Workload, count: number, consumer: Consumer) => {
     adapter === "rpc"
       ? 'import { Rpc, RpcGroup, type RpcClient } from "effect/rpc";'
       : `import { HttpApi, HttpApiEndpoint, HttpApiGroup, type HttpApiClient${sse ? ", HttpApiSchema" : ""} } from "effect/http-api";`
-  }\n${utilities ? `import { QueryClient } from "@tanstack/query-core";\nimport { ${factory}${configured ? ", configureUtils" : ""}${overloaded ? ", type CreateHttpApiQueryUtilsOptions, type EffectHttpApiQueryError, type InferQueryError, type RunPromiseExit" : ""} } from "${packageName}";` : ""}`;
+  }\n${utilities ? `import { QueryClient } from "@tanstack/query-core";\nimport { ${factory}${configured ? ", configureUtils" : ""}${overloaded ? ", type CreateHttpApiQueryUtilsOptions, type EffectHttpApiQueryError, type InferQueryError, type RunPromiseExit, type RuntimeInput" : ""} } from "${packageName}";` : ""}`;
   const success =
     "const Value = Schema.Struct({ id: Schema.Int, label: Schema.String });";
   const contract = contractFixture(workload, count);
@@ -176,10 +176,10 @@ const fixture = (workload: Workload, count: number, consumer: Consumer) => {
     ? `const utils = configureUtils(raw, { query: { policy: { retry: false } }, scoped: { scale: { scoped: { "read-${last}": { query: { policy: { staleTime: 1000 }, interceptors: [async ({ next }) => { const value = await next(); value.label satisfies string; return value; }] } } } } } });\n`
     : "";
   const runner = overloaded
-    ? 'declare const runPromiseExit: RunPromiseExit<"acquisition-service" | "stream-service">;\n'
+    ? 'declare const runtime: RunPromiseExit<"acquisition-service" | "stream-service">;\n'
     : "";
   const use = utilities
-    ? `${runner}const ${configured ? "raw" : "utils"} = ${factory}(contract, { client, keyPrefix: ["type-baseline"]${overloaded ? ", runPromiseExit" : ""} });
+    ? `${runner}const ${configured ? "raw" : "utils"} = ${factory}(contract, { client, keyPrefix: ["type-baseline"]${overloaded ? ", runtime" : ""} });
 ${configuration}const options = utils.scale["read-${last}"].queryOptions({ input: ${adapter === "rpc" ? "{ id: 1 }" : "{ params: { id: 1 } }"}, select: value => value.label });
 const cached = new QueryClient().getQueryData(options.queryKey);
 const id: number | undefined = cached?.id;

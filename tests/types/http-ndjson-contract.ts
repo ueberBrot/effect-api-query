@@ -11,6 +11,7 @@ import {
   type InferQueryData,
   type InferQueryError,
   type RunPromiseExit,
+  type RuntimeInput,
 } from "@ueberbrot/effect-api-query";
 import {
   Context,
@@ -145,7 +146,7 @@ true satisfies Assert<
 const http = createHttpApiQueryUtils(api, {
   client,
   keyPrefix: ["ndjson"],
-  runPromiseExit,
+  runtime: runPromiseExit,
 });
 true satisfies Assert<Equal<keyof typeof http.records, "key" | "watch">>;
 true satisfies Assert<
@@ -307,7 +308,7 @@ declare const extraRunner: RunPromiseExit<
 const extra = createHttpApiQueryUtils(api, {
   client: extraClient,
   keyPrefix: ["extra"],
-  runPromiseExit: extraRunner,
+  runtime: extraRunner,
 });
 type ExtraFailure =
   Exclude<
@@ -328,8 +329,8 @@ true satisfies Assert<
       typeof api,
       readonly ["extra"],
       typeof extraClient
-    >["runPromiseExit"],
-    typeof extraRunner
+    >["runtime"],
+    typeof extraRunner | { readonly runPromiseExit: typeof extraRunner }
   >
 >;
 

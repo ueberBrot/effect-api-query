@@ -601,7 +601,7 @@ describe("createRpcQueryUtils configuration", () => {
 
         const safeOptions: ServicefulOptions = {
           client,
-          runPromiseExit: async () =>
+          runtime: async () =>
             await Promise.reject(
               new Error("Key preparation tests must not execute RPCs")
             ),
@@ -653,7 +653,7 @@ describe("createRpcQueryUtils configuration", () => {
         > = {
           client,
           keyPrefix: ["app"] as const,
-          runPromiseExit: Effect.runPromiseExit,
+          runtime: Effect.runPromiseExit,
         };
 
         const utils = createRpcQueryUtils(decodingGroup, options);

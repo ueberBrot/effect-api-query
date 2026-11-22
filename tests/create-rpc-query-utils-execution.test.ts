@@ -281,7 +281,7 @@ describe("createRpcQueryUtils execution boundaries", () => {
             "encoding.update": (payload) => payload,
           },
           keyPrefix: ["app"] as const,
-          runPromiseExit,
+          runtime: runPromiseExit,
         });
 
         const mutation = new MutationObserver(
@@ -797,7 +797,7 @@ describe("createRpcQueryUtils execution boundaries", () => {
       const utils = createRpcQueryUtils(group, {
         client,
         keyPrefix: ["app"] as const,
-        runPromiseExit,
+        runtime: runPromiseExit,
       });
 
       yield* Effect.promise(async () => {
@@ -830,7 +830,7 @@ describe("createRpcQueryUtils execution boundaries", () => {
       const utils = createRpcQueryUtils(group, {
         client,
         keyPrefix: ["app"] as const,
-        runPromiseExit,
+        runtime: runPromiseExit,
       });
       const mutation = new MutationObserver(
         new QueryClient(),
@@ -883,7 +883,7 @@ describe("createRpcQueryUtils execution boundaries", () => {
       const utils = createRpcQueryUtils(group, {
         client,
         keyPrefix: ["app"] as const,
-        runPromiseExit,
+        runtime: runPromiseExit,
       });
 
       const query = queryClient.query(utils.health.ping.queryOptions());

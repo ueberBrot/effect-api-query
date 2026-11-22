@@ -285,16 +285,16 @@ export type ConfiguredUtils<Node, Configuration, Inherited = unknown> = {
       : Node[Key];
 };
 
-type RuntimeConfiguration = Partial<
+export type RuntimeConfiguration = Partial<
   Record<QueryView | "mutation", RuntimeViewConfiguration>
 > & {
   readonly scoped?: Readonly<Record<string, RuntimeConfiguration | undefined>>;
 };
 
-type RuntimeNode = Record<string, unknown> & UtilityNode;
+export type RuntimeNode = Record<string, unknown> & UtilityNode;
 type RuntimeBuilder = (...args: unknown[]) => unknown;
 
-interface ConfigurationLayer {
+export interface ConfigurationLayer {
   readonly depth: number;
   readonly options: RuntimeConfiguration;
 }
@@ -306,6 +306,20 @@ const configuredLeaves = new WeakMap<
     readonly layers: readonly ConfigurationLayer[];
   }
 >();
+
+export const readConfiguredLeaf = (node: RuntimeNode) =>
+  configuredLeaves.get(node);
+
+export const reapplyLeafConfiguration = (
+  base: RuntimeNode,
+  layers: readonly ConfigurationLayer[]
+): RuntimeNode => {
+  const configured = Object.freeze(
+    configureLeaf(base, scopeConfigurations(layers))
+  );
+  configuredLeaves.set(configured, { original: base, layers });
+  return configured;
+};
 
 const isUtilityChild = (child: RuntimeNode[string]): child is RuntimeNode =>
   Predicate.hasProperty(child, "key") && Predicate.isFunction(child.key);

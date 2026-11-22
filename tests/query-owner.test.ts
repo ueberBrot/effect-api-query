@@ -4,7 +4,7 @@ import {
   QueryCache,
   QueryClient,
 } from "@tanstack/query-core";
-import { Effect, Exit, Stream } from "effect";
+import { Effect, Exit, Layer, ManagedRuntime, Stream } from "effect";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -13,6 +13,7 @@ import {
   createRpcQueryUtils,
   EffectHttpApiQueryEmptyStreamError,
   EffectRpcQueryEmptyStreamError,
+  prepareInput,
 } from "#effect-api-query";
 
 import { group, makeRpcTestClient } from "./fixtures/effect-rpc";
@@ -333,7 +334,7 @@ describe("query owners", () => {
                 createRpcQueryUtils(group, {
                   client: base,
                   keyPrefix: ["owner-stream"],
-                  runPromiseExit: setup.wrapRunner(Effect.runPromiseExit),
+                  runtime: setup.wrapRunner(Effect.runPromiseExit),
                 }),
                 {
                   streamed: {
@@ -419,7 +420,7 @@ describe("query owners", () => {
                   createRpcQueryUtils(group, {
                     client: base,
                     keyPrefix: ["owner-live", coalesceMs ?? "none"],
-                    runPromiseExit: setup.wrapRunner(Effect.runPromiseExit),
+                    runtime: setup.wrapRunner(Effect.runPromiseExit),
                   }),
                   {
                     live: {
@@ -491,4 +492,299 @@ describe("query owners", () => {
       await observed;
     }
   );
+
+  it("wrapRunner accepts ManagedRuntime and object runtimes with receiver preserved", async () => {
+    const managed = ManagedRuntime.make(Layer.empty);
+    const owner = await acquireQueryOwner(
+      async () => await Promise.resolve(null)
+    );
+    try {
+      const wrappedManaged = owner.wrapRunner(managed);
+      const exit = await wrappedManaged(Effect.succeed(42));
+
+      let observedTag: string | undefined;
+      const objRuntime = {
+        tag: "owner-object-runtime",
+        async runPromiseExit<A, E>(
+          this: { readonly tag: string },
+          effect: Effect.Effect<A, E>,
+          options?: { readonly signal?: AbortSignal }
+        ) {
+          observedTag = this.tag;
+          return await Effect.runPromiseExit(effect, options);
+        },
+      };
+      const wrappedObj = owner.wrapRunner(objRuntime);
+      const objExit = await wrappedObj(Effect.succeed("bound"));
+      expect({
+        managed: Exit.isSuccess(exit) ? exit.value : null,
+        obj: Exit.isSuccess(objExit) ? objExit.value : null,
+        observedTag,
+      }).toStrictEqual({
+        managed: 42,
+        obj: "bound",
+        observedTag: "owner-object-runtime",
+      });
+    } finally {
+      await owner.dispose();
+      await managed.dispose();
+    }
+  });
+
+  it("trackUtils tracks runners, all query views, and mutations on roots, branches, and leaves", async () => {
+    await Effect.runPromise(
+      Effect.scoped(
+        Effect.gen(function* testTrackUtilsLifecycle() {
+          const streamStarted = gate();
+          const streamFinalizing = gate();
+          const streamCleaned = gate();
+          const mutationStarted = gate();
+          const mutationFinish = gate();
+          const events: string[] = [];
+
+          const client = yield* makeRpcTestClient(group, {
+            "events.watch": () =>
+              Stream.fromEffect(
+                Effect.sync(() => {
+                  streamStarted.open();
+                })
+              ).pipe(
+                Stream.flatMap(() => Stream.never),
+                Stream.ensuring(
+                  Effect.promise(async () => {
+                    streamFinalizing.open();
+                    await streamCleaned.promise;
+                    events.push("stream-cleaned");
+                  })
+                )
+              ),
+            "health.ping": () => Effect.void,
+            "toString.child": () => Effect.void,
+            "diagnostics.fail": () => Effect.fail("declared-failure" as const),
+            "users.get": (input) =>
+              Effect.promise(async () => {
+                if (input.id === 99) {
+                  mutationStarted.open();
+                  await mutationFinish.promise;
+                  events.push("mutation-finished");
+                }
+                return {
+                  id: input.id,
+                  locale: input.locale ?? "en",
+                  name: "Ada",
+                };
+              }),
+          });
+
+          yield* Effect.promise(async () => {
+            const raw = createRpcQueryUtils(group, { client });
+            const owner = await acquireQueryOwner(async (setup) => {
+              await setup.acquire(
+                () => "transport",
+                () => {
+                  events.push("released");
+                }
+              );
+              return setup.trackUtils(raw);
+            });
+
+            const tracked = owner.resources;
+            const user = await owner.queryClient.query(
+              tracked.users.get.queryOptions({ input: { id: 1 } })
+            );
+            const infinite = await owner.queryClient.infiniteQuery(
+              tracked.users.get.infiniteOptions({
+                initialPageParam: 2,
+                input: (id: number) => ({ id }),
+                getNextPageParam: () => null,
+              })
+            );
+
+            const pendingStream = owner.queryClient.query(
+              tracked.events.watch.streamedOptions({
+                retry: false,
+                maxChunks: 10,
+              })
+            );
+            const settledStream = pendingStream.catch(() => null);
+            await streamStarted.promise;
+
+            const mutation = new MutationObserver(
+              owner.queryClient,
+              tracked.users.get.mutationOptions()
+            ).mutate({ id: 99 });
+            await mutationStarted.promise;
+
+            const disposing = owner.dispose();
+            await streamFinalizing.promise;
+            const eventsBeforeRelease = [...events];
+
+            streamCleaned.open();
+            mutationFinish.open();
+            const mutated = await mutation;
+            await disposing;
+            await settledStream;
+            expect({
+              userId: user.id,
+              infiniteId: infinite.pages[0]?.id,
+              mutatedId: mutated.id,
+              eventsBeforeRelease,
+              events,
+            }).toStrictEqual({
+              userId: 1,
+              infiniteId: 2,
+              mutatedId: 99,
+              eventsBeforeRelease: [],
+              events: ["stream-cleaned", "mutation-finished", "released"],
+            });
+
+            await expect(
+              owner.queryClient.query(
+                tracked.users.get.queryOptions({
+                  input: { id: 5 },
+                  retry: false,
+                })
+              )
+            ).rejects.toThrow("retired");
+            await expect(
+              new MutationObserver(
+                owner.queryClient,
+                tracked.users.get.mutationOptions()
+              ).mutate({ id: 5 })
+            ).rejects.toThrow("retired");
+          });
+        })
+      )
+    );
+  });
+
+  it("trackUtils composes with configureUtils in both orders, preserves PreparedInput, is idempotent, and rejects cross-owner rebinding", async () => {
+    await Effect.runPromise(
+      Effect.scoped(
+        Effect.gen(function* testTrackUtilsComposition() {
+          const client = yield* makeRpcTestClient(group, {
+            "events.watch": () => Stream.fromIterable(["a", "b"]),
+            "health.ping": () => Effect.void,
+            "toString.child": () => Effect.void,
+            "diagnostics.fail": () => Effect.fail("declared-failure" as const),
+            "users.get": (input) =>
+              Effect.succeed({
+                id: input.id,
+                locale: input.locale ?? "en",
+                name: "Ada",
+              }),
+          });
+
+          yield* Effect.promise(async () => {
+            const raw = createRpcQueryUtils(group, { client });
+            const ownerA = await acquireQueryOwner(
+              async () => await Promise.resolve("a")
+            );
+            const ownerB = await acquireQueryOwner(
+              async () => await Promise.resolve("b")
+            );
+            try {
+              const interceptorCalls: string[] = [];
+              const config = {
+                query: {
+                  interceptors: [
+                    async <T>({
+                      next,
+                    }: {
+                      readonly next: () => Promise<T>;
+                    }) => {
+                      interceptorCalls.push("query");
+                      return await next();
+                    },
+                  ],
+                },
+                streamed: {
+                  policy: { maxChunks: 5 as const },
+                },
+              };
+
+              const configuredThenTracked = ownerA.trackUtils(
+                configureUtils(raw, config)
+              );
+              const trackedThenConfigured = configureUtils(
+                ownerA.trackUtils(raw),
+                config
+              );
+
+              const preparedFromRaw = prepareInput(raw.users.get, { id: 10 });
+              const preparedFromTracked = prepareInput(
+                configuredThenTracked.users.get,
+                { id: 11 }
+              );
+
+              const res1 = await ownerA.queryClient.query(
+                configuredThenTracked.users.get.queryOptions({
+                  input: preparedFromRaw,
+                })
+              );
+              const res2 = await ownerA.queryClient.query(
+                trackedThenConfigured.users.get.queryOptions({
+                  input: preparedFromTracked,
+                })
+              );
+              const chunks1 = await ownerA.queryClient.query(
+                configuredThenTracked.events.watch.streamedOptions()
+              );
+              const chunks2 = await ownerA.queryClient.query(
+                trackedThenConfigured.events.watch.streamedOptions()
+              );
+              const trackedRoot = ownerA.trackUtils(raw);
+              const trackedBranch = ownerA.trackUtils(raw.users);
+              const trackedLeaf = ownerA.trackUtils(raw.users.get);
+              const branchRes = await ownerA.queryClient.query(
+                trackedBranch.get.queryOptions({ input: { id: 12 } })
+              );
+              const leafRes = await ownerA.queryClient.query(
+                trackedLeaf.queryOptions({ input: { id: 13 } })
+              );
+              expect({
+                ids: [res1.id, res2.id, branchRes.id, leafRes.id],
+                interceptorCalls,
+                chunks1,
+                chunks2,
+                idempotentRoot: ownerA.trackUtils(trackedRoot) === trackedRoot,
+                idempotentBranch:
+                  ownerA.trackUtils(trackedRoot.users) === trackedRoot.users,
+                idempotentLeaf:
+                  ownerA.trackUtils(trackedRoot.users.get) ===
+                  trackedRoot.users.get,
+                idempotentConfigured:
+                  ownerA.trackUtils(trackedThenConfigured) ===
+                  trackedThenConfigured,
+              }).toStrictEqual({
+                ids: [10, 11, 12, 13],
+                interceptorCalls: ["query", "query"],
+                chunks1: ["a", "b"],
+                chunks2: ["a", "b"],
+                idempotentRoot: true,
+                idempotentBranch: true,
+                idempotentLeaf: true,
+                idempotentConfigured: true,
+              });
+
+              expect(() => ownerB.trackUtils(trackedRoot)).toThrow(
+                "already tracked"
+              );
+              expect(() => ownerB.trackUtils(trackedRoot.users)).toThrow(
+                "already tracked"
+              );
+              expect(() => ownerB.trackUtils(trackedThenConfigured)).toThrow(
+                "already tracked"
+              );
+              expect(() => ownerB.trackUtils(configuredThenTracked)).toThrow(
+                "already tracked"
+              );
+            } finally {
+              await Promise.all([ownerA.dispose(), ownerB.dispose()]);
+            }
+          });
+        })
+      )
+    );
+  });
 });

@@ -6,10 +6,22 @@ import {
   skipToken as queryCoreSkipToken,
 } from "@tanstack/query-core";
 import { skipToken as reactQuerySkipToken } from "@tanstack/react-query";
-import { Effect, Schema, Stream } from "effect";
-import { Rpc, RpcGroup } from "effect/rpc";
+import {
+  Deferred,
+  Effect,
+  Layer,
+  ManagedRuntime,
+  Schema,
+  Stream,
+} from "effect";
+import { Rpc, RpcClient, RpcGroup, RpcServer, RpcTest } from "effect/rpc";
+import type { RpcMessage } from "effect/rpc";
 
-import { createRpcQueryUtils, skipToken } from "#effect-api-query";
+import {
+  createRpcQueryUtils,
+  EffectRpcQueryConfigError,
+  skipToken,
+} from "#effect-api-query";
 
 import { group, makeClient, makeRpcTestClient } from "./fixtures/effect-rpc";
 
@@ -24,7 +36,7 @@ describe(createRpcQueryUtils, () => {
         const utils = createRpcQueryUtils(group, {
           client,
           keyPrefix: ["app"] as const,
-          runPromiseExit: async (effect, options) => {
+          runtime: async (effect, options) => {
             executions += 1;
             return await runExit(effect, options);
           },
@@ -377,6 +389,231 @@ describe(createRpcQueryUtils, () => {
         expect(
           utils.events.audit.watch.streamedKey({ maxChunks: "unbounded" })
         ).not.toStrictEqual(utils.events.audit.watch.liveKey());
+      })
+  );
+
+  it.effect(
+    "omits keyPrefix to produce ['rpc'] roots and rejects empty or explicit undefined keyPrefix",
+    () =>
+      Effect.gen(function* testOptionalKeyPrefix() {
+        const client = yield* makeClient();
+        const utils = createRpcQueryUtils(group, { client });
+        expect(utils.key()).toStrictEqual(["rpc"]);
+        expect(utils.users.get.queryKey({ id: 7 })).toStrictEqual([
+          "rpc",
+          "users",
+          "get",
+          "query",
+          { id: 7, locale: "en" },
+        ]);
+        /* oxlint-disable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
+        expect(() =>
+          createRpcQueryUtils(group, { client, keyPrefix: [] } as never)
+        ).toThrow(expect.objectContaining({ code: "InvalidKeyPrefix" }));
+        expect(() =>
+          createRpcQueryUtils(group, { client, keyPrefix: undefined } as never)
+        ).toThrow(expect.objectContaining({ code: "InvalidKeyPrefix" }));
+        /* oxlint-enable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
+      })
+  );
+
+  it("accepts default tag-keyed RpcClient and makeNoSerialization, preserving receiver and eagerly validating missing tags", async () => {
+    await Effect.runPromise(
+      Effect.scoped(
+        Effect.gen(function* testDualRpcClient() {
+          const handlers = group.of({
+            "diagnostics.fail": () => Effect.fail("declared-failure" as const),
+            "events.watch": () => Stream.fromIterable(["one", "two"]),
+            "health.ping": () => Effect.void,
+            "toString.child": () => Effect.void,
+            "users.get": (payload) =>
+              Effect.succeed({
+                id: payload.id,
+                locale: payload.locale ?? "en",
+                name: "Ada",
+              }),
+          });
+          const objectClient = yield* RpcTest.makeClient(group).pipe(
+            Effect.provide(group.toLayer(handlers))
+          );
+          const utils = createRpcQueryUtils(group, { client: objectClient });
+          const queryClient = new QueryClient();
+          try {
+            const user = yield* Effect.promise(
+              async () =>
+                await queryClient.query(
+                  utils.users.get.queryOptions({ input: { id: 3 } })
+                )
+            );
+            const mutation = new MutationObserver(
+              queryClient,
+              utils.users.get.mutationOptions()
+            );
+            const mutated = yield* Effect.promise(
+              async () => await mutation.mutate({ id: 4, locale: "fr" })
+            );
+            const chunks = yield* Effect.promise(
+              async () =>
+                await queryClient.query(
+                  utils.events.watch.streamedOptions({ maxChunks: 10 })
+                )
+            );
+            const live = yield* Effect.promise(
+              async () =>
+                await queryClient.query(utils.events.watch.liveOptions())
+            );
+            expect({ user, mutated, chunks, live }).toStrictEqual({
+              user: { id: 3, locale: "en", name: "Ada" },
+              mutated: { id: 4, locale: "fr", name: "Ada" },
+              chunks: ["one", "two"],
+              live: "two",
+            });
+          } finally {
+            queryClient.clear();
+          }
+
+          const smallGroup = RpcGroup.make(
+            Rpc.make("ping.run", { success: Schema.String })
+          );
+          const reply =
+            yield* Deferred.make<
+              (
+                message: RpcMessage.FromServer<RpcGroup.Rpcs<typeof smallGroup>>
+              ) => Effect.Effect<void>
+            >();
+          const smallServer = yield* RpcServer.makeNoSerialization(smallGroup, {
+            disableFatalDefects: true,
+            onFromServer: (response) =>
+              Deferred.await(reply).pipe(
+                Effect.flatMap((write) => write(response))
+              ),
+          }).pipe(
+            Effect.provide(
+              smallGroup.toLayer({
+                "ping.run": () => Effect.succeed("pong"),
+              })
+            )
+          );
+          const noSer = yield* RpcClient.makeNoSerialization(smallGroup, {
+            supportsAck: true,
+            onFromClient: ({ message }) => smallServer.write(0, message),
+          });
+          yield* Deferred.succeed(reply, noSer.write);
+          const noSerUtils = createRpcQueryUtils(smallGroup, {
+            client: noSer.client,
+          });
+          const noSerQueryClient = new QueryClient();
+          try {
+            const pong = yield* Effect.promise(
+              async () =>
+                await noSerQueryClient.query(noSerUtils.ping.run.queryOptions())
+            );
+            expect(pong).toBe("pong");
+          } finally {
+            noSerQueryClient.clear();
+          }
+
+          let observedMarker: string | undefined;
+          const statefulClient = {
+            marker: "bound",
+            "ping.run"(this: { readonly marker: string }) {
+              observedMarker = this.marker;
+              return Effect.succeed("ok");
+            },
+          };
+          const statefulUtils = createRpcQueryUtils(smallGroup, {
+            // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion
+            client: statefulClient as RpcClient.RpcClient<
+              RpcGroup.Rpcs<typeof smallGroup>
+            >,
+          });
+          const receiverClient = new QueryClient();
+          try {
+            const res = yield* Effect.promise(
+              async () =>
+                await receiverClient.query(
+                  statefulUtils.ping.run.queryOptions()
+                )
+            );
+            expect({ res, observedMarker }).toStrictEqual({
+              res: "ok",
+              observedMarker: "bound",
+            });
+          } finally {
+            receiverClient.clear();
+          }
+
+          /* oxlint-disable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
+          expect(() =>
+            createRpcQueryUtils(smallGroup, { client: {} } as never)
+          ).toThrow(EffectRpcQueryConfigError);
+          expect(() =>
+            createRpcQueryUtils(smallGroup, {
+              client: { "ping.run": "not-a-function" },
+            } as never)
+          ).toThrow(
+            expect.objectContaining({
+              code: "InvalidRpcClient",
+              rpcTag: "ping.run",
+            })
+          );
+          /* oxlint-enable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
+        })
+      )
+    );
+  });
+
+  it.effect(
+    "accepts ManagedRuntime and object runtimes with receiver preserved",
+    () =>
+      Effect.gen(function* testUnifiedRuntime() {
+        const client = yield* makeClient();
+        const runExit = Effect.runPromiseExitWith(yield* Effect.context());
+        const managed = ManagedRuntime.make(Layer.empty);
+        const queryClient = new QueryClient();
+        try {
+          const managedUtils = createRpcQueryUtils(group, {
+            client,
+            runtime: managed,
+          });
+          const user = yield* Effect.promise(
+            async () =>
+              await queryClient.query(
+                managedUtils.users.get.queryOptions({ input: { id: 9 } })
+              )
+          );
+          expect(user).toStrictEqual({ id: 9, locale: "en", name: "Ada" });
+
+          let observedTag: string | undefined;
+          const objectRuntime = {
+            tag: "custom-runtime",
+            async runPromiseExit<A, E>(
+              this: { readonly tag: string },
+              effect: Effect.Effect<A, E>,
+              options?: { readonly signal?: AbortSignal }
+            ) {
+              observedTag = this.tag;
+              return await runExit(effect, options);
+            },
+          };
+          const objectUtils = createRpcQueryUtils(group, {
+            client,
+            runtime: objectRuntime,
+          });
+          const ping = yield* Effect.promise(
+            async () =>
+              await queryClient.query(objectUtils.health.ping.queryOptions())
+          );
+          expect({ ping, observedTag }).toStrictEqual({
+            ping: null,
+            observedTag: "custom-runtime",
+          });
+        } finally {
+          queryClient.clear();
+          yield* Effect.promise(async () => {
+            await managed.dispose();
+          });
+        }
       })
   );
 });

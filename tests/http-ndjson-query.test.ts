@@ -111,7 +111,7 @@ it.effect(
       const http = createHttpApiQueryUtils(serviceApi, {
         client,
         keyPrefix: ["services"],
-        runPromiseExit: Effect.runPromiseExitWith(
+        runtime: Effect.runPromiseExitWith(
           Context.make(RecordScale, { factor: 3 })
         ),
       });

@@ -23,7 +23,7 @@ export const startUsersApplication = async (baseUrl: string) => {
         createHttpApiQueryUtils(usersApi, {
           client,
           keyPrefix: ["users-app"],
-          runPromiseExit: setup.wrapRunner(runtime.runPromiseExit),
+          runtime: setup.wrapRunner(runtime),
         }),
         {
           query: {

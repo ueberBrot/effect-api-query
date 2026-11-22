@@ -10,6 +10,7 @@ import type {
   EffectHttpApiQueryError,
   InferQueryError,
   RunPromiseExit,
+  RuntimeInput,
 } from "@ueberbrot/effect-api-query";
 import { Context, Effect, Schema, SchemaTransformation } from "effect";
 import type { Stream } from "effect";
@@ -160,7 +161,7 @@ declare const runPromiseExit: RunPromiseExit<Scale | "client-service">;
 const utils = createHttpApiQueryUtils(api, {
   client,
   keyPrefix: ["consumer"],
-  runPromiseExit,
+  runtime: runPromiseExit,
 });
 true satisfies Assert<
   Equal<Extract<keyof typeof utils, string>, "key" | "views" | "events">
@@ -293,7 +294,7 @@ createHttpApiQueryUtils(api, { client, keyPrefix: ["missing"] });
 const custom = createHttpApiQueryUtils(api, {
   client,
   keyPrefix: ["custom"],
-  runPromiseExit,
+  runtime: runPromiseExit,
   keyEncoders: { views: { plain: (request) => request.params.id } },
 });
 custom.views.plain.streamedKey(input, { maxChunks: "unbounded" });
@@ -320,7 +321,7 @@ declare const extraRunner: RunPromiseExit<Scale | "stream-service">;
 const extra = createHttpApiQueryUtils(api, {
   client: extraClient,
   keyPrefix: ["extra"],
-  runPromiseExit: extraRunner,
+  runtime: extraRunner,
 });
 queryClient.getQueryData(
   extra.views.plain.streamedKey(input, { maxChunks: "unbounded" })
@@ -346,8 +347,13 @@ type ExtraRequirements = CreateHttpApiQueryUtilsOptions<
   typeof api,
   readonly ["extra"],
   typeof extraClient
->["runPromiseExit"];
-true satisfies Assert<Equal<ExtraRequirements, typeof extraRunner>>;
+>["runtime"];
+true satisfies Assert<
+  Equal<
+    ExtraRequirements,
+    typeof extraRunner | { readonly runPromiseExit: typeof extraRunner }
+  >
+>;
 true satisfies Assert<RunPromiseExit extends ExtraRequirements ? false : true>;
 
 declare const sseClient: HttpApiClient.ForApi<typeof api> & {
@@ -365,7 +371,7 @@ declare const sseClient: HttpApiClient.ForApi<typeof api> & {
 const sse = createHttpApiQueryUtils(api, {
   client: sseClient,
   keyPrefix: ["sse-overload"],
-  runPromiseExit: extraRunner,
+  runtime: extraRunner,
 });
 type SseFailure =
   InferQueryError<typeof sse.views.plain, "streamed"> extends infer Failure
@@ -385,8 +391,8 @@ true satisfies Assert<
       typeof api,
       readonly ["sse-overload"],
       typeof sseClient
-    >["runPromiseExit"],
-    typeof extraRunner
+    >["runtime"],
+    typeof extraRunner | { readonly runPromiseExit: typeof extraRunner }
   >
 >;
 
@@ -407,7 +413,7 @@ declare const sseFirstClient: Omit<StandardSseClient, "views"> & {
 const sseFirst = createHttpApiQueryUtils(api, {
   client: sseFirstClient,
   keyPrefix: ["sse-first"],
-  runPromiseExit: extraRunner,
+  runtime: extraRunner,
 });
 type SseFirstFailure =
   InferQueryError<typeof sseFirst.views.plain, "streamed"> extends infer Failure
@@ -424,8 +430,8 @@ true satisfies Assert<
       typeof api,
       readonly ["sse-first"],
       typeof sseFirstClient
-    >["runPromiseExit"],
-    typeof extraRunner
+    >["runtime"],
+    typeof extraRunner | { readonly runPromiseExit: typeof extraRunner }
   >
 >;
 
@@ -452,8 +458,8 @@ true satisfies Assert<
       typeof mixedApi,
       readonly ["mixed-services"],
       MixedClient
-    >["runPromiseExit"],
-    RunPromiseExit<Scale | "stream-service" | "buffered-service">
+    >["runtime"],
+    RuntimeInput<Scale | "stream-service" | "buffered-service">
   >
 >;
 

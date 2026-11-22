@@ -5,6 +5,7 @@ export type EffectRpcQueryConfigErrorCode =
   | "InvalidMaxChunks"
   | "InvalidRefetchMode"
   | "InvalidKeyPrefix"
+  | "InvalidRpcClient"
   | "InvalidRpcPath"
   | "RpcPathCollision"
   | "MissingKeyEncoder"

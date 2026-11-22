@@ -8,6 +8,7 @@ import {
   type InferQueryError,
   type RpcQueryUtils,
   type RunPromiseExit,
+  type RuntimeInput,
 } from "@ueberbrot/effect-api-query";
 import { Context, Effect, Schema } from "effect";
 import { Rpc, RpcGroup } from "effect/rpc";
@@ -67,7 +68,7 @@ const utils = createRpcQueryUtils(Group, {
       return { id: input.id, locale: input.locale };
     },
   },
-  runPromiseExit: runner,
+  runtime: runner,
 });
 
 utils.records.read.queryOptions({ input: { id: 1 } });
@@ -126,7 +127,7 @@ true satisfies Assert<
       typeof Group,
       readonly ["cast-audit"],
       "transport-failed"
-    >["runPromiseExit"],
-    RunPromiseExit<EncodingService>
+    >["runtime"],
+    RuntimeInput<EncodingService>
   >
 >;

@@ -1,5 +1,13 @@
 import { QueryClient } from "@tanstack/query-core";
-import { Cause, Effect, Exit, Layer, Schema, Scope } from "effect";
+import {
+  Cause,
+  Effect,
+  Exit,
+  Layer,
+  ManagedRuntime,
+  Schema,
+  Scope,
+} from "effect";
 import { HttpClient, HttpClientResponse, HttpServer } from "effect/http";
 import {
   HttpApi,
@@ -14,6 +22,7 @@ import { Rpc, RpcGroup } from "effect/rpc";
 import { describe, expect, it, vi } from "vite-plus/test";
 
 import {
+  acquireQueryOwner,
   createHttpApiQueryUtils,
   EffectHttpApiQueryConfigError,
   EffectHttpApiQueryError,
@@ -516,8 +525,7 @@ describe(createHttpApiQueryUtils, () => {
       const rejected = createHttpApiQueryUtils(api, {
         client,
         keyPrefix: ["test"],
-        runPromiseExit: async (): Promise<never> =>
-          await Promise.reject(rejection),
+        runtime: async (): Promise<never> => await Promise.reject(rejection),
       });
       await expect(
         queryClient.query(rejected.actions.fail.queryOptions())
@@ -707,5 +715,91 @@ describe(createHttpApiQueryUtils, () => {
       } as never)
     ).toThrow(expect.objectContaining({ code: "UnknownKeyEncoder" }));
     /* oxlint-enable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
+  });
+
+  it("omits keyPrefix to produce ['http', api.identifier] roots and supports ManagedRuntime and object runtimes", async () => {
+    const managed = ManagedRuntime.make(Layer.empty);
+    const queryClient = new QueryClient();
+    try {
+      const client = await Effect.runPromise(Effect.scoped(makeClient));
+      const unprefixed = createHttpApiQueryUtils(Api, {
+        client,
+        runtime: managed,
+      });
+      const fetched = await queryClient.query(
+        unprefixed.users.get.queryOptions({ input: { params: { id: 5 } } })
+      );
+      expect({
+        rootKey: unprefixed.key(),
+        queryKey: unprefixed.users.get.queryKey({ params: { id: 5 } }),
+        fetched,
+      }).toStrictEqual({
+        rootKey: ["http", "test"],
+        queryKey: [
+          "http",
+          "test",
+          "users",
+          "get",
+          "query",
+          { params: { id: "5" } },
+        ],
+        fetched: { id: 5, name: "Ada" },
+      });
+
+      /* oxlint-disable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
+      expect(() =>
+        createHttpApiQueryUtils(Api, {
+          client,
+          keyPrefix: undefined,
+        } as never)
+      ).toThrow(expect.objectContaining({ code: "InvalidKeyPrefix" }));
+      /* oxlint-enable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
+
+      let observedTag: string | undefined;
+      const objectRuntime = {
+        tag: "http-object-runtime",
+        async runPromiseExit<A, E>(
+          this: { readonly tag: string },
+          effect: Effect.Effect<A, E>,
+          options?: { readonly signal?: AbortSignal }
+        ) {
+          observedTag = this.tag;
+          return await Effect.runPromiseExit(effect, options);
+        },
+      };
+      const withReceiver = createHttpApiQueryUtils(Api, {
+        client,
+        runtime: objectRuntime,
+      });
+      const metadata = await queryClient.query(
+        withReceiver.users.get.metadataOptions({ input: { params: { id: 6 } } })
+      );
+      expect({ data: metadata.data, observedTag }).toStrictEqual({
+        data: { id: 6, name: "Ada" },
+        observedTag: "http-object-runtime",
+      });
+
+      const owner = await acquireQueryOwner(
+        async (setup) => await Promise.resolve(setup.trackUtils(unprefixed))
+      );
+      const trackedMeta = await owner.queryClient.query(
+        owner.resources.users.get.metadataOptions({
+          input: { params: { id: 7 } },
+        })
+      );
+      expect(trackedMeta.data).toStrictEqual({ id: 7, name: "Ada" });
+      await owner.dispose();
+      await expect(
+        owner.queryClient.query(
+          owner.resources.users.get.metadataOptions({
+            input: { params: { id: 8 } },
+            retry: false,
+          })
+        )
+      ).rejects.toThrow("retired");
+    } finally {
+      queryClient.clear();
+      await managed.dispose();
+    }
   });
 });

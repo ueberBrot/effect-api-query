@@ -86,7 +86,7 @@ describe("HTTP transport cancellation", () => {
           const utils = createHttpApiQueryUtils(Api, {
             client,
             keyPrefix: ["test"],
-            runPromiseExit,
+            runtime: runPromiseExit,
           });
           const pending =
             mode === "query"

@@ -3,13 +3,49 @@ import {
   MutationCache,
   QueryCache,
   QueryClient,
+  skipToken,
 } from "@tanstack/query-core";
-import type { QueryClientConfig } from "@tanstack/query-core";
-import { Cause, Exit } from "effect";
+import type {
+  QueryClientConfig,
+  QueryFunctionContext,
+} from "@tanstack/query-core";
+import { Cause, Exit, Predicate } from "effect";
 
 import { isEffectHttpApiQueryError } from "../http/errors";
 import { isEffectRpcQueryError } from "../rpc/errors";
-import type { RunPromiseExit } from "./types";
+import type {
+  RuntimeMutationBuilder,
+  RuntimeMutationFunction,
+  RuntimeOptions,
+  RuntimeQueryBuilder,
+} from "./configure";
+import {
+  readConfiguredLeaf,
+  reapplyLeafConfiguration,
+} from "./configure-utils";
+import type { UtilityNode } from "./configure-utils";
+import { resolveRuntime } from "./runtime";
+import type { RunPromiseExit, RuntimeInput } from "./types";
+import { readLeafDescriptor } from "./utility-tree";
+
+type RuntimeUtilityNode = RuntimeOptions & UtilityNode;
+
+const trackedOwners = new WeakMap<UtilityNode, symbol>();
+
+const queryOptionNames = [
+  "queryOptions",
+  "infiniteOptions",
+  "metadataOptions",
+  "liveOptions",
+  "streamedOptions",
+] as const;
+
+const isUtilityChild = (
+  value: RuntimeUtilityNode[string]
+): value is RuntimeUtilityNode =>
+  Predicate.isObject(value) &&
+  Predicate.hasProperty(value, "key") &&
+  Predicate.isFunction(value.key);
 
 /** Registers only resources whose lifetime is explicitly transferred to the owner. */
 export interface QueryOwnerSetup extends Omit<
@@ -45,10 +81,15 @@ export interface QueryOwner<A> {
   /** Accepts one complete application mutation promise, including awaited native callbacks. */
   readonly runMutation: <T>(execute: () => Promise<T>) => Promise<T>;
   /**
-   * Tracks utility runner calls. For streams, also register the complete query
-   * function with runQuery so retirement awaits iteration and cleanup.
+   * Tracks utility runner calls. Accepts a `RunPromiseExit` function or an object
+   * with a `runPromiseExit` method (such as `ManagedRuntime<R, never>`).
    */
-  readonly wrapRunner: <R>(runner: RunPromiseExit<R>) => RunPromiseExit<R>;
+  readonly wrapRunner: <R>(runner: RuntimeInput<R>) => RunPromiseExit<R>;
+  /**
+   * Binds a generated utility tree, branch, or leaf to this owner so runners,
+   * all query views, and mutations are tracked for retirement.
+   */
+  readonly trackUtils: <Node extends UtilityNode>(node: Node) => Node;
   /** Retires synchronously; repeated calls return the same disposal result. */
   readonly dispose: () => Promise<void>;
 }
@@ -61,6 +102,7 @@ export const acquireQueryOwner = async <A>(
   acquire: (setup: QueryOwnerSetup) => Promise<A>,
   cacheConfig?: QueryClientConfig
 ): Promise<QueryOwner<A>> => {
+  const ownerToken = Symbol("QueryOwner");
   const releases: (() => void | Promise<void>)[] = [];
   const pending = new Set<Promise<unknown>>();
   const cancelled = new WeakSet<Promise<unknown>>();
@@ -86,7 +128,6 @@ export const acquireQueryOwner = async <A>(
     let complete!: (value: T | PromiseLike<T>) => void;
     // oxlint-disable-next-line anti-slop/no-unknown-parameters
     let fail!: (error: unknown) => void;
-    // Register before executing so synchronous retirement sees all accepted work.
     // oxlint-disable-next-line promise/avoid-new
     const result = new Promise<T>((resolve, reject) => {
       complete = resolve;
@@ -115,7 +156,160 @@ export const acquireQueryOwner = async <A>(
       pending.delete(result);
     }
   };
-  // The same promise is part of the idempotent disposal contract.
+  const wrapRunner: QueryOwner<A>["wrapRunner"] = (input) => {
+    const runner = resolveRuntime(input);
+    return async (effect, options) =>
+      track(async () => {
+        const controller =
+          options?.signal === undefined ? undefined : new AbortController();
+        const abort = () => controller?.abort();
+        if (controller !== undefined) {
+          queries.add(controller);
+          options?.signal?.addEventListener("abort", abort, { once: true });
+          if (options?.signal?.aborted === true) {
+            controller.abort();
+          }
+        }
+        try {
+          const exit = await runner(
+            effect,
+            controller === undefined ? undefined : { signal: controller.signal }
+          );
+          if (
+            !active &&
+            Exit.isFailure(exit) &&
+            !Cause.hasInterruptsOnly(exit.cause)
+          ) {
+            drainFailures.push(exit.cause);
+          }
+          return exit;
+        } finally {
+          if (controller !== undefined) {
+            queries.delete(controller);
+            options?.signal?.removeEventListener("abort", abort);
+          }
+        }
+      });
+  };
+  const trackLeaf = (node: RuntimeUtilityNode): RuntimeUtilityNode => {
+    const descriptor = readLeafDescriptor(node);
+    const rebuilt: RuntimeUtilityNode =
+      descriptor === undefined
+        ? { ...node }
+        : // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
+          ({
+            ...descriptor.rebuild(wrapRunner(descriptor.runner)),
+          } as RuntimeUtilityNode);
+    for (const view of queryOptionNames) {
+      if (!Object.hasOwn(rebuilt, view)) {
+        continue;
+      }
+      const candidate = rebuilt[view];
+      if (!Predicate.isFunction(candidate)) {
+        continue;
+      }
+      // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
+      const builder = candidate as RuntimeQueryBuilder;
+      rebuilt[view] = (options?: RuntimeOptions) => {
+        const built = builder(options);
+        const { queryFn } = built;
+        if (queryFn === skipToken) {
+          return built;
+        }
+        return {
+          ...built,
+          queryFn: async (context: QueryFunctionContext) =>
+            await track(async () => await queryFn(context), context.signal),
+        };
+      };
+    }
+    if (Object.hasOwn(rebuilt, "mutationOptions")) {
+      const candidate = rebuilt["mutationOptions"];
+      if (Predicate.isFunction(candidate)) {
+        // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
+        const builder = candidate as RuntimeMutationBuilder;
+        rebuilt["mutationOptions"] = (options?: RuntimeOptions) => {
+          const built = builder(options);
+          const { mutationFn } = built;
+          const trackedMutationFn: RuntimeMutationFunction = async (
+            variables,
+            context
+          ) => await track(async () => await mutationFn(variables, context));
+          return {
+            ...built,
+            mutationFn: trackedMutationFn,
+          };
+        };
+      }
+    }
+    const frozen = Object.freeze(rebuilt);
+    trackedOwners.set(frozen, ownerToken);
+    return frozen;
+  };
+  const trackNode = (node: RuntimeUtilityNode): RuntimeUtilityNode => {
+    const existingOwner = trackedOwners.get(node);
+    if (existingOwner !== undefined) {
+      if (existingOwner !== ownerToken) {
+        throw new Error(
+          "Utility node is already tracked by another query owner"
+        );
+      }
+      return node;
+    }
+    const configured = readConfiguredLeaf(node);
+    if (configured !== undefined) {
+      const originalOwner = trackedOwners.get(configured.original);
+      if (originalOwner !== undefined) {
+        if (originalOwner !== ownerToken) {
+          throw new Error(
+            "Utility node is already tracked by another query owner"
+          );
+        }
+        return node;
+      }
+      const trackedBase = trackLeaf(configured.original);
+      const trackedConfigured = reapplyLeafConfiguration(
+        trackedBase,
+        configured.layers
+      );
+      trackedOwners.set(trackedConfigured, ownerToken);
+      return trackedConfigured;
+    }
+    const children = Object.entries(node).filter(
+      (entry): entry is [string, RuntimeUtilityNode] => isUtilityChild(entry[1])
+    );
+    if (children.length === 0) {
+      return trackLeaf(node);
+    }
+    let changed = false;
+    const nextBranch: RuntimeUtilityNode = { ...node };
+    for (const [name, child] of children) {
+      const trackedChild = trackNode(child);
+      if (trackedChild !== child) {
+        changed = true;
+      }
+      nextBranch[name] = trackedChild;
+    }
+    if (!changed) {
+      return node;
+    }
+    const frozen = Object.freeze(nextBranch);
+    trackedOwners.set(frozen, ownerToken);
+    return frozen;
+  };
+  const trackUtils: QueryOwner<A>["trackUtils"] = <Node extends UtilityNode>(
+    node: Node
+  ): Node => {
+    if (
+      !Predicate.isObject(node) ||
+      !Predicate.hasProperty(node, "key") ||
+      !Predicate.isFunction(node.key)
+    ) {
+      throw new TypeError("Expected a generated utility tree, branch, or leaf");
+    }
+    // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
+    return trackNode(node) as Node;
+  };
   // oxlint-disable-next-line typescript/promise-function-async
   const dispose = () => {
     if (disposal !== undefined) {
@@ -124,7 +318,6 @@ export const acquireQueryOwner = async <A>(
     active = false;
     const accepted = [...pending];
     const draining = Promise.allSettled(accepted);
-    // Defer cleanup so reentrant calls see the same promise.
     disposal = (async () => {
       await Promise.resolve();
       const failures: unknown[] = [];
@@ -158,7 +351,6 @@ export const acquireQueryOwner = async <A>(
           break;
         }
         try {
-          // Resource finalizers run in reverse dependency order.
           // oxlint-disable-next-line eslint/no-await-in-loop
           await release();
         } catch (error) {
@@ -181,39 +373,8 @@ export const acquireQueryOwner = async <A>(
     },
     runMutation: track,
     runQuery: track,
-    wrapRunner: (runner) => async (effect, options) =>
-      track(async () => {
-        const controller =
-          options?.signal === undefined ? undefined : new AbortController();
-        const abort = () => controller?.abort();
-        if (controller !== undefined) {
-          queries.add(controller);
-          options?.signal?.addEventListener("abort", abort, { once: true });
-          if (options?.signal?.aborted === true) {
-            controller.abort();
-          }
-        }
-        try {
-          const exit = await runner(
-            effect,
-            controller === undefined ? undefined : { signal: controller.signal }
-          );
-          // A cancellation with a failed finalizer is not a successful drain.
-          if (
-            !active &&
-            Exit.isFailure(exit) &&
-            !Cause.hasInterruptsOnly(exit.cause)
-          ) {
-            drainFailures.push(exit.cause);
-          }
-          return exit;
-        } finally {
-          if (controller !== undefined) {
-            queries.delete(controller);
-            options?.signal?.removeEventListener("abort", abort);
-          }
-        }
-      }),
+    wrapRunner,
+    trackUtils,
   };
   try {
     const resources = await acquire({

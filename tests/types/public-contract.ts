@@ -1099,7 +1099,7 @@ const missingEncoderOptions: CreateRpcQueryUtilsOptions<
 > = {
   client: encoderClient,
   keyPrefix,
-  runPromiseExit: encoderRunner,
+  runtime: encoderRunner,
 };
 void missingEncoderOptions;
 
@@ -1113,7 +1113,7 @@ const encoderOptions: CreateRpcQueryUtilsOptions<
     "secrets.read": () => ({ redacted: true }),
   },
   keyPrefix,
-  runPromiseExit: encoderRunner,
+  runtime: encoderRunner,
 };
 createRpcQueryUtils(encoderGroup, encoderOptions);
 // @ts-expect-error Key encoders do not satisfy residual RPC execution services.

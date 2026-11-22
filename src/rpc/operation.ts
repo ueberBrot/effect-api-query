@@ -1,6 +1,6 @@
 import { Predicate, SchemaAST } from "effect";
 import type { Effect, Stream } from "effect";
-import type { RpcClient, RpcGroup } from "effect/rpc";
+import type { RpcGroup } from "effect/rpc";
 import { Rpc, RpcSchema } from "effect/rpc";
 
 import type {
@@ -21,8 +21,24 @@ type RpcRequest = Pick<
   "_tag" | "payloadSchema" | "successSchema"
 >;
 
-type RpcClientInvocation<Result> = (
+type RpcFlatInvocation<Result> = (
   tag: string,
+  // oxlint-disable-next-line anti-slop/no-unknown-parameters
+  input: unknown,
+  // oxlint-disable-next-line anti-slop/no-unknown-parameters
+  options: unknown
+) => Result;
+
+type RpcMethodInvocation<Result> = (
+  // oxlint-disable-next-line anti-slop/no-unknown-parameters
+  this: unknown,
+  // oxlint-disable-next-line anti-slop/no-unknown-parameters
+  input: unknown,
+  // oxlint-disable-next-line anti-slop/no-unknown-parameters
+  options: unknown
+) => Result;
+
+type RpcInvoker<Result> = (
   // oxlint-disable-next-line anti-slop/no-unknown-parameters
   input: unknown,
   // oxlint-disable-next-line anti-slop/no-unknown-parameters
@@ -98,6 +114,36 @@ const takeRpcOptions = (options: Record<string, unknown>) => {
   return rpcOptions;
 };
 
+const createRpcInvoker = <Result>(
+  rpcTag: string,
+  // oxlint-disable-next-line anti-slop/no-unknown-parameters
+  client: unknown
+): RpcInvoker<Result> => {
+  if (Predicate.isFunction(client)) {
+    // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
+    const flat = client as RpcFlatInvocation<Result>;
+    return (input, options) => flat(rpcTag, input, options);
+  }
+  if (!Predicate.isObject(client)) {
+    throw new EffectRpcQueryConfigError(
+      "InvalidRpcClient",
+      "RPC client must be a ready tag-keyed or flat RpcClient",
+      { rpcTag }
+    );
+  }
+  const candidate = Object.hasOwn(client, rpcTag) ? client[rpcTag] : undefined;
+  if (!Predicate.isFunction(candidate)) {
+    throw new EffectRpcQueryConfigError(
+      "InvalidRpcClient",
+      `RPC client is missing a function for tag ${rpcTag}`,
+      { rpcTag }
+    );
+  }
+  // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
+  const method = candidate as RpcMethodInvocation<Result>;
+  return (input, options) => method.call(client, input, options);
+};
+
 const describeRpc = (
   definition: RpcRequest,
   // oxlint-disable-next-line anti-slop/no-unknown-parameters
@@ -117,42 +163,49 @@ const describeRpc = (
     takeOptions: takeRpcOptions,
   };
   if (!RpcSchema.isStreamSchema(definition.successSchema)) {
-    // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
-    const invoke = client as RpcClientInvocation<
-      Effect.Effect<unknown, unknown, unknown>
-    >;
+    const invoke = createRpcInvoker<Effect.Effect<unknown, unknown, unknown>>(
+      rpcTag,
+      client
+    );
     return {
       ...identity,
       kind: "Unary",
       // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
-      invoke: (input, options) => invoke(rpcTag, input, options),
+      invoke: (input, options) => invoke(input, options),
       executionError: (operation, cause) =>
         new EffectRpcQueryError(rpcTag, operation, cause),
     };
   }
-  // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
-  const invoke = client as RpcClientInvocation<
-    Stream.Stream<unknown, unknown, unknown>
-  >;
+  const invoke = createRpcInvoker<Stream.Stream<unknown, unknown, unknown>>(
+    rpcTag,
+    client
+  );
   return {
     ...identity,
     kind: "Streaming",
     prepareStream: createStreamPreparation({
       tag: rpcTag,
-      invoke: (input, options) => invoke(rpcTag, input, options),
+      invoke: (input, options) => invoke(input, options),
     }),
   };
 };
 
-export const extractRpcs = <Rpcs extends Rpc.Any, ClientError>(
+export const extractRpcs = (
   group: RpcGroup.Any,
-  client: RpcClient.RpcClient.Flat<Rpcs, ClientError>
+  // oxlint-disable-next-line anti-slop/no-unknown-parameters
+  client: unknown
 ): readonly OperationDescription[] => {
   if (
     !Predicate.hasProperty(group, "requests") ||
     !Predicate.isMap(group.requests)
   ) {
     throw new TypeError("Expected an Effect RPC group with a request map");
+  }
+  if (!Predicate.isFunction(client) && !Predicate.isObject(client)) {
+    throw new EffectRpcQueryConfigError(
+      "InvalidRpcClient",
+      "RPC client must be a ready tag-keyed or flat RpcClient"
+    );
   }
   return Array.from(group.requests.values(), (value) => {
     if (!Rpc.isRpc(value)) {

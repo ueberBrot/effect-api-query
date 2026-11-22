@@ -30,7 +30,7 @@ export const startHttpWorkflows = async (baseUrl: string) => {
       const base = createHttpApiQueryUtils(workflowsApi, {
         client,
         keyPrefix: ["http-workflows"],
-        runPromiseExit,
+        runtime: runPromiseExit,
       });
       const policy = defineUtilsPolicy<typeof base>()({
         query: { policy: { retry: false }, interceptors: [intercept] },

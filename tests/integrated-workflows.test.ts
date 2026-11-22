@@ -43,7 +43,7 @@ it.effect(
           const raw = createRpcQueryUtils(group, {
             client: setup.borrow(client),
             keyPrefix: ["combined"],
-            runPromiseExit: setup.wrapRunner(Effect.runPromiseExit),
+            runtime: setup.wrapRunner(Effect.runPromiseExit),
           });
           const policy = defineUtilsPolicy<typeof raw>()({
             query: { policy: { staleTime: Infinity, retry: false } },

@@ -1181,7 +1181,7 @@ describe("createRpcQueryUtils streaming execution", () => {
         throw new Error("The custom runner must supply the stream iterator");
       },
       keyPrefix: ["app"] as const,
-      runPromiseExit,
+      runtime: runPromiseExit,
     });
     const options = utils.events.watch.streamedOptions({
       maxChunks: "unbounded",
@@ -1344,7 +1344,7 @@ describe("createRpcQueryUtils streaming execution", () => {
           const utils = createRpcQueryUtils(streamGroup, {
             client,
             keyPrefix: ["app"] as const,
-            runPromiseExit: async (effect, options) => {
+            runtime: async (effect, options) => {
               executions += 1;
               return await runExit(effect, options);
             },

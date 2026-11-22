@@ -49,13 +49,13 @@ it.effect(
       const a = createRpcQueryUtils(group, {
         client: first,
         keyPrefix: ["first"],
-        runPromiseExit: firstRunner,
+        runtime: firstRunner,
         keyEncoders: { read: ({ id }) => ({ entity: id }) },
       });
       const b = createRpcQueryUtils(group, {
         client: second,
         keyPrefix: ["second"],
-        runPromiseExit: secondRunner,
+        runtime: secondRunner,
       });
       const queryClient = new QueryClient();
       expect(

@@ -22,6 +22,12 @@ export type JsonValue =
   | { readonly [key: string]: JsonValue }
   | readonly JsonValue[];
 
+/** A non-empty readonly tuple of JSON-safe values used to namespace cache keys. */
+export type KeyPrefix = readonly [JsonValue, ...JsonValue[]];
+
+/** An optional key prefix: either omitted (`readonly []`) or a non-empty tuple. */
+export type OptionalKeyPrefix = readonly [] | KeyPrefix;
+
 export type QueryData<A> = undefined extends A
   ? Exclude<A, undefined | void> | null
   : A;
@@ -31,6 +37,11 @@ export type RunPromiseExit<R = never> = <A, E>(
   effect: Effect.Effect<A, E, R>,
   options?: { readonly signal?: AbortSignal }
 ) => Promise<Exit.Exit<A, E>>;
+
+/** Runs an Effect directly or through a runtime object such as a `ManagedRuntime` with `ER = never`. */
+export type RuntimeInput<R = never> =
+  | RunPromiseExit<R>
+  | { readonly runPromiseExit: RunPromiseExit<R> };
 
 /** Requires encoders only when eligible requests need an override. */
 export type KeyEncoderRequirement<Eligible, Required, Encoders> = [
@@ -47,15 +58,15 @@ export type KeyEncoderRequirement<Eligible, Required, Encoders> = [
         readonly keyEncoders: Encoders;
       };
 
-/** Requires a custom runner when client-side Schema services remain. */
+/** Requires a custom runtime when client-side Schema services remain. */
 export type RunnerRequirement<Services> = [Services] extends [never]
   ? {
       /** Overrides service-free execution; defaults to `Effect.runPromiseExit`. */
-      readonly runPromiseExit?: RunPromiseExit;
+      readonly runtime?: RuntimeInput;
     }
   : {
       /** Runs Effects that retain client-side Schema services. */
-      readonly runPromiseExit: RunPromiseExit<Services>;
+      readonly runtime: RuntimeInput<Services>;
     };
 
 /** Uses the adapter's inputless proof to determine key-builder arguments. */
