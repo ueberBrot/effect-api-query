@@ -3597,6 +3597,138 @@
       "evidence": [
         "Compared the changeset to 8016013..eb7c0be, published peerDependencies, and ADR 0001/0042."
       ]
+    },
+    "source:.changeset/cancel-live-queries-before-first-value.md": {
+      "fingerprint": "4526d84747928a4aca1d0cd821319fa2d9dc779b056e8d5cd0a8c1de1b97ae3e",
+      "snapshot": {
+        ".changeset/cancel-live-queries-before-first-value.md": "aaa28a230d7b9770f4ac683011f260de663727bb9557970d7b7e1eb1a553a997"
+      },
+      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "outcome": "no-change",
+      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "evidence": [
+        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+      ]
+    },
+    "source:.changeset/normalize-structured-http-header-keys.md": {
+      "fingerprint": "a95b89bc6edac81049091b4ec7c174310aa2f68be5f7164def3dc2636685a4a4",
+      "snapshot": {
+        ".changeset/normalize-structured-http-header-keys.md": "a0f01314d55821ef392d07491684908b53e951c10772d17b3e8884775969433e"
+      },
+      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "outcome": "no-change",
+      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "evidence": [
+        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+      ]
+    },
+    "source:.changeset/reduce-http-call-allocations.md": {
+      "fingerprint": "d2b163cc33a3905269b15c2086e8278d2bab46223564255ae67d754bdc9a6f40",
+      "snapshot": {
+        ".changeset/reduce-http-call-allocations.md": "8be577429fb1c244ce47702f6b2449bace81ad87a135d42f7061cb67021850ce"
+      },
+      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "outcome": "no-change",
+      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "evidence": [
+        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+      ]
+    },
+    "source:.changeset/reduce-http-utility-type-checking.md": {
+      "fingerprint": "e963da8fd86c6e539a3341d3fe16fb503455aae53ea813c64cb188b984de18b5",
+      "snapshot": {
+        ".changeset/reduce-http-utility-type-checking.md": "ae0189ac410400b530a49c507c6ec1c556da88e7fcff094a971586221fd57165"
+      },
+      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "outcome": "no-change",
+      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "evidence": [
+        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+      ]
+    },
+    "source:.changeset/retire-http-metadata-queries-in-vite-example.md": {
+      "fingerprint": "83f30637e7a8844ded9c05964b01d6ef6b78091fbbb20e6f2ec59a66c3bd038c",
+      "snapshot": {
+        ".changeset/retire-http-metadata-queries-in-vite-example.md": "0f8b45da0f517a1d2221ea07c44425dcd048aac3bb42baacefd1943be5c9766a"
+      },
+      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "outcome": "no-change",
+      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "evidence": [
+        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+      ]
+    },
+    "source:.changeset/reuse-stream-policy-key-options.md": {
+      "fingerprint": "626e8e0718a8bf646aed510d3bbc42efdaca8083e3f2adc7b8f4ef4f18c15b53",
+      "snapshot": {
+        ".changeset/reuse-stream-policy-key-options.md": "698c92ce14f51be86dc41d05ef84f44fc02c6d9316131e79a81a1e4bcaa82983"
+      },
+      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "outcome": "no-change",
+      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "evidence": [
+        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+      ]
+    },
+    "source:.changeset/skip-unmatched-branch-query-keys.md": {
+      "fingerprint": "acf9e824346c1e45933f7adbea129eb0c6e081ccb63b15e29b5c4259d2fee0d0",
+      "snapshot": {
+        ".changeset/skip-unmatched-branch-query-keys.md": "090827b27171c1c9e4f12c4c7be9423afe0f470b0d58f0ed3569609d6952a8c0"
+      },
+      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "outcome": "no-change",
+      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "evidence": [
+        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+      ]
+    },
+    "source:.changeset/skip-unmatched-hydration-keys.md": {
+      "fingerprint": "cd406664d0d7bb7edd8e445c800989a437fc7c46c638037a0f08323f5088c55a",
+      "snapshot": {
+        ".changeset/skip-unmatched-hydration-keys.md": "9bc234390885e6a776358ba1f4638579c41b24050911c3e317a626099e324548"
+      },
+      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "outcome": "no-change",
+      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "evidence": [
+        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+      ]
+    },
+    "source:.changeset/speed-up-schema-structural-sharing.md": {
+      "fingerprint": "3a2dc00d0b2af1260b32e1ae1da8ac14c9a26640ddcf182a3eeb7f325543bca1",
+      "snapshot": {
+        ".changeset/speed-up-schema-structural-sharing.md": "f967624dbf3dc61cee4726e6cdf53d0cb7ee45c980aaa0ecc32b3b8a7f6f953d"
+      },
+      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "outcome": "no-change",
+      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "evidence": [
+        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+      ]
+    },
+    "source:.changeset/type-http-sse-policy-defaults.md": {
+      "fingerprint": "e25de3ec94432563c558c6513617485709c77252cf3de68c67e29f8f4aee1a70",
+      "snapshot": {
+        ".changeset/type-http-sse-policy-defaults.md": "461f2a5321f3c5354371eb39898749e71af3901aed107c71a713709168cf3f4f"
+      },
+      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "outcome": "no-change",
+      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "evidence": [
+        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+      ]
+    },
+    "source:.changeset/use-query-core-query-in-query-effects.md": {
+      "fingerprint": "79dbe5414f90dfafa18e25ef368a412e6d59ec2916e842e0208be3d09bed008d",
+      "snapshot": {
+        ".changeset/use-query-core-query-in-query-effects.md": "f0555f995cf8b9504e89a23b1a6674de722d0f8848d5a58372e0dc8443c99612"
+      },
+      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "outcome": "no-change",
+      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "evidence": [
+        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+      ]
     }
   }
 }
