@@ -2,8 +2,10 @@ import { Predicate, Schema } from "effect";
 import { HttpApiSchema } from "effect/http-api";
 import type { HttpApiEndpoint } from "effect/http-api";
 
+import { canonicalize } from "../core/canonical-key";
 import type { OperationInput } from "../core/operation";
 import { createSchemaKeyEncoding } from "../core/schema-key";
+import type { JsonValue } from "../core/types";
 import {
   EffectHttpApiQueryConfigError,
   EffectHttpApiQueryKeyError,
@@ -173,19 +175,20 @@ const normalizeRequestKey = (value: unknown) => {
     throw new TypeError("Encoded HTTP requests must be objects");
   }
   if (Predicate.isObject(request["headers"])) {
-    // oxlint-disable-next-line anti-slop/no-unsafe-dictionary-type, typescript/no-unsafe-assignment
-    const headers: Record<string, unknown> = Object.create(null);
+    // oxlint-disable-next-line typescript/no-unsafe-assignment
+    const headers: Record<string, JsonValue> = Object.create(null);
     for (const [name, headerValue] of Object.entries(request["headers"])) {
       const lower = name.toLowerCase();
+      const canonicalValue = canonicalize(headerValue);
       if (
         Object.hasOwn(headers, lower) &&
-        JSON.stringify(headers[lower]) !== JSON.stringify(headerValue)
+        JSON.stringify(headers[lower]) !== JSON.stringify(canonicalValue)
       ) {
         throw new TypeError(
           "Encoded header names must not have conflicting values"
         );
       }
-      headers[lower] = headerValue;
+      headers[lower] = canonicalValue;
     }
     return { ...request, headers };
   }

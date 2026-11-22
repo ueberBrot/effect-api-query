@@ -351,6 +351,74 @@ describe("HTTP semantic keys", () => {
     ).toThrow(expect.objectContaining({ code: "InvalidKeyValue" }));
   });
 
+  it("canonicalizes duplicate case-variant structured headers before collision detection", () => {
+    const contract = HttpApi.make("structured-headers").add(
+      HttpApiGroup.make("requests").add(
+        HttpApiEndpoint.get("read", "/read", {
+          headers: Schema.Record(Schema.String, Schema.Unknown),
+        })
+      )
+    );
+    const http = createHttpApiQueryUtils(contract, {
+      client: Effect.runSync(makeUnusedHttpClient(contract)),
+      keyPrefix: ["test"],
+    });
+
+    const reorderedKey = http.requests.read.queryKey({
+      headers: {
+        "X-Meta": { second: { b: "2", a: "1" }, first: "ok" },
+        "x-meta": { first: "ok", second: { a: "1", b: "2" } },
+      },
+    });
+    const canonicalKey = http.requests.read.queryKey({
+      headers: {
+        "x-meta": { first: "ok", second: { a: "1", b: "2" } },
+      },
+    });
+
+    expect(reorderedKey).toStrictEqual(canonicalKey);
+    expect(reorderedKey.at(-1)).toStrictEqual({
+      headers: {
+        "x-meta": { first: "ok", second: { a: "1", b: "2" } },
+      },
+    });
+
+    expect(() =>
+      http.requests.read.queryOptions({
+        input: {
+          headers: {
+            "X-Meta": { second: { b: "2", a: "1" }, first: "ok" },
+            "x-meta": { first: "ok", second: { a: "1", b: "3" } },
+          },
+        },
+      })
+    ).toThrow(expect.objectContaining({ code: "InvalidKeyValue" }));
+
+    const sparse: string[] = [];
+    sparse[1] = "a";
+    expect(() =>
+      http.requests.read.queryOptions({
+        input: {
+          headers: {
+            "X-Meta": sparse,
+            "x-meta": sparse,
+          },
+        },
+      })
+    ).toThrow(expect.objectContaining({ code: "InvalidKeyValue" }));
+
+    expect(() =>
+      http.requests.read.queryOptions({
+        input: {
+          headers: {
+            "X-Meta": { constructor: "bad" },
+            "x-meta": { constructor: "bad" },
+          },
+        },
+      })
+    ).toThrow(expect.objectContaining({ code: "InvalidKeyValue" }));
+  });
+
   it("omits nested undefined query members while preserving shared caller values", () => {
     const contract = HttpApi.make("nested").add(
       HttpApiGroup.make("requests").add(
