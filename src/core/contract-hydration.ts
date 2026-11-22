@@ -27,26 +27,8 @@ import {
 } from "./hydration";
 import type { CompiledHydrationCodec, HydrationRegistry } from "./hydration";
 import type { QueryView } from "./inference";
+import { isInvalidUtilitySegment } from "./operation";
 import type { JsonValue } from "./types";
-
-const reservedPathSegments = new Set([
-  "__proto__",
-  "constructor",
-  "infiniteKey",
-  "infiniteOptions",
-  "key",
-  "liveKey",
-  "liveOptions",
-  "metadataKey",
-  "metadataOptions",
-  "mutationKey",
-  "mutationOptions",
-  "prototype",
-  "queryKey",
-  "queryOptions",
-  "streamedKey",
-  "streamedOptions",
-]);
 
 const rpcAllowedViews = new Set(["query", "live", "streamed"]);
 const httpAllowedViews = new Set(["query", "metadata", "live", "streamed"]);
@@ -582,9 +564,7 @@ const validateSegments = (
   for (const { path, segments } of operations) {
     if (
       !EffectArray.isReadonlyArrayNonEmpty(segments) ||
-      segments.some(
-        (segment) => segment.length === 0 || reservedPathSegments.has(segment)
-      )
+      segments.some(isInvalidUtilitySegment)
     ) {
       throw new HydrationCodecError("InvalidContractPath", {
         path,

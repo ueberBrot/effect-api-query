@@ -14,7 +14,9 @@ Import these values and types from `@ueberbrot/effect-api-query`.
 | `UtilsConfiguration`, `ConfiguredUtils` | Type scoped configuration and the configured utility tree. |
 | `createBranchQueryFilter` | Select one view across all descendant leaves. |
 | `prepareInput`, `PreparedInput` | Reuse owner-bound input preparation explicitly. |
-| `findDeclaredError` | Match one tagged typed failure without flattening its Cause. |
+| `isEffectApiQueryError`, `getExecutionCause` | Recognize either execution wrapper and read its original Cause. |
+| `findDeclaredError`, `matchDeclaredError` | Select or handle one tagged failure in an execution error. |
+| `retryExecutionError`, `RetryExecutionErrorOptions` | Build a bounded Query retry predicate for single typed failures. |
 | `runQueryEvents` | Run sequential event handlers and recovery against a retiring query owner’s native cache. |
 | `consumeEvents`, `ConsumeEventsOptions` | Consume events sequentially with start and exit callbacks. |
 | `createRpcQueryUtils` | Builds the RPC utility tree. |

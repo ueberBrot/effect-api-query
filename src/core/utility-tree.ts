@@ -5,8 +5,10 @@ import type { Cause } from "effect";
 import { canonicalizeArray } from "./canonical-key";
 import type { UtilityNode } from "./configure-utils";
 import { prepareMetadataExecution } from "./metadata-query";
+import { isInvalidUtilitySegment } from "./operation";
 import type {
   BufferedOperation,
+  MutationOperation,
   OperationDescription,
   QueryPreparation,
   RuntimeKeyEncoder,
@@ -27,25 +29,6 @@ import type {
   RunPromiseExit,
   RuntimeInput,
 } from "./types";
-
-const reservedPathSegments = new Set([
-  "__proto__",
-  "constructor",
-  "infiniteKey",
-  "infiniteOptions",
-  "key",
-  "liveKey",
-  "liveOptions",
-  "metadataKey",
-  "metadataOptions",
-  "mutationKey",
-  "mutationOptions",
-  "prototype",
-  "queryKey",
-  "queryOptions",
-  "streamedKey",
-  "streamedOptions",
-]);
 
 interface PreparedQuery {
   readonly input: unknown;
@@ -90,9 +73,7 @@ const planPaths = (
     const segments = operation.path;
     if (
       !EffectArray.isReadonlyArrayNonEmpty(segments) ||
-      segments.some(
-        (segment) => segment.length === 0 || reservedPathSegments.has(segment)
-      )
+      segments.some(isInvalidUtilitySegment)
     ) {
       throw errors.invalidPath(operation.id);
     }
@@ -155,7 +136,9 @@ const execute = async <Operation extends UnaryQueryOperation | "metadata">(
     throw description.executionError(operation, exit.cause);
   }
 
-  return operation !== "mutation" && exit.value === undefined
+  return operation !== "call" &&
+    operation !== "mutation" &&
+    exit.value === undefined
     ? null
     : exit.value;
 };
@@ -368,12 +351,44 @@ const createInfiniteBuilders = (
   return { infiniteKey, infiniteOptions };
 };
 
-const createMutationBuilders = (
-  description: BufferedOperation,
+const createBufferedBuilders = (
+  description: UnaryOperation | MutationOperation,
   operationKey: readonly JsonValue[],
   runPromiseExit: RunPromiseExit<unknown>
 ) => {
   const mutationKey = freezeKey([...operationKey, "mutation"]);
+
+  const prepareDirect = (argument: Record<string, unknown> = {}) => {
+    const options = { ...argument };
+    const owner = description.kind === "Unary" ? description.input : undefined;
+    const prepared = readPreparedInput(owner, options["input"]);
+    return {
+      input: prepared === undefined ? options["input"] : prepared.input,
+      requestOptions: description.takeOptions(options),
+    };
+  };
+
+  const call = async (
+    argument?: Record<string, unknown> & { readonly signal?: AbortSignal }
+  ) => {
+    const { input, requestOptions } = prepareDirect(argument);
+    return execute(
+      description,
+      "call",
+      input,
+      runPromiseExit,
+      requestOptions,
+      argument?.signal
+    );
+  };
+  const bindDirectEffect =
+    <Result>(
+      invoke: (...args: Parameters<BufferedOperation["invoke"]>) => Result
+    ) =>
+    (argument?: Record<string, unknown>) => {
+      const { input, requestOptions } = prepareDirect(argument);
+      return invoke(input, requestOptions);
+    };
 
   const mutationOptions = (argument: Record<string, unknown> = {}) => {
     const options = { ...argument };
@@ -392,7 +407,12 @@ const createMutationBuilders = (
       mutationKey,
     };
   };
-  return { mutationKey: () => mutationKey, mutationOptions };
+  return {
+    call,
+    effect: bindDirectEffect(description.invoke),
+    mutationKey: () => mutationKey,
+    mutationOptions,
+  };
 };
 
 const createUnaryBuilders = (
@@ -448,7 +468,7 @@ const createUnaryBuilders = (
       keyEncoder,
       runPromiseExit
     ),
-    ...createMutationBuilders(description, operationKey, runPromiseExit),
+    ...createBufferedBuilders(description, operationKey, runPromiseExit),
     queryKey: query.key,
     queryOptions: query.options,
     ...(metadataQuery === undefined
@@ -640,7 +660,7 @@ const insertLeaf = (
   const buildLeaf = (leafRunner: RunPromiseExit<unknown>) => {
     let builders;
     if (operation.kind === "Mutation") {
-      builders = createMutationBuilders(operation, operationKey, leafRunner);
+      builders = createBufferedBuilders(operation, operationKey, leafRunner);
     } else if (operation.kind === "Streaming") {
       builders = createStreamingBuilders(
         operation,

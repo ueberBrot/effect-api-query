@@ -145,3 +145,9 @@ The #180 Fallow audit compares all 65 findings with original spec166 base `15a61
 The shipped skill and planning metadata now name the existing package version `0.6.1`, which the combined package/runtime/compiler checks exercise. This corrects the prior `0.6.0` verification label; it selects no future package version or release schedule. Activation text, identity, prerequisites and six-reference structure stay unchanged.
 
 The #180 retained-code audit found unused Effect cache wrapper bodies in every factory consumer. Pinned Effect.fnUntraced only creates a lazy function and defines its own length. Five pure-call annotations remove those unused bodies without changing service identity, keys, lifetimes, entry points or eager utility construction. A tightened RPC byte ceiling fails before the change and passes afterward. Matched before/after consumer reports show 1,364 fewer minified bytes with peers included and 800 fewer with peers external; gzip savings vary with compression. The combined source module prevents per-original-file byte accounting, and marker absence alone does not prove every service allocation disappeared.
+
+### Direct execution and shared error handling (#215)
+
+The cache-workflows reference covers direct execution through a leaf runtime and composition with the raw client Effect. It also covers shared Cause inspection, tagged matching, and retry limits. The domain map tracks both tasks. The skill tree adds the source mapping for ADR 0050.
+
+The public execution and query-usability suites cover both adapters, multipart, prepared input, raw success, stream omissions, and query-owner cancellation. The compiled retry recipe and public type fixtures check the consumer contract. Fresh consumer-agent verification is outside this implementation task.

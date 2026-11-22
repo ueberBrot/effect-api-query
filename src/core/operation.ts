@@ -4,7 +4,32 @@ import type { Cause, Effect } from "effect";
 import type { JsonValue, RunPromiseExit } from "./types";
 
 export type RuntimeKeyEncoder = (input: unknown) => JsonValue;
-export type UnaryQueryOperation = "query" | "infinite" | "mutation";
+export type UnaryQueryOperation = "call" | "query" | "infinite" | "mutation";
+
+const reservedPathSegments = new Set([
+  "__proto__",
+  "call",
+  "constructor",
+  "effect",
+  "infiniteKey",
+  "infiniteOptions",
+  "key",
+  "liveKey",
+  "liveOptions",
+  "metadataKey",
+  "metadataOptions",
+  "mutationKey",
+  "mutationOptions",
+  "prototype",
+  "queryFilter",
+  "queryKey",
+  "queryOptions",
+  "streamedKey",
+  "streamedOptions",
+]);
+
+export const isInvalidUtilitySegment = (segment: string): boolean =>
+  segment.length === 0 || reservedPathSegments.has(segment);
 
 export type OperationInput =
   | { readonly _tag: "Inputless" }

@@ -102,25 +102,33 @@ describe("HTTP multipart mutations", () => {
       "file",
       new File(["first upload"], "notes.txt", { type: "text/plain" })
     );
+    const input = {
+      params: { id: 7 },
+      query: { revision: 3 },
+      headers: { "x-kind": "document" },
+      payload,
+    };
+    const result = {
+      url: "https://example.test/folders/7/uploads?revision=3",
+      kind: "document",
+      title: "Release notes",
+      fileName: "notes.txt",
+      contents: "first upload",
+    };
+    await expect(utils.files.upload.call({ input })).resolves.toStrictEqual(
+      result
+    );
+    await expect(
+      Effect.runPromise(utils.files.upload.effect({ input }))
+    ).resolves.toStrictEqual(result);
     const queryClient = new QueryClient();
     try {
       await expect(
         new MutationObserver(
           queryClient,
           utils.files.upload.mutationOptions()
-        ).mutate({
-          params: { id: 7 },
-          query: { revision: 3 },
-          headers: { "x-kind": "document" },
-          payload,
-        })
-      ).resolves.toStrictEqual({
-        url: "https://example.test/folders/7/uploads?revision=3",
-        kind: "document",
-        title: "Release notes",
-        fileName: "notes.txt",
-        contents: "first upload",
-      });
+        ).mutate(input)
+      ).resolves.toStrictEqual(result);
     } finally {
       queryClient.clear();
     }

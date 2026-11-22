@@ -6,6 +6,8 @@ import type { Rpc, RpcClient, RpcGroup, RpcSchema } from "effect/rpc";
 import type { PreparedInput } from "../core/prepared-input";
 import type {
   ContainsRedacted,
+  DirectArgs,
+  DirectCall,
   InfiniteQueryBuilder,
   InfiniteQueryKey,
   UnaryQueryBuilder,
@@ -348,12 +350,29 @@ export interface RpcStreamLeaf<
   readonly streamedOptions: StreamedOptionsBuilder<R, Prefix, ClientError>;
 }
 
+type DirectPayload<R extends Rpc.Any> =
+  | Rpc.PayloadConstructor<R>
+  | PreparedInput<Rpc.PayloadConstructor<R>>;
+
 /** The key and option builders exposed at one unary RPC path. */
 export interface RpcQueryLeaf<
   R extends Rpc.Any,
   Prefix extends readonly JsonValue[],
   ClientError,
 > {
+  /** Runs the RPC through the leaf's runtime and returns its raw success value. */
+  readonly call: DirectCall<
+    DirectPayload<R>,
+    PayloadlessRpc<R>,
+    Rpc.Success<R>,
+    RpcOptionsInput
+  >;
+
+  /** Returns the client Effect for the RPC with its original errors and services. */
+  readonly effect: (
+    ...args: DirectArgs<DirectPayload<R>, PayloadlessRpc<R>, RpcOptionsInput>
+  ) => RpcClient.RpcClient.Result<R, ClientError, false, false>;
+
   /** Builds a semantic, data-tagged infinite-query key from constructor input. */
   readonly infiniteKey: InfiniteKeyBuilder<R, Prefix, ClientError>;
 

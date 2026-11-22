@@ -44,6 +44,8 @@ describe.each([
           client,
           keyPrefix: ["test", coalesceMs ?? "none"],
         });
+        expect(http.events.watch).not.toHaveProperty("call");
+        expect(http.events.watch).not.toHaveProperty("effect");
         const queryClient = new QueryClient({
           defaultOptions: { queries: { retry: false } },
         });

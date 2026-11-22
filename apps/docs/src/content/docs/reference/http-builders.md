@@ -16,7 +16,7 @@ Key builders return immutable keys tagged with cache data and error types. Optio
 | `streamedKey(input, policy)`, `streamedOptions(options)` | Accumulated SSE or NDJSON emissions with retention and publication policy. |
 | `liveKey(input?, policy?)`, `liveOptions(options?)` | Latest SSE or NDJSON emission. |
 
-Input-bearing keys take a complete request. Inputless stream keys take their policy as the first argument. Buffered multipart endpoints only build mutations. SSE and NDJSON endpoints only build accumulated and live queries.
+Input-bearing keys take a complete request. Inputless stream keys take their policy as the first argument. Buffered multipart endpoints support mutation builders and direct execution. SSE and NDJSON endpoints only build accumulated and live queries.
 
 ## Query options
 
@@ -35,6 +35,12 @@ Use a complete input before calling `refetch`. If input exists and you only want
 `mutationOptions(options?)` supplies `mutationKey` and `mutationFn`. Pass the decoded request as variables when the mutation runs. Variables stay out of the key. Callbacks infer result, request, and error types. A successful mutation can return `undefined`.
 
 Mutations have no query abort signal. Use callbacks to invalidate, seed, or update reads. See [mutations](/effect-api-query/guides/mutations/).
+
+## Run a buffered endpoint directly
+
+Use `call({ input, signal })` for a promise or `effect({ input })` for the client Effect. Omit `input` for requests without input. Queryable endpoints also accept their own prepared input. For buffered multipart endpoints, supply the request with its `FormData` payload.
+
+Both methods use decoded-only response mode and preserve successful `undefined`. `call` uses the leaf's runtime, including tracking added by `QueryOwner.trackUtils`. A failed Exit rejects with `EffectHttpApiQueryError` and operation `"call"`. With `effect`, you provide any required services and run the Effect.
 
 ## Buffered metadata
 

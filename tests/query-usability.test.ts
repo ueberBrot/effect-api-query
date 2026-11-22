@@ -16,9 +16,14 @@ import {
   createBranchQueryFilter,
   createRpcQueryUtils,
   createHttpApiQueryUtils,
+  EffectHttpApiQueryError,
   EffectRpcQueryError,
   findDeclaredError,
+  getExecutionCause,
+  isEffectApiQueryError,
+  matchDeclaredError,
   prepareInput,
+  retryExecutionError,
 } from "#effect-api-query";
 
 import { makeRpcTestClient } from "./fixtures/effect-rpc";
@@ -322,7 +327,81 @@ describe("query usability", () => {
       })
   );
 });
+const fallback = () => "fallback";
+
 describe("typed failures", () => {
+  const missing = { _tag: "NotFound", id: 1 } as const;
+  const busy = { _tag: "Busy", seconds: 10 } as const;
+  type Failure = typeof missing | typeof busy;
+  const httpIdentity = {
+    apiId: "test",
+    groupId: "users",
+    endpoint: "get",
+    method: "GET",
+  };
+  const adapters = [
+    (cause: Cause.Cause<Failure>) =>
+      new EffectRpcQueryError("users.get", "query", cause),
+    (cause: Cause.Cause<Failure>) =>
+      new EffectHttpApiQueryError(httpIdentity, "query", cause),
+  ] as const;
+
+  it.each(adapters)(
+    "classifies one declared failure across adapters (%#)",
+    (wrap) => {
+      const cause = Cause.fail(missing);
+      const error = wrap(cause);
+      const cases = { NotFound: (failure: typeof missing) => failure.id };
+      const retry = retryExecutionError({
+        shouldRetry: (failure, count) => failure === missing && count < 5,
+      });
+      expect({
+        recognized: isEffectApiQueryError(error),
+        original: getExecutionCause(error) === cause,
+      }).toStrictEqual({ recognized: true, original: true });
+      expect(matchDeclaredError(error, cases, fallback)).toBe(1);
+      expect(matchDeclaredError(wrap(Cause.fail(busy)), cases, fallback)).toBe(
+        "fallback"
+      );
+      expect([0, 1, 2, 3, 4].map((count) => retry(count, error))).toStrictEqual(
+        [true, true, true, false, false]
+      );
+      const custom = retryExecutionError({
+        shouldRetry: () => true,
+        maxRetries: 1,
+      });
+      expect([custom(0, error), custom(1, error)]).toStrictEqual([true, false]);
+    }
+  );
+
+  it.each(adapters)("falls back for other Cause shapes (%#)", (wrap) => {
+    const retry = retryExecutionError({
+      shouldRetry: () => {
+        throw new Error("Expected to bypass the retry callback");
+      },
+    });
+    const causes = [
+      Cause.empty,
+      Cause.die(missing),
+      Cause.interrupt(1),
+      Cause.combine(Cause.fail(missing), Cause.fail(busy)),
+      Cause.combine(Cause.fail(missing), Cause.die("defect")),
+    ];
+    for (const cause of causes) {
+      const error = wrap(cause);
+      expect(getExecutionCause(error)).toBe(cause);
+      expect(
+        matchDeclaredError(error, { NotFound: () => 1 }, (original) => original)
+      ).toBe(error);
+      expect(retry(0, error)).toBe(false);
+    }
+    const error = new Error("runner failed", { cause: Cause.fail(missing) });
+    expect(isEffectApiQueryError(error)).toBe(false);
+    expect(getExecutionCause(error)).toBeUndefined();
+    expect(matchDeclaredError(error, {}, (original) => original)).toBe(error);
+    expect(retry(0, error)).toBe(false);
+  });
+
   it("matches typed failures without hiding compound causes or defects", () => {
     const failure = { _tag: "NotFound", id: 1 } as const;
     const error = new EffectRpcQueryError("read", "query", Cause.fail(failure));
