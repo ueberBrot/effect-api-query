@@ -34,29 +34,11 @@ const prepareQueryOptions = <
   E = DefaultError,
   K extends QueryKey = QueryKey,
 >(
-  options: QueryEffectFetchOptions<A, E, K>,
-  staleTime?: QueryExecuteOptions<A, E, A, A, K>["staleTime"]
-): QueryExecuteOptions<A, E, A, A, K> => {
-  const next: QueryExecuteOptions<A, E, A, A, K> = {
-    ...options,
-    select: identity,
-  };
-  if (staleTime !== undefined) {
-    next.staleTime = staleTime;
-  }
-  return next;
-};
-
-const hasCachedData = <A, E, K extends QueryKey>(
-  client: QueryClient,
-  options: QueryExecuteOptions<A, E, A, A, K>
-): boolean => {
-  const { queryHash } = client.defaultQueryOptions(options);
-  return (
-    client.getQueryCache().get(queryHash)?.state.data !== undefined ||
-    options.initialData !== undefined
-  );
-};
+  options: QueryEffectFetchOptions<A, E, K>
+): QueryExecuteOptions<A, E, A, A, K> => ({
+  ...options,
+  select: identity,
+});
 
 /** The existing application cache; providing it does not acquire or dispose resources. */
 export class QueryClientService extends Context.Service<
@@ -155,14 +137,18 @@ const ensure =
     const client = yield* QueryClientService;
     return yield* wait<A>(async () => {
       const { revalidateIfStale, ...rest } = options;
-      const fetchOptions = prepareQueryOptions(rest);
-      const shouldRevalidate =
-        revalidateIfStale === true && hasCachedData(client, fetchOptions);
-      const data = await client.query(prepareQueryOptions(rest, "static"));
-      if (shouldRevalidate) {
+      const fetchOptions = client.defaultQueryOptions(
+        prepareQueryOptions(rest)
+      );
+      const query = client.getQueryCache().build(client, fetchOptions);
+      const cachedData = query.state.data;
+      if (cachedData === undefined) {
+        return await client.query(fetchOptions);
+      }
+      if (revalidateIfStale === true) {
         void client.query(fetchOptions).catch(noop);
       }
-      return data;
+      return cachedData;
     });
   });
 

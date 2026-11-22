@@ -390,6 +390,27 @@ for (const operation of ["fetch", "ensure"] as const) {
   );
 }
 
+it.effect("revalidates stale initial data inherited from query defaults", () =>
+  Effect.gen(function* revalidatesInitialData() {
+    const client = new QueryClient();
+    const queryKey = ["default-initial-data"];
+    client.setQueryDefaults(queryKey, { initialData: 1, staleTime: 0 });
+    let executions = 0;
+    const data = yield* queryEffects
+      .ensure({
+        queryKey,
+        queryFn: async () => {
+          executions += 1;
+          return await Promise.resolve(2);
+        },
+        revalidateIfStale: true,
+      })
+      .pipe(Effect.provideService(QueryClientService, client));
+    expect({ data, executions }).toStrictEqual({ data: 1, executions: 1 });
+    client.clear();
+  })
+);
+
 it.effect(
   "preserves stale/fresh reuse semantics for fetch, ensure, and revalidateIfStale",
   () =>
