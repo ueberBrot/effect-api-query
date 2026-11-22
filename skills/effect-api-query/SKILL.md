@@ -48,6 +48,7 @@ sources:
   - "docs/adr/0049-*.md"
   - "docs/adr/0050-*.md"
   - "docs/adr/0051-*.md"
+  - "docs/adr/0052-*.md"
   - "apps/docs/astro.config.mts"
   - "**/apps/docs/src/content/docs/**/*.md"
   - "**/apps/docs/src/content/docs/**/*.mdx"
@@ -92,7 +93,7 @@ Read the reference for the task at hand.
 | If you need to | Read |
 | --- | --- |
 | Infer types, wait for input, page, prepare input, batch or recover streams, or trace cleanup | [Query patterns](references/query-patterns.md) |
-| Run a leaf directly, handle execution errors, manage cache policies, or retire an owner | [Cache workflows](references/cache-workflows.md) |
+| Run a leaf directly, handle execution errors, manage cache policies, compose cache operations in Effect, or retire an owner | [Cache workflows](references/cache-workflows.md) |
 | Capture a stream for server rendering, register codecs, hydrate, or transfer a loader selection | [Hydration and SSR](references/hydration-and-ssr.md) |
 | Rebuild reactive options, mount providers, use Suspense, or choose transport and versions | [Frameworks and hosts](references/frameworks-and-hosts.md) |
 

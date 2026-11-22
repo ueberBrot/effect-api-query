@@ -16,7 +16,6 @@ export const directory = RpcGroup.make(
   })
 );
 
-// Supply the same ready client and QueryClient used by the application's providers.
 export const directoryEffects = (
   client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof directory>>,
   queryClient: QueryClient
@@ -29,12 +28,12 @@ export const directoryEffects = (
     function* renameFromEvent(id: number, name: string) {
       const options = rpc.users.read.queryOptions({
         input: { id },
-        select: (user) => user.name,
       });
-      // ensure returns the full cached user, even though observers select its name.
-      const user = yield* queryEffects.ensure(options);
+      const user = yield* queryEffects.query({
+        ...options,
+        staleTime: "static",
+      });
       yield* queryEffects.setData(options.queryKey, { ...user, name });
-      // Domain policy: mark all directory reads stale without starting refetches.
       yield* queryEffects.invalidate(
         rpc.users.read.queryFilter({ view: "query", refetchType: "none" })
       );

@@ -1,11 +1,14 @@
 import { expect, it } from "@effect/vitest";
-import { QueryClient, QueryObserver } from "@tanstack/query-core";
+import {
+  CancelledError,
+  QueryClient,
+  QueryObserver,
+} from "@tanstack/query-core";
 import { Cause, Deferred, Effect, Exit, Fiber, Schema, Stream } from "effect";
 import { Rpc, RpcGroup } from "effect/rpc";
 
 import {
   acquireQueryOwner,
-  configureUtils,
   createRpcQueryUtils,
   EffectRpcQueryError,
   EffectHttpApiQueryError,
@@ -19,7 +22,7 @@ import { makeRpcTestClient } from "./fixtures/effect-rpc";
 import { waitForQueryState } from "./fixtures/query-cache";
 
 it.effect(
-  "shares ensured data with direct QueryClient consumers and typed updates",
+  "shares queried data with direct QueryClient consumers and typed updates",
   () =>
     Effect.gen(function* scenario0() {
       const client = new QueryClient();
@@ -28,7 +31,7 @@ it.effect(
         queryFn: async () => await Promise.resolve(42),
       };
       const program = Effect.gen(function* scenario1() {
-        expect(yield* queryEffects.ensure(options)).toBe(42);
+        expect(yield* queryEffects.query(options)).toBe(42);
         expect(yield* queryEffects.getData(options.queryKey)).toBe(42);
         yield* queryEffects.setData<number>(
           options.queryKey,
@@ -73,13 +76,13 @@ it.effect(
       const observer = new QueryObserver(client, options);
       const unsubscribe = observer.subscribe(() => {});
       const run = queryEffects
-        .fetch(options)
+        .query(options)
         .pipe(Effect.provideService(QueryClientService, client));
       const first = yield* Effect.forkChild(run);
       yield* Deferred.await(started);
       const second = yield* Effect.forkChild(
         queryEffects
-          .ensure(options)
+          .query(options)
           .pipe(Effect.provideService(QueryClientService, client))
       );
       yield* Effect.yieldNow;
@@ -88,7 +91,7 @@ it.effect(
         "fetching"
       );
       yield* Deferred.succeed(release, 17);
-      expect(yield* Fiber.join(second)).toBe(17);
+      expect(yield* Fiber.join(second)).toBe("value:17");
       expect(observer.getCurrentResult().data).toBe("value:17");
       expect(client.getQueryData(options.queryKey)).toBe(17);
       expect(executions).toBe(1);
@@ -97,69 +100,67 @@ it.effect(
     })
 );
 
-for (const operation of ["fetch", "ensure"] as const) {
-  it.effect(
-    `${operation} preserves the complete failed Exit and distinguishes runner rejection`,
-    () =>
-      Effect.gen(function* scenario4() {
-        const group = RpcGroup.make(
-          Rpc.make("read", { success: Schema.Int, error: Schema.String })
+it.effect(
+  "preserves the complete failed Exit and distinguishes runner rejection",
+  () =>
+    Effect.gen(function* scenario4() {
+      const group = RpcGroup.make(
+        Rpc.make("read", { success: Schema.Int, error: Schema.String })
+      );
+      const ready = yield* makeRpcTestClient(group, {
+        read: () => Effect.fail("denied"),
+      });
+      const run = Effect.runPromiseExitWith(yield* Effect.context());
+      let observedCause: unknown;
+      const client = new QueryClient();
+      const utils = createRpcQueryUtils(group, {
+        client: ready,
+        keyPrefix: ["failure"],
+        runtime: async (effect, options) => {
+          const exit = await run(effect, options);
+          if (Exit.isFailure(exit)) {
+            const cause = Cause.combine(
+              exit.cause,
+              Cause.die(new Error("defect"))
+            );
+            observedCause = cause;
+            return Exit.failCause(cause);
+          }
+          return exit;
+        },
+      });
+      const failure = yield* queryEffects
+        .query(utils.read.queryOptions())
+        .pipe(Effect.flip, Effect.provideService(QueryClientService, client));
+      expect(failure).toBeInstanceOf(QueryClientOperationError);
+      expect(failure.cause).toBeInstanceOf(EffectRpcQueryError);
+      if (failure.cause instanceof EffectRpcQueryError) {
+        expect(failure.cause.cause).toBe(observedCause);
+        expect(failure.cause.cause.reasons).toHaveLength(2);
+        expect(client.getQueryState(utils.read.queryKey())?.error).toBe(
+          failure.cause
         );
-        const ready = yield* makeRpcTestClient(group, {
-          read: () => Effect.fail("denied"),
-        });
-        const run = Effect.runPromiseExitWith(yield* Effect.context());
-        let observedCause: unknown;
-        const client = new QueryClient();
-        const utils = createRpcQueryUtils(group, {
-          client: ready,
-          keyPrefix: ["failure"],
-          runtime: async (effect, options) => {
-            const exit = await run(effect, options);
-            if (Exit.isFailure(exit)) {
-              const cause = Cause.combine(
-                exit.cause,
-                Cause.die(new Error("defect"))
-              );
-              observedCause = cause;
-              return Exit.failCause(cause);
-            }
-            return exit;
-          },
-        });
-        const failure = yield* queryEffects[operation](
-          utils.read.queryOptions()
-        ).pipe(Effect.flip, Effect.provideService(QueryClientService, client));
-        expect(failure).toBeInstanceOf(QueryClientOperationError);
-        expect(failure.cause).toBeInstanceOf(EffectRpcQueryError);
-        if (failure.cause instanceof EffectRpcQueryError) {
-          expect(failure.cause.cause).toBe(observedCause);
-          expect(failure.cause.cause.reasons).toHaveLength(2);
-          expect(client.getQueryState(utils.read.queryKey())?.error).toBe(
-            failure.cause
-          );
-        }
-        const rejection = new Error("runner rejected without Exit");
-        const rejecting = createRpcQueryUtils(group, {
-          client: ready,
-          keyPrefix: ["rejection"],
-          runtime: async () => await Promise.reject(rejection),
-        });
-        const runnerFailure = yield* queryEffects
-          .ensure(rejecting.read.queryOptions())
-          .pipe(Effect.flip, Effect.provideService(QueryClientService, client));
-        expect(runnerFailure).toBeInstanceOf(QueryClientOperationError);
-        expect(runnerFailure.cause).toBe(rejection);
-        const callbackFailure = yield* queryEffects
-          .setData(utils.read.queryKey(), () => {
-            throw rejection;
-          })
-          .pipe(Effect.flip, Effect.provideService(QueryClientService, client));
-        expect(callbackFailure.cause).toBe(rejection);
-        client.clear();
-      })
-  );
-}
+      }
+      const rejection = new Error("runner rejected without Exit");
+      const rejecting = createRpcQueryUtils(group, {
+        client: ready,
+        keyPrefix: ["rejection"],
+        runtime: async () => await Promise.reject(rejection),
+      });
+      const runnerFailure = yield* queryEffects
+        .query(rejecting.read.queryOptions())
+        .pipe(Effect.flip, Effect.provideService(QueryClientService, client));
+      expect(runnerFailure).toBeInstanceOf(QueryClientOperationError);
+      expect(runnerFailure.cause).toBe(rejection);
+      const callbackFailure = yield* queryEffects
+        .setData(utils.read.queryKey(), () => {
+          throw rejection;
+        })
+        .pipe(Effect.flip, Effect.provideService(QueryClientService, client));
+      expect(callbackFailure.cause).toBe(rejection);
+      client.clear();
+    })
+);
 
 it.effect(
   "invalidates generated filters with native active refetch behavior",
@@ -183,7 +184,7 @@ it.effect(
       const observer = new QueryObserver(client, options);
       const unsubscribe = observer.subscribe(() => {});
       yield* queryEffects
-        .ensure(options)
+        .query(options)
         .pipe(Effect.provideService(QueryClientService, client));
       yield* queryEffects
         .invalidate(utils.read.queryFilter({ view: "query" }))
@@ -251,20 +252,11 @@ it.effect(
                 events.push("released");
               }
             );
-            return configureUtils(
+            return setup.trackUtils(
               createRpcQueryUtils(group, {
                 client: ready,
                 keyPrefix: ["bridge-owner"],
-                runtime: setup.wrapRunner(Effect.runPromiseExit),
-              }),
-              {
-                live: {
-                  interceptors: [
-                    async ({ next, context }) =>
-                      await setup.runQuery(next, context.signal),
-                  ],
-                },
-              }
+              })
             );
           })
       );
@@ -277,7 +269,7 @@ it.effect(
       try {
         const waiter = yield* Effect.forkChild(
           queryEffects
-            .fetch(options)
+            .query(options)
             .pipe(Effect.provideService(QueryClientService, owner.queryClient))
         );
         yield* Deferred.await(pending);
@@ -308,201 +300,309 @@ it.effect(
     })
 );
 
-for (const operation of ["fetch", "ensure"] as const) {
-  for (const rejection of [
-    new EffectHttpApiQueryError(
-      { apiId: "foreign", groupId: "users", endpoint: "read", method: "GET" },
-      "query",
-      Cause.fail(123)
-    ),
-    new EffectRpcQueryError("read", "query", Cause.fail(123)),
-  ]) {
-    it.effect(
-      `${operation} retains a runner rejection with ${rejection._tag} as an unknown cause`,
-      () =>
-        Effect.gen(function* foreignRunnerFailure() {
-          const group = RpcGroup.make(
-            Rpc.make("read", {
-              success: Schema.Int,
-              error: Schema.Literal("missing"),
-            })
-          );
-          const ready = yield* makeRpcTestClient(group, {
-            read: () => Effect.fail("missing"),
-          });
-          const utils = createRpcQueryUtils(group, {
-            client: ready,
-            keyPrefix: ["foreign-rejection", operation, rejection._tag],
-            runtime: async () => await Promise.reject(rejection),
-          });
-          const client = new QueryClient();
-          const failure = yield* queryEffects[operation](
-            utils.read.queryOptions({ retry: false })
-          ).pipe(
-            Effect.flip,
-            Effect.provideService(QueryClientService, client)
-          );
-          expect(failure).toBeInstanceOf(QueryClientOperationError);
-          expect(failure.cause).toBe(rejection);
-          expect(client.getQueryState(utils.read.queryKey())?.error).toBe(
-            rejection
-          );
-          client.clear();
-        })
-    );
-  }
-}
-
-for (const operation of ["fetch", "ensure"] as const) {
+for (const rejection of [
+  new EffectHttpApiQueryError(
+    { apiId: "foreign", groupId: "users", endpoint: "read", method: "GET" },
+    "query",
+    Cause.fail(123)
+  ),
+  new EffectRpcQueryError("read", "query", Cause.fail(123)),
+]) {
   it.effect(
-    `${operation} does not mutate caller-supplied query options in place`,
+    `query retains a runner rejection with ${rejection._tag} as an unknown cause`,
     () =>
-      Effect.gen(function* preservesCallerOptions() {
-        const client = new QueryClient();
-        const rawOptions = Object.freeze({
-          queryKey: ["immutable-raw", operation] as const,
-          queryFn: async () => await Promise.resolve(11),
-          staleTime: 0,
-        });
-        const rawSnapshot = { ...rawOptions };
-        const rawResult = yield* queryEffects[operation](rawOptions).pipe(
-          Effect.provideService(QueryClientService, client)
-        );
-        expect(rawResult).toBe(11);
-        expect(rawOptions).toStrictEqual(rawSnapshot);
-
-        const defaultedOptions = Object.freeze(
-          client.defaultQueryOptions({
-            queryKey: ["immutable-defaulted", operation] as const,
-            queryFn: async () => await Promise.resolve(22),
-            staleTime: 0,
+      Effect.gen(function* foreignRunnerFailure() {
+        const group = RpcGroup.make(
+          Rpc.make("read", {
+            success: Schema.Int,
+            error: Schema.Literal("missing"),
           })
         );
-        const defaultedSnapshot = { ...defaultedOptions };
-        const defaultedResult = yield* queryEffects[operation](
-          defaultedOptions
-        ).pipe(Effect.provideService(QueryClientService, client));
-        expect(defaultedResult).toBe(22);
-        expect(defaultedOptions).toStrictEqual(defaultedSnapshot);
+        const ready = yield* makeRpcTestClient(group, {
+          read: () => Effect.fail("missing"),
+        });
+        const utils = createRpcQueryUtils(group, {
+          client: ready,
+          keyPrefix: ["foreign-rejection", rejection._tag],
+          runtime: async () => await Promise.reject(rejection),
+        });
+        const client = new QueryClient();
+        const failure = yield* queryEffects
+          .query(utils.read.queryOptions({ retry: false }))
+          .pipe(Effect.flip, Effect.provideService(QueryClientService, client));
+        expect(failure).toBeInstanceOf(QueryClientOperationError);
+        expect(failure.cause).toBe(rejection);
+        expect(client.getQueryState(utils.read.queryKey())?.error).toBe(
+          rejection
+        );
         client.clear();
       })
   );
 }
 
-it.effect("revalidates stale initial data inherited from query defaults", () =>
-  Effect.gen(function* revalidatesInitialData() {
+it.effect("does not mutate caller-supplied query options in place", () =>
+  Effect.gen(function* preservesCallerOptions() {
     const client = new QueryClient();
-    const queryKey = ["default-initial-data"];
-    client.setQueryDefaults(queryKey, { initialData: 1, staleTime: 0 });
-    let executions = 0;
-    const data = yield* queryEffects
-      .ensure({
-        queryKey,
-        queryFn: async () => {
-          executions += 1;
-          return await Promise.resolve(2);
-        },
-        revalidateIfStale: true,
-      })
+    const rawOptions = Object.freeze({
+      queryKey: ["immutable-raw"] as const,
+      queryFn: async () => await Promise.resolve(11),
+      staleTime: 0,
+    });
+    const rawSnapshot = { ...rawOptions };
+    const rawResult = yield* queryEffects
+      .query(rawOptions)
       .pipe(Effect.provideService(QueryClientService, client));
-    expect({ data, executions }).toStrictEqual({ data: 1, executions: 1 });
+    expect(rawResult).toBe(11);
+    expect(rawOptions).toStrictEqual(rawSnapshot);
+
+    const rawWithDefaults = {
+      queryKey: ["immutable-defaulted"] as const,
+      queryFn: async () => await Promise.resolve(22),
+      staleTime: 0,
+    };
+    const defaultedOptions = Object.freeze({
+      ...client.defaultQueryOptions(rawWithDefaults),
+      queryFn: rawWithDefaults.queryFn,
+    });
+    const defaultedSnapshot = { ...defaultedOptions };
+    const defaultedResult = yield* queryEffects
+      .query(defaultedOptions)
+      .pipe(Effect.provideService(QueryClientService, client));
+    expect(defaultedResult).toBe(22);
+    expect(defaultedOptions).toStrictEqual(defaultedSnapshot);
+    client.clear();
+  })
+);
+
+it.effect("selects fresh and static results while caching decoded data", () =>
+  Effect.gen(function* cacheReuseSemantics() {
+    const client = new QueryClient();
+    const queryKey = ["cache-reuse"] as const;
+    let executions = 0;
+    const options = {
+      queryKey,
+      queryFn: async () => {
+        executions += 1;
+        return await Promise.resolve(executions);
+      },
+      select: (value: number) => `selected:${value}`,
+    };
+    yield* Effect.gen(function* reuse() {
+      expect(
+        yield* queryEffects.query({ ...options, staleTime: "static" })
+      ).toBe("selected:1");
+      yield* queryEffects.invalidate({ queryKey, refetchType: "none" });
+      expect(
+        yield* queryEffects.query({ ...options, staleTime: "static" })
+      ).toBe("selected:1");
+      expect(yield* queryEffects.query({ ...options, staleTime: 0 })).toBe(
+        "selected:2"
+      );
+    }).pipe(Effect.provideService(QueryClientService, client));
+    expect(client.getQueryData(queryKey)).toBe(2);
+    client.clear();
+  })
+);
+
+it.effect("selects multiple pages from frozen infinite options", () =>
+  Effect.gen(function* frozenInfinite() {
+    const client = new QueryClient();
+    const queryKey = ["frozen-infinite"] as const;
+    const options = Object.freeze({
+      queryKey,
+      queryFn: async ({ pageParam }: { pageParam: string }) =>
+        await Promise.resolve(pageParam),
+      initialPageParam: "a",
+      getNextPageParam: (page: string) => `${page}b`,
+      pages: 2,
+      select: ({ pages }: { pages: string[] }) => pages.join(","),
+    });
+    const selected = yield* queryEffects
+      .infiniteQuery(options)
+      .pipe(Effect.provideService(QueryClientService, client));
+    expect(selected).toBe("a,ab");
+    expect(client.getQueryData(queryKey)).toStrictEqual({
+      pages: ["a", "ab"],
+      pageParams: ["a", "ab"],
+    });
     client.clear();
   })
 );
 
 it.effect(
-  "reports a staleTime callback failure while ensuring cached data",
+  "warms caches from frozen options and swallows prefetch failures",
   () =>
-    Effect.gen(function* freshnessCallbackFailure() {
+    Effect.gen(function* warmsCaches() {
       const client = new QueryClient();
-      const queryKey = ["freshness-callback-failure"];
-      const cause = new Error("Cannot resolve freshness");
-      client.setQueryData(queryKey, 1);
-      try {
-        const failure = yield* queryEffects
-          .ensure<number>({
-            queryKey,
-            revalidateIfStale: true,
-            staleTime: () => {
-              throw cause;
-            },
+      const failure = new Error("unavailable");
+      const failing = {
+        queryKey: ["failing-prefetch"],
+        queryFn: async () => await Promise.reject(failure),
+      };
+      const infinite = { initialPageParam: 1 };
+      yield* Effect.gen(function* prefetchQueries() {
+        yield* queryEffects.prefetch({
+          ...failing,
+          queryKey: ["warm"],
+          queryFn: () => 42,
+        });
+        yield* queryEffects.prefetchInfinite(
+          Object.freeze({
+            ...infinite,
+            queryKey: ["warm-infinite"],
+            queryFn: ({ pageParam }: { pageParam: number }) => pageParam,
           })
-          .pipe(Effect.flip, Effect.provideService(QueryClientService, client));
-        expect(failure.cause).toBe(cause);
-      } finally {
-        client.clear();
-      }
+        );
+        yield* queryEffects.prefetch(failing);
+        yield* queryEffects.prefetchInfinite(
+          Object.freeze({
+            ...infinite,
+            ...failing,
+            queryKey: ["failing-infinite"],
+          })
+        );
+      }).pipe(Effect.provideService(QueryClientService, client));
+      expect(client.getQueryData(["warm"])).toBe(42);
+      expect(client.getQueryData(["warm-infinite"])).toStrictEqual({
+        pages: [1],
+        pageParams: [1],
+      });
+      expect(client.getQueryState(failing.queryKey)?.error).toBe(failure);
+      expect(client.getQueryState(["failing-infinite"])?.error).toBe(failure);
+      client.clear();
     })
 );
 
-it.effect(
-  "preserves stale/fresh reuse semantics for fetch, ensure, and revalidateIfStale",
-  () =>
-    Effect.gen(function* cacheReuseSemantics() {
-      const client = new QueryClient();
-      let executions = 0;
-      const options = {
-        queryKey: ["cache-reuse"] as const,
-        queryFn: async () => {
-          executions += 1;
-          return await Promise.resolve(executions);
-        },
-        select: (value: number) => `selected:${value}`,
-      };
-
-      const first = yield* queryEffects
-        .fetch({ ...options, staleTime: Infinity })
-        .pipe(Effect.provideService(QueryClientService, client));
-      const freshFetch = yield* queryEffects
-        .fetch({ ...options, staleTime: Infinity })
-        .pipe(Effect.provideService(QueryClientService, client));
-      const staleEnsure = yield* queryEffects
-        .ensure({ ...options, staleTime: 0 })
-        .pipe(Effect.provideService(QueryClientService, client));
-      const staleFetch = yield* queryEffects
-        .fetch({ ...options, staleTime: 0 })
-        .pipe(Effect.provideService(QueryClientService, client));
-      const revalidatedEnsure = yield* queryEffects
-        .ensure({ ...options, staleTime: 0, revalidateIfStale: true })
-        .pipe(Effect.provideService(QueryClientService, client));
-      yield* waitForQueryState(
-        client,
-        () => client.getQueryData(options.queryKey) === 3
-      );
-
-      let coldExecutions = 0;
-      const coldEnsure = yield* queryEffects
-        .ensure({
-          queryKey: ["cache-reuse-cold"] as const,
-          queryFn: async () => {
-            coldExecutions += 1;
-            return await Promise.resolve(coldExecutions);
-          },
-          staleTime: 0,
-          revalidateIfStale: true,
-        })
-        .pipe(Effect.provideService(QueryClientService, client));
-
-      expect({
-        first,
-        freshFetch,
-        staleEnsure,
-        staleFetch,
-        revalidatedEnsure,
-        executions,
-        coldEnsure,
-        coldExecutions,
-      }).toStrictEqual({
-        first: 1,
-        freshFetch: 1,
-        staleEnsure: 1,
-        staleFetch: 2,
-        revalidatedEnsure: 2,
-        executions: 3,
-        coldEnsure: 1,
-        coldExecutions: 1,
+for (const abortFrom of ["fiber", "caller"] as const) {
+  it.effect(
+    `cleans up an exclusive stream snapshot on ${abortFrom} abort`,
+    () => {
+      const controller = new AbortController();
+      return Effect.gen(function* abortSnapshot() {
+        const client = new QueryClient();
+        const reason = new Error("capture stopped");
+        const started = yield* Deferred.make<boolean>();
+        const cleaned = yield* Deferred.make<boolean>();
+        const group = RpcGroup.make(
+          Rpc.make("watch", { success: Schema.Int, stream: true })
+        );
+        const ready = yield* makeRpcTestClient(group, {
+          watch: () =>
+            Stream.fromEffect(
+              Deferred.succeed(started, true).pipe(Effect.andThen(Effect.never))
+            ).pipe(Stream.ensuring(Deferred.succeed(cleaned, true))),
+        });
+        const utils = createRpcQueryUtils(group, { client: ready });
+        const options = utils.watch.liveOptions();
+        const capture = queryEffects.streamSnapshot(options, {
+          signal: controller.signal,
+        });
+        const fiber = yield* Effect.forkChild(
+          capture.pipe(Effect.provideService(QueryClientService, client))
+        );
+        try {
+          yield* Deferred.await(started);
+          if (abortFrom === "fiber") {
+            yield* Fiber.interrupt(fiber);
+            expect(controller.signal.aborted).toBe(false);
+          } else {
+            controller.abort(reason);
+            const failure = yield* Fiber.join(fiber).pipe(Effect.flip);
+            expect(failure).toBeInstanceOf(QueryClientOperationError);
+            expect(failure.cause).toBe(reason);
+          }
+          yield* Deferred.await(cleaned);
+          expect(client.getQueryState(options.queryKey)?.fetchStatus).toBe(
+            "idle"
+          );
+        } finally {
+          client.clear();
+        }
       });
+    }
+  );
+}
 
+for (const operation of ["invalidate", "refetch", "reset"] as const) {
+  it.effect(
+    `interrupts the ${operation} waiter while active refetch completes`,
+    () =>
+      Effect.gen(function* interruptRefetchWaiter() {
+        const client = new QueryClient();
+        const queryKey = [operation] as const;
+        const started = yield* Deferred.make<boolean>();
+        const release = yield* Deferred.make<number>();
+        const run = Effect.runPromiseWith(yield* Effect.context());
+        const observer = new QueryObserver(client, {
+          queryKey,
+          initialData: 1,
+          staleTime: Infinity,
+          queryFn: async ({ signal }) =>
+            await run(
+              Deferred.succeed(started, true).pipe(
+                Effect.andThen(Deferred.await(release))
+              ),
+              { signal }
+            ),
+        });
+        const stop = observer.subscribe(() => {});
+        try {
+          yield* Effect.gen(function* refetch() {
+            const waiter = yield* Effect.forkChild(
+              queryEffects[operation]({ queryKey })
+            );
+            yield* Deferred.await(started);
+            yield* Fiber.interrupt(waiter);
+            expect(yield* queryEffects.isFetching({ queryKey })).toBe(1);
+            yield* Deferred.succeed(release, 2);
+            yield* waitForQueryState(
+              client,
+              () => observer.getCurrentResult().data === 2
+            );
+            expect(yield* queryEffects.isFetching({ queryKey })).toBe(0);
+            expect((yield* queryEffects.getState(queryKey))?.data).toBe(2);
+          }).pipe(Effect.provideService(QueryClientService, client));
+        } finally {
+          stop();
+          client.clear();
+        }
+      })
+  );
+}
+
+it.effect("cancels and removes only the matching cache entry", () =>
+  Effect.gen(function* cancelAndRemove() {
+    const client = new QueryClient();
+    const queryKey = ["cancel-me"] as const;
+    const started = yield* Deferred.make<boolean>();
+    const run = Effect.runPromiseWith(yield* Effect.context());
+    const options = {
+      queryKey,
+      queryFn: async ({ signal }: { signal: AbortSignal }) =>
+        await run(
+          Deferred.succeed(started, true).pipe(Effect.andThen(Effect.never)),
+          { signal }
+        ),
+    };
+    try {
+      yield* Effect.gen(function* cancel() {
+        yield* queryEffects.setData<number>(["keep-me"], 1);
+        const waiter = yield* Effect.forkChild(
+          queryEffects.query(options).pipe(Effect.flip)
+        );
+        yield* Deferred.await(started);
+        yield* queryEffects.cancel({ queryKey });
+        const failure = yield* Fiber.join(waiter);
+        expect(failure.cause).toBeInstanceOf(CancelledError);
+        expect((yield* queryEffects.getState(queryKey))?.fetchStatus).toBe(
+          "idle"
+        );
+        yield* queryEffects.remove({ queryKey });
+        expect(yield* queryEffects.getState(queryKey)).toBeUndefined();
+        expect(yield* queryEffects.getData(["keep-me"])).toBe(1);
+      }).pipe(Effect.provideService(QueryClientService, client));
+    } finally {
       client.clear();
-    })
+    }
+  })
 );

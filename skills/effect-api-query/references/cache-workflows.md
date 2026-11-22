@@ -246,13 +246,15 @@ See [cache filters](https://ueberbrot.github.io/effect-api-query/guides/cache-fi
 
 ## Compose cache operations in Effect
 
-Provide the application's existing QueryClient as `QueryClientService`. Run `queryEffects.getData` and `setData` with exact keys, `fetch` or `ensure` with generated options, and `invalidate` with generated filters. Provide the service with `Effect.provideService` or a Layer.
+Provide the existing QueryClient as `QueryClientService` with `Effect.provideService` or a Layer. With a query owner, provide `owner.queryClient` and pass utility trees through `owner.trackUtils` so retirement drains query work.
 
-Fetch and ensure use `queryClient.query` and return the full cached data. `fetch` follows native freshness rules. `ensure` returns cached data even when stale and fetches if absent. Set `revalidateIfStale` for background refresh. Use a snapshot for open streams. Write immutably and return `undefined` to skip a write. Invalidation keeps native refetch and `throwOnError` behavior.
+Use `query` or `infiniteQuery` with generated options. Both apply `select` to the result and cache the decoded data. Set `staleTime: "static"` to reuse existing data. Use `prefetch` or `prefetchInfinite` to warm the cache without surfacing query failures. For the first publication from an open stream, use `streamSnapshot` with an idle, unobserved key.
 
-On native failure, inspect `QueryClientOperationError.cause` as `unknown`. It preserves the original rejection, including any execution wrapper and full Cause. Shared work can come from another caller. The wrapper's class alone cannot prove the current options' declared failure type.
+Pass exact keys to `getData`, `getState`, and `setData`. Write immutably and return `undefined` to skip a write. Use generated or native filters with `isFetching`, `invalidate`, `refetch`, `cancel`, `remove`, and `reset`. These operations keep native QueryClient behavior, including `throwOnError` on refetch.
 
-Interrupting an Effect stops its wait. QueryClient can finish shared work and publish for observers. Cancel native queries only when the owner wants to stop that shared work. See [query effects](https://ueberbrot.github.io/effect-api-query/guides/query-effects/) for examples.
+Inspect `QueryClientOperationError.cause` as `unknown`. It preserves the original failure, including any execution wrapper and full Cause. Shared work can come from another caller, so the wrapper alone cannot prove the current query's declared failure type.
+
+Interrupt the fiber to stop its wait on shared work. Use `cancel` to stop the shared query. Interrupting `streamSnapshot` aborts its exclusive capture and triggers local cleanup. See [query effects](https://ueberbrot.github.io/effect-api-query/guides/query-effects/) for examples.
 
 ## Opt in to query owner setup
 

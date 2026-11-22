@@ -1,6 +1,6 @@
 ---
 title: Compose QueryClient Operations in Effect
-description: Read, ensure, update, and invalidate the application's existing cache from Effects.
+description: Run queries and manage the application's existing cache from Effect.
 ---
 
 Use `queryEffects` to read and update your application's QueryClient from Effect. Provide the same client your hooks use through `QueryClientService`. Keep ownership and cleanup in the app.
@@ -28,7 +28,6 @@ export const directory = RpcGroup.make(
   })
 );
 
-// Supply the same ready client and QueryClient used by the application's providers.
 export const directoryEffects = (
   client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof directory>>,
   queryClient: QueryClient
@@ -41,12 +40,12 @@ export const directoryEffects = (
     function* renameFromEvent(id: number, name: string) {
       const options = rpc.users.read.queryOptions({
         input: { id },
-        select: (user) => user.name,
       });
-      // ensure returns the full cached user, even though observers select its name.
-      const user = yield* queryEffects.ensure(options);
+      const user = yield* queryEffects.query({
+        ...options,
+        staleTime: "static",
+      });
       yield* queryEffects.setData(options.queryKey, { ...user, name });
-      // Domain policy: mark all directory reads stale without starting refetches.
       yield* queryEffects.invalidate(
         rpc.users.read.queryFilter({ view: "query", refetchType: "none" })
       );
@@ -62,18 +61,26 @@ You can pass the returned `rpc` options to native hooks and QueryClient methods 
 
 ## Choose the operation
 
-- `getData(key)` reads cached data or `undefined`. Exact generated keys infer data types. Broad prefixes infer `unknown`.
-- `ensure(options)` returns cached data even when stale and fetches if absent. Set `revalidateIfStale` to refresh stale data in the background.
-- `fetch(options)` uses `queryClient.query` for freshness, retries, deduplication, and cache writes.
-- `setData(key, updater, options?)` uses `setQueryData`. Pass a new value or update it immutably. Return `undefined` to skip the write.
-- `invalidate(filters?, options?)` uses `invalidateQueries`. Pass generated filters or prefixes. Active matches refetch by default. Use `refetchType: "none"` to mark them stale only. Refetch failures follow native `throwOnError`.
+| Operation | Use |
+| --- | --- |
+| `query(options)` | Reuse fresh data or fetch it. Set `staleTime: "static"` to reuse data whenever the cache has it. |
+| `infiniteQuery(options)` | Load paged data. To request multiple pages, set `pages` and supply `getNextPageParam`. |
+| `prefetch(options)`, `prefetchInfinite(options)` | Warm the cache. Both discard the result and swallow query failures. |
+| `streamSnapshot(options, controls?)` | Capture the first new publication or stream completion on an idle, unobserved query. |
+| `getData(key)`, `getState(key)` | Read cached data or query state. Exact generated keys carry data and error types. |
+| `setData(key, updater, options?)` | Supply a value or update the cached value immutably. Return `undefined` from an updater to skip the write. |
+| `isFetching(filters?)` | Count matching queries that are fetching. |
+| `invalidate(filters?, options?)` | Mark matches stale. Active matches refetch by default. Set `refetchType: "none"` to mark them stale without refetching. |
+| `refetch(filters?, options?)` | Refetch matching queries under native QueryClient rules. |
+| `cancel(filters?, options?)`, `remove(filters?)` | Cancel matching queries or remove their entries from the cache. |
+| `reset(filters?, options?)` | Restore matching queries to their initial state and refetch active matches. |
 
-The Effects run when you provide `QueryClientService` and execute them. Fetch and ensure return the full cached data. Use `select` with native hooks, observers, or `queryClient.query` to project a result. Fetching a stream waits for completion. For the first visible data from an open stream, use a [stream snapshot](/effect-api-query/guides/stream-snapshots/).
+`query` and `infiniteQuery` apply `select` to the returned value and cache the original data. Pass a concrete query key to reads and writes. For cache operations that take filters, pass native filters or use the utility's `.queryFilter()`.
 
 ## Handle failures and interruption
 
-Each operation reports a native rejection as `QueryClientOperationError`. Its `cause` holds the original value, including any adapter error and its complete Effect Cause. Treat the rejection as `unknown`. A custom runner can reject with any value, and QueryClient can share work another caller started. Narrowing the wrapper does not establish the current query's declared failure type. Generated options retain that type for native consumers.
+Fallible operations wrap the original failure in `QueryClientOperationError`. Treat its `cause` as `unknown`. If the original value is an adapter error, it retains the complete Effect Cause. Shared work can come from another caller, so inspect the cause before reading failure details.
 
-Interrupting an Effect stops that caller's wait. QueryClient retains its own abort signal and can continue running shared work after every waiter leaves. The same rule applies to already started invalidation.
+Interrupting an Effect stops its wait for shared queries or refetches. Use `queryEffects.cancel` to cancel work for all waiters and observers. For a query owner, provide `owner.queryClient` and use `owner.trackUtils` so retirement waits for local cleanup. See [switch cache owners](/effect-api-query/guides/switch-cache-owners/).
 
-Use native `cancelQueries` if the owner intends to stop shared work for all waiters and observers. Wait for local cleanup before releasing the client or runtime. See [cancellation](/effect-api-query/guides/cancellation/) and [switch cache owners](/effect-api-query/guides/switch-cache-owners/).
+For an open stream, use `streamSnapshot` to capture data before the stream ends. Interrupting its fiber or aborting its optional caller signal cancels the capture and starts local cleanup. See [stream snapshots](/effect-api-query/guides/stream-snapshots/).

@@ -81,7 +81,7 @@ This error means a live HTTP stream ended before its first value. It exposes the
 
 The Effect cache bridge wraps native rejections and synchronous callback failures in this class. Its `cause: unknown` contains the original value, including any adapter error and full Effect Cause. Shared query work can come from a different caller. Validate a recognized failure before reading its fields. See [query effects](/effect-api-query/guides/query-effects/).
 
-Interrupt an Effect waiter to stop its wait. To stop shared work, cancel the native query explicitly.
+Interrupt an Effect waiter to stop its wait. To stop shared work, call `queryEffects.cancel`. Interrupting `queryEffects.streamSnapshot` cancels its exclusive capture.
 
 ## `QueryDescriptorError`
 

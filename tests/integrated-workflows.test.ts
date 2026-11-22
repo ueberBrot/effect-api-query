@@ -73,7 +73,7 @@ it.effect(
           const options = received.leaf.queryOptions({ input: received.input });
           const cached = await run(
             queryEffects
-              .ensure(options)
+              .query({ ...options, staleTime: "static" })
               .pipe(
                 Effect.provideService(QueryClientService, browser.queryClient)
               )

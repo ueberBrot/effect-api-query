@@ -34,7 +34,7 @@ skills:
       - Native provider setup, Suspense recovery, reactive accessors, and host boundaries
     tasks:
       - Check application-owned policy maps against their RPC or HTTP contracts before client acquisition. Type-check SSE settings at the SSE leaf, including flat path entries. Apply policies through configureUtils, which copies decoder settings for keys and options.
-      - Compose typed reads, ensure, cache updates and generated filter invalidation in Effect using an explicit existing QueryClient service; interrupt waiters without cancelling shared execution.
+      - Use QueryClientService to run queries, warm the cache, and apply cache operations in Effect. Use an exclusive stream snapshot to capture a stream that can stay open.
       - Derive buffered, paginated, accumulated, live, and metadata options from a ready client. Use its HTTP request parse options when encoding default keys.
       - Use colocated query filters for lazy-safe branch views and canonical leaf inputs. Use concrete keys for exact stream policies and explicit projections for encoded partial input.
       - Reuse inferred input, cached query data, and mutation types in application modules.
@@ -246,6 +246,11 @@ tensions:
       - effect-api-query
     description: Generated options declare native error types, but Promise rejections and deduplicated execution do not establish the current failed Exit or its payload.
     implication: Handle queryEffects failures through QueryClientOperationError and preserve its unknown original cause, including complete execution wrappers.
+  - name: Shared waits and exclusive stream capture
+    skills:
+      - effect-api-query
+    description: QueryClient owns shared fetches, while a stream snapshot owns its exclusive capture.
+    implication: Interrupt the Effect to stop waiting for shared work or abort its stream snapshot. Use queryEffects.cancel to stop a shared query.
   - name: Library contracts and application workflows
     skills:
       - effect-api-query
