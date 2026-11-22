@@ -351,16 +351,15 @@ export type RpcContractEncodingServices<Group extends RpcGroup.Any, Options> = [
   ? RpcSchemaServices<RpcsOf<Group>, "EncodingServices">
   : RpcOptionsServices<Group, Options, "EncodingServices">;
 
-export type HttpGroupPaths<Group extends HttpApiGroup.Constraint> =
+export type HttpHydrationGroupPaths<Group extends HttpApiGroup.Constraint> =
   Group extends HttpApiGroup.Constraint
     ? Group extends { readonly topLevel: true }
       ? Queryable<Supported<Endpoints<Group>>>["identifier"]
       : `${Group["identifier"]}.${Queryable<Supported<Endpoints<Group>>>["identifier"]}`
     : never;
 
-export type HttpContractPaths<Api extends HttpApi.Constraint> = HttpGroupPaths<
-  SupportedGroups<Api>
->;
+export type HttpContractPaths<Api extends HttpApi.Constraint> =
+  HttpHydrationGroupPaths<SupportedGroups<Api>>;
 
 export type HttpEndpointAtPath<
   Api extends HttpApi.Constraint,

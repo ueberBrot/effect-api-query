@@ -190,7 +190,7 @@ export type QueryKeyBuilder<
   PayloadlessRpc<R>
 >;
 
-export type ConcreteInfiniteKey<
+export type RpcConcreteInfiniteKey<
   Prefix extends readonly JsonValue[],
   R extends Rpc.Any,
   ClientError,
@@ -223,7 +223,7 @@ export type InfiniteKeyBuilder<
   ClientError,
 > = KeyBuilder<
   Rpc.PayloadConstructor<R>,
-  ConcreteInfiniteKey<Prefix, R, ClientError>,
+  RpcConcreteInfiniteKey<Prefix, R, ClientError>,
   PayloadlessRpc<R>
 >;
 
@@ -553,7 +553,7 @@ export type KeyEncoderOption<Group extends RpcGroup.Any> =
   >;
 
 /** Requires a custom runner when client-side Schema services remain. */
-export type RunnerOption<Group extends RpcGroup.Any> = RunnerRequirement<
+export type RpcRunnerOption<Group extends RpcGroup.Any> = RunnerRequirement<
   Rpc.ServicesClient<RpcsOf<Group>>
 >;
 
@@ -576,7 +576,7 @@ export type CreateRpcQueryUtilsOptions<
   readonly client: ReadyRpcClient<RpcsOf<Group>, ClientError>;
 } & RpcKeyPrefixOption<Prefix> &
   KeyEncoderOption<Group> &
-  RunnerOption<Group>;
+  RpcRunnerOption<Group>;
 
 export type CreateRpcQueryUtilsClientOptions<
   Group extends RpcGroup.Any,
@@ -587,4 +587,4 @@ export type CreateRpcQueryUtilsClientOptions<
   readonly client: Client & ReadyRpcClient<RpcsOf<Group>, unknown>;
 } & RpcKeyPrefixOption<Prefix> &
   KeyEncoderOption<Group> &
-  RunnerOption<Group>;
+  RpcRunnerOption<Group>;
