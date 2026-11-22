@@ -70,22 +70,16 @@ jobs:
         run: vp run test
 
   packed-compatibility:
-    name: Packed compatibility (${{ matrix.shard }})
+    name: Packed compatibility
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      matrix:
-        shard: ["1/2", "2/2"]
 
     steps:
       - *checkout
       - *setup_repository
 
       - name: Check packed Effect and Query Core consumers
-        env:
-          SHARD: ${{ matrix.shard }}
-        run: vp run effect-compatibility --shard="$SHARD"
+        run: vp run effect-compatibility
 
   source-quality:
     name: Source quality

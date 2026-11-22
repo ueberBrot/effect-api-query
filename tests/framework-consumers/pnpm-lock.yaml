@@ -191,8 +191,8 @@ importers:
         specifier: 5.107.1
         version: 5.107.1(vue@3.5.44(typescript@5.9.3))
       effect:
-        specifier: 4.0.6
-        version: 4.0.6
+        specifier: 4.1.4
+        version: 4.1.4
       rxjs:
         specifier: 7.8.2
         version: 7.8.2
@@ -506,8 +506,8 @@ packages:
   devalue@5.9.4:
     resolution: {integrity: sha512-sPAT4pztbu6586/hrhOnMKS17IJrvg12mXiSPSS3W5qDeN2RGgvZ0diZCm31dBbnevfVmujNO3IM2wrS4Y2Rhg==}
 
-  effect@4.0.6:
-    resolution: {integrity: sha512-Tc3mkzuLR6t6P9dhLt0D2GrxYtmU5td4XEJEiXCmILz53IRIfJyHsKZWjTA3xEjiwpNTtXBgI4iqYPxMztBDrw==}
+  effect@4.1.4:
+    resolution: {integrity: sha512-Tgrv/9FN+TZYyOn8XSli+fVqAfwDrDAkiX5Uu9vztINb675VTQdhD0gWI5Kzvhlh9QqzjZvw72iugqw5pwoghQ==}
 
   entities@7.0.1:
     resolution: {integrity: sha512-TWrgLOFUQTH994YUyl1yT4uyavY5nNB5muff+RtWaqNVCAK408b5ZnnbNAUEWLTCpum9w6arT70i1XdQ4UeOPA==}
@@ -979,7 +979,7 @@ snapshots:
 
   devalue@5.9.4: {}
 
-  effect@4.0.6: {}
+  effect@4.1.4: {}
 
   entities@7.0.1: {}
 

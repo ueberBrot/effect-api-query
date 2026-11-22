@@ -81,7 +81,7 @@ For independent reads, pass generated options to `useSuspenseQueries` to start t
 
 ## Match application dependencies
 
-Use the [compatibility table](https://ueberbrot.github.io/effect-api-query/reference/compatibility-and-limits/#requirements-and-tested-integrations) to select library peers and framework wrappers. The packed checks pair each listed Effect release with both Query Core pins. The framework checks use the development combination. Use a compiler supported by the framework's tooling.
+Use the [compatibility table](https://ueberbrot.github.io/effect-api-query/reference/compatibility-and-limits/#requirements-and-tested-integrations) to select library peers and framework wrappers. The packed checks verify each listed Effect and Query Core pin under both compilers. The framework checks use the development combination. Use a compiler supported by the framework's tooling.
 
 Match Effect runtime, testing, and platform releases within the installed package's peer range. The repo uses Effect-enhanced TSRS for development. The minimum checked consumer compiler is TypeScript 5.9.3.
 

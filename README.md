@@ -10,7 +10,7 @@ This package is pre-1.0. Minor releases can include breaking changes.
 pnpm add @ueberbrot/effect-api-query @tanstack/query-core
 ```
 
-Use Effect `>=4.0.6 <4.2.0` and Query Core `>=5.104.4 <6`. See [installation](https://ueberbrot.github.io/effect-api-query/getting-started/installation/) for compiler and framework requirements.
+Use Effect `>=4.1.4 <4.2.0` and Query Core `>=5.107.1 <6`. See [installation](https://ueberbrot.github.io/effect-api-query/getting-started/installation/) for compiler and framework requirements.
 
 ## Fetch a user
 

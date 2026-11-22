@@ -41,10 +41,14 @@ ok(
   "Expected explicit Query Core versions."
 );
 // Pin age-eligible representatives; review each admitted minor before changing support.
-const effectVersions = new Set([floor, "4.0.7", current]);
+const effectVersions = new Set([floor, current]);
 ok(
-  manifest.peerDependencies.effect === ">=4.0.6 <4.2.0",
+  manifest.peerDependencies.effect === ">=4.1.4 <4.2.0",
   "Review the Effect minor matrix when changing support."
+);
+ok(
+  manifest.peerDependencies["@tanstack/query-core"] === ">=5.107.1 <6",
+  "Review the Query Core matrix when changing support."
 );
 const { values } = parseArgs({
   options: {

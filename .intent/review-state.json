@@ -3,10 +3,10 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "c486da8c439eafd8f497eaa17694a83942c54328718ab7c0e0d571dd0f9ec4fb",
+      "fingerprint": "67236d034fa52b9652514a24086bb03ec114a2073085c9e642ee32b18b4e6fbf",
       "snapshot": {
         "GLOSSARY.md": "4532453f4efb696d95c66aabb9f62863e28984bb961f97ee288034af62d76f29",
-        "README.md": "87db3a47ce666b408001c89b81b2133393eb2074c63ba1ac1786be8e20b96dfd",
+        "README.md": "105964ce204e5b6164b1c340215bad52be2eadc69504bc0ed8fa330c27247230",
         "apps/docs/astro.config.mts": "35bd7d7706e004e3e708a82614e825c7fde0ee1aea6624843ba8cc57f70c2c5c",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "22ff578a9df30be697f12bdfeb5861b9d2b3e6956255387eaa4e1b18d0f33315",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "742d428e16998d9a36caca902dcee5759c750db6b1ba75cad93f113c60542545",
@@ -20,10 +20,11 @@
         "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "c8815a75b20b473a6d54ffc8a0eff41db396965434d80f54ae60ccd7ff25f5ad",
         "apps/docs/src/content/docs/getting-started/feature-support.md": "a4ba730fc86ed8acb65cb6ad20952199b164e9004a959931ca373576e67fa82f",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "70f2b53fb07dff591f3996805999473c3da3d54df629de6ddb07a8f9f428107b",
-        "apps/docs/src/content/docs/getting-started/installation.md": "c561ea9c05dcdddcb77cb6aad6ad1946a04f8a0320b963d5f788f13f78afa7af",
+        "apps/docs/src/content/docs/getting-started/installation.md": "9a8f24b05b512c20ed879cb1bb0100a7255fd33cd5f2dd41656f9e31fe76964c",
         "apps/docs/src/content/docs/getting-started/quick-start.md": "38f55ff9ff12e6fdc2638ebe0a1d93c26523e352fa4412d3f158f59868d9451a",
         "apps/docs/src/content/docs/guides/angular-query.md": "16afe6996ee8f70b4b77b430c93aeb2a4dc658a0ae8e92b3993d95f065a86b9f",
         "apps/docs/src/content/docs/guides/cache-filters.md": "67902d4de08ff851f4b59da281098aafd7843144ec1682394cceb7b0630e458e",
+        "apps/docs/src/content/docs/guides/cache-management.md": null,
         "apps/docs/src/content/docs/guides/cancellation.md": "f1448f0d84f51ee21eb17bc60f4d680824be498849f1c5355d45da2d3aebddbb",
         "apps/docs/src/content/docs/guides/choose-stream-history.md": "6af27c2e396cc5c0bad8ed690686abd69e8861a37cc6ccfac86af1e70db93e55",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "36f23ce558abe3106bba1a9a120aed2f8224462ae73d89b30ff78b4a40104cea",
@@ -59,7 +60,7 @@
         "apps/docs/src/content/docs/index.mdx": "85d93175471e294ca4d8efd0325ed391ad1a53257413be59a67c7becd252d2dc",
         "apps/docs/src/content/docs/integrations/index.md": "0ab5ad7e47cd37ae3d7d9e19bc93c696b29bd3f44ca9c0daf0dbdf0f606bc73d",
         "apps/docs/src/content/docs/reference/browser-and-worker-hosts.md": "19d83208a1a542a35c44961fc4e80b2f5e21143ad0e66187f7359b888e830886",
-        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "b46439f84a95c7d83ccecaefa5fb2ce273186ae2fec384105d39596998c49289",
+        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "6c2c238d5684ee4fe091644e4e90ad28264883a49286bcb2a7bc0725a02aa359",
         "apps/docs/src/content/docs/reference/errors.md": "c7dca6277bfc64f3db9b8c7cc1ca7cb1389ca7e3f075e50bf65f05bd0c7326f2",
         "apps/docs/src/content/docs/reference/external-http-clients.md": "501ad4c67b7beabbccb05d11665bed8d7d7f4a030460fb8620134fe5be8be5fe",
         "apps/docs/src/content/docs/reference/factory.md": "954a3416d3f8220a249fa883c83ec3ea068450b35fde5901107a609aab73fa41",
@@ -95,13 +96,13 @@
         "docs/adr/0030-publish-documentation-from-released-revisions.md": "0088082ffe753ecc6e5cec31d8e9882fae42c323af10e011f76372852a524a1c",
         "docs/adr/0031-add-explicit-query-reuse-and-stream-controls.md": "984b9e0da315eb23a79f170d84f4725e54bfa521be8d03bad5f518ba7f1afece",
         "docs/adr/0032-configure-utility-trees-and-require-stream-retention.md": "e46238f04f3213d2c32dcb64fb2c17d38d033699d08b3b9d7986bbbe1d2f1ff7",
-        "docs/adr/0033-bound-effect-support-to-a-patch-line.md": "aa1919cc8dedca1cc3439ec13a0f96f012f56a5e425887f3c4ddc92e47063cfc",
+        "docs/adr/0033-bound-effect-support-to-a-patch-line.md": "59713543a4078bd86dfd47eb5e1f29825347fb2156d5233ce28e87c4d350f3ef",
         "docs/adr/0034-extend-http-stream-views-to-decoded-ndjson.md": "445ed1f9a4cb3a74938f2d01579e50c046a681aaa2dcd856ef9587c62aaa7cf2",
         "docs/adr/0035-use-effect-enhanced-tsrs-for-development.md": "ef20a8cb9211973e6b0d3dc59e752fe3861729c19c65e81fb4354d9db6e123df",
         "docs/adr/0037-own-stream-publication-through-query-core.md": "a7800a9b941557bc34d3a3102e94d4227f8e5f31ff852b6830a33e12ac2ec553",
         "docs/adr/0039-coalesce-live-snapshots-explicitly.md": "4d95533f87474e8a55a9a6a0f0339f375a7e5d242195e26e99c2d7e895171f02",
         "docs/adr/0040-add-opt-in-query-owner-retirement.md": "5e5f0a05577c779ed22a62a3e99a8abd509c241fa9949e9fb50a9aec068472fc",
-        "docs/adr/0042-define-the-compatibility-promise.md": "2e2ae6512eb714ed8601daee80fe3852fdb62614602be5ad54ffd5e58f0beb99",
+        "docs/adr/0042-define-the-compatibility-promise.md": "8b6f98e53258be5793a11c73bb74795495f6c052827e0192aeac355d84f3b9f3",
         "docs/adr/0043-keep-editor-selection-contributor-owned.md": "3ccd02edb9d41b09bf112b64cc335bfcc3e981f9986a9f704b376532ef5798ac",
         "e2e/http-workflows.spec.ts": "8e7f7622ea481a56dc3f0ebceabe61691f8f34e3489ef1945ff3e929a1e6b2e0",
         "examples/contracts/src/client.ts": "0be1072f4734c20623f9250dc64954a1398f05714956566f0af82469ef43c87e",
@@ -175,9 +176,9 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "d5ec78bbea61c95d8df59e00b672a9e13b1de9b3b368307776d016ef770e231d",
+        "package.json": "03e11e3472fb13ac3aa38c3194366b64d7da922fca0444b259529f3c0a6cf80f",
         "pnpm-workspace.yaml": "fc4bff1fa9ef4a4887691c6e004e02829736f93ee07efcb563f78f836a21a276",
-        "scripts/check-effect-compatibility.mts": "bbb63ee11c2aed7bf50dd9dab1e303eb511e8efd7110f1c4ce9686a940421993",
+        "scripts/check-effect-compatibility.mts": "202b5d5a221c3340e7f4832af9e152ea9e3a3802377efa2d23b8448fa55bec7e",
         "scripts/check-framework-consumers.mts": "f0111ac9ed84996f722f656358b810da0b9ecc8c6c0219a2019d1076b5d50cbc",
         "scripts/check-toolchain.mts": "3c8efdb93594058ed78947bc65ad51c88ac4b26cab23b0b1fe6f8786a6d386e9",
         "scripts/check-workflow.mts": "c3a760a6b111d3f1dc7570a510ee09aabfc048786ef8c6dd1c9fe7b26cecd00c",
@@ -190,10 +191,12 @@
         "scripts/performance/budgets.mts": "ab7b9acdcc9ed4f8647a2766a98485e5b3521e01f2d945f78b7cf6eb03fc32ab",
         "scripts/performance/common.mts": "507d45618fbaf2c7be6f986a5f958d1958cdddc95e42a77ff1d50d8225538a3d",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
+        "scripts/verify-docs-examples.mts": null,
+        "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "f98700277bbbfb035c03be5ed7cd0f3146990472ca949a8633f75f849ae14c55",
         "skills/effect-api-query/references/cache-workflows.md": "304d13e671bbe4be6b04bdcd28b4ba4e9a5bf597ccf9e0c6a69d3f5a08518735",
-        "skills/effect-api-query/references/frameworks-and-hosts.md": "a134be8075588e30f28e2994462f3baa0733a2be28a9db826e0df8d91c69a4a5",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "28e93576ddb0301d5c946a38963ce884c4b5fe610f471b7e0430a9a8e241de30",
         "skills/effect-api-query/references/http.md": "4dcc63f909686f0f0e1b48f3f0c4238782bdbb6dc69ceebb838786271da09aa9",
         "skills/effect-api-query/references/hydration-and-ssr.md": "f127b348b421c596abdf5e3df97ed2bfe144fac37980226cfda23392c71ac2d7",
         "skills/effect-api-query/references/query-patterns.md": "064e36b3977ad372e7e340cc981f72a9539cec7ab36efed2337ffff257a4a9c3",
@@ -271,7 +274,7 @@
         "tests/fixtures/websocket-checks.ts": "9144c4fe42e1565d43f75dbb9a928f58cf60f87d3c44db053769e076c11423eb",
         "tests/framework-consumers/angular.ts": "4d629324cb6e4d5ec9029c96670cf78a022e10ea98ee12df1997ac731d1d68ad",
         "tests/framework-consumers/contracts.ts": "cc6eb274850950dfd64b3f4613fb527e7dbc452518c25268a99d24f6ac2d2bac",
-        "tests/framework-consumers/package.json": "94e7a24cd9700168558e77b09511cd9c7b9a6b84c0dd0199cf253dce89a177c0",
+        "tests/framework-consumers/package.json": "0cabc690b509757ea3c7014e6b2fa443b6e3fb3ff8e0fc72e7fe304c239e33a5",
         "tests/framework-consumers/solid.ts": "0e0b261f0f80de83f799326cfa4fdd8cf14cb480909b69bb498b759467ec8bdb",
         "tests/framework-consumers/svelte.ts": "652f8d97d781803239ca667497768077167fffaabec851d5a076f692c376223c",
         "tests/framework-consumers/vue.ts": "e23859e5fe8f8e24a55d8e782dd2880d1a6d88859bdf40ff7b60e8b0c150ab50",
@@ -372,21 +375,18 @@
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6",
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca"
       },
-      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
-      "outcome": "no-change",
-      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
+      "head": "37229410153dfb2f96aa4e4db580a1c539559986",
+      "outcome": "updated",
+      "reason": "Updated frameworks-and-hosts reference, compatibility docs, README, ADR 0033, ADR 0042, package.json peer floors (effect >=4.1.4 <4.2.0, @tanstack/query-core >=5.107.1 <6), compatibility matrix script, and framework consumer pins for 0.8.0 (#211).",
       "evidence": [
-        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
-        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
-        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
-        "Scoped generated changes: package.json."
+        "vp run effect-compatibility (Effect 4.1.4, Query Core 5.107.1, TSRS 0.25.0-ts7.1.0-beta and TS 5.9.3), vp run api-types, vp run framework-types, vp run quality (76 test files, 920 tests), vp run docs-check"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "2f45aaaf5875dbef76fdc4c2c3b68e2f4314f86abc36a27f58a97091e8f6af25",
+      "fingerprint": "57ec37779c12ceac612ab3aa47b2daaaf63ff3b7a489fc88fd18265c8aedd0f7",
       "snapshot": {
         "GLOSSARY.md": "4532453f4efb696d95c66aabb9f62863e28984bb961f97ee288034af62d76f29",
-        "README.md": "87db3a47ce666b408001c89b81b2133393eb2074c63ba1ac1786be8e20b96dfd",
+        "README.md": "105964ce204e5b6164b1c340215bad52be2eadc69504bc0ed8fa330c27247230",
         "_artifacts/domain_map.yaml": "ac3046d1216793d438624283071f879c2660f15011b5e85c0d30260e2a1caa12",
         "_artifacts/skill_spec.md": "75ca7ff6eaee2c54466fa171c29779c08c6100bfca3cc33c46f38059d554ee8c",
         "_artifacts/skill_tree.yaml": "42fff5ffa1e5ae1257af626f41c664597cfe6d44247a67aa16076d098241acec",
@@ -403,7 +403,7 @@
         "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": "c8815a75b20b473a6d54ffc8a0eff41db396965434d80f54ae60ccd7ff25f5ad",
         "apps/docs/src/content/docs/getting-started/feature-support.md": "a4ba730fc86ed8acb65cb6ad20952199b164e9004a959931ca373576e67fa82f",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "70f2b53fb07dff591f3996805999473c3da3d54df629de6ddb07a8f9f428107b",
-        "apps/docs/src/content/docs/getting-started/installation.md": "c561ea9c05dcdddcb77cb6aad6ad1946a04f8a0320b963d5f788f13f78afa7af",
+        "apps/docs/src/content/docs/getting-started/installation.md": "9a8f24b05b512c20ed879cb1bb0100a7255fd33cd5f2dd41656f9e31fe76964c",
         "apps/docs/src/content/docs/getting-started/quick-start.md": "38f55ff9ff12e6fdc2638ebe0a1d93c26523e352fa4412d3f158f59868d9451a",
         "apps/docs/src/content/docs/guides/angular-query.md": "16afe6996ee8f70b4b77b430c93aeb2a4dc658a0ae8e92b3993d95f065a86b9f",
         "apps/docs/src/content/docs/guides/cache-filters.md": "67902d4de08ff851f4b59da281098aafd7843144ec1682394cceb7b0630e458e",
@@ -442,7 +442,7 @@
         "apps/docs/src/content/docs/index.mdx": "85d93175471e294ca4d8efd0325ed391ad1a53257413be59a67c7becd252d2dc",
         "apps/docs/src/content/docs/integrations/index.md": "0ab5ad7e47cd37ae3d7d9e19bc93c696b29bd3f44ca9c0daf0dbdf0f606bc73d",
         "apps/docs/src/content/docs/reference/browser-and-worker-hosts.md": "19d83208a1a542a35c44961fc4e80b2f5e21143ad0e66187f7359b888e830886",
-        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "b46439f84a95c7d83ccecaefa5fb2ce273186ae2fec384105d39596998c49289",
+        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "6c2c238d5684ee4fe091644e4e90ad28264883a49286bcb2a7bc0725a02aa359",
         "apps/docs/src/content/docs/reference/errors.md": "c7dca6277bfc64f3db9b8c7cc1ca7cb1389ca7e3f075e50bf65f05bd0c7326f2",
         "apps/docs/src/content/docs/reference/external-http-clients.md": "501ad4c67b7beabbccb05d11665bed8d7d7f4a030460fb8620134fe5be8be5fe",
         "apps/docs/src/content/docs/reference/factory.md": "954a3416d3f8220a249fa883c83ec3ea068450b35fde5901107a609aab73fa41",
@@ -478,13 +478,13 @@
         "docs/adr/0030-publish-documentation-from-released-revisions.md": "0088082ffe753ecc6e5cec31d8e9882fae42c323af10e011f76372852a524a1c",
         "docs/adr/0031-add-explicit-query-reuse-and-stream-controls.md": "984b9e0da315eb23a79f170d84f4725e54bfa521be8d03bad5f518ba7f1afece",
         "docs/adr/0032-configure-utility-trees-and-require-stream-retention.md": "e46238f04f3213d2c32dcb64fb2c17d38d033699d08b3b9d7986bbbe1d2f1ff7",
-        "docs/adr/0033-bound-effect-support-to-a-patch-line.md": "aa1919cc8dedca1cc3439ec13a0f96f012f56a5e425887f3c4ddc92e47063cfc",
+        "docs/adr/0033-bound-effect-support-to-a-patch-line.md": "59713543a4078bd86dfd47eb5e1f29825347fb2156d5233ce28e87c4d350f3ef",
         "docs/adr/0034-extend-http-stream-views-to-decoded-ndjson.md": "445ed1f9a4cb3a74938f2d01579e50c046a681aaa2dcd856ef9587c62aaa7cf2",
         "docs/adr/0035-use-effect-enhanced-tsrs-for-development.md": "ef20a8cb9211973e6b0d3dc59e752fe3861729c19c65e81fb4354d9db6e123df",
         "docs/adr/0037-own-stream-publication-through-query-core.md": "a7800a9b941557bc34d3a3102e94d4227f8e5f31ff852b6830a33e12ac2ec553",
         "docs/adr/0039-coalesce-live-snapshots-explicitly.md": "4d95533f87474e8a55a9a6a0f0339f375a7e5d242195e26e99c2d7e895171f02",
         "docs/adr/0040-add-opt-in-query-owner-retirement.md": "5e5f0a05577c779ed22a62a3e99a8abd509c241fa9949e9fb50a9aec068472fc",
-        "docs/adr/0042-define-the-compatibility-promise.md": "2e2ae6512eb714ed8601daee80fe3852fdb62614602be5ad54ffd5e58f0beb99",
+        "docs/adr/0042-define-the-compatibility-promise.md": "8b6f98e53258be5793a11c73bb74795495f6c052827e0192aeac355d84f3b9f3",
         "docs/adr/0043-keep-editor-selection-contributor-owned.md": "3ccd02edb9d41b09bf112b64cc335bfcc3e981f9986a9f704b376532ef5798ac",
         "e2e/http-workflows.spec.ts": "8e7f7622ea481a56dc3f0ebceabe61691f8f34e3489ef1945ff3e929a1e6b2e0",
         "examples/contracts/src/client.ts": "0be1072f4734c20623f9250dc64954a1398f05714956566f0af82469ef43c87e",
@@ -558,9 +558,9 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "d5ec78bbea61c95d8df59e00b672a9e13b1de9b3b368307776d016ef770e231d",
+        "package.json": "03e11e3472fb13ac3aa38c3194366b64d7da922fca0444b259529f3c0a6cf80f",
         "pnpm-workspace.yaml": "fc4bff1fa9ef4a4887691c6e004e02829736f93ee07efcb563f78f836a21a276",
-        "scripts/check-effect-compatibility.mts": "bbb63ee11c2aed7bf50dd9dab1e303eb511e8efd7110f1c4ce9686a940421993",
+        "scripts/check-effect-compatibility.mts": "202b5d5a221c3340e7f4832af9e152ea9e3a3802377efa2d23b8448fa55bec7e",
         "scripts/check-framework-consumers.mts": "f0111ac9ed84996f722f656358b810da0b9ecc8c6c0219a2019d1076b5d50cbc",
         "scripts/check-toolchain.mts": "3c8efdb93594058ed78947bc65ad51c88ac4b26cab23b0b1fe6f8786a6d386e9",
         "scripts/check-workflow.mts": "c3a760a6b111d3f1dc7570a510ee09aabfc048786ef8c6dd1c9fe7b26cecd00c",
@@ -576,7 +576,7 @@
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "f98700277bbbfb035c03be5ed7cd0f3146990472ca949a8633f75f849ae14c55",
         "skills/effect-api-query/references/cache-workflows.md": "304d13e671bbe4be6b04bdcd28b4ba4e9a5bf597ccf9e0c6a69d3f5a08518735",
-        "skills/effect-api-query/references/frameworks-and-hosts.md": "a134be8075588e30f28e2994462f3baa0733a2be28a9db826e0df8d91c69a4a5",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "28e93576ddb0301d5c946a38963ce884c4b5fe610f471b7e0430a9a8e241de30",
         "skills/effect-api-query/references/http.md": "4dcc63f909686f0f0e1b48f3f0c4238782bdbb6dc69ceebb838786271da09aa9",
         "skills/effect-api-query/references/hydration-and-ssr.md": "f127b348b421c596abdf5e3df97ed2bfe144fac37980226cfda23392c71ac2d7",
         "skills/effect-api-query/references/query-patterns.md": "064e36b3977ad372e7e340cc981f72a9539cec7ab36efed2337ffff257a4a9c3",
@@ -654,7 +654,7 @@
         "tests/fixtures/websocket-checks.ts": "9144c4fe42e1565d43f75dbb9a928f58cf60f87d3c44db053769e076c11423eb",
         "tests/framework-consumers/angular.ts": "4d629324cb6e4d5ec9029c96670cf78a022e10ea98ee12df1997ac731d1d68ad",
         "tests/framework-consumers/contracts.ts": "cc6eb274850950dfd64b3f4613fb527e7dbc452518c25268a99d24f6ac2d2bac",
-        "tests/framework-consumers/package.json": "94e7a24cd9700168558e77b09511cd9c7b9a6b84c0dd0199cf253dce89a177c0",
+        "tests/framework-consumers/package.json": "0cabc690b509757ea3c7014e6b2fa443b6e3fb3ff8e0fc72e7fe304c239e33a5",
         "tests/framework-consumers/solid.ts": "0e0b261f0f80de83f799326cfa4fdd8cf14cb480909b69bb498b759467ec8bdb",
         "tests/framework-consumers/svelte.ts": "652f8d97d781803239ca667497768077167fffaabec851d5a076f692c376223c",
         "tests/framework-consumers/vue.ts": "e23859e5fe8f8e24a55d8e782dd2880d1a6d88859bdf40ff7b60e8b0c150ab50",
@@ -755,14 +755,11 @@
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6",
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca"
       },
-      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
+      "head": "37229410153dfb2f96aa4e4db580a1c539559986",
       "outcome": "no-change",
-      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
+      "reason": "One-skill/six-reference structure, domain map, and skill tree source globs already cover the raised 0.8.0 peer floors, compatibility script, ADRs, docs, and frameworks-and-hosts reference (#211).",
       "evidence": [
-        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
-        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
-        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
-        "Scoped generated changes: package.json."
+        "Changed: README.md, apps/docs/src/content/docs/getting-started/installation.md, apps/docs/src/content/docs/reference/compatibility-and-limits.md, docs/adr/0033-bound-effect-support-to-a-patch-line.md, docs/adr/0042-define-the-compatibility-promise.md, package.json, scripts/check-effect-compatibility.mts, skills/effect-api-query/references/frameworks-and-hosts.md, tests/framework-consumers/package.json at 37229410153dfb2f96aa4e4db580a1c539559986"
       ]
     },
     "source:vite.config.ts": {
@@ -855,15 +852,15 @@
       ]
     },
     "source:.github/workflows/ci.yml": {
-      "fingerprint": "9d361ca5afcd3d69d575674e28f23ce588191ae2a8cfe554a42d54c675999079",
+      "fingerprint": "46d9b0c118348e0f07996e43b7d9092d15a79a8e3250bed53877e38f5e8461fc",
       "snapshot": {
-        ".github/workflows/ci.yml": "cb40d07dae55323f879792224e4fa4e9afe3a2540f461482d01ba1c86a12767e"
+        ".github/workflows/ci.yml": "75441ea00bdc66597feaaa52ec6b24bee07e5e520e55f26fe214815f3a1c015b"
       },
-      "head": "d997fa5ee2742d679a26e79322f1004bb60746a5",
+      "head": "37229410153dfb2f96aa4e4db580a1c539559986",
       "outcome": "no-change",
-      "reason": "PR shards start independently. Release and other non-PR validation waits for both build artifacts, and all required browser checks depend on the selected shard workflow.",
+      "reason": "Removed obsolete 2-shard matrix on packed-compatibility CI job because the 0.8.0 compatibility matrix has one floor/development combination (effect@4.1.4, @tanstack/query-core@5.107.1); no skill guidance change needed.",
       "evidence": [
-        "The workflow guard verified both entry paths. actionlint and targeted yamllint passed."
+        "vp run effect-compatibility (Effect 4.1.4, Query Core 5.107.1, TSRS 0.25.0-ts7.1.0-beta and TS 5.9.3), vp run api-types, vp run framework-types, vp run quality (76 test files, 920 tests), vp run docs-check"
       ]
     },
     "source:tests/packed-consumer/construction-baseline.mts": {
@@ -2641,15 +2638,15 @@
       ]
     },
     "source:tests/framework-consumers/pnpm-lock.yaml": {
-      "fingerprint": "1366692ae7c9b912406e687c02f2bd52a480791605c702c107bfd04b6e2a379d",
+      "fingerprint": "95d5bade4117dd57ef48ab3c44fa0a8a8c10d6b9640586d1b71f601947d531aa",
       "snapshot": {
-        "tests/framework-consumers/pnpm-lock.yaml": "641cfe0f814a5fad84ca2c8f65fd9fedd0b0161c339902833b8548f70370c663"
+        "tests/framework-consumers/pnpm-lock.yaml": "4b36f0f92385413af116f7429de6e30a721a6f0173cb019518311f859216e892"
       },
-      "head": "8016013111c7e5181ab9c7eed489c3ad6f9f894d",
-      "outcome": "out-of-scope",
-      "reason": "Internal repository toolchain, CI container, Fallow config, or contributor documentation update with no shipped consumer skill impact.",
+      "head": "37229410153dfb2f96aa4e4db580a1c539559986",
+      "outcome": "no-change",
+      "reason": "Updated framework consumer lockfile to match effect@4.1.4 pin; no skill guidance change needed.",
       "evidence": [
-        "Verified tests/framework-consumers/pnpm-lock.yaml is internal development/CI configuration."
+        "vp run effect-compatibility (Effect 4.1.4, Query Core 5.107.1, TSRS 0.25.0-ts7.1.0-beta and TS 5.9.3), vp run api-types, vp run framework-types, vp run quality (76 test files, 920 tests), vp run docs-check"
       ]
     },
     "source:tests/framework-consumers/pnpm-workspace.yaml": {

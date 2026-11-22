@@ -88,8 +88,8 @@
     "vitest": "catalog:"
   },
   "peerDependencies": {
-    "@tanstack/query-core": ">=5.104.4 <6",
-    "effect": ">=4.0.6 <4.2.0"
+    "@tanstack/query-core": ">=5.107.1 <6",
+    "effect": ">=4.1.4 <4.2.0"
   },
   "packageManager": "pnpm@12.15.0"
 }
