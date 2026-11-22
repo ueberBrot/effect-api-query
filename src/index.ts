@@ -26,7 +26,19 @@ export {
   infiniteQueryCodec,
   queryViewCodec,
 } from "./core/hydration";
-export type { HydrationCodec, HydrationRegistry } from "./core/hydration";
+export type {
+  HydrationCodec,
+  HydrationCodecErrorCode,
+  HydrationRegistry,
+  HydrationRegistryEntry,
+} from "./core/hydration";
+export { createContractHydrationRegistry } from "./core/contract-hydration";
+export type {
+  HttpContractHydrationOptions,
+  HttpContractHydrationViews,
+  RpcContractHydrationOptions,
+  RpcContractHydrationViews,
+} from "./core/contract-hydration-types";
 export { recoverStream } from "./core/stream-recovery";
 export type {
   RecoverStreamOptions,
