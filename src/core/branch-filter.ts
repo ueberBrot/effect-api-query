@@ -40,14 +40,25 @@ export const createBranchQueryFilter = (
     }
   };
   visit(branch);
+  const groups = [...byLength];
+  let minLength = Number.POSITIVE_INFINITY;
+  for (const [length] of groups) {
+    if (length < minLength) {
+      minLength = length;
+    }
+  }
   const queryKey = branch.key();
   return (options = {}) => ({
     ...options,
     queryKey,
     predicate: (query) => {
-      for (const [length, prefixes] of byLength) {
+      if (query.queryKey.length < minLength) {
+        return false;
+      }
+      for (const [length, prefixes] of groups) {
         if (
           query.queryKey.length >= length &&
+          query.queryKey[length - 1] === view &&
           prefixes.has(hashKey(query.queryKey.slice(0, length)))
         ) {
           return options.predicate?.(query) ?? true;

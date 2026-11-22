@@ -124,6 +124,97 @@ describe("Schema structural sharing", () => {
     const cyclic: CyclicContainer = {};
     cyclic.self = cyclic;
     expect(() => client.setQueryData(key, cyclic)).toThrow(TypeError);
+    const cyclicArray: unknown[] = [];
+    cyclicArray.push(cyclicArray);
+    expect(() => client.setQueryData(["cyclic-array"], cyclicArray)).toThrow(
+      TypeError
+    );
+    client.clear();
+  });
+
+  it("shares acyclic shared references and bails out on sparse, symbol, extra-key, getter, and non-enumerable containers", () => {
+    const client = new QueryClient({
+      defaultOptions: {
+        queries: {
+          structuralSharing: schemaStructuralSharing(Reading, {
+            equivalence: Schema.toEquivalence(Reading),
+          }),
+        },
+      },
+    });
+    const shared = [reading(1)];
+    const first = { left: shared, right: shared };
+    client.setQueryData(["dag"], first);
+    const incomingShared = [reading(1)];
+    client.setQueryData(["dag"], {
+      left: incomingShared,
+      right: incomingShared,
+    });
+
+    const sparsePrev = [reading(1), undefined, reading(2)];
+    const sparseNext: (Reading | undefined)[] = [];
+    sparseNext[0] = reading(1);
+    sparseNext[2] = reading(2);
+    client.setQueryData(["sparse"], sparsePrev);
+    client.setQueryData(["sparse"], sparseNext);
+
+    const tag = Symbol("tag");
+    const symArrayPrev = Object.assign([reading(1)], { [tag]: 1 });
+    const symArrayNext = Object.assign([reading(1)], { [tag]: 2 });
+    client.setQueryData(["sym-array"], symArrayPrev);
+    client.setQueryData(["sym-array"], symArrayNext);
+
+    const expandoPrev = Object.assign([reading(1)], { extra: 1 });
+    const expandoNext = Object.assign([reading(1)], { extra: 2 });
+    client.setQueryData(["expando-array"], expandoPrev);
+    client.setQueryData(["expando-array"], expandoNext);
+
+    const getterPrev = {
+      get item() {
+        return reading(1);
+      },
+    };
+    const getterNext = {
+      get item() {
+        return reading(1);
+      },
+    };
+    client.setQueryData(["getter"], getterPrev);
+    client.setQueryData(["getter"], getterNext);
+
+    const hiddenPrev = Object.defineProperty(
+      { visible: reading(1) },
+      "hidden",
+      {
+        enumerable: false,
+        value: 1,
+      }
+    );
+    const hiddenNext = Object.defineProperty(
+      { visible: reading(1) },
+      "hidden",
+      {
+        enumerable: false,
+        value: 2,
+      }
+    );
+    client.setQueryData(["non-enumerable"], hiddenPrev);
+    client.setQueryData(["non-enumerable"], hiddenNext);
+    expect({
+      dag: client.getQueryData(["dag"]) === first,
+      sparse: client.getQueryData(["sparse"]) === sparseNext,
+      symbolArray: client.getQueryData(["sym-array"]) === symArrayNext,
+      expandoArray: client.getQueryData(["expando-array"]) === expandoNext,
+      getter: client.getQueryData(["getter"]) === getterNext,
+      nonEnumerable: client.getQueryData(["non-enumerable"]) === hiddenNext,
+    }).toStrictEqual({
+      dag: true,
+      sparse: true,
+      symbolArray: true,
+      expandoArray: true,
+      getter: true,
+      nonEnumerable: true,
+    });
     client.clear();
   });
 
