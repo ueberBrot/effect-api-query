@@ -39,14 +39,12 @@ Import `configureUtils` from `@ueberbrot/effect-api-query`. Import `RpcClientErr
 
 ```ts
 const read = configureUtils(rpc.profile.read, {
-  query: {
-    policy: retryPolicy(
-      (failure) =>
-        Schema.is(RpcClientError.RpcClientError)(failure) &&
-        failure.reason._tag === "HttpError" &&
-        failure.reason.kind === "TransportError"
-    ),
-  },
+  query: retryPolicy(
+    (failure) =>
+      Schema.is(RpcClientError.RpcClientError)(failure) &&
+      failure.reason._tag === "HttpError" &&
+      failure.reason.kind === "TransportError"
+  ),
 });
 return read.queryOptions();
 ```
@@ -59,13 +57,11 @@ Import `HttpClientError` from `effect/http`. Reuse the helper with HTTP's transp
 
 ```ts
 const read = configureUtils(http.profile.read, {
-  query: {
-    policy: retryPolicy(
-      (failure) =>
-        HttpClientError.isHttpClientError(failure) &&
-        failure.reason._tag === "TransportError"
-    ),
-  },
+  query: retryPolicy(
+    (failure) =>
+      HttpClientError.isHttpClientError(failure) &&
+      failure.reason._tag === "TransportError"
+  ),
 });
 return read.queryOptions();
 ```

@@ -242,14 +242,10 @@ it.effect("dispatches empty named SSE events only when requested", () =>
     }
 
     for (const order of ["root-first", "leaf-first"] as const) {
-      const root = { streamed: { policy: { maxChunks: 2 } } };
+      const root = { streamed: { maxChunks: 2 } };
       const specific = {
-        scoped: {
-          events: {
-            scoped: {
-              watch: { streamed: { policy: { maxChunks: 1 } } },
-            },
-          },
+        paths: {
+          "events.watch": { streamed: { maxChunks: 1 } },
         },
       };
       const configured =
@@ -988,7 +984,7 @@ it.effect(
         sseOptions: { maxEventSize: 128, dispatchEmptyNamedEvents: true },
       };
       const configured = configureUtils(leaf, {
-        live: { policy: { coalesceMs: 1000 } },
+        live: { coalesceMs: 1000 },
       });
       const queryClient = new QueryClient();
       const publications: unknown[] = [];

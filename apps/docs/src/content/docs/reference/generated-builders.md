@@ -75,9 +75,9 @@ Streaming RPCs provide these builders.
 
 | Builder | Result |
 | --- | --- |
-| `streamedKey(input, policy)` | Data-tagged key for history and its retention, refetch, and publication policy. |
+| `streamedKey(options)` | Data-tagged key for history and its retention, refetch, and publication policy. |
 | `streamedOptions(options)` | Query options that accumulate emitted values according to the history policy. |
-| `liveKey(input?, policy?)` | Data-tagged key for the latest value and any coalescing policy. |
+| `liveKey(options?)` | Data-tagged key for the latest value and any coalescing policy. |
 | `liveOptions(options?)` | Query options that store the latest published value. |
 
 See [streaming](/effect-api-query/guides/streaming/) for examples.
@@ -94,7 +94,7 @@ Choose a `refetchMode` for accumulated history.
 - `append` adds incoming values to the cached sequence.
 - `replace` keeps cached values until the next stream completes successfully.
 
-Set `maxChunks` to a positive safe integer or `"unbounded"`. You can set it through [`streamed.policy`](/effect-api-query/guides/query-defaults/) for a tree, branch, or leaf.
+Set `maxChunks` to a positive safe integer or `"unbounded"`. You can set it through [`streamed`](/effect-api-query/guides/query-defaults/) for a tree, branch, or leaf.
 
 A finite bound keeps the newest values in order after publication. It counts elements. Refetch applies the bound as follows.
 

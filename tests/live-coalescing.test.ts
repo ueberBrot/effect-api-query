@@ -24,7 +24,7 @@ it.effect(
         keyPrefix: ["coalesce"],
       }).watch;
       const configured = configureUtils(leaf, {
-        live: { policy: { coalesceMs: 100 } },
+        live: { coalesceMs: 100 },
       });
       const options = configured.liveOptions();
       const queryClient = new QueryClient();

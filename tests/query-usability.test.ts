@@ -97,7 +97,7 @@ describe("query usability", () => {
           ).toBe(2);
           const input = prepareInput(rpc.stable, { id: 2 });
           const configured = configureUtils(rpc.stable, {
-            query: { policy: { staleTime: 1000 } },
+            query: { staleTime: 1000 },
           });
           const options = configured.queryOptions({ input });
           expect(options.queryKey).toStrictEqual(
@@ -166,9 +166,7 @@ describe("query usability", () => {
           "another utility leaf"
         );
         const configured = configureUtils(rpc.users.read, {
-          query: {
-            policy: { staleTime: 100 },
-          },
+          query: { staleTime: 100 },
         });
         const again = prepareInput(configured, { id: 8 });
         expect(
@@ -206,7 +204,7 @@ describe("query usability", () => {
         const calls: string[] = [];
         const leaf = configureUtils(rpc.users.read, {
           query: {
-            policy: { staleTime: 1000 },
+            staleTime: 1000,
             interceptors: [
               async ({ next: execute }) => {
                 calls.push("outer");
@@ -221,10 +219,8 @@ describe("query usability", () => {
             ],
           },
           mutation: {
-            policy: {
-              onSuccess: () => {
-                calls.push("shared success");
-              },
+            onSuccess: () => {
+              calls.push("shared success");
             },
             callbacks: "compose",
             interceptors: [

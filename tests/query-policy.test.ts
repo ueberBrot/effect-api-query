@@ -26,9 +26,7 @@ it.effect(
       });
       const read = configureUtils(utils.read, {
         query: {
-          policy: {
-            staleTime: Infinity,
-          },
+          staleTime: Infinity,
         },
       }).queryOptions;
       const queryClient = new QueryClient();
@@ -68,10 +66,8 @@ it.effect(
       });
       const read = configureUtils(utils.read, {
         query: {
-          policy: {
-            retry: (count, error) => count === 0 && error.operation === "query",
-            retryDelay: 0,
-          },
+          retry: (count, error) => count === 0 && error.operation === "query",
+          retryDelay: 0,
         },
       }).queryOptions;
       expect(
@@ -106,19 +102,15 @@ it.effect(
       const queryClient = new QueryClient();
       const read = configureUtils(utils.read, {
         query: {
-          policy: {
-            staleTime: Infinity,
-          },
+          staleTime: Infinity,
         },
       }).queryOptions;
       const write = configureUtils(utils.write, {
         mutation: {
-          policy: {
-            onSuccess: async (_data, _variables, _result, context) => {
-              await context.client.invalidateQueries({
-                queryKey: utils.read.key(),
-              });
-            },
+          onSuccess: async (_data, _variables, _result, context) => {
+            await context.client.invalidateQueries({
+              queryKey: utils.read.key(),
+            });
           },
         },
       }).mutationOptions;

@@ -12,7 +12,7 @@ export const dashboard = (
 ) => ({
   read: configureUtils(rpc.users.read, {
     query: {
-      policy: { staleTime: 1000 },
+      staleTime: 1000,
       interceptors: [
         async ({ next: execute }) => {
           const value = await execute();

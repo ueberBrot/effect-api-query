@@ -52,14 +52,12 @@ const program = Effect.gen(function* () {
         const queryClient = new QueryClient();
         const read = configureUtils(rpc.read, {
           query: {
-            policy: {
-              structuralSharing: {
-                helper: shareSnapshot,
-                recipe: shareSnapshotRecipe,
-                native: true,
-                disabled: false,
-              }[policy],
-            },
+            structuralSharing: {
+              helper: shareSnapshot,
+              recipe: shareSnapshotRecipe,
+              native: true,
+              disabled: false,
+            }[policy],
           },
         });
         const options = read.queryOptions();

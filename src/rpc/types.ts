@@ -405,7 +405,10 @@ export type RpcTagEntry<
   R extends Rpc.Any,
   Tag extends string,
 > = Tag extends string
-  ? { readonly path: Tag; readonly rpc: R & { readonly _tag: Tag } }
+  ? {
+      readonly path: Tag;
+      readonly rpc: R["_tag"] extends Tag ? R : R & { readonly _tag: Tag };
+    }
   : never;
 
 export type RpcPathEntry<R extends Rpc.Any> = R extends Rpc.Any

@@ -75,14 +75,12 @@ const rpcReadOptions = (
     RpcClientError.RpcClientError
   >(readGroup, { client, keyPrefix: ["profile-app"] });
   const read = configureUtils(rpc.profile.read, {
-    query: {
-      policy: retryPolicy(
-        (failure) =>
-          Schema.is(RpcClientError.RpcClientError)(failure) &&
-          failure.reason._tag === "HttpError" &&
-          failure.reason.kind === "TransportError"
-      ),
-    },
+    query: retryPolicy(
+      (failure) =>
+        Schema.is(RpcClientError.RpcClientError)(failure) &&
+        failure.reason._tag === "HttpError" &&
+        failure.reason.kind === "TransportError"
+    ),
   });
   return read.queryOptions();
 };
@@ -92,13 +90,11 @@ const httpReadOptions = (client: HttpApiClient.ForApi<typeof readApi>) => {
     keyPrefix: ["profile-app"],
   });
   const read = configureUtils(http.profile.read, {
-    query: {
-      policy: retryPolicy(
-        (failure) =>
-          HttpClientError.isHttpClientError(failure) &&
-          failure.reason._tag === "TransportError"
-      ),
-    },
+    query: retryPolicy(
+      (failure) =>
+        HttpClientError.isHttpClientError(failure) &&
+        failure.reason._tag === "TransportError"
+    ),
   });
   return read.queryOptions();
 };

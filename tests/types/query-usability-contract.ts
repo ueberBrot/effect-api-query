@@ -49,7 +49,7 @@ const rpc = createRpcQueryUtils(group, { client, keyPrefix: ["usability"] });
 const queryClient = new QueryClient();
 const leaf = configureUtils(rpc.read, {
   query: {
-    policy: { staleTime: 1000 },
+    staleTime: 1000,
     interceptors: [
       async ({ next }) => {
         const data: number = await next();
@@ -58,11 +58,9 @@ const leaf = configureUtils(rpc.read, {
     ],
   },
   mutation: {
-    policy: {
-      onSuccess: (data, input) => {
-        const result: number = data + input.id;
-        void result;
-      },
+    onSuccess: (data, input) => {
+      const result: number = data + input.id;
+      void result;
     },
     callbacks: "compose",
   },
@@ -111,13 +109,13 @@ rpc.watch.streamedOptions({
   publicationBatchSize: 10,
   publicationMaxWaitMs: 50,
 });
-// @ts-expect-error Read leaves have no live view.
 configureUtils(rpc.read, {
+  // @ts-expect-error Read leaves have no live view.
   live: {},
 });
-// @ts-expect-error Policies cannot replace generated identity.
 configureUtils(rpc.read, {
-  query: { policy: { queryKey: [] } },
+  // @ts-expect-error Policies cannot replace generated identity.
+  query: { queryKey: [] },
 });
 const projectedPolicy = {
   staleTime: 100,
@@ -125,12 +123,12 @@ const projectedPolicy = {
 };
 configureUtils(rpc.read, {
   // @ts-expect-error Variable-supplied projections must remain local to preserve result types.
-  query: { policy: projectedPolicy },
+  query: projectedPolicy,
 });
 const optimisticPolicy = { retry: false, onMutate: () => ({ previous: 1 }) };
 configureUtils(rpc.read, {
   // @ts-expect-error Variable-supplied optimistic context must remain local to the mutation.
-  mutation: { policy: optimisticPolicy },
+  mutation: optimisticPolicy,
 });
 queryClient.invalidateQueries(createBranchQueryFilter(rpc, "query")());
 declare const failure: InferQueryError<typeof rpc.read>;
@@ -161,9 +159,7 @@ const http = createHttpApiQueryUtils(api, {
 const request = prepareInput(http.users.read, { params: { id: 1 } });
 const metadata = useQuery(
   configureUtils(http.users.read, {
-    metadata: {
-      policy: { staleTime: 1000 },
-    },
+    metadata: { staleTime: 1000 },
   }).metadataOptions({ input: request, select: (value) => value.data })
 );
 const data: number | undefined = metadata.data;

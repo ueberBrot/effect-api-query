@@ -308,9 +308,7 @@ describe.each(["reset", "append", "replace"] as const)(
           const http = configureUtils(
             createHttpApiQueryUtils(api, { client, keyPrefix: ["retention"] }),
             {
-              streamed: {
-                policy: { maxChunks: 2, refetchMode, publicationBatchSize: 2 },
-              },
+              streamed: { maxChunks: 2, refetchMode, publicationBatchSize: 2 },
             }
           );
           const input = { query: { channel: "news" } };
@@ -519,7 +517,7 @@ it.effect(
       });
       const leaf = http.records.watch;
       const configured = configureUtils(leaf, {
-        live: { policy: { coalesceMs: 1000 } },
+        live: { coalesceMs: 1000 },
       });
       const input = { query: { channel: "news" } };
       const queryClient = new QueryClient();

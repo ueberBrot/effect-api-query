@@ -152,41 +152,29 @@ type OptionalStreamInput = Assert<
   Equal<InferInput<typeof broad.optionalWatch>, string | void>
 >;
 configureUtils(broad.unknownRead, {
-  query: {
-    policy: { retry: false },
-  },
+  query: { retry: false },
 }).queryOptions({
   input: { id: 1 },
 });
 configureUtils(broad.anyRead, {
-  query: {
-    policy: { retry: false },
-  },
+  query: { retry: false },
 }).queryOptions({ input: { id: 1 } });
 configureUtils(broad.optionalRead, {
-  query: {
-    policy: { retry: false },
-  },
+  query: { retry: false },
 }).queryOptions({
   input: undefined,
 });
 configureUtils(broad.unknownWatch, {
-  streamed: {
-    policy: { retry: false },
-  },
+  streamed: { retry: false },
 }).streamedOptions({
   maxChunks: "unbounded",
   input: { id: 1 },
 });
 configureUtils(broad.anyWatch, {
-  live: {
-    policy: { retry: false },
-  },
+  live: { retry: false },
 }).liveOptions({ input: { id: 1 } });
 configureUtils(broad.optionalWatch, {
-  live: {
-    policy: { retry: false },
-  },
+  live: { retry: false },
 }).liveOptions({
   input: "Ada",
 });
@@ -232,9 +220,7 @@ const policy = {
   refetchInterval: (query) => (query.state.data === null ? false : 1000),
 } satisfies QueryPolicy<typeof rpc.read>;
 const read = configureUtils(rpc.read, {
-  query: {
-    policy: policy,
-  },
+  query: policy,
 }).queryOptions;
 const selected = read({ input, select: (data) => `${data}` });
 useQuery(selected).data satisfies string | undefined;
@@ -254,13 +240,11 @@ const conditional = read({ input: conditionalInput });
 useSuspenseQuery(conditional);
 const infinite = configureUtils(rpc.read, {
   infinite: {
-    policy: {
-      staleTime: (query) => {
-        query.state.data satisfies
-          | InfiniteData<number | null, unknown>
-          | undefined;
-        return 1000;
-      },
+    staleTime: (query) => {
+      query.state.data satisfies
+        | InfiniteData<number | null, unknown>
+        | undefined;
+      return 1000;
     },
   },
 }).infiniteOptions({
@@ -278,16 +262,12 @@ queryClient.getQueryData(infinite.queryKey) satisfies
   | undefined;
 const live = configureUtils(rpc.watch, {
   live: {
-    policy: {
-      retry: (_count, error) => error._tag !== "EffectRpcQueryEmptyStreamError",
-    },
+    retry: (_count, error) => error._tag !== "EffectRpcQueryEmptyStreamError",
   },
 }).liveOptions({ input: { channel: "one" }, select: (data) => `${data}` });
 useQuery(live).data satisfies string | undefined;
 configureUtils(rpc.watchAll, {
-  streamed: {
-    policy: { gcTime: 60000 },
-  },
+  streamed: { gcTime: 60000 },
 }).streamedOptions({ maxChunks: 2 });
 const mutationPolicy = {
   onSuccess: (data, variables, result, context) => {
@@ -302,9 +282,7 @@ const mutationPolicy = {
   },
 } satisfies MutationPolicy<typeof rpc.read>;
 const mutate = configureUtils(rpc.read, {
-  mutation: {
-    policy: mutationPolicy,
-  },
+  mutation: mutationPolicy,
 }).mutationOptions;
 const mutation = mutate({
   onMutate: (variables) => ({ previous: variables.id }),
@@ -380,49 +358,37 @@ type MultipartInput = Assert<
 type HttpStreamInput = Assert<Equal<InferInput<typeof http.items.watch>, void>>;
 configureUtils(http.items.read, {
   metadata: {
-    policy: {
-      staleTime: (query) => (query.state.data?.status === 200 ? 30000 : 0),
-      retry: (_count, error) => {
-        error satisfies EffectHttpApiQueryError<unknown>;
-        return false;
-      },
+    staleTime: (query) => (query.state.data?.status === 200 ? 30000 : 0),
+    retry: (_count, error) => {
+      error satisfies EffectHttpApiQueryError<unknown>;
+      return false;
     },
   },
 }).metadataOptions({ input: { params: { id: 1 } } });
 configureUtils(http.items.upload, {
   mutation: {
-    policy: {
-      onSuccess: (data, variables) => {
-        data satisfies number;
-        variables.payload satisfies FormData;
-      },
+    onSuccess: (data, variables) => {
+      data satisfies number;
+      variables.payload satisfies FormData;
     },
   },
 }).mutationOptions();
-// @ts-expect-error Multipart leaves have no query policy
 configureUtils(http.items.upload, {
-  query: {
-    policy: {},
-  },
+  // @ts-expect-error Multipart leaves have no query policy
+  query: {},
 });
-// @ts-expect-error Stream leaves have no mutation policy
 configureUtils(rpc.watch, {
-  mutation: {
-    policy: {},
-  },
+  // @ts-expect-error Stream leaves have no mutation policy
+  mutation: {},
 });
-// @ts-expect-error There is no metadata view on an RPC leaf
 configureUtils(rpc.read, {
-  metadata: {
-    policy: {},
-  },
+  // @ts-expect-error There is no metadata view on an RPC leaf
+  metadata: {},
 });
 declare const unresolvedLeaf: typeof rpc.read | typeof rpc.watch;
-// @ts-expect-error The chosen view must exist on every possible leaf
 configureUtils(unresolvedLeaf, {
-  query: {
-    policy: {},
-  },
+  // @ts-expect-error The chosen view must exist on every possible leaf
+  query: {},
 });
 // @ts-expect-error A view prefix also requires a view on every possible leaf
 viewPrefix(unresolvedLeaf, "live");
@@ -432,137 +398,97 @@ viewPrefix(rpc.read, "live");
 viewPrefix(rpc, "query");
 // @ts-expect-error Multipart leaves have no query view prefix
 viewPrefix(http.items.upload, "query");
-// @ts-expect-error Inputs belong to each builder invocation
+configureUtils(rpc.read, {
+  // @ts-expect-error Inputs belong to each builder invocation
+  query: { input },
+}).queryOptions;
+configureUtils(rpc.read, {
+  // @ts-expect-error A policy cannot replace the generated key
+  query: { queryKey: ["owned"] },
+}).queryOptions;
+configureUtils(rpc.read, {
+  // @ts-expect-error A policy cannot replace the generated function
+  query: { queryFn: () => Promise.resolve(1) },
+}).queryOptions;
+configureUtils(rpc.read, {
+  // @ts-expect-error QueryClient owns hashing
+  query: { queryKeyHashFn: () => "custom" },
+}).queryOptions;
 configureUtils(rpc.read, {
   query: {
-    policy: { input },
+    // @ts-expect-error Projection inference remains local
+    select: (value: number | null) => `${value}`,
   },
 }).queryOptions;
-// @ts-expect-error A policy cannot replace the generated key
 configureUtils(rpc.read, {
-  query: {
-    policy: { queryKey: ["owned"] },
-  },
+  // @ts-expect-error Initial data inference remains local
+  query: { initialData: 1 },
 }).queryOptions;
-// @ts-expect-error A policy cannot replace the generated function
 configureUtils(rpc.read, {
-  query: {
-    policy: { queryFn: () => Promise.resolve(1) },
-  },
+  // @ts-expect-error Placeholder data inference remains local
+  query: { placeholderData: 1 },
 }).queryOptions;
-// @ts-expect-error QueryClient owns hashing
 configureUtils(rpc.read, {
   query: {
-    policy: { queryKeyHashFn: () => "custom" },
-  },
-}).queryOptions;
-// @ts-expect-error Projection inference remains local
-configureUtils(rpc.read, {
-  query: {
-    policy: {
-      select: (value: number | null) => `${value}`,
-    },
-  },
-}).queryOptions;
-// @ts-expect-error Initial data inference remains local
-configureUtils(rpc.read, {
-  query: {
-    policy: { initialData: 1 },
-  },
-}).queryOptions;
-// @ts-expect-error Placeholder data inference remains local
-configureUtils(rpc.read, {
-  query: {
-    policy: { placeholderData: 1 },
-  },
-}).queryOptions;
-// @ts-expect-error RPC request options remain local
-configureUtils(rpc.read, {
-  query: {
-    policy: {
-      rpcOptions: { headers: { authorization: "token" } },
-    },
+    // @ts-expect-error RPC request options remain local
+    rpcOptions: { headers: { authorization: "token" } },
   },
 }).queryOptions;
 configureUtils(rpc.watch, {
-  streamed: {
-    policy: { maxChunks: 10 },
-  },
+  streamed: { maxChunks: 10 },
 }).streamedOptions({ input: { channel: "one" } });
 configureUtils(http.items.watch, {
-  live: {
-    policy: { sseOptions: { maxEventSize: 1024 } },
-  },
+  live: { sseOptions: { maxEventSize: 1024 } },
   streamed: {
-    policy: {
-      maxChunks: 10,
-      sseOptions: { maxEventSize: 1024, dispatchEmptyNamedEvents: true },
-    },
+    maxChunks: 10,
+    sseOptions: { maxEventSize: 1024, dispatchEmptyNamedEvents: true },
   },
 }).liveOptions;
-// @ts-expect-error SSE decoding options must match Sse.DecodeOptions
 configureUtils(http.items.watch, {
   live: {
-    policy: {
-      sseOptions: { maxEventSize: "1024" },
-    },
+    // @ts-expect-error SSE decoding options must match Sse.DecodeOptions
+    sseOptions: { maxEventSize: "1024" },
   },
 }).liveOptions;
-// @ts-expect-error Page setup remains local
 configureUtils(rpc.read, {
-  infinite: {
-    policy: { initialPageParam: 0 },
-  },
+  // @ts-expect-error Page setup remains local
+  infinite: { initialPageParam: 0 },
 }).infiniteOptions;
 configureUtils(rpc.read, {
   mutation: {
-    policy: {
-      // @ts-expect-error Shared callbacks cannot assume a call-site optimistic result
-      onSuccess: (_data, _variables, result) => result.previous,
-    },
+    // @ts-expect-error Shared callbacks cannot assume a call-site optimistic result
+    onSuccess: (_data, _variables, result) => result.previous,
   },
 }).mutationOptions;
-// @ts-expect-error Optimistic context inference remains local
 configureUtils(rpc.read, {
-  mutation: {
-    policy: { onMutate: () => ({ previous: 1 }) },
-  },
+  // @ts-expect-error Optimistic context inference remains local
+  mutation: { onMutate: () => ({ previous: 1 }) },
 }).mutationOptions;
-// @ts-expect-error A mutation policy cannot replace the generated key
 configureUtils(rpc.read, {
-  mutation: {
-    policy: { mutationKey: ["owned"] },
-  },
+  // @ts-expect-error A mutation policy cannot replace the generated key
+  mutation: { mutationKey: ["owned"] },
 }).mutationOptions;
-// @ts-expect-error Request-local adapter options are supplied to the bound builder
 configureUtils(rpc.read, {
-  mutation: {
-    policy: { rpcOptions: {} },
-  },
+  // @ts-expect-error Request-local adapter options are supplied to the bound builder
+  mutation: { rpcOptions: {} },
 }).mutationOptions;
-// @ts-expect-error A typed callback cannot change the leaf's mutation output
 configureUtils(rpc.read, {
-  mutation: {
-    policy: { onSuccess: (_data: string) => {} },
-  },
+  // @ts-expect-error A typed callback cannot change the leaf's mutation output
+  mutation: { onSuccess: (_data: string) => {} },
 }).mutationOptions;
-// @ts-expect-error A typed callback cannot change the leaf's query error
 configureUtils(rpc.read, {
   query: {
-    policy: {
-      retry: (
-        _count,
-        _error: {
-          different: true;
-        }
-      ) => false,
-    },
+    // @ts-expect-error A typed callback cannot change the leaf's query error
+    retry: (
+      _count,
+      _error: {
+        different: true;
+      }
+    ) => false,
   },
 }).queryOptions;
 const injected = { retry: false, queryHash: "custom" };
 configureUtils(rpc.read, {
-  query: {
-    // @ts-expect-error Exclusions also apply to stored policy objects
-    policy: injected,
-  },
+  // @ts-expect-error Exclusions also apply to stored policy objects
+  query: injected,
 }).queryOptions;

@@ -698,9 +698,7 @@ describe("query owners", () => {
                     },
                   ],
                 },
-                streamed: {
-                  policy: { maxChunks: 5 as const },
-                },
+                streamed: { maxChunks: 5 as const },
               };
 
               const configuredThenTracked = ownerA.trackUtils(

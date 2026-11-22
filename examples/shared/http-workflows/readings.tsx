@@ -45,7 +45,7 @@ export const ReadingsExample = ({
   const read = useMemo(
     () =>
       configureUtils(application.http.readings.read, {
-        query: { policy: { structuralSharing: shareReadings } },
+        query: { structuralSharing: shareReadings },
       }),
     [application]
   );

@@ -3,8 +3,10 @@ export { skipToken } from "@tanstack/query-core";
 
 /** Creates the public RPC utility tree. @api public */
 export { createRpcQueryUtils } from "./rpc/create-utils";
+export { defineRpcPolicy } from "./rpc/create-utils";
 /** Creates the public HTTP utility tree. @api public */
 export { createHttpApiQueryUtils } from "./http/create-utils";
+export { defineHttpApiPolicy } from "./http/create-utils";
 export { fetchStreamSnapshot } from "./core/stream-snapshot";
 export type { StreamSnapshotOptions } from "./core/stream-snapshot";
 export { viewPrefix } from "./core/view-prefix";
@@ -102,7 +104,7 @@ export type {
 /** The type of Query Core's exact skip sentinel. @api public */
 export type { SkipToken } from "@tanstack/query-core";
 
-export { configureUtils, defineUtilsPolicy } from "./core/configure-utils";
+export { configureUtils } from "./core/configure-utils";
 export type {
   ConfiguredUtils,
   UtilsConfiguration,

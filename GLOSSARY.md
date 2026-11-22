@@ -16,7 +16,7 @@ These terms describe how the package builds TanStack Query utilities from Effect
 
 **HTTP metadata view**: A buffered HTTP query view with decoded query data and an immutable snapshot of the response status and raw string headers. Declared decoded header wrappers remain part of the data. _Avoid_: Raw response, header-wrapped success
 
-**Policy map**: An application-owned tree, branch, or leaf configuration checked against a contract-derived utility type by `defineUtilsPolicy`. It feeds `configureUtils` without adding callbacks or runtime values to the shared Effect declaration. _Avoid_: Plugin registry, contract annotation
+**Policy map**: Application-owned defaults, interceptors, and mutation callbacks for generated utilities. A tree or branch can name descendants with a flat `paths` map. `defineRpcPolicy` and `defineHttpApiPolicy` check reusable maps against contracts before client acquisition. `configureUtils` applies the map. _Avoid_: Plugin registry, contract annotation
 
 ## Payloads and keys
 

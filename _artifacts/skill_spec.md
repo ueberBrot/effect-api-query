@@ -52,6 +52,8 @@ These checks verify the recommended APIs and observable behavior. A fresh isolat
 
 ## Coverage and batch history
 
+- **Flat policy maps, spec #210 ticket #214, base `272c099`:** The cache-workflows reference uses inline view options, relative `paths`, and contract-inferred policy constructors. The query-patterns reference points to `streamed.maxChunks`. The shipped examples also use the integration base’s unified key arguments and `runtime` option. The domain map keeps typed SSE settings and scope order in the existing task. The skill tree maps ADR 0049, which amends ADR 0032. The existing configuration tests and compiler fixtures exercise the revised guidance. Fresh consumer-agent evidence is pending.
+
 - **Five-round architecture review, base `8007f00`:** Align HTTP key encoding with declared parse options and keep owner caches independent. Update the HTTP and cache workflow references. Existing source mappings cover the narrower overload fixture, prepared inputs, stream recovery and publication, and the example retirement checks. Verify through the public compiler and runtime suites.
 
 - **Architecture review, base `b92b37b`:** Keep the existing skill and references. The cache workflow now describes copied SSE decoder defaults. Existing source mappings cover the shared query-prefix index, stream cleanup, and HTTP overload inference. Verify these through the public cache and compiler fixtures.

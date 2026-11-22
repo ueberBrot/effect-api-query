@@ -29,12 +29,10 @@ const DocumentEditor = ({
     () =>
       configureUtils(application.http.documents.write, {
         mutation: {
-          policy: {
-            onSuccess: async () => {
-              await application.queryClient.invalidateQueries({
-                queryKey: application.http.documents.read.key(),
-              });
-            },
+          onSuccess: async () => {
+            await application.queryClient.invalidateQueries({
+              queryKey: application.http.documents.read.key(),
+            });
           },
         },
       }),

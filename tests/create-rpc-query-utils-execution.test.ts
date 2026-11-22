@@ -39,7 +39,7 @@ describe("createRpcQueryUtils execution boundaries", () => {
       });
       const input = prepareInput(utils.users.get, { id: 7 });
       const configured = configureUtils(utils.users.get, {
-        query: { policy: { staleTime: 500 } },
+        query: { staleTime: 500 },
       });
       const raw = yield* Effect.promise(
         async () => await captureFailure(utils.health.ping.call())

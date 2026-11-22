@@ -52,15 +52,15 @@ declare const policy:
       readonly select: (value: number) => string;
     };
 // @ts-expect-error Every policy union member must keep observer selection local.
-configureUtils(rpc.read, { query: { policy } });
+configureUtils(rpc.read, { query: policy });
 
 declare const validPolicy:
   | { readonly staleTime: number }
   | { readonly retry: false };
-configureUtils(rpc.read, { query: { policy: validPolicy } });
+configureUtils(rpc.read, { query: validPolicy });
 
 const configured = configureUtils(rpc.read, {
-  mutation: { policy: { retry: false } },
+  mutation: { retry: false },
 });
 const replacementFn = { retry: false, mutationFn: async () => 1 };
 const replacementKey = { retry: false, mutationKey: ["replacement"] };

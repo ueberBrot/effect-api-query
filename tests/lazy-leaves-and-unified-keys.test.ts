@@ -371,16 +371,12 @@ describe("lazy-memoized frozen leaves", () => {
         const rpc = createRpcQueryUtils(rpcContract, { client: rpcClient });
 
         const configured = configureUtils(rpc, {
-          query: { policy: { staleTime: 5000 } },
-          streamed: { policy: { maxChunks: 20 } },
+          query: { staleTime: 5000 },
+          streamed: { maxChunks: 20 },
         });
         const sparseConfigured = configureUtils(rpc, {
-          scoped: {
-            users: {
-              scoped: {
-                get: { query: { policy: { staleTime: 1000 } } },
-              },
-            },
+          paths: {
+            "users.get": { query: { staleTime: 1000 } },
           },
         });
 
@@ -395,7 +391,7 @@ describe("lazy-memoized frozen leaves", () => {
         try {
           const tracked = owner1.trackUtils(configured);
           const configuredAfterTrack = configureUtils(tracked, {
-            query: { policy: { retry: false } },
+            query: { retry: false },
           });
 
           expect({

@@ -19,7 +19,7 @@ import {
 import {
   createHttpApiQueryUtils,
   configureUtils,
-  defineUtilsPolicy,
+  defineHttpApiPolicy,
   EffectHttpApiQueryError,
   type CreateHttpApiQueryUtilsOptions,
   type EffectHttpApiQueryConfigErrorCode,
@@ -2120,42 +2120,53 @@ getUser.infiniteOptions({
   queryKeyHashFn: JSON.stringify,
 });
 
-const httpPolicy = defineUtilsPolicy<
-  HttpApiQueryUtils<typeof api, typeof prefix>
->()({
-  scoped: {
-    "user.accounts": {
-      scoped: {
-        "get.user": {
-          metadata: {
-            interceptors: [
-              async ({ next }) => {
-                const result = await next();
-                result.data.id satisfies number;
-                result.status satisfies number;
-                // @ts-expect-error Metadata data retains its decoded shape.
-                result.data satisfies string;
-                return result;
-              },
-            ],
+const httpPolicy = defineHttpApiPolicy(
+  api,
+  {
+    paths: {
+      "user.accounts.get.user": {
+        query: {
+          enabled: (query) => query.queryKey[0] === "app",
+          refetchInterval: (query) => {
+            query.queryKey[0] satisfies "app";
+            return 500;
           },
-          mutation: {
-            policy: {
-              onSuccess: (data, variables) => {
-                data.id satisfies number;
-                variables.params.id satisfies number;
-                // @ts-expect-error Variables retain decoded request parts.
-                variables.id;
-              },
+        },
+        metadata: {
+          interceptors: [
+            async ({ next }) => {
+              const result = await next();
+              result.data.id satisfies number;
+              result.status satisfies number;
+              // @ts-expect-error Metadata data retains its decoded shape.
+              result.data satisfies string;
+              return result;
             },
+          ],
+        },
+        mutation: {
+          onSuccess: (data, variables) => {
+            data.id satisfies number;
+            variables.params.id satisfies number;
+            // @ts-expect-error Variables retain decoded request parts.
+            variables.id;
           },
         },
       },
     },
   },
-});
+  { keyPrefix: prefix }
+);
 configureUtils(utils, httpPolicy);
-// @ts-expect-error HTTP policy scopes use literal group identifiers.
-defineUtilsPolicy<typeof utils>()({ scoped: { users: {} } });
+defineHttpApiPolicy(
+  api,
+  {
+    paths: {
+      // @ts-expect-error HTTP policy scopes use literal group identifiers.
+      users: {},
+    },
+  },
+  { keyPrefix: prefix }
+);
 // @ts-expect-error A buffered HTTP leaf does not support a live view.
-defineUtilsPolicy<(typeof utils)["user.accounts"]["get.user"]>()({ live: {} });
+configureUtils(utils["user.accounts"]["get.user"], { live: {} });

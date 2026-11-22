@@ -49,8 +49,8 @@ it.effect(
         keyPrefix: ["sharing"],
       });
       const rpc = configureUtils(base, {
-        scoped: {
-          read: { query: { policy: { structuralSharing: shareSnapshot } } },
+        paths: {
+          read: { query: { structuralSharing: shareSnapshot } },
         },
       });
       const queryClient = new QueryClient();
@@ -124,7 +124,7 @@ it.effect("leaves sharing opt-in and honors a local native override", () =>
       keyPrefix: ["sharing-defaults"],
     });
     const configured = configureUtils(rpc.read, {
-      query: { policy: { structuralSharing: shareSnapshot } },
+      query: { structuralSharing: shareSnapshot },
     });
     const queryClient = new QueryClient();
     try {

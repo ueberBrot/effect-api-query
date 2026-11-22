@@ -1,6 +1,7 @@
 import { HttpApi } from "effect/http-api";
 import type { HttpApiClient } from "effect/http-api";
 
+import type { CheckedConfiguration } from "../core/configure-utils";
 import type { KeyPrefix, OptionalKeyPrefix, RuntimeInput } from "../core/types";
 import { createUtilityTree } from "../core/utility-tree";
 import { compileHttpOperations } from "./operation";
@@ -58,4 +59,34 @@ export function createHttpApiQueryUtils(
     runtime: options.runtime as RuntimeInput<unknown> | undefined,
     errors,
   });
+}
+
+/** Checks a reusable policy map against an HTTP API without acquiring a client. */
+export function defineHttpApiPolicy<
+  const Api extends HttpApi.Constraint,
+  const Configuration extends object,
+>(
+  api: Api,
+  configuration: CheckedConfiguration<HttpApiQueryUtils<Api>, Configuration>
+): Configuration;
+
+export function defineHttpApiPolicy<
+  const Api extends HttpApi.Constraint,
+  const Prefix extends KeyPrefix,
+  const Configuration extends object,
+>(
+  api: Api,
+  configuration: CheckedConfiguration<
+    HttpApiQueryUtils<Api, Prefix>,
+    Configuration
+  >,
+  options: { readonly keyPrefix: Prefix }
+): Configuration;
+
+export function defineHttpApiPolicy<const Configuration extends object>(
+  _api: HttpApi.Constraint,
+  configuration: Configuration,
+  _options?: { readonly keyPrefix: KeyPrefix }
+): Configuration {
+  return configuration;
 }
