@@ -2,6 +2,7 @@ import { QueryClient, QueryObserver, skipToken } from "@tanstack/query-core";
 import {
   configureUtils,
   createHttpApiQueryUtils,
+  defineUtilsPolicy,
   type CreateHttpApiQueryUtilsOptions,
   type EffectHttpApiQueryConfigError,
   type EffectHttpApiQueryEmptyStreamError,
@@ -238,6 +239,40 @@ http.records.watch.streamedKey(input, ssePolicy);
 http.records.watch.liveOptions({ input, sseOptions: {} });
 // @ts-expect-error NDJSON has no SSE decoder controls on inputless views.
 http.wrapped.liveKey({ sseOptions: {} });
+// @ts-expect-error NDJSON streamed policy rejects SSE decoder controls.
+configureUtils(http.records.watch, {
+  streamed: {
+    policy: {
+      maxChunks: 2,
+      sseOptions: { maxEventSize: 100 },
+    },
+  },
+});
+// @ts-expect-error NDJSON live policy rejects SSE decoder controls.
+configureUtils(http.records.watch, {
+  live: { policy: { sseOptions: { maxEventSize: 100 } } },
+});
+// @ts-expect-error NDJSON policy assembly rejects SSE decoder controls in scoped maps.
+defineUtilsPolicy<typeof http>()({
+  scoped: {
+    records: {
+      scoped: {
+        watch: {
+          streamed: {
+            policy: {
+              maxChunks: 2,
+              sseOptions: { maxEventSize: 100 },
+            },
+          },
+        },
+      },
+    },
+  },
+});
+// @ts-expect-error Inputless NDJSON policy assembly rejects SSE decoder controls.
+defineUtilsPolicy<typeof http.wrapped>()({
+  live: { policy: { sseOptions: {} } },
+});
 const perCallLimit = {
   input,
   maxChunks: 2,

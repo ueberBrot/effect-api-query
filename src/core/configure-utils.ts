@@ -35,16 +35,25 @@ export interface UtilityNode {
   readonly key: () => QueryKey;
 }
 
+export type StreamKeyPolicy<Leaf, View extends "streamed" | "live"> =
+  Leaf extends Record<`${View}Key`, (...args: infer Args) => unknown>
+    ? Required<Args> extends readonly [unknown, infer Policy]
+      ? Partial<NonNullable<Policy>>
+      : Required<Args> extends readonly [infer Policy]
+        ? Partial<NonNullable<Policy>>
+        : View extends "streamed"
+          ? Partial<StreamedPolicyOptions>
+          : LivePolicyOptions
+    : View extends "streamed"
+      ? Partial<StreamedPolicyOptions>
+      : LivePolicyOptions;
+
 export interface QueryConfiguration<
   Leaf,
   View extends SupportedQueryView<Leaf>,
 > {
   readonly policy?: QueryPolicy<Leaf, View> &
-    (View extends "streamed"
-      ? Partial<StreamedPolicyOptions>
-      : View extends "live"
-        ? LivePolicyOptions
-        : unknown);
+    (View extends "streamed" | "live" ? StreamKeyPolicy<Leaf, View> : unknown);
   readonly interceptors?: readonly QueryInterceptor<Leaf, View>[];
 }
 
@@ -300,6 +309,14 @@ const views: readonly QueryView[] = [
   "streamed",
 ];
 const configurationViews = [...views, "mutation"] as const;
+const streamKeyPolicyOptions: ReadonlySet<string> = new Set([
+  "maxChunks",
+  "refetchMode",
+  "publicationBatchSize",
+  "publicationMaxWaitMs",
+  "coalesceMs",
+  "sseOptions",
+]);
 
 const snapshotConfiguration = (
   configuration: RuntimeConfiguration | undefined
@@ -394,14 +411,7 @@ const configureLeaf = (
       const buildKey = streamedKey as RuntimeBuilder;
       const history = Object.fromEntries(
         Object.entries(policy).filter(([option]) =>
-          [
-            "maxChunks",
-            "refetchMode",
-            "publicationBatchSize",
-            "publicationMaxWaitMs",
-            "coalesceMs",
-            "sseOptions",
-          ].includes(option)
+          streamKeyPolicyOptions.has(option)
         )
       );
       configured[view === "live" ? "liveKey" : "streamedKey"] =
