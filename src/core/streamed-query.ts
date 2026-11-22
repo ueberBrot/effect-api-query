@@ -189,7 +189,7 @@ const streamQueryIterable = <A>(
         }
         if (result.done === true) {
           detach();
-          if (!emitted && emptyError !== undefined) {
+          if (!emitted && !signal.aborted && emptyError !== undefined) {
             throw emptyError();
           }
         }

@@ -2,14 +2,8 @@ import { CancelledError, QueryClient } from "@tanstack/query-core";
 import type { QueryClientConfig } from "@tanstack/query-core";
 import { Cause, Exit } from "effect";
 
-import {
-  isEffectHttpApiQueryError,
-  EffectHttpApiQueryEmptyStreamError,
-} from "../http/errors";
-import {
-  isEffectRpcQueryError,
-  EffectRpcQueryEmptyStreamError,
-} from "../rpc/errors";
+import { isEffectHttpApiQueryError } from "../http/errors";
+import { isEffectRpcQueryError } from "../rpc/errors";
 import type { RunPromiseExit } from "./types";
 
 /** Registers only resources whose lifetime is explicitly transferred to the owner. */
@@ -99,9 +93,7 @@ export const acquireQueryOwner = async <A>(
           (error instanceof CancelledError ||
             ((isEffectRpcQueryError(error) ||
               isEffectHttpApiQueryError(error)) &&
-              Cause.hasInterruptsOnly(error.cause)) ||
-            error instanceof EffectRpcQueryEmptyStreamError ||
-            error instanceof EffectHttpApiQueryEmptyStreamError)
+              Cause.hasInterruptsOnly(error.cause)))
         ) {
           cancelled.add(result);
         }
