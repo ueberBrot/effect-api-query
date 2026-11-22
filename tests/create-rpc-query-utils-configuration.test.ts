@@ -158,6 +158,7 @@ describe("createRpcQueryUtils configuration", () => {
     "namespace.queryKey",
     "namespace.mutationKey",
     "namespace.queryOptions",
+    "namespace.queryFilter",
     "namespace.streamedKey",
     "namespace.streamedOptions",
     "namespace.mutationOptions",

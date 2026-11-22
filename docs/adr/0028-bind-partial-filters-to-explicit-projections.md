@@ -1,6 +1,6 @@
 # Bind partial filters to explicit input projections
 
-Status: Accepted. Extends [ADR 0008](0008-use-flat-prefix-matchable-key-tuples.md).
+Status: Accepted. Extends [ADR 0008](0008-use-flat-prefix-matchable-key-tuples.md). Extended by [ADR 0051](0051-colocate-query-filters-on-utility-trees.md), which retains the explicit projection and colocates whole-view filters.
 
 Bind a supported leaf view to native query filters with an explicit typed projection for partial canonical payload fields. Running the full input constructor would add defaults and overconstrain the match. Inverting arbitrary custom key encoders is not reliable. The caller therefore selects and encodes the fields to match.
 

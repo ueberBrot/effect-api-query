@@ -12,7 +12,6 @@ This example uses the [directory contract](/effect-api-query/guides/query-effect
 ```ts
 import {
   acquireQueryOwner,
-  createQueryFilter,
   createRpcQueryUtils,
   queryEffects,
   recoverStream,
@@ -61,11 +60,9 @@ export const acquireDirectoryEvents = async (
     return { connection, rpc };
   });
   const { connection, rpc } = owner.resources;
-  const reads = createQueryFilter(rpc.users.read, "query");
-  const invalidate = queryEffects.invalidate({
-    ...reads(),
-    refetchType: "none",
-  });
+  const invalidate = queryEffects.invalidate(
+    rpc.users.read.queryFilter({ view: "query", refetchType: "none" })
+  );
   const source = recoverStream({
     initialCursor: "0",
     // This application's protocol uses decimal positions, represented as strings.

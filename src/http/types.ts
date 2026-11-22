@@ -10,6 +10,7 @@ import type {
 } from "effect/http-api";
 
 import type { PreparedInput } from "../core/prepared-input";
+import type { BranchQueryFilter, LeafQueryFilter } from "../core/query-filter";
 import type {
   ContainsRedacted,
   InfiniteQueryBuilder,
@@ -444,6 +445,12 @@ export type BufferedLeaf<
   ([Queryable<Endpoint>] extends [never]
     ? unknown
     : {
+        /** Builds native filters for this buffered HTTP endpoint. */
+        readonly queryFilter: LeafQueryFilter<
+          Request<Endpoint>,
+          HasRequest<Endpoint> extends false ? true : false,
+          "query" | "infinite" | "metadata"
+        >;
         readonly queryKey: KeyBuilder<
           Request<Endpoint>,
           ConcreteKey<Endpoint, Key, ClientError>,
@@ -518,6 +525,17 @@ export type StreamedLeaf<
   ClientError,
 > = {
   readonly key: () => Key;
+
+  /** Builds native filters for this streaming HTTP endpoint. */
+  readonly queryFilter: LeafQueryFilter<
+    Request<Endpoint>,
+    HasRequest<Endpoint> extends false ? true : false,
+    "live" | "streamed",
+    {
+      readonly live: HttpDecoderPolicy<Endpoint> & LivePolicyOptions;
+      readonly streamed: Partial<HttpStreamPolicy<Endpoint>>;
+    }
+  >;
 
   readonly streamedKey: HasRequest<Endpoint> extends false
     ? (
@@ -637,6 +655,8 @@ export type GroupTree<
 > = {
   readonly [utilityPaths]?: HttpGroupPaths<Group>;
   readonly key: () => readonly [...RootKey, Group["identifier"]];
+  /** Builds native filters for descendant queries. */
+  readonly queryFilter: BranchQueryFilter;
 } & {
   readonly [
     Endpoint in Supported<Endpoints<Group>> as Endpoint["identifier"]
@@ -658,6 +678,8 @@ export type HttpApiQueryUtils<
   readonly [httpQueryClient]?: Client;
   readonly [utilityPaths]?: HttpApiPaths<Api>;
   readonly key: () => Root<Api, Prefix>;
+  /** Builds native filters for descendant queries. */
+  readonly queryFilter: BranchQueryFilter;
 } & {
   readonly [
     Group in Extract<

@@ -149,12 +149,20 @@ const http = createHttpApiQueryUtils(api, {
   runtime: runPromiseExit,
 });
 true satisfies Assert<
-  Equal<Extract<keyof typeof http.records, string>, "key" | "watch">
+  Equal<
+    Extract<keyof typeof http.records, string>,
+    "key" | "queryFilter" | "watch"
+  >
 >;
 true satisfies Assert<
   Equal<
     keyof typeof http.records.watch,
-    "key" | "streamedKey" | "streamedOptions" | "liveKey" | "liveOptions"
+    | "key"
+    | "queryFilter"
+    | "streamedKey"
+    | "streamedOptions"
+    | "liveKey"
+    | "liveOptions"
   >
 >;
 input satisfies InferInput<typeof http.records.watch>;

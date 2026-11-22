@@ -1,7 +1,4 @@
-import {
-  configureUtils,
-  createBranchQueryFilter,
-} from "@ueberbrot/effect-api-query";
+import { configureUtils } from "@ueberbrot/effect-api-query";
 
 import type { DashboardClient, DashboardRpc } from "./fixture";
 
@@ -23,9 +20,7 @@ export const dashboard = (
     },
   }),
   refresh: async () => {
-    await client.invalidateQueries(
-      createBranchQueryFilter(rpc.users, "query")()
-    );
+    await client.invalidateQueries(rpc.users.queryFilter({ view: "query" }));
   },
   watch: rpc.users.watch.streamedOptions({
     maxChunks: "unbounded",

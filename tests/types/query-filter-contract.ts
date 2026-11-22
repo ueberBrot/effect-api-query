@@ -19,15 +19,15 @@ byId(1, {
   stale: true,
   predicate: (query) => query.state.status === "success",
 });
-createQueryFilter(rpc.watch, "streamed")({ fetchStatus: "fetching" });
+rpc.watch.queryFilter({ view: "streamed", fetchStatus: "fetching" });
 // @ts-expect-error The projection determines the filter input.
 byId("1");
 // @ts-expect-error Generated filters retain their own key identity.
 byId(1, { queryKey: ["other"] });
 // @ts-expect-error Unary leaves have no live representation.
-createQueryFilter(rpc.read, "live");
+createQueryFilter(rpc.read, "live", () => null);
 // @ts-expect-error Streaming leaves have no ordinary query view.
-createQueryFilter(rpc.watch, "query");
+createQueryFilter(rpc.watch, "query", () => null);
 // @ts-expect-error Projections must return strict JSON types.
 createQueryFilter(rpc.read, "query", (id: number) => ({ id: BigInt(id) }));
 
@@ -41,4 +41,37 @@ const filter = contextual({ id: 1 });
 filter.queryKey satisfies QueryKey;
 const cache = new QueryCache();
 cache.find({ ...filter, exact: false });
-cache.find(createQueryFilter(rpc.read, "query")());
+cache.find(rpc.read.queryFilter({ view: "query", input: { id: 1 } }));
+cache.find(rpc.read.queryFilter());
+cache.find(rpc.queryFilter({ view: "metadata" }));
+
+type AcceptsFilter<Builder, Options> = Builder extends (
+  options: infer Argument
+) => unknown
+  ? Options extends Argument
+    ? true
+    : false
+  : false;
+
+false satisfies AcceptsFilter<
+  typeof rpc.read.queryFilter,
+  { input: { id: 1 } }
+>;
+false satisfies AcceptsFilter<
+  typeof rpc.read.queryFilter,
+  { view: "streamed" }
+>;
+false satisfies AcceptsFilter<
+  typeof rpc.queryFilter,
+  { view: "query"; input: { id: 1 } }
+>;
+false satisfies AcceptsFilter<
+  typeof rpc.watch.queryFilter,
+  { view: "live"; input: undefined }
+>;
+false satisfies 2 extends Parameters<typeof createQueryFilter>["length"]
+  ? true
+  : false;
+false satisfies "createBranchQueryFilter" extends keyof typeof import("@ueberbrot/effect-api-query")
+  ? true
+  : false;

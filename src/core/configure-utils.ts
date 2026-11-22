@@ -114,8 +114,10 @@ export type InheritedMethods = {
   ]: (...args: never[]) => unknown;
 };
 
-// Generated branches contain only their key builder and named children.
-export type ChildNames<Node> = Exclude<Extract<keyof Node, string>, "key">;
+export type ChildNames<Node> = Exclude<
+  Extract<keyof Node, string>,
+  "key" | "queryFilter"
+>;
 
 export type Children<Node> = [ChildNames<Node>] extends [never]
   ? never
@@ -573,7 +575,7 @@ const configureNode = (
     configurations.length === 0
       ? scopedChildren
       : Object.keys(node).flatMap((name) => {
-          if (name === "key") {
+          if (name === "key" || name === "queryFilter") {
             return [];
           }
           const entry = readChildEntry(node, name);

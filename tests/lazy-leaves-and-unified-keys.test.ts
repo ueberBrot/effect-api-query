@@ -434,9 +434,24 @@ describe("lazy-memoized frozen leaves", () => {
             "Utility node is already tracked by another query owner"
           );
 
+          const cachedRead = ["rpc", "users", "get", "query", { id: 9 }];
+          owner1.queryClient.setQueryData(cachedRead, "user-9");
+          const filteredTracked = owner1.queryClient.getQueriesData(
+            tracked.queryFilter({ view: "query" })
+          );
+          const filteredConfigured = owner1.queryClient.getQueriesData(
+            configuredAfterTrack.users.queryFilter({ view: "query" })
+          );
+
           const firstTrackedLeaf = tracked.users.get;
           const prepared = prepareInput(firstTrackedLeaf, { id: 9 });
           expect({
+            filteredTracked,
+            filteredConfigured,
+            filteredLeaf: configuredAfterTrack.users.get.queryFilter({
+              view: "query",
+              input: prepared,
+            }).queryKey,
             rawMatchesTracked: rpc.users.get.queryKey({ input: prepared }),
             configuredMatchesTracked: configured.users.get.queryKey({
               input: prepared,
@@ -449,6 +464,9 @@ describe("lazy-memoized frozen leaves", () => {
             trackedLeafMemoized: firstTrackedLeaf === tracked.users.get,
             trackedLeafFrozen: Object.isFrozen(firstTrackedLeaf),
           }).toStrictEqual({
+            filteredTracked: [[cachedRead, "user-9"]],
+            filteredConfigured: [[cachedRead, "user-9"]],
+            filteredLeaf: cachedRead,
             rawMatchesTracked: tracked.users.get.queryKey({ input: prepared }),
             configuredMatchesTracked: tracked.users.get.queryKey({
               input: prepared,

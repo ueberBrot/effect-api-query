@@ -127,7 +127,7 @@ export function eventOptions(
       input,
       ...policy,
     }),
-    historyKey: rpc.events.watch.streamedKey(input, policy),
+    historyKey: rpc.events.watch.streamedKey({ input, ...policy }),
     latest: rpc.events.watch.liveOptions({ input }),
   };
 }
@@ -137,7 +137,7 @@ Use either set of options with an ordinary hook or observer. History and latest 
 
 For accumulated history, set `maxChunks` to a positive safe integer or `"unbounded"`. Set it directly for each key and options builder, or configure `streamed.policy`. Different retention bounds and refetch modes use distinct entries. Unbounded retention with reset keeps the original unlimited-history key.
 
-Reuse the options' `queryKey` or call `streamedKey(input, policy)`. For an inputless operation, use `streamedKey(policy)`. Include SSE decoder options for HTTP SSE. NDJSON uses its declaration's decoder limits.
+Reuse the options' `queryKey` or call `streamedKey({ input, ...policy })`. For an inputless operation, use `streamedKey(policy)`. Include SSE decoder options for HTTP SSE. NDJSON uses its declaration's decoder limits.
 
 Choose a refetch mode for accumulated history.
 
@@ -149,7 +149,7 @@ Set `publicationBatchSize` to a positive safe integer. The first event publishes
 
 Use `coalesceMs` only when each live emission is complete state. Use a whole number from 1 to 2,147,483,647 milliseconds. Each fetch publishes the first value immediately. The next value starts a fixed timer and subsequent values replace the pending snapshot. Completion or failure flushes it. Cancellation drops it and clears the timer. Scheduling can delay publication.
 
-Pass matching policy to `liveKey(input, { coalesceMs })` or `liveKey({ coalesceMs })` if inputless. Set `live.policy` to share this across keys and options. Omit the local value to inherit it. Pass `coalesceMs: undefined` to clear it. Explicit deadlines change the key. Pass the same local `sseOptions` for keys and options.
+Pass matching policy to `liveKey({ input, coalesceMs })` or `liveKey({ coalesceMs })` if inputless. Set `live.policy` to share this across keys and options. Omit the local value to inherit it. Pass `coalesceMs: undefined` to clear it. Explicit deadlines change the key. Pass the same local `sseOptions` for keys and options.
 
 An empty unseeded accumulated stream resolves to `[]`. An empty append keeps existing history. Empty reset and replace finish with `[]`. A live stream that completes before its first value raises the adapter's empty-stream error. Aborting before the first value follows native cancellation.
 

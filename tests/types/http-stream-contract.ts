@@ -164,18 +164,26 @@ const utils = createHttpApiQueryUtils(api, {
   runtime: runPromiseExit,
 });
 true satisfies Assert<
-  Equal<Extract<keyof typeof utils, string>, "key" | "views" | "events">
+  Equal<
+    Extract<keyof typeof utils, string>,
+    "key" | "queryFilter" | "views" | "events"
+  >
 >;
 true satisfies Assert<
   Equal<
     Extract<keyof typeof utils.views, string>,
-    "key" | "plain" | "wrapped" | "ndjson" | "wrappedNdjson"
+    "key" | "queryFilter" | "plain" | "wrapped" | "ndjson" | "wrappedNdjson"
   >
 >;
 true satisfies Assert<
   Equal<
     keyof typeof utils.views.plain,
-    "key" | "streamedKey" | "streamedOptions" | "liveKey" | "liveOptions"
+    | "key"
+    | "queryFilter"
+    | "streamedKey"
+    | "streamedOptions"
+    | "liveKey"
+    | "liveOptions"
   >
 >;
 const queryClient = new QueryClient();

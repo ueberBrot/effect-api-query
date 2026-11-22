@@ -51,7 +51,7 @@ type OperationName =
   `read-${(typeof indexes)[number]}-${0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}`;
 true satisfies Assert<
   Equal<
-    Exclude<Extract<keyof typeof utils.scale, string>, "key">,
+    Exclude<Extract<keyof typeof utils.scale, string>, "key" | "queryFilter">,
     OperationName
   >
 >;

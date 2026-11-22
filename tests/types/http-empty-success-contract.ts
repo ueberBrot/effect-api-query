@@ -39,6 +39,7 @@ const explicit = http.responses.explicit;
 
 type BufferedBuilder =
   | "key"
+  | "queryFilter"
   | "queryKey"
   | "queryOptions"
   | "metadataKey"

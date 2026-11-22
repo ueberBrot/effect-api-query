@@ -45,7 +45,7 @@ try {
   const http = createHttpApiQueryUtils(users, {
     client,
     keyPrefix: ["users-app"],
-    runPromiseExit: runtime.runPromiseExit,
+    runtime,
   });
   await queryClient.query(
     http.users.get.queryOptions({
@@ -61,7 +61,7 @@ try {
     queryClient,
     http.users.rename.mutationOptions({
       onSuccess: async () => {
-        await queryClient.invalidateQueries({ queryKey: http.users.key() });
+        await queryClient.invalidateQueries(http.users.queryFilter());
       },
     })
   );
@@ -69,8 +69,7 @@ try {
   const upload = new MutationObserver(
     queryClient,
     http.users.upload.mutationOptions({
-      onSuccess: () =>
-        queryClient.invalidateQueries({ queryKey: http.users.key() }),
+      onSuccess: () => queryClient.invalidateQueries(http.users.queryFilter()),
     })
   );
   const payload = new FormData();
@@ -157,7 +156,7 @@ export function httpEventOptions(
   };
   return {
     history: http.events.watch.streamedOptions({ input, ...policy }),
-    historyKey: http.events.watch.streamedKey(input, policy),
+    historyKey: http.events.watch.streamedKey({ input, ...policy }),
     latest: http.events.watch.liveOptions({
       input,
       sseOptions: policy.sseOptions,

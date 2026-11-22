@@ -12,7 +12,6 @@ This module takes a ready RPC client and the app's QueryClient. It loads a user 
 ```ts
 import type { QueryClient } from "@tanstack/query-core";
 import {
-  createQueryFilter,
   createRpcQueryUtils,
   queryEffects,
   QueryClientService,
@@ -38,7 +37,6 @@ export const directoryEffects = (
     client,
     keyPrefix: ["directory"],
   });
-  const allUsers = createQueryFilter(rpc.users.read, "query");
   const renameFromEvent = Effect.fn("Directory.renameFromEvent")(
     function* renameFromEvent(id: number, name: string) {
       const options = rpc.users.read.queryOptions({
@@ -49,7 +47,9 @@ export const directoryEffects = (
       const user = yield* queryEffects.ensure(options);
       yield* queryEffects.setData(options.queryKey, { ...user, name });
       // Domain policy: mark all directory reads stale without starting refetches.
-      yield* queryEffects.invalidate({ ...allUsers(), refetchType: "none" });
+      yield* queryEffects.invalidate(
+        rpc.users.read.queryFilter({ view: "query", refetchType: "none" })
+      );
       return yield* queryEffects.getData(options.queryKey);
     },
     Effect.provideService(QueryClientService, queryClient)

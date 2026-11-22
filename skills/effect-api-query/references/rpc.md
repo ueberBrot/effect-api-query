@@ -41,14 +41,14 @@ try {
   await queryClient.query(
     rpc.users.get.queryOptions({ input, staleTime: 30_000 })
   );
-  const cached = queryClient.getQueryData(rpc.users.get.queryKey(input));
+  const cached = queryClient.getQueryData(rpc.users.get.queryKey({ input }));
   console.log(cached?.name);
 
   const rename = new MutationObserver(
     queryClient,
     rpc.users.rename.mutationOptions({
       onSuccess: async () => {
-        await queryClient.invalidateQueries({ queryKey: rpc.users.key() });
+        await queryClient.invalidateQueries(rpc.users.queryFilter());
       },
     })
   );

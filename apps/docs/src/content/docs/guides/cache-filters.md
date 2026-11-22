@@ -3,18 +3,18 @@ title: Cache Keys and Filters
 description: Read typed entries and target native cache operations with generated prefixes and exact keys.
 ---
 
-Use a concrete generated key to read or write one typed cache entry. Use a root, branch, leaf, or view prefix to target multiple entries for invalidation or cancellation. Import `viewPrefix` from `@ueberbrot/effect-api-query` if you need one view. Add native conditions such as `stale` to narrow the match.
+Use a concrete generated key to read or write one typed cache entry. Pass a generated `.queryFilter()` to cache operations such as `invalidateQueries` and `cancelQueries`. Add native conditions such as `stale` to narrow the match.
 
-| Scope | Key | Matches |
+| Scope | Filter | Matches |
 | --- | --- | --- |
-| Root | `rpc.key()` or `http.key()` | All cached query views in that utility tree |
-| Branch | `rpc.users.key()` | Every descendant leaf and query view |
-| Leaf | `rpc.users.get.key()` | Ordinary and infinite queries, plus metadata views for HTTP leaves |
-| Operation | `viewPrefix(rpc.users.get, 'query')` | Ordinary queries for that leaf |
-| Encoded partial input | Operation prefix followed by an encoded partial object | Entries containing those encoded fields |
-| Exact entry | Generated concrete key with `exact: true` | One complete cache identity, including its stream policy |
+| Root | `rpc.queryFilter()` or `http.queryFilter()` | All query views in that utility tree |
+| Branch | `rpc.users.queryFilter()` | Every descendant query view |
+| Leaf | `rpc.users.get.queryFilter()` | Every query view of one leaf |
+| View | `rpc.users.get.queryFilter({ view: "query" })` | All inputs of one leaf's query view |
+| Input | `rpc.users.get.queryFilter({ view: "query", input: { id: 1 } })` | Queries with that canonical input |
+| Exact entry | `{ queryKey, exact: true }` with a concrete key | One complete cache identity, including its stream policy |
 
-The leaf prefix matches all its query views. Use `viewPrefix(leaf, 'streamed')` for accumulated history, `'live'` for the latest value, `'metadata'` for HTTP metadata, or `'infinite'` for pages. Mutation keys belong to a separate cache.
+Select `streamed` for accumulated history, `live` for the latest value, `metadata` for HTTP metadata, or `infinite` for pages. Mutation keys belong to a separate cache. Multipart HTTP leaves provide mutation builders only.
 
 ## Choose the cache operation
 
@@ -40,7 +40,7 @@ const payload = {
 Use the factory setup from the [RPC quick start](/effect-api-query/getting-started/quick-start/) to build `rpc`. Select every locale for user 1 with an encoded partial filter.
 
 ```ts
-const queryPrefix = viewPrefix(rpc.users.get, "query");
+const queryPrefix = rpc.users.get.queryFilter({ view: "query" }).queryKey;
 await queryClient.invalidateQueries({
   queryKey: [...queryPrefix, { id: "1" }],
   type: "inactive",
@@ -51,16 +51,30 @@ await queryClient.invalidateQueries({
 To match one request, keep its generated key and pass `exact: true`.
 
 ```ts
-const queryKey = rpc.users.get.queryKey({ id: 1, locale: "en" });
+const queryKey = rpc.users.get.queryKey({ input: { id: 1, locale: "en" } });
 const user = queryClient.getQueryData(queryKey);
 await queryClient.invalidateQueries({ queryKey, exact: true });
 ```
 
 Partial filters compare the encoded values stored in keys. Here `FiniteFromString` turns numeric input `1` into `"1"`, so filter by `id: "1"`. Omit `locale` to match every locale, or pass `locale: "en"` to match only English. Objects match recursively, arrays match by position, and strings must match in full.
 
-Use the key builder for complete input. `queryKey({ id: 1 })` fills in the default locale. The builder rejects `{ locale: "en" }` because it lacks an ID. Use a partial filter to match across defaulted fields.
+Use the key builder for complete input. `queryKey({ input: { id: 1 } })` fills in the default locale. The builder rejects `{ input: { locale: "en" } }` because the input lacks an ID. Use a partial filter to match across defaulted fields.
 
-`[...viewPrefix(rpc.users.watch, 'streamed'), { id: '1' }]` matches every history policy for user 1. For one history, use `rpc.users.watch.streamedKey({ id: 1 }, { maxChunks: 2, refetchMode: 'append' })` with `exact: true`. Unbounded retention with reset keeps the unlimited-history key. Let the builder produce the stream suffix.
+Pass a full input or a `PreparedInput` with the view to use the leaf's key encoding. A stream filter matches every stream policy for that input.
+
+```ts
+const input = { id: 1, locale: "en" };
+await queryClient.cancelQueries(
+  rpc.users.watch.queryFilter({ view: "streamed", input })
+);
+
+const queryKey = rpc.users.watch.streamedKey({
+  input,
+  maxChunks: 2,
+  refetchMode: "append",
+});
+await queryClient.cancelQueries({ queryKey, exact: true });
+```
 
 ## Reuse a typed partial filter
 
@@ -75,7 +89,7 @@ await queryClient.invalidateQueries(userQueries(1, { type: "inactive" }));
 
 By default, the projection receives the leaf's full input type. Annotate its parameter to take a scalar or partial input. The example matches user 1 without supplying a locale. If the leaf uses a custom encoder, match that encoder's output. HTTP filters use the request labels and header names stored in the key.
 
-To match the whole view, omit the projection. `createQueryFilter(rpc.users.get, 'query')` accepts native filter options. The builder copies and freezes its projected JSON. Invalid JSON or a failed projection throws before cache access. `exact: true` still requires a complete key. Bulk reads keep TanStack's heterogeneous result type.
+Use `rpc.users.get.queryFilter({ view: "query" })` to match the whole view. The projection builder copies and freezes its projected JSON. Invalid JSON or a failed projection throws before cache access. `exact: true` still requires a complete key. Bulk reads keep TanStack's heterogeneous result type.
 
 ## Filter HTTP queries
 
@@ -84,7 +98,7 @@ This example uses a contract with `id: Schema.FiniteFromString` in `params`, `qu
 Build `http` using the [HTTP quick start](/effect-api-query/getting-started/http-quick-start/). Use request labels to select a path parameter or header independently.
 
 ```ts
-const queryPrefix = viewPrefix(http.users.get, "query");
+const queryPrefix = http.users.get.queryFilter({ view: "query" }).queryKey;
 await queryClient.invalidateQueries({
   queryKey: [...queryPrefix, { params: { id: "1" } }],
 });
@@ -97,15 +111,17 @@ For an exact read, pass the full decoded request to the builder.
 
 ```ts
 const key = http.users.get.queryKey({
-  params: { id: 1 },
-  query: { id: 7 },
-  headers: { "X-Locale": "en" },
-  payload: { id: 7 },
+  input: {
+    params: { id: 1 },
+    query: { id: 7 },
+    headers: { "X-Locale": "en" },
+    payload: { id: 7 },
+  },
 });
 const user = queryClient.getQueryData(key);
 ```
 
-The leaf prefix also includes metadata and infinite views. For every history policy of a `users.watch` request, use `[...viewPrefix(http.users.watch, 'streamed'), { query: { id: '1' } }]`.
+The leaf prefix also includes metadata and infinite views. To match all history policies for one request, use `http.users.watch.queryFilter({ view: "streamed", input: { query: { id: 1 } } })`.
 
 Default HTTP keys encode each request part, omit encoded `undefined` members, and lowercase headers. Use `params: { id: "1" }` to match the encoded number, and `headers: { 'x-locale': 'en' }` to match the header. Keep the labels in the filter. `{ query: { id: "7" } }` and `{ payload: { id: "7" } }` match different inputs. Unlabeled `{ id: "7" }` matches neither.
 
@@ -119,13 +135,10 @@ Concrete keys carry a DataTag, which gives `getQueryData` and `setQueryData` the
 
 ## Select a view across a branch
 
-To invalidate ordinary reads while leaving live streams open, bind a branch filter.
+To invalidate ordinary reads and leave live streams open, select the `query` view on a branch.
 
 ```ts
-import { createBranchQueryFilter } from "@ueberbrot/effect-api-query";
-
-const userReads = createBranchQueryFilter(rpc.users, "query");
-await queryClient.invalidateQueries(userReads());
+await queryClient.invalidateQueries(rpc.users.queryFilter({ view: "query" }));
 ```
 
-Select `query`, `infinite`, `metadata`, `streamed`, or `live` on a generated root, branch, or leaf. The helper indexes supported descendants once. If the view is absent, the filter matches nothing. Your `predicate` and other native conditions further narrow matches. Use the result for filtering. For direct reads or defaults, use a key.
+The filter checks descendant paths without constructing their leaves. If no descendant supports the view, the filter matches nothing. A custom `predicate` narrows the match further. Leave out `exact` to include descendants. Use `viewPrefix(leaf, view)` when you need a raw key prefix, such as for `setQueryDefaults`.

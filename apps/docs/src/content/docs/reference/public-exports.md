@@ -12,7 +12,6 @@ Import these values and types from `@ueberbrot/effect-api-query`.
 | `acquireQueryOwner`, `QueryOwner`, `QueryOwnerSetup` | Opt in to acquired/borrowed resource setup, guarded cache callbacks and local query/mutation retirement. |
 | `configureUtils` | Configure policies and ordered interceptors on a tree, branch, or leaf. |
 | `UtilsConfiguration`, `ConfiguredUtils` | Type scoped configuration and the configured utility tree. |
-| `createBranchQueryFilter` | Select one view across all descendant leaves. |
 | `prepareInput`, `PreparedInput` | Reuse owner-bound input preparation explicitly. |
 | `findDeclaredError` | Match one tagged typed failure without flattening its Cause. |
 | `runQueryEvents` | Run sequential event handlers and recovery against a retiring query owner’s native cache. |

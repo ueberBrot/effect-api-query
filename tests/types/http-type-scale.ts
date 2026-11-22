@@ -119,13 +119,22 @@ type Equal<Left, Right> =
 type Assert<Value extends true> = Value;
 type Endpoint = `read.${(typeof indexes)[number]}`;
 true satisfies Assert<
-  Equal<Extract<keyof typeof utils, string>, "key" | (typeof groups)[number]>
+  Equal<
+    Extract<keyof typeof utils, string>,
+    "key" | "queryFilter" | (typeof groups)[number]
+  >
 >;
 true satisfies Assert<
-  Equal<Extract<keyof typeof utils.accounts, string>, "key" | Endpoint>
+  Equal<
+    Extract<keyof typeof utils.accounts, string>,
+    "key" | "queryFilter" | Endpoint
+  >
 >;
 true satisfies Assert<
-  Equal<Extract<keyof typeof utils.users, string>, "key" | Endpoint>
+  Equal<
+    Extract<keyof typeof utils.users, string>,
+    "key" | "queryFilter" | Endpoint
+  >
 >;
 
 const input = {

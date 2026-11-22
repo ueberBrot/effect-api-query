@@ -219,12 +219,19 @@ describe(createHttpApiQueryUtils, () => {
       client: Effect.runSync(makeUnusedHttpClient(mixed)),
       keyPrefix: ["test"],
     });
-    expect(Object.keys(utils)).toStrictEqual(["key", "uploads", "kept"]);
+    expect(Object.keys(utils)).toStrictEqual([
+      "key",
+      "queryFilter",
+      "uploads",
+      "kept",
+    ]);
     expect(Object.keys(utils.uploads)).toStrictEqual([
       "key",
+      "queryFilter",
       "upload",
       "brandedUpload",
     ]);
+    expect("queryFilter" in utils.uploads.upload).toBe(false);
     expect(utils.uploads.upload.mutationKey()).toStrictEqual([
       "test",
       "http",
@@ -233,7 +240,11 @@ describe(createHttpApiQueryUtils, () => {
       "upload",
       "mutation",
     ]);
-    expect(Object.keys(utils.kept)).toStrictEqual(["key", "read"]);
+    expect(Object.keys(utils.kept)).toStrictEqual([
+      "key",
+      "queryFilter",
+      "read",
+    ]);
   });
 
   it("rejects contradictory multipart brands and encoding atomically", () => {
@@ -352,8 +363,13 @@ describe(createHttpApiQueryUtils, () => {
       client: Effect.runSync(makeUnusedHttpClient(api)),
       keyPrefix: ["test"],
     });
-    expect(Object.keys(utils)).toStrictEqual(["key", "views"]);
-    expect(Object.keys(utils.views)).toStrictEqual(["key", "read", "events"]);
+    expect(Object.keys(utils)).toStrictEqual(["key", "queryFilter", "views"]);
+    expect(Object.keys(utils.views)).toStrictEqual([
+      "key",
+      "queryFilter",
+      "read",
+      "events",
+    ]);
   });
 
   it("projects literal identifiers and top-level inputless endpoints without splitting dots", async () => {

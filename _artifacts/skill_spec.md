@@ -52,6 +52,8 @@ These checks verify the recommended APIs and observable behavior. A fresh isolat
 
 ## Coverage and batch history
 
+- **Colocated query filters, #216, base `272c099`:** Update the cache workflow to build filters on roots, branches, and queryable leaves. Branch view filters use path metadata and keep leaves lazy. Full leaf input uses the same canonical encoding as the key builders. Keep explicit projections for partial input and add ADR 0051 to the source map. Runtime cache tests, packed compiler fixtures, and the existing dashboard grader cover the task. Fresh consumer-agent discovery remains unverified because this task excludes delegation.
+
 - **Five-round architecture review, base `8007f00`:** Align HTTP key encoding with declared parse options and keep owner caches independent. Update the HTTP and cache workflow references. Existing source mappings cover the narrower overload fixture, prepared inputs, stream recovery and publication, and the example retirement checks. Verify through the public compiler and runtime suites.
 
 - **Architecture review, base `b92b37b`:** Keep the existing skill and references. The cache workflow now describes copied SSE decoder defaults. Existing source mappings cover the shared query-prefix index, stream cleanup, and HTTP overload inference. Verify these through the public cache and compiler fixtures.

@@ -45,6 +45,7 @@ sources:
   - "docs/adr/0040-*.md"
   - "docs/adr/0042-*.md"
   - "docs/adr/0043-*.md"
+  - "docs/adr/0051-*.md"
   - "apps/docs/astro.config.mts"
   - "**/apps/docs/src/content/docs/**/*.md"
   - "**/apps/docs/src/content/docs/**/*.mdx"

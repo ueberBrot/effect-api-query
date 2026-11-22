@@ -4,6 +4,7 @@ import type { Headers } from "effect/http";
 import type { Rpc, RpcClient, RpcGroup, RpcSchema } from "effect/rpc";
 
 import type { PreparedInput } from "../core/prepared-input";
+import type { BranchQueryFilter, LeafQueryFilter } from "../core/query-filter";
 import type {
   ContainsRedacted,
   InfiniteQueryBuilder,
@@ -330,6 +331,17 @@ export interface RpcStreamLeaf<
   /** Returns the immutable key prefix for this streaming RPC. */
   readonly key: () => RpcKey<Prefix, R>;
 
+  /** Builds native filters for this streaming RPC. */
+  readonly queryFilter: LeafQueryFilter<
+    Rpc.PayloadConstructor<R>,
+    PayloadlessRpc<R>,
+    "live" | "streamed",
+    {
+      readonly live: LivePolicyOptions;
+      readonly streamed: Partial<StreamedPolicyOptions>;
+    }
+  >;
+
   /** Builds a semantic key for the latest-value view of the stream. */
   readonly liveKey: StreamKeyBuilder<
     R,
@@ -373,6 +385,13 @@ export interface RpcQueryLeaf<
     Rpc.PayloadConstructor<R>,
     MutationKey<Prefix, R>,
     RpcOptionsInput
+  >;
+
+  /** Builds native filters for this RPC. */
+  readonly queryFilter: LeafQueryFilter<
+    Rpc.PayloadConstructor<R>,
+    PayloadlessRpc<R>,
+    "query" | "infinite"
   >;
 
   /** Builds a semantic, data-tagged query key from constructor input. */
@@ -432,6 +451,8 @@ export type PathTree<
           PathDescendants<Groups[Head], Head>["path"]
         >;
         readonly key: () => readonly [...Prefix, "rpc", ...Path, Head];
+        /** Builds native filters for descendant queries. */
+        readonly queryFilter: BranchQueryFilter;
       } & PathTree<
         PathDescendants<Groups[Head], Head>,
         Prefix,
@@ -512,6 +533,8 @@ export type RpcQueryUtils<
   readonly [utilityPaths]?: PathsFromTags<RpcsOf<Group>["_tag"]>;
   /** Returns the immutable root key, including the RPC discriminator. */
   readonly key: () => readonly [...Prefix, "rpc"];
+  /** Builds native filters for descendant queries. */
+  readonly queryFilter: BranchQueryFilter;
 } & PathTree<RpcPathEntry<RpcsOf<Group>>, Prefix, ClientError>;
 
 export type NeedsKeyEncoder<R extends Rpc.Any> = [

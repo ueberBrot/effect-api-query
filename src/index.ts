@@ -107,7 +107,6 @@ export type {
   ConfiguredUtils,
   UtilsConfiguration,
 } from "./core/configure-utils";
-export { createBranchQueryFilter } from "./core/branch-filter";
 export { findDeclaredError } from "./core/declared-error";
 export { prepareInput } from "./core/prepared-input";
 export type { PreparedInput } from "./core/prepared-input";
