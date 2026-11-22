@@ -13,11 +13,13 @@ import type {
   KeyBuilder,
   KeyEncoderRequirement,
   OptionalKeyPrefix,
+  PathsFromTags,
   QueryData,
   RunnerRequirement,
   MutationBuilder,
   StreamedPolicyOptions,
   LivePolicyOptions,
+  utilityPaths,
 } from "../core/types";
 import type {
   EffectRpcQueryConfigError,
@@ -301,20 +303,22 @@ export type StreamKeyBuilder<R extends Rpc.Any, Key> =
   PayloadlessRpc<R> extends true
     ? (policy?: LivePolicyOptions) => Key
     : (
-        input:
-          | Rpc.PayloadConstructor<R>
-          | PreparedInput<Rpc.PayloadConstructor<R>>,
-        policy?: LivePolicyOptions
+        options: {
+          readonly input:
+            | Rpc.PayloadConstructor<R>
+            | PreparedInput<Rpc.PayloadConstructor<R>>;
+        } & LivePolicyOptions
       ) => Key;
 
 export type StreamedKeyBuilder<R extends Rpc.Any, Key> =
   PayloadlessRpc<R> extends true
     ? (policy: StreamedPolicyOptions) => Key
     : (
-        input:
-          | Rpc.PayloadConstructor<R>
-          | PreparedInput<Rpc.PayloadConstructor<R>>,
-        policy: StreamedPolicyOptions
+        options: {
+          readonly input:
+            | Rpc.PayloadConstructor<R>
+            | PreparedInput<Rpc.PayloadConstructor<R>>;
+        } & StreamedPolicyOptions
       ) => Key;
 
 /** The key and option builders exposed at one streaming RPC path. */
@@ -424,6 +428,9 @@ export type PathTree<
         : RpcStreamLeaf<R, Prefix, ClientError>
       : never
     : {
+        readonly [utilityPaths]?: PathsFromTags<
+          PathDescendants<Groups[Head], Head>["path"]
+        >;
         readonly key: () => readonly [...Prefix, "rpc", ...Path, Head];
       } & PathTree<
         PathDescendants<Groups[Head], Head>,
@@ -495,13 +502,14 @@ export type ExtractRpcClientError<Group extends RpcGroup.Any, Client> =
         : never
       : never;
 
-/** An eager utility tree projected from the group's dotted RPC tags. */
+/** A utility tree with lazy-memoized frozen leaves projected from the group's dotted RPC tags. */
 export type RpcQueryUtils<
   Group extends RpcGroup.Any,
   Prefix extends OptionalKeyPrefix = readonly [],
   ClientError = never,
 > = {
   readonly [rpcQueryClientError]?: ClientError;
+  readonly [utilityPaths]?: PathsFromTags<RpcsOf<Group>["_tag"]>;
   /** Returns the immutable root key, including the RPC discriminator. */
   readonly key: () => readonly [...Prefix, "rpc"];
 } & PathTree<RpcPathEntry<RpcsOf<Group>>, Prefix, ClientError>;

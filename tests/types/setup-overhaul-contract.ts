@@ -365,8 +365,8 @@ const owner = await acquireQueryOwner(async (setup) => {
   trackedFirst.events.watch.streamedOptions({ input: { channel: "a" } });
 
   const prepared = prepareInput(trackedLeaf, { id: 1 });
-  trackedLeaf.queryKey(prepared);
-  configuredFirst.users.get.queryKey(prepared);
+  trackedLeaf.queryKey({ input: prepared });
+  configuredFirst.users.get.queryKey({ input: prepared });
 
   return { trackedRoot, configuredFirst, trackedFirst };
 });

@@ -207,9 +207,9 @@ const program = Effect.gen(function* () {
       const preparedRpc = prepareInput(rpc, input);
       const preparedHttp = prepareInput(http, request);
       const workloads = [
-        ["rpc", "query-key", () => rpc.queryKey(input)],
+        ["rpc", "query-key", () => rpc.queryKey({ input })],
         ["rpc", "query-options", () => rpc.queryOptions({ input })],
-        ["http", "query-key", () => http.queryKey(request)],
+        ["http", "query-key", () => http.queryKey({ input: request })],
         ["http", "query-options", () => http.queryOptions({ input: request })],
         [
           "rpc",

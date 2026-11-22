@@ -195,11 +195,13 @@ const topLevelKey: readonly ["app", "http", "account.api", "ping"] =
 void [root, groupKey, endpointKey, topLevelKey];
 true satisfies Assert<
   Equal<
-    keyof (typeof utils)["user.accounts"],
+    Extract<keyof (typeof utils)["user.accounts"], string>,
     "key" | "get.user" | "save" | "upload" | "mixedUpload" | "wrappedBuffered"
   >
 >;
-true satisfies Assert<Equal<keyof typeof utils.uploads, "key" | "mixedUpload">>;
+true satisfies Assert<
+  Equal<Extract<keyof typeof utils.uploads, string>, "key" | "mixedUpload">
+>;
 true satisfies Assert<
   Equal<
     keyof (typeof utils)["user.accounts"]["upload"],
@@ -776,18 +778,22 @@ const completeRequest = {
   headers: { "x-locale": "en" },
   payload: { page: 2 },
 };
-keyUtils["request.parts"].queryKey(completeRequest);
+keyUtils["request.parts"].queryKey({ input: completeRequest });
 keyUtils["request.parts"].mutationOptions().mutationFn(completeRequest);
-// @ts-expect-error A declared optional-only query container stays required.
 keyUtils["request.parts"].queryKey({
-  params: { id: 1 },
-  headers: { "x-locale": "en" },
-  payload: { page: 2 },
+  // @ts-expect-error A declared optional-only query container stays required.
+  input: {
+    params: { id: 1 },
+    headers: { "x-locale": "en" },
+    payload: { page: 2 },
+  },
 });
 keyUtils["request.parts"].queryKey({
-  ...completeRequest,
-  // @ts-expect-error HTTP payloads use decoded fields.
-  payload: { page: "2" },
+  input: {
+    ...completeRequest,
+    // @ts-expect-error HTTP payloads use decoded fields.
+    payload: { page: "2" },
+  },
 });
 keyUtils["request.parts"]
   .mutationOptions()
@@ -999,7 +1005,9 @@ const custom = createHttpApiQueryUtils(api, {
   runtime: extraRunner,
 });
 const customState = queryClient.getQueryState(
-  custom["user.accounts"].save.queryKey({ payload: { id: 1, name: "Ada" } })
+  custom["user.accounts"].save.queryKey({
+    input: { payload: { id: 1, name: "Ada" } },
+  })
 );
 true satisfies Assert<
   Equal<
@@ -1044,7 +1052,9 @@ const omittedCustom = createHttpApiQueryUtils(omittedServiceApi, {
   client: omittedCustomClient,
   keyPrefix: ["app"],
 });
-true satisfies Assert<Equal<keyof typeof omittedCustom.system, "key" | "ping">>;
+true satisfies Assert<
+  Equal<Extract<keyof typeof omittedCustom.system, string>, "key" | "ping">
+>;
 
 class DecodeMiddlewareError extends Context.Service<
   DecodeMiddlewareError,
@@ -1293,7 +1303,7 @@ true satisfies Assert<
 >;
 const overloadedServiceState = queryClient.getQueryState(
   overloadedServiceUtils.work.serviceful.queryKey({
-    payload: { id: 1, name: "Ada" },
+    input: { payload: { id: 1, name: "Ada" } },
   })
 );
 true satisfies Assert<
@@ -1396,7 +1406,7 @@ const overloadedCustomUtils = createHttpApiQueryUtils(api, {
 });
 const overloadedCustomState = queryClient.getQueryState(
   overloadedCustomUtils["user.accounts"].save.queryKey({
-    payload: { id: 1, name: "Ada" },
+    input: { payload: { id: 1, name: "Ada" } },
   })
 );
 true satisfies Assert<
@@ -1484,7 +1494,7 @@ type UserMetadata = {
 true satisfies Assert<
   Equal<ReturnType<typeof getUser.metadataKey>[5], "metadata">
 >;
-const metadataCache = queryClient.getQueryData(getUser.metadataKey(input));
+const metadataCache = queryClient.getQueryData(getUser.metadataKey({ input }));
 true satisfies Assert<Equal<typeof metadataCache, UserMetadata | undefined>>;
 const initialMetadata = {
   data: { id: 1, name: "Ada" },
@@ -1559,7 +1569,7 @@ getUser.metadataMutationOptions();
 // @ts-expect-error Metadata views retain complete decoded request containers.
 getUser.metadataOptions({ input: { params: { id: 1 } } });
 // @ts-expect-error Response controls belong to the metadata view.
-getUser.metadataKey({ ...input, responseMode: "response-only" });
+getUser.metadataKey({ input: { ...input, responseMode: "response-only" } });
 // @ts-expect-error Inputless metadata builders cannot be skipped.
 utils.ping.metadataOptions(skipToken);
 // @ts-expect-error Metadata hash defaults belong to QueryClient.
@@ -1573,7 +1583,7 @@ true satisfies Assert<
 >;
 const metadataServiceState = queryClient.getQueryState(
   overloadedServiceUtils.work.serviceful.metadataKey({
-    payload: { id: 1, name: "Ada" },
+    input: { payload: { id: 1, name: "Ada" } },
   })
 );
 true satisfies Assert<
@@ -1772,7 +1782,9 @@ true satisfies Assert<
     InfiniteData<typeof User.Type, number> | undefined
   >
 >;
-const infiniteKeyCache = queryClient.getQueryData(getUser.infiniteKey(input));
+const infiniteKeyCache = queryClient.getQueryData(
+  getUser.infiniteKey({ input })
+);
 true satisfies Assert<
   Equal<
     typeof infiniteKeyCache,

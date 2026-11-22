@@ -25,9 +25,9 @@ it.effect(
         keyPrefix: ["view-prefix"],
       });
       const queryClient = new QueryClient();
-      const first = utils.users.read.queryKey({ id: 1 });
-      const second = utils.users.read.queryKey({ id: 2 });
-      const paged = utils.users.read.infiniteKey({ id: 1 });
+      const first = utils.users.read.queryKey({ input: { id: 1 } });
+      const second = utils.users.read.queryKey({ input: { id: 2 } });
+      const paged = utils.users.read.infiniteKey({ input: { id: 1 } });
       try {
         queryClient.setQueryData(first, "Ada");
         queryClient.setQueryData(second, "Grace");

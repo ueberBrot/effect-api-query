@@ -82,7 +82,7 @@ describe("createRpcQueryUtils execution boundaries", () => {
         pages: [{ cursor: 0, nextCursor: 1, values: [0, 1] }],
       });
       expect({ queryKey: options.queryKey, meta: options.meta }).toStrictEqual({
-        queryKey: utils.pages.list.infiniteKey({ cursor: 0 }),
+        queryKey: utils.pages.list.infiniteKey({ input: { cursor: 0 } }),
         meta: { source: "infinite-test" },
       });
 
@@ -103,7 +103,7 @@ describe("createRpcQueryUtils execution boundaries", () => {
 
       yield* Effect.promise(async () => {
         await queryClient.invalidateQueries({
-          queryKey: utils.pages.list.infiniteKey({ cursor: 0 }),
+          queryKey: utils.pages.list.infiniteKey({ input: { cursor: 0 } }),
         });
       });
       yield* Effect.promise(async () => {

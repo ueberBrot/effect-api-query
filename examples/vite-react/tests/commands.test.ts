@@ -25,7 +25,9 @@ describe("Cancellable commands", () => {
             onSettled: async () => {
               if (captured.isActive()) {
                 await captured.queryClient.invalidateQueries({
-                  queryKey: captured.rpcQuery.commands.status.queryKey(input),
+                  queryKey: captured.rpcQuery.commands.status.queryKey({
+                    input,
+                  }),
                 });
               }
             },
@@ -145,7 +147,9 @@ describe("Cancellable commands", () => {
         rpcQuery.commands.cancel.mutationOptions({
           onSettled: async () => {
             await queryClient.invalidateQueries({
-              queryKey: rpcQuery.commands.status.queryKey(firstInput),
+              queryKey: rpcQuery.commands.status.queryKey({
+                input: firstInput,
+              }),
             });
           },
         })

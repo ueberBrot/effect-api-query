@@ -21,7 +21,7 @@ const Command = ({
       return;
     }
     await queryClient.invalidateQueries({
-      queryKey: rpcQuery.commands.status.queryKey(input),
+      queryKey: rpcQuery.commands.status.queryKey({ input }),
     });
   };
   const start = useMutation(

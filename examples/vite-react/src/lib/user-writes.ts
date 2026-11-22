@@ -114,9 +114,11 @@ export const makeUserWrites = ({
       ? ownership
       : undefined;
   };
-  const rpcPages = rpcQuery.users.page.infiniteKey({ cursor: 0, pageSize: 4 });
+  const rpcPages = rpcQuery.users.page.infiniteKey({
+    input: { cursor: 0, pageSize: 4 },
+  });
   const httpPages = httpQuery.users.page.infiniteKey({
-    query: { cursor: 0, pageSize: 4 },
+    input: { query: { cursor: 0, pageSize: 4 } },
   });
   const cancel = async () => {
     await Promise.all([
@@ -309,13 +311,17 @@ export const makeUserWrites = ({
     }
     replaceUser(-write, user, write, 0, "settled");
     queryClient.setQueryData(
-      rpcQuery.users.get.queryKey({ id: user.id, locale: user.locale }),
+      rpcQuery.users.get.queryKey({
+        input: { id: user.id, locale: user.locale },
+      }),
       user
     );
     queryClient.setQueryData(
       httpQuery.users.get.queryKey({
-        params: { id: user.id },
-        query: { locale: user.locale },
+        input: {
+          params: { id: user.id },
+          query: { locale: user.locale },
+        },
       }),
       user
     );

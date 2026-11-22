@@ -141,8 +141,9 @@ const measure = Effect.fnUntraced(function* measure(scenario: Case) {
   const input = { workload: scenario.workload };
   const queryKey =
     scenario.view === "live"
-      ? leaf.liveKey(input)
-      : leaf.streamedKey(input, {
+      ? leaf.liveKey({ input })
+      : leaf.streamedKey({
+          input,
           maxChunks: scenario.maxChunks ?? "unbounded",
         });
   const objects = observedObjects();

@@ -14,7 +14,7 @@ import type {
 } from "./types";
 
 /**
- * Derives an eager, frozen TanStack Query utility tree from an Effect RPC group.
+ * Derives a frozen TanStack Query utility tree with lazy-memoized leaves from an Effect RPC group.
  *
  * Dotted RPC tags become nested properties with unary or streaming utility leaves.
  * Accepts both default tag-keyed `RpcClient` and `RpcClient.Flat` clients.

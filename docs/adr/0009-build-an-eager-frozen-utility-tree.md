@@ -1,6 +1,6 @@
 # Build an eager frozen utility tree
 
-Status: Accepted. Implementation ownership clarified by [ADR 0021](0021-share-utility-construction-through-private-modules.md).
+Status: Accepted. Implementation ownership clarified by [ADR 0021](0021-share-utility-construction-through-private-modules.md). Amended by [ADR 0046](0046-lazy-memoized-frozen-leaves-and-unified-key-inputs.md) for lazy-memoized frozen leaves.
 
 ## Context
 

@@ -96,7 +96,7 @@ describe("query usability", () => {
           });
           const options = configured.queryOptions({ input });
           expect(options.queryKey).toStrictEqual(
-            rpc.stable.queryKey({ id: 2, locale: "en" })
+            rpc.stable.queryKey({ input: { id: 2, locale: "en" } })
           );
           const preparedResult = yield* Effect.promise(
             async () => await queryClient.query(options)
@@ -142,8 +142,8 @@ describe("query usability", () => {
       const options = rpc.users.read.queryOptions({ input });
       expect({
         encoded,
-        key: rpc.users.read.queryKey(input),
-        infinite: rpc.users.read.infiniteKey(input),
+        key: rpc.users.read.queryKey({ input }),
+        infinite: rpc.users.read.infiniteKey({ input }),
       }).toStrictEqual({
         encoded: 1,
         key: options.queryKey,
@@ -157,7 +157,7 @@ describe("query usability", () => {
         expect(() => make().users.read.queryOptions({ input })).toThrow(
           "another utility leaf"
         );
-        expect(() => rpc.users.nested.read.queryKey(input)).toThrow(
+        expect(() => rpc.users.nested.read.queryKey({ input })).toThrow(
           "another utility leaf"
         );
         const configured = configureUtils(rpc.users.read, {
@@ -278,16 +278,25 @@ describe("query usability", () => {
         });
         const queryClient = new QueryClient();
         try {
-          queryClient.setQueryData(rpc.users.read.queryKey({ id: 1 }), 1);
           queryClient.setQueryData(
-            rpc.users.nested.read.queryKey({ id: 2 }),
+            rpc.users.read.queryKey({ input: { id: 1 } }),
+            1
+          );
+          queryClient.setQueryData(
+            rpc.users.nested.read.queryKey({ input: { id: 2 } }),
             2
           );
-          queryClient.setQueryData(rpc.users.read.infiniteKey({ id: 1 }), {
-            pages: [1],
-            pageParams: [0],
-          });
-          queryClient.setQueryData(rpc.users.watch.liveKey({ id: 1 }), 1);
+          queryClient.setQueryData(
+            rpc.users.read.infiniteKey({ input: { id: 1 } }),
+            {
+              pages: [1],
+              pageParams: [0],
+            }
+          );
+          queryClient.setQueryData(
+            rpc.users.watch.liveKey({ input: { id: 1 } }),
+            1
+          );
           const filter = createBranchQueryFilter(rpc.users, "query");
           yield* Effect.promise(async () => {
             await queryClient.invalidateQueries(filter());
@@ -429,8 +438,8 @@ it.effect("reuses HTTP preparation for buffered and metadata views", () =>
       expect(metadata.data).toBe(7);
       expect(Object.isFrozen(metadata)).toBe(true);
       expect(encoded).toBe(1);
-      expect(http.users.read.queryKey(input)).toStrictEqual(
-        http.users.read.queryKey({ params: { id: 7 } })
+      expect(http.users.read.queryKey({ input })).toStrictEqual(
+        http.users.read.queryKey({ input: { params: { id: 7 } } })
       );
     } finally {
       queryClient.clear();

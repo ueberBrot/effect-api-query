@@ -97,28 +97,30 @@ describe("createRpcQueryUtils streaming execution", () => {
         expect(streamed).toStrictEqual(["news:en:first", "news:en:second"]);
         expect(live).toBe("news:en:second");
         expect(
-          utils.events.watch.streamedKey(
-            { channel: "news" },
-            { maxChunks: "unbounded" }
-          )
+          utils.events.watch.streamedKey({
+            input: { channel: "news" },
+            maxChunks: "unbounded",
+          })
         ).toStrictEqual(
-          utils.events.watch.streamedKey(
-            { channel: "news", locale: "en" },
-            { maxChunks: "unbounded" }
-          )
+          utils.events.watch.streamedKey({
+            input: { channel: "news", locale: "en" },
+            maxChunks: "unbounded",
+          })
         );
         expect(
-          utils.events.watch.streamedKey(
-            { channel: "news" },
-            { maxChunks: "unbounded" }
-          )
-        ).not.toStrictEqual(utils.events.watch.liveKey({ channel: "news" }));
+          utils.events.watch.streamedKey({
+            input: { channel: "news" },
+            maxChunks: "unbounded",
+          })
+        ).not.toStrictEqual(
+          utils.events.watch.liveKey({ input: { channel: "news" } })
+        );
         expect(
           Object.isFrozen(
-            utils.events.watch.streamedKey(
-              { channel: "news" },
-              { maxChunks: "unbounded" }
-            )
+            utils.events.watch.streamedKey({
+              input: { channel: "news" },
+              maxChunks: "unbounded",
+            })
           )
         ).toBe(true);
       })

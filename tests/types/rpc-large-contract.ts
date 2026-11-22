@@ -50,7 +50,10 @@ type Assert<Value extends true> = Value;
 type OperationName =
   `read-${(typeof indexes)[number]}-${0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}`;
 true satisfies Assert<
-  Equal<Exclude<keyof typeof utils.scale, "key">, OperationName>
+  Equal<
+    Exclude<Extract<keyof typeof utils.scale, string>, "key">,
+    OperationName
+  >
 >;
 utils.scale["read-99-9"].key() satisfies readonly [
   "large-contract",

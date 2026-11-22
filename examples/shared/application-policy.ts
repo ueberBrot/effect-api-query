@@ -40,7 +40,9 @@ export const applicationQueries = (
       policy: {
         onSuccess: async (user) => {
           queryClient.setQueryData(
-            base.users.get.queryKey({ id: user.id, locale: user.locale }),
+            base.users.get.queryKey({
+              input: { id: user.id, locale: user.locale },
+            }),
             user
           );
           await queryClient.invalidateQueries({

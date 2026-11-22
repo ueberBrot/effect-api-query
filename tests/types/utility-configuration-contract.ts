@@ -136,11 +136,11 @@ const historyConfiguration = {
 } satisfies UtilsConfiguration<typeof base>;
 const history = configureUtils(base, historyConfiguration);
 history.users.watch.streamedOptions({ input: { id: 1 } });
-history.users.watch.streamedKey({ id: 1 });
+history.users.watch.streamedKey({ input: { id: 1 } });
 history.ticks.streamedOptions();
 history.ticks.streamedKey();
 history.ticks.streamedKey(undefined);
-history.users.watch.streamedKey({ id: 1 }, undefined);
+history.users.watch.streamedKey({ input: { id: 1 }, refetchMode: undefined });
 history.users.watch.streamedOptions({
   input: { id: 1 },
   maxChunks: "unbounded",

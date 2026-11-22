@@ -20,7 +20,7 @@ const completion = runQueryEvents(
     onEvent: (event) =>
       Effect.gen(function* () {
         yield* queryEffects.setData(
-          rpc.users.read.queryKey({ id: event.id }),
+          rpc.users.read.queryKey({ input: { id: event.id } }),
           event
         );
         yield* queryEffects.invalidate({ ...reads(), refetchType: "none" });
@@ -29,7 +29,7 @@ const completion = runQueryEvents(
   Effect.runPromiseExit
 );
 const wrong = queryEffects.setData(
-  rpc.users.read.queryKey({ id: 1 }),
+  rpc.users.read.queryKey({ input: { id: 1 } }),
   // @ts-expect-error Generated keys retain decoded user data in event mappings
   { id: 1, name: 123 }
 );

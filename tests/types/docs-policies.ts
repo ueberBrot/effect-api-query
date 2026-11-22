@@ -101,7 +101,7 @@ const createUser = configureUtils(rpc.users.create, {
     policy: {
       onSuccess: async (created) => {
         queryClient.setQueryData(
-          rpc.users.get.queryKey({ id: created.id }),
+          rpc.users.get.queryKey({ input: { id: created.id } }),
           created
         );
         await queryClient.invalidateQueries({ queryKey: rpc.users.key() });

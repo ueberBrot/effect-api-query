@@ -80,7 +80,7 @@ describe("TanStack Start server rendering", () => {
         directoryCount: queryClient.getQueryData(rpcQuery.users.list.queryKey())
           ?.length,
         page: queryClient.getQueryData(
-          rpcQuery.users.page.infiniteKey({ cursor: 0, pageSize: 4 })
+          rpcQuery.users.page.infiniteKey({ input: { cursor: 0, pageSize: 4 } })
         ),
       }).toMatchObject({
         directoryCount: 12,
@@ -150,7 +150,7 @@ describe("TanStack Start server rendering", () => {
         )?.length,
         page: queryClient.getQueryData(
           httpQuery.users.page.infiniteKey({
-            query: { cursor: 0, pageSize: 4 },
+            input: { query: { cursor: 0, pageSize: 4 } },
           })
         ),
         rpcDirectory: queryClient.getQueryData(rpcQuery.users.list.queryKey()),

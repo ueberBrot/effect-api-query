@@ -285,6 +285,7 @@ export default defineConfig({
           "scripts/measure-structural-sharing.mts",
           "scripts/measure-streams.mts",
           "tests/utility-configuration.test.ts",
+          "tests/lazy-leaves-and-unified-keys.test.ts",
           "tests/configuration-composition.test.ts",
           "src/http/create-utils.ts",
           "src/http/operation.ts",

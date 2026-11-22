@@ -63,7 +63,7 @@ const typedUtils: RpcQueryUtils<typeof group, typeof keyPrefix> = utils;
 
 utils.scale["rpc-0"].queryOptions({ input: { id: "rpc-0" } });
 utils.scale["group-12"].get.mutationOptions();
-utils.scale["region-24"].users.get.queryKey({ id: "user-24" });
+utils.scale["region-24"].users.get.queryKey({ input: { id: "user-24" } });
 utils.scale["zone-36"].accounts.users.get.queryOptions({
   input: { id: "user-36" },
 });

@@ -31,6 +31,12 @@ import type {
   UnaryQueryBuilder,
   UnaryQueryBuilderDescriptor,
 } from "./types";
+import {
+  buildBranchFrom,
+  defineLazyLeafDescriptor,
+  readLazyLeafSlot,
+} from "./utility-tree";
+import type { LazyLeafSlot } from "./utility-tree";
 
 export interface UtilityNode {
   readonly key: () => QueryKey;
@@ -38,13 +44,11 @@ export interface UtilityNode {
 
 export type StreamKeyPolicy<Leaf, View extends "streamed" | "live"> =
   Leaf extends Record<`${View}Key`, (...args: infer Args) => unknown>
-    ? Required<Args> extends readonly [unknown, infer Policy]
-      ? Partial<NonNullable<Policy>>
-      : Required<Args> extends readonly [infer Policy]
-        ? Partial<NonNullable<Policy>>
-        : View extends "streamed"
-          ? Partial<StreamedPolicyOptions>
-          : LivePolicyOptions
+    ? Required<Args> extends readonly [infer Options]
+      ? Partial<Omit<NonNullable<Options>, "input">>
+      : View extends "streamed"
+        ? Partial<StreamedPolicyOptions>
+        : LivePolicyOptions
     : View extends "streamed"
       ? Partial<StreamedPolicyOptions>
       : LivePolicyOptions;
@@ -255,13 +259,19 @@ export type WithDefaultRetention<Builder> =
     : Builder;
 
 export type WithDefaultKeyRetention<KeyBuilder> = KeyBuilder extends (
-  ...args: infer Args
+  options: infer Options
 ) => infer Key
-  ? Args extends readonly [infer Input, infer Policy]
-    ? (input: Input, policy?: Partial<Policy>) => Key
-    : Args extends readonly [infer Policy]
-      ? (policy?: Partial<Policy>) => Key
-      : KeyBuilder
+  ? "input" extends keyof NonNullable<Options>
+    ? (
+        options: Omit<NonNullable<Options>, "maxChunks"> & {
+          readonly maxChunks?: StreamedPolicyOptions["maxChunks"];
+        }
+      ) => Key
+    : (
+        options?: Omit<NonNullable<Options>, "maxChunks"> & {
+          readonly maxChunks?: StreamedPolicyOptions["maxChunks"];
+        }
+      ) => Key
   : KeyBuilder;
 
 /** Preserves leaf builders and makes configured stream retention optional at call sites. */
@@ -445,10 +455,18 @@ const configureLeaf = (
       const buildKey = streamedKey as RuntimeBuilder;
       configured[view === "live" ? "liveKey" : "streamedKey"] =
         inputKind(node.key) === "Inputless"
-          ? (options?: Partial<StreamedPolicyOptions>) =>
-              buildKey({ ...policy, ...options })
-          : (input: unknown, options?: Partial<StreamedPolicyOptions>) =>
-              buildKey(input, { ...policy, ...options });
+          ? (options?: Record<string, unknown>) => {
+              if (options !== undefined && !Predicate.isObject(options)) {
+                throw new TypeError("Query key options must be an object");
+              }
+              return buildKey({ ...policy, ...options });
+            }
+          : (options?: Record<string, unknown>) => {
+              if (!Predicate.isObject(options)) {
+                throw new TypeError("Query key options must be an object");
+              }
+              return buildKey({ ...policy, ...options });
+            };
     }
   }
   if (Object.hasOwn(node, "mutationOptions")) {
@@ -481,6 +499,54 @@ const configureLeaf = (
   return configured;
 };
 
+type ChildEntry =
+  | {
+      readonly kind: "branch";
+      readonly name: string;
+      readonly node: RuntimeNode;
+    }
+  | {
+      readonly kind: "lazy";
+      readonly name: string;
+      readonly slot: LazyLeafSlot;
+    };
+
+const readChildEntry = (
+  node: RuntimeNode,
+  name: string
+): ChildEntry | undefined => {
+  const descriptor = Object.getOwnPropertyDescriptor(node, name);
+  if (descriptor?.enumerable !== true) {
+    return undefined;
+  }
+  const slot = readLazyLeafSlot(descriptor);
+  if (slot !== undefined) {
+    return { kind: "lazy", name, slot };
+  }
+  if ("value" in descriptor && isUtilityChild(descriptor.value)) {
+    return { kind: "branch", name, node: descriptor.value };
+  }
+  return undefined;
+};
+
+const configureLeafNode = (
+  node: RuntimeNode,
+  configurations: readonly ConfigurationLayer[]
+): RuntimeNode => {
+  const previous = configuredLeaves.get(node);
+  const original = previous?.original ?? node;
+  const layers = EffectArray.sortWith(
+    [...(previous?.layers ?? []), ...configurations],
+    (layer) => layer.depth,
+    Order.Number
+  );
+  const configured = Object.freeze(
+    configureLeaf(original, scopeConfigurations(layers))
+  );
+  configuredLeaves.set(configured, { original, layers });
+  return configured;
+};
+
 const configureNode = (
   node: RuntimeNode,
   inherited: readonly ConfigurationLayer[],
@@ -497,49 +563,71 @@ const configureNode = (
     return node;
   }
   const scopedChildren = scopeNames.map((name) => {
-    const child = Object.prototype.propertyIsEnumerable.call(node, name)
-      ? node[name]
-      : undefined;
-    if (!isUtilityChild(child)) {
+    const entry = readChildEntry(node, name);
+    if (entry === undefined) {
       throw new TypeError(`Unknown utility scope: ${name}`);
     }
-    return [name, child] as const;
+    return entry;
   });
-  const children =
+  const children: readonly ChildEntry[] =
     configurations.length === 0
       ? scopedChildren
-      : Object.entries(node).filter((entry): entry is [string, RuntimeNode] =>
-          isUtilityChild(entry[1])
-        );
+      : Object.keys(node).flatMap((name) => {
+          if (name === "key") {
+            return [];
+          }
+          const entry = readChildEntry(node, name);
+          return entry === undefined ? [] : [entry];
+        });
   if (children.length === 0) {
-    const previous = configuredLeaves.get(node);
-    const original = previous?.original ?? node;
-    const layers = EffectArray.sortWith(
-      [...(previous?.layers ?? []), ...configurations],
-      (layer) => layer.depth,
-      Order.Number
-    );
-    const configured = Object.freeze(
-      configureLeaf(original, scopeConfigurations(layers))
-    );
-    configuredLeaves.set(configured, { original, layers });
-    return configured;
+    return configureLeafNode(node, configurations);
   }
-  let configured: RuntimeNode | undefined;
-  for (const [name, child] of children) {
-    const next = configureNode(
-      child,
-      configurations,
-      scoped !== undefined && Object.hasOwn(scoped, name)
-        ? scoped[name]
-        : undefined
-    );
-    if (next !== child) {
-      configured ??= { ...node };
-      configured[name] = next;
+  const replacements = new Map<string, PropertyDescriptor>();
+  for (const entry of children) {
+    const childConfiguration =
+      scoped !== undefined && Object.hasOwn(scoped, entry.name)
+        ? scoped[entry.name]
+        : undefined;
+    if (entry.kind === "lazy") {
+      const invalidScopes = Object.keys(childConfiguration?.scoped ?? {});
+      if (invalidScopes.length > 0) {
+        throw new TypeError(`Unknown utility scope: ${invalidScopes[0]}`);
+      }
+      const leafSnapshot = snapshotConfiguration(childConfiguration);
+      const leafConfigurations =
+        leafSnapshot === undefined
+          ? configurations
+          : [
+              ...configurations,
+              { depth: node.key().length + 1, options: leafSnapshot },
+            ];
+      if (leafConfigurations.length > 0) {
+        replacements.set(
+          entry.name,
+          defineLazyLeafDescriptor(
+            () =>
+              configureLeafNode(entry.slot.materialize(), leafConfigurations),
+            entry.slot.ownerToken
+          )
+        );
+      }
+    } else {
+      const next = configureNode(
+        entry.node,
+        configurations,
+        childConfiguration
+      );
+      if (next !== entry.node) {
+        replacements.set(entry.name, {
+          value: next,
+          enumerable: true,
+          writable: false,
+          configurable: false,
+        });
+      }
     }
   }
-  return configured === undefined ? node : Object.freeze(configured);
+  return replacements.size === 0 ? node : buildBranchFrom(node, replacements);
 };
 
 /** Applies root, branch, and leaf configuration while preserving generated cache identity. */

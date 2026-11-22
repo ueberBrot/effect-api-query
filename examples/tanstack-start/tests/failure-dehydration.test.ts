@@ -82,11 +82,13 @@ describe("TanStack Start router dehydration", () => {
       const pagesKey =
         adapter === "http"
           ? browserApplication.httpQuery.users.page.infiniteKey({
-              query: { cursor: 0, pageSize: 4 },
+              input: { query: { cursor: 0, pageSize: 4 } },
             })
           : browserApplication.rpcQuery.users.page.infiniteKey({
-              cursor: 0,
-              pageSize: 4,
+              input: {
+                cursor: 0,
+                pageSize: 4,
+              },
             });
       const watchedKeys: readonly QueryKey[] = [usersKey, pagesKey];
       let duplicateFetches = 0;

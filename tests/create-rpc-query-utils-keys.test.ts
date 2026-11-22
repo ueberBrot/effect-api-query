@@ -112,7 +112,7 @@ describe("createRpcQueryUtils semantic keys", () => {
           keyPrefix: ["tenant", 42] as const,
         });
 
-        const queryKey = utils.users.get.queryKey({ id: 1 });
+        const queryKey = utils.users.get.queryKey({ input: { id: 1 } });
 
         expect({
           root: utils.key(),
@@ -163,7 +163,7 @@ describe("createRpcQueryUtils semantic keys", () => {
           keyPrefix: ["tenant", 42] as const,
         });
 
-        const infiniteKey = utils.users.get.infiniteKey({ id: 1 });
+        const infiniteKey = utils.users.get.infiniteKey({ input: { id: 1 } });
 
         expect(infiniteKey).toStrictEqual([
           "tenant",
@@ -175,10 +175,10 @@ describe("createRpcQueryUtils semantic keys", () => {
           { id: 1, locale: "en" },
         ]);
         expect(infiniteKey).toStrictEqual(
-          utils.users.get.infiniteKey({ id: 1, locale: "en" })
+          utils.users.get.infiniteKey({ input: { id: 1, locale: "en" } })
         );
         for (const otherView of [
-          utils.users.get.queryKey({ id: 1 }),
+          utils.users.get.queryKey({ input: { id: 1 } }),
           utils.users.get.mutationKey(),
         ]) {
           expect(infiniteKey).not.toStrictEqual(otherView);
@@ -246,18 +246,22 @@ describe("createRpcQueryUtils semantic keys", () => {
         });
 
         expect(
-          utils.shapes.struct.queryKey({ id: 1, name: "Ada" }).at(-1)
+          utils.shapes.struct.queryKey({ input: { id: 1, name: "Ada" } }).at(-1)
         ).toStrictEqual({
           id: 1,
           name: "Ada",
         });
-        expect(utils.shapes.defaulted.queryKey({ id: 1 })).toStrictEqual(
-          utils.shapes.defaulted.queryKey({ id: 1, locale: "en" })
+        expect(
+          utils.shapes.defaulted.queryKey({ input: { id: 1 } })
+        ).toStrictEqual(
+          utils.shapes.defaulted.queryKey({ input: { id: 1, locale: "en" } })
         );
         expect(
-          utils.shapes.transformed.queryKey({ id: 42 }).at(-1)
+          utils.shapes.transformed.queryKey({ input: { id: 42 } }).at(-1)
         ).toStrictEqual({ id: "42" });
-        expect(utils.shapes.class.queryKey({ id: 1 }).at(-1)).toStrictEqual({
+        expect(
+          utils.shapes.class.queryKey({ input: { id: 1 } }).at(-1)
+        ).toStrictEqual({
           id: 1,
         });
         expect(utils.shapes.void.queryKey()).toStrictEqual([
@@ -291,7 +295,7 @@ describe("createRpcQueryUtils semantic keys", () => {
         });
         const input = { z: "last", details: { z: 2, a: 1 }, a: "first" };
 
-        const key = utils.nested.read.queryKey(input);
+        const key = utils.nested.read.queryKey({ input });
         input.details.a = 99;
         input.a = "changed";
 
@@ -365,7 +369,7 @@ describe("createRpcQueryUtils semantic keys", () => {
 
         for (const invalidValue of invalidValues) {
           const error = captureKeyError(() =>
-            utils.invalid.read.queryKey({ value: invalidValue })
+            utils.invalid.read.queryKey({ input: { value: invalidValue } })
           );
           expect(error).toMatchObject({
             _tag: "EffectRpcQueryKeyError",
@@ -416,7 +420,9 @@ describe("createRpcQueryUtils semantic keys", () => {
         /* oxlint-disable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
         const construction = captureKeyError(() =>
           utils.errors.construction.queryKey({
-            secret: "do-not-retain" as "expected",
+            input: {
+              secret: "do-not-retain" as "expected",
+            },
           })
         );
         /* oxlint-enable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
@@ -431,7 +437,7 @@ describe("createRpcQueryUtils semantic keys", () => {
         }
 
         const encoding = captureKeyError(() =>
-          utils.errors.encoding.queryKey("safe-value")
+          utils.errors.encoding.queryKey({ input: "safe-value" })
         );
         expect(encoding).toMatchObject({
           code: "PayloadEncodingFailed",

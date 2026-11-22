@@ -168,7 +168,7 @@ true satisfies Assert<
 >;
 true satisfies Assert<
   Equal<
-    keyof typeof utils.views,
+    Extract<keyof typeof utils.views, string>,
     "key" | "plain" | "wrapped" | "ndjson" | "wrappedNdjson"
   >
 >;
@@ -209,7 +209,8 @@ true satisfies Assert<
     number | undefined
   >
 >;
-const key = utils.views.plain.streamedKey(input, {
+const key = utils.views.plain.streamedKey({
+  input,
   maxChunks: 3,
   sseOptions: { maxEventSize: 1024 },
 });
@@ -266,7 +267,7 @@ true satisfies Assert<
 >;
 const captured = { params: { id: 1 }, sseOptions: { maxEventSize: 1024 } };
 // @ts-expect-error Decoder controls remain separate from request input.
-utils.views.plain.streamedKey(captured, { maxChunks: "unbounded" });
+utils.views.plain.streamedKey({ input: captured, maxChunks: "unbounded" });
 utils.views.plain.streamedOptions({
   maxChunks: "unbounded",
   // @ts-expect-error The adapter owns response mode.
@@ -297,7 +298,7 @@ const custom = createHttpApiQueryUtils(api, {
   runtime: runPromiseExit,
   keyEncoders: { views: { plain: (request) => request.params.id } },
 });
-custom.views.plain.streamedKey(input, { maxChunks: "unbounded" });
+custom.views.plain.streamedKey({ input, maxChunks: "unbounded" });
 initial.queryKey satisfies typeof key;
 
 declare const extraStream: Stream.Stream<
@@ -324,11 +325,11 @@ const extra = createHttpApiQueryUtils(api, {
   runtime: extraRunner,
 });
 queryClient.getQueryData(
-  extra.views.plain.streamedKey(input, { maxChunks: "unbounded" })
+  extra.views.plain.streamedKey({ input, maxChunks: "unbounded" })
 ) satisfies readonly number[] | undefined;
 
 const extraState = queryClient.getQueryState(
-  extra.views.plain.streamedKey(input, { maxChunks: "unbounded" })
+  extra.views.plain.streamedKey({ input, maxChunks: "unbounded" })
 );
 type ExtraFailure =
   Exclude<
@@ -469,7 +470,8 @@ const liveOptions = utils.views.plain.liveOptions({
   select: (value) => value.toFixed(2),
   staleTime: Infinity,
 });
-const liveKey = utils.views.plain.liveKey(input, {
+const liveKey = utils.views.plain.liveKey({
+  input,
   sseOptions: { maxEventSize: 1024 },
 });
 true satisfies Assert<Equal<(typeof liveKey)["length"], 8>>;
@@ -543,7 +545,7 @@ true satisfies Assert<
   >
 >;
 const extraLiveState = queryClient.getQueryState(
-  extra.views.plain.liveKey(input)
+  extra.views.plain.liveKey({ input })
 );
 type ExtraLiveFailure =
   Exclude<
@@ -559,7 +561,7 @@ true satisfies Assert<
   >
 >;
 // @ts-expect-error Decoder controls remain separate from captured requests.
-utils.views.plain.liveKey(captured);
+utils.views.plain.liveKey({ input: captured });
 utils.views.plain.liveOptions({
   // @ts-expect-error The adapter owns response mode.
   input: { ...input, responseMode: "response-only" },
@@ -567,12 +569,12 @@ utils.views.plain.liveOptions({
 // @ts-expect-error Live queries retain one value and expose no history bound.
 utils.views.plain.liveOptions({ input, maxChunks: 2 });
 // @ts-expect-error Live queries expose no accumulated refetch mode.
-utils.views.plain.liveKey(input, { refetchMode: "append" });
+utils.views.plain.liveKey({ input, refetchMode: "append" });
 // @ts-expect-error Caller hashes belong in QueryClient defaults.
 utils.views.plain.liveOptions({ input, queryKeyHashFn: JSON.stringify });
 // @ts-expect-error Inputless live endpoints reject skipToken.
 utils.events.liveOptions({ input: skipToken });
-custom.views.plain.liveKey(input);
+custom.views.plain.liveKey({ input });
 
 const UndefinedValue = Schema.Null.pipe(
   Schema.decodeTo(

@@ -332,7 +332,9 @@ describe.each(["reset", "append", "replace"] as const)(
                 refetchMode === "append" ? [{ id: 2 }, { id: 3 }] : [{ id: 3 }];
               expect(result).toStrictEqual(expected);
               expect(
-                queryClient.getQueryData(http.records.watch.streamedKey(input))
+                queryClient.getQueryData(
+                  http.records.watch.streamedKey({ input })
+                )
               ).toStrictEqual(expected);
               expect(publications).toContainEqual(expected);
             } finally {
@@ -485,14 +487,14 @@ it.effect("caches decoded NDJSON records in accumulated and live views", () =>
         )
       ).toStrictEqual({ id: 3 });
       expect(
-        http.records.watch.streamedKey(input, { maxChunks: 2 })
+        http.records.watch.streamedKey({ input, maxChunks: 2 })
       ).toStrictEqual([
         ...http.records.watch.key(),
         "streamed",
         { query: { channel: "news" } },
         { maxChunks: 2, refetchMode: "reset" },
       ]);
-      expect(http.records.watch.liveKey(input)).toStrictEqual([
+      expect(http.records.watch.liveKey({ input })).toStrictEqual([
         ...http.records.watch.key(),
         "live",
         { query: { channel: "news" } },
@@ -538,18 +540,18 @@ it.effect(
         );
         expect({
           key: options.queryKey,
-          configuredKey: configured.liveKey(input),
+          configuredKey: configured.liveKey({ input }),
           result,
           publications,
-          cached: queryClient.getQueryData(configured.liveKey(input)),
+          cached: queryClient.getQueryData(configured.liveKey({ input })),
         }).toStrictEqual({
-          key: leaf.liveKey(input, { coalesceMs: 1000 }),
-          configuredKey: leaf.liveKey(input, { coalesceMs: 1000 }),
+          key: leaf.liveKey({ input, coalesceMs: 1000 }),
+          configuredKey: leaf.liveKey({ input, coalesceMs: 1000 }),
           result: { id: 3 },
           publications: [{ id: 1 }, { id: 3 }],
           cached: { id: 3 },
         });
-        expect(options.queryKey).not.toStrictEqual(leaf.liveKey(input));
+        expect(options.queryKey).not.toStrictEqual(leaf.liveKey({ input }));
         publications.length = 0;
         const local = configured.liveOptions({ input, coalesceMs: undefined });
         const localResult = yield* Effect.promise(
@@ -557,13 +559,13 @@ it.effect(
         );
         expect({
           key: local.queryKey,
-          configuredKey: configured.liveKey(input, { coalesceMs: undefined }),
+          configuredKey: configured.liveKey({ input, coalesceMs: undefined }),
           result: localResult,
           publications,
           original: queryClient.getQueryData(options.queryKey),
         }).toStrictEqual({
-          key: leaf.liveKey(input),
-          configuredKey: leaf.liveKey(input),
+          key: leaf.liveKey({ input }),
+          configuredKey: leaf.liveKey({ input }),
           result: { id: 3 },
           publications: [{ id: 1 }, { id: 2 }, { id: 3 }],
           original: { id: 3 },

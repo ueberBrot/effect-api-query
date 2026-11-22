@@ -127,7 +127,7 @@ const createUser = configureUtils(rpc.users.create, {
     policy: {
       onSuccess: async (created) => {
         queryClient.setQueryData(
-          rpc.users.get.queryKey({ id: created.id }),
+          rpc.users.get.queryKey({ input: { id: created.id } }),
           created
         );
         await queryClient.invalidateQueries({ queryKey: rpc.users.key() });
@@ -244,7 +244,9 @@ export const applicationQueries = (
       policy: {
         onSuccess: async (user) => {
           queryClient.setQueryData(
-            base.users.get.queryKey({ id: user.id, locale: user.locale }),
+            base.users.get.queryKey({
+              input: { id: user.id, locale: user.locale },
+            }),
             user
           );
           await queryClient.invalidateQueries({
