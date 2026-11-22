@@ -46,7 +46,7 @@ Both methods use decoded-only response mode and preserve successful `undefined`.
 
 ## Buffered metadata
 
-Buffered query endpoints support `metadataKey(request)` and `metadataOptions({ input, ...options })`. Omit the request for inputless endpoints. The client runs in decoded-and-response mode. The cache holds this envelope.
+Buffered query endpoints support `metadataKey({ input: request })` and `metadataOptions({ input, ...options })`. Omit the request for inputless endpoints. The client runs in decoded-and-response mode. The cache holds this envelope.
 
 ```ts
 type Metadata<DecodedSuccess> = {
@@ -106,7 +106,7 @@ Both views share the underlying error, service, and cleanup contract. SSE valida
 
 Supply `initialPageParam` and `getNextPageParam`. If the endpoint takes input, use `input(pageParam)` to build each decoded request or use `input: skipToken` to pause. Omit `input` for inputless endpoints.
 
-The first mapped request forms the infinite key. Use `infiniteKey(request)` or `infiniteKey()` if inputless. The `infinite` segment separates it from ordinary queries. Keys from `infiniteOptions` retain the inferred page parameter.
+The first mapped request forms the infinite key. Use `infiniteKey({ input: request })` or `infiniteKey()` if inputless. The `infinite` segment separates it from ordinary queries. Keys from `infiniteOptions` retain the inferred page parameter.
 
 Use the same filters in the first request and each later page. Rebuild options if filters change. The mapper must be deterministic because key creation and page execution both call it.
 

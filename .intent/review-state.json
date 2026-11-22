@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "038c3008c9d831710f2047ae06f4b61bfa42bbb8b0e9fc95750bbef99502aa70",
+      "fingerprint": "ddb90917ff5a4613165d515e8a76c008a9ceeed65174308c8f81c17e3fd424f3",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -65,7 +65,7 @@
         "apps/docs/src/content/docs/reference/external-http-clients.md": "501ad4c67b7beabbccb05d11665bed8d7d7f4a030460fb8620134fe5be8be5fe",
         "apps/docs/src/content/docs/reference/factory.md": "61ce893c3cf475d240cfce6c047ae5cd6e7adca44ad1d99b9741b90f200f9516",
         "apps/docs/src/content/docs/reference/generated-builders.md": "84a2c18a80b0c913739351dbf51f94387c057e6f5c4e3fbe88b87aca59f4b68e",
-        "apps/docs/src/content/docs/reference/http-builders.md": "9d91fa4dc0c65e359d1724d9a53d666c299ddffe25d2a1054809832f762986aa",
+        "apps/docs/src/content/docs/reference/http-builders.md": "fb855f00ec3e26f8457811e0662c323b0edbdb0b75419ffa3f8d5f06eb4d7d5b",
         "apps/docs/src/content/docs/reference/http-factory.md": "253286bda9751beddb42b0bd6d1139d00821fe1f29d35f7306fc7c063a03dd0c",
         "apps/docs/src/content/docs/reference/performance.md": "aead5216878119c3f3fa9fe4f62c459ee064984f14428546f1f7fea584a1d7bf",
         "apps/docs/src/content/docs/reference/public-exports.md": "70a4d7fa8386aa1945f7736b0ffd10658173cba53554f6801a83b6cc4dc0365d",
@@ -390,7 +390,7 @@
         "tests/types/rpc-cast-contract.ts": "670d5ada82df341b564b18aa7f67f6810221e5c9b4fbd165dd5a3e28d994d01b",
         "tests/types/rpc-large-contract.ts": "a09d75fc9122807f8ffc58ff75988caaf858ab9e74172b04935c9c3fe26efabb",
         "tests/types/server-local-client-contract.ts": "582a121efab98c6c52d371b6f07c3e0c42c07cbb60f0d70f357f24262d677f99",
-        "tests/types/setup-overhaul-contract.ts": "7d4f71e58b815e9f317acb03b4dddf69f806c2633f7e44078b5c0ef220c3cd78",
+        "tests/types/setup-overhaul-contract.ts": "5ec60e16a3623cb530e6a7a646ebaefa01759d179bcf106594243cc456a3da8c",
         "tests/types/snapshot-contract.ts": "7eb7b28d2ef7e8348992ca69d52d6cb557d3e4a119f33b0a26c61a5da4f211e4",
         "tests/types/stream-publication-contract.ts": "b780ec6b771f36a8027caab1a958a080d3dd23be2f16cff2590cb3996b344b6b",
         "tests/types/stream-recovery-contract.ts": "cd9ad0a63edb515f1ff17ca64bbd9e5dd2484637e199aa2cbaa6cebf3e01527f",
@@ -403,15 +403,15 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "ef5aedfc80477dce61f0c4b24f7552d5a9a6d452",
-      "outcome": "updated",
-      "reason": "Canonical 0.8.0 guidance reconciles the actual source diff. ADR 0044 changes factory setup and owner tracking, 0045 raises the peer floors, 0046 changes key inputs and delays leaf construction, 0047 derives hydration codecs, and 0048 adds optional React wiring. These five inherited source items are now mapped to the existing skill. The inherited React entry and TSX declaration input now belong to the React integration mapping. The inherited commands component belongs to the cache/cancellation workflow and now uses an exact colocated filter. The owner tracker now surrounds the complete configured operation in either composition order, as documented. The metadata and unary guidance now link to contract derivation and describe the derived metadata codec. The existing planning record already covers that workflow. The coalescing test now fakes elapsed time along with timeout callbacks, so it exercises the same publication deadline with one clock. Runtime coalescing and the guidance are unchanged.",
+      "head": "66fb964ede68817b3d23b90986e18bd7bd4e8732",
+      "outcome": "no-change",
+      "reason": "The shipped HTTP and query-pattern references already describe the input object for exact metadata and infinite keys. Corrected two positional signatures in the HTTP reference and removed non-directive fixture comments.",
       "evidence": [
-        "Integrated base 7788ee4 and ADRs 0044–0053; src/react/index.tsx, tsconfig.declarations.json, src/core/configure-utils.ts, src/core/query-owner.ts, examples/vite-react/src/components/sections/commands-section.tsx and examples/tanstack-start/src/lib/snapshot-preparation.ts. Intent structural validation passed (one skill). Docs excerpts passed (24) and Astro reported zero diagnostics. Focused owner, React, Start, execution and Reactivity checks passed (99 tests in 14 files, one worker), including the metadata drain regression. Fallow passed all four commands and both example production builds passed. Fresh independent consumer discovery was excluded. Production docs build passed with 62 pages and all links valid. Packed Effect compatibility passed with both compilers and 468 runtime tests under one worker. tests/live-coalescing.test.ts passed all eight assertions cases in five separate one-worker runs."
+        "apps/docs/src/content/docs/reference/http-builders.md; tests/types/setup-overhaul-contract.ts; shipped HTTP and query-pattern references; api-types passed on TSRS and TS 5.9.3; docs-check passed all 24 excerpts."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "fb16a891db9f66bdb27668be6558fea041cc240caeed20e7352d03431cceff8d",
+      "fingerprint": "f3ffc3cf0cb38f695258bf5e6a07f40e6a65f41991ace87f32dc10c2781270cb",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -476,7 +476,7 @@
         "apps/docs/src/content/docs/reference/external-http-clients.md": "501ad4c67b7beabbccb05d11665bed8d7d7f4a030460fb8620134fe5be8be5fe",
         "apps/docs/src/content/docs/reference/factory.md": "61ce893c3cf475d240cfce6c047ae5cd6e7adca44ad1d99b9741b90f200f9516",
         "apps/docs/src/content/docs/reference/generated-builders.md": "84a2c18a80b0c913739351dbf51f94387c057e6f5c4e3fbe88b87aca59f4b68e",
-        "apps/docs/src/content/docs/reference/http-builders.md": "9d91fa4dc0c65e359d1724d9a53d666c299ddffe25d2a1054809832f762986aa",
+        "apps/docs/src/content/docs/reference/http-builders.md": "fb855f00ec3e26f8457811e0662c323b0edbdb0b75419ffa3f8d5f06eb4d7d5b",
         "apps/docs/src/content/docs/reference/http-factory.md": "253286bda9751beddb42b0bd6d1139d00821fe1f29d35f7306fc7c063a03dd0c",
         "apps/docs/src/content/docs/reference/performance.md": "aead5216878119c3f3fa9fe4f62c459ee064984f14428546f1f7fea584a1d7bf",
         "apps/docs/src/content/docs/reference/public-exports.md": "70a4d7fa8386aa1945f7736b0ffd10658173cba53554f6801a83b6cc4dc0365d",
@@ -801,7 +801,7 @@
         "tests/types/rpc-cast-contract.ts": "670d5ada82df341b564b18aa7f67f6810221e5c9b4fbd165dd5a3e28d994d01b",
         "tests/types/rpc-large-contract.ts": "a09d75fc9122807f8ffc58ff75988caaf858ab9e74172b04935c9c3fe26efabb",
         "tests/types/server-local-client-contract.ts": "582a121efab98c6c52d371b6f07c3e0c42c07cbb60f0d70f357f24262d677f99",
-        "tests/types/setup-overhaul-contract.ts": "7d4f71e58b815e9f317acb03b4dddf69f806c2633f7e44078b5c0ef220c3cd78",
+        "tests/types/setup-overhaul-contract.ts": "5ec60e16a3623cb530e6a7a646ebaefa01759d179bcf106594243cc456a3da8c",
         "tests/types/snapshot-contract.ts": "7eb7b28d2ef7e8348992ca69d52d6cb557d3e4a119f33b0a26c61a5da4f211e4",
         "tests/types/stream-publication-contract.ts": "b780ec6b771f36a8027caab1a958a080d3dd23be2f16cff2590cb3996b344b6b",
         "tests/types/stream-recovery-contract.ts": "cd9ad0a63edb515f1ff17ca64bbd9e5dd2484637e199aa2cbaa6cebf3e01527f",
@@ -814,11 +814,11 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "ef5aedfc80477dce61f0c4b24f7552d5a9a6d452",
-      "outcome": "updated",
-      "reason": "The domain map now covers tag-keyed setup, tracked owners, contract hydration and optional React providers. The skill tree maps ADRs 0044–0048 and their React, declaration, and command evidence without adding another skill. The skill spec records the release sources, ownership and the retirement regression. The metadata and unary guidance now link to contract derivation and describe the derived metadata codec. The existing planning record already covers that workflow. The coalescing test now fakes elapsed time along with timeout callbacks, so it exercises the same publication deadline with one clock. Runtime coalescing and the guidance are unchanged.",
+      "head": "66fb964ede68817b3d23b90986e18bd7bd4e8732",
+      "outcome": "no-change",
+      "reason": "The domain map, skill specification, and skill tree already cover HTTP key identity, buffered metadata, and pagination. Correcting call syntax and deleting fixture comments leave task scope, prerequisites, and source mappings accurate.",
       "evidence": [
-        "_artifacts/domain_map.yaml, _artifacts/skill_spec.md, _artifacts/skill_tree.yaml at integrated base 7788ee4 plus this reviewed diff. Intent sync and structural validation passed. Docs excerpts passed (24) and focused runtime passed (99). Fresh independent consumer discovery remains unverified. Production docs build passed with 62 pages and all links valid. Packed Effect compatibility passed with both compilers and 468 runtime tests under one worker. tests/live-coalescing.test.ts passed all eight assertions cases in five separate one-worker runs."
+        "_artifacts/domain_map.yaml; _artifacts/skill_spec.md; _artifacts/skill_tree.yaml; packed api-types and docs-check passed."
       ]
     },
     "source:vite.config.ts": {

@@ -96,7 +96,6 @@ declare const customFlatClient: RpcClient.RpcClient.Flat<
 >;
 declare const serviceObjectClient: RpcClient.RpcClient<ServiceRpcs, never>;
 
-// 1. Optional keyPrefix on RPC (omitted -> readonly [], root ["rpc"])
 const unprefixedObjectRpc = createRpcQueryUtils(rpcGroup, {
   client: objectClient,
 });
@@ -121,14 +120,12 @@ const annotatedUnprefixedFlat: RpcQueryUtils<
 > = unprefixedFlatRpc;
 void [annotatedUnprefixedObject, annotatedUnprefixedFlat];
 
-// Default Prefix parameter on RpcQueryUtils is readonly []
 const defaultPrefixAnnotation: RpcQueryUtils<typeof rpcGroup> =
   createRpcQueryUtils(rpcGroup, {
     client: {} as RpcClient.RpcClient<Rpcs, never>,
   });
 void defaultPrefixAnnotation;
 
-// Prefixed RPC with both client shapes
 const prefixedObjectRpc = createRpcQueryUtils(rpcGroup, {
   client: customObjectClient,
   keyPrefix: ["tenant-a"],
@@ -150,7 +147,6 @@ true satisfies Assert<
   >
 >;
 
-// ClientMiddlewareError preserved on unary + streaming for BOTH object and flat clients
 true satisfies Assert<
   Equal<
     InferQueryError<typeof prefixedObjectRpc.users.get>,
@@ -195,7 +191,6 @@ true satisfies Assert<
   >
 >;
 
-// makeNoSerialization (object and flat)
 declare const noSerObject: Effect.Success<
   ReturnType<typeof RpcClient.makeNoSerialization<Rpcs, "no-ser-err", false>>
 >["client"];
@@ -221,7 +216,6 @@ true satisfies Assert<
   >
 >;
 
-// Invalid keyPrefix rejections on RPC
 declare const mutablePrefix: string[];
 createRpcQueryUtils(rpcGroup, {
   client: objectClient,
@@ -244,7 +238,6 @@ createRpcQueryUtils<typeof rpcGroup, readonly ["app"]>(rpcGroup, {
   client: neverErrorObjectClient,
 });
 
-// 2. Optional keyPrefix on HTTP
 const httpApi = HttpApi.make("accounts").add(
   HttpApiGroup.make("users").add(
     HttpApiEndpoint.get("get", "/users/:id", {
@@ -281,7 +274,6 @@ createHttpApiQueryUtils<typeof httpApi, readonly ["app"]>(httpApi, {
   client: httpClient,
 });
 
-// 3. Unified runtime option (RunPromiseExit, { runPromiseExit }, ManagedRuntime<R, never>)
 declare const okRuntime: ManagedRuntime.ManagedRuntime<ServiceDep, never>;
 declare const failingRuntime: ManagedRuntime.ManagedRuntime<
   ServiceDep,
@@ -333,7 +325,6 @@ createHttpApiQueryUtils(httpApi, {
   runPromiseExit: Effect.runPromiseExit,
 });
 
-// 4. QueryOwner.wrapRunner with RuntimeInput and QueryOwner.trackUtils composition
 const owner = await acquireQueryOwner(async (setup) => {
   const wrappedFn = setup.wrapRunner(okRuntime);
   wrappedFn satisfies RunPromiseExit<ServiceDep>;
