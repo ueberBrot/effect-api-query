@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from "@effect/vitest";
-import { QueryClient, QueryObserver, skipToken } from "@tanstack/query-core";
+import {
+  CancelledError,
+  QueryClient,
+  QueryObserver,
+  skipToken,
+} from "@tanstack/query-core";
 import {
   Cause,
   Deferred,
@@ -22,6 +27,7 @@ import type { RpcClient } from "effect/rpc";
 import { Rpc, RpcGroup } from "effect/rpc";
 
 import {
+  configureUtils,
   createHttpApiQueryUtils,
   createRpcQueryUtils,
   EffectHttpApiQueryError,
@@ -402,6 +408,85 @@ describe("createRpcQueryUtils streaming execution", () => {
         );
         expect(error).toBeInstanceOf(EffectRpcQueryEmptyStreamError);
       })
+  );
+
+  describe.each([
+    { label: "uncoalesced", coalesceMs: undefined },
+    { label: "coalesced", coalesceMs: 100 },
+  ] as const)(
+    "aborts an in-flight $label RPC live query before its first emission",
+    ({ coalesceMs }) => {
+      it.effect("settles cleanly without throwing an empty-stream error", () =>
+        Effect.gen(function* abortRpcLiveBeforeFirstEmission() {
+          const started = yield* Deferred.make<boolean>();
+          const finalized = yield* Deferred.make<boolean>();
+          const Watch = Rpc.make("events.watch", {
+            success: Schema.String,
+            stream: true,
+          });
+          const streamGroup = RpcGroup.make(Watch);
+          const client = yield* makeRpcTestClient(streamGroup, {
+            "events.watch": () =>
+              Stream.fromEffect(
+                Deferred.succeed(started, true).pipe(
+                  Effect.andThen(Effect.never)
+                )
+              ).pipe(Stream.ensuring(Deferred.succeed(finalized, true))),
+          });
+          let executionError: unknown;
+          let executionSettled = false;
+          const executionDone = yield* Deferred.make<boolean>();
+          const runPromise = Effect.runPromiseWith(yield* Effect.context());
+          const utils = configureUtils(
+            createRpcQueryUtils(streamGroup, {
+              client,
+              keyPrefix: ["abort-rpc-live", coalesceMs ?? "none"] as const,
+            }),
+            {
+              live: {
+                interceptors: [
+                  async ({ next }) => {
+                    try {
+                      return await next();
+                    } catch (error) {
+                      executionError = error;
+                      throw error;
+                    } finally {
+                      executionSettled = true;
+                      await runPromise(Deferred.succeed(executionDone, true));
+                    }
+                  },
+                ],
+              },
+            }
+          );
+          const queryClient = new QueryClient({
+            defaultOptions: { queries: { retry: false } },
+          });
+          const options = utils.events.watch.liveOptions(
+            coalesceMs === undefined ? undefined : { coalesceMs }
+          );
+          try {
+            const pending = queryClient.query(options);
+            yield* Deferred.await(started);
+            yield* Effect.promise(async () => {
+              await queryClient.cancelQueries({ queryKey: options.queryKey });
+            });
+            const queryError = yield* Effect.promise(
+              async () => await captureFailure(pending)
+            );
+            yield* Deferred.await(finalized);
+            yield* Deferred.await(executionDone);
+            expect(queryError).toBeInstanceOf(CancelledError);
+            expect(executionSettled).toBe(true);
+            expect(executionError).toBeUndefined();
+            expect(queryClient.getQueryData(options.queryKey)).toBeUndefined();
+          } finally {
+            queryClient.clear();
+          }
+        })
+      );
+    }
   );
 
   it.effect("supports reset, append, and replace refetch modes", () =>

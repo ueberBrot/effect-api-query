@@ -6,6 +6,8 @@ import {
   acquireQueryOwner,
   configureUtils,
   createRpcQueryUtils,
+  EffectHttpApiQueryEmptyStreamError,
+  EffectRpcQueryEmptyStreamError,
 } from "#effect-api-query";
 
 import { group, makeRpcTestClient } from "./fixtures/effect-rpc";
@@ -320,4 +322,127 @@ describe("query owners", () => {
       )
     );
   });
+
+  it.each([undefined, 100] as const)(
+    "retires an accepted native live stream (coalesceMs: %s) aborted before its first emission before releasing its local transport",
+    async (coalesceMs) => {
+      await Effect.runPromise(
+        Effect.scoped(
+          Effect.gen(function* retireLiveStreamOwner() {
+            const started = gate();
+            const cleaned = gate();
+            const finalizing = gate();
+            let released = false;
+            const release = gate();
+            const base = yield* makeRpcTestClient(group, {
+              "events.watch": () =>
+                Stream.fromEffect(
+                  Effect.sync(() => {
+                    started.open();
+                  })
+                ).pipe(
+                  Stream.flatMap(() => Stream.never),
+                  Stream.ensuring(
+                    Effect.promise(async () => {
+                      finalizing.open();
+                      await cleaned.promise;
+                    })
+                  )
+                ),
+              "health.ping": () => Effect.void,
+              "toString.child": () => Effect.void,
+              "diagnostics.fail": () =>
+                Effect.fail("declared-failure" as const),
+              "users.get": (input) =>
+                Effect.succeed({
+                  id: input.id,
+                  locale: input.locale ?? "en",
+                  name: "Ada",
+                }),
+            });
+            yield* Effect.promise(async () => {
+              const owner = await acquireQueryOwner(async (setup) => {
+                await setup.acquire(
+                  () => base,
+                  () => {
+                    released = true;
+                    release.open();
+                  }
+                );
+                return configureUtils(
+                  createRpcQueryUtils(group, {
+                    client: base,
+                    keyPrefix: ["owner-live", coalesceMs ?? "none"],
+                    runPromiseExit: setup.wrapRunner(Effect.runPromiseExit),
+                  }),
+                  {
+                    live: {
+                      interceptors: [
+                        async ({ next, context }) =>
+                          await setup.runQuery(next, context.signal),
+                      ],
+                    },
+                  }
+                );
+              });
+              const pending = owner.queryClient.query(
+                owner.resources.events.watch.liveOptions({
+                  retry: false,
+                  ...(coalesceMs === undefined ? undefined : { coalesceMs }),
+                })
+              );
+              const settled = pending.catch(() => null);
+              await started.promise;
+              const disposing = owner.dispose();
+              await finalizing.promise;
+              expect(released).toBe(false);
+              cleaned.open();
+              await disposing;
+              await settled;
+              await release.promise;
+              expect(owner.queryClient.getQueryCache().getAll()).toStrictEqual(
+                []
+              );
+            });
+          })
+        )
+      );
+    }
+  );
+
+  it.each([
+    ["RPC", () => new EffectRpcQueryEmptyStreamError("events.watch")],
+    [
+      "HTTP",
+      () =>
+        new EffectHttpApiQueryEmptyStreamError({
+          apiId: "empty-live",
+          groupId: "events",
+          endpoint: "watch",
+          method: "GET",
+        }),
+    ],
+  ] as const)(
+    "does not classify %s empty-stream package errors as cancellations during retirement",
+    async (_adapter, createError) => {
+      const finish = gate();
+      const owner = await acquireQueryOwner(
+        async () => await Promise.resolve(null)
+      );
+      const controller = new AbortController();
+      const emptyError = createError();
+      const tracked = owner.runQuery(async () => {
+        await finish.promise;
+        throw emptyError;
+      }, controller.signal);
+      const observed = tracked.catch(() => null);
+      controller.abort();
+      const disposing = owner.dispose();
+      finish.open();
+      await expect(disposing).rejects.toMatchObject({
+        errors: [emptyError],
+      });
+      await observed;
+    }
+  );
 });

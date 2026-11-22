@@ -36,11 +36,14 @@ export const streamPublicationBatches =
       await closing;
     };
     const onAbort = () => {
-      // The finally block awaits and propagates cleanup failures.
-      // oxlint-disable-next-line promise/prefer-await-to-then
-      void close().catch(() => {
-        /* Awaited again in finally, which propagates the failure. */
-      });
+      void (async () => {
+        await Promise.resolve();
+        try {
+          await close();
+        } catch {
+          /* Awaited again in finally, which propagates the failure. */
+        }
+      })();
     };
     signal.addEventListener("abort", onAbort, { once: true });
     const clearDeadline = () => {
