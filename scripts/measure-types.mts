@@ -33,7 +33,13 @@ const compilers = [
   { name: "current", package: "@effect/tsgo" },
   { name: "minimum", package: "typescript-5.9" },
 ] as const;
-const consumers = ["contract", "raw", "configured"] as const;
+const consumers = [
+  "contract",
+  "raw",
+  "configured",
+  "hydration-bare",
+  "hydration-paths",
+] as const;
 type Consumer = (typeof consumers)[number];
 type HttpClient = (typeof httpClients)[number];
 type Workload =
@@ -153,40 +159,69 @@ const contract = HttpApi.make("type-baseline").add(HttpApiGroup.make("scale").ad
 ${httpClientDeclarations[workload.httpClient]}`;
 };
 
+const fixtureImports = (
+  adapter: Workload["adapter"],
+  consumer: Consumer,
+  sse: boolean,
+  overloaded: boolean
+) => {
+  const effectImport = `import { Schema${overloaded ? ", type Effect, type Stream" : ""} } from "effect";`;
+  const contractImport =
+    adapter === "rpc"
+      ? 'import { Rpc, RpcGroup, type RpcClient } from "effect/rpc";'
+      : `import { HttpApi, HttpApiEndpoint, HttpApiGroup, type HttpApiClient${sse ? ", HttpApiSchema" : ""} } from "effect/http-api";`;
+  if (consumer === "contract") {
+    return `${effectImport}\n${contractImport}`;
+  }
+  if (consumer === "hydration-bare" || consumer === "hydration-paths") {
+    return `${effectImport}\n${contractImport}\nimport { createContractHydrationRegistry } from "${packageName}";`;
+  }
+  const factory =
+    adapter === "rpc" ? "createRpcQueryUtils" : "createHttpApiQueryUtils";
+  const configured = consumer === "configured";
+  return `${effectImport}\n${contractImport}\nimport { QueryClient } from "@tanstack/query-core";\nimport { ${factory}${configured ? ", configureUtils" : ""}${overloaded ? ", type CreateHttpApiQueryUtilsOptions, type EffectHttpApiQueryError, type InferQueryError, type RunPromiseExit, type RuntimeInput" : ""} } from "${packageName}";`;
+};
+
 const fixture = (workload: Workload, count: number, consumer: Consumer) => {
   const { adapter } = workload;
   const sse = workload.adapter === "http" && workload.httpClient !== "buffered";
   const overloaded =
     workload.adapter === "http" &&
     workload.httpClient.startsWith("sse-overload");
-  const utilities = consumer !== "contract";
-  const configured = consumer === "configured";
   const last = count - 1;
-  const factory =
-    adapter === "rpc" ? "createRpcQueryUtils" : "createHttpApiQueryUtils";
-  const imports = `import { Schema${overloaded ? ", type Effect, type Stream" : ""} } from "effect";\n${
-    adapter === "rpc"
-      ? 'import { Rpc, RpcGroup, type RpcClient } from "effect/rpc";'
-      : `import { HttpApi, HttpApiEndpoint, HttpApiGroup, type HttpApiClient${sse ? ", HttpApiSchema" : ""} } from "effect/http-api";`
-  }\n${utilities ? `import { QueryClient } from "@tanstack/query-core";\nimport { ${factory}${configured ? ", configureUtils" : ""}${overloaded ? ", type CreateHttpApiQueryUtilsOptions, type EffectHttpApiQueryError, type InferQueryError, type RunPromiseExit, type RuntimeInput" : ""} } from "${packageName}";` : ""}`;
+  const imports = fixtureImports(adapter, consumer, sse, overloaded);
   const success =
     "const Value = Schema.Struct({ id: Schema.Int, label: Schema.String });";
   const contract = contractFixture(workload, count);
+  if (consumer === "hydration-bare") {
+    return `${imports}\n${success}\n${contract}\nconst registry = createContractHydrationRegistry(contract);\nexport { registry };\n`;
+  }
+  if (consumer === "hydration-paths") {
+    return `${imports}\n${success}\n${contract}\nconst registry = createContractHydrationRegistry(contract, { keyPrefix: ["type-baseline"], paths: { "scale.read-${last}": { query: Value, infinite: { pageParam: Schema.Int } } } });\nexport { registry };\n`;
+  }
+  if (consumer === "contract") {
+    const operation =
+      adapter === "rpc"
+        ? `client("scale.read-${last}", { id: 1 })`
+        : `client.scale["read-${last}"]({ params: { id: 1 } })`;
+    return `${imports}\n${success}\n${contract}\nconst operation = ${operation};\nexport { contract, operation };\n`;
+  }
+  const configured = consumer === "configured";
+  const factory =
+    adapter === "rpc" ? "createRpcQueryUtils" : "createHttpApiQueryUtils";
   const configuration = configured
     ? `const utils = configureUtils(raw, { query: { policy: { retry: false } }, scoped: { scale: { scoped: { "read-${last}": { query: { policy: { staleTime: 1000 }, interceptors: [async ({ next }) => { const value = await next(); value.label satisfies string; return value; }] } } } } } });\n`
     : "";
   const runner = overloaded
     ? 'declare const runtime: RunPromiseExit<"acquisition-service" | "stream-service">;\n'
     : "";
-  const use = utilities
-    ? `${runner}const ${configured ? "raw" : "utils"} = ${factory}(contract, { client, keyPrefix: ["type-baseline"]${overloaded ? ", runtime" : ""} });
+  const use = `${runner}const ${configured ? "raw" : "utils"} = ${factory}(contract, { client, keyPrefix: ["type-baseline"]${overloaded ? ", runtime" : ""} });
 ${configuration}const options = utils.scale["read-${last}"].queryOptions({ input: ${adapter === "rpc" ? "{ id: 1 }" : "{ params: { id: 1 } }"}, select: value => value.label });
 const cached = new QueryClient().getQueryData(options.queryKey);
 const id: number | undefined = cached?.id;
 export { options, id };
 ${sse ? useSse : ""}
-${overloaded ? checkOverload : ""}`
-    : `const operation = ${adapter === "rpc" ? `client("scale.read-${last}", { id: 1 })` : `client.scale["read-${last}"]({ params: { id: 1 } })`};\nexport { contract, operation };`;
+${overloaded ? checkOverload : ""}`;
   return `${imports}\n${success}\n${contract}\n${use}\n`;
 };
 
