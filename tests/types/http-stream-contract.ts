@@ -8,6 +8,7 @@ import type {
   CreateHttpApiQueryUtilsOptions,
   EffectHttpApiQueryConfigError,
   EffectHttpApiQueryError,
+  InferQueryError,
   RunPromiseExit,
 } from "@ueberbrot/effect-api-query";
 import { Context, Effect, Schema, SchemaTransformation } from "effect";
@@ -348,6 +349,113 @@ type ExtraRequirements = CreateHttpApiQueryUtilsOptions<
 >["runPromiseExit"];
 true satisfies Assert<Equal<ExtraRequirements, typeof extraRunner>>;
 true satisfies Assert<RunPromiseExit extends ExtraRequirements ? false : true>;
+
+declare const sseClient: HttpApiClient.ForApi<typeof api> & {
+  readonly views: {
+    readonly plain: (request: {
+      readonly params: { readonly id: number };
+      readonly responseMode: "decoded-only";
+      readonly sseOptions: {
+        readonly maxEventSize: number;
+        readonly dispatchEmptyNamedEvents: boolean;
+      };
+    }) => Effect.Effect<typeof extraStream, "extra-error", Scale>;
+  };
+};
+const sse = createHttpApiQueryUtils(api, {
+  client: sseClient,
+  keyPrefix: ["sse-overload"],
+  runPromiseExit: extraRunner,
+});
+type SseFailure =
+  InferQueryError<typeof sse.views.plain, "streamed"> extends infer Failure
+    ? Failure extends EffectHttpApiQueryError<infer Error>
+      ? Error
+      : never
+    : never;
+true satisfies Assert<
+  Equal<
+    Extract<SseFailure, "extra-error" | "stream-error">,
+    "extra-error" | "stream-error"
+  >
+>;
+true satisfies Assert<
+  Equal<
+    CreateHttpApiQueryUtilsOptions<
+      typeof api,
+      readonly ["sse-overload"],
+      typeof sseClient
+    >["runPromiseExit"],
+    typeof extraRunner
+  >
+>;
+
+type StandardSseClient = HttpApiClient.ForApi<typeof api>;
+type SseOverload = (request: {
+  readonly params: { readonly id: number };
+  readonly responseMode: "decoded-only";
+  readonly sseOptions: {
+    readonly maxEventSize: number;
+    readonly dispatchEmptyNamedEvents: boolean;
+  };
+}) => Effect.Effect<typeof extraStream, never, Scale>;
+declare const sseFirstClient: Omit<StandardSseClient, "views"> & {
+  readonly views: Omit<StandardSseClient["views"], "plain"> & {
+    readonly plain: SseOverload & StandardSseClient["views"]["plain"];
+  };
+};
+const sseFirst = createHttpApiQueryUtils(api, {
+  client: sseFirstClient,
+  keyPrefix: ["sse-first"],
+  runPromiseExit: extraRunner,
+});
+type SseFirstFailure =
+  InferQueryError<typeof sseFirst.views.plain, "streamed"> extends infer Failure
+    ? Failure extends EffectHttpApiQueryError<infer Error>
+      ? Error
+      : never
+    : never;
+true satisfies Assert<
+  Equal<Extract<SseFirstFailure, "stream-error">, "stream-error">
+>;
+true satisfies Assert<
+  Equal<
+    CreateHttpApiQueryUtilsOptions<
+      typeof api,
+      readonly ["sse-first"],
+      typeof sseFirstClient
+    >["runPromiseExit"],
+    typeof extraRunner
+  >
+>;
+
+const buffered = HttpApiEndpoint.get("read", "/read", {
+  success: Schema.Int,
+});
+const mixedApi = HttpApi.make("mixed-services").add(
+  HttpApiGroup.make("views").add(buffered, Plain)
+);
+type MixedClient = {
+  readonly views: {
+    readonly read: HttpApiClient.Client.Method<
+      typeof buffered,
+      never,
+      "buffered-service"
+    >;
+    readonly plain: HttpApiClient.ForApi<typeof mixedApi>["views"]["plain"] &
+      SseOverload;
+  };
+};
+true satisfies Assert<
+  Equal<
+    CreateHttpApiQueryUtilsOptions<
+      typeof mixedApi,
+      readonly ["mixed-services"],
+      MixedClient
+    >["runPromiseExit"],
+    RunPromiseExit<Scale | "stream-service" | "buffered-service">
+  >
+>;
 
 const liveOptions = utils.views.plain.liveOptions({
   input,

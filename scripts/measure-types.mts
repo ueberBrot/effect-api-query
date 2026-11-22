@@ -20,12 +20,77 @@ import {
 const counts = positiveIntegers("TYPE_COUNTS", [50, 250, 1000]);
 const selectedCompilers = choices("TYPE_COMPILERS", ["current", "minimum"]);
 const adapters = choices("TYPE_ADAPTERS", ["rpc", "http"]);
+const httpClients =
+  process.env["TYPE_HTTP_CLIENTS"] === undefined
+    ? (["buffered"] as const)
+    : choices("TYPE_HTTP_CLIENTS", [
+        "buffered",
+        "sse",
+        "sse-overload",
+        "sse-overload-typed-error",
+      ]);
 const compilers = [
   { name: "current", package: "@effect/tsgo" },
   { name: "minimum", package: "typescript-5.9" },
 ] as const;
 const consumers = ["contract", "raw", "configured"] as const;
 type Consumer = (typeof consumers)[number];
+type HttpClient = (typeof httpClients)[number];
+type Workload =
+  | { adapter: "rpc" }
+  | { adapter: "http"; httpClient: HttpClient };
+
+const workloads = adapters.flatMap<Workload>((adapter) =>
+  adapter === "rpc"
+    ? [{ adapter }]
+    : httpClients.map((httpClient) => ({ adapter, httpClient }))
+);
+
+const sseEndpoint = `const events = HttpApiEndpoint.get("events", "/events/:id", {
+  params: { id: Schema.Int },
+  success: HttpApiSchema.StreamSse({ data: Schema.Int }),
+});`;
+const sseOverload = (
+  error: string
+) => `type StandardClient = HttpApiClient.ForApi<typeof contract, ${error}>;
+declare const client: StandardClient & {
+  readonly scale: {
+    readonly events: (request: {
+      readonly params: { readonly id: number };
+      readonly responseMode: "decoded-only";
+      readonly sseOptions: {
+        readonly maxEventSize: number;
+        readonly dispatchEmptyNamedEvents: boolean;
+      };
+    }) => Effect.Effect<
+      Stream.Stream<number, "stream-error", "stream-service">,
+      "acquisition-error",
+      "acquisition-service"
+    >;
+  };
+};`;
+const standardHttpClient =
+  "declare const client: HttpApiClient.ForApi<typeof contract>;";
+const httpClientDeclarations = {
+  buffered: standardHttpClient,
+  sse: standardHttpClient,
+  "sse-overload": sseOverload("never"),
+  "sse-overload-typed-error": sseOverload('"client-error"'),
+} satisfies Record<HttpClient, string>;
+const useSse = `export const stream = utils.scale.events.streamedOptions({
+  input: { params: { id: 1 } },
+  maxChunks: 3,
+});`;
+const checkOverload = `type Failure = InferQueryError<typeof utils.scale.events, "streamed">;
+type Payload<T> = T extends EffectHttpApiQueryError<infer E> ? E : never;
+type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
+type OverloadErrors = "acquisition-error" | "stream-error";
+true satisfies Equal<Extract<Payload<Failure>, OverloadErrors>, OverloadErrors>;
+type Runner = CreateHttpApiQueryUtilsOptions<
+  typeof contract, readonly ["type-baseline"], typeof client
+>["runPromiseExit"];
+declare const expectedRunner: Runner;
+expectedRunner satisfies typeof runPromiseExit;`;
 
 interface CompilerDiagnostics {
   readonly files: number;
@@ -63,30 +128,64 @@ const parseDiagnostics = (output: string): CompilerDiagnostics => {
     totalMilliseconds: metric("Total time", "s") * 1000,
   };
 };
-const fixture = (
-  adapter: "rpc" | "http",
-  count: number,
-  consumer: Consumer
-) => {
+
+const contractFixture = (workload: Workload, count: number) => {
+  if (workload.adapter === "rpc") {
+    const operations = Array.from(
+      { length: count },
+      (_, index) =>
+        `Rpc.make("scale.read-${index}", { payload: { id: Schema.Int }, success: Value }),`
+    );
+    return `const contract = RpcGroup.make(\n${operations.join("\n")}\n);
+declare const client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof contract>>;`;
+  }
+  const operations = Array.from(
+    { length: count },
+    (_, index) => `endpoint("read-${index}"),`
+  );
+  const sse = workload.httpClient !== "buffered";
+  if (sse) {
+    operations.push("events,");
+  }
+  return `const endpoint = <const Name extends string>(name: Name) => HttpApiEndpoint.get(name, "/:id", { params: { id: Schema.Int }, success: Value });
+${sse ? sseEndpoint : ""}
+const contract = HttpApi.make("type-baseline").add(HttpApiGroup.make("scale").add(\n${operations.join("\n")}\n));
+${httpClientDeclarations[workload.httpClient]}`;
+};
+
+const fixture = (workload: Workload, count: number, consumer: Consumer) => {
+  const { adapter } = workload;
+  const sse = workload.adapter === "http" && workload.httpClient !== "buffered";
+  const overloaded =
+    workload.adapter === "http" &&
+    workload.httpClient.startsWith("sse-overload");
   const utilities = consumer !== "contract";
   const configured = consumer === "configured";
   const last = count - 1;
-  const imports = `import { Schema } from "effect";\n${
+  const factory =
+    adapter === "rpc" ? "createRpcQueryUtils" : "createHttpApiQueryUtils";
+  const imports = `import { Schema${overloaded ? ", type Effect, type Stream" : ""} } from "effect";\n${
     adapter === "rpc"
       ? 'import { Rpc, RpcGroup, type RpcClient } from "effect/rpc";'
-      : 'import { HttpApi, HttpApiEndpoint, HttpApiGroup, type HttpApiClient } from "effect/http-api";'
-  }\n${utilities ? `import { QueryClient } from "@tanstack/query-core";\nimport { ${adapter === "rpc" ? "createRpcQueryUtils" : "createHttpApiQueryUtils"}${configured ? ", configureUtils" : ""} } from "${packageName}";` : ""}`;
+      : `import { HttpApi, HttpApiEndpoint, HttpApiGroup, type HttpApiClient${sse ? ", HttpApiSchema" : ""} } from "effect/http-api";`
+  }\n${utilities ? `import { QueryClient } from "@tanstack/query-core";\nimport { ${factory}${configured ? ", configureUtils" : ""}${overloaded ? ", type CreateHttpApiQueryUtilsOptions, type EffectHttpApiQueryError, type InferQueryError, type RunPromiseExit" : ""} } from "${packageName}";` : ""}`;
   const success =
     "const Value = Schema.Struct({ id: Schema.Int, label: Schema.String });";
-  const contract =
-    adapter === "rpc"
-      ? `const contract = RpcGroup.make(\n${Array.from({ length: count }, (_, index) => `Rpc.make("scale.read-${index}", { payload: { id: Schema.Int }, success: Value }),`).join("\n")}\n);\ndeclare const client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof contract>>;`
-      : `const endpoint = <const Name extends string>(name: Name) => HttpApiEndpoint.get(name, "/:id", { params: { id: Schema.Int }, success: Value });\nconst contract = HttpApi.make("type-baseline").add(HttpApiGroup.make("scale").add(\n${Array.from({ length: count }, (_, index) => `endpoint("read-${index}"),`).join("\n")}\n));\ndeclare const client: HttpApiClient.ForApi<typeof contract>;`;
+  const contract = contractFixture(workload, count);
   const configuration = configured
     ? `const utils = configureUtils(raw, { query: { policy: { retry: false } }, scoped: { scale: { scoped: { "read-${last}": { query: { policy: { staleTime: 1000 }, interceptors: [async ({ next }) => { const value = await next(); value.label satisfies string; return value; }] } } } } } });\n`
     : "";
+  const runner = overloaded
+    ? 'declare const runPromiseExit: RunPromiseExit<"acquisition-service" | "stream-service">;\n'
+    : "";
   const use = utilities
-    ? `const ${configured ? "raw" : "utils"} = ${adapter === "rpc" ? "createRpcQueryUtils" : "createHttpApiQueryUtils"}(contract, { client, keyPrefix: ["type-baseline"] });\n${configuration}const options = utils.scale["read-${last}"].queryOptions({ input: ${adapter === "rpc" ? "{ id: 1 }" : "{ params: { id: 1 } }"}, select: value => value.label });\nconst cached = new QueryClient().getQueryData(options.queryKey);\nconst id: number | undefined = cached?.id;\nexport { options, id };`
+    ? `${runner}const ${configured ? "raw" : "utils"} = ${factory}(contract, { client, keyPrefix: ["type-baseline"]${overloaded ? ", runPromiseExit" : ""} });
+${configuration}const options = utils.scale["read-${last}"].queryOptions({ input: ${adapter === "rpc" ? "{ id: 1 }" : "{ params: { id: 1 } }"}, select: value => value.label });
+const cached = new QueryClient().getQueryData(options.queryKey);
+const id: number | undefined = cached?.id;
+export { options, id };
+${sse ? useSse : ""}
+${overloaded ? checkOverload : ""}`
     : `const operation = ${adapter === "rpc" ? `client("scale.read-${last}", { id: 1 })` : `client.scale["read-${last}"]({ params: { id: 1 } })`};\nexport { contract, operation };`;
   return `${imports}\n${success}\n${contract}\n${use}\n`;
 };
@@ -102,7 +201,8 @@ const measurements: {
   engineVersion: string;
   package: string;
   languageVersion: string;
-  adapter: string;
+  adapter: Workload["adapter"];
+  httpClient?: HttpClient;
   operations: number;
   utilities: boolean;
   consumer: Consumer;
@@ -115,11 +215,11 @@ try {
   for (const compiler of compilers.filter((entry) =>
     selectedCompilers.includes(entry.name)
   )) {
-    for (const adapter of adapters) {
+    for (const workload of workloads) {
       for (const count of counts) {
         for (const consumer of consumers) {
           const source = path.join(directory, "consumer.ts");
-          writeFileSync(source, fixture(adapter, count, consumer));
+          writeFileSync(source, fixture(workload, count, consumer));
           const config = path.join(directory, "tsconfig.json");
           writeFileSync(
             config,
@@ -181,8 +281,12 @@ try {
               compiler.name === "current"
                 ? currentCompiler.languageVersion
                 : "5.9.3",
-            adapter,
-            operations: count,
+            ...workload,
+            operations:
+              count +
+              (workload.adapter === "http" && workload.httpClient !== "buffered"
+                ? 1
+                : 0),
             utilities: consumer !== "contract",
             consumer,
             exitCode: compilation.status,
@@ -200,17 +304,23 @@ try {
     context,
     workload: {
       counts,
+      workloads,
       consumers,
       declarationSource: "built public package exports",
       compilation:
-        "fresh compiler process, one literal contract, raw or scoped-configured final leaf consumed",
+        "fresh compiler process, one literal contract, final buffered leaf and any SSE leaf consumed",
       skipLibCheck: true,
       samples: 1,
     },
     measurements,
   });
   for (const measurement of measurements) {
-    const key = `${measurement.compiler}/${measurement.adapter}/${measurement.operations}/${measurement.consumer}`;
+    const adapter =
+      measurement.httpClient === undefined ||
+      measurement.httpClient === "buffered"
+        ? measurement.adapter
+        : measurement.httpClient;
+    const key = `${measurement.compiler}/${adapter}/${measurement.operations}/${measurement.consumer}`;
     const budget = compilerBudgets.get(key);
     if (budget !== undefined) {
       assertBudget(key, measurement.diagnostics.instantiations, budget);
@@ -221,7 +331,7 @@ try {
     process.exitCode = 1;
     for (const failure of failures) {
       console.error(
-        `${failure.compiler} ${failure.adapter} ${failure.operations} ${failure.consumer}: compilation failed\n${failure.errors.slice(0, 3).join("\n")}`
+        `${failure.compiler} ${failure.httpClient ?? failure.adapter} ${failure.operations} ${failure.consumer}: compilation failed\n${failure.errors.slice(0, 3).join("\n")}`
       );
     }
   }

@@ -5,3 +5,5 @@ minimumReleaseAge: 10080
 minimumReleaseAgeStrict: true
 minimumReleaseAgeIgnoreMissingTime: false
 trustLockfile: false
+allowBuilds:
+  vue-demi@0.14.10: false

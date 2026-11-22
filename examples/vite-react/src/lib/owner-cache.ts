@@ -1,4 +1,5 @@
 import type { QueryClient, QueryKey } from "@tanstack/react-query";
+import type { QueryOwner } from "@ueberbrot/effect-api-query";
 import { Schema } from "effect";
 
 const OwnerIdentity = Schema.Struct({
@@ -47,11 +48,13 @@ export const makeOwnerCache = ({
   queryClient,
   directoryKeys,
   storage,
+  lifecycle,
 }: {
   readonly identity: ApplicationOwnerIdentity;
   readonly queryClient: QueryClient;
   readonly directoryKeys: Readonly<Record<"rpc" | "http", QueryKey>>;
   readonly storage?: DirectoryStorage | undefined;
+  readonly lifecycle?: Pick<QueryOwner<unknown>, "runMutation" | "dispose">;
 }) => {
   const owner = Object.freeze(Schema.decodeSync(OwnerIdentity)(identity));
   const storageKey = `effect-api-query:directory:${JSON.stringify(ownerKeyPrefix(owner))}`;
@@ -63,10 +66,11 @@ export const makeOwnerCache = ({
     if (!active) {
       throw new Error("Owner is inactive");
     }
-    const result = (async () => {
+    const run = async () => {
       await Promise.resolve();
       return await execute();
-    })();
+    };
+    const result = lifecycle === undefined ? run() : lifecycle.runMutation(run);
     pendingMutations.add(result);
     try {
       return await result;
@@ -168,11 +172,15 @@ export const makeOwnerCache = ({
           saveDirectory();
         }
       } finally {
-        try {
-          await queryClient.cancelQueries();
-        } finally {
-          queryClient.clear();
-          await Promise.allSettled(pendingMutations);
+        if (lifecycle === undefined) {
+          try {
+            await queryClient.cancelQueries();
+          } finally {
+            queryClient.clear();
+            await Promise.allSettled(pendingMutations);
+          }
+        } else {
+          await lifecycle.dispose();
         }
       }
     })();

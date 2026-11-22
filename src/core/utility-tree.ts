@@ -2,7 +2,7 @@ import { skipToken } from "@tanstack/query-core";
 import { Array as EffectArray, Effect, Exit, Predicate } from "effect";
 import type { Cause } from "effect";
 
-import { canonicalize, canonicalizeArray } from "./canonical-key";
+import { canonicalizeArray } from "./canonical-key";
 import { prepareMetadataExecution } from "./metadata-query";
 import type {
   BufferedOperation,
@@ -14,7 +14,11 @@ import type {
   UnaryOperation,
   UnaryQueryOperation,
 } from "./operation";
-import { readPreparedInput, registerInputOwner } from "./prepared-input";
+import {
+  prepareQueryInput,
+  readPreparedInput,
+  registerInputOwner,
+} from "./prepared-input";
 import type { JsonValue, RunPromiseExit } from "./types";
 
 const reservedPathSegments = new Set([
@@ -153,6 +157,7 @@ const prepareQuery = (
   keyEncoder: RuntimeKeyEncoder | undefined,
   identity: readonly JsonValue[] = []
 ): PreparedQuery => {
+  const reused = readPreparedInput(description.input, input);
   if (description.input._tag === "Inputless") {
     return {
       input: undefined,
@@ -162,22 +167,12 @@ const prepareQuery = (
           : freezeKey([...operationKey, ...identity]),
     };
   }
-  const reused = readPreparedInput(description.input, input);
-  const prepared = reused ?? description.input.prepare(input, keyEncoder);
-  try {
-    return {
-      input: prepared.input,
-      key: freezeKey([
-        ...operationKey,
-        reused === undefined
-          ? canonicalize(prepared.keyValue)
-          : reused.keyValue,
-        ...identity,
-      ]),
-    };
-  } catch (error) {
-    throw description.input.invalidKey(error);
-  }
+  const prepared =
+    reused ?? prepareQueryInput(description.input, input, keyEncoder);
+  return {
+    input: prepared.input,
+    key: freezeKey([...operationKey, prepared.keyValue, ...identity]),
+  };
 };
 
 const prepareQueryOptions = (
@@ -471,14 +466,12 @@ const validateKeyEncoders = (
   keyEncoders: ReadonlyMap<string, RuntimeKeyEncoder>,
   errors: TreeErrors
 ) => {
-  const supportedIds = new Set(
-    operations
-      .filter(
-        (operation) =>
-          operation.kind !== "Mutation" && operation.input._tag !== "Inputless"
-      )
-      .map((operation) => operation.id)
-  );
+  const supportedIds = new Set<string>();
+  for (const operation of operations) {
+    if (operation.kind !== "Mutation" && operation.input._tag !== "Inputless") {
+      supportedIds.add(operation.id);
+    }
+  }
   for (const id of keyEncoders.keys()) {
     if (!supportedIds.has(id)) {
       throw errors.unknownEncoder(id);

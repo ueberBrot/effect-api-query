@@ -270,6 +270,7 @@ describe("runnable HTTP workflows", () => {
       let disposed = false;
       const completedDisposal = disposal.then(() => {
         disposed = true;
+        return true;
       });
       await Effect.runPromise(Deferred.await(finalizing));
       expect(disposed).toBe(false);

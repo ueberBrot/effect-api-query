@@ -1,19 +1,44 @@
-// Keep the native v5 fetch/ensure APIs for the supported Query Core floor.
-/* oxlint-disable typescript/no-deprecated */
 /* oxlint-disable eslint/max-classes-per-file */
+import { noop } from "@tanstack/query-core";
 import type {
   DefaultError,
-  EnsureQueryDataOptions,
-  FetchQueryOptions,
   InferDataFromTag,
   InvalidateOptions,
   InvalidateQueryFilters,
   QueryClient,
+  QueryExecuteOptions,
   QueryKey,
   SetDataOptions,
   Updater,
 } from "@tanstack/query-core";
-import { Context, Effect } from "effect";
+import { Context, Effect, Predicate } from "effect";
+
+type QueryEffectFetchOptions<
+  A,
+  E = DefaultError,
+  K extends QueryKey = QueryKey,
+> = Omit<QueryExecuteOptions<A, E, A, A, K>, "select">;
+
+type QueryEffectEnsureOptions<
+  A,
+  E = DefaultError,
+  K extends QueryKey = QueryKey,
+> = QueryEffectFetchOptions<A, E, K> & {
+  revalidateIfStale?: boolean;
+};
+
+const identity = <A>(data: A): A => data;
+
+const prepareQueryOptions = <
+  A,
+  E = DefaultError,
+  K extends QueryKey = QueryKey,
+>(
+  options: QueryEffectFetchOptions<A, E, K>
+): QueryExecuteOptions<A, E, A, A, K> => ({
+  ...options,
+  select: identity,
+});
 
 /** The existing application cache; providing it does not acquire or dispose resources. */
 export class QueryClientService extends Context.Service<
@@ -92,10 +117,12 @@ const fetch =
     E = DefaultError,
     K extends QueryKey = QueryKey,
   >(
-    options: FetchQueryOptions<A, E, A, K>
+    options: QueryEffectFetchOptions<A, E, K>
   ): Effect.fn.Return<A, QueryClientOperationError, QueryClientService> {
     const client = yield* QueryClientService;
-    return yield* wait<A>(async () => await client.fetchQuery(options));
+    return yield* wait<A>(
+      async () => await client.query(prepareQueryOptions(options))
+    );
   });
 
 const ensure =
@@ -105,10 +132,32 @@ const ensure =
     E = DefaultError,
     K extends QueryKey = QueryKey,
   >(
-    options: EnsureQueryDataOptions<A, E, A, K>
+    options: QueryEffectEnsureOptions<A, E, K>
   ): Effect.fn.Return<A, QueryClientOperationError, QueryClientService> {
     const client = yield* QueryClientService;
-    return yield* wait<A>(async () => await client.ensureQueryData(options));
+    return yield* wait<A>(async () => {
+      const { revalidateIfStale, ...rest } = options;
+      const fetchOptions = client.defaultQueryOptions(
+        prepareQueryOptions(rest)
+      );
+      const query = client.getQueryCache().build(client, fetchOptions);
+      const cachedData = query.state.data;
+      if (cachedData === undefined) {
+        return await client.query(fetchOptions);
+      }
+      if (revalidateIfStale === true) {
+        const { staleTime } = fetchOptions;
+        const resolved = Predicate.isFunction(staleTime)
+          ? staleTime(query)
+          : staleTime;
+        if (query.isStaleByTime(resolved)) {
+          void client
+            .query({ ...fetchOptions, staleTime: resolved ?? 0 })
+            .catch(noop);
+        }
+      }
+      return cachedData;
+    });
   });
 
 const invalidate =

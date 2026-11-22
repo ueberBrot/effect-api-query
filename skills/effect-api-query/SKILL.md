@@ -32,6 +32,7 @@ sources:
   - "README.md"
   - "package.json"
   - "pnpm-workspace.yaml"
+  - "tests/framework-consumers/package.json"
   - "scripts/*.mts"
   - "scripts/performance/*.mts"
   - "docs/adr/000*.md"

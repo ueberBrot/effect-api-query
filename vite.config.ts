@@ -116,6 +116,7 @@ export default defineConfig({
       typeCheck: true,
     },
     rules: {
+      "anti-slop/require-readable-spacing": "off",
       "effecttsgo/any-unknown-in-error-context": "error",
       "effecttsgo/unsafe-effect-type-assertion": "error",
     },
@@ -414,7 +415,7 @@ export default defineConfig({
   run: {
     tasks: {
       check: {
-        command: "effect-tsgo --tsrs-lint=0.21.0-ts7.1.0-beta vp check",
+        command: "effect-tsgo --tsrs-lint=0.25.0-ts7.1.0-beta vp check",
         dependsOn: ["pack", "docs-sync", "repository-check"],
         cache: {
           output: [],
@@ -427,7 +428,7 @@ export default defineConfig({
         },
       },
       lint: {
-        command: "effect-tsgo --tsrs-lint=0.21.0-ts7.1.0-beta vp lint",
+        command: "effect-tsgo --tsrs-lint=0.25.0-ts7.1.0-beta vp lint",
         dependsOn: ["pack", "docs-sync", "repository-check"],
         cache: {
           output: [],
@@ -435,7 +436,7 @@ export default defineConfig({
       },
       typecheck: {
         command:
-          "effect-tsgo --tsrs-lint=0.21.0-ts7.1.0-beta vp check --no-fmt",
+          "effect-tsgo --tsrs-lint=0.25.0-ts7.1.0-beta vp check --no-fmt",
         dependsOn: ["pack", "docs-sync", "repository-check"],
         cache: {
           output: [],
@@ -450,7 +451,7 @@ export default defineConfig({
         cache: false,
       },
       "effect-check": {
-        command: "effect-tsgo tsrs@0.21.0-ts7.1.0-beta --project tsconfig.json",
+        command: "effect-tsgo tsrs@0.25.0-ts7.1.0-beta --project tsconfig.json",
         dependsOn: ["pack"],
         cache: {
           output: [],
@@ -523,7 +524,7 @@ export default defineConfig({
       },
       "api-types": {
         command: [
-          "effect-tsgo tsrs@0.21.0-ts7.1.0-beta --project tests/types/tsconfig.json",
+          "effect-tsgo tsrs@0.25.0-ts7.1.0-beta --project tests/types/tsconfig.json",
           "node node_modules/typescript-5.9/bin/tsc --project tests/types/tsconfig.json",
         ],
         dependsOn: ["pack"],
@@ -531,7 +532,7 @@ export default defineConfig({
       },
       "server-local-types": {
         command: [
-          "effect-tsgo tsrs@0.21.0-ts7.1.0-beta --project tests/fixtures/tsconfig.server-local.json",
+          "effect-tsgo tsrs@0.25.0-ts7.1.0-beta --project tests/fixtures/tsconfig.server-local.json",
           "node node_modules/typescript-5.9/bin/tsc --project tests/fixtures/tsconfig.server-local.json",
         ],
         cache: {

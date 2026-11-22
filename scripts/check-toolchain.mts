@@ -30,8 +30,8 @@ try {
   const version = check([...compilerCommand(root, "current"), "--version"]);
   ok(
     version.status === 0 &&
-      version.output.includes("7.1.0-beta+effect-tsgo.0.67.3") &&
-      version.output.includes("tsrs 0.21.0"),
+      version.output.includes("7.1.0-beta+effect-tsgo.0.69.0") &&
+      version.output.includes("tsrs 0.25.0"),
     version.output
   );
   const declarationCompiler = spawnSync(compilerExecutable(), ["--version"], {

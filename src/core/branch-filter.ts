@@ -1,9 +1,9 @@
-import { hashKey } from "@tanstack/query-core";
 import type { QueryFilters, QueryKey } from "@tanstack/query-core";
 import { Predicate } from "effect";
 
 import type { QueryView } from "./inference";
 import type { QueryFilterOptions } from "./query-filter";
+import { indexQueryPrefixes } from "./query-prefix-index";
 
 interface BranchNode {
   readonly key: () => QueryKey;
@@ -20,7 +20,7 @@ export const createBranchQueryFilter = (
 ): ((
   options?: QueryFilterOptions
 ) => QueryFilters & { readonly queryKey: QueryKey }) => {
-  const byLength = new Map<number, Set<string>>();
+  const entries: (readonly [QueryKey, true])[] = [];
   const seen = new WeakSet();
   const visit = (node: BranchNode) => {
     if (seen.has(node)) {
@@ -28,10 +28,7 @@ export const createBranchQueryFilter = (
     }
     seen.add(node);
     if (Predicate.hasProperty(node, `${view}Options`)) {
-      const prefix: QueryKey = [...node.key(), view];
-      const entries = byLength.get(prefix.length) ?? new Set<string>();
-      entries.add(hashKey(prefix));
-      byLength.set(prefix.length, entries);
+      entries.push([[...node.key(), view], true]);
     }
     for (const child of Object.values(node)) {
       if (isBranchNode(child)) {
@@ -40,20 +37,12 @@ export const createBranchQueryFilter = (
     }
   };
   visit(branch);
+  const match = indexQueryPrefixes(entries, { order: "discovery" });
   const queryKey = branch.key();
   return (options = {}) => ({
     ...options,
     queryKey,
-    predicate: (query) => {
-      for (const [length, prefixes] of byLength) {
-        if (
-          query.queryKey.length >= length &&
-          prefixes.has(hashKey(query.queryKey.slice(0, length)))
-        ) {
-          return options.predicate?.(query) ?? true;
-        }
-      }
-      return false;
-    },
+    predicate: (query) =>
+      match(query.queryKey) === true && (options.predicate?.(query) ?? true),
   });
 };

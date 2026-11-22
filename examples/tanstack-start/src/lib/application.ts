@@ -127,15 +127,21 @@ export const startTanStackStartApplication = async ({
   const dispose = async () => {
     disposal ??= (async () => {
       try {
-        abort.abort();
-        await queryClient.cancelQueries();
-        await Promise.allSettled(pendingWork);
-      } finally {
-        queryClient.clear();
         try {
-          await httpRuntime.dispose();
+          abort.abort();
+          await queryClient.cancelQueries();
         } finally {
-          await rpcClient.dispose();
+          await Promise.allSettled(pendingWork);
+        }
+      } finally {
+        try {
+          queryClient.clear();
+        } finally {
+          try {
+            await httpRuntime.dispose();
+          } finally {
+            await rpcClient.dispose();
+          }
         }
       }
     })();

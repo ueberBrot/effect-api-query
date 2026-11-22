@@ -78,7 +78,7 @@ By default, disposal and owner switches erase persistence. The `pagehide` callba
 
 ## Opt-in owner helper
 
-Use `acquireQueryOwner` to register resources and wait for work at disposal. Each call creates a QueryClient. Pass cache configuration as the second argument. See the [React provider example](/effect-api-query/guides/react-query/) for acquisition, tracking, and unmounting.
+Use `acquireQueryOwner` to register resources and wait for work at disposal. Each call creates a QueryClient with its own query and mutation caches. If you pass a cache in the configuration, the owner copies its callbacks into a fresh cache. See the [React provider example](/effect-api-query/guides/react-query/) for acquisition, tracking, and unmounting.
 
 Await each `setup.acquire(start, release)` in order. Release handlers run once in reverse order, including after a later acquisition fails. With `setup.borrow(value)`, your app remains responsible for release. Finish acquiring resources during setup. Effect Scope still manages resources inside an acquired runtime or client.
 
@@ -92,4 +92,4 @@ Disposal reports pending Promise failures and non-interruption-only Effect Cause
 
 For server work, use an [explicit cancellation protocol](/effect-api-query/guides/cancellation/#request-server-cancellation-explicitly). Wait for an application acknowledgement if you need remote completion. You can also manage client lifetime yourself with the ordinary factories.
 
-Pass the native query signal to `runQuery` so only interruption of that cancelled query is ignored during drain. This includes empty live queries at cancellation. Typed failures and finalizer defects still surface.
+Pass the native query signal to `runQuery` so disposal can ignore ordinary interruption of the cancelled query. Include the HTTP metadata view if the owner uses it. Typed failures and finalizer defects still surface.

@@ -26,6 +26,7 @@ import {
   type EffectHttpApiQueryKeyErrorCode,
   type HttpApiKeyEncoder,
   type HttpApiQueryUtils,
+  type InferQueryError,
   type RunPromiseExit,
 } from "@ueberbrot/effect-api-query";
 import { Context, Effect, Schema } from "effect";
@@ -1282,6 +1283,79 @@ createHttpApiQueryUtils(serviceApi, {
   runPromiseExit: extraRunner,
 });
 
+const variantApi = HttpApi.make("variants").add(
+  HttpApiGroup.make("work").add(
+    HttpApiEndpoint.post("choose", "/choose", {
+      payload: Schema.Union([
+        Schema.TaggedStruct("A", { id: Schema.Int }),
+        Schema.TaggedStruct("B", { name: Schema.String }),
+      ]),
+      success: Schema.String,
+    })
+  )
+);
+type VariantMethod = HttpApiClient.ForApi<typeof variantApi>["work"]["choose"];
+type VariantRequest = {
+  readonly payload: { readonly _tag: "A"; readonly id: number };
+  readonly responseMode: "decoded-only";
+};
+type VariantOverload = (
+  request: VariantRequest
+) => Effect.Effect<string, "variant-error", "variant-service">;
+type UndispatchedOverload = (
+  request: VariantRequest & { readonly extra: string }
+) => Effect.Effect<string, "undispatched-error", "undispatched-service">;
+type VariantRequirements<Method> = CreateHttpApiQueryUtilsOptions<
+  typeof variantApi,
+  readonly ["variants"],
+  { readonly work: { readonly choose: Method } }
+>["runPromiseExit"];
+true satisfies Assert<
+  Equal<
+    VariantRequirements<VariantOverload & VariantMethod>,
+    RunPromiseExit<"variant-service">
+  >
+>;
+true satisfies Assert<
+  Equal<
+    VariantRequirements<VariantMethod & VariantOverload & UndispatchedOverload>,
+    RunPromiseExit<"variant-service">
+  >
+>;
+declare const variantClient: {
+  readonly work: {
+    readonly choose: VariantMethod & VariantOverload & UndispatchedOverload;
+  };
+};
+declare const variantRunner: RunPromiseExit<"variant-service">;
+const variant = createHttpApiQueryUtils(variantApi, {
+  client: variantClient,
+  keyPrefix: ["variants"],
+  runPromiseExit: variantRunner,
+});
+type HttpFailurePayload<T> =
+  T extends EffectHttpApiQueryError<infer Payload> ? Payload : never;
+true satisfies Assert<
+  Equal<
+    Extract<
+      HttpFailurePayload<InferQueryError<typeof variant.work.choose>>,
+      "variant-error" | "undispatched-error"
+    >,
+    "variant-error"
+  >
+>;
+true satisfies Assert<
+  Equal<
+    Extract<
+      HttpFailurePayload<
+        InferQueryError<typeof variant.work.choose, "metadata">
+      >,
+      "variant-error"
+    >,
+    never
+  >
+>;
+
 declare const overloadedCustomMethod: (typeof customClient)["user.accounts"]["save"] &
   RawResponseMethod;
 const overloadedCustomClient = {
@@ -1317,6 +1391,26 @@ const rawLast = createHttpApiQueryUtils(extraApi, {
 });
 const rawFirstState = queryClient.getQueryState(rawFirst.ping.queryKey());
 const rawLastState = queryClient.getQueryState(rawLast.ping.queryKey());
+type NativeRawPing = (request: {
+  readonly responseMode: "response-only";
+}) => ReturnType<typeof client.ping<"response-only", never>>;
+declare const nativeRawLastPing: typeof client.ping & NativeRawPing;
+const nativeRawLast = createHttpApiQueryUtils(extraApi, {
+  client: { ping: nativeRawLastPing },
+  keyPrefix: ["app"],
+});
+true satisfies Assert<
+  Equal<
+    InferQueryError<typeof nativeRawLast.ping, "query">,
+    InferQueryError<typeof rawFirst.ping, "query">
+  >
+>;
+true satisfies Assert<
+  Equal<
+    InferQueryError<typeof nativeRawLast.ping, "metadata">,
+    InferQueryError<typeof rawFirst.ping, "metadata">
+  >
+>;
 true satisfies Assert<
   Equal<
     NonNullable<typeof rawFirstState>["error"],

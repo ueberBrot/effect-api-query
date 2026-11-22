@@ -143,102 +143,58 @@ export interface MakeStreamQueryOptions {
   readonly runPromiseExit: RunPromiseExit<unknown>;
 }
 
-const streamQueryIterable = <A>(
-  source: AsyncIterable<A>,
-  signal: AbortSignal,
-  emptyError: (() => Error) | undefined
-): AsyncIterable<A> => ({
-  [Symbol.asyncIterator]() {
-    const iterator = source[Symbol.asyncIterator]();
-    let closePromise: Promise<IteratorResult<A>> | undefined;
-    let emitted = false;
-    const detach = () => {
-      // oxlint-disable-next-line eslint/no-use-before-define
-      signal.removeEventListener("abort", onAbort);
-    };
-    const close = async () => {
-      closePromise ??= (async () => {
-        try {
-          return (
-            (await iterator.return?.()) ?? { done: true, value: undefined }
-          );
-        } finally {
-          detach();
-        }
-      })();
-      return await closePromise;
-    };
-    const onAbort = () => {
-      // oxlint-disable-next-line promise/prefer-await-to-then
-      void Promise.resolve().then(close).catch(detach);
-    };
-    signal.addEventListener("abort", onAbort, { once: true });
-
-    return {
-      async next() {
-        let result: IteratorResult<A>;
-        if (signal.aborted) {
-          result = await close();
-        } else {
-          try {
-            result = await iterator.next();
-          } catch (error) {
-            detach();
-            throw error;
-          }
-        }
-        if (result.done === true) {
-          detach();
-          if (!emitted && emptyError !== undefined) {
-            throw emptyError();
-          }
-        }
-        emitted = true;
-        return result;
-      },
-      return: close,
-      async throw(cause?: unknown) {
-        detach();
-        if (iterator.throw !== undefined) {
-          return await iterator.throw(cause);
-        }
-        await close();
-        throw cause;
-      },
-    };
-  },
-});
-
 // Query Core owns fetch/retry/observer state; this consumer owns stream publication.
 const consumeQueryStream = async <A, Data>(
   context: QueryFunctionContext,
   stream: AsyncIterable<A>,
   initialValue: Data,
-  reducer: (previous: Data, value: A) => Data,
-  replace: boolean
+  reducer: (previous: Data, value: A) => Data
 ): Promise<Data> => {
   const { client, queryKey, signal } = context;
-  let result = initialValue;
   for await (const value of stream) {
     if (signal.aborted) {
       break;
     }
-    if (replace) {
-      result = reducer(result, value);
-    } else {
-      client.setQueryData<Data>(queryKey, (previous) =>
-        // Cached null is a value, not an absent entry.
-        // oxlint-disable-next-line typescript/prefer-nullish-coalescing
-        reducer(previous === undefined ? initialValue : previous, value)
-      );
-    }
-  }
-  if (replace && !signal.aborted) {
-    client.setQueryData<Data>(queryKey, result);
+    client.setQueryData<Data>(queryKey, (previous) =>
+      // Cached null is a value, not an absent entry.
+      // oxlint-disable-next-line typescript/prefer-nullish-coalescing
+      reducer(previous === undefined ? initialValue : previous, value)
+    );
   }
   const data = client.getQueryData<Data>(queryKey);
   // oxlint-disable-next-line typescript/prefer-nullish-coalescing
   return data === undefined ? initialValue : data;
+};
+
+const consumeReplacement = async <A>(
+  { client, queryKey, signal }: QueryFunctionContext,
+  batches: AsyncIterable<readonly A[]>,
+  maxChunks: number | undefined
+): Promise<A[]> => {
+  const history: A[] = [];
+  let start = 0;
+  for await (const batch of batches) {
+    if (signal.aborted) {
+      break;
+    }
+    for (const value of batch) {
+      if (maxChunks === undefined || history.length < maxChunks) {
+        history.push(value);
+      } else {
+        history[start] = value;
+        start = (start + 1) % maxChunks;
+      }
+    }
+  }
+  if (!signal.aborted) {
+    client.setQueryData<A[]>(
+      queryKey,
+      start === 0
+        ? history
+        : [...history.slice(start), ...history.slice(0, start)]
+    );
+  }
+  return client.getQueryData<A[]>(queryKey) ?? [];
 };
 
 export const makeStreamQuery = ({
@@ -295,11 +251,7 @@ export const makeStreamQuery = ({
     if (Exit.isFailure(exit)) {
       throw executionError(exit.cause);
     }
-    return streamQueryIterable(
-      exit.value,
-      signal,
-      policy._tag === "Live" ? emptyError : undefined
-    );
+    return exit.value;
   };
 
   if (policy._tag === "Live") {
@@ -310,18 +262,16 @@ export const makeStreamQuery = ({
       }
       return await consumeQueryStream(
         context,
-        policy.coalesceMs === undefined
-          ? await streamFn(context)
-          : streamLiveSnapshots(
-              await streamFn(context),
-              context.signal,
-              policy.coalesceMs
-            ),
+        streamLiveSnapshots(
+          await streamFn(context),
+          context.signal,
+          policy.coalesceMs,
+          emptyError
+        ),
         null,
         // oxlint-disable-next-line anti-slop/no-unknown-parameters
         (_latest: unknown, value: unknown) =>
-          value === undefined ? null : value,
-        false
+          value === undefined ? null : value
       );
     };
   }
@@ -335,16 +285,20 @@ export const makeStreamQuery = ({
     if (reset) {
       query.setState({ ...query.resetState, fetchStatus: "fetching" });
     }
+    const batches = streamPublicationBatches(
+      await streamFn(context),
+      publicationBatchSize,
+      context.signal,
+      publicationMaxWaitMs
+    );
+    if (isRefetch && refetchMode === "replace") {
+      return await consumeReplacement(context, batches, maxChunks);
+    }
     let emitted = false;
     const initialValue: unknown[] = [];
     const result = await consumeQueryStream(
       context,
-      streamPublicationBatches(
-        await streamFn(context),
-        publicationBatchSize,
-        context.signal,
-        publicationMaxWaitMs
-      ),
+      batches,
       initialValue,
       (values: unknown[], batch: readonly unknown[]) => {
         const history = reset && !emitted ? [] : values;
@@ -366,8 +320,7 @@ export const makeStreamQuery = ({
               : batch[index - history.length];
         }
         return next;
-      },
-      isRefetch && refetchMode === "replace"
+      }
     );
     return reset && !emitted ? [] : result;
   };

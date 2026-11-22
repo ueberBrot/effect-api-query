@@ -26,6 +26,45 @@ import { captureFailure } from "./fixtures/async";
 import { makeRpcTestClient } from "./fixtures/effect-rpc";
 
 it.effect(
+  "closes each recovery attempt before reconnecting and closes the active attempt when the consumer stops",
+  () =>
+    Effect.gen(function* closesAttempts() {
+      let attempts = 0;
+      let active = 0;
+      let largest = 0;
+      const values = yield* recoverStream({
+        connect: () =>
+          Stream.unwrap(
+            Effect.acquireRelease(
+              Effect.sync(() => {
+                active += 1;
+                largest = Math.max(largest, active);
+                attempts += 1;
+                return attempts;
+              }),
+              () =>
+                Effect.sync(() => {
+                  active -= 1;
+                })
+            ).pipe(
+              Effect.map((attempt) =>
+                attempt <= 100 ? Stream.fail("offline") : Stream.make(1, 2)
+              )
+            )
+          ),
+        cursor: (value) => value,
+        retryDelay: (_cause, attempt) => (attempt <= 100 ? 0 : undefined),
+      }).pipe(Stream.take(1), Stream.runCollect);
+      expect({ values, attempts, active, largest }).toStrictEqual({
+        values: [1],
+        attempts: 101,
+        active: 0,
+        largest: 1,
+      });
+    })
+);
+
+it.effect(
   "resumes after accepted cursors, ignores replayed events, and exposes connection state",
   () =>
     Effect.gen(function* resumesAcceptedCursors() {
@@ -194,9 +233,9 @@ describe.each(["ensuring", "acquireRelease"] as const)(
                 })
               );
               /* oxlint-disable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
-              const client = (() => recovered) as RpcClient.RpcClient.Flat<
+              const client: RpcClient.RpcClient.Flat<
                 RpcGroup.Rpcs<typeof group>
-              >;
+              > = (() => recovered) as never;
               /* oxlint-enable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
               const rpc = createRpcQueryUtils(group, {
                 client,

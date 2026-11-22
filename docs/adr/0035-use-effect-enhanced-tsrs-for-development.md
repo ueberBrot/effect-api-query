@@ -14,4 +14,4 @@ Retain TypeScript 5.9.3 for minimum-consumer checks and JavaScript compiler API 
 
 Vite+ remains the task interface. Preparation verifies the pinned bundled engine without rewriting installed compiler binaries. The editor SDK launcher and declaration generator invoke that engine explicitly. Declaration emission has a source-only project; root type and lint checks continue to cover fixtures, applications, tests, and scripts.
 
-See [the contributor toolchain procedure](../agents/toolchain.md) for editor setup and validation limits. TSRS and its lint backend remain experimental upstream. A CLI check alone does not establish editor, lint, or declaration parity; keep separate checks for each integration. No consumer compiler minimum changes.
+See [the Vite+ task definitions](../../vite.config.ts) for validation and [ADR 0043](0043-keep-editor-selection-contributor-owned.md) for editor setup. TSRS and its lint backend remain experimental upstream. A CLI check alone does not establish editor, lint, or declaration parity; keep separate checks for each integration. No consumer compiler minimum changes.

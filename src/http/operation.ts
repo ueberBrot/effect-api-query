@@ -1,6 +1,5 @@
-import { Effect, Predicate } from "effect";
+import { Context, Effect, Predicate } from "effect";
 import type { Cause } from "effect";
-import type { Sse } from "effect/encoding";
 import type { HttpClientResponse } from "effect/http";
 import type { HttpApi } from "effect/http-api";
 
@@ -19,6 +18,7 @@ import type { HttpApiEndpointIdentity } from "./errors";
 import { createHttpRequest } from "./request";
 import type { HttpRequestDescription } from "./request";
 import { createHttpStreamPreparation } from "./streamed-query";
+import type { HttpSseDecoderOptions } from "./types";
 
 type HttpOperation = (
   | UnaryOperation
@@ -28,7 +28,9 @@ type HttpOperation = (
   readonly identity: HttpApiEndpointIdentity;
 };
 
-type RuntimeHttpMethod = <Mode extends "decoded-only" | "decoded-and-response">(
+type RuntimeHttpMethod<Mode extends "decoded-only" | "decoded-and-response"> = (
+  // oxlint-disable-next-line anti-slop/no-unknown-parameters
+  this: unknown,
   // oxlint-disable-next-line anti-slop/no-unsafe-dictionary-type
   request: Record<string, unknown> & { readonly responseMode: Mode }
 ) => Effect.Effect<
@@ -86,6 +88,7 @@ const describeHttpEndpoints = (
   }
   const descriptions: HttpEndpointDescription[] = [];
   for (const group of Object.values(api.groups)) {
+    const groupAnnotations = Context.merge(api.annotations, group.annotations);
     for (const endpoint of Object.values(group.endpoints)) {
       const identity = {
         apiId: api.identifier,
@@ -93,7 +96,11 @@ const describeHttpEndpoints = (
         endpoint: endpoint.identifier,
         method: endpoint.method,
       };
-      const request = createHttpRequest(endpoint, identity);
+      const request = createHttpRequest(
+        endpoint,
+        identity,
+        Context.merge(groupAnnotations, endpoint.annotations)
+      );
       if (request === undefined) {
         continue;
       }
@@ -130,7 +137,7 @@ const extractHttpEndpoints = (
       // oxlint-disable-next-line anti-slop/no-unknown-parameters
       requestInput: unknown,
       responseMode: Mode,
-      sseOptions?: Sse.DecodeOptions
+      sseOptions?: HttpSseDecoderOptions
     ) => {
       const method = Predicate.hasProperty(target, identity.endpoint)
         ? target[identity.endpoint]
@@ -141,13 +148,20 @@ const extractHttpEndpoints = (
         );
       }
       // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
-      const call = method as RuntimeHttpMethod;
-      // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
-      return call.bind(target)({
-        ...(Predicate.isObject(requestInput) ? requestInput : undefined),
+      const call = method as RuntimeHttpMethod<Mode>;
+      const decodedRequest: Parameters<typeof call>[0] = {
         responseMode,
         ...(sseOptions === undefined ? undefined : { sseOptions }),
-      });
+      };
+      if (Predicate.isObject(requestInput)) {
+        for (const part of request.parts) {
+          if (part in requestInput) {
+            decodedRequest[part] = requestInput[part];
+          }
+        }
+      }
+      // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context, anti-slop/no-reflect-apply
+      return Reflect.apply(call, target, [decodedRequest]);
     };
     const common = {
       identity,

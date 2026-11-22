@@ -6,25 +6,36 @@ export interface SchemaStructuralSharingOptions<T> {
   readonly equivalence: Equivalence.Equivalence<T>;
 }
 
-type SharingContainer =
-  | { readonly [key: PropertyKey]: unknown }
-  | readonly unknown[];
+interface PlainObject {
+  readonly [key: PropertyKey]: unknown;
+}
 
-const containerKeys = (
-  value: SharingContainer
-): readonly string[] | undefined => {
-  const array = Array.isArray(value);
-  if (
-    Object.getPrototypeOf(value) !==
-    (array ? Array.prototype : Object.prototype)
-  ) {
+const isPlainDenseArray = (value: readonly unknown[]): boolean => {
+  if (Object.getPrototypeOf(value) !== Array.prototype) {
+    return false;
+  }
+  const { length } = value;
+  if (Reflect.ownKeys(value).length !== length + 1) {
+    return false;
+  }
+  for (let index = 0; index < length; index += 1) {
+    const descriptor = Object.getOwnPropertyDescriptor(value, index);
+    if (
+      descriptor?.enumerable !== true ||
+      !Object.hasOwn(descriptor, "value")
+    ) {
+      return false;
+    }
+  }
+  return true;
+};
+
+const plainObjectKeys = (value: PlainObject): readonly string[] | undefined => {
+  if (Object.getPrototypeOf(value) !== Object.prototype) {
     return undefined;
   }
   const keys: string[] = [];
   for (const key of Reflect.ownKeys(value)) {
-    if (array && key === "length") {
-      continue;
-    }
     const descriptor = Object.getOwnPropertyDescriptor(value, key);
     if (
       !Predicate.isString(key) ||
@@ -35,21 +46,45 @@ const containerKeys = (
     }
     keys.push(key);
   }
-  if (
-    array &&
-    (keys.length !== value.length ||
-      keys.some((key, index) => key !== String(index)))
-  ) {
-    return undefined;
-  }
   return keys;
 };
 
-const assertAcyclic = (value: unknown, ancestors: WeakSet<object>): void => {
-  if (!Predicate.isObject(value) && !Array.isArray(value)) {
+const setOwnDataProperty = (
+  target: Record<string, unknown>,
+  key: string,
+  value: unknown
+): void => {
+  if (key in target) {
+    Object.defineProperty(target, key, {
+      configurable: true,
+      enumerable: true,
+      value,
+      writable: true,
+    });
+  } else {
+    target[key] = value;
+  }
+};
+
+const assertAcyclic = (value: unknown, ancestors: Set<object>): void => {
+  if (Array.isArray(value)) {
+    if (!isPlainDenseArray(value)) {
+      return;
+    }
+    if (ancestors.has(value)) {
+      throw new TypeError("Schema sharing requires acyclic plain containers");
+    }
+    ancestors.add(value);
+    for (const item of value) {
+      assertAcyclic(item, ancestors);
+    }
+    ancestors.delete(value);
     return;
   }
-  const keys = containerKeys(value);
+  if (!Predicate.isObject(value)) {
+    return;
+  }
+  const keys = plainObjectKeys(value);
   if (keys === undefined) {
     return;
   }
@@ -57,10 +92,147 @@ const assertAcyclic = (value: unknown, ancestors: WeakSet<object>): void => {
     throw new TypeError("Schema sharing requires acyclic plain containers");
   }
   ancestors.add(value);
-  for (const child of Object.values(value)) {
-    assertAcyclic(child, ancestors);
+  for (const key of keys) {
+    assertAcyclic(value[key], ancestors);
   }
   ancestors.delete(value);
+};
+
+type ShareNode = (
+  previous: unknown,
+  incoming: unknown,
+  ancestors: Set<object>
+) => unknown;
+
+const shareArray = (
+  previous: unknown,
+  incoming: readonly unknown[],
+  ancestors: Set<object>,
+  share: ShareNode
+): unknown => {
+  if (!isPlainDenseArray(incoming)) {
+    return incoming;
+  }
+  if (ancestors.has(incoming)) {
+    throw new TypeError("Schema sharing requires acyclic plain containers");
+  }
+  ancestors.add(incoming);
+  if (!Array.isArray(previous) || !isPlainDenseArray(previous)) {
+    for (const item of incoming) {
+      assertAcyclic(item, ancestors);
+    }
+    ancestors.delete(incoming);
+    return incoming;
+  }
+  const previousArray: readonly unknown[] = previous;
+  const { length } = incoming;
+  let sameAsPrevious: boolean = previousArray.length === length;
+  let sameAsIncoming = true;
+  let values: unknown[] | undefined;
+  for (let index = 0; index < length; index += 1) {
+    const next: unknown = incoming[index];
+    const prev: unknown = previousArray[index];
+    const shared = share(prev, next, ancestors);
+    if (values === undefined) {
+      const matchesPrevious: boolean =
+        sameAsPrevious && Object.is(shared, prev);
+      const matchesIncoming: boolean =
+        sameAsIncoming && Object.is(shared, next);
+      if (!matchesPrevious && !matchesIncoming) {
+        values = Array.from({ length });
+        for (let prior = 0; prior < index; prior += 1) {
+          values[prior] = sameAsPrevious
+            ? previousArray[prior]
+            : incoming[prior];
+        }
+        values[index] = shared;
+      }
+      sameAsPrevious = matchesPrevious;
+      sameAsIncoming = matchesIncoming;
+    } else {
+      values[index] = shared;
+    }
+  }
+  ancestors.delete(incoming);
+  if (values !== undefined) {
+    return values;
+  }
+  return sameAsPrevious ? previousArray : incoming;
+};
+
+const copyPrefixProperties = (
+  target: Record<string, unknown>,
+  keys: readonly string[],
+  count: number,
+  source: PlainObject
+): void => {
+  for (let prior = 0; prior < count; prior += 1) {
+    const priorKey = keys[prior];
+    if (priorKey !== undefined) {
+      setOwnDataProperty(target, priorKey, source[priorKey]);
+    }
+  }
+};
+
+const sharePlainObject = (
+  previous: unknown,
+  incoming: PlainObject,
+  ancestors: Set<object>,
+  share: ShareNode
+): unknown => {
+  const keys = plainObjectKeys(incoming);
+  if (keys === undefined) {
+    return incoming;
+  }
+  if (ancestors.has(incoming)) {
+    throw new TypeError("Schema sharing requires acyclic plain containers");
+  }
+  ancestors.add(incoming);
+  const oldKeys = Predicate.isObject(previous)
+    ? plainObjectKeys(previous)
+    : undefined;
+  if (oldKeys === undefined || !Predicate.isObject(previous)) {
+    for (const key of keys) {
+      assertAcyclic(incoming[key], ancestors);
+    }
+    ancestors.delete(incoming);
+    return incoming;
+  }
+  let sameAsPrevious: boolean = keys.length === oldKeys.length;
+  let sameAsIncoming = true;
+  let values: Record<string, unknown> | undefined;
+  for (let index = 0; index < keys.length; index += 1) {
+    const key = keys[index];
+    if (key === undefined) {
+      continue;
+    }
+    const hasPrevious = Object.hasOwn(previous, key);
+    const prev = hasPrevious ? previous[key] : undefined;
+    const next = incoming[key];
+    const shared = share(prev, next, ancestors);
+    if (values === undefined) {
+      const matchesPrevious: boolean =
+        sameAsPrevious && hasPrevious && Object.is(shared, prev);
+      const matchesIncoming: boolean =
+        sameAsIncoming && Object.is(shared, next);
+      if (!matchesPrevious && !matchesIncoming) {
+        values = {};
+        copyPrefixProperties(
+          values,
+          keys,
+          index,
+          sameAsPrevious ? previous : incoming
+        );
+        setOwnDataProperty(values, key, shared);
+      }
+      sameAsPrevious = matchesPrevious;
+      sameAsIncoming = matchesIncoming;
+    } else {
+      setOwnDataProperty(values, key, shared);
+    }
+  }
+  ancestors.delete(incoming);
+  return values ?? (sameAsPrevious ? previous : incoming);
 };
 
 /**
@@ -74,62 +246,31 @@ export const schemaStructuralSharing = <T>(
   options: SchemaStructuralSharingOptions<NoInfer<T>>
 ): ((previous: unknown, incoming: unknown) => unknown) => {
   const accepts = Schema.is(schema);
-  const share = (previous: unknown, incoming: unknown): unknown => {
+  const share: ShareNode = (previous, incoming, ancestors) => {
     if (Object.is(previous, incoming)) {
+      assertAcyclic(incoming, ancestors);
       return previous;
     }
     if (accepts(incoming)) {
+      assertAcyclic(incoming, ancestors);
       return accepts(previous) && options.equivalence(previous, incoming)
         ? previous
         : incoming;
     }
-    if (Array.isArray(previous) && Array.isArray(incoming)) {
-      if (
-        containerKeys(previous) === undefined ||
-        containerKeys(incoming) === undefined
-      ) {
-        return incoming;
-      }
-      const values = incoming.map((value, index) =>
-        share(previous[index], value)
-      );
-      if (
-        previous.length === incoming.length &&
-        values.every((value, index) => Object.is(value, previous[index]))
-      ) {
-        return previous;
-      }
-      return values.every((value, index) => Object.is(value, incoming[index]))
-        ? incoming
-        : values;
+    if (Array.isArray(incoming)) {
+      return shareArray(previous, incoming, ancestors, share);
     }
-    if (Predicate.isObject(previous) && Predicate.isObject(incoming)) {
-      const keys = containerKeys(incoming);
-      const oldKeys = containerKeys(previous);
-      if (keys === undefined || oldKeys === undefined) {
-        return incoming;
-      }
-      const values = Object.fromEntries(
-        keys.map((key) => [key, share(previous[key], incoming[key])])
-      );
-      if (
-        keys.length === oldKeys.length &&
-        keys.every(
-          (key) =>
-            Object.hasOwn(previous, key) &&
-            Object.is(values[key], previous[key])
-        )
-      ) {
-        return previous;
-      }
-      return keys.every((key) => Object.is(values[key], incoming[key]))
-        ? incoming
-        : values;
+    if (Predicate.isObject(incoming)) {
+      return sharePlainObject(previous, incoming, ancestors, share);
     }
     return incoming;
   };
   return (previous, incoming) => {
-    assertAcyclic(incoming, new WeakSet());
-    return share(previous, incoming);
+    try {
+      return share(previous, incoming, new Set());
+    } catch (error) {
+      assertAcyclic(incoming, new Set());
+      throw error;
+    }
   };
 };

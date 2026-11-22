@@ -1,11 +1,21 @@
 import { expect, it } from "@effect/vitest";
 import { QueryClient, skipToken } from "@tanstack/query-core";
 import { Effect, Schema, Stream } from "effect";
+import { HttpClient, HttpClientResponse } from "effect/http";
+import {
+  HttpApi,
+  HttpApiClient,
+  HttpApiEndpoint,
+  HttpApiGroup,
+  HttpApiSchema,
+} from "effect/http-api";
 import { Rpc, RpcGroup } from "effect/rpc";
 
 import {
   configureUtils,
+  createHttpApiQueryUtils,
   createRpcQueryUtils,
+  defineUtilsPolicy,
   prepareInput,
 } from "#effect-api-query";
 
@@ -301,4 +311,223 @@ it.effect("keeps the frozen tree for empty configuration scopes", () =>
       queryClient.clear();
     }
   })
+);
+
+it.effect(
+  "inherits sseOptions on HTTP SSE keys and options with local override precedence",
+  () =>
+    Effect.gen(function* inheritsSseOptions() {
+      const eventSchema = Schema.Struct({
+        event: Schema.String,
+        data: Schema.String,
+      });
+      const api = HttpApi.make("configured-sse").add(
+        HttpApiGroup.make("events").add(
+          HttpApiEndpoint.get("watch", "/watch", {
+            success: HttpApiSchema.StreamSse({
+              events: eventSchema,
+            }),
+          }),
+          HttpApiEndpoint.get("channel", "/channels/:id", {
+            params: { id: Schema.String },
+            success: HttpApiSchema.StreamSse({
+              events: eventSchema,
+            }),
+          })
+        )
+      );
+      const sseBody =
+        "event: state\n\nevent: state\ndata: one\n\nevent: state\ndata: two\n\n";
+      const client = yield* HttpApiClient.makeWith(api, {
+        baseUrl: "https://example.test",
+        httpClient: HttpClient.make((request) =>
+          Effect.succeed(
+            HttpClientResponse.fromWeb(
+              request,
+              new Response(sseBody, {
+                headers: { "content-type": "text/event-stream" },
+                status: 200,
+              })
+            )
+          )
+        ),
+      });
+      const base = createHttpApiQueryUtils(api, {
+        client,
+        keyPrefix: ["configured-sse"],
+      });
+      const inheritedSse = {
+        maxEventSize: 128,
+        dispatchEmptyNamedEvents: true,
+      };
+      const callerSse = { ...inheritedSse };
+      const overrideSse = {
+        maxEventSize: 64,
+        dispatchEmptyNamedEvents: false,
+      };
+      const policy = defineUtilsPolicy<typeof base>()({
+        scoped: {
+          events: {
+            scoped: {
+              watch: {
+                streamed: {
+                  policy: { maxChunks: 3, sseOptions: callerSse },
+                },
+                live: {
+                  policy: { sseOptions: callerSse },
+                },
+              },
+              channel: {
+                streamed: {
+                  policy: { maxChunks: 3, sseOptions: callerSse },
+                },
+                live: {
+                  policy: { sseOptions: callerSse },
+                },
+              },
+            },
+          },
+        },
+      });
+      const configured = configureUtils(base, policy);
+      callerSse.maxEventSize = 256;
+      callerSse.dispatchEmptyNamedEvents = false;
+      const channelInput = { params: { id: "alpha" } };
+      const queryClient = new QueryClient();
+      try {
+        const inheritedStreamedOptions =
+          configured.events.watch.streamedOptions();
+        const inheritedStreamedResult = yield* Effect.promise(
+          async () => await queryClient.query(inheritedStreamedOptions)
+        );
+        expect({
+          key: inheritedStreamedOptions.queryKey,
+          configuredKey: configured.events.watch.streamedKey(),
+          result: inheritedStreamedResult,
+          cached: queryClient.getQueryData(
+            configured.events.watch.streamedKey()
+          ),
+        }).toStrictEqual({
+          key: base.events.watch.streamedKey({
+            maxChunks: 3,
+            sseOptions: inheritedSse,
+          }),
+          configuredKey: base.events.watch.streamedKey({
+            maxChunks: 3,
+            sseOptions: inheritedSse,
+          }),
+          result: [
+            { event: "state", data: "" },
+            { event: "state", data: "one" },
+            { event: "state", data: "two" },
+          ],
+          cached: [
+            { event: "state", data: "" },
+            { event: "state", data: "one" },
+            { event: "state", data: "two" },
+          ],
+        });
+
+        const overrideStreamedOptions = configured.events.watch.streamedOptions(
+          { sseOptions: overrideSse }
+        );
+        const overrideStreamedResult = yield* Effect.promise(
+          async () => await queryClient.query(overrideStreamedOptions)
+        );
+        expect({
+          key: overrideStreamedOptions.queryKey,
+          configuredKey: configured.events.watch.streamedKey({
+            sseOptions: overrideSse,
+          }),
+          result: overrideStreamedResult,
+          cached: queryClient.getQueryData(
+            configured.events.watch.streamedKey({ sseOptions: overrideSse })
+          ),
+        }).toStrictEqual({
+          key: base.events.watch.streamedKey({
+            maxChunks: 3,
+            sseOptions: overrideSse,
+          }),
+          configuredKey: base.events.watch.streamedKey({
+            maxChunks: 3,
+            sseOptions: overrideSse,
+          }),
+          result: [
+            { event: "state", data: "one" },
+            { event: "state", data: "two" },
+          ],
+          cached: [
+            { event: "state", data: "one" },
+            { event: "state", data: "two" },
+          ],
+        });
+
+        const inheritedLiveOptions = configured.events.watch.liveOptions();
+        const inheritedLiveResult = yield* Effect.promise(
+          async () => await queryClient.query(inheritedLiveOptions)
+        );
+        expect({
+          key: inheritedLiveOptions.queryKey,
+          configuredKey: configured.events.watch.liveKey(),
+          result: inheritedLiveResult,
+          overrideKey: configured.events.watch.liveKey({
+            sseOptions: overrideSse,
+          }),
+          resetKey: configured.events.watch.liveKey({ sseOptions: undefined }),
+        }).toStrictEqual({
+          key: base.events.watch.liveKey({ sseOptions: inheritedSse }),
+          configuredKey: base.events.watch.liveKey({
+            sseOptions: inheritedSse,
+          }),
+          result: { event: "state", data: "two" },
+          overrideKey: base.events.watch.liveKey({ sseOptions: overrideSse }),
+          resetKey: base.events.watch.liveKey(),
+        });
+
+        const channelStreamedOptions =
+          configured.events.channel.streamedOptions({ input: channelInput });
+        const channelOverrideLiveOptions =
+          configured.events.channel.liveOptions({
+            input: channelInput,
+            sseOptions: overrideSse,
+          });
+        expect({
+          streamedKey: configured.events.channel.streamedKey(channelInput),
+          streamedOptionsKey: channelStreamedOptions.queryKey,
+          streamedOverrideKey: configured.events.channel.streamedKey(
+            channelInput,
+            { sseOptions: overrideSse }
+          ),
+          liveKey: configured.events.channel.liveKey(channelInput),
+          liveOverrideKey: configured.events.channel.liveKey(channelInput, {
+            sseOptions: overrideSse,
+          }),
+          liveOverrideOptionsKey: channelOverrideLiveOptions.queryKey,
+        }).toStrictEqual({
+          streamedKey: base.events.channel.streamedKey(channelInput, {
+            maxChunks: 3,
+            sseOptions: inheritedSse,
+          }),
+          streamedOptionsKey: base.events.channel.streamedKey(channelInput, {
+            maxChunks: 3,
+            sseOptions: inheritedSse,
+          }),
+          streamedOverrideKey: base.events.channel.streamedKey(channelInput, {
+            maxChunks: 3,
+            sseOptions: overrideSse,
+          }),
+          liveKey: base.events.channel.liveKey(channelInput, {
+            sseOptions: inheritedSse,
+          }),
+          liveOverrideKey: base.events.channel.liveKey(channelInput, {
+            sseOptions: overrideSse,
+          }),
+          liveOverrideOptionsKey: base.events.channel.liveKey(channelInput, {
+            sseOptions: overrideSse,
+          }),
+        });
+      } finally {
+        queryClient.clear();
+      }
+    })
 );

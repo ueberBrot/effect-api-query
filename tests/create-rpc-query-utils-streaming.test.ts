@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from "@effect/vitest";
-import { QueryClient, QueryObserver, skipToken } from "@tanstack/query-core";
+import {
+  CancelledError,
+  QueryClient,
+  QueryObserver,
+  skipToken,
+} from "@tanstack/query-core";
 import {
   Cause,
   Deferred,
@@ -22,6 +27,7 @@ import type { RpcClient } from "effect/rpc";
 import { Rpc, RpcGroup } from "effect/rpc";
 
 import {
+  configureUtils,
   createHttpApiQueryUtils,
   createRpcQueryUtils,
   EffectHttpApiQueryError,
@@ -404,6 +410,118 @@ describe("createRpcQueryUtils streaming execution", () => {
       })
   );
 
+  describe.each([
+    { label: "uncoalesced", coalesceMs: undefined },
+    { label: "coalesced", coalesceMs: 100 },
+  ] as const)(
+    "aborts an in-flight $label RPC live query before its first emission",
+    ({ coalesceMs }) => {
+      it.effect("settles cleanly without throwing an empty-stream error", () =>
+        Effect.gen(function* abortRpcLiveBeforeFirstEmission() {
+          const started = yield* Deferred.make<boolean>();
+          const finalized = yield* Deferred.make<boolean>();
+          const Watch = Rpc.make("events.watch", {
+            success: Schema.String,
+            stream: true,
+          });
+          const streamGroup = RpcGroup.make(Watch);
+          const client = yield* makeRpcTestClient(streamGroup, {
+            "events.watch": () =>
+              Stream.fromEffect(
+                Deferred.succeed(started, true).pipe(
+                  Effect.andThen(Effect.never)
+                )
+              ).pipe(Stream.ensuring(Deferred.succeed(finalized, true))),
+          });
+          let executionError: unknown;
+          let executionSettled = false;
+          const executionDone = yield* Deferred.make<boolean>();
+          const runPromise = Effect.runPromiseWith(yield* Effect.context());
+          const utils = configureUtils(
+            createRpcQueryUtils(streamGroup, {
+              client,
+              keyPrefix: ["abort-rpc-live", coalesceMs ?? "none"] as const,
+            }),
+            {
+              live: {
+                interceptors: [
+                  async ({ next }) => {
+                    try {
+                      return await next();
+                    } catch (error) {
+                      executionError = error;
+                      throw error;
+                    } finally {
+                      executionSettled = true;
+                      await runPromise(Deferred.succeed(executionDone, true));
+                    }
+                  },
+                ],
+              },
+            }
+          );
+          const queryClient = new QueryClient({
+            defaultOptions: { queries: { retry: false } },
+          });
+          const options = utils.events.watch.liveOptions(
+            coalesceMs === undefined ? undefined : { coalesceMs }
+          );
+          try {
+            const pending = queryClient.query(options);
+            yield* Deferred.await(started);
+            yield* Effect.promise(async () => {
+              await queryClient.cancelQueries({ queryKey: options.queryKey });
+            });
+            const queryError = yield* Effect.promise(
+              async () => await captureFailure(pending)
+            );
+            yield* Deferred.await(finalized);
+            yield* Deferred.await(executionDone);
+            expect(queryError).toBeInstanceOf(CancelledError);
+            expect(executionSettled).toBe(true);
+            expect(executionError).toBeUndefined();
+            expect(queryClient.getQueryData(options.queryKey)).toBeUndefined();
+          } finally {
+            queryClient.clear();
+          }
+        })
+      );
+    }
+  );
+
+  it.effect("keeps bounded replacement history in emission order", () =>
+    Effect.gen(function* retainsReplacementHistory() {
+      const group = RpcGroup.make(
+        Rpc.make("watch", { success: Schema.Int, stream: true })
+      );
+      let start = 0;
+      const client = yield* makeRpcTestClient(group, {
+        watch: () => {
+          const values = [start, start + 1, start + 2, start + 3];
+          start += 4;
+          return Stream.fromIterable(values);
+        },
+      });
+      const tree = createRpcQueryUtils(group, {
+        client,
+        keyPrefix: ["replace-ordered"],
+      });
+      const cache = new QueryClient();
+      const options = tree.watch.streamedOptions({
+        maxChunks: 3,
+        refetchMode: "replace",
+      });
+      try {
+        yield* Effect.promise(async () => await cache.query(options));
+        expect(
+          yield* Effect.promise(async () => await cache.query(options))
+        ).toStrictEqual([5, 6, 7]);
+      } finally {
+        cache.clear();
+      }
+    })
+  );
+
   it.effect("supports reset, append, and replace refetch modes", () =>
     Effect.gen(function* refetchAcrossPolicies() {
       let run = 0;
@@ -668,9 +786,9 @@ describe("createRpcQueryUtils streaming execution", () => {
                 throw new TypeError("Expected a native stream failure");
               }
               /* oxlint-disable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
-              const client = (() => source) as RpcClient.RpcClient.Flat<
+              const client: RpcClient.RpcClient.Flat<
                 RpcGroup.Rpcs<typeof group>
-              >;
+              > = (() => source) as never;
               /* oxlint-enable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
               const rpc = createRpcQueryUtils(group, {
                 client,
@@ -737,12 +855,14 @@ describe("createRpcQueryUtils streaming execution", () => {
 
       it.each([
         ["live", undefined],
+        ["live", 20],
         ["streamed", undefined],
         ["streamed", 20],
       ] as const)(
         "preserves interruption and cleanup defects when cancelling a pending %s pull with deadline %s",
         async (operation, publicationMaxWaitMs) => {
           const timed = publicationMaxWaitMs !== undefined;
+          const cancelOnPublication = timed && operation === "live";
           if (timed) {
             vi.useFakeTimers();
           }
@@ -781,9 +901,8 @@ describe("createRpcQueryUtils streaming execution", () => {
                   )
                 );
           /* oxlint-disable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
-          const client = (() => source) as RpcClient.RpcClient.Flat<
-            RpcGroup.Rpcs<typeof group>
-          >;
+          const client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof group>> =
+            (() => source) as never;
           /* oxlint-enable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
           const rpc = createRpcQueryUtils(group, {
             client,
@@ -791,7 +910,7 @@ describe("createRpcQueryUtils streaming execution", () => {
           });
           const options =
             operation === "live"
-              ? rpc.watch.liveOptions()
+              ? rpc.watch.liveOptions({ coalesceMs: publicationMaxWaitMs })
               : rpc.watch.streamedOptions({
                   maxChunks: "unbounded",
                   publicationBatchSize: 10,
@@ -803,6 +922,11 @@ describe("createRpcQueryUtils streaming execution", () => {
           }
           const queryClient = new QueryClient();
           const controller = new AbortController();
+          const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
+            if (cancelOnPublication && event.query.state.data === 2) {
+              controller.abort();
+            }
+          });
           let settled = false;
           const pending = (async () => {
             const result = await captureFailure(
@@ -820,14 +944,22 @@ describe("createRpcQueryUtils streaming execution", () => {
           })();
           try {
             await Effect.runPromise(Deferred.await(entered));
-            controller.abort();
+            if (!cancelOnPublication) {
+              controller.abort();
+            }
             if (timed) {
               await vi.advanceTimersByTimeAsync(50);
             }
-            expect(settled).toBe(false);
-            expect(queryClient.getQueryData(options.queryKey)).toStrictEqual(
-              timed ? [1] : undefined
-            );
+            const published = { live: 2, streamed: [1] };
+            expect({
+              aborted: controller.signal.aborted,
+              settled,
+              data: queryClient.getQueryData(options.queryKey),
+            }).toStrictEqual({
+              aborted: true,
+              settled: false,
+              data: timed ? published[operation] : undefined,
+            });
             await Effect.runPromise(Deferred.succeed(releaseGate, true));
             const error = await pending;
             expect(error).toMatchObject({
@@ -848,6 +980,7 @@ describe("createRpcQueryUtils streaming execution", () => {
               )
             ).toBe(true);
           } finally {
+            unsubscribe();
             controller.abort();
             await Effect.runPromise(Deferred.succeed(releaseGate, true));
             await pending;
@@ -999,9 +1132,8 @@ describe("createRpcQueryUtils streaming execution", () => {
       Stream.ensuring(Deferred.succeed(finalized, true).pipe(Effect.asVoid))
     );
     /* oxlint-disable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
-    const client = (() => source) as RpcClient.RpcClient.Flat<
-      RpcGroup.Rpcs<typeof streamGroup>
-    >;
+    const client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof streamGroup>> =
+      (() => source) as never;
     /* oxlint-enable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
     const queryClient = new QueryClient();
     const utils = createRpcQueryUtils(streamGroup, {
@@ -1096,7 +1228,9 @@ describe("createRpcQueryUtils streaming execution", () => {
         const secondFinalized = yield* Deferred.make<boolean>();
         let run = 0;
         /* oxlint-disable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
-        const client = (() => {
+        const client: RpcClient.RpcClient.Flat<
+          RpcGroup.Rpcs<typeof streamGroup>
+        > = (() => {
           run += 1;
           const started = run === 1 ? firstStarted : secondStarted;
           const finalized = run === 1 ? firstFinalized : secondFinalized;
@@ -1119,7 +1253,7 @@ describe("createRpcQueryUtils streaming execution", () => {
               })
             )
           );
-        }) as RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof streamGroup>>;
+        }) as never;
         /* oxlint-enable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
         const queryClient = new QueryClient();
         const options = createRpcQueryUtils(streamGroup, {

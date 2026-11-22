@@ -22,15 +22,13 @@ Before exploring the codebase, read [the domain documentation guide](docs/agents
 
 ### Vite+
 
-Check `package.json` and `vite.config.ts` first, and run `vp run <name>` when the project defines a script or task with that name.
+Use `vp run <task>` when the repository defines it.
 
 ### Testing
 
-Use compile-time fixtures to verify the published type contract. Reserve runtime tests for behavior that can fail at runtime; avoid testing guarantees already enforced by the type system.
+Use compile-time fixtures for public type contracts and runtime tests for behavior.
 
 ## Learning more about Effect
-
-This repository uses the Effect TypeScript library.
 
 Before writing any Effect code, read `node_modules/effect/AGENTS.md` completely and follow its links when required.
 

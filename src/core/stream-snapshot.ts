@@ -76,8 +76,8 @@ export const fetchStreamSnapshot = async <
   ) {
     throw new Error("Stream snapshots require an idle query without observers");
   }
-  let published = false;
-  let started = false;
+  let captured = false;
+  let closed = false;
   let executionSignal: AbortSignal | undefined;
   let failed = false;
   let failure: unknown;
@@ -100,12 +100,13 @@ export const fetchStreamSnapshot = async <
     if (
       event.query.queryHash === queryHash &&
       event.type === "updated" &&
-      event.action.type === "success" &&
-      event.action.manual === true
+      event.action.type === "success"
     ) {
-      published = true;
-      ready();
-      void cancel();
+      captured = true;
+      if (event.action.manual === true) {
+        ready();
+        void cancel();
+      }
     }
   });
   const onAbort = () => {
@@ -130,7 +131,9 @@ export const fetchStreamSnapshot = async <
       staleTime: 0,
       initialDataUpdatedAt: 0,
       queryFn: async (context) => {
-        started = true;
+        if (closed || context.signal.aborted) {
+          throw new CancelledError({ revert: true });
+        }
         failed = false;
         failure = undefined;
         executionSignal = context.signal;
@@ -152,10 +155,14 @@ export const fetchStreamSnapshot = async <
     });
     await Promise.race([publication, fetching]);
     result = await fetching;
-    if (!published && (!started || executionSignal?.aborted === true)) {
+    if (
+      !captured &&
+      (executionSignal === undefined || executionSignal.aborted)
+    ) {
       throw new CancelledError({ revert: true });
     }
   } finally {
+    closed = true;
     stop();
     clearTimeout(timer);
     signal?.removeEventListener("abort", onAbort);

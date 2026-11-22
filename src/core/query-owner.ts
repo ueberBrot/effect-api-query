@@ -1,15 +1,14 @@
-import { CancelledError, QueryClient } from "@tanstack/query-core";
+import {
+  CancelledError,
+  MutationCache,
+  QueryCache,
+  QueryClient,
+} from "@tanstack/query-core";
 import type { QueryClientConfig } from "@tanstack/query-core";
 import { Cause, Exit } from "effect";
 
-import {
-  isEffectHttpApiQueryError,
-  EffectHttpApiQueryEmptyStreamError,
-} from "../http/errors";
-import {
-  isEffectRpcQueryError,
-  EffectRpcQueryEmptyStreamError,
-} from "../rpc/errors";
+import { isEffectHttpApiQueryError } from "../http/errors";
+import { isEffectRpcQueryError } from "../rpc/errors";
 import type { RunPromiseExit } from "./types";
 
 /** Registers only resources whose lifetime is explicitly transferred to the owner. */
@@ -67,7 +66,11 @@ export const acquireQueryOwner = async <A>(
   const cancelled = new WeakSet<Promise<unknown>>();
   const queries = new Set<AbortController>();
   const drainFailures: unknown[] = [];
-  const queryClient = new QueryClient(cacheConfig);
+  const queryClient = new QueryClient({
+    ...cacheConfig,
+    queryCache: new QueryCache({ ...cacheConfig?.queryCache?.config }),
+    mutationCache: new MutationCache({ ...cacheConfig?.mutationCache?.config }),
+  });
   let active = true;
   let disposal: Promise<void> | undefined;
   const assertActive = () => {
@@ -99,9 +102,7 @@ export const acquireQueryOwner = async <A>(
           (error instanceof CancelledError ||
             ((isEffectRpcQueryError(error) ||
               isEffectHttpApiQueryError(error)) &&
-              Cause.hasInterruptsOnly(error.cause)) ||
-            error instanceof EffectRpcQueryEmptyStreamError ||
-            error instanceof EffectHttpApiQueryEmptyStreamError)
+              Cause.hasInterruptsOnly(error.cause)))
         ) {
           cancelled.add(result);
         }

@@ -1,8 +1,8 @@
-import { hashKey } from "@tanstack/query-core";
 import type { DehydratedState, QueryKey } from "@tanstack/query-core";
-import { Array as EffectArray, Effect, Order, Schema } from "effect";
+import { Effect, Schema } from "effect";
 
 import type { InferQueryData, SupportedQueryView } from "./inference";
+import { compileQueryPrefix, indexQueryPrefixes } from "./query-prefix-index";
 import { viewPrefix } from "./view-prefix";
 
 /** One generated leaf/view's cache-data codec, before observer selection. */
@@ -25,16 +25,7 @@ export interface HydrationCodec<
 const makeCodec = <S extends Schema.Codec<unknown, unknown, unknown, unknown>>(
   prefix: QueryKey,
   schema: S
-) => {
-  const hash = hashKey(prefix);
-  return Object.freeze({
-    prefix,
-    schema,
-    matches: (key: QueryKey) =>
-      key.length >= prefix.length &&
-      hashKey(key.slice(0, prefix.length)) === hash,
-  });
-};
+) => Object.freeze({ prefix, schema, matches: compileQueryPrefix(prefix) });
 
 /** Registers a codec whose decoded type matches the generated cached representation. */
 export const queryViewCodec = <
@@ -152,34 +143,25 @@ export const createHydrationRegistry = <
   Entries[number]["schema"]["EncodingServices"]
 > => {
   type Entry = Entries[number];
-  const byLength = new Map<number, Map<string, Entry>>();
   const codecs: readonly Entry[] = entries;
-  for (const codec of codecs) {
-    const lengthCodecs =
-      byLength.get(codec.prefix.length) ?? new Map<string, Entry>();
-    const hash = hashKey(codec.prefix);
-    if (lengthCodecs.has(hash)) {
-      throw new HydrationCodecError("DuplicateCodec");
-    }
-    lengthCodecs.set(hash, codec);
-    byLength.set(codec.prefix.length, lengthCodecs);
-  }
-  const lengths = EffectArray.sort(byLength.keys(), Order.flip(Order.Number));
-  const codecFor = (key: QueryKey): Entry | undefined => {
-    for (const length of lengths) {
-      if (key.length >= length) {
-        const codec = byLength.get(length)?.get(hashKey(key.slice(0, length)));
-        if (codec !== undefined) {
-          return codec;
-        }
-      }
-    }
-    return undefined;
-  };
+  const codecFor = indexQueryPrefixes(
+    codecs.map(
+      ({ prefix, schema }) =>
+        [
+          prefix,
+          {
+            encode: Schema.encodeUnknownEffect(schema),
+            decode: Schema.decodeUnknownEffect(schema),
+          },
+        ] as const
+    ),
+    { duplicateError: () => new HydrationCodecError("DuplicateCodec") }
+  );
+  type Codec = NonNullable<ReturnType<typeof codecFor>>;
   const transform = <R>(
     queries: DehydratedState["queries"],
     convert: (
-      codec: Entry,
+      codec: Codec,
       // oxlint-disable-next-line anti-slop/no-unknown-parameters
       data: unknown
     ) => Effect.Effect<unknown, Schema.SchemaError, R>
@@ -202,12 +184,12 @@ export const createHydrationRegistry = <
     encodeQueries: (queries) =>
       transform(queries, (codec, data) =>
         // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
-        Schema.encodeUnknownEffect(codec.schema)(data)
+        codec.encode(data)
       ),
     decodeQueries: (queries) =>
       transform(queries, (codec, data) =>
         // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
-        Schema.decodeUnknownEffect(codec.schema)(data)
+        codec.decode(data)
       ),
   };
 };

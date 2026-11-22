@@ -3,9 +3,12 @@ import type { QueryKey } from "@tanstack/query-core";
 import { Schema } from "effect";
 
 import { canonicalize, canonicalizeArray } from "./canonical-key";
-import type { InferInput, SupportedQueryView } from "./inference";
+import type {
+  BoundDescriptorInput,
+  InferInput,
+  SupportedQueryView,
+} from "./inference";
 import { descriptorInput } from "./prepared-input";
-import type { PreparedInput } from "./prepared-input";
 import type { JsonValue } from "./types";
 import { viewPrefix } from "./view-prefix";
 
@@ -132,10 +135,8 @@ export const createQueryDescriptor = <
         view,
         prefix,
         // SAFETY: registered generated owners distinguish inputless leaves; other tokens retain this leaf's decoded input.
-        // oxlint-disable-next-line typescript/no-unsafe-type-assertion, typescript/no-invalid-void-type
-        input: prepared.token as [InferInput<Leaf>] extends [void]
-          ? InferInput<Leaf>
-          : PreparedInput<InferInput<Leaf>>,
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+        input: prepared.token?.() as BoundDescriptorInput<Leaf, View>,
       });
     },
   });

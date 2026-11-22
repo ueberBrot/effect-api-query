@@ -3,9 +3,9 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "e352622154e826c22c1fe0b7ba543b657457b9c9a3e0833c46cef74f98dcca54",
+      "fingerprint": "0e7f0184ba71084e821e9a2f1fdd0fd8cda055faf9a62de124c0d0ac9016e43d",
       "snapshot": {
-        "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
+        "GLOSSARY.md": "4532453f4efb696d95c66aabb9f62863e28984bb961f97ee288034af62d76f29",
         "README.md": "87db3a47ce666b408001c89b81b2133393eb2074c63ba1ac1786be8e20b96dfd",
         "apps/docs/astro.config.mts": "35bd7d7706e004e3e708a82614e825c7fde0ee1aea6624843ba8cc57f70c2c5c",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "22ff578a9df30be697f12bdfeb5861b9d2b3e6956255387eaa4e1b18d0f33315",
@@ -38,8 +38,8 @@
         "apps/docs/src/content/docs/guides/optimistic-writes.md": "c58a8cb57c5c067087783fa3a8605bcb793e2f83bc999c827b0caa1b36cb1455",
         "apps/docs/src/content/docs/guides/pagination.md": "f5d2435f3d6c2de7f9be9e48f50d3befefb788393be5af0d6cd1c81086771422",
         "apps/docs/src/content/docs/guides/queries.md": "07efda66d3d2cebeb371ec76f8069800758974f1ab53237de866beaf9b3f6ea7",
-        "apps/docs/src/content/docs/guides/query-defaults.md": "8b44635e6883a06abe27128e85bca90d0b9eb83b3c4e11c4fbe3dbc7182fc7f7",
-        "apps/docs/src/content/docs/guides/query-effects.md": "622b788af48f5c577ccd54286e3a79c59e658f929acb9e1d41b989a39e4f5225",
+        "apps/docs/src/content/docs/guides/query-defaults.md": "544ef381d7238736475999efb1aa38b6f63578f44e59bc892728da948cd452f2",
+        "apps/docs/src/content/docs/guides/query-effects.md": "d7a36ac2e19128f0237e4fd913ad428347561846e9e2de973d20fafd7a61c191",
         "apps/docs/src/content/docs/guides/react-query.md": "fd910ff5be38aac37291b58acace742226bb91903f8ef788c40c80b388ee58b5",
         "apps/docs/src/content/docs/guides/reconnect-streams.md": "c40e0bdc9b38ef2f1395c4012b7d53e86e697e666da51b772ab95efe0d72b717",
         "apps/docs/src/content/docs/guides/refresh-from-events.md": "84fe1bcec0d38999996d231af6f7145956367854eac530e819dcc3f9838c32ea",
@@ -48,10 +48,10 @@
         "apps/docs/src/content/docs/guides/share-decoded-values.md": "a3185fbf8403daff4a63de35cc6b4acdffead666ff8f24b06f0b8bf96eda050d",
         "apps/docs/src/content/docs/guides/solid-query.md": "6ec1cacb1238cf3dbc7b71ca6311757c76949973522a83d12299f20026dea695",
         "apps/docs/src/content/docs/guides/stream-snapshots.md": "b26610d19e9fa95827c211c39dd2983b676e1a0d64307da56970ec4a5b8a333b",
-        "apps/docs/src/content/docs/guides/streaming.md": "afbb74407e11a88cb9ebd2fbaf9e0c2620a140283e6fe9125128f0f4dd478173",
+        "apps/docs/src/content/docs/guides/streaming.md": "780ee11e776d204ffcd022b845686ab1012c2e325a9fbb99c51c720c0fd5f7cf",
         "apps/docs/src/content/docs/guides/suspense-and-recovery.md": "c4aeec1df383a9b4365a85d63ef1c345918b063ad35028431d0fed91f96ce21d",
         "apps/docs/src/content/docs/guides/svelte-query.md": "640d9d04953f4be453d686558d30f5ef83b4aea9489b1b4695760a82ff7a245b",
-        "apps/docs/src/content/docs/guides/switch-cache-owners.md": "75ddf27af480e4890e010e7d031374258f04e17cce20d37570203f5b2c559469",
+        "apps/docs/src/content/docs/guides/switch-cache-owners.md": "892fbf32cc077b4a9bf1ad2846aa394d2c0d887bd12eeed96948ffc0d300eb40",
         "apps/docs/src/content/docs/guides/tanstack-start.md": "eaea3d51fa366f74e0bbcb2d159cb78a94254ff70860734181a1a9576b59953f",
         "apps/docs/src/content/docs/guides/trace-streams.md": "7e81de0d4d088d6ab316842c872ad4493e0554b309cad78566802701ad70fe33",
         "apps/docs/src/content/docs/guides/vue-query.md": "a2d8a91f749632bfdb79ac99ea7cd625e7907fb1c96e92a0af2c581f3b0b1025",
@@ -59,14 +59,14 @@
         "apps/docs/src/content/docs/index.mdx": "85d93175471e294ca4d8efd0325ed391ad1a53257413be59a67c7becd252d2dc",
         "apps/docs/src/content/docs/integrations/index.md": "0ab5ad7e47cd37ae3d7d9e19bc93c696b29bd3f44ca9c0daf0dbdf0f606bc73d",
         "apps/docs/src/content/docs/reference/browser-and-worker-hosts.md": "19d83208a1a542a35c44961fc4e80b2f5e21143ad0e66187f7359b888e830886",
-        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "0f4bdb7509f0348a5fb3b59a554d088b28462456a461dfa739cbff4c5c446558",
+        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "b46439f84a95c7d83ccecaefa5fb2ce273186ae2fec384105d39596998c49289",
         "apps/docs/src/content/docs/reference/errors.md": "c7dca6277bfc64f3db9b8c7cc1ca7cb1389ca7e3f075e50bf65f05bd0c7326f2",
         "apps/docs/src/content/docs/reference/external-http-clients.md": "501ad4c67b7beabbccb05d11665bed8d7d7f4a030460fb8620134fe5be8be5fe",
         "apps/docs/src/content/docs/reference/factory.md": "954a3416d3f8220a249fa883c83ec3ea068450b35fde5901107a609aab73fa41",
         "apps/docs/src/content/docs/reference/generated-builders.md": "9082369b9d1f9c44bed21356ffea5f3e6de58823df8ff13dc0c4f13b4432b15a",
         "apps/docs/src/content/docs/reference/http-builders.md": "df55394d799f1a709e997e54801b68a84170e58a165b6ffff323c3dc76e1a586",
-        "apps/docs/src/content/docs/reference/http-factory.md": "77db555d98f90e015cbefb12ef9a79a28d4a982fa9d31f8d9a181b76de4f81ff",
-        "apps/docs/src/content/docs/reference/performance.md": "1fa8ed73ff7e4994402be36dc79179797f150811fc06a30beed8ca04ac77f83e",
+        "apps/docs/src/content/docs/reference/http-factory.md": "2cd975b14754bb0283fbd5fe5c398281a9bbb82381e5efdef34f28eb961be02d",
+        "apps/docs/src/content/docs/reference/performance.md": "e99a4efe7b8326f0524af814d33f52f9bdb6e9c49598496d5a31b3696bcdcee5",
         "apps/docs/src/content/docs/reference/public-exports.md": "47b84dca065572179e24d9d99649c5025bb9b187f5963fc82e74e79b64b72954",
         "apps/docs/src/content/docs/reference/type-inference.md": "1531ba44c4965b8b0105b0157a1bcde8282c275e995d1e2a864548d198e56cb8",
         "docs/adr/0001-target-effect-4-release-candidate.md": "f8152332adf7278911e3b4e119d6079a444b01db840f225b62b1a05cd5ecf4f2",
@@ -97,14 +97,14 @@
         "docs/adr/0032-configure-utility-trees-and-require-stream-retention.md": "e46238f04f3213d2c32dcb64fb2c17d38d033699d08b3b9d7986bbbe1d2f1ff7",
         "docs/adr/0033-bound-effect-support-to-a-patch-line.md": "aa1919cc8dedca1cc3439ec13a0f96f012f56a5e425887f3c4ddc92e47063cfc",
         "docs/adr/0034-extend-http-stream-views-to-decoded-ndjson.md": "445ed1f9a4cb3a74938f2d01579e50c046a681aaa2dcd856ef9587c62aaa7cf2",
-        "docs/adr/0035-use-effect-enhanced-tsrs-for-development.md": "be8bde3dc27e5095c286fb9150d167c8e8950fc7bc8d92108a12f550db7995e9",
+        "docs/adr/0035-use-effect-enhanced-tsrs-for-development.md": "ef20a8cb9211973e6b0d3dc59e752fe3861729c19c65e81fb4354d9db6e123df",
         "docs/adr/0037-own-stream-publication-through-query-core.md": "a7800a9b941557bc34d3a3102e94d4227f8e5f31ff852b6830a33e12ac2ec553",
         "docs/adr/0039-coalesce-live-snapshots-explicitly.md": "4d95533f87474e8a55a9a6a0f0339f375a7e5d242195e26e99c2d7e895171f02",
         "docs/adr/0040-add-opt-in-query-owner-retirement.md": "5e5f0a05577c779ed22a62a3e99a8abd509c241fa9949e9fb50a9aec068472fc",
         "docs/adr/0042-define-the-compatibility-promise.md": "2e2ae6512eb714ed8601daee80fe3852fdb62614602be5ad54ffd5e58f0beb99",
         "docs/adr/0043-keep-editor-selection-contributor-owned.md": "3ccd02edb9d41b09bf112b64cc335bfcc3e981f9986a9f704b376532ef5798ac",
         "e2e/http-workflows.spec.ts": "8e7f7622ea481a56dc3f0ebceabe61691f8f34e3489ef1945ff3e929a1e6b2e0",
-        "examples/contracts/src/client.ts": "fdf559bf0a798c7ea7f7aee01967837e720f7727a1bd11978aec51aad59f00f2",
+        "examples/contracts/src/client.ts": "0be1072f4734c20623f9250dc64954a1398f05714956566f0af82469ef43c87e",
         "examples/contracts/src/contracts.ts": "74d69e1a07c0b32c2a48b8fed8cfceaac8844ead860fbd00b9e357657b39d88e",
         "examples/contracts/src/http-api.ts": "bcecd0611e4bdeac0dad04159cc73db3165aca20ac1f89e597e6c73a76d99cef",
         "examples/contracts/src/index.ts": "c33fab4003401bb603897353250ebcc834a7916d4e3a696f384bf98e329420d1",
@@ -122,7 +122,7 @@
         "examples/server/src/web-handler.ts": "df76905670800bd27b419727a7e962c749bf6756b5f533c986186887b122eaeb",
         "examples/server/src/workflow-handlers.ts": "49d9abf85b7088417ae393ef7d8de328142b37b961b7114e95a0a42bc6991972",
         "examples/server/tests/fixtures/websocket-server.ts": "468801a4f5c50ccdc9855d8a8ef24cb1915f30f857625a99f4dfc20106fc2f53",
-        "examples/server/tests/http-api.test.ts": "3d341c3a2d370562d7a04413adc179eed6aa822eb808a058deae09d6791ba0d4",
+        "examples/server/tests/http-api.test.ts": "1d83276750c25e57a1a213dcdd81c319458dadaa2f43f92d33e81b3a6b1143fc",
         "examples/server/tests/rpc-transport-overhead.test.ts": "3fd291dc98127cd4a976efd3eca1beb04e9e50a7139d6fd6ab03290380005b18",
         "examples/server/tests/rpc-websocket-consumer.test.ts": "e5092fd7e402a0010c2d6c6426e09c407622528c9a0cd0dd41d0f3c826d1fed1",
         "examples/server/tests/server.test.ts": "5c9c176fcccf73c0c610502dd6b0f3c21946b1681538a6e033ee593b9bfa4934",
@@ -144,100 +144,101 @@
         "examples/shared/use-slow-query-cancellation.ts": "872ea8e5ef8b97b2d6def07a8cc5c79a885099ffb6e60ebf6db6e39b9aa628f1",
         "examples/tanstack-start/src/components/effect-error-details.tsx": "843d359788306199d2f206d445d512f2798dda9c1625d09650ac7a09a26c4a29",
         "examples/tanstack-start/src/lib/api-server.ts": "3ab4000ee28dc8f73237b4508e0f0a0a1b1e4baf865ae501348487a978e19f23",
-        "examples/tanstack-start/src/lib/application.ts": "4456944d1ded48ac041dce627201111ac05936ed57263b9ca674a877a21dec38",
+        "examples/tanstack-start/src/lib/application.ts": "718c175eb3bbace8a5ad3e68c5feec5a5a83c7bd7203a592c615bf1662ff34a6",
         "examples/tanstack-start/src/lib/featured-user.ts": "8c9b33056cd2e4c2c19a95de3fad5b93e326b654117c75086b55f44630ad599d",
         "examples/tanstack-start/src/lib/query-ssr.ts": "30042b98b74d2fcc241a2d752d0ed388555082047098b9ca17e3a6fc2727f4e8",
         "examples/tanstack-start/src/lib/server-application.ts": "84a8be06a20a2777023a00599f1bad7f6db1018f247aff6818d08c1fc933655b",
         "examples/tanstack-start/src/lib/server-host.ts": "20eb1a8538720b8cba9df3011d48974f286a44921fe641096985be533f687dad",
         "examples/tanstack-start/src/lib/snapshot-preparation.ts": "0f261657058c6b480482b615a3009ce229276d6fc6785fdb258e3b3830f79311",
         "examples/tanstack-start/src/router.tsx": "be5fd785e1d43ef59af33aa9e4a2e9d4d688390265cdb6f65babfdf0da29c2fd",
-        "examples/tanstack-start/tests/application.test.ts": "cfe76770be9e66e9cb8c2ed8e531a46f5442c5721c023302586f85c97fc954df",
+        "examples/tanstack-start/tests/application.test.ts": "c035d4f446d922a438294e54113c98038f7ae72650a35837613979ecec75f8ea",
         "examples/tanstack-start/tests/async-hydration.test.ts": "2915fdf8dd1ef9737404d76aa9045176593a5b9ee21ef84beca20759e6b8a9e5",
         "examples/tanstack-start/tests/client-navigation.test.tsx": "084a8c42a1312e12720098d985a8796a534ddc07aa12f18a9b5595ed94a1c507",
         "examples/tanstack-start/tests/failure-dehydration.test.ts": "5a132899aeb7727f53a30bfffc0c1ee7ac5d59ff96a752077f7169d0df4b4581",
         "examples/tanstack-start/tests/featured-selection.test.ts": "3a6e1db27843a392d354cb58ab7b8d7bfaf327ffe42910118d426d42875f1123",
         "examples/tanstack-start/tests/server-local.test.ts": "6d04b85b3e584deb8e4b6f847235ceab8a811eb2d3837dc209f89cf87cf0d291",
-        "examples/tanstack-start/tests/server-render.test.tsx": "e46b15c02fc7b5fc76d52f9d64dfc5b88d4d36e0151908138de9babe7a5d53a3",
+        "examples/tanstack-start/tests/server-render.test.tsx": "4265e8d8508efce2bad73d54c74ec5603c783d18fbd6977b785a37bb48a1e722",
         "examples/vite-react/src/app.tsx": "ca8282f2d2adc59fe62d19253e8f395d2585cdc4dae2209bab134b01cb701d7c",
-        "examples/vite-react/src/lib/application.ts": "da2b2fa16d237e6fcc49b4ffbd99d2aa8a402a861f78cf71634a07172bd12bd3",
-        "examples/vite-react/src/lib/owner-cache.ts": "e9eaa783cce49e7905027ae93ef1c525e2713187e83ffa4ecf726ba7235a420d",
+        "examples/vite-react/src/lib/application.ts": "ad23667d7079509acdd0491366f6d1961c4b7029c00f977d433be41028ae0e87",
+        "examples/vite-react/src/lib/owner-cache.ts": "05e418ee7e05b237804e4ee920963d0b8e483614e7a80c0fe82ee10300c9066a",
         "examples/vite-react/src/lib/user-writes.ts": "999277fa02ff9c1439186b59636f7078458a5cbc3c84bed06514867b270a3b5e",
         "examples/vite-react/src/main.tsx": "6672a5685f0ccbdbc982676056bdb60d8f63b33987e319a146e42c3a0013a56b",
         "examples/vite-react/tests/app.test.tsx": "29597cde134da8e236466ce403d1898796c1ffb883a8c35f8d4c3e542aa779d8",
         "examples/vite-react/tests/commands-ui.test.tsx": "d24bafc224efa769efeb1a2c0398a86b0dbef6c63cd19ba73d3b3bede921a1fd",
         "examples/vite-react/tests/commands.test.ts": "1bd076ba62d754e323beedb7bfb9c2e2ce75f2eee117003a5f5bb55350610386",
-        "examples/vite-react/tests/http-workflows.test.ts": "ab29cb1530f41ca4739d734084d2cd19ea40058f8531399dbeecdb0ebb7276e8",
+        "examples/vite-react/tests/http-workflows.test.ts": "9f39f4d9888fbd189823057d77ef634b10479a98920b29705c92548b2fbfd467",
         "examples/vite-react/tests/minimal-setup.test.tsx": "fb5cb0465320068d8bc37bfab0cf1c4579e82a9c318243ad15424d0f35661281",
         "examples/vite-react/tests/owner-boundary.test.tsx": "f8fc6b26f24884d87d364a9b07f16ba912a7e92efbb96b0c815a62be22ac6bab",
         "examples/vite-react/tests/owner-cache.test.ts": "1ac4bebb04b973fa11e26f4b684fe6b217a075a255ac1828d9ed109c359c9ed9",
-        "examples/vite-react/tests/owner-switch.test.ts": "0f16f2ac4023dfedd525a76e03d374d62e2289aace71eb688ce43fd367c147ce",
+        "examples/vite-react/tests/owner-switch.test.ts": "89c15a93c959d393785ce0fa8088f7e00f3eece2c7fa353b7e78b2e4510e8eed",
         "examples/vite-react/tests/slow-query-cancellation.test.tsx": "827e3a4cdec1dca4e8dfdf6ef48ba449f6e69bcfc6c67660ae8f4648e9556042",
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "f601fc8c8c5139f4da2805d2faddc2a61085782d32c4929e7920a3e27e0ba71d",
-        "pnpm-workspace.yaml": "c7ceebab8301785f74932daaf1b16f2b09cbc5d7f030868659857724e71b8956",
-        "scripts/check-effect-compatibility.mts": "7f0fdbadca7b11d118253cabfca201008c1f7680e42ebcdbfec05c65364d904b",
+        "package.json": "5a6e851de9bed1a00a1054746189fddf375733ad7894c5e96cb6c362251eb206",
+        "pnpm-workspace.yaml": "fc4bff1fa9ef4a4887691c6e004e02829736f93ee07efcb563f78f836a21a276",
+        "scripts/check-effect-compatibility.mts": "bbb63ee11c2aed7bf50dd9dab1e303eb511e8efd7110f1c4ce9686a940421993",
         "scripts/check-framework-consumers.mts": "f0111ac9ed84996f722f656358b810da0b9ecc8c6c0219a2019d1076b5d50cbc",
-        "scripts/check-toolchain.mts": "4e401073f141efdcf81c40ca1bc9825f805711576118b830ed63484ea7795cac",
+        "scripts/check-toolchain.mts": "3c8efdb93594058ed78947bc65ad51c88ac4b26cab23b0b1fe6f8786a6d386e9",
         "scripts/check-workflow.mts": "c3a760a6b111d3f1dc7570a510ee09aabfc048786ef8c6dd1c9fe7b26cecd00c",
-        "scripts/compiler.mts": "9212aaa7f819948f73c7a75c42575bcf935cbd2811493fbc6edc5f4e73448668",
+        "scripts/compiler.mts": "e160a1a81eccb29c77e5f2f0fd8eba7f3ebe6f04cce91fc805c9e6ab96ce1d49",
         "scripts/measure-bundles.mts": "f00e0cfc803f3a951cb41f140ae8bfee7136ae7e486b13467a2009288aaa8350",
         "scripts/measure-construction.mts": "2fbad4879fe77ff24234a6be5666047b41cc7c3fd5ce9143d640ef4b41a426bd",
         "scripts/measure-streams.mts": "342a94723ee8fc92083ee346a5d7e36f96440a32510c61fefb4f81c17b64f273",
         "scripts/measure-structural-sharing.mts": "ca3d41f08706749f56ebb40173f04f98bf70e6492f04ecc1460400fb5b69f748",
-        "scripts/measure-types.mts": "eb15c41ee7773610312e3cd78d9311a13884a737cd5357fcd3083e868d083c5b",
-        "scripts/performance/budgets.mts": "a97ce19167bda55891a66daa14263549643757dd5db309c367e4be766637b957",
+        "scripts/measure-types.mts": "e4ce7e0ba0e8d910d7f34f5e74af3a51eae96ef12afacb36ca662d32e8b9858b",
+        "scripts/performance/budgets.mts": "ab7b9acdcc9ed4f8647a2766a98485e5b3521e01f2d945f78b7cf6eb03fc32ab",
         "scripts/performance/common.mts": "507d45618fbaf2c7be6f986a5f958d1958cdddc95e42a77ff1d50d8225538a3d",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
-        "skills/effect-api-query/SKILL.md": "b4f7e1876083e72c9e37ee9bf674ba94d23bca6fc1fd236218b09eb62bab6eaf",
-        "skills/effect-api-query/references/cache-workflows.md": "67d3bb698047f7ff3147c6cb8a88406f7fd0c9a6a0ea2f755842066cb199662b",
-        "skills/effect-api-query/references/frameworks-and-hosts.md": "1058d852cefe969b30a85ea38994a02eb9e0967fbe3870c4880b61801c9e6a0b",
-        "skills/effect-api-query/references/http.md": "55dc0b7c3722cd25f8ff2143853dbcb32b8ee43270792360148dfd12cc8515d8",
+        "skills/effect-api-query/SKILL.md": "f98700277bbbfb035c03be5ed7cd0f3146990472ca949a8633f75f849ae14c55",
+        "skills/effect-api-query/references/cache-workflows.md": "304d13e671bbe4be6b04bdcd28b4ba4e9a5bf597ccf9e0c6a69d3f5a08518735",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "a134be8075588e30f28e2994462f3baa0733a2be28a9db826e0df8d91c69a4a5",
+        "skills/effect-api-query/references/http.md": "4dcc63f909686f0f0e1b48f3f0c4238782bdbb6dc69ceebb838786271da09aa9",
         "skills/effect-api-query/references/hydration-and-ssr.md": "f127b348b421c596abdf5e3df97ed2bfe144fac37980226cfda23392c71ac2d7",
-        "skills/effect-api-query/references/query-patterns.md": "e4adffe6bd06620535b419bb39bc0a09ac06414b26a4aa84752a8ea19fc0625d",
+        "skills/effect-api-query/references/query-patterns.md": "064e36b3977ad372e7e340cc981f72a9539cec7ab36efed2337ffff257a4a9c3",
         "skills/effect-api-query/references/rpc.md": "cdebd0eb64309a1237c06b15ccb3cc906cce1957627dd9d057bcc2c6c29da089",
-        "src/core/branch-filter.ts": "71a8c6039f1775881bbc00d92e14e2ef823bf7150721307a74f16a1579bccc86",
+        "src/core/branch-filter.ts": "3b6273c347c060735cb054b2c5c653fd56c2df5571e4607c67e1c19037767312",
         "src/core/canonical-key.ts": "84e91000876a6795557aab39dcc5d44e328250bf9b30ad02fd67afd02f5003e9",
-        "src/core/configure-utils.ts": "6714feba8c44f48823e3a84ec90df86772b53cdae2e2cf34ff8fc6d3961a9301",
-        "src/core/configure.ts": "ea0d4073e4965198343a96498e7e55cf78f31c8af0ac30c23a82c4df0314576b",
+        "src/core/configure-utils.ts": "e47d9badd996596acdca5952a77e1aa59b166d2a4edc9a7d996755035d2e5af7",
+        "src/core/configure.ts": "277f1d1201be35962d6b75c3e9f4074e7f4798456d515ddbd23d7dc3bf6693cf",
         "src/core/consume-events.ts": "648144582c4bdbf4a9cb0d35ddc54327abbefc654f2d37b6154232bcd09a1752",
         "src/core/declared-error.ts": "a051225762704a9ae02bcc8f5559f5e9b45a29fcb48f25dde03be28e0abfe9a4",
-        "src/core/hydration.ts": "7cffdee6acc9d2beb046707978f11bb31dc484e966de1f0baba082e56fd1a14e",
-        "src/core/inference.ts": "af390ef595b30ed5ce6d73ccdd9ede07df0df46cc68ea36f9936e579652cb6a4",
+        "src/core/hydration.ts": "4041e3310a757e772c9b57931725049167bcf1f611aca32c4e778f9d06a51408",
+        "src/core/inference.ts": "6ad965a84bca31ff5c45c95514b0aeba469ff1b5e7866e8f32480bbf86b715a0",
         "src/core/interceptor.ts": "1bc8566c5669e1e797e8293b441a6ed175252a29c6eaa42999690cb835a5347f",
-        "src/core/metadata-query.ts": "b7cc903f800a3723d931623d420abcfec6ef65bf757fddbf2cf5a36c4c52ded9",
+        "src/core/metadata-query.ts": "88379aa77f2338eaa5349f06e736ff9acc9519fb3bd5cc6c2e43da9d46d76926",
         "src/core/operation.ts": "166ed139d6a6be3a3df0ce6b60ed01e71dcfa6075091a18f1869808355838cfc",
         "src/core/policy.ts": "ced3a6fdf1ab7e273eb518700a42d68b4823abdb1088fae6855424e4e479ded4",
-        "src/core/prepared-input.ts": "4fd806b273f95ad2aafb382e89df1d0443f8c270a0e575f1690d7e6564e443c7",
-        "src/core/query-descriptor.ts": "a23e937f8ff9856ee867131539a8c3f943871cbac18e1243dbdf4c5bd8537546",
-        "src/core/query-effects.ts": "ec7044353bb6f531986cf9fcd43479ff33c954b404ed56acfcbed459dda3b8a0",
+        "src/core/prepared-input.ts": "c0c24b6c3f0a7a99122a3c4ee627954ced2724aec1cdce9f965aa753aef0c087",
+        "src/core/query-descriptor.ts": "165cd4a9bed50a9619d9e0566a07b8533ac3fd572d1241e37b2b531c7c9b1c08",
+        "src/core/query-effects.ts": "d57712c6a11f68889056db64652676584426e65af3b522b8dc30e3b7f67e8585",
         "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
-        "src/core/query-owner.ts": "3338cd9dac985870417a46b8c40c0ec73e6b7963ae2f9198691fee663c3a41b7",
-        "src/core/schema-key.ts": "7dad2749d30f2ab828dbc7e96d6e1e2b32b6733450cb6dc734de607629d925f8",
-        "src/core/schema-structural-sharing.ts": "1a961c521aaf02c00689bee654ff428bb9d519ebf87651f7faedb9dfd1a06ccc",
+        "src/core/query-owner.ts": "0efde209652fcdf5fa7dc81393cfcd09adbaf431dc376ccd41dd7157e4759326",
+        "src/core/query-prefix-index.ts": "419a20fcf9bb28c5e7dbedb0c5af6f0e0dab52c0332773dbf39af638ac671cc2",
+        "src/core/schema-key.ts": "0d6c00371526085fe19689a7401dfd86cb6f6a96f6b351b4b31bb2648804d5df",
+        "src/core/schema-structural-sharing.ts": "7ebd221a5730f652f0e88fbc52c418b8bba173172bf49971d6988e5a021b3ac0",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
-        "src/core/stream-publication.ts": "e6a2fbded6ead8351c83fa3adabf84fb0d1b52d559e3d209a2831aca69d58e21",
-        "src/core/stream-recovery.ts": "2287649cd64adfbe8cb069b66d338d178ad1239492cf7530e2ea5addbfd1fd81",
-        "src/core/stream-snapshot.ts": "97fbb56308b2e2decacd86a02b3f0a3ced76692444ba25a7abaae05b442c233a",
-        "src/core/streamed-query.ts": "a44dbb1a17a0d266f9e38e6b819dff7dbc417821e14f089e8ed2825dfe763b23",
+        "src/core/stream-publication.ts": "0ecae3160d553d5b9d2b940abab3ccb93c610c77a2baed2dd2a70704c6771b89",
+        "src/core/stream-recovery.ts": "ecc7fb61c6cb8b8f1617a2bfa69387b64e3e224c09f1f5f6f47964bd256f1bbd",
+        "src/core/stream-snapshot.ts": "6a7f2c896aa0a9b11150893861513004241b228e70922cfc429aba2c8ef854b6",
+        "src/core/streamed-query.ts": "b7b55cfca6e191aace14335a0c1833da4f36d19f95fa1bcf9e683472a580fe18",
         "src/core/types.ts": "ded3b620e25ab5def0a96dbafead82398f7f7a43572a434cc30b0c505ee2409b",
-        "src/core/utility-tree.ts": "7b113d01c672c1148d022556f72c6e8f49c5afc0170fc88dcff74008abed28f1",
+        "src/core/utility-tree.ts": "57f0557e34d37ba9b808b20b51aeed7d46dea7c77a38b5e671f71fd5e00127b4",
         "src/core/view-prefix.ts": "dfc0d74a07c8afe3f63952d59c29088ba4afb45e11a402ef8b72c5e2282cb063",
         "src/http/create-utils.ts": "8d128bb9646e095456d3dcf696f1aa6e365d0de328df571c64eea7421935c9f5",
         "src/http/errors.ts": "afa6e7a015a257683ec8d96d5d5da1ffc25a79b0ff498fddb538e059af7643b3",
-        "src/http/operation.ts": "4a3651be65fee9fc039c38c0f191ba6a79347a5bd45c3f233de7d90c12d8bf9c",
-        "src/http/request.ts": "4dced85460db56cb83514486417e17dd4a35629ad28749a2ac01dadbe45113b3",
-        "src/http/streamed-query.ts": "27d1f5418009216d960816485cfd7f1760a8e3f638ccb9ac8dfa5fc040b1564a",
-        "src/http/types.ts": "aff8b44ee5ab3013fd34172f0e425fc272b95f4ca096ec5ee66e514bc4be4e1e",
+        "src/http/operation.ts": "e105e250a2a85c0b6e19589bd7ef5fb613eec0c2802ba699d5f6ca3c9fda4263",
+        "src/http/request.ts": "0d82d523cc871fe25f475e8670009644aa924fbc4f8ead5ad0b1c9462bd20dfd",
+        "src/http/streamed-query.ts": "be93ca8b11f2a165c8e9f2c45fea19253653e478e3746dd19ea3819997f8a937",
+        "src/http/types.ts": "00c5696406525cec1a191f029581e129cc2b003933fb4362fa2994c30af22714",
         "src/index.ts": "85ed201a88913658d6d55d780e33f549444c1bbb591e593d22f842e70199c9c0",
         "src/rpc/create-utils.ts": "8ebf030b0f76f91c248434c169d789d6328d2ba43c07afe15e04db0a02f05c2c",
         "src/rpc/errors.ts": "8e1fbcc7843b2bf99e9d80bfd365dc118d52351909d5c8f48c46ba9d39fdedd3",
         "src/rpc/operation.ts": "ac10df77707045d22c2d58ff0f776362a7fb5ce03e179c10238c42320ad6f719",
         "src/rpc/streamed-query.ts": "cf80fac99983903e6ab60aeecc5fe3cf1a0208b26143cc6f588c615d728f2ee7",
-        "src/rpc/types.ts": "5c77358187150d34209bdbffda162b3a5ecd3108662e0e29aeee6ddd23dbfd80",
+        "src/rpc/types.ts": "1349a3de4f5238450d42d72cebb3b1a247ed196229b27ad15b9a7f0a5514cd4b",
         "tests/cache-recipes.test.ts": "fb95bbbba35f8bcf9661c993a61385f3186d935bb5626da6181d8ce9e6a9a49e",
         "tests/configuration-composition.test.ts": "2fc9ac3deaa514bd5221e89eaac8922905a896d937635c7a3bcc2de698519de4",
         "tests/contract-reuse.test.ts": "ef45d0a7116c56bdff46decb93cb4cd8f55baa1836edc0382434742f27249747",
@@ -251,11 +252,11 @@
         "tests/create-rpc-query-utils-stream-cache.test.ts": "c2aea3349503b5bfe9abfd445a2e6a54a939843f8d00b6bf4d75ad607b2d99e7",
         "tests/create-rpc-query-utils-stream-hashing.test.ts": "417f45c4fd7584d164fe5ecc9e354bdf52a1117a5a46f7729c2ffb5791eaf068",
         "tests/create-rpc-query-utils-stream-publication.test.ts": "f0f6919a98e3c4efd59ab39a7c8f2a2efb817c0b55913cd82c034126c8d5e459",
-        "tests/create-rpc-query-utils-streaming.test.ts": "6f0fccd52258df72d1bb471bd04873426708209fa48e0b9c3a0c831d9002f5a1",
+        "tests/create-rpc-query-utils-streaming.test.ts": "016c22bd2eb46330d23e0c209b608ccaf99dede7a46553306a92bd1e429b14b5",
         "tests/create-rpc-query-utils-structural-sharing.test.ts": "1698a72dcfde4aaabac4161193fc0379c445f8a8be61d47d29797a315b66b06f",
         "tests/create-rpc-query-utils.test.ts": "b6ccee687718bbd528819f497ba2ac09acfe06a1400c5bb38b863eb082f0776f",
         "tests/docs-examples.test.ts": "e181c2d34afb1ed761133c2b143ca26048ddab32be2bc5d7486af4355b5e5bde",
-        "tests/docs-release.test.ts": "edb5be9b26b99339770f74ab188e67f30f4642afd19f91dc8e4c85163d71ccb4",
+        "tests/docs-release.test.ts": "d1346be1c3b6f30775ae1cf6e6d2af978fc813078ea0c903d6ab8b95aabd0d13",
         "tests/execution-interceptor.test.ts": "9c8a26e24cdd5807a4dca68bfdd88663246b3a5632483581ec3cbd4cdcf69b9a",
         "tests/fixtures/async.ts": "c72af69141ce4f2dd4e9b63910ed20378e546dcd015a2d7befacd439ba4a006e",
         "tests/fixtures/decode-utf8.ts": "f0441c8aa2553ce2c1dccff7cac1bbaec2cdc668916278c7a0efff90482ace61",
@@ -270,41 +271,42 @@
         "tests/fixtures/websocket-checks.ts": "9144c4fe42e1565d43f75dbb9a928f58cf60f87d3c44db053769e076c11423eb",
         "tests/framework-consumers/angular.ts": "4d629324cb6e4d5ec9029c96670cf78a022e10ea98ee12df1997ac731d1d68ad",
         "tests/framework-consumers/contracts.ts": "cc6eb274850950dfd64b3f4613fb527e7dbc452518c25268a99d24f6ac2d2bac",
+        "tests/framework-consumers/package.json": "94e7a24cd9700168558e77b09511cd9c7b9a6b84c0dd0199cf253dce89a177c0",
         "tests/framework-consumers/solid.ts": "0e0b261f0f80de83f799326cfa4fdd8cf14cb480909b69bb498b759467ec8bdb",
         "tests/framework-consumers/svelte.ts": "652f8d97d781803239ca667497768077167fffaabec851d5a076f692c376223c",
         "tests/framework-consumers/vue.ts": "e23859e5fe8f8e24a55d8e782dd2880d1a6d88859bdf40ff7b60e8b0c150ab50",
         "tests/http-cached-views.test.ts": "8df1da4d541d18830da6bd14334d670589e55e6c4bfb50175dc198444a96f129",
-        "tests/http-execution.test.ts": "064730968e39333e717a08dab15c9cb2455974c8d0f06cdbcd6768bf992c1d53",
+        "tests/http-execution.test.ts": "7d43723e36108c190b138a13f2a1c70f7a03dcfe4235f3d9592e98b4c9ef657a",
         "tests/http-hydration.test.ts": "51da967534267d49dc91f577f43a54fc88045cce8f89623c1106df8c88c21570",
-        "tests/http-live-query.test.ts": "e4ed31b68185eba7e80587815ee9bd2ca0573639c2695edf2af0532aa42ac269",
-        "tests/http-metadata-options.test.ts": "702a73eb9e005d038d35c233806a065ab4da7d35fa1255df336711bd09be96d4",
+        "tests/http-live-query.test.ts": "43dece9673bf6aa381c11a49fbc9a3cdd471c55e446d5f0fb4c206bed9ed5eb8",
+        "tests/http-metadata-options.test.ts": "35923dbcebeddb4aafa299da1afb91a9124d0b25cc728bf05d19876bc4f4f6d9",
         "tests/http-multipart.test.ts": "331f18bf9730579f05513d3ab93734b8118e313b219604e8c0276c07110476ae",
         "tests/http-ndjson-query.test.ts": "7a77db15f41389ea1ecdd38f85a73be5fc15e4916b94254d5e16f7ea923477bd",
         "tests/http-query-options.test.ts": "e7b2ca44c44cd8402ca688960458e1190c54c68845556fc4ea5d131ab8649891",
-        "tests/http-semantic-keys.test.ts": "4fa4efd4b8211e52560be80aecade363486372d06cb3eeca0c496a783ea21f8c",
+        "tests/http-semantic-keys.test.ts": "00ab2f6ff02e9ca0b9b94a6e6e9ec70c437edbac23791f3f5d675de1dcacb706",
         "tests/http-structural-sharing.test.ts": "35ea74a2711f56cd2001cd5a1f3ffe58f10f4ecbf094c0d4ce7d9e9a62dead42",
         "tests/http-transport-cancellation.test.ts": "0ba26a9bae56b26605fc03009c1f50fe90930356d0fa0c4ec4ddc5c120430f00",
-        "tests/hydration-codecs.test.ts": "67a0a8e1e7ab78ba4cfb2f44b188a4001669584134ac21f0eb8bc03f993ee4ad",
+        "tests/hydration-codecs.test.ts": "3035d8b59997fc62823d7c6f3251041ce38824b0088775c3c4d1186c95e30d7d",
         "tests/integrated-workflows.test.ts": "0547cf36a5d172126c1241fa67c350a32f6549ed9dbca2b6007c71b72edf052b",
         "tests/live-coalescing.test.ts": "e5456fa321374e61dfef6992ebc706c9c558803795393b55da10e33c926bf413",
-        "tests/publication-deadline.test.ts": "2797557ff14bf8527ea446cec1e1d7c61cd3666f11f127e640c53ce5d7e30868",
+        "tests/publication-deadline.test.ts": "38f754f5d53e1781a0f1d3ae0102b3d90d7358485bb2b645bdf7b68076f21574",
         "tests/query-descriptor.test.ts": "8e23e94f2028c77f55887e0e0492213cbf5920de88b19a6933e1ea79e385a5ab",
-        "tests/query-effects.test.ts": "68c85372b5417be8073e3c117ee55a3f77e270f30edc55cdbf3144e6aa86b47e",
+        "tests/query-effects.test.ts": "247508f2c53dac4de5317769b9d7a55b818fb962df91d2232acc54711d5ddd2d",
         "tests/query-events.test.ts": "27c913c8ff1d65384a70695ef891e156f99ac122bc36e5be10f195b568b5e7b5",
         "tests/query-filter.test.ts": "ff531a86816872cd2cadf01d79bd9d9ff5be1895bab150330a90aa8375508004",
-        "tests/query-owner.test.ts": "e6ec5f2cd7ca7404da235c11f30249b1f769a9c5902c24f681d23f0e0ef64705",
+        "tests/query-owner.test.ts": "ee01002a83b3a5f787abb38919cf893a9cf0c73836bcef637ad9f44607a23bcc",
         "tests/query-policy.test.ts": "19b1d0fde232b4af9e041197a1aa6726f30e4fb7118533e5b3f7af08cbbe4002",
         "tests/query-usability.test.ts": "313e6c03b560b4c20ffc32ed8e2bd96ce94fc2fb3977489f311324b6988e190f",
         "tests/query-view-prefix.test.ts": "fd94e3d01f52a0978242246f02a3e989bddd1e055f828f48d7a41187f696dd69",
         "tests/schema-sharing-prototypes.test.ts": "628a6622656b9b53e686d14b9efbd3abc13c61a13db1546001b0689b491f6022",
-        "tests/schema-structural-sharing.test.ts": "577e0ac004db61c5778bf2362b8d208fca6fd6e830a3eaa6496a4c534d3a6e57",
+        "tests/schema-structural-sharing.test.ts": "da34a1ce3b723abce0e5e1b95cee80458ae4073236d23eed6eea70aab5a97af4",
         "tests/skills-maintenance.test.ts": "7bbf6bee1c9867ba314cd3cadf86db603a4aa9959a863c6e908b7401d767d9d4",
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
         "tests/skills/query-usability/grade.test.ts": "f3c2650deba0d887f66fb3b3afd284cd9baf562296f2984e5c84b014ecec8cbd",
         "tests/skills/query-usability/solution.ts": "38583676eaa2d33e8ca56c07a430e3a28787feae9d84c6d3612e01d6d7f1d80f",
         "tests/stream-publication.test.ts": "57db2c6db5273a5c6789bb65dee2eeff5293eb98ee472fec102dffca984a65a6",
-        "tests/stream-recovery.test.ts": "93e68be6631e0335129d9459e9989aff56e3431e8ece9540104278a8b5cc1cb1",
-        "tests/stream-snapshot.test.ts": "c001d7ad4dfbded79e2ee66b5595c2f23ea42c5a814c451d3ca154cc7ef07a67",
+        "tests/stream-recovery.test.ts": "f5ceb7a1503b60c072d00f235f7fb546b1ab046ec6aa5f4ad830b273afb74c59",
+        "tests/stream-snapshot.test.ts": "a59ce44e80854140184df0ba742b39c80a3dd0c4b691d2b4afdbd73d2e754ed8",
         "tests/types/application-policy-contract.ts": "ac6c4b852a201269c5a8837cc4410abff593645530f274a097208eb45ad40ccd",
         "tests/types/docs-functionality.ts": "065ff9eac091e4a25c814e3e49b49d0f6258fffb7c5ed0661a1ec960b41ac0c0",
         "tests/types/docs-http-ndjson.ts": "a86513c1047b700ce27fc49b3d1fb31004cf745096d8403a0bdc780d95a448a3",
@@ -338,18 +340,18 @@
         "tests/types/exact-options-union-contract.ts": "857e9596c241919f66a2befc2acb86ead3ab44b672e1e1425872a622366139b4",
         "tests/types/example-owner-contract.ts": "ed58343a4a7da9606e07703d19f3c0470e25923c81de357c0dbfd1258c3fc439",
         "tests/types/generic-client-error-contract.tsx": "f0b2f55deffde27ff745209485f9f8b817e4e537e8c60efd345946b77cf54bd9",
-        "tests/types/helper-contract.ts": "0021a5b845c65f608ed5dd429227752ceb32784e75c198b01868f017120a7aa1",
-        "tests/types/http-contract.ts": "eae48b86aeced5dbf82e23f3053b28a99e5386a086d767f7739ede4037c15001",
+        "tests/types/helper-contract.ts": "c40e14a64a8429052bf64523abd0ac9f41c3ee38c707c5bd86f0809964307e52",
+        "tests/types/http-contract.ts": "bc88a4f2a239b0cba80a338c1ff420e814eb3fe3f0cb3eebfab0490345f80662",
         "tests/types/http-empty-success-contract.ts": "00ccdb360edc598b9bc6c8a7708dab6b7ca85cf267ce7caa9a81a6b52f2868d5",
-        "tests/types/http-ndjson-contract.ts": "47d62788b90fb0f08faabe59646f10fc53fe54ef740cc4aaae9fb1c73e49f5f0",
-        "tests/types/http-stream-contract.ts": "1bfaa95c6237341b8137e81f1b1ffa17e5374dca2407328b324d86b3080fd815",
+        "tests/types/http-ndjson-contract.ts": "c44bf1d296958be46c35e97a7803a36141eb40d1346d6df9d5b3e7e428b8ac1a",
+        "tests/types/http-stream-contract.ts": "ffa424b9cf6aa92c079318e8ca26f888b73636ea66d9d2be670f744c5f74f4ce",
         "tests/types/http-type-scale.ts": "447d34e1fa952c843a866fd4dcde80dd32390f7ff14ba701b1960f45bc1292ce",
         "tests/types/http-view-proof.ts": "0b66f30863c5451d47144980af9cf5517637c8f7ca7866b64d1a704cea089413",
         "tests/types/hydration-contract.ts": "fade858552c1b04fd45f48e86a42668a6132918196eca9089d56f1948551cd64",
         "tests/types/interceptor-contract.ts": "14814393d97b03b55b8a8e84014e24f0f6fc1003e71c2d832a8d643320c5ea18",
         "tests/types/live-coalescing-contract.ts": "c476bfec4ff03244a35938e0bc168894e917ab9e723536e2b759e0002a3ce836",
         "tests/types/public-contract.ts": "307d25cd97a652d64938c40c76c14b6f43cea69cd06b7b7d3bca194f22321b33",
-        "tests/types/query-descriptor-contract.tsx": "933101b6a3696d07a757a10560a25ebd0b1077e1542d9cc330e73cf114aa33b4",
+        "tests/types/query-descriptor-contract.tsx": "38c5361e436f6f272b733cd049dccdf7f6964e6c4ff7c99a47288f5c50b92f64",
         "tests/types/query-effects-contract.ts": "188ea0f6ad1daf0a212f17a6f455b8cf1cd1f2d1fa5c652d32c83c2a5b476c8f",
         "tests/types/query-events-contract.ts": "b9576153175094b50bce0a7ae3d9285a843d2b91c714a5dfafff24a6be8cbda6",
         "tests/types/query-filter-contract.ts": "89977942cf8942af10535fb2ec4a4ab679d920a7d226ef26616faaf518b9a6e9",
@@ -360,32 +362,35 @@
         "tests/types/rpc-large-contract.ts": "a6187bb074b321cd2f8642b7ffcedbd92309e8a8709585fa1c3af1082ea97ef8",
         "tests/types/server-local-client-contract.ts": "4b150665dbcb3022fd90149c9c70cbd8a07322b3739e80ee712b80bd735f110b",
         "tests/types/snapshot-contract.ts": "7eb7b28d2ef7e8348992ca69d52d6cb557d3e4a119f33b0a26c61a5da4f211e4",
-        "tests/types/stream-publication-contract.ts": "40fbfd6a71f8ff57a9158e8b12127cf4398732bed4af2cacaab291adc88f36b8",
+        "tests/types/stream-publication-contract.ts": "95e0b4ff0efe93b52d3c4680aefdcd32c16ea6d615f6f2358eb5bce3acb53d14",
         "tests/types/stream-recovery-contract.ts": "cd9ad0a63edb515f1ff17ca64bbd9e5dd2484637e199aa2cbaa6cebf3e01527f",
         "tests/types/stream-retention-contract.ts": "f9e780657769e8354d0ef7f357fe82df100fc3c11ecdd75d28680416e6ffb1a9",
         "tests/types/tanstack-start-contract.ts": "fdfb1043660a634e5d43eab80d60b254f03db8c35c85940e8bfc8f23adb4d350",
         "tests/types/type-scale.ts": "03bcc9eca13fb59054b8f047a70183cd33cdb9ba7acc73d6e8061c9eb271d546",
         "tests/types/utility-configuration-contract.ts": "b8c5db14d17c2fd549f70c6fbad8d21234ca5859f0c69e53b0b8504ef8cb5b17",
-        "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
+        "tests/utility-configuration.test.ts": "1e34654296370b6961bf8c2bae226d32ade28da2c179b4d9afd6d69dea70b1cb",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6",
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca"
       },
-      "head": "d997fa5ee2742d679a26e79322f1004bb60746a5",
-      "outcome": "no-change",
-      "reason": "The workflow guard checks how the repository schedules browser validation and preserves the existing package and image version check. The library API, supported integrations and consumer guidance are unchanged.",
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "updated",
+      "reason": "HTTP default request keys use the effective parse options for each part. Query owners create independent caches from supplied callback configuration. The HTTP and cache workflow references describe these rules.",
       "evidence": [
-        "Compared tests/workflow-guards.test.ts with d997fa5 and inspected the shared Playwright workflow.",
-        "All 93 focused workflow and release tests passed."
+        "src/http/request.ts and src/core/query-owner.ts",
+        "tests/http-semantic-keys.test.ts and tests/query-owner.test.ts passed in the 113-test focused run",
+        "Both public compiler suites passed including the narrowed-overload, endpoint service, RPC path, and loader descriptor fixtures",
+        "The hydration runtime fixtures passed after binding each codec once",
+        "Default and SSE compiler workloads passed their instantiation budgets"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "84c800c2298ce137449cef81cb47dfd8de3892f21a7d0260808f8ca845a55da5",
+      "fingerprint": "7b13f476dec0e1eadfe036b1daa7c776220f284d9856e12a03939278e81fadf7",
       "snapshot": {
-        "GLOSSARY.md": "5b8588813cb79689ffc9dcd787c41bf2365c20724ab21bbce0a0dee1b0a02ab4",
+        "GLOSSARY.md": "4532453f4efb696d95c66aabb9f62863e28984bb961f97ee288034af62d76f29",
         "README.md": "87db3a47ce666b408001c89b81b2133393eb2074c63ba1ac1786be8e20b96dfd",
-        "_artifacts/domain_map.yaml": "6024e7b4b43872d0d76ca08c5f0b9ab63e345e7fe751350fba9bbd4381aeeca3",
-        "_artifacts/skill_spec.md": "8f63b2698ca47330bafca0d76f65c38431519ce6ad168827f0b3eefa7b3f740e",
-        "_artifacts/skill_tree.yaml": "b474fa35e275172c68a15fe0be02bf24f3eaec88d0cb214a97b80fe35775e70f",
+        "_artifacts/domain_map.yaml": "ac3046d1216793d438624283071f879c2660f15011b5e85c0d30260e2a1caa12",
+        "_artifacts/skill_spec.md": "75ca7ff6eaee2c54466fa171c29779c08c6100bfca3cc33c46f38059d554ee8c",
+        "_artifacts/skill_tree.yaml": "42fff5ffa1e5ae1257af626f41c664597cfe6d44247a67aa16076d098241acec",
         "apps/docs/astro.config.mts": "35bd7d7706e004e3e708a82614e825c7fde0ee1aea6624843ba8cc57f70c2c5c",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "22ff578a9df30be697f12bdfeb5861b9d2b3e6956255387eaa4e1b18d0f33315",
         "apps/docs/src/content/docs/concepts/data-normalization.md": "742d428e16998d9a36caca902dcee5759c750db6b1ba75cad93f113c60542545",
@@ -417,8 +422,8 @@
         "apps/docs/src/content/docs/guides/optimistic-writes.md": "c58a8cb57c5c067087783fa3a8605bcb793e2f83bc999c827b0caa1b36cb1455",
         "apps/docs/src/content/docs/guides/pagination.md": "f5d2435f3d6c2de7f9be9e48f50d3befefb788393be5af0d6cd1c81086771422",
         "apps/docs/src/content/docs/guides/queries.md": "07efda66d3d2cebeb371ec76f8069800758974f1ab53237de866beaf9b3f6ea7",
-        "apps/docs/src/content/docs/guides/query-defaults.md": "8b44635e6883a06abe27128e85bca90d0b9eb83b3c4e11c4fbe3dbc7182fc7f7",
-        "apps/docs/src/content/docs/guides/query-effects.md": "622b788af48f5c577ccd54286e3a79c59e658f929acb9e1d41b989a39e4f5225",
+        "apps/docs/src/content/docs/guides/query-defaults.md": "544ef381d7238736475999efb1aa38b6f63578f44e59bc892728da948cd452f2",
+        "apps/docs/src/content/docs/guides/query-effects.md": "d7a36ac2e19128f0237e4fd913ad428347561846e9e2de973d20fafd7a61c191",
         "apps/docs/src/content/docs/guides/react-query.md": "fd910ff5be38aac37291b58acace742226bb91903f8ef788c40c80b388ee58b5",
         "apps/docs/src/content/docs/guides/reconnect-streams.md": "c40e0bdc9b38ef2f1395c4012b7d53e86e697e666da51b772ab95efe0d72b717",
         "apps/docs/src/content/docs/guides/refresh-from-events.md": "84fe1bcec0d38999996d231af6f7145956367854eac530e819dcc3f9838c32ea",
@@ -427,10 +432,10 @@
         "apps/docs/src/content/docs/guides/share-decoded-values.md": "a3185fbf8403daff4a63de35cc6b4acdffead666ff8f24b06f0b8bf96eda050d",
         "apps/docs/src/content/docs/guides/solid-query.md": "6ec1cacb1238cf3dbc7b71ca6311757c76949973522a83d12299f20026dea695",
         "apps/docs/src/content/docs/guides/stream-snapshots.md": "b26610d19e9fa95827c211c39dd2983b676e1a0d64307da56970ec4a5b8a333b",
-        "apps/docs/src/content/docs/guides/streaming.md": "afbb74407e11a88cb9ebd2fbaf9e0c2620a140283e6fe9125128f0f4dd478173",
+        "apps/docs/src/content/docs/guides/streaming.md": "780ee11e776d204ffcd022b845686ab1012c2e325a9fbb99c51c720c0fd5f7cf",
         "apps/docs/src/content/docs/guides/suspense-and-recovery.md": "c4aeec1df383a9b4365a85d63ef1c345918b063ad35028431d0fed91f96ce21d",
         "apps/docs/src/content/docs/guides/svelte-query.md": "640d9d04953f4be453d686558d30f5ef83b4aea9489b1b4695760a82ff7a245b",
-        "apps/docs/src/content/docs/guides/switch-cache-owners.md": "75ddf27af480e4890e010e7d031374258f04e17cce20d37570203f5b2c559469",
+        "apps/docs/src/content/docs/guides/switch-cache-owners.md": "892fbf32cc077b4a9bf1ad2846aa394d2c0d887bd12eeed96948ffc0d300eb40",
         "apps/docs/src/content/docs/guides/tanstack-start.md": "eaea3d51fa366f74e0bbcb2d159cb78a94254ff70860734181a1a9576b59953f",
         "apps/docs/src/content/docs/guides/trace-streams.md": "7e81de0d4d088d6ab316842c872ad4493e0554b309cad78566802701ad70fe33",
         "apps/docs/src/content/docs/guides/vue-query.md": "a2d8a91f749632bfdb79ac99ea7cd625e7907fb1c96e92a0af2c581f3b0b1025",
@@ -438,14 +443,14 @@
         "apps/docs/src/content/docs/index.mdx": "85d93175471e294ca4d8efd0325ed391ad1a53257413be59a67c7becd252d2dc",
         "apps/docs/src/content/docs/integrations/index.md": "0ab5ad7e47cd37ae3d7d9e19bc93c696b29bd3f44ca9c0daf0dbdf0f606bc73d",
         "apps/docs/src/content/docs/reference/browser-and-worker-hosts.md": "19d83208a1a542a35c44961fc4e80b2f5e21143ad0e66187f7359b888e830886",
-        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "0f4bdb7509f0348a5fb3b59a554d088b28462456a461dfa739cbff4c5c446558",
+        "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "b46439f84a95c7d83ccecaefa5fb2ce273186ae2fec384105d39596998c49289",
         "apps/docs/src/content/docs/reference/errors.md": "c7dca6277bfc64f3db9b8c7cc1ca7cb1389ca7e3f075e50bf65f05bd0c7326f2",
         "apps/docs/src/content/docs/reference/external-http-clients.md": "501ad4c67b7beabbccb05d11665bed8d7d7f4a030460fb8620134fe5be8be5fe",
         "apps/docs/src/content/docs/reference/factory.md": "954a3416d3f8220a249fa883c83ec3ea068450b35fde5901107a609aab73fa41",
         "apps/docs/src/content/docs/reference/generated-builders.md": "9082369b9d1f9c44bed21356ffea5f3e6de58823df8ff13dc0c4f13b4432b15a",
         "apps/docs/src/content/docs/reference/http-builders.md": "df55394d799f1a709e997e54801b68a84170e58a165b6ffff323c3dc76e1a586",
-        "apps/docs/src/content/docs/reference/http-factory.md": "77db555d98f90e015cbefb12ef9a79a28d4a982fa9d31f8d9a181b76de4f81ff",
-        "apps/docs/src/content/docs/reference/performance.md": "1fa8ed73ff7e4994402be36dc79179797f150811fc06a30beed8ca04ac77f83e",
+        "apps/docs/src/content/docs/reference/http-factory.md": "2cd975b14754bb0283fbd5fe5c398281a9bbb82381e5efdef34f28eb961be02d",
+        "apps/docs/src/content/docs/reference/performance.md": "e99a4efe7b8326f0524af814d33f52f9bdb6e9c49598496d5a31b3696bcdcee5",
         "apps/docs/src/content/docs/reference/public-exports.md": "47b84dca065572179e24d9d99649c5025bb9b187f5963fc82e74e79b64b72954",
         "apps/docs/src/content/docs/reference/type-inference.md": "1531ba44c4965b8b0105b0157a1bcde8282c275e995d1e2a864548d198e56cb8",
         "docs/adr/0001-target-effect-4-release-candidate.md": "f8152332adf7278911e3b4e119d6079a444b01db840f225b62b1a05cd5ecf4f2",
@@ -476,14 +481,14 @@
         "docs/adr/0032-configure-utility-trees-and-require-stream-retention.md": "e46238f04f3213d2c32dcb64fb2c17d38d033699d08b3b9d7986bbbe1d2f1ff7",
         "docs/adr/0033-bound-effect-support-to-a-patch-line.md": "aa1919cc8dedca1cc3439ec13a0f96f012f56a5e425887f3c4ddc92e47063cfc",
         "docs/adr/0034-extend-http-stream-views-to-decoded-ndjson.md": "445ed1f9a4cb3a74938f2d01579e50c046a681aaa2dcd856ef9587c62aaa7cf2",
-        "docs/adr/0035-use-effect-enhanced-tsrs-for-development.md": "be8bde3dc27e5095c286fb9150d167c8e8950fc7bc8d92108a12f550db7995e9",
+        "docs/adr/0035-use-effect-enhanced-tsrs-for-development.md": "ef20a8cb9211973e6b0d3dc59e752fe3861729c19c65e81fb4354d9db6e123df",
         "docs/adr/0037-own-stream-publication-through-query-core.md": "a7800a9b941557bc34d3a3102e94d4227f8e5f31ff852b6830a33e12ac2ec553",
         "docs/adr/0039-coalesce-live-snapshots-explicitly.md": "4d95533f87474e8a55a9a6a0f0339f375a7e5d242195e26e99c2d7e895171f02",
         "docs/adr/0040-add-opt-in-query-owner-retirement.md": "5e5f0a05577c779ed22a62a3e99a8abd509c241fa9949e9fb50a9aec068472fc",
         "docs/adr/0042-define-the-compatibility-promise.md": "2e2ae6512eb714ed8601daee80fe3852fdb62614602be5ad54ffd5e58f0beb99",
         "docs/adr/0043-keep-editor-selection-contributor-owned.md": "3ccd02edb9d41b09bf112b64cc335bfcc3e981f9986a9f704b376532ef5798ac",
         "e2e/http-workflows.spec.ts": "8e7f7622ea481a56dc3f0ebceabe61691f8f34e3489ef1945ff3e929a1e6b2e0",
-        "examples/contracts/src/client.ts": "fdf559bf0a798c7ea7f7aee01967837e720f7727a1bd11978aec51aad59f00f2",
+        "examples/contracts/src/client.ts": "0be1072f4734c20623f9250dc64954a1398f05714956566f0af82469ef43c87e",
         "examples/contracts/src/contracts.ts": "74d69e1a07c0b32c2a48b8fed8cfceaac8844ead860fbd00b9e357657b39d88e",
         "examples/contracts/src/http-api.ts": "bcecd0611e4bdeac0dad04159cc73db3165aca20ac1f89e597e6c73a76d99cef",
         "examples/contracts/src/index.ts": "c33fab4003401bb603897353250ebcc834a7916d4e3a696f384bf98e329420d1",
@@ -501,7 +506,7 @@
         "examples/server/src/web-handler.ts": "df76905670800bd27b419727a7e962c749bf6756b5f533c986186887b122eaeb",
         "examples/server/src/workflow-handlers.ts": "49d9abf85b7088417ae393ef7d8de328142b37b961b7114e95a0a42bc6991972",
         "examples/server/tests/fixtures/websocket-server.ts": "468801a4f5c50ccdc9855d8a8ef24cb1915f30f857625a99f4dfc20106fc2f53",
-        "examples/server/tests/http-api.test.ts": "3d341c3a2d370562d7a04413adc179eed6aa822eb808a058deae09d6791ba0d4",
+        "examples/server/tests/http-api.test.ts": "1d83276750c25e57a1a213dcdd81c319458dadaa2f43f92d33e81b3a6b1143fc",
         "examples/server/tests/rpc-transport-overhead.test.ts": "3fd291dc98127cd4a976efd3eca1beb04e9e50a7139d6fd6ab03290380005b18",
         "examples/server/tests/rpc-websocket-consumer.test.ts": "e5092fd7e402a0010c2d6c6426e09c407622528c9a0cd0dd41d0f3c826d1fed1",
         "examples/server/tests/server.test.ts": "5c9c176fcccf73c0c610502dd6b0f3c21946b1681538a6e033ee593b9bfa4934",
@@ -523,100 +528,101 @@
         "examples/shared/use-slow-query-cancellation.ts": "872ea8e5ef8b97b2d6def07a8cc5c79a885099ffb6e60ebf6db6e39b9aa628f1",
         "examples/tanstack-start/src/components/effect-error-details.tsx": "843d359788306199d2f206d445d512f2798dda9c1625d09650ac7a09a26c4a29",
         "examples/tanstack-start/src/lib/api-server.ts": "3ab4000ee28dc8f73237b4508e0f0a0a1b1e4baf865ae501348487a978e19f23",
-        "examples/tanstack-start/src/lib/application.ts": "4456944d1ded48ac041dce627201111ac05936ed57263b9ca674a877a21dec38",
+        "examples/tanstack-start/src/lib/application.ts": "718c175eb3bbace8a5ad3e68c5feec5a5a83c7bd7203a592c615bf1662ff34a6",
         "examples/tanstack-start/src/lib/featured-user.ts": "8c9b33056cd2e4c2c19a95de3fad5b93e326b654117c75086b55f44630ad599d",
         "examples/tanstack-start/src/lib/query-ssr.ts": "30042b98b74d2fcc241a2d752d0ed388555082047098b9ca17e3a6fc2727f4e8",
         "examples/tanstack-start/src/lib/server-application.ts": "84a8be06a20a2777023a00599f1bad7f6db1018f247aff6818d08c1fc933655b",
         "examples/tanstack-start/src/lib/server-host.ts": "20eb1a8538720b8cba9df3011d48974f286a44921fe641096985be533f687dad",
         "examples/tanstack-start/src/lib/snapshot-preparation.ts": "0f261657058c6b480482b615a3009ce229276d6fc6785fdb258e3b3830f79311",
         "examples/tanstack-start/src/router.tsx": "be5fd785e1d43ef59af33aa9e4a2e9d4d688390265cdb6f65babfdf0da29c2fd",
-        "examples/tanstack-start/tests/application.test.ts": "cfe76770be9e66e9cb8c2ed8e531a46f5442c5721c023302586f85c97fc954df",
+        "examples/tanstack-start/tests/application.test.ts": "c035d4f446d922a438294e54113c98038f7ae72650a35837613979ecec75f8ea",
         "examples/tanstack-start/tests/async-hydration.test.ts": "2915fdf8dd1ef9737404d76aa9045176593a5b9ee21ef84beca20759e6b8a9e5",
         "examples/tanstack-start/tests/client-navigation.test.tsx": "084a8c42a1312e12720098d985a8796a534ddc07aa12f18a9b5595ed94a1c507",
         "examples/tanstack-start/tests/failure-dehydration.test.ts": "5a132899aeb7727f53a30bfffc0c1ee7ac5d59ff96a752077f7169d0df4b4581",
         "examples/tanstack-start/tests/featured-selection.test.ts": "3a6e1db27843a392d354cb58ab7b8d7bfaf327ffe42910118d426d42875f1123",
         "examples/tanstack-start/tests/server-local.test.ts": "6d04b85b3e584deb8e4b6f847235ceab8a811eb2d3837dc209f89cf87cf0d291",
-        "examples/tanstack-start/tests/server-render.test.tsx": "e46b15c02fc7b5fc76d52f9d64dfc5b88d4d36e0151908138de9babe7a5d53a3",
+        "examples/tanstack-start/tests/server-render.test.tsx": "4265e8d8508efce2bad73d54c74ec5603c783d18fbd6977b785a37bb48a1e722",
         "examples/vite-react/src/app.tsx": "ca8282f2d2adc59fe62d19253e8f395d2585cdc4dae2209bab134b01cb701d7c",
-        "examples/vite-react/src/lib/application.ts": "da2b2fa16d237e6fcc49b4ffbd99d2aa8a402a861f78cf71634a07172bd12bd3",
-        "examples/vite-react/src/lib/owner-cache.ts": "e9eaa783cce49e7905027ae93ef1c525e2713187e83ffa4ecf726ba7235a420d",
+        "examples/vite-react/src/lib/application.ts": "ad23667d7079509acdd0491366f6d1961c4b7029c00f977d433be41028ae0e87",
+        "examples/vite-react/src/lib/owner-cache.ts": "05e418ee7e05b237804e4ee920963d0b8e483614e7a80c0fe82ee10300c9066a",
         "examples/vite-react/src/lib/user-writes.ts": "999277fa02ff9c1439186b59636f7078458a5cbc3c84bed06514867b270a3b5e",
         "examples/vite-react/src/main.tsx": "6672a5685f0ccbdbc982676056bdb60d8f63b33987e319a146e42c3a0013a56b",
         "examples/vite-react/tests/app.test.tsx": "29597cde134da8e236466ce403d1898796c1ffb883a8c35f8d4c3e542aa779d8",
         "examples/vite-react/tests/commands-ui.test.tsx": "d24bafc224efa769efeb1a2c0398a86b0dbef6c63cd19ba73d3b3bede921a1fd",
         "examples/vite-react/tests/commands.test.ts": "1bd076ba62d754e323beedb7bfb9c2e2ce75f2eee117003a5f5bb55350610386",
-        "examples/vite-react/tests/http-workflows.test.ts": "ab29cb1530f41ca4739d734084d2cd19ea40058f8531399dbeecdb0ebb7276e8",
+        "examples/vite-react/tests/http-workflows.test.ts": "9f39f4d9888fbd189823057d77ef634b10479a98920b29705c92548b2fbfd467",
         "examples/vite-react/tests/minimal-setup.test.tsx": "fb5cb0465320068d8bc37bfab0cf1c4579e82a9c318243ad15424d0f35661281",
         "examples/vite-react/tests/owner-boundary.test.tsx": "f8fc6b26f24884d87d364a9b07f16ba912a7e92efbb96b0c815a62be22ac6bab",
         "examples/vite-react/tests/owner-cache.test.ts": "1ac4bebb04b973fa11e26f4b684fe6b217a075a255ac1828d9ed109c359c9ed9",
-        "examples/vite-react/tests/owner-switch.test.ts": "0f16f2ac4023dfedd525a76e03d374d62e2289aace71eb688ce43fd367c147ce",
+        "examples/vite-react/tests/owner-switch.test.ts": "89c15a93c959d393785ce0fa8088f7e00f3eece2c7fa353b7e78b2e4510e8eed",
         "examples/vite-react/tests/slow-query-cancellation.test.tsx": "827e3a4cdec1dca4e8dfdf6ef48ba449f6e69bcfc6c67660ae8f4648e9556042",
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "689539c71e640b55e03b473e5a26f88aa1e12704a68fb7fa0984c64144365e8e",
-        "package.json": "f601fc8c8c5139f4da2805d2faddc2a61085782d32c4929e7920a3e27e0ba71d",
-        "pnpm-workspace.yaml": "c7ceebab8301785f74932daaf1b16f2b09cbc5d7f030868659857724e71b8956",
-        "scripts/check-effect-compatibility.mts": "7f0fdbadca7b11d118253cabfca201008c1f7680e42ebcdbfec05c65364d904b",
+        "package.json": "5a6e851de9bed1a00a1054746189fddf375733ad7894c5e96cb6c362251eb206",
+        "pnpm-workspace.yaml": "fc4bff1fa9ef4a4887691c6e004e02829736f93ee07efcb563f78f836a21a276",
+        "scripts/check-effect-compatibility.mts": "bbb63ee11c2aed7bf50dd9dab1e303eb511e8efd7110f1c4ce9686a940421993",
         "scripts/check-framework-consumers.mts": "f0111ac9ed84996f722f656358b810da0b9ecc8c6c0219a2019d1076b5d50cbc",
-        "scripts/check-toolchain.mts": "4e401073f141efdcf81c40ca1bc9825f805711576118b830ed63484ea7795cac",
+        "scripts/check-toolchain.mts": "3c8efdb93594058ed78947bc65ad51c88ac4b26cab23b0b1fe6f8786a6d386e9",
         "scripts/check-workflow.mts": "c3a760a6b111d3f1dc7570a510ee09aabfc048786ef8c6dd1c9fe7b26cecd00c",
-        "scripts/compiler.mts": "9212aaa7f819948f73c7a75c42575bcf935cbd2811493fbc6edc5f4e73448668",
+        "scripts/compiler.mts": "e160a1a81eccb29c77e5f2f0fd8eba7f3ebe6f04cce91fc805c9e6ab96ce1d49",
         "scripts/measure-bundles.mts": "f00e0cfc803f3a951cb41f140ae8bfee7136ae7e486b13467a2009288aaa8350",
         "scripts/measure-construction.mts": "2fbad4879fe77ff24234a6be5666047b41cc7c3fd5ce9143d640ef4b41a426bd",
         "scripts/measure-streams.mts": "342a94723ee8fc92083ee346a5d7e36f96440a32510c61fefb4f81c17b64f273",
         "scripts/measure-structural-sharing.mts": "ca3d41f08706749f56ebb40173f04f98bf70e6492f04ecc1460400fb5b69f748",
-        "scripts/measure-types.mts": "eb15c41ee7773610312e3cd78d9311a13884a737cd5357fcd3083e868d083c5b",
-        "scripts/performance/budgets.mts": "a97ce19167bda55891a66daa14263549643757dd5db309c367e4be766637b957",
+        "scripts/measure-types.mts": "e4ce7e0ba0e8d910d7f34f5e74af3a51eae96ef12afacb36ca662d32e8b9858b",
+        "scripts/performance/budgets.mts": "ab7b9acdcc9ed4f8647a2766a98485e5b3521e01f2d945f78b7cf6eb03fc32ab",
         "scripts/performance/common.mts": "507d45618fbaf2c7be6f986a5f958d1958cdddc95e42a77ff1d50d8225538a3d",
         "scripts/resolve-docs-release.mts": "5c438c95d123b78f164557ca112904e9c9ff4d2c0125e6c03f77e1065269df45",
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
-        "skills/effect-api-query/SKILL.md": "b4f7e1876083e72c9e37ee9bf674ba94d23bca6fc1fd236218b09eb62bab6eaf",
-        "skills/effect-api-query/references/cache-workflows.md": "67d3bb698047f7ff3147c6cb8a88406f7fd0c9a6a0ea2f755842066cb199662b",
-        "skills/effect-api-query/references/frameworks-and-hosts.md": "1058d852cefe969b30a85ea38994a02eb9e0967fbe3870c4880b61801c9e6a0b",
-        "skills/effect-api-query/references/http.md": "55dc0b7c3722cd25f8ff2143853dbcb32b8ee43270792360148dfd12cc8515d8",
+        "skills/effect-api-query/SKILL.md": "f98700277bbbfb035c03be5ed7cd0f3146990472ca949a8633f75f849ae14c55",
+        "skills/effect-api-query/references/cache-workflows.md": "304d13e671bbe4be6b04bdcd28b4ba4e9a5bf597ccf9e0c6a69d3f5a08518735",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "a134be8075588e30f28e2994462f3baa0733a2be28a9db826e0df8d91c69a4a5",
+        "skills/effect-api-query/references/http.md": "4dcc63f909686f0f0e1b48f3f0c4238782bdbb6dc69ceebb838786271da09aa9",
         "skills/effect-api-query/references/hydration-and-ssr.md": "f127b348b421c596abdf5e3df97ed2bfe144fac37980226cfda23392c71ac2d7",
-        "skills/effect-api-query/references/query-patterns.md": "e4adffe6bd06620535b419bb39bc0a09ac06414b26a4aa84752a8ea19fc0625d",
+        "skills/effect-api-query/references/query-patterns.md": "064e36b3977ad372e7e340cc981f72a9539cec7ab36efed2337ffff257a4a9c3",
         "skills/effect-api-query/references/rpc.md": "cdebd0eb64309a1237c06b15ccb3cc906cce1957627dd9d057bcc2c6c29da089",
-        "src/core/branch-filter.ts": "71a8c6039f1775881bbc00d92e14e2ef823bf7150721307a74f16a1579bccc86",
+        "src/core/branch-filter.ts": "3b6273c347c060735cb054b2c5c653fd56c2df5571e4607c67e1c19037767312",
         "src/core/canonical-key.ts": "84e91000876a6795557aab39dcc5d44e328250bf9b30ad02fd67afd02f5003e9",
-        "src/core/configure-utils.ts": "6714feba8c44f48823e3a84ec90df86772b53cdae2e2cf34ff8fc6d3961a9301",
-        "src/core/configure.ts": "ea0d4073e4965198343a96498e7e55cf78f31c8af0ac30c23a82c4df0314576b",
+        "src/core/configure-utils.ts": "e47d9badd996596acdca5952a77e1aa59b166d2a4edc9a7d996755035d2e5af7",
+        "src/core/configure.ts": "277f1d1201be35962d6b75c3e9f4074e7f4798456d515ddbd23d7dc3bf6693cf",
         "src/core/consume-events.ts": "648144582c4bdbf4a9cb0d35ddc54327abbefc654f2d37b6154232bcd09a1752",
         "src/core/declared-error.ts": "a051225762704a9ae02bcc8f5559f5e9b45a29fcb48f25dde03be28e0abfe9a4",
-        "src/core/hydration.ts": "7cffdee6acc9d2beb046707978f11bb31dc484e966de1f0baba082e56fd1a14e",
-        "src/core/inference.ts": "af390ef595b30ed5ce6d73ccdd9ede07df0df46cc68ea36f9936e579652cb6a4",
+        "src/core/hydration.ts": "4041e3310a757e772c9b57931725049167bcf1f611aca32c4e778f9d06a51408",
+        "src/core/inference.ts": "6ad965a84bca31ff5c45c95514b0aeba469ff1b5e7866e8f32480bbf86b715a0",
         "src/core/interceptor.ts": "1bc8566c5669e1e797e8293b441a6ed175252a29c6eaa42999690cb835a5347f",
-        "src/core/metadata-query.ts": "b7cc903f800a3723d931623d420abcfec6ef65bf757fddbf2cf5a36c4c52ded9",
+        "src/core/metadata-query.ts": "88379aa77f2338eaa5349f06e736ff9acc9519fb3bd5cc6c2e43da9d46d76926",
         "src/core/operation.ts": "166ed139d6a6be3a3df0ce6b60ed01e71dcfa6075091a18f1869808355838cfc",
         "src/core/policy.ts": "ced3a6fdf1ab7e273eb518700a42d68b4823abdb1088fae6855424e4e479ded4",
-        "src/core/prepared-input.ts": "4fd806b273f95ad2aafb382e89df1d0443f8c270a0e575f1690d7e6564e443c7",
-        "src/core/query-descriptor.ts": "a23e937f8ff9856ee867131539a8c3f943871cbac18e1243dbdf4c5bd8537546",
-        "src/core/query-effects.ts": "ec7044353bb6f531986cf9fcd43479ff33c954b404ed56acfcbed459dda3b8a0",
+        "src/core/prepared-input.ts": "c0c24b6c3f0a7a99122a3c4ee627954ced2724aec1cdce9f965aa753aef0c087",
+        "src/core/query-descriptor.ts": "165cd4a9bed50a9619d9e0566a07b8533ac3fd572d1241e37b2b531c7c9b1c08",
+        "src/core/query-effects.ts": "d57712c6a11f68889056db64652676584426e65af3b522b8dc30e3b7f67e8585",
         "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
         "src/core/query-filter.ts": "05065d26755c79fb342825c530821e8440de2b929ec2187490f40f7f9601721d",
-        "src/core/query-owner.ts": "3338cd9dac985870417a46b8c40c0ec73e6b7963ae2f9198691fee663c3a41b7",
-        "src/core/schema-key.ts": "7dad2749d30f2ab828dbc7e96d6e1e2b32b6733450cb6dc734de607629d925f8",
-        "src/core/schema-structural-sharing.ts": "1a961c521aaf02c00689bee654ff428bb9d519ebf87651f7faedb9dfd1a06ccc",
+        "src/core/query-owner.ts": "0efde209652fcdf5fa7dc81393cfcd09adbaf431dc376ccd41dd7157e4759326",
+        "src/core/query-prefix-index.ts": "419a20fcf9bb28c5e7dbedb0c5af6f0e0dab52c0332773dbf39af638ac671cc2",
+        "src/core/schema-key.ts": "0d6c00371526085fe19689a7401dfd86cb6f6a96f6b351b4b31bb2648804d5df",
+        "src/core/schema-structural-sharing.ts": "7ebd221a5730f652f0e88fbc52c418b8bba173172bf49971d6988e5a021b3ac0",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
-        "src/core/stream-publication.ts": "e6a2fbded6ead8351c83fa3adabf84fb0d1b52d559e3d209a2831aca69d58e21",
-        "src/core/stream-recovery.ts": "2287649cd64adfbe8cb069b66d338d178ad1239492cf7530e2ea5addbfd1fd81",
-        "src/core/stream-snapshot.ts": "97fbb56308b2e2decacd86a02b3f0a3ced76692444ba25a7abaae05b442c233a",
-        "src/core/streamed-query.ts": "a44dbb1a17a0d266f9e38e6b819dff7dbc417821e14f089e8ed2825dfe763b23",
+        "src/core/stream-publication.ts": "0ecae3160d553d5b9d2b940abab3ccb93c610c77a2baed2dd2a70704c6771b89",
+        "src/core/stream-recovery.ts": "ecc7fb61c6cb8b8f1617a2bfa69387b64e3e224c09f1f5f6f47964bd256f1bbd",
+        "src/core/stream-snapshot.ts": "6a7f2c896aa0a9b11150893861513004241b228e70922cfc429aba2c8ef854b6",
+        "src/core/streamed-query.ts": "b7b55cfca6e191aace14335a0c1833da4f36d19f95fa1bcf9e683472a580fe18",
         "src/core/types.ts": "ded3b620e25ab5def0a96dbafead82398f7f7a43572a434cc30b0c505ee2409b",
-        "src/core/utility-tree.ts": "7b113d01c672c1148d022556f72c6e8f49c5afc0170fc88dcff74008abed28f1",
+        "src/core/utility-tree.ts": "57f0557e34d37ba9b808b20b51aeed7d46dea7c77a38b5e671f71fd5e00127b4",
         "src/core/view-prefix.ts": "dfc0d74a07c8afe3f63952d59c29088ba4afb45e11a402ef8b72c5e2282cb063",
         "src/http/create-utils.ts": "8d128bb9646e095456d3dcf696f1aa6e365d0de328df571c64eea7421935c9f5",
         "src/http/errors.ts": "afa6e7a015a257683ec8d96d5d5da1ffc25a79b0ff498fddb538e059af7643b3",
-        "src/http/operation.ts": "4a3651be65fee9fc039c38c0f191ba6a79347a5bd45c3f233de7d90c12d8bf9c",
-        "src/http/request.ts": "4dced85460db56cb83514486417e17dd4a35629ad28749a2ac01dadbe45113b3",
-        "src/http/streamed-query.ts": "27d1f5418009216d960816485cfd7f1760a8e3f638ccb9ac8dfa5fc040b1564a",
-        "src/http/types.ts": "aff8b44ee5ab3013fd34172f0e425fc272b95f4ca096ec5ee66e514bc4be4e1e",
+        "src/http/operation.ts": "e105e250a2a85c0b6e19589bd7ef5fb613eec0c2802ba699d5f6ca3c9fda4263",
+        "src/http/request.ts": "0d82d523cc871fe25f475e8670009644aa924fbc4f8ead5ad0b1c9462bd20dfd",
+        "src/http/streamed-query.ts": "be93ca8b11f2a165c8e9f2c45fea19253653e478e3746dd19ea3819997f8a937",
+        "src/http/types.ts": "00c5696406525cec1a191f029581e129cc2b003933fb4362fa2994c30af22714",
         "src/index.ts": "85ed201a88913658d6d55d780e33f549444c1bbb591e593d22f842e70199c9c0",
         "src/rpc/create-utils.ts": "8ebf030b0f76f91c248434c169d789d6328d2ba43c07afe15e04db0a02f05c2c",
         "src/rpc/errors.ts": "8e1fbcc7843b2bf99e9d80bfd365dc118d52351909d5c8f48c46ba9d39fdedd3",
         "src/rpc/operation.ts": "ac10df77707045d22c2d58ff0f776362a7fb5ce03e179c10238c42320ad6f719",
         "src/rpc/streamed-query.ts": "cf80fac99983903e6ab60aeecc5fe3cf1a0208b26143cc6f588c615d728f2ee7",
-        "src/rpc/types.ts": "5c77358187150d34209bdbffda162b3a5ecd3108662e0e29aeee6ddd23dbfd80",
+        "src/rpc/types.ts": "1349a3de4f5238450d42d72cebb3b1a247ed196229b27ad15b9a7f0a5514cd4b",
         "tests/cache-recipes.test.ts": "fb95bbbba35f8bcf9661c993a61385f3186d935bb5626da6181d8ce9e6a9a49e",
         "tests/configuration-composition.test.ts": "2fc9ac3deaa514bd5221e89eaac8922905a896d937635c7a3bcc2de698519de4",
         "tests/contract-reuse.test.ts": "ef45d0a7116c56bdff46decb93cb4cd8f55baa1836edc0382434742f27249747",
@@ -630,11 +636,11 @@
         "tests/create-rpc-query-utils-stream-cache.test.ts": "c2aea3349503b5bfe9abfd445a2e6a54a939843f8d00b6bf4d75ad607b2d99e7",
         "tests/create-rpc-query-utils-stream-hashing.test.ts": "417f45c4fd7584d164fe5ecc9e354bdf52a1117a5a46f7729c2ffb5791eaf068",
         "tests/create-rpc-query-utils-stream-publication.test.ts": "f0f6919a98e3c4efd59ab39a7c8f2a2efb817c0b55913cd82c034126c8d5e459",
-        "tests/create-rpc-query-utils-streaming.test.ts": "6f0fccd52258df72d1bb471bd04873426708209fa48e0b9c3a0c831d9002f5a1",
+        "tests/create-rpc-query-utils-streaming.test.ts": "016c22bd2eb46330d23e0c209b608ccaf99dede7a46553306a92bd1e429b14b5",
         "tests/create-rpc-query-utils-structural-sharing.test.ts": "1698a72dcfde4aaabac4161193fc0379c445f8a8be61d47d29797a315b66b06f",
         "tests/create-rpc-query-utils.test.ts": "b6ccee687718bbd528819f497ba2ac09acfe06a1400c5bb38b863eb082f0776f",
         "tests/docs-examples.test.ts": "e181c2d34afb1ed761133c2b143ca26048ddab32be2bc5d7486af4355b5e5bde",
-        "tests/docs-release.test.ts": "edb5be9b26b99339770f74ab188e67f30f4642afd19f91dc8e4c85163d71ccb4",
+        "tests/docs-release.test.ts": "d1346be1c3b6f30775ae1cf6e6d2af978fc813078ea0c903d6ab8b95aabd0d13",
         "tests/execution-interceptor.test.ts": "9c8a26e24cdd5807a4dca68bfdd88663246b3a5632483581ec3cbd4cdcf69b9a",
         "tests/fixtures/async.ts": "c72af69141ce4f2dd4e9b63910ed20378e546dcd015a2d7befacd439ba4a006e",
         "tests/fixtures/decode-utf8.ts": "f0441c8aa2553ce2c1dccff7cac1bbaec2cdc668916278c7a0efff90482ace61",
@@ -649,41 +655,42 @@
         "tests/fixtures/websocket-checks.ts": "9144c4fe42e1565d43f75dbb9a928f58cf60f87d3c44db053769e076c11423eb",
         "tests/framework-consumers/angular.ts": "4d629324cb6e4d5ec9029c96670cf78a022e10ea98ee12df1997ac731d1d68ad",
         "tests/framework-consumers/contracts.ts": "cc6eb274850950dfd64b3f4613fb527e7dbc452518c25268a99d24f6ac2d2bac",
+        "tests/framework-consumers/package.json": "94e7a24cd9700168558e77b09511cd9c7b9a6b84c0dd0199cf253dce89a177c0",
         "tests/framework-consumers/solid.ts": "0e0b261f0f80de83f799326cfa4fdd8cf14cb480909b69bb498b759467ec8bdb",
         "tests/framework-consumers/svelte.ts": "652f8d97d781803239ca667497768077167fffaabec851d5a076f692c376223c",
         "tests/framework-consumers/vue.ts": "e23859e5fe8f8e24a55d8e782dd2880d1a6d88859bdf40ff7b60e8b0c150ab50",
         "tests/http-cached-views.test.ts": "8df1da4d541d18830da6bd14334d670589e55e6c4bfb50175dc198444a96f129",
-        "tests/http-execution.test.ts": "064730968e39333e717a08dab15c9cb2455974c8d0f06cdbcd6768bf992c1d53",
+        "tests/http-execution.test.ts": "7d43723e36108c190b138a13f2a1c70f7a03dcfe4235f3d9592e98b4c9ef657a",
         "tests/http-hydration.test.ts": "51da967534267d49dc91f577f43a54fc88045cce8f89623c1106df8c88c21570",
-        "tests/http-live-query.test.ts": "e4ed31b68185eba7e80587815ee9bd2ca0573639c2695edf2af0532aa42ac269",
-        "tests/http-metadata-options.test.ts": "702a73eb9e005d038d35c233806a065ab4da7d35fa1255df336711bd09be96d4",
+        "tests/http-live-query.test.ts": "43dece9673bf6aa381c11a49fbc9a3cdd471c55e446d5f0fb4c206bed9ed5eb8",
+        "tests/http-metadata-options.test.ts": "35923dbcebeddb4aafa299da1afb91a9124d0b25cc728bf05d19876bc4f4f6d9",
         "tests/http-multipart.test.ts": "331f18bf9730579f05513d3ab93734b8118e313b219604e8c0276c07110476ae",
         "tests/http-ndjson-query.test.ts": "7a77db15f41389ea1ecdd38f85a73be5fc15e4916b94254d5e16f7ea923477bd",
         "tests/http-query-options.test.ts": "e7b2ca44c44cd8402ca688960458e1190c54c68845556fc4ea5d131ab8649891",
-        "tests/http-semantic-keys.test.ts": "4fa4efd4b8211e52560be80aecade363486372d06cb3eeca0c496a783ea21f8c",
+        "tests/http-semantic-keys.test.ts": "00ab2f6ff02e9ca0b9b94a6e6e9ec70c437edbac23791f3f5d675de1dcacb706",
         "tests/http-structural-sharing.test.ts": "35ea74a2711f56cd2001cd5a1f3ffe58f10f4ecbf094c0d4ce7d9e9a62dead42",
         "tests/http-transport-cancellation.test.ts": "0ba26a9bae56b26605fc03009c1f50fe90930356d0fa0c4ec4ddc5c120430f00",
-        "tests/hydration-codecs.test.ts": "67a0a8e1e7ab78ba4cfb2f44b188a4001669584134ac21f0eb8bc03f993ee4ad",
+        "tests/hydration-codecs.test.ts": "3035d8b59997fc62823d7c6f3251041ce38824b0088775c3c4d1186c95e30d7d",
         "tests/integrated-workflows.test.ts": "0547cf36a5d172126c1241fa67c350a32f6549ed9dbca2b6007c71b72edf052b",
         "tests/live-coalescing.test.ts": "e5456fa321374e61dfef6992ebc706c9c558803795393b55da10e33c926bf413",
-        "tests/publication-deadline.test.ts": "2797557ff14bf8527ea446cec1e1d7c61cd3666f11f127e640c53ce5d7e30868",
+        "tests/publication-deadline.test.ts": "38f754f5d53e1781a0f1d3ae0102b3d90d7358485bb2b645bdf7b68076f21574",
         "tests/query-descriptor.test.ts": "8e23e94f2028c77f55887e0e0492213cbf5920de88b19a6933e1ea79e385a5ab",
-        "tests/query-effects.test.ts": "68c85372b5417be8073e3c117ee55a3f77e270f30edc55cdbf3144e6aa86b47e",
+        "tests/query-effects.test.ts": "247508f2c53dac4de5317769b9d7a55b818fb962df91d2232acc54711d5ddd2d",
         "tests/query-events.test.ts": "27c913c8ff1d65384a70695ef891e156f99ac122bc36e5be10f195b568b5e7b5",
         "tests/query-filter.test.ts": "ff531a86816872cd2cadf01d79bd9d9ff5be1895bab150330a90aa8375508004",
-        "tests/query-owner.test.ts": "e6ec5f2cd7ca7404da235c11f30249b1f769a9c5902c24f681d23f0e0ef64705",
+        "tests/query-owner.test.ts": "ee01002a83b3a5f787abb38919cf893a9cf0c73836bcef637ad9f44607a23bcc",
         "tests/query-policy.test.ts": "19b1d0fde232b4af9e041197a1aa6726f30e4fb7118533e5b3f7af08cbbe4002",
         "tests/query-usability.test.ts": "313e6c03b560b4c20ffc32ed8e2bd96ce94fc2fb3977489f311324b6988e190f",
         "tests/query-view-prefix.test.ts": "fd94e3d01f52a0978242246f02a3e989bddd1e055f828f48d7a41187f696dd69",
         "tests/schema-sharing-prototypes.test.ts": "628a6622656b9b53e686d14b9efbd3abc13c61a13db1546001b0689b491f6022",
-        "tests/schema-structural-sharing.test.ts": "577e0ac004db61c5778bf2362b8d208fca6fd6e830a3eaa6496a4c534d3a6e57",
+        "tests/schema-structural-sharing.test.ts": "da34a1ce3b723abce0e5e1b95cee80458ae4073236d23eed6eea70aab5a97af4",
         "tests/skills-maintenance.test.ts": "7bbf6bee1c9867ba314cd3cadf86db603a4aa9959a863c6e908b7401d767d9d4",
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
         "tests/skills/query-usability/grade.test.ts": "f3c2650deba0d887f66fb3b3afd284cd9baf562296f2984e5c84b014ecec8cbd",
         "tests/skills/query-usability/solution.ts": "38583676eaa2d33e8ca56c07a430e3a28787feae9d84c6d3612e01d6d7f1d80f",
         "tests/stream-publication.test.ts": "57db2c6db5273a5c6789bb65dee2eeff5293eb98ee472fec102dffca984a65a6",
-        "tests/stream-recovery.test.ts": "93e68be6631e0335129d9459e9989aff56e3431e8ece9540104278a8b5cc1cb1",
-        "tests/stream-snapshot.test.ts": "c001d7ad4dfbded79e2ee66b5595c2f23ea42c5a814c451d3ca154cc7ef07a67",
+        "tests/stream-recovery.test.ts": "f5ceb7a1503b60c072d00f235f7fb546b1ab046ec6aa5f4ad830b273afb74c59",
+        "tests/stream-snapshot.test.ts": "a59ce44e80854140184df0ba742b39c80a3dd0c4b691d2b4afdbd73d2e754ed8",
         "tests/types/application-policy-contract.ts": "ac6c4b852a201269c5a8837cc4410abff593645530f274a097208eb45ad40ccd",
         "tests/types/docs-functionality.ts": "065ff9eac091e4a25c814e3e49b49d0f6258fffb7c5ed0661a1ec960b41ac0c0",
         "tests/types/docs-http-ndjson.ts": "a86513c1047b700ce27fc49b3d1fb31004cf745096d8403a0bdc780d95a448a3",
@@ -717,18 +724,18 @@
         "tests/types/exact-options-union-contract.ts": "857e9596c241919f66a2befc2acb86ead3ab44b672e1e1425872a622366139b4",
         "tests/types/example-owner-contract.ts": "ed58343a4a7da9606e07703d19f3c0470e25923c81de357c0dbfd1258c3fc439",
         "tests/types/generic-client-error-contract.tsx": "f0b2f55deffde27ff745209485f9f8b817e4e537e8c60efd345946b77cf54bd9",
-        "tests/types/helper-contract.ts": "0021a5b845c65f608ed5dd429227752ceb32784e75c198b01868f017120a7aa1",
-        "tests/types/http-contract.ts": "eae48b86aeced5dbf82e23f3053b28a99e5386a086d767f7739ede4037c15001",
+        "tests/types/helper-contract.ts": "c40e14a64a8429052bf64523abd0ac9f41c3ee38c707c5bd86f0809964307e52",
+        "tests/types/http-contract.ts": "bc88a4f2a239b0cba80a338c1ff420e814eb3fe3f0cb3eebfab0490345f80662",
         "tests/types/http-empty-success-contract.ts": "00ccdb360edc598b9bc6c8a7708dab6b7ca85cf267ce7caa9a81a6b52f2868d5",
-        "tests/types/http-ndjson-contract.ts": "47d62788b90fb0f08faabe59646f10fc53fe54ef740cc4aaae9fb1c73e49f5f0",
-        "tests/types/http-stream-contract.ts": "1bfaa95c6237341b8137e81f1b1ffa17e5374dca2407328b324d86b3080fd815",
+        "tests/types/http-ndjson-contract.ts": "c44bf1d296958be46c35e97a7803a36141eb40d1346d6df9d5b3e7e428b8ac1a",
+        "tests/types/http-stream-contract.ts": "ffa424b9cf6aa92c079318e8ca26f888b73636ea66d9d2be670f744c5f74f4ce",
         "tests/types/http-type-scale.ts": "447d34e1fa952c843a866fd4dcde80dd32390f7ff14ba701b1960f45bc1292ce",
         "tests/types/http-view-proof.ts": "0b66f30863c5451d47144980af9cf5517637c8f7ca7866b64d1a704cea089413",
         "tests/types/hydration-contract.ts": "fade858552c1b04fd45f48e86a42668a6132918196eca9089d56f1948551cd64",
         "tests/types/interceptor-contract.ts": "14814393d97b03b55b8a8e84014e24f0f6fc1003e71c2d832a8d643320c5ea18",
         "tests/types/live-coalescing-contract.ts": "c476bfec4ff03244a35938e0bc168894e917ab9e723536e2b759e0002a3ce836",
         "tests/types/public-contract.ts": "307d25cd97a652d64938c40c76c14b6f43cea69cd06b7b7d3bca194f22321b33",
-        "tests/types/query-descriptor-contract.tsx": "933101b6a3696d07a757a10560a25ebd0b1077e1542d9cc330e73cf114aa33b4",
+        "tests/types/query-descriptor-contract.tsx": "38c5361e436f6f272b733cd049dccdf7f6964e6c4ff7c99a47288f5c50b92f64",
         "tests/types/query-effects-contract.ts": "188ea0f6ad1daf0a212f17a6f455b8cf1cd1f2d1fa5c652d32c83c2a5b476c8f",
         "tests/types/query-events-contract.ts": "b9576153175094b50bce0a7ae3d9285a843d2b91c714a5dfafff24a6be8cbda6",
         "tests/types/query-filter-contract.ts": "89977942cf8942af10535fb2ec4a4ab679d920a7d226ef26616faaf518b9a6e9",
@@ -739,36 +746,35 @@
         "tests/types/rpc-large-contract.ts": "a6187bb074b321cd2f8642b7ffcedbd92309e8a8709585fa1c3af1082ea97ef8",
         "tests/types/server-local-client-contract.ts": "4b150665dbcb3022fd90149c9c70cbd8a07322b3739e80ee712b80bd735f110b",
         "tests/types/snapshot-contract.ts": "7eb7b28d2ef7e8348992ca69d52d6cb557d3e4a119f33b0a26c61a5da4f211e4",
-        "tests/types/stream-publication-contract.ts": "40fbfd6a71f8ff57a9158e8b12127cf4398732bed4af2cacaab291adc88f36b8",
+        "tests/types/stream-publication-contract.ts": "95e0b4ff0efe93b52d3c4680aefdcd32c16ea6d615f6f2358eb5bce3acb53d14",
         "tests/types/stream-recovery-contract.ts": "cd9ad0a63edb515f1ff17ca64bbd9e5dd2484637e199aa2cbaa6cebf3e01527f",
         "tests/types/stream-retention-contract.ts": "f9e780657769e8354d0ef7f357fe82df100fc3c11ecdd75d28680416e6ffb1a9",
         "tests/types/tanstack-start-contract.ts": "fdfb1043660a634e5d43eab80d60b254f03db8c35c85940e8bfc8f23adb4d350",
         "tests/types/type-scale.ts": "03bcc9eca13fb59054b8f047a70183cd33cdb9ba7acc73d6e8061c9eb271d546",
         "tests/types/utility-configuration-contract.ts": "b8c5db14d17c2fd549f70c6fbad8d21234ca5859f0c69e53b0b8504ef8cb5b17",
-        "tests/utility-configuration.test.ts": "1de60c59249fa71aa2dd93b204f6769ac9120ed0bd87e3559ba2c8195615718b",
+        "tests/utility-configuration.test.ts": "1e34654296370b6961bf8c2bae226d32ade28da2c179b4d9afd6d69dea70b1cb",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6",
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca"
       },
-      "head": "d997fa5ee2742d679a26e79322f1004bb60746a5",
-      "outcome": "no-change",
-      "reason": "The domain map, skill specification and skill tree still describe the same consumer tasks and test coverage. This change moves the browser build to the PR runner while retaining the tested release artifact path.",
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "updated",
+      "reason": "The domain map records HTTP parse options and owner cache isolation. The skill specification records the review scope. The existing skill tree mappings cover the changed runtime, type fixtures, examples, and documentation.",
       "evidence": [
-        "Compared ci.yml, playwright.yml and the workflow guard with d997fa5.",
-        "Both example builds, the docs build and the focused guards passed locally."
+        "_artifacts/domain_map.yaml",
+        "_artifacts/skill_spec.md",
+        "_artifacts/skill_tree.yaml"
       ]
     },
     "source:vite.config.ts": {
-      "fingerprint": "d3258dff93bd88315f3247e3760ba2b5cb53881570ed32582cf21e61358b5922",
+      "fingerprint": "9a0b8992ae5676ec7e9be675f9f42b43a969955e88bcdac411869547a86c077d",
       "snapshot": {
-        "vite.config.ts": "ac8fd6fcf49d42a688cb68a1fee0db71602207f6d6a1d4134d0e918cb7923eaa"
+        "vite.config.ts": "025311d2d4e579b5c49716e5dc8ce7a2ce0db3bdaa6704b27af00b6be0feec08"
       },
-      "head": "d0ad100b587dd1b6be3e7bcecc9f0dd1572fac4d",
-      "outcome": "no-change",
-      "reason": "Compared the change with origin/main 9e0afbe: repository artifact placement, PR completion guidance and local hook/import checks affect contributor workflow; public query behavior and shipped consumer guidance are unchanged. Repository-specific instructions remain in owned docs; external skills are preserved.",
+      "head": "8016013111c7e5181ab9c7eed489c3ad6f9f894d",
+      "outcome": "out-of-scope",
+      "reason": "Internal repository toolchain, CI container, Fallow config, or contributor documentation update with no shipped consumer skill impact.",
       "evidence": [
-        "Base 9e0afbe141435d8e79c8c0c1305142daf0d66031; inspected changed script, hooks, Vite configuration and agent docs.",
-        "vp test -- tests/skills-maintenance.test.ts tests/workflow-guards.test.ts: 21 passed after rebase.",
-        "vp run --no-cache check: passed after rebase; prior Fallow checks and shellcheck/shfmt passed. No fresh consumer/discovery evaluation: shipped guidance unchanged."
+        "Verified vite.config.ts is internal development/CI configuration."
       ]
     },
     "source:.github/workflows/release.yml": {
@@ -837,17 +843,15 @@
       ]
     },
     "source:.fallowrc.jsonc": {
-      "fingerprint": "1ca255dbb2a37782b3bf94c47216518ae78e7c62b1c61c76f35d344fce1f1db8",
+      "fingerprint": "6f1176538ef3ff43ccf50aac16c3d180b1061fdc218886e7c70b3a6dbd3d9c47",
       "snapshot": {
-        ".fallowrc.jsonc": "8dffc5b2ab80cfa97bc758f5d34f5f7e813d9ad13d43418cc8ef59a0e92dd05d"
+        ".fallowrc.jsonc": "3bacad07e78237c142d8edb8f00fced768b18ccb9b22697979a7aa0315d16d24"
       },
-      "head": "d0ad100b587dd1b6be3e7bcecc9f0dd1572fac4d",
-      "outcome": "no-change",
-      "reason": "Compared the change with origin/main 9e0afbe: repository artifact placement, PR completion guidance and local hook/import checks affect contributor workflow; public query behavior and shipped consumer guidance are unchanged. Repository-specific instructions remain in owned docs; external skills are preserved.",
+      "head": "8016013111c7e5181ab9c7eed489c3ad6f9f894d",
+      "outcome": "out-of-scope",
+      "reason": "Internal repository toolchain, CI container, Fallow config, or contributor documentation update with no shipped consumer skill impact.",
       "evidence": [
-        "Base 9e0afbe141435d8e79c8c0c1305142daf0d66031; inspected changed script, hooks, Vite configuration and agent docs.",
-        "vp test -- tests/skills-maintenance.test.ts tests/workflow-guards.test.ts: 21 passed after rebase.",
-        "vp run --no-cache check: passed after rebase; prior Fallow checks and shellcheck/shfmt passed. No fresh consumer/discovery evaluation: shipped guidance unchanged."
+        "Verified .fallowrc.jsonc is internal development/CI configuration."
       ]
     },
     "source:.github/workflows/ci.yml": {
@@ -2639,33 +2643,27 @@
       ]
     },
     "source:tests/framework-consumers/pnpm-lock.yaml": {
-      "fingerprint": "d74c395f505cca7554216d116dc658f45f5fe73719cd79d2bc6487707676bf08",
+      "fingerprint": "1366692ae7c9b912406e687c02f2bd52a480791605c702c107bfd04b6e2a379d",
       "snapshot": {
-        "tests/framework-consumers/pnpm-lock.yaml": "8b5adbca70ed770f575a2f2a8c654e45f03fb99d5fecbd0e0d3627481f06c866"
+        "tests/framework-consumers/pnpm-lock.yaml": "641cfe0f814a5fad84ca2c8f65fd9fedd0b0161c339902833b8548f70370c663"
       },
-      "head": "2c88aa4e8d17fbebf58c339d350bfe7e73b60669",
-      "outcome": "no-change",
-      "reason": "Inspected actual source diff: pinned TSRS replaces the active current compiler in native Vite+ and isolated packed fixtures; strict rules, public TypeScript 5.9 minimum and runtime contracts remain unchanged. ADR 0035, contributor toolchain guidance and the updated framework reference already cover this tooling distinction; no additional shipped guidance is warranted.",
+      "head": "8016013111c7e5181ab9c7eed489c3ad6f9f894d",
+      "outcome": "out-of-scope",
+      "reason": "Internal repository toolchain, CI container, Fallow config, or contributor documentation update with no shipped consumer skill impact.",
       "evidence": [
-        "Combined tree from 2c88aa4e (#169 plus #170) and b53f94fa (#167). Compared all source, RPC/HTTP/query-pattern guidance and query-usability regressions against 2c88aa4e: unchanged. Both input ownership and stream guarantees retained; ADR 0014 remains accepted and ADR 0037 intact.",
-        "Frozen pnpm 12.15.0 installation and preparation passed; actual SDK launcher reports @effect/tsgo 0.67.3, TSRS 0.21.0-ts7.1.0-beta, TypeScript 7.1.0-beta, revision 3e9236361fa9; --listFilesOnly locates bundled matching TSRS standard libraries. Root compiler API/minimum is TypeScript 5.9.3; Astro retains 6.0.3.",
-        "vp run toolchain-check passes identity and nonzero TS2322, floatingEffect and type-aware require-await rejection. Uncached strict typecheck passes 211 files; effect-check passes. Scoped test passes 343 cases in 15 files plus current/minimum public and server-local fixtures. Package TSRS declaration production, ATTW and publint pass.",
-        "Packed framework-types passes Vue/Solid/Svelte/Angular on both compilers. Packed effect-compatibility passes public compiler fixtures and 163 runtime cases each at Effect 4.0.6 and 4.1.0. Sequential vite-react-build, tanstack-start-build and docs-build pass; docs check includes 21 excerpt cases, Astro 0 errors/warnings/hints, 59 pages and valid internal links.",
-        "Inspected skill entry, six references and all three planning documents: domain map retains input and stream coverage plus compiler-role clarification; skill_spec retains #167/#169/#170 cumulative histories. Existing skill_tree paths, source globs, prerequisites and reference inventory remain accurate without changes. Intent sync no-op; one skill structurally validates. Scoped format, shellcheck, shfmt and relaxed YAML validation pass.",
-        "Prior #167 macOS arm64 LSP protocol evidence retained in 167-result.md; GUI SDK attachment/extension exclusivity, Windows/Linux/running container, fresh consumer-agent discovery and browser E2E remain unverified. Optional Fallow transitive TypeScript 7.0.2 remains an upstream limitation; no active repository compiler selection uses it. Full architecture review and integrated browser/performance acceptance remain parent scope. No research review outcome recorded."
+        "Verified tests/framework-consumers/pnpm-lock.yaml is internal development/CI configuration."
       ]
     },
     "source:tests/framework-consumers/pnpm-workspace.yaml": {
-      "fingerprint": "6263478e1bae26c5271dd6573e7e3b76cee1756003b105895b3cd72528a0cef8",
+      "fingerprint": "8c330735aef442df94230fe2875056c9943b2096353d90f8c7838f60ed4ba72b",
       "snapshot": {
-        "tests/framework-consumers/pnpm-workspace.yaml": "abaf5c17531d2f7d0cc07f34ce3383a2eabf7492a012f8c3fce609df8d6e3896"
+        "tests/framework-consumers/pnpm-workspace.yaml": "6f69cfd27a5e10ae3ef329ea0b38ab490d6de2f4c873c417cef787dadaaeb4b8"
       },
-      "head": "848ea4bfa501ec60d65c83bd801b4e16f121807d",
+      "head": "eb7c0bedbdad04ee7fc5cd17af125cbb5ba8c43a",
       "outcome": "no-change",
-      "reason": "Updated native integration lockfile and removed the obsolete Core override; the compatibility table now describes the verified aligned versions.",
+      "reason": "The fixture explicitly disables the vue-demi install script. The packed framework check already installs with ignored scripts. The policy is fixture-local and adds no consumer setup step.",
       "evidence": [
-        "vp run --no-cache quality: packed Vue/Solid/Svelte/Angular consumers passed on TS7 and TS5.9.",
-        "vp -C tests/framework-consumers install --frozen-lockfile --ignore-scripts passed with unchanged strict seven-day policy."
+        "Reviewed 8016013..eb7c0be for tests/framework-consumers/pnpm-workspace.yaml and scripts/check-framework-consumers.mts. The packed Vue, Solid, Svelte, and Angular fixtures passed both compilers via vp run framework-types."
       ]
     },
     "source:tests/framework-consumers/tsconfig.json": {
@@ -3125,20 +3123,15 @@
       ]
     },
     "source:.devcontainer/setup.sh": {
-      "fingerprint": "ab462642d75b0bdb6cb22447898bc1042215ddb972bb1e3757170cd32123b0dd",
+      "fingerprint": "21e7b00a7c4c2c8451003a144f289f509b6612202944b6445c159c22389485f3",
       "snapshot": {
-        ".devcontainer/setup.sh": "59adc905479a134b250e9ce1b103ff5de3f4401e394c0eec69afb69469a9abf1"
+        ".devcontainer/setup.sh": "d9f244be6fb7cf971d050789787d4adea1ef8e02fd025e60e46b81b916400007"
       },
-      "head": "3a0d99ccb798198ad0c29f234ed763bc30ad37b1",
-      "outcome": "no-change",
-      "reason": "Owned #167 contributor tooling/configuration source implements the explicit pinned TSRS launcher, source-only declarations, editor SDK or isolated compiler install. It introduces no independent consumer task needing a new shipped skill; compiler-role guidance is reconciled in the existing framework reference and planning record.",
+      "head": "8016013111c7e5181ab9c7eed489c3ad6f9f894d",
+      "outcome": "out-of-scope",
+      "reason": "Internal repository toolchain, CI container, Fallow config, or contributor documentation update with no shipped consumer skill impact.",
       "evidence": [
-        "Base 15a618a; implementation e92d584; latest integration dbb64e8 merged at 3a0d99c.",
-        "Post-merge vp run check and effect-check pass; vp run test passes 801 tests including both public/server-local compilers.",
-        "vp run toolchain-check rejects TS2322, floatingEffect and require-await; TSRS identity 0.21.0 / TypeScript 7.1.0-beta / @effect/tsgo 0.67.3.",
-        "Packed four-framework and Effect floor/current checks pass on TSRS and TypeScript 5.9; declarations pass ATTW/publint. Application and docs checks/build pass before merge; repeated affected checks recorded in /tmp/effect-api-query-spec-166/167-result.md.",
-        "macOS arm64 LSP protocol initialization, unsaved didOpen/didChange diagnostics, hover, definition, Effect actions pass. Graphical VS Code, Linux/Windows/container and fresh consumer-agent discovery remain unverified.",
-        "shellcheck and shfmt -i 2 -sr pass; YAML relaxed style with existing long-line convention passes. Fallow optional dependency retains upstream TypeScript 7.0.2."
+        "Verified .devcontainer/setup.sh is internal development/CI configuration."
       ]
     },
     "source:.vscode/settings.json": {
@@ -3184,17 +3177,15 @@
       ]
     },
     "source:docs/agents/toolchain.md": {
-      "fingerprint": "d236c3a8759f011e5289691fb063a1adbd93eb3c8e7eff094eb21c595cfd68ca",
+      "fingerprint": "a74a67547bb9a5007a8b294173c5a736fbb8afb1d1fbec005240c96bb6f343a8",
       "snapshot": {
-        "docs/agents/toolchain.md": "ab6f8871841838201d3d2927e02fbbffbda33494caa01a6556b029497debeca5"
+        "docs/agents/toolchain.md": null
       },
-      "head": "8f3464be38ea14aef0b371e7d4315767f2b45946",
-      "outcome": "updated",
-      "reason": "The cleanup is now a separate follow-up to merged main d14f7b4. Both custom editor launchers and forced SDK settings are removed; direct pinned declaration compiler resolution and its identity check preserve CLI behavior. ADR 0043 amends editor routing while ADR 0035 retains its recorded decision. The skill source mapping/tree include the new amendment; skill_spec records the maintainer direction and the domain map remains accurate. Deleted SDK locations need no separate skill.",
+      "head": "8d21ec65e0c734805fe969a6fdfca88b767601d8",
+      "outcome": "no-change",
+      "reason": "The compiler instructions moved to AGENTS.md and ADR 0035 points there. The compiler decision, public compatibility and shipped developer tasks remain the same.",
       "evidence": [
-        "Cleanup branch contains only the editor/compiler-path and unused private Tailwind declaration cleanup relative to d14f7b4. Exact installed native compiler identity equals the explicit CLI; pack/ATTW/publint, both public compilers, strict checks, rejection checks and Fallow all pass.",
-        "Merged main has the same tree as 0142e48, whose hosted CI 43432706834 passed Source quality, both builds/docs and all three browser jobs. Runtime evidence remains 870 tests, eight peer pairs of 403 cases and 150 application browser cases; the cleanup changes no library runtime or public contract.",
-        "All three planning records reconciled, one skill/six references retained, current contributor instructions updated. Editor and Windows/container integration remain unverified and contributor-owned; no new graphical or discovery claim."
+        "Verified the revised ADR target and checked the three planning records. The repository guard and shipped skill validation passed."
       ]
     },
     "source:tsconfig.declarations.json": {
@@ -3589,15 +3580,419 @@
       ]
     },
     "source:.github/workflows/playwright.yml": {
-      "fingerprint": "b30d29c8db1280b1bae6b0fdfe843f58baf846d3e29d0a017a4a206689548576",
+      "fingerprint": "fd8ca1fefcb59aaf352ac83b6d78472a289b1826e4523440ba50d8216f07ddb9",
       "snapshot": {
-        ".github/workflows/playwright.yml": "c64f6a59cd39e031fb15a8e268b11c5dcd73a3e0c8516d2a8b93a8623b29c405"
+        ".github/workflows/playwright.yml": "805d999bf8a2fe890f3099a95e34d6d0244fccb361ff946663a415fcbf6d0c80"
       },
-      "head": "d997fa5ee2742d679a26e79322f1004bb60746a5",
-      "outcome": "no-change",
-      "reason": "The reusable workflow shares the pinned image, six shards and diagnostics for both paths. PR shards build the files they test, and release shards restore the CI artifacts.",
+      "head": "8016013111c7e5181ab9c7eed489c3ad6f9f894d",
+      "outcome": "out-of-scope",
+      "reason": "Internal repository toolchain, CI container, Fallow config, or contributor documentation update with no shipped consumer skill impact.",
       "evidence": [
-        "Verified the image pin in the focused guard. Both example build commands and the docs build passed locally. actionlint, targeted yamllint and medium-or-higher zizmor checks passed."
+        "Verified .github/workflows/playwright.yml is internal development/CI configuration."
+      ]
+    },
+    "source:.changeset/steady-query-streams.md": {
+      "fingerprint": "4d74571b8b52ce59399b66771c2a62bb1636cca0fe363a1fe15c96c8189070a6",
+      "snapshot": {
+        ".changeset/steady-query-streams.md": "265004550972b00deeff093c2f4578bb07ce66bb4bf363c651f67a60f6c81d47"
+      },
+      "head": "eb7c0bedbdad04ee7fc5cd17af125cbb5ba8c43a",
+      "outcome": "no-change",
+      "reason": "The patch changeset summarizes behavior already covered by the updated references and selects the compatible-fix category from ADR 0001 and ADR 0042. The release note creates no additional developer task.",
+      "evidence": [
+        "Compared the changeset to 8016013..eb7c0be, published peerDependencies, and ADR 0001/0042."
+      ]
+    },
+    "source:.changeset/cancel-live-queries-before-first-value.md": {
+      "fingerprint": "4526d84747928a4aca1d0cd821319fa2d9dc779b056e8d5cd0a8c1de1b97ae3e",
+      "snapshot": {
+        ".changeset/cancel-live-queries-before-first-value.md": "aaa28a230d7b9770f4ac683011f260de663727bb9557970d7b7e1eb1a553a997"
+      },
+      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "outcome": "no-change",
+      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "evidence": [
+        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+      ]
+    },
+    "source:.changeset/normalize-structured-http-header-keys.md": {
+      "fingerprint": "a95b89bc6edac81049091b4ec7c174310aa2f68be5f7164def3dc2636685a4a4",
+      "snapshot": {
+        ".changeset/normalize-structured-http-header-keys.md": "a0f01314d55821ef392d07491684908b53e951c10772d17b3e8884775969433e"
+      },
+      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "outcome": "no-change",
+      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "evidence": [
+        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+      ]
+    },
+    "source:.changeset/reduce-http-call-allocations.md": {
+      "fingerprint": "d2b163cc33a3905269b15c2086e8278d2bab46223564255ae67d754bdc9a6f40",
+      "snapshot": {
+        ".changeset/reduce-http-call-allocations.md": "8be577429fb1c244ce47702f6b2449bace81ad87a135d42f7061cb67021850ce"
+      },
+      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "outcome": "no-change",
+      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "evidence": [
+        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+      ]
+    },
+    "source:.changeset/reduce-http-utility-type-checking.md": {
+      "fingerprint": "e963da8fd86c6e539a3341d3fe16fb503455aae53ea813c64cb188b984de18b5",
+      "snapshot": {
+        ".changeset/reduce-http-utility-type-checking.md": "ae0189ac410400b530a49c507c6ec1c556da88e7fcff094a971586221fd57165"
+      },
+      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "outcome": "no-change",
+      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "evidence": [
+        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+      ]
+    },
+    "source:.changeset/retire-http-metadata-queries-in-vite-example.md": {
+      "fingerprint": "83f30637e7a8844ded9c05964b01d6ef6b78091fbbb20e6f2ec59a66c3bd038c",
+      "snapshot": {
+        ".changeset/retire-http-metadata-queries-in-vite-example.md": "0f8b45da0f517a1d2221ea07c44425dcd048aac3bb42baacefd1943be5c9766a"
+      },
+      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "outcome": "no-change",
+      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "evidence": [
+        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+      ]
+    },
+    "source:.changeset/reuse-stream-policy-key-options.md": {
+      "fingerprint": "626e8e0718a8bf646aed510d3bbc42efdaca8083e3f2adc7b8f4ef4f18c15b53",
+      "snapshot": {
+        ".changeset/reuse-stream-policy-key-options.md": "698c92ce14f51be86dc41d05ef84f44fc02c6d9316131e79a81a1e4bcaa82983"
+      },
+      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "outcome": "no-change",
+      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "evidence": [
+        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+      ]
+    },
+    "source:.changeset/skip-unmatched-branch-query-keys.md": {
+      "fingerprint": "acf9e824346c1e45933f7adbea129eb0c6e081ccb63b15e29b5c4259d2fee0d0",
+      "snapshot": {
+        ".changeset/skip-unmatched-branch-query-keys.md": "090827b27171c1c9e4f12c4c7be9423afe0f470b0d58f0ed3569609d6952a8c0"
+      },
+      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "outcome": "no-change",
+      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "evidence": [
+        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+      ]
+    },
+    "source:.changeset/skip-unmatched-hydration-keys.md": {
+      "fingerprint": "cd406664d0d7bb7edd8e445c800989a437fc7c46c638037a0f08323f5088c55a",
+      "snapshot": {
+        ".changeset/skip-unmatched-hydration-keys.md": "9bc234390885e6a776358ba1f4638579c41b24050911c3e317a626099e324548"
+      },
+      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "outcome": "no-change",
+      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "evidence": [
+        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+      ]
+    },
+    "source:.changeset/speed-up-schema-structural-sharing.md": {
+      "fingerprint": "3a2dc00d0b2af1260b32e1ae1da8ac14c9a26640ddcf182a3eeb7f325543bca1",
+      "snapshot": {
+        ".changeset/speed-up-schema-structural-sharing.md": "f967624dbf3dc61cee4726e6cdf53d0cb7ee45c980aaa0ecc32b3b8a7f6f953d"
+      },
+      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "outcome": "no-change",
+      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "evidence": [
+        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+      ]
+    },
+    "source:.changeset/type-http-sse-policy-defaults.md": {
+      "fingerprint": "e25de3ec94432563c558c6513617485709c77252cf3de68c67e29f8f4aee1a70",
+      "snapshot": {
+        ".changeset/type-http-sse-policy-defaults.md": "461f2a5321f3c5354371eb39898749e71af3901aed107c71a713709168cf3f4f"
+      },
+      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "outcome": "no-change",
+      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "evidence": [
+        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+      ]
+    },
+    "source:.changeset/use-query-core-query-in-query-effects.md": {
+      "fingerprint": "79dbe5414f90dfafa18e25ef368a412e6d59ec2916e842e0208be3d09bed008d",
+      "snapshot": {
+        ".changeset/use-query-core-query-in-query-effects.md": "f0555f995cf8b9504e89a23b1a6674de722d0f8848d5a58372e0dc8443c99612"
+      },
+      "head": "e158c734fa4d5211dcd2ef2bb063d610ad8c949b",
+      "outcome": "no-change",
+      "reason": "This patch changeset describes one release change already covered by the integrated implementation and guidance. Splitting the release notes introduces no new developer task.",
+      "evidence": [
+        "Compared all eleven entries with the combined release note and the integration diff. Changesets status still reports a single patch bump."
+      ]
+    },
+    "source:.changeset/infer-http-sse-overload-requirements.md": {
+      "fingerprint": "7daa6dfac6333dc75ecd71728494eb22d4adc8a9fbf1deab3c6d91962116aca0",
+      "snapshot": {
+        ".changeset/infer-http-sse-overload-requirements.md": "206fcc15cd3c7900287c405d8c3c9168fe850ee78d4e588b5eaf4ebdd4027258"
+      },
+      "head": "b92b37b08aaecd367175bea696d046692f94249f",
+      "outcome": "no-change",
+      "reason": "The patch note describes a verified SSE behavior already covered by the public fixture and the existing cache workflow. It introduces no new task for the skill.",
+      "evidence": [
+        "vp exec changeset status --since=main reported one patch bump."
+      ]
+    },
+    "source:.changeset/snapshot-configured-sse-options.md": {
+      "fingerprint": "e273b2a32571dd05db5e03255f33b29fcdce5bed9b65515234afaf964625f358",
+      "snapshot": {
+        ".changeset/snapshot-configured-sse-options.md": "fe7a9dc968110e0615dc1032eaa3eb54111c257956109e292ccc165fcbccebeb"
+      },
+      "head": "b92b37b08aaecd367175bea696d046692f94249f",
+      "outcome": "no-change",
+      "reason": "The patch note describes a verified SSE behavior already covered by the public fixture and the existing cache workflow. It introduces no new task for the skill.",
+      "evidence": [
+        "vp exec changeset status --since=main reported one patch bump."
+      ]
+    },
+    "source:.changeset/reduce-http-overload-type-checking.md": {
+      "fingerprint": "3b022e4fe8ca91b686691b70d5eaec1599c67648efc9513a663b7273cd33aefa",
+      "snapshot": {
+        ".changeset/reduce-http-overload-type-checking.md": "1ac838f5a7c82e0c41b5896ce44939c4278d214a91a336ce3d65fc01901870db"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "The patch release note describes a compiler optimization covered by existing guidance and adds no usage requirement.",
+      "evidence": [
+        ".changeset/reduce-http-overload-type-checking.md",
+        "Changesets selects patch release 0.7.1",
+        "vp run type-baseline passed on TSRS and TypeScript 5.9.3"
+      ]
+    },
+    "source:.changeset/reduce-scoped-configuration-type-checking.md": {
+      "fingerprint": "234a6953ae4a951f528b632ba9a1bdbd2f52d7a77ec52b1d4502754225f5f9e1",
+      "snapshot": {
+        ".changeset/reduce-scoped-configuration-type-checking.md": "a689ce76e7e0787416f8af62361277ae1384132ede4a43f9ce791413dcb4d4ee"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "The patch release note describes a compiler optimization covered by existing guidance and adds no usage requirement.",
+      "evidence": [
+        ".changeset/reduce-scoped-configuration-type-checking.md",
+        "Changesets selects patch release 0.7.1",
+        "vp run type-baseline passed on TSRS and TypeScript 5.9.3"
+      ]
+    },
+    "source:.changeset/buffer-replacement-stream-history.md": {
+      "fingerprint": "85afe8803771e0aedda7838d6fa8ef28f4ba3a72c062426c9c9995e59b4d6a9d",
+      "snapshot": {
+        ".changeset/buffer-replacement-stream-history.md": "f1e408cd00d1988248a85ff313d97f48374a1febc694049955ee60f15462c1c8"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/buffer-replacement-stream-history.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/close-vite-query-admission-on-retirement.md": {
+      "fingerprint": "d5b626d21906fef7708beb66e2f67f697f35a998616fd05ecab88cc2428ffc7f",
+      "snapshot": {
+        ".changeset/close-vite-query-admission-on-retirement.md": "d82e75622f16db7ab446fa5e6a44e6f3903c7816dff44bd85096928126da4948"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/close-vite-query-admission-on-retirement.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/flush-ready-stream-deadlines.md": {
+      "fingerprint": "51c00e0f61081f9ddcf2c8fd4e930a2896fc245790547aaa48952bf822029249",
+      "snapshot": {
+        ".changeset/flush-ready-stream-deadlines.md": "ab36efa0e32f3d374147d71c371db391a5315f3d4424cf5de587456d74b369ae"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/flush-ready-stream-deadlines.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/group-rpc-path-types.md": {
+      "fingerprint": "4bd54ee76638ab9a4520d0f8173246f0bc55aa579a27357ca3a5416a43e591e2",
+      "snapshot": {
+        ".changeset/group-rpc-path-types.md": "34d89a60d2926c13fb9a4059e16bb87693784ae7a4c8a86eff37b6931b692d78"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/group-rpc-path-types.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/honor-http-request-parse-options.md": {
+      "fingerprint": "ba1da39b02c57ef393f8e59bdc88b620608280b78a453bc030459fe8aa50fada",
+      "snapshot": {
+        ".changeset/honor-http-request-parse-options.md": "d93aa2f7ee0dc0b4a8a8b95c194e21820f1746d144d2c3e51324d104e642e266"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/honor-http-request-parse-options.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/infer-narrowed-http-overloads.md": {
+      "fingerprint": "b45ad1cdf0363f1b5bfd511fb8293e23b8380b2bb73bcd799cc642d996ed9e3f",
+      "snapshot": {
+        ".changeset/infer-narrowed-http-overloads.md": "7064aaf33c250fc7d5e345d769e5002b3c3767811a46f7b4a92d767b0462c638"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/infer-narrowed-http-overloads.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/isolate-query-owner-caches.md": {
+      "fingerprint": "706453cd9f9f02da5fa4b4a809770905dd017fd95f8410918cf98bf40bb6027f",
+      "snapshot": {
+        ".changeset/isolate-query-owner-caches.md": "2ca962e9c5e13d3901953b1254147dfa42203fed2cbb1cf8fc6ee2c8032b9fb2"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/isolate-query-owner-caches.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/preserve-http-request-parts.md": {
+      "fingerprint": "0602e9c6fa012bf836398897c76265f67fa0187227fddf2b72e7ac2f38de7fb8",
+      "snapshot": {
+        ".changeset/preserve-http-request-parts.md": "b972ba94ac2917a6bc04b1a79848db2c2654f131f6ba283e30e3b8014095198e"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/preserve-http-request-parts.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/preserve-metadata-fallback-sharing.md": {
+      "fingerprint": "c7bfad0a520faf5d89c6a8695ed9af4f0796e0a6e4d3ddfb69eaeadd4c1387b7",
+      "snapshot": {
+        ".changeset/preserve-metadata-fallback-sharing.md": "9936240e9eab6fdc5fd98284c9eba93a59a6f5baec429debcdcbcef04d966426"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/preserve-metadata-fallback-sharing.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/release-failed-stream-recovery-attempts.md": {
+      "fingerprint": "adf2472375a000aa924e979da21f20698246946daa53f999cf056cecb16f9077",
+      "snapshot": {
+        ".changeset/release-failed-stream-recovery-attempts.md": "6070517de294c5dd82e53941ab69a1257b9a103bd02a1420a2c3f5b53702612d"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/release-failed-stream-recovery-attempts.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/release-start-clients-after-cache-errors.md": {
+      "fingerprint": "15fac9f74b8d4a84389c9f49bfe33639c5729e3e79a768e3d7922d2089caaa8b",
+      "snapshot": {
+        ".changeset/release-start-clients-after-cache-errors.md": "9b61e8f12bb3d42aa37da20f31c9284a98f9d98b22b679ee851925696b364ad8"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/release-start-clients-after-cache-errors.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/retain-bound-descriptor-input.md": {
+      "fingerprint": "28b057bbbe31b69a0dfc873db1834d6b14b5ae7ba31859e66ffdccc370870408",
+      "snapshot": {
+        ".changeset/retain-bound-descriptor-input.md": "763ae47d7268e959e9d521e38d4404afbfbc6b3da90799474428d70057b0f64d"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/retain-bound-descriptor-input.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/reuse-hydration-codec-operations.md": {
+      "fingerprint": "f3429fff382454fe1ce2474e593629dca59527f56902cf83324f14f7115c34bd",
+      "snapshot": {
+        ".changeset/reuse-hydration-codec-operations.md": "a0b7d1563210914d64c32dbad19fa4917a53e63f168cde45d83f105541f5c873"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/reuse-hydration-codec-operations.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/speed-up-branch-query-filter-matching.md": {
+      "fingerprint": "19353244ba32d69c21e4ec79450a9b4ea9efc5726b493b967bf30c1fe91f562a",
+      "snapshot": {
+        ".changeset/speed-up-branch-query-filter-matching.md": "e207af1c2e5084923b8267f030deb316db8042642a4515ba088e364e0f25be91"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/speed-up-branch-query-filter-matching.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/support-native-snapshot-persisters.md": {
+      "fingerprint": "54c1ed2cc75488c5f0e7bdf7b943ce331a1ae4cf3963682669c0f4023e01edff",
+      "snapshot": {
+        ".changeset/support-native-snapshot-persisters.md": "b23eae40ca838e74dbdee7854978feeef67a198536c75aa02e36aec0a4e024b3"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/support-native-snapshot-persisters.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
+      ]
+    },
+    "source:.changeset/visit-configured-utility-scopes.md": {
+      "fingerprint": "fd6ad3fd73b404a6e51b9936251d036b36e63d8ff19b22be1fb8bffdbfe27f70",
+      "snapshot": {
+        ".changeset/visit-configured-utility-scopes.md": "be4b401c8ec9b09474a5e6e9b128941f52430309022d9c39b2b89b80ace21d2b"
+      },
+      "head": "8007f00b1512cd52e3998b1068201096e7701104",
+      "outcome": "no-change",
+      "reason": "This focused patch release note is tracked in Changesets. The matching runtime or compiler source is already covered by the skill review.",
+      "evidence": [
+        ".changeset/visit-configured-utility-scopes.md",
+        "The Changesets plan retains a patch release and the corresponding fixtures exercise the implementation"
       ]
     }
   }

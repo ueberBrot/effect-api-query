@@ -113,14 +113,15 @@ const recoverWithPolicy = <A, E, R, C, EG, RG, EF, RF, RS>(
     options.onState?.(value) ?? Effect.void;
   return Stream.suspend(() => {
     let cursor = check(initialCursor);
-    const connect = (
-      attempt: number
-    ): Stream.Stream<A, E | EG | EF, R | RG | RF | RS> =>
-      Stream.unwrap(
-        Effect.gen(function* connectStream() {
+    const recovered = Stream.unwrap(
+      Effect.gen(function* recoveryPull() {
+        const parent = yield* Scope.Scope;
+        type Chunk = readonly [A, ...A[]];
+        let attempt = 0;
+        let current: Pull.Pull<Chunk, E | EG, void, R | RG | RS> | undefined;
+        const open = Effect.gen(function* openAttempt() {
           yield* state({ status: "connecting", cursor, attempt });
-          const scope = yield* Scope.make();
-          yield* Effect.addFinalizer((exit) => Scope.close(scope, exit));
+          const scope = yield* Scope.fork(parent);
           const source = Stream.suspend(() => options.connect(cursor)).pipe(
             Stream.rechunk(1),
             Stream.mapEffect(
@@ -140,65 +141,78 @@ const recoverWithPolicy = <A, E, R, C, EG, RG, EF, RF, RS>(
             Stream.filter(Option.isSome),
             Stream.map((value) => value.value)
           );
-          const pull = yield* Stream.toPull(source).pipe(Scope.provide(scope));
-          return Stream.fromPull(
-            Effect.succeed(
-              Effect.uninterruptibleMask((restore) =>
-                restore(pull).pipe(
-                  Effect.onError((cause) =>
-                    Scope.close(scope, Pull.doneExitFromCause(cause))
-                  ),
-                  Effect.catchCause((cause) => {
-                    const completion = Pull.filterDone(cause);
-                    return Effect.failCause(
-                      Result.isFailure(completion) ? completion.failure : cause
-                    );
-                  })
+          const pull = yield* Stream.toPull(source).pipe(
+            Scope.provide(scope),
+            Effect.onError((cause) => Scope.close(scope, Exit.failCause(cause)))
+          );
+          return {
+            pull: Effect.uninterruptibleMask((restore) =>
+              restore(pull).pipe(
+                Effect.onError((cause) =>
+                  Scope.close(scope, Pull.doneExitFromCause(cause))
                 )
               )
+            ),
+          };
+        });
+        const read = Effect.suspend(
+          () =>
+            current ??
+            open.pipe(
+              Effect.flatMap(({ pull }) => {
+                current = pull;
+                return pull;
+              })
             )
-          );
-        })
-      ).pipe(
-        Stream.catchCause((cause) => {
-          if (Cause.hasInterrupts(cause)) {
-            return Stream.failCause(cause);
-          }
-          return Stream.unwrap(
-            Effect.gen(function* recoverConnection() {
+        );
+        const next: Pull.Pull<Chunk, E | EG | EF, void, R | RG | RF | RS> =
+          read.pipe(
+            Effect.catchCause((cause) => {
+              const completion = Pull.filterDone(cause);
+              if (Result.isSuccess(completion)) {
+                return Effect.failCause(cause);
+              }
+              const { failure } = completion;
+              if (Cause.hasInterrupts(failure)) {
+                return Effect.failCause(failure);
+              }
+              current = undefined;
               const nextAttempt = attempt + 1;
-              const delayInput = options.retryDelay(cause, nextAttempt);
-              const expired = options.isReplayExpired?.(cause) === true;
+              const delayInput = options.retryDelay(failure, nextAttempt);
+              const expired = options.isReplayExpired?.(failure) === true;
               if (
                 delayInput === undefined ||
                 (expired && options.onReplayExpired === undefined)
               ) {
-                return yield* Effect.failCause(cause);
+                return Effect.failCause(failure);
               }
-              const delay = Duration.fromInputUnsafe(delayInput);
-              yield* state({
-                status: "backing-off",
-                cursor,
-                attempt: nextAttempt,
-                delay,
-                cause,
-              });
-              yield* Effect.sleep(delay);
-              if (expired && options.onReplayExpired !== undefined) {
+              return Effect.gen(function* retryAttempt() {
+                const delay = Duration.fromInputUnsafe(delayInput);
                 yield* state({
-                  status: "refreshing",
+                  status: "backing-off",
                   cursor,
                   attempt: nextAttempt,
-                  cause,
+                  delay,
+                  cause: failure,
                 });
-                cursor = check(yield* options.onReplayExpired(cause));
-              }
-              return connect(nextAttempt);
+                yield* Effect.sleep(delay);
+                if (expired && options.onReplayExpired !== undefined) {
+                  yield* state({
+                    status: "refreshing",
+                    cursor,
+                    attempt: nextAttempt,
+                    cause: failure,
+                  });
+                  cursor = check(yield* options.onReplayExpired(failure));
+                }
+                attempt = nextAttempt;
+              }).pipe(Effect.andThen(Effect.suspend(() => next)));
             })
           );
-        })
-      );
-    return connect(0).pipe(
+        return Stream.fromPull(Effect.succeed(next));
+      })
+    );
+    return recovered.pipe(
       Stream.onExit((exit) => {
         if (Exit.isSuccess(exit)) {
           return state({ status: "completed", cursor });

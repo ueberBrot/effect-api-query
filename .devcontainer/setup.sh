@@ -27,4 +27,4 @@ corepack install
 pnpm install --frozen-lockfile --store-dir /home/node/.local/share/pnpm/store
 
 # Fail setup if the exact bundled development compiler cannot start.
-pnpm exec effect-tsgo tsrs@0.21.0-ts7.1.0-beta --version
+pnpm exec effect-tsgo tsrs@0.25.0-ts7.1.0-beta --version

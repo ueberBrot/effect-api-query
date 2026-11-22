@@ -353,3 +353,157 @@ for (const operation of ["fetch", "ensure"] as const) {
     );
   }
 }
+
+for (const operation of ["fetch", "ensure"] as const) {
+  it.effect(
+    `${operation} does not mutate caller-supplied query options in place`,
+    () =>
+      Effect.gen(function* preservesCallerOptions() {
+        const client = new QueryClient();
+        const rawOptions = Object.freeze({
+          queryKey: ["immutable-raw", operation] as const,
+          queryFn: async () => await Promise.resolve(11),
+          staleTime: 0,
+        });
+        const rawSnapshot = { ...rawOptions };
+        const rawResult = yield* queryEffects[operation](rawOptions).pipe(
+          Effect.provideService(QueryClientService, client)
+        );
+        expect(rawResult).toBe(11);
+        expect(rawOptions).toStrictEqual(rawSnapshot);
+
+        const defaultedOptions = Object.freeze(
+          client.defaultQueryOptions({
+            queryKey: ["immutable-defaulted", operation] as const,
+            queryFn: async () => await Promise.resolve(22),
+            staleTime: 0,
+          })
+        );
+        const defaultedSnapshot = { ...defaultedOptions };
+        const defaultedResult = yield* queryEffects[operation](
+          defaultedOptions
+        ).pipe(Effect.provideService(QueryClientService, client));
+        expect(defaultedResult).toBe(22);
+        expect(defaultedOptions).toStrictEqual(defaultedSnapshot);
+        client.clear();
+      })
+  );
+}
+
+it.effect("revalidates stale initial data inherited from query defaults", () =>
+  Effect.gen(function* revalidatesInitialData() {
+    const client = new QueryClient();
+    const queryKey = ["default-initial-data"];
+    client.setQueryDefaults(queryKey, { initialData: 1, staleTime: 0 });
+    let executions = 0;
+    const data = yield* queryEffects
+      .ensure({
+        queryKey,
+        queryFn: async () => {
+          executions += 1;
+          return await Promise.resolve(2);
+        },
+        revalidateIfStale: true,
+      })
+      .pipe(Effect.provideService(QueryClientService, client));
+    expect({ data, executions }).toStrictEqual({ data: 1, executions: 1 });
+    client.clear();
+  })
+);
+
+it.effect(
+  "reports a staleTime callback failure while ensuring cached data",
+  () =>
+    Effect.gen(function* freshnessCallbackFailure() {
+      const client = new QueryClient();
+      const queryKey = ["freshness-callback-failure"];
+      const cause = new Error("Cannot resolve freshness");
+      client.setQueryData(queryKey, 1);
+      try {
+        const failure = yield* queryEffects
+          .ensure<number>({
+            queryKey,
+            revalidateIfStale: true,
+            staleTime: () => {
+              throw cause;
+            },
+          })
+          .pipe(Effect.flip, Effect.provideService(QueryClientService, client));
+        expect(failure.cause).toBe(cause);
+      } finally {
+        client.clear();
+      }
+    })
+);
+
+it.effect(
+  "preserves stale/fresh reuse semantics for fetch, ensure, and revalidateIfStale",
+  () =>
+    Effect.gen(function* cacheReuseSemantics() {
+      const client = new QueryClient();
+      let executions = 0;
+      const options = {
+        queryKey: ["cache-reuse"] as const,
+        queryFn: async () => {
+          executions += 1;
+          return await Promise.resolve(executions);
+        },
+        select: (value: number) => `selected:${value}`,
+      };
+
+      const first = yield* queryEffects
+        .fetch({ ...options, staleTime: Infinity })
+        .pipe(Effect.provideService(QueryClientService, client));
+      const freshFetch = yield* queryEffects
+        .fetch({ ...options, staleTime: Infinity })
+        .pipe(Effect.provideService(QueryClientService, client));
+      const staleEnsure = yield* queryEffects
+        .ensure({ ...options, staleTime: 0 })
+        .pipe(Effect.provideService(QueryClientService, client));
+      const staleFetch = yield* queryEffects
+        .fetch({ ...options, staleTime: 0 })
+        .pipe(Effect.provideService(QueryClientService, client));
+      const revalidatedEnsure = yield* queryEffects
+        .ensure({ ...options, staleTime: 0, revalidateIfStale: true })
+        .pipe(Effect.provideService(QueryClientService, client));
+      yield* waitForQueryState(
+        client,
+        () => client.getQueryData(options.queryKey) === 3
+      );
+
+      let coldExecutions = 0;
+      const coldEnsure = yield* queryEffects
+        .ensure({
+          queryKey: ["cache-reuse-cold"] as const,
+          queryFn: async () => {
+            coldExecutions += 1;
+            return await Promise.resolve(coldExecutions);
+          },
+          staleTime: 0,
+          revalidateIfStale: true,
+        })
+        .pipe(Effect.provideService(QueryClientService, client));
+
+      expect({
+        first,
+        freshFetch,
+        staleEnsure,
+        staleFetch,
+        revalidatedEnsure,
+        executions,
+        coldEnsure,
+        coldExecutions,
+      }).toStrictEqual({
+        first: 1,
+        freshFetch: 1,
+        staleEnsure: 1,
+        staleFetch: 2,
+        revalidatedEnsure: 2,
+        executions: 3,
+        coldEnsure: 1,
+        coldExecutions: 1,
+      });
+
+      client.clear();
+    })
+);

@@ -62,9 +62,10 @@ const inspectKeyEncoding = (
 };
 
 export const createSchemaKeyEncoding = (
-  schema: Schema.Top
+  schema: Schema.Top,
+  options?: SchemaAST.ParseOptions
 ): SchemaKeyEncoding => {
-  const cached = encodings.get(schema);
+  const cached = options === undefined ? encodings.get(schema) : undefined;
   if (cached !== undefined) {
     return cached;
   }
@@ -80,7 +81,7 @@ export const createSchemaKeyEncoding = (
         const encodingSchema =
           // oxlint-disable-next-line anti-slop/no-chained-type-assertions, anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
           schema as unknown as Schema.ConstraintEncoder<unknown>;
-        defaultEncode = Schema.encodeUnknownSync(encodingSchema);
+        defaultEncode = Schema.encodeUnknownSync(encodingSchema, options);
       }
       return defaultEncode(input);
     },
@@ -92,7 +93,7 @@ export const createSchemaKeyEncoding = (
       }
     }
   }
-  if (encoding.cacheable) {
+  if (options === undefined && encoding.cacheable) {
     encodings.set(schema, encoding);
   }
   return encoding;

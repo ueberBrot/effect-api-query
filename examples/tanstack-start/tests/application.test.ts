@@ -1,9 +1,17 @@
 import { User } from "@effect-api-query/contracts";
+import { startExampleRpcClient } from "@effect-api-query/contracts/client";
 import type { ExampleRpcClient } from "@effect-api-query/contracts/client";
 import { startExampleRpcServer } from "@effect-api-query/server";
 import { MutationObserver } from "@tanstack/react-query";
 import { Deferred, Effect, Exit, Scope, Stream } from "effect";
-import { afterEach, beforeEach, describe, expect, it } from "vite-plus/test";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vite-plus/test";
 
 import { startTanStackStartApplication } from "../src/lib/application.ts";
 import type { TanStackStartApplication } from "../src/lib/application.ts";
@@ -158,6 +166,32 @@ describe("TanStack Start HTTP request ownership", () => {
 });
 
 describe("TanStack Start execution settlement", () => {
+  it("releases the ready client when a cache subscriber fails during disposal", async () => {
+    const rpcUrl = "http://example.test/rpc";
+    const ready = await startExampleRpcClient(rpcUrl);
+    const dispose = vi.fn<() => Promise<void>>(async () => {
+      await ready.dispose();
+    });
+    const owned = await startTanStackStartApplication({
+      rpcUrl,
+      rpcClient: { ...ready, dispose },
+    });
+    const error = new Error("cache subscriber failed");
+    owned.queryClient.setQueryData(["cached"], true);
+    const stop = owned.queryClient.getQueryCache().subscribe((event) => {
+      if (event.type === "removed") {
+        throw error;
+      }
+    });
+    try {
+      await expect(owned.dispose()).rejects.toBe(error);
+      expect(dispose).toHaveBeenCalledOnce();
+    } finally {
+      stop();
+      await ready.dispose();
+    }
+  });
+
   it.each(["unary", "stream"] as const)(
     "drains ordinary %s query finalizers before disposing ready clients",
     async (view) => {

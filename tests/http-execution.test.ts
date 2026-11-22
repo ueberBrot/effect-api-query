@@ -213,24 +213,30 @@ describe("HTTP execution", () => {
     } satisfies HttpApiClient.ForApi<typeof api> & Receiver;
     const utils = createHttpApiQueryUtils(api, { client, keyPrefix: ["test"] });
     const queryClient = new QueryClient();
+    const input = Object.defineProperty({ params: { id: "query" } }, "params", {
+      enumerable: false,
+      get: () => ({ id: "query" }),
+    });
+    const mutationInput = { params: { id: "mutation" } };
+    Object.defineProperty(mutationInput, "params", { enumerable: false });
     try {
       await expect(
-        queryClient.query(
-          utils.grouped.read.queryOptions({
-            input: { params: { id: "query" } },
-          })
-        )
+        queryClient.query(utils.grouped.read.queryOptions({ input }))
       ).resolves.toBe("https://example.test/grouped/query");
+      await expect(
+        queryClient.query(utils.grouped.read.metadataOptions({ input }))
+      ).resolves.toMatchObject({ data: "https://example.test/grouped/query" });
       await expect(
         new MutationObserver(
           queryClient,
           utils.readRoot.mutationOptions()
-        ).mutate({
-          params: { id: "mutation" },
-        })
+        ).mutate(mutationInput)
       ).resolves.toBe("https://example.test/root/mutation");
-      expect(receivers[0]).toBe(grouped);
-      expect(receivers[1]).toBe(client);
+      expect(
+        receivers.map(
+          (receiver, index) => receiver === (index === 2 ? client : grouped)
+        )
+      ).toStrictEqual([true, true, true]);
     } finally {
       queryClient.clear();
     }
@@ -600,6 +606,54 @@ describe("HTTP execution", () => {
       expect(queryClient.getQueryData(options.queryKey)).toBe(42);
     } finally {
       unsubscribe();
+      queryClient.clear();
+    }
+  });
+
+  it("preserves receiver binding when invoking HTTP client endpoint methods", async () => {
+    const api = HttpApi.make("receiver").add(
+      HttpApiGroup.make("items").add(
+        HttpApiEndpoint.get("read", "/items", {
+          success: Schema.String,
+        })
+      )
+    );
+    const baseClient = await Effect.runPromise(
+      HttpApiClient.makeWith(api, {
+        baseUrl: "https://example.test",
+        httpClient: HttpClient.make((request) =>
+          Effect.succeed(
+            HttpClientResponse.fromWeb(request, Response.json("bound-receiver"))
+          )
+        ),
+      })
+    );
+    let observedReceiver: unknown;
+    const items = {
+      read: Object.assign(
+        new Proxy(baseClient.items.read, {
+          apply(
+            target,
+            thisArg,
+            argArray: Parameters<typeof baseClient.items.read>
+          ) {
+            observedReceiver = thisArg;
+            return target(...argArray);
+          },
+        }),
+        { call: "wrapper metadata" }
+      ),
+    };
+    const utils = createHttpApiQueryUtils(api, {
+      client: { items },
+      keyPrefix: ["receiver"],
+    });
+    const queryClient = new QueryClient();
+    try {
+      const value = await queryClient.query(utils.items.read.queryOptions());
+      expect(value).toBe("bound-receiver");
+      expect(observedReceiver).toBe(items);
+    } finally {
       queryClient.clear();
     }
   });

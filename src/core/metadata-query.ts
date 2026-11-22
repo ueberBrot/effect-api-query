@@ -22,17 +22,33 @@ const shareQueryData = (previous: unknown, data: unknown, policy: unknown) => {
 
 const fetchedPolicies = new WeakMap<object, { readonly policy: unknown }>();
 
+export const resolveMetadataPolicy = (options?: Record<string, unknown>) => {
+  const hasLocalPolicy =
+    options !== undefined && Object.hasOwn(options, "structuralSharing");
+  const localPolicy = options?.["structuralSharing"];
+  return ({ client, queryKey }: QueryFunctionContext) =>
+    hasLocalPolicy
+      ? localPolicy
+      : client.defaultQueryOptions({ queryKey }).structuralSharing;
+};
+
 export const preserveMetadataPolicy = <Data>(
   previous: unknown,
-  data: Data
+  data: Data,
+  fallback: unknown
 ): Data => {
-  if (Predicate.isObject(previous) && Predicate.isObject(data)) {
-    const policy = fetchedPolicies.get(previous);
-    if (policy !== undefined) {
-      fetchedPolicies.set(data, policy);
-    }
+  if (!Predicate.isObject(data)) {
+    return data;
   }
-  return data;
+  const produced = Predicate.isObject(previous)
+    ? fetchedPolicies.get(previous)
+    : undefined;
+  if (previous === data && produced !== undefined) {
+    return data;
+  }
+  const replacement = { ...data };
+  fetchedPolicies.set(replacement, produced ?? { policy: fallback });
+  return replacement;
 };
 
 export const prepareMetadataExecution = (
@@ -44,7 +60,7 @@ export const prepareMetadataExecution = (
   requestOptions: unknown,
   skipped: boolean
 ) => {
-  const hasLocalPolicy = Object.hasOwn(options, "structuralSharing");
+  const resolvePolicy = resolveMetadataPolicy(options);
   const localPolicy = options["structuralSharing"];
   if (!skipped) {
     options["structuralSharing"] = (previous: unknown, data: unknown) => {
@@ -63,23 +79,20 @@ export const prepareMetadataExecution = (
     };
   }
 
-  return (input: unknown) =>
-    async ({ client, queryKey, signal }: QueryFunctionContext) => {
-      const policy = hasLocalPolicy
-        ? localPolicy
-        : client.defaultQueryOptions({ queryKey }).structuralSharing;
-      const exit = await runPromiseExit(
-        // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
-        description.invoke(input, requestOptions),
-        { signal }
-      );
-      if (Exit.isFailure(exit)) {
-        throw description.executionError("metadata", exit.cause);
-      }
-      const data = exit.value === undefined ? null : exit.value;
-      if (Predicate.isObject(data)) {
-        fetchedPolicies.set(data, { policy });
-      }
-      return data;
-    };
+  return (input: unknown) => async (context: QueryFunctionContext) => {
+    const policy = resolvePolicy(context);
+    const exit = await runPromiseExit(
+      // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
+      description.invoke(input, requestOptions),
+      { signal: context.signal }
+    );
+    if (Exit.isFailure(exit)) {
+      throw description.executionError("metadata", exit.cause);
+    }
+    const data = exit.value === undefined ? null : exit.value;
+    if (Predicate.isObject(data)) {
+      fetchedPolicies.set(data, { policy });
+    }
+    return data;
+  };
 };
