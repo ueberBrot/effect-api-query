@@ -84,7 +84,7 @@
 
   "overrides": [
     {
-      "files": ["src/index.ts"],
+      "files": ["src/index.ts", "src/react/index.tsx"],
       "rules": { "unused-types": "off" },
     },
   ],

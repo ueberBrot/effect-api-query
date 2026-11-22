@@ -37,12 +37,17 @@
   "types": "./dist/index.d.mts",
   "imports": {
     "#effect-api-query": "./src/index.ts",
+    "#effect-api-query/react": "./src/react/index.tsx",
     "#effect-api-query/*": "./src/*.ts"
   },
   "exports": {
     ".": {
       "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs"
+    },
+    "./react": {
+      "types": "./dist/react.d.mts",
+      "import": "./dist/react.mjs"
     }
   },
   "publishConfig": {
@@ -70,11 +75,13 @@
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-router-ssr-query": "catalog:",
     "@tanstack/react-start": "catalog:",
+    "@testing-library/react": "catalog:",
     "@types/node": "24.19.2",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "effect": "catalog:",
     "fallow": "3.43.0",
+    "jsdom": "catalog:",
     "publint": "0.3.25",
     "react": "catalog:",
     "react-dom": "catalog:",
@@ -89,7 +96,17 @@
   },
   "peerDependencies": {
     "@tanstack/query-core": ">=5.107.1 <6",
-    "effect": ">=4.1.4 <4.2.0"
+    "@tanstack/react-query": ">=5.107.1 <6",
+    "effect": ">=4.1.4 <4.2.0",
+    "react": "^18 || ^19"
+  },
+  "peerDependenciesMeta": {
+    "@tanstack/react-query": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
   },
   "packageManager": "pnpm@12.15.0"
 }

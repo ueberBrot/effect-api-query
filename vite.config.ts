@@ -28,7 +28,7 @@ const ignoredPaths = [
   "test-results/**",
 ];
 
-const testFiles = ["tests/**/*.test.ts", "examples/**/*.test.{ts,tsx}"];
+const testFiles = ["tests/**/*.test.{ts,tsx}", "examples/**/*.test.{ts,tsx}"];
 const effectTestBlocks = [
   "it.effect",
   "it.live",
@@ -143,7 +143,7 @@ export default defineConfig({
       },
       {
         files: [
-          "src/**/*.ts",
+          "src/**/*.{ts,tsx}",
           "examples/**/src/**/*.{ts,tsx}",
           "examples/shared/**/*.ts",
           "scripts/**/*.mts",
@@ -243,7 +243,11 @@ export default defineConfig({
       },
       {
         ...ultraciteReact,
-        files: ["examples/**/*.{ts,tsx}"],
+        files: [
+          "src/react/**/*.{ts,tsx}",
+          "tests/**/*.test.tsx",
+          "examples/**/*.{ts,tsx}",
+        ],
       },
       {
         files: ["examples/**/*.{ts,tsx}"],
@@ -377,6 +381,7 @@ export default defineConfig({
       "examples/**/*.test.ts",
       "examples/**/*.test.tsx",
       "tests/**/*.test.ts",
+      "tests/**/*.test.tsx",
     ],
     passWithNoTests: true,
   },
@@ -387,8 +392,20 @@ export default defineConfig({
     },
     clean: true,
     deps: {
-      neverBundle: ["effect", "@tanstack/query-core"],
-      onlyImport: ["effect", "@tanstack/query-core"],
+      neverBundle: [
+        "effect",
+        "@tanstack/query-core",
+        "react",
+        "react/jsx-runtime",
+        "@tanstack/react-query",
+      ],
+      onlyImport: [
+        "effect",
+        "@tanstack/query-core",
+        "react",
+        "react/jsx-runtime",
+        "@tanstack/react-query",
+      ],
     },
     dts: {
       generator: "tsgo",
@@ -397,7 +414,10 @@ export default defineConfig({
         path: compilerExecutable(),
       },
     },
-    entry: ["src/index.ts"],
+    entry: {
+      index: "src/index.ts",
+      react: "src/react/index.tsx",
+    },
     format: ["esm"],
     publint: {
       level: "error",
