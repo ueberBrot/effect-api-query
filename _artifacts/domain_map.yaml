@@ -46,7 +46,7 @@ skills:
       - Apply native defaults and scoped policies without losing call-site selection, conditional input, or explicitly undefined seed behavior; compose mutation callbacks or intercept native execution attempts.
       - Reuse equivalent immutable decoded records and nested containers with a schema-specific structuralSharing policy while preserving metadata freezing and generated types.
       - Capture open streams and drain queries, preparation, and accepted writes before request disposal.
-      - Derive registries from matching contracts, override unsupported schemas, and hydrate selected views into their decoded cache representation. Preserve HTTP success variants with overlapping JSON encodings and distinct undefined stream elements.
+      - Derive registries from matching contracts, override unsupported schemas, and hydrate selected views into their decoded cache representation. Use cached HTTP metadata status to select declared successes. Preserve top-level union members with overlapping JSON encodings and distinct undefined stream elements. Set view overrides directly on configuration objects.
       - Preserve neighboring writes and originating ownership during mutation overlap.
       - Defer event refresh until participating writes settle.
       - Retire consumers and accepted work before acquiring a replacement owner. Each owner creates its query and mutation caches from configuration and drains registered work before release.

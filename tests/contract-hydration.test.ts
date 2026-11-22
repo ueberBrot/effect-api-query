@@ -87,6 +87,46 @@ const dummyHttpClient = HttpClient.make((request) =>
 
 describe("createContractHydrationRegistry — RPC contracts", () => {
   it.effect(
+    "preserves RPC union members in query, live, and streamed data",
+    () =>
+      Effect.gen(function* preservesRpcUnionMembers() {
+        const Value = Schema.Union([
+          Schema.BigInt,
+          Schema.String,
+          Schema.Undefined,
+          Schema.Null,
+        ]);
+        const group = RpcGroup.make(
+          Rpc.make("read", { success: Value }),
+          Rpc.make("watch", { success: Value, stream: true })
+        );
+        const client = yield* makeRpcTestClient(group, {
+          read: () => Effect.succeed("42"),
+          watch: () => Stream.make(42n, undefined, null, "42"),
+        });
+        const { read, watch } = createRpcQueryUtils(group, { client });
+        const query = read.queryOptions();
+        const live = watch.liveOptions();
+        const streamed = watch.streamedOptions({ maxChunks: 4 });
+        const server = new QueryClient();
+        const browser = new QueryClient();
+        yield* Effect.promise(async () => await server.query(query));
+        server.setQueryData(live.queryKey, "42");
+        server.setQueryData(streamed.queryKey, [42n, undefined, null, "42"]);
+        yield* roundTripJson(
+          createContractHydrationRegistry(group),
+          server,
+          browser
+        );
+        expect([
+          browser.getQueryData(query.queryKey),
+          browser.getQueryData(live.queryKey),
+          browser.getQueryData(streamed.queryKey),
+        ]).toStrictEqual(["42", "42", [42n, undefined, null, "42"]]);
+      })
+  );
+
+  it.effect(
     "round-trips unary, void, optional, infinite, live, and streamed RPC views with default empty keyPrefix",
     () =>
       Effect.gen(function* roundTripsRpcViews() {
@@ -327,6 +367,219 @@ describe("createContractHydrationRegistry — HTTP contracts", () => {
       expect(browser.getQueryData(metadataKey)?.data).toBe(42n);
     })
   );
+
+  it.effect(
+    "preserves overlapping HTTP success shapes in query and metadata data",
+    () =>
+      Effect.gen(function* preservesOverlappingHttpSuccesses() {
+        const api = HttpApi.make("overlapping").add(
+          HttpApiGroup.make("values").add(
+            HttpApiEndpoint.get("read", "/value", {
+              success: [
+                HttpApiSchema.status(200)(Schema.Struct({ id: Schema.Int })),
+                HttpApiSchema.status(201)(
+                  Schema.Struct({ id: Schema.Int, flag: Schema.Boolean })
+                ),
+              ],
+            })
+          )
+        );
+        const httpClient = HttpClient.make((request) =>
+          Effect.succeed(
+            HttpClientResponse.fromWeb(
+              request,
+              Response.json({ id: 1, flag: true }, { status: 201 })
+            )
+          )
+        );
+        const client = yield* HttpApiClient.makeWith(api, {
+          baseUrl: "https://example.test",
+          httpClient,
+        });
+        const { read } = createHttpApiQueryUtils(api, { client }).values;
+        const query = read.queryOptions();
+        const metadata = read.metadataOptions();
+        const server = new QueryClient();
+        const browser = new QueryClient();
+        const queryData = yield* Effect.promise(
+          async () => await server.query(query)
+        );
+        const metadataData = yield* Effect.promise(
+          async () => await server.query(metadata)
+        );
+        yield* roundTripJson(
+          createContractHydrationRegistry(api),
+          server,
+          browser
+        );
+        expect(queryData).toStrictEqual({ id: 1, flag: true });
+        expect(metadataData.status).toBe(201);
+        expect({
+          data: browser.getQueryData(query.queryKey),
+          metadata: browser.getQueryData(metadata.queryKey),
+        }).toStrictEqual({ data: queryData, metadata: metadataData });
+      })
+  );
+
+  it.effect(
+    "uses only the HTTP success codecs for the cached metadata status",
+    () =>
+      Effect.gen(function* usesMetadataStatus() {
+        const Unselected = Schema.String.pipe(
+          Schema.middlewareEncoding(() => Effect.die("unexpected 200 encoder"))
+        );
+        const api = HttpApi.make("statuses").add(
+          HttpApiGroup.make("values").add(
+            HttpApiEndpoint.get("read", "/value", {
+              success: [Unselected, HttpApiSchema.status(201)(Schema.String)],
+            })
+          )
+        );
+        const client = yield* HttpApiClient.makeWith(api, {
+          baseUrl: "https://example.test",
+          httpClient: dummyHttpClient,
+        });
+        const key = createHttpApiQueryUtils(api, {
+          client,
+        }).values.read.metadataKey();
+        const server = new QueryClient();
+        const browser = new QueryClient();
+        const metadata = {
+          data: "created",
+          status: 201,
+          headers: { etag: "1" },
+        };
+        server.setQueryData(key, metadata);
+        yield* roundTripJson(
+          createContractHydrationRegistry(api),
+          server,
+          browser
+        );
+        expect(browser.getQueryData(key)).toStrictEqual(metadata);
+      })
+  );
+
+  it.effect(
+    "preserves top-level union members within one or several HTTP success declarations",
+    () =>
+      Effect.gen(function* preservesHttpUnionMembers() {
+        const Union = Schema.Union([Schema.BigInt, Schema.String]);
+        const api = HttpApi.make("unions").add(
+          HttpApiGroup.make("values").add(
+            HttpApiEndpoint.get("single", "/single", { success: Union }),
+            HttpApiEndpoint.get("multiple", "/multiple", {
+              success: [Union, HttpApiSchema.status(201)(Schema.Boolean)],
+            })
+          )
+        );
+        const client = yield* HttpApiClient.makeWith(api, {
+          baseUrl: "https://example.test",
+          httpClient: dummyHttpClient,
+        });
+        const { single, multiple } = createHttpApiQueryUtils(api, {
+          client,
+        }).values;
+        const server = new QueryClient();
+        const browser = new QueryClient();
+        server.setQueryData(single.queryKey(), "42");
+        server.setQueryData(multiple.queryKey(), "42");
+        server.setQueryData(single.metadataKey(), {
+          data: "42",
+          status: 200,
+          headers: {},
+        });
+        server.setQueryData(multiple.metadataKey(), {
+          data: 42n,
+          status: 200,
+          headers: {},
+        });
+        yield* roundTripJson(
+          createContractHydrationRegistry(api),
+          server,
+          browser
+        );
+        expect([
+          browser.getQueryData(single.queryKey()),
+          browser.getQueryData(multiple.queryKey()),
+          browser.getQueryData(single.metadataKey())?.data,
+          browser.getQueryData(multiple.metadataKey())?.data,
+        ]).toStrictEqual(["42", "42", "42", 42n]);
+      })
+  );
+
+  it.effect("preserves union members in HTTP NDJSON and SSE data views", () =>
+    Effect.gen(function* preservesHttpStreamUnionMembers() {
+      const Value = Schema.Union([Schema.BigInt, Schema.String]);
+      const api = HttpApi.make("stream-unions").add(
+        HttpApiGroup.make("values").add(
+          HttpApiEndpoint.get("ndjson", "/ndjson", {
+            success: HttpApiSchema.StreamNdjson({ schema: Value }),
+          }),
+          HttpApiEndpoint.get("sse", "/sse", {
+            success: HttpApiSchema.WithHeaders(
+              HttpApiSchema.StreamSse({ data: Value }),
+              { "x-stream-id": Schema.String }
+            ),
+          })
+        )
+      );
+      const client = yield* HttpApiClient.makeWith(api, {
+        baseUrl: "https://example.test",
+        httpClient: dummyHttpClient,
+      });
+      const { ndjson, sse } = createHttpApiQueryUtils(api, { client }).values;
+      const server = new QueryClient();
+      const browser = new QueryClient();
+      const wrapped = HttpApiSchema.withHeaders({
+        body: "42",
+        headers: { "x-stream-id": "s-1" },
+      });
+      const ndjsonStreamed = ndjson.streamedKey({ maxChunks: 4 });
+      const ndjsonLive = ndjson.liveKey();
+      const sseStreamed = sse.streamedKey({ maxChunks: 4 });
+      const sseLive = sse.liveKey();
+      server.setQueryData(ndjsonStreamed, [42n, "42"]);
+      server.setQueryData(ndjsonLive, "42");
+      server.setQueryData(sseStreamed, [wrapped]);
+      server.setQueryData(sseLive, wrapped);
+      yield* roundTripJson(
+        createContractHydrationRegistry(api),
+        server,
+        browser
+      );
+      expect([
+        browser.getQueryData(ndjsonStreamed),
+        browser.getQueryData(ndjsonLive),
+        browser.getQueryData(sseStreamed),
+        browser.getQueryData(sseLive),
+      ]).toStrictEqual([[42n, "42"], "42", [wrapped], wrapped]);
+    })
+  );
+
+  it("ignores inherited view overrides on accepted RPC and HTTP paths", () => {
+    const group = RpcGroup.make(Rpc.make("read", { success: Schema.String }));
+    const api = HttpApi.make("own-views").add(
+      HttpApiGroup.make("values", { topLevel: true }).add(
+        HttpApiEndpoint.get("read", "/value", { success: Schema.String })
+      )
+    );
+    const inherited = {
+      query: false,
+      infinite: { pageParam: Schema.Int },
+    };
+    const config = {};
+    Object.setPrototypeOf(config, { ...inherited, metadata: false });
+    const options = { paths: { read: config } };
+    const rpcRegistry = createContractHydrationRegistry(group, options);
+    const httpRegistry = createContractHydrationRegistry(api, options);
+    expect([
+      rpcRegistry.matches(["rpc", "read", "query"]),
+      httpRegistry.matches(["http", "own-views", "read", "query"]),
+      httpRegistry.matches(["http", "own-views", "read", "metadata"]),
+      rpcRegistry.matches(["rpc", "read", "infinite"]),
+      httpRegistry.matches(["http", "own-views", "read", "infinite"]),
+    ]).toStrictEqual([true, true, true, false, false]);
+  });
 
   it("reads hydration overrides only from own path properties", () => {
     const group = RpcGroup.make(
@@ -1045,6 +1298,61 @@ describe("eager validation & HydrationCodecError", () => {
 class DecodeSvc extends Context.Service<DecodeSvc, { readonly tag: string }>()(
   "ComposeDecodeSvc"
 ) {}
+
+const EncodeSvc = Context.Service<{ readonly offset: bigint }>(
+  "UnionEncodeSvc"
+);
+
+it.effect(
+  "round-trips an encoded-side union with separate Effect services",
+  () =>
+    Effect.gen(function* roundTripsTransformedUnion() {
+      const Value = Schema.Union([Schema.BigInt, Schema.String]);
+      const Transformed = Value.pipe(
+        Schema.decodeTo(
+          Schema.Struct({ value: Value }),
+          SchemaTransformation.transformEffect({
+            decode: (value) =>
+              DecodeSvc.pipe(
+                Effect.map(({ tag }) => ({
+                  value: Predicate.isString(value)
+                    ? value.slice(tag.length)
+                    : value - 1n,
+                }))
+              ),
+            encode: ({ value }) =>
+              EncodeSvc.pipe(
+                Effect.map(({ offset }) =>
+                  Predicate.isString(value)
+                    ? `${offset}${value}`
+                    : value + offset
+                )
+              ),
+          })
+        )
+      );
+      const group = RpcGroup.make(Rpc.make("read", { success: Transformed }));
+      const registry = createContractHydrationRegistry(group);
+      const key = ["rpc", "read", "query"];
+      const server = new QueryClient();
+      server.setQueryData(key, { value: "42" });
+      const snapshot = dehydrate(server);
+      const encoded = yield* registry
+        .encodeQueries(snapshot.queries)
+        .pipe(Effect.provideService(EncodeSvc, { offset: 1n }));
+      const json = JSON.stringify(encoded);
+      const strictJson = yield* Schema.decodeEffect(
+        Schema.fromJsonString(Schema.Json)
+      )(json);
+      expect(strictJson).toStrictEqual(encoded);
+      const decoded = yield* registry
+        .decodeQueries(encoded)
+        .pipe(Effect.provideService(DecodeSvc, { tag: "1" }));
+      const browser = new QueryClient();
+      hydrate(browser, { ...snapshot, queries: decoded });
+      expect(browser.getQueryData(key)).toStrictEqual({ value: "42" });
+    })
+);
 
 describe("composable createHydrationRegistry", () => {
   it.effect(

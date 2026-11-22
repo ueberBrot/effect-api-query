@@ -1,13 +1,14 @@
 import {
   Array as EffectArray,
+  Effect,
   Function,
   Predicate,
   Schema,
   SchemaAST,
+  SchemaParser,
   SchemaTransformation,
 } from "effect";
-import { HttpApiSchema } from "effect/http-api";
-import type { HttpApi } from "effect/http-api";
+import { HttpApi, HttpApiSchema } from "effect/http-api";
 import { Rpc, RpcSchema } from "effect/rpc";
 import type { RpcGroup } from "effect/rpc";
 
@@ -63,6 +64,9 @@ const freezeMetadata = (data: unknown): unknown => {
     ? data
     : Object.freeze({ ...data, headers: snapshot });
 };
+
+const readOwn = (record: Record<string, unknown>, key: string) =>
+  Object.hasOwn(record, key) ? record[key] : undefined;
 
 const normalizeKeyPrefix = (
   options: Record<string, unknown> | undefined
@@ -305,6 +309,24 @@ const toJsonCodecSafe = (
   }
 };
 
+const deriveJsonCodec = (
+  schema: Schema.Top,
+  path: string,
+  view: QueryView
+): Schema.Top => {
+  const derived = toJsonCodecSafe(schema, path, view);
+  assertEncodable(derived, path, view);
+  if (schema.ast.encoding !== undefined) {
+    const encoded = Schema.toEncoded(schema);
+    if (SchemaAST.isUnion(encoded.ast)) {
+      return protectUnion(toJsonCodecSafe(encoded, path, view)).pipe(
+        Schema.decodeTo(schema)
+      );
+    }
+  }
+  return derived;
+};
+
 const stripTopLevelUndefined = (
   ast: SchemaAST.AST
 ): SchemaAST.AST | undefined => {
@@ -351,7 +373,7 @@ const toTop = (schema: Schema.Constraint): Schema.Top =>
 const tagCodec = (tag: number | string, codec: Schema.Top): Schema.Top =>
   Schema.Tuple([Schema.Literal(tag), codec]).pipe(
     Schema.decodeTo(
-      Schema.toType(codec),
+      Schema.Unknown,
       SchemaTransformation.transform({
         decode: ([, value]) => value,
         encode: (value) => [tag, value] as const,
@@ -359,15 +381,78 @@ const tagCodec = (tag: number | string, codec: Schema.Top): Schema.Top =>
     )
   );
 
+const preferExactMembers = <DecodingServices, EncodingServices>(
+  union: Schema.Codec<unknown, unknown, DecodingServices, EncodingServices>
+): Schema.Top => {
+  const encode = SchemaParser.encodeUnknownEffect(union, {});
+  const decode = SchemaParser.decodeUnknownEffect(union, {});
+  return Schema.Unknown.pipe(
+    Schema.decodeTo(
+      Schema.Unknown,
+      SchemaTransformation.transformEffect({
+        decode,
+        encode: (value, options) =>
+          options.onExcessProperty === "error"
+            ? encode(value, options)
+            : encode(value, { ...options, onExcessProperty: "error" }).pipe(
+                Effect.catch(() => encode(value, options))
+              ),
+      })
+    )
+  );
+};
+
+const protectUnion = (codec: Schema.Top): Schema.Top => {
+  const preserveUnionMembers = Function.memoize(
+    (ast: SchemaAST.AST): SchemaAST.AST => {
+      if (ast.encoding !== undefined) {
+        return ast;
+      }
+      if (SchemaAST.isSuspend(ast)) {
+        return new SchemaAST.Suspend(
+          () => preserveUnionMembers(ast.thunk()),
+          ast.annotations,
+          ast.checks,
+          ast.encoding,
+          ast.context
+        );
+      }
+      if (!SchemaAST.isUnion(ast) || ast.types.length < 2) {
+        return ast;
+      }
+      const members = ast.types.map(
+        (member, index) =>
+          tagCodec(index, Schema.make<Schema.Top>(preserveUnionMembers(member)))
+            .ast
+      );
+      const union = Schema.make<Schema.Top>(
+        new SchemaAST.Union(
+          members,
+          ast.options,
+          ast.annotations,
+          ast.checks,
+          undefined,
+          undefined,
+          ast.encodingChecks
+        )
+      );
+      return preferExactMembers(union).ast;
+    }
+  );
+  return Schema.make<Schema.Top>(preserveUnionMembers(codec.ast));
+};
+
 const adaptStreamedElement = (codec: Schema.Top): Schema.Top => {
   if (!acceptsUndefined(codec.ast)) {
-    return codec;
+    return protectUnion(codec);
   }
   const withoutUndefined = stripTopLevelUndefined(codec.ast);
   if (withoutUndefined === undefined) {
     return UndefinedElementCodec;
   }
-  const nonUndefinedCodec = toTop(Schema.make(withoutUndefined));
+  const nonUndefinedCodec = protectUnion(
+    Schema.make<Schema.Top>(withoutUndefined)
+  );
   return Schema.Union([
     UndefinedElementCodec,
     tagCodec("value", nonUndefinedCodec),
@@ -376,13 +461,13 @@ const adaptStreamedElement = (codec: Schema.Top): Schema.Top => {
 
 const adaptQueryData = (codec: Schema.Top): Schema.Top => {
   if (!acceptsUndefined(codec.ast)) {
-    return codec;
+    return protectUnion(codec);
   }
   const withoutUndefined = stripTopLevelUndefined(codec.ast);
   if (withoutUndefined === undefined) {
     return Schema.Null;
   }
-  const nonUndefined = toTop(Schema.make(withoutUndefined));
+  const nonUndefined = protectUnion(Schema.make<Schema.Top>(withoutUndefined));
   return acceptsNull(codec.ast)
     ? nonUndefined
     : Schema.Union([
@@ -391,10 +476,13 @@ const adaptQueryData = (codec: Schema.Top): Schema.Top => {
       ]);
 };
 
-const makeMetadataCodec = (dataCodec: Schema.Top): Schema.Top =>
+const makeMetadataCodec = (
+  dataCodec: Schema.Top,
+  status: Schema.Top = Schema.Finite
+): Schema.Top =>
   Schema.Struct({
+    status,
     data: dataCodec,
-    status: Schema.Finite,
     headers: Schema.Record(Schema.String, Schema.String),
   });
 
@@ -418,13 +506,15 @@ const deriveBufferedMemberCodec = (
 ): Schema.Top => {
   if (HttpApiSchema.isWithHeaders(schema)) {
     const bodyCodec = deriveBufferedMemberCodec(schema.schema, path, view);
-    const headersCodec = toJsonCodecSafe(schema.headers, path, view);
-    assertEncodable(headersCodec, path, view);
+    const headersCodec = deriveJsonCodec(schema.headers, path, view);
     const adaptedBody =
       acceptsUndefined(bodyCodec.ast) && acceptsNull(bodyCodec.ast)
         ? adaptStreamedElement(bodyCodec)
-        : bodyCodec;
-    return Schema.Struct({ body: adaptedBody, headers: headersCodec }).pipe(
+        : protectUnion(bodyCodec);
+    return Schema.Struct({
+      body: adaptedBody,
+      headers: protectUnion(headersCodec),
+    }).pipe(
       Schema.decodeTo(
         Schema.toType(schema),
         SchemaTransformation.transform({
@@ -441,13 +531,9 @@ const deriveBufferedMemberCodec = (
     );
   }
   if (HttpApiSchema.getEncodeToWithHeadersParts(schema) !== undefined) {
-    const typeCodec = toJsonCodecSafe(Schema.toType(schema), path, view);
-    assertEncodable(typeCodec, path, view);
-    return typeCodec;
+    return deriveJsonCodec(Schema.toType(schema), path, view);
   }
-  const derived = toJsonCodecSafe(schema, path, view);
-  assertEncodable(derived, path, view);
-  return derived;
+  return deriveJsonCodec(schema, path, view);
 };
 
 const deriveHttpBufferedCodec = (
@@ -463,7 +549,29 @@ const deriveHttpBufferedCodec = (
   const [first] = memberCodecs;
   return memberCodecs.length === 1 && first !== undefined
     ? first
-    : Schema.Union(memberCodecs.map((codec, index) => tagCodec(index, codec)));
+    : preferExactMembers(
+        Schema.Union(memberCodecs.map((codec, index) => tagCodec(index, codec)))
+      );
+};
+
+const deriveHttpMetadataCodec = (
+  successes: ReadonlyMap<number, readonly Schema.Top[]>,
+  path: string
+): Schema.Top => {
+  if (successes.size === 1) {
+    const [members] = successes.values();
+    return makeMetadataCodec(
+      deriveHttpBufferedCodec(members ?? [], path, "metadata")
+    );
+  }
+  return Schema.Union(
+    [...successes].map(([status, members]) =>
+      makeMetadataCodec(
+        deriveHttpBufferedCodec(members, path, "metadata"),
+        Schema.Literal(status)
+      )
+    )
+  );
 };
 
 const extractHttpStreamChunkSchema = (
@@ -476,20 +584,17 @@ const extractHttpStreamChunkSchema = (
       streamSchema.sseMode === "data" &&
       Predicate.hasProperty(streamSchema.events, "fields") &&
       Predicate.isObject(streamSchema.events.fields) &&
-      Schema.isSchema(streamSchema.events.fields["data"])
+      Predicate.hasProperty(streamSchema.events.fields["data"], "to") &&
+      Schema.isSchema(streamSchema.events.fields["data"].to)
     ) {
-      const dataField = streamSchema.events.fields["data"];
-      assertEncodable(dataField, path, view);
-      return dataField;
+      const dataCodec = streamSchema.events.fields["data"].to;
+      assertEncodable(dataCodec, path, view);
+      return dataCodec;
     }
-    const eventsCodec = toJsonCodecSafe(toTop(streamSchema.events), path, view);
-    assertEncodable(eventsCodec, path, view);
-    return eventsCodec;
+    return deriveJsonCodec(toTop(streamSchema.events), path, view);
   }
   if (isStreamNdjson(streamSchema)) {
-    const innerCodec = toJsonCodecSafe(streamSchema.schema, path, view);
-    assertEncodable(innerCodec, path, view);
-    return innerCodec;
+    return deriveJsonCodec(streamSchema.schema, path, view);
   }
   throw new HydrationCodecError("UnencodableSchema", {
     path,
@@ -509,15 +614,14 @@ const deriveHttpStreamCodec = (
       path,
       view
     );
-    const headersCodec = toJsonCodecSafe(successSchema.headers, path, view);
-    assertEncodable(headersCodec, path, view);
+    const headersCodec = deriveJsonCodec(successSchema.headers, path, view);
     const adaptedChunk =
       acceptsUndefined(chunkCodec.ast) && acceptsNull(chunkCodec.ast)
         ? adaptStreamedElement(chunkCodec)
-        : chunkCodec;
+        : protectUnion(chunkCodec);
     const wrapped = Schema.Struct({
       body: adaptedChunk,
-      headers: headersCodec,
+      headers: protectUnion(headersCodec),
     }).pipe(
       Schema.decodeTo(
         Schema.toType(
@@ -637,17 +741,16 @@ const extractInfiniteConfig = (
   if (infinite === undefined || infinite === false) {
     return undefined;
   }
-  if (
-    !Predicate.isObject(infinite) ||
-    !Schema.isSchema(infinite["pageParam"])
-  ) {
+  const config = Predicate.isObject(infinite) ? infinite : {};
+  const pageParam = readOwn(config, "pageParam");
+  if (!Schema.isSchema(pageParam)) {
     throw new HydrationCodecError("InvalidContractPath", {
       path,
       view: "infinite",
       message: `Infinite hydration config for "${path}" requires a pageParam schema`,
     });
   }
-  const { page } = infinite;
+  const page = readOwn(config, "page");
   if (page !== undefined && !Schema.isSchema(page)) {
     throw new HydrationCodecError("InvalidContractPath", {
       path,
@@ -655,9 +758,7 @@ const extractInfiniteConfig = (
       message: `Infinite hydration page override for "${path}" must be a Schema`,
     });
   }
-  return page === undefined
-    ? { pageParam: infinite["pageParam"] }
-    : { pageParam: infinite["pageParam"], page };
+  return page === undefined ? { pageParam } : { pageParam, page };
 };
 
 const resolvePathConfigObject = (
@@ -689,7 +790,8 @@ const registerStreamViews = (
   deriveLive: () => Schema.Top,
   deriveStreamed: () => Schema.Top
 ): void => {
-  const { live: liveConfig, streamed: streamedConfig } = config;
+  const liveConfig = readOwn(config, "live");
+  const streamedConfig = readOwn(config, "streamed");
   if (liveConfig !== false) {
     if (Schema.isSchema(liveConfig)) {
       codecs.push(
@@ -737,11 +839,8 @@ const collectRpcOperationCodecs = (
   if (RpcSchema.isStreamSchema(rpc.successSchema)) {
     validatePathConfigKeys(path, config, rpcStreamKeys);
     const chunkSchema = rpc.successSchema.success;
-    const deriveChunk = (view: "live" | "streamed") => {
-      const derived = toJsonCodecSafe(chunkSchema, path, view);
-      assertEncodable(derived, path, view);
-      return derived;
-    };
+    const deriveChunk = (view: "live" | "streamed") =>
+      deriveJsonCodec(chunkSchema, path, view);
     registerStreamViews(
       codecs,
       operationPrefix,
@@ -754,13 +853,11 @@ const collectRpcOperationCodecs = (
   }
 
   validatePathConfigKeys(path, config, rpcUnaryKeys);
-  const deriveUnary = (view: "query" | "infinite") => {
-    const derived = toJsonCodecSafe(rpc.successSchema, path, view);
-    assertEncodable(derived, path, view);
-    return adaptQueryData(derived);
-  };
+  const deriveUnary = (view: "query" | "infinite") =>
+    adaptQueryData(deriveJsonCodec(rpc.successSchema, path, view));
 
-  const { query: queryConfig, infinite: infiniteConfig } = config;
+  const queryConfig = readOwn(config, "query");
+  const infiniteConfig = readOwn(config, "infinite");
   const customQuery = Schema.isSchema(queryConfig) ? queryConfig : undefined;
   if (queryConfig !== false) {
     if (customQuery !== undefined) {
@@ -841,10 +938,7 @@ const buildRpcContractRegistry = (
   const rootPrefix = [...keyPrefix, "rpc"];
 
   for (const { path, segments, rpc } of operations) {
-    const config = resolvePathConfigObject(
-      path,
-      Object.hasOwn(paths, path) ? paths[path] : undefined
-    );
+    const config = resolvePathConfigObject(path, readOwn(paths, path));
     if (config === false) {
       continue;
     }
@@ -866,6 +960,7 @@ const collectHttpOperationCodecs = (
   operationPrefix: readonly JsonValue[],
   path: string,
   classified: QueryableHttpEndpoint,
+  successesByStatus: ReadonlyMap<number, readonly Schema.Top[]>,
   config: Record<string, unknown>,
   views: ReadonlyMap<string, boolean>
 ): void => {
@@ -883,14 +978,12 @@ const collectHttpOperationCodecs = (
   }
 
   validatePathConfigKeys(path, config, httpBufferedKeys);
-  const deriveBuffered = (view: "query" | "metadata" | "infinite") =>
+  const deriveBuffered = (view: "query" | "infinite") =>
     deriveHttpBufferedCodec(classified.successes, path, view);
 
-  const {
-    query: queryConfig,
-    metadata: metadataConfig,
-    infinite: infiniteConfig,
-  } = config;
+  const queryConfig = readOwn(config, "query");
+  const metadataConfig = readOwn(config, "metadata");
+  const infiniteConfig = readOwn(config, "infinite");
   const customQuery = Schema.isSchema(queryConfig) ? queryConfig : undefined;
   if (queryConfig !== false) {
     if (customQuery !== undefined) {
@@ -920,11 +1013,14 @@ const collectHttpOperationCodecs = (
         )
       );
     } else if (views.get("metadata") !== false) {
-      const dataCodec = customQuery ?? deriveBuffered("metadata");
+      const metadataCodec =
+        customQuery === undefined
+          ? deriveHttpMetadataCodec(successesByStatus, path)
+          : makeMetadataCodec(customQuery);
       codecs.push(
         compileHydrationCodec(
           Object.freeze([...operationPrefix, "metadata"]),
-          asCodec(makeMetadataCodec(dataCodec)),
+          asCodec(metadataCodec),
           { postDecode: freezeMetadata }
         )
       );
@@ -983,17 +1079,19 @@ const buildHttpContractRegistry = (
     readonly path: string;
     readonly segments: readonly string[];
     readonly classified: QueryableHttpEndpoint;
+    readonly successesByStatus: ReadonlyMap<number, readonly Schema.Top[]>;
   }[] = [];
 
-  for (const group of Object.values(api.groups)) {
-    for (const endpoint of Object.values(group.endpoints)) {
+  HttpApi.reflect(api, {
+    onGroup: Function.constVoid,
+    onEndpoint: ({ group, endpoint, successes }) => {
       const classified = classifyHttpEndpoint(endpoint);
       if (
         classified === undefined ||
         classified.kind === "Mutation" ||
         classified.kind === "ContradictoryMultipart"
       ) {
-        continue;
+        return;
       }
       const segments = group.topLevel
         ? [endpoint.identifier]
@@ -1001,9 +1099,14 @@ const buildHttpContractRegistry = (
       const path = group.topLevel
         ? endpoint.identifier
         : `${group.identifier}.${endpoint.identifier}`;
-      operations.push({ path, segments, classified });
-    }
-  }
+      operations.push({
+        path,
+        segments,
+        classified,
+        successesByStatus: successes,
+      });
+    },
+  });
 
   validateSegments(operations);
   validateHttpPaths(operations, paths);
@@ -1011,11 +1114,8 @@ const buildHttpContractRegistry = (
   const codecs: CompiledHydrationCodec[] = [];
   const rootPrefix = [...keyPrefix, "http", api.identifier];
 
-  for (const { path, segments, classified } of operations) {
-    const config = resolvePathConfigObject(
-      path,
-      Object.hasOwn(paths, path) ? paths[path] : undefined
-    );
+  for (const { path, segments, classified, successesByStatus } of operations) {
+    const config = resolvePathConfigObject(path, readOwn(paths, path));
     if (config === false) {
       continue;
     }
@@ -1024,6 +1124,7 @@ const buildHttpContractRegistry = (
       [...rootPrefix, ...segments],
       path,
       classified,
+      successesByStatus,
       config,
       views
     );

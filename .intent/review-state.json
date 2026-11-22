@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "7438a2d0e0928658c883483ba578d03f61bb626556e37c8e526ccc176a16c3b6",
+      "fingerprint": "429bfc7719b9bcd64bf92b226a511980804b708d98155910a6142a539a1bd40f",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -31,7 +31,7 @@
         "apps/docs/src/content/docs/guides/handle-failures.md": "56eee50db2863ebf2d197ab8b3305a54530ee85796b9b0e078a5f0b9081b0988",
         "apps/docs/src/content/docs/guides/http-metadata.md": "e07f1aab249005e6c4008c47ee90f0c73590513610cde475348fb5a98deb7147",
         "apps/docs/src/content/docs/guides/http-queries-and-mutations.md": "8a8b390f98a016b1266b8a89d6724be26133834ac5532cc3a354ac6ac81f547d",
-        "apps/docs/src/content/docs/guides/hydrate-query-views.md": "4e1668babc8bf191b87d678d7fa511cdeb47a640ce4b73adcbe1b7c856db7208",
+        "apps/docs/src/content/docs/guides/hydrate-query-views.md": "1fb3d31ac8a1d7c0aee516d85dbddcddcf695a2670661a515c1872c517cd5027",
         "apps/docs/src/content/docs/guides/hydrate-unary-data.md": "d2667c626e6f83ad0bb5f5adf8183f7a456d9369bd0b9887f3d8e6faecf55246",
         "apps/docs/src/content/docs/guides/loader-descriptors.md": "09e75c85d5952b5a5d045620ed7e7f49b31194d3dad3874df751344c610bf540",
         "apps/docs/src/content/docs/guides/mutations.md": "46841822ce1b757903a6aa12d3bd4e7e61ec7fd006c95fe08a4f8a0e207caecb",
@@ -207,7 +207,7 @@
         "skills/effect-api-query/references/cache-workflows.md": "c95adec9719783c668ce5dd2ca92bd6ffdace53481a5db62ab93972b955da678",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "c935bcd818c7266d45cade2a9b514cbac5907415e5787d742379bfaae4c4da97",
         "skills/effect-api-query/references/http.md": "8365345e9e1ee86f0e34d3612fb7324ca32789b725b891605888fd0ad0bdc709",
-        "skills/effect-api-query/references/hydration-and-ssr.md": "e09b52a8023c7870afc184702792fd5f18e5e424449d0c4610e23c7e21c6bc2c",
+        "skills/effect-api-query/references/hydration-and-ssr.md": "7362694a36895a967fee284a8c327ad40b3c9a3ea1bbc930e4d0c187dfa029e4",
         "skills/effect-api-query/references/query-patterns.md": "00fd65b2d5ceae32c60f2b5ab9dde405d3db33640054b10c3e13135c521b7074",
         "skills/effect-api-query/references/rpc.md": "d5bc0d199249ef185f1cd532e282d95788807def0e18bc5f175730534aa2ed68",
         "src/core/branch-filter.ts": "da18cded0a176b20e6056b74bd52e70fb8ec588346beabb01fe1f2d4f1a8b1e3",
@@ -216,7 +216,7 @@
         "src/core/configure.ts": "277f1d1201be35962d6b75c3e9f4074e7f4798456d515ddbd23d7dc3bf6693cf",
         "src/core/consume-events.ts": "648144582c4bdbf4a9cb0d35ddc54327abbefc654f2d37b6154232bcd09a1752",
         "src/core/contract-hydration-types.ts": "731e037c608464412d901327d6e12663d9504079c3599b8a024a920ae8290896",
-        "src/core/contract-hydration.ts": "51c8f43a969509d1605da3aaf9923a80831ae89e8cfaa9700ea60a876758aaaa",
+        "src/core/contract-hydration.ts": "5ba671e9f62d2d31bcd3a843ddadfe988c4b00b2ba42e40fe2a4bb1b6582fc59",
         "src/core/declared-error.ts": "72146f75dc4f99abb60c143ae4464abf6a512cd5ffe713597bb3fb967f58c7a0",
         "src/core/hydration.ts": "08c812094bb4662cdf118b1825a47a4ec4bc1e4bd248a878726cbd4ff31aaf1e",
         "src/core/inference.ts": "249bc1d59e4ea6ddc7e3a09a63b93c13e3805f9d70ead00f44c710ff95e4df94",
@@ -259,7 +259,7 @@
         "src/rpc/types.ts": "546fc5c5cf1b89c81adce716bb585d5561ee064a0da3552ed6996f311083b285",
         "tests/cache-recipes.test.ts": "39cb580ca6cd726ce58a93699fe1b14f697bafc7cac9fc9b4b76a539e73d6c1a",
         "tests/configuration-composition.test.ts": "be2ffca6e62965d8b79a311998787f74565d4af86bcaec46c36f5a963b0d16f5",
-        "tests/contract-hydration.test.ts": "09a80e7defcba82bb6d05bfacdeed0db60a3cf4d234ba1df1eac1f3cbe21f25f",
+        "tests/contract-hydration.test.ts": "247c21b0161758c68d55bf3ff9129440437ae4e99c2348008c77570039ecf8bc",
         "tests/contract-reuse.test.ts": "21b97cec6da64d3a42d58e69aaad1754aaec2bb4dd1ac876ef25ec801f970a12",
         "tests/create-http-api-query-utils.test.ts": "0d13f2b74a760c10d34f9f561a808a24ee7f59401e8434709220b61f6d048e6f",
         "tests/create-rpc-query-utils-configuration.test.ts": "3c6f5f8d77643dc7ae3c535cc2a78a3f8b3d7bddcf5de263d9944c217a58e839",
@@ -402,20 +402,20 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "8130b77811f823794a7e9dcfc104a40556f5eb3a",
+      "head": "1788d68b7031acf190e9cceec26aee916521802e",
       "outcome": "updated",
-      "reason": "The cache reference now documents stream policy matching with configured defaults, and the hydration reference describes paired registries and preserving decoded variants and stream elements.",
+      "reason": "Describe status-based selection for HTTP metadata, top-level union hydration, and own-property view overrides. The guidance points to a custom codec for ambiguous unions inside object fields.",
       "evidence": [
-        "Compared base 8130b77 with src/core/utility-tree.ts, src/core/contract-hydration.ts, and src/http/endpoint.ts. All 127 focused runtime tests, both public compilers, docs-check, skills-check, and bundle-baseline passed. Fresh consumer evidence is unverified."
+        "Compared 1788d68 with src/core/contract-hydration.ts and tests/contract-hydration.test.ts. Seven new public regressions fail on the base. All 27 focused hydration tests pass with the fix, including header wrappers, binary data, normalized null, and separate Effect services. Scoped skills-check and project typecheck pass. Fresh consumer-agent verification remains unverified."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "4be535a44d6864e107a9c8e4cfac5f38713e170bbb826571ad9b8da3d7e6454e",
+      "fingerprint": "0878264b9b9779386395bb03bea53d7898e21c0a69f3726c20737969f8205539",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
-        "_artifacts/domain_map.yaml": "122a07547c105d145f788a74a2ce541679749f060bff1b1a314c17e7d87137c0",
-        "_artifacts/skill_spec.md": "f385212cfb0949672250aefbd8596285e50c97cde412f41c0d0da32c7a4d5658",
+        "_artifacts/domain_map.yaml": "00a98dbc0741269f5da4da36a3fea2d04f7d39c3faf8ea13c085d9ae3c55f88e",
+        "_artifacts/skill_spec.md": "ed33f247e41e5d410c433477ccefd5ad6840571dc2493079532cd3eee6501b4e",
         "_artifacts/skill_tree.yaml": "16f542e7682b84596d15b066716f06a2657fdffd14bab445279b409e7e1baa32",
         "apps/docs/astro.config.mts": "35bd7d7706e004e3e708a82614e825c7fde0ee1aea6624843ba8cc57f70c2c5c",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "7bd278881a3163cd900fccdf9a85724c8a033ff62092aeecc17f13400e89b861",
@@ -441,7 +441,7 @@
         "apps/docs/src/content/docs/guides/handle-failures.md": "56eee50db2863ebf2d197ab8b3305a54530ee85796b9b0e078a5f0b9081b0988",
         "apps/docs/src/content/docs/guides/http-metadata.md": "e07f1aab249005e6c4008c47ee90f0c73590513610cde475348fb5a98deb7147",
         "apps/docs/src/content/docs/guides/http-queries-and-mutations.md": "8a8b390f98a016b1266b8a89d6724be26133834ac5532cc3a354ac6ac81f547d",
-        "apps/docs/src/content/docs/guides/hydrate-query-views.md": "4e1668babc8bf191b87d678d7fa511cdeb47a640ce4b73adcbe1b7c856db7208",
+        "apps/docs/src/content/docs/guides/hydrate-query-views.md": "1fb3d31ac8a1d7c0aee516d85dbddcddcf695a2670661a515c1872c517cd5027",
         "apps/docs/src/content/docs/guides/hydrate-unary-data.md": "d2667c626e6f83ad0bb5f5adf8183f7a456d9369bd0b9887f3d8e6faecf55246",
         "apps/docs/src/content/docs/guides/loader-descriptors.md": "09e75c85d5952b5a5d045620ed7e7f49b31194d3dad3874df751344c610bf540",
         "apps/docs/src/content/docs/guides/mutations.md": "46841822ce1b757903a6aa12d3bd4e7e61ec7fd006c95fe08a4f8a0e207caecb",
@@ -617,7 +617,7 @@
         "skills/effect-api-query/references/cache-workflows.md": "c95adec9719783c668ce5dd2ca92bd6ffdace53481a5db62ab93972b955da678",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "c935bcd818c7266d45cade2a9b514cbac5907415e5787d742379bfaae4c4da97",
         "skills/effect-api-query/references/http.md": "8365345e9e1ee86f0e34d3612fb7324ca32789b725b891605888fd0ad0bdc709",
-        "skills/effect-api-query/references/hydration-and-ssr.md": "e09b52a8023c7870afc184702792fd5f18e5e424449d0c4610e23c7e21c6bc2c",
+        "skills/effect-api-query/references/hydration-and-ssr.md": "7362694a36895a967fee284a8c327ad40b3c9a3ea1bbc930e4d0c187dfa029e4",
         "skills/effect-api-query/references/query-patterns.md": "00fd65b2d5ceae32c60f2b5ab9dde405d3db33640054b10c3e13135c521b7074",
         "skills/effect-api-query/references/rpc.md": "d5bc0d199249ef185f1cd532e282d95788807def0e18bc5f175730534aa2ed68",
         "src/core/branch-filter.ts": "da18cded0a176b20e6056b74bd52e70fb8ec588346beabb01fe1f2d4f1a8b1e3",
@@ -626,7 +626,7 @@
         "src/core/configure.ts": "277f1d1201be35962d6b75c3e9f4074e7f4798456d515ddbd23d7dc3bf6693cf",
         "src/core/consume-events.ts": "648144582c4bdbf4a9cb0d35ddc54327abbefc654f2d37b6154232bcd09a1752",
         "src/core/contract-hydration-types.ts": "731e037c608464412d901327d6e12663d9504079c3599b8a024a920ae8290896",
-        "src/core/contract-hydration.ts": "51c8f43a969509d1605da3aaf9923a80831ae89e8cfaa9700ea60a876758aaaa",
+        "src/core/contract-hydration.ts": "5ba671e9f62d2d31bcd3a843ddadfe988c4b00b2ba42e40fe2a4bb1b6582fc59",
         "src/core/declared-error.ts": "72146f75dc4f99abb60c143ae4464abf6a512cd5ffe713597bb3fb967f58c7a0",
         "src/core/hydration.ts": "08c812094bb4662cdf118b1825a47a4ec4bc1e4bd248a878726cbd4ff31aaf1e",
         "src/core/inference.ts": "249bc1d59e4ea6ddc7e3a09a63b93c13e3805f9d70ead00f44c710ff95e4df94",
@@ -669,7 +669,7 @@
         "src/rpc/types.ts": "546fc5c5cf1b89c81adce716bb585d5561ee064a0da3552ed6996f311083b285",
         "tests/cache-recipes.test.ts": "39cb580ca6cd726ce58a93699fe1b14f697bafc7cac9fc9b4b76a539e73d6c1a",
         "tests/configuration-composition.test.ts": "be2ffca6e62965d8b79a311998787f74565d4af86bcaec46c36f5a963b0d16f5",
-        "tests/contract-hydration.test.ts": "09a80e7defcba82bb6d05bfacdeed0db60a3cf4d234ba1df1eac1f3cbe21f25f",
+        "tests/contract-hydration.test.ts": "247c21b0161758c68d55bf3ff9129440437ae4e99c2348008c77570039ecf8bc",
         "tests/contract-reuse.test.ts": "21b97cec6da64d3a42d58e69aaad1754aaec2bb4dd1ac876ef25ec801f970a12",
         "tests/create-http-api-query-utils.test.ts": "0d13f2b74a760c10d34f9f561a808a24ee7f59401e8434709220b61f6d048e6f",
         "tests/create-rpc-query-utils-configuration.test.ts": "3c6f5f8d77643dc7ae3c535cc2a78a3f8b3d7bddcf5de263d9944c217a58e839",
@@ -812,11 +812,11 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "8130b77811f823794a7e9dcfc104a40556f5eb3a",
+      "head": "1788d68b7031acf190e9cceec26aee916521802e",
       "outcome": "updated",
-      "reason": "The domain map covers policy matching and lossless hydration, the skill spec records the review fixes, and the skill tree maps ADR 0054 to the existing skill.",
+      "reason": "The domain map and skill spec record status selection, top-level union members, own-property options, and the scope of verification. The existing skill tree maps the affected source, public tests, and documentation.",
       "evidence": [
-        "Reviewed the map, spec, and tree against both shipped references and ADRs 0051 and 0054. Intent sync and skills-check passed. Public cache, JSON round-trip, and documentation checks passed."
+        "Reviewed all three planning records against the hydration guide and shipped hydration reference. Intent sync found no metadata changes. The scoped skill validation and 27 focused runtime cases pass."
       ]
     },
     "source:vite.config.ts": {
