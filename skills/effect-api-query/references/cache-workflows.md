@@ -32,7 +32,7 @@ export const users = RpcGroup.make(
 );
 
 export function userCache(
-  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof users>>
+  client: RpcClient.RpcClient<RpcGroup.Rpcs<typeof users>>
 ) {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
@@ -127,7 +127,7 @@ export const directory = RpcGroup.make(
 );
 
 export function userPolicies(
-  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof directory>>
+  client: RpcClient.RpcClient<RpcGroup.Rpcs<typeof directory>>
 ) {
   const rpc = createRpcQueryUtils(directory, {
     client,
@@ -161,7 +161,7 @@ Use the same contract to run an authorization check before writing.
 
 ```ts
 export function authorizedRename(
-  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof directory>>,
+  client: RpcClient.RpcClient<RpcGroup.Rpcs<typeof directory>>,
   authorize: (id: number) => Promise<void>
 ) {
   const rpc = createRpcQueryUtils(directory, {
@@ -260,19 +260,19 @@ Interrupt the fiber to stop its wait on shared work. Use `cancel` to stop the sh
 
 Use `acquireQueryOwner` to create independent query and mutation caches and register resources. Supplied caches contribute their callback configuration. Await each `setup.acquire(start, release)` in order. Releases run in reverse order, even if setup fails. Use `setup.borrow(value)` when the caller retains ownership.
 
-Wrap the runner with `setup.wrapRunner`. For each used view, configure an interceptor that calls `setup.runQuery(next, context.signal)`. This tracks the complete function because stream pulls outlast iterable creation. See [React setup](https://ueberbrot.github.io/effect-api-query/guides/react-query/) and [retirement](https://ueberbrot.github.io/effect-api-query/guides/switch-cache-owners/#opt-in-owner-helper).
+Call `setup.trackUtils(utils)` or `owner.trackUtils(utils)` once. This tracks the leaf runner, full query functions including stream pulls, and generated mutation functions. Apply `configureUtils` in either order. Use `owner.wrapRunner(runtime)` for custom execution outside the tree. See [React setup](https://ueberbrot.github.io/effect-api-query/guides/react-query/) and [retirement](https://ueberbrot.github.io/effect-api-query/guides/switch-cache-owners/#opt-in-owner-helper).
 
 Use `owner.runMutation(() => mutation.mutateAsync(input))` to wait for the request and awaited callbacks. Wrapping `mutationFn` only tracks that attempt. Use `networkMode: "always"` and `retry: false` for immediate attempts. Offline queues need an app policy. A runner that starts after retirement rejects even inside an accepted mutation.
 
 Use `owner.commit` for synchronous late writes and `isActive()` for other side effects. Unmount, dispose, then acquire and mount the replacement. Disposal stops admission, cancels queries, waits for tracked work, clears caches, and releases acquired resources. Repeated calls share the result. It reports pending failures and attempts all releases. Borrowed resources stay open. A stalled finalizer delays disposal.
 
-Pass the native signal to `runQuery` and track every view you use, including HTTP metadata. Disposal ignores ordinary interruption of cancelled work. Typed failures and finalizer defects still surface.
+For custom work tracked with `runQuery`, forward the native signal. Disposal ignores ordinary interruption of cancelled work. Typed failures and finalizer defects still surface.
 
 ## Scoped event consumption
 
-Run `runQueryEvents(owner, source, options, runPromiseExit)` with your source and optional recovery. Map events to exact updates and filter invalidation. The helper supplies the owner's cache to the source and hooks. It awaits each handler. Inspect the complete Exit. Admission or runner rejection stays a rejected Promise.
+Run `runQueryEvents(owner, source, options, runner)` with your source and optional recovery. Map events to exact updates and filter invalidation. The helper supplies the owner's cache to the source and hooks. It awaits each handler. Inspect the complete Exit. Admission or runner rejection stays a rejected Promise.
 
-Keep the runner signal-aware and await its finalizers. Retirement stops consumption, backoff, and refresh. Use the original owner's guard for external writes. If refresh starts shared native queries, track both their runners and complete executions. See [scoped event consumption](https://ueberbrot.github.io/effect-api-query/guides/scoped-event-cache/).
+Keep the runner signal-aware and await its finalizers. Retirement stops consumption, backoff, and refresh. Use the original owner's guard for external writes. If refresh starts native queries, use the owner’s tracked utilities. See [scoped event consumption](https://ueberbrot.github.io/effect-api-query/guides/scoped-event-cache/).
 
 Recovery advances before downstream handling. A handler failure stops delivery. Earlier writes remain. Persist processing checkpoints under app policy. After replay expiry, return the refreshed snapshot's cursor. Keep bounded event history only if the UI needs it.
 

@@ -13,7 +13,7 @@ The package supports Effect `>=4.1.4 <4.2.0` and Query Core `>=5.107.1 <6`. With
 
 Use ESM, an environment that supports ES2022, and TypeScript with `strict: true`. See [compatibility and limits](/effect-api-query/reference/compatibility-and-limits/#requirements-and-tested-integrations) for compiler and framework versions.
 
-If you use React, install React Query. Keep the app and wrapper on the same resolved Query Core version.
+For React wiring, import `@ueberbrot/effect-api-query/react`. That subpath uses optional peers React `^18 || ^19` and React Query `>=5.107.1 <6`. The root entry point works without either package. Keep your app and wrapper on the same resolved Query Core version.
 
 ```sh
 pnpm add @tanstack/react-query

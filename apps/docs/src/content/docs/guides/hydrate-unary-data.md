@@ -50,7 +50,7 @@ export class Profile extends Schema.Class<
 
 Pair `serializeData: Schema.encodeUnknownSync(Profile)` on the server with `defaultOptions: { deserializeData: Schema.decodeUnknownSync(Profile) }` in the browser. See the [rich-value example](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-hydration-rich.ts) for `snapshotProfile`, `hydrateProfile`, and both factories.
 
-Prefetch with `profileRpcOptions` or `profileHttpOptions`. Send `snapshotProfile` and then call `hydrateProfile` in the browser. Both the hydrated value and later refetch contain a `Profile` with bigint credits and bytes. The example reserves the `'profile'` prefix for this shape. You can bind a codec to a leaf with `queryViewCodec(leaf, 'query', Profile)`. Use `hydrationCallbacks(codec)` for a service-free codec and filter for matching successful queries. For multiple shapes, [register the views](/effect-api-query/guides/hydrate-query-views/#register-generated-leaves-and-views).
+Prefetch with `profileRpcOptions` or `profileHttpOptions`. Send `snapshotProfile` and then call `hydrateProfile` in the browser. Both the hydrated value and later refetch contain a `Profile` with bigint credits and bytes. The example reserves the `'profile'` prefix for this shape. You can bind a codec to a leaf with `queryViewCodec(leaf, 'query', Profile)`. Use `hydrationCallbacks(codec)` for a service-free codec and filter for matching successful queries. For multiple shapes, [derive a registry from the contract](/effect-api-query/guides/hydrate-query-views/#derive-a-registry-from-the-contract).
 
 Native serialization and deserialization callbacks must finish synchronously without required services. Handle a thrown codec error in your rendering or hydration code.
 

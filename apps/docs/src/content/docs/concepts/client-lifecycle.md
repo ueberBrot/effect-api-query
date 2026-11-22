@@ -14,7 +14,7 @@ Give each server request its own resources. Keep browser resources alive for the
 
 ## HTTP clients and execution services
 
-The factory defaults to `Effect.runPromiseExit` for Effects that need no services. If a supported endpoint needs services to encode requests or decode responses, supply a runner that provides them. Provide any services the client still needs. Forward the runner's `options` so query cancellation reaches Effect. A custom key encoder only builds cache identity. Supply execution services separately.
+Service-free Effects use the default runner. If the client, request encoder, or response decoder needs services, pass a ManagedRuntime as `runtime`. Its layer must have a `never` error type. If you pass a runner function, forward its options so query cancellation reaches Effect. A custom key encoder only builds cache identity. Supply execution services separately.
 
 Set authentication and request middleware on the HTTP client before passing it to the factory. If middleware changes results by user or tenant, include a safe identifier in `keyPrefix`. See the [HTTP factory](/effect-api-query/reference/http-factory/) for request input and key encoders.
 

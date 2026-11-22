@@ -3,15 +3,21 @@ title: Hydrate Query Views
 description: Register typed view codecs and prepare native snapshots for JSON hydration and refetch.
 ---
 
-Register each cache view with `queryViewCodec` or `infiniteQueryCodec`. Pass the registrations to `createHydrationRegistry`. On the server, dehydrate the cache and await encoding. In the browser, await decoding before one native `hydrate` call. Both caches hold decoded data.
+Derive view codecs from your Effect contract with `createContractHydrationRegistry`. On the server, dehydrate the cache and await encoding. In the browser, await decoding before one native `hydrate` call. Both caches hold decoded data.
 
 This example extends the [Profile codec](/effect-api-query/guides/hydrate-unary-data/). Give server and browser separate clients, runtimes, Scopes, and QueryClients. Use the same contract, input, prefix, and hashing defaults.
 
-## Register generated leaves and views
+## Derive a registry from the contract
 
-Import `queryViewCodec`, `infiniteQueryCodec`, and `createHydrationRegistry` from `@ueberbrot/effect-api-query`. Import `Schema` from `effect`. The codec's decoded type must match the data cached before `select`. Include safe owner identity in the prefix if it affects results.
+Pass the RPC group or HttpApi directly. The registry uses the same keys as the utility tree. If you set `keyPrefix` on the utilities, pass it here too. See the [Start snapshot module](https://github.com/ueberBrot/effect-api-query/blob/main/examples/tanstack-start/src/lib/snapshot-preparation.ts) for composing RPC and HTTP registries with `createHydrationRegistry`.
 
-The [typed example](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/hydration-contract.ts) includes the contract and imports. Its `read` leaf returns `Profile` and its `watch` leaf emits `Profile`, `undefined`, or `null`. Register each view's cached type.
+Derivation covers buffered queries, HTTP metadata, live values, and accumulated history. Use `paths` to override a view or register infinite pages with `infinite: { pageParam }`. A custom `query` codec also supplies the decoded data codec for metadata and pages unless you override them.
+
+Set a global view in `views` to `false` to omit it, or set a path or one of its views to `false`. Opaque or unencodable schemas such as `Redacted` require an override or opt-out. The registry throws `HydrationCodecError` during setup if it cannot derive a codec.
+
+### Register a hand-written codec
+
+Use `queryViewCodec` and `infiniteQueryCodec` when you want to register an individual view. The codec’s decoded type must match the data cached before `select`. The [typed example](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/hydration-contract.ts) includes the contract and imports. Its `read` leaf returns `Profile` and its `watch` leaf emits `Profile`, `undefined`, or `null`. Register each view's cached type.
 
 ```ts
 const viewRegistry = createHydrationRegistry([
@@ -156,7 +162,7 @@ const ProfileMetadata = Schema.Struct({
 
 Register `ProfileMetadata` for the `metadata` view. For HTTP streams, use an array of `WrappedElement` for accumulated history or one `WrappedElement` for live data.
 
-`ProfileMetadata` preserves decoded data, numeric status, and raw string headers. The app owns hydrated envelopes. A later fetch produces a frozen envelope and raw headers. Transfer only public headers and keep private values out of error Causes you serialize.
+`ProfileMetadata` preserves decoded data, numeric status, and raw string headers. Contract-derived metadata codecs freeze the decoded envelope and raw header map. If you register your own full metadata codec, it controls the decoded envelope. Transfer only public headers and keep private values out of error Causes you serialize.
 
 ## Use native callbacks for one synchronous view
 

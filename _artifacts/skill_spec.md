@@ -12,8 +12,8 @@ One `effect-api-query` skill covers the library. Its activation description supp
 | HTTP | Decoded requests, SSE and NDJSON, multipart mutations, metadata |
 | Query patterns | Inference, skipping, pages, publication batches, recovery and tracing |
 | Cache workflows | Typed policies, interceptors, partial filters, writes, Effect cache operations, Reactivity invalidation, and owners |
-| Hydration and SSR | Snapshots, typed view registration, preparation and cleanup |
-| Frameworks and hosts | Provider setup, Suspense, reactive accessors, declared peers and checked combinations, transports and hosts |
+| Hydration and SSR | Snapshots, contract-derived registries, typed view overrides, preparation and cleanup |
+| Frameworks and hosts | Optional React providers, Suspense, reactive accessors, declared peers and checked combinations, transports and hosts |
 
 Consumers load the guidance from installed `@ueberbrot/effect-api-query` without repository-local authoring skills. Planning records remain outside the shipped package.
 
@@ -31,7 +31,7 @@ Strict compiler fixtures check public declarations and documentation examples. R
 
 The compatibility reference owns the version table. Framework guidance links to it and distinguishes library peers, wrapper framework peers, and exact checked combinations. Native framework consumer fixtures check TypeScript hook inference against a packed package. Framework component compilers and application builds follow their own tooling requirements.
 
-Exact coordinated Effect development pins are separate from the bounded consumer peer range. `vp run effect-compatibility` checks Effect minimum/development/maintained minor representatives against Query Core minimum/development using the existing public compiler fixtures and focused execution, cancellation, and hydration tests against a packed package. Required APIs, type contracts, or correctness fixes raise the minimum; other range changes require compatibility evidence. Future minors require review. The existing skill, six references, and source mappings cover this dependency-selection task.
+Exact coordinated Effect development pins are separate from the bounded consumer peer range. `vp run effect-compatibility` checks the pinned Effect and Query Core floors, which also serve as the development pins using the existing public compiler fixtures and focused execution, cancellation, and hydration tests against a packed package. Required APIs, type contracts, or correctness fixes raise the minimum; other range changes require compatibility evidence. Future minors require review. The existing skill, six references, and source mappings cover this dependency-selection task.
 
 The usability batch reuses the existing executable consumer fixtures:
 
@@ -159,3 +159,9 @@ The #180 retained-code audit found unused Effect cache wrapper bodies in every f
 The cache-workflows reference covers direct execution through a leaf runtime and composition with the raw client Effect. It also covers shared Cause inspection, tagged matching, and retry limits. The domain map tracks both tasks. The skill tree adds the source mapping for ADR 0050.
 
 The public execution and query-usability suites cover both adapters, multipart, prepared input, raw success, stream omissions, and query-owner cancellation. The compiled retry recipe and public type fixtures check the consumer contract. Fresh consumer-agent verification is outside this implementation task.
+
+### 0.8.0 release guidance (#221)
+
+Source base: `7788ee4`. Retain the existing skill and six references. Prefer the tag-keyed RPC client and optional prefixes. Pass the runtime directly and track utilities once per owner. The cache reference owns flat policy maps, colocated filters, direct execution, shared failure inspection, Effect cache operations, and broad versus exact Reactivity bindings. Derive hydration codecs from the contract and keep custom registrations for overrides. The React reference covers the optional subpath and caller-owned retirement.
+
+The domain map records the new setup, hydration, and React tasks. The skill tree adds ADRs 0044–0048, the React entry point, declarations configuration, and the commands example as sources. The example and compiler checks exercise the documented APIs. The owner-switch regression verifies that retirement waits for an interceptor added after tracking. The live coalescing test uses one fake clock for both timeout callbacks and elapsed time. Fresh consumer-agent discovery remains unverified.

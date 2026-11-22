@@ -31,12 +31,9 @@ const queryClient = new QueryClient();
 
 try {
   const client = await Effect.runPromise(
-    RpcClient.make(users, { flatten: true }).pipe(
-      Effect.provide(protocol),
-      Scope.provide(scope)
-    )
+    RpcClient.make(users).pipe(Effect.provide(protocol), Scope.provide(scope))
   );
-  const rpc = createRpcQueryUtils(users, { client, keyPrefix: ["users-app"] });
+  const rpc = createRpcQueryUtils(users, { client });
   const input = { id: 1 };
   await queryClient.query(
     rpc.users.get.queryOptions({ input, staleTime: 30_000 })
@@ -65,7 +62,7 @@ try {
 
 ## Tree and payload semantics
 
-Acquire a flat client with `RpcClient.make(group, { flatten: true })`. Dotted tags become nested paths, so `users.get` becomes `rpc.users.get`. Use brackets for a segment with a hyphen. The factory rejects colliding paths and reserved names.
+Acquire a tag-keyed client with `RpcClient.make(group)`. You can also use an existing flat client. Factories validate paths and object-client methods up front and build each frozen leaf on first access. Dotted tags become nested paths, so `users.get` becomes `rpc.users.get`. Use brackets for a segment with a hyphen. The factory rejects colliding paths and reserved names.
 
 Pass payload constructor input. Preparation applies Schema defaults before it builds the key. If the locale defaults to `'en'`, omitted and explicit English values match the same query. The client constructs the normalized payload again during execution. Use a query-stable Schema so both constructions have the same encoded meaning.
 

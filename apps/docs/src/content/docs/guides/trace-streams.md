@@ -3,7 +3,7 @@ title: Trace Stream Consumption
 description: Keep an application span open through HTTP SSE pulls and asynchronous iterator cleanup.
 ---
 
-Configure telemetry in the app runtime. Trace the stream returned by the ready client so the span covers each pull and cleanup. A span around `runPromiseExit` ends when the iterable is ready.
+Configure telemetry in the app runtime. Trace the stream returned by the ready client so the span covers each pull and cleanup. A span around the runtime call ends when the iterable is ready.
 
 ## Define the shared feed contract
 
@@ -37,7 +37,6 @@ import {
   createHttpApiQueryUtils,
   fetchStreamSnapshot,
 } from "@ueberbrot/effect-api-query";
-import type { RunPromiseExit } from "@ueberbrot/effect-api-query";
 import { Effect, Layer, ManagedRuntime, Stream, Tracer } from "effect";
 import { FetchHttpClient } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
@@ -77,7 +76,7 @@ The span records the declared API and endpoint, receipt, and cleanup. Keep emitt
 
 ## Supply the runtime and await cleanup
 
-In `trace-feed.ts`, configure Effect's OTLP exporter with your collector URL, such as its `/v1/traces` endpoint. The function acquires the client and supplies a runner that forwards the signal. The snapshot helper captures one live value, closes the iterator, and waits for cleanup before disposing of the runtime.
+In `trace-feed.ts`, configure Effect's OTLP exporter with your collector URL, such as its `/v1/traces` endpoint. The function acquires the client and passes the ManagedRuntime to the factory. The snapshot helper captures one live value, closes the iterator, and waits for cleanup before disposing of the runtime.
 
 ```ts
 const captureTracedFeed = async (
@@ -103,12 +102,10 @@ const captureTracedFeed = async (
         transformResponse: traceDecodedResponse,
       })
     );
-    const runPromiseExit: RunPromiseExit = (effect, options) =>
-      runtime.runPromiseExit(effect, options);
     const http = createHttpApiQueryUtils(feedApi, {
       client,
       keyPrefix: ["feed-app"],
-      runtime: runPromiseExit,
+      runtime,
     });
     return await fetchStreamSnapshot(
       queryClient,

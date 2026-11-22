@@ -12,7 +12,7 @@ Use ESM and an environment that supports ES2022. The package declares Effect and
 | Effect | Library peer: `>=4.1.4 <4.2.0` | Coordinated runtime, testing, and Node platform packages: minimum and development `4.1.4` |
 | Query Core | Library peer: `>=5.107.1 <6` | Minimum and development `5.107.1` |
 | TypeScript | Public declarations: 5.9 through reviewed 7.1 beta, with `strict: true` | `5.9.3` and Effect-enhanced TSRS `0.25.0` (TypeScript `7.1.0-beta`) |
-| React and React Query | React Query peer: React `^18 \|\| ^19` | React `19.3.1`, React Query `5.107.1` |
+| React and React Query | Optional peers for `./react`: React `^18 \|\| ^19`, React Query `>=5.107.1 <6` | React `19.3.1`, React Query `5.107.1` |
 | Vue and Vue Query | Vue Query peer: Vue `^2.6.0 \|\| ^3.3.0` | Vue `3.5.44`, Vue Query `5.107.1` |
 | Solid and Solid Query | Solid Query peer: Solid `^1.6.0` | Solid `1.9.18`, Solid Query `5.107.1` |
 | Svelte and Svelte Query | Svelte Query peer: Svelte `^5.25.0` | Svelte `5.57.3`, Svelte Query `6.4.1` |
@@ -48,7 +48,7 @@ Configure clients, providers, middleware, serialization, cache updates, and disp
 
 TanStack supplies an abort signal for queries. Mutations have no matching signal. Use an explicit domain operation to cancel server work. Undo completed work through a separate compensation operation.
 
-Stream queries publish through the public Query Core cache API. For complete integrations, see [examples](/effect-api-query/examples/). For calls without a cache, use the ready Effect client directly.
+Stream queries publish through the public Query Core cache API. For complete integrations, see [examples](/effect-api-query/examples/). For direct unary or buffered execution, use a leaf’s `call` or `effect`.
 
 [Browser and worker hosts](/effect-api-query/reference/browser-and-worker-hosts/) explains ready-client ownership and the worker transport boundary.
 

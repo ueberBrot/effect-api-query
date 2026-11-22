@@ -33,7 +33,7 @@ export const group = RpcGroup.make(
 );
 
 export function makeUserHooks(
-  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof group>>
+  client: RpcClient.RpcClient<RpcGroup.Rpcs<typeof group>>
 ) {
   const rpc = createRpcQueryUtils(group, { client, keyPrefix: ["users-app"] });
   return {
@@ -73,7 +73,7 @@ When the last ordinary observer leaves, TanStack can cancel an abort-aware query
 
 Run the [HTTP workflows](https://ueberbrot.github.io/effect-api-query/examples/http-workflows/) for typed errors, uploads, stream sharing, and recovery. Start's browser workflow uses a separate owner from server rendering. Its featured-user loader transfers a selection that the browser rebinds before reading the cache.
 
-For React, acquire one client, build the utilities and QueryClient, then mount `QueryClientProvider`. Unmount consumers and await disposal. See the [complete React setup](https://ueberbrot.github.io/effect-api-query/guides/react-query/#acquire-and-mount-the-client).
+For React 18 or 19, import `createQueryUtilsContext`, `QueryOwnerProvider`, or `useQueryOwner` from `@ueberbrot/effect-api-query/react`. The subpath uses optional React and React Query peers. Use native Query hooks. The provider's QueryClient boundary remounts observers when the client changes. If the host already provides the cache, set `provideQueryClient={false}`. App code calls `owner.dispose()` on retirement. Strict Mode and Activity effect cleanup do not retire the owner. See the [complete React setup](https://ueberbrot.github.io/effect-api-query/guides/react-query/#acquire-and-mount-the-client).
 
 Wrap the React error boundary and Suspense in `QueryErrorResetBoundary`. On retry, reset both error states. If a background refetch fails while data exists, the screen can still render that data. Show the error locally after fetching stops, or explicitly throw it for boundary recovery.
 
@@ -95,7 +95,7 @@ Match the site's version badge to the installed package before applying its exam
 
 Choose the transport your application already owns.
 
-- HTTP RPC needs a flat client in a live Scope and matching serialization. Follow [RPC setup](rpc.md).
+- HTTP RPC needs a ready client in a live Scope and matching serialization. Follow [RPC setup](rpc.md).
 - With a shared WebSocket, unary and stream requests keep distinct keys and cancellation. Retire the old owner before replacing connections. Set reconnect, backoff, authentication, and replay in the app. Wait for a server acknowledgement if you need proof of cleanup.
 - Server-local RPC can use public decoded messages inside the request Scope. Server-owned services define authority. Use a schema-aware protocol when wire validation or codec effects matter.
 - A browser window or dedicated worker owns its client, runtime, Scope, and cache. Configure cross-host transport, authentication, and synchronization separately. Wait for worker cleanup before termination.

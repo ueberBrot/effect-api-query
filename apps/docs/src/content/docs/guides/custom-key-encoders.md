@@ -16,7 +16,7 @@ const rpcQuery = createRpcQueryUtils(rpcGroup, {
   keyEncoders: {
     "secrets.read": (payload) => ({ secretId: identifySecret(payload.secret) }),
   },
-  runPromiseExit,
+  runtime,
 });
 ```
 

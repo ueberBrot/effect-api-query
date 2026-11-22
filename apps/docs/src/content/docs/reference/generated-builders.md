@@ -11,12 +11,14 @@ Unary RPCs provide these builders.
 | --- | --- |
 | `call(options?)` | Runs the RPC through the leaf's runtime and returns a promise. |
 | `effect(options?)` | Returns the ready client's Effect with its original error and service types. |
-| `queryKey(input?)` | Payload-specific, data-tagged query key. Payload-bearing RPCs require constructor input. |
+| `queryKey(options?)` | Payload-specific, data-tagged query key. Payload-bearing RPCs require constructor input. |
 | `queryOptions(options?)` | Fresh Query Core options with generated `queryFn` and `queryKey`. |
-| `infiniteKey(input?)` | Data-tagged infinite-query key derived from the initial page's payload. |
+| `infiniteKey(options?)` | Data-tagged infinite-query key derived from the initial page's payload. |
 | `infiniteOptions(options)` | Fresh infinite-query options that map each `pageParam` to an RPC payload. |
 | `mutationKey()` | Immutable operation key shared by mutations of this RPC. |
 | `mutationOptions(options?)` | Fresh mutation options with generated `mutationFn` and `mutationKey`. Pass variables when the mutation runs. |
+
+For input-bearing keys, pass `{ input }` with any view settings in the same object. Inputless keys omit `input`. Use `skipToken` only with option builders.
 
 An RPC takes no payload if it omits `payload` or uses `Schema.Void`. `Schema.Unknown`, `Schema.Any`, and unions containing `Schema.Void` still take payloads. Use constructor input for keys, query options, mutation variables, and infinite page mappers. Custom encoders get the normalized payload.
 

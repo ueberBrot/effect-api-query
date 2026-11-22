@@ -42,7 +42,7 @@ export const users = RpcGroup.make(
 );
 
 export function makeUseUser(
-  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof users>>
+  client: RpcClient.RpcClient<RpcGroup.Rpcs<typeof users>>
 ) {
   const rpc = createRpcQueryUtils(users, { client, keyPrefix: ["users-app"] });
   return function useUser(id: number | undefined) {
@@ -79,7 +79,7 @@ export const catalog = RpcGroup.make(
 );
 
 export async function loadPages(
-  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof catalog>>,
+  client: RpcClient.RpcClient<RpcGroup.Rpcs<typeof catalog>>,
   queryClient: QueryClient
 ) {
   const rpc = createRpcQueryUtils(catalog, {
@@ -114,7 +114,7 @@ export const events = RpcGroup.make(
 );
 
 export function eventOptions(
-  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof events>>
+  client: RpcClient.RpcClient<RpcGroup.Rpcs<typeof events>>
 ) {
   const rpc = createRpcQueryUtils(events, {
     client,

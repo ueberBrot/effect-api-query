@@ -9,12 +9,14 @@ Key builders return immutable keys tagged with cache data and error types. Optio
 
 | Builder | View |
 | --- | --- |
-| `queryKey(input?)`, `queryOptions(options?)` | Decoded query data. |
-| `metadataKey(input?)`, `metadataOptions(options?)` | Decoded data, status, and raw headers. |
-| `infiniteKey(input?)`, `infiniteOptions(options)` | Native `InfiniteData` for paginated responses. |
+| `queryKey(options?)`, `queryOptions(options?)` | Decoded query data. |
+| `metadataKey(options?)`, `metadataOptions(options?)` | Decoded data, status, and raw headers. |
+| `infiniteKey(options?)`, `infiniteOptions(options)` | Native `InfiniteData` for paginated responses. |
 | `mutationKey()`, `mutationOptions(options?)` | Mutation options whose variables are supplied at execution. |
-| `streamedKey(input, policy)`, `streamedOptions(options)` | Accumulated SSE or NDJSON emissions with retention and publication policy. |
-| `liveKey(input?, policy?)`, `liveOptions(options?)` | Latest SSE or NDJSON emission. |
+| `streamedKey({ input, ...policy })`, `streamedOptions(options)` | Accumulated SSE or NDJSON emissions with retention and publication policy. |
+| `liveKey(options?)`, `liveOptions(options?)` | Latest SSE or NDJSON emission. |
+
+For input-bearing keys, pass `{ input }` with any view settings in the same object. Inputless keys omit `input`. Use `skipToken` only with option builders.
 
 Input-bearing keys take a complete request. Inputless stream keys take their policy as the first argument. Buffered multipart endpoints support mutation builders and direct execution. SSE and NDJSON endpoints only build accumulated and live queries.
 
@@ -84,7 +86,7 @@ The runner supplies stream services and receives the query abort signal. Cancell
 
 The first event publishes immediately. Later events publish by batch. Completion or failure flushes pending values, except that `replace` publishes only on success. Cancellation discards pending values. Set a deadline if a quiet stream must publish a partial batch. Invalid size or deadline throws `RangeError` before execution, even for skipped input. The builder strips the controls from native options.
 
-Pass the same decoder and history settings to `streamedKey(input, policy)` or `streamedKey(policy)` if inputless. Set `maxChunks` explicitly or inherit it through `configureUtils`. Omitted batch size and size one share a key. Nondefault sizes and explicit deadlines have distinct keys. Endpoint prefixes match all policies. Resume headers declared on the endpoint affect request identity. Decoder controls belong to view policy.
+Pass the same decoder and history settings to `streamedKey({ input, ...policy })` or `streamedKey(policy)` if inputless. Set `maxChunks` explicitly or inherit it through `configureUtils`. Omitted batch size and size one share a key. Nondefault sizes and explicit deadlines have distinct keys. Endpoint prefixes match all policies. Resume headers declared on the endpoint affect request identity. Decoder controls belong to view policy.
 
 Set NDJSON's `maxElementBytes` on `HttpApiSchema.StreamNdjson`. Effect frames and decodes the stream, including any declared header wrapper. Only SSE takes `sseOptions`. Streaming endpoints have no metadata view.
 

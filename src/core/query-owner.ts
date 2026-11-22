@@ -21,6 +21,7 @@ import type {
 } from "./configure";
 import {
   readConfiguredLeaf,
+  registerLeafTracking,
   reapplyLeafConfiguration,
 } from "./configure-utils";
 import type { UtilityNode } from "./configure-utils";
@@ -196,15 +197,9 @@ export const acquireQueryOwner = async <A>(
         }
       });
   };
-  const trackLeaf = (node: RuntimeUtilityNode): RuntimeUtilityNode => {
-    const descriptor = readLeafDescriptor(node);
-    const rebuilt: RuntimeUtilityNode =
-      descriptor === undefined
-        ? { ...node }
-        : // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
-          ({
-            ...descriptor.rebuild(wrapRunner(descriptor.runner)),
-          } as RuntimeUtilityNode);
+  const wrapLeafExecution = (
+    rebuilt: RuntimeUtilityNode
+  ): RuntimeUtilityNode => {
     for (const view of queryOptionNames) {
       if (!Object.hasOwn(rebuilt, view)) {
         continue;
@@ -247,9 +242,21 @@ export const acquireQueryOwner = async <A>(
         };
       }
     }
-    const frozen = Object.freeze(rebuilt);
-    trackedOwners.set(frozen, ownerToken);
-    return frozen;
+    return rebuilt;
+  };
+  const trackLeaf = (node: RuntimeUtilityNode): RuntimeUtilityNode => {
+    const descriptor = readLeafDescriptor(node);
+    const base: RuntimeUtilityNode =
+      descriptor === undefined
+        ? { ...node }
+        : // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
+          ({
+            ...descriptor.rebuild(wrapRunner(descriptor.runner)),
+          } as RuntimeUtilityNode);
+    const tracked = Object.freeze(wrapLeafExecution({ ...base }));
+    registerLeafTracking(tracked, base, wrapLeafExecution);
+    trackedOwners.set(tracked, ownerToken);
+    return tracked;
   };
   const trackNode = (node: RuntimeUtilityNode): RuntimeUtilityNode => {
     const existingOwner = trackedOwners.get(node);

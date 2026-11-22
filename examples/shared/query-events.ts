@@ -19,7 +19,7 @@ export interface DirectoryEvent {
 
 /** The application supplies its decoded transport and authoritative snapshot protocol. */
 export interface DirectoryConnection {
-  readonly client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof directory>>;
+  readonly client: RpcClient.RpcClient<RpcGroup.Rpcs<typeof directory>>;
   readonly connect: (
     cursor: string
   ) => Stream.Stream<DirectoryEvent, "expired" | "offline">;
@@ -40,11 +40,9 @@ export const acquireDirectoryEvents = async (
     const connection = await setup.acquire(acquire, async (value) => {
       await value.close();
     });
-    const rpc = createRpcQueryUtils(directory, {
-      client: connection.client,
-      keyPrefix: ["directory-events"],
-      runtime: setup.wrapRunner(Effect.runPromiseExit),
-    });
+    const rpc = setup.trackUtils(
+      createRpcQueryUtils(directory, { client: connection.client })
+    );
     return { connection, rpc };
   });
   const { connection, rpc } = owner.resources;

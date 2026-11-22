@@ -5,6 +5,7 @@ import {
   QueryObserver,
 } from "@tanstack/query-core";
 import { Cause, Deferred, Effect, Exit, Fiber, Schema, Stream } from "effect";
+import { Reactivity } from "effect/reactivity";
 import { Rpc, RpcGroup } from "effect/rpc";
 
 import {
@@ -18,7 +19,10 @@ import {
 } from "#effect-api-query";
 
 import { directory, directoryEffects } from "../examples/shared/query-effects";
-import { makeRpcTestClient } from "./fixtures/effect-rpc";
+import {
+  makeObjectRpcTestClient,
+  makeRpcTestClient,
+} from "./fixtures/effect-rpc";
 import { waitForQueryState } from "./fixtures/query-cache";
 
 it.effect(
@@ -201,7 +205,7 @@ it.effect(
   "runs the complete application event workflow against its supplied cache",
   () =>
     Effect.gen(function* applicationWorkflow() {
-      const ready = yield* makeRpcTestClient(directory, {
+      const ready = yield* makeObjectRpcTestClient(directory, {
         "users.read": ({ id }) => Effect.succeed({ id, name: "Ada" }),
       });
       const client = new QueryClient();
@@ -212,6 +216,17 @@ it.effect(
       });
       const key = application.rpc.users.read.queryKey({ input: { id: 1 } });
       expect(client.getQueryData(key)).toStrictEqual({ id: 1, name: "Grace" });
+      expect(client.getQueryState(key)?.isInvalidated).toBe(true);
+      client.setQueryData(key, { id: 1, name: "Grace" });
+      const reactivity = yield* Reactivity.make;
+      const bridge = yield* application
+        .bindUserRefresh(1)
+        .pipe(Effect.provideService(Reactivity.Reactivity, reactivity));
+      reactivity.invalidateUnsafe(["users:2"]);
+      yield* bridge.flush;
+      expect(client.getQueryState(key)?.isInvalidated).toBe(false);
+      reactivity.invalidateUnsafe(["users:1"]);
+      yield* bridge.flush;
       expect(client.getQueryState(key)?.isInvalidated).toBe(true);
       client.clear();
     })

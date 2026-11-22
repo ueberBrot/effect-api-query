@@ -19,7 +19,6 @@ export const makeServerLocalRpcClient = Effect.fnUntraced(function* <
       Deferred.await(reply).pipe(Effect.flatMap((write) => write(response))),
   });
   const { client, write } = yield* RpcClient.makeNoSerialization(group, {
-    flatten: true,
     supportsAck: true,
     onFromClient: ({ message }) =>
       Effect.provideContext(server.write(0, message), serverContext),

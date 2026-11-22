@@ -153,11 +153,11 @@ describe("server-local ready-client construction", () => {
         Promise.all([
           Effect.runPromise(
             // oxlint-disable-next-line unicorn/no-useless-undefined
-            Effect.flip(first("owner.read", undefined))
+            Effect.flip(first["owner.read"](undefined))
           ),
           Effect.runPromise(
             Effect.flip(
-              first("owner.read", undefined, {
+              first["owner.read"](undefined, {
                 headers: { "x-owner": "second-owner" },
               })
             )
@@ -167,7 +167,7 @@ describe("server-local ready-client construction", () => {
 
       await Effect.runPromise(Scope.close(firstScope, Exit.void));
       const disposed = await Effect.runPromiseExit(
-        first("owner.read", undefined, {
+        first["owner.read"](undefined, {
           headers: { "x-owner": "first-owner" },
         })
       );
@@ -176,7 +176,7 @@ describe("server-local ready-client construction", () => {
       ).toBe(true);
       await expect(
         Effect.runPromise(
-          second("owner.read", undefined, {
+          second["owner.read"](undefined, {
             headers: { "x-owner": "second-owner" },
           })
         )
@@ -214,7 +214,7 @@ describe("server-local ready-client construction", () => {
       );
       const direct = await Effect.runPromiseExit(
         // oxlint-disable-next-line unicorn/no-useless-undefined
-        client("diagnostics.fail", undefined)
+        client["diagnostics.fail"](undefined)
       );
       if (Exit.isSuccess(direct)) {
         throw new Error("Expected the local client to fail");

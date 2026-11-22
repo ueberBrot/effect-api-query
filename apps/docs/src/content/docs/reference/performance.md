@@ -5,7 +5,7 @@ description: Factory and key construction costs, measurement workloads, and adap
 
 ## Construction
 
-Each factory builds and freezes the whole utility tree for one ready client. A larger contract takes more work even if the app uses few leaves.
+Each factory validates the full contract and freezes its branches before returning. It builds and freezes each leaf on first access. Larger contracts still cost more to validate, while apps that use few leaves avoid constructing the rest.
 
 A payload-bearing key needs freshly encoded, frozen JSON. RPC constructs and encodes the payload. HTTP encodes each declared request part. Options also retain input and create a query function. To reuse input preparation, use `prepareInput`.
 
@@ -31,7 +31,7 @@ vp run bundle-baseline
 vp run stream-baseline
 ```
 
-The type workload measures contracts, raw utilities, and configured utilities at 50, 250, and 1,000 operations on both compilers. The bundle workload compares consumers with included and external peers. The stream workload measures retention, batch size and deadlines, live values, cache writes, notifications, and cleanup.
+The packed type workload runs at 50, 250, and 1,000 operations on Effect-enhanced TSRS 0.25.0 and TypeScript 5.9.3. It covers direct contract types, raw and configured utilities, default tag-keyed RPC clients, reusable policy maps, mixed contracts with root or path stream retention, and contract-derived hydration with and without overrides. The bundle workload compares consumers with included and external peers. The stream workload measures retention, batch size and deadlines, live values, cache writes, notifications, and cleanup.
 
 To measure the cost of an SSE overload, run 1,000 buffered HTTP endpoints and one SSE endpoint. Compare the standard client with clients that have a specialized SSE overload, with and without a typed client error.
 
@@ -43,7 +43,7 @@ TYPE_ADAPTERS=http TYPE_COUNTS=1000 TYPE_HTTP_CLIENTS=sse,sse-overload,sse-overl
 
 Compare the same operation counts, consumer, compiler, target, lockfile, and options. Run warmup separately and sample fresh compiler processes. Use instantiations to compare compiler work. Report memory, check time, and elapsed time separately.
 
-Each workload prints JSON with dependency and runtime versions. Set `PERFORMANCE_OUTPUT` to write it to a file. Construction reports include fingerprints of the configuration and workload script.
+Each workload prints JSON. Construction, type, bundle, and stream reports include version information and support `PERFORMANCE_OUTPUT` for writing the report to a file. Construction also records fingerprints of the configuration and workload script.
 
 See the [stream workload](https://github.com/ueberBrot/effect-api-query/blob/main/tests/create-rpc-query-utils-stream-baseline.test.ts) and [transport workload](https://github.com/ueberBrot/effect-api-query/blob/main/examples/server/tests/rpc-transport-overhead.test.ts). Compare matching workload and dependency versions. Time and memory vary by machine.
 
@@ -54,6 +54,23 @@ The [bundle and compiler budgets](https://github.com/ueberBrot/effect-api-query/
 Before changing a budget, run the default workloads with matching compilers, dependencies, contracts, and consumed leaves. Explain what accounts for the added cost. Timing and heap measurements are observations.
 
 Stream write limits follow event counts or batch flushes. Observer notifications also include fetch and settlement. Deadline and coalescing counts can vary with scheduling. Separate deterministic tests cover deadlines, coalescing, and final flushes.
+
+### 0.8.0 bundle reference
+
+These byte counts use the packed release candidate, Effect `4.1.4`, Query Core `5.107.1`, and the pinned Rolldown build. Each pair gives minified and gzip bytes.
+
+| Consumer | Peers | Native | Adapter | Adapter delta | Maximum delta |
+| --- | --- | --: | --: | --: | --: |
+| RPC | Included | 117,274 / 35,943 | 154,414 / 48,053 | 37,140 / 12,110 | 37,300 / 12,200 |
+| RPC | External | 434 / 294 | 22,447 / 7,983 | 22,013 / 7,689 | 22,200 / 7,800 |
+| HTTP | Included | 125,679 / 38,576 | 171,261 / 53,135 | 45,582 / 14,559 | 45,800 / 14,700 |
+| HTTP | External | 558 / 338 | 28,355 / 9,702 | 27,797 / 9,364 | 28,000 / 9,500 |
+| Streamed | Included | 126,082 / 38,919 | 154,416 / 48,044 | 28,334 / 9,125 | 28,500 / 9,300 |
+| Streamed | External | 450 / 307 | 22,452 / 7,981 | 22,002 / 7,674 | 22,200 / 7,800 |
+| Hydration | Included | 119,098 / 36,395 | 159,219 / 49,579 | 40,121 / 13,184 | 40,300 / 13,300 |
+| Hydration | External | 332 / 233 | 24,862 / 8,802 | 24,530 / 8,569 | 24,700 / 8,700 |
+
+All eight sizes match the integrated 0.8.0 source before documentation and example changes. The old ceilings came from an earlier API. The current ceilings use the measured sizes plus 90–218 bytes of headroom. The workload still checks that unused Reactivity bridge code stays out of these consumers.
 
 ### Bundle attribution limits
 
@@ -77,7 +94,7 @@ Prepare a large input once when several builders reuse it.
 import { prepareInput } from "@ueberbrot/effect-api-query";
 
 const prepared = prepareInput(rpc.users.get, { id: 1 });
-const key = rpc.users.get.queryKey(prepared);
+const key = rpc.users.get.queryKey({ input: prepared });
 const options = rpc.users.get.queryOptions({
   input: prepared,
   staleTime: 30_000,

@@ -375,6 +375,22 @@ const configuredLeaves = new WeakMap<
   }
 >();
 
+const trackedLeaves = new WeakMap<
+  RuntimeNode,
+  {
+    readonly base: RuntimeNode;
+    readonly wrap: (node: RuntimeNode) => RuntimeNode;
+  }
+>();
+
+export const registerLeafTracking = (
+  tracked: RuntimeNode,
+  base: RuntimeNode,
+  wrap: (node: RuntimeNode) => RuntimeNode
+): void => {
+  trackedLeaves.set(tracked, { base, wrap });
+};
+
 export const readConfiguredLeaf = (node: RuntimeNode) =>
   configuredLeaves.get(node);
 
@@ -382,11 +398,14 @@ export const reapplyLeafConfiguration = (
   base: RuntimeNode,
   layers: readonly ConfigurationLayer[]
 ): RuntimeNode => {
-  const configured = Object.freeze(
-    configureLeaf(base, scopeConfigurations(layers))
+  const tracking = trackedLeaves.get(base);
+  const configured = configureLeaf(
+    tracking?.base ?? base,
+    scopeConfigurations(layers)
   );
-  configuredLeaves.set(configured, { original: base, layers });
-  return configured;
+  const result = Object.freeze(tracking?.wrap(configured) ?? configured);
+  configuredLeaves.set(result, { original: base, layers });
+  return result;
 };
 
 const isUtilityChild = (child: RuntimeNode[string]): child is RuntimeNode =>
@@ -699,11 +718,7 @@ const configureLeafNode = (
     (layer) => layer.depth,
     Order.Number
   );
-  const configured = Object.freeze(
-    configureLeaf(original, scopeConfigurations(layers))
-  );
-  configuredLeaves.set(configured, { original, layers });
-  return configured;
+  return reapplyLeafConfiguration(original, layers);
 };
 
 interface ConfigurationPlan {

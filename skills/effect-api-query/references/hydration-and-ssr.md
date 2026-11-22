@@ -25,7 +25,7 @@ export const updates = RpcGroup.make(
 
 export async function captureUpdates(
   queryClient: QueryClient,
-  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof updates>>,
+  client: RpcClient.RpcClient<RpcGroup.Rpcs<typeof updates>>,
   signal: AbortSignal
 ) {
   const rpc = createRpcQueryUtils(updates, {
@@ -110,7 +110,13 @@ Choose the codec for the full cached shape.
 
 Use a tagged codec for `undefined` history elements so JSON distinguishes them from `null`. An HTTP wrapper with an undefined body still contains the body field. Encode each declared success and rich page parameter.
 
-## Register query-view codecs and prepare the native snapshot
+## Derive query-view codecs and prepare the native snapshot
+
+Call `createContractHydrationRegistry(groupOrApi)` without a client. If utilities use a `keyPrefix`, supply the same tuple to the registry. Combine RPC and HTTP registries and manual codecs with `createHydrationRegistry`.
+
+Derivation covers buffered queries, HTTP metadata, live values, and accumulated history. It preserves decoded header wrappers and distinct undefined stream elements. It rebuilds frozen metadata envelopes. Add `paths["users.page"].infinite: { pageParam: Cursor }` for infinite data. A custom query codec supplies the default metadata data and infinite page codec. Use `views` or path settings to opt out with `false`. If an opaque schema cannot round trip through JSON, override its codec or opt out before constructing the registry.
+
+### Register a custom view
 
 Use the [hydration guide](https://ueberbrot.github.io/effect-api-query/guides/hydrate-query-views/) for native dehydration and registry batch preparation.
 

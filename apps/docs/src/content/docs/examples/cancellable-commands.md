@@ -18,7 +18,7 @@ const [operationId] = useState(() => crypto.randomUUID());
 const input = { operationId };
 const reconcile = async () => {
   await queryClient.invalidateQueries({
-    queryKey: rpcQuery.commands.status.queryKey(input),
+    queryKey: rpcQuery.commands.status.queryKey({ input }),
   });
 };
 

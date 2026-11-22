@@ -62,8 +62,8 @@ mkdirSync(artifacts, { recursive: true });
 const directory = mkdtempSync(path.join(artifacts, "bundles-"));
 const context = prepareConsumer(directory);
 const measurements: {
-  consumer: string;
-  peers: string;
+  consumer: keyof typeof consumers;
+  peers: "included" | "external";
   baseline: { minifiedBytes: number; gzipBytes: number };
   adapter: { minifiedBytes: number; gzipBytes: number };
   difference: { minifiedBytes: number; gzipBytes: number };
@@ -156,18 +156,6 @@ try {
               baseline.optionalDiagnosticMarkers.reactivityBridge,
             `${name} retained an unused Reactivity bridge`
           );
-          const budget =
-            bundleBudgets[name][externalPeers ? "external" : "included"];
-          assertBudget(
-            `${name} minified delta`,
-            adapter.minifiedBytes - baseline.minifiedBytes,
-            budget[0]
-          );
-          assertBudget(
-            `${name} gzip delta`,
-            adapter.gzipBytes - baseline.gzipBytes,
-            budget[1]
-          );
           measurements.push({
             consumer: name,
             retained,
@@ -204,6 +192,15 @@ try {
     },
     measurements,
   });
+  for (const { consumer, peers, difference } of measurements) {
+    const [minified, gzip] = bundleBudgets[consumer][peers];
+    assertBudget(
+      `${consumer} ${peers} minified delta`,
+      difference.minifiedBytes,
+      minified
+    );
+    assertBudget(`${consumer} ${peers} gzip delta`, difference.gzipBytes, gzip);
+  }
 } finally {
   rmSync(directory, { recursive: true, force: true });
 }

@@ -36,6 +36,7 @@ const compilers = [
 const consumers = [
   "contract",
   "raw",
+  "object-client",
   "configured",
   "policy",
   "retention-root",
@@ -139,7 +140,12 @@ const parseDiagnostics = (output: string): CompilerDiagnostics => {
   };
 };
 
-const contractFixture = (workload: Workload, count: number, mixed: boolean) => {
+const contractFixture = (
+  workload: Workload,
+  count: number,
+  mixed: boolean,
+  objectClient: boolean
+) => {
   if (workload.adapter === "rpc") {
     const operations = Array.from(
       { length: count },
@@ -151,7 +157,7 @@ const contractFixture = (workload: Workload, count: number, mixed: boolean) => {
         'Rpc.make("scale.events", { success: Schema.Int, stream: true }),';
     }
     return `const contract = RpcGroup.make(\n${operations.join("\n")}\n);
-declare const client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof contract>>;`;
+declare const client: RpcClient.RpcClient${objectClient ? "" : ".Flat"}<RpcGroup.Rpcs<typeof contract>>;`;
   }
   const operations = Array.from(
     { length: count },
@@ -215,7 +221,12 @@ const fixture = (workload: Workload, count: number, consumer: Consumer) => {
   );
   const success =
     "const Value = Schema.Struct({ id: Schema.Int, label: Schema.String });";
-  const contract = contractFixture(workload, count, mixed);
+  const contract = contractFixture(
+    workload,
+    count,
+    mixed,
+    consumer === "object-client"
+  );
   if (consumer === "hydration-bare") {
     return `${imports}\n${success}\n${contract}\nconst registry = createContractHydrationRegistry(contract);\nexport { registry };\n`;
   }
@@ -297,6 +308,9 @@ try {
     for (const workload of workloads) {
       for (const count of counts) {
         for (const consumer of selectedConsumers) {
+          if (consumer === "object-client" && workload.adapter !== "rpc") {
+            continue;
+          }
           if (count < 2 && usesRetention(consumer)) {
             continue;
           }

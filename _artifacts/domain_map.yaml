@@ -1,6 +1,6 @@
 library:
   name: "@ueberbrot/effect-api-query"
-  version: 0.7.0
+  version: 0.8.0
   repository: https://github.com/ueberBrot/effect-api-query
   description: TanStack Query utilities derived from ready Effect RPC and HTTP clients.
   primary_framework: framework-agnostic
@@ -29,9 +29,9 @@ skills:
       - Opt-in live snapshot coalescing, fixed pending timers with event-loop delay, terminal flush, cancellation discard, configured HTTP decoder identity, and RPC tuple compatibility
       - Stream snapshots and request cleanup
       - Optimistic overlap, event refresh, and owner replacement
-      - DTO and rich-value hydration with typed view registration
+      - DTO and rich-value hydration with contract derivation and typed view overrides
       - Loader selections with explicit input codecs and owner validation
-      - Native provider setup, Suspense recovery, reactive accessors, and host boundaries
+      - Optional React owner and utility providers, Suspense recovery, reactive accessors, and host boundaries
     tasks:
       - Check application-owned policy maps against their RPC or HTTP contracts before client acquisition. Type-check SSE settings at the SSE leaf, including flat path entries. Apply policies through configureUtils, which copies decoder settings for keys and options.
       - Use QueryClientService to run queries, warm the cache, and apply cache operations in Effect. Use an exclusive stream snapshot to capture a stream that can stay open.
@@ -46,11 +46,11 @@ skills:
       - Apply native defaults and scoped policies without losing call-site selection, conditional input, or explicitly undefined seed behavior; compose mutation callbacks or intercept native execution attempts.
       - Reuse equivalent immutable decoded records and nested containers with a schema-specific structuralSharing policy while preserving metadata freezing and generated types.
       - Capture open streams and drain queries, preparation, and accepted writes before request disposal.
-      - Hydrate every selected view into its normal decoded cache representation.
+      - Derive registries from contracts, override unsupported schemas, and hydrate selected views into their decoded cache representation.
       - Preserve neighboring writes and originating ownership during mutation overlap.
       - Defer event refresh until participating writes settle.
       - Retire consumers and accepted work before acquiring a replacement owner. Each owner creates its query and mutation caches from configuration and drains registered work before release.
-      - Acquire a ready client and mount native providers with awaited cleanup.
+      - Acquire a ready client and track its utility tree for retirement. In React, use a keyed owner provider and await caller-managed cleanup.
       - Recover initial Suspense failures, retain cached data after failed refetches, and start independent reads together with native cancellation limits.
       - Recover stream delivery with numeric convenience or explicit application cursor acceptance/order and gap detection, authoritative replay refresh, full hook inference, and cancellable backoff.
       - Map recovered events explicitly to generated-key updates and filter invalidation in one query owner; await sequential handlers and retirement cleanup, and keep durable checkpoints and retained history under application policy.
@@ -60,10 +60,10 @@ skills:
     subsystems:
       - name: RPC
         package: "@ueberbrot/effect-api-query"
-        config_surface: Literal RpcGroup, flat ready client, prefix, key encoders, runner.
+        config_surface: Literal RpcGroup, tag-keyed or flat ready client, optional prefix, key encoders, runtime.
       - name: HTTP
         package: "@ueberbrot/effect-api-query"
-        config_surface: Literal HttpApi, ready client, prefix, request encoders, runner.
+        config_surface: Literal HttpApi, ready client, optional prefix, request encoders, runtime.
     reference_candidates:
       - topic: Adapter inputs and capabilities
         reason: RPC construction and HTTP decoded containers differ.
@@ -72,7 +72,7 @@ skills:
       - topic: Hydration and SSR
         reason: Captures, view codecs, and preparation require request lifetime.
       - topic: Frameworks and hosts
-        reason: Native providers, Suspense recovery, hook overloads, and transport boundaries depend on the integration. The package does not provide these services.
+        reason: The optional React subpath provides typed context and keyed cache wiring. Hooks and transport remain native to their frameworks and hosts.
     failure_modes:
       - mistake: Treat Reactivity record keys as per-entity subscriptions
         mechanism: Effect matches both the record group and its IDs, so writes can trigger sibling bindings.

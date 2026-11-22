@@ -57,15 +57,12 @@ const queryClient = new QueryClient();
 
 try {
   const client = await Effect.runPromise(
-    RpcClient.make(usersRpc, { flatten: true }).pipe(
+    RpcClient.make(usersRpc).pipe(
       Effect.provide(protocol),
       Scope.provide(scope)
     )
   );
-  const rpc = createRpcQueryUtils(usersRpc, {
-    client,
-    keyPrefix: ["users-app"] as const,
-  });
+  const rpc = createRpcQueryUtils(usersRpc, { client });
 
   const user = await queryClient.query(
     rpc.users.get.queryOptions({ input: { id: 1 } })

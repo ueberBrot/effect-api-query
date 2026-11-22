@@ -55,6 +55,17 @@ export const makeRpcTestClient = Effect.fn("TestRpc.makeRpcTestClient")(
   }
 );
 
+export const makeObjectRpcTestClient = Effect.fn(
+  "TestRpc.makeObjectRpcTestClient"
+)(function* makeObjectRpcTestClient<
+  Rpcs extends Rpc.Any,
+  const Handlers extends RpcGroup.HandlersFrom<Rpcs>,
+>(rpcGroup: RpcGroup.RpcGroup<Rpcs>, rpcHandlers: Handlers) {
+  return yield* RpcTest.makeClient(rpcGroup).pipe(
+    Effect.provide(rpcGroup.toLayer(rpcHandlers))
+  );
+});
+
 export const makeClient = Effect.fn("TestRpc.makeClient")(
   function* makeClient() {
     return yield* RpcTest.makeClient(group, { flatten: true }).pipe(

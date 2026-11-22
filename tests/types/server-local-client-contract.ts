@@ -21,7 +21,7 @@ const Read = Rpc.make("profiles.read", {
 const group = RpcGroup.make(Read);
 const construction = makeServerLocalRpcClient(group);
 declare const client: Effect.Success<typeof construction>;
-const call = client("profiles.read", {
+const call = client["profiles.read"]({
   name: "Ada",
 });
 type Equal<Left, Right> =
@@ -35,5 +35,5 @@ true satisfies Assert<Equal<Effect.Success<typeof call>, string>>;
 true satisfies Assert<Equal<Effect.Error<typeof call>, "not-found">>;
 true satisfies Assert<Equal<Effect.Services<typeof call>, CodecService>>;
 // @ts-expect-error The declaration-derived client does not accept a numeric profile name.
-const invalidCall = client("profiles.read", { name: 1 });
+const invalidCall = client["profiles.read"]({ name: 1 });
 void [call, invalidCall];

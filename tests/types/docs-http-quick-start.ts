@@ -15,7 +15,6 @@ try {
   );
   const http = createHttpApiQueryUtils(usersApi, {
     client,
-    keyPrefix: ["users-app"] as const,
     runtime,
   });
 

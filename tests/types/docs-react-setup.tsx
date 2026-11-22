@@ -1,12 +1,17 @@
-import { QueryClientProvider, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { createQueryUtilsContext } from "@ueberbrot/effect-api-query/react";
 import { createRoot } from "react-dom/client";
 
 import { startUsersApplication } from "./docs-react-client.ts";
 import type { UsersApplication } from "./docs-react-client.ts";
 
-const User = ({ application }: { readonly application: UsersApplication }) => {
+const { Provider, useQueryUtils } =
+  createQueryUtilsContext<UsersApplication["resources"]>();
+
+const User = () => {
+  const http = useQueryUtils();
   const user = useQuery(
-    application.http.users.get.queryOptions({ input: { params: { id: 1 } } })
+    http.users.get.queryOptions({ input: { params: { id: 1 } } })
   );
   if (user.isPending) {
     return <p>Loading user…</p>;
@@ -24,9 +29,9 @@ export const mountUsersApplication = async (
   const application = await startUsersApplication(baseUrl);
   const root = createRoot(element);
   root.render(
-    <QueryClientProvider client={application.queryClient}>
-      <User application={application} />
-    </QueryClientProvider>
+    <Provider owner={application}>
+      <User />
+    </Provider>
   );
   return async () => {
     root.unmount();

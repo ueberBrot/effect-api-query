@@ -57,7 +57,7 @@ Dehydrate the server QueryClient and hydrate a separate browser QueryClient. Reg
 
 Keep browser resources alive while the browser app uses them.
 
-Choose the shape the browser needs. For plain values or Schema class instances, use [hydrate unary data](/effect-api-query/guides/hydrate-unary-data/) to preserve the same shape across hydration and later browser fetches.
+Use `createContractHydrationRegistry` to transfer decoded classes and other rich values. The [example snapshot module](https://github.com/ueberBrot/effect-api-query/blob/main/examples/tanstack-start/src/lib/snapshot-preparation.ts) combines the RPC and HTTP registries before the router publishes or hydrates a snapshot. For a single DTO or custom codec, see [hydrate unary data](/effect-api-query/guides/hydrate-unary-data/) to preserve the same shape across hydration and later browser fetches.
 
 ## Let the browser refetch failed queries
 

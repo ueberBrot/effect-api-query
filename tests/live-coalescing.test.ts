@@ -63,7 +63,9 @@ it.effect(
   "flushes latest pending at a non-sliding deadline, preserves slow snapshots and drops pending on cancellation",
   () =>
     Effect.gen(function* flushesDeadline() {
-      vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+      vi.useFakeTimers({
+        toFake: ["setTimeout", "clearTimeout", "performance"],
+      });
       const midReached = yield* Deferred.make<boolean>();
       const midResume = yield* Deferred.make<boolean>();
       const reached = yield* Deferred.make<boolean>();

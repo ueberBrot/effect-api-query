@@ -8,7 +8,7 @@ import {
   applicationPolicy,
 } from "../../examples/shared/application-policy";
 
-declare const client: RpcClient.RpcClient.Flat<
+declare const client: RpcClient.RpcClient<
   RpcGroup.Rpcs<typeof exampleRpcGroup>
 >;
 const application = applicationQueries(

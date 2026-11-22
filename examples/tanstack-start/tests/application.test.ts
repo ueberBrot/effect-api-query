@@ -212,15 +212,21 @@ describe("TanStack Start execution settlement", () => {
           : Stream.fromEffect(
               Deferred.succeed(entered, true).pipe(Effect.as("ready"))
             ).pipe(Stream.concat(Stream.never), Stream.ensuring(cleanup));
+      const rpcUrl = "http://example.test/rpc";
+      const ready = await startExampleRpcClient(rpcUrl);
       const application = await startTanStackStartApplication({
-        rpcUrl: "http://example.test/rpc",
+        rpcUrl,
         rpcClient: {
           // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion
-          client: (() => source) as ExampleRpcClient,
-          runPromiseExit: Effect.runPromiseExit,
+          client: {
+            ...ready.client,
+            "diagnostics.slow": () => source,
+            "diagnostics.stream": () => source,
+          } as ExampleRpcClient,
+          runtime: Effect.runPromiseExit,
           dispose: async () => {
             events.push("disposed");
-            await Promise.resolve();
+            await ready.dispose();
           },
         },
       });
@@ -280,15 +286,20 @@ describe("TanStack Start execution settlement", () => {
         Effect.andThen(Deferred.await(release)),
         Effect.tap(() => Effect.sync(() => events.push("completed")))
       );
+      const rpcUrl = "http://example.test/rpc";
+      const ready = await startExampleRpcClient(rpcUrl);
       const application = await startTanStackStartApplication({
-        rpcUrl: "http://example.test/rpc",
+        rpcUrl,
         rpcClient: {
           // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion
-          client: (() => mutation) as ExampleRpcClient,
-          runPromiseExit: Effect.runPromiseExit,
+          client: {
+            ...ready.client,
+            "users.create": () => mutation,
+          } as ExampleRpcClient,
+          runtime: Effect.runPromiseExit,
           dispose: async () => {
             events.push("disposed");
-            await Promise.resolve();
+            await ready.dispose();
           },
         },
         fetch: async () => {

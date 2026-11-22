@@ -44,7 +44,7 @@ Run `consume(events)` in the app runtime. The [typed example](https://github.com
 
 Use the consumer's `reactivityKeys.directory`, `reactivityKeys.all`, or `reactivityKeys.user({ id, locale })`. Include every detail your local writers refresh in `observedUsers`. Network events can target any valid user.
 
-Reactivity uses its own application keys. Register the mapping to TanStack query keys explicitly.
+Reactivity uses its own application keys. Register their mapping to TanStack filters with [`bindReactivityInvalidation`](/effect-api-query/guides/query-effects/#invalidate-queries-from-effect-reactivity) when you only need scoped invalidation. The bridge supports broad and exact keys and coalesces repeated triggers within a microtask. The event consumer also coordinates delivery and optimistic writes.
 
 The consumer combines pending invalidations and lets broad ones cover narrower reads. It waits while its QueryClient has pending mutations, which protects optimistic writes. Apply the same rule to other refresh paths. `flush()` drains runnable work. Jobs report errors to `onRefreshError`; queries keep their native retry and error state.
 

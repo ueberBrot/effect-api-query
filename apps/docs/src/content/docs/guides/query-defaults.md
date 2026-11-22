@@ -219,7 +219,7 @@ export const applicationPolicy = defineRpcPolicy(
 );
 
 export const applicationQueries = (
-  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof exampleRpcGroup>>,
+  client: RpcClient.RpcClient<RpcGroup.Rpcs<typeof exampleRpcGroup>>,
   queryClient: QueryClient,
   notifyCreated: (name: string, requestedName: string) => void
 ) => {

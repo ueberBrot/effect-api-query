@@ -22,8 +22,8 @@ A buffered multipart alternative makes an endpoint mutation-only even if it also
 | Option | Contract |
 | --- | --- |
 | `client` | Ready client for the supplied HttpApi. The application owns its transport, middleware, and lifetime. |
-| `keyPrefix` | Non-empty JSON tuple containing any safe tenant, user, or other client-identity partition. |
-| `runPromiseExit` | Required when exposed endpoints or the ready client need execution services. Service-free calls default to Effect's runner. |
+| `keyPrefix` | Optional non-empty JSON tuple of safe identity values. Omit it to start keys at `["http", api.identifier]`. |
+| `runtime` | Pass a ManagedRuntime with no layer initialization error, or a compatible runner function. Supply it when execution needs services. |
 | `keyEncoders` | Synchronous encoders keyed first by declaration group identifier, then endpoint identifier, including top-level groups. |
 
 An encoder receives the full decoded request and returns `JsonValue`. For a query-capable endpoint, supply one for encoding services, opaque middleware, redacted values, or multiple payload alternatives. Runtime validation catches opaque middleware that TypeScript misses, including synchronous middleware. Preserve every body and content-type difference that affects responses.
@@ -42,7 +42,7 @@ Supply every declared request object, even if its fields are optional. For no qu
 
 Keep retained request values unchanged. See [input ownership](/effect-api-query/concepts/data-normalization/#keep-captured-inputs-unchanged).
 
-Ordinary queries and mutations return decoded data. A query caches `null` for successful `undefined`, while a mutation keeps `undefined`. Text stays a string and binary data stays a `Uint8Array`. Declared wrappers preserve decoded bodies and headers. Supply an app serializer for rich SSR values.
+Ordinary queries and mutations return decoded data. A query caches `null` for successful `undefined`, while a mutation keeps `undefined`. Text stays a string and binary data stays a `Uint8Array`. Declared wrappers preserve decoded bodies and headers. Use [contract hydration codecs](/effect-api-query/guides/hydrate-query-views/) for rich SSR values.
 
 The Effect Cause retains declared endpoint, middleware, Schema, transport, and additional ready-client errors.
 
@@ -50,4 +50,4 @@ Supply services used by endpoint request encoders, decoders, and the ready clien
 
 An endpoint with a single SSE or NDJSON success supports accumulated and live views, including a declared `WithHeaders` wrapper. Effect decodes emissions. The factory skips raw byte response streams, upgrades, mixed buffered and streamed successes, and any streaming request payload. It also skips streamed successes with buffered multipart input. Groups with no supported endpoints disappear.
 
-The factory rejects unsafe names, collisions, and conflicting multipart metadata. Keep literal declaration types so TypeScript can infer supported paths.
+The factory rejects unsafe names, collisions, and conflicting multipart metadata before building any leaf. It freezes branches immediately and builds frozen leaves on first access. Keep literal declaration types so TypeScript can infer supported paths.

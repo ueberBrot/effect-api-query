@@ -6,8 +6,8 @@ description: Learn how normalized payloads produce stable cache identity.
 The library constructs an RPC payload before it builds the query key. The key includes values supplied by constructor defaults.
 
 ```ts
-rpcQuery.users.get.queryKey({ id: 1 });
-rpcQuery.users.get.queryKey({ id: 1, locale: "en" });
+rpcQuery.users.get.queryKey({ input: { id: 1 } });
+rpcQuery.users.get.queryKey({ input: { id: 1, locale: "en" } });
 ```
 
 If the RPC payload Schema supplies `locale: 'en'` as a constructor default, both calls produce the same canonical key.
@@ -23,7 +23,7 @@ Configure key hashing on QueryClient before adding cache entries. Generated buil
 
 Key objects cannot contain `__proto__` or `constructor` properties at any depth. Prefixes, Schema output, and custom encoder output all follow this restriction.
 
-RPC keys begin with the caller prefix followed by `rpc`. HTTP keys begin with the caller prefix, `http`, and the HttpApi identifier. A factory's `key()` includes these generated segments.
+RPC keys begin with the caller prefix followed by `rpc`. HTTP keys begin with the caller prefix, `http`, and the HttpApi identifier. Omit `keyPrefix` when the adapter and declaration path provide enough separation. A factory’s `key()` includes these generated segments.
 
 The operation follows the RPC path. It is `query`, `infinite`, `streamed`, `live`, or `mutation`. Exact query keys also include the encoded payload, if present. The public payload slot is `unknown`. Use builders for exact keys and explicit projections for partial filters. The library validates and freezes each payload. A root, branch, or RPC prefix matches the operations below it.
 

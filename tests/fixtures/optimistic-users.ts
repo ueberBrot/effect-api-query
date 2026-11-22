@@ -155,10 +155,7 @@ export const makeControlledUserWrites = Effect.fnUntraced(
           );
     };
     const rpcClient: ExampleRpcClient = yield* RpcTest.makeClient(
-      exampleRpcGroup,
-      {
-        flatten: true,
-      }
+      exampleRpcGroup
     ).pipe(
       Effect.provide(
         exampleRpcGroup.toLayer({

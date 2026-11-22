@@ -8,6 +8,7 @@ Import these values and types from `@ueberbrot/effect-api-query`.
 | Export | Purpose |
 | --- | --- |
 | `queryEffects`, `QueryClientService` | Compose native cache operations in Effect with the existing application QueryClient. |
+| `bindReactivityInvalidation` | Connect Effect Reactivity keys to native query invalidation within a Scope. |
 | `QueryClientOperationError` | Retains exact native rejections, including execution wrappers, as an unknown cause. |
 | `acquireQueryOwner`, `QueryOwner`, `QueryOwnerSetup` | Opt in to acquired/borrowed resource setup, guarded cache callbacks and local query/mutation retirement. |
 | `configureUtils` | Configure policies and ordered interceptors on a tree, branch, or leaf. |
@@ -26,6 +27,7 @@ Import these values and types from `@ueberbrot/effect-api-query`.
 | `MutationPolicyOptions` | Selects callback replacement or shared-before-local composition. |
 | `QueryInterceptor`, `MutationInterceptor` | Type native execution context, input, and continuation. |
 | `queryViewCodec`, `infiniteQueryCodec` | Bind paired Schema codecs to a leaf view or infinite pages and page parameters. |
+| `createContractHydrationRegistry` | Derive hydration codecs from an RPC group or HttpApi without a client. |
 | `createHydrationRegistry`, `hydrationCallbacks` | Prepare heterogeneous snapshots or one view with native serialization callbacks. |
 | `HydrationCodec`, `HydrationRegistry`, `HydrationCodecError` | Type codec registration, snapshot preparation, and registration failures. |
 | `recoverStream` | Reconnect a decoded stream with application-supplied cursor and recovery policy. |
@@ -44,7 +46,7 @@ Import these values and types from `@ueberbrot/effect-api-query`.
 | `isEffectRpcQueryError` | Runtime guard for RPC execution errors. |
 | `CreateRpcQueryUtilsOptions` | Factory option type. |
 | `RpcQueryUtils` | Generated utility-tree type. |
-| `RunPromiseExit` | Runner adapter type with optional abort signal. |
+| `RuntimeInput`, `RunPromiseExit` | Factory runtime input and runner function type with optional abort signal. |
 | `KeyEncoder` | Synchronous semantic key-encoder type. |
 | `JsonValue` | Immutable strict-JSON key value. |
 | `QueryData` | Query success type with possible `undefined` normalized to `null`. |
@@ -55,6 +57,10 @@ Import these values and types from `@ueberbrot/effect-api-query`.
 See the [HTTP factory](/effect-api-query/reference/http-factory/) for HTTP types and [errors](/effect-api-query/reference/errors/) for error classes and codes.
 
 Use `UnaryRpcOptions` for local headers and Context. `StreamingRpcOptions` adds the client's stream buffer size. See [request-local RPC options](/effect-api-query/reference/generated-builders/#request-local-rpc-options).
+
+## React subpath
+
+Import `createQueryUtilsContext`, `QueryOwnerProvider`, and `useQueryOwner` from `@ueberbrot/effect-api-query/react`. See [React Query](/effect-api-query/guides/react-query/) for provider setup and disposal.
 
 ## fetchStreamSnapshot
 

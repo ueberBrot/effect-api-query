@@ -19,42 +19,32 @@ export const startHttpWorkflows = async (baseUrl: string) => {
       const client = await runtime.runPromise(
         HttpApiClient.make(workflowsApi, { baseUrl })
       );
-      const runPromiseExit = setup.wrapRunner(runtime.runPromiseExit);
-      const intercept = async <T>({
-        next,
-        context,
-      }: {
-        readonly next: () => Promise<T>;
-        readonly context: { readonly signal: AbortSignal };
-      }) => await setup.runQuery(next, context.signal);
       const base = createHttpApiQueryUtils(workflowsApi, {
         client,
         keyPrefix: ["http-workflows"],
-        runtime: runPromiseExit,
+        runtime,
       });
       const policy = defineHttpApiPolicy(workflowsApi, {
-        query: { retry: false, interceptors: [intercept] },
-        metadata: { retry: false, interceptors: [intercept] },
-        infinite: { retry: false, interceptors: [intercept] },
+        query: { retry: false },
+        metadata: { retry: false },
+        infinite: { retry: false },
         live: {
           retry: false,
           coalesceMs: 250,
-          interceptors: [intercept],
         },
         streamed: {
           retry: false,
           maxChunks: 4,
           publicationBatchSize: 3,
           publicationMaxWaitMs: 180,
-          interceptors: [intercept],
         },
         mutation: { retry: false },
       });
       return {
         runtime,
         client,
-        runPromiseExit,
-        http: configureUtils(base, policy),
+        run: setup.wrapRunner(runtime),
+        http: setup.trackUtils(configureUtils(base, policy)),
       };
     },
     {
@@ -62,7 +52,7 @@ export const startHttpWorkflows = async (baseUrl: string) => {
     }
   );
   const { queryClient } = owner;
-  const { runtime, client, runPromiseExit, http } = owner.resources;
+  const { runtime, client, run, http } = owner.resources;
   const drainMutations = Effect.callback<boolean>((resume) => {
     const cache = queryClient.getMutationCache();
     const check = () => {
@@ -87,7 +77,7 @@ export const startHttpWorkflows = async (baseUrl: string) => {
       }
       const controller = new AbortController();
       const done = (async () => {
-        const exit = await runPromiseExit(effect, {
+        const exit = await run(effect, {
           signal: controller.signal,
         });
         if (Exit.isFailure(exit)) {

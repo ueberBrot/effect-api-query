@@ -11,7 +11,7 @@ import {
 
 import { directory } from "../examples/shared/query-effects";
 import { acquireDirectoryEvents } from "../examples/shared/query-events";
-import { makeRpcTestClient } from "./fixtures/effect-rpc";
+import { makeObjectRpcTestClient } from "./fixtures/effect-rpc";
 
 const gate = () => {
   let open!: () => void;
@@ -252,7 +252,7 @@ describe("owner event consumption", () => {
     await Effect.runPromise(
       Effect.scoped(
         Effect.gen(function* eventWorkflow() {
-          const client = yield* makeRpcTestClient(directory, {
+          const client = yield* makeObjectRpcTestClient(directory, {
             "users.read": ({ id }) => Effect.succeed({ id, name: "server" }),
           });
           yield* Effect.promise(async () => {

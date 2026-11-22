@@ -38,8 +38,8 @@ export const makeUsersInvalidator =
       return;
     }
     await Promise.all([
-      queryClient.invalidateQueries({ queryKey: rpcQuery.users.key() }),
-      queryClient.invalidateQueries({ queryKey: httpQuery.users.key() }),
+      queryClient.invalidateQueries(rpcQuery.users.queryFilter()),
+      queryClient.invalidateQueries(httpQuery.users.queryFilter()),
     ]);
   };
 
@@ -122,8 +122,8 @@ export const makeUserWrites = ({
   });
   const cancel = async () => {
     await Promise.all([
-      queryClient.cancelQueries({ queryKey: rpcQuery.users.key() }),
-      queryClient.cancelQueries({ queryKey: httpQuery.users.key() }),
+      queryClient.cancelQueries(rpcQuery.users.queryFilter()),
+      queryClient.cancelQueries(httpQuery.users.queryFilter()),
     ]);
   };
   const begin = async () => {

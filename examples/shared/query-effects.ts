@@ -1,5 +1,6 @@
 import type { QueryClient } from "@tanstack/query-core";
 import {
+  bindReactivityInvalidation,
   createRpcQueryUtils,
   queryEffects,
   QueryClientService,
@@ -17,7 +18,7 @@ export const directory = RpcGroup.make(
 );
 
 export const directoryEffects = (
-  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof directory>>,
+  client: RpcClient.RpcClient<RpcGroup.Rpcs<typeof directory>>,
   queryClient: QueryClient
 ) => {
   const rpc = createRpcQueryUtils(directory, {
@@ -41,5 +42,12 @@ export const directoryEffects = (
     },
     Effect.provideService(QueryClientService, queryClient)
   );
-  return { rpc, renameFromEvent };
+  const bindUserRefresh = (id: number) =>
+    bindReactivityInvalidation([
+      {
+        keys: [`users:${id}`],
+        filter: rpc.users.read.queryFilter({ view: "query", input: { id } }),
+      },
+    ]).pipe(Effect.provideService(QueryClientService, queryClient));
+  return { rpc, renameFromEvent, bindUserRefresh };
 };

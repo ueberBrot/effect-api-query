@@ -41,7 +41,7 @@ describe("example HTTP API", () => {
             name: "Grace Hopper",
           })
         );
-        expect(yield* rpc("users.get", { id: 13 })).toMatchObject({
+        expect(yield* rpc["users.get"]({ id: 13 })).toMatchObject({
           name: "Grace Hopper",
         });
         const removed = yield* Effect.promise(
@@ -55,7 +55,7 @@ describe("example HTTP API", () => {
           status: removed.status,
           body: yield* Effect.promise(async () => await removed.text()),
         }).toStrictEqual({ status: 204, body: "" });
-        expect(yield* Effect.flip(rpc("users.get", { id: 13 }))).toBe(
+        expect(yield* Effect.flip(rpc["users.get"]({ id: 13 }))).toBe(
           "user-not-found"
         );
       })
@@ -136,7 +136,7 @@ describe("example HTTP API", () => {
             async ({ signal }) =>
               await Effect.runPromiseWith(context)(
                 // oxlint-disable-next-line unicorn/no-useless-undefined
-                rpc("diagnostics.status", undefined),
+                rpc["diagnostics.status"](undefined),
                 { signal }
               )
           )
@@ -150,7 +150,7 @@ describe("example HTTP API", () => {
             async ({ signal }) =>
               await Effect.runPromiseWith(context)(
                 // oxlint-disable-next-line unicorn/no-useless-undefined
-                rpc("diagnostics.status", undefined),
+                rpc["diagnostics.status"](undefined),
                 { signal }
               )
           )
@@ -242,7 +242,7 @@ describe("example HTTP API", () => {
         const server = yield* startExampleRpcServer();
         const rpc = yield* makeExampleRpcClient(server.rpcUrl);
         expect(
-          yield* rpc("commands.start", {
+          yield* rpc["commands.start"]({
             operationId: "shared-domain-scope",
             steps: 1,
           })
@@ -327,7 +327,7 @@ describe("example HTTP API", () => {
           const json: unknown = await response.json();
           return Schema.decodeUnknownSync(DiagnosticStatus)(json);
         };
-        const rpcSlow = yield* rpc("diagnostics.slow", {
+        const rpcSlow = yield* rpc["diagnostics.slow"]({
           durationMs: 60_000,
           operationId: "rpc-panel",
         }).pipe(Effect.forkChild);
@@ -352,10 +352,10 @@ describe("example HTTP API", () => {
               http: { started: 1, interrupted: 0 },
             });
         });
-        yield* rpc("diagnostics.cancel", { operationId: "rpc-panel" });
+        yield* rpc["diagnostics.cancel"]({ operationId: "rpc-panel" });
         expect({
           rpcFailed: Exit.isFailure(yield* Fiber.await(rpcSlow)),
-          rpc: yield* rpc("diagnostics.operationStatus", {
+          rpc: yield* rpc["diagnostics.operationStatus"]({
             operationId: "rpc-panel",
           }),
           http: yield* Effect.promise(
@@ -376,9 +376,9 @@ describe("example HTTP API", () => {
             .toStrictEqual({ started: 1, interrupted: 1 });
         });
         // oxlint-disable-next-line unicorn/no-useless-undefined
-        const beforeReset = yield* rpc("diagnostics.status", undefined);
+        const beforeReset = yield* rpc["diagnostics.status"](undefined);
         // oxlint-disable-next-line unicorn/no-useless-undefined
-        yield* rpc("testing.reset", undefined);
+        yield* rpc["testing.reset"](undefined);
         expect({
           beforeReset,
           afterReset: yield* Effect.promise(

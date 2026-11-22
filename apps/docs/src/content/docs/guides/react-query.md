@@ -37,7 +37,6 @@ Save the client setup in `client.ts`. `startUsersApplication` acquires the HTTP 
 import {
   acquireQueryOwner,
   createHttpApiQueryUtils,
-  configureUtils,
 } from "@ueberbrot/effect-api-query";
 import { ManagedRuntime } from "effect";
 import { FetchHttpClient } from "effect/http";
@@ -55,29 +54,13 @@ export const startUsersApplication = async (baseUrl: string) => {
       const client = await runtime.runPromise(
         HttpApiClient.make(usersApi, { baseUrl })
       );
-      return configureUtils(
-        createHttpApiQueryUtils(usersApi, {
-          client,
-          keyPrefix: ["users-app"],
-          runtime: setup.wrapRunner(runtime),
-        }),
-        {
-          query: {
-            interceptors: [
-              async ({ next, context }) =>
-                await setup.runQuery(next, context.signal),
-            ],
-          },
-        }
+      return setup.trackUtils(
+        createHttpApiQueryUtils(usersApi, { client, runtime })
       );
     },
     { defaultOptions: { queries: { retry: false } } }
   );
-  return {
-    http: owner.resources,
-    queryClient: owner.queryClient,
-    dispose: owner.dispose,
-  };
+  return owner;
 };
 
 export type UsersApplication = Awaited<
@@ -85,22 +68,27 @@ export type UsersApplication = Awaited<
 >;
 ```
 
-This example uses the optional `acquireQueryOwner` helper. Register resources it must close with `setup.acquire`. Use `setup.borrow(client)` for resources your app closes itself. If acquisition fails, the helper releases previously acquired resources in reverse order. Track runners and query functions so disposal can await local finalizers. See [owner retirement](/effect-api-query/guides/switch-cache-owners/#opt-in-owner-helper) before adding writes.
+This example uses the optional `acquireQueryOwner` helper. Register resources it must close with `setup.acquire`. Use `setup.borrow(client)` for resources your app closes itself. If acquisition fails, the helper releases previously acquired resources in reverse order. Call `setup.trackUtils` once so disposal waits for client execution, query finalizers, and accepted generated mutation functions. See [owner retirement](/effect-api-query/guides/switch-cache-owners/#opt-in-owner-helper) before adding writes.
 
 ### Component and provider
 
-In `users-app.tsx`, pass the ready utilities to the component. Give `QueryClientProvider` the QueryClient picked by the same setup.
+In `users-app.tsx`, create a typed context with `createQueryUtilsContext` from the optional React subpath. Pass the query owner to its provider. It supplies both the utility tree and the owner’s QueryClient.
 
 ```tsx
-import { QueryClientProvider, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { createQueryUtilsContext } from "@ueberbrot/effect-api-query/react";
 import { createRoot } from "react-dom/client";
 
 import { startUsersApplication } from "./client.ts";
 import type { UsersApplication } from "./client.ts";
 
-const User = ({ application }: { readonly application: UsersApplication }) => {
+const { Provider, useQueryUtils } =
+  createQueryUtilsContext<UsersApplication["resources"]>();
+
+const User = () => {
+  const http = useQueryUtils();
   const user = useQuery(
-    application.http.users.get.queryOptions({ input: { params: { id: 1 } } })
+    http.users.get.queryOptions({ input: { params: { id: 1 } } })
   );
   if (user.isPending) {
     return <p>Loading user…</p>;
@@ -118,9 +106,9 @@ export const mountUsersApplication = async (
   const application = await startUsersApplication(baseUrl);
   const root = createRoot(element);
   root.render(
-    <QueryClientProvider client={application.queryClient}>
-      <User application={application} />
-    </QueryClientProvider>
+    <Provider owner={application}>
+      <User />
+    </Provider>
   );
   return async () => {
     root.unmount();
@@ -128,6 +116,10 @@ export const mountUsersApplication = async (
   };
 };
 ```
+
+If you only need the owner and cache, use `QueryOwnerProvider` with `useQueryOwner`. When a host such as TanStack Start provides the cache, set `provideQueryClient={false}`.
+
+The provider remounts its QueryClient subtree when the client changes, so observers attach to the new cache. Your app calls `dispose()` on retirement. React Strict Mode and Activity can clean up effects without retiring the owner.
 
 ### Application entry point
 

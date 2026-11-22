@@ -15,14 +15,16 @@ import { Effect, Layer, ManagedRuntime } from "effect";
 import { FetchHttpClient, HttpClient, HttpClientRequest } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
 
+type StartKeyPrefix = readonly ["tanstack-start", string];
+
 const makeExampleRpcQueryUtils = (
   client: ExampleRpcClient,
   runtime: RunPromiseExit,
-  identity: string
+  keyPrefix: StartKeyPrefix
 ) =>
   createRpcQueryUtils(exampleRpcGroup, {
     client,
-    keyPrefix: ["tanstack-start", identity] as const,
+    keyPrefix,
     runtime,
   });
 
@@ -31,15 +33,16 @@ export type ExampleRpcQueryUtils = ReturnType<typeof makeExampleRpcQueryUtils>;
 const makeExampleHttpQueryUtils = (
   client: HttpApiClient.ForApi<typeof exampleHttpApi>,
   runtime: RunPromiseExit,
-  identity: string
+  keyPrefix: StartKeyPrefix
 ) =>
   createHttpApiQueryUtils(exampleHttpApi, {
     client,
-    keyPrefix: ["tanstack-start", identity],
+    keyPrefix,
     runtime,
   });
 
 export interface TanStackStartApplication {
+  readonly keyPrefix: readonly ["tanstack-start", string];
   readonly runPreparation: <A, E>(effect: Effect.Effect<A, E>) => Promise<A>;
   readonly captureSnapshot: typeof fetchStreamSnapshot;
   readonly httpQuery: ReturnType<typeof makeExampleHttpQueryUtils>;
@@ -74,6 +77,7 @@ export const startTanStackStartApplication = async ({
           Layer.provide(Layer.succeed(FetchHttpClient.Fetch, applicationFetch))
         )
   );
+  const keyPrefix: StartKeyPrefix = ["tanstack-start", identity];
   const abort = new AbortController();
   const pendingWork = new Set<Promise<unknown>>();
   const trackWork = async <A>(execute: () => A | Promise<A>): Promise<A> => {
@@ -89,7 +93,14 @@ export const startTanStackStartApplication = async ({
   const ownRunner =
     (runner: RunPromiseExit): RunPromiseExit =>
     async (effect, options) =>
-      trackWork(async () => runner(effect, options));
+      trackWork(async () =>
+        runner(
+          effect,
+          options?.signal === undefined
+            ? options
+            : { signal: AbortSignal.any([abort.signal, options.signal]) }
+        )
+      );
   const queryClient = new QueryClient({
     defaultOptions: {
       mutations: { retry: false },
@@ -163,21 +174,22 @@ export const startTanStackStartApplication = async ({
     const httpQuery = makeExampleHttpQueryUtils(
       httpClient,
       ownRunner(httpRuntime.runPromiseExit),
-      identity
+      keyPrefix
     );
     const rpcQuery = makeExampleRpcQueryUtils(
       rpcClient.client,
-      ownRunner(rpcClient.runPromiseExit),
-      identity
+      ownRunner(rpcClient.runtime),
+      keyPrefix
     );
     return {
+      keyPrefix,
       captureSnapshot,
       runPreparation,
       httpQuery,
       invalidateUsers: async () => {
         await Promise.all([
-          queryClient.invalidateQueries({ queryKey: rpcQuery.users.key() }),
-          queryClient.invalidateQueries({ queryKey: httpQuery.users.key() }),
+          queryClient.invalidateQueries(rpcQuery.users.queryFilter()),
+          queryClient.invalidateQueries(httpQuery.users.queryFilter()),
         ]);
       },
       dispose,

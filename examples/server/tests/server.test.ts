@@ -34,7 +34,7 @@ const waitForStatus = Effect.fn("TestExampleRpc.waitForStatus")(
   ) {
     for (let attempt = 0; attempt < 100; attempt += 1) {
       // oxlint-disable-next-line unicorn/no-useless-undefined
-      const status = yield* client("diagnostics.status", undefined);
+      const status = yield* client["diagnostics.status"](undefined);
       if (predicate(status)) {
         return status;
       }
@@ -163,7 +163,7 @@ describe("example RPC server", () => {
         ).toBe(200);
         const client = yield* makeExampleRpcClient(server.rpcUrl);
         // oxlint-disable-next-line unicorn/no-useless-undefined
-        expect(yield* client("users.list", undefined)).toHaveLength(12);
+        expect(yield* client["users.list"](undefined)).toHaveLength(12);
       })
   );
 
@@ -236,7 +236,7 @@ describe("example RPC server", () => {
       const client = yield* makeExampleRpcClient(server.rpcUrl);
 
       // oxlint-disable-next-line unicorn/no-useless-undefined
-      yield* client("users.list", undefined);
+      yield* client["users.list"](undefined);
 
       const expectedAnnotations: unknown = expect.objectContaining({
         "http.method": "POST",
@@ -257,10 +257,10 @@ describe("example RPC server", () => {
         const server = yield* startExampleRpcServer();
         const client = yield* makeExampleRpcClient(server.rpcUrl);
         // oxlint-disable-next-line unicorn/no-useless-undefined
-        yield* client("testing.reset", undefined);
+        yield* client["testing.reset"](undefined);
 
         // oxlint-disable-next-line unicorn/no-useless-undefined
-        const initialDirectory = yield* client("users.list", undefined);
+        const initialDirectory = yield* client["users.list"](undefined);
         expect({
           count: initialDirectory.length,
           first: initialDirectory[0],
@@ -272,7 +272,7 @@ describe("example RPC server", () => {
         });
 
         expect(
-          yield* client("users.create", { name: "Grace Hopper" })
+          yield* client["users.create"]({ name: "Grace Hopper" })
         ).toStrictEqual(
           new User({
             id: 13,
@@ -282,9 +282,9 @@ describe("example RPC server", () => {
         );
 
         // oxlint-disable-next-line unicorn/no-useless-undefined
-        expect(yield* client("testing.reset", undefined)).toBeUndefined();
+        expect(yield* client["testing.reset"](undefined)).toBeUndefined();
         // oxlint-disable-next-line unicorn/no-useless-undefined
-        expect(yield* client("users.list", undefined)).toStrictEqual(
+        expect(yield* client["users.list"](undefined)).toStrictEqual(
           initialDirectory
         );
       })
@@ -295,10 +295,10 @@ describe("example RPC server", () => {
       const server = yield* startExampleRpcServer();
       const client = yield* makeExampleRpcClient(server.rpcUrl);
       // oxlint-disable-next-line unicorn/no-useless-undefined
-      yield* client("testing.reset", undefined);
+      yield* client["testing.reset"](undefined);
 
       expect(
-        yield* client("testing.seed", {
+        yield* client["testing.seed"]({
           users: [
             new SeedUser({ name: "Grace Hopper" }),
             new SeedUser({ locale: "nl", name: "Dijkstra" }),
@@ -308,7 +308,7 @@ describe("example RPC server", () => {
         new User({ id: 1, locale: "en", name: "Grace Hopper" }),
         new User({ id: 2, locale: "nl", name: "Dijkstra" }),
       ]);
-      expect(yield* client("users.get", { id: 1 })).toStrictEqual(
+      expect(yield* client["users.get"]({ id: 1 })).toStrictEqual(
         new User({
           id: 1,
           locale: "en",
@@ -322,7 +322,7 @@ describe("example RPC server", () => {
     Effect.gen(function* authorizeUserDeletion() {
       const server = yield* startExampleRpcServer();
       const client = yield* makeExampleRpcClient(server.rpcUrl);
-      yield* client("testing.seed", {
+      yield* client["testing.seed"]({
         users: [
           new SeedUser({ name: "Grace Hopper" }),
           new SeedUser({ locale: "nl", name: "Dijkstra" }),
@@ -330,7 +330,7 @@ describe("example RPC server", () => {
       });
 
       const unauthorized = yield* Effect.flip(
-        client("users.delete", { id: 1 })
+        client["users.delete"]({ id: 1 })
       );
       expect(unauthorized).toMatchObject({
         _tag: "ExampleAuthorizationError",
@@ -338,12 +338,12 @@ describe("example RPC server", () => {
       });
 
       expect(
-        yield* RpcClient.withHeaders(client("users.delete", { id: 1 }), {
+        yield* RpcClient.withHeaders(client["users.delete"]({ id: 1 }), {
           "x-example-authorization": "allowed",
         })
       ).toBeUndefined();
       // oxlint-disable-next-line unicorn/no-useless-undefined
-      expect(yield* client("users.list", undefined)).toStrictEqual([
+      expect(yield* client["users.list"](undefined)).toStrictEqual([
         new User({ id: 2, locale: "nl", name: "Dijkstra" }),
       ]);
     })
@@ -356,7 +356,7 @@ describe("example RPC server", () => {
 
       const declaredFailure = yield* Effect.exit(
         // oxlint-disable-next-line unicorn/no-useless-undefined
-        client("diagnostics.fail", undefined)
+        client["diagnostics.fail"](undefined)
       );
       expect(Exit.isFailure(declaredFailure)).toBe(true);
       if (Exit.isSuccess(declaredFailure)) {
@@ -379,7 +379,7 @@ describe("example RPC server", () => {
 
       const streamed = yield* Stream.runCollect(
         // oxlint-disable-next-line unicorn/no-useless-undefined
-        client("diagnostics.stream", undefined)
+        client["diagnostics.stream"](undefined)
       );
       expect([...streamed]).toStrictEqual([
         "Connection opened",
@@ -395,8 +395,8 @@ describe("example RPC server", () => {
       const server = yield* startExampleRpcServer();
       const client = yield* makeExampleRpcClient(server.rpcUrl);
       // oxlint-disable-next-line unicorn/no-useless-undefined
-      yield* client("testing.reset", undefined);
-      const slow = yield* client("diagnostics.slow", {
+      yield* client["testing.reset"](undefined);
+      const slow = yield* client["diagnostics.slow"]({
         durationMs: 60_000,
       }).pipe(Effect.forkChild);
 
@@ -428,10 +428,10 @@ describe("example RPC server", () => {
       );
       const observer = yield* makeExampleRpcClient(server.rpcUrl);
       // oxlint-disable-next-line unicorn/no-useless-undefined
-      yield* observer("testing.reset", undefined);
+      yield* observer["testing.reset"](undefined);
 
-      const running = subject.runPromiseExit(
-        subject.client("diagnostics.slow", {
+      const running = subject.runtime(
+        subject.client["diagnostics.slow"]({
           durationMs: 60_000,
           operationId: "dispose-active-client",
         })
@@ -465,11 +465,11 @@ describe("example RPC server", () => {
       const firstClient = yield* makeExampleRpcClient(server.rpcUrl);
       const secondClient = yield* makeExampleRpcClient(server.rpcUrl);
       // oxlint-disable-next-line unicorn/no-useless-undefined
-      yield* firstClient("testing.reset", undefined);
-      const firstSlow = yield* firstClient("diagnostics.slow", {
+      yield* firstClient["testing.reset"](undefined);
+      const firstSlow = yield* firstClient["diagnostics.slow"]({
         durationMs: 60_000,
       }).pipe(Effect.forkChild);
-      const secondSlow = yield* secondClient("diagnostics.slow", {
+      const secondSlow = yield* secondClient["diagnostics.slow"]({
         durationMs: 60_000,
       }).pipe(Effect.forkChild);
 
