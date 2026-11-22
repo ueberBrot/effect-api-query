@@ -38,6 +38,12 @@ test("opens tutorials and feature guides and searches the production index", asy
     }
   });
   page.on("requestfailed", (request) => {
+    if (
+      request.failure()?.errorText === "NS_BINDING_ABORTED" &&
+      request.headers()["sec-purpose"] === "prefetch"
+    ) {
+      return;
+    }
     if (new URL(request.url()).origin === origin) {
       failedAssets.push(request.url());
     }
