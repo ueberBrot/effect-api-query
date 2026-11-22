@@ -283,7 +283,7 @@ export const acquireQueryOwner = async <A>(
     let hasChildren = false;
     const replacements = new Map<string, PropertyDescriptor>();
     for (const name of Object.keys(node)) {
-      if (name === "key") {
+      if (name === "key" || name === "queryFilter") {
         continue;
       }
       const descriptor = Object.getOwnPropertyDescriptor(node, name);

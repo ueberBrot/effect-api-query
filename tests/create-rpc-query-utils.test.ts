@@ -245,6 +245,7 @@ describe(createRpcQueryUtils, () => {
       expect(Object.getPrototypeOf(utils)).toBe(Object.prototype);
       expect(Reflect.ownKeys(utils)).toStrictEqual([
         "key",
+        "queryFilter",
         "status",
         "billing-history",
       ]);
@@ -363,10 +364,10 @@ describe(createRpcQueryUtils, () => {
         });
 
         expect(new Set(Object.keys(utils))).toStrictEqual(
-          new Set(["events", "key", "reports", "updates"])
+          new Set(["events", "key", "queryFilter", "reports", "updates"])
         );
         expect(new Set(Object.keys(utils.reports))).toStrictEqual(
-          new Set(["key", "list", "watch"])
+          new Set(["key", "queryFilter", "list", "watch"])
         );
         expect({
           unary: utils.reports.list.key(),

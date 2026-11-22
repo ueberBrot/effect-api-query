@@ -1,8 +1,9 @@
 import { describe, expect, it } from "@effect/vitest";
 import { QueryClient } from "@tanstack/query-core";
-import { Effect, Schema } from "effect";
+import { Effect, Predicate, Schema } from "effect";
 import { HttpApi, HttpApiEndpoint, HttpApiGroup } from "effect/http-api";
 import { Rpc, RpcGroup } from "effect/rpc";
+import { vi } from "vitest";
 
 import {
   createHttpApiQueryUtils,
@@ -94,9 +95,112 @@ describe("query filters", () => {
       queryClient.getQueryCache().findAll(locale("en", { type: "inactive" }))
     ).toHaveLength(1);
     expect(queryClient.getQueryCache().findAll(locale("fr"))).toHaveLength(0);
-    const metadata = createQueryFilter(http.users.read, "metadata");
-    expect(queryClient.getQueryCache().findAll(metadata())).toHaveLength(1);
+    const metadata = http.users.read.queryFilter({ view: "metadata", input });
+    expect(queryClient.getQueryCache().findAll(metadata)).toHaveLength(1);
     queryClient.clear();
+  });
+
+  it("matches literal HTTP paths without constructing leaves", () => {
+    const api = HttpApi.make("filters").add(
+      HttpApiGroup.make("users.v1").add(
+        HttpApiEndpoint.get("read.one", "/read", { success: Schema.String })
+      ),
+      HttpApiGroup.make("health", { topLevel: true }).add(
+        HttpApiEndpoint.get("ping", "/ping", { success: Schema.String })
+      )
+    );
+    const http = createHttpApiQueryUtils(api, {
+      client: Effect.runSync(makeUnusedHttpClient(api)),
+    });
+    const queryClient = new QueryClient();
+    const branch = http["users.v1"];
+    const read = ["http", "filters", "users.v1", "read.one", "query"];
+    const metadata = ["http", "filters", "users.v1", "read.one", "metadata"];
+    const topLevel = ["http", "filters", "ping", "query"];
+    const unrelated = ["http", "filters", "users.v1", "unknown", "query"];
+    queryClient.setQueryData(read, "read");
+    queryClient.setQueryData(metadata, "metadata");
+    queryClient.setQueryData(topLevel, "top-level");
+    queryClient.setQueryData(unrelated, "unrelated");
+
+    const freeze = vi.spyOn(Object, "freeze");
+    const frozenLeaves = () =>
+      freeze.mock.calls.filter(([value]) =>
+        Predicate.hasProperty(value, "queryOptions")
+      );
+    try {
+      expect({
+        branchView: queryClient.getQueriesData(
+          branch.queryFilter({ view: "query" })
+        ),
+        rootView: queryClient.getQueriesData(
+          http.queryFilter({ view: "query" })
+        ),
+        allViews: queryClient.getQueriesData(http.queryFilter()).length,
+        frozenLeaves: frozenLeaves().length,
+      }).toStrictEqual({
+        branchView: [[read, "read"]],
+        rootView: [
+          [read, "read"],
+          [topLevel, "top-level"],
+        ],
+        allViews: 4,
+        frozenLeaves: 0,
+      });
+      expect(branch["read.one"].queryKey()).toStrictEqual(read);
+      expect(frozenLeaves()).toHaveLength(1);
+    } finally {
+      freeze.mockRestore();
+      queryClient.clear();
+    }
+  });
+
+  it("refetches, cancels, and resets only the selected view", async () => {
+    const api = HttpApi.make("filters").add(
+      HttpApiGroup.make("users").add(
+        HttpApiEndpoint.get("read", "/read", { success: Schema.String })
+      )
+    );
+    const http = createHttpApiQueryUtils(api, {
+      client: Effect.runSync(makeUnusedHttpClient(api)),
+    });
+    const queryClient = new QueryClient();
+    const read = http.users.read.queryOptions();
+    const metadata = http.users.read.metadataKey();
+    const filter = http.users.queryFilter({ view: "query" });
+    const queryFn = vi
+      .fn<() => Promise<string>>()
+      .mockResolvedValueOnce("1")
+      .mockResolvedValueOnce("2");
+    try {
+      await queryClient.query({ ...read, queryFn });
+      queryClient.setQueryData(metadata, {
+        data: "metadata",
+        status: 200,
+        headers: {},
+      });
+      await queryClient.refetchQueries(filter);
+      expect(queryClient.getQueryData(read.queryKey)).toBe("2");
+
+      const cancelled = vi.fn<() => void>();
+      const pending = queryClient.query({
+        ...read,
+        queryFn: async ({ signal }) => {
+          signal.addEventListener("abort", cancelled, { once: true });
+          return await Effect.runPromise(Effect.never, { signal });
+        },
+      });
+      const completion = pending.catch(() => null);
+      await queryClient.cancelQueries(filter);
+      await completion;
+      expect(cancelled).toHaveBeenCalledOnce();
+
+      await queryClient.resetQueries(filter);
+      expect(queryClient.getQueryData(read.queryKey)).toBeUndefined();
+      expect(queryClient.getQueryData(metadata)?.data).toBe("metadata");
+    } finally {
+      queryClient.clear();
+    }
   });
 
   it.effect(

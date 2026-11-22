@@ -2,7 +2,6 @@ import type { Document } from "@effect-api-query/contracts";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   configureUtils,
-  createBranchQueryFilter,
   findDeclaredError,
   isEffectHttpApiQueryError,
 } from "@ueberbrot/effect-api-query";
@@ -118,10 +117,6 @@ export const DocumentExample = ({
 }) => {
   const { http, queryClient } = application;
   const document = useQuery(http.documents.read.metadataOptions());
-  const metadataReads = useMemo(
-    () => createBranchQueryFilter(http.documents, "metadata"),
-    [http]
-  );
   return (
     <section className="grid gap-4">
       <p>
@@ -149,7 +144,9 @@ export const DocumentExample = ({
         variant="secondary"
         disabled={document.isFetching}
         onClick={() => {
-          void queryClient.invalidateQueries(metadataReads());
+          void queryClient.invalidateQueries(
+            http.documents.queryFilter({ view: "metadata" })
+          );
         }}
       >
         Refresh metadata views

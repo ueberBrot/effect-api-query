@@ -41,6 +41,7 @@ type BufferedBuilder =
   | "call"
   | "effect"
   | "key"
+  | "queryFilter"
   | "queryKey"
   | "queryOptions"
   | "metadataKey"

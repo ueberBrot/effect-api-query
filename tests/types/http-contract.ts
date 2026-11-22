@@ -196,11 +196,20 @@ void [root, groupKey, endpointKey, topLevelKey];
 true satisfies Assert<
   Equal<
     Extract<keyof (typeof utils)["user.accounts"], string>,
-    "key" | "get.user" | "save" | "upload" | "mixedUpload" | "wrappedBuffered"
+    | "key"
+    | "queryFilter"
+    | "get.user"
+    | "save"
+    | "upload"
+    | "mixedUpload"
+    | "wrappedBuffered"
   >
 >;
 true satisfies Assert<
-  Equal<Extract<keyof typeof utils.uploads, string>, "key" | "mixedUpload">
+  Equal<
+    Extract<keyof typeof utils.uploads, string>,
+    "key" | "queryFilter" | "mixedUpload"
+  >
 >;
 true satisfies Assert<
   Equal<
@@ -230,6 +239,7 @@ true satisfies Assert<
     | "call"
     | "effect"
     | "key"
+    | "queryFilter"
     | "queryKey"
     | "queryOptions"
     | "mutationKey"
@@ -636,7 +646,9 @@ const emptyUtils = createHttpApiQueryUtils(emptyApi, {
   client: emptyClient,
   keyPrefix: ["app"],
 });
-true satisfies Assert<Equal<Extract<keyof typeof emptyUtils, string>, "key">>;
+true satisfies Assert<
+  Equal<Extract<keyof typeof emptyUtils, string>, "key" | "queryFilter">
+>;
 createHttpApiQueryUtils(emptyApi, {
   client: emptyClient,
   keyPrefix: ["app"],
@@ -1055,7 +1067,10 @@ const omittedCustom = createHttpApiQueryUtils(omittedServiceApi, {
   keyPrefix: ["app"],
 });
 true satisfies Assert<
-  Equal<Extract<keyof typeof omittedCustom.system, string>, "key" | "ping">
+  Equal<
+    Extract<keyof typeof omittedCustom.system, string>,
+    "key" | "queryFilter" | "ping"
+  >
 >;
 
 class DecodeMiddlewareError extends Context.Service<

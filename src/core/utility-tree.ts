@@ -2,8 +2,11 @@ import { skipToken } from "@tanstack/query-core";
 import { Array as EffectArray, Effect, Exit, Predicate } from "effect";
 import type { Cause } from "effect";
 
+import { createBranchFilter } from "./branch-filter";
+import type { FilterPath } from "./branch-filter";
 import { canonicalizeArray } from "./canonical-key";
 import type { UtilityNode } from "./configure-utils";
+import type { QueryView } from "./inference";
 import { prepareMetadataExecution } from "./metadata-query";
 import { isInvalidUtilitySegment } from "./operation";
 import type {
@@ -22,12 +25,15 @@ import {
   readPreparedInput,
   registerInputOwner,
 } from "./prepared-input";
+import type { QueryFilterOptions } from "./query-filter";
 import { resolveRuntime } from "./runtime";
 import type {
   JsonValue,
+  LivePolicyOptions,
   OptionalKeyPrefix,
   RunPromiseExit,
   RuntimeInput,
+  StreamedPolicyOptions,
 } from "./types";
 
 interface PreparedQuery {
@@ -168,6 +174,40 @@ const prepareQuery = (
     key: freezeKey([...operationKey, prepared.keyValue, ...identity]),
   };
 };
+
+type LeafFilterOptions = QueryFilterOptions &
+  LivePolicyOptions &
+  Partial<StreamedPolicyOptions> & {
+    readonly view?: QueryView;
+    readonly input?: unknown;
+    readonly sseOptions?: unknown;
+  };
+
+const createLeafFilter =
+  (
+    description: UnaryOperation | StreamingOperation,
+    operationKey: readonly JsonValue[],
+    keyEncoder: RuntimeKeyEncoder | undefined
+  ) =>
+  (argument: LeafFilterOptions = {}) => {
+    const { view, input, ...options } = argument;
+    delete options.coalesceMs;
+    delete options.maxChunks;
+    delete options.refetchMode;
+    delete options.publicationBatchSize;
+    delete options.publicationMaxWaitMs;
+    delete options.sseOptions;
+    if (view === undefined) {
+      return { ...options, queryKey: operationKey };
+    }
+    const prefix = freezeKey([...operationKey, view]);
+    return {
+      ...options,
+      queryKey: Object.hasOwn(argument, "input")
+        ? prepareQuery(description, input, prefix, keyEncoder).key
+        : prefix,
+    };
+  };
 
 const prepareQueryOptions = (
   description: OperationDescription,
@@ -462,6 +502,7 @@ const createUnaryBuilders = (
         );
 
   return {
+    queryFilter: createLeafFilter(description, operationKey, keyEncoder),
     ...createInfiniteBuilders(
       description,
       operationKey,
@@ -510,25 +551,12 @@ const createStreamingBuilders = (
   const streamed = createView("streamed");
 
   return {
+    queryFilter: createLeafFilter(description, operationKey, keyEncoder),
     liveKey: live.key,
     liveOptions: live.options,
     streamedKey: streamed.key,
     streamedOptions: streamed.options,
   };
-};
-
-const deepFreezeTree = (value: Record<string, unknown>) => {
-  for (const key of Object.keys(value)) {
-    const descriptor = Object.getOwnPropertyDescriptor(value, key);
-    if (
-      descriptor !== undefined &&
-      "value" in descriptor &&
-      Predicate.isObject(descriptor.value)
-    ) {
-      deepFreezeTree(descriptor.value);
-    }
-  }
-  return Object.freeze(value);
 };
 
 const validateKeyEncoders = (
@@ -619,8 +647,44 @@ export const buildBranchFrom = (
   return Object.freeze(next) as Record<string, unknown> & UtilityNode;
 };
 
+interface BuildBranch {
+  readonly node: Record<string, unknown>;
+  readonly children: Map<string, BuildBranch>;
+  readonly paths: FilterPath[];
+}
+
+const buildBranch = (key: readonly JsonValue[]): BuildBranch => {
+  const paths: FilterPath[] = [];
+  return {
+    node: { key: () => key, queryFilter: createBranchFilter(key, paths) },
+    children: new Map(),
+    paths,
+  };
+};
+
+const freezeBranch = (branch: BuildBranch) => {
+  for (const child of branch.children.values()) {
+    freezeBranch(child);
+  }
+  return Object.freeze(branch.node);
+};
+
+const operationViews = (
+  operation: OperationDescription
+): readonly QueryView[] => {
+  if (operation.kind === "Mutation") {
+    return [];
+  }
+  if (operation.kind === "Streaming") {
+    return ["live", "streamed"];
+  }
+  return operation.metadata === undefined
+    ? ["query", "infinite"]
+    : ["query", "infinite", "metadata"];
+};
+
 const insertLeaf = (
-  tree: Record<string, unknown>,
+  tree: BuildBranch,
   prefix: readonly JsonValue[],
   path: ValidatedOperationPath,
   keyEncoder: RuntimeKeyEncoder | undefined,
@@ -631,31 +695,30 @@ const insertLeaf = (
     path.operation.kind === "Mutation"
       ? path.operation
       : { ...path.operation, input: { ...path.operation.input } };
+  const operationKey = freezeKey([...prefix, ...segments]);
+  const filterPath: FilterPath = {
+    key: operationKey,
+    views: operationViews(operation),
+  };
   let branch = tree;
-  for (let index = 0; index < segments.length - 1; index += 1) {
-    const segment = segments[index];
-    if (segment === undefined) {
-      throw new TypeError(
-        "Validated operation paths must have defined segments"
-      );
-    }
-    const candidate = Object.hasOwn(branch, segment)
-      ? branch[segment]
-      : undefined;
-    let child = Predicate.isObject(candidate) ? candidate : undefined;
+  branch.paths.push(filterPath);
+  for (const [index, segment] of segments.slice(0, -1).entries()) {
+    let child = branch.children.get(segment);
     if (child === undefined) {
-      const key = freezeKey([...prefix, ...segments.slice(0, index + 1)]);
-      child = { key: () => key };
-      branch[segment] = child;
+      child = buildBranch(
+        freezeKey([...prefix, ...segments.slice(0, index + 1)])
+      );
+      branch.children.set(segment, child);
+      branch.node[segment] = child.node;
     }
     branch = child;
+    branch.paths.push(filterPath);
   }
 
   const leafName = segments.at(-1);
   if (leafName === undefined) {
     throw new TypeError("Validated operation paths must have a leaf");
   }
-  const operationKey = freezeKey([...prefix, ...segments]);
   const leafKey = () => operationKey;
   const buildLeaf = (leafRunner: RunPromiseExit<unknown>) => {
     let builders;
@@ -679,7 +742,7 @@ const insertLeaf = (
     return Object.freeze({ key: leafKey, ...builders });
   };
   Object.defineProperty(
-    branch,
+    branch.node,
     leafName,
     defineLazyLeafDescriptor(() => {
       const leaf = buildLeaf(runPromiseExit);
@@ -698,7 +761,7 @@ const createTree = (
   keyEncoders: ReadonlyMap<string, RuntimeKeyEncoder>,
   runPromiseExit: RunPromiseExit<unknown>
 ) => {
-  const tree = { key: () => prefix };
+  const tree = buildBranch(prefix);
 
   for (const path of paths) {
     insertLeaf(
@@ -709,7 +772,7 @@ const createTree = (
       runPromiseExit
     );
   }
-  return deepFreezeTree(tree);
+  return freezeBranch(tree);
 };
 
 export const createUtilityTree = (

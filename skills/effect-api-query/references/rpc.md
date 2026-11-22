@@ -48,7 +48,7 @@ try {
     queryClient,
     rpc.users.rename.mutationOptions({
       onSuccess: async () => {
-        await queryClient.invalidateQueries({ queryKey: rpc.users.key() });
+        await queryClient.invalidateQueries(rpc.users.queryFilter());
       },
     })
   );

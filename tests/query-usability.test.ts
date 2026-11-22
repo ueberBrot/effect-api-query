@@ -13,7 +13,6 @@ import { Rpc, RpcGroup } from "effect/rpc";
 import {
   configureUtils,
   consumeEvents,
-  createBranchQueryFilter,
   createRpcQueryUtils,
   createHttpApiQueryUtils,
   EffectHttpApiQueryError,
@@ -268,6 +267,46 @@ describe("query usability", () => {
         }
       })
   );
+  it.effect("filters prepared stream input across retention policies", () =>
+    Effect.gen(function* filterPreparedStream() {
+      const client = yield* makeRpcTestClient(group, handlers);
+      const rpc = createRpcQueryUtils(group, { client });
+      const leaf = rpc.users.watch;
+      const queryClient = new QueryClient();
+      const input = prepareInput(leaf, { id: 1 });
+      try {
+        queryClient.setQueryData(
+          leaf.streamedKey({ input, maxChunks: 2 }),
+          [1]
+        );
+        queryClient.setQueryData(
+          leaf.streamedKey({ input, maxChunks: 5 }),
+          [1]
+        );
+        queryClient.setQueryData(
+          leaf.streamedKey({ input: { id: 2 }, maxChunks: 2 }),
+          [2]
+        );
+        queryClient.setQueryData(leaf.liveKey({ input }), 1);
+
+        const filter = leaf.queryFilter({
+          view: "streamed",
+          input,
+          maxChunks: 2,
+        });
+        expect(filter).toStrictEqual({
+          queryKey: [...leaf.key(), "streamed", { id: 1 }],
+        });
+        queryClient.removeQueries(filter);
+        expect(queryClient.getQueriesData(leaf.queryFilter())).toHaveLength(2);
+        expect(
+          queryClient.getQueriesData(leaf.queryFilter({ view: "streamed" }))
+        ).toHaveLength(1);
+      } finally {
+        queryClient.clear();
+      }
+    })
+  );
   it.effect(
     "filters a branch view across nested leaves and composes native predicates",
     () =>
@@ -298,9 +337,9 @@ describe("query usability", () => {
             rpc.users.watch.liveKey({ input: { id: 1 } }),
             1
           );
-          const filter = createBranchQueryFilter(rpc.users, "query");
+          const filter = rpc.users.queryFilter({ view: "query" });
           yield* Effect.promise(async () => {
-            await queryClient.invalidateQueries(filter());
+            await queryClient.invalidateQueries(filter);
           });
           expect(
             queryClient
@@ -309,13 +348,14 @@ describe("query usability", () => {
           ).toHaveLength(2);
           expect(
             queryClient.getQueriesData(
-              filter({ predicate: (query) => query.state.data === 2 })
+              rpc.users.queryFilter({
+                view: "query",
+                predicate: (query) => query.state.data === 2,
+              })
             )
           ).toHaveLength(1);
           expect(
-            queryClient.getQueriesData(
-              createBranchQueryFilter(rpc, "metadata")()
-            )
+            queryClient.getQueriesData(rpc.queryFilter({ view: "metadata" }))
           ).toHaveLength(0);
         } finally {
           queryClient.clear();

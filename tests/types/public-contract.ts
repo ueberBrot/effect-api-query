@@ -256,6 +256,7 @@ type ExpectedLeafInterface =
   | "infiniteKey"
   | "infiniteOptions"
   | "key"
+  | "queryFilter"
   | "mutationKey"
   | "mutationOptions"
   | "queryKey"
@@ -270,6 +271,7 @@ type ExactLeafInterface = Assert<
 const exactLeafInterface: ExactLeafInterface = true;
 type ExpectedStreamLeafInterface =
   | "key"
+  | "queryFilter"
   | "liveKey"
   | "liveOptions"
   | "streamedKey"

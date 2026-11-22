@@ -109,7 +109,6 @@ export type {
   ConfiguredUtils,
   UtilsConfiguration,
 } from "./core/configure-utils";
-export { createBranchQueryFilter } from "./core/branch-filter";
 export {
   findDeclaredError,
   getExecutionCause,

@@ -36,7 +36,7 @@ skills:
       - Check application-owned policy maps against their RPC or HTTP contracts before client acquisition. Type-check SSE settings at the SSE leaf, including flat path entries. Apply policies through configureUtils, which copies decoder settings for keys and options.
       - Compose typed reads, ensure, cache updates and generated filter invalidation in Effect using an explicit existing QueryClient service; interrupt waiters without cancelling shared execution.
       - Derive buffered, paginated, accumulated, live, and metadata options from a ready client. Use its HTTP request parse options when encoding default keys.
-      - Address exact stream policy keys, select supported view prefixes, and compose encoded partial native filters with explicit typed projections.
+      - Use colocated query filters for lazy-safe branch views and canonical leaf inputs. Use concrete keys for exact stream policies and explicit projections for encoded partial input.
       - Reuse inferred input, cached query data, and mutation types in application modules.
       - Configure utility trees, branches, and leaves with ordered interceptors across views; reuse unchanged frozen subtrees while preserving policy snapshots and prepared-input ownership; select a branch view without changing key layouts.
       - Reuse owner-bound prepared inputs and configure policies once per owner; rebuild reactive call-site options when input changes.

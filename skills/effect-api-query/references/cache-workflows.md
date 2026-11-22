@@ -53,6 +53,7 @@ export function userCache(
       queryKey: rpc.users.read.queryKey({ input: { id: 1 } }),
       exact: true as const,
     },
+    userReads: rpc.users.queryFilter({ view: "query" }),
     everyLocale: createQueryFilter(rpc.users.read, "query", (id: number) => ({
       id: String(id),
     }))(1),
@@ -60,7 +61,7 @@ export function userCache(
 }
 ```
 
-Use `createQueryFilter` to bind a leaf and view to a projection into the actual key shape. By default, the projection takes the leaf's input. Annotate its parameter for a scalar or partial input. Return strict JSON. The helper copies and freezes it without running the constructor or filling defaults. Omit the projection to match the whole view with native conditions.
+Use `createQueryFilter` to bind a leaf and view to a projection into the actual key shape. By default, the projection takes the leaf's input. Annotate its parameter for a scalar or partial input. Return strict JSON. The helper copies and freezes it without running the constructor or filling defaults.
 
 `everyLocale` matches the encoded string ID for all locales. The concrete key fills in `locale: 'en'`. Match the output of the active encoder. Default HTTP keys keep request labels and lowercase headers. If an encoder returns only a scalar, use a broad prefix or exact key.
 
@@ -68,7 +69,9 @@ Pass generated prefixes to native `invalidateQueries` or `cancelQueries`. Invali
 
 Hooks, observers, and `queryClient.query` apply selection. The cache retains decoded data. Set hashing through QueryClient global or prefix defaults and keep it stable. Per-call hashes are rejected. Streams fail with `UnsupportedQueryHash` if a default hash or cached identity conflicts. Retire the cache before changing hashing. Mutation keys and defaults are separate.
 
-Bind a branch and view with `const userReads = createBranchQueryFilter(rpc.users, "query")`. Then pass `userReads()` to `queryClient.invalidateQueries`. Pass native conditions to `userReads` to narrow the match. Omit `exact` to include descendants. Absent views match nothing.
+Pass `userReads` directly to `queryClient.invalidateQueries`. Root and branch filters use paths without constructing lazy leaves. Omit `exact` to include descendants. Within a branch, a view with no matching leaves selects nothing.
+
+On a queryable leaf, omit `view` to select all views. Pass `{ view, input }` to match one canonical input. This accepts prepared input and matches all stream policies for that input. Use a concrete stream key with `exact: true` for one policy.
 
 ## Run a leaf directly
 
@@ -139,7 +142,7 @@ export function userPolicies(
     mutation: {
       callbacks: "compose",
       onSuccess: (_data, _variables, _result, context) =>
-        context.client.invalidateQueries({ queryKey: rpc.users.key() }),
+        context.client.invalidateQueries(rpc.users.queryFilter()),
     },
   });
   return {

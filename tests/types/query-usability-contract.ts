@@ -3,7 +3,6 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   configureUtils,
   consumeEvents,
-  createBranchQueryFilter,
   createHttpApiQueryUtils,
   createRpcQueryUtils,
   findDeclaredError,
@@ -130,7 +129,7 @@ configureUtils(rpc.read, {
   // @ts-expect-error Variable-supplied optimistic context must remain local to the mutation.
   mutation: optimisticPolicy,
 });
-queryClient.invalidateQueries(createBranchQueryFilter(rpc, "query")());
+queryClient.invalidateQueries(rpc.queryFilter({ view: "query" }));
 declare const failure: InferQueryError<typeof rpc.read>;
 const found = findDeclaredError(failure, "Missing");
 if (Option.isSome(found)) {

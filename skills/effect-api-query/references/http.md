@@ -61,7 +61,7 @@ try {
     queryClient,
     http.users.rename.mutationOptions({
       onSuccess: async () => {
-        await queryClient.invalidateQueries({ queryKey: http.users.key() });
+        await queryClient.invalidateQueries(http.users.queryFilter());
       },
     })
   );
@@ -69,8 +69,7 @@ try {
   const upload = new MutationObserver(
     queryClient,
     http.users.upload.mutationOptions({
-      onSuccess: () =>
-        queryClient.invalidateQueries({ queryKey: http.users.key() }),
+      onSuccess: () => queryClient.invalidateQueries(http.users.queryFilter()),
     })
   );
   const payload = new FormData();

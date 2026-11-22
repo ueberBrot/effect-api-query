@@ -13,7 +13,6 @@ Import these values and types from `@ueberbrot/effect-api-query`.
 | `configureUtils` | Configure policies and ordered interceptors on a tree, branch, or leaf. |
 | `defineRpcPolicy`, `defineHttpApiPolicy` | Check reusable policy maps against contracts before acquiring clients. |
 | `UtilsConfiguration`, `ConfiguredUtils` | Type configuration and the configured utility tree. |
-| `createBranchQueryFilter` | Select one view across all descendant leaves. |
 | `prepareInput`, `PreparedInput` | Reuse owner-bound input preparation explicitly. |
 | `isEffectApiQueryError`, `getExecutionCause` | Recognize either execution wrapper and read its original Cause. |
 | `findDeclaredError`, `matchDeclaredError` | Select or handle one tagged failure in an execution error. |

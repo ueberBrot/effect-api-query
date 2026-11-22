@@ -7,7 +7,6 @@ import {
   acquireQueryOwner,
   configureUtils,
   createRpcQueryUtils,
-  createQueryFilter,
   EffectRpcQueryError,
   EffectHttpApiQueryError,
   queryEffects,
@@ -187,7 +186,7 @@ it.effect(
         .ensure(options)
         .pipe(Effect.provideService(QueryClientService, client));
       yield* queryEffects
-        .invalidate(createQueryFilter(utils.read, "query")())
+        .invalidate(utils.read.queryFilter({ view: "query" }))
         .pipe(Effect.provideService(QueryClientService, client));
       expect(client.getQueryData(options.queryKey)).toBe(2);
       expect(observer.getCurrentResult().data).toBe(2);

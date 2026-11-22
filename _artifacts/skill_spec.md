@@ -52,6 +52,8 @@ These checks verify the recommended APIs and observable behavior. A fresh isolat
 
 ## Coverage and batch history
 
+- **Colocated query filters, #216, integrated at `7d5adcc`:** The cache-workflows reference uses generated filters on roots, branches, and queryable leaves. Branch view filters use path metadata and preserve lazy leaves. Full leaf filters share canonical encoding with concrete keys. Partial inputs use explicit projections. The domain map records these tasks, and the skill tree maps ADR 0051. Both public compiler suites, 192 focused runtime tests, and the docs check passed. Fresh consumer evidence is pending.
+
 - **Flat policy maps, spec #210 ticket #214, base `272c099`:** The cache-workflows reference uses inline view options, relative `paths`, and contract-inferred policy constructors. The query-patterns reference points to `streamed.maxChunks`. The shipped examples also use the integration base’s unified key arguments and `runtime` option. The domain map keeps typed SSE settings and scope order in the existing task. The skill tree maps ADR 0049, which amends ADR 0032. The existing configuration tests and compiler fixtures exercise the revised guidance. Fresh consumer-agent evidence is pending.
 
 - **Five-round architecture review, base `8007f00`:** Align HTTP key encoding with declared parse options and keep owner caches independent. Update the HTTP and cache workflow references. Existing source mappings cover the narrower overload fixture, prepared inputs, stream recovery and publication, and the example retirement checks. Verify through the public compiler and runtime suites.

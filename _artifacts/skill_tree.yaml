@@ -55,6 +55,7 @@ skills:
       - docs/adr/0043-*.md
       - docs/adr/0049-*.md
       - docs/adr/0050-*.md
+      - docs/adr/0051-*.md
       - apps/docs/astro.config.mts
       - "**/apps/docs/src/content/docs/**/*.md"
       - "**/apps/docs/src/content/docs/**/*.mdx"
