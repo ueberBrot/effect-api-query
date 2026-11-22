@@ -292,10 +292,6 @@ describe("query usability", () => {
         const filter = leaf.queryFilter({
           view: "streamed",
           input,
-          maxChunks: 2,
-        });
-        expect(filter).toStrictEqual({
-          queryKey: [...leaf.key(), "streamed", { id: 1 }],
         });
         queryClient.removeQueries(filter);
         expect(queryClient.getQueriesData(leaf.queryFilter())).toHaveLength(2);

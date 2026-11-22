@@ -42,6 +42,13 @@ const profile = new Profile({
   avatar: new Uint8Array([0, 128, 255]),
 });
 
+const DiagnosticEvent = Schema.Struct({
+  __effectApiQueryHydration: Schema.Literal("undefined"),
+});
+const diagnosticEvent = DiagnosticEvent.make({
+  __effectApiQueryHydration: "undefined",
+});
+
 const captureHydrationError = (fn: () => void): HydrationCodecError => {
   try {
     fn();
@@ -83,23 +90,36 @@ describe("createContractHydrationRegistry — RPC contracts", () => {
     "round-trips unary, void, optional, infinite, live, and streamed RPC views with default empty keyPrefix",
     () =>
       Effect.gen(function* roundTripsRpcViews() {
+        const OptionalName: Schema.Codec<string | undefined> = Schema.suspend(
+          () => Schema.Union([Schema.String, Schema.Undefined, OptionalName])
+        );
         const group = RpcGroup.make(
           Rpc.make("users.read", {
             payload: { id: Schema.Int },
             success: Profile,
           }),
           Rpc.make("health.ping", { success: Schema.Void }),
-          Rpc.make("users.optional", { success: Schema.UndefinedOr(Profile) }),
+          Rpc.make("users.optional", {
+            payload: { id: Schema.Int },
+            success: OptionalName,
+          }),
           Rpc.make("events.watch", {
-            success: Schema.UndefinedOr(Schema.NullOr(Profile)),
+            success: Schema.Union([
+              Profile,
+              Schema.Undefined,
+              Schema.Null,
+              DiagnosticEvent,
+            ]),
             stream: true,
           })
         );
         const client = yield* makeRpcTestClient(group, {
           "users.read": () => Effect.succeed(profile),
           "health.ping": () => Effect.void,
-          "users.optional": () => Effect.undefined,
-          "events.watch": () => Stream.fromIterable([profile, undefined, null]),
+          "users.optional": ({ id }) =>
+            Effect.succeed(id === 1 ? undefined : "Ada"),
+          "events.watch": () =>
+            Stream.fromIterable([profile, diagnosticEvent, undefined, null]),
         });
         const rpc = createRpcQueryUtils(group, { client });
         const registry = createContractHydrationRegistry(group, {
@@ -120,6 +140,11 @@ describe("createContractHydrationRegistry — RPC contracts", () => {
             staleTime: Infinity,
           });
           const optOpts = rpc.users.optional.queryOptions({
+            input: { id: 1 },
+            staleTime: Infinity,
+          });
+          const namedOpts = rpc.users.optional.queryOptions({
+            input: { id: 2 },
             staleTime: Infinity,
           });
           const infOpts = rpc.users.read.infiniteOptions({
@@ -139,6 +164,7 @@ describe("createContractHydrationRegistry — RPC contracts", () => {
           yield* Effect.promise(async () => await server.query(readOpts));
           yield* Effect.promise(async () => await server.query(pingOpts));
           yield* Effect.promise(async () => await server.query(optOpts));
+          yield* Effect.promise(async () => await server.query(namedOpts));
           yield* Effect.promise(
             async () => await server.infiniteQuery(infOpts)
           );
@@ -157,6 +183,7 @@ describe("createContractHydrationRegistry — RPC contracts", () => {
             avatar: restoredRead?.avatar,
             ping: browser.getQueryData(pingOpts.queryKey),
             optional: browser.getQueryData(optOpts.queryKey),
+            named: browser.getQueryData(namedOpts.queryKey),
             page: restoredPages?.pages[0],
             cursor: restoredPages?.pageParams[0],
             offset: restoredPages?.pageParams[0]?.offset,
@@ -168,10 +195,11 @@ describe("createContractHydrationRegistry — RPC contracts", () => {
             avatar: new Uint8Array([0, 128, 255]),
             ping: null,
             optional: null,
+            named: "Ada",
             page: expect.any(Profile),
             cursor: expect.any(Cursor),
             offset: 0n,
-            streamed: [expect.any(Profile), undefined, null],
+            streamed: [expect.any(Profile), diagnosticEvent, undefined, null],
             live: null,
           });
           /* oxlint-enable typescript/no-unsafe-assignment */
@@ -267,6 +295,65 @@ describe("createContractHydrationRegistry — RPC contracts", () => {
 });
 
 describe("createContractHydrationRegistry — HTTP contracts", () => {
+  it.effect("preserves HTTP success variants with the same JSON encoding", () =>
+    Effect.gen(function* preservesHttpSuccessVariants() {
+      const api = HttpApi.make("variants").add(
+        HttpApiGroup.make("values").add(
+          HttpApiEndpoint.get("read", "/value", {
+            success: [
+              HttpApiSchema.status(200)(Schema.BigInt),
+              HttpApiSchema.status(201)(Schema.String),
+            ],
+          })
+        )
+      );
+      const client = yield* HttpApiClient.makeWith(api, {
+        baseUrl: "https://example.test",
+        httpClient: dummyHttpClient,
+      });
+      const { read } = createHttpApiQueryUtils(api, { client }).values;
+      const queryKey = read.queryKey();
+      const metadataKey = read.metadataKey();
+      const server = new QueryClient();
+      const browser = new QueryClient();
+      server.setQueryData(queryKey, "42");
+      server.setQueryData(metadataKey, { data: 42n, status: 200, headers: {} });
+      yield* roundTripJson(
+        createContractHydrationRegistry(api),
+        server,
+        browser
+      );
+      expect(browser.getQueryData(queryKey)).toBe("42");
+      expect(browser.getQueryData(metadataKey)?.data).toBe(42n);
+    })
+  );
+
+  it("reads hydration overrides only from own path properties", () => {
+    const group = RpcGroup.make(
+      Rpc.make("toString", { success: Schema.String })
+    );
+    const api = HttpApi.make("inherited").add(
+      HttpApiGroup.make("root", { topLevel: true }).add(
+        HttpApiEndpoint.get("toString", "/text", { success: Schema.String })
+      )
+    );
+
+    const rpcKey = ["rpc", "toString", "query"];
+    const httpKey = ["http", "inherited", "toString", "query"];
+    expect(createContractHydrationRegistry(group).matches(rpcKey)).toBe(true);
+    expect(createContractHydrationRegistry(api).matches(httpKey)).toBe(true);
+    expect(
+      createContractHydrationRegistry(group, {
+        paths: { toString: false },
+      }).matches(rpcKey)
+    ).toBe(false);
+    expect(
+      createContractHydrationRegistry(api, {
+        paths: { toString: false },
+      }).matches(httpKey)
+    ).toBe(false);
+  });
+
   it.effect(
     "round-trips buffered, frozen metadata, Text, FormUrlEncoded, Uint8Array, disableCodecs, WithHeaders, encodeToWithHeaders, and multi-success unions",
     () =>
@@ -583,7 +670,12 @@ describe("createContractHydrationRegistry — HTTP contracts", () => {
           HttpApiGroup.make("streams").add(
             HttpApiEndpoint.get("sseData", "/sse-data", {
               success: HttpApiSchema.StreamSse({
-                data: Schema.UndefinedOr(Schema.NullOr(Profile)),
+                data: Schema.Union([
+                  Profile,
+                  Schema.Undefined,
+                  Schema.Null,
+                  DiagnosticEvent,
+                ]),
               }),
             }),
             HttpApiEndpoint.get("sseEvents", "/sse-events", {
@@ -627,7 +719,12 @@ describe("createContractHydrationRegistry — HTTP contracts", () => {
           const ndjsonLiveKey = http.streams.ndjson.liveKey();
           const ndjsonHeadersKey = http.streams.ndjsonHeaders.liveKey();
 
-          server.setQueryData(sseDataStreamKey, [profile, undefined, null]);
+          server.setQueryData(sseDataStreamKey, [
+            profile,
+            diagnosticEvent,
+            undefined,
+            null,
+          ]);
           server.setQueryData(sseDataLiveKey, null);
           server.setQueryData(sseEventsStreamKey, [
             { event: "tick", data: profile },
@@ -659,7 +756,12 @@ describe("createContractHydrationRegistry — HTTP contracts", () => {
             wrappedBody: restoredWrapped?.body,
             wrappedHeader: restoredWrapped?.headers["x-stream-id"],
           }).toStrictEqual({
-            sseDataStream: [expect.any(Profile), undefined, null],
+            sseDataStream: [
+              expect.any(Profile),
+              diagnosticEvent,
+              undefined,
+              null,
+            ],
             sseDataLive: null,
             sseEventsStream: [{ event: "tick", data: expect.any(Profile) }],
             ndjsonStream: [expect.any(Profile), undefined, null],

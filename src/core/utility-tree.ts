@@ -1,4 +1,4 @@
-import { skipToken } from "@tanstack/query-core";
+import { hashKey, skipToken } from "@tanstack/query-core";
 import { Array as EffectArray, Effect, Exit, Predicate } from "effect";
 import type { Cause } from "effect";
 
@@ -25,7 +25,7 @@ import {
   readPreparedInput,
   registerInputOwner,
 } from "./prepared-input";
-import type { QueryFilterOptions } from "./query-filter";
+import type { QueryFilter, QueryFilterOptions } from "./query-filter";
 import { resolveRuntime } from "./runtime";
 import type {
   JsonValue,
@@ -183,29 +183,76 @@ type LeafFilterOptions = QueryFilterOptions &
     readonly sseOptions?: unknown;
   };
 
+const streamPolicyKeys = new Set([
+  "coalesceMs",
+  "maxChunks",
+  "refetchMode",
+  "publicationBatchSize",
+  "publicationMaxWaitMs",
+  "sseOptions",
+]);
+
 const createLeafFilter =
   (
     description: UnaryOperation | StreamingOperation,
     operationKey: readonly JsonValue[],
-    keyEncoder: RuntimeKeyEncoder | undefined
+    keyEncoder: RuntimeKeyEncoder | undefined,
+    runPromiseExit: RunPromiseExit<unknown>
   ) =>
-  (argument: LeafFilterOptions = {}) => {
+  (
+    argument: LeafFilterOptions = {},
+    defaults?: Partial<Record<"live" | "streamed", Record<string, unknown>>>
+  ): QueryFilter => {
     const { view, input, ...options } = argument;
-    delete options.coalesceMs;
-    delete options.maxChunks;
-    delete options.refetchMode;
-    delete options.publicationBatchSize;
-    delete options.publicationMaxWaitMs;
-    delete options.sseOptions;
     if (view === undefined) {
       return { ...options, queryKey: operationKey };
     }
+
     const prefix = freezeKey([...operationKey, view]);
+    const inputless = description.input._tag === "Inputless";
+    const hasInput = Object.hasOwn(argument, "input");
+    const identity =
+      description.kind === "Streaming" &&
+      (view === "live" || view === "streamed") &&
+      Object.keys(options).some((key) => streamPolicyKeys.has(key))
+        ? description.prepareStream(
+            { ...defaults?.[view], ...options },
+            view,
+            runPromiseExit,
+            undefined
+          ).identity
+        : undefined;
+    let queryKey = prefix;
+    if (hasInput) {
+      queryKey = prepareQuery(
+        description,
+        input,
+        prefix,
+        keyEncoder,
+        identity
+      ).key;
+    } else if (inputless && identity !== undefined) {
+      queryKey = freezeKey([...prefix, ...identity]);
+    }
+    if (identity === undefined) {
+      return { ...options, queryKey };
+    }
+
+    const nativeOptions = Object.fromEntries(
+      Object.entries(options).filter(([key]) => !streamPolicyKeys.has(key))
+    );
+    if (options.exact === true && (inputless || hasInput)) {
+      return { ...nativeOptions, queryKey };
+    }
+    const identityIndex = inputless ? prefix.length : prefix.length + 1;
+    const identityHash = hashKey(identity);
     return {
-      ...options,
-      queryKey: Object.hasOwn(argument, "input")
-        ? prepareQuery(description, input, prefix, keyEncoder).key
-        : prefix,
+      ...nativeOptions,
+      queryKey,
+      predicate: (query) =>
+        query.queryKey.length >= identityIndex &&
+        hashKey(query.queryKey.slice(identityIndex)) === identityHash &&
+        (options.predicate?.(query) ?? true),
     };
   };
 
@@ -502,7 +549,12 @@ const createUnaryBuilders = (
         );
 
   return {
-    queryFilter: createLeafFilter(description, operationKey, keyEncoder),
+    queryFilter: createLeafFilter(
+      description,
+      operationKey,
+      keyEncoder,
+      runPromiseExit
+    ),
     ...createInfiniteBuilders(
       description,
       operationKey,
@@ -551,7 +603,12 @@ const createStreamingBuilders = (
   const streamed = createView("streamed");
 
   return {
-    queryFilter: createLeafFilter(description, operationKey, keyEncoder),
+    queryFilter: createLeafFilter(
+      description,
+      operationKey,
+      keyEncoder,
+      runPromiseExit
+    ),
     liveKey: live.key,
     liveOptions: live.options,
     streamedKey: streamed.key,

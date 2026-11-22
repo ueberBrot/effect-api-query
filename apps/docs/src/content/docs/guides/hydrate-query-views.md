@@ -13,6 +13,8 @@ Pass the RPC group or HttpApi directly. The registry uses the same keys as the u
 
 Derivation covers buffered queries, HTTP metadata, live values, and accumulated history. Use `paths` to override a view or register infinite pages with `infinite: { pageParam }`. A custom `query` codec also supplies the decoded data codec for metadata and pages unless you override them.
 
+Derivation preserves the decoded variant of an HTTP success when different variants share a JSON representation. It also preserves `undefined` and `null` as distinct accumulated stream elements. Use matching package versions and contract declarations on both sides of the snapshot.
+
 Set a global view in `views` to `false` to omit it, or set a path or one of its views to `false`. Opaque or unencodable schemas such as `Redacted` require an override or opt-out. The registry throws `HydrationCodecError` during setup if it cannot derive a codec.
 
 ### Register a hand-written codec

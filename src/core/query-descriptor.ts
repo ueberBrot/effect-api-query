@@ -38,14 +38,17 @@ export class QueryDescriptorError extends Error {
   }
 }
 
-const envelope = Schema.Struct({
-  version: Schema.Literal(1),
-  contract: Schema.String,
-  operation: Schema.Array(Schema.Json),
-  view: Schema.String,
-  input: Schema.Json,
-  identity: Schema.Json,
-});
+const envelope =
+  /* @__PURE__ */
+  (() =>
+    Schema.Struct({
+      version: Schema.Literal(1),
+      contract: Schema.String,
+      operation: Schema.Array(Schema.Json),
+      view: Schema.String,
+      input: Schema.Json,
+      identity: Schema.Json,
+    }))();
 
 /** Binds one explicit operation/view to each receiving ready-client owner. */
 export const createQueryDescriptor = <

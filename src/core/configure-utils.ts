@@ -599,6 +599,8 @@ const configureLeaf = (
   configurations: readonly RuntimeConfiguration[]
 ): RuntimeNode => {
   const configured = { ...node };
+  const streamPolicies: Partial<Record<"live" | "streamed", RuntimeOptions>> =
+    {};
   for (const view of views) {
     if (!Object.hasOwn(node, `${view}Options`)) {
       continue;
@@ -625,6 +627,7 @@ const configureLeaf = (
       interceptors: inherited.flatMap((entry) => entry.interceptors ?? []),
     });
     if (view === "streamed" || view === "live") {
+      streamPolicies[view] = policy;
       const streamedKey = node[view === "live" ? "liveKey" : "streamedKey"];
       if (!Predicate.isFunction(streamedKey)) {
         throw new TypeError("Streamed queries require a key builder");
@@ -646,6 +649,17 @@ const configureLeaf = (
               return buildKey({ ...policy, ...options });
             };
     }
+  }
+  const { queryFilter } = node;
+  if (
+    (streamPolicies.live !== undefined ||
+      streamPolicies.streamed !== undefined) &&
+    Predicate.isFunction(queryFilter)
+  ) {
+    // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
+    const filter = queryFilter as RuntimeBuilder;
+    configured["queryFilter"] = (options?: RuntimeOptions) =>
+      filter(options, streamPolicies);
   }
   if (Object.hasOwn(node, "mutationOptions")) {
     const mutations = configurations.flatMap((entry) =>

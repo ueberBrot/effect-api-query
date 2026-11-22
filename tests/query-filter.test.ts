@@ -1,14 +1,21 @@
 import { describe, expect, it } from "@effect/vitest";
 import { QueryClient } from "@tanstack/query-core";
-import { Effect, Predicate, Schema } from "effect";
-import { HttpApi, HttpApiEndpoint, HttpApiGroup } from "effect/http-api";
+import { Effect, Predicate, Schema, Stream } from "effect";
+import {
+  HttpApi,
+  HttpApiEndpoint,
+  HttpApiGroup,
+  HttpApiSchema,
+} from "effect/http-api";
 import { Rpc, RpcGroup } from "effect/rpc";
 import { vi } from "vitest";
 
 import {
+  configureUtils,
   createHttpApiQueryUtils,
   createQueryFilter,
   createRpcQueryUtils,
+  prepareInput,
 } from "#effect-api-query";
 
 import { makeRpcTestClient } from "./fixtures/effect-rpc";
@@ -61,6 +68,137 @@ describe("query filters", () => {
         queryClient.clear();
       })
   );
+
+  it.effect(
+    "uses configured stream policy with prepared input and exact matching",
+    () =>
+      Effect.gen(function* matchesConfiguredStreamPolicy() {
+        const group = RpcGroup.make(
+          Rpc.make("watch", {
+            payload: { id: Schema.FiniteFromString },
+            success: Schema.String,
+            stream: true,
+          })
+        );
+        const client = yield* makeRpcTestClient(group, {
+          watch: () => Stream.empty,
+        });
+        const { watch } = configureUtils(
+          createRpcQueryUtils(group, { client }),
+          {
+            streamed: { maxChunks: 2 },
+          }
+        );
+        const input = prepareInput(watch, { id: 1 });
+        const exactKey = watch.streamedKey({ input, refetchMode: "reset" });
+        const queryClient = new QueryClient();
+        queryClient.setQueryData(exactKey, ["default"]);
+        queryClient.setQueryData(
+          watch.streamedKey({ input, publicationBatchSize: 2 }),
+          ["batched"]
+        );
+        queryClient.setQueryData(watch.streamedKey({ input, maxChunks: 3 }), [
+          "long",
+        ]);
+        queryClient.setQueryData(watch.streamedKey({ input: { id: 2 } }), [
+          "other",
+        ]);
+        const filter = {
+          view: "streamed",
+          input,
+          refetchMode: "reset",
+        } as const;
+
+        expect(
+          queryClient.getQueriesData(watch.queryFilter(filter))
+        ).toStrictEqual([[exactKey, ["default"]]]);
+        expect(
+          queryClient.getQueriesData(
+            watch.queryFilter({ ...filter, exact: true })
+          )
+        ).toStrictEqual([[exactKey, ["default"]]]);
+        expect(
+          queryClient.getQueriesData(
+            watch.queryFilter({ view: "streamed", input })
+          )
+        ).toHaveLength(3);
+        expect(
+          queryClient.getQueriesData(
+            watch.queryFilter({ view: "streamed", input, exact: true })
+          )
+        ).toHaveLength(0);
+      })
+  );
+
+  it("matches canonical SSE identity across inputs and respects native predicates", () => {
+    const api = HttpApi.make("filters").add(
+      HttpApiGroup.make("events").add(
+        HttpApiEndpoint.get("watch", "/:id", {
+          params: { id: Schema.String },
+          success: HttpApiSchema.StreamSse({ data: Schema.String }),
+        })
+      )
+    );
+    const { watch } = configureUtils(
+      createHttpApiQueryUtils(api, {
+        client: Effect.runSync(makeUnusedHttpClient(api)),
+      }),
+      {
+        paths: {
+          "events.watch": { live: { sseOptions: { maxEventSize: 128 } } },
+        },
+      }
+    ).events;
+    const input = { params: { id: "one" } };
+    const queryClient = new QueryClient();
+    const one = watch.liveKey({ input });
+    const two = watch.liveKey({ input: { params: { id: "two" } } });
+    queryClient.setQueryData(one, "one");
+    queryClient.setQueryData(two, "two");
+    queryClient.setQueryData(
+      watch.liveKey({ input, sseOptions: { maxEventSize: 256 } }),
+      "larger"
+    );
+    queryClient.setQueryData(
+      watch.liveKey({
+        input,
+        sseOptions: { maxEventSize: 128, dispatchEmptyNamedEvents: true },
+      }),
+      "empty"
+    );
+    const policy = { maxEventSize: 128, dispatchEmptyNamedEvents: false };
+    expect(
+      queryClient.getQueriesData(
+        watch.queryFilter({
+          view: "live",
+          coalesceMs: undefined,
+          predicate: (query) => query.state.data === "two",
+        })
+      )
+    ).toStrictEqual([[two, "two"]]);
+    expect(
+      queryClient.getQueriesData(
+        watch.queryFilter({ view: "live", sseOptions: policy })
+      )
+    ).toStrictEqual([
+      [one, "one"],
+      [two, "two"],
+    ]);
+    expect(
+      queryClient.getQueriesData(
+        watch.queryFilter({
+          view: "live",
+          input,
+          sseOptions: policy,
+          exact: true,
+          predicate: (query) => query.state.data === "one",
+        })
+      )
+    ).toStrictEqual([[one, "one"]]);
+    expect(
+      queryClient.getQueriesData(watch.queryFilter({ view: "live", input }))
+    ).toHaveLength(3);
+  });
 
   it("keeps HTTP view and request containers separate while applying native conditions", () => {
     const api = HttpApi.make("filters").add(

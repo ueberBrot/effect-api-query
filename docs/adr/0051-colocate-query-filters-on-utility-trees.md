@@ -1,6 +1,6 @@
 # Colocate query filters on generated utility trees
 
-Status: Accepted. Partially amends [ADR 0003](0003-project-dotted-rpc-tags-into-utility-paths.md) and extends [ADR 0028](0028-bind-partial-filters-to-explicit-projections.md).
+Status: Accepted. Partially amends [ADR 0003](0003-project-dotted-rpc-tags-into-utility-paths.md) and extends [ADR 0028](0028-bind-partial-filters-to-explicit-projections.md). Partially amended by [ADR 0054](0054-match-stream-policies-in-leaf-query-filters.md).
 
 ## Context
 

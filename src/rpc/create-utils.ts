@@ -107,9 +107,9 @@ const rpcPolicy =
     configuration;
 
 /** Checks a reusable policy map against an RPC group without acquiring a client. */
-export const defineRpcPolicy = Object.assign(
-  rpcPolicy<RpcClientError.RpcClientError>(),
-  {
-    withClientError: rpcPolicy,
-  }
-);
+export const defineRpcPolicy =
+  /* @__PURE__ */
+  (() =>
+    Object.assign(rpcPolicy<RpcClientError.RpcClientError>(), {
+      withClientError: rpcPolicy,
+    }))();

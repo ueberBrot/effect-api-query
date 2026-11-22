@@ -298,6 +298,7 @@ export default defineConfig({
           "src/core/contract-hydration-types.ts",
           "src/http/create-utils.ts",
           "src/http/operation.ts",
+          "src/http/endpoint.ts",
           "src/http/request.ts",
           "src/http/streamed-query.ts",
           "src/http/types.ts",

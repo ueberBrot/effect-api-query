@@ -7,10 +7,12 @@ import {
   SchemaTransformation,
 } from "effect";
 import { HttpApiSchema } from "effect/http-api";
-import type { HttpApi, HttpApiEndpoint } from "effect/http-api";
+import type { HttpApi } from "effect/http-api";
 import { Rpc, RpcSchema } from "effect/rpc";
 import type { RpcGroup } from "effect/rpc";
 
+import { classifyHttpEndpoint } from "../http/endpoint";
+import type { QueryableHttpEndpoint } from "../http/endpoint";
 import { canonicalizeArray } from "./canonical-key";
 import type {
   HttpContractDecodingServices,
@@ -33,27 +35,18 @@ import type { JsonValue } from "./types";
 const rpcAllowedViews = new Set(["query", "live", "streamed"]);
 const httpAllowedViews = new Set(["query", "metadata", "live", "streamed"]);
 
-const UNDEFINED_MARKER_KEY = "__effectApiQueryHydration";
-const UNDEFINED_MARKER_VALUE = "undefined";
-
-const UndefinedMarkerSchema = Schema.Struct({
-  [UNDEFINED_MARKER_KEY]: Schema.Literal(UNDEFINED_MARKER_VALUE),
-});
-
-const UndefinedMarkerCodec = UndefinedMarkerSchema.pipe(
-  Schema.decodeTo(
-    Schema.Undefined,
-    SchemaTransformation.transform({
-      decode: Function.constUndefined,
-      encode: () => ({ [UNDEFINED_MARKER_KEY]: UNDEFINED_MARKER_VALUE }),
-    })
-  )
-);
-
-const isUndefinedMarkerObject = (value: unknown): boolean =>
-  Predicate.isObject(value) &&
-  Object.keys(value).length === 1 &&
-  value[UNDEFINED_MARKER_KEY] === UNDEFINED_MARKER_VALUE;
+const UndefinedElementCodec =
+  /* @__PURE__ */
+  (() =>
+    Schema.Tuple([Schema.Literal("undefined")]).pipe(
+      Schema.decodeTo(
+        Schema.Undefined,
+        SchemaTransformation.transform({
+          decode: Function.constUndefined,
+          encode: () => ["undefined"] as const,
+        })
+      )
+    ))();
 
 const freezeMetadata = (data: unknown): unknown => {
   if (!Predicate.isObject(data)) {
@@ -318,6 +311,15 @@ const stripTopLevelUndefined = (
   if (undefinedTags.has(ast._tag)) {
     return undefined;
   }
+  if (SchemaAST.isSuspend(ast)) {
+    return new SchemaAST.Suspend(
+      () => stripTopLevelUndefined(ast.thunk()) ?? Schema.Never.ast,
+      ast.annotations,
+      ast.checks,
+      ast.encoding,
+      ast.context
+    );
+  }
   if (SchemaAST.isUnion(ast)) {
     const remaining: SchemaAST.AST[] = [];
     for (const member of ast.types) {
@@ -328,9 +330,6 @@ const stripTopLevelUndefined = (
     }
     if (remaining.length === 0) {
       return undefined;
-    }
-    if (remaining.length === 1) {
-      return remaining[0];
     }
     return new SchemaAST.Union(
       remaining,
@@ -349,16 +348,30 @@ const toTop = (schema: Schema.Constraint): Schema.Top =>
   // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
   schema as Schema.Top;
 
+const tagCodec = (tag: number | string, codec: Schema.Top): Schema.Top =>
+  Schema.Tuple([Schema.Literal(tag), codec]).pipe(
+    Schema.decodeTo(
+      Schema.toType(codec),
+      SchemaTransformation.transform({
+        decode: ([, value]) => value,
+        encode: (value) => [tag, value] as const,
+      })
+    )
+  );
+
 const adaptStreamedElement = (codec: Schema.Top): Schema.Top => {
   if (!acceptsUndefined(codec.ast)) {
     return codec;
   }
   const withoutUndefined = stripTopLevelUndefined(codec.ast);
   if (withoutUndefined === undefined) {
-    return UndefinedMarkerCodec;
+    return UndefinedElementCodec;
   }
   const nonUndefinedCodec = toTop(Schema.make(withoutUndefined));
-  return Schema.Union([UndefinedMarkerCodec, nonUndefinedCodec]);
+  return Schema.Union([
+    UndefinedElementCodec,
+    tagCodec("value", nonUndefinedCodec),
+  ]);
 };
 
 const adaptQueryData = (codec: Schema.Top): Schema.Top => {
@@ -370,9 +383,12 @@ const adaptQueryData = (codec: Schema.Top): Schema.Top => {
     return Schema.Null;
   }
   const nonUndefined = toTop(Schema.make(withoutUndefined));
-  return acceptsNull(withoutUndefined)
+  return acceptsNull(codec.ast)
     ? nonUndefined
-    : Schema.NullOr(nonUndefined);
+    : Schema.Union([
+        tagCodec("null", Schema.Null),
+        tagCodec("value", nonUndefined),
+      ]);
 };
 
 const makeMetadataCodec = (dataCodec: Schema.Top): Schema.Top =>
@@ -442,13 +458,12 @@ const deriveHttpBufferedCodec = (
   const effective =
     successes.length > 0 ? successes : [HttpApiSchema.NoContent];
   const memberCodecs = effective.map((schema) =>
-    deriveBufferedMemberCodec(schema, path, view)
+    adaptQueryData(deriveBufferedMemberCodec(schema, path, view))
   );
-  const combined =
-    memberCodecs.length === 1 && memberCodecs[0] !== undefined
-      ? memberCodecs[0]
-      : Schema.Union(memberCodecs);
-  return adaptQueryData(combined);
+  const [first] = memberCodecs;
+  return memberCodecs.length === 1 && first !== undefined
+    ? first
+    : Schema.Union(memberCodecs.map((codec, index) => tagCodec(index, codec)));
 };
 
 const extractHttpStreamChunkSchema = (
@@ -530,26 +545,6 @@ const deriveHttpStreamCodec = (
   if (view === "live") {
     return adaptQueryData(chunkCodec);
   }
-  if (
-    isStreamSse(successSchema) &&
-    successSchema.sseMode === "data" &&
-    acceptsUndefined(chunkCodec.ast)
-  ) {
-    const elementCodec = Schema.Union([UndefinedMarkerSchema, chunkCodec]).pipe(
-      Schema.decodeTo(
-        Schema.toType(chunkCodec),
-        SchemaTransformation.transform({
-          decode: (value) =>
-            isUndefinedMarkerObject(value) ? undefined : value,
-          encode: (value) =>
-            value === undefined
-              ? { [UNDEFINED_MARKER_KEY]: UNDEFINED_MARKER_VALUE }
-              : value,
-        })
-      )
-    );
-    return Schema.Array(elementCodec);
-  }
   return Schema.Array(adaptStreamedElement(chunkCodec));
 };
 
@@ -598,78 +593,6 @@ const validateSegments = (
     }
     leafPaths.add(pathKey);
   }
-};
-
-const multipartBrands = (schema: Schema.Top): ReadonlySet<string> => {
-  const brands = new Set<string>();
-  const visited = new WeakSet();
-  let current: unknown = schema;
-  while (Schema.isSchema(current) && !visited.has(current)) {
-    visited.add(current);
-    if (
-      Predicate.hasProperty(current, "identifier") &&
-      (current.identifier === HttpApiSchema.MultipartTypeId ||
-        current.identifier === HttpApiSchema.MultipartStreamTypeId)
-    ) {
-      brands.add(current.identifier);
-    }
-    current = Predicate.hasProperty(current, "schema")
-      ? current.schema
-      : undefined;
-  }
-  return brands;
-};
-
-type ClassifiedHttpEndpoint =
-  | { readonly kind: "Unary"; readonly successes: readonly Schema.Top[] }
-  | { readonly kind: "Streaming"; readonly success: Schema.Top };
-
-const classifyHttpEndpoint = (
-  endpoint: HttpApiEndpoint.Top
-): ClassifiedHttpEndpoint | undefined => {
-  for (const { encoding, schemas } of endpoint.payload.values()) {
-    if (encoding._tag === "Stream") {
-      return undefined;
-    }
-    for (const schema of schemas) {
-      const brands = multipartBrands(schema);
-      if (
-        encoding._tag === "Multipart" ||
-        brands.has(HttpApiSchema.MultipartTypeId) ||
-        brands.has(HttpApiSchema.MultipartStreamTypeId)
-      ) {
-        return undefined;
-      }
-    }
-  }
-  const successes = [...endpoint.success];
-  const bodies = successes.map((schema) =>
-    HttpApiSchema.isWithHeaders(schema) ? schema.schema : schema
-  );
-  if (
-    bodies.some((body) =>
-      Predicate.hasProperty(body, "~effect/http-api/HttpApiSchema/Upgrade")
-    )
-  ) {
-    return undefined;
-  }
-  const streams = bodies.filter((body) =>
-    Predicate.hasProperty(body, "~effect/http-api/HttpApiSchema/Stream")
-  );
-  if (streams.length > 0) {
-    const [body] = bodies;
-    const [success] = successes;
-    if (
-      successes.length !== 1 ||
-      success === undefined ||
-      !Predicate.hasProperty(body, "_tag") ||
-      (body._tag !== "StreamSse" && body._tag !== "StreamNdjson")
-    ) {
-      return undefined;
-    }
-    return { kind: "Streaming", success };
-  }
-  return { kind: "Unary", successes };
 };
 
 const readPathsOption = (
@@ -918,7 +841,10 @@ const buildRpcContractRegistry = (
   const rootPrefix = [...keyPrefix, "rpc"];
 
   for (const { path, segments, rpc } of operations) {
-    const config = resolvePathConfigObject(path, paths[path]);
+    const config = resolvePathConfigObject(
+      path,
+      Object.hasOwn(paths, path) ? paths[path] : undefined
+    );
     if (config === false) {
       continue;
     }
@@ -939,7 +865,7 @@ const collectHttpOperationCodecs = (
   codecs: CompiledHydrationCodec[],
   operationPrefix: readonly JsonValue[],
   path: string,
-  classified: ClassifiedHttpEndpoint,
+  classified: QueryableHttpEndpoint,
   config: Record<string, unknown>,
   views: ReadonlyMap<string, boolean>
 ): void => {
@@ -1056,13 +982,17 @@ const buildHttpContractRegistry = (
   const operations: {
     readonly path: string;
     readonly segments: readonly string[];
-    readonly classified: ClassifiedHttpEndpoint;
+    readonly classified: QueryableHttpEndpoint;
   }[] = [];
 
   for (const group of Object.values(api.groups)) {
     for (const endpoint of Object.values(group.endpoints)) {
       const classified = classifyHttpEndpoint(endpoint);
-      if (classified === undefined) {
+      if (
+        classified === undefined ||
+        classified.kind === "Mutation" ||
+        classified.kind === "ContradictoryMultipart"
+      ) {
         continue;
       }
       const segments = group.topLevel
@@ -1082,7 +1012,10 @@ const buildHttpContractRegistry = (
   const rootPrefix = [...keyPrefix, "http", api.identifier];
 
   for (const { path, segments, classified } of operations) {
-    const config = resolvePathConfigObject(path, paths[path]);
+    const config = resolvePathConfigObject(
+      path,
+      Object.hasOwn(paths, path) ? paths[path] : undefined
+    );
     if (config === false) {
       continue;
     }

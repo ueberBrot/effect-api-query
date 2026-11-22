@@ -114,7 +114,7 @@ Use a tagged codec for `undefined` history elements so JSON distinguishes them f
 
 Call `createContractHydrationRegistry(groupOrApi)` without a client. If utilities use a `keyPrefix`, supply the same tuple to the registry. Combine RPC and HTTP registries and manual codecs with `createHydrationRegistry`.
 
-Derivation covers buffered queries, HTTP metadata, live values, and accumulated history. It preserves decoded header wrappers and distinct undefined stream elements. It rebuilds frozen metadata envelopes. Add `paths["users.page"].infinite: { pageParam: Cursor }` for infinite data. A custom query codec supplies the default metadata data and infinite page codec. Use `views` or path settings to opt out with `false`. If an opaque schema cannot round trip through JSON, override its codec or opt out before constructing the registry.
+Derivation covers buffered queries, HTTP metadata, live values, and accumulated history. It preserves decoded header wrappers, HTTP success variants with overlapping JSON encodings, and distinct `undefined` and `null` stream elements. Use matching package versions and contract declarations on both sides of the snapshot. It rebuilds frozen metadata envelopes. Add `paths["users.page"].infinite: { pageParam: Cursor }` for infinite data. A custom query codec supplies the default metadata data and infinite page codec. Use `views` or path settings to opt out with `false`. If an opaque schema cannot round trip through JSON, override its codec or opt out before constructing the registry.
 
 ### Register a custom view
 
