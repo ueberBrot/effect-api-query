@@ -489,10 +489,23 @@ configureUtils(rpc.watch, {
     policy: { maxChunks: 10 },
   },
 }).streamedOptions({ input: { channel: "one" } });
-// @ts-expect-error SSE decoding remains local
 configureUtils(http.items.watch, {
   live: {
-    policy: { sseOptions: {} },
+    policy: { sseOptions: { maxEventSize: 1024 } },
+  },
+  streamed: {
+    policy: {
+      maxChunks: 10,
+      sseOptions: { maxEventSize: 1024, dispatchEmptyNamedEvents: true },
+    },
+  },
+}).liveOptions;
+// @ts-expect-error SSE decoding options must match Sse.DecodeOptions
+configureUtils(http.items.watch, {
+  live: {
+    policy: {
+      sseOptions: { maxEventSize: "1024" },
+    },
   },
 }).liveOptions;
 // @ts-expect-error Page setup remains local

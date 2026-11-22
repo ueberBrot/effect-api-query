@@ -2,6 +2,7 @@ import {
   configureUtils,
   createHttpApiQueryUtils,
   createRpcQueryUtils,
+  defineUtilsPolicy,
 } from "@ueberbrot/effect-api-query";
 import { Schema } from "effect";
 import {
@@ -60,9 +61,47 @@ http.events.watch.streamedKey({
 // @ts-expect-error Live views do not accept accumulated publication policy.
 http.events.watch.liveOptions({ publicationBatchSize: 8 });
 
-const configuredSse = configureUtils(http.events.watch, {
-  live: { policy: { coalesceMs: 1000 } },
+const sseLeafPolicy = defineUtilsPolicy<typeof http.events.watch>()({
+  streamed: {
+    policy: {
+      maxChunks: 4,
+      sseOptions: { maxEventSize: 128, dispatchEmptyNamedEvents: true },
+    },
+  },
+  live: {
+    policy: {
+      coalesceMs: 1000,
+      sseOptions: { maxEventSize: 128, dispatchEmptyNamedEvents: true },
+    },
+  },
 });
+const sseScopedPolicy = defineUtilsPolicy<typeof http>()({
+  scoped: {
+    events: {
+      scoped: {
+        watch: {
+          streamed: {
+            policy: {
+              maxChunks: 4,
+              sseOptions: { maxEventSize: 128, dispatchEmptyNamedEvents: true },
+            },
+          },
+          live: {
+            policy: {
+              coalesceMs: 1000,
+              sseOptions: { maxEventSize: 128, dispatchEmptyNamedEvents: true },
+            },
+          },
+        },
+      },
+    },
+  },
+});
+const configuredSse = configureUtils(http.events.watch, sseLeafPolicy);
+configuredSse.streamedOptions();
+configuredSse.streamedKey();
+configuredSse.liveOptions();
+configuredSse.liveKey();
 configuredSse.liveOptions({
   sseOptions: { maxEventSize: 128, dispatchEmptyNamedEvents: true },
 });
@@ -70,11 +109,37 @@ configuredSse.liveKey({
   coalesceMs: undefined,
   sseOptions: { maxEventSize: 64, dispatchEmptyNamedEvents: false },
 });
+const configuredScopedSse = configureUtils(http, sseScopedPolicy);
+configuredScopedSse.events.watch.streamedOptions();
+configuredScopedSse.events.watch.streamedKey();
+configuredScopedSse.events.watch.liveOptions();
+configuredScopedSse.events.watch.liveKey();
 // @ts-expect-error RPC streams have no SSE decoder policy.
 configureUtils(rpc.watch, {
   live: {
     policy: {
       sseOptions: { maxEventSize: 128 },
+    },
+  },
+});
+configureUtils(rpc.watch, {
+  streamed: {
+    policy: {
+      maxChunks: 4,
+      // @ts-expect-error RPC streamed policies have no SSE decoder policy.
+      sseOptions: { maxEventSize: 128 },
+    },
+  },
+});
+// @ts-expect-error RPC policy assembly rejects SSE decoder policy inside scoped maps.
+defineUtilsPolicy<typeof rpc>()({
+  scoped: {
+    watch: {
+      live: {
+        policy: {
+          sseOptions: { maxEventSize: 128 },
+        },
+      },
     },
   },
 });
