@@ -1552,17 +1552,15 @@
       ]
     },
     "source:e2e-docs/docs.spec.ts": {
-      "fingerprint": "c3c8ede371b071994501a023b95083363a0eb3c9b5b47bf2410b7c7737b7242f",
+      "fingerprint": "4e18564a10a25a069f5c5d4af2cea5b75ff9c30ac49ee3c33f7fd569d6ac0807",
       "snapshot": {
-        "e2e-docs/docs.spec.ts": "7cae4c81d287281409b09a8d069222b3325bda98773dd2ebb566bc86a09ecd44"
+        "e2e-docs/docs.spec.ts": "ff9d6110e73e4cb53d54747f9bd0345bd30df26b60606847323bcb220a185f52"
       },
-      "head": "33df3355f25c2391b87ce80a60a8c34db84ed481",
-      "outcome": "updated",
-      "reason": "The existing version-selection guidance and ADR 0030 now match automatic deployment after successful root publication, optional manual docs-only corrections for an exact released version, and a static built version badge/JSON marker. Applications can identify the documented package version without a live npm lookup.",
+      "head": "5489c2b1a67495dce57b41d407157c96fd687d10",
+      "outcome": "no-change",
+      "reason": "The docs smoke test now excludes browser-canceled Firefox prefetches from its request-failure assertion. The documentation, public contracts, and shipped skill coverage stay accurate.",
       "evidence": [
-        "Reviewed e2e-docs/docs.spec.ts with .github/workflows/release.yml, .github/workflows/deploy-docs.yml, scripts/resolve-docs-release.mts, the compatibility guide, and skills/effect-api-query/references/frameworks-and-hosts.md.",
-        "The resolver passes 76 tests, including publication gating, docs-only revisions, legacy-release refusal, and built metadata validation. Four Chromium cases pass for static version HTML, JSON metadata, navigation, and zero registry requests. Final docs checks/build pass.",
-        "Git/npm read-only smoke checks validate the existing release identity and expected legacy/current-main refusal. A live npm publication or Pages deployment was not performed."
+        "e2e-docs/docs.spec.ts; release run 45055155451 recorded HTTP 200 followed by NS_BINDING_ABORTED with Sec-Purpose: prefetch. The trace replay and live Firefox reproduction passed with the guard. CI=true vp run docs-e2e passed all 12 checks across Chromium, Firefox, and WebKit."
       ]
     },
     "source:e2e/conditional-query.spec.ts": {
