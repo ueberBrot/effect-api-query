@@ -262,7 +262,7 @@ Use `acquireQueryOwner` to create independent query and mutation caches and regi
 
 Call `setup.trackUtils(utils)` or `owner.trackUtils(utils)` once. This tracks the leaf runner, full query functions including stream pulls, and generated mutation functions. Apply `configureUtils` in either order. Use `owner.wrapRunner(runtime)` for custom execution outside the tree. See [React setup](https://ueberbrot.github.io/effect-api-query/guides/react-query/) and [retirement](https://ueberbrot.github.io/effect-api-query/guides/switch-cache-owners/#opt-in-owner-helper).
 
-Use `owner.runMutation(() => mutation.mutateAsync(input))` to wait for the request and awaited callbacks. Wrapping `mutationFn` only tracks that attempt. Use `networkMode: "always"` and `retry: false` for immediate attempts. Offline queues need an app policy. A runner that starts after retirement rejects even inside an accepted mutation.
+Use `owner.runMutation(() => mutation.mutateAsync(input))` to wait for the request and awaited callbacks. `trackUtils` drains an accepted mutation attempt through its interceptors. Use `networkMode: "always"` and `retry: false` for immediate attempts. Offline queues need an app policy. A custom `wrapRunner` call that starts after retirement rejects.
 
 Use `owner.commit` for synchronous late writes and `isActive()` for other side effects. Unmount, dispose, then acquire and mount the replacement. Disposal stops admission, cancels queries, waits for tracked work, clears caches, and releases acquired resources. Repeated calls share the result. It reports pending failures and attempts all releases. Borrowed resources stay open. A stalled finalizer delays disposal.
 

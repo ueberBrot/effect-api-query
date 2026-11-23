@@ -50,6 +50,7 @@ skills:
       - Preserve neighboring writes and originating ownership during mutation overlap.
       - Defer event refresh until participating writes settle.
       - Retire consumers and accepted work before acquiring a replacement owner. Each owner creates its query and mutation caches from configuration and drains registered work before release.
+      - Drain accepted generated mutation attempts through their interceptors. Use runMutation to include awaited native callbacks.
       - Acquire a ready client and track its utility tree for retirement. In React, use a keyed owner provider and await caller-managed cleanup.
       - Recover initial Suspense failures, retain cached data after failed refetches, and start independent reads together with native cancellation limits.
       - Recover stream delivery with numeric convenience or explicit application cursor acceptance/order and gap detection, authoritative replay refresh, full hook inference, and cancellable backoff.

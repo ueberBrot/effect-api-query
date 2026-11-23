@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "5d45daeb7585a9d169d9ce4d3b5e81044e804c69c9c4dfc644f1777f9e6328d4",
+      "fingerprint": "ec66f7c040791f8bf8464070ae556563006284c9574bdaf5d819cd732593ed41",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -207,7 +207,7 @@
         "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "2685744544735bf8cc44da78882131ac2eb3cfa5ddd9aba1a440d17cc6de3600",
-        "skills/effect-api-query/references/cache-workflows.md": "f8616f449fda4e94897fca6a1fbb6819de0fe0823a138c771b40f1d5b6de5540",
+        "skills/effect-api-query/references/cache-workflows.md": "63445aa0afec236269929bdf049dc1a89741428739da359db7ac9fa4a36c1a19",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "c935bcd818c7266d45cade2a9b514cbac5907415e5787d742379bfaae4c4da97",
         "skills/effect-api-query/references/http.md": "8365345e9e1ee86f0e34d3612fb7324ca32789b725b891605888fd0ad0bdc709",
         "skills/effect-api-query/references/hydration-and-ssr.md": "30de11c14e0927bcf51c044b1f9870a46738b37081cd83fef96a9f3129c90d53",
@@ -232,7 +232,7 @@
         "src/core/query-effects.ts": "66e0311cf246b5edd7f3b287c060e2b9acb3a7a6d99644a06626b5b41e0e09cf",
         "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
         "src/core/query-filter.ts": "83848614ec7f7db8f188db40482bad14b46c08c40fc3b5f0325a8dbed98524b7",
-        "src/core/query-owner.ts": "dd1677d58eb698c70c62a9c0e2f44bd67ef8a910724e537f0fced42c5f4bcff4",
+        "src/core/query-owner.ts": "ee5df3163edaed9119ebc381f4f3dfa8511f69a412d0563f7f2f4cedea442e9d",
         "src/core/query-prefix-index.ts": "419a20fcf9bb28c5e7dbedb0c5af6f0e0dab52c0332773dbf39af638ac671cc2",
         "src/core/reactivity-invalidation.ts": "29a583352f001213c535be806046256daf040444a67665e3d6c202d7dd7a8054",
         "src/core/runtime.ts": "c59393fa31c1c57a2e4d149d45987f88e2033eeebe6c46a12bac9a30ceb47d24",
@@ -317,7 +317,7 @@
         "tests/query-effects.test.ts": "679d76ac8d598a0d973d18d48c1bde61aa1c7a84b96b3ae7ccc7d0cc50743fff",
         "tests/query-events.test.ts": "c7c4573cb6220564e29e5ee9bd95fdadee58dba426199d9778506571d280bf3d",
         "tests/query-filter.test.ts": "3a3e05979952a40052bab873bf43ccfbe9b22f00cada20ad276abb71117aa0fd",
-        "tests/query-owner.test.ts": "6c6f60b6048629f18c24d52bce1a2d87c853ff77b49d9bcd34ebf9d39cd60479",
+        "tests/query-owner.test.ts": "d7703b9242da562cbd823a866c26a5dd5bd7122a307e54805f62ce74db6483a3",
         "tests/query-policy.test.ts": "914702a1ae97649131495f50eb64a3bb554d7fcfe370bb27228323ef13270e20",
         "tests/query-usability.test.ts": "f2919940a513ee1440a20b162f7c1dbb2cf81841368483899765b9b58c9c26c6",
         "tests/query-view-prefix.test.ts": "2c00662e76474c8cb6fb51cec6e9a27626ce961b076bd74653ab84475b4ae764",
@@ -405,20 +405,20 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "afc49459502c6b0e91711bc19883f94712267dd1",
-      "outcome": "no-change",
-      "reason": "Contract hydration accepts explicit JSON codecs with union encodings and checks their individual members. The skill, domain map, skill spec and skill tree already cover derived union codecs and opaque schemas. Passed all 50 focused runtime tests, both public type compilers and the existing bundle budget.",
+      "head": "9b4df0c97d61eecb49512ee7cbee40ddd12db8bb",
+      "outcome": "updated",
+      "reason": "The cache-workflows reference distinguishes an accepted generated mutation from a new call to a manually wrapped runner after retirement.",
       "evidence": [
-        "Changed: tests/contract-hydration.test.ts at afc49459502c6b0e91711bc19883f94712267dd1"
+        "The 18 query-owner tests pass, including both tracking and configuration orders, and scoped Effect lint and skills-check pass. Fresh consumer-agent verification remains unverified."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "e13b7a89480b2eb2b72a3a5976a2668c95fb24d5c9b83390f9a87e3895218d6f",
+      "fingerprint": "ec86d824afc5dd4369f1558df31b4ee098445ad1f5110a8e8fccbe9f219576a1",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
-        "_artifacts/domain_map.yaml": "ee641b2d3e64f6e829402ef1ee81fd824455328ec8775037bfbfdbb666d4ecac",
-        "_artifacts/skill_spec.md": "e08d0d1b7656d2efbfc3d8dd22b8af0ef2859e5899c44958e4cb7b112973c136",
+        "_artifacts/domain_map.yaml": "cb1e4339fc7091c35694d604651c78b470c29dd8605da37c3697fa3a26f2d03e",
+        "_artifacts/skill_spec.md": "7bb20bd7a14b1b0280802968318c77db3dc59b75c15dce1a36d433ccc2aed2f3",
         "_artifacts/skill_tree.yaml": "16f542e7682b84596d15b066716f06a2657fdffd14bab445279b409e7e1baa32",
         "apps/docs/astro.config.mts": "35bd7d7706e004e3e708a82614e825c7fde0ee1aea6624843ba8cc57f70c2c5c",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "7bd278881a3163cd900fccdf9a85724c8a033ff62092aeecc17f13400e89b861",
@@ -620,7 +620,7 @@
         "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
         "skills/effect-api-query/SKILL.md": "2685744544735bf8cc44da78882131ac2eb3cfa5ddd9aba1a440d17cc6de3600",
-        "skills/effect-api-query/references/cache-workflows.md": "f8616f449fda4e94897fca6a1fbb6819de0fe0823a138c771b40f1d5b6de5540",
+        "skills/effect-api-query/references/cache-workflows.md": "63445aa0afec236269929bdf049dc1a89741428739da359db7ac9fa4a36c1a19",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "c935bcd818c7266d45cade2a9b514cbac5907415e5787d742379bfaae4c4da97",
         "skills/effect-api-query/references/http.md": "8365345e9e1ee86f0e34d3612fb7324ca32789b725b891605888fd0ad0bdc709",
         "skills/effect-api-query/references/hydration-and-ssr.md": "30de11c14e0927bcf51c044b1f9870a46738b37081cd83fef96a9f3129c90d53",
@@ -645,7 +645,7 @@
         "src/core/query-effects.ts": "66e0311cf246b5edd7f3b287c060e2b9acb3a7a6d99644a06626b5b41e0e09cf",
         "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
         "src/core/query-filter.ts": "83848614ec7f7db8f188db40482bad14b46c08c40fc3b5f0325a8dbed98524b7",
-        "src/core/query-owner.ts": "dd1677d58eb698c70c62a9c0e2f44bd67ef8a910724e537f0fced42c5f4bcff4",
+        "src/core/query-owner.ts": "ee5df3163edaed9119ebc381f4f3dfa8511f69a412d0563f7f2f4cedea442e9d",
         "src/core/query-prefix-index.ts": "419a20fcf9bb28c5e7dbedb0c5af6f0e0dab52c0332773dbf39af638ac671cc2",
         "src/core/reactivity-invalidation.ts": "29a583352f001213c535be806046256daf040444a67665e3d6c202d7dd7a8054",
         "src/core/runtime.ts": "c59393fa31c1c57a2e4d149d45987f88e2033eeebe6c46a12bac9a30ceb47d24",
@@ -730,7 +730,7 @@
         "tests/query-effects.test.ts": "679d76ac8d598a0d973d18d48c1bde61aa1c7a84b96b3ae7ccc7d0cc50743fff",
         "tests/query-events.test.ts": "c7c4573cb6220564e29e5ee9bd95fdadee58dba426199d9778506571d280bf3d",
         "tests/query-filter.test.ts": "3a3e05979952a40052bab873bf43ccfbe9b22f00cada20ad276abb71117aa0fd",
-        "tests/query-owner.test.ts": "6c6f60b6048629f18c24d52bce1a2d87c853ff77b49d9bcd34ebf9d39cd60479",
+        "tests/query-owner.test.ts": "d7703b9242da562cbd823a866c26a5dd5bd7122a307e54805f62ce74db6483a3",
         "tests/query-policy.test.ts": "914702a1ae97649131495f50eb64a3bb554d7fcfe370bb27228323ef13270e20",
         "tests/query-usability.test.ts": "f2919940a513ee1440a20b162f7c1dbb2cf81841368483899765b9b58c9c26c6",
         "tests/query-view-prefix.test.ts": "2c00662e76474c8cb6fb51cec6e9a27626ce961b076bd74653ab84475b4ae764",
@@ -818,11 +818,11 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "afc49459502c6b0e91711bc19883f94712267dd1",
-      "outcome": "no-change",
-      "reason": "Contract hydration accepts explicit JSON codecs with union encodings and checks their individual members. The skill, domain map, skill spec and skill tree already cover derived union codecs and opaque schemas. Passed all 50 focused runtime tests, both public type compilers and the existing bundle budget.",
+      "head": "9b4df0c97d61eecb49512ee7cbee40ddd12db8bb",
+      "outcome": "updated",
+      "reason": "The domain map and skill specification record that accepted generated mutation attempts drain through interceptors. The existing tree already maps the owner code, guidance, and tests.",
       "evidence": [
-        "Changed: tests/contract-hydration.test.ts at afc49459502c6b0e91711bc19883f94712267dd1"
+        "The 18 query-owner tests pass, including both tracking and configuration orders, and scoped Effect lint and skills-check pass. Fresh consumer-agent verification remains unverified."
       ]
     },
     "source:vite.config.ts": {

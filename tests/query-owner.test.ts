@@ -16,7 +16,7 @@ import {
   prepareInput,
 } from "#effect-api-query";
 
-import { group, makeRpcTestClient } from "./fixtures/effect-rpc";
+import { group, makeClient, makeRpcTestClient } from "./fixtures/effect-rpc";
 
 const gate = () => {
   let open!: () => void;
@@ -657,6 +657,69 @@ describe("query owners", () => {
       )
     );
   });
+
+  it.each(["configure first", "track first"] as const)(
+    "drains an accepted mutation waiting in an interceptor when utilities %s",
+    async (order) => {
+      await Effect.runPromise(
+        Effect.scoped(
+          Effect.flatMap(makeClient(), (client) =>
+            Effect.promise(async () => {
+              const intercepted = gate();
+              const resume = gate();
+              const events: string[] = [];
+              const raw = createRpcQueryUtils(group, {
+                client,
+                runtime: async (effect) => {
+                  const exit = await Effect.runPromiseExit(effect);
+                  events.push("wrote");
+                  return exit;
+                },
+              });
+              const owner = await acquireQueryOwner(async (setup) => {
+                await setup.acquire(
+                  () => "transport",
+                  () => {
+                    events.push("released");
+                  }
+                );
+                const config = {
+                  mutation: {
+                    interceptors: [
+                      async ({
+                        next: execute,
+                      }: {
+                        readonly next: () => Promise<void>;
+                      }) => {
+                        intercepted.open();
+                        await resume.promise;
+                        await execute();
+                      },
+                    ],
+                  },
+                };
+                return order === "configure first"
+                  ? setup.trackUtils(configureUtils(raw.health.ping, config))
+                  : configureUtils(setup.trackUtils(raw.health.ping), config);
+              });
+              const observer = new MutationObserver(
+                owner.queryClient,
+                owner.resources.mutationOptions({ retry: false })
+              );
+              const mutation = observer.mutate();
+              await intercepted.promise;
+              const disposal = owner.dispose();
+              resume.open();
+              await expect(
+                Promise.all([mutation, disposal])
+              ).resolves.toStrictEqual([undefined, undefined]);
+              expect(events).toStrictEqual(["wrote", "released"]);
+            })
+          )
+        )
+      );
+    }
+  );
 
   it("trackUtils composes with configureUtils in both orders, preserves PreparedInput, is idempotent, and rejects cross-owner rebinding", async () => {
     await Effect.runPromise(

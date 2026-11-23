@@ -253,6 +253,9 @@ export const acquireQueryOwner = async <A>(
           ({
             ...descriptor.rebuild(wrapRunner(descriptor.runner)),
           } as RuntimeUtilityNode);
+    if (Object.hasOwn(node, "mutationOptions")) {
+      base["mutationOptions"] = node["mutationOptions"];
+    }
     const tracked = Object.freeze(wrapLeafExecution({ ...base }));
     registerLeafTracking(tracked, base, wrapLeafExecution);
     trackedOwners.set(tracked, ownerToken);
