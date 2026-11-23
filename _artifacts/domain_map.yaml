@@ -289,7 +289,7 @@ tensions:
   - name: Measured cost and retained guarantees
     skills:
       - effect-api-query
-    description: Native bundle consumers omit adapter failure, cleanup and codec guarantees. Compiler work depends on the exact language engine and workload.
-    implication: Inspect retained modules and compare identical compiler workloads; enforce byte, instantiation and publication budgets without timing gates.
+    description: Bundle comparisons use the same consumer scenarios and installed toolchain for both revisions. Compiler work depends on the exact language engine and workload.
+    implication: Report bundle size changes against main. Check that unused Reactivity code is excluded. Enforce compiler instantiation and stream publication budgets.
 cross_references: []
 gaps: []

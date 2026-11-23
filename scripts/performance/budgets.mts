@@ -8,13 +8,6 @@ export const assertBudget = (
   ok(actual <= maximum, `${name}: ${actual} exceeds budget ${maximum}`);
 };
 
-export const bundleBudgets = {
-  rpc: { included: [37_300, 12_200], external: [22_200, 7800] },
-  http: { included: [45_800, 14_700], external: [28_000, 9500] },
-  streamed: { included: [28_500, 9300], external: [22_200, 7800] },
-  hydration: { included: [40_300, 13_300], external: [24_700, 8700] },
-} as const;
-
 export const compilerBudgets = new Map(
   Object.entries({
     "current/rpc/50/contract": 21_179,
