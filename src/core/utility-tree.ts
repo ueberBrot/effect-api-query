@@ -3,6 +3,7 @@ import { Effect, Predicate } from "effect";
 
 import { createBranchFilter } from "./branch-filter";
 import type { FilterPath } from "./branch-filter";
+import { registerMutationBuilder, registerQueryBuilder } from "./configure";
 import type { QueryView } from "./inference";
 import { prepareMetadataExecution } from "./metadata-query";
 import type {
@@ -219,7 +220,7 @@ const createQueryBuilders = (
     ).key;
   },
 
-  options: (argument?: unknown) => {
+  options: registerQueryBuilder((argument?: Record<string, unknown>) => {
     const { input, options, requestOptions } = prepareQueryOptions(
       description,
       argument
@@ -244,7 +245,7 @@ const createQueryBuilders = (
       prepared.key,
       makeQuery(prepared.input)
     );
-  },
+  }),
 });
 
 const createInfiniteBuilders = (
@@ -275,58 +276,62 @@ const createInfiniteBuilders = (
     ).key;
   };
 
-  const infiniteOptions = (argument: Record<string, unknown>) => {
-    const { input, options, requestOptions } = prepareQueryOptions(
-      description,
-      argument
-    );
-    if (description.input._tag !== "Inputless" && input === skipToken) {
-      return finalizeQueryOptions(options, infiniteOperationKey, skipToken);
-    }
+  const infiniteOptions = registerQueryBuilder(
+    (argument?: Record<string, unknown>) => {
+      const { input, options, requestOptions } = prepareQueryOptions(
+        description,
+        argument
+      );
+      if (description.input._tag !== "Inputless" && input === skipToken) {
+        return finalizeQueryOptions(options, infiniteOperationKey, skipToken);
+      }
 
-    const { initialPageParam } = options;
-    const inputForPage =
-      // oxlint-disable-next-line unicorn/no-useless-undefined
-      description.input._tag === "Inputless" ? () => undefined : input;
-    if (!Predicate.isFunction(inputForPage)) {
-      throw new TypeError("Infinite query input must be a page input function");
-    }
-    // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
-    const pageInput = inputForPage as (pageParam: unknown) => unknown;
-    const initialInput = pageInput(initialPageParam);
-    const prepared = prepareQuery(
-      description,
-      initialInput,
-      infiniteOperationKey,
-      keyEncoder
-    );
-
-    return finalizeQueryOptions(
-      options,
-      prepared.key,
-      async ({
-        pageParam,
-        signal,
-      }: {
-        readonly pageParam: unknown;
-        readonly signal: AbortSignal;
-      }) => {
-        const pageRequest = pageInput(pageParam);
-        const executionInput =
-          description.input._tag === "Input"
-            ? description.input.pageInput(pageRequest)
-            : undefined;
-        return executeBuffered(
-          description,
-          "infinite",
-          executionInput,
-          runPromiseExit,
-          requestOptions,
-          signal
+      const { initialPageParam } = options;
+      const inputForPage =
+        // oxlint-disable-next-line unicorn/no-useless-undefined
+        description.input._tag === "Inputless" ? () => undefined : input;
+      if (!Predicate.isFunction(inputForPage)) {
+        throw new TypeError(
+          "Infinite query input must be a page input function"
         );
       }
-    );
-  };
+      // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
+      const pageInput = inputForPage as (pageParam: unknown) => unknown;
+      const initialInput = pageInput(initialPageParam);
+      const prepared = prepareQuery(
+        description,
+        initialInput,
+        infiniteOperationKey,
+        keyEncoder
+      );
+
+      return finalizeQueryOptions(
+        options,
+        prepared.key,
+        async ({
+          pageParam,
+          signal,
+        }: {
+          readonly pageParam?: unknown;
+          readonly signal: AbortSignal;
+        }) => {
+          const pageRequest = pageInput(pageParam);
+          const executionInput =
+            description.input._tag === "Input"
+              ? description.input.pageInput(pageRequest)
+              : undefined;
+          return executeBuffered(
+            description,
+            "infinite",
+            executionInput,
+            runPromiseExit,
+            requestOptions,
+            signal
+          );
+        }
+      );
+    }
+  );
 
   return { infiniteKey, infiniteOptions };
 };
@@ -371,23 +376,25 @@ const createBufferedBuilders = (
       return invoke(input, requestOptions);
     };
 
-  const mutationOptions = (argument: Record<string, unknown> = {}) => {
-    const options = { ...argument };
-    const requestOptions = description.takeOptions(options);
-    return {
-      ...options,
+  const mutationOptions = registerMutationBuilder(
+    (argument: Record<string, unknown> = {}) => {
+      const options = { ...argument };
+      const requestOptions = description.takeOptions(options);
+      return {
+        ...options,
 
-      mutationFn: async (variables: unknown) =>
-        executeBuffered(
-          description,
-          "mutation",
-          variables,
-          mutationRunner,
-          requestOptions
-        ),
-      mutationKey,
-    };
-  };
+        mutationFn: async (variables: unknown) =>
+          executeBuffered(
+            description,
+            "mutation",
+            variables,
+            mutationRunner,
+            requestOptions
+          ),
+        mutationKey,
+      };
+    }
+  );
   return {
     call,
     effect: bindDirectEffect(description.invoke),

@@ -132,11 +132,6 @@ export default defineConfig({
         "error",
         {
           publicApiPrefixes: ["src/"],
-          ratchet: {
-            "src/core/configure-utils.ts": 2,
-            "src/core/configure.ts": 2,
-            "src/core/query-descriptor.ts": 1,
-          },
         },
       ],
     },

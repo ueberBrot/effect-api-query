@@ -17,7 +17,9 @@ export interface PreparedValue {
   readonly keyValue: JsonValue;
 }
 const values = new WeakMap<object, PreparedValue>();
-const registerPreparedInput = (value: PreparedValue) => {
+const registerPreparedInput = <Input>(
+  value: PreparedValue
+): PreparedInput<Input> => {
   const token = Object.freeze({
     "~effect-api-query/PreparedInput": Object.freeze({}),
   });
@@ -84,11 +86,7 @@ export const prepareInput = <Leaf extends { readonly key: () => QueryKey }>(
 };
 
 /** Descriptor rebinding creates a fresh token owned only by the receiving leaf. */
-export const descriptorInput = (
-  key: () => QueryKey,
-  // oxlint-disable-next-line anti-slop/no-unknown-parameters
-  input: unknown
-) => {
+export const descriptorInput = <Input>(key: () => QueryKey, input: Input) => {
   if (Predicate.isObject(input) && values.has(input)) {
     throw new TypeError(
       "Descriptors require input values, not prepared tokens"
@@ -103,7 +101,8 @@ export const descriptorInput = (
   }
   const prepared = prepareQueryInput(owner.input, input, owner.encoder);
   return {
-    token: () => registerPreparedInput({ owner: owner.input, ...prepared }),
+    token: () =>
+      registerPreparedInput<Input>({ owner: owner.input, ...prepared }),
     identity: prepared.keyValue,
   };
 };

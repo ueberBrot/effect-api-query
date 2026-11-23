@@ -1,6 +1,7 @@
 import { skipToken } from "@tanstack/query-core";
 import type {
   MutationFunctionContext,
+  QueryFunction,
   QueryFunctionContext,
   SkipToken,
 } from "@tanstack/query-core";
@@ -13,9 +14,7 @@ import {
 
 /* oxlint-disable anti-slop/no-unsafe-dictionary-type, anti-slop/no-unknown-parameters, anti-slop/no-unknown-returns */
 export type RuntimeOptions = Record<string, unknown>;
-export type RuntimeQueryFunction = (
-  context: QueryFunctionContext
-) => Promise<unknown>;
+export type RuntimeQueryFunction = QueryFunction;
 export type RuntimeMutationFunction = (
   input: unknown,
   context?: MutationFunctionContext
@@ -26,20 +25,40 @@ export type RuntimeQueryBuilder = (
 export type RuntimeMutationBuilder = (
   options?: RuntimeOptions
 ) => RuntimeOptions & { readonly mutationFn: RuntimeMutationFunction };
-type QueryInterceptor = (execution: {
-  readonly context: QueryFunctionContext;
-  readonly next: () => Promise<unknown>;
-}) => Promise<unknown>;
-type MutationInterceptor = (execution: {
-  readonly input: unknown;
-  readonly context: MutationFunctionContext | undefined;
-  readonly next: () => Promise<unknown>;
-}) => Promise<unknown>;
 type RuntimeCallback = (...args: unknown[]) => unknown;
 /* oxlint-enable anti-slop/no-unsafe-dictionary-type, anti-slop/no-unknown-parameters, anti-slop/no-unknown-returns */
 
 const isCallback = (value: unknown): value is RuntimeCallback =>
   Predicate.isFunction(value);
+
+const queryBuilders = new WeakMap<object, RuntimeQueryBuilder>();
+const mutationBuilders = new WeakMap<object, RuntimeMutationBuilder>();
+
+export const registerQueryBuilder = <Builder extends RuntimeQueryBuilder>(
+  builder: Builder
+): Builder => {
+  queryBuilders.set(builder, builder);
+  return builder;
+};
+
+export const registerMutationBuilder = <Builder extends RuntimeMutationBuilder>(
+  builder: Builder
+): Builder => {
+  mutationBuilders.set(builder, builder);
+  return builder;
+};
+
+export const readQueryBuilder = (
+  // oxlint-disable-next-line anti-slop/no-unknown-parameters
+  candidate: unknown
+): RuntimeQueryBuilder | undefined =>
+  Predicate.isFunction(candidate) ? queryBuilders.get(candidate) : undefined;
+
+export const readMutationBuilder = (
+  // oxlint-disable-next-line anti-slop/no-unknown-parameters
+  candidate: unknown
+): RuntimeMutationBuilder | undefined =>
+  Predicate.isFunction(candidate) ? mutationBuilders.get(candidate) : undefined;
 
 export interface RuntimeViewConfiguration {
   readonly policy?: RuntimeOptions | undefined;
@@ -69,12 +88,9 @@ export const configureQuery = (
   for (const candidate of EffectArray.reverse(
     configuration.interceptors ?? []
   )) {
-    if (!Predicate.isFunction(candidate)) {
+    if (!isCallback(candidate)) {
       throw new TypeError("Query interceptors must be functions");
     }
-    // SAFETY: Generated leaf types guarantee the interceptor's erased runtime signature.
-    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-    const interceptor = candidate as QueryInterceptor;
     const previous = build;
     build = (options) => {
       const built = previous(options);
@@ -89,7 +105,7 @@ export const configureQuery = (
         queryFn: async (context: QueryFunctionContext) => {
           const policy = resolvePolicy?.(context);
           let original: unknown;
-          const result = await interceptor({
+          const result = await candidate({
             context,
             next: once(async () => {
               const data = await queryFn(context);
@@ -109,7 +125,7 @@ export const configureQuery = (
     const previous = build;
     build = (options) => previous({ ...policy, ...options });
   }
-  return build;
+  return registerQueryBuilder(build);
 };
 
 export const configureMutation = (
@@ -120,12 +136,9 @@ export const configureMutation = (
   for (const candidate of EffectArray.reverse(
     configuration.interceptors ?? []
   )) {
-    if (!Predicate.isFunction(candidate)) {
+    if (!isCallback(candidate)) {
       throw new TypeError("Mutation interceptors must be functions");
     }
-    // SAFETY: Generated leaf types guarantee the interceptor's erased runtime signature.
-    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-    const interceptor = candidate as MutationInterceptor;
     const previous = build;
     build = (options) => {
       const built = previous(options);
@@ -133,7 +146,7 @@ export const configureMutation = (
         ...built,
         // oxlint-disable-next-line anti-slop/no-unknown-parameters
         mutationFn: async (input: unknown, context?: MutationFunctionContext) =>
-          await interceptor({
+          await candidate({
             input,
             context,
             next: once(async () => await built.mutationFn(input, context)),
@@ -167,5 +180,5 @@ export const configureMutation = (
           }
         : (options) => previous({ ...policy, ...options });
   }
-  return build;
+  return registerMutationBuilder(build);
 };
