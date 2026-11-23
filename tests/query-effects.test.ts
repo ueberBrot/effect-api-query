@@ -167,6 +167,64 @@ it.effect(
 );
 
 it.effect(
+  "supports Effect.catchTag, direct yielding, Error prototype, and exact cause preservation for QueryClientOperationError",
+  () =>
+    Effect.gen(function* taggedErrorBehavior() {
+      const client = new QueryClient();
+      const rejection = new Error("native query rejection");
+      const caught = yield* queryEffects
+        .query({
+          queryKey: ["tagged-error-catch"],
+          queryFn: async () => await Promise.reject(rejection),
+        })
+        .pipe(
+          Effect.catchTag("QueryClientOperationError", (error) =>
+            Effect.succeed(error)
+          ),
+          Effect.provideService(QueryClientService, client)
+        );
+      expect(caught).toBeInstanceOf(Error);
+      expect(caught).toBeInstanceOf(QueryClientOperationError);
+      expect({
+        _tag: caught._tag,
+        name: caught.name,
+        message: caught.message,
+        cause: caught.cause,
+      }).toStrictEqual({
+        _tag: "QueryClientOperationError",
+        name: "QueryClientOperationError",
+        message: "QueryClient operation failed",
+        cause: rejection,
+      });
+
+      const falsyCause = 0;
+      const yielded = yield* Effect.gen(function* yieldDirectly() {
+        yield* Effect.void;
+        return yield* new QueryClientOperationError(falsyCause);
+      }).pipe(
+        Effect.catchTag("QueryClientOperationError", (error) =>
+          Effect.succeed(error)
+        )
+      );
+      expect(yielded).toBeInstanceOf(Error);
+      expect({
+        isInstance: yielded instanceof QueryClientOperationError,
+        _tag: yielded._tag,
+        name: yielded.name,
+        message: yielded.message,
+        cause: yielded.cause,
+      }).toStrictEqual({
+        isInstance: true,
+        _tag: "QueryClientOperationError",
+        name: "QueryClientOperationError",
+        message: "QueryClient operation failed",
+        cause: falsyCause,
+      });
+      client.clear();
+    })
+);
+
+it.effect(
   "invalidates generated filters with native active refetch behavior",
   () =>
     Effect.gen(function* activeRefetch() {
