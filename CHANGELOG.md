@@ -1,5 +1,65 @@
 # effect-api-query
 
+## 0.8.0
+
+### Minor Changes
+
+- [#225](https://github.com/ueberBrot/effect-api-query/pull/225) [`678b6ac`](https://github.com/ueberBrot/effect-api-query/commit/678b6ac51935e909debcef963d8b56ee0ec58fff) - Replace `queryEffects.fetch` and `queryEffects.ensure` with `queryEffects.query`. Use `queryEffects.infiniteQuery` for pages. The API also exposes cache operations, prefetching, and stream snapshots.
+
+- [#225](https://github.com/ueberBrot/effect-api-query/pull/225) [`678b6ac`](https://github.com/ueberBrot/effect-api-query/commit/678b6ac51935e909debcef963d8b56ee0ec58fff) - Build filters with `queryFilter` on utility roots, branches, and queryable leaves. Replace `createBranchQueryFilter` with this method. Use `createQueryFilter(leaf, view, encode)` for partial input.
+
+- [#225](https://github.com/ueberBrot/effect-api-query/pull/225) [`678b6ac`](https://github.com/ueberBrot/effect-api-query/commit/678b6ac51935e909debcef963d8b56ee0ec58fff) - Replace `defineUtilsPolicy` with `defineRpcPolicy` or `defineHttpApiPolicy`. Both infer policy types from the contract before you acquire a client.
+
+- [#225](https://github.com/ueberBrot/effect-api-query/pull/225) [`678b6ac`](https://github.com/ueberBrot/effect-api-query/commit/678b6ac51935e909debcef963d8b56ee0ec58fff) - Use a flat `paths` map in `configureUtils` to configure descendants. Put view options beside `interceptors` and mutation `callbacks`.
+
+- [#225](https://github.com/ueberBrot/effect-api-query/pull/225) [`678b6ac`](https://github.com/ueberBrot/effect-api-query/commit/678b6ac51935e909debcef963d8b56ee0ec58fff) - Pass `{ input }` to key builders for operations that take input. Add stream policy fields to the same object when the view accepts them.
+
+- [#233](https://github.com/ueberBrot/effect-api-query/pull/233) [`e603455`](https://github.com/ueberBrot/effect-api-query/commit/e603455ecf5fb888c84417a9fab559c1fcc32624) - Contract hydration rejects `Schema.ObjectKeyword` without an explicit JSON encoding. Use a concrete JSON schema or supply a view codec to preserve the cached value.
+
+- [#225](https://github.com/ueberBrot/effect-api-query/pull/225) [`678b6ac`](https://github.com/ueberBrot/effect-api-query/commit/678b6ac51935e909debcef963d8b56ee0ec58fff) - Require Effect `>=4.1.4 <4.2.0` and TanStack Query Core `>=5.107.1 <6`.
+
+- [#225](https://github.com/ueberBrot/effect-api-query/pull/225) [`678b6ac`](https://github.com/ueberBrot/effect-api-query/commit/678b6ac51935e909debcef963d8b56ee0ec58fff) - Use `call` or `effect` on unary RPC and buffered HTTP leaves, including multipart endpoints. `call` runs through the leaf runtime. `effect` returns the client’s Effect. The utility tree reserves both names.
+
+- [#225](https://github.com/ueberBrot/effect-api-query/pull/225) [`678b6ac`](https://github.com/ueberBrot/effect-api-query/commit/678b6ac51935e909debcef963d8b56ee0ec58fff) - Replace the `runPromiseExit` factory option with `runtime`. Pass a runner function or an object with a `runPromiseExit` method, such as a `ManagedRuntime`.
+
+### Patch Changes
+
+- [#233](https://github.com/ueberBrot/effect-api-query/pull/233) [`e603455`](https://github.com/ueberBrot/effect-api-query/commit/e603455ecf5fb888c84417a9fab559c1fcc32624) - Pass a `ManagedRuntime` directly to `runQueryEvents` when its layers have no typed acquisition errors.
+
+- [#225](https://github.com/ueberBrot/effect-api-query/pull/225) [`678b6ac`](https://github.com/ueberBrot/effect-api-query/commit/678b6ac51935e909debcef963d8b56ee0ec58fff) - Pass Effect’s default tag-keyed RPC client directly to `createRpcQueryUtils`. Flat RPC clients remain supported.
+
+- [#225](https://github.com/ueberBrot/effect-api-query/pull/225) [`678b6ac`](https://github.com/ueberBrot/effect-api-query/commit/678b6ac51935e909debcef963d8b56ee0ec58fff) - Import typed utility and query-owner providers from `@ueberbrot/effect-api-query/react`. Install the optional React and TanStack React Query peers to use this entry point.
+
+- [#225](https://github.com/ueberBrot/effect-api-query/pull/225) [`678b6ac`](https://github.com/ueberBrot/effect-api-query/commit/678b6ac51935e909debcef963d8b56ee0ec58fff) - Use `bindReactivityInvalidation` to map Effect Reactivity keys to QueryClient invalidation filters. The subscription closes with its Scope.
+
+- [#225](https://github.com/ueberBrot/effect-api-query/pull/225) [`678b6ac`](https://github.com/ueberBrot/effect-api-query/commit/678b6ac51935e909debcef963d8b56ee0ec58fff) - Build each RPC or HTTP utility leaf on first access and reuse the frozen leaf on later reads. Factories still validate the tree up front.
+
+- [#225](https://github.com/ueberBrot/effect-api-query/pull/225) [`678b6ac`](https://github.com/ueberBrot/effect-api-query/commit/678b6ac51935e909debcef963d8b56ee0ec58fff) - Pass existing registries and individual view codecs together to `createHydrationRegistry`.
+
+- [#233](https://github.com/ueberBrot/effect-api-query/pull/233) [`e603455`](https://github.com/ueberBrot/effect-api-query/commit/e603455ecf5fb888c84417a9fab559c1fcc32624) - HTTP hydration derives query and metadata codecs from successful responses without converting middleware error schemas.
+
+- [#225](https://github.com/ueberBrot/effect-api-query/pull/225) [`678b6ac`](https://github.com/ueberBrot/effect-api-query/commit/678b6ac51935e909debcef963d8b56ee0ec58fff) - Use `createContractHydrationRegistry` to derive codecs from an RPC or HTTP contract. Override individual views or supply a page-parameter codec for infinite queries.
+
+- [#233](https://github.com/ueberBrot/effect-api-query/pull/233) [`e603455`](https://github.com/ueberBrot/effect-api-query/commit/e603455ecf5fb888c84417a9fab559c1fcc32624) - Stream snapshots wait for all accepted query functions to finish, including concurrent calls from a custom persister.
+
+- [#233](https://github.com/ueberBrot/effect-api-query/pull/233) [`e603455`](https://github.com/ueberBrot/effect-api-query/commit/e603455ecf5fb888c84417a9fab559c1fcc32624) - A tracked `.call()` rejects after query owner retirement before invoking the ready client.
+
+- [#225](https://github.com/ueberBrot/effect-api-query/pull/225) [`678b6ac`](https://github.com/ueberBrot/effect-api-query/commit/678b6ac51935e909debcef963d8b56ee0ec58fff) - Omit `keyPrefix` to use the default cache roots. RPC uses `["rpc"]`. HTTP uses `["http", api.identifier]`.
+
+- [#233](https://github.com/ueberBrot/effect-api-query/pull/233) [`e603455`](https://github.com/ueberBrot/effect-api-query/commit/e603455ecf5fb888c84417a9fab559c1fcc32624) - Pass `{ interruptOnRetire: true }` to `owner.wrapRunner` to interrupt an Effect when the query owner retires, even when the caller supplies no abort signal.
+
+- [#233](https://github.com/ueberBrot/effect-api-query/pull/233) [`e603455`](https://github.com/ueberBrot/effect-api-query/commit/e603455ecf5fb888c84417a9fab559c1fcc32624) - Streamed queries flush buffered values before reporting a failure. Live queries cancelled before the first value report cancellation.
+
+- [#233](https://github.com/ueberBrot/effect-api-query/pull/233) [`e603455`](https://github.com/ueberBrot/effect-api-query/commit/e603455ecf5fb888c84417a9fab559c1fcc32624) - Exact key builders reject `skipToken` before invoking custom key encoders. Use `input: skipToken` on query options to skip execution.
+
+- [#225](https://github.com/ueberBrot/effect-api-query/pull/225) [`678b6ac`](https://github.com/ueberBrot/effect-api-query/commit/678b6ac51935e909debcef963d8b56ee0ec58fff) - Inspect RPC and HTTP execution errors with `isEffectApiQueryError` and `getExecutionCause`. Use `matchDeclaredError` to handle tagged failures and `retryExecutionError` to set a retry limit.
+
+- [#225](https://github.com/ueberBrot/effect-api-query/pull/225) [`678b6ac`](https://github.com/ueberBrot/effect-api-query/commit/678b6ac51935e909debcef963d8b56ee0ec58fff) - Use `QueryOwner.trackUtils` to track a utility tree’s queries and mutation functions for retirement. You can apply `configureUtils` before or after tracking.
+
+- [#233](https://github.com/ueberBrot/effect-api-query/pull/233) [`e603455`](https://github.com/ueberBrot/effect-api-query/commit/e603455ecf5fb888c84417a9fab559c1fcc32624) - `flush` waits for other refetches to settle when a Reactivity invalidation binding throws.
+
+- [#233](https://github.com/ueberBrot/effect-api-query/pull/233) [`e603455`](https://github.com/ueberBrot/effect-api-query/commit/e603455ecf5fb888c84417a9fab559c1fcc32624) - `QueryClientOperationError` is now a yieldable Effect tagged error. Its `cause` still holds the original QueryClient failure.
+
 ## 0.7.1
 
 ### Patch Changes
