@@ -1,4 +1,5 @@
 import { Predicate, Schema } from "effect";
+import type { SchemaAST } from "effect";
 import { HttpApiSchema } from "effect/http-api";
 import type { HttpApiEndpoint } from "effect/http-api";
 
@@ -24,6 +25,66 @@ const unwrapSuccess = (success: Schema.Top) =>
   HttpApiSchema.isWithHeaders(success)
     ? { body: success.schema, headers: success.headers }
     : { body: success, headers: undefined };
+
+const findStatusAnnotation = (
+  ast: SchemaAST.AST | SchemaAST.FilterGroup<unknown>
+): Schema.Annotations.Annotations | undefined => {
+  const checks = ast.checks ?? [];
+  for (let index = checks.length - 1; index >= 0; index -= 1) {
+    const check = checks[index];
+    if (check === undefined) {
+      continue;
+    }
+    if (
+      check.annotations !== undefined &&
+      "httpApiStatus" in check.annotations
+    ) {
+      return check.annotations;
+    }
+    if (check._tag === "FilterGroup") {
+      const annotations = findStatusAnnotation(check);
+      if (annotations !== undefined) {
+        return annotations;
+      }
+    }
+  }
+  const { annotations } = ast;
+  return annotations && "httpApiStatus" in annotations
+    ? annotations
+    : undefined;
+};
+
+const readStatus = (ast: SchemaAST.AST): number | undefined => {
+  const annotations = findStatusAnnotation(ast);
+  if (annotations === undefined) {
+    return ast.context?.annotations?.httpApiStatus;
+  }
+  const { httpApiStatus } = annotations;
+  return Predicate.isNumber(httpApiStatus) ? httpApiStatus : undefined;
+};
+
+export const groupBufferedSuccessesByStatus = (
+  successes: readonly Schema.Top[]
+) => {
+  const byStatus = new Map<number, Schema.Top[]>();
+  for (const schema of successes.length === 0
+    ? [HttpApiSchema.NoContent]
+    : successes) {
+    const status =
+      readStatus(schema.ast) ??
+      (HttpApiSchema.isWithHeaders(schema)
+        ? readStatus(schema.schema.ast)
+        : undefined) ??
+      200;
+    const members = byStatus.get(status);
+    if (members === undefined) {
+      byStatus.set(status, [schema]);
+    } else {
+      members.push(schema);
+    }
+  }
+  return byStatus;
+};
 
 const isStreamSchema = (
   schema: Schema.Top

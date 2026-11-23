@@ -8,11 +8,15 @@ import {
   SchemaParser,
   SchemaTransformation,
 } from "effect";
-import { HttpApi, HttpApiSchema } from "effect/http-api";
+import { HttpApiSchema } from "effect/http-api";
+import type { HttpApi } from "effect/http-api";
 import { Rpc, RpcSchema } from "effect/rpc";
 import type { RpcGroup } from "effect/rpc";
 
-import { classifyHttpEndpoint } from "../http/endpoint";
+import {
+  classifyHttpEndpoint,
+  groupBufferedSuccessesByStatus,
+} from "../http/endpoint";
 import type { QueryableHttpEndpoint } from "../http/endpoint";
 import type {
   HttpContractDecodingServices,
@@ -949,7 +953,6 @@ const buildRpcContractRegistry = (
 
 const httpCodecDerivations = (
   classified: QueryableHttpEndpoint,
-  successesByStatus: ReadonlyMap<number, readonly Schema.Top[]>,
   path: string
 ): CodecDerivations =>
   classified.kind === "Streaming"
@@ -962,7 +965,10 @@ const httpCodecDerivations = (
           deriveHttpBufferedCodec(classified.successes, path, view),
         metadata: (customQuery) =>
           customQuery === undefined
-            ? deriveHttpMetadataCodec(successesByStatus, path)
+            ? deriveHttpMetadataCodec(
+                groupBufferedSuccessesByStatus(classified.successes),
+                path
+              )
             : makeMetadataCodec(customQuery),
       };
 
@@ -1005,19 +1011,17 @@ const buildHttpContractRegistry = (
     readonly name: string;
     readonly path: readonly string[];
     readonly classified: QueryableHttpEndpoint;
-    readonly successesByStatus: ReadonlyMap<number, readonly Schema.Top[]>;
   }[] = [];
 
-  HttpApi.reflect(api, {
-    onGroup: Function.constVoid,
-    onEndpoint: ({ group, endpoint, successes }) => {
+  for (const group of Object.values(api.groups)) {
+    for (const endpoint of Object.values(group.endpoints)) {
       const classified = classifyHttpEndpoint(endpoint);
       if (
         classified === undefined ||
         classified.kind === "Mutation" ||
         classified.kind === "ContradictoryMultipart"
       ) {
-        return;
+        continue;
       }
       const segments = group.topLevel
         ? [endpoint.identifier]
@@ -1029,10 +1033,9 @@ const buildHttpContractRegistry = (
         name: path,
         path: segments,
         classified,
-        successesByStatus: successes,
       });
-    },
-  });
+    }
+  }
 
   validateSegments(operations);
   validateHttpPaths(operations, paths);
@@ -1040,12 +1043,7 @@ const buildHttpContractRegistry = (
   const codecs: CompiledHydrationCodec[] = [];
   const rootPrefix = [...keyPrefix, "http", api.identifier];
 
-  for (const {
-    name: path,
-    path: segments,
-    classified,
-    successesByStatus,
-  } of operations) {
+  for (const { name: path, path: segments, classified } of operations) {
     const config = resolvePathConfigObject(path, readOwn(paths, path));
     if (config === false) {
       continue;
@@ -1056,7 +1054,7 @@ const buildHttpContractRegistry = (
       path,
       config,
       views,
-      httpCodecDerivations(classified, successesByStatus, path)
+      httpCodecDerivations(classified, path)
     );
   }
 

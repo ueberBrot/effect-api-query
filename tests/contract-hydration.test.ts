@@ -18,6 +18,7 @@ import {
   HttpApiClient,
   HttpApiEndpoint,
   HttpApiGroup,
+  HttpApiMiddleware,
   HttpApiSchema,
 } from "effect/http-api";
 import { Rpc, RpcGroup } from "effect/rpc";
@@ -507,6 +508,54 @@ describe("createContractHydrationRegistry — HTTP contracts", () => {
           browser
         );
         expect(browser.getQueryData(key)).toStrictEqual(metadata);
+      })
+  );
+
+  it.effect(
+    "derives HTTP success codecs without inspecting middleware errors",
+    () =>
+      Effect.gen(function* ignoresMiddlewareErrors() {
+        const detail = Symbol("detail");
+        const Authorization = HttpApiMiddleware.Service<never>()(
+          "ContractHydration/Authorization",
+          { error: Schema.Struct({ [detail]: Schema.String }) }
+        );
+        const api = HttpApi.make("middleware-errors").add(
+          HttpApiGroup.make("values").add(
+            HttpApiEndpoint.get("read", "/value", {
+              success: [
+                Schema.BigInt,
+                HttpApiSchema.status(201)(Schema.String),
+              ],
+            }).middleware(Authorization)
+          )
+        );
+        const queryKey = [
+          "http",
+          "middleware-errors",
+          "values",
+          "read",
+          "query",
+        ];
+        const metadataKey = [
+          "http",
+          "middleware-errors",
+          "values",
+          "read",
+          "metadata",
+        ];
+        const metadata = { data: "42", status: 201, headers: {} };
+        const server = new QueryClient();
+        const browser = new QueryClient();
+        server.setQueryData(queryKey, 42n);
+        server.setQueryData(metadataKey, metadata);
+        yield* roundTripJson(
+          createContractHydrationRegistry(api),
+          server,
+          browser
+        );
+        expect(browser.getQueryData(queryKey)).toBe(42n);
+        expect(browser.getQueryData(metadataKey)).toStrictEqual(metadata);
       })
   );
 
