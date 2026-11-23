@@ -7,13 +7,13 @@ import type {
 } from "@tanstack/query-core";
 import { Array as EffectArray, Order, Predicate } from "effect";
 
-import { configureMutation, configureQuery } from "./configure";
-import type {
-  RuntimeMutationBuilder,
-  RuntimeOptions,
-  RuntimeQueryBuilder,
-  RuntimeViewConfiguration,
+import {
+  configureMutation,
+  configureQuery,
+  readMutationBuilder,
+  readQueryBuilder,
 } from "./configure";
+import type { RuntimeOptions, RuntimeViewConfiguration } from "./configure";
 import type { MutationLeaf, QueryView, SupportedQueryView } from "./inference";
 import type { MutationInterceptor, QueryInterceptor } from "./interceptor";
 import type {
@@ -614,13 +614,11 @@ const configureLeaf = (
       Object.assign(policy, entry.policy);
     }
     const name = `${view}Options`;
-    const builder = node[name];
-    if (!Predicate.isFunction(builder)) {
-      throw new TypeError(`${name} must be a function`);
+    const builder = readQueryBuilder(node[name]);
+    if (builder === undefined) {
+      throw new TypeError(`${name} must be a generated query builder`);
     }
-    // SAFETY: Generated query builders return their owned query function and options.
-    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-    configured[name] = configureQuery(builder as RuntimeQueryBuilder, view, {
+    configured[name] = configureQuery(builder, view, {
       policy,
       interceptors: inherited.flatMap((entry) => entry.interceptors ?? []),
     });
@@ -664,13 +662,12 @@ const configureLeaf = (
       entry.mutation === undefined ? [] : [entry.mutation]
     );
     if (mutations.length > 0) {
-      const candidate = node["mutationOptions"];
-      if (!Predicate.isFunction(candidate)) {
-        throw new TypeError("mutationOptions must be a function");
+      let builder = readMutationBuilder(node["mutationOptions"]);
+      if (builder === undefined) {
+        throw new TypeError(
+          "mutationOptions must be a generated mutation builder"
+        );
       }
-      // SAFETY: Generated mutation builders return their owned mutation function and options.
-      // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-      let builder = candidate as RuntimeMutationBuilder;
       for (const entry of mutations) {
         builder = configureMutation(builder, {
           policy: entry.policy,

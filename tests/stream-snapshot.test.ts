@@ -1,3 +1,5 @@
+import { setImmediate } from "node:timers/promises";
+
 import { it } from "@effect/vitest";
 import { QueryClient, QueryObserver } from "@tanstack/query-core";
 import { Cause, Deferred, Effect, Equal, Exit, Schema, Stream } from "effect";
@@ -44,6 +46,45 @@ describe("stream snapshots", () => {
       ).resolves.toBe("42");
       expect(queryFn).not.toHaveBeenCalled();
     } finally {
+      client.clear();
+    }
+  });
+
+  test("drains every invocation accepted from a native persister", async () => {
+    const client = new QueryClient();
+    const entered = Deferred.makeUnsafe<boolean>();
+    const release = Deferred.makeUnsafe<boolean>();
+    let calls = 0;
+    let settled = false;
+    const snapshot = (async () => {
+      const data = await fetchStreamSnapshot(client, {
+        queryKey: ["concurrent-persister"],
+        queryFn: async () => {
+          calls += 1;
+          if (calls === 1) {
+            Deferred.doneUnsafe(entered, Exit.succeed(true));
+            await Effect.runPromise(Deferred.await(release));
+            return 1;
+          }
+          return 2;
+        },
+        persister: async (run, context) => {
+          void captureFailure(Promise.resolve(run(context)));
+          return await run(context);
+        },
+      });
+      settled = true;
+      return data;
+    })();
+    try {
+      await Effect.runPromise(Deferred.await(entered));
+      await setImmediate();
+      expect({ calls, settled }).toStrictEqual({ calls: 2, settled: false });
+      Deferred.doneUnsafe(release, Exit.succeed(true));
+      await expect(snapshot).resolves.toBe(2);
+    } finally {
+      Deferred.doneUnsafe(release, Exit.succeed(true));
+      await snapshot;
       client.clear();
     }
   });

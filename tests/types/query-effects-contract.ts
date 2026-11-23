@@ -105,6 +105,28 @@ type ComposedServices = Assert<
 type RejectionCause = Assert<
   Equal<Effect.Error<typeof selected>["cause"], unknown>
 >;
+type OperationErrorTag = Assert<
+  Equal<QueryClientOperationError["_tag"], "QueryClientOperationError">
+>;
+type OperationErrorIsError = Assert<
+  QueryClientOperationError extends Error ? true : false
+>;
+const recoveredByTag = selected.pipe(
+  Effect.catchTag("QueryClientOperationError", () => Effect.succeed(null))
+);
+type RecoveredByTagError = Assert<
+  Equal<Effect.Error<typeof recoveredByTag>, never>
+>;
+type RecoveredByTagSuccess = Assert<
+  Equal<Effect.Success<typeof recoveredByTag>, string | null>
+>;
+const yieldedOperationError = Effect.gen(function* () {
+  yield* Effect.void;
+  return yield* new QueryClientOperationError(new Error("boom"));
+});
+type YieldedOperationError = Assert<
+  Equal<Effect.Error<typeof yieldedOperationError>, QueryClientOperationError>
+>;
 type NoDeclaredPayloadClaim = Assert<
   Equal<
     Effect.Error<

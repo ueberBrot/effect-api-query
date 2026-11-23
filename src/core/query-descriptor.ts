@@ -1,6 +1,6 @@
 import { hashKey } from "@tanstack/query-core";
 import type { QueryKey } from "@tanstack/query-core";
-import { Schema } from "effect";
+import { Predicate, Schema } from "effect";
 
 import { canonicalize, canonicalizeArray } from "./canonical-key";
 import type {
@@ -9,6 +9,7 @@ import type {
   SupportedQueryView,
 } from "./inference";
 import { descriptorInput } from "./prepared-input";
+import type { PreparedInput } from "./prepared-input";
 import type { JsonValue } from "./types";
 import { viewPrefix } from "./view-prefix";
 
@@ -49,6 +50,15 @@ const envelope =
       input: Schema.Json,
       identity: Schema.Json,
     }))();
+
+const isBoundDescriptorInput = <
+  Leaf extends { readonly key: () => QueryKey },
+  View extends Exclude<SupportedQueryView<Leaf>, "infinite">,
+>(
+  value: PreparedInput<InferInput<Leaf>> | InferInput<Leaf> | undefined,
+  hasToken: boolean
+): value is BoundDescriptorInput<Leaf, View> =>
+  hasToken ? Predicate.isObject(value) : value === undefined;
 
 /** Binds one explicit operation/view to each receiving ready-client owner. */
 export const createQueryDescriptor = <
@@ -133,13 +143,20 @@ export const createQueryDescriptor = <
       if (hashKey([prepared.identity]) !== hashKey([descriptor.identity])) {
         throw new QueryDescriptorError("Identity");
       }
+      const boundInput = prepared.token?.();
+      if (
+        !isBoundDescriptorInput<Leaf, View>(
+          boundInput,
+          prepared.token !== undefined
+        )
+      ) {
+        throw new QueryDescriptorError("Input");
+      }
       return Object.freeze({
         leaf,
         view,
         prefix,
-        // SAFETY: registered generated owners distinguish inputless leaves; other tokens retain this leaf's decoded input.
-        // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-        input: prepared.token?.() as BoundDescriptorInput<Leaf, View>,
+        input: boundInput,
       });
     },
   });

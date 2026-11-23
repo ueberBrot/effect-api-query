@@ -77,12 +77,15 @@ describe("createRpcQueryUtils execution boundaries", () => {
     const contract = RpcGroup.make(Rpc.make("wait", { success: Schema.Void }));
     const started = Deferred.makeUnsafe<undefined>();
     const finalized = Deferred.makeUnsafe<undefined>();
+    let clientCalls = 0;
     const client = {
-      wait: () =>
-        Deferred.succeed(started, undefined).pipe(
+      wait: () => {
+        clientCalls += 1;
+        return Deferred.succeed(started, undefined).pipe(
           Effect.andThen(Effect.never),
           Effect.onInterrupt(() => Deferred.succeed(finalized, undefined))
-        ),
+        );
+      },
     };
     const runtime = {
       runner: Effect.runPromiseExit,
@@ -119,6 +122,7 @@ describe("createRpcQueryUtils execution boundaries", () => {
       operation: "call",
     });
     await expect(tracked.call()).rejects.toThrow("Query owner is retired");
+    expect(clientCalls).toBe(2);
   });
 
   it.effect("executes and advances infinite queries through Query Core", () =>

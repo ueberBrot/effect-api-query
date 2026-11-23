@@ -1,232 +1,220 @@
-const streamQueryIterable = <A>(
-  source: AsyncIterable<A>,
-  signal: AbortSignal,
-  emptyError: (() => Error) | undefined
-): AsyncIterable<A> => ({
-  [Symbol.asyncIterator]() {
-    const iterator = source[Symbol.asyncIterator]();
-    let closePromise: Promise<IteratorResult<A>> | undefined;
-    let emitted = false;
-    const detach = () => {
-      // oxlint-disable-next-line eslint/no-use-before-define
-      signal.removeEventListener("abort", onAbort);
-    };
-    const close = async () => {
-      closePromise ??= (async () => {
-        try {
-          return (
-            (await iterator.return?.()) ?? { done: true, value: undefined }
-          );
-        } finally {
-          detach();
-        }
-      })();
-      return await closePromise;
-    };
-    const onAbort = () => {
-      // oxlint-disable-next-line promise/prefer-await-to-then
-      void Promise.resolve().then(close).catch(detach);
-    };
-    signal.addEventListener("abort", onAbort, { once: true });
+import {
+  Cause,
+  Clock,
+  Deferred,
+  Duration,
+  Effect,
+  Exit,
+  Fiber,
+  Pull,
+  Scope,
+  Stream,
+} from "effect";
 
-    return {
-      async next() {
-        let result: IteratorResult<A>;
-        if (signal.aborted) {
-          result = await close();
-        } else {
-          try {
-            result = await iterator.next();
-          } catch (error) {
-            detach();
-            throw error;
+type NonEmptyBatch<A> = readonly [A, ...A[]];
+
+const batchStream = <A, E, R>(
+  source: Stream.Stream<A, E, R>,
+  batchSize: number,
+  maxWaitMs: number | undefined,
+  latestOnly: boolean
+): Stream.Stream<NonEmptyBatch<A>, E, R> =>
+  Stream.unwrap(
+    Effect.gen(function* setupPublication() {
+      const scope = yield* Scope.Scope;
+      const clock = yield* Clock.Clock;
+      const pull = yield* Stream.toPull(source);
+      let first = true;
+      let pending: [A, ...A[]] | undefined;
+      let chunkIterator: Iterator<A> | undefined;
+      let pendingPull:
+        | Fiber.Fiber<NonEmptyBatch<A>, E | Cause.Done>
+        | undefined;
+      let deadline:
+        | {
+            readonly at: bigint;
+            readonly gate: Deferred.Deferred<undefined>;
+            readonly fiber: Fiber.Fiber<void>;
           }
-        }
-        if (result.done === true) {
-          detach();
-          if (!emitted && !signal.aborted && emptyError !== undefined) {
-            throw emptyError();
-          }
-        }
-        emitted = true;
-        return result;
-      },
-      return: close,
-      async throw(cause?: unknown) {
-        detach();
-        if (iterator.throw !== undefined) {
-          return await iterator.throw(cause);
-        }
-        await close();
-        throw cause;
-      },
-    };
-  },
-});
+        | undefined;
+      let terminalCause: Cause.Cause<E | Cause.Done> | undefined;
 
-const retainPending = <A>(
-  pending: A[],
-  value: A,
-  latestOnly: boolean | undefined
-): A[] => {
-  if (latestOnly === true) {
-    return [value];
-  }
-  pending.push(value);
-  return pending;
-};
+      const clearDeadline = Effect.suspend(() => {
+        const fiber = deadline?.fiber;
+        deadline = undefined;
+        return fiber === undefined ? Effect.void : Fiber.interrupt(fiber);
+      });
 
-type PullResult<A> =
-  | { readonly kind: "value"; readonly result: IteratorResult<A> }
-  | { readonly kind: "error"; readonly error: unknown };
-
-const finishPublication = async <A>(
-  iterator: AsyncIterator<A>,
-  pull: Promise<PullResult<A>> | undefined
-): Promise<void> => {
-  try {
-    await iterator.return?.();
-  } finally {
-    const remaining = await pull;
-    if (remaining?.kind === "error") {
-      // oxlint-disable-next-line eslint/no-unsafe-finally
-      throw remaining.error;
-    }
-  }
-};
-
-export const streamPublicationBatches =
-  async function* streamPublicationBatches<A>(
-    source: AsyncIterable<A>,
-    batchSize: number,
-    signal: AbortSignal,
-    maxWaitMs?: number,
-    live?: { readonly emptyError: (() => Error) | undefined }
-  ): AsyncIterable<readonly A[]> {
-    const iterator = streamQueryIterable(source, signal, live?.emptyError)[
-      Symbol.asyncIterator
-    ]();
-    let first = true;
-    let pending: A[] = [];
-    let pull: Promise<PullResult<A>> | undefined;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    let wakeDeadline: (() => void) | undefined;
-    let deadlineAt: number | undefined;
-    const clearDeadline = () => {
-      clearTimeout(timer);
-      timer = undefined;
-      wakeDeadline = undefined;
-      deadlineAt = undefined;
-    };
-    const pullNext = async (): Promise<PullResult<A>> => {
-      try {
-        return { kind: "value", result: await iterator.next() };
-      } catch (error) {
-        return { kind: "error", error };
-      }
-    };
-    const startDeadline = (milliseconds: number) => {
-      deadlineAt = performance.now() + milliseconds;
-      timer = setTimeout(() => wakeDeadline?.(), milliseconds);
-    };
-    const waitForPull = async (outstanding: Promise<PullResult<A>>) => {
-      if (deadlineAt === undefined) {
-        return await outstanding;
-      }
-      // oxlint-disable-next-line promise/avoid-new
-      const result = await new Promise<PullResult<A> | "deadline">(
-        (resolve) => {
-          wakeDeadline = () => {
-            resolve("deadline");
-          };
-          void (async () => {
-            resolve(await outstanding);
-          })();
-        }
-      );
-      wakeDeadline = undefined;
-      return result !== "deadline" &&
-        result.kind === "value" &&
-        performance.now() >= deadlineAt
-        ? ("deadline" as const)
-        : result;
-    };
-    try {
-      while (!signal.aborted) {
-        pull ??= pullNext();
-        // oxlint-disable-next-line eslint/no-await-in-loop
-        const result = await waitForPull(pull);
-        if (result !== "deadline" && result.kind === "error") {
-          throw result.error;
-        }
-        if (signal.aborted) {
-          return;
-        }
-        if (result === "deadline") {
-          const batch = pending;
-          pending = [];
-          clearDeadline();
-          yield batch;
-          continue;
-        }
-        pull = undefined;
-        if (result.result.done === true) {
-          break;
-        }
-        pending = retainPending(
-          pending,
-          result.result.value,
-          live !== undefined
+      const startDeadline = Effect.fnUntraced(function* startDeadlineTimer(
+        milliseconds: number
+      ) {
+        const gate = Deferred.makeUnsafe<undefined>();
+        const at =
+          clock.monotonicTimeNanosUnsafe() + BigInt(milliseconds) * 1_000_000n;
+        const fiber = yield* Effect.sleep(Duration.millis(milliseconds)).pipe(
+          Effect.andThen(Deferred.succeed(gate, undefined)),
+          Effect.asVoid,
+          Effect.forkIn(scope, { startImmediately: true })
         );
-        if (first || pending.length === batchSize) {
-          first = false;
-          const batch = pending;
-          pending = [];
-          clearDeadline();
-          yield batch;
-        } else if (deadlineAt === undefined && maxWaitMs !== undefined) {
-          startDeadline(maxWaitMs);
+        deadline = { at, gate, fiber };
+      });
+
+      const takePending = (): NonEmptyBatch<A> | undefined => {
+        const batch = pending;
+        pending = undefined;
+        return batch;
+      };
+
+      const flushBatch = (batch: NonEmptyBatch<A>) =>
+        clearDeadline.pipe(Effect.as([batch] as const));
+
+      const isDeadlineReached = () =>
+        deadline !== undefined &&
+        (Deferred.isDoneUnsafe(deadline.gate) ||
+          clock.monotonicTimeNanosUnsafe() >= deadline.at);
+
+      const drainChunk = Effect.gen(function* drainCurrentChunk() {
+        while (chunkIterator !== undefined) {
+          if (pending !== undefined && isDeadlineReached()) {
+            return takePending();
+          }
+          const next = chunkIterator.next();
+          if (next.done === true) {
+            chunkIterator = undefined;
+            break;
+          }
+          if (pending === undefined || latestOnly) {
+            pending = [next.value];
+          } else {
+            pending.push(next.value);
+          }
+          if (first || pending.length === batchSize) {
+            first = false;
+            return takePending();
+          }
+          if (deadline === undefined && maxWaitMs !== undefined) {
+            yield* startDeadline(maxWaitMs);
+          }
         }
-      }
-    } catch (error) {
-      clearDeadline();
-      if (pending.length > 0 && !signal.aborted) {
-        yield pending;
-        pending = [];
-      }
-      throw error;
-    } finally {
-      clearDeadline();
-      await finishPublication(iterator, pull);
-    }
-    if (pending.length > 0 && !signal.aborted) {
-      yield pending;
-    }
-  };
+        return pending !== undefined && isDeadlineReached()
+          ? takePending()
+          : undefined;
+      });
 
-const coalescedSnapshots = async function* coalescedSnapshots<A>(
-  source: AsyncIterable<A>,
-  signal: AbortSignal,
-  coalesceMs: number,
-  emptyError: (() => Error) | undefined
-): AsyncIterable<A | undefined> {
-  for await (const batch of streamPublicationBatches(
-    source,
-    Infinity,
-    signal,
-    coalesceMs,
-    { emptyError }
-  )) {
-    yield batch[0];
-  }
-};
+      const pullOrWaitDeadline = Effect.gen(function* pullOrDeadline() {
+        let activePull = pendingPull;
+        if (activePull === undefined) {
+          activePull = yield* Effect.forkIn(pull, scope, {
+            startImmediately: true,
+          });
+          pendingPull = activePull;
+        }
+        const gate = deadline?.gate;
+        if (gate === undefined) {
+          const exit = yield* Fiber.await(activePull);
+          pendingPull = undefined;
+          return { _tag: "Pull" as const, exit };
+        }
+        const outcome = yield* Effect.raceFirst(
+          Fiber.await(activePull).pipe(
+            Effect.map((exit) => ({ _tag: "Pull" as const, exit }))
+          ),
+          Deferred.await(gate).pipe(Effect.as({ _tag: "Deadline" as const }))
+        );
+        if (outcome._tag === "Pull") {
+          pendingPull = undefined;
+        }
+        return outcome;
+      });
 
-export const streamLiveSnapshots = <A>(
-  source: AsyncIterable<A>,
-  signal: AbortSignal,
-  coalesceMs: number | undefined,
-  emptyError: (() => Error) | undefined
-): AsyncIterable<A | undefined> =>
+      yield* Effect.addFinalizer(() =>
+        Effect.gen(function* finalizePublication() {
+          yield* clearDeadline;
+          const outstanding = pendingPull;
+          pendingPull = undefined;
+          let cause = terminalCause;
+          terminalCause = undefined;
+          if (outstanding !== undefined) {
+            yield* Fiber.interrupt(outstanding);
+            const exit = yield* Fiber.await(outstanding);
+            if (Exit.isFailure(exit)) {
+              ({ cause } = exit);
+            }
+          }
+          if (
+            cause !== undefined &&
+            !Pull.isDoneCause(cause) &&
+            !Cause.hasInterruptsOnly(cause)
+          ) {
+            return yield* Effect.die(Cause.squash(cause));
+          }
+          return yield* Effect.void;
+        })
+      );
+
+      const nextBatch: Pull.Pull<
+        NonEmptyBatch<NonEmptyBatch<A>>,
+        E,
+        void,
+        R
+      > = Effect.gen(function* pullNextBatch() {
+        while (true) {
+          if (terminalCause !== undefined) {
+            if (Cause.hasInterruptsOnly(terminalCause)) {
+              pending = undefined;
+            } else {
+              const batch = takePending();
+              if (batch !== undefined) {
+                return yield* flushBatch(batch);
+              }
+            }
+            const cause = terminalCause;
+            terminalCause = undefined;
+            return yield* Effect.failCause(cause);
+          }
+
+          const ready = yield* drainChunk;
+          if (ready !== undefined) {
+            return yield* flushBatch(ready);
+          }
+
+          const outcome = yield* pullOrWaitDeadline;
+          if (outcome._tag === "Deadline") {
+            const batch = takePending();
+            if (batch !== undefined) {
+              return yield* flushBatch(batch);
+            }
+            yield* clearDeadline;
+            continue;
+          }
+
+          if (Exit.isFailure(outcome.exit)) {
+            terminalCause = outcome.exit.cause;
+            continue;
+          }
+          chunkIterator = outcome.exit.value[Symbol.iterator]();
+        }
+      });
+
+      return Stream.fromPull(Effect.succeed(nextBatch));
+    })
+  );
+
+export const streamPublicationBatches = <A, E, R>(
+  source: Stream.Stream<A, E, R>,
+  batchSize: number,
+  maxWaitMs?: number
+): Stream.Stream<readonly A[], E, R> =>
+  batchSize === 1
+    ? source.pipe(Stream.map((value): readonly A[] => [value]))
+    : batchStream(source, batchSize, maxWaitMs, false);
+
+export const streamLiveSnapshots = <A, E, R>(
+  source: Stream.Stream<A, E, R>,
+  coalesceMs: number | undefined
+): Stream.Stream<A, E, R> =>
   coalesceMs === undefined
-    ? streamQueryIterable(source, signal, emptyError)
-    : coalescedSnapshots(source, signal, coalesceMs, emptyError);
+    ? source
+    : batchStream(source, Infinity, coalesceMs, true).pipe(
+        Stream.map((batch) => batch[0])
+      );

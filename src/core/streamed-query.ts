@@ -229,6 +229,73 @@ const consumeReplacement = async <A>(
   return client.getQueryData<A[]>(queryKey) ?? [];
 };
 
+const streamQueryIterable = <A>(
+  source: AsyncIterable<A>,
+  signal: AbortSignal,
+  onEmpty?: () => Error
+): AsyncIterable<A> => ({
+  [Symbol.asyncIterator]() {
+    const iterator = source[Symbol.asyncIterator]();
+    let closePromise: Promise<IteratorResult<A>> | undefined;
+    let emitted = false;
+    const detach = () => {
+      // oxlint-disable-next-line eslint/no-use-before-define
+      signal.removeEventListener("abort", onAbort);
+    };
+    const close = async () => {
+      closePromise ??= (async () => {
+        try {
+          return (
+            (await iterator.return?.()) ?? { done: true, value: undefined }
+          );
+        } finally {
+          detach();
+        }
+      })();
+      return await closePromise;
+    };
+    const onAbort = () => {
+      // oxlint-disable-next-line promise/prefer-await-to-then
+      void Promise.resolve().then(close).catch(detach);
+    };
+    signal.addEventListener("abort", onAbort, { once: true });
+
+    return {
+      async next() {
+        let result: IteratorResult<A>;
+        if (signal.aborted) {
+          result = await close();
+        } else {
+          try {
+            result = await iterator.next();
+          } catch (error) {
+            detach();
+            throw error;
+          }
+        }
+        if (result.done === true) {
+          detach();
+          if (!emitted && !signal.aborted && onEmpty !== undefined) {
+            throw onEmpty();
+          }
+        } else {
+          emitted = true;
+        }
+        return result;
+      },
+      return: close,
+      async throw(cause?: unknown) {
+        detach();
+        if (iterator.throw !== undefined) {
+          return await iterator.throw(cause);
+        }
+        await close();
+        throw cause;
+      },
+    };
+  },
+});
+
 export const makeStreamQuery = ({
   policy,
   source,
@@ -239,8 +306,8 @@ export const makeStreamQuery = ({
 }: MakeStreamQueryOptions) => {
   const validateHash = (context: QueryFunctionContext) =>
     validateStreamHash(context, unsupportedHash);
-  const streamFn = async ({ signal }: { readonly signal: AbortSignal }) => {
-    const stream = Stream.unwrap(
+  const guardedStream = (signal: AbortSignal) =>
+    Stream.unwrap(
       Effect.gen(function* consumeStream() {
         const scope = yield* Scope.make();
         yield* Effect.addFinalizer((exit) =>
@@ -273,6 +340,11 @@ export const makeStreamQuery = ({
         );
       })
     );
+  const openStream = async <A>(
+    stream: Stream.Stream<A, unknown, unknown>,
+    signal: AbortSignal,
+    onEmpty?: () => Error
+  ) => {
     // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
     const exit = await runPromiseExit(Stream.toAsyncIterableEffect(stream), {
       signal,
@@ -280,7 +352,7 @@ export const makeStreamQuery = ({
     if (Exit.isFailure(exit)) {
       throw executionError(exit.cause);
     }
-    return exit.value;
+    return streamQueryIterable(exit.value, signal, onEmpty);
   };
 
   if (policy._tag === "Live") {
@@ -291,10 +363,9 @@ export const makeStreamQuery = ({
       }
       return await consumeQueryStream(
         context,
-        streamLiveSnapshots(
-          await streamFn(context),
+        await openStream(
+          streamLiveSnapshots(guardedStream(context.signal), policy.coalesceMs),
           context.signal,
-          policy.coalesceMs,
           emptyError
         ),
         null,
@@ -314,11 +385,13 @@ export const makeStreamQuery = ({
     if (reset) {
       query.setState({ ...query.resetState, fetchStatus: "fetching" });
     }
-    const batches = streamPublicationBatches(
-      await streamFn(context),
-      publicationBatchSize,
-      context.signal,
-      publicationMaxWaitMs
+    const batches = await openStream(
+      streamPublicationBatches(
+        guardedStream(context.signal),
+        publicationBatchSize,
+        publicationMaxWaitMs
+      ),
+      context.signal
     );
     if (isRefetch && refetchMode === "replace") {
       return await consumeReplacement(context, batches, maxChunks);

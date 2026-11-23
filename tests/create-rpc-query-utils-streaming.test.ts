@@ -485,6 +485,57 @@ describe("createRpcQueryUtils streaming execution", () => {
           }
         })
       );
+
+      it.effect(
+        "settles cleanly when an abort arrives after the first pull completes empty",
+        () => {
+          const controller = new AbortController();
+          return Effect.gen(function* abortEmptyLiveStream() {
+            const group = RpcGroup.make(
+              Rpc.make("watch", { success: Schema.String, stream: true })
+            );
+            const client = yield* makeRpcTestClient(group, {
+              watch: () =>
+                Stream.unwrap(
+                  Effect.sync(() => {
+                    queueMicrotask(() => {
+                      controller.abort();
+                    });
+                    return Stream.empty;
+                  })
+                ),
+            });
+            const { watch } = createRpcQueryUtils(group, { client });
+            const { queryFn, queryKey } = watch.liveOptions({ coalesceMs });
+            const queryClient = new QueryClient();
+            try {
+              if (!Predicate.isFunction(queryFn)) {
+                throw new TypeError(
+                  "Expected a callable stream query function"
+                );
+              }
+              const result = yield* Effect.promise(
+                async () =>
+                  await queryFn({
+                    client: queryClient,
+                    queryKey,
+                    signal: controller.signal,
+                    meta: undefined,
+                  })
+              );
+              expect({
+                result,
+                aborted: controller.signal.aborted,
+              }).toStrictEqual({
+                result: null,
+                aborted: true,
+              });
+            } finally {
+              queryClient.clear();
+            }
+          });
+        }
+      );
     }
   );
 
@@ -731,6 +782,69 @@ describe("createRpcQueryUtils streaming execution", () => {
       );
     }
   );
+
+  for (const operation of ["live", "streamed"] as const) {
+    it.effect(
+      `preserves a settled ${operation} failure when publishing the final batch triggers cancellation`,
+      () => {
+        const controller = new AbortController();
+        return Effect.gen(function* preservesSettledFailure() {
+          const group = RpcGroup.make(
+            Rpc.make("watch", { success: Schema.Int, stream: true })
+          );
+          const failure = new Error("stream failed");
+          const source = Stream.make(1, 2).pipe(
+            Stream.concat(Stream.die(failure))
+          );
+          const client = yield* makeRpcTestClient(group, {
+            watch: () => source,
+          });
+          const rpc = createRpcQueryUtils(group, { client });
+          const options =
+            operation === "live"
+              ? rpc.watch.liveOptions({ coalesceMs: 10_000 })
+              : rpc.watch.streamedOptions({
+                  maxChunks: "unbounded",
+                  publicationBatchSize: 10,
+                });
+          const { queryFn } = options;
+          if (!Predicate.isFunction(queryFn)) {
+            throw new TypeError("Expected a callable stream query function");
+          }
+          const queryClient = new QueryClient();
+          const unsubscribe = queryClient.getQueryCache().subscribe(() => {
+            const data = queryClient.getQueryData(options.queryKey);
+            if (data === 2 || (Array.isArray(data) && data.length === 2)) {
+              controller.abort();
+            }
+          });
+          try {
+            const error = yield* Effect.promise(
+              async () =>
+                await captureFailure(
+                  Promise.resolve(
+                    queryFn({
+                      client: queryClient,
+                      queryKey: options.queryKey,
+                      signal: controller.signal,
+                      meta: undefined,
+                    })
+                  )
+                )
+            );
+            expect(controller.signal.aborted).toBe(true);
+            expect(error).toMatchObject({
+              _tag: "EffectRpcQueryError",
+              cause: { reasons: [{ _tag: "Die", defect: failure }] },
+            });
+          } finally {
+            unsubscribe();
+            queryClient.clear();
+          }
+        });
+      }
+    );
+  }
 
   describe.each(["ensuring", "acquireRelease"] as const)(
     "client-side %s finalization",

@@ -252,7 +252,7 @@ Use `query` or `infiniteQuery` with generated options. Both apply `select` to th
 
 Pass exact keys to `getData`, `getState`, and `setData`. Write immutably and return `undefined` to skip a write. Use generated or native filters with `isFetching`, `invalidate`, `refetch`, `cancel`, `remove`, and `reset`. These operations keep native QueryClient behavior, including `throwOnError` on refetch.
 
-Inspect `QueryClientOperationError.cause` as `unknown`. It preserves the original failure, including any execution wrapper and full Cause. Shared work can come from another caller, so the wrapper alone cannot prove the current query's declared failure type.
+Inspect `QueryClientOperationError.cause` as `unknown`. `QueryClientOperationError` is a `Data.TaggedError`, so handle it with `Effect.catchTag("QueryClientOperationError", ...)`. It preserves the original failure, including any execution wrapper and full Cause. Shared work can come from another caller, so the wrapper alone cannot prove the current query's declared failure type.
 
 Interrupt the fiber to stop its wait on shared work. Use `cancel` to stop the shared query. Interrupting `streamSnapshot` aborts its exclusive capture and triggers local cleanup. See [query effects](https://ueberbrot.github.io/effect-api-query/guides/query-effects/) for examples.
 
@@ -260,7 +260,7 @@ Interrupt the fiber to stop its wait on shared work. Use `cancel` to stop the sh
 
 Use `acquireQueryOwner` to create independent query and mutation caches and register resources. Supplied caches contribute their callback configuration. Await each `setup.acquire(start, release)` in order. Releases run in reverse order, even if setup fails. Use `setup.borrow(value)` when the caller retains ownership.
 
-Call `setup.trackUtils(utils)` or `owner.trackUtils(utils)` once. This tracks the leaf runner, full query functions including stream pulls, and generated mutation functions. Apply `configureUtils` in either order. Use `owner.wrapRunner(runtime)` for custom execution outside the tree. See [React setup](https://ueberbrot.github.io/effect-api-query/guides/react-query/) and [retirement](https://ueberbrot.github.io/effect-api-query/guides/switch-cache-owners/#opt-in-owner-helper).
+Call `setup.trackUtils(utils)` or `owner.trackUtils(utils)` once. This tracks the leaf runner, full query functions including stream pulls, and generated mutation functions. Apply `configureUtils` in either order. Use `owner.wrapRunner(runtime)` for custom execution outside the tree, and pass `{ interruptOnRetire: true }` when a custom Effect should interrupt on owner retirement without a caller `AbortSignal`. See [React setup](https://ueberbrot.github.io/effect-api-query/guides/react-query/) and [retirement](https://ueberbrot.github.io/effect-api-query/guides/switch-cache-owners/#opt-in-owner-helper).
 
 Use `owner.runMutation(() => mutation.mutateAsync(input))` to wait for the request and awaited callbacks. `trackUtils` drains an accepted mutation attempt through its interceptors. Use `networkMode: "always"` and `retry: false` for immediate attempts. Offline queues need an app policy. A custom `wrapRunner` call that starts after retirement rejects.
 
@@ -270,7 +270,7 @@ For custom work tracked with `runQuery`, forward the native signal. Disposal ign
 
 ## Scoped event consumption
 
-Run `runQueryEvents(owner, source, options, runner)` with your source and optional recovery. Map events to exact updates and filter invalidation. The helper supplies the owner's cache to the source and hooks. It awaits each handler. Inspect the complete Exit. Admission or runner rejection stays a rejected Promise.
+Run `runQueryEvents(owner, source, options, runtime)` with your source and optional recovery. Pass a `ManagedRuntime` with no layer acquisition errors, or a `RunPromiseExit` function. Map events to exact updates and filter invalidation. The helper supplies the owner's cache to the source and hooks. It awaits each handler. Inspect the complete Exit. Admission or runner rejection stays a rejected Promise.
 
 Keep the runner signal-aware and await its finalizers. Retirement stops consumption, backoff, and refresh. Use the original owner's guard for external writes. If refresh starts native queries, use the owner's tracked utilities. See [scoped event consumption](https://ueberbrot.github.io/effect-api-query/guides/scoped-event-cache/).
 

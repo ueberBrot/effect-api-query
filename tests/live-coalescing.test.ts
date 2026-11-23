@@ -2,7 +2,7 @@ import { it, expect } from "@effect/vitest";
 import { QueryClient, QueryObserver } from "@tanstack/query-core";
 import { Deferred, Effect, Schema, Stream } from "effect";
 import { Rpc, RpcGroup } from "effect/rpc";
-import { vi } from "vite-plus/test";
+import { TestClock } from "effect/testing";
 
 import { createRpcQueryUtils } from "#effect-api-query";
 
@@ -10,12 +10,9 @@ import { makeRpcTestClient } from "./fixtures/effect-rpc";
 import { waitForQueryState } from "./fixtures/query-cache";
 
 it.effect(
-  "flushes latest pending at a non-sliding deadline, preserves slow snapshots and drops pending on cancellation",
+  "flushes the latest pending snapshot at a fixed deadline and preserves slower snapshots",
   () =>
     Effect.gen(function* flushesDeadline() {
-      vi.useFakeTimers({
-        toFake: ["setTimeout", "clearTimeout", "performance"],
-      });
       const midReached = yield* Deferred.make<boolean>();
       const midResume = yield* Deferred.make<boolean>();
       const reached = yield* Deferred.make<boolean>();
@@ -54,9 +51,11 @@ it.effect(
             Stream.ensuring(Deferred.succeed(finalized, true))
           ),
       });
+      const runtime = Effect.runPromiseExitWith(yield* Effect.context());
       const leaf = createRpcQueryUtils(group, {
         client,
         keyPrefix: ["deadline-live"],
+        runtime,
       }).watch;
       const options = leaf.liveOptions({ coalesceMs: 20 });
       const queryClient = new QueryClient();
@@ -74,21 +73,17 @@ it.effect(
       const stop = observer.subscribe(() => {});
       try {
         yield* Deferred.await(midReached);
-        yield* Effect.promise(async () => await vi.advanceTimersByTimeAsync(0));
+        yield* TestClock.adjust(0);
         expect(values).toStrictEqual([1]);
-        yield* Effect.promise(
-          async () => await vi.advanceTimersByTimeAsync(19)
-        );
+        yield* TestClock.adjust(19);
         expect(values).toStrictEqual([1]);
         yield* Deferred.succeed(midResume, true);
         yield* Deferred.await(reached);
-        yield* Effect.promise(async () => await vi.advanceTimersByTimeAsync(1));
+        yield* TestClock.adjust(1);
         expect(values).toStrictEqual([1, 3]);
         yield* Deferred.succeed(resume, true);
         yield* Deferred.await(finalPull);
-        yield* Effect.promise(
-          async () => await vi.advanceTimersByTimeAsync(20)
-        );
+        yield* TestClock.adjust(20);
         expect(values).toStrictEqual([1, 3, 4]);
         yield* Effect.promise(async () => {
           await queryClient.cancelQueries(
@@ -97,18 +92,12 @@ it.effect(
           );
         });
         yield* Deferred.await(finalized);
-        yield* Effect.promise(
-          async () => await vi.advanceTimersByTimeAsync(100)
-        );
-        expect({ values, timers: vi.getTimerCount() }).toStrictEqual({
-          values: [1, 3, 4],
-          timers: 0,
-        });
+        yield* TestClock.adjust(100);
+        expect(values).toStrictEqual([1, 3, 4]);
       } finally {
         stop();
         stopCache();
         queryClient.clear();
-        vi.useRealTimers();
       }
     })
 );

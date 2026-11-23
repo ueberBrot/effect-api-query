@@ -18,6 +18,7 @@ import {
   HttpApiClient,
   HttpApiEndpoint,
   HttpApiGroup,
+  HttpApiMiddleware,
   HttpApiSchema,
 } from "effect/http-api";
 import { Rpc, RpcGroup } from "effect/rpc";
@@ -507,6 +508,54 @@ describe("createContractHydrationRegistry — HTTP contracts", () => {
           browser
         );
         expect(browser.getQueryData(key)).toStrictEqual(metadata);
+      })
+  );
+
+  it.effect(
+    "derives HTTP success codecs without inspecting middleware errors",
+    () =>
+      Effect.gen(function* ignoresMiddlewareErrors() {
+        const detail = Symbol("detail");
+        const Authorization = HttpApiMiddleware.Service<never>()(
+          "ContractHydration/Authorization",
+          { error: Schema.Struct({ [detail]: Schema.String }) }
+        );
+        const api = HttpApi.make("middleware-errors").add(
+          HttpApiGroup.make("values").add(
+            HttpApiEndpoint.get("read", "/value", {
+              success: [
+                Schema.BigInt,
+                HttpApiSchema.status(201)(Schema.String),
+              ],
+            }).middleware(Authorization)
+          )
+        );
+        const queryKey = [
+          "http",
+          "middleware-errors",
+          "values",
+          "read",
+          "query",
+        ];
+        const metadataKey = [
+          "http",
+          "middleware-errors",
+          "values",
+          "read",
+          "metadata",
+        ];
+        const metadata = { data: "42", status: 201, headers: {} };
+        const server = new QueryClient();
+        const browser = new QueryClient();
+        server.setQueryData(queryKey, 42n);
+        server.setQueryData(metadataKey, metadata);
+        yield* roundTripJson(
+          createContractHydrationRegistry(api),
+          server,
+          browser
+        );
+        expect(browser.getQueryData(queryKey)).toBe(42n);
+        expect(browser.getQueryData(metadataKey)).toStrictEqual(metadata);
       })
   );
 
@@ -1325,29 +1374,37 @@ describe("eager validation & HydrationCodecError", () => {
       const success = Schema.Struct({
         box: Schema.optionalKey(opaque),
         value: Schema.Json.pipe(Schema.decodeTo(Schema.Unknown)),
+        object: Schema.JsonObject.pipe(Schema.decodeTo(Schema.ObjectKeyword)),
       });
       const group = RpcGroup.make(Rpc.make("read", { success }));
       const registry = createContractHydrationRegistry(group);
       const key = ["rpc", "read", "query"];
       const server = new QueryClient();
       const browser = new QueryClient();
-      const value = { box: makeOpaqueBox("42"), value: [null, 42] };
+      const value = {
+        box: makeOpaqueBox("42"),
+        value: [null, 42],
+        object: { ready: true },
+      };
       server.setQueryData(key, value);
       yield* roundTripJson(registry, server, browser);
       expect(browser.getQueryData(key)).toStrictEqual(value);
     })
   );
 
-  it("rejects an optional property with an implicit JSON fallback", () => {
-    const group = RpcGroup.make(
-      Rpc.make("read", {
-        success: Schema.Struct({ value: Schema.optionalKey(Schema.Unknown) }),
-      })
-    );
-    expect(() => createContractHydrationRegistry(group)).toThrow(
-      expect.objectContaining({ code: "UnencodableSchema", path: "read" })
-    );
-  });
+  it.each([Schema.Unknown, Schema.ObjectKeyword])(
+    "rejects an optional property with an implicit JSON fallback",
+    (fallback) => {
+      const group = RpcGroup.make(
+        Rpc.make("read", {
+          success: Schema.Struct({ value: Schema.optionalKey(fallback) }),
+        })
+      );
+      expect(() => createContractHydrationRegistry(group)).toThrow(
+        expect.objectContaining({ code: "UnencodableSchema", path: "read" })
+      );
+    }
+  );
 
   it.effect("derives an explicit JSON codec with a union on the wire", () =>
     Effect.gen(function* roundTripsExplicitUnionCodec() {

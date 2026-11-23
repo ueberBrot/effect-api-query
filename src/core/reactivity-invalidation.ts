@@ -1,14 +1,13 @@
-import { noop } from "@tanstack/query-core";
 import type {
   InvalidateOptions,
   InvalidateQueryFilters,
-  QueryClient,
 } from "@tanstack/query-core";
-import { Array as Arr, Effect } from "effect";
+import { Array as Arr, Cause, Effect, Latch } from "effect";
 import type { Scope } from "effect";
 import type { Reactivity } from "effect/reactivity";
 
-import { QueryClientService } from "./query-effects";
+import { queryEffects } from "./query-effects";
+import type { QueryClientService } from "./query-effects";
 
 /** Maps Effect Reactivity keys to explicit TanStack Query filters. */
 export interface ReactivityInvalidationBinding {
@@ -44,120 +43,174 @@ const sanitizeKeys = (
   return entries.length === 0 ? undefined : Object.fromEntries(entries);
 };
 
-const registerBindings = (
-  reactivity: Reactivity.Reactivity,
-  client: QueryClient,
-  bindings: readonly ReactivityInvalidationBinding[],
-  options: ReactivityInvalidationOptions | undefined
-) => {
-  const inFlight = new Set<Promise<void>>();
-  const pending = new Set<ReactivityInvalidationBinding>();
-  const unregister: (() => void)[] = [];
-  let closed = false;
+const reportFailure = (
+  onError: ((error: unknown) => void | PromiseLike<void>) | undefined,
+  error: unknown
+): Effect.Effect<void> =>
+  onError === undefined
+    ? Effect.void
+    : Effect.tryPromise(async () => {
+        await onError(error);
+      }).pipe(Effect.ignore);
 
-  const isActive = () => !closed && options?.isActive?.() !== false;
-  const onError: ((error: unknown) => void | PromiseLike<void>) | undefined =
-    options?.onError;
-  const report = async (error: unknown): Promise<void> => {
-    await onError?.(error);
-  };
-  const runPass = async (): Promise<void> => {
-    const batch = [...pending];
-    pending.clear();
-    await Promise.all(
-      batch.flatMap((binding) =>
-        Arr.ensure<InvalidateQueryFilters>(binding.filter).map(
-          async (filter) => {
-            try {
-              if (isActive()) {
-                await client.invalidateQueries(
-                  filter,
-                  binding.options ?? options?.invalidateOptions
-                );
-              }
-            } catch (error) {
-              await report(error).catch(noop);
+const bindInvalidations =
+  /* @__PURE__ */
+  Effect.fnUntraced(function* bindInvalidations(
+    reactivity: Reactivity.Reactivity,
+    bindings: readonly ReactivityInvalidationBinding[],
+    options: ReactivityInvalidationOptions | undefined
+  ) {
+    const ready = yield* Latch.make();
+    const idle = yield* Latch.make(true);
+    const pending = new Set<ReactivityInvalidationBinding>();
+    const unregister: (() => void)[] = [];
+    let inFlight = 0;
+    let closed = false;
+
+    const isActive = () => !closed && options?.isActive?.() !== false;
+    const onError: ((error: unknown) => void | PromiseLike<void>) | undefined =
+      options?.onError;
+
+    const invalidateFilter = (
+      filter: InvalidateQueryFilters,
+      invalidateOptions: InvalidateOptions | undefined
+    ): Effect.Effect<void, never, QueryClientService> =>
+      Effect.try(isActive).pipe(
+        Effect.flatMap((active) =>
+          active
+            ? queryEffects.invalidate(filter, invalidateOptions)
+            : Effect.void
+        ),
+        Effect.catch(({ cause }) => reportFailure(onError, cause))
+      );
+
+    const runPass = (
+      batch: readonly ReactivityInvalidationBinding[]
+    ): Effect.Effect<void, never, QueryClientService> =>
+      Effect.forEach(
+        batch,
+        (binding) =>
+          Effect.suspend(() => {
+            const invalidateOptions =
+              binding.options ?? options?.invalidateOptions;
+            return Effect.forEach(
+              Arr.ensure<InvalidateQueryFilters>(binding.filter),
+              (filter) => invalidateFilter(filter, invalidateOptions),
+              { concurrency: "unbounded", discard: true }
+            );
+          }).pipe(
+            Effect.catchCause((cause) =>
+              reportFailure(onError, Cause.squash(cause))
+            )
+          ),
+        { concurrency: "unbounded", discard: true }
+      );
+
+    const isIdle = () => pending.size === 0 && inFlight === 0;
+    const signalIdle = () => {
+      if (isIdle()) {
+        idle.openUnsafe();
+      }
+    };
+    const dispatch = Effect.suspend(() => {
+      ready.closeUnsafe();
+      if (closed || pending.size === 0) {
+        return Effect.void;
+      }
+      const batch = [...pending];
+      pending.clear();
+      inFlight += 1;
+      return Effect.suspend(() => runPass(batch)).pipe(
+        Effect.catchCause((cause) =>
+          reportFailure(onError, Cause.squash(cause))
+        ),
+        Effect.ensuring(
+          Effect.sync(() => {
+            inFlight -= 1;
+            signalIdle();
+          })
+        ),
+        Effect.forkDetach({ startImmediately: true }),
+        Effect.asVoid
+      );
+    }).pipe(Effect.uninterruptible);
+
+    yield* ready.await.pipe(
+      Effect.andThen(dispatch),
+      Effect.forever({ disableYield: true }),
+      Effect.forkScoped({ startImmediately: true })
+    );
+
+    const close = () => {
+      closed = true;
+      pending.clear();
+      for (const release of unregister) {
+        release();
+      }
+      unregister.length = 0;
+      signalIdle();
+    };
+
+    const enqueue = (binding: ReactivityInvalidationBinding): void => {
+      if (!isActive()) {
+        return;
+      }
+      if (pending.size === 0) {
+        queueMicrotask(() => {
+          ready.openUnsafe();
+        });
+      }
+      pending.add(binding);
+      idle.closeUnsafe();
+    };
+
+    yield* Effect.acquireRelease(
+      Effect.sync(() => {
+        try {
+          for (const binding of bindings) {
+            const keys = sanitizeKeys(binding.keys);
+            if (keys !== undefined) {
+              unregister.push(
+                reactivity.registerUnsafe(keys, () => {
+                  enqueue(binding);
+                })
+              );
             }
           }
-        )
-      )
+        } catch (error) {
+          close();
+          throw error;
+        }
+      }),
+      () => Effect.sync(close)
     );
-  };
-  const enqueue = (binding: ReactivityInvalidationBinding): void => {
-    if (!isActive()) {
-      return;
-    }
-    if (pending.size === 0) {
-      const pass = Promise.resolve()
-        .then(runPass)
-        .catch(report)
-        .catch(noop)
-        .finally(() => {
-          inFlight.delete(pass);
-        });
-      inFlight.add(pass);
-    }
-    pending.add(binding);
-  };
 
-  const close = () => {
-    closed = true;
-    pending.clear();
-    for (const release of unregister) {
-      release();
-    }
-    unregister.length = 0;
-  };
-  try {
-    for (const binding of bindings) {
-      const keys = sanitizeKeys(binding.keys);
-      if (keys !== undefined) {
-        unregister.push(
-          reactivity.registerUnsafe(keys, () => {
-            enqueue(binding);
-          })
-        );
-      }
-    }
-  } catch (error) {
-    close();
-    throw error;
-  }
-
-  const flush: Effect.Effect<void> = Effect.suspend(() =>
-    inFlight.size === 0
-      ? Effect.void
-      : Effect.promise(async () => {
-          await Promise.all(inFlight);
-        }).pipe(Effect.andThen(flush))
-  );
-  return { close, flush };
-};
+    const flush: Effect.Effect<void> = Effect.suspend(() =>
+      isIdle() ? Effect.void : idle.await.pipe(Effect.andThen(flush))
+    );
+    return { flush };
+  });
 
 /**
  * Loads Effect Reactivity and subscribes the current QueryClient until the Scope closes.
  * Run the returned flush Effect to wait for queued invalidations and native refetches.
  */
-export const bindReactivityInvalidation = (
+export const bindReactivityInvalidation: (
   bindings: readonly ReactivityInvalidationBinding[],
   options?: ReactivityInvalidationOptions
-): Effect.Effect<
+) => Effect.Effect<
   { readonly flush: Effect.Effect<void> },
   never,
   Scope.Scope | Reactivity.Reactivity | QueryClientService
-> =>
-  Effect.flatMap(
-    Effect.promise(async () => await import("effect/reactivity/Reactivity")),
-    ({ Reactivity: tag }) =>
-      Effect.gen(function* bindSubscriptions() {
-        const reactivity = yield* tag;
-        const client = yield* QueryClientService;
-        const { flush } = yield* Effect.acquireRelease(
-          Effect.sync(() =>
-            registerBindings(reactivity, client, bindings, options)
-          ),
-          (bridge) => Effect.sync(bridge.close)
-        );
-        return { flush };
-      })
-  );
+> =
+  /* @__PURE__ */
+  Effect.fnUntraced(function* bindReactivityInvalidation(
+    bindings: readonly ReactivityInvalidationBinding[],
+    options?: ReactivityInvalidationOptions
+  ) {
+    const { Reactivity: tag } = yield* Effect.promise(
+      async () => await import("effect/reactivity/Reactivity")
+    );
+    const reactivity = yield* tag;
+    return yield* bindInvalidations(reactivity, bindings, options);
+  });

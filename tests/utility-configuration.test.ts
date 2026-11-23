@@ -586,3 +586,30 @@ it.effect(
       ).toThrow("Unknown utility configuration option: paths");
     })
 );
+
+it.effect("rejects non-generated query and mutation builders", () =>
+  Effect.sync(() => {
+    const customLeaf = {
+      key: () => ["custom"] as const,
+      queryKey: () => ["custom", "query"] as const,
+      queryOptions: () => ({
+        queryKey: ["custom", "query"] as const,
+        queryFn: async () => await Promise.resolve(1),
+      }),
+      mutationOptions: () => ({
+        mutationKey: ["custom", "mutation"] as const,
+        mutationFn: async () => await Promise.resolve(1),
+      }),
+    };
+    expect(() =>
+      configureUtils<typeof customLeaf, object>(customLeaf, {
+        query: { staleTime: 100 },
+      })
+    ).toThrow(TypeError);
+    expect(() =>
+      configureUtils<typeof customLeaf, object>(customLeaf, {
+        mutation: { retry: false },
+      })
+    ).toThrow(TypeError);
+  })
+);

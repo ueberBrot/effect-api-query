@@ -8,11 +8,15 @@ import {
   SchemaParser,
   SchemaTransformation,
 } from "effect";
-import { HttpApi, HttpApiSchema } from "effect/http-api";
+import { HttpApiSchema } from "effect/http-api";
+import type { HttpApi } from "effect/http-api";
 import { Rpc, RpcSchema } from "effect/rpc";
 import type { RpcGroup } from "effect/rpc";
 
-import { classifyHttpEndpoint } from "../http/endpoint";
+import {
+  classifyHttpEndpoint,
+  groupBufferedSuccessesByStatus,
+} from "../http/endpoint";
 import type { QueryableHttpEndpoint } from "../http/endpoint";
 import type {
   HttpContractDecodingServices,
@@ -125,12 +129,17 @@ const isOpaqueDeclaration = (ast: SchemaAST.AST): boolean =>
   !Predicate.isFunction(ast.annotations?.["toCodecJson"]) &&
   !Predicate.isFunction(ast.annotations?.["toCodec"]);
 
-const isImplicitJsonLink = (link: SchemaAST.Link): boolean => {
-  const fallback = Schema.toCodecJson(Schema.Unknown).ast.encoding?.[0];
+const isImplicitJsonLink = (
+  link: SchemaAST.Link,
+  schema: Schema.Top
+): boolean => {
+  const fallback = Schema.toCodecJson(schema).ast.encoding?.[0];
   return (
     fallback !== undefined &&
     link.to.annotations === fallback.to.annotations &&
-    link.transformation === fallback.transformation
+    link.transformation === fallback.transformation &&
+    (!SchemaAST.isUnion(fallback.to) ||
+      (SchemaAST.isUnion(link.to) && link.to.types === fallback.to.types))
   );
 };
 
@@ -146,15 +155,20 @@ const isUnencodableAst = (
     return true;
   }
   if (ast.encoding !== undefined) {
-    if (isOpaqueDeclaration(ast) || SchemaAST.isUnknown(ast)) {
-      const [firstLink] = ast.encoding;
-      if (
-        isImplicitJsonLink(firstLink) ||
+    const [firstLink] = ast.encoding;
+    if (
+      SchemaAST.isObjectKeyword(ast) &&
+      isImplicitJsonLink(firstLink, Schema.ObjectKeyword)
+    ) {
+      return true;
+    }
+    if (
+      (isOpaqueDeclaration(ast) || SchemaAST.isUnknown(ast)) &&
+      (isImplicitJsonLink(firstLink, Schema.Unknown) ||
         SchemaAST.isUnknown(firstLink.to) ||
-        firstLink.to._tag === "Any"
-      ) {
-        return true;
-      }
+        firstLink.to._tag === "Any")
+    ) {
+      return true;
     }
     return ast.encoding.some((link) => isUnencodableAst(link.to, seen));
   }
@@ -939,7 +953,6 @@ const buildRpcContractRegistry = (
 
 const httpCodecDerivations = (
   classified: QueryableHttpEndpoint,
-  successesByStatus: ReadonlyMap<number, readonly Schema.Top[]>,
   path: string
 ): CodecDerivations =>
   classified.kind === "Streaming"
@@ -952,7 +965,10 @@ const httpCodecDerivations = (
           deriveHttpBufferedCodec(classified.successes, path, view),
         metadata: (customQuery) =>
           customQuery === undefined
-            ? deriveHttpMetadataCodec(successesByStatus, path)
+            ? deriveHttpMetadataCodec(
+                groupBufferedSuccessesByStatus(classified.successes),
+                path
+              )
             : makeMetadataCodec(customQuery),
       };
 
@@ -995,19 +1011,17 @@ const buildHttpContractRegistry = (
     readonly name: string;
     readonly path: readonly string[];
     readonly classified: QueryableHttpEndpoint;
-    readonly successesByStatus: ReadonlyMap<number, readonly Schema.Top[]>;
   }[] = [];
 
-  HttpApi.reflect(api, {
-    onGroup: Function.constVoid,
-    onEndpoint: ({ group, endpoint, successes }) => {
+  for (const group of Object.values(api.groups)) {
+    for (const endpoint of Object.values(group.endpoints)) {
       const classified = classifyHttpEndpoint(endpoint);
       if (
         classified === undefined ||
         classified.kind === "Mutation" ||
         classified.kind === "ContradictoryMultipart"
       ) {
-        return;
+        continue;
       }
       const segments = group.topLevel
         ? [endpoint.identifier]
@@ -1019,10 +1033,9 @@ const buildHttpContractRegistry = (
         name: path,
         path: segments,
         classified,
-        successesByStatus: successes,
       });
-    },
-  });
+    }
+  }
 
   validateSegments(operations);
   validateHttpPaths(operations, paths);
@@ -1030,12 +1043,7 @@ const buildHttpContractRegistry = (
   const codecs: CompiledHydrationCodec[] = [];
   const rootPrefix = [...keyPrefix, "http", api.identifier];
 
-  for (const {
-    name: path,
-    path: segments,
-    classified,
-    successesByStatus,
-  } of operations) {
+  for (const { name: path, path: segments, classified } of operations) {
     const config = resolvePathConfigObject(path, readOwn(paths, path));
     if (config === false) {
       continue;
@@ -1046,7 +1054,7 @@ const buildHttpContractRegistry = (
       path,
       config,
       views,
-      httpCodecDerivations(classified, successesByStatus, path)
+      httpCodecDerivations(classified, path)
     );
   }
 

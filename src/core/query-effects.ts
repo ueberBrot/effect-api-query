@@ -20,7 +20,7 @@ import type {
   SkipToken,
   Updater,
 } from "@tanstack/query-core";
-import { Context, Effect } from "effect";
+import { Context, Data, Effect } from "effect";
 
 import { fetchStreamSnapshot } from "./stream-snapshot";
 import type {
@@ -38,14 +38,25 @@ export class QueryClientService extends Context.Service<
   QueryClient
 >()("@ueberbrot/effect-api-query/QueryClientService") {}
 
+const QueryClientOperationErrorBase =
+  /* @__PURE__ */
+  Data.TaggedError("QueryClientOperationError")<{
+    readonly cause: unknown;
+    readonly message: string;
+  }>;
+
 /** A native QueryClient failure retaining the exact rejected value. */
-export class QueryClientOperationError extends Error {
-  readonly _tag = "QueryClientOperationError";
-  override readonly cause: unknown;
+export class QueryClientOperationError extends QueryClientOperationErrorBase {
   constructor(cause: unknown) {
-    super("QueryClient operation failed", { cause });
-    this.name = "QueryClientOperationError";
-    this.cause = cause;
+    super({
+      cause,
+      message: "QueryClient operation failed",
+    });
+  }
+
+  /** Serializes the wrapper without the original rejected value. */
+  override toJSON() {
+    return { _tag: this._tag, name: this.name };
   }
 }
 

@@ -87,6 +87,7 @@
               "tests/query-usability.test.ts",
               "tests/skills/query-usability/fixture.ts",
               "tests/skills/query-usability/grade.test.ts",
+              "tests/publication-deadline.test.ts",
               "tests/stream-publication.test.ts",
               "tests/live-coalescing.test.ts",
               "tests/stream-recovery.test.ts",

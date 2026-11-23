@@ -1,3 +1,4 @@
+import { skipToken } from "@tanstack/query-core";
 import type { QueryKey } from "@tanstack/query-core";
 import { Predicate } from "effect";
 
@@ -11,32 +12,36 @@ export interface PreparedInput<Input> {
   readonly "~effect-api-query/PreparedInput": { readonly input?: Input };
 }
 
+export interface PreparedInputOwner {
+  readonly input: OperationInput;
+  readonly encoder: RuntimeKeyEncoder | undefined;
+}
+
 export interface PreparedValue {
-  readonly owner: OperationInput;
+  readonly owner: PreparedInputOwner;
   readonly input: unknown;
   readonly keyValue: JsonValue;
 }
 const values = new WeakMap<object, PreparedValue>();
-const registerPreparedInput = (value: PreparedValue) => {
+const registerPreparedInput = <Input>(
+  value: PreparedValue
+): PreparedInput<Input> => {
   const token = Object.freeze({
     "~effect-api-query/PreparedInput": Object.freeze({}),
   });
   values.set(token, value);
   return token;
 };
-const owners = new WeakMap<
-  () => QueryKey,
-  {
-    readonly input: OperationInput;
-    readonly encoder: RuntimeKeyEncoder | undefined;
-  }
->();
+const owners = new WeakMap<() => QueryKey, PreparedInputOwner>();
 
 export const prepareQueryInput = (
   owner: Extract<OperationInput, { readonly _tag: "Input" }>,
   input: PreparedValue["input"],
   encoder: RuntimeKeyEncoder | undefined
 ) => {
+  if (input === skipToken) {
+    throw new TypeError("skipToken is only supported by query options");
+  }
   const prepared = owner.prepare(input, encoder);
   try {
     return { input: prepared.input, keyValue: canonicalize(prepared.keyValue) };
@@ -47,16 +52,15 @@ export const prepareQueryInput = (
 
 export const registerInputOwner = (
   key: () => QueryKey,
-  input: OperationInput,
-  encoder: RuntimeKeyEncoder | undefined
+  owner: PreparedInputOwner
 ) => {
-  owners.set(key, { input, encoder });
+  owners.set(key, owner);
 };
 
 export const inputKind = (key: () => QueryKey) => owners.get(key)?.input._tag;
 
 export const readPreparedInput = (
-  owner: OperationInput | undefined,
+  owner: PreparedInputOwner | undefined,
   input: PreparedValue["input"]
 ) => {
   const prepared = Predicate.isObject(input) ? values.get(input) : undefined;
@@ -78,17 +82,13 @@ export const prepareInput = <Leaf extends { readonly key: () => QueryKey }>(
     );
   }
   return registerPreparedInput({
-    owner: owner.input,
+    owner,
     ...prepareQueryInput(owner.input, input, owner.encoder),
   });
 };
 
 /** Descriptor rebinding creates a fresh token owned only by the receiving leaf. */
-export const descriptorInput = (
-  key: () => QueryKey,
-  // oxlint-disable-next-line anti-slop/no-unknown-parameters
-  input: unknown
-) => {
+export const descriptorInput = <Input>(key: () => QueryKey, input: Input) => {
   if (Predicate.isObject(input) && values.has(input)) {
     throw new TypeError(
       "Descriptors require input values, not prepared tokens"
@@ -103,7 +103,7 @@ export const descriptorInput = (
   }
   const prepared = prepareQueryInput(owner.input, input, owner.encoder);
   return {
-    token: () => registerPreparedInput({ owner: owner.input, ...prepared }),
+    token: () => registerPreparedInput<Input>({ owner, ...prepared }),
     identity: prepared.keyValue,
   };
 };

@@ -11,7 +11,7 @@ One `effect-api-query` skill covers the library. Its activation description supp
 | RPC | Payload construction, canonical identity, ready-client lifetime |
 | HTTP | Decoded requests, SSE and NDJSON, multipart mutations, metadata |
 | Query patterns | Inference, skipping, pages, publication batches, recovery and tracing |
-| Cache workflows | Typed policies, interceptors, partial filters, writes, Effect cache operations, Reactivity invalidation, and owners |
+| Cache workflows | Typed policies, interceptors, partial filters, writes, Effect cache operations, Reactivity invalidation, owners, and scoped event consumption |
 | Hydration and SSR | Snapshots, contract-derived registries, typed view overrides, preparation and cleanup |
 | Frameworks and hosts | Optional React providers, Suspense, reactive accessors, declared peers and checked combinations, transports and hosts |
 
@@ -47,10 +47,14 @@ The usability batch reuses the existing executable consumer fixtures:
 | Acquire, provide, render, and dispose a minimal React application | `tests/types/docs-react-setup.tsx`, `tests/types/docs-react-entry.ts`, `examples/vite-react/tests/minimal-setup.test.tsx` |
 | Reset initial Suspense errors, retain failed-refetch data, start reads together | `tests/types/docs-suspense.tsx`, `tests/types/react-queries-contract.tsx`, `examples/vite-react/tests/suspense-recovery.test.tsx` |
 | Trace lazy stream emissions and awaited cleanup | `tests/types/docs-stream-tracing.ts`, `examples/vite-react/tests/stream-tracing.test.ts` |
+| Consume events with an owner's cache and a managed runtime | `tests/types/query-events-contract.ts`, `tests/query-events.test.ts` |
+| Derive hydration codecs from encodable contract success schemas | `tests/contract-hydration.test.ts` |
 
 These checks verify the recommended APIs and observable behavior. A fresh isolated consumer session supplies separate evidence. This authoring session does not establish skill discovery or consumer reliability.
 
 ## Coverage and batch history
+
+- **Open ticket batch (`#226`, `#228`, `#229`, `#230`, `#231`), base `3026c21`:** Added `WrapRunnerOptions` (`interruptOnRetire`) to `QueryOwner.wrapRunner` for retirement-interruptible custom execution without a dummy `AbortController`, eliminated the last five erased-type assertions and zeroed the `repo/no-comments` ratchet, moved stream publication batching and live coalescing onto Effect `Stream`/`Clock`/`Scope` with deterministic `TestClock` coverage, bound Reactivity dispatch to the subscription Scope and used a latch to drain invalidations already in flight, and migrated `QueryClientOperationError` to `Data.TaggedError`. Updated `cache-workflows.md` for `QueryClientOperationError` (`Data.TaggedError`) and `wrapRunner(..., { interruptOnRetire: true })` while retaining one skill and six references. Verified with `vp run check`, `vp run fallow`, `vp run api-types`, full `vp test`, `vp exec intent maintainer check`, and `vp run skills-check`. Fresh consumer-agent verification remains unverified.
 
 - **0.8.0 docs and shipped skill cleanup, base `ce8bf11`:** Removed three off-topic or duplicate documentation pages (`reference/external-http-clients.md`, `getting-started/compatibility-and-stability.md`, `reference/browser-and-worker-hosts.md`), folded worker ownership into `concepts/client-lifecycle.md` and versioning into `reference/compatibility-and-limits.md`, trimmed `reference/performance.md` to user-facing lazy-leaf, tree-shaking, and `prepareInput` guidance, updated `guides/reconnect-streams.md` to the tag-keyed RPC client, and removed remaining style, punctuation, bold-label, and sentence-length defects across all 59 developer-facing docs. Updated the shipped skill and references to remove off-topic external-client and benchmark guidance, fix dead links, and tighten verification steps while retaining one skill and six references. Verified with `vp run docs-check` (24/24 excerpt tests, 0 Astro diagnostics), `vp run docs-build` (59 pages, all internal links valid), `vp exec intent maintainer check`, and `vp run skills-check`. Fresh consumer-agent verification remains unverified.
 

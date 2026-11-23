@@ -3,6 +3,7 @@ import { Effect, Predicate } from "effect";
 
 import { createBranchFilter } from "./branch-filter";
 import type { FilterPath } from "./branch-filter";
+import { registerMutationBuilder, registerQueryBuilder } from "./configure";
 import type { QueryView } from "./inference";
 import { prepareMetadataExecution } from "./metadata-query";
 import type {
@@ -20,6 +21,7 @@ import {
   readPreparedInput,
   registerInputOwner,
 } from "./prepared-input";
+import type { PreparedInputOwner } from "./prepared-input";
 import type { QueryFilter, QueryFilterOptions } from "./query-filter";
 import { executeBuffered, resolveRuntime } from "./runtime";
 import { clearStreamPolicy, hasStreamPolicy } from "./streamed-query";
@@ -46,15 +48,13 @@ interface PreparedQuery {
 const freezeKey = (parts: JsonValue[]) => Object.freeze(parts);
 
 const prepareQuery = (
-  description: UnaryOperation | StreamingOperation,
-
+  owner: PreparedInputOwner,
   input: unknown,
   operationKey: readonly JsonValue[],
-  keyEncoder: RuntimeKeyEncoder | undefined,
   identity: readonly JsonValue[] = []
 ): PreparedQuery => {
-  const reused = readPreparedInput(description.input, input);
-  if (description.input._tag === "Inputless") {
+  const reused = readPreparedInput(owner, input);
+  if (owner.input._tag === "Inputless") {
     return {
       input: undefined,
       key:
@@ -64,7 +64,7 @@ const prepareQuery = (
     };
   }
   const prepared =
-    reused ?? prepareQueryInput(description.input, input, keyEncoder);
+    reused ?? prepareQueryInput(owner.input, input, owner.encoder);
   return {
     input: prepared.input,
     key: freezeKey([...operationKey, prepared.keyValue, ...identity]),
@@ -114,7 +114,7 @@ const createLeafFilter =
   (
     description: UnaryOperation | StreamingOperation,
     operationKey: readonly JsonValue[],
-    keyEncoder: RuntimeKeyEncoder | undefined
+    owner: PreparedInputOwner
   ) =>
   (
     argument: LeafFilterOptions = {},
@@ -137,13 +137,7 @@ const createLeafFilter =
         : undefined;
     let queryKey = prefix;
     if (hasInput || (inputless && identity)) {
-      queryKey = prepareQuery(
-        description,
-        input,
-        prefix,
-        keyEncoder,
-        identity
-      ).key;
+      queryKey = prepareQuery(owner, input, prefix, identity).key;
     }
     if (identity) {
       clearStreamPolicy(options);
@@ -187,10 +181,33 @@ const finalizeQueryOptions = <QueryFn>(
   queryKey,
 });
 
+const createKeyBuilder =
+  (
+    owner: PreparedInputOwner,
+    operationKey: readonly JsonValue[],
+    prepareIdentity?: (options: Record<string, unknown>) => readonly JsonValue[]
+  ) =>
+  (argument?: unknown) => {
+    const inputless = owner.input._tag === "Inputless";
+    if (
+      !Predicate.isObject(argument) &&
+      (argument !== undefined || !inputless)
+    ) {
+      throw new TypeError("Query key options must be an object");
+    }
+    const { input, ...options } = { ...argument };
+    return prepareQuery(
+      owner,
+      inputless ? undefined : input,
+      operationKey,
+      prepareIdentity?.(options)
+    ).key;
+  };
+
 const createQueryBuilders = (
   description: UnaryOperation | StreamingOperation,
   operationKey: readonly JsonValue[],
-  keyEncoder: RuntimeKeyEncoder | undefined,
+  owner: PreparedInputOwner,
   prepareOptions: (
     options: Record<string, unknown>,
 
@@ -201,25 +218,9 @@ const createQueryBuilders = (
 
   prepareIdentity?: (options: Record<string, unknown>) => readonly JsonValue[]
 ) => ({
-  key: (argument?: unknown) => {
-    const inputless = description.input._tag === "Inputless";
-    if (
-      !Predicate.isObject(argument) &&
-      (argument !== undefined || !inputless)
-    ) {
-      throw new TypeError("Query key options must be an object");
-    }
-    const { input, ...options } = { ...argument };
-    return prepareQuery(
-      description,
-      inputless ? undefined : input,
-      operationKey,
-      keyEncoder,
-      prepareIdentity?.(options)
-    ).key;
-  },
+  key: createKeyBuilder(owner, operationKey, prepareIdentity),
 
-  options: (argument?: unknown) => {
+  options: registerQueryBuilder((argument?: Record<string, unknown>) => {
     const { input, options, requestOptions } = prepareQueryOptions(
       description,
       argument
@@ -232,101 +233,79 @@ const createQueryBuilders = (
     if (description.input._tag !== "Inputless" && input === skipToken) {
       return finalizeQueryOptions(options, operationKey, skipToken);
     }
-    const prepared = prepareQuery(
-      description,
-      input,
-      operationKey,
-      keyEncoder,
-      identity
-    );
+    const prepared = prepareQuery(owner, input, operationKey, identity);
     return finalizeQueryOptions(
       options,
       prepared.key,
       makeQuery(prepared.input)
     );
-  },
+  }),
 });
 
 const createInfiniteBuilders = (
   description: UnaryOperation,
   operationKey: readonly JsonValue[],
-  keyEncoder: RuntimeKeyEncoder | undefined,
+  owner: PreparedInputOwner,
   runPromiseExit: RunPromiseExit<unknown>
 ) => {
   const infiniteOperationKey = freezeKey([...operationKey, "infinite"]);
 
-  const infiniteKey = (argument?: unknown) => {
-    if (description.input._tag === "Inputless") {
-      return prepareQuery(
+  const infiniteKey =
+    owner.input._tag === "Inputless"
+      ? () => infiniteOperationKey
+      : createKeyBuilder(owner, infiniteOperationKey);
+
+  const infiniteOptions = registerQueryBuilder(
+    (argument?: Record<string, unknown>) => {
+      const { input, options, requestOptions } = prepareQueryOptions(
         description,
-        undefined,
-        infiniteOperationKey,
-        keyEncoder
-      ).key;
-    }
-    if (!Predicate.isObject(argument)) {
-      throw new TypeError("Query key options must be an object");
-    }
-    return prepareQuery(
-      description,
-      argument["input"],
-      infiniteOperationKey,
-      keyEncoder
-    ).key;
-  };
+        argument
+      );
+      if (description.input._tag !== "Inputless" && input === skipToken) {
+        return finalizeQueryOptions(options, infiniteOperationKey, skipToken);
+      }
 
-  const infiniteOptions = (argument: Record<string, unknown>) => {
-    const { input, options, requestOptions } = prepareQueryOptions(
-      description,
-      argument
-    );
-    if (description.input._tag !== "Inputless" && input === skipToken) {
-      return finalizeQueryOptions(options, infiniteOperationKey, skipToken);
-    }
-
-    const { initialPageParam } = options;
-    const inputForPage =
-      // oxlint-disable-next-line unicorn/no-useless-undefined
-      description.input._tag === "Inputless" ? () => undefined : input;
-    if (!Predicate.isFunction(inputForPage)) {
-      throw new TypeError("Infinite query input must be a page input function");
-    }
-    // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
-    const pageInput = inputForPage as (pageParam: unknown) => unknown;
-    const initialInput = pageInput(initialPageParam);
-    const prepared = prepareQuery(
-      description,
-      initialInput,
-      infiniteOperationKey,
-      keyEncoder
-    );
-
-    return finalizeQueryOptions(
-      options,
-      prepared.key,
-      async ({
-        pageParam,
-        signal,
-      }: {
-        readonly pageParam: unknown;
-        readonly signal: AbortSignal;
-      }) => {
-        const pageRequest = pageInput(pageParam);
-        const executionInput =
-          description.input._tag === "Input"
-            ? description.input.pageInput(pageRequest)
-            : undefined;
-        return executeBuffered(
-          description,
-          "infinite",
-          executionInput,
-          runPromiseExit,
-          requestOptions,
-          signal
+      const { initialPageParam } = options;
+      const inputForPage =
+        // oxlint-disable-next-line unicorn/no-useless-undefined
+        description.input._tag === "Inputless" ? () => undefined : input;
+      if (!Predicate.isFunction(inputForPage)) {
+        throw new TypeError(
+          "Infinite query input must be a page input function"
         );
       }
-    );
-  };
+      // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
+      const pageInput = inputForPage as (pageParam: unknown) => unknown;
+      const initialInput = pageInput(initialPageParam);
+      const prepared = prepareQuery(owner, initialInput, infiniteOperationKey);
+
+      return finalizeQueryOptions(
+        options,
+        prepared.key,
+        async ({
+          pageParam,
+          signal,
+        }: {
+          readonly pageParam?: unknown;
+          readonly signal: AbortSignal;
+        }) => {
+          const pageRequest = pageInput(pageParam);
+          const executionInput =
+            description.input._tag === "Input"
+              ? description.input.pageInput(pageRequest)
+              : undefined;
+          return executeBuffered(
+            description,
+            "infinite",
+            executionInput,
+            runPromiseExit,
+            requestOptions,
+            signal
+          );
+        }
+      );
+    }
+  );
 
   return { infiniteKey, infiniteOptions };
 };
@@ -335,13 +314,13 @@ const createBufferedBuilders = (
   description: UnaryOperation | MutationOperation,
   operationKey: readonly JsonValue[],
   runPromiseExit: RunPromiseExit<unknown>,
-  mutationRunner: RunPromiseExit<unknown>
+  mutationRunner: RunPromiseExit<unknown>,
+  owner?: PreparedInputOwner
 ) => {
   const mutationKey = freezeKey([...operationKey, "mutation"]);
 
   const prepareDirect = (argument: Record<string, unknown> = {}) => {
     const options = { ...argument };
-    const owner = description.kind === "Unary" ? description.input : undefined;
     const prepared = readPreparedInput(owner, options["input"]);
     return {
       input: prepared === undefined ? options["input"] : prepared.input,
@@ -371,23 +350,25 @@ const createBufferedBuilders = (
       return invoke(input, requestOptions);
     };
 
-  const mutationOptions = (argument: Record<string, unknown> = {}) => {
-    const options = { ...argument };
-    const requestOptions = description.takeOptions(options);
-    return {
-      ...options,
+  const mutationOptions = registerMutationBuilder(
+    (argument: Record<string, unknown> = {}) => {
+      const options = { ...argument };
+      const requestOptions = description.takeOptions(options);
+      return {
+        ...options,
 
-      mutationFn: async (variables: unknown) =>
-        executeBuffered(
-          description,
-          "mutation",
-          variables,
-          mutationRunner,
-          requestOptions
-        ),
-      mutationKey,
-    };
-  };
+        mutationFn: async (variables: unknown) =>
+          executeBuffered(
+            description,
+            "mutation",
+            variables,
+            mutationRunner,
+            requestOptions
+          ),
+        mutationKey,
+      };
+    }
+  );
   return {
     call,
     effect: bindDirectEffect(description.invoke),
@@ -399,7 +380,7 @@ const createBufferedBuilders = (
 const createUnaryBuilders = (
   description: UnaryOperation,
   operationKey: readonly JsonValue[],
-  keyEncoder: RuntimeKeyEncoder | undefined,
+  owner: PreparedInputOwner,
   runPromiseExit: RunPromiseExit<unknown>,
   mutationRunner: RunPromiseExit<unknown>
 ) => {
@@ -407,7 +388,7 @@ const createUnaryBuilders = (
   const query = createQueryBuilders(
     description,
     queryOperationKey,
-    keyEncoder,
+    owner,
     (_options, requestOptions) => ({
       identity: [],
       makeQuery:
@@ -430,7 +411,7 @@ const createUnaryBuilders = (
       : createQueryBuilders(
           description,
           freezeKey([...operationKey, "metadata"]),
-          keyEncoder,
+          owner,
           (options, requestOptions, input) => ({
             identity: [],
             makeQuery: prepareMetadataExecution(
@@ -444,18 +425,14 @@ const createUnaryBuilders = (
         );
 
   return {
-    queryFilter: createLeafFilter(description, operationKey, keyEncoder),
-    ...createInfiniteBuilders(
-      description,
-      operationKey,
-      keyEncoder,
-      runPromiseExit
-    ),
+    queryFilter: createLeafFilter(description, operationKey, owner),
+    ...createInfiniteBuilders(description, operationKey, owner, runPromiseExit),
     ...createBufferedBuilders(
       description,
       operationKey,
       runPromiseExit,
-      mutationRunner
+      mutationRunner,
+      owner
     ),
     queryKey: query.key,
     queryOptions: query.options,
@@ -471,14 +448,14 @@ const createUnaryBuilders = (
 const createStreamingBuilders = (
   description: StreamingOperation,
   operationKey: readonly JsonValue[],
-  keyEncoder: RuntimeKeyEncoder | undefined,
+  owner: PreparedInputOwner,
   runPromiseExit: RunPromiseExit<unknown>
 ) => {
   const createView = (operation: "live" | "streamed") =>
     createQueryBuilders(
       description,
       freezeKey([...operationKey, operation]),
-      keyEncoder,
+      owner,
       (options, requestOptions) => {
         const { identity, makeQuery } = description.prepareStream(
           options,
@@ -496,7 +473,7 @@ const createStreamingBuilders = (
   const streamed = createView("streamed");
 
   return {
-    queryFilter: createLeafFilter(description, operationKey, keyEncoder),
+    queryFilter: createLeafFilter(description, operationKey, owner),
     liveKey: live.key,
     liveOptions: live.options,
     streamedKey: streamed.key,
@@ -585,14 +562,10 @@ const insertLeaf = (
   runPromiseExit: RunPromiseExit<unknown>
 ) => {
   const { path: segments } = description;
-  const operation =
-    description.kind === "Mutation"
-      ? description
-      : { ...description, input: { ...description.input } };
   const operationKey = freezeKey([...prefix, ...segments]);
   const filterPath: FilterPath = {
     key: operationKey,
-    views: operationViews(operation),
+    views: operationViews(description),
   };
   let branch = tree;
   branch.paths.push(filterPath);
@@ -614,31 +587,38 @@ const insertLeaf = (
     throw new TypeError("Validated operation paths must have a leaf");
   }
   const leafKey = () => operationKey;
+  let inputOwner: PreparedInputOwner | undefined;
   const buildLeaf = (leafRunner: RunPromiseExit<unknown>) => {
-    let builders;
-    if (operation.kind === "Mutation") {
-      builders = createBufferedBuilders(
-        operation,
-        operationKey,
-        leafRunner,
-        runPromiseExit
-      );
-    } else if (operation.kind === "Streaming") {
-      builders = createStreamingBuilders(
-        operation,
-        operationKey,
-        keyEncoder,
-        leafRunner
-      );
-    } else {
-      builders = createUnaryBuilders(
-        operation,
-        operationKey,
-        keyEncoder,
-        leafRunner,
-        runPromiseExit
-      );
+    if (description.kind === "Mutation") {
+      return Object.freeze({
+        key: leafKey,
+        ...createBufferedBuilders(
+          description,
+          operationKey,
+          leafRunner,
+          runPromiseExit
+        ),
+      });
     }
+    inputOwner ??= {
+      input: description.input,
+      encoder: keyEncoder,
+    };
+    const builders =
+      description.kind === "Streaming"
+        ? createStreamingBuilders(
+            description,
+            operationKey,
+            inputOwner,
+            leafRunner
+          )
+        : createUnaryBuilders(
+            description,
+            operationKey,
+            inputOwner,
+            leafRunner,
+            runPromiseExit
+          );
     return Object.freeze({ key: leafKey, ...builders });
   };
   Object.defineProperty(
@@ -649,8 +629,8 @@ const insertLeaf = (
       leafRebuilders.set(leaf, (wrapRunner) =>
         buildLeaf(wrapRunner(runPromiseExit))
       );
-      if (operation.kind !== "Mutation") {
-        registerInputOwner(leaf.key, operation.input, keyEncoder);
+      if (inputOwner !== undefined) {
+        registerInputOwner(leafKey, inputOwner);
       }
       return leaf;
     })

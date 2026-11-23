@@ -1,15 +1,23 @@
 import { ok } from "node:assert/strict";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import {
+  copyFileSync,
+  cpSync,
+  mkdirSync,
+  mkdtempSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from "node:fs";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
 
-import { Effect } from "effect";
 import viteManifest from "vite/package.json" with { type: "json" };
 import { rolldown, VERSION } from "vite/rolldown";
 
 import manifest from "../package.json" with { type: "json" };
 import { currentCompiler } from "./compiler.mts";
-import { assertBudget, bundleBudgets } from "./performance/budgets.mts";
+import { capture, run } from "./lib/exec.mts";
 import {
   packageName,
   prepareConsumer,
@@ -24,8 +32,6 @@ const consumers = {
       'const contract = RpcGroup.make(Rpc.make("read", { payload: { id: Schema.Int }, success: Value }));',
     factory: "createRpcQueryUtils",
     usage: "utils.read.queryOptions({ input: { id: 1 } })",
-    native:
-      '({ queryKey: ["bundle-baseline", "rpc", "read", "query", { id: 1 }], queryFn: ({ signal }) => Effect.runPromise(client("read", { id: 1 }), { signal }) })',
   },
   http: {
     imports:
@@ -34,8 +40,6 @@ const consumers = {
       'const contract = HttpApi.make("bundle-baseline").add(HttpApiGroup.make("users").add(HttpApiEndpoint.get("read", "/:id", { params: { id: Schema.Int }, success: Value })));',
     factory: "createHttpApiQueryUtils",
     usage: "utils.users.read.queryOptions({ input: { params: { id: 1 } } })",
-    native:
-      '({ queryKey: ["bundle-baseline", "http", "bundle-baseline", "users", "read", { params: { id: 1 } }], queryFn: ({ signal }) => Effect.runPromise(client.users.read({ params: { id: 1 } }), { signal }) })',
   },
   streamed: {
     imports: 'import { Rpc, RpcGroup } from "effect/rpc";',
@@ -43,8 +47,6 @@ const consumers = {
       'const contract = RpcGroup.make(Rpc.make("watch", { success: Value, stream: true }));',
     factory: "createRpcQueryUtils",
     usage: 'utils.watch.streamedOptions({ maxChunks: "unbounded" })',
-    native:
-      '({ queryKey: ["bundle-baseline", "rpc", "watch", "streamed"], queryFn: streamedQuery({ streamFn: () => Stream.toAsyncIterable(client("watch", {})) }) })',
   },
   hydration: {
     imports: 'import { Rpc, RpcGroup } from "effect/rpc";',
@@ -53,134 +55,175 @@ const consumers = {
     factory: "createRpcQueryUtils",
     usage:
       '({ registry: createHydrationRegistry([queryViewCodec(utils.read, "query", Value)]), dehydrate, hydrate })',
-    native: "({ dehydrate, hydrate })",
   },
 } as const;
 
 const artifacts = path.join(repositoryRoot, ".artifacts", "performance");
 mkdirSync(artifacts, { recursive: true });
 const directory = mkdtempSync(path.join(artifacts, "bundles-"));
-const context = prepareConsumer(directory);
-const measurements: {
-  consumer: keyof typeof consumers;
-  peers: "included" | "external";
-  baseline: { minifiedBytes: number; gzipBytes: number };
-  adapter: { minifiedBytes: number; gzipBytes: number };
-  difference: { minifiedBytes: number; gzipBytes: number };
-  retained: readonly {
-    variant: string;
-    modules: readonly { id: string; renderedBytes: number }[];
-  }[];
-}[] = [];
-try {
-  await Effect.runPromise(
-    Effect.gen(function* measureBundles() {
-      for (const name of ["rpc", "http", "streamed", "hydration"] as const) {
-        const consumer = consumers[name];
-        for (const externalPeers of [false, true]) {
-          const sizes = [];
-          const retained: {
-            variant: string;
-            modules: { id: string; renderedBytes: number }[];
-          }[] = [];
-          for (const utilities of [false, true]) {
-            const entry = path.join(directory, "consumer.mjs");
-            writeFileSync(
-              entry,
-              `import { Effect, Schema, Stream } from "effect";\nimport { QueryClient, experimental_streamedQuery as streamedQuery, dehydrate, hydrate } from "@tanstack/query-core";\n${consumer.imports}\n${utilities ? `import { ${consumer.factory}${name === "hydration" ? ", createHydrationRegistry, queryViewCodec" : ""} } from "${packageName}";` : ""}\nconst Value = Schema.Struct({ id: Schema.Int, label: Schema.String });\n${consumer.declaration}\nexport { contract };\nexport const create = client => {\nconst queryClient = new QueryClient();\n${utilities ? `const utils = ${consumer.factory}(contract, { client, keyPrefix: ["bundle-baseline"] });\nreturn { queryClient, options: ${consumer.usage} };` : `return { queryClient, options: ${consumer.native} };`}\n};\n`
-            );
-            sizes.push(
-              yield* Effect.promise(async () => {
-                const bundle = await rolldown({
-                  input: entry,
-                  platform: "browser",
-                  external: externalPeers
-                    ? ["effect", /^effect\//u, "@tanstack/query-core"]
-                    : [],
-                  treeshake: true,
-                  logLevel: "silent",
-                  transform: {
-                    target: "es2022",
-                    define: { "process.env.NODE_ENV": '"production"' },
-                  },
-                });
-                try {
-                  const result = await bundle.generate({
-                    format: "esm",
-                    minify: true,
-                  });
-                  retained.push({
-                    variant: utilities ? "adapter" : "native",
-                    modules: result.output.flatMap((output) =>
-                      output.type === "chunk"
-                        ? Object.entries(output.modules)
-                            .filter(([, module]) => module.renderedLength > 0)
-                            .map(([id, module]) => ({
-                              id: path.relative(repositoryRoot, id),
-                              renderedBytes: module.renderedLength,
-                            }))
-                        : []
-                    ),
-                  });
-                  const code = result.output
-                    .filter((output) => output.type === "chunk")
-                    .map((output) => output.code)
-                    .join("\n");
-                  return {
-                    minifiedBytes: Buffer.byteLength(code),
-                    gzipBytes: gzipSync(code).byteLength,
-                    optionalDiagnosticMarkers: {
-                      owner: code.includes("Query owner is retired"),
-                      descriptor: code.includes("Query descriptor rejected"),
-                      effectCache: code.includes(
-                        "QueryClient operation failed"
-                      ),
-                      reactivityBridge:
-                        code.includes(".registerUnsafe(") ||
-                        code.includes("effect/reactivity"),
-                      sharing: code.includes("Schema sharing requires acyclic"),
-                    },
-                  };
-                } finally {
-                  await bundle.close();
-                }
-              })
-            );
-          }
-          const [baseline, adapter] = sizes;
-          if (baseline === undefined || adapter === undefined) {
-            throw new Error("Both bundle variants must complete");
-          }
-          ok(
-            !adapter.optionalDiagnosticMarkers.reactivityBridge ||
-              baseline.optionalDiagnosticMarkers.reactivityBridge,
-            `${name} retained an unused Reactivity bridge`
-          );
-          measurements.push({
-            consumer: name,
-            retained,
-            peers: externalPeers ? "external" : "included",
-            baseline,
-            adapter,
-            difference: {
-              minifiedBytes: adapter.minifiedBytes - baseline.minifiedBytes,
-              gzipBytes: adapter.gzipBytes - baseline.gzipBytes,
-            },
-          });
-        }
-      }
-    })
+const measure = async (
+  entry: string,
+  consumer: (typeof consumers)[keyof typeof consumers],
+  externalPeers: boolean
+) => {
+  const imports =
+    consumer.factory +
+    (consumer === consumers.hydration
+      ? ", createHydrationRegistry, queryViewCodec"
+      : "");
+  writeFileSync(
+    entry,
+    `import { Schema } from "effect";
+import { QueryClient, dehydrate, hydrate } from "@tanstack/query-core";
+${consumer.imports}
+import { ${imports} } from "${packageName}";
+const Value = Schema.Struct({ id: Schema.Int, label: Schema.String });
+${consumer.declaration}
+export { contract };
+export const create = client => {
+  const queryClient = new QueryClient();
+  const utils = ${consumer.factory}(contract, { client, keyPrefix: ["bundle-baseline"] });
+  return { queryClient, options: ${consumer.usage} };
+};
+`
   );
+  const bundle = await rolldown({
+    input: entry,
+    platform: "browser",
+    external: externalPeers
+      ? ["effect", /^effect\//u, "@tanstack/query-core"]
+      : [],
+    treeshake: true,
+    logLevel: "silent",
+    transform: {
+      target: "es2022",
+      define: { "process.env.NODE_ENV": '"production"' },
+    },
+  });
+  try {
+    const result = await bundle.generate({ format: "esm", minify: true });
+    const code = result.output
+      .filter((output) => output.type === "chunk")
+      .map((output) => output.code)
+      .join("\n");
+    return {
+      minifiedBytes: Buffer.byteLength(code),
+      gzipBytes: gzipSync(code).byteLength,
+      reactivityBridge:
+        code.includes(".registerUnsafe(") || code.includes("effect/reactivity"),
+    };
+  } finally {
+    await bundle.close();
+  }
+};
+
+try {
+  const mainRefs = capture(
+    "git",
+    [
+      "for-each-ref",
+      "--format=%(refname)",
+      "refs/remotes/origin/main",
+      "refs/heads/main",
+    ],
+    { cwd: repositoryRoot }
+  )
+    .trim()
+    .split("\n");
+  const mainRef = mainRefs.includes("refs/remotes/origin/main")
+    ? "refs/remotes/origin/main"
+    : "refs/heads/main";
+  const mainRevision = capture("git", ["rev-parse", "--verify", mainRef], {
+    cwd: repositoryRoot,
+  }).trim();
+  const mainSource = path.join(directory, "main-source");
+  const archive = path.join(directory, "main.tar");
+  mkdirSync(mainSource);
+  run("git", ["archive", "--format=tar", "--output", archive, mainRevision], {
+    cwd: repositoryRoot,
+  });
+  run("tar", ["-xf", archive, "-C", mainSource]);
+  symlinkSync(
+    path.join(repositoryRoot, "node_modules"),
+    path.join(mainSource, "node_modules"),
+    "junction"
+  );
+  execFileSync("vp", ["pack"], {
+    cwd: mainSource,
+    stdio: ["ignore", process.stderr, "inherit"],
+  });
+
+  const currentDirectory = path.join(directory, "current");
+  const mainDirectory = path.join(directory, "main");
+  const context = prepareConsumer(currentDirectory);
+  const mainPackage = path.join(mainDirectory, "node_modules", packageName);
+  mkdirSync(mainPackage, { recursive: true });
+  copyFileSync(
+    path.join(mainSource, "package.json"),
+    path.join(mainPackage, "package.json")
+  );
+  cpSync(path.join(mainSource, "dist"), path.join(mainPackage, "dist"), {
+    recursive: true,
+  });
+  copyFileSync(
+    path.join(currentDirectory, "package.json"),
+    path.join(mainDirectory, "package.json")
+  );
+
+  const comparisons = await Promise.allSettled(
+    Object.entries(consumers).flatMap(([name, consumer]) =>
+      [false, true].map(async (externalPeers) => {
+        const peers = externalPeers ? "external" : "included";
+        const entry = `${name}-${peers}.mjs`;
+        const main = await measure(
+          path.join(mainDirectory, entry),
+          consumer,
+          externalPeers
+        );
+        const current = await measure(
+          path.join(currentDirectory, entry),
+          consumer,
+          externalPeers
+        );
+        ok(
+          !current.reactivityBridge,
+          `${name} (${peers}) retained an unused Reactivity bridge`
+        );
+        return {
+          consumer: name,
+          peers,
+          main: {
+            minifiedBytes: main.minifiedBytes,
+            gzipBytes: main.gzipBytes,
+          },
+          current: {
+            minifiedBytes: current.minifiedBytes,
+            gzipBytes: current.gzipBytes,
+          },
+          difference: {
+            minifiedBytes: current.minifiedBytes - main.minifiedBytes,
+            gzipBytes: current.gzipBytes - main.gzipBytes,
+          },
+        };
+      })
+    )
+  );
+  const measurements = comparisons.map((comparison) => {
+    if (comparison.status === "rejected") {
+      throw comparison.reason;
+    }
+    return comparison.value;
+  });
+
   writeReport({
     context: { ...context, rolldown: VERSION },
     workload: {
       target: "browser ESM, ES2022",
       minified: true,
       consumerSource: "built public package exports",
-      baseline:
-        "same exported contract, ready client and QueryClient with native options; hydration baseline uses native JSON data only",
-      comparisonLimits:
-        "Successful decoded scalar/object workloads only. Native stream helper has no adapter cleanup/error/key guarantees; hydration registry adds schema codecs. Deltas measure retained capability cost, not runtime equivalence or optimization gains.",
+      main: { ref: mainRef, revision: mainRevision },
+      dependencies:
+        "Both revisions use the current checkout's installed toolchain and peers.",
       compiler: currentCompiler,
       vite: {
         importedAs: "vite",
@@ -192,15 +235,6 @@ try {
     },
     measurements,
   });
-  for (const { consumer, peers, difference } of measurements) {
-    const [minified, gzip] = bundleBudgets[consumer][peers];
-    assertBudget(
-      `${consumer} ${peers} minified delta`,
-      difference.minifiedBytes,
-      minified
-    );
-    assertBudget(`${consumer} ${peers} gzip delta`, difference.gzipBytes, gzip);
-  }
 } finally {
   rmSync(directory, { recursive: true, force: true });
 }
