@@ -82,7 +82,7 @@ export const fetchStreamSnapshot = async <
   let executionSignal: AbortSignal | undefined;
   let failed = false;
   let failure: unknown;
-  let cleanup = Promise.resolve();
+  const pending = new Set<Promise<void>>();
   let cancellation: Promise<void> | undefined;
   const cancel = async () => {
     cancellation ??= queryClient.cancelQueries({
@@ -104,6 +104,7 @@ export const fetchStreamSnapshot = async <
       event.action.type === "success"
     ) {
       captured = true;
+      closed = true;
       if (event.action.manual === true) {
         ready();
         void cancel();
@@ -140,9 +141,10 @@ export const fetchStreamSnapshot = async <
         executionSignal = context.signal;
         let finished!: () => void;
         // oxlint-disable-next-line promise/avoid-new
-        cleanup = new Promise<void>((resolve) => {
+        const cleanup = new Promise<void>((resolve) => {
           finished = resolve;
         });
+        pending.add(cleanup);
         try {
           return await options.queryFn(context);
         } catch (error) {
@@ -150,6 +152,7 @@ export const fetchStreamSnapshot = async <
           failure = error;
           throw error;
         } finally {
+          pending.delete(cleanup);
           finished();
         }
       },
@@ -168,7 +171,7 @@ export const fetchStreamSnapshot = async <
     clearTimeout(timer);
     signal?.removeEventListener("abort", onAbort);
     await cancel();
-    await cleanup;
+    await Promise.all(pending);
   }
   if (failed) {
     throw failure;
