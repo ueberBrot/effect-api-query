@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "a03daab4461b9547d290e773de4c6a87131c167c75a3aacc551fa8ca505a252f",
+      "fingerprint": "b37a05682e136ea1613fbf649a9e26f31e6b314e0a3b89a432a918c616185045",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -52,7 +52,7 @@
         "apps/docs/src/content/docs/guides/streaming.md": "0094954578cb2cf4a2b6fe759ce9893c27d2fea6810f42041a768d2fe7f5b4de",
         "apps/docs/src/content/docs/guides/suspense-and-recovery.md": "c4aeec1df383a9b4365a85d63ef1c345918b063ad35028431d0fed91f96ce21d",
         "apps/docs/src/content/docs/guides/svelte-query.md": "640d9d04953f4be453d686558d30f5ef83b4aea9489b1b4695760a82ff7a245b",
-        "apps/docs/src/content/docs/guides/switch-cache-owners.md": "2b533b5b360be58f8e27d994284f38a195a81fe3eb7ee99b7a18df9c9bd79575",
+        "apps/docs/src/content/docs/guides/switch-cache-owners.md": "1817e829240e81edcd2d0e1ac5b9570e8aad60275dc1099c274563447b6ccc60",
         "apps/docs/src/content/docs/guides/tanstack-start.md": "e97e42a5802717cf84826b07f645f10af4fd8f3b002ee8ed275d7e488cde5837",
         "apps/docs/src/content/docs/guides/trace-streams.md": "4ca7d118e9155cf459a093d7c8e45f099f8d9608d851938e223f80d6e5f30583",
         "apps/docs/src/content/docs/guides/vue-query.md": "a2d8a91f749632bfdb79ac99ea7cd625e7907fb1c96e92a0af2c581f3b0b1025",
@@ -407,15 +407,15 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "cb499d76119b63412b32a5d5a71f181ff26379b1",
+      "head": "5a72085c205101261e4ee66160027073fb780618",
       "outcome": "no-change",
-      "reason": "Shared path validation, utility options, and stream fields retain their documented behavior and meet all existing bundle budgets.",
+      "reason": "The owner guide now describes synchronous admission and callback invocation. The shipped skill already describes accepted work and retirement correctly.",
       "evidence": [
-        "Changed: src/core/contract-hydration.ts, src/core/streamed-query.ts, src/core/utility-node.ts, src/core/utility-path.ts, src/core/utility-tree.ts at cb499d76119b63412b32a5d5a71f181ff26379b1"
+        "Changed: apps/docs/src/content/docs/guides/switch-cache-owners.md at 5a72085c205101261e4ee66160027073fb780618"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "4ffbaa39d4c8d107c4f8f6a3915f95dcf66b9c159d9ab7e2aedc616cd5e60fe5",
+      "fingerprint": "4ba7c71c70c40a0510376e803c3f6f8a11cfdead37b54c7dadd873c42e4fbb89",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -467,7 +467,7 @@
         "apps/docs/src/content/docs/guides/streaming.md": "0094954578cb2cf4a2b6fe759ce9893c27d2fea6810f42041a768d2fe7f5b4de",
         "apps/docs/src/content/docs/guides/suspense-and-recovery.md": "c4aeec1df383a9b4365a85d63ef1c345918b063ad35028431d0fed91f96ce21d",
         "apps/docs/src/content/docs/guides/svelte-query.md": "640d9d04953f4be453d686558d30f5ef83b4aea9489b1b4695760a82ff7a245b",
-        "apps/docs/src/content/docs/guides/switch-cache-owners.md": "2b533b5b360be58f8e27d994284f38a195a81fe3eb7ee99b7a18df9c9bd79575",
+        "apps/docs/src/content/docs/guides/switch-cache-owners.md": "1817e829240e81edcd2d0e1ac5b9570e8aad60275dc1099c274563447b6ccc60",
         "apps/docs/src/content/docs/guides/tanstack-start.md": "e97e42a5802717cf84826b07f645f10af4fd8f3b002ee8ed275d7e488cde5837",
         "apps/docs/src/content/docs/guides/trace-streams.md": "4ca7d118e9155cf459a093d7c8e45f099f8d9608d851938e223f80d6e5f30583",
         "apps/docs/src/content/docs/guides/vue-query.md": "a2d8a91f749632bfdb79ac99ea7cd625e7907fb1c96e92a0af2c581f3b0b1025",
@@ -822,11 +822,11 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "cb499d76119b63412b32a5d5a71f181ff26379b1",
+      "head": "5a72085c205101261e4ee66160027073fb780618",
       "outcome": "no-change",
-      "reason": "Shared path validation, utility options, and stream fields retain their documented behavior and meet all existing bundle budgets.",
+      "reason": "The owner guide now describes synchronous admission and callback invocation. The shipped skill already describes accepted work and retirement correctly.",
       "evidence": [
-        "Changed: src/core/contract-hydration.ts, src/core/streamed-query.ts, src/core/utility-node.ts, src/core/utility-path.ts, src/core/utility-tree.ts at cb499d76119b63412b32a5d5a71f181ff26379b1"
+        "Changed: apps/docs/src/content/docs/guides/switch-cache-owners.md at 5a72085c205101261e4ee66160027073fb780618"
       ]
     },
     "source:vite.config.ts": {
