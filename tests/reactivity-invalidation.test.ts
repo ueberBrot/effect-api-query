@@ -351,7 +351,7 @@ it.effect(
 );
 
 it.effect(
-  "dispatches later batches while a refetch is pending and releases concurrent flush waiters",
+  "isolates a failing binding and drains the refetch across concurrent flush waiters",
   () =>
     Effect.gen(function* verifyInFlightCoalescing() {
       const queryClient = new QueryClient();
@@ -359,6 +359,8 @@ it.effect(
       const runPromise = Effect.runPromiseWith(yield* Effect.context());
       const started = yield* Deferred.make<undefined>();
       const release = yield* Deferred.make<number>();
+      const reported = yield* Deferred.make<unknown>();
+      const failure = new Error("filter failed");
       const user = ["user"];
       const groupKey = ["group"];
       let groupMatches = 0;
@@ -374,26 +376,40 @@ it.effect(
       queryClient.setQueryData(user, 1);
       queryClient.setQueryData(groupKey, 1);
 
-      const bridge = yield* bindReactivityInvalidation([
-        { keys: ["users:1"], filter: { queryKey: user, refetchType: "all" } },
-        {
-          keys: { groups: [1, 2] },
-          filter: {
-            queryKey: groupKey,
-            refetchType: "none",
-            predicate: () => {
-              groupMatches += 1;
-              return true;
+      const bridge = yield* bindReactivityInvalidation(
+        [
+          { keys: ["users:1"], filter: { queryKey: user, refetchType: "all" } },
+          {
+            keys: ["users:1"],
+            get filter(): never {
+              throw failure;
             },
           },
-        },
-      ]).pipe(
+          {
+            keys: { groups: [1, 2] },
+            filter: {
+              queryKey: groupKey,
+              refetchType: "none",
+              predicate: () => {
+                groupMatches += 1;
+                return true;
+              },
+            },
+          },
+        ],
+        {
+          onError: (error) => {
+            Deferred.doneUnsafe(reported, Exit.succeed(error));
+          },
+        }
+      ).pipe(
         Effect.provideService(Reactivity.Reactivity, reactivity),
         Effect.provideService(QueryClientService, queryClient)
       );
 
       reactivity.invalidateUnsafe(["users:1"]);
       yield* Deferred.await(started);
+      expect(yield* Deferred.await(reported)).toBe(failure);
 
       const firstWaiter = yield* Effect.forkChild(bridge.flush, {
         startImmediately: true,

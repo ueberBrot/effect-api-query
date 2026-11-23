@@ -89,15 +89,20 @@ const bindInvalidations =
     ): Effect.Effect<void, never, QueryClientService> =>
       Effect.forEach(
         batch,
-        (binding) => {
-          const invalidateOptions =
-            binding.options ?? options?.invalidateOptions;
-          return Effect.forEach(
-            Arr.ensure<InvalidateQueryFilters>(binding.filter),
-            (filter) => invalidateFilter(filter, invalidateOptions),
-            { concurrency: "unbounded", discard: true }
-          );
-        },
+        (binding) =>
+          Effect.suspend(() => {
+            const invalidateOptions =
+              binding.options ?? options?.invalidateOptions;
+            return Effect.forEach(
+              Arr.ensure<InvalidateQueryFilters>(binding.filter),
+              (filter) => invalidateFilter(filter, invalidateOptions),
+              { concurrency: "unbounded", discard: true }
+            );
+          }).pipe(
+            Effect.catchCause((cause) =>
+              reportFailure(onError, Cause.squash(cause))
+            )
+          ),
         { concurrency: "unbounded", discard: true }
       );
 
