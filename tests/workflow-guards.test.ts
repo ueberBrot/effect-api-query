@@ -155,8 +155,12 @@ describe("repository workflow guards", () => {
     withRepository((cwd) => {
       write(cwd, "PLAN.md");
       git(cwd, "add", "PLAN.md");
-      mkdirSync(path.join(cwd, "scripts"));
+      mkdirSync(path.join(cwd, "scripts/lib"), { recursive: true });
       cpSync(script, path.join(cwd, "scripts/check-workflow.mts"));
+      cpSync(
+        path.resolve(import.meta.dirname, "../scripts/lib/exec.mts"),
+        path.join(cwd, "scripts/lib/exec.mts")
+      );
       symlinkSync(
         path.resolve(import.meta.dirname, "../node_modules"),
         path.join(cwd, "node_modules")

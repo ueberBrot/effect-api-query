@@ -18,6 +18,7 @@ import { parseArgs } from "node:util";
 import sharedManifest from "../examples/shared/package.json" with { type: "json" };
 import manifest from "../package.json" with { type: "json" };
 import { compilerCommand, currentCompiler } from "./compiler.mts";
+import { capture, run as runCommand } from "./lib/exec.mts";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const workspace = readFileSync(path.join(root, "pnpm-workspace.yaml"), "utf-8");
@@ -105,8 +106,9 @@ const tests = [
   "query-policy",
   "live-coalescing",
 ].map((name) => `tests/${name}.test.ts`);
-const run = (args: string[], cwd: string) =>
-  execFileSync("vp", args, { cwd, stdio: "inherit" });
+const run = (args: readonly string[], cwd: string) => {
+  runCommand("vp", args, { cwd });
+};
 
 try {
   execFileSync(
@@ -228,14 +230,14 @@ try {
       ],
       consumer
     );
-    const installedEffect = execFileSync(
+    const installedEffect = capture(
       process.execPath,
       [
         "--input-type=module",
         "--eval",
         "import { getCurrentVersion } from 'effect/Version'; process.stdout.write(getCurrentVersion())",
       ],
-      { cwd: consumer, encoding: "utf-8" }
+      { cwd: consumer }
     );
     ok(
       installedEffect === version,
@@ -246,14 +248,14 @@ try {
       !existsSync(path.join(library, "src")),
       "Consumers must use the packed library."
     );
-    const resolvedEffect = execFileSync(
+    const resolvedEffect = capture(
       process.execPath,
       [
         "--input-type=module",
         "--eval",
         "process.stdout.write(import.meta.resolve('effect'))",
       ],
-      { cwd: realpathSync(library), encoding: "utf-8" }
+      { cwd: realpathSync(library) }
     );
     ok(
       resolvedEffect.includes(`/effect@${version}/`),
@@ -261,38 +263,38 @@ try {
     );
     for (const peer of ["effect", "@tanstack/query-core"]) {
       const resolve = (cwd: string) =>
-        execFileSync(
+        capture(
           process.execPath,
           [
             "--input-type=module",
             "--eval",
             `process.stdout.write(import.meta.resolve(${JSON.stringify(peer)}))`,
           ],
-          { cwd, encoding: "utf-8" }
+          { cwd }
         );
       ok(
         resolve(realpathSync(library)) === resolve(consumer),
         `Packed ${peer} must share the consumer peer instance.`
       );
     }
-    const installedQuery = execFileSync(
+    const installedQuery = capture(
       process.execPath,
       [
         "--input-type=module",
         "--eval",
         "import manifest from '@tanstack/query-core/package.json' with { type: 'json' }; process.stdout.write(manifest.version)",
       ],
-      { cwd: consumer, encoding: "utf-8" }
+      { cwd: consumer }
     );
     ok(installedQuery === queryVersion, `Expected Query Core ${queryVersion}.`);
-    const resolvedLibrary = execFileSync(
+    const resolvedLibrary = capture(
       process.execPath,
       [
         "--input-type=module",
         "--eval",
         `process.stdout.write(import.meta.resolve(${JSON.stringify(manifest.name)}))`,
       ],
-      { cwd: consumer, encoding: "utf-8" }
+      { cwd: consumer }
     );
     ok(
       resolvedLibrary.endsWith("/dist/index.mjs"),
@@ -302,7 +304,7 @@ try {
       console.log(
         `Checking public compiler fixtures: Effect ${version}, Query Core ${queryVersion}, ${compiler} ${compiler === "current" ? JSON.stringify(currentCompiler) : "TypeScript 5.9.3"}`
       );
-      execFileSync(
+      runCommand(
         process.execPath,
         [
           ...compilerCommand(consumer, compiler),
@@ -311,11 +313,11 @@ try {
           "--pretty",
           "false",
         ],
-        { cwd: consumer, stdio: "inherit" }
+        { cwd: consumer }
       );
     }
     for (const compiler of ["current", "minimum"] as const) {
-      const files = execFileSync(
+      const files = capture(
         process.execPath,
         [
           ...compilerCommand(consumer, compiler),
@@ -323,7 +325,7 @@ try {
           "tests/types/tsconfig.json",
           "--listFilesOnly",
         ],
-        { cwd: consumer, encoding: "utf-8" }
+        { cwd: consumer }
       );
       ok(
         files.includes(path.join(realpathSync(library), "dist/index.d.mts")),
@@ -338,9 +340,8 @@ try {
       path.join(consumer, "vite.config.ts"),
       `import { defineConfig } from "vite-plus";\nexport default defineConfig({ test: { include: ${JSON.stringify(tests)} } });\n`
     );
-    execFileSync(path.join(consumer, "node_modules/.bin/vp"), ["test"], {
+    runCommand(path.join(consumer, "node_modules/.bin/vp"), ["test"], {
       cwd: consumer,
-      stdio: "inherit",
     });
   }
 } finally {

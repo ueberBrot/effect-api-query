@@ -11,10 +11,11 @@ import {
 import { tmpdir } from "node:os";
 import nodePath from "node:path";
 
-const capture = (command: string, args: string[]) =>
-  execFileSync(command, args, { encoding: "utf-8" });
-const run = (args: string[]) => execFileSync("vp", args, { stdio: "inherit" });
-const git = (...args: string[]) => capture("git", args);
+import { git, run as runCommand } from "./lib/exec.mts";
+
+const run = (args: readonly string[]) => {
+  runCommand("vp", args);
+};
 const read = (path: string) => readFileSync(path, "utf-8");
 /* oxlint-disable anti-slop/no-runtime-typeof -- Parse the package manifest at the JSON input boundary. */
 const manifest = () => {

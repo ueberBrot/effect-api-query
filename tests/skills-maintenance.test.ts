@@ -100,6 +100,7 @@ describe("Intent maintenance validation", () => {
       "vite.config.ts",
       "scripts/compiler.mts",
       "scripts/check-workflow.mts",
+      "scripts/lib/exec.mts",
       "scripts/check-skills.sh",
       ".vite-hooks/pre-push",
     ]) {
