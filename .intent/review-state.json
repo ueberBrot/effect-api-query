@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "340429b2cd329d5e28376cf426677ede3033aa9b27dcf060b6572d13c7f42141",
+      "fingerprint": "86e495d4f81ec8d5fde376088a238bb11dbc174ab2a3486a068c530431b8b688",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -315,7 +315,7 @@
         "tests/hydration-codecs.test.ts": "89a6f85260421b6d8fa4de578df2df16c6b357c8f4c8c467db02d3a6d9531f69",
         "tests/integrated-workflows.test.ts": "f7656de73aea99cdc9a1aff92bcb27dbf6ffec6cfc26394d6b9c0be1148fa452",
         "tests/lazy-leaves-and-unified-keys.test.ts": "83c4ad695d0cd3b807fc379c169cd1ca27e6c47868d6132bcb5afbd608e47aa8",
-        "tests/live-coalescing.test.ts": "5b7e67d4c2b06641e3ccdffa116005616afc3662a2911f637ca1da372aec7948",
+        "tests/live-coalescing.test.ts": "449a0505b96afb99847dd873c2bc38e9853a5ddfe176d3a9172f0bf3a0f41c42",
         "tests/publication-deadline.test.ts": "38f754f5d53e1781a0f1d3ae0102b3d90d7358485bb2b645bdf7b68076f21574",
         "tests/query-descriptor.test.ts": "76b1cbd00f87aa3fa591a918cfbaca4f017d734a86b7cdd6f8c6ecc499205a7c",
         "tests/query-effects.test.ts": "679d76ac8d598a0d973d18d48c1bde61aa1c7a84b96b3ae7ccc7d0cc50743fff",
@@ -325,16 +325,16 @@
         "tests/query-policy.test.ts": "914702a1ae97649131495f50eb64a3bb554d7fcfe370bb27228323ef13270e20",
         "tests/query-usability.test.ts": "f2919940a513ee1440a20b162f7c1dbb2cf81841368483899765b9b58c9c26c6",
         "tests/query-view-prefix.test.ts": "2c00662e76474c8cb6fb51cec6e9a27626ce961b076bd74653ab84475b4ae764",
-        "tests/react-pack-isolation.test.ts": "38322eef4c2cba32754612972939313fac0b824317ae439fe87baf41bb5de281",
-        "tests/react.test.tsx": "81f999b7e5b4b1482a6821cfe8881c0d3d76d75477f18b1f36b81c72353ec523",
+        "tests/react-pack-isolation.test.ts": "0bc8c4893f54104ec9fe791336ba645fa43566c987ea2939b43f830621635138",
+        "tests/react.test.tsx": "a5494e54ab73dc73a30c4a1e0d51634ad9772735195295e1f65cc9274531b554",
         "tests/reactivity-invalidation.test.ts": "59f98c72a2168018e615de0c9db489a41e7444904e9a606e763b922c68edf2df",
         "tests/schema-sharing-prototypes.test.ts": "628a6622656b9b53e686d14b9efbd3abc13c61a13db1546001b0689b491f6022",
         "tests/schema-structural-sharing.test.ts": "dc4c580e9193fb7749701cad3efdd5563edf8019ed437a7a722f514530dd33da",
         "tests/skills-maintenance.test.ts": "7bbf6bee1c9867ba314cd3cadf86db603a4aa9959a863c6e908b7401d767d9d4",
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
-        "tests/skills/query-usability/grade.test.ts": "f3c2650deba0d887f66fb3b3afd284cd9baf562296f2984e5c84b014ecec8cbd",
+        "tests/skills/query-usability/grade.test.ts": "b4ce4b395a7f38bdc788f3d3268e0236bbe5827b153df9c0592165f0d81817cd",
         "tests/skills/query-usability/solution.ts": "3aa6797a7fb4a45c02ea1a48697c7dc8d055b762e80663ddcf4d761e8b9a0863",
-        "tests/stream-publication.test.ts": "8d2bb2cf4b885718bfd58d3c8a107021fec1ec5e485c2113413841e06e1e1df6",
+        "tests/stream-publication.test.ts": "7b48383872f678984bf72f0a684bb6c3ef57b5d64ba08ff47c32dddc88f1e15b",
         "tests/stream-recovery.test.ts": "41f795edb52eb21601efee459477256ae47408a344a7106d7246e640379e0376",
         "tests/stream-snapshot.test.ts": "a59ce44e80854140184df0ba742b39c80a3dd0c4b691d2b4afdbd73d2e754ed8",
         "tests/types/application-policy-contract.ts": "e2181da727cd335635d9d27c8b0d6eeaf9468fa052a449584f51345006c737ac",
@@ -370,7 +370,7 @@
         "tests/types/docs-suspense.tsx": "68462e89795da98c15ea48a9a910f4f9d4ab58672c9b848ce3422d3caf983acc",
         "tests/types/docs-user-events.ts": "c743f2f2e2c206561f1a59bfac3065505aa652e9c3b95df1a101a2c2f3b5bfed",
         "tests/types/exact-options-union-contract.ts": "0e002ee8725b8f6fc26870606ba9f90fc0c883d3f7d8b0a05a5372475d4c9c7a",
-        "tests/types/example-owner-contract.ts": "ed58343a4a7da9606e07703d19f3c0470e25923c81de357c0dbfd1258c3fc439",
+        "tests/types/example-owner-contract.ts": "29f77b57a90734cb6aab85ec470d945da489768444550a77093f449b8fcc68e4",
         "tests/types/generic-client-error-contract.tsx": "178aba21f540ddc45fe56cd60ffef015dfc308abbf0e609296df1dc27c2a0043",
         "tests/types/helper-contract.ts": "527b8d9b564047381c2cb42e851878b45cd63eea48c7f082998e47cb2bf66f9c",
         "tests/types/http-contract.ts": "1f521336bf4c18685608c89dd3fefd3b331032afba867015ae6bc7151c9ebf31",
@@ -409,15 +409,15 @@
         "tests/workflow-guards.test.ts": "c2318f29ff68848c75b534e6a599c5dc19c020a8730eb8f95487f2c2ac5bbbd5",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "ddcb33b23c176749967e803e82a78fb4e0308623",
+      "head": "772227bec6fed57c6e53148e6da2a00001527b87",
       "outcome": "no-change",
-      "reason": "The Vite directory cache and its fixtures now use the production query owner. Persistence and retirement guidance still apply.",
+      "reason": "The tests continue to exercise the published stream options and the example owner contract described by the skill.",
       "evidence": [
-        "Changed: examples/vite-react/src/lib/application.ts, examples/vite-react/src/lib/owner-cache.ts, examples/vite-react/tests/app.test.tsx, examples/vite-react/tests/commands-ui.test.tsx, examples/vite-react/tests/owner-cache.test.ts, examples/vite-react/tests/user-writes.test.ts, tests/cache-recipes.test.ts, tests/docs-release.test.ts, tests/fixtures/optimistic-users.ts, tests/fixtures/workflow.ts at ddcb33b23c176749967e803e82a78fb4e0308623"
+        "Changed: tests/stream-publication.test.ts at 772227bec6fed57c6e53148e6da2a00001527b87"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "f28639c1c6279f09e1b269df8529923f00974eb0ed0e35a3b797ad1bfa33b20e",
+      "fingerprint": "0be9d2fb386eaa7d88bc9890f7e9eec32019cb9b6c81ed7cae3799a0d1959972",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -732,7 +732,7 @@
         "tests/hydration-codecs.test.ts": "89a6f85260421b6d8fa4de578df2df16c6b357c8f4c8c467db02d3a6d9531f69",
         "tests/integrated-workflows.test.ts": "f7656de73aea99cdc9a1aff92bcb27dbf6ffec6cfc26394d6b9c0be1148fa452",
         "tests/lazy-leaves-and-unified-keys.test.ts": "83c4ad695d0cd3b807fc379c169cd1ca27e6c47868d6132bcb5afbd608e47aa8",
-        "tests/live-coalescing.test.ts": "5b7e67d4c2b06641e3ccdffa116005616afc3662a2911f637ca1da372aec7948",
+        "tests/live-coalescing.test.ts": "449a0505b96afb99847dd873c2bc38e9853a5ddfe176d3a9172f0bf3a0f41c42",
         "tests/publication-deadline.test.ts": "38f754f5d53e1781a0f1d3ae0102b3d90d7358485bb2b645bdf7b68076f21574",
         "tests/query-descriptor.test.ts": "76b1cbd00f87aa3fa591a918cfbaca4f017d734a86b7cdd6f8c6ecc499205a7c",
         "tests/query-effects.test.ts": "679d76ac8d598a0d973d18d48c1bde61aa1c7a84b96b3ae7ccc7d0cc50743fff",
@@ -742,16 +742,16 @@
         "tests/query-policy.test.ts": "914702a1ae97649131495f50eb64a3bb554d7fcfe370bb27228323ef13270e20",
         "tests/query-usability.test.ts": "f2919940a513ee1440a20b162f7c1dbb2cf81841368483899765b9b58c9c26c6",
         "tests/query-view-prefix.test.ts": "2c00662e76474c8cb6fb51cec6e9a27626ce961b076bd74653ab84475b4ae764",
-        "tests/react-pack-isolation.test.ts": "38322eef4c2cba32754612972939313fac0b824317ae439fe87baf41bb5de281",
-        "tests/react.test.tsx": "81f999b7e5b4b1482a6821cfe8881c0d3d76d75477f18b1f36b81c72353ec523",
+        "tests/react-pack-isolation.test.ts": "0bc8c4893f54104ec9fe791336ba645fa43566c987ea2939b43f830621635138",
+        "tests/react.test.tsx": "a5494e54ab73dc73a30c4a1e0d51634ad9772735195295e1f65cc9274531b554",
         "tests/reactivity-invalidation.test.ts": "59f98c72a2168018e615de0c9db489a41e7444904e9a606e763b922c68edf2df",
         "tests/schema-sharing-prototypes.test.ts": "628a6622656b9b53e686d14b9efbd3abc13c61a13db1546001b0689b491f6022",
         "tests/schema-structural-sharing.test.ts": "dc4c580e9193fb7749701cad3efdd5563edf8019ed437a7a722f514530dd33da",
         "tests/skills-maintenance.test.ts": "7bbf6bee1c9867ba314cd3cadf86db603a4aa9959a863c6e908b7401d767d9d4",
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
-        "tests/skills/query-usability/grade.test.ts": "f3c2650deba0d887f66fb3b3afd284cd9baf562296f2984e5c84b014ecec8cbd",
+        "tests/skills/query-usability/grade.test.ts": "b4ce4b395a7f38bdc788f3d3268e0236bbe5827b153df9c0592165f0d81817cd",
         "tests/skills/query-usability/solution.ts": "3aa6797a7fb4a45c02ea1a48697c7dc8d055b762e80663ddcf4d761e8b9a0863",
-        "tests/stream-publication.test.ts": "8d2bb2cf4b885718bfd58d3c8a107021fec1ec5e485c2113413841e06e1e1df6",
+        "tests/stream-publication.test.ts": "7b48383872f678984bf72f0a684bb6c3ef57b5d64ba08ff47c32dddc88f1e15b",
         "tests/stream-recovery.test.ts": "41f795edb52eb21601efee459477256ae47408a344a7106d7246e640379e0376",
         "tests/stream-snapshot.test.ts": "a59ce44e80854140184df0ba742b39c80a3dd0c4b691d2b4afdbd73d2e754ed8",
         "tests/types/application-policy-contract.ts": "e2181da727cd335635d9d27c8b0d6eeaf9468fa052a449584f51345006c737ac",
@@ -787,7 +787,7 @@
         "tests/types/docs-suspense.tsx": "68462e89795da98c15ea48a9a910f4f9d4ab58672c9b848ce3422d3caf983acc",
         "tests/types/docs-user-events.ts": "c743f2f2e2c206561f1a59bfac3065505aa652e9c3b95df1a101a2c2f3b5bfed",
         "tests/types/exact-options-union-contract.ts": "0e002ee8725b8f6fc26870606ba9f90fc0c883d3f7d8b0a05a5372475d4c9c7a",
-        "tests/types/example-owner-contract.ts": "ed58343a4a7da9606e07703d19f3c0470e25923c81de357c0dbfd1258c3fc439",
+        "tests/types/example-owner-contract.ts": "29f77b57a90734cb6aab85ec470d945da489768444550a77093f449b8fcc68e4",
         "tests/types/generic-client-error-contract.tsx": "178aba21f540ddc45fe56cd60ffef015dfc308abbf0e609296df1dc27c2a0043",
         "tests/types/helper-contract.ts": "527b8d9b564047381c2cb42e851878b45cd63eea48c7f082998e47cb2bf66f9c",
         "tests/types/http-contract.ts": "1f521336bf4c18685608c89dd3fefd3b331032afba867015ae6bc7151c9ebf31",
@@ -826,11 +826,11 @@
         "tests/workflow-guards.test.ts": "c2318f29ff68848c75b534e6a599c5dc19c020a8730eb8f95487f2c2ac5bbbd5",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "ddcb33b23c176749967e803e82a78fb4e0308623",
+      "head": "772227bec6fed57c6e53148e6da2a00001527b87",
       "outcome": "no-change",
-      "reason": "The Vite directory cache and its fixtures now use the production query owner. Persistence and retirement guidance still apply.",
+      "reason": "The tests continue to exercise the published stream options and the example owner contract described by the skill.",
       "evidence": [
-        "Changed: examples/vite-react/src/lib/application.ts, examples/vite-react/src/lib/owner-cache.ts, examples/vite-react/tests/app.test.tsx, examples/vite-react/tests/commands-ui.test.tsx, examples/vite-react/tests/owner-cache.test.ts, examples/vite-react/tests/user-writes.test.ts, tests/cache-recipes.test.ts, tests/docs-release.test.ts, tests/fixtures/optimistic-users.ts, tests/fixtures/workflow.ts at ddcb33b23c176749967e803e82a78fb4e0308623"
+        "Changed: tests/stream-publication.test.ts at 772227bec6fed57c6e53148e6da2a00001527b87"
       ]
     },
     "source:vite.config.ts": {

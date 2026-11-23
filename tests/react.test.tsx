@@ -8,7 +8,6 @@ import {
 } from "@tanstack/react-query";
 import { cleanup, render, screen } from "@testing-library/react";
 import { Activity, StrictMode, useEffect } from "react";
-import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 
 import { acquireQueryOwner } from "#effect-api-query";
@@ -469,28 +468,6 @@ describe("@ueberbrot/effect-api-query/react", () => {
     } finally {
       await outgoing.dispose();
       await incoming.dispose();
-    }
-  });
-
-  it("renders deterministically on the server without browser globals", async () => {
-    const { Provider, useQueryUtils } = createQueryUtilsContext<TestUtils>();
-    const owner = await makeBorrowedOwner("ssr");
-
-    const SsrChild = () => {
-      const utils = useQueryUtils();
-      const currentOwner = useQueryOwner();
-      return <span>{`${utils.label}:${currentOwner.isActive()}`}</span>;
-    };
-
-    try {
-      const html = renderToString(
-        <Provider owner={owner}>
-          <SsrChild />
-        </Provider>
-      );
-      expect(html).toContain("ssr:true");
-    } finally {
-      await owner.dispose();
     }
   });
 });

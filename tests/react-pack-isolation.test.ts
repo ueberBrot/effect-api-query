@@ -2,6 +2,13 @@ import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { acquireQueryOwner } from "@ueberbrot/effect-api-query";
+import {
+  createQueryUtilsContext,
+  useQueryOwner,
+} from "@ueberbrot/effect-api-query/react";
+import { createElement } from "react";
+import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vite-plus/test";
 
 const distDir = fileURLToPath(new URL("../dist", import.meta.url));
@@ -9,6 +16,32 @@ const distDir = fileURLToPath(new URL("../dist", import.meta.url));
 const firstLine = (content: string) => content.split(/\r?\n/u, 1)[0] ?? "";
 
 describe("packed React subpath isolation", () => {
+  it("renders the owner in Node without browser globals", async () => {
+    const { Provider, useQueryUtils } = createQueryUtilsContext<{
+      readonly label: string;
+    }>();
+    const owner = await acquireQueryOwner(
+      async (setup) => await Promise.resolve(setup.borrow({ label: "ssr" }))
+    );
+    const Child = () => {
+      const { label } = useQueryUtils();
+      const active = useQueryOwner().isActive();
+      return createElement("span", null, `${label}:${active}`);
+    };
+
+    try {
+      expect(globalThis).not.toHaveProperty("window");
+      expect(globalThis).not.toHaveProperty("document");
+      expect(
+        renderToString(
+          createElement(Provider, { owner, children: createElement(Child) })
+        )
+      ).toBe("<span>ssr:true</span>");
+    } finally {
+      await owner.dispose();
+    }
+  });
+
   it("emits 'use client' on line 1 of dist/react.mjs only", () => {
     const reactEntry = readFileSync(path.join(distDir, "react.mjs"), "utf-8");
     expect(firstLine(reactEntry)).toMatch(/^['"]use client['"];?$/u);

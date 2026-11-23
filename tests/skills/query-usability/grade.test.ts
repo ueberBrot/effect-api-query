@@ -1,9 +1,10 @@
 import { it, expect } from "@effect/vitest";
-import { QueryClient } from "@tanstack/query-core";
+import { QueryClient, QueryObserver } from "@tanstack/query-core";
 import { createRpcQueryUtils } from "@ueberbrot/effect-api-query";
-import { Effect, Stream } from "effect";
+import { Deferred, Effect, Stream } from "effect";
 
 import { makeRpcTestClient } from "../../fixtures/effect-rpc";
+import { waitForQueryState } from "../../fixtures/query-cache";
 import { group } from "./fixture";
 import { dashboard } from "./solution";
 
@@ -11,10 +12,15 @@ it.effect(
   "dashboard consumer preserves interception, view isolation, and a quiet-stream deadline",
   () =>
     Effect.gen(function* gradesDashboard() {
+      const second = yield* Deferred.make<number>();
       const client = yield* makeRpcTestClient(group, {
         "users.read": () => Effect.succeed(7),
         "users.nested.read": () => Effect.succeed(8),
-        "users.watch": () => Stream.empty,
+        "users.watch": () =>
+          Stream.make(1).pipe(
+            Stream.concat(Stream.fromEffect(Deferred.await(second))),
+            Stream.concat(Stream.never)
+          ),
       });
       const rpc = createRpcQueryUtils(group, {
         client,
@@ -39,14 +45,17 @@ it.effect(
           calls,
           defaults: result.read.queryOptions(),
           local: result.read.queryOptions({ staleTime: 10 }).staleTime,
-          original: rpc.users.read.queryOptions(),
+          originalHasStaleTime: Object.hasOwn(
+            rpc.users.read.queryOptions(),
+            "staleTime"
+          ),
         }).toMatchObject({
           value: 7,
           calls: [7],
           defaults: { staleTime: 1000 },
           local: 10,
+          originalHasStaleTime: false,
         });
-        expect(rpc.users.read.queryOptions()).not.toHaveProperty("staleTime");
         expect(
           queryClient
             .getQueryCache()
@@ -63,6 +72,27 @@ it.effect(
             publicationMaxWaitMs: 50,
           })
         );
+        const observer = new QueryObserver(queryClient, result.watch);
+        const stop = observer.subscribe(() => {});
+        try {
+          const readWatch = () => observer.getCurrentResult();
+          yield* waitForQueryState(queryClient, () => readWatch().isSuccess);
+          expect(readWatch()).toMatchObject({
+            data: [1],
+            fetchStatus: "fetching",
+          });
+          yield* Deferred.succeed(second, 2);
+          yield* waitForQueryState(
+            queryClient,
+            () => readWatch().data?.length === 2
+          );
+          expect(readWatch()).toMatchObject({
+            data: [1, 2],
+            fetchStatus: "fetching",
+          });
+        } finally {
+          stop();
+        }
       } finally {
         queryClient.clear();
       }
