@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "4b37ce60f3c31e2b6dd264f6c0ff77e952e44134fa711c0c3a8511ce02c42741",
+      "fingerprint": "9da314a3292bbf824a01b664253d9f3a2d362374762daf0280525c846534212c",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -17,14 +17,12 @@
         "apps/docs/src/content/docs/examples.md": "8a758ee409d1945942b6a1ce483e9833673763ca103aca9d99475ef18f88e47a",
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "e631c96038f44e298ead2ea284eaf1455f4cce315ece1e4050165a3ac3b2fa47",
         "apps/docs/src/content/docs/examples/http-workflows.md": "75270b12e44b9d1210509e110d183f6094a5218c275c063089724ed3d6848309",
-        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": null,
         "apps/docs/src/content/docs/getting-started/feature-support.md": "a4ba730fc86ed8acb65cb6ad20952199b164e9004a959931ca373576e67fa82f",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "8cff47f4df524507c0830f91fd380312a511ff288b81c4dc554aee9808f18304",
         "apps/docs/src/content/docs/getting-started/installation.md": "d9a98e0cf8a0f5d105546866c5e5a5a40ceb8302bb9e04f8ab66df70c6836309",
         "apps/docs/src/content/docs/getting-started/quick-start.md": "0818a1a00890f6dc9d9c1f9d621b1ea89c6ddb5547f2c9a0a28ded12a33fc31f",
         "apps/docs/src/content/docs/guides/angular-query.md": "16afe6996ee8f70b4b77b430c93aeb2a4dc658a0ae8e92b3993d95f065a86b9f",
         "apps/docs/src/content/docs/guides/cache-filters.md": "b5791dc317e5e1acac2b443508d113fd184463143a6f5870a0be6ba65fed1a7d",
-        "apps/docs/src/content/docs/guides/cache-management.md": null,
         "apps/docs/src/content/docs/guides/cancellation.md": "a81bee4250161714fa784d674867395373663969ca53f1a3f8dc7e31a90712b9",
         "apps/docs/src/content/docs/guides/choose-stream-history.md": "0149fc31d768147ff34912c95ac0daf5b407137b1f690b2620b765429b858bc5",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "76cab248df8fbb9b4d29db532c44a98bcbbf18417581e46b78ca0181ecb5f609",
@@ -186,7 +184,7 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "a272baf9fe3a76649fa65cd6db06121aa97b2623eac33e66bcfc8f0a05ca88e4",
-        "package.json": "53d2b60ed9c21a7f2ed3c993f96d2e3551fd1020ed9eb0c033413514819d0500",
+        "package.json": "ec0f87d81f965713c6315d2cd5e0049a7177a6214bdadd69121c8cadfe094ec0",
         "pnpm-workspace.yaml": "fc4bff1fa9ef4a4887691c6e004e02829736f93ee07efcb563f78f836a21a276",
         "scripts/check-effect-compatibility.mts": "b1de824e27e34089c445f183d1511d8e5f9e463892ff8edf83f76fb8c24778f4",
         "scripts/check-framework-consumers.mts": "fd6e99f4f9d854a0a738afd105094553e31472d525f7236693c235f8140dcad9",
@@ -202,8 +200,6 @@
         "scripts/performance/budgets.mts": "a2ace3af9dbc469203a35dd0f3a1359326a58e25b69eac284a3c3dbd2575564a",
         "scripts/performance/common.mts": "6ce0e1c018e08a442fcf787740d7ddd63457069ee932d28b04d8a1b41e136028",
         "scripts/resolve-docs-release.mts": "06e3c66de0b82e7587dab3ec9bad4f693622edbb85a238acf25a44bf9c3b034f",
-        "scripts/verify-docs-examples.mts": null,
-        "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "e514a013a90489d8d0ff5eb0620276f923c85fa765061aa4d3f312ac2ee4c7ad",
         "skills/effect-api-query/SKILL.md": "112b039108201d3aecc3b2e9c6dbd665ddaa01f37e0a16997814ea9b533c95a1",
         "skills/effect-api-query/references/cache-workflows.md": "9f370822c4f1ec986ef27afc7fd7647ad24b701f671f33d1fb86e8478d73769f",
@@ -409,22 +405,18 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "7e3eaea200f31f6a5bfaa7b9ffef3f590705ae5f",
-      "outcome": "updated",
-      "reason": "Document nonfailing managed runtimes for scoped events and the explicit codec requirement for broad object schemas. Existing lifetime and key guidance covers the corrected cleanup and exact key behavior.",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
+      "outcome": "no-change",
+      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
       "evidence": [
-        "5cc07ab",
-        "a12f18d",
-        "7e3eaea",
-        "tests/query-events.test.ts and tests/types/query-events-contract.ts",
-        "tests/contract-hydration.test.ts",
-        "vp run test passed 1005 tests and both public compilers",
-        "vp run skills-check passed",
-        "Fresh consumer-agent discovery unverified"
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: package.json."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "a82d29cfbc45f2c6c10b3fef497657c635946d44eaec9fa975356511d78ea2a6",
+      "fingerprint": "bc35a7f663a254030df5561476938f6464ac8ec6f6f3704df473479af8af1d82",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -441,14 +433,12 @@
         "apps/docs/src/content/docs/examples.md": "8a758ee409d1945942b6a1ce483e9833673763ca103aca9d99475ef18f88e47a",
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "e631c96038f44e298ead2ea284eaf1455f4cce315ece1e4050165a3ac3b2fa47",
         "apps/docs/src/content/docs/examples/http-workflows.md": "75270b12e44b9d1210509e110d183f6094a5218c275c063089724ed3d6848309",
-        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": null,
         "apps/docs/src/content/docs/getting-started/feature-support.md": "a4ba730fc86ed8acb65cb6ad20952199b164e9004a959931ca373576e67fa82f",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "8cff47f4df524507c0830f91fd380312a511ff288b81c4dc554aee9808f18304",
         "apps/docs/src/content/docs/getting-started/installation.md": "d9a98e0cf8a0f5d105546866c5e5a5a40ceb8302bb9e04f8ab66df70c6836309",
         "apps/docs/src/content/docs/getting-started/quick-start.md": "0818a1a00890f6dc9d9c1f9d621b1ea89c6ddb5547f2c9a0a28ded12a33fc31f",
         "apps/docs/src/content/docs/guides/angular-query.md": "16afe6996ee8f70b4b77b430c93aeb2a4dc658a0ae8e92b3993d95f065a86b9f",
         "apps/docs/src/content/docs/guides/cache-filters.md": "b5791dc317e5e1acac2b443508d113fd184463143a6f5870a0be6ba65fed1a7d",
-        "apps/docs/src/content/docs/guides/cache-management.md": null,
         "apps/docs/src/content/docs/guides/cancellation.md": "a81bee4250161714fa784d674867395373663969ca53f1a3f8dc7e31a90712b9",
         "apps/docs/src/content/docs/guides/choose-stream-history.md": "0149fc31d768147ff34912c95ac0daf5b407137b1f690b2620b765429b858bc5",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "76cab248df8fbb9b4d29db532c44a98bcbbf18417581e46b78ca0181ecb5f609",
@@ -610,7 +600,7 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "a272baf9fe3a76649fa65cd6db06121aa97b2623eac33e66bcfc8f0a05ca88e4",
-        "package.json": "53d2b60ed9c21a7f2ed3c993f96d2e3551fd1020ed9eb0c033413514819d0500",
+        "package.json": "ec0f87d81f965713c6315d2cd5e0049a7177a6214bdadd69121c8cadfe094ec0",
         "pnpm-workspace.yaml": "fc4bff1fa9ef4a4887691c6e004e02829736f93ee07efcb563f78f836a21a276",
         "scripts/check-effect-compatibility.mts": "b1de824e27e34089c445f183d1511d8e5f9e463892ff8edf83f76fb8c24778f4",
         "scripts/check-framework-consumers.mts": "fd6e99f4f9d854a0a738afd105094553e31472d525f7236693c235f8140dcad9",
@@ -626,8 +616,6 @@
         "scripts/performance/budgets.mts": "a2ace3af9dbc469203a35dd0f3a1359326a58e25b69eac284a3c3dbd2575564a",
         "scripts/performance/common.mts": "6ce0e1c018e08a442fcf787740d7ddd63457069ee932d28b04d8a1b41e136028",
         "scripts/resolve-docs-release.mts": "06e3c66de0b82e7587dab3ec9bad4f693622edbb85a238acf25a44bf9c3b034f",
-        "scripts/verify-docs-examples.mts": null,
-        "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "e514a013a90489d8d0ff5eb0620276f923c85fa765061aa4d3f312ac2ee4c7ad",
         "skills/effect-api-query/SKILL.md": "112b039108201d3aecc3b2e9c6dbd665ddaa01f37e0a16997814ea9b533c95a1",
         "skills/effect-api-query/references/cache-workflows.md": "9f370822c4f1ec986ef27afc7fd7647ad24b701f671f33d1fb86e8478d73769f",
@@ -833,15 +821,14 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "7e3eaea200f31f6a5bfaa7b9ffef3f590705ae5f",
-      "outcome": "updated",
-      "reason": "The domain map records managed-runtime event consumption and explicit codecs for broad objects. The skill specification names the executable checks. The existing skill tree covers the source and guidance with one skill and six references.",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
+      "outcome": "no-change",
+      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
       "evidence": [
-        "_artifacts/domain_map.yaml",
-        "_artifacts/skill_spec.md",
-        "_artifacts/skill_tree.yaml",
-        "vp run test passed 1005 tests",
-        "vp run skills-check passed"
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: package.json."
       ]
     },
     "source:vite.config.ts": {
@@ -1973,16 +1960,16 @@
       ]
     },
     "source:CHANGELOG.md": {
-      "fingerprint": "8f7143c6dabe14453c376e7ddf5b5d1adecc91ddd9f224349a050a8d11825c0a",
+      "fingerprint": "8b48754956198bd7408d0f98d3d035793a34336d832398cd587cc242ec4b8f99",
       "snapshot": {
-        "CHANGELOG.md": "99141749861754cb4c5ce6b2b845d6472bfd3ed1c7e96e7caa47b51f369dc22c"
+        "CHANGELOG.md": "8d8306abfdaf0b4fd35924784721dc4572e758b4c1a53801fa33753df50ebd44"
       },
-      "head": "e544fa89ded66e8af1e5152c960fe73bbb485d6b",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
       "outcome": "no-change",
       "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Before versioning: intent maintainer check passed at e544fa89ded66e8af1e5152c960fe73bbb485d6b.",
-        "changeset version and vp fmt generated 0.7.0 -> 0.7.1.",
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
         "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
         "Scoped generated changes: CHANGELOG.md."
       ]
@@ -4139,207 +4126,258 @@
       ]
     },
     "source:.changeset/accept-tag-keyed-rpc-clients.md": {
-      "fingerprint": "9167420685973e4be1e71cdae1c2f6299ed38a2df6a1e28b1ce5bd714c50ef51",
+      "fingerprint": "9eca7f8d4ca383fb72d659ee3a40384d324a37e25a6d42c22165f0ca737f4b38",
       "snapshot": {
-        ".changeset/accept-tag-keyed-rpc-clients.md": "12b5e8b9c520a130b5bfd1f5eeedbcca4562b1d8b887103d39a8988dc1661016"
+        ".changeset/accept-tag-keyed-rpc-clients.md": null
       },
-      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
       "outcome": "no-change",
-      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/accept-tag-keyed-rpc-clients.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/accept-tag-keyed-rpc-clients.md."
       ]
     },
     "source:.changeset/add-optional-react-providers.md": {
-      "fingerprint": "cc87eaf5189962a9f8126769fcb269d1c4d96dba4979b3b4d40f6c3dce950867",
+      "fingerprint": "0707183d0f520c9c916af83a44828e1b62e3b70a074c0a1a8ff6f18172cddd47",
       "snapshot": {
-        ".changeset/add-optional-react-providers.md": "598f3dcbb88aea96c936448e5d4c3d86378533a65187fdfecebdaebc4ec41a7a"
+        ".changeset/add-optional-react-providers.md": null
       },
-      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
       "outcome": "no-change",
-      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/add-optional-react-providers.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/add-optional-react-providers.md."
       ]
     },
     "source:.changeset/align-query-effects-with-query-core.md": {
-      "fingerprint": "2aed156f870680d4af08b8f53e27bab198f8bcf4779b30f85575ac98be149a35",
+      "fingerprint": "b816e3408695629a730ddaacbc6cc71d218a36c00cb6f5a534a2fc92bd62540f",
       "snapshot": {
-        ".changeset/align-query-effects-with-query-core.md": "cf6996410620bcc989053928d990b8425d6e68864251bf7c31fc3475e3f53bb5"
+        ".changeset/align-query-effects-with-query-core.md": null
       },
-      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
       "outcome": "no-change",
-      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/align-query-effects-with-query-core.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/align-query-effects-with-query-core.md."
       ]
     },
     "source:.changeset/bind-scoped-reactivity-invalidation.md": {
-      "fingerprint": "2226e77342594f0b8d0e72b6dac77d888db16e644b74adae48aa5f1c41fcef6f",
+      "fingerprint": "ded4ffb5cdce8f72a733f10170f0587aa281774695cb5f8dec61126b37436051",
       "snapshot": {
-        ".changeset/bind-scoped-reactivity-invalidation.md": "e9a84358ad2e445341d2f5e8bc84c0e307a667e53187a50f50b6de9c68a5d6a7"
+        ".changeset/bind-scoped-reactivity-invalidation.md": null
       },
-      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
       "outcome": "no-change",
-      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/bind-scoped-reactivity-invalidation.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/bind-scoped-reactivity-invalidation.md."
       ]
     },
     "source:.changeset/build-utility-leaves-on-demand.md": {
-      "fingerprint": "6c3151ad2071054563edeccb46b4689c3764943d521adf9c2b0ed598f82c1878",
+      "fingerprint": "34aca94c423a076df74dda6530c6cd464cc8261d891f3c15eeec6c6257d1628c",
       "snapshot": {
-        ".changeset/build-utility-leaves-on-demand.md": "9352d94edabf32e1dd7ba9d239d62decddcddb29da3d707cccebc9b96efe9fe4"
+        ".changeset/build-utility-leaves-on-demand.md": null
       },
-      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
       "outcome": "no-change",
-      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/build-utility-leaves-on-demand.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/build-utility-leaves-on-demand.md."
       ]
     },
     "source:.changeset/colocate-query-filters.md": {
-      "fingerprint": "8a8ebf025d67e28cb6cd82d302c63adf912df0142b3f1cff9687487e3be1e6fc",
+      "fingerprint": "0dd253637710f28e6db4f6254ab23eb9a9de2151c88e78f1731fe7a10d8c2246",
       "snapshot": {
-        ".changeset/colocate-query-filters.md": "1bca2e720040625a00e0fa9b6b97112f8dd8a41387f977fa4d51d7ac9ea81cb8"
+        ".changeset/colocate-query-filters.md": null
       },
-      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
       "outcome": "no-change",
-      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/colocate-query-filters.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/colocate-query-filters.md."
       ]
     },
     "source:.changeset/compose-hydration-registries.md": {
-      "fingerprint": "eaaaed4e9d70c1f12f9beaaebd2f4b544b64d1b0a963f159802a4f58e0978a8f",
+      "fingerprint": "57c1f71d156d849664123223e0016833d4067715266d5f1298a58e9beee47011",
       "snapshot": {
-        ".changeset/compose-hydration-registries.md": "0e4f6bd94aef397cd1e75d5cd89c72784a77ec0e21a16821b6ad3f22b8e6bb45"
+        ".changeset/compose-hydration-registries.md": null
       },
-      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
       "outcome": "no-change",
-      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/compose-hydration-registries.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/compose-hydration-registries.md."
       ]
     },
     "source:.changeset/define-policies-from-contracts.md": {
-      "fingerprint": "277a9b8322ea3b7bde8a2da80f1d0680c6f0974b24fd5c854f05d0e590964b9b",
+      "fingerprint": "5147f4daff5fb223579f6985babf1eb3df50efb5eef4cb0899dda4dfc58e1c0c",
       "snapshot": {
-        ".changeset/define-policies-from-contracts.md": "44cea259d80041b85c504194c050a0c3e0a68753e64955ae33d0b3d9725cf915"
+        ".changeset/define-policies-from-contracts.md": null
       },
-      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
       "outcome": "no-change",
-      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/define-policies-from-contracts.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/define-policies-from-contracts.md."
       ]
     },
     "source:.changeset/derive-hydration-codecs.md": {
-      "fingerprint": "8e15d9322a7d5d0f4f66477b9d8c197c40c127184410c1c03cb53ef1fd50c99b",
+      "fingerprint": "e34b178d8ebc96413afa6a11fa67f60e522097c1299a4f4f09e817085de64775",
       "snapshot": {
-        ".changeset/derive-hydration-codecs.md": "ab7df4e33189f7638ce9ed88132249e1176b9f61a526abf8368379390efb15b6"
+        ".changeset/derive-hydration-codecs.md": null
       },
-      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
       "outcome": "no-change",
-      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/derive-hydration-codecs.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/derive-hydration-codecs.md."
       ]
     },
     "source:.changeset/flatten-utility-policy-maps.md": {
-      "fingerprint": "14998f05b2b73447f9fe13c03061f4587e189b505a99f787a177e0f9cda21a07",
+      "fingerprint": "ad83a21e0158a8c09c6edaf9db0a1bddb1c5d13fbaf1ae009b2027591050a217",
       "snapshot": {
-        ".changeset/flatten-utility-policy-maps.md": "62e1715fc406cd179fde267a4d60a101a48995391b802cba016c73fc7a6a2f46"
+        ".changeset/flatten-utility-policy-maps.md": null
       },
-      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
       "outcome": "no-change",
-      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/flatten-utility-policy-maps.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/flatten-utility-policy-maps.md."
       ]
     },
     "source:.changeset/make-key-prefix-optional.md": {
-      "fingerprint": "721b0f2f711d8eddcdf37445699c2b7c81390d651070dbae2f1bdf9324a48b7f",
+      "fingerprint": "754293c3a6a0981fd47e1becb6228a182adb8d47f54821b02bb8a6e45af1223a",
       "snapshot": {
-        ".changeset/make-key-prefix-optional.md": "f268e45b4b958a64d37825f05740fa40c5c950f1a28ff626e2aa7819d83d7814"
+        ".changeset/make-key-prefix-optional.md": null
       },
-      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
       "outcome": "no-change",
-      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/make-key-prefix-optional.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/make-key-prefix-optional.md."
       ]
     },
     "source:.changeset/pass-input-in-key-options.md": {
-      "fingerprint": "0ceb6aba20fd1bc03890a26f647caf40499f510eb9af179d5b429f5aa4b83774",
+      "fingerprint": "b7435b1e9cbef2223b496c99b8b0c7c462a7a841d60109ff2a8a6847e246f86e",
       "snapshot": {
-        ".changeset/pass-input-in-key-options.md": "d46ddb072084d47ebf5cd915abd805ced9fa819601025715e05f13e202a19c2d"
+        ".changeset/pass-input-in-key-options.md": null
       },
-      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
       "outcome": "no-change",
-      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/pass-input-in-key-options.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/pass-input-in-key-options.md."
       ]
     },
     "source:.changeset/require-supported-peer-versions.md": {
-      "fingerprint": "26f8ffbead2dae9e17a897737fd33ff06d45fd4a695b1e33f28790d08eedf9b7",
+      "fingerprint": "d644a8c9ecf39f594d4ad5ea70742d12e30d66ec317dad8fe2e81eb8cc65cc83",
       "snapshot": {
-        ".changeset/require-supported-peer-versions.md": "40814955f8b927a03eba689cbca7a0eb4871882edcfb5d5632e09e9e203d1001"
+        ".changeset/require-supported-peer-versions.md": null
       },
-      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
       "outcome": "no-change",
-      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/require-supported-peer-versions.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/require-supported-peer-versions.md."
       ]
     },
     "source:.changeset/run-buffered-leaves-directly.md": {
-      "fingerprint": "d3dee080e7171e77b7866e19f247257e4310c6428645feeff4f729ae248e9946",
+      "fingerprint": "8efbd420936e21c137508b8945675aab936ab5a967aca4b4f96ab41b85198415",
       "snapshot": {
-        ".changeset/run-buffered-leaves-directly.md": "7dbf2241cb05682e90d97c7a89baf218ad12405c10d974de8b22c3dcf3cb2d38"
+        ".changeset/run-buffered-leaves-directly.md": null
       },
-      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
       "outcome": "no-change",
-      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/run-buffered-leaves-directly.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/run-buffered-leaves-directly.md."
       ]
     },
     "source:.changeset/share-execution-error-handling.md": {
-      "fingerprint": "d6c06749a3bece1c0c4d3103971b74215ff90a20d794704bbda3e4d30872915a",
+      "fingerprint": "691f6dc949a806f7855ecb43e350e5da2e778529b912e5d41e56e63300c67c82",
       "snapshot": {
-        ".changeset/share-execution-error-handling.md": "28c00c5f9f50f2cf4223138f85f0d744a99a57debd53406abf074a848c190d32"
+        ".changeset/share-execution-error-handling.md": null
       },
-      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
       "outcome": "no-change",
-      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/share-execution-error-handling.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/share-execution-error-handling.md."
       ]
     },
     "source:.changeset/track-utilities-with-query-owners.md": {
-      "fingerprint": "ae6cf9d8ca5eae8c7cb28e4b4e42dd4b1ddfd2a2aea3aefe10a7f9ca4a10eb97",
+      "fingerprint": "21dab3bc23d830d9abffba5288363d4a04e8ff3487224ac9e6468faceb01d45e",
       "snapshot": {
-        ".changeset/track-utilities-with-query-owners.md": "20249a21407189377ce61d0be51c248391ffd0319651cf07401438b63e1cdbdc"
+        ".changeset/track-utilities-with-query-owners.md": null
       },
-      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
       "outcome": "no-change",
-      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/track-utilities-with-query-owners.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/track-utilities-with-query-owners.md."
       ]
     },
     "source:.changeset/unify-runtime-options.md": {
-      "fingerprint": "8cfb12a1f0c04b41fcafb790e1b7a840d0f29dde4e648aaa8c6554ab378d80d7",
+      "fingerprint": "0ca08f75d1e74bf638640a412991da56d3d7179b0f07682c1af37bd49925ee7f",
       "snapshot": {
-        ".changeset/unify-runtime-options.md": "87de81a3fe238370d6c67690c6ff9bac823030f531457c402d253df9affb81a9"
+        ".changeset/unify-runtime-options.md": null
       },
-      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
       "outcome": "no-change",
-      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/unify-runtime-options.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/unify-runtime-options.md."
       ]
     },
     "source:.agents/skills/delete-comment/SKILL.md": {
@@ -4407,143 +4445,153 @@
       ]
     },
     "source:.changeset/accept-managed-runtimes-for-query-events.md": {
-      "fingerprint": "0a6cb0dd310cc755b1364f3a8a71d403c30ff5ce2c133f890a08b2a89559b37f",
+      "fingerprint": "285841a7b284d21d1b4f32fc00d71c986565040769547d3a05506e5a6861a23e",
       "snapshot": {
-        ".changeset/accept-managed-runtimes-for-query-events.md": "20270145443832f43dfce694e6147a9c69bdda4a2cc81d4f13c717a73e4c50fa"
+        ".changeset/accept-managed-runtimes-for-query-events.md": null
       },
-      "head": "94ab666b2c72575d195088be1ae82a22413f6304",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
       "outcome": "no-change",
-      "reason": "This release note summarizes public behavior covered by the recorded source and guidance review. The shipped skill and planning records already cover its workflow.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/accept-managed-runtimes-for-query-events.md",
-        "94ab666 recorded the implementation and guidance review",
-        "Changeset status against origin/main includes this note and resolves to 0.8.0"
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/accept-managed-runtimes-for-query-events.md."
       ]
     },
     "source:.changeset/derive-http-hydration-from-successes.md": {
-      "fingerprint": "8816b970ce5a2da97a289202ee927ec4faa1fad9efa03f403b9244add55c4d88",
+      "fingerprint": "2229d4164e76a57ade945ba275cf53cb1488eb776ebfbb1f723f655ee8c60e04",
       "snapshot": {
-        ".changeset/derive-http-hydration-from-successes.md": "25ebaa7ba03ac9c428326867fc7b9be04c8726ae362ada32cb170dded02a4287"
+        ".changeset/derive-http-hydration-from-successes.md": null
       },
-      "head": "94ab666b2c72575d195088be1ae82a22413f6304",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
       "outcome": "no-change",
-      "reason": "This release note summarizes public behavior covered by the recorded source and guidance review. The shipped skill and planning records already cover its workflow.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/derive-http-hydration-from-successes.md",
-        "94ab666 recorded the implementation and guidance review",
-        "Changeset status against origin/main includes this note and resolves to 0.8.0"
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/derive-http-hydration-from-successes.md."
       ]
     },
     "source:.changeset/drain-concurrent-stream-snapshot-pulls.md": {
-      "fingerprint": "801212674999a1b5676844aa535060af1836c64d2b5429a0478fa6e0be25479d",
+      "fingerprint": "4f9ac4ebd116d5a21bd43b2fc1074fcaa8651c106a75818ff8ecdffbcc60c00a",
       "snapshot": {
-        ".changeset/drain-concurrent-stream-snapshot-pulls.md": "c4f41bcbe60a9fb40eabcf2dc822983d9c21fdadf336b93725fe20ae1d235b42"
+        ".changeset/drain-concurrent-stream-snapshot-pulls.md": null
       },
-      "head": "94ab666b2c72575d195088be1ae82a22413f6304",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
       "outcome": "no-change",
-      "reason": "This release note summarizes public behavior covered by the recorded source and guidance review. The shipped skill and planning records already cover its workflow.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/drain-concurrent-stream-snapshot-pulls.md",
-        "94ab666 recorded the implementation and guidance review",
-        "Changeset status against origin/main includes this note and resolves to 0.8.0"
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/drain-concurrent-stream-snapshot-pulls.md."
       ]
     },
     "source:.changeset/guard-direct-calls-after-owner-retirement.md": {
-      "fingerprint": "bb1a02bf0743cbdefdf16f77b4a783213c839be01533dc2721568efcab434c8b",
+      "fingerprint": "f9051fc1e85bae654e02f329e9f462520d44d3960606b4971ab8f50167429908",
       "snapshot": {
-        ".changeset/guard-direct-calls-after-owner-retirement.md": "fbc485ac7cd3a0f2024cde8c32918ef44b0a1b01dd71605d22a6a132f8a40686"
+        ".changeset/guard-direct-calls-after-owner-retirement.md": null
       },
-      "head": "94ab666b2c72575d195088be1ae82a22413f6304",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
       "outcome": "no-change",
-      "reason": "This release note summarizes public behavior covered by the recorded source and guidance review. The shipped skill and planning records already cover its workflow.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/guard-direct-calls-after-owner-retirement.md",
-        "94ab666 recorded the implementation and guidance review",
-        "Changeset status against origin/main includes this note and resolves to 0.8.0"
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/guard-direct-calls-after-owner-retirement.md."
       ]
     },
     "source:.changeset/opt-in-to-owner-retirement-interruption.md": {
-      "fingerprint": "0c72aa12f854f7688b6cdebf7c55e501cb5c58bbd712001e13081f3ada774bd4",
+      "fingerprint": "14c1b3c9ed264cb4174edc91ea459cef91907648ff68e282b6f6c428dc8a16bd",
       "snapshot": {
-        ".changeset/opt-in-to-owner-retirement-interruption.md": "804468b68fd291d7d52402339576f144fdc52eec008a96569a9d09676f64c2af"
+        ".changeset/opt-in-to-owner-retirement-interruption.md": null
       },
-      "head": "94ab666b2c72575d195088be1ae82a22413f6304",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
       "outcome": "no-change",
-      "reason": "This release note summarizes public behavior covered by the recorded source and guidance review. The shipped skill and planning records already cover its workflow.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/opt-in-to-owner-retirement-interruption.md",
-        "94ab666 recorded the implementation and guidance review",
-        "Changeset status against origin/main includes this note and resolves to 0.8.0"
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/opt-in-to-owner-retirement-interruption.md."
       ]
     },
     "source:.changeset/preserve-stream-publication-on-failure.md": {
-      "fingerprint": "d96e8504408572c4846a3b77db14f5ece876e7d5c93c1aa11fc89170abb3da4c",
+      "fingerprint": "ee2f5942a6aa7900ffae8b666bb32eafa9a137ce9190da1da4bd797ed08871a7",
       "snapshot": {
-        ".changeset/preserve-stream-publication-on-failure.md": "8fe0684c21e14b81c107150ee3d58c8a405c415e614b5b14a158577dcf313c5e"
+        ".changeset/preserve-stream-publication-on-failure.md": null
       },
-      "head": "94ab666b2c72575d195088be1ae82a22413f6304",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
       "outcome": "no-change",
-      "reason": "This release note summarizes public behavior covered by the recorded source and guidance review. The shipped skill and planning records already cover its workflow.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/preserve-stream-publication-on-failure.md",
-        "94ab666 recorded the implementation and guidance review",
-        "Changeset status against origin/main includes this note and resolves to 0.8.0"
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/preserve-stream-publication-on-failure.md."
       ]
     },
     "source:.changeset/reject-skip-token-in-exact-keys.md": {
-      "fingerprint": "81e6fd99ab49870cba4cecb9b54de7ef6082bcb6cd27b49e9fb9867c618f7a44",
+      "fingerprint": "51a97848d1d652f7b085830cf4b748a51a2d837f4d30830eeab012a27d9b2ffd",
       "snapshot": {
-        ".changeset/reject-skip-token-in-exact-keys.md": "1464c9b6fc8f5dae01f7dd9b75642fcc9a54ae4e935a0963d35869949051acd4"
+        ".changeset/reject-skip-token-in-exact-keys.md": null
       },
-      "head": "94ab666b2c72575d195088be1ae82a22413f6304",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
       "outcome": "no-change",
-      "reason": "This release note summarizes public behavior covered by the recorded source and guidance review. The shipped skill and planning records already cover its workflow.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/reject-skip-token-in-exact-keys.md",
-        "94ab666 recorded the implementation and guidance review",
-        "Changeset status against origin/main includes this note and resolves to 0.8.0"
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/reject-skip-token-in-exact-keys.md."
       ]
     },
     "source:.changeset/require-explicit-json-for-broad-object-hydration.md": {
-      "fingerprint": "c17df42e24bd14cd6ab01fb4c388e0ffe77b6a163d0ea94d995a0e97ac5d9d1c",
+      "fingerprint": "04adca40967956352fb6d8d297c86225c7929fc7feda1dd95da5262caef4f842",
       "snapshot": {
-        ".changeset/require-explicit-json-for-broad-object-hydration.md": "249263dd0357244ee17579a78e675e2417e9f27bb890c47c647632f485d2d685"
+        ".changeset/require-explicit-json-for-broad-object-hydration.md": null
       },
-      "head": "94ab666b2c72575d195088be1ae82a22413f6304",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
       "outcome": "no-change",
-      "reason": "This release note summarizes public behavior covered by the recorded source and guidance review. The shipped skill and planning records already cover its workflow.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/require-explicit-json-for-broad-object-hydration.md",
-        "94ab666 recorded the implementation and guidance review",
-        "Changeset status against origin/main includes this note and resolves to 0.8.0"
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/require-explicit-json-for-broad-object-hydration.md."
       ]
     },
     "source:.changeset/wait-for-sibling-reactivity-refetches.md": {
-      "fingerprint": "364fb729d71b5561cfa3de92ff1e9df38b1ba359c59abef41f33a532d6a578ea",
+      "fingerprint": "e705a7d640f383a4ea46d46907b8997dce12cfa8dba82e31f3620ac8a3f9bb2e",
       "snapshot": {
-        ".changeset/wait-for-sibling-reactivity-refetches.md": "e30253e2e6fa5d39ba016eafe7930b89603df585450c6d864348e1547525a571"
+        ".changeset/wait-for-sibling-reactivity-refetches.md": null
       },
-      "head": "94ab666b2c72575d195088be1ae82a22413f6304",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
       "outcome": "no-change",
-      "reason": "This release note summarizes public behavior covered by the recorded source and guidance review. The shipped skill and planning records already cover its workflow.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/wait-for-sibling-reactivity-refetches.md",
-        "94ab666 recorded the implementation and guidance review",
-        "Changeset status against origin/main includes this note and resolves to 0.8.0"
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/wait-for-sibling-reactivity-refetches.md."
       ]
     },
     "source:.changeset/yield-query-client-operation-errors.md": {
-      "fingerprint": "871f1f52c411680aa8cf6e262e68c81a48b9f1742dde77c21041d88b6f474468",
+      "fingerprint": "1c48dba0556f2f0411c4506716cd1f4b435ee46b34adbfbf699fdb72f8d51fd4",
       "snapshot": {
-        ".changeset/yield-query-client-operation-errors.md": "9255725992526c13bc5a8e31683e750e844ec2b9c2c4cfea701808334ea34d77"
+        ".changeset/yield-query-client-operation-errors.md": null
       },
-      "head": "94ab666b2c72575d195088be1ae82a22413f6304",
+      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
       "outcome": "no-change",
-      "reason": "This release note summarizes public behavior covered by the recorded source and guidance review. The shipped skill and planning records already cover its workflow.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/yield-query-client-operation-errors.md",
-        "94ab666 recorded the implementation and guidance review",
-        "Changeset status against origin/main includes this note and resolves to 0.8.0"
+        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
+        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/yield-query-client-operation-errors.md."
       ]
     }
   }
