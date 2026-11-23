@@ -170,6 +170,15 @@ const isOpaqueDeclaration = (ast: SchemaAST.AST): boolean =>
   !Predicate.isFunction(ast.annotations?.["toCodecJson"]) &&
   !Predicate.isFunction(ast.annotations?.["toCodec"]);
 
+const isImplicitJsonLink = (link: SchemaAST.Link): boolean => {
+  const fallback = Schema.toCodecJson(Schema.Unknown).ast.encoding?.[0];
+  return (
+    fallback !== undefined &&
+    link.to.annotations === fallback.to.annotations &&
+    link.transformation === fallback.transformation
+  );
+};
+
 const isUnencodableAst = (
   ast: SchemaAST.AST,
   seen: Set<SchemaAST.AST>
@@ -185,7 +194,7 @@ const isUnencodableAst = (
     if (isOpaqueDeclaration(ast) || SchemaAST.isUnknown(ast)) {
       const [firstLink] = ast.encoding;
       if (
-        hasRepresentation(firstLink.to, "effect/schema/Json") ||
+        isImplicitJsonLink(firstLink) ||
         SchemaAST.isUnknown(firstLink.to) ||
         firstLink.to._tag === "Any"
       ) {

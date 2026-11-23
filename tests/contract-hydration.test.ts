@@ -1252,6 +1252,45 @@ const isOpaqueBox = (value: unknown): value is OpaqueBox =>
   Predicate.isObject(value) && value[opaqueBrand] === true;
 
 describe("eager validation & HydrationCodecError", () => {
+  it.effect("derives explicitly JSON-backed opaque and unknown schemas", () =>
+    Effect.gen(function* roundTripsExplicitJsonCodecs() {
+      const decodeString = SchemaParser.decodeUnknownEffect(Schema.String);
+      const opaque = Schema.Json.pipe(
+        Schema.decodeTo(
+          Schema.declare(isOpaqueBox),
+          SchemaTransformation.transformEffect({
+            decode: (json) => Effect.map(decodeString(json), makeOpaqueBox),
+            encode: (box) => Effect.succeed(box.secret),
+          })
+        )
+      );
+      const success = Schema.Struct({
+        box: Schema.optionalKey(opaque),
+        value: Schema.Json.pipe(Schema.decodeTo(Schema.Unknown)),
+      });
+      const group = RpcGroup.make(Rpc.make("read", { success }));
+      const registry = createContractHydrationRegistry(group);
+      const key = ["rpc", "read", "query"];
+      const server = new QueryClient();
+      const browser = new QueryClient();
+      const value = { box: makeOpaqueBox("42"), value: [null, 42] };
+      server.setQueryData(key, value);
+      yield* roundTripJson(registry, server, browser);
+      expect(browser.getQueryData(key)).toStrictEqual(value);
+    })
+  );
+
+  it("rejects an optional property with an implicit JSON fallback", () => {
+    const group = RpcGroup.make(
+      Rpc.make("read", {
+        success: Schema.Struct({ value: Schema.optionalKey(Schema.Unknown) }),
+      })
+    );
+    expect(() => createContractHydrationRegistry(group)).toThrow(
+      expect.objectContaining({ code: "UnencodableSchema", path: "read" })
+    );
+  });
+
   it.effect("derives an explicit JSON codec with a union on the wire", () =>
     Effect.gen(function* roundTripsExplicitUnionCodec() {
       const wire = Schema.Union([Schema.String, Schema.Finite]);

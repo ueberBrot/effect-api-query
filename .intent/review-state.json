@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "ec66f7c040791f8bf8464070ae556563006284c9574bdaf5d819cd732593ed41",
+      "fingerprint": "ecf9eee079cf431f75b8d3c66d9de8010d42d525d5d73c40462e159a565b704e",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -219,7 +219,7 @@
         "src/core/configure.ts": "277f1d1201be35962d6b75c3e9f4074e7f4798456d515ddbd23d7dc3bf6693cf",
         "src/core/consume-events.ts": "648144582c4bdbf4a9cb0d35ddc54327abbefc654f2d37b6154232bcd09a1752",
         "src/core/contract-hydration-types.ts": "53366364723a34f8948f2b813ad60ec20de98ee878f9398aff38bb15bf12fd45",
-        "src/core/contract-hydration.ts": "1bc72cd7e81ea7a5c4428b5daf09a1ac5d1dd26c80d8397dc7c7ba87fed7eb11",
+        "src/core/contract-hydration.ts": "15a1a343e6a6a52e31d11c168d951c73ed3d6e49314da331ce73d656e922c140",
         "src/core/declared-error.ts": "72146f75dc4f99abb60c143ae4464abf6a512cd5ffe713597bb3fb967f58c7a0",
         "src/core/hydration.ts": "08c812094bb4662cdf118b1825a47a4ec4bc1e4bd248a878726cbd4ff31aaf1e",
         "src/core/inference.ts": "249bc1d59e4ea6ddc7e3a09a63b93c13e3805f9d70ead00f44c710ff95e4df94",
@@ -262,7 +262,7 @@
         "src/rpc/types.ts": "6116aee2a62b26a895caf709c99c5969d6e45358c0919abd40068f9ce2db3f54",
         "tests/cache-recipes.test.ts": "39cb580ca6cd726ce58a93699fe1b14f697bafc7cac9fc9b4b76a539e73d6c1a",
         "tests/configuration-composition.test.ts": "be2ffca6e62965d8b79a311998787f74565d4af86bcaec46c36f5a963b0d16f5",
-        "tests/contract-hydration.test.ts": "ed7afac0d2f946019ce2923e9c7ed44e96e6e7991c47909d30b2661391ff8cc0",
+        "tests/contract-hydration.test.ts": "4a9c8680055115e260de9f072912e6cd081657b8eb311cf610a4a7d9d6642452",
         "tests/contract-reuse.test.ts": "21b97cec6da64d3a42d58e69aaad1754aaec2bb4dd1ac876ef25ec801f970a12",
         "tests/create-http-api-query-utils.test.ts": "eb325bcc52192a5666a33ba617e397e02c4e2004b696104600936710abeed2d9",
         "tests/create-rpc-query-utils-configuration.test.ts": "3c6f5f8d77643dc7ae3c535cc2a78a3f8b3d7bddcf5de263d9944c217a58e839",
@@ -405,15 +405,15 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "9b4df0c97d61eecb49512ee7cbee40ddd12db8bb",
-      "outcome": "updated",
-      "reason": "The cache-workflows reference distinguishes an accepted generated mutation from a new call to a manually wrapped runner after retirement.",
+      "head": "f0c36507c50b9adfddde75786ca09372afcc67d2",
+      "outcome": "no-change",
+      "reason": "The hydration reference already recommends Schema.Json and requires overrides for opaque schemas without an explicit JSON codec. Explicit links now derive successfully and implicit fallbacks stay rejected.",
       "evidence": [
-        "The 18 query-owner tests pass, including both tracking and configuration orders, and scoped Effect lint and skills-check pass. Fresh consumer-agent verification remains unverified."
+        "All 24 contract hydration tests and scoped Effect lint pass, including explicit codecs and an optional field with an implicit fallback."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "ec86d824afc5dd4369f1558df31b4ee098445ad1f5110a8e8fccbe9f219576a1",
+      "fingerprint": "00016764d38980b0e5daa22d97c0be8aaeaec34b81ee831cf125d1623547e472",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -632,7 +632,7 @@
         "src/core/configure.ts": "277f1d1201be35962d6b75c3e9f4074e7f4798456d515ddbd23d7dc3bf6693cf",
         "src/core/consume-events.ts": "648144582c4bdbf4a9cb0d35ddc54327abbefc654f2d37b6154232bcd09a1752",
         "src/core/contract-hydration-types.ts": "53366364723a34f8948f2b813ad60ec20de98ee878f9398aff38bb15bf12fd45",
-        "src/core/contract-hydration.ts": "1bc72cd7e81ea7a5c4428b5daf09a1ac5d1dd26c80d8397dc7c7ba87fed7eb11",
+        "src/core/contract-hydration.ts": "15a1a343e6a6a52e31d11c168d951c73ed3d6e49314da331ce73d656e922c140",
         "src/core/declared-error.ts": "72146f75dc4f99abb60c143ae4464abf6a512cd5ffe713597bb3fb967f58c7a0",
         "src/core/hydration.ts": "08c812094bb4662cdf118b1825a47a4ec4bc1e4bd248a878726cbd4ff31aaf1e",
         "src/core/inference.ts": "249bc1d59e4ea6ddc7e3a09a63b93c13e3805f9d70ead00f44c710ff95e4df94",
@@ -675,7 +675,7 @@
         "src/rpc/types.ts": "6116aee2a62b26a895caf709c99c5969d6e45358c0919abd40068f9ce2db3f54",
         "tests/cache-recipes.test.ts": "39cb580ca6cd726ce58a93699fe1b14f697bafc7cac9fc9b4b76a539e73d6c1a",
         "tests/configuration-composition.test.ts": "be2ffca6e62965d8b79a311998787f74565d4af86bcaec46c36f5a963b0d16f5",
-        "tests/contract-hydration.test.ts": "ed7afac0d2f946019ce2923e9c7ed44e96e6e7991c47909d30b2661391ff8cc0",
+        "tests/contract-hydration.test.ts": "4a9c8680055115e260de9f072912e6cd081657b8eb311cf610a4a7d9d6642452",
         "tests/contract-reuse.test.ts": "21b97cec6da64d3a42d58e69aaad1754aaec2bb4dd1ac876ef25ec801f970a12",
         "tests/create-http-api-query-utils.test.ts": "eb325bcc52192a5666a33ba617e397e02c4e2004b696104600936710abeed2d9",
         "tests/create-rpc-query-utils-configuration.test.ts": "3c6f5f8d77643dc7ae3c535cc2a78a3f8b3d7bddcf5de263d9944c217a58e839",
@@ -818,11 +818,11 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "9b4df0c97d61eecb49512ee7cbee40ddd12db8bb",
-      "outcome": "updated",
-      "reason": "The domain map and skill specification record that accepted generated mutation attempts drain through interceptors. The existing tree already maps the owner code, guidance, and tests.",
+      "head": "f0c36507c50b9adfddde75786ca09372afcc67d2",
+      "outcome": "no-change",
+      "reason": "The domain map, skill specification, and skill tree already cover deriving JSON codecs and using overrides for unsupported schemas. The existing mappings include the implementation and regression tests.",
       "evidence": [
-        "The 18 query-owner tests pass, including both tracking and configuration orders, and scoped Effect lint and skills-check pass. Fresh consumer-agent verification remains unverified."
+        "All 24 contract hydration tests and scoped Effect lint pass, including explicit codecs and an optional field with an implicit fallback."
       ]
     },
     "source:vite.config.ts": {
