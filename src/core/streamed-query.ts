@@ -14,7 +14,6 @@ import { validateStreamHash } from "./stream-hash-index";
 import {
   streamLiveSnapshots,
   streamPublicationBatches,
-  streamQueryIterable,
 } from "./stream-publication";
 import { closeScopeOnPullEnd } from "./stream-pull";
 import type {
@@ -229,6 +228,73 @@ const consumeReplacement = async <A>(
   }
   return client.getQueryData<A[]>(queryKey) ?? [];
 };
+
+const streamQueryIterable = <A>(
+  source: AsyncIterable<A>,
+  signal: AbortSignal,
+  onEmpty?: () => Error
+): AsyncIterable<A> => ({
+  [Symbol.asyncIterator]() {
+    const iterator = source[Symbol.asyncIterator]();
+    let closePromise: Promise<IteratorResult<A>> | undefined;
+    let emitted = false;
+    const detach = () => {
+      // oxlint-disable-next-line eslint/no-use-before-define
+      signal.removeEventListener("abort", onAbort);
+    };
+    const close = async () => {
+      closePromise ??= (async () => {
+        try {
+          return (
+            (await iterator.return?.()) ?? { done: true, value: undefined }
+          );
+        } finally {
+          detach();
+        }
+      })();
+      return await closePromise;
+    };
+    const onAbort = () => {
+      // oxlint-disable-next-line promise/prefer-await-to-then
+      void Promise.resolve().then(close).catch(detach);
+    };
+    signal.addEventListener("abort", onAbort, { once: true });
+
+    return {
+      async next() {
+        let result: IteratorResult<A>;
+        if (signal.aborted) {
+          result = await close();
+        } else {
+          try {
+            result = await iterator.next();
+          } catch (error) {
+            detach();
+            throw error;
+          }
+        }
+        if (result.done === true) {
+          detach();
+          if (!emitted && !signal.aborted && onEmpty !== undefined) {
+            throw onEmpty();
+          }
+        } else {
+          emitted = true;
+        }
+        return result;
+      },
+      return: close,
+      async throw(cause?: unknown) {
+        detach();
+        if (iterator.throw !== undefined) {
+          return await iterator.throw(cause);
+        }
+        await close();
+        throw cause;
+      },
+    };
+  },
+});
 
 export const makeStreamQuery = ({
   policy,
