@@ -58,7 +58,6 @@ export function createRpcQueryUtils(
   }
 ): object {
   const rpcs = extractRpcs(group, options.client);
-  const hasKeyPrefix = "keyPrefix" in options;
   const keyEncoders = new Map<string, RuntimeKeyEncoder>();
   for (const [tag, encoder] of Object.entries(options.keyEncoders ?? {})) {
     if (encoder !== undefined) {
@@ -66,8 +65,7 @@ export function createRpcQueryUtils(
     }
   }
   return createUtilityTree(rpcs, {
-    hasKeyPrefix,
-    keyPrefix: options.keyPrefix,
+    prefixOptions: options,
     keyNamespace: ["rpc"],
     keyEncoders,
     // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion

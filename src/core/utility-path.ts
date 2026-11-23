@@ -1,5 +1,31 @@
 import { Array as EffectArray } from "effect";
 
+import { canonicalizeArray } from "./canonical-key";
+import type { TreeErrors } from "./operation";
+import type { JsonValue } from "./types";
+
+export interface KeyPrefixInput {
+  readonly keyPrefix?: unknown;
+}
+
+export const normalizeUtilityKeyPrefix = (
+  options: KeyPrefixInput | undefined,
+  invalid: TreeErrors["invalidPrefix"]
+): readonly JsonValue[] => {
+  if (options === undefined || !("keyPrefix" in options)) {
+    return [];
+  }
+  const { keyPrefix } = options;
+  if (!Array.isArray(keyPrefix) || keyPrefix.length === 0) {
+    throw invalid("Shape");
+  }
+  try {
+    return canonicalizeArray(keyPrefix);
+  } catch (error) {
+    throw invalid("Value", error);
+  }
+};
+
 const reservedSegments = new Set([
   "__proto__",
   "call",

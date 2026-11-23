@@ -14,7 +14,6 @@ import type { RpcGroup } from "effect/rpc";
 
 import { classifyHttpEndpoint } from "../http/endpoint";
 import type { QueryableHttpEndpoint } from "../http/endpoint";
-import { canonicalizeArray } from "./canonical-key";
 import type {
   HttpContractDecodingServices,
   HttpContractEncodingServices,
@@ -32,7 +31,10 @@ import type { CompiledHydrationCodec, HydrationRegistry } from "./hydration";
 import type { QueryView } from "./inference";
 import { freezeMetadata } from "./metadata-query";
 import type { JsonValue } from "./types";
-import { validateUtilityPaths } from "./utility-path";
+import {
+  normalizeUtilityKeyPrefix,
+  validateUtilityPaths,
+} from "./utility-path";
 
 const rpcAllowedViews = new Set(["query", "live", "streamed"]);
 const httpAllowedViews = new Set(["query", "metadata", "live", "streamed"]);
@@ -55,23 +57,20 @@ const readOwn = (record: Record<string, unknown>, key: string) =>
 
 const normalizeKeyPrefix = (
   options: Record<string, unknown> | undefined
-): readonly JsonValue[] => {
-  if (options === undefined || !("keyPrefix" in options)) {
-    return [];
-  }
-  const { keyPrefix: prefix } = options;
-  if (!Array.isArray(prefix) || prefix.length === 0) {
-    throw new HydrationCodecError("InvalidKeyPrefix");
-  }
-  try {
-    return canonicalizeArray(prefix);
-  } catch (error) {
-    throw new HydrationCodecError("InvalidKeyPrefix", {
-      message: "keyPrefix must contain only JSON-safe values",
-      cause: error,
-    });
-  }
-};
+): readonly JsonValue[] =>
+  normalizeUtilityKeyPrefix(
+    options,
+    (reason, cause) =>
+      new HydrationCodecError(
+        "InvalidKeyPrefix",
+        reason === "Shape"
+          ? undefined
+          : {
+              message: "keyPrefix must contain only JSON-safe values",
+              cause,
+            }
+      )
+  );
 
 const validateViews = (
   options: Record<string, unknown> | undefined,

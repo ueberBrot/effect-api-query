@@ -49,10 +49,8 @@ export function createHttpApiQueryUtils(
     options.client,
     options.keyEncoders
   );
-  const hasKeyPrefix = "keyPrefix" in options;
   return createUtilityTree(operations, {
-    hasKeyPrefix,
-    keyPrefix: options.keyPrefix,
+    prefixOptions: options,
     keyNamespace: ["http", api.identifier],
     keyEncoders,
     // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion

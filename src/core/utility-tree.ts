@@ -4,7 +4,6 @@ import type { Cause } from "effect";
 
 import { createBranchFilter } from "./branch-filter";
 import type { FilterPath } from "./branch-filter";
-import { canonicalizeArray } from "./canonical-key";
 import type { QueryView } from "./inference";
 import { prepareMetadataExecution } from "./metadata-query";
 import type {
@@ -29,15 +28,17 @@ import { clearStreamPolicy, hasStreamPolicy } from "./streamed-query";
 import type {
   JsonValue,
   LivePolicyOptions,
-  OptionalKeyPrefix,
   RunPromiseExit,
   RuntimeInput,
   StreamedPolicyOptions,
 } from "./types";
 import { defineLazyLeafDescriptor } from "./utility-node";
 import type { RuntimeUtilityNode, UtilityNode } from "./utility-node";
-import { validateUtilityPaths } from "./utility-path";
-import type { UtilityPath } from "./utility-path";
+import {
+  normalizeUtilityKeyPrefix,
+  validateUtilityPaths,
+} from "./utility-path";
+import type { KeyPrefixInput, UtilityPath } from "./utility-path";
 
 interface PreparedQuery {
   readonly input: unknown;
@@ -45,25 +46,6 @@ interface PreparedQuery {
 }
 
 const freezeKey = (parts: JsonValue[]) => Object.freeze(parts);
-
-const normalizePrefix = (
-  hasKeyPrefix: boolean,
-  prefix: OptionalKeyPrefix | undefined,
-  errors: TreeErrors
-): readonly JsonValue[] => {
-  if (!hasKeyPrefix) {
-    return [];
-  }
-  if (!Array.isArray(prefix) || prefix.length === 0) {
-    throw errors.invalidPrefix("Shape");
-  }
-
-  try {
-    return canonicalizeArray(prefix);
-  } catch (error) {
-    throw errors.invalidPrefix("Value", error);
-  }
-};
 
 const execute = async <Operation extends UnaryQueryOperation | "metadata">(
   description: {
@@ -750,8 +732,7 @@ const createTree = (
 export const createUtilityTree = (
   operations: readonly OperationDescription[],
   options: {
-    readonly hasKeyPrefix: boolean;
-    readonly keyPrefix: OptionalKeyPrefix | undefined;
+    readonly prefixOptions: KeyPrefixInput;
     readonly keyNamespace: readonly string[];
     readonly keyEncoders: ReadonlyMap<string, RuntimeKeyEncoder>;
     readonly runtime: RuntimeInput<unknown> | undefined;
@@ -759,7 +740,10 @@ export const createUtilityTree = (
   }
 ): Record<string, unknown> => {
   const prefix = freezeKey([
-    ...normalizePrefix(options.hasKeyPrefix, options.keyPrefix, options.errors),
+    ...normalizeUtilityKeyPrefix(
+      options.prefixOptions,
+      options.errors.invalidPrefix
+    ),
     ...options.keyNamespace,
   ]);
   const paths = validateUtilityPaths(
