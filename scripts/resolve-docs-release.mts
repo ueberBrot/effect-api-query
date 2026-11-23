@@ -121,8 +121,6 @@ const permittedDocumentationPath = (path: string): boolean => {
     /^apps\/docs\/(?:src|public)\/.+$/u.test(path) ||
     path === "apps/docs/astro.config.mts" ||
     path === "apps/docs/tsconfig.json" ||
-    /^e2e-docs\/.+$/u.test(path) ||
-    path === "playwright.docs.config.ts" ||
     path === "tests/docs-examples.test.ts" ||
     /^tests\/types\/docs-[^/]+\.(?:ts|tsx)$/u.test(path)
   );
@@ -192,8 +190,6 @@ export const resolveDocumentationRevision = (
     revision,
     "--",
     "apps/docs",
-    "e2e-docs",
-    "playwright.docs.config.ts",
     "tests/docs-examples.test.ts",
     "tests/types",
   ]).split("\0");

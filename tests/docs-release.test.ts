@@ -251,8 +251,6 @@ describe("manual documentation revision", () => {
         "apps/docs/public/package-version.js",
         "apps/docs/astro.config.mts",
         "apps/docs/tsconfig.json",
-        "e2e-docs/version.test.ts",
-        "playwright.docs.config.ts",
         "tests/docs-examples.test.ts",
         "tests/types/docs-quick-start.ts",
       ])
@@ -298,7 +296,6 @@ describe("manual documentation revision", () => {
     "apps/docs/public/package-lock.json",
     "apps/docs/src/pnpm-lock.yaml",
     "apps/docs/public/npm-shrinkwrap.json",
-    "e2e-docs/nested/yarn.lock",
     "apps/docs/src/bun.lockb",
     "apps/docs/src/pnpm-workspace.yaml",
     "scripts/resolve-docs-release.mts",

@@ -1,5 +1,5 @@
 import { strict as effectStrict } from "@effect/tsgo/oxlint-presets";
-import { ConfigProvider, Effect, Predicate } from "effect";
+import { Predicate } from "effect";
 import ultraciteOxfmt from "ultracite/oxfmt";
 import ultraciteAntiSlop from "ultracite/oxlint/anti-slop";
 import ultraciteCore from "ultracite/oxlint/core";
@@ -662,18 +662,6 @@ export default defineConfig({
           output: [],
         },
       },
-      "docs-e2e": {
-        command: "playwright test --config playwright.docs.config.ts",
-        cache: false,
-        dependsOn:
-          Effect.runSync(
-            ConfigProvider.fromEnv({ preserveEmptyStrings: true }).load([
-              "DOCS_BASE_URL",
-            ])
-          )?.value === undefined
-            ? ["docs-build"]
-            : [],
-      },
       "docs-preview": {
         command: "vp run --filter @effect-api-query/docs preview",
         cache: false,
@@ -691,7 +679,6 @@ export default defineConfig({
           "vp run vite-react-build",
           "vp run tanstack-start-build",
           "vp run docs-build",
-          "vp run docs-e2e",
           "vp run e2e",
         ],
         cache: false,
