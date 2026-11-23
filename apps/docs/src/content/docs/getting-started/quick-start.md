@@ -3,7 +3,7 @@ title: RPC Quick Start
 description: Run a typed RPC query with an Effect client and TanStack Query.
 ---
 
-Fetch user 1 and print the name. [Install the package](/effect-api-query/getting-started/installation/) first. The example needs a server that implements `usersRpc` at `http://localhost:3000/rpc` with Effect’s JSON RPC protocol. The server must have a user with ID 1.
+Fetch user 1 and print the name. [Install the package](/effect-api-query/getting-started/installation/) first. The example needs a server that implements `usersRpc` at `http://localhost:3000/rpc` with the Effect JSON RPC protocol. The server must have a user with ID 1.
 
 If you want to try the library with a server included, [run a complete example](/effect-api-query/examples/).
 

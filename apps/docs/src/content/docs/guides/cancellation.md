@@ -3,7 +3,7 @@ title: Cancellation
 description: Cancel queries and request server-side cancellation for long-running commands.
 ---
 
-Pass your ManagedRuntime to the factory. If you use a custom runner, forward TanStack’s abort signal.
+Pass your ManagedRuntime to the factory. If you use a custom runner, forward the TanStack abort signal.
 
 ```ts
 const rpcQuery = createRpcQueryUtils(group, { client, runtime });

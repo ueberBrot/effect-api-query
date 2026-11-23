@@ -194,7 +194,3 @@ Configured copies of a leaf share its handle owner. Other leaves and factory ins
 ## Consume events without cache history
 
 Run `consumeEvents(source, { onEvent, onStart?, onExit? })` inside the app's Scope for notifications or invalidation without cache history. It awaits each event handler and stops on its failure. `onStart` signals local startup. `onExit` receives the Exit after cleanup and runs before settlement. Interrupt and await the Effect before disposing of the runtime. Add `recoverStream` upstream if replay is needed.
-
-## Check performance claims
-
-For compiler, bundle, or stream cost comparisons, see [performance and bundling](https://ueberbrot.github.io/effect-api-query/reference/performance/). Compare the same contracts, leaves, dependencies, compiler, and target. Use byte, instantiation, and publication budgets. Report elapsed time separately. Native bundle comparisons measure the cost of retained capabilities.

@@ -23,7 +23,7 @@ Configure key hashing on QueryClient before adding cache entries. Generated buil
 
 Key objects cannot contain `__proto__` or `constructor` properties at any depth. Prefixes, Schema output, and custom encoder output all follow this restriction.
 
-RPC keys begin with the caller prefix followed by `rpc`. HTTP keys begin with the caller prefix, `http`, and the HttpApi identifier. Omit `keyPrefix` when the adapter and declaration path provide enough separation. A factory’s `key()` includes these generated segments.
+RPC keys begin with the caller prefix followed by `rpc`. HTTP keys begin with the caller prefix, `http`, and the HttpApi identifier. Omit `keyPrefix` when the adapter and declaration path provide enough separation. Calling `key()` on a factory includes these generated segments.
 
 The operation follows the RPC path. It is `query`, `infinite`, `streamed`, `live`, or `mutation`. Exact query keys also include the encoded payload, if present. The public payload slot is `unknown`. Use builders for exact keys and explicit projections for partial filters. The library validates and freezes each payload. A root, branch, or RPC prefix matches the operations below it.
 

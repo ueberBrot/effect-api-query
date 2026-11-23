@@ -3,7 +3,7 @@ title: Cancellable Commands
 description: Run the example's explicit command protocol without treating mutation cancellation as rollback.
 ---
 
-Open the **Cancellable commands** panel in the [Vite React app](/effect-api-query/examples/#run-vite-react). The Start app serves the same operations.
+Open the "Cancellable commands" panel in the [Vite React app](/effect-api-query/examples/#run-vite-react). The Start app serves the same operations.
 
 The app defines the command IDs, progress, workers, and records. The library builds query and mutation options. See [cancellation](/effect-api-query/guides/cancellation/) for local query signals and cleanup.
 

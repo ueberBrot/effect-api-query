@@ -147,6 +147,10 @@ export default defineConfig({
                   label: "Stream History",
                   slug: "guides/choose-stream-history",
                 },
+                {
+                  label: "Reconnect Streams",
+                  slug: "guides/reconnect-streams",
+                },
               ],
               collapsed: true,
             },
@@ -296,16 +300,8 @@ export default defineConfig({
                   slug: "guides/websocket-clients",
                 },
                 {
-                  label: "Browser and Worker Hosts",
-                  slug: "reference/browser-and-worker-hosts",
-                },
-                {
                   label: "Stream Tracing",
                   slug: "guides/trace-streams",
-                },
-                {
-                  label: "External HTTP Clients",
-                  slug: "reference/external-http-clients",
                 },
               ],
               collapsed: true,
@@ -318,6 +314,10 @@ export default defineConfig({
             {
               label: "Run the Applications",
               slug: "examples",
+            },
+            {
+              label: "HTTP Workflows",
+              slug: "examples/http-workflows",
             },
             {
               label: "Cancellable Commands",
@@ -344,10 +344,6 @@ export default defineConfig({
             {
               label: "Compatibility and Limits",
               slug: "reference/compatibility-and-limits",
-            },
-            {
-              label: "Compatibility and Stability",
-              slug: "getting-started/compatibility-and-stability",
             },
             {
               label: "Performance and Bundling",

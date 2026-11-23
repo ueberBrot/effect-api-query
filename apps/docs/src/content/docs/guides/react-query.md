@@ -72,7 +72,7 @@ This example uses the optional `acquireQueryOwner` helper. Register resources it
 
 ### Component and provider
 
-In `users-app.tsx`, create a typed context with `createQueryUtilsContext` from the optional React subpath. Pass the query owner to its provider. It supplies both the utility tree and the owner’s QueryClient.
+In `users-app.tsx`, create a typed context with `createQueryUtilsContext` from the optional React subpath. Pass the query owner to its provider. It supplies both the utility tree and the owner's QueryClient.
 
 ```tsx
 import { useQuery } from "@tanstack/react-query";

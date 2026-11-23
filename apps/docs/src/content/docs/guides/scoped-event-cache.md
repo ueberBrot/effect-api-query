@@ -115,7 +115,7 @@ On logout or replacement, await `owner.dispose()`. Retirement stops new work, in
 
 ## Choose recovery and cache policy
 
-The helper waits for each event handler before pulling the next event. A handler failure stops delivery and preserves its Cause. Recovery retries source failures; handlers run once per delivery. `onExit` follows cleanup. Provide any additional Effect services through the runner.
+The helper waits for each event handler before pulling the next event. A handler failure stops delivery and preserves its Cause. Recovery retries source failures, and handlers run once per delivery. `onExit` follows cleanup. Provide any additional Effect services through the runner.
 
 The example replaces one user by exact key and marks related reads stale without refetching. A gap invalidates potentially missed users. If replay expires, fetch authoritative data and return its matching cursor. For deletions or partial snapshots, decide which entries to remove or refresh.
 

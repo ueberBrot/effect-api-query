@@ -110,7 +110,9 @@ Read the reference for the task at hand.
 ## Handle failures and cleanup
 
 - Catch configuration and key preparation failures where you build the tree or options. Incompatible hashing can also fail during stream execution.
-- Use `isEffectApiQueryError` for failed Effect Exits from either adapter. Use `getExecutionCause` to inspect the original Cause. A runner that rejects without an Exit passes its rejection through.
-- Stop consumers and cancel queries before disposal. Wait for local stream cleanup, pending preparation, and accepted mutations. Native cancellation can settle before finalizers finish. To stop server work, use an application command protocol.
+- Use `isEffectApiQueryError` for failed Effect Exits from either adapter and `getExecutionCause` to read the original Cause. Runner rejections without an Exit pass through.
+- Before disposal, stop consumers, cancel queries, and wait for local stream cleanup, pending preparation, and accepted mutations. Native cancellation can settle before finalizers finish. Use an application command protocol to stop server work.
 
-Type-check one call against the installed package with strict settings. Exercise its result and cache behavior. If you changed identity or lifetime, verify that entries stay separate and disposal finishes.
+## Verify before handoff
+
+Type-check one call against the installed package with strict settings, and exercise its result and cache behavior. If you changed identity or lifetime, confirm that entries stay separate and disposal completes cleanly.

@@ -61,4 +61,4 @@ Supply valid input before calling `refetch()` because a skipped query has no que
 
 For HTTP pagination, build the full request for each page. See [pagination](/effect-api-query/guides/pagination/) for stable filters and cursors.
 
-In the [example apps](/effect-api-query/examples/#pause-a-query-until-a-user-is-selected), use **Choose before fetching**. Clear and reselect a user while the cached result is fresh to see it reused.
+In the [example apps](/effect-api-query/examples/#pause-a-query-until-a-user-is-selected), use "Choose before fetching". Clear and reselect a user while the cached result is fresh to see it reused.

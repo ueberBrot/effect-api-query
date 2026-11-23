@@ -76,8 +76,8 @@ Pass native options, decoded input if required, and these stream controls.
 | --- | --- |
 | `maxChunks` | Required positive safe integer that limits retained events, or `"unbounded"`. A configured leaf can inherit this choice. |
 | `refetchMode` | `reset` (default), `append`, or `replace`. |
-| `publicationBatchSize` | Positive safe integer for ordered publication batches; defaults to one. |
-| `publicationMaxWaitMs` | Integer from 1 through 2,147,483,647; flushes a partial batch from its first buffered event. Omitted means no deadline. |
+| `publicationBatchSize` | Positive safe integer for ordered publication batches. Defaults to 1. |
+| `publicationMaxWaitMs` | Integer from 1 through 2,147,483,647. Flushes a partial batch from its first buffered event. Omitted means no deadline. |
 | `sseOptions.maxEventSize` (SSE only) | Positive safe integer that limits pending parser text. Defaults to 10 × 1024 × 1024 JavaScript string code units. |
 
 The query caches a readonly array in emission order. It preserves `undefined` elements and decoded header wrappers. An empty stream can succeed. Acquisition and consumption failures produce `EffectHttpApiQueryError` with operation `streamed`. Its Cause retains HTTP, Schema, and ready-client failures. SSE can also report declared failures, `Sse.Retry`, and `Sse.SseError`. NDJSON framing and decoding follow the client's error channel.

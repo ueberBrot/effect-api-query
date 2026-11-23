@@ -14,7 +14,7 @@ Factory or builder configuration failures throw synchronously. Incompatible hash
 - `RpcPathCollision`
 - `MissingKeyEncoder`
 - `UnknownKeyEncoder`
-- `UnsupportedQueryHash`: a builder received `queryKeyHashFn` or `queryHash`, or stream execution found either a default hash inconsistent with its key hasher or a conflicting cached identity.
+- `UnsupportedQueryHash`: a builder received `queryKeyHashFn` or `queryHash`. During stream execution, this code also reports a default hash mismatch or a conflicting cached identity.
 
 The error can also expose `rpcTag`, `path`, and an underlying `cause`.
 
@@ -53,7 +53,7 @@ HTTP factory and builder failures throw synchronously. Incompatible hashing can 
 - `MissingKeyEncoder`
 - `UnknownKeyEncoder`
 - `UnsupportedEndpointMetadata`
-- `UnsupportedQueryHash`: a builder received `queryKeyHashFn` or `queryHash`, or stream execution found either a default hash inconsistent with its key hasher or a conflicting cached identity.
+- `UnsupportedQueryHash`: a builder received `queryKeyHashFn` or `queryHash`. During stream execution, this code also reports a default hash mismatch or a conflicting cached identity.
 
 The error exposes `apiId`. When available, it also exposes `groupId`, `endpoint`, `method`, `path`, and an underlying `cause`.
 

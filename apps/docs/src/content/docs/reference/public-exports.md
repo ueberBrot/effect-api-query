@@ -18,7 +18,7 @@ Import these values and types from `@ueberbrot/effect-api-query`.
 | `isEffectApiQueryError`, `getExecutionCause` | Recognize either execution wrapper and read its original Cause. |
 | `findDeclaredError`, `matchDeclaredError` | Select or handle one tagged failure in an execution error. |
 | `retryExecutionError`, `RetryExecutionErrorOptions` | Build a bounded Query retry predicate for single typed failures. |
-| `runQueryEvents` | Run sequential event handlers and recovery against a retiring query owner’s native cache. |
+| `runQueryEvents` | Run sequential event handlers and recovery against a retiring query owner's native cache. |
 | `consumeEvents`, `ConsumeEventsOptions` | Consume events sequentially with start and exit callbacks. |
 | `createRpcQueryUtils` | Builds the RPC utility tree. |
 | `viewPrefix` | Selects every input of one supported leaf view. |

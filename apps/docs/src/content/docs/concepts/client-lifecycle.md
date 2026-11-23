@@ -10,7 +10,7 @@ Your application acquires the Effect client and releases it when work is done. U
 3. Keep these resources alive while queries, streams, or mutations use them.
 4. Stop consumers and cancel queries. Wait for local stream cleanup and accepted mutations. Clear the cache, then release the client and runtime.
 
-Give each server request its own resources. Keep browser resources alive for the lifetime of the app or cache owner.
+Give each server request its own resources. Keep browser resources alive for the lifetime of the app or cache owner. A browser window and a dedicated worker each own their own client, runner, Scope, and QueryClient. Wait for local cleanup before you terminate a worker.
 
 ## HTTP clients and execution services
 

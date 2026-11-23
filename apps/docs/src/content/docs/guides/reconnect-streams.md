@@ -13,7 +13,7 @@ If replay expires or skips a position, fetch current state and return the cursor
 
 ## Attach the ready client
 
-This example uses a flat RPC client with `events.watch`. The operation takes `feed` and `after` and emits objects with numeric cursors. It uses the [domain-event consumer](/effect-api-query/guides/refresh-from-events/) as `consumer`.
+This example uses a tag-keyed RPC client with `events.watch`. The operation takes `feed` and `after` and emits objects with numeric cursors. It uses the [domain-event consumer](/effect-api-query/guides/refresh-from-events/) as `consumer`.
 
 Supply `isReplayExpired` to classify the Cause and `refreshAndGetCursor` to refresh state and return its cursor. Use `refreshGap` to refresh before accepting a gap. Use `setConnectionState` to update the owner's store.
 
@@ -22,7 +22,7 @@ import { recoverStream } from "@ueberbrot/effect-api-query";
 import { Cause, Effect, Stream } from "effect";
 
 const delivery = recoverStream({
-  connect: (after) => client("events.watch", { feed: "news", after }),
+  connect: (after) => client["events.watch"]({ feed: "news", after }),
   cursor: (event) => event.cursor,
   initialCursor: consumer.cursor(),
   retryDelay: (cause, attempt) =>

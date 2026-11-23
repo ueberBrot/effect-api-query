@@ -84,7 +84,7 @@ Use the transferred selection to avoid reading the route or form again. `bind` c
 
 ## Encode rich input explicitly
 
-To transfer `{ id: bigint }`, use `Schema.Struct({ id: Schema.BigIntFromString })`. The descriptor stores a decimal string. `bind` reconstructs the bigint. Match the decoded type to `InferInput<typeof leaf>`. Pass constructor input to `capture`; it copies and freezes the encoded JSON.
+To transfer `{ id: bigint }`, use `Schema.Struct({ id: Schema.BigIntFromString })`. The descriptor stores a decimal string. `bind` reconstructs the bigint. Match the decoded type to `InferInput<typeof leaf>`. Pass constructor input to `capture`. It copies and freezes the encoded JSON.
 
 `capture` prepares the input before and after the codec round trip and compares canonical identity. `bind` checks the same identity on the receiving leaf. Use deterministic, query-stable RPC constructors. Preserve all values that affect execution, even fields your key encoder omits. Equal keys alone cannot verify those fields.
 

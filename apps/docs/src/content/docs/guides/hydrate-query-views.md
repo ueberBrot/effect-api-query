@@ -21,7 +21,7 @@ Set a global view in `views` to `false` to omit it, or set a path or one of its 
 
 ### Register a hand-written codec
 
-Use `queryViewCodec` and `infiniteQueryCodec` when you want to register an individual view. The codec’s decoded type must match the data cached before `select`. The [typed example](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/hydration-contract.ts) includes the contract and imports. Its `read` leaf returns `Profile` and its `watch` leaf emits `Profile`, `undefined`, or `null`. Register each view's cached type.
+Use `queryViewCodec` and `infiniteQueryCodec` when you want to register an individual view. The decoded type of the codec must match the data cached before `select`. The [typed example](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/hydration-contract.ts) includes the contract and imports. Its `read` leaf returns `Profile` and its `watch` leaf emits `Profile`, `undefined`, or `null`. Register each view's cached type.
 
 ```ts
 const viewRegistry = createHydrationRegistry([

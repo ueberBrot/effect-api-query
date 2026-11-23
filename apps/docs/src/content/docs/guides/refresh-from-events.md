@@ -46,7 +46,7 @@ Use the consumer's `reactivityKeys.directory`, `reactivityKeys.all`, or `reactiv
 
 Reactivity uses its own application keys. Register their mapping to TanStack filters with [`bindReactivityInvalidation`](/effect-api-query/guides/query-effects/#invalidate-queries-from-effect-reactivity) when you only need scoped invalidation. The bridge supports broad and exact keys and coalesces repeated triggers within a microtask. The event consumer also coordinates delivery and optimistic writes.
 
-The consumer combines pending invalidations and lets broad ones cover narrower reads. It waits while its QueryClient has pending mutations, which protects optimistic writes. Apply the same rule to other refresh paths. `flush()` drains runnable work. Jobs report errors to `onRefreshError`; queries keep their native retry and error state.
+The consumer combines pending invalidations and lets broad ones cover narrower reads. It waits while its QueryClient has pending mutations, which protects optimistic writes. Apply the same rule to other refresh paths. `flush()` drains runnable work. Jobs report errors to `onRefreshError`, and queries keep their native retry and error state.
 
 See [optimistic writes](/effect-api-query/guides/optimistic-writes/) for overlapping mutations.
 

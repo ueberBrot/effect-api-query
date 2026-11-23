@@ -85,7 +85,7 @@ Use the [compatibility table](https://ueberbrot.github.io/effect-api-query/refer
 
 Match Effect runtime, testing, and platform releases within the installed package's peer range. The repo uses Effect-enhanced TSRS for development. The minimum checked consumer compiler is TypeScript 5.9.3.
 
-Before 1.0, breaking contracts, new capabilities, and support changes can appear in minor releases. See [compatibility and stability](https://ueberbrot.github.io/effect-api-query/getting-started/compatibility-and-stability/) for the release policy.
+Before 1.0, breaking contracts, new capabilities, and support changes can appear in minor releases. See [compatibility and limits](https://ueberbrot.github.io/effect-api-query/reference/compatibility-and-limits/) for the release policy.
 
 Keep app and wrapper on one resolved Query Core version. Keep Angular core, common, compiler, and platform-browser on the same release.
 
@@ -99,10 +99,9 @@ Choose the transport your application already owns.
 - With a shared WebSocket, unary and stream requests keep distinct keys and cancellation. Retire the old owner before replacing connections. Set reconnect, backoff, authentication, and replay in the app. Wait for a server acknowledgement if you need proof of cleanup.
 - Server-local RPC can use public decoded messages inside the request Scope. Server-owned services define authority. Use a schema-aware protocol when wire validation or codec effects matter.
 - A browser window or dedicated worker owns its client, runtime, Scope, and cache. Configure cross-host transport, authentication, and synchronization separately. Wait for worker cleanup before termination.
-- Use `openapi-typescript` with `OpenApi.fromApi` for encoded DTO types and `openapi-fetch` for direct HTTP. Supply multipart serialization and an SSE decoder if needed. Pass an Effect HttpApiClient to the factory.
 
 The app supplies transport batching, platform services, and providers. Execution guards use same-realm `instanceof`. Across realms, transfer a safe error DTO.
 
-See [Vue](https://ueberbrot.github.io/effect-api-query/guides/vue-query/), [Solid](https://ueberbrot.github.io/effect-api-query/guides/solid-query/), [Svelte](https://ueberbrot.github.io/effect-api-query/guides/svelte-query/), and [Angular](https://ueberbrot.github.io/effect-api-query/guides/angular-query/) for native hooks. See [worker hosts](https://ueberbrot.github.io/effect-api-query/reference/browser-and-worker-hosts/) and [WebSocket clients](https://ueberbrot.github.io/effect-api-query/guides/websocket-clients/) for transport setup.
+See [Vue](https://ueberbrot.github.io/effect-api-query/guides/vue-query/), [Solid](https://ueberbrot.github.io/effect-api-query/guides/solid-query/), [Svelte](https://ueberbrot.github.io/effect-api-query/guides/svelte-query/), and [Angular](https://ueberbrot.github.io/effect-api-query/guides/angular-query/) for native hooks. See [client lifecycle](https://ueberbrot.github.io/effect-api-query/concepts/client-lifecycle/) and [WebSocket clients](https://ueberbrot.github.io/effect-api-query/guides/websocket-clients/) for host and transport setup.
 
 See [query owner setup](cache-workflows.md#opt-in-to-query-owner-setup) for acquired and borrowed resources. For execution errors, follow [failure handling](https://ueberbrot.github.io/effect-api-query/guides/handle-failures/) and [retry queries](https://ueberbrot.github.io/effect-api-query/guides/retry-queries/).
