@@ -28,7 +28,7 @@ export const parseManifest = (json: string) => {
   return { ...manifest, name: manifest.name, version: manifest.version };
 };
 
-export const verifyDocumentationVersion = (
+const verifyDocumentationVersion = (
   json: string | undefined,
   version: string
 ): void => {

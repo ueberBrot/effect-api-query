@@ -1,3 +1,4 @@
+import { spawnSync } from "node:child_process";
 import {
   copyFileSync,
   mkdirSync,
@@ -12,12 +13,10 @@ import { Predicate } from "effect";
 import { describe, expect, it, vi } from "vitest";
 import { isScalar, visit } from "yaml";
 
-import { capture } from "../scripts/lib/exec.mts";
 import {
   publishedRootVersion,
   resolveDocumentationRevision,
 } from "../scripts/resolve-docs-release.mts";
-import { verifyDocumentationVersion } from "../scripts/verify-docs-version.mts";
 import {
   readWorkflow,
   workflowSteps,
@@ -133,6 +132,29 @@ describe("root publication", () => {
   );
 });
 
+const runVersionVerifier = (json?: string) => {
+  const cwd = mkdtempSync(nodePath.join(tmpdir(), "docs-version-"));
+  try {
+    const verifier = nodePath.join(cwd, "verify-docs-version.mts");
+    if (json !== undefined) {
+      const dist = nodePath.join(cwd, "apps/docs/dist");
+      mkdirSync(dist, { recursive: true });
+      writeFileSync(nodePath.join(dist, "package-version.json"), json);
+    }
+    copyFileSync(
+      new URL("../scripts/verify-docs-version.mts", import.meta.url),
+      verifier
+    );
+    return spawnSync(process.execPath, [verifier], {
+      cwd,
+      encoding: "utf-8",
+      env: { ...process.env, DOCS_VERSION: version },
+    });
+  } finally {
+    rmSync(cwd, { recursive: true, force: true });
+  }
+};
+
 describe("manual documentation revision", () => {
   it("requires a correction ref for a legacy release and accepts its static version backport", () => {
     const tree = `100644 blob ${docs}\tapps/docs/src/index.mdx\0`;
@@ -152,9 +174,7 @@ describe("manual documentation revision", () => {
         gitFixture(["apps/docs/astro.config.mts"], { tree })
       )
     ).toStrictEqual({ revision: docs, version });
-    expect(() => {
-      verifyDocumentationVersion(manifest, version);
-    }).not.toThrow();
+    expect(runVersionVerifier(manifest).status).toBe(0);
   });
 
   it("pins the conventional release tag when npm omits gitHead", () => {
@@ -339,50 +359,33 @@ describe("manual documentation revision", () => {
 
 describe("built documentation version", () => {
   it("runs the uploaded verifier with only the restored docs and script", () => {
-    const cwd = mkdtempSync(nodePath.join(tmpdir(), "docs-version-"));
-    try {
-      const verifier = nodePath.join(cwd, "verify-docs-version.mts");
-      const dist = nodePath.join(cwd, "apps/docs/dist");
-      mkdirSync(dist, { recursive: true });
-      writeFileSync(nodePath.join(dist, "package-version.json"), manifest);
-      copyFileSync(
-        new URL("../scripts/verify-docs-version.mts", import.meta.url),
-        verifier
-      );
-      vi.stubEnv("DOCS_VERSION", version);
-      expect(() =>
-        capture(process.execPath, [verifier], { cwd })
-      ).not.toThrow();
-    } finally {
-      vi.unstubAllEnvs();
-      rmSync(cwd, { recursive: true, force: true });
-    }
+    expect(runVersionVerifier(manifest).status).toBe(0);
   });
 
   it("explains how to supply missing static version metadata", () => {
-    expect(() => {
-      verifyDocumentationVersion(undefined, version);
-    }).toThrow(
+    const result = runVersionVerifier();
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain(
       "supply docs-ref with the static package version badge and JSON metadata"
     );
   });
 
-  it("accepts a static marker for the exact released root package", () => {
-    expect(() => {
-      verifyDocumentationVersion(manifest, version);
-    }).not.toThrow();
-  });
-
   it.each([
-    "",
-    "{}",
-    "null",
-    JSON.stringify({ name: "another-package", version }),
-    JSON.stringify({ name, version: "0.2.0" }),
-  ])("rejects missing or mismatched build metadata: %s", (json) => {
-    expect(() => {
-      verifyDocumentationVersion(json, version);
-    }).toThrow(/.+/u);
+    ["", "SyntaxError"],
+    ["{}", "public root package name and version must match"],
+    ["null", "public root package name and version must match"],
+    [
+      JSON.stringify({ name: "another-package", version }),
+      "public root package name and version must match",
+    ],
+    [
+      JSON.stringify({ name, version: "0.2.0" }),
+      "documentation build is for a different package version",
+    ],
+  ])("rejects invalid build metadata: %s", (json, message) => {
+    const result = runVersionVerifier(json);
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain(message);
   });
 });
 

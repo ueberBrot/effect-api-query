@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "1f9be3561e8c736c9d500cfa03fa675fd9c685bb264f7734b2f2094ce47e1a2b",
+      "fingerprint": "875e72a683b37cf517fdc47771aabc4935d784a7ebddb94d911a74f4b28bd1b1",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -200,7 +200,7 @@
         "scripts/performance/budgets.mts": "a2ace3af9dbc469203a35dd0f3a1359326a58e25b69eac284a3c3dbd2575564a",
         "scripts/performance/common.mts": "6ce0e1c018e08a442fcf787740d7ddd63457069ee932d28b04d8a1b41e136028",
         "scripts/resolve-docs-release.mts": "d40db299f62659ab3cf57bdbf90aa682700d072c0d82548d78702cfdaa262183",
-        "scripts/verify-docs-version.mts": "c7389e5fbee57e9b2991e2cd0668502bb59ac7d348d59a3c4d9c0b1d37d2f960",
+        "scripts/verify-docs-version.mts": "58f63de6f871726a5bef8b70d1de7fad591374c52823e3cf60a160a9f37541e8",
         "scripts/version-packages.mts": "e514a013a90489d8d0ff5eb0620276f923c85fa765061aa4d3f312ac2ee4c7ad",
         "skills/effect-api-query/SKILL.md": "112b039108201d3aecc3b2e9c6dbd665ddaa01f37e0a16997814ea9b533c95a1",
         "skills/effect-api-query/references/cache-workflows.md": "9f370822c4f1ec986ef27afc7fd7647ad24b701f671f33d1fb86e8478d73769f",
@@ -277,7 +277,7 @@
         "tests/create-rpc-query-utils-structural-sharing.test.ts": "f9bd67aed07f7aed8113fdbfeb31810dbc19e0cb4ec0cbeef64a14e7589002fb",
         "tests/create-rpc-query-utils.test.ts": "1229679c118d267fd0a94ffcb560a9a7f77a8acecd423ed742c036c667b89faf",
         "tests/docs-examples.test.ts": "c5f3f714eebf1a5f418e519fab89411d60eb1d2be128484d4d3cbc858c00354f",
-        "tests/docs-release.test.ts": "e5e06bba99de0a82bb8e2ccb4eb7add66e8f623b200c1b56412aed3b5ea6f036",
+        "tests/docs-release.test.ts": "8729f2d3451f91741587a52f826d7c3188221bd23496a6fd92acf7c3cffa462f",
         "tests/execution-interceptor.test.ts": "2d839cf557cfcb1116787b79eebb397921626876552d5bbdea7429feda389143",
         "tests/fixtures/async.ts": "c72af69141ce4f2dd4e9b63910ed20378e546dcd015a2d7befacd439ba4a006e",
         "tests/fixtures/decode-utf8.ts": "f0441c8aa2553ce2c1dccff7cac1bbaec2cdc668916278c7a0efff90482ace61",
@@ -406,18 +406,17 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "468e21895d1f391a2fc5eff5546b07dd2d4762b3",
+      "head": "e6a227aaf17b5b39b4653accc6725248ad1e1ce0",
       "outcome": "no-change",
-      "reason": "The separation of the verifier repairs the repository deployment without changing any consumer task or public API.",
+      "reason": "The documentation version check keeps the same runtime behavior and is exercised through its standalone CLI. The shipped skill, domain map, skill spec, and skill tree still describe the same consumer tasks.",
       "evidence": [
-        "75 tests in tests/docs-release.test.ts passed",
-        "Standalone 0.8.0 verifier passed with only the restored docs and script",
-        "Manual resolution confirmed the 0.8.0 npm record and Git tag",
-        "actionlint and yamllint passed"
+        "74 release and workflow tests passed in tests/docs-release.test.ts",
+        "vp run fallow passed all four audits, including production dead code",
+        "scripts/verify-docs-version.mts runs after restoring the workflow artifact"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "b3be5e92fb1414da0a63707494d15d950f59877586a597c8751f49dfd4408209",
+      "fingerprint": "f4cbe19d79be68a77fd562866b9d24d1ae1b1e82360c6f912f6fa54a50acbd05",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -617,7 +616,7 @@
         "scripts/performance/budgets.mts": "a2ace3af9dbc469203a35dd0f3a1359326a58e25b69eac284a3c3dbd2575564a",
         "scripts/performance/common.mts": "6ce0e1c018e08a442fcf787740d7ddd63457069ee932d28b04d8a1b41e136028",
         "scripts/resolve-docs-release.mts": "d40db299f62659ab3cf57bdbf90aa682700d072c0d82548d78702cfdaa262183",
-        "scripts/verify-docs-version.mts": "c7389e5fbee57e9b2991e2cd0668502bb59ac7d348d59a3c4d9c0b1d37d2f960",
+        "scripts/verify-docs-version.mts": "58f63de6f871726a5bef8b70d1de7fad591374c52823e3cf60a160a9f37541e8",
         "scripts/version-packages.mts": "e514a013a90489d8d0ff5eb0620276f923c85fa765061aa4d3f312ac2ee4c7ad",
         "skills/effect-api-query/SKILL.md": "112b039108201d3aecc3b2e9c6dbd665ddaa01f37e0a16997814ea9b533c95a1",
         "skills/effect-api-query/references/cache-workflows.md": "9f370822c4f1ec986ef27afc7fd7647ad24b701f671f33d1fb86e8478d73769f",
@@ -694,7 +693,7 @@
         "tests/create-rpc-query-utils-structural-sharing.test.ts": "f9bd67aed07f7aed8113fdbfeb31810dbc19e0cb4ec0cbeef64a14e7589002fb",
         "tests/create-rpc-query-utils.test.ts": "1229679c118d267fd0a94ffcb560a9a7f77a8acecd423ed742c036c667b89faf",
         "tests/docs-examples.test.ts": "c5f3f714eebf1a5f418e519fab89411d60eb1d2be128484d4d3cbc858c00354f",
-        "tests/docs-release.test.ts": "e5e06bba99de0a82bb8e2ccb4eb7add66e8f623b200c1b56412aed3b5ea6f036",
+        "tests/docs-release.test.ts": "8729f2d3451f91741587a52f826d7c3188221bd23496a6fd92acf7c3cffa462f",
         "tests/execution-interceptor.test.ts": "2d839cf557cfcb1116787b79eebb397921626876552d5bbdea7429feda389143",
         "tests/fixtures/async.ts": "c72af69141ce4f2dd4e9b63910ed20378e546dcd015a2d7befacd439ba4a006e",
         "tests/fixtures/decode-utf8.ts": "f0441c8aa2553ce2c1dccff7cac1bbaec2cdc668916278c7a0efff90482ace61",
@@ -823,14 +822,13 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "468e21895d1f391a2fc5eff5546b07dd2d4762b3",
+      "head": "e6a227aaf17b5b39b4653accc6725248ad1e1ce0",
       "outcome": "no-change",
-      "reason": "The domain map, skill spec and skill tree still cover the same consumer tasks. The existing script source glob covers the separate verifier.",
+      "reason": "The documentation version check keeps the same runtime behavior and is exercised through its standalone CLI. The shipped skill, domain map, skill spec, and skill tree still describe the same consumer tasks.",
       "evidence": [
-        "75 tests in tests/docs-release.test.ts passed",
-        "Standalone 0.8.0 verifier passed with only the restored docs and script",
-        "Manual resolution confirmed the 0.8.0 npm record and Git tag",
-        "actionlint and yamllint passed"
+        "74 release and workflow tests passed in tests/docs-release.test.ts",
+        "vp run fallow passed all four audits, including production dead code",
+        "scripts/verify-docs-version.mts runs after restoring the workflow artifact"
       ]
     },
     "source:vite.config.ts": {
