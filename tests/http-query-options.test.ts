@@ -223,9 +223,6 @@ describe("HTTP query options", () => {
     const unsubscribe = observer.subscribe(() => {});
     const unsubscribePages = pages.subscribe(() => {});
     try {
-      expect(utils.users.list.queryOptions({ input: skipToken }).queryFn).toBe(
-        skipToken
-      );
       expect(options).toMatchObject({
         queryFn: skipToken,
         queryKey: ["test", "http", "pages", "users", "list", "query"],

@@ -62,6 +62,12 @@ const captureHydrationError = (fn: () => void): HydrationCodecError => {
   throw new Error("Expected HydrationCodecError");
 };
 
+const parseSnapshot = (json: string) => {
+  // oxlint-disable-next-line typescript/no-unsafe-assignment
+  const wire: ReturnType<typeof dehydrate> = JSON.parse(json);
+  return wire;
+};
+
 const roundTripJson = Effect.fnUntraced(function* roundTripJson(
   registry: HydrationRegistry,
   server: QueryClient,
@@ -74,8 +80,7 @@ const roundTripJson = Effect.fnUntraced(function* roundTripJson(
   });
   const encoded = yield* registry.encodeQueries(snapshot.queries);
   const json = JSON.stringify({ ...snapshot, queries: encoded });
-  // oxlint-disable-next-line typescript/no-unsafe-assignment
-  const wire: typeof snapshot = JSON.parse(json);
+  const wire = parseSnapshot(json);
   const decoded = yield* registry.decodeQueries(wire.queries);
   hydrate(browser, { ...wire, queries: decoded });
 });
@@ -1580,13 +1585,14 @@ it.effect(
       const encoded = yield* registry
         .encodeQueries(snapshot.queries)
         .pipe(Effect.provideService(EncodeSvc, { offset: 1n }));
-      const json = JSON.stringify(encoded);
+      const json = JSON.stringify({ ...snapshot, queries: encoded });
       const strictJson = yield* Schema.decodeEffect(
         Schema.fromJsonString(Schema.Json)
       )(json);
-      expect(strictJson).toStrictEqual(encoded);
+      const wire = parseSnapshot(json);
+      expect(wire).toStrictEqual(strictJson);
       const decoded = yield* registry
-        .decodeQueries(encoded)
+        .decodeQueries(wire.queries)
         .pipe(Effect.provideService(DecodeSvc, { tag: "1" }));
       const browser = new QueryClient();
       hydrate(browser, { ...snapshot, queries: decoded });
@@ -1596,7 +1602,7 @@ it.effect(
 
 describe("composable createHydrationRegistry", () => {
   it.effect(
-    "flattens package registries alongside manual codecs, preserves DuplicateCodec & longest-prefix, and rejects structural fakes",
+    "flattens package registries alongside manual codecs, detects duplicate codecs, and rejects structural fakes",
     () =>
       Effect.gen(function* composesRegistries() {
         const ServiceString = Schema.String.pipe(

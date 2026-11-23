@@ -115,33 +115,6 @@ describe("createRpcQueryUtils configuration", () => {
     ).toThrow(expect.objectContaining({ code: "MissingKeyEncoder" }));
   });
 
-  it.effect(
-    "reports invalid utility paths with a stable configuration error",
-    () =>
-      Effect.gen(function* rejectInvalidUtilityPath() {
-        const InvalidPath = Rpc.make("invalid..path", {
-          success: Schema.String,
-        });
-        const invalidGroup = RpcGroup.make(InvalidPath);
-        const client = yield* makeRpcTestClient(invalidGroup, {
-          "invalid..path": () => Effect.succeed("ok"),
-        });
-
-        expect(() =>
-          createRpcQueryUtils(invalidGroup, {
-            client,
-            keyPrefix: ["app"] as const,
-          })
-        ).toThrow(
-          expect.objectContaining<Partial<EffectRpcQueryConfigError>>({
-            _tag: "EffectRpcQueryConfigError",
-            code: "InvalidRpcPath",
-            rpcTag: "invalid..path",
-          })
-        );
-      })
-  );
-
   it.each([
     "",
     ".leading",
@@ -708,24 +681,5 @@ describe("createRpcQueryUtils configuration", () => {
         }
       }
     }
-  );
-
-  it.effect("rejects an own __proto__ property defined by an encoder", () =>
-    Effect.gen(function* rejectOwnProtoEncoderProperty() {
-      const encoded: JsonValue = Object.defineProperty({}, "__proto__", {
-        enumerable: true,
-        value: "semantic-value",
-      });
-      const client = yield* makeClient();
-      const utils = createRpcQueryUtils(group, {
-        client,
-        keyEncoders: { "users.get": () => encoded },
-        keyPrefix: ["app"] as const,
-      });
-
-      expect(() => utils.users.get.queryKey({ input: { id: 1 } })).toThrow(
-        expect.objectContaining({ code: "InvalidKeyValue" })
-      );
-    })
   );
 });

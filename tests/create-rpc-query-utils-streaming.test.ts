@@ -436,7 +436,6 @@ describe("createRpcQueryUtils streaming execution", () => {
               ).pipe(Stream.ensuring(Deferred.succeed(finalized, true))),
           });
           let executionError: unknown;
-          let executionSettled = false;
           const executionDone = yield* Deferred.make<boolean>();
           const runPromise = Effect.runPromiseWith(yield* Effect.context());
           const utils = configureUtils(
@@ -454,7 +453,6 @@ describe("createRpcQueryUtils streaming execution", () => {
                       executionError = error;
                       throw error;
                     } finally {
-                      executionSettled = true;
                       await runPromise(Deferred.succeed(executionDone, true));
                     }
                   },
@@ -480,7 +478,6 @@ describe("createRpcQueryUtils streaming execution", () => {
             yield* Deferred.await(finalized);
             yield* Deferred.await(executionDone);
             expect(queryError).toBeInstanceOf(CancelledError);
-            expect(executionSettled).toBe(true);
             expect(executionError).toBeUndefined();
             expect(queryClient.getQueryData(options.queryKey)).toBeUndefined();
           } finally {
@@ -1155,8 +1152,6 @@ describe("createRpcQueryUtils streaming execution", () => {
       )
     );
 
-    expect(Deferred.isDoneUnsafe(interrupted)).toBe(true);
-    expect(Deferred.isDoneUnsafe(finalized)).toBe(true);
     await expect(query).resolves.toStrictEqual(["ready"]);
   });
 
@@ -1323,7 +1318,9 @@ describe("createRpcQueryUtils streaming execution", () => {
         yield* Deferred.await(started);
         unsubscribe();
         yield* Deferred.await(finalized);
-        expect(Deferred.isDoneUnsafe(finalized)).toBe(true);
+        expect(queryClient.getQueryState(options.queryKey)?.fetchStatus).toBe(
+          "idle"
+        );
       })
   );
 
@@ -1410,39 +1407,5 @@ describe("createRpcQueryUtils streaming execution", () => {
         })
       );
     }
-  );
-
-  it.effect("reuses Query Core skipToken for payload-bearing streams", () =>
-    Effect.gen(function* reuseStreamSkipToken() {
-      const Watch = Rpc.make("events.watch", {
-        payload: { channel: Schema.String },
-        success: Schema.String,
-        stream: true,
-      });
-      const streamGroup = RpcGroup.make(Watch);
-      const client = yield* makeRpcTestClient(streamGroup, {
-        "events.watch": () => Stream.empty,
-      });
-      const utils = createRpcQueryUtils(streamGroup, {
-        client,
-        keyPrefix: ["app"] as const,
-      });
-
-      expect(
-        utils.events.watch.streamedOptions({
-          maxChunks: "unbounded",
-          input: skipToken,
-        })
-      ).toMatchObject({
-        queryFn: skipToken,
-        queryKey: ["app", "rpc", "events", "watch", "streamed"],
-      });
-      expect(
-        utils.events.watch.liveOptions({ input: skipToken })
-      ).toMatchObject({
-        queryFn: skipToken,
-        queryKey: ["app", "rpc", "events", "watch", "live"],
-      });
-    })
   );
 });

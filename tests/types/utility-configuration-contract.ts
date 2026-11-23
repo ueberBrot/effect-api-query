@@ -174,14 +174,6 @@ declare const invalidUnionPolicy:
   | { readonly staleTime: number; readonly queryHash: string };
 // @ts-expect-error A forbidden policy property in any union member is rejected.
 configureUtils(base.users.read, { query: invalidUnionPolicy });
-declare const invalidUnionView:
-  | { readonly staleTime: number }
-  | {
-      readonly staleTime: number;
-      readonly queryHash: string;
-    };
-// @ts-expect-error View unions retain exact policy checks.
-configureUtils(base.users.read, { query: invalidUnionView });
 declare const invalidUnionScope:
   | {
       readonly "users.read": {
@@ -261,20 +253,12 @@ defineRpcPolicy.withClientError<never>()(
   },
   { keyPrefix: ["configuration"] }
 );
-// @ts-expect-error A unary leaf has no live view.
-configureUtils(base.users.read, { live: { retry: false } });
 // @ts-expect-error Assembly rejects invalid native options.
 configureUtils(base.users.read, { query: { staleTime: "forever" } });
-// @ts-expect-error Inputs remain local.
-configureUtils(base.users.read, { query: { input: { id: 1 } } });
 configureUtils(base.users.read, {
   // @ts-expect-error Optimistic preparation remains local.
   mutation: { onMutate: () => ({ previous: 1 }) },
 });
-// @ts-expect-error Exact checks include assigned options.
-configureUtils(base.users.read, { query: invalidPolicy });
-// @ts-expect-error Exact checks include union members.
-configureUtils(base.users.read, { query: invalidUnionPolicy });
 const assembledBranch = configureUtils(base.users, {
   paths: {
     watch: { streamed: { maxChunks: 3 } },

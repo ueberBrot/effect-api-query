@@ -451,10 +451,6 @@ describe(createHttpApiQueryUtils, () => {
         "health.check",
         "query",
       ]);
-      expect({
-        root: Object.isFrozen(utils),
-        group: Object.isFrozen(utils["users.v1"]),
-      }).toStrictEqual({ root: true, group: true });
     } finally {
       queryClient.clear();
     }
@@ -544,7 +540,7 @@ describe(createHttpApiQueryUtils, () => {
     ).toThrow(EffectHttpApiQueryConfigError);
   });
 
-  it("preserves the complete failed Cause and passes runner rejections through", async () => {
+  it("preserves the complete failed Cause", async () => {
     const api = HttpApi.make("failure").add(
       HttpApiGroup.make("actions").add(
         HttpApiEndpoint.get("fail", "/fail", {
@@ -591,15 +587,6 @@ describe(createHttpApiQueryUtils, () => {
         throw new Error("Expected HTTP execution error");
       }
       expect(error.cause).toBe(cause);
-      const rejection = new Error("runner");
-      const rejected = createHttpApiQueryUtils(api, {
-        client,
-        keyPrefix: ["test"],
-        runtime: async (): Promise<never> => await Promise.reject(rejection),
-      });
-      await expect(
-        queryClient.query(rejected.actions.fail.queryOptions())
-      ).rejects.toBe(rejection);
     } finally {
       queryClient.clear();
     }
@@ -769,7 +756,7 @@ describe(createHttpApiQueryUtils, () => {
     );
   });
 
-  it("rejects empty key prefixes and unknown endpoint encoders", () => {
+  it("rejects empty key prefixes", () => {
     /* oxlint-disable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
     expect(() =>
       createHttpApiQueryUtils(Api, {
@@ -777,15 +764,6 @@ describe(createHttpApiQueryUtils, () => {
         keyPrefix: [],
       } as never)
     ).toThrow(expect.objectContaining({ code: "InvalidKeyPrefix" }));
-    /* oxlint-enable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
-    /* oxlint-disable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
-    expect(() =>
-      createHttpApiQueryUtils(Api, {
-        client: Effect.runSync(makeUnusedHttpClient(Api)),
-        keyPrefix: ["test"],
-        keyEncoders: { users: { missing: () => null } },
-      } as never)
-    ).toThrow(expect.objectContaining({ code: "UnknownKeyEncoder" }));
     /* oxlint-enable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
   });
 

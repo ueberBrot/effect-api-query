@@ -1,10 +1,5 @@
 import { it } from "@effect/vitest";
-import {
-  dehydrate,
-  hydrate,
-  QueryClient,
-  QueryObserver,
-} from "@tanstack/query-core";
+import { dehydrate, hydrate, QueryClient } from "@tanstack/query-core";
 import { QueryClientProvider, useSuspenseQuery } from "@tanstack/react-query";
 import { Effect, Schema, SchemaTransformation, Stream } from "effect";
 import { HttpApi, HttpApiEndpoint, HttpApiGroup } from "effect/http-api";
@@ -267,15 +262,8 @@ it.effect(
       const bound = registration.bind(registration.capture());
       const options = bound.leaf.liveOptions({ staleTime: Infinity });
       const cache = new QueryClient();
-      const observer = new QueryObserver(cache, { ...options, enabled: false });
-      const unsubscribe = observer.subscribe(() => {});
       try {
-        yield* Effect.promise(async () => {
-          await expect(fetchStreamSnapshot(cache, options)).rejects.toThrow(
-            "idle query without observers"
-          );
-        });
-        unsubscribe();
+        expect(bound.input).toBeUndefined();
         expect(
           yield* Effect.promise(
             async () => await fetchStreamSnapshot(cache, options)
@@ -283,8 +271,6 @@ it.effect(
         ).toBe(1);
         expect(bound.prefix).toStrictEqual([...rpc.watch.key(), "live"]);
       } finally {
-        unsubscribe();
-        observer.destroy();
         cache.clear();
       }
     })

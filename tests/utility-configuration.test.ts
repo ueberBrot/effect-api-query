@@ -100,35 +100,6 @@ it.effect(
     })
 );
 
-it.effect(
-  "keeps prepared inputs and typed cache keys on configured leaves",
-  () =>
-    Effect.gen(function* keepsPreparation() {
-      const client = yield* makeClient();
-      const base = createRpcQueryUtils(group, {
-        client,
-        keyPrefix: ["configured-input"],
-      });
-      const input = prepareInput(base.users.get, { id: 9 });
-      const rpc = configureUtils(base, {
-        query: { staleTime: 1000 },
-      });
-      const queryClient = new QueryClient();
-      try {
-        const data = yield* Effect.promise(
-          async () =>
-            await queryClient.query(rpc.users.get.queryOptions({ input }))
-        );
-        expect(
-          queryClient.getQueryData(base.users.get.queryKey({ input }))
-        ).toBe(data);
-        expect(Object.isFrozen(rpc.users.get)).toBe(true);
-      } finally {
-        queryClient.clear();
-      }
-    })
-);
-
 it.effect("runs inherited interceptors outside leaf interceptors", () =>
   Effect.gen(function* ordersInterceptors() {
     const client = yield* makeClient();

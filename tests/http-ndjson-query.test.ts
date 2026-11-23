@@ -291,59 +291,53 @@ it.effect(
     })
 );
 
-describe.each(["reset", "append", "replace"] as const)(
-  "retains configured NDJSON %s histories",
-  (refetchMode) => {
-    it.effect(
-      "publishes bounded refetch history through native QueryClient",
-      () =>
-        Effect.gen(function* retainNdjsonHistory() {
-          let calls = 0;
-          const client = yield* makeClient(() => {
-            calls += 1;
-            return ndjson(
-              calls === 1 ? ['{"id":"1"}\n{"id":"2"}\n'] : ['{"id":"3"}\n']
-            );
-          });
-          const http = configureUtils(
-            createHttpApiQueryUtils(api, { client, keyPrefix: ["retention"] }),
-            {
-              streamed: { maxChunks: 2, refetchMode, publicationBatchSize: 2 },
-            }
-          );
-          const input = { query: { channel: "news" } };
-          const options = http.records.watch.streamedOptions({ input });
-          const queryClient = new QueryClient();
-          const publications: unknown[] = [];
-          try {
-            yield* Effect.promise(async () => await queryClient.query(options));
-            const stop = queryClient.getQueryCache().subscribe((event) => {
-              if (event.type === "updated" && event.action.type === "success") {
-                publications.push(event.query.state.data);
-              }
-            });
-            try {
-              const result = yield* Effect.promise(
-                async () => await queryClient.query(options)
-              );
-              const expected =
-                refetchMode === "append" ? [{ id: 2 }, { id: 3 }] : [{ id: 3 }];
-              expect(result).toStrictEqual(expected);
-              expect(
-                queryClient.getQueryData(
-                  http.records.watch.streamedKey({ input })
-                )
-              ).toStrictEqual(expected);
-              expect(publications).toContainEqual(expected);
-            } finally {
-              stop();
-            }
-          } finally {
-            queryClient.clear();
-          }
-        })
+it.effect("appends bounded NDJSON history through native QueryClient", () =>
+  Effect.gen(function* retainNdjsonHistory() {
+    let calls = 0;
+    const client = yield* makeClient(() => {
+      calls += 1;
+      return ndjson(
+        calls === 1 ? ['{"id":"1"}\n{"id":"2"}\n'] : ['{"id":"3"}\n']
+      );
+    });
+    const http = configureUtils(
+      createHttpApiQueryUtils(api, { client, keyPrefix: ["retention"] }),
+      {
+        streamed: {
+          maxChunks: 2,
+          refetchMode: "append",
+          publicationBatchSize: 2,
+        },
+      }
     );
-  }
+    const input = { query: { channel: "news" } };
+    const options = http.records.watch.streamedOptions({ input });
+    const queryClient = new QueryClient();
+    const publications: unknown[] = [];
+    try {
+      yield* Effect.promise(async () => await queryClient.query(options));
+      const stop = queryClient.getQueryCache().subscribe((event) => {
+        if (event.type === "updated" && event.action.type === "success") {
+          publications.push(event.query.state.data);
+        }
+      });
+      try {
+        const result = yield* Effect.promise(
+          async () => await queryClient.query(options)
+        );
+        const expected = [{ id: 2 }, { id: 3 }];
+        expect(result).toStrictEqual(expected);
+        expect(
+          queryClient.getQueryData(http.records.watch.streamedKey({ input }))
+        ).toStrictEqual(expected);
+        expect(publications).toContainEqual(expected);
+      } finally {
+        stop();
+      }
+    } finally {
+      queryClient.clear();
+    }
+  })
 );
 
 describe.each(

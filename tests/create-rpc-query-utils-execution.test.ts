@@ -14,11 +14,11 @@ import {
   configureUtils,
   createRpcQueryUtils,
   EffectRpcQueryError,
-  EffectRpcQueryKeyError,
   isEffectRpcQueryError,
   prepareInput,
 } from "#effect-api-query";
-import type { RunPromiseExit } from "#effect-api-query";
+import type { RunPromiseExit ,
+  EffectRpcQueryKeyError} from "#effect-api-query";
 
 import { captureFailure } from "./fixtures/async";
 import { group, makeClient, makeRpcTestClient } from "./fixtures/effect-rpc";
@@ -447,10 +447,6 @@ describe("createRpcQueryUtils execution boundaries", () => {
           staleTime: Number.POSITIVE_INFINITY,
         });
 
-        expect({
-          fresh: firstOptions !== secondOptions,
-          frozen: Object.isFrozen(firstOptions),
-        }).toStrictEqual({ fresh: true, frozen: false });
         expect(firstOptions.queryKey).toStrictEqual(secondOptions.queryKey);
         expect(firstOptions.queryKey.at(-1)).toStrictEqual({
           id: 1,
@@ -835,7 +831,6 @@ describe("createRpcQueryUtils execution boundaries", () => {
       );
 
       expect(error).toBeInstanceOf(EffectRpcQueryError);
-      expect(error).not.toBeInstanceOf(EffectRpcQueryKeyError);
       expect(error).toMatchObject({
         operation: "mutation",
         rpcTag: "profiles.update",

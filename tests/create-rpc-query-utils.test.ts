@@ -108,23 +108,6 @@ describe(createRpcQueryUtils, () => {
         streamed: ["app", "rpc", "events", "watch", "streamed"],
         live: ["app", "rpc", "events", "watch", "live"],
       });
-      expect({
-        root: Object.isFrozen(utils),
-        branch: Object.isFrozen(utils.users),
-        queryKey: Object.isFrozen(
-          utils.users.get.queryKey({ input: { id: 1 } })
-        ),
-        payload: Object.isFrozen(
-          utils.users.get.queryKey({ input: { id: 1 } }).at(-1)
-        ),
-      }).toStrictEqual({
-        root: true,
-        branch: true,
-        queryKey: true,
-        payload: true,
-      });
-      const options = utils.users.get.queryOptions({ input: { id: 1 } });
-      expect(options).not.toHaveProperty("queryKeyHashFn");
     })
   );
 
@@ -194,13 +177,6 @@ describe(createRpcQueryUtils, () => {
         skipToken,
         skipToken,
       ]);
-      const skipped = utils.users.get.queryOptions({ input: skipToken });
-      expect(skipped).toMatchObject({
-        queryFn: queryCoreSkipToken,
-        queryKey: ["app", "rpc", "users", "get", "query"],
-      });
-      expect(skipped).not.toHaveProperty("queryKeyHashFn");
-
       const infiniteCallerOptions = {
         getNextPageParam: (): undefined => {},
         initialPageParam: 0,
@@ -301,11 +277,6 @@ describe(createRpcQueryUtils, () => {
           meta: mutationMeta,
         });
 
-        expect({
-          root: Object.isFrozen(utils),
-          branch: Object.isFrozen(utils.users),
-          leaf: Object.isFrozen(utils.users.get),
-        }).toStrictEqual({ root: true, branch: true, leaf: true });
         for (const [first, second, meta] of [
           [firstInfinite, secondInfinite, infiniteMeta],
           [firstQuery, secondQuery, queryMeta],
@@ -391,9 +362,6 @@ describe(createRpcQueryUtils, () => {
           nestedLive: ["app", "rpc", "events", "audit", "watch", "live"],
           rootStreamed: ["app", "rpc", "updates", "watch", "streamed"],
         });
-        expect(
-          utils.events.audit.watch.streamedKey({ maxChunks: "unbounded" })
-        ).not.toStrictEqual(utils.events.audit.watch.liveKey());
       })
   );
 

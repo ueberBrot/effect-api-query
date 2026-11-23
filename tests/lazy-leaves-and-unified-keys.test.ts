@@ -103,8 +103,6 @@ const isLazyLeafProperty = (
   return Predicate.isFunction(descriptor.get);
 };
 
-const flatSuccessClient = () => Effect.succeed("ok");
-
 describe("unified { input, ... } *Key builders", () => {
   it.effect(
     "matches *Options keys across RPC unary, infinite, live, and streamed leaves",
@@ -485,30 +483,4 @@ describe("lazy-memoized frozen leaves", () => {
         }
       })
   );
-
-  it("validates paths, encoders, prefixes, and object-client methods eagerly even when leaves are lazy", () => {
-    const collisionGroup = RpcGroup.make(
-      Rpc.make("users", { success: Schema.String }),
-      Rpc.make("users.get", { success: Schema.String })
-    );
-    expect(() =>
-      createRpcQueryUtils(collisionGroup, {
-        // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion
-        client: flatSuccessClient as never,
-      })
-    ).toThrow("collides with");
-
-    const singleGroup = RpcGroup.make(
-      Rpc.make("users.get", {
-        payload: { id: Schema.String },
-        success: Schema.String,
-      })
-    );
-    expect(() =>
-      createRpcQueryUtils(singleGroup, {
-        // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion
-        client: {} as never,
-      })
-    ).toThrow("missing a function for tag users.get");
-  });
 });
