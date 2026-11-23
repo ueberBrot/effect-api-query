@@ -11,6 +11,7 @@ import type {
 } from "@tanstack/query-core";
 import { Cause, Exit, Predicate } from "effect";
 
+import { isCallback } from "./configure";
 import type {
   RuntimeMutationBuilder,
   RuntimeMutationFunction,
@@ -247,6 +248,13 @@ export const acquireQueryOwner = async <A>(
   const wrapLeafExecution = (
     rebuilt: RuntimeUtilityNode
   ): RuntimeUtilityNode => {
+    const { call } = rebuilt;
+    if (isCallback(call)) {
+      rebuilt["call"] = async (options?: RuntimeOptions) => {
+        assertActive();
+        return await call(options);
+      };
+    }
     for (const view of queryOptionNames) {
       if (!Object.hasOwn(rebuilt, view)) {
         continue;

@@ -25,10 +25,10 @@ export type RuntimeQueryBuilder = (
 export type RuntimeMutationBuilder = (
   options?: RuntimeOptions
 ) => RuntimeOptions & { readonly mutationFn: RuntimeMutationFunction };
-type RuntimeCallback = (...args: unknown[]) => unknown;
+export type RuntimeCallback = (...args: unknown[]) => unknown;
 /* oxlint-enable anti-slop/no-unsafe-dictionary-type, anti-slop/no-unknown-parameters, anti-slop/no-unknown-returns */
 
-const isCallback = (value: unknown): value is RuntimeCallback =>
+export const isCallback = (value: unknown): value is RuntimeCallback =>
   Predicate.isFunction(value);
 
 const createBuilderRegistry = <Base extends object>() => {
