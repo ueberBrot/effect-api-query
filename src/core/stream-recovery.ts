@@ -10,6 +10,8 @@ import {
   Stream,
 } from "effect";
 
+import { closeScopeOnPullEnd } from "./stream-pull";
+
 /** Local delivery state; it does not acknowledge server-side persistence or cleanup. */
 export type StreamConnectionState<E, C = number> =
   | {
@@ -147,11 +149,7 @@ const recoverWithPolicy = <A, E, R, C, EG, RG, EF, RF, RS>(
           );
           return {
             pull: Effect.uninterruptibleMask((restore) =>
-              restore(pull).pipe(
-                Effect.onError((cause) =>
-                  Scope.close(scope, Pull.doneExitFromCause(cause))
-                )
-              )
+              closeScopeOnPullEnd(scope, restore(pull))
             ),
           };
         });

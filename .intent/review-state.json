@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "fab14881d79134248ae9471f69350c166224d6612504bae65af2fc244b86e60f",
+      "fingerprint": "03c2bb24681e2cc226459e11623d877e96a635a85704e3693c8660c00d6d495a",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -240,9 +240,10 @@
         "src/core/schema-structural-sharing.ts": "7ebd221a5730f652f0e88fbc52c418b8bba173172bf49971d6988e5a021b3ac0",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
         "src/core/stream-publication.ts": "0ecae3160d553d5b9d2b940abab3ccb93c610c77a2baed2dd2a70704c6771b89",
-        "src/core/stream-recovery.ts": "ecc7fb61c6cb8b8f1617a2bfa69387b64e3e224c09f1f5f6f47964bd256f1bbd",
+        "src/core/stream-pull.ts": "9b7957b4487ddcdce2183f55c6f08e6cddee011c5d5e5b8c7b72ec839a7e3c42",
+        "src/core/stream-recovery.ts": "d0a3b8a043ed39bb3f18bb3381e6e082ae7e5cb8584c3247bc24840594c431bd",
         "src/core/stream-snapshot.ts": "5c31085e7f22c8242b42443f5468a160a6dd6a779a29bedcc5a9c14d7a855402",
-        "src/core/streamed-query.ts": "087110a6f270c6891271dc989d94e0199ab9c7b2eb982479aa9d6f16fad9da32",
+        "src/core/streamed-query.ts": "eccd0c1aa564096ccc5c489e27ffb6437a4ae5650766d233595eff263e29cf99",
         "src/core/types.ts": "666e2a4d5d7f3c94d392a9ced105246122b48f4fa1bc30ca001e1c26a9425b61",
         "src/core/utility-node.ts": "8c3eb7adeec4cf49d5a475d34e785d060abd39f6a9a6049dc48a390cae0df74b",
         "src/core/utility-path.ts": "d46bb166dd03d2163063339a9cd6228dbcdeafea6ae14ad908bdb4ec6244f13e",
@@ -407,15 +408,15 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "7858500859e0578a9c82b2e7ac43b0dc81a66487",
+      "head": "e5319c674561ea0b376d65448343e63763e26aa4",
       "outcome": "no-change",
-      "reason": "Buffered execution shares the runtime and Cause handling across unary and metadata views.",
+      "reason": "Stream queries and recovery share scope cleanup on pull completion with existing scope ownership and error mapping.",
       "evidence": [
-        "Changed: src/core/runtime.ts at 7858500859e0578a9c82b2e7ac43b0dc81a66487"
+        "Changed: src/core/stream-pull.ts, src/core/stream-recovery.ts at e5319c674561ea0b376d65448343e63763e26aa4"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "1bfa61bf7ae8edd082ccc8e8034f399e57c084372ec09a69683460a0913c384d",
+      "fingerprint": "aca35bfa8fb8ab8876335c134eb691828b6e2caddb3ef0912d37f4a5f663dfb0",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -655,9 +656,10 @@
         "src/core/schema-structural-sharing.ts": "7ebd221a5730f652f0e88fbc52c418b8bba173172bf49971d6988e5a021b3ac0",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
         "src/core/stream-publication.ts": "0ecae3160d553d5b9d2b940abab3ccb93c610c77a2baed2dd2a70704c6771b89",
-        "src/core/stream-recovery.ts": "ecc7fb61c6cb8b8f1617a2bfa69387b64e3e224c09f1f5f6f47964bd256f1bbd",
+        "src/core/stream-pull.ts": "9b7957b4487ddcdce2183f55c6f08e6cddee011c5d5e5b8c7b72ec839a7e3c42",
+        "src/core/stream-recovery.ts": "d0a3b8a043ed39bb3f18bb3381e6e082ae7e5cb8584c3247bc24840594c431bd",
         "src/core/stream-snapshot.ts": "5c31085e7f22c8242b42443f5468a160a6dd6a779a29bedcc5a9c14d7a855402",
-        "src/core/streamed-query.ts": "087110a6f270c6891271dc989d94e0199ab9c7b2eb982479aa9d6f16fad9da32",
+        "src/core/streamed-query.ts": "eccd0c1aa564096ccc5c489e27ffb6437a4ae5650766d233595eff263e29cf99",
         "src/core/types.ts": "666e2a4d5d7f3c94d392a9ced105246122b48f4fa1bc30ca001e1c26a9425b61",
         "src/core/utility-node.ts": "8c3eb7adeec4cf49d5a475d34e785d060abd39f6a9a6049dc48a390cae0df74b",
         "src/core/utility-path.ts": "d46bb166dd03d2163063339a9cd6228dbcdeafea6ae14ad908bdb4ec6244f13e",
@@ -822,11 +824,11 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "7858500859e0578a9c82b2e7ac43b0dc81a66487",
+      "head": "e5319c674561ea0b376d65448343e63763e26aa4",
       "outcome": "no-change",
-      "reason": "Buffered execution shares the runtime and Cause handling across unary and metadata views.",
+      "reason": "Stream queries and recovery share scope cleanup on pull completion with existing scope ownership and error mapping.",
       "evidence": [
-        "Changed: src/core/runtime.ts at 7858500859e0578a9c82b2e7ac43b0dc81a66487"
+        "Changed: src/core/stream-pull.ts, src/core/stream-recovery.ts at e5319c674561ea0b376d65448343e63763e26aa4"
       ]
     },
     "source:vite.config.ts": {

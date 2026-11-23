@@ -15,6 +15,7 @@ import {
   streamLiveSnapshots,
   streamPublicationBatches,
 } from "./stream-publication";
+import { closeScopeOnPullEnd } from "./stream-pull";
 import type {
   LivePolicyOptions,
   RunPromiseExit,
@@ -255,10 +256,7 @@ export const makeStreamQuery = ({
           Effect.succeed(
             Effect.uninterruptibleMask((restore) =>
               // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
-              restore(pull).pipe(
-                Effect.onError((cause) =>
-                  Scope.close(scope, Pull.doneExitFromCause(cause))
-                ),
+              closeScopeOnPullEnd(scope, restore(pull)).pipe(
                 Effect.catchCause((cause) => {
                   const completion = Pull.filterDone(cause);
                   if (
