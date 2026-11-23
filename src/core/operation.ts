@@ -67,16 +67,22 @@ export interface QueryPreparation {
   readonly makeQuery: (input: unknown) => QueryFunction;
 }
 
+interface StreamPreparation {
+  readonly identity: readonly JsonValue[];
+  readonly makeQuery: (
+    input: unknown,
+    runner: RunPromiseExit<unknown>,
+    requestOptions: unknown
+  ) => QueryFunction;
+}
+
 export interface StreamingOperation extends OperationIdentity {
   readonly kind: "Streaming";
   readonly input: OperationInput;
   readonly prepareStream: (
     options: Record<string, unknown>,
-    operation: "live" | "streamed",
-    runner: RunPromiseExit<unknown>,
-
-    requestOptions: unknown
-  ) => QueryPreparation;
+    operation: "live" | "streamed"
+  ) => StreamPreparation;
 }
 
 export type OperationDescription =

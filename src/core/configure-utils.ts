@@ -23,6 +23,7 @@ import type {
   QueryPolicy,
 } from "./policy";
 import { inputKind } from "./prepared-input";
+import { isStreamPolicyOption } from "./streamed-query";
 import type {
   OwnedMutationOption,
   StreamedPolicyOptions,
@@ -496,22 +497,14 @@ const mutationOptions = new Set<string>([
   MutationObserverOptions,
   OwnedMutationOption | "onMutate"
 >)[]);
-const streamOptions = new Set([
-  "maxChunks",
-  "publicationBatchSize",
-  "publicationMaxWaitMs",
-  "refetchMode",
-  "sseOptions",
-]);
-
 const validateViewOption = (view: ConfigurationViews, name: string) => {
   const valid =
     name === "interceptors" ||
     (view === "mutation"
       ? name === "callbacks" || mutationOptions.has(name)
       : queryOptions.has(name) ||
-        (view === "streamed" && streamOptions.has(name)) ||
-        (view === "live" && (name === "coalesceMs" || name === "sseOptions")));
+        ((view === "streamed" || view === "live") &&
+          isStreamPolicyOption(view, name)));
   if (!valid) {
     throw new TypeError(`Unknown ${view} configuration option: ${name}`);
   }

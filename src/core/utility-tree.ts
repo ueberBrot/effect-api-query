@@ -26,7 +26,7 @@ import {
 } from "./prepared-input";
 import type { QueryFilter, QueryFilterOptions } from "./query-filter";
 import { resolveRuntime } from "./runtime";
-import { clearStreamPolicy } from "./streamed-query";
+import { clearStreamPolicy, hasStreamPolicy } from "./streamed-query";
 import type {
   JsonValue,
   LivePolicyOptions,
@@ -133,21 +133,11 @@ type LeafFilterOptions = QueryFilterOptions &
     readonly sseOptions?: unknown;
   };
 
-const streamPolicyKeys = [
-  "coalesceMs",
-  "maxChunks",
-  "refetchMode",
-  "publicationBatchSize",
-  "publicationMaxWaitMs",
-  "sseOptions",
-] as const;
-
 const createLeafFilter =
   (
     description: UnaryOperation | StreamingOperation,
     operationKey: readonly JsonValue[],
-    keyEncoder: RuntimeKeyEncoder | undefined,
-    runPromiseExit: RunPromiseExit<unknown>
+    keyEncoder: RuntimeKeyEncoder | undefined
   ) =>
   (
     argument: LeafFilterOptions = {},
@@ -164,13 +154,9 @@ const createLeafFilter =
     const identity =
       description.kind === "Streaming" &&
       (view === "live" || view === "streamed") &&
-      streamPolicyKeys.some((key) => Object.hasOwn(options, key))
-        ? description.prepareStream(
-            { ...defaults?.[view], ...options },
-            view,
-            runPromiseExit,
-            undefined
-          ).identity
+      hasStreamPolicy(options)
+        ? description.prepareStream({ ...defaults?.[view], ...options }, view)
+            .identity
         : undefined;
     let queryKey = prefix;
     if (hasInput || (inputless && identity)) {
@@ -184,7 +170,6 @@ const createLeafFilter =
     }
     if (identity) {
       clearStreamPolicy(options);
-      delete options.sseOptions;
     }
     const filter = { ...options, queryKey };
     const hasCanonicalInput = hasInput && !inputless;
@@ -500,12 +485,7 @@ const createUnaryBuilders = (
         );
 
   return {
-    queryFilter: createLeafFilter(
-      description,
-      operationKey,
-      keyEncoder,
-      runPromiseExit
-    ),
+    queryFilter: createLeafFilter(description, operationKey, keyEncoder),
     ...createInfiniteBuilders(
       description,
       operationKey,
@@ -530,36 +510,29 @@ const createStreamingBuilders = (
   keyEncoder: RuntimeKeyEncoder | undefined,
   runPromiseExit: RunPromiseExit<unknown>
 ) => {
-  const createView = (operation: "live" | "streamed") => {
-    const prepare = (
-      options: Record<string, unknown>,
-
-      requestOptions?: unknown
-    ) =>
-      description.prepareStream(
-        options,
-        operation,
-        runPromiseExit,
-        requestOptions
-      );
-    return createQueryBuilders(
+  const createView = (operation: "live" | "streamed") =>
+    createQueryBuilders(
       description,
       freezeKey([...operationKey, operation]),
       keyEncoder,
-      prepare,
-      (options) => prepare(options).identity
+      (options, requestOptions) => {
+        const { identity, makeQuery } = description.prepareStream(
+          options,
+          operation
+        );
+        return {
+          identity,
+          makeQuery: (input) =>
+            makeQuery(input, runPromiseExit, requestOptions),
+        };
+      },
+      (options) => description.prepareStream(options, operation).identity
     );
-  };
   const live = createView("live");
   const streamed = createView("streamed");
 
   return {
-    queryFilter: createLeafFilter(
-      description,
-      operationKey,
-      keyEncoder,
-      runPromiseExit
-    ),
+    queryFilter: createLeafFilter(description, operationKey, keyEncoder),
     liveKey: live.key,
     liveOptions: live.options,
     streamedKey: streamed.key,
