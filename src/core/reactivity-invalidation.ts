@@ -1,14 +1,13 @@
-import { noop } from "@tanstack/query-core";
 import type {
   InvalidateOptions,
   InvalidateQueryFilters,
-  QueryClient,
 } from "@tanstack/query-core";
-import { Array as Arr, Effect } from "effect";
+import { Array as Arr, Effect, Latch, Queue } from "effect";
 import type { Scope } from "effect";
 import type { Reactivity } from "effect/reactivity";
 
-import { QueryClientService } from "./query-effects";
+import { queryEffects } from "./query-effects";
+import type { QueryClientService } from "./query-effects";
 
 /** Maps Effect Reactivity keys to explicit TanStack Query filters. */
 export interface ReactivityInvalidationBinding {
@@ -44,95 +43,114 @@ const sanitizeKeys = (
   return entries.length === 0 ? undefined : Object.fromEntries(entries);
 };
 
-const registerBindings = (
+const reportFailure = (
+  onError: ((error: unknown) => void | PromiseLike<void>) | undefined,
+  error: unknown
+): Effect.Effect<void> =>
+  onError === undefined
+    ? Effect.void
+    : Effect.tryPromise(async () => {
+        await onError(error);
+      }).pipe(Effect.ignore);
+
+const bindWorker = Effect.fnUntraced(function* bindWorker(
   reactivity: Reactivity.Reactivity,
-  client: QueryClient,
   bindings: readonly ReactivityInvalidationBinding[],
   options: ReactivityInvalidationOptions | undefined
-) => {
-  const inFlight = new Set<Promise<void>>();
-  const pending = new Set<ReactivityInvalidationBinding>();
+) {
+  const queue = yield* Queue.unbounded<ReactivityInvalidationBinding>();
+  const idle = yield* Latch.make(true);
   const unregister: (() => void)[] = [];
   let closed = false;
 
   const isActive = () => !closed && options?.isActive?.() !== false;
   const onError: ((error: unknown) => void | PromiseLike<void>) | undefined =
     options?.onError;
-  const report = async (error: unknown): Promise<void> => {
-    await onError?.(error);
-  };
-  const runPass = async (): Promise<void> => {
-    const batch = [...pending];
-    pending.clear();
-    await Promise.all(
-      batch.flatMap((binding) =>
-        Arr.ensure<InvalidateQueryFilters>(binding.filter).map(
-          async (filter) => {
-            try {
-              if (isActive()) {
-                await client.invalidateQueries(
-                  filter,
-                  binding.options ?? options?.invalidateOptions
-                );
-              }
-            } catch (error) {
-              await report(error).catch(noop);
-            }
-          }
-        )
-      )
+
+  const invalidateFilter = (
+    filter: InvalidateQueryFilters,
+    invalidateOptions: InvalidateOptions | undefined
+  ): Effect.Effect<void, never, QueryClientService> =>
+    Effect.suspend(() =>
+      isActive()
+        ? queryEffects
+            .invalidate(filter, invalidateOptions)
+            .pipe(Effect.catch(({ cause }) => reportFailure(onError, cause)))
+        : Effect.void
     );
-  };
-  const enqueue = (binding: ReactivityInvalidationBinding): void => {
-    if (!isActive()) {
-      return;
-    }
-    if (pending.size === 0) {
-      const pass = Promise.resolve()
-        .then(runPass)
-        .catch(report)
-        .catch(noop)
-        .finally(() => {
-          inFlight.delete(pass);
-        });
-      inFlight.add(pass);
-    }
-    pending.add(binding);
-  };
+
+  const runPass = (
+    batch: readonly ReactivityInvalidationBinding[]
+  ): Effect.Effect<void, never, QueryClientService> =>
+    Effect.forEach(
+      new Set(batch),
+      (binding) => {
+        const invalidateOptions = binding.options ?? options?.invalidateOptions;
+        return Effect.forEach(
+          Arr.ensure<InvalidateQueryFilters>(binding.filter),
+          (filter) => invalidateFilter(filter, invalidateOptions),
+          { concurrency: "unbounded", discard: true }
+        );
+      },
+      { concurrency: "unbounded", discard: true }
+    );
+
+  const worker = Effect.forever(
+    Effect.gen(function* processBatch() {
+      const batch = yield* Queue.takeAll(queue);
+      yield* runPass(batch);
+      yield* Effect.sync(() => {
+        if (Queue.sizeUnsafe(queue) === 0) {
+          idle.openUnsafe();
+        }
+      });
+    })
+  ).pipe(Effect.ensuring(idle.open));
+
+  yield* Effect.forkScoped(worker);
 
   const close = () => {
     closed = true;
-    pending.clear();
     for (const release of unregister) {
       release();
     }
     unregister.length = 0;
+    Queue.shutdownUnsafe(queue);
+    idle.openUnsafe();
   };
-  try {
-    for (const binding of bindings) {
-      const keys = sanitizeKeys(binding.keys);
-      if (keys !== undefined) {
-        unregister.push(
-          reactivity.registerUnsafe(keys, () => {
-            enqueue(binding);
-          })
-        );
-      }
-    }
-  } catch (error) {
-    close();
-    throw error;
-  }
 
-  const flush: Effect.Effect<void> = Effect.suspend(() =>
-    inFlight.size === 0
-      ? Effect.void
-      : Effect.promise(async () => {
-          await Promise.all(inFlight);
-        }).pipe(Effect.andThen(flush))
+  const enqueue = (binding: ReactivityInvalidationBinding): void => {
+    if (!isActive()) {
+      return;
+    }
+    if (Queue.offerUnsafe(queue, binding)) {
+      idle.closeUnsafe();
+    }
+  };
+
+  yield* Effect.acquireRelease(
+    Effect.sync(() => {
+      try {
+        for (const binding of bindings) {
+          const keys = sanitizeKeys(binding.keys);
+          if (keys !== undefined) {
+            unregister.push(
+              reactivity.registerUnsafe(keys, () => {
+                enqueue(binding);
+              })
+            );
+          }
+        }
+      } catch (error) {
+        close();
+        throw error;
+      }
+    }),
+    () => Effect.sync(close)
   );
-  return { close, flush };
-};
+
+  return { flush: idle.await };
+});
 
 /**
  * Loads Effect Reactivity and subscribes the current QueryClient until the Scope closes.
@@ -146,18 +164,12 @@ export const bindReactivityInvalidation = (
   never,
   Scope.Scope | Reactivity.Reactivity | QueryClientService
 > =>
-  Effect.flatMap(
-    Effect.promise(async () => await import("effect/reactivity/Reactivity")),
-    ({ Reactivity: tag }) =>
-      Effect.gen(function* bindSubscriptions() {
-        const reactivity = yield* tag;
-        const client = yield* QueryClientService;
-        const { flush } = yield* Effect.acquireRelease(
-          Effect.sync(() =>
-            registerBindings(reactivity, client, bindings, options)
-          ),
-          (bridge) => Effect.sync(bridge.close)
-        );
-        return { flush };
-      })
+  Effect.promise(async () => await import("effect/reactivity/Reactivity")).pipe(
+    Effect.flatMap(({ Reactivity: tag }) =>
+      tag.pipe(
+        Effect.flatMap((reactivity) =>
+          bindWorker(reactivity, bindings, options)
+        )
+      )
+    )
   );

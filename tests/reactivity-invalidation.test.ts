@@ -1,6 +1,6 @@
 import { expect, it } from "@effect/vitest";
 import { QueryClient } from "@tanstack/query-core";
-import { Deferred, Effect, Fiber } from "effect";
+import { Deferred, Effect, Exit, Fiber, Scope } from "effect";
 import { Reactivity } from "effect/reactivity";
 
 import {
@@ -343,5 +343,122 @@ it.effect(
           await running;
         });
       }
+    })
+);
+
+it.effect(
+  "coalesces triggers that arrive while a pass is in flight and releases concurrent flush waiters",
+  () =>
+    Effect.gen(function* verifyInFlightCoalescing() {
+      const queryClient = new QueryClient();
+      const reactivity = yield* Reactivity.make;
+      const runPromise = Effect.runPromiseWith(yield* Effect.context());
+      const started = yield* Deferred.make<undefined>();
+      const release = yield* Deferred.make<number>();
+      const user = ["user"];
+      const groupKey = ["group"];
+      let groupMatches = 0;
+
+      queryClient.setQueryDefaults(user, {
+        queryFn: async () =>
+          await runPromise(
+            Deferred.succeed(started, undefined).pipe(
+              Effect.andThen(Deferred.await(release))
+            )
+          ),
+      });
+      queryClient.setQueryData(user, 1);
+      queryClient.setQueryData(groupKey, 1);
+
+      const bridge = yield* bindReactivityInvalidation([
+        { keys: ["users:1"], filter: { queryKey: user, refetchType: "all" } },
+        {
+          keys: { groups: [1, 2] },
+          filter: {
+            queryKey: groupKey,
+            refetchType: "none",
+            predicate: () => {
+              groupMatches += 1;
+              return true;
+            },
+          },
+        },
+      ]).pipe(
+        Effect.provideService(Reactivity.Reactivity, reactivity),
+        Effect.provideService(QueryClientService, queryClient)
+      );
+
+      reactivity.invalidateUnsafe(["users:1"]);
+      yield* Deferred.await(started);
+
+      const firstWaiter = yield* Effect.forkChild(bridge.flush, {
+        startImmediately: true,
+      });
+      const secondWaiter = yield* Effect.forkChild(bridge.flush, {
+        startImmediately: true,
+      });
+
+      reactivity.invalidateUnsafe({ groups: [1] });
+      reactivity.invalidateUnsafe({ groups: [2] });
+      yield* Deferred.succeed(release, 2);
+
+      yield* Fiber.join(firstWaiter);
+      yield* Fiber.join(secondWaiter);
+
+      expect(queryClient.getQueryData(user)).toBe(2);
+      expect(queryClient.getQueryState(groupKey)?.isInvalidated).toBe(true);
+      expect(groupMatches).toBe(1);
+    })
+);
+
+it.effect(
+  "unblocks flush and stops queued work when the Scope closes during an in-flight invalidation",
+  () =>
+    Effect.gen(function* verifyScopeCloseDuringInFlight() {
+      const queryClient = new QueryClient();
+      const reactivity = yield* Reactivity.make;
+      const runPromise = Effect.runPromiseWith(yield* Effect.context());
+      const started = yield* Deferred.make<undefined>();
+      const release = yield* Deferred.make<number>();
+      const user = ["user"];
+      const groupKey = ["group"];
+
+      queryClient.setQueryDefaults(user, {
+        queryFn: async () =>
+          await runPromise(
+            Deferred.succeed(started, undefined).pipe(
+              Effect.andThen(Deferred.await(release))
+            )
+          ),
+      });
+      queryClient.setQueryData(user, 1);
+      queryClient.setQueryData(groupKey, 1);
+
+      const scope = yield* Scope.make();
+      const bridge = yield* bindReactivityInvalidation([
+        { keys: ["users:1"], filter: { queryKey: user, refetchType: "all" } },
+        {
+          keys: ["groups"],
+          filter: { queryKey: groupKey, refetchType: "none" },
+        },
+      ]).pipe(
+        Effect.provideService(Scope.Scope, scope),
+        Effect.provideService(Reactivity.Reactivity, reactivity),
+        Effect.provideService(QueryClientService, queryClient)
+      );
+
+      reactivity.invalidateUnsafe(["users:1"]);
+      yield* Deferred.await(started);
+      const waiter = yield* Effect.forkChild(bridge.flush, {
+        startImmediately: true,
+      });
+      reactivity.invalidateUnsafe(["groups"]);
+
+      yield* Scope.close(scope, Exit.void);
+      yield* Fiber.join(waiter);
+      expect(queryClient.getQueryState(groupKey)?.isInvalidated).toBe(false);
+
+      yield* Deferred.succeed(release, 2);
+      yield* bridge.flush;
     })
 );
