@@ -1,5 +1,7 @@
+import path from "node:path";
+
 import { strict as effectStrict } from "@effect/tsgo/oxlint-presets";
-import { ConfigProvider, Effect, Predicate } from "effect";
+import { Predicate } from "effect";
 import ultraciteOxfmt from "ultracite/oxfmt";
 import ultraciteAntiSlop from "ultracite/oxlint/anti-slop";
 import ultraciteCore from "ultracite/oxlint/core";
@@ -28,7 +30,7 @@ const ignoredPaths = [
   "test-results/**",
 ];
 
-const testFiles = ["tests/**/*.test.ts", "examples/**/*.test.{ts,tsx}"];
+const testFiles = ["tests/**/*.test.{ts,tsx}", "examples/**/*.test.{ts,tsx}"];
 const effectTestBlocks = [
   "it.effect",
   "it.live",
@@ -98,7 +100,14 @@ export default defineConfig({
       effectStrict,
       vitestPreset,
     ],
-    jsPlugins: [...ultraciteAntiSlop.jsPlugins, ...ultraciteShadcn.jsPlugins],
+    jsPlugins: [
+      ...ultraciteAntiSlop.jsPlugins,
+      ...ultraciteShadcn.jsPlugins,
+      {
+        name: "repo",
+        specifier: path.resolve("scripts/oxlint-no-comments.mts"),
+      },
+    ],
     settings: {
       shadcn: {
         componentImports: ["(?:^|/)components/"],
@@ -119,6 +128,17 @@ export default defineConfig({
       "anti-slop/require-readable-spacing": "off",
       "effecttsgo/any-unknown-in-error-context": "error",
       "effecttsgo/unsafe-effect-type-assertion": "error",
+      "repo/no-comments": [
+        "error",
+        {
+          publicApiPrefixes: ["src/"],
+          ratchet: {
+            "src/core/configure-utils.ts": 2,
+            "src/core/configure.ts": 2,
+            "src/core/query-descriptor.ts": 1,
+          },
+        },
+      ],
     },
     overrides: [
       {
@@ -143,7 +163,7 @@ export default defineConfig({
       },
       {
         files: [
-          "src/**/*.ts",
+          "src/**/*.{ts,tsx}",
           "examples/**/src/**/*.{ts,tsx}",
           "examples/shared/**/*.ts",
           "scripts/**/*.mts",
@@ -176,6 +196,8 @@ export default defineConfig({
           "src/core/metadata-query.ts",
           "src/core/schema-structural-sharing.ts",
           "src/core/configure-utils.ts",
+          "src/core/contract-hydration.ts",
+          "src/core/reactivity-invalidation.ts",
         ],
         rules: {
           "anti-slop/no-unknown-parameters": "off",
@@ -243,7 +265,11 @@ export default defineConfig({
       },
       {
         ...ultraciteReact,
-        files: ["examples/**/*.{ts,tsx}"],
+        files: [
+          "src/react/**/*.{ts,tsx}",
+          "tests/**/*.test.tsx",
+          "examples/**/*.{ts,tsx}",
+        ],
       },
       {
         files: ["examples/**/*.{ts,tsx}"],
@@ -259,6 +285,7 @@ export default defineConfig({
       },
       {
         files: [
+          "src/core/reactivity-invalidation.ts",
           "examples/contracts/src/client.ts",
           "examples/contracts/src/contracts.ts",
           "examples/contracts/src/http-api.ts",
@@ -285,9 +312,13 @@ export default defineConfig({
           "scripts/measure-structural-sharing.mts",
           "scripts/measure-streams.mts",
           "tests/utility-configuration.test.ts",
+          "tests/lazy-leaves-and-unified-keys.test.ts",
           "tests/configuration-composition.test.ts",
+          "src/core/contract-hydration.ts",
+          "src/core/contract-hydration-types.ts",
           "src/http/create-utils.ts",
           "src/http/operation.ts",
+          "src/http/endpoint.ts",
           "src/http/request.ts",
           "src/http/streamed-query.ts",
           "src/http/types.ts",
@@ -329,6 +360,7 @@ export default defineConfig({
           "tests/http-structural-sharing.test.ts",
           "tests/http-semantic-keys.test.ts",
           "tests/http-transport-cancellation.test.ts",
+          "tests/contract-hydration.test.ts",
           "tests/hydration-codecs.test.ts",
           "tests/query-filter.test.ts",
           "tests/query-usability.test.ts",
@@ -336,6 +368,7 @@ export default defineConfig({
           "tests/skills/query-usability/grade.test.ts",
           "tests/query-policy.test.ts",
           "tests/query-effects.test.ts",
+          "tests/reactivity-invalidation.test.ts",
           "tests/query-descriptor.test.ts",
           "tests/integrated-workflows.test.ts",
           "examples/shared/query-effects.ts",
@@ -377,6 +410,7 @@ export default defineConfig({
       "examples/**/*.test.ts",
       "examples/**/*.test.tsx",
       "tests/**/*.test.ts",
+      "tests/**/*.test.tsx",
     ],
     passWithNoTests: true,
   },
@@ -387,8 +421,20 @@ export default defineConfig({
     },
     clean: true,
     deps: {
-      neverBundle: ["effect", "@tanstack/query-core"],
-      onlyImport: ["effect", "@tanstack/query-core"],
+      neverBundle: [
+        "effect",
+        "@tanstack/query-core",
+        "react",
+        "react/jsx-runtime",
+        "@tanstack/react-query",
+      ],
+      onlyImport: [
+        "effect",
+        "@tanstack/query-core",
+        "react",
+        "react/jsx-runtime",
+        "@tanstack/react-query",
+      ],
     },
     dts: {
       generator: "tsgo",
@@ -397,7 +443,10 @@ export default defineConfig({
         path: compilerExecutable(),
       },
     },
-    entry: ["src/index.ts"],
+    entry: {
+      index: "src/index.ts",
+      react: "src/react/index.tsx",
+    },
     format: ["esm"],
     publint: {
       level: "error",
@@ -610,7 +659,6 @@ export default defineConfig({
         cache: false,
       },
       "docs-sync": {
-        // Root typed linting includes docs files that import Astro's generated modules.
         command: "vp -C apps/docs exec astro sync",
         cache: {
           output: ["apps/docs/.astro/**"],
@@ -633,18 +681,6 @@ export default defineConfig({
           output: [],
         },
       },
-      "docs-e2e": {
-        command: "playwright test --config playwright.docs.config.ts",
-        cache: false,
-        dependsOn:
-          Effect.runSync(
-            ConfigProvider.fromEnv({ preserveEmptyStrings: true }).load([
-              "DOCS_BASE_URL",
-            ])
-          )?.value === undefined
-            ? ["docs-build"]
-            : [],
-      },
       "docs-preview": {
         command: "vp run --filter @effect-api-query/docs preview",
         cache: false,
@@ -662,7 +698,6 @@ export default defineConfig({
           "vp run vite-react-build",
           "vp run tanstack-start-build",
           "vp run docs-build",
-          "vp run docs-e2e",
           "vp run e2e",
         ],
         cache: false,

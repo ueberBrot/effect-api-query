@@ -13,10 +13,12 @@ import {
 import { tmpdir } from "node:os";
 import path from "node:path";
 
+import { Predicate } from "effect";
 import { describe, expect, it } from "vitest";
 
 import manifest from "../package.json" with { type: "json" };
 import { currentCompiler } from "../scripts/compiler.mts";
+import { readWorkflow, workflowValue } from "./fixtures/workflow";
 
 const script = path.resolve(
   import.meta.dirname,
@@ -86,35 +88,52 @@ const push = (cwd: string, base: string, state?: string, deletion = false) =>
 
 describe("repository workflow guards", () => {
   it("pins the Playwright image to the package version and a digest", () => {
-    const workflow = readFileSync(
-      new URL("../.github/workflows/playwright.yml", import.meta.url),
-      "utf-8"
-    );
-    const image =
-      /^\s+image: mcr\.microsoft\.com\/playwright:v(?<version>[^\s-]+)-noble@sha256:[\da-f]{64}$/mu.exec(
-        workflow
-      )?.groups?.["version"];
-    expect(image).toBe(manifest.devDependencies["@playwright/test"]);
+    const workflow = readWorkflow("playwright");
+    const image = workflowValue(workflow, [
+      "jobs",
+      "shards",
+      "container",
+      "image",
+    ]);
+    const reference =
+      /^mcr\.microsoft\.com\/playwright:v(?<version>[^\s-]+)-noble@sha256:[\da-f]{64}$/u;
+    expect(
+      Predicate.isString(image)
+        ? reference.exec(image)?.groups?.["version"]
+        : undefined
+    ).toBe(manifest.devDependencies["@playwright/test"]);
   });
 
   it("starts PR browser jobs independently and tests the prepared artifacts for releases", () => {
-    const workflow = readFileSync(
-      new URL("../.github/workflows/ci.yml", import.meta.url),
-      "utf-8"
+    const workflow = readWorkflow("ci");
+    const pullRequest = "browser-shards";
+    const artifacts = "browser-shards-from-artifacts";
+    expect({
+      runLocally: workflowValue(workflow, [
+        "jobs",
+        pullRequest,
+        "with",
+        "build-locally",
+      ]),
+      pullRequestWhen: workflowValue(workflow, ["jobs", pullRequest, "if"]),
+      pullRequestNeeds: workflowValue(workflow, ["jobs", pullRequest, "needs"]),
+      useArtifacts: workflowValue(workflow, [
+        "jobs",
+        artifacts,
+        "with",
+        "build-locally",
+      ]),
+      artifactsWhen: workflowValue(workflow, ["jobs", artifacts, "if"]),
+    }).toStrictEqual({
+      runLocally: true,
+      pullRequestWhen: "github.event_name == 'pull_request'",
+      pullRequestNeeds: undefined,
+      useArtifacts: false,
+      artifactsWhen: "github.event_name != 'pull_request'",
+    });
+    expect(workflowValue(workflow, ["jobs", artifacts, "needs"])).toStrictEqual(
+      expect.arrayContaining(["example-builds", "documentation"])
     );
-    const [, browserJobs] = workflow.split("\n  browser-shards:\n");
-    const [pullRequest, artifactJobAndGate] = (browserJobs ?? "").split(
-      "\n  browser-shards-from-artifacts:\n"
-    );
-    const [artifacts] = (artifactJobAndGate ?? "").split("\n  browser:\n");
-
-    expect(pullRequest).toContain("if: github.event_name == 'pull_request'");
-    expect(pullRequest).toContain("build-locally: true");
-    expect(pullRequest).not.toContain("needs:");
-    expect(artifacts).toContain(
-      "if: github.event_name != 'pull_request'\n    needs: [example-builds, documentation]"
-    );
-    expect(artifacts).toContain("build-locally: false");
   });
 
   it.each([
@@ -136,8 +155,12 @@ describe("repository workflow guards", () => {
     withRepository((cwd) => {
       write(cwd, "PLAN.md");
       git(cwd, "add", "PLAN.md");
-      mkdirSync(path.join(cwd, "scripts"));
+      mkdirSync(path.join(cwd, "scripts/lib"), { recursive: true });
       cpSync(script, path.join(cwd, "scripts/check-workflow.mts"));
+      cpSync(
+        path.resolve(import.meta.dirname, "../scripts/lib/exec.mts"),
+        path.join(cwd, "scripts/lib/exec.mts")
+      );
       symlinkSync(
         path.resolve(import.meta.dirname, "../node_modules"),
         path.join(cwd, "node_modules")
@@ -177,9 +200,12 @@ describe("repository workflow guards", () => {
 
   it("blocks a merged branch before running checks", () => {
     withRepository((cwd, base) => {
+      write(cwd, "vite.config.ts", "export default {};\n");
+      save(cwd);
       const result = push(cwd, base, "false\ttrue");
       expect(result.status).toBe(1);
       expect(result.stderr).toContain("already merged");
+      expect(existsSync(path.join(cwd, ".git/checks"))).toBe(false);
     });
   });
 
@@ -205,13 +231,16 @@ describe("repository workflow guards", () => {
       write(cwd, "docs/example.md");
       save(cwd);
       expect(push(cwd, base, "true\ttrue").status).toBe(0);
+      expect(existsSync(path.join(cwd, ".git/checks"))).toBe(false);
     });
   });
 
   it("rejects dirty checkouts rather than validating unpushed edits", () => {
     withRepository((cwd, base) => {
       write(cwd, "README.md", "changed\n");
-      expect(push(cwd, base).stderr).toContain("Commit or stash");
+      const result = push(cwd, base);
+      expect(result.status).toBe(1);
+      expect(result.stderr).toContain("Commit or stash");
     });
   });
 

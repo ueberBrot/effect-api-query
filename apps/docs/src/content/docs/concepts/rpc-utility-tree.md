@@ -3,7 +3,7 @@ title: RPC Utility Tree
 description: Understand how RPC tags become nested query utilities.
 ---
 
-`createRpcQueryUtils` builds a frozen object with methods for each RPC. Dots in tags become nested properties.
+`createRpcQueryUtils` validates the full contract and freezes the branches. Dots in tags become nested properties. The first access to a leaf builds and freezes it. Later accesses return the same leaf.
 
 | RPC tag                    | Generated path                            |
 | -------------------------- | ----------------------------------------- |

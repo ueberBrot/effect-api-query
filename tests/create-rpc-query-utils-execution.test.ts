@@ -10,17 +10,117 @@ import { Context, Deferred, Effect, Equal, Exit, Schema } from "effect";
 import { Rpc, RpcGroup } from "effect/rpc";
 
 import {
+  acquireQueryOwner,
+  configureUtils,
   createRpcQueryUtils,
   EffectRpcQueryError,
-  EffectRpcQueryKeyError,
   isEffectRpcQueryError,
+  prepareInput,
 } from "#effect-api-query";
-import type { RunPromiseExit } from "#effect-api-query";
+import type { RunPromiseExit, EffectRpcQueryKeyError } from "#effect-api-query";
 
 import { captureFailure } from "./fixtures/async";
 import { group, makeClient, makeRpcTestClient } from "./fixtures/effect-rpc";
 
 describe("createRpcQueryUtils execution boundaries", () => {
+  it.effect("executes unary leaves with raw success and prepared input", () =>
+    Effect.gen(function* executeDirectRpc() {
+      const client = yield* makeClient();
+      const encodedIds: number[] = [];
+      const utils = createRpcQueryUtils(group, {
+        client,
+        keyEncoders: {
+          "users.get": ({ id }) => {
+            encodedIds.push(id);
+            return id;
+          },
+        },
+      });
+      const input = prepareInput(utils.users.get, { id: 7 });
+      const configured = configureUtils(utils.users.get, {
+        query: { staleTime: 500 },
+      });
+      const raw = yield* Effect.promise(
+        async () => await captureFailure(utils.health.ping.call())
+      );
+      const expected = { id: 7, locale: "en", name: "Ada" };
+      const user = yield* Effect.promise(
+        async () => await configured.call({ input })
+      );
+      const effectValue = yield* configured.effect({ input });
+      expect({ raw, user, effectValue, encodedIds }).toStrictEqual({
+        encodedIds: [7],
+        raw: undefined,
+        user: expected,
+        effectValue: expected,
+      });
+      expect(() =>
+        createRpcQueryUtils(group, { client }).users.get.effect({ input })
+      ).toThrow("Prepared input belongs to another utility leaf");
+      const error = yield* Effect.promise(
+        async () => await captureFailure(utils.diagnostics.fail.call())
+      );
+      expect(error).toMatchObject({
+        _tag: "EffectRpcQueryError",
+        operation: "call",
+      });
+      expect(yield* Effect.flip(utils.diagnostics.fail.effect())).toBe(
+        "declared-failure"
+      );
+      expect(
+        ["call", "effect"].some((key) => Object.hasOwn(utils.events.watch, key))
+      ).toBe(false);
+    }).pipe(Effect.scoped)
+  );
+
+  it("tracks direct calls through the inherited runtime and honors abort signals", async () => {
+    const contract = RpcGroup.make(Rpc.make("wait", { success: Schema.Void }));
+    const started = Deferred.makeUnsafe<undefined>();
+    const finalized = Deferred.makeUnsafe<undefined>();
+    const client = {
+      wait: () =>
+        Deferred.succeed(started, undefined).pipe(
+          Effect.andThen(Effect.never),
+          Effect.onInterrupt(() => Deferred.succeed(finalized, undefined))
+        ),
+    };
+    const runtime = {
+      runner: Effect.runPromiseExit,
+      async runPromiseExit<A, E>(
+        this: { readonly runner: RunPromiseExit },
+        effect: Effect.Effect<A, E>,
+        options?: { readonly signal?: AbortSignal }
+      ) {
+        return await this.runner(effect, options);
+      },
+    };
+    const utils = createRpcQueryUtils(contract, { client, runtime });
+    const owner = await acquireQueryOwner(
+      async () => await Promise.resolve(utils)
+    );
+    const tracked = owner.trackUtils(utils).wait;
+    const controller = new AbortController();
+    const interrupted = captureFailure(
+      tracked.call({ signal: controller.signal })
+    );
+    await Effect.runPromise(Deferred.await(started));
+    controller.abort();
+    await expect(interrupted).resolves.toMatchObject({
+      operation: "call",
+      cause: { reasons: [expect.objectContaining({ _tag: "Interrupt" })] },
+    });
+    await Effect.runPromise(Deferred.await(finalized));
+
+    const duringRetirement = captureFailure(
+      tracked.call({ signal: new AbortController().signal })
+    );
+    await owner.dispose();
+    await expect(duringRetirement).resolves.toMatchObject({
+      operation: "call",
+    });
+    await expect(tracked.call()).rejects.toThrow("Query owner is retired");
+  });
+
   it.effect("executes and advances infinite queries through Query Core", () =>
     Effect.gen(function* advanceInfiniteQueries() {
       const ListPage = Rpc.make("pages.list", {
@@ -82,7 +182,7 @@ describe("createRpcQueryUtils execution boundaries", () => {
         pages: [{ cursor: 0, nextCursor: 1, values: [0, 1] }],
       });
       expect({ queryKey: options.queryKey, meta: options.meta }).toStrictEqual({
-        queryKey: utils.pages.list.infiniteKey({ cursor: 0 }),
+        queryKey: utils.pages.list.infiniteKey({ input: { cursor: 0 } }),
         meta: { source: "infinite-test" },
       });
 
@@ -103,7 +203,7 @@ describe("createRpcQueryUtils execution boundaries", () => {
 
       yield* Effect.promise(async () => {
         await queryClient.invalidateQueries({
-          queryKey: utils.pages.list.infiniteKey({ cursor: 0 }),
+          queryKey: utils.pages.list.infiniteKey({ input: { cursor: 0 } }),
         });
       });
       yield* Effect.promise(async () => {
@@ -281,7 +381,7 @@ describe("createRpcQueryUtils execution boundaries", () => {
             "encoding.update": (payload) => payload,
           },
           keyPrefix: ["app"] as const,
-          runPromiseExit,
+          runtime: runPromiseExit,
         });
 
         const mutation = new MutationObserver(
@@ -346,10 +446,6 @@ describe("createRpcQueryUtils execution boundaries", () => {
           staleTime: Number.POSITIVE_INFINITY,
         });
 
-        expect({
-          fresh: firstOptions !== secondOptions,
-          frozen: Object.isFrozen(firstOptions),
-        }).toStrictEqual({ fresh: true, frozen: false });
         expect(firstOptions.queryKey).toStrictEqual(secondOptions.queryKey);
         expect(firstOptions.queryKey.at(-1)).toStrictEqual({
           id: 1,
@@ -734,7 +830,6 @@ describe("createRpcQueryUtils execution boundaries", () => {
       );
 
       expect(error).toBeInstanceOf(EffectRpcQueryError);
-      expect(error).not.toBeInstanceOf(EffectRpcQueryKeyError);
       expect(error).toMatchObject({
         operation: "mutation",
         rpcTag: "profiles.update",
@@ -797,7 +892,7 @@ describe("createRpcQueryUtils execution boundaries", () => {
       const utils = createRpcQueryUtils(group, {
         client,
         keyPrefix: ["app"] as const,
-        runPromiseExit,
+        runtime: runPromiseExit,
       });
 
       yield* Effect.promise(async () => {
@@ -830,7 +925,7 @@ describe("createRpcQueryUtils execution boundaries", () => {
       const utils = createRpcQueryUtils(group, {
         client,
         keyPrefix: ["app"] as const,
-        runPromiseExit,
+        runtime: runPromiseExit,
       });
       const mutation = new MutationObserver(
         new QueryClient(),
@@ -883,7 +978,7 @@ describe("createRpcQueryUtils execution boundaries", () => {
       const utils = createRpcQueryUtils(group, {
         client,
         keyPrefix: ["app"] as const,
-        runPromiseExit,
+        runtime: runPromiseExit,
       });
 
       const query = queryClient.query(utils.health.ping.queryOptions());

@@ -10,11 +10,11 @@ Your application acquires the Effect client and releases it when work is done. U
 3. Keep these resources alive while queries, streams, or mutations use them.
 4. Stop consumers and cancel queries. Wait for local stream cleanup and accepted mutations. Clear the cache, then release the client and runtime.
 
-Give each server request its own resources. Keep browser resources alive for the lifetime of the app or cache owner.
+Give each server request its own resources. Keep browser resources alive for the lifetime of the app or cache owner. A browser window and a dedicated worker each own their own client, runner, Scope, and QueryClient. Wait for local cleanup before you terminate a worker.
 
 ## HTTP clients and execution services
 
-The factory defaults to `Effect.runPromiseExit` for Effects that need no services. If a supported endpoint needs services to encode requests or decode responses, supply a runner that provides them. Provide any services the client still needs. Forward the runner's `options` so query cancellation reaches Effect. A custom key encoder only builds cache identity. Supply execution services separately.
+Service-free Effects use the default runner. If the client, request encoder, or response decoder needs services, pass a ManagedRuntime as `runtime`. Its layer must have a `never` error type. If you pass a runner function, forward its options so query cancellation reaches Effect. A custom key encoder only builds cache identity. Supply execution services separately.
 
 Set authentication and request middleware on the HTTP client before passing it to the factory. If middleware changes results by user or tenant, include a safe identifier in `keyPrefix`. See the [HTTP factory](/effect-api-query/reference/http-factory/) for request input and key encoders.
 

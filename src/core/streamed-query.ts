@@ -15,7 +15,13 @@ import {
   streamLiveSnapshots,
   streamPublicationBatches,
 } from "./stream-publication";
-import type { RunPromiseExit, StreamRefetchMode } from "./types";
+import { closeScopeOnPullEnd } from "./stream-pull";
+import type {
+  LivePolicyOptions,
+  RunPromiseExit,
+  StreamedPolicyOptions,
+  StreamRefetchMode,
+} from "./types";
 
 export type StreamQueryPolicy =
   | {
@@ -43,6 +49,38 @@ const validatePublicationDeadline: (
       publicationMaxWaitMs > 2_147_483_647)
   ) {
     throw new RangeError(`${option} must be an integer from 1 to 2147483647`);
+  }
+};
+
+const policyFields = [
+  "coalesceMs",
+  "maxChunks",
+  "refetchMode",
+  "publicationBatchSize",
+  "publicationMaxWaitMs",
+  "sseOptions",
+];
+
+export const isStreamPolicyOption = (
+  view: "live" | "streamed",
+  name: string
+): boolean =>
+  name === "sseOptions" ||
+  (policyFields.includes(name) &&
+    (name === "coalesceMs") === (view === "live"));
+
+export type StreamPolicyFields = {
+  -readonly [
+    Key in keyof (StreamedPolicyOptions & LivePolicyOptions)
+  ]?: (StreamedPolicyOptions & LivePolicyOptions)[Key];
+} & { sseOptions?: unknown };
+
+export const hasStreamPolicy = (options: StreamPolicyFields): boolean =>
+  policyFields.some((key) => Object.hasOwn(options, key));
+
+export const clearStreamPolicy = (options: StreamPolicyFields): void => {
+  for (const key of policyFields) {
+    Reflect.deleteProperty(options, key);
   }
 };
 
@@ -105,11 +143,7 @@ export const prepareStreamPolicy = (
     validatePublicationDeadline(options["coalesceMs"], "coalesceMs");
     policy = { _tag: "Live", coalesceMs: options["coalesceMs"] };
   }
-  delete options["coalesceMs"];
-  delete options["refetchMode"];
-  delete options["maxChunks"];
-  delete options["publicationBatchSize"];
-  delete options["publicationMaxWaitMs"];
+  clearStreamPolicy(options);
   if (policy._tag === "Live") {
     return {
       policy,
@@ -143,7 +177,6 @@ export interface MakeStreamQueryOptions {
   readonly runPromiseExit: RunPromiseExit<unknown>;
 }
 
-// Query Core owns fetch/retry/observer state; this consumer owns stream publication.
 const consumeQueryStream = async <A, Data>(
   context: QueryFunctionContext,
   stream: AsyncIterable<A>,
@@ -156,7 +189,6 @@ const consumeQueryStream = async <A, Data>(
       break;
     }
     client.setQueryData<Data>(queryKey, (previous) =>
-      // Cached null is a value, not an absent entry.
       // oxlint-disable-next-line typescript/prefer-nullish-coalescing
       reducer(previous === undefined ? initialValue : previous, value)
     );
@@ -222,10 +254,7 @@ export const makeStreamQuery = ({
           Effect.succeed(
             Effect.uninterruptibleMask((restore) =>
               // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
-              restore(pull).pipe(
-                Effect.onError((cause) =>
-                  Scope.close(scope, Pull.doneExitFromCause(cause))
-                ),
+              closeScopeOnPullEnd(scope, restore(pull)).pipe(
                 Effect.catchCause((cause) => {
                   const completion = Pull.filterDone(cause);
                   if (

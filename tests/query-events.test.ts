@@ -11,7 +11,7 @@ import {
 
 import { directory } from "../examples/shared/query-effects";
 import { acquireDirectoryEvents } from "../examples/shared/query-events";
-import { makeRpcTestClient } from "./fixtures/effect-rpc";
+import { makeObjectRpcTestClient } from "./fixtures/effect-rpc";
 
 const gate = () => {
   let open!: () => void;
@@ -252,7 +252,7 @@ describe("owner event consumption", () => {
     await Effect.runPromise(
       Effect.scoped(
         Effect.gen(function* eventWorkflow() {
-          const client = yield* makeRpcTestClient(directory, {
+          const client = yield* makeObjectRpcTestClient(directory, {
             "users.read": ({ id }) => Effect.succeed({ id, name: "server" }),
           });
           yield* Effect.promise(async () => {
@@ -283,7 +283,9 @@ describe("owner event consumption", () => {
                 })
             );
             const { owner } = app;
-            const key = owner.resources.rpc.users.read.queryKey({ id: 1 });
+            const key = owner.resources.rpc.users.read.queryKey({
+              input: { id: 1 },
+            });
             const values: unknown[] = [];
             const unsubscribe = owner.queryClient
               .getQueryCache()
@@ -300,7 +302,7 @@ describe("owner event consumption", () => {
             });
             expect(
               owner.queryClient.getQueryData(
-                owner.resources.rpc.users.read.queryKey({ id: 2 })
+                owner.resources.rpc.users.read.queryKey({ input: { id: 2 } })
               )
             ).toStrictEqual({ id: 2, name: "refreshed" });
             expect(owner.queryClient.getQueryState(key)?.isInvalidated).toBe(

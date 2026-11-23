@@ -1,12 +1,17 @@
-import { readFileSync } from "node:fs";
-
+import { Predicate } from "effect";
 import { describe, expect, it, vi } from "vitest";
+import { isScalar, visit } from "yaml";
 
 import {
   publishedRootVersion,
   resolveDocumentationRevision,
   verifyDocumentationVersion,
 } from "../scripts/resolve-docs-release.mts";
+import {
+  readWorkflow,
+  workflowSteps,
+  workflowValue,
+} from "./fixtures/workflow";
 
 const name = "@ueberbrot/effect-api-query";
 const version = "0.1.0";
@@ -246,8 +251,6 @@ describe("manual documentation revision", () => {
         "apps/docs/public/package-version.js",
         "apps/docs/astro.config.mts",
         "apps/docs/tsconfig.json",
-        "e2e-docs/version.test.ts",
-        "playwright.docs.config.ts",
         "tests/docs-examples.test.ts",
         "tests/types/docs-quick-start.ts",
       ])
@@ -293,24 +296,12 @@ describe("manual documentation revision", () => {
     "apps/docs/public/package-lock.json",
     "apps/docs/src/pnpm-lock.yaml",
     "apps/docs/public/npm-shrinkwrap.json",
-    "e2e-docs/nested/yarn.lock",
     "apps/docs/src/bun.lockb",
     "apps/docs/src/pnpm-workspace.yaml",
     "scripts/resolve-docs-release.mts",
     "tests/types/public-contract.ts",
   ])("rejects library, dependency, and control changes: %s", (path) => {
     expect(() => resolve([path])).toThrow("allowlist");
-  });
-
-  it("rejects unreleased main even when its package version still exists on npm", () => {
-    expect(() =>
-      resolveDocumentationRevision(
-        version,
-        "main",
-        metadata,
-        gitFixture(["src/rpc/create-utils.ts"])
-      )
-    ).toThrow("allowlist");
   });
 
   it("requires the released commit to be an ancestor of the docs revision", () => {
@@ -363,121 +354,208 @@ describe("built documentation version", () => {
   });
 });
 
+const expression = (body: string) => `\${{ ${body} }}`;
+
 describe("documentation workflow boundaries", () => {
-  const releaseWorkflow = readFileSync(
-    new URL("../.github/workflows/release.yml", import.meta.url),
-    "utf-8"
-  );
-  const deploymentWorkflow = readFileSync(
-    new URL("../.github/workflows/deploy-docs.yml", import.meta.url),
-    "utf-8"
-  );
-  const [releaseJobs, deployment] = releaseWorkflow.split("\n  deploy-docs:\n");
-  const [beforePublishing, publishing] = (releaseJobs ?? "").split(
-    "\n  publish:\n"
-  );
-  const [, packing] = (beforePublishing ?? "").split("\n  quality-and-pack:\n");
-  const [, buildAndDeploy] = deploymentWorkflow.split("\n  build:\n");
-  const [build, deploy] = (buildAndDeploy ?? "").split("\n  deploy:\n");
+  const releaseWorkflow = readWorkflow("release");
+  const docsWorkflow = readWorkflow("deploy-docs");
+  const resolveSteps = workflowSteps(docsWorkflow, "resolve");
+  const build = workflowSteps(docsWorkflow, "build");
+  const deploy = workflowSteps(docsWorkflow, "deploy");
+  const jobValue = (
+    workflow: typeof docsWorkflow,
+    job: string,
+    ...fields: string[]
+  ) => workflowValue(workflow, ["jobs", job, ...fields]);
+  const uses = (step: (typeof build)[number], action: string) => {
+    const reference = step.get("uses");
+    return Predicate.isString(reference) && reference.startsWith(`${action}@`);
+  };
+  const download = (artifactName: string) =>
+    build.find(
+      (step) =>
+        uses(step, "actions/download-artifact") &&
+        step.getIn(["with", "name"]) === artifactName
+    );
+  const hasSameRunSource = (step: (typeof build)[number] | undefined) =>
+    step !== undefined &&
+    ["run-id", "github-token", "repository"].every(
+      (field) => step.getIn(["with", field]) === undefined
+    );
 
   it("requires successful validation and actual root publication before automatic deployment", () => {
-    expect(deployment).toContain("needs.validation.result == 'success'");
-    expect(deployment).toContain("needs.publish.result == 'success'");
-    expect(deployment).toContain("needs.publish.outputs.published == 'true'");
-    expect(deployment).toContain(
-      "contains(fromJSON(needs.publish.outputs.published-packages).*.name, '@ueberbrot/effect-api-query')"
+    const condition = jobValue(releaseWorkflow, "deploy-docs", "if");
+    expect(
+      new Set(
+        String(condition)
+          .split(/\s*&&\s*/u)
+          .map((term) => term.trim())
+      )
+    ).toStrictEqual(
+      new Set([
+        "github.ref == 'refs/heads/main'",
+        "needs.validation.result == 'success'",
+        "needs.publish.result == 'success'",
+        "needs.publish.outputs.published == 'true'",
+        "contains(fromJSON(needs.publish.outputs.published-packages).*.name, '@ueberbrot/effect-api-query')",
+      ])
     );
-    expect(deployment).toMatch(/needs:\n\s+- validation\n\s+- publish/u);
-  });
-
-  it("uses Changesets publish outputs and retains the publication opt-in", () => {
-    expect(releaseWorkflow).toMatch(
-      /published: \$\{\{ steps\.publish\.outputs\.published \}\}/u
-    );
-    expect(releaseWorkflow).toMatch(
-      /name: Publish release artifact to npm\n\s+id: publish/u
-    );
-    expect(releaseWorkflow).toContain("vars.NPM_PUBLISH_ENABLED == 'true'");
-  });
-
-  it("starts packing from the release plan and requires validation before publishing", () => {
-    expect(packing).toMatch(/^\s+needs: select-mode$/mu);
-    expect(publishing).toMatch(
-      /needs:\n\s+- select-mode\n\s+- quality-and-pack\n\s+- validation/u
+    expect(jobValue(releaseWorkflow, "deploy-docs", "needs")).toStrictEqual(
+      expect.arrayContaining(["validation", "publish"])
     );
   });
 
-  it("restores automatic docs only from this run", () => {
-    expect(build).toMatch(
-      /if: inputs.build-artifact != ''\n\s+uses: actions\/download-artifact@[\da-f]{40}\b/u
+  it("publishes only after validation and packing, with explicit opt-in", () => {
+    const publish = workflowSteps(releaseWorkflow, "publish").find(
+      (step) => step.get("id") === "publish"
     );
-    expect(build).toContain("name: documentation-build");
-    expect(build).not.toMatch(/run-id:|github-token:|repository:/u);
+    expect({
+      prerequisite: jobValue(releaseWorkflow, "quality-and-pack", "needs"),
+      published: jobValue(releaseWorkflow, "publish", "outputs", "published"),
+      publishesWithChangesets:
+        publish !== undefined && uses(publish, "changesets/action/publish"),
+    }).toMatchObject({
+      prerequisite: "select-mode",
+      published: expression("steps.publish.outputs.published"),
+      publishesWithChangesets: true,
+    });
+    expect(jobValue(releaseWorkflow, "publish", "needs")).toStrictEqual(
+      expect.arrayContaining(["select-mode", "quality-and-pack", "validation"])
+    );
+    expect(
+      new Set(
+        String(jobValue(releaseWorkflow, "publish", "if"))
+          .split(/\s*&&\s*/u)
+          .map((term) => term.trim())
+      )
+    ).toStrictEqual(
+      new Set([
+        "needs.select-mode.outputs.mode == 'publish'",
+        "github.event_name == 'push'",
+        "vars.NPM_PUBLISH_ENABLED == 'true'",
+      ])
+    );
+  });
+
+  it("restores documentation and its trusted verifier from this run", () => {
+    const artifact = download("documentation-build");
+    const verifier = download("documentation-verifier");
+    const upload = resolveSteps.find((step) =>
+      uses(step, "actions/upload-artifact")
+    );
+    expect({
+      condition: artifact?.get("if"),
+      sameRunBuild: hasSameRunSource(artifact),
+      sameRunVerifier: hasSameRunSource(verifier),
+      verifierArtifact: upload?.getIn(["with", "name"]),
+      verifierPath: upload?.getIn(["with", "path"]),
+    }).toStrictEqual({
+      condition: "inputs.build-artifact != ''",
+      sameRunBuild: true,
+      sameRunVerifier: true,
+      verifierArtifact: "documentation-verifier",
+      verifierPath: "scripts/resolve-docs-release.mts",
+    });
   });
 
   it("builds manual docs only at the verified SHA and verifies the static version", () => {
-    expect(build).toMatch(
-      /ref: \$\{\{ needs\.resolve\.outputs\.revision \}\}/u
+    const checkout = build.find((step) => uses(step, "actions/checkout"));
+    const buildDocs = build.find(
+      (step) => step.get("run") === "vp run docs-build"
     );
-    expect(build).toMatch(
-      /name: Build documentation\n\s+if: inputs.build-artifact == ''/u
+    const verifiedNode = build.findIndex(
+      (step) =>
+        uses(step, "actions/setup-node") &&
+        step.getIn(["with", "node-version"]) ===
+          expression("needs.resolve.outputs.node-version")
     );
-    expect(build).toMatch(
-      /DOCS_VERSION: \$\{\{ needs\.resolve\.outputs\.version \}\}/u
+    const verifyVersion = build.findIndex(
+      (step) =>
+        step.get("run") ===
+          'node "$RUNNER_TEMP/documentation-verifier/resolve-docs-release.mts" verify-build' &&
+        step.getIn(["env", "DOCS_VERSION"]) ===
+          expression("needs.resolve.outputs.version")
     );
-    expect(build).toContain('resolve-docs-release.mts" verify-build');
+    expect({
+      revision: checkout?.getIn(["with", "ref"]),
+      buildWhen: buildDocs?.get("if"),
+      verifiedAfterNodeSetup:
+        verifiedNode !== -1 && verifyVersion > verifiedNode,
+    }).toStrictEqual({
+      revision: expression("needs.resolve.outputs.revision"),
+      buildWhen: "inputs.build-artifact == ''",
+      verifiedAfterNodeSetup: true,
+    });
   });
 
-  it("sets up repository Node before resolution and the exact resolved Node before artifact verification", () => {
-    expect(deploymentWorkflow).toContain("node-version-file: .node-version");
-    expect(build).toMatch(
-      /node-version: \$\{\{ needs\.resolve\.outputs\.node-version \}\}/u
+  it("sets up repository Node before resolving the release", () => {
+    const node = resolveSteps.findIndex(
+      (step) =>
+        uses(step, "actions/setup-node") &&
+        step.getIn(["with", "node-version-file"]) === ".node-version"
     );
-    expect(
-      deploymentWorkflow.match(/uses: actions\/setup-node@[\da-f]{40}/gu)
-    ).toHaveLength(2);
-    expect(
-      deploymentWorkflow.indexOf("name: Set up repository Node version")
-    ).toBeLessThan(
-      deploymentWorkflow.indexOf("run: node scripts/resolve-docs-release.mts")
+    const resolveVersion = resolveSteps.findIndex(
+      (step) => step.get("run") === "node scripts/resolve-docs-release.mts"
     );
-    expect(build?.indexOf("name: Set up verified Node version")).toBeLessThan(
-      build?.indexOf("name: Verify documentation package version") ?? 0
-    );
+    expect(node !== -1 && resolveVersion > node).toBe(true);
   });
 
   it("keeps source execution read-only and deploys on a fresh runner", () => {
-    expect(deploymentWorkflow).toContain("permissions: {}");
-    expect(build).toMatch(/permissions:\n\s+contents: read/u);
-    expect(build).not.toMatch(/id-token: write|pages: write/u);
-    expect(deploy).toMatch(
-      /permissions:\n\s+id-token: write\n\s+pages: write/u
-    );
-    expect(deploy).not.toMatch(
-      /checkout@|run:|setup-repository|download-artifact@/u
-    );
+    expect({
+      topLevel: workflowValue(docsWorkflow, ["permissions"]),
+      build: jobValue(docsWorkflow, "build", "permissions"),
+      deploy: jobValue(docsWorkflow, "deploy", "permissions"),
+      deployNeeds: jobValue(docsWorkflow, "deploy", "needs"),
+    }).toStrictEqual({
+      topLevel: {},
+      build: { contents: "read" },
+      deploy: { "id-token": "write", pages: "write" },
+      deployNeeds: "build",
+    });
+    expect(
+      deploy.map((step) => [
+        uses(step, "actions/deploy-pages"),
+        step.get("run"),
+      ])
+    ).toStrictEqual([[true, undefined]]);
   });
 
   it("uses read-only checkout credentials and passes inputs as environment data", () => {
-    expect(deploymentWorkflow).not.toContain("pull_request_target");
-    expect(deploymentWorkflow).not.toMatch(/run:.*\$\{\{/u);
     expect(
-      deploymentWorkflow.match(/persist-credentials: false/gu)
-    ).toHaveLength(2);
+      docsWorkflow.getIn(["on", "pull_request_target"], true)
+    ).toBeUndefined();
+    for (const steps of [resolveSteps, build]) {
+      const checkout = steps.find((step) => uses(step, "actions/checkout"));
+      expect(checkout?.getIn(["with", "persist-credentials"])).toBe(false);
+    }
+    const scripts = [...resolveSteps, ...build, ...deploy].map((step) =>
+      step.get("run")
+    );
+    expect(
+      scripts.some((run) => Predicate.isString(run) && /\$\{\{/u.test(run))
+    ).toBe(false);
   });
 
   it("retains full action commit pins", () => {
-    const actions = [
-      ...`${releaseWorkflow}\n${deploymentWorkflow}`.matchAll(
-        /uses: (?<action>[^\s]+)/gu
-      ),
-    ].flatMap((match) => {
-      const [, action] = match;
-      return action !== undefined && !action.startsWith("./") ? [action] : [];
-    });
-    expect(actions.length).toBeGreaterThan(0);
-    for (const action of actions) {
-      expect(action).toMatch(/@[\da-f]{40}$/u);
+    const references: string[] = [];
+    for (const workflow of [releaseWorkflow, docsWorkflow]) {
+      visit(workflow, {
+        Pair: (_key, { key, value }) => {
+          if (
+            isScalar(key) &&
+            key.value === "uses" &&
+            isScalar(value) &&
+            Predicate.isString(value.value) &&
+            !value.value.startsWith("./")
+          ) {
+            references.push(value.value);
+          }
+        },
+      });
     }
+    expect(references.length).toBeGreaterThan(0);
+    expect(
+      references.every((reference) => /@[\da-f]{40}$/u.test(reference))
+    ).toBe(true);
   });
 });

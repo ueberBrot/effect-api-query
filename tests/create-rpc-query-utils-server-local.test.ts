@@ -119,7 +119,7 @@ describe("server-local ready-client construction", () => {
       const firstUtils = createRpcQueryUtils(group, {
         client: first,
         keyPrefix: ["local", "first-owner"],
-        runPromiseExit: async (effect, options) =>
+        runtime: async (effect, options) =>
           await Effect.runPromiseExit(
             RpcClient.withHeaders(effect, { "x-owner": "first-owner" }).pipe(
               Effect.provideService(RequestOwner, { name: "second-owner" })
@@ -130,7 +130,7 @@ describe("server-local ready-client construction", () => {
       const secondUtils = createRpcQueryUtils(group, {
         client: second,
         keyPrefix: ["local", "second-owner"],
-        runPromiseExit: async (effect, options) =>
+        runtime: async (effect, options) =>
           await Effect.runPromiseExit(
             RpcClient.withHeaders(effect, { "x-owner": "second-owner" }).pipe(
               Effect.provideService(RequestOwner, { name: "first-owner" })
@@ -153,11 +153,11 @@ describe("server-local ready-client construction", () => {
         Promise.all([
           Effect.runPromise(
             // oxlint-disable-next-line unicorn/no-useless-undefined
-            Effect.flip(first("owner.read", undefined))
+            Effect.flip(first["owner.read"](undefined))
           ),
           Effect.runPromise(
             Effect.flip(
-              first("owner.read", undefined, {
+              first["owner.read"](undefined, {
                 headers: { "x-owner": "second-owner" },
               })
             )
@@ -167,7 +167,7 @@ describe("server-local ready-client construction", () => {
 
       await Effect.runPromise(Scope.close(firstScope, Exit.void));
       const disposed = await Effect.runPromiseExit(
-        first("owner.read", undefined, {
+        first["owner.read"](undefined, {
           headers: { "x-owner": "first-owner" },
         })
       );
@@ -176,7 +176,7 @@ describe("server-local ready-client construction", () => {
       ).toBe(true);
       await expect(
         Effect.runPromise(
-          second("owner.read", undefined, {
+          second["owner.read"](undefined, {
             headers: { "x-owner": "second-owner" },
           })
         )
@@ -214,7 +214,7 @@ describe("server-local ready-client construction", () => {
       );
       const direct = await Effect.runPromiseExit(
         // oxlint-disable-next-line unicorn/no-useless-undefined
-        client("diagnostics.fail", undefined)
+        client["diagnostics.fail"](undefined)
       );
       if (Exit.isSuccess(direct)) {
         throw new Error("Expected the local client to fail");
@@ -230,7 +230,7 @@ describe("server-local ready-client construction", () => {
       const utils = createRpcQueryUtils(group, {
         client,
         keyPrefix: ["local"],
-        runPromiseExit: async (effect, options) => {
+        runtime: async (effect, options) => {
           const exit = await Effect.runPromiseExit(effect, options);
           if (Exit.isFailure(exit)) {
             queryCause = exit.cause;

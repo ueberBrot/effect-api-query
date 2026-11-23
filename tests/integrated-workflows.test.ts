@@ -1,6 +1,6 @@
 import { it } from "@effect/vitest";
 import { dehydrate, hydrate } from "@tanstack/query-core";
-import { Effect, Equivalence, Schema, Stream } from "effect";
+import { Effect, Equivalence, Exit, Schema, Stream } from "effect";
 import { Rpc, RpcGroup } from "effect/rpc";
 import { expect } from "vite-plus/test";
 
@@ -9,7 +9,7 @@ import {
   configureUtils,
   createQueryDescriptor,
   createRpcQueryUtils,
-  defineUtilsPolicy,
+  defineRpcPolicy,
   queryEffects,
   QueryClientService,
   recoverStream,
@@ -43,11 +43,15 @@ it.effect(
           const raw = createRpcQueryUtils(group, {
             client: setup.borrow(client),
             keyPrefix: ["combined"],
-            runPromiseExit: setup.wrapRunner(Effect.runPromiseExit),
+            runtime: setup.wrapRunner(Effect.runPromiseExit),
           });
-          const policy = defineUtilsPolicy<typeof raw>()({
-            query: { policy: { staleTime: Infinity, retry: false } },
-          });
+          const policy = defineRpcPolicy.withClientError<never>()(
+            group,
+            {
+              query: { staleTime: Infinity, retry: false },
+            },
+            { keyPrefix: ["combined"] }
+          );
           return await Promise.resolve(configureUtils(raw, policy));
         });
       yield* Effect.promise(async () => {
@@ -69,7 +73,7 @@ it.effect(
           const options = received.leaf.queryOptions({ input: received.input });
           const cached = await run(
             queryEffects
-              .ensure(options)
+              .query({ ...options, staleTime: "static" })
               .pipe(
                 Effect.provideService(QueryClientService, browser.queryClient)
               )
@@ -87,7 +91,12 @@ it.effect(
           browser.queryClient.setQueryDefaults(options.queryKey, {
             structuralSharing: sharing,
           });
-          await runQueryEvents(
+          const events: string[] = [];
+          const stored: (
+            | { readonly id: number; readonly name: string }
+            | undefined
+          )[] = [];
+          const consumed = await runQueryEvents(
             browser,
             recoverStream({
               initialCursor: "event-0",
@@ -97,16 +106,33 @@ it.effect(
               retryDelay: () => {},
             }),
             {
-              onEvent: () =>
+              onEvent: (event) =>
                 queryEffects
-                  .setData(options.queryKey, { id: 7, name: "initial" })
-                  .pipe(Effect.asVoid),
+                  .setData(options.queryKey, { id: 7, name: "updated" })
+                  .pipe(
+                    Effect.tap((data) =>
+                      Effect.sync(() => {
+                        events.push(event);
+                        stored.push(data);
+                      })
+                    ),
+                    Effect.asVoid
+                  ),
             },
             Effect.runPromiseExit
           );
-          expect(browser.queryClient.getQueryData(options.queryKey)).toBe(
-            cached
-          );
+          const updated = browser.queryClient.getQueryData(options.queryKey);
+          expect({
+            success: Exit.isSuccess(consumed),
+            events,
+            updated,
+            reused: updated === stored[0] && updated === stored[1],
+          }).toStrictEqual({
+            success: true,
+            events: ["event-1", "event-2"],
+            updated: { id: 7, name: "updated" },
+            reused: true,
+          });
 
           const live = browser.resources.watch.liveOptions({ coalesceMs: 50 });
           await expect(browser.queryClient.query(live)).resolves.toBe(3);
@@ -115,7 +141,7 @@ it.effect(
             cache.setQueryData(options.queryKey, { id: 7, name: "late" });
           });
           expect(browser.queryClient.getQueryData(options.queryKey)).toBe(
-            cached
+            updated
           );
         } finally {
           await server.dispose();

@@ -41,6 +41,6 @@ To transfer ordinary data, see [hydrate unary data](/effect-api-query/guides/hyd
 
 ## Configure the client and host
 
-Set up transport, authentication, and services before you pass the client to a factory. See [WebSocket clients](/effect-api-query/guides/websocket-clients/), [browser and worker hosts](/effect-api-query/reference/browser-and-worker-hosts/), and [stream tracing](/effect-api-query/guides/trace-streams/). If you consume an API through a generated OpenAPI client, see [external HTTP clients](/effect-api-query/reference/external-http-clients/).
+Set up transport, authentication, and services before you pass the client to a factory. See [WebSocket clients](/effect-api-query/guides/websocket-clients/), [client lifecycle](/effect-api-query/concepts/client-lifecycle/), and [stream tracing](/effect-api-query/guides/trace-streams/).
 
 For complete hosts and applications, [run the examples](/effect-api-query/examples/).

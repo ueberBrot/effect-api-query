@@ -1,22 +1,32 @@
 import type { DataTag, QueryKey } from "@tanstack/query-core";
-import type { Context, Schema, SchemaAST } from "effect";
+import type { Context, Effect, Schema, SchemaAST, Stream } from "effect";
 import type { Headers } from "effect/http";
 import type { Rpc, RpcClient, RpcGroup, RpcSchema } from "effect/rpc";
 
 import type { PreparedInput } from "../core/prepared-input";
 import type {
+  BranchQueryFilter,
+  LeafQueryFilter,
+  StreamedFilterPolicy,
+} from "../core/query-filter";
+import type {
   ContainsRedacted,
+  DirectArgs,
+  DirectCall,
   InfiniteQueryBuilder,
   InfiniteQueryKey,
   UnaryQueryBuilder,
   JsonValue,
   KeyBuilder,
   KeyEncoderRequirement,
+  OptionalKeyPrefix,
+  PathsFromTags,
   QueryData,
   RunnerRequirement,
   MutationBuilder,
   StreamedPolicyOptions,
   LivePolicyOptions,
+  utilityPaths,
 } from "../core/types";
 import type {
   EffectRpcQueryConfigError,
@@ -88,12 +98,12 @@ export type PayloadBearingRpcs<Group extends RpcGroup.Any> =
 
 export type ClientMiddlewareError<R extends Rpc.Any> =
   R extends Rpc.Rpc<
-    string,
-    Schema.Top,
-    Schema.Top,
-    Schema.Top,
+    infer _Tag,
+    infer _Payload,
+    infer _Success,
+    infer _Error,
     infer Middleware,
-    unknown
+    infer _Requires
   >
     ? Middleware["~ClientError"]
     : never;
@@ -187,7 +197,7 @@ export type QueryKeyBuilder<
   PayloadlessRpc<R>
 >;
 
-export type ConcreteInfiniteKey<
+export type RpcConcreteInfiniteKey<
   Prefix extends readonly JsonValue[],
   R extends Rpc.Any,
   ClientError,
@@ -220,7 +230,7 @@ export type InfiniteKeyBuilder<
   ClientError,
 > = KeyBuilder<
   Rpc.PayloadConstructor<R>,
-  ConcreteInfiniteKey<Prefix, R, ClientError>,
+  RpcConcreteInfiniteKey<Prefix, R, ClientError>,
   PayloadlessRpc<R>
 >;
 
@@ -300,20 +310,22 @@ export type StreamKeyBuilder<R extends Rpc.Any, Key> =
   PayloadlessRpc<R> extends true
     ? (policy?: LivePolicyOptions) => Key
     : (
-        input:
-          | Rpc.PayloadConstructor<R>
-          | PreparedInput<Rpc.PayloadConstructor<R>>,
-        policy?: LivePolicyOptions
+        options: {
+          readonly input:
+            | Rpc.PayloadConstructor<R>
+            | PreparedInput<Rpc.PayloadConstructor<R>>;
+        } & LivePolicyOptions
       ) => Key;
 
 export type StreamedKeyBuilder<R extends Rpc.Any, Key> =
   PayloadlessRpc<R> extends true
     ? (policy: StreamedPolicyOptions) => Key
     : (
-        input:
-          | Rpc.PayloadConstructor<R>
-          | PreparedInput<Rpc.PayloadConstructor<R>>,
-        policy: StreamedPolicyOptions
+        options: {
+          readonly input:
+            | Rpc.PayloadConstructor<R>
+            | PreparedInput<Rpc.PayloadConstructor<R>>;
+        } & StreamedPolicyOptions
       ) => Key;
 
 /** The key and option builders exposed at one streaming RPC path. */
@@ -324,6 +336,17 @@ export interface RpcStreamLeaf<
 > {
   /** Returns the immutable key prefix for this streaming RPC. */
   readonly key: () => RpcKey<Prefix, R>;
+
+  /** Builds native filters for this streaming RPC. */
+  readonly queryFilter: LeafQueryFilter<
+    Rpc.PayloadConstructor<R>,
+    PayloadlessRpc<R>,
+    "live" | "streamed",
+    {
+      readonly live: LivePolicyOptions;
+      readonly streamed: StreamedFilterPolicy<StreamedPolicyOptions>;
+    }
+  >;
 
   /** Builds a semantic key for the latest-value view of the stream. */
   readonly liveKey: StreamKeyBuilder<
@@ -343,12 +366,29 @@ export interface RpcStreamLeaf<
   readonly streamedOptions: StreamedOptionsBuilder<R, Prefix, ClientError>;
 }
 
+export type DirectPayload<R extends Rpc.Any> =
+  | Rpc.PayloadConstructor<R>
+  | PreparedInput<Rpc.PayloadConstructor<R>>;
+
 /** The key and option builders exposed at one unary RPC path. */
 export interface RpcQueryLeaf<
   R extends Rpc.Any,
   Prefix extends readonly JsonValue[],
   ClientError,
 > {
+  /** Runs the RPC through the leaf's runtime and returns its raw success value. */
+  readonly call: DirectCall<
+    DirectPayload<R>,
+    PayloadlessRpc<R>,
+    Rpc.Success<R>,
+    RpcOptionsInput
+  >;
+
+  /** Returns the client Effect for the RPC with its original errors and services. */
+  readonly effect: (
+    ...args: DirectArgs<DirectPayload<R>, PayloadlessRpc<R>, RpcOptionsInput>
+  ) => RpcClient.RpcClient.Result<R, ClientError, false, false>;
+
   /** Builds a semantic, data-tagged infinite-query key from constructor input. */
   readonly infiniteKey: InfiniteKeyBuilder<R, Prefix, ClientError>;
 
@@ -370,6 +410,13 @@ export interface RpcQueryLeaf<
     RpcOptionsInput
   >;
 
+  /** Builds native filters for this RPC. */
+  readonly queryFilter: LeafQueryFilter<
+    Rpc.PayloadConstructor<R>,
+    PayloadlessRpc<R>,
+    "query" | "infinite"
+  >;
+
   /** Builds a semantic, data-tagged query key from constructor input. */
   readonly queryKey: QueryKeyBuilder<R, Prefix, ClientError>;
 
@@ -381,7 +428,10 @@ export type RpcTagEntry<
   R extends Rpc.Any,
   Tag extends string,
 > = Tag extends string
-  ? { readonly path: Tag; readonly rpc: R & { readonly _tag: Tag } }
+  ? {
+      readonly path: Tag;
+      readonly rpc: R["_tag"] extends Tag ? R : R & { readonly _tag: Tag };
+    }
   : never;
 
 export type RpcPathEntry<R extends Rpc.Any> = R extends Rpc.Any
@@ -423,7 +473,12 @@ export type PathTree<
         : RpcStreamLeaf<R, Prefix, ClientError>
       : never
     : {
+        readonly [utilityPaths]?: PathsFromTags<
+          PathDescendants<Groups[Head], Head>["path"]
+        >;
         readonly key: () => readonly [...Prefix, "rpc", ...Path, Head];
+        /** Builds native filters for descendant queries. */
+        readonly queryFilter: BranchQueryFilter;
       } & PathTree<
         PathDescendants<Groups[Head], Head>,
         Prefix,
@@ -434,15 +489,78 @@ export type PathTree<
 
 declare const rpcQueryClientError: unique symbol;
 
-/** An eager utility tree projected from the group's dotted RPC tags. */
+/** A ready tag-keyed or flattened Effect RPC client. */
+export type ReadyRpcClient<Rpcs extends Rpc.Any, ClientError = never> =
+  // oxlint-disable-next-line typescript/no-generated-empty-object-type
+  | RpcClient.RpcClient<Rpcs, ClientError>
+  | RpcClient.RpcClient.Flat<Rpcs, ClientError>;
+
+export type ReturnError<Res> =
+  Res extends Effect.Effect<infer _A, infer E, infer _R>
+    ? E
+    : Res extends Stream.Stream<infer _A, infer E, infer _R>
+      ? E
+      : never;
+
+export type DeclaredRpcError<R extends Rpc.Any> =
+  R extends Rpc.Rpc<
+    infer _Tag,
+    infer _Payload,
+    infer Success,
+    infer Error,
+    infer Middleware,
+    infer _Requires
+  >
+    ?
+        | Error["Type"]
+        | Middleware["error"]["Type"]
+        | Middleware["~ClientError"]
+        | (Success extends RpcSchema.Stream<infer _A, infer StreamError>
+            ? StreamError["Type"]
+            : never)
+    : never;
+
+export type ObjectMethodError<
+  Client,
+  Tag extends PropertyKey,
+> = Tag extends keyof Client
+  ? Client[Tag] extends (input: never) => infer Res
+    ? ReturnError<Res>
+    : never
+  : never;
+
+export type FlatMethodError<Client, Tag extends string> = Client extends (
+  tag: Tag,
+  payload: never
+) => infer Res
+  ? ReturnError<Res>
+  : never;
+
+export type ExtractRpcClientError<Group extends RpcGroup.Any, Client> =
+  Client extends RpcClient.RpcClient.Flat<RpcsOf<Group>, infer E>
+    ? E
+    : RpcsOf<Group> extends infer R
+      ? R extends Rpc.Any
+        ? Exclude<
+            | ObjectMethodError<Client, R["_tag"]>
+            | FlatMethodError<Client, R["_tag"]>,
+            DeclaredRpcError<R>
+          >
+        : never
+      : never;
+
+/** A utility tree with lazy-memoized frozen leaves projected from the group's dotted RPC tags. */
 export type RpcQueryUtils<
   Group extends RpcGroup.Any,
-  Prefix extends readonly [JsonValue, ...JsonValue[]],
+  Prefix extends OptionalKeyPrefix = readonly [],
   ClientError = never,
 > = {
   readonly [rpcQueryClientError]?: ClientError;
+  readonly [utilityPaths]?: PathsFromTags<RpcsOf<Group>["_tag"]>;
   /** Returns the immutable root key, including the RPC discriminator. */
   readonly key: () => readonly [...Prefix, "rpc"];
+  /** Builds native filters for descendant queries. */
+  readonly queryFilter: BranchQueryFilter;
 } & PathTree<RpcPathEntry<RpcsOf<Group>>, Prefix, ClientError>;
 
 export type NeedsKeyEncoder<R extends Rpc.Any> = [
@@ -484,20 +602,38 @@ export type KeyEncoderOption<Group extends RpcGroup.Any> =
   >;
 
 /** Requires a custom runner when client-side Schema services remain. */
-export type RunnerOption<Group extends RpcGroup.Any> = RunnerRequirement<
+export type RpcRunnerOption<Group extends RpcGroup.Any> = RunnerRequirement<
   Rpc.ServicesClient<RpcsOf<Group>>
 >;
+
+export type RpcKeyPrefixOption<Prefix extends OptionalKeyPrefix> = [
+  Prefix,
+] extends [readonly []]
+  ? { readonly keyPrefix?: never }
+  : {
+      /** A non-empty JSON-safe tuple that namespaces every generated key. */
+      readonly keyPrefix: Prefix;
+    };
 
 /** Configuration for deriving a utility tree from an Effect RPC group. */
 export type CreateRpcQueryUtilsOptions<
   Group extends RpcGroup.Any,
-  Prefix extends readonly [JsonValue, ...JsonValue[]],
+  Prefix extends OptionalKeyPrefix = readonly [],
   ClientError = never,
 > = {
-  /** A ready, flat RPC client whose Scope remains owned by the caller. */
-  readonly client: RpcClient.RpcClient.Flat<RpcsOf<Group>, ClientError>;
+  /** A ready tag-keyed or flat RPC client whose Scope remains owned by the caller. */
+  readonly client: ReadyRpcClient<RpcsOf<Group>, ClientError>;
+} & RpcKeyPrefixOption<Prefix> &
+  KeyEncoderOption<Group> &
+  RpcRunnerOption<Group>;
 
-  /** A non-empty JSON-safe tuple that namespaces every generated key. */
-  readonly keyPrefix: Prefix;
-} & KeyEncoderOption<Group> &
-  RunnerOption<Group>;
+export type CreateRpcQueryUtilsClientOptions<
+  Group extends RpcGroup.Any,
+  Prefix extends OptionalKeyPrefix,
+  Client,
+> = {
+  /** A ready tag-keyed or flat RPC client whose Scope remains owned by the caller. */
+  readonly client: Client & ReadyRpcClient<RpcsOf<Group>, unknown>;
+} & RpcKeyPrefixOption<Prefix> &
+  KeyEncoderOption<Group> &
+  RpcRunnerOption<Group>;

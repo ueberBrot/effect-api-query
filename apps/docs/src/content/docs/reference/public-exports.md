@@ -8,14 +8,17 @@ Import these values and types from `@ueberbrot/effect-api-query`.
 | Export | Purpose |
 | --- | --- |
 | `queryEffects`, `QueryClientService` | Compose native cache operations in Effect with the existing application QueryClient. |
+| `bindReactivityInvalidation` | Connect Effect Reactivity keys to native query invalidation within a Scope. |
 | `QueryClientOperationError` | Retains exact native rejections, including execution wrappers, as an unknown cause. |
 | `acquireQueryOwner`, `QueryOwner`, `QueryOwnerSetup` | Opt in to acquired/borrowed resource setup, guarded cache callbacks and local query/mutation retirement. |
 | `configureUtils` | Configure policies and ordered interceptors on a tree, branch, or leaf. |
-| `UtilsConfiguration`, `ConfiguredUtils` | Type scoped configuration and the configured utility tree. |
-| `createBranchQueryFilter` | Select one view across all descendant leaves. |
+| `defineRpcPolicy`, `defineHttpApiPolicy` | Check reusable policy maps against contracts before acquiring clients. |
+| `UtilsConfiguration`, `ConfiguredUtils` | Type configuration and the configured utility tree. |
 | `prepareInput`, `PreparedInput` | Reuse owner-bound input preparation explicitly. |
-| `findDeclaredError` | Match one tagged typed failure without flattening its Cause. |
-| `runQueryEvents` | Run sequential event handlers and recovery against a retiring query owner’s native cache. |
+| `isEffectApiQueryError`, `getExecutionCause` | Recognize either execution wrapper and read its original Cause. |
+| `findDeclaredError`, `matchDeclaredError` | Select or handle one tagged failure in an execution error. |
+| `retryExecutionError`, `RetryExecutionErrorOptions` | Build a bounded Query retry predicate for single typed failures. |
+| `runQueryEvents` | Run sequential event handlers and recovery against a retiring query owner's native cache. |
 | `consumeEvents`, `ConsumeEventsOptions` | Consume events sequentially with start and exit callbacks. |
 | `createRpcQueryUtils` | Builds the RPC utility tree. |
 | `viewPrefix` | Selects every input of one supported leaf view. |
@@ -24,6 +27,7 @@ Import these values and types from `@ueberbrot/effect-api-query`.
 | `MutationPolicyOptions` | Selects callback replacement or shared-before-local composition. |
 | `QueryInterceptor`, `MutationInterceptor` | Type native execution context, input, and continuation. |
 | `queryViewCodec`, `infiniteQueryCodec` | Bind paired Schema codecs to a leaf view or infinite pages and page parameters. |
+| `createContractHydrationRegistry` | Derive hydration codecs from an RPC group or HttpApi without a client. |
 | `createHydrationRegistry`, `hydrationCallbacks` | Prepare heterogeneous snapshots or one view with native serialization callbacks. |
 | `HydrationCodec`, `HydrationRegistry`, `HydrationCodecError` | Type codec registration, snapshot preparation, and registration failures. |
 | `recoverStream` | Reconnect a decoded stream with application-supplied cursor and recovery policy. |
@@ -42,7 +46,7 @@ Import these values and types from `@ueberbrot/effect-api-query`.
 | `isEffectRpcQueryError` | Runtime guard for RPC execution errors. |
 | `CreateRpcQueryUtilsOptions` | Factory option type. |
 | `RpcQueryUtils` | Generated utility-tree type. |
-| `RunPromiseExit` | Runner adapter type with optional abort signal. |
+| `RuntimeInput`, `RunPromiseExit` | Factory runtime input and runner function type with optional abort signal. |
 | `KeyEncoder` | Synchronous semantic key-encoder type. |
 | `JsonValue` | Immutable strict-JSON key value. |
 | `QueryData` | Query success type with possible `undefined` normalized to `null`. |
@@ -53,6 +57,10 @@ Import these values and types from `@ueberbrot/effect-api-query`.
 See the [HTTP factory](/effect-api-query/reference/http-factory/) for HTTP types and [errors](/effect-api-query/reference/errors/) for error classes and codes.
 
 Use `UnaryRpcOptions` for local headers and Context. `StreamingRpcOptions` adds the client's stream buffer size. See [request-local RPC options](/effect-api-query/reference/generated-builders/#request-local-rpc-options).
+
+## React subpath
+
+Import `createQueryUtilsContext`, `QueryOwnerProvider`, and `useQueryOwner` from `@ueberbrot/effect-api-query/react`. See [React Query](/effect-api-query/guides/react-query/) for provider setup and disposal.
 
 ## fetchStreamSnapshot
 
@@ -89,11 +97,11 @@ See [type inference](/effect-api-query/reference/type-inference/) for input, cac
 
 ## Configure shared behavior
 
-`configureUtils(treeOrLeaf, configuration)` returns frozen utilities and keeps their keys. Set `{ policy, interceptors }` per view. Mutations also take `callbacks: "replace" | "compose"`. Use `scoped` for named descendants.
+`configureUtils(treeOrLeaf, configuration)` returns frozen utilities and keeps their keys. Set TanStack options and `interceptors` inside each view. Mutations also take `callbacks: "replace" | "compose"`. Use `paths` for named descendants.
 
 Policy precedence runs from QueryClient defaults to tree, branch, leaf, and call site. Interceptors wrap broad to specific, with the first entry outermost. Leaf callbacks infer contract types. Shared callbacks receive `unknown`.
 
-Use `QueryPolicy<Leaf, View>` or `MutationPolicy<Leaf>` for reusable settings. Keep input, selection, initial data, page mapping, and optimistic context local. A `streamed.policy` retention setting applies to both keys and options.
+Use `QueryPolicy<Leaf, View>` or `MutationPolicy<Leaf>` for reusable settings. Keep input, selection, initial data, page mapping, and optimistic context local. A `streamed` retention setting applies to both keys and options.
 
 See [defaults and policies](/effect-api-query/guides/query-defaults/) for callback composition and examples.
 

@@ -1,6 +1,5 @@
 import {
   acquireQueryOwner,
-  createQueryFilter,
   createRpcQueryUtils,
   queryEffects,
   recoverStream,
@@ -18,9 +17,8 @@ export interface DirectoryEvent {
   readonly name: string;
 }
 
-/** The application supplies its decoded transport and authoritative snapshot protocol. */
 export interface DirectoryConnection {
-  readonly client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof directory>>;
+  readonly client: RpcClient.RpcClient<RpcGroup.Rpcs<typeof directory>>;
   readonly connect: (
     cursor: string
   ) => Stream.Stream<DirectoryEvent, "expired" | "offline">;
@@ -41,22 +39,17 @@ export const acquireDirectoryEvents = async (
     const connection = await setup.acquire(acquire, async (value) => {
       await value.close();
     });
-    const rpc = createRpcQueryUtils(directory, {
-      client: connection.client,
-      keyPrefix: ["directory-events"],
-      runPromiseExit: setup.wrapRunner(Effect.runPromiseExit),
-    });
+    const rpc = setup.trackUtils(
+      createRpcQueryUtils(directory, { client: connection.client })
+    );
     return { connection, rpc };
   });
   const { connection, rpc } = owner.resources;
-  const reads = createQueryFilter(rpc.users.read, "query");
-  const invalidate = queryEffects.invalidate({
-    ...reads(),
-    refetchType: "none",
-  });
+  const invalidate = queryEffects.invalidate(
+    rpc.users.read.queryFilter({ view: "query", refetchType: "none" })
+  );
   const source = recoverStream({
     initialCursor: "0",
-    // This application's protocol uses decimal positions, represented as strings.
     cursorPolicy: {
       accept: (previous, next) => BigInt(next) > BigInt(previous),
       isGap: (previous, next) => BigInt(next) > BigInt(previous) + 1n,
@@ -72,7 +65,7 @@ export const acquireDirectoryEvents = async (
         const snapshot = yield* connection.refresh;
         for (const user of snapshot.users) {
           yield* queryEffects.setData(
-            rpc.users.read.queryKey({ id: user.id }),
+            rpc.users.read.queryKey({ input: { id: user.id } }),
             user
           );
         }
@@ -87,7 +80,7 @@ export const acquireDirectoryEvents = async (
       onEvent: (event) =>
         Effect.gen(function* onEvent() {
           yield* queryEffects.setData(
-            rpc.users.read.queryKey({ id: event.id }),
+            rpc.users.read.queryKey({ input: { id: event.id } }),
             {
               id: event.id,
               name: event.name,

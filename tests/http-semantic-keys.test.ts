@@ -76,11 +76,11 @@ describe("HTTP semantic keys", () => {
       keyPrefix: ["parse-options"],
     });
     const invalid = { query: { id: "valid", extra: true } };
-    expect(() => http.requests.strict.queryKey(invalid)).toThrow(
+    expect(() => http.requests.strict.queryKey({ input: invalid })).toThrow(
       "Could not encode the HTTP key"
     );
     expect(
-      http.requests.relaxed.queryKey({ query: { id: "x" } }).at(-1)
+      http.requests.relaxed.queryKey({ input: { query: { id: "x" } } }).at(-1)
     ).toStrictEqual({ query: { id: "x" } });
   });
 
@@ -189,7 +189,7 @@ describe("HTTP semantic keys", () => {
     };
     try {
       const read = async (
-        request: Parameters<typeof http.requests.read.queryKey>[0]
+        request: Parameters<typeof http.requests.read.queryKey>[0]["input"]
       ) =>
         await queryClient.query(
           http.requests.read.queryOptions({ input: request })
@@ -284,14 +284,14 @@ describe("HTTP semantic keys", () => {
     const queryClient = new QueryClient();
     try {
       expect({
-        key: http.text.queryKey({ payload: 42 }).at(-1),
+        key: http.text.queryKey({ input: { payload: 42 } }).at(-1),
         data: await queryClient.query(
           http.text.queryOptions({ input: { payload: 42 } })
         ),
       }).toStrictEqual({ key: { payload: "42" }, data: 42 });
       expect({
         key: http.form
-          .queryKey({ payload: { page: 2, filter: undefined } })
+          .queryKey({ input: { payload: { page: 2, filter: undefined } } })
           .at(-1),
         data: await queryClient.query(
           http.form.queryOptions({ input: { payload: { page: 2 } } })
@@ -299,7 +299,7 @@ describe("HTTP semantic keys", () => {
       }).toStrictEqual({ key: { payload: { page: "2" } }, data: 2 });
       const search = { payload: { page: 3 }, query: { sort: "name" } };
       expect({
-        key: http.search.queryKey(search).at(-1),
+        key: http.search.queryKey({ input: search }).at(-1),
         data: await queryClient.query(
           http.search.queryOptions({ input: search })
         ),
@@ -317,7 +317,7 @@ describe("HTTP semantic keys", () => {
         keyPrefix: ["default"],
       });
       expect(() =>
-        defaults.binary.queryKey({ payload: new Uint8Array([7]) })
+        defaults.binary.queryKey({ input: { payload: new Uint8Array([7]) } })
       ).toThrow(expect.objectContaining({ code: "InvalidKeyValue" }));
     } finally {
       queryClient.clear();
@@ -331,7 +331,7 @@ describe("HTTP semantic keys", () => {
       headers: { "X-Locale": "en", "x-locale": "en", ignored: undefined },
       payload: { nested: { kept: [2, 1] } },
     };
-    const key = utils.requests.save.queryKey(input);
+    const key = utils.requests.save.queryKey({ input });
     expect(key.at(-1)).toStrictEqual({
       query: {},
       headers: { "x-locale": "en" },
@@ -339,9 +339,11 @@ describe("HTTP semantic keys", () => {
     });
     expect(key).toStrictEqual(
       utils.requests.save.queryKey({
-        query: {},
-        headers: { "x-locale": "en" },
-        payload: { nested: { kept: [2, 1] } },
+        input: {
+          query: {},
+          headers: { "x-locale": "en" },
+          payload: { nested: { kept: [2, 1] } },
+        },
       })
     );
     expect(input).toStrictEqual({
@@ -395,14 +397,18 @@ describe("HTTP semantic keys", () => {
     });
 
     const reorderedKey = http.requests.read.queryKey({
-      headers: {
-        "X-Meta": { second: { b: "2", a: "1" }, first: "ok" },
-        "x-meta": { first: "ok", second: { a: "1", b: "2" } },
+      input: {
+        headers: {
+          "X-Meta": { second: { b: "2", a: "1" }, first: "ok" },
+          "x-meta": { first: "ok", second: { a: "1", b: "2" } },
+        },
       },
     });
     const canonicalKey = http.requests.read.queryKey({
-      headers: {
-        "x-meta": { first: "ok", second: { a: "1", b: "2" } },
+      input: {
+        headers: {
+          "x-meta": { first: "ok", second: { a: "1", b: "2" } },
+        },
       },
     });
 
@@ -472,7 +478,7 @@ describe("HTTP semantic keys", () => {
     const input = {
       query: { rows: [shared, { id: "second", absent: undefined }, shared] },
     };
-    const key = http.requests.read.queryKey(input);
+    const key = http.requests.read.queryKey({ input });
 
     expect(key.at(-1)).toStrictEqual({
       query: { rows: [{ id: "first" }, { id: "second" }, { id: "first" }] },
@@ -505,14 +511,16 @@ describe("HTTP semantic keys", () => {
       keyPrefix: ["test"],
     });
     expect(
-      http.search.find.queryKey({ query: { values: ["b", "a"] } }).at(-1)
+      http.search.find
+        .queryKey({ input: { query: { values: ["b", "a"] } } })
+        .at(-1)
     ).toStrictEqual({
       query: { values: ["b", "a"] },
     });
     expect(
-      http.search.find.queryKey({ query: { values: ["b", "a"] } })
+      http.search.find.queryKey({ input: { query: { values: ["b", "a"] } } })
     ).not.toStrictEqual(
-      http.search.find.queryKey({ query: { values: ["a", "b"] } })
+      http.search.find.queryKey({ input: { query: { values: ["a", "b"] } } })
     );
     /* oxlint-disable unicorn/no-new-array */
     for (const values of [new Array<unknown>(1), [undefined]]) {
@@ -543,9 +551,9 @@ describe("HTTP semantic keys", () => {
     Object.setPrototypeOf(prototype, Array.prototype);
     Object.setPrototypeOf(values, prototype);
 
-    expect(() => http.requests.read.queryKey({ payload: values })).toThrow(
-      expect.objectContaining({ code: "InvalidKeyValue" })
-    );
+    expect(() =>
+      http.requests.read.queryKey({ input: { payload: values } })
+    ).toThrow(expect.objectContaining({ code: "InvalidKeyValue" }));
     expect(() =>
       http.requests.read.queryOptions({ input: { payload: values } })
     ).toThrow(expect.objectContaining({ code: "InvalidKeyValue" }));
@@ -554,7 +562,7 @@ describe("HTTP semantic keys", () => {
   it("keeps custom encoder output strict, copied, and deeply frozen", () => {
     const input = { query: {}, headers: {}, payload: null };
     const value = { nested: { values: [2, 1] } };
-    const key = encodeTestKey(() => value).requests.save.queryKey(input);
+    const key = encodeTestKey(() => value).requests.save.queryKey({ input });
     value.nested.values.push(3);
     expect(key.at(-1)).toStrictEqual({ nested: { values: [2, 1] } });
     const encoded = key.at(-1);
@@ -644,7 +652,9 @@ describe("HTTP semantic keys", () => {
         },
       },
     });
-    expect(custom["save.one"].queryKey({ payload: 1 }).at(-1)).toStrictEqual({
+    expect(
+      custom["save.one"].queryKey({ input: { payload: 1 } }).at(-1)
+    ).toStrictEqual({
       kind: "number",
       value: 1,
     });
@@ -702,8 +712,10 @@ describe("HTTP semantic keys", () => {
           http.forms.submit.queryOptions({ input: { payload: "1" } })
         )
       ).resolves.toBe("string:1");
-      expect(http.forms.submit.queryKey({ payload: 1 })).not.toStrictEqual(
-        http.forms.submit.queryKey({ payload: "1" })
+      expect(
+        http.forms.submit.queryKey({ input: { payload: 1 } })
+      ).not.toStrictEqual(
+        http.forms.submit.queryKey({ input: { payload: "1" } })
       );
     } finally {
       queryClient.clear();
@@ -759,10 +771,10 @@ describe("HTTP semantic keys", () => {
         /* oxlint-disable anti-slop/no-unknown-parameters, anti-slop/require-safety-comment-for-type-assertion */
         expect(
           (
-            safe.requests.save.queryKey as (
-              input: unknown
-            ) => readonly unknown[]
-          )(input).at(-1)
+            safe.requests.save.queryKey as (options: {
+              readonly input: unknown;
+            }) => readonly unknown[]
+          )({ input }).at(-1)
         ).toStrictEqual({ identity: "public-id" });
         /* oxlint-enable anti-slop/no-unknown-parameters, anti-slop/require-safety-comment-for-type-assertion */
         expect(received).toBe(input);

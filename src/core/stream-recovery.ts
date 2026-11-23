@@ -10,6 +10,8 @@ import {
   Stream,
 } from "effect";
 
+import { closeScopeOnPullEnd } from "./stream-pull";
+
 /** Local delivery state; it does not acknowledge server-side persistence or cleanup. */
 export type StreamConnectionState<E, C = number> =
   | {
@@ -147,11 +149,7 @@ const recoverWithPolicy = <A, E, R, C, EG, RG, EF, RF, RS>(
           );
           return {
             pull: Effect.uninterruptibleMask((restore) =>
-              restore(pull).pipe(
-                Effect.onError((cause) =>
-                  Scope.close(scope, Pull.doneExitFromCause(cause))
-                )
-              )
+              closeScopeOnPullEnd(scope, restore(pull))
             ),
           };
         });
@@ -270,7 +268,6 @@ export function recoverStream<
   RF = R,
   RS = R,
 >(
-  // Preserve union-typed annotations separately from direct callback inference.
   // oxlint-disable-next-line typescript/unified-signatures
   options: RecoverStreamOptions<A, E, R, C, EG, RG, EF, RF, RS>
 ): Stream.Stream<A, NoInfer<E | EG | EF>, NoInfer<R | RG | RF | RS>>;

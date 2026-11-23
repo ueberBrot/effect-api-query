@@ -11,10 +11,11 @@ import {
 import { tmpdir } from "node:os";
 import nodePath from "node:path";
 
-const capture = (command: string, args: string[]) =>
-  execFileSync(command, args, { encoding: "utf-8" });
-const run = (args: string[]) => execFileSync("vp", args, { stdio: "inherit" });
-const git = (...args: string[]) => capture("git", args);
+import { git, run as runCommand } from "./lib/exec.mts";
+
+const run = (args: readonly string[]) => {
+  runCommand("vp", args);
+};
 const read = (path: string) => readFileSync(path, "utf-8");
 /* oxlint-disable anti-slop/no-runtime-typeof -- Parse the package manifest at the JSON input boundary. */
 const manifest = () => {
@@ -31,7 +32,6 @@ const manifest = () => {
 
 /* oxlint-enable anti-slop/no-runtime-typeof */
 
-// Never turn an outstanding source or guidance review into a generated-release review.
 ok(
   !git("status", "--porcelain", "--untracked-files=all").trim(),
   "Versioning requires a clean working tree."
@@ -120,8 +120,6 @@ if (generated.size > 0) {
   );
   try {
     const reportPath = nodePath.join(directory, "review.json");
-    // Intent 0.5.5 exits before flushing large piped JSON. A regular file keeps
-    // complete snapshots without relying on the CLI's stdout pipe buffer.
     const output = openSync(reportPath, "wx");
     try {
       execFileSync(
@@ -172,8 +170,6 @@ if (generated.size > 0) {
       }),
     };
     /* oxlint-enable anti-slop/no-runtime-typeof, anti-slop/no-unknown-parameters */
-    // Use the pre-generation HEAD, not Intent's older baseline: consumed Changesets
-    // may have been added after that baseline and still need deletion records in PR CI.
     const reviewed = report.items.map((item) => {
       ok(
         item.problemCount === 0 &&

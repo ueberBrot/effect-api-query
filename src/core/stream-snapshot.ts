@@ -35,6 +35,17 @@ const validateSnapshotControls = (
   }
 };
 
+export type StreamSnapshotQueryOptions<
+  A,
+  E,
+  Data,
+  K extends QueryKey,
+> = QueryExecuteOptions<A, E, Data, A, K> & {
+  readonly queryFn: QueryFunction<A, K>;
+  readonly queryHash?: never;
+  readonly queryKeyHashFn?: never;
+};
+
 export const fetchStreamSnapshot = async <
   TQueryFnData,
   TError = DefaultError,
@@ -42,17 +53,7 @@ export const fetchStreamSnapshot = async <
   TQueryKey extends QueryKey = QueryKey,
 >(
   queryClient: QueryClient,
-  options: QueryExecuteOptions<
-    TQueryFnData,
-    TError,
-    TData,
-    TQueryFnData,
-    TQueryKey
-  > & {
-    readonly queryFn: QueryFunction<TQueryFnData, TQueryKey>;
-    readonly queryHash?: never;
-    readonly queryKeyHashFn?: never;
-  },
+  options: StreamSnapshotQueryOptions<TQueryFnData, TError, TData, TQueryKey>,
   { mode = "fresh", signal, timeoutMs = 10_000 }: StreamSnapshotOptions = {}
 ): Promise<TData> => {
   signal?.throwIfAborted();

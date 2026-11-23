@@ -1,6 +1,6 @@
 # Define the compatibility promise
 
-Status: Accepted. Extends compatibility validation in [ADR 0033](0033-bound-effect-support-to-a-patch-line.md). Versioning continues to follow [ADR 0001](0001-target-effect-4-release-candidate.md).
+Status: Accepted. Extends compatibility validation in [ADR 0033](0033-bound-effect-support-to-a-patch-line.md). Peer floors amended for `0.8.0` by [ADR 0045](0045-raise-0-8-0-peer-floors.md). Versioning continues to follow [ADR 0001](0001-target-effect-4-release-candidate.md).
 
 ## Context
 

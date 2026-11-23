@@ -460,8 +460,9 @@ export const exerciseSocketInterruption = async () =>
             emitted ? emittedData : undefined
           );
           expect(
-            queryClient.getQueryState(rpc.values.read.queryKey({ id: 3 }))
-              ?.fetchStatus
+            queryClient.getQueryState(
+              rpc.values.read.queryKey({ input: { id: 3 } })
+            )?.fetchStatus
           ).toBe("fetching");
         }
       }

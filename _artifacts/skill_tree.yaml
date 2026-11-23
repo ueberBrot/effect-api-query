@@ -1,6 +1,6 @@
 library:
   name: "@ueberbrot/effect-api-query"
-  version: 0.7.0
+  version: 0.8.0
 generated_from:
   domain_map: _artifacts/domain_map.yaml
   skill_spec: _artifacts/skill_spec.md
@@ -22,12 +22,15 @@ skills:
       - "**/examples/shared/http-workflows/*.ts*"
       - e2e/http-workflows.spec.ts
       - src/**/*.ts
+      - src/react/index.tsx
+      - tsconfig.declarations.json
       - tests/**/*.ts
       - tests/**/*.tsx
       - "**/examples/shared/*.ts"
       - "**/examples/vite-react/src/lib/*.ts"
       - "**/examples/vite-react/src/main.tsx"
       - "**/examples/vite-react/src/app.tsx"
+      - "**/examples/vite-react/src/components/sections/commands-section.tsx"
       - "**/examples/shared/ui/effect-error-details.tsx"
       - "**/examples/vite-react/tests/*.ts*"
       - "**/examples/tanstack-start/src/lib/*.ts"
@@ -53,6 +56,17 @@ skills:
       - docs/adr/0040-*.md
       - docs/adr/0042-*.md
       - docs/adr/0043-*.md
+      - docs/adr/0044-*.md
+      - docs/adr/0045-*.md
+      - docs/adr/0046-*.md
+      - docs/adr/0047-*.md
+      - docs/adr/0048-*.md
+      - docs/adr/0049-*.md
+      - docs/adr/0050-*.md
+      - docs/adr/0051-*.md
+      - docs/adr/0052-*.md
+      - docs/adr/0053-*.md
+      - docs/adr/0054-*.md
       - apps/docs/astro.config.mts
       - "**/apps/docs/src/content/docs/**/*.md"
       - "**/apps/docs/src/content/docs/**/*.mdx"

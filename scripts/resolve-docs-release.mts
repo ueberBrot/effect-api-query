@@ -1,5 +1,6 @@
-import { execFileSync } from "node:child_process";
 import { appendFileSync, existsSync, readFileSync } from "node:fs";
+
+import { capture } from "./lib/exec.mts";
 
 const packageName = "@ueberbrot/effect-api-query";
 const repository = "git+https://github.com/ueberBrot/effect-api-query.git";
@@ -121,8 +122,6 @@ const permittedDocumentationPath = (path: string): boolean => {
     /^apps\/docs\/(?:src|public)\/.+$/u.test(path) ||
     path === "apps/docs/astro.config.mts" ||
     path === "apps/docs/tsconfig.json" ||
-    /^e2e-docs\/.+$/u.test(path) ||
-    path === "playwright.docs.config.ts" ||
     path === "tests/docs-examples.test.ts" ||
     /^tests\/types\/docs-[^/]+\.(?:ts|tsx)$/u.test(path)
   );
@@ -192,8 +191,6 @@ export const resolveDocumentationRevision = (
     revision,
     "--",
     "apps/docs",
-    "e2e-docs",
-    "playwright.docs.config.ts",
     "tests/docs-examples.test.ts",
     "tests/types",
   ]).split("\0");
@@ -269,7 +266,7 @@ if (import.meta.main) {
         version,
         process.env["DOCS_REF"] ?? "",
         metadata,
-        (args) => execFileSync("git", args, { encoding: "utf-8" })
+        (args) => capture("git", args)
       );
     } else {
       if (

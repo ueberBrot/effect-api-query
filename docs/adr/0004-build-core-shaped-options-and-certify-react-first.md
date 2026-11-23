@@ -1,6 +1,6 @@
 # Build core-shaped options and certify React first
 
-Status: Partially superseded by [ADR 0032](0032-configure-utility-trees-and-require-stream-retention.md) for shared configuration and published key payload types.
+Status: Partially superseded by [ADR 0032](0032-configure-utility-trees-and-require-stream-retention.md) for shared configuration and published key payload types. Amended by [ADR 0048](0048-add-optional-react-subpath-wiring.md) for the optional `./react` subpath.
 
 ## Context
 

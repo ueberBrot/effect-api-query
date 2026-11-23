@@ -3,11 +3,10 @@ title: Cancellation
 description: Cancel queries and request server-side cancellation for long-running commands.
 ---
 
-Forward TanStack's `AbortSignal` in your application runner. Import `RunPromiseExit` from `@ueberbrot/effect-api-query`.
+Pass your ManagedRuntime to the factory. If you use a custom runner, forward the TanStack abort signal.
 
 ```ts
-const runPromiseExit: RunPromiseExit = (effect, options) =>
-  runtime.runPromiseExit(effect, options);
+const rpcQuery = createRpcQueryUtils(group, { client, runtime });
 ```
 
 To cancel one RPC request from a loader or event handler, pass its exact generated key.
@@ -17,9 +16,9 @@ const input = { durationMs: 60_000, operationId: "slow-query" };
 
 void queryClient.query(rpcQuery.diagnostics.slow.queryOptions({ input }));
 
-await queryClient.cancelQueries({
-  queryKey: rpcQuery.diagnostics.slow.queryKey(input),
-});
+await queryClient.cancelQueries(
+  rpcQuery.diagnostics.slow.queryFilter({ view: "query", input, exact: true })
+);
 ```
 
 TanStack aborts the signal, and the runner uses it to interrupt Effect. Remote interruption depends on your RPC transport.
@@ -30,7 +29,7 @@ Use ordinary hooks if cancellation matters, especially for open streams. TanStac
 
 ## Cancel an HTTP query
 
-Pass an HTTP `queryKey(input)` or `key()` prefix to `queryClient.cancelQueries`. The generated function forwards the signal to the runner. The default runner interrupts the HTTP client. A fetch transport aborts its pending request. A custom runner must forward the signal to do the same. TanStack controls cancellation state and cache behavior.
+Pass an HTTP `queryKey({ input })` or `key()` prefix to `queryClient.cancelQueries`. The generated function forwards the signal to the runner. The default runner interrupts the HTTP client. A fetch transport aborts its pending request. A custom runner must forward the signal to do the same. TanStack controls cancellation state and cache behavior.
 
 ## Request server cancellation explicitly
 

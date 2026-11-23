@@ -8,10 +8,7 @@ async function readUser(
   client: HttpApiClient.ForApi<typeof usersApi>,
   queryClient: QueryClient
 ) {
-  const http = createHttpApiQueryUtils(usersApi, {
-    client,
-    keyPrefix: ["users-app"],
-  });
+  const http = createHttpApiQueryUtils(usersApi, { client });
   const user = await queryClient.query(
     http.users.get.queryOptions({ input: { params: { id: 1 } } })
   );

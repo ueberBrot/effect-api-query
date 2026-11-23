@@ -24,6 +24,7 @@ import { describe, expect, it } from "vite-plus/test";
 import {
   createHttpApiQueryUtils,
   EffectHttpApiQueryError,
+  prepareInput,
 } from "#effect-api-query";
 import type { RunPromiseExit } from "#effect-api-query";
 
@@ -155,6 +156,27 @@ const makeFailureClient = async (
   );
 
 describe("HTTP execution", () => {
+  it("runs buffered calls with decoded input and preserves wrapper identity for failures", async () => {
+    const client = await makeFailureClient([]);
+    const utils = createHttpApiQueryUtils(FailureApi, { client });
+    const leaf = utils.actions.read;
+    const input = prepareInput(leaf, { params: { scenario: "ok" } });
+    await expect(leaf.call({ input })).resolves.toBe(42);
+    await expect(Effect.runPromise(leaf.effect({ input }))).resolves.toBe(42);
+    const denied = { params: { scenario: "declared" } };
+    await expect(leaf.call({ input: denied })).rejects.toMatchObject({
+      _tag: "EffectHttpApiQueryError",
+      operation: "call",
+      endpoint: "read",
+    });
+    await expect(
+      Effect.runPromise(Effect.flip(leaf.effect({ input: denied })))
+    ).resolves.toStrictEqual({
+      _tag: "Denied",
+      message: "access denied",
+    });
+  });
+
   it("preserves group and top-level receivers of caller-provided ready client methods", async () => {
     const api = HttpApi.make("receivers").add(
       HttpApiGroup.make("grouped").add(
@@ -295,7 +317,7 @@ describe("HTTP execution", () => {
     const utils = createHttpApiQueryUtils(api, {
       client,
       keyPrefix: ["test"],
-      runPromiseExit,
+      runtime: runPromiseExit,
     });
     const queryClient = new QueryClient();
     try {
@@ -445,7 +467,7 @@ describe("HTTP execution", () => {
       const utils = createHttpApiQueryUtils(FailureApi, {
         client,
         keyPrefix: ["test"],
-        runPromiseExit,
+        runtime: runPromiseExit,
       });
       const queryClient = new QueryClient({
         defaultOptions: {
@@ -506,7 +528,7 @@ describe("HTTP execution", () => {
     const utils = createHttpApiQueryUtils(FailureApi, {
       client,
       keyPrefix: ["test"],
-      runPromiseExit,
+      runtime: runPromiseExit,
     });
     const queryClient = new QueryClient();
     const input = { params: { scenario: "success" } };
@@ -536,8 +558,7 @@ describe("HTTP execution", () => {
     const utils = createHttpApiQueryUtils(FailureApi, {
       client,
       keyPrefix: ["test"],
-      runPromiseExit: async (): Promise<never> =>
-        await Promise.reject(rejection),
+      runtime: async (): Promise<never> => await Promise.reject(rejection),
     });
     const queryClient = new QueryClient();
     const input = { params: { scenario: "success" } };

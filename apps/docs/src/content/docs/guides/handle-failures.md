@@ -42,6 +42,10 @@ The HTTP client encodes mutation input when the mutation runs. Its encoding fail
 
 See the [HTTP factory reference](/effect-api-query/reference/http-builders/#cache-identity-and-failures) for key-error codes.
 
+## Handle RPC and HTTP together
+
+Use `isEffectApiQueryError` to narrow to either execution wrapper. Use `getExecutionCause(error)` to read the original Cause from either wrapper. It returns `undefined` for other errors.
+
 ## Match a tagged typed failure
 
 Use `findDeclaredError` to find a single tagged failure. It returns an Effect `Option` typed to the selected tag.
@@ -57,3 +61,15 @@ if (Option.isSome(missing)) {
 ```
 
 The wrapper's failure union includes `{ _tag: 'Missing', id: number }` here. The helper accepts only tags in that union, including typed transport failures. It returns `Some` for a single match and `None` for other errors or a composite Cause. Keep the wrapper if you need the complete Cause. Validate untrusted input separately.
+
+Use `matchDeclaredError` to handle selected tags. Each handler receives the failure for its tag. The fallback receives the original error if no handler matches, or if the Cause does not contain exactly one typed failure.
+
+```ts
+import { matchDeclaredError } from "@ueberbrot/effect-api-query";
+
+const message = matchDeclaredError(
+  error,
+  { Missing: ({ id }) => `Could not find ${id}` },
+  () => "The request failed"
+);
+```

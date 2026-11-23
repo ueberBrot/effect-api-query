@@ -38,7 +38,7 @@ const createUser = owner.trackMutationOptions(
         return;
       }
       queryClient.setQueryData(
-        rpc.users.get.queryKey({ id: user.id, locale: user.locale }),
+        rpc.users.get.queryKey({ input: { id: user.id, locale: user.locale } }),
         user
       );
       await invalidateUsers();
@@ -82,9 +82,9 @@ Use `acquireQueryOwner` to register resources and wait for work at disposal. Eac
 
 Await each `setup.acquire(start, release)` in order. Release handlers run once in reverse order, including after a later acquisition fails. With `setup.borrow(value)`, your app remains responsible for release. Finish acquiring resources during setup. Effect Scope still manages resources inside an acquired runtime or client.
 
-`dispose()` marks the owner inactive immediately. Repeated calls share its promise. It aborts registered runners, cancels native queries, waits for registered work, clears caches, then releases acquired resources. Use `setup.wrapRunner(runtime.runPromiseExit)` and a `configureUtils` interceptor in each used view. The interceptor calls `setup.runQuery(next, context.signal)` to track the full query, including stream pulls and cleanup. The runner must honor the signal and await local finalizers. Work without a signal is drained without interruption.
+`dispose()` marks the owner inactive immediately. Repeated calls share its promise. It aborts registered runners, cancels native queries, waits for registered work, clears caches, then releases acquired resources. Call `setup.trackUtils(utils)` during setup or `owner.trackUtils(utils)` afterward. It tracks the leaf runtime, the full query including stream cleanup, and the generated mutation function. You can apply `configureUtils` before or after tracking. The runner must honor the signal and await local finalizers. Work without a signal is drained without interruption.
 
-Track the full native promise with `owner.runMutation(() => mutation.mutateAsync(input))` or `owner.runMutation(() => observer.mutate(input))`. It accepts work synchronously and starts the callback in the next microtask. Disposal waits for the request and awaited callbacks. Track only `mutationFn` if you intend to drain only that attempt. Use `networkMode: "always"` and `retry: false` for immediate attempts. An attempt that starts after retirement rejects even if its outer callback is already accepted. A drained mutation can still fail.
+Track the full native promise with `owner.runMutation(() => mutation.mutateAsync(input))` or `owner.runMutation(() => observer.mutate(input))`. The owner registers the work before it calls the function. Both happen synchronously. Disposal waits for the request and awaited callbacks. Track only `mutationFn` if you intend to drain only that attempt. Use `networkMode: "always"` and `retry: false` for immediate attempts. An attempt that starts after retirement rejects even if its outer callback is already accepted. A drained mutation can still fail.
 
 Use `owner.commit(cache => { /* synchronous cache update */ })` for late cache writes. It targets the original cache and skips retired owners. Use `isActive()` for invalidation, persistence, and other side effects. Keep detached work guarded as well. Remount providers on replacement and include safe user or tenant identity in keys and storage.
 

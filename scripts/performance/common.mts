@@ -1,4 +1,3 @@
-import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import {
   copyFileSync,
@@ -11,6 +10,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { Schema } from "effect";
+
+import { capture } from "../lib/exec.mts";
 
 export const repositoryRoot = fileURLToPath(new URL("../../", import.meta.url));
 export const packageName = "@ueberbrot/effect-api-query";
@@ -58,14 +59,12 @@ export const performanceContext = (
     .digest("hex"),
   platform: process.platform,
   architecture: process.arch,
-  sourceRevision: execFileSync("git", ["rev-parse", "HEAD"], {
+  sourceRevision: capture("git", ["rev-parse", "HEAD"], {
     cwd: repositoryRoot,
-    encoding: "utf-8",
   }).trim(),
   workingTreeChanged:
-    execFileSync("git", ["status", "--porcelain"], {
+    capture("git", ["status", "--porcelain"], {
       cwd: repositoryRoot,
-      encoding: "utf-8",
     }).trim().length > 0,
   effect: packageVersion("effect"),
   queryCore: packageVersion("@tanstack/query-core"),

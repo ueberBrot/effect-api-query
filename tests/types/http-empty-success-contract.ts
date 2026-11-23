@@ -38,7 +38,10 @@ const empty = http.responses.empty;
 const explicit = http.responses.explicit;
 
 type BufferedBuilder =
+  | "call"
+  | "effect"
   | "key"
+  | "queryFilter"
   | "queryKey"
   | "queryOptions"
   | "metadataKey"
@@ -75,6 +78,8 @@ const emptyMetadata = queryClient.query(empty.metadataOptions());
 const explicitMetadata = queryClient.query(explicit.metadataOptions());
 true satisfies Assert<Equal<Awaited<typeof emptyMetadata>["data"], null>>;
 true satisfies Assert<Equal<Awaited<typeof explicitMetadata>["data"], null>>;
+const emptyCall = empty.call();
+true satisfies Assert<Equal<Awaited<typeof emptyCall>, void>>;
 const emptyMutation = empty.mutationOptions().mutationFn();
 const explicitMutation = explicit.mutationOptions().mutationFn();
 true satisfies Assert<Equal<Awaited<typeof emptyMutation>, void>>;

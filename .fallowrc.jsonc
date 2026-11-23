@@ -11,6 +11,7 @@
     "scripts/measure-bundles.mts",
     "scripts/measure-streams.mts",
     "scripts/measure-types.mts",
+    "scripts/oxlint-no-comments.mts",
     "scripts/resolve-docs-release.mts",
     "playwright.docs.config.ts",
     "tests/types/*.{ts,tsx}",
@@ -84,7 +85,7 @@
 
   "overrides": [
     {
-      "files": ["src/index.ts"],
+      "files": ["src/index.ts", "src/react/index.tsx"],
       "rules": { "unused-types": "off" },
     },
   ],

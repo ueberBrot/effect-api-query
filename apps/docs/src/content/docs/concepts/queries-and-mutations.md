@@ -3,7 +3,7 @@ title: Generated Utility Model
 description: Understand the contract, input, data, error, and cache identity carried by generated leaves.
 ---
 
-Pass the factory an Effect declaration, its ready client, and a cache prefix. The factory builds a frozen utility tree. Each leaf represents one RPC or HTTP endpoint and provides methods for its supported operations.
+Pass the factory an Effect declaration, its ready client, and an optional cache prefix. The factory builds a frozen utility tree. Each leaf represents one RPC or HTTP endpoint and provides methods for its supported operations.
 
 ## What a generated leaf carries
 

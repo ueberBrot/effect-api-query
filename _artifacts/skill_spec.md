@@ -11,9 +11,9 @@ One `effect-api-query` skill covers the library. Its activation description supp
 | RPC | Payload construction, canonical identity, ready-client lifetime |
 | HTTP | Decoded requests, SSE and NDJSON, multipart mutations, metadata |
 | Query patterns | Inference, skipping, pages, publication batches, recovery and tracing |
-| Cache workflows | Typed policies, interceptors, partial filters, writes and owners |
-| Hydration and SSR | Snapshots, typed view registration, preparation and cleanup |
-| Frameworks and hosts | Provider setup, Suspense, reactive accessors, declared peers and checked combinations, transports and hosts |
+| Cache workflows | Typed policies, interceptors, partial filters, writes, Effect cache operations, Reactivity invalidation, and owners |
+| Hydration and SSR | Snapshots, contract-derived registries, typed view overrides, preparation and cleanup |
+| Frameworks and hosts | Optional React providers, Suspense, reactive accessors, declared peers and checked combinations, transports and hosts |
 
 Consumers load the guidance from installed `@ueberbrot/effect-api-query` without repository-local authoring skills. Planning records remain outside the shipped package.
 
@@ -31,7 +31,7 @@ Strict compiler fixtures check public declarations and documentation examples. R
 
 The compatibility reference owns the version table. Framework guidance links to it and distinguishes library peers, wrapper framework peers, and exact checked combinations. Native framework consumer fixtures check TypeScript hook inference against a packed package. Framework component compilers and application builds follow their own tooling requirements.
 
-Exact coordinated Effect development pins are separate from the bounded consumer peer range. `vp run effect-compatibility` checks Effect minimum/development/maintained minor representatives against Query Core minimum/development using the existing public compiler fixtures and focused execution, cancellation, and hydration tests against a packed package. Required APIs, type contracts, or correctness fixes raise the minimum; other range changes require compatibility evidence. Future minors require review. The existing skill, six references, and source mappings cover this dependency-selection task.
+Exact coordinated Effect development pins are separate from the bounded consumer peer range. `vp run effect-compatibility` checks the pinned Effect and Query Core floors, which also serve as the development pins using the existing public compiler fixtures and focused execution, cancellation, and hydration tests against a packed package. Required APIs, type contracts, or correctness fixes raise the minimum; other range changes require compatibility evidence. Future minors require review. The existing skill, six references, and source mappings cover this dependency-selection task.
 
 The usability batch reuses the existing executable consumer fixtures:
 
@@ -51,6 +51,20 @@ The usability batch reuses the existing executable consumer fixtures:
 These checks verify the recommended APIs and observable behavior. A fresh isolated consumer session supplies separate evidence. This authoring session does not establish skill discovery or consumer reliability.
 
 ## Coverage and batch history
+
+- **0.8.0 docs and shipped skill cleanup, base `ce8bf11`:** Removed three off-topic or duplicate documentation pages (`reference/external-http-clients.md`, `getting-started/compatibility-and-stability.md`, `reference/browser-and-worker-hosts.md`), folded worker ownership into `concepts/client-lifecycle.md` and versioning into `reference/compatibility-and-limits.md`, trimmed `reference/performance.md` to user-facing lazy-leaf, tree-shaking, and `prepareInput` guidance, updated `guides/reconnect-streams.md` to the tag-keyed RPC client, and removed remaining style, punctuation, bold-label, and sentence-length defects across all 59 developer-facing docs. Updated the shipped skill and references to remove off-topic external-client and benchmark guidance, fix dead links, and tighten verification steps while retaining one skill and six references. Verified with `vp run docs-check` (24/24 excerpt tests, 0 Astro diagnostics), `vp run docs-build` (59 pages, all internal links valid), `vp exec intent maintainer check`, and `vp run skills-check`. Fresh consumer-agent verification remains unverified.
+
+- **Hydration recheck for #217, base `1788d68`:** The hydration reference and existing guide cover status-based HTTP metadata selection, top-level union members, and own-property view overrides. The domain map records those behaviors. The existing skill-tree sources cover the implementation, guide, and public JSON round-trip tests. The tests reproduce the reported defects and exercise RPC and HTTP stream members and Effect services for a transformed union. Fresh consumer-agent verification is unverified.
+
+- **0.8.0 review fixes for #216 and #217, base `8130b77`:** The cache-workflows reference explains broad and policy-specific stream filters, including canonical defaults and SSE identity. The hydration reference documents matching producers and consumers and preserving HTTP success variants and distinct stream elements. The domain map covers both tasks, and the skill tree maps ADR 0054. The public cache and JSON round-trip regressions exercise the changes. Pure codec and policy initializers let factory consumers omit those unused features. Fresh consumer discovery and task completion remain unverified.
+
+- **Scoped Reactivity invalidation, #219, base `97b7860`:** The cache-workflows reference maps Reactivity keys to colocated filters, ties listeners to a Scope, and uses the query owner guard for retirement. The domain map records why record keys can trigger sibling bindings. The skill tree maps ADR 0053. Runtime tests exercise reactive writes, key prefix isolation, coalescing, disposal, flushing, and error delivery. On integration base `61d013f`, both public compilers accept the application-local key augmentation, all 25 focused Query Effects and Reactivity tests pass, and the docs check passes. The bridge branch also passed its packed runtime checks. Fresh consumer behavior remains unverified.
+
+- **Effect cache operations, spec #210 ticket #218, base `97b7860`:** The cache-workflows reference uses the 14 current Query Core operations. Selection affects returned data. Fiber interruption leaves shared queries running and aborts exclusive stream snapshots. The domain map records this interruption boundary, and the skill tree maps ADR 0052. The existing shared example and public fixtures exercise the new operations. Fresh consumer evidence is pending.
+
+- **Colocated query filters, #216, integrated at `7d5adcc`:** The cache-workflows reference uses generated filters on roots, branches, and queryable leaves. Branch view filters use path metadata and preserve lazy leaves. Full leaf filters share canonical encoding with concrete keys. Partial inputs use explicit projections. The domain map records these tasks, and the skill tree maps ADR 0051. Both public compiler suites, 192 focused runtime tests, and the docs check passed. Fresh consumer evidence is pending.
+
+- **Flat policy maps, spec #210 ticket #214, base `272c099`:** The cache-workflows reference uses inline view options, relative `paths`, and contract-inferred policy constructors. The query-patterns reference points to `streamed.maxChunks`. The shipped examples also use the integration base’s unified key arguments and `runtime` option. The domain map keeps typed SSE settings and scope order in the existing task. The skill tree maps ADR 0049, which amends ADR 0032. The existing configuration tests and compiler fixtures exercise the revised guidance. Fresh consumer-agent evidence is pending.
 
 - **Five-round architecture review, base `8007f00`:** Align HTTP key encoding with declared parse options and keep owner caches independent. Update the HTTP and cache workflow references. Existing source mappings cover the narrower overload fixture, prepared inputs, stream recovery and publication, and the example retirement checks. Verify through the public compiler and runtime suites.
 
@@ -145,3 +159,21 @@ The #180 Fallow audit compares all 65 findings with original spec166 base `15a61
 The shipped skill and planning metadata now name the existing package version `0.6.1`, which the combined package/runtime/compiler checks exercise. This corrects the prior `0.6.0` verification label; it selects no future package version or release schedule. Activation text, identity, prerequisites and six-reference structure stay unchanged.
 
 The #180 retained-code audit found unused Effect cache wrapper bodies in every factory consumer. Pinned Effect.fnUntraced only creates a lazy function and defines its own length. Five pure-call annotations remove those unused bodies without changing service identity, keys, lifetimes, entry points or eager utility construction. A tightened RPC byte ceiling fails before the change and passes afterward. Matched before/after consumer reports show 1,364 fewer minified bytes with peers included and 800 fewer with peers external; gzip savings vary with compression. The combined source module prevents per-original-file byte accounting, and marker absence alone does not prove every service allocation disappeared.
+
+### Direct execution and shared error handling (#215)
+
+The cache-workflows reference covers direct execution through a leaf runtime and composition with the raw client Effect. It also covers shared Cause inspection, tagged matching, and retry limits. The domain map tracks both tasks. The skill tree adds the source mapping for ADR 0050.
+
+The public execution and query-usability suites cover both adapters, multipart, prepared input, raw success, stream omissions, and query-owner cancellation. The compiled retry recipe and public type fixtures check the consumer contract. Fresh consumer-agent verification is outside this implementation task.
+
+### 0.8.0 release guidance (#221)
+
+Source base: `7788ee4`. Retain the existing skill and six references. Prefer the tag-keyed RPC client and optional prefixes. Pass the runtime directly and track utilities once per owner. The cache reference owns flat policy maps, colocated filters, direct execution, shared failure inspection, Effect cache operations, and broad versus exact Reactivity bindings. Derive hydration codecs from the contract and keep custom registrations for overrides. The React reference covers the optional subpath and caller-owned retirement.
+
+The domain map records the new setup, hydration, and React tasks. The skill tree adds ADRs 0044–0048, the React entry point, declarations configuration, and the commands example as sources. The example and compiler checks exercise the documented APIs. The owner-switch regression verifies that retirement waits for an interceptor added after tracking. The live coalescing test uses one fake clock for both timeout callbacks and elapsed time. Fresh consumer-agent discovery remains unverified.
+
+The PR #225 review fixes match full canonical input across policies and require retention when selecting a policy on an unconfigured leaf. Hydration preserves overlapping nested and SSE union members, supports Effect's JSON schemas, and requires an explicit codec for unrestricted data. The existing filter and hydration runtime tests and public type fixtures cover these behaviors. The skill tree already maps those sources.
+
+The owner retirement review verifies that accepted mutation attempts can reach their runtime after retirement starts. The cache reference distinguishes those attempts from new calls to a manually wrapped runner. The query-owner suite covers both tracking and configuration orders.
+
+The hydration review confirms that successful native query state can retain an earlier failure reason. The SSR and hydration examples filter both error fields before transfer. The existing hydration reference owns this guidance, and a router regression covers a recovered successful entry.

@@ -42,16 +42,15 @@ import {
 
 describe("cache recipes", () => {
   test("refreshes event cursors once and defers gaps until an overlapping write settles", async () => {
-    const queryClient = new QueryClient();
-    const fixture = await Effect.runPromise(
-      makeControlledUserWrites(queryClient)
-    );
+    const fixture = await Effect.runPromise(makeControlledUserWrites());
     const scope = Scope.makeUnsafe();
     const reactivity = Effect.runSync(Reactivity.make);
     const { application } = fixture;
-    const { rpcQuery, httpQuery } = application;
+    const { rpcQuery, httpQuery, queryClient } = application;
     const ada = new User({ id: 1, name: "Ada", locale: "en" });
-    const key = rpcQuery.users.get.queryKey({ id: 1, locale: "en" });
+    const key = rpcQuery.users.get.queryKey({
+      input: { id: 1, locale: "en" },
+    });
     const diagnostic = rpcQuery.diagnostics.status.queryKey();
     fixture.seed([ada]);
     queryClient.setQueryData(key, ada);
@@ -484,8 +483,8 @@ it.effect(
           adapter === "rpc" ? rpc.users.read.key() : http.users.read.key();
         const key =
           adapter === "rpc"
-            ? rpc.users.read.queryKey({ id: 1 })
-            : http.users.read.queryKey({ params: { id: 1 } });
+            ? rpc.users.read.queryKey({ input: { id: 1 } })
+            : http.users.read.queryKey({ input: { params: { id: 1 } } });
         queryClient.setQueryDefaults(rootKey, {
           staleTime: 60_000,
           queryKeyHashFn: (queryKey) => `defaults:${JSON.stringify(queryKey)}`,

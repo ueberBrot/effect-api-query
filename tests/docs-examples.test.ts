@@ -29,6 +29,11 @@ const syntaxNodes = (
         ts.isJsxText(node)
       ) {
         ({ text } = node);
+      } else if (
+        ts.isPrefixUnaryExpression(node) ||
+        ts.isPostfixUnaryExpression(node)
+      ) {
+        text = String(node.operator);
       } else if (ts.isVariableDeclarationList(node)) {
         text = String(node.getFirstToken()?.kind);
       }
@@ -50,7 +55,13 @@ const syntaxNodes = (
 describe("documentation excerpts", () => {
   it.each([
     ["guides/loader-descriptors", ["tests/types/docs-loader-descriptors.tsx"]],
-    ["guides/query-effects", ["examples/shared/query-effects"]],
+    [
+      "guides/query-effects",
+      [
+        "examples/shared/query-effects",
+        "tests/types/docs-reactivity-invalidation",
+      ],
+    ],
     ["guides/scoped-event-cache", ["examples/shared/query-events"]],
     [
       "README.md",

@@ -63,7 +63,9 @@ export type OptionsInput<Leaf> = Leaf extends {
   : Leaf extends { readonly queryKey: (...args: infer Args) => unknown }
     ? Args extends []
       ? void
-      : Exclude<Args[0], PreparedInput<unknown>>
+      : NonNullable<Args[0]> extends { readonly input: infer Input }
+        ? Exclude<Input, PreparedInput<unknown>>
+        : void
     : never;
 
 /** The RPC payload constructor input or decoded HTTP request accepted by a leaf. */

@@ -33,8 +33,19 @@ const compilers = [
   { name: "current", package: "@effect/tsgo" },
   { name: "minimum", package: "typescript-5.9" },
 ] as const;
-const consumers = ["contract", "raw", "configured"] as const;
+const consumers = [
+  "contract",
+  "raw",
+  "object-client",
+  "configured",
+  "policy",
+  "retention-root",
+  "retention-path",
+  "hydration-bare",
+  "hydration-paths",
+] as const;
 type Consumer = (typeof consumers)[number];
+const selectedConsumers = choices("TYPE_CONSUMERS", consumers);
 type HttpClient = (typeof httpClients)[number];
 type Workload =
   | { adapter: "rpc" }
@@ -88,9 +99,9 @@ type OverloadErrors = "acquisition-error" | "stream-error";
 true satisfies Equal<Extract<Payload<Failure>, OverloadErrors>, OverloadErrors>;
 type Runner = CreateHttpApiQueryUtilsOptions<
   typeof contract, readonly ["type-baseline"], typeof client
->["runPromiseExit"];
+>["runtime"];
 declare const expectedRunner: Runner;
-expectedRunner satisfies typeof runPromiseExit;`;
+expectedRunner satisfies RuntimeInput<"acquisition-service" | "stream-service">;`;
 
 interface CompilerDiagnostics {
   readonly files: number;
@@ -129,29 +140,70 @@ const parseDiagnostics = (output: string): CompilerDiagnostics => {
   };
 };
 
-const contractFixture = (workload: Workload, count: number) => {
+const contractFixture = (
+  workload: Workload,
+  count: number,
+  mixed: boolean,
+  objectClient: boolean
+) => {
   if (workload.adapter === "rpc") {
     const operations = Array.from(
       { length: count },
       (_, index) =>
         `Rpc.make("scale.read-${index}", { payload: { id: Schema.Int }, success: Value }),`
     );
+    if (mixed) {
+      operations[0] =
+        'Rpc.make("scale.events", { success: Schema.Int, stream: true }),';
+    }
     return `const contract = RpcGroup.make(\n${operations.join("\n")}\n);
-declare const client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof contract>>;`;
+declare const client: RpcClient.RpcClient${objectClient ? "" : ".Flat"}<RpcGroup.Rpcs<typeof contract>>;`;
   }
   const operations = Array.from(
     { length: count },
     (_, index) => `endpoint("read-${index}"),`
   );
   const sse = workload.httpClient !== "buffered";
-  if (sse) {
+  if (mixed) {
+    operations[0] = "events,";
+  } else if (sse) {
     operations.push("events,");
   }
   return `const endpoint = <const Name extends string>(name: Name) => HttpApiEndpoint.get(name, "/:id", { params: { id: Schema.Int }, success: Value });
-${sse ? sseEndpoint : ""}
+${sse || mixed ? sseEndpoint : ""}
 const contract = HttpApi.make("type-baseline").add(HttpApiGroup.make("scale").add(\n${operations.join("\n")}\n));
 ${httpClientDeclarations[workload.httpClient]}`;
 };
+
+const fixtureImports = (
+  adapter: Workload["adapter"],
+  consumer: Consumer,
+  sse: boolean,
+  overloaded: boolean
+) => {
+  const effectImport = `import { Schema${overloaded ? ", type Effect, type Stream" : ""} } from "effect";`;
+  const contractImport =
+    adapter === "rpc"
+      ? 'import { Rpc, RpcGroup, type RpcClient } from "effect/rpc";'
+      : `import { HttpApi, HttpApiEndpoint, HttpApiGroup, type HttpApiClient${sse ? ", HttpApiSchema" : ""} } from "effect/http-api";`;
+  if (consumer === "contract") {
+    return `${effectImport}\n${contractImport}`;
+  }
+  if (consumer === "hydration-bare" || consumer === "hydration-paths") {
+    return `${effectImport}\n${contractImport}\nimport { createContractHydrationRegistry } from "${packageName}";`;
+  }
+  const factory =
+    adapter === "rpc" ? "createRpcQueryUtils" : "createHttpApiQueryUtils";
+  const configured = isConfiguredConsumer(consumer);
+  const policy = adapter === "rpc" ? "defineRpcPolicy" : "defineHttpApiPolicy";
+  return `${effectImport}\n${contractImport}\nimport { QueryClient } from "@tanstack/query-core";\nimport { ${factory}${configured ? ", configureUtils" : ""}${consumer === "policy" ? `, ${policy}` : ""}${overloaded ? ", type CreateHttpApiQueryUtilsOptions, type EffectHttpApiQueryError, type InferQueryError, type RunPromiseExit, type RuntimeInput" : ""} } from "${packageName}";`;
+};
+
+const isConfiguredConsumer = (consumer: Consumer) =>
+  consumer === "configured" || consumer === "policy" || usesRetention(consumer);
+
+const usesRetention = (consumer: Consumer) =>
+  consumer === "retention-root" || consumer === "retention-path";
 
 const fixture = (workload: Workload, count: number, consumer: Consumer) => {
   const { adapter } = workload;
@@ -159,35 +211,73 @@ const fixture = (workload: Workload, count: number, consumer: Consumer) => {
   const overloaded =
     workload.adapter === "http" &&
     workload.httpClient.startsWith("sse-overload");
-  const utilities = consumer !== "contract";
-  const configured = consumer === "configured";
   const last = count - 1;
-  const factory =
-    adapter === "rpc" ? "createRpcQueryUtils" : "createHttpApiQueryUtils";
-  const imports = `import { Schema${overloaded ? ", type Effect, type Stream" : ""} } from "effect";\n${
-    adapter === "rpc"
-      ? 'import { Rpc, RpcGroup, type RpcClient } from "effect/rpc";'
-      : `import { HttpApi, HttpApiEndpoint, HttpApiGroup, type HttpApiClient${sse ? ", HttpApiSchema" : ""} } from "effect/http-api";`
-  }\n${utilities ? `import { QueryClient } from "@tanstack/query-core";\nimport { ${factory}${configured ? ", configureUtils" : ""}${overloaded ? ", type CreateHttpApiQueryUtilsOptions, type EffectHttpApiQueryError, type InferQueryError, type RunPromiseExit" : ""} } from "${packageName}";` : ""}`;
+  const mixed = usesRetention(consumer);
+  const imports = fixtureImports(
+    adapter,
+    consumer,
+    sse || (mixed && adapter === "http"),
+    overloaded
+  );
   const success =
     "const Value = Schema.Struct({ id: Schema.Int, label: Schema.String });";
-  const contract = contractFixture(workload, count);
+  const contract = contractFixture(
+    workload,
+    count,
+    mixed,
+    consumer === "object-client"
+  );
+  if (consumer === "hydration-bare") {
+    return `${imports}\n${success}\n${contract}\nconst registry = createContractHydrationRegistry(contract);\nexport { registry };\n`;
+  }
+  if (consumer === "hydration-paths") {
+    return `${imports}\n${success}\n${contract}\nconst registry = createContractHydrationRegistry(contract, { keyPrefix: ["type-baseline"], paths: { "scale.read-${last}": { query: Value, infinite: { pageParam: Schema.Int } } } });\nexport { registry };\n`;
+  }
+  if (consumer === "contract") {
+    const operation =
+      adapter === "rpc"
+        ? `client("scale.read-${last}", { id: 1 })`
+        : `client.scale["read-${last}"]({ params: { id: 1 } })`;
+    return `${imports}\n${success}\n${contract}\nconst operation = ${operation};\nexport { contract, operation };\n`;
+  }
+  const configured = isConfiguredConsumer(consumer);
+  const factory =
+    adapter === "rpc" ? "createRpcQueryUtils" : "createHttpApiQueryUtils";
   const configuration = configured
-    ? `const utils = configureUtils(raw, { query: { policy: { retry: false } }, scoped: { scale: { scoped: { "read-${last}": { query: { policy: { staleTime: 1000 }, interceptors: [async ({ next }) => { const value = await next(); value.label satisfies string; return value; }] } } } } } });\n`
+    ? configurationFixture(adapter, consumer, last)
     : "";
   const runner = overloaded
-    ? 'declare const runPromiseExit: RunPromiseExit<"acquisition-service" | "stream-service">;\n'
+    ? 'declare const runtime: RunPromiseExit<"acquisition-service" | "stream-service">;\n'
     : "";
-  const use = utilities
-    ? `${runner}const ${configured ? "raw" : "utils"} = ${factory}(contract, { client, keyPrefix: ["type-baseline"]${overloaded ? ", runPromiseExit" : ""} });
+  const use = `${runner}const ${configured ? "raw" : "utils"} = ${factory}(contract, { client, keyPrefix: ["type-baseline"]${overloaded ? ", runtime" : ""} });
 ${configuration}const options = utils.scale["read-${last}"].queryOptions({ input: ${adapter === "rpc" ? "{ id: 1 }" : "{ params: { id: 1 } }"}, select: value => value.label });
 const cached = new QueryClient().getQueryData(options.queryKey);
 const id: number | undefined = cached?.id;
 export { options, id };
+${mixed ? `export const retained = utils.scale.events.streamedOptions(${adapter === "http" ? "{ input: { params: { id: 1 } } }" : ""});` : ""}
 ${sse ? useSse : ""}
-${overloaded ? checkOverload : ""}`
-    : `const operation = ${adapter === "rpc" ? `client("scale.read-${last}", { id: 1 })` : `client.scale["read-${last}"]({ params: { id: 1 } })`};\nexport { contract, operation };`;
+${overloaded ? checkOverload : ""}`;
   return `${imports}\n${success}\n${contract}\n${use}\n`;
+};
+
+const configurationFixture = (
+  adapter: Workload["adapter"],
+  consumer: Consumer,
+  last: number
+) => {
+  const settings = `{ query: { retry: false }, paths: { "scale.read-${last}": { query: { staleTime: 1000, interceptors: [async ({ next }) => { const value = await next(); value.label satisfies string; return value; }] } } } }`;
+  if (consumer === "policy") {
+    const constructor =
+      adapter === "rpc" ? "defineRpcPolicy" : "defineHttpApiPolicy";
+    return `const policy = ${constructor}(contract, ${settings}, { keyPrefix: ["type-baseline"] });\nconst utils = configureUtils(raw, policy);\n`;
+  }
+  if (consumer === "retention-root") {
+    return "const utils = configureUtils(raw, { streamed: { maxChunks: 3 } });\n";
+  }
+  if (consumer === "retention-path") {
+    return 'const utils = configureUtils(raw, { paths: { "scale.events": { streamed: { maxChunks: 3 } } } });\n';
+  }
+  return `const utils = configureUtils(raw, ${settings});\n`;
 };
 
 const artifacts = path.join(repositoryRoot, ".artifacts", "performance");
@@ -217,7 +307,20 @@ try {
   )) {
     for (const workload of workloads) {
       for (const count of counts) {
-        for (const consumer of consumers) {
+        for (const consumer of selectedConsumers) {
+          if (consumer === "object-client" && workload.adapter !== "rpc") {
+            continue;
+          }
+          if (count < 2 && usesRetention(consumer)) {
+            continue;
+          }
+          if (
+            workload.adapter === "http" &&
+            workload.httpClient !== "buffered" &&
+            (consumer === "policy" || usesRetention(consumer))
+          ) {
+            continue;
+          }
           const source = path.join(directory, "consumer.ts");
           writeFileSync(source, fixture(workload, count, consumer));
           const config = path.join(directory, "tsconfig.json");
@@ -305,7 +408,7 @@ try {
     workload: {
       counts,
       workloads,
-      consumers,
+      consumers: selectedConsumers,
       declarationSource: "built public package exports",
       compilation:
         "fresh compiler process, one literal contract, final buffered leaf and any SSE leaf consumed",
@@ -320,8 +423,13 @@ try {
       measurement.httpClient === "buffered"
         ? measurement.adapter
         : measurement.httpClient;
-    const key = `${measurement.compiler}/${adapter}/${measurement.operations}/${measurement.consumer}`;
-    const budget = compilerBudgets.get(key);
+    const fixtureKey = `${measurement.compiler}/${adapter}/${measurement.operations}`;
+    const key = `${fixtureKey}/${measurement.consumer}`;
+    const budget =
+      compilerBudgets.get(key) ??
+      (isConfiguredConsumer(measurement.consumer)
+        ? compilerBudgets.get(`${fixtureKey}/configured`)
+        : undefined);
     if (budget !== undefined) {
       assertBudget(key, measurement.diagnostics.instantiations, budget);
     }

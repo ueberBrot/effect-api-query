@@ -19,7 +19,7 @@ import {
 import {
   createHttpApiQueryUtils,
   configureUtils,
-  defineUtilsPolicy,
+  defineHttpApiPolicy,
   EffectHttpApiQueryError,
   type CreateHttpApiQueryUtilsOptions,
   type EffectHttpApiQueryConfigErrorCode,
@@ -28,6 +28,7 @@ import {
   type HttpApiQueryUtils,
   type InferQueryError,
   type RunPromiseExit,
+  type RuntimeInput,
 } from "@ueberbrot/effect-api-query";
 import { Context, Effect, Schema } from "effect";
 import type {
@@ -160,7 +161,7 @@ const configuration: CreateHttpApiQueryUtilsOptions<typeof api, typeof prefix> =
     keyPrefix: prefix,
   };
 true satisfies Assert<
-  Equal<typeof configuration.runPromiseExit, RunPromiseExit | undefined>
+  Equal<typeof configuration.runtime, RuntimeInput | undefined>
 >;
 const utils = createHttpApiQueryUtils(api, configuration);
 const annotated: HttpApiQueryUtils<typeof api, typeof prefix> = utils;
@@ -194,15 +195,26 @@ const topLevelKey: readonly ["app", "http", "account.api", "ping"] =
 void [root, groupKey, endpointKey, topLevelKey];
 true satisfies Assert<
   Equal<
-    keyof (typeof utils)["user.accounts"],
-    "key" | "get.user" | "save" | "upload" | "mixedUpload" | "wrappedBuffered"
+    Extract<keyof (typeof utils)["user.accounts"], string>,
+    | "key"
+    | "queryFilter"
+    | "get.user"
+    | "save"
+    | "upload"
+    | "mixedUpload"
+    | "wrappedBuffered"
   >
 >;
-true satisfies Assert<Equal<keyof typeof utils.uploads, "key" | "mixedUpload">>;
+true satisfies Assert<
+  Equal<
+    Extract<keyof typeof utils.uploads, string>,
+    "key" | "queryFilter" | "mixedUpload"
+  >
+>;
 true satisfies Assert<
   Equal<
     keyof (typeof utils)["user.accounts"]["upload"],
-    "key" | "mutationKey" | "mutationOptions"
+    "call" | "effect" | "key" | "mutationKey" | "mutationOptions"
   >
 >;
 true satisfies Assert<
@@ -224,7 +236,10 @@ void [uploadKey, uploadMutationKey];
 true satisfies Assert<
   Equal<
     keyof typeof utils.ping,
+    | "call"
+    | "effect"
     | "key"
+    | "queryFilter"
     | "queryKey"
     | "queryOptions"
     | "mutationKey"
@@ -477,12 +492,12 @@ createHttpApiQueryUtils(serviceApi, {
 createHttpApiQueryUtils(serviceApi, {
   client: serviceClient,
   keyPrefix: ["app"],
-  runPromiseExit: runner,
+  runtime: runner,
 });
 const serviceUtils = createHttpApiQueryUtils(serviceApi, {
   client: serviceClient,
   keyPrefix: ["app"],
-  runPromiseExit: runner,
+  runtime: runner,
   keyEncoders: { work: { serviceful: encoder } },
 });
 const serviceQuery = serviceUtils.work.serviceful.queryOptions({
@@ -515,9 +530,14 @@ type ServiceRequirements = NonNullable<
     typeof serviceApi,
     readonly ["app"],
     typeof serviceClient
-  >["runPromiseExit"]
+  >["runtime"]
 >;
-true satisfies Assert<Equal<ServiceRequirements, typeof runner>>;
+true satisfies Assert<
+  Equal<
+    ServiceRequirements,
+    typeof runner | { readonly runPromiseExit: typeof runner }
+  >
+>;
 
 const extraApi = HttpApi.make("extra").add(
   HttpApiGroup.make("system", { topLevel: true }).add(Ping)
@@ -534,8 +554,8 @@ true satisfies Assert<
       typeof extraApi,
       readonly ["app"],
       typeof extraClient
-    >["runPromiseExit"],
-    typeof extraRunner
+    >["runtime"],
+    typeof extraRunner | { readonly runPromiseExit: typeof extraRunner }
   >
 >;
 true satisfies Assert<
@@ -544,8 +564,8 @@ true satisfies Assert<
       typeof extraApi,
       readonly ["app"],
       HttpApiClient.ForApi<typeof extraApi, never, unknown>
-    >["runPromiseExit"],
-    RunPromiseExit<unknown>
+    >["runtime"],
+    RuntimeInput<unknown>
   >
 >;
 // @ts-expect-error Additional ready-client services alone still require a runner.
@@ -553,7 +573,7 @@ createHttpApiQueryUtils(extraApi, { client: extraClient, keyPrefix: ["app"] });
 const extraUtils = createHttpApiQueryUtils(extraApi, {
   client: extraClient,
   keyPrefix: ["app"],
-  runPromiseExit: extraRunner,
+  runtime: extraRunner,
 });
 const extraError:
   | EffectHttpApiQueryError<
@@ -626,7 +646,9 @@ const emptyUtils = createHttpApiQueryUtils(emptyApi, {
   client: emptyClient,
   keyPrefix: ["app"],
 });
-true satisfies Assert<Equal<Extract<keyof typeof emptyUtils, string>, "key">>;
+true satisfies Assert<
+  Equal<Extract<keyof typeof emptyUtils, string>, "key" | "queryFilter">
+>;
 createHttpApiQueryUtils(emptyApi, {
   client: emptyClient,
   keyPrefix: ["app"],
@@ -708,7 +730,7 @@ declare const headerRunner: RunPromiseExit<DecodeSuccess>;
 createHttpApiQueryUtils(headerApi, {
   client: headerClient,
   keyPrefix: ["app"],
-  runPromiseExit: headerRunner,
+  runtime: headerRunner,
 });
 const configCode: EffectHttpApiQueryConfigErrorCode =
   "UnsupportedEndpointMetadata";
@@ -770,18 +792,22 @@ const completeRequest = {
   headers: { "x-locale": "en" },
   payload: { page: 2 },
 };
-keyUtils["request.parts"].queryKey(completeRequest);
+keyUtils["request.parts"].queryKey({ input: completeRequest });
 keyUtils["request.parts"].mutationOptions().mutationFn(completeRequest);
-// @ts-expect-error A declared optional-only query container stays required.
 keyUtils["request.parts"].queryKey({
-  params: { id: 1 },
-  headers: { "x-locale": "en" },
-  payload: { page: 2 },
+  // @ts-expect-error A declared optional-only query container stays required.
+  input: {
+    params: { id: 1 },
+    headers: { "x-locale": "en" },
+    payload: { page: 2 },
+  },
 });
 keyUtils["request.parts"].queryKey({
-  ...completeRequest,
-  // @ts-expect-error HTTP payloads use decoded fields.
-  payload: { page: "2" },
+  input: {
+    ...completeRequest,
+    // @ts-expect-error HTTP payloads use decoded fields.
+    payload: { page: "2" },
+  },
 });
 keyUtils["request.parts"]
   .mutationOptions()
@@ -872,18 +898,23 @@ declare const encodingRunner: RunPromiseExit<
 type RequestPartRequirements = CreateHttpApiQueryUtilsOptions<
   typeof servicePartsApi,
   readonly ["app"]
->["runPromiseExit"];
-true satisfies Assert<Equal<RequestPartRequirements, typeof encodingRunner>>;
+>["runtime"];
+true satisfies Assert<
+  Equal<
+    RequestPartRequirements,
+    typeof encodingRunner | { readonly runPromiseExit: typeof encodingRunner }
+  >
+>;
 // @ts-expect-error Encoding services in non-payload request parts require a key encoder.
 createHttpApiQueryUtils(servicePartsApi, {
   client: servicePartsClient,
   keyPrefix: ["app"],
-  runPromiseExit: encodingRunner,
+  runtime: encodingRunner,
 });
 createHttpApiQueryUtils(servicePartsApi, {
   client: servicePartsClient,
   keyPrefix: ["app"],
-  runPromiseExit: encodingRunner,
+  runtime: encodingRunner,
   keyEncoders: {
     parts: {
       serviceParts: (request) => ({
@@ -941,7 +972,7 @@ const constructedWith = Effect.gen(function* () {
   const generated = createHttpApiQueryUtils(authorizedApi, {
     client: ready,
     keyPrefix: ["app"],
-    runPromiseExit: extraRunner,
+    runtime: extraRunner,
   });
   const state = queryClient.getQueryState(generated.account.ping.queryKey());
   true satisfies Assert<
@@ -985,10 +1016,12 @@ createHttpApiQueryUtils(api, { client: customClient, keyPrefix: ["app"] });
 const custom = createHttpApiQueryUtils(api, {
   client: customClient,
   keyPrefix: ["app"],
-  runPromiseExit: extraRunner,
+  runtime: extraRunner,
 });
 const customState = queryClient.getQueryState(
-  custom["user.accounts"].save.queryKey({ payload: { id: 1, name: "Ada" } })
+  custom["user.accounts"].save.queryKey({
+    input: { payload: { id: 1, name: "Ada" } },
+  })
 );
 true satisfies Assert<
   Equal<
@@ -1006,14 +1039,14 @@ createHttpApiQueryUtils(api, {
   client: customClient,
   keyPrefix: ["app"],
   // @ts-expect-error An unrelated schema runner cannot supply custom method services.
-  runPromiseExit: headerRunner,
+  runtime: headerRunner,
 });
 createHttpApiQueryUtils(serviceApi, {
   client: serviceClient,
   keyPrefix: ["app"],
   keyEncoders: { work: { serviceful: encoder } },
   // @ts-expect-error A custom key encoder leaves execution schema services intact.
-  runPromiseExit: extraRunner,
+  runtime: extraRunner,
 });
 
 const omittedCustomClient = {
@@ -1033,7 +1066,12 @@ const omittedCustom = createHttpApiQueryUtils(omittedServiceApi, {
   client: omittedCustomClient,
   keyPrefix: ["app"],
 });
-true satisfies Assert<Equal<keyof typeof omittedCustom.system, "key" | "ping">>;
+true satisfies Assert<
+  Equal<
+    Extract<keyof typeof omittedCustom.system, string>,
+    "key" | "queryFilter" | "ping"
+  >
+>;
 
 class DecodeMiddlewareError extends Context.Service<
   DecodeMiddlewareError,
@@ -1066,13 +1104,19 @@ declare const middlewareRunner: RunPromiseExit<DecodeMiddlewareError>;
 createHttpApiQueryUtils(middlewareServiceApi, {
   client: middlewareServiceClient,
   keyPrefix: ["app"],
-  runPromiseExit: middlewareRunner,
+  runtime: middlewareRunner,
 });
 type MiddlewareRequirements = CreateHttpApiQueryUtilsOptions<
   typeof middlewareServiceApi,
   readonly ["app"]
->["runPromiseExit"];
-true satisfies Assert<Equal<MiddlewareRequirements, typeof middlewareRunner>>;
+>["runtime"];
+true satisfies Assert<
+  Equal<
+    MiddlewareRequirements,
+    | typeof middlewareRunner
+    | { readonly runPromiseExit: typeof middlewareRunner }
+  >
+>;
 const omittedMiddlewareApi = HttpApi.make("omitted-middleware").add(
   HttpApiGroup.make("account").add(Ping, Stream.middleware(ServicefulAuth))
 );
@@ -1122,14 +1166,19 @@ createHttpApiQueryUtils(servicefulUploadApi, {
 const servicefulUploadUtils = createHttpApiQueryUtils(servicefulUploadApi, {
   client: servicefulUploadClient,
   keyPrefix: ["app"],
-  runPromiseExit: uploadRunner,
+  runtime: uploadRunner,
 });
 type UploadRequirements = CreateHttpApiQueryUtilsOptions<
   typeof servicefulUploadApi,
   readonly ["app"],
   typeof servicefulUploadClient
->["runPromiseExit"];
-true satisfies Assert<Equal<UploadRequirements, typeof uploadRunner>>;
+>["runtime"];
+true satisfies Assert<
+  Equal<
+    UploadRequirements,
+    typeof uploadRunner | { readonly runPromiseExit: typeof uploadRunner }
+  >
+>;
 const servicefulUploadOptions =
   servicefulUploadUtils.files.upload.mutationOptions();
 const servicefulUploadHook = useMutation(servicefulUploadOptions);
@@ -1158,12 +1207,12 @@ createHttpApiQueryUtils(servicefulUploadApi, {
   client: servicefulUploadClient,
   keyPrefix: ["app"],
   // @ts-expect-error Supplying only custom client services cannot run serviceful request/response schemas.
-  runPromiseExit: extraRunner,
+  runtime: extraRunner,
 });
 createHttpApiQueryUtils(servicefulUploadApi, {
   client: servicefulUploadClient,
   keyPrefix: ["app"],
-  runPromiseExit: uploadRunner,
+  runtime: uploadRunner,
   // @ts-expect-error Serviceful multipart endpoints need execution services but accept no key encoder.
   keyEncoders: { files: { upload: () => "unused" } },
 });
@@ -1191,7 +1240,7 @@ createHttpApiQueryUtils(api, {
 const customUploadUtils = createHttpApiQueryUtils(api, {
   client: customUploadClient,
   keyPrefix: ["app"],
-  runPromiseExit: extraRunner,
+  runtime: extraRunner,
 });
 const customUploadHook = useMutation(
   customUploadUtils.upload.mutationOptions()
@@ -1256,17 +1305,31 @@ const overloadedServiceUtils = createHttpApiQueryUtils(serviceApi, {
   client: overloadedServiceClient,
   keyPrefix: ["app"],
   keyEncoders: { work: { serviceful: encoder } },
-  runPromiseExit: metadataRunner,
+  runtime: metadataRunner,
 });
+const decodedEffect = overloadedServiceUtils.work.serviceful.effect({
+  input: { payload: { id: 1, name: "Ada" } },
+});
+true satisfies Assert<
+  Equal<
+    Effect.Services<typeof decodedEffect>,
+    EncodeRequest | DecodeSuccess | DecodeError | ExtraClientService
+  >
+>;
 type OverloadedRequirements = CreateHttpApiQueryUtilsOptions<
   typeof serviceApi,
   readonly ["app"],
   typeof overloadedServiceClient
->["runPromiseExit"];
-true satisfies Assert<Equal<OverloadedRequirements, typeof metadataRunner>>;
+>["runtime"];
+true satisfies Assert<
+  Equal<
+    OverloadedRequirements,
+    typeof metadataRunner | { readonly runPromiseExit: typeof metadataRunner }
+  >
+>;
 const overloadedServiceState = queryClient.getQueryState(
   overloadedServiceUtils.work.serviceful.queryKey({
-    payload: { id: 1, name: "Ada" },
+    input: { payload: { id: 1, name: "Ada" } },
   })
 );
 true satisfies Assert<
@@ -1280,7 +1343,7 @@ createHttpApiQueryUtils(serviceApi, {
   keyPrefix: ["app"],
   keyEncoders: { work: { serviceful: encoder } },
   // @ts-expect-error Decoded schema requirements survive response-control overloads.
-  runPromiseExit: extraRunner,
+  runtime: extraRunner,
 });
 
 const variantApi = HttpApi.make("variants").add(
@@ -1309,17 +1372,17 @@ type VariantRequirements<Method> = CreateHttpApiQueryUtilsOptions<
   typeof variantApi,
   readonly ["variants"],
   { readonly work: { readonly choose: Method } }
->["runPromiseExit"];
+>["runtime"];
 true satisfies Assert<
   Equal<
     VariantRequirements<VariantOverload & VariantMethod>,
-    RunPromiseExit<"variant-service">
+    RuntimeInput<"variant-service">
   >
 >;
 true satisfies Assert<
   Equal<
     VariantRequirements<VariantMethod & VariantOverload & UndispatchedOverload>,
-    RunPromiseExit<"variant-service">
+    RuntimeInput<"variant-service">
   >
 >;
 declare const variantClient: {
@@ -1327,11 +1390,11 @@ declare const variantClient: {
     readonly choose: VariantMethod & VariantOverload & UndispatchedOverload;
   };
 };
-declare const variantRunner: RunPromiseExit<"variant-service">;
+declare const variantRunner: RuntimeInput<"variant-service">;
 const variant = createHttpApiQueryUtils(variantApi, {
   client: variantClient,
   keyPrefix: ["variants"],
-  runPromiseExit: variantRunner,
+  runtime: variantRunner,
 });
 type HttpFailurePayload<T> =
   T extends EffectHttpApiQueryError<infer Payload> ? Payload : never;
@@ -1365,11 +1428,11 @@ const overloadedCustomClient = {
 const overloadedCustomUtils = createHttpApiQueryUtils(api, {
   client: overloadedCustomClient,
   keyPrefix: ["app"],
-  runPromiseExit: extraRunner,
+  runtime: extraRunner,
 });
 const overloadedCustomState = queryClient.getQueryState(
   overloadedCustomUtils["user.accounts"].save.queryKey({
-    payload: { id: 1, name: "Ada" },
+    input: { payload: { id: 1, name: "Ada" } },
   })
 );
 true satisfies Assert<
@@ -1457,7 +1520,7 @@ type UserMetadata = {
 true satisfies Assert<
   Equal<ReturnType<typeof getUser.metadataKey>[5], "metadata">
 >;
-const metadataCache = queryClient.getQueryData(getUser.metadataKey(input));
+const metadataCache = queryClient.getQueryData(getUser.metadataKey({ input }));
 true satisfies Assert<Equal<typeof metadataCache, UserMetadata | undefined>>;
 const initialMetadata = {
   data: { id: 1, name: "Ada" },
@@ -1532,7 +1595,7 @@ getUser.metadataMutationOptions();
 // @ts-expect-error Metadata views retain complete decoded request containers.
 getUser.metadataOptions({ input: { params: { id: 1 } } });
 // @ts-expect-error Response controls belong to the metadata view.
-getUser.metadataKey({ ...input, responseMode: "response-only" });
+getUser.metadataKey({ input: { ...input, responseMode: "response-only" } });
 // @ts-expect-error Inputless metadata builders cannot be skipped.
 utils.ping.metadataOptions(skipToken);
 // @ts-expect-error Metadata hash defaults belong to QueryClient.
@@ -1546,7 +1609,7 @@ true satisfies Assert<
 >;
 const metadataServiceState = queryClient.getQueryState(
   overloadedServiceUtils.work.serviceful.metadataKey({
-    payload: { id: 1, name: "Ada" },
+    input: { payload: { id: 1, name: "Ada" } },
   })
 );
 true satisfies Assert<
@@ -1745,7 +1808,9 @@ true satisfies Assert<
     InfiniteData<typeof User.Type, number> | undefined
   >
 >;
-const infiniteKeyCache = queryClient.getQueryData(getUser.infiniteKey(input));
+const infiniteKeyCache = queryClient.getQueryData(
+  getUser.infiniteKey({ input })
+);
 true satisfies Assert<
   Equal<
     typeof infiniteKeyCache,
@@ -2070,42 +2135,53 @@ getUser.infiniteOptions({
   queryKeyHashFn: JSON.stringify,
 });
 
-const httpPolicy = defineUtilsPolicy<
-  HttpApiQueryUtils<typeof api, typeof prefix>
->()({
-  scoped: {
-    "user.accounts": {
-      scoped: {
-        "get.user": {
-          metadata: {
-            interceptors: [
-              async ({ next }) => {
-                const result = await next();
-                result.data.id satisfies number;
-                result.status satisfies number;
-                // @ts-expect-error Metadata data retains its decoded shape.
-                result.data satisfies string;
-                return result;
-              },
-            ],
+const httpPolicy = defineHttpApiPolicy(
+  api,
+  {
+    paths: {
+      "user.accounts.get.user": {
+        query: {
+          enabled: (query) => query.queryKey[0] === "app",
+          refetchInterval: (query) => {
+            query.queryKey[0] satisfies "app";
+            return 500;
           },
-          mutation: {
-            policy: {
-              onSuccess: (data, variables) => {
-                data.id satisfies number;
-                variables.params.id satisfies number;
-                // @ts-expect-error Variables retain decoded request parts.
-                variables.id;
-              },
+        },
+        metadata: {
+          interceptors: [
+            async ({ next }) => {
+              const result = await next();
+              result.data.id satisfies number;
+              result.status satisfies number;
+              // @ts-expect-error Metadata data retains its decoded shape.
+              result.data satisfies string;
+              return result;
             },
+          ],
+        },
+        mutation: {
+          onSuccess: (data, variables) => {
+            data.id satisfies number;
+            variables.params.id satisfies number;
+            // @ts-expect-error Variables retain decoded request parts.
+            variables.id;
           },
         },
       },
     },
   },
-});
+  { keyPrefix: prefix }
+);
 configureUtils(utils, httpPolicy);
-// @ts-expect-error HTTP policy scopes use literal group identifiers.
-defineUtilsPolicy<typeof utils>()({ scoped: { users: {} } });
+defineHttpApiPolicy(
+  api,
+  {
+    paths: {
+      // @ts-expect-error HTTP policy scopes use literal group identifiers.
+      users: {},
+    },
+  },
+  { keyPrefix: prefix }
+);
 // @ts-expect-error A buffered HTTP leaf does not support a live view.
-defineUtilsPolicy<(typeof utils)["user.accounts"]["get.user"]>()({ live: {} });
+configureUtils(utils["user.accounts"]["get.user"], { live: {} });

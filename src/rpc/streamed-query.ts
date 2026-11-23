@@ -20,7 +20,7 @@ export interface RpcStreamInvocation {
 
 export const createStreamPreparation =
   (rpc: RpcStreamInvocation): StreamingOperation["prepareStream"] =>
-  (options, operation, runPromiseExit, requestOptions) => {
+  (options, operation) => {
     const { policy, history } = prepareStreamPolicy(
       options,
       operation,
@@ -29,7 +29,7 @@ export const createStreamPreparation =
     );
     return {
       identity: history === undefined ? [] : [Object.freeze(history)],
-      makeQuery: (input) =>
+      makeQuery: (input, runPromiseExit, requestOptions) =>
         makeStreamQuery({
           policy,
           source: Stream.suspend(() => rpc.invoke(input, requestOptions)),

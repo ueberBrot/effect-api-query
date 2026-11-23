@@ -8,7 +8,7 @@ import {
   applicationPolicy,
 } from "../../examples/shared/application-policy";
 
-declare const client: RpcClient.RpcClient.Flat<
+declare const client: RpcClient.RpcClient<
   RpcGroup.Rpcs<typeof exampleRpcGroup>
 >;
 const application = applicationQueries(
@@ -19,7 +19,7 @@ const application = applicationQueries(
     requestedName satisfies string;
   }
 );
-applicationPolicy.query.policy.retry satisfies false;
+applicationPolicy.query.retry satisfies false;
 application
   .selectedUser(1)
   .select?.(new User({ id: 1, locale: "en", name: "Ada" })) satisfies

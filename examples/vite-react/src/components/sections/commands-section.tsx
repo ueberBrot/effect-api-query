@@ -20,9 +20,13 @@ const Command = ({
     if (!application.isActive()) {
       return;
     }
-    await queryClient.invalidateQueries({
-      queryKey: rpcQuery.commands.status.queryKey(input),
-    });
+    await queryClient.invalidateQueries(
+      rpcQuery.commands.status.queryFilter({
+        view: "query",
+        input,
+        exact: true,
+      })
+    );
   };
   const start = useMutation(
     trackMutationOptions(

@@ -45,7 +45,7 @@ try {
   const http = createHttpApiQueryUtils(users, {
     client,
     keyPrefix: ["users-app"],
-    runPromiseExit: runtime.runPromiseExit,
+    runtime,
   });
   await queryClient.query(
     http.users.get.queryOptions({
@@ -61,7 +61,7 @@ try {
     queryClient,
     http.users.rename.mutationOptions({
       onSuccess: async () => {
-        await queryClient.invalidateQueries({ queryKey: http.users.key() });
+        await queryClient.invalidateQueries(http.users.queryFilter());
       },
     })
   );
@@ -69,8 +69,7 @@ try {
   const upload = new MutationObserver(
     queryClient,
     http.users.upload.mutationOptions({
-      onSuccess: () =>
-        queryClient.invalidateQueries({ queryKey: http.users.key() }),
+      onSuccess: () => queryClient.invalidateQueries(http.users.queryFilter()),
     })
   );
   const payload = new FormData();
@@ -110,7 +109,7 @@ If the Schema accepts named events without a data line, set `sseOptions.dispatch
 
 ## Read buffered metadata
 
-Use `metadataOptions` for decoded data with response status and raw headers. Use `metadataKey(input)` for exact cache access. Its `metadata` segment separates it from the ordinary view. The leaf prefix matches both. This view is available only on query-capable buffered endpoints.
+Use `metadataOptions` for decoded data with response status and raw headers. Use `metadataKey({ input })` for exact cache access. Its `metadata` segment separates it from the ordinary view. The leaf prefix matches both. This view is available only on query-capable buffered endpoints.
 
 The adapter freezes the fetched envelope and its copied headers. It keeps decoded data and declared wrappers as returned. Only a whole `undefined` becomes `null`. The app owns initial, hydrated, manual, and selected values.
 
@@ -157,7 +156,7 @@ export function httpEventOptions(
   };
   return {
     history: http.events.watch.streamedOptions({ input, ...policy }),
-    historyKey: http.events.watch.streamedKey(input, policy),
+    historyKey: http.events.watch.streamedKey({ input, ...policy }),
     latest: http.events.watch.liveOptions({
       input,
       sseOptions: policy.sseOptions,

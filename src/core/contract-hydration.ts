@@ -1,0 +1,1135 @@
+import {
+  Array as EffectArray,
+  Effect,
+  Function,
+  Predicate,
+  Schema,
+  SchemaAST,
+  SchemaParser,
+  SchemaTransformation,
+} from "effect";
+import { HttpApi, HttpApiSchema } from "effect/http-api";
+import { Rpc, RpcSchema } from "effect/rpc";
+import type { RpcGroup } from "effect/rpc";
+
+import { classifyHttpEndpoint } from "../http/endpoint";
+import type { QueryableHttpEndpoint } from "../http/endpoint";
+import type {
+  HttpContractDecodingServices,
+  HttpContractEncodingServices,
+  HttpContractHydrationOptions,
+  RpcContractDecodingServices,
+  RpcContractEncodingServices,
+  RpcContractHydrationOptions,
+} from "./contract-hydration-types";
+import {
+  buildHydrationRegistry,
+  compileHydrationCodec,
+  HydrationCodecError,
+} from "./hydration";
+import type { CompiledHydrationCodec, HydrationRegistry } from "./hydration";
+import type { QueryView } from "./inference";
+import { freezeMetadata } from "./metadata-query";
+import type { JsonValue } from "./types";
+import {
+  normalizeUtilityKeyPrefix,
+  validateUtilityPaths,
+} from "./utility-path";
+
+const rpcAllowedViews = new Set(["query", "live", "streamed"]);
+const httpAllowedViews = new Set(["query", "metadata", "live", "streamed"]);
+
+const UndefinedElementCodec =
+  /* @__PURE__ */
+  (() =>
+    Schema.Tuple([Schema.Literal("undefined")]).pipe(
+      Schema.decodeTo(
+        Schema.Undefined,
+        SchemaTransformation.transform({
+          decode: Function.constUndefined,
+          encode: () => ["undefined"] as const,
+        })
+      )
+    ))();
+
+const readOwn = (record: Record<string, unknown>, key: string) =>
+  Object.hasOwn(record, key) ? record[key] : undefined;
+
+const normalizeKeyPrefix = (
+  options: Record<string, unknown> | undefined
+): readonly JsonValue[] =>
+  normalizeUtilityKeyPrefix(
+    options,
+    (reason, cause) =>
+      new HydrationCodecError(
+        "InvalidKeyPrefix",
+        reason === "Shape"
+          ? undefined
+          : {
+              message: "keyPrefix must contain only JSON-safe values",
+              cause,
+            }
+      )
+  );
+
+const validateViews = (
+  options: Record<string, unknown> | undefined,
+  allowed: ReadonlySet<string>
+): ReadonlyMap<string, boolean> => {
+  const result = new Map<string, boolean>();
+  const views = options?.["views"];
+  if (views === undefined) {
+    return result;
+  }
+  if (!Predicate.isObject(views)) {
+    throw new HydrationCodecError("InvalidContractPath", {
+      message: "views must be an object of boolean view toggles",
+    });
+  }
+  for (const key of new Set([
+    ...Object.getOwnPropertyNames(views),
+    ...allowed,
+  ])) {
+    if (!allowed.has(key)) {
+      throw new HydrationCodecError("UnknownPath", {
+        message: `Unknown hydration view "${key}"`,
+      });
+    }
+    const value = views[key];
+    if (value !== undefined) {
+      if (!Predicate.isBoolean(value)) {
+        throw new HydrationCodecError("InvalidContractPath", {
+          message: `Hydration view "${key}" must be a boolean`,
+        });
+      }
+      result.set(key, value);
+    }
+  }
+  return result;
+};
+
+const isWithHeadersValue = (
+  value: unknown
+): value is HttpApiSchema.withHeaders<unknown, unknown> =>
+  Predicate.hasProperty(value, HttpApiSchema.WithHeadersValueTypeId);
+
+const hasRepresentation = (ast: SchemaAST.AST, id: string): boolean => {
+  const representation = ast.annotations?.["representation"];
+  return (
+    Predicate.hasProperty(representation, "id") && representation.id === id
+  );
+};
+
+const isOpaqueDeclaration = (ast: SchemaAST.AST): boolean =>
+  SchemaAST.isDeclaration(ast) &&
+  !Predicate.isFunction(ast.annotations?.["toCodecJson"]) &&
+  !Predicate.isFunction(ast.annotations?.["toCodec"]);
+
+const isImplicitJsonLink = (link: SchemaAST.Link): boolean => {
+  const fallback = Schema.toCodecJson(Schema.Unknown).ast.encoding?.[0];
+  return (
+    fallback !== undefined &&
+    link.to.annotations === fallback.to.annotations &&
+    link.transformation === fallback.transformation
+  );
+};
+
+const isUnencodableAst = (
+  ast: SchemaAST.AST,
+  seen: Set<SchemaAST.AST>
+): boolean => {
+  if (seen.has(ast)) {
+    return false;
+  }
+  seen.add(ast);
+  if (hasRepresentation(ast, "effect/schema/Redacted")) {
+    return true;
+  }
+  if (ast.encoding !== undefined) {
+    if (isOpaqueDeclaration(ast) || SchemaAST.isUnknown(ast)) {
+      const [firstLink] = ast.encoding;
+      if (
+        isImplicitJsonLink(firstLink) ||
+        SchemaAST.isUnknown(firstLink.to) ||
+        firstLink.to._tag === "Any"
+      ) {
+        return true;
+      }
+    }
+    return ast.encoding.some((link) => isUnencodableAst(link.to, seen));
+  }
+  return isUnencodableBodyAst(ast, seen);
+};
+
+const unencodableTags = new Set<SchemaAST.AST["_tag"]>([
+  "Any",
+  "BigInt",
+  "Symbol",
+  "UniqueSymbol",
+]);
+
+const isUnencodableBodyAst = (
+  ast: SchemaAST.AST,
+  seen: Set<SchemaAST.AST>
+): boolean => {
+  if (unencodableTags.has(ast._tag) || isOpaqueDeclaration(ast)) {
+    return true;
+  }
+  if (SchemaAST.isLiteral(ast)) {
+    return (
+      !Predicate.isString(ast.literal) &&
+      !Predicate.isNumber(ast.literal) &&
+      !Predicate.isBoolean(ast.literal)
+    );
+  }
+  if (SchemaAST.isArrays(ast)) {
+    return (
+      ast.elements.some((element) => isUnencodableAst(element, seen)) ||
+      ast.rest.some((rest) => isUnencodableAst(rest, seen))
+    );
+  }
+  if (SchemaAST.isObjects(ast)) {
+    return (
+      ast.propertySignatures.some(
+        (property) =>
+          !Predicate.isString(property.name) ||
+          isUnencodableAst(property.type, seen)
+      ) ||
+      ast.indexSignatures.some(
+        (signature) =>
+          isUnencodableAst(signature.parameter, seen) ||
+          isUnencodableAst(signature.type, seen)
+      )
+    );
+  }
+  if (SchemaAST.isUnion(ast)) {
+    return ast.types.some((member) => isUnencodableAst(member, seen));
+  }
+  if (SchemaAST.isSuspend(ast)) {
+    return isUnencodableAst(ast.thunk(), seen);
+  }
+  return false;
+};
+
+const assertEncodable = (
+  schema: Schema.Top,
+  path: string,
+  view: QueryView
+): void => {
+  if (isUnencodableAst(schema.ast, new Set())) {
+    throw new HydrationCodecError("UnencodableSchema", {
+      path,
+      view,
+      message: `Schema for "${path}" (${view}) is not JSON-encodable; provide a custom codec override or disable it with false`,
+    });
+  }
+};
+
+const acceptsTag = (
+  ast: SchemaAST.AST,
+  tags: ReadonlySet<SchemaAST.AST["_tag"]>,
+  seen: Set<SchemaAST.AST>
+): boolean => {
+  if (seen.has(ast)) {
+    return false;
+  }
+  seen.add(ast);
+  if (tags.has(ast._tag)) {
+    return true;
+  }
+  if (SchemaAST.isUnion(ast)) {
+    return ast.types.some((member) => acceptsTag(member, tags, seen));
+  }
+  if (SchemaAST.isSuspend(ast)) {
+    return acceptsTag(ast.thunk(), tags, seen);
+  }
+  return false;
+};
+
+const undefinedTags = new Set<SchemaAST.AST["_tag"]>(["Undefined", "Void"]);
+const nullTags = new Set<SchemaAST.AST["_tag"]>(["Null"]);
+
+const acceptsUndefined = (ast: SchemaAST.AST): boolean =>
+  acceptsTag(ast, undefinedTags, new Set());
+
+const acceptsNull = (ast: SchemaAST.AST): boolean =>
+  acceptsTag(ast, nullTags, new Set());
+
+const toJsonCodecSafe = (
+  schema: Schema.Top,
+  path: string,
+  view: QueryView
+): Schema.Top => {
+  try {
+    return Schema.toCodecJson(schema);
+  } catch (error) {
+    throw new HydrationCodecError("UnencodableSchema", {
+      path,
+      view,
+      message: `Schema for "${path}" (${view}) cannot be converted to a JSON codec`,
+      cause: error,
+    });
+  }
+};
+
+const deriveJsonCodec = (
+  schema: Schema.Top,
+  path: string,
+  view: QueryView
+): Schema.Top => {
+  const derived = toJsonCodecSafe(schema, path, view);
+  assertEncodable(derived, path, view);
+  return derived;
+};
+
+const stripTopLevelUndefined = (
+  ast: SchemaAST.AST
+): SchemaAST.AST | undefined => {
+  if (undefinedTags.has(ast._tag)) {
+    return undefined;
+  }
+  if (SchemaAST.isSuspend(ast)) {
+    return new SchemaAST.Suspend(
+      () => stripTopLevelUndefined(ast.thunk()) ?? Schema.Never.ast,
+      ast.annotations,
+      ast.checks,
+      ast.encoding,
+      ast.context
+    );
+  }
+  if (SchemaAST.isUnion(ast)) {
+    const remaining: SchemaAST.AST[] = [];
+    for (const member of ast.types) {
+      const stripped = stripTopLevelUndefined(member);
+      if (stripped !== undefined) {
+        remaining.push(stripped);
+      }
+    }
+    if (remaining.length === 0) {
+      return undefined;
+    }
+    return new SchemaAST.Union(
+      remaining,
+      ast.options,
+      ast.annotations,
+      ast.checks,
+      ast.encoding,
+      ast.context,
+      ast.encodingChecks
+    );
+  }
+  return ast;
+};
+
+const toTop = (schema: Schema.Constraint): Schema.Top =>
+  // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
+  schema as Schema.Top;
+
+const tagCodec = (tag: number | string, codec: Schema.Top): Schema.Top =>
+  Schema.Tuple([Schema.Literal(tag), codec]).pipe(
+    Schema.decodeTo(
+      Schema.Unknown,
+      SchemaTransformation.transform({
+        decode: ([, value]) => value,
+        encode: (value) => [tag, value] as const,
+      })
+    )
+  );
+
+const preferExactMembers = <DecodingServices, EncodingServices>(
+  union: Schema.Codec<unknown, unknown, DecodingServices, EncodingServices>
+): Schema.Top => {
+  const encode = SchemaParser.encodeUnknownEffect(union, {});
+  const decode = SchemaParser.decodeUnknownEffect(union, {});
+  return Schema.Unknown.pipe(
+    Schema.decodeTo(
+      Schema.Unknown,
+      SchemaTransformation.transformEffect({
+        decode,
+        encode: (value, options) =>
+          options.onExcessProperty === "error"
+            ? encode(value, options)
+            : encode(value, { ...options, onExcessProperty: "error" }).pipe(
+                Effect.catch(() => encode(value, options))
+              ),
+      })
+    )
+  );
+};
+
+const copyCodecAst = (
+  ast: SchemaAST.AST,
+  fields: Partial<Pick<SchemaAST.AST, "context" | "encoding">>
+): SchemaAST.AST => {
+  const prototype: unknown = Object.getPrototypeOf(ast);
+  const copy = {};
+  Object.setPrototypeOf(copy, Predicate.isObject(prototype) ? prototype : null);
+  return Object.assign(copy, ast, fields);
+};
+
+const protectUnion = (codec: Schema.Top): Schema.Top => {
+  const preserveUnionMembers = Function.memoize(
+    (ast: SchemaAST.AST): SchemaAST.AST => {
+      if (ast.encoding !== undefined) {
+        const link = EffectArray.lastNonEmpty(ast.encoding);
+        const encoded = preserveUnionMembers(link.to);
+        return encoded === link.to
+          ? ast
+          : copyCodecAst(ast, {
+              encoding: EffectArray.append(
+                ast.encoding.slice(0, -1),
+                new SchemaAST.Link(encoded, link.transformation)
+              ),
+            });
+      }
+      if (SchemaAST.isObjects(ast)) {
+        const properties = SchemaAST.mapOrSame(
+          ast.propertySignatures,
+          (property) => {
+            const type = preserveUnionMembers(property.type);
+            return type === property.type
+              ? property
+              : new SchemaAST.PropertySignature(property.name, type);
+          }
+        );
+        const indexes = SchemaAST.mapOrSame(ast.indexSignatures, (index) => {
+          const type = preserveUnionMembers(index.type);
+          return type === index.type
+            ? index
+            : new SchemaAST.IndexSignature(index.parameter, type);
+        });
+        return properties === ast.propertySignatures &&
+          indexes === ast.indexSignatures
+          ? ast
+          : new SchemaAST.Objects(
+              properties,
+              indexes,
+              ast.annotations,
+              ast.checks,
+              undefined,
+              ast.context,
+              ast.encodingChecks
+            );
+      }
+      if (SchemaAST.isArrays(ast)) {
+        const elements = SchemaAST.mapOrSame(
+          ast.elements,
+          preserveUnionMembers
+        );
+        const rest = SchemaAST.mapOrSame(ast.rest, preserveUnionMembers);
+        return elements === ast.elements && rest === ast.rest
+          ? ast
+          : new SchemaAST.Arrays(
+              ast.isMutable,
+              elements,
+              rest,
+              ast.annotations,
+              ast.checks,
+              undefined,
+              ast.context,
+              ast.encodingChecks
+            );
+      }
+      if (SchemaAST.isSuspend(ast)) {
+        return new SchemaAST.Suspend(
+          () => preserveUnionMembers(ast.thunk()),
+          ast.annotations,
+          ast.checks,
+          ast.encoding,
+          ast.context
+        );
+      }
+      if (!SchemaAST.isUnion(ast) || ast.types.length < 2) {
+        return ast;
+      }
+      const members = ast.types.map(
+        (member, index) =>
+          tagCodec(index, Schema.make<Schema.Top>(preserveUnionMembers(member)))
+            .ast
+      );
+      const union = Schema.make<Schema.Top>(
+        new SchemaAST.Union(
+          members,
+          ast.options,
+          ast.annotations,
+          ast.checks,
+          undefined,
+          undefined,
+          ast.encodingChecks
+        )
+      );
+      const protectedAst = preferExactMembers(union).ast;
+      if (ast.context === undefined || protectedAst.encoding === undefined) {
+        return protectedAst;
+      }
+      const [link] = protectedAst.encoding;
+      return copyCodecAst(protectedAst, {
+        context: ast.context,
+        encoding: [
+          new SchemaAST.Link(
+            copyCodecAst(link.to, { context: ast.context }),
+            link.transformation
+          ),
+        ],
+      });
+    }
+  );
+  return Schema.make<Schema.Top>(preserveUnionMembers(codec.ast));
+};
+
+const adaptStreamedElement = (codec: Schema.Top): Schema.Top => {
+  if (!acceptsUndefined(codec.ast)) {
+    return protectUnion(codec);
+  }
+  const withoutUndefined = stripTopLevelUndefined(codec.ast);
+  if (withoutUndefined === undefined) {
+    return UndefinedElementCodec;
+  }
+  const nonUndefinedCodec = protectUnion(
+    Schema.make<Schema.Top>(withoutUndefined)
+  );
+  return Schema.Union([
+    UndefinedElementCodec,
+    tagCodec("value", nonUndefinedCodec),
+  ]);
+};
+
+const adaptQueryData = (codec: Schema.Top): Schema.Top => {
+  if (!acceptsUndefined(codec.ast)) {
+    return protectUnion(codec);
+  }
+  const withoutUndefined = stripTopLevelUndefined(codec.ast);
+  if (withoutUndefined === undefined) {
+    return Schema.Null;
+  }
+  const nonUndefined = protectUnion(Schema.make<Schema.Top>(withoutUndefined));
+  return acceptsNull(codec.ast)
+    ? nonUndefined
+    : Schema.Union([
+        tagCodec("null", Schema.Null),
+        tagCodec("value", nonUndefined),
+      ]);
+};
+
+const makeMetadataCodec = (
+  dataCodec: Schema.Top,
+  status: Schema.Top = Schema.Finite
+): Schema.Top =>
+  Schema.Struct({
+    status,
+    data: dataCodec,
+    headers: Schema.Record(Schema.String, Schema.String),
+  });
+
+const makeInfiniteCodec = (
+  pageCodec: Schema.Top,
+  pageParamCodec: Schema.Top
+): Schema.Top =>
+  Schema.Struct({
+    pages: Schema.Array(pageCodec),
+    pageParams: Schema.Array(pageParamCodec),
+  });
+
+const asCodec = (
+  schema: Schema.Top
+): Schema.Codec<unknown, unknown, unknown, unknown> => schema;
+
+const wrapWithHeaders = (
+  bodyCodec: Schema.Top,
+  headersCodec: Schema.Top,
+  type: Schema.toType<HttpApiSchema.WithHeaders<Schema.Top, Schema.Top>>,
+  description: "response value" | "stream chunk"
+): Schema.Top =>
+  Schema.Struct({
+    body:
+      acceptsUndefined(bodyCodec.ast) && acceptsNull(bodyCodec.ast)
+        ? adaptStreamedElement(bodyCodec)
+        : protectUnion(bodyCodec),
+    headers: protectUnion(headersCodec),
+  }).pipe(
+    Schema.decodeTo(
+      type,
+      SchemaTransformation.transform({
+        decode: ({ body, headers }) =>
+          HttpApiSchema.withHeaders({ body, headers }),
+        encode: (value) => {
+          if (!isWithHeadersValue(value)) {
+            throw new TypeError(`Expected a WithHeaders ${description}`);
+          }
+          return { body: value.body, headers: value.headers };
+        },
+      })
+    )
+  );
+
+const deriveBufferedMemberCodec = (
+  schema: Schema.Top,
+  path: string,
+  view: QueryView
+): Schema.Top => {
+  if (HttpApiSchema.isWithHeaders(schema)) {
+    return wrapWithHeaders(
+      deriveBufferedMemberCodec(schema.schema, path, view),
+      deriveJsonCodec(schema.headers, path, view),
+      Schema.toType(schema),
+      "response value"
+    );
+  }
+  if (HttpApiSchema.getEncodeToWithHeadersParts(schema) !== undefined) {
+    return deriveJsonCodec(Schema.toType(schema), path, view);
+  }
+  return deriveJsonCodec(schema, path, view);
+};
+
+const deriveHttpBufferedCodec = (
+  successes: readonly Schema.Top[],
+  path: string,
+  view: QueryView
+): Schema.Top => {
+  const effective =
+    successes.length > 0 ? successes : [HttpApiSchema.NoContent];
+  const memberCodecs = effective.map((schema) =>
+    adaptQueryData(deriveBufferedMemberCodec(schema, path, view))
+  );
+  const [first] = memberCodecs;
+  return memberCodecs.length === 1 && first !== undefined
+    ? first
+    : preferExactMembers(
+        Schema.Union(memberCodecs.map((codec, index) => tagCodec(index, codec)))
+      );
+};
+
+const deriveHttpMetadataCodec = (
+  successes: ReadonlyMap<number, readonly Schema.Top[]>,
+  path: string
+): Schema.Top => {
+  if (successes.size === 1) {
+    const [members] = successes.values();
+    return makeMetadataCodec(
+      deriveHttpBufferedCodec(members ?? [], path, "metadata")
+    );
+  }
+  return Schema.Union(
+    [...successes].map(([status, members]) =>
+      makeMetadataCodec(
+        deriveHttpBufferedCodec(members, path, "metadata"),
+        Schema.Literal(status)
+      )
+    )
+  );
+};
+
+type StreamingHttpEndpoint = Extract<
+  QueryableHttpEndpoint,
+  { readonly kind: "Streaming" }
+>;
+
+const deriveHttpStreamChunk = (
+  stream: StreamingHttpEndpoint["stream"],
+  path: string,
+  view: QueryView
+): Schema.Top => {
+  if (stream._tag === "StreamNdjson") {
+    return deriveJsonCodec(stream.schema, path, view);
+  }
+  if (
+    stream.sseMode === "data" &&
+    Predicate.hasProperty(stream.events, "fields") &&
+    Predicate.isObject(stream.events.fields) &&
+    Predicate.hasProperty(stream.events.fields["data"], "to") &&
+    Schema.isSchema(stream.events.fields["data"].to)
+  ) {
+    const dataCodec = stream.events.fields["data"].to;
+    assertEncodable(dataCodec, path, view);
+    return dataCodec;
+  }
+  return deriveJsonCodec(toTop(stream.events), path, view);
+};
+
+const deriveHttpStreamCodec = (
+  { stream, headers }: StreamingHttpEndpoint,
+  path: string,
+  view: "live" | "streamed"
+): Schema.Top => {
+  const chunk = deriveHttpStreamChunk(stream, path, view);
+  if (headers !== undefined) {
+    const headerCodec = deriveJsonCodec(headers, path, view);
+    const wrapped = wrapWithHeaders(
+      chunk,
+      headerCodec,
+      Schema.toType(
+        HttpApiSchema.WithHeaders(
+          Schema.toType(chunk),
+          Schema.toType(headerCodec)
+        )
+      ),
+      "stream chunk"
+    );
+    return view === "live" ? wrapped : Schema.Array(wrapped);
+  }
+  return view === "live"
+    ? adaptQueryData(chunk)
+    : Schema.Array(adaptStreamedElement(chunk));
+};
+
+const validateSegments = (
+  operations: readonly {
+    readonly name: string;
+    readonly path: readonly string[];
+  }[]
+): void => {
+  const messages = {
+    invalid: "cannot be projected into a hydration key",
+    duplicate: "duplicates another operation",
+    descendant: "collides with a nested operation",
+    parent: "collides with a parent operation",
+  };
+  validateUtilityPaths(
+    operations,
+    ({ name }, kind) =>
+      new HydrationCodecError("InvalidContractPath", {
+        path: name,
+        message: `Contract path "${name}" ${messages[kind]}`,
+      })
+  );
+};
+
+const readPathsOption = (
+  options: Record<string, unknown> | undefined
+): Record<string, unknown> => {
+  const paths = options?.["paths"];
+  if (paths === undefined) {
+    return {};
+  }
+  if (!Predicate.isObject(paths)) {
+    throw new HydrationCodecError("InvalidContractPath", {
+      message: "paths must be an object keyed by contract dot-paths",
+    });
+  }
+  return paths;
+};
+
+const readViewOverrides = (
+  path: string,
+  config: Record<string, unknown>,
+  allowed: ReadonlySet<string>
+): ReadonlyMap<string, unknown> => {
+  const overrides = new Map<string, unknown>();
+  for (const key of Object.getOwnPropertyNames(config)) {
+    const value = config[key];
+    if (value === undefined) {
+      continue;
+    }
+    if (!allowed.has(key)) {
+      throw new HydrationCodecError("UnknownPath", {
+        path,
+        message: `Unsupported hydration view "${key}" for "${path}"`,
+      });
+    }
+    overrides.set(key, value);
+  }
+  return overrides;
+};
+
+const extractInfiniteConfig = (
+  path: string,
+  infinite: unknown
+):
+  | { readonly pageParam: Schema.Top; readonly page?: Schema.Top }
+  | undefined => {
+  if (infinite === undefined || infinite === false) {
+    return undefined;
+  }
+  const config = Predicate.isObject(infinite) ? infinite : {};
+  const pageParam = readOwn(config, "pageParam");
+  if (!Schema.isSchema(pageParam)) {
+    throw new HydrationCodecError("InvalidContractPath", {
+      path,
+      view: "infinite",
+      message: `Infinite hydration config for "${path}" requires a pageParam schema`,
+    });
+  }
+  const page = readOwn(config, "page");
+  if (page !== undefined && !Schema.isSchema(page)) {
+    throw new HydrationCodecError("InvalidContractPath", {
+      path,
+      view: "infinite",
+      message: `Infinite hydration page override for "${path}" must be a Schema`,
+    });
+  }
+  return page === undefined ? { pageParam } : { pageParam, page };
+};
+
+const resolvePathConfigObject = (
+  path: string,
+  pathConfig: unknown
+): Record<string, unknown> | false => {
+  if (pathConfig === false) {
+    return false;
+  }
+  if (pathConfig !== undefined && !Predicate.isObject(pathConfig)) {
+    throw new HydrationCodecError("InvalidContractPath", {
+      path,
+      message: `Hydration config for "${path}" must be false or a view map`,
+    });
+  }
+  return pathConfig ?? {};
+};
+
+const unaryKeys = new Set(["query", "infinite"]);
+const metadataKeys = new Set(["query", "metadata", "infinite"]);
+const streamKeys = new Set(["live", "streamed"]);
+
+type CodecDerivations =
+  | {
+      readonly query: (view: "query" | "infinite") => Schema.Top;
+      readonly metadata?: (customQuery: Schema.Top | undefined) => Schema.Top;
+    }
+  | {
+      readonly live: () => Schema.Top;
+      readonly streamed: () => Schema.Top;
+    };
+
+const collectOperationCodecs = (
+  codecs: CompiledHydrationCodec[],
+  operationPrefix: readonly JsonValue[],
+  path: string,
+  config: Record<string, unknown>,
+  views: ReadonlyMap<string, boolean>,
+  derive: CodecDerivations
+): void => {
+  let allowed = streamKeys;
+  if (!("live" in derive)) {
+    allowed = derive.metadata === undefined ? unaryKeys : metadataKeys;
+  }
+  const overrides = readViewOverrides(path, config, allowed);
+  const register = (view: QueryView, schema: Schema.Top) => {
+    codecs.push(
+      compileHydrationCodec(
+        Object.freeze([...operationPrefix, view]),
+        asCodec(schema),
+        view === "metadata" ? { postDecode: freezeMetadata } : undefined
+      )
+    );
+  };
+  const registerDefault = (
+    view: Exclude<QueryView, "infinite">,
+    deriveDefault: () => Schema.Top
+  ) => {
+    const override = overrides.get(view);
+    const custom = Schema.isSchema(override) ? override : undefined;
+    if (
+      custom !== undefined ||
+      (override !== false && views.get(view) !== false)
+    ) {
+      register(view, custom ?? deriveDefault());
+    }
+    return custom;
+  };
+
+  if ("live" in derive) {
+    registerDefault("live", derive.live);
+    registerDefault("streamed", derive.streamed);
+    return;
+  }
+
+  const customQuery = registerDefault("query", () => derive.query("query"));
+  const deriveMetadata = derive.metadata;
+  if (deriveMetadata !== undefined) {
+    registerDefault("metadata", () => deriveMetadata(customQuery));
+  }
+
+  const infinite = extractInfiniteConfig(path, overrides.get("infinite"));
+  if (infinite !== undefined) {
+    register(
+      "infinite",
+      makeInfiniteCodec(
+        infinite.page ?? customQuery ?? derive.query("infinite"),
+        infinite.pageParam
+      )
+    );
+  }
+};
+
+const rpcCodecDerivations = (
+  rpc: Rpc.AnyWithProps,
+  path: string
+): CodecDerivations => {
+  const { successSchema } = rpc;
+  if (RpcSchema.isStreamSchema(successSchema)) {
+    const chunk = successSchema.success;
+    return {
+      live: () => adaptQueryData(deriveJsonCodec(chunk, path, "live")),
+      streamed: () =>
+        Schema.Array(
+          adaptStreamedElement(deriveJsonCodec(chunk, path, "streamed"))
+        ),
+    };
+  }
+  return {
+    query: (view) => adaptQueryData(deriveJsonCodec(successSchema, path, view)),
+  };
+};
+
+const buildRpcContractRegistry = (
+  group: RpcGroup.Any,
+  options: Record<string, unknown> | undefined
+): HydrationRegistry<unknown, unknown> => {
+  const keyPrefix = normalizeKeyPrefix(options);
+  const views = validateViews(options, rpcAllowedViews);
+  const paths = readPathsOption(options);
+
+  const operations: {
+    readonly name: string;
+    readonly path: readonly string[];
+    readonly rpc: Rpc.AnyWithProps;
+  }[] = [];
+
+  if (
+    !Predicate.hasProperty(group, "requests") ||
+    !Predicate.isMap(group.requests)
+  ) {
+    throw new TypeError("Expected an Effect RPC group with a request map");
+  }
+
+  for (const value of group.requests.values()) {
+    if (!Rpc.isRpc(value)) {
+      throw new TypeError("Expected an Effect RPC declaration");
+    }
+    const rawTag: unknown = value._tag;
+    if (!Predicate.isString(rawTag)) {
+      throw new TypeError("Expected an Effect RPC declaration");
+    }
+    operations.push({
+      name: rawTag,
+      path: rawTag.split("."),
+      rpc: value,
+    });
+  }
+
+  validateSegments(operations);
+
+  const knownPaths = new Set(operations.map((op) => op.name));
+  for (const path of Object.getOwnPropertyNames(paths)) {
+    if (!knownPaths.has(path)) {
+      throw new HydrationCodecError("UnknownPath", { path });
+    }
+  }
+
+  const codecs: CompiledHydrationCodec[] = [];
+  const rootPrefix = [...keyPrefix, "rpc"];
+
+  for (const { name: path, path: segments, rpc } of operations) {
+    const config = resolvePathConfigObject(path, readOwn(paths, path));
+    if (config === false) {
+      continue;
+    }
+    collectOperationCodecs(
+      codecs,
+      [...rootPrefix, ...segments],
+      path,
+      config,
+      views,
+      rpcCodecDerivations(rpc, path)
+    );
+  }
+
+  return buildHydrationRegistry(codecs);
+};
+
+const httpCodecDerivations = (
+  classified: QueryableHttpEndpoint,
+  successesByStatus: ReadonlyMap<number, readonly Schema.Top[]>,
+  path: string
+): CodecDerivations =>
+  classified.kind === "Streaming"
+    ? {
+        live: () => deriveHttpStreamCodec(classified, path, "live"),
+        streamed: () => deriveHttpStreamCodec(classified, path, "streamed"),
+      }
+    : {
+        query: (view) =>
+          deriveHttpBufferedCodec(classified.successes, path, view),
+        metadata: (customQuery) =>
+          customQuery === undefined
+            ? deriveHttpMetadataCodec(successesByStatus, path)
+            : makeMetadataCodec(customQuery),
+      };
+
+const validateHttpPaths = (
+  operations: readonly { readonly name: string }[],
+  paths: Record<string, unknown>
+): void => {
+  const pathCounts = new Map<string, number>();
+  for (const { name: path } of operations) {
+    pathCounts.set(path, (pathCounts.get(path) ?? 0) + 1);
+  }
+  const ambiguousPaths = new Set<string>();
+  for (const [path, count] of pathCounts) {
+    if (count > 1) {
+      ambiguousPaths.add(path);
+    }
+  }
+  for (const path of Object.getOwnPropertyNames(paths)) {
+    if (ambiguousPaths.has(path)) {
+      throw new HydrationCodecError("InvalidContractPath", {
+        path,
+        message: `HTTP hydration path "${path}" is ambiguous across dotted group and endpoint identifiers`,
+      });
+    }
+    if (!pathCounts.has(path)) {
+      throw new HydrationCodecError("UnknownPath", { path });
+    }
+  }
+};
+
+const buildHttpContractRegistry = (
+  api: HttpApi.Top,
+  options: Record<string, unknown> | undefined
+): HydrationRegistry<unknown, unknown> => {
+  const keyPrefix = normalizeKeyPrefix(options);
+  const views = validateViews(options, httpAllowedViews);
+  const paths = readPathsOption(options);
+
+  const operations: {
+    readonly name: string;
+    readonly path: readonly string[];
+    readonly classified: QueryableHttpEndpoint;
+    readonly successesByStatus: ReadonlyMap<number, readonly Schema.Top[]>;
+  }[] = [];
+
+  HttpApi.reflect(api, {
+    onGroup: Function.constVoid,
+    onEndpoint: ({ group, endpoint, successes }) => {
+      const classified = classifyHttpEndpoint(endpoint);
+      if (
+        classified === undefined ||
+        classified.kind === "Mutation" ||
+        classified.kind === "ContradictoryMultipart"
+      ) {
+        return;
+      }
+      const segments = group.topLevel
+        ? [endpoint.identifier]
+        : [group.identifier, endpoint.identifier];
+      const path = group.topLevel
+        ? endpoint.identifier
+        : `${group.identifier}.${endpoint.identifier}`;
+      operations.push({
+        name: path,
+        path: segments,
+        classified,
+        successesByStatus: successes,
+      });
+    },
+  });
+
+  validateSegments(operations);
+  validateHttpPaths(operations, paths);
+
+  const codecs: CompiledHydrationCodec[] = [];
+  const rootPrefix = [...keyPrefix, "http", api.identifier];
+
+  for (const {
+    name: path,
+    path: segments,
+    classified,
+    successesByStatus,
+  } of operations) {
+    const config = resolvePathConfigObject(path, readOwn(paths, path));
+    if (config === false) {
+      continue;
+    }
+    collectOperationCodecs(
+      codecs,
+      [...rootPrefix, ...segments],
+      path,
+      config,
+      views,
+      httpCodecDerivations(classified, successesByStatus, path)
+    );
+  }
+
+  return buildHydrationRegistry(codecs);
+};
+
+const isRpcGroup = (
+  value: RpcGroup.Any | HttpApi.Constraint
+): value is RpcGroup.Any =>
+  Predicate.hasProperty(value, "requests") && Predicate.isMap(value.requests);
+
+const isHttpApi = (
+  value: RpcGroup.Any | HttpApi.Constraint
+): value is HttpApi.Top =>
+  Predicate.hasProperty(value, "groups") &&
+  Predicate.isObject(value.groups) &&
+  Predicate.hasProperty(value, "identifier") &&
+  Predicate.isString(value.identifier);
+
+/** Derives a hydration codec registry directly from an Effect `RpcGroup` contract. */
+export function createContractHydrationRegistry<Group extends RpcGroup.Any>(
+  contract: Group,
+  options?: undefined
+): HydrationRegistry<
+  RpcContractDecodingServices<Group, undefined>,
+  RpcContractEncodingServices<Group, undefined>
+>;
+
+export function createContractHydrationRegistry<
+  Group extends RpcGroup.Any,
+  const Options extends object | undefined,
+>(
+  contract: Group,
+  options: Options &
+    NoInfer<
+      Options extends undefined
+        ? undefined
+        : RpcContractHydrationOptions<Group, Options>
+    >
+): HydrationRegistry<
+  RpcContractDecodingServices<Group, Options>,
+  RpcContractEncodingServices<Group, Options>
+>;
+
+/** Derives a hydration codec registry directly from an Effect `HttpApi` contract. */
+export function createContractHydrationRegistry<Api extends HttpApi.Constraint>(
+  contract: Api,
+  options?: undefined
+): HydrationRegistry<
+  HttpContractDecodingServices<Api, undefined>,
+  HttpContractEncodingServices<Api, undefined>
+>;
+
+export function createContractHydrationRegistry<
+  Api extends HttpApi.Constraint,
+  const Options extends object | undefined,
+>(
+  contract: Api,
+  options: Options &
+    NoInfer<
+      Options extends undefined
+        ? undefined
+        : HttpContractHydrationOptions<Api, Options>
+    >
+): HydrationRegistry<
+  HttpContractDecodingServices<Api, Options>,
+  HttpContractEncodingServices<Api, Options>
+>;
+
+export function createContractHydrationRegistry(
+  contract: RpcGroup.Any | HttpApi.Constraint,
+  options?: Record<string, unknown>
+): HydrationRegistry<unknown, unknown> {
+  if (options !== undefined && !Predicate.isObject(options)) {
+    throw new HydrationCodecError("InvalidContractPath", {
+      message: "Contract hydration options must be an object",
+    });
+  }
+  if (isRpcGroup(contract)) {
+    return buildRpcContractRegistry(contract, options);
+  }
+  if (isHttpApi(contract)) {
+    return buildHttpContractRegistry(contract, options);
+  }
+  throw new TypeError("Expected an Effect RpcGroup or HttpApi contract");
+}

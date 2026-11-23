@@ -13,12 +13,16 @@ import { Rpc, RpcGroup } from "effect/rpc";
 import {
   configureUtils,
   consumeEvents,
-  createBranchQueryFilter,
   createRpcQueryUtils,
   createHttpApiQueryUtils,
+  EffectHttpApiQueryError,
   EffectRpcQueryError,
   findDeclaredError,
+  getExecutionCause,
+  isEffectApiQueryError,
+  matchDeclaredError,
   prepareInput,
+  retryExecutionError,
 } from "#effect-api-query";
 
 import { makeRpcTestClient } from "./fixtures/effect-rpc";
@@ -92,11 +96,11 @@ describe("query usability", () => {
           ).toBe(2);
           const input = prepareInput(rpc.stable, { id: 2 });
           const configured = configureUtils(rpc.stable, {
-            query: { policy: { staleTime: 1000 } },
+            query: { staleTime: 1000 },
           });
           const options = configured.queryOptions({ input });
           expect(options.queryKey).toStrictEqual(
-            rpc.stable.queryKey({ id: 2, locale: "en" })
+            rpc.stable.queryKey({ input: { id: 2, locale: "en" } })
           );
           const preparedResult = yield* Effect.promise(
             async () => await queryClient.query(options)
@@ -142,8 +146,8 @@ describe("query usability", () => {
       const options = rpc.users.read.queryOptions({ input });
       expect({
         encoded,
-        key: rpc.users.read.queryKey(input),
-        infinite: rpc.users.read.infiniteKey(input),
+        key: rpc.users.read.queryKey({ input }),
+        infinite: rpc.users.read.infiniteKey({ input }),
       }).toStrictEqual({
         encoded: 1,
         key: options.queryKey,
@@ -157,13 +161,11 @@ describe("query usability", () => {
         expect(() => make().users.read.queryOptions({ input })).toThrow(
           "another utility leaf"
         );
-        expect(() => rpc.users.nested.read.queryKey(input)).toThrow(
+        expect(() => rpc.users.nested.read.queryKey({ input })).toThrow(
           "another utility leaf"
         );
         const configured = configureUtils(rpc.users.read, {
-          query: {
-            policy: { staleTime: 100 },
-          },
+          query: { staleTime: 100 },
         });
         const again = prepareInput(configured, { id: 8 });
         expect(
@@ -201,7 +203,7 @@ describe("query usability", () => {
         const calls: string[] = [];
         const leaf = configureUtils(rpc.users.read, {
           query: {
-            policy: { staleTime: 1000 },
+            staleTime: 1000,
             interceptors: [
               async ({ next: execute }) => {
                 calls.push("outer");
@@ -216,10 +218,8 @@ describe("query usability", () => {
             ],
           },
           mutation: {
-            policy: {
-              onSuccess: () => {
-                calls.push("shared success");
-              },
+            onSuccess: () => {
+              calls.push("shared success");
             },
             callbacks: "compose",
             interceptors: [
@@ -267,6 +267,42 @@ describe("query usability", () => {
         }
       })
   );
+  it.effect("filters prepared stream input across retention policies", () =>
+    Effect.gen(function* filterPreparedStream() {
+      const client = yield* makeRpcTestClient(group, handlers);
+      const rpc = createRpcQueryUtils(group, { client });
+      const leaf = rpc.users.watch;
+      const queryClient = new QueryClient();
+      const input = prepareInput(leaf, { id: 1 });
+      try {
+        queryClient.setQueryData(
+          leaf.streamedKey({ input, maxChunks: 2 }),
+          [1]
+        );
+        queryClient.setQueryData(
+          leaf.streamedKey({ input, maxChunks: 5 }),
+          [1]
+        );
+        queryClient.setQueryData(
+          leaf.streamedKey({ input: { id: 2 }, maxChunks: 2 }),
+          [2]
+        );
+        queryClient.setQueryData(leaf.liveKey({ input }), 1);
+
+        const filter = leaf.queryFilter({
+          view: "streamed",
+          input,
+        });
+        queryClient.removeQueries(filter);
+        expect(queryClient.getQueriesData(leaf.queryFilter())).toHaveLength(2);
+        expect(
+          queryClient.getQueriesData(leaf.queryFilter({ view: "streamed" }))
+        ).toHaveLength(1);
+      } finally {
+        queryClient.clear();
+      }
+    })
+  );
   it.effect(
     "filters a branch view across nested leaves and composes native predicates",
     () =>
@@ -278,19 +314,28 @@ describe("query usability", () => {
         });
         const queryClient = new QueryClient();
         try {
-          queryClient.setQueryData(rpc.users.read.queryKey({ id: 1 }), 1);
           queryClient.setQueryData(
-            rpc.users.nested.read.queryKey({ id: 2 }),
+            rpc.users.read.queryKey({ input: { id: 1 } }),
+            1
+          );
+          queryClient.setQueryData(
+            rpc.users.nested.read.queryKey({ input: { id: 2 } }),
             2
           );
-          queryClient.setQueryData(rpc.users.read.infiniteKey({ id: 1 }), {
-            pages: [1],
-            pageParams: [0],
-          });
-          queryClient.setQueryData(rpc.users.watch.liveKey({ id: 1 }), 1);
-          const filter = createBranchQueryFilter(rpc.users, "query");
+          queryClient.setQueryData(
+            rpc.users.read.infiniteKey({ input: { id: 1 } }),
+            {
+              pages: [1],
+              pageParams: [0],
+            }
+          );
+          queryClient.setQueryData(
+            rpc.users.watch.liveKey({ input: { id: 1 } }),
+            1
+          );
+          const filter = rpc.users.queryFilter({ view: "query" });
           yield* Effect.promise(async () => {
-            await queryClient.invalidateQueries(filter());
+            await queryClient.invalidateQueries(filter);
           });
           expect(
             queryClient
@@ -299,13 +344,14 @@ describe("query usability", () => {
           ).toHaveLength(2);
           expect(
             queryClient.getQueriesData(
-              filter({ predicate: (query) => query.state.data === 2 })
+              rpc.users.queryFilter({
+                view: "query",
+                predicate: (query) => query.state.data === 2,
+              })
             )
           ).toHaveLength(1);
           expect(
-            queryClient.getQueriesData(
-              createBranchQueryFilter(rpc, "metadata")()
-            )
+            queryClient.getQueriesData(rpc.queryFilter({ view: "metadata" }))
           ).toHaveLength(0);
         } finally {
           queryClient.clear();
@@ -313,7 +359,81 @@ describe("query usability", () => {
       })
   );
 });
+const fallback = () => "fallback";
+
 describe("typed failures", () => {
+  const missing = { _tag: "NotFound", id: 1 } as const;
+  const busy = { _tag: "Busy", seconds: 10 } as const;
+  type Failure = typeof missing | typeof busy;
+  const httpIdentity = {
+    apiId: "test",
+    groupId: "users",
+    endpoint: "get",
+    method: "GET",
+  };
+  const adapters = [
+    (cause: Cause.Cause<Failure>) =>
+      new EffectRpcQueryError("users.get", "query", cause),
+    (cause: Cause.Cause<Failure>) =>
+      new EffectHttpApiQueryError(httpIdentity, "query", cause),
+  ] as const;
+
+  it.each(adapters)(
+    "classifies one declared failure across adapters (%#)",
+    (wrap) => {
+      const cause = Cause.fail(missing);
+      const error = wrap(cause);
+      const cases = { NotFound: (failure: typeof missing) => failure.id };
+      const retry = retryExecutionError({
+        shouldRetry: (failure, count) => failure === missing && count < 5,
+      });
+      expect({
+        recognized: isEffectApiQueryError(error),
+        original: getExecutionCause(error) === cause,
+      }).toStrictEqual({ recognized: true, original: true });
+      expect(matchDeclaredError(error, cases, fallback)).toBe(1);
+      expect(matchDeclaredError(wrap(Cause.fail(busy)), cases, fallback)).toBe(
+        "fallback"
+      );
+      expect([0, 1, 2, 3, 4].map((count) => retry(count, error))).toStrictEqual(
+        [true, true, true, false, false]
+      );
+      const custom = retryExecutionError({
+        shouldRetry: () => true,
+        maxRetries: 1,
+      });
+      expect([custom(0, error), custom(1, error)]).toStrictEqual([true, false]);
+    }
+  );
+
+  it.each(adapters)("falls back for other Cause shapes (%#)", (wrap) => {
+    const retry = retryExecutionError({
+      shouldRetry: () => {
+        throw new Error("Expected to bypass the retry callback");
+      },
+    });
+    const causes = [
+      Cause.empty,
+      Cause.die(missing),
+      Cause.interrupt(1),
+      Cause.combine(Cause.fail(missing), Cause.fail(busy)),
+      Cause.combine(Cause.fail(missing), Cause.die("defect")),
+    ];
+    for (const cause of causes) {
+      const error = wrap(cause);
+      expect(getExecutionCause(error)).toBe(cause);
+      expect(
+        matchDeclaredError(error, { NotFound: () => 1 }, (original) => original)
+      ).toBe(error);
+      expect(retry(0, error)).toBe(false);
+    }
+    const error = new Error("runner failed", { cause: Cause.fail(missing) });
+    expect(isEffectApiQueryError(error)).toBe(false);
+    expect(getExecutionCause(error)).toBeUndefined();
+    expect(matchDeclaredError(error, {}, (original) => original)).toBe(error);
+    expect(retry(0, error)).toBe(false);
+  });
+
   it("matches typed failures without hiding compound causes or defects", () => {
     const failure = { _tag: "NotFound", id: 1 } as const;
     const error = new EffectRpcQueryError("read", "query", Cause.fail(failure));
@@ -429,8 +549,8 @@ it.effect("reuses HTTP preparation for buffered and metadata views", () =>
       expect(metadata.data).toBe(7);
       expect(Object.isFrozen(metadata)).toBe(true);
       expect(encoded).toBe(1);
-      expect(http.users.read.queryKey(input)).toStrictEqual(
-        http.users.read.queryKey({ params: { id: 7 } })
+      expect(http.users.read.queryKey({ input })).toStrictEqual(
+        http.users.read.queryKey({ input: { params: { id: 7 } } })
       );
     } finally {
       queryClient.clear();

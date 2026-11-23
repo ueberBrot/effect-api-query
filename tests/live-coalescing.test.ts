@@ -4,66 +4,18 @@ import { Deferred, Effect, Schema, Stream } from "effect";
 import { Rpc, RpcGroup } from "effect/rpc";
 import { vi } from "vite-plus/test";
 
-import { createRpcQueryUtils, configureUtils } from "#effect-api-query";
+import { createRpcQueryUtils } from "#effect-api-query";
 
 import { makeRpcTestClient } from "./fixtures/effect-rpc";
 import { waitForQueryState } from "./fixtures/query-cache";
 
 it.effect(
-  "coalesces fast complete snapshots with immediate first and final publication",
-  () =>
-    Effect.gen(function* coalescesFastSnapshots() {
-      const group = RpcGroup.make(
-        Rpc.make("watch", { success: Schema.Int, stream: true })
-      );
-      const client = yield* makeRpcTestClient(group, {
-        watch: () => Stream.make(1, 2, 3, 4),
-      });
-      const leaf = createRpcQueryUtils(group, {
-        client,
-        keyPrefix: ["coalesce"],
-      }).watch;
-      const configured = configureUtils(leaf, {
-        live: { policy: { coalesceMs: 100 } },
-      });
-      const options = configured.liveOptions();
-      const queryClient = new QueryClient();
-      const writes: unknown[] = [];
-      const stop = queryClient.getQueryCache().subscribe((event) => {
-        if (
-          event.type === "updated" &&
-          event.action.type === "success" &&
-          event.action.manual === true
-        ) {
-          writes.push(event.query.state.data);
-        }
-      });
-      try {
-        expect(
-          yield* Effect.promise(async () => await queryClient.query(options))
-        ).toBe(4);
-        expect(writes).toStrictEqual([1, 4]);
-        expect(options.queryKey).toStrictEqual(
-          leaf.liveKey({ coalesceMs: 100 })
-        );
-
-        expect(options.queryKey).not.toStrictEqual(leaf.liveKey());
-        expect({
-          stripped: Object.hasOwn(options, "coalesceMs"),
-          key: configured.liveKey(),
-        }).toStrictEqual({ stripped: false, key: options.queryKey });
-      } finally {
-        stop();
-        queryClient.clear();
-      }
-    })
-);
-
-it.effect(
   "flushes latest pending at a non-sliding deadline, preserves slow snapshots and drops pending on cancellation",
   () =>
     Effect.gen(function* flushesDeadline() {
-      vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+      vi.useFakeTimers({
+        toFake: ["setTimeout", "clearTimeout", "performance"],
+      });
       const midReached = yield* Deferred.make<boolean>();
       const midResume = yield* Deferred.make<boolean>();
       const reached = yield* Deferred.make<boolean>();

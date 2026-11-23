@@ -66,7 +66,7 @@ const policy = {
   refetchOnWindowFocus: false,
   retry: false,
 } satisfies QueryPolicy<typeof rpc.users.get>;
-const user = configureUtils(rpc.users.get, { query: { policy } });
+const user = configureUtils(rpc.users.get, { query: policy });
 const selected = user.queryOptions({
   input: { id: 1 },
   select: (value) => value.name,
@@ -78,19 +78,14 @@ const refreshUser = user.queryOptions({
 });
 
 const configured = configureUtils(rpc, {
-  query: { policy: { retry: false } },
-  scoped: {
+  query: { retry: false },
+  paths: {
     users: {
-      query: { policy: { staleTime: 30_000 } },
-      scoped: {
-        get: {
-          query: {
-            policy: {
-              staleTime: (query) =>
-                query.state.data === undefined ? 0 : 60_000,
-            },
-          },
-        },
+      query: { staleTime: 30_000 },
+    },
+    "users.get": {
+      query: {
+        staleTime: (query) => (query.state.data === undefined ? 0 : 60_000),
       },
     },
   },
@@ -98,14 +93,12 @@ const configured = configureUtils(rpc, {
 
 const createUser = configureUtils(rpc.users.create, {
   mutation: {
-    policy: {
-      onSuccess: async (created) => {
-        queryClient.setQueryData(
-          rpc.users.get.queryKey({ id: created.id }),
-          created
-        );
-        await queryClient.invalidateQueries({ queryKey: rpc.users.key() });
-      },
+    onSuccess: async (created) => {
+      queryClient.setQueryData(
+        rpc.users.get.queryKey({ input: { id: created.id } }),
+        created
+      );
+      await queryClient.invalidateQueries({ queryKey: rpc.users.key() });
     },
   },
 });
@@ -120,10 +113,8 @@ const creation = createUser.mutationOptions({
 const composedCreateUser = configureUtils(rpc.users.create, {
   mutation: {
     callbacks: "compose",
-    policy: {
-      onSuccess: () =>
-        queryClient.invalidateQueries({ queryKey: rpc.users.key() }),
-    },
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: rpc.users.key() }),
   },
 });
 

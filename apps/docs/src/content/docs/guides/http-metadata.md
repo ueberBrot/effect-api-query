@@ -15,7 +15,7 @@ console.log(current.data.name, current.status);
 const etag = current.headers["etag"];
 ```
 
-This view caches decoded `data` with a numeric `status` and raw string `headers`. Each fetched envelope and header snapshot is frozen, even if you rebuild observer options during the request. A local structural-sharing callback overrides inherited defaults. Decoded data, including declared header wrappers, stays application-owned. Use `metadataKey(input)` or the options' `queryKey` for an exact match. The endpoint prefix matches both views.
+This view caches decoded `data` with a numeric `status` and raw string `headers`. Each fetched envelope and header snapshot is frozen, even if you rebuild observer options during the request. A local structural-sharing callback overrides inherited defaults. Decoded data, including declared header wrappers, stays application-owned. Use `metadataKey({ input })` or the options' `queryKey` for an exact match. The endpoint prefix matches both views.
 
 ## Update with an ETag
 
@@ -48,4 +48,4 @@ The server enforces the precondition. Inspect rejection through the [HTTP execut
 
 Metadata queries support native selection, initial data, skipping, and cancellation. See [buffered metadata](/effect-api-query/reference/http-builders/#buffered-metadata) for sharing and immutability.
 
-For server rendering, register `queryViewCodec(http.users.get, 'metadata', MetadataCodec)` alongside the ordinary codec. Describe decoded data, numeric status, and raw string headers. Preserve any decoded header wrapper inside `data`. Transfer only public headers. The app owns hydrated envelopes. The next metadata fetch produces a frozen snapshot. See [register a view codec](/effect-api-query/guides/hydrate-query-views/#register-generated-leaves-and-views).
+For server rendering, derive a registry from the HttpApi declaration. Its metadata codec restores the decoded data, numeric status, and frozen raw header map. It preserves any decoded header wrapper inside `data`. Transfer only public headers. See [derive a registry from the contract](/effect-api-query/guides/hydrate-query-views/#derive-a-registry-from-the-contract).

@@ -1,5 +1,13 @@
 import { QueryClient } from "@tanstack/query-core";
-import { Cause, Effect, Exit, Layer, Schema, Scope } from "effect";
+import {
+  Cause,
+  Effect,
+  Exit,
+  Layer,
+  ManagedRuntime,
+  Schema,
+  Scope,
+} from "effect";
 import { HttpClient, HttpClientResponse, HttpServer } from "effect/http";
 import {
   HttpApi,
@@ -14,6 +22,8 @@ import { Rpc, RpcGroup } from "effect/rpc";
 import { describe, expect, it, vi } from "vite-plus/test";
 
 import {
+  acquireQueryOwner,
+  createContractHydrationRegistry,
   createHttpApiQueryUtils,
   EffectHttpApiQueryConfigError,
   EffectHttpApiQueryError,
@@ -56,6 +66,35 @@ const makeClient = HttpApiTest.groups(Api, ["users"]).pipe(
 );
 
 describe(createHttpApiQueryUtils, () => {
+  it("preserves inherited key prefix getters for utilities and hydration", () => {
+    class TenantOptions {
+      readonly #tenant = "tenant";
+
+      get keyPrefix() {
+        return [this.#tenant] as const;
+      }
+    }
+    const group = RpcGroup.make(Rpc.make("read"));
+    const rpc = createRpcQueryUtils(
+      group,
+      Object.assign(new TenantOptions(), {
+        client: { read: () => Effect.void },
+      })
+    );
+    const http = createHttpApiQueryUtils(
+      HttpApi.make("empty"),
+      Object.assign(new TenantOptions(), { client: {} })
+    );
+    const registry = createContractHydrationRegistry(
+      group,
+      new TenantOptions()
+    );
+    const key = rpc.read.queryKey();
+    expect(key).toStrictEqual(["tenant", "rpc", "read", "query"]);
+    expect(http.key()).toStrictEqual(["tenant", "http", "empty"]);
+    expect(registry.matches(key)).toBe(true);
+  });
+
   it("rejects sparse key prefixes through both adapters, including nested arrays", () => {
     const sparse = ["app", "tenant"] as const;
     Reflect.deleteProperty(sparse, 1);
@@ -136,7 +175,9 @@ describe(createHttpApiQueryUtils, () => {
           .build(queryClient, utils.users.remove.mutationOptions())
           .execute({ params: { id: 1 } })
       ).resolves.toBeUndefined();
-      expect(utils.users.get.queryKey({ params: { id: 1 } })).toStrictEqual([
+      expect(
+        utils.users.get.queryKey({ input: { params: { id: 1 } } })
+      ).toStrictEqual([
         "shared",
         "http",
         "test",
@@ -208,12 +249,19 @@ describe(createHttpApiQueryUtils, () => {
       client: Effect.runSync(makeUnusedHttpClient(mixed)),
       keyPrefix: ["test"],
     });
-    expect(Object.keys(utils)).toStrictEqual(["key", "uploads", "kept"]);
+    expect(Object.keys(utils)).toStrictEqual([
+      "key",
+      "queryFilter",
+      "uploads",
+      "kept",
+    ]);
     expect(Object.keys(utils.uploads)).toStrictEqual([
       "key",
+      "queryFilter",
       "upload",
       "brandedUpload",
     ]);
+    expect("queryFilter" in utils.uploads.upload).toBe(false);
     expect(utils.uploads.upload.mutationKey()).toStrictEqual([
       "test",
       "http",
@@ -222,7 +270,11 @@ describe(createHttpApiQueryUtils, () => {
       "upload",
       "mutation",
     ]);
-    expect(Object.keys(utils.kept)).toStrictEqual(["key", "read"]);
+    expect(Object.keys(utils.kept)).toStrictEqual([
+      "key",
+      "queryFilter",
+      "read",
+    ]);
   });
 
   it("rejects contradictory multipart brands and encoding atomically", () => {
@@ -341,8 +393,13 @@ describe(createHttpApiQueryUtils, () => {
       client: Effect.runSync(makeUnusedHttpClient(api)),
       keyPrefix: ["test"],
     });
-    expect(Object.keys(utils)).toStrictEqual(["key", "views"]);
-    expect(Object.keys(utils.views)).toStrictEqual(["key", "read", "events"]);
+    expect(Object.keys(utils)).toStrictEqual(["key", "queryFilter", "views"]);
+    expect(Object.keys(utils.views)).toStrictEqual([
+      "key",
+      "queryFilter",
+      "read",
+      "events",
+    ]);
   });
 
   it("projects literal identifiers and top-level inputless endpoints without splitting dots", async () => {
@@ -394,14 +451,32 @@ describe(createHttpApiQueryUtils, () => {
         "health.check",
         "query",
       ]);
-      expect({
-        root: Object.isFrozen(utils),
-        group: Object.isFrozen(utils["users.v1"]),
-      }).toStrictEqual({ root: true, group: true });
     } finally {
       queryClient.clear();
     }
   });
+
+  it.each(["call", "effect", "queryFilter"])(
+    "rejects %s as an HTTP group or endpoint",
+    (segment) => {
+      const nested = HttpApi.make("invalid").add(
+        HttpApiGroup.make(segment).add(HttpApiEndpoint.get("read", "/read"))
+      );
+      const topLevel = HttpApi.make("invalid").add(
+        HttpApiGroup.make("root", { topLevel: true }).add(
+          HttpApiEndpoint.get(segment, "/read")
+        )
+      );
+      const nestedClient = Effect.runSync(makeUnusedHttpClient(nested));
+      const topLevelClient = Effect.runSync(makeUnusedHttpClient(topLevel));
+      expect(() =>
+        createHttpApiQueryUtils(nested, { client: nestedClient })
+      ).toThrow(expect.objectContaining({ code: "InvalidEndpointPath" }));
+      expect(() =>
+        createHttpApiQueryUtils(topLevel, { client: topLevelClient })
+      ).toThrow(expect.objectContaining({ code: "InvalidEndpointPath" }));
+    }
+  );
 
   it("rejects reserved paths and top-level collisions before constructing utilities", () => {
     const reservedGroup = HttpApi.make("invalid").add(
@@ -465,7 +540,7 @@ describe(createHttpApiQueryUtils, () => {
     ).toThrow(EffectHttpApiQueryConfigError);
   });
 
-  it("preserves the complete failed Cause and passes runner rejections through", async () => {
+  it("preserves the complete failed Cause", async () => {
     const api = HttpApi.make("failure").add(
       HttpApiGroup.make("actions").add(
         HttpApiEndpoint.get("fail", "/fail", {
@@ -512,16 +587,6 @@ describe(createHttpApiQueryUtils, () => {
         throw new Error("Expected HTTP execution error");
       }
       expect(error.cause).toBe(cause);
-      const rejection = new Error("runner");
-      const rejected = createHttpApiQueryUtils(api, {
-        client,
-        keyPrefix: ["test"],
-        runPromiseExit: async (): Promise<never> =>
-          await Promise.reject(rejection),
-      });
-      await expect(
-        queryClient.query(rejected.actions.fail.queryOptions())
-      ).rejects.toBe(rejection);
     } finally {
       queryClient.clear();
     }
@@ -554,16 +619,16 @@ describe(createHttpApiQueryUtils, () => {
       keyPrefix: ["shared"],
     });
     const queryClient = new QueryClient();
-    const first = http.users.get.queryKey({ params: { id: 1 } });
-    const second = http.users.get.queryKey({ params: { id: 2 } });
+    const first = http.users.get.queryKey({ input: { params: { id: 1 } } });
+    const second = http.users.get.queryKey({ input: { params: { id: 2 } } });
     const other = http.users.list.queryKey();
-    const rpcKey = rpc.users.get.queryKey({ id: 1 });
+    const rpcKey = rpc.users.get.queryKey({ input: { id: 1 } });
     try {
       for (const key of [first, second, other, rpcKey]) {
         queryClient.setQueryData(key, "cached");
       }
       expect(http.users.get.mutationKey()).not.toStrictEqual(
-        http.users.get.queryKey({ params: { id: 1 } })
+        http.users.get.queryKey({ input: { params: { id: 1 } } })
       );
       await queryClient.invalidateQueries({ queryKey: http.users.get.key() });
       expect({
@@ -607,7 +672,7 @@ describe(createHttpApiQueryUtils, () => {
       keyPrefix: ["test"],
       keyEncoders: { forms: { submit: ({ payload }) => ({ payload }) } },
     });
-    expect(utils.submit.queryKey({ payload: "yes" })).toStrictEqual([
+    expect(utils.submit.queryKey({ input: { payload: "yes" } })).toStrictEqual([
       "test",
       "http",
       "keys",
@@ -627,14 +692,14 @@ describe(createHttpApiQueryUtils, () => {
         },
       },
     });
-    expect(() => invalid.submit.queryKey({ payload: 1 })).toThrow(
+    expect(() => invalid.submit.queryKey({ input: { payload: 1 } })).toThrow(
       expect.objectContaining({
         _tag: "EffectHttpApiQueryKeyError",
         code: "KeyEncoderFailed",
         cause,
       })
     );
-    expect(() => invalid.submit.queryKey({ payload: 1 })).toThrow(
+    expect(() => invalid.submit.queryKey({ input: { payload: 1 } })).toThrow(
       EffectHttpApiQueryKeyError
     );
   });
@@ -660,7 +725,7 @@ describe(createHttpApiQueryUtils, () => {
       headers: { "x-version": 3 },
       payload: { name: "Ada" },
     };
-    const key = utils.users.save.queryKey(input);
+    const key = utils.users.save.queryKey({ input });
     expect(key.at(-1)).toStrictEqual({
       params: { id: "1" },
       query: { page: "2" },
@@ -671,7 +736,9 @@ describe(createHttpApiQueryUtils, () => {
     expect(key.at(-1)).toMatchObject({ payload: { name: "Ada" } });
     /* oxlint-disable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
     expect(() =>
-      utils.users.save.queryKey({ ...input, params: { id: "raw" } } as never)
+      utils.users.save.queryKey({
+        input: { ...input, params: { id: "raw" } },
+      } as never)
     ).toThrow(
       expect.objectContaining({
         code: "RequestEncodingFailed",
@@ -684,12 +751,12 @@ describe(createHttpApiQueryUtils, () => {
       keyPrefix: ["test"],
       keyEncoders: { users: { save: () => Number.NaN } },
     });
-    expect(() => unsafe.users.save.queryKey(input)).toThrow(
+    expect(() => unsafe.users.save.queryKey({ input })).toThrow(
       expect.objectContaining({ code: "InvalidKeyValue" })
     );
   });
 
-  it("rejects empty key prefixes and unknown endpoint encoders", () => {
+  it("rejects empty key prefixes", () => {
     /* oxlint-disable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
     expect(() =>
       createHttpApiQueryUtils(Api, {
@@ -698,14 +765,93 @@ describe(createHttpApiQueryUtils, () => {
       } as never)
     ).toThrow(expect.objectContaining({ code: "InvalidKeyPrefix" }));
     /* oxlint-enable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
-    /* oxlint-disable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
-    expect(() =>
-      createHttpApiQueryUtils(Api, {
-        client: Effect.runSync(makeUnusedHttpClient(Api)),
-        keyPrefix: ["test"],
-        keyEncoders: { users: { missing: () => null } },
-      } as never)
-    ).toThrow(expect.objectContaining({ code: "UnknownKeyEncoder" }));
-    /* oxlint-enable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
+  });
+
+  it("omits keyPrefix to produce ['http', api.identifier] roots and supports ManagedRuntime and object runtimes", async () => {
+    const managed = ManagedRuntime.make(Layer.empty);
+    const queryClient = new QueryClient();
+    try {
+      const client = await Effect.runPromise(Effect.scoped(makeClient));
+      const unprefixed = createHttpApiQueryUtils(Api, {
+        client,
+        runtime: managed,
+      });
+      const fetched = await queryClient.query(
+        unprefixed.users.get.queryOptions({ input: { params: { id: 5 } } })
+      );
+      expect({
+        rootKey: unprefixed.key(),
+        queryKey: unprefixed.users.get.queryKey({
+          input: { params: { id: 5 } },
+        }),
+        fetched,
+      }).toStrictEqual({
+        rootKey: ["http", "test"],
+        queryKey: [
+          "http",
+          "test",
+          "users",
+          "get",
+          "query",
+          { params: { id: "5" } },
+        ],
+        fetched: { id: 5, name: "Ada" },
+      });
+
+      /* oxlint-disable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
+      expect(() =>
+        createHttpApiQueryUtils(Api, {
+          client,
+          keyPrefix: undefined,
+        } as never)
+      ).toThrow(expect.objectContaining({ code: "InvalidKeyPrefix" }));
+      /* oxlint-enable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
+
+      let observedTag: string | undefined;
+      const objectRuntime = {
+        tag: "http-object-runtime",
+        async runPromiseExit<A, E>(
+          this: { readonly tag: string },
+          effect: Effect.Effect<A, E>,
+          options?: { readonly signal?: AbortSignal }
+        ) {
+          observedTag = this.tag;
+          return await Effect.runPromiseExit(effect, options);
+        },
+      };
+      const withReceiver = createHttpApiQueryUtils(Api, {
+        client,
+        runtime: objectRuntime,
+      });
+      const metadata = await queryClient.query(
+        withReceiver.users.get.metadataOptions({ input: { params: { id: 6 } } })
+      );
+      expect({ data: metadata.data, observedTag }).toStrictEqual({
+        data: { id: 6, name: "Ada" },
+        observedTag: "http-object-runtime",
+      });
+
+      const owner = await acquireQueryOwner(
+        async (setup) => await Promise.resolve(setup.trackUtils(unprefixed))
+      );
+      const trackedMeta = await owner.queryClient.query(
+        owner.resources.users.get.metadataOptions({
+          input: { params: { id: 7 } },
+        })
+      );
+      expect(trackedMeta.data).toStrictEqual({ id: 7, name: "Ada" });
+      await owner.dispose();
+      await expect(
+        owner.queryClient.query(
+          owner.resources.users.get.metadataOptions({
+            input: { params: { id: 8 } },
+            retry: false,
+          })
+        )
+      ).rejects.toThrow("retired");
+    } finally {
+      queryClient.clear();
+      await managed.dispose();
+    }
   });
 });

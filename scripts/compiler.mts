@@ -1,7 +1,6 @@
 import { createRequire } from "node:module";
 import path from "node:path";
 
-// Explicit versions prevent the wrapper's installed/latest fallback selection.
 export const currentCompiler = {
   engine: "tsrs",
   package: "@effect/tsgo",

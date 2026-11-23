@@ -64,18 +64,11 @@ describe.each(["rpc", "http"] as const)("publication adapter %s", (adapter) => {
           keyPrefix: ["publication"],
         });
         const leaf = adapter === "rpc" ? rpc.watch : http.events.watch;
-        const options =
-          adapter === "rpc"
-            ? rpc.watch.streamedOptions({
-                maxChunks: "unbounded",
-                publicationBatchSize: 3,
-                publicationMaxWaitMs: 50,
-              })
-            : http.events.watch.streamedOptions({
-                maxChunks: "unbounded",
-                publicationBatchSize: 3,
-                publicationMaxWaitMs: 50,
-              });
+        const policy = {
+          maxChunks: "unbounded",
+          publicationBatchSize: 3,
+          publicationMaxWaitMs: 50,
+        } as const;
         const queryClient = new QueryClient();
         const publications: unknown[] = [];
         const stop = queryClient.getQueryCache().subscribe((event) => {
@@ -88,33 +81,21 @@ describe.each(["rpc", "http"] as const)("publication adapter %s", (adapter) => {
           }
         });
         try {
-          const result = yield* Effect.promise(async () =>
-            adapter === "rpc"
-              ? await queryClient.query(
-                  rpc.watch.streamedOptions({
-                    maxChunks: "unbounded",
-                    publicationBatchSize: 3,
-                    publicationMaxWaitMs: 50,
-                  })
-                )
-              : await queryClient.query(
-                  http.events.watch.streamedOptions({
-                    maxChunks: "unbounded",
-                    publicationBatchSize: 3,
-                    publicationMaxWaitMs: 50,
-                  })
-                )
-          );
+          const streamed = yield* Effect.promise(async () => {
+            if (adapter === "rpc") {
+              const options = rpc.watch.streamedOptions(policy);
+              return { options, result: await queryClient.query(options) };
+            }
+            const options = http.events.watch.streamedOptions(policy);
+            return { options, result: await queryClient.query(options) };
+          });
+          const { options: streamOptions, result } = streamed;
           expect({ result, publications }).toStrictEqual({
             result: [1, 2, 3, 4, 5, 6],
             publications: [[1], [1, 2, 3, 4], [1, 2, 3, 4, 5, 6]],
           });
-          expect(options.queryKey).toStrictEqual(
-            leaf.streamedKey({
-              maxChunks: "unbounded",
-              publicationBatchSize: 3,
-              publicationMaxWaitMs: 50,
-            })
+          expect(streamOptions.queryKey).toStrictEqual(
+            leaf.streamedKey(policy)
           );
           expect(
             leaf.streamedKey({
@@ -122,38 +103,44 @@ describe.each(["rpc", "http"] as const)("publication adapter %s", (adapter) => {
               publicationBatchSize: 1,
             })
           ).toStrictEqual(leaf.streamedKey({ maxChunks: "unbounded" }));
-          expect(options.queryKey).not.toStrictEqual(
+          expect(streamOptions.queryKey).not.toStrictEqual(
             leaf.streamedKey({ maxChunks: "unbounded" })
           );
 
           publications.length = 0;
-          const configured = configureUtils(leaf, {
-            live: { policy: { coalesceMs: 100 } },
+          const config = {
+            live: { coalesceMs: 100 },
+          };
+          const live = yield* Effect.promise(async () => {
+            if (adapter === "rpc") {
+              const configured = configureUtils(rpc.watch, config);
+              const options = configured.liveOptions();
+              return {
+                options,
+                configuredKey: configured.liveKey(),
+                result: await queryClient.query(options),
+              };
+            }
+            const configured = configureUtils(http.events.watch, config);
+            const options = configured.liveOptions();
+            return {
+              options,
+              configuredKey: configured.liveKey(),
+              result: await queryClient.query(options),
+            };
           });
-          const live =
-            adapter === "rpc"
-              ? configureUtils(rpc.watch, {
-                  live: { policy: { coalesceMs: 100 } },
-                }).liveOptions()
-              : configureUtils(http.events.watch, {
-                  live: { policy: { coalesceMs: 100 } },
-                }).liveOptions();
           expect({
-            key: live.queryKey,
-            configuredKey: configured.liveKey(),
-            result: yield* Effect.promise(async () =>
-              adapter === "rpc"
-                ? await queryClient.query(
-                    rpc.watch.liveOptions({ coalesceMs: 100 })
-                  )
-                : await queryClient.query(
-                    http.events.watch.liveOptions({ coalesceMs: 100 })
-                  )
-            ),
+            key: live.options.queryKey,
+            configuredKey: live.configuredKey,
+            defaultCache: queryClient.getQueryData(leaf.liveKey()),
+            hasBuilderOption: Object.hasOwn(live.options, "coalesceMs"),
+            result: live.result,
             publications,
           }).toStrictEqual({
             key: leaf.liveKey({ coalesceMs: 100 }),
             configuredKey: leaf.liveKey({ coalesceMs: 100 }),
+            defaultCache: undefined,
+            hasBuilderOption: false,
             result: 6,
             publications: [1, 6],
           });

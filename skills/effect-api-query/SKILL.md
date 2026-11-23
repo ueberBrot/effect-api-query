@@ -8,18 +8,21 @@ metadata:
     Derive typed TanStack Query keys and options from ready Effect RPC and HTTP clients, preserving cache identity, typed filters and execution policies, decoded query views, registered hydration codecs, stream recovery, native framework behavior, and application-owned resource lifetime.
   type: core
   library: "@ueberbrot/effect-api-query"
-  library_version: "0.7.0"
+  library_version: "0.8.0"
 sources:
   - "**/examples/contracts/src/*.ts"
   - "**/examples/shared/http-workflows/*.ts*"
   - "e2e/http-workflows.spec.ts"
   - "src/**/*.ts"
+  - "src/react/index.tsx"
+  - "tsconfig.declarations.json"
   - "tests/**/*.ts"
   - "tests/**/*.tsx"
   - "**/examples/shared/*.ts"
   - "**/examples/vite-react/src/lib/*.ts"
   - "**/examples/vite-react/src/main.tsx"
   - "**/examples/vite-react/src/app.tsx"
+  - "**/examples/vite-react/src/components/sections/commands-section.tsx"
   - "**/examples/shared/ui/effect-error-details.tsx"
   - "**/examples/vite-react/tests/*.ts*"
   - "**/examples/tanstack-start/src/lib/*.ts"
@@ -45,6 +48,17 @@ sources:
   - "docs/adr/0040-*.md"
   - "docs/adr/0042-*.md"
   - "docs/adr/0043-*.md"
+  - "docs/adr/0044-*.md"
+  - "docs/adr/0045-*.md"
+  - "docs/adr/0046-*.md"
+  - "docs/adr/0047-*.md"
+  - "docs/adr/0048-*.md"
+  - "docs/adr/0049-*.md"
+  - "docs/adr/0050-*.md"
+  - "docs/adr/0051-*.md"
+  - "docs/adr/0052-*.md"
+  - "docs/adr/0053-*.md"
+  - "docs/adr/0054-*.md"
   - "apps/docs/astro.config.mts"
   - "**/apps/docs/src/content/docs/**/*.md"
   - "**/apps/docs/src/content/docs/**/*.mdx"
@@ -59,13 +73,13 @@ sources:
 
    | Contract | Factory | Setup |
    | --- | --- | --- |
-   | Effect RPC group | `createRpcQueryUtils` with a flat client | [RPC](references/rpc.md) |
+   | Effect RPC group | `createRpcQueryUtils` with the default tag-keyed client | [RPC](references/rpc.md) |
    | Effect HttpApi declaration | `createHttpApiQueryUtils` with an HttpApiClient | [HTTP](references/http.md) |
 
 3. Import the factory from `@ueberbrot/effect-api-query`. Keep contract identifiers literal. Build the utility tree once per client and cache owner.
-4. Pass a non-empty JSON tuple as `keyPrefix`. Include safe values for any tenant, user, or backend identity that changes results. Keep credentials in the client.
+4. If you need a key namespace, supply a non-empty JSON tuple as `keyPrefix`. Include safe values for any tenant, user, or backend identity that changes results. Keep credentials in the client.
 
-The app owns the client, transport, authentication, runtime, and cache. Keep the client alive through requests and local cleanup. If execution needs Effect services, supply a `runPromiseExit` that provides them and forwards the `signal` in its second argument. Use the default runner for service-free requests.
+The app owns the client, transport, authentication, runtime, and cache. Keep the client alive through requests and local cleanup. If execution needs Effect services, pass a ManagedRuntime with a `never` layer error as `runtime`. If you pass a runner function, forward its `signal`. Use the default runner for service-free requests.
 
 ## Build the options
 
@@ -78,7 +92,7 @@ The app owns the client, transport, authentication, runtime, and cache. Keep the
 | Keep ordered stream history | `streamedOptions` | Ordinary query hook or observer |
 | Keep the latest stream value | `liveOptions` | Ordinary query hook or observer |
 
-Unary RPC and buffered HTTP without multipart support reads, writes, and pages. Buffered multipart HTTP takes `FormData` through a mutation. Streaming RPC and supported HTTP SSE or NDJSON expose both stream views. Omit `input` for operations that take none. Set `maxChunks` to a positive safe integer or `"unbounded"` for accumulated history.
+Unary RPC and buffered HTTP without multipart support reads, writes, and pages. Buffered multipart HTTP takes `FormData` in a mutation or direct call. Streaming RPC and supported HTTP SSE or NDJSON expose both stream views. Pass `{ input, ... }` to input-bearing key and option builders. Omit `input` for operations that take none. Set `maxChunks` to a positive safe integer or `"unbounded"` for accumulated history.
 
 - Keep captured inputs unchanged. Mutating input can send a different request under the old key. Build new options when input changes.
 - Pass native settings to the builder and use the returned key and function together. Use a generated concrete key for typed cache reads and writes. Set hashing on QueryClient before use and keep it stable.
@@ -89,14 +103,16 @@ Read the reference for the task at hand.
 | If you need to | Read |
 | --- | --- |
 | Infer types, wait for input, page, prepare input, batch or recover streams, or trace cleanup | [Query patterns](references/query-patterns.md) |
-| Filter or update the cache, share policies, intercept execution, or retire an owner | [Cache workflows](references/cache-workflows.md) |
+| Run a leaf directly, handle execution errors, manage cache policies, compose cache operations in Effect, bind Reactivity to invalidation, or retire an owner | [Cache workflows](references/cache-workflows.md) |
 | Capture a stream for server rendering, register codecs, hydrate, or transfer a loader selection | [Hydration and SSR](references/hydration-and-ssr.md) |
 | Rebuild reactive options, mount providers, use Suspense, or choose transport and versions | [Frameworks and hosts](references/frameworks-and-hosts.md) |
 
 ## Handle failures and cleanup
 
 - Catch configuration and key preparation failures where you build the tree or options. Incompatible hashing can also fail during stream execution.
-- Use `isEffectRpcQueryError` or `isEffectHttpApiQueryError` for failed Effect Exits. Inspect the full `cause` before deciding what to show, log, or retry. A runner that rejects without an Exit passes its rejection through.
-- Stop consumers and cancel queries before disposal. Wait for local stream cleanup, pending preparation, and accepted mutations. Native cancellation can settle before finalizers finish. To stop server work, use an application command protocol.
+- Use `isEffectApiQueryError` for failed Effect Exits from either adapter and `getExecutionCause` to read the original Cause. Runner rejections without an Exit pass through.
+- Before disposal, stop consumers, cancel queries, and wait for local stream cleanup, pending preparation, and accepted mutations. Native cancellation can settle before finalizers finish. Use an application command protocol to stop server work.
 
-Type-check one call against the installed package with strict settings. Exercise its result and cache behavior. If you changed identity or lifetime, verify that entries stay separate and disposal finishes.
+## Verify before handoff
+
+Type-check one call against the installed package with strict settings, and exercise its result and cache behavior. If you changed identity or lifetime, confirm that entries stay separate and disposal completes cleanly.

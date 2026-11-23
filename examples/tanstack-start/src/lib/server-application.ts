@@ -31,7 +31,7 @@ export const startServerApplication = async ({
         await host.handleRequest(new Request(input, init)),
       rpcClient: {
         client,
-        runPromiseExit: Effect.runPromiseExit,
+        runtime: Effect.runPromiseExit,
         dispose: async () => {
           await Effect.runPromise(Scope.close(scope, Exit.void));
         },

@@ -18,7 +18,6 @@ const WorkflowsPage = () => {
   useEffect(() => {
     let active = true;
     let acquired: HttpWorkflows | undefined;
-    // Event consumption belongs to the browser, never the SSR request owner.
     void (async () => {
       try {
         const value = await startHttpWorkflows(window.location.origin);

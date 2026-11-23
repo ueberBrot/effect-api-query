@@ -29,7 +29,7 @@ pnpm install --frozen-lockfile
 
 If your shell cannot find `vp`, prefix it with `pnpm exec`. For example, run `pnpm exec vp run vite-react-dev`.
 
-To use the Dev Container, install Docker and the VS Code Dev Containers extension. Open the repository and choose **Dev Containers: Reopen in Container**. The container installs dependencies and forwards app ports.
+To use the Dev Container, install Docker and the VS Code Dev Containers extension. Open the repository and choose "Dev Containers: Reopen in Container". The container installs dependencies and forwards app ports.
 
 StackBlitz WebContainers lack the native binding that Vite+ needs to run these examples.
 
@@ -47,7 +47,7 @@ Vite starts the development server and proxies `/rpc` and `/api` to the standalo
 | --- | --- | --- |
 | Create/delete a user in either directory | Both adapters refresh through explicit cross-prefix invalidation | [application.ts](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/lib/application.ts) |
 | Trigger a declared HTTP failure | HTTP execution metadata and preserved Cause | [http-section.tsx](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/components/sections/http-section.tsx) |
-| Start a slow query, wait for **Ready to cancel**, then cancel | Only that operation is interrupted. Completed writes remain. | [Cancellation](/effect-api-query/guides/cancellation/) |
+| Start a slow query, wait for "Ready to cancel", then cancel | Only that operation is interrupted. Completed writes remain. | [Cancellation](/effect-api-query/guides/cancellation/) |
 | Switch cache owner or reload | Private caches retire. Allowlisted directory DTOs can persist. | [owner-cache.ts](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/lib/owner-cache.ts) |
 
 See the [shared contracts](https://github.com/ueberBrot/effect-api-query/tree/main/examples/contracts/src), [browser setup](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/lib/application.ts), and [server handlers](https://github.com/ueberBrot/effect-api-query/tree/main/examples/server/src) to adapt the example.
@@ -58,25 +58,25 @@ See the [shared contracts](https://github.com/ueberBrot/effect-api-query/tree/ma
 vp run tanstack-start-dev
 ```
 
-Open `http://127.0.0.1:3000`. Choose **HTTP users** to see server-rendered data and navigation after hydration. Choose **HTTP SSR failure** to see the browser refetch a failed read that the server omitted. Each request and the browser use separate clients and caches.
+Open `http://127.0.0.1:3000`. Choose "HTTP users" to see server-rendered data and navigation after hydration. Choose "HTTP SSR failure" to see the browser refetch a failed read that the server omitted. Each request and the browser use separate clients and caches.
 
 See the [router](https://github.com/ueberBrot/effect-api-query/blob/main/examples/tanstack-start/src/router.tsx), [hydration codecs](https://github.com/ueberBrot/effect-api-query/blob/main/examples/tanstack-start/src/lib/query-ssr.ts), and [failure route](https://github.com/ueberBrot/effect-api-query/blob/main/examples/tanstack-start/src/routes/http-failure.tsx). The [Start guide](/effect-api-query/guides/tanstack-start/) explains the integration.
 
 ## Try cancellable commands
 
-In **Cancellable commands**, start two commands and cancel one. The other continues. See [cancellable commands](/effect-api-query/examples/cancellable-commands/) for the command protocol.
+In "Cancellable commands", start two commands and cancel one. The other continues. See [cancellable commands](/effect-api-query/examples/cancellable-commands/) for the command protocol.
 
 ## Pause a query until a user is selected
 
-In **Choose before fetching**, select a user to load its summary. **No user selected** pauses the query. Clear and reselect the same user within 30 seconds to reuse its cached result.
+In "Choose before fetching", select a user to load its summary. "No user selected" pauses the query. Clear and reselect the same user within 30 seconds to reuse its cached result.
 
 ## Compare full and bounded stream history
 
-When diagnostics finish, choose **Replay newest 2** or **Replay full history**. The first keeps two states and the second keeps all four. The live view keeps the latest state. See [stream history](/effect-api-query/guides/choose-stream-history/) for how each policy changes the key.
+When diagnostics finish, choose "Replay newest 2" or "Replay full history". The first keeps two states and the second keeps all four. The live view keeps the latest state. See [stream history](/effect-api-query/guides/choose-stream-history/) for how each policy changes the key.
 
 ## Inspect request-local metadata
 
-**Trigger declared failure** sends `x-request-source: diagnostics-panel` on that RPC request. Shared authorization stays on the client runner. See [request-local RPC options](/effect-api-query/reference/generated-builders/#request-local-rpc-options).
+"Trigger declared failure" sends `x-request-source: diagnostics-panel` on that RPC request. Shared authorization stays on the client runner. See [request-local RPC options](/effect-api-query/reference/generated-builders/#request-local-rpc-options).
 
 ## Build the examples
 

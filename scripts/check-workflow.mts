@@ -1,10 +1,8 @@
 import { ok } from "node:assert/strict";
-import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 
-const capture = (command: string, args: string[]) =>
-  execFileSync(command, args, { encoding: "utf-8" });
-const git = (...args: string[]) => capture("git", args);
+import { capture, git, run } from "./lib/exec.mts";
+
 const splitPaths = (output: string) => output.split("\0").filter(Boolean);
 const planning = new Set([
   "_artifacts/domain_map.yaml",
@@ -104,23 +102,17 @@ if (mode === "--push") {
     }
     if (
       [...changed].some((file) =>
-        /^(?:vite\.config\.ts|scripts\/(?:compiler|check-workflow)\.mts|scripts\/check-skills\.sh|\.vite-hooks\/|tests\/(?:skills-maintenance|workflow-guards)\.test\.ts)/u.test(
+        /^(?:vite\.config\.ts|scripts\/(?:compiler|check-workflow|lib\/exec)\.mts|scripts\/check-skills\.sh|\.vite-hooks\/|tests\/(?:skills-maintenance|workflow-guards)\.test\.ts)/u.test(
           file
         )
       )
     ) {
-      execFileSync(
-        "vp",
-        [
-          "test",
-          "--",
-          "tests/skills-maintenance.test.ts",
-          "tests/workflow-guards.test.ts",
-        ],
-        {
-          stdio: "inherit",
-        }
-      );
+      run("vp", [
+        "test",
+        "--",
+        "tests/skills-maintenance.test.ts",
+        "tests/workflow-guards.test.ts",
+      ]);
     }
     if (
       [...changed].some((file) =>
@@ -129,7 +121,7 @@ if (mode === "--push") {
         )
       )
     ) {
-      execFileSync("vp", ["run", "effect-compatibility"], { stdio: "inherit" });
+      run("vp", ["run", "effect-compatibility"]);
     }
   }
 } else {

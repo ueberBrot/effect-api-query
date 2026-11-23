@@ -67,7 +67,10 @@ const snapshotProfile = (queryClient: QueryClient): string =>
     dehydrate(queryClient, {
       shouldDehydrateMutation: () => false,
       shouldDehydrateQuery: (query) =>
-        defaultShouldDehydrateQuery(query) && query.queryKey[0] === "profile",
+        defaultShouldDehydrateQuery(query) &&
+        query.state.error === null &&
+        query.state.fetchFailureReason === null &&
+        query.queryKey[0] === "profile",
       serializeData: Schema.encodeUnknownSync(Profile),
     })
   );

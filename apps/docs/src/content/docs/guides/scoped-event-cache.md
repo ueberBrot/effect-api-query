@@ -12,7 +12,6 @@ This example uses the [directory contract](/effect-api-query/guides/query-effect
 ```ts
 import {
   acquireQueryOwner,
-  createQueryFilter,
   createRpcQueryUtils,
   queryEffects,
   recoverStream,
@@ -32,7 +31,7 @@ export interface DirectoryEvent {
 
 /** The application supplies its decoded transport and authoritative snapshot protocol. */
 export interface DirectoryConnection {
-  readonly client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof directory>>;
+  readonly client: RpcClient.RpcClient<RpcGroup.Rpcs<typeof directory>>;
   readonly connect: (
     cursor: string
   ) => Stream.Stream<DirectoryEvent, "expired" | "offline">;
@@ -53,19 +52,15 @@ export const acquireDirectoryEvents = async (
     const connection = await setup.acquire(acquire, async (value) => {
       await value.close();
     });
-    const rpc = createRpcQueryUtils(directory, {
-      client: connection.client,
-      keyPrefix: ["directory-events"],
-      runPromiseExit: setup.wrapRunner(Effect.runPromiseExit),
-    });
+    const rpc = setup.trackUtils(
+      createRpcQueryUtils(directory, { client: connection.client })
+    );
     return { connection, rpc };
   });
   const { connection, rpc } = owner.resources;
-  const reads = createQueryFilter(rpc.users.read, "query");
-  const invalidate = queryEffects.invalidate({
-    ...reads(),
-    refetchType: "none",
-  });
+  const invalidate = queryEffects.invalidate(
+    rpc.users.read.queryFilter({ view: "query", refetchType: "none" })
+  );
   const source = recoverStream({
     initialCursor: "0",
     // This application's protocol uses decimal positions, represented as strings.
@@ -84,7 +79,7 @@ export const acquireDirectoryEvents = async (
         const snapshot = yield* connection.refresh;
         for (const user of snapshot.users) {
           yield* queryEffects.setData(
-            rpc.users.read.queryKey({ id: user.id }),
+            rpc.users.read.queryKey({ input: { id: user.id } }),
             user
           );
         }
@@ -99,7 +94,7 @@ export const acquireDirectoryEvents = async (
       onEvent: (event) =>
         Effect.gen(function* onEvent() {
           yield* queryEffects.setData(
-            rpc.users.read.queryKey({ id: event.id }),
+            rpc.users.read.queryKey({ input: { id: event.id } }),
             {
               id: event.id,
               name: event.name,
@@ -120,7 +115,7 @@ On logout or replacement, await `owner.dispose()`. Retirement stops new work, in
 
 ## Choose recovery and cache policy
 
-The helper waits for each event handler before pulling the next event. A handler failure stops delivery and preserves its Cause. Recovery retries source failures; handlers run once per delivery. `onExit` follows cleanup. Provide any additional Effect services through the runner.
+The helper waits for each event handler before pulling the next event. A handler failure stops delivery and preserves its Cause. Recovery retries source failures, and handlers run once per delivery. `onExit` follows cleanup. Provide any additional Effect services through the runner.
 
 The example replaces one user by exact key and marks related reads stale without refetching. A gap invalidates potentially missed users. If replay expires, fetch authoritative data and return its matching cursor. For deletions or partial snapshots, decide which entries to remove or refresh.
 

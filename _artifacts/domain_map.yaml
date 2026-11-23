@@ -1,6 +1,6 @@
 library:
   name: "@ueberbrot/effect-api-query"
-  version: 0.7.0
+  version: 0.8.0
   repository: https://github.com/ueberBrot/effect-api-query
   description: TanStack Query utilities derived from ready Effect RPC and HTTP clients.
   primary_framework: framework-agnostic
@@ -18,6 +18,7 @@ skills:
       - "@ueberbrot/effect-api-query"
     covers:
       - RPC construction, explicit prepared inputs, and canonical identity
+      - Direct execution on unary RPC and buffered HTTP leaves, plus shared classification of execution failures
       - Query-stable RPC construction and deterministic defaults
       - Immutable captured input and nontransferable prepared-input ownership
       - HTTP decoded requests, SSE and NDJSON, multipart mutations, metadata, and omitted streaming uploads or upgrades
@@ -28,26 +29,30 @@ skills:
       - Opt-in live snapshot coalescing, fixed pending timers with event-loop delay, terminal flush, cancellation discard, configured HTTP decoder identity, and RPC tuple compatibility
       - Stream snapshots and request cleanup
       - Optimistic overlap, event refresh, and owner replacement
-      - DTO and rich-value hydration with typed view registration
+      - DTO and rich-value hydration with contract derivation and typed view overrides
       - Loader selections with explicit input codecs and owner validation
-      - Native provider setup, Suspense recovery, reactive accessors, and host boundaries
+      - Optional React owner and utility providers, Suspense recovery, reactive accessors, and host boundaries
     tasks:
-      - Assemble application-owned policy maps before client acquisition. Type-check SSE decoder settings at the SSE leaf, including through scoped maps. Apply policies through configureUtils, which copies decoder settings for keys and options.
-      - Compose typed reads, ensure, cache updates and generated filter invalidation in Effect using an explicit existing QueryClient service; interrupt waiters without cancelling shared execution.
+      - Check application-owned policy maps against their RPC or HTTP contracts before client acquisition. Type-check SSE settings at the SSE leaf, including flat path entries. Apply policies through configureUtils, which copies decoder settings for keys and options.
+      - Use QueryClientService to run queries, warm the cache, and apply cache operations in Effect. Use an exclusive stream snapshot to capture a stream that can stay open.
+      - Bind application Reactivity keys to explicit cache filters within a Scope. Retain key prefix isolation and stop invalidation at query owner retirement.
       - Derive buffered, paginated, accumulated, live, and metadata options from a ready client. Use its HTTP request parse options when encoding default keys.
-      - Address exact stream policy keys, select supported view prefixes, and compose encoded partial native filters with explicit typed projections.
+      - Use colocated query filters for lazy-safe branch views and complete canonical leaf inputs. Omit stream policy options to match across policies. Supply retention for a policy match if none is configured. Use explicit projections for encoded partial input.
       - Reuse inferred input, cached query data, and mutation types in application modules.
       - Configure utility trees, branches, and leaves with ordered interceptors across views; reuse unchanged frozen subtrees while preserving policy snapshots and prepared-input ownership; select a branch view without changing key layouts.
       - Reuse owner-bound prepared inputs and configure policies once per owner; rebuild reactive call-site options when input changes.
-      - Match single tagged failures without flattening composite Causes.
+      - Call buffered leaves through the inherited runtime or compose their client Effects. Reuse prepared input only on its owning leaf.
+      - Match single tagged failures and bound native retries without flattening composite Causes.
       - Apply native defaults and scoped policies without losing call-site selection, conditional input, or explicitly undefined seed behavior; compose mutation callbacks or intercept native execution attempts.
       - Reuse equivalent immutable decoded records and nested containers with a schema-specific structuralSharing policy while preserving metadata freezing and generated types.
       - Capture open streams and drain queries, preparation, and accepted writes before request disposal.
-      - Hydrate every selected view into its normal decoded cache representation.
+      - Derive registries from matching contracts, override unsupported schemas, and hydrate selected views into their decoded cache representation. Use cached HTTP metadata status to select declared successes. Preserve nested union members with overlapping JSON encodings and distinct undefined stream elements. Set view overrides directly on configuration objects.
+      - Exclude retained errors and fetch failure reasons from successful queries in public snapshots.
       - Preserve neighboring writes and originating ownership during mutation overlap.
       - Defer event refresh until participating writes settle.
       - Retire consumers and accepted work before acquiring a replacement owner. Each owner creates its query and mutation caches from configuration and drains registered work before release.
-      - Acquire a ready client and mount native providers with awaited cleanup.
+      - Drain accepted generated mutation attempts through their interceptors. Use runMutation to include awaited native callbacks.
+      - Acquire a ready client and track its utility tree for retirement. In React, use a keyed owner provider and await caller-managed cleanup.
       - Recover initial Suspense failures, retain cached data after failed refetches, and start independent reads together with native cancellation limits.
       - Recover stream delivery with numeric convenience or explicit application cursor acceptance/order and gap detection, authoritative replay refresh, full hook inference, and cancellable backoff.
       - Map recovered events explicitly to generated-key updates and filter invalidation in one query owner; await sequential handlers and retirement cleanup, and keep durable checkpoints and retained history under application policy.
@@ -57,10 +62,10 @@ skills:
     subsystems:
       - name: RPC
         package: "@ueberbrot/effect-api-query"
-        config_surface: Literal RpcGroup, flat ready client, prefix, key encoders, runner.
+        config_surface: Literal RpcGroup, tag-keyed or flat ready client, optional prefix, key encoders, runtime.
       - name: HTTP
         package: "@ueberbrot/effect-api-query"
-        config_surface: Literal HttpApi, ready client, prefix, request encoders, runner.
+        config_surface: Literal HttpApi, ready client, optional prefix, request encoders, runtime.
     reference_candidates:
       - topic: Adapter inputs and capabilities
         reason: RPC construction and HTTP decoded containers differ.
@@ -69,8 +74,15 @@ skills:
       - topic: Hydration and SSR
         reason: Captures, view codecs, and preparation require request lifetime.
       - topic: Frameworks and hosts
-        reason: Native providers, Suspense recovery, hook overloads, and transport boundaries depend on the integration. The package does not provide these services.
+        reason: The optional React subpath provides typed context and keyed cache wiring. Hooks and transport remain native to their frameworks and hosts.
     failure_modes:
+      - mistake: Treat Reactivity record keys as per-entity subscriptions
+        mechanism: Effect matches both the record group and its IDs, so writes can trigger sibling bindings.
+        wrong_pattern: "Bind { users: [1] } and expect writes to { users: [2] } to skip that binding."
+        correct_pattern: Use a matching string array key for exact events and colocated filters for cache scope. Use distinct Reactivity services for independent owners.
+        source: apps/docs/src/content/docs/guides/query-effects.md
+        priority: HIGH
+        status: active
       - mistake: Assume invalidation immediately refetches inactive queries
         mechanism: QueryClient marks matching entries stale and refetches active matches by default.
         wrong_pattern: Invalidate an unobserved query after a write and read its cache as if the request has completed.
@@ -126,7 +138,7 @@ skills:
       - mistake: Assume shared callbacks have one leaf contract
         mechanism: Root and branch policies span heterogeneous descendants and receive unknown contract values.
         wrong_pattern: Read a specific result field from a root policy callback.
-        correct_pattern: Move contract-dependent callbacks into the leaf scoped configuration.
+        correct_pattern: Move contract-dependent callbacks into a leaf configuration or a leaf entry in paths.
         source: src/core/configure-utils.ts
         priority: HIGH
         status: active
@@ -204,7 +216,7 @@ skills:
         mechanism: Development uses coordinated Effect pins and Effect-enhanced TSRS targeting TypeScript 7.1 beta; consumers retain TypeScript 5.9 and the supported Effect floor. ADR 0035 separates compiler roles; ADR 0042 defines prospective versioning and compatibility guarantees.
         wrong_pattern: Require every consumer to upgrade whenever the development catalog changes.
         correct_pattern: Read the published peer range, coordinate Effect integrations, and check the packed Effect minimum/development/maintained-minor and Query Core floor/current matrix; distinguish ranges from exact evidence; raise the minimum only for required APIs, type contracts, or correctness fixes.
-        source: apps/docs/src/content/docs/getting-started/compatibility-and-stability.md
+        source: apps/docs/src/content/docs/reference/compatibility-and-limits.md
         priority: HIGH
         status: active
       - mistake: Rely on changed metadata options after a fresh hit
@@ -244,6 +256,11 @@ tensions:
       - effect-api-query
     description: Generated options declare native error types, but Promise rejections and deduplicated execution do not establish the current failed Exit or its payload.
     implication: Handle queryEffects failures through QueryClientOperationError and preserve its unknown original cause, including complete execution wrappers.
+  - name: Shared waits and exclusive stream capture
+    skills:
+      - effect-api-query
+    description: QueryClient owns shared fetches, while a stream snapshot owns its exclusive capture.
+    implication: Interrupt the Effect to stop waiting for shared work or abort its stream snapshot. Use queryEffects.cancel to stop a shared query.
   - name: Library contracts and application workflows
     skills:
       - effect-api-query

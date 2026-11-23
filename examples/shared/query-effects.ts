@@ -1,6 +1,6 @@
 import type { QueryClient } from "@tanstack/query-core";
 import {
-  createQueryFilter,
+  bindReactivityInvalidation,
   createRpcQueryUtils,
   queryEffects,
   QueryClientService,
@@ -17,30 +17,37 @@ export const directory = RpcGroup.make(
   })
 );
 
-// Supply the same ready client and QueryClient used by the application's providers.
 export const directoryEffects = (
-  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof directory>>,
+  client: RpcClient.RpcClient<RpcGroup.Rpcs<typeof directory>>,
   queryClient: QueryClient
 ) => {
   const rpc = createRpcQueryUtils(directory, {
     client,
     keyPrefix: ["directory"],
   });
-  const allUsers = createQueryFilter(rpc.users.read, "query");
   const renameFromEvent = Effect.fn("Directory.renameFromEvent")(
     function* renameFromEvent(id: number, name: string) {
       const options = rpc.users.read.queryOptions({
         input: { id },
-        select: (user) => user.name,
       });
-      // ensure returns the full cached user, even though observers select its name.
-      const user = yield* queryEffects.ensure(options);
+      const user = yield* queryEffects.query({
+        ...options,
+        staleTime: "static",
+      });
       yield* queryEffects.setData(options.queryKey, { ...user, name });
-      // Domain policy: mark all directory reads stale without starting refetches.
-      yield* queryEffects.invalidate({ ...allUsers(), refetchType: "none" });
+      yield* queryEffects.invalidate(
+        rpc.users.read.queryFilter({ view: "query", refetchType: "none" })
+      );
       return yield* queryEffects.getData(options.queryKey);
     },
     Effect.provideService(QueryClientService, queryClient)
   );
-  return { rpc, renameFromEvent };
+  const bindUserRefresh = (id: number) =>
+    bindReactivityInvalidation([
+      {
+        keys: [`users:${id}`],
+        filter: rpc.users.read.queryFilter({ view: "query", input: { id } }),
+      },
+    ]).pipe(Effect.provideService(QueryClientService, queryClient));
+  return { rpc, renameFromEvent, bindUserRefresh };
 };

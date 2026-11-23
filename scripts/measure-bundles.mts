@@ -1,3 +1,4 @@
+import { ok } from "node:assert/strict";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
@@ -61,8 +62,8 @@ mkdirSync(artifacts, { recursive: true });
 const directory = mkdtempSync(path.join(artifacts, "bundles-"));
 const context = prepareConsumer(directory);
 const measurements: {
-  consumer: string;
-  peers: string;
+  consumer: keyof typeof consumers;
+  peers: "included" | "external";
   baseline: { minifiedBytes: number; gzipBytes: number };
   adapter: { minifiedBytes: number; gzipBytes: number };
   difference: { minifiedBytes: number; gzipBytes: number };
@@ -134,6 +135,9 @@ try {
                       effectCache: code.includes(
                         "QueryClient operation failed"
                       ),
+                      reactivityBridge:
+                        code.includes(".registerUnsafe(") ||
+                        code.includes("effect/reactivity"),
                       sharing: code.includes("Schema sharing requires acyclic"),
                     },
                   };
@@ -147,17 +151,10 @@ try {
           if (baseline === undefined || adapter === undefined) {
             throw new Error("Both bundle variants must complete");
           }
-          const budget =
-            bundleBudgets[name][externalPeers ? "external" : "included"];
-          assertBudget(
-            `${name} minified delta`,
-            adapter.minifiedBytes - baseline.minifiedBytes,
-            budget[0]
-          );
-          assertBudget(
-            `${name} gzip delta`,
-            adapter.gzipBytes - baseline.gzipBytes,
-            budget[1]
+          ok(
+            !adapter.optionalDiagnosticMarkers.reactivityBridge ||
+              baseline.optionalDiagnosticMarkers.reactivityBridge,
+            `${name} retained an unused Reactivity bridge`
           );
           measurements.push({
             consumer: name,
@@ -195,6 +192,15 @@ try {
     },
     measurements,
   });
+  for (const { consumer, peers, difference } of measurements) {
+    const [minified, gzip] = bundleBudgets[consumer][peers];
+    assertBudget(
+      `${consumer} ${peers} minified delta`,
+      difference.minifiedBytes,
+      minified
+    );
+    assertBudget(`${consumer} ${peers} gzip delta`, difference.gzipBytes, gzip);
+  }
 } finally {
   rmSync(directory, { recursive: true, force: true });
 }

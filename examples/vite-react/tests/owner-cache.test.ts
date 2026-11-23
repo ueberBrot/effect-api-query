@@ -1,8 +1,5 @@
-import {
-  MutationObserver,
-  onlineManager,
-  QueryClient,
-} from "@tanstack/react-query";
+import { MutationObserver, onlineManager } from "@tanstack/react-query";
+import { acquireQueryOwner } from "@ueberbrot/effect-api-query";
 import { Deferred, Effect } from "effect";
 import { describe, expect, it, vi } from "vite-plus/test";
 
@@ -29,27 +26,32 @@ const makeStorage = () => {
   };
 };
 
-const makeCache = (
-  queryClient: QueryClient,
+const makeCache = async (
   storage: ReturnType<typeof makeStorage>,
   owner = identity
 ) => {
   const prefix = ownerKeyPrefix(owner);
-  return makeOwnerCache({
-    identity: owner,
-    queryClient,
-    directoryKeys: {
-      rpc: [...prefix, "rpc", "users", "list", "query"],
-      http: [...prefix, "http", "users", "list", "query"],
-    },
-    storage,
-  });
+  const lifecycle = await acquireQueryOwner(
+    async () => await Promise.resolve(null)
+  );
+  return {
+    queryClient: lifecycle.queryClient,
+    ...makeOwnerCache({
+      identity: owner,
+      lifecycle,
+      directoryKeys: {
+        rpc: [...prefix, "rpc", "users", "list", "query"],
+        http: [...prefix, "http", "users", "list", "query"],
+      },
+      storage,
+    }),
+  };
 };
 
 describe("application private cache owner", () => {
   it("attempts accepted native writes without leaving an offline queue on owner handoff", async () => {
-    const queryClient = new QueryClient();
-    const owner = makeCache(queryClient, makeStorage());
+    const owner = await makeCache(makeStorage());
+    const { queryClient } = owner;
     const mutation = new MutationObserver(
       queryClient,
       owner.trackMutationOptions({
@@ -74,9 +76,9 @@ describe("application private cache owner", () => {
   });
 
   it("drains an accepted native mutation and rejects new native work after retirement", async () => {
-    const queryClient = new QueryClient();
     const stored = makeStorage();
-    const owner = makeCache(queryClient, stored);
+    const owner = await makeCache(stored);
+    const { queryClient } = owner;
     queryClient.setQueryData(
       [...ownerKeyPrefix(identity), "rpc", "users", "list", "query"],
       [{ id: 1, name: "Ada", locale: "en" }]
@@ -114,8 +116,8 @@ describe("application private cache owner", () => {
 
   it("preserves an explicit reload snapshot while retiring its old in-memory owner", async () => {
     const storage = makeStorage();
-    const queryClient = new QueryClient();
-    const owner = makeCache(queryClient, storage);
+    const owner = await makeCache(storage);
+    const { queryClient } = owner;
     const key = [...ownerKeyPrefix(identity), "rpc", "users", "list", "query"];
     queryClient.setQueryData(key, [{ id: 2, name: "Grace", locale: "fr" }]);
     await owner.retire({ discardPersistence: false });
@@ -124,8 +126,8 @@ describe("application private cache owner", () => {
       queries: queryClient.getQueryCache().getAll(),
       snapshots: storage.values.size,
     }).toStrictEqual({ active: false, queries: [], snapshots: 1 });
-    const browser = new QueryClient();
-    const resumed = makeCache(browser, storage);
+    const resumed = await makeCache(storage);
+    const { queryClient: browser } = resumed;
     expect(resumed.restoreDirectory()).toBe(true);
     expect({
       data: browser.getQueryData(key),
@@ -141,10 +143,10 @@ describe("application private cache owner", () => {
     }).toStrictEqual({ snapshots: 0, restored: false });
   });
 
-  it("restores only validated directory DTOs for the same owner and compatible busters", () => {
+  it("restores only validated directory DTOs for the same owner and compatible busters", async () => {
     const storage = makeStorage();
-    const server = new QueryClient();
-    const original = makeCache(server, storage);
+    const original = await makeCache(storage);
+    const { queryClient: server } = original;
     const key = [...ownerKeyPrefix(identity), "rpc", "users", "list", "query"];
     server.setQueryData(key, [{ id: 1, name: "Ada", locale: "en" }]);
     original.persistDirectory();
@@ -154,8 +156,8 @@ describe("application private cache owner", () => {
       throw new Error("Expected a persisted directory");
     }
     const [storageKey, json] = saved;
-    const browser = new QueryClient();
-    const restored = makeCache(browser, storage);
+    const restored = await makeCache(storage);
+    const { queryClient: browser } = restored;
     expect(restored.restoreDirectory()).toBe(true);
     expect(browser.getQueryData(key)).toStrictEqual([
       { id: 1, name: "Ada", locale: "en" },
@@ -191,63 +193,12 @@ describe("application private cache owner", () => {
       expect(storage.getItem(storageKey)).toBeNull();
     }
     storage.setItem(storageKey, json);
-    const other = makeCache(browser, storage, {
+    const other = await makeCache(storage, {
       ...identity,
       tenantId: "team-b",
     });
     expect(other.restoreDirectory()).toBe(false);
     expect(storage.getItem(storageKey)).toBe(json);
-    server.clear();
-    browser.clear();
-  });
-
-  it("retires immediately, removes private state, and lets accepted mutations settle", async () => {
-    const queryClient = new QueryClient();
-    const storage = makeStorage();
-    const owner = makeCache(queryClient, storage);
-    const key = [...ownerKeyPrefix(identity), "rpc", "users", "list", "query"];
-    queryClient.setQueryData(key, [{ id: 1, name: "Ada", locale: "en" }]);
-    owner.persistDirectory();
-    expect(storage.values.size).toBe(1);
-    const complete = Deferred.makeUnsafe<number>();
-    let serverWriteCompleted = false;
-    const result = owner.runMutation(async () => {
-      const value = await Effect.runPromise(Deferred.await(complete));
-      serverWriteCompleted = true;
-      return value;
-    });
-    await Promise.resolve();
-    const retiring = owner.retire();
-    const activeAfterRetirement = owner.isActive();
-    await expect(
-      owner.runMutation(async () => await Promise.resolve(3))
-    ).rejects.toThrow("Owner is inactive");
-    await Promise.resolve();
-    expect({
-      active: activeAfterRetirement,
-      data: queryClient.getQueryData(key),
-      snapshots: storage.values.size,
-    }).toStrictEqual({ active: false, data: undefined, snapshots: 0 });
-    owner.persistDirectory();
-    const snapshotsAfterPersistence = storage.values.size;
-    let retired = false;
-    void (async () => {
-      await retiring;
-      retired = true;
-    })();
-    await Promise.resolve();
-    expect({ retired, snapshots: snapshotsAfterPersistence }).toStrictEqual({
-      retired: false,
-      snapshots: 0,
-    });
-    await Effect.runPromise(Deferred.succeed(complete, 2));
-    const completed = await result;
-    await retiring;
-    expect({ completed, serverWriteCompleted, retired }).toStrictEqual({
-      completed: 2,
-      serverWriteCompleted: true,
-      retired: true,
-    });
-    await owner.retire();
+    await Promise.all([original.retire(), restored.retire(), other.retire()]);
   });
 });

@@ -57,8 +57,7 @@ try {
   );
   const http = createHttpApiQueryUtils(usersApi, {
     client,
-    keyPrefix: ["users-app"] as const,
-    runPromiseExit: runtime.runPromiseExit,
+    runtime,
   });
 
   const user = await queryClient.query(

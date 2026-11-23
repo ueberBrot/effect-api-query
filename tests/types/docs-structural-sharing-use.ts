@@ -47,7 +47,7 @@ function readingQueries<E>(
     }
   );
   const read = configureUtils(rpc.read, {
-    query: { policy: { structuralSharing: shareSnapshot } },
+    query: { structuralSharing: shareSnapshot },
   });
   const options = read.queryOptions({ select: (data) => data.readings.length });
   queryClient.query(options) satisfies Promise<number>;
@@ -74,7 +74,7 @@ function readingQueries<E>(
     keyPrefix: ["readings"],
   });
   const metadata = configureUtils(http.readings.read, {
-    metadata: { policy: { structuralSharing: shareMetadataSnapshot } },
+    metadata: { structuralSharing: shareMetadataSnapshot },
   });
   const metadataOptions = metadata.metadataOptions({
     select: ({ data }) => data.readings.length,

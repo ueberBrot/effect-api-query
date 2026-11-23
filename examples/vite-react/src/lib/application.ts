@@ -4,15 +4,13 @@ import type { ExampleRpcClient } from "@effect-api-query/contracts/client";
 import type { QueryClient } from "@tanstack/react-query";
 import {
   acquireQueryOwner,
-  configureUtils,
   createHttpApiQueryUtils,
   createRpcQueryUtils,
 } from "@ueberbrot/effect-api-query";
-import type { QueryOwner, RunPromiseExit } from "@ueberbrot/effect-api-query";
+import type { RuntimeInput } from "@ueberbrot/effect-api-query";
 import { ManagedRuntime } from "effect";
 import { FetchHttpClient, HttpClient, HttpClientRequest } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
-import type { RpcClientError } from "effect/rpc";
 
 import { makeOwnerCache, ownerKeyPrefix } from "./owner-cache.ts";
 import type {
@@ -21,61 +19,19 @@ import type {
 } from "./owner-cache.ts";
 import { makeUsersInvalidator, makeUserWrites } from "./user-writes.ts";
 
-const queryRetirementConfiguration = (
-  runQuery: QueryOwner<unknown>["runQuery"]
-) => {
-  const intercept = async <T>({
-    next,
-    context,
-  }: {
-    readonly next: () => Promise<T>;
-    readonly context: { readonly signal: AbortSignal };
-  }) => await runQuery(next, context.signal);
-  const query = { interceptors: [intercept] };
-  return {
-    query,
-    metadata: query,
-    infinite: query,
-    live: query,
-    streamed: query,
-  };
-};
-
 const makeExampleRpcQueryUtils = (
   client: ExampleRpcClient,
-  runPromiseExit: RunPromiseExit,
-  keyPrefix: ReturnType<typeof ownerKeyPrefix>,
-  runQuery: QueryOwner<unknown>["runQuery"]
-) =>
-  configureUtils(
-    createRpcQueryUtils<
-      typeof exampleRpcGroup,
-      ReturnType<typeof ownerKeyPrefix>,
-      RpcClientError.RpcClientError
-    >(exampleRpcGroup, {
-      client,
-      keyPrefix,
-      runPromiseExit,
-    }),
-    queryRetirementConfiguration(runQuery)
-  );
+  runtime: RuntimeInput,
+  keyPrefix: ReturnType<typeof ownerKeyPrefix>
+) => createRpcQueryUtils(exampleRpcGroup, { client, keyPrefix, runtime });
 
 export type ExampleRpcQueryUtils = ReturnType<typeof makeExampleRpcQueryUtils>;
 
 const makeExampleHttpQueryUtils = (
   client: HttpApiClient.ForApi<typeof exampleHttpApi>,
-  runPromiseExit: RunPromiseExit,
-  keyPrefix: ReturnType<typeof ownerKeyPrefix>,
-  runQuery: QueryOwner<unknown>["runQuery"]
-) =>
-  configureUtils(
-    createHttpApiQueryUtils(exampleHttpApi, {
-      client,
-      keyPrefix,
-      runPromiseExit,
-    }),
-    queryRetirementConfiguration(runQuery)
-  );
+  runtime: RuntimeInput,
+  keyPrefix: ReturnType<typeof ownerKeyPrefix>
+) => createHttpApiQueryUtils(exampleHttpApi, { client, keyPrefix, runtime });
 
 export type ExampleHttpQueryUtils = ReturnType<
   typeof makeExampleHttpQueryUtils
@@ -161,21 +117,14 @@ export const startViteReactApplication = async ({
   };
 
   try {
-    const httpQuery = makeExampleHttpQueryUtils(
-      httpClient,
-      lifecycle.wrapRunner(httpRuntime.runPromiseExit),
-      keyPrefix,
-      lifecycle.runQuery
+    const httpQuery = lifecycle.trackUtils(
+      makeExampleHttpQueryUtils(httpClient, httpRuntime, keyPrefix)
     );
-    const rpcQuery = makeExampleRpcQueryUtils(
-      rpcClient.client,
-      lifecycle.wrapRunner(rpcClient.runPromiseExit),
-      keyPrefix,
-      lifecycle.runQuery
+    const rpcQuery = lifecycle.trackUtils(
+      makeExampleRpcQueryUtils(rpcClient.client, rpcClient.runtime, keyPrefix)
     );
     owner = makeOwnerCache({
       identity: capturedIdentity,
-      queryClient,
       directoryKeys: {
         rpc: rpcQuery.users.list.queryKey(),
         http: httpQuery.users.list.queryKey(),

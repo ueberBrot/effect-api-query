@@ -59,7 +59,12 @@ export const setupQuerySsr = (
 ): void => {
   const codecs = makeSnapshotPreparation(application, preparation);
   setupRouterSsrQueryIntegration({
-    dehydrateOptions: { shouldDehydrateQuery: defaultShouldDehydrateQuery },
+    dehydrateOptions: {
+      shouldDehydrateQuery: (query) =>
+        defaultShouldDehydrateQuery(query) &&
+        query.state.error === null &&
+        query.state.fetchFailureReason === null,
+    },
     queryClient: application.queryClient,
     router,
   });

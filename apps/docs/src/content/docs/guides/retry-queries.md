@@ -9,32 +9,17 @@ This policy allows two retries for `RetryLater` or an approved transport failure
 
 ## Share the decision and delay
 
-Import `Cause`, `Result`, and `Schema` from `effect`. Declare `RetryLater` with a finite `retryAfterMs` field and share the helper between RPC and HTTP.
+Import `getExecutionCause` and `retryExecutionError` from `@ueberbrot/effect-api-query`. Import `Cause`, `Result`, and `Schema` from `effect`. Declare `RetryLater` with a finite `retryAfterMs` field and share the helper between RPC and HTTP.
 
 ```ts
-const retryPolicy = <Error, Failure>(
-  causeOf: (error: Error) => Cause.Cause<Failure> | undefined,
-  isTransient: (failure: Failure) => boolean
-) => ({
-  retry: (failureCount: number, error: Error) => {
-    const cause = causeOf(error);
-    if (
-      !cause ||
-      failureCount >= 2 ||
-      Cause.hasDies(cause) ||
-      Cause.hasInterrupts(cause) ||
-      cause.reasons.length !== 1
-    ) {
-      return false;
-    }
-    const failure = Cause.findError(cause);
-    return (
-      Result.isSuccess(failure) &&
-      (Schema.is(RetryLater)(failure.success) || isTransient(failure.success))
-    );
-  },
-  retryDelay: (attemptIndex: number, error: Error) => {
-    const cause = causeOf(error);
+const retryPolicy = (isTransient: (failure: unknown) => boolean) => ({
+  retry: retryExecutionError({
+    maxRetries: 2,
+    shouldRetry: (failure) =>
+      Schema.is(RetryLater)(failure) || isTransient(failure),
+  }),
+  retryDelay: (attemptIndex: number, error: unknown) => {
+    const cause = getExecutionCause(error);
     if (cause) {
       const failure = Cause.findError(cause);
       if (Result.isSuccess(failure) && Schema.is(RetryLater)(failure.success)) {
@@ -46,25 +31,20 @@ const retryPolicy = <Error, Failure>(
 });
 ```
 
-The helper stops on defects, interruptions, and Causes with multiple reasons. `Cause.findError` returns a `Result` whose success keeps the typed failure union. Schema checks handle unknown values. The adapter guard excludes unwrapped runner failures.
+`retryExecutionError` calls `shouldRetry` only for a single typed failure from either execution wrapper. It stops on defects, interruptions, composite Causes, and unwrapped runner failures. Omit `maxRetries` to allow up to three retries.
 
 ## Bind a typed RPC policy
 
-Import `configureUtils`, `isEffectRpcQueryError`, and `InferQueryError` from `@ueberbrot/effect-api-query`. Import `RpcClientError` from `effect/rpc`. After you build `rpc`, attach the policy to the profile read.
+Import `configureUtils` from `@ueberbrot/effect-api-query`. Import `RpcClientError` from `effect/rpc`. After you build `rpc`, attach the policy to the profile read.
 
 ```ts
-type Error = InferQueryError<typeof rpc.profile.read>;
 const read = configureUtils(rpc.profile.read, {
-  query: {
-    policy: retryPolicy(
-      (error: Error) =>
-        isEffectRpcQueryError(error) ? error.cause : undefined,
-      (failure) =>
-        Schema.is(RpcClientError.RpcClientError)(failure) &&
-        failure.reason._tag === "HttpError" &&
-        failure.reason.kind === "TransportError"
-    ),
-  },
+  query: retryPolicy(
+    (failure) =>
+      Schema.is(RpcClientError.RpcClientError)(failure) &&
+      failure.reason._tag === "HttpError" &&
+      failure.reason.kind === "TransportError"
+  ),
 });
 return read.queryOptions();
 ```
@@ -73,20 +53,15 @@ This example retries only RPC failures from HTTP transport. Configure WebSocket 
 
 ## Bind the same decision to HTTP
 
-Import `isEffectHttpApiQueryError` from `@ueberbrot/effect-api-query` and `HttpClientError` from `effect/http`. Reuse the helper with HTTP's transport classifier.
+Import `HttpClientError` from `effect/http`. Reuse the helper with HTTP's transport classifier.
 
 ```ts
-type Error = InferQueryError<typeof http.profile.read>;
 const read = configureUtils(http.profile.read, {
-  query: {
-    policy: retryPolicy(
-      (error: Error) =>
-        isEffectHttpApiQueryError(error) ? error.cause : undefined,
-      (failure) =>
-        HttpClientError.isHttpClientError(failure) &&
-        failure.reason._tag === "TransportError"
-    ),
-  },
+  query: retryPolicy(
+    (failure) =>
+      HttpClientError.isHttpClientError(failure) &&
+      failure.reason._tag === "TransportError"
+  ),
 });
 return read.queryOptions();
 ```

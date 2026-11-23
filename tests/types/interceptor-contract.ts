@@ -74,7 +74,7 @@ useMutation(
 );
 configureUtils(rpc.read, {
   mutation: {
-    policy: { onSuccess: () => undefined },
+    onSuccess: () => undefined,
     callbacks: "compose",
   },
 }).mutationOptions({
@@ -83,9 +83,9 @@ configureUtils(rpc.read, {
     optimistic.previous satisfies number;
   },
 });
-// @ts-expect-error The interceptor must preserve the decoded query function result.
 configureUtils(rpc.read, {
   query: {
+    // @ts-expect-error The interceptor must preserve the decoded query function result.
     interceptors: [async () => 1],
   },
 }).queryOptions;

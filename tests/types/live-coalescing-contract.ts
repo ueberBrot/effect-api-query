@@ -23,9 +23,9 @@ const options = rpc.watch.liveOptions({
 const cache = new QueryClient();
 const value: null | undefined = cache.getQueryData(options.queryKey);
 const configured = configureUtils(rpc, {
-  live: { policy: { coalesceMs: 25 } },
+  live: { coalesceMs: 25 },
 });
-configured.watch.liveKey({ id: "a" }, { coalesceMs: undefined });
+configured.watch.liveKey({ input: { id: "a" }, coalesceMs: undefined });
 // @ts-expect-error Live deadlines are numeric.
 rpc.watch.liveOptions({ input: { id: "a" }, coalesceMs: "25" });
 // @ts-expect-error Live queries do not accumulate batches.

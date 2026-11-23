@@ -12,4 +12,3 @@ const opaqueDelivery = recoverStream({
   retryDelay: (_cause, attempt) => (attempt === 1 ? 0 : undefined),
 });
 const ids = Effect.runPromise(Stream.runCollect(opaqueDelivery));
-// Resolves to ["id-z", "id-a"].

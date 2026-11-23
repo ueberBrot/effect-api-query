@@ -8,7 +8,7 @@ import type {
 import { useEffect, useMemo, useRef, useState } from "react";
 
 export interface DiagnosticQuery<Input, Data> {
-  readonly queryKey: (input: Input) => QueryKey;
+  readonly queryKey: (options: { readonly input: Input }) => QueryKey;
   readonly queryOptions: (options: { readonly input: Input }) => {
     readonly queryKey: QueryKey;
     readonly queryFn: QueryFunction<Data> | SkipToken;
@@ -23,21 +23,27 @@ export interface StatusInput {
   readonly operationId: string;
 }
 
+export interface DiagnosticStatusCall<Input> {
+  readonly call: (options: {
+    readonly input: Input;
+    readonly signal: AbortSignal;
+  }) => Promise<DiagnosticStatus>;
+}
+
 export interface SlowQueryApplication {
   readonly queryClient: QueryClient;
   readonly rpcQuery: {
     readonly diagnostics: {
       readonly slow: DiagnosticQuery<SlowInput, string>;
-      readonly operationStatus: DiagnosticQuery<StatusInput, DiagnosticStatus>;
+      readonly operationStatus: DiagnosticStatusCall<StatusInput>;
     };
   };
   readonly httpQuery: {
     readonly diagnostics: {
       readonly slow: DiagnosticQuery<{ readonly query: SlowInput }, string>;
-      readonly operationStatus: DiagnosticQuery<
-        { readonly params: StatusInput },
-        DiagnosticStatus
-      >;
+      readonly operationStatus: DiagnosticStatusCall<{
+        readonly params: StatusInput;
+      }>;
     };
   };
   readonly isActive?: () => boolean;
@@ -112,9 +118,8 @@ export const useSlowQueryCancellation = (
     () =>
       transport === "http"
         ? {
-            key: httpQuery.diagnostics.slow.queryKey({ query: slowInput }),
-            statusKey: httpQuery.diagnostics.operationStatus.queryKey({
-              params: { operationId: slowInput.operationId },
+            key: httpQuery.diagnostics.slow.queryKey({
+              input: { query: slowInput },
             }),
             run: async () =>
               await queryClient.query(
@@ -122,29 +127,22 @@ export const useSlowQueryCancellation = (
                   input: { query: slowInput },
                 })
               ),
-            readStatus: async () =>
-              await queryClient.query({
-                ...httpQuery.diagnostics.operationStatus.queryOptions({
-                  input: { params: { operationId: slowInput.operationId } },
-                }),
-                staleTime: 0,
+            readStatus: async (signal: AbortSignal) =>
+              await httpQuery.diagnostics.operationStatus.call({
+                input: { params: { operationId: slowInput.operationId } },
+                signal,
               }),
           }
         : {
-            key: rpcQuery.diagnostics.slow.queryKey(slowInput),
-            statusKey: rpcQuery.diagnostics.operationStatus.queryKey({
-              operationId: slowInput.operationId,
-            }),
+            key: rpcQuery.diagnostics.slow.queryKey({ input: slowInput }),
             run: async () =>
               await queryClient.query(
                 rpcQuery.diagnostics.slow.queryOptions({ input: slowInput })
               ),
-            readStatus: async () =>
-              await queryClient.query({
-                ...rpcQuery.diagnostics.operationStatus.queryOptions({
-                  input: { operationId: slowInput.operationId },
-                }),
-                staleTime: 0,
+            readStatus: async (signal: AbortSignal) =>
+              await rpcQuery.diagnostics.operationStatus.call({
+                input: { operationId: slowInput.operationId },
+                signal,
               }),
           },
     [httpQuery, queryClient, rpcQuery, slowInput, transport]
@@ -157,10 +155,6 @@ export const useSlowQueryCancellation = (
     return () => {
       controller.abort();
       void queryClient.cancelQueries({ queryKey: adapter.key, exact: true });
-      void queryClient.cancelQueries({
-        queryKey: adapter.statusKey,
-        exact: true,
-      });
     };
   }, [adapter, queryClient]);
 
@@ -178,7 +172,7 @@ export const useSlowQueryCancellation = (
     for (let attempt = 0; attempt < 100; attempt += 1) {
       assertActive(signal);
       // oxlint-disable-next-line eslint/no-await-in-loop
-      const status = await adapter.readStatus();
+      const status = await adapter.readStatus(signal);
       assertActive(signal);
       if (predicate(status)) {
         return status;
@@ -205,7 +199,7 @@ export const useSlowQueryCancellation = (
     }
     setState({ _tag: "Starting" });
     try {
-      const before = await adapter.readStatus();
+      const before = await adapter.readStatus(signal);
       assertActive(signal);
       baseline.current = before;
       void runQuery();

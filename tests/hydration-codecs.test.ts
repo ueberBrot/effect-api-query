@@ -327,7 +327,7 @@ it.effect(
           defaultOptions: { deserializeData },
         });
         expect(
-          browser.getQueryData(rpc.read.queryKey({ id: 2 }))
+          browser.getQueryData(rpc.read.queryKey({ input: { id: 2 } }))
         ).toBeInstanceOf(Profile);
       } finally {
         server.clear();
@@ -399,7 +399,7 @@ it.effect(
         yield* Deferred.succeed(release, true);
         yield* Fiber.join(hydration);
         expect(
-          browser.getQueryData(rpc.read.queryKey({ id: 1 }))
+          browser.getQueryData(rpc.read.queryKey({ input: { id: 1 } }))
         ).toBeInstanceOf(Profile);
         browser.clear();
         browser.setQueryData(["existing"], "untouched");
@@ -423,7 +423,9 @@ it.effect(
         expect(browser.getQueryCache().getAll()).toStrictEqual(current);
         expect({
           existing: browser.getQueryData(["existing"]),
-          decoded: browser.getQueryData(rpc.read.queryKey({ id: 1 })),
+          decoded: browser.getQueryData(
+            rpc.read.queryKey({ input: { id: 1 } })
+          ),
         }).toStrictEqual({ existing: "untouched", decoded: undefined });
       } finally {
         server.clear();
@@ -462,7 +464,10 @@ it.effect(
           failure: { code: "UnknownQuery" },
         });
         queryClient.clear();
-        queryClient.setQueryData(rpc.read.queryKey({ id: 1 }), profile);
+        queryClient.setQueryData(
+          rpc.read.queryKey({ input: { id: 1 } }),
+          profile
+        );
         const queries = dehydrate(queryClient).queries.map((query) => ({
           ...query,
           promise: Promise.resolve(profile),
@@ -492,13 +497,17 @@ it.effect(
       });
       const codec = queryViewCodec(rpc.read, "query", Profile);
       const registry = createHydrationRegistry([codec]);
-      const key = rpc.read.queryKey({ id: 1 });
+      const key = rpc.read.queryKey({ input: { id: 1 } });
       expect({
         codecMatch: codec.matches(key),
-        codecWrongView: codec.matches(rpc.read.infiniteKey({ id: 1 })),
+        codecWrongView: codec.matches(
+          rpc.read.infiniteKey({ input: { id: 1 } })
+        ),
         codecShort: codec.matches(["short"]),
         registryMatch: registry.matches(key),
-        registryWrongView: registry.matches(rpc.read.infiniteKey({ id: 1 })),
+        registryWrongView: registry.matches(
+          rpc.read.infiniteKey({ input: { id: 1 } })
+        ),
         registryShort: registry.matches(["short"]),
         registryOtherTenant: registry.matches([
           { tenant: "two" },

@@ -140,33 +140,23 @@ const program = Effect.gen(function* () {
     const rpcTree = rpcFactory();
     const httpTree = httpFactory();
     const sparse = {
-      scoped: {
-        records: {
-          scoped: {
-            "read-0": { query: { policy: { staleTime: 30_000 } } },
-          },
-        },
-      },
+      paths: { "records.read-0": { query: { staleTime: 30_000 } } },
     };
-    const denseScopes: Readonly<
+    const densePaths: Readonly<
       Record<
-        `read-${number}`,
-        { readonly query: { readonly policy: { readonly staleTime: number } } }
+        `records.read-${number}`,
+        { readonly query: { readonly staleTime: number } }
       >
     > = Object.fromEntries(
       Array.from({ length: operationCount }, (_, index) => [
-        `read-${index}`,
-        { query: { policy: { staleTime: index } } },
+        `records.read-${index}`,
+        { query: { staleTime: index } },
       ])
     );
     const dense = {
-      scoped: {
-        records: {
-          scoped: denseScopes,
-        },
-      },
+      paths: densePaths,
     };
-    const broad = { query: { policy: { retry: false } } } as const;
+    const broad = { query: { retry: false } } as const;
     for (const [adapter, tree] of [
       ["rpc", rpcTree],
       ["http", httpTree],
@@ -207,9 +197,9 @@ const program = Effect.gen(function* () {
       const preparedRpc = prepareInput(rpc, input);
       const preparedHttp = prepareInput(http, request);
       const workloads = [
-        ["rpc", "query-key", () => rpc.queryKey(input)],
+        ["rpc", "query-key", () => rpc.queryKey({ input })],
         ["rpc", "query-options", () => rpc.queryOptions({ input })],
-        ["http", "query-key", () => http.queryKey(request)],
+        ["http", "query-key", () => http.queryKey({ input: request })],
         ["http", "query-options", () => http.queryOptions({ input: request })],
         [
           "rpc",

@@ -51,17 +51,17 @@ const makeApplication = ({
     queryFn: async ({ signal }: QueryFunctionContext) =>
       await Effect.runPromise(slow(input), { signal }),
   });
-  const statusQuery = (transport: Transport, { operationId }: StatusInput) => ({
-    queryKey: [transport, "status", operationId],
-    queryFn: async ({ signal }: QueryFunctionContext) => {
-      statusSignals.push(signal);
-      const current = status(operationId);
-      return await Effect.runPromise(
-        readStatus?.(current) ?? Effect.succeed(current),
-        { signal }
-      );
-    },
-  });
+  const callStatus = async (
+    { operationId }: StatusInput,
+    signal: AbortSignal
+  ) => {
+    statusSignals.push(signal);
+    const current = status(operationId);
+    return await Effect.runPromise(
+      readStatus?.(current) ?? Effect.succeed(current),
+      { signal }
+    );
+  };
 
   const application = {
     queryClient,
@@ -69,22 +69,30 @@ const makeApplication = ({
     rpcQuery: {
       diagnostics: {
         slow: {
-          queryKey: (input: SlowInput) => slowQuery("rpc", input).queryKey,
+          queryKey: ({ input }: { readonly input: SlowInput }) =>
+            slowQuery("rpc", input).queryKey,
           queryOptions: ({ input }: { readonly input: SlowInput }) =>
             slowQuery("rpc", input),
         },
         operationStatus: {
-          queryKey: (input: StatusInput) => statusQuery("rpc", input).queryKey,
-          queryOptions: ({ input }: { readonly input: StatusInput }) =>
-            statusQuery("rpc", input),
+          call: async ({
+            input,
+            signal,
+          }: {
+            readonly input: StatusInput;
+            readonly signal: AbortSignal;
+          }) => await callStatus(input, signal),
         },
       },
     },
     httpQuery: {
       diagnostics: {
         slow: {
-          queryKey: ({ query }: { readonly query: SlowInput }) =>
-            slowQuery("http", query).queryKey,
+          queryKey: ({
+            input,
+          }: {
+            readonly input: { readonly query: SlowInput };
+          }) => slowQuery("http", input.query).queryKey,
           queryOptions: ({
             input,
           }: {
@@ -92,13 +100,13 @@ const makeApplication = ({
           }) => slowQuery("http", input.query),
         },
         operationStatus: {
-          queryKey: ({ params }: { readonly params: StatusInput }) =>
-            statusQuery("http", params).queryKey,
-          queryOptions: ({
+          call: async ({
             input,
+            signal,
           }: {
             readonly input: { readonly params: StatusInput };
-          }) => statusQuery("http", input.params),
+            readonly signal: AbortSignal;
+          }) => await callStatus(input.params, signal),
         },
       },
     },

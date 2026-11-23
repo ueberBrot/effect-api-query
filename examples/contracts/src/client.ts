@@ -5,7 +5,7 @@ import { RpcClient, RpcSerialization } from "effect/rpc";
 
 import { exampleRpcGroup } from "./contracts.ts";
 
-export type ExampleRpcClient = RpcClient.RpcClient.Flat<
+export type ExampleRpcClient = RpcClient.RpcClient<
   RpcGroup.Rpcs<typeof exampleRpcGroup>,
   RpcClientError.RpcClientError
 >;
@@ -13,7 +13,7 @@ export type ExampleRpcClient = RpcClient.RpcClient.Flat<
 export interface StartedExampleRpcClient {
   readonly client: ExampleRpcClient;
   readonly dispose: () => Promise<void>;
-  readonly runPromiseExit: <A, E>(
+  readonly runtime: <A, E>(
     effect: Effect.Effect<A, E>,
     options?: { readonly signal?: AbortSignal }
   ) => Promise<Exit.Exit<A, E>>;
@@ -27,31 +27,11 @@ export const makeExampleRpcClient = Effect.fn(
     Layer.provide(FetchHttpClient.layer)
   );
 
-  const client = yield* RpcClient.make(exampleRpcGroup, { flatten: true }).pipe(
+  const client = yield* RpcClient.make(exampleRpcGroup).pipe(
     Effect.provide(protocolLayer)
   );
   let nextSlowOperation = 1;
-  type ClientArguments = {
-    [Tag in Parameters<ExampleRpcClient>[0]]: Parameters<
-      typeof client<Tag, boolean, unknown>
-    >;
-  }[Parameters<ExampleRpcClient>[0]];
-  type ClientResult = {
-    [Tag in Parameters<ExampleRpcClient>[0]]: ReturnType<
-      typeof client<Tag, boolean, unknown>
-    >;
-  }[Parameters<ExampleRpcClient>[0]];
-
-  const forwardClient: (...args: Parameters<ExampleRpcClient>) => ClientResult =
-    client;
-
-  const cancellationAwareClient = (
-    ...[tag, payload, options]: ClientArguments
-  ) => {
-    if (tag !== "diagnostics.slow") {
-      return forwardClient(tag, payload, options);
-    }
-
+  const slow: ExampleRpcClient["diagnostics.slow"] = (payload, options) => {
     const suppliedOperationId = payload.operationId;
     const operationId =
       suppliedOperationId ??
@@ -61,13 +41,12 @@ export const makeExampleRpcClient = Effect.fn(
       nextSlowOperation += 1;
     }
 
-    return client(
-      "diagnostics.slow",
+    return client["diagnostics.slow"](
       { ...payload, operationId },
       options
     ).pipe(
       Effect.onInterrupt(() =>
-        client("diagnostics.cancel", { operationId }).pipe(
+        client["diagnostics.cancel"]({ operationId }).pipe(
           Effect.ignoreCause({
             log: true,
             message: "Failed to cancel example slow operation",
@@ -77,8 +56,7 @@ export const makeExampleRpcClient = Effect.fn(
     );
   };
 
-  // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion
-  return cancellationAwareClient as ExampleRpcClient;
+  return { ...client, "diagnostics.slow": slow };
 });
 
 export const startExampleRpcClient = async (
@@ -117,7 +95,7 @@ export const startExampleRpcClient = async (
     return {
       client,
       dispose,
-      runPromiseExit: async (effect, options) =>
+      runtime: async (effect, options) =>
         runtime.runPromiseExit(
           RpcClient.withHeaders(effect, {
             "x-example-authorization": "allowed",

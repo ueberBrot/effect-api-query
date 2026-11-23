@@ -1,7 +1,6 @@
 import {
   runQueryEvents,
   queryEffects,
-  createQueryFilter,
   type QueryOwner,
   type QueryClientOperationError,
 } from "@ueberbrot/effect-api-query";
@@ -11,7 +10,6 @@ import { directoryEffects } from "../../examples/shared/query-effects";
 
 declare const owner: QueryOwner<unknown>;
 declare const rpc: ReturnType<typeof directoryEffects>["rpc"];
-const reads = createQueryFilter(rpc.users.read, "query");
 const events = Stream.make({ id: 1, name: "Ada" });
 const completion = runQueryEvents(
   owner,
@@ -20,16 +18,18 @@ const completion = runQueryEvents(
     onEvent: (event) =>
       Effect.gen(function* () {
         yield* queryEffects.setData(
-          rpc.users.read.queryKey({ id: event.id }),
+          rpc.users.read.queryKey({ input: { id: event.id } }),
           event
         );
-        yield* queryEffects.invalidate({ ...reads(), refetchType: "none" });
+        yield* queryEffects.invalidate(
+          rpc.users.read.queryFilter({ view: "query", refetchType: "none" })
+        );
       }),
   },
   Effect.runPromiseExit
 );
 const wrong = queryEffects.setData(
-  rpc.users.read.queryKey({ id: 1 }),
+  rpc.users.read.queryKey({ input: { id: 1 } }),
   // @ts-expect-error Generated keys retain decoded user data in event mappings
   { id: 1, name: 123 }
 );

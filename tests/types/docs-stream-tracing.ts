@@ -3,7 +3,6 @@ import {
   createHttpApiQueryUtils,
   fetchStreamSnapshot,
 } from "@ueberbrot/effect-api-query";
-import type { RunPromiseExit } from "@ueberbrot/effect-api-query";
 import { Effect, Layer, ManagedRuntime, Stream, Tracer } from "effect";
 import { FetchHttpClient } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
@@ -59,12 +58,10 @@ const captureTracedFeed = async (
         transformResponse: traceDecodedResponse,
       })
     );
-    const runPromiseExit: RunPromiseExit = (effect, options) =>
-      runtime.runPromiseExit(effect, options);
     const http = createHttpApiQueryUtils(feedApi, {
       client,
       keyPrefix: ["feed-app"],
-      runPromiseExit,
+      runtime,
     });
     return await fetchStreamSnapshot(
       queryClient,

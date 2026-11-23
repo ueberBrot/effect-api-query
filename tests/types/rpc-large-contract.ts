@@ -50,7 +50,10 @@ type Assert<Value extends true> = Value;
 type OperationName =
   `read-${(typeof indexes)[number]}-${0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}`;
 true satisfies Assert<
-  Equal<Exclude<keyof typeof utils.scale, "key">, OperationName>
+  Equal<
+    Exclude<Extract<keyof typeof utils.scale, string>, "key" | "queryFilter">,
+    OperationName
+  >
 >;
 utils.scale["read-99-9"].key() satisfies readonly [
   "large-contract",
@@ -72,23 +75,19 @@ utils.scale["read-99-9"].queryOptions({ input: { id: "2" } });
 utils.scale["read-100-0"];
 
 const configured = configureUtils(utils, {
-  query: { policy: { retry: false } },
-  scoped: {
-    scale: {
-      scoped: {
-        "read-99-9": {
-          query: {
-            policy: { staleTime: 1000 },
-            interceptors: [
-              async ({ next }) => {
-                const user = await next();
-                user.id satisfies number;
-                user.name satisfies string;
-                return user;
-              },
-            ],
+  query: { retry: false },
+  paths: {
+    "scale.read-99-9": {
+      query: {
+        staleTime: 1000,
+        interceptors: [
+          async ({ next }) => {
+            const user = await next();
+            user.id satisfies number;
+            user.name satisfies string;
+            return user;
           },
-        },
+        ],
       },
     },
   },
@@ -107,6 +106,10 @@ const configuredSelected: string | undefined = configuredLast.select?.({
 });
 // @ts-expect-error Scoped configuration preserves the generated input type.
 configured.scale["read-99-9"].queryOptions({ input: { id: "2" } });
-// @ts-expect-error Scoped configuration only accepts declared child names.
-configureUtils(utils.scale, { scoped: { "read-100-0": {} } });
+configureUtils(utils.scale, {
+  paths: {
+    // @ts-expect-error Scoped configuration only accepts declared child names.
+    "read-100-0": {},
+  },
+});
 void [first, id, selected, configuredId, configuredSelected];

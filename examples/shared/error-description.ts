@@ -1,18 +1,18 @@
 import {
-  isEffectHttpApiQueryError,
-  isEffectRpcQueryError,
+  getExecutionCause,
+  isEffectApiQueryError,
 } from "@ueberbrot/effect-api-query";
 import { Cause } from "effect";
 
 // oxlint-disable-next-line anti-slop/no-unknown-parameters
 export const describeEffectError = (error: unknown) => {
-  if (isEffectRpcQueryError(error) || isEffectHttpApiQueryError(error)) {
-    const operation = isEffectRpcQueryError(error)
-      ? error.rpcTag
-      : `${error.groupId}.${error.endpoint}`;
+  if (isEffectApiQueryError(error)) {
+    const operation =
+      "rpcTag" in error ? error.rpcTag : `${error.groupId}.${error.endpoint}`;
+    const cause = getExecutionCause(error);
     return {
       summary: `${error.name} from ${operation} (${error.operation})`,
-      details: Cause.pretty(error.cause),
+      details: cause === undefined ? undefined : Cause.pretty(cause),
     };
   }
   return error instanceof Error

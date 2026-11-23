@@ -1,5 +1,5 @@
 import { Context, Predicate, Schema } from "effect";
-import { HttpApi, HttpApiSchema } from "effect/http-api";
+import { HttpApi } from "effect/http-api";
 import type { HttpApiEndpoint } from "effect/http-api";
 
 import { canonicalize } from "../core/canonical-key";
@@ -7,31 +7,12 @@ import type { OperationInput } from "../core/operation";
 import { createSchemaKeyEncoding } from "../core/schema-key";
 import type { SchemaKeyEncoding } from "../core/schema-key";
 import type { JsonValue } from "../core/types";
+import { classifyHttpEndpoint } from "./endpoint";
 import {
   EffectHttpApiQueryConfigError,
   EffectHttpApiQueryKeyError,
 } from "./errors";
 import type { HttpApiEndpointIdentity } from "./errors";
-
-const multipartBrands = (schema: Schema.Top): ReadonlySet<string> => {
-  const brands = new Set<string>();
-  const visited = new WeakSet();
-  let current: unknown = schema;
-  while (Schema.isSchema(current) && !visited.has(current)) {
-    visited.add(current);
-    if (
-      Predicate.hasProperty(current, "identifier") &&
-      (current.identifier === HttpApiSchema.MultipartTypeId ||
-        current.identifier === HttpApiSchema.MultipartStreamTypeId)
-    ) {
-      brands.add(current.identifier);
-    }
-    current = Predicate.hasProperty(current, "schema")
-      ? current.schema
-      : undefined;
-  }
-  return brands;
-};
 
 export type HttpRequestDescription = (
   | { readonly kind: "Unary"; readonly input: OperationInput }
@@ -81,84 +62,6 @@ const requestKeyEncoding = (
       );
     },
   };
-};
-
-const classifyEndpoint = (
-  endpoint: HttpApiEndpoint.Top,
-  identity: HttpApiEndpointIdentity
-):
-  | {
-      readonly kind: "Unary";
-      readonly schemas: readonly Schema.Top[];
-    }
-  | {
-      readonly kind: "Streaming";
-      readonly stream: "StreamSse" | "StreamNdjson";
-      readonly schemas: readonly Schema.Top[];
-    }
-  | { readonly kind: "Mutation" }
-  | undefined => {
-  const payloads: Schema.Top[] = [];
-  let multipart = false;
-  let multipartStream = false;
-  for (const { encoding, schemas } of endpoint.payload.values()) {
-    if (encoding._tag === "Stream") {
-      return undefined;
-    }
-    for (const schema of schemas) {
-      const brands = multipartBrands(schema);
-      const buffered = brands.has(HttpApiSchema.MultipartTypeId);
-      const streamed = brands.has(HttpApiSchema.MultipartStreamTypeId);
-      const expectedBuffered =
-        encoding._tag === "Multipart" && encoding.mode === "buffered";
-      const expectedStreamed =
-        encoding._tag === "Multipart" && encoding.mode === "stream";
-      const metadataAgrees =
-        buffered === expectedBuffered && streamed === expectedStreamed;
-      if (!metadataAgrees) {
-        throw new EffectHttpApiQueryConfigError(
-          "UnsupportedEndpointMetadata",
-          `HTTP endpoint ${identity.groupId}/${identity.endpoint} has contradictory multipart metadata`,
-          identity
-        );
-      }
-      multipart ||= expectedBuffered;
-      multipartStream ||= expectedStreamed;
-      payloads.push(schema);
-    }
-  }
-  if (multipartStream) {
-    return undefined;
-  }
-  const successes = [...endpoint.success];
-  const bodies = successes.map((schema) =>
-    HttpApiSchema.isWithHeaders(schema) ? schema.schema : schema
-  );
-  if (
-    bodies.some((body) =>
-      Predicate.hasProperty(body, "~effect/http-api/HttpApiSchema/Upgrade")
-    )
-  ) {
-    return undefined;
-  }
-  const streams = bodies.filter((body) =>
-    Predicate.hasProperty(body, "~effect/http-api/HttpApiSchema/Stream")
-  );
-  if (streams.length > 0) {
-    const [body] = bodies;
-    if (
-      multipart ||
-      successes.length !== 1 ||
-      !Predicate.hasProperty(body, "_tag") ||
-      (body._tag !== "StreamSse" && body._tag !== "StreamNdjson")
-    ) {
-      return undefined;
-    }
-    return { kind: "Streaming", stream: body._tag, schemas: payloads };
-  }
-  return multipart
-    ? { kind: "Mutation" }
-    : { kind: "Unary", schemas: payloads };
 };
 
 // oxlint-disable-next-line anti-slop/no-unknown-parameters, anti-slop/no-unknown-returns
@@ -242,9 +145,16 @@ export const createHttpRequest = (
   identity: HttpApiEndpointIdentity,
   annotations: Context.Context<never>
 ): HttpRequestDescription | undefined => {
-  const classified = classifyEndpoint(endpoint, identity);
+  const classified = classifyHttpEndpoint(endpoint);
   if (classified === undefined) {
     return undefined;
+  }
+  if (classified.kind === "ContradictoryMultipart") {
+    throw new EffectHttpApiQueryConfigError(
+      "UnsupportedEndpointMetadata",
+      `HTTP endpoint ${identity.groupId}/${identity.endpoint} has contradictory multipart metadata`,
+      identity
+    );
   }
   const fields: RequestFields = {};
   if (endpoint.params !== undefined) {
@@ -262,14 +172,14 @@ export const createHttpRequest = (
       parts: [...Object.keys(fields), "payload"],
     };
   }
-  const payloads = classified.schemas;
+  const { payloads } = classified;
   if (payloads.length > 0) {
     fields["payload"] = Schema.Union(payloads);
   }
   const parts = Object.keys(fields);
   const description =
     classified.kind === "Streaming"
-      ? { kind: classified.kind, stream: classified.stream, parts }
+      ? { kind: classified.kind, stream: classified.stream._tag, parts }
       : { kind: classified.kind, parts };
   if (parts.length === 0) {
     return { ...description, input: { _tag: "Inputless" } };

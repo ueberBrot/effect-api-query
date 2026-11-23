@@ -23,6 +23,7 @@ import type {
   QueryPolicy,
 } from "./policy";
 import { inputKind } from "./prepared-input";
+import { isStreamPolicyOption } from "./streamed-query";
 import type {
   OwnedMutationOption,
   StreamedPolicyOptions,
@@ -30,38 +31,34 @@ import type {
   KeysOfUnion,
   UnaryQueryBuilder,
   UnaryQueryBuilderDescriptor,
+  utilityPaths,
 } from "./types";
-
-export interface UtilityNode {
-  readonly key: () => QueryKey;
-}
+import { mapUtilityChildren, readUtilityChild } from "./utility-node";
+import type { RuntimeUtilityNode, UtilityNode } from "./utility-node";
 
 export type StreamKeyPolicy<Leaf, View extends "streamed" | "live"> =
   Leaf extends Record<`${View}Key`, (...args: infer Args) => unknown>
-    ? Required<Args> extends readonly [unknown, infer Policy]
-      ? Partial<NonNullable<Policy>>
-      : Required<Args> extends readonly [infer Policy]
-        ? Partial<NonNullable<Policy>>
-        : View extends "streamed"
-          ? Partial<StreamedPolicyOptions>
-          : LivePolicyOptions
+    ? Required<Args> extends readonly [infer Options]
+      ? Partial<Omit<NonNullable<Options>, "input">>
+      : View extends "streamed"
+        ? Partial<StreamedPolicyOptions>
+        : LivePolicyOptions
     : View extends "streamed"
       ? Partial<StreamedPolicyOptions>
       : LivePolicyOptions;
 
-export interface QueryConfiguration<
+export type QueryConfiguration<
   Leaf,
   View extends SupportedQueryView<Leaf>,
-> {
-  readonly policy?: QueryPolicy<Leaf, View> &
-    (View extends "streamed" | "live" ? StreamKeyPolicy<Leaf, View> : unknown);
-  readonly interceptors?: readonly QueryInterceptor<Leaf, View>[];
-}
+> = QueryPolicy<Leaf, View> &
+  (View extends "streamed" | "live" ? StreamKeyPolicy<Leaf, View> : unknown) & {
+    readonly interceptors?: readonly QueryInterceptor<Leaf, View>[];
+  };
 
-export type MutationConfiguration<Leaf> = MutationPolicyOptions & {
-  readonly policy?: MutationPolicy<Leaf>;
-  readonly interceptors?: readonly MutationInterceptor<Leaf>[];
-};
+export type MutationConfiguration<Leaf> = MutationPolicy<Leaf> &
+  MutationPolicyOptions & {
+    readonly interceptors?: readonly MutationInterceptor<Leaf>[];
+  };
 
 export type SharedQueryInterceptor<View extends QueryView> = <Data>(execution: {
   readonly context: QueryFunctionContext<
@@ -77,26 +74,25 @@ export type SharedMutationInterceptor = <Data>(execution: {
   readonly next: () => Promise<Data>;
 }) => Promise<Data>;
 
-export interface SharedQueryConfiguration<View extends QueryView> {
-  readonly policy?: Omit<
-    QueryObserverOptions<unknown, unknown>,
-    LocalQueryOption
-  > &
-    (View extends "streamed"
-      ? Partial<StreamedPolicyOptions>
-      : View extends "live"
-        ? LivePolicyOptions
-        : unknown);
-  readonly interceptors?: readonly SharedQueryInterceptor<View>[];
-}
+export type SharedQueryConfiguration<View extends QueryView> = Omit<
+  QueryObserverOptions<unknown, unknown>,
+  LocalQueryOption
+> &
+  (View extends "streamed"
+    ? Partial<StreamedPolicyOptions>
+    : View extends "live"
+      ? LivePolicyOptions
+      : unknown) & {
+    readonly interceptors?: readonly SharedQueryInterceptor<View>[];
+  };
 
-export type SharedMutationConfiguration = MutationPolicyOptions & {
-  readonly policy?: Omit<
-    MutationObserverOptions<unknown, unknown, unknown>,
-    OwnedMutationOption | "onMutate"
-  >;
-  readonly interceptors?: readonly SharedMutationInterceptor[];
-};
+export type SharedMutationConfiguration = Omit<
+  MutationObserverOptions<unknown, unknown, unknown>,
+  OwnedMutationOption | "onMutate"
+> &
+  MutationPolicyOptions & {
+    readonly interceptors?: readonly SharedMutationInterceptor[];
+  };
 
 export type InheritedMethods = {
   readonly [
@@ -110,41 +106,68 @@ export type InheritedMethods = {
   ]: (...args: never[]) => unknown;
 };
 
-// Generated branches contain only their key builder and named children.
-export type ChildNames<Node> = Exclude<Extract<keyof Node, string>, "key">;
+export type IsLeaf<Node> = Node extends
+  | { readonly queryOptions: unknown }
+  | { readonly streamedOptions: unknown }
+  | { readonly mutationOptions: unknown }
+  ? true
+  : false;
 
-export type Children<Node> = [ChildNames<Node>] extends [never]
+export type NodePaths<Node> = Node extends {
+  readonly [utilityPaths]?: infer Paths extends string;
+}
+  ? Paths
+  : never;
+
+export type LookupPath<Node, Path extends string> = Path extends keyof Node
+  ? Node[Path]
+  : LookupDescendant<Node, Path>;
+
+export type LookupDescendant<
+  Node,
+  Path extends string,
+  Prefix extends string = "",
+> = Path extends `${infer Head}.${infer Tail}`
+  ? `${Prefix}${Head}` extends keyof Node
+    ? LookupPath<Node[`${Prefix}${Head}`], Tail> extends infer Child
+      ? [Child] extends [never]
+        ? LookupDescendant<Node, Tail, `${Prefix}${Head}.`>
+        : Child
+      : never
+    : LookupDescendant<Node, Tail, `${Prefix}${Head}.`>
+  : never;
+
+export type NodeViews<Node> =
+  IsLeaf<Node> extends true
+    ? {
+        readonly [View in QueryView]?: View extends SupportedQueryView<Node>
+          ? QueryConfiguration<Node, Extract<View, SupportedQueryView<Node>>>
+          : never;
+      } & {
+        readonly mutation?: Node extends MutationLeaf
+          ? MutationConfiguration<Node>
+          : never;
+      }
+    : {
+        readonly [View in QueryView]?: SharedQueryConfiguration<View>;
+      } & {
+        readonly mutation?: SharedMutationConfiguration;
+      };
+
+export type PathConfigurations<Node> = [NodePaths<Node>] extends [never]
   ? never
   : {
-      readonly [Key in ChildNames<Node>]?:
-        | UtilsConfiguration<Node[Key]>
-        | (Key extends keyof InheritedMethods ? InheritedMethods[Key] : never);
+      readonly [Path in NodePaths<Node>]?:
+        | NodeViews<LookupPath<Node, Path>>
+        | (Path extends keyof InheritedMethods
+            ? InheritedMethods[Path]
+            : never);
     };
-
-export type LeafMembers<Node> = Node extends MutationLeaf
-  ? Node
-  : [SupportedQueryView<Node>] extends [never]
-    ? never
-    : Node;
 
 /** Typed defaults and ordered interceptors for a generated tree, branch, or leaf. */
-export type UtilsConfiguration<Node> = [LeafMembers<Node>] extends [never]
-  ? {
-      readonly [View in QueryView]?: SharedQueryConfiguration<View>;
-    } & {
-      readonly mutation?: SharedMutationConfiguration;
-      readonly scoped?: Children<Node>;
-    }
-  : {
-      readonly [View in QueryView]?: View extends SupportedQueryView<Node>
-        ? QueryConfiguration<Node, Extract<View, SupportedQueryView<Node>>>
-        : never;
-    } & {
-      readonly mutation?: [Node] extends [MutationLeaf]
-        ? MutationConfiguration<Node>
-        : never;
-      readonly scoped?: never;
-    };
+export type UtilsConfiguration<Node> = NodeViews<Node> & {
+  readonly paths?: IsLeaf<Node> extends true ? never : PathConfigurations<Node>;
+};
 
 export type ExtraProperties<Expected, Actual> = {
   readonly [Key in Exclude<KeysOfUnion<Actual>, keyof Expected>]: never;
@@ -156,78 +179,82 @@ export type Property<Value, Key extends PropertyKey> = Value extends unknown
     : never
   : never;
 
-export type ExactView<Expected, Actual> = ExtraProperties<Expected, Actual> &
-  ("policy" extends KeysOfUnion<Actual>
-    ? {
-        readonly policy?: ExtraProperties<
-          NonNullable<Property<Expected, "policy">>,
-          NonNullable<Property<Actual, "policy">>
-        >;
-      }
-    : unknown);
-
-export type ExactChildConfiguration<Node, Key, Actual> =
-  Key extends keyof InheritedMethods
-    ? [Exclude<Actual, InheritedMethods[Key]>] extends [never]
-      ? never
-      :
-          | ExactConfigurationProperties<
-              Node,
-              Exclude<Actual, InheritedMethods[Key]>
-            >
-          | Extract<Actual, InheritedMethods[Key]>
-    : ExactConfigurationProperties<Node, Actual>;
-
-export type ExactConfiguration<Node, Actual> = [Actual] extends [
-  UtilsConfiguration<Node>,
-]
-  ? ExactConfigurationProperties<Node, Actual>
-  : never;
-
-export type ExactConfigurationProperties<Node, Actual> = ExtraProperties<
-  UtilsConfiguration<Node>,
-  Actual
-> & {
+export type ExactViews<Node, Actual> = {
   readonly [
-    Key in KeysOfUnion<Actual> & keyof UtilsConfiguration<Node>
-  ]?: Key extends "scoped"
-    ? NonNullable<Property<Actual, Key>> extends object
-      ? ExtraProperties<Children<Node>, NonNullable<Property<Actual, Key>>> & {
-          readonly [
-            Child in KeysOfUnion<NonNullable<Property<Actual, Key>>> &
-              keyof Node
-          ]?: ExactChildConfiguration<
-            Node[Child],
-            Child,
-            NonNullable<Property<NonNullable<Property<Actual, Key>>, Child>>
-          >;
-        }
-      : unknown
-    : ExactView<
-        NonNullable<UtilsConfiguration<Node>[Key]>,
-        NonNullable<Property<Actual, Key>>
-      >;
+    View in KeysOfUnion<Actual> & keyof NodeViews<Node>
+  ]?: ExtraProperties<
+    NonNullable<NodeViews<Node>[View]>,
+    NonNullable<Property<Actual, View>>
+  >;
 };
 
-export type StreamPolicy<Configuration> = Configuration extends {
-  readonly streamed: { readonly policy: infer Policy };
-}
-  ? Policy
-  : unknown;
+export type ExactPathViews<Node, Path, Actual> =
+  Path extends keyof InheritedMethods
+    ? [Exclude<Actual, InheritedMethods[Path]>] extends [never]
+      ? never
+      :
+          | ExactPathConfiguration<
+              Node,
+              Exclude<Actual, InheritedMethods[Path]>
+            >
+          | Extract<Actual, InheritedMethods[Path]>
+    : ExactPathConfiguration<Node, Actual>;
 
-export type ScopedConfiguration<
+export type ExactPathConfiguration<Node, Actual> = ExtraProperties<
+  NodeViews<Node>,
+  Actual
+> &
+  ExactViews<Node, Actual>;
+
+export type ExactPaths<Node, Paths> = ExtraProperties<
+  PathConfigurations<Node>,
+  Paths
+> & {
+  readonly [Path in KeysOfUnion<Paths> & NodePaths<Node>]?: ExactPathViews<
+    LookupPath<Node, Path>,
+    Path,
+    NonNullable<Property<Paths, Path>>
+  >;
+};
+
+export type ExactConfiguration<Node, Actual> = ExactViews<Node, Actual> &
+  ExtraProperties<UtilsConfiguration<Node>, Actual> & {
+    readonly paths?: "paths" extends KeysOfUnion<Actual>
+      ? ExactPaths<Node, NonNullable<Property<Actual, "paths">>>
+      : unknown;
+  };
+
+export type HasRetention<Configuration> = [Configuration] extends [never]
+  ? false
+  : [Configuration] extends [
+        {
+          readonly streamed: {
+            readonly maxChunks: StreamedPolicyOptions["maxChunks"];
+          };
+        },
+      ]
+    ? true
+    : false;
+
+export type ConfigPaths<Configuration> = [Configuration] extends [
+  {
+    readonly paths: infer Paths;
+  },
+]
+  ? Paths
+  : object;
+
+export type ConfigHasAnyRetention<
   Configuration,
-  Key extends PropertyKey,
-> = Configuration extends { readonly scoped: infer Scoped }
-  ? Key extends keyof Scoped
-    ? Scoped[Key]
-    : unknown
-  : unknown;
-
-export type RetentionDefault<Configuration, Inherited> =
-  StreamPolicy<Configuration> extends { readonly maxChunks: infer MaxChunks }
-    ? { readonly maxChunks: MaxChunks }
-    : Inherited;
+  Paths = ConfigPaths<Configuration>,
+> =
+  HasRetention<Configuration> extends true
+    ? true
+    : true extends {
+          [Path in keyof Paths]-?: HasRetention<Paths[Path]>;
+        }[keyof Paths]
+      ? true
+      : false;
 
 export type WithDefaultRetention<Builder> =
   UnaryQueryBuilderDescriptor<Builder> extends infer Descriptor
@@ -255,60 +282,140 @@ export type WithDefaultRetention<Builder> =
     : Builder;
 
 export type WithDefaultKeyRetention<KeyBuilder> = KeyBuilder extends (
-  ...args: infer Args
+  options: infer Options
 ) => infer Key
-  ? Args extends readonly [infer Input, infer Policy]
-    ? (input: Input, policy?: Partial<Policy>) => Key
-    : Args extends readonly [infer Policy]
-      ? (policy?: Partial<Policy>) => Key
-      : KeyBuilder
+  ? "input" extends keyof NonNullable<Options>
+    ? (
+        options: Omit<NonNullable<Options>, "maxChunks"> & {
+          readonly maxChunks?: StreamedPolicyOptions["maxChunks"];
+        }
+      ) => Key
+    : (
+        options?: Omit<NonNullable<Options>, "maxChunks"> & {
+          readonly maxChunks?: StreamedPolicyOptions["maxChunks"];
+        }
+      ) => Key
   : KeyBuilder;
 
-/** Preserves leaf builders and makes configured stream retention optional at call sites. */
-export type ConfiguredUtils<Node, Configuration, Inherited = unknown> = {
-  readonly [Key in keyof Node]: Node[Key] extends UtilityNode
-    ? Key extends string
-      ? ConfiguredUtils<
-          Node[Key],
-          ScopedConfiguration<Configuration, Key>,
-          RetentionDefault<Configuration, Inherited>
-        >
-      : Node[Key]
-    : RetentionDefault<Configuration, Inherited> extends {
-          readonly maxChunks: StreamedPolicyOptions["maxChunks"];
-        }
-      ? Key extends "streamedOptions"
+export type FilterWithDefaultRetention<Options> = Options extends {
+  readonly view: "streamed";
+  readonly maxChunks: infer Retention;
+}
+  ? Omit<Options, "maxChunks"> & { readonly maxChunks?: Retention }
+  : Options;
+
+export type WithDefaultFilterRetention<Filter> = Filter extends (
+  options?: infer Options
+) => infer Result
+  ? (options?: FilterWithDefaultRetention<Options>) => Result
+  : Filter;
+
+export type JoinPath<
+  Prefix extends string,
+  Key extends string,
+> = Prefix extends "" ? Key : `${Prefix}.${Key}`;
+
+export type ApplyRetentionTree<
+  Node,
+  Paths,
+  Inherited extends boolean,
+  Prefix extends string = "",
+> = {
+  readonly [Key in keyof Node]: Key extends string
+    ? Key extends "streamedOptions"
+      ? Inherited extends true
         ? WithDefaultRetention<Node[Key]>
-        : Key extends "streamedKey"
+        : Node[Key]
+      : Key extends "streamedKey"
+        ? Inherited extends true
           ? WithDefaultKeyRetention<Node[Key]>
           : Node[Key]
-      : Node[Key];
+        : Key extends "queryFilter"
+          ? Inherited extends true
+            ? WithDefaultFilterRetention<Node[Key]>
+            : Node[Key]
+          : Node[Key] extends UtilityNode
+            ? ApplyRetentionTree<
+                Node[Key],
+                Paths,
+                Inherited extends true
+                  ? true
+                  : JoinPath<Prefix, Key> extends keyof Paths
+                    ? HasRetention<Paths[JoinPath<Prefix, Key>]>
+                    : false,
+                JoinPath<Prefix, Key>
+              >
+            : Node[Key]
+    : Node[Key];
 };
 
-type RuntimeConfiguration = Partial<
+/** Preserves leaf builders and makes configured stream retention optional at call sites. */
+export type ConfiguredUtils<Node, Configuration> =
+  ConfigHasAnyRetention<Configuration> extends true
+    ? ApplyRetentionTree<
+        Node,
+        ConfigPaths<Configuration>,
+        HasRetention<Configuration>
+      >
+    : Node;
+
+type ConfigurationViews = QueryView | "mutation";
+
+export type RuntimeConfiguration = Partial<
   Record<QueryView | "mutation", RuntimeViewConfiguration>
-> & {
-  readonly scoped?: Readonly<Record<string, RuntimeConfiguration | undefined>>;
+>;
+
+type RuntimePolicyMap = Partial<Record<ConfigurationViews, RuntimeOptions>> & {
+  readonly paths?: Readonly<Record<string, RuntimePolicyMap>>;
 };
 
-type RuntimeNode = Record<string, unknown> & UtilityNode;
 type RuntimeBuilder = (...args: unknown[]) => unknown;
 
-interface ConfigurationLayer {
+export interface ConfigurationLayer {
   readonly depth: number;
   readonly options: RuntimeConfiguration;
 }
 
 const configuredLeaves = new WeakMap<
-  RuntimeNode,
+  RuntimeUtilityNode,
   {
-    readonly original: RuntimeNode;
+    readonly original: RuntimeUtilityNode;
     readonly layers: readonly ConfigurationLayer[];
   }
 >();
 
-const isUtilityChild = (child: RuntimeNode[string]): child is RuntimeNode =>
-  Predicate.hasProperty(child, "key") && Predicate.isFunction(child.key);
+const trackedLeaves = new WeakMap<
+  RuntimeUtilityNode,
+  {
+    readonly base: RuntimeUtilityNode;
+    readonly wrap: (node: RuntimeUtilityNode) => RuntimeUtilityNode;
+  }
+>();
+
+export const registerLeafTracking = (
+  tracked: RuntimeUtilityNode,
+  base: RuntimeUtilityNode,
+  wrap: (node: RuntimeUtilityNode) => RuntimeUtilityNode
+): void => {
+  trackedLeaves.set(tracked, { base, wrap });
+};
+
+export const readConfiguredLeaf = (node: RuntimeUtilityNode) =>
+  configuredLeaves.get(node);
+
+export const reapplyLeafConfiguration = (
+  base: RuntimeUtilityNode,
+  layers: readonly ConfigurationLayer[]
+): RuntimeUtilityNode => {
+  const tracking = trackedLeaves.get(base);
+  const configured = configureLeaf(
+    tracking?.base ?? base,
+    scopeConfigurations(layers)
+  );
+  const result = Object.freeze(tracking?.wrap(configured) ?? configured);
+  configuredLeaves.set(result, { original: base, layers });
+  return result;
+};
 
 const views: readonly QueryView[] = [
   "query",
@@ -338,30 +445,123 @@ const snapshotPolicy = (
   return Object.freeze(snapshot);
 };
 
+const queryOptions = new Set<string>([
+  "_defaulted",
+  "_optimisticResults",
+  "_type",
+  "behavior",
+  "enabled",
+  "gcTime",
+  "meta",
+  "networkMode",
+  "notifyOnChangeProps",
+  "persister",
+  "refetchInterval",
+  "refetchIntervalInBackground",
+  "refetchOnMount",
+  "refetchOnReconnect",
+  "refetchOnWindowFocus",
+  "retry",
+  "retryDelay",
+  "retryOnMount",
+  "staleTime",
+  "structuralSharing",
+  "suspense",
+  "throwOnError",
+] satisfies readonly (keyof Omit<QueryObserverOptions, LocalQueryOption>)[]);
+const mutationOptions = new Set<string>([
+  "_defaulted",
+  "gcTime",
+  "meta",
+  "networkMode",
+  "onError",
+  "onSettled",
+  "onSuccess",
+  "retry",
+  "retryDelay",
+  "scope",
+  "throwOnError",
+] satisfies readonly (keyof Omit<
+  MutationObserverOptions,
+  OwnedMutationOption | "onMutate"
+>)[]);
+const validateViewOption = (view: ConfigurationViews, name: string) => {
+  const valid =
+    name === "interceptors" ||
+    (view === "mutation"
+      ? name === "callbacks" || mutationOptions.has(name)
+      : queryOptions.has(name) ||
+        ((view === "streamed" || view === "live") &&
+          isStreamPolicyOption(view, name)));
+  if (!valid) {
+    throw new TypeError(`Unknown ${view} configuration option: ${name}`);
+  }
+};
+
+const snapshotView = (
+  view: ConfigurationViews,
+  entry: RuntimeOptions
+): RuntimeViewConfiguration | undefined => {
+  if (!Predicate.isObject(entry) || Array.isArray(entry)) {
+    throw new TypeError(`${view} configuration must be an object`);
+  }
+  for (const name of Object.keys(entry)) {
+    validateViewOption(view, name);
+  }
+  const { interceptors, callbacks, ...policy } = entry;
+  if (
+    interceptors !== undefined &&
+    (!Array.isArray(interceptors) || !interceptors.every(Predicate.isFunction))
+  ) {
+    throw new TypeError(`${view} interceptors must be functions`);
+  }
+  if (
+    callbacks !== undefined &&
+    callbacks !== "replace" &&
+    callbacks !== "compose"
+  ) {
+    throw new TypeError('Mutation callbacks must use "replace" or "compose"');
+  }
+  const hasPolicy = Object.keys(policy).length > 0;
+  const hasInterceptors = interceptors !== undefined && interceptors.length > 0;
+  if (!hasPolicy && !hasInterceptors && callbacks === undefined) {
+    return undefined;
+  }
+  return Object.freeze({
+    policy: hasPolicy ? snapshotPolicy(view, policy) : undefined,
+    interceptors: hasInterceptors
+      ? Object.freeze([...interceptors])
+      : undefined,
+    callbacks,
+  });
+};
+
 const snapshotConfiguration = (
-  configuration: RuntimeConfiguration | undefined
+  configuration: RuntimePolicyMap,
+  allowPaths: boolean
 ): RuntimeConfiguration | undefined => {
+  if (!Predicate.isObject(configuration) || Array.isArray(configuration)) {
+    throw new TypeError("Utility configuration must be an object");
+  }
+  for (const name of Object.keys(configuration)) {
+    if (
+      !(allowPaths && name === "paths") &&
+      !configurationViews.some((view) => view === name)
+    ) {
+      throw new TypeError(`Unknown utility configuration option: ${name}`);
+    }
+  }
   let snapshot: RuntimeConfiguration | undefined;
   for (const view of configurationViews) {
-    const entry = configuration?.[view];
-    if (entry === undefined) {
+    if (!Object.hasOwn(configuration, view)) {
       continue;
     }
-    const { policy, interceptors, callbacks } = entry;
-    const hasPolicy = policy !== undefined && Object.keys(policy).length > 0;
-    const hasInterceptors =
-      interceptors !== undefined && interceptors.length > 0;
-    if (!hasPolicy && !hasInterceptors && callbacks === undefined) {
-      continue;
+    const entry = configuration[view];
+    const policy = entry === undefined ? undefined : snapshotView(view, entry);
+    if (policy !== undefined) {
+      snapshot ??= {};
+      snapshot[view] = policy;
     }
-    snapshot ??= {};
-    snapshot[view] = Object.freeze({
-      policy: hasPolicy ? snapshotPolicy(view, policy) : undefined,
-      interceptors: hasInterceptors
-        ? Object.freeze([...interceptors])
-        : undefined,
-      callbacks,
-    });
   }
   return snapshot === undefined ? undefined : Object.freeze(snapshot);
 };
@@ -393,10 +593,12 @@ const scopeConfigurations = (
 };
 
 const configureLeaf = (
-  node: RuntimeNode,
+  node: RuntimeUtilityNode,
   configurations: readonly RuntimeConfiguration[]
-): RuntimeNode => {
+): RuntimeUtilityNode => {
   const configured = { ...node };
+  const streamPolicies: Partial<Record<"live" | "streamed", RuntimeOptions>> =
+    {};
   for (const view of views) {
     if (!Object.hasOwn(node, `${view}Options`)) {
       continue;
@@ -423,6 +625,7 @@ const configureLeaf = (
       interceptors: inherited.flatMap((entry) => entry.interceptors ?? []),
     });
     if (view === "streamed" || view === "live") {
+      streamPolicies[view] = policy;
       const streamedKey = node[view === "live" ? "liveKey" : "streamedKey"];
       if (!Predicate.isFunction(streamedKey)) {
         throw new TypeError("Streamed queries require a key builder");
@@ -431,11 +634,30 @@ const configureLeaf = (
       const buildKey = streamedKey as RuntimeBuilder;
       configured[view === "live" ? "liveKey" : "streamedKey"] =
         inputKind(node.key) === "Inputless"
-          ? (options?: Partial<StreamedPolicyOptions>) =>
-              buildKey({ ...policy, ...options })
-          : (input: unknown, options?: Partial<StreamedPolicyOptions>) =>
-              buildKey(input, { ...policy, ...options });
+          ? (options?: Record<string, unknown>) => {
+              if (options !== undefined && !Predicate.isObject(options)) {
+                throw new TypeError("Query key options must be an object");
+              }
+              return buildKey({ ...policy, ...options });
+            }
+          : (options?: Record<string, unknown>) => {
+              if (!Predicate.isObject(options)) {
+                throw new TypeError("Query key options must be an object");
+              }
+              return buildKey({ ...policy, ...options });
+            };
     }
+  }
+  const { queryFilter } = node;
+  if (
+    (streamPolicies.live !== undefined ||
+      streamPolicies.streamed !== undefined) &&
+    Predicate.isFunction(queryFilter)
+  ) {
+    // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
+    const filter = queryFilter as RuntimeBuilder;
+    configured["queryFilter"] = (options?: RuntimeOptions) =>
+      filter(options, streamPolicies);
   }
   if (Object.hasOwn(node, "mutationOptions")) {
     const mutations = configurations.flatMap((entry) =>
@@ -467,65 +689,137 @@ const configureLeaf = (
   return configured;
 };
 
+const configureLeafNode = (
+  node: RuntimeUtilityNode,
+  configurations: readonly ConfigurationLayer[]
+): RuntimeUtilityNode => {
+  const previous = configuredLeaves.get(node);
+  const original = previous?.original ?? node;
+  const layers = EffectArray.sortWith(
+    [...(previous?.layers ?? []), ...configurations],
+    (layer) => layer.depth,
+    Order.Number
+  );
+  return reapplyLeafConfiguration(original, layers);
+};
+
+interface ConfigurationPlan {
+  options?: RuntimeConfiguration | undefined;
+  readonly children: Map<string, ConfigurationPlan>;
+}
+
+const resolvePath = (
+  node: RuntimeUtilityNode,
+  path: string
+): readonly (readonly string[])[] => {
+  const matches: string[][] = [];
+  if (readUtilityChild(node, path) !== undefined) {
+    matches.push([path]);
+  }
+  for (
+    let dot = path.indexOf(".");
+    dot !== -1;
+    dot = path.indexOf(".", dot + 1)
+  ) {
+    const child = readUtilityChild(node, path.slice(0, dot));
+    if (child?.kind === "branch") {
+      for (const tail of resolvePath(child.node, path.slice(dot + 1))) {
+        matches.push([path.slice(0, dot), ...tail]);
+      }
+    }
+  }
+  return matches;
+};
+
+const planConfiguration = (
+  node: RuntimeUtilityNode,
+  configuration: RuntimePolicyMap
+): ConfigurationPlan => {
+  const leaf = configurationViews.some((view) =>
+    Object.hasOwn(node, `${view}Options`)
+  );
+  const plan: ConfigurationPlan = {
+    options: snapshotConfiguration(configuration, !leaf),
+    children: new Map(),
+  };
+  const { paths } = configuration;
+  if (paths === undefined) {
+    return plan;
+  }
+  if (!Predicate.isObject(paths) || Array.isArray(paths)) {
+    throw new TypeError("Utility paths must be an object");
+  }
+  for (const [path, settings] of Object.entries(paths)) {
+    const [segments, ambiguous] = resolvePath(node, path);
+    if (segments === undefined || ambiguous !== undefined) {
+      throw new TypeError(
+        `${ambiguous === undefined ? "Unknown" : "Ambiguous"} utility path: ${path}`
+      );
+    }
+    const snapshot = snapshotConfiguration(settings, false);
+    if (snapshot === undefined) {
+      continue;
+    }
+    let target = plan;
+    for (const segment of segments) {
+      let child = target.children.get(segment);
+      if (child === undefined) {
+        child = { children: new Map() };
+        target.children.set(segment, child);
+      }
+      target = child;
+    }
+    target.options = snapshot;
+  }
+  return plan;
+};
+
 const configureNode = (
-  node: RuntimeNode,
+  node: RuntimeUtilityNode,
   inherited: readonly ConfigurationLayer[],
-  configuration: RuntimeConfiguration | undefined
-): RuntimeNode => {
-  const snapshot = snapshotConfiguration(configuration);
+  plan: ConfigurationPlan | undefined
+): RuntimeUtilityNode => {
   const configurations =
-    snapshot === undefined
+    plan?.options === undefined
       ? inherited
-      : [...inherited, { depth: node.key().length, options: snapshot }];
-  const scoped = configuration?.scoped;
-  const scopeNames = Object.keys(scoped ?? {});
-  if (configurations.length === 0 && scopeNames.length === 0) {
+      : [...inherited, { depth: node.key().length, options: plan.options }];
+  const names =
+    configurations.length === 0
+      ? [...(plan?.children.keys() ?? [])]
+      : Object.keys(node);
+  if (names.length === 0) {
     return node;
   }
-  const scopedChildren = scopeNames.map((name) => {
-    const child = Object.prototype.propertyIsEnumerable.call(node, name)
-      ? node[name]
-      : undefined;
-    if (!isUtilityChild(child)) {
-      throw new TypeError(`Unknown utility scope: ${name}`);
-    }
-    return [name, child] as const;
-  });
-  const children =
-    configurations.length === 0
-      ? scopedChildren
-      : Object.entries(node).filter((entry): entry is [string, RuntimeNode] =>
-          isUtilityChild(entry[1])
-        );
-  if (children.length === 0) {
-    const previous = configuredLeaves.get(node);
-    const original = previous?.original ?? node;
-    const layers = EffectArray.sortWith(
-      [...(previous?.layers ?? []), ...configurations],
-      (layer) => layer.depth,
-      Order.Number
-    );
-    const configured = Object.freeze(
-      configureLeaf(original, scopeConfigurations(layers))
-    );
-    configuredLeaves.set(configured, { original, layers });
-    return configured;
+  if (
+    configurationViews.some((view) => Object.hasOwn(node, `${view}Options`))
+  ) {
+    return configureLeafNode(node, configurations);
   }
-  let configured: RuntimeNode | undefined;
-  for (const [name, child] of children) {
-    const next = configureNode(
-      child,
-      configurations,
-      scoped !== undefined && Object.hasOwn(scoped, name)
-        ? scoped[name]
-        : undefined
-    );
-    if (next !== child) {
-      configured ??= { ...node };
-      configured[name] = next;
-    }
-  }
-  return configured === undefined ? node : Object.freeze(configured);
+  return (
+    mapUtilityChildren(
+      node,
+      (child, name) =>
+        configureNode(child, configurations, plan?.children.get(name)),
+      (slot, name) => {
+        const childOptions = plan?.children.get(name)?.options;
+        const leafConfigurations =
+          childOptions === undefined
+            ? configurations
+            : [
+                ...configurations,
+                { depth: node.key().length + 1, options: childOptions },
+              ];
+        return leafConfigurations.length === 0
+          ? slot
+          : {
+              materialize: () =>
+                configureLeafNode(slot.materialize(), leafConfigurations),
+              ownerToken: slot.ownerToken,
+            };
+      },
+      names
+    ) ?? node
+  );
 };
 
 /** Applies root, branch, and leaf configuration while preserving generated cache identity. */
@@ -534,31 +828,18 @@ export const configureUtils = <
   const Configuration extends object,
 >(
   tree: Node,
-  configuration: Configuration &
-    NoInfer<UtilsConfiguration<Node>> &
-    NoInfer<ExactConfiguration<Node, Configuration>>
+  configuration: CheckedConfiguration<Node, Configuration>
 ): ConfiguredUtils<Node, Configuration> => {
   // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
-  const node = tree as RuntimeNode;
+  const node = tree as RuntimeUtilityNode;
+  const settings: object = configuration;
   // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
-  const options = configuration as RuntimeConfiguration;
+  const options = settings as RuntimePolicyMap;
+  const configured = configureNode(node, [], planConfiguration(node, options));
   // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
-  return configureNode(node, [], options) as ConfiguredUtils<
-    Node,
-    Configuration
-  >;
+  return configured as ConfiguredUtils<Node, Configuration>;
 };
 
-/**
- * Checks a reusable policy map against a contract-derived utility type without a ready client.
- * Pass the result to configureUtils at the same tree, branch, or leaf scope.
- * Assembly retains literals such as stream retention; configuration snapshots the values.
- */
-export const defineUtilsPolicy =
-  <Node extends UtilityNode>() =>
-  <const Configuration extends object>(
-    configuration: Configuration &
-      NoInfer<UtilsConfiguration<Node>> &
-      NoInfer<ExactConfiguration<Node, Configuration>>
-  ): Configuration =>
-    configuration;
+export type CheckedConfiguration<Node, Configuration> = Configuration &
+  NoInfer<UtilsConfiguration<Node>> &
+  NoInfer<ExactConfiguration<Node, Configuration>>;

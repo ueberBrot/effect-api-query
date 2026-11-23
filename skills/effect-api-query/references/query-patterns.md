@@ -42,7 +42,7 @@ export const users = RpcGroup.make(
 );
 
 export function makeUseUser(
-  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof users>>
+  client: RpcClient.RpcClient<RpcGroup.Rpcs<typeof users>>
 ) {
   const rpc = createRpcQueryUtils(users, { client, keyPrefix: ["users-app"] });
   return function useUser(id: number | undefined) {
@@ -79,7 +79,7 @@ export const catalog = RpcGroup.make(
 );
 
 export async function loadPages(
-  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof catalog>>,
+  client: RpcClient.RpcClient<RpcGroup.Rpcs<typeof catalog>>,
   queryClient: QueryClient
 ) {
   const rpc = createRpcQueryUtils(catalog, {
@@ -114,7 +114,7 @@ export const events = RpcGroup.make(
 );
 
 export function eventOptions(
-  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof events>>
+  client: RpcClient.RpcClient<RpcGroup.Rpcs<typeof events>>
 ) {
   const rpc = createRpcQueryUtils(events, {
     client,
@@ -127,7 +127,7 @@ export function eventOptions(
       input,
       ...policy,
     }),
-    historyKey: rpc.events.watch.streamedKey(input, policy),
+    historyKey: rpc.events.watch.streamedKey({ input, ...policy }),
     latest: rpc.events.watch.liveOptions({ input }),
   };
 }
@@ -135,9 +135,9 @@ export function eventOptions(
 
 Use either set of options with an ordinary hook or observer. History and latest values have separate keys. Observing both starts two executions.
 
-For accumulated history, set `maxChunks` to a positive safe integer or `"unbounded"`. Set it directly for each key and options builder, or configure `streamed.policy`. Different retention bounds and refetch modes use distinct entries. Unbounded retention with reset keeps the original unlimited-history key.
+For accumulated history, set `maxChunks` to a positive safe integer or `"unbounded"`. Set it directly for each key and options builder, or configure `streamed`. Different retention bounds and refetch modes use distinct entries. Unbounded retention with reset keeps the original unlimited-history key.
 
-Reuse the options' `queryKey` or call `streamedKey(input, policy)`. For an inputless operation, use `streamedKey(policy)`. Include SSE decoder options for HTTP SSE. NDJSON uses its declaration's decoder limits.
+Reuse the options' `queryKey` or call `streamedKey({ input, ...policy })`. For an inputless operation, use `streamedKey(policy)`. Include SSE decoder options for HTTP SSE. NDJSON uses its declaration's decoder limits.
 
 Choose a refetch mode for accumulated history.
 
@@ -149,7 +149,7 @@ Set `publicationBatchSize` to a positive safe integer. The first event publishes
 
 Use `coalesceMs` only when each live emission is complete state. Use a whole number from 1 to 2,147,483,647 milliseconds. Each fetch publishes the first value immediately. The next value starts a fixed timer and subsequent values replace the pending snapshot. Completion or failure flushes it. Cancellation drops it and clears the timer. Scheduling can delay publication.
 
-Pass matching policy to `liveKey(input, { coalesceMs })` or `liveKey({ coalesceMs })` if inputless. Set `live.policy` to share this across keys and options. Omit the local value to inherit it. Pass `coalesceMs: undefined` to clear it. Explicit deadlines change the key. Pass the same local `sseOptions` for keys and options.
+Pass matching policy to `liveKey({ input, coalesceMs })` or `liveKey({ coalesceMs })` if inputless. Set `live.coalesceMs` to share this across keys and options. Omit the local value to inherit it. Pass `coalesceMs: undefined` to clear it. Explicit deadlines change the key. Pass the same local `sseOptions` for keys and options.
 
 An empty unseeded accumulated stream resolves to `[]`. An empty append keeps existing history. Empty reset and replace finish with `[]`. A live stream that completes before its first value raises the adapter's empty-stream error. Aborting before the first value follows native cancellation.
 
@@ -194,7 +194,3 @@ Configured copies of a leaf share its handle owner. Other leaves and factory ins
 ## Consume events without cache history
 
 Run `consumeEvents(source, { onEvent, onStart?, onExit? })` inside the app's Scope for notifications or invalidation without cache history. It awaits each event handler and stops on its failure. `onStart` signals local startup. `onExit` receives the Exit after cleanup and runs before settlement. Interrupt and await the Effect before disposing of the runtime. Add `recoverStream` upstream if replay is needed.
-
-## Check performance claims
-
-For compiler, bundle, or stream cost comparisons, see [performance and bundling](https://ueberbrot.github.io/effect-api-query/reference/performance/). Compare the same contracts, leaves, dependencies, compiler, and target. Use byte, instantiation, and publication budgets. Report elapsed time separately. Native bundle comparisons measure the cost of retained capabilities.

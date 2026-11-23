@@ -4,7 +4,7 @@ import type { Cause, Effect } from "effect";
 import type { JsonValue, RunPromiseExit } from "./types";
 
 export type RuntimeKeyEncoder = (input: unknown) => JsonValue;
-export type UnaryQueryOperation = "query" | "infinite" | "mutation";
+export type UnaryQueryOperation = "call" | "query" | "infinite" | "mutation";
 
 export type OperationInput =
   | { readonly _tag: "Inputless" }
@@ -52,8 +52,6 @@ export interface UnaryOperation extends BufferedOperation {
       operation: "metadata",
       cause: Cause.Cause<unknown>
     ) => Error;
-
-    readonly finalizeData: (data: unknown) => unknown;
   };
 }
 
@@ -67,16 +65,22 @@ export interface QueryPreparation {
   readonly makeQuery: (input: unknown) => QueryFunction;
 }
 
+export interface StreamPreparation {
+  readonly identity: readonly JsonValue[];
+  readonly makeQuery: (
+    input: unknown,
+    runner: RunPromiseExit<unknown>,
+    requestOptions: unknown
+  ) => QueryFunction;
+}
+
 export interface StreamingOperation extends OperationIdentity {
   readonly kind: "Streaming";
   readonly input: OperationInput;
   readonly prepareStream: (
     options: Record<string, unknown>,
-    operation: "live" | "streamed",
-    runner: RunPromiseExit<unknown>,
-
-    requestOptions: unknown
-  ) => QueryPreparation;
+    operation: "live" | "streamed"
+  ) => StreamPreparation;
 }
 
 export type OperationDescription =

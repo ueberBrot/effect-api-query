@@ -32,7 +32,7 @@ export const users = RpcGroup.make(
 );
 
 export function userCache(
-  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof users>>
+  client: RpcClient.RpcClient<RpcGroup.Rpcs<typeof users>>
 ) {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
@@ -50,9 +50,10 @@ export function userCache(
       select: (user) => user.name,
     }),
     exact: {
-      queryKey: rpc.users.read.queryKey({ id: 1 }),
+      queryKey: rpc.users.read.queryKey({ input: { id: 1 } }),
       exact: true as const,
     },
+    userReads: rpc.users.queryFilter({ view: "query" }),
     everyLocale: createQueryFilter(rpc.users.read, "query", (id: number) => ({
       id: String(id),
     }))(1),
@@ -60,7 +61,7 @@ export function userCache(
 }
 ```
 
-Use `createQueryFilter` to bind a leaf and view to a projection into the actual key shape. By default, the projection takes the leaf's input. Annotate its parameter for a scalar or partial input. Return strict JSON. The helper copies and freezes it without running the constructor or filling defaults. Omit the projection to match the whole view with native conditions.
+Use `createQueryFilter` to bind a leaf and view to a projection into the actual key shape. By default, the projection takes the leaf's input. Annotate its parameter for a scalar or partial input. Return strict JSON. The helper copies and freezes it without running the constructor or filling defaults.
 
 `everyLocale` matches the encoded string ID for all locales. The concrete key fills in `locale: 'en'`. Match the output of the active encoder. Default HTTP keys keep request labels and lowercase headers. If an encoder returns only a scalar, use a broad prefix or exact key.
 
@@ -68,23 +69,37 @@ Pass generated prefixes to native `invalidateQueries` or `cancelQueries`. Invali
 
 Hooks, observers, and `queryClient.query` apply selection. The cache retains decoded data. Set hashing through QueryClient global or prefix defaults and keep it stable. Per-call hashes are rejected. Streams fail with `UnsupportedQueryHash` if a default hash or cached identity conflicts. Retire the cache before changing hashing. Mutation keys and defaults are separate.
 
-Bind a branch and view with `const userReads = createBranchQueryFilter(rpc.users, "query")`. Then pass `userReads()` to `queryClient.invalidateQueries`. Pass native conditions to `userReads` to narrow the match. Omit `exact` to include descendants. Absent views match nothing.
+Pass `userReads` directly to `queryClient.invalidateQueries`. Root and branch filters use paths without constructing lazy leaves. Omit `exact` to include descendants. Within a branch, a view with no matching leaves selects nothing.
 
-Use `findDeclaredError(error, tag)` for one tagged failure in a typed union. Composite Causes, defects, interruption, and unrelated errors return None. Keep the original wrapper and classify retry policy separately.
+On a queryable leaf, omit `view` to select all views. Pass `{ view, input }` with raw or prepared input to match that complete canonical input. Use `createQueryFilter` for partial input. For streams, omit policy options to match across policies. Supply policy options to match the key builder's canonical policy, including configured defaults and SSE decoder settings. Supply `maxChunks` for this match if the accumulated view has no configured retention. Omit input to match across inputs. For an exact key, pass `exact: true` with the complete input when required and the stream policy.
+
+## Run a leaf directly
+
+Use `leaf.call({ input, signal })` to run a unary RPC or buffered HTTP endpoint outside the cache. Omit input for an inputless leaf. Pass a prepared input only to its originating queryable leaf or a configured or tracked copy. For buffered multipart HTTP, pass the decoded request with its `FormData` payload.
+
+Use `rpcOptions` to pass headers or context to a unary RPC. `call` uses the leaf runtime and follows query-owner tracking. It preserves successful `undefined` and wraps a failed Exit with operation `"call"`. HTTP uses decoded-only mode.
+
+Use `leaf.effect({ input })` to compose the ready client's Effect. Provide any services and run it in the app. Both methods skip Query view policies. Use the stream views for streaming leaves.
+
+## Classify execution failures
+
+Use `findDeclaredError(error, tag)` to get an Effect Option for one tagged failure. Use `matchDeclaredError(error, handlers, orElse)` to handle selected tags. The fallback receives the original error for unmatched tags, defects, interruptions, composite Causes, and other errors.
+
+Pass `retryExecutionError({ shouldRetry, maxRetries })` as the TanStack `retry` predicate. `shouldRetry` receives the single typed failure and the zero-based failure count. The default limit is three retries. The predicate stops on defects, interrupts, composite Causes, and unwrapped errors.
 
 ## Assemble contract-associated policies
 
-Use `defineUtilsPolicy<UtilityType>()(configuration)` when reuse starts before client acquisition. Derive the type from `RpcQueryUtils` or `HttpApiQueryUtils` with the actual declaration, prefix, and client error information. Apply it to the matching scope with `configureUtils`. Literal defaults such as retention remain visible to builders.
+Use `defineRpcPolicy(group, configuration)` or `defineHttpApiPolicy(api, configuration)` before acquiring a client. Pass `{ keyPrefix }` as the third argument when the utility tree uses a prefix. For custom RPC client errors, use `defineRpcPolicy.withClientError<E>()(group, configuration)`. Apply the map to the utility tree with `configureUtils`. Literal retention values remain visible to builders.
 
 Keep the declaration shared. Put policy values, callbacks, cache access, and runtime choices in the app. The policy map retains literals and checks paths, views, and fields. `configureUtils` copies policy values and interceptor arrays. Keep retained values and dependencies unchanged. Leaf callbacks keep concrete types. Optimistic context stays local.
 
-Set SSE decoder defaults on the SSE leaf's `streamed.policy.sseOptions` or `live.policy.sseOptions`, including inside a `scoped` map. `configureUtils` copies those settings for both keys and options.
+Set SSE decoder defaults on the SSE leaf's `streamed.sseOptions` or `live.sseOptions`, including inside a `paths` entry. `configureUtils` copies those settings for both keys and options.
 
 For the full example, see [defaults and policies](https://ueberbrot.github.io/effect-api-query/guides/query-defaults/).
 
 ## Configure shared behavior
 
-Use `{ policy, interceptors }` for a query view. Add `callbacks` for mutations and `scoped` for specific children. `configureUtils` returns frozen copies with the same keys and prepared-input owner.
+Put view options beside `interceptors`. Mutations also accept `callbacks`. Use `paths` for descendants, such as `"users.get"` on the tree or `"get"` on the users branch. Configure a leaf directly when two HTTP nodes produce the same joined path. `configureUtils` returns frozen copies with the same keys and prepared-input owner.
 
 Configure once per owner and reuse across renders. Frozen subtrees can be shared when their settings stay the same. Empty policy and interceptor lists add nothing. Explicit undefined settings and callback modes still affect merging.
 
@@ -112,7 +127,7 @@ export const directory = RpcGroup.make(
 );
 
 export function userPolicies(
-  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof directory>>
+  client: RpcClient.RpcClient<RpcGroup.Rpcs<typeof directory>>
 ) {
   const rpc = createRpcQueryUtils(directory, {
     client,
@@ -122,14 +137,12 @@ export function userPolicies(
     staleTime: (query) => (query.state.data === undefined ? 0 : 60_000),
     retry: false,
   } satisfies QueryPolicy<typeof rpc.users.get>;
-  const read = configureUtils(rpc.users.get, { query: { policy } });
+  const read = configureUtils(rpc.users.get, { query: policy });
   const rename = configureUtils(rpc.users.rename, {
     mutation: {
       callbacks: "compose",
-      policy: {
-        onSuccess: (_data, _variables, _result, context) =>
-          context.client.invalidateQueries({ queryKey: rpc.users.key() }),
-      },
+      onSuccess: (_data, _variables, _result, context) =>
+        context.client.invalidateQueries(rpc.users.queryFilter()),
     },
   });
   return {
@@ -148,7 +161,7 @@ Use the same contract to run an authorization check before writing.
 
 ```ts
 export function authorizedRename(
-  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof directory>>,
+  client: RpcClient.RpcClient<RpcGroup.Rpcs<typeof directory>>,
   authorize: (id: number) => Promise<void>
 ) {
   const rpc = createRpcQueryUtils(directory, {
@@ -170,7 +183,7 @@ export function authorizedRename(
 
 Leaf callbacks get the view's data and error types, or the mutation's result and variables. Use `QueryPolicy<typeof leaf, View>` or `MutationPolicy<typeof leaf>` for reusable policies. Shared tree and branch callbacks get `unknown` because their leaves can differ.
 
-Defaults apply from QueryClient to tree, branch, leaf, and call site. Keep input, selection, initial and placeholder data, page mapping, adapter controls, and optimistic context local. Set history controls in `streamed.policy` to share them between options and keys.
+Defaults apply from QueryClient to tree, branch, leaf, and call site. Keep input, selection, initial and placeholder data, page mapping, adapter controls, and optimistic context local. Set history controls in `streamed` to share them between options and keys.
 
 More specific mutation callbacks replace broader callbacks by default. Set `mutation.callbacks: "compose"` to run the shared callback first, then the narrower one. This applies to `onSuccess`, `onError`, and `onSettled`. A rejection stops the pair and follows TanStack's error handling. Define `onMutate` at the call site to retain its result type.
 
@@ -233,30 +246,42 @@ See [cache filters](https://ueberbrot.github.io/effect-api-query/guides/cache-fi
 
 ## Compose cache operations in Effect
 
-Provide the application's existing QueryClient as `QueryClientService`. Run `queryEffects.getData` and `setData` with exact keys, `fetch` or `ensure` with generated options, and `invalidate` with generated filters. Provide the service with `Effect.provideService` or a Layer.
+Provide the existing QueryClient as `QueryClientService` with `Effect.provideService` or a Layer. With a query owner, provide `owner.queryClient` and pass utility trees through `owner.trackUtils` so retirement drains query work.
 
-Fetch and ensure use `queryClient.query` and return the full cached data. `fetch` follows native freshness rules. `ensure` returns cached data even when stale and fetches if absent. Set `revalidateIfStale` for background refresh. Use a snapshot for open streams. Write immutably and return `undefined` to skip a write. Invalidation keeps native refetch and `throwOnError` behavior.
+Use `query` or `infiniteQuery` with generated options. Both apply `select` to the result and cache the decoded data. Set `staleTime: "static"` to reuse existing data. Use `prefetch` or `prefetchInfinite` to warm the cache without surfacing query failures. For the first publication from an open stream, use `streamSnapshot` with an idle, unobserved key.
 
-On native failure, inspect `QueryClientOperationError.cause` as `unknown`. It preserves the original rejection, including any execution wrapper and full Cause. Shared work can come from another caller. The wrapper's class alone cannot prove the current options' declared failure type.
+Pass exact keys to `getData`, `getState`, and `setData`. Write immutably and return `undefined` to skip a write. Use generated or native filters with `isFetching`, `invalidate`, `refetch`, `cancel`, `remove`, and `reset`. These operations keep native QueryClient behavior, including `throwOnError` on refetch.
 
-Interrupting an Effect stops its wait. QueryClient can finish shared work and publish for observers. Cancel native queries only when the owner wants to stop that shared work. See [query effects](https://ueberbrot.github.io/effect-api-query/guides/query-effects/) for examples.
+Inspect `QueryClientOperationError.cause` as `unknown`. It preserves the original failure, including any execution wrapper and full Cause. Shared work can come from another caller, so the wrapper alone cannot prove the current query's declared failure type.
+
+Interrupt the fiber to stop its wait on shared work. Use `cancel` to stop the shared query. Interrupting `streamSnapshot` aborts its exclusive capture and triggers local cleanup. See [query effects](https://ueberbrot.github.io/effect-api-query/guides/query-effects/) for examples.
 
 ## Opt in to query owner setup
 
 Use `acquireQueryOwner` to create independent query and mutation caches and register resources. Supplied caches contribute their callback configuration. Await each `setup.acquire(start, release)` in order. Releases run in reverse order, even if setup fails. Use `setup.borrow(value)` when the caller retains ownership.
 
-Wrap the runner with `setup.wrapRunner`. For each used view, configure an interceptor that calls `setup.runQuery(next, context.signal)`. This tracks the complete function because stream pulls outlast iterable creation. See [React setup](https://ueberbrot.github.io/effect-api-query/guides/react-query/) and [retirement](https://ueberbrot.github.io/effect-api-query/guides/switch-cache-owners/#opt-in-owner-helper).
+Call `setup.trackUtils(utils)` or `owner.trackUtils(utils)` once. This tracks the leaf runner, full query functions including stream pulls, and generated mutation functions. Apply `configureUtils` in either order. Use `owner.wrapRunner(runtime)` for custom execution outside the tree. See [React setup](https://ueberbrot.github.io/effect-api-query/guides/react-query/) and [retirement](https://ueberbrot.github.io/effect-api-query/guides/switch-cache-owners/#opt-in-owner-helper).
 
-Use `owner.runMutation(() => mutation.mutateAsync(input))` to wait for the request and awaited callbacks. Wrapping `mutationFn` only tracks that attempt. Use `networkMode: "always"` and `retry: false` for immediate attempts. Offline queues need an app policy. A runner that starts after retirement rejects even inside an accepted mutation.
+Use `owner.runMutation(() => mutation.mutateAsync(input))` to wait for the request and awaited callbacks. `trackUtils` drains an accepted mutation attempt through its interceptors. Use `networkMode: "always"` and `retry: false` for immediate attempts. Offline queues need an app policy. A custom `wrapRunner` call that starts after retirement rejects.
 
 Use `owner.commit` for synchronous late writes and `isActive()` for other side effects. Unmount, dispose, then acquire and mount the replacement. Disposal stops admission, cancels queries, waits for tracked work, clears caches, and releases acquired resources. Repeated calls share the result. It reports pending failures and attempts all releases. Borrowed resources stay open. A stalled finalizer delays disposal.
 
-Pass the native signal to `runQuery` and track every view you use, including HTTP metadata. Disposal ignores ordinary interruption of cancelled work. Typed failures and finalizer defects still surface.
+For custom work tracked with `runQuery`, forward the native signal. Disposal ignores ordinary interruption of cancelled work. Typed failures and finalizer defects still surface.
 
 ## Scoped event consumption
 
-Run `runQueryEvents(owner, source, options, runPromiseExit)` with your source and optional recovery. Map events to exact updates and filter invalidation. The helper supplies the owner's cache to the source and hooks. It awaits each handler. Inspect the complete Exit. Admission or runner rejection stays a rejected Promise.
+Run `runQueryEvents(owner, source, options, runner)` with your source and optional recovery. Map events to exact updates and filter invalidation. The helper supplies the owner's cache to the source and hooks. It awaits each handler. Inspect the complete Exit. Admission or runner rejection stays a rejected Promise.
 
-Keep the runner signal-aware and await its finalizers. Retirement stops consumption, backoff, and refresh. Use the original owner's guard for external writes. If refresh starts shared native queries, track both their runners and complete executions. See [scoped event consumption](https://ueberbrot.github.io/effect-api-query/guides/scoped-event-cache/).
+Keep the runner signal-aware and await its finalizers. Retirement stops consumption, backoff, and refresh. Use the original owner's guard for external writes. If refresh starts native queries, use the owner's tracked utilities. See [scoped event consumption](https://ueberbrot.github.io/effect-api-query/guides/scoped-event-cache/).
 
 Recovery advances before downstream handling. A handler failure stops delivery. Earlier writes remain. Persist processing checkpoints under app policy. After replay expiry, return the refreshed snapshot's cursor. Keep bounded event history only if the UI needs it.
+
+## Invalidate queries from Effect Reactivity
+
+Bind Reactivity keys to colocated `queryFilter` results with `bindReactivityInvalidation`. Use the filters from the target utility tree to preserve its key prefix. Provide the cache as `QueryClientService` and the Reactivity service used by the writer. Bind inside the request or browser owner's Scope.
+
+Use the same array key on both sides for exact matches, such as `["users:1"]`. A record like `{ users: [1] }` also matches the group name, so it can trigger other `users` bindings. Use separate Reactivity instances when owners need separate events. Declare `Reactivity.Keys` in application code.
+
+With a query owner, pass `{ isActive: owner.isActive }`. Closing the Scope removes listeners and discards queued work. Use `yield* bridge.flush` to wait for queued and in-flight work. Provide `onError` for native invalidation failures. Invalidation runs during pending mutations, so keep optimistic-write coordination in the app.
+
+See [Reactivity invalidation](https://ueberbrot.github.io/effect-api-query/guides/query-effects/#invalidate-queries-from-effect-reactivity) for the binding example and options.

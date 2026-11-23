@@ -160,6 +160,8 @@ export const prepareViewSnapshot = Effect.fnUntraced(function* (
     shouldDehydrateMutation: () => false,
     shouldDehydrateQuery: (query) =>
       defaultShouldDehydrateQuery(query) &&
+      query.state.error === null &&
+      query.state.fetchFailureReason === null &&
       query.queryKey[0] === "hydration-views",
   });
   const queries = yield* Effect.forEach(

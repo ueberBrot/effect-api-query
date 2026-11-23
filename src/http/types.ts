@@ -11,7 +11,14 @@ import type {
 
 import type { PreparedInput } from "../core/prepared-input";
 import type {
+  BranchQueryFilter,
+  LeafQueryFilter,
+  StreamedFilterPolicy,
+} from "../core/query-filter";
+import type {
   ContainsRedacted,
+  DirectArgs,
+  DirectCall,
   InfiniteQueryBuilder,
   InfiniteQueryKey,
   UnaryQueryBuilder,
@@ -19,11 +26,13 @@ import type {
   KeyBuilder,
   KeyEncoderRequirement,
   MutationBuilder,
+  OptionalKeyPrefix,
   QueryData,
   RequiredAdapterKeys,
   RunnerRequirement,
   StreamedPolicyOptions,
   LivePolicyOptions,
+  utilityPaths,
 } from "../core/types";
 import type {
   EffectHttpApiQueryConfigError,
@@ -418,11 +427,32 @@ export type InfiniteBuilder<
   HasRequest<Endpoint> extends false ? true : false
 >;
 
+export type DirectRequest<Endpoint extends HttpApiEndpoint.ConstraintRequest> =
+  [Queryable<Endpoint>] extends [never]
+    ? Request<Endpoint>
+    : Request<Endpoint> | PreparedInput<Request<Endpoint>>;
+
 export type MutationLeaf<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Key extends readonly JsonValue[],
   ClientError,
+  Services,
 > = {
+  /** Runs the endpoint through the leaf's runtime and returns decoded success. */
+  readonly call: DirectCall<
+    DirectRequest<Endpoint>,
+    HasRequest<Endpoint> extends false ? true : false,
+    Success<Endpoint>
+  >;
+
+  /** Returns the decoded-only client Effect with its original errors and services. */
+  readonly effect: (
+    ...args: DirectArgs<
+      DirectRequest<Endpoint>,
+      HasRequest<Endpoint> extends false ? true : false
+    >
+  ) => Effect.Effect<Success<Endpoint>, ClientError, Services>;
+
   readonly key: () => Key;
   readonly mutationKey: () => readonly [...Key, "mutation"];
   readonly mutationOptions: MutationBuilder<
@@ -437,11 +467,18 @@ export type BufferedLeaf<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Key extends readonly JsonValue[],
   ClientError,
-  MetadataClientError = ClientError,
-> = MutationLeaf<Endpoint, Key, ClientError> &
+  MetadataClientError,
+  Services,
+> = MutationLeaf<Endpoint, Key, ClientError, Services> &
   ([Queryable<Endpoint>] extends [never]
     ? unknown
     : {
+        /** Builds native filters for this buffered HTTP endpoint. */
+        readonly queryFilter: LeafQueryFilter<
+          Request<Endpoint>,
+          HasRequest<Endpoint> extends false ? true : false,
+          "query" | "infinite" | "metadata"
+        >;
         readonly queryKey: KeyBuilder<
           Request<Endpoint>,
           ConcreteKey<Endpoint, Key, ClientError>,
@@ -517,13 +554,25 @@ export type StreamedLeaf<
 > = {
   readonly key: () => Key;
 
+  /** Builds native filters for this streaming HTTP endpoint. */
+  readonly queryFilter: LeafQueryFilter<
+    Request<Endpoint>,
+    HasRequest<Endpoint> extends false ? true : false,
+    "live" | "streamed",
+    {
+      readonly live: HttpDecoderPolicy<Endpoint> & LivePolicyOptions;
+      readonly streamed: StreamedFilterPolicy<HttpStreamPolicy<Endpoint>>;
+    }
+  >;
+
   readonly streamedKey: HasRequest<Endpoint> extends false
     ? (
         policy: HttpStreamPolicy<Endpoint>
       ) => StreamedKey<Endpoint, Key, ClientError>
     : (
-        input: Request<Endpoint> | PreparedInput<Request<Endpoint>>,
-        policy: HttpStreamPolicy<Endpoint>
+        options: {
+          readonly input: Request<Endpoint> | PreparedInput<Request<Endpoint>>;
+        } & HttpStreamPolicy<Endpoint>
       ) => StreamedKey<Endpoint, Key, ClientError>;
   readonly streamedOptions: UnaryQueryBuilder<
     Request<Endpoint>,
@@ -565,8 +614,10 @@ export type LiveLeaf<
         policy?: HttpDecoderPolicy<Endpoint> & LivePolicyOptions
       ) => LiveKey<Endpoint, Key, ClientError>
     : (
-        input: Request<Endpoint> | PreparedInput<Request<Endpoint>>,
-        policy?: HttpDecoderPolicy<Endpoint> & LivePolicyOptions
+        options: {
+          readonly input: Request<Endpoint> | PreparedInput<Request<Endpoint>>;
+        } & HttpDecoderPolicy<Endpoint> &
+          LivePolicyOptions
       ) => LiveKey<Endpoint, Key, ClientError>;
   readonly liveOptions: UnaryQueryBuilder<
     Request<Endpoint>,
@@ -600,7 +651,8 @@ export type EndpointLeaf<
           Endpoint,
           Key,
           Effect.Error<Decoded>,
-          Effect.Error<Metadata>
+          Effect.Error<Metadata>,
+          Effect.Services<Decoded>
         >
       :
             | Effect.Error<Decoded>
@@ -610,12 +662,30 @@ export type EndpointLeaf<
         : never
     : never;
 
+export type HttpGroupPaths<Group extends HttpApiGroup.Constraint> = Supported<
+  Endpoints<Group>
+>["identifier"];
+
+export type HttpApiPaths<Api extends HttpApi.Constraint> =
+  SupportedGroups<Api> extends infer Group
+    ? Group extends HttpApiGroup.Constraint
+      ? Group extends { readonly topLevel: true }
+        ? HttpGroupPaths<Group>
+        :
+            | Group["identifier"]
+            | `${Group["identifier"]}.${HttpGroupPaths<Group>}`
+      : never
+    : never;
+
 export type GroupTree<
   RootKey extends readonly JsonValue[],
   Group extends HttpApiGroup.Constraint,
   GroupClient,
 > = {
+  readonly [utilityPaths]?: HttpGroupPaths<Group>;
   readonly key: () => readonly [...RootKey, Group["identifier"]];
+  /** Builds native filters for descendant queries. */
+  readonly queryFilter: BranchQueryFilter;
 } & {
   readonly [
     Endpoint in Supported<Endpoints<Group>> as Endpoint["identifier"]
@@ -628,14 +698,17 @@ export type GroupTree<
 
 declare const httpQueryClient: unique symbol;
 
-/** An eager utility tree mirroring the ready HTTP client's literal properties. */
+/** A utility tree with lazy-memoized frozen leaves mirroring the ready HTTP client's literal properties. */
 export type HttpApiQueryUtils<
   Api extends HttpApi.Constraint,
-  Prefix extends readonly [JsonValue, ...JsonValue[]],
+  Prefix extends OptionalKeyPrefix = readonly [],
   Client = HttpApiClient.ForApi<Api>,
 > = {
   readonly [httpQueryClient]?: Client;
+  readonly [utilityPaths]?: HttpApiPaths<Api>;
   readonly key: () => Root<Api, Prefix>;
+  /** Builds native filters for descendant queries. */
+  readonly queryFilter: BranchQueryFilter;
 } & {
   readonly [
     Group in Extract<
@@ -794,13 +867,22 @@ export type RunnerOption<
   Client,
 > = RunnerRequirement<ClientServices<Api, Client>>;
 
+export type HttpKeyPrefixOption<Prefix extends OptionalKeyPrefix> = [
+  Prefix,
+] extends [readonly []]
+  ? { readonly keyPrefix?: never }
+  : {
+      /** A non-empty JSON-safe tuple that namespaces every generated key. */
+      readonly keyPrefix: Prefix;
+    };
+
 /** Derives HTTP utilities while the caller retains client and runtime ownership. */
 export type CreateHttpApiQueryUtilsOptions<
   Api extends HttpApi.Constraint,
-  Prefix extends readonly [JsonValue, ...JsonValue[]],
+  Prefix extends OptionalKeyPrefix = readonly [],
   Client = HttpApiClient.ForApi<Api>,
 > = {
   readonly client: Client & HttpApiClient.ForApi<Api, unknown, unknown>;
-  readonly keyPrefix: Prefix;
-} & EncoderOption<Api> &
+} & HttpKeyPrefixOption<Prefix> &
+  EncoderOption<Api> &
   RunnerOption<Api, NoInfer<Client>>;

@@ -25,7 +25,7 @@ export const updates = RpcGroup.make(
 
 export async function captureUpdates(
   queryClient: QueryClient,
-  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof updates>>,
+  client: RpcClient.RpcClient<RpcGroup.Rpcs<typeof updates>>,
   signal: AbortSignal
 ) {
   const rpc = createRpcQueryUtils(updates, {
@@ -83,7 +83,10 @@ export const snapshotProfile = (queryClient: QueryClient): string =>
     dehydrate(queryClient, {
       shouldDehydrateMutation: () => false,
       shouldDehydrateQuery: (query) =>
-        defaultShouldDehydrateQuery(query) && query.queryKey[0] === "profile",
+        defaultShouldDehydrateQuery(query) &&
+        query.state.error === null &&
+        query.state.fetchFailureReason === null &&
+        query.queryKey[0] === "profile",
       serializeData: Schema.encodeUnknownSync(Profile),
     })
   );
@@ -110,7 +113,15 @@ Choose the codec for the full cached shape.
 
 Use a tagged codec for `undefined` history elements so JSON distinguishes them from `null`. An HTTP wrapper with an undefined body still contains the body field. Encode each declared success and rich page parameter.
 
-## Register query-view codecs and prepare the native snapshot
+## Derive query-view codecs and prepare the native snapshot
+
+Call `createContractHydrationRegistry(groupOrApi)` without a client. If utilities use a `keyPrefix`, supply the same tuple to the registry. Combine RPC and HTTP registries and manual codecs with `createHydrationRegistry`.
+
+Derivation covers buffered queries, HTTP metadata, live values, and accumulated history. It preserves decoded header wrappers, overlapping union members in objects and arrays, and distinct `undefined` and `null` stream elements. For endpoints with several success statuses, HTTP metadata uses the cached status to select the corresponding schemas. Hydration rebuilds a frozen metadata envelope. Buffered HTTP query data has no status, so derivation prefers a success schema that accepts all cached fields. Use matching package versions and contract declarations on both sides of the snapshot.
+
+Add `paths["users.page"].infinite: { pageParam: Cursor }` for infinite data. A custom query codec supplies the default metadata data and infinite page codec. Set `views` or path settings directly on the configuration objects to opt out with `false`. Use `Schema.Json` for JSON values. Supply an override or opt out for unrestricted `Schema.Any` or opaque schemas without a JSON codec.
+
+### Register a custom view
 
 Use the [hydration guide](https://ueberbrot.github.io/effect-api-query/guides/hydrate-query-views/) for native dehydration and registry batch preparation.
 
@@ -126,7 +137,10 @@ const encodeProfiles = Effect.fnUntraced(function* (queryClient: QueryClient) {
   const snapshot = dehydrate(queryClient, {
     shouldDehydrateMutation: () => false,
     shouldDehydrateQuery: (query) =>
-      defaultShouldDehydrateQuery(query) && registry.matches(query.queryKey),
+      defaultShouldDehydrateQuery(query) &&
+      query.state.error === null &&
+      query.state.fetchFailureReason === null &&
+      registry.matches(query.queryKey),
   });
   const queries = yield* registry.encodeQueries(snapshot.queries);
   return JSON.stringify({ ...snapshot, queries });
@@ -139,7 +153,7 @@ On the server, filter dehydration with `registry.matches(query.queryKey)` and aw
 
 A duplicate registration throws `HydrationCodecError` with `DuplicateCodec`. Preparation reports `UnknownQuery` for unmatched keys and `UnsettledQuery` for unsuccessful or promise-bearing entries. Select settled successes. For one synchronous service-free codec, use `hydrationCallbacks(codec)` on matching entries.
 
-Keep `defaultShouldDehydrateQuery` to omit failures. If you transfer them, encode `state.error` and `state.fetchFailureReason` separately. Allowlist public values and headers. Reconstruct error behavior explicitly on the browser.
+For public snapshots, select successful queries and require both `state.error` and `state.fetchFailureReason` to be `null`. Query Core can retain a failure reason after status returns to success. To send a public failure, encode both fields separately, allowlist public values and headers, and reconstruct error behavior in the browser.
 
 ## Drain request work before disposal
 

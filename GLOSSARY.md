@@ -4,9 +4,9 @@ These terms describe how the package builds TanStack Query utilities from Effect
 
 ## Generated API
 
-**RPC utility tree**: A nested object built from literal Effect RPC tags. Branches represent RPC namespaces. Unary and streaming leaves provide typed key and option builders. _Avoid_: Router, generated client
+**RPC utility tree**: A nested object built from literal Effect RPC tags. Branches represent RPC namespaces. Unary and streaming leaves provide typed key and option builders. Unary leaves also support direct execution. Roots, branches, and leaves provide colocated query filters. _Avoid_: Router, generated client
 
-**HTTP utility tree**: A nested object built from the literal group and endpoint identifiers in an Effect HttpApi. Supported buffered, SSE, and NDJSON endpoints provide typed key and option builders. Multipart endpoints support buffered mutations only. Endpoints in top-level groups appear at the root. _Avoid_: RPC utility tree, generated client
+**HTTP utility tree**: A nested object built from the literal group and endpoint identifiers in an Effect HttpApi. Supported buffered, SSE, and NDJSON endpoints provide typed key and option builders. Buffered endpoints support direct execution, including multipart mutations. Roots, branches, and queryable leaves provide colocated query filters. Endpoints in top-level groups appear at the root. _Avoid_: RPC utility tree, generated client
 
 **Query data**: The successful decoded RPC or HTTP value that TanStack Query receives. Buffered queries and live queries convert successful `undefined` to `null`. Accumulated stream elements and mutation data keep their original values. _Avoid_: RPC success value when it is `undefined`
 
@@ -16,7 +16,7 @@ These terms describe how the package builds TanStack Query utilities from Effect
 
 **HTTP metadata view**: A buffered HTTP query view with decoded query data and an immutable snapshot of the response status and raw string headers. Declared decoded header wrappers remain part of the data. _Avoid_: Raw response, header-wrapped success
 
-**Policy map**: An application-owned tree, branch, or leaf configuration checked against a contract-derived utility type by `defineUtilsPolicy`. It feeds `configureUtils` without adding callbacks or runtime values to the shared Effect declaration. _Avoid_: Plugin registry, contract annotation
+**Policy map**: Application-owned defaults, interceptors, and mutation callbacks for generated utilities. A tree or branch can name descendants with a flat `paths` map. `defineRpcPolicy` and `defineHttpApiPolicy` check reusable maps against contracts before client acquisition. `configureUtils` applies the map. _Avoid_: Plugin registry, contract annotation
 
 ## Payloads and keys
 
@@ -30,7 +30,7 @@ These terms describe how the package builds TanStack Query utilities from Effect
 
 **Canonical key payload**: The immutable, JSON-safe representation of a normalized payload that identifies a cache entry. It is independent of the transport encoding for a protocol. _Avoid_: Wire payload, raw input
 
-**Key prefix**: A non-empty tuple of JSON-safe values that the caller supplies to namespace a utility tree. Generated roots append an adapter discriminator. HTTP roots also append the API identifier. _Avoid_: Automatic namespace, client identity
+**Key prefix**: An optional non-empty tuple of JSON-safe values that the caller supplies to namespace a utility tree. Omitting it defaults to `readonly []`. Generated roots append an adapter discriminator. HTTP roots also append the API identifier. _Avoid_: Automatic namespace, client identity
 
 **Prepared input**: An opaque handle that reuses one utility leaf's normalized execution input and canonical key payload. The caller keeps retained values unchanged. Configured copies share the owner; other leaves and utility trees cannot use the handle. _Avoid_: Input snapshot, global memoization
 
@@ -44,7 +44,7 @@ These terms describe how the package builds TanStack Query utilities from Effect
 
 **Cancellable command**: An application operation with an identifier assigned before work starts, observable progress, and an explicit cancellation request. Its terminal domain state is independent of the TanStack mutation state. Cancellation stops future work without undoing completed work. _Avoid_: Mutation cancellation, rollback
 
-**Ready RPC client**: A flat, tag-first Effect RPC client acquired within a Scope. The Scope stays alive while an RPC utility tree uses the client. The caller owns the Scope and disposal. _Avoid_: Client factory, owned client
+**Ready RPC client**: A tag-keyed (`RpcClient`) or flat (`RpcClient.Flat`) Effect RPC client acquired within a Scope. The default tag-keyed client is the primary shape. The Scope stays alive while an RPC utility tree uses the client. The caller owns the Scope and disposal. _Avoid_: Client factory, owned client
 
 **Ready HTTP API client**: An acquired Effect HttpApiClient. The caller owns its transport, middleware, runtime, and resource lifetime. _Avoid_: URL client, client factory, owned client
 

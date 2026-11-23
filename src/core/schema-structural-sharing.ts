@@ -49,6 +49,38 @@ const plainObjectKeys = (value: PlainObject): readonly string[] | undefined => {
   return keys;
 };
 
+const canInspectAtom = (
+  value: unknown,
+  checked: Map<object, boolean>
+): boolean => {
+  if (!Predicate.isObject(value)) {
+    return true;
+  }
+  const previous = checked.get(value);
+  if (previous !== undefined) {
+    return previous;
+  }
+  checked.set(value, false);
+  let safe: boolean;
+  if (Array.isArray(value)) {
+    safe =
+      isPlainDenseArray(value) &&
+      value.every((item) => canInspectAtom(item, checked));
+  } else {
+    const prototype: unknown = Object.getPrototypeOf(value);
+    if (prototype === Object.prototype) {
+      const keys = plainObjectKeys(value);
+      safe =
+        keys !== undefined &&
+        keys.every((key) => canInspectAtom(value[key], checked));
+    } else {
+      safe = prototype !== null;
+    }
+  }
+  checked.set(value, safe);
+  return safe;
+};
+
 const setOwnDataProperty = (
   target: Record<string, unknown>,
   key: string,
@@ -246,26 +278,28 @@ export const schemaStructuralSharing = <T>(
   options: SchemaStructuralSharingOptions<NoInfer<T>>
 ): ((previous: unknown, incoming: unknown) => unknown) => {
   const accepts = Schema.is(schema);
-  const share: ShareNode = (previous, incoming, ancestors) => {
-    if (Object.is(previous, incoming)) {
-      assertAcyclic(incoming, ancestors);
-      return previous;
-    }
-    if (accepts(incoming)) {
-      assertAcyclic(incoming, ancestors);
-      return accepts(previous) && options.equivalence(previous, incoming)
-        ? previous
-        : incoming;
-    }
-    if (Array.isArray(incoming)) {
-      return shareArray(previous, incoming, ancestors, share);
-    }
-    if (Predicate.isObject(incoming)) {
-      return sharePlainObject(previous, incoming, ancestors, share);
-    }
-    return incoming;
-  };
   return (previous, incoming) => {
+    const checked = new Map<object, boolean>();
+    const share: ShareNode = (oldValue, newValue, ancestors) => {
+      if (Object.is(oldValue, newValue)) {
+        assertAcyclic(newValue, ancestors);
+        return oldValue;
+      }
+      if (canInspectAtom(newValue, checked) && accepts(newValue)) {
+        return canInspectAtom(oldValue, checked) &&
+          accepts(oldValue) &&
+          options.equivalence(oldValue, newValue)
+          ? oldValue
+          : newValue;
+      }
+      if (Array.isArray(newValue)) {
+        return shareArray(oldValue, newValue, ancestors, share);
+      }
+      if (Predicate.isObject(newValue)) {
+        return sharePlainObject(oldValue, newValue, ancestors, share);
+      }
+      return newValue;
+    };
     try {
       return share(previous, incoming, new Set());
     } catch (error) {

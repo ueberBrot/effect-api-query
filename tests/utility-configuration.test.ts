@@ -15,7 +15,7 @@ import {
   configureUtils,
   createHttpApiQueryUtils,
   createRpcQueryUtils,
-  defineUtilsPolicy,
+  defineHttpApiPolicy,
   prepareInput,
 } from "#effect-api-query";
 
@@ -27,14 +27,10 @@ it.effect("applies root, branch, leaf, and local query defaults in order", () =>
     const rpc = configureUtils(
       createRpcQueryUtils(group, { client, keyPrefix: ["configured"] }),
       {
-        query: { policy: { retry: false, staleTime: 100 } },
-        scoped: {
-          users: {
-            query: { policy: { gcTime: 5000 } },
-            scoped: {
-              get: { query: { policy: { staleTime: 1000 } } },
-            },
-          },
+        query: { retry: false, staleTime: 100 },
+        paths: {
+          "users.get": { query: { staleTime: 1000 } },
+          users: { query: { gcTime: 5000, staleTime: 200 } },
         },
       }
     );
@@ -78,7 +74,7 @@ it.effect(
         keyPrefix: ["configured-history"],
       });
       const rpc = configureUtils(base, {
-        streamed: { policy: { maxChunks: 2 } },
+        streamed: { maxChunks: 2 },
       });
       const queryClient = new QueryClient();
       try {
@@ -104,35 +100,6 @@ it.effect(
     })
 );
 
-it.effect(
-  "keeps prepared inputs and typed cache keys on configured leaves",
-  () =>
-    Effect.gen(function* keepsPreparation() {
-      const client = yield* makeClient();
-      const base = createRpcQueryUtils(group, {
-        client,
-        keyPrefix: ["configured-input"],
-      });
-      const input = prepareInput(base.users.get, { id: 9 });
-      const rpc = configureUtils(base, {
-        query: { policy: { staleTime: 1000 } },
-      });
-      const queryClient = new QueryClient();
-      try {
-        const data = yield* Effect.promise(
-          async () =>
-            await queryClient.query(rpc.users.get.queryOptions({ input }))
-        );
-        expect(queryClient.getQueryData(base.users.get.queryKey(input))).toBe(
-          data
-        );
-        expect(Object.isFrozen(rpc.users.get)).toBe(true);
-      } finally {
-        queryClient.clear();
-      }
-    })
-);
-
 it.effect("runs inherited interceptors outside leaf interceptors", () =>
   Effect.gen(function* ordersInterceptors() {
     const client = yield* makeClient();
@@ -152,10 +119,8 @@ it.effect("runs inherited interceptors outside leaf interceptors", () =>
         },
         mutation: {
           callbacks: "compose",
-          policy: {
-            onSuccess: () => {
-              calls.push("root success");
-            },
+          onSuccess: () => {
+            calls.push("root success");
           },
           interceptors: [
             async ({ next: execute }) => {
@@ -164,33 +129,27 @@ it.effect("runs inherited interceptors outside leaf interceptors", () =>
             },
           ],
         },
-        scoped: {
-          users: {
-            scoped: {
-              get: {
-                query: {
-                  interceptors: [
-                    async ({ next: execute }) => {
-                      calls.push("leaf query");
-                      return await execute();
-                    },
-                  ],
+        paths: {
+          "users.get": {
+            query: {
+              interceptors: [
+                async ({ next: execute }) => {
+                  calls.push("leaf query");
+                  return await execute();
                 },
-                mutation: {
-                  callbacks: "compose",
-                  policy: {
-                    onSuccess: () => {
-                      calls.push("leaf success");
-                    },
-                  },
-                  interceptors: [
-                    async ({ next: execute }) => {
-                      calls.push("leaf mutation");
-                      return await execute();
-                    },
-                  ],
-                },
+              ],
+            },
+            mutation: {
+              callbacks: "compose",
+              onSuccess: () => {
+                calls.push("leaf success");
               },
+              interceptors: [
+                async ({ next: execute }) => {
+                  calls.push("leaf mutation");
+                  return await execute();
+                },
+              ],
             },
           },
         },
@@ -234,16 +193,18 @@ it.effect("reuses unaffected configured branches in a sparse snapshot", () =>
     const client = yield* makeClient();
     const base = configureUtils(
       createRpcQueryUtils(group, { client, keyPrefix: ["sparse-snapshot"] }),
-      { query: { policy: { staleTime: 100 } } }
+      { query: { staleTime: 100 } }
     );
     const input = prepareInput(base.users.get, { id: 9 });
-    const settings = { query: { policy: { staleTime: 200 } } };
+    const settings = { query: { staleTime: 200 } };
     const configured = configureUtils(base, {
-      scoped: { users: { scoped: { get: settings } } },
+      paths: {
+        "users.get": settings,
+      },
     });
-    settings.query.policy.staleTime = 999;
+    settings.query.staleTime = 999;
     const later = configureUtils(configured, {
-      query: { policy: { gcTime: 500 } },
+      query: { gcTime: 500 },
     });
     const queryClient = new QueryClient();
     try {
@@ -295,8 +256,10 @@ it.effect("keeps the frozen tree for empty configuration scopes", () =>
       keyPrefix: ["empty-configuration"],
     });
     const configured = configureUtils(base, {
-      query: { policy: {}, interceptors: [] },
-      scoped: { users: { scoped: { get: {} } } },
+      query: { interceptors: [] },
+      paths: {
+        "users.get": {},
+      },
     });
     expect(configured).toBe(base);
     const queryClient = new QueryClient();
@@ -365,30 +328,22 @@ it.effect(
         maxEventSize: 64,
         dispatchEmptyNamedEvents: false,
       };
-      const policy = defineUtilsPolicy<typeof base>()({
-        scoped: {
-          events: {
-            scoped: {
-              watch: {
-                streamed: {
-                  policy: { maxChunks: 3, sseOptions: callerSse },
-                },
-                live: {
-                  policy: { sseOptions: callerSse },
-                },
-              },
-              channel: {
-                streamed: {
-                  policy: { maxChunks: 3, sseOptions: callerSse },
-                },
-                live: {
-                  policy: { sseOptions: callerSse },
-                },
-              },
+      const policy = defineHttpApiPolicy(
+        api,
+        {
+          paths: {
+            "events.watch": {
+              streamed: { maxChunks: 3, sseOptions: callerSse },
+              live: { sseOptions: callerSse },
+            },
+            "events.channel": {
+              streamed: { maxChunks: 3, sseOptions: callerSse },
+              live: { sseOptions: callerSse },
             },
           },
         },
-      });
+        { keyPrefix: ["configured-sse"] }
+      );
       const configured = configureUtils(base, policy);
       callerSse.maxEventSize = 256;
       callerSse.dispatchEmptyNamedEvents = false;
@@ -492,42 +447,142 @@ it.effect(
             sseOptions: overrideSse,
           });
         expect({
-          streamedKey: configured.events.channel.streamedKey(channelInput),
+          streamedKey: configured.events.channel.streamedKey({
+            input: channelInput,
+          }),
           streamedOptionsKey: channelStreamedOptions.queryKey,
-          streamedOverrideKey: configured.events.channel.streamedKey(
-            channelInput,
-            { sseOptions: overrideSse }
-          ),
-          liveKey: configured.events.channel.liveKey(channelInput),
-          liveOverrideKey: configured.events.channel.liveKey(channelInput, {
+          streamedOverrideKey: configured.events.channel.streamedKey({
+            input: channelInput,
+            sseOptions: overrideSse,
+          }),
+          liveKey: configured.events.channel.liveKey({ input: channelInput }),
+          liveOverrideKey: configured.events.channel.liveKey({
+            input: channelInput,
             sseOptions: overrideSse,
           }),
           liveOverrideOptionsKey: channelOverrideLiveOptions.queryKey,
         }).toStrictEqual({
-          streamedKey: base.events.channel.streamedKey(channelInput, {
+          streamedKey: base.events.channel.streamedKey({
+            input: channelInput,
             maxChunks: 3,
             sseOptions: inheritedSse,
           }),
-          streamedOptionsKey: base.events.channel.streamedKey(channelInput, {
+          streamedOptionsKey: base.events.channel.streamedKey({
+            input: channelInput,
             maxChunks: 3,
             sseOptions: inheritedSse,
           }),
-          streamedOverrideKey: base.events.channel.streamedKey(channelInput, {
+          streamedOverrideKey: base.events.channel.streamedKey({
+            input: channelInput,
             maxChunks: 3,
             sseOptions: overrideSse,
           }),
-          liveKey: base.events.channel.liveKey(channelInput, {
+          liveKey: base.events.channel.liveKey({
+            input: channelInput,
             sseOptions: inheritedSse,
           }),
-          liveOverrideKey: base.events.channel.liveKey(channelInput, {
+          liveOverrideKey: base.events.channel.liveKey({
+            input: channelInput,
             sseOptions: overrideSse,
           }),
-          liveOverrideOptionsKey: base.events.channel.liveKey(channelInput, {
+          liveOverrideOptionsKey: base.events.channel.liveKey({
+            input: channelInput,
             sseOptions: overrideSse,
           }),
         });
       } finally {
         queryClient.clear();
       }
+    })
+);
+
+it.effect(
+  "resolves literal HTTP identifiers and rejects only ambiguous selected paths",
+  () =>
+    Effect.gen(function* resolvesDottedPaths() {
+      const api = HttpApi.make("dotted-policies").add(
+        HttpApiGroup.make("user.accounts").add(
+          HttpApiEndpoint.get("get.user", "/accounts/user", {
+            success: Schema.Int,
+          }),
+          HttpApiEndpoint.get("get.team", "/accounts/team", {
+            success: Schema.Int,
+          })
+        ),
+        HttpApiGroup.make("user").add(
+          HttpApiEndpoint.get("accounts.get.user", "/user", {
+            success: Schema.Int,
+          })
+        ),
+        HttpApiGroup.make("root", { topLevel: true }).add(
+          HttpApiEndpoint.get("admin.toString", "/admin", {
+            success: Schema.Int,
+          }),
+          HttpApiEndpoint.get("toString", "/name", { success: Schema.Int })
+        )
+      );
+      const client = yield* HttpApiClient.makeWith(api, {
+        httpClient: HttpClient.make(() =>
+          Effect.die("Unexpected HTTP request")
+        ),
+      });
+      const base = createHttpApiQueryUtils(api, { client });
+      const policy = defineHttpApiPolicy(api, {
+        paths: {
+          "user.accounts.get.team": { query: { staleTime: 200 } },
+          "user.accounts": { query: { staleTime: 100 } },
+          "admin.toString": { query: { staleTime: 300 } },
+          toString: { query: { staleTime: 400 } },
+        },
+      });
+      const configured = configureUtils(base, policy);
+      expect(configured.user).toBe(base.user);
+      expect({
+        team: configured["user.accounts"]["get.team"].queryOptions(),
+        user: configured["user.accounts"]["get.user"].queryOptions(),
+        admin: configured["admin.toString"].queryOptions(),
+        name: configured.toString.queryOptions(),
+      }).toMatchObject({
+        team: { staleTime: 200 },
+        user: { staleTime: 100 },
+        admin: { staleTime: 300 },
+        name: { staleTime: 400 },
+      });
+      expect(() =>
+        configureUtils(base, {
+          paths: { "user.accounts.get.user": { query: { staleTime: 500 } } },
+        })
+      ).toThrow("Ambiguous utility path: user.accounts.get.user");
+      const branch = configureUtils(configured["user.accounts"], {
+        paths: { "get.user": { query: { staleTime: 600 } } },
+      });
+      expect(branch["get.user"].queryOptions()).toMatchObject({
+        staleTime: 600,
+      });
+    })
+);
+
+it.effect(
+  "validates JavaScript policy maps before returning configured utilities",
+  () =>
+    Effect.gen(function* rejectsInvalidSettings() {
+      const client = yield* makeClient();
+      const base = createRpcQueryUtils(group, { client });
+      const unknownPath = Object.fromEntries([
+        ["paths", { "users.missing": {} }],
+      ]);
+      const unknownOption = Object.fromEntries([
+        ["paths", { "users.get": { query: { retrry: false } } }],
+      ]);
+      const leafPaths = Object.fromEntries([["paths", {}]]);
+      expect(() =>
+        configureUtils<typeof base, object>(base, unknownPath)
+      ).toThrow("Unknown utility path: users.missing");
+      expect(() =>
+        configureUtils<typeof base, object>(base, unknownOption)
+      ).toThrow("Unknown query configuration option: retrry");
+      expect(() =>
+        configureUtils<typeof base.users.get, object>(base.users.get, leafPaths)
+      ).toThrow("Unknown utility configuration option: paths");
     })
 );

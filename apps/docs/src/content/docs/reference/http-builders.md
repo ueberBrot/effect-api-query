@@ -9,14 +9,16 @@ Key builders return immutable keys tagged with cache data and error types. Optio
 
 | Builder | View |
 | --- | --- |
-| `queryKey(input?)`, `queryOptions(options?)` | Decoded query data. |
-| `metadataKey(input?)`, `metadataOptions(options?)` | Decoded data, status, and raw headers. |
-| `infiniteKey(input?)`, `infiniteOptions(options)` | Native `InfiniteData` for paginated responses. |
+| `queryKey(options?)`, `queryOptions(options?)` | Decoded query data. |
+| `metadataKey(options?)`, `metadataOptions(options?)` | Decoded data, status, and raw headers. |
+| `infiniteKey(options?)`, `infiniteOptions(options)` | Native `InfiniteData` for paginated responses. |
 | `mutationKey()`, `mutationOptions(options?)` | Mutation options whose variables are supplied at execution. |
-| `streamedKey(input, policy)`, `streamedOptions(options)` | Accumulated SSE or NDJSON emissions with retention and publication policy. |
-| `liveKey(input?, policy?)`, `liveOptions(options?)` | Latest SSE or NDJSON emission. |
+| `streamedKey({ input, ...policy })`, `streamedOptions(options)` | Accumulated SSE or NDJSON emissions with retention and publication policy. |
+| `liveKey(options?)`, `liveOptions(options?)` | Latest SSE or NDJSON emission. |
 
-Input-bearing keys take a complete request. Inputless stream keys take their policy as the first argument. Buffered multipart endpoints only build mutations. SSE and NDJSON endpoints only build accumulated and live queries.
+For input-bearing keys, pass `{ input }` with any view settings in the same object. Inputless keys omit `input`. Use `skipToken` only with option builders.
+
+Input-bearing keys take a complete request. Inputless stream keys take their policy as the first argument. Buffered multipart endpoints support mutation builders and direct execution. SSE and NDJSON endpoints only build accumulated and live queries.
 
 ## Query options
 
@@ -36,9 +38,15 @@ Use a complete input before calling `refetch`. If input exists and you only want
 
 Mutations have no query abort signal. Use callbacks to invalidate, seed, or update reads. See [mutations](/effect-api-query/guides/mutations/).
 
+## Run a buffered endpoint directly
+
+Use `call({ input, signal })` for a promise or `effect({ input })` for the client Effect. Omit `input` for requests without input. Queryable endpoints also accept their own prepared input. For buffered multipart endpoints, supply the request with its `FormData` payload.
+
+Both methods use decoded-only response mode and preserve successful `undefined`. `call` uses the leaf's runtime, including tracking added by `QueryOwner.trackUtils`. A failed Exit rejects with `EffectHttpApiQueryError` and operation `"call"`. With `effect`, you provide any required services and run the Effect.
+
 ## Buffered metadata
 
-Buffered query endpoints support `metadataKey(request)` and `metadataOptions({ input, ...options })`. Omit the request for inputless endpoints. The client runs in decoded-and-response mode. The cache holds this envelope.
+Buffered query endpoints support `metadataKey({ input: request })` and `metadataOptions({ input, ...options })`. Omit the request for inputless endpoints. The client runs in decoded-and-response mode. The cache holds this envelope.
 
 ```ts
 type Metadata<DecodedSuccess> = {
@@ -68,8 +76,8 @@ Pass native options, decoded input if required, and these stream controls.
 | --- | --- |
 | `maxChunks` | Required positive safe integer that limits retained events, or `"unbounded"`. A configured leaf can inherit this choice. |
 | `refetchMode` | `reset` (default), `append`, or `replace`. |
-| `publicationBatchSize` | Positive safe integer for ordered publication batches; defaults to one. |
-| `publicationMaxWaitMs` | Integer from 1 through 2,147,483,647; flushes a partial batch from its first buffered event. Omitted means no deadline. |
+| `publicationBatchSize` | Positive safe integer for ordered publication batches. Defaults to 1. |
+| `publicationMaxWaitMs` | Integer from 1 through 2,147,483,647. Flushes a partial batch from its first buffered event. Omitted means no deadline. |
 | `sseOptions.maxEventSize` (SSE only) | Positive safe integer that limits pending parser text. Defaults to 10 × 1024 × 1024 JavaScript string code units. |
 
 The query caches a readonly array in emission order. It preserves `undefined` elements and decoded header wrappers. An empty stream can succeed. Acquisition and consumption failures produce `EffectHttpApiQueryError` with operation `streamed`. Its Cause retains HTTP, Schema, and ready-client failures. SSE can also report declared failures, `Sse.Retry`, and `Sse.SseError`. NDJSON framing and decoding follow the client's error channel.
@@ -78,7 +86,7 @@ The runner supplies stream services and receives the query abort signal. Cancell
 
 The first event publishes immediately. Later events publish by batch. Completion or failure flushes pending values, except that `replace` publishes only on success. Cancellation discards pending values. Set a deadline if a quiet stream must publish a partial batch. Invalid size or deadline throws `RangeError` before execution, even for skipped input. The builder strips the controls from native options.
 
-Pass the same decoder and history settings to `streamedKey(input, policy)` or `streamedKey(policy)` if inputless. Set `maxChunks` explicitly or inherit it through `configureUtils`. Omitted batch size and size one share a key. Nondefault sizes and explicit deadlines have distinct keys. Endpoint prefixes match all policies. Resume headers declared on the endpoint affect request identity. Decoder controls belong to view policy.
+Pass the same decoder and history settings to `streamedKey({ input, ...policy })` or `streamedKey(policy)` if inputless. Set `maxChunks` explicitly or inherit it through `configureUtils`. Omitted batch size and size one share a key. Nondefault sizes and explicit deadlines have distinct keys. Endpoint prefixes match all policies. Resume headers declared on the endpoint affect request identity. Decoder controls belong to view policy.
 
 Set NDJSON's `maxElementBytes` on `HttpApiSchema.StreamNdjson`. Effect frames and decodes the stream, including any declared header wrapper. Only SSE takes `sseOptions`. Streaming endpoints have no metadata view.
 
@@ -98,7 +106,7 @@ Both views share the underlying error, service, and cleanup contract. SSE valida
 
 Supply `initialPageParam` and `getNextPageParam`. If the endpoint takes input, use `input(pageParam)` to build each decoded request or use `input: skipToken` to pause. Omit `input` for inputless endpoints.
 
-The first mapped request forms the infinite key. Use `infiniteKey(request)` or `infiniteKey()` if inputless. The `infinite` segment separates it from ordinary queries. Keys from `infiniteOptions` retain the inferred page parameter.
+The first mapped request forms the infinite key. Use `infiniteKey({ input: request })` or `infiniteKey()` if inputless. The `infinite` segment separates it from ordinary queries. Keys from `infiniteOptions` retain the inferred page parameter.
 
 Use the same filters in the first request and each later page. Rebuild options if filters change. The mapper must be deterministic because key creation and page execution both call it.
 

@@ -58,6 +58,8 @@ const prepareRegisteredSnapshot = Effect.fnUntraced(function* (
     shouldDehydrateMutation: () => false,
     shouldDehydrateQuery: (query) =>
       defaultShouldDehydrateQuery(query) &&
+      query.state.error === null &&
+      query.state.fetchFailureReason === null &&
       viewRegistry.matches(query.queryKey),
   });
   const queries = yield* viewRegistry.encodeQueries(snapshot.queries);

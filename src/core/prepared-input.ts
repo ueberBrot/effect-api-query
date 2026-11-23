@@ -55,8 +55,10 @@ export const registerInputOwner = (
 
 export const inputKind = (key: () => QueryKey) => owners.get(key)?.input._tag;
 
-// oxlint-disable-next-line anti-slop/no-unknown-parameters
-export const readPreparedInput = (owner: OperationInput, input: unknown) => {
+export const readPreparedInput = (
+  owner: OperationInput | undefined,
+  input: PreparedValue["input"]
+) => {
   const prepared = Predicate.isObject(input) ? values.get(input) : undefined;
   if (prepared !== undefined && prepared.owner !== owner) {
     throw new TypeError("Prepared input belongs to another utility leaf");

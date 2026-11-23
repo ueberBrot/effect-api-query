@@ -1,7 +1,6 @@
 import {
   acquireQueryOwner,
   createHttpApiQueryUtils,
-  configureUtils,
 } from "@ueberbrot/effect-api-query";
 import { ManagedRuntime } from "effect";
 import { FetchHttpClient } from "effect/http";
@@ -19,29 +18,13 @@ export const startUsersApplication = async (baseUrl: string) => {
       const client = await runtime.runPromise(
         HttpApiClient.make(usersApi, { baseUrl })
       );
-      return configureUtils(
-        createHttpApiQueryUtils(usersApi, {
-          client,
-          keyPrefix: ["users-app"],
-          runPromiseExit: setup.wrapRunner(runtime.runPromiseExit),
-        }),
-        {
-          query: {
-            interceptors: [
-              async ({ next, context }) =>
-                await setup.runQuery(next, context.signal),
-            ],
-          },
-        }
+      return setup.trackUtils(
+        createHttpApiQueryUtils(usersApi, { client, runtime })
       );
     },
     { defaultOptions: { queries: { retry: false } } }
   );
-  return {
-    http: owner.resources,
-    queryClient: owner.queryClient,
-    dispose: owner.dispose,
-  };
+  return owner;
 };
 
 export type UsersApplication = Awaited<

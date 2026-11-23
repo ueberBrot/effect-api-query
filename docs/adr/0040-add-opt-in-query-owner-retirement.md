@@ -1,6 +1,6 @@
 # Add opt-in query owner retirement
 
-Status: Accepted. Extends [ADR 0007](0007-keep-the-core-factory-lifecycle-neutral.md) without changing factory ownership.
+Status: Accepted. Extends [ADR 0007](0007-keep-the-core-factory-lifecycle-neutral.md) without changing factory ownership. Partially amended by [ADR 0044](0044-simplify-factory-setup-and-owner-tracking.md) for `RuntimeInput` on `wrapRunner` and `trackUtils`. Extended by [ADR 0048](0048-add-optional-react-subpath-wiring.md) for lifecycle-neutral React provider wiring and keyed remounting.
 
 ## Context
 

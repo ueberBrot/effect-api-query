@@ -1,6 +1,6 @@
 # Keep the core factory lifecycle-neutral
 
-Status: Accepted. Implementation ownership clarified by [ADR 0021](0021-share-utility-construction-through-private-modules.md). Extended by [ADR 0022](0022-add-buffered-http-utilities-with-separate-key-roots.md).
+Status: Accepted. Implementation ownership clarified by [ADR 0021](0021-share-utility-construction-through-private-modules.md). Extended by [ADR 0022](0022-add-buffered-http-utilities-with-separate-key-roots.md). Partially amended by [ADR 0044](0044-simplify-factory-setup-and-owner-tracking.md) for dual ready RPC clients and unified `runtime` input.
 
 ## Context
 

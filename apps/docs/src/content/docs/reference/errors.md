@@ -14,7 +14,7 @@ Factory or builder configuration failures throw synchronously. Incompatible hash
 - `RpcPathCollision`
 - `MissingKeyEncoder`
 - `UnknownKeyEncoder`
-- `UnsupportedQueryHash`: a builder received `queryKeyHashFn` or `queryHash`, or stream execution found either a default hash inconsistent with its key hasher or a conflicting cached identity.
+- `UnsupportedQueryHash`: a builder received `queryKeyHashFn` or `queryHash`. During stream execution, this code also reports a default hash mismatch or a conflicting cached identity.
 
 The error can also expose `rpcTag`, `path`, and an underlying `cause`.
 
@@ -29,7 +29,7 @@ An RPC key preparation failure throws before execution. The error exposes `rpcTa
 
 ## `EffectRpcQueryError<E>`
 
-This error wraps a failed RPC `Exit`. It exposes `rpcTag`, `operation`, and the complete `Cause.Cause<E>`. Use `isEffectRpcQueryError(value)` in the same JavaScript realm. For unary calls, `operation` is `query`, `infinite`, or `mutation`.
+This error wraps a failed RPC `Exit`. It exposes `rpcTag`, `operation`, and the complete `Cause.Cause<E>`. Use `isEffectRpcQueryError(value)` in the same JavaScript realm. For unary RPCs, `operation` is `call`, `query`, `infinite`, or `mutation`.
 
 Streaming failures use `streamed` or `live` and retain the complete Cause, including cleanup failures.
 
@@ -53,7 +53,7 @@ HTTP factory and builder failures throw synchronously. Incompatible hashing can 
 - `MissingKeyEncoder`
 - `UnknownKeyEncoder`
 - `UnsupportedEndpointMetadata`
-- `UnsupportedQueryHash`: a builder received `queryKeyHashFn` or `queryHash`, or stream execution found either a default hash inconsistent with its key hasher or a conflicting cached identity.
+- `UnsupportedQueryHash`: a builder received `queryKeyHashFn` or `queryHash`. During stream execution, this code also reports a default hash mismatch or a conflicting cached identity.
 
 The error exposes `apiId`. When available, it also exposes `groupId`, `endpoint`, `method`, `path`, and an underlying `cause`.
 
@@ -69,7 +69,7 @@ This error throws during key preparation, before the client runs. It exposes `ap
 
 ## `EffectHttpApiQueryError<E>`
 
-This error wraps a failed HTTP `Exit`. It exposes `apiId`, `groupId`, `endpoint`, `method`, `operation`, and `Cause.Cause<E>`. Operations are `query`, `infinite`, `mutation`, `metadata`, `streamed`, and `live`. Use `isEffectHttpApiQueryError(value)` in the same JavaScript realm.
+This error wraps a failed HTTP `Exit`. It exposes `apiId`, `groupId`, `endpoint`, `method`, `operation`, and `Cause.Cause<E>`. Operations are `call`, `query`, `infinite`, `mutation`, `metadata`, `streamed`, and `live`. Use `isEffectHttpApiQueryError(value)` in the same JavaScript realm.
 
 The Cause retains endpoint, middleware, Schema, and transport failures, including defects and interruption. SSE can also report declared event errors, `Sse.Retry`, and `Sse.SseError`. Inspect the Cause for private values before logging it. Runner rejections without an Exit pass through.
 
@@ -81,7 +81,7 @@ This error means a live HTTP stream ended before its first value. It exposes the
 
 The Effect cache bridge wraps native rejections and synchronous callback failures in this class. Its `cause: unknown` contains the original value, including any adapter error and full Effect Cause. Shared query work can come from a different caller. Validate a recognized failure before reading its fields. See [query effects](/effect-api-query/guides/query-effects/).
 
-Interrupt an Effect waiter to stop its wait. To stop shared work, cancel the native query explicitly.
+Interrupt an Effect waiter to stop its wait. To stop shared work, call `queryEffects.cancel`. Interrupting `queryEffects.streamSnapshot` cancels its exclusive capture.
 
 ## `QueryDescriptorError`
 

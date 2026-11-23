@@ -2,7 +2,7 @@ import { QueryClient, QueryObserver, skipToken } from "@tanstack/query-core";
 import {
   configureUtils,
   createHttpApiQueryUtils,
-  defineUtilsPolicy,
+  defineHttpApiPolicy,
   type CreateHttpApiQueryUtilsOptions,
   type EffectHttpApiQueryConfigError,
   type EffectHttpApiQueryEmptyStreamError,
@@ -11,6 +11,7 @@ import {
   type InferQueryData,
   type InferQueryError,
   type RunPromiseExit,
+  type RuntimeInput,
 } from "@ueberbrot/effect-api-query";
 import {
   Context,
@@ -145,13 +146,23 @@ true satisfies Assert<
 const http = createHttpApiQueryUtils(api, {
   client,
   keyPrefix: ["ndjson"],
-  runPromiseExit,
+  runtime: runPromiseExit,
 });
-true satisfies Assert<Equal<keyof typeof http.records, "key" | "watch">>;
+true satisfies Assert<
+  Equal<
+    Extract<keyof typeof http.records, string>,
+    "key" | "queryFilter" | "watch"
+  >
+>;
 true satisfies Assert<
   Equal<
     keyof typeof http.records.watch,
-    "key" | "streamedKey" | "streamedOptions" | "liveKey" | "liveOptions"
+    | "key"
+    | "queryFilter"
+    | "streamedKey"
+    | "streamedOptions"
+    | "liveKey"
+    | "liveOptions"
   >
 >;
 input satisfies InferInput<typeof http.records.watch>;
@@ -227,51 +238,45 @@ true satisfies Assert<
 http.records.watch.streamedOptions({ input: skipToken, maxChunks: "unbounded" })
   .queryFn satisfies typeof skipToken;
 const configured = configureUtils(http, {
-  streamed: { policy: { maxChunks: 2 } },
+  streamed: { maxChunks: 2 },
 });
 configured.records.watch.streamedOptions({ input });
-configured.records.watch.streamedKey(input);
-http.records.watch.liveKey(input);
-const ssePolicy = { maxChunks: 2, sseOptions: { maxEventSize: 100 } };
+configured.records.watch.streamedKey({ input });
+http.records.watch.liveKey({ input });
+const ssePolicy = { input, maxChunks: 2, sseOptions: { maxEventSize: 100 } };
 // @ts-expect-error NDJSON has no SSE decoder controls, including captured policies.
-http.records.watch.streamedKey(input, ssePolicy);
+http.records.watch.streamedKey(ssePolicy);
 // @ts-expect-error NDJSON has no SSE decoder controls.
 http.records.watch.liveOptions({ input, sseOptions: {} });
 // @ts-expect-error NDJSON has no SSE decoder controls on inputless views.
 http.wrapped.liveKey({ sseOptions: {} });
-// @ts-expect-error NDJSON streamed policy rejects SSE decoder controls.
 configureUtils(http.records.watch, {
   streamed: {
-    policy: {
-      maxChunks: 2,
-      sseOptions: { maxEventSize: 100 },
-    },
+    // @ts-expect-error NDJSON streamed policy rejects SSE decoder controls.
+    sseOptions: { maxEventSize: 100 },
   },
 });
-// @ts-expect-error NDJSON live policy rejects SSE decoder controls.
 configureUtils(http.records.watch, {
-  live: { policy: { sseOptions: { maxEventSize: 100 } } },
+  // @ts-expect-error NDJSON live policy rejects SSE decoder controls.
+  live: { sseOptions: { maxEventSize: 100 } },
 });
-// @ts-expect-error NDJSON policy assembly rejects SSE decoder controls in scoped maps.
-defineUtilsPolicy<typeof http>()({
-  scoped: {
-    records: {
-      scoped: {
-        watch: {
-          streamed: {
-            policy: {
-              maxChunks: 2,
-              sseOptions: { maxEventSize: 100 },
-            },
-          },
+defineHttpApiPolicy(
+  api,
+  {
+    paths: {
+      "records.watch": {
+        streamed: {
+          // @ts-expect-error NDJSON policy assembly rejects SSE decoder controls in scoped maps.
+          sseOptions: { maxEventSize: 100 },
         },
       },
     },
   },
-});
-// @ts-expect-error Inputless NDJSON policy assembly rejects SSE decoder controls.
-defineUtilsPolicy<typeof http.wrapped>()({
-  live: { policy: { sseOptions: {} } },
+  { keyPrefix: ["ndjson"] }
+);
+configureUtils(http.wrapped, {
+  // @ts-expect-error Inputless NDJSON policy assembly rejects SSE decoder controls.
+  live: { sseOptions: {} },
 });
 const perCallLimit = {
   input,
@@ -307,7 +312,7 @@ declare const extraRunner: RunPromiseExit<
 const extra = createHttpApiQueryUtils(api, {
   client: extraClient,
   keyPrefix: ["extra"],
-  runPromiseExit: extraRunner,
+  runtime: extraRunner,
 });
 type ExtraFailure =
   Exclude<
@@ -328,10 +333,10 @@ true satisfies Assert<
       typeof api,
       readonly ["extra"],
       typeof extraClient
-    >["runPromiseExit"],
-    typeof extraRunner
+    >["runtime"],
+    typeof extraRunner | { readonly runPromiseExit: typeof extraRunner }
   >
 >;
 
 http.records.watch.liveOptions({ input, coalesceMs: 25 });
-http.records.watch.liveKey(input, { coalesceMs: 25 });
+http.records.watch.liveKey({ input, coalesceMs: 25 });

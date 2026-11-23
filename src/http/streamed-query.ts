@@ -13,8 +13,7 @@ import type { HttpSseDecoderOptions } from "./types";
 
 const decoderOptions = (
   identity: HttpApiEndpointIdentity,
-  // oxlint-disable-next-line anti-slop/no-unsafe-dictionary-type
-  options: Record<string, unknown>
+  options: { readonly sseOptions?: unknown }
 ): HttpSseDecoderOptions => {
   const { sseOptions } = options;
   const decoder = Predicate.isObject(sseOptions) ? sseOptions : undefined;
@@ -58,7 +57,8 @@ export const createHttpStreamPreparation =
       sseOptions: HttpSseDecoderOptions | undefined
     ) => Effect.Effect<unknown, unknown, unknown>
   ): StreamingOperation["prepareStream"] =>
-  (options, operation, runPromiseExit) => {
+  (options, operation) => {
+    const { sseOptions: decoder } = options;
     const { policy, history } = prepareStreamPolicy(
       options,
       operation,
@@ -66,8 +66,9 @@ export const createHttpStreamPreparation =
         new EffectHttpApiQueryConfigError(code, message, identity)
     );
     const sseOptions =
-      stream === "StreamSse" ? decoderOptions(identity, options) : undefined;
-    delete options["sseOptions"];
+      stream === "StreamSse"
+        ? decoderOptions(identity, { sseOptions: decoder })
+        : undefined;
     return {
       identity: [
         Object.freeze({
@@ -80,7 +81,7 @@ export const createHttpStreamPreparation =
             : undefined),
         }),
       ],
-      makeQuery: (input) =>
+      makeQuery: (input, runPromiseExit) =>
         makeStreamQuery({
           policy,
           source: Stream.unwrap(

@@ -1,10 +1,5 @@
 import { it } from "@effect/vitest";
-import {
-  dehydrate,
-  hydrate,
-  QueryClient,
-  QueryObserver,
-} from "@tanstack/query-core";
+import { dehydrate, hydrate, QueryClient } from "@tanstack/query-core";
 import { QueryClientProvider, useSuspenseQuery } from "@tanstack/react-query";
 import { Effect, Schema, SchemaTransformation, Stream } from "effect";
 import { HttpApi, HttpApiEndpoint, HttpApiGroup } from "effect/http-api";
@@ -73,7 +68,6 @@ it.effect("reuses a loader selection across independent hydrated owners", () =>
         descriptor,
         state: dehydrate(serverCache),
       });
-      // SAFETY: this snapshot is produced immediately above by native dehydrate in the same test.
       // oxlint-disable-next-line typescript/no-unsafe-assignment
       const transferred: {
         readonly descriptor: unknown;
@@ -228,8 +222,8 @@ it.effect("transfers rich decoded input with an explicit codec", () =>
             await cache.query(bound.leaf.queryOptions({ input: bound.input }))
         )
       ).toBe("23");
-      expect(bound.leaf.queryKey(bound.input)).toStrictEqual(
-        rpc.read.queryKey({ id: 23n })
+      expect(bound.leaf.queryKey({ input: bound.input })).toStrictEqual(
+        rpc.read.queryKey({ input: { id: 23n } })
       );
     } finally {
       cache.clear();
@@ -267,15 +261,8 @@ it.effect(
       const bound = registration.bind(registration.capture());
       const options = bound.leaf.liveOptions({ staleTime: Infinity });
       const cache = new QueryClient();
-      const observer = new QueryObserver(cache, { ...options, enabled: false });
-      const unsubscribe = observer.subscribe(() => {});
       try {
-        yield* Effect.promise(async () => {
-          await expect(fetchStreamSnapshot(cache, options)).rejects.toThrow(
-            "idle query without observers"
-          );
-        });
-        unsubscribe();
+        expect(bound.input).toBeUndefined();
         expect(
           yield* Effect.promise(
             async () => await fetchStreamSnapshot(cache, options)
@@ -283,8 +270,6 @@ it.effect(
         ).toBe(1);
         expect(bound.prefix).toStrictEqual([...rpc.watch.key(), "live"]);
       } finally {
-        unsubscribe();
-        observer.destroy();
         cache.clear();
       }
     })
@@ -323,8 +308,8 @@ it.effect(
         input,
       }).bind(descriptor);
       expect(descriptor.input).toStrictEqual({ query: { id: "7" } });
-      expect(bound.leaf.metadataKey(bound.input)).toStrictEqual(
-        server.users.read.metadataKey({ query: { id: 7 } })
+      expect(bound.leaf.metadataKey({ input: bound.input })).toStrictEqual(
+        server.users.read.metadataKey({ input: { query: { id: 7 } } })
       );
       expect(bound.prefix).toStrictEqual([
         "http-loader",

@@ -9,12 +9,16 @@ Unary RPCs provide these builders.
 
 | Builder | Result |
 | --- | --- |
-| `queryKey(input?)` | Payload-specific, data-tagged query key. Payload-bearing RPCs require constructor input. |
+| `call(options?)` | Runs the RPC through the leaf's runtime and returns a promise. |
+| `effect(options?)` | Returns the ready client's Effect with its original error and service types. |
+| `queryKey(options?)` | Payload-specific, data-tagged query key. Payload-bearing RPCs require constructor input. |
 | `queryOptions(options?)` | Fresh Query Core options with generated `queryFn` and `queryKey`. |
-| `infiniteKey(input?)` | Data-tagged infinite-query key derived from the initial page's payload. |
+| `infiniteKey(options?)` | Data-tagged infinite-query key derived from the initial page's payload. |
 | `infiniteOptions(options)` | Fresh infinite-query options that map each `pageParam` to an RPC payload. |
 | `mutationKey()` | Immutable operation key shared by mutations of this RPC. |
 | `mutationOptions(options?)` | Fresh mutation options with generated `mutationFn` and `mutationKey`. Pass variables when the mutation runs. |
+
+For input-bearing keys, pass `{ input }` with any view settings in the same object. Inputless keys omit `input`. Use `skipToken` only with option builders.
 
 An RPC takes no payload if it omits `payload` or uses `Schema.Void`. `Schema.Unknown`, `Schema.Any`, and unions containing `Schema.Void` still take payloads. Use constructor input for keys, query options, mutation variables, and infinite page mappers. Custom encoders get the normalized payload.
 
@@ -30,13 +34,21 @@ Use `skipToken` on query option builders that take input. Key builders, mutation
 
 Set hashing through QueryClient defaults and keep it stable while entries exist. Per-call `queryKeyHashFn` and `queryHash` throw `EffectRpcQueryConfigError` with code `UnsupportedQueryHash`. Stream execution also uses this code if a hashing change conflicts with an existing key.
 
+## Run an RPC directly
+
+Pass the payload constructor input or prepared input as `{ input }`. For a payloadless RPC, call the method with no arguments.
+
+Use `call` for a promise. It accepts `signal` and uses the leaf's runtime, including tracking added by `QueryOwner.trackUtils`. A failed Exit rejects with `EffectRpcQueryError` and operation `"call"`. A successful call preserves `undefined`.
+
+Use `effect` to compose the RPC in an Effect program. The caller provides its services and runs it. Both methods bypass Query cache and view policies.
+
 ## Request-local RPC options
 
 All option builders accept `rpcOptions`. They pass it to the ready client at execution and omit it from the returned Query options.
 
 | Builders | Request options |
 | --- | --- |
-| `queryOptions`, `infiniteOptions`, `mutationOptions` | `UnaryRpcOptions`: `headers` and `context` |
+| `queryOptions`, `infiniteOptions`, `mutationOptions`, `call`, `effect` | `UnaryRpcOptions`: `headers` and `context` |
 | `streamedOptions`, `liveOptions` | `StreamingRpcOptions`: `headers`, `context`, and `streamBufferSize` |
 
 `headers` accepts Effect's `Headers.Input`. `context` accepts `Context.Context<never>`. Use `streamBufferSize` for the client's stream buffer and `maxChunks` for retained cache history.
@@ -65,9 +77,9 @@ Streaming RPCs provide these builders.
 
 | Builder | Result |
 | --- | --- |
-| `streamedKey(input, policy)` | Data-tagged key for history and its retention, refetch, and publication policy. |
+| `streamedKey(options)` | Data-tagged key for history and its retention, refetch, and publication policy. |
 | `streamedOptions(options)` | Query options that accumulate emitted values according to the history policy. |
-| `liveKey(input?, policy?)` | Data-tagged key for the latest value and any coalescing policy. |
+| `liveKey(options?)` | Data-tagged key for the latest value and any coalescing policy. |
 | `liveOptions(options?)` | Query options that store the latest published value. |
 
 See [streaming](/effect-api-query/guides/streaming/) for examples.
@@ -84,7 +96,7 @@ Choose a `refetchMode` for accumulated history.
 - `append` adds incoming values to the cached sequence.
 - `replace` keeps cached values until the next stream completes successfully.
 
-Set `maxChunks` to a positive safe integer or `"unbounded"`. You can set it through [`streamed.policy`](/effect-api-query/guides/query-defaults/) for a tree, branch, or leaf.
+Set `maxChunks` to a positive safe integer or `"unbounded"`. You can set it through [`streamed`](/effect-api-query/guides/query-defaults/) for a tree, branch, or leaf.
 
 A finite bound keeps the newest values in order after publication. It counts elements. Refetch applies the bound as follows.
 

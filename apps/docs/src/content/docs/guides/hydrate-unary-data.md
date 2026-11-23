@@ -50,7 +50,7 @@ export class Profile extends Schema.Class<
 
 Pair `serializeData: Schema.encodeUnknownSync(Profile)` on the server with `defaultOptions: { deserializeData: Schema.decodeUnknownSync(Profile) }` in the browser. See the [rich-value example](https://github.com/ueberBrot/effect-api-query/blob/main/tests/types/docs-hydration-rich.ts) for `snapshotProfile`, `hydrateProfile`, and both factories.
 
-Prefetch with `profileRpcOptions` or `profileHttpOptions`. Send `snapshotProfile` and then call `hydrateProfile` in the browser. Both the hydrated value and later refetch contain a `Profile` with bigint credits and bytes. The example reserves the `'profile'` prefix for this shape. You can bind a codec to a leaf with `queryViewCodec(leaf, 'query', Profile)`. Use `hydrationCallbacks(codec)` for a service-free codec and filter for matching successful queries. For multiple shapes, [register the views](/effect-api-query/guides/hydrate-query-views/#register-generated-leaves-and-views).
+Prefetch with `profileRpcOptions` or `profileHttpOptions`. Send `snapshotProfile` and then call `hydrateProfile` in the browser. Both the hydrated value and later refetch contain a `Profile` with bigint credits and bytes. The example reserves the `'profile'` prefix for this shape. You can bind a codec to a leaf with `queryViewCodec(leaf, 'query', Profile)`. Use `hydrationCallbacks(codec)` for a service-free codec and filter for matching successful queries. For multiple shapes, [derive a registry from the contract](/effect-api-query/guides/hydrate-query-views/#derive-a-registry-from-the-contract).
 
 Native serialization and deserialization callbacks must finish synchronously without required services. Handle a thrown codec error in your rendering or hydration code.
 
@@ -85,7 +85,7 @@ Both caches keep decoded `Profile` values. Only the snapshot contains encoded da
 
 ## Omit failed queries by default
 
-Keep `defaultShouldDehydrateQuery` so the browser refetches omitted failures with its own client. A new failure includes the generated error and its Cause. The examples keep this filter when selecting the profile prefix.
+Use `defaultShouldDehydrateQuery` to select successful queries. A successful entry can retain an earlier failure reason. Before sending a public snapshot, also require `state.error` and `state.fetchFailureReason` to be `null`. The browser can refetch omitted entries with its own client.
 
 To transfer a failure, encode and decode `state.error` and `state.fetchFailureReason` separately. Native data callbacks only transform data. Allowlist public tags and fields. Leave out private messages, defects, and transport details.
 

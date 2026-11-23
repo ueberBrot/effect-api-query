@@ -1,7 +1,7 @@
 import { workflowsApi } from "@effect-api-query/contracts";
 import {
   acquireQueryOwner,
-  defineUtilsPolicy,
+  defineHttpApiPolicy,
   configureUtils,
   createHttpApiQueryUtils,
 } from "@ueberbrot/effect-api-query";
@@ -19,43 +19,32 @@ export const startHttpWorkflows = async (baseUrl: string) => {
       const client = await runtime.runPromise(
         HttpApiClient.make(workflowsApi, { baseUrl })
       );
-      const runPromiseExit = setup.wrapRunner(runtime.runPromiseExit);
-      const intercept = async <T>({
-        next,
-        context,
-      }: {
-        readonly next: () => Promise<T>;
-        readonly context: { readonly signal: AbortSignal };
-      }) => await setup.runQuery(next, context.signal);
       const base = createHttpApiQueryUtils(workflowsApi, {
         client,
         keyPrefix: ["http-workflows"],
-        runPromiseExit,
+        runtime,
       });
-      const policy = defineUtilsPolicy<typeof base>()({
-        query: { policy: { retry: false }, interceptors: [intercept] },
-        metadata: { policy: { retry: false }, interceptors: [intercept] },
-        infinite: { policy: { retry: false }, interceptors: [intercept] },
+      const policy = defineHttpApiPolicy(workflowsApi, {
+        query: { retry: false },
+        metadata: { retry: false },
+        infinite: { retry: false },
         live: {
-          policy: { retry: false, coalesceMs: 250 },
-          interceptors: [intercept],
+          retry: false,
+          coalesceMs: 250,
         },
         streamed: {
-          policy: {
-            retry: false,
-            maxChunks: 4,
-            publicationBatchSize: 3,
-            publicationMaxWaitMs: 180,
-          },
-          interceptors: [intercept],
+          retry: false,
+          maxChunks: 4,
+          publicationBatchSize: 3,
+          publicationMaxWaitMs: 180,
         },
-        mutation: { policy: { retry: false } },
+        mutation: { retry: false },
       });
       return {
         runtime,
         client,
-        runPromiseExit,
-        http: configureUtils(base, policy),
+        run: setup.wrapRunner(runtime),
+        http: setup.trackUtils(configureUtils(base, policy)),
       };
     },
     {
@@ -63,7 +52,7 @@ export const startHttpWorkflows = async (baseUrl: string) => {
     }
   );
   const { queryClient } = owner;
-  const { runtime, client, runPromiseExit, http } = owner.resources;
+  const { runtime, client, run, http } = owner.resources;
   const drainMutations = Effect.callback<boolean>((resume) => {
     const cache = queryClient.getMutationCache();
     const check = () => {
@@ -88,7 +77,7 @@ export const startHttpWorkflows = async (baseUrl: string) => {
       }
       const controller = new AbortController();
       const done = (async () => {
-        const exit = await runPromiseExit(effect, {
+        const exit = await run(effect, {
           signal: controller.signal,
         });
         if (Exit.isFailure(exit)) {
@@ -102,11 +91,9 @@ export const startHttpWorkflows = async (baseUrl: string) => {
         },
       };
     },
-    // Preserve the owner's idempotent disposal promise.
     // oxlint-disable-next-line typescript/promise-function-async
     dispose: () => {
       if (owner.isActive()) {
-        // The owner reports this registered drain's failures through disposal.
         void Promise.allSettled([
           owner.runMutation(async () => runtime.runPromise(drainMutations)),
         ]);

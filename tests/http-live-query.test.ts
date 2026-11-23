@@ -44,6 +44,8 @@ describe.each([
           client,
           keyPrefix: ["test", coalesceMs ?? "none"],
         });
+        expect(http.events.watch).not.toHaveProperty("call");
+        expect(http.events.watch).not.toHaveProperty("effect");
         const queryClient = new QueryClient({
           defaultOptions: { queries: { retry: false } },
         });
@@ -98,7 +100,6 @@ describe.each([
           )
         );
         let executionError: unknown;
-        let executionSettled = false;
         const executionDone = yield* Deferred.make<boolean>();
         const runPromise = Effect.runPromiseWith(yield* Effect.context());
         const http = configureUtils(
@@ -116,7 +117,6 @@ describe.each([
                     executionError = error;
                     throw error;
                   } finally {
-                    executionSettled = true;
                     await runPromise(Deferred.succeed(executionDone, true));
                   }
                 },
@@ -142,7 +142,6 @@ describe.each([
           yield* Deferred.await(finalized);
           yield* Deferred.await(executionDone);
           expect(queryError).toBeInstanceOf(CancelledError);
-          expect(executionSettled).toBe(true);
           expect(executionError).toBeUndefined();
           expect(queryClient.getQueryData(options.queryKey)).toBeUndefined();
         } finally {

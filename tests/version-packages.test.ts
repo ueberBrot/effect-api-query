@@ -84,11 +84,14 @@ describe("Changesets Intent review integration", () => {
         changelog: ["@changesets/cli/changelog", {}],
       })
     );
-    // The default changelog is local: integration tests need no GitHub credential.
-    mkdirSync(nodePath.join(fixture, "scripts"));
+    mkdirSync(nodePath.join(fixture, "scripts/lib"), { recursive: true });
     cpSync(
       nodePath.join(repository, "scripts/version-packages.mts"),
       nodePath.join(fixture, "scripts/version-packages.mts")
+    );
+    cpSync(
+      nodePath.join(repository, "scripts/lib/exec.mts"),
+      nodePath.join(fixture, "scripts/lib/exec.mts")
     );
     run(fixture, "vp", [
       "exec",

@@ -3,30 +3,26 @@ import type { QueryClient } from "@tanstack/query-core";
 import {
   configureUtils,
   createRpcQueryUtils,
-  defineUtilsPolicy,
+  defineRpcPolicy,
 } from "@ueberbrot/effect-api-query";
-import type { RpcQueryUtils } from "@ueberbrot/effect-api-query";
 import type { RpcClient, RpcGroup } from "effect/rpc";
 
-type ApplicationUtils = RpcQueryUtils<
-  typeof exampleRpcGroup,
-  readonly ["policy-app"]
->;
-
-export const applicationPolicy = defineUtilsPolicy<ApplicationUtils>()({
-  query: { policy: { retry: false } },
-  scoped: {
-    users: {
-      query: { policy: { staleTime: 30_000 } },
-      scoped: {
-        get: { query: { policy: { staleTime: 60_000 } } },
+export const applicationPolicy = defineRpcPolicy(
+  exampleRpcGroup,
+  {
+    query: { retry: false },
+    paths: {
+      users: {
+        query: { staleTime: 30_000 },
       },
+      "users.get": { query: { staleTime: 60_000 } },
     },
   },
-});
+  { keyPrefix: ["policy-app"] }
+);
 
 export const applicationQueries = (
-  client: RpcClient.RpcClient.Flat<RpcGroup.Rpcs<typeof exampleRpcGroup>>,
+  client: RpcClient.RpcClient<RpcGroup.Rpcs<typeof exampleRpcGroup>>,
   queryClient: QueryClient,
   notifyCreated: (name: string, requestedName: string) => void
 ) => {
@@ -34,24 +30,23 @@ export const applicationQueries = (
     client,
     keyPrefix: ["policy-app"],
   });
-  const writes = defineUtilsPolicy<ApplicationUtils["users"]["create"]>()({
+  const configured = configureUtils(base, applicationPolicy);
+  const create = configureUtils(configured.users.create, {
     mutation: {
       callbacks: "compose",
-      policy: {
-        onSuccess: async (user) => {
-          queryClient.setQueryData(
-            base.users.get.queryKey({ id: user.id, locale: user.locale }),
-            user
-          );
-          await queryClient.invalidateQueries({
-            queryKey: base.users.list.key(),
-          });
-        },
+      onSuccess: async (user) => {
+        queryClient.setQueryData(
+          base.users.get.queryKey({
+            input: { id: user.id, locale: user.locale },
+          }),
+          user
+        );
+        await queryClient.invalidateQueries({
+          queryKey: base.users.list.key(),
+        });
       },
     },
   });
-  const configured = configureUtils(base, applicationPolicy);
-  const create = configureUtils(configured.users.create, writes);
   return {
     rpc: configured,
     selectedUser: (id: number) =>

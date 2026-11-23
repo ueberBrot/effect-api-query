@@ -60,7 +60,7 @@ it.effect(
         keyPrefix: ["metadata-sharing"],
       });
       const http = configureUtils(base, {
-        metadata: { policy: { structuralSharing: shareMetadataSnapshot } },
+        metadata: { structuralSharing: shareMetadataSnapshot },
       });
       const queryClient = new QueryClient();
       const observer = new QueryObserver(

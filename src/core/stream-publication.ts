@@ -87,7 +87,6 @@ const finishPublication = async <A>(
   try {
     await iterator.return?.();
   } finally {
-    // A deadline can win while cancellation's finalizer failure is still in the pull.
     const remaining = await pull;
     if (remaining?.kind === "error") {
       // oxlint-disable-next-line eslint/no-unsafe-finally
@@ -155,7 +154,6 @@ export const streamPublicationBatches =
     try {
       while (!signal.aborted) {
         pull ??= pullNext();
-        // Pull sequentially to preserve event order and bound in-flight work.
         // oxlint-disable-next-line eslint/no-await-in-loop
         const result = await waitForPull(pull);
         if (result !== "deadline" && result.kind === "error") {
@@ -206,8 +204,6 @@ export const streamPublicationBatches =
     }
   };
 
-// Reuse the ordered consumer's deadline, single pull, and cleanup contract,
-// retaining only one unpublished complete-state snapshot.
 const coalescedSnapshots = async function* coalescedSnapshots<A>(
   source: AsyncIterable<A>,
   signal: AbortSignal,

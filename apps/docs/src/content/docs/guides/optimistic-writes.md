@@ -11,8 +11,8 @@ The Vite React example uses the same workflow for RPC and HTTP while keeping the
 
 When the server returns the new user, replace that write's temporary list entry. Also seed the exact detail keys for the returned user.
 
-- `rpcQuery.users.get.queryKey({ id: user.id, locale: user.locale })`
-- `httpQuery.users.get.queryKey({ params: { id: user.id }, query: { locale: user.locale } })`
+- `rpcQuery.users.get.queryKey({ input: { id: user.id, locale: user.locale } })`
+- `httpQuery.users.get.queryKey({ input: { params: { id: user.id }, query: { locale: user.locale } } })`
 
 A French response belongs under a French detail key. An RPC detail query that uses the default English locale has a different key.
 

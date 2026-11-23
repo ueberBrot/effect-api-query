@@ -3,8 +3,10 @@ export { skipToken } from "@tanstack/query-core";
 
 /** Creates the public RPC utility tree. @api public */
 export { createRpcQueryUtils } from "./rpc/create-utils";
+export { defineRpcPolicy } from "./rpc/create-utils";
 /** Creates the public HTTP utility tree. @api public */
 export { createHttpApiQueryUtils } from "./http/create-utils";
+export { defineHttpApiPolicy } from "./http/create-utils";
 export { fetchStreamSnapshot } from "./core/stream-snapshot";
 export type { StreamSnapshotOptions } from "./core/stream-snapshot";
 export { viewPrefix } from "./core/view-prefix";
@@ -26,7 +28,19 @@ export {
   infiniteQueryCodec,
   queryViewCodec,
 } from "./core/hydration";
-export type { HydrationCodec, HydrationRegistry } from "./core/hydration";
+export type {
+  HydrationCodec,
+  HydrationCodecErrorCode,
+  HydrationRegistry,
+  HydrationRegistryEntry,
+} from "./core/hydration";
+export { createContractHydrationRegistry } from "./core/contract-hydration";
+export type {
+  HttpContractHydrationOptions,
+  HttpContractHydrationViews,
+  RpcContractHydrationOptions,
+  RpcContractHydrationViews,
+} from "./core/contract-hydration-types";
 export { recoverStream } from "./core/stream-recovery";
 export type {
   RecoverStreamOptions,
@@ -69,11 +83,19 @@ export type {
   EffectRpcQueryConfigErrorCode,
   EffectRpcQueryKeyErrorCode,
 } from "./rpc/errors";
-export type { JsonValue, QueryData, RunPromiseExit } from "./core/types";
+export type {
+  JsonValue,
+  KeyPrefix,
+  OptionalKeyPrefix,
+  QueryData,
+  RunPromiseExit,
+  RuntimeInput,
+} from "./core/types";
 /** Types for annotating generated utilities and custom adapters. @api public */
 export type {
   CreateRpcQueryUtilsOptions,
   KeyEncoder,
+  ReadyRpcClient,
   RpcQueryUtils,
   StreamingRpcOptions,
   UnaryRpcOptions,
@@ -82,13 +104,20 @@ export type {
 /** The type of Query Core's exact skip sentinel. @api public */
 export type { SkipToken } from "@tanstack/query-core";
 
-export { configureUtils, defineUtilsPolicy } from "./core/configure-utils";
+export { configureUtils } from "./core/configure-utils";
 export type {
   ConfiguredUtils,
   UtilsConfiguration,
 } from "./core/configure-utils";
-export { createBranchQueryFilter } from "./core/branch-filter";
-export { findDeclaredError } from "./core/declared-error";
+export {
+  findDeclaredError,
+  getExecutionCause,
+  isEffectApiQueryError,
+  matchDeclaredError,
+  retryExecutionError,
+} from "./core/declared-error";
+export type { RetryExecutionErrorOptions } from "./core/declared-error";
+
 export { prepareInput } from "./core/prepared-input";
 export type { PreparedInput } from "./core/prepared-input";
 export { consumeEvents } from "./core/consume-events";
@@ -112,3 +141,9 @@ export {
 export type { QueryDescriptor } from "./core/query-descriptor";
 
 export { runQueryEvents } from "./core/query-events";
+
+export { bindReactivityInvalidation } from "./core/reactivity-invalidation";
+export type {
+  ReactivityInvalidationBinding,
+  ReactivityInvalidationOptions,
+} from "./core/reactivity-invalidation";

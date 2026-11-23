@@ -18,7 +18,7 @@ export const recoveredEvents = (
     readonly refresh: () => void;
   }
 ) => {
-  const refresh = client.documents.read().pipe(
+  const refresh = http.documents.read.effect().pipe(
     Effect.tap((document) =>
       queryEffects
         .setData(http.documents.read.queryKey(), document)
@@ -47,7 +47,7 @@ export const recoveredEvents = (
     },
     onGap: () => refresh,
     onReplayExpired: () =>
-      client.feeds.snapshot().pipe(
+      http.feeds.snapshot.effect().pipe(
         Effect.tap(() => refresh),
         Effect.map(({ cursor }) => String(cursor))
       ),
@@ -63,10 +63,12 @@ export const recoveredEvents = (
       {
         onEvent: (event) =>
           queryEffects
-            .invalidate({
-              queryKey: http.documents.read.queryKey(),
-              refetchType: "active",
-            })
+            .invalidate(
+              http.documents.read.queryFilter({
+                view: "query",
+                refetchType: "active",
+              })
+            )
             .pipe(
               Effect.andThen(
                 Effect.sync(() => {

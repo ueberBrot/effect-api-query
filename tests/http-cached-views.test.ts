@@ -242,14 +242,10 @@ it.effect("dispatches empty named SSE events only when requested", () =>
     }
 
     for (const order of ["root-first", "leaf-first"] as const) {
-      const root = { streamed: { policy: { maxChunks: 2 } } };
+      const root = { streamed: { maxChunks: 2 } };
       const specific = {
-        scoped: {
-          events: {
-            scoped: {
-              watch: { streamed: { policy: { maxChunks: 1 } } },
-            },
-          },
+        paths: {
+          "events.watch": { streamed: { maxChunks: 1 } },
         },
       };
       const configured =
@@ -314,7 +310,7 @@ it.effect(
       );
       const decoderHttp = createHttpApiQueryUtils(api, {
         client: decoderClient,
-        keyPrefix: ["decoder"],
+        keyPrefix: ["views"],
       });
       const failed = yield* Effect.promise(
         async () =>
@@ -605,55 +601,47 @@ it.effect(
     })
 );
 
-it.effect(
-  "freezes custom HTTP metadata sharing without freezing manual cache writes",
-  () =>
-    Effect.gen(function* freezeSharedMetadataWithMutableManualWrites() {
-      const client = yield* makeClient(() =>
-        Response.json("document", {
-          status: 203,
-          headers: { etag: "revision" },
-        })
-      );
-      const http = createHttpApiQueryUtils(api, {
-        client,
-        keyPrefix: ["metadata-sharing"],
-      });
-      const queryClient = new QueryClient();
-      yield* Effect.addFinalizer(() =>
-        Effect.sync(() => {
-          queryClient.clear();
-        })
-      );
-      const options = http.items.read.metadataOptions();
-      yield* Effect.promise(async () => await queryClient.query(options));
-      queryClient.setQueryDefaults(http.items.read.key(), {
-        structuralSharing: (_previous, data) => {
-          if (!Predicate.isObject(data)) {
-            throw new TypeError("Expected a metadata view");
-          }
-          return { ...data, status: 211 };
-        },
-      });
-      yield* Effect.promise(
-        async () => await queryClient.query(http.items.read.metadataOptions())
-      );
-      const shared = queryClient.getQueryData(options.queryKey);
-      if (shared === undefined) {
-        throw new TypeError("Expected cached metadata");
-      }
-      expect({
-        status: shared.status,
-        view: Object.isFrozen(shared),
-        headers: Object.isFrozen(shared.headers),
-      }).toStrictEqual({ status: 211, view: true, headers: true });
-      const manual = { ...shared, headers: { etag: "manual" } };
-      queryClient.setQueryData(options.queryKey, manual);
-      expect({
-        view: Object.isFrozen(manual),
-        headers: Object.isFrozen(manual.headers),
-      }).toStrictEqual({ view: false, headers: false });
-    })
+it.effect("freezes metadata after changing the prefix sharing policy", () =>
+  Effect.gen(function* freezeMetadataAfterPolicyChange() {
+    const client = yield* makeClient(() =>
+      Response.json("document", {
+        status: 203,
+        headers: { etag: "revision" },
+      })
+    );
+    const http = createHttpApiQueryUtils(api, {
+      client,
+      keyPrefix: ["metadata-sharing"],
+    });
+    const queryClient = new QueryClient();
+    yield* Effect.addFinalizer(() =>
+      Effect.sync(() => {
+        queryClient.clear();
+      })
+    );
+    const options = http.items.read.metadataOptions();
+    yield* Effect.promise(async () => await queryClient.query(options));
+    queryClient.setQueryDefaults(http.items.read.key(), {
+      structuralSharing: (_previous, data) => {
+        if (!Predicate.isObject(data)) {
+          throw new TypeError("Expected a metadata view");
+        }
+        return { ...data, status: 211 };
+      },
+    });
+    yield* Effect.promise(
+      async () => await queryClient.query(http.items.read.metadataOptions())
+    );
+    const shared = queryClient.getQueryData(options.queryKey);
+    if (shared === undefined) {
+      throw new TypeError("Expected cached metadata");
+    }
+    expect({
+      status: shared.status,
+      view: Object.isFrozen(shared),
+      headers: Object.isFrozen(shared.headers),
+    }).toStrictEqual({ status: 211, view: true, headers: true });
+  })
 );
 
 describe.each(["global", "prefix"] as const)(
@@ -988,7 +976,7 @@ it.effect(
         sseOptions: { maxEventSize: 128, dispatchEmptyNamedEvents: true },
       };
       const configured = configureUtils(leaf, {
-        live: { policy: { coalesceMs: 1000 } },
+        live: { coalesceMs: 1000 },
       });
       const queryClient = new QueryClient();
       const publications: unknown[] = [];

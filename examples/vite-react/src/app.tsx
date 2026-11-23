@@ -1,6 +1,5 @@
 import { WorkflowNavigation } from "@effect-api-query/shared/http-workflows/app.tsx";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { createQueryUtilsContext } from "@ueberbrot/effect-api-query/react";
 
 import { CommandsSection } from "./components/sections/commands-section.tsx";
 import { DiagnosticsSection } from "./components/sections/diagnostics-section.tsx";
@@ -9,49 +8,42 @@ import { MutationsSection } from "./components/sections/mutations-section.tsx";
 import { QueriesSection } from "./components/sections/queries-section.tsx";
 import type { ViteReactApplication } from "./lib/application.ts";
 
-const ExampleContent = ({
-  application,
-}: {
-  readonly application: ViteReactApplication;
-}) => (
-  <div className="app-backdrop text-text-secondary min-h-screen antialiased">
-    <main className="mx-auto grid max-w-7xl gap-5 px-5 py-12 md:grid-cols-2">
-      <header className="border-border border-l-brand-600 bg-card shadow-shadow/50 border p-6 shadow-2xl md:col-span-2 md:border-l-4 md:p-8">
-        <WorkflowNavigation />
-        <h1 className="display-heading tracking-display text-foreground max-w-4xl text-3xl font-black sm:text-5xl">
-          Compare full queries, pages, and streams
-        </h1>
-        <p className="text-muted-foreground mt-5 max-w-3xl leading-7">
-          See how generated Effect HTTP and RPC options share a directory,
-          append cursor-based pages, retain stream history, and display the
-          latest live value.
-        </p>
-      </header>
+const { Provider, useQueryUtils } =
+  createQueryUtilsContext<ViteReactApplication>();
 
-      <HttpSection application={application} />
-      <QueriesSection application={application} />
-      <MutationsSection application={application} />
-      <DiagnosticsSection application={application} />
-      <CommandsSection application={application} />
-    </main>
-  </div>
-);
+const ExampleContent = () => {
+  const application = useQueryUtils();
+  return (
+    <div className="app-backdrop text-text-secondary min-h-screen antialiased">
+      <main className="mx-auto grid max-w-7xl gap-5 px-5 py-12 md:grid-cols-2">
+        <header className="border-border border-l-brand-600 bg-card shadow-shadow/50 border p-6 shadow-2xl md:col-span-2 md:border-l-4 md:p-8">
+          <WorkflowNavigation />
+          <h1 className="display-heading tracking-display text-foreground max-w-4xl text-3xl font-black sm:text-5xl">
+            Compare full queries, pages, and streams
+          </h1>
+          <p className="text-muted-foreground mt-5 max-w-3xl leading-7">
+            See how generated Effect HTTP and RPC options share a directory,
+            append cursor-based pages, retain stream history, and display the
+            latest live value.
+          </p>
+        </header>
+
+        <HttpSection application={application} />
+        <QueriesSection application={application} />
+        <MutationsSection application={application} />
+        <DiagnosticsSection application={application} />
+        <CommandsSection application={application} />
+      </main>
+    </div>
+  );
+};
 
 export const ViteReactExample = ({
   application,
 }: {
   readonly application: ViteReactApplication;
-}) => {
-  const boundary = useMemo(
-    () => ({
-      client: application.queryClient,
-      key: globalThis.crypto.randomUUID(),
-    }),
-    [application.queryClient]
-  );
-  return (
-    <QueryClientProvider key={boundary.key} client={boundary.client}>
-      <ExampleContent application={application} />
-    </QueryClientProvider>
-  );
-};
+}) => (
+  <Provider utils={application} client={application.queryClient}>
+    <ExampleContent />
+  </Provider>
+);

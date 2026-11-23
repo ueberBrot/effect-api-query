@@ -14,6 +14,7 @@ import nodePath from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { compilerCommand, currentCompiler } from "./compiler.mts";
+import { capture, run as runCommand } from "./lib/exec.mts";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const fixtures = nodePath.join(root, "tests/framework-consumers");
@@ -32,8 +33,13 @@ const project = nodePath.join(
   directory,
   selected.length > 0 ? "tsconfig.selected.json" : "tsconfig.json"
 );
-const run = (command: string, commandArgs: string[], cwd = directory) =>
-  execFileSync(command, commandArgs, { cwd, stdio: "inherit" });
+const run = (
+  command: string,
+  commandArgs: readonly string[],
+  cwd = directory
+) => {
+  runCommand(command, commandArgs, { cwd });
+};
 
 try {
   for (const entry of readdirSync(fixtures)) {
@@ -92,14 +98,14 @@ try {
     directory,
     "node_modules/@ueberbrot/effect-api-query"
   );
-  const resolved = execFileSync(
+  const resolved = capture(
     process.execPath,
     [
       "--input-type=module",
       "--eval",
       "process.stdout.write(import.meta.resolve('@ueberbrot/effect-api-query'))",
     ],
-    { cwd: directory, encoding: "utf-8" }
+    { cwd: directory }
   );
   const entry = realpathSync(fileURLToPath(resolved));
   ok(
