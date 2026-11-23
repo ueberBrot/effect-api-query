@@ -11,7 +11,7 @@ One `effect-api-query` skill covers the library. Its activation description supp
 | RPC | Payload construction, canonical identity, ready-client lifetime |
 | HTTP | Decoded requests, SSE and NDJSON, multipart mutations, metadata |
 | Query patterns | Inference, skipping, pages, publication batches, recovery and tracing |
-| Cache workflows | Typed policies, interceptors, partial filters, writes, Effect cache operations, Reactivity invalidation, and owners |
+| Cache workflows | Typed policies, interceptors, partial filters, writes, Effect cache operations, Reactivity invalidation, owners, and scoped event consumption |
 | Hydration and SSR | Snapshots, contract-derived registries, typed view overrides, preparation and cleanup |
 | Frameworks and hosts | Optional React providers, Suspense, reactive accessors, declared peers and checked combinations, transports and hosts |
 
@@ -47,6 +47,8 @@ The usability batch reuses the existing executable consumer fixtures:
 | Acquire, provide, render, and dispose a minimal React application | `tests/types/docs-react-setup.tsx`, `tests/types/docs-react-entry.ts`, `examples/vite-react/tests/minimal-setup.test.tsx` |
 | Reset initial Suspense errors, retain failed-refetch data, start reads together | `tests/types/docs-suspense.tsx`, `tests/types/react-queries-contract.tsx`, `examples/vite-react/tests/suspense-recovery.test.tsx` |
 | Trace lazy stream emissions and awaited cleanup | `tests/types/docs-stream-tracing.ts`, `examples/vite-react/tests/stream-tracing.test.ts` |
+| Consume events with an owner's cache and a managed runtime | `tests/types/query-events-contract.ts`, `tests/query-events.test.ts` |
+| Derive hydration codecs from encodable contract success schemas | `tests/contract-hydration.test.ts` |
 
 These checks verify the recommended APIs and observable behavior. A fresh isolated consumer session supplies separate evidence. This authoring session does not establish skill discovery or consumer reliability.
 

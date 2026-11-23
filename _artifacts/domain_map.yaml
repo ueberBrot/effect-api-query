@@ -46,7 +46,7 @@ skills:
       - Apply native defaults and scoped policies without losing call-site selection, conditional input, or explicitly undefined seed behavior; compose mutation callbacks or intercept native execution attempts.
       - Reuse equivalent immutable decoded records and nested containers with a schema-specific structuralSharing policy while preserving metadata freezing and generated types.
       - Capture open streams and drain queries, preparation, and accepted writes before request disposal.
-      - Derive registries from matching contracts, override unsupported schemas, and hydrate selected views into their decoded cache representation. Use cached HTTP metadata status to select declared successes. Preserve nested union members with overlapping JSON encodings and distinct undefined stream elements. Set view overrides directly on configuration objects.
+      - Derive registries from matching contracts, override unsupported schemas and broad object schemas without an explicit JSON codec, and hydrate selected views into their decoded cache representation. Use cached HTTP metadata status to select declared successes. Preserve nested union members with overlapping JSON encodings and distinct undefined stream elements. Set view overrides directly on configuration objects.
       - Exclude retained errors and fetch failure reasons from successful queries in public snapshots.
       - Preserve neighboring writes and originating ownership during mutation overlap.
       - Defer event refresh until participating writes settle.
@@ -55,7 +55,7 @@ skills:
       - Acquire a ready client and track its utility tree for retirement. In React, use a keyed owner provider and await caller-managed cleanup.
       - Recover initial Suspense failures, retain cached data after failed refetches, and start independent reads together with native cancellation limits.
       - Recover stream delivery with numeric convenience or explicit application cursor acceptance/order and gap detection, authoritative replay refresh, full hook inference, and cancellable backoff.
-      - Map recovered events explicitly to generated-key updates and filter invalidation in one query owner; await sequential handlers and retirement cleanup, and keep durable checkpoints and retained history under application policy.
+      - Pass a managed runtime or runner to consume recovered events in one query owner. Map events to exact updates and filter invalidation. Await sequential handlers and retirement cleanup. Keep durable checkpoints and retained history under application policy.
       - Trace the consumed Stream and its cleanup while its owning runtime remains alive.
       - Rebuild options inside native reactive framework accessors.
       - Match documentation to the installed package, distinguish declared peer requirements from checked native hook combinations, and choose an application-owned transport within documented host boundaries.
