@@ -5,7 +5,6 @@ import type { Cause } from "effect";
 import { createBranchFilter } from "./branch-filter";
 import type { FilterPath } from "./branch-filter";
 import { canonicalizeArray } from "./canonical-key";
-import type { UtilityNode } from "./configure-utils";
 import type { QueryView } from "./inference";
 import { prepareMetadataExecution } from "./metadata-query";
 import type {
@@ -35,6 +34,8 @@ import type {
   RuntimeInput,
   StreamedPolicyOptions,
 } from "./types";
+import { defineLazyLeafDescriptor } from "./utility-node";
+import type { UtilityNode } from "./utility-node";
 import { validateUtilityPaths } from "./utility-path";
 import type { UtilityPath } from "./utility-path";
 
@@ -596,58 +597,11 @@ export interface LeafRuntimeDescriptor {
   ) => Record<string, unknown>;
 }
 
-export interface LazyLeafSlot {
-  readonly materialize: () => Record<string, unknown> & UtilityNode;
-  readonly ownerToken?: symbol | undefined;
-}
-
 const leafDescriptors = new WeakMap<UtilityNode, LeafRuntimeDescriptor>();
-const lazyLeafGetters = new WeakMap<() => unknown, LazyLeafSlot>();
 
 export const readLeafDescriptor = (
   node: UtilityNode
 ): LeafRuntimeDescriptor | undefined => leafDescriptors.get(node);
-
-export const defineLazyLeafDescriptor = (
-  materialize: () => Record<string, unknown> & UtilityNode,
-  ownerToken?: symbol
-): PropertyDescriptor => {
-  let cached: (Record<string, unknown> & UtilityNode) | undefined;
-  const get = () => {
-    cached ??= materialize();
-    return cached;
-  };
-  lazyLeafGetters.set(get, { materialize: get, ownerToken });
-  return {
-    enumerable: true,
-    configurable: false,
-    get,
-  };
-};
-
-export const readLazyLeafSlot = (
-  descriptor: PropertyDescriptor | undefined
-): LazyLeafSlot | undefined => {
-  // oxlint-disable-next-line typescript/unbound-method
-  const getter = descriptor?.get;
-  return getter === undefined ? undefined : lazyLeafGetters.get(getter);
-};
-
-export const buildBranchFrom = (
-  source: Record<string, unknown> & UtilityNode,
-  replacements: ReadonlyMap<string, PropertyDescriptor>
-): Record<string, unknown> & UtilityNode => {
-  const next: Record<string, unknown> = {};
-  for (const name of Object.keys(source)) {
-    const descriptor =
-      replacements.get(name) ?? Object.getOwnPropertyDescriptor(source, name);
-    if (descriptor !== undefined) {
-      Object.defineProperty(next, name, descriptor);
-    }
-  }
-  // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
-  return Object.freeze(next) as Record<string, unknown> & UtilityNode;
-};
 
 interface BuildBranch {
   readonly node: Record<string, unknown>;

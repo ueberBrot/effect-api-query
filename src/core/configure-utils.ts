@@ -33,16 +33,8 @@ import type {
   UnaryQueryBuilderDescriptor,
   utilityPaths,
 } from "./types";
-import {
-  buildBranchFrom,
-  defineLazyLeafDescriptor,
-  readLazyLeafSlot,
-} from "./utility-tree";
-import type { LazyLeafSlot } from "./utility-tree";
-
-export interface UtilityNode {
-  readonly key: () => QueryKey;
-}
+import { mapUtilityChildren, readUtilityChild } from "./utility-node";
+import type { RuntimeUtilityNode, UtilityNode } from "./utility-node";
 
 export type StreamKeyPolicy<Leaf, View extends "streamed" | "live"> =
   Leaf extends Record<`${View}Key`, (...args: infer Args) => unknown>
@@ -377,7 +369,6 @@ type RuntimePolicyMap = Partial<Record<ConfigurationViews, RuntimeOptions>> & {
   readonly paths?: Readonly<Record<string, RuntimePolicyMap>>;
 };
 
-export type RuntimeNode = Record<string, unknown> & UtilityNode;
 type RuntimeBuilder = (...args: unknown[]) => unknown;
 
 export interface ConfigurationLayer {
@@ -386,36 +377,36 @@ export interface ConfigurationLayer {
 }
 
 const configuredLeaves = new WeakMap<
-  RuntimeNode,
+  RuntimeUtilityNode,
   {
-    readonly original: RuntimeNode;
+    readonly original: RuntimeUtilityNode;
     readonly layers: readonly ConfigurationLayer[];
   }
 >();
 
 const trackedLeaves = new WeakMap<
-  RuntimeNode,
+  RuntimeUtilityNode,
   {
-    readonly base: RuntimeNode;
-    readonly wrap: (node: RuntimeNode) => RuntimeNode;
+    readonly base: RuntimeUtilityNode;
+    readonly wrap: (node: RuntimeUtilityNode) => RuntimeUtilityNode;
   }
 >();
 
 export const registerLeafTracking = (
-  tracked: RuntimeNode,
-  base: RuntimeNode,
-  wrap: (node: RuntimeNode) => RuntimeNode
+  tracked: RuntimeUtilityNode,
+  base: RuntimeUtilityNode,
+  wrap: (node: RuntimeUtilityNode) => RuntimeUtilityNode
 ): void => {
   trackedLeaves.set(tracked, { base, wrap });
 };
 
-export const readConfiguredLeaf = (node: RuntimeNode) =>
+export const readConfiguredLeaf = (node: RuntimeUtilityNode) =>
   configuredLeaves.get(node);
 
 export const reapplyLeafConfiguration = (
-  base: RuntimeNode,
+  base: RuntimeUtilityNode,
   layers: readonly ConfigurationLayer[]
-): RuntimeNode => {
+): RuntimeUtilityNode => {
   const tracking = trackedLeaves.get(base);
   const configured = configureLeaf(
     tracking?.base ?? base,
@@ -425,9 +416,6 @@ export const reapplyLeafConfiguration = (
   configuredLeaves.set(result, { original: base, layers });
   return result;
 };
-
-const isUtilityChild = (child: RuntimeNode[string]): child is RuntimeNode =>
-  Predicate.hasProperty(child, "key") && Predicate.isFunction(child.key);
 
 const views: readonly QueryView[] = [
   "query",
@@ -605,9 +593,9 @@ const scopeConfigurations = (
 };
 
 const configureLeaf = (
-  node: RuntimeNode,
+  node: RuntimeUtilityNode,
   configurations: readonly RuntimeConfiguration[]
-): RuntimeNode => {
+): RuntimeUtilityNode => {
   const configured = { ...node };
   const streamPolicies: Partial<Record<"live" | "streamed", RuntimeOptions>> =
     {};
@@ -701,40 +689,10 @@ const configureLeaf = (
   return configured;
 };
 
-type ChildEntry =
-  | {
-      readonly kind: "branch";
-      readonly name: string;
-      readonly node: RuntimeNode;
-    }
-  | {
-      readonly kind: "lazy";
-      readonly name: string;
-      readonly slot: LazyLeafSlot;
-    };
-
-const readChildEntry = (
-  node: RuntimeNode,
-  name: string
-): ChildEntry | undefined => {
-  const descriptor = Object.getOwnPropertyDescriptor(node, name);
-  if (descriptor?.enumerable !== true) {
-    return undefined;
-  }
-  const slot = readLazyLeafSlot(descriptor);
-  if (slot !== undefined) {
-    return { kind: "lazy", name, slot };
-  }
-  if ("value" in descriptor && isUtilityChild(descriptor.value)) {
-    return { kind: "branch", name, node: descriptor.value };
-  }
-  return undefined;
-};
-
 const configureLeafNode = (
-  node: RuntimeNode,
+  node: RuntimeUtilityNode,
   configurations: readonly ConfigurationLayer[]
-): RuntimeNode => {
+): RuntimeUtilityNode => {
   const previous = configuredLeaves.get(node);
   const original = previous?.original ?? node;
   const layers = EffectArray.sortWith(
@@ -751,11 +709,11 @@ interface ConfigurationPlan {
 }
 
 const resolvePath = (
-  node: RuntimeNode,
+  node: RuntimeUtilityNode,
   path: string
 ): readonly (readonly string[])[] => {
   const matches: string[][] = [];
-  if (readChildEntry(node, path) !== undefined) {
+  if (readUtilityChild(node, path) !== undefined) {
     matches.push([path]);
   }
   for (
@@ -763,10 +721,10 @@ const resolvePath = (
     dot !== -1;
     dot = path.indexOf(".", dot + 1)
   ) {
-    const child = readChildEntry(node, path.slice(0, dot));
+    const child = readUtilityChild(node, path.slice(0, dot));
     if (child?.kind === "branch") {
       for (const tail of resolvePath(child.node, path.slice(dot + 1))) {
-        matches.push([child.name, ...tail]);
+        matches.push([path.slice(0, dot), ...tail]);
       }
     }
   }
@@ -774,7 +732,7 @@ const resolvePath = (
 };
 
 const planConfiguration = (
-  node: RuntimeNode,
+  node: RuntimeUtilityNode,
   configuration: RuntimePolicyMap
 ): ConfigurationPlan => {
   const leaf = configurationViews.some((view) =>
@@ -817,10 +775,10 @@ const planConfiguration = (
 };
 
 const configureNode = (
-  node: RuntimeNode,
+  node: RuntimeUtilityNode,
   inherited: readonly ConfigurationLayer[],
   plan: ConfigurationPlan | undefined
-): RuntimeNode => {
+): RuntimeUtilityNode => {
   const configurations =
     plan?.options === undefined
       ? inherited
@@ -837,44 +795,31 @@ const configureNode = (
   ) {
     return configureLeafNode(node, configurations);
   }
-  const replacements = new Map<string, PropertyDescriptor>();
-  for (const name of names) {
-    const entry = readChildEntry(node, name);
-    if (entry === undefined) {
-      continue;
-    }
-    const childPlan = plan?.children.get(name);
-    if (entry.kind === "lazy") {
-      const leafConfigurations =
-        childPlan?.options === undefined
-          ? configurations
-          : [
-              ...configurations,
-              { depth: node.key().length + 1, options: childPlan.options },
-            ];
-      if (leafConfigurations.length > 0) {
-        replacements.set(
-          name,
-          defineLazyLeafDescriptor(
-            () =>
-              configureLeafNode(entry.slot.materialize(), leafConfigurations),
-            entry.slot.ownerToken
-          )
-        );
-      }
-    } else {
-      const next = configureNode(entry.node, configurations, childPlan);
-      if (next !== entry.node) {
-        replacements.set(name, {
-          value: next,
-          enumerable: true,
-          writable: false,
-          configurable: false,
-        });
-      }
-    }
-  }
-  return replacements.size === 0 ? node : buildBranchFrom(node, replacements);
+  return (
+    mapUtilityChildren(
+      node,
+      (child, name) =>
+        configureNode(child, configurations, plan?.children.get(name)),
+      (slot, name) => {
+        const childOptions = plan?.children.get(name)?.options;
+        const leafConfigurations =
+          childOptions === undefined
+            ? configurations
+            : [
+                ...configurations,
+                { depth: node.key().length + 1, options: childOptions },
+              ];
+        return leafConfigurations.length === 0
+          ? slot
+          : {
+              materialize: () =>
+                configureLeafNode(slot.materialize(), leafConfigurations),
+              ownerToken: slot.ownerToken,
+            };
+      },
+      names
+    ) ?? node
+  );
 };
 
 /** Applies root, branch, and leaf configuration while preserving generated cache identity. */
@@ -886,7 +831,7 @@ export const configureUtils = <
   configuration: CheckedConfiguration<Node, Configuration>
 ): ConfiguredUtils<Node, Configuration> => {
   // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
-  const node = tree as RuntimeNode;
+  const node = tree as RuntimeUtilityNode;
   const settings: object = configuration;
   // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
   const options = settings as RuntimePolicyMap;

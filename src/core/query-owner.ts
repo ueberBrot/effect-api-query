@@ -24,17 +24,11 @@ import {
   registerLeafTracking,
   reapplyLeafConfiguration,
 } from "./configure-utils";
-import type { UtilityNode } from "./configure-utils";
 import { resolveRuntime } from "./runtime";
 import type { RunPromiseExit, RuntimeInput } from "./types";
-import {
-  buildBranchFrom,
-  defineLazyLeafDescriptor,
-  readLazyLeafSlot,
-  readLeafDescriptor,
-} from "./utility-tree";
-
-type RuntimeUtilityNode = RuntimeOptions & UtilityNode;
+import { isUtilityNode, mapUtilityChildren } from "./utility-node";
+import type { RuntimeUtilityNode, UtilityNode } from "./utility-node";
+import { readLeafDescriptor } from "./utility-tree";
 
 const trackedOwners = new WeakMap<UtilityNode, symbol>();
 
@@ -45,13 +39,6 @@ const queryOptionNames = [
   "liveOptions",
   "streamedOptions",
 ] as const;
-
-const isUtilityChild = (
-  value: RuntimeUtilityNode[string]
-): value is RuntimeUtilityNode =>
-  Predicate.isObject(value) &&
-  Predicate.hasProperty(value, "key") &&
-  Predicate.isFunction(value.key);
 
 /** Registers only resources whose lifetime is explicitly transferred to the owner. */
 export interface QueryOwnerSetup extends Omit<
@@ -290,67 +277,30 @@ export const acquireQueryOwner = async <A>(
       trackedOwners.set(trackedConfigured, ownerToken);
       return trackedConfigured;
     }
-    let hasChildren = false;
-    const replacements = new Map<string, PropertyDescriptor>();
-    for (const name of Object.keys(node)) {
-      if (name === "key" || name === "queryFilter") {
-        continue;
+    const frozen = mapUtilityChildren(node, trackNode, (slot) => {
+      if (slot.ownerToken === undefined) {
+        return { materialize: () => trackNode(slot.materialize()), ownerToken };
       }
-      const descriptor = Object.getOwnPropertyDescriptor(node, name);
-      if (descriptor === undefined) {
-        continue;
-      }
-      const slot = readLazyLeafSlot(descriptor);
-      if (slot !== undefined) {
-        hasChildren = true;
-        if (slot.ownerToken !== undefined) {
-          if (slot.ownerToken !== ownerToken) {
-            throw new Error(
-              "Utility node is already tracked by another query owner"
-            );
-          }
-          continue;
-        }
-        replacements.set(
-          name,
-          defineLazyLeafDescriptor(
-            () => trackNode(slot.materialize()),
-            ownerToken
-          )
+      if (slot.ownerToken !== ownerToken) {
+        throw new Error(
+          "Utility node is already tracked by another query owner"
         );
-        continue;
       }
-      if ("value" in descriptor && isUtilityChild(descriptor.value)) {
-        hasChildren = true;
-        const trackedChild = trackNode(descriptor.value);
-        if (trackedChild !== descriptor.value) {
-          replacements.set(name, {
-            value: trackedChild,
-            enumerable: true,
-            writable: false,
-            configurable: false,
-          });
-        }
-      }
-    }
-    if (!hasChildren) {
+      return slot;
+    });
+    if (frozen === undefined) {
       return trackLeaf(node);
     }
-    if (replacements.size === 0) {
+    if (frozen === node) {
       return node;
     }
-    const frozen = buildBranchFrom(node, replacements);
     trackedOwners.set(frozen, ownerToken);
     return frozen;
   };
   const trackUtils: QueryOwner<A>["trackUtils"] = <Node extends UtilityNode>(
     node: Node
   ): Node => {
-    if (
-      !Predicate.isObject(node) ||
-      !Predicate.hasProperty(node, "key") ||
-      !Predicate.isFunction(node.key)
-    ) {
+    if (!isUtilityNode(node)) {
       throw new TypeError("Expected a generated utility tree, branch, or leaf");
     }
     // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
