@@ -14,6 +14,7 @@ import { validateStreamHash } from "./stream-hash-index";
 import {
   streamLiveSnapshots,
   streamPublicationBatches,
+  streamQueryIterable,
 } from "./stream-publication";
 import { closeScopeOnPullEnd } from "./stream-pull";
 import type {
@@ -239,8 +240,8 @@ export const makeStreamQuery = ({
 }: MakeStreamQueryOptions) => {
   const validateHash = (context: QueryFunctionContext) =>
     validateStreamHash(context, unsupportedHash);
-  const streamFn = async ({ signal }: { readonly signal: AbortSignal }) => {
-    const stream = Stream.unwrap(
+  const guardedStream = (signal: AbortSignal) =>
+    Stream.unwrap(
       Effect.gen(function* consumeStream() {
         const scope = yield* Scope.make();
         yield* Effect.addFinalizer((exit) =>
@@ -273,6 +274,10 @@ export const makeStreamQuery = ({
         );
       })
     );
+  const openStream = async <A>(
+    stream: Stream.Stream<A, unknown, unknown>,
+    signal: AbortSignal
+  ) => {
     // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
     const exit = await runPromiseExit(Stream.toAsyncIterableEffect(stream), {
       signal,
@@ -280,7 +285,7 @@ export const makeStreamQuery = ({
     if (Exit.isFailure(exit)) {
       throw executionError(exit.cause);
     }
-    return exit.value;
+    return streamQueryIterable(exit.value, signal);
   };
 
   if (policy._tag === "Live") {
@@ -291,11 +296,13 @@ export const makeStreamQuery = ({
       }
       return await consumeQueryStream(
         context,
-        streamLiveSnapshots(
-          await streamFn(context),
-          context.signal,
-          policy.coalesceMs,
-          emptyError
+        await openStream(
+          streamLiveSnapshots(
+            guardedStream(context.signal),
+            policy.coalesceMs,
+            emptyError
+          ),
+          context.signal
         ),
         null,
         // oxlint-disable-next-line anti-slop/no-unknown-parameters
@@ -314,11 +321,13 @@ export const makeStreamQuery = ({
     if (reset) {
       query.setState({ ...query.resetState, fetchStatus: "fetching" });
     }
-    const batches = streamPublicationBatches(
-      await streamFn(context),
-      publicationBatchSize,
-      context.signal,
-      publicationMaxWaitMs
+    const batches = await openStream(
+      streamPublicationBatches(
+        guardedStream(context.signal),
+        publicationBatchSize,
+        publicationMaxWaitMs
+      ),
+      context.signal
     );
     if (isRefetch && refetchMode === "replace") {
       return await consumeReplacement(context, batches, maxChunks);

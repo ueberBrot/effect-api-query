@@ -370,6 +370,7 @@ export default defineConfig({
           "examples/shared/query-events.ts",
           "examples/shared/application-policy.ts",
           "tests/query-view-prefix.test.ts",
+          "tests/publication-deadline.test.ts",
           "tests/stream-publication.test.ts",
           "tests/live-coalescing.test.ts",
           "tests/stream-recovery.test.ts",
