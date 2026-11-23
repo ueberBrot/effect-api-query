@@ -29,6 +29,11 @@ const syntaxNodes = (
         ts.isJsxText(node)
       ) {
         ({ text } = node);
+      } else if (
+        ts.isPrefixUnaryExpression(node) ||
+        ts.isPostfixUnaryExpression(node)
+      ) {
+        text = String(node.operator);
       } else if (ts.isVariableDeclarationList(node)) {
         text = String(node.getFirstToken()?.kind);
       }

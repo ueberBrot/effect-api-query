@@ -157,6 +157,7 @@ test("uses canonical repository links and serves branded icons", async ({
 });
 
 test("shows the built package version without consulting the registry", async ({
+  browser,
   page,
   request,
 }) => {
@@ -165,15 +166,20 @@ test("shows the built package version without consulting the registry", async ({
     registryRequests.push(route.request().url());
     await route.fulfill({ json: { version: "1.2.3-beta.1" } });
   });
-  const response = await page.goto(docsBase, { waitUntil: "networkidle" });
-  if (response === null) {
-    throw new Error("The docs page must return its built HTML");
+  const staticContext = await browser.newContext({ javaScriptEnabled: false });
+  try {
+    const staticPage = await staticContext.newPage();
+    await staticPage.goto(docsBase);
+    const versionLink = staticPage.getByRole("link", {
+      name: packageLabel,
+      exact: true,
+    });
+    await expect(versionLink).toHaveAttribute("href", packageUrl);
+    await expect(versionLink).toHaveText(packageVersion);
+  } finally {
+    await staticContext.close();
   }
-  const html = await response.text();
-  expect(html).toContain(`href="${packageUrl}"`);
-  expect(html).toContain(`aria-label="${packageLabel}"`);
-  expect(html).toContain(`>${packageVersion}</a>`);
-  expect(html).not.toContain("package-version.js");
+  await page.goto(docsBase, { waitUntil: "networkidle" });
   const versionResponse = await request.get(`${docsBase}package-version.json`);
   expect(versionResponse.ok()).toBe(true);
   expect(versionResponse.headers()["content-type"]).toContain(

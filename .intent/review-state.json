@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "8000ae2ad1ca950abd2d1c47bdebc27d52fe4478d92e3620c85abb930b6b2409",
+      "fingerprint": "f2f18ca864086b449f15e19e285c58034dd857788114e0b912bf949d26393454",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -166,7 +166,7 @@
         "examples/tanstack-start/tests/application.test.ts": "c6fcd55703e96cc9f07800ec9f799721cbb4d88d9ea81f5295ccde8b2f1c7be0",
         "examples/tanstack-start/tests/async-hydration.test.ts": "cd0de37ce7df4a68dc98366bf8bd620c39cee48d39f2ac285981e40412e8d467",
         "examples/tanstack-start/tests/client-navigation.test.tsx": "40349f7559078dbd23af9763a49935da479c0dbc955472ffa56fd5d174f999e6",
-        "examples/tanstack-start/tests/failure-dehydration.test.ts": "2436de3fcf69b60d3c70890b0772b453aae0823dd1e22a0a3fbbe7b49e1cdcf0",
+        "examples/tanstack-start/tests/failure-dehydration.test.ts": "326574cfefebfdc1f8e2050a0369643c648455bb6c201ef070658eb0293dfc18",
         "examples/tanstack-start/tests/featured-selection.test.ts": "3a6e1db27843a392d354cb58ab7b8d7bfaf327ffe42910118d426d42875f1123",
         "examples/tanstack-start/tests/server-local.test.ts": "6d04b85b3e584deb8e4b6f847235ceab8a811eb2d3837dc209f89cf87cf0d291",
         "examples/tanstack-start/tests/server-render.test.tsx": "dd2ea45a1e610055ba7ef68f3a6140e06eaf43ad806e0bdc6757d9c63fba86c7",
@@ -188,7 +188,7 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "b6a65ce399862be0b587459bea7b3e504c930b28327f6888e89cab0cd371d2cb",
-        "package.json": "d95b655af6d656439400b7cf45b7e5e1e75edacad4bcb1085d1dfc4c9cb6c639",
+        "package.json": "53d2b60ed9c21a7f2ed3c993f96d2e3551fd1020ed9eb0c033413514819d0500",
         "pnpm-workspace.yaml": "fc4bff1fa9ef4a4887691c6e004e02829736f93ee07efcb563f78f836a21a276",
         "scripts/check-effect-compatibility.mts": "539bf68dc1e6a95a857ccc7491c623df65fa755ee77b717b915f76f119392bb1",
         "scripts/check-framework-consumers.mts": "f0111ac9ed84996f722f656358b810da0b9ecc8c6c0219a2019d1076b5d50cbc",
@@ -280,8 +280,8 @@
         "tests/create-rpc-query-utils-streaming.test.ts": "f9fafba808b8bf067c657fe22aa9c87489e15d5341b1b1e953cb94d727d7efef",
         "tests/create-rpc-query-utils-structural-sharing.test.ts": "f9bd67aed07f7aed8113fdbfeb31810dbc19e0cb4ec0cbeef64a14e7589002fb",
         "tests/create-rpc-query-utils.test.ts": "1229679c118d267fd0a94ffcb560a9a7f77a8acecd423ed742c036c667b89faf",
-        "tests/docs-examples.test.ts": "8913ba56ae41a4fdba3eabfc835551e048ccf4a4dd356861ede51bc0fc990303",
-        "tests/docs-release.test.ts": "d1346be1c3b6f30775ae1cf6e6d2af978fc813078ea0c903d6ab8b95aabd0d13",
+        "tests/docs-examples.test.ts": "c5f3f714eebf1a5f418e519fab89411d60eb1d2be128484d4d3cbc858c00354f",
+        "tests/docs-release.test.ts": "baa19a1563ab25570279be6ca21b193563f0f70d526cec460b79b3102a0593da",
         "tests/execution-interceptor.test.ts": "2d839cf557cfcb1116787b79eebb397921626876552d5bbdea7429feda389143",
         "tests/fixtures/async.ts": "c72af69141ce4f2dd4e9b63910ed20378e546dcd015a2d7befacd439ba4a006e",
         "tests/fixtures/decode-utf8.ts": "f0441c8aa2553ce2c1dccff7cac1bbaec2cdc668916278c7a0efff90482ace61",
@@ -294,6 +294,7 @@
         "tests/fixtures/socket-client.ts": "296a95f39b359fe4061f1915108ca833ba476d7ee71b2367ec95af05d1a163da",
         "tests/fixtures/user-events.ts": "8b7cfe683f2d058ec09a2ab739b90bd78124aa7e694c9bff4358c36492273987",
         "tests/fixtures/websocket-checks.ts": "44320dee0fcc32d7131579f05c40a7ced8171cf2acb9ea902307560e8255a742",
+        "tests/fixtures/workflow.ts": "98ccb2223f3a10d56ba05a956aacb1c4530b03568aa9bf52efeecfd27c7d2a4f",
         "tests/framework-consumers/angular.ts": "4d629324cb6e4d5ec9029c96670cf78a022e10ea98ee12df1997ac731d1d68ad",
         "tests/framework-consumers/contracts.ts": "525456ad9bd9f3b95fca1cbf93c347c04a8936d4994202b7cff460736b9371d2",
         "tests/framework-consumers/package.json": "0cabc690b509757ea3c7014e6b2fa443b6e3fb3ff8e0fc72e7fe304c239e33a5",
@@ -405,18 +406,18 @@
         "tests/types/utility-configuration-contract.ts": "3a3d4e200e84d04d2e9856bfb4509a4ba948f4a67997d1327e66beef36aa0eb4",
         "tests/utility-configuration.test.ts": "2c2f29725e313bfed30e337ea7aad077ab77a47fe91b3de41cbd6b1bb70d59ff",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6",
-        "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
+        "tests/workflow-guards.test.ts": "c2318f29ff68848c75b534e6a599c5dc19c020a8730eb8f95487f2c2ac5bbbd5",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "83364fa402603a054d07d15b1e3ee68120101b30",
-      "outcome": "updated",
-      "reason": "Public SSR snapshots now omit successful entries with retained failure state. Updated the shipped hydration recipe and checked the real router dehydration path and documentation excerpts.",
+      "head": "adb52bf699c52dd664831654dceb780c85db5c7e",
+      "outcome": "no-change",
+      "reason": "Workflow checks use parsed job and step values and the documentation check observes the rendered version.",
       "evidence": [
-        "Changed: apps/docs/src/content/docs/guides/hydrate-query-views.md, apps/docs/src/content/docs/guides/hydrate-unary-data.md, apps/docs/src/content/docs/guides/tanstack-start.md, examples/tanstack-start/src/lib/query-ssr.ts, examples/tanstack-start/tests/failure-dehydration.test.ts, skills/effect-api-query/references/hydration-and-ssr.md, tests/types/docs-hydration-async.ts, tests/types/docs-hydration-dto.ts, tests/types/docs-hydration-rich.ts, tests/types/docs-hydration-views.ts, tests/types/hydration-contract.ts at 83364fa402603a054d07d15b1e3ee68120101b30"
+        "Changed: tests/docs-release.test.ts at adb52bf699c52dd664831654dceb780c85db5c7e"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "0dd561cea519773b5fe91fb7c10862675153635f2a07cae13fd33b51481025dd",
+      "fingerprint": "8b5c9f6ce7696238ae0994da9cfb803fc2847a5206cd59f8cdd2eb1eeb2fb564",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -582,7 +583,7 @@
         "examples/tanstack-start/tests/application.test.ts": "c6fcd55703e96cc9f07800ec9f799721cbb4d88d9ea81f5295ccde8b2f1c7be0",
         "examples/tanstack-start/tests/async-hydration.test.ts": "cd0de37ce7df4a68dc98366bf8bd620c39cee48d39f2ac285981e40412e8d467",
         "examples/tanstack-start/tests/client-navigation.test.tsx": "40349f7559078dbd23af9763a49935da479c0dbc955472ffa56fd5d174f999e6",
-        "examples/tanstack-start/tests/failure-dehydration.test.ts": "2436de3fcf69b60d3c70890b0772b453aae0823dd1e22a0a3fbbe7b49e1cdcf0",
+        "examples/tanstack-start/tests/failure-dehydration.test.ts": "326574cfefebfdc1f8e2050a0369643c648455bb6c201ef070658eb0293dfc18",
         "examples/tanstack-start/tests/featured-selection.test.ts": "3a6e1db27843a392d354cb58ab7b8d7bfaf327ffe42910118d426d42875f1123",
         "examples/tanstack-start/tests/server-local.test.ts": "6d04b85b3e584deb8e4b6f847235ceab8a811eb2d3837dc209f89cf87cf0d291",
         "examples/tanstack-start/tests/server-render.test.tsx": "dd2ea45a1e610055ba7ef68f3a6140e06eaf43ad806e0bdc6757d9c63fba86c7",
@@ -604,7 +605,7 @@
         "examples/vite-react/tests/stream-tracing.test.ts": "f0d7c8086f44b904e1c15606bc057c4fa17b6e0c626e3d9530a33acb43112036",
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "b6a65ce399862be0b587459bea7b3e504c930b28327f6888e89cab0cd371d2cb",
-        "package.json": "d95b655af6d656439400b7cf45b7e5e1e75edacad4bcb1085d1dfc4c9cb6c639",
+        "package.json": "53d2b60ed9c21a7f2ed3c993f96d2e3551fd1020ed9eb0c033413514819d0500",
         "pnpm-workspace.yaml": "fc4bff1fa9ef4a4887691c6e004e02829736f93ee07efcb563f78f836a21a276",
         "scripts/check-effect-compatibility.mts": "539bf68dc1e6a95a857ccc7491c623df65fa755ee77b717b915f76f119392bb1",
         "scripts/check-framework-consumers.mts": "f0111ac9ed84996f722f656358b810da0b9ecc8c6c0219a2019d1076b5d50cbc",
@@ -696,8 +697,8 @@
         "tests/create-rpc-query-utils-streaming.test.ts": "f9fafba808b8bf067c657fe22aa9c87489e15d5341b1b1e953cb94d727d7efef",
         "tests/create-rpc-query-utils-structural-sharing.test.ts": "f9bd67aed07f7aed8113fdbfeb31810dbc19e0cb4ec0cbeef64a14e7589002fb",
         "tests/create-rpc-query-utils.test.ts": "1229679c118d267fd0a94ffcb560a9a7f77a8acecd423ed742c036c667b89faf",
-        "tests/docs-examples.test.ts": "8913ba56ae41a4fdba3eabfc835551e048ccf4a4dd356861ede51bc0fc990303",
-        "tests/docs-release.test.ts": "d1346be1c3b6f30775ae1cf6e6d2af978fc813078ea0c903d6ab8b95aabd0d13",
+        "tests/docs-examples.test.ts": "c5f3f714eebf1a5f418e519fab89411d60eb1d2be128484d4d3cbc858c00354f",
+        "tests/docs-release.test.ts": "baa19a1563ab25570279be6ca21b193563f0f70d526cec460b79b3102a0593da",
         "tests/execution-interceptor.test.ts": "2d839cf557cfcb1116787b79eebb397921626876552d5bbdea7429feda389143",
         "tests/fixtures/async.ts": "c72af69141ce4f2dd4e9b63910ed20378e546dcd015a2d7befacd439ba4a006e",
         "tests/fixtures/decode-utf8.ts": "f0441c8aa2553ce2c1dccff7cac1bbaec2cdc668916278c7a0efff90482ace61",
@@ -710,6 +711,7 @@
         "tests/fixtures/socket-client.ts": "296a95f39b359fe4061f1915108ca833ba476d7ee71b2367ec95af05d1a163da",
         "tests/fixtures/user-events.ts": "8b7cfe683f2d058ec09a2ab739b90bd78124aa7e694c9bff4358c36492273987",
         "tests/fixtures/websocket-checks.ts": "44320dee0fcc32d7131579f05c40a7ced8171cf2acb9ea902307560e8255a742",
+        "tests/fixtures/workflow.ts": "98ccb2223f3a10d56ba05a956aacb1c4530b03568aa9bf52efeecfd27c7d2a4f",
         "tests/framework-consumers/angular.ts": "4d629324cb6e4d5ec9029c96670cf78a022e10ea98ee12df1997ac731d1d68ad",
         "tests/framework-consumers/contracts.ts": "525456ad9bd9f3b95fca1cbf93c347c04a8936d4994202b7cff460736b9371d2",
         "tests/framework-consumers/package.json": "0cabc690b509757ea3c7014e6b2fa443b6e3fb3ff8e0fc72e7fe304c239e33a5",
@@ -821,14 +823,14 @@
         "tests/types/utility-configuration-contract.ts": "3a3d4e200e84d04d2e9856bfb4509a4ba948f4a67997d1327e66beef36aa0eb4",
         "tests/utility-configuration.test.ts": "2c2f29725e313bfed30e337ea7aad077ab77a47fe91b3de41cbd6b1bb70d59ff",
         "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6",
-        "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
+        "tests/workflow-guards.test.ts": "c2318f29ff68848c75b534e6a599c5dc19c020a8730eb8f95487f2c2ac5bbbd5",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "83364fa402603a054d07d15b1e3ee68120101b30",
-      "outcome": "updated",
-      "reason": "Public SSR snapshots now omit successful entries with retained failure state. Updated the shipped hydration recipe and checked the real router dehydration path and documentation excerpts.",
+      "head": "adb52bf699c52dd664831654dceb780c85db5c7e",
+      "outcome": "no-change",
+      "reason": "Workflow checks use parsed job and step values and the documentation check observes the rendered version.",
       "evidence": [
-        "Changed: _artifacts/domain_map.yaml, _artifacts/skill_spec.md, apps/docs/src/content/docs/guides/hydrate-query-views.md, apps/docs/src/content/docs/guides/hydrate-unary-data.md, apps/docs/src/content/docs/guides/tanstack-start.md, examples/tanstack-start/src/lib/query-ssr.ts, examples/tanstack-start/tests/failure-dehydration.test.ts, skills/effect-api-query/references/hydration-and-ssr.md, tests/types/docs-hydration-async.ts, tests/types/docs-hydration-dto.ts, tests/types/docs-hydration-rich.ts, tests/types/docs-hydration-views.ts, tests/types/hydration-contract.ts at 83364fa402603a054d07d15b1e3ee68120101b30"
+        "Changed: tests/docs-release.test.ts at adb52bf699c52dd664831654dceb780c85db5c7e"
       ]
     },
     "source:vite.config.ts": {
@@ -1613,15 +1615,15 @@
       ]
     },
     "source:e2e-docs/docs.spec.ts": {
-      "fingerprint": "4e18564a10a25a069f5c5d4af2cea5b75ff9c30ac49ee3c33f7fd569d6ac0807",
+      "fingerprint": "92b3e685d537cab0fbc7bce519ae86b129e50fa5ee34ed6e07513862f6e9a682",
       "snapshot": {
-        "e2e-docs/docs.spec.ts": "ff9d6110e73e4cb53d54747f9bd0345bd30df26b60606847323bcb220a185f52"
+        "e2e-docs/docs.spec.ts": "5e31b096ac01a87906911bca10053c6a13a849ddbde40b5f87e11d90c8db5239"
       },
-      "head": "5489c2b1a67495dce57b41d407157c96fd687d10",
+      "head": "adb52bf699c52dd664831654dceb780c85db5c7e",
       "outcome": "no-change",
-      "reason": "The docs smoke test now excludes browser-canceled Firefox prefetches from its request-failure assertion. The documentation, public contracts, and shipped skill coverage stay accurate.",
+      "reason": "Workflow checks now inspect parsed jobs and steps, and documentation checks inspect rendered behavior without JavaScript.",
       "evidence": [
-        "e2e-docs/docs.spec.ts; release run 45055155451 recorded HTTP 200 followed by NS_BINDING_ABORTED with Sec-Purpose: prefetch. The trace replay and live Firefox reproduction passed with the guard. CI=true vp run docs-e2e passed all 12 checks across Chromium, Firefox, and WebKit."
+        "Changed: e2e-docs/docs.spec.ts at adb52bf699c52dd664831654dceb780c85db5c7e"
       ]
     },
     "source:e2e/conditional-query.spec.ts": {

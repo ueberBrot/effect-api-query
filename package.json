@@ -92,7 +92,8 @@
     "unplugin-unused": "0.6.0",
     "vite": "catalog:",
     "vite-plus": "catalog:",
-    "vitest": "catalog:"
+    "vitest": "catalog:",
+    "yaml": "2.9.1"
   },
   "peerDependencies": {
     "@tanstack/query-core": ">=5.107.1 <6",
