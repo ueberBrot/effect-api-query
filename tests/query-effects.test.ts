@@ -206,7 +206,6 @@ it.effect(
           Effect.succeed(error)
         )
       );
-      expect(yielded).toBeInstanceOf(Error);
       expect({
         isInstance: yielded instanceof QueryClientOperationError,
         _tag: yielded._tag,
@@ -220,8 +219,23 @@ it.effect(
         message: "QueryClient operation failed",
         cause: falsyCause,
       });
+
       client.clear();
     })
+);
+
+it.effect("serializes a query client error with a circular cause", () =>
+  Effect.sync(() => {
+    const cause = { self: {} };
+    cause.self = cause;
+    const error = new QueryClientOperationError(cause);
+    expect(error.cause).toBe(cause);
+    expect(error.toJSON()).toStrictEqual({
+      _tag: "QueryClientOperationError",
+      name: "QueryClientOperationError",
+    });
+    expect(() => JSON.stringify(error)).not.toThrow();
+  })
 );
 
 it.effect(
