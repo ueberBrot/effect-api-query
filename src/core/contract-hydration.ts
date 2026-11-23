@@ -93,10 +93,7 @@ const validateViews = (
   allowed: ReadonlySet<string>
 ): ReadonlyMap<string, boolean> => {
   const result = new Map<string, boolean>();
-  if (options === undefined || !Object.hasOwn(options, "views")) {
-    return result;
-  }
-  const { views } = options;
+  const views = options?.["views"];
   if (views === undefined) {
     return result;
   }
@@ -105,12 +102,16 @@ const validateViews = (
       message: "views must be an object of boolean view toggles",
     });
   }
-  for (const [key, value] of Object.entries(views)) {
+  for (const key of new Set([
+    ...Object.getOwnPropertyNames(views),
+    ...allowed,
+  ])) {
     if (!allowed.has(key)) {
       throw new HydrationCodecError("UnknownPath", {
         message: `Unknown hydration view "${key}"`,
       });
     }
+    const value = views[key];
     if (value !== undefined) {
       if (!Predicate.isBoolean(value)) {
         throw new HydrationCodecError("InvalidContractPath", {

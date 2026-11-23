@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "e5166aa589bfdc6ea48caf124ab25430961760677d52f1bf24efee20dd998175",
+      "fingerprint": "7372fcd4368fb38bccd924dde8bfcef7ead984c03329d725f7eb2a29e856bb54",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -219,7 +219,7 @@
         "src/core/configure.ts": "277f1d1201be35962d6b75c3e9f4074e7f4798456d515ddbd23d7dc3bf6693cf",
         "src/core/consume-events.ts": "648144582c4bdbf4a9cb0d35ddc54327abbefc654f2d37b6154232bcd09a1752",
         "src/core/contract-hydration-types.ts": "53366364723a34f8948f2b813ad60ec20de98ee878f9398aff38bb15bf12fd45",
-        "src/core/contract-hydration.ts": "6ed5ebc529148eb009745874074115c6680cbb8b5d3276731da25e00b4c8a8f7",
+        "src/core/contract-hydration.ts": "e3be4570210a3f0ba6c7cd6651fe66dcb317e5d162e5d3a15a54620d82fae317",
         "src/core/declared-error.ts": "72146f75dc4f99abb60c143ae4464abf6a512cd5ffe713597bb3fb967f58c7a0",
         "src/core/hydration.ts": "08c812094bb4662cdf118b1825a47a4ec4bc1e4bd248a878726cbd4ff31aaf1e",
         "src/core/inference.ts": "249bc1d59e4ea6ddc7e3a09a63b93c13e3805f9d70ead00f44c710ff95e4df94",
@@ -262,7 +262,7 @@
         "src/rpc/types.ts": "6116aee2a62b26a895caf709c99c5969d6e45358c0919abd40068f9ce2db3f54",
         "tests/cache-recipes.test.ts": "39cb580ca6cd726ce58a93699fe1b14f697bafc7cac9fc9b4b76a539e73d6c1a",
         "tests/configuration-composition.test.ts": "be2ffca6e62965d8b79a311998787f74565d4af86bcaec46c36f5a963b0d16f5",
-        "tests/contract-hydration.test.ts": "85c0a0c1a0753309af1be97e820b29b1dbad077696725f132953257bfc182bff",
+        "tests/contract-hydration.test.ts": "e5b9beaef7006eb0b7917ea687374e3773c460e922843dabb58cdce1721b6159",
         "tests/contract-reuse.test.ts": "21b97cec6da64d3a42d58e69aaad1754aaec2bb4dd1ac876ef25ec801f970a12",
         "tests/create-http-api-query-utils.test.ts": "eb325bcc52192a5666a33ba617e397e02c4e2004b696104600936710abeed2d9",
         "tests/create-rpc-query-utils-configuration.test.ts": "3c6f5f8d77643dc7ae3c535cc2a78a3f8b3d7bddcf5de263d9944c217a58e839",
@@ -405,15 +405,15 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "dd90f479da33587194bf83bd69eef834a65fac28",
+      "head": "ca2627c8f4a8a80f888d5f2222a262c8bc8c558a",
       "outcome": "no-change",
-      "reason": "Both factories and contract hydration use a supplied keyPrefix getter as documented. The skill, domain map, skill spec and skill tree already describe the same prefix and cache identity. Passed 48 focused tests and both public type compilers.",
+      "reason": "Top-level hydration toggles now match the options accepted by the type checker. The skill, domain map, skill spec and skill tree already describe these toggles and their Effect service contract. Passed 21 focused hydration tests and both public type compilers.",
       "evidence": [
-        "Changed: tests/create-http-api-query-utils.test.ts at dd90f479da33587194bf83bd69eef834a65fac28"
+        "Changed: tests/contract-hydration.test.ts at ca2627c8f4a8a80f888d5f2222a262c8bc8c558a"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "c428d7c8d2388beb22a7c8e5f85b7f1d4639cd56a02a720f9b8be272ceefecca",
+      "fingerprint": "fd4a1cad4469a0d30283244cf009bbd1851101eb8dab916282595dba74123d41",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -632,7 +632,7 @@
         "src/core/configure.ts": "277f1d1201be35962d6b75c3e9f4074e7f4798456d515ddbd23d7dc3bf6693cf",
         "src/core/consume-events.ts": "648144582c4bdbf4a9cb0d35ddc54327abbefc654f2d37b6154232bcd09a1752",
         "src/core/contract-hydration-types.ts": "53366364723a34f8948f2b813ad60ec20de98ee878f9398aff38bb15bf12fd45",
-        "src/core/contract-hydration.ts": "6ed5ebc529148eb009745874074115c6680cbb8b5d3276731da25e00b4c8a8f7",
+        "src/core/contract-hydration.ts": "e3be4570210a3f0ba6c7cd6651fe66dcb317e5d162e5d3a15a54620d82fae317",
         "src/core/declared-error.ts": "72146f75dc4f99abb60c143ae4464abf6a512cd5ffe713597bb3fb967f58c7a0",
         "src/core/hydration.ts": "08c812094bb4662cdf118b1825a47a4ec4bc1e4bd248a878726cbd4ff31aaf1e",
         "src/core/inference.ts": "249bc1d59e4ea6ddc7e3a09a63b93c13e3805f9d70ead00f44c710ff95e4df94",
@@ -675,7 +675,7 @@
         "src/rpc/types.ts": "6116aee2a62b26a895caf709c99c5969d6e45358c0919abd40068f9ce2db3f54",
         "tests/cache-recipes.test.ts": "39cb580ca6cd726ce58a93699fe1b14f697bafc7cac9fc9b4b76a539e73d6c1a",
         "tests/configuration-composition.test.ts": "be2ffca6e62965d8b79a311998787f74565d4af86bcaec46c36f5a963b0d16f5",
-        "tests/contract-hydration.test.ts": "85c0a0c1a0753309af1be97e820b29b1dbad077696725f132953257bfc182bff",
+        "tests/contract-hydration.test.ts": "e5b9beaef7006eb0b7917ea687374e3773c460e922843dabb58cdce1721b6159",
         "tests/contract-reuse.test.ts": "21b97cec6da64d3a42d58e69aaad1754aaec2bb4dd1ac876ef25ec801f970a12",
         "tests/create-http-api-query-utils.test.ts": "eb325bcc52192a5666a33ba617e397e02c4e2004b696104600936710abeed2d9",
         "tests/create-rpc-query-utils-configuration.test.ts": "3c6f5f8d77643dc7ae3c535cc2a78a3f8b3d7bddcf5de263d9944c217a58e839",
@@ -818,11 +818,11 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "dd90f479da33587194bf83bd69eef834a65fac28",
+      "head": "ca2627c8f4a8a80f888d5f2222a262c8bc8c558a",
       "outcome": "no-change",
-      "reason": "Both factories and contract hydration use a supplied keyPrefix getter as documented. The skill, domain map, skill spec and skill tree already describe the same prefix and cache identity. Passed 48 focused tests and both public type compilers.",
+      "reason": "Top-level hydration toggles now match the options accepted by the type checker. The skill, domain map, skill spec and skill tree already describe these toggles and their Effect service contract. Passed 21 focused hydration tests and both public type compilers.",
       "evidence": [
-        "Changed: tests/create-http-api-query-utils.test.ts at dd90f479da33587194bf83bd69eef834a65fac28"
+        "Changed: tests/contract-hydration.test.ts at ca2627c8f4a8a80f888d5f2222a262c8bc8c558a"
       ]
     },
     "source:vite.config.ts": {

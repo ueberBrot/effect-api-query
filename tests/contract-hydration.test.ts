@@ -85,6 +85,10 @@ const dummyHttpClient = HttpClient.make((request) =>
   )
 );
 
+class DecodeSvc extends Context.Service<DecodeSvc, { readonly tag: string }>()(
+  "ComposeDecodeSvc"
+) {}
+
 describe("createContractHydrationRegistry — RPC contracts", () => {
   it.effect("preserves nested union members and built-in JSON schemas", () =>
     Effect.gen(function* preservesNestedUnionMembers() {
@@ -639,6 +643,32 @@ describe("createContractHydrationRegistry — HTTP contracts", () => {
       ]);
     })
   );
+
+  it("honors top-level view toggles supplied by getters and non-enumerable properties", () => {
+    const success = Schema.String.pipe(
+      Schema.middlewareDecoding((decode) =>
+        DecodeSvc.pipe(Effect.andThen(decode))
+      )
+    );
+    const group = RpcGroup.make(Rpc.make("read", { success }));
+    const views = { query: false } as const;
+    const inheritedOptions = { views };
+    Object.setPrototypeOf(inheritedOptions, {
+      get views() {
+        return views;
+      },
+    });
+    Reflect.deleteProperty(inheritedOptions, "views");
+    Object.defineProperty(views, "query", { enumerable: false });
+
+    for (const options of [inheritedOptions, { views }]) {
+      const registry: HydrationRegistry = createContractHydrationRegistry(
+        group,
+        options
+      );
+      expect(registry.matches(["rpc", "read", "query"])).toBe(false);
+    }
+  });
 
   it("ignores inherited view overrides on accepted RPC and HTTP paths", () => {
     const group = RpcGroup.make(Rpc.make("read", { success: Schema.String }));
@@ -1378,10 +1408,6 @@ describe("eager validation & HydrationCodecError", () => {
     });
   });
 });
-
-class DecodeSvc extends Context.Service<DecodeSvc, { readonly tag: string }>()(
-  "ComposeDecodeSvc"
-) {}
 
 const EncodeSvc = Context.Service<{ readonly offset: bigint }>(
   "UnionEncodeSvc"
