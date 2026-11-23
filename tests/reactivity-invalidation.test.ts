@@ -115,9 +115,13 @@ it.effect(
       expect(queryClient.getQueryState(key)?.isInvalidated).toBe(true);
       expect(matches).toBe(1);
 
-      reactivity.invalidateUnsafe(["users:1"]);
+      yield* Effect.promise(async () => {
+        reactivity.invalidateUnsafe(["users:1"]);
+        await Promise.resolve();
+        reactivity.invalidateUnsafe(["users:2"]);
+      });
       yield* bridge.flush;
-      expect(matches).toBe(2);
+      expect(matches).toBe(3);
     })
 );
 
@@ -347,7 +351,7 @@ it.effect(
 );
 
 it.effect(
-  "coalesces triggers that arrive while a pass is in flight and releases concurrent flush waiters",
+  "dispatches later batches while a refetch is pending and releases concurrent flush waiters",
   () =>
     Effect.gen(function* verifyInFlightCoalescing() {
       const queryClient = new QueryClient();
@@ -400,30 +404,45 @@ it.effect(
 
       reactivity.invalidateUnsafe({ groups: [1] });
       reactivity.invalidateUnsafe({ groups: [2] });
+      yield* Effect.promise(async () => {
+        await Promise.resolve();
+      });
+      const beforeRelease = {
+        invalidated: queryClient.getQueryState(groupKey)?.isInvalidated,
+        matches: groupMatches,
+        flushed: firstWaiter.pollUnsafe() !== undefined,
+      };
       yield* Deferred.succeed(release, 2);
+      expect(beforeRelease).toStrictEqual({
+        invalidated: true,
+        matches: 1,
+        flushed: false,
+      });
 
       yield* Fiber.join(firstWaiter);
       yield* Fiber.join(secondWaiter);
 
       expect(queryClient.getQueryData(user)).toBe(2);
-      expect(queryClient.getQueryState(groupKey)?.isInvalidated).toBe(true);
       expect(groupMatches).toBe(1);
     })
 );
 
 it.effect(
-  "unblocks flush and stops queued work when the Scope closes during an in-flight invalidation",
+  "drops queued work on Scope closure and waits for a started refetch to report its failure",
   () =>
     Effect.gen(function* verifyScopeCloseDuringInFlight() {
       const queryClient = new QueryClient();
       const reactivity = yield* Reactivity.make;
       const runPromise = Effect.runPromiseWith(yield* Effect.context());
       const started = yield* Deferred.make<undefined>();
-      const release = yield* Deferred.make<number>();
+      const release = yield* Deferred.make<number, Error>();
+      const failure = new Error("refetch failed after scope closure");
+      const errors: unknown[] = [];
       const user = ["user"];
       const groupKey = ["group"];
 
       queryClient.setQueryDefaults(user, {
+        retry: false,
         queryFn: async () =>
           await runPromise(
             Deferred.succeed(started, undefined).pipe(
@@ -435,13 +454,21 @@ it.effect(
       queryClient.setQueryData(groupKey, 1);
 
       const scope = yield* Scope.make();
-      const bridge = yield* bindReactivityInvalidation([
-        { keys: ["users:1"], filter: { queryKey: user, refetchType: "all" } },
+      const bridge = yield* bindReactivityInvalidation(
+        [
+          { keys: ["users:1"], filter: { queryKey: user, refetchType: "all" } },
+          {
+            keys: ["groups"],
+            filter: { queryKey: groupKey, refetchType: "none" },
+          },
+        ],
         {
-          keys: ["groups"],
-          filter: { queryKey: groupKey, refetchType: "none" },
-        },
-      ]).pipe(
+          invalidateOptions: { throwOnError: true },
+          onError: (error) => {
+            errors.push(error);
+          },
+        }
+      ).pipe(
         Effect.provideService(Scope.Scope, scope),
         Effect.provideService(Reactivity.Reactivity, reactivity),
         Effect.provideService(QueryClientService, queryClient)
@@ -455,10 +482,57 @@ it.effect(
       reactivity.invalidateUnsafe(["groups"]);
 
       yield* Scope.close(scope, Exit.void);
+      const beforeRelease = {
+        invalidated: queryClient.getQueryState(groupKey)?.isInvalidated,
+        flushed: waiter.pollUnsafe() !== undefined,
+      };
+      yield* Deferred.fail(release, failure);
       yield* Fiber.join(waiter);
-      expect(queryClient.getQueryState(groupKey)?.isInvalidated).toBe(false);
+      expect(beforeRelease).toStrictEqual({
+        invalidated: false,
+        flushed: false,
+      });
+      expect(errors).toStrictEqual([failure]);
+    })
+);
 
-      yield* Deferred.succeed(release, 2);
+it.effect(
+  "reports a deferred guard failure and dispatches later triggers",
+  () =>
+    Effect.gen(function* verifyDeferredGuardFailure() {
+      const queryClient = new QueryClient();
+      const reactivity = yield* Reactivity.make;
+      const key = ["users"];
+      const failure = new Error("guard failed");
+      const errors: unknown[] = [];
+      let checks = 0;
+      queryClient.setQueryData(key, 1);
+      const bridge = yield* bindReactivityInvalidation(
+        [{ keys: ["users:1"], filter: { queryKey: key, refetchType: "none" } }],
+        {
+          isActive: () => {
+            checks += 1;
+            if (checks === 2) {
+              throw failure;
+            }
+            return true;
+          },
+          onError: (error) => {
+            errors.push(error);
+          },
+        }
+      ).pipe(
+        Effect.provideService(Reactivity.Reactivity, reactivity),
+        Effect.provideService(QueryClientService, queryClient)
+      );
+
+      reactivity.invalidateUnsafe(["users:1"]);
       yield* bridge.flush;
+      expect(errors).toStrictEqual([failure]);
+      expect(queryClient.getQueryState(key)?.isInvalidated).toBe(false);
+
+      reactivity.invalidateUnsafe(["users:1"]);
+      yield* bridge.flush;
+      expect(queryClient.getQueryState(key)?.isInvalidated).toBe(true);
     })
 );

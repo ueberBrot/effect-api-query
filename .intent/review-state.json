@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "f6a9e3a557d16129064ac3de28a538d222490b62768d5e4f9c0bfb27eeabcc47",
+      "fingerprint": "9b335bac18b82a670620b711ae8dbeff34d763716f97485e40e9196fdcc19e1a",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -233,12 +233,12 @@
         "src/core/query-filter.ts": "83848614ec7f7db8f188db40482bad14b46c08c40fc3b5f0325a8dbed98524b7",
         "src/core/query-owner.ts": "953e504291ac88ba5a89eb3a83ba7b5e18835faaede4a0827c00e440d2f02d8a",
         "src/core/query-prefix-index.ts": "419a20fcf9bb28c5e7dbedb0c5af6f0e0dab52c0332773dbf39af638ac671cc2",
-        "src/core/reactivity-invalidation.ts": "33751c4b8f10176f7c0356f56fac1ffe6bea7f98a2da19bb783221ae3fd8e8cc",
+        "src/core/reactivity-invalidation.ts": "eb5620b3236ce31cb29359354de65e903daeb9c71589a57a839fddb529a80aab",
         "src/core/runtime.ts": "9e99f2a078a1058b3b6b01ada7585d3f63d3486b397be3a6e1f08f0d3f0a9fad",
         "src/core/schema-key.ts": "0d6c00371526085fe19689a7401dfd86cb6f6a96f6b351b4b31bb2648804d5df",
         "src/core/schema-structural-sharing.ts": "73c3ab3f285e3146376b6c413b34ba4503fc2a07b0e2f8217785951f795f22a8",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
-        "src/core/stream-publication.ts": "0bf0f0e6ea4597be6d2a33c275b14940bb0ab9ff6976bb7548553fbf0020a404",
+        "src/core/stream-publication.ts": "63f5c649c666bd083face93cf188354dfa7e16605bc565c00c6209133afcd5f0",
         "src/core/stream-pull.ts": "9b7957b4487ddcdce2183f55c6f08e6cddee011c5d5e5b8c7b72ec839a7e3c42",
         "src/core/stream-recovery.ts": "3e18902069a6388e23668ca7639d1c4308f98ce097c23daf4d12b562c0e9c664",
         "src/core/stream-snapshot.ts": "5c31085e7f22c8242b42443f5468a160a6dd6a779a29bedcc5a9c14d7a855402",
@@ -316,7 +316,7 @@
         "tests/lazy-leaves-and-unified-keys.test.ts": "83c4ad695d0cd3b807fc379c169cd1ca27e6c47868d6132bcb5afbd608e47aa8",
         "tests/live-coalescing.test.ts": "449a0505b96afb99847dd873c2bc38e9853a5ddfe176d3a9172f0bf3a0f41c42",
         "tests/no-comments-rule.test.ts": "1a6c8be388ab03e30ea8976e7399a7841e53c0b449ff31032be4252c7d3412d8",
-        "tests/publication-deadline.test.ts": "f283a90efb1f5c8728da8d92941319cd874225cd83bd32df6b74a1f060f72b12",
+        "tests/publication-deadline.test.ts": "c519142364433b6551bbdd03bf9460558d0a406ad61432429962a9cb7bf8fe10",
         "tests/query-descriptor.test.ts": "c2a7b2498a9da9bbf0c5299de97881f2a1eef87578ecc7add4fd259042e13688",
         "tests/query-effects.test.ts": "c8e5534721e37a7fe1060212c423806491417cee95e17373ab055860d83a55ac",
         "tests/query-events.test.ts": "a410506d4323e1857e9fd2b89dfc590cc913392180478e00ce6017e17cf2cfc0",
@@ -327,7 +327,7 @@
         "tests/query-view-prefix.test.ts": "2c00662e76474c8cb6fb51cec6e9a27626ce961b076bd74653ab84475b4ae764",
         "tests/react-pack-isolation.test.ts": "0bc8c4893f54104ec9fe791336ba645fa43566c987ea2939b43f830621635138",
         "tests/react.test.tsx": "a5494e54ab73dc73a30c4a1e0d51634ad9772735195295e1f65cc9274531b554",
-        "tests/reactivity-invalidation.test.ts": "be3036f0d536226701b88fc3730cd49a186290696d356e58e44c0a42c5f2af55",
+        "tests/reactivity-invalidation.test.ts": "865e16d772c0ef9a7886701f033e3d3b76846e6ef3d533b38d0ed737edf7919a",
         "tests/schema-sharing-prototypes.test.ts": "628a6622656b9b53e686d14b9efbd3abc13c61a13db1546001b0689b491f6022",
         "tests/schema-structural-sharing.test.ts": "dc4c580e9193fb7749701cad3efdd5563edf8019ed437a7a722f514530dd33da",
         "tests/skills-maintenance.test.ts": "015e0b882f6a43e0692c9643ad78fe111bcd15edf2adff1b46f5d0deb68b3498",
@@ -409,15 +409,15 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "58b86564697ad352c85e52fc3bf0aaafcda1142d",
-      "outcome": "updated",
-      "reason": "Updated cache-workflows.md for QueryClientOperationError Data.TaggedError and QueryOwner.wrapRunner interruptOnRetire option; retained one skill and six references.",
+      "head": "ec1c9d70d075a6a10f0e5b01da10bb5995064c29",
+      "outcome": "no-change",
+      "reason": "Reactivity again dispatches per microtask, drains native refetches started before scope closure, and reports deferred guard and refetch failures. Stream batching again honors elapsed deadlines. The cache workflows and query patterns guidance and the existing domain map, skill spec, and skill tree cover these restored contracts. Focused regressions and the full quality gate passed, and stream publication budgets passed.",
       "evidence": [
-        "vp run check, vp run fallow, vp run api-types, vp test (82/82 files, 994/994 tests + 78/78 post-review tests)"
+        "Changed: src/core/reactivity-invalidation.ts, src/core/stream-publication.ts, tests/publication-deadline.test.ts, tests/reactivity-invalidation.test.ts at ec1c9d70d075a6a10f0e5b01da10bb5995064c29"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "df5b6711ac78d10204a1bbe50edb62bbe6dd055e6730e80fb0b4e2539b0ab466",
+      "fingerprint": "eac35c5a0326f6729d065a5f2d539b1bac20778b5b2a0c2da8bfb03f395b6e7a",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -650,12 +650,12 @@
         "src/core/query-filter.ts": "83848614ec7f7db8f188db40482bad14b46c08c40fc3b5f0325a8dbed98524b7",
         "src/core/query-owner.ts": "953e504291ac88ba5a89eb3a83ba7b5e18835faaede4a0827c00e440d2f02d8a",
         "src/core/query-prefix-index.ts": "419a20fcf9bb28c5e7dbedb0c5af6f0e0dab52c0332773dbf39af638ac671cc2",
-        "src/core/reactivity-invalidation.ts": "33751c4b8f10176f7c0356f56fac1ffe6bea7f98a2da19bb783221ae3fd8e8cc",
+        "src/core/reactivity-invalidation.ts": "eb5620b3236ce31cb29359354de65e903daeb9c71589a57a839fddb529a80aab",
         "src/core/runtime.ts": "9e99f2a078a1058b3b6b01ada7585d3f63d3486b397be3a6e1f08f0d3f0a9fad",
         "src/core/schema-key.ts": "0d6c00371526085fe19689a7401dfd86cb6f6a96f6b351b4b31bb2648804d5df",
         "src/core/schema-structural-sharing.ts": "73c3ab3f285e3146376b6c413b34ba4503fc2a07b0e2f8217785951f795f22a8",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
-        "src/core/stream-publication.ts": "0bf0f0e6ea4597be6d2a33c275b14940bb0ab9ff6976bb7548553fbf0020a404",
+        "src/core/stream-publication.ts": "63f5c649c666bd083face93cf188354dfa7e16605bc565c00c6209133afcd5f0",
         "src/core/stream-pull.ts": "9b7957b4487ddcdce2183f55c6f08e6cddee011c5d5e5b8c7b72ec839a7e3c42",
         "src/core/stream-recovery.ts": "3e18902069a6388e23668ca7639d1c4308f98ce097c23daf4d12b562c0e9c664",
         "src/core/stream-snapshot.ts": "5c31085e7f22c8242b42443f5468a160a6dd6a779a29bedcc5a9c14d7a855402",
@@ -733,7 +733,7 @@
         "tests/lazy-leaves-and-unified-keys.test.ts": "83c4ad695d0cd3b807fc379c169cd1ca27e6c47868d6132bcb5afbd608e47aa8",
         "tests/live-coalescing.test.ts": "449a0505b96afb99847dd873c2bc38e9853a5ddfe176d3a9172f0bf3a0f41c42",
         "tests/no-comments-rule.test.ts": "1a6c8be388ab03e30ea8976e7399a7841e53c0b449ff31032be4252c7d3412d8",
-        "tests/publication-deadline.test.ts": "f283a90efb1f5c8728da8d92941319cd874225cd83bd32df6b74a1f060f72b12",
+        "tests/publication-deadline.test.ts": "c519142364433b6551bbdd03bf9460558d0a406ad61432429962a9cb7bf8fe10",
         "tests/query-descriptor.test.ts": "c2a7b2498a9da9bbf0c5299de97881f2a1eef87578ecc7add4fd259042e13688",
         "tests/query-effects.test.ts": "c8e5534721e37a7fe1060212c423806491417cee95e17373ab055860d83a55ac",
         "tests/query-events.test.ts": "a410506d4323e1857e9fd2b89dfc590cc913392180478e00ce6017e17cf2cfc0",
@@ -744,7 +744,7 @@
         "tests/query-view-prefix.test.ts": "2c00662e76474c8cb6fb51cec6e9a27626ce961b076bd74653ab84475b4ae764",
         "tests/react-pack-isolation.test.ts": "0bc8c4893f54104ec9fe791336ba645fa43566c987ea2939b43f830621635138",
         "tests/react.test.tsx": "a5494e54ab73dc73a30c4a1e0d51634ad9772735195295e1f65cc9274531b554",
-        "tests/reactivity-invalidation.test.ts": "be3036f0d536226701b88fc3730cd49a186290696d356e58e44c0a42c5f2af55",
+        "tests/reactivity-invalidation.test.ts": "865e16d772c0ef9a7886701f033e3d3b76846e6ef3d533b38d0ed737edf7919a",
         "tests/schema-sharing-prototypes.test.ts": "628a6622656b9b53e686d14b9efbd3abc13c61a13db1546001b0689b491f6022",
         "tests/schema-structural-sharing.test.ts": "dc4c580e9193fb7749701cad3efdd5563edf8019ed437a7a722f514530dd33da",
         "tests/skills-maintenance.test.ts": "015e0b882f6a43e0692c9643ad78fe111bcd15edf2adff1b46f5d0deb68b3498",
@@ -826,10 +826,12 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "58b86564697ad352c85e52fc3bf0aaafcda1142d",
-      "outcome": "updated",
-      "reason": "Recorded #226, #228, #229, #230, and #231 implementation and verification batch in _artifacts/skill_spec.md.",
-      "evidence": ["vp exec intent maintainer check and vp run skills-check"]
+      "head": "ec1c9d70d075a6a10f0e5b01da10bb5995064c29",
+      "outcome": "no-change",
+      "reason": "Reactivity again dispatches per microtask, drains native refetches started before scope closure, and reports deferred guard and refetch failures. Stream batching again honors elapsed deadlines. The cache workflows and query patterns guidance and the existing domain map, skill spec, and skill tree cover these restored contracts. Focused regressions and the full quality gate passed, and stream publication budgets passed.",
+      "evidence": [
+        "Changed: src/core/reactivity-invalidation.ts, src/core/stream-publication.ts, tests/publication-deadline.test.ts, tests/reactivity-invalidation.test.ts at ec1c9d70d075a6a10f0e5b01da10bb5995064c29"
+      ]
     },
     "source:vite.config.ts": {
       "fingerprint": "5eb8295660f22bbb1720021cc77728fad6573a662ef0bff4db067617ad30f6ec",
