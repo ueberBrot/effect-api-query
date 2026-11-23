@@ -187,7 +187,6 @@ const isUnencodableAst = (
       if (
         hasRepresentation(firstLink.to, "effect/schema/Json") ||
         SchemaAST.isUnknown(firstLink.to) ||
-        firstLink.to._tag === "Union" ||
         firstLink.to._tag === "Any"
       ) {
         return true;

@@ -7,6 +7,7 @@ import {
   ManagedRuntime,
   Predicate,
   Schema,
+  SchemaParser,
   SchemaTransformation,
   Stream,
 } from "effect";
@@ -1251,6 +1252,33 @@ const isOpaqueBox = (value: unknown): value is OpaqueBox =>
   Predicate.isObject(value) && value[opaqueBrand] === true;
 
 describe("eager validation & HydrationCodecError", () => {
+  it.effect("derives an explicit JSON codec with a union on the wire", () =>
+    Effect.gen(function* roundTripsExplicitUnionCodec() {
+      const wire = Schema.Union([Schema.String, Schema.Finite]);
+      const decodeValue = SchemaParser.decodeUnknownEffect(
+        Schema.Struct({ value: wire })
+      );
+      const success = wire.pipe(
+        Schema.decodeTo(
+          Schema.Unknown,
+          SchemaTransformation.transformEffect<unknown, string | number>({
+            decode: (value) => Effect.succeed({ value }),
+            encode: (value) =>
+              Effect.map(decodeValue(value), (decoded) => decoded.value),
+          })
+        )
+      );
+      const group = RpcGroup.make(Rpc.make("read", { success }));
+      const registry = createContractHydrationRegistry(group);
+      const key = ["rpc", "read", "query"];
+      const server = new QueryClient();
+      const browser = new QueryClient();
+      server.setQueryData(key, { value: 4 });
+      yield* roundTripJson(registry, server, browser);
+      expect(browser.getQueryData(key)).toStrictEqual({ value: 4 });
+    })
+  );
+
   it("rejects opaque Schema.declare, Redacted, and unencodable encodeToWithHeaders unless overridden or opted out", () => {
     const OpaqueSchema = Schema.declare(isOpaqueBox);
     const OpaqueCodec = Schema.String.pipe(
