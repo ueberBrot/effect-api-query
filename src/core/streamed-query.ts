@@ -300,7 +300,8 @@ export const makeStreamQuery = ({
           streamLiveSnapshots(
             guardedStream(context.signal),
             policy.coalesceMs,
-            emptyError
+            emptyError,
+            context.signal
           ),
           context.signal
         ),

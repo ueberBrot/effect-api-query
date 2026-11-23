@@ -75,7 +75,8 @@ export const streamQueryIterable = <A>(
 
 const ensureNonEmpty = <A, E, R, E2 = never>(
   source: Stream.Stream<A, E, R>,
-  emptyError: (() => E2) | undefined
+  emptyError: (() => E2) | undefined,
+  signal: AbortSignal | undefined
 ): Stream.Stream<A, E | E2, R> => {
   if (emptyError === undefined) {
     return source;
@@ -97,7 +98,8 @@ const ensureNonEmpty = <A, E, R, E2 = never>(
             })
           ),
           Effect.catchCauseIf(
-            (cause) => !emitted && Pull.isDoneCause(cause),
+            (cause) =>
+              !emitted && signal?.aborted !== true && Pull.isDoneCause(cause),
             () => Effect.fail(emptyError())
           )
         )
@@ -301,9 +303,10 @@ export const streamPublicationBatches = <A, E, R>(
 export const streamLiveSnapshots = <A, E, R, E2 = never>(
   source: Stream.Stream<A, E, R>,
   coalesceMs: number | undefined,
-  emptyError: (() => E2) | undefined
+  emptyError: (() => E2) | undefined,
+  signal?: AbortSignal
 ): Stream.Stream<A, E | E2, R> => {
-  const checked = ensureNonEmpty(source, emptyError);
+  const checked = ensureNonEmpty(source, emptyError, signal);
   return coalesceMs === undefined
     ? checked
     : batchStream(checked, Infinity, coalesceMs, true).pipe(

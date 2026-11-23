@@ -485,6 +485,55 @@ describe("createRpcQueryUtils streaming execution", () => {
           }
         })
       );
+
+      it.effect(
+        "settles cleanly when the first pull aborts and completes empty",
+        () => {
+          const controller = new AbortController();
+          return Effect.gen(function* abortEmptyLiveStream() {
+            const group = RpcGroup.make(
+              Rpc.make("watch", { success: Schema.String, stream: true })
+            );
+            const client = yield* makeRpcTestClient(group, {
+              watch: () =>
+                Stream.unwrap(
+                  Effect.sync(() => {
+                    controller.abort();
+                    return Stream.empty;
+                  })
+                ),
+            });
+            const { watch } = createRpcQueryUtils(group, { client });
+            const { queryFn, queryKey } = watch.liveOptions({ coalesceMs });
+            const queryClient = new QueryClient();
+            try {
+              if (!Predicate.isFunction(queryFn)) {
+                throw new TypeError(
+                  "Expected a callable stream query function"
+                );
+              }
+              const result = yield* Effect.promise(
+                async () =>
+                  await queryFn({
+                    client: queryClient,
+                    queryKey,
+                    signal: controller.signal,
+                    meta: undefined,
+                  })
+              );
+              expect({
+                result,
+                aborted: controller.signal.aborted,
+              }).toStrictEqual({
+                result: null,
+                aborted: true,
+              });
+            } finally {
+              queryClient.clear();
+            }
+          });
+        }
+      );
     }
   );
 
