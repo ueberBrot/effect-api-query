@@ -706,6 +706,24 @@ describe("createContractHydrationRegistry — HTTP contracts", () => {
     ]).toStrictEqual([false, false, false]);
   });
 
+  it("reads each own hydration view override once", () => {
+    const group = RpcGroup.make(Rpc.make("read", { success: Schema.String }));
+    let reads = 0;
+    const registry = createContractHydrationRegistry(group, {
+      paths: {
+        read: {
+          get query() {
+            reads += 1;
+            return reads === 1 ? false : undefined;
+          },
+        },
+      },
+    });
+
+    expect(reads).toBe(1);
+    expect(registry.matches(["rpc", "read", "query"])).toBe(false);
+  });
+
   it("ignores inherited view overrides on accepted RPC and HTTP paths", () => {
     const group = RpcGroup.make(Rpc.make("read", { success: Schema.String }));
     const api = HttpApi.make("own-views").add(
@@ -1484,12 +1502,18 @@ describe("eager validation & HydrationCodecError", () => {
         paths: { "a.b.c": false },
       });
     });
+    const hiddenPaths = { "a.b.c": false } as const;
+    Object.defineProperty(hiddenPaths, "a.b.c", { enumerable: false });
+    const hiddenAmbiguousErr = captureHydrationError(() => {
+      createContractHydrationRegistry(ambiguousApi, { paths: hiddenPaths });
+    });
 
     const expected = {
       emptyPrefix: { code: "InvalidKeyPrefix" },
       nonJsonPrefix: { code: "InvalidKeyPrefix" },
       unknownPath: { code: "UnknownPath", path: "users.missing" },
       ambiguous: { code: "InvalidContractPath", path: "a.b.c" },
+      hiddenAmbiguous: { code: "InvalidContractPath", path: "a.b.c" },
     } as const;
 
     expect({
@@ -1497,6 +1521,10 @@ describe("eager validation & HydrationCodecError", () => {
       nonJsonPrefix: { code: nonJsonPrefixErr.code },
       unknownPath: { code: unknownPathErr.code, path: unknownPathErr.path },
       ambiguous: { code: ambiguousErr.code, path: ambiguousErr.path },
+      hiddenAmbiguous: {
+        code: hiddenAmbiguousErr.code,
+        path: hiddenAmbiguousErr.path,
+      },
       bareAmbiguousOk: createContractHydrationRegistry(ambiguousApi).matches([
         "http",
         "ambiguous",

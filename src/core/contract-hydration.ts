@@ -770,19 +770,26 @@ const readPathsOption = (
   return paths;
 };
 
-const validatePathConfigKeys = (
+const readViewOverrides = (
   path: string,
   config: Record<string, unknown>,
   allowed: ReadonlySet<string>
-): void => {
-  for (const [key, value] of Object.entries(config)) {
-    if (value !== undefined && !allowed.has(key)) {
+): ReadonlyMap<string, unknown> => {
+  const overrides = new Map<string, unknown>();
+  for (const key of Object.getOwnPropertyNames(config)) {
+    const value = config[key];
+    if (value === undefined) {
+      continue;
+    }
+    if (!allowed.has(key)) {
       throw new HydrationCodecError("UnknownPath", {
         path,
         message: `Unsupported hydration view "${key}" for "${path}"`,
       });
     }
+    overrides.set(key, value);
   }
+  return overrides;
 };
 
 const extractInfiniteConfig = (
@@ -830,116 +837,99 @@ const resolvePathConfigObject = (
   return pathConfig ?? {};
 };
 
-const rpcUnaryKeys = new Set(["query", "infinite"]);
-const rpcStreamKeys = new Set(["live", "streamed"]);
-const httpBufferedKeys = new Set(["query", "metadata", "infinite"]);
-const httpStreamKeys = new Set(["live", "streamed"]);
+const unaryKeys = new Set(["query", "infinite"]);
+const metadataKeys = new Set(["query", "metadata", "infinite"]);
+const streamKeys = new Set(["live", "streamed"]);
 
-const registerStreamViews = (
-  codecs: CompiledHydrationCodec[],
-  operationPrefix: readonly JsonValue[],
-  config: Record<string, unknown>,
-  views: ReadonlyMap<string, boolean>,
-  deriveLive: () => Schema.Top,
-  deriveStreamed: () => Schema.Top
-): void => {
-  const liveConfig = readOwn(config, "live");
-  const streamedConfig = readOwn(config, "streamed");
-  if (liveConfig !== false) {
-    if (Schema.isSchema(liveConfig)) {
-      codecs.push(
-        compileHydrationCodec(
-          Object.freeze([...operationPrefix, "live"]),
-          asCodec(liveConfig)
-        )
-      );
-    } else if (views.get("live") !== false) {
-      codecs.push(
-        compileHydrationCodec(
-          Object.freeze([...operationPrefix, "live"]),
-          asCodec(deriveLive())
-        )
-      );
+type CodecDerivations =
+  | {
+      readonly query: (view: "query" | "infinite") => Schema.Top;
+      readonly metadata?: (customQuery: Schema.Top | undefined) => Schema.Top;
     }
-  }
-  if (streamedConfig !== false) {
-    if (Schema.isSchema(streamedConfig)) {
-      codecs.push(
-        compileHydrationCodec(
-          Object.freeze([...operationPrefix, "streamed"]),
-          asCodec(streamedConfig)
-        )
-      );
-    } else if (views.get("streamed") !== false) {
-      codecs.push(
-        compileHydrationCodec(
-          Object.freeze([...operationPrefix, "streamed"]),
-          asCodec(deriveStreamed())
-        )
-      );
-    }
-  }
-};
+  | {
+      readonly live: () => Schema.Top;
+      readonly streamed: () => Schema.Top;
+    };
 
-const collectRpcOperationCodecs = (
+const collectOperationCodecs = (
   codecs: CompiledHydrationCodec[],
   operationPrefix: readonly JsonValue[],
   path: string,
-  rpc: Rpc.AnyWithProps,
   config: Record<string, unknown>,
-  views: ReadonlyMap<string, boolean>
+  views: ReadonlyMap<string, boolean>,
+  derive: CodecDerivations
 ): void => {
-  if (RpcSchema.isStreamSchema(rpc.successSchema)) {
-    validatePathConfigKeys(path, config, rpcStreamKeys);
-    const chunkSchema = rpc.successSchema.success;
-    const deriveChunk = (view: "live" | "streamed") =>
-      deriveJsonCodec(chunkSchema, path, view);
-    registerStreamViews(
-      codecs,
-      operationPrefix,
-      config,
-      views,
-      () => adaptQueryData(deriveChunk("live")),
-      () => Schema.Array(adaptStreamedElement(deriveChunk("streamed")))
+  let allowed = streamKeys;
+  if (!("live" in derive)) {
+    allowed = derive.metadata === undefined ? unaryKeys : metadataKeys;
+  }
+  const overrides = readViewOverrides(path, config, allowed);
+  const register = (view: QueryView, schema: Schema.Top) => {
+    codecs.push(
+      compileHydrationCodec(
+        Object.freeze([...operationPrefix, view]),
+        asCodec(schema),
+        view === "metadata" ? { postDecode: freezeMetadata } : undefined
+      )
     );
+  };
+  const registerDefault = (
+    view: Exclude<QueryView, "infinite">,
+    deriveDefault: () => Schema.Top
+  ) => {
+    const override = overrides.get(view);
+    const custom = Schema.isSchema(override) ? override : undefined;
+    if (
+      custom !== undefined ||
+      (override !== false && views.get(view) !== false)
+    ) {
+      register(view, custom ?? deriveDefault());
+    }
+    return custom;
+  };
+
+  if ("live" in derive) {
+    registerDefault("live", derive.live);
+    registerDefault("streamed", derive.streamed);
     return;
   }
 
-  validatePathConfigKeys(path, config, rpcUnaryKeys);
-  const deriveUnary = (view: "query" | "infinite") =>
-    adaptQueryData(deriveJsonCodec(rpc.successSchema, path, view));
-
-  const queryConfig = readOwn(config, "query");
-  const infiniteConfig = readOwn(config, "infinite");
-  const customQuery = Schema.isSchema(queryConfig) ? queryConfig : undefined;
-  if (queryConfig !== false) {
-    if (customQuery !== undefined) {
-      codecs.push(
-        compileHydrationCodec(
-          Object.freeze([...operationPrefix, "query"]),
-          asCodec(customQuery)
-        )
-      );
-    } else if (views.get("query") !== false) {
-      codecs.push(
-        compileHydrationCodec(
-          Object.freeze([...operationPrefix, "query"]),
-          asCodec(deriveUnary("query"))
-        )
-      );
-    }
+  const customQuery = registerDefault("query", () => derive.query("query"));
+  const deriveMetadata = derive.metadata;
+  if (deriveMetadata !== undefined) {
+    registerDefault("metadata", () => deriveMetadata(customQuery));
   }
 
-  const infinite = extractInfiniteConfig(path, infiniteConfig);
+  const infinite = extractInfiniteConfig(path, overrides.get("infinite"));
   if (infinite !== undefined) {
-    const pageCodec = infinite.page ?? customQuery ?? deriveUnary("infinite");
-    codecs.push(
-      compileHydrationCodec(
-        Object.freeze([...operationPrefix, "infinite"]),
-        asCodec(makeInfiniteCodec(pageCodec, infinite.pageParam))
+    register(
+      "infinite",
+      makeInfiniteCodec(
+        infinite.page ?? customQuery ?? derive.query("infinite"),
+        infinite.pageParam
       )
     );
   }
+};
+
+const rpcCodecDerivations = (
+  rpc: Rpc.AnyWithProps,
+  path: string
+): CodecDerivations => {
+  const { successSchema } = rpc;
+  if (RpcSchema.isStreamSchema(successSchema)) {
+    const chunk = successSchema.success;
+    return {
+      live: () => adaptQueryData(deriveJsonCodec(chunk, path, "live")),
+      streamed: () =>
+        Schema.Array(
+          adaptStreamedElement(deriveJsonCodec(chunk, path, "streamed"))
+        ),
+    };
+  }
+  return {
+    query: (view) => adaptQueryData(deriveJsonCodec(successSchema, path, view)),
+  };
 };
 
 const buildRpcContractRegistry = (
@@ -981,7 +971,7 @@ const buildRpcContractRegistry = (
   validateSegments(operations);
 
   const knownPaths = new Set(operations.map((op) => op.path));
-  for (const path of Object.keys(paths)) {
+  for (const path of Object.getOwnPropertyNames(paths)) {
     if (!knownPaths.has(path)) {
       throw new HydrationCodecError("UnknownPath", { path });
     }
@@ -995,103 +985,38 @@ const buildRpcContractRegistry = (
     if (config === false) {
       continue;
     }
-    collectRpcOperationCodecs(
+    collectOperationCodecs(
       codecs,
       [...rootPrefix, ...segments],
       path,
-      rpc,
       config,
-      views
+      views,
+      rpcCodecDerivations(rpc, path)
     );
   }
 
   return buildHydrationRegistry(codecs);
 };
 
-const collectHttpOperationCodecs = (
-  codecs: CompiledHydrationCodec[],
-  operationPrefix: readonly JsonValue[],
-  path: string,
+const httpCodecDerivations = (
   classified: QueryableHttpEndpoint,
   successesByStatus: ReadonlyMap<number, readonly Schema.Top[]>,
-  config: Record<string, unknown>,
-  views: ReadonlyMap<string, boolean>
-): void => {
-  if (classified.kind === "Streaming") {
-    validatePathConfigKeys(path, config, httpStreamKeys);
-    registerStreamViews(
-      codecs,
-      operationPrefix,
-      config,
-      views,
-      () => deriveHttpStreamCodec(classified.success, path, "live"),
-      () => deriveHttpStreamCodec(classified.success, path, "streamed")
-    );
-    return;
-  }
-
-  validatePathConfigKeys(path, config, httpBufferedKeys);
-  const deriveBuffered = (view: "query" | "infinite") =>
-    deriveHttpBufferedCodec(classified.successes, path, view);
-
-  const queryConfig = readOwn(config, "query");
-  const metadataConfig = readOwn(config, "metadata");
-  const infiniteConfig = readOwn(config, "infinite");
-  const customQuery = Schema.isSchema(queryConfig) ? queryConfig : undefined;
-  if (queryConfig !== false) {
-    if (customQuery !== undefined) {
-      codecs.push(
-        compileHydrationCodec(
-          Object.freeze([...operationPrefix, "query"]),
-          asCodec(customQuery)
-        )
-      );
-    } else if (views.get("query") !== false) {
-      codecs.push(
-        compileHydrationCodec(
-          Object.freeze([...operationPrefix, "query"]),
-          asCodec(deriveBuffered("query"))
-        )
-      );
-    }
-  }
-
-  if (metadataConfig !== false) {
-    if (Schema.isSchema(metadataConfig)) {
-      codecs.push(
-        compileHydrationCodec(
-          Object.freeze([...operationPrefix, "metadata"]),
-          asCodec(metadataConfig),
-          { postDecode: freezeMetadata }
-        )
-      );
-    } else if (views.get("metadata") !== false) {
-      const metadataCodec =
-        customQuery === undefined
-          ? deriveHttpMetadataCodec(successesByStatus, path)
-          : makeMetadataCodec(customQuery);
-      codecs.push(
-        compileHydrationCodec(
-          Object.freeze([...operationPrefix, "metadata"]),
-          asCodec(metadataCodec),
-          { postDecode: freezeMetadata }
-        )
-      );
-    }
-  }
-
-  const infinite = extractInfiniteConfig(path, infiniteConfig);
-  if (infinite !== undefined) {
-    const pageCodec =
-      infinite.page ?? customQuery ?? deriveBuffered("infinite");
-    codecs.push(
-      compileHydrationCodec(
-        Object.freeze([...operationPrefix, "infinite"]),
-        asCodec(makeInfiniteCodec(pageCodec, infinite.pageParam))
-      )
-    );
-  }
-};
+  path: string
+): CodecDerivations =>
+  classified.kind === "Streaming"
+    ? {
+        live: () => deriveHttpStreamCodec(classified.success, path, "live"),
+        streamed: () =>
+          deriveHttpStreamCodec(classified.success, path, "streamed"),
+      }
+    : {
+        query: (view) =>
+          deriveHttpBufferedCodec(classified.successes, path, view),
+        metadata: (customQuery) =>
+          customQuery === undefined
+            ? deriveHttpMetadataCodec(successesByStatus, path)
+            : makeMetadataCodec(customQuery),
+      };
 
 const validateHttpPaths = (
   operations: readonly { readonly path: string }[],
@@ -1107,7 +1032,7 @@ const validateHttpPaths = (
       ambiguousPaths.add(path);
     }
   }
-  for (const path of Object.keys(paths)) {
+  for (const path of Object.getOwnPropertyNames(paths)) {
     if (ambiguousPaths.has(path)) {
       throw new HydrationCodecError("InvalidContractPath", {
         path,
@@ -1172,14 +1097,13 @@ const buildHttpContractRegistry = (
     if (config === false) {
       continue;
     }
-    collectHttpOperationCodecs(
+    collectOperationCodecs(
       codecs,
       [...rootPrefix, ...segments],
       path,
-      classified,
-      successesByStatus,
       config,
-      views
+      views,
+      httpCodecDerivations(classified, successesByStatus, path)
     );
   }
 
