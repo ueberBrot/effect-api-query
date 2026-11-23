@@ -304,6 +304,19 @@ export type WithDefaultKeyRetention<KeyBuilder> = KeyBuilder extends (
       ) => Key
   : KeyBuilder;
 
+export type FilterWithDefaultRetention<Options> = Options extends {
+  readonly view: "streamed";
+  readonly maxChunks: infer Retention;
+}
+  ? Omit<Options, "maxChunks"> & { readonly maxChunks?: Retention }
+  : Options;
+
+export type WithDefaultFilterRetention<Filter> = Filter extends (
+  options?: infer Options
+) => infer Result
+  ? (options?: FilterWithDefaultRetention<Options>) => Result
+  : Filter;
+
 export type JoinPath<
   Prefix extends string,
   Key extends string,
@@ -324,18 +337,22 @@ export type ApplyRetentionTree<
         ? Inherited extends true
           ? WithDefaultKeyRetention<Node[Key]>
           : Node[Key]
-        : Node[Key] extends UtilityNode
-          ? ApplyRetentionTree<
-              Node[Key],
-              Paths,
-              Inherited extends true
-                ? true
-                : JoinPath<Prefix, Key> extends keyof Paths
-                  ? HasRetention<Paths[JoinPath<Prefix, Key>]>
-                  : false,
-              JoinPath<Prefix, Key>
-            >
-          : Node[Key]
+        : Key extends "queryFilter"
+          ? Inherited extends true
+            ? WithDefaultFilterRetention<Node[Key]>
+            : Node[Key]
+          : Node[Key] extends UtilityNode
+            ? ApplyRetentionTree<
+                Node[Key],
+                Paths,
+                Inherited extends true
+                  ? true
+                  : JoinPath<Prefix, Key> extends keyof Paths
+                    ? HasRetention<Paths[JoinPath<Prefix, Key>]>
+                    : false,
+                JoinPath<Prefix, Key>
+              >
+            : Node[Key]
     : Node[Key];
 };
 

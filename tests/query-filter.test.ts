@@ -75,7 +75,10 @@ describe("query filters", () => {
       Effect.gen(function* matchesConfiguredStreamPolicy() {
         const group = RpcGroup.make(
           Rpc.make("watch", {
-            payload: { id: Schema.FiniteFromString },
+            payload: {
+              id: Schema.FiniteFromString,
+              locale: Schema.optionalKey(Schema.String),
+            },
             success: Schema.String,
             stream: true,
           })
@@ -103,6 +106,10 @@ describe("query filters", () => {
         queryClient.setQueryData(watch.streamedKey({ input: { id: 2 } }), [
           "other",
         ]);
+        queryClient.setQueryData(
+          watch.streamedKey({ input: { id: 1, locale: "fr" } }),
+          ["localized"]
+        );
         const filter = {
           view: "streamed",
           input,

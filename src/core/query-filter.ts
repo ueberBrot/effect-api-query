@@ -24,6 +24,10 @@ export type BranchQueryFilter = (
   options?: BranchQueryFilterOptions
 ) => QueryFilter;
 
+export type StreamedFilterPolicy<Policy> =
+  | Policy
+  | { readonly [Key in keyof Policy]?: never };
+
 export type LeafQueryFilter<
   Input,
   Inputless extends boolean,

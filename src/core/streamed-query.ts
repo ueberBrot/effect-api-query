@@ -15,7 +15,12 @@ import {
   streamLiveSnapshots,
   streamPublicationBatches,
 } from "./stream-publication";
-import type { RunPromiseExit, StreamRefetchMode } from "./types";
+import type {
+  LivePolicyOptions,
+  RunPromiseExit,
+  StreamedPolicyOptions,
+  StreamRefetchMode,
+} from "./types";
 
 export type StreamQueryPolicy =
   | {
@@ -44,6 +49,18 @@ const validatePublicationDeadline: (
   ) {
     throw new RangeError(`${option} must be an integer from 1 to 2147483647`);
   }
+};
+
+export const clearStreamPolicy = (options: {
+  -readonly [
+    Key in keyof (StreamedPolicyOptions & LivePolicyOptions)
+  ]?: (StreamedPolicyOptions & LivePolicyOptions)[Key];
+}): void => {
+  delete options.coalesceMs;
+  delete options.refetchMode;
+  delete options.maxChunks;
+  delete options.publicationBatchSize;
+  delete options.publicationMaxWaitMs;
 };
 
 export const prepareStreamPolicy = (
@@ -105,11 +122,7 @@ export const prepareStreamPolicy = (
     validatePublicationDeadline(options["coalesceMs"], "coalesceMs");
     policy = { _tag: "Live", coalesceMs: options["coalesceMs"] };
   }
-  delete options["coalesceMs"];
-  delete options["refetchMode"];
-  delete options["maxChunks"];
-  delete options["publicationBatchSize"];
-  delete options["publicationMaxWaitMs"];
+  clearStreamPolicy(options);
   if (policy._tag === "Live") {
     return {
       policy,

@@ -157,16 +157,15 @@ const isStreamNdjson = (
   Predicate.hasProperty(schema, "_tag") &&
   schema._tag === "StreamNdjson";
 
-const isRedactedAst = (ast: SchemaAST.AST): boolean => {
+const hasRepresentation = (ast: SchemaAST.AST, id: string): boolean => {
   const representation = ast.annotations?.["representation"];
   return (
-    Predicate.hasProperty(representation, "id") &&
-    representation.id === "effect/schema/Redacted"
+    Predicate.hasProperty(representation, "id") && representation.id === id
   );
 };
 
 const isOpaqueDeclaration = (ast: SchemaAST.AST): boolean =>
-  ast._tag === "Declaration" &&
+  SchemaAST.isDeclaration(ast) &&
   !Predicate.isFunction(ast.annotations?.["toCodecJson"]) &&
   !Predicate.isFunction(ast.annotations?.["toCodec"]);
 
@@ -178,17 +177,17 @@ const isUnencodableAst = (
     return false;
   }
   seen.add(ast);
-  if (isRedactedAst(ast)) {
+  if (hasRepresentation(ast, "effect/schema/Redacted")) {
     return true;
   }
-  if (ast.encoding !== undefined && ast.encoding.length > 0) {
-    if (isOpaqueDeclaration(ast)) {
+  if (ast.encoding !== undefined) {
+    if (isOpaqueDeclaration(ast) || SchemaAST.isUnknown(ast)) {
       const [firstLink] = ast.encoding;
       if (
-        firstLink !== undefined &&
-        (SchemaAST.isUnknown(firstLink.to) ||
-          firstLink.to._tag === "Union" ||
-          firstLink.to._tag === "Any")
+        hasRepresentation(firstLink.to, "effect/schema/Json") ||
+        SchemaAST.isUnknown(firstLink.to) ||
+        firstLink.to._tag === "Union" ||
+        firstLink.to._tag === "Any"
       ) {
         return true;
       }
@@ -199,7 +198,7 @@ const isUnencodableAst = (
 };
 
 const unencodableTags = new Set<SchemaAST.AST["_tag"]>([
-  "Declaration",
+  "Any",
   "BigInt",
   "Symbol",
   "UniqueSymbol",
@@ -209,7 +208,7 @@ const isUnencodableBodyAst = (
   ast: SchemaAST.AST,
   seen: Set<SchemaAST.AST>
 ): boolean => {
-  if (unencodableTags.has(ast._tag)) {
+  if (unencodableTags.has(ast._tag) || isOpaqueDeclaration(ast)) {
     return true;
   }
   if (SchemaAST.isLiteral(ast)) {
@@ -316,14 +315,6 @@ const deriveJsonCodec = (
 ): Schema.Top => {
   const derived = toJsonCodecSafe(schema, path, view);
   assertEncodable(derived, path, view);
-  if (schema.ast.encoding !== undefined) {
-    const encoded = Schema.toEncoded(schema);
-    if (SchemaAST.isUnion(encoded.ast)) {
-      return protectUnion(toJsonCodecSafe(encoded, path, view)).pipe(
-        Schema.decodeTo(schema)
-      );
-    }
-  }
   return derived;
 };
 
@@ -402,11 +393,78 @@ const preferExactMembers = <DecodingServices, EncodingServices>(
   );
 };
 
+const copyCodecAst = (
+  ast: SchemaAST.AST,
+  fields: Partial<Pick<SchemaAST.AST, "context" | "encoding">>
+): SchemaAST.AST => {
+  const prototype: unknown = Object.getPrototypeOf(ast);
+  const copy = {};
+  Object.setPrototypeOf(copy, Predicate.isObject(prototype) ? prototype : null);
+  return Object.assign(copy, ast, fields);
+};
+
 const protectUnion = (codec: Schema.Top): Schema.Top => {
   const preserveUnionMembers = Function.memoize(
     (ast: SchemaAST.AST): SchemaAST.AST => {
       if (ast.encoding !== undefined) {
-        return ast;
+        const link = EffectArray.lastNonEmpty(ast.encoding);
+        const encoded = preserveUnionMembers(link.to);
+        return encoded === link.to
+          ? ast
+          : copyCodecAst(ast, {
+              encoding: EffectArray.append(
+                ast.encoding.slice(0, -1),
+                new SchemaAST.Link(encoded, link.transformation)
+              ),
+            });
+      }
+      if (SchemaAST.isObjects(ast)) {
+        const properties = SchemaAST.mapOrSame(
+          ast.propertySignatures,
+          (property) => {
+            const type = preserveUnionMembers(property.type);
+            return type === property.type
+              ? property
+              : new SchemaAST.PropertySignature(property.name, type);
+          }
+        );
+        const indexes = SchemaAST.mapOrSame(ast.indexSignatures, (index) => {
+          const type = preserveUnionMembers(index.type);
+          return type === index.type
+            ? index
+            : new SchemaAST.IndexSignature(index.parameter, type);
+        });
+        return properties === ast.propertySignatures &&
+          indexes === ast.indexSignatures
+          ? ast
+          : new SchemaAST.Objects(
+              properties,
+              indexes,
+              ast.annotations,
+              ast.checks,
+              undefined,
+              ast.context,
+              ast.encodingChecks
+            );
+      }
+      if (SchemaAST.isArrays(ast)) {
+        const elements = SchemaAST.mapOrSame(
+          ast.elements,
+          preserveUnionMembers
+        );
+        const rest = SchemaAST.mapOrSame(ast.rest, preserveUnionMembers);
+        return elements === ast.elements && rest === ast.rest
+          ? ast
+          : new SchemaAST.Arrays(
+              ast.isMutable,
+              elements,
+              rest,
+              ast.annotations,
+              ast.checks,
+              undefined,
+              ast.context,
+              ast.encodingChecks
+            );
       }
       if (SchemaAST.isSuspend(ast)) {
         return new SchemaAST.Suspend(
@@ -436,7 +494,20 @@ const protectUnion = (codec: Schema.Top): Schema.Top => {
           ast.encodingChecks
         )
       );
-      return preferExactMembers(union).ast;
+      const protectedAst = preferExactMembers(union).ast;
+      if (ast.context === undefined || protectedAst.encoding === undefined) {
+        return protectedAst;
+      }
+      const [link] = protectedAst.encoding;
+      return copyCodecAst(protectedAst, {
+        context: ast.context,
+        encoding: [
+          new SchemaAST.Link(
+            copyCodecAst(link.to, { context: ast.context }),
+            link.transformation
+          ),
+        ],
+      });
     }
   );
   return Schema.make<Schema.Top>(preserveUnionMembers(codec.ast));
@@ -1147,12 +1218,20 @@ const isHttpApi = (
   Predicate.isString(value.identifier);
 
 /** Derives a hydration codec registry directly from an Effect `RpcGroup` contract. */
+export function createContractHydrationRegistry<Group extends RpcGroup.Any>(
+  contract: Group,
+  options?: undefined
+): HydrationRegistry<
+  RpcContractDecodingServices<Group, undefined>,
+  RpcContractEncodingServices<Group, undefined>
+>;
+
 export function createContractHydrationRegistry<
   Group extends RpcGroup.Any,
-  const Options extends object | undefined = undefined,
+  const Options extends object | undefined,
 >(
   contract: Group,
-  options?: Options &
+  options: Options &
     NoInfer<
       Options extends undefined
         ? undefined
@@ -1164,12 +1243,20 @@ export function createContractHydrationRegistry<
 >;
 
 /** Derives a hydration codec registry directly from an Effect `HttpApi` contract. */
+export function createContractHydrationRegistry<Api extends HttpApi.Constraint>(
+  contract: Api,
+  options?: undefined
+): HydrationRegistry<
+  HttpContractDecodingServices<Api, undefined>,
+  HttpContractEncodingServices<Api, undefined>
+>;
+
 export function createContractHydrationRegistry<
   Api extends HttpApi.Constraint,
-  const Options extends object | undefined = undefined,
+  const Options extends object | undefined,
 >(
   contract: Api,
-  options?: Options &
+  options: Options &
     NoInfer<
       Options extends undefined
         ? undefined

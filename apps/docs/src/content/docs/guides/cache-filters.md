@@ -60,7 +60,7 @@ Partial filters compare the encoded values stored in keys. Here `FiniteFromStrin
 
 Use the key builder for complete input. `queryKey({ input: { id: 1 } })` fills in the default locale. The builder rejects `{ input: { locale: "en" } }` because the input lacks an ID. Use a partial filter to match across defaulted fields.
 
-Pass a full input or a `PreparedInput` with the view to use the leaf's key encoding. Omit stream policy options to match across policies. Supply policy options to match the same canonical policy as the key builder, including configured defaults and HTTP SSE decoder settings. For an accumulated stream, supply `maxChunks` if the leaf has no configured retention. Omit input to match that policy across inputs, or pass complete input and `exact: true` for an exact key.
+Pass a full input or a `PreparedInput` with the view to match that canonical input. Omit stream policy options to match across policies. Supply policy options to match the same canonical policy as the key builder, including configured defaults and HTTP SSE decoder settings. For an accumulated stream, supply `maxChunks` if the leaf has no configured retention. Omit input to match that policy across inputs, or pass complete input and `exact: true` for an exact key.
 
 ```ts
 const input = { id: 1, locale: "en" };

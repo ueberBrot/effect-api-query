@@ -1,6 +1,7 @@
 import { QueryCache } from "@tanstack/query-core";
 import type { QueryKey } from "@tanstack/query-core";
 import {
+  configureUtils,
   createQueryFilter,
   createRpcQueryUtils,
 } from "@ueberbrot/effect-api-query";
@@ -20,6 +21,14 @@ byId(1, {
   predicate: (query) => query.state.status === "success",
 });
 rpc.watch.queryFilter({ view: "streamed", fetchStatus: "fetching" });
+rpc.watch.queryFilter({
+  view: "streamed",
+  maxChunks: 3,
+  refetchMode: "append",
+});
+configureUtils(rpc, {
+  paths: { watch: { streamed: { maxChunks: 3 } } },
+}).watch.queryFilter({ view: "streamed", refetchMode: "append" });
 // @ts-expect-error The projection determines the filter input.
 byId("1");
 // @ts-expect-error Generated filters retain their own key identity.
@@ -68,6 +77,10 @@ false satisfies AcceptsFilter<
 false satisfies AcceptsFilter<
   typeof rpc.watch.queryFilter,
   { view: "live"; input: undefined }
+>;
+false satisfies AcceptsFilter<
+  typeof rpc.watch.queryFilter,
+  { view: "streamed"; refetchMode: "append" }
 >;
 false satisfies 2 extends Parameters<typeof createQueryFilter>["length"]
   ? true

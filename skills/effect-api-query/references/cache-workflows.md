@@ -71,7 +71,7 @@ Hooks, observers, and `queryClient.query` apply selection. The cache retains dec
 
 Pass `userReads` directly to `queryClient.invalidateQueries`. Root and branch filters use paths without constructing lazy leaves. Omit `exact` to include descendants. Within a branch, a view with no matching leaves selects nothing.
 
-On a queryable leaf, omit `view` to select all views. Pass `{ view, input }` to match canonical input, including prepared input. For streams, omit policy options to match across policies. Supply policy options to match the key builder's canonical policy, including configured defaults and SSE decoder settings. Supply `maxChunks` for this match if the accumulated view has no configured retention. Omit input to match across inputs. For an exact key, pass `exact: true` with the complete input when required and the stream policy.
+On a queryable leaf, omit `view` to select all views. Pass `{ view, input }` with raw or prepared input to match that complete canonical input. Use `createQueryFilter` for partial input. For streams, omit policy options to match across policies. Supply policy options to match the key builder's canonical policy, including configured defaults and SSE decoder settings. Supply `maxChunks` for this match if the accumulated view has no configured retention. Omit input to match across inputs. For an exact key, pass `exact: true` with the complete input when required and the stream policy.
 
 ## Run a leaf directly
 

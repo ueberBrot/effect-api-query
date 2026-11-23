@@ -1,6 +1,7 @@
 import { QueryClient, QueryObserver, skipToken } from "@tanstack/query-core";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import {
+  configureUtils,
   createHttpApiQueryUtils,
   EffectHttpApiQueryEmptyStreamError,
 } from "@ueberbrot/effect-api-query";
@@ -188,6 +189,12 @@ true satisfies Assert<
 >;
 const queryClient = new QueryClient();
 const input = { params: { id: 1 } };
+utils.views.plain.queryFilter({ view: "streamed", input, maxChunks: 3 });
+// @ts-expect-error A stream policy needs retention on an unconfigured leaf.
+utils.views.plain.queryFilter({ view: "streamed", refetchMode: "append" });
+configureUtils(utils.views.plain, {
+  streamed: { maxChunks: 3 },
+}).queryFilter({ view: "streamed", sseOptions: { maxEventSize: 1024 } });
 const options = utils.views.plain.streamedOptions({
   input,
   maxChunks: 3,

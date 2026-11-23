@@ -4,7 +4,11 @@ import type { Headers } from "effect/http";
 import type { Rpc, RpcClient, RpcGroup, RpcSchema } from "effect/rpc";
 
 import type { PreparedInput } from "../core/prepared-input";
-import type { BranchQueryFilter, LeafQueryFilter } from "../core/query-filter";
+import type {
+  BranchQueryFilter,
+  LeafQueryFilter,
+  StreamedFilterPolicy,
+} from "../core/query-filter";
 import type {
   ContainsRedacted,
   DirectArgs,
@@ -340,7 +344,7 @@ export interface RpcStreamLeaf<
     "live" | "streamed",
     {
       readonly live: LivePolicyOptions;
-      readonly streamed: Partial<StreamedPolicyOptions>;
+      readonly streamed: StreamedFilterPolicy<StreamedPolicyOptions>;
     }
   >;
 

@@ -103,6 +103,26 @@ type _RpcDisabledPathServices = Assert<
   Equal<typeof rpcDisabledPath, HydrationRegistry<DecB, EncB>>
 >;
 
+declare const eitherRpcPath:
+  | { readonly "users.read": false }
+  | { readonly "events.watch": false };
+const rpcAlternativePaths = createContractHydrationRegistry(rpcGroup, {
+  paths: eitherRpcPath,
+});
+type _RpcAlternativePathServices = Assert<
+  Equal<typeof rpcAlternativePaths, HydrationRegistry<DecA | DecB, EncA | EncB>>
+>;
+
+// @ts-expect-error An explicit options type requires an options argument.
+createContractHydrationRegistry<typeof rpcGroup, { views: { query: false } }>(
+  rpcGroup
+);
+
+// @ts-expect-error A codec for one literal cannot encode every string in the view.
+createContractHydrationRegistry(rpcGroup, {
+  paths: { "events.watch": { live: Schema.Literal("event") } },
+});
+
 const rpcViewsDisabled = createContractHydrationRegistry(rpcGroup, {
   views: { live: false, streamed: false },
 });
@@ -254,6 +274,16 @@ type _HttpBareServices = Assert<
     typeof httpBare,
     HydrationRegistry<DecA | DecB | DecHdr, EncA | EncB | EncHdr>
   >
+>;
+
+declare const eitherHttpPath:
+  | { readonly "data.profile": false }
+  | { readonly "data.sseData": false };
+const httpAlternativePaths = createContractHydrationRegistry(httpApi, {
+  paths: eitherHttpPath,
+});
+type _HttpAlternativePathServices = Assert<
+  Equal<typeof httpAlternativePaths, typeof httpBare>
 >;
 
 const httpQueryInheritMetadata = createContractHydrationRegistry(httpApi, {

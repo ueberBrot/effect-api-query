@@ -519,19 +519,17 @@ describe(createRpcQueryUtils, () => {
           }
 
           let observedMarker: string | undefined;
-          const statefulClient = {
-            marker: "bound",
-            "ping.run"(this: { readonly marker: string }) {
+          class StatefulClient {
+            readonly marker = "bound";
+            "ping.run"() {
               observedMarker = this.marker;
-              return Effect.succeed("ok");
-            },
-          };
-          const statefulUtils = createRpcQueryUtils(smallGroup, {
-            // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion
-            client: statefulClient as RpcClient.RpcClient<
-              RpcGroup.Rpcs<typeof smallGroup>
-            >,
-          });
+              return Effect.void;
+            }
+          }
+          const statefulUtils = createRpcQueryUtils(
+            RpcGroup.make(Rpc.make("ping.run")),
+            { client: new StatefulClient() }
+          );
           const receiverClient = new QueryClient();
           try {
             const res = yield* Effect.promise(
@@ -541,7 +539,7 @@ describe(createRpcQueryUtils, () => {
                 )
             );
             expect({ res, observedMarker }).toStrictEqual({
-              res: "ok",
+              res: null,
               observedMarker: "bound",
             });
           } finally {
@@ -551,6 +549,12 @@ describe(createRpcQueryUtils, () => {
           /* oxlint-disable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
           expect(() =>
             createRpcQueryUtils(smallGroup, { client: {} } as never)
+          ).toThrow(EffectRpcQueryConfigError);
+          expect(() =>
+            createRpcQueryUtils(
+              RpcGroup.make(Rpc.make("toString", { success: Schema.String })),
+              { client: {} } as never
+            )
           ).toThrow(EffectRpcQueryConfigError);
           expect(() =>
             createRpcQueryUtils(smallGroup, {

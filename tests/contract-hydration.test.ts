@@ -86,6 +86,47 @@ const dummyHttpClient = HttpClient.make((request) =>
 );
 
 describe("createContractHydrationRegistry — RPC contracts", () => {
+  it.effect("preserves nested union members and built-in JSON schemas", () =>
+    Effect.gen(function* preservesNestedUnionMembers() {
+      const Value = Schema.Union([Schema.BigInt, Schema.String]);
+      const Nested = Schema.Struct({
+        optional: Schema.optionalKey(Value),
+        values: Schema.Array(Value),
+        dictionary: Schema.Record(Schema.String, Value),
+        json: Schema.Json,
+        jsonObject: Schema.JsonObject,
+      });
+      const group = RpcGroup.make(Rpc.make("read", { success: Nested }));
+      const key = ["rpc", "read", "query"];
+      const value = Nested.make({
+        values: ["42", 42n],
+        dictionary: { text: "42", bigint: 42n },
+        json: [null, { count: 1 }],
+        jsonObject: { count: 1 },
+      });
+      const server = new QueryClient();
+      const browser = new QueryClient();
+      const registry = createContractHydrationRegistry(group);
+      server.setQueryData(key, value);
+      yield* roundTripJson(registry, server, browser);
+      expect(browser.getQueryData(key)).toStrictEqual(value);
+      const withOptional = Nested.make({ ...value, optional: "42" });
+      server.setQueryData(key, withOptional);
+      browser.clear();
+      yield* roundTripJson(registry, server, browser);
+      expect(browser.getQueryData(key)).toStrictEqual(withOptional);
+    })
+  );
+
+  it("rejects unrestricted Any before serializing a stream", () => {
+    const group = RpcGroup.make(
+      Rpc.make("watch", { success: Schema.Any, stream: true })
+    );
+    expect(() => createContractHydrationRegistry(group)).toThrow(
+      expect.objectContaining({ code: "UnencodableSchema", path: "watch" })
+    );
+  });
+
   it.effect(
     "preserves RPC union members in query, live, and streamed data",
     () =>
@@ -553,6 +594,49 @@ describe("createContractHydrationRegistry — HTTP contracts", () => {
         browser.getQueryData(sseStreamed),
         browser.getQueryData(sseLive),
       ]).toStrictEqual([[42n, "42"], "42", [wrapped], wrapped]);
+    })
+  );
+
+  it.effect("preserves a transformed SSE data codec's encoded union", () =>
+    Effect.gen(function* preservesTransformedSseData() {
+      const Value = Schema.Union([Schema.BigInt, Schema.String]);
+      const Data = Value.pipe(
+        Schema.decodeTo(
+          Schema.Struct({ value: Value }),
+          SchemaTransformation.transform({
+            decode: (value) => ({ value }),
+            encode: ({ value }) => value,
+          })
+        )
+      );
+      const api = HttpApi.make("sse-encoded-union").add(
+        HttpApiGroup.make("events").add(
+          HttpApiEndpoint.get("watch", "/events", {
+            success: HttpApiSchema.StreamSse({ data: Data }),
+          })
+        )
+      );
+      const client = yield* HttpApiClient.makeWith(api, {
+        baseUrl: "https://example.test",
+        httpClient: dummyHttpClient,
+      });
+      const { watch } = createHttpApiQueryUtils(api, { client }).events;
+      const live = watch.liveKey();
+      const streamed = watch.streamedKey({ maxChunks: 3 });
+      const server = new QueryClient();
+      const browser = new QueryClient();
+      server.setQueryData(live, { value: "42" });
+      server.setQueryData(streamed, [{ value: 42n }, { value: "42" }]);
+      yield* roundTripJson(
+        createContractHydrationRegistry(api),
+        server,
+        browser
+      );
+      expect(browser.getQueryData(live)).toStrictEqual({ value: "42" });
+      expect(browser.getQueryData(streamed)).toStrictEqual([
+        { value: 42n },
+        { value: "42" },
+      ]);
     })
   );
 

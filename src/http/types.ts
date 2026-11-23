@@ -10,7 +10,11 @@ import type {
 } from "effect/http-api";
 
 import type { PreparedInput } from "../core/prepared-input";
-import type { BranchQueryFilter, LeafQueryFilter } from "../core/query-filter";
+import type {
+  BranchQueryFilter,
+  LeafQueryFilter,
+  StreamedFilterPolicy,
+} from "../core/query-filter";
 import type {
   ContainsRedacted,
   DirectArgs,
@@ -557,7 +561,7 @@ export type StreamedLeaf<
     "live" | "streamed",
     {
       readonly live: HttpDecoderPolicy<Endpoint> & LivePolicyOptions;
-      readonly streamed: Partial<HttpStreamPolicy<Endpoint>>;
+      readonly streamed: StreamedFilterPolicy<HttpStreamPolicy<Endpoint>>;
     }
   >;
 

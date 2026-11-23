@@ -27,6 +27,7 @@ import {
 } from "./prepared-input";
 import type { QueryFilter, QueryFilterOptions } from "./query-filter";
 import { resolveRuntime } from "./runtime";
+import { clearStreamPolicy } from "./streamed-query";
 import type {
   JsonValue,
   LivePolicyOptions,
@@ -183,14 +184,14 @@ type LeafFilterOptions = QueryFilterOptions &
     readonly sseOptions?: unknown;
   };
 
-const streamPolicyKeys = new Set([
+const streamPolicyKeys = [
   "coalesceMs",
   "maxChunks",
   "refetchMode",
   "publicationBatchSize",
   "publicationMaxWaitMs",
   "sseOptions",
-]);
+] as const;
 
 const createLeafFilter =
   (
@@ -214,7 +215,7 @@ const createLeafFilter =
     const identity =
       description.kind === "Streaming" &&
       (view === "live" || view === "streamed") &&
-      Object.keys(options).some((key) => streamPolicyKeys.has(key))
+      streamPolicyKeys.some((key) => Object.hasOwn(options, key))
         ? description.prepareStream(
             { ...defaults?.[view], ...options },
             view,
@@ -223,7 +224,7 @@ const createLeafFilter =
           ).identity
         : undefined;
     let queryKey = prefix;
-    if (hasInput) {
+    if (hasInput || (inputless && identity)) {
       queryKey = prepareQuery(
         description,
         input,
@@ -231,29 +232,30 @@ const createLeafFilter =
         keyEncoder,
         identity
       ).key;
-    } else if (inputless && identity !== undefined) {
-      queryKey = freezeKey([...prefix, ...identity]);
     }
-    if (identity === undefined) {
-      return { ...options, queryKey };
+    if (identity) {
+      clearStreamPolicy(options);
+      delete options.sseOptions;
     }
-
-    const nativeOptions = Object.fromEntries(
-      Object.entries(options).filter(([key]) => !streamPolicyKeys.has(key))
-    );
-    if (options.exact === true && (inputless || hasInput)) {
-      return { ...nativeOptions, queryKey };
+    const filter = { ...options, queryKey };
+    const hasCanonicalInput = hasInput && !inputless;
+    if (options.exact === true || (!hasCanonicalInput && !identity)) {
+      return filter;
     }
-    const identityIndex = inputless ? prefix.length : prefix.length + 1;
-    const identityHash = hashKey(identity);
-    return {
-      ...nativeOptions,
-      queryKey,
-      predicate: (query) =>
-        query.queryKey.length >= identityIndex &&
-        hashKey(query.queryKey.slice(identityIndex)) === identityHash &&
-        (options.predicate?.(query) ?? true),
-    };
+    const inputIndex = prefix.length;
+    const inputHash = hasCanonicalInput
+      ? hashKey([queryKey[inputIndex]])
+      : undefined;
+    const identityIndex = inputless ? inputIndex : inputIndex + 1;
+    const identityHash = identity && hashKey(identity);
+    filter.predicate = (query) =>
+      (inputHash === undefined ||
+        hashKey([query.queryKey[inputIndex]]) === inputHash) &&
+      (identityHash === undefined ||
+        (query.queryKey.length >= identityIndex &&
+          hashKey(query.queryKey.slice(identityIndex)) === identityHash)) &&
+      (options.predicate?.(query) ?? true);
+    return filter;
   };
 
 const prepareQueryOptions = (

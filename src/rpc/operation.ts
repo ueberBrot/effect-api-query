@@ -131,8 +131,13 @@ const createRpcInvoker = <Result>(
       { rpcTag }
     );
   }
-  const candidate = Object.hasOwn(client, rpcTag) ? client[rpcTag] : undefined;
-  if (!Predicate.isFunction(candidate)) {
+  const candidate = client[rpcTag];
+  if (
+    !Predicate.isFunction(candidate) ||
+    (!Object.hasOwn(client, rpcTag) &&
+      candidate ===
+        Object.getOwnPropertyDescriptor(Object.prototype, rpcTag)?.value)
+  ) {
     throw new EffectRpcQueryConfigError(
       "InvalidRpcClient",
       `RPC client is missing a function for tag ${rpcTag}`,

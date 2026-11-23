@@ -37,7 +37,7 @@ skills:
       - Use QueryClientService to run queries, warm the cache, and apply cache operations in Effect. Use an exclusive stream snapshot to capture a stream that can stay open.
       - Bind application Reactivity keys to explicit cache filters within a Scope. Retain key prefix isolation and stop invalidation at query owner retirement.
       - Derive buffered, paginated, accumulated, live, and metadata options from a ready client. Use its HTTP request parse options when encoding default keys.
-      - Use colocated query filters for lazy-safe branch views and canonical leaf inputs. Omit stream policy options for a broad match or supply them to match the canonical stream identity. Use explicit projections for encoded partial input.
+      - Use colocated query filters for lazy-safe branch views and complete canonical leaf inputs. Omit stream policy options to match across policies. Supply retention for a policy match if none is configured. Use explicit projections for encoded partial input.
       - Reuse inferred input, cached query data, and mutation types in application modules.
       - Configure utility trees, branches, and leaves with ordered interceptors across views; reuse unchanged frozen subtrees while preserving policy snapshots and prepared-input ownership; select a branch view without changing key layouts.
       - Reuse owner-bound prepared inputs and configure policies once per owner; rebuild reactive call-site options when input changes.
@@ -46,7 +46,7 @@ skills:
       - Apply native defaults and scoped policies without losing call-site selection, conditional input, or explicitly undefined seed behavior; compose mutation callbacks or intercept native execution attempts.
       - Reuse equivalent immutable decoded records and nested containers with a schema-specific structuralSharing policy while preserving metadata freezing and generated types.
       - Capture open streams and drain queries, preparation, and accepted writes before request disposal.
-      - Derive registries from matching contracts, override unsupported schemas, and hydrate selected views into their decoded cache representation. Use cached HTTP metadata status to select declared successes. Preserve top-level union members with overlapping JSON encodings and distinct undefined stream elements. Set view overrides directly on configuration objects.
+      - Derive registries from matching contracts, override unsupported schemas, and hydrate selected views into their decoded cache representation. Use cached HTTP metadata status to select declared successes. Preserve nested union members with overlapping JSON encodings and distinct undefined stream elements. Set view overrides directly on configuration objects.
       - Preserve neighboring writes and originating ownership during mutation overlap.
       - Defer event refresh until participating writes settle.
       - Retire consumers and accepted work before acquiring a replacement owner. Each owner creates its query and mutation caches from configuration and drains registered work before release.

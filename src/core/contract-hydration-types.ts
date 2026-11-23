@@ -52,9 +52,9 @@ export type ExactCodec<Data, Actual> = Actual extends unknown
       ? [Type] extends [Data]
         ? [Data] extends [Type]
           ? Actual
-          : Schema.Codec<Data, unknown, unknown, unknown>
-        : Schema.Codec<Data, unknown, unknown, unknown>
-      : Schema.Codec<Data, unknown, unknown, unknown>
+          : never
+        : never
+      : never
   : never;
 
 export type CodecServices<
@@ -71,7 +71,7 @@ export type InfiniteConfigConstraint<PageData, Actual> = Actual extends unknown
       } & ExactKeys<Actual, "pageParam" | "page">
   : never;
 
-export type GuaranteedModifiedKeys<Paths> = Paths extends object
+export type GuaranteedModifiedKeys<Paths> = [Paths] extends [object]
   ? {
       readonly [Key in keyof Paths & string]: [
         Extract<Paths[Key], undefined>,
