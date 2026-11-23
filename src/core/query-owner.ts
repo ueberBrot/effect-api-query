@@ -86,6 +86,16 @@ const failedExitCause = <A, E>(exit: Exit.Exit<A, E>) =>
     ? exit.cause
     : undefined;
 
+/** Configures how a wrapped runner behaves when its query owner retires. */
+export interface WrapRunnerOptions {
+  /**
+   * Controls whether executions started through the wrapped runner are
+   * interrupted on owner retirement. Defaults to interrupting only when a
+   * caller `AbortSignal` is passed.
+   */
+  readonly interruptOnRetire?: boolean | undefined;
+}
+
 /** Registers only resources whose lifetime is explicitly transferred to the owner. */
 export interface QueryOwnerSetup extends Omit<
   QueryOwner<never>,
@@ -123,7 +133,10 @@ export interface QueryOwner<A> {
    * Tracks utility runner calls. Accepts a `RunPromiseExit` function or an object
    * with a `runPromiseExit` method (such as `ManagedRuntime<R, never>`).
    */
-  readonly wrapRunner: <R>(runner: RuntimeInput<R>) => RunPromiseExit<R>;
+  readonly wrapRunner: <R>(
+    runner: RuntimeInput<R>,
+    options?: WrapRunnerOptions
+  ) => RunPromiseExit<R>;
   /**
    * Binds a generated utility tree, branch, or leaf to this owner so runners,
    * all query views, and mutations are tracked for retirement.
@@ -195,33 +208,36 @@ export const acquireQueryOwner = async <A>(
       pending.delete(work);
     }
   };
-  const wrapRunner: QueryOwner<A>["wrapRunner"] = (input) => {
+  const wrapRunner: QueryOwner<A>["wrapRunner"] = (input, wrapOptions) => {
     const runner = resolveRuntime(input);
+    const interruptOnRetire = wrapOptions?.interruptOnRetire;
     return async (effect, options) =>
       track(
         async () => {
-          const controller =
-            options?.signal === undefined ? undefined : new AbortController();
-          const abort = () => controller?.abort();
-          if (controller !== undefined) {
-            queries.add(controller);
-            options?.signal?.addEventListener("abort", abort, { once: true });
-            if (options?.signal?.aborted === true) {
-              controller.abort();
-            }
-          }
-          try {
+          const shouldInterruptOnRetire =
+            interruptOnRetire ?? options?.signal !== undefined;
+          if (!shouldInterruptOnRetire) {
             return await runner(
               effect,
-              controller === undefined
+              options?.signal === undefined
                 ? undefined
-                : { signal: controller.signal }
+                : { signal: options.signal }
             );
+          }
+          const controller = new AbortController();
+          const abort = () => {
+            controller.abort();
+          };
+          queries.add(controller);
+          options?.signal?.addEventListener("abort", abort, { once: true });
+          if (options?.signal?.aborted === true) {
+            controller.abort();
+          }
+          try {
+            return await runner(effect, { signal: controller.signal });
           } finally {
-            if (controller !== undefined) {
-              queries.delete(controller);
-              options?.signal?.removeEventListener("abort", abort);
-            }
+            queries.delete(controller);
+            options?.signal?.removeEventListener("abort", abort);
           }
         },
         undefined,

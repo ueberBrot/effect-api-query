@@ -132,7 +132,11 @@ export {
 export { schemaStructuralSharing } from "./core/schema-structural-sharing";
 export type { SchemaStructuralSharingOptions } from "./core/schema-structural-sharing";
 export { acquireQueryOwner } from "./core/query-owner";
-export type { QueryOwner, QueryOwnerSetup } from "./core/query-owner";
+export type {
+  QueryOwner,
+  QueryOwnerSetup,
+  WrapRunnerOptions,
+} from "./core/query-owner";
 
 export {
   createQueryDescriptor,

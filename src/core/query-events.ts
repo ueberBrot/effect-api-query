@@ -20,9 +20,8 @@ export const runQueryEvents = async <A, E, R, HE, HR>(
   options: ConsumeEventsOptions<A, E, R, HE, HR>,
   runPromiseExit: RunPromiseExit<Exclude<R | HR, QueryClientService>>
 ): Promise<Exit.Exit<void, E | HE>> =>
-  owner.wrapRunner(runPromiseExit)(
+  owner.wrapRunner(runPromiseExit, { interruptOnRetire: true })(
     consumeEvents(source, options).pipe(
       Effect.provideService(QueryClientService, owner.queryClient)
-    ),
-    { signal: new AbortController().signal }
+    )
   );

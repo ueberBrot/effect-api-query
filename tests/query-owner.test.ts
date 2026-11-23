@@ -898,4 +898,106 @@ describe("query owners", () => {
       )
     );
   });
+
+  it("wrapRunner with interruptOnRetire interrupts Effects without a caller signal and drains finalizers before release", async () => {
+    const started = gate();
+    const finalizing = gate();
+    const cleanup = gate();
+    const events: string[] = [];
+    const owner = await acquireQueryOwner(
+      async (setup) =>
+        await setup.acquire(
+          () => "transport",
+          () => {
+            events.push("released");
+          }
+        )
+    );
+    const run = owner.wrapRunner(Effect.runPromiseExit, {
+      interruptOnRetire: true,
+    });
+    const result = run(
+      Effect.sync(() => {
+        started.open();
+      }).pipe(
+        Effect.flatMap(() => Effect.never),
+        Effect.ensuring(
+          Effect.promise(async () => {
+            finalizing.open();
+            await cleanup.promise;
+            events.push("cleaned");
+          })
+        )
+      )
+    );
+    await started.promise;
+    const disposed = owner.dispose();
+    await finalizing.promise;
+    expect(events).toStrictEqual([]);
+    cleanup.open();
+    await disposed;
+    const exit = await result;
+    expect(Exit.isFailure(exit)).toBe(true);
+    expect(events).toStrictEqual(["cleaned", "released"]);
+  });
+
+  it("wrapRunner with interruptOnRetire still honors a caller AbortSignal before retirement", async () => {
+    const started = gate();
+    const owner = await acquireQueryOwner(
+      async () => await Promise.resolve(null)
+    );
+    const run = owner.wrapRunner(Effect.runPromiseExit, {
+      interruptOnRetire: true,
+    });
+    const controller = new AbortController();
+    const result = run(
+      Effect.sync(() => {
+        started.open();
+      }).pipe(Effect.flatMap(() => Effect.never)),
+      { signal: controller.signal }
+    );
+    await started.promise;
+    controller.abort();
+    const exit = await result;
+    expect(Exit.isFailure(exit)).toBe(true);
+    expect(owner.isActive()).toBe(true);
+    await owner.dispose();
+  });
+
+  it("wrapRunner with interruptOnRetire: false drains on retirement even when a caller signal is supplied", async () => {
+    const started = gate();
+    const finish = gate();
+    const events: string[] = [];
+    const owner = await acquireQueryOwner(
+      async (setup) =>
+        await setup.acquire(
+          () => "transport",
+          () => {
+            events.push("released");
+          }
+        )
+    );
+    const run = owner.wrapRunner(Effect.runPromiseExit, {
+      interruptOnRetire: false,
+    });
+    const controller = new AbortController();
+    const result = run(
+      Effect.promise(async () => {
+        started.open();
+        await finish.promise;
+        events.push("finished");
+        return "done";
+      }),
+      { signal: controller.signal }
+    );
+    await started.promise;
+    const disposed = owner.dispose();
+    await Promise.resolve();
+    expect(controller.signal.aborted).toBe(false);
+    expect(events).toStrictEqual([]);
+    finish.open();
+    await disposed;
+    await expect(result).resolves.toStrictEqual(Exit.succeed("done"));
+    expect(events).toStrictEqual(["finished", "released"]);
+  });
 });
