@@ -4405,6 +4405,146 @@
         "vp run fallow passed with 0 dead-code issues.",
         "vp test passed 109/109 tests across workflow-guards, version-packages, skills-maintenance, and docs-release."
       ]
+    },
+    "source:.changeset/accept-managed-runtimes-for-query-events.md": {
+      "fingerprint": "0a6cb0dd310cc755b1364f3a8a71d403c30ff5ce2c133f890a08b2a89559b37f",
+      "snapshot": {
+        ".changeset/accept-managed-runtimes-for-query-events.md": "20270145443832f43dfce694e6147a9c69bdda4a2cc81d4f13c717a73e4c50fa"
+      },
+      "head": "94ab666b2c72575d195088be1ae82a22413f6304",
+      "outcome": "no-change",
+      "reason": "This release note summarizes public behavior covered by the recorded source and guidance review. The shipped skill and planning records already cover its workflow.",
+      "evidence": [
+        ".changeset/accept-managed-runtimes-for-query-events.md",
+        "94ab666 recorded the implementation and guidance review",
+        "Changeset status against origin/main includes this note and resolves to 0.8.0"
+      ]
+    },
+    "source:.changeset/derive-http-hydration-from-successes.md": {
+      "fingerprint": "8816b970ce5a2da97a289202ee927ec4faa1fad9efa03f403b9244add55c4d88",
+      "snapshot": {
+        ".changeset/derive-http-hydration-from-successes.md": "25ebaa7ba03ac9c428326867fc7b9be04c8726ae362ada32cb170dded02a4287"
+      },
+      "head": "94ab666b2c72575d195088be1ae82a22413f6304",
+      "outcome": "no-change",
+      "reason": "This release note summarizes public behavior covered by the recorded source and guidance review. The shipped skill and planning records already cover its workflow.",
+      "evidence": [
+        ".changeset/derive-http-hydration-from-successes.md",
+        "94ab666 recorded the implementation and guidance review",
+        "Changeset status against origin/main includes this note and resolves to 0.8.0"
+      ]
+    },
+    "source:.changeset/drain-concurrent-stream-snapshot-pulls.md": {
+      "fingerprint": "801212674999a1b5676844aa535060af1836c64d2b5429a0478fa6e0be25479d",
+      "snapshot": {
+        ".changeset/drain-concurrent-stream-snapshot-pulls.md": "c4f41bcbe60a9fb40eabcf2dc822983d9c21fdadf336b93725fe20ae1d235b42"
+      },
+      "head": "94ab666b2c72575d195088be1ae82a22413f6304",
+      "outcome": "no-change",
+      "reason": "This release note summarizes public behavior covered by the recorded source and guidance review. The shipped skill and planning records already cover its workflow.",
+      "evidence": [
+        ".changeset/drain-concurrent-stream-snapshot-pulls.md",
+        "94ab666 recorded the implementation and guidance review",
+        "Changeset status against origin/main includes this note and resolves to 0.8.0"
+      ]
+    },
+    "source:.changeset/guard-direct-calls-after-owner-retirement.md": {
+      "fingerprint": "bb1a02bf0743cbdefdf16f77b4a783213c839be01533dc2721568efcab434c8b",
+      "snapshot": {
+        ".changeset/guard-direct-calls-after-owner-retirement.md": "fbc485ac7cd3a0f2024cde8c32918ef44b0a1b01dd71605d22a6a132f8a40686"
+      },
+      "head": "94ab666b2c72575d195088be1ae82a22413f6304",
+      "outcome": "no-change",
+      "reason": "This release note summarizes public behavior covered by the recorded source and guidance review. The shipped skill and planning records already cover its workflow.",
+      "evidence": [
+        ".changeset/guard-direct-calls-after-owner-retirement.md",
+        "94ab666 recorded the implementation and guidance review",
+        "Changeset status against origin/main includes this note and resolves to 0.8.0"
+      ]
+    },
+    "source:.changeset/opt-in-to-owner-retirement-interruption.md": {
+      "fingerprint": "0c72aa12f854f7688b6cdebf7c55e501cb5c58bbd712001e13081f3ada774bd4",
+      "snapshot": {
+        ".changeset/opt-in-to-owner-retirement-interruption.md": "804468b68fd291d7d52402339576f144fdc52eec008a96569a9d09676f64c2af"
+      },
+      "head": "94ab666b2c72575d195088be1ae82a22413f6304",
+      "outcome": "no-change",
+      "reason": "This release note summarizes public behavior covered by the recorded source and guidance review. The shipped skill and planning records already cover its workflow.",
+      "evidence": [
+        ".changeset/opt-in-to-owner-retirement-interruption.md",
+        "94ab666 recorded the implementation and guidance review",
+        "Changeset status against origin/main includes this note and resolves to 0.8.0"
+      ]
+    },
+    "source:.changeset/preserve-stream-publication-on-failure.md": {
+      "fingerprint": "d96e8504408572c4846a3b77db14f5ece876e7d5c93c1aa11fc89170abb3da4c",
+      "snapshot": {
+        ".changeset/preserve-stream-publication-on-failure.md": "8fe0684c21e14b81c107150ee3d58c8a405c415e614b5b14a158577dcf313c5e"
+      },
+      "head": "94ab666b2c72575d195088be1ae82a22413f6304",
+      "outcome": "no-change",
+      "reason": "This release note summarizes public behavior covered by the recorded source and guidance review. The shipped skill and planning records already cover its workflow.",
+      "evidence": [
+        ".changeset/preserve-stream-publication-on-failure.md",
+        "94ab666 recorded the implementation and guidance review",
+        "Changeset status against origin/main includes this note and resolves to 0.8.0"
+      ]
+    },
+    "source:.changeset/reject-skip-token-in-exact-keys.md": {
+      "fingerprint": "81e6fd99ab49870cba4cecb9b54de7ef6082bcb6cd27b49e9fb9867c618f7a44",
+      "snapshot": {
+        ".changeset/reject-skip-token-in-exact-keys.md": "1464c9b6fc8f5dae01f7dd9b75642fcc9a54ae4e935a0963d35869949051acd4"
+      },
+      "head": "94ab666b2c72575d195088be1ae82a22413f6304",
+      "outcome": "no-change",
+      "reason": "This release note summarizes public behavior covered by the recorded source and guidance review. The shipped skill and planning records already cover its workflow.",
+      "evidence": [
+        ".changeset/reject-skip-token-in-exact-keys.md",
+        "94ab666 recorded the implementation and guidance review",
+        "Changeset status against origin/main includes this note and resolves to 0.8.0"
+      ]
+    },
+    "source:.changeset/require-explicit-json-for-broad-object-hydration.md": {
+      "fingerprint": "c17df42e24bd14cd6ab01fb4c388e0ffe77b6a163d0ea94d995a0e97ac5d9d1c",
+      "snapshot": {
+        ".changeset/require-explicit-json-for-broad-object-hydration.md": "249263dd0357244ee17579a78e675e2417e9f27bb890c47c647632f485d2d685"
+      },
+      "head": "94ab666b2c72575d195088be1ae82a22413f6304",
+      "outcome": "no-change",
+      "reason": "This release note summarizes public behavior covered by the recorded source and guidance review. The shipped skill and planning records already cover its workflow.",
+      "evidence": [
+        ".changeset/require-explicit-json-for-broad-object-hydration.md",
+        "94ab666 recorded the implementation and guidance review",
+        "Changeset status against origin/main includes this note and resolves to 0.8.0"
+      ]
+    },
+    "source:.changeset/wait-for-sibling-reactivity-refetches.md": {
+      "fingerprint": "364fb729d71b5561cfa3de92ff1e9df38b1ba359c59abef41f33a532d6a578ea",
+      "snapshot": {
+        ".changeset/wait-for-sibling-reactivity-refetches.md": "e30253e2e6fa5d39ba016eafe7930b89603df585450c6d864348e1547525a571"
+      },
+      "head": "94ab666b2c72575d195088be1ae82a22413f6304",
+      "outcome": "no-change",
+      "reason": "This release note summarizes public behavior covered by the recorded source and guidance review. The shipped skill and planning records already cover its workflow.",
+      "evidence": [
+        ".changeset/wait-for-sibling-reactivity-refetches.md",
+        "94ab666 recorded the implementation and guidance review",
+        "Changeset status against origin/main includes this note and resolves to 0.8.0"
+      ]
+    },
+    "source:.changeset/yield-query-client-operation-errors.md": {
+      "fingerprint": "871f1f52c411680aa8cf6e262e68c81a48b9f1742dde77c21041d88b6f474468",
+      "snapshot": {
+        ".changeset/yield-query-client-operation-errors.md": "9255725992526c13bc5a8e31683e750e844ec2b9c2c4cfea701808334ea34d77"
+      },
+      "head": "94ab666b2c72575d195088be1ae82a22413f6304",
+      "outcome": "no-change",
+      "reason": "This release note summarizes public behavior covered by the recorded source and guidance review. The shipped skill and planning records already cover its workflow.",
+      "evidence": [
+        ".changeset/yield-query-client-operation-errors.md",
+        "94ab666 recorded the implementation and guidance review",
+        "Changeset status against origin/main includes this note and resolves to 0.8.0"
+      ]
     }
   }
 }
