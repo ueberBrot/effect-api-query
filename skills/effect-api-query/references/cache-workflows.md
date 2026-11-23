@@ -270,7 +270,7 @@ For custom work tracked with `runQuery`, forward the native signal. Disposal ign
 
 ## Scoped event consumption
 
-Run `runQueryEvents(owner, source, options, runner)` with your source and optional recovery. Map events to exact updates and filter invalidation. The helper supplies the owner's cache to the source and hooks. It awaits each handler. Inspect the complete Exit. Admission or runner rejection stays a rejected Promise.
+Run `runQueryEvents(owner, source, options, runtime)` with your source and optional recovery. Pass a `ManagedRuntime` with no layer acquisition errors, or a `RunPromiseExit` function. Map events to exact updates and filter invalidation. The helper supplies the owner's cache to the source and hooks. It awaits each handler. Inspect the complete Exit. Admission or runner rejection stays a rejected Promise.
 
 Keep the runner signal-aware and await its finalizers. Retirement stops consumption, backoff, and refresh. Use the original owner's guard for external writes. If refresh starts native queries, use the owner's tracked utilities. See [scoped event consumption](https://ueberbrot.github.io/effect-api-query/guides/scoped-event-cache/).
 

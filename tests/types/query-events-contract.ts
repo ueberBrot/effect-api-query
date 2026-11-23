@@ -4,7 +4,7 @@ import {
   type QueryOwner,
   type QueryClientOperationError,
 } from "@ueberbrot/effect-api-query";
-import { Effect, Stream, Context } from "effect";
+import { Effect, Stream, Context, Layer, ManagedRuntime } from "effect";
 
 import { directoryEffects } from "../../examples/shared/query-effects";
 
@@ -38,16 +38,8 @@ class Domain extends Context.Service<Domain, { readonly name: string }>()(
   "Events/Domain"
 ) {}
 const needsDomain = { onEvent: () => Effect.asVoid(Domain) };
-const withDomain = runQueryEvents(
-  owner,
-  events,
-  needsDomain,
-  (effect, options) =>
-    Effect.runPromiseExit(
-      effect.pipe(Effect.provideService(Domain, { name: "test" })),
-      options
-    )
-);
+const runtime = ManagedRuntime.make(Layer.succeed(Domain, { name: "test" }));
+const withDomain = runQueryEvents(owner, events, needsDomain, runtime);
 type Assert<T extends true> = T;
 type ErrorContract = Assert<
   typeof completion extends Promise<

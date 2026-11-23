@@ -1,4 +1,4 @@
-import { Cause, Effect, Exit, Stream } from "effect";
+import { Cause, Effect, Exit, Layer, ManagedRuntime, Stream } from "effect";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -161,6 +161,7 @@ describe("owner event consumption", () => {
           })
         )
       );
+      const runtime = ManagedRuntime.make(Layer.empty);
       const result = runQueryEvents(
         old,
         source,
@@ -172,7 +173,7 @@ describe("owner event consumption", () => {
               order.push("exit");
             }),
         },
-        Effect.runPromiseExit
+        runtime
       );
       await entered.promise;
       const disposed = old.dispose();
@@ -196,6 +197,7 @@ describe("owner event consumption", () => {
         )
       ).rejects.toThrow("retired");
       await next.dispose();
+      await runtime.dispose();
     }
   );
 
