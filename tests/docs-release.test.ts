@@ -482,7 +482,8 @@ describe("documentation workflow boundaries", () => {
     expect({
       revision: checkout?.getIn(["with", "ref"]),
       buildWhen: buildDocs?.get("if"),
-      verifiedAfterNodeSetup: verifiedNode !== -1 && verifyVersion > verifiedNode,
+      verifiedAfterNodeSetup:
+        verifiedNode !== -1 && verifyVersion > verifiedNode,
     }).toStrictEqual({
       revision: expression("needs.resolve.outputs.revision"),
       buildWhen: "inputs.build-artifact == ''",

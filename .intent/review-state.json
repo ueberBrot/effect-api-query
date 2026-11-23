@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "86e495d4f81ec8d5fde376088a238bb11dbc174ab2a3486a068c530431b8b688",
+      "fingerprint": "440e21369fe5e72e7df2e6f25d419b80d73afccd6b8747c52c73d05fbe8f05c0",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -269,7 +269,7 @@
         "tests/contract-reuse.test.ts": "21b97cec6da64d3a42d58e69aaad1754aaec2bb4dd1ac876ef25ec801f970a12",
         "tests/create-http-api-query-utils.test.ts": "a6b89aeb4e7570d6bff9b9fa45723b2a2d3a0180ed7d7807f222cbe2003f93d5",
         "tests/create-rpc-query-utils-configuration.test.ts": "c04f7903c14a2d8be54f1e8c84f0e00dd10e3b9148090c196b8ed7b25dfa8f52",
-        "tests/create-rpc-query-utils-execution.test.ts": "d0bbabd2b00ae13b8d7c2929275a7a51b44807796078858e9234048108484696",
+        "tests/create-rpc-query-utils-execution.test.ts": "8bac555036f42024929f2699bea059c768e7fde037dc49c86e9c8f896515baa1",
         "tests/create-rpc-query-utils-keys.test.ts": "a8cef8ab9bb0de24e814fc619090ead2a7b5c8df5aebb52e57d5d35fce0cda32",
         "tests/create-rpc-query-utils-request-options.test.ts": "741d08e1d515c726a9f37df77b1a34f1c01beec5bb802c6c49bbccf10e6b8dcd",
         "tests/create-rpc-query-utils-server-local.test.ts": "25fea3038360f04d39e44e0e148c10b4aaf5df0c780d2c613892b6472aa6d3d0",
@@ -281,7 +281,7 @@
         "tests/create-rpc-query-utils-structural-sharing.test.ts": "f9bd67aed07f7aed8113fdbfeb31810dbc19e0cb4ec0cbeef64a14e7589002fb",
         "tests/create-rpc-query-utils.test.ts": "1229679c118d267fd0a94ffcb560a9a7f77a8acecd423ed742c036c667b89faf",
         "tests/docs-examples.test.ts": "c5f3f714eebf1a5f418e519fab89411d60eb1d2be128484d4d3cbc858c00354f",
-        "tests/docs-release.test.ts": "f71618e8f8e73582ccf13c1904b5ebcbdaf5d946b1e62a3d40aecfa98a0c72f0",
+        "tests/docs-release.test.ts": "b99a75f0771fc3b8fe9f48685571790587f11604dd16e8fbc71be68f838d6dc9",
         "tests/execution-interceptor.test.ts": "2d839cf557cfcb1116787b79eebb397921626876552d5bbdea7429feda389143",
         "tests/fixtures/async.ts": "c72af69141ce4f2dd4e9b63910ed20378e546dcd015a2d7befacd439ba4a006e",
         "tests/fixtures/decode-utf8.ts": "f0441c8aa2553ce2c1dccff7cac1bbaec2cdc668916278c7a0efff90482ace61",
@@ -409,15 +409,15 @@
         "tests/workflow-guards.test.ts": "c2318f29ff68848c75b534e6a599c5dc19c020a8730eb8f95487f2c2ac5bbbd5",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "772227bec6fed57c6e53148e6da2a00001527b87",
+      "head": "adf665b34623fbf5b4a5b09439403f3fc3f00dff",
       "outcome": "no-change",
-      "reason": "The tests continue to exercise the published stream options and the example owner contract described by the skill.",
+      "reason": "Formatted the imports and line wrapping in two revised tests. Test assertions and shipped guidance are unchanged.",
       "evidence": [
-        "Changed: tests/stream-publication.test.ts at 772227bec6fed57c6e53148e6da2a00001527b87"
+        "Changed: tests/create-rpc-query-utils-execution.test.ts, tests/docs-release.test.ts at adf665b34623fbf5b4a5b09439403f3fc3f00dff"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "0be9d2fb386eaa7d88bc9890f7e9eec32019cb9b6c81ed7cae3799a0d1959972",
+      "fingerprint": "c757eff9fe185b12db49d9a28325aa304b820d04e1b62097763b4d76b5663b4e",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -686,7 +686,7 @@
         "tests/contract-reuse.test.ts": "21b97cec6da64d3a42d58e69aaad1754aaec2bb4dd1ac876ef25ec801f970a12",
         "tests/create-http-api-query-utils.test.ts": "a6b89aeb4e7570d6bff9b9fa45723b2a2d3a0180ed7d7807f222cbe2003f93d5",
         "tests/create-rpc-query-utils-configuration.test.ts": "c04f7903c14a2d8be54f1e8c84f0e00dd10e3b9148090c196b8ed7b25dfa8f52",
-        "tests/create-rpc-query-utils-execution.test.ts": "d0bbabd2b00ae13b8d7c2929275a7a51b44807796078858e9234048108484696",
+        "tests/create-rpc-query-utils-execution.test.ts": "8bac555036f42024929f2699bea059c768e7fde037dc49c86e9c8f896515baa1",
         "tests/create-rpc-query-utils-keys.test.ts": "a8cef8ab9bb0de24e814fc619090ead2a7b5c8df5aebb52e57d5d35fce0cda32",
         "tests/create-rpc-query-utils-request-options.test.ts": "741d08e1d515c726a9f37df77b1a34f1c01beec5bb802c6c49bbccf10e6b8dcd",
         "tests/create-rpc-query-utils-server-local.test.ts": "25fea3038360f04d39e44e0e148c10b4aaf5df0c780d2c613892b6472aa6d3d0",
@@ -698,7 +698,7 @@
         "tests/create-rpc-query-utils-structural-sharing.test.ts": "f9bd67aed07f7aed8113fdbfeb31810dbc19e0cb4ec0cbeef64a14e7589002fb",
         "tests/create-rpc-query-utils.test.ts": "1229679c118d267fd0a94ffcb560a9a7f77a8acecd423ed742c036c667b89faf",
         "tests/docs-examples.test.ts": "c5f3f714eebf1a5f418e519fab89411d60eb1d2be128484d4d3cbc858c00354f",
-        "tests/docs-release.test.ts": "f71618e8f8e73582ccf13c1904b5ebcbdaf5d946b1e62a3d40aecfa98a0c72f0",
+        "tests/docs-release.test.ts": "b99a75f0771fc3b8fe9f48685571790587f11604dd16e8fbc71be68f838d6dc9",
         "tests/execution-interceptor.test.ts": "2d839cf557cfcb1116787b79eebb397921626876552d5bbdea7429feda389143",
         "tests/fixtures/async.ts": "c72af69141ce4f2dd4e9b63910ed20378e546dcd015a2d7befacd439ba4a006e",
         "tests/fixtures/decode-utf8.ts": "f0441c8aa2553ce2c1dccff7cac1bbaec2cdc668916278c7a0efff90482ace61",
@@ -826,11 +826,11 @@
         "tests/workflow-guards.test.ts": "c2318f29ff68848c75b534e6a599c5dc19c020a8730eb8f95487f2c2ac5bbbd5",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "772227bec6fed57c6e53148e6da2a00001527b87",
+      "head": "adf665b34623fbf5b4a5b09439403f3fc3f00dff",
       "outcome": "no-change",
-      "reason": "The tests continue to exercise the published stream options and the example owner contract described by the skill.",
+      "reason": "Formatted the imports and line wrapping in two revised tests. Test assertions and shipped guidance are unchanged.",
       "evidence": [
-        "Changed: tests/stream-publication.test.ts at 772227bec6fed57c6e53148e6da2a00001527b87"
+        "Changed: tests/create-rpc-query-utils-execution.test.ts, tests/docs-release.test.ts at adf665b34623fbf5b4a5b09439403f3fc3f00dff"
       ]
     },
     "source:vite.config.ts": {

@@ -17,8 +17,7 @@ import {
   isEffectRpcQueryError,
   prepareInput,
 } from "#effect-api-query";
-import type { RunPromiseExit ,
-  EffectRpcQueryKeyError} from "#effect-api-query";
+import type { RunPromiseExit, EffectRpcQueryKeyError } from "#effect-api-query";
 
 import { captureFailure } from "./fixtures/async";
 import { group, makeClient, makeRpcTestClient } from "./fixtures/effect-rpc";
