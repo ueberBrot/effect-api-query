@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "b37a05682e136ea1613fbf649a9e26f31e6b314e0a3b89a432a918c616185045",
+      "fingerprint": "fab14881d79134248ae9471f69350c166224d6612504bae65af2fc244b86e60f",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -224,7 +224,7 @@
         "src/core/hydration.ts": "08c812094bb4662cdf118b1825a47a4ec4bc1e4bd248a878726cbd4ff31aaf1e",
         "src/core/inference.ts": "249bc1d59e4ea6ddc7e3a09a63b93c13e3805f9d70ead00f44c710ff95e4df94",
         "src/core/interceptor.ts": "1bc8566c5669e1e797e8293b441a6ed175252a29c6eaa42999690cb835a5347f",
-        "src/core/metadata-query.ts": "2e755bff09fe7d7fed841adeb0f3df7c0b7743ad6407727415bac03ee25e9f12",
+        "src/core/metadata-query.ts": "7e85b8f5491819e474d69694354ec1377df1c28061cd40184d85fa865efdd276",
         "src/core/operation.ts": "fd61b32046c5cf69518de08ed0f85d8f96fc90d474fd4be79fd7c2577addc53e",
         "src/core/policy.ts": "ced3a6fdf1ab7e273eb518700a42d68b4823abdb1088fae6855424e4e479ded4",
         "src/core/prepared-input.ts": "aae8c8c442a13e138606fc0d7fcbd8711396c9cd7661bfdf198e7365fd7567ff",
@@ -235,7 +235,7 @@
         "src/core/query-owner.ts": "3a5b0809dd87c54567f35b156cfcacd1d8e61f19cfb8c72197cddba86ada4a91",
         "src/core/query-prefix-index.ts": "419a20fcf9bb28c5e7dbedb0c5af6f0e0dab52c0332773dbf39af638ac671cc2",
         "src/core/reactivity-invalidation.ts": "29a583352f001213c535be806046256daf040444a67665e3d6c202d7dd7a8054",
-        "src/core/runtime.ts": "c59393fa31c1c57a2e4d149d45987f88e2033eeebe6c46a12bac9a30ceb47d24",
+        "src/core/runtime.ts": "9e99f2a078a1058b3b6b01ada7585d3f63d3486b397be3a6e1f08f0d3f0a9fad",
         "src/core/schema-key.ts": "0d6c00371526085fe19689a7401dfd86cb6f6a96f6b351b4b31bb2648804d5df",
         "src/core/schema-structural-sharing.ts": "7ebd221a5730f652f0e88fbc52c418b8bba173172bf49971d6988e5a021b3ac0",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
@@ -246,7 +246,7 @@
         "src/core/types.ts": "666e2a4d5d7f3c94d392a9ced105246122b48f4fa1bc30ca001e1c26a9425b61",
         "src/core/utility-node.ts": "8c3eb7adeec4cf49d5a475d34e785d060abd39f6a9a6049dc48a390cae0df74b",
         "src/core/utility-path.ts": "d46bb166dd03d2163063339a9cd6228dbcdeafea6ae14ad908bdb4ec6244f13e",
-        "src/core/utility-tree.ts": "95b50d82f394a8a6e4305da92c9ce7f74682d8ab3b2c7a310a740303f94308e7",
+        "src/core/utility-tree.ts": "e9ea81f6a142fe1cf7e135e649efc8877b32b0ddb9262c17f32d527148ebf8b5",
         "src/core/view-prefix.ts": "dfc0d74a07c8afe3f63952d59c29088ba4afb45e11a402ef8b72c5e2282cb063",
         "src/http/create-utils.ts": "3d1e9ad3edd8b1dd6d614dea1c3fa4783ba150acf7ef7f8af6282ba024fd250e",
         "src/http/endpoint.ts": "73562ae37aa478c901714001525357a978cedfd36e5a8efbdfa6286d7deac0fb",
@@ -407,15 +407,15 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "5a72085c205101261e4ee66160027073fb780618",
+      "head": "7858500859e0578a9c82b2e7ac43b0dc81a66487",
       "outcome": "no-change",
-      "reason": "The owner guide now describes synchronous admission and callback invocation. The shipped skill already describes accepted work and retirement correctly.",
+      "reason": "Buffered execution shares the runtime and Cause handling across unary and metadata views.",
       "evidence": [
-        "Changed: apps/docs/src/content/docs/guides/switch-cache-owners.md at 5a72085c205101261e4ee66160027073fb780618"
+        "Changed: src/core/runtime.ts at 7858500859e0578a9c82b2e7ac43b0dc81a66487"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "4ba7c71c70c40a0510376e803c3f6f8a11cfdead37b54c7dadd873c42e4fbb89",
+      "fingerprint": "1bfa61bf7ae8edd082ccc8e8034f399e57c084372ec09a69683460a0913c384d",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -639,7 +639,7 @@
         "src/core/hydration.ts": "08c812094bb4662cdf118b1825a47a4ec4bc1e4bd248a878726cbd4ff31aaf1e",
         "src/core/inference.ts": "249bc1d59e4ea6ddc7e3a09a63b93c13e3805f9d70ead00f44c710ff95e4df94",
         "src/core/interceptor.ts": "1bc8566c5669e1e797e8293b441a6ed175252a29c6eaa42999690cb835a5347f",
-        "src/core/metadata-query.ts": "2e755bff09fe7d7fed841adeb0f3df7c0b7743ad6407727415bac03ee25e9f12",
+        "src/core/metadata-query.ts": "7e85b8f5491819e474d69694354ec1377df1c28061cd40184d85fa865efdd276",
         "src/core/operation.ts": "fd61b32046c5cf69518de08ed0f85d8f96fc90d474fd4be79fd7c2577addc53e",
         "src/core/policy.ts": "ced3a6fdf1ab7e273eb518700a42d68b4823abdb1088fae6855424e4e479ded4",
         "src/core/prepared-input.ts": "aae8c8c442a13e138606fc0d7fcbd8711396c9cd7661bfdf198e7365fd7567ff",
@@ -650,7 +650,7 @@
         "src/core/query-owner.ts": "3a5b0809dd87c54567f35b156cfcacd1d8e61f19cfb8c72197cddba86ada4a91",
         "src/core/query-prefix-index.ts": "419a20fcf9bb28c5e7dbedb0c5af6f0e0dab52c0332773dbf39af638ac671cc2",
         "src/core/reactivity-invalidation.ts": "29a583352f001213c535be806046256daf040444a67665e3d6c202d7dd7a8054",
-        "src/core/runtime.ts": "c59393fa31c1c57a2e4d149d45987f88e2033eeebe6c46a12bac9a30ceb47d24",
+        "src/core/runtime.ts": "9e99f2a078a1058b3b6b01ada7585d3f63d3486b397be3a6e1f08f0d3f0a9fad",
         "src/core/schema-key.ts": "0d6c00371526085fe19689a7401dfd86cb6f6a96f6b351b4b31bb2648804d5df",
         "src/core/schema-structural-sharing.ts": "7ebd221a5730f652f0e88fbc52c418b8bba173172bf49971d6988e5a021b3ac0",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
@@ -661,7 +661,7 @@
         "src/core/types.ts": "666e2a4d5d7f3c94d392a9ced105246122b48f4fa1bc30ca001e1c26a9425b61",
         "src/core/utility-node.ts": "8c3eb7adeec4cf49d5a475d34e785d060abd39f6a9a6049dc48a390cae0df74b",
         "src/core/utility-path.ts": "d46bb166dd03d2163063339a9cd6228dbcdeafea6ae14ad908bdb4ec6244f13e",
-        "src/core/utility-tree.ts": "95b50d82f394a8a6e4305da92c9ce7f74682d8ab3b2c7a310a740303f94308e7",
+        "src/core/utility-tree.ts": "e9ea81f6a142fe1cf7e135e649efc8877b32b0ddb9262c17f32d527148ebf8b5",
         "src/core/view-prefix.ts": "dfc0d74a07c8afe3f63952d59c29088ba4afb45e11a402ef8b72c5e2282cb063",
         "src/http/create-utils.ts": "3d1e9ad3edd8b1dd6d614dea1c3fa4783ba150acf7ef7f8af6282ba024fd250e",
         "src/http/endpoint.ts": "73562ae37aa478c901714001525357a978cedfd36e5a8efbdfa6286d7deac0fb",
@@ -822,11 +822,11 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "5a72085c205101261e4ee66160027073fb780618",
+      "head": "7858500859e0578a9c82b2e7ac43b0dc81a66487",
       "outcome": "no-change",
-      "reason": "The owner guide now describes synchronous admission and callback invocation. The shipped skill already describes accepted work and retirement correctly.",
+      "reason": "Buffered execution shares the runtime and Cause handling across unary and metadata views.",
       "evidence": [
-        "Changed: apps/docs/src/content/docs/guides/switch-cache-owners.md at 5a72085c205101261e4ee66160027073fb780618"
+        "Changed: src/core/runtime.ts at 7858500859e0578a9c82b2e7ac43b0dc81a66487"
       ]
     },
     "source:vite.config.ts": {

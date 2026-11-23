@@ -1,8 +1,9 @@
 import { replaceEqualDeep } from "@tanstack/query-core";
 import type { QueryFunctionContext } from "@tanstack/query-core";
-import { Exit, Predicate } from "effect";
+import { Predicate } from "effect";
 
 import type { UnaryOperation } from "./operation";
+import { executeBuffered } from "./runtime";
 import type { RunPromiseExit } from "./types";
 
 export const freezeMetadata = <Data>(data: Data): Data => {
@@ -97,15 +98,14 @@ export const prepareMetadataExecution = (
 
   return (input: unknown) => async (context: QueryFunctionContext) => {
     const policy = resolvePolicy(context);
-    const exit = await runPromiseExit(
-      // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
-      description.invoke(input, requestOptions),
-      { signal: context.signal }
+    const data = await executeBuffered(
+      description,
+      "metadata",
+      input,
+      runPromiseExit,
+      requestOptions,
+      context.signal
     );
-    if (Exit.isFailure(exit)) {
-      throw description.executionError("metadata", exit.cause);
-    }
-    const data = exit.value === undefined ? null : exit.value;
     if (Predicate.isObject(data)) {
       fetchedPolicies.set(data, { policy });
     }

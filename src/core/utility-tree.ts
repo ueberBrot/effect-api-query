@@ -1,6 +1,5 @@
 import { hashKey, skipToken } from "@tanstack/query-core";
-import { Effect, Exit, Predicate } from "effect";
-import type { Cause } from "effect";
+import { Effect, Predicate } from "effect";
 
 import { createBranchFilter } from "./branch-filter";
 import type { FilterPath } from "./branch-filter";
@@ -15,7 +14,6 @@ import type {
   StreamingOperation,
   TreeErrors,
   UnaryOperation,
-  UnaryQueryOperation,
 } from "./operation";
 import {
   prepareQueryInput,
@@ -23,7 +21,7 @@ import {
   registerInputOwner,
 } from "./prepared-input";
 import type { QueryFilter, QueryFilterOptions } from "./query-filter";
-import { resolveRuntime } from "./runtime";
+import { executeBuffered, resolveRuntime } from "./runtime";
 import { clearStreamPolicy, hasStreamPolicy } from "./streamed-query";
 import type {
   JsonValue,
@@ -46,41 +44,6 @@ interface PreparedQuery {
 }
 
 const freezeKey = (parts: JsonValue[]) => Object.freeze(parts);
-
-const execute = async <Operation extends UnaryQueryOperation | "metadata">(
-  description: {
-    readonly invoke: UnaryOperation["invoke"];
-    readonly executionError: (
-      operation: Operation,
-      cause: Cause.Cause<unknown>
-    ) => Error;
-  },
-  operation: Operation,
-
-  input: unknown,
-  runPromiseExit: RunPromiseExit<unknown>,
-
-  requestOptions?: unknown,
-  signal?: AbortSignal
-) => {
-  // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
-  const effect = description.invoke(input, requestOptions);
-  const exit = await runPromiseExit(
-    // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
-    effect,
-    signal === undefined ? undefined : { signal }
-  );
-
-  if (Exit.isFailure(exit)) {
-    throw description.executionError(operation, exit.cause);
-  }
-
-  return operation !== "call" &&
-    operation !== "mutation" &&
-    exit.value === undefined
-    ? null
-    : exit.value;
-};
 
 const prepareQuery = (
   description: UnaryOperation | StreamingOperation,
@@ -353,7 +316,7 @@ const createInfiniteBuilders = (
           description.input._tag === "Input"
             ? description.input.pageInput(pageRequest)
             : undefined;
-        return execute(
+        return executeBuffered(
           description,
           "infinite",
           executionInput,
@@ -390,7 +353,7 @@ const createBufferedBuilders = (
     argument?: Record<string, unknown> & { readonly signal?: AbortSignal }
   ) => {
     const { input, requestOptions } = prepareDirect(argument);
-    return execute(
+    return executeBuffered(
       description,
       "call",
       input,
@@ -415,7 +378,7 @@ const createBufferedBuilders = (
       ...options,
 
       mutationFn: async (variables: unknown) =>
-        execute(
+        executeBuffered(
           description,
           "mutation",
           variables,
@@ -450,7 +413,7 @@ const createUnaryBuilders = (
       makeQuery:
         (input) =>
         async ({ signal }) =>
-          execute(
+          executeBuffered(
             description,
             "query",
             input,
