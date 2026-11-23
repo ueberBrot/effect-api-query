@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@effect/vitest";
-import { QueryClient } from "@tanstack/query-core";
+import { QueryClient, QueryObserver, skipToken } from "@tanstack/query-core";
 import { Effect, Predicate, Schema, Stream } from "effect";
 import {
   HttpApi,
@@ -95,6 +95,10 @@ describe("query filters", () => {
         const input = prepareInput(watch, { id: 1 });
         const exactKey = watch.streamedKey({ input, refetchMode: "reset" });
         const queryClient = new QueryClient();
+        const skipped = new QueryObserver(
+          queryClient,
+          watch.streamedOptions({ input: skipToken })
+        );
         queryClient.setQueryData(exactKey, ["default"]);
         queryClient.setQueryData(
           watch.streamedKey({ input, publicationBatchSize: 2 }),
@@ -134,6 +138,15 @@ describe("query filters", () => {
             watch.queryFilter({ view: "streamed", input, exact: true })
           )
         ).toHaveLength(0);
+        const policyOnly = { view: "streamed", refetchMode: "reset" } as const;
+        expect({
+          skipped: skipped.getCurrentResult().fetchStatus,
+          broadCount: queryClient.getQueriesData(watch.queryFilter(policyOnly))
+            .length,
+          exact: queryClient.getQueriesData(
+            watch.queryFilter({ ...policyOnly, exact: true })
+          ),
+        }).toStrictEqual({ skipped: "idle", broadCount: 3, exact: [] });
       })
   );
 

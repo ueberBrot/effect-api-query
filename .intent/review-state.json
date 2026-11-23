@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "942f5da163080ee75c17b248bfd8c2814d0076236eded0aea2afcead499773fa",
+      "fingerprint": "71e7d21d5a44e35d790d726e3f8786cf015fdd581e4f1a4bf2bf3e987ac1347f",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -245,7 +245,7 @@
         "src/core/streamed-query.ts": "21e0d2c6bee1a79a25eb3c9d73374c9681ad03c7885d0a541f521dfd7fdd2298",
         "src/core/types.ts": "666e2a4d5d7f3c94d392a9ced105246122b48f4fa1bc30ca001e1c26a9425b61",
         "src/core/utility-path.ts": "98a2e760cb0eb66dd1be96d436bb35abc07139298efeefadf072d569b53b7aa3",
-        "src/core/utility-tree.ts": "5490db5f5a4091430d793597dd7e79dac0a6c0802f70297b21b68af606ab2301",
+        "src/core/utility-tree.ts": "d819686e2333cfab95012c2ade433cd663cbce0f58360d7016f655e648b8e74f",
         "src/core/view-prefix.ts": "dfc0d74a07c8afe3f63952d59c29088ba4afb45e11a402ef8b72c5e2282cb063",
         "src/http/create-utils.ts": "8a27c1955323d3f4e993b244e073e3cf41cc88ac39d1c1da68cda27e85440f80",
         "src/http/endpoint.ts": "71c543b8e59d5a005e53403bdaa62f02cd291fc7ef121e46a7b56d9520d9c465",
@@ -317,7 +317,7 @@
         "tests/query-descriptor.test.ts": "cf3c2e255a697995dacc743f64877ff5d7be70363f83f4924d3e939f3fdbde05",
         "tests/query-effects.test.ts": "679d76ac8d598a0d973d18d48c1bde61aa1c7a84b96b3ae7ccc7d0cc50743fff",
         "tests/query-events.test.ts": "c7c4573cb6220564e29e5ee9bd95fdadee58dba426199d9778506571d280bf3d",
-        "tests/query-filter.test.ts": "3a3e05979952a40052bab873bf43ccfbe9b22f00cada20ad276abb71117aa0fd",
+        "tests/query-filter.test.ts": "cabc2aa76c97b879ae823b3e252966dfa743eecd320f35e7e6a9f3f086803f86",
         "tests/query-owner.test.ts": "d7703b9242da562cbd823a866c26a5dd5bd7122a307e54805f62ce74db6483a3",
         "tests/query-policy.test.ts": "914702a1ae97649131495f50eb64a3bb554d7fcfe370bb27228323ef13270e20",
         "tests/query-usability.test.ts": "f2919940a513ee1440a20b162f7c1dbb2cf81841368483899765b9b58c9c26c6",
@@ -406,15 +406,15 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "a8b92493f16699c19cd6d7ba3e50937e6fcb3fe8",
+      "head": "3ce8d87640b20daa20e93cae86d29d82810f18ab",
       "outcome": "no-change",
-      "reason": "Generated stream options, keys, policy maps, and filters retain their documented rules through shared policy field handling.",
+      "reason": "Policy-specific exact filters require a complete generated key as documented.",
       "evidence": [
-        "Changed: src/core/configure-utils.ts, src/core/streamed-query.ts, src/core/utility-tree.ts, src/http/streamed-query.ts at a8b92493f16699c19cd6d7ba3e50937e6fcb3fe8"
+        "Changed: tests/query-filter.test.ts at 3ce8d87640b20daa20e93cae86d29d82810f18ab"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "d699950fb955d17e82a6e23f01dc805b91e707f885b188df7ab2a753d9047856",
+      "fingerprint": "95e04fb0fe24c0a41d29490d7bbae5269274e18b78492f2ce1fea817347d2add",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -659,7 +659,7 @@
         "src/core/streamed-query.ts": "21e0d2c6bee1a79a25eb3c9d73374c9681ad03c7885d0a541f521dfd7fdd2298",
         "src/core/types.ts": "666e2a4d5d7f3c94d392a9ced105246122b48f4fa1bc30ca001e1c26a9425b61",
         "src/core/utility-path.ts": "98a2e760cb0eb66dd1be96d436bb35abc07139298efeefadf072d569b53b7aa3",
-        "src/core/utility-tree.ts": "5490db5f5a4091430d793597dd7e79dac0a6c0802f70297b21b68af606ab2301",
+        "src/core/utility-tree.ts": "d819686e2333cfab95012c2ade433cd663cbce0f58360d7016f655e648b8e74f",
         "src/core/view-prefix.ts": "dfc0d74a07c8afe3f63952d59c29088ba4afb45e11a402ef8b72c5e2282cb063",
         "src/http/create-utils.ts": "8a27c1955323d3f4e993b244e073e3cf41cc88ac39d1c1da68cda27e85440f80",
         "src/http/endpoint.ts": "71c543b8e59d5a005e53403bdaa62f02cd291fc7ef121e46a7b56d9520d9c465",
@@ -731,7 +731,7 @@
         "tests/query-descriptor.test.ts": "cf3c2e255a697995dacc743f64877ff5d7be70363f83f4924d3e939f3fdbde05",
         "tests/query-effects.test.ts": "679d76ac8d598a0d973d18d48c1bde61aa1c7a84b96b3ae7ccc7d0cc50743fff",
         "tests/query-events.test.ts": "c7c4573cb6220564e29e5ee9bd95fdadee58dba426199d9778506571d280bf3d",
-        "tests/query-filter.test.ts": "3a3e05979952a40052bab873bf43ccfbe9b22f00cada20ad276abb71117aa0fd",
+        "tests/query-filter.test.ts": "cabc2aa76c97b879ae823b3e252966dfa743eecd320f35e7e6a9f3f086803f86",
         "tests/query-owner.test.ts": "d7703b9242da562cbd823a866c26a5dd5bd7122a307e54805f62ce74db6483a3",
         "tests/query-policy.test.ts": "914702a1ae97649131495f50eb64a3bb554d7fcfe370bb27228323ef13270e20",
         "tests/query-usability.test.ts": "f2919940a513ee1440a20b162f7c1dbb2cf81841368483899765b9b58c9c26c6",
@@ -820,11 +820,11 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "a8b92493f16699c19cd6d7ba3e50937e6fcb3fe8",
+      "head": "3ce8d87640b20daa20e93cae86d29d82810f18ab",
       "outcome": "no-change",
-      "reason": "Generated stream options, keys, policy maps, and filters retain their documented rules through shared policy field handling.",
+      "reason": "Policy-specific exact filters require a complete generated key as documented.",
       "evidence": [
-        "Changed: src/core/configure-utils.ts, src/core/streamed-query.ts, src/core/utility-tree.ts, src/http/streamed-query.ts at a8b92493f16699c19cd6d7ba3e50937e6fcb3fe8"
+        "Changed: tests/query-filter.test.ts at 3ce8d87640b20daa20e93cae86d29d82810f18ab"
       ]
     },
     "source:vite.config.ts": {

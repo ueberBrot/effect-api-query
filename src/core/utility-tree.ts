@@ -133,6 +133,39 @@ type LeafFilterOptions = QueryFilterOptions &
     readonly sseOptions?: unknown;
   };
 
+const matchLeafSegments = (
+  filter: QueryFilter,
+  inputIndex: number,
+  inputless: boolean,
+  hasInput: boolean,
+  identity: readonly JsonValue[] | undefined
+): QueryFilter => {
+  if (filter.exact === true) {
+    return !inputless && !hasInput && identity !== undefined
+      ? { ...filter, predicate: () => false }
+      : filter;
+  }
+  const hasCanonicalInput = hasInput && !inputless;
+  if (!hasCanonicalInput && identity === undefined) {
+    return filter;
+  }
+  const inputHash = hasCanonicalInput
+    ? hashKey([filter.queryKey[inputIndex]])
+    : undefined;
+  const identityIndex = inputless ? inputIndex : inputIndex + 1;
+  const identityHash = identity && hashKey(identity);
+  return {
+    ...filter,
+    predicate: (query) =>
+      (inputHash === undefined ||
+        hashKey([query.queryKey[inputIndex]]) === inputHash) &&
+      (identityHash === undefined ||
+        (query.queryKey.length >= identityIndex &&
+          hashKey(query.queryKey.slice(identityIndex)) === identityHash)) &&
+      (filter.predicate?.(query) ?? true),
+  };
+};
+
 const createLeafFilter =
   (
     description: UnaryOperation | StreamingOperation,
@@ -171,25 +204,13 @@ const createLeafFilter =
     if (identity) {
       clearStreamPolicy(options);
     }
-    const filter = { ...options, queryKey };
-    const hasCanonicalInput = hasInput && !inputless;
-    if (options.exact === true || (!hasCanonicalInput && !identity)) {
-      return filter;
-    }
-    const inputIndex = prefix.length;
-    const inputHash = hasCanonicalInput
-      ? hashKey([queryKey[inputIndex]])
-      : undefined;
-    const identityIndex = inputless ? inputIndex : inputIndex + 1;
-    const identityHash = identity && hashKey(identity);
-    filter.predicate = (query) =>
-      (inputHash === undefined ||
-        hashKey([query.queryKey[inputIndex]]) === inputHash) &&
-      (identityHash === undefined ||
-        (query.queryKey.length >= identityIndex &&
-          hashKey(query.queryKey.slice(identityIndex)) === identityHash)) &&
-      (options.predicate?.(query) ?? true);
-    return filter;
+    return matchLeafSegments(
+      { ...options, queryKey },
+      prefix.length,
+      inputless,
+      hasInput,
+      identity
+    );
   };
 
 const prepareQueryOptions = (
