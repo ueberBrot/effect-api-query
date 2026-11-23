@@ -199,16 +199,21 @@ const batchStream = <A, E, R>(
           yield* clearDeadline;
           const outstanding = pendingPull;
           pendingPull = undefined;
+          let cause = terminalCause;
+          terminalCause = undefined;
           if (outstanding !== undefined) {
             yield* Fiber.interrupt(outstanding);
             const exit = yield* Fiber.await(outstanding);
-            if (
-              Exit.isFailure(exit) &&
-              !Pull.isDoneCause(exit.cause) &&
-              !Cause.hasInterruptsOnly(exit.cause)
-            ) {
-              return yield* Effect.die(Cause.squash(exit.cause));
+            if (Exit.isFailure(exit)) {
+              ({ cause } = exit);
             }
+          }
+          if (
+            cause !== undefined &&
+            !Pull.isDoneCause(cause) &&
+            !Cause.hasInterruptsOnly(cause)
+          ) {
+            return yield* Effect.die(Cause.squash(cause));
           }
           return yield* Effect.void;
         })
@@ -267,7 +272,7 @@ export const streamPublicationBatches = <A, E, R>(
   batchSize: number,
   maxWaitMs?: number
 ): Stream.Stream<readonly A[], E, R> =>
-  batchSize === 1 && maxWaitMs === undefined
+  batchSize === 1
     ? source.pipe(Stream.map((value): readonly A[] => [value]))
     : batchStream(source, batchSize, maxWaitMs, false);
 

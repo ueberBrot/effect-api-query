@@ -9,6 +9,7 @@ import {
   Fiber,
   Queue,
   Schema,
+  Scope,
   Stream,
 } from "effect";
 import { Rpc, RpcGroup } from "effect/rpc";
@@ -101,9 +102,10 @@ describe("publication deadlines with TestClock", () => {
           )
         );
 
+        const pullScope = yield* Scope.fork(yield* Scope.Scope);
         const pull = yield* Stream.toPull(
           streamPublicationBatches(source, 10, 50)
-        );
+        ).pipe(Scope.provide(pullScope));
 
         const firstFiber = yield* Effect.forkChild(pull);
         yield* Queue.offer(queue, 1);
@@ -125,14 +127,20 @@ describe("publication deadlines with TestClock", () => {
         yield* TestClock.adjust(50);
         expect(yield* Fiber.join(thirdFiber)).toStrictEqual([[3]]);
 
+        const finalPull = yield* Effect.forkChild(pull);
+        yield* TestClock.adjust(0);
+        yield* Scope.close(pullScope, Exit.void);
+
         expect({
           pullsBeforeDeadline,
           pullsAfterDeadline,
           closed,
+          interrupted: Exit.isFailure(yield* Fiber.await(finalPull)),
         }).toStrictEqual({
           pullsBeforeDeadline: 3,
           pullsAfterDeadline: 3,
-          closed: 0,
+          closed: 1,
+          interrupted: true,
         });
       })
   );
