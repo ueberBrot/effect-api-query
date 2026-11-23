@@ -20,6 +20,16 @@ const multipartBrands = (schema: Schema.Top) => {
   return { buffered, streamed };
 };
 
+const unwrapSuccess = (success: Schema.Top) =>
+  HttpApiSchema.isWithHeaders(success)
+    ? { body: success.schema, headers: success.headers }
+    : { body: success, headers: undefined };
+
+const isStreamSchema = (
+  schema: Schema.Top
+): schema is HttpApiSchema.StreamSchema =>
+  Predicate.hasProperty(schema, "~effect/http-api/HttpApiSchema/Stream");
+
 export type QueryableHttpEndpoint =
   | {
       readonly kind: "Unary";
@@ -29,8 +39,11 @@ export type QueryableHttpEndpoint =
   | {
       readonly kind: "Streaming";
       readonly payloads: readonly Schema.Top[];
-      readonly stream: "StreamSse" | "StreamNdjson";
-      readonly success: Schema.Top;
+      readonly stream: Extract<
+        HttpApiSchema.StreamSchema,
+        { readonly _tag: "StreamSse" | "StreamNdjson" }
+      >;
+      readonly headers: Schema.Top | undefined;
     };
 
 export const classifyHttpEndpoint = (
@@ -65,22 +78,24 @@ export const classifyHttpEndpoint = (
   }
   const { success: successes } = endpoint;
   for (const success of successes) {
-    const body = HttpApiSchema.isWithHeaders(success)
-      ? success.schema
-      : success;
+    const { body, headers } = unwrapSuccess(success);
     if (Predicate.hasProperty(body, "~effect/http-api/HttpApiSchema/Upgrade")) {
       return undefined;
     }
-    if (Predicate.hasProperty(body, "~effect/http-api/HttpApiSchema/Stream")) {
+    if (isStreamSchema(body)) {
       if (
         multipart ||
         successes.size !== 1 ||
-        !Predicate.hasProperty(body, "_tag") ||
         (body._tag !== "StreamSse" && body._tag !== "StreamNdjson")
       ) {
         return undefined;
       }
-      return { kind: "Streaming", stream: body._tag, payloads, success };
+      return {
+        kind: "Streaming",
+        stream: body,
+        headers,
+        payloads,
+      };
     }
   }
   return multipart

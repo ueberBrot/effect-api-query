@@ -114,35 +114,6 @@ const isWithHeadersValue = (
 ): value is HttpApiSchema.withHeaders<unknown, unknown> =>
   Predicate.hasProperty(value, HttpApiSchema.WithHeadersValueTypeId);
 
-const isStreamSse = (
-  schema: Schema.Top
-): schema is HttpApiSchema.StreamSse<
-  Schema.Codec<unknown, unknown, unknown, unknown> & {
-    readonly Type: {
-      readonly event: string;
-      readonly data: unknown;
-      readonly id?: string | undefined;
-    };
-    readonly Encoded: {
-      readonly event?: string | undefined;
-      readonly data: string;
-      readonly id?: string | undefined;
-    };
-  },
-  Schema.Top,
-  unknown
-> =>
-  Predicate.hasProperty(schema, "~effect/http-api/HttpApiSchema/Stream") &&
-  Predicate.hasProperty(schema, "_tag") &&
-  schema._tag === "StreamSse";
-
-const isStreamNdjson = (
-  schema: Schema.Top
-): schema is HttpApiSchema.StreamNdjson<Schema.Top> =>
-  Predicate.hasProperty(schema, "~effect/http-api/HttpApiSchema/Stream") &&
-  Predicate.hasProperty(schema, "_tag") &&
-  schema._tag === "StreamNdjson";
-
 const hasRepresentation = (ast: SchemaAST.AST, id: string): boolean => {
   const representation = ast.annotations?.["representation"];
   return (
@@ -564,35 +535,45 @@ const asCodec = (
   schema: Schema.Top
 ): Schema.Codec<unknown, unknown, unknown, unknown> => schema;
 
+const wrapWithHeaders = (
+  bodyCodec: Schema.Top,
+  headersCodec: Schema.Top,
+  type: Schema.toType<HttpApiSchema.WithHeaders<Schema.Top, Schema.Top>>,
+  description: "response value" | "stream chunk"
+): Schema.Top =>
+  Schema.Struct({
+    body:
+      acceptsUndefined(bodyCodec.ast) && acceptsNull(bodyCodec.ast)
+        ? adaptStreamedElement(bodyCodec)
+        : protectUnion(bodyCodec),
+    headers: protectUnion(headersCodec),
+  }).pipe(
+    Schema.decodeTo(
+      type,
+      SchemaTransformation.transform({
+        decode: ({ body, headers }) =>
+          HttpApiSchema.withHeaders({ body, headers }),
+        encode: (value) => {
+          if (!isWithHeadersValue(value)) {
+            throw new TypeError(`Expected a WithHeaders ${description}`);
+          }
+          return { body: value.body, headers: value.headers };
+        },
+      })
+    )
+  );
+
 const deriveBufferedMemberCodec = (
   schema: Schema.Top,
   path: string,
   view: QueryView
 ): Schema.Top => {
   if (HttpApiSchema.isWithHeaders(schema)) {
-    const bodyCodec = deriveBufferedMemberCodec(schema.schema, path, view);
-    const headersCodec = deriveJsonCodec(schema.headers, path, view);
-    const adaptedBody =
-      acceptsUndefined(bodyCodec.ast) && acceptsNull(bodyCodec.ast)
-        ? adaptStreamedElement(bodyCodec)
-        : protectUnion(bodyCodec);
-    return Schema.Struct({
-      body: adaptedBody,
-      headers: protectUnion(headersCodec),
-    }).pipe(
-      Schema.decodeTo(
-        Schema.toType(schema),
-        SchemaTransformation.transform({
-          decode: ({ body, headers }) =>
-            HttpApiSchema.withHeaders({ body, headers }),
-          encode: (value) => {
-            if (!isWithHeadersValue(value)) {
-              throw new TypeError("Expected a WithHeaders response value");
-            }
-            return { body: value.body, headers: value.headers };
-          },
-        })
-      )
+    return wrapWithHeaders(
+      deriveBufferedMemberCodec(schema.schema, path, view),
+      deriveJsonCodec(schema.headers, path, view),
+      Schema.toType(schema),
+      "response value"
     );
   }
   if (HttpApiSchema.getEncodeToWithHeadersParts(schema) !== undefined) {
@@ -639,82 +620,57 @@ const deriveHttpMetadataCodec = (
   );
 };
 
-const extractHttpStreamChunkSchema = (
-  streamSchema: Schema.Top,
+type StreamingHttpEndpoint = Extract<
+  QueryableHttpEndpoint,
+  { readonly kind: "Streaming" }
+>;
+
+const deriveHttpStreamChunk = (
+  stream: StreamingHttpEndpoint["stream"],
   path: string,
   view: QueryView
 ): Schema.Top => {
-  if (isStreamSse(streamSchema)) {
-    if (
-      streamSchema.sseMode === "data" &&
-      Predicate.hasProperty(streamSchema.events, "fields") &&
-      Predicate.isObject(streamSchema.events.fields) &&
-      Predicate.hasProperty(streamSchema.events.fields["data"], "to") &&
-      Schema.isSchema(streamSchema.events.fields["data"].to)
-    ) {
-      const dataCodec = streamSchema.events.fields["data"].to;
-      assertEncodable(dataCodec, path, view);
-      return dataCodec;
-    }
-    return deriveJsonCodec(toTop(streamSchema.events), path, view);
+  if (stream._tag === "StreamNdjson") {
+    return deriveJsonCodec(stream.schema, path, view);
   }
-  if (isStreamNdjson(streamSchema)) {
-    return deriveJsonCodec(streamSchema.schema, path, view);
+  if (
+    stream.sseMode === "data" &&
+    Predicate.hasProperty(stream.events, "fields") &&
+    Predicate.isObject(stream.events.fields) &&
+    Predicate.hasProperty(stream.events.fields["data"], "to") &&
+    Schema.isSchema(stream.events.fields["data"].to)
+  ) {
+    const dataCodec = stream.events.fields["data"].to;
+    assertEncodable(dataCodec, path, view);
+    return dataCodec;
   }
-  throw new HydrationCodecError("UnencodableSchema", {
-    path,
-    view,
-    message: `Unsupported HTTP stream schema for "${path}"`,
-  });
+  return deriveJsonCodec(toTop(stream.events), path, view);
 };
 
 const deriveHttpStreamCodec = (
-  successSchema: Schema.Top,
+  { stream, headers }: StreamingHttpEndpoint,
   path: string,
   view: "live" | "streamed"
 ): Schema.Top => {
-  if (HttpApiSchema.isWithHeaders(successSchema)) {
-    const chunkCodec = extractHttpStreamChunkSchema(
-      successSchema.schema,
-      path,
-      view
-    );
-    const headersCodec = deriveJsonCodec(successSchema.headers, path, view);
-    const adaptedChunk =
-      acceptsUndefined(chunkCodec.ast) && acceptsNull(chunkCodec.ast)
-        ? adaptStreamedElement(chunkCodec)
-        : protectUnion(chunkCodec);
-    const wrapped = Schema.Struct({
-      body: adaptedChunk,
-      headers: protectUnion(headersCodec),
-    }).pipe(
-      Schema.decodeTo(
-        Schema.toType(
-          HttpApiSchema.WithHeaders(
-            Schema.toType(chunkCodec),
-            Schema.toType(headersCodec)
-          )
-        ),
-        SchemaTransformation.transform({
-          decode: ({ body, headers }) =>
-            HttpApiSchema.withHeaders({ body, headers }),
-          encode: (value) => {
-            if (!isWithHeadersValue(value)) {
-              throw new TypeError("Expected a WithHeaders stream chunk");
-            }
-            return { body: value.body, headers: value.headers };
-          },
-        })
-      )
+  const chunk = deriveHttpStreamChunk(stream, path, view);
+  if (headers !== undefined) {
+    const headerCodec = deriveJsonCodec(headers, path, view);
+    const wrapped = wrapWithHeaders(
+      chunk,
+      headerCodec,
+      Schema.toType(
+        HttpApiSchema.WithHeaders(
+          Schema.toType(chunk),
+          Schema.toType(headerCodec)
+        )
+      ),
+      "stream chunk"
     );
     return view === "live" ? wrapped : Schema.Array(wrapped);
   }
-
-  const chunkCodec = extractHttpStreamChunkSchema(successSchema, path, view);
-  if (view === "live") {
-    return adaptQueryData(chunkCodec);
-  }
-  return Schema.Array(adaptStreamedElement(chunkCodec));
+  return view === "live"
+    ? adaptQueryData(chunk)
+    : Schema.Array(adaptStreamedElement(chunk));
 };
 
 const validateSegments = (
@@ -990,9 +946,8 @@ const httpCodecDerivations = (
 ): CodecDerivations =>
   classified.kind === "Streaming"
     ? {
-        live: () => deriveHttpStreamCodec(classified.success, path, "live"),
-        streamed: () =>
-          deriveHttpStreamCodec(classified.success, path, "streamed"),
+        live: () => deriveHttpStreamCodec(classified, path, "live"),
+        streamed: () => deriveHttpStreamCodec(classified, path, "streamed"),
       }
     : {
         query: (view) =>

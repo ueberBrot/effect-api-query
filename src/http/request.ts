@@ -179,7 +179,7 @@ export const createHttpRequest = (
   const parts = Object.keys(fields);
   const description =
     classified.kind === "Streaming"
-      ? { kind: classified.kind, stream: classified.stream, parts }
+      ? { kind: classified.kind, stream: classified.stream._tag, parts }
       : { kind: classified.kind, parts };
   if (parts.length === 0) {
     return { ...description, input: { _tag: "Inputless" } };
