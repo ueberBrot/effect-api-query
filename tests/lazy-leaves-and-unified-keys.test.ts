@@ -284,16 +284,46 @@ describe("unified { input, ... } *Key builders", () => {
         );
         expect(() =>
           rpc.users.get.queryKey({ input: skipToken } as never)
-        ).toThrow("Could not construct the payload for RPC users.get");
+        ).toThrow("skipToken");
         expect(() =>
           rpc.events.watch.streamedKey({
             input: skipToken,
             maxChunks: 5,
           } as never)
-        ).toThrow("Could not construct the payload for RPC events.watch");
-        /* oxlint-enable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
+        ).toThrow("skipToken");
       })
   );
+
+  it.effect("rejects skipToken before custom key encoders run", () =>
+    Effect.gen(function* rejectSkipWithCustomEncoder() {
+      const looseContract = RpcGroup.make(
+        Rpc.make("read", { payload: Schema.Unknown, success: Schema.String })
+      );
+      const looseClient = yield* makeRpcTestClient(
+        looseContract,
+        looseContract.of({ read: () => Effect.succeed("read") })
+      );
+      const loose = createRpcQueryUtils(looseContract, {
+        client: looseClient,
+        keyEncoders: { read: () => "encoded" },
+      });
+      const httpClient = yield* makeUnusedHttpClient(httpContract);
+      const http = createHttpApiQueryUtils(httpContract, {
+        client: httpClient,
+        keyEncoders: { items: { get: () => "encoded" } },
+      });
+      expect(() => loose.read.queryKey({ input: skipToken })).toThrow(
+        "skipToken"
+      );
+      expect(() =>
+        http.items.get.infiniteKey({ input: skipToken } as never)
+      ).toThrow("skipToken");
+      expect(loose.read.queryOptions({ input: skipToken }).queryFn).toBe(
+        skipToken
+      );
+    })
+  );
+  /* oxlint-enable typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion */
 });
 
 describe("lazy-memoized frozen leaves", () => {
