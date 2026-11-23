@@ -31,7 +31,6 @@ export const defineLazyLeafDescriptor = (
   lazyLeafGetters.set(get, { materialize: get, ownerToken });
   return {
     enumerable: true,
-    configurable: false,
     get,
   };
 };
@@ -118,8 +117,6 @@ export const mapUtilityChildren = (
         replacements.set(name, {
           value: next,
           enumerable: true,
-          writable: false,
-          configurable: false,
         });
       }
     }

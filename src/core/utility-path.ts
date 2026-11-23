@@ -1,5 +1,3 @@
-import { Array as EffectArray } from "effect";
-
 import { canonicalizeArray } from "./canonical-key";
 import type { TreeErrors } from "./operation";
 import type { JsonValue } from "./types";
@@ -49,53 +47,50 @@ const reservedSegments = new Set([
 ]);
 
 export type InvalidUtilityPath =
-  | { readonly kind: "invalid" }
-  | {
-      readonly kind: "duplicate" | "parent" | "descendant";
-      readonly segments: readonly string[];
-    };
+  | "invalid"
+  | "duplicate"
+  | "parent"
+  | "descendant";
 
-export interface UtilityPath<Operation> {
-  readonly operation: Operation;
-  readonly segments: readonly [string, ...string[]];
-}
-
-export const validateUtilityPaths = <Operation>(
+export const validateUtilityPaths = <
+  Operation extends { readonly path: readonly string[] },
+>(
   operations: readonly Operation[],
-  segmentsOf: (operation: Operation) => readonly string[],
-  error: (operation: Operation, issue: InvalidUtilityPath) => Error
-): readonly UtilityPath<Operation>[] => {
-  const branches = new Map<string, readonly string[]>();
-  const leaves = new Set<string>();
-  return operations.map((operation) => {
-    const segments = segmentsOf(operation);
+  error: (
+    operation: Operation,
+    kind: InvalidUtilityPath,
+    conflictingPath: readonly string[]
+  ) => Error
+): void => {
+  const paths = new Map<string, readonly string[] | null>();
+  for (const operation of operations) {
+    const { path } = operation;
     if (
-      !EffectArray.isReadonlyArrayNonEmpty(segments) ||
-      segments.some(
-        (segment) => segment.length === 0 || reservedSegments.has(segment)
-      )
+      path.length === 0 ||
+      path.some((segment) => !segment || reservedSegments.has(segment))
     ) {
-      throw error(operation, { kind: "invalid" });
+      throw error(operation, "invalid", path);
     }
-    const key = JSON.stringify(segments);
-    if (leaves.has(key)) {
-      throw error(operation, { kind: "duplicate", segments });
+    const key = JSON.stringify(path);
+    const match = paths.get(key);
+    if (match !== undefined) {
+      throw error(
+        operation,
+        match === null ? "duplicate" : "descendant",
+        match ?? path
+      );
     }
-    const descendant = branches.get(key);
-    if (descendant !== undefined) {
-      throw error(operation, { kind: "descendant", segments: descendant });
-    }
-    for (let index = 1; index < segments.length; index += 1) {
-      const parent = segments.slice(0, index);
+    for (let index = 1; index < path.length; index += 1) {
+      const parent = path.slice(0, index);
       const parentKey = JSON.stringify(parent);
-      if (leaves.has(parentKey)) {
-        throw error(operation, { kind: "parent", segments: parent });
+      const parentMatch = paths.get(parentKey);
+      if (parentMatch === null) {
+        throw error(operation, "parent", parent);
       }
-      if (!branches.has(parentKey)) {
-        branches.set(parentKey, segments);
+      if (parentMatch === undefined) {
+        paths.set(parentKey, path);
       }
     }
-    leaves.add(key);
-    return { operation, segments };
-  });
+    paths.set(key, null);
+  }
 };

@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "b93baf14dff4191df4f9aaa8f0e3680fd6682cb9b03afb967cc6c5b39ef9b94b",
+      "fingerprint": "a03daab4461b9547d290e773de4c6a87131c167c75a3aacc551fa8ca505a252f",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -219,7 +219,7 @@
         "src/core/configure.ts": "277f1d1201be35962d6b75c3e9f4074e7f4798456d515ddbd23d7dc3bf6693cf",
         "src/core/consume-events.ts": "648144582c4bdbf4a9cb0d35ddc54327abbefc654f2d37b6154232bcd09a1752",
         "src/core/contract-hydration-types.ts": "53366364723a34f8948f2b813ad60ec20de98ee878f9398aff38bb15bf12fd45",
-        "src/core/contract-hydration.ts": "4149266d0d121426178e88487f3ddc3380f4c85a116bc51b99bda74b4a8f0022",
+        "src/core/contract-hydration.ts": "9933ac766943e12cc69b36391aafa82c2248a5f07f236ae0dcd79761cbfccc9d",
         "src/core/declared-error.ts": "72146f75dc4f99abb60c143ae4464abf6a512cd5ffe713597bb3fb967f58c7a0",
         "src/core/hydration.ts": "08c812094bb4662cdf118b1825a47a4ec4bc1e4bd248a878726cbd4ff31aaf1e",
         "src/core/inference.ts": "249bc1d59e4ea6ddc7e3a09a63b93c13e3805f9d70ead00f44c710ff95e4df94",
@@ -242,11 +242,11 @@
         "src/core/stream-publication.ts": "0ecae3160d553d5b9d2b940abab3ccb93c610c77a2baed2dd2a70704c6771b89",
         "src/core/stream-recovery.ts": "ecc7fb61c6cb8b8f1617a2bfa69387b64e3e224c09f1f5f6f47964bd256f1bbd",
         "src/core/stream-snapshot.ts": "5c31085e7f22c8242b42443f5468a160a6dd6a779a29bedcc5a9c14d7a855402",
-        "src/core/streamed-query.ts": "2b5d7e848b892783b3f41d537f27af69201781423a41bf3861c71d2007d5d80d",
+        "src/core/streamed-query.ts": "087110a6f270c6891271dc989d94e0199ab9c7b2eb982479aa9d6f16fad9da32",
         "src/core/types.ts": "666e2a4d5d7f3c94d392a9ced105246122b48f4fa1bc30ca001e1c26a9425b61",
-        "src/core/utility-node.ts": "e699b04106da0db5df89007066468bbbc5ac05c46ac483d8fae548c73d4edb96",
-        "src/core/utility-path.ts": "cf40ed3f2c1403ef174199282afe53df5d135236c3251fd45e93d1cf9c0252fd",
-        "src/core/utility-tree.ts": "e5074c482e1efb120776fbbe43db3c34e45938571218102e92a3a91f416b646b",
+        "src/core/utility-node.ts": "8c3eb7adeec4cf49d5a475d34e785d060abd39f6a9a6049dc48a390cae0df74b",
+        "src/core/utility-path.ts": "d46bb166dd03d2163063339a9cd6228dbcdeafea6ae14ad908bdb4ec6244f13e",
+        "src/core/utility-tree.ts": "95b50d82f394a8a6e4305da92c9ce7f74682d8ab3b2c7a310a740303f94308e7",
         "src/core/view-prefix.ts": "dfc0d74a07c8afe3f63952d59c29088ba4afb45e11a402ef8b72c5e2282cb063",
         "src/http/create-utils.ts": "3d1e9ad3edd8b1dd6d614dea1c3fa4783ba150acf7ef7f8af6282ba024fd250e",
         "src/http/endpoint.ts": "73562ae37aa478c901714001525357a978cedfd36e5a8efbdfa6286d7deac0fb",
@@ -407,15 +407,15 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "17f1d882b1c4acabcf0d47f87d86fa70f10c1d8c",
+      "head": "cb499d76119b63412b32a5d5a71f181ff26379b1",
       "outcome": "no-change",
-      "reason": "Types used by internal module interfaces are exported from their defining modules without adding package exports.",
+      "reason": "Shared path validation, utility options, and stream fields retain their documented behavior and meet all existing bundle budgets.",
       "evidence": [
-        "Changed: src/core/operation.ts, src/core/streamed-query.ts, src/core/utility-node.ts, src/core/utility-path.ts, src/core/utility-tree.ts at 17f1d882b1c4acabcf0d47f87d86fa70f10c1d8c"
+        "Changed: src/core/contract-hydration.ts, src/core/streamed-query.ts, src/core/utility-node.ts, src/core/utility-path.ts, src/core/utility-tree.ts at cb499d76119b63412b32a5d5a71f181ff26379b1"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "3e3fc75fe0e05a62d5c48e5b1906c5feab902fa081854180545018f5c48efafa",
+      "fingerprint": "4ffbaa39d4c8d107c4f8f6a3915f95dcf66b9c159d9ab7e2aedc616cd5e60fe5",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -634,7 +634,7 @@
         "src/core/configure.ts": "277f1d1201be35962d6b75c3e9f4074e7f4798456d515ddbd23d7dc3bf6693cf",
         "src/core/consume-events.ts": "648144582c4bdbf4a9cb0d35ddc54327abbefc654f2d37b6154232bcd09a1752",
         "src/core/contract-hydration-types.ts": "53366364723a34f8948f2b813ad60ec20de98ee878f9398aff38bb15bf12fd45",
-        "src/core/contract-hydration.ts": "4149266d0d121426178e88487f3ddc3380f4c85a116bc51b99bda74b4a8f0022",
+        "src/core/contract-hydration.ts": "9933ac766943e12cc69b36391aafa82c2248a5f07f236ae0dcd79761cbfccc9d",
         "src/core/declared-error.ts": "72146f75dc4f99abb60c143ae4464abf6a512cd5ffe713597bb3fb967f58c7a0",
         "src/core/hydration.ts": "08c812094bb4662cdf118b1825a47a4ec4bc1e4bd248a878726cbd4ff31aaf1e",
         "src/core/inference.ts": "249bc1d59e4ea6ddc7e3a09a63b93c13e3805f9d70ead00f44c710ff95e4df94",
@@ -657,11 +657,11 @@
         "src/core/stream-publication.ts": "0ecae3160d553d5b9d2b940abab3ccb93c610c77a2baed2dd2a70704c6771b89",
         "src/core/stream-recovery.ts": "ecc7fb61c6cb8b8f1617a2bfa69387b64e3e224c09f1f5f6f47964bd256f1bbd",
         "src/core/stream-snapshot.ts": "5c31085e7f22c8242b42443f5468a160a6dd6a779a29bedcc5a9c14d7a855402",
-        "src/core/streamed-query.ts": "2b5d7e848b892783b3f41d537f27af69201781423a41bf3861c71d2007d5d80d",
+        "src/core/streamed-query.ts": "087110a6f270c6891271dc989d94e0199ab9c7b2eb982479aa9d6f16fad9da32",
         "src/core/types.ts": "666e2a4d5d7f3c94d392a9ced105246122b48f4fa1bc30ca001e1c26a9425b61",
-        "src/core/utility-node.ts": "e699b04106da0db5df89007066468bbbc5ac05c46ac483d8fae548c73d4edb96",
-        "src/core/utility-path.ts": "cf40ed3f2c1403ef174199282afe53df5d135236c3251fd45e93d1cf9c0252fd",
-        "src/core/utility-tree.ts": "e5074c482e1efb120776fbbe43db3c34e45938571218102e92a3a91f416b646b",
+        "src/core/utility-node.ts": "8c3eb7adeec4cf49d5a475d34e785d060abd39f6a9a6049dc48a390cae0df74b",
+        "src/core/utility-path.ts": "d46bb166dd03d2163063339a9cd6228dbcdeafea6ae14ad908bdb4ec6244f13e",
+        "src/core/utility-tree.ts": "95b50d82f394a8a6e4305da92c9ce7f74682d8ab3b2c7a310a740303f94308e7",
         "src/core/view-prefix.ts": "dfc0d74a07c8afe3f63952d59c29088ba4afb45e11a402ef8b72c5e2282cb063",
         "src/http/create-utils.ts": "3d1e9ad3edd8b1dd6d614dea1c3fa4783ba150acf7ef7f8af6282ba024fd250e",
         "src/http/endpoint.ts": "73562ae37aa478c901714001525357a978cedfd36e5a8efbdfa6286d7deac0fb",
@@ -822,11 +822,11 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "17f1d882b1c4acabcf0d47f87d86fa70f10c1d8c",
+      "head": "cb499d76119b63412b32a5d5a71f181ff26379b1",
       "outcome": "no-change",
-      "reason": "Types used by internal module interfaces are exported from their defining modules without adding package exports.",
+      "reason": "Shared path validation, utility options, and stream fields retain their documented behavior and meet all existing bundle budgets.",
       "evidence": [
-        "Changed: src/core/operation.ts, src/core/streamed-query.ts, src/core/utility-node.ts, src/core/utility-path.ts, src/core/utility-tree.ts at 17f1d882b1c4acabcf0d47f87d86fa70f10c1d8c"
+        "Changed: src/core/contract-hydration.ts, src/core/streamed-query.ts, src/core/utility-node.ts, src/core/utility-path.ts, src/core/utility-tree.ts at cb499d76119b63412b32a5d5a71f181ff26379b1"
       ]
     },
     "source:vite.config.ts": {

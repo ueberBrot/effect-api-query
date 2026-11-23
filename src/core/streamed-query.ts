@@ -51,26 +51,22 @@ const validatePublicationDeadline: (
   }
 };
 
-const policyFields = {
-  live: ["coalesceMs", "sseOptions"],
-  streamed: [
-    "maxChunks",
-    "refetchMode",
-    "publicationBatchSize",
-    "publicationMaxWaitMs",
-    "sseOptions",
-  ],
-} satisfies Record<"live" | "streamed", readonly string[]>;
-
-const allPolicyFields = new Set([
-  ...policyFields.live,
-  ...policyFields.streamed,
-]);
+const policyFields = [
+  "coalesceMs",
+  "maxChunks",
+  "refetchMode",
+  "publicationBatchSize",
+  "publicationMaxWaitMs",
+  "sseOptions",
+];
 
 export const isStreamPolicyOption = (
   view: "live" | "streamed",
   name: string
-): boolean => policyFields[view].includes(name);
+): boolean =>
+  name === "sseOptions" ||
+  (policyFields.includes(name) &&
+    (name === "coalesceMs") === (view === "live"));
 
 export type StreamPolicyFields = {
   -readonly [
@@ -78,17 +74,11 @@ export type StreamPolicyFields = {
   ]?: (StreamedPolicyOptions & LivePolicyOptions)[Key];
 } & { sseOptions?: unknown };
 
-export const hasStreamPolicy = (options: StreamPolicyFields): boolean => {
-  for (const key of allPolicyFields) {
-    if (Object.hasOwn(options, key)) {
-      return true;
-    }
-  }
-  return false;
-};
+export const hasStreamPolicy = (options: StreamPolicyFields): boolean =>
+  policyFields.some((key) => Object.hasOwn(options, key));
 
 export const clearStreamPolicy = (options: StreamPolicyFields): void => {
-  for (const key of allPolicyFields) {
+  for (const key of policyFields) {
     Reflect.deleteProperty(options, key);
   }
 };

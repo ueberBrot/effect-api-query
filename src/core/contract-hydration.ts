@@ -674,8 +674,8 @@ const deriveHttpStreamCodec = (
 
 const validateSegments = (
   operations: readonly {
-    readonly path: string;
-    readonly segments: readonly string[];
+    readonly name: string;
+    readonly path: readonly string[];
   }[]
 ): void => {
   const messages = {
@@ -686,11 +686,10 @@ const validateSegments = (
   };
   validateUtilityPaths(
     operations,
-    (operation) => operation.segments,
-    ({ path }, { kind }) =>
+    ({ name }, kind) =>
       new HydrationCodecError("InvalidContractPath", {
-        path,
-        message: `Contract path "${path}" ${messages[kind]}`,
+        path: name,
+        message: `Contract path "${name}" ${messages[kind]}`,
       })
   );
 };
@@ -881,8 +880,8 @@ const buildRpcContractRegistry = (
   const paths = readPathsOption(options);
 
   const operations: {
-    readonly path: string;
-    readonly segments: readonly string[];
+    readonly name: string;
+    readonly path: readonly string[];
     readonly rpc: Rpc.AnyWithProps;
   }[] = [];
 
@@ -902,15 +901,15 @@ const buildRpcContractRegistry = (
       throw new TypeError("Expected an Effect RPC declaration");
     }
     operations.push({
-      path: rawTag,
-      segments: rawTag.split("."),
+      name: rawTag,
+      path: rawTag.split("."),
       rpc: value,
     });
   }
 
   validateSegments(operations);
 
-  const knownPaths = new Set(operations.map((op) => op.path));
+  const knownPaths = new Set(operations.map((op) => op.name));
   for (const path of Object.getOwnPropertyNames(paths)) {
     if (!knownPaths.has(path)) {
       throw new HydrationCodecError("UnknownPath", { path });
@@ -920,7 +919,7 @@ const buildRpcContractRegistry = (
   const codecs: CompiledHydrationCodec[] = [];
   const rootPrefix = [...keyPrefix, "rpc"];
 
-  for (const { path, segments, rpc } of operations) {
+  for (const { name: path, path: segments, rpc } of operations) {
     const config = resolvePathConfigObject(path, readOwn(paths, path));
     if (config === false) {
       continue;
@@ -958,11 +957,11 @@ const httpCodecDerivations = (
       };
 
 const validateHttpPaths = (
-  operations: readonly { readonly path: string }[],
+  operations: readonly { readonly name: string }[],
   paths: Record<string, unknown>
 ): void => {
   const pathCounts = new Map<string, number>();
-  for (const { path } of operations) {
+  for (const { name: path } of operations) {
     pathCounts.set(path, (pathCounts.get(path) ?? 0) + 1);
   }
   const ambiguousPaths = new Set<string>();
@@ -993,8 +992,8 @@ const buildHttpContractRegistry = (
   const paths = readPathsOption(options);
 
   const operations: {
-    readonly path: string;
-    readonly segments: readonly string[];
+    readonly name: string;
+    readonly path: readonly string[];
     readonly classified: QueryableHttpEndpoint;
     readonly successesByStatus: ReadonlyMap<number, readonly Schema.Top[]>;
   }[] = [];
@@ -1017,8 +1016,8 @@ const buildHttpContractRegistry = (
         ? endpoint.identifier
         : `${group.identifier}.${endpoint.identifier}`;
       operations.push({
-        path,
-        segments,
+        name: path,
+        path: segments,
         classified,
         successesByStatus: successes,
       });
@@ -1031,7 +1030,12 @@ const buildHttpContractRegistry = (
   const codecs: CompiledHydrationCodec[] = [];
   const rootPrefix = [...keyPrefix, "http", api.identifier];
 
-  for (const { path, segments, classified, successesByStatus } of operations) {
+  for (const {
+    name: path,
+    path: segments,
+    classified,
+    successesByStatus,
+  } of operations) {
     const config = resolvePathConfigObject(path, readOwn(paths, path));
     if (config === false) {
       continue;

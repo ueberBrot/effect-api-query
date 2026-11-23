@@ -38,7 +38,7 @@ import {
   normalizeUtilityKeyPrefix,
   validateUtilityPaths,
 } from "./utility-path";
-import type { KeyPrefixInput, UtilityPath } from "./utility-path";
+import type { KeyPrefixInput } from "./utility-path";
 
 interface PreparedQuery {
   readonly input: unknown;
@@ -124,29 +124,27 @@ const matchLeafSegments = (
   identity: readonly JsonValue[] | undefined
 ): QueryFilter => {
   if (filter.exact === true) {
-    return !inputless && !hasInput && identity !== undefined
-      ? { ...filter, predicate: () => false }
-      : filter;
-  }
-  const hasCanonicalInput = hasInput && !inputless;
-  if (!hasCanonicalInput && identity === undefined) {
+    if (!inputless && !hasInput && identity !== undefined) {
+      filter.predicate = () => false;
+    }
     return filter;
   }
-  const inputHash = hasCanonicalInput
-    ? hashKey([filter.queryKey[inputIndex]])
-    : undefined;
+  const inputHash =
+    hasInput && !inputless ? hashKey([filter.queryKey[inputIndex]]) : undefined;
   const identityIndex = inputless ? inputIndex : inputIndex + 1;
   const identityHash = identity && hashKey(identity);
-  return {
-    ...filter,
-    predicate: (query) =>
-      (inputHash === undefined ||
-        hashKey([query.queryKey[inputIndex]]) === inputHash) &&
-      (identityHash === undefined ||
-        (query.queryKey.length >= identityIndex &&
-          hashKey(query.queryKey.slice(identityIndex)) === identityHash)) &&
-      (filter.predicate?.(query) ?? true),
-  };
+  if (inputHash === undefined && identityHash === undefined) {
+    return filter;
+  }
+  const { predicate } = filter;
+  filter.predicate = (query) =>
+    (inputHash === undefined ||
+      hashKey([query.queryKey[inputIndex]]) === inputHash) &&
+    (identityHash === undefined ||
+      (query.queryKey.length >= identityIndex &&
+        hashKey(query.queryKey.slice(identityIndex)) === identityHash)) &&
+    (predicate?.(query) ?? true);
+  return filter;
 };
 
 const createLeafFilter =
@@ -241,29 +239,21 @@ const createQueryBuilders = (
   prepareIdentity?: (options: Record<string, unknown>) => readonly JsonValue[]
 ) => ({
   key: (argument?: unknown) => {
-    if (argument !== undefined && !Predicate.isObject(argument)) {
+    const inputless = description.input._tag === "Inputless";
+    if (
+      !Predicate.isObject(argument) &&
+      (argument !== undefined || !inputless)
+    ) {
       throw new TypeError("Query key options must be an object");
     }
-    if (description.input._tag === "Inputless") {
-      const options = argument === undefined ? {} : { ...argument };
-      const identity = prepareIdentity?.(options) ?? [];
-      return prepareQuery(
-        description,
-        undefined,
-        operationKey,
-        keyEncoder,
-        identity
-      ).key;
-    }
-    if (argument === undefined) {
-      throw new TypeError("Query key options must be an object");
-    }
-    const options = { ...argument };
-    const { input } = options;
-    delete options["input"];
-    const identity = prepareIdentity?.(options) ?? [];
-    return prepareQuery(description, input, operationKey, keyEncoder, identity)
-      .key;
+    const { input, ...options } = { ...argument };
+    return prepareQuery(
+      description,
+      inputless ? undefined : input,
+      operationKey,
+      keyEncoder,
+      prepareIdentity?.(options)
+    ).key;
   },
 
   options: (argument?: unknown) => {
@@ -556,25 +546,20 @@ const validateKeyEncoders = (
   keyEncoders: ReadonlyMap<string, RuntimeKeyEncoder>,
   errors: TreeErrors
 ) => {
-  const supportedIds = new Set<string>();
+  const requiresEncoderById = new Map<string, boolean>();
   for (const operation of operations) {
-    if (operation.kind !== "Mutation" && operation.input._tag !== "Inputless") {
-      supportedIds.add(operation.id);
+    if (operation.kind !== "Mutation" && operation.input._tag === "Input") {
+      requiresEncoderById.set(operation.id, operation.input.requiresEncoder);
     }
   }
   for (const id of keyEncoders.keys()) {
-    if (!supportedIds.has(id)) {
+    if (!requiresEncoderById.has(id)) {
       throw errors.unknownEncoder(id);
     }
   }
-  for (const operation of operations) {
-    if (
-      operation.kind !== "Mutation" &&
-      operation.input._tag === "Input" &&
-      operation.input.requiresEncoder &&
-      !Predicate.isFunction(keyEncoders.get(operation.id))
-    ) {
-      throw errors.missingEncoder(operation.id);
+  for (const [id, required] of requiresEncoderById) {
+    if (required && !Predicate.isFunction(keyEncoders.get(id))) {
+      throw errors.missingEncoder(id);
     }
   }
 };
@@ -632,15 +617,15 @@ const operationViews = (
 const insertLeaf = (
   tree: BuildBranch,
   prefix: readonly JsonValue[],
-  path: UtilityPath<OperationDescription>,
+  description: OperationDescription,
   keyEncoder: RuntimeKeyEncoder | undefined,
   runPromiseExit: RunPromiseExit<unknown>
 ) => {
-  const { segments } = path;
+  const { path: segments } = description;
   const operation =
-    path.operation.kind === "Mutation"
-      ? path.operation
-      : { ...path.operation, input: { ...path.operation.input } };
+    description.kind === "Mutation"
+      ? description
+      : { ...description, input: { ...description.input } };
   const operationKey = freezeKey([...prefix, ...segments]);
   const filterPath: FilterPath = {
     key: operationKey,
@@ -711,18 +696,18 @@ const insertLeaf = (
 
 const createTree = (
   prefix: readonly JsonValue[],
-  paths: readonly UtilityPath<OperationDescription>[],
+  operations: readonly OperationDescription[],
   keyEncoders: ReadonlyMap<string, RuntimeKeyEncoder>,
   runPromiseExit: RunPromiseExit<unknown>
 ) => {
   const tree = buildBranch(prefix);
 
-  for (const path of paths) {
+  for (const operation of operations) {
     insertLeaf(
       tree,
       prefix,
-      path,
-      keyEncoders.get(path.operation.id),
+      operation,
+      keyEncoders.get(operation.id),
       runPromiseExit
     );
   }
@@ -746,17 +731,14 @@ export const createUtilityTree = (
     ),
     ...options.keyNamespace,
   ]);
-  const paths = validateUtilityPaths(
-    operations,
-    (operation) => operation.path,
-    ({ id }, issue) =>
-      issue.kind === "invalid"
-        ? options.errors.invalidPath(id)
-        : options.errors.pathCollision(
-            id,
-            issue.segments,
-            issue.kind === "duplicate" ? "duplicates" : "collides with"
-          )
+  validateUtilityPaths(operations, ({ id }, issue, segments) =>
+    issue === "invalid"
+      ? options.errors.invalidPath(id)
+      : options.errors.pathCollision(
+          id,
+          segments,
+          issue === "duplicate" ? "duplicates" : "collides with"
+        )
   );
   validateKeyEncoders(operations, options.keyEncoders, options.errors);
   const runner =
@@ -764,5 +746,5 @@ export const createUtilityTree = (
       ? // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
         (Effect.runPromiseExit as RunPromiseExit<unknown>)
       : resolveRuntime(options.runtime);
-  return createTree(prefix, paths, options.keyEncoders, runner);
+  return createTree(prefix, operations, options.keyEncoders, runner);
 };
