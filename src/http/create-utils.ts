@@ -49,7 +49,7 @@ export function createHttpApiQueryUtils(
     options.client,
     options.keyEncoders
   );
-  const hasKeyPrefix = Object.hasOwn(options, "keyPrefix");
+  const hasKeyPrefix = "keyPrefix" in options;
   return createUtilityTree(operations, {
     hasKeyPrefix,
     keyPrefix: options.keyPrefix,

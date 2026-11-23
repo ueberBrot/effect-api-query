@@ -23,6 +23,7 @@ import { describe, expect, it, vi } from "vite-plus/test";
 
 import {
   acquireQueryOwner,
+  createContractHydrationRegistry,
   createHttpApiQueryUtils,
   EffectHttpApiQueryConfigError,
   EffectHttpApiQueryError,
@@ -65,6 +66,35 @@ const makeClient = HttpApiTest.groups(Api, ["users"]).pipe(
 );
 
 describe(createHttpApiQueryUtils, () => {
+  it("preserves inherited key prefix getters for utilities and hydration", () => {
+    class TenantOptions {
+      readonly #tenant = "tenant";
+
+      get keyPrefix() {
+        return [this.#tenant] as const;
+      }
+    }
+    const group = RpcGroup.make(Rpc.make("read"));
+    const rpc = createRpcQueryUtils(
+      group,
+      Object.assign(new TenantOptions(), {
+        client: { read: () => Effect.void },
+      })
+    );
+    const http = createHttpApiQueryUtils(
+      HttpApi.make("empty"),
+      Object.assign(new TenantOptions(), { client: {} })
+    );
+    const registry = createContractHydrationRegistry(
+      group,
+      new TenantOptions()
+    );
+    const key = rpc.read.queryKey();
+    expect(key).toStrictEqual(["tenant", "rpc", "read", "query"]);
+    expect(http.key()).toStrictEqual(["tenant", "http", "empty"]);
+    expect(registry.matches(key)).toBe(true);
+  });
+
   it("rejects sparse key prefixes through both adapters, including nested arrays", () => {
     const sparse = ["app", "tenant"] as const;
     Reflect.deleteProperty(sparse, 1);

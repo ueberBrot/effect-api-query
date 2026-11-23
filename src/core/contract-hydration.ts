@@ -71,7 +71,7 @@ const readOwn = (record: Record<string, unknown>, key: string) =>
 const normalizeKeyPrefix = (
   options: Record<string, unknown> | undefined
 ): readonly JsonValue[] => {
-  if (options === undefined || !Object.hasOwn(options, "keyPrefix")) {
+  if (options === undefined || !("keyPrefix" in options)) {
     return [];
   }
   const { keyPrefix: prefix } = options;

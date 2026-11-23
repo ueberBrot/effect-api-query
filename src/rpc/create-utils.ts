@@ -58,7 +58,7 @@ export function createRpcQueryUtils(
   }
 ): object {
   const rpcs = extractRpcs(group, options.client);
-  const hasKeyPrefix = Object.hasOwn(options, "keyPrefix");
+  const hasKeyPrefix = "keyPrefix" in options;
   const keyEncoders = new Map<string, RuntimeKeyEncoder>();
   for (const [tag, encoder] of Object.entries(options.keyEncoders ?? {})) {
     if (encoder !== undefined) {
