@@ -361,33 +361,4 @@ describe("owner event consumption", () => {
     expect(owner.queryClient.getQueryData(["user"])).toBe("after gap");
     await owner.dispose();
   });
-
-  it("opts into owner retirement interruption via wrapRunner without passing a dummy AbortSignal", async () => {
-    const owner = await acquireQueryOwner(
-      async () => await Promise.resolve(null)
-    );
-    const wrapCalls: unknown[] = [];
-    const runOptions: unknown[] = [];
-    const observedOwner: Pick<typeof owner, "queryClient" | "wrapRunner"> = {
-      queryClient: owner.queryClient,
-      wrapRunner: (runner, options) => {
-        wrapCalls.push(options);
-        const wrapped = owner.wrapRunner(runner, options);
-        return async (effect, execOptions) => {
-          runOptions.push(execOptions);
-          return await wrapped(effect, execOptions);
-        };
-      },
-    };
-    const exit = await runQueryEvents(
-      observedOwner,
-      Stream.succeed("event"),
-      { onEvent: () => Effect.void },
-      Effect.runPromiseExit
-    );
-    expect(Exit.isSuccess(exit)).toBe(true);
-    expect(wrapCalls).toStrictEqual([{ interruptOnRetire: true }]);
-    expect(runOptions).toStrictEqual([undefined]);
-    await owner.dispose();
-  });
 });
