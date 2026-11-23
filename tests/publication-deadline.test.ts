@@ -235,6 +235,32 @@ describe("publication deadlines with TestClock", () => {
   );
 
   it.effect(
+    "does not flush buffered values when upstream terminates with an interrupt-only cause",
+    () =>
+      Effect.gen(function* skipsPendingBatchOnUpstreamInterrupt() {
+        const emitted: (readonly number[])[] = [];
+        const source = Stream.make(1, 2).pipe(
+          Stream.concat(Stream.fromEffect(Effect.interrupt))
+        );
+        const exit = yield* Effect.exit(
+          streamPublicationBatches(source, 5, 50).pipe(
+            Stream.runForEach((batch) =>
+              Effect.sync(() => {
+                emitted.push(batch);
+              })
+            )
+          )
+        );
+
+        expect(Exit.isFailure(exit)).toBe(true);
+        if (Exit.isFailure(exit)) {
+          expect(Cause.hasInterruptsOnly(exit.cause)).toBe(true);
+        }
+        expect(emitted).toStrictEqual([[1]]);
+      })
+  );
+
+  it.effect(
     "drives live query coalescing deterministically through QueryClient with TestClock",
     () =>
       Effect.gen(function* drivesLiveQueryWithTestClock() {

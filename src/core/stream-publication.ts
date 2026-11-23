@@ -123,7 +123,7 @@ const batchStream = <A, E, R>(
         | Fiber.Fiber<NonEmptyBatch<A>, E | Cause.Done>
         | undefined;
       let deadlineFiber: Fiber.Fiber<void> | undefined;
-      let deadlineGate: Deferred.Deferred<boolean> | undefined;
+      let deadlineGate: Deferred.Deferred<undefined> | undefined;
       let terminalCause: Cause.Cause<E | Cause.Done> | undefined;
 
       const clearDeadline = Effect.suspend(() => {
@@ -133,18 +133,17 @@ const batchStream = <A, E, R>(
         return fiber === undefined ? Effect.void : Fiber.interrupt(fiber);
       });
 
-      const startDeadline = (milliseconds: number) =>
-        Effect.gen(function* startDeadlineTimer() {
-          const gate = Deferred.makeUnsafe<boolean>();
-          deadlineGate = gate;
-          deadlineFiber = yield* Effect.sleep(
-            Duration.millis(milliseconds)
-          ).pipe(
-            Effect.andThen(Deferred.succeed(gate, true)),
-            Effect.asVoid,
-            Effect.forkIn(scope, { startImmediately: true })
-          );
-        });
+      const startDeadline = Effect.fnUntraced(function* startDeadlineTimer(
+        milliseconds: number
+      ) {
+        const gate = Deferred.makeUnsafe<undefined>();
+        deadlineGate = gate;
+        deadlineFiber = yield* Effect.sleep(Duration.millis(milliseconds)).pipe(
+          Effect.andThen(Deferred.succeed(gate, undefined)),
+          Effect.asVoid,
+          Effect.forkIn(scope, { startImmediately: true })
+        );
+      });
 
       const takePending = (): NonEmptyBatch<A> | undefined => {
         const batch = pending;
@@ -240,9 +239,13 @@ const batchStream = <A, E, R>(
       > = Effect.gen(function* pullNextBatch() {
         while (true) {
           if (terminalCause !== undefined) {
-            const batch = takePending();
-            if (batch !== undefined) {
-              return yield* flushBatch(batch);
+            if (Cause.hasInterruptsOnly(terminalCause)) {
+              pending = undefined;
+            } else {
+              const batch = takePending();
+              if (batch !== undefined) {
+                return yield* flushBatch(batch);
+              }
             }
             const cause = terminalCause;
             terminalCause = undefined;

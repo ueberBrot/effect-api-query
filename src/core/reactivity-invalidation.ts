@@ -156,20 +156,20 @@ const bindWorker = Effect.fnUntraced(function* bindWorker(
  * Loads Effect Reactivity and subscribes the current QueryClient until the Scope closes.
  * Run the returned flush Effect to wait for queued invalidations and native refetches.
  */
-export const bindReactivityInvalidation = (
+export const bindReactivityInvalidation: (
   bindings: readonly ReactivityInvalidationBinding[],
   options?: ReactivityInvalidationOptions
-): Effect.Effect<
+) => Effect.Effect<
   { readonly flush: Effect.Effect<void> },
   never,
   Scope.Scope | Reactivity.Reactivity | QueryClientService
-> =>
-  Effect.promise(async () => await import("effect/reactivity/Reactivity")).pipe(
-    Effect.flatMap(({ Reactivity: tag }) =>
-      tag.pipe(
-        Effect.flatMap((reactivity) =>
-          bindWorker(reactivity, bindings, options)
-        )
-      )
-    )
+> = Effect.fnUntraced(function* bindReactivityInvalidation(
+  bindings: readonly ReactivityInvalidationBinding[],
+  options?: ReactivityInvalidationOptions
+) {
+  const { Reactivity: tag } = yield* Effect.promise(
+    async () => await import("effect/reactivity/Reactivity")
   );
+  const reactivity = yield* tag;
+  return yield* bindWorker(reactivity, bindings, options);
+});

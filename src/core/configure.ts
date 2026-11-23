@@ -31,34 +31,26 @@ type RuntimeCallback = (...args: unknown[]) => unknown;
 const isCallback = (value: unknown): value is RuntimeCallback =>
   Predicate.isFunction(value);
 
-const queryBuilders = new WeakMap<object, RuntimeQueryBuilder>();
-const mutationBuilders = new WeakMap<object, RuntimeMutationBuilder>();
-
-export const registerQueryBuilder = <Builder extends RuntimeQueryBuilder>(
-  builder: Builder
-): Builder => {
-  queryBuilders.set(builder, builder);
-  return builder;
+const createBuilderRegistry = <Base extends object>() => {
+  const registry = new WeakMap<object, Base>();
+  return {
+    register: <Builder extends Base>(builder: Builder): Builder => {
+      registry.set(builder, builder);
+      return builder;
+    },
+    // oxlint-disable-next-line anti-slop/no-unknown-parameters
+    read: (candidate: unknown): Base | undefined =>
+      Predicate.isFunction(candidate) ? registry.get(candidate) : undefined,
+  };
 };
 
-export const registerMutationBuilder = <Builder extends RuntimeMutationBuilder>(
-  builder: Builder
-): Builder => {
-  mutationBuilders.set(builder, builder);
-  return builder;
-};
+const queryBuilderRegistry = createBuilderRegistry<RuntimeQueryBuilder>();
+const mutationBuilderRegistry = createBuilderRegistry<RuntimeMutationBuilder>();
 
-export const readQueryBuilder = (
-  // oxlint-disable-next-line anti-slop/no-unknown-parameters
-  candidate: unknown
-): RuntimeQueryBuilder | undefined =>
-  Predicate.isFunction(candidate) ? queryBuilders.get(candidate) : undefined;
-
-export const readMutationBuilder = (
-  // oxlint-disable-next-line anti-slop/no-unknown-parameters
-  candidate: unknown
-): RuntimeMutationBuilder | undefined =>
-  Predicate.isFunction(candidate) ? mutationBuilders.get(candidate) : undefined;
+export const registerQueryBuilder = queryBuilderRegistry.register;
+export const registerMutationBuilder = mutationBuilderRegistry.register;
+export const readQueryBuilder = queryBuilderRegistry.read;
+export const readMutationBuilder = mutationBuilderRegistry.read;
 
 export interface RuntimeViewConfiguration {
   readonly policy?: RuntimeOptions | undefined;
