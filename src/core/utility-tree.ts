@@ -35,7 +35,7 @@ import type {
   StreamedPolicyOptions,
 } from "./types";
 import { defineLazyLeafDescriptor } from "./utility-node";
-import type { UtilityNode } from "./utility-node";
+import type { RuntimeUtilityNode, UtilityNode } from "./utility-node";
 import { validateUtilityPaths } from "./utility-path";
 import type { UtilityPath } from "./utility-path";
 
@@ -399,7 +399,8 @@ const createInfiniteBuilders = (
 const createBufferedBuilders = (
   description: UnaryOperation | MutationOperation,
   operationKey: readonly JsonValue[],
-  runPromiseExit: RunPromiseExit<unknown>
+  runPromiseExit: RunPromiseExit<unknown>,
+  mutationRunner: RunPromiseExit<unknown>
 ) => {
   const mutationKey = freezeKey([...operationKey, "mutation"]);
 
@@ -446,7 +447,7 @@ const createBufferedBuilders = (
           description,
           "mutation",
           variables,
-          runPromiseExit,
+          mutationRunner,
           requestOptions
         ),
       mutationKey,
@@ -464,7 +465,8 @@ const createUnaryBuilders = (
   description: UnaryOperation,
   operationKey: readonly JsonValue[],
   keyEncoder: RuntimeKeyEncoder | undefined,
-  runPromiseExit: RunPromiseExit<unknown>
+  runPromiseExit: RunPromiseExit<unknown>,
+  mutationRunner: RunPromiseExit<unknown>
 ) => {
   const queryOperationKey = freezeKey([...operationKey, "query"]);
   const query = createQueryBuilders(
@@ -514,7 +516,12 @@ const createUnaryBuilders = (
       keyEncoder,
       runPromiseExit
     ),
-    ...createBufferedBuilders(description, operationKey, runPromiseExit),
+    ...createBufferedBuilders(
+      description,
+      operationKey,
+      runPromiseExit,
+      mutationRunner
+    ),
     queryKey: query.key,
     queryOptions: query.options,
     ...(metadataQuery === undefined
@@ -590,18 +597,19 @@ const validateKeyEncoders = (
   }
 };
 
-export interface LeafRuntimeDescriptor {
-  readonly runner: RunPromiseExit<unknown>;
-  readonly rebuild: (
-    runner: RunPromiseExit<unknown>
-  ) => Record<string, unknown>;
-}
+type RunnerWrapper = (
+  runner: RunPromiseExit<unknown>
+) => RunPromiseExit<unknown>;
 
-const leafDescriptors = new WeakMap<UtilityNode, LeafRuntimeDescriptor>();
+const leafRebuilders = new WeakMap<
+  UtilityNode,
+  (wrapRunner: RunnerWrapper) => RuntimeUtilityNode
+>();
 
-export const readLeafDescriptor = (
-  node: UtilityNode
-): LeafRuntimeDescriptor | undefined => leafDescriptors.get(node);
+export const rebuildLeafForOwner = (
+  node: RuntimeUtilityNode,
+  wrapRunner: RunnerWrapper
+): RuntimeUtilityNode => leafRebuilders.get(node)?.(wrapRunner) ?? { ...node };
 
 interface BuildBranch {
   readonly node: Record<string, unknown>;
@@ -679,7 +687,12 @@ const insertLeaf = (
   const buildLeaf = (leafRunner: RunPromiseExit<unknown>) => {
     let builders;
     if (operation.kind === "Mutation") {
-      builders = createBufferedBuilders(operation, operationKey, leafRunner);
+      builders = createBufferedBuilders(
+        operation,
+        operationKey,
+        leafRunner,
+        runPromiseExit
+      );
     } else if (operation.kind === "Streaming") {
       builders = createStreamingBuilders(
         operation,
@@ -692,7 +705,8 @@ const insertLeaf = (
         operation,
         operationKey,
         keyEncoder,
-        leafRunner
+        leafRunner,
+        runPromiseExit
       );
     }
     return Object.freeze({ key: leafKey, ...builders });
@@ -702,7 +716,9 @@ const insertLeaf = (
     leafName,
     defineLazyLeafDescriptor(() => {
       const leaf = buildLeaf(runPromiseExit);
-      leafDescriptors.set(leaf, { runner: runPromiseExit, rebuild: buildLeaf });
+      leafRebuilders.set(leaf, (wrapRunner) =>
+        buildLeaf(wrapRunner(runPromiseExit))
+      );
       if (operation.kind !== "Mutation") {
         registerInputOwner(leaf.key, operation.input, keyEncoder);
       }

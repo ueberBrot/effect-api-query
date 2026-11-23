@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "6e8f3f9ac935977e0dca835efdda9f3ca250f52f195064e82c466020dc89d8b7",
+      "fingerprint": "cadd3821d77eba73ec92969c7557b6db3ce4828c4982af66ec5003ca4a82e495",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -232,7 +232,7 @@
         "src/core/query-effects.ts": "66e0311cf246b5edd7f3b287c060e2b9acb3a7a6d99644a06626b5b41e0e09cf",
         "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
         "src/core/query-filter.ts": "83848614ec7f7db8f188db40482bad14b46c08c40fc3b5f0325a8dbed98524b7",
-        "src/core/query-owner.ts": "4d1060edcb5ee2b49f8a8043c7cfba534f2d903590ea9f587c5aaaae6a8a5b2d",
+        "src/core/query-owner.ts": "1c09e65e361d0cbaacf7f8b378ff39c7bfdc19c2c07ff51dcdd86cfa4f6bc68b",
         "src/core/query-prefix-index.ts": "419a20fcf9bb28c5e7dbedb0c5af6f0e0dab52c0332773dbf39af638ac671cc2",
         "src/core/reactivity-invalidation.ts": "29a583352f001213c535be806046256daf040444a67665e3d6c202d7dd7a8054",
         "src/core/runtime.ts": "c59393fa31c1c57a2e4d149d45987f88e2033eeebe6c46a12bac9a30ceb47d24",
@@ -246,7 +246,7 @@
         "src/core/types.ts": "666e2a4d5d7f3c94d392a9ced105246122b48f4fa1bc30ca001e1c26a9425b61",
         "src/core/utility-node.ts": "4da6b6f6d24521e81779ae96cca7adcfb99ab1e9982136fa64027fa94865b537",
         "src/core/utility-path.ts": "98a2e760cb0eb66dd1be96d436bb35abc07139298efeefadf072d569b53b7aa3",
-        "src/core/utility-tree.ts": "43cdbb2afa5480d7ce087ccd191672ba81a5f5ad43891f1e407b17f41309a5c5",
+        "src/core/utility-tree.ts": "514ba3f0926429125e952143ef33f29b01283b71eafebfebc7f690d96e2411ff",
         "src/core/view-prefix.ts": "dfc0d74a07c8afe3f63952d59c29088ba4afb45e11a402ef8b72c5e2282cb063",
         "src/http/create-utils.ts": "8a27c1955323d3f4e993b244e073e3cf41cc88ac39d1c1da68cda27e85440f80",
         "src/http/endpoint.ts": "71c543b8e59d5a005e53403bdaa62f02cd291fc7ef121e46a7b56d9520d9c465",
@@ -407,15 +407,15 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "1f7b24f7a3f35aa13686e6cc6b281911a7b0f68a",
+      "head": "b1226efd605154adab6a80874568617c2f974aec",
       "outcome": "no-change",
-      "reason": "Configuration and owner tracking now use one lazy descriptor traversal with the documented composition and ownership behavior.",
+      "reason": "Generated leaves now assign the original mutation runner during rebuild and retain owner admission for the complete mutation function.",
       "evidence": [
-        "Changed: src/core/configure-utils.ts, src/core/query-owner.ts, src/core/utility-node.ts, src/core/utility-tree.ts at 1f7b24f7a3f35aa13686e6cc6b281911a7b0f68a"
+        "Changed: src/core/query-owner.ts, src/core/utility-tree.ts at b1226efd605154adab6a80874568617c2f974aec"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "deabbfdbfdca54678d6735f5c637ce2a74ceeb7ed84fc9c990ec5c1645f73edf",
+      "fingerprint": "14b89a04b9f7e7392f6305dfb41d064fb64324e0343cb199006d3a671c41c622",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -647,7 +647,7 @@
         "src/core/query-effects.ts": "66e0311cf246b5edd7f3b287c060e2b9acb3a7a6d99644a06626b5b41e0e09cf",
         "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
         "src/core/query-filter.ts": "83848614ec7f7db8f188db40482bad14b46c08c40fc3b5f0325a8dbed98524b7",
-        "src/core/query-owner.ts": "4d1060edcb5ee2b49f8a8043c7cfba534f2d903590ea9f587c5aaaae6a8a5b2d",
+        "src/core/query-owner.ts": "1c09e65e361d0cbaacf7f8b378ff39c7bfdc19c2c07ff51dcdd86cfa4f6bc68b",
         "src/core/query-prefix-index.ts": "419a20fcf9bb28c5e7dbedb0c5af6f0e0dab52c0332773dbf39af638ac671cc2",
         "src/core/reactivity-invalidation.ts": "29a583352f001213c535be806046256daf040444a67665e3d6c202d7dd7a8054",
         "src/core/runtime.ts": "c59393fa31c1c57a2e4d149d45987f88e2033eeebe6c46a12bac9a30ceb47d24",
@@ -661,7 +661,7 @@
         "src/core/types.ts": "666e2a4d5d7f3c94d392a9ced105246122b48f4fa1bc30ca001e1c26a9425b61",
         "src/core/utility-node.ts": "4da6b6f6d24521e81779ae96cca7adcfb99ab1e9982136fa64027fa94865b537",
         "src/core/utility-path.ts": "98a2e760cb0eb66dd1be96d436bb35abc07139298efeefadf072d569b53b7aa3",
-        "src/core/utility-tree.ts": "43cdbb2afa5480d7ce087ccd191672ba81a5f5ad43891f1e407b17f41309a5c5",
+        "src/core/utility-tree.ts": "514ba3f0926429125e952143ef33f29b01283b71eafebfebc7f690d96e2411ff",
         "src/core/view-prefix.ts": "dfc0d74a07c8afe3f63952d59c29088ba4afb45e11a402ef8b72c5e2282cb063",
         "src/http/create-utils.ts": "8a27c1955323d3f4e993b244e073e3cf41cc88ac39d1c1da68cda27e85440f80",
         "src/http/endpoint.ts": "71c543b8e59d5a005e53403bdaa62f02cd291fc7ef121e46a7b56d9520d9c465",
@@ -822,11 +822,11 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "1f7b24f7a3f35aa13686e6cc6b281911a7b0f68a",
+      "head": "b1226efd605154adab6a80874568617c2f974aec",
       "outcome": "no-change",
-      "reason": "Configuration and owner tracking now use one lazy descriptor traversal with the documented composition and ownership behavior.",
+      "reason": "Generated leaves now assign the original mutation runner during rebuild and retain owner admission for the complete mutation function.",
       "evidence": [
-        "Changed: src/core/configure-utils.ts, src/core/query-owner.ts, src/core/utility-node.ts, src/core/utility-tree.ts at 1f7b24f7a3f35aa13686e6cc6b281911a7b0f68a"
+        "Changed: src/core/query-owner.ts, src/core/utility-tree.ts at b1226efd605154adab6a80874568617c2f974aec"
       ]
     },
     "source:vite.config.ts": {

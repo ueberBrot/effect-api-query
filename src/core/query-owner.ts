@@ -28,7 +28,7 @@ import { resolveRuntime } from "./runtime";
 import type { RunPromiseExit, RuntimeInput } from "./types";
 import { isUtilityNode, mapUtilityChildren } from "./utility-node";
 import type { RuntimeUtilityNode, UtilityNode } from "./utility-node";
-import { readLeafDescriptor } from "./utility-tree";
+import { rebuildLeafForOwner } from "./utility-tree";
 
 const trackedOwners = new WeakMap<UtilityNode, symbol>();
 
@@ -232,17 +232,7 @@ export const acquireQueryOwner = async <A>(
     return rebuilt;
   };
   const trackLeaf = (node: RuntimeUtilityNode): RuntimeUtilityNode => {
-    const descriptor = readLeafDescriptor(node);
-    const base: RuntimeUtilityNode =
-      descriptor === undefined
-        ? { ...node }
-        : // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
-          ({
-            ...descriptor.rebuild(wrapRunner(descriptor.runner)),
-          } as RuntimeUtilityNode);
-    if (Object.hasOwn(node, "mutationOptions")) {
-      base["mutationOptions"] = node["mutationOptions"];
-    }
+    const base = rebuildLeafForOwner(node, wrapRunner);
     const tracked = Object.freeze(wrapLeafExecution({ ...base }));
     registerLeafTracking(tracked, base, wrapLeafExecution);
     trackedOwners.set(tracked, ownerToken);
