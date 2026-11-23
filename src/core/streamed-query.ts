@@ -72,7 +72,7 @@ export const isStreamPolicyOption = (
   name: string
 ): boolean => policyFields[view].includes(name);
 
-type StreamPolicyFields = {
+export type StreamPolicyFields = {
   -readonly [
     Key in keyof (StreamedPolicyOptions & LivePolicyOptions)
   ]?: (StreamedPolicyOptions & LivePolicyOptions)[Key];

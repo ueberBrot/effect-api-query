@@ -65,7 +65,7 @@ export interface QueryPreparation {
   readonly makeQuery: (input: unknown) => QueryFunction;
 }
 
-interface StreamPreparation {
+export interface StreamPreparation {
   readonly identity: readonly JsonValue[];
   readonly makeQuery: (
     input: unknown,

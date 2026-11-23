@@ -60,7 +60,7 @@ const buildBranchFrom = (
   return Object.freeze(next) as RuntimeUtilityNode;
 };
 
-type UtilityChild =
+export type UtilityChild =
   | { readonly kind: "branch"; readonly node: RuntimeUtilityNode }
   | { readonly kind: "lazy"; readonly slot: LazyLeafSlot };
 

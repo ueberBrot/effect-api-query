@@ -579,7 +579,7 @@ const validateKeyEncoders = (
   }
 };
 
-type RunnerWrapper = (
+export type RunnerWrapper = (
   runner: RunPromiseExit<unknown>
 ) => RunPromiseExit<unknown>;
 

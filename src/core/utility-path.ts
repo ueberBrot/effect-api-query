@@ -48,7 +48,7 @@ const reservedSegments = new Set([
   "streamedOptions",
 ]);
 
-type InvalidUtilityPath =
+export type InvalidUtilityPath =
   | { readonly kind: "invalid" }
   | {
       readonly kind: "duplicate" | "parent" | "descendant";
