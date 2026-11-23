@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { CommandStatus } from "@effect-api-query/contracts";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, within } from "@testing-library/react";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
@@ -20,7 +20,7 @@ describe("Cancellable command recovery", () => {
     );
     const fixture = await Effect.runPromise(
       makeControlledUserWrites(
-        new QueryClient({ defaultOptions: { queries: { retry: false } } }),
+        { defaultOptions: { queries: { retry: false } } },
         {
           start: ({ operationId, steps }) => {
             starts.push(operationId);
@@ -85,7 +85,7 @@ describe("Cancellable command recovery", () => {
     let failedReads = 0;
     const fixture = await Effect.runPromise(
       makeControlledUserWrites(
-        new QueryClient({ defaultOptions: { queries: { retry: false } } }),
+        { defaultOptions: { queries: { retry: false } } },
         {
           start: ({ operationId, steps }) => {
             command = new CommandStatus({

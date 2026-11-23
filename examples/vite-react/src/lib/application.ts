@@ -125,7 +125,6 @@ export const startViteReactApplication = async ({
     );
     owner = makeOwnerCache({
       identity: capturedIdentity,
-      queryClient,
       directoryKeys: {
         rpc: rpcQuery.users.list.queryKey(),
         http: httpQuery.users.list.queryKey(),

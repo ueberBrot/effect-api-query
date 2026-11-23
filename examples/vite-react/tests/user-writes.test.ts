@@ -40,9 +40,7 @@ describe("User writes in the Vite application", () => {
   )(
     "preserves an authoritative $refreshedAdapter list after a failed $adapter deletion with another user: $retainOther",
     async ({ adapter, refreshedAdapter, retainOther }) => {
-      const fixture = await Effect.runPromise(
-        makeControlledUserWrites(new QueryClient())
-      );
+      const fixture = await Effect.runPromise(makeControlledUserWrites());
       const { queryClient, rpcQuery, httpQuery, userWrites } =
         fixture.application;
       const ada = new User({ id: 1, name: "Ada", locale: "en" });
@@ -96,9 +94,7 @@ describe("User writes in the Vite application", () => {
   it.each(["rpc", "http"] as const)(
     "keeps a refreshed %s list authoritative through a later creation and failed deletion",
     async (adapter) => {
-      const fixture = await Effect.runPromise(
-        makeControlledUserWrites(new QueryClient())
-      );
+      const fixture = await Effect.runPromise(makeControlledUserWrites());
       const { queryClient, rpcQuery, httpQuery, userWrites } =
         fixture.application;
       const ada = new User({ id: 1, name: "Ada", locale: "en" });
@@ -150,9 +146,7 @@ describe("User writes in the Vite application", () => {
   it.each(["rpc", "http"] as const)(
     "preserves a reentrant authoritative %s list publication during an optimistic edit",
     async (adapter) => {
-      const fixture = await Effect.runPromise(
-        makeControlledUserWrites(new QueryClient())
-      );
+      const fixture = await Effect.runPromise(makeControlledUserWrites());
       const { queryClient, rpcQuery, httpQuery, userWrites } =
         fixture.application;
       const ada = new User({ id: 1, name: "Ada", locale: "en" });
@@ -196,9 +190,7 @@ describe("User writes in the Vite application", () => {
   it.each(["rpc", "http"] as const)(
     "keeps an authoritative %s list after both overlapping deletes fail",
     async (adapter) => {
-      const fixture = await Effect.runPromise(
-        makeControlledUserWrites(new QueryClient())
-      );
+      const fixture = await Effect.runPromise(makeControlledUserWrites());
       const { queryClient, rpcQuery, httpQuery, userWrites } =
         fixture.application;
       const ada = new User({ id: 1, name: "Ada", locale: "en" });
@@ -243,9 +235,7 @@ describe("User writes in the Vite application", () => {
   it.each(["rpc", "http"] as const)(
     "keeps equal authoritative %s pages independent of optimistic ownership",
     async (adapter) => {
-      const fixture = await Effect.runPromise(
-        makeControlledUserWrites(new QueryClient())
-      );
+      const fixture = await Effect.runPromise(makeControlledUserWrites());
       const { queryClient, rpcQuery, httpQuery, userWrites } =
         fixture.application;
       const ada = new User({ id: 1, name: "Ada", locale: "en" });
@@ -301,9 +291,7 @@ describe("User writes in the Vite application", () => {
   it.each(["rpc", "http"] as const)(
     "preserves refreshed %s page totals when a pending creation fails",
     async (adapter) => {
-      const fixture = await Effect.runPromise(
-        makeControlledUserWrites(new QueryClient())
-      );
+      const fixture = await Effect.runPromise(makeControlledUserWrites());
       const { queryClient, rpcQuery, httpQuery, userWrites } =
         fixture.application;
       const rpcPages = rpcQuery.users.page.infiniteKey({
@@ -376,9 +364,7 @@ describe("User writes in the Vite application", () => {
   it.each(["rpc", "http"] as const)(
     "preserves refreshed %s page totals when a pending deletion fails",
     async (adapter) => {
-      const fixture = await Effect.runPromise(
-        makeControlledUserWrites(new QueryClient())
-      );
+      const fixture = await Effect.runPromise(makeControlledUserWrites());
       const { queryClient, rpcQuery, httpQuery, userWrites } =
         fixture.application;
       const ada = new User({ id: 1, name: "Ada", locale: "en" });
@@ -451,9 +437,7 @@ describe("User writes in the Vite application", () => {
   );
 
   it("restores an optimistic page without adjusting a freshly appended page", async () => {
-    const fixture = await Effect.runPromise(
-      makeControlledUserWrites(new QueryClient())
-    );
+    const fixture = await Effect.runPromise(makeControlledUserWrites());
     const { queryClient, rpcQuery, userWrites } = fixture.application;
     const ada = new User({ id: 1, name: "Ada", locale: "en" });
     const alan = new User({ id: 2, name: "Alan", locale: "en" });
@@ -498,9 +482,7 @@ describe("User writes in the Vite application", () => {
   });
 
   it("publishes a pending user and seeds the returned user through exact generated keys", async () => {
-    const fixture = await Effect.runPromise(
-      makeControlledUserWrites(new QueryClient())
-    );
+    const fixture = await Effect.runPromise(makeControlledUserWrites());
     const { queryClient, rpcQuery, httpQuery, userWrites } =
       fixture.application;
     const ada = new User({ id: 1, name: "Ada", locale: "en" });
@@ -545,9 +527,7 @@ describe("User writes in the Vite application", () => {
   });
 
   it("rolls back a failed deletion without erasing a newer creation or changing page parameters", async () => {
-    const fixture = await Effect.runPromise(
-      makeControlledUserWrites(new QueryClient())
-    );
+    const fixture = await Effect.runPromise(makeControlledUserWrites());
     const { queryClient, rpcQuery, httpQuery, userWrites } =
       fixture.application;
     const ada = new User({ id: 1, name: "Ada", locale: "en" });
@@ -624,9 +604,7 @@ describe("User writes in the Vite application", () => {
   });
 
   it("keeps a newer successful deletion when an older delete fails", async () => {
-    const fixture = await Effect.runPromise(
-      makeControlledUserWrites(new QueryClient())
-    );
+    const fixture = await Effect.runPromise(makeControlledUserWrites());
     const { queryClient, rpcQuery, userWrites } = fixture.application;
     const ada = new User({ id: 1, name: "Ada", locale: "en" });
     fixture.seed([ada]);
@@ -661,9 +639,7 @@ describe("User writes in the Vite application", () => {
   });
 
   it("restores the original entity when both overlapping deletes fail", async () => {
-    const fixture = await Effect.runPromise(
-      makeControlledUserWrites(new QueryClient())
-    );
+    const fixture = await Effect.runPromise(makeControlledUserWrites());
     const { queryClient, rpcQuery, userWrites } = fixture.application;
     const ada = new User({ id: 1, name: "Ada", locale: "en" });
     queryClient.setQueryData(rpcQuery.users.list.queryKey(), [ada]);
@@ -708,9 +684,7 @@ describe("User writes in the Vite application", () => {
   it.each([true, false])(
     "restores distinct failed deletions in directory order with the earlier failure first: %s",
     async (earlierFailsFirst) => {
-      const fixture = await Effect.runPromise(
-        makeControlledUserWrites(new QueryClient())
-      );
+      const fixture = await Effect.runPromise(makeControlledUserWrites());
       const { queryClient, rpcQuery, httpQuery, userWrites } =
         fixture.application;
       const ada = new User({ id: 1, name: "Ada", locale: "en" });
@@ -818,9 +792,7 @@ describe("User writes in the Vite application", () => {
   )(
     "restores refreshed $adapter rows and pages through overlapping deletions; added target: $addedTarget, newer failure first: $newerFailsFirst",
     async ({ adapter, addedTarget, newerFailsFirst }) => {
-      const fixture = await Effect.runPromise(
-        makeControlledUserWrites(new QueryClient())
-      );
+      const fixture = await Effect.runPromise(makeControlledUserWrites());
       const { queryClient, rpcQuery, httpQuery, userWrites } =
         fixture.application;
       const ada = new User({ id: 1, name: "Ada", locale: "en" });
@@ -956,9 +928,7 @@ describe("User writes in the Vite application", () => {
   );
 
   it("preserves a newer creation when an older create callback completes late", async () => {
-    const fixture = await Effect.runPromise(
-      makeControlledUserWrites(new QueryClient())
-    );
+    const fixture = await Effect.runPromise(makeControlledUserWrites());
     const { queryClient, rpcQuery, userWrites } = fixture.application;
     queryClient.setQueryData(rpcQuery.users.list.queryKey(), []);
     try {
@@ -992,15 +962,13 @@ describe("User writes in the Vite application", () => {
 
   it("cancels an older reconciliation fetch before publishing a newer write", async () => {
     const fixture = await Effect.runPromise(
-      makeControlledUserWrites(
-        new QueryClient({
-          defaultOptions: {
-            queries: {
-              queryKeyHashFn: (key) => `owner:${JSON.stringify(key)}`,
-            },
+      makeControlledUserWrites({
+        defaultOptions: {
+          queries: {
+            queryKeyHashFn: (key) => `owner:${JSON.stringify(key)}`,
           },
-        })
-      )
+        },
+      })
     );
     const { queryClient, rpcQuery, userWrites } = fixture.application;
     queryClient.setQueryData(rpcQuery.users.list.queryKey(), []);
@@ -1054,9 +1022,7 @@ describe("User writes in the Vite application", () => {
   });
 
   it("keeps late callbacks bound to a retired owner and leaves a replacement client untouched", async () => {
-    const fixture = await Effect.runPromise(
-      makeControlledUserWrites(new QueryClient())
-    );
+    const fixture = await Effect.runPromise(makeControlledUserWrites());
     const { queryClient, rpcQuery, userWrites } = fixture.application;
     queryClient.setQueryData(rpcQuery.users.list.queryKey(), []);
     const replacement = new QueryClient();
@@ -1088,12 +1054,8 @@ describe("User writes in the Vite application", () => {
   });
 
   it("settles through its original owner after native observer callbacks are replaced", async () => {
-    const original = await Effect.runPromise(
-      makeControlledUserWrites(new QueryClient())
-    );
-    const replacement = await Effect.runPromise(
-      makeControlledUserWrites(new QueryClient())
-    );
+    const original = await Effect.runPromise(makeControlledUserWrites());
+    const replacement = await Effect.runPromise(makeControlledUserWrites());
     const first = original.application;
     const second = replacement.application;
     const grace = new User({ id: 2, name: "Grace", locale: "en" });
@@ -1129,9 +1091,7 @@ describe("User writes in the Vite application", () => {
   });
 
   it("removes a failed creation without erasing a newer response or corrupting page totals", async () => {
-    const fixture = await Effect.runPromise(
-      makeControlledUserWrites(new QueryClient())
-    );
+    const fixture = await Effect.runPromise(makeControlledUserWrites());
     const { queryClient, rpcQuery, userWrites } = fixture.application;
     queryClient.setQueryData(rpcQuery.users.list.queryKey(), []);
     const pages = rpcQuery.users.page.infiniteKey({

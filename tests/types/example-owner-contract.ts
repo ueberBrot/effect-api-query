@@ -1,9 +1,13 @@
 import { QueryClient } from "@tanstack/react-query";
 import type { MutationFunctionContext } from "@tanstack/react-query";
+import { acquireQueryOwner } from "@ueberbrot/effect-api-query";
 
 import { makeOwnerCache } from "../../examples/vite-react/src/lib/owner-cache.ts";
 
-const queryClient = new QueryClient();
+const lifecycle = await acquireQueryOwner(
+  async (setup) => await Promise.resolve(setup.borrow({}))
+);
+const { queryClient } = lifecycle;
 const owner = makeOwnerCache({
   identity: {
     tenantId: "a",
@@ -11,7 +15,7 @@ const owner = makeOwnerCache({
     sessionGeneration: 0,
     permissionGeneration: 0,
   },
-  queryClient,
+  lifecycle,
   directoryKeys: { rpc: ["rpc"], http: ["http"] },
 });
 const generated = owner.trackMutationOptions({

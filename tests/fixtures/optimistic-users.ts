@@ -9,7 +9,7 @@ import {
 } from "@effect-api-query/contracts";
 import type { CommandPayload } from "@effect-api-query/contracts";
 import type { ExampleRpcClient } from "@effect-api-query/contracts/client";
-import type { QueryClient } from "@tanstack/query-core";
+import type { QueryClientConfig } from "@tanstack/query-core";
 import { Deferred, Effect, Exit, Layer, Queue, Scope, Stream } from "effect";
 import { HttpServer } from "effect/http";
 import { HttpApiBuilder, HttpApiTest } from "effect/http-api";
@@ -17,6 +17,7 @@ import { RpcTest } from "effect/rpc";
 import type { RpcClientError } from "effect/rpc";
 
 import {
+  acquireQueryOwner,
   createHttpApiQueryUtils,
   createRpcQueryUtils,
 } from "#effect-api-query";
@@ -58,7 +59,7 @@ export interface ControlledUserWrites {
 
 export const makeControlledUserWrites = Effect.fnUntraced(
   function* makeControlledUserWrites(
-    queryClient: QueryClient,
+    cacheConfig?: QueryClientConfig,
     commandHandlers?: {
       readonly start: (input: CommandPayload) => Effect.Effect<CommandStatus>;
       readonly status: (input: {
@@ -66,6 +67,14 @@ export const makeControlledUserWrites = Effect.fnUntraced(
       }) => Effect.Effect<CommandStatus | null>;
     }
   ): Effect.fn.Return<ControlledUserWrites> {
+    const lifecycle = yield* Effect.promise(
+      async () =>
+        await acquireQueryOwner(
+          async () => await Promise.resolve(null),
+          cacheConfig
+        )
+    );
+    const { queryClient } = lifecycle;
     const scope = yield* Scope.make();
     const run = Effect.runPromiseWith(yield* Effect.context());
     const creates = yield* Queue.unbounded<CreateRequest>();
@@ -263,7 +272,7 @@ export const makeControlledUserWrites = Effect.fnUntraced(
     });
     const owner = makeOwnerCache({
       identity,
-      queryClient,
+      lifecycle,
       directoryKeys: {
         rpc: rpcQuery.users.list.queryKey(),
         http: httpQuery.users.list.queryKey(),

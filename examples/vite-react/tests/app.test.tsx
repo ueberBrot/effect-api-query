@@ -2,11 +2,7 @@
 
 import { User } from "@effect-api-query/contracts";
 import { startExampleRpcServer } from "@effect-api-query/server";
-import {
-  QueryClient,
-  QueryClientProvider,
-  useQuery,
-} from "@tanstack/react-query";
+import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import {
   cleanup,
   fireEvent,
@@ -142,9 +138,7 @@ describe("plain Vite React integration", () => {
 
   it("shows optimistic creation and removal, then restores a failed deletion beside the created user", async () => {
     cleanup();
-    const fixture = await Effect.runPromise(
-      makeControlledUserWrites(new QueryClient())
-    );
+    const fixture = await Effect.runPromise(makeControlledUserWrites());
     const owned = fixture.application;
     const ada = new User({ id: 1, name: "Ada", locale: "en" });
     fixture.seed([ada]);

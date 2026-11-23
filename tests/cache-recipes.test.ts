@@ -42,14 +42,11 @@ import {
 
 describe("cache recipes", () => {
   test("refreshes event cursors once and defers gaps until an overlapping write settles", async () => {
-    const queryClient = new QueryClient();
-    const fixture = await Effect.runPromise(
-      makeControlledUserWrites(queryClient)
-    );
+    const fixture = await Effect.runPromise(makeControlledUserWrites());
     const scope = Scope.makeUnsafe();
     const reactivity = Effect.runSync(Reactivity.make);
     const { application } = fixture;
-    const { rpcQuery, httpQuery } = application;
+    const { rpcQuery, httpQuery, queryClient } = application;
     const ada = new User({ id: 1, name: "Ada", locale: "en" });
     const key = rpcQuery.users.get.queryKey({
       input: { id: 1, locale: "en" },
