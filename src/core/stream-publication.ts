@@ -15,11 +15,13 @@ type NonEmptyBatch<A> = readonly [A, ...A[]];
 
 export const streamQueryIterable = <A>(
   source: AsyncIterable<A>,
-  signal: AbortSignal
+  signal: AbortSignal,
+  onEmpty?: () => Error
 ): AsyncIterable<A> => ({
   [Symbol.asyncIterator]() {
     const iterator = source[Symbol.asyncIterator]();
     let closePromise: Promise<IteratorResult<A>> | undefined;
+    let emitted = false;
     const detach = () => {
       // oxlint-disable-next-line eslint/no-use-before-define
       signal.removeEventListener("abort", onAbort);
@@ -57,6 +59,11 @@ export const streamQueryIterable = <A>(
         }
         if (result.done === true) {
           detach();
+          if (!emitted && !signal.aborted && onEmpty !== undefined) {
+            throw onEmpty();
+          }
+        } else {
+          emitted = true;
         }
         return result;
       },
@@ -72,42 +79,6 @@ export const streamQueryIterable = <A>(
     };
   },
 });
-
-const ensureNonEmpty = <A, E, R, E2 = never>(
-  source: Stream.Stream<A, E, R>,
-  emptyError: (() => E2) | undefined,
-  signal: AbortSignal | undefined
-): Stream.Stream<A, E | E2, R> => {
-  if (emptyError === undefined) {
-    return source;
-  }
-  return Stream.unwrap(
-    Effect.gen(function* wrapNonEmpty() {
-      const pull = yield* Stream.toPull(source);
-      let emitted = false;
-      const next: Pull.Pull<
-        NonEmptyBatch<A>,
-        E | E2,
-        void,
-        R
-      > = Effect.uninterruptibleMask((restore) =>
-        restore(pull).pipe(
-          Effect.tap(() =>
-            Effect.sync(() => {
-              emitted = true;
-            })
-          ),
-          Effect.catchCauseIf(
-            (cause) =>
-              !emitted && signal?.aborted !== true && Pull.isDoneCause(cause),
-            () => Effect.fail(emptyError())
-          )
-        )
-      );
-      return Stream.fromPull(Effect.succeed(next));
-    })
-  );
-};
 
 const batchStream = <A, E, R>(
   source: Stream.Stream<A, E, R>,
@@ -300,16 +271,12 @@ export const streamPublicationBatches = <A, E, R>(
     ? source.pipe(Stream.map((value): readonly A[] => [value]))
     : batchStream(source, batchSize, maxWaitMs, false);
 
-export const streamLiveSnapshots = <A, E, R, E2 = never>(
+export const streamLiveSnapshots = <A, E, R>(
   source: Stream.Stream<A, E, R>,
-  coalesceMs: number | undefined,
-  emptyError: (() => E2) | undefined,
-  signal?: AbortSignal
-): Stream.Stream<A, E | E2, R> => {
-  const checked = ensureNonEmpty(source, emptyError, signal);
-  return coalesceMs === undefined
-    ? checked
-    : batchStream(checked, Infinity, coalesceMs, true).pipe(
+  coalesceMs: number | undefined
+): Stream.Stream<A, E, R> =>
+  coalesceMs === undefined
+    ? source
+    : batchStream(source, Infinity, coalesceMs, true).pipe(
         Stream.map((batch) => batch[0])
       );
-};

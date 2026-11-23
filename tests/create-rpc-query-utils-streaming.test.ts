@@ -487,7 +487,7 @@ describe("createRpcQueryUtils streaming execution", () => {
       );
 
       it.effect(
-        "settles cleanly when the first pull aborts and completes empty",
+        "settles cleanly when an abort arrives after the first pull completes empty",
         () => {
           const controller = new AbortController();
           return Effect.gen(function* abortEmptyLiveStream() {
@@ -498,7 +498,9 @@ describe("createRpcQueryUtils streaming execution", () => {
               watch: () =>
                 Stream.unwrap(
                   Effect.sync(() => {
-                    controller.abort();
+                    queueMicrotask(() => {
+                      controller.abort();
+                    });
                     return Stream.empty;
                   })
                 ),

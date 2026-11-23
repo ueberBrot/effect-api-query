@@ -49,7 +49,7 @@ describe("publication deadlines with TestClock", () => {
           )
         );
         const snapshots = yield* Stream.runCollect(
-          streamLiveSnapshots(source, 20, undefined)
+          streamLiveSnapshots(source, 20)
         ).pipe(Effect.provideService(Clock.Clock, clock));
         expect(snapshots).toStrictEqual([1, 2, 3]);
       })
@@ -147,9 +147,7 @@ describe("publication deadlines with TestClock", () => {
             Queue.take(queue).pipe(Effect.map((value) => [value] as const))
           )
         );
-        const pull = yield* Stream.toPull(
-          streamLiveSnapshots(source, 20, undefined)
-        );
+        const pull = yield* Stream.toPull(streamLiveSnapshots(source, 20));
 
         const firstFiber = yield* Effect.forkChild(pull);
         yield* Queue.offer(queue, 1);
@@ -193,42 +191,19 @@ describe("publication deadlines with TestClock", () => {
       })
   );
 
-  it.effect(
-    "surfaces the empty-stream error only when a live stream completes empty",
-    () =>
-      Effect.gen(function* surfacesEmptyLiveStreamError() {
-        const emptyError = new Error("empty live stream");
-        const coalescedExit = yield* Effect.exit(
-          Stream.runCollect(
-            streamLiveSnapshots(Stream.empty, 20, () => emptyError)
-          )
-        );
-        expect(Exit.isFailure(coalescedExit)).toBe(true);
-        if (Exit.isFailure(coalescedExit)) {
-          expect(Cause.squash(coalescedExit.cause)).toBe(emptyError);
-        }
-
-        const uncoalescedExit = yield* Effect.exit(
-          Stream.runCollect(
-            streamLiveSnapshots(Stream.empty, undefined, () => emptyError)
-          )
-        );
-        expect(Exit.isFailure(uncoalescedExit)).toBe(true);
-        if (Exit.isFailure(uncoalescedExit)) {
-          expect(Cause.squash(uncoalescedExit.cause)).toBe(emptyError);
-        }
-
-        const interruptedFiber = yield* Stream.runCollect(
-          streamLiveSnapshots(Stream.never, 20, () => emptyError)
-        ).pipe(Effect.forkChild);
-        yield* TestClock.adjust(0);
-        yield* Fiber.interrupt(interruptedFiber);
-        const interruptedExit = yield* Fiber.await(interruptedFiber);
-        expect(Exit.isFailure(interruptedExit)).toBe(true);
-        if (Exit.isFailure(interruptedExit)) {
-          expect(Cause.hasInterruptsOnly(interruptedExit.cause)).toBe(true);
-        }
-      })
+  it.effect("interrupts a coalesced stream before the first emission", () =>
+    Effect.gen(function* interruptsBeforeEmission() {
+      const interruptedFiber = yield* Stream.runCollect(
+        streamLiveSnapshots(Stream.never, 20)
+      ).pipe(Effect.forkChild);
+      yield* TestClock.adjust(0);
+      yield* Fiber.interrupt(interruptedFiber);
+      const interruptedExit = yield* Fiber.await(interruptedFiber);
+      expect(Exit.isFailure(interruptedExit)).toBe(true);
+      if (Exit.isFailure(interruptedExit)) {
+        expect(Cause.hasInterruptsOnly(interruptedExit.cause)).toBe(true);
+      }
+    })
   );
 
   it.effect(

@@ -276,7 +276,8 @@ export const makeStreamQuery = ({
     );
   const openStream = async <A>(
     stream: Stream.Stream<A, unknown, unknown>,
-    signal: AbortSignal
+    signal: AbortSignal,
+    onEmpty?: () => Error
   ) => {
     // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
     const exit = await runPromiseExit(Stream.toAsyncIterableEffect(stream), {
@@ -285,7 +286,7 @@ export const makeStreamQuery = ({
     if (Exit.isFailure(exit)) {
       throw executionError(exit.cause);
     }
-    return streamQueryIterable(exit.value, signal);
+    return streamQueryIterable(exit.value, signal, onEmpty);
   };
 
   if (policy._tag === "Live") {
@@ -297,13 +298,9 @@ export const makeStreamQuery = ({
       return await consumeQueryStream(
         context,
         await openStream(
-          streamLiveSnapshots(
-            guardedStream(context.signal),
-            policy.coalesceMs,
-            emptyError,
-            context.signal
-          ),
-          context.signal
+          streamLiveSnapshots(guardedStream(context.signal), policy.coalesceMs),
+          context.signal,
+          emptyError
         ),
         null,
         // oxlint-disable-next-line anti-slop/no-unknown-parameters
