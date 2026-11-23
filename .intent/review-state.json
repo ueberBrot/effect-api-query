@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "8b6532e0a86841d51cbce00ba7602e932790ce88ee81535a169165c475fa4848",
+      "fingerprint": "8246a91fe0371ef4a9f377d310f5401ac1cdf1d1d23dac5e9eb1aba291ec2abd",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -237,7 +237,7 @@
         "src/core/reactivity-invalidation.ts": "29a583352f001213c535be806046256daf040444a67665e3d6c202d7dd7a8054",
         "src/core/runtime.ts": "9e99f2a078a1058b3b6b01ada7585d3f63d3486b397be3a6e1f08f0d3f0a9fad",
         "src/core/schema-key.ts": "0d6c00371526085fe19689a7401dfd86cb6f6a96f6b351b4b31bb2648804d5df",
-        "src/core/schema-structural-sharing.ts": "7ebd221a5730f652f0e88fbc52c418b8bba173172bf49971d6988e5a021b3ac0",
+        "src/core/schema-structural-sharing.ts": "73c3ab3f285e3146376b6c413b34ba4503fc2a07b0e2f8217785951f795f22a8",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
         "src/core/stream-publication.ts": "0ecae3160d553d5b9d2b940abab3ccb93c610c77a2baed2dd2a70704c6771b89",
         "src/core/stream-pull.ts": "9b7957b4487ddcdce2183f55c6f08e6cddee011c5d5e5b8c7b72ec839a7e3c42",
@@ -328,7 +328,7 @@
         "tests/react.test.tsx": "81f999b7e5b4b1482a6821cfe8881c0d3d76d75477f18b1f36b81c72353ec523",
         "tests/reactivity-invalidation.test.ts": "59f98c72a2168018e615de0c9db489a41e7444904e9a606e763b922c68edf2df",
         "tests/schema-sharing-prototypes.test.ts": "628a6622656b9b53e686d14b9efbd3abc13c61a13db1546001b0689b491f6022",
-        "tests/schema-structural-sharing.test.ts": "da34a1ce3b723abce0e5e1b95cee80458ae4073236d23eed6eea70aab5a97af4",
+        "tests/schema-structural-sharing.test.ts": "dc4c580e9193fb7749701cad3efdd5563edf8019ed437a7a722f514530dd33da",
         "tests/skills-maintenance.test.ts": "7bbf6bee1c9867ba314cd3cadf86db603a4aa9959a863c6e908b7401d767d9d4",
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
         "tests/skills/query-usability/grade.test.ts": "f3c2650deba0d887f66fb3b3afd284cd9baf562296f2984e5c84b014ecec8cbd",
@@ -408,15 +408,15 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "ae1647806e0a7504be5ed0f87945c05e009b0d55",
+      "head": "01f8a36f6078cea736c9bdb9f8d23b8464a45a53",
       "outcome": "no-change",
-      "reason": "Retained real-browser workflow checks and focused native lifecycle regressions while removing duplicate example coverage.",
+      "reason": "Schema sharing now preserves the documented pass-through behavior for plain accessors, including those nested in a Schema-valid object.",
       "evidence": [
-        "Changed: examples/server/tests/http-api.test.ts, examples/tanstack-start/tests/client-navigation.test.tsx, examples/tanstack-start/tests/server-render.test.tsx, examples/vite-react/tests/app.test.tsx, examples/vite-react/tests/http-workflows.test.ts, tests/create-rpc-query-utils-execution.test.ts at ae1647806e0a7504be5ed0f87945c05e009b0d55"
+        "Changed: src/core/schema-structural-sharing.ts, tests/schema-structural-sharing.test.ts at 01f8a36f6078cea736c9bdb9f8d23b8464a45a53"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "edcbce8c44d36327761c2d5838404c5f1fd24a4d651f864d4f1776e9b26ca425",
+      "fingerprint": "a7ba1f7f7f01cbfc80f830d588cdb04c152d86c32532d14debdd9be5d95fc231",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -653,7 +653,7 @@
         "src/core/reactivity-invalidation.ts": "29a583352f001213c535be806046256daf040444a67665e3d6c202d7dd7a8054",
         "src/core/runtime.ts": "9e99f2a078a1058b3b6b01ada7585d3f63d3486b397be3a6e1f08f0d3f0a9fad",
         "src/core/schema-key.ts": "0d6c00371526085fe19689a7401dfd86cb6f6a96f6b351b4b31bb2648804d5df",
-        "src/core/schema-structural-sharing.ts": "7ebd221a5730f652f0e88fbc52c418b8bba173172bf49971d6988e5a021b3ac0",
+        "src/core/schema-structural-sharing.ts": "73c3ab3f285e3146376b6c413b34ba4503fc2a07b0e2f8217785951f795f22a8",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
         "src/core/stream-publication.ts": "0ecae3160d553d5b9d2b940abab3ccb93c610c77a2baed2dd2a70704c6771b89",
         "src/core/stream-pull.ts": "9b7957b4487ddcdce2183f55c6f08e6cddee011c5d5e5b8c7b72ec839a7e3c42",
@@ -744,7 +744,7 @@
         "tests/react.test.tsx": "81f999b7e5b4b1482a6821cfe8881c0d3d76d75477f18b1f36b81c72353ec523",
         "tests/reactivity-invalidation.test.ts": "59f98c72a2168018e615de0c9db489a41e7444904e9a606e763b922c68edf2df",
         "tests/schema-sharing-prototypes.test.ts": "628a6622656b9b53e686d14b9efbd3abc13c61a13db1546001b0689b491f6022",
-        "tests/schema-structural-sharing.test.ts": "da34a1ce3b723abce0e5e1b95cee80458ae4073236d23eed6eea70aab5a97af4",
+        "tests/schema-structural-sharing.test.ts": "dc4c580e9193fb7749701cad3efdd5563edf8019ed437a7a722f514530dd33da",
         "tests/skills-maintenance.test.ts": "7bbf6bee1c9867ba314cd3cadf86db603a4aa9959a863c6e908b7401d767d9d4",
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
         "tests/skills/query-usability/grade.test.ts": "f3c2650deba0d887f66fb3b3afd284cd9baf562296f2984e5c84b014ecec8cbd",
@@ -824,11 +824,11 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "ae1647806e0a7504be5ed0f87945c05e009b0d55",
+      "head": "01f8a36f6078cea736c9bdb9f8d23b8464a45a53",
       "outcome": "no-change",
-      "reason": "Retained real-browser workflow checks and focused native lifecycle regressions while removing duplicate example coverage.",
+      "reason": "Schema sharing now preserves the documented pass-through behavior for plain accessors, including those nested in a Schema-valid object.",
       "evidence": [
-        "Changed: examples/server/tests/http-api.test.ts, examples/tanstack-start/tests/client-navigation.test.tsx, examples/tanstack-start/tests/server-render.test.tsx, examples/vite-react/tests/app.test.tsx, examples/vite-react/tests/http-workflows.test.ts, tests/create-rpc-query-utils-execution.test.ts at ae1647806e0a7504be5ed0f87945c05e009b0d55"
+        "Changed: src/core/schema-structural-sharing.ts, tests/schema-structural-sharing.test.ts at 01f8a36f6078cea736c9bdb9f8d23b8464a45a53"
       ]
     },
     "source:vite.config.ts": {

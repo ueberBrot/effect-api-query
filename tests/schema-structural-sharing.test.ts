@@ -253,6 +253,39 @@ describe("Schema structural sharing", () => {
     expect(share([reading(1)], incoming)).toBe(incoming);
   });
 
+  it("leaves plain accessors untouched when a Schema validates containers", () => {
+    const schema = Schema.Struct({
+      nested: Schema.Struct({ item: Schema.Int }),
+    });
+    const client = new QueryClient({
+      defaultOptions: {
+        queries: {
+          structuralSharing: schemaStructuralSharing(schema, {
+            equivalence: Schema.toEquivalence(schema),
+          }),
+        },
+      },
+    });
+    const key = ["accessor"];
+    const plain = { nested: { item: 1 } };
+    const accessor = {
+      nested: {
+        get item(): number {
+          throw new Error("Unexpected getter invocation");
+        },
+      },
+    };
+    try {
+      client.setQueryData(key, plain);
+      client.setQueryData(key, accessor);
+      expect(client.getQueryData(key)).toBe(accessor);
+      client.setQueryData(key, plain);
+      expect(client.getQueryData(key)).toBe(plain);
+    } finally {
+      client.clear();
+    }
+  });
+
   it("rejects cycles when previous and incoming share the same reference", () => {
     const share = schemaStructuralSharing(Reading, {
       equivalence: Schema.toEquivalence(Reading),
