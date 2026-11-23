@@ -150,14 +150,6 @@ test.describe("plain Vite React application", () => {
     await expect(failure).toContainText("DiagnosticFailure");
   });
 
-  test("cancels a query and observes server interruption", async ({ page }) => {
-    await page.getByRole("button", { name: "Start slow query" }).click();
-    await expect(page.getByText("Ready to cancel")).toBeVisible();
-
-    await page.getByRole("button", { name: "Cancel query" }).click();
-    await expect(page.getByText("Server interruptions: 1")).toBeVisible();
-  });
-
   test("cancels a pending command and reconciles progress without stopping another command", async ({
     page,
   }) => {

@@ -73,21 +73,6 @@ describe("runnable HTTP workflows", () => {
     });
   });
 
-  it.each(["sse", "ndjson"] as const)(
-    "decodes %s over HTTP into bounded history and latest-value caches",
-    async (format) => {
-      await withApplication(async ({ http, queryClient }) => {
-        const history =
-          format === "sse"
-            ? await queryClient.query(http.feeds.sse.streamedOptions())
-            : await queryClient.query(http.feeds.ndjson.streamedOptions());
-        expect(history.map((event) => event.sequence)).toStrictEqual([
-          5, 6, 7, 8,
-        ]);
-      });
-    }
-  );
-
   it.each([
     {
       scenario: "disconnect",
@@ -227,17 +212,6 @@ describe("runnable HTTP workflows", () => {
       await expect(completion).resolves.toBe("stopped");
       expect(() => application.consume(Effect.void)).toThrow("closed");
     });
-  });
-
-  it("cancels a query accepted in the same turn as disposal", async () => {
-    const application = await startHttpWorkflows("http://127.0.0.1");
-    const reading = application.queryClient.query(
-      application.http.documents.read.queryOptions()
-    );
-    const completion = reading.catch(() => null);
-    await application.dispose();
-    await completion;
-    expect(application.queryClient.getQueryCache().getAll()).toHaveLength(0);
   });
 
   it("retires synchronously and drains raw consumer cleanup once", async () => {

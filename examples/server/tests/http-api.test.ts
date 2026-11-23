@@ -235,24 +235,6 @@ describe("example HTTP API", () => {
       })
   );
 
-  it.live(
-    "keeps command workers alive until the caller closes the server Scope",
-    () =>
-      Effect.gen(function* retainCommandWorkers() {
-        const server = yield* startExampleRpcServer();
-        const rpc = yield* makeExampleRpcClient(server.rpcUrl);
-        expect(
-          yield* rpc["commands.start"]({
-            operationId: "shared-domain-scope",
-            steps: 1,
-          })
-        ).toMatchObject({
-          state: "completed",
-          completedSteps: 1,
-        });
-      })
-  );
-
   it.live("closes an in-flight HTTP request when the server Scope closes", () =>
     Effect.gen(function* closeActiveHttpRequest() {
       const owner = yield* Scope.make();

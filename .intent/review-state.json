@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "4a24cfdd733ab321b8ce90c9c5d646bb8921dae7318ef526a418e626128fb9b1",
+      "fingerprint": "8b6532e0a86841d51cbce00ba7602e932790ce88ee81535a169165c475fa4848",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -134,7 +134,7 @@
         "examples/server/src/web-handler.ts": "df76905670800bd27b419727a7e962c749bf6756b5f533c986186887b122eaeb",
         "examples/server/src/workflow-handlers.ts": "49d9abf85b7088417ae393ef7d8de328142b37b961b7114e95a0a42bc6991972",
         "examples/server/tests/fixtures/websocket-server.ts": "468801a4f5c50ccdc9855d8a8ef24cb1915f30f857625a99f4dfc20106fc2f53",
-        "examples/server/tests/http-api.test.ts": "2b681fac9f4c3b8a49cf7c5b9a1a5bd84eaa033f3689c8b0cd3d144cfc6c4f8d",
+        "examples/server/tests/http-api.test.ts": "d15519fa758abc218e9ce84647424506f402444237aa60c782a4cc95afff5c0e",
         "examples/server/tests/rpc-transport-overhead.test.ts": "3fd291dc98127cd4a976efd3eca1beb04e9e50a7139d6fd6ab03290380005b18",
         "examples/server/tests/rpc-websocket-consumer.test.ts": "e5092fd7e402a0010c2d6c6426e09c407622528c9a0cd0dd41d0f3c826d1fed1",
         "examples/server/tests/server.test.ts": "70cc543fad4329356c0973f741db7e0db67a72a76b58c1a8af7e5772e8fd76ee",
@@ -165,21 +165,21 @@
         "examples/tanstack-start/src/router.tsx": "be5fd785e1d43ef59af33aa9e4a2e9d4d688390265cdb6f65babfdf0da29c2fd",
         "examples/tanstack-start/tests/application.test.ts": "c6fcd55703e96cc9f07800ec9f799721cbb4d88d9ea81f5295ccde8b2f1c7be0",
         "examples/tanstack-start/tests/async-hydration.test.ts": "cd0de37ce7df4a68dc98366bf8bd620c39cee48d39f2ac285981e40412e8d467",
-        "examples/tanstack-start/tests/client-navigation.test.tsx": "084a8c42a1312e12720098d985a8796a534ddc07aa12f18a9b5595ed94a1c507",
+        "examples/tanstack-start/tests/client-navigation.test.tsx": "40349f7559078dbd23af9763a49935da479c0dbc955472ffa56fd5d174f999e6",
         "examples/tanstack-start/tests/failure-dehydration.test.ts": "8e241373af150b7028a07ab04228f24959a8eca081e32a2aa46f19f935ec602f",
         "examples/tanstack-start/tests/featured-selection.test.ts": "3a6e1db27843a392d354cb58ab7b8d7bfaf327ffe42910118d426d42875f1123",
         "examples/tanstack-start/tests/server-local.test.ts": "6d04b85b3e584deb8e4b6f847235ceab8a811eb2d3837dc209f89cf87cf0d291",
-        "examples/tanstack-start/tests/server-render.test.tsx": "3d8dd0c57b17b2d8b6575b65bd681dd386e496ab3ea959f89d4c69cfe82a00e4",
+        "examples/tanstack-start/tests/server-render.test.tsx": "dd2ea45a1e610055ba7ef68f3a6140e06eaf43ad806e0bdc6757d9c63fba86c7",
         "examples/vite-react/src/app.tsx": "fb14cd1ad3f9acdec32bc51f28673152ca61062d8e7907646b5fd4615d8a281c",
         "examples/vite-react/src/components/sections/commands-section.tsx": "2c4a6c984f0c4956c95071a17a8ff03a19b812d26fc43a8b40a8fc7015b494dc",
         "examples/vite-react/src/lib/application.ts": "b45c4ab2271d11e71dda5a89b685891d29aba717287ef9ae201925d1dbe42d7e",
         "examples/vite-react/src/lib/owner-cache.ts": "05e418ee7e05b237804e4ee920963d0b8e483614e7a80c0fe82ee10300c9066a",
         "examples/vite-react/src/lib/user-writes.ts": "5fb5c25fc828a79b7ef26cc32f85dd4a8d6750435eb20d6d9ab5f5271e1ded6d",
         "examples/vite-react/src/main.tsx": "6672a5685f0ccbdbc982676056bdb60d8f63b33987e319a146e42c3a0013a56b",
-        "examples/vite-react/tests/app.test.tsx": "29597cde134da8e236466ce403d1898796c1ffb883a8c35f8d4c3e542aa779d8",
+        "examples/vite-react/tests/app.test.tsx": "b3a82f4006895c7b2052a7e3ef22ff3b311b166315c5115db6b085c0e5f52960",
         "examples/vite-react/tests/commands-ui.test.tsx": "5df931c53510844e34ce6fd558601274ebdd99670681504f599506d95ac8537e",
         "examples/vite-react/tests/commands.test.ts": "0ac21d5abc11586e4ae0e93ba2ebf50ebbb1c8425f85e1f81083e6f95636adad",
-        "examples/vite-react/tests/http-workflows.test.ts": "9f39f4d9888fbd189823057d77ef634b10479a98920b29705c92548b2fbfd467",
+        "examples/vite-react/tests/http-workflows.test.ts": "4278ea748aa549720ba4dd2ff0b0ab57c423d1688b9144b0c4a6e6e22c094eee",
         "examples/vite-react/tests/minimal-setup.test.tsx": "fb5cb0465320068d8bc37bfab0cf1c4579e82a9c318243ad15424d0f35661281",
         "examples/vite-react/tests/owner-boundary.test.tsx": "f8fc6b26f24884d87d364a9b07f16ba912a7e92efbb96b0c815a62be22ac6bab",
         "examples/vite-react/tests/owner-cache.test.ts": "1ac4bebb04b973fa11e26f4b684fe6b217a075a255ac1828d9ed109c359c9ed9",
@@ -269,7 +269,7 @@
         "tests/contract-reuse.test.ts": "21b97cec6da64d3a42d58e69aaad1754aaec2bb4dd1ac876ef25ec801f970a12",
         "tests/create-http-api-query-utils.test.ts": "a6b89aeb4e7570d6bff9b9fa45723b2a2d3a0180ed7d7807f222cbe2003f93d5",
         "tests/create-rpc-query-utils-configuration.test.ts": "c04f7903c14a2d8be54f1e8c84f0e00dd10e3b9148090c196b8ed7b25dfa8f52",
-        "tests/create-rpc-query-utils-execution.test.ts": "57a6f5f863eea73551ec9cf625410db1c2e5501de828c38a051e976804f39f05",
+        "tests/create-rpc-query-utils-execution.test.ts": "d0bbabd2b00ae13b8d7c2929275a7a51b44807796078858e9234048108484696",
         "tests/create-rpc-query-utils-keys.test.ts": "a8cef8ab9bb0de24e814fc619090ead2a7b5c8df5aebb52e57d5d35fce0cda32",
         "tests/create-rpc-query-utils-request-options.test.ts": "741d08e1d515c726a9f37df77b1a34f1c01beec5bb802c6c49bbccf10e6b8dcd",
         "tests/create-rpc-query-utils-server-local.test.ts": "25fea3038360f04d39e44e0e148c10b4aaf5df0c780d2c613892b6472aa6d3d0",
@@ -408,15 +408,15 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "7f7f10e579f68421fcff0c6a6403d7736ba6423c",
+      "head": "ae1647806e0a7504be5ed0f87945c05e009b0d55",
       "outcome": "no-change",
-      "reason": "Removed redundant checks while keeping the runtime and type contract exercises of generated queries.",
+      "reason": "Retained real-browser workflow checks and focused native lifecycle regressions while removing duplicate example coverage.",
       "evidence": [
-        "Changed: tests/contract-hydration.test.ts, tests/create-rpc-query-utils-streaming.test.ts at 7f7f10e579f68421fcff0c6a6403d7736ba6423c"
+        "Changed: examples/server/tests/http-api.test.ts, examples/tanstack-start/tests/client-navigation.test.tsx, examples/tanstack-start/tests/server-render.test.tsx, examples/vite-react/tests/app.test.tsx, examples/vite-react/tests/http-workflows.test.ts, tests/create-rpc-query-utils-execution.test.ts at ae1647806e0a7504be5ed0f87945c05e009b0d55"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "ff86c4660e68528230217398c53e0eadfe0d0bc782bdabc8e5c089350df3eb2f",
+      "fingerprint": "edcbce8c44d36327761c2d5838404c5f1fd24a4d651f864d4f1776e9b26ca425",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -550,7 +550,7 @@
         "examples/server/src/web-handler.ts": "df76905670800bd27b419727a7e962c749bf6756b5f533c986186887b122eaeb",
         "examples/server/src/workflow-handlers.ts": "49d9abf85b7088417ae393ef7d8de328142b37b961b7114e95a0a42bc6991972",
         "examples/server/tests/fixtures/websocket-server.ts": "468801a4f5c50ccdc9855d8a8ef24cb1915f30f857625a99f4dfc20106fc2f53",
-        "examples/server/tests/http-api.test.ts": "2b681fac9f4c3b8a49cf7c5b9a1a5bd84eaa033f3689c8b0cd3d144cfc6c4f8d",
+        "examples/server/tests/http-api.test.ts": "d15519fa758abc218e9ce84647424506f402444237aa60c782a4cc95afff5c0e",
         "examples/server/tests/rpc-transport-overhead.test.ts": "3fd291dc98127cd4a976efd3eca1beb04e9e50a7139d6fd6ab03290380005b18",
         "examples/server/tests/rpc-websocket-consumer.test.ts": "e5092fd7e402a0010c2d6c6426e09c407622528c9a0cd0dd41d0f3c826d1fed1",
         "examples/server/tests/server.test.ts": "70cc543fad4329356c0973f741db7e0db67a72a76b58c1a8af7e5772e8fd76ee",
@@ -581,21 +581,21 @@
         "examples/tanstack-start/src/router.tsx": "be5fd785e1d43ef59af33aa9e4a2e9d4d688390265cdb6f65babfdf0da29c2fd",
         "examples/tanstack-start/tests/application.test.ts": "c6fcd55703e96cc9f07800ec9f799721cbb4d88d9ea81f5295ccde8b2f1c7be0",
         "examples/tanstack-start/tests/async-hydration.test.ts": "cd0de37ce7df4a68dc98366bf8bd620c39cee48d39f2ac285981e40412e8d467",
-        "examples/tanstack-start/tests/client-navigation.test.tsx": "084a8c42a1312e12720098d985a8796a534ddc07aa12f18a9b5595ed94a1c507",
+        "examples/tanstack-start/tests/client-navigation.test.tsx": "40349f7559078dbd23af9763a49935da479c0dbc955472ffa56fd5d174f999e6",
         "examples/tanstack-start/tests/failure-dehydration.test.ts": "8e241373af150b7028a07ab04228f24959a8eca081e32a2aa46f19f935ec602f",
         "examples/tanstack-start/tests/featured-selection.test.ts": "3a6e1db27843a392d354cb58ab7b8d7bfaf327ffe42910118d426d42875f1123",
         "examples/tanstack-start/tests/server-local.test.ts": "6d04b85b3e584deb8e4b6f847235ceab8a811eb2d3837dc209f89cf87cf0d291",
-        "examples/tanstack-start/tests/server-render.test.tsx": "3d8dd0c57b17b2d8b6575b65bd681dd386e496ab3ea959f89d4c69cfe82a00e4",
+        "examples/tanstack-start/tests/server-render.test.tsx": "dd2ea45a1e610055ba7ef68f3a6140e06eaf43ad806e0bdc6757d9c63fba86c7",
         "examples/vite-react/src/app.tsx": "fb14cd1ad3f9acdec32bc51f28673152ca61062d8e7907646b5fd4615d8a281c",
         "examples/vite-react/src/components/sections/commands-section.tsx": "2c4a6c984f0c4956c95071a17a8ff03a19b812d26fc43a8b40a8fc7015b494dc",
         "examples/vite-react/src/lib/application.ts": "b45c4ab2271d11e71dda5a89b685891d29aba717287ef9ae201925d1dbe42d7e",
         "examples/vite-react/src/lib/owner-cache.ts": "05e418ee7e05b237804e4ee920963d0b8e483614e7a80c0fe82ee10300c9066a",
         "examples/vite-react/src/lib/user-writes.ts": "5fb5c25fc828a79b7ef26cc32f85dd4a8d6750435eb20d6d9ab5f5271e1ded6d",
         "examples/vite-react/src/main.tsx": "6672a5685f0ccbdbc982676056bdb60d8f63b33987e319a146e42c3a0013a56b",
-        "examples/vite-react/tests/app.test.tsx": "29597cde134da8e236466ce403d1898796c1ffb883a8c35f8d4c3e542aa779d8",
+        "examples/vite-react/tests/app.test.tsx": "b3a82f4006895c7b2052a7e3ef22ff3b311b166315c5115db6b085c0e5f52960",
         "examples/vite-react/tests/commands-ui.test.tsx": "5df931c53510844e34ce6fd558601274ebdd99670681504f599506d95ac8537e",
         "examples/vite-react/tests/commands.test.ts": "0ac21d5abc11586e4ae0e93ba2ebf50ebbb1c8425f85e1f81083e6f95636adad",
-        "examples/vite-react/tests/http-workflows.test.ts": "9f39f4d9888fbd189823057d77ef634b10479a98920b29705c92548b2fbfd467",
+        "examples/vite-react/tests/http-workflows.test.ts": "4278ea748aa549720ba4dd2ff0b0ab57c423d1688b9144b0c4a6e6e22c094eee",
         "examples/vite-react/tests/minimal-setup.test.tsx": "fb5cb0465320068d8bc37bfab0cf1c4579e82a9c318243ad15424d0f35661281",
         "examples/vite-react/tests/owner-boundary.test.tsx": "f8fc6b26f24884d87d364a9b07f16ba912a7e92efbb96b0c815a62be22ac6bab",
         "examples/vite-react/tests/owner-cache.test.ts": "1ac4bebb04b973fa11e26f4b684fe6b217a075a255ac1828d9ed109c359c9ed9",
@@ -685,7 +685,7 @@
         "tests/contract-reuse.test.ts": "21b97cec6da64d3a42d58e69aaad1754aaec2bb4dd1ac876ef25ec801f970a12",
         "tests/create-http-api-query-utils.test.ts": "a6b89aeb4e7570d6bff9b9fa45723b2a2d3a0180ed7d7807f222cbe2003f93d5",
         "tests/create-rpc-query-utils-configuration.test.ts": "c04f7903c14a2d8be54f1e8c84f0e00dd10e3b9148090c196b8ed7b25dfa8f52",
-        "tests/create-rpc-query-utils-execution.test.ts": "57a6f5f863eea73551ec9cf625410db1c2e5501de828c38a051e976804f39f05",
+        "tests/create-rpc-query-utils-execution.test.ts": "d0bbabd2b00ae13b8d7c2929275a7a51b44807796078858e9234048108484696",
         "tests/create-rpc-query-utils-keys.test.ts": "a8cef8ab9bb0de24e814fc619090ead2a7b5c8df5aebb52e57d5d35fce0cda32",
         "tests/create-rpc-query-utils-request-options.test.ts": "741d08e1d515c726a9f37df77b1a34f1c01beec5bb802c6c49bbccf10e6b8dcd",
         "tests/create-rpc-query-utils-server-local.test.ts": "25fea3038360f04d39e44e0e148c10b4aaf5df0c780d2c613892b6472aa6d3d0",
@@ -824,11 +824,11 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "7f7f10e579f68421fcff0c6a6403d7736ba6423c",
+      "head": "ae1647806e0a7504be5ed0f87945c05e009b0d55",
       "outcome": "no-change",
-      "reason": "Removed redundant checks while keeping the runtime and type contract exercises of generated queries.",
+      "reason": "Retained real-browser workflow checks and focused native lifecycle regressions while removing duplicate example coverage.",
       "evidence": [
-        "Changed: tests/contract-hydration.test.ts, tests/create-rpc-query-utils-streaming.test.ts at 7f7f10e579f68421fcff0c6a6403d7736ba6423c"
+        "Changed: examples/server/tests/http-api.test.ts, examples/tanstack-start/tests/client-navigation.test.tsx, examples/tanstack-start/tests/server-render.test.tsx, examples/vite-react/tests/app.test.tsx, examples/vite-react/tests/http-workflows.test.ts, tests/create-rpc-query-utils-execution.test.ts at ae1647806e0a7504be5ed0f87945c05e009b0d55"
       ]
     },
     "source:vite.config.ts": {
@@ -1398,15 +1398,15 @@
       ]
     },
     "source:e2e/vite-react.spec.ts": {
-      "fingerprint": "211e737cd0dc7b124a704c919158851949f36bace649b5fdf027fde071b18161",
+      "fingerprint": "30872c25dffbf2b19279ed26e7aa0e2329650ab2a06f02df7790085e54c0cae2",
       "snapshot": {
-        "e2e/vite-react.spec.ts": "a033b85e0303e95c35f0c10ee034fd2ff3e965006ecb0aa463492752f95654c0"
+        "e2e/vite-react.spec.ts": "42d0b9e35760130e785c2fefaaa231ccd0b9cadfdcec7e6b7ffd8f38114ceee8"
       },
-      "head": "0ea1465a605c80725da9e0a0a9686c86de5b6b82",
+      "head": "ae1647806e0a7504be5ed0f87945c05e009b0d55",
       "outcome": "no-change",
-      "reason": "Preset formatting and repository test setup preserve the existing browser scenarios and native library usage. No new integration task or recommendation is introduced.",
+      "reason": "Retained real-browser workflow checks and focused native lifecycle regressions while removing duplicate example coverage.",
       "evidence": [
-        "e2e/vite-react.spec.ts diff reviewed; final compiler checks and app builds pass. Earlier Chromium/Firefox application/docs checks passed; latest docs Chromium run passes 7 cases. WebKit is blocked at launch by missing host libraries."
+        "Changed: e2e/vite-react.spec.ts at ae1647806e0a7504be5ed0f87945c05e009b0d55"
       ]
     },
     "source:examples/tanstack-start/src/routes/index.tsx": {

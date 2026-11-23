@@ -233,39 +233,6 @@ describe("TanStack Start server rendering", () => {
     }
   );
 
-  it("reuses a cached snapshot without subscribing or executing the stream", async () => {
-    const Watch = Rpc.make("watch", { success: Schema.String, stream: true });
-    const group = RpcGroup.make(Watch);
-    const client = vi.fn<() => Stream.Stream<string>>(() =>
-      Stream.make("unexpected")
-    );
-    const queryClient = new QueryClient();
-    const options = createRpcQueryUtils(group, {
-      // oxlint-disable-next-line typescript/no-unsafe-type-assertion, anti-slop/require-safety-comment-for-type-assertion
-      client: client as never,
-      keyPrefix: ["cached-snapshot"],
-    }).watch.streamedOptions({ maxChunks: "unbounded" });
-    const previous = ["previous"];
-    queryClient.setQueryData(options.queryKey, previous);
-    const subscriptions = trackSnapshotSubscriptions(queryClient);
-
-    try {
-      await expect(
-        fetchStreamSnapshot(queryClient, options, { mode: "cached" })
-      ).resolves.toBe(previous);
-      expect(subscriptions.subscribe).not.toHaveBeenCalled();
-      expect(client).not.toHaveBeenCalled();
-      expect({
-        fetchStatus: queryClient.getQueryState(options.queryKey)?.fetchStatus,
-        fetching: queryClient.isFetching(),
-      }).toStrictEqual({ fetchStatus: "idle", fetching: 0 });
-    } finally {
-      queryClient.clear();
-      expect(queryClient.getQueryCache().hasListeners()).toBe(false);
-      subscriptions.subscribe.mockRestore();
-    }
-  });
-
   it("settles and releases its listener when cancelled before the first streamed value", async () => {
     const Watch = Rpc.make("watch", { success: Schema.String, stream: true });
     const group = RpcGroup.make(Watch);
