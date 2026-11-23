@@ -52,8 +52,6 @@ export interface UnaryOperation extends BufferedOperation {
       operation: "metadata",
       cause: Cause.Cause<unknown>
     ) => Error;
-
-    readonly finalizeData: (data: unknown) => unknown;
   };
 }
 

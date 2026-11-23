@@ -3,6 +3,7 @@ import type { Cause } from "effect";
 import type { HttpClientResponse } from "effect/http";
 import type { HttpApi } from "effect/http-api";
 
+import { freezeMetadata } from "../core/metadata-query";
 import type {
   MutationOperation,
   StreamingOperation,
@@ -50,23 +51,6 @@ export interface CompiledHttpOperations {
   readonly errors: TreeErrors;
   readonly keyEncoders: ReadonlyMap<string, RuntimeKeyEncoder>;
 }
-
-// oxlint-disable-next-line anti-slop/no-unknown-parameters
-const freezeMetadata = (data: unknown) => {
-  if (!Predicate.isObject(data)) {
-    return data;
-  }
-  const { headers } = data;
-  const snapshot =
-    Predicate.isObject(headers) &&
-    (!Object.isFrozen(headers) ||
-      Object.getPrototypeOf(headers) !== Object.prototype)
-      ? Object.freeze({ ...headers })
-      : headers;
-  return Object.isFrozen(data) && snapshot === headers
-    ? data
-    : Object.freeze({ ...data, headers: snapshot });
-};
 
 interface HttpEndpointDescription {
   readonly identity: HttpApiEndpointIdentity;
@@ -215,7 +199,6 @@ const extractHttpEndpoints = (
                   operation: "metadata",
                   cause: Cause.Cause<unknown>
                 ) => new EffectHttpApiQueryError(identity, operation, cause),
-                finalizeData: freezeMetadata,
               },
             }
           : undefined),

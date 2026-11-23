@@ -5,6 +5,22 @@ import { Exit, Predicate } from "effect";
 import type { UnaryOperation } from "./operation";
 import type { RunPromiseExit } from "./types";
 
+export const freezeMetadata = <Data>(data: Data): Data => {
+  if (!Predicate.isObject(data)) {
+    return data;
+  }
+  const { headers } = data;
+  const snapshot =
+    Predicate.isObject(headers) &&
+    (!Object.isFrozen(headers) ||
+      Object.getPrototypeOf(headers) !== Object.prototype)
+      ? Object.freeze({ ...headers })
+      : headers;
+  return Object.isFrozen(data) && snapshot === headers
+    ? data
+    : Object.freeze({ ...data, headers: snapshot });
+};
+
 type StructuralSharing = (previous: unknown, data: unknown) => unknown;
 
 const isStructuralSharing = (policy: unknown): policy is StructuralSharing =>
@@ -75,7 +91,7 @@ export const prepareMetadataExecution = (
         data,
         produced === undefined ? localPolicy : produced.policy
       );
-      return produced === undefined ? shared : description.finalizeData(shared);
+      return produced === undefined ? shared : freezeMetadata(shared);
     };
   }
 

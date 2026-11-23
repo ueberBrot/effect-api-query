@@ -30,6 +30,7 @@ import {
 } from "./hydration";
 import type { CompiledHydrationCodec, HydrationRegistry } from "./hydration";
 import type { QueryView } from "./inference";
+import { freezeMetadata } from "./metadata-query";
 import type { JsonValue } from "./types";
 import { validateUtilityPaths } from "./utility-path";
 
@@ -48,22 +49,6 @@ const UndefinedElementCodec =
         })
       )
     ))();
-
-const freezeMetadata = (data: unknown): unknown => {
-  if (!Predicate.isObject(data)) {
-    return data;
-  }
-  const { headers } = data;
-  const snapshot =
-    Predicate.isObject(headers) &&
-    (!Object.isFrozen(headers) ||
-      Object.getPrototypeOf(headers) !== Object.prototype)
-      ? Object.freeze({ ...headers })
-      : headers;
-  return Object.isFrozen(data) && snapshot === headers
-    ? data
-    : Object.freeze({ ...data, headers: snapshot });
-};
 
 const readOwn = (record: Record<string, unknown>, key: string) =>
   Object.hasOwn(record, key) ? record[key] : undefined;
