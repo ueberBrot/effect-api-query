@@ -24,6 +24,5 @@ export const runQueryEvents = async <A, E, R, HE, HR>(
     consumeEvents(source, options).pipe(
       Effect.provideService(QueryClientService, owner.queryClient)
     ),
-    // A signal registers this non-query Effect for owner retirement as well.
     { signal: new AbortController().signal }
   );

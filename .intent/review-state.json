@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "9adc5d0e7fe00966fcd7c8a53b02748f5d7b8ce2a3f0fdde1c7a248f34c9860d",
+      "fingerprint": "4134f8ed368f849b5b1e0dc16c986aefedd1cb4b98950ff5c18966bf3d6e4dd8",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -59,10 +59,8 @@
         "apps/docs/src/content/docs/guides/websocket-clients.md": "a7cce80cc74795de1e3663dfa145bca78e75b8499c74548318610108d9fc7352",
         "apps/docs/src/content/docs/index.mdx": "85d93175471e294ca4d8efd0325ed391ad1a53257413be59a67c7becd252d2dc",
         "apps/docs/src/content/docs/integrations/index.md": "2e0a5c9ab07e54b15231a0595b3dec2484265c7d3835bc5c922d54ac4aaf6407",
-        "apps/docs/src/content/docs/reference/browser-and-worker-hosts.md": null,
         "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "153db813fa4beaa5a29f21370eb5330580dd9cc7c59ce7620e725a3f2ba02f7c",
         "apps/docs/src/content/docs/reference/errors.md": "93f774499c059f6c0daf33b2e97b8fd35b91c9eaf8353c022bb6d7009d13919a",
-        "apps/docs/src/content/docs/reference/external-http-clients.md": null,
         "apps/docs/src/content/docs/reference/factory.md": "61ce893c3cf475d240cfce6c047ae5cd6e7adca44ad1d99b9741b90f200f9516",
         "apps/docs/src/content/docs/reference/generated-builders.md": "84a2c18a80b0c913739351dbf51f94387c057e6f5c4e3fbe88b87aca59f4b68e",
         "apps/docs/src/content/docs/reference/http-builders.md": "7f8d4983aa9da11ad53d2fa3490d6db248c10c044e74da99c76c0d8b2a5c5b4f",
@@ -142,7 +140,7 @@
         "examples/shared/application-policy.ts": "2279f3b84b39f4029e1e98c81c1d8d8f2a255b4c8b61c19f0df05540badff4b3",
         "examples/shared/error-description.ts": "09ee9c111be0e2660e3623d074092cd3b475e21a0582af2dbf57849bcf43d413",
         "examples/shared/http-workflows/app.tsx": "452cec00a71934b2547a4cc62b48eb26a71795c7d37be84d1fd64a32dd2218d1",
-        "examples/shared/http-workflows/application.ts": "3d79d211d22ed83b93f44f52b3cf8926faecc1ada84c9285afb695fe4dc0e572",
+        "examples/shared/http-workflows/application.ts": "abc3d60a225df03ce6061490b20d50c238cd4f8d4e9c2fe0e36832aca2707594",
         "examples/shared/http-workflows/document.tsx": "bc8fc896fb4884d2b4be50ddacc0e8a268428ab7743e9dd37048e4dc6d360275",
         "examples/shared/http-workflows/events.tsx": "5d24c115015439fb6d8d0441b657a19966eba482002d6ca46327a0588f25bf7c",
         "examples/shared/http-workflows/readings.tsx": "e762f3a5e3b6c1d2d48f310e33a7d867dcb061cc7dd4b596cab6bef83b832933",
@@ -151,7 +149,7 @@
         "examples/shared/http-workflows/streams.tsx": "f78576b1fb979db15771a4a4c12a57be7a7bdcd55dad1183590925982f65769a",
         "examples/shared/http-workflows/upload.tsx": "e6e307ae67c58d52a9d56e898b31cde8c384491abe46203da1e7cfc631572184",
         "examples/shared/query-effects.ts": "11bf5083ccf764ce7381f70951d7ef50fa11cb698feb18a961f9e1feafac012a",
-        "examples/shared/query-events.ts": "1803b473872efd26095b13e8d9e8ff488f04580dcf9075d3978c6d54a5cdff54",
+        "examples/shared/query-events.ts": "d69a08aba6d8157b814f50ceb7cc22954f6b1fe69f6f84370d3e189b4bb74997",
         "examples/shared/ui/effect-error-details.tsx": "13527eb9de23e517de0b66d6949f2e1f15e92b886d9feae312b1aa60b4e80c12",
         "examples/shared/use-slow-query-cancellation.ts": "ae0e787c91f6f194c506bd6e93d6242bc9ad5d8a524ac4785b42ee55066ee789",
         "examples/tanstack-start/src/components/effect-error-details.tsx": "843d359788306199d2f206d445d512f2798dda9c1625d09650ac7a09a26c4a29",
@@ -167,7 +165,7 @@
         "examples/tanstack-start/tests/async-hydration.test.ts": "cd0de37ce7df4a68dc98366bf8bd620c39cee48d39f2ac285981e40412e8d467",
         "examples/tanstack-start/tests/client-navigation.test.tsx": "40349f7559078dbd23af9763a49935da479c0dbc955472ffa56fd5d174f999e6",
         "examples/tanstack-start/tests/failure-dehydration.test.ts": "326574cfefebfdc1f8e2050a0369643c648455bb6c201ef070658eb0293dfc18",
-        "examples/tanstack-start/tests/featured-selection.test.ts": "3a6e1db27843a392d354cb58ab7b8d7bfaf327ffe42910118d426d42875f1123",
+        "examples/tanstack-start/tests/featured-selection.test.ts": "6c1b8f34af32204f74e507f95af62843e3b3a785db5c9eaa78630571be68f9df",
         "examples/tanstack-start/tests/server-local.test.ts": "6d04b85b3e584deb8e4b6f847235ceab8a811eb2d3837dc209f89cf87cf0d291",
         "examples/tanstack-start/tests/server-render.test.tsx": "dd2ea45a1e610055ba7ef68f3a6140e06eaf43ad806e0bdc6757d9c63fba86c7",
         "examples/vite-react/src/app.tsx": "fb14cd1ad3f9acdec32bc51f28673152ca61062d8e7907646b5fd4615d8a281c",
@@ -190,22 +188,23 @@
         "examples/vite-react/tests/user-writes.test.ts": "a272baf9fe3a76649fa65cd6db06121aa97b2623eac33e66bcfc8f0a05ca88e4",
         "package.json": "53d2b60ed9c21a7f2ed3c993f96d2e3551fd1020ed9eb0c033413514819d0500",
         "pnpm-workspace.yaml": "fc4bff1fa9ef4a4887691c6e004e02829736f93ee07efcb563f78f836a21a276",
-        "scripts/check-effect-compatibility.mts": "539bf68dc1e6a95a857ccc7491c623df65fa755ee77b717b915f76f119392bb1",
+        "scripts/check-effect-compatibility.mts": "b08f461711772a8214aae5962099d04a7ef39fa5bc6d56a0c9ae03de6b1f52f9",
         "scripts/check-framework-consumers.mts": "f0111ac9ed84996f722f656358b810da0b9ecc8c6c0219a2019d1076b5d50cbc",
         "scripts/check-toolchain.mts": "3c8efdb93594058ed78947bc65ad51c88ac4b26cab23b0b1fe6f8786a6d386e9",
         "scripts/check-workflow.mts": "c3a760a6b111d3f1dc7570a510ee09aabfc048786ef8c6dd1c9fe7b26cecd00c",
-        "scripts/compiler.mts": "e160a1a81eccb29c77e5f2f0fd8eba7f3ebe6f04cce91fc805c9e6ab96ce1d49",
+        "scripts/compiler.mts": "b838a5766d3f9f8d8f73450814a703ff3b61e67a8ebeecfcb795d0da12f483bb",
         "scripts/measure-bundles.mts": "03a84f47cf0924ff254b0bd86ddd7771fd71052afee5fe1beddff54037435562",
         "scripts/measure-construction.mts": "9620ff945416a3ab1f96ffc6a0cc5bb9623a3155db9fad1e27a4f801745f7b8d",
         "scripts/measure-streams.mts": "342a94723ee8fc92083ee346a5d7e36f96440a32510c61fefb4f81c17b64f273",
         "scripts/measure-structural-sharing.mts": "fc8281a6ecbc48d20632c8088474380533aeec21da55409f25690281e5a77576",
         "scripts/measure-types.mts": "d19f44d904843eabeb63fe4ab5868fb63b22467fd1f4655eb801a141899a2bab",
+        "scripts/oxlint-no-comments.mts": "13bc2661cb403d0ded2ad3d08a42296160ee4d7c969580c4438fd8822d096660",
         "scripts/performance/budgets.mts": "fe5a92644a539613d702aaacd8257bd7ee9d79c6152519e401b2d26fa23442d2",
         "scripts/performance/common.mts": "507d45618fbaf2c7be6f986a5f958d1958cdddc95e42a77ff1d50d8225538a3d",
         "scripts/resolve-docs-release.mts": "aee5bbd15cbc4a2671c145c77298e0451a29c1e90853cf8e04f4669dafc5b4d9",
         "scripts/verify-docs-examples.mts": null,
         "scripts/verify-packed-consumer.mts": null,
-        "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
+        "scripts/version-packages.mts": "7c3ba9d3b440a96e783c046bb473e72bf63799c85d5c5d9e436d8d5a73d144e0",
         "skills/effect-api-query/SKILL.md": "112b039108201d3aecc3b2e9c6dbd665ddaa01f37e0a16997814ea9b533c95a1",
         "skills/effect-api-query/references/cache-workflows.md": "8469b8826449284ac4f271b590129905d6d04d59887cee3d1a5cf8101aeb5406",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "03e8c84d889b7dd478edebe96262bd09d2a5f90edac6e8705cae44a7ecc91a62",
@@ -230,7 +229,7 @@
         "src/core/prepared-input.ts": "aae8c8c442a13e138606fc0d7fcbd8711396c9cd7661bfdf198e7365fd7567ff",
         "src/core/query-descriptor.ts": "d1650d691dc5b03eed820cab0afb747ba875572ee4eec42e70f927d59374d45b",
         "src/core/query-effects.ts": "66e0311cf246b5edd7f3b287c060e2b9acb3a7a6d99644a06626b5b41e0e09cf",
-        "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
+        "src/core/query-events.ts": "d6a3b88e42aa447a827b1a29a9b5ad8b9560d1191c047eb96132292f43568314",
         "src/core/query-filter.ts": "83848614ec7f7db8f188db40482bad14b46c08c40fc3b5f0325a8dbed98524b7",
         "src/core/query-owner.ts": "3a5b0809dd87c54567f35b156cfcacd1d8e61f19cfb8c72197cddba86ada4a91",
         "src/core/query-prefix-index.ts": "419a20fcf9bb28c5e7dbedb0c5af6f0e0dab52c0332773dbf39af638ac671cc2",
@@ -239,12 +238,12 @@
         "src/core/schema-key.ts": "0d6c00371526085fe19689a7401dfd86cb6f6a96f6b351b4b31bb2648804d5df",
         "src/core/schema-structural-sharing.ts": "73c3ab3f285e3146376b6c413b34ba4503fc2a07b0e2f8217785951f795f22a8",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
-        "src/core/stream-publication.ts": "0ecae3160d553d5b9d2b940abab3ccb93c610c77a2baed2dd2a70704c6771b89",
+        "src/core/stream-publication.ts": "827a3136e69eb303df42d4cdbcf534ed4a99b5f21139cb0bec89c65822472a9d",
         "src/core/stream-pull.ts": "9b7957b4487ddcdce2183f55c6f08e6cddee011c5d5e5b8c7b72ec839a7e3c42",
-        "src/core/stream-recovery.ts": "d0a3b8a043ed39bb3f18bb3381e6e082ae7e5cb8584c3247bc24840594c431bd",
+        "src/core/stream-recovery.ts": "3e18902069a6388e23668ca7639d1c4308f98ce097c23daf4d12b562c0e9c664",
         "src/core/stream-snapshot.ts": "5c31085e7f22c8242b42443f5468a160a6dd6a779a29bedcc5a9c14d7a855402",
-        "src/core/streamed-query.ts": "eccd0c1aa564096ccc5c489e27ffb6437a4ae5650766d233595eff263e29cf99",
-        "src/core/types.ts": "666e2a4d5d7f3c94d392a9ced105246122b48f4fa1bc30ca001e1c26a9425b61",
+        "src/core/streamed-query.ts": "048d9fc19b44f7a993893c7c73e8f529ecdce19b534b44de4d5dc6b2db26ad0c",
+        "src/core/types.ts": "02880615b7202768895d7e637b8b6fbd558a12f02f4a6f4d8c0d46301fb66fe0",
         "src/core/utility-node.ts": "8c3eb7adeec4cf49d5a475d34e785d060abd39f6a9a6049dc48a390cae0df74b",
         "src/core/utility-path.ts": "d46bb166dd03d2163063339a9cd6228dbcdeafea6ae14ad908bdb4ec6244f13e",
         "src/core/utility-tree.ts": "e9ea81f6a142fe1cf7e135e649efc8877b32b0ddb9262c17f32d527148ebf8b5",
@@ -316,12 +315,13 @@
         "tests/integrated-workflows.test.ts": "f7656de73aea99cdc9a1aff92bcb27dbf6ffec6cfc26394d6b9c0be1148fa452",
         "tests/lazy-leaves-and-unified-keys.test.ts": "83c4ad695d0cd3b807fc379c169cd1ca27e6c47868d6132bcb5afbd608e47aa8",
         "tests/live-coalescing.test.ts": "449a0505b96afb99847dd873c2bc38e9853a5ddfe176d3a9172f0bf3a0f41c42",
+        "tests/no-comments-rule.test.ts": "1a6c8be388ab03e30ea8976e7399a7841e53c0b449ff31032be4252c7d3412d8",
         "tests/publication-deadline.test.ts": "38f754f5d53e1781a0f1d3ae0102b3d90d7358485bb2b645bdf7b68076f21574",
-        "tests/query-descriptor.test.ts": "76b1cbd00f87aa3fa591a918cfbaca4f017d734a86b7cdd6f8c6ecc499205a7c",
+        "tests/query-descriptor.test.ts": "c2a7b2498a9da9bbf0c5299de97881f2a1eef87578ecc7add4fd259042e13688",
         "tests/query-effects.test.ts": "679d76ac8d598a0d973d18d48c1bde61aa1c7a84b96b3ae7ccc7d0cc50743fff",
         "tests/query-events.test.ts": "c7c4573cb6220564e29e5ee9bd95fdadee58dba426199d9778506571d280bf3d",
         "tests/query-filter.test.ts": "cabc2aa76c97b879ae823b3e252966dfa743eecd320f35e7e6a9f3f086803f86",
-        "tests/query-owner.test.ts": "08e409839045d7c506c55785e7f467f9654729609b5b647bb344542947f6988c",
+        "tests/query-owner.test.ts": "76ca91df19179acdaada15f7c3b71037e95d6f3dc4922f2290de897163444937",
         "tests/query-policy.test.ts": "914702a1ae97649131495f50eb64a3bb554d7fcfe370bb27228323ef13270e20",
         "tests/query-usability.test.ts": "f2919940a513ee1440a20b162f7c1dbb2cf81841368483899765b9b58c9c26c6",
         "tests/query-view-prefix.test.ts": "2c00662e76474c8cb6fb51cec6e9a27626ce961b076bd74653ab84475b4ae764",
@@ -349,7 +349,7 @@
         "tests/types/docs-hydration-views.ts": "51ea328985db10dba9b739666bdc2395a86ae5a957b29d5d08cdde326a6237aa",
         "tests/types/docs-loader-descriptors-use.tsx": "fe7b9e05ffef588c0178090c25ef80c7ff16f0134d0774f94d649807be4cccf7",
         "tests/types/docs-loader-descriptors.tsx": "a904c561cdafd3ede4e4b17155f3392aff2497b9ea3d0d7a2a2c6a05a270e680",
-        "tests/types/docs-opaque-recovery.ts": "88e2c2764ccd8195f65c4f46ff891a8487fe8b3740376239d5385fa9b7aea8ce",
+        "tests/types/docs-opaque-recovery.ts": "3365c44b5cf28be4522dcb321bb893826a7e577e6e2bdb462779c4aa8f295058",
         "tests/types/docs-policies.ts": "08b2afae79458768d5c097edc00960daf4a3c5ba3d487b467ae1214f4f640ad9",
         "tests/types/docs-react-client.ts": "7f26cf749a4da594315392bd50e0a91a01a97b20797072d698b6edac97959ab0",
         "tests/types/docs-react-entry.ts": "f2aec2af1d2723452d875f90c2427f732d865ebdf299d0b864f0683475269474",
@@ -405,19 +405,19 @@
         "tests/types/type-scale.ts": "0a6472b438c7ef14c3ee5b030b500ab6f66f13e7cd50250a3b0798bdec48c8a7",
         "tests/types/utility-configuration-contract.ts": "3a3d4e200e84d04d2e9856bfb4509a4ba948f4a67997d1327e66beef36aa0eb4",
         "tests/utility-configuration.test.ts": "2c2f29725e313bfed30e337ea7aad077ab77a47fe91b3de41cbd6b1bb70d59ff",
-        "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6",
+        "tests/version-packages.test.ts": "6e4b22118e2c3c90704c3dcf229111d288738ab8cf6586b863e8fd52200ff86c",
         "tests/workflow-guards.test.ts": "c2318f29ff68848c75b534e6a599c5dc19c020a8730eb8f95487f2c2ac5bbbd5",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "ce8bf1105e0830f7de5d90800015c6662e8eaae9",
-      "outcome": "updated",
-      "reason": "Removed off-topic external-client and internal benchmark guidance, fixed dead documentation links, replaced curly apostrophes, tightened verification steps, and verified that removing e2e-docs does not affect library usage guidance.",
+      "head": "c02af82057b315004d9fa22269fdc15d14ce162a",
+      "outcome": "no-change",
+      "reason": "Only non-public code comments were removed and repo-internal lint/ADR/skill tooling was added; public library API and consumer guidance are unchanged.",
       "evidence": [
-        "vp run docs-check, vp run docs-build, vp test (docs-release, docs-examples, workflow-guards), vp run check, vp run fallow, and vp run skills-check."
+        "vp run check, vp run fallow, tests/no-comments-rule.test.ts"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "222f1c5fdc4018c39be15af5fbbc71bc64a349934cbc41cde11fb7daf4291115",
+      "fingerprint": "7fc1e2eeba8f639c3d89b67dc92289e42afe88bb60afbbbf7f85480eb16b00fd",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -476,10 +476,8 @@
         "apps/docs/src/content/docs/guides/websocket-clients.md": "a7cce80cc74795de1e3663dfa145bca78e75b8499c74548318610108d9fc7352",
         "apps/docs/src/content/docs/index.mdx": "85d93175471e294ca4d8efd0325ed391ad1a53257413be59a67c7becd252d2dc",
         "apps/docs/src/content/docs/integrations/index.md": "2e0a5c9ab07e54b15231a0595b3dec2484265c7d3835bc5c922d54ac4aaf6407",
-        "apps/docs/src/content/docs/reference/browser-and-worker-hosts.md": null,
         "apps/docs/src/content/docs/reference/compatibility-and-limits.md": "153db813fa4beaa5a29f21370eb5330580dd9cc7c59ce7620e725a3f2ba02f7c",
         "apps/docs/src/content/docs/reference/errors.md": "93f774499c059f6c0daf33b2e97b8fd35b91c9eaf8353c022bb6d7009d13919a",
-        "apps/docs/src/content/docs/reference/external-http-clients.md": null,
         "apps/docs/src/content/docs/reference/factory.md": "61ce893c3cf475d240cfce6c047ae5cd6e7adca44ad1d99b9741b90f200f9516",
         "apps/docs/src/content/docs/reference/generated-builders.md": "84a2c18a80b0c913739351dbf51f94387c057e6f5c4e3fbe88b87aca59f4b68e",
         "apps/docs/src/content/docs/reference/http-builders.md": "7f8d4983aa9da11ad53d2fa3490d6db248c10c044e74da99c76c0d8b2a5c5b4f",
@@ -559,7 +557,7 @@
         "examples/shared/application-policy.ts": "2279f3b84b39f4029e1e98c81c1d8d8f2a255b4c8b61c19f0df05540badff4b3",
         "examples/shared/error-description.ts": "09ee9c111be0e2660e3623d074092cd3b475e21a0582af2dbf57849bcf43d413",
         "examples/shared/http-workflows/app.tsx": "452cec00a71934b2547a4cc62b48eb26a71795c7d37be84d1fd64a32dd2218d1",
-        "examples/shared/http-workflows/application.ts": "3d79d211d22ed83b93f44f52b3cf8926faecc1ada84c9285afb695fe4dc0e572",
+        "examples/shared/http-workflows/application.ts": "abc3d60a225df03ce6061490b20d50c238cd4f8d4e9c2fe0e36832aca2707594",
         "examples/shared/http-workflows/document.tsx": "bc8fc896fb4884d2b4be50ddacc0e8a268428ab7743e9dd37048e4dc6d360275",
         "examples/shared/http-workflows/events.tsx": "5d24c115015439fb6d8d0441b657a19966eba482002d6ca46327a0588f25bf7c",
         "examples/shared/http-workflows/readings.tsx": "e762f3a5e3b6c1d2d48f310e33a7d867dcb061cc7dd4b596cab6bef83b832933",
@@ -568,7 +566,7 @@
         "examples/shared/http-workflows/streams.tsx": "f78576b1fb979db15771a4a4c12a57be7a7bdcd55dad1183590925982f65769a",
         "examples/shared/http-workflows/upload.tsx": "e6e307ae67c58d52a9d56e898b31cde8c384491abe46203da1e7cfc631572184",
         "examples/shared/query-effects.ts": "11bf5083ccf764ce7381f70951d7ef50fa11cb698feb18a961f9e1feafac012a",
-        "examples/shared/query-events.ts": "1803b473872efd26095b13e8d9e8ff488f04580dcf9075d3978c6d54a5cdff54",
+        "examples/shared/query-events.ts": "d69a08aba6d8157b814f50ceb7cc22954f6b1fe69f6f84370d3e189b4bb74997",
         "examples/shared/ui/effect-error-details.tsx": "13527eb9de23e517de0b66d6949f2e1f15e92b886d9feae312b1aa60b4e80c12",
         "examples/shared/use-slow-query-cancellation.ts": "ae0e787c91f6f194c506bd6e93d6242bc9ad5d8a524ac4785b42ee55066ee789",
         "examples/tanstack-start/src/components/effect-error-details.tsx": "843d359788306199d2f206d445d512f2798dda9c1625d09650ac7a09a26c4a29",
@@ -584,7 +582,7 @@
         "examples/tanstack-start/tests/async-hydration.test.ts": "cd0de37ce7df4a68dc98366bf8bd620c39cee48d39f2ac285981e40412e8d467",
         "examples/tanstack-start/tests/client-navigation.test.tsx": "40349f7559078dbd23af9763a49935da479c0dbc955472ffa56fd5d174f999e6",
         "examples/tanstack-start/tests/failure-dehydration.test.ts": "326574cfefebfdc1f8e2050a0369643c648455bb6c201ef070658eb0293dfc18",
-        "examples/tanstack-start/tests/featured-selection.test.ts": "3a6e1db27843a392d354cb58ab7b8d7bfaf327ffe42910118d426d42875f1123",
+        "examples/tanstack-start/tests/featured-selection.test.ts": "6c1b8f34af32204f74e507f95af62843e3b3a785db5c9eaa78630571be68f9df",
         "examples/tanstack-start/tests/server-local.test.ts": "6d04b85b3e584deb8e4b6f847235ceab8a811eb2d3837dc209f89cf87cf0d291",
         "examples/tanstack-start/tests/server-render.test.tsx": "dd2ea45a1e610055ba7ef68f3a6140e06eaf43ad806e0bdc6757d9c63fba86c7",
         "examples/vite-react/src/app.tsx": "fb14cd1ad3f9acdec32bc51f28673152ca61062d8e7907646b5fd4615d8a281c",
@@ -607,22 +605,23 @@
         "examples/vite-react/tests/user-writes.test.ts": "a272baf9fe3a76649fa65cd6db06121aa97b2623eac33e66bcfc8f0a05ca88e4",
         "package.json": "53d2b60ed9c21a7f2ed3c993f96d2e3551fd1020ed9eb0c033413514819d0500",
         "pnpm-workspace.yaml": "fc4bff1fa9ef4a4887691c6e004e02829736f93ee07efcb563f78f836a21a276",
-        "scripts/check-effect-compatibility.mts": "539bf68dc1e6a95a857ccc7491c623df65fa755ee77b717b915f76f119392bb1",
+        "scripts/check-effect-compatibility.mts": "b08f461711772a8214aae5962099d04a7ef39fa5bc6d56a0c9ae03de6b1f52f9",
         "scripts/check-framework-consumers.mts": "f0111ac9ed84996f722f656358b810da0b9ecc8c6c0219a2019d1076b5d50cbc",
         "scripts/check-toolchain.mts": "3c8efdb93594058ed78947bc65ad51c88ac4b26cab23b0b1fe6f8786a6d386e9",
         "scripts/check-workflow.mts": "c3a760a6b111d3f1dc7570a510ee09aabfc048786ef8c6dd1c9fe7b26cecd00c",
-        "scripts/compiler.mts": "e160a1a81eccb29c77e5f2f0fd8eba7f3ebe6f04cce91fc805c9e6ab96ce1d49",
+        "scripts/compiler.mts": "b838a5766d3f9f8d8f73450814a703ff3b61e67a8ebeecfcb795d0da12f483bb",
         "scripts/measure-bundles.mts": "03a84f47cf0924ff254b0bd86ddd7771fd71052afee5fe1beddff54037435562",
         "scripts/measure-construction.mts": "9620ff945416a3ab1f96ffc6a0cc5bb9623a3155db9fad1e27a4f801745f7b8d",
         "scripts/measure-streams.mts": "342a94723ee8fc92083ee346a5d7e36f96440a32510c61fefb4f81c17b64f273",
         "scripts/measure-structural-sharing.mts": "fc8281a6ecbc48d20632c8088474380533aeec21da55409f25690281e5a77576",
         "scripts/measure-types.mts": "d19f44d904843eabeb63fe4ab5868fb63b22467fd1f4655eb801a141899a2bab",
+        "scripts/oxlint-no-comments.mts": "13bc2661cb403d0ded2ad3d08a42296160ee4d7c969580c4438fd8822d096660",
         "scripts/performance/budgets.mts": "fe5a92644a539613d702aaacd8257bd7ee9d79c6152519e401b2d26fa23442d2",
         "scripts/performance/common.mts": "507d45618fbaf2c7be6f986a5f958d1958cdddc95e42a77ff1d50d8225538a3d",
         "scripts/resolve-docs-release.mts": "aee5bbd15cbc4a2671c145c77298e0451a29c1e90853cf8e04f4669dafc5b4d9",
         "scripts/verify-docs-examples.mts": null,
         "scripts/verify-packed-consumer.mts": null,
-        "scripts/version-packages.mts": "7a1a756ef6ace760e83dbfc4363023f6ec60c49e273e9805a53c6a21b40f14ee",
+        "scripts/version-packages.mts": "7c3ba9d3b440a96e783c046bb473e72bf63799c85d5c5d9e436d8d5a73d144e0",
         "skills/effect-api-query/SKILL.md": "112b039108201d3aecc3b2e9c6dbd665ddaa01f37e0a16997814ea9b533c95a1",
         "skills/effect-api-query/references/cache-workflows.md": "8469b8826449284ac4f271b590129905d6d04d59887cee3d1a5cf8101aeb5406",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "03e8c84d889b7dd478edebe96262bd09d2a5f90edac6e8705cae44a7ecc91a62",
@@ -647,7 +646,7 @@
         "src/core/prepared-input.ts": "aae8c8c442a13e138606fc0d7fcbd8711396c9cd7661bfdf198e7365fd7567ff",
         "src/core/query-descriptor.ts": "d1650d691dc5b03eed820cab0afb747ba875572ee4eec42e70f927d59374d45b",
         "src/core/query-effects.ts": "66e0311cf246b5edd7f3b287c060e2b9acb3a7a6d99644a06626b5b41e0e09cf",
-        "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
+        "src/core/query-events.ts": "d6a3b88e42aa447a827b1a29a9b5ad8b9560d1191c047eb96132292f43568314",
         "src/core/query-filter.ts": "83848614ec7f7db8f188db40482bad14b46c08c40fc3b5f0325a8dbed98524b7",
         "src/core/query-owner.ts": "3a5b0809dd87c54567f35b156cfcacd1d8e61f19cfb8c72197cddba86ada4a91",
         "src/core/query-prefix-index.ts": "419a20fcf9bb28c5e7dbedb0c5af6f0e0dab52c0332773dbf39af638ac671cc2",
@@ -656,12 +655,12 @@
         "src/core/schema-key.ts": "0d6c00371526085fe19689a7401dfd86cb6f6a96f6b351b4b31bb2648804d5df",
         "src/core/schema-structural-sharing.ts": "73c3ab3f285e3146376b6c413b34ba4503fc2a07b0e2f8217785951f795f22a8",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
-        "src/core/stream-publication.ts": "0ecae3160d553d5b9d2b940abab3ccb93c610c77a2baed2dd2a70704c6771b89",
+        "src/core/stream-publication.ts": "827a3136e69eb303df42d4cdbcf534ed4a99b5f21139cb0bec89c65822472a9d",
         "src/core/stream-pull.ts": "9b7957b4487ddcdce2183f55c6f08e6cddee011c5d5e5b8c7b72ec839a7e3c42",
-        "src/core/stream-recovery.ts": "d0a3b8a043ed39bb3f18bb3381e6e082ae7e5cb8584c3247bc24840594c431bd",
+        "src/core/stream-recovery.ts": "3e18902069a6388e23668ca7639d1c4308f98ce097c23daf4d12b562c0e9c664",
         "src/core/stream-snapshot.ts": "5c31085e7f22c8242b42443f5468a160a6dd6a779a29bedcc5a9c14d7a855402",
-        "src/core/streamed-query.ts": "eccd0c1aa564096ccc5c489e27ffb6437a4ae5650766d233595eff263e29cf99",
-        "src/core/types.ts": "666e2a4d5d7f3c94d392a9ced105246122b48f4fa1bc30ca001e1c26a9425b61",
+        "src/core/streamed-query.ts": "048d9fc19b44f7a993893c7c73e8f529ecdce19b534b44de4d5dc6b2db26ad0c",
+        "src/core/types.ts": "02880615b7202768895d7e637b8b6fbd558a12f02f4a6f4d8c0d46301fb66fe0",
         "src/core/utility-node.ts": "8c3eb7adeec4cf49d5a475d34e785d060abd39f6a9a6049dc48a390cae0df74b",
         "src/core/utility-path.ts": "d46bb166dd03d2163063339a9cd6228dbcdeafea6ae14ad908bdb4ec6244f13e",
         "src/core/utility-tree.ts": "e9ea81f6a142fe1cf7e135e649efc8877b32b0ddb9262c17f32d527148ebf8b5",
@@ -733,12 +732,13 @@
         "tests/integrated-workflows.test.ts": "f7656de73aea99cdc9a1aff92bcb27dbf6ffec6cfc26394d6b9c0be1148fa452",
         "tests/lazy-leaves-and-unified-keys.test.ts": "83c4ad695d0cd3b807fc379c169cd1ca27e6c47868d6132bcb5afbd608e47aa8",
         "tests/live-coalescing.test.ts": "449a0505b96afb99847dd873c2bc38e9853a5ddfe176d3a9172f0bf3a0f41c42",
+        "tests/no-comments-rule.test.ts": "1a6c8be388ab03e30ea8976e7399a7841e53c0b449ff31032be4252c7d3412d8",
         "tests/publication-deadline.test.ts": "38f754f5d53e1781a0f1d3ae0102b3d90d7358485bb2b645bdf7b68076f21574",
-        "tests/query-descriptor.test.ts": "76b1cbd00f87aa3fa591a918cfbaca4f017d734a86b7cdd6f8c6ecc499205a7c",
+        "tests/query-descriptor.test.ts": "c2a7b2498a9da9bbf0c5299de97881f2a1eef87578ecc7add4fd259042e13688",
         "tests/query-effects.test.ts": "679d76ac8d598a0d973d18d48c1bde61aa1c7a84b96b3ae7ccc7d0cc50743fff",
         "tests/query-events.test.ts": "c7c4573cb6220564e29e5ee9bd95fdadee58dba426199d9778506571d280bf3d",
         "tests/query-filter.test.ts": "cabc2aa76c97b879ae823b3e252966dfa743eecd320f35e7e6a9f3f086803f86",
-        "tests/query-owner.test.ts": "08e409839045d7c506c55785e7f467f9654729609b5b647bb344542947f6988c",
+        "tests/query-owner.test.ts": "76ca91df19179acdaada15f7c3b71037e95d6f3dc4922f2290de897163444937",
         "tests/query-policy.test.ts": "914702a1ae97649131495f50eb64a3bb554d7fcfe370bb27228323ef13270e20",
         "tests/query-usability.test.ts": "f2919940a513ee1440a20b162f7c1dbb2cf81841368483899765b9b58c9c26c6",
         "tests/query-view-prefix.test.ts": "2c00662e76474c8cb6fb51cec6e9a27626ce961b076bd74653ab84475b4ae764",
@@ -766,7 +766,7 @@
         "tests/types/docs-hydration-views.ts": "51ea328985db10dba9b739666bdc2395a86ae5a957b29d5d08cdde326a6237aa",
         "tests/types/docs-loader-descriptors-use.tsx": "fe7b9e05ffef588c0178090c25ef80c7ff16f0134d0774f94d649807be4cccf7",
         "tests/types/docs-loader-descriptors.tsx": "a904c561cdafd3ede4e4b17155f3392aff2497b9ea3d0d7a2a2c6a05a270e680",
-        "tests/types/docs-opaque-recovery.ts": "88e2c2764ccd8195f65c4f46ff891a8487fe8b3740376239d5385fa9b7aea8ce",
+        "tests/types/docs-opaque-recovery.ts": "3365c44b5cf28be4522dcb321bb893826a7e577e6e2bdb462779c4aa8f295058",
         "tests/types/docs-policies.ts": "08b2afae79458768d5c097edc00960daf4a3c5ba3d487b467ae1214f4f640ad9",
         "tests/types/docs-react-client.ts": "7f26cf749a4da594315392bd50e0a91a01a97b20797072d698b6edac97959ab0",
         "tests/types/docs-react-entry.ts": "f2aec2af1d2723452d875f90c2427f732d865ebdf299d0b864f0683475269474",
@@ -822,26 +822,26 @@
         "tests/types/type-scale.ts": "0a6472b438c7ef14c3ee5b030b500ab6f66f13e7cd50250a3b0798bdec48c8a7",
         "tests/types/utility-configuration-contract.ts": "3a3d4e200e84d04d2e9856bfb4509a4ba948f4a67997d1327e66beef36aa0eb4",
         "tests/utility-configuration.test.ts": "2c2f29725e313bfed30e337ea7aad077ab77a47fe91b3de41cbd6b1bb70d59ff",
-        "tests/version-packages.test.ts": "279407b5a6d2a6cda1f62939b34ebbef654c652dfd4d20cbde7d4292081c2be6",
+        "tests/version-packages.test.ts": "6e4b22118e2c3c90704c3dcf229111d288738ab8cf6586b863e8fd52200ff86c",
         "tests/workflow-guards.test.ts": "c2318f29ff68848c75b534e6a599c5dc19c020a8730eb8f95487f2c2ac5bbbd5",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "ce8bf1105e0830f7de5d90800015c6662e8eaae9",
-      "outcome": "updated",
-      "reason": "Updated _artifacts/domain_map.yaml and _artifacts/skill_spec.md for the docs and skill cleanup; removing e2e-docs requires no skill tree or domain map change.",
-      "evidence": ["vp exec intent maintainer check and vp run skills-check."]
+      "head": "c02af82057b315004d9fa22269fdc15d14ce162a",
+      "outcome": "no-change",
+      "reason": "Only non-public code comments were removed and repo-internal lint/ADR/skill tooling was added; public library API and consumer guidance are unchanged.",
+      "evidence": [
+        "vp run check, vp run fallow, tests/no-comments-rule.test.ts"
+      ]
     },
     "source:vite.config.ts": {
-      "fingerprint": "5c21b03da3b24167704aec3f76533fa7854be77843b85d72b478e4a1bb6b6248",
+      "fingerprint": "16be73d65b663fc0cc254b4fbea0371989c81d11ee2e19afdab08f0519a00ed5",
       "snapshot": {
-        "vite.config.ts": "72e0a669884ce8d262597b22d78434d02759f9795d532614dfbd64b41282ff7f"
+        "vite.config.ts": "eedd9bec1c36042a387cdd729a7c8eab8669d3b25174e88978dda1b1ffd7502d"
       },
-      "head": "ce8bf1105e0830f7de5d90800015c6662e8eaae9",
+      "head": "c02af82057b315004d9fa22269fdc15d14ce162a",
       "outcome": "out-of-scope",
-      "reason": "Removed repository-only static docs Playwright suite and its CI/task wiring; published library API and shipped skill usage guidance are unchanged.",
-      "evidence": [
-        "vp test (docs-release, docs-examples, workflow-guards), vp run check, vp run fallow, and vp run skills-check."
-      ]
+      "reason": "Repository-internal lint config, ADRs, fallow config, example comment cleanup, and repo-local /delete-comment skill do not affect the shipped consumer skill.",
+      "evidence": ["vp run check, vp run fallow"]
     },
     "source:.github/workflows/release.yml": {
       "fingerprint": "07a534472bf31e21369f8c35796ee2048edbf753d16b03fe12068eb9bf4e84d5",
@@ -904,16 +904,14 @@
       ]
     },
     "source:.fallowrc.jsonc": {
-      "fingerprint": "2aebd1b983b0c419ad516ed8fd595bd7f8d03e0cb9acb4fc03b930143b5858e0",
+      "fingerprint": "c8fb2282d7bb4c911cd8354a160ed46af844ff8c5de7508715009e2d9f67f2ee",
       "snapshot": {
-        ".fallowrc.jsonc": "201603e6a342784233d4dcf5e629ce6835dd7400247297fd7d7cfea7fa2bec0f"
+        ".fallowrc.jsonc": "175112267393caa4345cabd826996f338908f0607d3c7d5519e94d072119041e"
       },
-      "head": "7788ee4719efe1f2b34ab88eeed1df9e80c2e8bc",
-      "outcome": "no-change",
-      "reason": "The inherited React-subpath change adds src/react/index.tsx to the existing public-barrel unused-type exception. This lets intentionally exported React props and context types remain callable by consumers without generating false internal unused-type findings. It changes no consumer setup, lifecycle or API guidance.",
-      "evidence": [
-        "Inherited commit edcbcbc, .fallowrc.jsonc, src/react/index.tsx and tests/react-pack-isolation.test.ts. All four Fallow commands passed. The React behavior suite passed in the 99 focused tests, and the release-candidate package passed publint and attw."
-      ]
+      "head": "c02af82057b315004d9fa22269fdc15d14ce162a",
+      "outcome": "out-of-scope",
+      "reason": "Repository-internal lint config, ADRs, fallow config, example comment cleanup, and repo-local /delete-comment skill do not affect the shipped consumer skill.",
+      "evidence": ["vp run check, vp run fallow"]
     },
     "source:.github/workflows/ci.yml": {
       "fingerprint": "46d9b0c118348e0f07996e43b7d9092d15a79a8e3250bed53877e38f5e8461fc",
@@ -3443,21 +3441,14 @@
       ]
     },
     "source:examples/tanstack-start/src/routes/workflows.tsx": {
-      "fingerprint": "5fdf5cbc4f09144db1f06da041beb819048aa240b9c11f0ad638eb1db1b0f66d",
+      "fingerprint": "ee34f073c358350d50128bdab176c07ec544c4156428138f3f7f1810b1411391",
       "snapshot": {
-        "examples/tanstack-start/src/routes/workflows.tsx": "c2c11ca26342bf866a7e0724e0cee1283485c7df3a17b88d5c2cfc2b44598dd6"
+        "examples/tanstack-start/src/routes/workflows.tsx": "1b02dcebd29b2bd5e29a0f1e3fbc564b92a1c12bd7d63202e1a68f7c983b3fe6"
       },
-      "head": "90ca0e6ac412cf97f62854b7e29d4438e2d6ffb0",
-      "outcome": "no-change",
-      "reason": "Inspected actual owned diff: host imports now name the private shared package, common stylesheet scanning follows shared ownership, exact lint/type path exceptions follow moved modules, the real toolchain command is a Fallow entry, and the existing minor changeset describes corrected registration. These implementation and tooling details require no additional shipped guidance.",
-      "evidence": [
-        "Source base 90ca0e6; actual src/core/query-owner.ts and examples/shared/http-workflows/application.ts diff; native public application and owner regressions.",
-        "architecture-raw-finalizer-red.log and architecture-same-turn-red.log reproduce prior failures; corresponding GREEN evidence and final 870 runtime tests pass.",
-        "Both pinned public/server compilers, strict 231-file checking/457-file formatting, package/ATTW/publint, native framework compilers, Effect diagnostics and toolchain rejection checks pass.",
-        "Both final production builds and docs checks pass; all four Fallow audits pass with clean development/production dead-code scans and no new suppressions/threshold changes.",
-        "150 browser cases passed before private workspace packaging; final 150-case browser rerun running. Eight packed peer pairs passed 403 cases each before internal type-export/consumer-fixture cleanup; final CI will rerun the matrix.",
-        "Fresh Astra architecture/fix source rechecks found no remaining actionable admission finding. No fresh consumer/discovery or GUI/platform claim; default yamllint retains repository line-length/document-start issues."
-      ]
+      "head": "c02af82057b315004d9fa22269fdc15d14ce162a",
+      "outcome": "out-of-scope",
+      "reason": "Repository-internal lint config, ADRs, fallow config, example comment cleanup, and repo-local /delete-comment skill do not affect the shipped consumer skill.",
+      "evidence": ["vp run check, vp run fallow"]
     },
     "source:examples/shared/styles.css": {
       "fingerprint": "bd7baafe0c5b7e65f5c1aa649dde34bd6e40c9df07442c7b0afbf2cd4d75fa31",
@@ -4339,6 +4330,56 @@
       "evidence": [
         ".changeset/unify-runtime-options.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
       ]
+    },
+    "source:.agents/skills/delete-comment/SKILL.md": {
+      "fingerprint": "bdbd452e38abe8c61816732dd8581ef873751cc178d149a42987bd68ffb39a10",
+      "snapshot": {
+        ".agents/skills/delete-comment/SKILL.md": "bc4f314cf2b57ff02e53cb98d7d0e46da6e35feb37f5cc53d7242df5077a9eb6"
+      },
+      "head": "c02af82057b315004d9fa22269fdc15d14ce162a",
+      "outcome": "out-of-scope",
+      "reason": "Repo-local /delete-comment skill and its OpenAI skill metadata do not affect the shipped consumer skill.",
+      "evidence": ["vp run check, vp exec intent maintainer check"]
+    },
+    "source:docs/adr/0055-base-release-intent-reviews-on-pre-generation-head.md": {
+      "fingerprint": "aaa3f86fbb6b894115b3e3891bcf78117a98fed783ada094477141e225ba862b",
+      "snapshot": {
+        "docs/adr/0055-base-release-intent-reviews-on-pre-generation-head.md": "2ee0c8b3ef506433c69d72398e1460d74fca11122af683b2bd18ce63aea25058"
+      },
+      "head": "c02af82057b315004d9fa22269fdc15d14ce162a",
+      "outcome": "out-of-scope",
+      "reason": "Repository-internal lint config, ADRs, fallow config, example comment cleanup, and repo-local /delete-comment skill do not affect the shipped consumer skill.",
+      "evidence": ["vp run check, vp run fallow"]
+    },
+    "source:docs/adr/0056-rethrow-pending-pull-failures-during-stream-cleanup.md": {
+      "fingerprint": "104186af2fed5b6d6f94b24a09a092b3e12826eef23f0667a797dd440028082c",
+      "snapshot": {
+        "docs/adr/0056-rethrow-pending-pull-failures-during-stream-cleanup.md": "88a665c0309d10ec7b44f6b11e22859059f6e88244890d562e640290cf7eb1ad"
+      },
+      "head": "c02af82057b315004d9fa22269fdc15d14ce162a",
+      "outcome": "out-of-scope",
+      "reason": "Repository-internal lint config, ADRs, fallow config, example comment cleanup, and repo-local /delete-comment skill do not affect the shipped consumer skill.",
+      "evidence": ["vp run check, vp run fallow"]
+    },
+    "source:docs/adr/0057-preserve-type-signature-variance-and-overload-inference.md": {
+      "fingerprint": "805a155c72e0d9ab2f6fdafca3a411647bc83f31649572eb2941c1ad64620dfc",
+      "snapshot": {
+        "docs/adr/0057-preserve-type-signature-variance-and-overload-inference.md": "3a41494adffc7f038aa5440eb503d9cc9eda764534915bccc934083be00f64f3"
+      },
+      "head": "c02af82057b315004d9fa22269fdc15d14ce162a",
+      "outcome": "out-of-scope",
+      "reason": "Repository-internal lint config, ADRs, fallow config, example comment cleanup, and repo-local /delete-comment skill do not affect the shipped consumer skill.",
+      "evidence": ["vp run check, vp run fallow"]
+    },
+    "source:.agents/skills/delete-comment/agents/openai.yaml": {
+      "fingerprint": "f3675808fad1daabb6bfef684b9fa3bfaa6dcaec46fdd2699dc439a5388f4c93",
+      "snapshot": {
+        ".agents/skills/delete-comment/agents/openai.yaml": "1c0c53bf4f0a605721c6ee172432439eb30fc393964d674bb640f36fd3a914e0"
+      },
+      "head": "c02af82057b315004d9fa22269fdc15d14ce162a",
+      "outcome": "out-of-scope",
+      "reason": "Repo-local /delete-comment skill and its OpenAI skill metadata do not affect the shipped consumer skill.",
+      "evidence": ["vp run check, vp exec intent maintainer check"]
     }
   }
 }

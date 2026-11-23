@@ -1,0 +1,6 @@
+interface:
+  display_name: "Delete Comment"
+  short_description: "Audit comments, move decisions to ADRs, and tighten the ratchet"
+  default_prompt: "Use $delete-comment to audit code comments, classify and remove them, and tighten the repo/no-comments ratchet."
+policy:
+  allow_implicit_invocation: false

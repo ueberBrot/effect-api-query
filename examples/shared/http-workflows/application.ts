@@ -91,11 +91,9 @@ export const startHttpWorkflows = async (baseUrl: string) => {
         },
       };
     },
-    // Preserve the owner's idempotent disposal promise.
     // oxlint-disable-next-line typescript/promise-function-async
     dispose: () => {
       if (owner.isActive()) {
-        // The owner reports this registered drain's failures through disposal.
         void Promise.allSettled([
           owner.runMutation(async () => runtime.runPromise(drainMutations)),
         ]);

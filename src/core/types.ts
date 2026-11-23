@@ -170,7 +170,6 @@ export type QueryInput<
 > &
   AdapterOptions;
 
-// The broad signature supports native direct calls; hooks infer the final key signature.
 export type GeneratedQueryFunction<
   Data,
   Key extends QueryKey,
@@ -389,7 +388,6 @@ export type UnaryQueryBuilder<
     readonly error: Error;
     readonly key: Key;
     readonly skippedKey: SkippedKey;
-    // Configured builders accept more options, preserving assignment to the original builder.
     readonly adapterOptions: (options: AdapterOptions) => void;
     readonly inputless: Inputless;
   };

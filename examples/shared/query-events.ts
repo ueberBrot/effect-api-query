@@ -17,7 +17,6 @@ export interface DirectoryEvent {
   readonly name: string;
 }
 
-/** The application supplies its decoded transport and authoritative snapshot protocol. */
 export interface DirectoryConnection {
   readonly client: RpcClient.RpcClient<RpcGroup.Rpcs<typeof directory>>;
   readonly connect: (
@@ -51,7 +50,6 @@ export const acquireDirectoryEvents = async (
   );
   const source = recoverStream({
     initialCursor: "0",
-    // This application's protocol uses decimal positions, represented as strings.
     cursorPolicy: {
       accept: (previous, next) => BigInt(next) > BigInt(previous),
       isGap: (previous, next) => BigInt(next) > BigInt(previous) + 1n,

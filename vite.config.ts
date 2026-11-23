@@ -1,3 +1,5 @@
+import path from "node:path";
+
 import { strict as effectStrict } from "@effect/tsgo/oxlint-presets";
 import { Predicate } from "effect";
 import ultraciteOxfmt from "ultracite/oxfmt";
@@ -98,7 +100,14 @@ export default defineConfig({
       effectStrict,
       vitestPreset,
     ],
-    jsPlugins: [...ultraciteAntiSlop.jsPlugins, ...ultraciteShadcn.jsPlugins],
+    jsPlugins: [
+      ...ultraciteAntiSlop.jsPlugins,
+      ...ultraciteShadcn.jsPlugins,
+      {
+        name: "repo",
+        specifier: path.resolve("scripts/oxlint-no-comments.mts"),
+      },
+    ],
     settings: {
       shadcn: {
         componentImports: ["(?:^|/)components/"],
@@ -119,6 +128,17 @@ export default defineConfig({
       "anti-slop/require-readable-spacing": "off",
       "effecttsgo/any-unknown-in-error-context": "error",
       "effecttsgo/unsafe-effect-type-assertion": "error",
+      "repo/no-comments": [
+        "error",
+        {
+          publicApiPrefixes: ["src/"],
+          ratchet: {
+            "src/core/configure-utils.ts": 2,
+            "src/core/configure.ts": 2,
+            "src/core/query-descriptor.ts": 1,
+          },
+        },
+      ],
     },
     overrides: [
       {
@@ -639,7 +659,6 @@ export default defineConfig({
         cache: false,
       },
       "docs-sync": {
-        // Root typed linting includes docs files that import Astro's generated modules.
         command: "vp -C apps/docs exec astro sync",
         cache: {
           output: ["apps/docs/.astro/**"],

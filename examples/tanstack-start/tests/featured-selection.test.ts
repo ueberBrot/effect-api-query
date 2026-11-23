@@ -30,7 +30,6 @@ describe("featured user loader", () => {
         history: createMemoryHistory({ initialEntries: ["/details"] }),
       });
       await router.load();
-      // JSON serialization exercises the loader transfer boundary.
       // oxlint-disable-next-line unicorn/prefer-structured-clone
       const selection: unknown = JSON.parse(
         JSON.stringify(router.state.matches.at(-1)?.loaderData)

@@ -268,7 +268,6 @@ export function recoverStream<
   RF = R,
   RS = R,
 >(
-  // Preserve union-typed annotations separately from direct callback inference.
   // oxlint-disable-next-line typescript/unified-signatures
   options: RecoverStreamOptions<A, E, R, C, EG, RG, EF, RF, RS>
 ): Stream.Stream<A, NoInfer<E | EG | EF>, NoInfer<R | RG | RF | RS>>;

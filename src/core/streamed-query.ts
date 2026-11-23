@@ -177,7 +177,6 @@ export interface MakeStreamQueryOptions {
   readonly runPromiseExit: RunPromiseExit<unknown>;
 }
 
-// Query Core owns fetch/retry/observer state; this consumer owns stream publication.
 const consumeQueryStream = async <A, Data>(
   context: QueryFunctionContext,
   stream: AsyncIterable<A>,
@@ -190,7 +189,6 @@ const consumeQueryStream = async <A, Data>(
       break;
     }
     client.setQueryData<Data>(queryKey, (previous) =>
-      // Cached null is a value, not an absent entry.
       // oxlint-disable-next-line typescript/prefer-nullish-coalescing
       reducer(previous === undefined ? initialValue : previous, value)
     );

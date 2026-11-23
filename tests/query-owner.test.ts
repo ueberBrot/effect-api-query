@@ -20,7 +20,6 @@ import { group, makeClient, makeRpcTestClient } from "./fixtures/effect-rpc";
 
 const gate = () => {
   let open!: () => void;
-  // Controlled external completion boundary for drain tests.
   // oxlint-disable-next-line promise/avoid-new
   const promise = new Promise<void>((resolve) => {
     open = resolve;

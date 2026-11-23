@@ -40,7 +40,6 @@ ok(
   queryFloor !== undefined && queryCurrent !== undefined,
   "Expected explicit Query Core versions."
 );
-// Pin age-eligible representatives; review each admitted minor before changing support.
 const effectVersions = new Set([floor, current]);
 ok(
   manifest.peerDependencies.effect === ">=4.1.4 <4.2.0",
@@ -260,7 +259,6 @@ try {
       resolvedEffect.includes(`/effect@${version}/`),
       "The packed library must resolve the selected Effect peer."
     );
-    // A root version check can conceal a second peer instance inside the package.
     for (const peer of ["effect", "@tanstack/query-core"]) {
       const resolve = (cwd: string) =>
         execFileSync(

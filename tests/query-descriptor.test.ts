@@ -68,7 +68,6 @@ it.effect("reuses a loader selection across independent hydrated owners", () =>
         descriptor,
         state: dehydrate(serverCache),
       });
-      // SAFETY: this snapshot is produced immediately above by native dehydrate in the same test.
       // oxlint-disable-next-line typescript/no-unsafe-assignment
       const transferred: {
         readonly descriptor: unknown;
