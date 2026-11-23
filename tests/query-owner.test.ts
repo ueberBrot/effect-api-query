@@ -284,7 +284,58 @@ describe("query owners", () => {
     const disposed = owner.dispose();
     const exit = await result;
     expect(Exit.isFailure(exit)).toBe(true);
-    await expect(disposed).rejects.toBeInstanceOf(AggregateError);
+    await expect(disposed).rejects.toMatchObject({
+      errors: [Exit.isFailure(exit) ? exit.cause : undefined],
+    });
+  });
+
+  it("reports a generated query finalizer failure once with its full Cause", async () => {
+    const started = gate();
+    await Effect.runPromise(
+      Effect.scoped(
+        Effect.gen(function* verifyGeneratedQueryCleanup() {
+          const client = yield* makeClient();
+          const run = Effect.runPromiseExitWith(yield* Effect.context());
+          const utilities = createRpcQueryUtils(group, {
+            client,
+            runtime: async (effect, options) =>
+              await run(
+                effect.pipe(
+                  Effect.tap(() =>
+                    Effect.sync(started.open).pipe(Effect.andThen(Effect.never))
+                  ),
+                  Effect.ensuring(Effect.die("finalizer failed"))
+                ),
+                options
+              ),
+          });
+          yield* Effect.promise(async () => {
+            const owner = await acquireQueryOwner(
+              async (setup) =>
+                await Promise.resolve(setup.trackUtils(utilities))
+            );
+            const query = owner.queryClient
+              .query(owner.resources.health.ping.queryOptions({ retry: false }))
+              .catch(() => null);
+            await started.promise;
+            await expect(owner.dispose()).rejects.toMatchObject({
+              errors: [
+                {
+                  _tag: "EffectRpcQueryError",
+                  cause: {
+                    reasons: [
+                      { _tag: "Interrupt" },
+                      { _tag: "Die", defect: "finalizer failed" },
+                    ],
+                  },
+                },
+              ],
+            });
+            await query;
+          });
+        })
+      )
+    );
   });
 
   it("retires an accepted native accumulated stream before releasing its local transport", async () => {

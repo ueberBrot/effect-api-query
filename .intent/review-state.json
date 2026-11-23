@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "cadd3821d77eba73ec92969c7557b6db3ce4828c4982af66ec5003ca4a82e495",
+      "fingerprint": "5b132f2f858d076311aa715baa23c185b9234c899635e7ed2f9231d42e30f719",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -232,7 +232,7 @@
         "src/core/query-effects.ts": "66e0311cf246b5edd7f3b287c060e2b9acb3a7a6d99644a06626b5b41e0e09cf",
         "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
         "src/core/query-filter.ts": "83848614ec7f7db8f188db40482bad14b46c08c40fc3b5f0325a8dbed98524b7",
-        "src/core/query-owner.ts": "1c09e65e361d0cbaacf7f8b378ff39c7bfdc19c2c07ff51dcdd86cfa4f6bc68b",
+        "src/core/query-owner.ts": "3a5b0809dd87c54567f35b156cfcacd1d8e61f19cfb8c72197cddba86ada4a91",
         "src/core/query-prefix-index.ts": "419a20fcf9bb28c5e7dbedb0c5af6f0e0dab52c0332773dbf39af638ac671cc2",
         "src/core/reactivity-invalidation.ts": "29a583352f001213c535be806046256daf040444a67665e3d6c202d7dd7a8054",
         "src/core/runtime.ts": "c59393fa31c1c57a2e4d149d45987f88e2033eeebe6c46a12bac9a30ceb47d24",
@@ -319,7 +319,7 @@
         "tests/query-effects.test.ts": "679d76ac8d598a0d973d18d48c1bde61aa1c7a84b96b3ae7ccc7d0cc50743fff",
         "tests/query-events.test.ts": "c7c4573cb6220564e29e5ee9bd95fdadee58dba426199d9778506571d280bf3d",
         "tests/query-filter.test.ts": "cabc2aa76c97b879ae823b3e252966dfa743eecd320f35e7e6a9f3f086803f86",
-        "tests/query-owner.test.ts": "d7703b9242da562cbd823a866c26a5dd5bd7122a307e54805f62ce74db6483a3",
+        "tests/query-owner.test.ts": "dcdbfc8bafd02b6b855cafd06b183948eb39a91ff56e2b08fafca65ccd6a1aba",
         "tests/query-policy.test.ts": "914702a1ae97649131495f50eb64a3bb554d7fcfe370bb27228323ef13270e20",
         "tests/query-usability.test.ts": "f2919940a513ee1440a20b162f7c1dbb2cf81841368483899765b9b58c9c26c6",
         "tests/query-view-prefix.test.ts": "2c00662e76474c8cb6fb51cec6e9a27626ce961b076bd74653ab84475b4ae764",
@@ -407,15 +407,15 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "b1226efd605154adab6a80874568617c2f974aec",
+      "head": "659804a67fe5d54ba62596eff2df5fa4ad04e204",
       "outcome": "no-change",
-      "reason": "Generated leaves now assign the original mutation runner during rebuild and retain owner admission for the complete mutation function.",
+      "reason": "Retirement preserves complete Effect Causes while reporting each generated finalizer failure once.",
       "evidence": [
-        "Changed: src/core/query-owner.ts, src/core/utility-tree.ts at b1226efd605154adab6a80874568617c2f974aec"
+        "Changed: src/core/query-owner.ts, tests/query-owner.test.ts at 659804a67fe5d54ba62596eff2df5fa4ad04e204"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "14b89a04b9f7e7392f6305dfb41d064fb64324e0343cb199006d3a671c41c622",
+      "fingerprint": "13a80ff1be63700f4a908c22b5b7d9ec5c40ad59239e83bf03dcacae5f04f147",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -647,7 +647,7 @@
         "src/core/query-effects.ts": "66e0311cf246b5edd7f3b287c060e2b9acb3a7a6d99644a06626b5b41e0e09cf",
         "src/core/query-events.ts": "a3c0432349ba696ee90eefd2ade6af83e250be449321dbe8381341ea2508ed11",
         "src/core/query-filter.ts": "83848614ec7f7db8f188db40482bad14b46c08c40fc3b5f0325a8dbed98524b7",
-        "src/core/query-owner.ts": "1c09e65e361d0cbaacf7f8b378ff39c7bfdc19c2c07ff51dcdd86cfa4f6bc68b",
+        "src/core/query-owner.ts": "3a5b0809dd87c54567f35b156cfcacd1d8e61f19cfb8c72197cddba86ada4a91",
         "src/core/query-prefix-index.ts": "419a20fcf9bb28c5e7dbedb0c5af6f0e0dab52c0332773dbf39af638ac671cc2",
         "src/core/reactivity-invalidation.ts": "29a583352f001213c535be806046256daf040444a67665e3d6c202d7dd7a8054",
         "src/core/runtime.ts": "c59393fa31c1c57a2e4d149d45987f88e2033eeebe6c46a12bac9a30ceb47d24",
@@ -734,7 +734,7 @@
         "tests/query-effects.test.ts": "679d76ac8d598a0d973d18d48c1bde61aa1c7a84b96b3ae7ccc7d0cc50743fff",
         "tests/query-events.test.ts": "c7c4573cb6220564e29e5ee9bd95fdadee58dba426199d9778506571d280bf3d",
         "tests/query-filter.test.ts": "cabc2aa76c97b879ae823b3e252966dfa743eecd320f35e7e6a9f3f086803f86",
-        "tests/query-owner.test.ts": "d7703b9242da562cbd823a866c26a5dd5bd7122a307e54805f62ce74db6483a3",
+        "tests/query-owner.test.ts": "dcdbfc8bafd02b6b855cafd06b183948eb39a91ff56e2b08fafca65ccd6a1aba",
         "tests/query-policy.test.ts": "914702a1ae97649131495f50eb64a3bb554d7fcfe370bb27228323ef13270e20",
         "tests/query-usability.test.ts": "f2919940a513ee1440a20b162f7c1dbb2cf81841368483899765b9b58c9c26c6",
         "tests/query-view-prefix.test.ts": "2c00662e76474c8cb6fb51cec6e9a27626ce961b076bd74653ab84475b4ae764",
@@ -822,11 +822,11 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "b1226efd605154adab6a80874568617c2f974aec",
+      "head": "659804a67fe5d54ba62596eff2df5fa4ad04e204",
       "outcome": "no-change",
-      "reason": "Generated leaves now assign the original mutation runner during rebuild and retain owner admission for the complete mutation function.",
+      "reason": "Retirement preserves complete Effect Causes while reporting each generated finalizer failure once.",
       "evidence": [
-        "Changed: src/core/query-owner.ts, src/core/utility-tree.ts at b1226efd605154adab6a80874568617c2f974aec"
+        "Changed: src/core/query-owner.ts, tests/query-owner.test.ts at 659804a67fe5d54ba62596eff2df5fa4ad04e204"
       ]
     },
     "source:vite.config.ts": {

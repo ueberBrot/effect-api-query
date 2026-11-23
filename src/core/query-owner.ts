@@ -11,8 +11,6 @@ import type {
 } from "@tanstack/query-core";
 import { Cause, Exit, Predicate } from "effect";
 
-import { isEffectHttpApiQueryError } from "../http/errors";
-import { isEffectRpcQueryError } from "../rpc/errors";
 import type {
   RuntimeMutationBuilder,
   RuntimeMutationFunction,
@@ -24,6 +22,7 @@ import {
   registerLeafTracking,
   reapplyLeafConfiguration,
 } from "./configure-utils";
+import { getExecutionCause } from "./declared-error";
 import { resolveRuntime } from "./runtime";
 import type { RunPromiseExit, RuntimeInput } from "./types";
 import { isUtilityNode, mapUtilityChildren } from "./utility-node";
@@ -39,6 +38,53 @@ const queryOptionNames = [
   "liveOptions",
   "streamedOptions",
 ] as const;
+
+interface PendingWork {
+  readonly result: Promise<unknown>;
+  cancelled: boolean;
+  failedExit?: Cause.Cause<unknown> | undefined;
+}
+
+const drainAcceptedWork = async (
+  accepted: readonly PendingWork[]
+): Promise<unknown[]> => {
+  const completions: PendingWork["result"][] = [];
+  for (const { result } of accepted) {
+    completions.push(result);
+  }
+  const settled = await Promise.allSettled(completions);
+  const failures: unknown[] = [];
+  const wrappedCauses = new Map<Cause.Cause<unknown>, number>();
+  const failedExits: Cause.Cause<unknown>[] = [];
+  for (const [index, work] of accepted.entries()) {
+    const outcome = settled[index];
+    if (work.failedExit !== undefined) {
+      failedExits.push(work.failedExit);
+    }
+    if (outcome?.status !== "rejected" || work.cancelled) {
+      continue;
+    }
+    failures.push(outcome.reason);
+    const cause = getExecutionCause(outcome.reason);
+    if (cause !== undefined) {
+      wrappedCauses.set(cause, (wrappedCauses.get(cause) ?? 0) + 1);
+    }
+  }
+  for (const cause of failedExits) {
+    const wrapped = wrappedCauses.get(cause) ?? 0;
+    if (wrapped === 0) {
+      failures.push(cause);
+    } else {
+      wrappedCauses.set(cause, wrapped - 1);
+    }
+  }
+  return failures;
+};
+
+const failedExitCause = <A, E>(exit: Exit.Exit<A, E>) =>
+  Exit.isFailure(exit) && !Cause.hasInterruptsOnly(exit.cause)
+    ? exit.cause
+    : undefined;
 
 /** Registers only resources whose lifetime is explicitly transferred to the owner. */
 export interface QueryOwnerSetup extends Omit<
@@ -97,10 +143,8 @@ export const acquireQueryOwner = async <A>(
 ): Promise<QueryOwner<A>> => {
   const ownerToken = Symbol("QueryOwner");
   const releases: (() => void | Promise<void>)[] = [];
-  const pending = new Set<Promise<unknown>>();
-  const cancelled = new WeakSet<Promise<unknown>>();
+  const pending = new Set<PendingWork>();
   const queries = new Set<AbortController>();
-  const drainFailures: unknown[] = [];
   const queryClient = new QueryClient({
     ...cacheConfig,
     queryCache: new QueryCache({ ...cacheConfig?.queryCache?.config }),
@@ -115,7 +159,8 @@ export const acquireQueryOwner = async <A>(
   };
   const track = async <T>(
     execute: () => Promise<T>,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    readFailure?: (value: T) => Cause.Cause<unknown> | undefined
   ): Promise<T> => {
     assertActive();
     let complete!: (value: T | PromiseLike<T>) => void;
@@ -126,63 +171,62 @@ export const acquireQueryOwner = async <A>(
       complete = resolve;
       fail = reject;
     });
-    pending.add(result);
+    const work: PendingWork = { result, cancelled: false };
+    pending.add(work);
     void (async () => {
       try {
-        complete(await execute());
+        const value = await execute();
+        if (!active) {
+          work.failedExit = readFailure?.(value);
+        }
+        complete(value);
       } catch (error) {
-        if (
+        const cause = getExecutionCause(error);
+        work.cancelled =
           signal?.aborted === true &&
           (error instanceof CancelledError ||
-            ((isEffectRpcQueryError(error) ||
-              isEffectHttpApiQueryError(error)) &&
-              Cause.hasInterruptsOnly(error.cause)))
-        ) {
-          cancelled.add(result);
-        }
+            (cause !== undefined && Cause.hasInterruptsOnly(cause)));
         fail(error);
       }
     })();
     try {
       return await result;
     } finally {
-      pending.delete(result);
+      pending.delete(work);
     }
   };
   const wrapRunner: QueryOwner<A>["wrapRunner"] = (input) => {
     const runner = resolveRuntime(input);
     return async (effect, options) =>
-      track(async () => {
-        const controller =
-          options?.signal === undefined ? undefined : new AbortController();
-        const abort = () => controller?.abort();
-        if (controller !== undefined) {
-          queries.add(controller);
-          options?.signal?.addEventListener("abort", abort, { once: true });
-          if (options?.signal?.aborted === true) {
-            controller.abort();
-          }
-        }
-        try {
-          const exit = await runner(
-            effect,
-            controller === undefined ? undefined : { signal: controller.signal }
-          );
-          if (
-            !active &&
-            Exit.isFailure(exit) &&
-            !Cause.hasInterruptsOnly(exit.cause)
-          ) {
-            drainFailures.push(exit.cause);
-          }
-          return exit;
-        } finally {
+      track(
+        async () => {
+          const controller =
+            options?.signal === undefined ? undefined : new AbortController();
+          const abort = () => controller?.abort();
           if (controller !== undefined) {
-            queries.delete(controller);
-            options?.signal?.removeEventListener("abort", abort);
+            queries.add(controller);
+            options?.signal?.addEventListener("abort", abort, { once: true });
+            if (options?.signal?.aborted === true) {
+              controller.abort();
+            }
           }
-        }
-      });
+          try {
+            return await runner(
+              effect,
+              controller === undefined
+                ? undefined
+                : { signal: controller.signal }
+            );
+          } finally {
+            if (controller !== undefined) {
+              queries.delete(controller);
+              options?.signal?.removeEventListener("abort", abort);
+            }
+          }
+        },
+        undefined,
+        failedExitCause
+      );
   };
   const wrapLeafExecution = (
     rebuilt: RuntimeUtilityNode
@@ -302,8 +346,7 @@ export const acquireQueryOwner = async <A>(
       return disposal;
     }
     active = false;
-    const accepted = [...pending];
-    const draining = Promise.allSettled(accepted);
+    const draining = drainAcceptedWork([...pending]);
     disposal = (async () => {
       await Promise.resolve();
       const failures: unknown[] = [];
@@ -315,17 +358,7 @@ export const acquireQueryOwner = async <A>(
       } catch (error) {
         failures.push(error);
       }
-      const drained = await draining;
-      for (const [index, result] of drained.entries()) {
-        const promise = accepted[index];
-        if (
-          result.status === "rejected" &&
-          (promise === undefined || !cancelled.has(promise))
-        ) {
-          failures.push(result.reason);
-        }
-      }
-      failures.push(...drainFailures);
+      failures.push(...(await draining));
       try {
         queryClient.clear();
       } catch (error) {
