@@ -1,12 +1,23 @@
+import {
+  copyFileSync,
+  mkdirSync,
+  mkdtempSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
+import nodePath from "node:path";
+
 import { Predicate } from "effect";
 import { describe, expect, it, vi } from "vitest";
 import { isScalar, visit } from "yaml";
 
+import { capture } from "../scripts/lib/exec.mts";
 import {
   publishedRootVersion,
   resolveDocumentationRevision,
-  verifyDocumentationVersion,
 } from "../scripts/resolve-docs-release.mts";
+import { verifyDocumentationVersion } from "../scripts/verify-docs-version.mts";
 import {
   readWorkflow,
   workflowSteps,
@@ -327,6 +338,27 @@ describe("manual documentation revision", () => {
 });
 
 describe("built documentation version", () => {
+  it("runs the uploaded verifier with only the restored docs and script", () => {
+    const cwd = mkdtempSync(nodePath.join(tmpdir(), "docs-version-"));
+    try {
+      const verifier = nodePath.join(cwd, "verify-docs-version.mts");
+      const dist = nodePath.join(cwd, "apps/docs/dist");
+      mkdirSync(dist, { recursive: true });
+      writeFileSync(nodePath.join(dist, "package-version.json"), manifest);
+      copyFileSync(
+        new URL("../scripts/verify-docs-version.mts", import.meta.url),
+        verifier
+      );
+      vi.stubEnv("DOCS_VERSION", version);
+      expect(() =>
+        capture(process.execPath, [verifier], { cwd })
+      ).not.toThrow();
+    } finally {
+      vi.unstubAllEnvs();
+      rmSync(cwd, { recursive: true, force: true });
+    }
+  });
+
   it("explains how to supply missing static version metadata", () => {
     expect(() => {
       verifyDocumentationVersion(undefined, version);
@@ -454,7 +486,7 @@ describe("documentation workflow boundaries", () => {
       sameRunBuild: true,
       sameRunVerifier: true,
       verifierArtifact: "documentation-verifier",
-      verifierPath: "scripts/resolve-docs-release.mts",
+      verifierPath: "scripts/verify-docs-version.mts",
     });
   });
 
@@ -472,7 +504,7 @@ describe("documentation workflow boundaries", () => {
     const verifyVersion = build.findIndex(
       (step) =>
         step.get("run") ===
-          'node "$RUNNER_TEMP/documentation-verifier/resolve-docs-release.mts" verify-build' &&
+          'node "$RUNNER_TEMP/documentation-verifier/verify-docs-version.mts"' &&
         step.getIn(["env", "DOCS_VERSION"]) ===
           expression("needs.resolve.outputs.version")
     );

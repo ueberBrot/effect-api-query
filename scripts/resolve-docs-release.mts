@@ -1,42 +1,20 @@
-import { appendFileSync, existsSync, readFileSync } from "node:fs";
+import { appendFileSync, readFileSync } from "node:fs";
 
 import { capture } from "./lib/exec.mts";
+import {
+  packageName,
+  parseManifest,
+  validateVersion,
+} from "./verify-docs-version.mts";
 
-const packageName = "@ueberbrot/effect-api-query";
 const repository = "git+https://github.com/ueberBrot/effect-api-query.git";
 const shaPattern = /^[\da-f]{40}$/u;
-const versionPattern =
-  /^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-(?:0|[1-9]\d*|\d*[a-zA-Z-][\da-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][\da-zA-Z-]*))*)?$/u;
-
-const validateVersion = (version: string): string => {
-  if (version.length > 128 || !versionPattern.test(version)) {
-    throw new Error("An exact npm version is required.");
-  }
-  return version;
-};
 
 const validateRevision = (revision: string): string => {
   if (!shaPattern.test(revision)) {
     throw new Error("A full lowercase commit SHA is required.");
   }
   return revision;
-};
-
-const parseManifest = (json: string) => {
-  const manifest: unknown = JSON.parse(json);
-  if (
-    typeof manifest !== "object" ||
-    manifest === null ||
-    !("name" in manifest) ||
-    manifest.name !== packageName ||
-    !("version" in manifest) ||
-    typeof manifest.version !== "string" ||
-    ("private" in manifest && manifest.private === true)
-  ) {
-    throw new Error("The public root package name and version must match.");
-  }
-  validateVersion(manifest.version);
-  return { ...manifest, name: manifest.name, version: manifest.version };
 };
 
 export const publishedRootVersion = (
@@ -220,79 +198,53 @@ export const resolveDocumentationRevision = (
   return { revision, version };
 };
 
-export const verifyDocumentationVersion = (
-  json: string | undefined,
-  version: string
-): void => {
-  if (json === undefined) {
-    throw new Error(
-      "The documentation build must emit package-version.json. For a legacy release, supply docs-ref with the static package version badge and JSON metadata."
-    );
-  }
-  if (parseManifest(json).version !== validateVersion(version)) {
-    throw new Error(
-      "The documentation build is for a different package version."
-    );
-  }
-};
-
 if (import.meta.main) {
   const version = process.env["DOCS_VERSION"] ?? "";
-  if (process.argv[2] === "verify-build") {
-    const metadataPath = "apps/docs/dist/package-version.json";
-    verifyDocumentationVersion(
-      existsSync(metadataPath)
-        ? readFileSync(metadataPath, "utf-8")
-        : undefined,
-      version
+  const artifact = process.env["BUILD_ARTIFACT"] ?? "";
+  let release: ReturnType<typeof resolveDocumentationRevision>;
+  if (artifact === "") {
+    validateVersion(version);
+    const response = await fetch(
+      `https://registry.npmjs.org/@ueberbrot%2feffect-api-query/${version}`,
+      { redirect: "error", signal: AbortSignal.timeout(15_000) }
+    );
+    if (!response.ok) {
+      throw new Error("The exact package version is unavailable from npm.");
+    }
+    const metadata = await response.text();
+    if (metadata.length > 1_048_576) {
+      throw new Error("npm returned oversized package metadata.");
+    }
+    release = resolveDocumentationRevision(
+      version,
+      process.env["DOCS_REF"] ?? "",
+      metadata,
+      (args) => capture("git", args)
     );
   } else {
-    const artifact = process.env["BUILD_ARTIFACT"] ?? "";
-    let release: ReturnType<typeof resolveDocumentationRevision>;
-    if (artifact === "") {
-      validateVersion(version);
-      const response = await fetch(
-        `https://registry.npmjs.org/@ueberbrot%2feffect-api-query/${version}`,
-        { redirect: "error", signal: AbortSignal.timeout(15_000) }
+    if (
+      artifact !== "documentation-build" ||
+      process.env["GITHUB_EVENT_NAME"] !== "push" ||
+      process.env["GITHUB_REF"] !== "refs/heads/main"
+    ) {
+      throw new Error(
+        "Automatic documentation must use the release run's CI artifact."
       );
-      if (!response.ok) {
-        throw new Error("The exact package version is unavailable from npm.");
-      }
-      const metadata = await response.text();
-      if (metadata.length > 1_048_576) {
-        throw new Error("npm returned oversized package metadata.");
-      }
-      release = resolveDocumentationRevision(
-        version,
-        process.env["DOCS_REF"] ?? "",
-        metadata,
-        (args) => capture("git", args)
-      );
-    } else {
-      if (
-        artifact !== "documentation-build" ||
-        process.env["GITHUB_EVENT_NAME"] !== "push" ||
-        process.env["GITHUB_REF"] !== "refs/heads/main"
-      ) {
-        throw new Error(
-          "Automatic documentation must use the release run's CI artifact."
-        );
-      }
-      release = {
-        revision: validateRevision(process.env["GITHUB_SHA"] ?? ""),
-        version: publishedRootVersion(
-          readFileSync("package.json", "utf-8"),
-          process.env["PUBLISHED_PACKAGES"] ?? ""
-        ),
-      };
     }
-    const output = process.env["GITHUB_OUTPUT"];
-    if (output === undefined || output === "") {
-      throw new Error("GITHUB_OUTPUT is required.");
-    }
-    appendFileSync(
-      output,
-      `revision=${release.revision}\nversion=${release.version}\n`
-    );
+    release = {
+      revision: validateRevision(process.env["GITHUB_SHA"] ?? ""),
+      version: publishedRootVersion(
+        readFileSync("package.json", "utf-8"),
+        process.env["PUBLISHED_PACKAGES"] ?? ""
+      ),
+    };
   }
+  const output = process.env["GITHUB_OUTPUT"];
+  if (output === undefined || output === "") {
+    throw new Error("GITHUB_OUTPUT is required.");
+  }
+  appendFileSync(
+    output,
+    `revision=${release.revision}\nversion=${release.version}\n`
+  );
 }

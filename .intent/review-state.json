@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "9da314a3292bbf824a01b664253d9f3a2d362374762daf0280525c846534212c",
+      "fingerprint": "1f9be3561e8c736c9d500cfa03fa675fd9c685bb264f7734b2f2094ce47e1a2b",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -199,7 +199,8 @@
         "scripts/oxlint-no-comments.mts": "13bc2661cb403d0ded2ad3d08a42296160ee4d7c969580c4438fd8822d096660",
         "scripts/performance/budgets.mts": "a2ace3af9dbc469203a35dd0f3a1359326a58e25b69eac284a3c3dbd2575564a",
         "scripts/performance/common.mts": "6ce0e1c018e08a442fcf787740d7ddd63457069ee932d28b04d8a1b41e136028",
-        "scripts/resolve-docs-release.mts": "06e3c66de0b82e7587dab3ec9bad4f693622edbb85a238acf25a44bf9c3b034f",
+        "scripts/resolve-docs-release.mts": "d40db299f62659ab3cf57bdbf90aa682700d072c0d82548d78702cfdaa262183",
+        "scripts/verify-docs-version.mts": "c7389e5fbee57e9b2991e2cd0668502bb59ac7d348d59a3c4d9c0b1d37d2f960",
         "scripts/version-packages.mts": "e514a013a90489d8d0ff5eb0620276f923c85fa765061aa4d3f312ac2ee4c7ad",
         "skills/effect-api-query/SKILL.md": "112b039108201d3aecc3b2e9c6dbd665ddaa01f37e0a16997814ea9b533c95a1",
         "skills/effect-api-query/references/cache-workflows.md": "9f370822c4f1ec986ef27afc7fd7647ad24b701f671f33d1fb86e8478d73769f",
@@ -276,7 +277,7 @@
         "tests/create-rpc-query-utils-structural-sharing.test.ts": "f9bd67aed07f7aed8113fdbfeb31810dbc19e0cb4ec0cbeef64a14e7589002fb",
         "tests/create-rpc-query-utils.test.ts": "1229679c118d267fd0a94ffcb560a9a7f77a8acecd423ed742c036c667b89faf",
         "tests/docs-examples.test.ts": "c5f3f714eebf1a5f418e519fab89411d60eb1d2be128484d4d3cbc858c00354f",
-        "tests/docs-release.test.ts": "404e80d3a0773dbfebbaa4b2b98e6643ce577909fceea4090b63cd2aae71a965",
+        "tests/docs-release.test.ts": "e5e06bba99de0a82bb8e2ccb4eb7add66e8f623b200c1b56412aed3b5ea6f036",
         "tests/execution-interceptor.test.ts": "2d839cf557cfcb1116787b79eebb397921626876552d5bbdea7429feda389143",
         "tests/fixtures/async.ts": "c72af69141ce4f2dd4e9b63910ed20378e546dcd015a2d7befacd439ba4a006e",
         "tests/fixtures/decode-utf8.ts": "f0441c8aa2553ce2c1dccff7cac1bbaec2cdc668916278c7a0efff90482ace61",
@@ -405,18 +406,18 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
+      "head": "468e21895d1f391a2fc5eff5546b07dd2d4762b3",
       "outcome": "no-change",
-      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
+      "reason": "The separation of the verifier repairs the repository deployment without changing any consumer task or public API.",
       "evidence": [
-        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
-        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
-        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
-        "Scoped generated changes: package.json."
+        "75 tests in tests/docs-release.test.ts passed",
+        "Standalone 0.8.0 verifier passed with only the restored docs and script",
+        "Manual resolution confirmed the 0.8.0 npm record and Git tag",
+        "actionlint and yamllint passed"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "bc35a7f663a254030df5561476938f6464ac8ec6f6f3704df473479af8af1d82",
+      "fingerprint": "b3be5e92fb1414da0a63707494d15d950f59877586a597c8751f49dfd4408209",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -615,7 +616,8 @@
         "scripts/oxlint-no-comments.mts": "13bc2661cb403d0ded2ad3d08a42296160ee4d7c969580c4438fd8822d096660",
         "scripts/performance/budgets.mts": "a2ace3af9dbc469203a35dd0f3a1359326a58e25b69eac284a3c3dbd2575564a",
         "scripts/performance/common.mts": "6ce0e1c018e08a442fcf787740d7ddd63457069ee932d28b04d8a1b41e136028",
-        "scripts/resolve-docs-release.mts": "06e3c66de0b82e7587dab3ec9bad4f693622edbb85a238acf25a44bf9c3b034f",
+        "scripts/resolve-docs-release.mts": "d40db299f62659ab3cf57bdbf90aa682700d072c0d82548d78702cfdaa262183",
+        "scripts/verify-docs-version.mts": "c7389e5fbee57e9b2991e2cd0668502bb59ac7d348d59a3c4d9c0b1d37d2f960",
         "scripts/version-packages.mts": "e514a013a90489d8d0ff5eb0620276f923c85fa765061aa4d3f312ac2ee4c7ad",
         "skills/effect-api-query/SKILL.md": "112b039108201d3aecc3b2e9c6dbd665ddaa01f37e0a16997814ea9b533c95a1",
         "skills/effect-api-query/references/cache-workflows.md": "9f370822c4f1ec986ef27afc7fd7647ad24b701f671f33d1fb86e8478d73769f",
@@ -692,7 +694,7 @@
         "tests/create-rpc-query-utils-structural-sharing.test.ts": "f9bd67aed07f7aed8113fdbfeb31810dbc19e0cb4ec0cbeef64a14e7589002fb",
         "tests/create-rpc-query-utils.test.ts": "1229679c118d267fd0a94ffcb560a9a7f77a8acecd423ed742c036c667b89faf",
         "tests/docs-examples.test.ts": "c5f3f714eebf1a5f418e519fab89411d60eb1d2be128484d4d3cbc858c00354f",
-        "tests/docs-release.test.ts": "404e80d3a0773dbfebbaa4b2b98e6643ce577909fceea4090b63cd2aae71a965",
+        "tests/docs-release.test.ts": "e5e06bba99de0a82bb8e2ccb4eb7add66e8f623b200c1b56412aed3b5ea6f036",
         "tests/execution-interceptor.test.ts": "2d839cf557cfcb1116787b79eebb397921626876552d5bbdea7429feda389143",
         "tests/fixtures/async.ts": "c72af69141ce4f2dd4e9b63910ed20378e546dcd015a2d7befacd439ba4a006e",
         "tests/fixtures/decode-utf8.ts": "f0441c8aa2553ce2c1dccff7cac1bbaec2cdc668916278c7a0efff90482ace61",
@@ -821,25 +823,30 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
+      "head": "468e21895d1f391a2fc5eff5546b07dd2d4762b3",
       "outcome": "no-change",
-      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
+      "reason": "The domain map, skill spec and skill tree still cover the same consumer tasks. The existing script source glob covers the separate verifier.",
       "evidence": [
-        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
-        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
-        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
-        "Scoped generated changes: package.json."
+        "75 tests in tests/docs-release.test.ts passed",
+        "Standalone 0.8.0 verifier passed with only the restored docs and script",
+        "Manual resolution confirmed the 0.8.0 npm record and Git tag",
+        "actionlint and yamllint passed"
       ]
     },
     "source:vite.config.ts": {
-      "fingerprint": "5eb8295660f22bbb1720021cc77728fad6573a662ef0bff4db067617ad30f6ec",
+      "fingerprint": "b3fb5884e86ed0b7688943d3e87742bae94deb1da76f7c2dea39f98f9c106267",
       "snapshot": {
-        "vite.config.ts": "a2ccf56e8317fdec4dce75eb136cf54cdc0fc5261b014e6be919d4fd99738509"
+        "vite.config.ts": "455255d540aee86c6cb250c5eabab29adffef86c14272b0e712aa504b67180f5"
       },
-      "head": "58b86564697ad352c85e52fc3bf0aaafcda1142d",
+      "head": "468e21895d1f391a2fc5eff5546b07dd2d4762b3",
       "outcome": "no-change",
-      "reason": "Removed repo/no-comments ratchet after #228 and added tests/publication-deadline.test.ts to unstable-API test allowlist; internal lint config only.",
-      "evidence": ["vp run check and vp test -- tests/no-comments-rule.test.ts"]
+      "reason": "The verifier uses the same scoped input-validation lint exception as the original release script. There is no change to public behavior or consumer guidance.",
+      "evidence": [
+        "75 tests in tests/docs-release.test.ts passed",
+        "Standalone 0.8.0 verifier passed with only the restored docs and script",
+        "Manual resolution confirmed the 0.8.0 npm record and Git tag",
+        "actionlint and yamllint passed"
+      ]
     },
     "source:.github/workflows/release.yml": {
       "fingerprint": "07a534472bf31e21369f8c35796ee2048edbf753d16b03fe12068eb9bf4e84d5",
@@ -1857,17 +1864,18 @@
       ]
     },
     "source:.github/workflows/deploy-docs.yml": {
-      "fingerprint": "b5498f4a7c128ef9fc336b67de5c3ea8918a5472a16c567968f97d0c7acd7655",
+      "fingerprint": "20eaba630f71f7ea5163424dadaf27cdfa2eb192dd5bb7c5569fc9672b524b84",
       "snapshot": {
-        ".github/workflows/deploy-docs.yml": "3c60bce9216ecc890e9a26e75d089a6d19316403f2b344c7501f7644bc5f9f99"
+        ".github/workflows/deploy-docs.yml": "33bd152e0f7094cb75a7f8327e295fcf3b7c925f19c8ced941e0273fa92168c9"
       },
-      "head": "33df3355f25c2391b87ce80a60a8c34db84ed481",
-      "outcome": "updated",
-      "reason": "The existing version-selection guidance and ADR 0030 now match automatic deployment after successful root publication, optional manual docs-only corrections for an exact released version, and a static built version badge/JSON marker. Applications can identify the documented package version without a live npm lookup.",
+      "head": "468e21895d1f391a2fc5eff5546b07dd2d4762b3",
+      "outcome": "no-change",
+      "reason": "The workflow now uploads a standalone verifier and keeps the same package-version gate. Existing consumer guidance still applies.",
       "evidence": [
-        "Reviewed .github/workflows/deploy-docs.yml with .github/workflows/release.yml, .github/workflows/deploy-docs.yml, scripts/resolve-docs-release.mts, the compatibility guide, and skills/effect-api-query/references/frameworks-and-hosts.md.",
-        "The resolver passes 76 tests, including publication gating, docs-only revisions, legacy-release refusal, and built metadata validation. Four Chromium cases pass for static version HTML, JSON metadata, navigation, and zero registry requests. Final docs checks/build pass.",
-        "Git/npm read-only smoke checks validate the existing release identity and expected legacy/current-main refusal. A live npm publication or Pages deployment was not performed."
+        "75 tests in tests/docs-release.test.ts passed",
+        "Standalone 0.8.0 verifier passed with only the restored docs and script",
+        "Manual resolution confirmed the 0.8.0 npm record and Git tag",
+        "actionlint and yamllint passed"
       ]
     },
     "source:playwright.config.ts": {

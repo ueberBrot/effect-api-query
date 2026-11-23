@@ -151,7 +151,10 @@ export default defineConfig({
         },
       },
       {
-        files: ["scripts/resolve-docs-release.mts"],
+        files: [
+          "scripts/resolve-docs-release.mts",
+          "scripts/verify-docs-version.mts",
+        ],
         rules: {
           "anti-slop/no-runtime-typeof": "off",
         },
