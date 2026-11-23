@@ -4123,6 +4123,210 @@
       "evidence": [
         ".changeset/fresh-queries-simpler-setup.md, docs/adr/0001-target-effect-4-release-candidate.md, docs/adr/0042-define-the-compatibility-promise.md, docs/adr/0045-raise-0-8-0-peer-floors.md, package.json and the mapped skill references. Docs excerpts and skill validation passed."
       ]
+    },
+    "source:.changeset/accept-tag-keyed-rpc-clients.md": {
+      "fingerprint": "9167420685973e4be1e71cdae1c2f6299ed38a2df6a1e28b1ce5bd714c50ef51",
+      "snapshot": {
+        ".changeset/accept-tag-keyed-rpc-clients.md": "12b5e8b9c520a130b5bfd1f5eeedbcca4562b1d8b887103d39a8988dc1661016"
+      },
+      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "outcome": "no-change",
+      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "evidence": [
+        ".changeset/accept-tag-keyed-rpc-clients.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+      ]
+    },
+    "source:.changeset/add-optional-react-providers.md": {
+      "fingerprint": "cc87eaf5189962a9f8126769fcb269d1c4d96dba4979b3b4d40f6c3dce950867",
+      "snapshot": {
+        ".changeset/add-optional-react-providers.md": "598f3dcbb88aea96c936448e5d4c3d86378533a65187fdfecebdaebc4ec41a7a"
+      },
+      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "outcome": "no-change",
+      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "evidence": [
+        ".changeset/add-optional-react-providers.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+      ]
+    },
+    "source:.changeset/align-query-effects-with-query-core.md": {
+      "fingerprint": "2aed156f870680d4af08b8f53e27bab198f8bcf4779b30f85575ac98be149a35",
+      "snapshot": {
+        ".changeset/align-query-effects-with-query-core.md": "cf6996410620bcc989053928d990b8425d6e68864251bf7c31fc3475e3f53bb5"
+      },
+      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "outcome": "no-change",
+      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "evidence": [
+        ".changeset/align-query-effects-with-query-core.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+      ]
+    },
+    "source:.changeset/bind-scoped-reactivity-invalidation.md": {
+      "fingerprint": "2226e77342594f0b8d0e72b6dac77d888db16e644b74adae48aa5f1c41fcef6f",
+      "snapshot": {
+        ".changeset/bind-scoped-reactivity-invalidation.md": "e9a84358ad2e445341d2f5e8bc84c0e307a667e53187a50f50b6de9c68a5d6a7"
+      },
+      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "outcome": "no-change",
+      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "evidence": [
+        ".changeset/bind-scoped-reactivity-invalidation.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+      ]
+    },
+    "source:.changeset/build-utility-leaves-on-demand.md": {
+      "fingerprint": "6c3151ad2071054563edeccb46b4689c3764943d521adf9c2b0ed598f82c1878",
+      "snapshot": {
+        ".changeset/build-utility-leaves-on-demand.md": "9352d94edabf32e1dd7ba9d239d62decddcddb29da3d707cccebc9b96efe9fe4"
+      },
+      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "outcome": "no-change",
+      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "evidence": [
+        ".changeset/build-utility-leaves-on-demand.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+      ]
+    },
+    "source:.changeset/colocate-query-filters.md": {
+      "fingerprint": "8a8ebf025d67e28cb6cd82d302c63adf912df0142b3f1cff9687487e3be1e6fc",
+      "snapshot": {
+        ".changeset/colocate-query-filters.md": "1bca2e720040625a00e0fa9b6b97112f8dd8a41387f977fa4d51d7ac9ea81cb8"
+      },
+      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "outcome": "no-change",
+      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "evidence": [
+        ".changeset/colocate-query-filters.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+      ]
+    },
+    "source:.changeset/compose-hydration-registries.md": {
+      "fingerprint": "eaaaed4e9d70c1f12f9beaaebd2f4b544b64d1b0a963f159802a4f58e0978a8f",
+      "snapshot": {
+        ".changeset/compose-hydration-registries.md": "0e4f6bd94aef397cd1e75d5cd89c72784a77ec0e21a16821b6ad3f22b8e6bb45"
+      },
+      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "outcome": "no-change",
+      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "evidence": [
+        ".changeset/compose-hydration-registries.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+      ]
+    },
+    "source:.changeset/define-policies-from-contracts.md": {
+      "fingerprint": "277a9b8322ea3b7bde8a2da80f1d0680c6f0974b24fd5c854f05d0e590964b9b",
+      "snapshot": {
+        ".changeset/define-policies-from-contracts.md": "44cea259d80041b85c504194c050a0c3e0a68753e64955ae33d0b3d9725cf915"
+      },
+      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "outcome": "no-change",
+      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "evidence": [
+        ".changeset/define-policies-from-contracts.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+      ]
+    },
+    "source:.changeset/derive-hydration-codecs.md": {
+      "fingerprint": "8e15d9322a7d5d0f4f66477b9d8c197c40c127184410c1c03cb53ef1fd50c99b",
+      "snapshot": {
+        ".changeset/derive-hydration-codecs.md": "ab7df4e33189f7638ce9ed88132249e1176b9f61a526abf8368379390efb15b6"
+      },
+      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "outcome": "no-change",
+      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "evidence": [
+        ".changeset/derive-hydration-codecs.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+      ]
+    },
+    "source:.changeset/flatten-utility-policy-maps.md": {
+      "fingerprint": "14998f05b2b73447f9fe13c03061f4587e189b505a99f787a177e0f9cda21a07",
+      "snapshot": {
+        ".changeset/flatten-utility-policy-maps.md": "62e1715fc406cd179fde267a4d60a101a48995391b802cba016c73fc7a6a2f46"
+      },
+      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "outcome": "no-change",
+      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "evidence": [
+        ".changeset/flatten-utility-policy-maps.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+      ]
+    },
+    "source:.changeset/make-key-prefix-optional.md": {
+      "fingerprint": "721b0f2f711d8eddcdf37445699c2b7c81390d651070dbae2f1bdf9324a48b7f",
+      "snapshot": {
+        ".changeset/make-key-prefix-optional.md": "f268e45b4b958a64d37825f05740fa40c5c950f1a28ff626e2aa7819d83d7814"
+      },
+      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "outcome": "no-change",
+      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "evidence": [
+        ".changeset/make-key-prefix-optional.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+      ]
+    },
+    "source:.changeset/pass-input-in-key-options.md": {
+      "fingerprint": "0ceb6aba20fd1bc03890a26f647caf40499f510eb9af179d5b429f5aa4b83774",
+      "snapshot": {
+        ".changeset/pass-input-in-key-options.md": "d46ddb072084d47ebf5cd915abd805ced9fa819601025715e05f13e202a19c2d"
+      },
+      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "outcome": "no-change",
+      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "evidence": [
+        ".changeset/pass-input-in-key-options.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+      ]
+    },
+    "source:.changeset/require-supported-peer-versions.md": {
+      "fingerprint": "26f8ffbead2dae9e17a897737fd33ff06d45fd4a695b1e33f28790d08eedf9b7",
+      "snapshot": {
+        ".changeset/require-supported-peer-versions.md": "40814955f8b927a03eba689cbca7a0eb4871882edcfb5d5632e09e9e203d1001"
+      },
+      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "outcome": "no-change",
+      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "evidence": [
+        ".changeset/require-supported-peer-versions.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+      ]
+    },
+    "source:.changeset/run-buffered-leaves-directly.md": {
+      "fingerprint": "d3dee080e7171e77b7866e19f247257e4310c6428645feeff4f729ae248e9946",
+      "snapshot": {
+        ".changeset/run-buffered-leaves-directly.md": "7dbf2241cb05682e90d97c7a89baf218ad12405c10d974de8b22c3dcf3cb2d38"
+      },
+      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "outcome": "no-change",
+      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "evidence": [
+        ".changeset/run-buffered-leaves-directly.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+      ]
+    },
+    "source:.changeset/share-execution-error-handling.md": {
+      "fingerprint": "d6c06749a3bece1c0c4d3103971b74215ff90a20d794704bbda3e4d30872915a",
+      "snapshot": {
+        ".changeset/share-execution-error-handling.md": "28c00c5f9f50f2cf4223138f85f0d744a99a57debd53406abf074a848c190d32"
+      },
+      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "outcome": "no-change",
+      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "evidence": [
+        ".changeset/share-execution-error-handling.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+      ]
+    },
+    "source:.changeset/track-utilities-with-query-owners.md": {
+      "fingerprint": "ae6cf9d8ca5eae8c7cb28e4b4e42dd4b1ddfd2a2aea3aefe10a7f9ca4a10eb97",
+      "snapshot": {
+        ".changeset/track-utilities-with-query-owners.md": "20249a21407189377ce61d0be51c248391ffd0319651cf07401438b63e1cdbdc"
+      },
+      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "outcome": "no-change",
+      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "evidence": [
+        ".changeset/track-utilities-with-query-owners.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+      ]
+    },
+    "source:.changeset/unify-runtime-options.md": {
+      "fingerprint": "8cfb12a1f0c04b41fcafb790e1b7a840d0f29dde4e648aaa8c6554ab378d80d7",
+      "snapshot": {
+        ".changeset/unify-runtime-options.md": "87de81a3fe238370d6c67690c6ff9bac823030f531457c402d253df9affb81a9"
+      },
+      "head": "82fe8a43515bdc923678bee73bee1cd37e4d0e70",
+      "outcome": "no-change",
+      "reason": "The focused release note describes an existing 0.8.0 change. The shipped usage guidance and planning record already cover that behavior.",
+      "evidence": [
+        ".changeset/unify-runtime-options.md was checked against the public API and ADRs 0044–0054. Changesets parsed all 17 entries and resolves the root package from 0.7.1 to 0.8.0. Release-note formatting passed."
+      ]
     }
   }
 }
