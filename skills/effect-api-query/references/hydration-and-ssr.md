@@ -119,7 +119,7 @@ Call `createContractHydrationRegistry(groupOrApi)` without a client. If utilitie
 
 Derivation covers buffered queries, HTTP metadata, live values, and accumulated history. It preserves decoded header wrappers, overlapping union members in objects and arrays, and distinct `undefined` and `null` stream elements. For endpoints with several success statuses, HTTP metadata uses the cached status to select the corresponding schemas. Hydration rebuilds a frozen metadata envelope. Buffered HTTP query data has no status, so derivation prefers a success schema that accepts all cached fields. Use matching package versions and contract declarations on both sides of the snapshot.
 
-Add `paths["users.page"].infinite: { pageParam: Cursor }` for infinite data. A custom query codec supplies the default metadata data and infinite page codec. Set `views` or path settings directly on the configuration objects to opt out with `false`. Use `Schema.Json` for JSON values. Supply an override or opt out for unrestricted `Schema.Any` or opaque schemas without a JSON codec.
+Add `paths["users.page"].infinite: { pageParam: Cursor }` for infinite data. A custom query codec supplies the default metadata data and infinite page codec. Set `views` or path settings directly on the configuration objects to opt out with `false`. Use `Schema.Json` for JSON values. Supply a JSON codec or opt out for unrestricted `Schema.Any`, `Schema.Unknown`, `Schema.ObjectKeyword`, or opaque schemas.
 
 ### Register a custom view
 

@@ -125,12 +125,17 @@ const isOpaqueDeclaration = (ast: SchemaAST.AST): boolean =>
   !Predicate.isFunction(ast.annotations?.["toCodecJson"]) &&
   !Predicate.isFunction(ast.annotations?.["toCodec"]);
 
-const isImplicitJsonLink = (link: SchemaAST.Link): boolean => {
-  const fallback = Schema.toCodecJson(Schema.Unknown).ast.encoding?.[0];
+const isImplicitJsonLink = (
+  link: SchemaAST.Link,
+  schema: Schema.Top
+): boolean => {
+  const fallback = Schema.toCodecJson(schema).ast.encoding?.[0];
   return (
     fallback !== undefined &&
     link.to.annotations === fallback.to.annotations &&
-    link.transformation === fallback.transformation
+    link.transformation === fallback.transformation &&
+    (!SchemaAST.isUnion(fallback.to) ||
+      (SchemaAST.isUnion(link.to) && link.to.types === fallback.to.types))
   );
 };
 
@@ -146,15 +151,20 @@ const isUnencodableAst = (
     return true;
   }
   if (ast.encoding !== undefined) {
-    if (isOpaqueDeclaration(ast) || SchemaAST.isUnknown(ast)) {
-      const [firstLink] = ast.encoding;
-      if (
-        isImplicitJsonLink(firstLink) ||
+    const [firstLink] = ast.encoding;
+    if (
+      SchemaAST.isObjectKeyword(ast) &&
+      isImplicitJsonLink(firstLink, Schema.ObjectKeyword)
+    ) {
+      return true;
+    }
+    if (
+      (isOpaqueDeclaration(ast) || SchemaAST.isUnknown(ast)) &&
+      (isImplicitJsonLink(firstLink, Schema.Unknown) ||
         SchemaAST.isUnknown(firstLink.to) ||
-        firstLink.to._tag === "Any"
-      ) {
-        return true;
-      }
+        firstLink.to._tag === "Any")
+    ) {
+      return true;
     }
     return ast.encoding.some((link) => isUnencodableAst(link.to, seen));
   }
