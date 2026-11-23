@@ -782,10 +782,7 @@ const validateSegments = (
 const readPathsOption = (
   options: Record<string, unknown> | undefined
 ): Record<string, unknown> => {
-  if (options === undefined || !Object.hasOwn(options, "paths")) {
-    return {};
-  }
-  const { paths } = options;
+  const paths = options?.["paths"];
   if (paths === undefined) {
     return {};
   }

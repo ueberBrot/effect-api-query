@@ -671,6 +671,41 @@ describe("createContractHydrationRegistry — HTTP contracts", () => {
     }
   });
 
+  it("honors a top-level paths getter on RPC and HTTP hydration options", () => {
+    const success = Schema.String.pipe(
+      Schema.middlewareDecoding((decode) =>
+        DecodeSvc.pipe(Effect.andThen(decode))
+      )
+    );
+    const group = RpcGroup.make(Rpc.make("read", { success }));
+    const api = HttpApi.make("getter-paths").add(
+      HttpApiGroup.make("values", { topLevel: true }).add(
+        HttpApiEndpoint.get("read", "/value", { success })
+      )
+    );
+    const prototype = {
+      get paths() {
+        return { read: false } as const;
+      },
+    };
+    const options = { paths: prototype.paths };
+    Object.setPrototypeOf(options, prototype);
+    Reflect.deleteProperty(options, "paths");
+    const rpc: HydrationRegistry = createContractHydrationRegistry(
+      group,
+      options
+    );
+    const http: HydrationRegistry = createContractHydrationRegistry(
+      api,
+      options
+    );
+    expect([
+      rpc.matches(["rpc", "read", "query"]),
+      http.matches(["http", "getter-paths", "read", "query"]),
+      http.matches(["http", "getter-paths", "read", "metadata"]),
+    ]).toStrictEqual([false, false, false]);
+  });
+
   it("ignores inherited view overrides on accepted RPC and HTTP paths", () => {
     const group = RpcGroup.make(Rpc.make("read", { success: Schema.String }));
     const api = HttpApi.make("own-views").add(
