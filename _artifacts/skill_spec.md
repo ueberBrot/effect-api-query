@@ -173,3 +173,5 @@ The domain map records the new setup, hydration, and React tasks. The skill tree
 The PR #225 review fixes match full canonical input across policies and require retention when selecting a policy on an unconfigured leaf. Hydration preserves overlapping nested and SSE union members, supports Effect's JSON schemas, and requires an explicit codec for unrestricted data. The existing filter and hydration runtime tests and public type fixtures cover these behaviors. The skill tree already maps those sources.
 
 The owner retirement review verifies that accepted mutation attempts can reach their runtime after retirement starts. The cache reference distinguishes those attempts from new calls to a manually wrapped runner. The query-owner suite covers both tracking and configuration orders.
+
+The hydration review confirms that successful native query state can retain an earlier failure reason. The SSR and hydration examples filter both error fields before transfer. The existing hydration reference owns this guidance, and a router regression covers a recovered successful entry.

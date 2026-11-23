@@ -85,7 +85,7 @@ Both caches keep decoded `Profile` values. Only the snapshot contains encoded da
 
 ## Omit failed queries by default
 
-Keep `defaultShouldDehydrateQuery` so the browser refetches omitted failures with its own client. A new failure includes the generated error and its Cause. The examples keep this filter when selecting the profile prefix.
+Use `defaultShouldDehydrateQuery` to select successful queries. A successful entry can retain an earlier failure reason. Before sending a public snapshot, also require `state.error` and `state.fetchFailureReason` to be `null`. The browser can refetch omitted entries with its own client.
 
 To transfer a failure, encode and decode `state.error` and `state.fetchFailureReason` separately. Native data callbacks only transform data. Allowlist public tags and fields. Leave out private messages, defects, and transport details.
 

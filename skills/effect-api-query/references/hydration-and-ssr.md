@@ -83,7 +83,10 @@ export const snapshotProfile = (queryClient: QueryClient): string =>
     dehydrate(queryClient, {
       shouldDehydrateMutation: () => false,
       shouldDehydrateQuery: (query) =>
-        defaultShouldDehydrateQuery(query) && query.queryKey[0] === "profile",
+        defaultShouldDehydrateQuery(query) &&
+        query.state.error === null &&
+        query.state.fetchFailureReason === null &&
+        query.queryKey[0] === "profile",
       serializeData: Schema.encodeUnknownSync(Profile),
     })
   );
@@ -134,7 +137,10 @@ const encodeProfiles = Effect.fnUntraced(function* (queryClient: QueryClient) {
   const snapshot = dehydrate(queryClient, {
     shouldDehydrateMutation: () => false,
     shouldDehydrateQuery: (query) =>
-      defaultShouldDehydrateQuery(query) && registry.matches(query.queryKey),
+      defaultShouldDehydrateQuery(query) &&
+      query.state.error === null &&
+      query.state.fetchFailureReason === null &&
+      registry.matches(query.queryKey),
   });
   const queries = yield* registry.encodeQueries(snapshot.queries);
   return JSON.stringify({ ...snapshot, queries });
@@ -147,7 +153,7 @@ On the server, filter dehydration with `registry.matches(query.queryKey)` and aw
 
 A duplicate registration throws `HydrationCodecError` with `DuplicateCodec`. Preparation reports `UnknownQuery` for unmatched keys and `UnsettledQuery` for unsuccessful or promise-bearing entries. Select settled successes. For one synchronous service-free codec, use `hydrationCallbacks(codec)` on matching entries.
 
-Keep `defaultShouldDehydrateQuery` to omit failures. If you transfer them, encode `state.error` and `state.fetchFailureReason` separately. Allowlist public values and headers. Reconstruct error behavior explicitly on the browser.
+For public snapshots, select successful queries and require both `state.error` and `state.fetchFailureReason` to be `null`. Query Core can retain a failure reason after status returns to success. To send a public failure, encode both fields separately, allowlist public values and headers, and reconstruct error behavior in the browser.
 
 ## Drain request work before disposal
 

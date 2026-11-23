@@ -48,7 +48,10 @@ setupRouterSsrQueryIntegration({
   router,
   queryClient,
   dehydrateOptions: {
-    shouldDehydrateQuery: defaultShouldDehydrateQuery,
+    shouldDehydrateQuery: (query) =>
+      defaultShouldDehydrateQuery(query) &&
+      query.state.error === null &&
+      query.state.fetchFailureReason === null,
   },
 });
 ```
@@ -61,7 +64,7 @@ Use `createContractHydrationRegistry` to transfer decoded classes and other rich
 
 ## Let the browser refetch failed queries
 
-Keep `defaultShouldDehydrateQuery` to transfer successful data and omit failed queries. The browser can refetch an omitted query and receive a new execution error with its Cause if it fails again.
+The default filter omits queries with an error status. A successful entry can still hold an earlier failure. The filter above also omits queries with an error or fetch failure reason. The browser can refetch those queries with its own client.
 
 If a loader failure must still render the page, catch the rejection. Then use `useQuery` in the component for pending and error states. Otherwise let the route handle the loader error. See [handle failures](/effect-api-query/guides/handle-failures/) to inspect its Cause.
 

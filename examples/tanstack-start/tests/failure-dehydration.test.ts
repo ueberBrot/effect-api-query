@@ -35,6 +35,49 @@ describe("TanStack Start router dehydration", () => {
     vi.unstubAllGlobals();
   });
 
+  it("omits a successful cache entry that retains an earlier failure", async () => {
+    if (serverScope === undefined) {
+      throw new Error("Server scope was not initialized");
+    }
+    const server = await Effect.runPromise(
+      startExampleRpcServer().pipe(Scope.provide(serverScope))
+    );
+    const router = await createTanStackStartRouter({
+      history: createMemoryHistory({ initialEntries: ["/"] }),
+      rpcUrl: server.rpcUrl,
+      scrollRestoration: false,
+    });
+    const application = router.options.context;
+    applications.push(application);
+    attachRouterServerSsrUtils({ manifest: undefined, router });
+    try {
+      const options = application.rpcQuery.users.list.queryOptions();
+      const failure = new Error("Server-only failure");
+      await expect(
+        application.queryClient.query({
+          ...options,
+          retry: false,
+          queryFn: () => {
+            throw failure;
+          },
+        })
+      ).rejects.toBe(failure);
+      application.queryClient.setQueryData(options.queryKey, []);
+      expect(
+        application.queryClient.getQueryState(options.queryKey)
+      ).toMatchObject({
+        status: "success",
+        fetchStatus: "idle",
+        fetchFailureReason: failure,
+      });
+      await expect(router.options.dehydrate?.()).resolves.not.toHaveProperty(
+        "query.initial"
+      );
+    } finally {
+      router.serverSsr?.cleanup();
+    }
+  });
+
   it.each([
     { route: "/", adapter: "rpc" },
     { route: "/http", adapter: "http" },

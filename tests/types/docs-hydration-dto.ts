@@ -56,7 +56,10 @@ const snapshotDto = (queryClient: QueryClient): string =>
     dehydrate(queryClient, {
       shouldDehydrateMutation: () => false,
       shouldDehydrateQuery: (query) =>
-        defaultShouldDehydrateQuery(query) && query.queryKey[0] === "dto",
+        defaultShouldDehydrateQuery(query) &&
+        query.state.error === null &&
+        query.state.fetchFailureReason === null &&
+        query.queryKey[0] === "dto",
     })
   );
 
