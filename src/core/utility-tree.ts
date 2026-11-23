@@ -1,5 +1,5 @@
 import { hashKey, skipToken } from "@tanstack/query-core";
-import { Array as EffectArray, Effect, Exit, Predicate } from "effect";
+import { Effect, Exit, Predicate } from "effect";
 import type { Cause } from "effect";
 
 import { createBranchFilter } from "./branch-filter";
@@ -8,7 +8,6 @@ import { canonicalizeArray } from "./canonical-key";
 import type { UtilityNode } from "./configure-utils";
 import type { QueryView } from "./inference";
 import { prepareMetadataExecution } from "./metadata-query";
-import { isInvalidUtilitySegment } from "./operation";
 import type {
   BufferedOperation,
   MutationOperation,
@@ -36,15 +35,12 @@ import type {
   RuntimeInput,
   StreamedPolicyOptions,
 } from "./types";
+import { validateUtilityPaths } from "./utility-path";
+import type { UtilityPath } from "./utility-path";
 
 interface PreparedQuery {
   readonly input: unknown;
   readonly key: readonly JsonValue[];
-}
-
-interface ValidatedOperationPath {
-  readonly operation: OperationDescription;
-  readonly segments: readonly [string, ...string[]];
 }
 
 const freezeKey = (parts: JsonValue[]) => Object.freeze(parts);
@@ -66,53 +62,6 @@ const normalizePrefix = (
   } catch (error) {
     throw errors.invalidPrefix("Value", error);
   }
-};
-
-const planPaths = (
-  operations: readonly OperationDescription[],
-  errors: TreeErrors
-) => {
-  const branchPaths = new Map<string, readonly string[]>();
-  const leafPaths = new Set<string>();
-  const plan: ValidatedOperationPath[] = [];
-
-  for (const operation of operations) {
-    const segments = operation.path;
-    if (
-      !EffectArray.isReadonlyArrayNonEmpty(segments) ||
-      segments.some(isInvalidUtilitySegment)
-    ) {
-      throw errors.invalidPath(operation.id);
-    }
-    const pathKey = JSON.stringify(segments);
-    if (leafPaths.has(pathKey)) {
-      throw errors.pathCollision(operation.id, segments, "duplicates");
-    }
-    const descendantPath = branchPaths.get(pathKey);
-    if (descendantPath !== undefined) {
-      throw errors.pathCollision(operation.id, descendantPath, "collides with");
-    }
-    const parents: string[] = [];
-    for (let index = 1; index < segments.length; index += 1) {
-      const parent = segments.slice(0, index);
-      const parentKey = JSON.stringify(parent);
-      if (leafPaths.has(parentKey)) {
-        throw errors.pathCollision(operation.id, parent, "collides with");
-      }
-      parents.push(parentKey);
-    }
-    for (const parent of parents) {
-      if (!branchPaths.has(parent)) {
-        branchPaths.set(parent, segments);
-      }
-    }
-    leafPaths.add(pathKey);
-    plan.push({
-      operation,
-      segments,
-    });
-  }
-  return plan;
 };
 
 const execute = async <Operation extends UnaryQueryOperation | "metadata">(
@@ -745,7 +694,7 @@ const operationViews = (
 const insertLeaf = (
   tree: BuildBranch,
   prefix: readonly JsonValue[],
-  path: ValidatedOperationPath,
+  path: UtilityPath<OperationDescription>,
   keyEncoder: RuntimeKeyEncoder | undefined,
   runPromiseExit: RunPromiseExit<unknown>
 ) => {
@@ -816,7 +765,7 @@ const insertLeaf = (
 
 const createTree = (
   prefix: readonly JsonValue[],
-  paths: readonly ValidatedOperationPath[],
+  paths: readonly UtilityPath<OperationDescription>[],
   keyEncoders: ReadonlyMap<string, RuntimeKeyEncoder>,
   runPromiseExit: RunPromiseExit<unknown>
 ) => {
@@ -849,7 +798,18 @@ export const createUtilityTree = (
     ...normalizePrefix(options.hasKeyPrefix, options.keyPrefix, options.errors),
     ...options.keyNamespace,
   ]);
-  const paths = planPaths(operations, options.errors);
+  const paths = validateUtilityPaths(
+    operations,
+    (operation) => operation.path,
+    ({ id }, issue) =>
+      issue.kind === "invalid"
+        ? options.errors.invalidPath(id)
+        : options.errors.pathCollision(
+            id,
+            issue.segments,
+            issue.kind === "duplicate" ? "duplicates" : "collides with"
+          )
+  );
   validateKeyEncoders(operations, options.keyEncoders, options.errors);
   const runner =
     options.runtime === undefined

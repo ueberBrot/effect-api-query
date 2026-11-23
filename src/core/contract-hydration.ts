@@ -30,8 +30,8 @@ import {
 } from "./hydration";
 import type { CompiledHydrationCodec, HydrationRegistry } from "./hydration";
 import type { QueryView } from "./inference";
-import { isInvalidUtilitySegment } from "./operation";
 import type { JsonValue } from "./types";
+import { validateUtilityPaths } from "./utility-path";
 
 const rpcAllowedViews = new Set(["query", "live", "streamed"]);
 const httpAllowedViews = new Set(["query", "metadata", "live", "streamed"]);
@@ -738,45 +738,21 @@ const validateSegments = (
     readonly segments: readonly string[];
   }[]
 ): void => {
-  const branchPaths = new Map<string, readonly string[]>();
-  const leafPaths = new Set<string>();
-  for (const { path, segments } of operations) {
-    if (
-      !EffectArray.isReadonlyArrayNonEmpty(segments) ||
-      segments.some(isInvalidUtilitySegment)
-    ) {
-      throw new HydrationCodecError("InvalidContractPath", {
+  const messages = {
+    invalid: "cannot be projected into a hydration key",
+    duplicate: "duplicates another operation",
+    descendant: "collides with a nested operation",
+    parent: "collides with a parent operation",
+  };
+  validateUtilityPaths(
+    operations,
+    (operation) => operation.segments,
+    ({ path }, { kind }) =>
+      new HydrationCodecError("InvalidContractPath", {
         path,
-        message: `Contract path "${path}" cannot be projected into a hydration key`,
-      });
-    }
-    const pathKey = JSON.stringify(segments);
-    if (leafPaths.has(pathKey)) {
-      throw new HydrationCodecError("InvalidContractPath", {
-        path,
-        message: `Contract path "${path}" duplicates another operation`,
-      });
-    }
-    if (branchPaths.has(pathKey)) {
-      throw new HydrationCodecError("InvalidContractPath", {
-        path,
-        message: `Contract path "${path}" collides with a nested operation`,
-      });
-    }
-    for (let index = 1; index < segments.length; index += 1) {
-      const parentKey = JSON.stringify(segments.slice(0, index));
-      if (leafPaths.has(parentKey)) {
-        throw new HydrationCodecError("InvalidContractPath", {
-          path,
-          message: `Contract path "${path}" collides with a parent operation`,
-        });
-      }
-      if (!branchPaths.has(parentKey)) {
-        branchPaths.set(parentKey, segments);
-      }
-    }
-    leafPaths.add(pathKey);
-  }
+        message: `Contract path "${path}" ${messages[kind]}`,
+      })
+  );
 };
 
 const readPathsOption = (

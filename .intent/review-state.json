@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "109b92743acd613e173990d94a3d0bf00501832bf770cfc4db21dbafc6bb5cf4",
+      "fingerprint": "a3908d1f65b4f2bd753edd96bd3dae51c7ac78fe3b28863e88cfdd404f1ce6f0",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -219,13 +219,13 @@
         "src/core/configure.ts": "277f1d1201be35962d6b75c3e9f4074e7f4798456d515ddbd23d7dc3bf6693cf",
         "src/core/consume-events.ts": "648144582c4bdbf4a9cb0d35ddc54327abbefc654f2d37b6154232bcd09a1752",
         "src/core/contract-hydration-types.ts": "53366364723a34f8948f2b813ad60ec20de98ee878f9398aff38bb15bf12fd45",
-        "src/core/contract-hydration.ts": "fb89df24c2fb2819759b868301fa62b64026920f031c2f1d4a0de4841101071a",
+        "src/core/contract-hydration.ts": "4cfb560e36c3a038aa626652d04ee0934f04b4f93954839a35287411adf8b546",
         "src/core/declared-error.ts": "72146f75dc4f99abb60c143ae4464abf6a512cd5ffe713597bb3fb967f58c7a0",
         "src/core/hydration.ts": "08c812094bb4662cdf118b1825a47a4ec4bc1e4bd248a878726cbd4ff31aaf1e",
         "src/core/inference.ts": "249bc1d59e4ea6ddc7e3a09a63b93c13e3805f9d70ead00f44c710ff95e4df94",
         "src/core/interceptor.ts": "1bc8566c5669e1e797e8293b441a6ed175252a29c6eaa42999690cb835a5347f",
         "src/core/metadata-query.ts": "88379aa77f2338eaa5349f06e736ff9acc9519fb3bd5cc6c2e43da9d46d76926",
-        "src/core/operation.ts": "8932f213d0463a2fe513be2cb1381f474c5fd781d8bd93e2a4fa222fa79a017a",
+        "src/core/operation.ts": "d664f90a3eb1090e6f8871eb61a569f1cff3774a3e1fe83da0a4e3e6bb9b7eab",
         "src/core/policy.ts": "ced3a6fdf1ab7e273eb518700a42d68b4823abdb1088fae6855424e4e479ded4",
         "src/core/prepared-input.ts": "aae8c8c442a13e138606fc0d7fcbd8711396c9cd7661bfdf198e7365fd7567ff",
         "src/core/query-descriptor.ts": "d1650d691dc5b03eed820cab0afb747ba875572ee4eec42e70f927d59374d45b",
@@ -244,7 +244,8 @@
         "src/core/stream-snapshot.ts": "5c31085e7f22c8242b42443f5468a160a6dd6a779a29bedcc5a9c14d7a855402",
         "src/core/streamed-query.ts": "c20bf9e7fc48842ae758dc7c0567371c7399650f756c524e4c49de5ef2fd792b",
         "src/core/types.ts": "666e2a4d5d7f3c94d392a9ced105246122b48f4fa1bc30ca001e1c26a9425b61",
-        "src/core/utility-tree.ts": "ee9dbb03d326cc6632d9566d086f6d925e0909a8f3212172285fb6136f31664d",
+        "src/core/utility-path.ts": "98a2e760cb0eb66dd1be96d436bb35abc07139298efeefadf072d569b53b7aa3",
+        "src/core/utility-tree.ts": "03b096c8313fcd6d2020d32886bda3d734fa7e9a543fdfdaf9d7e29364b2f02a",
         "src/core/view-prefix.ts": "dfc0d74a07c8afe3f63952d59c29088ba4afb45e11a402ef8b72c5e2282cb063",
         "src/http/create-utils.ts": "8a27c1955323d3f4e993b244e073e3cf41cc88ac39d1c1da68cda27e85440f80",
         "src/http/endpoint.ts": "71c543b8e59d5a005e53403bdaa62f02cd291fc7ef121e46a7b56d9520d9c465",
@@ -405,15 +406,15 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "fdebd6a71005b6fa2bf7f0d14e13fffbf048b394",
+      "head": "d44527a208c61db04a473b536237e09d12ff8325",
       "outcome": "no-change",
-      "reason": "The hydration reference already documents the paths option. The registry now reads the top-level option through its getter and still looks up entries on the path map itself.",
+      "reason": "Utility construction and hydration now share segment validation, with the same path selection, error messages and public interfaces.",
       "evidence": [
-        "All 43 query owner and contract hydration tests and scoped Effect lint pass. The paths regression checks service-free types and disabled RPC query and HTTP query and metadata views."
+        "Changed: src/core/contract-hydration.ts, src/core/operation.ts, src/core/utility-path.ts, src/core/utility-tree.ts at d44527a208c61db04a473b536237e09d12ff8325"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "1caba364765ad107e94338b622b78c57fa1c758484f620ba6358511194dcd37f",
+      "fingerprint": "254e50e5f606c2bc69271f2c716393fab0c20723c3b52aa737c47f9e66278268",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -632,13 +633,13 @@
         "src/core/configure.ts": "277f1d1201be35962d6b75c3e9f4074e7f4798456d515ddbd23d7dc3bf6693cf",
         "src/core/consume-events.ts": "648144582c4bdbf4a9cb0d35ddc54327abbefc654f2d37b6154232bcd09a1752",
         "src/core/contract-hydration-types.ts": "53366364723a34f8948f2b813ad60ec20de98ee878f9398aff38bb15bf12fd45",
-        "src/core/contract-hydration.ts": "fb89df24c2fb2819759b868301fa62b64026920f031c2f1d4a0de4841101071a",
+        "src/core/contract-hydration.ts": "4cfb560e36c3a038aa626652d04ee0934f04b4f93954839a35287411adf8b546",
         "src/core/declared-error.ts": "72146f75dc4f99abb60c143ae4464abf6a512cd5ffe713597bb3fb967f58c7a0",
         "src/core/hydration.ts": "08c812094bb4662cdf118b1825a47a4ec4bc1e4bd248a878726cbd4ff31aaf1e",
         "src/core/inference.ts": "249bc1d59e4ea6ddc7e3a09a63b93c13e3805f9d70ead00f44c710ff95e4df94",
         "src/core/interceptor.ts": "1bc8566c5669e1e797e8293b441a6ed175252a29c6eaa42999690cb835a5347f",
         "src/core/metadata-query.ts": "88379aa77f2338eaa5349f06e736ff9acc9519fb3bd5cc6c2e43da9d46d76926",
-        "src/core/operation.ts": "8932f213d0463a2fe513be2cb1381f474c5fd781d8bd93e2a4fa222fa79a017a",
+        "src/core/operation.ts": "d664f90a3eb1090e6f8871eb61a569f1cff3774a3e1fe83da0a4e3e6bb9b7eab",
         "src/core/policy.ts": "ced3a6fdf1ab7e273eb518700a42d68b4823abdb1088fae6855424e4e479ded4",
         "src/core/prepared-input.ts": "aae8c8c442a13e138606fc0d7fcbd8711396c9cd7661bfdf198e7365fd7567ff",
         "src/core/query-descriptor.ts": "d1650d691dc5b03eed820cab0afb747ba875572ee4eec42e70f927d59374d45b",
@@ -657,7 +658,8 @@
         "src/core/stream-snapshot.ts": "5c31085e7f22c8242b42443f5468a160a6dd6a779a29bedcc5a9c14d7a855402",
         "src/core/streamed-query.ts": "c20bf9e7fc48842ae758dc7c0567371c7399650f756c524e4c49de5ef2fd792b",
         "src/core/types.ts": "666e2a4d5d7f3c94d392a9ced105246122b48f4fa1bc30ca001e1c26a9425b61",
-        "src/core/utility-tree.ts": "ee9dbb03d326cc6632d9566d086f6d925e0909a8f3212172285fb6136f31664d",
+        "src/core/utility-path.ts": "98a2e760cb0eb66dd1be96d436bb35abc07139298efeefadf072d569b53b7aa3",
+        "src/core/utility-tree.ts": "03b096c8313fcd6d2020d32886bda3d734fa7e9a543fdfdaf9d7e29364b2f02a",
         "src/core/view-prefix.ts": "dfc0d74a07c8afe3f63952d59c29088ba4afb45e11a402ef8b72c5e2282cb063",
         "src/http/create-utils.ts": "8a27c1955323d3f4e993b244e073e3cf41cc88ac39d1c1da68cda27e85440f80",
         "src/http/endpoint.ts": "71c543b8e59d5a005e53403bdaa62f02cd291fc7ef121e46a7b56d9520d9c465",
@@ -818,11 +820,11 @@
         "tests/workflow-guards.test.ts": "e506f9c0bcdaf376e87c6720c1eaa7528fa4b104af30f587d352385e4f9866ca",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "fdebd6a71005b6fa2bf7f0d14e13fffbf048b394",
+      "head": "d44527a208c61db04a473b536237e09d12ff8325",
       "outcome": "no-change",
-      "reason": "The domain map and specification already cover typed hydration path overrides for both adapters, and the skill tree already maps their implementation and tests.",
+      "reason": "Utility construction and hydration now share segment validation, with the same path selection, error messages and public interfaces.",
       "evidence": [
-        "All 43 query owner and contract hydration tests and scoped Effect lint pass. The paths regression checks service-free types and disabled RPC query and HTTP query and metadata views."
+        "Changed: src/core/contract-hydration.ts, src/core/operation.ts, src/core/utility-path.ts, src/core/utility-tree.ts at d44527a208c61db04a473b536237e09d12ff8325"
       ]
     },
     "source:vite.config.ts": {
