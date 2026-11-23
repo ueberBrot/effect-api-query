@@ -1,5 +1,6 @@
 import {
   Cause,
+  Clock,
   Deferred,
   Duration,
   Effect,
@@ -115,6 +116,7 @@ const batchStream = <A, E, R>(
   Stream.unwrap(
     Effect.gen(function* setupPublication() {
       const scope = yield* Scope.Scope;
+      const clock = yield* Clock.Clock;
       const pull = yield* Stream.toPull(source);
       let first = true;
       let pending: [A, ...A[]] | undefined;
@@ -122,14 +124,18 @@ const batchStream = <A, E, R>(
       let pendingPull:
         | Fiber.Fiber<NonEmptyBatch<A>, E | Cause.Done>
         | undefined;
-      let deadlineFiber: Fiber.Fiber<void> | undefined;
-      let deadlineGate: Deferred.Deferred<undefined> | undefined;
+      let deadline:
+        | {
+            readonly at: bigint;
+            readonly gate: Deferred.Deferred<undefined>;
+            readonly fiber: Fiber.Fiber<void>;
+          }
+        | undefined;
       let terminalCause: Cause.Cause<E | Cause.Done> | undefined;
 
       const clearDeadline = Effect.suspend(() => {
-        const fiber = deadlineFiber;
-        deadlineFiber = undefined;
-        deadlineGate = undefined;
+        const fiber = deadline?.fiber;
+        deadline = undefined;
         return fiber === undefined ? Effect.void : Fiber.interrupt(fiber);
       });
 
@@ -137,12 +143,14 @@ const batchStream = <A, E, R>(
         milliseconds: number
       ) {
         const gate = Deferred.makeUnsafe<undefined>();
-        deadlineGate = gate;
-        deadlineFiber = yield* Effect.sleep(Duration.millis(milliseconds)).pipe(
+        const at =
+          clock.monotonicTimeNanosUnsafe() + BigInt(milliseconds) * 1_000_000n;
+        const fiber = yield* Effect.sleep(Duration.millis(milliseconds)).pipe(
           Effect.andThen(Deferred.succeed(gate, undefined)),
           Effect.asVoid,
           Effect.forkIn(scope, { startImmediately: true })
         );
+        deadline = { at, gate, fiber };
       });
 
       const takePending = (): NonEmptyBatch<A> | undefined => {
@@ -155,7 +163,9 @@ const batchStream = <A, E, R>(
         clearDeadline.pipe(Effect.as([batch] as const));
 
       const isDeadlineReached = () =>
-        deadlineGate !== undefined && Deferred.isDoneUnsafe(deadlineGate);
+        deadline !== undefined &&
+        (Deferred.isDoneUnsafe(deadline.gate) ||
+          clock.monotonicTimeNanosUnsafe() >= deadline.at);
 
       const drainChunk = Effect.gen(function* drainCurrentChunk() {
         while (chunkIterator !== undefined) {
@@ -176,7 +186,7 @@ const batchStream = <A, E, R>(
             first = false;
             return takePending();
           }
-          if (deadlineGate === undefined && maxWaitMs !== undefined) {
+          if (deadline === undefined && maxWaitMs !== undefined) {
             yield* startDeadline(maxWaitMs);
           }
         }
@@ -193,7 +203,7 @@ const batchStream = <A, E, R>(
           });
           pendingPull = activePull;
         }
-        const gate = deadlineGate;
+        const gate = deadline?.gate;
         if (gate === undefined) {
           const exit = yield* Fiber.await(activePull);
           pendingPull = undefined;

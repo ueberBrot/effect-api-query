@@ -2,6 +2,7 @@ import { describe, expect, it } from "@effect/vitest";
 import { QueryClient, QueryObserver } from "@tanstack/query-core";
 import {
   Cause,
+  Clock,
   Deferred,
   Effect,
   Exit,
@@ -22,6 +23,38 @@ import {
 import { makeRpcTestClient } from "./fixtures/effect-rpc";
 
 describe("publication deadlines with TestClock", () => {
+  it.effect(
+    "publishes the pending snapshot when a pull outlasts the deadline before the timer runs",
+    () =>
+      Effect.gen(function* flushesElapsedDeadline() {
+        let elapsed = 0n;
+        const monotonicTimeNanosUnsafe = () => elapsed;
+        const clock: Clock.Clock = {
+          currentTimeMillisUnsafe: () => 0,
+          currentTimeMillis: Effect.succeed(0),
+          currentTimeNanosUnsafe: () => 0n,
+          currentTimeNanos: Effect.succeed(0n),
+          monotonicTimeNanosUnsafe,
+          monotonicTimeNanos: Effect.sync(monotonicTimeNanosUnsafe),
+          sleep: () => Effect.never,
+        };
+        const source = Stream.make(1, 2, 3).pipe(
+          Stream.rechunk(1),
+          Stream.tap((value) =>
+            Effect.sync(() => {
+              if (value === 3) {
+                elapsed = 21_000_000n;
+              }
+            })
+          )
+        );
+        const snapshots = yield* Stream.runCollect(
+          streamLiveSnapshots(source, 20, undefined)
+        ).pipe(Effect.provideService(Clock.Clock, clock));
+        expect(snapshots).toStrictEqual([1, 2, 3]);
+      })
+  );
+
   it.effect(
     "publishes the first value immediately and flushes subsequent batches at non-sliding deadlines",
     () =>
