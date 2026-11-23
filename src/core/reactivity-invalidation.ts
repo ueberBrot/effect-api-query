@@ -60,9 +60,7 @@ const bindInvalidations =
     bindings: readonly ReactivityInvalidationBinding[],
     options: ReactivityInvalidationOptions | undefined
   ) {
-    const runFork = Effect.runForkWith(
-      yield* Effect.context<QueryClientService>()
-    );
+    const ready = yield* Latch.make();
     const idle = yield* Latch.make(true);
     const pending = new Set<ReactivityInvalidationBinding>();
     const unregister: (() => void)[] = [];
@@ -109,27 +107,34 @@ const bindInvalidations =
         idle.openUnsafe();
       }
     };
-    const dispatch = () => {
-      if (pending.size === 0) {
-        return;
+    const dispatch = Effect.suspend(() => {
+      ready.closeUnsafe();
+      if (closed || pending.size === 0) {
+        return Effect.void;
       }
       const batch = [...pending];
       pending.clear();
       inFlight += 1;
-      runFork(
-        Effect.suspend(() => runPass(batch)).pipe(
-          Effect.catchCause((cause) =>
-            reportFailure(onError, Cause.squash(cause))
-          ),
-          Effect.ensuring(
-            Effect.sync(() => {
-              inFlight -= 1;
-              signalIdle();
-            })
-          )
-        )
+      return Effect.suspend(() => runPass(batch)).pipe(
+        Effect.catchCause((cause) =>
+          reportFailure(onError, Cause.squash(cause))
+        ),
+        Effect.ensuring(
+          Effect.sync(() => {
+            inFlight -= 1;
+            signalIdle();
+          })
+        ),
+        Effect.forkDetach({ startImmediately: true }),
+        Effect.asVoid
       );
-    };
+    }).pipe(Effect.uninterruptible);
+
+    yield* ready.await.pipe(
+      Effect.andThen(dispatch),
+      Effect.forever({ disableYield: true }),
+      Effect.forkScoped({ startImmediately: true })
+    );
 
     const close = () => {
       closed = true;
@@ -146,7 +151,9 @@ const bindInvalidations =
         return;
       }
       if (pending.size === 0) {
-        queueMicrotask(dispatch);
+        queueMicrotask(() => {
+          ready.openUnsafe();
+        });
       }
       pending.add(binding);
       idle.closeUnsafe();
