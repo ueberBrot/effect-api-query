@@ -897,15 +897,17 @@
       ]
     },
     "source:.github/workflows/release.yml": {
-      "fingerprint": "07a534472bf31e21369f8c35796ee2048edbf753d16b03fe12068eb9bf4e84d5",
+      "fingerprint": "2d2cc2281577425c83569afb430355c7da75a1eb2a92a5310f5326ab4b63421d",
       "snapshot": {
-        ".github/workflows/release.yml": "16e1392601580cd685cd4a6bda818e34d2466931d216483f16463d6a0c8821b3"
+        ".github/workflows/release.yml": "28bd9aad48820618a74c8948c1b76faa11f0b4053a15b60212c506f1c1d2f40b"
       },
-      "head": "12605b905cef953bbb73b3643928aae5f19dc4f4",
-      "outcome": "no-change",
-      "reason": "Packing can start once the release plan exists. Publishing still requires successful validation and the packed artifact. Documentation deployment still requires confirmed publication.",
+      "head": "fd3c7cb562ddd6b27a8691b954542cc88b20f0b2",
+      "outcome": "out-of-scope",
+      "reason": "The CI release workflow now gives manual dispatches a separate concurrency group. This scheduling change leaves library behavior, consumer tasks, and the shipped skill and planning records accurate.",
       "evidence": [
-        "actionlint and the focused release workflow regression tests passed."
+        "Reviewed .github/workflows/release.yml against 7aeff4eb5ac28fcd7af91baa8331360b41a1d637.",
+        "The GitHub Actions expression evaluator passed six concurrency checks and 120 release guard evaluations. The parsed trigger, jobs, and permissions matched the base.",
+        "actionlint passed. Offline zizmor and default yamllint diagnostics matched the base."
       ]
     },
     "source:e2e/browser-test-config.ts": {
