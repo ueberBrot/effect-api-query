@@ -40,7 +40,9 @@ export const UserList = ({
               disabled={
                 !isSynced ||
                 user.id < 0 ||
-                (deleteUser.isPending && deleteUser.variables.id === user.id)
+                (deleteUser.isPending &&
+                  deleteUser.variables.id === user.id &&
+                  deleteUser.variables.revision === user.revision)
               }
               onClick={() => {
                 deleteUser.mutate({ id: user.id, revision: user.revision });

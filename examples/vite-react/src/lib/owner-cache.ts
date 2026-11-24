@@ -15,7 +15,14 @@ export type DirectoryStorage = Pick<
   Storage,
   "getItem" | "removeItem" | "setItem"
 >;
-const Directory = Schema.Array(Schema.Struct(User.fields));
+const Directory = Schema.Array(
+  Schema.Struct({
+    id: User.fields.id,
+    revision: User.fields.revision,
+    name: User.fields.name,
+    locale: User.fields.locale,
+  })
+);
 
 const PersistedDirectory = Schema.fromJsonString(
   Schema.Struct({

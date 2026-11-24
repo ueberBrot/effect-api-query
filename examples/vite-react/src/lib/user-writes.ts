@@ -45,6 +45,14 @@ export const makeUsersInvalidator =
 
 type DeleteTarget = Pick<User, "id" | "revision">;
 
+const matchesUser = (user: User, target: DeleteTarget) =>
+  user.id === target.id && user.revision === target.revision;
+
+const optimisticUser = (write: number) => ({
+  id: -write,
+  revision: "optimistic",
+});
+
 const deletionKey = ({ id, revision }: DeleteTarget) =>
   JSON.stringify([id, revision]);
 
@@ -59,10 +67,7 @@ const restoreList = (
   snapshot: readonly User[] | undefined,
   target: DeleteTarget
 ) => {
-  const index =
-    snapshot?.findIndex(
-      (user) => user.id === target.id && user.revision === target.revision
-    ) ?? -1;
+  const index = snapshot?.findIndex((user) => matchesUser(user, target)) ?? -1;
   const user = snapshot?.[index];
   if (
     current === undefined ||
@@ -267,17 +272,13 @@ export const makeUserWrites = ({
     };
   };
   const replaceUser = (
-    {
-      id,
-      revision,
-    }: DeleteTarget | { readonly id: number; readonly revision?: never },
+    target: DeleteTarget,
     replacement: User | undefined,
     write: number,
     totalChange: number,
     phase: "optimistic" | "settled"
   ) => {
-    const matches = (user: User) =>
-      user.id === id && (revision === undefined || user.revision === revision);
+    const matches = (user: User) => matchesUser(user, target);
     for (const key of listKeys) {
       editList(
         key,
@@ -302,9 +303,9 @@ export const makeUserWrites = ({
       );
     }
     editPages((data, directory) => {
-      if (revision !== undefined) {
+      if (target.id > 0) {
         const replaced = (user: User) =>
-          user.id === id && user.revision !== revision;
+          user.id === target.id && user.revision !== target.revision;
         if (
           data.pages.some((page) => page.users.some(replaced)) ||
           (directory?.some(replaced) === true &&
@@ -347,7 +348,7 @@ export const makeUserWrites = ({
     if (!isActive()) {
       return;
     }
-    replaceUser({ id: -write }, user, write, 0, "settled");
+    replaceUser(optimisticUser(write), user, write, 0, "settled");
     queryClient.setQueryData(
       rpcQuery.users.get.queryKey({
         input: { id: user.id, locale: user.locale },
@@ -366,7 +367,7 @@ export const makeUserWrites = ({
   };
   const createFailed = (write: number | undefined) => {
     if (isActive() && write !== undefined) {
-      replaceUser({ id: -write }, undefined, write, -1, "settled");
+      replaceUser(optimisticUser(write), undefined, write, -1, "settled");
     }
   };
   const startCreate = async (input: {
@@ -378,12 +379,11 @@ export const makeUserWrites = ({
       pending.delete(write);
       throw new Error("The application owner has retired");
     }
-    const temporaryId = -write;
+    const temporary = optimisticUser(write);
     replaceUser(
-      { id: temporaryId },
+      temporary,
       new User({
-        id: temporaryId,
-        revision: "optimistic",
+        ...temporary,
         name: input.name,
         locale: input.locale ?? "en",
       }),
@@ -486,8 +486,7 @@ export const makeUserWrites = ({
     finishDelete(target, write, true);
   };
   const startDelete = async (target: DeleteTarget) => {
-    const matches = (user: User) =>
-      user.id === target.id && user.revision === target.revision;
+    const matches = (user: User) => matchesUser(user, target);
     const write = await begin();
     if (!isActive()) {
       pending.delete(write);

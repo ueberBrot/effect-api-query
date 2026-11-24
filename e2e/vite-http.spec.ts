@@ -59,7 +59,7 @@ test.describe("Vite React HTTP API example", () => {
     const lookup = page.waitForRequest((request) =>
       isHttpRequest(request, "GET", "/users/2")
     );
-    await selection.selectOption("2");
+    await selection.selectOption({ label: "HTTP user 2: Edsger Dijkstra" });
     const lookupRequest = await lookup;
     expect(new URL(lookupRequest.url()).searchParams.get("locale")).toBe("fr");
     await expect(
@@ -71,7 +71,7 @@ test.describe("Vite React HTTP API example", () => {
     await expect(
       http.getByText("HTTP selected: Edsger Dijkstra, locale fr")
     ).toHaveCount(0);
-    await selection.selectOption("2");
+    await selection.selectOption({ label: "HTTP user 2: Edsger Dijkstra" });
     await expect(
       http.getByText("HTTP selected: Edsger Dijkstra, locale fr")
     ).toBeVisible();
@@ -156,7 +156,7 @@ test.describe("Vite React HTTP API example", () => {
     await enableDemoWrites(page, writeToken);
     const http = page.getByRole("region", { name: "HTTP API example" });
     const selection = http.getByLabel("HTTP user details");
-    await selection.selectOption("1");
+    await selection.selectOption({ label: "HTTP user 1: Ada Lovelace" });
     await expect(
       http.getByText("HTTP selected: Ada Lovelace, locale fr")
     ).toBeVisible();
@@ -176,7 +176,7 @@ test.describe("Vite React HTTP API example", () => {
         .getByRole("button", { name: "Delete HTTP Ada Lovelace" })
         .click();
       await started;
-      await selection.selectOption("2");
+      await selection.selectOption({ label: "HTTP user 2: Edsger Dijkstra" });
       await expect(
         http.getByText("HTTP selected: Edsger Dijkstra, locale fr")
       ).toBeVisible();
@@ -184,7 +184,9 @@ test.describe("Vite React HTTP API example", () => {
       release.resolve();
     }
     await expect(http.getByText("HTTP delete result: undefined")).toBeVisible();
-    await expect(selection).toHaveValue("2");
+    await expect(selection.locator("option:checked")).toHaveText(
+      "HTTP user 2: Edsger Dijkstra"
+    );
     await expect(
       http.getByText("HTTP selected: Edsger Dijkstra, locale fr")
     ).toBeVisible();

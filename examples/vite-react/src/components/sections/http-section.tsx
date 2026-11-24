@@ -18,17 +18,21 @@ import type { SubmitEvent } from "react";
 import type { ViteReactApplication } from "../../lib/application.ts";
 
 const HttpSelectionResult = ({
-  selectedId,
+  revision,
   user,
+  isFetching,
 }: {
-  readonly selectedId: number | undefined;
+  readonly revision: string | undefined;
   readonly user: User | undefined;
+  readonly isFetching: boolean;
 }) => {
-  if (selectedId === undefined) {
+  if (revision === undefined) {
     return <p>HTTP user query skipped</p>;
   }
-  if (user === undefined) {
-    return <p>Loading HTTP user…</p>;
+  if (user?.revision !== revision) {
+    return (
+      <p>{isFetching ? "Loading HTTP user…" : "HTTP user unavailable."}</p>
+    );
   }
   return (
     <p>
@@ -133,7 +137,12 @@ export const HttpSection = ({
   const { httpQuery, userWrites } = application;
   const users = useQuery(httpQuery.users.list.queryOptions());
   const [selection, setSelection] = useState<Pick<User, "id" | "revision">>();
-  const selectedId = selection?.id;
+  const listedSelection = users.data?.find((user) => user.id === selection?.id);
+  const selected =
+    listedSelection === undefined ||
+    listedSelection.revision === selection?.revision
+      ? selection
+      : undefined;
   const clearDeletedSelection = ({ id, revision }: User) => {
     setSelection((current) =>
       current?.id === id && current.revision === revision ? undefined : current
@@ -141,11 +150,12 @@ export const HttpSection = ({
   };
   const selectedUser = useQuery(
     httpQuery.users.get.queryOptions({
-      staleTime: 30_000,
+      staleTime: (query) =>
+        query.state.data?.revision === selected?.revision ? 30_000 : 0,
       input:
-        selectedId === undefined
+        selected === undefined
           ? skipToken
-          : { params: { id: selectedId }, query: { locale: "fr" } },
+          : { params: { id: selected.id }, query: { locale: "fr" } },
     })
   );
   const pages = useInfiniteQuery(
@@ -245,24 +255,29 @@ export const HttpSection = ({
             HTTP user details
             <select
               className="border-border-strong bg-muted border p-2"
-              value={selectedId ?? ""}
+              value={selected?.revision ?? ""}
               onChange={(event) => {
-                const id = event.currentTarget.value;
+                const revision = event.currentTarget.value;
                 setSelection(
-                  users.data?.find((user) => String(user.id) === id)
+                  users.data?.find((user) => user.revision === revision)
                 );
               }}
             >
               <option value="">Choose an HTTP user</option>
               {users.data?.map((user) => (
-                <option key={user.id} value={user.id}>
+                <option
+                  disabled={user.id < 0}
+                  key={user.id}
+                  value={user.revision}
+                >
                   HTTP user {user.id}: {user.name}
                 </option>
               ))}
             </select>
           </label>
           <HttpSelectionResult
-            selectedId={selectedId}
+            isFetching={selectedUser.isFetching}
+            revision={selected?.revision}
             user={selectedUser.data}
           />
           <EffectErrorDetails error={selectedUser.error} />

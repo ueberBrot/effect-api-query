@@ -64,20 +64,23 @@ describe("User writes in the Vite application", () => {
       ).mutate({ id: previous.id, revision: previous.revision });
       const outcome = Promise.allSettled([deletion]);
       const request = await fixture.nextDelete();
-      expect({
-        rpc: queryClient.getQueryData(rpcList),
-        rpcPage: queryClient.getQueryData(rpcPages)?.pages[0]?.users,
-        http: queryClient.getQueryData(httpList),
-        httpPages: queryClient.getQueryData(httpPages),
-        httpUpdatedAt: queryClient.getQueryState(httpList)?.dataUpdatedAt,
-      }).toStrictEqual({
-        rpc: [],
-        rpcPage: [],
-        http: [replacement],
-        httpPages: replacementPages,
-        httpUpdatedAt: 0,
-      });
-      await request.fail();
+      try {
+        expect({
+          rpc: queryClient.getQueryData(rpcList),
+          rpcPage: queryClient.getQueryData(rpcPages)?.pages[0]?.users,
+          http: queryClient.getQueryData(httpList),
+          httpPages: queryClient.getQueryData(httpPages),
+          httpUpdatedAt: queryClient.getQueryState(httpList)?.dataUpdatedAt,
+        }).toStrictEqual({
+          rpc: [],
+          rpcPage: [],
+          http: [replacement],
+          httpPages: replacementPages,
+          httpUpdatedAt: 0,
+        });
+      } finally {
+        await request.fail();
+      }
       await expect(outcome).resolves.toMatchObject([{ status: "rejected" }]);
       expect(queryClient.getQueryData(httpList)).toStrictEqual([replacement]);
       expect(queryClient.getQueryState(httpList)?.dataUpdatedAt).toBe(0);
