@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "d33c51d225a49bb0dd8f7ebf6689d25fc94de86f73b1cabb592a4db1b748bcaf",
+      "fingerprint": "51ba57956252c7087298232a7d32c10657a6cb2e1d9345aebbdf598b9a3bc8f2",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -218,8 +218,8 @@
         "src/core/configure-utils.ts": "ee45471eb50bc526951b8af08fa605fae0d9a056a143c222ecde9180c7bfcd30",
         "src/core/configure.ts": "5a7e7f8dc1fa13e0d698678e79521bdce79aefcaec4c4235ac20b340f1076925",
         "src/core/consume-events.ts": "648144582c4bdbf4a9cb0d35ddc54327abbefc654f2d37b6154232bcd09a1752",
-        "src/core/contract-hydration-types.ts": "044b6fe4a83c29d98f7fe933aedcf37c9fd0efd4e64814bc668dfc8b91468e16",
-        "src/core/contract-hydration.ts": "297842049a02b1ddbf3a820f80defe2076edc39f95e87e751aba9061721cf3f4",
+        "src/core/contract-hydration-types.ts": "fb0e5a7e1569301057422e662185a2a11f4007473dca58b1786422d6fed5deac",
+        "src/core/contract-hydration.ts": "f50a263eab1688abc5eb31a4be498fea6271ce515766cddf9284fb6bebaf8447",
         "src/core/declared-error.ts": "72146f75dc4f99abb60c143ae4464abf6a512cd5ffe713597bb3fb967f58c7a0",
         "src/core/hydration.ts": "08c812094bb4662cdf118b1825a47a4ec4bc1e4bd248a878726cbd4ff31aaf1e",
         "src/core/inference.ts": "249bc1d59e4ea6ddc7e3a09a63b93c13e3805f9d70ead00f44c710ff95e4df94",
@@ -265,7 +265,7 @@
         "src/rpc/types.ts": "6116aee2a62b26a895caf709c99c5969d6e45358c0919abd40068f9ce2db3f54",
         "tests/cache-recipes.test.ts": "fe686d2434c1604f4b2577e582d3dcae3a183fffced090c5362bd649cbfc2569",
         "tests/configuration-composition.test.ts": "be2ffca6e62965d8b79a311998787f74565d4af86bcaec46c36f5a963b0d16f5",
-        "tests/contract-hydration.test.ts": "0ade5d3fadad5d70824fa8aa00198cb8f714d49f66b040e593b868dc3df81907",
+        "tests/contract-hydration.test.ts": "58c14600fe331059e5c456ed28c5e7392f4a575a19a4bd29eb14f1cf21149e9b",
         "tests/contract-reuse.test.ts": "21b97cec6da64d3a42d58e69aaad1754aaec2bb4dd1ac876ef25ec801f970a12",
         "tests/create-http-api-query-utils.test.ts": "a6b89aeb4e7570d6bff9b9fa45723b2a2d3a0180ed7d7807f222cbe2003f93d5",
         "tests/create-rpc-query-utils-configuration.test.ts": "c04f7903c14a2d8be54f1e8c84f0e00dd10e3b9148090c196b8ed7b25dfa8f52",
@@ -339,7 +339,7 @@
         "tests/stream-recovery.test.ts": "41f795edb52eb21601efee459477256ae47408a344a7106d7246e640379e0376",
         "tests/stream-snapshot.test.ts": "497a414206d844608d49cee4db98cc97764b92a36efb5f019255ef8b4a38ee9c",
         "tests/types/application-policy-contract.ts": "e2181da727cd335635d9d27c8b0d6eeaf9468fa052a449584f51345006c737ac",
-        "tests/types/contract-hydration-contract.ts": "64e30726d14c6896d8378b53233e24a3e637548a873e29a82aac65f391940a10",
+        "tests/types/contract-hydration-contract.ts": "9a7a9daf5214633cfa16e3d29b7f2d01cbefbf5a03a737bbac9624baa12e43fc",
         "tests/types/docs-functionality.ts": "065ff9eac091e4a25c814e3e49b49d0f6258fffb7c5ed0661a1ec960b41ac0c0",
         "tests/types/docs-http-ndjson.ts": "a86513c1047b700ce27fc49b3d1fb31004cf745096d8403a0bdc780d95a448a3",
         "tests/types/docs-http-quick-start-contract.ts": "e034175f607fc9414e4919c6762a859e03908b0ee7ba77cb5dc6556b746ec26c",
@@ -410,15 +410,15 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "38d7d433661ed701518acda559d9bb1f0031c2cd",
-      "outcome": "updated",
-      "reason": "Updated skills/effect-api-query/references/hydration-and-ssr.md, apps/docs/src/content/docs/guides/hydrate-query-views.md, ADR 0058 (amending ADR 0047), and _artifacts/skill_spec.md for #239 contract-derived hydration hardening (nested Redacted detection, HttpApiSchema.asNoContent preservation, and opt-in explicit header allowlist for HTTP metadata hydration); verified with full vp test, vp run typecheck, vp run format, and vp run fallow",
+      "head": "3512154ae81322c77788a90d53bf582fb1bdfe04",
+      "outcome": "no-change",
+      "reason": "Addressed all #239 review findings (union/wrapped-Void asNoContent, intermediate Void transform preservation, own views.metadata check, distributive per-path metadata type override, and encodeToWithHeaders Redacted check); ADR 0058, skill reference, and guide already accurately reflect behavior",
       "evidence": [
-        "Changed: apps/docs/src/content/docs/guides/hydrate-query-views.md, docs/adr/0047-derive-hydration-codecs-from-contracts.md, skills/effect-api-query/references/hydration-and-ssr.md, src/core/contract-hydration-types.ts, src/core/contract-hydration.ts, src/index.ts, tests/contract-hydration.test.ts, tests/types/contract-hydration-contract.ts at 38d7d433661ed701518acda559d9bb1f0031c2cd"
+        "Changed: src/core/contract-hydration-types.ts, src/core/contract-hydration.ts, tests/contract-hydration.test.ts, tests/types/contract-hydration-contract.ts at 3512154ae81322c77788a90d53bf582fb1bdfe04"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "ed29a9ba36a1d9e2a888a7a31008ebbfdd4e542c5dc7944c7a10ca88ec480de1",
+      "fingerprint": "16faf91913360405723af76d339ad33bbf9ef81f26e471e56f9e708afa71eaf0",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -636,8 +636,8 @@
         "src/core/configure-utils.ts": "ee45471eb50bc526951b8af08fa605fae0d9a056a143c222ecde9180c7bfcd30",
         "src/core/configure.ts": "5a7e7f8dc1fa13e0d698678e79521bdce79aefcaec4c4235ac20b340f1076925",
         "src/core/consume-events.ts": "648144582c4bdbf4a9cb0d35ddc54327abbefc654f2d37b6154232bcd09a1752",
-        "src/core/contract-hydration-types.ts": "044b6fe4a83c29d98f7fe933aedcf37c9fd0efd4e64814bc668dfc8b91468e16",
-        "src/core/contract-hydration.ts": "297842049a02b1ddbf3a820f80defe2076edc39f95e87e751aba9061721cf3f4",
+        "src/core/contract-hydration-types.ts": "fb0e5a7e1569301057422e662185a2a11f4007473dca58b1786422d6fed5deac",
+        "src/core/contract-hydration.ts": "f50a263eab1688abc5eb31a4be498fea6271ce515766cddf9284fb6bebaf8447",
         "src/core/declared-error.ts": "72146f75dc4f99abb60c143ae4464abf6a512cd5ffe713597bb3fb967f58c7a0",
         "src/core/hydration.ts": "08c812094bb4662cdf118b1825a47a4ec4bc1e4bd248a878726cbd4ff31aaf1e",
         "src/core/inference.ts": "249bc1d59e4ea6ddc7e3a09a63b93c13e3805f9d70ead00f44c710ff95e4df94",
@@ -683,7 +683,7 @@
         "src/rpc/types.ts": "6116aee2a62b26a895caf709c99c5969d6e45358c0919abd40068f9ce2db3f54",
         "tests/cache-recipes.test.ts": "fe686d2434c1604f4b2577e582d3dcae3a183fffced090c5362bd649cbfc2569",
         "tests/configuration-composition.test.ts": "be2ffca6e62965d8b79a311998787f74565d4af86bcaec46c36f5a963b0d16f5",
-        "tests/contract-hydration.test.ts": "0ade5d3fadad5d70824fa8aa00198cb8f714d49f66b040e593b868dc3df81907",
+        "tests/contract-hydration.test.ts": "58c14600fe331059e5c456ed28c5e7392f4a575a19a4bd29eb14f1cf21149e9b",
         "tests/contract-reuse.test.ts": "21b97cec6da64d3a42d58e69aaad1754aaec2bb4dd1ac876ef25ec801f970a12",
         "tests/create-http-api-query-utils.test.ts": "a6b89aeb4e7570d6bff9b9fa45723b2a2d3a0180ed7d7807f222cbe2003f93d5",
         "tests/create-rpc-query-utils-configuration.test.ts": "c04f7903c14a2d8be54f1e8c84f0e00dd10e3b9148090c196b8ed7b25dfa8f52",
@@ -757,7 +757,7 @@
         "tests/stream-recovery.test.ts": "41f795edb52eb21601efee459477256ae47408a344a7106d7246e640379e0376",
         "tests/stream-snapshot.test.ts": "497a414206d844608d49cee4db98cc97764b92a36efb5f019255ef8b4a38ee9c",
         "tests/types/application-policy-contract.ts": "e2181da727cd335635d9d27c8b0d6eeaf9468fa052a449584f51345006c737ac",
-        "tests/types/contract-hydration-contract.ts": "64e30726d14c6896d8378b53233e24a3e637548a873e29a82aac65f391940a10",
+        "tests/types/contract-hydration-contract.ts": "9a7a9daf5214633cfa16e3d29b7f2d01cbefbf5a03a737bbac9624baa12e43fc",
         "tests/types/docs-functionality.ts": "065ff9eac091e4a25c814e3e49b49d0f6258fffb7c5ed0661a1ec960b41ac0c0",
         "tests/types/docs-http-ndjson.ts": "a86513c1047b700ce27fc49b3d1fb31004cf745096d8403a0bdc780d95a448a3",
         "tests/types/docs-http-quick-start-contract.ts": "e034175f607fc9414e4919c6762a859e03908b0ee7ba77cb5dc6556b746ec26c",
@@ -828,11 +828,11 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "38d7d433661ed701518acda559d9bb1f0031c2cd",
-      "outcome": "updated",
-      "reason": "Updated skills/effect-api-query/references/hydration-and-ssr.md, apps/docs/src/content/docs/guides/hydrate-query-views.md, ADR 0058 (amending ADR 0047), and _artifacts/skill_spec.md for #239 contract-derived hydration hardening (nested Redacted detection, HttpApiSchema.asNoContent preservation, and opt-in explicit header allowlist for HTTP metadata hydration); verified with full vp test, vp run typecheck, vp run format, and vp run fallow",
+      "head": "3512154ae81322c77788a90d53bf582fb1bdfe04",
+      "outcome": "no-change",
+      "reason": "Addressed all #239 review findings (union/wrapped-Void asNoContent, intermediate Void transform preservation, own views.metadata check, distributive per-path metadata type override, and encodeToWithHeaders Redacted check); ADR 0058, skill reference, and guide already accurately reflect behavior",
       "evidence": [
-        "Changed: _artifacts/skill_spec.md, apps/docs/src/content/docs/guides/hydrate-query-views.md, docs/adr/0047-derive-hydration-codecs-from-contracts.md, skills/effect-api-query/references/hydration-and-ssr.md, src/core/contract-hydration-types.ts, src/core/contract-hydration.ts, src/index.ts, tests/contract-hydration.test.ts, tests/types/contract-hydration-contract.ts at 38d7d433661ed701518acda559d9bb1f0031c2cd"
+        "Changed: src/core/contract-hydration-types.ts, src/core/contract-hydration.ts, tests/contract-hydration.test.ts, tests/types/contract-hydration-contract.ts at 3512154ae81322c77788a90d53bf582fb1bdfe04"
       ]
     },
     "source:vite.config.ts": {

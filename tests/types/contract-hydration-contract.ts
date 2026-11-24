@@ -302,6 +302,21 @@ type _HttpQueryInheritServices = Assert<
   Equal<typeof httpQueryInheritMetadata, HydrationRegistry<never, never>>
 >;
 
+declare const conditionalMetadata:
+  | { readonly headers: readonly ["etag"] }
+  | false;
+const httpConditionalPathMetadata = createContractHydrationRegistry(httpApi, {
+  views: { query: false, live: false, streamed: false },
+  paths: {
+    "data.profile": {
+      metadata: conditionalMetadata,
+    },
+  },
+});
+type _HttpConditionalPathMetadataServices = Assert<
+  Equal<typeof httpConditionalPathMetadata, HydrationRegistry<DecA, EncA>>
+>;
+
 const httpQueryDisabledNoMetadata = createContractHydrationRegistry(httpApi, {
   views: { query: false, live: false, streamed: false },
 });
@@ -374,6 +389,7 @@ void [
   rpcQueryDisabledInfinite,
   httpBare,
   httpQueryInheritMetadata,
+  httpConditionalPathMetadata,
   httpQueryDisabledNoMetadata,
   optionalSound,
   composed,

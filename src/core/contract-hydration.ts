@@ -164,7 +164,7 @@ const validateViews = (
         message: `Unknown hydration view "${key}"`,
       });
     }
-    const value = views[key];
+    const value = key === "metadata" ? readOwn(views, key) : views[key];
     if (value === undefined) {
       continue;
     }
@@ -742,17 +742,73 @@ const wrapWithHeaders = (
     )
   );
 
-const isSynthesizedNoContent = (ast: SchemaAST.AST): boolean =>
-  !SchemaAST.isVoid(ast) &&
-  (SchemaAST.isVoid(SchemaAST.toEncoded(ast)) ||
-    (ast.encoding !== undefined &&
-      ast.encoding.some((link) => SchemaAST.isVoid(link.to))));
+const isTerminalVoidAst = (ast: SchemaAST.AST): boolean => {
+  if (!SchemaAST.isVoid(ast)) {
+    return false;
+  }
+  if (ast.encoding === undefined) {
+    return true;
+  }
+  return (
+    ast.encoding.length === 1 &&
+    isImplicitJsonLink(ast.encoding[0], Schema.Void)
+  );
+};
+
+const isBodylessTransportEncoding = (ast: SchemaAST.AST): boolean => {
+  let current = ast;
+  while (current.encoding !== undefined) {
+    const next = EffectArray.lastNonEmpty(current.encoding).to;
+    if (isTerminalVoidAst(next)) {
+      return true;
+    }
+    current = next;
+  }
+  return false;
+};
+
+const stripBodylessTransport = (ast: SchemaAST.AST): SchemaAST.AST => {
+  if (isBodylessTransportEncoding(ast)) {
+    return SchemaAST.toType(ast);
+  }
+  if (SchemaAST.isUnion(ast)) {
+    const members = SchemaAST.mapOrSame(ast.types, stripBodylessTransport);
+    return members === ast.types
+      ? ast
+      : new SchemaAST.Union(
+          members,
+          ast.options,
+          ast.annotations,
+          ast.checks,
+          ast.encoding,
+          ast.context,
+          ast.encodingChecks
+        );
+  }
+  if (SchemaAST.isSuspend(ast)) {
+    return new SchemaAST.Suspend(
+      () => stripBodylessTransport(ast.thunk()),
+      ast.annotations,
+      ast.checks,
+      ast.encoding,
+      ast.context
+    );
+  }
+  return ast;
+};
 
 const deriveBufferedMemberCodec = (
   schema: Schema.Top,
   path: string,
   view: QueryView
 ): Schema.Top => {
+  if (containsRedactedAst(schema.ast, new Set())) {
+    throw new HydrationCodecError("UnencodableSchema", {
+      path,
+      view,
+      message: `Schema for "${path}" (${view}) is not JSON-encodable; provide a custom codec override or disable it with false`,
+    });
+  }
   if (HttpApiSchema.isWithHeaders(schema)) {
     return wrapWithHeaders(
       deriveBufferedMemberCodec(schema.schema, path, view),
@@ -764,10 +820,12 @@ const deriveBufferedMemberCodec = (
   if (HttpApiSchema.getEncodeToWithHeadersParts(schema) !== undefined) {
     return deriveJsonCodec(Schema.toType(schema), path, view);
   }
-  if (isSynthesizedNoContent(schema.ast)) {
-    return deriveJsonCodec(Schema.toType(schema), path, view);
-  }
-  return deriveJsonCodec(schema, path, view);
+  const stripped = stripBodylessTransport(schema.ast);
+  return deriveJsonCodec(
+    stripped === schema.ast ? schema : Schema.make<Schema.Top>(stripped),
+    path,
+    view
+  );
 };
 
 const deriveHttpBufferedCodec = (

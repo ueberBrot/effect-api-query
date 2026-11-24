@@ -3,9 +3,11 @@ import { dehydrate, hydrate, QueryClient } from "@tanstack/query-core";
 import {
   Context,
   Effect,
+  Function,
   Layer,
   ManagedRuntime,
   Predicate,
+  Redacted,
   Schema,
   SchemaParser,
   SchemaTransformation,
@@ -1941,6 +1943,9 @@ describe("composable createHydrationRegistry", () => {
             "items.synthesized": {
               infinite: { pageParam: Schema.Int },
             },
+            "items.empty": {
+              infinite: { pageParam: Schema.Int },
+            },
           },
         });
         const server = new QueryClient();
@@ -1963,6 +1968,15 @@ describe("composable createHydrationRegistry", () => {
           });
           server.setQueryData(http.items.synthesized.infiniteKey(), {
             pages: [queryResult],
+            pageParams: [1],
+          });
+          server.setQueryData(http.items.empty.metadataKey(), {
+            data: null,
+            status: 204,
+            headers: {},
+          });
+          server.setQueryData(http.items.empty.infiniteKey(), {
+            pages: [null],
             pageParams: [1],
           });
 
@@ -1988,6 +2002,12 @@ describe("composable createHydrationRegistry", () => {
             hydratedProfileInstance: hydratedProfile instanceof Profile,
             hydratedProfileName: hydratedProfile?.name,
             hydratedEmpty: browser.getQueryData(http.items.empty.queryKey()),
+            hydratedEmptyMeta: browser.getQueryData(
+              http.items.empty.metadataKey()
+            )?.data,
+            hydratedEmptyInfinite: browser.getQueryData(
+              http.items.empty.infiniteKey()
+            ),
           }).toStrictEqual({
             emptyResult: null,
             callsBeforeHydration: { stampCalls: 1, profileCalls: 1 },
@@ -1998,6 +2018,8 @@ describe("composable createHydrationRegistry", () => {
             hydratedProfileInstance: true,
             hydratedProfileName: profileResult.name,
             hydratedEmpty: null,
+            hydratedEmptyMeta: null,
+            hydratedEmptyInfinite: { pages: [null], pageParams: [1] },
           });
         } finally {
           server.clear();
@@ -2093,6 +2115,168 @@ describe("composable createHydrationRegistry", () => {
               headers: { etag: '"v1"', "x-public": "visible" },
             },
             frozen: true,
+          });
+        } finally {
+          server.clear();
+          browser.clear();
+        }
+      })
+  );
+
+  it.effect(
+    "handles union asNoContent, wrapped Void asNoContent, intermediate Void transforms, own metadata views, and encodeToWithHeaders Redacted checks",
+    () =>
+      Effect.gen(function* verifiesReviewEdgeCases() {
+        let unionFactoryCalls = 0;
+        let voidFactoryCalls = 0;
+        const SynthesizedUnion = Schema.Union([
+          Schema.String.pipe(
+            HttpApiSchema.asNoContent({
+              decode: () => {
+                unionFactoryCalls += 1;
+                return "factory";
+              },
+            })
+          ),
+          Schema.Finite,
+        ]);
+        const WrappedVoid = HttpApiSchema.WithHeaders(
+          Schema.Void.pipe(
+            HttpApiSchema.asNoContent({
+              decode: () => {
+                voidFactoryCalls += 1;
+              },
+            })
+          ),
+          { "x-id": Schema.String }
+        );
+        const ThroughVoid = Schema.String.pipe(
+          Schema.decodeTo(
+            Schema.Void,
+            SchemaTransformation.transform({
+              decode: Function.constVoid,
+              encode: () => "wire-string",
+            })
+          ),
+          Schema.decodeTo(
+            Schema.declare(isOpaqueBox),
+            SchemaTransformation.transform({
+              decode: () => makeOpaqueBox("decoded"),
+              encode: Function.constVoid,
+            })
+          )
+        );
+        const api = HttpApi.make("edge-cases").add(
+          HttpApiGroup.make("items").add(
+            HttpApiEndpoint.get("union", "/union", {
+              success: SynthesizedUnion,
+            }),
+            HttpApiEndpoint.get("wrappedVoid", "/wrapped-void", {
+              success: WrappedVoid,
+            }),
+            HttpApiEndpoint.get("throughVoid", "/through-void", {
+              success: ThroughVoid,
+            })
+          )
+        );
+        const redactedEncodedHeadersApi = HttpApi.make("encoded-redacted").add(
+          HttpApiGroup.make("items").add(
+            HttpApiEndpoint.get("read", "/read", {
+              success: Schema.String.pipe(
+                HttpApiSchema.encodeToWithHeaders(
+                  {
+                    body: Schema.String,
+                    headers: {
+                      "x-secret": Schema.RedactedFromValue(Schema.String),
+                    },
+                  },
+                  {
+                    decode: ({ body }) => body,
+                    encode: (body) => ({
+                      body,
+                      headers: { "x-secret": Redacted.make("secret") },
+                    }),
+                  }
+                )
+              ),
+            })
+          )
+        );
+
+        const client = yield* HttpApiClient.makeWith(api, {
+          baseUrl: "https://example.test",
+          httpClient: dummyHttpClient,
+        });
+        const http = createHttpApiQueryUtils(api, { client });
+        const registry = createContractHydrationRegistry(api);
+        const server = new QueryClient();
+        const browser = new QueryClient();
+        try {
+          server.setQueryData(http.items.union.queryKey(), "cached");
+          server.setQueryData(
+            http.items.wrappedVoid.queryKey(),
+            HttpApiSchema.withHeaders({
+              body: undefined,
+              headers: { "x-id": "1" },
+            })
+          );
+          server.setQueryData(
+            http.items.throughVoid.queryKey(),
+            makeOpaqueBox("live")
+          );
+          yield* roundTripJson(registry, server, browser);
+
+          const inheritedViews = {};
+          Object.setPrototypeOf(inheritedViews, {
+            metadata: { headers: ["etag"] },
+          });
+          const ownGetterViews = {
+            get metadata() {
+              return { headers: ["etag"] } as const;
+            },
+          };
+          const ownNonEnumViews = {};
+          Object.defineProperty(ownNonEnumViews, "metadata", {
+            value: { headers: ["etag"] },
+            enumerable: false,
+          });
+
+          const metaKey = http.items.union.metadataKey();
+          expect({
+            unionRestored: browser.getQueryData(http.items.union.queryKey()),
+            unionFactoryCalls,
+            wrappedVoidRestored: browser.getQueryData(
+              http.items.wrappedVoid.queryKey()
+            ),
+            voidFactoryCalls,
+            throughVoidRestored: browser.getQueryData(
+              http.items.throughVoid.queryKey()
+            )?.secret,
+            inheritedMetaMatches: createContractHydrationRegistry(api, {
+              views: inheritedViews,
+            }).matches(metaKey),
+            ownGetterMetaMatches: createContractHydrationRegistry(api, {
+              views: ownGetterViews,
+            }).matches(metaKey),
+            ownNonEnumMetaMatches: createContractHydrationRegistry(api, {
+              views: ownNonEnumViews,
+            }).matches(metaKey),
+            encodedHeadersRedactedCode: captureHydrationError(() => {
+              createContractHydrationRegistry(redactedEncodedHeadersApi);
+            }).code,
+          }).toStrictEqual({
+            unionRestored: "cached",
+            unionFactoryCalls: 0,
+            wrappedVoidRestored: HttpApiSchema.withHeaders({
+              body: undefined,
+              headers: { "x-id": "1" },
+            }),
+            voidFactoryCalls: 0,
+            throughVoidRestored: "decoded",
+            inheritedMetaMatches: false,
+            ownGetterMetaMatches: true,
+            ownNonEnumMetaMatches: true,
+            encodedHeadersRedactedCode: "UnencodableSchema",
           });
         } finally {
           server.clear();

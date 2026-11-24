@@ -450,6 +450,17 @@ export type UnmodifiedGroupEndpoints<
   { readonly identifier: GroupModifiedEndpointIds<Group, ModifiedPaths> }
 >;
 
+export type HttpMetadataPathOverride<
+  Endpoint extends HttpApiEndpoint.ConstraintRequest,
+  Actual,
+> = Actual extends unknown
+  ? Actual extends false | undefined
+    ? Actual
+    : Actual extends { readonly headers: unknown }
+      ? ValidateMetadataConfig<Actual>
+      : ExactCodec<MetadataData<Endpoint>, Actual>
+  : never;
+
 export type HttpBufferedPathConfig<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Actual,
@@ -463,11 +474,10 @@ export type HttpBufferedPathConfig<
               QueryData<HttpSuccess<Endpoint>>,
               PropOf<Actual, "query">
             >;
-        readonly metadata?:
-          | false
-          | (PropOf<Actual, "metadata"> extends { readonly headers: unknown }
-              ? ValidateMetadataConfig<PropOf<Actual, "metadata">>
-              : ExactCodec<MetadataData<Endpoint>, PropOf<Actual, "metadata">>);
+        readonly metadata?: HttpMetadataPathOverride<
+          Endpoint,
+          PropOf<Actual, "metadata">
+        >;
         readonly infinite?: InfiniteConfigConstraint<
           QueryData<HttpSuccess<Endpoint>>,
           PropOf<Actual, "infinite">
