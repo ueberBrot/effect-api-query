@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "3585e80396b37e3d1292bc1bd8dbd2ce17dcbe8379f25a5057509dc701814304",
+      "fingerprint": "8dbbc704f98f5210a5c305e218f52cc2f61af6be19231feda7d3acced4168920",
       "snapshot": {
         "GLOSSARY.md": "7fa3de9ce2b21e39ad33af675cc200077db85b9a4ae8c15fc9ff63c9d44e1d97",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -166,15 +166,16 @@
         "examples/tanstack-start/src/lib/api-server.ts": "3ab4000ee28dc8f73237b4508e0f0a0a1b1e4baf865ae501348487a978e19f23",
         "examples/tanstack-start/src/lib/application.ts": "11c093bafe02b54462a9d7b3633acaa51100b98cecd40a3958604446e923a968",
         "examples/tanstack-start/src/lib/featured-user.ts": "8c9b33056cd2e4c2c19a95de3fad5b93e326b654117c75086b55f44630ad599d",
+        "examples/tanstack-start/src/lib/pagehide.ts": "c7087fa9d31767f2fe79ee5399eb76aef93234b7fc524b8f53f1c1aa805715d8",
         "examples/tanstack-start/src/lib/query-ssr.ts": "b33c5f09b2e546d49616ff487b610c4e80602980ce945e86bf6419b1afc2309a",
         "examples/tanstack-start/src/lib/server-application.ts": "6232bd35b1ceecac48a513948b1051b7906d1d2bfd9dc765bd52c286db794783",
         "examples/tanstack-start/src/lib/server-host.ts": "e1dee5bbc3b249188c05612acea6d561eca9b56cb01150a582d430cfe96a3160",
         "examples/tanstack-start/src/lib/snapshot-preparation.ts": "0e74b94ede08a8bf0cd1edcb88ab41240c77f6d20207516313a0de99ca8defce",
-        "examples/tanstack-start/src/router.tsx": "69988635edac5ae4dddc6d9d89d6a1360e2bdd86048bf0d63222977cf24ec7ba",
-        "examples/tanstack-start/src/routes/__root.tsx": "0432b23a22688c2a8121e914628173b7a7f158b8a1904787d0d1326a108d0ee6",
+        "examples/tanstack-start/src/router.tsx": "3817954a4bee3dc266e172abbe820b2aeafc535180576d5683337026b6d69869",
+        "examples/tanstack-start/src/routes/__root.tsx": "69dec466b32abda26d0d4f91e0e1702e35f3013e343f75c4aa07a05922a15c86",
         "examples/tanstack-start/tests/application.test.ts": "213ac5d51142c28811f87136fd1044f72eb7884ff3b9da511158b1a76d1c9f53",
         "examples/tanstack-start/tests/async-hydration.test.ts": "bf61a1ca9dd2c19d70dae618416ab454cafb0b8dfe39cb89aaa3f8803b84c210",
-        "examples/tanstack-start/tests/client-navigation.test.tsx": "40349f7559078dbd23af9763a49935da479c0dbc955472ffa56fd5d174f999e6",
+        "examples/tanstack-start/tests/client-navigation.test.tsx": "d1ee92c2c29383932dfc386c330ca947f482e6d9648a6298930e369e25c80c31",
         "examples/tanstack-start/tests/failure-dehydration.test.ts": "326574cfefebfdc1f8e2050a0369643c648455bb6c201ef070658eb0293dfc18",
         "examples/tanstack-start/tests/featured-selection.test.ts": "2ee74357fc6b7a82eea385ec456db4da8df40fa04fcf509698ea93985c8815d6",
         "examples/tanstack-start/tests/server-local.test.ts": "fefe2dfec6d5199f257ab4b20cb09176ae2d014c60305ca47790107001ba1649",
@@ -425,16 +426,16 @@
         "tests/workflow-guards.test.ts": "563c464dfb45e0873138aff38d323cdfb64b7e6caae84f70fa46db4c65dba410",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "a4b238e01bf835d366ab77e654024a1f864dc9e6",
-      "outcome": "updated",
-      "reason": "The standalone example defaults to same-origin access. The framework reference points to the explicit origin allowlist for direct browser reads, and demo write sessions continue to use the same-origin proxy.",
+      "head": "ee9b35db84db36a064f40ccccc6440cfeaf053a3",
+      "outcome": "no-change",
+      "reason": "The Start example keeps browser lifetimes across a persisted pagehide and continues to dispose on a permanent exit. The shipped framework and hydration guidance already assigns disposal to the application and fresh captures to an exclusive query.",
       "evidence": [
-        "Compared the standalone server, tests, examples page, and framework reference with origin/main at 303f1d1. The runtime uses exact serialized origins and preserves the shared body limit and session checks.",
-        "All 53 standalone tests passed, including CORS, body limits, transport cancellation, and IPv6. The standalone CLI smoke verified the environment allowlist. The documentation check passed 24 excerpt tests, and skill validation passed. Fresh consumer-agent discovery remains unverified."
+        "Compared the Start router, its root context and navigation regression with e6220ff. The framework and hydration references still describe the separate application owners, snapshot ownership, and descriptor rebinding accurately.",
+        "Nine focused Start tests passed. Chromium, Firefox, and WebKit confirmed both owners can accept work after simulated restoration and cancel work on permanent departure."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "92759d78eadb727fb5a454dbbf1be901b23e18ec7e997869ae1cbed5c8ab6cf5",
+      "fingerprint": "fccd379f200a436d5afffd36812052f530b638aaaaaced4bfb5453bdb14f3363",
       "snapshot": {
         "GLOSSARY.md": "7fa3de9ce2b21e39ad33af675cc200077db85b9a4ae8c15fc9ff63c9d44e1d97",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -600,15 +601,16 @@
         "examples/tanstack-start/src/lib/api-server.ts": "3ab4000ee28dc8f73237b4508e0f0a0a1b1e4baf865ae501348487a978e19f23",
         "examples/tanstack-start/src/lib/application.ts": "11c093bafe02b54462a9d7b3633acaa51100b98cecd40a3958604446e923a968",
         "examples/tanstack-start/src/lib/featured-user.ts": "8c9b33056cd2e4c2c19a95de3fad5b93e326b654117c75086b55f44630ad599d",
+        "examples/tanstack-start/src/lib/pagehide.ts": "c7087fa9d31767f2fe79ee5399eb76aef93234b7fc524b8f53f1c1aa805715d8",
         "examples/tanstack-start/src/lib/query-ssr.ts": "b33c5f09b2e546d49616ff487b610c4e80602980ce945e86bf6419b1afc2309a",
         "examples/tanstack-start/src/lib/server-application.ts": "6232bd35b1ceecac48a513948b1051b7906d1d2bfd9dc765bd52c286db794783",
         "examples/tanstack-start/src/lib/server-host.ts": "e1dee5bbc3b249188c05612acea6d561eca9b56cb01150a582d430cfe96a3160",
         "examples/tanstack-start/src/lib/snapshot-preparation.ts": "0e74b94ede08a8bf0cd1edcb88ab41240c77f6d20207516313a0de99ca8defce",
-        "examples/tanstack-start/src/router.tsx": "69988635edac5ae4dddc6d9d89d6a1360e2bdd86048bf0d63222977cf24ec7ba",
-        "examples/tanstack-start/src/routes/__root.tsx": "0432b23a22688c2a8121e914628173b7a7f158b8a1904787d0d1326a108d0ee6",
+        "examples/tanstack-start/src/router.tsx": "3817954a4bee3dc266e172abbe820b2aeafc535180576d5683337026b6d69869",
+        "examples/tanstack-start/src/routes/__root.tsx": "69dec466b32abda26d0d4f91e0e1702e35f3013e343f75c4aa07a05922a15c86",
         "examples/tanstack-start/tests/application.test.ts": "213ac5d51142c28811f87136fd1044f72eb7884ff3b9da511158b1a76d1c9f53",
         "examples/tanstack-start/tests/async-hydration.test.ts": "bf61a1ca9dd2c19d70dae618416ab454cafb0b8dfe39cb89aaa3f8803b84c210",
-        "examples/tanstack-start/tests/client-navigation.test.tsx": "40349f7559078dbd23af9763a49935da479c0dbc955472ffa56fd5d174f999e6",
+        "examples/tanstack-start/tests/client-navigation.test.tsx": "d1ee92c2c29383932dfc386c330ca947f482e6d9648a6298930e369e25c80c31",
         "examples/tanstack-start/tests/failure-dehydration.test.ts": "326574cfefebfdc1f8e2050a0369643c648455bb6c201ef070658eb0293dfc18",
         "examples/tanstack-start/tests/featured-selection.test.ts": "2ee74357fc6b7a82eea385ec456db4da8df40fa04fcf509698ea93985c8815d6",
         "examples/tanstack-start/tests/server-local.test.ts": "fefe2dfec6d5199f257ab4b20cb09176ae2d014c60305ca47790107001ba1649",
@@ -859,12 +861,12 @@
         "tests/workflow-guards.test.ts": "563c464dfb45e0873138aff38d323cdfb64b7e6caae84f70fa46db4c65dba410",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "a4b238e01bf835d366ab77e654024a1f864dc9e6",
-      "outcome": "updated",
-      "reason": "The domain map records the explicit allowlist and same-origin sessions. The skill spec records the standalone transport batch. The existing skill tree maps the server, tests, and setup guidance.",
+      "head": "ee9b35db84db36a064f40ccccc6440cfeaf053a3",
+      "outcome": "no-change",
+      "reason": "The domain map and skill specification still cover application-owned lifetimes, request snapshots, and loader descriptors. The existing skill tree already tracks the Start router and its supporting source.",
       "evidence": [
-        "Compared the domain map, skill spec, skill tree, and framework reference with origin/main at 303f1d1. Both YAML files parsed, and maintainer sync found nothing to synchronize.",
-        "All 53 standalone tests and the standalone CLI smoke passed. The documentation and skill checks passed."
+        "Reviewed _artifacts/domain_map.yaml, _artifacts/skill_spec.md, and _artifacts/skill_tree.yaml against the pinned Start diff. Intent sync required no changes.",
+        "Checked regression evidence for existing server snapshots, hydrated query data, and restored browser owners."
       ]
     },
     "source:vite.config.ts": {
@@ -1426,15 +1428,15 @@
       ]
     },
     "source:e2e/tanstack-start.spec.ts": {
-      "fingerprint": "443de376314af57ee2a0bccbfa6a479b7f97a4cf0c578074c8c1bacd4cdfe408",
+      "fingerprint": "1f841a537fe424a787f21a39f776d4e3935e49878fefe42ee8bcdd41183ccf7f",
       "snapshot": {
-        "e2e/tanstack-start.spec.ts": "003871b2564eaf59e178b45dd5d9f5e9626c17aa44ad0d38a185857857537a0c"
+        "e2e/tanstack-start.spec.ts": "35f23c363ed10bb6dd536986e580fa679bf3ebc466766dc03287942e9f35220b"
       },
-      "head": "861dbbc713ec3936fac538b1a5317b6ce487efdd",
+      "head": "ee9b35db84db36a064f40ccccc6440cfeaf053a3",
       "outcome": "no-change",
-      "reason": "The Playwright test harness now uses a fresh preview and isolated domain per test, preserving the application workflows described by the skill.",
+      "reason": "The added Playwright flows exercise the private example through existing controls and do not change library behavior or shipped usage guidance.",
       "evidence": [
-        "e2e/tanstack-start.spec.ts at 861dbbc; Chromium passed with two workers and a concurrent four-host smoke check passed."
+        "Chromium reproduced the two restoration failures and the missing featured-user state on e6220ff. Focused Playwright coverage included Chromium, Firefox, and WebKit."
       ]
     },
     "source:e2e/vite-react.spec.ts": {
@@ -1450,15 +1452,15 @@
       ]
     },
     "source:examples/tanstack-start/src/routes/index.tsx": {
-      "fingerprint": "e596b29ef4e1968b251f7da52311d70617c8d23d4373fd4ee3782563a196638e",
+      "fingerprint": "6987333ad02de6a3cdd8c56e6c0a30be998990a7649bc0104020a9dc53c81947",
       "snapshot": {
-        "examples/tanstack-start/src/routes/index.tsx": "b5de9da9db5c978ec1c2b4df22ed1e77419b269f7933b9487c73c02be00559e4"
+        "examples/tanstack-start/src/routes/index.tsx": "ca80af466b8ef3dd120da2908eeb1293d77a2adb185eaf5fc3341f45682fc7d2"
       },
-      "head": "861dbbc713ec3936fac538b1a5317b6ce487efdd",
+      "head": "ee9b35db84db36a064f40ccccc6440cfeaf053a3",
       "outcome": "no-change",
-      "reason": "The private demo removes shared fixture controls while continuing to demonstrate ordinary generated queries and user creation.",
+      "reason": "Fresh captures still prepare the server response. Browser query observers own their fetches, consistent with existing guidance to reserve the snapshot key for exclusive capture.",
       "evidence": [
-        "examples/tanstack-start/src/routes/index.tsx at 861dbbc; both example builds and the Chromium suite passed."
+        "The mounted-stream integration test reproduced the exclusive-capture loader failure on e6220ff and passed after the fix. Focused SSR snapshot and browser replay tests passed."
       ]
     },
     "source:examples/vite-react/src/components/sections/commands-section.tsx": {
@@ -2299,15 +2301,15 @@
       ]
     },
     "source:examples/tanstack-start/src/routes/details.tsx": {
-      "fingerprint": "2b5bf05d019524913122cfb4def121fecb4bd765100aa5db4c499e37c5b8e8ae",
+      "fingerprint": "20e5d9b021ddeeda972443918cb399ed92e3fafe61577640b9d099b8f012e098",
       "snapshot": {
-        "examples/tanstack-start/src/routes/details.tsx": "efb3afdb4284244f761bad8d75637d0be14b8abe08f2d91374a39da088079e42"
+        "examples/tanstack-start/src/routes/details.tsx": "cc98f580029f747d2e6e4a7c90d3bb728dbad005f20476b9fd4cc47e289c1288"
       },
-      "head": "bc4e899e8f9ae5cfb4c23870870a59e0b659f805",
-      "outcome": "updated",
-      "reason": "Actual native route consumes the documented descriptor or HTTP workflow provider. The existing framework guidance now covers the route and its lifetime; it does not justify another skill.",
+      "head": "ee9b35db84db36a064f40ccccc6440cfeaf053a3",
+      "outcome": "no-change",
+      "reason": "The route revalidates its generated query and presents the declared missing-user outcome as a route 404. The loader descriptor still transfers the same selection and uses the same cache key and hydration codec.",
       "evidence": [
-        "Compared own diff against required base 3e70c51 and merged parent bc4e899. Fresh checks: 127 app runtime tests; 150 CLI Playwright cases across Chromium/Firefox/WebKit; both app production builds; strict/typed lint/format and Effect checks; public/server-local fixtures and packed framework consumers under TSRS and TS5.9; 24 executable docs tests and Astro check. Intent structural skills validation passes. Fallow retains 13 untouched findings; default YAML lint retains inherited style findings (93 to 92 line-length findings). Logs and coverage matrix: /tmp/effect-api-query-spec-166/pre1-examples-result.md. Independent consumer/discovery evidence is unverified because agents are prohibited. No library API, release policy or dependency change."
+        "The descriptor rebinding test passed. The browser regression exercised authorized deletion, warm navigation and document reload, alongside the successful hydration case."
       ]
     },
     "source:examples/tanstack-start/src/routes/rpc.ts": {
@@ -3476,14 +3478,16 @@
       ]
     },
     "source:examples/tanstack-start/src/routes/workflows.tsx": {
-      "fingerprint": "ee34f073c358350d50128bdab176c07ec544c4156428138f3f7f1810b1411391",
+      "fingerprint": "0c698aa6e4426dd56d79f5b57af62046cd34c93c3292c2af283e3bf255c6ff16",
       "snapshot": {
-        "examples/tanstack-start/src/routes/workflows.tsx": "1b02dcebd29b2bd5e29a0f1e3fbc564b92a1c12bd7d63202e1a68f7c983b3fe6"
+        "examples/tanstack-start/src/routes/workflows.tsx": "2ec9df27aeecd4e89ed600a85391fdbdcad64b22880c1a6bc7b2d72f56578f35"
       },
-      "head": "c02af82057b315004d9fa22269fdc15d14ce162a",
-      "outcome": "out-of-scope",
-      "reason": "Repository-internal lint config, ADRs, fallow config, example comment cleanup, and repo-local /delete-comment skill do not affect the shipped consumer skill.",
-      "evidence": ["vp run check, vp run fallow"]
+      "head": "ee9b35db84db36a064f40ccccc6440cfeaf053a3",
+      "outcome": "no-change",
+      "reason": "The route preserves its browser workflow owner on persisted events and keeps permanent departure and component cleanup at the caller. The shared workflow application and its library guidance need no edits.",
+      "evidence": [
+        "All three browser engines completed a new workflow stream after the simulated restore and reported cancellation of an in-flight stream on permanent departure."
+      ]
     },
     "source:examples/shared/styles.css": {
       "fingerprint": "bd7baafe0c5b7e65f5c1aa649dde34bd6e40c9df07442c7b0afbf2cd4d75fa31",

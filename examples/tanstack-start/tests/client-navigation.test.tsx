@@ -61,16 +61,16 @@ describe("TanStack Start client navigation", () => {
 
   it("reloads the home loader while both stream views remain mounted", async () => {
     const router = await renderRoute("/");
-    await screen.findByText(/^Current state:/u, {}, { timeout: 5000 });
+    const history = { name: "Accumulated stream history" };
+    await screen.findByRole("region", history, { timeout: 5000 });
 
     await act(async () => {
       await router.invalidate({ sync: true });
     });
 
-    expect(screen.queryByRole("heading", { name: "Route failed" })).toBeNull();
-    expect(
-      screen.getByRole("region", { name: "Accumulated stream history" })
-    ).toBeDefined();
+    expect(router.state.matches.at(-1)?.status).toBe("success");
+    await screen.findByRole("region", history, { timeout: 5000 });
     expect(screen.getByText(/^Current state:/u)).toBeDefined();
+    expect(screen.queryByRole("heading", { name: "Route failed" })).toBeNull();
   });
 });

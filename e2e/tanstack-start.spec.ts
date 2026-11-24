@@ -36,7 +36,8 @@ const expectRequestAbortedOnDeparture = async (
       new PageTransitionEvent("pagehide", { persisted: false })
     );
   });
-  await aborted;
+  const failed = await aborted;
+  expect(failed.failure()?.errorText).toMatch(/abort|cancel/iu);
 };
 
 test("restored Start app can fetch and still disposes on permanent departure", async ({
