@@ -323,6 +323,74 @@ describe("createRpcQueryUtils streaming execution", () => {
     })
   );
 
+  it.effect("clears seeded RPC history before a reset refetch fails", () =>
+    Effect.gen(function* clearSeededRpcHistory() {
+      const started = yield* Deferred.make<boolean>();
+      const fail = yield* Deferred.make<boolean>();
+      const Watch = Rpc.make("events.watch", {
+        success: Schema.Finite,
+        error: Schema.String,
+        stream: true,
+      });
+      const group = RpcGroup.make(Watch);
+      let refetch = false;
+      const client = yield* makeRpcTestClient(group, {
+        "events.watch": () =>
+          refetch
+            ? Stream.fromEffect(
+                Deferred.succeed(started, true).pipe(
+                  Effect.andThen(Deferred.await(fail)),
+                  Effect.andThen(Effect.fail("refetch failed"))
+                )
+              )
+            : Stream.make(1),
+      });
+      const options = createRpcQueryUtils(group, {
+        client,
+      }).events.watch.streamedOptions({
+        initialData: [9],
+        maxChunks: 2,
+        refetchOnMount: false,
+        retry: false,
+      });
+      const queryClient = new QueryClient();
+      const observer = new QueryObserver(queryClient, options);
+      const stop = observer.subscribe(() => {});
+      try {
+        expect(
+          yield* Effect.promise(async () => await queryClient.query(options))
+        ).toStrictEqual([9, 1]);
+        refetch = true;
+        const pending = observer.refetch();
+        yield* Deferred.await(started);
+        expect(observer.getCurrentResult()).toMatchObject({
+          status: "pending",
+          fetchStatus: "fetching",
+          data: undefined,
+        });
+        expect(queryClient.getQueryData(options.queryKey)).toBeUndefined();
+
+        yield* Deferred.succeed(fail, true);
+        const failed = yield* Effect.promise(async () => await pending);
+        expect({
+          status: failed.status,
+          fetchStatus: failed.fetchStatus,
+          data: failed.data,
+          cached: queryClient.getQueryData(options.queryKey),
+        }).toStrictEqual({
+          status: "error",
+          fetchStatus: "idle",
+          data: undefined,
+          cached: undefined,
+        });
+        expect(failed.error).toBeInstanceOf(EffectRpcQueryError);
+      } finally {
+        stop();
+        queryClient.clear();
+      }
+    })
+  );
+
   it.effect(
     "rejects invalid retention bounds synchronously, including skipped queries",
     () =>

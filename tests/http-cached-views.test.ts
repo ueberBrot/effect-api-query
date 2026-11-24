@@ -806,6 +806,71 @@ describe.each(["global", "prefix"] as const)(
   }
 );
 
+it.effect("clears seeded HTTP history before a reset refetch fails", () =>
+  Effect.gen(function* clearSeededHttpHistory() {
+    const started =
+      yield* Deferred.make<ReadableStreamDefaultController<Uint8Array>>();
+    let refetch = false;
+    const client = yield* makeClient(() => {
+      if (!refetch) {
+        return sse("data: 1\n\n");
+      }
+      return new Response(
+        new ReadableStream<Uint8Array>({
+          start(controller) {
+            Deferred.doneUnsafe(started, Exit.succeed(controller));
+          },
+        }),
+        { headers: { "content-type": "text/event-stream" } }
+      );
+    });
+    const options = createHttpApiQueryUtils(api, {
+      client,
+    }).items.watch.streamedOptions({
+      initialData: [9],
+      maxChunks: 2,
+      refetchOnMount: false,
+      retry: false,
+    });
+    const queryClient = new QueryClient();
+    const observer = new QueryObserver(queryClient, options);
+    const stop = observer.subscribe(() => {});
+    try {
+      expect(
+        yield* Effect.promise(async () => await queryClient.query(options))
+      ).toStrictEqual([9, 1]);
+      refetch = true;
+      const pending = observer.refetch();
+      const body = yield* Deferred.await(started);
+      expect(observer.getCurrentResult()).toMatchObject({
+        status: "pending",
+        fetchStatus: "fetching",
+        data: undefined,
+      });
+      expect(queryClient.getQueryData(options.queryKey)).toBeUndefined();
+
+      body.enqueue(new TextEncoder().encode("data: invalid JSON\n\n"));
+      body.close();
+      const failed = yield* Effect.promise(async () => await pending);
+      expect({
+        status: failed.status,
+        fetchStatus: failed.fetchStatus,
+        data: failed.data,
+        cached: queryClient.getQueryData(options.queryKey),
+      }).toStrictEqual({
+        status: "error",
+        fetchStatus: "idle",
+        data: undefined,
+        cached: undefined,
+      });
+      expect(isEffectHttpApiQueryError(failed.error)).toBe(true);
+    } finally {
+      stop();
+      queryClient.clear();
+    }
+  })
+);
+
 describe.each(["reset", "append", "replace"] as const)(
   "retains bounded HTTP %s histories with native refetch publication",
   (refetchMode) => {
