@@ -79,7 +79,8 @@ describe("example operation ownership", () => {
           result,
           running: yield* Fiber.join(running),
           duplicate: yield* Fiber.join(duplicate),
-          foreignStatus: yield* b["commands.status"](privateInput),
+          foreignStatus: yield* Effect.flip(b["commands.status"](privateInput)),
+          unknownStatus: yield* Effect.flip(b["commands.status"](unknown)),
           foreignCancel: yield* Effect.flip(b["commands.cancel"](privateInput)),
         }).toMatchObject({
           firstStatus: cancelled,
@@ -87,7 +88,8 @@ describe("example operation ownership", () => {
           result: { state: "cancelled", totalSteps: 40 },
           running: result,
           duplicate: result,
-          foreignStatus: null,
+          foreignStatus: "operation-not-found",
+          unknownStatus: "operation-not-found",
           foreignCancel: "operation-not-found",
         });
       })

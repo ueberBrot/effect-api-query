@@ -1,3 +1,4 @@
+import { OperationNotFound } from "@effect-api-query/contracts";
 import type { DiagnosticStatus } from "@effect-api-query/contracts";
 import type {
   QueryClient,
@@ -104,7 +105,8 @@ const readBaseline = async (
     const cause = getExecutionCause(error);
     if (
       cause !== undefined &&
-      Result.getOrUndefined(Cause.findError(cause)) === "operation-not-found"
+      Result.getOrUndefined(Cause.findError(cause)) ===
+        OperationNotFound.literal
     ) {
       return { started: 0, interrupted: 0 };
     }

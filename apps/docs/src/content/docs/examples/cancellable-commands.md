@@ -38,7 +38,7 @@ const cancel = useMutation(
 const status = useQuery(
   rpcQuery.commands.status.queryOptions({
     input,
-    enabled: start.status !== "idle",
+    enabled: reserved,
     refetchInterval: (query) =>
       query.state.data?.state === "running" ||
       query.state.status === "error" ||
@@ -76,6 +76,6 @@ Start serves the same handlers at `/rpc`. Use `application.rpcQuery.commands` wi
 
 Transport interruption requires transport support. The slow-query demo explicitly calls `diagnostics.cancel` when its local Effect is interrupted. Define an operation like this if the server needs an explicit cancellation request.
 
-The server Scope owns the workers, which can continue after a view unmounts. Cancelling stops future steps and keeps completed steps. If work already finished, cancel returns its completed result. A duplicate Start returns the existing result. After reservation, Cancel can arrive before Start and settle the command as cancelled. Cancelling an unknown command returns `operation-not-found`.
+The server Scope owns the workers, which can continue after a view unmounts. Cancelling stops future steps and keeps completed steps. If work already finished, cancel returns its completed result. A duplicate Start returns the existing result. After reservation, Cancel can arrive before Start and settle the command as cancelled. Looking up or cancelling an unknown command returns `operation-not-found`.
 
 The demo keeps records in memory until reset or shutdown. If records must survive restarts, add authorization, durable storage, and a retention policy.

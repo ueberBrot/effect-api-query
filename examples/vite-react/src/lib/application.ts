@@ -1,5 +1,8 @@
 import { exampleHttpApi, exampleRpcGroup } from "@effect-api-query/contracts";
-import { startExampleRpcClient } from "@effect-api-query/contracts/client";
+import {
+  makeExampleFetchLayer,
+  startExampleRpcClient,
+} from "@effect-api-query/contracts/client";
 import type { ExampleRpcClient } from "@effect-api-query/contracts/client";
 import type { QueryClient } from "@tanstack/react-query";
 import {
@@ -8,8 +11,7 @@ import {
   createRpcQueryUtils,
 } from "@ueberbrot/effect-api-query";
 import type { RuntimeInput } from "@ueberbrot/effect-api-query";
-import { Layer, ManagedRuntime } from "effect";
-import { FetchHttpClient } from "effect/http";
+import { ManagedRuntime } from "effect";
 import { HttpApiClient } from "effect/http-api";
 
 import { makeOwnerCache, ownerKeyPrefix } from "./owner-cache.ts";
@@ -89,16 +91,7 @@ export const startViteReactApplication = async ({
         async (acquired) => acquired.dispose()
       );
       const httpRuntime = await setup.acquire(
-        () =>
-          ManagedRuntime.make(
-            applicationFetch === undefined
-              ? FetchHttpClient.layer
-              : FetchHttpClient.layer.pipe(
-                  Layer.provide(
-                    Layer.succeed(FetchHttpClient.Fetch, applicationFetch)
-                  )
-                )
-          ),
+        () => ManagedRuntime.make(makeExampleFetchLayer(applicationFetch)),
         async (acquired) => acquired.dispose()
       );
       const httpClient = await httpRuntime.runPromise(

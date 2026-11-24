@@ -1,8 +1,13 @@
-import { CommandStatus } from "@effect-api-query/contracts";
+import { CommandStatus, OperationNotFound } from "@effect-api-query/contracts";
 import type { CommandPayload } from "@effect-api-query/contracts";
 import { Deferred, Effect, Exit, Scope } from "effect";
 
 import { requireOperationOwner } from "./caller.ts";
+
+const ownedCommandKey = Effect.fnUntraced(function* (operationId: string) {
+  const owner = yield* requireOperationOwner;
+  return JSON.stringify([owner, operationId]);
+});
 
 interface Command {
   status: CommandStatus;
@@ -75,8 +80,7 @@ export const makeCommands = Effect.fn("ExampleRpc.makeCommands")(function* () {
   }: {
     readonly operationId: string;
   }) {
-    const owner = yield* requireOperationOwner;
-    const key = JSON.stringify([owner, operationId]);
+    const key = yield* ownedCommandKey(operationId);
     if (!commands.has(key)) {
       commands.set(key, null);
     }
@@ -100,12 +104,8 @@ export const makeCommands = Effect.fn("ExampleRpc.makeCommands")(function* () {
     operationId,
     steps,
   }: CommandPayload) {
-    const owner = yield* requireOperationOwner;
-    const command = yield* startWork(
-      JSON.stringify([owner, operationId]),
-      operationId,
-      steps
-    );
+    const key = yield* ownedCommandKey(operationId);
+    const command = yield* startWork(key, operationId, steps);
     return yield* Deferred.await(command.done);
   });
 
@@ -114,11 +114,10 @@ export const makeCommands = Effect.fn("ExampleRpc.makeCommands")(function* () {
   }: {
     readonly operationId: string;
   }) {
-    const owner = yield* requireOperationOwner;
-    const key = JSON.stringify([owner, operationId]);
+    const key = yield* ownedCommandKey(operationId);
     const existing = commands.get(key);
     if (existing === undefined) {
-      return yield* Effect.fail("operation-not-found" as const);
+      return yield* Effect.fail(OperationNotFound.literal);
     }
     if (existing === null) {
       const cancelled = createCommand(key, operationId, 0);
@@ -126,7 +125,7 @@ export const makeCommands = Effect.fn("ExampleRpc.makeCommands")(function* () {
       return cancelled.status;
     }
     yield* Deferred.done(existing.cancellation, Exit.void);
-    return yield* Deferred.await(existing.done);
+    return yield* Effect.interruptible(Deferred.await(existing.done));
   }, Effect.uninterruptible);
 
   const status = Effect.fn("ExampleRpc.Commands.status")(function* ({
@@ -134,8 +133,12 @@ export const makeCommands = Effect.fn("ExampleRpc.makeCommands")(function* () {
   }: {
     readonly operationId: string;
   }) {
-    const owner = yield* requireOperationOwner;
-    return commands.get(JSON.stringify([owner, operationId]))?.status ?? null;
+    const key = yield* ownedCommandKey(operationId);
+    const command = commands.get(key);
+    if (command === undefined) {
+      return yield* Effect.fail(OperationNotFound.literal);
+    }
+    return command?.status ?? null;
   });
 
   const reset = Effect.gen(function* () {

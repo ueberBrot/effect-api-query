@@ -100,8 +100,11 @@ export const createTanStackStartRouter = async (
 const startApplication = createIsomorphicFn()
   .server(async () => await startRequestApplication(getRequest()))
   .client(async () => {
-    await startOperationSession("/rpc");
-    return await startTanStackStartApplication({ rpcUrl: "/rpc" });
+    const sessionFetch = await startOperationSession("/rpc");
+    return await startTanStackStartApplication({
+      rpcUrl: "/rpc",
+      fetch: sessionFetch,
+    });
   });
 
 export const getRouter = async () =>

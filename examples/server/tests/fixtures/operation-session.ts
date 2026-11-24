@@ -1,3 +1,5 @@
+import { operationSessionPath } from "@effect-api-query/contracts";
+
 export const openOperationSession = async (
   origin: string,
   send: (request: Request) => Promise<Response> = fetch,
@@ -8,7 +10,7 @@ export const openOperationSession = async (
     headers.set("cookie", cookie);
   }
   const response = await send(
-    new Request(`${origin}/api/demo-operations`, {
+    new Request(`${origin}${operationSessionPath}`, {
       method: "POST",
       headers,
     })

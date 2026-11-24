@@ -1,6 +1,6 @@
 import { startExampleRpcServer } from "@effect-api-query/server";
 import { MutationObserver, QueryObserver } from "@tanstack/react-query";
-import { Effect, Exit, Scope } from "effect";
+import { Cause, Effect, Exit, Scope } from "effect";
 import { describe, expect, it } from "vite-plus/test";
 
 import { startExampleServerFixture } from "../../server/tests/fixtures/example-server.ts";
@@ -223,7 +223,7 @@ describe("Cancellable commands", () => {
     try {
       await expect(
         queryClient.query(rpcQuery.commands.status.queryOptions({ input }))
-      ).resolves.toBeNull();
+      ).rejects.toMatchObject({ cause: Cause.fail("operation-not-found") });
       await rpcQuery.commands.reserve.call({ input });
       const cancelled = await cancel.mutate(input);
       expect(cancelled).toMatchObject({
@@ -290,7 +290,9 @@ describe("Cancellable commands", () => {
         state: "cancelled",
         totalSteps: 40,
       });
-      await expect(queryClient.query(options)).resolves.toBeNull();
+      await expect(queryClient.query(options)).rejects.toMatchObject({
+        cause: Cause.fail("operation-not-found"),
+      });
       await expect(start.mutate({ ...input, steps: 1 })).resolves.toMatchObject(
         {
           state: "completed",

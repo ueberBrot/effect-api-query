@@ -48,7 +48,7 @@ const Command = ({
   const status = useQuery(
     rpcQuery.commands.status.queryOptions({
       input,
-      enabled: start.status !== "idle",
+      enabled: reserved,
       refetchInterval: (query) =>
         query.state.data?.state === "running" ||
         query.state.status === "error" ||

@@ -35,9 +35,10 @@ const startSelectedExample = async () => {
       dispose: application.dispose,
     };
   }
-  await startOperationSession(rpcUrl);
+  const sessionFetch = await startOperationSession(rpcUrl);
   const application = await startViteReactApplication({
     rpcUrl,
+    fetch: sessionFetch,
     httpBaseUrl,
     directoryStorage: globalThis.sessionStorage,
   });

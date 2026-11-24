@@ -3,7 +3,7 @@ import { FetchHttpClient } from "effect/http";
 import type { RpcClientError, RpcGroup } from "effect/rpc";
 import { RpcClient, RpcSerialization } from "effect/rpc";
 
-import { exampleRpcGroup } from "./contracts.ts";
+import { exampleRpcGroup, OperationNotFound } from "./contracts.ts";
 
 export type ExampleRpcClient = RpcClient.RpcClient<
   RpcGroup.Rpcs<typeof exampleRpcGroup>,
@@ -19,18 +19,19 @@ export interface StartedExampleRpcClient {
   ) => Promise<Exit.Exit<A, E>>;
 }
 
+export const makeExampleFetchLayer = (fetch?: typeof globalThis.fetch) =>
+  fetch === undefined
+    ? FetchHttpClient.layer
+    : FetchHttpClient.layer.pipe(
+        Layer.provide(Layer.succeed(FetchHttpClient.Fetch, fetch))
+      );
+
 export const makeExampleRpcClient = Effect.fn(
   "ExampleRpc.makeExampleRpcClient"
 )(function* (rpcUrl: string, fetch?: typeof globalThis.fetch) {
-  const fetchLayer =
-    fetch === undefined
-      ? FetchHttpClient.layer
-      : FetchHttpClient.layer.pipe(
-          Layer.provide(Layer.succeed(FetchHttpClient.Fetch, fetch))
-        );
   const protocolLayer = RpcClient.layerProtocolHttp({ url: rpcUrl }).pipe(
     Layer.provide(RpcSerialization.layerJson),
-    Layer.provide(fetchLayer)
+    Layer.provide(makeExampleFetchLayer(fetch))
   );
 
   const client = yield* RpcClient.make(exampleRpcGroup).pipe(
@@ -46,7 +47,7 @@ export const makeExampleRpcClient = Effect.fn(
       Effect.onInterrupt(() =>
         client["diagnostics.cancel"]({ operationId }).pipe(
           Effect.catchIf(
-            (error) => error === "operation-not-found",
+            (error) => error === OperationNotFound.literal,
             () => Effect.void
           ),
           Effect.ignoreCause({

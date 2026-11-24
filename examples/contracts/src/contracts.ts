@@ -56,6 +56,8 @@ export class ExampleAuthorization extends RpcMiddleware.Service<ExampleAuthoriza
   { error: ExampleAuthorizationError }
 ) {}
 
+export const operationSessionPath = "/api/demo-operations";
+
 export const OperationNotFound = Schema.Literal("operation-not-found");
 
 const operationLookupError = Schema.Union([
@@ -95,7 +97,7 @@ const CommandsReserve = Rpc.make("commands.reserve", {
 const CommandsStatus = Rpc.make("commands.status", {
   payload: OperationId,
   success: Schema.NullOr(CommandStatus),
-  error: ExampleAuthorizationError,
+  error: operationLookupError,
 });
 
 const CommandsCancel = Rpc.make("commands.cancel", {

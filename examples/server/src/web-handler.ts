@@ -1,4 +1,7 @@
-import { exampleRpcGroup } from "@effect-api-query/contracts";
+import {
+  exampleRpcGroup,
+  operationSessionPath,
+} from "@effect-api-query/contracts";
 import { NodeFileSystem } from "@effect/platform-node";
 import { Clock, Context, Effect, Layer, Path, Scope } from "effect";
 import type { HttpServerRequest } from "effect/http";
@@ -199,7 +202,7 @@ const makeHostWebHandler = Effect.fn("ExampleServer.makeHostWebHandler")(
         if (path === "/api/demo-access") {
           return await issueWriteSession(request, Context.empty());
         }
-        if (path === "/api/demo-operations") {
+        if (path === operationSessionPath) {
           return await issueOperationSession(request, Context.empty());
         }
       }

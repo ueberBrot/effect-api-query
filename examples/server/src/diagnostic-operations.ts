@@ -1,4 +1,7 @@
-import { DiagnosticFailure } from "@effect-api-query/contracts";
+import {
+  DiagnosticFailure,
+  OperationNotFound,
+} from "@effect-api-query/contracts";
 import type {
   DiagnosticStatus,
   SlowDiagnosticInput,
@@ -28,7 +31,7 @@ export const makeDiagnosticOperations = Effect.sync(() => {
       const owner = yield* requireOperationOwner;
       const operation = owners.get(owner)?.operations.get(operationId);
       return operation === undefined
-        ? yield* Effect.fail("operation-not-found" as const)
+        ? yield* Effect.fail(OperationNotFound.literal)
         : operation.status;
     }
   );
@@ -44,7 +47,7 @@ export const makeDiagnosticOperations = Effect.sync(() => {
     const owner = yield* requireOperationOwner;
     const operation = owners.get(owner)?.operations.get(operationId);
     if (operation === undefined) {
-      return yield* Effect.fail("operation-not-found" as const);
+      return yield* Effect.fail(OperationNotFound.literal);
     }
     // oxlint-disable-next-line unicorn/no-array-method-this-argument
     return yield* Effect.forEach(
