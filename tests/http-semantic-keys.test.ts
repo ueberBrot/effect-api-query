@@ -1062,6 +1062,117 @@ describe("HTTP semantic keys", () => {
     }
   });
 
+  it("rejects case-sensitive header regexes, tuple-array queries, USVString-normalized names, encoded keys, addHttpApi, and streaming endpoints", () => {
+    const caseSensitiveHeader = HttpApi.make("case-sensitive-header")
+      .annotate(HttpApi.RedactedNames, { headers: [/^x-token$/u] })
+      .add(
+        HttpApiGroup.make("g").add(
+          HttpApiEndpoint.get("read", "/read", {
+            headers: { "X-Token": Schema.String },
+          })
+        )
+      );
+    const tupleArrayQuery = HttpApi.make("tuple-array-query")
+      .annotate(HttpApi.RedactedNames, { query: ["token"] })
+      .add(
+        HttpApiGroup.make("g").add(
+          HttpApiEndpoint.get("read", "/read", {
+            query: Schema.Array(Schema.Tuple([Schema.String, Schema.String])),
+          })
+        )
+      );
+    const loneSurrogateQuery = HttpApi.make("lone-surrogate-query")
+      .annotate(HttpApi.RedactedNames, { query: ["\uFFFD"] })
+      .add(
+        HttpApiGroup.make("g").add(
+          HttpApiEndpoint.get("read", "/read", {
+            query: { "\uD800": Schema.String },
+          })
+        )
+      );
+    const suspendedRenamed = Schema.suspend(() =>
+      Schema.Union([
+        Schema.Struct({ publicField: Schema.String }),
+        Schema.Struct({ authToken: Schema.String }).pipe(
+          Schema.encodeKeys({ authToken: "token" })
+        ),
+      ])
+    );
+    const encodedKeysUnion = HttpApi.make("encoded-keys-union")
+      .annotate(HttpApi.RedactedNames, { query: ["token"] })
+      .add(
+        HttpApiGroup.make("g").add(
+          HttpApiEndpoint.get("read", "/read", {
+            query: suspendedRenamed,
+          })
+        )
+      );
+    const importedSubApi = HttpApi.make("imported")
+      .annotate(HttpApi.RedactedNames, { headers: ["x-imported-secret"] })
+      .add(
+        HttpApiGroup.make("sub").add(
+          HttpApiEndpoint.get("read", "/read", {
+            headers: { "x-imported-secret": Schema.String },
+          })
+        )
+      );
+    const parentApi = HttpApi.make("parent").addHttpApi(importedSubApi);
+    const streamingRedacted = HttpApi.make("streaming-redacted")
+      .annotate(HttpApi.RedactedNames, { query: ["token"] })
+      .add(
+        HttpApiGroup.make("g").add(
+          HttpApiEndpoint.get("watch", "/watch", {
+            query: { token: Schema.String },
+            success: HttpApiSchema.StreamSse({ data: Schema.String }),
+          })
+        )
+      );
+
+    const builders: (() => void)[] = [
+      () => {
+        createHttpApiQueryUtils(caseSensitiveHeader, {
+          client: Effect.runSync(makeUnusedHttpClient(caseSensitiveHeader)),
+          keyPrefix: ["test"],
+        });
+      },
+      () => {
+        createHttpApiQueryUtils(tupleArrayQuery, {
+          client: Effect.runSync(makeUnusedHttpClient(tupleArrayQuery)),
+          keyPrefix: ["test"],
+        });
+      },
+      () => {
+        createHttpApiQueryUtils(loneSurrogateQuery, {
+          client: Effect.runSync(makeUnusedHttpClient(loneSurrogateQuery)),
+          keyPrefix: ["test"],
+        });
+      },
+      () => {
+        createHttpApiQueryUtils(encodedKeysUnion, {
+          client: Effect.runSync(makeUnusedHttpClient(encodedKeysUnion)),
+          keyPrefix: ["test"],
+        });
+      },
+      () => {
+        createHttpApiQueryUtils(parentApi, {
+          client: Effect.runSync(makeUnusedHttpClient(parentApi)),
+          keyPrefix: ["test"],
+        });
+      },
+      () => {
+        createHttpApiQueryUtils(streamingRedacted, {
+          client: Effect.runSync(makeUnusedHttpClient(streamingRedacted)),
+          keyPrefix: ["test"],
+        });
+      },
+    ];
+    for (const build of builders) {
+      expect(build).toThrow(
+        expect.objectContaining({ code: "MissingKeyEncoder" })
+      );
+    }
+  });
+
   it("preserves repeated wire-parameter ordering for colliding URL-encoded request parts", async () => {
     const wireValue = Schema.Union([
       Schema.String,
@@ -1093,6 +1204,15 @@ describe("HTTP semantic keys", () => {
         HttpApiEndpoint.get("fixed", "/fixed", {
           query: { first: Schema.String, second: Schema.String },
           success: Schema.String,
+        }),
+        HttpApiEndpoint.get("payloadAndQuery", "/payload-and-query", {
+          payload: {
+            tag: Schema.Union([Schema.String, Schema.Array(Schema.String)]),
+          },
+          query: {
+            tag: Schema.Union([Schema.String, Schema.Array(Schema.String)]),
+          },
+          success: Schema.String,
         })
       )
     );
@@ -1122,6 +1242,12 @@ describe("HTTP semantic keys", () => {
         .handle("fixed", ({ query }) =>
           Effect.succeed(`${query.first}:${query.second}`)
         )
+        .handle("payloadAndQuery", () =>
+          Effect.gen(function* readCombinedUrl() {
+            const request = yield* HttpServerRequest.HttpServerRequest;
+            return request.url;
+          })
+        )
     );
     const scope = Scope.makeUnsafe();
     const client = await Effect.runPromise(
@@ -1140,6 +1266,8 @@ describe("HTTP semantic keys", () => {
     try {
       const literalFirst = { "a[b]": "1", a: { b: "2" } };
       const nestedFirst = { a: { b: "2" }, "a[b]": "1" };
+      const surrogateFirst = { "\uD800": "A", "\uD801": "B" };
+      const surrogateSecond = { "\uD801": "B", "\uD800": "A" };
 
       expect({
         reorderedDistinct:
@@ -1148,6 +1276,13 @@ describe("HTTP semantic keys", () => {
           ) !==
           JSON.stringify(
             http.query.queryKey({ input: { query: nestedFirst } })
+          ),
+        surrogateDistinct:
+          JSON.stringify(
+            http.query.queryKey({ input: { query: surrogateFirst } })
+          ) !==
+          JSON.stringify(
+            http.query.queryKey({ input: { query: surrogateSecond } })
           ),
         nestedDistinct:
           JSON.stringify(
@@ -1184,6 +1319,7 @@ describe("HTTP semantic keys", () => {
           ),
       }).toStrictEqual({
         reorderedDistinct: true,
+        surrogateDistinct: true,
         nestedDistinct: true,
         arrayDistinct: true,
         unrelatedKeyReused: true,
@@ -1192,16 +1328,26 @@ describe("HTTP semantic keys", () => {
       const [
         firstUrl,
         secondUrl,
+        surrogateFirstUrl,
+        surrogateSecondUrl,
         getPayloadFirst,
         getPayloadSecond,
         formFirst,
         formSecond,
+        payloadAndQueryFirst,
+        payloadAndQuerySecond,
       ] = await Promise.all([
         queryClient.query(
           http.query.queryOptions({ input: { query: literalFirst } })
         ),
         queryClient.query(
           http.query.queryOptions({ input: { query: nestedFirst } })
+        ),
+        queryClient.query(
+          http.query.queryOptions({ input: { query: surrogateFirst } })
+        ),
+        queryClient.query(
+          http.query.queryOptions({ input: { query: surrogateSecond } })
         ),
         queryClient.query(
           http.getPayload.queryOptions({
@@ -1219,29 +1365,47 @@ describe("HTTP semantic keys", () => {
         queryClient.query(
           http.formPayload.queryOptions({ input: { payload: nestedFirst } })
         ),
+        queryClient.query(
+          http.payloadAndQuery.queryOptions({
+            input: { payload: { tag: "1" }, query: { tag: "2" } },
+          })
+        ),
+        queryClient.query(
+          http.payloadAndQuery.queryOptions({
+            input: { payload: { tag: "2" }, query: { tag: "1" } },
+          })
+        ),
       ]);
 
       expect({
         firstUrl,
         secondUrl,
+        surrogateFirstUrl,
+        surrogateSecondUrl,
         queryCalls,
         getPayloadFirst,
         getPayloadSecond,
         formFirst,
         formSecond,
+        payloadAndQueryFirst,
+        payloadAndQuerySecond,
         fixedKey: http.fixed
           .queryKey({ input: { query: { second: "2", first: "1" } } })
           .at(-1),
       }).toStrictEqual({
         firstUrl: "/query?a%5Bb%5D=1&a%5Bb%5D=2",
         secondUrl: "/query?a%5Bb%5D=2&a%5Bb%5D=1",
-        queryCalls: 2,
+        surrogateFirstUrl: "/query?%EF%BF%BD=A&%EF%BF%BD=B",
+        surrogateSecondUrl: "/query?%EF%BF%BD=B&%EF%BF%BD=A",
+        queryCalls: 4,
         getPayloadFirst:
           "/get-payload?filter%5Bb%5D%5Bc%5D=1&filter%5Bb%5D%5Bc%5D=2",
         getPayloadSecond:
           "/get-payload?filter%5Bb%5D%5Bc%5D=2&filter%5Bb%5D%5Bc%5D=1",
         formFirst: "a%5Bb%5D=1&a%5Bb%5D=2",
         formSecond: "a%5Bb%5D=2&a%5Bb%5D=1",
+        payloadAndQueryFirst: "/payload-and-query?tag=1&tag=2",
+        payloadAndQuerySecond: "/payload-and-query?tag=2&tag=1",
         fixedKey: { query: { first: "1", second: "2" } },
       });
     } finally {

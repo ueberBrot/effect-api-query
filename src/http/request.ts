@@ -90,6 +90,54 @@ const mergeRedactionAnalysis = (
   return "Safe";
 };
 
+const toUnicodeScalarString = (value: string): string => {
+  let result = "";
+  let changed = false;
+  for (const char of value) {
+    const code = char.codePointAt(0);
+    if (code !== undefined && code >= 0xd8_00 && code <= 0xdf_ff) {
+      result += "\uFFFD";
+      changed = true;
+    } else {
+      result += char;
+    }
+  }
+  return changed ? result : value;
+};
+
+const matchesHeaderRedaction = (
+  name: string,
+  patterns: readonly (string | RegExp)[]
+): boolean =>
+  patterns.length > 0 &&
+  (Headers.isRedactedName(name, patterns) ||
+    Headers.isRedactedName(name.toLowerCase(), patterns));
+
+const matchesQueryRedaction = (
+  wireName: string,
+  patterns: readonly (string | RegExp)[]
+): boolean => {
+  if (patterns.length === 0) {
+    return false;
+  }
+  const wellFormed = toUnicodeScalarString(wireName);
+  return (
+    Headers.isRedactedName(wireName, patterns) ||
+    (wellFormed !== wireName && Headers.isRedactedName(wellFormed, patterns))
+  );
+};
+
+const isOpenRedactedAst = (
+  ast: SchemaAST.AST,
+  nested: boolean,
+  prefixLength: number
+): boolean =>
+  SchemaAST.isAny(ast) ||
+  SchemaAST.isUnknown(ast) ||
+  SchemaAST.isObjectKeyword(ast) ||
+  SchemaAST.isDeclaration(ast) ||
+  (nested && prefixLength === 0 && SchemaAST.isArrays(ast));
+
 const inspectRedactedAst = (
   ast: SchemaAST.AST,
   patterns: readonly (string | RegExp)[],
@@ -97,12 +145,7 @@ const inspectRedactedAst = (
   prefix: readonly string[],
   seen: Set<SchemaAST.AST>
 ): RedactionAnalysis => {
-  if (
-    SchemaAST.isAny(ast) ||
-    SchemaAST.isUnknown(ast) ||
-    SchemaAST.isObjectKeyword(ast) ||
-    SchemaAST.isDeclaration(ast)
-  ) {
+  if (isOpenRedactedAst(ast, nested, prefix.length)) {
     return "RequiresEncoder";
   }
   if (SchemaAST.isUnion(ast)) {
@@ -143,7 +186,12 @@ const inspectRedactedAst = (
       continue;
     }
     const nextPath = [...prefix, String(property.name)];
-    if (Headers.isRedactedName(formatWireName(nextPath), patterns)) {
+    const wireName = formatWireName(nextPath);
+    if (
+      nested
+        ? matchesQueryRedaction(wireName, patterns)
+        : matchesHeaderRedaction(wireName, patterns)
+    ) {
       return "RequiresEncoder";
     }
     if (nested) {
@@ -315,23 +363,6 @@ const recordWireParam = (
   }
 };
 
-// oxlint-disable-next-line anti-slop/no-unknown-parameters
-const coerceWireValue = (value: unknown): string => {
-  if (Predicate.isString(value)) {
-    return value;
-  }
-  if (
-    value === null ||
-    Predicate.isNumber(value) ||
-    Predicate.isBoolean(value) ||
-    Predicate.isBigInt(value)
-  ) {
-    return String(value);
-  }
-  // oxlint-disable-next-line typescript/no-base-to-string
-  return String(value);
-};
-
 const collectWireParams = (
   // oxlint-disable-next-line anti-slop/no-unsafe-dictionary-type
   record: Record<string, unknown>,
@@ -345,36 +376,31 @@ const collectWireParams = (
     }
     const nextPath = [...prefix, key];
     const wireName = formatWireName(nextPath);
+    const serializedName = toUnicodeScalarString(wireName);
     if (Array.isArray(item)) {
       let emitted = false;
       for (const element of item) {
         if (element === undefined) {
           continue;
         }
-        if (
-          !emitted &&
-          redactedPatterns.length > 0 &&
-          Headers.isRedactedName(wireName, redactedPatterns)
-        ) {
+        if (!emitted && matchesQueryRedaction(wireName, redactedPatterns)) {
           throw new TypeError(
             "Redacted HTTP query parameters require a custom key encoder"
           );
         }
-        recordWireParam(byName, wireName, coerceWireValue(element), !emitted);
+        recordWireParam(byName, serializedName, String(element), !emitted);
         emitted = true;
       }
     } else if (isPlainObject(item)) {
       collectWireParams(item, nextPath, byName, redactedPatterns);
     } else {
-      if (
-        redactedPatterns.length > 0 &&
-        Headers.isRedactedName(wireName, redactedPatterns)
-      ) {
+      if (matchesQueryRedaction(wireName, redactedPatterns)) {
         throw new TypeError(
           "Redacted HTTP query parameters require a custom key encoder"
         );
       }
-      recordWireParam(byName, wireName, coerceWireValue(item), true);
+      // oxlint-disable-next-line typescript/no-base-to-string
+      recordWireParam(byName, serializedName, String(item), true);
     }
   }
 };
@@ -385,22 +411,38 @@ const normalizeUrlEncodedPart = (
   redactedPatterns: readonly (string | RegExp)[]
   // oxlint-disable-next-line anti-slop/no-unknown-returns
 ): unknown => {
+  if (Array.isArray(value)) {
+    if (redactedPatterns.length > 0) {
+      for (const entry of value) {
+        if (
+          Array.isArray(entry) &&
+          entry.length > 0 &&
+          Predicate.isString(entry[0]) &&
+          matchesQueryRedaction(entry[0], redactedPatterns)
+        ) {
+          throw new TypeError(
+            "Redacted HTTP query parameters require a custom key encoder"
+          );
+        }
+      }
+    }
+    return value;
+  }
   if (!isPlainObject(value)) {
     return value;
   }
   const byName = new Map<string, WireParamEntry>();
   collectWireParams(value, [], byName, redactedPatterns);
-  let collidingOrder: Record<string, readonly string[]> | undefined;
+  // oxlint-disable-next-line typescript/no-unsafe-assignment
+  const collidingOrder: Record<string, readonly string[]> = Object.create(null);
+  let hasCollision = false;
   for (const [wireName, entry] of byName) {
     if (entry.sources > 1) {
-      // oxlint-disable-next-line typescript/no-unsafe-assignment
-      collidingOrder ??= Object.create(null);
-      if (collidingOrder !== undefined) {
-        collidingOrder[wireName] = entry.values;
-      }
+      collidingOrder[wireName] = entry.values;
+      hasCollision = true;
     }
   }
-  return collidingOrder === undefined ? value : [value, collidingOrder];
+  return hasCollision ? [value, collidingOrder] : value;
 };
 
 const normalizeHeaders = (
@@ -411,10 +453,7 @@ const normalizeHeaders = (
   // oxlint-disable-next-line typescript/no-unsafe-assignment
   const headers: Record<string, JsonValue> = Object.create(null);
   for (const [name, headerValue] of Object.entries(rawHeaders)) {
-    if (
-      redactedPatterns.length > 0 &&
-      Headers.isRedactedName(name, redactedPatterns)
-    ) {
+    if (matchesHeaderRedaction(name, redactedPatterns)) {
       throw new TypeError("Redacted HTTP headers require a custom key encoder");
     }
     const lower = name.toLowerCase();
@@ -474,8 +513,7 @@ const normalizeRequestKey = (
 export const createHttpRequest = (
   endpoint: HttpApiEndpoint.Top,
   identity: HttpApiEndpointIdentity,
-  annotations: Context.Context<never>,
-  annotationLayers: readonly Context.Context<never>[] = [annotations]
+  annotationLayers: readonly Context.Context<never>[]
 ): HttpRequestDescription | undefined => {
   const classified = classifyHttpEndpoint(endpoint);
   if (classified === undefined) {
@@ -515,6 +553,10 @@ export const createHttpRequest = (
       : { kind: classified.kind, parts };
   if (parts.length === 0) {
     return { ...description, input: { _tag: "Inputless" } };
+  }
+  let annotations = Context.empty();
+  for (const layer of annotationLayers) {
+    annotations = Context.merge(annotations, layer);
   }
   const redactedNames = collectRedactedNames(annotationLayers);
   const redactPayloadAsQuery =

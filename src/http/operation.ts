@@ -1,4 +1,4 @@
-import { Context, Effect, Predicate } from "effect";
+import { Effect, Predicate } from "effect";
 import type { Cause } from "effect";
 import type { HttpClientResponse } from "effect/http";
 import type { HttpApi } from "effect/http-api";
@@ -72,7 +72,6 @@ const describeHttpEndpoints = (
   }
   const descriptions: HttpEndpointDescription[] = [];
   for (const group of Object.values(api.groups)) {
-    const groupAnnotations = Context.merge(api.annotations, group.annotations);
     for (const endpoint of Object.values(group.endpoints)) {
       const identity = {
         apiId: api.identifier,
@@ -80,12 +79,11 @@ const describeHttpEndpoints = (
         endpoint: endpoint.identifier,
         method: endpoint.method,
       };
-      const request = createHttpRequest(
-        endpoint,
-        identity,
-        Context.merge(groupAnnotations, endpoint.annotations),
-        [api.annotations, group.annotations, endpoint.annotations]
-      );
+      const request = createHttpRequest(endpoint, identity, [
+        api.annotations,
+        group.annotations,
+        endpoint.annotations,
+      ]);
       if (request === undefined) {
         continue;
       }
