@@ -1,6 +1,6 @@
 import { QueryClient } from "@tanstack/query-core";
 import { Schema, Option } from "effect";
-import { describe, expect, it } from "vite-plus/test";
+import { describe, expect, it, vi } from "vite-plus/test";
 
 import { schemaStructuralSharing } from "#effect-api-query";
 
@@ -241,16 +241,120 @@ describe("Schema structural sharing", () => {
     client.clear();
   });
 
-  it("passes through arrays with accessors without reading their elements", () => {
+  it.each(["root", "nested"] as const)(
+    "screens %s arrays before validating either value or comparing them",
+    (position) => {
+      const checked = vi.fn<() => boolean>(() => true);
+      const equivalence = vi.fn<() => boolean>(() => true);
+      const element = Schema.Unknown.check(Schema.makeFilter(checked));
+      const array = Schema.Array(element);
+      const schema = Schema.Union([array, Schema.Struct({ items: array })]);
+      const share = schemaStructuralSharing(schema, { equivalence });
+      const wrap = (items: readonly unknown[]) =>
+        position === "root" ? items : { items };
+      const plain = wrap([1]);
+      const get = vi.fn<() => number>(() => 1);
+      const accessor = wrap(Object.defineProperty([1], "0", { get }));
+      const extraProperty = wrap(Object.assign([1], { extra: true }));
+      const cyclicItems: unknown[] = [];
+      const cyclic = wrap(cyclicItems);
+      cyclicItems.push(cyclic);
+
+      expect(share(plain, accessor)).toBe(accessor);
+      expect(share(plain, extraProperty)).toBe(extraProperty);
+      expect(() => share(plain, cyclic)).toThrow(
+        "Schema sharing requires acyclic plain containers"
+      );
+      expect(checked).not.toHaveBeenCalled();
+
+      expect({
+        replacedAccessor: share(accessor, plain) === plain,
+        replacedExtraProperty: share(extraProperty, plain) === plain,
+        replacedCycle: share(cyclic, plain) === plain,
+        validations: checked.mock.calls.length,
+        getterCalls: get.mock.calls.length,
+        comparisons: equivalence.mock.calls.length,
+      }).toStrictEqual({
+        replacedAccessor: true,
+        replacedExtraProperty: true,
+        replacedCycle: true,
+        validations: 3,
+        getterCalls: 0,
+        comparisons: 0,
+      });
+    }
+  );
+
+  it("checks both arrays before Schema validation and reuses equivalent arrays", () => {
+    const schema = Schema.Array(Schema.Int);
+    const checked = vi.fn<() => boolean>(() => true);
+    const share = schemaStructuralSharing(
+      schema.check(Schema.makeFilter(checked)),
+      { equivalence: Schema.toEquivalence(schema) }
+    );
+    const previous = [1];
+    const incoming = [1];
+    const ownKeys = vi.spyOn(Reflect, "ownKeys");
+    try {
+      expect(share(previous, incoming)).toBe(previous);
+      const previousInspection = ownKeys.mock.calls.findIndex(
+        ([value]) => value === previous
+      );
+      expect(ownKeys.mock.invocationCallOrder[previousInspection]).toBeLessThan(
+        checked.mock.invocationCallOrder[0] ?? 0
+      );
+    } finally {
+      ownKeys.mockRestore();
+    }
+  });
+
+  it("rejects an incoming cycle before comparing an earlier sibling", () => {
+    const checked = vi.fn<() => boolean>(() => true);
+    const equivalence = vi.fn<() => boolean>(() => true);
+    const schema = Schema.Int.check(Schema.makeFilter(checked));
+    const share = schemaStructuralSharing(schema, { equivalence });
+    const items: unknown[] = [];
+    const incoming = { value: 1, items };
+    items.push(incoming);
+
+    expect(() => share({ value: 2, items: [] }, incoming)).toThrow(TypeError);
+    expect(checked).not.toHaveBeenCalled();
+    expect(equivalence).not.toHaveBeenCalled();
+  });
+
+  it("bounds cycle-check work on a shared DAG in each invocation", () => {
     const share = schemaStructuralSharing(Reading, {
       equivalence: Schema.toEquivalence(Reading),
     });
-    const incoming = Object.defineProperty([reading(1)], "0", {
-      get: () => {
-        throw new Error("Unexpected getter invocation");
-      },
-    });
-    expect(share([reading(1)], incoming)).toBe(incoming);
+    interface Diamond {
+      readonly left: { readonly child: Graph };
+      readonly right: readonly Graph[];
+    }
+    type Graph = readonly Reading[] | Diamond;
+    let graph: Graph = [reading(1)];
+    const containers = new Set<object>([graph]);
+    for (let depth = 0; depth < 5; depth += 1) {
+      const left: Diamond["left"] = { child: graph };
+      const right: Diamond["right"] = [graph];
+      graph = { left, right };
+      containers.add(left).add(right).add(graph);
+    }
+    const ownKeys = vi.spyOn(Reflect, "ownKeys");
+    try {
+      for (const previous of [undefined, graph]) {
+        expect(share(previous, graph)).toBe(graph);
+        const inspections = ownKeys.mock.calls.filter(([value]) =>
+          containers.has(value)
+        );
+        expect(new Set(inspections.map(([value]) => value)).size).toBe(
+          containers.size
+        );
+        expect(inspections.length).toBeLessThanOrEqual(3 * containers.size);
+        ownKeys.mockClear();
+      }
+    } finally {
+      ownKeys.mockRestore();
+    }
   });
 
   it("leaves plain accessors untouched when a Schema validates containers", () => {

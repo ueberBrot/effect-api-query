@@ -94,7 +94,8 @@ skills:
       - mistake: Treat generic equality or wire serialization as decoded-value equality
         mechanism: Effect equality can cache comparisons and inspect custom objects, while Schema equivalence follows declared fields and annotations.
         wrong_pattern: Use generic Equal.equals or encoded JSON to reuse arbitrary mutable or custom cached objects.
-        correct_pattern: Use schemaStructuralSharing with an explicit decoded atom equivalence; include private/extra state, retain custom reference semantics, and require synchronous service-free validation over acyclic plain containers. Pass custom-prototype containers through unchanged. Preserve HTTP metadata freezing.
+        correct_pattern: >-
+          Use schemaStructuralSharing with explicit decoded atom equivalence that includes private or extra state. Keep validation and equivalence synchronous and service-free. Use plain objects and dense arrays with enumerable data properties. Shared references can form an acyclic graph. Incoming cycles through supported containers throw before callbacks. Preserve HTTP metadata freezing.
         source: tests/types/docs-structural-sharing.ts
         priority: HIGH
         status: active

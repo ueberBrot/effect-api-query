@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "abf1adb6e43990b57e168c26fb8cabbe167cd8b7ce1cc7b3bce5606744a170cd",
+      "fingerprint": "c28e4d139a4527ecf0854e75abd56cf203e7ae8114cb6ef217e618d2f9291382",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -44,7 +44,7 @@
         "apps/docs/src/content/docs/guides/refresh-from-events.md": "e2294732dd207f72fa27adc22dcedf9c83402d56c8f52f4c1d20017a77773212",
         "apps/docs/src/content/docs/guides/retry-queries.md": "c8082d04cd147106b6cc57587c33185770488c7c9cf3312a009b8a3b78944557",
         "apps/docs/src/content/docs/guides/scoped-event-cache.md": "f37c9c21f51f69b5ac1bb78e20199ad22943a1a5d4a6a9127d2da4171df28245",
-        "apps/docs/src/content/docs/guides/share-decoded-values.md": "66fbdd16d08e6569f3442c35401d6efecc9aa94744f1569ade35995ae16858d0",
+        "apps/docs/src/content/docs/guides/share-decoded-values.md": "005ac9eccedba6bb547192650ff2c204b9df546176076e55c91a6e13dea9ed8a",
         "apps/docs/src/content/docs/guides/solid-query.md": "6ec1cacb1238cf3dbc7b71ca6311757c76949973522a83d12299f20026dea695",
         "apps/docs/src/content/docs/guides/stream-snapshots.md": "b26610d19e9fa95827c211c39dd2983b676e1a0d64307da56970ec4a5b8a333b",
         "apps/docs/src/content/docs/guides/streaming.md": "0094954578cb2cf4a2b6fe759ce9893c27d2fea6810f42041a768d2fe7f5b4de",
@@ -217,7 +217,7 @@
         "scripts/verify-docs-version.mts": "58f63de6f871726a5bef8b70d1de7fad591374c52823e3cf60a160a9f37541e8",
         "scripts/version-packages.mts": "e514a013a90489d8d0ff5eb0620276f923c85fa765061aa4d3f312ac2ee4c7ad",
         "skills/effect-api-query/SKILL.md": "2f317d7b9ee273c24731613181d10495e73d0ca698c3c59a3fed557f6f2770fe",
-        "skills/effect-api-query/references/cache-workflows.md": "9179b14cbef2dae7dd25f1e959fa42373b9cd22a84dc906b0cc3c05243bc141f",
+        "skills/effect-api-query/references/cache-workflows.md": "cd50c5f67f8fce77cf8cc2b95b1697bd20205a688adb7319625b62c414402327",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "f8e2ed21583481dffd1680ce85340af508bbd8a5baeb8227da094a099da81fef",
         "skills/effect-api-query/references/http.md": "20ca47fe0b3fd957f06328176967d68f1baa38d41b4bb45e033b86f4722c9d45",
         "skills/effect-api-query/references/hydration-and-ssr.md": "0265ce970039b2ca41be2165683c135fd9584ea9a3c95b147a73eca8e54bd19f",
@@ -247,7 +247,7 @@
         "src/core/reactivity-invalidation.ts": "0f8465628e341e00cca4b65ea19ac75d6cfe1f344da092e4e89ec4dabda6976a",
         "src/core/runtime.ts": "9e99f2a078a1058b3b6b01ada7585d3f63d3486b397be3a6e1f08f0d3f0a9fad",
         "src/core/schema-key.ts": "0d6c00371526085fe19689a7401dfd86cb6f6a96f6b351b4b31bb2648804d5df",
-        "src/core/schema-structural-sharing.ts": "73c3ab3f285e3146376b6c413b34ba4503fc2a07b0e2f8217785951f795f22a8",
+        "src/core/schema-structural-sharing.ts": "e4acf5aac2fd01a364506d2c375d9e785227b4e2a57f82b887e55fd16ffcfbd7",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
         "src/core/stream-publication.ts": "16db2d472ee7146cd0faff53624ed0bfa31eb365c10e52587621750d053e8078",
         "src/core/stream-pull.ts": "9b7957b4487ddcdce2183f55c6f08e6cddee011c5d5e5b8c7b72ec839a7e3c42",
@@ -340,7 +340,7 @@
         "tests/react.test.tsx": "a5494e54ab73dc73a30c4a1e0d51634ad9772735195295e1f65cc9274531b554",
         "tests/reactivity-invalidation.test.ts": "4e4c02e42b62a0e0cdadf058051ac1074f7cc430675569e40c31e4537ed9694d",
         "tests/schema-sharing-prototypes.test.ts": "628a6622656b9b53e686d14b9efbd3abc13c61a13db1546001b0689b491f6022",
-        "tests/schema-structural-sharing.test.ts": "dc4c580e9193fb7749701cad3efdd5563edf8019ed437a7a722f514530dd33da",
+        "tests/schema-structural-sharing.test.ts": "e92f9f428804339a99d7ff4c6fc40a9696d953eeccb1176f6b3758a33412eb2d",
         "tests/skills-maintenance.test.ts": "015e0b882f6a43e0692c9643ad78fe111bcd15edf2adff1b46f5d0deb68b3498",
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
         "tests/skills/query-usability/grade.test.ts": "b4ce4b395a7f38bdc788f3d3268e0236bbe5827b153df9c0592165f0d81817cd",
@@ -421,20 +421,23 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "903b57e83b0b79ade935d99f18bda6b123f07886",
+      "head": "83ce90d345a6d9dd48147dc13c4301ffc4b546c6",
       "outcome": "updated",
-      "reason": "The HTTP reference now describes own raw headers on refetch and frozen metadata snapshots from imperative interceptor results and cache reads.",
+      "reason": "The cache-workflows reference and sharing guide describe screening both sides before Schema validation, rejecting incoming cycles before callbacks, and supporting shared acyclic references.",
       "evidence": [
-        "src/core/metadata-query.ts and tests/http-metadata-options.test.ts against 21868ef8. All 38 focused HTTP tests, docs-check and skills-check passed. Independent source and behavior review completed. Fresh consumer discovery was not run."
+        "src/core/schema-structural-sharing.ts",
+        "tests/schema-structural-sharing.test.ts",
+        "Focused core, prototype, RPC, and HTTP sharing checks passed (23 tests).",
+        "Intent validated the shipped skill. Fresh consumer-agent verification was not performed."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "d556c8903efb18f6f5dc2c444498c2a8818dd2ecb2e6ff12344c0fcdc439cb98",
+      "fingerprint": "185b115968c0619f142d98dff544ed3518a132df00f38d01e8ba72b15f06b165",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
-        "_artifacts/domain_map.yaml": "9ac6f83ae85ef8b140cc7c35ddd27725640ad645013f70d31e954ed9db550ccc",
-        "_artifacts/skill_spec.md": "4b451d59f3c2fb02cb27b8ff5e8cfd56c899c6228f9f81c00d347ea97c21f131",
+        "_artifacts/domain_map.yaml": "83f6dd9d557fe4958ef9452b951d20199c3823a681e705910d4f488e8186074d",
+        "_artifacts/skill_spec.md": "7e886f47bf3d145ac57949001db1774e29a28ba314857e557b256208535480a6",
         "_artifacts/skill_tree.yaml": "12ee0ddea311f100d0093cb01cfd3cb3695d0e93653d7a6e9dc45d6d2ba1a463",
         "apps/docs/astro.config.mts": "90c54a40605dc0f553b9f62831c88a3e012fe6da44a1e216e4f981bcf1af2272",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "a826348cf7b3fd34b0677280daa75a08ce99138cb68fbd79d4ef52936190eeb6",
@@ -473,7 +476,7 @@
         "apps/docs/src/content/docs/guides/refresh-from-events.md": "e2294732dd207f72fa27adc22dcedf9c83402d56c8f52f4c1d20017a77773212",
         "apps/docs/src/content/docs/guides/retry-queries.md": "c8082d04cd147106b6cc57587c33185770488c7c9cf3312a009b8a3b78944557",
         "apps/docs/src/content/docs/guides/scoped-event-cache.md": "f37c9c21f51f69b5ac1bb78e20199ad22943a1a5d4a6a9127d2da4171df28245",
-        "apps/docs/src/content/docs/guides/share-decoded-values.md": "66fbdd16d08e6569f3442c35401d6efecc9aa94744f1569ade35995ae16858d0",
+        "apps/docs/src/content/docs/guides/share-decoded-values.md": "005ac9eccedba6bb547192650ff2c204b9df546176076e55c91a6e13dea9ed8a",
         "apps/docs/src/content/docs/guides/solid-query.md": "6ec1cacb1238cf3dbc7b71ca6311757c76949973522a83d12299f20026dea695",
         "apps/docs/src/content/docs/guides/stream-snapshots.md": "b26610d19e9fa95827c211c39dd2983b676e1a0d64307da56970ec4a5b8a333b",
         "apps/docs/src/content/docs/guides/streaming.md": "0094954578cb2cf4a2b6fe759ce9893c27d2fea6810f42041a768d2fe7f5b4de",
@@ -646,7 +649,7 @@
         "scripts/verify-docs-version.mts": "58f63de6f871726a5bef8b70d1de7fad591374c52823e3cf60a160a9f37541e8",
         "scripts/version-packages.mts": "e514a013a90489d8d0ff5eb0620276f923c85fa765061aa4d3f312ac2ee4c7ad",
         "skills/effect-api-query/SKILL.md": "2f317d7b9ee273c24731613181d10495e73d0ca698c3c59a3fed557f6f2770fe",
-        "skills/effect-api-query/references/cache-workflows.md": "9179b14cbef2dae7dd25f1e959fa42373b9cd22a84dc906b0cc3c05243bc141f",
+        "skills/effect-api-query/references/cache-workflows.md": "cd50c5f67f8fce77cf8cc2b95b1697bd20205a688adb7319625b62c414402327",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "f8e2ed21583481dffd1680ce85340af508bbd8a5baeb8227da094a099da81fef",
         "skills/effect-api-query/references/http.md": "20ca47fe0b3fd957f06328176967d68f1baa38d41b4bb45e033b86f4722c9d45",
         "skills/effect-api-query/references/hydration-and-ssr.md": "0265ce970039b2ca41be2165683c135fd9584ea9a3c95b147a73eca8e54bd19f",
@@ -676,7 +679,7 @@
         "src/core/reactivity-invalidation.ts": "0f8465628e341e00cca4b65ea19ac75d6cfe1f344da092e4e89ec4dabda6976a",
         "src/core/runtime.ts": "9e99f2a078a1058b3b6b01ada7585d3f63d3486b397be3a6e1f08f0d3f0a9fad",
         "src/core/schema-key.ts": "0d6c00371526085fe19689a7401dfd86cb6f6a96f6b351b4b31bb2648804d5df",
-        "src/core/schema-structural-sharing.ts": "73c3ab3f285e3146376b6c413b34ba4503fc2a07b0e2f8217785951f795f22a8",
+        "src/core/schema-structural-sharing.ts": "e4acf5aac2fd01a364506d2c375d9e785227b4e2a57f82b887e55fd16ffcfbd7",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
         "src/core/stream-publication.ts": "16db2d472ee7146cd0faff53624ed0bfa31eb365c10e52587621750d053e8078",
         "src/core/stream-pull.ts": "9b7957b4487ddcdce2183f55c6f08e6cddee011c5d5e5b8c7b72ec839a7e3c42",
@@ -769,7 +772,7 @@
         "tests/react.test.tsx": "a5494e54ab73dc73a30c4a1e0d51634ad9772735195295e1f65cc9274531b554",
         "tests/reactivity-invalidation.test.ts": "4e4c02e42b62a0e0cdadf058051ac1074f7cc430675569e40c31e4537ed9694d",
         "tests/schema-sharing-prototypes.test.ts": "628a6622656b9b53e686d14b9efbd3abc13c61a13db1546001b0689b491f6022",
-        "tests/schema-structural-sharing.test.ts": "dc4c580e9193fb7749701cad3efdd5563edf8019ed437a7a722f514530dd33da",
+        "tests/schema-structural-sharing.test.ts": "e92f9f428804339a99d7ff4c6fc40a9696d953eeccb1176f6b3758a33412eb2d",
         "tests/skills-maintenance.test.ts": "015e0b882f6a43e0692c9643ad78fe111bcd15edf2adff1b46f5d0deb68b3498",
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
         "tests/skills/query-usability/grade.test.ts": "b4ce4b395a7f38bdc788f3d3268e0236bbe5827b153df9c0592165f0d81817cd",
@@ -850,11 +853,14 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "903b57e83b0b79ade935d99f18bda6b123f07886",
+      "head": "83ce90d345a6d9dd48147dc13c4301ffc4b546c6",
       "outcome": "updated",
-      "reason": "The domain map and skill spec record the two metadata read paths and the existing skill tree already maps the runtime, references and regression tests.",
+      "reason": "The domain map and skill spec cover array screening and acyclic shared references. Existing skill tree globs cover the implementation, focused tests, and guide.",
       "evidence": [
-        "_artifacts/domain_map.yaml, _artifacts/skill_spec.md and _artifacts/skill_tree.yaml reconciled with the HTTP reference. All 38 focused HTTP tests and skills-check passed."
+        "_artifacts/domain_map.yaml",
+        "_artifacts/skill_spec.md",
+        "_artifacts/skill_tree.yaml",
+        "Both YAML records parsed. The 23 focused sharing tests and shipped skill validation passed."
       ]
     },
     "source:vite.config.ts": {
@@ -4712,6 +4718,19 @@
       "reason": "The patch changeset records the compatible fixes under ADR 0001. The release note requires no additional guidance or mapping.",
       "evidence": [
         ".changeset/preserve-http-metadata-snapshots.md describes the two behaviors covered by tests/http-metadata-options.test.ts."
+      ]
+    },
+    "source:.changeset/screen-arrays-before-schema-sharing.md": {
+      "fingerprint": "1222cb09d38501abeed40db89198569ae39bd9f5376b19883c20abdeaa559b90",
+      "snapshot": {
+        ".changeset/screen-arrays-before-schema-sharing.md": "d774ae3a9a29fd525eb0a8772fe0ff6e3d06c955bec873e3f19144e76f3d80c9"
+      },
+      "head": "033bfddb8e0dcdc595fc7dad24aaf1f93a81f1cd",
+      "outcome": "out-of-scope",
+      "reason": "The patch changeset summarizes the compatible fix already covered by the sharing guide and cache-workflows reference.",
+      "evidence": [
+        ".changeset/screen-arrays-before-schema-sharing.md",
+        "docs/adr/0001-target-effect-4-release-candidate.md"
       ]
     }
   }

@@ -205,7 +205,7 @@ Type-check a call with selection, conditional input, or local optimistic context
 
 Keep native sharing by default. For immutable decoded class instances, dates, or collections, follow [share decoded values](https://ueberbrot.github.io/effect-api-query/guides/share-decoded-values/). Use `schemaStructuralSharing(Reading, { equivalence: Schema.toEquivalence(Reading) })` for a single decoded record. Compare meaningful extra state in the equivalence.
 
-The helper compares array positions and keeps whole class instances. Equivalent values reuse the previous reference. For unknown fields that need reference equality, use `Schema.overrideToEquivalence(() => Equivalence.strictEqual())`. Keep compared data unchanged. The helper traverses plain acyclic objects and dense arrays with enumerable string data properties. Unsupported values pass through. Traversed cycles throw. Validation and equivalence must run synchronously without services.
+The helper compares array positions and keeps whole class instances. Equivalent values reuse the previous reference. For unknown fields that need reference equality, use `Schema.overrideToEquivalence(() => Equivalence.strictEqual())`. Keep compared data unchanged. Plain objects and dense arrays need enumerable string data properties for Schema validation. Shared acyclic references are valid. Incoming cycles through supported containers throw before validation or equivalence. Both callbacks must run synchronously without services.
 
 The same callback works inside a metadata envelope. Fetched envelopes and raw headers stay frozen. Initial, manual, hydrated, and selected values keep their usual ownership. Check references through an observer or `getQueryData`. Measure both equal and changed data.
 
