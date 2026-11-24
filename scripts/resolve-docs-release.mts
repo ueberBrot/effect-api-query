@@ -1,5 +1,13 @@
-import { X509Certificate, verify } from "node:crypto";
-import { appendFileSync, readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import {
+  appendFileSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
+import nodePath from "node:path";
 
 import { capture } from "./lib/exec.mts";
 import {
@@ -8,52 +16,30 @@ import {
   validateVersion,
 } from "./verify-docs-version.mts";
 
-const repository = "git+https://github.com/ueberBrot/effect-api-query.git";
-const repositoryUrl = "https://github.com/ueberBrot/effect-api-query";
-const encodedPackageName = "@ueberbrot%2feffect-api-query";
-const purlPackageName = "%40ueberbrot/effect-api-query";
+const repositorySlug = "ueberBrot/effect-api-query";
+const repositoryUrl = `https://github.com/${repositorySlug}`;
+const repository = `git+${repositoryUrl}.git`;
+const encodedPackageName = packageName.replace("/", "%2f");
+const purlPackageName = packageName.replace("@", "%40");
+const unscopedPackageName = packageName.slice(packageName.indexOf("/") + 1);
 const approvedBranchRef = "refs/remotes/origin/main";
 const releaseWorkflowRef = "refs/heads/main";
 const releaseWorkflowPath = ".github/workflows/release.yml";
-const expectedSignerSan = `URI:${repositoryUrl}/${releaseWorkflowPath}@${releaseWorkflowRef}`;
+const signerWorkflow = `${repositorySlug}/${releaseWorkflowPath}`;
+const githubOidcIssuer = "https://token.actions.githubusercontent.com";
 const slsaPredicateType = "https://slsa.dev/provenance/v1";
-const githubActionsBuildType =
-  "https://slsa-framework.github.io/github-actions-buildtypes/workflow/v1";
-const inTotoStatementType = "https://in-toto.io/Statement/v1";
-const dssePayloadType = "application/vnd.in-toto+json";
 const shaPattern = /^[\da-f]{40}$/u;
 const integrityPattern = /^sha512-(?<digest>[\dA-Za-z+/]{86}==)$/u;
 
-interface RegistryDist {
-  readonly integrity: string;
-  readonly tarball: string;
-  readonly attestations?: unknown;
+export interface ProvenanceVerificationInput {
+  readonly version: string;
+  readonly revision: string;
+  readonly expectedSha512: string;
+  readonly bundleJson: string;
+  readonly tarball: Buffer;
 }
 
-interface RawSlsaBundle {
-  readonly verificationMaterial: {
-    readonly certificate?: unknown;
-    readonly x509CertificateChain?: unknown;
-    readonly tlogEntries?: unknown;
-  };
-  readonly dsseEnvelope: {
-    readonly payloadType?: unknown;
-    readonly payload?: unknown;
-    readonly signatures?: unknown;
-  };
-}
-
-interface SlsaBundle {
-  readonly certDer: Buffer;
-  readonly payload: string;
-  readonly sig: string;
-}
-
-interface RawBuildDefinition {
-  readonly buildType?: unknown;
-  readonly externalParameters?: unknown;
-  readonly resolvedDependencies?: unknown;
-}
+export type ProvenanceVerifier = (input: ProvenanceVerificationInput) => void;
 
 const validateRevision = (revision: string): string => {
   if (!shaPattern.test(revision)) {
@@ -61,6 +47,9 @@ const validateRevision = (revision: string): string => {
   }
   return revision;
 };
+
+const expectedTarballUrl = (version: string): string =>
+  `https://registry.npmjs.org/${packageName}/-/${unscopedPackageName}-${version}.tgz`;
 
 const expectedAttestationsUrl = (version: string): string =>
   `https://registry.npmjs.org/-/npm/v1/attestations/${encodedPackageName}@${version}`;
@@ -76,6 +65,19 @@ const assertAncestor = (
   } catch (error) {
     throw new Error(message, { cause: error });
   }
+};
+
+const readMainFirstParents = (
+  readGit: (args: readonly string[]) => string
+): ReadonlySet<string> => {
+  const commits = readGit(["rev-list", "--first-parent", approvedBranchRef])
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line !== "");
+  if (commits.length === 0) {
+    throw new Error("Could not resolve the protected main branch history.");
+  }
+  return new Set(commits.map((commit) => validateRevision(commit)));
 };
 
 export const publishedRootVersion = (
@@ -119,25 +121,33 @@ const parseIntegritySha512 = (integrity: string): string => {
   return Buffer.from(digest, "base64").toString("hex");
 };
 
-const validateDistAttestations = (
-  dist: RegistryDist,
+const hasExpectedAttestations = (
+  dist: { readonly attestations?: unknown },
   version: string
-): void => {
+): boolean => {
   const { attestations } = dist;
+  return (
+    typeof attestations === "object" &&
+    attestations !== null &&
+    "url" in attestations &&
+    attestations.url === expectedAttestationsUrl(version) &&
+    "provenance" in attestations &&
+    typeof attestations.provenance === "object" &&
+    attestations.provenance !== null &&
+    "predicateType" in attestations.provenance &&
+    attestations.provenance.predicateType === slsaPredicateType
+  );
+};
+
+const validateRegistryGitHead = (
+  metadata: { readonly gitHead: unknown },
+  revision: string
+): void => {
   if (
-    typeof attestations !== "object" ||
-    attestations === null ||
-    !("url" in attestations) ||
-    attestations.url !== expectedAttestationsUrl(version) ||
-    !("provenance" in attestations) ||
-    typeof attestations.provenance !== "object" ||
-    attestations.provenance === null ||
-    !("predicateType" in attestations.provenance) ||
-    attestations.provenance.predicateType !== slsaPredicateType
+    typeof metadata.gitHead !== "string" ||
+    validateRevision(metadata.gitHead) !== revision
   ) {
-    throw new Error(
-      "npm metadata lacks verifiable SLSA provenance for this release."
-    );
+    throw new Error("npm gitHead does not match the release tag.");
   }
 };
 
@@ -164,92 +174,32 @@ const validateRegistryMetadata = (
     !("integrity" in metadata.dist) ||
     typeof metadata.dist.integrity !== "string" ||
     !("tarball" in metadata.dist) ||
-    metadata.dist.tarball !==
-      `https://registry.npmjs.org/${packageName}/-/effect-api-query-${version}.tgz`
+    metadata.dist.tarball !== expectedTarballUrl(version)
   ) {
     throw new Error(
       "npm metadata must identify this repository's released package."
     );
   }
-  const dist: RegistryDist = {
-    integrity: metadata.dist.integrity,
-    tarball: metadata.dist.tarball,
-    attestations:
-      "attestations" in metadata.dist ? metadata.dist.attestations : undefined,
-  };
-  const expectedSha512 = parseIntegritySha512(dist.integrity);
-  if (
-    "gitHead" in metadata &&
-    (typeof metadata.gitHead !== "string" ||
-      validateRevision(metadata.gitHead) !== revision)
-  ) {
-    throw new Error("npm gitHead does not match the release tag.");
+  const expectedSha512 = parseIntegritySha512(metadata.dist.integrity);
+  if ("gitHead" in metadata) {
+    validateRegistryGitHead({ gitHead: metadata.gitHead }, revision);
   }
-  validateDistAttestations(dist, version);
+  if (
+    !("attestations" in metadata.dist) ||
+    !hasExpectedAttestations(
+      { attestations: metadata.dist.attestations },
+      version
+    )
+  ) {
+    throw new Error(
+      "npm metadata lacks verifiable SLSA provenance for this release."
+    );
+  }
   return expectedSha512;
 };
 
-const readLeafCertificateDer = (
-  verificationMaterial: RawSlsaBundle["verificationMaterial"]
-): Buffer | undefined => {
-  const { certificate, x509CertificateChain } = verificationMaterial;
-  if (
-    typeof certificate === "object" &&
-    certificate !== null &&
-    "rawBytes" in certificate &&
-    typeof certificate.rawBytes === "string" &&
-    certificate.rawBytes.length > 0
-  ) {
-    return Buffer.from(certificate.rawBytes, "base64");
-  }
-  if (
-    typeof x509CertificateChain === "object" &&
-    x509CertificateChain !== null &&
-    "certificates" in x509CertificateChain &&
-    Array.isArray(x509CertificateChain.certificates)
-  ) {
-    const certificates: readonly unknown[] = x509CertificateChain.certificates;
-    const [first] = certificates;
-    if (
-      typeof first === "object" &&
-      first !== null &&
-      "rawBytes" in first &&
-      typeof first.rawBytes === "string" &&
-      first.rawBytes.length > 0
-    ) {
-      return Buffer.from(first.rawBytes, "base64");
-    }
-  }
-  return undefined;
-};
-
-const parseDsseEnvelope = (dsseEnvelope: RawSlsaBundle["dsseEnvelope"]) => {
-  const { payloadType, payload, signatures } = dsseEnvelope;
-  if (
-    payloadType !== dssePayloadType ||
-    typeof payload !== "string" ||
-    payload.length === 0 ||
-    !Array.isArray(signatures) ||
-    signatures.length !== 1
-  ) {
-    throw new Error("npm provenance DSSE envelope is malformed.");
-  }
-  const signatureList: readonly unknown[] = signatures;
-  const [firstSignature] = signatureList;
-  if (
-    typeof firstSignature !== "object" ||
-    firstSignature === null ||
-    !("sig" in firstSignature) ||
-    typeof firstSignature.sig !== "string" ||
-    firstSignature.sig.length === 0
-  ) {
-    throw new Error("npm provenance DSSE signature is missing.");
-  }
-  return { payload, sig: firstSignature.sig };
-};
-
-const selectRawSlsaBundle = (json: string): RawSlsaBundle => {
-  const parsed: unknown = JSON.parse(json);
+export const extractSlsaBundleJson = (attestationsJson: string): string => {
+  const parsed: unknown = JSON.parse(attestationsJson);
   if (
     typeof parsed !== "object" ||
     parsed === null ||
@@ -273,174 +223,105 @@ const selectRawSlsaBundle = (json: string): RawSlsaBundle => {
     slsaEntry === null ||
     !("bundle" in slsaEntry) ||
     typeof slsaEntry.bundle !== "object" ||
-    slsaEntry.bundle === null ||
-    !("verificationMaterial" in slsaEntry.bundle) ||
-    typeof slsaEntry.bundle.verificationMaterial !== "object" ||
-    slsaEntry.bundle.verificationMaterial === null ||
-    !("dsseEnvelope" in slsaEntry.bundle) ||
-    typeof slsaEntry.bundle.dsseEnvelope !== "object" ||
-    slsaEntry.bundle.dsseEnvelope === null
+    slsaEntry.bundle === null
   ) {
     throw new Error(
       "npm provenance must contain a single SLSA v1 attestation bundle."
     );
   }
-  return {
-    verificationMaterial: slsaEntry.bundle.verificationMaterial,
-    dsseEnvelope: slsaEntry.bundle.dsseEnvelope,
-  };
+  return JSON.stringify(slsaEntry.bundle);
 };
 
-const parseSlsaBundle = (json: string): SlsaBundle => {
-  const { verificationMaterial, dsseEnvelope } = selectRawSlsaBundle(json);
-  if (
-    !Array.isArray(verificationMaterial.tlogEntries) ||
-    verificationMaterial.tlogEntries.length === 0
-  ) {
-    throw new Error(
-      "npm provenance bundle must include transparency log entries."
-    );
-  }
-  const certDer = readLeafCertificateDer(verificationMaterial);
-  if (certDer === undefined || certDer.length === 0) {
-    throw new Error(
-      "npm provenance bundle must include a signing certificate."
-    );
-  }
-  const { payload, sig } = parseDsseEnvelope(dsseEnvelope);
-  return { certDer, payload, sig };
-};
-
-const verifyDssePayload = (bundle: SlsaBundle): Buffer => {
-  const cert = new X509Certificate(bundle.certDer);
-  if (cert.subjectAltName !== expectedSignerSan) {
-    throw new Error(
-      "npm provenance certificate does not match this repository's release workflow."
-    );
-  }
-  const payloadBytes = Buffer.from(bundle.payload, "base64");
-  const pae = Buffer.concat([
-    Buffer.from(
-      `DSSEv1 ${dssePayloadType.length} ${dssePayloadType} ${payloadBytes.length} `,
-      "utf-8"
-    ),
-    payloadBytes,
-  ]);
-  const algorithm =
-    cert.publicKey.asymmetricKeyType === "ed25519" ? null : "sha256";
-  if (
-    !verify(algorithm, pae, cert.publicKey, Buffer.from(bundle.sig, "base64"))
-  ) {
-    throw new Error("npm provenance DSSE signature verification failed.");
-  }
-  return payloadBytes;
-};
-
-const verifyResolvedSourceCommit = (
-  resolvedDependencies: readonly unknown[],
-  revision: string
-): void => {
-  const expectedSourceUri = `git+${repositoryUrl}@${releaseWorkflowRef}`;
-  const matchingSources = resolvedDependencies.filter(
-    (dep) =>
-      typeof dep === "object" &&
-      dep !== null &&
-      "uri" in dep &&
-      dep.uri === expectedSourceUri
-  );
-  const [source] = matchingSources;
-  if (
-    matchingSources.length !== 1 ||
-    typeof source !== "object" ||
-    source === null ||
-    !("digest" in source) ||
-    typeof source.digest !== "object" ||
-    source.digest === null ||
-    !("gitCommit" in source.digest) ||
-    typeof source.digest.gitCommit !== "string" ||
-    validateRevision(source.digest.gitCommit) !== revision
-  ) {
-    throw new Error(
-      "npm provenance source commit does not match the release tag."
-    );
-  }
-};
-
-const verifyBuildDefinition = (
-  buildDefinition: RawBuildDefinition,
-  revision: string
-): void => {
-  const { buildType, externalParameters, resolvedDependencies } =
-    buildDefinition;
-  if (
-    buildType !== githubActionsBuildType ||
-    typeof externalParameters !== "object" ||
-    externalParameters === null ||
-    !("workflow" in externalParameters) ||
-    typeof externalParameters.workflow !== "object" ||
-    externalParameters.workflow === null ||
-    !("repository" in externalParameters.workflow) ||
-    externalParameters.workflow.repository !== repositoryUrl ||
-    !("ref" in externalParameters.workflow) ||
-    externalParameters.workflow.ref !== releaseWorkflowRef ||
-    !("path" in externalParameters.workflow) ||
-    externalParameters.workflow.path !== releaseWorkflowPath ||
-    !Array.isArray(resolvedDependencies)
-  ) {
-    throw new Error(
-      "npm provenance does not match this repository's release workflow."
-    );
-  }
-  const deps: readonly unknown[] = resolvedDependencies;
-  verifyResolvedSourceCommit(deps, revision);
-};
-
-const verifyReleaseProvenance = (
+const verifyVerifiedStatementSubject = (
+  ghOutputJson: string,
   version: string,
-  revision: string,
-  expectedSha512: string,
-  json: string
+  expectedSha512: string
 ): void => {
-  const payloadBytes = verifyDssePayload(parseSlsaBundle(json));
-  const statement: unknown = JSON.parse(payloadBytes.toString("utf-8"));
-  if (
-    typeof statement !== "object" ||
-    statement === null ||
-    !("_type" in statement) ||
-    statement._type !== inTotoStatementType ||
-    !("predicateType" in statement) ||
-    statement.predicateType !== slsaPredicateType ||
-    !("subject" in statement) ||
-    !Array.isArray(statement.subject) ||
-    !("predicate" in statement) ||
-    typeof statement.predicate !== "object" ||
-    statement.predicate === null ||
-    !("buildDefinition" in statement.predicate) ||
-    typeof statement.predicate.buildDefinition !== "object" ||
-    statement.predicate.buildDefinition === null
-  ) {
-    throw new Error("npm provenance statement is malformed.");
+  const parsed: unknown = JSON.parse(ghOutputJson);
+  if (!Array.isArray(parsed) || parsed.length === 0) {
+    throw new Error("gh attestation verify returned no verified attestations.");
   }
   const expectedPurl = `pkg:npm/${purlPackageName}@${version}`;
-  const subjects: readonly unknown[] = statement.subject;
-  const hasMatchingSubject = subjects.some(
-    (subject) =>
-      typeof subject === "object" &&
-      subject !== null &&
-      "name" in subject &&
-      subject.name === expectedPurl &&
-      "digest" in subject &&
-      typeof subject.digest === "object" &&
-      subject.digest !== null &&
-      "sha512" in subject.digest &&
-      subject.digest.sha512 === expectedSha512
-  );
+  const results: readonly unknown[] = parsed;
+  const hasMatchingSubject = results.some((entry) => {
+    if (
+      typeof entry !== "object" ||
+      entry === null ||
+      !("verificationResult" in entry) ||
+      typeof entry.verificationResult !== "object" ||
+      entry.verificationResult === null ||
+      !("statement" in entry.verificationResult) ||
+      typeof entry.verificationResult.statement !== "object" ||
+      entry.verificationResult.statement === null ||
+      !("subject" in entry.verificationResult.statement) ||
+      !Array.isArray(entry.verificationResult.statement.subject)
+    ) {
+      return false;
+    }
+    const subjects: readonly unknown[] =
+      entry.verificationResult.statement.subject;
+    return subjects.some(
+      (subject) =>
+        typeof subject === "object" &&
+        subject !== null &&
+        "name" in subject &&
+        subject.name === expectedPurl &&
+        "digest" in subject &&
+        typeof subject.digest === "object" &&
+        subject.digest !== null &&
+        "sha512" in subject.digest &&
+        subject.digest.sha512 === expectedSha512
+    );
+  });
   if (!hasMatchingSubject) {
     throw new Error(
-      "npm provenance subject does not match the published package artifact."
+      "Verified npm provenance subject does not match the published package artifact."
     );
   }
-  verifyBuildDefinition(statement.predicate.buildDefinition, revision);
+};
+
+export const verifySlsaAttestationWithGh = (
+  input: ProvenanceVerificationInput,
+  runCommand: (command: string, args: readonly string[]) => string = capture
+): void => {
+  const actualSha512 = createHash("sha512").update(input.tarball).digest("hex");
+  if (actualSha512 !== input.expectedSha512) {
+    throw new Error("Downloaded npm tarball does not match dist.integrity.");
+  }
+  const workDir = mkdtempSync(nodePath.join(tmpdir(), "docs-provenance-"));
+  try {
+    const tarballPath = nodePath.join(workDir, "package.tgz");
+    const bundlePath = nodePath.join(workDir, "bundle.json");
+    writeFileSync(tarballPath, input.tarball);
+    writeFileSync(bundlePath, input.bundleJson, "utf-8");
+    const output = runCommand("gh", [
+      "attestation",
+      "verify",
+      tarballPath,
+      "--bundle",
+      bundlePath,
+      "--digest-alg",
+      "sha512",
+      "--repo",
+      repositorySlug,
+      "--signer-workflow",
+      signerWorkflow,
+      "--source-ref",
+      releaseWorkflowRef,
+      "--source-digest",
+      input.revision,
+      "--cert-oidc-issuer",
+      githubOidcIssuer,
+      "--predicate-type",
+      slsaPredicateType,
+      "--deny-self-hosted-runners",
+      "--format",
+      "json",
+    ]);
+    verifyVerifiedStatementSubject(output, input.version, input.expectedSha512);
+  } finally {
+    rmSync(workDir, { recursive: true, force: true });
+  }
 };
 
 const permittedDocumentationPath = (path: string): boolean => {
@@ -466,7 +347,9 @@ export const resolveDocumentationRevision = (
   docsRef: string,
   metadata: string,
   attestations: string,
-  readGit: (args: readonly string[]) => string
+  tarball: Buffer,
+  readGit: (args: readonly string[]) => string,
+  verifyProvenance: ProvenanceVerifier = verifySlsaAttestationWithGh
 ) => {
   validateVersion(version);
   const release = validateRevision(
@@ -477,16 +360,20 @@ export const resolveDocumentationRevision = (
     ]).trim()
   );
   const expectedSha512 = validateRegistryMetadata(version, release, metadata);
-  verifyReleaseProvenance(version, release, expectedSha512, attestations);
-  const approvedTip = validateRevision(
-    readGit(["rev-parse", "--verify", `${approvedBranchRef}^{commit}`]).trim()
-  );
-  assertAncestor(
-    readGit,
-    release,
-    approvedTip,
-    "The release commit must be reachable from the protected main branch."
-  );
+  const bundleJson = extractSlsaBundleJson(attestations);
+  verifyProvenance({
+    version,
+    revision: release,
+    expectedSha512,
+    bundleJson,
+    tarball,
+  });
+  const mainFirstParents = readMainFirstParents(readGit);
+  if (!mainFirstParents.has(release)) {
+    throw new Error(
+      "The release commit must be on the protected main branch's first-parent history."
+    );
+  }
   if (
     parseManifest(readGit(["show", `${release}:package.json`])).version !==
     version
@@ -517,12 +404,11 @@ export const resolveDocumentationRevision = (
       revision,
       "The released commit must be an ancestor of docs-ref."
     );
-    assertAncestor(
-      readGit,
-      revision,
-      approvedTip,
-      "docs-ref must be reachable from the protected main branch."
-    );
+    if (!mainFirstParents.has(revision)) {
+      throw new Error(
+        "docs-ref must be on the protected main branch's first-parent history."
+      );
+    }
     const changes = readGit([
       "diff",
       "--name-only",
@@ -576,11 +462,12 @@ export const resolveDocumentationRevision = (
   return { revision, version };
 };
 
-const fetchRegistryJson = async (
+const fetchRegistryBytes = async (
   url: string,
+  maxBytes: number,
   unavailableMessage: string,
   oversizedMessage: string
-): Promise<string> => {
+): Promise<Buffer> => {
   const response = await fetch(url, {
     redirect: "error",
     signal: AbortSignal.timeout(15_000),
@@ -588,11 +475,11 @@ const fetchRegistryJson = async (
   if (!response.ok) {
     throw new Error(unavailableMessage);
   }
-  const text = await response.text();
-  if (text.length > 1_048_576) {
+  const bytes = Buffer.from(await response.arrayBuffer());
+  if (bytes.length > maxBytes) {
     throw new Error(oversizedMessage);
   }
-  return text;
+  return bytes;
 };
 
 if (import.meta.main) {
@@ -601,21 +488,30 @@ if (import.meta.main) {
   let release: ReturnType<typeof resolveDocumentationRevision>;
   if (artifact === "") {
     validateVersion(version);
-    const metadata = await fetchRegistryJson(
+    const metadataBytes = await fetchRegistryBytes(
       `https://registry.npmjs.org/${encodedPackageName}/${version}`,
+      1_048_576,
       "The exact package version is unavailable from npm.",
       "npm returned oversized package metadata."
     );
-    const attestations = await fetchRegistryJson(
+    const attestationsBytes = await fetchRegistryBytes(
       expectedAttestationsUrl(version),
+      1_048_576,
       "npm provenance attestations are unavailable for this package version.",
       "npm returned oversized provenance attestations."
+    );
+    const tarball = await fetchRegistryBytes(
+      expectedTarballUrl(version),
+      50 * 1_048_576,
+      "The exact package tarball is unavailable from npm.",
+      "npm returned an oversized package tarball."
     );
     release = resolveDocumentationRevision(
       version,
       process.env["DOCS_REF"] ?? "",
-      metadata,
-      attestations,
+      metadataBytes.toString("utf-8"),
+      attestationsBytes.toString("utf-8"),
+      tarball,
       (args) => capture("git", args)
     );
   } else {
