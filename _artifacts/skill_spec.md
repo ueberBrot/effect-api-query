@@ -54,6 +54,8 @@ These checks verify the recommended APIs and observable behavior. A fresh isolat
 
 ## Coverage and batch history
 
+- **Example operation limits (#250), base `d8e5c89d`:** The example host caps active work, keeps pending and pre-start cancelled reservations in a separate expiring budget, and keeps bounded inactive history. The command guide scopes retry safety to retained records and describes how the diagnostic panel handles an evicted outcome. The domain map records this limitation, and existing skill tree mappings cover the host, contracts, guide, and deterministic tests. The library's cancellation guidance and public contracts remain accurate.
+
 - **Standalone example transport (#247), base `1182c6ef`:** The framework reference links the explicit browser origin allowlist and keeps the same-origin proxy as the default. The domain map covers direct reads and same-origin sessions. Existing skill tree mappings cover the server, example setup, and protocol regressions.
 
 - **Generated key namespace isolation (#237), base `a2357f7`:** Cache and hydration guidance covers full namespace comparison, cross-adapter filters, and clearing persisted flat-key snapshots. The domain map records the migration failure mode, and the skill tree maps ADR 0059. Runtime and compiler fixtures cover native filters, defaults, and hydration through generated keys. Fresh consumer-agent discovery remains unverified.

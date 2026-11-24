@@ -1,12 +1,28 @@
-import { CommandStatus, OperationNotFound } from "@effect-api-query/contracts";
+import {
+  CommandStatus,
+  CommandSteps,
+  InvalidOperationInput,
+  OperationCapacityExceeded,
+  OperationNotFound,
+} from "@effect-api-query/contracts";
 import type { CommandPayload } from "@effect-api-query/contracts";
-import { Deferred, Effect, Exit, Scope } from "effect";
+import { Clock, Deferred, Effect, Exit, Schema, Scope } from "effect";
 
-import { requireOperationOwner } from "./caller.ts";
+import { requireOperationOwnerFor } from "./caller.ts";
+import {
+  commandReservationTtlMs,
+  makeOperationAdmission,
+  maxPendingCommandReservations,
+  maxPendingCommandReservationsPerOwner,
+  operationKey,
+  retainRecentEntry,
+} from "./operation-limits.ts";
 
-const ownedCommandKey = Effect.fnUntraced(function* (operationId: string) {
-  const owner = yield* requireOperationOwner;
-  return JSON.stringify([owner, operationId]);
+const validSteps = Schema.is(CommandSteps);
+
+const ownedCommand = Effect.fnUntraced(function* (operationId: string) {
+  const owner = yield* requireOperationOwnerFor(operationId);
+  return { owner, key: operationKey(owner, operationId) };
 });
 
 interface Command {
@@ -15,55 +31,121 @@ interface Command {
   readonly done: Deferred.Deferred<CommandStatus>;
 }
 
+interface CommandReservation {
+  readonly owner: string;
+  readonly expiresAt: number;
+  cancelled: CommandStatus | null;
+}
+
 export const makeCommands = Effect.fn("ExampleRpc.makeCommands")(function* () {
   const scope = yield* Scope.Scope;
-  const commands = new Map<string, Command | null>();
+  const clock = yield* Clock.Clock;
+  const admission = makeOperationAdmission();
+  const running = new Map<string, Command>();
+  const reservations = new Map<string, CommandReservation>();
+  const history = new Map<string, CommandStatus>();
 
-  const finish = Effect.fn("ExampleRpc.Commands.finish")(function* (
-    command: Command,
-    state: "completed" | "cancelled"
+  const getLiveReservation = (key: string, now: number) => {
+    const reservation = reservations.get(key) ?? null;
+    if (reservation !== null && reservation.expiresAt <= now) {
+      reservations.delete(key);
+      return null;
+    }
+    return reservation;
+  };
+
+  const work = Effect.fn("ExampleRpc.Commands.work")(function* (
+    command: Command
   ) {
-    command.status = new CommandStatus({
-      operationId: command.status.operationId,
-      completedSteps: command.status.completedSteps,
-      totalSteps: command.status.totalSteps,
-      state,
-    });
-    yield* Deferred.succeed(command.done, command.status);
+    for (let step = 0; step < command.status.totalSteps; step += 1) {
+      const cancelled = yield* Deferred.await(command.cancellation).pipe(
+        Effect.as(true),
+        Effect.timeoutOrElse({
+          duration: "100 millis",
+          orElse: () => Effect.succeed(false),
+        })
+      );
+      if (cancelled) {
+        return "cancelled" as const;
+      }
+      command.status = new CommandStatus({
+        operationId: command.status.operationId,
+        state: "running",
+        totalSteps: command.status.totalSteps,
+        completedSteps: step + 1,
+      });
+    }
+    return "completed" as const;
   });
 
-  const work = Effect.fn("ExampleRpc.Commands.work")(
-    function* (command: Command) {
-      for (let step = 0; step < command.status.totalSteps; step += 1) {
-        const cancelled = yield* Deferred.await(command.cancellation).pipe(
-          Effect.as(true),
-          Effect.timeoutOrElse({
-            duration: "100 millis",
-            orElse: () => Effect.succeed(false),
-          })
-        );
-        if (cancelled) {
-          yield* finish(command, "cancelled");
-          return;
-        }
-        command.status = new CommandStatus({
-          operationId: command.status.operationId,
-          state: command.status.state,
-          totalSteps: command.status.totalSteps,
-          completedSteps: step + 1,
-        });
-      }
-      yield* finish(command, "completed");
-    },
-    (effect, command) =>
-      effect.pipe(Effect.onInterrupt(() => finish(command, "cancelled")))
-  );
+  const reserve = Effect.fn("ExampleRpc.Commands.reserve")(function* ({
+    operationId,
+  }: {
+    readonly operationId: string;
+  }) {
+    const { owner, key } = yield* ownedCommand(operationId);
+    const now = clock.currentTimeMillisUnsafe();
+    if (
+      running.has(key) ||
+      history.has(key) ||
+      getLiveReservation(key, now) !== null
+    ) {
+      return yield* Effect.void;
+    }
 
-  const createCommand = (key: string, operationId: string, steps: number) => {
+    let ownerReservations = 0;
+    for (const reservedKey of reservations.keys()) {
+      if (getLiveReservation(reservedKey, now)?.owner === owner) {
+        ownerReservations += 1;
+      }
+    }
+    if (
+      reservations.size >= maxPendingCommandReservations ||
+      ownerReservations >= maxPendingCommandReservationsPerOwner
+    ) {
+      return yield* Effect.fail(OperationCapacityExceeded.literal);
+    }
+
+    reservations.set(key, {
+      owner,
+      expiresAt: now + commandReservationTtlMs,
+      cancelled: null,
+    });
+    return yield* Effect.void;
+  });
+
+  const start = Effect.fn("ExampleRpc.Commands.start")(function* ({
+    operationId,
+    steps,
+  }: CommandPayload) {
+    const { owner, key } = yield* ownedCommand(operationId);
+    if (!validSteps(steps)) {
+      return yield* Effect.fail(InvalidOperationInput.literal);
+    }
+    const active = running.get(key);
+    if (active !== undefined) {
+      return yield* Effect.interruptible(Deferred.await(active.done));
+    }
+    const terminal = history.get(key);
+    if (terminal !== undefined) {
+      return terminal;
+    }
+    const cancelled =
+      getLiveReservation(key, clock.currentTimeMillisUnsafe())?.cancelled ??
+      null;
+    if (cancelled !== null) {
+      reservations.delete(key);
+      retainRecentEntry(history, key, cancelled);
+      return cancelled;
+    }
+    if (!admission.tryAcquire(owner)) {
+      return yield* Effect.fail(OperationCapacityExceeded.literal);
+    }
+
     const command: Command = {
       status: new CommandStatus({
         operationId,
-        state: steps === 0 ? "cancelled" : "running",
+        state: "running",
         completedSteps: 0,
         totalSteps: steps,
       }),
@@ -71,61 +153,56 @@ export const makeCommands = Effect.fn("ExampleRpc.makeCommands")(function* () {
       cancellation: Deferred.makeUnsafe<void>(),
       done: Deferred.makeUnsafe<CommandStatus>(),
     };
-    commands.set(key, command);
-    return command;
-  };
+    reservations.delete(key);
+    running.set(key, command);
+    const fiber = yield* Effect.forkIn(work(command), scope, {
+      uninterruptible: false,
+    });
+    fiber.addObserver((exit) => {
+      const status = new CommandStatus({
+        operationId,
+        totalSteps: steps,
+        completedSteps: command.status.completedSteps,
+        state: Exit.isSuccess(exit) ? exit.value : "cancelled",
+      });
+      running.delete(key);
+      admission.release(owner);
+      retainRecentEntry(history, key, status);
+      Deferred.doneUnsafe(command.done, Effect.succeed(status));
+    });
 
-  const reserve = Effect.fn("ExampleRpc.Commands.reserve")(function* ({
-    operationId,
-  }: {
-    readonly operationId: string;
-  }) {
-    const key = yield* ownedCommandKey(operationId);
-    if (!commands.has(key)) {
-      commands.set(key, null);
-    }
-  });
-
-  const startWork = Effect.fn("ExampleRpc.Commands.startWork")(function* (
-    key: string,
-    operationId: string,
-    steps: number
-  ) {
-    const existing = commands.get(key);
-    if (existing !== undefined && existing !== null) {
-      return existing;
-    }
-    const command = createCommand(key, operationId, steps);
-    yield* Effect.forkIn(work(command), scope, { uninterruptible: false });
-    return command;
+    return yield* Effect.interruptible(Deferred.await(command.done));
   }, Effect.uninterruptible);
-
-  const start = Effect.fn("ExampleRpc.Commands.start")(function* ({
-    operationId,
-    steps,
-  }: CommandPayload) {
-    const key = yield* ownedCommandKey(operationId);
-    const command = yield* startWork(key, operationId, steps);
-    return yield* Deferred.await(command.done);
-  });
 
   const cancel = Effect.fn("ExampleRpc.Commands.cancel")(function* ({
     operationId,
   }: {
     readonly operationId: string;
   }) {
-    const key = yield* ownedCommandKey(operationId);
-    const existing = commands.get(key);
-    if (existing === undefined) {
+    const { key } = yield* ownedCommand(operationId);
+    const active = running.get(key);
+    if (active !== undefined) {
+      yield* Deferred.done(active.cancellation, Exit.void);
+      return yield* Effect.interruptible(Deferred.await(active.done));
+    }
+    const terminal = history.get(key);
+    if (terminal !== undefined) {
+      return terminal;
+    }
+    const reservation = getLiveReservation(
+      key,
+      clock.currentTimeMillisUnsafe()
+    );
+    if (reservation === null) {
       return yield* Effect.fail(OperationNotFound.literal);
     }
-    if (existing === null) {
-      const cancelled = createCommand(key, operationId, 0);
-      yield* Deferred.succeed(cancelled.done, cancelled.status);
-      return cancelled.status;
-    }
-    yield* Deferred.done(existing.cancellation, Exit.void);
-    return yield* Effect.interruptible(Deferred.await(existing.done));
+    reservation.cancelled ??= new CommandStatus({
+      operationId,
+      state: "cancelled",
+      completedSteps: 0,
+      totalSteps: 0,
+    });
+    return reservation.cancelled;
   }, Effect.uninterruptible);
 
   const status = Effect.fn("ExampleRpc.Commands.status")(function* ({
@@ -133,22 +210,27 @@ export const makeCommands = Effect.fn("ExampleRpc.makeCommands")(function* () {
   }: {
     readonly operationId: string;
   }) {
-    const key = yield* ownedCommandKey(operationId);
-    const command = commands.get(key);
-    if (command === undefined) {
-      return yield* Effect.fail(OperationNotFound.literal);
+    const { key } = yield* ownedCommand(operationId);
+    const current = running.get(key)?.status ?? history.get(key);
+    if (current !== undefined) {
+      return current;
     }
-    return command?.status ?? null;
+    const reservation = getLiveReservation(
+      key,
+      clock.currentTimeMillisUnsafe()
+    );
+    return reservation === null
+      ? yield* Effect.fail(OperationNotFound.literal)
+      : reservation.cancelled;
   });
 
   const reset = Effect.gen(function* () {
-    for (const command of commands.values()) {
-      if (command !== null) {
-        yield* Deferred.done(command.cancellation, Exit.void);
-        yield* Deferred.await(command.done);
-      }
+    for (const command of running.values()) {
+      yield* Deferred.done(command.cancellation, Exit.void);
+      yield* Deferred.await(command.done);
     }
-    commands.clear();
+    reservations.clear();
+    history.clear();
   });
 
   return { start, reserve, cancel, status, reset };
