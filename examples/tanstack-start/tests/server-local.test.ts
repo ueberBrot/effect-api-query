@@ -251,7 +251,7 @@ describe("Start request-local execution", () => {
           }),
           staleTime: 0,
         })
-      ).resolves.toStrictEqual({ started: 1, interrupted: 1 });
+      ).resolves.toStrictEqual({ started: 1, interrupted: 1, completed: 0 });
       await expect(
         second.queryClient.query(second.httpQuery.users.list.queryOptions())
       ).resolves.toHaveLength(12);
@@ -284,10 +284,10 @@ describe("Start request-local execution", () => {
       const input = { params: { operationId: "anonymous" } };
       await expect(
         owner.httpQuery.diagnostics.operationStatus.call({ input })
-      ).resolves.toStrictEqual({ started: 2, interrupted: 0 });
+      ).resolves.toStrictEqual({ started: 2, interrupted: 0, completed: 2 });
       await expect(
         other.httpQuery.diagnostics.operationStatus.call({ input })
-      ).resolves.toStrictEqual({ started: 1, interrupted: 0 });
+      ).resolves.toStrictEqual({ started: 1, interrupted: 0, completed: 1 });
     } finally {
       await Promise.all([owner.dispose(), other.dispose()]);
       await Effect.runPromise(Scope.close(hostScope, Exit.void));

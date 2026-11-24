@@ -3,6 +3,7 @@ import {
   OperationNotFound,
 } from "@effect-api-query/contracts";
 import type {
+  DiagnosticOperationStatus,
   DiagnosticStatus,
   SlowDiagnosticInput,
 } from "@effect-api-query/contracts";
@@ -11,7 +12,7 @@ import { Deferred, Effect, Exit } from "effect";
 import { requireOperationOwner } from "./caller.ts";
 
 interface DiagnosticOperation {
-  status: DiagnosticStatus;
+  status: DiagnosticOperationStatus;
   readonly active: Set<Deferred.Deferred<void>>;
 }
 
@@ -82,7 +83,7 @@ export const makeDiagnosticOperations = Effect.sync(() => {
           operations: new Map<string, DiagnosticOperation>(),
         };
         const operation = state.operations.get(operationId) ?? {
-          status: initialStatus(),
+          status: { ...initialStatus(), completed: 0 },
           active: new Set<Deferred.Deferred<void>>(),
         };
         // oxlint-disable-next-line typescript/no-invalid-void-type
@@ -108,6 +109,12 @@ export const makeDiagnosticOperations = Effect.sync(() => {
       ({ state, operation, cancellation }, exit) =>
         Effect.sync(() => {
           operation.active.delete(cancellation);
+          if (Exit.isSuccess(exit)) {
+            operation.status = {
+              ...operation.status,
+              completed: operation.status.completed + 1,
+            };
+          }
           if (Exit.hasInterrupts(exit)) {
             operation.status = {
               ...operation.status,

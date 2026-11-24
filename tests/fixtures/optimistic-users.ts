@@ -181,7 +181,7 @@ export const makeControlledUserWrites = Effect.fnUntraced(
           "diagnostics.status": () =>
             Effect.succeed({ started: 0, interrupted: 0 }),
           "diagnostics.operationStatus": () =>
-            Effect.succeed({ started: 0, interrupted: 0 }),
+            Effect.succeed({ started: 0, interrupted: 0, completed: 0 }),
           "commands.start":
             commandHandlers?.start ??
             (({ operationId, steps }) =>
@@ -235,7 +235,7 @@ export const makeControlledUserWrites = Effect.fnUntraced(
             Effect.succeed({ started: 0, interrupted: 0 })
           )
           .handle("operationStatus", () =>
-            Effect.succeed({ started: 0, interrupted: 0 })
+            Effect.succeed({ started: 0, interrupted: 0, completed: 0 })
           )
     );
     const httpClient = yield* HttpApiTest.groups(exampleHttpApi, [

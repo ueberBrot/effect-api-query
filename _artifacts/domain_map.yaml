@@ -193,6 +193,13 @@ skills:
         source: examples/server/src/commands.ts
         priority: HIGH
         status: active
+      - mistake: Keep polling command status at the healthy interval after repeated failures
+        mechanism: Each interval starts a new fetch and can reset its retry budget.
+        wrong_pattern: Return the healthy polling interval for an errored status query.
+        correct_pattern: Bound consecutive failures with backoff, pause automatic polling on exhaustion, and expose manual refresh.
+        source: examples/vite-react/src/components/sections/commands-section.tsx
+        priority: HIGH
+        status: active
       - mistake: Point the browser at the standalone API without configuring its origin
         mechanism: The standalone server grants cross-origin access only to explicitly configured app origins. Demo session routes require same-origin requests.
         wrong_pattern: Set VITE_HTTP_BASE_URL for direct browser reads and assume the standalone server allows any origin.

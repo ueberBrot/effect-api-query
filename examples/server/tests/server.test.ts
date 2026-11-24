@@ -73,8 +73,8 @@ describe("example RPC server", () => {
           second: yield* diagnostics.operationStatus("second"),
           total: yield* diagnostics.status,
         }).toStrictEqual({
-          first: { started: 2, interrupted: 0 },
-          second: { started: 1, interrupted: 0 },
+          first: { started: 2, interrupted: 0, completed: 2 },
+          second: { started: 1, interrupted: 0, completed: 1 },
           total: { started: 3, interrupted: 0 },
         });
         yield* diagnostics.reset;
@@ -87,7 +87,7 @@ describe("example RPC server", () => {
         });
         expect({ unused, first, total }).toStrictEqual({
           unused: "operation-not-found",
-          first: { started: 1, interrupted: 0 },
+          first: { started: 1, interrupted: 0, completed: 1 },
           total: { started: 1, interrupted: 0 },
         });
       }).pipe(

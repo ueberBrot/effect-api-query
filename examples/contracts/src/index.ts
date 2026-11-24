@@ -1,6 +1,7 @@
 export {
   CommandStatus,
   DiagnosticFailure,
+  DiagnosticOperationStatus,
   DiagnosticStatus,
   exampleRpcGroup,
   ExampleAuthorization,

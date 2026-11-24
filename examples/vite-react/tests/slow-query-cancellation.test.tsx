@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import type { DiagnosticStatus } from "@effect-api-query/contracts";
+import type { DiagnosticOperationStatus } from "@effect-api-query/contracts";
 import { useSlowQueryCancellation } from "@effect-api-query/shared/use-slow-query-cancellation.ts";
 import { QueryClient } from "@tanstack/react-query";
 import type { QueryFunctionContext } from "@tanstack/react-query";
@@ -20,22 +20,24 @@ type Transport = "rpc" | "http";
 const makeApplication = ({
   readStatus,
   isActive = () => true,
+  slowResult = Effect.never,
 }: {
   readonly readStatus?: (
-    status: DiagnosticStatus
-  ) => Effect.Effect<DiagnosticStatus>;
+    status: DiagnosticOperationStatus
+  ) => Effect.Effect<DiagnosticOperationStatus>;
   readonly isActive?: () => boolean;
+  readonly slowResult?: Effect.Effect<string, Error>;
 } = {}) => {
   const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
+    defaultOptions: { queries: { retry: false, staleTime: 60_000 } },
   });
-  const operations = new Map<string, DiagnosticStatus>();
+  const operations = new Map<string, DiagnosticOperationStatus>();
   const statusSignals: AbortSignal[] = [];
   const status = (operationId: string) =>
-    operations.get(operationId) ?? { started: 0, interrupted: 0 };
+    operations.get(operationId) ?? { started: 0, interrupted: 0, completed: 0 };
   const slow = Effect.fnUntraced(function* slow({ operationId }: SlowInput) {
     operations.set(operationId, { ...status(operationId), started: 1 });
-    return yield* Effect.never.pipe(
+    return yield* slowResult.pipe(
       Effect.onInterrupt(() =>
         Effect.sync(() => {
           operations.set(operationId, {
@@ -69,8 +71,6 @@ const makeApplication = ({
     rpcQuery: {
       diagnostics: {
         slow: {
-          queryKey: ({ input }: { readonly input: SlowInput }) =>
-            slowQuery("rpc", input).queryKey,
           queryOptions: ({ input }: { readonly input: SlowInput }) =>
             slowQuery("rpc", input),
         },
@@ -88,11 +88,6 @@ const makeApplication = ({
     httpQuery: {
       diagnostics: {
         slow: {
-          queryKey: ({
-            input,
-          }: {
-            readonly input: { readonly query: SlowInput };
-          }) => slowQuery("http", input.query).queryKey,
           queryOptions: ({
             input,
           }: {
@@ -116,6 +111,124 @@ const makeApplication = ({
 
 describe("shared slow-query cancellation lifetime", () => {
   afterEach(cleanup);
+
+  it.each([
+    { transport: "rpc", outcome: "Completed" },
+    { transport: "rpc", outcome: "Failed" },
+    { transport: "http", outcome: "Completed" },
+    { transport: "http", outcome: "Failed" },
+  ] as const)(
+    "settles a ready $transport query as $outcome and starts again with a fresh ID",
+    async ({ transport, outcome }) => {
+      const result = Deferred.makeUnsafe<string, Error>();
+      const failure = new Error("slow query failed");
+      const { application, operations } = makeApplication({
+        slowResult: Deferred.await(result),
+      });
+      const hook = renderHook(() =>
+        useSlowQueryCancellation(application, transport)
+      );
+      try {
+        await act(async () => {
+          await hook.result.current.start();
+        });
+        expect(hook.result.current.canCancel).toBe(true);
+        const cancelReadyRun = hook.result.current.cancel;
+        await act(async () => {
+          await Effect.runPromise(
+            outcome === "Completed"
+              ? Deferred.succeed(result, "completed")
+              : Deferred.fail(result, failure)
+          );
+        });
+        await waitFor(() => {
+          expect(hook.result.current.state).toStrictEqual(
+            outcome === "Completed"
+              ? { _tag: outcome }
+              : { _tag: outcome, error: failure }
+          );
+        });
+        expect(hook.result.current.canCancel).toBe(false);
+        expect(hook.result.current.canStart).toBe(true);
+        await act(cancelReadyRun);
+        expect(hook.result.current.state._tag).toBe(outcome);
+
+        await act(async () => {
+          await hook.result.current.start();
+        });
+        expect([...operations.values()]).toStrictEqual([
+          { started: 1, interrupted: 0, completed: 0 },
+          { started: 1, interrupted: 0, completed: 0 },
+        ]);
+      } finally {
+        hook.unmount();
+        await application.queryClient.cancelQueries();
+        application.queryClient.clear();
+      }
+    }
+  );
+
+  it.each(["rpc", "http"] as const)(
+    "reports completion when the %s server finishes before Cancel aborts the response",
+    async (transport) => {
+      let serverCompleted = false;
+      const { application } = makeApplication({
+        readStatus: (status) =>
+          Effect.succeed(
+            serverCompleted
+              ? { ...status, completed: 1, interrupted: 0 }
+              : status
+          ),
+      });
+      const hook = renderHook(() =>
+        useSlowQueryCancellation(application, transport)
+      );
+      try {
+        await act(async () => {
+          await hook.result.current.start();
+        });
+        expect(hook.result.current.canCancel).toBe(true);
+        serverCompleted = true;
+        await act(async () => {
+          await hook.result.current.cancel();
+        });
+        expect(hook.result.current.state).toStrictEqual({ _tag: "Completed" });
+        expect(hook.result.current.canStart).toBe(true);
+        expect(hook.result.current.canCancel).toBe(false);
+      } finally {
+        hook.unmount();
+        await application.queryClient.cancelQueries();
+        application.queryClient.clear();
+      }
+    }
+  );
+
+  it("stops waiting for readiness when a query settles during a status request", async () => {
+    const result = Deferred.makeUnsafe<string>();
+    const { application, statusSignals } = makeApplication({
+      slowResult: Deferred.await(result),
+      readStatus: (status) =>
+        status.started === 0 ? Effect.succeed(status) : Effect.never,
+    });
+    const hook = renderHook(() => useSlowQueryCancellation(application));
+    try {
+      const { start } = hook.result.current;
+      await act(async () => {
+        const starting = start();
+        await waitFor(() => {
+          expect(statusSignals).toHaveLength(2);
+        });
+        await Effect.runPromise(Deferred.succeed(result, "completed"));
+        await starting;
+      });
+      expect(statusSignals[1]?.aborted).toBe(true);
+      expect(hook.result.current.state).toStrictEqual({ _tag: "Completed" });
+    } finally {
+      hook.unmount();
+      await application.queryClient.cancelQueries();
+      application.queryClient.clear();
+    }
+  });
 
   it.each(["rpc", "http"] as const)(
     "unmounting one %s hook interrupts only its operation",
@@ -209,7 +322,7 @@ describe("shared slow-query cancellation lifetime", () => {
   it("does not publish a completed status request or poll again after its owner retires", async () => {
     let active = true;
     let statusReads = 0;
-    const release = Deferred.makeUnsafe<DiagnosticStatus>();
+    const release = Deferred.makeUnsafe<DiagnosticOperationStatus>();
     const { application, operations } = makeApplication({
       isActive: () => active,
       readStatus: (status) => {
@@ -231,7 +344,11 @@ describe("shared slow-query cancellation lifetime", () => {
       active = false;
       await act(async () => {
         await Effect.runPromise(
-          Deferred.succeed(release, { started: 1, interrupted: 0 })
+          Deferred.succeed(release, {
+            started: 1,
+            interrupted: 0,
+            completed: 0,
+          })
         );
         await starting;
       });

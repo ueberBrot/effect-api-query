@@ -1,16 +1,16 @@
-import type { DiagnosticStatus } from "@effect-api-query/contracts";
+import type { DiagnosticOperationStatus } from "@effect-api-query/contracts";
 import type {
   QueryClient,
   QueryFunction,
   QueryKey,
   SkipToken,
 } from "@tanstack/react-query";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { CancelledError } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
 
 import { isOperationNotFound } from "./operation-errors.ts";
 
 export interface DiagnosticQuery<Input, Data> {
-  readonly queryKey: (options: { readonly input: Input }) => QueryKey;
   readonly queryOptions: (options: { readonly input: Input }) => {
     readonly queryKey: QueryKey;
     readonly queryFn: QueryFunction<Data> | SkipToken;
@@ -29,7 +29,7 @@ export interface DiagnosticStatusCall<Input> {
   readonly call: (options: {
     readonly input: Input;
     readonly signal: AbortSignal;
-  }) => Promise<DiagnosticStatus>;
+  }) => Promise<DiagnosticOperationStatus>;
 }
 
 export interface SlowQueryApplication {
@@ -56,6 +56,7 @@ export type SlowQueryCancellationState =
   | { readonly _tag: "Starting" }
   | { readonly _tag: "Ready" }
   | { readonly _tag: "Cancelling" }
+  | { readonly _tag: "Completed" }
   | { readonly _tag: "Cancelled"; readonly interruptions: number }
   | { readonly _tag: "Failed"; readonly error: unknown };
 
@@ -74,6 +75,9 @@ export const describeSlowQueryCancellation = (
     }
     case "Cancelling": {
       return "Cancelling query…";
+    }
+    case "Completed": {
+      return "Slow query completed";
     }
     case "Cancelled": {
       return `Server interruptions: ${String(state.interruptions)}`;
@@ -95,18 +99,57 @@ const delay = async (milliseconds: number) => {
 };
 
 const readBaseline = async (
-  readStatus: (signal: AbortSignal) => Promise<DiagnosticStatus>,
+  readStatus: (signal: AbortSignal) => Promise<DiagnosticOperationStatus>,
   signal: AbortSignal
-): Promise<DiagnosticStatus> => {
+): Promise<DiagnosticOperationStatus> => {
   try {
     return await readStatus(signal);
   } catch (error) {
     if (isOperationNotFound(error)) {
-      return { started: 0, interrupted: 0 };
+      return { started: 0, interrupted: 0, completed: 0 };
     }
     throw error;
   }
 };
+
+const makeSlowQuery = (
+  { rpcQuery, httpQuery }: Pick<SlowQueryApplication, "rpcQuery" | "httpQuery">,
+  transport: "rpc" | "http"
+) => {
+  const operationId = globalThis.crypto.randomUUID();
+  const input = { durationMs: 60_000, operationId };
+  return transport === "http"
+    ? {
+        options: httpQuery.diagnostics.slow.queryOptions({
+          input: { query: input },
+        }),
+        readStatus: async (signal: AbortSignal) =>
+          await httpQuery.diagnostics.operationStatus.call({
+            input: { params: { operationId } },
+            signal,
+          }),
+      }
+    : {
+        options: rpcQuery.diagnostics.slow.queryOptions({ input }),
+        readStatus: async (signal: AbortSignal) =>
+          await rpcQuery.diagnostics.operationStatus.call({
+            input: { operationId },
+            signal,
+          }),
+      };
+};
+
+interface SlowQueryRun {
+  readonly controller: AbortController;
+  readonly queryKey: QueryKey;
+  phase:
+    | { readonly _tag: "Starting" }
+    | { readonly _tag: "Ready"; readonly before: DiagnosticOperationStatus }
+    | { readonly _tag: "Cancelling" };
+  readonly readStatus: (
+    signal: AbortSignal
+  ) => Promise<DiagnosticOperationStatus>;
+}
 
 const alwaysActive = () => true;
 
@@ -122,57 +165,21 @@ export const useSlowQueryCancellation = (
   const [state, setState] = useState<SlowQueryCancellationState>({
     _tag: "Idle",
   });
-  // oxlint-disable-next-line unicorn/no-useless-undefined
-  const baseline = useRef<DiagnosticStatus | undefined>(undefined);
-  // oxlint-disable-next-line react/hook-use-state
-  const [slowInput] = useState(() => ({
-    durationMs: 60_000,
-    operationId: globalThis.crypto.randomUUID(),
-  }));
-  const lifetime = useRef<AbortController | null>(null);
-  const adapter = useMemo(
-    () =>
-      transport === "http"
-        ? {
-            key: httpQuery.diagnostics.slow.queryKey({
-              input: { query: slowInput },
-            }),
-            run: async () =>
-              await queryClient.query(
-                httpQuery.diagnostics.slow.queryOptions({
-                  input: { query: slowInput },
-                })
-              ),
-            readStatus: async (signal: AbortSignal) =>
-              await httpQuery.diagnostics.operationStatus.call({
-                input: { params: { operationId: slowInput.operationId } },
-                signal,
-              }),
-          }
-        : {
-            key: rpcQuery.diagnostics.slow.queryKey({ input: slowInput }),
-            run: async () =>
-              await queryClient.query(
-                rpcQuery.diagnostics.slow.queryOptions({ input: slowInput })
-              ),
-            readStatus: async (signal: AbortSignal) =>
-              await rpcQuery.diagnostics.operationStatus.call({
-                input: { operationId: slowInput.operationId },
-                signal,
-              }),
-          },
-    [httpQuery, queryClient, rpcQuery, slowInput, transport]
-  );
+  const mounted = useRef(false);
+  const current = useRef<SlowQueryRun | null>(null);
 
   useEffect(() => {
-    const controller = new AbortController();
-    lifetime.current = controller;
-    baseline.current = undefined;
+    mounted.current = true;
     return () => {
-      controller.abort();
-      void queryClient.cancelQueries({ queryKey: adapter.key, exact: true });
+      mounted.current = false;
+      const run = current.current;
+      current.current = null;
+      if (run !== null) {
+        run.controller.abort();
+        void queryClient.cancelQueries({ queryKey: run.queryKey, exact: true });
+      }
     };
-  }, [adapter, queryClient]);
+  }, [queryClient]);
 
   const assertActive = (signal: AbortSignal) => {
     signal.throwIfAborted();
@@ -182,16 +189,16 @@ export const useSlowQueryCancellation = (
   };
 
   const waitForStatus = async (
-    predicate: (status: DiagnosticStatus) => boolean,
-    signal: AbortSignal,
+    { controller: { signal }, readStatus }: SlowQueryRun,
+    predicate: (status: DiagnosticOperationStatus) => boolean,
     allowMissing = false
-  ): Promise<DiagnosticStatus> => {
+  ): Promise<DiagnosticOperationStatus> => {
     for (let attempt = 0; attempt < 100; attempt += 1) {
       assertActive(signal);
       // oxlint-disable-next-line eslint/no-await-in-loop
       const status = await (allowMissing
-        ? readBaseline(adapter.readStatus, signal)
-        : adapter.readStatus(signal));
+        ? readBaseline(readStatus, signal)
+        : readStatus(signal));
       assertActive(signal);
       if (predicate(status)) {
         return status;
@@ -202,66 +209,89 @@ export const useSlowQueryCancellation = (
     throw new Error("Timed out waiting for diagnostic status");
   };
 
-  const runQuery = async () => {
-    try {
-      await adapter.run();
-    } catch {
-      // oxlint-disable-next-line eslint/no-useless-return
+  const finish = (run: SlowQueryRun, next: SlowQueryCancellationState) => {
+    if (current.current !== run) {
       return;
+    }
+    current.current = null;
+    run.controller.abort();
+    if (isActive()) {
+      setState(next);
     }
   };
 
   const start = async () => {
-    const signal = lifetime.current?.signal;
-    if (signal === undefined || signal.aborted || !isActive()) {
+    if (!mounted.current || current.current !== null || !isActive()) {
       return;
     }
+    const { options, readStatus } = makeSlowQuery(
+      { rpcQuery, httpQuery },
+      transport
+    );
+    const run: SlowQueryRun = {
+      controller: new AbortController(),
+      queryKey: options.queryKey,
+      phase: { _tag: "Starting" },
+      readStatus,
+    };
+    const { signal } = run.controller;
+    const trackSettlement = async () => {
+      try {
+        await queryClient.query(options);
+        finish(run, { _tag: "Completed" });
+      } catch (error) {
+        if (
+          run.phase._tag !== "Cancelling" ||
+          !(error instanceof CancelledError)
+        ) {
+          finish(run, { _tag: "Failed", error });
+        }
+      }
+    };
+    current.current = run;
     setState({ _tag: "Starting" });
     try {
-      const before = await readBaseline(adapter.readStatus, signal);
+      const before = await readBaseline(readStatus, signal);
       assertActive(signal);
-      baseline.current = before;
-      void runQuery();
-      await waitForStatus(
-        ({ started }) => started > before.started,
-        signal,
-        true
-      );
+      void trackSettlement();
+      await waitForStatus(run, ({ started }) => started > before.started, true);
       assertActive(signal);
+      run.phase = { _tag: "Ready", before };
       setState({ _tag: "Ready" });
     } catch (error) {
-      if (!signal.aborted && isActive()) {
-        setState({ _tag: "Failed", error });
+      if (current.current === run) {
+        finish(run, { _tag: "Failed", error });
+        await queryClient.cancelQueries({
+          queryKey: run.queryKey,
+          exact: true,
+        });
       }
     }
   };
 
   const cancel = async () => {
-    const before = baseline.current;
-    const signal = lifetime.current?.signal;
-    if (
-      before === undefined ||
-      signal === undefined ||
-      signal.aborted ||
-      !isActive()
-    ) {
+    const run = current.current;
+    if (run?.phase._tag !== "Ready" || !isActive()) {
       return;
     }
-
+    const { before } = run.phase;
+    run.phase = { _tag: "Cancelling" };
     setState({ _tag: "Cancelling" });
     try {
-      await queryClient.cancelQueries({ queryKey: adapter.key, exact: true });
-      assertActive(signal);
+      await queryClient.cancelQueries({ queryKey: run.queryKey, exact: true });
       const status = await waitForStatus(
-        ({ interrupted }) => interrupted > before.interrupted,
-        signal
+        run,
+        ({ completed, interrupted }) =>
+          completed > before.completed || interrupted > before.interrupted
       );
-      assertActive(signal);
-      setState({ _tag: "Cancelled", interruptions: status.interrupted });
+      finish(
+        run,
+        status.interrupted > before.interrupted
+          ? { _tag: "Cancelled", interruptions: status.interrupted }
+          : { _tag: "Completed" }
+      );
     } catch (error) {
-      if (!signal.aborted && isActive()) {
-        setState({ _tag: "Failed", error });
-      }
+      finish(run, { _tag: "Failed", error });
     }
   };
 

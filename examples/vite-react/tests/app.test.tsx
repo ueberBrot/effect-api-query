@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { User } from "@effect-api-query/contracts";
+import { CommandStatus, User } from "@effect-api-query/contracts";
 import { startExampleRpcServer } from "@effect-api-query/server";
 import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import {
@@ -9,12 +9,14 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from "@testing-library/react";
-import { Effect, Exit, Scope } from "effect";
+import { Deferred, Effect, Exit, Scope } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vite-plus/test";
 
 import { makeControlledUserWrites } from "../../../tests/fixtures/optimistic-users.ts";
 import { ViteReactExample } from "../src/app.tsx";
+import { CommandsSection } from "../src/components/sections/commands-section.tsx";
 import { CreateUserForm } from "../src/components/users/create-user-form.tsx";
 import { UserList } from "../src/components/users/user-list.tsx";
 import { startViteReactApplication } from "../src/lib/application.ts";
@@ -177,4 +179,81 @@ describe("plain Vite React integration", () => {
       await owned.dispose();
     }
   });
+});
+
+const completedCommandStatus = (operationId: string) =>
+  new CommandStatus({
+    operationId,
+    state: "completed",
+    completedSteps: 40,
+    totalSteps: 40,
+  });
+
+describe("cancellable command status", () => {
+  it.each(["success", "error"] as const)(
+    "reconciles a delayed reservation after a Start mutation settles as %s",
+    async (mutationStatus) => {
+      const finishStart = Deferred.makeUnsafe<boolean>();
+      const deliverReservation = Deferred.makeUnsafe<null>();
+      let statusReads = 0;
+      const { application } = await Effect.runPromise(
+        makeControlledUserWrites(undefined, {
+          start: ({ operationId }) =>
+            Deferred.await(finishStart).pipe(
+              Effect.flatMap(() =>
+                mutationStatus === "success"
+                  ? Effect.succeed(completedCommandStatus(operationId))
+                  : Effect.die(new Error("Start response was lost"))
+              )
+            ),
+          status: ({ operationId }) =>
+            Effect.suspend(() => {
+              statusReads += 1;
+              if (statusReads === 2) {
+                return Deferred.await(deliverReservation);
+              }
+              return Effect.succeed(
+                statusReads === 1 ? null : completedCommandStatus(operationId)
+              );
+            }),
+        })
+      );
+      try {
+        render(
+          <QueryClientProvider client={application.queryClient}>
+            <CommandsSection application={application} />
+          </QueryClientProvider>
+        );
+        const command = within(
+          screen.getByRole("region", { name: "Command 1" })
+        );
+        fireEvent.click(command.getByRole("button", { name: "Start command" }));
+        await waitFor(() => {
+          expect(statusReads).toBe(2);
+        });
+
+        await Effect.runPromise(Deferred.succeed(finishStart, true));
+        await waitFor(() => {
+          const query = application.queryClient.getQueryCache().find({
+            queryKey: application.rpcQuery.commands.status.key(),
+            exact: false,
+          });
+          expect(query?.state.isInvalidated).toBe(true);
+        });
+        await Effect.runPromise(Deferred.succeed(deliverReservation, null));
+
+        await expect(
+          command.findByText(`Start mutation: ${mutationStatus}`)
+        ).resolves.toBeDefined();
+        await expect(
+          command.findByText("Server state: completed")
+        ).resolves.toBeDefined();
+      } finally {
+        await Effect.runPromise(Deferred.succeed(finishStart, true));
+        await Effect.runPromise(Deferred.succeed(deliverReservation, null));
+        cleanup();
+        await application.dispose();
+      }
+    }
+  );
 });

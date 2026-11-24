@@ -175,6 +175,14 @@ export const DiagnosticStatus = Schema.Struct({
 
 export type DiagnosticStatus = typeof DiagnosticStatus.Type;
 
+// oxlint-disable-next-line eslint/no-redeclare
+export const DiagnosticOperationStatus = Schema.Struct({
+  ...DiagnosticStatus.fields,
+  completed: Schema.Int,
+});
+
+export type DiagnosticOperationStatus = typeof DiagnosticOperationStatus.Type;
+
 const DiagnosticsStatusRpc = Rpc.make("diagnostics.status", {
   success: DiagnosticStatus,
   error: ExampleAuthorizationError,
@@ -182,7 +190,7 @@ const DiagnosticsStatusRpc = Rpc.make("diagnostics.status", {
 
 const DiagnosticsOperationStatus = Rpc.make("diagnostics.operationStatus", {
   payload: OperationId,
-  success: DiagnosticStatus,
+  success: DiagnosticOperationStatus,
   error: operationLookupError,
 });
 
