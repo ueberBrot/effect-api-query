@@ -73,6 +73,8 @@ When the last ordinary observer leaves, TanStack can cancel an abort-aware query
 
 Run the [HTTP workflows](https://ueberbrot.github.io/effect-api-query/examples/http-workflows/) for typed errors, uploads, stream sharing, and recovery. Start's browser workflow uses a separate owner from server rendering. Its featured-user loader transfers a selection that the browser rebinds before reading the cache.
 
+Use the Vite proxy for same-origin access to the standalone API. For direct cross-origin reads, follow the explicit allowlist setup in [Run Vite React](https://ueberbrot.github.io/effect-api-query/examples/#run-vite-react).
+
 To enable user deletion and shared workflow writes in the runnable demos, set `EXAMPLE_WRITE_TOKEN` on the server and enter it under **Demo write access** on the same origin. The server verifies the credential and issues a short-lived HttpOnly session.
 
 For React 18 or 19, import `createQueryUtilsContext`, `QueryOwnerProvider`, or `useQueryOwner` from `@ueberbrot/effect-api-query/react`. The subpath uses optional React and React Query peers. Use native Query hooks. The provider's QueryClient boundary remounts observers when the client changes. If the host already provides the cache, set `provideQueryClient={false}`. App code calls `owner.dispose()` on retirement. Strict Mode and Activity effect cleanup do not retire the owner. See the [complete React setup](https://ueberbrot.github.io/effect-api-query/guides/react-query/#acquire-and-mount-the-client).

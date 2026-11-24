@@ -1,21 +1,13 @@
 import { createServer } from "node:http";
+import { isIPv6 } from "node:net";
 
-import {
-  NodeHttpServer,
-  NodeHttpServerRequest,
-  NodeStream,
-} from "@effect/platform-node";
+import { NodeHttpServer } from "@effect/platform-node";
 import { Effect, Option, Schema } from "effect";
 import type { Layer } from "effect";
-import {
-  HttpEffect,
-  HttpServerError,
-  HttpServerRequest,
-  HttpServerResponse,
-} from "effect/http";
+import { HttpEffect, HttpServerRequest, HttpServerResponse } from "effect/http";
 
 import type { ExampleDomain } from "./domain.ts";
-import { makeExampleWebHandler } from "./web-handler.ts";
+import { makeExampleWebHandler, maxRequestBodyBytes } from "./web-handler.ts";
 
 // oxlint-disable-next-line unicorn/throw-new-error
 class ExampleRpcServerError extends Schema.TaggedError<
@@ -26,14 +18,47 @@ class ExampleRpcServerError extends Schema.TaggedError<
   message: Schema.String,
 }) {}
 
-const corsHeaders = (httpApi: boolean) => ({
-  "access-control-allow-headers": `authorization,baggage,content-type,${httpApi ? "if-match," : ""}traceparent,tracestate`,
-  "access-control-allow-methods": httpApi
-    ? "GET,POST,DELETE,OPTIONS"
-    : "POST,OPTIONS",
-  "access-control-allow-origin": "*",
-  "access-control-expose-headers": "etag",
-});
+const isCorsOriginList = Schema.is(
+  Schema.Array(
+    Schema.String.check(
+      Schema.makeFilter((origin: string) => {
+        const url = URL.parse(origin);
+        return (
+          url !== null &&
+          (url.protocol === "http:" || url.protocol === "https:") &&
+          url.origin === origin
+        );
+      })
+    )
+  )
+);
+
+const corsHeaders = (
+  allowedOrigins: ReadonlySet<string>,
+  origin: string | undefined,
+  httpApi: boolean,
+  responseVary?: string
+) => {
+  if (allowedOrigins.size === 0) {
+    return null;
+  }
+  let vary = "Origin";
+  if (responseVary !== undefined) {
+    vary = responseVary === "*" ? responseVary : `${responseVary}, Origin`;
+  }
+  if (origin === undefined || !allowedOrigins.has(origin)) {
+    return { vary };
+  }
+  return {
+    "access-control-allow-headers": `authorization,baggage,content-type,${httpApi ? "if-match," : ""}traceparent,tracestate`,
+    "access-control-allow-methods": httpApi
+      ? "GET,POST,DELETE,OPTIONS"
+      : "POST,OPTIONS",
+    "access-control-allow-origin": origin,
+    "access-control-expose-headers": "etag",
+    vary,
+  };
+};
 
 export interface RunningExampleRpcServer {
   readonly host: string;
@@ -44,6 +69,7 @@ export interface RunningExampleRpcServer {
 }
 
 export interface StartExampleRpcServerOptions {
+  readonly allowedOrigins?: readonly string[];
   readonly domainLayer?: Layer.Layer<ExampleDomain>;
   readonly host?: string;
   readonly port?: number;
@@ -55,6 +81,14 @@ export const startExampleRpcServer = Effect.fn(
 )((options: StartExampleRpcServerOptions = {}) =>
   Effect.gen(function* () {
     const host = options.host ?? "127.0.0.1";
+    const origins = options.allowedOrigins ?? [];
+    if (!isCorsOriginList(origins)) {
+      return yield* new ExampleRpcServerError({
+        cause: undefined,
+        message: "Example RPC server requires serialized HTTP(S) CORS origins",
+      });
+    }
+    const allowedOrigins = new Set(origins);
     const webHandler = yield* makeExampleWebHandler(
       options.domainLayer,
       options.writeToken
@@ -98,13 +132,14 @@ export const startExampleRpcServer = Effect.fn(
       const path = url.value.pathname;
       const isRpcPath = path === "/rpc" || path === "/rpc/";
       const isHttpPath = path.startsWith("/api/");
+      const { origin } = request.headers;
 
       if (request.method === "GET" && path === "/health") {
         return HttpServerResponse.jsonUnsafe({ status: "ready" });
       }
       if (request.method === "OPTIONS" && (isRpcPath || isHttpPath)) {
         return HttpServerResponse.empty({
-          headers: corsHeaders(isHttpPath),
+          headers: corsHeaders(allowedOrigins, origin, isHttpPath) ?? {},
           status: 204,
         });
       }
@@ -112,21 +147,24 @@ export const startExampleRpcServer = Effect.fn(
         return HttpServerResponse.empty({ status: 404 });
       }
 
-      const apiRequest = request.modify({});
-      Object.defineProperty(apiRequest, "stream", {
-        value: NodeStream.fromReadable({
-          closeOnDone: false,
-          evaluate: () => NodeHttpServerRequest.toIncomingMessage(request),
-          onError: (cause) =>
-            new HttpServerError.HttpServerError({
-              reason: new HttpServerError.RequestParseError({ cause, request }),
-            }),
-        }) satisfies typeof request.stream,
-      });
-      const response = yield* api.pipe(
-        Effect.provideService(HttpServerRequest.HttpServerRequest, apiRequest)
+      const response =
+        request.method !== "GET" &&
+        request.method !== "HEAD" &&
+        Number(request.headers["content-length"]) > maxRequestBodyBytes
+          ? HttpServerResponse.empty({
+              headers: { "cache-control": "no-store" },
+              status: 413,
+            })
+          : yield* api;
+      const headers = corsHeaders(
+        allowedOrigins,
+        origin,
+        isHttpPath,
+        response.headers["vary"]
       );
-      return HttpServerResponse.setHeaders(response, corsHeaders(isHttpPath));
+      return headers === null
+        ? response
+        : HttpServerResponse.setHeaders(response, headers);
     });
     yield* server.serve(app);
     yield* Effect.addFinalizer(() =>
@@ -136,7 +174,8 @@ export const startExampleRpcServer = Effect.fn(
     );
 
     const { port } = server.address;
-    const url = `http://${host}:${String(port)}`;
+    const urlHost = isIPv6(host) ? `[${host}]` : host;
+    const url = `http://${urlHost}:${String(port)}`;
     return {
       host,
       port,

@@ -193,6 +193,13 @@ skills:
         source: examples/server/src/commands.ts
         priority: HIGH
         status: active
+      - mistake: Point the browser at the standalone API without configuring its origin
+        mechanism: The standalone server grants cross-origin access only to explicitly configured app origins. Demo session routes require same-origin requests.
+        wrong_pattern: Set VITE_HTTP_BASE_URL for direct browser reads and assume the standalone server allows any origin.
+        correct_pattern: Use the Vite proxy by default. For direct reads, configure the app origin in EXAMPLE_ALLOWED_ORIGINS on the standalone server.
+        source: examples/server/src/server.ts
+        priority: HIGH
+        status: active
       - mistake: Dispose resources after native cancellation alone
         mechanism: Query settlement can precede local finalization. Accepted writes and preparation can still need the runtime.
         wrong_pattern: await queryClient.cancelQueries(); await runtime.dispose()
