@@ -1,6 +1,9 @@
 import { ok } from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
+import * as Option from "effect/Option";
+import * as Schema from "effect/Schema";
+
 import { capture, git, run } from "./lib/exec.mts";
 
 const splitPaths = (output: string) => output.split("\0").filter(Boolean);
@@ -31,13 +34,109 @@ const checkFiles = (files: string[]) => {
     `Unexpected repository files:\n${rejected.join("\n")}\nKeep session output in the OS temporary directory or ignored .artifacts/. See docs/agents/domain.md.`
   );
 };
+const pullRequestsQuery = `
+  query($owner: String!, $repo: String!, $branch: String!, $endCursor: String) {
+    repository(owner: $owner, name: $repo) {
+      nameWithOwner
+      pullRequests(headRefName: $branch, states: [OPEN, CLOSED, MERGED], first: 100, after: $endCursor) {
+        nodes { headRefName headRepository { nameWithOwner } state }
+        pageInfo { hasNextPage endCursor }
+      }
+    }
+  }
+`;
+const unknownPrState =
+  "Could not determine PR state; check gh authentication and retry.";
+
+const repositoryName = Schema.Struct({ nameWithOwner: Schema.NonEmptyString });
+const decodePullRequestPages = Schema.decodeUnknownOption(
+  Schema.fromJsonString(
+    Schema.NonEmptyArray(
+      Schema.Struct({
+        data: Schema.Struct({
+          repository: Schema.Struct({
+            ...repositoryName.fields,
+            pullRequests: Schema.Struct({
+              nodes: Schema.Array(
+                Schema.Struct({
+                  headRefName: Schema.NonEmptyString,
+                  headRepository: Schema.NullOr(repositoryName),
+                  state: Schema.Literals(["OPEN", "CLOSED", "MERGED"]),
+                })
+              ),
+              pageInfo: Schema.Struct({ hasNextPage: Schema.Boolean }),
+            }),
+          }),
+        }),
+      })
+    )
+  )
+);
+const queryPullRequestPages = (remote: string, branch: string) => {
+  const url = new URL(
+    remote.replace(/^git@(?<host>[^:]+):/u, "ssh://git@$<host>/")
+  );
+  const hostname = url.hostname.toLowerCase().replace(/^www\./u, "");
+  const identity = /^\/(?<owner>[\w-]+)\/(?<repo>[\w.-]+?)\/?$/u.exec(
+    decodeURIComponent(url.pathname)
+  )?.groups;
+  const owner = identity?.["owner"];
+  const repo = identity?.["repo"]?.replace(/\.git$/u, "");
+  ok(
+    owner !== undefined && repo !== undefined && repo !== "" && hostname !== "",
+    "Could not identify the GitHub push repository."
+  );
+  const pages = decodePullRequestPages(
+    capture("gh", [
+      "api",
+      "graphql",
+      "--hostname",
+      hostname,
+      "--paginate",
+      "--slurp",
+      "-f",
+      `query=${pullRequestsQuery}`,
+      "-f",
+      `owner=${owner}`,
+      "-f",
+      `repo=${repo}`,
+      "-f",
+      `branch=${branch}`,
+    ])
+  );
+  ok(Option.isSome(pages), unknownPrState);
+  return pages.value;
+};
+
+const pullRequestState = (remote: string, branch: string) => {
+  const pages = queryPullRequestPages(remote, branch);
+  let open = false;
+  let merged = false;
+  for (const [index, { data }] of pages.entries()) {
+    const { nameWithOwner, pullRequests } = data.repository;
+    ok(
+      pullRequests.pageInfo.hasNextPage === index < pages.length - 1,
+      unknownPrState
+    );
+    const destination = nameWithOwner.toLowerCase();
+    for (const { headRefName, headRepository, state } of pullRequests.nodes) {
+      if (
+        headRefName !== branch ||
+        headRepository?.nameWithOwner.toLowerCase() !== destination
+      ) {
+        continue;
+      }
+      open ||= state === "OPEN";
+      merged ||= state === "MERGED";
+    }
+  }
+  return { open, merged };
+};
+
 const zero = /^0+$/u;
 const [mode, , remote] = process.argv.slice(2);
 if (mode === "--push") {
   if (remote !== undefined) {
-    const repo = remote
-      .replace(/^git@(?<host>[^:]+):/u, "https://$<host>/")
-      .replace(/\.git$/u, "");
     const changed = new Set<string>();
     for (const line of readFileSync(0, "utf-8").trim().split("\n")) {
       if (!line) {
@@ -63,29 +162,9 @@ if (mode === "--push") {
         "Commit or stash working changes before pushing so checks cover the pushed commit."
       );
       const branch = remoteRef.slice("refs/heads/".length);
-      const state = capture("gh", [
-        "pr",
-        "list",
-        "--repo",
-        repo,
-        "--head",
-        branch,
-        "--state",
-        "all",
-        "--json",
-        "state,mergedAt",
-        "--jq",
-        '[any(.[]; .state == "OPEN"), any(.[]; .mergedAt != null)] | @tsv',
-      ]).trim();
+      const { open, merged } = pullRequestState(remote, branch);
       ok(
-        state === "true\tfalse" ||
-          state === "true\ttrue" ||
-          state === "false\tfalse" ||
-          state === "false\ttrue",
-        "Could not determine PR state; check gh authentication and retry."
-      );
-      ok(
-        state !== "false\ttrue",
+        open || !merged,
         `PR branch ${branch} is already merged. Start follow-up work from current main on a new branch.`
       );
       checkFiles(

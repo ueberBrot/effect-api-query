@@ -13,13 +13,15 @@ import nodePath from "node:path";
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import { fixtureGitEnvironment } from "./fixtures/git-environment";
+
 const repository = nodePath.resolve(import.meta.dirname, "..");
 const fixture = mkdtempSync(nodePath.join(tmpdir(), "skills-maintenance-"));
 const workflow = ".github/workflows/ci.yml";
 const reviewState = ".intent/review-state.json";
 const skill = "skills/maintenance-fixture/SKILL.md";
 const environment = (overrides: NodeJS.ProcessEnv = {}) => ({
-  ...process.env,
+  ...fixtureGitEnvironment(),
   GITHUB_ACTIONS: "false",
   GITHUB_STEP_SUMMARY: "",
   INTENT_REVIEW_BASE: "",
