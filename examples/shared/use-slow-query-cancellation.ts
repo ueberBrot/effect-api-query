@@ -1,4 +1,3 @@
-import { OperationNotFound } from "@effect-api-query/contracts";
 import type { DiagnosticStatus } from "@effect-api-query/contracts";
 import type {
   QueryClient,
@@ -6,9 +5,9 @@ import type {
   QueryKey,
   SkipToken,
 } from "@tanstack/react-query";
-import { getExecutionCause } from "@ueberbrot/effect-api-query";
-import { Cause, Result } from "effect";
 import { useEffect, useMemo, useRef, useState } from "react";
+
+import { isOperationNotFound } from "./operation-errors.ts";
 
 export interface DiagnosticQuery<Input, Data> {
   readonly queryKey: (options: { readonly input: Input }) => QueryKey;
@@ -102,12 +101,7 @@ const readBaseline = async (
   try {
     return await readStatus(signal);
   } catch (error) {
-    const cause = getExecutionCause(error);
-    if (
-      cause !== undefined &&
-      Result.getOrUndefined(Cause.findError(cause)) ===
-        OperationNotFound.literal
-    ) {
+    if (isOperationNotFound(error)) {
       return { started: 0, interrupted: 0 };
     }
     throw error;

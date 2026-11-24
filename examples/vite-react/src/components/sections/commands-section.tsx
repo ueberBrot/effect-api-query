@@ -1,3 +1,4 @@
+import { isOperationNotFound } from "@effect-api-query/shared/operation-errors.ts";
 import { ActionButton } from "@effect-api-query/shared/ui/action-button.tsx";
 import { EffectErrorDetails } from "@effect-api-query/shared/ui/effect-error-details.tsx";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -50,10 +51,11 @@ const Command = ({
       input,
       enabled: reserved,
       refetchInterval: (query) =>
-        query.state.data?.state === "running" ||
-        query.state.status === "error" ||
-        query.state.data === undefined ||
-        (query.state.data === null && start.isPending)
+        !isOperationNotFound(query.state.error) &&
+        (query.state.data?.state === "running" ||
+          query.state.status === "error" ||
+          query.state.data === undefined ||
+          (query.state.data === null && start.isPending))
           ? 100
           : false,
     })

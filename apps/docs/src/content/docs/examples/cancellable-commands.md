@@ -14,6 +14,8 @@ The client assigns an ID before starting each command. The server scopes IDs to 
 In the React component, use the app's `rpcQuery` and QueryClient. Import `useState`, `useQuery`, and `useMutation` from their native packages.
 
 ```ts
+import { isOperationNotFound } from "@effect-api-query/shared/operation-errors.ts";
+
 const [operationId] = useState(() => crypto.randomUUID());
 const input = { operationId };
 const [reserved, setReserved] = useState(false);
@@ -40,10 +42,11 @@ const status = useQuery(
     input,
     enabled: reserved,
     refetchInterval: (query) =>
-      query.state.data?.state === "running" ||
-      query.state.status === "error" ||
-      query.state.data === undefined ||
-      (query.state.data === null && start.isPending)
+      !isOperationNotFound(query.state.error) &&
+      (query.state.data?.state === "running" ||
+        query.state.status === "error" ||
+        query.state.data === undefined ||
+        (query.state.data === null && start.isPending))
         ? 100
         : false,
   })
@@ -59,7 +62,7 @@ cancel.mutate(input);
 
 Disable Start while it is pending or once the server accepts the command. If Start fails or the response is uncertain, reuse the same ID so a retry cannot create another command. Disable Cancel until `reserved` is true, during cancellation, and after terminal status. See the [complete panel](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/components/sections/commands-section.tsx).
 
-The cancel handler signals the worker and waits for it to stop. Its mutation invalidates the status key in `onSettled`, so the active query refetches even if cancellation failed. Poll while the command runs or status is unresolved. Stop at terminal status or when a settled Start has no command.
+The cancel handler signals the worker and waits for it to stop. Its mutation invalidates the status key in `onSettled`, so the active query refetches even if cancellation failed. Poll while the command runs or status is unresolved. Stop at terminal status, a missing operation, or when a settled Start has no command.
 
 A cancelled command returns `{ state: 'cancelled', ... }` as a successful result. TanStack reports the mutations as `success`. Use the command state for the UI. Each ID has a separate query and worker, so cancelling one leaves the other running.
 
