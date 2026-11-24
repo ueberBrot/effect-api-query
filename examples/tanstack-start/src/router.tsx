@@ -14,6 +14,7 @@ import {
   startTanStackStartApplication,
 } from "./lib/application.ts";
 import type { TanStackStartApplication } from "./lib/application.ts";
+import { onPermanentPageHide } from "./lib/pagehide.ts";
 import { setupQuerySsr } from "./lib/query-ssr.ts";
 import { startRequestApplication } from "./lib/server-host.ts";
 import type { SnapshotPreparation } from "./lib/snapshot-preparation.ts";
@@ -41,16 +42,19 @@ const registerBrowserDisposal = (
   if (typeof window === "undefined") {
     return;
   }
-  const dispose = () => {
+  onPermanentPageHide(() => {
     void reportCleanupFailure(application.dispose());
-  };
-  window.addEventListener("pagehide", dispose, { once: true });
+  });
 };
 
 export const createTanStackStartRouter = async (
   options: CreateTanStackStartRouterOptions
 ) => {
-  const { history, isServer, scrollRestoration = true } = options;
+  const {
+    history,
+    isServer = typeof document === "undefined",
+    scrollRestoration = true,
+  } = options;
   const application =
     options.application ??
     (await startTanStackStartApplication({ rpcUrl: options.rpcUrl }));
@@ -60,11 +64,8 @@ export const createTanStackStartRouter = async (
   if (history !== undefined) {
     navigation.history = history;
   }
-  if (isServer !== undefined) {
-    navigation.isServer = isServer;
-  }
   const router = createRouter({
-    context: application,
+    context: { ...application, isServer },
     defaultErrorComponent: ErrorPage,
     defaultNotFoundComponent: NotFoundPage,
     defaultPendingComponent: PendingPage,
@@ -72,6 +73,7 @@ export const createTanStackStartRouter = async (
     defaultPreload: "intent",
     defaultPreloadStaleTime: 0,
     ...navigation,
+    isServer,
     routeTree,
     scrollRestoration,
   });

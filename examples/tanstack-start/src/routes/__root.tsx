@@ -122,7 +122,9 @@ const Document = ({ children }: { readonly children: ReactNode }) => (
   </html>
 );
 
-export const Route = createRootRouteWithContext<TanStackStartApplication>()({
+export const Route = createRootRouteWithContext<
+  TanStackStartApplication & { readonly isServer: boolean }
+>()({
   component: Root,
   head: () => ({
     links: [{ href: stylesheet, rel: "stylesheet" }],
