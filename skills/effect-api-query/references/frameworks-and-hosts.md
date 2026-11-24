@@ -106,6 +106,8 @@ Choose the transport your application already owns.
 
 The app supplies transport batching, platform services, and providers. Execution guards use same-realm `instanceof`. Across realms, transfer a safe error DTO.
 
+For buffered JSON RPC batches, limit message count before dispatch and count encoded response bytes as replies arrive. The standalone and TanStack Start demos accept up to 16 messages and 1 MiB of aggregate response JSON per HTTP RPC request. Both reject overflow with HTTP 413. A response-limit rejection can follow completed operations, so avoid retrying a batch of writes as a unit.
+
 See [Vue](https://ueberbrot.github.io/effect-api-query/guides/vue-query/), [Solid](https://ueberbrot.github.io/effect-api-query/guides/solid-query/), [Svelte](https://ueberbrot.github.io/effect-api-query/guides/svelte-query/), and [Angular](https://ueberbrot.github.io/effect-api-query/guides/angular-query/) for native hooks. See [client lifecycle](https://ueberbrot.github.io/effect-api-query/concepts/client-lifecycle/) and [WebSocket clients](https://ueberbrot.github.io/effect-api-query/guides/websocket-clients/) for host and transport setup.
 
 See [query owner setup](cache-workflows.md#opt-in-to-query-owner-setup) for acquired and borrowed resources. For execution errors, follow [failure handling](https://ueberbrot.github.io/effect-api-query/guides/handle-failures/) and [retry queries](https://ueberbrot.github.io/effect-api-query/guides/retry-queries/).

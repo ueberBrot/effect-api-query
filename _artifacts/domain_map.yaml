@@ -186,6 +186,13 @@ skills:
         source: examples/server/src/web-handler.ts
         priority: CRITICAL
         status: active
+      - mistake: Rely on upload limits to bound buffered RPC replies
+        mechanism: Each request message can produce multiple replies or return more bytes than it received.
+        wrong_pattern: Collect all replies before applying a response byte limit.
+        correct_pattern: Cap message count before dispatch and encoded bytes before buffering more frames. Close request-scoped work on overflow.
+        source: examples/server/src/buffered-rpc.ts
+        priority: HIGH
+        status: active
       - mistake: Use an operation ID as proof of ownership
         mechanism: Callers can choose the same command or diagnostic ID.
         wrong_pattern: Look up a command or cancel diagnostics by ID alone.
