@@ -111,7 +111,7 @@ If the Schema accepts named events without a data line, set `sseOptions.dispatch
 
 Use `metadataOptions` for decoded data with response status and raw headers. Use `metadataKey({ input })` for exact cache access. Its `metadata` segment separates it from the ordinary view. The leaf prefix matches both. This view is available only on query-capable buffered endpoints.
 
-The adapter freezes the fetched envelope and its copied headers. It keeps decoded data and declared wrappers as returned. Only a whole `undefined` becomes `null`. The app owns initial, hydrated, manual, and selected values.
+Fetched envelopes and header snapshots are frozen in the cache and on imperative fetch returns, including interceptor replacements and fallbacks. Default sharing preserves raw header names as own string properties across refetches. Decoded data and declared wrappers keep their own reference semantics. Only a whole `undefined` becomes `null`. The app owns initial, hydrated, manual, and selected values.
 
 Global and prefix sharing policies apply to fetched snapshots. Selected values and manual writes use the local policy passed to `metadataOptions` or standard deep sharing. A fresh-cache hit keeps the query's installed options. Use an observer or actual fetch to install a new policy. Native selection, defaults, skipping, and cancellation still apply.
 

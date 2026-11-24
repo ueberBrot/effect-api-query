@@ -6,6 +6,14 @@ import type { UnaryOperation } from "./operation";
 import { executeBuffered } from "./runtime";
 import type { RunPromiseExit } from "./types";
 
+const isEnumerableDataProperty = (descriptor?: PropertyDescriptor) =>
+  descriptor?.enumerable === true && Object.hasOwn(descriptor, "value");
+
+const hasPlainSnapshotProperties = (value: Readonly<Record<string, unknown>>) =>
+  Object.values(Object.getOwnPropertyDescriptors(value)).every(
+    isEnumerableDataProperty
+  );
+
 export const freezeMetadata = <Data>(data: Data): Data => {
   if (!Predicate.isObject(data)) {
     return data;
@@ -14,10 +22,13 @@ export const freezeMetadata = <Data>(data: Data): Data => {
   const snapshot =
     Predicate.isObject(headers) &&
     (!Object.isFrozen(headers) ||
-      Object.getPrototypeOf(headers) !== Object.prototype)
+      Object.getPrototypeOf(headers) !== Object.prototype ||
+      !hasPlainSnapshotProperties(headers))
       ? Object.freeze({ ...headers })
       : headers;
-  return Object.isFrozen(data) && snapshot === headers
+  return Object.isFrozen(data) &&
+    snapshot === headers &&
+    hasPlainSnapshotProperties(data)
     ? data
     : Object.freeze({ ...data, headers: snapshot });
 };
@@ -27,14 +38,56 @@ type StructuralSharing = (previous: unknown, data: unknown) => unknown;
 const isStructuralSharing = (policy: unknown): policy is StructuralSharing =>
   Predicate.isFunction(policy);
 
-const shareQueryData = (previous: unknown, data: unknown, policy: unknown) => {
+const shareFetchedMetadata = (previous: unknown, data: unknown) => {
+  if (!Predicate.isObject(previous) || !Predicate.isObject(data)) {
+    return replaceEqualDeep(previous, data);
+  }
+
+  const { headers } = data;
+  const previousEnvelope = hasPlainSnapshotProperties(previous)
+    ? previous
+    : Object.fromEntries(
+        Object.keys(data)
+          .filter((name) => Object.hasOwn(previous, name))
+          .map((name) => [name, previous[name]])
+      );
+  const previousHeaderProperty = Object.getOwnPropertyDescriptor(
+    previousEnvelope,
+    "headers"
+  );
+  const previousHeaders: unknown = previousHeaderProperty?.value;
+  const sameHeaders =
+    isEnumerableDataProperty(previousHeaderProperty) &&
+    Predicate.isObject(headers) &&
+    Predicate.isObject(previousHeaders) &&
+    Object.keys(headers).length ===
+      Object.getOwnPropertyNames(previousHeaders).length &&
+    Object.entries(headers).every(([name, value]) => {
+      const property = Object.getOwnPropertyDescriptor(previousHeaders, name);
+      return isEnumerableDataProperty(property) && property?.value === value;
+    });
+  const shared = replaceEqualDeep(previousEnvelope, {
+    ...data,
+    headers: previousHeaders,
+  });
+  return sameHeaders ? shared : { ...shared, headers };
+};
+
+const shareQueryData = (
+  previous: unknown,
+  data: unknown,
+  policy: unknown,
+  fetched: boolean
+) => {
   if (policy === false) {
     return data;
   }
   if (isStructuralSharing(policy)) {
     return policy(previous, data);
   }
-  return replaceEqualDeep(previous, data);
+  return fetched
+    ? shareFetchedMetadata(previous, data)
+    : replaceEqualDeep(previous, data);
 };
 
 const fetchedPolicies = new WeakMap<object, { readonly policy: unknown }>();
@@ -64,8 +117,17 @@ export const preserveMetadataPolicy = <Data>(
     return data;
   }
   const replacement = { ...data };
-  fetchedPolicies.set(replacement, produced ?? { policy: fallback });
-  return replacement;
+  for (const name of ["data", "status", "headers"] as const) {
+    if (!Object.hasOwn(replacement, name) && name in data) {
+      Object.defineProperty(replacement, name, {
+        enumerable: true,
+        value: data[name],
+      });
+    }
+  }
+  const snapshot = freezeMetadata(replacement);
+  fetchedPolicies.set(snapshot, produced ?? { policy: fallback });
+  return snapshot;
 };
 
 export const prepareMetadataExecution = (
@@ -90,7 +152,8 @@ export const prepareMetadataExecution = (
       const shared = shareQueryData(
         previous,
         data,
-        produced === undefined ? localPolicy : produced.policy
+        produced === undefined ? localPolicy : produced.policy,
+        produced !== undefined
       );
       return produced === undefined ? shared : freezeMetadata(shared);
     };

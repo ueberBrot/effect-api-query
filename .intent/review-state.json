@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "471423c74905c86600de5cbee332edf8daa80b3c4e487d5fd0c385bcf8c116a4",
+      "fingerprint": "abf1adb6e43990b57e168c26fb8cabbe167cd8b7ce1cc7b3bce5606744a170cd",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -219,7 +219,7 @@
         "skills/effect-api-query/SKILL.md": "2f317d7b9ee273c24731613181d10495e73d0ca698c3c59a3fed557f6f2770fe",
         "skills/effect-api-query/references/cache-workflows.md": "9179b14cbef2dae7dd25f1e959fa42373b9cd22a84dc906b0cc3c05243bc141f",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "f8e2ed21583481dffd1680ce85340af508bbd8a5baeb8227da094a099da81fef",
-        "skills/effect-api-query/references/http.md": "e61055cdee73224724f4bcd56b5d4061a53b344d9bc0b601672b50c98555cfca",
+        "skills/effect-api-query/references/http.md": "20ca47fe0b3fd957f06328176967d68f1baa38d41b4bb45e033b86f4722c9d45",
         "skills/effect-api-query/references/hydration-and-ssr.md": "0265ce970039b2ca41be2165683c135fd9584ea9a3c95b147a73eca8e54bd19f",
         "skills/effect-api-query/references/query-patterns.md": "983066711ed321e7ce37ae230ab97379d30e010cfa11c74211053c982bcea6a1",
         "skills/effect-api-query/references/rpc.md": "d5bc0d199249ef185f1cd532e282d95788807def0e18bc5f175730534aa2ed68",
@@ -234,7 +234,7 @@
         "src/core/hydration.ts": "08c812094bb4662cdf118b1825a47a4ec4bc1e4bd248a878726cbd4ff31aaf1e",
         "src/core/inference.ts": "249bc1d59e4ea6ddc7e3a09a63b93c13e3805f9d70ead00f44c710ff95e4df94",
         "src/core/interceptor.ts": "1bc8566c5669e1e797e8293b441a6ed175252a29c6eaa42999690cb835a5347f",
-        "src/core/metadata-query.ts": "7e85b8f5491819e474d69694354ec1377df1c28061cd40184d85fa865efdd276",
+        "src/core/metadata-query.ts": "02501422602e321f41e3ea77a7d7e4ec60370233baf6a9363bec0d44b5a88386",
         "src/core/operation.ts": "fd61b32046c5cf69518de08ed0f85d8f96fc90d474fd4be79fd7c2577addc53e",
         "src/core/policy.ts": "ced3a6fdf1ab7e273eb518700a42d68b4823abdb1088fae6855424e4e479ded4",
         "src/core/prepared-input.ts": "2f481fed3e0f89fe284a0cf99e0d39a884a7fbcf92925c6b69f96df8b3d9ba66",
@@ -315,7 +315,7 @@
         "tests/http-execution.test.ts": "9b97e1391768e624648f453cd51beff43f8525a3cb089bec520337125dffd5cb",
         "tests/http-hydration.test.ts": "51da967534267d49dc91f577f43a54fc88045cce8f89623c1106df8c88c21570",
         "tests/http-live-query.test.ts": "94e0c0c3befaf3bbdc7bbcd27400ee412d4d3eb9931db670a30c560b0b67cdee",
-        "tests/http-metadata-options.test.ts": "35923dbcebeddb4aafa299da1afb91a9124d0b25cc728bf05d19876bc4f4f6d9",
+        "tests/http-metadata-options.test.ts": "44c5016243e529736bee140b67fca55a2ef57a9829df30bdffbddbbb8a6f474e",
         "tests/http-multipart.test.ts": "1e9aabe7401e6e0baac20c58d86b87c371dde43dd2049ec5f343968ad5254005",
         "tests/http-ndjson-query.test.ts": "5f722d8bcaaff9a6f4b5413ec393d14dfce6d282646f20377eec504cdd4663f8",
         "tests/http-query-options.test.ts": "aac64adf89e7dc9e281e65d7cdd9256e99dba785d934fafc14b2b02c6476ae3b",
@@ -421,22 +421,20 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "10ad0fba5e49cfa5f252d4fdb8721cfdf56a67ad",
+      "head": "903b57e83b0b79ade935d99f18bda6b123f07886",
       "outcome": "updated",
-      "reason": "The example hosts now bind command and diagnostic records to verified callers. The cache-workflows reference and command guide explain owner-scoped reservations and typed missing operations.",
+      "reason": "The HTTP reference now describes own raw headers on refetch and frozen metadata snapshots from imperative interceptor results and cache reads.",
       "evidence": [
-        "Reviewed the source diff from 30552d7d through 10ad0fba, including examples/server/src/caller.ts, commands.ts, diagnostic-operations.ts, and web-handler.ts.",
-        "The full runtime and compiler suite passed 1040 tests. Scoped integration passed 161 tests, and 36 browser tests passed on Chromium, Firefox, and WebKit.",
-        "The browser tests cover first-session coordination, renewal, and ownership through the actual Start routes. Docs checks passed. Fresh skill discovery was not exercised."
+        "src/core/metadata-query.ts and tests/http-metadata-options.test.ts against 21868ef8. All 38 focused HTTP tests, docs-check and skills-check passed. Independent source and behavior review completed. Fresh consumer discovery was not run."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "b27365611bf5f06affd03afc416e40311d4a13fd5e087c96f816ab43f7631f46",
+      "fingerprint": "d556c8903efb18f6f5dc2c444498c2a8818dd2ecb2e6ff12344c0fcdc439cb98",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
-        "_artifacts/domain_map.yaml": "f6e19dbdf595ced937207c2fee6683fbfe3f8aaf10e3a789d08d5c9f52ef48ee",
-        "_artifacts/skill_spec.md": "fee054ac5b92b265f0e7ee60804304b3d253e6579bb3bdee9823e70e74e0cec6",
+        "_artifacts/domain_map.yaml": "9ac6f83ae85ef8b140cc7c35ddd27725640ad645013f70d31e954ed9db550ccc",
+        "_artifacts/skill_spec.md": "4b451d59f3c2fb02cb27b8ff5e8cfd56c899c6228f9f81c00d347ea97c21f131",
         "_artifacts/skill_tree.yaml": "12ee0ddea311f100d0093cb01cfd3cb3695d0e93653d7a6e9dc45d6d2ba1a463",
         "apps/docs/astro.config.mts": "90c54a40605dc0f553b9f62831c88a3e012fe6da44a1e216e4f981bcf1af2272",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "a826348cf7b3fd34b0677280daa75a08ce99138cb68fbd79d4ef52936190eeb6",
@@ -650,7 +648,7 @@
         "skills/effect-api-query/SKILL.md": "2f317d7b9ee273c24731613181d10495e73d0ca698c3c59a3fed557f6f2770fe",
         "skills/effect-api-query/references/cache-workflows.md": "9179b14cbef2dae7dd25f1e959fa42373b9cd22a84dc906b0cc3c05243bc141f",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "f8e2ed21583481dffd1680ce85340af508bbd8a5baeb8227da094a099da81fef",
-        "skills/effect-api-query/references/http.md": "e61055cdee73224724f4bcd56b5d4061a53b344d9bc0b601672b50c98555cfca",
+        "skills/effect-api-query/references/http.md": "20ca47fe0b3fd957f06328176967d68f1baa38d41b4bb45e033b86f4722c9d45",
         "skills/effect-api-query/references/hydration-and-ssr.md": "0265ce970039b2ca41be2165683c135fd9584ea9a3c95b147a73eca8e54bd19f",
         "skills/effect-api-query/references/query-patterns.md": "983066711ed321e7ce37ae230ab97379d30e010cfa11c74211053c982bcea6a1",
         "skills/effect-api-query/references/rpc.md": "d5bc0d199249ef185f1cd532e282d95788807def0e18bc5f175730534aa2ed68",
@@ -665,7 +663,7 @@
         "src/core/hydration.ts": "08c812094bb4662cdf118b1825a47a4ec4bc1e4bd248a878726cbd4ff31aaf1e",
         "src/core/inference.ts": "249bc1d59e4ea6ddc7e3a09a63b93c13e3805f9d70ead00f44c710ff95e4df94",
         "src/core/interceptor.ts": "1bc8566c5669e1e797e8293b441a6ed175252a29c6eaa42999690cb835a5347f",
-        "src/core/metadata-query.ts": "7e85b8f5491819e474d69694354ec1377df1c28061cd40184d85fa865efdd276",
+        "src/core/metadata-query.ts": "02501422602e321f41e3ea77a7d7e4ec60370233baf6a9363bec0d44b5a88386",
         "src/core/operation.ts": "fd61b32046c5cf69518de08ed0f85d8f96fc90d474fd4be79fd7c2577addc53e",
         "src/core/policy.ts": "ced3a6fdf1ab7e273eb518700a42d68b4823abdb1088fae6855424e4e479ded4",
         "src/core/prepared-input.ts": "2f481fed3e0f89fe284a0cf99e0d39a884a7fbcf92925c6b69f96df8b3d9ba66",
@@ -746,7 +744,7 @@
         "tests/http-execution.test.ts": "9b97e1391768e624648f453cd51beff43f8525a3cb089bec520337125dffd5cb",
         "tests/http-hydration.test.ts": "51da967534267d49dc91f577f43a54fc88045cce8f89623c1106df8c88c21570",
         "tests/http-live-query.test.ts": "94e0c0c3befaf3bbdc7bbcd27400ee412d4d3eb9931db670a30c560b0b67cdee",
-        "tests/http-metadata-options.test.ts": "35923dbcebeddb4aafa299da1afb91a9124d0b25cc728bf05d19876bc4f4f6d9",
+        "tests/http-metadata-options.test.ts": "44c5016243e529736bee140b67fca55a2ef57a9829df30bdffbddbbb8a6f474e",
         "tests/http-multipart.test.ts": "1e9aabe7401e6e0baac20c58d86b87c371dde43dd2049ec5f343968ad5254005",
         "tests/http-ndjson-query.test.ts": "5f722d8bcaaff9a6f4b5413ec393d14dfce6d282646f20377eec504cdd4663f8",
         "tests/http-query-options.test.ts": "aac64adf89e7dc9e281e65d7cdd9256e99dba785d934fafc14b2b02c6476ae3b",
@@ -852,12 +850,11 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "10ad0fba5e49cfa5f252d4fdb8721cfdf56a67ad",
+      "head": "903b57e83b0b79ade935d99f18bda6b123f07886",
       "outcome": "updated",
-      "reason": "The domain map records operation-ID ownership, the skill specification records the example protocol change, and the synchronized skill tree maps the affected UI and transport evidence.",
+      "reason": "The domain map and skill spec record the two metadata read paths and the existing skill tree already maps the runtime, references and regression tests.",
       "evidence": [
-        "_artifacts/domain_map.yaml, _artifacts/skill_spec.md, and _artifacts/skill_tree.yaml were reconciled with the changes at 10ad0fba.",
-        "vp exec intent maintainer sync, repository formatting and type checks, and the example integration and browser matrices passed."
+        "_artifacts/domain_map.yaml, _artifacts/skill_spec.md and _artifacts/skill_tree.yaml reconciled with the HTTP reference. All 38 focused HTTP tests and skills-check passed."
       ]
     },
     "source:vite.config.ts": {
@@ -4703,6 +4700,18 @@
       "reason": "The Playwright test harness now uses a fresh preview and isolated domain per test, preserving the application workflows described by the skill.",
       "evidence": [
         "e2e/example-host.ts at 861dbbc; Chromium passed with two workers and a concurrent four-host smoke check passed."
+      ]
+    },
+    "source:.changeset/preserve-http-metadata-snapshots.md": {
+      "fingerprint": "ac12c7e1dde08dea417a5e25785f77d37800264733d02adced4a0728b1119df7",
+      "snapshot": {
+        ".changeset/preserve-http-metadata-snapshots.md": "dada4aab8523e36a1a4e2f4dd679e9ca17b2bfe8d8fc8dea7ae78e038f8398f1"
+      },
+      "head": "21868ef8d808e5a4c07dbff91268ff24b6f27312",
+      "outcome": "no-change",
+      "reason": "The patch changeset records the compatible fixes under ADR 0001. The release note requires no additional guidance or mapping.",
+      "evidence": [
+        ".changeset/preserve-http-metadata-snapshots.md describes the two behaviors covered by tests/http-metadata-options.test.ts."
       ]
     }
   }
