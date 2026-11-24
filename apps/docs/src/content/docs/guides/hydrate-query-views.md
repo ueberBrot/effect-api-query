@@ -11,7 +11,7 @@ This example extends the [Profile codec](/effect-api-query/guides/hydrate-unary-
 
 Pass the RPC group or HttpApi directly. The registry uses the same keys as the utility tree. If you set `keyPrefix` on the utilities, pass it here too. See the [Start snapshot module](https://github.com/ueberBrot/effect-api-query/blob/main/examples/tanstack-start/src/lib/snapshot-preparation.ts) for composing RPC and HTTP registries with `createHydrationRegistry`.
 
-Derivation covers buffered queries, HTTP metadata, live values, and accumulated history. Use `paths` to override a view or register infinite pages with `infinite: { pageParam }`. A custom `query` codec also supplies the decoded data codec for metadata and pages unless you override them.
+Derivation covers buffered queries, live values, and accumulated history by default. HTTP metadata hydration is opt-in so unfiltered server-only response headers do not enter browser snapshots: configure `views: { metadata: { headers: ["etag"] } }` (or `headers: []`), a per-path `paths[path].metadata: { headers: [...] }`, or a custom `metadata` codec. Use `paths` to override a view or register infinite pages with `infinite: { pageParam }`. A custom `query` codec also supplies the decoded data codec for metadata and pages unless you override them.
 
 Derivation preserves union members that share a JSON representation, such as `42n` and `"42"`, including in objects and arrays. It keeps `undefined` and `null` distinct in accumulated history. When an endpoint declares multiple success statuses, HTTP metadata uses the cached response status to select the corresponding schemas. For buffered HTTP query data, the registry prefers a success schema that accepts all cached fields.
 

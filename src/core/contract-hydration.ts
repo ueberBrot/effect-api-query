@@ -76,18 +76,83 @@ const normalizeKeyPrefix = (
       )
   );
 
+interface ValidatedViews {
+  readonly toggles: ReadonlyMap<string, boolean>;
+  readonly metadataHeaders: readonly string[] | undefined;
+}
+
+const parseMetadataHeadersConfig = (
+  value: unknown,
+  path?: string
+): readonly string[] | false | undefined => {
+  if (value === undefined || value === false) {
+    return value;
+  }
+  if (!Predicate.isObject(value)) {
+    throw new HydrationCodecError("InvalidContractPath", {
+      path,
+      view: "metadata",
+      message:
+        "HTTP metadata hydration requires an explicit header allowlist ({ headers: [...] }), a custom codec, or false",
+    });
+  }
+  const keys = Object.getOwnPropertyNames(value);
+  if (
+    keys.some((key) => key !== "headers") ||
+    !Object.hasOwn(value, "headers")
+  ) {
+    throw new HydrationCodecError("InvalidContractPath", {
+      path,
+      view: "metadata",
+      message:
+        'HTTP metadata hydration config must only specify a "headers" string array',
+    });
+  }
+  const rawHeaders = value["headers"];
+  if (!Array.isArray(rawHeaders)) {
+    throw new HydrationCodecError("InvalidContractPath", {
+      path,
+      view: "metadata",
+      message:
+        "HTTP metadata hydration headers must be an array of non-empty header names",
+    });
+  }
+  const headers: string[] = [];
+  for (let index = 0; index < rawHeaders.length; index += 1) {
+    if (!Object.hasOwn(rawHeaders, index)) {
+      throw new HydrationCodecError("InvalidContractPath", {
+        path,
+        view: "metadata",
+        message: "HTTP metadata hydration headers must not be a sparse array",
+      });
+    }
+    const header: unknown = rawHeaders[index];
+    if (!Predicate.isString(header) || header.trim().length === 0) {
+      throw new HydrationCodecError("InvalidContractPath", {
+        path,
+        view: "metadata",
+        message:
+          "HTTP metadata hydration headers must be an array of non-empty header names",
+      });
+    }
+    headers.push(header);
+  }
+  return headers;
+};
+
 const validateViews = (
   options: Record<string, unknown> | undefined,
   allowed: ReadonlySet<string>
-): ReadonlyMap<string, boolean> => {
-  const result = new Map<string, boolean>();
+): ValidatedViews => {
+  const toggles = new Map<string, boolean>();
+  let metadataHeaders: readonly string[] | undefined;
   const views = options?.["views"];
   if (views === undefined) {
-    return result;
+    return { toggles, metadataHeaders };
   }
   if (!Predicate.isObject(views)) {
     throw new HydrationCodecError("InvalidContractPath", {
-      message: "views must be an object of boolean view toggles",
+      message: "views must be an object of view configurations",
     });
   }
   for (const key of new Set([
@@ -100,16 +165,22 @@ const validateViews = (
       });
     }
     const value = views[key];
-    if (value !== undefined) {
-      if (!Predicate.isBoolean(value)) {
-        throw new HydrationCodecError("InvalidContractPath", {
-          message: `Hydration view "${key}" must be a boolean`,
-        });
-      }
-      result.set(key, value);
+    if (value === undefined) {
+      continue;
     }
+    if (key === "metadata") {
+      const parsed = parseMetadataHeadersConfig(value);
+      metadataHeaders = parsed === false ? undefined : parsed;
+      continue;
+    }
+    if (!Predicate.isBoolean(value)) {
+      throw new HydrationCodecError("InvalidContractPath", {
+        message: `Hydration view "${key}" must be a boolean`,
+      });
+    }
+    toggles.set(key, value);
   }
-  return result;
+  return { toggles, metadataHeaders };
 };
 
 const isWithHeadersValue = (
@@ -225,12 +296,69 @@ const isUnencodableBodyAst = (
   return false;
 };
 
+const containsRedactedAst = (
+  ast: SchemaAST.AST,
+  seen: Set<SchemaAST.AST>
+): boolean => {
+  if (seen.has(ast)) {
+    return false;
+  }
+  seen.add(ast);
+  if (hasRepresentation(ast, "effect/schema/Redacted")) {
+    return true;
+  }
+  if (
+    ast.encoding !== undefined &&
+    ast.encoding.some((link) => containsRedactedAst(link.to, seen))
+  ) {
+    return true;
+  }
+  if (
+    SchemaAST.isDeclaration(ast) &&
+    ast.typeParameters.some((param) => containsRedactedAst(param, seen))
+  ) {
+    return true;
+  }
+  if (SchemaAST.isArrays(ast)) {
+    return (
+      ast.elements.some((element) => containsRedactedAst(element, seen)) ||
+      ast.rest.some((rest) => containsRedactedAst(rest, seen))
+    );
+  }
+  if (SchemaAST.isObjects(ast)) {
+    return (
+      ast.propertySignatures.some((property) =>
+        containsRedactedAst(property.type, seen)
+      ) ||
+      ast.indexSignatures.some(
+        (signature) =>
+          containsRedactedAst(signature.parameter, seen) ||
+          containsRedactedAst(signature.type, seen)
+      )
+    );
+  }
+  if (SchemaAST.isUnion(ast)) {
+    return ast.types.some((member) => containsRedactedAst(member, seen));
+  }
+  if (SchemaAST.isSuspend(ast)) {
+    try {
+      return containsRedactedAst(ast.thunk(), seen);
+    } catch {
+      return true;
+    }
+  }
+  return false;
+};
+
 const assertEncodable = (
   schema: Schema.Top,
   path: string,
   view: QueryView
 ): void => {
-  if (isUnencodableAst(schema.ast, new Set())) {
+  if (
+    containsRedactedAst(schema.ast, new Set()) ||
+    isUnencodableAst(schema.ast, new Set())
+  ) {
     throw new HydrationCodecError("UnencodableSchema", {
       path,
       view,
@@ -291,6 +419,13 @@ const deriveJsonCodec = (
   path: string,
   view: QueryView
 ): Schema.Top => {
+  if (containsRedactedAst(schema.ast, new Set())) {
+    throw new HydrationCodecError("UnencodableSchema", {
+      path,
+      view,
+      message: `Schema for "${path}" (${view}) is not JSON-encodable; provide a custom codec override or disable it with false`,
+    });
+  }
   const derived = toJsonCodecSafe(schema, path, view);
   assertEncodable(derived, path, view);
   return derived;
@@ -525,14 +660,45 @@ const adaptQueryData = (codec: Schema.Top): Schema.Top => {
       ]);
 };
 
+const makeAllowedHeadersCodec = (
+  allowedHeaders: readonly string[]
+): Schema.Top => {
+  const allowed = new Set(allowedHeaders.map((name) => name.toLowerCase()));
+  const filterHeaders = (record: Readonly<Record<string, string>>) => {
+    const filtered: Record<string, string> = {};
+    for (const [name, value] of Object.entries(record)) {
+      const lower = name.toLowerCase();
+      if (allowed.has(lower)) {
+        Object.defineProperty(filtered, lower, {
+          value,
+          enumerable: true,
+          configurable: true,
+          writable: true,
+        });
+      }
+    }
+    return filtered;
+  };
+  return Schema.Record(Schema.String, Schema.String).pipe(
+    Schema.decodeTo(
+      Schema.Record(Schema.String, Schema.String),
+      SchemaTransformation.transform({
+        decode: filterHeaders,
+        encode: filterHeaders,
+      })
+    )
+  );
+};
+
 const makeMetadataCodec = (
   dataCodec: Schema.Top,
+  allowedHeaders: readonly string[],
   status: Schema.Top = Schema.Finite
 ): Schema.Top =>
   Schema.Struct({
     status,
     data: dataCodec,
-    headers: Schema.Record(Schema.String, Schema.String),
+    headers: makeAllowedHeadersCodec(allowedHeaders),
   });
 
 const makeInfiniteCodec = (
@@ -576,6 +742,12 @@ const wrapWithHeaders = (
     )
   );
 
+const isSynthesizedNoContent = (ast: SchemaAST.AST): boolean =>
+  !SchemaAST.isVoid(ast) &&
+  (SchemaAST.isVoid(SchemaAST.toEncoded(ast)) ||
+    (ast.encoding !== undefined &&
+      ast.encoding.some((link) => SchemaAST.isVoid(link.to))));
+
 const deriveBufferedMemberCodec = (
   schema: Schema.Top,
   path: string,
@@ -590,6 +762,9 @@ const deriveBufferedMemberCodec = (
     );
   }
   if (HttpApiSchema.getEncodeToWithHeadersParts(schema) !== undefined) {
+    return deriveJsonCodec(Schema.toType(schema), path, view);
+  }
+  if (isSynthesizedNoContent(schema.ast)) {
     return deriveJsonCodec(Schema.toType(schema), path, view);
   }
   return deriveJsonCodec(schema, path, view);
@@ -615,18 +790,21 @@ const deriveHttpBufferedCodec = (
 
 const deriveHttpMetadataCodec = (
   successes: ReadonlyMap<number, readonly Schema.Top[]>,
-  path: string
+  path: string,
+  allowedHeaders: readonly string[]
 ): Schema.Top => {
   if (successes.size === 1) {
     const [members] = successes.values();
     return makeMetadataCodec(
-      deriveHttpBufferedCodec(members ?? [], path, "metadata")
+      deriveHttpBufferedCodec(members ?? [], path, "metadata"),
+      allowedHeaders
     );
   }
   return Schema.Union(
     [...successes].map(([status, members]) =>
       makeMetadataCodec(
         deriveHttpBufferedCodec(members, path, "metadata"),
+        allowedHeaders,
         Schema.Literal(status)
       )
     )
@@ -797,7 +975,10 @@ const streamKeys = new Set(["live", "streamed"]);
 type CodecDerivations =
   | {
       readonly query: (view: "query" | "infinite") => Schema.Top;
-      readonly metadata?: (customQuery: Schema.Top | undefined) => Schema.Top;
+      readonly metadata?: (
+        customQuery: Schema.Top | undefined,
+        allowedHeaders: readonly string[]
+      ) => Schema.Top;
     }
   | {
       readonly live: () => Schema.Top;
@@ -809,7 +990,7 @@ const collectOperationCodecs = (
   operationPrefix: readonly JsonValue[],
   path: string,
   config: Record<string, unknown>,
-  views: ReadonlyMap<string, boolean>,
+  views: ValidatedViews,
   derive: CodecDerivations
 ): void => {
   let allowed = streamKeys;
@@ -827,14 +1008,14 @@ const collectOperationCodecs = (
     );
   };
   const registerDefault = (
-    view: Exclude<QueryView, "infinite">,
+    view: Exclude<QueryView, "infinite" | "metadata">,
     deriveDefault: () => Schema.Top
   ) => {
     const override = overrides.get(view);
     const custom = Schema.isSchema(override) ? override : undefined;
     if (
       custom !== undefined ||
-      (override !== false && views.get(view) !== false)
+      (override !== false && views.toggles.get(view) !== false)
     ) {
       register(view, custom ?? deriveDefault());
     }
@@ -850,7 +1031,18 @@ const collectOperationCodecs = (
   const customQuery = registerDefault("query", () => derive.query("query"));
   const deriveMetadata = derive.metadata;
   if (deriveMetadata !== undefined) {
-    registerDefault("metadata", () => deriveMetadata(customQuery));
+    const metadataOverride = overrides.get("metadata");
+    if (Schema.isSchema(metadataOverride)) {
+      register("metadata", metadataOverride);
+    } else if (metadataOverride !== false) {
+      const allowedHeaders =
+        metadataOverride === undefined
+          ? views.metadataHeaders
+          : parseMetadataHeadersConfig(metadataOverride, path);
+      if (allowedHeaders !== undefined && allowedHeaders !== false) {
+        register("metadata", deriveMetadata(customQuery, allowedHeaders));
+      }
+    }
   }
 
   const infinite = extractInfiniteConfig(path, overrides.get("infinite"));
@@ -963,13 +1155,14 @@ const httpCodecDerivations = (
     : {
         query: (view) =>
           deriveHttpBufferedCodec(classified.successes, path, view),
-        metadata: (customQuery) =>
+        metadata: (customQuery, allowedHeaders) =>
           customQuery === undefined
             ? deriveHttpMetadataCodec(
                 groupBufferedSuccessesByStatus(classified.successes),
-                path
+                path,
+                allowedHeaders
               )
-            : makeMetadataCodec(customQuery),
+            : makeMetadataCodec(customQuery, allowedHeaders),
       };
 
 const validateHttpPaths = (

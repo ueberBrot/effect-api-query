@@ -136,13 +136,65 @@ export interface RpcContractHydrationViews {
   readonly streamed?: boolean;
 }
 
+/** Explicit raw response-header allowlist for contract-derived HTTP metadata hydration. */
+export interface HttpMetadataHydrationConfig {
+  readonly headers: readonly string[];
+}
+
 /** Top-level view toggles for HTTP contract hydration registries. */
 export interface HttpContractHydrationViews {
   readonly query?: boolean;
-  readonly metadata?: boolean;
+  readonly metadata?: false | HttpMetadataHydrationConfig;
   readonly live?: boolean;
   readonly streamed?: boolean;
 }
+
+export type ValidateMetadataConfig<Actual> = Actual extends undefined
+  ? undefined
+  : Actual extends false
+    ? false
+    : {
+        readonly headers: readonly string[];
+      } & ExactKeys<Actual, "headers">;
+
+export type ValidateHttpViews<ActualViews> = ActualViews extends undefined
+  ? undefined
+  : {
+      readonly [
+        Key in keyof ActualViews & keyof HttpContractHydrationViews
+      ]?: Key extends "metadata"
+        ? ValidateMetadataConfig<ActualViews[Key]>
+        : ActualViews[Key] extends boolean | undefined
+          ? ActualViews[Key]
+          : boolean;
+    } & ExactKeys<ActualViews, keyof HttpContractHydrationViews>;
+
+export type MetadataViewEnabled<Views> = [Views] extends [undefined]
+  ? false
+  : Views extends object
+    ? "metadata" extends keyof Views
+      ? [Exclude<Views["metadata"], false | undefined>] extends [never]
+        ? false
+        : true
+      : false
+    : false;
+
+export type ResolveMetadataServices<
+  Override,
+  Fallback,
+  Enabled extends boolean,
+  Channel extends ServiceChannel,
+> = Override extends unknown
+  ? Override extends false
+    ? never
+    : Override extends undefined
+      ? Enabled extends true
+        ? Fallback
+        : never
+      : Override extends HttpMetadataHydrationConfig
+        ? Fallback
+        : CodecServices<Override, Channel>
+  : never;
 
 export type RpcUnaryPathConfig<
   R extends Rpc.Any,
@@ -413,7 +465,9 @@ export type HttpBufferedPathConfig<
             >;
         readonly metadata?:
           | false
-          | ExactCodec<MetadataData<Endpoint>, PropOf<Actual, "metadata">>;
+          | (PropOf<Actual, "metadata"> extends { readonly headers: unknown }
+              ? ValidateMetadataConfig<PropOf<Actual, "metadata">>
+              : ExactCodec<MetadataData<Endpoint>, PropOf<Actual, "metadata">>);
         readonly infinite?: InfiniteConfigConstraint<
           QueryData<HttpSuccess<Endpoint>>,
           PropOf<Actual, "infinite">
@@ -467,10 +521,7 @@ export type HttpContractHydrationOptions<
   Actual = unknown,
 > = {
   readonly keyPrefix?: ValidateKeyPrefix<Actual>;
-  readonly views?: ValidateViews<
-    PropOf<Actual, "views">,
-    keyof HttpContractHydrationViews
-  >;
+  readonly views?: ValidateHttpViews<PropOf<Actual, "views">>;
   readonly paths?: HttpPathsConstraint<Api, PropOf<Actual, "paths">>;
 } & ExactKeys<Actual, "keyPrefix" | "views" | "paths">;
 
@@ -509,7 +560,7 @@ export type HttpEndpointUnmodifiedServices<
   Channel extends ServiceChannel,
 > = Endpoint extends HttpApiEndpoint.ConstraintRequest
   ? [StreamingEndpoint<Endpoint>] extends [never]
-    ? true extends ViewEnabled<Views, "query"> | ViewEnabled<Views, "metadata">
+    ? true extends ViewEnabled<Views, "query"> | MetadataViewEnabled<Views>
       ? HttpEndpointSchemaServices<Endpoint, Channel>
       : never
     : true extends ViewEnabled<Views, "live"> | ViewEnabled<Views, "streamed">
@@ -555,14 +606,14 @@ export type HttpModifiedPathServices<
                 ViewEnabled<Views, "query">,
                 Channel
               >
-            | ResolveViewServices<
+            | ResolveMetadataServices<
                 PropOf<Config, "metadata">,
                 ResolveInheritedDataServices<
                   PropOf<Config, "query">,
                   HttpEndpointSchemaServices<Endpoint, Channel>,
                   Channel
                 >,
-                ViewEnabled<Views, "metadata">,
+                MetadataViewEnabled<Views>,
                 Channel
               >
             | ResolveInfiniteServices<

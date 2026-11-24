@@ -287,7 +287,11 @@ type _HttpAlternativePathServices = Assert<
 >;
 
 const httpQueryInheritMetadata = createContractHydrationRegistry(httpApi, {
-  views: { live: false, streamed: false },
+  views: {
+    live: false,
+    streamed: false,
+    metadata: { headers: ["etag"] },
+  },
   paths: {
     "data.profile": {
       query: Profile,
@@ -297,6 +301,26 @@ const httpQueryInheritMetadata = createContractHydrationRegistry(httpApi, {
 type _HttpQueryInheritServices = Assert<
   Equal<typeof httpQueryInheritMetadata, HydrationRegistry<never, never>>
 >;
+
+const httpQueryDisabledNoMetadata = createContractHydrationRegistry(httpApi, {
+  views: { query: false, live: false, streamed: false },
+});
+type _HttpQueryDisabledNoMetadataServices = Assert<
+  Equal<typeof httpQueryDisabledNoMetadata, HydrationRegistry<never, never>>
+>;
+
+// @ts-expect-error HTTP metadata view requires an explicit header allowlist object or false
+createContractHydrationRegistry(httpApi, { views: { metadata: true } });
+
+createContractHydrationRegistry(httpApi, {
+  views: {
+    metadata: {
+      headers: ["etag"],
+      // @ts-expect-error HTTP metadata header allowlist rejects unknown keys
+      extra: true,
+    },
+  },
+});
 
 // @ts-expect-error Unknown HTTP views key is rejected
 createContractHydrationRegistry(httpApi, { views: { metadtaa: false } });
@@ -350,6 +374,7 @@ void [
   rpcQueryDisabledInfinite,
   httpBare,
   httpQueryInheritMetadata,
+  httpQueryDisabledNoMetadata,
   optionalSound,
   composed,
 ];
