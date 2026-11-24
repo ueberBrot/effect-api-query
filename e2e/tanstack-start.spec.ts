@@ -1,13 +1,125 @@
 import { createServer, request as nodeRequest } from "node:http";
 
 import { expect } from "@playwright/test";
+import type { Page } from "@playwright/test";
 import { Schema } from "effect";
 
 import {
+  enableDemoWrites,
   prepareExampleApplication,
   startExampleTest as test,
   recordsRpc,
 } from "./example-application.ts";
+
+const restoreFromBackForwardCache = async (page: Page) => {
+  await page.evaluate(() => {
+    window.dispatchEvent(
+      new PageTransitionEvent("pagehide", { persisted: true })
+    );
+    window.dispatchEvent(
+      new PageTransitionEvent("pageshow", { persisted: true })
+    );
+  });
+};
+
+test("restored Start app can fetch and still disposes on permanent departure", async ({
+  exampleUrl,
+  page,
+}) => {
+  await prepareExampleApplication(page, exampleUrl);
+  await page.getByRole("button", { name: "Read cached directory" }).click();
+  await expect(page.getByText("Cached directory: 12 users")).toBeVisible();
+  await restoreFromBackForwardCache(page);
+  await page.getByRole("button", { name: "Load next 4 users" }).click();
+  await expect(page.getByText("8 of 12 loaded")).toBeVisible();
+
+  await page.getByRole("link", { name: "Diagnostics", exact: true }).click();
+  const started = page.waitForRequest((request) =>
+    recordsRpc(request.postData(), "diagnostics.slow")
+  );
+  await page.getByRole("button", { name: "Start slow query" }).click();
+  const request = await started;
+  await expect(page.getByText("Ready to cancel")).toBeVisible();
+  const aborted = page.waitForEvent(
+    "requestfailed",
+    (failed) => failed === request
+  );
+  await page.evaluate(() => {
+    window.dispatchEvent(
+      new PageTransitionEvent("pagehide", { persisted: false })
+    );
+  });
+  await aborted;
+});
+
+test("restored workflows can stream and still dispose on permanent departure", async ({
+  exampleUrl,
+  page,
+}) => {
+  await page.goto(`${exampleUrl}/workflows?example=streams`);
+  const start = page.getByRole("button", { name: "Start streams" });
+  await start.click();
+  await expect(
+    page.getByText("Latest update: 8", { exact: true })
+  ).toBeVisible();
+  await expect(page.getByText("Streams idle", { exact: true })).toBeVisible();
+  await restoreFromBackForwardCache(page);
+
+  await page.getByLabel("HTTP stream format").selectOption("ndjson");
+  await start.click();
+  await expect(
+    page.getByText("Latest update: 8", { exact: true })
+  ).toBeVisible();
+  await expect(page.getByText("Streams idle", { exact: true })).toBeVisible();
+
+  const started = page.waitForRequest((request) =>
+    new URL(request.url()).pathname.endsWith("/ndjson")
+  );
+  await start.click();
+  const request = await started;
+  const aborted = page.waitForEvent(
+    "requestfailed",
+    (failed) => failed === request
+  );
+  await page.evaluate(() => {
+    window.dispatchEvent(
+      new PageTransitionEvent("pagehide", { persisted: false })
+    );
+  });
+  await aborted;
+});
+
+test("deleting the featured user updates cached navigation and a document reload", async ({
+  exampleUrl,
+  page,
+  writeToken,
+}) => {
+  await page.goto(`${exampleUrl}/details`);
+  await expect(
+    page.getByRole("heading", { name: "Ada Lovelace" })
+  ).toBeVisible();
+  await page.getByRole("link", { name: "HTTP users", exact: true }).click();
+  await enableDemoWrites(page, writeToken);
+  await page
+    .getByRole("button", { name: "Delete HTTP Ada Lovelace", exact: true })
+    .click();
+  await expect(
+    page.getByText("HTTP: Ada Lovelace", { exact: true })
+  ).toHaveCount(0);
+
+  await page.getByRole("link", { name: "Featured user", exact: true }).click();
+  const missing = page.getByText("The featured user is no longer available.");
+  await expect(missing).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Ada Lovelace" })).toHaveCount(
+    0
+  );
+  const response = await page.reload();
+  expect(response?.status()).toBe(404);
+  await expect(missing).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Ada Lovelace" })).toHaveCount(
+    0
+  );
+});
 
 test("the featured loader descriptor hydrates without a browser RPC", async ({
   exampleUrl,
@@ -170,6 +282,16 @@ test.describe("TanStack Start application", () => {
     await page.getByRole("button", { name: "Replay full history" }).click();
     await expect(page.getByText("4 updates retained")).toBeVisible();
     await expect(history.getByRole("listitem")).toHaveCount(4);
+  });
+
+  test("selecting the current Users route keeps both stream views usable", async ({
+    page,
+  }) => {
+    await expect(page.getByText("Current state: Ready")).toBeVisible();
+    await page.getByRole("link", { name: "Users", exact: true }).click();
+    await page.getByRole("button", { name: "Replay newest 2" }).click();
+    await expect(page.getByText("2 updates retained")).toBeVisible();
+    await expect(page.getByText("Current state: Ready")).toBeVisible();
   });
 
   test("navigates on the client and reuses the hydrated cache", async ({

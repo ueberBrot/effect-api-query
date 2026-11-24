@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 
 import { EffectErrorDetails } from "../components/effect-error-details.tsx";
 import { reportCleanupFailure } from "../lib/application.ts";
+import { onPermanentPageHide } from "../lib/pagehide.ts";
 
 const WorkflowsPage = () => {
   const { example } = Route.useSearch();
@@ -34,14 +35,17 @@ const WorkflowsPage = () => {
       }
     })();
     const dispose = () => {
+      if (!active) {
+        return;
+      }
       active = false;
       if (acquired !== undefined) {
         void reportCleanupFailure(acquired.dispose());
       }
     };
-    window.addEventListener("pagehide", dispose, { once: true });
+    const unsubscribe = onPermanentPageHide(dispose);
     return () => {
-      window.removeEventListener("pagehide", dispose);
+      unsubscribe();
       dispose();
     };
   }, []);

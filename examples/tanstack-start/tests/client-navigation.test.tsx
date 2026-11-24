@@ -54,4 +54,29 @@ describe("TanStack Start client navigation", () => {
       screen.findByRole("heading", { name: "Page not found" })
     ).resolves.toBeDefined();
   });
+
+  it("reloads the home loader while both stream views remain mounted", async () => {
+    if (serverScope === undefined) {
+      throw new Error("Server scope was not initialized");
+    }
+    const server = await Effect.runPromise(
+      startExampleRpcServer().pipe(Scope.provide(serverScope))
+    );
+    const router = await createTanStackStartRouter({
+      history: createMemoryHistory({ initialEntries: ["/"] }),
+      rpcUrl: server.rpcUrl,
+      scrollRestoration: false,
+    });
+    browserApplication = router.options.context;
+    await router.load();
+    render(<RouterProvider router={router} />);
+    await screen.findByText(/^Current state:/u, {}, { timeout: 5000 });
+
+    await act(async () => {
+      await router.invalidate({ sync: true });
+    });
+
+    expect(screen.queryByRole("heading", { name: "Route failed" })).toBeNull();
+    expect(screen.getByText(/^Current state:/u)).toBeDefined();
+  });
 });

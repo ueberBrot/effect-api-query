@@ -290,23 +290,26 @@ const UsersPage = () => {
 export const Route = createFileRoute("/")({
   component: UsersPage,
   loader: async ({ context }) => {
+    const { queryClient, rpcQuery } = context;
+    const snapshots = context.isServer
+      ? [
+          context.captureSnapshot(
+            queryClient,
+            streamedDiagnosticsOptions(rpcQuery)
+          ),
+          context.captureSnapshot(queryClient, liveDiagnosticOptions(rpcQuery)),
+        ]
+      : [];
     await Promise.all([
-      context.queryClient.query({
-        ...context.rpcQuery.users.list.queryOptions(),
+      queryClient.query({
+        ...rpcQuery.users.list.queryOptions(),
         staleTime: "static",
       }),
-      context.queryClient.infiniteQuery({
-        ...userPagesOptions(context.rpcQuery),
+      queryClient.infiniteQuery({
+        ...userPagesOptions(rpcQuery),
         staleTime: "static",
       }),
-      context.captureSnapshot(
-        context.queryClient,
-        streamedDiagnosticsOptions(context.rpcQuery)
-      ),
-      context.captureSnapshot(
-        context.queryClient,
-        liveDiagnosticOptions(context.rpcQuery)
-      ),
+      ...snapshots,
     ]);
   },
 });
