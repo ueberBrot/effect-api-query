@@ -2,6 +2,8 @@ import { hashKey } from "@tanstack/query-core";
 import type { QueryKey } from "@tanstack/query-core";
 import { Array as EffectArray, Order, Predicate } from "effect";
 
+import { generatedViewKeyLimit } from "./utility-key";
+
 type PrimitiveSegment = string | number | boolean;
 
 const isPrimitiveSegment = (
@@ -11,7 +13,17 @@ const isPrimitiveSegment = (
   Predicate.isBoolean(value) ||
   (Predicate.isNumber(value) && Number.isFinite(value));
 
-export const compileQueryPrefix = (prefix: QueryKey, maxLength: number) => {
+export const hasFixedQueryPrefix = (key: QueryKey, prefix: QueryKey): boolean =>
+  key.length >= prefix.length &&
+  prefix.every((segment, index) => key[index] === segment);
+
+export const compileQueryPrefix = (prefix: QueryKey) => {
+  const maxLength = generatedViewKeyLimit(prefix);
+  if (Number.isFinite(maxLength)) {
+    return (key: QueryKey): boolean =>
+      key.length <= maxLength && hasFixedQueryPrefix(key, prefix);
+  }
+
   const hash = hashKey(prefix);
   const { length } = prefix;
   const lastIndex = length - 1;
@@ -21,7 +33,7 @@ export const compileQueryPrefix = (prefix: QueryKey, maxLength: number) => {
   const checkFirst = isPrimitiveSegment(first);
 
   return (key: QueryKey): boolean => {
-    if (key.length < length || key.length > maxLength) {
+    if (key.length < length) {
       return false;
     }
     const keyLast = key[lastIndex];
@@ -53,7 +65,7 @@ const canMatchSegment = (
   segments.has(segment);
 
 export const indexQueryPrefixes = <Value>(
-  entries: Iterable<readonly [QueryKey, Value, maxLength: number]>,
+  entries: Iterable<readonly [QueryKey, Value]>,
   options: {
     readonly order?: "discovery" | "longest-first";
     readonly duplicateError?: () => Error;
@@ -63,7 +75,11 @@ export const indexQueryPrefixes = <Value>(
     readonly length: number;
     readonly values: Map<
       string,
-      { readonly value: Value; readonly maxLength: number }
+      {
+        readonly value: Value;
+        readonly prefix: QueryKey;
+        readonly maxLength: number;
+      }
     >;
     first: Set<PrimitiveSegment> | undefined;
     last: Set<PrimitiveSegment> | undefined;
@@ -71,7 +87,7 @@ export const indexQueryPrefixes = <Value>(
 
   const byLength = new Map<number, Bucket>();
   let minLength = Number.POSITIVE_INFINITY;
-  for (const [prefix, value, maxLength] of entries) {
+  for (const [prefix, value] of entries) {
     const { length } = prefix;
     let bucket = byLength.get(length);
     if (bucket === undefined) {
@@ -88,7 +104,11 @@ export const indexQueryPrefixes = <Value>(
     if (options.duplicateError !== undefined && bucket.values.has(hash)) {
       throw options.duplicateError();
     }
-    bucket.values.set(hash, { value, maxLength });
+    bucket.values.set(hash, {
+      value,
+      prefix,
+      maxLength: generatedViewKeyLimit(prefix),
+    });
     bucket.first = collectSegment(bucket.first, prefix[0]);
     bucket.last = collectSegment(bucket.last, prefix[length - 1]);
   }
@@ -115,7 +135,12 @@ export const indexQueryPrefixes = <Value>(
         canMatchSegment(first, key[0])
       ) {
         const entry = values.get(hashKey(key.slice(0, length)));
-        if (entry && key.length <= entry.maxLength) {
+        if (
+          entry &&
+          (!Number.isFinite(entry.maxLength) ||
+            (key.length <= entry.maxLength &&
+              hasFixedQueryPrefix(key, entry.prefix)))
+        ) {
           return entry.value;
         }
       }

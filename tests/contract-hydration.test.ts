@@ -2496,7 +2496,24 @@ it.effect(
           regionRegistry.matches(localKey),
           localRegistry.matches(regionKey),
         ]).toStrictEqual([true, false, false, false]);
-        expect(registry.matches(legacy)).toBe(false);
+        const codec = queryViewCodec(
+          rpc.directory.read,
+          "query",
+          Schema.String
+        );
+        const incomplete = [...rpcKey.slice(0, -2), undefined, "query"];
+        const extended = [...rpcKey, "local", "detail"];
+        expect({
+          legacy: registry.matches(legacy),
+          incomplete: registry.matches(incomplete),
+          direct: codec.matches(incomplete),
+          extended: registry.matches(extended),
+        }).toStrictEqual({
+          legacy: false,
+          incomplete: false,
+          direct: false,
+          extended: false,
+        });
 
         yield* roundTripJson(registry, server, browser);
         expect([

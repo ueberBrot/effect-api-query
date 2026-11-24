@@ -28,6 +28,7 @@ import {
   hydrationCallbacks,
   infiniteQueryCodec,
   queryViewCodec,
+  viewPrefix,
 } from "#effect-api-query";
 
 import { makeRpcTestClient } from "./fixtures/effect-rpc.ts";
@@ -70,7 +71,7 @@ describe.each(["short-first", "nested-first"] as const)(
           });
           const nested = createRpcQueryUtils(nestedGroup, {
             client: nestedClient,
-            keyPrefix: ["nested", "application"],
+            keyPrefix: [...viewPrefix(rpc.read, "query"), "application"],
           });
           const shortCodec = queryViewCodec(rpc.read, "query", Profile);
           const nestedCodec = queryViewCodec(
@@ -90,6 +91,7 @@ describe.each(["short-first", "nested-first"] as const)(
               profile
             );
             queryClient.setQueryData(nested.read.queryKey(), "nested");
+            expect(shortCodec.matches(nested.read.queryKey())).toBe(false);
             const queries = yield* registry.encodeQueries(
               dehydrate(queryClient).queries
             );

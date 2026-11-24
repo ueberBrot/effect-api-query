@@ -7,7 +7,6 @@ import type {
   SupportedQueryView,
 } from "./inference";
 import { compileQueryPrefix, indexQueryPrefixes } from "./query-prefix-index";
-import { generatedViewKeyLimit } from "./utility-key";
 import { viewPrefix } from "./view-prefix";
 
 /** One generated leaf/view's cache-data codec, before observer selection. */
@@ -30,12 +29,7 @@ export interface HydrationCodec<
 const makeCodec = <S extends Schema.Codec<unknown, unknown, unknown, unknown>>(
   prefix: QueryKey,
   schema: S
-) =>
-  Object.freeze({
-    prefix,
-    schema,
-    matches: compileQueryPrefix(prefix, generatedViewKeyLimit(prefix)),
-  });
+) => Object.freeze({ prefix, schema, matches: compileQueryPrefix(prefix) });
 
 /** Registers a codec whose decoded type matches the generated cached representation. */
 export const queryViewCodec = <
@@ -239,10 +233,7 @@ export const buildHydrationRegistry = <
   codecs: readonly CompiledHydrationCodec[]
 ): HydrationRegistry<DecodingServices, EncodingServices> => {
   const codecFor = indexQueryPrefixes(
-    codecs.map(
-      (codec) =>
-        [codec.prefix, codec, generatedViewKeyLimit(codec.prefix)] as const
-    ),
+    codecs.map((codec) => [codec.prefix, codec] as const),
     { duplicateError: () => new HydrationCodecError("DuplicateCodec") }
   );
   const transform = <R>(

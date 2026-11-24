@@ -36,11 +36,14 @@ export const utilityOperationKey = <
   Object.freeze([...root, ...path, null] as const);
 
 export const generatedViewKeyLimit = (prefix: QueryKey): number => {
-  const [namespace] = prefix;
+  const [namespace, adapter] = prefix;
   if (
     !Predicate.isString(namespace) ||
     !namespace.startsWith(keyVersion) ||
-    prefix.at(-2) !== null
+    (adapter !== "rpc" && adapter !== "http") ||
+    prefix.length < (adapter === "rpc" ? 5 : 6) ||
+    prefix.at(-2) !== null ||
+    !prefix.slice(0, -2).every(Predicate.isString)
   ) {
     return Number.POSITIVE_INFINITY;
   }
