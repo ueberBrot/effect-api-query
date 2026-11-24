@@ -5,20 +5,20 @@ import type { JsonValue } from "./types";
 
 const keyVersion = "effect-api-query:v2:";
 
-type UtilityNamespace = `${typeof keyVersion}${string}`;
-
 export type UtilityRootKey<
   Prefix extends readonly JsonValue[],
   Namespace extends readonly string[],
 > = readonly [
-  Prefix extends readonly [] ? `${typeof keyVersion}[]` : UtilityNamespace,
+  Prefix extends readonly []
+    ? `${typeof keyVersion}[]`
+    : `${typeof keyVersion}${string}`,
   ...Namespace,
 ];
 
 export const utilityRootKey = (
   prefix: readonly JsonValue[],
   namespace: readonly string[]
-): readonly [UtilityNamespace, ...string[]] =>
+): readonly [`${typeof keyVersion}${string}`, ...string[]] =>
   Object.freeze([`${keyVersion}${JSON.stringify(prefix)}`, ...namespace]);
 
 export type UtilityOperationKey<

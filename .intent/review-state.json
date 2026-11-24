@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "8b29ed59033f216bd7a419c8bcad1ce0cd6949576edba12c760aafa194427e9b",
+      "fingerprint": "424e1acc1c7448107bb1499b1499e7ae4e8dafdbb20e3950ad26c0db25afc6f5",
       "snapshot": {
         "GLOSSARY.md": "7fa3de9ce2b21e39ad33af675cc200077db85b9a4ae8c15fc9ff63c9d44e1d97",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -256,7 +256,7 @@
         "src/core/stream-snapshot.ts": "0e2fc754d8b19065f577a152f64f5b35c5429ac196662b2db8534eb33c3cb037",
         "src/core/streamed-query.ts": "023305232c8e0d173730216d14a7f9cecd9b52cce3dfac4bcecd9a5d62960b7a",
         "src/core/types.ts": "02880615b7202768895d7e637b8b6fbd558a12f02f4a6f4d8c0d46301fb66fe0",
-        "src/core/utility-key.ts": "b50f3d4167896615b27899359b613d5bc1d49ae94c5b756174be7468de96f9f9",
+        "src/core/utility-key.ts": "4598575b8ed11000db74a0e7fe273e65ff6c25c723fd8dec9514c3405e6704bf",
         "src/core/utility-node.ts": "8c3eb7adeec4cf49d5a475d34e785d060abd39f6a9a6049dc48a390cae0df74b",
         "src/core/utility-path.ts": "d46bb166dd03d2163063339a9cd6228dbcdeafea6ae14ad908bdb4ec6244f13e",
         "src/core/utility-tree.ts": "c3d209df30df146921612c5473e2b38b60c512aa6cf6ec330c14d124d7b35211",
@@ -424,18 +424,15 @@
         "tests/workflow-guards.test.ts": "563c464dfb45e0873138aff38d323cdfb64b7e6caae84f70fa46db4c65dba410",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "3c439384033513c706d76524e5a0a98985fbac0b",
-      "outcome": "updated",
-      "reason": "V2 generated keys encode the complete caller tuple in one segment. The cache and hydration references now describe strict namespace selection, cross-adapter filters, and the persisted snapshot reset.",
+      "head": "e70e4f04553d975a5d22b6ca78b460870ee379d7",
+      "outcome": "no-change",
+      "reason": "Inline the existing template literal type to satisfy Fallow. The generated keys and guidance are unchanged.",
       "evidence": [
-        "src/core/utility-key.ts, src/core/branch-filter.ts and src/core/query-prefix-index.ts at b483858",
-        "Focused public tests passed (70). Full vp run test passed (1056), including TSRS and TypeScript 5.9.3 fixtures. Packed compatibility passed (492). Type-aware lint, format and skill validation passed.",
-        "Fresh consumer-agent skill discovery remains unverified.",
-        "Revalidated the complete suite after incorporating main at 7aeff4e. The reviewed runtime and compiler fixtures are unchanged."
+        "Changed: src/core/utility-key.ts at e70e4f04553d975a5d22b6ca78b460870ee379d7"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "89e998db363b589f26102fc83a1df567637f4bc55d48e72fadde06e6fd5ba415",
+      "fingerprint": "7e201cab39291c8229b6f5faf67323a97a3ffaf62f96abdc42120bf7153a1da3",
       "snapshot": {
         "GLOSSARY.md": "7fa3de9ce2b21e39ad33af675cc200077db85b9a4ae8c15fc9ff63c9d44e1d97",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -691,7 +688,7 @@
         "src/core/stream-snapshot.ts": "0e2fc754d8b19065f577a152f64f5b35c5429ac196662b2db8534eb33c3cb037",
         "src/core/streamed-query.ts": "023305232c8e0d173730216d14a7f9cecd9b52cce3dfac4bcecd9a5d62960b7a",
         "src/core/types.ts": "02880615b7202768895d7e637b8b6fbd558a12f02f4a6f4d8c0d46301fb66fe0",
-        "src/core/utility-key.ts": "b50f3d4167896615b27899359b613d5bc1d49ae94c5b756174be7468de96f9f9",
+        "src/core/utility-key.ts": "4598575b8ed11000db74a0e7fe273e65ff6c25c723fd8dec9514c3405e6704bf",
         "src/core/utility-node.ts": "8c3eb7adeec4cf49d5a475d34e785d060abd39f6a9a6049dc48a390cae0df74b",
         "src/core/utility-path.ts": "d46bb166dd03d2163063339a9cd6228dbcdeafea6ae14ad908bdb4ec6244f13e",
         "src/core/utility-tree.ts": "c3d209df30df146921612c5473e2b38b60c512aa6cf6ec330c14d124d7b35211",
@@ -859,13 +856,11 @@
         "tests/workflow-guards.test.ts": "563c464dfb45e0873138aff38d323cdfb64b7e6caae84f70fa46db4c65dba410",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "3c439384033513c706d76524e5a0a98985fbac0b",
-      "outcome": "updated",
-      "reason": "The domain map records the legacy snapshot and raw-prefix failure mode, the skill specification records #237, and the skill tree maps ADR 0059 without changing its reference structure.",
+      "head": "e70e4f04553d975a5d22b6ca78b460870ee379d7",
+      "outcome": "no-change",
+      "reason": "Inline the existing template literal type to satisfy Fallow. The generated keys and guidance are unchanged.",
       "evidence": [
-        "_artifacts/domain_map.yaml, _artifacts/skill_spec.md and _artifacts/skill_tree.yaml at b483858",
-        "vp exec intent maintainer sync, vp run skills-check and public filter and hydration regressions passed.",
-        "Revalidated the complete suite after incorporating main at 7aeff4e. The reviewed runtime and compiler fixtures are unchanged."
+        "Changed: src/core/utility-key.ts at e70e4f04553d975a5d22b6ca78b460870ee379d7"
       ]
     },
     "source:vite.config.ts": {
