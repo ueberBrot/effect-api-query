@@ -1,8 +1,10 @@
 import { spawnSync } from "node:child_process";
+import { sign } from "node:crypto";
 import {
   copyFileSync,
   mkdirSync,
   mkdtempSync,
+  readFileSync,
   rmSync,
   writeFileSync,
 } from "node:fs";
@@ -24,10 +26,21 @@ import {
 } from "./fixtures/workflow";
 
 const name = "@ueberbrot/effect-api-query";
+const encodedName = "@ueberbrot%2feffect-api-query";
+const purlName = "%40ueberbrot/effect-api-query";
 const version = "0.1.0";
 const release = "0ea1465a605c80725da9e0a0a9686c86de5b6b82";
 const docs = "a".repeat(40);
+const mainTip = "b".repeat(40);
+const integrityBase64 = `${"A".repeat(86)}==`;
+const expectedSha512 = Buffer.from(integrityBase64, "base64").toString("hex");
 const manifest = JSON.stringify({ name, version });
+const attestationUrl = `https://registry.npmjs.org/-/npm/v1/attestations/${encodedName}@${version}`;
+const slsaPredicateType = "https://slsa.dev/provenance/v1";
+const dssePayloadType = "application/vnd.in-toto+json";
+const defaultWorkflowSan =
+  "URI:https://github.com/ueberBrot/effect-api-query/.github/workflows/release.yml@refs/heads/main";
+
 const registryMetadata = {
   name,
   version,
@@ -36,28 +49,218 @@ const registryMetadata = {
     url: "git+https://github.com/ueberBrot/effect-api-query.git",
   },
   dist: {
-    integrity: `sha512-${"A".repeat(86)}==`,
+    integrity: `sha512-${integrityBase64}`,
     tarball: `https://registry.npmjs.org/${name}/-/effect-api-query-${version}.tgz`,
+    attestations: {
+      url: attestationUrl,
+      provenance: {
+        predicateType: slsaPredicateType,
+      },
+    },
   },
 };
 const metadata = JSON.stringify(registryMetadata);
 
+const createSigner = (san: string) => {
+  const cwd = mkdtempSync(nodePath.join(tmpdir(), "docs-signer-"));
+  try {
+    const keyPath = nodePath.join(cwd, "key.pem");
+    const certPath = nodePath.join(cwd, "cert.der");
+    const result = spawnSync(
+      "openssl",
+      [
+        "req",
+        "-x509",
+        "-newkey",
+        "ec",
+        "-pkeyopt",
+        "ec_paramgen_curve:prime256v1",
+        "-nodes",
+        "-keyout",
+        keyPath,
+        "-out",
+        certPath,
+        "-outform",
+        "DER",
+        "-days",
+        "1",
+        "-subj",
+        "/CN=sigstore-test",
+        "-addext",
+        `subjectAltName=${san}`,
+      ],
+      { encoding: "utf-8" }
+    );
+    if (result.status !== 0) {
+      throw new Error(`openssl failed: ${result.stderr}`);
+    }
+    return {
+      privateKeyPem: readFileSync(keyPath, "utf-8"),
+      certBase64: readFileSync(certPath).toString("base64"),
+    };
+  } finally {
+    rmSync(cwd, { recursive: true, force: true });
+  }
+};
+
+const releaseSigner = createSigner(defaultWorkflowSan);
+const foreignSigner = createSigner(
+  "URI:https://github.com/ueberBrot/effect-api-query/.github/workflows/ci.yml@refs/heads/feature"
+);
+
+const createAttestations = (
+  options: {
+    signer?: { readonly privateKeyPem: string; readonly certBase64: string };
+    gitCommit?: string;
+    sha512?: string;
+    subjectName?: string;
+    workflowRef?: string;
+    workflowPath?: string;
+    workflowRepo?: string;
+    tamperSignature?: boolean;
+    tlogEntries?: readonly unknown[];
+    useCertChain?: boolean;
+  } = {}
+) => {
+  const signer = options.signer ?? releaseSigner;
+  const statement = {
+    _type: "https://in-toto.io/Statement/v1",
+    predicateType: slsaPredicateType,
+    subject: [
+      {
+        name: options.subjectName ?? `pkg:npm/${purlName}@${version}`,
+        digest: {
+          sha512: options.sha512 ?? expectedSha512,
+        },
+      },
+    ],
+    predicate: {
+      buildDefinition: {
+        buildType:
+          "https://slsa-framework.github.io/github-actions-buildtypes/workflow/v1",
+        externalParameters: {
+          workflow: {
+            ref: options.workflowRef ?? "refs/heads/main",
+            repository:
+              options.workflowRepo ??
+              "https://github.com/ueberBrot/effect-api-query",
+            path: options.workflowPath ?? ".github/workflows/release.yml",
+          },
+        },
+        resolvedDependencies: [
+          {
+            uri: `git+${options.workflowRepo ?? "https://github.com/ueberBrot/effect-api-query"}@${options.workflowRef ?? "refs/heads/main"}`,
+            digest: {
+              gitCommit: options.gitCommit ?? release,
+            },
+          },
+        ],
+      },
+    },
+  };
+  const payloadBytes = Buffer.from(JSON.stringify(statement), "utf-8");
+  const pae = Buffer.concat([
+    Buffer.from(
+      `DSSEv1 ${dssePayloadType.length} ${dssePayloadType} ${payloadBytes.length} `,
+      "utf-8"
+    ),
+    payloadBytes,
+  ]);
+  const signature = sign("sha256", pae, signer.privateKeyPem);
+  if (options.tamperSignature === true) {
+    signature[0] = ((signature[0] ?? 0) + 1) % 256;
+  }
+  const verificationMaterial =
+    options.useCertChain === true
+      ? {
+          x509CertificateChain: {
+            certificates: [{ rawBytes: signer.certBase64 }],
+          },
+          tlogEntries: options.tlogEntries ?? [{ logIndex: "1" }],
+        }
+      : {
+          certificate: { rawBytes: signer.certBase64 },
+          tlogEntries: options.tlogEntries ?? [{ logIndex: "1" }],
+        };
+  return JSON.stringify({
+    attestations: [
+      {
+        predicateType:
+          "https://github.com/npm/attestation/tree/main/specs/publish/v0.1",
+        bundle: {},
+      },
+      {
+        predicateType: slsaPredicateType,
+        bundle: {
+          mediaType: "application/vnd.dev.sigstore.bundle.v0.3+json",
+          verificationMaterial,
+          dsseEnvelope: {
+            payloadType: dssePayloadType,
+            payload: payloadBytes.toString("base64"),
+            signatures: [{ sig: signature.toString("base64") }],
+          },
+        },
+      },
+    ],
+  });
+};
+
+const validAttestations = createAttestations();
+
+interface GitFixtureOptions {
+  descendant?: boolean;
+  releaseReachableFromMain?: boolean;
+  docsReachableFromMain?: boolean;
+  releaseManifest?: string;
+  docsManifest?: string;
+  tree?: string;
+  releaseRevision?: string;
+}
+
+const checkMergeBase = (
+  args: readonly string[],
+  options: GitFixtureOptions
+): string => {
+  const [ancestor, descendant] = args.slice(2);
+  if (
+    ancestor === release &&
+    descendant === mainTip &&
+    options.releaseReachableFromMain === false
+  ) {
+    throw new Error("The release is not reachable from main.");
+  }
+  if (
+    ancestor === release &&
+    descendant === docs &&
+    options.descendant === false
+  ) {
+    throw new Error("The release is not an ancestor.");
+  }
+  if (
+    ancestor === docs &&
+    descendant === mainTip &&
+    options.docsReachableFromMain === false
+  ) {
+    throw new Error("docs-ref is not reachable from main.");
+  }
+  return "";
+};
+
 const gitFixture = (
   paths: readonly string[] = [],
-  options: {
-    descendant?: boolean;
-    releaseManifest?: string;
-    docsManifest?: string;
-    tree?: string;
-    releaseRevision?: string;
-  } = {}
+  options: GitFixtureOptions = {}
 ) =>
   vi.fn<(args: readonly string[]) => string>((args) => {
     switch (args[0] ?? "") {
       case "rev-parse": {
-        return args[2]?.startsWith("refs/tags/") === true
-          ? (options.releaseRevision ?? release)
-          : docs;
+        const target = args.at(-1) ?? "";
+        if (target.startsWith("refs/tags/")) {
+          return options.releaseRevision ?? release;
+        }
+        if (target === "refs/remotes/origin/main^{commit}") {
+          return mainTip;
+        }
+        return docs;
       }
       case "show": {
         return args[1] === `${release}:package.json`
@@ -65,10 +268,7 @@ const gitFixture = (
           : (options.docsManifest ?? manifest);
       }
       case "merge-base": {
-        if (options.descendant === false) {
-          throw new Error("The release is not an ancestor.");
-        }
-        return "";
+        return checkMergeBase(args, options);
       }
       case "diff": {
         return paths.map((path) => `${path}\0`).join("");
@@ -91,12 +291,14 @@ const gitFixture = (
 
 const resolve = (
   paths: readonly string[],
-  options: Parameters<typeof gitFixture>[1] = {}
+  options: Parameters<typeof gitFixture>[1] = {},
+  attestations: string = validAttestations
 ) =>
   resolveDocumentationRevision(
     version,
     "docs/corrections",
     metadata,
+    attestations,
     gitFixture(paths, options)
   );
 
@@ -163,6 +365,7 @@ describe("manual documentation revision", () => {
         version,
         "",
         metadata,
+        validAttestations,
         gitFixture([], { tree })
       )
     ).toThrow("Supply docs-ref");
@@ -171,16 +374,23 @@ describe("manual documentation revision", () => {
         version,
         "docs/version-backport",
         metadata,
+        validAttestations,
         gitFixture(["apps/docs/astro.config.mts"], { tree })
       )
     ).toStrictEqual({ revision: docs, version });
     expect(runVersionVerifier(manifest).status).toBe(0);
   });
 
-  it("pins the conventional release tag when npm omits gitHead", () => {
+  it("binds the release tag via npm SLSA provenance when npm omits gitHead", () => {
     const readGit = gitFixture();
     expect(
-      resolveDocumentationRevision(version, "", metadata, readGit)
+      resolveDocumentationRevision(
+        version,
+        "",
+        metadata,
+        validAttestations,
+        readGit
+      )
     ).toStrictEqual({
       revision: release,
       version,
@@ -190,14 +400,33 @@ describe("manual documentation revision", () => {
       "--verify",
       `refs/tags/${name}@${version}^{commit}`,
     ]);
+    expect(readGit).toHaveBeenCalledWith([
+      "merge-base",
+      "--is-ancestor",
+      release,
+      mainTip,
+    ]);
   });
 
-  it("requires a matching full gitHead when npm supplies it", () => {
+  it("accepts a matching x509CertificateChain provenance bundle", () => {
+    expect(
+      resolveDocumentationRevision(
+        version,
+        "",
+        metadata,
+        createAttestations({ useCertChain: true }),
+        gitFixture()
+      )
+    ).toStrictEqual({ revision: release, version });
+  });
+
+  it("requires a matching full gitHead when npm supplies it alongside provenance", () => {
     expect(
       resolveDocumentationRevision(
         version,
         "",
         JSON.stringify({ ...registryMetadata, gitHead: release }),
+        validAttestations,
         gitFixture()
       )
     ).toStrictEqual({ revision: release, version });
@@ -211,6 +440,7 @@ describe("manual documentation revision", () => {
           version,
           "",
           JSON.stringify({ ...registryMetadata, gitHead }),
+          validAttestations,
           gitFixture()
         )
       ).toThrow(/.+/u);
@@ -231,12 +461,85 @@ describe("manual documentation revision", () => {
       ...registryMetadata,
       dist: { ...registryMetadata.dist, tarball: "https://evil.invalid/file" },
     },
-  ])("rejects inconsistent registry metadata: %j", (value) => {
+    {
+      ...registryMetadata,
+      dist: {
+        integrity: registryMetadata.dist.integrity,
+        tarball: registryMetadata.dist.tarball,
+      },
+    },
+    {
+      ...registryMetadata,
+      dist: {
+        ...registryMetadata.dist,
+        attestations: {
+          ...registryMetadata.dist.attestations,
+          url: "https://evil.invalid/attestations",
+        },
+      },
+    },
+    {
+      ...registryMetadata,
+      dist: {
+        ...registryMetadata.dist,
+        attestations: {
+          ...registryMetadata.dist.attestations,
+          provenance: { predicateType: "https://slsa.dev/provenance/v0.2" },
+        },
+      },
+    },
+  ])("rejects inconsistent or unattested registry metadata: %j", (value) => {
     expect(() =>
       resolveDocumentationRevision(
         version,
         "",
         JSON.stringify(value),
+        validAttestations,
+        gitFixture()
+      )
+    ).toThrow(/.+/u);
+  });
+
+  it.each([
+    ["missing attestations array", JSON.stringify({})],
+    ["missing SLSA provenance entry", JSON.stringify({ attestations: [] })],
+    ["tampered DSSE signature", createAttestations({ tamperSignature: true })],
+    [
+      "untrusted certificate SAN",
+      createAttestations({ signer: foreignSigner }),
+    ],
+    ["empty transparency log entries", createAttestations({ tlogEntries: [] })],
+    [
+      "mismatched artifact sha512",
+      createAttestations({ sha512: "f".repeat(128) }),
+    ],
+    [
+      "mismatched package purl",
+      createAttestations({ subjectName: "pkg:npm/other@0.1.0" }),
+    ],
+    [
+      "wrong workflow ref",
+      createAttestations({ workflowRef: "refs/heads/feature" }),
+    ],
+    [
+      "wrong workflow path",
+      createAttestations({ workflowPath: ".github/workflows/ci.yml" }),
+    ],
+    [
+      "wrong workflow repository",
+      createAttestations({ workflowRepo: "https://github.com/other/repo" }),
+    ],
+    [
+      "moved release tag (gitCommit mismatch)",
+      createAttestations({ gitCommit: docs }),
+    ],
+  ])("rejects invalid release provenance (%s)", (_label, attestations) => {
+    expect(() =>
+      resolveDocumentationRevision(
+        version,
+        "",
+        metadata,
+        attestations,
         gitFixture()
       )
     ).toThrow(/.+/u);
@@ -256,7 +559,13 @@ describe("manual documentation revision", () => {
     (input) => {
       const readGit = gitFixture();
       expect(() =>
-        resolveDocumentationRevision(input, "", metadata, readGit)
+        resolveDocumentationRevision(
+          input,
+          "",
+          metadata,
+          validAttestations,
+          readGit
+        )
       ).toThrow(/.+/u);
       expect(readGit).not.toHaveBeenCalled();
     }
@@ -270,11 +579,17 @@ describe("manual documentation revision", () => {
     "main\nother",
   ])("rejects unsupported documentation refs: %s", (ref) => {
     expect(() =>
-      resolveDocumentationRevision(version, ref, metadata, gitFixture())
+      resolveDocumentationRevision(
+        version,
+        ref,
+        metadata,
+        validAttestations,
+        gitFixture()
+      )
     ).toThrow(/.+/u);
   });
 
-  it("pins a docs branch with only permitted changes to its full commit SHA", () => {
+  it("pins a reviewed docs branch with only permitted changes to its full commit SHA", () => {
     expect(
       resolve([
         "apps/docs/src/content/docs/index.mdx",
@@ -288,10 +603,50 @@ describe("manual documentation revision", () => {
     ).toStrictEqual({ revision: docs, version });
   });
 
+  it("rejects an unreviewed docs-ref branch even when changed paths match the allowlist", () => {
+    expect(() =>
+      resolve(["apps/docs/astro.config.mts", "tests/docs-examples.test.ts"], {
+        docsReachableFromMain: false,
+      })
+    ).toThrow("protected main branch");
+  });
+
+  it("rejects an unreviewed docs-ref commit SHA even when changed paths match the allowlist", () => {
+    expect(() =>
+      resolveDocumentationRevision(
+        version,
+        docs,
+        metadata,
+        validAttestations,
+        gitFixture(["apps/docs/src/content/docs/index.mdx"], {
+          docsReachableFromMain: false,
+        })
+      )
+    ).toThrow("protected main branch");
+  });
+
+  it("rejects a release commit that is not reachable from the protected main branch", () => {
+    expect(() =>
+      resolveDocumentationRevision(
+        version,
+        "",
+        metadata,
+        validAttestations,
+        gitFixture([], { releaseReachableFromMain: false })
+      )
+    ).toThrow("protected main branch");
+  });
+
   it("accepts underscore branch names and still asks Git to validate them", () => {
     const readGit = gitFixture();
     expect(
-      resolveDocumentationRevision(version, "docs/fix_badge", metadata, readGit)
+      resolveDocumentationRevision(
+        version,
+        "docs/fix_badge",
+        metadata,
+        validAttestations,
+        readGit
+      )
     ).toStrictEqual({ revision: docs, version });
     expect(readGit).toHaveBeenCalledWith([
       "check-ref-format",
@@ -299,10 +654,16 @@ describe("manual documentation revision", () => {
     ]);
   });
 
-  it("accepts a full docs commit SHA without interpreting it as a branch", () => {
+  it("accepts a reviewed full docs commit SHA without interpreting it as a branch", () => {
     const readGit = gitFixture();
     expect(
-      resolveDocumentationRevision(version, docs, metadata, readGit)
+      resolveDocumentationRevision(
+        version,
+        docs,
+        metadata,
+        validAttestations,
+        readGit
+      )
     ).toStrictEqual({ revision: docs, version });
     expect(readGit).toHaveBeenCalledWith([
       "rev-parse",
