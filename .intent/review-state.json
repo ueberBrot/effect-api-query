@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "d48189aa9b01fae7b4d32d50db30c2a6450ab03aad0bbdbc84b0bc2dc196af84",
+      "fingerprint": "c28e4d139a4527ecf0854e75abd56cf203e7ae8114cb6ef217e618d2f9291382",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -44,7 +44,7 @@
         "apps/docs/src/content/docs/guides/refresh-from-events.md": "e2294732dd207f72fa27adc22dcedf9c83402d56c8f52f4c1d20017a77773212",
         "apps/docs/src/content/docs/guides/retry-queries.md": "c8082d04cd147106b6cc57587c33185770488c7c9cf3312a009b8a3b78944557",
         "apps/docs/src/content/docs/guides/scoped-event-cache.md": "f37c9c21f51f69b5ac1bb78e20199ad22943a1a5d4a6a9127d2da4171df28245",
-        "apps/docs/src/content/docs/guides/share-decoded-values.md": "aec27f0796bf619a9ad862e74f18a932e2c1cffba47bfb7f3224b99d6e1da535",
+        "apps/docs/src/content/docs/guides/share-decoded-values.md": "005ac9eccedba6bb547192650ff2c204b9df546176076e55c91a6e13dea9ed8a",
         "apps/docs/src/content/docs/guides/solid-query.md": "6ec1cacb1238cf3dbc7b71ca6311757c76949973522a83d12299f20026dea695",
         "apps/docs/src/content/docs/guides/stream-snapshots.md": "b26610d19e9fa95827c211c39dd2983b676e1a0d64307da56970ec4a5b8a333b",
         "apps/docs/src/content/docs/guides/streaming.md": "0094954578cb2cf4a2b6fe759ce9893c27d2fea6810f42041a768d2fe7f5b4de",
@@ -421,7 +421,7 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "c4dccdab4857cd3861fa130862106916a01deee7",
+      "head": "83ce90d345a6d9dd48147dc13c4301ffc4b546c6",
       "outcome": "updated",
       "reason": "The cache-workflows reference and sharing guide describe screening both sides before Schema validation, rejecting incoming cycles before callbacks, and supporting shared acyclic references.",
       "evidence": [
@@ -432,7 +432,7 @@
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "c9258e52a57ac7f6ce8e69161711fb31b29e79fa665e74a237fa4cc0a58df064",
+      "fingerprint": "185b115968c0619f142d98dff544ed3518a132df00f38d01e8ba72b15f06b165",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -476,7 +476,7 @@
         "apps/docs/src/content/docs/guides/refresh-from-events.md": "e2294732dd207f72fa27adc22dcedf9c83402d56c8f52f4c1d20017a77773212",
         "apps/docs/src/content/docs/guides/retry-queries.md": "c8082d04cd147106b6cc57587c33185770488c7c9cf3312a009b8a3b78944557",
         "apps/docs/src/content/docs/guides/scoped-event-cache.md": "f37c9c21f51f69b5ac1bb78e20199ad22943a1a5d4a6a9127d2da4171df28245",
-        "apps/docs/src/content/docs/guides/share-decoded-values.md": "aec27f0796bf619a9ad862e74f18a932e2c1cffba47bfb7f3224b99d6e1da535",
+        "apps/docs/src/content/docs/guides/share-decoded-values.md": "005ac9eccedba6bb547192650ff2c204b9df546176076e55c91a6e13dea9ed8a",
         "apps/docs/src/content/docs/guides/solid-query.md": "6ec1cacb1238cf3dbc7b71ca6311757c76949973522a83d12299f20026dea695",
         "apps/docs/src/content/docs/guides/stream-snapshots.md": "b26610d19e9fa95827c211c39dd2983b676e1a0d64307da56970ec4a5b8a333b",
         "apps/docs/src/content/docs/guides/streaming.md": "0094954578cb2cf4a2b6fe759ce9893c27d2fea6810f42041a768d2fe7f5b4de",
@@ -853,7 +853,7 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "c4dccdab4857cd3861fa130862106916a01deee7",
+      "head": "83ce90d345a6d9dd48147dc13c4301ffc4b546c6",
       "outcome": "updated",
       "reason": "The domain map and skill spec cover array screening and acyclic shared references. Existing skill tree globs cover the implementation, focused tests, and guide.",
       "evidence": [

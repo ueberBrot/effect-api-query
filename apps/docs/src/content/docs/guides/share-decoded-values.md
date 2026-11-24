@@ -47,7 +47,7 @@ export const shareSnapshot = schemaStructuralSharing(Reading, {
 });
 ```
 
-The callback also works in QueryClient defaults and on selected values. It uses the supplied equivalence for Schema-valid atoms and recursively compares plain objects and dense arrays. Use containers with enumerable string data properties. Sparse arrays, symbol properties, accessors, and custom-prototype containers pass through without container Schema validation. An incoming cycle through supported containers throws `TypeError` before Schema validation or equivalence. Shared acyclic references are valid.
+The callback also works in QueryClient defaults and on selected values. It uses the supplied equivalence for Schema-valid atoms and recursively compares plain objects and dense arrays. Sparse arrays, arrays with custom prototypes, and plain containers with unsupported properties such as accessors or symbols pass through without Schema validation. Schema class instances can still be validated as atoms. An incoming cycle through supported containers throws `TypeError` before Schema validation or equivalence. Shared acyclic references are valid.
 
 Both Schema validation and equivalence must run synchronously without services. Defects, asynchronous checks, missing services, and thrown equivalence errors propagate. The helper compares decoded values and leaves them unfrozen. Keep both inputs unchanged.
 
