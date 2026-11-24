@@ -2128,6 +2128,7 @@ describe("composable createHydrationRegistry", () => {
     () =>
       Effect.gen(function* verifiesReviewEdgeCases() {
         let unionFactoryCalls = 0;
+        let transformedUnionFactoryCalls = 0;
         let voidFactoryCalls = 0;
         const SynthesizedUnion = Schema.Union([
           Schema.String.pipe(
@@ -2140,6 +2141,27 @@ describe("composable createHydrationRegistry", () => {
           ),
           Schema.Finite,
         ]);
+        const TransformedUnion = Schema.Union([
+          Schema.String.pipe(
+            HttpApiSchema.asNoContent({
+              decode: () => {
+                transformedUnionFactoryCalls += 1;
+                return `factory-${transformedUnionFactoryCalls}`;
+              },
+            })
+          ),
+          Schema.Finite,
+        ]).pipe(
+          Schema.decodeTo(
+            Schema.Struct({
+              value: Schema.Union([Schema.String, Schema.Finite]),
+            }),
+            SchemaTransformation.transform({
+              decode: (value) => ({ value }),
+              encode: ({ value }) => value,
+            })
+          )
+        );
         const WrappedVoid = HttpApiSchema.WithHeaders(
           Schema.Void.pipe(
             HttpApiSchema.asNoContent({
@@ -2170,6 +2192,9 @@ describe("composable createHydrationRegistry", () => {
           HttpApiGroup.make("items").add(
             HttpApiEndpoint.get("union", "/union", {
               success: SynthesizedUnion,
+            }),
+            HttpApiEndpoint.get("transformedUnion", "/transformed-union", {
+              success: TransformedUnion,
             }),
             HttpApiEndpoint.get("wrappedVoid", "/wrapped-void", {
               success: WrappedVoid,
@@ -2213,6 +2238,9 @@ describe("composable createHydrationRegistry", () => {
         const browser = new QueryClient();
         try {
           server.setQueryData(http.items.union.queryKey(), "cached");
+          server.setQueryData(http.items.transformedUnion.queryKey(), {
+            value: "factory-1",
+          });
           server.setQueryData(
             http.items.wrappedVoid.queryKey(),
             HttpApiSchema.withHeaders({
@@ -2245,6 +2273,10 @@ describe("composable createHydrationRegistry", () => {
           expect({
             unionRestored: browser.getQueryData(http.items.union.queryKey()),
             unionFactoryCalls,
+            transformedUnionRestored: browser.getQueryData(
+              http.items.transformedUnion.queryKey()
+            ),
+            transformedUnionFactoryCalls,
             wrappedVoidRestored: browser.getQueryData(
               http.items.wrappedVoid.queryKey()
             ),
@@ -2267,6 +2299,8 @@ describe("composable createHydrationRegistry", () => {
           }).toStrictEqual({
             unionRestored: "cached",
             unionFactoryCalls: 0,
+            transformedUnionRestored: { value: "factory-1" },
+            transformedUnionFactoryCalls: 0,
             wrappedVoidRestored: HttpApiSchema.withHeaders({
               body: undefined,
               headers: { "x-id": "1" },

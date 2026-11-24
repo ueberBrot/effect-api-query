@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "51ba57956252c7087298232a7d32c10657a6cb2e1d9345aebbdf598b9a3bc8f2",
+      "fingerprint": "ca619a644cde6c04108562e808efb8057ffee6892f50151fa2129054f4275f95",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -219,7 +219,7 @@
         "src/core/configure.ts": "5a7e7f8dc1fa13e0d698678e79521bdce79aefcaec4c4235ac20b340f1076925",
         "src/core/consume-events.ts": "648144582c4bdbf4a9cb0d35ddc54327abbefc654f2d37b6154232bcd09a1752",
         "src/core/contract-hydration-types.ts": "fb0e5a7e1569301057422e662185a2a11f4007473dca58b1786422d6fed5deac",
-        "src/core/contract-hydration.ts": "f50a263eab1688abc5eb31a4be498fea6271ce515766cddf9284fb6bebaf8447",
+        "src/core/contract-hydration.ts": "c3783bb93a190e45f0b703d05ecbd11ee607f9410046f7c1ce3ca7dbd62ff395",
         "src/core/declared-error.ts": "72146f75dc4f99abb60c143ae4464abf6a512cd5ffe713597bb3fb967f58c7a0",
         "src/core/hydration.ts": "08c812094bb4662cdf118b1825a47a4ec4bc1e4bd248a878726cbd4ff31aaf1e",
         "src/core/inference.ts": "249bc1d59e4ea6ddc7e3a09a63b93c13e3805f9d70ead00f44c710ff95e4df94",
@@ -265,7 +265,7 @@
         "src/rpc/types.ts": "6116aee2a62b26a895caf709c99c5969d6e45358c0919abd40068f9ce2db3f54",
         "tests/cache-recipes.test.ts": "fe686d2434c1604f4b2577e582d3dcae3a183fffced090c5362bd649cbfc2569",
         "tests/configuration-composition.test.ts": "be2ffca6e62965d8b79a311998787f74565d4af86bcaec46c36f5a963b0d16f5",
-        "tests/contract-hydration.test.ts": "58c14600fe331059e5c456ed28c5e7392f4a575a19a4bd29eb14f1cf21149e9b",
+        "tests/contract-hydration.test.ts": "3fefe763f805641ed372be2560a02467415369663d0b979ad74802e1cc1357d5",
         "tests/contract-reuse.test.ts": "21b97cec6da64d3a42d58e69aaad1754aaec2bb4dd1ac876ef25ec801f970a12",
         "tests/create-http-api-query-utils.test.ts": "a6b89aeb4e7570d6bff9b9fa45723b2a2d3a0180ed7d7807f222cbe2003f93d5",
         "tests/create-rpc-query-utils-configuration.test.ts": "c04f7903c14a2d8be54f1e8c84f0e00dd10e3b9148090c196b8ed7b25dfa8f52",
@@ -410,20 +410,20 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "3512154ae81322c77788a90d53bf582fb1bdfe04",
-      "outcome": "no-change",
-      "reason": "Addressed all #239 review findings (union/wrapped-Void asNoContent, intermediate Void transform preservation, own views.metadata check, distributive per-path metadata type override, and encodeToWithHeaders Redacted check); ADR 0058, skill reference, and guide already accurately reflect behavior",
+      "head": "54c9c3d50726ec53ffdad69cd57e90969fa77ea7",
+      "outcome": "updated",
+      "reason": "Recurse stripBodylessTransport through encoding links for transformed-union asNoContent, updated ADR 0058 wording and _artifacts/skill_spec.md base SHA; full test suite, typecheck, format, and fallow passed",
       "evidence": [
-        "Changed: src/core/contract-hydration-types.ts, src/core/contract-hydration.ts, tests/contract-hydration.test.ts, tests/types/contract-hydration-contract.ts at 3512154ae81322c77788a90d53bf582fb1bdfe04"
+        "Changed: src/core/contract-hydration.ts, tests/contract-hydration.test.ts at 54c9c3d50726ec53ffdad69cd57e90969fa77ea7"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "16faf91913360405723af76d339ad33bbf9ef81f26e471e56f9e708afa71eaf0",
+      "fingerprint": "0b85980e978f75ed371c5daf6c79020f8dc5bf328ee94a025c82c37490a22978",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
         "_artifacts/domain_map.yaml": "a1ee71cd9573f65d8897f71b8e37023d90e7ccf7eb2b1055645f39911dd324f9",
-        "_artifacts/skill_spec.md": "c0cdf214f5121232687909e686a6fcecea6c10075deac760ee03aac47d6e8b25",
+        "_artifacts/skill_spec.md": "19d6f14fae5b8c011531833cfad77321985485e1b9b76aa2612b34f9b638d261",
         "_artifacts/skill_tree.yaml": "16f542e7682b84596d15b066716f06a2657fdffd14bab445279b409e7e1baa32",
         "apps/docs/astro.config.mts": "90c54a40605dc0f553b9f62831c88a3e012fe6da44a1e216e4f981bcf1af2272",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "a826348cf7b3fd34b0677280daa75a08ce99138cb68fbd79d4ef52936190eeb6",
@@ -637,7 +637,7 @@
         "src/core/configure.ts": "5a7e7f8dc1fa13e0d698678e79521bdce79aefcaec4c4235ac20b340f1076925",
         "src/core/consume-events.ts": "648144582c4bdbf4a9cb0d35ddc54327abbefc654f2d37b6154232bcd09a1752",
         "src/core/contract-hydration-types.ts": "fb0e5a7e1569301057422e662185a2a11f4007473dca58b1786422d6fed5deac",
-        "src/core/contract-hydration.ts": "f50a263eab1688abc5eb31a4be498fea6271ce515766cddf9284fb6bebaf8447",
+        "src/core/contract-hydration.ts": "c3783bb93a190e45f0b703d05ecbd11ee607f9410046f7c1ce3ca7dbd62ff395",
         "src/core/declared-error.ts": "72146f75dc4f99abb60c143ae4464abf6a512cd5ffe713597bb3fb967f58c7a0",
         "src/core/hydration.ts": "08c812094bb4662cdf118b1825a47a4ec4bc1e4bd248a878726cbd4ff31aaf1e",
         "src/core/inference.ts": "249bc1d59e4ea6ddc7e3a09a63b93c13e3805f9d70ead00f44c710ff95e4df94",
@@ -683,7 +683,7 @@
         "src/rpc/types.ts": "6116aee2a62b26a895caf709c99c5969d6e45358c0919abd40068f9ce2db3f54",
         "tests/cache-recipes.test.ts": "fe686d2434c1604f4b2577e582d3dcae3a183fffced090c5362bd649cbfc2569",
         "tests/configuration-composition.test.ts": "be2ffca6e62965d8b79a311998787f74565d4af86bcaec46c36f5a963b0d16f5",
-        "tests/contract-hydration.test.ts": "58c14600fe331059e5c456ed28c5e7392f4a575a19a4bd29eb14f1cf21149e9b",
+        "tests/contract-hydration.test.ts": "3fefe763f805641ed372be2560a02467415369663d0b979ad74802e1cc1357d5",
         "tests/contract-reuse.test.ts": "21b97cec6da64d3a42d58e69aaad1754aaec2bb4dd1ac876ef25ec801f970a12",
         "tests/create-http-api-query-utils.test.ts": "a6b89aeb4e7570d6bff9b9fa45723b2a2d3a0180ed7d7807f222cbe2003f93d5",
         "tests/create-rpc-query-utils-configuration.test.ts": "c04f7903c14a2d8be54f1e8c84f0e00dd10e3b9148090c196b8ed7b25dfa8f52",
@@ -828,11 +828,11 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "3512154ae81322c77788a90d53bf582fb1bdfe04",
-      "outcome": "no-change",
-      "reason": "Addressed all #239 review findings (union/wrapped-Void asNoContent, intermediate Void transform preservation, own views.metadata check, distributive per-path metadata type override, and encodeToWithHeaders Redacted check); ADR 0058, skill reference, and guide already accurately reflect behavior",
+      "head": "54c9c3d50726ec53ffdad69cd57e90969fa77ea7",
+      "outcome": "updated",
+      "reason": "Recurse stripBodylessTransport through encoding links for transformed-union asNoContent, updated ADR 0058 wording and _artifacts/skill_spec.md base SHA; full test suite, typecheck, format, and fallow passed",
       "evidence": [
-        "Changed: src/core/contract-hydration-types.ts, src/core/contract-hydration.ts, tests/contract-hydration.test.ts, tests/types/contract-hydration-contract.ts at 3512154ae81322c77788a90d53bf582fb1bdfe04"
+        "Changed: _artifacts/skill_spec.md, src/core/contract-hydration.ts, tests/contract-hydration.test.ts at 54c9c3d50726ec53ffdad69cd57e90969fa77ea7"
       ]
     },
     "source:vite.config.ts": {
@@ -4662,15 +4662,15 @@
       ]
     },
     "source:docs/adr/0058-require-explicit-header-allowlist-for-metadata-hydration.md": {
-      "fingerprint": "5c7e4927b4ae2703fb2aa0a6d85a26d77c70f7d5924d673c175390dcd552b337",
+      "fingerprint": "9d8733edc8e3b6234364c1f6d1f7600007903abfdbf94b98cacd9e4ae4e2904b",
       "snapshot": {
-        "docs/adr/0058-require-explicit-header-allowlist-for-metadata-hydration.md": "ee2f488ef55193745558a8e64ce735379d185500ab46a02ebc3407195a8cabd5"
+        "docs/adr/0058-require-explicit-header-allowlist-for-metadata-hydration.md": "ac37974ef7edc08996517abbacdaee2f935ca1128ca7ec2c9092893fd5f10a07"
       },
-      "head": "38d7d433661ed701518acda559d9bb1f0031c2cd",
+      "head": "54c9c3d50726ec53ffdad69cd57e90969fa77ea7",
       "outcome": "updated",
-      "reason": "Updated skills/effect-api-query/references/hydration-and-ssr.md, apps/docs/src/content/docs/guides/hydrate-query-views.md, ADR 0058 (amending ADR 0047), and _artifacts/skill_spec.md for #239 contract-derived hydration hardening (nested Redacted detection, HttpApiSchema.asNoContent preservation, and opt-in explicit header allowlist for HTTP metadata hydration); verified with full vp test, vp run typecheck, vp run format, and vp run fallow",
+      "reason": "Recurse stripBodylessTransport through encoding links for transformed-union asNoContent, updated ADR 0058 wording and _artifacts/skill_spec.md base SHA; full test suite, typecheck, format, and fallow passed",
       "evidence": [
-        "Changed: docs/adr/0058-require-explicit-header-allowlist-for-metadata-hydration.md at 38d7d433661ed701518acda559d9bb1f0031c2cd"
+        "Changed: docs/adr/0058-require-explicit-header-allowlist-for-metadata-hydration.md at 54c9c3d50726ec53ffdad69cd57e90969fa77ea7"
       ]
     }
   }

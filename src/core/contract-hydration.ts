@@ -771,6 +771,18 @@ const stripBodylessTransport = (ast: SchemaAST.AST): SchemaAST.AST => {
   if (isBodylessTransportEncoding(ast)) {
     return SchemaAST.toType(ast);
   }
+  if (ast.encoding !== undefined) {
+    const encoding = SchemaAST.mapOrSame(ast.encoding, (link) => {
+      const target = stripBodylessTransport(link.to);
+      return target === link.to
+        ? link
+        : new SchemaAST.Link(target, link.transformation);
+    });
+    return encoding === ast.encoding ||
+      !EffectArray.isReadonlyArrayNonEmpty(encoding)
+      ? ast
+      : copyCodecAst(ast, { encoding });
+  }
   if (SchemaAST.isUnion(ast)) {
     const members = SchemaAST.mapOrSame(ast.types, stripBodylessTransport);
     return members === ast.types
