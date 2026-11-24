@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "55b958361c4619b6f5e2416b4c53ccb512001e485723ecd083a3c698e147f3f5",
+      "fingerprint": "ac0ba0f98f4610a53baaedc06fca5a00e431939bbdda87af1d60f22240af05fb",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -198,8 +198,9 @@
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "a272baf9fe3a76649fa65cd6db06121aa97b2623eac33e66bcfc8f0a05ca88e4",
         "examples/vite-react/vite.config.ts": "68b64cb963fcb1fa90330d04519202729d9e692229d25f81a26c14a3733362d9",
-        "package.json": "ec0f87d81f965713c6315d2cd5e0049a7177a6214bdadd69121c8cadfe094ec0",
+        "package.json": "d5b7f7ffaedf4964b16816d89d355564a255cc7692078fcd84546d71c04a88a3",
         "pnpm-workspace.yaml": "fc4bff1fa9ef4a4887691c6e004e02829736f93ee07efcb563f78f836a21a276",
+        "scripts/check-changesets.mts": "3bc0fb81c8152724514e093a26653a634ff1e3dee459b3f6f2d6b77812c27704",
         "scripts/check-effect-compatibility.mts": "b1de824e27e34089c445f183d1511d8e5f9e463892ff8edf83f76fb8c24778f4",
         "scripts/check-framework-consumers.mts": "fd6e99f4f9d854a0a738afd105094553e31472d525f7236693c235f8140dcad9",
         "scripts/check-toolchain.mts": "3c8efdb93594058ed78947bc65ad51c88ac4b26cab23b0b1fe6f8786a6d386e9",
@@ -215,7 +216,7 @@
         "scripts/performance/common.mts": "6ce0e1c018e08a442fcf787740d7ddd63457069ee932d28b04d8a1b41e136028",
         "scripts/resolve-docs-release.mts": "0ed8db1359b317feadf9479fc7dcefc879b4899279b56c672a95499595644c4e",
         "scripts/verify-docs-version.mts": "58f63de6f871726a5bef8b70d1de7fad591374c52823e3cf60a160a9f37541e8",
-        "scripts/version-packages.mts": "e514a013a90489d8d0ff5eb0620276f923c85fa765061aa4d3f312ac2ee4c7ad",
+        "scripts/version-packages.mts": "f55dbeee640fca92645542f70295a796b2fd85072a5317092975ece494fa30d8",
         "skills/effect-api-query/SKILL.md": "2f317d7b9ee273c24731613181d10495e73d0ca698c3c59a3fed557f6f2770fe",
         "skills/effect-api-query/references/cache-workflows.md": "cd50c5f67f8fce77cf8cc2b95b1697bd20205a688adb7319625b62c414402327",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "f8e2ed21583481dffd1680ce85340af508bbd8a5baeb8227da094a099da81fef",
@@ -418,30 +419,21 @@
         "tests/types/type-scale.ts": "0a6472b438c7ef14c3ee5b030b500ab6f66f13e7cd50250a3b0798bdec48c8a7",
         "tests/types/utility-configuration-contract.ts": "3a3d4e200e84d04d2e9856bfb4509a4ba948f4a67997d1327e66beef36aa0eb4",
         "tests/utility-configuration.test.ts": "55361de62fbb7e7695c94f940de566c2e35d218539a77b6ab1000877f71ad288",
-        "tests/version-packages.test.ts": "c043e1877c54aab8fe2119de324909a3f671e5aea60cdfe6778f63abffc313c1",
+        "tests/version-packages.test.ts": "344d38290bf48eb570e243c2683ccb39ab41b54b44bf4f6347161c288847584e",
         "tests/workflow-guards.test.ts": "563c464dfb45e0873138aff38d323cdfb64b7e6caae84f70fa46db4c65dba410",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "604d5bbe3b10d228f728e39200b56fc7fa81ea9b",
+      "head": "0c856aa5ff3addeb2061b4ae5685b92f6d0d2e8e",
       "outcome": "no-change",
-      "reason": "The query-patterns reference now covers seeded reset refetches and failure before the first emission. PR #261 changes how the contributor pre-push guard matches GitHub repositories and branches, and isolates the test fixtures from the invoking hook. The shipped guidance and all three planning records still apply.",
+      "reason": "The GitHub changelog still accepts supported commit metadata and local configuration. Release validation runs before any generated edits reach the caller. The library runtime, published types, installation contract, and guidance retain their existing behavior. The domain map, skill spec, and skill tree retain their coverage.",
       "evidence": [
-        "Previous main review: bca2fed98b7bf479d16fcf01e95a339cd3722478 (updated).",
-        "src/core/streamed-query.ts",
-        "tests/create-rpc-query-utils-streaming.test.ts",
-        "tests/http-cached-views.test.ts",
-        "73 focused tests and shipped skill validation passed. A fresh consumer session was not run.",
-        "Previous PR #261 review: 6cb1f314b47352db02daad26d7a850ee1ac82909 (no-change).",
-        "Both guard suites passed all 27 tests with Git context pointing at a disposable outer repository. Its refs, index status, and configuration were preserved.",
-        "All 27 guard tests passed on the merge with an outer Git context. The disposable repository's refs, status, and local configuration matched their snapshots.",
-        "scripts/check-workflow.mts",
-        "tests/fixtures/git-environment.ts",
-        "tests/skills-maintenance.test.ts",
-        "tests/workflow-guards.test.ts"
+        "Reviewed package.json, scripts/check-changesets.mts, scripts/version-packages.mts, and tests/version-packages.test.ts against d4736df.",
+        "22 disposable versioning integration tests passed. Type-aware lint and TypeScript checking passed.",
+        "Prior release-independent outcomes remain in the review state at d4736df."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "e244c7d4dfad63e96c5862538f307ccab3842b0179bc0b06b0f073c3b7590689",
+      "fingerprint": "5e6dc155635ece3fda8708686e7619b906867942a85580d8e381c4a205e67cbf",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -639,8 +631,9 @@
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "a272baf9fe3a76649fa65cd6db06121aa97b2623eac33e66bcfc8f0a05ca88e4",
         "examples/vite-react/vite.config.ts": "68b64cb963fcb1fa90330d04519202729d9e692229d25f81a26c14a3733362d9",
-        "package.json": "ec0f87d81f965713c6315d2cd5e0049a7177a6214bdadd69121c8cadfe094ec0",
+        "package.json": "d5b7f7ffaedf4964b16816d89d355564a255cc7692078fcd84546d71c04a88a3",
         "pnpm-workspace.yaml": "fc4bff1fa9ef4a4887691c6e004e02829736f93ee07efcb563f78f836a21a276",
+        "scripts/check-changesets.mts": "3bc0fb81c8152724514e093a26653a634ff1e3dee459b3f6f2d6b77812c27704",
         "scripts/check-effect-compatibility.mts": "b1de824e27e34089c445f183d1511d8e5f9e463892ff8edf83f76fb8c24778f4",
         "scripts/check-framework-consumers.mts": "fd6e99f4f9d854a0a738afd105094553e31472d525f7236693c235f8140dcad9",
         "scripts/check-toolchain.mts": "3c8efdb93594058ed78947bc65ad51c88ac4b26cab23b0b1fe6f8786a6d386e9",
@@ -656,7 +649,7 @@
         "scripts/performance/common.mts": "6ce0e1c018e08a442fcf787740d7ddd63457069ee932d28b04d8a1b41e136028",
         "scripts/resolve-docs-release.mts": "0ed8db1359b317feadf9479fc7dcefc879b4899279b56c672a95499595644c4e",
         "scripts/verify-docs-version.mts": "58f63de6f871726a5bef8b70d1de7fad591374c52823e3cf60a160a9f37541e8",
-        "scripts/version-packages.mts": "e514a013a90489d8d0ff5eb0620276f923c85fa765061aa4d3f312ac2ee4c7ad",
+        "scripts/version-packages.mts": "f55dbeee640fca92645542f70295a796b2fd85072a5317092975ece494fa30d8",
         "skills/effect-api-query/SKILL.md": "2f317d7b9ee273c24731613181d10495e73d0ca698c3c59a3fed557f6f2770fe",
         "skills/effect-api-query/references/cache-workflows.md": "cd50c5f67f8fce77cf8cc2b95b1697bd20205a688adb7319625b62c414402327",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "f8e2ed21583481dffd1680ce85340af508bbd8a5baeb8227da094a099da81fef",
@@ -859,26 +852,17 @@
         "tests/types/type-scale.ts": "0a6472b438c7ef14c3ee5b030b500ab6f66f13e7cd50250a3b0798bdec48c8a7",
         "tests/types/utility-configuration-contract.ts": "3a3d4e200e84d04d2e9856bfb4509a4ba948f4a67997d1327e66beef36aa0eb4",
         "tests/utility-configuration.test.ts": "55361de62fbb7e7695c94f940de566c2e35d218539a77b6ab1000877f71ad288",
-        "tests/version-packages.test.ts": "c043e1877c54aab8fe2119de324909a3f671e5aea60cdfe6778f63abffc313c1",
+        "tests/version-packages.test.ts": "344d38290bf48eb570e243c2683ccb39ab41b54b44bf4f6347161c288847584e",
         "tests/workflow-guards.test.ts": "563c464dfb45e0873138aff38d323cdfb64b7e6caae84f70fa46db4c65dba410",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "604d5bbe3b10d228f728e39200b56fc7fa81ea9b",
+      "head": "0c856aa5ff3addeb2061b4ae5685b92f6d0d2e8e",
       "outcome": "no-change",
-      "reason": "The domain map and skill spec record why seeded data can be absent during reset and after failure. The existing skill tree maps both adapter tests and the shared core source. PR #261 changes how the contributor pre-push guard matches GitHub repositories and branches, and isolates the test fixtures from the invoking hook. The shipped guidance and all three planning records still apply.",
+      "reason": "The GitHub changelog still accepts supported commit metadata and local configuration. Release validation runs before any generated edits reach the caller. The library runtime, published types, installation contract, and guidance retain their existing behavior. The domain map, skill spec, and skill tree retain their coverage.",
       "evidence": [
-        "Previous main review: bca2fed98b7bf479d16fcf01e95a339cd3722478 (updated).",
-        "_artifacts/domain_map.yaml",
-        "_artifacts/skill_spec.md",
-        "_artifacts/skill_tree.yaml",
-        "Both YAML files parsed. The 73 focused tests and shipped skill validation passed.",
-        "Previous PR #261 review: 6cb1f314b47352db02daad26d7a850ee1ac82909 (no-change).",
-        "Both guard suites passed all 27 tests with Git context pointing at a disposable outer repository. Its refs, index status, and configuration were preserved.",
-        "All 27 guard tests passed on the merge with an outer Git context. The disposable repository's refs, status, and local configuration matched their snapshots.",
-        "scripts/check-workflow.mts",
-        "tests/fixtures/git-environment.ts",
-        "tests/skills-maintenance.test.ts",
-        "tests/workflow-guards.test.ts"
+        "Reviewed package.json, scripts/check-changesets.mts, scripts/version-packages.mts, and tests/version-packages.test.ts against d4736df.",
+        "22 disposable versioning integration tests passed. Type-aware lint and TypeScript checking passed.",
+        "Prior release-independent outcomes remain in the review state at d4736df."
       ]
     },
     "source:vite.config.ts": {
@@ -969,15 +953,16 @@
       "evidence": ["vp run check, vp run fallow"]
     },
     "source:.github/workflows/ci.yml": {
-      "fingerprint": "46d9b0c118348e0f07996e43b7d9092d15a79a8e3250bed53877e38f5e8461fc",
+      "fingerprint": "d35b7660115a5f7381a3c713bacb430245394310da3599071c8bf9a236340bc0",
       "snapshot": {
-        ".github/workflows/ci.yml": "75441ea00bdc66597feaaa52ec6b24bee07e5e520e55f26fe214815f3a1c015b"
+        ".github/workflows/ci.yml": "e0381109a77f6f7eda9920702cdff13aea807e6f4ae7041128aa0dfa6f11cb5a"
       },
-      "head": "37229410153dfb2f96aa4e4db580a1c539559986",
+      "head": "d4736df66596b9683bccceaf8a5edb9913d6daea",
       "outcome": "no-change",
-      "reason": "Removed obsolete 2-shard matrix on packed-compatibility CI job because the 0.8.0 compatibility matrix has one floor/development combination (effect@4.1.4, @tanstack/query-core@5.107.1); no skill guidance change needed.",
+      "reason": "The source supports repository CI and release generation. It does not affect the shipped library APIs or application guidance.",
       "evidence": [
-        "vp run effect-compatibility (Effect 4.1.4, Query Core 5.107.1, TSRS 0.25.0-ts7.1.0-beta and TS 5.9.3), vp run api-types, vp run framework-types, vp run quality (76 test files, 920 tests), vp run docs-check"
+        "Reviewed the workflow entry point and isolated checkout against d4736df.",
+        "The fixture tests verify malformed commit directives, large diffs, Git errors, inherited Git context, and a clean retry after validation fails."
       ]
     },
     "source:tests/packed-consumer/construction-baseline.mts": {
@@ -4481,17 +4466,16 @@
       "evidence": ["vp run check, vp exec intent maintainer check"]
     },
     "source:scripts/lib/exec.mts": {
-      "fingerprint": "ab4370085f8916e7523c2948752aabcc5b39313e2b4f97126c5627e226e1af5c",
+      "fingerprint": "ff89eeedc4357dd851e3ad4994ba6138942840741152de73ab9aa63e7a883b7c",
       "snapshot": {
-        "scripts/lib/exec.mts": "a51db5cecd0b74f08b49b873c83bde649227fdd9f4fbeeefe30bc1240b210dae"
+        "scripts/lib/exec.mts": "04f58623f94fdc1dbd01279a908261e25eb3e51b763523eeef04dc38ef5facb0"
       },
-      "head": "6897479c900a49fc94e8da66055ba25d1f42390e",
+      "head": "d4736df66596b9683bccceaf8a5edb9913d6daea",
       "outcome": "no-change",
-      "reason": "Extracted internal zero-dependency child_process wrapper scripts/lib/exec.mts used by repository maintenance scripts and updated test fixtures to copy it. No public API, runtime behavior, or consumer guidance changed.",
+      "reason": "The source supports repository CI and release generation. It does not affect the shipped library APIs or application guidance.",
       "evidence": [
-        "vp run check passed with 0 warnings, lint errors, or type errors across 250 files.",
-        "vp run fallow passed with 0 dead-code issues.",
-        "vp test passed 109/109 tests across workflow-guards, version-packages, skills-maintenance, and docs-release."
+        "Reviewed the workflow entry point and isolated checkout against d4736df.",
+        "The fixture tests verify malformed commit directives, large diffs, Git errors, inherited Git context, and a clean retry after validation fails."
       ]
     },
     "source:.changeset/accept-managed-runtimes-for-query-events.md": {
@@ -4765,6 +4749,19 @@
         ".changeset/clear-seeded-stream-reset.md",
         "skills/effect-api-query/references/query-patterns.md",
         "ADR 0001 classifies compatible fixes as patches."
+      ]
+    },
+    "source:scripts/lib/versioning-checkout.mts": {
+      "fingerprint": "130ca1726d9b09b39596baa4310bceb6b48d3602b8e0c0c373b8addf970cd573",
+      "snapshot": {
+        "scripts/lib/versioning-checkout.mts": "04c3a68ae9a744e3e46ba19bd0e8a333fbd50697c25f2a83028c2e6708f4a5d3"
+      },
+      "head": "0c856aa5ff3addeb2061b4ae5685b92f6d0d2e8e",
+      "outcome": "no-change",
+      "reason": "The isolated checkout, streamed patch comparison, and scoped patch recovery support repository release generation. Published library behavior and application guidance retain their existing scope.",
+      "evidence": [
+        "Reviewed scripts/lib/versioning-checkout.mts against d4736df.",
+        "The fixture tests cover large patches, failed Git diffs, inherited Git context and checkout hooks, local changelog settings, and recovery after validation and patch transfer fail."
       ]
     }
   }
