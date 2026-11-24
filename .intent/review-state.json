@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "c203c3e855bcfbeff6c7c71ad972d1f796c0ca75fd44895f33b2f7e3d9436f7a",
+      "fingerprint": "3585e80396b37e3d1292bc1bd8dbd2ce17dcbe8379f25a5057509dc701814304",
       "snapshot": {
         "GLOSSARY.md": "7fa3de9ce2b21e39ad33af675cc200077db85b9a4ae8c15fc9ff63c9d44e1d97",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -199,8 +199,9 @@
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "a272baf9fe3a76649fa65cd6db06121aa97b2623eac33e66bcfc8f0a05ca88e4",
         "examples/vite-react/vite.config.ts": "68b64cb963fcb1fa90330d04519202729d9e692229d25f81a26c14a3733362d9",
-        "package.json": "ec0f87d81f965713c6315d2cd5e0049a7177a6214bdadd69121c8cadfe094ec0",
+        "package.json": "d5b7f7ffaedf4964b16816d89d355564a255cc7692078fcd84546d71c04a88a3",
         "pnpm-workspace.yaml": "fc4bff1fa9ef4a4887691c6e004e02829736f93ee07efcb563f78f836a21a276",
+        "scripts/check-changesets.mts": "f6873750bad442963f37471471a1ceada69ebf3593d9993586a73bce269e5edb",
         "scripts/check-effect-compatibility.mts": "b1de824e27e34089c445f183d1511d8e5f9e463892ff8edf83f76fb8c24778f4",
         "scripts/check-framework-consumers.mts": "fd6e99f4f9d854a0a738afd105094553e31472d525f7236693c235f8140dcad9",
         "scripts/check-toolchain.mts": "3c8efdb93594058ed78947bc65ad51c88ac4b26cab23b0b1fe6f8786a6d386e9",
@@ -216,7 +217,7 @@
         "scripts/performance/common.mts": "6ce0e1c018e08a442fcf787740d7ddd63457069ee932d28b04d8a1b41e136028",
         "scripts/resolve-docs-release.mts": "0ed8db1359b317feadf9479fc7dcefc879b4899279b56c672a95499595644c4e",
         "scripts/verify-docs-version.mts": "58f63de6f871726a5bef8b70d1de7fad591374c52823e3cf60a160a9f37541e8",
-        "scripts/version-packages.mts": "e514a013a90489d8d0ff5eb0620276f923c85fa765061aa4d3f312ac2ee4c7ad",
+        "scripts/version-packages.mts": "1ca732a8744059fbaba75324aa5e6d82ad5802e79f857536c799217a466d1ab6",
         "skills/effect-api-query/SKILL.md": "baa3087574b4a2d209b970e6245a0e8ef560aa9041e75c38e8d039e262031cc2",
         "skills/effect-api-query/references/cache-workflows.md": "c5dcfe3fffe553c04fd1466264b12ac7b367af4e2b7f6aa05edf0c61733bc272",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "4809f54726f8b2b31e1130ff6eae92fbdfae07e6a40f25c73c9bfd3ea24f66f7",
@@ -420,20 +421,20 @@
         "tests/types/type-scale.ts": "0a6472b438c7ef14c3ee5b030b500ab6f66f13e7cd50250a3b0798bdec48c8a7",
         "tests/types/utility-configuration-contract.ts": "ae3fb53c4f8e1f7723345374749c9130aa7f1a6b40a306d77b2918ba75c8985f",
         "tests/utility-configuration.test.ts": "55361de62fbb7e7695c94f940de566c2e35d218539a77b6ab1000877f71ad288",
-        "tests/version-packages.test.ts": "c043e1877c54aab8fe2119de324909a3f671e5aea60cdfe6778f63abffc313c1",
+        "tests/version-packages.test.ts": "508dd54effa563ebbab43d710556ad3257948fce8771ee571448bf2c0bb37e34",
         "tests/workflow-guards.test.ts": "563c464dfb45e0873138aff38d323cdfb64b7e6caae84f70fa46db4c65dba410",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "7a2bf42cd2777f1d16a0fb66261e71b61d3fee70",
+      "head": "a4b238e01bf835d366ab77e654024a1f864dc9e6",
       "outcome": "updated",
-      "reason": "The standalone example now requires an exact browser origin allowlist for direct reads. The framework reference points to setup and retains proxy-based session guidance.",
+      "reason": "The standalone example defaults to same-origin access. The framework reference points to the explicit origin allowlist for direct browser reads, and demo write sessions continue to use the same-origin proxy.",
       "evidence": [
-        "Pinned base 1182c6ef; examples/server/src/server.ts and main.ts implement the standalone policy, and apps/docs/src/content/docs/examples.md documents EXAMPLE_ALLOWED_ORIGINS.",
-        "All 53 standalone tests passed, including production entry-point protocol coverage. A standalone CLI smoke verified environment setup. Intent skill validation passed. Fresh consumer-agent discovery was not exercised."
+        "Compared the standalone server, tests, examples page, and framework reference with origin/main at 303f1d1. The runtime uses exact serialized origins and preserves the shared body limit and session checks.",
+        "All 53 standalone tests passed, including CORS, body limits, transport cancellation, and IPv6. The standalone CLI smoke verified the environment allowlist. The documentation check passed 24 excerpt tests, and skill validation passed. Fresh consumer-agent discovery remains unverified."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "96ef2c3ceab7d04d7cc9b6c8fd58dcf18b79f14cdc11d2efa9ab734263a47011",
+      "fingerprint": "92759d78eadb727fb5a454dbbf1be901b23e18ec7e997869ae1cbed5c8ab6cf5",
       "snapshot": {
         "GLOSSARY.md": "7fa3de9ce2b21e39ad33af675cc200077db85b9a4ae8c15fc9ff63c9d44e1d97",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -632,8 +633,9 @@
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "a272baf9fe3a76649fa65cd6db06121aa97b2623eac33e66bcfc8f0a05ca88e4",
         "examples/vite-react/vite.config.ts": "68b64cb963fcb1fa90330d04519202729d9e692229d25f81a26c14a3733362d9",
-        "package.json": "ec0f87d81f965713c6315d2cd5e0049a7177a6214bdadd69121c8cadfe094ec0",
+        "package.json": "d5b7f7ffaedf4964b16816d89d355564a255cc7692078fcd84546d71c04a88a3",
         "pnpm-workspace.yaml": "fc4bff1fa9ef4a4887691c6e004e02829736f93ee07efcb563f78f836a21a276",
+        "scripts/check-changesets.mts": "f6873750bad442963f37471471a1ceada69ebf3593d9993586a73bce269e5edb",
         "scripts/check-effect-compatibility.mts": "b1de824e27e34089c445f183d1511d8e5f9e463892ff8edf83f76fb8c24778f4",
         "scripts/check-framework-consumers.mts": "fd6e99f4f9d854a0a738afd105094553e31472d525f7236693c235f8140dcad9",
         "scripts/check-toolchain.mts": "3c8efdb93594058ed78947bc65ad51c88ac4b26cab23b0b1fe6f8786a6d386e9",
@@ -649,7 +651,7 @@
         "scripts/performance/common.mts": "6ce0e1c018e08a442fcf787740d7ddd63457069ee932d28b04d8a1b41e136028",
         "scripts/resolve-docs-release.mts": "0ed8db1359b317feadf9479fc7dcefc879b4899279b56c672a95499595644c4e",
         "scripts/verify-docs-version.mts": "58f63de6f871726a5bef8b70d1de7fad591374c52823e3cf60a160a9f37541e8",
-        "scripts/version-packages.mts": "e514a013a90489d8d0ff5eb0620276f923c85fa765061aa4d3f312ac2ee4c7ad",
+        "scripts/version-packages.mts": "1ca732a8744059fbaba75324aa5e6d82ad5802e79f857536c799217a466d1ab6",
         "skills/effect-api-query/SKILL.md": "baa3087574b4a2d209b970e6245a0e8ef560aa9041e75c38e8d039e262031cc2",
         "skills/effect-api-query/references/cache-workflows.md": "c5dcfe3fffe553c04fd1466264b12ac7b367af4e2b7f6aa05edf0c61733bc272",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "4809f54726f8b2b31e1130ff6eae92fbdfae07e6a40f25c73c9bfd3ea24f66f7",
@@ -853,16 +855,16 @@
         "tests/types/type-scale.ts": "0a6472b438c7ef14c3ee5b030b500ab6f66f13e7cd50250a3b0798bdec48c8a7",
         "tests/types/utility-configuration-contract.ts": "ae3fb53c4f8e1f7723345374749c9130aa7f1a6b40a306d77b2918ba75c8985f",
         "tests/utility-configuration.test.ts": "55361de62fbb7e7695c94f940de566c2e35d218539a77b6ab1000877f71ad288",
-        "tests/version-packages.test.ts": "c043e1877c54aab8fe2119de324909a3f671e5aea60cdfe6778f63abffc313c1",
+        "tests/version-packages.test.ts": "508dd54effa563ebbab43d710556ad3257948fce8771ee571448bf2c0bb37e34",
         "tests/workflow-guards.test.ts": "563c464dfb45e0873138aff38d323cdfb64b7e6caae84f70fa46db4c65dba410",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "7a2bf42cd2777f1d16a0fb66261e71b61d3fee70",
+      "head": "a4b238e01bf835d366ab77e654024a1f864dc9e6",
       "outcome": "updated",
-      "reason": "The domain map records the same-origin and direct read setup, the skill spec records #247, and existing tree globs already own every changed source and setup path.",
+      "reason": "The domain map records the explicit allowlist and same-origin sessions. The skill spec records the standalone transport batch. The existing skill tree maps the server, tests, and setup guidance.",
       "evidence": [
-        "_artifacts/domain_map.yaml, _artifacts/skill_spec.md, and _artifacts/skill_tree.yaml were reconciled against the 1182c6ef diff.",
-        "All 53 standalone tests and Intent skill validation passed. maintainer sync reported nothing to synchronize."
+        "Compared the domain map, skill spec, skill tree, and framework reference with origin/main at 303f1d1. Both YAML files parsed, and maintainer sync found nothing to synchronize.",
+        "All 53 standalone tests and the standalone CLI smoke passed. The documentation and skill checks passed."
       ]
     },
     "source:vite.config.ts": {
@@ -953,15 +955,16 @@
       "evidence": ["vp run check, vp run fallow"]
     },
     "source:.github/workflows/ci.yml": {
-      "fingerprint": "46d9b0c118348e0f07996e43b7d9092d15a79a8e3250bed53877e38f5e8461fc",
+      "fingerprint": "d35b7660115a5f7381a3c713bacb430245394310da3599071c8bf9a236340bc0",
       "snapshot": {
-        ".github/workflows/ci.yml": "75441ea00bdc66597feaaa52ec6b24bee07e5e520e55f26fe214815f3a1c015b"
+        ".github/workflows/ci.yml": "e0381109a77f6f7eda9920702cdff13aea807e6f4ae7041128aa0dfa6f11cb5a"
       },
-      "head": "37229410153dfb2f96aa4e4db580a1c539559986",
+      "head": "b09a96385dbffd22806fe55aee3ef70cbfe8d122",
       "outcome": "no-change",
-      "reason": "Removed obsolete 2-shard matrix on packed-compatibility CI job because the 0.8.0 compatibility matrix has one floor/development combination (effect@4.1.4, @tanstack/query-core@5.107.1); no skill guidance change needed.",
+      "reason": "The CI entry point validates parsed Changeset notes before source checks. This supports release maintenance outside the shipped skill's application guidance.",
       "evidence": [
-        "vp run effect-compatibility (Effect 4.1.4, Query Core 5.107.1, TSRS 0.25.0-ts7.1.0-beta and TS 5.9.3), vp run api-types, vp run framework-types, vp run quality (76 test files, 920 tests), vp run docs-check"
+        "node scripts/check-changesets.mts passed on the merged checkout. Focused versioning fixtures passed for valid and malformed directives.",
+        "actionlint and yamllint passed. Offline zizmor reported the same six advisories as 1182c6e."
       ]
     },
     "source:tests/packed-consumer/construction-baseline.mts": {
@@ -4465,17 +4468,16 @@
       "evidence": ["vp run check, vp exec intent maintainer check"]
     },
     "source:scripts/lib/exec.mts": {
-      "fingerprint": "ab4370085f8916e7523c2948752aabcc5b39313e2b4f97126c5627e226e1af5c",
+      "fingerprint": "ff89eeedc4357dd851e3ad4994ba6138942840741152de73ab9aa63e7a883b7c",
       "snapshot": {
-        "scripts/lib/exec.mts": "a51db5cecd0b74f08b49b873c83bde649227fdd9f4fbeeefe30bc1240b210dae"
+        "scripts/lib/exec.mts": "04f58623f94fdc1dbd01279a908261e25eb3e51b763523eeef04dc38ef5facb0"
       },
-      "head": "6897479c900a49fc94e8da66055ba25d1f42390e",
+      "head": "b09a96385dbffd22806fe55aee3ef70cbfe8d122",
       "outcome": "no-change",
-      "reason": "Extracted internal zero-dependency child_process wrapper scripts/lib/exec.mts used by repository maintenance scripts and updated test fixtures to copy it. No public API, runtime behavior, or consumer guidance changed.",
+      "reason": "The command helpers accept an optional explicit environment for isolated Git and Changesets commands. Existing callers that omit it still inherit the process environment.",
       "evidence": [
-        "vp run check passed with 0 warnings, lint errors, or type errors across 250 files.",
-        "vp run fallow passed with 0 dead-code issues.",
-        "vp test passed 109/109 tests across workflow-guards, version-packages, skills-maintenance, and docs-release."
+        "Reviewed the optional env forwarding in capture and run.",
+        "Focused versioning and guard fixtures passed, including inherited Git context and worktree-local changelog settings."
       ]
     },
     "source:.changeset/accept-managed-runtimes-for-query-events.md": {
@@ -4763,6 +4765,19 @@
         "docs/adr/0059-version-and-isolate-generated-query-keys.md and .changeset/isolate-generated-key-namespaces.md at b483858",
         "Public runtime, compiler, compatibility and format checks passed.",
         "Revalidated the complete suite after incorporating main at 7aeff4e. The reviewed runtime and compiler fixtures are unchanged."
+      ]
+    },
+    "source:scripts/lib/versioning-checkout.mts": {
+      "fingerprint": "85b6b4b3988eb7c639cf730e1a18c8c69220f4fd6585a1700f4ce459907c4f29",
+      "snapshot": {
+        "scripts/lib/versioning-checkout.mts": "70213fb5d4e3b65266be917145abe429e5c0270524e6593c48327f8d3acb26f5"
+      },
+      "head": "b09a96385dbffd22806fe55aee3ef70cbfe8d122",
+      "outcome": "no-change",
+      "reason": "Versioning isolates generation, digests the generated patch, and transfers validated edits. On failed transfer, recovery restores only generated paths observed to match the candidate and skips recreated deletions. Concurrent writes can race that comparison. This checkout helper has no effect on consumer guidance.",
+      "evidence": [
+        "Reviewed scripts/lib/versioning-checkout.mts and its call site at b09a963 against 1182c6e.",
+        "Disposable fixtures passed for large patches, failed Git diffs, pre-transfer validation and retry, clean restoration after failed apply, and preservation of a caller edit and a recreated note."
       ]
     }
   }

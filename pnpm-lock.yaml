@@ -249,6 +249,9 @@ importers:
       '@changesets/config':
         specifier: 4.0.1
         version: 4.0.1
+      '@changesets/read':
+        specifier: 1.0.1
+        version: 1.0.1
       '@effect-api-query/contracts':
         specifier: workspace:*
         version: link:examples/contracts

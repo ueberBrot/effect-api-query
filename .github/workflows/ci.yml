@@ -43,6 +43,9 @@ jobs:
         with:
           dependency-cache: ${{ inputs.dependency-cache || 'fresh' }}
 
+      - name: Validate Changeset commit directives
+        run: node scripts/check-changesets.mts
+
       - name: Verify formatting
         run: vp run format
 
