@@ -3,6 +3,7 @@ import { MutationObserver, QueryObserver } from "@tanstack/react-query";
 import { Effect, Exit, Scope } from "effect";
 import { describe, expect, it } from "vite-plus/test";
 
+import { startExampleServerFixture } from "../../server/tests/fixtures/example-server.ts";
 import { startViteReactApplication } from "../src/lib/application.ts";
 import type { ViteReactApplication } from "../src/lib/application.ts";
 
@@ -193,8 +194,8 @@ describe("Cancellable commands", () => {
 
   it("keeps command IDs idempotent across early cancellation, completion, and reset", async () => {
     const scope = await Effect.runPromise(Scope.make());
-    const server = await Effect.runPromise(
-      startExampleRpcServer().pipe(Scope.provide(scope))
+    const { server, reset } = await Effect.runPromise(
+      startExampleServerFixture().pipe(Scope.provide(scope))
     );
     const application = await startViteReactApplication({
       rpcUrl: server.rpcUrl,
@@ -223,11 +224,7 @@ describe("Cancellable commands", () => {
         cancelled: await cancel.mutate(input),
       }).toStrictEqual({ started: cancelled, cancelled });
 
-      const reset = new MutationObserver(
-        queryClient,
-        rpcQuery.testing.reset.mutationOptions()
-      );
-      await reset.mutate();
+      await Effect.runPromise(reset);
       const [completed, duplicate] = await Promise.all([
         start.mutate(input),
         start.mutate(input),
@@ -254,8 +251,8 @@ describe("Cancellable commands", () => {
 
   it("resets running commands before allowing their operation IDs to be reused", async () => {
     const scope = await Effect.runPromise(Scope.make());
-    const server = await Effect.runPromise(
-      startExampleRpcServer().pipe(Scope.provide(scope))
+    const { server, reset } = await Effect.runPromise(
+      startExampleServerFixture().pipe(Scope.provide(scope))
     );
     const application = await startViteReactApplication({
       rpcUrl: server.rpcUrl,
@@ -275,11 +272,7 @@ describe("Cancellable commands", () => {
           return status?.completedSteps ?? 0;
         })
         .toBeGreaterThan(0);
-      const reset = new MutationObserver(
-        queryClient,
-        rpcQuery.testing.reset.mutationOptions()
-      );
-      await reset.mutate();
+      await Effect.runPromise(reset);
       await expect(running).resolves.toMatchObject({
         state: "cancelled",
         totalSteps: 40,

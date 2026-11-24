@@ -6,6 +6,7 @@ import {
   NodeStream,
 } from "@effect/platform-node";
 import { Effect, Option, Schema } from "effect";
+import type { Layer } from "effect";
 import {
   HttpEffect,
   HttpServerError,
@@ -13,6 +14,7 @@ import {
   HttpServerResponse,
 } from "effect/http";
 
+import type { ExampleDomain } from "./domain.ts";
 import { makeExampleWebHandler } from "./web-handler.ts";
 
 // oxlint-disable-next-line unicorn/throw-new-error
@@ -42,6 +44,7 @@ export interface RunningExampleRpcServer {
 }
 
 export interface StartExampleRpcServerOptions {
+  readonly domainLayer?: Layer.Layer<ExampleDomain>;
   readonly host?: string;
   readonly port?: number;
 }
@@ -51,7 +54,7 @@ export const startExampleRpcServer = Effect.fn(
 )((options: StartExampleRpcServerOptions = {}) =>
   Effect.gen(function* () {
     const host = options.host ?? "127.0.0.1";
-    const webHandler = yield* makeExampleWebHandler();
+    const webHandler = yield* makeExampleWebHandler(options.domainLayer);
     const nodeServer = createServer();
     const server = yield* NodeHttpServer.make(() => nodeServer, {
       disablePreemptiveShutdown: true,

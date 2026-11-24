@@ -123,15 +123,6 @@ const UsersDelete = Rpc.make("users.delete", {
   error: Schema.Literal("user-not-found"),
 }).middleware(ExampleAuthorization);
 
-const TestingReset = Rpc.make("testing.reset", {
-  success: Schema.Void,
-});
-
-const TestingSeed = Rpc.make("testing.seed", {
-  payload: { users: Schema.Array(SeedUser) },
-  success: Schema.Array(User),
-});
-
 const DiagnosticsSlow = Rpc.make("diagnostics.slow", {
   payload: {
     durationMs: Schema.Int.pipe(
@@ -191,8 +182,6 @@ export const exampleRpcGroup = RpcGroup.make(
   UsersPage,
   UsersCreate,
   UsersDelete,
-  TestingReset,
-  TestingSeed,
   DiagnosticsSlow,
   DiagnosticsCancel,
   DiagnosticsStatusRpc,

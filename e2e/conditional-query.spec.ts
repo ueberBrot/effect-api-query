@@ -1,17 +1,18 @@
-import { expect, test } from "@playwright/test";
+import { expect } from "@playwright/test";
 
 import {
+  exampleTest,
   prepareExampleApplication,
   recordsRpc,
-  tanStackStartApplication,
-  viteReactApplication,
+  startExampleTest,
 } from "./example-application.ts";
 
-for (const [name, application] of [
-  ["Vite React", viteReactApplication],
-  ["TanStack Start", tanStackStartApplication],
+for (const [name, test] of [
+  ["Vite React", exampleTest],
+  ["TanStack Start", startExampleTest],
 ] as const) {
   test(`${name} pauses user lookup and preserves selection and cache options`, async ({
+    exampleUrl,
     page,
   }) => {
     let lookupRequests = 0;
@@ -25,7 +26,7 @@ for (const [name, application] of [
       }
     });
     await page.clock.install();
-    await prepareExampleApplication(page, application);
+    await prepareExampleApplication(page, exampleUrl);
     const lookup = page.getByRole("region", {
       name: "Conditional user lookup",
     });

@@ -1,16 +1,27 @@
-import { expect, test } from "@playwright/test";
+import { expect } from "@playwright/test";
+
+import { exampleTest as test } from "./example-application.ts";
 
 for (const application of [
-  { name: "Vite React", url: "http://127.0.0.1:4173/" },
-  { name: "TanStack Start", url: "http://127.0.0.1:3000/workflows" },
-]) {
+  {
+    name: "Vite React",
+    exampleHost: "standalone",
+    path: "/",
+  },
+  {
+    name: "TanStack Start",
+    exampleHost: "start",
+    path: "/workflows",
+  },
+] as const) {
   test.describe(application.name, () => {
-    const baseUrl = application.url;
+    test.use({ exampleHost: application.exampleHost });
 
     test("a first typed write seeds the generated cache entry", async ({
+      exampleUrl,
       page,
     }) => {
-      await page.goto(`${baseUrl}?example=minimal`);
+      await page.goto(`${exampleUrl}${application.path}?example=minimal`);
       await expect(
         page.getByRole("heading", { name: "First read and write" })
       ).toBeVisible();
@@ -28,9 +39,10 @@ for (const application of [
     });
 
     test("metadata writes expose typed validation and revision conflicts", async ({
+      exampleUrl,
       page,
     }) => {
-      await page.goto(`${baseUrl}?example=metadata`);
+      await page.goto(`${exampleUrl}${application.path}?example=metadata`);
       await expect(page.getByText("HTTP status: 200")).toBeVisible();
       await page
         .getByRole("button", { name: "Remember this revision" })
@@ -59,9 +71,10 @@ for (const application of [
 
     for (const format of ["sse", "ndjson"]) {
       test(`${format} retains four updates, exposes the latest value, and cancels`, async ({
+        exampleUrl,
         page,
       }) => {
-        await page.goto(`${baseUrl}?example=streams`);
+        await page.goto(`${exampleUrl}${application.path}?example=streams`);
         await page.getByLabel("HTTP stream format").selectOption(format);
         await page.getByRole("button", { name: "Start streams" }).click();
         await expect(
@@ -87,9 +100,10 @@ for (const application of [
     }
 
     test("multipart upload reports the received file and rejects an oversized selection", async ({
+      exampleUrl,
       page,
     }) => {
-      await page.goto(`${baseUrl}?example=upload`);
+      await page.goto(`${exampleUrl}${application.path}?example=upload`);
       await page.getByLabel("Attachment", { exact: true }).setInputFiles({
         name: "notes.txt",
         mimeType: "text/plain",
@@ -111,9 +125,10 @@ for (const application of [
     });
 
     test("schema sharing preserves memoized cards until their decoded data changes", async ({
+      exampleUrl,
       page,
     }) => {
-      await page.goto(`${baseUrl}?example=sharing`);
+      await page.goto(`${exampleUrl}${application.path}?example=sharing`);
       const cards = page
         .getByRole("list", { name: "Decoded readings" })
         .getByRole("listitem");
@@ -157,8 +172,11 @@ for (const application of [
       { scenario: "gap", sequences: "1, 2, 3, 5, 6, 7, 8", refreshes: 1 },
       { scenario: "expired", sequences: "1, 2, 3, 6, 7, 8", refreshes: 1 },
     ]) {
-      test(`event delivery recovers ${scenario}`, async ({ page }) => {
-        await page.goto(`${baseUrl}?example=events`);
+      test(`event delivery recovers ${scenario}`, async ({
+        exampleUrl,
+        page,
+      }) => {
+        await page.goto(`${exampleUrl}${application.path}?example=events`);
         await page.getByLabel("Delivery scenario").selectOption(scenario);
         await page.getByRole("button", { name: "Consume events" }).click();
         await expect(

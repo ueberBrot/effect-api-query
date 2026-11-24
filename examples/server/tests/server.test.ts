@@ -1,7 +1,7 @@
 import dns from "node:dns";
 import { request as nodeRequest } from "node:http";
 
-import { SeedUser, User } from "@effect-api-query/contracts";
+import { exampleRpcGroup, SeedUser, User } from "@effect-api-query/contracts";
 import type { DiagnosticStatus } from "@effect-api-query/contracts";
 import {
   makeExampleRpcClient,
@@ -26,6 +26,7 @@ import {
 import { RpcClient } from "effect/rpc";
 
 import { makeDiagnosticOperations } from "../src/diagnostic-operations.ts";
+import { startExampleServerFixture } from "./fixtures/example-server.ts";
 
 const waitForStatus = Effect.fn("TestExampleRpc.waitForStatus")(
   function* waitForStatus(
@@ -47,6 +48,12 @@ const waitForStatus = Effect.fn("TestExampleRpc.waitForStatus")(
 );
 
 describe("example RPC server", () => {
+  it("keeps fixture operations out of the shared public RPC contract", () => {
+    expect(exampleRpcGroup.requests.has("users.list")).toBe(true);
+    expect(exampleRpcGroup.requests.has("testing.seed")).toBe(false);
+    expect(exampleRpcGroup.requests.has("testing.reset")).toBe(false);
+  });
+
   it.effect(
     "keeps captured diagnostic statuses intact across later operations and reset",
     () =>
@@ -251,13 +258,11 @@ describe("example RPC server", () => {
   });
 
   it.effect(
-    "serves deterministic user state over HTTP and resets it explicitly",
+    "restores the public user directory through the trusted fixture",
     () =>
       Effect.gen(function* resetUserDirectory() {
-        const server = yield* startExampleRpcServer();
+        const { server, reset } = yield* startExampleServerFixture();
         const client = yield* makeExampleRpcClient(server.rpcUrl);
-        // oxlint-disable-next-line unicorn/no-useless-undefined
-        yield* client["testing.reset"](undefined);
 
         // oxlint-disable-next-line unicorn/no-useless-undefined
         const initialDirectory = yield* client["users.list"](undefined);
@@ -281,8 +286,7 @@ describe("example RPC server", () => {
           })
         );
 
-        // oxlint-disable-next-line unicorn/no-useless-undefined
-        expect(yield* client["testing.reset"](undefined)).toBeUndefined();
+        yield* reset;
         // oxlint-disable-next-line unicorn/no-useless-undefined
         expect(yield* client["users.list"](undefined)).toStrictEqual(
           initialDirectory
@@ -290,15 +294,13 @@ describe("example RPC server", () => {
       })
   );
 
-  it.live("seeds deterministic users and applies locale defaults", () =>
+  it.live("seeds the public directory through the trusted fixture", () =>
     Effect.gen(function* seedUserDefaults() {
-      const server = yield* startExampleRpcServer();
+      const { server, seed } = yield* startExampleServerFixture();
       const client = yield* makeExampleRpcClient(server.rpcUrl);
-      // oxlint-disable-next-line unicorn/no-useless-undefined
-      yield* client["testing.reset"](undefined);
 
       expect(
-        yield* client["testing.seed"]({
+        yield* seed({
           users: [
             new SeedUser({ name: "Grace Hopper" }),
             new SeedUser({ locale: "nl", name: "Dijkstra" }),
@@ -320,9 +322,9 @@ describe("example RPC server", () => {
 
   it.live("requires authorization to delete a seeded user", () =>
     Effect.gen(function* authorizeUserDeletion() {
-      const server = yield* startExampleRpcServer();
+      const { server, seed } = yield* startExampleServerFixture();
       const client = yield* makeExampleRpcClient(server.rpcUrl);
-      yield* client["testing.seed"]({
+      yield* seed({
         users: [
           new SeedUser({ name: "Grace Hopper" }),
           new SeedUser({ locale: "nl", name: "Dijkstra" }),
@@ -394,8 +396,7 @@ describe("example RPC server", () => {
     Effect.gen(function* reportSlowInterruption() {
       const server = yield* startExampleRpcServer();
       const client = yield* makeExampleRpcClient(server.rpcUrl);
-      // oxlint-disable-next-line unicorn/no-useless-undefined
-      yield* client["testing.reset"](undefined);
+
       const slow = yield* client["diagnostics.slow"]({
         durationMs: 60_000,
       }).pipe(Effect.forkChild);
@@ -427,8 +428,6 @@ describe("example RPC server", () => {
           }).pipe(Effect.orDie)
       );
       const observer = yield* makeExampleRpcClient(server.rpcUrl);
-      // oxlint-disable-next-line unicorn/no-useless-undefined
-      yield* observer["testing.reset"](undefined);
 
       const running = subject.runtime(
         subject.client["diagnostics.slow"]({
@@ -464,8 +463,7 @@ describe("example RPC server", () => {
       const server = yield* startExampleRpcServer();
       const firstClient = yield* makeExampleRpcClient(server.rpcUrl);
       const secondClient = yield* makeExampleRpcClient(server.rpcUrl);
-      // oxlint-disable-next-line unicorn/no-useless-undefined
-      yield* firstClient["testing.reset"](undefined);
+
       const firstSlow = yield* firstClient["diagnostics.slow"]({
         durationMs: 60_000,
       }).pipe(Effect.forkChild);

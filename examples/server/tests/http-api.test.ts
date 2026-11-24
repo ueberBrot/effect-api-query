@@ -12,6 +12,8 @@ import { Effect, Exit, Fiber, Schema, Scope } from "effect";
 import { FetchHttpClient } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
 
+import { startExampleServerFixture } from "./fixtures/example-server.ts";
+
 describe("example HTTP API", () => {
   it.effect(
     "shares user state with RPC and returns no content after deletion",
@@ -296,7 +298,7 @@ describe("example HTTP API", () => {
     "tracks and cancels simultaneous RPC and HTTP diagnostic operations independently",
     () =>
       Effect.gen(function* cancelIndependentDiagnostics() {
-        const server = yield* startExampleRpcServer();
+        const { server, reset } = yield* startExampleServerFixture();
         const rpc = yield* makeExampleRpcClient(server.rpcUrl);
         const readStatus = async (
           id: string,
@@ -359,8 +361,7 @@ describe("example HTTP API", () => {
         });
         // oxlint-disable-next-line unicorn/no-useless-undefined
         const beforeReset = yield* rpc["diagnostics.status"](undefined);
-        // oxlint-disable-next-line unicorn/no-useless-undefined
-        yield* rpc["testing.reset"](undefined);
+        yield* reset;
         expect({
           beforeReset,
           afterReset: yield* Effect.promise(

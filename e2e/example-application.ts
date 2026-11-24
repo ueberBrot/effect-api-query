@@ -1,32 +1,71 @@
-import { expect } from "@playwright/test";
+import { fork } from "node:child_process";
+import { once } from "node:events";
+import { fileURLToPath } from "node:url";
+
+import { expect, test as base } from "@playwright/test";
 import type { Page, Request } from "@playwright/test";
+import { Schema } from "effect";
 
-export interface ExampleApplication {
-  readonly heading: string;
-  readonly url: string;
-}
+const decodeOrigin = Schema.decodeUnknownSync(Schema.String);
 
-export const tanStackStartApplication = {
-  heading: "Compare full queries, pages, and streams",
-  url: "http://127.0.0.1:3000",
-} satisfies ExampleApplication;
+export const exampleTest = base.extend<{
+  exampleHost: "standalone" | "start";
+  exampleUrl: string;
+}>({
+  exampleHost: ["standalone", { option: true }],
+  exampleUrl: [
+    async ({ exampleHost }, use) => {
+      const host = fork(
+        fileURLToPath(new URL("example-host.ts", import.meta.url)),
+        [exampleHost],
+        {
+          execArgv: ["--import", "tsx"],
+          stdio: ["ignore", "ignore", "inherit", "ipc"],
+        }
+      );
+      const exited = once(host, "exit");
+      try {
+        const message = await Promise.race([
+          once(host, "message", { signal: AbortSignal.timeout(15_000) }),
+          (async () => {
+            await exited;
+            throw new Error(
+              `Example host exited during startup (${host.exitCode ?? host.signalCode})`
+            );
+          })(),
+        ]);
+        await use(decodeOrigin(message[0]));
+      } finally {
+        if (host.connected) {
+          host.disconnect();
+        }
+        const forceExit = setTimeout(() => {
+          host.kill("SIGKILL");
+        }, 5000).unref();
+        try {
+          await exited;
+        } finally {
+          clearTimeout(forceExit);
+        }
+      }
+      expect(host.exitCode, "example host exit code").toBe(0);
+    },
+    { auto: true },
+  ],
+});
 
-export const viteReactApplication = {
-  heading: "Compare full queries, pages, and streams",
-  url: "http://127.0.0.1:4173",
-} satisfies ExampleApplication;
+export const startExampleTest = exampleTest.extend({ exampleHost: "start" });
 
 export const prepareExampleApplication = async (
   page: Page,
-  application: ExampleApplication
+  exampleUrl: string
 ): Promise<void> => {
-  await page.goto(application.url);
+  await page.goto(exampleUrl);
   await expect(
-    page.getByRole("heading", { name: application.heading })
+    page.getByRole("heading", {
+      name: "Compare full queries, pages, and streams",
+    })
   ).toBeVisible();
-  await page.getByRole("button", { name: "Reset directory" }).click();
-  await expect(page.getByText("Ada Lovelace", { exact: true })).toBeVisible();
-  await page.reload();
   await expect(page.getByText("Ada Lovelace", { exact: true })).toBeVisible();
 };
 

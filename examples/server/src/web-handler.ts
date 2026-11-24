@@ -118,10 +118,11 @@ const makeRpcWebHandler = Effect.fn("ExampleRpc.makeRpcWebHandler")(
 );
 
 const provideDomain = Effect.fn("ExampleDomain.provide")(function* <A, E, R>(
-  effect: Effect.Effect<A, E, R | ExampleDomain>
+  effect: Effect.Effect<A, E, R | ExampleDomain>,
+  domainLayer = ExampleDomain.layer
 ) {
   const scope = yield* Scope.Scope;
-  const context = yield* Layer.buildWithScope(ExampleDomain.layer, scope);
+  const context = yield* Layer.buildWithScope(domainLayer, scope);
   return yield* Effect.provide(effect, context);
 });
 
@@ -204,6 +205,6 @@ export type ExampleHost = Effect.Success<ReturnType<typeof makeExampleHost>>;
 
 export const makeExampleWebHandler = Effect.fn(
   "ExampleServer.makeExampleWebHandler"
-)(() =>
-  makeExampleHost().pipe(Effect.map(({ handleRequest }) => handleRequest))
+)((domainLayer: Layer.Layer<ExampleDomain> = ExampleDomain.layer) =>
+  provideDomain(makeHostWebHandler(), domainLayer)
 );

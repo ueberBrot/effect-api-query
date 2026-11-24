@@ -1,16 +1,16 @@
-import { expect, test } from "@playwright/test";
+import { expect } from "@playwright/test";
 import type { Request } from "@playwright/test";
 
 import {
   isHttpRequest,
+  exampleTest as test,
   prepareExampleApplication,
   recordsRpc,
-  viteReactApplication,
 } from "./example-application.ts";
 
 test.describe("Vite React HTTP API example", () => {
-  test.beforeEach(async ({ page }) => {
-    await prepareExampleApplication(page, viteReactApplication);
+  test.beforeEach(async ({ exampleUrl, page }) => {
+    await prepareExampleApplication(page, exampleUrl);
   });
 
   test("reuses the HTTP directory cache and skips an unselected user query", async ({

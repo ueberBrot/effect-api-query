@@ -1,15 +1,16 @@
 import { createServer, request as nodeRequest } from "node:http";
 
-import { expect, test } from "@playwright/test";
+import { expect } from "@playwright/test";
 import { Schema } from "effect";
 
 import {
   prepareExampleApplication,
+  startExampleTest as test,
   recordsRpc,
-  tanStackStartApplication,
 } from "./example-application.ts";
 
 test("the featured loader descriptor hydrates without a browser RPC", async ({
+  exampleUrl,
   page,
 }) => {
   const browserReads: string[] = [];
@@ -18,7 +19,7 @@ test("the featured loader descriptor hydrates without a browser RPC", async ({
       browserReads.push(request.url());
     }
   });
-  await page.goto(`${tanStackStartApplication.url}/details`);
+  await page.goto(`${exampleUrl}/details`);
   await expect(
     page.getByRole("heading", { name: "Featured user" })
   ).toBeVisible();
@@ -28,11 +29,13 @@ test("the featured loader descriptor hydrates without a browser RPC", async ({
   expect(browserReads).toStrictEqual([]);
 });
 
-test("Start rejects an oversized upload before the sender ends the request", async () => {
+test("Start rejects an oversized upload before the sender ends the request", async ({
+  exampleUrl,
+}) => {
   // oxlint-disable-next-line promise/avoid-new
   const status = await new Promise<number | undefined>((resolve, reject) => {
     const request = nodeRequest(
-      `${tanStackStartApplication.url}/rpc`,
+      `${exampleUrl}/rpc`,
       { method: "POST" },
       (response) => {
         response.resume();
@@ -52,6 +55,7 @@ test("Start rejects an oversized upload before the sender ends the request", asy
 });
 
 test("SSR keeps its RPC destination independent of incoming host headers", async ({
+  exampleUrl,
   request,
 }) => {
   let redirectedRequests = 0;
@@ -68,16 +72,13 @@ test("SSR keeps its RPC destination independent of incoming host headers", async
       Schema.Struct({ port: Schema.Int })
     )(destination.address());
     const host = `127.0.0.1:${String(address.port)}`;
-    const response = await request.get(
-      `${tanStackStartApplication.url}/details`,
-      {
-        headers: {
-          host,
-          "x-forwarded-host": host,
-          "x-forwarded-proto": "http",
-        },
-      }
-    );
+    const response = await request.get(`${exampleUrl}/details`, {
+      headers: {
+        host,
+        "x-forwarded-host": host,
+        "x-forwarded-proto": "http",
+      },
+    });
     expect(redirectedRequests).toBe(0);
     expect(response.ok()).toBe(true);
     expect(await response.text()).toContain("Ada Lovelace");
@@ -97,12 +98,13 @@ test("SSR keeps its RPC destination independent of incoming host headers", async
 });
 
 test.describe("TanStack Start application", () => {
-  test.beforeEach(async ({ page }) => {
-    await prepareExampleApplication(page, tanStackStartApplication);
+  test.beforeEach(async ({ exampleUrl, page }) => {
+    await prepareExampleApplication(page, exampleUrl);
   });
 
   test("server-renders and hydrates without a duplicate successful query", async ({
     browser,
+    exampleUrl,
     page,
   }) => {
     const serverRenderedContext = await browser.newContext({
@@ -110,9 +112,7 @@ test.describe("TanStack Start application", () => {
     });
     try {
       const serverRenderedPage = await serverRenderedContext.newPage();
-      const serverRenderedResponse = await serverRenderedPage.goto(
-        tanStackStartApplication.url
-      );
+      const serverRenderedResponse = await serverRenderedPage.goto(exampleUrl);
 
       expect(serverRenderedResponse?.ok()).toBe(true);
       await expect(
@@ -198,7 +198,10 @@ test.describe("TanStack Start application", () => {
     expect(browserListRequests).toBe(0);
   });
 
-  test("hydrates and advances an infinite query", async ({ page }) => {
+  test("hydrates and advances an infinite query", async ({
+    exampleUrl,
+    page,
+  }) => {
     await expect(page.getByText("4 of 12 loaded")).toBeVisible();
     await expect(page.getByText("Page 1: 4 users")).toBeVisible();
 
@@ -211,7 +214,7 @@ test.describe("TanStack Start application", () => {
 
     const rpcUrl = new URL(rpcResponse.url());
     expect(rpcResponse.request().method()).toBe("POST");
-    expect(rpcUrl.origin).toBe(new URL(tanStackStartApplication.url).origin);
+    expect(rpcUrl.origin).toBe(new URL(exampleUrl).origin);
     expect(rpcUrl.pathname).toBe("/rpc/");
 
     await expect(page.getByText("Page 2: 4 users")).toBeVisible();
