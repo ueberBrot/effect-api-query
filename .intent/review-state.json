@@ -4600,6 +4600,30 @@
         "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
         "Scoped generated changes: .changeset/yield-query-client-operation-errors.md."
       ]
+    },
+    "source:.changeset/preserve-repeated-http-wire-parameter-order.md": {
+      "fingerprint": "9ca45718be476d5d63c5f5e8bcf51ca3e61d54cf7f1c5a6cb52b5178552f5b46",
+      "snapshot": {
+        ".changeset/preserve-repeated-http-wire-parameter-order.md": "129ecfe2f7f1049cdb2c814555c340abb3afd75669da7303e996433d6575ef67"
+      },
+      "head": "9ed6190ffc3cc7236ec506b216443afaf288437e",
+      "outcome": "no-change",
+      "reason": "Added focused release changesets for #238; shipped skill guidance in skills/effect-api-query/references/http.md and _artifacts/skill_spec.md is already updated",
+      "evidence": [
+        "Changed: .changeset/preserve-repeated-http-wire-parameter-order.md at 9ed6190ffc3cc7236ec506b216443afaf288437e"
+      ]
+    },
+    "source:.changeset/require-key-encoders-for-http-redacted-names.md": {
+      "fingerprint": "0ab056160a5cff85f8d8b15b345d7bf54c0dadfcfa91572a0c2039b427495aa6",
+      "snapshot": {
+        ".changeset/require-key-encoders-for-http-redacted-names.md": "5c9b4ebb39543f494e456fdc2c6a74cafccf1bc4d3709ebeb5068d7a9b637053"
+      },
+      "head": "9ed6190ffc3cc7236ec506b216443afaf288437e",
+      "outcome": "no-change",
+      "reason": "Added focused release changesets for #238; shipped skill guidance in skills/effect-api-query/references/http.md and _artifacts/skill_spec.md is already updated",
+      "evidence": [
+        "Changed: .changeset/require-key-encoders-for-http-redacted-names.md at 9ed6190ffc3cc7236ec506b216443afaf288437e"
+      ]
     }
   }
 }
