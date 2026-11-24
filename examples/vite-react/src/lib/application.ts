@@ -8,7 +8,7 @@ import {
   createRpcQueryUtils,
 } from "@ueberbrot/effect-api-query";
 import type { RuntimeInput } from "@ueberbrot/effect-api-query";
-import { ManagedRuntime } from "effect";
+import { Layer, ManagedRuntime } from "effect";
 import { FetchHttpClient } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
 
@@ -58,6 +58,7 @@ export interface ViteReactApplication {
 export interface StartViteReactApplicationOptions {
   readonly rpcUrl: string;
   readonly httpBaseUrl?: string;
+  readonly fetch?: typeof globalThis.fetch;
   readonly identity?: ApplicationOwnerIdentity;
   readonly directoryStorage?: DirectoryStorage;
 }
@@ -72,6 +73,7 @@ export const startViteReactApplication = async ({
     permissionGeneration: 1,
   },
   directoryStorage,
+  fetch: applicationFetch,
 }: StartViteReactApplicationOptions): Promise<ViteReactApplication> => {
   const keyPrefix = ownerKeyPrefix(identity);
   const capturedIdentity = Object.freeze({
@@ -83,11 +85,20 @@ export const startViteReactApplication = async ({
   const lifecycle = await acquireQueryOwner(
     async (setup) => {
       const rpcClient = await setup.acquire(
-        async () => startExampleRpcClient(rpcUrl),
+        async () => startExampleRpcClient(rpcUrl, applicationFetch),
         async (acquired) => acquired.dispose()
       );
       const httpRuntime = await setup.acquire(
-        () => ManagedRuntime.make(FetchHttpClient.layer),
+        () =>
+          ManagedRuntime.make(
+            applicationFetch === undefined
+              ? FetchHttpClient.layer
+              : FetchHttpClient.layer.pipe(
+                  Layer.provide(
+                    Layer.succeed(FetchHttpClient.Fetch, applicationFetch)
+                  )
+                )
+          ),
         async (acquired) => acquired.dispose()
       );
       const httpClient = await httpRuntime.runPromise(

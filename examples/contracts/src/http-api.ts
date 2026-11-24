@@ -11,13 +11,16 @@ import {
   DiagnosticFailure,
   DiagnosticStatus,
   ExampleAuthorizationError,
+  OperationNotFound,
   User,
   UserPage,
 } from "./contracts.ts";
 
+const unauthorized = ExampleAuthorizationError.pipe(HttpApiSchema.status(401));
+
 export class ExampleHttpAuthorization extends HttpApiMiddleware.Service<ExampleHttpAuthorization>()(
   "@effect-api-query/contracts/ExampleHttpAuthorization",
-  { error: ExampleAuthorizationError.pipe(HttpApiSchema.status(401)) }
+  { error: unauthorized }
 ) {}
 
 const missingUser = Schema.Literal("user-not-found").pipe(
@@ -60,7 +63,7 @@ const diagnostics = HttpApiGroup.make("diagnostics").add(
     success: Schema.Never,
     error: DiagnosticFailure.pipe(HttpApiSchema.status(422)),
   }),
-  HttpApiEndpoint.get("slow", "/diagnostics/slow", {
+  HttpApiEndpoint.post("slow", "/diagnostics/slow", {
     query: {
       durationMs: Schema.Int.check(
         Schema.isBetween({ minimum: 0, maximum: 60_000 })
@@ -68,6 +71,7 @@ const diagnostics = HttpApiGroup.make("diagnostics").add(
       operationId: Schema.String,
     },
     success: Schema.String,
+    error: unauthorized,
   }),
   HttpApiEndpoint.get(
     "operationStatus",
@@ -75,10 +79,12 @@ const diagnostics = HttpApiGroup.make("diagnostics").add(
     {
       params: { operationId: Schema.String },
       success: DiagnosticStatus,
+      error: [unauthorized, OperationNotFound.pipe(HttpApiSchema.status(404))],
     }
   ),
   HttpApiEndpoint.get("status", "/diagnostics/status", {
     success: DiagnosticStatus,
+    error: unauthorized,
   })
 );
 

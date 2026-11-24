@@ -11,27 +11,42 @@ import { Context, Effect, Option, Schema } from "effect";
 import type { Clock } from "effect";
 import { Cookies } from "effect/http";
 
-export interface DemoWriter {
-  readonly id: string;
-  readonly role: "demo-writer";
+export interface Caller {
+  readonly writerId: string | null;
+  readonly operationOwner: string | null;
 }
 
-export const VerifiedCaller = Context.Reference<DemoWriter | null>(
+export const anonymousCaller: Caller = { writerId: null, operationOwner: null };
+
+export const VerifiedCaller = Context.Reference<Caller>(
   "@effect-api-query/server/VerifiedCaller",
-  { defaultValue: () => null }
+  { defaultValue: () => anonymousCaller }
 );
+
+const missingAuthorization = () =>
+  new ExampleAuthorizationError({ reason: "missing-example-authorization" });
 
 export const requireDemoWriter = Effect.gen(function* () {
   const caller = yield* VerifiedCaller;
-  if (caller?.role !== "demo-writer") {
-    return yield* new ExampleAuthorizationError({
-      reason: "missing-example-authorization",
-    });
+  if (caller.writerId === null) {
+    return yield* missingAuthorization();
   }
   return yield* Effect.void;
 });
 
-const cookieName = "example-write-session";
+export const requireOperationOwner = Effect.gen(function* () {
+  const caller = yield* VerifiedCaller;
+  if (caller.operationOwner === null) {
+    return yield* missingAuthorization();
+  }
+  return caller.operationOwner;
+});
+
+const writeCookie = "example-write-session";
+const operationCookie = (request: Request) => {
+  const { port, protocol } = new URL(request.url);
+  return `example-operation-session-${port || (protocol === "https:" ? "443" : "80")}`;
+};
 const sessionLifetimeSeconds = 3600;
 const decodeSession = Schema.decodeUnknownOption(
   Schema.Tuple([
@@ -43,8 +58,6 @@ const decodeSession = Schema.decodeUnknownOption(
 
 const digest = (value: string) => createHash("sha256").update(value).digest();
 
-const writer = (id: string): DemoWriter =>
-  Object.freeze({ id, role: "demo-writer" });
 const sameOrigin = (request: Request) =>
   request.headers.get("origin") === new URL(request.url).origin;
 
@@ -57,10 +70,10 @@ export const makeCallerVerifier = (
       ? undefined
       : digest(`Bearer ${writeToken}`);
   const key = randomBytes(32);
-  const operator = writer(randomUUID());
+  const operatorId = randomUUID();
   const nowSeconds = () => Math.floor(clock.currentTimeMillisUnsafe() / 1000);
-  const sign = (session: string) =>
-    createHmac("sha256", key).update(session).digest("base64url");
+  const sign = (name: string, session: string) =>
+    createHmac("sha256", key).update(`${name}:${session}`).digest("base64url");
   const verifyBearer = (request: Request) => {
     const header = request.headers.get("authorization");
     return (
@@ -70,20 +83,11 @@ export const makeCallerVerifier = (
     );
   };
 
-  const verify = (request: Request): DemoWriter | null => {
-    if (verifyBearer(request)) {
-      return operator;
-    }
-    if (
-      request.method !== "GET" &&
-      request.method !== "HEAD" &&
-      !sameOrigin(request)
-    ) {
-      return null;
-    }
-    // @effect-diagnostics-next-line unstableApiUsage:off
-    const cookies = Cookies.parseHeader(request.headers.get("cookie") ?? "");
-    const session = decodeSession(cookies[cookieName]?.split("."));
+  const readSession = (
+    cookies: Readonly<Record<string, string>>,
+    name: string
+  ) => {
+    const session = decodeSession(cookies[name]?.split("."));
     if (Option.isNone(session)) {
       return null;
     }
@@ -92,15 +96,39 @@ export const makeCallerVerifier = (
       Number(expires) <= nowSeconds() ||
       !timingSafeEqual(
         Buffer.from(signature),
-        Buffer.from(sign(`${id}.${expires}`))
+        Buffer.from(sign(name, `${id}.${expires}`))
       )
     ) {
       return null;
     }
-    return writer(id);
+    return id;
   };
 
-  const issueSession = (request: Request): Response => {
+  const verify = (request: Request): Caller => {
+    if (verifyBearer(request)) {
+      return { writerId: operatorId, operationOwner: operatorId };
+    }
+    if (
+      request.method !== "GET" &&
+      request.method !== "HEAD" &&
+      !sameOrigin(request)
+    ) {
+      return anonymousCaller;
+    }
+    // @effect-diagnostics-next-line unstableApiUsage:off
+    const cookies = Cookies.parseHeader(request.headers.get("cookie") ?? "");
+    const writerId = readSession(cookies, writeCookie);
+    return {
+      writerId,
+      operationOwner: readSession(cookies, operationCookie(request)),
+    };
+  };
+
+  const issueSession = (
+    request: Request,
+    scope: "write" | "operations"
+  ): Response => {
+    const name = scope === "write" ? writeCookie : operationCookie(request);
     const url = new URL(request.url);
     const secure = url.protocol === "https:";
     const loopback = ["127.0.0.1", "[::1]", "localhost"].includes(url.hostname);
@@ -108,19 +136,30 @@ export const makeCallerVerifier = (
     if (
       !(secure || loopback) ||
       !sameOrigin(request) ||
-      !verifyBearer(request)
+      (scope === "write" && !verifyBearer(request))
     ) {
       return new Response(null, { headers, status: 401 });
     }
-    const session = `${randomUUID()}.${nowSeconds() + sessionLifetimeSeconds}`;
+    // @effect-diagnostics-next-line unstableApiUsage:off
+    const cookies = Cookies.parseHeader(request.headers.get("cookie") ?? "");
+    const id =
+      scope === "operations"
+        ? (readSession(cookies, name) ?? randomUUID())
+        : randomUUID();
+    const session = `${id}.${nowSeconds() + sessionLifetimeSeconds}`;
     return new Response(null, {
       status: 204,
       headers: {
         ...headers,
-        "set-cookie": `${cookieName}=${session}.${sign(session)}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${sessionLifetimeSeconds}${secure ? "; Secure" : ""}`,
+        "set-cookie": `${name}=${session}.${sign(name, session)}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${sessionLifetimeSeconds}${secure ? "; Secure" : ""}`,
       },
     });
   };
 
-  return { verify, issueSession };
+  return {
+    verify,
+    issueWriteSession: (request: Request) => issueSession(request, "write"),
+    issueOperationSession: (request: Request) =>
+      issueSession(request, "operations"),
+  };
 };

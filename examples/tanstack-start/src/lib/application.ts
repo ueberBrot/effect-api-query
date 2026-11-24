@@ -67,7 +67,8 @@ export const startTanStackStartApplication = async ({
   identity = "example",
   httpBaseUrl = new URL(rpcUrl, globalThis.location?.href).origin,
 }: StartTanStackStartApplicationOptions): Promise<TanStackStartApplication> => {
-  const rpcClient = readyRpcClient ?? (await startExampleRpcClient(rpcUrl));
+  const rpcClient =
+    readyRpcClient ?? (await startExampleRpcClient(rpcUrl, applicationFetch));
   const httpRuntime = ManagedRuntime.make(
     applicationFetch === undefined
       ? FetchHttpClient.layer

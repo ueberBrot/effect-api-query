@@ -29,6 +29,7 @@ sources:
   - "**/examples/vite-react/src/app.tsx"
   - "**/examples/vite-react/vite.config.ts"
   - "**/examples/vite-react/src/components/sections/commands-section.tsx"
+  - "**/examples/vite-react/src/components/sections/mutations-section.tsx"
   - "**/examples/shared/ui/effect-error-details.tsx"
   - "**/examples/vite-react/tests/*.ts*"
   - "**/examples/tanstack-start/src/lib/*.ts"

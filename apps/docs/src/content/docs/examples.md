@@ -39,7 +39,7 @@ StackBlitz WebContainers lack the native binding that Vite+ needs to run these e
 vp run vite-react-dev
 ```
 
-Vite starts the development server and proxies `/rpc` and `/api` to the standalone API. Both adapters share a user directory. For reads from another HTTP host, set `VITE_HTTP_BASE_URL` to its origin. The contract adds `/api`. Browser write access requires the same-origin proxy.
+Vite starts the development server and proxies `/rpc` and `/api` to the standalone API. Both adapters share a user directory. For reads from another HTTP host, set `VITE_HTTP_BASE_URL` to its origin. The contract adds `/api`. Browser write access and cancellable operations use the same-origin proxy. The apps acquire an unprivileged operation session on load. Reload to renew a valid session or start a fresh session after it expires.
 
 ### Compare HTTP and RPC
 

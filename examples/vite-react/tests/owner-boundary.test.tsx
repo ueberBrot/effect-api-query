@@ -12,6 +12,7 @@ import {
 import { Effect, Exit, Scope } from "effect";
 import { describe, expect, it, vi } from "vite-plus/test";
 
+import { openOperationSession } from "../../server/tests/fixtures/operation-session.ts";
 import { ViteReactExample } from "../src/app.tsx";
 import { startViteReactApplication } from "../src/lib/application.ts";
 import type { ViteReactApplication } from "../src/lib/application.ts";
@@ -27,7 +28,11 @@ describe("React consumers at the application owner boundary", () => {
         const server = await Effect.runPromise(
           startExampleRpcServer().pipe(Scope.provide(serverScope))
         );
-        previous = await startViteReactApplication({ rpcUrl: server.rpcUrl });
+        const session = await openOperationSession(server.url);
+        previous = await startViteReactApplication({
+          rpcUrl: server.rpcUrl,
+          fetch: session.fetch,
+        });
         const view = render(<ViteReactExample application={previous} />);
         const first = screen.getByRole("region", { name: "Command 1" });
         fireEvent.click(
@@ -47,6 +52,7 @@ describe("React consumers at the application owner boundary", () => {
         }
         current = await startViteReactApplication({
           rpcUrl: server.rpcUrl,
+          fetch: session.fetch,
           identity: { ...previous.identity, permissionGeneration },
         });
         view.rerender(<ViteReactExample application={current} />);

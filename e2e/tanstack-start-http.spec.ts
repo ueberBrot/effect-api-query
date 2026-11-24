@@ -216,7 +216,7 @@ test.describe("TanStack Start HTTP API example", () => {
     await expect(failure).toContainText("requested-failure");
 
     const started = page.waitForRequest((request) =>
-      isHttpRequest(request, "GET", "/diagnostics/slow")
+      isHttpRequest(request, "POST", "/diagnostics/slow")
     );
     await page.getByRole("button", { name: "Start slow HTTP query" }).click();
     const request = await started;
@@ -233,6 +233,7 @@ test.describe("TanStack Start HTTP API example", () => {
 
   for (const transport of ["http", "rpc"] as const) {
     test(`navigation cancels the pending ${transport.toUpperCase()} operation and stops status requests`, async ({
+      browser,
       exampleUrl,
       page,
     }) => {
@@ -254,7 +255,7 @@ test.describe("TanStack Start HTTP API example", () => {
       });
       const started = page.waitForRequest((request) =>
         transport === "http"
-          ? isHttpRequest(request, "GET", "/diagnostics/slow")
+          ? isHttpRequest(request, "POST", "/diagnostics/slow")
           : recordsRpc(request.postData(), "diagnostics.slow")
       );
       await page
@@ -284,6 +285,27 @@ test.describe("TanStack Start HTTP API example", () => {
         )
       ).toBeVisible();
       expect(statusRequests).toBeGreaterThan(0);
+      const statusUrl = `${exampleUrl}/api/diagnostics/operations/${encodeURIComponent(operationId)}`;
+      const otherCaller = await browser.newContext();
+      try {
+        const session = await otherCaller.request.post(
+          `${exampleUrl}/api/demo-operations`,
+          {
+            headers: { origin: exampleUrl },
+          }
+        );
+        expect(session.status()).toBe(204);
+        const [foreign, unknown] = await Promise.all([
+          otherCaller.request.get(statusUrl),
+          otherCaller.request.get(
+            `${exampleUrl}/api/diagnostics/operations/unknown`
+          ),
+        ]);
+        expect(foreign.status()).toBe(404);
+        expect(await foreign.text()).toBe(await unknown.text());
+      } finally {
+        await otherCaller.close();
+      }
 
       const aborted = page.waitForEvent(
         "requestfailed",
@@ -297,7 +319,6 @@ test.describe("TanStack Start HTTP API example", () => {
       ).toBeVisible();
       await aborted;
       const requestsAfterNavigation = statusRequests;
-      const statusUrl = `${exampleUrl}/api/diagnostics/operations/${encodeURIComponent(operationId)}`;
       await expect
         .poll(async () => {
           const response = await page.request.get(statusUrl);

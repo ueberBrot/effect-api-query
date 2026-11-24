@@ -236,7 +236,7 @@ Use safe identities in `keyPrefix`, including tenant, user, backend, session, or
 
 Remount consumers even when identity stays the same because hooks can retain the old QueryClient. Guard late commit, rollback, and settlement callbacks.
 
-Accepted commands can finish during retirement. Use an [explicit command operation](https://ueberbrot.github.io/effect-api-query/examples/cancellable-commands/) to stop future server work. A hanging request or finalizer delays handoff.
+Accepted commands can finish during retirement. Scope reservations, progress, and cancellation to the verified caller. Reserve the ID before exposing Cancel if it can reach the server before Start. Use an [explicit command operation](https://ueberbrot.github.io/effect-api-query/examples/cancellable-commands/) to stop future server work. A hanging request or finalizer delays handoff.
 
 Persist only approved DTO views. Include safe owner identity and separate schema and key versions in the saved envelope. Validate it before restoring with newly generated keys. Discard incompatible data. Leave out optimistic values, mutations, errors, credentials, and unrelated entries. Use paired codecs for rich values.
 

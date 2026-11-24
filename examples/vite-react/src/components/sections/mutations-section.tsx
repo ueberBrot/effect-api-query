@@ -11,9 +11,8 @@ export const MutationsSection = ({
 }) => {
   const { rpcQuery } = application;
   const voidQuery = useQuery(
-    rpcQuery.diagnostics.cancel.queryOptions({
+    rpcQuery.diagnostics.ping.queryOptions({
       enabled: false,
-      input: { operationId: "no-active-operation" },
     })
   );
 

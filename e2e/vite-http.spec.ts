@@ -176,14 +176,14 @@ test.describe("Vite React HTTP API example", () => {
     const http = page.getByRole("region", { name: "HTTP API example" });
     let httpSettled = false;
     const observeCompletion = (completed: Request) => {
-      if (isHttpRequest(completed, "GET", "/diagnostics/slow")) {
+      if (isHttpRequest(completed, "POST", "/diagnostics/slow")) {
         httpSettled = true;
       }
     };
     page.on("requestfinished", observeCompletion);
     page.on("requestfailed", observeCompletion);
     const started = page.waitForRequest((request) =>
-      isHttpRequest(request, "GET", "/diagnostics/slow")
+      isHttpRequest(request, "POST", "/diagnostics/slow")
     );
     await http.getByRole("button", { name: "Start slow HTTP query" }).click();
     const request = await started;

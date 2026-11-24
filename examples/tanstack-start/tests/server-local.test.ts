@@ -5,6 +5,7 @@ import { Effect, Exit, Scope } from "effect";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 
 import { makeExampleHost } from "../../server/src/web-handler.ts";
+import { openOperationSession } from "../../server/tests/fixtures/operation-session.ts";
 import type { TanStackStartApplication } from "../src/lib/application.ts";
 import { startServerApplication } from "../src/lib/server-application.ts";
 import { createTanStackStartRouter } from "../src/router.tsx";
@@ -201,12 +202,17 @@ describe("Start request-local execution", () => {
       makeExampleHost().pipe(Scope.provide(ownerScope))
     );
     const abort = new AbortController();
+    const session = await openOperationSession(
+      "http://localhost",
+      host.handleRequest
+    );
     const first = await startServerApplication({
       host,
-      request: new Request("http://example.local/", { signal: abort.signal }),
+      request: session.request("/", { signal: abort.signal }),
     });
     const second = await startServerApplication({
       host,
+      request: session.request("/"),
     });
     try {
       const read = first.queryClient.query(
@@ -252,6 +258,39 @@ describe("Start request-local execution", () => {
     } finally {
       await Promise.all([first.dispose(), second.dispose()]);
       await Effect.runPromise(Scope.close(ownerScope, Exit.void));
+    }
+  });
+
+  it("isolates omitted diagnostic IDs and forwards the verified session to local HTTP", async () => {
+    const hostScope = Scope.makeUnsafe();
+    const host = await Effect.runPromise(
+      makeExampleHost().pipe(Scope.provide(hostScope))
+    );
+    const origin = "http://localhost";
+    const [session, otherSession] = await Promise.all([
+      openOperationSession(origin, host.handleRequest),
+      openOperationSession(origin, host.handleRequest),
+    ]);
+    const [owner, other] = await Promise.all([
+      startServerApplication({ host, request: session.request("/") }),
+      startServerApplication({ host, request: otherSession.request("/") }),
+    ]);
+    try {
+      await Promise.all([
+        owner.rpcQuery.diagnostics.slow.call({ input: { durationMs: 0 } }),
+        other.rpcQuery.diagnostics.slow.call({ input: { durationMs: 0 } }),
+      ]);
+      await owner.rpcQuery.diagnostics.slow.call({ input: { durationMs: 0 } });
+      const input = { params: { operationId: "anonymous" } };
+      await expect(
+        owner.httpQuery.diagnostics.operationStatus.call({ input })
+      ).resolves.toStrictEqual({ started: 2, interrupted: 0 });
+      await expect(
+        other.httpQuery.diagnostics.operationStatus.call({ input })
+      ).resolves.toStrictEqual({ started: 1, interrupted: 0 });
+    } finally {
+      await Promise.all([owner.dispose(), other.dispose()]);
+      await Effect.runPromise(Scope.close(hostScope, Exit.void));
     }
   });
 

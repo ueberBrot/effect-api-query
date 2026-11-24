@@ -7,7 +7,7 @@ import { makeUsers } from "./users.ts";
 const makeDomain = Effect.fn("ExampleDomain.make")(function* () {
   return {
     users: yield* makeUsers(),
-    diagnostics: yield* makeDiagnosticOperations(),
+    diagnostics: yield* makeDiagnosticOperations,
     commands: yield* makeCommands(),
   };
 });
