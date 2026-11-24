@@ -10,6 +10,7 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import nodePath from "node:path";
+import { parseEnv } from "node:util";
 
 import { checkChangesets } from "./check-changesets.mts";
 import { capture, run as runCommand } from "./lib/exec.mts";
@@ -30,7 +31,31 @@ const manifest = (read: (path: string) => string) => {
 
 /* oxlint-enable anti-slop/no-runtime-typeof */
 
-await withVersioningCheckout(async ({ base, options, digest }) => {
+const changelogEnvironment = (source: string, env: NodeJS.ProcessEnv) => {
+  let content: string;
+  try {
+    content = readFileSync(nodePath.join(source, ".env"), "utf-8");
+  } catch {
+    return env;
+  }
+
+  const file = parseEnv(content);
+  const merged = { ...env };
+  for (const name of [
+    "GITHUB_GRAPHQL_URL",
+    "GITHUB_REPOSITORY",
+    "GITHUB_SERVER_URL",
+    "GITHUB_TOKEN",
+  ]) {
+    if (merged[name] === undefined || merged[name] === "") {
+      merged[name] = file[name];
+    }
+  }
+  return merged;
+};
+
+await withVersioningCheckout(async (checkout) => {
+  const { base, options, source, digestGeneratedPatch } = checkout;
   const git = (...args: string[]) => capture("git", args, options);
   const run = (args: readonly string[]) => {
     runCommand("vp", args, options);
@@ -56,10 +81,13 @@ await withVersioningCheckout(async ({ base, options, digest }) => {
       "Versioning created unexpected untracked files."
     );
   };
-  run(["exec", "changeset", "version"]);
+  runCommand("vp", ["exec", "changeset", "version"], {
+    ...options,
+    env: changelogEnvironment(source, options.env),
+  });
   run(["fmt"]);
   checkGitState();
-  const patchDigest = await digest();
+  const patchDigest = await digestGeneratedPatch();
 
   const changes = git("diff", "--no-renames", "--name-status", "-z", base)
     .split("\0")
@@ -200,7 +228,7 @@ await withVersioningCheckout(async ({ base, options, digest }) => {
   run(["exec", "intent", "maintainer", "check"]);
   checkGitState();
   ok(
-    (await digest()) === patchDigest,
+    (await digestGeneratedPatch()) === patchDigest,
     "The generated release changed during Intent review."
   );
 });

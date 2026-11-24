@@ -3,12 +3,12 @@ import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { once } from "node:events";
 import {
-  copyFileSync,
-  existsSync,
+  lstatSync,
   mkdtempSync,
   rmSync,
   statSync,
   symlinkSync,
+  writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
 import nodePath from "node:path";
@@ -26,7 +26,7 @@ const diff = [
   "--dst-prefix=b/",
 ];
 
-const digestPatch = async (
+const digestGeneratedPatch = async (
   base: string,
   options: { cwd: string; env: NodeJS.ProcessEnv }
 ) => {
@@ -48,7 +48,8 @@ export const withVersioningCheckout = async (
   generate: (checkout: {
     readonly base: string;
     readonly options: { readonly cwd: string; readonly env: NodeJS.ProcessEnv };
-    readonly digest: () => Promise<string>;
+    readonly source: string;
+    readonly digestGeneratedPatch: () => Promise<string>;
   }) => Promise<void>
 ) => {
   const gitLocalVariables = new Set([
@@ -98,34 +99,13 @@ export const withVersioningCheckout = async (
         nodePath.join(worktree, "node_modules"),
         "junction"
       );
-      const envFile = nodePath.join(cwd, ".env");
-      const versioningEnvFile = nodePath.join(worktree, ".env");
-      if (
-        !existsSync(versioningEnvFile) &&
-        statSync(envFile, { throwIfNoEntry: false })?.isFile() === true
-      ) {
-        copyFileSync(envFile, versioningEnvFile);
-      }
       await generate({
         base,
         options,
-        digest: async () => digestPatch(base, options),
+        source: cwd,
+        digestGeneratedPatch: async () => digestGeneratedPatch(base, options),
       });
       capture("git", [...diff, `--output=${patch}`, base, "--", "."], options);
-      capture(
-        "git",
-        [
-          "diff",
-          "--no-renames",
-          "--name-only",
-          "-z",
-          `--output=${paths}`,
-          base,
-          "--",
-          ".",
-        ],
-        options
-      );
     } finally {
       git("worktree", "remove", "--force", worktree);
     }
@@ -138,6 +118,15 @@ export const withVersioningCheckout = async (
     if (statSync(patch).size > 0) {
       const apply = ["--whitespace=nowarn", patch];
       run("git", ["apply", "--check", ...apply], { cwd, env });
+      const candidate = {
+        cwd,
+        env: {
+          ...env,
+          GIT_INDEX_FILE: nodePath.join(directory, "candidate-index"),
+        },
+      };
+      run("git", ["read-tree", base], candidate);
+      run("git", ["apply", "--cached", ...apply], candidate);
       try {
         run("git", ["apply", ...apply], { cwd, env });
       } catch (error) {
@@ -146,17 +135,56 @@ export const withVersioningCheckout = async (
             git("rev-parse", "HEAD").trim() === base,
             "The original checkout changed HEAD during patch application."
           );
-          run(
+          const list = ["diff", "--no-renames", "--name-only", "-z"];
+          const differsFromCandidate = new Set(
+            capture("git", list, candidate).split("\0")
+          );
+          const generatedPaths = capture(
             "git",
-            [
-              "--literal-pathspecs",
-              "restore",
-              "--worktree",
-              `--source=${base}`,
-              `--pathspec-from-file=${paths}`,
-              "--pathspec-file-nul",
-            ],
-            { cwd, env }
+            [...list, "--cached", base],
+            candidate
+          )
+            .split("\0")
+            .filter(Boolean);
+          const recreatedPaths = new Set(
+            capture(
+              "git",
+              [...list, "--diff-filter=D", "--cached", base],
+              candidate
+            )
+              .split("\0")
+              .filter(
+                (path) =>
+                  path !== "" &&
+                  lstatSync(nodePath.join(cwd, path), {
+                    throwIfNoEntry: false,
+                  }) !== undefined
+              )
+          );
+          const appliedPaths = generatedPaths.filter(
+            (path) =>
+              !differsFromCandidate.has(path) && !recreatedPaths.has(path)
+          );
+          if (appliedPaths.length > 0) {
+            writeFileSync(paths, `${appliedPaths.join("\0")}\0`);
+            run(
+              "git",
+              [
+                "--literal-pathspecs",
+                "restore",
+                "--worktree",
+                `--source=${base}`,
+                `--pathspec-from-file=${paths}`,
+                "--pathspec-file-nul",
+              ],
+              { cwd, env }
+            );
+          }
+          ok(
+            !git(...list, base)
+              .split("\0")
+              .some((path) => generatedPaths.includes(path)),
+            "Generated paths differ from both the starting checkout and the verified release."
           );
         } catch (restoreError) {
           throw new AggregateError(
@@ -169,6 +197,10 @@ export const withVersioningCheckout = async (
       }
     }
   } finally {
-    rmSync(directory, { recursive: true, force: true });
+    try {
+      rmSync(directory, { recursive: true, force: true });
+    } catch (error) {
+      console.warn("Versioning could not remove its temporary files.", error);
+    }
   }
 };

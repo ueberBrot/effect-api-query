@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "ac0ba0f98f4610a53baaedc06fca5a00e431939bbdda87af1d60f22240af05fb",
+      "fingerprint": "d0c6362a9cac610c6da4e847b638561fcbaf49ba7bb0140de5665e6057045bee",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -200,7 +200,7 @@
         "examples/vite-react/vite.config.ts": "68b64cb963fcb1fa90330d04519202729d9e692229d25f81a26c14a3733362d9",
         "package.json": "d5b7f7ffaedf4964b16816d89d355564a255cc7692078fcd84546d71c04a88a3",
         "pnpm-workspace.yaml": "fc4bff1fa9ef4a4887691c6e004e02829736f93ee07efcb563f78f836a21a276",
-        "scripts/check-changesets.mts": "3bc0fb81c8152724514e093a26653a634ff1e3dee459b3f6f2d6b77812c27704",
+        "scripts/check-changesets.mts": "f6873750bad442963f37471471a1ceada69ebf3593d9993586a73bce269e5edb",
         "scripts/check-effect-compatibility.mts": "b1de824e27e34089c445f183d1511d8e5f9e463892ff8edf83f76fb8c24778f4",
         "scripts/check-framework-consumers.mts": "fd6e99f4f9d854a0a738afd105094553e31472d525f7236693c235f8140dcad9",
         "scripts/check-toolchain.mts": "3c8efdb93594058ed78947bc65ad51c88ac4b26cab23b0b1fe6f8786a6d386e9",
@@ -216,7 +216,7 @@
         "scripts/performance/common.mts": "6ce0e1c018e08a442fcf787740d7ddd63457069ee932d28b04d8a1b41e136028",
         "scripts/resolve-docs-release.mts": "0ed8db1359b317feadf9479fc7dcefc879b4899279b56c672a95499595644c4e",
         "scripts/verify-docs-version.mts": "58f63de6f871726a5bef8b70d1de7fad591374c52823e3cf60a160a9f37541e8",
-        "scripts/version-packages.mts": "f55dbeee640fca92645542f70295a796b2fd85072a5317092975ece494fa30d8",
+        "scripts/version-packages.mts": "1ca732a8744059fbaba75324aa5e6d82ad5802e79f857536c799217a466d1ab6",
         "skills/effect-api-query/SKILL.md": "2f317d7b9ee273c24731613181d10495e73d0ca698c3c59a3fed557f6f2770fe",
         "skills/effect-api-query/references/cache-workflows.md": "cd50c5f67f8fce77cf8cc2b95b1697bd20205a688adb7319625b62c414402327",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "f8e2ed21583481dffd1680ce85340af508bbd8a5baeb8227da094a099da81fef",
@@ -419,21 +419,21 @@
         "tests/types/type-scale.ts": "0a6472b438c7ef14c3ee5b030b500ab6f66f13e7cd50250a3b0798bdec48c8a7",
         "tests/types/utility-configuration-contract.ts": "3a3d4e200e84d04d2e9856bfb4509a4ba948f4a67997d1327e66beef36aa0eb4",
         "tests/utility-configuration.test.ts": "55361de62fbb7e7695c94f940de566c2e35d218539a77b6ab1000877f71ad288",
-        "tests/version-packages.test.ts": "344d38290bf48eb570e243c2683ccb39ab41b54b44bf4f6347161c288847584e",
+        "tests/version-packages.test.ts": "508dd54effa563ebbab43d710556ad3257948fce8771ee571448bf2c0bb37e34",
         "tests/workflow-guards.test.ts": "563c464dfb45e0873138aff38d323cdfb64b7e6caae84f70fa46db4c65dba410",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "0c856aa5ff3addeb2061b4ae5685b92f6d0d2e8e",
+      "head": "d2a8fcfddc429ba662375e0b3f18ade9da35181c",
       "outcome": "no-change",
-      "reason": "The GitHub changelog still accepts supported commit metadata and local configuration. Release validation runs before any generated edits reach the caller. The library runtime, published types, installation contract, and guidance retain their existing behavior. The domain map, skill spec, and skill tree retain their coverage.",
+      "reason": "CI validates parsed release notes. Versioning preserves changelog metadata and exports local changelog configuration only to Changesets. The library runtime, published types, installation contract, and guidance retain their existing behavior. The domain map, skill spec, and skill tree retain their coverage.",
       "evidence": [
-        "Reviewed package.json, scripts/check-changesets.mts, scripts/version-packages.mts, and tests/version-packages.test.ts against d4736df.",
-        "22 disposable versioning integration tests passed. Type-aware lint and TypeScript checking passed.",
+        "Reviewed the tooling and its fixtures against d4736df.",
+        "The full suite and type-aware lint passed before review follow-ups. Focused fixtures passed for rollback, inherited Git context, caller edits during transfer, and worktree-local .env settings.",
         "Prior release-independent outcomes remain in the review state at d4736df."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "5e6dc155635ece3fda8708686e7619b906867942a85580d8e381c4a205e67cbf",
+      "fingerprint": "a9265fbda580f89d682d012c0fdfbb12d1b6a961f986b3f13576510f70b523e0",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -633,7 +633,7 @@
         "examples/vite-react/vite.config.ts": "68b64cb963fcb1fa90330d04519202729d9e692229d25f81a26c14a3733362d9",
         "package.json": "d5b7f7ffaedf4964b16816d89d355564a255cc7692078fcd84546d71c04a88a3",
         "pnpm-workspace.yaml": "fc4bff1fa9ef4a4887691c6e004e02829736f93ee07efcb563f78f836a21a276",
-        "scripts/check-changesets.mts": "3bc0fb81c8152724514e093a26653a634ff1e3dee459b3f6f2d6b77812c27704",
+        "scripts/check-changesets.mts": "f6873750bad442963f37471471a1ceada69ebf3593d9993586a73bce269e5edb",
         "scripts/check-effect-compatibility.mts": "b1de824e27e34089c445f183d1511d8e5f9e463892ff8edf83f76fb8c24778f4",
         "scripts/check-framework-consumers.mts": "fd6e99f4f9d854a0a738afd105094553e31472d525f7236693c235f8140dcad9",
         "scripts/check-toolchain.mts": "3c8efdb93594058ed78947bc65ad51c88ac4b26cab23b0b1fe6f8786a6d386e9",
@@ -649,7 +649,7 @@
         "scripts/performance/common.mts": "6ce0e1c018e08a442fcf787740d7ddd63457069ee932d28b04d8a1b41e136028",
         "scripts/resolve-docs-release.mts": "0ed8db1359b317feadf9479fc7dcefc879b4899279b56c672a95499595644c4e",
         "scripts/verify-docs-version.mts": "58f63de6f871726a5bef8b70d1de7fad591374c52823e3cf60a160a9f37541e8",
-        "scripts/version-packages.mts": "f55dbeee640fca92645542f70295a796b2fd85072a5317092975ece494fa30d8",
+        "scripts/version-packages.mts": "1ca732a8744059fbaba75324aa5e6d82ad5802e79f857536c799217a466d1ab6",
         "skills/effect-api-query/SKILL.md": "2f317d7b9ee273c24731613181d10495e73d0ca698c3c59a3fed557f6f2770fe",
         "skills/effect-api-query/references/cache-workflows.md": "cd50c5f67f8fce77cf8cc2b95b1697bd20205a688adb7319625b62c414402327",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "f8e2ed21583481dffd1680ce85340af508bbd8a5baeb8227da094a099da81fef",
@@ -852,16 +852,16 @@
         "tests/types/type-scale.ts": "0a6472b438c7ef14c3ee5b030b500ab6f66f13e7cd50250a3b0798bdec48c8a7",
         "tests/types/utility-configuration-contract.ts": "3a3d4e200e84d04d2e9856bfb4509a4ba948f4a67997d1327e66beef36aa0eb4",
         "tests/utility-configuration.test.ts": "55361de62fbb7e7695c94f940de566c2e35d218539a77b6ab1000877f71ad288",
-        "tests/version-packages.test.ts": "344d38290bf48eb570e243c2683ccb39ab41b54b44bf4f6347161c288847584e",
+        "tests/version-packages.test.ts": "508dd54effa563ebbab43d710556ad3257948fce8771ee571448bf2c0bb37e34",
         "tests/workflow-guards.test.ts": "563c464dfb45e0873138aff38d323cdfb64b7e6caae84f70fa46db4c65dba410",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "0c856aa5ff3addeb2061b4ae5685b92f6d0d2e8e",
+      "head": "d2a8fcfddc429ba662375e0b3f18ade9da35181c",
       "outcome": "no-change",
-      "reason": "The GitHub changelog still accepts supported commit metadata and local configuration. Release validation runs before any generated edits reach the caller. The library runtime, published types, installation contract, and guidance retain their existing behavior. The domain map, skill spec, and skill tree retain their coverage.",
+      "reason": "CI validates parsed release notes. Versioning preserves changelog metadata and exports local changelog configuration only to Changesets. The library runtime, published types, installation contract, and guidance retain their existing behavior. The domain map, skill spec, and skill tree retain their coverage.",
       "evidence": [
-        "Reviewed package.json, scripts/check-changesets.mts, scripts/version-packages.mts, and tests/version-packages.test.ts against d4736df.",
-        "22 disposable versioning integration tests passed. Type-aware lint and TypeScript checking passed.",
+        "Reviewed the tooling and its fixtures against d4736df.",
+        "The full suite and type-aware lint passed before review follow-ups. Focused fixtures passed for rollback, inherited Git context, caller edits during transfer, and worktree-local .env settings.",
         "Prior release-independent outcomes remain in the review state at d4736df."
       ]
     },
@@ -4752,16 +4752,16 @@
       ]
     },
     "source:scripts/lib/versioning-checkout.mts": {
-      "fingerprint": "130ca1726d9b09b39596baa4310bceb6b48d3602b8e0c0c373b8addf970cd573",
+      "fingerprint": "85b6b4b3988eb7c639cf730e1a18c8c69220f4fd6585a1700f4ce459907c4f29",
       "snapshot": {
-        "scripts/lib/versioning-checkout.mts": "04c3a68ae9a744e3e46ba19bd0e8a333fbd50697c25f2a83028c2e6708f4a5d3"
+        "scripts/lib/versioning-checkout.mts": "70213fb5d4e3b65266be917145abe429e5c0270524e6593c48327f8d3acb26f5"
       },
-      "head": "0c856aa5ff3addeb2061b4ae5685b92f6d0d2e8e",
+      "head": "d2a8fcfddc429ba662375e0b3f18ade9da35181c",
       "outcome": "no-change",
-      "reason": "The isolated checkout, streamed patch comparison, and scoped patch recovery support repository release generation. Published library behavior and application guidance retain their existing scope.",
+      "reason": "Repository release generation streams Git diffs and transfers only validated edits. Recovery restores release-generated paths that still match the candidate and preserves concurrent caller edits. Published library behavior and application guidance retain their existing scope.",
       "evidence": [
         "Reviewed scripts/lib/versioning-checkout.mts against d4736df.",
-        "The fixture tests cover large patches, failed Git diffs, inherited Git context and checkout hooks, local changelog settings, and recovery after validation and patch transfer fail."
+        "Disposable fixtures cover large patches, failed Git diffs, inherited Git context and checkout hooks, and recovery after failed validation and patch transfer."
       ]
     }
   }

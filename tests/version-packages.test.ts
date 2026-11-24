@@ -39,12 +39,18 @@ const write = (cwd: string, file: string, content: string) => {
 const read = (cwd: string, file: string) =>
   readFileSync(nodePath.join(cwd, file), "utf-8");
 
-const version = (cwd: string, env = fixtureEnv) =>
-  spawnSync("node", ["scripts/version-packages.mts"], {
-    cwd,
-    env,
-    encoding: "utf-8",
-  });
+const version = (cwd: string, env?: NodeJS.ProcessEnv) =>
+  env
+    ? spawnSync("node", ["scripts/version-packages.mts"], {
+        cwd,
+        env,
+        encoding: "utf-8",
+      })
+    : spawnSync("vp", ["run", "version-packages"], {
+        cwd,
+        env: fixtureEnv,
+        encoding: "utf-8",
+      });
 
 const withCommand = (cwd: string, command: "git" | "vp", script: string) => {
   const bin = nodePath.join(cwd, ".git", "test-bin");
@@ -412,21 +418,29 @@ exec "$FIXTURE_COMMAND" "$@"
 
   it("preserves ignored .env settings for the changelog generator", () => {
     withCheckout((cwd) => {
-      write(cwd, ".git/info/exclude", ".env\n");
-      write(cwd, ".env", "FIXTURE_RELEASE_NOTE=Local changelog settings\n");
+      write(cwd, ".git/local-excludes", ".env\n");
+      git(cwd, "config", "extensions.worktreeConfig", "true");
+      git(
+        cwd,
+        "config",
+        "--worktree",
+        "core.excludesFile",
+        nodePath.join(cwd, ".git/local-excludes")
+      );
+      write(cwd, ".env", "GITHUB_SERVER_URL=https://fixture.invalid\n");
       const env = withCommand(
         cwd,
         "vp",
         `
 if [ "$1 $2 $3" = "exec changeset version" ]; then
-  grep -qx 'FIXTURE_RELEASE_NOTE=Local changelog settings' .env || exit 23
+  test "$GITHUB_SERVER_URL" = https://fixture.invalid || exit 23
 fi
 exec "$FIXTURE_COMMAND" "$@"
 `
       );
-      expect(version(cwd, env).status).toBe(0);
+      expect(version(cwd, { ...env, GITHUB_SERVER_URL: "" }).status).toBe(0);
       expect(read(cwd, ".env")).toBe(
-        "FIXTURE_RELEASE_NOTE=Local changelog settings\n"
+        "GITHUB_SERVER_URL=https://fixture.invalid\n"
       );
     });
   }, 30_000);
@@ -449,6 +463,33 @@ exec "$FIXTURE_COMMAND" "$@"
       expect(result.stderr).toContain("git apply --whitespace=nowarn");
       expect(git(cwd, "status", "--porcelain")).toBe("");
       expect(version(cwd).status).toBe(0);
+    });
+  }, 30_000);
+
+  it("preserves a caller edit during failed patch transfer", () => {
+    withCheckout((cwd) => {
+      const env = withCommand(
+        cwd,
+        "git",
+        `
+if [ "$1" = apply ] && [ "$2" = --whitespace=nowarn ]; then
+  "$FIXTURE_COMMAND" "$@" || exit "$?"
+  printf '%s\\n' 'Caller edited the changelog.' >> CHANGELOG.md
+  printf '%s\\n' 'Caller restored the release note.' > .changeset/release-fixture.md
+  exit 23
+fi
+exec "$FIXTURE_COMMAND" "$@"
+`
+      );
+      const result = version(cwd, env);
+      expect(result.status).toBe(1);
+      expect(result.stderr).toContain("Git could not restore the checkout");
+      expect(git(cwd, "status", "--porcelain")).toBe(
+        " M .changeset/release-fixture.md\n M CHANGELOG.md\n"
+      );
+      expect(read(cwd, "CHANGELOG.md")).toContain(
+        "Caller edited the changelog."
+      );
     });
   }, 30_000);
 

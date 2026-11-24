@@ -1,12 +1,13 @@
 import { readChangesets } from "@changesets/read";
 
+/* oxlint-disable eslint/require-unicode-regexp -- Match the case folding of the pinned GitHub changelog. */
+const pullDirective = /^\s*(?:pr|pull|pull\s+request):\s*#?\d+/im;
+/* oxlint-enable eslint/require-unicode-regexp */
+
 export const checkChangesets = async (cwd: string) => {
   const invalid: string[] = [];
   for (const { id, summary } of await readChangesets(cwd)) {
-    const withoutPull = summary.replace(
-      /^\s*(?:pr|pull|pull\s+request):\s*#?\d+/imu,
-      ""
-    );
+    const withoutPull = summary.replace(pullDirective, "");
     const directive = /^\s*commit:[^\S\r\n\u2028\u2029]*(?<sha>[^\s]*)/imu.exec(
       withoutPull
     );
