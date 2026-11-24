@@ -24,6 +24,26 @@ const script = path.resolve(
   import.meta.dirname,
   "../scripts/check-workflow.mts"
 );
+const destination = "owner/repo";
+const topic = "feature/topic";
+const fixturePullRequest = (
+  state: "OPEN" | "MERGED",
+  repository = destination,
+  branch = topic
+) => ({
+  headRefName: branch,
+  headRepository: { nameWithOwner: repository },
+  state,
+});
+const pullRequestPage = (nodes: readonly unknown[], hasNextPage = false) => ({
+  data: {
+    repository: {
+      nameWithOwner: destination,
+      pullRequests: { nodes, pageInfo: { hasNextPage } },
+    },
+  },
+});
+type GitHubResponse = readonly ReturnType<typeof pullRequestPage>[];
 const git = (cwd: string, ...args: string[]) =>
   execFileSync("git", args, { cwd, encoding: "utf-8" }).trim();
 const write = (cwd: string, file: string, content = "fixture\n") => {
@@ -44,7 +64,11 @@ const withRepository = (run: (cwd: string, base: string) => void) => {
     write(cwd, "README.md");
     const base = save(cwd);
     git(cwd, "update-ref", "refs/remotes/origin/main", base);
-    write(cwd, ".git/bin/gh", '#!/bin/sh\nprintf "%s\\n" "$PR_STATE"\n');
+    write(
+      cwd,
+      ".git/bin/gh",
+      '#!/bin/sh\nprintf "%s\\n" "$@" > "$GH_ARGS"\nprintf "%s\\n" "$GH_RESPONSE"\n'
+    );
     write(
       cwd,
       ".git/bin/vp",
@@ -61,7 +85,7 @@ const check = (
   cwd: string,
   args: string[] = [],
   input = "",
-  state = "false\tfalse"
+  response: GitHubResponse = [pullRequestPage([])]
 ) =>
   spawnSync(
     process.execPath,
@@ -73,17 +97,23 @@ const check = (
       env: {
         ...process.env,
         PATH: `${path.join(cwd, ".git/bin")}${path.delimiter}${process.env["PATH"] ?? ""}`,
-        PR_STATE: state,
+        GH_ARGS: path.join(cwd, ".git/gh-args"),
+        GH_RESPONSE: JSON.stringify(response),
         WORKFLOW_LOG: path.join(cwd, ".git/checks"),
       },
     }
   );
-const push = (cwd: string, base: string, state?: string, deletion = false) =>
+const push = (
+  cwd: string,
+  base: string,
+  response?: GitHubResponse,
+  { deletion = false, remote = "git@github.com:owner/repo.git" } = {}
+) =>
   check(
     cwd,
-    ["--push", "origin", "git@github.com:owner/repo.git"],
-    `refs/heads/main ${deletion ? "0".repeat(40) : git(cwd, "rev-parse", "HEAD")} refs/heads/topic ${base}\n`,
-    state
+    ["--push", "origin", remote],
+    `refs/heads/main ${deletion ? "0".repeat(40) : git(cwd, "rev-parse", "HEAD")} refs/heads/${topic} ${base}\n`,
+    response
   );
 
 describe("repository workflow guards", () => {
@@ -202,12 +232,56 @@ describe("repository workflow guards", () => {
     withRepository((cwd, base) => {
       write(cwd, "vite.config.ts", "export default {};\n");
       save(cwd);
-      const result = push(cwd, base, "false\ttrue");
+      const result = push(cwd, base, [
+        pullRequestPage([fixturePullRequest("OPEN", "fork/repo")], true),
+        pullRequestPage([
+          fixturePullRequest("MERGED", "Owner/Repo"),
+          fixturePullRequest("OPEN", destination, "feature/Topic"),
+        ]),
+      ]);
       expect(result.status).toBe(1);
       expect(result.stderr).toContain("already merged");
       expect(existsSync(path.join(cwd, ".git/checks"))).toBe(false);
     });
   });
+
+  it.each([
+    "git@github.com:owner/repo.git",
+    "https://www.github.com/owner/repo.git",
+    "https://github.com/%6fwner/%72epo.git",
+  ])(
+    "allows a push to %s when the same-named merged branch belongs to a fork",
+    (remote) => {
+      withRepository((cwd, base) => {
+        const result = push(
+          cwd,
+          base,
+          [pullRequestPage([fixturePullRequest("MERGED", "fork/repo")])],
+          { remote }
+        );
+        expect(result.status).toBe(0);
+        const args = readFileSync(
+          path.join(cwd, ".git/gh-args"),
+          "utf-8"
+        ).split("\n");
+        expect(args.slice(0, 6)).toStrictEqual([
+          "api",
+          "graphql",
+          "--hostname",
+          "github.com",
+          "--paginate",
+          "--slurp",
+        ]);
+        expect(args).toStrictEqual(
+          expect.arrayContaining([
+            "owner=owner",
+            "repo=repo",
+            `branch=${topic}`,
+          ])
+        );
+      });
+    }
+  );
 
   it("runs checkout tests for config changes and compatibility for workspace changes", () => {
     withRepository((cwd, base) => {
@@ -230,7 +304,14 @@ describe("repository workflow guards", () => {
     withRepository((cwd, base) => {
       write(cwd, "docs/example.md");
       save(cwd);
-      expect(push(cwd, base, "true\ttrue").status).toBe(0);
+      expect(
+        push(cwd, base, [
+          pullRequestPage([
+            fixturePullRequest("OPEN"),
+            fixturePullRequest("MERGED"),
+          ]),
+        ]).status
+      ).toBe(0);
       expect(existsSync(path.join(cwd, ".git/checks"))).toBe(false);
     });
   });
@@ -244,15 +325,35 @@ describe("repository workflow guards", () => {
     });
   });
 
-  it("fails closed when PR state is unavailable", () => {
+  it.each([
+    {
+      reason: "the response is incomplete",
+      response: [pullRequestPage([], true)],
+    },
+    {
+      reason: "a matching PR is missing state",
+      response: [
+        pullRequestPage([
+          { ...fixturePullRequest("MERGED"), state: undefined },
+        ]),
+      ],
+    },
+  ])("fails closed when $reason", ({ response }) => {
     withRepository((cwd, base) => {
-      expect(push(cwd, base, "unavailable").status).toBe(1);
+      const result = push(cwd, base, response);
+      expect(result.status).toBe(1);
+      expect(result.stderr).toContain("Could not determine PR state");
     });
   });
 
   it("allows deleting a merged branch", () => {
     withRepository((cwd, base) => {
-      expect(push(cwd, base, "false\ttrue", true).status).toBe(0);
+      expect(
+        push(cwd, base, [pullRequestPage([fixturePullRequest("MERGED")])], {
+          deletion: true,
+        }).status
+      ).toBe(0);
+      expect(existsSync(path.join(cwd, ".git/gh-args"))).toBe(false);
     });
   });
 

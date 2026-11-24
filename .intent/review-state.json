@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "c28e4d139a4527ecf0854e75abd56cf203e7ae8114cb6ef217e618d2f9291382",
+      "fingerprint": "3b008240c944a7c55ff79187683aef015340c2a9bd0e7ebcd1121b83e0885933",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -203,7 +203,7 @@
         "scripts/check-effect-compatibility.mts": "b1de824e27e34089c445f183d1511d8e5f9e463892ff8edf83f76fb8c24778f4",
         "scripts/check-framework-consumers.mts": "fd6e99f4f9d854a0a738afd105094553e31472d525f7236693c235f8140dcad9",
         "scripts/check-toolchain.mts": "3c8efdb93594058ed78947bc65ad51c88ac4b26cab23b0b1fe6f8786a6d386e9",
-        "scripts/check-workflow.mts": "0116805295028c170b22e6dc759ef23313e06debe266ba1d6e243a1f4781288a",
+        "scripts/check-workflow.mts": "7628ba32f7321f5759c0180a5859fa478603704d8c6a7e2a22c643ef19d5808c",
         "scripts/compiler.mts": "b838a5766d3f9f8d8f73450814a703ff3b61e67a8ebeecfcb795d0da12f483bb",
         "scripts/measure-bundles.mts": "1825619af7f775a4e593e3198b0d521f7eadff0456b55c92a885ac455c0b1bcd",
         "scripts/measure-construction.mts": "9620ff945416a3ab1f96ffc6a0cc5bb9623a3155db9fad1e27a4f801745f7b8d",
@@ -418,21 +418,19 @@
         "tests/types/utility-configuration-contract.ts": "3a3d4e200e84d04d2e9856bfb4509a4ba948f4a67997d1327e66beef36aa0eb4",
         "tests/utility-configuration.test.ts": "55361de62fbb7e7695c94f940de566c2e35d218539a77b6ab1000877f71ad288",
         "tests/version-packages.test.ts": "c043e1877c54aab8fe2119de324909a3f671e5aea60cdfe6778f63abffc313c1",
-        "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
+        "tests/workflow-guards.test.ts": "2cc027ece2c43c38f1e0e6f18bb0adc738be854349cd07cba2666d9e78214995",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "83ce90d345a6d9dd48147dc13c4301ffc4b546c6",
-      "outcome": "updated",
-      "reason": "The cache-workflows reference and sharing guide describe screening both sides before Schema validation, rejecting incoming cycles before callbacks, and supporting shared acyclic references.",
+      "head": "95c0d76197111351575d5e4337823a93f3f238f5",
+      "outcome": "no-change",
+      "reason": "The pre-push guard and its local fixture now match pull requests by destination repository and branch. Neither file changes the library runtime, types, consumer guidance, domain map, planning specification, or skill tree.",
       "evidence": [
-        "src/core/schema-structural-sharing.ts",
-        "tests/schema-structural-sharing.test.ts",
-        "Focused core, prototype, RPC, and HTTP sharing checks passed (23 tests).",
-        "Intent validated the shipped skill. Fresh consumer-agent verification was not performed."
+        "scripts/check-workflow.mts and tests/workflow-guards.test.ts cover the contributor pre-push path.",
+        "vp test -- tests/skills-maintenance.test.ts tests/workflow-guards.test.ts passed 27 tests."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "185b115968c0619f142d98dff544ed3518a132df00f38d01e8ba72b15f06b165",
+      "fingerprint": "0772c3e560ddaa11a2448c5291c41e73745561869546140f67b7b1901017da00",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -635,7 +633,7 @@
         "scripts/check-effect-compatibility.mts": "b1de824e27e34089c445f183d1511d8e5f9e463892ff8edf83f76fb8c24778f4",
         "scripts/check-framework-consumers.mts": "fd6e99f4f9d854a0a738afd105094553e31472d525f7236693c235f8140dcad9",
         "scripts/check-toolchain.mts": "3c8efdb93594058ed78947bc65ad51c88ac4b26cab23b0b1fe6f8786a6d386e9",
-        "scripts/check-workflow.mts": "0116805295028c170b22e6dc759ef23313e06debe266ba1d6e243a1f4781288a",
+        "scripts/check-workflow.mts": "7628ba32f7321f5759c0180a5859fa478603704d8c6a7e2a22c643ef19d5808c",
         "scripts/compiler.mts": "b838a5766d3f9f8d8f73450814a703ff3b61e67a8ebeecfcb795d0da12f483bb",
         "scripts/measure-bundles.mts": "1825619af7f775a4e593e3198b0d521f7eadff0456b55c92a885ac455c0b1bcd",
         "scripts/measure-construction.mts": "9620ff945416a3ab1f96ffc6a0cc5bb9623a3155db9fad1e27a4f801745f7b8d",
@@ -850,17 +848,15 @@
         "tests/types/utility-configuration-contract.ts": "3a3d4e200e84d04d2e9856bfb4509a4ba948f4a67997d1327e66beef36aa0eb4",
         "tests/utility-configuration.test.ts": "55361de62fbb7e7695c94f940de566c2e35d218539a77b6ab1000877f71ad288",
         "tests/version-packages.test.ts": "c043e1877c54aab8fe2119de324909a3f671e5aea60cdfe6778f63abffc313c1",
-        "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
+        "tests/workflow-guards.test.ts": "2cc027ece2c43c38f1e0e6f18bb0adc738be854349cd07cba2666d9e78214995",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "83ce90d345a6d9dd48147dc13c4301ffc4b546c6",
-      "outcome": "updated",
-      "reason": "The domain map and skill spec cover array screening and acyclic shared references. Existing skill tree globs cover the implementation, focused tests, and guide.",
+      "head": "95c0d76197111351575d5e4337823a93f3f238f5",
+      "outcome": "no-change",
+      "reason": "The pre-push guard and its local fixture now match pull requests by destination repository and branch. Neither file changes the library runtime, types, consumer guidance, domain map, planning specification, or skill tree.",
       "evidence": [
-        "_artifacts/domain_map.yaml",
-        "_artifacts/skill_spec.md",
-        "_artifacts/skill_tree.yaml",
-        "Both YAML records parsed. The 23 focused sharing tests and shipped skill validation passed."
+        "scripts/check-workflow.mts and tests/workflow-guards.test.ts cover the contributor pre-push path.",
+        "vp test -- tests/skills-maintenance.test.ts tests/workflow-guards.test.ts passed 27 tests."
       ]
     },
     "source:vite.config.ts": {
