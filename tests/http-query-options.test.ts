@@ -80,11 +80,12 @@ describe("HTTP query options", () => {
         )
       ).resolves.toStrictEqual({ items: ["active:42"], next: null });
       expect(options.queryKey).toStrictEqual([
-        "test",
+        'effect-api-query:v2:["test"]',
         "http",
         "pages",
         "users",
         "list",
+        null,
         "infinite",
         { query: { cursor: "0", filter: "active" } },
       ]);
@@ -225,13 +226,29 @@ describe("HTTP query options", () => {
     try {
       expect(options).toMatchObject({
         queryFn: skipToken,
-        queryKey: ["test", "http", "pages", "users", "list", "query"],
+        queryKey: [
+          'effect-api-query:v2:["test"]',
+          "http",
+          "pages",
+          "users",
+          "list",
+          null,
+          "query",
+        ],
         staleTime: 123,
         meta: { label: "waiting" },
       });
       expect(infinite).toMatchObject({
         queryFn: skipToken,
-        queryKey: ["test", "http", "pages", "users", "list", "infinite"],
+        queryKey: [
+          'effect-api-query:v2:["test"]',
+          "http",
+          "pages",
+          "users",
+          "list",
+          null,
+          "infinite",
+        ],
         retry: false,
       });
       expect({

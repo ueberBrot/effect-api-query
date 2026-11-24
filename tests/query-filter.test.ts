@@ -272,10 +272,41 @@ describe("query filters", () => {
     });
     const queryClient = new QueryClient();
     const branch = http["users.v1"];
-    const read = ["http", "filters", "users.v1", "read.one", "query"];
-    const metadata = ["http", "filters", "users.v1", "read.one", "metadata"];
-    const topLevel = ["http", "filters", "ping", "query"];
-    const unrelated = ["http", "filters", "users.v1", "unknown", "query"];
+    const read = [
+      "effect-api-query:v2:[]",
+      "http",
+      "filters",
+      "users.v1",
+      "read.one",
+      null,
+      "query",
+    ];
+    const metadata = [
+      "effect-api-query:v2:[]",
+      "http",
+      "filters",
+      "users.v1",
+      "read.one",
+      null,
+      "metadata",
+    ];
+    const topLevel = [
+      "effect-api-query:v2:[]",
+      "http",
+      "filters",
+      "ping",
+      null,
+      "query",
+    ];
+    const unrelated = [
+      "effect-api-query:v2:[]",
+      "http",
+      "filters",
+      "users.v1",
+      "unknown",
+      null,
+      "query",
+    ];
     queryClient.setQueryData(read, "read");
     queryClient.setQueryData(metadata, "metadata");
     queryClient.setQueryData(topLevel, "top-level");
@@ -400,3 +431,127 @@ describe("query filters", () => {
       })
   );
 });
+
+it.effect(
+  "isolates structured RPC and HTTP namespaces in native cache operations",
+  () =>
+    Effect.gen(function* isolateStructuredNamespaces() {
+      const group = RpcGroup.make(
+        Rpc.make("users.read", { success: Schema.String })
+      );
+      const rpcClient = yield* makeRpcTestClient(group, {
+        "users.read": () => Effect.succeed("read"),
+      });
+      const api = HttpApi.make("directory").add(
+        HttpApiGroup.make("users").add(
+          HttpApiEndpoint.get("read", "/read", { success: Schema.String })
+        )
+      );
+      const httpClient = yield* makeUnusedHttpClient(api);
+      const keyPrefix = [{ scope: "directory" }, ["reader"]] as const;
+      const withExtraField = [
+        { scope: "directory", locale: "en" },
+        ["reader"],
+      ] as const;
+      const withExtraElement = [
+        { scope: "directory" },
+        ["reader", "writer"],
+      ] as const;
+      const withExtraSegment = [...keyPrefix, "local"] as const;
+      const rpc = createRpcQueryUtils(group, { client: rpcClient, keyPrefix });
+      const http = createHttpApiQueryUtils(api, {
+        client: httpClient,
+        keyPrefix,
+      });
+
+      const foreign = [
+        createRpcQueryUtils(group, {
+          client: rpcClient,
+          keyPrefix: withExtraField,
+        }),
+        createRpcQueryUtils(group, {
+          client: rpcClient,
+          keyPrefix: withExtraElement,
+        }),
+        createRpcQueryUtils(group, {
+          client: rpcClient,
+          keyPrefix: withExtraSegment,
+        }),
+        createRpcQueryUtils(group, { client: rpcClient }),
+        createHttpApiQueryUtils(api, {
+          client: httpClient,
+          keyPrefix: withExtraField,
+        }),
+        createHttpApiQueryUtils(api, {
+          client: httpClient,
+          keyPrefix: withExtraElement,
+        }),
+        createHttpApiQueryUtils(api, {
+          client: httpClient,
+          keyPrefix: withExtraSegment,
+        }),
+        createHttpApiQueryUtils(api, { client: httpClient }),
+      ].map((tree) => tree.users.read.queryKey());
+      const client = new QueryClient();
+      try {
+        for (const key of foreign) {
+          client.setQueryData(key, "foreign");
+        }
+        for (const tree of [rpc, http]) {
+          const key = tree.users.read.queryKey();
+          const descendant = [...tree.users.key(), "local", "entry"];
+          client.setQueryData(key, "selected");
+          client.setQueryData(descendant, "descendant");
+
+          expect({
+            root: client.getQueriesData(tree.queryFilter()),
+            nativeConditions: client.getQueriesData(
+              tree.users.queryFilter({
+                type: "inactive",
+                fetchStatus: "idle",
+                predicate: (query) => query.state.data === "selected",
+              })
+            ),
+            exact: client.getQueriesData(
+              tree.users.queryFilter({ exact: true })
+            ),
+            view: client.getQueriesData(
+              tree.users.queryFilter({ view: "query" })
+            ),
+          }).toStrictEqual({
+            root: [
+              [key, "selected"],
+              [descendant, "descendant"],
+            ],
+            nativeConditions: [[key, "selected"]],
+            exact: [],
+            view: [[key, "selected"]],
+          });
+
+          client.setQueryDefaults(tree.key(), { staleTime: 1000 });
+          expect({
+            selected: client.getQueryDefaults(key).staleTime,
+            foreign: foreign.map(
+              (other) => client.getQueryDefaults(other).staleTime
+            ),
+          }).toStrictEqual({
+            selected: 1000,
+            foreign: foreign.map(() => {}),
+          });
+          expect(
+            client.setQueriesData(tree.users.queryFilter(), () => "updated")
+          ).toStrictEqual([
+            [key, "updated"],
+            [descendant, "updated"],
+          ]);
+          client.removeQueries(tree.queryFilter());
+          expect(client.getQueriesData(tree.queryFilter())).toStrictEqual([]);
+        }
+        expect(foreign.map((key) => client.getQueryData(key))).toStrictEqual(
+          foreign.map(() => "foreign")
+        );
+      } finally {
+        client.clear();
+      }
+    })
+);

@@ -1562,7 +1562,14 @@ describe("createRpcQueryUtils streaming execution", () => {
           expect(options).toMatchObject({
             ...callerOptions,
             queryFn: skipToken,
-            queryKey: ["app", "rpc", "events", "watch", operation],
+            queryKey: [
+              'effect-api-query:v2:["app"]',
+              "rpc",
+              "events",
+              "watch",
+              null,
+              operation,
+            ],
           });
           expect({
             input: "input" in options,

@@ -41,14 +41,22 @@ function dtoRpcOptions<E>(
       client,
       keyPrefix: ["dto", "rpc"],
     }
-  ).profile.read.queryOptions({ retry: false, staleTime: 60_000 });
+  ).profile.read.queryOptions({
+    retry: false,
+    staleTime: 60_000,
+    meta: { snapshot: "dto" },
+  });
 }
 
 function dtoHttpOptions(client: HttpApiClient.ForApi<typeof dtoApi>) {
   return createHttpApiQueryUtils(dtoApi, {
     client,
     keyPrefix: ["dto", "http"],
-  }).profile.read.queryOptions({ retry: false, staleTime: 60_000 });
+  }).profile.read.queryOptions({
+    retry: false,
+    staleTime: 60_000,
+    meta: { snapshot: "dto" },
+  });
 }
 
 const snapshotDto = (queryClient: QueryClient): string =>
@@ -59,7 +67,7 @@ const snapshotDto = (queryClient: QueryClient): string =>
         defaultShouldDehydrateQuery(query) &&
         query.state.error === null &&
         query.state.fetchFailureReason === null &&
-        query.queryKey[0] === "dto",
+        query.meta?.["snapshot"] === "dto",
     })
   );
 

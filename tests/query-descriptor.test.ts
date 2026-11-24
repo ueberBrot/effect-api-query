@@ -312,11 +312,12 @@ it.effect(
         server.users.read.metadataKey({ input: { query: { id: 7 } } })
       );
       expect(bound.prefix).toStrictEqual([
-        "http-loader",
+        'effect-api-query:v2:["http-loader"]',
         "http",
         "descriptor-api",
         "users",
         "read",
+        null,
         "metadata",
       ]);
     })

@@ -77,6 +77,13 @@ skills:
       - topic: Frameworks and hosts
         reason: The optional React subpath provides typed context and keyed cache wiring. Hooks and transport remain native to their frameworks and hosts.
     failure_modes:
+      - mistake: Restore flat generated keys or filter with the raw caller prefix after upgrading
+        mechanism: V2 keys encode the complete caller tuple in one versioned namespace segment. A legacy flat tuple could identify more than one operation.
+        wrong_pattern: Restore an earlier TanStack snapshot or invalidate with the raw factory keyPrefix.
+        correct_pattern: Bump the persisted cache buster, rebuild keys with generated builders, and use each generated root filter for cross-adapter changes.
+        source: docs/adr/0059-version-and-isolate-generated-query-keys.md
+        priority: HIGH
+        status: active
       - mistake: Treat Reactivity record keys as per-entity subscriptions
         mechanism: Effect matches both the record group and its IDs, so writes can trigger sibling bindings.
         wrong_pattern: "Bind { users: [1] } and expect writes to { users: [2] } to skip that binding."

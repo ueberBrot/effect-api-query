@@ -22,7 +22,7 @@ A buffered multipart alternative makes an endpoint mutation-only even if it also
 | Option | Contract |
 | --- | --- |
 | `client` | Ready client for the supplied HttpApi. The application owns its transport, middleware, and lifetime. |
-| `keyPrefix` | Optional non-empty JSON tuple of safe identity values. Omit it to start keys at `["http", api.identifier]`. |
+| `keyPrefix` | Optional non-empty JSON tuple of safe identity values. Omit it to use the empty namespace for the HTTP API. |
 | `runtime` | Pass a ManagedRuntime with no layer initialization error, or a compatible runner function. Supply it when execution needs services. |
 | `keyEncoders` | Synchronous encoders keyed first by declaration group identifier, then endpoint identifier, including top-level groups. |
 

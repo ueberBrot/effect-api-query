@@ -151,7 +151,15 @@ describe("query usability", () => {
       }).toStrictEqual({
         encoded: 1,
         key: options.queryKey,
-        infinite: ["prepared", "rpc", "users", "read", "infinite", { id: 7 }],
+        infinite: [
+          'effect-api-query:v2:["prepared"]',
+          "rpc",
+          "users",
+          "read",
+          null,
+          "infinite",
+          { id: 7 },
+        ],
       });
       const queryClient = new QueryClient();
       try {

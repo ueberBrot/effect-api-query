@@ -38,7 +38,7 @@ const prepareProfileSnapshot = Effect.fnUntraced(function* (
       defaultShouldDehydrateQuery(query) &&
       query.state.error === null &&
       query.state.fetchFailureReason === null &&
-      query.queryKey[0] === "profile",
+      query.meta?.["snapshot"] === "profile",
   });
   const queries = yield* Effect.forEach(snapshot.queries, (query) =>
     Schema.encodeUnknownEffect(PreparedProfile)(query.state.data).pipe(

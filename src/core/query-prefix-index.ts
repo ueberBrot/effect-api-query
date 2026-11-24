@@ -11,7 +11,7 @@ const isPrimitiveSegment = (
   Predicate.isBoolean(value) ||
   (Predicate.isNumber(value) && Number.isFinite(value));
 
-export const compileQueryPrefix = (prefix: QueryKey) => {
+export const compileQueryPrefix = (prefix: QueryKey, maxLength: number) => {
   const hash = hashKey(prefix);
   const { length } = prefix;
   const lastIndex = length - 1;
@@ -21,7 +21,7 @@ export const compileQueryPrefix = (prefix: QueryKey) => {
   const checkFirst = isPrimitiveSegment(first);
 
   return (key: QueryKey): boolean => {
-    if (key.length < length) {
+    if (key.length < length || key.length > maxLength) {
       return false;
     }
     const keyLast = key[lastIndex];
@@ -53,7 +53,7 @@ const canMatchSegment = (
   segments.has(segment);
 
 export const indexQueryPrefixes = <Value>(
-  entries: Iterable<readonly [QueryKey, Value]>,
+  entries: Iterable<readonly [QueryKey, Value, maxLength: number]>,
   options: {
     readonly order?: "discovery" | "longest-first";
     readonly duplicateError?: () => Error;
@@ -61,14 +61,17 @@ export const indexQueryPrefixes = <Value>(
 ) => {
   interface Bucket {
     readonly length: number;
-    readonly values: Map<string, Value>;
+    readonly values: Map<
+      string,
+      { readonly value: Value; readonly maxLength: number }
+    >;
     first: Set<PrimitiveSegment> | undefined;
     last: Set<PrimitiveSegment> | undefined;
   }
 
   const byLength = new Map<number, Bucket>();
   let minLength = Number.POSITIVE_INFINITY;
-  for (const [prefix, value] of entries) {
+  for (const [prefix, value, maxLength] of entries) {
     const { length } = prefix;
     let bucket = byLength.get(length);
     if (bucket === undefined) {
@@ -85,7 +88,7 @@ export const indexQueryPrefixes = <Value>(
     if (options.duplicateError !== undefined && bucket.values.has(hash)) {
       throw options.duplicateError();
     }
-    bucket.values.set(hash, value);
+    bucket.values.set(hash, { value, maxLength });
     bucket.first = collectSegment(bucket.first, prefix[0]);
     bucket.last = collectSegment(bucket.last, prefix[length - 1]);
   }
@@ -111,9 +114,9 @@ export const indexQueryPrefixes = <Value>(
         canMatchSegment(last, key[length - 1]) &&
         canMatchSegment(first, key[0])
       ) {
-        const value = values.get(hashKey(key.slice(0, length)));
-        if (value !== undefined) {
-          return value;
+        const entry = values.get(hashKey(key.slice(0, length)));
+        if (entry && key.length <= entry.maxLength) {
+          return entry.value;
         }
       }
     }

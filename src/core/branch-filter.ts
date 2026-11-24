@@ -6,6 +6,7 @@ import type {
   BranchQueryFilterOptions,
 } from "./query-filter";
 import { indexQueryPrefixes } from "./query-prefix-index";
+import { generatedViewKeyLimit } from "./utility-key";
 
 export interface FilterPath {
   readonly key: QueryKey;
@@ -24,10 +25,11 @@ export const createBranchFilter = (
     matchers ??= new Map();
     let match = matchers.get(view);
     if (match === undefined) {
-      const entries: (readonly [QueryKey, true])[] = [];
+      const entries: (readonly [QueryKey, true, number])[] = [];
       for (const path of paths) {
         if (path.views.includes(view)) {
-          entries.push([[...path.key, view], true]);
+          const prefix = [...path.key, view];
+          entries.push([prefix, true, generatedViewKeyLimit(prefix)]);
         }
       }
       match = indexQueryPrefixes(entries, { order: "discovery" });

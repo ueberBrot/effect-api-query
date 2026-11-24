@@ -66,7 +66,7 @@ describe("createRpcQueryUtils semantic keys", () => {
       })
   );
 
-  it.effect("owns a normalized, deeply frozen copy of the key prefix", () =>
+  it.effect("owns a canonical snapshot of the key prefix", () =>
     Effect.gen(function* freezeCanonicalKeyPrefix() {
       const mutableNamespace = {
         nested: { value: 1 },
@@ -80,25 +80,10 @@ describe("createRpcQueryUtils semantic keys", () => {
       mutableNamespace.numbers[0] = 3;
 
       expect(utils.key()).toStrictEqual([
-        "app",
-        {
-          nested: { value: 1 },
-          numbers: [0],
-        },
+        'effect-api-query:v2:["app",{"nested":{"value":1},"numbers":[0]}]',
         "rpc",
       ]);
-      expect(Object.is(utils.key()[1]?.numbers?.[0], -0)).toBe(false);
-      expect({
-        key: Object.isFrozen(utils.key()),
-        namespace: Object.isFrozen(utils.key()[1]),
-        nested: Object.isFrozen(utils.key()[1]?.nested),
-        numbers: Object.isFrozen(utils.key()[1]?.numbers),
-      }).toStrictEqual({
-        key: true,
-        namespace: true,
-        nested: true,
-        numbers: true,
-      });
+      expect(Object.isFrozen(utils.key())).toBe(true);
     })
   );
 
@@ -119,35 +104,35 @@ describe("createRpcQueryUtils semantic keys", () => {
           branch: utils.users.key(),
           leaf: utils.users.get.key(),
         }).toStrictEqual({
-          root: queryKey.slice(0, 3),
-          branch: queryKey.slice(0, 4),
+          root: queryKey.slice(0, 2),
+          branch: queryKey.slice(0, 3),
           leaf: queryKey.slice(0, 5),
         });
         expect(queryKey.slice(0, 6)).toStrictEqual([
-          "tenant",
-          42,
+          'effect-api-query:v2:["tenant",42]',
           "rpc",
           "users",
           "get",
+          null,
           "query",
         ]);
         expect(utils.users.get.mutationKey()).toStrictEqual([
-          "tenant",
-          42,
+          'effect-api-query:v2:["tenant",42]',
           "rpc",
           "users",
           "get",
+          null,
           "mutation",
         ]);
         expect(utils.users.get.mutationOptions().mutationKey).toBe(
           utils.users.get.mutationKey()
         );
         expect(utils.health.ping.queryKey()).toStrictEqual([
-          "tenant",
-          42,
+          'effect-api-query:v2:["tenant",42]',
           "rpc",
           "health",
           "ping",
+          null,
           "query",
         ]);
       })
@@ -166,11 +151,11 @@ describe("createRpcQueryUtils semantic keys", () => {
         const infiniteKey = utils.users.get.infiniteKey({ input: { id: 1 } });
 
         expect(infiniteKey).toStrictEqual([
-          "tenant",
-          42,
+          'effect-api-query:v2:["tenant",42]',
           "rpc",
           "users",
           "get",
+          null,
           "infinite",
           { id: 1, locale: "en" },
         ]);
@@ -188,11 +173,11 @@ describe("createRpcQueryUtils semantic keys", () => {
           payload: Object.isFrozen(infiniteKey.at(-1)),
         }).toStrictEqual({ key: true, payload: true });
         expect(utils.health.ping.infiniteKey()).toStrictEqual([
-          "tenant",
-          42,
+          'effect-api-query:v2:["tenant",42]',
           "rpc",
           "health",
           "ping",
+          null,
           "infinite",
         ]);
       })
@@ -265,10 +250,11 @@ describe("createRpcQueryUtils semantic keys", () => {
           id: 1,
         });
         expect(utils.shapes.void.queryKey()).toStrictEqual([
-          "app",
+          'effect-api-query:v2:["app"]',
           "rpc",
           "shapes",
           "void",
+          null,
           "query",
         ]);
       })

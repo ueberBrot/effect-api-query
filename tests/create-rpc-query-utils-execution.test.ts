@@ -322,7 +322,14 @@ describe("createRpcQueryUtils execution boundaries", () => {
           key: firstOptions.mutationKey,
           shared: firstOptions.mutationKey === utils.counter.set.mutationKey(),
         }).toStrictEqual({
-          key: ["app", "rpc", "counter", "set", "mutation"],
+          key: [
+            'effect-api-query:v2:["app"]',
+            "rpc",
+            "counter",
+            "set",
+            null,
+            "mutation",
+          ],
           shared: true,
         });
 
