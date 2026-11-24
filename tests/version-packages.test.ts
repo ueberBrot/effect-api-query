@@ -1,6 +1,7 @@
 import { execFileSync, spawnSync } from "node:child_process";
 import {
   cpSync,
+  existsSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
@@ -13,11 +14,15 @@ import nodePath from "node:path";
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import { fixtureGitEnvironment } from "./fixtures/git-environment";
+
 const repository = nodePath.resolve(import.meta.dirname, "..");
 const fixture = mkdtempSync(nodePath.join(tmpdir(), "version-packages-"));
+const fixtureEnv = fixtureGitEnvironment();
 const run = (cwd: string, command: string, args: string[]) =>
   execFileSync(command, args, {
     cwd,
+    env: fixtureEnv,
     encoding: "utf-8",
     stdio: ["ignore", "pipe", "pipe"],
   });
@@ -33,6 +38,37 @@ const write = (cwd: string, file: string, content: string) => {
 };
 const read = (cwd: string, file: string) =>
   readFileSync(nodePath.join(cwd, file), "utf-8");
+
+const version = (cwd: string, env?: NodeJS.ProcessEnv) =>
+  env
+    ? spawnSync("node", ["scripts/version-packages.mts"], {
+        cwd,
+        env,
+        encoding: "utf-8",
+      })
+    : spawnSync("vp", ["run", "version-packages"], {
+        cwd,
+        env: fixtureEnv,
+        encoding: "utf-8",
+      });
+
+const withCommand = (cwd: string, command: "git" | "vp", script: string) => {
+  const bin = nodePath.join(cwd, ".git", "test-bin");
+  mkdirSync(bin, { recursive: true });
+  writeFileSync(nodePath.join(bin, command), `#!/bin/sh\n${script}\n`, {
+    mode: 0o755,
+  });
+  return {
+    ...fixtureEnv,
+    PATH: `${bin}${nodePath.delimiter}${fixtureEnv["PATH"] ?? ""}`,
+    FIXTURE_COMMAND: run(cwd, "sh", [
+      "-c",
+      'command -v "$1"',
+      "sh",
+      command,
+    ]).trim(),
+  };
+};
 
 const withCheckout = (test: (cwd: string) => void) => {
   const cwd = mkdtempSync(nodePath.join(tmpdir(), "version-packages-case-"));
@@ -90,8 +126,16 @@ describe("Changesets Intent review integration", () => {
       nodePath.join(fixture, "scripts/version-packages.mts")
     );
     cpSync(
+      nodePath.join(repository, "scripts/check-changesets.mts"),
+      nodePath.join(fixture, "scripts/check-changesets.mts")
+    );
+    cpSync(
       nodePath.join(repository, "scripts/lib/exec.mts"),
       nodePath.join(fixture, "scripts/lib/exec.mts")
+    );
+    cpSync(
+      nodePath.join(repository, "scripts/lib/versioning-checkout.mts"),
+      nodePath.join(fixture, "scripts/lib/versioning-checkout.mts")
     );
     run(fixture, "vp", [
       "exec",
@@ -211,10 +255,7 @@ describe("Changesets Intent review integration", () => {
         );
         commit(cwd);
         const before = read(cwd, ".intent/review-state.json");
-        const result = spawnSync("vp", ["run", "version-packages"], {
-          cwd,
-          encoding: "utf-8",
-        });
+        const result = version(cwd);
         expect(result.status).not.toBe(0);
         expect(read(cwd, ".intent/review-state.json")).toBe(before);
         expect(JSON.parse(read(cwd, "package.json"))).toMatchObject({
@@ -225,14 +266,238 @@ describe("Changesets Intent review integration", () => {
     30_000
   );
 
+  it.each([
+    ["release-fixture.md", "Commit: main~1"],
+    ["pre/bad.md", "  COMMIT:\nabcdef1"],
+    ["release-fixture.md", "PR: #12 commit: not-a-sha"],
+  ])(
+    "rejects a malformed commit directive in %s before versioning",
+    (file, directive) => {
+      withCheckout((cwd) => {
+        const path = `.changeset/${file}`;
+        mkdirSync(nodePath.dirname(nodePath.join(cwd, path)), {
+          recursive: true,
+        });
+        write(
+          cwd,
+          path,
+          `${read(cwd, ".changeset/release-fixture.md")}\n${directive}\n`
+        );
+        commit(cwd);
+        const ci = spawnSync("node", ["scripts/check-changesets.mts"], {
+          cwd,
+          env: fixtureEnv,
+          encoding: "utf-8",
+        });
+        expect(ci.status).toBe(1);
+        expect(ci.stderr).toContain(`${path}: invalid commit directive`);
+
+        const versioning = version(cwd);
+        expect(versioning.status).toBe(1);
+        expect(versioning.stderr).toContain(
+          `${path}: invalid commit directive`
+        );
+        expect(git(cwd, "status", "--porcelain")).toBe("");
+      });
+    },
+    30_000
+  );
+
+  it("accepts hexadecimal commit SHAs and ignores Changesets guidance files", () => {
+    withCheckout((cwd) => {
+      const path = ".changeset/release-fixture.md";
+      write(
+        cwd,
+        path,
+        `${read(cwd, path)}\n  CoMmIt: AbCdef1 with summary text\n\nCommit: later prose\n`
+      );
+      write(cwd, ".changeset/README.md", "Commit: example only\n");
+      expect(run(cwd, "node", ["scripts/check-changesets.mts"])).toBe("");
+    });
+  });
+
+  it("versions the current checkout with inherited Git context and skips checkout hooks", () => {
+    withCheckout((cwd) => {
+      const marker = nodePath.join(cwd, ".git", "checkout-hook-ran");
+      const hooks = nodePath.join(cwd, ".git", "hooks");
+      mkdirSync(hooks, { recursive: true });
+      writeFileSync(
+        nodePath.join(hooks, "post-checkout"),
+        '#!/bin/sh\nprintf "%s\\n" ran > "$FIXTURE_HOOK_MARKER"\n',
+        { mode: 0o755 }
+      );
+      git(cwd, "config", "core.hooksPath", hooks);
+      const result = version(cwd, {
+        ...fixtureEnv,
+        GIT_DIR: nodePath.join(fixture, ".git"),
+        GIT_WORK_TREE: fixture,
+        GIT_INDEX_FILE: nodePath.join(fixture, ".git/index"),
+        GIT_LITERAL_PATHSPECS: "1",
+        FIXTURE_HOOK_MARKER: marker,
+      });
+      expect(result.status).toBe(0);
+      expect(JSON.parse(read(cwd, "package.json"))).toMatchObject({
+        version: "0.2.0",
+      });
+      expect(git(fixture, "status", "--porcelain")).toBe("");
+      expect(existsSync(marker)).toBe(false);
+    });
+  }, 30_000);
+
+  it("compares a generated diff greater than one MiB", () => {
+    withCheckout((cwd) => {
+      const path = ".changeset/release-fixture.md";
+      const sample = `${"0123456789".repeat(10)}\n`;
+      write(
+        cwd,
+        path,
+        `${read(cwd, path)}\n~~~text\n${sample.repeat(11_000)}~~~\n`
+      );
+      commit(cwd);
+      intent(
+        cwd,
+        "review",
+        "--unchanged",
+        "The longer fixture release note describes the same change."
+      );
+      run(cwd, "vp", ["fmt", ".intent/review-state.json"]);
+      commit(cwd);
+      run(cwd, "vp", ["run", "version-packages"]);
+      expect(read(cwd, "CHANGELOG.md").length).toBeGreaterThan(1024 * 1024);
+      expect(git(cwd, "diff", "--cached", "--name-only")).toBe("");
+    });
+  }, 30_000);
+
+  it("rejects a failed Git diff even when it produced patch bytes", () => {
+    withCheckout((cwd) => {
+      const env = withCommand(
+        cwd,
+        "git",
+        `
+if [ "$1" = diff ] && [ "$4" = --binary ]; then
+  "$FIXTURE_COMMAND" "$@" || exit "$?"
+  exit 23
+fi
+exec "$FIXTURE_COMMAND" "$@"
+`
+      );
+      const result = version(cwd, env);
+      expect(result.status).toBe(1);
+      expect(result.stderr).toContain("git diff failed (exit 23)");
+      expect(git(cwd, "status", "--porcelain")).toBe("");
+      expect(version(cwd).status).toBe(0);
+    });
+  }, 30_000);
+
+  it("retries after validation fails following a recorded Intent review", () => {
+    withCheckout((cwd) => {
+      const worktrees = git(cwd, "worktree", "list", "--porcelain");
+      const env = withCommand(
+        cwd,
+        "vp",
+        `
+if [ "$1 $2 $3 $4 $5" = "exec intent maintainer check --base" ]; then
+  printf '%s\\n' 'Fixture validation failed after review.' >&2
+  exit 23
+fi
+exec "$FIXTURE_COMMAND" "$@"
+`
+      );
+      const result = version(cwd, env);
+      expect(result.status).toBe(1);
+      expect(result.stderr).toContain(
+        "Fixture validation failed after review."
+      );
+      expect(git(cwd, "status", "--porcelain")).toBe("");
+      expect(git(cwd, "worktree", "list", "--porcelain")).toBe(worktrees);
+
+      run(cwd, "vp", ["run", "version-packages"]);
+      expect(intent(cwd, "check")).toContain("0 pending review item(s)");
+    });
+  }, 30_000);
+
+  it("preserves ignored .env settings for the changelog generator", () => {
+    withCheckout((cwd) => {
+      write(cwd, ".git/local-excludes", ".env\n");
+      git(cwd, "config", "extensions.worktreeConfig", "true");
+      git(
+        cwd,
+        "config",
+        "--worktree",
+        "core.excludesFile",
+        nodePath.join(cwd, ".git/local-excludes")
+      );
+      write(cwd, ".env", "GITHUB_SERVER_URL=https://fixture.invalid\n");
+      const env = withCommand(
+        cwd,
+        "vp",
+        `
+if [ "$1 $2 $3" = "exec changeset version" ]; then
+  test "$GITHUB_SERVER_URL" = https://fixture.invalid || exit 23
+fi
+exec "$FIXTURE_COMMAND" "$@"
+`
+      );
+      expect(version(cwd, { ...env, GITHUB_SERVER_URL: "" }).status).toBe(0);
+      expect(read(cwd, ".env")).toBe(
+        "GITHUB_SERVER_URL=https://fixture.invalid\n"
+      );
+    });
+  }, 30_000);
+
+  it("restores generated paths after patch transfer fails", () => {
+    withCheckout((cwd) => {
+      const env = withCommand(
+        cwd,
+        "git",
+        `
+if [ "$1" = apply ] && [ "$2" = --whitespace=nowarn ]; then
+  "$FIXTURE_COMMAND" "$@" || exit "$?"
+  exit 23
+fi
+exec "$FIXTURE_COMMAND" "$@"
+`
+      );
+      const result = version(cwd, env);
+      expect(result.status).toBe(1);
+      expect(result.stderr).toContain("git apply --whitespace=nowarn");
+      expect(git(cwd, "status", "--porcelain")).toBe("");
+      expect(version(cwd).status).toBe(0);
+    });
+  }, 30_000);
+
+  it("preserves a caller edit during failed patch transfer", () => {
+    withCheckout((cwd) => {
+      const env = withCommand(
+        cwd,
+        "git",
+        `
+if [ "$1" = apply ] && [ "$2" = --whitespace=nowarn ]; then
+  "$FIXTURE_COMMAND" "$@" || exit "$?"
+  printf '%s\\n' 'Caller edited the changelog.' >> CHANGELOG.md
+  printf '%s\\n' 'Caller restored the release note.' > .changeset/release-fixture.md
+  exit 23
+fi
+exec "$FIXTURE_COMMAND" "$@"
+`
+      );
+      const result = version(cwd, env);
+      expect(result.status).toBe(1);
+      expect(result.stderr).toContain("Git could not restore the checkout");
+      expect(git(cwd, "status", "--porcelain")).toBe(
+        " M .changeset/release-fixture.md\n M CHANGELOG.md\n"
+      );
+      expect(read(cwd, "CHANGELOG.md")).toContain(
+        "Caller edited the changelog."
+      );
+    });
+  }, 30_000);
+
   it("refuses a dirty tree before consuming Changesets", () => {
     withCheckout((cwd) => {
       write(cwd, "src/index.ts", "export const value = 2;\n");
       const before = read(cwd, ".intent/review-state.json");
-      const result = spawnSync("vp", ["run", "version-packages"], {
-        cwd,
-        encoding: "utf-8",
-      });
+      const result = version(cwd);
       expect(result.status).not.toBe(0);
       expect(result.stderr).toContain("clean working tree");
       expect(read(cwd, ".intent/review-state.json")).toBe(before);
@@ -311,12 +576,10 @@ export default {
         run(cwd, "vp", ["fmt", ".intent/review-state.json"]);
         commit(cwd);
         const before = read(cwd, ".intent/review-state.json");
-        const result = spawnSync("vp", ["run", "version-packages"], {
-          cwd,
-          encoding: "utf-8",
-        });
+        const result = version(cwd);
         expect(result.status).not.toBe(0);
         expect(read(cwd, ".intent/review-state.json")).toBe(before);
+        expect(git(cwd, "status", "--porcelain")).toBe("");
         expect(result.stderr).toMatch(
           /Only the root package version|Unexpected versioning change|preserve existing changelog/u
         );
@@ -332,7 +595,7 @@ export default {
       const result = spawnSync(
         "vp",
         ["exec", "intent", "maintainer", "check", "--base", "main"],
-        { cwd, encoding: "utf-8" }
+        { cwd, env: fixtureEnv, encoding: "utf-8" }
       );
       expect(result.status).toBe(1);
       expect(result.stdout).toContain("changed src/index.ts");
