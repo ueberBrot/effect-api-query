@@ -95,13 +95,7 @@ export const startExampleRpcClient = async (
     return {
       client,
       dispose,
-      runtime: async (effect, options) =>
-        runtime.runPromiseExit(
-          RpcClient.withHeaders(effect, {
-            "x-example-authorization": "allowed",
-          }),
-          options
-        ),
+      runtime: runtime.runPromiseExit,
     };
   } catch (error) {
     try {

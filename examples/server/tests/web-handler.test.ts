@@ -1,6 +1,12 @@
-import { makeExampleRpcWebHandler } from "@effect-api-query/server/web-handler";
+import { randomUUID } from "node:crypto";
+
+import {
+  makeExampleRpcWebHandler,
+  makeExampleWebHandler,
+} from "@effect-api-query/server/web-handler";
 import { describe, expect, it } from "@effect/vitest";
 import { Effect } from "effect";
+import { TestClock } from "effect/testing";
 
 const streamingRequest = (
   url: string,
@@ -144,5 +150,54 @@ describe("example RPC request body limit", () => {
           expect(cancelled).toBe(true);
         }
       })
+  );
+});
+
+describe("verified demo write sessions", () => {
+  it.effect("allows same-origin writes until the issued session expires", () =>
+    Effect.gen(function* verifySession() {
+      const writeToken = randomUUID();
+      // oxlint-disable-next-line unicorn/no-useless-undefined
+      const handle = yield* makeExampleWebHandler(undefined, writeToken);
+      const origin = "https://example.test";
+      const issued = yield* Effect.promise(
+        async () =>
+          await handle(
+            new Request(`${origin}/api/demo-access`, {
+              method: "POST",
+              headers: { origin, authorization: `Bearer ${writeToken}` },
+            })
+          )
+      );
+      expect(issued.status).toBe(204);
+      const cookie = issued.headers.get("set-cookie");
+      expect(cookie).toMatch(
+        /; HttpOnly; SameSite=Strict; Max-Age=3600; Secure$/u
+      );
+      if (cookie === null) {
+        throw new Error("The host did not issue a session");
+      }
+      const remove = (id: number, requestOrigin: string) =>
+        Effect.promise(
+          async () =>
+            await handle(
+              new Request(`${origin}/api/users/${String(id)}`, {
+                method: "DELETE",
+                headers: {
+                  origin: requestOrigin,
+                  cookie: cookie.split(";")[0] ?? "",
+                },
+              })
+            )
+        );
+      const crossOrigin = yield* remove(1, "https://other.example.test");
+      expect(crossOrigin.status).toBe(401);
+      const authorized = yield* remove(1, origin);
+      expect(authorized.status).toBe(204);
+
+      yield* TestClock.adjust("1 hour");
+      const expired = yield* remove(2, origin);
+      expect(expired.status).toBe(401);
+    })
   );
 });

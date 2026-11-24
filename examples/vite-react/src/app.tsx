@@ -1,3 +1,4 @@
+import { DemoWriteAccess } from "@effect-api-query/shared/demo-write-access.tsx";
 import { WorkflowNavigation } from "@effect-api-query/shared/http-workflows/app.tsx";
 import { createQueryUtilsContext } from "@ueberbrot/effect-api-query/react";
 
@@ -18,6 +19,7 @@ const ExampleContent = () => {
       <main className="mx-auto grid max-w-7xl gap-5 px-5 py-12 md:grid-cols-2">
         <header className="border-border border-l-brand-600 bg-card shadow-shadow/50 border p-6 shadow-2xl md:col-span-2 md:border-l-4 md:p-8">
           <WorkflowNavigation />
+          <DemoWriteAccess />
           <h1 className="display-heading tracking-display text-foreground max-w-4xl text-3xl font-black sm:text-5xl">
             Compare full queries, pages, and streams
           </h1>

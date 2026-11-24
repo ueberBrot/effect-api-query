@@ -2,6 +2,7 @@ import { expect } from "@playwright/test";
 import type { Request } from "@playwright/test";
 
 import {
+  enableDemoWrites,
   isHttpRequest,
   exampleTest as test,
   prepareExampleApplication,
@@ -70,7 +71,9 @@ test.describe("Vite React HTTP API example", () => {
 
   test("shares mutations across adapters and decodes an HTTP no-content deletion", async ({
     page,
+    writeToken,
   }) => {
+    await enableDemoWrites(page, writeToken);
     const http = page.getByRole("region", { name: "HTTP API example" });
     await expect(
       http.getByText("HTTP: Ada Lovelace", { exact: true })

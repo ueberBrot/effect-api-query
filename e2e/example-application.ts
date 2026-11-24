@@ -1,4 +1,5 @@
 import { fork } from "node:child_process";
+import { randomUUID } from "node:crypto";
 import { once } from "node:events";
 import { fileURLToPath } from "node:url";
 
@@ -11,14 +12,20 @@ const decodeOrigin = Schema.decodeUnknownSync(Schema.String);
 export const exampleTest = base.extend<{
   exampleHost: "standalone" | "start";
   exampleUrl: string;
+  writeToken: string;
 }>({
   exampleHost: ["standalone", { option: true }],
+  // oxlint-disable-next-line eslint/no-empty-pattern
+  writeToken: async ({}, use) => {
+    await use(randomUUID());
+  },
   exampleUrl: [
-    async ({ exampleHost }, use) => {
+    async ({ exampleHost, writeToken }, use) => {
       const host = fork(
         fileURLToPath(new URL("example-host.ts", import.meta.url)),
         [exampleHost],
         {
+          env: { ...process.env, EXAMPLE_WRITE_TOKEN: writeToken },
           execArgv: ["--import", "tsx"],
           stdio: ["ignore", "ignore", "inherit", "ipc"],
         }
@@ -79,3 +86,12 @@ export const isHttpRequest = (
 ): boolean =>
   request.method() === method &&
   new URL(request.url()).pathname === `/api${pathname}`;
+
+export const enableDemoWrites = async (page: Page, writeToken: string) => {
+  await page.getByText("Demo write access", { exact: true }).click();
+  await page.getByLabel("Write token").fill(writeToken);
+  await page.getByRole("button", { name: "Enable writes" }).click();
+  await expect(page.getByLabel("Write access", { exact: true })).toHaveText(
+    "Write access enabled for one hour."
+  );
+};

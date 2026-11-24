@@ -1,6 +1,9 @@
 import { expect } from "@playwright/test";
 
-import { exampleTest as test } from "./example-application.ts";
+import {
+  enableDemoWrites,
+  exampleTest as test,
+} from "./example-application.ts";
 
 for (const application of [
   {
@@ -20,8 +23,10 @@ for (const application of [
     test("a first typed write seeds the generated cache entry", async ({
       exampleUrl,
       page,
+      writeToken,
     }) => {
       await page.goto(`${exampleUrl}${application.path}?example=minimal`);
+      await enableDemoWrites(page, writeToken);
       await expect(
         page.getByRole("heading", { name: "First read and write" })
       ).toBeVisible();
@@ -41,8 +46,10 @@ for (const application of [
     test("metadata writes expose typed validation and revision conflicts", async ({
       exampleUrl,
       page,
+      writeToken,
     }) => {
       await page.goto(`${exampleUrl}${application.path}?example=metadata`);
+      await enableDemoWrites(page, writeToken);
       await expect(page.getByText("HTTP status: 200")).toBeVisible();
       await page
         .getByRole("button", { name: "Remember this revision" })
@@ -67,6 +74,47 @@ for (const application of [
       await expect(page.getByRole("alert")).toHaveText(
         "The document changed. Read the latest revision before saving again."
       );
+    });
+
+    test("requires write access and atomically checks document revisions", async ({
+      exampleUrl,
+      page,
+      writeToken,
+    }) => {
+      await page.goto(`${exampleUrl}${application.path}?example=metadata`);
+      const document = `${exampleUrl}/api/workflows/document`;
+      const readings = `${exampleUrl}/api/workflows/readings`;
+      const before = await page.request.get(document);
+      const etag = '"document-1"';
+      expect(before.headers()["etag"]).toBe(etag);
+      const headers = { "if-match": etag, origin: exampleUrl };
+      const write = async (title: string) =>
+        await page.request.post(document, { data: { title }, headers });
+      const deniedDocument = await write("Anonymous title");
+      expect(deniedDocument.status()).toBe(401);
+      const deniedReadings = await page.request.post(readings, {
+        data: { room: "lab" },
+        headers: { origin: exampleUrl },
+      });
+      expect(deniedReadings.status()).toBe(401);
+      const afterDenial = await page.request.get(document);
+      expect(afterDenial.headers()["etag"]).toBe(etag);
+
+      await enableDemoWrites(page, writeToken);
+      const writes = await Promise.all([
+        write("First title"),
+        write("Second title"),
+      ]);
+      const statuses = writes.map((response) => response.status());
+      expect(statuses).toContain(200);
+      expect(statuses).toContain(412);
+      const conflict = writes.find((response) => response.status() === 412);
+      expect(await conflict?.json()).toMatchObject({
+        currentEtag: '"document-2"',
+      });
+      const after = await page.request.get(document);
+      expect(after.headers()["etag"]).toBe('"document-2"');
+      expect(await after.json()).toMatchObject({ revision: 2 });
     });
 
     for (const format of ["sse", "ndjson"]) {
@@ -127,8 +175,10 @@ for (const application of [
     test("schema sharing preserves memoized cards until their decoded data changes", async ({
       exampleUrl,
       page,
+      writeToken,
     }) => {
       await page.goto(`${exampleUrl}${application.path}?example=sharing`);
+      await enableDemoWrites(page, writeToken);
       const cards = page
         .getByRole("list", { name: "Decoded readings" })
         .getByRole("listitem");

@@ -23,6 +23,7 @@ import {
   Scope,
   Stream,
 } from "effect";
+import { FetchHttpClient } from "effect/http";
 import { RpcClient } from "effect/rpc";
 
 import { makeDiagnosticOperations } from "../src/diagnostic-operations.ts";
@@ -207,7 +208,7 @@ describe("example RPC server", () => {
           await fetch(server.rpcUrl, {
             headers: {
               "access-control-request-headers":
-                "baggage,content-type,traceparent,tracestate,x-example-authorization",
+                "authorization,baggage,content-type,traceparent,tracestate",
               "access-control-request-method": "POST",
               origin: "http://127.0.0.1:5173",
             },
@@ -217,7 +218,7 @@ describe("example RPC server", () => {
       expect(preflight.status).toBe(204);
       expect(preflight.headers.get("access-control-allow-origin")).toBe("*");
       expect(preflight.headers.get("access-control-allow-headers")).toBe(
-        "baggage,content-type,traceparent,tracestate,x-example-authorization"
+        "authorization,baggage,content-type,traceparent,tracestate"
       );
       expect(preflight.headers.get("access-control-allow-methods")).toContain(
         "POST"
@@ -322,7 +323,7 @@ describe("example RPC server", () => {
 
   it.live("requires authorization to delete a seeded user", () =>
     Effect.gen(function* authorizeUserDeletion() {
-      const { server, seed } = yield* startExampleServerFixture();
+      const { server, seed, writeToken } = yield* startExampleServerFixture();
       const client = yield* makeExampleRpcClient(server.rpcUrl);
       yield* seed({
         users: [
@@ -338,11 +339,19 @@ describe("example RPC server", () => {
         _tag: "ExampleAuthorizationError",
         reason: "missing-example-authorization",
       });
+      const metadataOnly = yield* Effect.flip(
+        RpcClient.withHeaders(client["users.delete"]({ id: 1 }), {
+          authorization: `Bearer ${writeToken}`,
+        })
+      );
+      expect(metadataOnly).toMatchObject({ _tag: "ExampleAuthorizationError" });
 
       expect(
-        yield* RpcClient.withHeaders(client["users.delete"]({ id: 1 }), {
-          "x-example-authorization": "allowed",
-        })
+        yield* client["users.delete"]({ id: 1 }).pipe(
+          Effect.provideService(FetchHttpClient.RequestInit, {
+            headers: { authorization: `Bearer ${writeToken}` },
+          })
+        )
       ).toBeUndefined();
       // oxlint-disable-next-line unicorn/no-useless-undefined
       expect(yield* client["users.list"](undefined)).toStrictEqual([

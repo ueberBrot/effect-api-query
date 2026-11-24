@@ -18,11 +18,9 @@ describe("featured user loader", () => {
     );
     const server = await startServerApplication({
       host,
-      authorization: "allowed",
     });
     const browser = await startServerApplication({
       host,
-      authorization: "allowed",
     });
     try {
       const router = await createTanStackStartRouter({

@@ -12,7 +12,7 @@ import {
 } from "@ueberbrot/effect-api-query";
 import type { RunPromiseExit } from "@ueberbrot/effect-api-query";
 import { Effect, Layer, ManagedRuntime } from "effect";
-import { FetchHttpClient, HttpClient, HttpClientRequest } from "effect/http";
+import { FetchHttpClient } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
 
 type StartKeyPrefix = readonly ["tanstack-start", string];
@@ -58,7 +58,6 @@ export interface StartTanStackStartApplicationOptions {
   readonly fetch?: typeof globalThis.fetch;
   readonly httpBaseUrl?: string;
   readonly identity?: string;
-  readonly httpAuthorization?: string;
 }
 
 export const startTanStackStartApplication = async ({
@@ -66,7 +65,6 @@ export const startTanStackStartApplication = async ({
   rpcClient: readyRpcClient,
   fetch: applicationFetch,
   identity = "example",
-  httpAuthorization = "allowed",
   httpBaseUrl = new URL(rpcUrl, globalThis.location?.href).origin,
 }: StartTanStackStartApplicationOptions): Promise<TanStackStartApplication> => {
   const rpcClient = readyRpcClient ?? (await startExampleRpcClient(rpcUrl));
@@ -163,12 +161,6 @@ export const startTanStackStartApplication = async ({
     const httpClient = await httpRuntime.runPromise(
       HttpApiClient.make(exampleHttpApi, {
         baseUrl: httpBaseUrl,
-        transformClient: HttpClient.mapRequest(
-          HttpClientRequest.setHeader(
-            "x-example-authorization",
-            httpAuthorization
-          )
-        ),
       })
     );
     const httpQuery = makeExampleHttpQueryUtils(

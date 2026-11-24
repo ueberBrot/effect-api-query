@@ -9,7 +9,7 @@ Complete the [workspace setup](/effect-api-query/examples/#set-up-locally), then
 vp run vite-react-dev
 ```
 
-Open `http://127.0.0.1:5173` and choose a screen from the navigation.
+Open `http://127.0.0.1:5173` and choose a screen from the navigation. [Enable demo writes](/effect-api-query/examples/#enable-demo-writes) to save document titles or change readings in either app.
 
 For Start, run `vp run tanstack-start-dev` and open `http://127.0.0.1:3000/workflows`. Both apps use the same workflow components. Start opens the workflow's resources in the browser, separately from server rendering. Leaving the route waits for local work before disposal.
 

@@ -39,7 +39,7 @@ StackBlitz WebContainers lack the native binding that Vite+ needs to run these e
 vp run vite-react-dev
 ```
 
-Vite starts the development server and proxies `/rpc` and `/api` to the standalone API. Both adapters share a user directory. To use another HTTP host, set `VITE_HTTP_BASE_URL` to its origin. The contract adds `/api`, and client middleware adds the demo authorization header.
+Vite starts the development server and proxies `/rpc` and `/api` to the standalone API. Both adapters share a user directory. For reads from another HTTP host, set `VITE_HTTP_BASE_URL` to its origin. The contract adds `/api`. Browser write access requires the same-origin proxy.
 
 ### Compare HTTP and RPC
 
@@ -62,6 +62,10 @@ Open `http://127.0.0.1:3000`. Choose "HTTP users" to see server-rendered data an
 
 See the [router](https://github.com/ueberBrot/effect-api-query/blob/main/examples/tanstack-start/src/router.tsx), [hydration codecs](https://github.com/ueberBrot/effect-api-query/blob/main/examples/tanstack-start/src/lib/query-ssr.ts), and [failure route](https://github.com/ueberBrot/effect-api-query/blob/main/examples/tanstack-start/src/routes/http-failure.tsx). The [Start guide](/effect-api-query/guides/tanstack-start/) explains the integration.
 
+## Enable demo writes
+
+To try user deletion or change the shared workflow document and readings, set `EXAMPLE_WRITE_TOKEN` to a private random value before starting the server. Open **Demo write access** in the app and enter the token. The browser receives a one-hour session cookie. Use the app and API on the same origin, through the Vite proxy or the Start host.
+
 ## Try cancellable commands
 
 In "Cancellable commands", start two commands and cancel one. The other continues. See [cancellable commands](/effect-api-query/examples/cancellable-commands/) for the command protocol.
@@ -76,7 +80,7 @@ When diagnostics finish, choose "Replay newest 2" or "Replay full history". The 
 
 ## Inspect request-local metadata
 
-"Trigger declared failure" sends `x-request-source: diagnostics-panel` on that RPC request. Shared authorization stays on the client runner. See [request-local RPC options](/effect-api-query/reference/generated-builders/#request-local-rpc-options).
+"Trigger declared failure" sends `x-request-source: diagnostics-panel` on that RPC request. See [request-local RPC options](/effect-api-query/reference/generated-builders/#request-local-rpc-options).
 
 ## Build the examples
 

@@ -2,6 +2,7 @@ import { expect } from "@playwright/test";
 import { Schema } from "effect";
 
 import {
+  enableDemoWrites,
   isHttpRequest,
   prepareExampleApplication,
   startExampleTest as test,
@@ -127,7 +128,42 @@ test.describe("TanStack Start HTTP API example", () => {
 
   test("mutates and invalidates the hydrated HTTP directory", async ({
     page,
+    writeToken,
   }) => {
+    const { origin } = new URL(page.url());
+    const deleteRpcUser = async () => {
+      const response = await page.request.post(`${origin}/rpc`, {
+        headers: { origin },
+        data: [
+          {
+            _tag: "Request",
+            id: "1",
+            tag: "users.delete",
+            payload: { id: 2 },
+            headers: [],
+          },
+        ],
+      });
+      expect(response.ok()).toBe(true);
+      const result: unknown = await response.json();
+      return result;
+    };
+    const failedSignIn = await page.request.post(`${origin}/api/demo-access`, {
+      headers: { origin, authorization: "Bearer invalid-token" },
+    });
+    expect(failedSignIn.status()).toBe(401);
+    expect(failedSignIn.headers()["set-cookie"]).toBeUndefined();
+    expect(await deleteRpcUser()).toMatchObject([
+      { exit: { _tag: "Failure" } },
+    ]);
+    const unauthorized = await page.request.delete(
+      new URL("/api/users/1", page.url()).href
+    );
+    expect(unauthorized.status()).toBe(401);
+    await enableDemoWrites(page, writeToken);
+    expect(await deleteRpcUser()).toMatchObject([
+      { exit: { _tag: "Success" } },
+    ]);
     const refreshed = page.waitForResponse(
       (response) =>
         response.ok() && isHttpRequest(response.request(), "GET", "/users")

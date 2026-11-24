@@ -1,6 +1,7 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Schema } from "effect";
 
+import { DemoWriteAccess } from "../demo-write-access.tsx";
 import type { HttpWorkflows } from "./application.ts";
 import { DocumentExample, MinimalExample } from "./document.tsx";
 import { EventsExample } from "./events.tsx";
@@ -54,6 +55,7 @@ export const HttpWorkflowsExample = ({
     <QueryClientProvider client={application.queryClient}>
       <main className="mx-auto grid max-w-4xl gap-8 px-5 py-12">
         <WorkflowNavigation basePath={basePath} />
+        {basePath === "/" && <DemoWriteAccess />}
         <h1 className="display-heading text-foreground text-3xl font-bold">
           {title}
         </h1>

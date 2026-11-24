@@ -28,11 +28,9 @@ describe("Start snapshot preparation", () => {
     );
     const server = await startServerApplication({
       host,
-      authorization: "allowed",
     });
     const browser = await startServerApplication({
       host,
-      authorization: "allowed",
     });
     try {
       const serverRouter = await createTanStackStartRouter({
@@ -129,11 +127,9 @@ describe("Start snapshot preparation", () => {
     );
     const server = await startServerApplication({
       host,
-      authorization: "allowed",
     });
     const browser = await startServerApplication({
       host,
-      authorization: "allowed",
     });
     try {
       const serverRouter = await createTanStackStartRouter({
@@ -196,18 +192,21 @@ describe("Start snapshot preparation", () => {
     const application = await startServerApplication({
       host: {
         ...host,
-        makeRpcClient: Effect.fnUntraced(function* makeRpcClient(
-          authorization: string | undefined
-        ) {
-          yield* Effect.addFinalizer(() =>
-            Effect.sync(() => {
-              events.push("clients-released");
-            })
-          );
-          return yield* host.makeRpcClient(authorization);
-        }),
+        forRequest: (request) => {
+          const local = host.forRequest(request);
+          return {
+            ...local,
+            makeRpcClient: Effect.fnUntraced(function* makeRpcClient() {
+              yield* Effect.addFinalizer(() =>
+                Effect.sync(() => {
+                  events.push("clients-released");
+                })
+              );
+              return yield* local.makeRpcClient();
+            }),
+          };
+        },
       },
-      authorization: "allowed",
     });
     let publishing: Promise<unknown> | undefined;
     try {

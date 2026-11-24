@@ -9,7 +9,7 @@ import {
 } from "@ueberbrot/effect-api-query";
 import type { RuntimeInput } from "@ueberbrot/effect-api-query";
 import { ManagedRuntime } from "effect";
-import { FetchHttpClient, HttpClient, HttpClientRequest } from "effect/http";
+import { FetchHttpClient } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
 
 import { makeOwnerCache, ownerKeyPrefix } from "./owner-cache.ts";
@@ -93,9 +93,6 @@ export const startViteReactApplication = async ({
       const httpClient = await httpRuntime.runPromise(
         HttpApiClient.make(exampleHttpApi, {
           baseUrl: httpBaseUrl,
-          transformClient: HttpClient.mapRequest(
-            HttpClientRequest.setHeader("x-example-authorization", "allowed")
-          ),
         })
       );
       return { rpcClient, httpRuntime, httpClient };

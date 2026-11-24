@@ -1,13 +1,12 @@
 import {
   exampleHttpApi,
-  ExampleAuthorizationError,
   ExampleHttpAuthorization,
   SeedUser,
 } from "@effect-api-query/contracts";
 import { Effect, Layer } from "effect";
-import { HttpServerRequest } from "effect/http";
 import { HttpApiBuilder } from "effect/http-api";
 
+import { requireDemoWriter } from "./caller.ts";
 import { ExampleDomain } from "./domain.ts";
 
 const usersRoutes = HttpApiBuilder.group(
@@ -40,22 +39,13 @@ const diagnosticRoutes = HttpApiBuilder.group(
   })
 );
 
-const authorization = Layer.succeed(
+export const exampleHttpAuthorization = Layer.succeed(
   ExampleHttpAuthorization,
-  ExampleHttpAuthorization.of(
-    Effect.fn("ExampleHttp.authorization")(function* (effect) {
-      const request = yield* HttpServerRequest.HttpServerRequest;
-      if (request.headers["x-example-authorization"] !== "allowed") {
-        return yield* new ExampleAuthorizationError({
-          reason: "missing-example-authorization",
-        });
-      }
-      return yield* effect;
-    })
+  ExampleHttpAuthorization.of((effect) =>
+    Effect.andThen(requireDemoWriter, effect)
   )
 );
 
 export const exampleHttpRoutes = HttpApiBuilder.layer(exampleHttpApi).pipe(
-  Layer.provide([usersRoutes, diagnosticRoutes]),
-  Layer.provide(authorization)
+  Layer.provide([usersRoutes, diagnosticRoutes])
 );

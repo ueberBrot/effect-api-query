@@ -21,7 +21,8 @@ const servePreview = async (
   );
   const options: PreviewOptions = { port: 0 };
   if (apiTarget !== undefined) {
-    options.proxy = { "/api": apiTarget, "/rpc": apiTarget };
+    const proxy = { target: apiTarget, changeOrigin: false };
+    options.proxy = { "/api": proxy, "/rpc": proxy };
   }
   const server = await preview({ preview: options });
   try {
@@ -44,7 +45,9 @@ if (process.argv[2] === "start") {
   const scope = Scope.makeUnsafe();
   try {
     const server = await Effect.runPromise(
-      startExampleRpcServer().pipe(Scope.provide(scope))
+      startExampleRpcServer({
+        writeToken: process.env["EXAMPLE_WRITE_TOKEN"],
+      }).pipe(Scope.provide(scope))
     );
     await servePreview("vite-react", server.url);
   } finally {

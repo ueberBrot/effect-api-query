@@ -21,20 +21,27 @@ skills:
       - "**/examples/contracts/src/*.ts"
       - "**/examples/shared/http-workflows/*.ts*"
       - e2e/http-workflows.spec.ts
+      - e2e/example-application.ts
+      - e2e/example-host.ts
+      - e2e/tanstack-start-http.spec.ts
+      - e2e/vite-http.spec.ts
       - src/**/*.ts
       - src/react/index.tsx
       - tsconfig.declarations.json
       - tests/**/*.ts
       - tests/**/*.tsx
       - "**/examples/shared/*.ts"
+      - "**/examples/shared/demo-write-access.tsx"
       - "**/examples/vite-react/src/lib/*.ts"
       - "**/examples/vite-react/src/main.tsx"
       - "**/examples/vite-react/src/app.tsx"
+      - "**/examples/vite-react/vite.config.ts"
       - "**/examples/vite-react/src/components/sections/commands-section.tsx"
       - "**/examples/shared/ui/effect-error-details.tsx"
       - "**/examples/vite-react/tests/*.ts*"
       - "**/examples/tanstack-start/src/lib/*.ts"
       - "**/examples/tanstack-start/src/router.tsx"
+      - "**/examples/tanstack-start/src/routes/__root.tsx"
       - "**/examples/tanstack-start/src/components/effect-error-details.tsx"
       - "**/examples/tanstack-start/tests/*.ts*"
       - "**/examples/server/src/*.ts"
