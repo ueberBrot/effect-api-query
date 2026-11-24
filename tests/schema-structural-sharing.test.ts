@@ -285,6 +285,29 @@ describe("Schema structural sharing", () => {
     }
   );
 
+  it("checks both arrays before Schema validation and reuses equivalent arrays", () => {
+    const schema = Schema.Array(Schema.Int);
+    const checked = vi.fn<() => boolean>(() => true);
+    const share = schemaStructuralSharing(
+      schema.check(Schema.makeFilter(checked)),
+      { equivalence: Schema.toEquivalence(schema) }
+    );
+    const previous = [1];
+    const incoming = [1];
+    const ownKeys = vi.spyOn(Reflect, "ownKeys");
+    try {
+      expect(share(previous, incoming)).toBe(previous);
+      const previousInspection = ownKeys.mock.calls.findIndex(
+        ([value]) => value === previous
+      );
+      expect(ownKeys.mock.invocationCallOrder[previousInspection]).toBeLessThan(
+        checked.mock.invocationCallOrder[0] ?? 0
+      );
+    } finally {
+      ownKeys.mockRestore();
+    }
+  });
+
   it("rejects an incoming cycle before comparing an earlier sibling", () => {
     const checked = vi.fn<() => boolean>(() => true);
     const equivalence = vi.fn<() => boolean>(() => true);

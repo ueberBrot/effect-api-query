@@ -257,12 +257,15 @@ export const schemaStructuralSharing = <T>(
       if (Object.is(oldValue, newValue)) {
         return oldValue;
       }
-      if (canInspectAtom(newValue, checked) && accepts(newValue)) {
-        return canInspectAtom(oldValue, checked) &&
-          accepts(oldValue) &&
-          options.equivalence(oldValue, newValue)
-          ? oldValue
-          : newValue;
+      if (canInspectAtom(newValue, checked)) {
+        const canInspectPrevious = canInspectAtom(oldValue, checked);
+        if (accepts(newValue)) {
+          return canInspectPrevious &&
+            accepts(oldValue) &&
+            options.equivalence(oldValue, newValue)
+            ? oldValue
+            : newValue;
+        }
       }
       if (Array.isArray(newValue)) {
         return shareArray(oldValue, newValue, share);

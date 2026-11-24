@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "863f46da5067d14ed92d07b3e04c6b0e5f73946722219a41371dd64572c5ed0d",
+      "fingerprint": "d48189aa9b01fae7b4d32d50db30c2a6450ab03aad0bbdbc84b0bc2dc196af84",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -247,7 +247,7 @@
         "src/core/reactivity-invalidation.ts": "0f8465628e341e00cca4b65ea19ac75d6cfe1f344da092e4e89ec4dabda6976a",
         "src/core/runtime.ts": "9e99f2a078a1058b3b6b01ada7585d3f63d3486b397be3a6e1f08f0d3f0a9fad",
         "src/core/schema-key.ts": "0d6c00371526085fe19689a7401dfd86cb6f6a96f6b351b4b31bb2648804d5df",
-        "src/core/schema-structural-sharing.ts": "70d01c80a86a3c000014a76433369b9aa004503c1bc2ad6aecca531262b691d7",
+        "src/core/schema-structural-sharing.ts": "e4acf5aac2fd01a364506d2c375d9e785227b4e2a57f82b887e55fd16ffcfbd7",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
         "src/core/stream-publication.ts": "16db2d472ee7146cd0faff53624ed0bfa31eb365c10e52587621750d053e8078",
         "src/core/stream-pull.ts": "9b7957b4487ddcdce2183f55c6f08e6cddee011c5d5e5b8c7b72ec839a7e3c42",
@@ -340,7 +340,7 @@
         "tests/react.test.tsx": "a5494e54ab73dc73a30c4a1e0d51634ad9772735195295e1f65cc9274531b554",
         "tests/reactivity-invalidation.test.ts": "4e4c02e42b62a0e0cdadf058051ac1074f7cc430675569e40c31e4537ed9694d",
         "tests/schema-sharing-prototypes.test.ts": "628a6622656b9b53e686d14b9efbd3abc13c61a13db1546001b0689b491f6022",
-        "tests/schema-structural-sharing.test.ts": "dbe1249beb771e45a43647f80a5b3264ecf545f37e370ce004259f60d2b03b1d",
+        "tests/schema-structural-sharing.test.ts": "e92f9f428804339a99d7ff4c6fc40a9696d953eeccb1176f6b3758a33412eb2d",
         "tests/skills-maintenance.test.ts": "015e0b882f6a43e0692c9643ad78fe111bcd15edf2adff1b46f5d0deb68b3498",
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
         "tests/skills/query-usability/grade.test.ts": "b4ce4b395a7f38bdc788f3d3268e0236bbe5827b153df9c0592165f0d81817cd",
@@ -421,18 +421,18 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "033bfddb8e0dcdc595fc7dad24aaf1f93a81f1cd",
+      "head": "c4dccdab4857cd3861fa130862106916a01deee7",
       "outcome": "updated",
-      "reason": "The cache-workflows reference and sharing guide now describe descriptor screening, rejection of incoming cycles before callbacks, and support for shared acyclic references.",
+      "reason": "The cache-workflows reference and sharing guide describe screening both sides before Schema validation, rejecting incoming cycles before callbacks, and supporting shared acyclic references.",
       "evidence": [
         "src/core/schema-structural-sharing.ts",
         "tests/schema-structural-sharing.test.ts",
-        "Focused structural-sharing checks passed across core, RPC, and HTTP (20 tests).",
+        "Focused core, prototype, RPC, and HTTP sharing checks passed (23 tests).",
         "Intent validated the shipped skill. Fresh consumer-agent verification was not performed."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "c4d0cab1e4c7bf05c566d5686bdd10ad87c99bdf896aef9a173a1586778516b1",
+      "fingerprint": "c9258e52a57ac7f6ce8e69161711fb31b29e79fa665e74a237fa4cc0a58df064",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -679,7 +679,7 @@
         "src/core/reactivity-invalidation.ts": "0f8465628e341e00cca4b65ea19ac75d6cfe1f344da092e4e89ec4dabda6976a",
         "src/core/runtime.ts": "9e99f2a078a1058b3b6b01ada7585d3f63d3486b397be3a6e1f08f0d3f0a9fad",
         "src/core/schema-key.ts": "0d6c00371526085fe19689a7401dfd86cb6f6a96f6b351b4b31bb2648804d5df",
-        "src/core/schema-structural-sharing.ts": "70d01c80a86a3c000014a76433369b9aa004503c1bc2ad6aecca531262b691d7",
+        "src/core/schema-structural-sharing.ts": "e4acf5aac2fd01a364506d2c375d9e785227b4e2a57f82b887e55fd16ffcfbd7",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
         "src/core/stream-publication.ts": "16db2d472ee7146cd0faff53624ed0bfa31eb365c10e52587621750d053e8078",
         "src/core/stream-pull.ts": "9b7957b4487ddcdce2183f55c6f08e6cddee011c5d5e5b8c7b72ec839a7e3c42",
@@ -772,7 +772,7 @@
         "tests/react.test.tsx": "a5494e54ab73dc73a30c4a1e0d51634ad9772735195295e1f65cc9274531b554",
         "tests/reactivity-invalidation.test.ts": "4e4c02e42b62a0e0cdadf058051ac1074f7cc430675569e40c31e4537ed9694d",
         "tests/schema-sharing-prototypes.test.ts": "628a6622656b9b53e686d14b9efbd3abc13c61a13db1546001b0689b491f6022",
-        "tests/schema-structural-sharing.test.ts": "dbe1249beb771e45a43647f80a5b3264ecf545f37e370ce004259f60d2b03b1d",
+        "tests/schema-structural-sharing.test.ts": "e92f9f428804339a99d7ff4c6fc40a9696d953eeccb1176f6b3758a33412eb2d",
         "tests/skills-maintenance.test.ts": "015e0b882f6a43e0692c9643ad78fe111bcd15edf2adff1b46f5d0deb68b3498",
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
         "tests/skills/query-usability/grade.test.ts": "b4ce4b395a7f38bdc788f3d3268e0236bbe5827b153df9c0592165f0d81817cd",
@@ -853,14 +853,14 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "033bfddb8e0dcdc595fc7dad24aaf1f93a81f1cd",
+      "head": "c4dccdab4857cd3861fa130862106916a01deee7",
       "outcome": "updated",
       "reason": "The domain map and skill spec cover array screening and acyclic shared references. Existing skill tree globs cover the implementation, focused tests, and guide.",
       "evidence": [
         "_artifacts/domain_map.yaml",
         "_artifacts/skill_spec.md",
         "_artifacts/skill_tree.yaml",
-        "Both YAML records parsed. The 20 focused sharing tests and shipped skill validation passed."
+        "Both YAML records parsed. The 23 focused sharing tests and shipped skill validation passed."
       ]
     },
     "source:vite.config.ts": {
