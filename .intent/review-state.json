@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "f4b20b94d6188c7bd94d4ed6f2c163efa38aa36bffeccdad04aeabc239d3d891",
+      "fingerprint": "fb0764a694517eed6224314638753bcc4bd3fa82a1798dc7598a70637c4eec1b",
       "snapshot": {
         "GLOSSARY.md": "7fa3de9ce2b21e39ad33af675cc200077db85b9a4ae8c15fc9ff63c9d44e1d97",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -123,6 +123,7 @@
         "examples/contracts/src/http-api.ts": "a42b92f1e774c73fba4bc2ec37e4c51a11c7876648a6bfb8e6857f3fd47f66d8",
         "examples/contracts/src/index.ts": "3041aa0c902aebf6be3cbbc7af5f7785fe95ca8b48c11ebf09c523e6542d1a03",
         "examples/contracts/src/workflows.ts": "7dde26f07e320dd914085c596c4cd7e16156c7500dea03635eccb45f905887e1",
+        "examples/server/src/buffered-rpc.ts": "eb26348ba333f7ba06b51f9704a11660cab7f4256a543d7875c020e3be205ee2",
         "examples/server/src/caller.ts": "608820bd3dedec9c1b8bdbd60acf501e8bdf9cd02771ad65ba8d772d9400e8ae",
         "examples/server/src/commands.ts": "ac3fc4a5f40e02e0d03016af9058aff79a743641c9100d33e9ad0742ee98cf52",
         "examples/server/src/diagnostic-operations.ts": "05db049a1f11951a4a4c4a9fb50ebe765957c6d8f37267958f56eea6f8efa249",
@@ -135,8 +136,9 @@
         "examples/server/src/server-local-rpc.ts": "e1b4fceef8056fbc2fc3e9f985c6e96ef955b992744bb695783e547c93f498da",
         "examples/server/src/server.ts": "faa7bc03bce476accb9655b01e79cf724928346c0e071c7460e9ebc1c18f3400",
         "examples/server/src/users.ts": "4dccf6e201e3aeb4182bd127edc9b77fdb66ac043e7d49dd728ce39a1554b6fb",
-        "examples/server/src/web-handler.ts": "f258f3cfc0456074063b78ed2ab7ebbab29e8aff6a8de4128aadca92fccd0e72",
+        "examples/server/src/web-handler.ts": "9d5e94e52a038ed3fa962250426e5c905ba90185a1f09ce78ef735f1463bb29c",
         "examples/server/src/workflow-handlers.ts": "49d9abf85b7088417ae393ef7d8de328142b37b961b7114e95a0a42bc6991972",
+        "examples/server/tests/buffered-rpc.test.ts": "d23dc39f64ef81c23c5e4c19076a4e03b9f45620b5b26dd74a8ca70bc2f399be",
         "examples/server/tests/fixtures/example-server.ts": "e3c57f43a59cfb11d244cca675c337ebda3c592b234642d02b59265269eac528",
         "examples/server/tests/fixtures/operation-session.ts": "9c1c82c6d00db97b927b4005b5a074d71a09802fe955c39940fb14a1b884657f",
         "examples/server/tests/fixtures/websocket-server.ts": "468801a4f5c50ccdc9855d8a8ef24cb1915f30f857625a99f4dfc20106fc2f53",
@@ -228,7 +230,7 @@
         "scripts/version-packages.mts": "1ca732a8744059fbaba75324aa5e6d82ad5802e79f857536c799217a466d1ab6",
         "skills/effect-api-query/SKILL.md": "405460e4baa3c69d703ecb8b76372480de2117233c6c135bf4878b050dff6f45",
         "skills/effect-api-query/references/cache-workflows.md": "21356f8177d20dbbb861dc6620bb70906b1fc8e196ef8fac52f65cd38a01fb9c",
-        "skills/effect-api-query/references/frameworks-and-hosts.md": "4809f54726f8b2b31e1130ff6eae92fbdfae07e6a40f25c73c9bfd3ea24f66f7",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "efd340201e3cd309fa4bd1bedacd5ed8288b2b67dcecaac65d35a7dfcc49863d",
         "skills/effect-api-query/references/http.md": "20ca47fe0b3fd957f06328176967d68f1baa38d41b4bb45e033b86f4722c9d45",
         "skills/effect-api-query/references/hydration-and-ssr.md": "1ba1c8e987a897e25ff68eb0c1998db0163e3d8b17e1488423580ad63cf42ef1",
         "skills/effect-api-query/references/query-patterns.md": "7572b942b16df06f80a1e053651cd1f1d1f6ceb5079472d65288696a5857abbb",
@@ -433,27 +435,22 @@
         "tests/workflow-guards.test.ts": "563c464dfb45e0873138aff38d323cdfb64b7e6caae84f70fa46db4c65dba410",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "69ba1b757b457b474eade7668a49e12022e6f1b4",
-      "outcome": "no-change",
-      "reason": "The example host bounds work and history and retains pre-start cancellations in expiring reservations until Start arrives. The diagnostic panels describe an evicted result as unavailable. Existing library guidance on verified caller scope, explicit cancellation and bounded status retries still applies.",
+      "head": "efcac0502bddbc3a939264e97afb22a655c373e1",
+      "outcome": "updated",
+      "reason": "The shared example HTTP RPC host rejects over-limit operation counts before dispatch and caps encoded aggregate replies. The frameworks-and-hosts reference explains the application-owned limits and the risk of retrying completed writes.",
       "evidence": [
-        "examples/contracts/src/contracts.ts",
-        "examples/contracts/src/http-api.ts",
-        "examples/server/src/commands.ts",
-        "examples/server/src/diagnostic-operations.ts",
-        "examples/shared/use-slow-query-cancellation.ts",
-        "skills/effect-api-query/references/cache-workflows.md",
-        "apps/docs/src/content/docs/examples/cancellable-commands.md",
-        "Focused examples: 32 tests passed, covering delayed starts, admission, cancellation, and evicted diagnostic outcomes. vp run --no-cache check passed."
+        "Reviewed examples/server/src/buffered-rpc.ts and web-handler.ts at efcac05 against 57c53bf.",
+        "All 65 example server tests passed, including exact UTF-8 limits, cleanup after overflow, streams, caller ownership, operation caps and Expect: 100-continue.",
+        "vp run skills-check passed. Fresh consumer discovery was not evaluated."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "ba4b53774640b863118b5dcf00a191f24677aa140157bb8542a1bb8a9b1ab3dc",
+      "fingerprint": "2a4149fdeab1f0486b84c2bae34cf247f71dc1023ddc85e67ce48bef5268d39c",
       "snapshot": {
         "GLOSSARY.md": "7fa3de9ce2b21e39ad33af675cc200077db85b9a4ae8c15fc9ff63c9d44e1d97",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
-        "_artifacts/domain_map.yaml": "6147a8762ab6417448ca541afb7a3b48ec94219acd66ad61ae8ae310053d7c7d",
-        "_artifacts/skill_spec.md": "78b96c3e98fe50a8286739dc48e04835033dd3982851ee6ca351407922f89cb1",
+        "_artifacts/domain_map.yaml": "6b8a0eb83a20bfcbd701e11e89d105028a05d2da12f810ba0e0baa7bfeefef3e",
+        "_artifacts/skill_spec.md": "f14de38bcf69364bd53c332e71869a8c7864181a8b62e83b9fd1f4e9f89c2ba7",
         "_artifacts/skill_tree.yaml": "c98e6b966286b0fb625563a09708fa98c546a76a489beffa00640e07d974844f",
         "apps/docs/astro.config.mts": "90c54a40605dc0f553b9f62831c88a3e012fe6da44a1e216e4f981bcf1af2272",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "a826348cf7b3fd34b0677280daa75a08ce99138cb68fbd79d4ef52936190eeb6",
@@ -571,6 +568,7 @@
         "examples/contracts/src/http-api.ts": "a42b92f1e774c73fba4bc2ec37e4c51a11c7876648a6bfb8e6857f3fd47f66d8",
         "examples/contracts/src/index.ts": "3041aa0c902aebf6be3cbbc7af5f7785fe95ca8b48c11ebf09c523e6542d1a03",
         "examples/contracts/src/workflows.ts": "7dde26f07e320dd914085c596c4cd7e16156c7500dea03635eccb45f905887e1",
+        "examples/server/src/buffered-rpc.ts": "eb26348ba333f7ba06b51f9704a11660cab7f4256a543d7875c020e3be205ee2",
         "examples/server/src/caller.ts": "608820bd3dedec9c1b8bdbd60acf501e8bdf9cd02771ad65ba8d772d9400e8ae",
         "examples/server/src/commands.ts": "ac3fc4a5f40e02e0d03016af9058aff79a743641c9100d33e9ad0742ee98cf52",
         "examples/server/src/diagnostic-operations.ts": "05db049a1f11951a4a4c4a9fb50ebe765957c6d8f37267958f56eea6f8efa249",
@@ -583,8 +581,9 @@
         "examples/server/src/server-local-rpc.ts": "e1b4fceef8056fbc2fc3e9f985c6e96ef955b992744bb695783e547c93f498da",
         "examples/server/src/server.ts": "faa7bc03bce476accb9655b01e79cf724928346c0e071c7460e9ebc1c18f3400",
         "examples/server/src/users.ts": "4dccf6e201e3aeb4182bd127edc9b77fdb66ac043e7d49dd728ce39a1554b6fb",
-        "examples/server/src/web-handler.ts": "f258f3cfc0456074063b78ed2ab7ebbab29e8aff6a8de4128aadca92fccd0e72",
+        "examples/server/src/web-handler.ts": "9d5e94e52a038ed3fa962250426e5c905ba90185a1f09ce78ef735f1463bb29c",
         "examples/server/src/workflow-handlers.ts": "49d9abf85b7088417ae393ef7d8de328142b37b961b7114e95a0a42bc6991972",
+        "examples/server/tests/buffered-rpc.test.ts": "d23dc39f64ef81c23c5e4c19076a4e03b9f45620b5b26dd74a8ca70bc2f399be",
         "examples/server/tests/fixtures/example-server.ts": "e3c57f43a59cfb11d244cca675c337ebda3c592b234642d02b59265269eac528",
         "examples/server/tests/fixtures/operation-session.ts": "9c1c82c6d00db97b927b4005b5a074d71a09802fe955c39940fb14a1b884657f",
         "examples/server/tests/fixtures/websocket-server.ts": "468801a4f5c50ccdc9855d8a8ef24cb1915f30f857625a99f4dfc20106fc2f53",
@@ -676,7 +675,7 @@
         "scripts/version-packages.mts": "1ca732a8744059fbaba75324aa5e6d82ad5802e79f857536c799217a466d1ab6",
         "skills/effect-api-query/SKILL.md": "405460e4baa3c69d703ecb8b76372480de2117233c6c135bf4878b050dff6f45",
         "skills/effect-api-query/references/cache-workflows.md": "21356f8177d20dbbb861dc6620bb70906b1fc8e196ef8fac52f65cd38a01fb9c",
-        "skills/effect-api-query/references/frameworks-and-hosts.md": "4809f54726f8b2b31e1130ff6eae92fbdfae07e6a40f25c73c9bfd3ea24f66f7",
+        "skills/effect-api-query/references/frameworks-and-hosts.md": "efd340201e3cd309fa4bd1bedacd5ed8288b2b67dcecaac65d35a7dfcc49863d",
         "skills/effect-api-query/references/http.md": "20ca47fe0b3fd957f06328176967d68f1baa38d41b4bb45e033b86f4722c9d45",
         "skills/effect-api-query/references/hydration-and-ssr.md": "1ba1c8e987a897e25ff68eb0c1998db0163e3d8b17e1488423580ad63cf42ef1",
         "skills/effect-api-query/references/query-patterns.md": "7572b942b16df06f80a1e053651cd1f1d1f6ceb5079472d65288696a5857abbb",
@@ -881,14 +880,12 @@
         "tests/workflow-guards.test.ts": "563c464dfb45e0873138aff38d323cdfb64b7e6caae84f70fa46db4c65dba410",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "69ba1b757b457b474eade7668a49e12022e6f1b4",
+      "head": "efcac0502bddbc3a939264e97afb22a655c373e1",
       "outcome": "updated",
-      "reason": "The domain map and skill specification capture the command retry window, expiring reservations and their pre-start cancellations, and diagnostic history. Existing skill tree sources cover the contracts, host, example hook, guide, and fixtures.",
+      "reason": "The domain map and planning record capture count admission, framed response accounting and per-request cleanup. The existing skill tree already maps the example server implementation and tests.",
       "evidence": [
-        "_artifacts/domain_map.yaml",
-        "_artifacts/skill_spec.md",
-        "_artifacts/skill_tree.yaml",
-        "vp exec intent maintainer sync found no changes. Focused examples: 32 tests passed. vp run --no-cache check passed."
+        "_artifacts/domain_map.yaml, _artifacts/skill_spec.md and _artifacts/skill_tree.yaml reviewed against the frameworks-and-hosts reference and scoped runtime tests at efcac05.",
+        "vp exec intent maintainer sync found no changes."
       ]
     },
     "source:vite.config.ts": {
