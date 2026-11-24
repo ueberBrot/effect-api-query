@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "c28e4d139a4527ecf0854e75abd56cf203e7ae8114cb6ef217e618d2f9291382",
+      "fingerprint": "155901ef43ed5511d7fda50f7817c86d23f2dd188f9563e760d7afc34888122d",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -221,7 +221,7 @@
         "skills/effect-api-query/references/frameworks-and-hosts.md": "f8e2ed21583481dffd1680ce85340af508bbd8a5baeb8227da094a099da81fef",
         "skills/effect-api-query/references/http.md": "20ca47fe0b3fd957f06328176967d68f1baa38d41b4bb45e033b86f4722c9d45",
         "skills/effect-api-query/references/hydration-and-ssr.md": "0265ce970039b2ca41be2165683c135fd9584ea9a3c95b147a73eca8e54bd19f",
-        "skills/effect-api-query/references/query-patterns.md": "983066711ed321e7ce37ae230ab97379d30e010cfa11c74211053c982bcea6a1",
+        "skills/effect-api-query/references/query-patterns.md": "7572b942b16df06f80a1e053651cd1f1d1f6ceb5079472d65288696a5857abbb",
         "skills/effect-api-query/references/rpc.md": "d5bc0d199249ef185f1cd532e282d95788807def0e18bc5f175730534aa2ed68",
         "src/core/branch-filter.ts": "da18cded0a176b20e6056b74bd52e70fb8ec588346beabb01fe1f2d4f1a8b1e3",
         "src/core/canonical-key.ts": "84e91000876a6795557aab39dcc5d44e328250bf9b30ad02fd67afd02f5003e9",
@@ -253,7 +253,7 @@
         "src/core/stream-pull.ts": "9b7957b4487ddcdce2183f55c6f08e6cddee011c5d5e5b8c7b72ec839a7e3c42",
         "src/core/stream-recovery.ts": "3e18902069a6388e23668ca7639d1c4308f98ce097c23daf4d12b562c0e9c664",
         "src/core/stream-snapshot.ts": "0e2fc754d8b19065f577a152f64f5b35c5429ac196662b2db8534eb33c3cb037",
-        "src/core/streamed-query.ts": "b5d766e6f33b824e1eee3c3d785d301b4853b6a2c43b870cefbe3d0c0b94ba97",
+        "src/core/streamed-query.ts": "023305232c8e0d173730216d14a7f9cecd9b52cce3dfac4bcecd9a5d62960b7a",
         "src/core/types.ts": "02880615b7202768895d7e637b8b6fbd558a12f02f4a6f4d8c0d46301fb66fe0",
         "src/core/utility-node.ts": "8c3eb7adeec4cf49d5a475d34e785d060abd39f6a9a6049dc48a390cae0df74b",
         "src/core/utility-path.ts": "d46bb166dd03d2163063339a9cd6228dbcdeafea6ae14ad908bdb4ec6244f13e",
@@ -287,7 +287,7 @@
         "tests/create-rpc-query-utils-stream-cache.test.ts": "e7c3eecbf214071e76a6b4305b1b0619bb825dad38fa95807e29fdadcb043c6f",
         "tests/create-rpc-query-utils-stream-hashing.test.ts": "417f45c4fd7584d164fe5ecc9e354bdf52a1117a5a46f7729c2ffb5791eaf068",
         "tests/create-rpc-query-utils-stream-publication.test.ts": "f0f6919a98e3c4efd59ab39a7c8f2a2efb817c0b55913cd82c034126c8d5e459",
-        "tests/create-rpc-query-utils-streaming.test.ts": "c0c977f8bb55f033f15dc474bf7854bbc8485cbb61fe0c7a09a3f8a1a0874bbd",
+        "tests/create-rpc-query-utils-streaming.test.ts": "cb0fbee40331b34de27aecf3737f8f54f834af245d602e86d97b3263db74d374",
         "tests/create-rpc-query-utils-structural-sharing.test.ts": "f9bd67aed07f7aed8113fdbfeb31810dbc19e0cb4ec0cbeef64a14e7589002fb",
         "tests/create-rpc-query-utils.test.ts": "1229679c118d267fd0a94ffcb560a9a7f77a8acecd423ed742c036c667b89faf",
         "tests/docs-examples.test.ts": "c5f3f714eebf1a5f418e519fab89411d60eb1d2be128484d4d3cbc858c00354f",
@@ -311,7 +311,7 @@
         "tests/framework-consumers/solid.ts": "0e0b261f0f80de83f799326cfa4fdd8cf14cb480909b69bb498b759467ec8bdb",
         "tests/framework-consumers/svelte.ts": "652f8d97d781803239ca667497768077167fffaabec851d5a076f692c376223c",
         "tests/framework-consumers/vue.ts": "e23859e5fe8f8e24a55d8e782dd2880d1a6d88859bdf40ff7b60e8b0c150ab50",
-        "tests/http-cached-views.test.ts": "b3d7cc05502c171f65cab2857ae9f5f958c1dad09d068d5c21ce13c83756c4ee",
+        "tests/http-cached-views.test.ts": "373d299c913f24da868f356950dedd40c39f39dfe61d170fca26bb2e4f3d0cfe",
         "tests/http-execution.test.ts": "9b97e1391768e624648f453cd51beff43f8525a3cb089bec520337125dffd5cb",
         "tests/http-hydration.test.ts": "51da967534267d49dc91f577f43a54fc88045cce8f89623c1106df8c88c21570",
         "tests/http-live-query.test.ts": "94e0c0c3befaf3bbdc7bbcd27400ee412d4d3eb9931db670a30c560b0b67cdee",
@@ -421,23 +421,23 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "83ce90d345a6d9dd48147dc13c4301ffc4b546c6",
+      "head": "bca2fed98b7bf479d16fcf01e95a339cd3722478",
       "outcome": "updated",
-      "reason": "The cache-workflows reference and sharing guide describe screening both sides before Schema validation, rejecting incoming cycles before callbacks, and supporting shared acyclic references.",
+      "reason": "The query-patterns reference now covers seeded reset refetches and failure before the first emission.",
       "evidence": [
-        "src/core/schema-structural-sharing.ts",
-        "tests/schema-structural-sharing.test.ts",
-        "Focused core, prototype, RPC, and HTTP sharing checks passed (23 tests).",
-        "Intent validated the shipped skill. Fresh consumer-agent verification was not performed."
+        "src/core/streamed-query.ts",
+        "tests/create-rpc-query-utils-streaming.test.ts",
+        "tests/http-cached-views.test.ts",
+        "73 focused tests and shipped skill validation passed. A fresh consumer session was not run."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "185b115968c0619f142d98dff544ed3518a132df00f38d01e8ba72b15f06b165",
+      "fingerprint": "d7e486dea42db14983fef350cafc33fed1c3dbdff99a90abd9e770d78fbab866",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
-        "_artifacts/domain_map.yaml": "83f6dd9d557fe4958ef9452b951d20199c3823a681e705910d4f488e8186074d",
-        "_artifacts/skill_spec.md": "7e886f47bf3d145ac57949001db1774e29a28ba314857e557b256208535480a6",
+        "_artifacts/domain_map.yaml": "a7e695b0746bd2d6abe5e8ad210b7830fd67ca1b095fb148ad3bc02823d1fd38",
+        "_artifacts/skill_spec.md": "df629b1e84ce4ec93662efa8503c19222d087f330830e4a9b60407516cea6938",
         "_artifacts/skill_tree.yaml": "12ee0ddea311f100d0093cb01cfd3cb3695d0e93653d7a6e9dc45d6d2ba1a463",
         "apps/docs/astro.config.mts": "90c54a40605dc0f553b9f62831c88a3e012fe6da44a1e216e4f981bcf1af2272",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "a826348cf7b3fd34b0677280daa75a08ce99138cb68fbd79d4ef52936190eeb6",
@@ -653,7 +653,7 @@
         "skills/effect-api-query/references/frameworks-and-hosts.md": "f8e2ed21583481dffd1680ce85340af508bbd8a5baeb8227da094a099da81fef",
         "skills/effect-api-query/references/http.md": "20ca47fe0b3fd957f06328176967d68f1baa38d41b4bb45e033b86f4722c9d45",
         "skills/effect-api-query/references/hydration-and-ssr.md": "0265ce970039b2ca41be2165683c135fd9584ea9a3c95b147a73eca8e54bd19f",
-        "skills/effect-api-query/references/query-patterns.md": "983066711ed321e7ce37ae230ab97379d30e010cfa11c74211053c982bcea6a1",
+        "skills/effect-api-query/references/query-patterns.md": "7572b942b16df06f80a1e053651cd1f1d1f6ceb5079472d65288696a5857abbb",
         "skills/effect-api-query/references/rpc.md": "d5bc0d199249ef185f1cd532e282d95788807def0e18bc5f175730534aa2ed68",
         "src/core/branch-filter.ts": "da18cded0a176b20e6056b74bd52e70fb8ec588346beabb01fe1f2d4f1a8b1e3",
         "src/core/canonical-key.ts": "84e91000876a6795557aab39dcc5d44e328250bf9b30ad02fd67afd02f5003e9",
@@ -685,7 +685,7 @@
         "src/core/stream-pull.ts": "9b7957b4487ddcdce2183f55c6f08e6cddee011c5d5e5b8c7b72ec839a7e3c42",
         "src/core/stream-recovery.ts": "3e18902069a6388e23668ca7639d1c4308f98ce097c23daf4d12b562c0e9c664",
         "src/core/stream-snapshot.ts": "0e2fc754d8b19065f577a152f64f5b35c5429ac196662b2db8534eb33c3cb037",
-        "src/core/streamed-query.ts": "b5d766e6f33b824e1eee3c3d785d301b4853b6a2c43b870cefbe3d0c0b94ba97",
+        "src/core/streamed-query.ts": "023305232c8e0d173730216d14a7f9cecd9b52cce3dfac4bcecd9a5d62960b7a",
         "src/core/types.ts": "02880615b7202768895d7e637b8b6fbd558a12f02f4a6f4d8c0d46301fb66fe0",
         "src/core/utility-node.ts": "8c3eb7adeec4cf49d5a475d34e785d060abd39f6a9a6049dc48a390cae0df74b",
         "src/core/utility-path.ts": "d46bb166dd03d2163063339a9cd6228dbcdeafea6ae14ad908bdb4ec6244f13e",
@@ -719,7 +719,7 @@
         "tests/create-rpc-query-utils-stream-cache.test.ts": "e7c3eecbf214071e76a6b4305b1b0619bb825dad38fa95807e29fdadcb043c6f",
         "tests/create-rpc-query-utils-stream-hashing.test.ts": "417f45c4fd7584d164fe5ecc9e354bdf52a1117a5a46f7729c2ffb5791eaf068",
         "tests/create-rpc-query-utils-stream-publication.test.ts": "f0f6919a98e3c4efd59ab39a7c8f2a2efb817c0b55913cd82c034126c8d5e459",
-        "tests/create-rpc-query-utils-streaming.test.ts": "c0c977f8bb55f033f15dc474bf7854bbc8485cbb61fe0c7a09a3f8a1a0874bbd",
+        "tests/create-rpc-query-utils-streaming.test.ts": "cb0fbee40331b34de27aecf3737f8f54f834af245d602e86d97b3263db74d374",
         "tests/create-rpc-query-utils-structural-sharing.test.ts": "f9bd67aed07f7aed8113fdbfeb31810dbc19e0cb4ec0cbeef64a14e7589002fb",
         "tests/create-rpc-query-utils.test.ts": "1229679c118d267fd0a94ffcb560a9a7f77a8acecd423ed742c036c667b89faf",
         "tests/docs-examples.test.ts": "c5f3f714eebf1a5f418e519fab89411d60eb1d2be128484d4d3cbc858c00354f",
@@ -743,7 +743,7 @@
         "tests/framework-consumers/solid.ts": "0e0b261f0f80de83f799326cfa4fdd8cf14cb480909b69bb498b759467ec8bdb",
         "tests/framework-consumers/svelte.ts": "652f8d97d781803239ca667497768077167fffaabec851d5a076f692c376223c",
         "tests/framework-consumers/vue.ts": "e23859e5fe8f8e24a55d8e782dd2880d1a6d88859bdf40ff7b60e8b0c150ab50",
-        "tests/http-cached-views.test.ts": "b3d7cc05502c171f65cab2857ae9f5f958c1dad09d068d5c21ce13c83756c4ee",
+        "tests/http-cached-views.test.ts": "373d299c913f24da868f356950dedd40c39f39dfe61d170fca26bb2e4f3d0cfe",
         "tests/http-execution.test.ts": "9b97e1391768e624648f453cd51beff43f8525a3cb089bec520337125dffd5cb",
         "tests/http-hydration.test.ts": "51da967534267d49dc91f577f43a54fc88045cce8f89623c1106df8c88c21570",
         "tests/http-live-query.test.ts": "94e0c0c3befaf3bbdc7bbcd27400ee412d4d3eb9931db670a30c560b0b67cdee",
@@ -853,14 +853,14 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "83ce90d345a6d9dd48147dc13c4301ffc4b546c6",
+      "head": "bca2fed98b7bf479d16fcf01e95a339cd3722478",
       "outcome": "updated",
-      "reason": "The domain map and skill spec cover array screening and acyclic shared references. Existing skill tree globs cover the implementation, focused tests, and guide.",
+      "reason": "The domain map and skill spec record why seeded data can be absent during reset and after failure. The existing skill tree maps both adapter tests and the shared core source.",
       "evidence": [
         "_artifacts/domain_map.yaml",
         "_artifacts/skill_spec.md",
         "_artifacts/skill_tree.yaml",
-        "Both YAML records parsed. The 23 focused sharing tests and shipped skill validation passed."
+        "Both YAML files parsed. The 73 focused tests and shipped skill validation passed."
       ]
     },
     "source:vite.config.ts": {
@@ -4731,6 +4731,20 @@
       "evidence": [
         ".changeset/screen-arrays-before-schema-sharing.md",
         "docs/adr/0001-target-effect-4-release-candidate.md"
+      ]
+    },
+    "source:.changeset/clear-seeded-stream-reset.md": {
+      "fingerprint": "9c7977d1dc30fd3c21f74c13a65f44d8d3f89d9be4366874aa4402631fb49440",
+      "snapshot": {
+        ".changeset/clear-seeded-stream-reset.md": "63245ef60f390557d8dd0616fba5c1b7a587f26d70742f1d9e4fba52dac4e552"
+      },
+      "head": "bca2fed98b7bf479d16fcf01e95a339cd3722478",
+      "outcome": "no-change",
+      "reason": "The patch changeset describes the same reset behavior as the updated query-patterns reference and needs no separate skill mapping.",
+      "evidence": [
+        ".changeset/clear-seeded-stream-reset.md",
+        "skills/effect-api-query/references/query-patterns.md",
+        "ADR 0001 classifies compatible fixes as patches."
       ]
     }
   }
