@@ -32,6 +32,7 @@ import type {
   RuntimeInput,
   StreamedPolicyOptions,
 } from "./types";
+import { utilityOperationKey, utilityRootKey } from "./utility-key";
 import { defineLazyLeafDescriptor } from "./utility-node";
 import type { RuntimeUtilityNode, UtilityNode } from "./utility-node";
 import {
@@ -562,7 +563,7 @@ const insertLeaf = (
   runPromiseExit: RunPromiseExit<unknown>
 ) => {
   const { path: segments } = description;
-  const operationKey = freezeKey([...prefix, ...segments]);
+  const operationKey = utilityOperationKey(prefix, segments);
   const filterPath: FilterPath = {
     key: operationKey,
     views: operationViews(description),
@@ -667,13 +668,13 @@ export const createUtilityTree = (
     readonly errors: TreeErrors;
   }
 ): Record<string, unknown> => {
-  const prefix = freezeKey([
-    ...normalizeUtilityKeyPrefix(
+  const prefix = utilityRootKey(
+    normalizeUtilityKeyPrefix(
       options.prefixOptions,
       options.errors.invalidPrefix
     ),
-    ...options.keyNamespace,
-  ]);
+    options.keyNamespace
+  );
   validateUtilityPaths(operations, ({ id }, issue, segments) =>
     issue === "invalid"
       ? options.errors.invalidPath(id)

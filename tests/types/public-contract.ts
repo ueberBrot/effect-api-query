@@ -406,10 +406,11 @@ const streamedKey = utils.events.watch.streamedKey({
   maxChunks: "unbounded",
 });
 streamedKey satisfies readonly [
-  "app",
+  `effect-api-query:v2:${string}`,
   "rpc",
   "events",
   "watch",
+  null,
   "streamed",
   ...unknown[],
 ];
@@ -480,24 +481,34 @@ liveHook.error satisfies
 const liveResult: Promise<number> = queryClient.query(liveOptions);
 const liveKey = utils.events.watch.liveKey({ input: { channel: "news" } });
 liveKey satisfies readonly [
-  "app",
+  `effect-api-query:v2:${string}`,
   "rpc",
   "events",
   "watch",
+  null,
   "live",
   unknown,
   unknown?,
 ];
 // @ts-expect-error the optional policy slot breaks the previous exact-length RPC tuple
-liveKey satisfies readonly ["app", "rpc", "events", "watch", "live", unknown];
+liveKey satisfies readonly [
+  `effect-api-query:v2:${string}`,
+  "rpc",
+  "events",
+  "watch",
+  null,
+  "live",
+  unknown,
+];
 const inputlessCompatibilityKey = utils.events.audit.watch.liveKey();
 // @ts-expect-error inputless default keys also expose the optional policy slot
 inputlessCompatibilityKey satisfies readonly [
-  "app",
+  `effect-api-query:v2:${string}`,
   "rpc",
   "events",
   "audit",
   "watch",
+  null,
   "live",
 ];
 const cachedLive = queryClient.getQueryData(liveKey);
@@ -771,10 +782,11 @@ true satisfies Assert<
 
 const infiniteKey = utils.users.pages.infiniteKey({ input: { cursor: 0 } });
 infiniteKey satisfies readonly [
-  "app",
+  `effect-api-query:v2:${string}`,
   "rpc",
   "users",
   "pages",
+  null,
   "infinite",
   unknown,
 ];
@@ -834,8 +846,23 @@ const conditionalInfiniteOptions = utils.users.pages.infiniteOptions({
   },
   staleTime: (query) => {
     query.queryKey satisfies
-      | readonly ["app", "rpc", "users", "pages", "infinite"]
-      | readonly ["app", "rpc", "users", "pages", "infinite", unknown];
+      | readonly [
+          `effect-api-query:v2:${string}`,
+          "rpc",
+          "users",
+          "pages",
+          null,
+          "infinite",
+        ]
+      | readonly [
+          `effect-api-query:v2:${string}`,
+          "rpc",
+          "users",
+          "pages",
+          null,
+          "infinite",
+          unknown,
+        ];
     return 30_000;
   },
   select: (data) => data.pages.length,
@@ -1152,10 +1179,11 @@ void cachedUser;
 
 const concreteQueryKey = utils.users.get.queryKey({ input: { id: 1 } });
 concreteQueryKey satisfies readonly [
-  "app",
+  `effect-api-query:v2:${string}`,
   "rpc",
   "users",
   "get",
+  null,
   "query",
   unknown,
 ];
@@ -1232,10 +1260,11 @@ const getMutationOptions = utils.users.get.mutationOptions<{
   },
 });
 getMutationOptions.mutationKey satisfies readonly [
-  "app",
+  `effect-api-query:v2:${string}`,
   "rpc",
   "users",
   "get",
+  null,
   "mutation",
 ];
 getMutationOptions.throwOnError satisfies
@@ -1341,7 +1370,14 @@ const skippedQueryObject = utils.users.get.queryOptions({
   input: skipToken,
   select: (user) => user.name,
   staleTime: (query) => {
-    query.queryKey satisfies readonly ["app", "rpc", "users", "get", "query"];
+    query.queryKey satisfies readonly [
+      `effect-api-query:v2:${string}`,
+      "rpc",
+      "users",
+      "get",
+      null,
+      "query",
+    ];
     return 30_000;
   },
   retry: (_count, error) => {
@@ -1357,10 +1393,11 @@ new QueryObserver(queryClient, skippedQueryObject).getCurrentResult()
   .data satisfies string | undefined;
 skippedQueryObject.queryFn satisfies SkipToken;
 skippedQueryObject.queryKey satisfies readonly [
-  "app",
+  `effect-api-query:v2:${string}`,
   "rpc",
   "users",
   "get",
+  null,
   "query",
 ];
 // @ts-expect-error package input is consumed
@@ -1381,10 +1418,11 @@ new QueryObserver(queryClient, skippedStreamObject).getCurrentResult()
   .data satisfies string | undefined;
 skippedStreamObject.queryFn satisfies SkipToken;
 skippedStreamObject.queryKey satisfies readonly [
-  "app",
+  `effect-api-query:v2:${string}`,
   "rpc",
   "events",
   "watch",
+  null,
   "streamed",
 ];
 // @ts-expect-error stream policy is consumed
@@ -1410,10 +1448,11 @@ new QueryObserver(queryClient, skippedLiveObject).getCurrentResult()
   .data satisfies number | undefined;
 skippedLiveObject.queryFn satisfies SkipToken;
 skippedLiveObject.queryKey satisfies readonly [
-  "app",
+  `effect-api-query:v2:${string}`,
   "rpc",
   "events",
   "watch",
+  null,
   "live",
 ];
 // @ts-expect-error package input is consumed
@@ -1650,8 +1689,23 @@ const conditionalStreamOptions = utils.events.watch.streamedOptions({
   select: (values) => values.join(", "),
   staleTime: (query) => {
     query.queryKey satisfies
-      | readonly ["app", "rpc", "events", "watch", "streamed"]
-      | readonly ["app", "rpc", "events", "watch", "streamed", ...unknown[]];
+      | readonly [
+          `effect-api-query:v2:${string}`,
+          "rpc",
+          "events",
+          "watch",
+          null,
+          "streamed",
+        ]
+      | readonly [
+          `effect-api-query:v2:${string}`,
+          "rpc",
+          "events",
+          "watch",
+          null,
+          "streamed",
+          ...unknown[],
+        ];
     return 30_000;
   },
 });
@@ -1759,8 +1813,23 @@ const conditionalUserOptions = utils.users.get.queryOptions({
     conditionalUserId === undefined ? skipToken : { id: conditionalUserId },
   refetchInterval: (query) => {
     query.queryKey satisfies
-      | readonly ["app", "rpc", "users", "get", "query"]
-      | readonly ["app", "rpc", "users", "get", "query", unknown];
+      | readonly [
+          `effect-api-query:v2:${string}`,
+          "rpc",
+          "users",
+          "get",
+          null,
+          "query",
+        ]
+      | readonly [
+          `effect-api-query:v2:${string}`,
+          "rpc",
+          "users",
+          "get",
+          null,
+          "query",
+          unknown,
+        ];
     return false;
   },
   select: (user) => user.name,
@@ -2075,26 +2144,29 @@ const optionalKey = broadPayloadUtils.payload.optional.queryKey({
   input: "input",
 });
 unknownKey satisfies readonly [
-  "payload",
+  `effect-api-query:v2:${string}`,
   "rpc",
   "payload",
   "unknown",
+  null,
   "query",
   unknown,
 ];
 anyKey satisfies readonly [
-  "payload",
+  `effect-api-query:v2:${string}`,
   "rpc",
   "payload",
   "any",
+  null,
   "query",
   unknown,
 ];
 optionalKey satisfies readonly [
-  "payload",
+  `effect-api-query:v2:${string}`,
   "rpc",
   "payload",
   "optional",
+  null,
   "query",
   unknown,
 ];
@@ -2169,23 +2241,33 @@ queryClient.infiniteQuery(broadOptionalPages) satisfies Promise<
 broadPayloadUtils.payload.unknown.infiniteKey({
   input: { page: 0 },
 }) satisfies readonly [
-  "payload",
+  `effect-api-query:v2:${string}`,
   "rpc",
   "payload",
   "unknown",
+  null,
   "infinite",
   unknown,
 ];
 broadPayloadUtils.payload.any.infiniteKey({
   input: { page: 0 },
-}) satisfies readonly ["payload", "rpc", "payload", "any", "infinite", unknown];
+}) satisfies readonly [
+  `effect-api-query:v2:${string}`,
+  "rpc",
+  "payload",
+  "any",
+  null,
+  "infinite",
+  unknown,
+];
 broadPayloadUtils.payload.optional.infiniteKey({
   input: "0",
 }) satisfies readonly [
-  "payload",
+  `effect-api-query:v2:${string}`,
   "rpc",
   "payload",
   "optional",
+  null,
   "infinite",
   unknown,
 ];
@@ -2229,52 +2311,58 @@ const broadOptionalLiveKey = broadPayloadUtils.payload.optionalWatch.liveKey({
   input: "input",
 });
 unknownStreamedKey satisfies readonly [
-  "payload",
+  `effect-api-query:v2:${string}`,
   "rpc",
   "payload",
   "unknownWatch",
+  null,
   "streamed",
   ...unknown[],
 ];
 anyStreamedKey satisfies readonly [
-  "payload",
+  `effect-api-query:v2:${string}`,
   "rpc",
   "payload",
   "anyWatch",
+  null,
   "streamed",
   ...unknown[],
 ];
 optionalStreamedKey satisfies readonly [
-  "payload",
+  `effect-api-query:v2:${string}`,
   "rpc",
   "payload",
   "optionalWatch",
+  null,
   "streamed",
   ...unknown[],
 ];
 unknownLiveKey satisfies readonly [
-  "payload",
+  `effect-api-query:v2:${string}`,
   "rpc",
   "payload",
   "unknownWatch",
+  null,
   "live",
   unknown,
   unknown?,
 ];
 anyLiveKey satisfies readonly [
-  "payload",
+  `effect-api-query:v2:${string}`,
   "rpc",
   "payload",
   "anyWatch",
+  null,
   "live",
   unknown,
   unknown?,
 ];
 broadOptionalLiveKey satisfies readonly [
-  "payload",
+  `effect-api-query:v2:${string}`,
   "rpc",
   "payload",
   "optionalWatch",
+  null,
   "live",
   unknown,
   unknown?,
@@ -2412,17 +2500,19 @@ true satisfies Assert<
 >;
 
 broadPayloadUtils.payload.void.queryKey() satisfies readonly [
-  "payload",
+  `effect-api-query:v2:${string}`,
   "rpc",
   "payload",
   "void",
+  null,
   "query",
 ];
 broadPayloadUtils.payload.void.infiniteKey() satisfies readonly [
-  "payload",
+  `effect-api-query:v2:${string}`,
   "rpc",
   "payload",
   "void",
+  null,
   "infinite",
 ];
 broadPayloadUtils.payload.void.queryOptions();
@@ -2436,10 +2526,11 @@ broadPayloadUtils.payload.void
 broadPayloadUtils.payload.voidWatch.streamedKey({
   maxChunks: "unbounded",
 }) satisfies readonly [
-  "payload",
+  `effect-api-query:v2:${string}`,
   "rpc",
   "payload",
   "voidWatch",
+  null,
   "streamed",
   ...unknown[],
 ];
@@ -2448,10 +2539,11 @@ broadPayloadUtils.payload.voidWatch.streamedKey({
   refetchMode: "append",
 });
 broadPayloadUtils.payload.voidWatch.liveKey() satisfies readonly [
-  "payload",
+  `effect-api-query:v2:${string}`,
   "rpc",
   "payload",
   "voidWatch",
+  null,
   "live",
   unknown?,
 ];

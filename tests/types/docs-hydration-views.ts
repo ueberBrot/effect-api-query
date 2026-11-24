@@ -6,7 +6,7 @@ import {
 import type {
   DehydratedState,
   QueryClient,
-  QueryKey,
+  QueryMeta,
 } from "@tanstack/query-core";
 import { Context, Effect, Schema, SchemaTransformation } from "effect";
 import { HttpApiSchema } from "effect/http-api";
@@ -147,9 +147,8 @@ const ViewId = Schema.Literals([
   "wrapped-live",
 ]);
 
-const codecFor = Effect.fnUntraced(function* (key: QueryKey) {
-  yield* Schema.decodeUnknownEffect(Schema.Literal("hydration-views"))(key[0]);
-  const id = yield* Schema.decodeUnknownEffect(ViewId)(key[1]);
+const codecFor = Effect.fnUntraced(function* (meta: QueryMeta | undefined) {
+  const id = yield* Schema.decodeUnknownEffect(ViewId)(meta?.["snapshotView"]);
   return codecs[id];
 });
 
@@ -162,12 +161,12 @@ export const prepareViewSnapshot = Effect.fnUntraced(function* (
       defaultShouldDehydrateQuery(query) &&
       query.state.error === null &&
       query.state.fetchFailureReason === null &&
-      query.queryKey[0] === "hydration-views",
+      Schema.is(ViewId)(query.meta?.["snapshotView"]),
   });
   const queries = yield* Effect.forEach(
     snapshot.queries,
     Effect.fnUntraced(function* (query) {
-      const codec = yield* codecFor(query.queryKey);
+      const codec = yield* codecFor(query.meta);
       const data = yield* Schema.encodeUnknownEffect(codec)(query.state.data);
       return { ...query, state: { ...query.state, data } };
     })
@@ -183,7 +182,7 @@ export const prepareViewHydration = Effect.fnUntraced(function* (
   const queries = yield* Effect.forEach(
     snapshot.queries,
     Effect.fnUntraced(function* (query) {
-      const codec = yield* codecFor(query.queryKey);
+      const codec = yield* codecFor(query.meta);
       const data = yield* Schema.decodeUnknownEffect(codec)(query.state.data);
       return { ...query, state: { ...query.state, data } };
     })

@@ -180,18 +180,29 @@ const input = {
 const query = utils["user.accounts"]["get.user"].queryOptions({ input });
 const queryClient = new QueryClient();
 
-const root: readonly ["app", "http", "account.api"] = utils.key();
-const groupKey: readonly ["app", "http", "account.api", "user.accounts"] =
-  utils["user.accounts"].key();
+const root: readonly [`effect-api-query:v2:${string}`, "http", "account.api"] =
+  utils.key();
+const groupKey: readonly [
+  `effect-api-query:v2:${string}`,
+  "http",
+  "account.api",
+  "user.accounts",
+] = utils["user.accounts"].key();
 const endpointKey: readonly [
-  "app",
+  `effect-api-query:v2:${string}`,
   "http",
   "account.api",
   "user.accounts",
   "get.user",
+  null,
 ] = utils["user.accounts"]["get.user"].key();
-const topLevelKey: readonly ["app", "http", "account.api", "ping"] =
-  utils.ping.key();
+const topLevelKey: readonly [
+  `effect-api-query:v2:${string}`,
+  "http",
+  "account.api",
+  "ping",
+  null,
+] = utils.ping.key();
 void [root, groupKey, endpointKey, topLevelKey];
 true satisfies Assert<
   Equal<
@@ -223,13 +234,19 @@ true satisfies Assert<
     keyof typeof utils.upload
   >
 >;
-const uploadKey: readonly ["app", "http", "account.api", "upload"] =
-  utils.upload.key();
-const uploadMutationKey: readonly [
-  "app",
+const uploadKey: readonly [
+  `effect-api-query:v2:${string}`,
   "http",
   "account.api",
   "upload",
+  null,
+] = utils.upload.key();
+const uploadMutationKey: readonly [
+  `effect-api-query:v2:${string}`,
+  "http",
+  "account.api",
+  "upload",
+  null,
   "mutation",
 ] = utils.upload.mutationKey();
 void [uploadKey, uploadMutationKey];
@@ -1518,7 +1535,7 @@ type UserMetadata = {
   readonly headers: Readonly<Record<string, string>>;
 };
 true satisfies Assert<
-  Equal<ReturnType<typeof getUser.metadataKey>[5], "metadata">
+  Equal<ReturnType<typeof getUser.metadataKey>[6], "metadata">
 >;
 const metadataCache = queryClient.getQueryData(getUser.metadataKey({ input }));
 true satisfies Assert<Equal<typeof metadataCache, UserMetadata | undefined>>;
@@ -1552,11 +1569,12 @@ const skippedMetadata = getUser.metadataOptions({
 });
 skippedMetadata.queryFn satisfies SkipToken;
 skippedMetadata.queryKey satisfies readonly [
-  "app",
+  `effect-api-query:v2:${string}`,
   "http",
   "account.api",
   "user.accounts",
   "get.user",
+  null,
   "metadata",
 ];
 const skippedMetadataHook = useQuery(skippedMetadata);
@@ -1692,11 +1710,12 @@ const skippedObject = getUser.queryOptions({
   select: (user) => user.name,
   staleTime: (query) => {
     query.queryKey satisfies readonly [
-      "app",
+      `effect-api-query:v2:${string}`,
       "http",
       "account.api",
       "user.accounts",
       "get.user",
+      null,
       "query",
     ];
     return 1_000;
@@ -1873,11 +1892,12 @@ const skippedPages = getUser.infiniteOptions({
 });
 skippedPages.queryFn satisfies SkipToken;
 skippedPages.queryKey satisfies readonly [
-  "app",
+  `effect-api-query:v2:${string}`,
   "http",
   "account.api",
   "user.accounts",
   "get.user",
+  null,
   "infinite",
 ];
 useInfiniteQuery(skippedPages).data satisfies string[] | undefined;
@@ -2141,9 +2161,9 @@ const httpPolicy = defineHttpApiPolicy(
     paths: {
       "user.accounts.get.user": {
         query: {
-          enabled: (query) => query.queryKey[0] === "app",
+          enabled: (query) => query.queryKey[0] === utils.key()[0],
           refetchInterval: (query) => {
-            query.queryKey[0] satisfies "app";
+            query.queryKey[0] satisfies `effect-api-query:v2:${string}`;
             return 500;
           },
         },

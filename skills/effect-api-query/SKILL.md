@@ -67,6 +67,7 @@ sources:
   - "docs/adr/0052-*.md"
   - "docs/adr/0053-*.md"
   - "docs/adr/0054-*.md"
+  - "docs/adr/0059-version-and-isolate-generated-query-keys.md"
   - "apps/docs/astro.config.mts"
   - "**/apps/docs/src/content/docs/**/*.md"
   - "**/apps/docs/src/content/docs/**/*.mdx"
@@ -104,7 +105,7 @@ Unary RPC and buffered HTTP without multipart support reads, writes, and pages. 
 
 - Keep captured inputs unchanged. Mutating input can send a different request under the old key. Build new options when input changes.
 - Pass native settings to the builder and use the returned key and function together. Use a generated concrete key for typed cache reads and writes. Set hashing on QueryClient before use and keep it stable.
-- After writes, choose which reads to invalidate. Native invalidation marks entries stale and refetches active matches by default. Use a generated prefix to target one tree or the original prefix to target both adapters.
+- After writes, choose which reads to invalidate. Native invalidation marks entries stale and refetches active matches by default. Use each tree’s generated filter when a write affects both adapters. Bump persisted key versions when upgrading from the original flat key format.
 
 Read the reference for the task at hand.
 

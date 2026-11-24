@@ -1,6 +1,6 @@
 # Use flat prefix-matchable key tuples
 
-Status: Amended by ADR 0018, ADR 0020, and [ADR 0044](0044-simplify-factory-setup-and-owner-tracking.md) (optional `keyPrefix` defaulting to `readonly []`). Extended by [ADR 0022](0022-add-buffered-http-utilities-with-separate-key-roots.md).
+Status: Partially superseded by [ADR 0059](0059-version-and-isolate-generated-query-keys.md) for key layout and namespace matching. Amended by ADR 0018, ADR 0020, and [ADR 0044](0044-simplify-factory-setup-and-owner-tracking.md) (optional `keyPrefix` defaulting to `readonly []`). Extended by [ADR 0022](0022-add-buffered-http-utilities-with-separate-key-roots.md).
 
 ## Context
 

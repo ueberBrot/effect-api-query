@@ -165,11 +165,12 @@ true satisfies Assert<
   >
 >;
 const endpointKey: readonly [
-  "type-scale",
+  `effect-api-query:v2:${string}`,
   "http",
   "type-scale",
   "projects",
   "read.24",
+  null,
 ] = utils.projects["read.24"].key();
 const pages = utils.teams["read.36"].infiniteOptions({
   initialPageParam: 0,

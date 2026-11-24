@@ -114,7 +114,7 @@ QueryClient stores `InfiniteData`. Use `select` to change the returned shape whi
 
 ## Cache identity and failures
 
-HTTP roots include `keyPrefix`, `http`, and the HttpApi identifier. Keys then add the endpoint path, operation, and canonical request if present. Use `utils.key()` to target the HTTP tree. Use the original prefix if you intend to target RPC and HTTP together.
+HTTP roots include a versioned namespace for the complete `keyPrefix`, followed by `http` and the HttpApi identifier. Use `utils.key()` for native defaults and `utils.queryFilter()` for cache operations. To invalidate both RPC and HTTP, apply both generated root filters.
 
 The library synchronously encodes each declared request part and retains its label. A payload sent as URL parameters still uses `payload` in the key. Preparation uses the endpoint Schemas without building a request or body.
 

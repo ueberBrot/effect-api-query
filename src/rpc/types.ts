@@ -28,6 +28,7 @@ import type {
   LivePolicyOptions,
   utilityPaths,
 } from "../core/types";
+import type { UtilityOperationKey, UtilityRootKey } from "../core/utility-key";
 import type {
   EffectRpcQueryConfigError,
   EffectRpcQueryEmptyStreamError,
@@ -134,7 +135,10 @@ export type Segments<Tag extends string> =
 export type RpcKey<
   Prefix extends readonly JsonValue[],
   R extends Rpc.Any,
-> = readonly [...Prefix, "rpc", ...Segments<R["_tag"]>];
+> = UtilityOperationKey<
+  UtilityRootKey<Prefix, readonly ["rpc"]>,
+  Segments<R["_tag"]>
+>;
 
 export type QueryOperationKey<
   Prefix extends readonly JsonValue[],
@@ -476,7 +480,11 @@ export type PathTree<
         readonly [utilityPaths]?: PathsFromTags<
           PathDescendants<Groups[Head], Head>["path"]
         >;
-        readonly key: () => readonly [...Prefix, "rpc", ...Path, Head];
+        readonly key: () => readonly [
+          ...UtilityRootKey<Prefix, readonly ["rpc"]>,
+          ...Path,
+          Head,
+        ];
         /** Builds native filters for descendant queries. */
         readonly queryFilter: BranchQueryFilter;
       } & PathTree<
@@ -558,7 +566,7 @@ export type RpcQueryUtils<
   readonly [rpcQueryClientError]?: ClientError;
   readonly [utilityPaths]?: PathsFromTags<RpcsOf<Group>["_tag"]>;
   /** Returns the immutable root key, including the RPC discriminator. */
-  readonly key: () => readonly [...Prefix, "rpc"];
+  readonly key: () => UtilityRootKey<Prefix, readonly ["rpc"]>;
   /** Builds native filters for descendant queries. */
   readonly queryFilter: BranchQueryFilter;
 } & PathTree<RpcPathEntry<RpcsOf<Group>>, Prefix, ClientError>;

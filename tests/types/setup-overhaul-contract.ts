@@ -103,10 +103,16 @@ const unprefixedFlatRpc = createRpcQueryUtils(rpcGroup, {
   client: flatClient,
 });
 true satisfies Assert<
-  Equal<ReturnType<typeof unprefixedObjectRpc.key>, readonly ["rpc"]>
+  Equal<
+    ReturnType<typeof unprefixedObjectRpc.key>,
+    readonly ["effect-api-query:v2:[]", "rpc"]
+  >
 >;
 true satisfies Assert<
-  Equal<ReturnType<typeof unprefixedFlatRpc.key>, readonly ["rpc"]>
+  Equal<
+    ReturnType<typeof unprefixedFlatRpc.key>,
+    readonly ["effect-api-query:v2:[]", "rpc"]
+  >
 >;
 const annotatedUnprefixedObject: RpcQueryUtils<
   typeof rpcGroup,
@@ -251,7 +257,10 @@ const unprefixedHttp = createHttpApiQueryUtils(httpApi, {
   client: httpClient,
 });
 true satisfies Assert<
-  Equal<ReturnType<typeof unprefixedHttp.key>, readonly ["http", "accounts"]>
+  Equal<
+    ReturnType<typeof unprefixedHttp.key>,
+    readonly ["effect-api-query:v2:[]", "http", "accounts"]
+  >
 >;
 const annotatedUnprefixedHttp: HttpApiQueryUtils<typeof httpApi> =
   unprefixedHttp;

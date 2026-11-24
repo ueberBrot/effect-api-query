@@ -52,14 +52,22 @@ function profileRpcOptions<E>(
   >(profileGroup, {
     client,
     keyPrefix: ["profile", "rpc"],
-  }).profile.read.queryOptions({ retry: false, staleTime: 60_000 });
+  }).profile.read.queryOptions({
+    retry: false,
+    staleTime: 60_000,
+    meta: { snapshot: "profile" },
+  });
 }
 
 function profileHttpOptions(client: HttpApiClient.ForApi<typeof profileApi>) {
   return createHttpApiQueryUtils(profileApi, {
     client,
     keyPrefix: ["profile", "http"],
-  }).profile.read.queryOptions({ retry: false, staleTime: 60_000 });
+  }).profile.read.queryOptions({
+    retry: false,
+    staleTime: 60_000,
+    meta: { snapshot: "profile" },
+  });
 }
 
 const snapshotProfile = (queryClient: QueryClient): string =>
@@ -70,7 +78,7 @@ const snapshotProfile = (queryClient: QueryClient): string =>
         defaultShouldDehydrateQuery(query) &&
         query.state.error === null &&
         query.state.fetchFailureReason === null &&
-        query.queryKey[0] === "profile",
+        query.meta?.["snapshot"] === "profile",
       serializeData: Schema.encodeUnknownSync(Profile),
     })
   );

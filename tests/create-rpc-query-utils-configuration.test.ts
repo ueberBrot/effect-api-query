@@ -89,9 +89,10 @@ describe("createRpcQueryUtils configuration", () => {
       keyEncoders: { toString: ({ id }) => id },
     });
     expect(utils.toString.queryKey({ input: { id: 1 } })).toStrictEqual([
-      "app",
+      'effect-api-query:v2:["app"]',
       "rpc",
       "toString",
+      null,
       "query",
       1,
     ]);
@@ -292,10 +293,11 @@ describe("createRpcQueryUtils configuration", () => {
 
       expect(receivedPayload).toStrictEqual({ id: 1, locale: "en" });
       expect(key).toStrictEqual([
-        "app",
+        'effect-api-query:v2:["app"]',
         "rpc",
         "users",
         "get",
+        null,
         "query",
         { id: 1, locale: "en" },
       ]);
@@ -382,10 +384,11 @@ describe("createRpcQueryUtils configuration", () => {
 
         expect(receivedRedacted).toBe(true);
         expect(key).toStrictEqual([
-          "app",
+          'effect-api-query:v2:["app"]',
           "rpc",
           "secrets",
           "read",
+          null,
           "query",
           { subject: "current-user" },
         ]);
@@ -451,9 +454,10 @@ describe("createRpcQueryUtils configuration", () => {
     ready = true;
     const utils = createRpcQueryUtils(rpcGroup, options);
     expect(utils.read.queryKey({ input: { id: 1 } })).toStrictEqual([
-      "app",
+      'effect-api-query:v2:["app"]',
       "rpc",
       "read",
+      null,
       "query",
       { id: 1 },
     ]);
@@ -526,9 +530,10 @@ describe("createRpcQueryUtils configuration", () => {
         },
       })
     ).toStrictEqual([
-      "app",
+      'effect-api-query:v2:["app"]',
       "rpc",
       "read",
+      null,
       "query",
       { name: "root", children: [{ name: "leaf", children: [] }] },
     ]);
@@ -594,10 +599,11 @@ describe("createRpcQueryUtils configuration", () => {
         expect(
           utils.encoding.serviceful.queryKey({ input: { value: "safe" } })
         ).toStrictEqual([
-          "app",
+          'effect-api-query:v2:["app"]',
           "rpc",
           "encoding",
           "serviceful",
+          null,
           "query",
           { value: "safe" },
         ]);
@@ -639,10 +645,11 @@ describe("createRpcQueryUtils configuration", () => {
         expect(
           utils.decoding.only.queryKey({ input: { value: "safe" } })
         ).toStrictEqual([
-          "app",
+          'effect-api-query:v2:["app"]',
           "rpc",
           "decoding",
           "only",
+          null,
           "query",
           { value: "safe" },
         ]);

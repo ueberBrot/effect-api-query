@@ -229,9 +229,9 @@ const key = utils.views.plain.streamedKey({
   maxChunks: 3,
   sseOptions: { maxEventSize: 1024 },
 });
-true satisfies Assert<Equal<(typeof key)["length"], 8>>;
+true satisfies Assert<Equal<(typeof key)["length"], 9>>;
 const inputlessHistoryKey = utils.views.wrapped.streamedKey({ maxChunks: 10 });
-true satisfies Assert<Equal<(typeof inputlessHistoryKey)["length"], 7>>;
+true satisfies Assert<Equal<(typeof inputlessHistoryKey)["length"], 8>>;
 queryClient.setQueryData(key, [1, 2]);
 const skipped = utils.views.plain.streamedOptions({
   input: skipToken,
@@ -489,9 +489,9 @@ const liveKey = utils.views.plain.liveKey({
   input,
   sseOptions: { maxEventSize: 1024 },
 });
-true satisfies Assert<Equal<(typeof liveKey)["length"], 8>>;
+true satisfies Assert<Equal<(typeof liveKey)["length"], 9>>;
 const inputlessLiveKey = utils.views.wrapped.liveKey();
-true satisfies Assert<Equal<(typeof inputlessLiveKey)["length"], 7>>;
+true satisfies Assert<Equal<(typeof inputlessLiveKey)["length"], 8>>;
 const liveData = queryClient.getQueryData(liveKey);
 true satisfies Assert<Equal<typeof liveData, number | undefined>>;
 const liveState = queryClient.getQueryState(liveOptions.queryKey);

@@ -56,10 +56,11 @@ true satisfies Assert<
   >
 >;
 utils.scale["read-99-9"].key() satisfies readonly [
-  "large-contract",
+  `effect-api-query:v2:${string}`,
   "rpc",
   "scale",
   "read-99-9",
+  null,
 ];
 const first = utils.scale["read-0-0"].queryOptions({ input: { id: 1 } });
 const last = utils.scale["read-99-9"].queryOptions({

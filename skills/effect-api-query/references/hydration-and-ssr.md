@@ -54,7 +54,7 @@ A finalizer failure can reject capture even after data appears. Inspect the exec
 
 Use equivalent declarations, inputs, safe prefixes, and hashing across server and browser. Give them separate clients, QueryClients, runtimes, and Scopes. Set `staleTime` for browser refetch behavior. A new browser stream uses its own client.
 
-For JSON-safe values, cache the same DTO on both sides. For rich values, encode at transfer and decode before hydration. Selection leaves cached data intact. `structuredClone` copies data without the class prototype and is not a JSON codec. This codec restores the class and rich fields on hydration and refetch.
+For JSON-safe values, cache the same DTO on both sides. For rich values, encode at transfer and decode before hydration. Selection leaves cached data intact. `structuredClone` copies data without the class prototype and is not a JSON codec. This codec restores the class and rich fields on hydration and refetch. Set `meta: { snapshot: "profile" }` on the generated query options selected by this snapshot.
 
 ```ts
 import {
@@ -86,7 +86,7 @@ export const snapshotProfile = (queryClient: QueryClient): string =>
         defaultShouldDehydrateQuery(query) &&
         query.state.error === null &&
         query.state.fetchFailureReason === null &&
-        query.queryKey[0] === "profile",
+        query.meta?.["snapshot"] === "profile",
       serializeData: Schema.encodeUnknownSync(Profile),
     })
   );
@@ -117,7 +117,7 @@ Use a tagged codec for `undefined` history elements so JSON distinguishes them f
 
 Call `createContractHydrationRegistry(groupOrApi)` without a client. If utilities use a `keyPrefix`, supply the same tuple to the registry. Combine RPC and HTTP registries and manual codecs with `createHydrationRegistry`.
 
-Derivation covers buffered queries, live values, and accumulated history by default. HTTP metadata hydration is opt-in so unfiltered server-only response headers never enter snapshots by default: pass `views: { metadata: { headers: ["etag"] } }` (or `headers: []` for status and data only), a per-path `paths[path].metadata: { headers: [...] }`, or a custom `metadata` codec. Derivation preserves decoded header wrappers, `HttpApiSchema.asNoContent` cached decoded values, overlapping union members in objects and arrays, and distinct `undefined` and `null` stream elements. For endpoints with several success statuses, HTTP metadata uses the cached status to select the corresponding schemas. Hydration filters raw headers to the allowlist and rebuilds a frozen metadata envelope. Buffered HTTP query data has no status, so derivation prefers a success schema that accepts all cached fields. Use matching package versions and contract declarations on both sides of the snapshot.
+Derivation covers buffered queries, live values, and accumulated history by default. HTTP metadata hydration is opt-in so unfiltered server-only response headers never enter snapshots by default: pass `views: { metadata: { headers: ["etag"] } }` (or `headers: []` for status and data only), a per-path `paths[path].metadata: { headers: [...] }`, or a custom `metadata` codec. Derivation preserves decoded header wrappers, `HttpApiSchema.asNoContent` cached decoded values, overlapping union members in objects and arrays, and distinct `undefined` and `null` stream elements. For endpoints with several success statuses, HTTP metadata uses the cached status to select the corresponding schemas. Hydration filters raw headers to the allowlist and rebuilds a frozen metadata envelope. Buffered HTTP query data has no status, so derivation prefers a success schema that accepts all cached fields. Use matching package versions and contract declarations on both sides of the snapshot. When upgrading from the original flat prefix format, bump the persisted TanStack cache buster and discard old snapshots. Restore application-owned DTOs with current generated keys only if the stored identity is explicit.
 
 Add `paths["users.page"].infinite: { pageParam: Cursor }` for infinite data. A custom query codec supplies the default metadata data and infinite page codec. Set `views` or path settings directly on the configuration objects to opt out with `false`. Use `Schema.Json` for JSON values. Supply a JSON codec or opt out for unrestricted `Schema.Any`, `Schema.Unknown`, `Schema.ObjectKeyword`, opaque schemas, or `Redacted` schemas (including nested `Redacted` inside `Option`, structs, unions, arrays, or `Schema.suspend`).
 

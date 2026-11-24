@@ -186,7 +186,10 @@ type StreamMutationError = Assert<
 >;
 const prefix = viewPrefix(rpc.read, "query");
 type ViewPrefix = Assert<
-  Equal<typeof prefix, readonly ["helpers", "rpc", "read", "query"]>
+  Equal<
+    typeof prefix,
+    readonly [`effect-api-query:v2:${string}`, "rpc", "read", null, "query"]
+  >
 >;
 type UntaggedPrefix = Assert<
   Equal<typeof dataTagSymbol extends keyof typeof prefix ? true : false, false>
@@ -195,9 +198,10 @@ const prefixCacheData = queryClient.getQueryData(prefix);
 type PrefixCacheData = Assert<Equal<typeof prefixCacheData, unknown>>;
 queryClient.invalidateQueries({ queryKey: prefix });
 viewPrefix(rpc.watch, "streamed") satisfies readonly [
-  "helpers",
+  `effect-api-query:v2:${string}`,
   "rpc",
   "watch",
+  null,
   "streamed",
 ];
 // @ts-expect-error RPC leaves have no metadata view

@@ -173,11 +173,15 @@ describe("cache recipes", () => {
         const history = createRpcQueryUtils(group, {
           client,
           keyPrefix: ["hydration-views", "history"],
-        }).watch.streamedOptions({ maxChunks: "unbounded" });
+        }).watch.streamedOptions({
+          meta: { snapshotView: "history" },
+          maxChunks: "unbounded",
+        });
         const infinite = createRpcQueryUtils(group, {
           client,
           keyPrefix: ["hydration-views", "infinite"],
         }).page.infiniteOptions({
+          meta: { snapshotView: "infinite" },
           initialPageParam: new Cursor({ offset: 0n }),
           input: (cursor) => ({ offset: cursor.offset }),
           getNextPageParam: () => {},
@@ -185,7 +189,7 @@ describe("cache recipes", () => {
         const latest = createRpcQueryUtils(group, {
           client,
           keyPrefix: ["hydration-views", "live"],
-        }).latest.liveOptions();
+        }).latest.liveOptions({ meta: { snapshotView: "live" } });
         const refreshed = new Profile({
           name: "Grace",
           credits: 42n,
@@ -210,15 +214,19 @@ describe("cache recipes", () => {
         const browserHistory = createRpcQueryUtils(group, {
           client: browserClient,
           keyPrefix: ["hydration-views", "history"],
-        }).watch.streamedOptions({ maxChunks: "unbounded" });
+        }).watch.streamedOptions({
+          meta: { snapshotView: "history" },
+          maxChunks: "unbounded",
+        });
         const browserLatest = createRpcQueryUtils(group, {
           client: browserClient,
           keyPrefix: ["hydration-views", "live"],
-        }).latest.liveOptions();
+        }).latest.liveOptions({ meta: { snapshotView: "live" } });
         const browserInfinite = createRpcQueryUtils(group, {
           client: browserClient,
           keyPrefix: ["hydration-views", "infinite"],
         }).page.infiniteOptions({
+          meta: { snapshotView: "infinite" },
           initialPageParam: new Cursor({ offset: 0n }),
           input: (cursor) => ({ offset: cursor.offset }),
           getNextPageParam: () => {},

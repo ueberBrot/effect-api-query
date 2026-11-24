@@ -34,6 +34,7 @@ import type {
   LivePolicyOptions,
   utilityPaths,
 } from "../core/types";
+import type { UtilityOperationKey, UtilityRootKey } from "../core/utility-key";
 import type {
   EffectHttpApiQueryConfigError,
   EffectHttpApiQueryEmptyStreamError,
@@ -342,7 +343,7 @@ export type ExposedClientServices<Api extends HttpApi.Constraint, Client> =
 export type Root<
   Api extends HttpApi.Constraint,
   Prefix extends readonly JsonValue[],
-> = readonly [...Prefix, "http", ApiIdentifier<Api>];
+> = UtilityRootKey<Prefix, readonly ["http", ApiIdentifier<Api>]>;
 export type ConcreteKey<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Key extends readonly JsonValue[],
@@ -691,7 +692,10 @@ export type GroupTree<
     Endpoint in Supported<Endpoints<Group>> as Endpoint["identifier"]
   ]: EndpointLeaf<
     Endpoint,
-    readonly [...RootKey, Group["identifier"], Endpoint["identifier"]],
+    UtilityOperationKey<
+      RootKey,
+      readonly [Group["identifier"], Endpoint["identifier"]]
+    >,
     Member<GroupClient, Endpoint["identifier"]>
   >;
 };
@@ -723,7 +727,7 @@ export type HttpApiQueryUtils<
     > as Endpoint["identifier"]
   ]: EndpointLeaf<
     Endpoint,
-    readonly [...Root<Api, Prefix>, Endpoint["identifier"]],
+    UtilityOperationKey<Root<Api, Prefix>, readonly [Endpoint["identifier"]]>,
     Member<Client, Endpoint["identifier"]>
   >;
 };

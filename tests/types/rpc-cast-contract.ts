@@ -114,11 +114,11 @@ true satisfies Assert<
   Equal<InferQueryData<typeof utils.records.watch, "live">, string | null>
 >;
 utils.health.ping.queryKey() satisfies readonly [
-  "cast-audit",
-  1,
+  `effect-api-query:v2:${string}`,
   "rpc",
   "health",
   "ping",
+  null,
   "query",
 ];
 true satisfies Assert<
