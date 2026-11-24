@@ -30,16 +30,35 @@ const githubOidcIssuer = "https://token.actions.githubusercontent.com";
 const slsaPredicateType = "https://slsa.dev/provenance/v1";
 const shaPattern = /^[\da-f]{40}$/u;
 const integrityPattern = /^sha512-(?<digest>[\dA-Za-z+/]{86}==)$/u;
+const maxMetadataBytes = 1_048_576;
+const maxTarballBytes = 50 * 1_048_576;
 
-export interface ProvenanceVerificationInput {
+export interface DocsReleaseEnv {
+  readonly BUILD_ARTIFACT?: string | undefined;
+  readonly DOCS_REF?: string | undefined;
+  readonly DOCS_VERSION?: string | undefined;
+  readonly GITHUB_EVENT_NAME?: string | undefined;
+  readonly GITHUB_REF?: string | undefined;
+  readonly GITHUB_SHA?: string | undefined;
+  readonly PUBLISHED_PACKAGES?: string | undefined;
+}
+
+export interface DocsReleaseAdapters {
+  readonly fetch?: typeof globalThis.fetch;
+  readonly readManifest?: () => string;
+  readonly runCommand?: (
+    command: "git" | "gh",
+    args: readonly string[]
+  ) => string;
+}
+
+interface ProvenanceVerificationInput {
   readonly version: string;
   readonly revision: string;
   readonly expectedSha512: string;
   readonly bundleJson: string;
   readonly tarball: Buffer;
 }
-
-export type ProvenanceVerifier = (input: ProvenanceVerificationInput) => void;
 
 const validateRevision = (revision: string): string => {
   if (!shaPattern.test(revision)) {
@@ -80,7 +99,7 @@ const readMainFirstParents = (
   return new Set(commits.map((commit) => validateRevision(commit)));
 };
 
-export const publishedRootVersion = (
+const publishedRootVersion = (
   manifest: string,
   publishedPackages: string
 ): string => {
@@ -198,7 +217,7 @@ const validateRegistryMetadata = (
   return expectedSha512;
 };
 
-export const extractSlsaBundleJson = (attestationsJson: string): string => {
+const extractSlsaBundleJson = (attestationsJson: string): string => {
   const parsed: unknown = JSON.parse(attestationsJson);
   if (
     typeof parsed !== "object" ||
@@ -280,9 +299,9 @@ const verifyVerifiedStatementSubject = (
   }
 };
 
-export const verifySlsaAttestationWithGh = (
+const verifySlsaAttestation = (
   input: ProvenanceVerificationInput,
-  runCommand: (command: string, args: readonly string[]) => string = capture
+  runCommand: (command: "git" | "gh", args: readonly string[]) => string
 ): void => {
   const actualSha512 = createHash("sha512").update(input.tarball).digest("hex");
   if (actualSha512 !== input.expectedSha512) {
@@ -342,16 +361,135 @@ const permittedDocumentationPath = (path: string): boolean => {
   );
 };
 
-export const resolveDocumentationRevision = (
+const readBoundedResponse = async (
+  response: Response,
+  maxBytes: number,
+  oversizedMessage: string
+): Promise<Buffer> => {
+  const declaredLength = response.headers.get("content-length");
+  if (declaredLength !== null && Number(declaredLength) > maxBytes) {
+    await response.body?.cancel();
+    throw new Error(oversizedMessage);
+  }
+  if (response.body === null) {
+    const bytes = Buffer.from(await response.arrayBuffer());
+    if (bytes.length > maxBytes) {
+      throw new Error(oversizedMessage);
+    }
+    return bytes;
+  }
+  const chunks: Buffer[] = [];
+  let total = 0;
+  for await (const chunk of response.body) {
+    const buffer = Buffer.from(chunk);
+    total += buffer.byteLength;
+    if (total > maxBytes) {
+      throw new Error(oversizedMessage);
+    }
+    chunks.push(buffer);
+  }
+  return Buffer.concat(chunks, total);
+};
+
+const fetchRegistryBytes = async (
+  fetchImpl: typeof globalThis.fetch,
+  url: string,
+  maxBytes: number,
+  unavailableMessage: string,
+  oversizedMessage: string
+): Promise<Buffer> => {
+  const response = await fetchImpl(url, {
+    redirect: "error",
+    signal: AbortSignal.timeout(15_000),
+  });
+  if (!response.ok) {
+    await response.body?.cancel();
+    throw new Error(unavailableMessage);
+  }
+  return readBoundedResponse(response, maxBytes, oversizedMessage);
+};
+
+const resolveDocsRefRevision = (
+  readGit: (args: readonly string[]) => string,
+  release: string,
+  docsRef: string,
+  mainFirstParents: ReadonlySet<string>
+): string => {
+  let ref = docsRef;
+  if (!shaPattern.test(ref)) {
+    if (ref.length > 255 || !/^[\da-zA-Z_][\da-zA-Z_./-]*$/u.test(ref)) {
+      throw new Error("docs-ref must be a branch name or a full commit SHA.");
+    }
+    readGit(["check-ref-format", `refs/heads/${ref}`]);
+    ref = `refs/remotes/origin/${ref}`;
+  }
+  const revision = validateRevision(
+    readGit([
+      "rev-parse",
+      "--verify",
+      "--end-of-options",
+      `${ref}^{commit}`,
+    ]).trim()
+  );
+  assertAncestor(
+    readGit,
+    release,
+    revision,
+    "The released commit must be an ancestor of docs-ref."
+  );
+  if (!mainFirstParents.has(revision)) {
+    throw new Error(
+      "docs-ref must be on the protected main branch's first-parent history."
+    );
+  }
+  const changes = readGit([
+    "diff",
+    "--name-only",
+    "--no-renames",
+    "-z",
+    release,
+    revision,
+    "--",
+  ])
+    .split("\0")
+    .filter((path) => path !== "");
+  if (changes.some((path) => !permittedDocumentationPath(path))) {
+    throw new Error(
+      "docs-ref changes files outside the documentation allowlist."
+    );
+  }
+  return revision;
+};
+
+const resolveManualDocsRelease = async (
   version: string,
   docsRef: string,
-  metadata: string,
-  attestations: string,
-  tarball: Buffer,
-  readGit: (args: readonly string[]) => string,
-  verifyProvenance: ProvenanceVerifier = verifySlsaAttestationWithGh
+  fetchImpl: typeof globalThis.fetch,
+  runCommand: (command: "git" | "gh", args: readonly string[]) => string
 ) => {
   validateVersion(version);
+  const readGit = (args: readonly string[]) => runCommand("git", args);
+  const metadataBytes = await fetchRegistryBytes(
+    fetchImpl,
+    `https://registry.npmjs.org/${encodedPackageName}/${version}`,
+    maxMetadataBytes,
+    "The exact package version is unavailable from npm.",
+    "npm returned oversized package metadata."
+  );
+  const attestationsBytes = await fetchRegistryBytes(
+    fetchImpl,
+    expectedAttestationsUrl(version),
+    maxMetadataBytes,
+    "npm provenance attestations are unavailable for this package version.",
+    "npm returned oversized provenance attestations."
+  );
+  const tarball = await fetchRegistryBytes(
+    fetchImpl,
+    expectedTarballUrl(version),
+    maxTarballBytes,
+    "The exact package tarball is unavailable from npm.",
+    "npm returned an oversized package tarball."
+  );
   const release = validateRevision(
     readGit([
       "rev-parse",
@@ -359,15 +497,16 @@ export const resolveDocumentationRevision = (
       `refs/tags/${packageName}@${version}^{commit}`,
     ]).trim()
   );
-  const expectedSha512 = validateRegistryMetadata(version, release, metadata);
-  const bundleJson = extractSlsaBundleJson(attestations);
-  verifyProvenance({
+  const expectedSha512 = validateRegistryMetadata(
     version,
-    revision: release,
-    expectedSha512,
-    bundleJson,
-    tarball,
-  });
+    release,
+    metadataBytes.toString("utf-8")
+  );
+  const bundleJson = extractSlsaBundleJson(attestationsBytes.toString("utf-8"));
+  verifySlsaAttestation(
+    { version, revision: release, expectedSha512, bundleJson, tarball },
+    runCommand
+  );
   const mainFirstParents = readMainFirstParents(readGit);
   if (!mainFirstParents.has(release)) {
     throw new Error(
@@ -380,52 +519,10 @@ export const resolveDocumentationRevision = (
   ) {
     throw new Error("The release tag's root package does not match npm.");
   }
-  let revision = release;
-  if (docsRef !== "") {
-    let ref = docsRef;
-    if (!shaPattern.test(ref)) {
-      if (ref.length > 255 || !/^[\da-zA-Z_][\da-zA-Z_./-]*$/u.test(ref)) {
-        throw new Error("docs-ref must be a branch name or a full commit SHA.");
-      }
-      readGit(["check-ref-format", `refs/heads/${ref}`]);
-      ref = `refs/remotes/origin/${ref}`;
-    }
-    revision = validateRevision(
-      readGit([
-        "rev-parse",
-        "--verify",
-        "--end-of-options",
-        `${ref}^{commit}`,
-      ]).trim()
-    );
-    assertAncestor(
-      readGit,
-      release,
-      revision,
-      "The released commit must be an ancestor of docs-ref."
-    );
-    if (!mainFirstParents.has(revision)) {
-      throw new Error(
-        "docs-ref must be on the protected main branch's first-parent history."
-      );
-    }
-    const changes = readGit([
-      "diff",
-      "--name-only",
-      "--no-renames",
-      "-z",
-      release,
-      revision,
-      "--",
-    ])
-      .split("\0")
-      .filter((path) => path !== "");
-    if (changes.some((path) => !permittedDocumentationPath(path))) {
-      throw new Error(
-        "docs-ref changes files outside the documentation allowlist."
-      );
-    }
-  }
+  const revision =
+    docsRef === ""
+      ? release
+      : resolveDocsRefRevision(readGit, release, docsRef, mainFirstParents);
   const tree = readGit([
     "ls-tree",
     "-r",
@@ -462,76 +559,38 @@ export const resolveDocumentationRevision = (
   return { revision, version };
 };
 
-const fetchRegistryBytes = async (
-  url: string,
-  maxBytes: number,
-  unavailableMessage: string,
-  oversizedMessage: string
-): Promise<Buffer> => {
-  const response = await fetch(url, {
-    redirect: "error",
-    signal: AbortSignal.timeout(15_000),
-  });
-  if (!response.ok) {
-    throw new Error(unavailableMessage);
+export const resolveDocsRelease = async (
+  env: DocsReleaseEnv,
+  adapters: DocsReleaseAdapters = {}
+) => {
+  const artifact = env.BUILD_ARTIFACT ?? "";
+  if (artifact === "") {
+    return resolveManualDocsRelease(
+      env.DOCS_VERSION ?? "",
+      env.DOCS_REF ?? "",
+      adapters.fetch ?? globalThis.fetch,
+      adapters.runCommand ?? capture
+    );
   }
-  const bytes = Buffer.from(await response.arrayBuffer());
-  if (bytes.length > maxBytes) {
-    throw new Error(oversizedMessage);
+  if (
+    artifact !== "documentation-build" ||
+    env.GITHUB_EVENT_NAME !== "push" ||
+    env.GITHUB_REF !== "refs/heads/main"
+  ) {
+    throw new Error(
+      "Automatic documentation must use the release run's CI artifact."
+    );
   }
-  return bytes;
+  const readManifest =
+    adapters.readManifest ?? (() => readFileSync("package.json", "utf-8"));
+  return {
+    revision: validateRevision(env.GITHUB_SHA ?? ""),
+    version: publishedRootVersion(readManifest(), env.PUBLISHED_PACKAGES ?? ""),
+  };
 };
 
 if (import.meta.main) {
-  const version = process.env["DOCS_VERSION"] ?? "";
-  const artifact = process.env["BUILD_ARTIFACT"] ?? "";
-  let release: ReturnType<typeof resolveDocumentationRevision>;
-  if (artifact === "") {
-    validateVersion(version);
-    const metadataBytes = await fetchRegistryBytes(
-      `https://registry.npmjs.org/${encodedPackageName}/${version}`,
-      1_048_576,
-      "The exact package version is unavailable from npm.",
-      "npm returned oversized package metadata."
-    );
-    const attestationsBytes = await fetchRegistryBytes(
-      expectedAttestationsUrl(version),
-      1_048_576,
-      "npm provenance attestations are unavailable for this package version.",
-      "npm returned oversized provenance attestations."
-    );
-    const tarball = await fetchRegistryBytes(
-      expectedTarballUrl(version),
-      50 * 1_048_576,
-      "The exact package tarball is unavailable from npm.",
-      "npm returned an oversized package tarball."
-    );
-    release = resolveDocumentationRevision(
-      version,
-      process.env["DOCS_REF"] ?? "",
-      metadataBytes.toString("utf-8"),
-      attestationsBytes.toString("utf-8"),
-      tarball,
-      (args) => capture("git", args)
-    );
-  } else {
-    if (
-      artifact !== "documentation-build" ||
-      process.env["GITHUB_EVENT_NAME"] !== "push" ||
-      process.env["GITHUB_REF"] !== "refs/heads/main"
-    ) {
-      throw new Error(
-        "Automatic documentation must use the release run's CI artifact."
-      );
-    }
-    release = {
-      revision: validateRevision(process.env["GITHUB_SHA"] ?? ""),
-      version: publishedRootVersion(
-        readFileSync("package.json", "utf-8"),
-        process.env["PUBLISHED_PACKAGES"] ?? ""
-      ),
-    };
-  }
+  const release = await resolveDocsRelease(process.env);
   const output = process.env["GITHUB_OUTPUT"];
   if (output === undefined || output === "") {
     throw new Error("GITHUB_OUTPUT is required.");
