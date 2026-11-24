@@ -223,28 +223,97 @@ describe("example HTTP API", () => {
   );
 
   it.effect(
-    "provides HTTP preflight headers while preserving RPC methods",
+    "grants CORS only to configured origins and preserves route metadata",
     () =>
       Effect.gen(function* exposeHttpPreflight() {
-        const server = yield* startExampleRpcServer();
+        const origin = "http://127.0.0.1:5173";
+        const otherAllowedOrigin = "https://example.com";
+        const server = yield* startExampleRpcServer({
+          allowedOrigins: [origin, otherAllowedOrigin],
+        });
         const http = yield* Effect.promise(
           async () =>
-            await fetch(`${server.url}/api/users`, { method: "OPTIONS" })
+            await fetch(`${server.httpApiUrl}/users`, {
+              headers: {
+                "access-control-request-headers": "authorization,if-match",
+                "access-control-request-method": "DELETE",
+                origin,
+              },
+              method: "OPTIONS",
+            })
         );
-        expect(http.status).toBe(204);
-        expect(http.headers.get("access-control-allow-origin")).toBe("*");
-        expect(http.headers.get("access-control-allow-methods")).toBe(
-          "GET,POST,DELETE,OPTIONS"
-        );
+        expect({
+          methods: http.headers.get("access-control-allow-methods"),
+          origin: http.headers.get("access-control-allow-origin"),
+          status: http.status,
+          vary: http.headers.get("vary"),
+        }).toStrictEqual({
+          methods: "GET,POST,DELETE,OPTIONS",
+          origin,
+          status: 204,
+          vary: "Origin",
+        });
         expect(http.headers.get("access-control-allow-headers")).toContain(
-          "authorization"
+          "if-match"
         );
         const rpc = yield* Effect.promise(
-          async () => await fetch(server.rpcUrl, { method: "OPTIONS" })
+          async () =>
+            await fetch(server.rpcUrl, {
+              headers: {
+                "access-control-request-method": "POST",
+                origin: otherAllowedOrigin,
+              },
+              method: "OPTIONS",
+            })
         );
-        expect(rpc.headers.get("access-control-allow-methods")).toBe(
-          "POST,OPTIONS"
+        expect({
+          headers: rpc.headers.get("access-control-allow-headers"),
+          methods: rpc.headers.get("access-control-allow-methods"),
+          origin: rpc.headers.get("access-control-allow-origin"),
+          status: rpc.status,
+        }).toStrictEqual({
+          headers: "authorization,baggage,content-type,traceparent,tracestate",
+          methods: "POST,OPTIONS",
+          origin: otherAllowedOrigin,
+          status: 204,
+        });
+        for (const requestOrigin of [origin, `${origin}0`, undefined]) {
+          const expectedOrigin = requestOrigin === origin ? origin : null;
+          const headers =
+            requestOrigin === undefined ? {} : { origin: requestOrigin };
+          const response = yield* Effect.promise(
+            async () => await fetch(`${server.httpApiUrl}/users`, { headers })
+          );
+          expect(response.status).toBe(200);
+          expect(response.headers.get("access-control-allow-origin")).toBe(
+            expectedOrigin
+          );
+          expect(response.headers.get("access-control-expose-headers")).toBe(
+            expectedOrigin === null ? null : "etag"
+          );
+          expect(response.headers.get("vary")).toBe("Origin");
+        }
+        const denied = yield* Effect.promise(
+          async () =>
+            await fetch(server.rpcUrl, {
+              headers: {
+                "access-control-request-method": "POST",
+                origin: "https://other.example",
+              },
+              method: "OPTIONS",
+            })
         );
+        expect({
+          headers: denied.headers.get("access-control-allow-headers"),
+          origin: denied.headers.get("access-control-allow-origin"),
+          status: denied.status,
+          vary: denied.headers.get("vary"),
+        }).toStrictEqual({
+          headers: null,
+          origin: null,
+          status: 204,
+          vary: "Origin",
+        });
       })
   );
 

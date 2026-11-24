@@ -7,6 +7,10 @@ import { NodeRuntime } from "@effect/platform-node";
 import { Effect, Logger } from "effect";
 
 const serverOptions = {
+  allowedOrigins: (process.env["EXAMPLE_ALLOWED_ORIGINS"] ?? "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter((origin) => origin !== ""),
   port: 3001,
   writeToken: process.env["EXAMPLE_WRITE_TOKEN"],
 } satisfies StartExampleRpcServerOptions;

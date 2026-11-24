@@ -134,6 +134,77 @@ describe("example RPC server", () => {
       })
   );
 
+  for (const scenario of [
+    "accepted",
+    "chunked overflow",
+    "declared overflow",
+  ] as const) {
+    it.live(`handles Expect: 100-continue for ${scenario}`, () =>
+      Effect.gen(function* continueRequest() {
+        const server = yield* startExampleRpcServer();
+        const result = yield* Effect.tryPromise(
+          async () =>
+            // oxlint-disable-next-line promise/avoid-new
+            await new Promise<{
+              readonly cacheControl: string | undefined;
+              readonly continues: number;
+              readonly status: number | undefined;
+            }>((resolve, reject) => {
+              const body = JSON.stringify({ name: "Grace Hopper" });
+              const headers = {
+                "content-type": "application/json",
+                expect: "100-continue",
+                ...(scenario === "chunked overflow"
+                  ? { "transfer-encoding": "chunked" }
+                  : {
+                      "content-length": String(
+                        scenario === "accepted"
+                          ? Buffer.byteLength(body)
+                          : 1024 * 1024 + 1
+                      ),
+                    }),
+              };
+              let continues = 0;
+              const request = nodeRequest(
+                `${server.httpApiUrl}/users`,
+                { headers, method: "POST" },
+                (response) => {
+                  response.resume();
+                  response.once("end", () => {
+                    request.destroy();
+                    resolve({
+                      cacheControl: response.headers["cache-control"],
+                      continues,
+                      status: response.statusCode,
+                    });
+                  });
+                }
+              );
+              request.once("error", reject);
+              request.setTimeout(1000, () => {
+                request.destroy(new Error("Request timed out"));
+              });
+              request.on("continue", () => {
+                continues += 1;
+                if (scenario === "chunked overflow") {
+                  request.write(" ".repeat(1024 * 1024 + 1));
+                } else if (scenario === "accepted") {
+                  request.end(body);
+                }
+              });
+              request.flushHeaders();
+            })
+        );
+        expect(result).toStrictEqual({
+          cacheControl:
+            scenario === "declared overflow" ? "no-store" : undefined,
+          continues: scenario === "declared overflow" ? 0 : 1,
+          status: scenario === "accepted" ? 200 : 413,
+        });
+      })
+    );
+  }
+
   it.live(
     "keeps origin-form paths local and rejects invalid request targets",
     () =>
@@ -207,31 +278,64 @@ describe("example RPC server", () => {
     })
   );
 
-  it.effect("exposes browser-safe RPC preflight metadata", () =>
-    Effect.gen(function* rpcPreflightMetadata() {
-      const server = yield* startExampleRpcServer();
-      const preflight = yield* Effect.promise(
-        async () =>
-          await fetch(server.rpcUrl, {
-            headers: {
-              "access-control-request-headers":
-                "authorization,baggage,content-type,traceparent,tracestate",
-              "access-control-request-method": "POST",
-              origin: "http://127.0.0.1:5173",
-            },
-            method: "OPTIONS",
-          })
+  it.live("advertises usable IPv6 URLs while binding the original host", () =>
+    Effect.gen(function* ipv6Urls() {
+      const server = yield* startExampleRpcServer({ host: "::1" });
+      const origin = `http://[::1]:${String(server.port)}`;
+      expect(server.host).toBe("::1");
+      expect(new URL(server.url).origin).toBe(origin);
+      expect(new URL(server.httpApiUrl).href).toBe(`${origin}/api`);
+      expect(new URL(server.rpcUrl).href).toBe(`${origin}/rpc`);
+      const response = yield* Effect.promise(
+        async () => await fetch(`${server.url}/health`)
       );
-      expect(preflight.status).toBe(204);
-      expect(preflight.headers.get("access-control-allow-origin")).toBe("*");
-      expect(preflight.headers.get("access-control-allow-headers")).toBe(
-        "authorization,baggage,content-type,traceparent,tracestate"
-      );
-      expect(preflight.headers.get("access-control-allow-methods")).toContain(
-        "POST"
-      );
+      expect(response.status).toBe(200);
     })
   );
+
+  it.effect("omits CORS permission by default for RPC and HTTP", () =>
+    Effect.gen(function* denyDefaultCors() {
+      const server = yield* startExampleRpcServer();
+      const origin = "http://127.0.0.1:5173";
+      for (const url of [server.rpcUrl, `${server.httpApiUrl}/users`]) {
+        const preflight = yield* Effect.promise(
+          async () =>
+            await fetch(url, {
+              headers: {
+                "access-control-request-headers": "content-type",
+                "access-control-request-method": "POST",
+                origin,
+              },
+              method: "OPTIONS",
+            })
+        );
+        expect(preflight.status).toBe(204);
+        expect(preflight.headers.get("access-control-allow-origin")).toBeNull();
+        expect(
+          preflight.headers.get("access-control-allow-methods")
+        ).toBeNull();
+      }
+      const response = yield* Effect.promise(
+        async () =>
+          await fetch(`${server.httpApiUrl}/users`, { headers: { origin } })
+      );
+      expect(response.status).toBe(200);
+      expect(response.headers.get("access-control-allow-origin")).toBeNull();
+    })
+  );
+
+  for (const origin of ["*", "null", "https://example.com/"]) {
+    it.effect(`rejects non-origin CORS configuration ${origin}`, () =>
+      Effect.gen(function* rejectInvalidOrigin() {
+        const error = yield* Effect.flip(
+          startExampleRpcServer({ allowedOrigins: [origin] })
+        );
+        expect(error.message).toBe(
+          "Example RPC server requires serialized HTTP(S) CORS origins"
+        );
+      })
+    );
+  }
 
   it.effect("logs structured HTTP response metadata for RPC requests", () => {
     const entries: {

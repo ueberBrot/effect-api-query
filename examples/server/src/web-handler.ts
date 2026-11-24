@@ -32,7 +32,7 @@ const rpcLayer = Layer.mergeAll(
   exampleRpcHandlersLayer,
   RpcSerialization.layerJson
 );
-const maxRequestBodyBytes = 1024 * 1024;
+export const maxRequestBodyBytes = 1024 * 1024;
 
 const readRequestBody = async (
   request: Request
