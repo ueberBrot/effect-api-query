@@ -37,6 +37,7 @@ skills:
       - Use QueryClientService to run queries, warm the cache, and apply cache operations in Effect. Use an exclusive stream snapshot to capture a stream that can stay open.
       - Bind application Reactivity keys to explicit cache filters within a Scope. Retain key prefix isolation and stop invalidation at query owner retirement.
       - Derive buffered, paginated, accumulated, live, and metadata options from a ready client. Use its HTTP request parse options when encoding default keys.
+      - Read frozen HTTP metadata envelopes and own raw header strings through imperative fetches and from the cache, including interceptor replacements and fallbacks.
       - Use colocated query filters for lazy-safe branch views and complete canonical leaf inputs. Omit stream policy options to match across policies. Supply retention for a policy match if none is configured. Use explicit projections for encoded partial input.
       - Reuse inferred input, cached query data, and mutation types in application modules.
       - Configure utility trees, branches, and leaves with ordered interceptors across views; reuse unchanged frozen subtrees while preserving policy snapshots and prepared-input ownership; select a branch view without changing key layouts.

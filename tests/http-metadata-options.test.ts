@@ -27,6 +27,139 @@ const api = HttpApi.make("metadata-options").add(
     })
   )
 );
+describe.each([
+  "non-enumerable",
+  "accessor",
+  "hidden header",
+  "live status",
+  "unused getter",
+] as const)("metadata refetch after a %s seed", (seed) => {
+  it.effect("preserves own raw response headers", () =>
+    Effect.gen(function* preserveRawMetadataHeaders() {
+      let etag = "first";
+      let title = "document";
+      const client = yield* HttpApiClient.makeWith(api, {
+        baseUrl: "https://example.test",
+        httpClient: HttpClient.make((request) =>
+          Effect.sync(() =>
+            HttpClientResponse.fromWeb(
+              request,
+              Response.json(
+                { title },
+                {
+                  headers: [
+                    ["__proto__", "raw header"],
+                    ["etag", etag],
+                  ],
+                }
+              )
+            )
+          )
+        ),
+      });
+      const {
+        documents: { read },
+      } = createHttpApiQueryUtils(api, { client });
+      const queryClient = new QueryClient();
+      const fetch = async () => await queryClient.query(read.metadataOptions());
+      try {
+        let seedEtag = etag;
+        let seedStatus = 200;
+        const matchingHeaders = {
+          ["__proto__"]: "raw header",
+          "content-type": "application/json",
+          etag,
+        };
+        let initialHeaders = matchingHeaders;
+        if (seed === "accessor") {
+          initialHeaders = {
+            ...matchingHeaders,
+            get etag() {
+              return seedEtag;
+            },
+          };
+        } else if (seed === "non-enumerable") {
+          initialHeaders = Object.defineProperty(
+            { ...matchingHeaders, extra: "seed" },
+            "__proto__",
+            { enumerable: false }
+          );
+        } else if (seed === "hidden header") {
+          initialHeaders = Object.defineProperty(
+            { ...matchingHeaders },
+            "extra",
+            { value: "seed" }
+          );
+        }
+        const initial = {
+          data: { title },
+          status: 200,
+          headers: Object.freeze(initialHeaders),
+        };
+        if (seed === "live status") {
+          Object.defineProperty(initial, "status", {
+            get: () => seedStatus,
+            enumerable: true,
+          });
+        } else if (seed === "unused getter") {
+          Object.defineProperty(initial, "extra", {
+            get: () => {
+              throw new Error("Unused seed getter");
+            },
+            enumerable: true,
+          });
+        }
+        queryClient.setQueryData(read.metadataKey(), Object.freeze(initial));
+        const first = yield* Effect.promise(fetch);
+        seedEtag = "changed";
+        seedStatus = 203;
+        const seeded = queryClient.getQueryData(read.metadataKey());
+        expect({
+          ownHeader: Object.hasOwn(first.headers, "__proto__"),
+          headers: seeded?.headers,
+          extra: seeded?.headers["extra"],
+          status: seeded?.status,
+          dataShared: seeded?.data === initial.data,
+        }).toStrictEqual({
+          ownHeader: true,
+          headers: first.headers,
+          extra: undefined,
+          status: 200,
+          dataShared: true,
+        });
+
+        etag = "second";
+        yield* Effect.promise(fetch);
+        const refreshed = queryClient.getQueryData(read.metadataKey());
+        expect(refreshed?.headers).toStrictEqual({
+          ["__proto__"]: "raw header",
+          "content-type": "application/json",
+          etag: "second",
+        });
+        expect({
+          headersFrozen: Object.isFrozen(refreshed?.headers),
+          envelopeFrozen: Object.isFrozen(refreshed),
+          dataShared: refreshed?.data === seeded?.data,
+        }).toStrictEqual({
+          headersFrozen: true,
+          envelopeFrozen: true,
+          dataShared: true,
+        });
+
+        yield* Effect.promise(fetch);
+        expect(queryClient.getQueryData(read.metadataKey())).toBe(refreshed);
+
+        title = "updated document";
+        yield* Effect.promise(fetch);
+        expect(queryClient.getQueryData(read.metadataKey())?.headers).toBe(
+          refreshed?.headers
+        );
+      } finally {
+        queryClient.clear();
+      }
+    })
+  );
+});
 it.effect(
   "keeps initial, hydrated, manual and selected metadata data application-owned",
   () =>
@@ -247,10 +380,15 @@ describe.each(metadataReplacements)(
     );
   }
 );
-describe.each(["replace", "fallback"] as const)(
-  "metadata interceptor %s envelope",
-  (mode) => {
-    it.effect("preserves the fetched metadata policy", () =>
+describe.each([
+  { mode: "replace", source: "getter" },
+  { mode: "replace", source: "hidden getter" },
+  { mode: "fallback", source: "mutable" },
+  { mode: "fallback", source: "class" },
+] as const)(
+  "metadata interceptor $mode envelope with $source input",
+  ({ mode, source }) => {
+    it.effect("freezes imperative and cached results with their policy", () =>
       Effect.gen(function* retainInterceptedMetadataPolicy() {
         const client = yield* HttpApiClient.makeWith(api, {
           baseUrl: "https://example.test",
@@ -281,25 +419,92 @@ describe.each(["replace", "fallback"] as const)(
             },
           },
         });
+        const sourceHeaders = { etag: "intercepted" };
+        let headers = sourceHeaders;
+        if (source === "getter") {
+          headers = Object.freeze({
+            get etag() {
+              return sourceHeaders.etag;
+            },
+          });
+        } else if (source === "hidden getter") {
+          headers = Object.freeze(
+            Object.defineProperty({ ...sourceHeaders }, "extra", {
+              get: () => sourceHeaders.etag,
+            })
+          );
+        }
+        const data = { title: mode };
+        const envelope = { data, status: 200, headers };
+        class MetadataFallback {
+          readonly #envelope = envelope;
+          get data() {
+            return this.#envelope.data;
+          }
+          get status() {
+            return this.#envelope.status;
+          }
+          get headers() {
+            return this.#envelope.headers;
+          }
+        }
+        const replacement =
+          source === "class" ? new MetadataFallback() : envelope;
         const read = configureUtils(http.documents.read, {
           metadata: {
             interceptors: [
               async ({ next }) =>
                 mode === "replace"
-                  ? { ...(await next()) }
-                  : { data: { title: "fallback" }, status: 200, headers: {} },
+                  ? { ...(await next()), ...envelope }
+                  : replacement,
             ],
           },
         }).metadataOptions;
         try {
-          yield* Effect.promise(async () => await queryClient.query(read()));
+          const result = yield* Effect.promise(
+            async () => await queryClient.query(read())
+          );
+          expect({
+            status: result.status,
+            sameData: result.data === data,
+            envelopeFrozen: Object.isFrozen(result),
+            headersFrozen: Object.isFrozen(result.headers),
+            sourceFrozen: Object.isFrozen(replacement),
+            sourceHeadersFrozen: Object.isFrozen(sourceHeaders),
+            dataFrozen: Object.isFrozen(data),
+          }).toStrictEqual({
+            status: 200,
+            sameData: true,
+            envelopeFrozen: true,
+            headersFrozen: true,
+            sourceFrozen: false,
+            sourceHeadersFrozen: false,
+            dataFrozen: false,
+          });
+          sourceHeaders.etag = "changed";
+          expect(result.headers).toStrictEqual({ etag: "intercepted" });
           const fetched = queryClient.getQueryData(
             http.documents.read.metadataKey()
           );
-          expect(fetched?.status).toBe(211);
-          expect(sharingCalls).toBe(1);
-          expect(Object.isFrozen(fetched)).toBe(true);
-          expect(Object.isFrozen(fetched?.headers)).toBe(true);
+          expect({
+            status: fetched?.status,
+            sameData: fetched?.data === data,
+            etag: fetched?.headers["etag"],
+            extra: fetched?.headers["extra"],
+            imperativeExtra: result.headers["extra"],
+            sharingCalls,
+            envelopeFrozen: Object.isFrozen(fetched),
+            headersFrozen: Object.isFrozen(fetched?.headers),
+          }).toStrictEqual({
+            status: 211,
+            sameData: true,
+            etag: "intercepted",
+            extra: undefined,
+            imperativeExtra: undefined,
+            sharingCalls: 1,
+            envelopeFrozen: true,
+            headersFrozen: true,
+          });
           queryClient.setQueryData(http.documents.read.metadataKey(), {
             data: { title: "manual" },
             status: 207,

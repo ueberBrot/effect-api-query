@@ -54,6 +54,8 @@ These checks verify the recommended APIs and observable behavior. A fresh isolat
 
 ## Coverage and batch history
 
+- **HTTP metadata snapshots (#240), base `21868ef8`:** The HTTP reference covers own raw header strings across default cache sharing and frozen envelopes and header snapshots for imperative and cached interceptor results. The domain map records both read paths. Existing skill tree sources cover the runtime and public regressions in `tests/http-metadata-options.test.ts`.
+
 - **Caller-owned operations (#246), base `30552d7d`:** The cache-workflows reference covers caller-scoped commands and explicit reservations. The domain map records why an operation ID alone cannot authorize status or cancellation. The skill tree tracks the browser session and host adapters. Runtime and browser tests cover same-ID isolation, cancellation and request-local authority. The published library's runtime and type contracts are unchanged.
 
 - **Verified demo writes (#246), base `016214ad`:** The framework reference covers server-provisioned demo sessions for user deletion and shared workflow writes. The domain map records request-owned authority across the network and Start SSR. The skill tree tracks the access form and browser fixtures. The published library's runtime and type contracts are unchanged.
