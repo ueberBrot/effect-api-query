@@ -53,7 +53,7 @@ const canInspectAtom = (
   value: unknown,
   checked: Map<object, boolean>
 ): boolean => {
-  if (!Predicate.isObject(value)) {
+  if (!Predicate.isObjectOrArray(value)) {
     return true;
   }
   const previous = checked.get(value);
@@ -98,62 +98,45 @@ const setOwnDataProperty = (
   }
 };
 
-const assertAcyclic = (value: unknown, ancestors: Set<object>): void => {
-  if (Array.isArray(value)) {
-    if (!isPlainDenseArray(value)) {
-      return;
-    }
-    if (ancestors.has(value)) {
-      throw new TypeError("Schema sharing requires acyclic plain containers");
-    }
-    ancestors.add(value);
-    for (const item of value) {
-      assertAcyclic(item, ancestors);
-    }
-    ancestors.delete(value);
-    return;
-  }
-  if (!Predicate.isObject(value)) {
-    return;
-  }
-  const keys = plainObjectKeys(value);
-  if (keys === undefined) {
+const assertAcyclic = (
+  value: unknown,
+  ancestors: Set<object>,
+  completed: Set<object>
+): void => {
+  if (!Predicate.isObjectOrArray(value) || completed.has(value)) {
     return;
   }
   if (ancestors.has(value)) {
     throw new TypeError("Schema sharing requires acyclic plain containers");
   }
   ancestors.add(value);
-  for (const key of keys) {
-    assertAcyclic(value[key], ancestors);
+  if (Array.isArray(value)) {
+    if (isPlainDenseArray(value)) {
+      for (const item of value) {
+        assertAcyclic(item, ancestors, completed);
+      }
+    }
+  } else {
+    for (const key of plainObjectKeys(value) ?? []) {
+      assertAcyclic(value[key], ancestors, completed);
+    }
   }
   ancestors.delete(value);
+  completed.add(value);
 };
 
-type ShareNode = (
-  previous: unknown,
-  incoming: unknown,
-  ancestors: Set<object>
-) => unknown;
+type ShareNode = (previous: unknown, incoming: unknown) => unknown;
 
 const shareArray = (
   previous: unknown,
   incoming: readonly unknown[],
-  ancestors: Set<object>,
   share: ShareNode
 ): unknown => {
-  if (!isPlainDenseArray(incoming)) {
-    return incoming;
-  }
-  if (ancestors.has(incoming)) {
-    throw new TypeError("Schema sharing requires acyclic plain containers");
-  }
-  ancestors.add(incoming);
-  if (!Array.isArray(previous) || !isPlainDenseArray(previous)) {
-    for (const item of incoming) {
-      assertAcyclic(item, ancestors);
-    }
-    ancestors.delete(incoming);
+  if (
+    !isPlainDenseArray(incoming) ||
+    !Array.isArray(previous) ||
+    !isPlainDenseArray(previous)
+  ) {
     return incoming;
   }
   const previousArray: readonly unknown[] = previous;
@@ -164,7 +147,7 @@ const shareArray = (
   for (let index = 0; index < length; index += 1) {
     const next: unknown = incoming[index];
     const prev: unknown = previousArray[index];
-    const shared = share(prev, next, ancestors);
+    const shared = share(prev, next);
     if (values === undefined) {
       const matchesPrevious: boolean =
         sameAsPrevious && Object.is(shared, prev);
@@ -185,7 +168,6 @@ const shareArray = (
       values[index] = shared;
     }
   }
-  ancestors.delete(incoming);
   if (values !== undefined) {
     return values;
   }
@@ -209,25 +191,16 @@ const copyPrefixProperties = (
 const sharePlainObject = (
   previous: unknown,
   incoming: PlainObject,
-  ancestors: Set<object>,
   share: ShareNode
 ): unknown => {
   const keys = plainObjectKeys(incoming);
   if (keys === undefined) {
     return incoming;
   }
-  if (ancestors.has(incoming)) {
-    throw new TypeError("Schema sharing requires acyclic plain containers");
-  }
-  ancestors.add(incoming);
   const oldKeys = Predicate.isObject(previous)
     ? plainObjectKeys(previous)
     : undefined;
   if (oldKeys === undefined || !Predicate.isObject(previous)) {
-    for (const key of keys) {
-      assertAcyclic(incoming[key], ancestors);
-    }
-    ancestors.delete(incoming);
     return incoming;
   }
   let sameAsPrevious: boolean = keys.length === oldKeys.length;
@@ -241,7 +214,7 @@ const sharePlainObject = (
     const hasPrevious = Object.hasOwn(previous, key);
     const prev = hasPrevious ? previous[key] : undefined;
     const next = incoming[key];
-    const shared = share(prev, next, ancestors);
+    const shared = share(prev, next);
     if (values === undefined) {
       const matchesPrevious: boolean =
         sameAsPrevious && hasPrevious && Object.is(shared, prev);
@@ -263,7 +236,6 @@ const sharePlainObject = (
       setOwnDataProperty(values, key, shared);
     }
   }
-  ancestors.delete(incoming);
   return values ?? (sameAsPrevious ? previous : incoming);
 };
 
@@ -279,10 +251,10 @@ export const schemaStructuralSharing = <T>(
 ): ((previous: unknown, incoming: unknown) => unknown) => {
   const accepts = Schema.is(schema);
   return (previous, incoming) => {
+    assertAcyclic(incoming, new Set(), new Set());
     const checked = new Map<object, boolean>();
-    const share: ShareNode = (oldValue, newValue, ancestors) => {
+    const share: ShareNode = (oldValue, newValue) => {
       if (Object.is(oldValue, newValue)) {
-        assertAcyclic(newValue, ancestors);
         return oldValue;
       }
       if (canInspectAtom(newValue, checked) && accepts(newValue)) {
@@ -293,18 +265,13 @@ export const schemaStructuralSharing = <T>(
           : newValue;
       }
       if (Array.isArray(newValue)) {
-        return shareArray(oldValue, newValue, ancestors, share);
+        return shareArray(oldValue, newValue, share);
       }
       if (Predicate.isObject(newValue)) {
-        return sharePlainObject(oldValue, newValue, ancestors, share);
+        return sharePlainObject(oldValue, newValue, share);
       }
       return newValue;
     };
-    try {
-      return share(previous, incoming, new Set());
-    } catch (error) {
-      assertAcyclic(incoming, new Set());
-      throw error;
-    }
+    return share(previous, incoming);
   };
 };

@@ -54,6 +54,8 @@ These checks verify the recommended APIs and observable behavior. A fresh isolat
 
 ## Coverage and batch history
 
+- **Schema structural sharing (#241), base `033bfddb`:** The cache reference and sharing guide cover screening arrays before Schema callbacks and rejecting incoming cycles through supported containers. The domain map records support for shared acyclic references. Existing skill tree globs cover the core implementation and focused callback and traversal regressions. Fresh consumer verification remains unverified.
+
 - **HTTP metadata snapshots (#240), base `21868ef8`:** The HTTP reference covers own raw header strings across default cache sharing and frozen envelopes and header snapshots for imperative and cached interceptor results. The domain map records both read paths. Existing skill tree sources cover the runtime and public regressions in `tests/http-metadata-options.test.ts`.
 
 - **Caller-owned operations (#246), base `30552d7d`:** The cache-workflows reference covers caller-scoped commands and explicit reservations. The domain map records why an operation ID alone cannot authorize status or cancellation. The skill tree tracks the browser session and host adapters. Runtime and browser tests cover same-ID isolation, cancellation and request-local authority. The published library's runtime and type contracts are unchanged.
