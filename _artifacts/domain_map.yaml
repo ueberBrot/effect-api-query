@@ -235,6 +235,13 @@ skills:
         source: examples/vite-react/src/lib/user-writes.ts
         priority: CRITICAL
         status: active
+      - mistake: Delete a cached directory row by numeric ID alone
+        mechanism: A restored or delayed row can refer to a previous record after the server reuses its ID.
+        wrong_pattern: Enable deletion on restored data and submit only the displayed ID.
+        correct_pattern: Require a successful refresh for each restored view and match the displayed ID and revision in the server update and local deletion callbacks.
+        source: examples/server/src/users.ts
+        priority: CRITICAL
+        status: active
       - mistake: Hydrate rich values without paired view codecs
         mechanism: JSON loses prototypes, rich page parameters, and distinct undefined elements.
         wrong_pattern: hydrate(queryClient, JSON.parse(snapshot))

@@ -8,15 +8,20 @@ import type { ViteReactApplication } from "../../lib/application.ts";
 export const UserList = ({
   application,
   users,
+  isSynced,
 }: {
   readonly application: ViteReactApplication;
   readonly users: readonly User[] | undefined;
+  readonly isSynced: boolean;
 }) => {
   const { userWrites } = application;
   const deleteUser = useMutation(userWrites.rpcDelete());
 
   return (
     <>
+      {users !== undefined && !isSynced ? (
+        <p>Refresh the directory before deleting users.</p>
+      ) : null}
       <ul className="grid gap-3 sm:grid-cols-2">
         {users?.map((user) => (
           <li
@@ -33,11 +38,14 @@ export const UserList = ({
             <ActionButton
               aria-label={`Delete ${user.name}`}
               disabled={
+                !isSynced ||
                 user.id < 0 ||
-                (deleteUser.isPending && deleteUser.variables.id === user.id)
+                (deleteUser.isPending &&
+                  deleteUser.variables.id === user.id &&
+                  deleteUser.variables.revision === user.revision)
               }
               onClick={() => {
-                deleteUser.mutate({ id: user.id });
+                deleteUser.mutate({ id: user.id, revision: user.revision });
               }}
               type="button"
               variant="danger"

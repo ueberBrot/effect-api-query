@@ -200,3 +200,7 @@ The PR #225 review fixes match full canonical input across policies and require 
 The owner retirement review verifies that accepted mutation attempts can reach their runtime after retirement starts. The cache reference distinguishes those attempts from new calls to a manually wrapped runner. The query-owner suite covers both tracking and configuration orders.
 
 The hydration review confirms that successful native query state can retain an earlier failure reason. The SSR and hydration examples filter both error fields before transfer. The existing hydration reference owns this guidance, and a router regression covers a recovered successful entry.
+
+### Directory deletion and restoration (#249)
+
+Base `f49dc0e`. The cache-workflows reference covers read-only restored views and application-owned record revisions. The domain map records numeric ID reuse. The skill tree maps the directory UI and its transport call sites. The example persists revision-bearing DTOs under schema version 2. Server tests exercise the same conditional deletion through RPC and HTTP. Vite integration and browser tests cover late selection settlement, featured-user fallback, and per-adapter refresh. Fresh consumer-agent discovery is unverified.

@@ -119,12 +119,14 @@ describe("Start request-local execution", () => {
       if (remove === undefined) {
         throw new Error("Mutation function is missing");
       }
-      await expect(remove({ id: 1 })).rejects.toMatchObject({
+      const { id, revision } = await allowed.queryClient.query(
+        allowed.rpcQuery.users.get.queryOptions({ input: { id: 1 } })
+      );
+      const target = { id, revision };
+      await expect(remove(target)).rejects.toMatchObject({
         name: "EffectRpcQueryError",
       });
-      await allowed.rpcQuery.users.delete
-        .mutationOptions()
-        .mutationFn({ id: 1 });
+      await allowed.rpcQuery.users.delete.mutationOptions().mutationFn(target);
       expect(globalThis.fetch).not.toHaveBeenCalled();
       await allowed.dispose();
       await expect(

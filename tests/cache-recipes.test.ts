@@ -47,7 +47,12 @@ describe("cache recipes", () => {
     const reactivity = Effect.runSync(Reactivity.make);
     const { application } = fixture;
     const { rpcQuery, httpQuery, queryClient } = application;
-    const ada = new User({ id: 1, name: "Ada", locale: "en" });
+    const ada = new User({
+      id: 1,
+      revision: "user-1",
+      name: "Ada",
+      locale: "en",
+    });
     const key = rpcQuery.users.get.queryKey({
       input: { id: 1, locale: "en" },
     });
@@ -96,7 +101,7 @@ describe("cache recipes", () => {
       const creation = await fixture.nextCreate();
       finish = async () => {
         await creation.succeed(
-          new User({ id: 2, name: "Grace", locale: "en" })
+          new User({ id: 2, revision: "user-2", name: "Grace", locale: "en" })
         );
         await mutation;
       };

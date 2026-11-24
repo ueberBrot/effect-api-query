@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { CommandStatus, User } from "@effect-api-query/contracts";
+import { CommandStatus, SeedUser, User } from "@effect-api-query/contracts";
 import { startExampleRpcServer } from "@effect-api-query/server";
 import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import {
@@ -15,8 +15,11 @@ import { Deferred, Effect, Exit, Scope } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vite-plus/test";
 
 import { makeControlledUserWrites } from "../../../tests/fixtures/optimistic-users.ts";
+import { startExampleServerFixture } from "../../server/tests/fixtures/example-server.ts";
 import { ViteReactExample } from "../src/app.tsx";
 import { CommandsSection } from "../src/components/sections/commands-section.tsx";
+import { HttpSection } from "../src/components/sections/http-section.tsx";
+import { QueriesSection } from "../src/components/sections/queries-section.tsx";
 import { CreateUserForm } from "../src/components/users/create-user-form.tsx";
 import { UserList } from "../src/components/users/user-list.tsx";
 import { startViteReactApplication } from "../src/lib/application.ts";
@@ -33,7 +36,11 @@ const OptimisticUsers = ({
   return (
     <>
       <CreateUserForm application={application} />
-      <UserList application={application} users={users.data} />
+      <UserList
+        application={application}
+        isSynced={users.dataUpdatedAt !== 0}
+        users={users.data}
+      />
     </>
   );
 };
@@ -139,7 +146,12 @@ describe("plain Vite React integration", () => {
     cleanup();
     const fixture = await Effect.runPromise(makeControlledUserWrites());
     const owned = fixture.application;
-    const ada = new User({ id: 1, name: "Ada", locale: "en" });
+    const ada = new User({
+      id: 1,
+      revision: "user-1",
+      name: "Ada",
+      locale: "en",
+    });
     fixture.seed([ada]);
     owned.queryClient.setQueryData(owned.rpcQuery.users.list.queryKey(), [ada]);
     render(
@@ -165,7 +177,9 @@ describe("plain Vite React integration", () => {
           .getByRole("button", { name: "Delete Grace" })
           .hasAttribute("disabled"),
       }).toStrictEqual({ name: "Grace", disabled: true });
-      await creation.succeed(new User({ id: 2, name: "Grace", locale: "en" }));
+      await creation.succeed(
+        new User({ id: 2, revision: "user-2", name: "Grace", locale: "en" })
+      );
       await expect(screen.findByText("Added Grace")).resolves.toBeDefined();
       await deletion.fail();
       const restoredAda = await screen.findByText("Ada", { exact: true });
@@ -177,6 +191,115 @@ describe("plain Vite React integration", () => {
     } finally {
       cleanup();
       await owned.dispose();
+    }
+  });
+});
+
+describe("featured user", () => {
+  it("isolates a missing featured record and renders an empty directory", async () => {
+    const { application } = await Effect.runPromise(
+      makeControlledUserWrites({
+        defaultOptions: { queries: { staleTime: Infinity, retry: false } },
+      })
+    );
+    const list = application.rpcQuery.users.list.queryKey();
+    application.queryClient.setQueryData(list, [
+      new User({ id: 1, revision: "missing", name: "Missing", locale: "en" }),
+    ]);
+    render(
+      <QueryClientProvider client={application.queryClient}>
+        <QueriesSection application={application} />
+      </QueryClientProvider>
+    );
+    try {
+      await expect(
+        screen.findByText("Featured user unavailable.")
+      ).resolves.toBeDefined();
+      expect(
+        screen.getByRole("heading", { name: "Infinite query" })
+      ).toBeDefined();
+      application.queryClient.setQueryData(list, []);
+      await expect(
+        screen.findByText("No featured user.")
+      ).resolves.toBeDefined();
+      expect(
+        screen.getByRole("button", { name: "Invalidate user queries" })
+      ).toBeDefined();
+    } finally {
+      cleanup();
+      await application.dispose();
+    }
+  });
+});
+
+describe("HTTP user selection", () => {
+  it("keeps the selected replacement when a previous revision's delete settles", async () => {
+    const scope = Scope.makeUnsafe();
+    const deleted = Deferred.makeUnsafe<boolean>();
+    const release = Deferred.makeUnsafe<boolean>();
+    let application: ViteReactApplication | undefined;
+    try {
+      const { server, seed, writeToken } = await Effect.runPromise(
+        startExampleServerFixture().pipe(Scope.provide(scope))
+      );
+      const owned = await startViteReactApplication({
+        rpcUrl: server.rpcUrl,
+        fetch: async (input, init) => {
+          if (init?.method !== "DELETE") {
+            return await fetch(input, init);
+          }
+          const headers = new Headers(init.headers);
+          headers.set("authorization", `Bearer ${writeToken}`);
+          const response = await fetch(input, { ...init, headers });
+          Deferred.doneUnsafe(deleted, Effect.succeed(response.ok));
+          await Effect.runPromise(Deferred.await(release));
+          return response;
+        },
+      });
+      application = owned;
+      const [previous] = await Effect.runPromise(
+        seed({ users: [new SeedUser({ name: "Ada" })] })
+      );
+      if (previous === undefined) {
+        throw new Error("Expected a seeded user");
+      }
+      render(
+        <QueryClientProvider client={owned.queryClient}>
+          <HttpSection application={owned} />
+        </QueryClientProvider>
+      );
+      await screen.findByRole("option", { name: "HTTP user 1: Ada" });
+      const selection = screen.getByLabelText("HTTP user details");
+      fireEvent.change(selection, { target: { value: previous.revision } });
+      await screen.findByText("HTTP selected: Ada, locale fr");
+
+      fireEvent.click(screen.getByRole("button", { name: "Delete HTTP Ada" }));
+      await expect(
+        Effect.runPromise(
+          Deferred.await(deleted).pipe(Effect.timeout("3 seconds"))
+        )
+      ).resolves.toBe(true);
+      const [replacement] = await Effect.runPromise(
+        seed({ users: [new SeedUser({ name: "Grace" })] })
+      );
+      if (replacement === undefined) {
+        throw new Error("Expected a replacement user");
+      }
+      fireEvent.click(
+        screen.getByRole("button", { name: "Invalidate HTTP user queries" })
+      );
+      await screen.findByRole("option", { name: "HTTP user 1: Grace" });
+      fireEvent.change(selection, { target: { value: replacement.revision } });
+      await screen.findByText("HTTP selected: Grace, locale fr");
+
+      Deferred.doneUnsafe(release, Effect.succeed(true));
+      await screen.findByText("HTTP delete result: undefined");
+      expect(screen.getByText("HTTP selected: Grace, locale fr")).toBeDefined();
+    } finally {
+      Deferred.doneUnsafe(release, Effect.succeed(true));
+      cleanup();
+      await application?.dispose();
+      await Effect.runPromise(Scope.close(scope, Exit.void));
     }
   });
 });

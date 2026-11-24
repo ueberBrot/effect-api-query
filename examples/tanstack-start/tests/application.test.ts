@@ -132,19 +132,24 @@ describe("TanStack Start HTTP request ownership", () => {
       const first = authorized.httpQuery.users.list.queryOptions();
       const second = anonymous.httpQuery.users.list.queryOptions();
       expect(first.queryKey).not.toStrictEqual(second.queryKey);
-      await authorized.queryClient.query(first);
+      const [user] = await authorized.queryClient.query(first);
+      if (user === undefined) {
+        throw new Error("Expected a seeded user");
+      }
+      const target = {
+        params: { id: user.id },
+        query: { revision: user.revision },
+      };
       expect({
         authorizedKey: anonymous.queryClient.getQueryData(first.queryKey),
         anonymousKey: anonymous.queryClient.getQueryData(second.queryKey),
       }).toStrictEqual({ authorizedKey: undefined, anonymousKey: undefined });
       await expect(
-        anonymous.httpQuery.users.delete
-          .mutationOptions()
-          .mutationFn({ params: { id: 1 } })
+        anonymous.httpQuery.users.delete.mutationOptions().mutationFn(target)
       ).rejects.toMatchObject({ name: "EffectHttpApiQueryError" });
       await authorized.httpQuery.users.delete
         .mutationOptions()
-        .mutationFn({ params: { id: 1 } });
+        .mutationFn(target);
       const anonymousUsers = await anonymous.queryClient.query(second);
       expect({
         anonymousCount: anonymousUsers.length,
@@ -335,7 +340,12 @@ describe("TanStack Start execution settlement", () => {
         const disposal = application.dispose();
         await Effect.runPromise(Effect.sleep("20 millis"));
         expect(events).toStrictEqual([]);
-        const user = new User({ id: 1, name: "Ada", locale: "en" });
+        const user = new User({
+          id: 1,
+          revision: "user-1",
+          name: "Ada",
+          locale: "en",
+        });
         await Effect.runPromise(Deferred.succeed(release, user));
         await expect(pending).resolves.toStrictEqual(user);
         await disposal;
@@ -356,7 +366,7 @@ describe("TanStack Start execution settlement", () => {
         await Effect.runPromise(
           Deferred.succeed(
             release,
-            new User({ id: 1, name: "Ada", locale: "en" })
+            new User({ id: 1, revision: "user-1", name: "Ada", locale: "en" })
           )
         );
         await application.dispose();

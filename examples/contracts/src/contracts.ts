@@ -2,10 +2,15 @@
 import { Effect, Schema } from "effect";
 import { Rpc, RpcGroup, RpcMiddleware } from "effect/rpc";
 
+export const UserIdentity = {
+  id: Schema.Int,
+  revision: Schema.NonEmptyString,
+} as const;
+
 export class User extends Schema.Class<User, { readonly brand: unique symbol }>(
   "User"
 )({
-  id: Schema.Int,
+  ...UserIdentity,
   locale: Schema.String,
   name: Schema.String,
 }) {}
@@ -138,7 +143,7 @@ const UsersCreate = Rpc.make("users.create", {
 });
 
 const UsersDelete = Rpc.make("users.delete", {
-  payload: { id: Schema.Int },
+  payload: UserIdentity,
   success: Schema.Void,
   error: Schema.Literal("user-not-found"),
 }).middleware(ExampleAuthorization);

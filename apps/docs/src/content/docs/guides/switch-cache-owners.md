@@ -66,13 +66,13 @@ A hanging request or finalizer delays the handoff. Define an explicit shutdown p
 
 ## Restore a directory snapshot
 
-Pass approved Storage through `directoryStorage`. The browser example uses sessionStorage. `persistDirectory()` stores only RPC and HTTP `users.list` arrays of `{ id: number, name: string, locale: string }`. A pending write removes the snapshot so it cannot restore optimistic state after reload.
+Pass approved Storage through `directoryStorage`. The browser example uses sessionStorage. `persistDirectory()` stores only RPC and HTTP `users.list` arrays of `{ id: number, revision: string, name: string, locale: string }`. A pending write removes the snapshot so it cannot restore optimistic state after reload.
 
-The storage name includes the safe owner tuple. The snapshot repeats it with `schemaVersion: 1` and `keyVersion: 1`. The app validates identity, versions, and all entries before deriving current cache keys. It removes incompatible data before writing to the cache and reads only the current owner's storage slot.
+The storage name includes the safe owner tuple. The snapshot repeats it with `schemaVersion: 2` and `keyVersion: 1`. The app validates identity, versions, and all entries before deriving current cache keys. It removes incompatible data before writing to the cache and reads only the current owner's storage slot.
 
 Bump the schema version if DTO meaning changes. Bump the key version if the persisted view's key changes.
 
-Restored values use `dataUpdatedAt: 0` so ordinary queries refetch them. Use a paired [hydration codec](/effect-api-query/guides/hydrate-unary-data/) if you need class methods.
+Restored values use `dataUpdatedAt: 0` so ordinary queries refetch them. Each directory allows deletions after its own first successful refresh. Optimistic cache edits preserve the timestamp. Both transports send the displayed record's ID and revision, and the shared store matches them in the same update that removes the record. This also protects against a record being replaced after a successful refresh. Use a paired [hydration codec](/effect-api-query/guides/hydrate-unary-data/) if you need class methods.
 
 By default, disposal and owner switches erase persistence. The `pagehide` callback uses `dispose({ discardPersistence: false })` to save a settled directory before retiring the owner. Persistence calls from a retired owner do nothing. Disposal reports storage errors after cleanup. The pagehide and HMR callbacks report cleanup rejections to the console.
 

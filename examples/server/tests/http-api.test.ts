@@ -5,7 +5,7 @@ import {
   DiagnosticStatus,
   exampleHttpApi,
   User,
-  UserPage,
+  SeedUser,
 } from "@effect-api-query/contracts";
 import { makeExampleRpcClient } from "@effect-api-query/contracts/client";
 import { startExampleRpcServer } from "@effect-api-query/server";
@@ -39,24 +39,24 @@ describe("example HTTP API", () => {
           const json: unknown = await created.json();
           return json;
         });
-        expect(
-          yield* Schema.decodeUnknownEffect(User)(createdJson)
-        ).toStrictEqual(
-          new User({
-            id: 13,
-            locale: "en",
-            name: "Grace Hopper",
-          })
-        );
+        const user = yield* Schema.decodeUnknownEffect(User)(createdJson);
+        expect(user).toMatchObject({
+          id: 13,
+          locale: "en",
+          name: "Grace Hopper",
+        });
         expect(yield* rpc["users.get"]({ id: 13 })).toMatchObject({
           name: "Grace Hopper",
         });
         const removed = yield* Effect.promise(
           async () =>
-            await fetch(`${server.url}/api/users/13`, {
-              method: "DELETE",
-              headers: { authorization: `Bearer ${writeToken}` },
-            })
+            await fetch(
+              `${server.url}/api/users/13?revision=${user.revision}`,
+              {
+                method: "DELETE",
+                headers: { authorization: `Bearer ${writeToken}` },
+              }
+            )
         );
         expect({
           status: removed.status,
@@ -68,6 +68,50 @@ describe("example HTTP API", () => {
       })
   );
 
+  it.effect("rejects a previous record revision through both transports", () =>
+    Effect.gen(function* rejectStaleDirectoryDeletion() {
+      const { server, seed, writeToken } = yield* startExampleServerFixture();
+      const rpc = yield* makeExampleRpcClient(server.rpcUrl);
+      const http = yield* HttpApiClient.make(exampleHttpApi, {
+        baseUrl: server.url,
+      }).pipe(Effect.provide(FetchHttpClient.layer));
+      const headers = { authorization: `Bearer ${writeToken}` };
+      const users = [new SeedUser({ name: "Grace Hopper" })];
+      yield* seed({ users });
+      const { id, revision } = yield* rpc["users.get"]({ id: 1 });
+      yield* seed({ users });
+      const replacement = yield* http.users.get({ params: { id }, query: {} });
+      expect(replacement.revision).not.toBe(revision);
+
+      const staleHttp = { params: { id }, query: { revision } };
+      const staleRpc = { id, revision };
+      expect(
+        yield* Effect.flip(rpc["users.delete"](staleRpc)).pipe(
+          Effect.provideService(FetchHttpClient.RequestInit, { headers })
+        )
+      ).toBe("user-not-found");
+      expect(
+        yield* Effect.flip(http.users.delete(staleHttp)).pipe(
+          Effect.provideService(FetchHttpClient.RequestInit, { headers })
+        )
+      ).toBe("user-not-found");
+      expect({
+        http: yield* http.users.list(),
+        rpc: yield* rpc["users.get"]({ id }),
+      }).toStrictEqual({ http: [replacement], rpc: replacement });
+
+      yield* http.users
+        .delete({
+          params: { id },
+          query: { revision: replacement.revision },
+        })
+        .pipe(Effect.provideService(FetchHttpClient.RequestInit, { headers }));
+      expect(yield* Effect.flip(rpc["users.get"]({ id }))).toBe(
+        "user-not-found"
+      );
+    })
+  );
+
   it.effect("decodes params, query, and buffered pages", () =>
     Effect.gen(function* decodeHttpInputs() {
       const server = yield* startExampleRpcServer();
@@ -77,25 +121,17 @@ describe("example HTTP API", () => {
       expect(yield* client.users.list()).toHaveLength(12);
       expect(
         yield* client.users.get({ params: { id: 1 }, query: { locale: "de" } })
-      ).toStrictEqual(
-        new User({
-          id: 1,
-          locale: "de",
-          name: "Ada Lovelace",
-        })
-      );
+      ).toMatchObject({ id: 1, locale: "de", name: "Ada Lovelace" });
       expect(
         yield* client.users.page({ query: { cursor: 10, pageSize: 5 } })
-      ).toStrictEqual(
-        new UserPage({
-          nextCursor: null,
-          total: 12,
-          users: [
-            new User({ id: 11, locale: "en", name: "Annie Easley" }),
-            new User({ id: 12, locale: "en", name: "James Gosling" }),
-          ],
-        })
-      );
+      ).toMatchObject({
+        nextCursor: null,
+        total: 12,
+        users: [
+          { id: 11, locale: "en", name: "Annie Easley" },
+          { id: 12, locale: "en", name: "James Gosling" },
+        ],
+      });
     })
   );
 
@@ -108,8 +144,14 @@ describe("example HTTP API", () => {
       expect(
         yield* Effect.flip(client.users.get({ params: { id: 99 }, query: {} }))
       ).toBe("user-not-found");
+      const { revision } = yield* client.users.get({
+        params: { id: 1 },
+        query: {},
+      });
       expect(
-        yield* Effect.flip(client.users.delete({ params: { id: 1 } }))
+        yield* Effect.flip(
+          client.users.delete({ params: { id: 1 }, query: { revision } })
+        )
       ).toMatchObject({
         _tag: "ExampleAuthorizationError",
         reason: "missing-example-authorization",

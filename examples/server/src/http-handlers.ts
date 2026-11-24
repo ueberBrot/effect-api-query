@@ -18,7 +18,7 @@ const usersRoutes = HttpApiBuilder.group(
       list: () => users.list(),
       get: ({ params, query }) => users.get({ ...params, ...query }),
       create: ({ payload }) => users.create(new SeedUser(payload)),
-      delete: ({ params }) => users.delete(params),
+      delete: ({ params, query }) => users.delete({ ...params, ...query }),
       page: ({ query }) => users.page(query),
     });
   })

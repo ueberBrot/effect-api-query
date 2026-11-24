@@ -1,5 +1,6 @@
 import { expect } from "@playwright/test";
 import type { Request } from "@playwright/test";
+import { Deferred, Effect } from "effect";
 
 import {
   enableDemoWrites,
@@ -8,6 +9,14 @@ import {
   prepareExampleApplication,
   recordsRpc,
 } from "./example-application.ts";
+
+const makeGate = () => {
+  const gate = Deferred.makeUnsafe<boolean>();
+  return {
+    promise: Effect.runPromise(Deferred.await(gate)),
+    resolve: () => Deferred.doneUnsafe(gate, Effect.succeed(true)),
+  };
+};
 
 test.describe("Vite React HTTP API example", () => {
   test.beforeEach(async ({ exampleUrl, page }) => {
@@ -50,7 +59,7 @@ test.describe("Vite React HTTP API example", () => {
     const lookup = page.waitForRequest((request) =>
       isHttpRequest(request, "GET", "/users/2")
     );
-    await selection.selectOption("2");
+    await selection.selectOption({ label: "HTTP user 2: Edsger Dijkstra" });
     const lookupRequest = await lookup;
     expect(new URL(lookupRequest.url()).searchParams.get("locale")).toBe("fr");
     await expect(
@@ -62,7 +71,7 @@ test.describe("Vite React HTTP API example", () => {
     await expect(
       http.getByText("HTTP selected: Edsger Dijkstra, locale fr")
     ).toHaveCount(0);
-    await selection.selectOption("2");
+    await selection.selectOption({ label: "HTTP user 2: Edsger Dijkstra" });
     await expect(
       http.getByText("HTTP selected: Edsger Dijkstra, locale fr")
     ).toBeVisible();
@@ -138,6 +147,108 @@ test.describe("Vite React HTTP API example", () => {
     await expect(
       http.getByText("HTTP and RPC user queries invalidated and refetched")
     ).toBeVisible();
+  });
+
+  test("keeps a newer HTTP selection when the previous user's deletion settles", async ({
+    page,
+    writeToken,
+  }) => {
+    await enableDemoWrites(page, writeToken);
+    const http = page.getByRole("region", { name: "HTTP API example" });
+    const selection = http.getByLabel("HTTP user details");
+    await selection.selectOption({ label: "HTTP user 1: Ada Lovelace" });
+    await expect(
+      http.getByText("HTTP selected: Ada Lovelace, locale fr")
+    ).toBeVisible();
+
+    const release = makeGate();
+    await page.route("**/api/users/1?*", async (route) => {
+      if (route.request().method() === "DELETE") {
+        await release.promise;
+      }
+      await route.continue();
+    });
+    const started = page.waitForRequest((request) =>
+      isHttpRequest(request, "DELETE", "/users/1")
+    );
+    try {
+      await http
+        .getByRole("button", { name: "Delete HTTP Ada Lovelace" })
+        .click();
+      await started;
+      await selection.selectOption({ label: "HTTP user 2: Edsger Dijkstra" });
+      await expect(
+        http.getByText("HTTP selected: Edsger Dijkstra, locale fr")
+      ).toBeVisible();
+    } finally {
+      release.resolve();
+    }
+    await expect(http.getByText("HTTP delete result: undefined")).toBeVisible();
+    await expect(selection.locator("option:checked")).toHaveText(
+      "HTTP user 2: Edsger Dijkstra"
+    );
+    await expect(
+      http.getByText("HTTP selected: Edsger Dijkstra, locale fr")
+    ).toBeVisible();
+  });
+
+  test("uses a live featured user after deleting the previous one and reloading", async ({
+    page,
+    writeToken,
+  }) => {
+    await enableDemoWrites(page, writeToken);
+    await expect(page.getByText("Featured: Ada Lovelace")).toBeVisible();
+    await page
+      .getByRole("button", { name: "Delete HTTP Ada Lovelace" })
+      .click();
+    await expect(page.getByText("HTTP delete result: undefined")).toBeVisible();
+    await page.reload();
+    await expect(page.getByText("Featured: Edsger Dijkstra")).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Infinite query" })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Delete HTTP Edsger Dijkstra" })
+    ).toBeEnabled();
+  });
+
+  test("keeps each restored directory read-only until its own refresh succeeds", async ({
+    page,
+  }) => {
+    const rpcDelete = page.getByRole("button", {
+      name: "Delete Ada Lovelace",
+      exact: true,
+    });
+    const httpDelete = page.getByRole("button", {
+      name: "Delete HTTP Ada Lovelace",
+      exact: true,
+    });
+    await expect(rpcDelete).toBeEnabled();
+    await expect(httpDelete).toBeEnabled();
+    const rpcRefresh = makeGate();
+    const httpRefresh = makeGate();
+    await page.route("**/rpc", async (route) => {
+      if (recordsRpc(route.request().postData(), "users.list")) {
+        await rpcRefresh.promise;
+      }
+      await route.continue();
+    });
+    await page.route("**/api/users", async (route) => {
+      await httpRefresh.promise;
+      await route.continue();
+    });
+    try {
+      await page.reload();
+      await expect(rpcDelete).toBeDisabled();
+      await expect(httpDelete).toBeDisabled();
+      rpcRefresh.resolve();
+      await expect(rpcDelete).toBeEnabled();
+      await expect(httpDelete).toBeDisabled();
+    } finally {
+      rpcRefresh.resolve();
+      httpRefresh.resolve();
+    }
+    await expect(httpDelete).toBeEnabled();
   });
 
   test("accumulates HTTP pages with distinct cursors", async ({ page }) => {

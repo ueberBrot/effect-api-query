@@ -105,14 +105,15 @@ export const makeControlledUserWrites = Effect.fnUntraced(
     });
     const remove = Effect.fnUntraced(function* remove({
       id,
-    }: {
-      readonly id: number;
-    }) {
+      revision,
+    }: Pick<User, "id" | "revision">) {
       const gate = yield* Deferred.make<boolean, "user-not-found">();
       yield* Queue.offer(deletes, {
         id,
         succeed: async () => {
-          users = users.filter((user) => user.id !== id);
+          users = users.filter(
+            (user) => user.id !== id || user.revision !== revision
+          );
           await run(Deferred.succeed(gate, true));
         },
         fail: async () => {
@@ -160,7 +161,12 @@ export const makeControlledUserWrites = Effect.fnUntraced(
       return user === undefined
         ? Effect.fail("user-not-found" as const)
         : Effect.succeed(
-            new User({ id: user.id, name: user.name, locale: locale ?? "en" })
+            new User({
+              id: user.id,
+              name: user.name,
+              revision: user.revision,
+              locale: locale ?? "en",
+            })
           );
     };
     const rpcClient: ExampleRpcClient = yield* RpcTest.makeClient(
@@ -219,7 +225,9 @@ export const makeControlledUserWrites = Effect.fnUntraced(
       (group) =>
         group
           .handle("create", ({ payload }) => create(payload))
-          .handle("delete", ({ params }) => remove(params))
+          .handle("delete", ({ params, query }) =>
+            remove({ ...params, ...query })
+          )
           .handle("get", ({ params, query }) => get({ ...params, ...query }))
           .handle("list", list)
           .handle("page", ({ query }) => page(query))

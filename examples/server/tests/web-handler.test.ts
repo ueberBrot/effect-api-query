@@ -1,11 +1,12 @@
 import { randomUUID } from "node:crypto";
 
+import { User } from "@effect-api-query/contracts";
 import {
   makeExampleRpcWebHandler,
   makeExampleWebHandler,
 } from "@effect-api-query/server/web-handler";
 import { describe, expect, it } from "@effect/vitest";
-import { Effect } from "effect";
+import { Effect, Schema } from "effect";
 import { TestClock } from "effect/testing";
 
 const streamingRequest = (
@@ -177,26 +178,41 @@ describe("verified demo write sessions", () => {
       if (cookie === null) {
         throw new Error("The host did not issue a session");
       }
-      const remove = (id: number, requestOrigin: string) =>
+      const { json } = yield* Effect.promise(async () => {
+        const response = await handle(new Request(`${origin}/api/users`));
+        const payload: unknown = await response.json();
+        return { json: payload };
+      });
+      const directory = yield* Schema.decodeUnknownEffect(
+        Schema.NonEmptyArray(User)
+      )(json);
+      const [first, second] = directory;
+      if (second === undefined) {
+        throw new Error("Expected a second user");
+      }
+      const remove = ({ id, revision }: User, requestOrigin: string) =>
         Effect.promise(
           async () =>
             await handle(
-              new Request(`${origin}/api/users/${String(id)}`, {
-                method: "DELETE",
-                headers: {
-                  origin: requestOrigin,
-                  cookie: cookie.split(";")[0] ?? "",
-                },
-              })
+              new Request(
+                `${origin}/api/users/${String(id)}?revision=${revision}`,
+                {
+                  method: "DELETE",
+                  headers: {
+                    origin: requestOrigin,
+                    cookie: cookie.split(";")[0] ?? "",
+                  },
+                }
+              )
             )
         );
-      const crossOrigin = yield* remove(1, "https://other.example.test");
+      const crossOrigin = yield* remove(first, "https://other.example.test");
       expect(crossOrigin.status).toBe(401);
-      const authorized = yield* remove(1, origin);
+      const authorized = yield* remove(first, origin);
       expect(authorized.status).toBe(204);
 
       yield* TestClock.adjust("1 hour");
-      const expired = yield* remove(2, origin);
+      const expired = yield* remove(second, origin);
       expect(expired.status).toBe(401);
     })
   );
