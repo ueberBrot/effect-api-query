@@ -26,7 +26,7 @@ describe("TanStack Start client navigation", () => {
     }
   });
 
-  it("renders the loader failure and the default 404", async () => {
+  const renderRoute = async (path: string) => {
     if (serverScope === undefined) {
       throw new Error("Server scope was not initialized");
     }
@@ -34,7 +34,7 @@ describe("TanStack Start client navigation", () => {
       startExampleRpcServer().pipe(Scope.provide(serverScope))
     );
     const router = await createTanStackStartRouter({
-      history: createMemoryHistory({ initialEntries: ["/failure"] }),
+      history: createMemoryHistory({ initialEntries: [path] }),
       rpcUrl: server.rpcUrl,
       scrollRestoration: false,
     });
@@ -42,7 +42,11 @@ describe("TanStack Start client navigation", () => {
 
     await router.load();
     render(<RouterProvider router={router} />);
+    return router;
+  };
 
+  it("renders the loader failure and the default 404", async () => {
+    const router = await renderRoute("/failure");
     const failure = await screen.findByRole("alert");
     expect(failure.textContent).toContain("DiagnosticFailure");
 
@@ -56,20 +60,7 @@ describe("TanStack Start client navigation", () => {
   });
 
   it("reloads the home loader while both stream views remain mounted", async () => {
-    if (serverScope === undefined) {
-      throw new Error("Server scope was not initialized");
-    }
-    const server = await Effect.runPromise(
-      startExampleRpcServer().pipe(Scope.provide(serverScope))
-    );
-    const router = await createTanStackStartRouter({
-      history: createMemoryHistory({ initialEntries: ["/"] }),
-      rpcUrl: server.rpcUrl,
-      scrollRestoration: false,
-    });
-    browserApplication = router.options.context;
-    await router.load();
-    render(<RouterProvider router={router} />);
+    const router = await renderRoute("/");
     await screen.findByText(/^Current state:/u, {}, { timeout: 5000 });
 
     await act(async () => {
@@ -77,6 +68,9 @@ describe("TanStack Start client navigation", () => {
     });
 
     expect(screen.queryByRole("heading", { name: "Route failed" })).toBeNull();
+    expect(
+      screen.getByRole("region", { name: "Accumulated stream history" })
+    ).toBeDefined();
     expect(screen.getByText(/^Current state:/u)).toBeDefined();
   });
 });

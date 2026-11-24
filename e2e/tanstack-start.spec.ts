@@ -1,17 +1,18 @@
 import { createServer, request as nodeRequest } from "node:http";
 
 import { expect } from "@playwright/test";
-import type { Page } from "@playwright/test";
+import type { Page, Request } from "@playwright/test";
 import { Schema } from "effect";
 
 import {
   enableDemoWrites,
+  isHttpRequest,
   prepareExampleApplication,
   startExampleTest as test,
   recordsRpc,
 } from "./example-application.ts";
 
-const restoreFromBackForwardCache = async (page: Page) => {
+const simulateBackForwardCacheRestore = async (page: Page) => {
   await page.evaluate(() => {
     window.dispatchEvent(
       new PageTransitionEvent("pagehide", { persisted: true })
@@ -22,24 +23,10 @@ const restoreFromBackForwardCache = async (page: Page) => {
   });
 };
 
-test("restored Start app can fetch and still disposes on permanent departure", async ({
-  exampleUrl,
-  page,
-}) => {
-  await prepareExampleApplication(page, exampleUrl);
-  await page.getByRole("button", { name: "Read cached directory" }).click();
-  await expect(page.getByText("Cached directory: 12 users")).toBeVisible();
-  await restoreFromBackForwardCache(page);
-  await page.getByRole("button", { name: "Load next 4 users" }).click();
-  await expect(page.getByText("8 of 12 loaded")).toBeVisible();
-
-  await page.getByRole("link", { name: "Diagnostics", exact: true }).click();
-  const started = page.waitForRequest((request) =>
-    recordsRpc(request.postData(), "diagnostics.slow")
-  );
-  await page.getByRole("button", { name: "Start slow query" }).click();
-  const request = await started;
-  await expect(page.getByText("Ready to cancel")).toBeVisible();
+const expectRequestAbortedOnDeparture = async (
+  page: Page,
+  request: Request
+) => {
   const aborted = page.waitForEvent(
     "requestfailed",
     (failed) => failed === request
@@ -50,6 +37,27 @@ test("restored Start app can fetch and still disposes on permanent departure", a
     );
   });
   await aborted;
+};
+
+test("restored Start app can fetch and still disposes on permanent departure", async ({
+  exampleUrl,
+  page,
+}) => {
+  await prepareExampleApplication(page, exampleUrl);
+  await page.getByRole("button", { name: "Read cached directory" }).click();
+  await expect(page.getByText("Cached directory: 12 users")).toBeVisible();
+  await simulateBackForwardCacheRestore(page);
+  await page.getByRole("button", { name: "Load next 4 users" }).click();
+  await expect(page.getByText("8 of 12 loaded")).toBeVisible();
+
+  await page.getByRole("link", { name: "Diagnostics", exact: true }).click();
+  const started = page.waitForRequest((request) =>
+    recordsRpc(request.postData(), "diagnostics.slow")
+  );
+  await page.getByRole("button", { name: "Start slow query" }).click();
+  const request = await started;
+  await expect(page.getByText("Ready to cancel")).toBeVisible();
+  await expectRequestAbortedOnDeparture(page, request);
 });
 
 test("restored workflows can stream and still dispose on permanent departure", async ({
@@ -63,7 +71,7 @@ test("restored workflows can stream and still dispose on permanent departure", a
     page.getByText("Latest update: 8", { exact: true })
   ).toBeVisible();
   await expect(page.getByText("Streams idle", { exact: true })).toBeVisible();
-  await restoreFromBackForwardCache(page);
+  await simulateBackForwardCacheRestore(page);
 
   await page.getByLabel("HTTP stream format").selectOption("ndjson");
   await start.click();
@@ -73,20 +81,11 @@ test("restored workflows can stream and still dispose on permanent departure", a
   await expect(page.getByText("Streams idle", { exact: true })).toBeVisible();
 
   const started = page.waitForRequest((request) =>
-    new URL(request.url()).pathname.endsWith("/ndjson")
+    isHttpRequest(request, "GET", "/workflows/ndjson")
   );
   await start.click();
   const request = await started;
-  const aborted = page.waitForEvent(
-    "requestfailed",
-    (failed) => failed === request
-  );
-  await page.evaluate(() => {
-    window.dispatchEvent(
-      new PageTransitionEvent("pagehide", { persisted: false })
-    );
-  });
-  await aborted;
+  await expectRequestAbortedOnDeparture(page, request);
 });
 
 test("deleting the featured user updates cached navigation and a document reload", async ({
