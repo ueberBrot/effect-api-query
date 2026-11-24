@@ -6,7 +6,10 @@ import type {
 import { NodeRuntime } from "@effect/platform-node";
 import { Effect, Logger } from "effect";
 
-const serverOptions = { port: 3001 } satisfies StartExampleRpcServerOptions;
+const serverOptions = {
+  port: 3001,
+  writeToken: process.env["EXAMPLE_WRITE_TOKEN"],
+} satisfies StartExampleRpcServerOptions;
 const developmentLogger = Logger.layer([
   Logger.consolePretty(),
   Logger.tracerLogger,

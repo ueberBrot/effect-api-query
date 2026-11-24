@@ -7,6 +7,8 @@ import {
   HttpApiSchema,
 } from "effect/http-api";
 
+import { ExampleHttpAuthorization } from "./http-api.ts";
+
 export class Document extends Schema.Class<
   Document,
   { readonly brand: unique symbol }
@@ -82,7 +84,7 @@ export const workflowsApi = HttpApi.make("WorkflowsApi")
           RevisionConflict.pipe(HttpApiSchema.status(412)),
           TitleRejected.pipe(HttpApiSchema.status(422)),
         ],
-      })
+      }).middleware(ExampleHttpAuthorization)
     ),
     HttpApiGroup.make("feeds").add(
       HttpApiEndpoint.get("sse", "/workflows/sse", {
@@ -123,7 +125,7 @@ export const workflowsApi = HttpApi.make("WorkflowsApi")
       HttpApiEndpoint.post("change", "/workflows/readings", {
         payload: Schema.Struct({ room: Room }),
         success: HttpApiSchema.NoContent,
-      })
+      }).middleware(ExampleHttpAuthorization)
     )
   )
   .prefix("/api");

@@ -82,16 +82,16 @@ describe("plain Vite React integration", () => {
     expect(screen.getByText("User 13, locale fr")).toBeDefined();
   });
 
-  it("deletes the user selected from the rendered list", async () => {
+  it("restores the selected user when deletion is unauthorized", async () => {
     await expect(screen.findByText("Edsger Dijkstra")).resolves.toBeDefined();
 
     fireEvent.click(
       screen.getByRole("button", { name: "Delete Edsger Dijkstra" })
     );
 
-    await waitFor(() => {
-      expect(screen.queryByText("Edsger Dijkstra")).toBeNull();
-    });
+    const alert = await screen.findByRole("alert");
+    expect(alert.textContent).toContain("users.delete");
+    expect(screen.getByText("Edsger Dijkstra")).toBeDefined();
   });
 
   it("adds HTTP user details across both adapter views", async () => {

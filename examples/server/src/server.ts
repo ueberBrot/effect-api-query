@@ -27,7 +27,7 @@ class ExampleRpcServerError extends Schema.TaggedError<
 }) {}
 
 const corsHeaders = (httpApi: boolean) => ({
-  "access-control-allow-headers": `baggage,content-type,${httpApi ? "if-match," : ""}traceparent,tracestate,x-example-authorization`,
+  "access-control-allow-headers": `authorization,baggage,content-type,${httpApi ? "if-match," : ""}traceparent,tracestate`,
   "access-control-allow-methods": httpApi
     ? "GET,POST,DELETE,OPTIONS"
     : "POST,OPTIONS",
@@ -47,6 +47,7 @@ export interface StartExampleRpcServerOptions {
   readonly domainLayer?: Layer.Layer<ExampleDomain>;
   readonly host?: string;
   readonly port?: number;
+  readonly writeToken?: string | undefined;
 }
 
 export const startExampleRpcServer = Effect.fn(
@@ -54,7 +55,10 @@ export const startExampleRpcServer = Effect.fn(
 )((options: StartExampleRpcServerOptions = {}) =>
   Effect.gen(function* () {
     const host = options.host ?? "127.0.0.1";
-    const webHandler = yield* makeExampleWebHandler(options.domainLayer);
+    const webHandler = yield* makeExampleWebHandler(
+      options.domainLayer,
+      options.writeToken
+    );
     const nodeServer = createServer();
     const server = yield* NodeHttpServer.make(() => nodeServer, {
       disablePreemptiveShutdown: true,

@@ -163,6 +163,13 @@ skills:
         source: src/rpc/streamed-query.ts
         priority: HIGH
         status: active
+      - mistake: Trust client metadata as authority for a server write
+        mechanism: RPC envelope headers can coexist with transport headers, and server-local RPC skips the transport.
+        wrong_pattern: Authorize deletion from an RPC header or give SSR a default write credential.
+        correct_pattern: Verify the incoming request at the host and bind the caller to the request's network or server-local execution.
+        source: examples/server/src/web-handler.ts
+        priority: CRITICAL
+        status: active
       - mistake: Dispose resources after native cancellation alone
         mechanism: Query settlement can precede local finalization. Accepted writes and preparation can still need the runtime.
         wrong_pattern: await queryClient.cancelQueries(); await runtime.dispose()

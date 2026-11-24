@@ -1,3 +1,4 @@
+import { DemoWriteAccess } from "@effect-api-query/shared/demo-write-access.tsx";
 import {
   createRootRouteWithContext,
   HeadContent,
@@ -98,6 +99,7 @@ const Root = () => (
               </li>
             </ul>
           </nav>
+          <DemoWriteAccess />
         </div>
       </header>
       <Outlet />

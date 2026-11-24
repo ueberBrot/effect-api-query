@@ -2,8 +2,8 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite-plus";
 
 const apiProxy = {
-  "/api": "http://127.0.0.1:3001",
-  "/rpc": "http://127.0.0.1:3001",
+  "/api": { target: "http://127.0.0.1:3001", changeOrigin: false },
+  "/rpc": { target: "http://127.0.0.1:3001", changeOrigin: false },
 };
 
 export default defineConfig({

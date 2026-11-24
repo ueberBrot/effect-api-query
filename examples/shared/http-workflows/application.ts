@@ -5,15 +5,25 @@ import {
   configureUtils,
   createHttpApiQueryUtils,
 } from "@ueberbrot/effect-api-query";
-import { Effect, Exit, ManagedRuntime } from "effect";
+import { Effect, Exit, Layer, ManagedRuntime } from "effect";
 import { FetchHttpClient } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
 
-export const startHttpWorkflows = async (baseUrl: string) => {
+export const startHttpWorkflows = async (
+  baseUrl: string,
+  fetch?: typeof globalThis.fetch
+) => {
   const owner = await acquireQueryOwner(
     async (setup) => {
       const runtime = await setup.acquire(
-        () => ManagedRuntime.make(FetchHttpClient.layer),
+        () =>
+          ManagedRuntime.make(
+            fetch === undefined
+              ? FetchHttpClient.layer
+              : FetchHttpClient.layer.pipe(
+                  Layer.provide(Layer.succeed(FetchHttpClient.Fetch, fetch))
+                )
+          ),
         async (acquired) => acquired.dispose()
       );
       const client = await runtime.runPromise(

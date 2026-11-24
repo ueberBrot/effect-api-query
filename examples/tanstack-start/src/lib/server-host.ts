@@ -6,7 +6,9 @@ import { reportCleanupFailure } from "./application.ts";
 import { startServerApplication } from "./server-application.ts";
 
 const scope = Scope.makeUnsafe();
-const host = Effect.runPromise(makeExampleHost().pipe(Scope.provide(scope)));
+const host = Effect.runPromise(
+  makeExampleHost(process.env["EXAMPLE_WRITE_TOKEN"]).pipe(Scope.provide(scope))
+);
 let disposal: Promise<void> | undefined;
 
 if (import.meta.hot !== undefined) {
@@ -21,6 +23,5 @@ export const getExampleHost = async () => await host;
 export const startRequestApplication = async (request: Request) =>
   await startServerApplication({
     host: await host,
-    authorization: request.headers.get("x-example-authorization") ?? "allowed",
-    signal: request.signal,
+    request,
   });

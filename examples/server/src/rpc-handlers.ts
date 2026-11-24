@@ -1,10 +1,10 @@
 import {
   exampleRpcGroup,
   ExampleAuthorization,
-  ExampleAuthorizationError,
 } from "@effect-api-query/contracts";
 import { Effect, Layer, Schedule, Stream } from "effect";
 
+import { requireDemoWriter } from "./caller.ts";
 import { ExampleDomain } from "./domain.ts";
 
 const diagnosticStream = Stream.concat(
@@ -50,15 +50,7 @@ const handlersLayer = exampleRpcGroup.toLayer(
 
 const authorizationLayer = Layer.succeed(
   ExampleAuthorization,
-  ExampleAuthorization.of((effect, { headers }) =>
-    headers["x-example-authorization"] === "allowed"
-      ? effect
-      : Effect.fail(
-          new ExampleAuthorizationError({
-            reason: "missing-example-authorization",
-          })
-        )
-  )
+  ExampleAuthorization.of((effect) => Effect.andThen(requireDemoWriter, effect))
 );
 
 export const exampleRpcHandlersLayer = Layer.mergeAll(

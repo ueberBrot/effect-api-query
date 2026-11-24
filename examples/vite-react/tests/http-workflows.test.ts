@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 import { Reading } from "@effect-api-query/contracts";
 import { startExampleRpcServer } from "@effect-api-query/server";
 import { startHttpWorkflows } from "@effect-api-query/shared/http-workflows/application.ts";
@@ -15,10 +17,17 @@ const withApplication = async (
   const scope = await Effect.runPromise(Scope.make());
   let application: HttpWorkflows | undefined;
   try {
+    const writeToken = randomUUID();
     const server = await Effect.runPromise(
-      startExampleRpcServer().pipe(Scope.provide(scope))
+      startExampleRpcServer({ writeToken }).pipe(Scope.provide(scope))
     );
-    application = await startHttpWorkflows(server.url);
+    application = await startHttpWorkflows(server.url, async (input, init) => {
+      const request = new Request(input, init);
+      if (new URL(request.url).origin === server.url) {
+        request.headers.set("authorization", `Bearer ${writeToken}`);
+      }
+      return await fetch(request);
+    });
     await run(application, server.url);
   } finally {
     try {

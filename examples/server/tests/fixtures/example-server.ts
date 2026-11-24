@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 import { startExampleRpcServer } from "@effect-api-query/server";
 import { Context, Effect, Layer, Scope } from "effect";
 
@@ -11,11 +13,14 @@ export const startExampleServerFixture = Effect.fn("startExampleServerFixture")(
       context,
       ExampleDomain
     );
+    const writeToken = randomUUID();
     const server = yield* startExampleRpcServer({
+      writeToken,
       domainLayer: Layer.succeedContext(context),
     });
     return {
       server,
+      writeToken,
       seed: users.seed,
       reset: Effect.gen(function* resetFixture() {
         yield* commands.reset;

@@ -1,10 +1,6 @@
-import {
-  exampleRpcGroup,
-  ExampleAuthorization,
-  ExampleAuthorizationError,
-} from "@effect-api-query/contracts";
+import { exampleRpcGroup } from "@effect-api-query/contracts";
 import { NodeFileSystem } from "@effect/platform-node";
-import { Context, Effect, Layer, Path, Scope } from "effect";
+import { Clock, Context, Effect, Layer, Path, Scope } from "effect";
 import type { HttpServerRequest } from "effect/http";
 import {
   HttpEffect,
@@ -14,8 +10,13 @@ import {
 } from "effect/http";
 import { RpcSerialization, RpcServer } from "effect/rpc";
 
+import type { DemoWriter } from "./caller.ts";
+import { makeCallerVerifier, VerifiedCaller } from "./caller.ts";
 import { ExampleDomain } from "./domain.ts";
-import { exampleHttpRoutes } from "./http-handlers.ts";
+import {
+  exampleHttpAuthorization,
+  exampleHttpRoutes,
+} from "./http-handlers.ts";
 import { exampleRpcHandlersLayer } from "./rpc-handlers.ts";
 import { makeServerLocalRpcClient } from "./server-local-rpc.ts";
 import { workflowRoutes } from "./workflow-handlers.ts";
@@ -83,8 +84,16 @@ const readRequestBody = async (
 };
 
 const withRequestBodyLimit =
-  (handler: (request: Request) => Promise<Response>) =>
-  async (request: Request): Promise<Response> => {
+  (
+    handler: (
+      request: Request,
+      context: Context.Context<never>
+    ) => Response | Promise<Response>
+  ) =>
+  async (
+    request: Request,
+    context: Context.Context<never>
+  ): Promise<Response> => {
     const body = await readRequestBody(request);
     if (body instanceof Response) {
       return body;
@@ -95,7 +104,8 @@ const withRequestBodyLimit =
         headers: request.headers,
         method: request.method,
         signal: request.signal,
-      })
+      }),
+      context
     );
   };
 
@@ -128,15 +138,23 @@ const provideDomain = Effect.fn("ExampleDomain.provide")(function* <A, E, R>(
 
 export const makeExampleRpcWebHandler = Effect.fn(
   "ExampleRpc.makeExampleRpcWebHandler"
-)(() => provideDomain(makeRpcWebHandler()));
+)(function* () {
+  const rpc = yield* provideDomain(makeRpcWebHandler());
+  return async (request: Request) => await rpc(request, Context.empty());
+});
 
 const makeHostWebHandler = Effect.fn("ExampleServer.makeHostWebHandler")(
-  function* () {
+  function* (writeToken: string | undefined) {
+    const callers = makeCallerVerifier(writeToken, yield* Clock.Clock);
     const rpc = yield* makeRpcWebHandler();
     const httpEffect = (yield* HttpRouter.toHttpEffect(
       Layer.mergeAll(exampleHttpRoutes, workflowRoutes).pipe(
         Layer.provide(
-          Layer.mergeAll(HttpServer.layerServices, NodeFileSystem.layer)
+          Layer.mergeAll(
+            HttpServer.layerServices,
+            NodeFileSystem.layer,
+            exampleHttpAuthorization
+          )
         )
       )
     )).pipe(Effect.provide(Layer.mergeAll(NodeFileSystem.layer, Path.layer)));
@@ -148,21 +166,36 @@ const makeHostWebHandler = Effect.fn("ExampleServer.makeHostWebHandler")(
       >(runtimeContext)(HttpMiddleware.logger(httpEffect))
     );
 
-    return async (request: Request): Promise<Response> => {
+    const handle = async (
+      request: Request,
+      caller: DemoWriter | null
+    ): Promise<Response> => {
       const path = new URL(request.url).pathname;
+      const context = Context.make(VerifiedCaller, caller);
       if ((path === "/rpc" || path === "/rpc/") && request.method === "POST") {
-        return await rpc(request);
+        return await rpc(request, context);
       }
       if (path.startsWith("/api/")) {
-        return await http(request);
+        return await http(request, context);
       }
       return new Response(null, { status: 404 });
+    };
+
+    const issueSession = withRequestBodyLimit(callers.issueSession);
+    return {
+      verify: callers.verify,
+      handle,
+      handleRequest: async (request: Request) =>
+        new URL(request.url).pathname === "/api/demo-access" &&
+        request.method === "POST"
+          ? await issueSession(request, Context.empty())
+          : await handle(request, callers.verify(request)),
     };
   }
 );
 
 export const makeExampleHost = Effect.fn("ExampleServer.makeExampleHost")(
-  function* () {
+  function* (writeToken?: string) {
     const scope = yield* Scope.Scope;
     const domainContext = yield* Layer.buildWithScope(
       ExampleDomain.layer,
@@ -172,32 +205,30 @@ export const makeExampleHost = Effect.fn("ExampleServer.makeExampleHost")(
       exampleRpcHandlersLayer,
       scope
     ).pipe(Effect.provide(domainContext));
-    const handleRequest = yield* makeHostWebHandler().pipe(
-      Effect.provide(domainContext)
-    );
-    const makeRpcClient = Effect.fn("ExampleServer.makeRequestRpcClient")(
-      function* (authorization: string | undefined) {
-        const requestScope = yield* Scope.Scope;
-        const authority = ExampleAuthorization.of((effect) =>
-          authorization === "allowed"
-            ? effect
-            : Effect.fail(
-                new ExampleAuthorizationError({
-                  reason: "missing-example-authorization",
-                })
-              )
-        );
-        const serverContext = Context.add(
-          Context.add(handlersContext, ExampleAuthorization, authority),
-          Scope.Scope,
-          requestScope
-        );
-        return yield* makeServerLocalRpcClient(exampleRpcGroup).pipe(
-          Effect.provideContext(serverContext)
-        );
-      }
-    );
-    return { handleRequest, makeRpcClient };
+    const { verify, handle, handleRequest } = yield* makeHostWebHandler(
+      writeToken
+    ).pipe(Effect.provide(domainContext));
+    const forRequest = (request?: Request) => {
+      const caller = request === undefined ? null : verify(request);
+      const makeRpcClient = Effect.fn("ExampleServer.makeRequestRpcClient")(
+        function* () {
+          const requestScope = yield* Scope.Scope;
+          const serverContext = handlersContext.pipe(
+            Context.add(VerifiedCaller, caller),
+            Context.add(Scope.Scope, requestScope)
+          );
+          return yield* makeServerLocalRpcClient(exampleRpcGroup).pipe(
+            Effect.provideContext(serverContext)
+          );
+        }
+      );
+      return {
+        makeRpcClient,
+        fetch: async (input: RequestInfo | URL, init?: RequestInit) =>
+          await handle(new Request(input, init), caller),
+      };
+    };
+    return { handleRequest, forRequest };
   }
 );
 
@@ -205,6 +236,13 @@ export type ExampleHost = Effect.Success<ReturnType<typeof makeExampleHost>>;
 
 export const makeExampleWebHandler = Effect.fn(
   "ExampleServer.makeExampleWebHandler"
-)((domainLayer: Layer.Layer<ExampleDomain> = ExampleDomain.layer) =>
-  provideDomain(makeHostWebHandler(), domainLayer)
-);
+)(function* (
+  domainLayer: Layer.Layer<ExampleDomain> = ExampleDomain.layer,
+  writeToken?: string
+) {
+  const { handleRequest } = yield* provideDomain(
+    makeHostWebHandler(writeToken),
+    domainLayer
+  );
+  return handleRequest;
+});

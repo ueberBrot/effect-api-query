@@ -9,26 +9,24 @@ import {
 export const startServerApplication = async ({
   host,
   identity = "example",
-  authorization,
-  signal,
+  request,
 }: {
   readonly host: ExampleHost;
   readonly identity?: string;
-  readonly authorization: string | undefined;
-  readonly signal?: AbortSignal;
+  readonly request?: Request;
 }) => {
+  const signal = request?.signal;
   signal?.throwIfAborted();
+  const local = host.forRequest(request);
   const scope = Scope.makeUnsafe();
   try {
     const client = await Effect.runPromise(
-      host.makeRpcClient(authorization).pipe(Scope.provide(scope))
+      local.makeRpcClient().pipe(Scope.provide(scope))
     );
     const application = await startTanStackStartApplication({
       rpcUrl: "http://example.local/rpc",
       identity,
-      httpAuthorization: authorization ?? "",
-      fetch: async (input, init) =>
-        await host.handleRequest(new Request(input, init)),
+      fetch: local.fetch,
       rpcClient: {
         client,
         runtime: Effect.runPromiseExit,

@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 import {
   DiagnosticStatus,
   exampleHttpApi,
@@ -19,7 +21,8 @@ describe("example HTTP API", () => {
     "shares user state with RPC and returns no content after deletion",
     () =>
       Effect.gen(function* shareRpcHttpUserState() {
-        const server = yield* startExampleRpcServer();
+        const writeToken = randomUUID();
+        const server = yield* startExampleRpcServer({ writeToken });
         const rpc = yield* makeExampleRpcClient(server.rpcUrl);
         const created = yield* Effect.promise(
           async () =>
@@ -50,7 +53,7 @@ describe("example HTTP API", () => {
           async () =>
             await fetch(`${server.url}/api/users/13`, {
               method: "DELETE",
-              headers: { "x-example-authorization": "allowed" },
+              headers: { authorization: `Bearer ${writeToken}` },
             })
         );
         expect({
@@ -226,7 +229,7 @@ describe("example HTTP API", () => {
           "GET,POST,DELETE,OPTIONS"
         );
         expect(http.headers.get("access-control-allow-headers")).toContain(
-          "x-example-authorization"
+          "authorization"
         );
         const rpc = yield* Effect.promise(
           async () => await fetch(server.rpcUrl, { method: "OPTIONS" })

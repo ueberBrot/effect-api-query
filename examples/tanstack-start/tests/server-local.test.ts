@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 import { createMemoryHistory } from "@tanstack/react-router";
 import { Effect, Exit, Scope } from "effect";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
@@ -27,7 +29,6 @@ describe("Start request-local execution", () => {
     );
     const application = await startServerApplication({
       host,
-      authorization: "allowed",
     });
     try {
       for (const input of [
@@ -72,19 +73,22 @@ describe("Start request-local execution", () => {
         throw new Error("Unexpected network request");
       })
     );
+    const writeToken = randomUUID();
     const host = await Effect.runPromise(
-      makeExampleHost().pipe(Scope.provide(scope))
+      makeExampleHost(writeToken).pipe(Scope.provide(scope))
     );
     try {
       const allowed = await startServerApplication({
         host,
-        identity: "reader",
-        authorization: "allowed",
+        identity: "writer",
+        request: new Request("http://example.local/", {
+          headers: { authorization: `Bearer ${writeToken}` },
+        }),
       });
       const denied = await startServerApplication({
         host,
         identity: "restricted",
-        authorization: "denied",
+        request: new Request("http://example.local/"),
       });
       applications.push(allowed, denied);
       const create = allowed.rpcQuery.users.create.mutationOptions().mutationFn;
@@ -109,7 +113,7 @@ describe("Start request-local execution", () => {
         denied.rpcQuery.users.list.queryKey()
       );
       const remove = denied.rpcQuery.users.delete.mutationOptions({
-        rpcOptions: { headers: { "x-example-authorization": "allowed" } },
+        rpcOptions: { headers: { authorization: `Bearer ${writeToken}` } },
       }).mutationFn;
       if (remove === undefined) {
         throw new Error("Mutation function is missing");
@@ -117,11 +121,14 @@ describe("Start request-local execution", () => {
       await expect(remove({ id: 1 })).rejects.toMatchObject({
         name: "EffectRpcQueryError",
       });
+      await allowed.rpcQuery.users.delete
+        .mutationOptions()
+        .mutationFn({ id: 1 });
       expect(globalThis.fetch).not.toHaveBeenCalled();
       await allowed.dispose();
       await expect(
         denied.queryClient.query(denied.rpcQuery.users.list.queryOptions())
-      ).resolves.toHaveLength(13);
+      ).resolves.toHaveLength(12);
     } finally {
       await Promise.all(
         applications.splice(0).map(async ({ dispose }) => {
@@ -141,18 +148,21 @@ describe("Start request-local execution", () => {
     const application = await startServerApplication({
       host: {
         ...host,
-        makeRpcClient: Effect.fnUntraced(function* makeRpcClient(
-          authorization: string | undefined
-        ) {
-          yield* Effect.addFinalizer(() =>
-            Effect.sync(() => {
-              events.push("released");
-            })
-          );
-          return yield* host.makeRpcClient(authorization);
-        }),
+        forRequest: (request) => {
+          const local = host.forRequest(request);
+          return {
+            ...local,
+            makeRpcClient: Effect.fnUntraced(function* makeRpcClient() {
+              yield* Effect.addFinalizer(() =>
+                Effect.sync(() => {
+                  events.push("released");
+                })
+              );
+              return yield* local.makeRpcClient();
+            }),
+          };
+        },
       },
-      authorization: "allowed",
     });
     try {
       const capture = application.captureSnapshot(
@@ -193,12 +203,10 @@ describe("Start request-local execution", () => {
     const abort = new AbortController();
     const first = await startServerApplication({
       host,
-      authorization: "allowed",
-      signal: abort.signal,
+      request: new Request("http://example.local/", { signal: abort.signal }),
     });
     const second = await startServerApplication({
       host,
-      authorization: "allowed",
     });
     try {
       const read = first.queryClient.query(
@@ -259,15 +267,18 @@ describe("Start request-local execution", () => {
     const application = await startServerApplication({
       host: {
         ...host,
-        makeRpcClient: Effect.fnUntraced(function* makeRpcClient(
-          authorization: string | undefined
-        ) {
-          yield* Effect.addFinalizer(() => Effect.die(failure));
-          return yield* host.makeRpcClient(authorization);
-        }),
+        forRequest: (request) => {
+          const local = host.forRequest(request);
+          return {
+            ...local,
+            makeRpcClient: Effect.fnUntraced(function* makeRpcClient() {
+              yield* Effect.addFinalizer(() => Effect.die(failure));
+              return yield* local.makeRpcClient();
+            }),
+          };
+        },
       },
-      authorization: "allowed",
-      signal: abort.signal,
+      request: new Request("http://example.local/", { signal: abort.signal }),
     });
     try {
       abort.abort();

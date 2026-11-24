@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 import { User } from "@effect-api-query/contracts";
 import { startExampleRpcClient } from "@effect-api-query/contracts/client";
 import type { ExampleRpcClient } from "@effect-api-query/contracts/client";
@@ -13,8 +15,10 @@ import {
   vi,
 } from "vite-plus/test";
 
+import { makeExampleHost } from "../../server/src/web-handler.ts";
 import { startTanStackStartApplication } from "../src/lib/application.ts";
 import type { TanStackStartApplication } from "../src/lib/application.ts";
+import { startServerApplication } from "../src/lib/server-application.ts";
 
 describe("TanStack Start application ownership", () => {
   let application: TanStackStartApplication | undefined;
@@ -104,19 +108,22 @@ describe("TanStack Start HTTP request ownership", () => {
     const scope = Scope.makeUnsafe();
     const applications: TanStackStartApplication[] = [];
     try {
-      const server = await Effect.runPromise(
-        startExampleRpcServer().pipe(Scope.provide(scope))
+      const writeToken = randomUUID();
+      const host = await Effect.runPromise(
+        makeExampleHost(writeToken).pipe(Scope.provide(scope))
       );
-      const authorized = await startTanStackStartApplication({
-        rpcUrl: server.rpcUrl,
+      const authorized = await startServerApplication({
+        host,
         identity: "authorized-reader",
-        httpAuthorization: "allowed",
+        request: new Request("http://example.local/http", {
+          headers: { authorization: `Bearer ${writeToken}` },
+        }),
       });
       applications.push(authorized);
-      const anonymous = await startTanStackStartApplication({
-        rpcUrl: server.rpcUrl,
+      const anonymous = await startServerApplication({
+        host,
         identity: "anonymous-reader",
-        httpAuthorization: "",
+        request: new Request("http://example.local/http"),
       });
       applications.push(anonymous);
       const first = authorized.httpQuery.users.list.queryOptions();
