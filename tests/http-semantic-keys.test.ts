@@ -1171,6 +1171,27 @@ describe("HTTP semantic keys", () => {
         expect.objectContaining({ code: "MissingKeyEncoder" })
       );
     }
+
+    const unredactedNested = HttpApi.make("unredacted-nested-query")
+      .annotate(HttpApi.RedactedNames, { query: [/^filter$/u] })
+      .add(
+        HttpApiGroup.make("g").add(
+          HttpApiEndpoint.get("read", "/read", {
+            query: { filter: Schema.Struct({ id: Schema.String }) },
+          })
+        )
+      );
+    const unredactedUtils = createHttpApiQueryUtils(unredactedNested, {
+      client: Effect.runSync(makeUnusedHttpClient(unredactedNested)),
+      keyPrefix: ["test"],
+    });
+    expect(
+      unredactedUtils.g.read
+        .queryKey({ input: { query: { filter: { id: "1" } } } })
+        .at(-1)
+    ).toStrictEqual({
+      query: { filter: { id: "1" } },
+    });
   });
 
   it("preserves repeated wire-parameter ordering for colliding URL-encoded request parts", async () => {

@@ -138,6 +138,9 @@ const isOpenRedactedAst = (
   SchemaAST.isDeclaration(ast) ||
   (nested && prefixLength === 0 && SchemaAST.isArrays(ast));
 
+const isEmptyWireAst = (ast: SchemaAST.AST): boolean =>
+  SchemaAST.isUndefined(ast) || SchemaAST.isVoid(ast) || SchemaAST.isNever(ast);
+
 const inspectRedactedAst = (
   ast: SchemaAST.AST,
   patterns: readonly (string | RegExp)[],
@@ -175,7 +178,12 @@ const inspectRedactedAst = (
     }
   }
   if (!SchemaAST.isObjects(ast)) {
-    return "Safe";
+    if (!nested || prefix.length === 0 || isEmptyWireAst(ast)) {
+      return "Safe";
+    }
+    return matchesQueryRedaction(formatWireName(prefix), patterns)
+      ? "RequiresEncoder"
+      : "Safe";
   }
   if (ast.indexSignatures.length > 0) {
     return "RequiresEncoder";
@@ -186,22 +194,18 @@ const inspectRedactedAst = (
       continue;
     }
     const nextPath = [...prefix, String(property.name)];
-    const wireName = formatWireName(nextPath);
-    if (
-      nested
-        ? matchesQueryRedaction(wireName, patterns)
-        : matchesHeaderRedaction(wireName, patterns)
-    ) {
-      return "RequiresEncoder";
-    }
-    if (nested) {
-      result = mergeRedactionAnalysis(
-        result,
-        inspectRedactedAst(property.type, patterns, true, nextPath, seen)
-      );
-      if (result === "RequiresEncoder") {
-        return result;
+    if (!nested) {
+      if (matchesHeaderRedaction(formatWireName(nextPath), patterns)) {
+        return "RequiresEncoder";
       }
+      continue;
+    }
+    result = mergeRedactionAnalysis(
+      result,
+      inspectRedactedAst(property.type, patterns, true, nextPath, seen)
+    );
+    if (result === "RequiresEncoder") {
+      return result;
     }
   }
   return result;

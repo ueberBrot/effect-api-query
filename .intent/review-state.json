@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "3a8b07dce39c30e3a417604f1e99306693d4ee38e7f33e81492f9008ab1f4935",
+      "fingerprint": "6522523a4e5d12e5f855438ea12b8836806f4fc4fe0cb306bfea29bcb27061fd",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -253,7 +253,7 @@
         "src/http/endpoint.ts": "06670d2d3f13f14c0faa0aaa8774a133baa99c63819e97f2b5501ef2ee175900",
         "src/http/errors.ts": "bcda0ae353816a1f31001839ee7c7d51270c307be7380a0263b06c1b98276f36",
         "src/http/operation.ts": "c84ab791816693d965d155114b2f5d69adf2808fc892a6fa05f9b7b49b5f4dda",
-        "src/http/request.ts": "7cfcef6fc94cd54e880cf323e34bc602554b43492c23d9f71bd586d3898bccae",
+        "src/http/request.ts": "c6ae7ef094fd00cb4c7537cc2599fe7a4400b77100d4feeeb870d71898e5698d",
         "src/http/streamed-query.ts": "fac8ba0fd1ff7059295d9fab0237ac86f5b75673bb6d5776ada5f44c6e9d0c44",
         "src/http/types.ts": "ca84b5df8e86a16169ba953983055744d058218835cc748020a0310e801494c8",
         "src/index.ts": "dc946f4279705804c786467ce7aefdd72d141de3cf6cfa2f8b2acfa34d66a524",
@@ -309,7 +309,7 @@
         "tests/http-multipart.test.ts": "1e9aabe7401e6e0baac20c58d86b87c371dde43dd2049ec5f343968ad5254005",
         "tests/http-ndjson-query.test.ts": "5f722d8bcaaff9a6f4b5413ec393d14dfce6d282646f20377eec504cdd4663f8",
         "tests/http-query-options.test.ts": "aac64adf89e7dc9e281e65d7cdd9256e99dba785d934fafc14b2b02c6476ae3b",
-        "tests/http-semantic-keys.test.ts": "710e6cd6c9de20bfc7e57b7071e136b2508041413fa78225d405be2311d6162c",
+        "tests/http-semantic-keys.test.ts": "2d6d9f1a675e42f15a2a26c3616a911a37bbef90b6e516cda3a81bff45e1f9bf",
         "tests/http-structural-sharing.test.ts": "7cb0dbe6359b567a9ab3eeb550ecfa45855845d93be53baa1d4a1caf20ee8977",
         "tests/http-transport-cancellation.test.ts": "b3dc08d09bfad3c33d257369ae087311b53a341e7031cf5213915b69404774d3",
         "tests/hydration-codecs.test.ts": "89a6f85260421b6d8fa4de578df2df16c6b357c8f4c8c467db02d3a6d9531f69",
@@ -410,15 +410,15 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "708497da8c4770c11e091a00c0f47d04fec95547",
-      "outcome": "updated",
-      "reason": "Updated skills/effect-api-query/references/http.md and _artifacts/skill_spec.md for #238 HttpApi.RedactedNames enforcement and repeated wire-parameter ordering in HTTP canonical keys; verified with full vp test, vp run typecheck, vp run format, and vp run fallow",
+      "head": "187580d8adc95c1886c5a0e68c6e202c10b01470",
+      "outcome": "no-change",
+      "reason": "Refined static query redaction AST matching to check only leaf paths that emit wire values; guidance in skills/effect-api-query/references/http.md and _artifacts/skill_spec.md already accurately covers #238",
       "evidence": [
-        "Changed: skills/effect-api-query/references/http.md, src/http/endpoint.ts, src/http/operation.ts, src/http/request.ts, tests/http-semantic-keys.test.ts at 708497da8c4770c11e091a00c0f47d04fec95547"
+        "Changed: src/http/request.ts, tests/http-semantic-keys.test.ts at 187580d8adc95c1886c5a0e68c6e202c10b01470"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "2f5a5f725126c4e5f911707f294ba79cbe14592dcc1047d92e2f4582cb569313",
+      "fingerprint": "1be646198d8b0c4867982d3de35dd133769f7e70a7d5a52da6b2b9298804500a",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -671,7 +671,7 @@
         "src/http/endpoint.ts": "06670d2d3f13f14c0faa0aaa8774a133baa99c63819e97f2b5501ef2ee175900",
         "src/http/errors.ts": "bcda0ae353816a1f31001839ee7c7d51270c307be7380a0263b06c1b98276f36",
         "src/http/operation.ts": "c84ab791816693d965d155114b2f5d69adf2808fc892a6fa05f9b7b49b5f4dda",
-        "src/http/request.ts": "7cfcef6fc94cd54e880cf323e34bc602554b43492c23d9f71bd586d3898bccae",
+        "src/http/request.ts": "c6ae7ef094fd00cb4c7537cc2599fe7a4400b77100d4feeeb870d71898e5698d",
         "src/http/streamed-query.ts": "fac8ba0fd1ff7059295d9fab0237ac86f5b75673bb6d5776ada5f44c6e9d0c44",
         "src/http/types.ts": "ca84b5df8e86a16169ba953983055744d058218835cc748020a0310e801494c8",
         "src/index.ts": "dc946f4279705804c786467ce7aefdd72d141de3cf6cfa2f8b2acfa34d66a524",
@@ -727,7 +727,7 @@
         "tests/http-multipart.test.ts": "1e9aabe7401e6e0baac20c58d86b87c371dde43dd2049ec5f343968ad5254005",
         "tests/http-ndjson-query.test.ts": "5f722d8bcaaff9a6f4b5413ec393d14dfce6d282646f20377eec504cdd4663f8",
         "tests/http-query-options.test.ts": "aac64adf89e7dc9e281e65d7cdd9256e99dba785d934fafc14b2b02c6476ae3b",
-        "tests/http-semantic-keys.test.ts": "710e6cd6c9de20bfc7e57b7071e136b2508041413fa78225d405be2311d6162c",
+        "tests/http-semantic-keys.test.ts": "2d6d9f1a675e42f15a2a26c3616a911a37bbef90b6e516cda3a81bff45e1f9bf",
         "tests/http-structural-sharing.test.ts": "7cb0dbe6359b567a9ab3eeb550ecfa45855845d93be53baa1d4a1caf20ee8977",
         "tests/http-transport-cancellation.test.ts": "b3dc08d09bfad3c33d257369ae087311b53a341e7031cf5213915b69404774d3",
         "tests/hydration-codecs.test.ts": "89a6f85260421b6d8fa4de578df2df16c6b357c8f4c8c467db02d3a6d9531f69",
@@ -828,11 +828,11 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "708497da8c4770c11e091a00c0f47d04fec95547",
-      "outcome": "updated",
-      "reason": "Updated skills/effect-api-query/references/http.md and _artifacts/skill_spec.md for #238 HttpApi.RedactedNames enforcement and repeated wire-parameter ordering in HTTP canonical keys; verified with full vp test, vp run typecheck, vp run format, and vp run fallow",
+      "head": "187580d8adc95c1886c5a0e68c6e202c10b01470",
+      "outcome": "no-change",
+      "reason": "Refined static query redaction AST matching to check only leaf paths that emit wire values; guidance in skills/effect-api-query/references/http.md and _artifacts/skill_spec.md already accurately covers #238",
       "evidence": [
-        "Changed: _artifacts/skill_spec.md, skills/effect-api-query/references/http.md, src/http/endpoint.ts, src/http/operation.ts, src/http/request.ts, tests/http-semantic-keys.test.ts at 708497da8c4770c11e091a00c0f47d04fec95547"
+        "Changed: src/http/request.ts, tests/http-semantic-keys.test.ts at 187580d8adc95c1886c5a0e68c6e202c10b01470"
       ]
     },
     "source:vite.config.ts": {
