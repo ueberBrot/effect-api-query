@@ -7,6 +7,8 @@ import type {
 } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { isOperationNotFound } from "./operation-errors.ts";
+
 export interface DiagnosticQuery<Input, Data> {
   readonly queryKey: (options: { readonly input: Input }) => QueryKey;
   readonly queryOptions: (options: { readonly input: Input }) => {
@@ -92,6 +94,20 @@ const delay = async (milliseconds: number) => {
   });
 };
 
+const readBaseline = async (
+  readStatus: (signal: AbortSignal) => Promise<DiagnosticStatus>,
+  signal: AbortSignal
+): Promise<DiagnosticStatus> => {
+  try {
+    return await readStatus(signal);
+  } catch (error) {
+    if (isOperationNotFound(error)) {
+      return { started: 0, interrupted: 0 };
+    }
+    throw error;
+  }
+};
+
 const alwaysActive = () => true;
 
 export const useSlowQueryCancellation = (
@@ -167,12 +183,15 @@ export const useSlowQueryCancellation = (
 
   const waitForStatus = async (
     predicate: (status: DiagnosticStatus) => boolean,
-    signal: AbortSignal
+    signal: AbortSignal,
+    allowMissing = false
   ): Promise<DiagnosticStatus> => {
     for (let attempt = 0; attempt < 100; attempt += 1) {
       assertActive(signal);
       // oxlint-disable-next-line eslint/no-await-in-loop
-      const status = await adapter.readStatus(signal);
+      const status = await (allowMissing
+        ? readBaseline(adapter.readStatus, signal)
+        : adapter.readStatus(signal));
       assertActive(signal);
       if (predicate(status)) {
         return status;
@@ -199,11 +218,15 @@ export const useSlowQueryCancellation = (
     }
     setState({ _tag: "Starting" });
     try {
-      const before = await adapter.readStatus(signal);
+      const before = await readBaseline(adapter.readStatus, signal);
       assertActive(signal);
       baseline.current = before;
       void runQuery();
-      await waitForStatus(({ started }) => started > before.started, signal);
+      await waitForStatus(
+        ({ started }) => started > before.started,
+        signal,
+        true
+      );
       assertActive(signal);
       setState({ _tag: "Ready" });
     } catch (error) {

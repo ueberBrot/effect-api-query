@@ -1,4 +1,7 @@
-import { exampleRpcGroup } from "@effect-api-query/contracts";
+import {
+  exampleRpcGroup,
+  operationSessionPath,
+} from "@effect-api-query/contracts";
 import { NodeFileSystem } from "@effect/platform-node";
 import { Clock, Context, Effect, Layer, Path, Scope } from "effect";
 import type { HttpServerRequest } from "effect/http";
@@ -10,8 +13,12 @@ import {
 } from "effect/http";
 import { RpcSerialization, RpcServer } from "effect/rpc";
 
-import type { DemoWriter } from "./caller.ts";
-import { makeCallerVerifier, VerifiedCaller } from "./caller.ts";
+import type { Caller } from "./caller.ts";
+import {
+  anonymousCaller,
+  makeCallerVerifier,
+  VerifiedCaller,
+} from "./caller.ts";
 import { ExampleDomain } from "./domain.ts";
 import {
   exampleHttpAuthorization,
@@ -168,7 +175,7 @@ const makeHostWebHandler = Effect.fn("ExampleServer.makeHostWebHandler")(
 
     const handle = async (
       request: Request,
-      caller: DemoWriter | null
+      caller: Caller
     ): Promise<Response> => {
       const path = new URL(request.url).pathname;
       const context = Context.make(VerifiedCaller, caller);
@@ -176,21 +183,32 @@ const makeHostWebHandler = Effect.fn("ExampleServer.makeHostWebHandler")(
         return await rpc(request, context);
       }
       if (path.startsWith("/api/")) {
-        return await http(request, context);
+        const response = await http(request, context);
+        if (path.startsWith("/api/diagnostics/")) {
+          response.headers.set("cache-control", "no-store");
+        }
+        return response;
       }
       return new Response(null, { status: 404 });
     };
 
-    const issueSession = withRequestBodyLimit(callers.issueSession);
-    return {
-      verify: callers.verify,
-      handle,
-      handleRequest: async (request: Request) =>
-        new URL(request.url).pathname === "/api/demo-access" &&
-        request.method === "POST"
-          ? await issueSession(request, Context.empty())
-          : await handle(request, callers.verify(request)),
+    const issueWriteSession = withRequestBodyLimit(callers.issueWriteSession);
+    const issueOperationSession = withRequestBodyLimit(
+      callers.issueOperationSession
+    );
+    const handleRequest = async (request: Request) => {
+      if (request.method === "POST") {
+        const path = new URL(request.url).pathname;
+        if (path === "/api/demo-access") {
+          return await issueWriteSession(request, Context.empty());
+        }
+        if (path === operationSessionPath) {
+          return await issueOperationSession(request, Context.empty());
+        }
+      }
+      return await handle(request, callers.verify(request));
     };
+    return { verify: callers.verify, handle, handleRequest };
   }
 );
 
@@ -209,7 +227,7 @@ export const makeExampleHost = Effect.fn("ExampleServer.makeExampleHost")(
       writeToken
     ).pipe(Effect.provide(domainContext));
     const forRequest = (request?: Request) => {
-      const caller = request === undefined ? null : verify(request);
+      const caller = request === undefined ? anonymousCaller : verify(request);
       const makeRpcClient = Effect.fn("ExampleServer.makeRequestRpcClient")(
         function* () {
           const requestScope = yield* Scope.Scope;

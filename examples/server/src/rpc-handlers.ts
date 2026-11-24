@@ -20,6 +20,7 @@ const handlersLayer = exampleRpcGroup.toLayer(
 
     return exampleRpcGroup.of({
       "commands.start": commands.start,
+      "commands.reserve": commands.reserve,
       "commands.status": commands.status,
       "commands.cancel": commands.cancel,
       "diagnostics.cancel": Effect.fn("ExampleRpc.diagnostics.cancel")(
@@ -35,6 +36,7 @@ const handlersLayer = exampleRpcGroup.toLayer(
         diagnostics.operationStatus(operationId)
       ),
       "diagnostics.slow": diagnostics.slow,
+      "diagnostics.ping": () => Effect.void,
       "diagnostics.status": Effect.fn("ExampleRpc.diagnostics.status")(
         () => diagnostics.status
       ),

@@ -1,124 +1,133 @@
-import { DiagnosticFailure } from "@effect-api-query/contracts";
+import {
+  DiagnosticFailure,
+  OperationNotFound,
+} from "@effect-api-query/contracts";
 import type {
   DiagnosticStatus,
   SlowDiagnosticInput,
 } from "@effect-api-query/contracts";
-import { Deferred, Effect, Exit, HashMap, Option, Ref } from "effect";
+import { Deferred, Effect, Exit } from "effect";
+
+import { requireOperationOwner } from "./caller.ts";
+
+interface DiagnosticOperation {
+  status: DiagnosticStatus;
+  readonly active: Set<Deferred.Deferred<void>>;
+}
 
 const initialStatus = (): DiagnosticStatus => ({ interrupted: 0, started: 0 });
 
-const initialState = () => ({
-  total: initialStatus(),
-  operations: HashMap.empty<string, DiagnosticStatus>(),
-});
+export const makeDiagnosticOperations = Effect.sync(() => {
+  const owners = new Map<
+    string,
+    {
+      total: DiagnosticStatus;
+      readonly operations: Map<string, DiagnosticOperation>;
+    }
+  >();
 
-export const makeDiagnosticOperations = Effect.fn(
-  "ExampleRpc.makeDiagnosticOperations"
-)(function* () {
-  const state = yield* Ref.make(initialState());
-  const active = new Map<string, Set<Deferred.Deferred<void>>>();
-
-  const record = Effect.fn("ExampleDiagnostics.record")(
-    (operationId: string, event: keyof DiagnosticStatus) =>
-      Ref.update(state, (current) => {
-        const previous = Option.getOrElse(
-          HashMap.get(current.operations, operationId),
-          initialStatus
-        );
-        return {
-          total: { ...current.total, [event]: current.total[event] + 1 },
-          operations: HashMap.set(current.operations, operationId, {
-            ...previous,
-            [event]: previous[event] + 1,
-          }),
-        };
-      })
+  const operationStatus = Effect.fn("ExampleDiagnostics.operationStatus")(
+    function* (operationId: string) {
+      const owner = yield* requireOperationOwner;
+      const operation = owners.get(owner)?.operations.get(operationId);
+      return operation === undefined
+        ? yield* Effect.fail(OperationNotFound.literal)
+        : operation.status;
+    }
   );
 
-  const remove = Effect.fn("ExampleRpc.DiagnosticOperations.remove")(
-    (operationId: string, cancellation: Deferred.Deferred<void>) =>
-      Effect.sync(() => {
-        const operations = active.get(operationId);
-        if (operations === undefined || !operations.delete(cancellation)) {
-          return false;
-        }
-        if (operations.size === 0) {
-          active.delete(operationId);
-        }
-        return true;
-      })
-  );
+  const status = Effect.gen(function* () {
+    const owner = yield* requireOperationOwner;
+    return owners.get(owner)?.total ?? initialStatus();
+  });
 
-  const cancel = Effect.fn("ExampleRpc.DiagnosticOperations.cancel")(
-    (operationId: string) =>
-      Effect.suspend(() => {
-        const operations = active.get(operationId);
-        if (operations === undefined) {
-          return Effect.void;
-        }
-        // oxlint-disable-next-line unicorn/no-array-method-this-argument
-        return Effect.forEach(operations, (cancellation) =>
-          Deferred.done(cancellation, Exit.void)
-        ).pipe(Effect.asVoid);
-      })
-  );
+  const cancel = Effect.fn("ExampleRpc.DiagnosticOperations.cancel")(function* (
+    operationId: string
+  ) {
+    const owner = yield* requireOperationOwner;
+    const operation = owners.get(owner)?.operations.get(operationId);
+    if (operation === undefined) {
+      return yield* Effect.fail(OperationNotFound.literal);
+    }
+    // oxlint-disable-next-line unicorn/no-array-method-this-argument
+    return yield* Effect.forEach(
+      [...operation.active],
+      (cancellation) => Deferred.done(cancellation, Exit.void),
+      { discard: true }
+    );
+  });
 
   const reset = Effect.suspend(() => {
-    const cancellations = [...active.values()].flatMap((operations) => [
-      ...operations,
-    ]);
-    active.clear();
+    const active = [...owners.values()].flatMap(({ operations }) =>
+      [...operations.values()].flatMap((operation) => [...operation.active])
+    );
+    owners.clear();
     // oxlint-disable-next-line unicorn/no-array-method-this-argument
-    return Effect.forEach(cancellations, (cancellation) =>
-      Deferred.done(cancellation, Exit.void)
-    ).pipe(Effect.andThen(Ref.set(state, initialState())));
+    return Effect.forEach(
+      active,
+      (cancellation) => Deferred.done(cancellation, Exit.void),
+      { discard: true }
+    );
   });
 
   const slow = Effect.fn("ExampleRpc.diagnostics.slow")(function* ({
     durationMs,
-    operationId,
+    operationId = "anonymous",
   }: SlowDiagnosticInput) {
-    const id = operationId ?? "anonymous";
-    // oxlint-disable-next-line typescript/no-invalid-void-type
-    const cancellation = yield* Deferred.make<void>();
-    const operations = active.get(id) ?? new Set<Deferred.Deferred<void>>();
-    operations.add(cancellation);
-    active.set(id, operations);
-    yield* record(id, "started");
-
-    return yield* Deferred.await(cancellation).pipe(
-      Effect.andThen(Effect.interrupt),
-      Effect.timeoutOrElse({
-        duration: durationMs ?? 60_000,
-        orElse: () => Effect.succeed("completed"),
+    const owner = yield* requireOperationOwner;
+    return yield* Effect.acquireUseRelease(
+      Effect.sync(() => {
+        const state = owners.get(owner) ?? {
+          total: initialStatus(),
+          operations: new Map<string, DiagnosticOperation>(),
+        };
+        const operation = state.operations.get(operationId) ?? {
+          status: initialStatus(),
+          active: new Set<Deferred.Deferred<void>>(),
+        };
+        // oxlint-disable-next-line typescript/no-invalid-void-type
+        const cancellation = Deferred.makeUnsafe<void>();
+        operation.active.add(cancellation);
+        operation.status = {
+          ...operation.status,
+          started: operation.status.started + 1,
+        };
+        state.total = { ...state.total, started: state.total.started + 1 };
+        state.operations.set(operationId, operation);
+        owners.set(owner, state);
+        return { state, operation, cancellation };
       }),
-      Effect.onInterrupt(() =>
-        remove(id, cancellation).pipe(
-          Effect.flatMap((removed) =>
-            removed ? record(id, "interrupted") : Effect.void
-          )
-        )
-      ),
-      Effect.ensuring(remove(id, cancellation))
+      ({ cancellation }) =>
+        Deferred.await(cancellation).pipe(
+          Effect.andThen(Effect.interrupt),
+          Effect.timeoutOrElse({
+            duration: durationMs ?? 60_000,
+            orElse: () => Effect.succeed("completed"),
+          })
+        ),
+      ({ state, operation, cancellation }, exit) =>
+        Effect.sync(() => {
+          operation.active.delete(cancellation);
+          if (Exit.hasInterrupts(exit)) {
+            operation.status = {
+              ...operation.status,
+              interrupted: operation.status.interrupted + 1,
+            };
+            state.total = {
+              ...state.total,
+              interrupted: state.total.interrupted + 1,
+            };
+          }
+        })
     );
   });
 
   return {
     cancel,
     fail: Effect.fail(new DiagnosticFailure({ reason: "requested-failure" })),
-    operationStatus: Effect.fn("ExampleDiagnostics.operationStatus")(
-      (operationId: string) =>
-        Ref.get(state).pipe(
-          Effect.map((current) =>
-            Option.getOrElse(
-              HashMap.get(current.operations, operationId),
-              initialStatus
-            )
-          )
-        )
-    ),
+    operationStatus,
     reset,
     slow,
-    status: Ref.get(state).pipe(Effect.map((current) => current.total)),
+    status,
   } as const;
 });

@@ -1,9 +1,10 @@
 import { startExampleRpcServer } from "@effect-api-query/server";
 import { MutationObserver, QueryObserver } from "@tanstack/react-query";
-import { Effect, Exit, Scope } from "effect";
+import { Cause, Effect, Exit, Scope } from "effect";
 import { describe, expect, it } from "vite-plus/test";
 
 import { startExampleServerFixture } from "../../server/tests/fixtures/example-server.ts";
+import { openOperationSession } from "../../server/tests/fixtures/operation-session.ts";
 import { startViteReactApplication } from "../src/lib/application.ts";
 import type { ViteReactApplication } from "../src/lib/application.ts";
 
@@ -16,7 +17,11 @@ describe("Cancellable commands", () => {
       const server = await Effect.runPromise(
         startExampleRpcServer().pipe(Scope.provide(serverScope))
       );
-      previous = await startViteReactApplication({ rpcUrl: server.rpcUrl });
+      const session = await openOperationSession(server.url);
+      previous = await startViteReactApplication({
+        rpcUrl: server.rpcUrl,
+        fetch: session.fetch,
+      });
       const captured = previous;
       const input = { operationId: "owner-handoff", steps: 10 };
       const start = new MutationObserver(
@@ -73,6 +78,7 @@ describe("Cancellable commands", () => {
 
       current = await startViteReactApplication({
         rpcUrl: server.rpcUrl,
+        fetch: session.fetch,
         identity: { ...captured.identity, permissionGeneration: 2 },
       });
       const replacementStart = new MutationObserver(
@@ -100,8 +106,10 @@ describe("Cancellable commands", () => {
     const server = await Effect.runPromise(
       startExampleRpcServer().pipe(Scope.provide(scope))
     );
+    const session = await openOperationSession(server.url);
     const application = await startViteReactApplication({
       rpcUrl: server.rpcUrl,
+      fetch: session.fetch,
     });
     const { queryClient, rpcQuery } = application;
     const firstInput = { operationId: "first", steps: 40 };
@@ -197,8 +205,10 @@ describe("Cancellable commands", () => {
     const { server, reset } = await Effect.runPromise(
       startExampleServerFixture().pipe(Scope.provide(scope))
     );
+    const session = await openOperationSession(server.url);
     const application = await startViteReactApplication({
       rpcUrl: server.rpcUrl,
+      fetch: session.fetch,
     });
     const { queryClient, rpcQuery } = application;
     const start = new MutationObserver(
@@ -213,7 +223,8 @@ describe("Cancellable commands", () => {
     try {
       await expect(
         queryClient.query(rpcQuery.commands.status.queryOptions({ input }))
-      ).resolves.toBeNull();
+      ).rejects.toMatchObject({ cause: Cause.fail("operation-not-found") });
+      await rpcQuery.commands.reserve.call({ input });
       const cancelled = await cancel.mutate(input);
       expect(cancelled).toMatchObject({
         state: "cancelled",
@@ -254,8 +265,10 @@ describe("Cancellable commands", () => {
     const { server, reset } = await Effect.runPromise(
       startExampleServerFixture().pipe(Scope.provide(scope))
     );
+    const session = await openOperationSession(server.url);
     const application = await startViteReactApplication({
       rpcUrl: server.rpcUrl,
+      fetch: session.fetch,
     });
     const { queryClient, rpcQuery } = application;
     const input = { operationId: "reset-running" };
@@ -277,7 +290,9 @@ describe("Cancellable commands", () => {
         state: "cancelled",
         totalSteps: 40,
       });
-      await expect(queryClient.query(options)).resolves.toBeNull();
+      await expect(queryClient.query(options)).rejects.toMatchObject({
+        cause: Cause.fail("operation-not-found"),
+      });
       await expect(start.mutate({ ...input, steps: 1 })).resolves.toMatchObject(
         {
           state: "completed",

@@ -141,4 +141,36 @@ describe("Cancellable command recovery", () => {
       await fixture.application.dispose();
     }
   });
+
+  it("stops polling a command missing from the renewed session", async () => {
+    const readStatus = vi.fn<() => Effect.Effect<never, "operation-not-found">>(
+      () => Effect.fail("operation-not-found")
+    );
+    const fixture = await Effect.runPromise(
+      makeControlledUserWrites(
+        { defaultOptions: { queries: { retry: false } } },
+        { status: readStatus }
+      )
+    );
+    try {
+      const view = render(
+        <QueryClientProvider client={fixture.application.queryClient}>
+          <CommandsSection application={fixture.application} />
+        </QueryClientProvider>
+      );
+      const first = within(view.getByRole("region", { name: "Command 1" }));
+      fireEvent.click(first.getByRole("button", { name: "Start command" }));
+      await expect(
+        first.findByText("Start mutation: success")
+      ).resolves.toBeDefined();
+      const alert = await first.findByRole("alert");
+      expect(alert.textContent).toContain("commands.status");
+      const reads = readStatus.mock.calls.length;
+      await Effect.runPromise(Effect.sleep("250 millis"));
+      expect(readStatus).toHaveBeenCalledTimes(reads);
+    } finally {
+      cleanup();
+      await fixture.application.dispose();
+    }
+  });
 });

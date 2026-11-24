@@ -10,11 +10,12 @@ import { makeExampleRpcClient } from "@effect-api-query/contracts/client";
 import { startExampleRpcServer } from "@effect-api-query/server";
 import { makeExampleWebHandler } from "@effect-api-query/server/web-handler";
 import { describe, expect, it } from "@effect/vitest";
-import { Effect, Exit, Fiber, Schema, Scope } from "effect";
+import { Effect, Exit, Fiber, Layer, Schema, Scope } from "effect";
 import { FetchHttpClient } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
 
 import { startExampleServerFixture } from "./fixtures/example-server.ts";
+import { openOperationSession } from "./fixtures/operation-session.ts";
 
 describe("example HTTP API", () => {
   it.effect(
@@ -123,16 +124,21 @@ describe("example HTTP API", () => {
   it.live("interrupts server work when the HTTP request is aborted", () =>
     Effect.gen(function* abortHttpServerWork() {
       const server = yield* startExampleRpcServer();
-      const rpc = yield* makeExampleRpcClient(server.rpcUrl);
+      const session = yield* Effect.promise(
+        async () => await openOperationSession(server.url)
+      );
+      const rpc = yield* makeExampleRpcClient(server.rpcUrl, session.fetch);
       const context = yield* Effect.context();
       // @effect-diagnostics-next-line abortControllerInEffect:off
       const controller = new AbortController();
-      const pending = fetch(
-        `${server.url}/api/diagnostics/slow?durationMs=60000&operationId=http-abort`,
-        {
-          signal: controller.signal,
-        }
-      )
+      const pending = session
+        .fetch(
+          `${server.url}/api/diagnostics/slow?durationMs=60000&operationId=http-abort`,
+          {
+            method: "POST",
+            signal: controller.signal,
+          }
+        )
         .then(() => "completed")
         .catch(() => "aborted");
       yield* Effect.promise(async () => {
@@ -162,7 +168,9 @@ describe("example HTTP API", () => {
           .toStrictEqual({ started: 1, interrupted: 1 });
       });
       const status = yield* Effect.promise(async () => {
-        const response = await fetch(`${server.url}/api/diagnostics/status`);
+        const response = await session.fetch(
+          `${server.url}/api/diagnostics/status`
+        );
         const json: unknown = await response.json();
         return json;
       });
@@ -245,13 +253,24 @@ describe("example HTTP API", () => {
       const owner = yield* Scope.make();
       yield* Effect.addFinalizer(() => Scope.close(owner, Exit.void));
       const server = yield* startExampleRpcServer().pipe(Scope.provide(owner));
+      const session = yield* Effect.promise(
+        async () => await openOperationSession(server.url)
+      );
       const client = yield* HttpApiClient.make(exampleHttpApi, {
         baseUrl: server.url,
-      }).pipe(Effect.provide(FetchHttpClient.layer));
+      }).pipe(
+        Effect.provide(
+          FetchHttpClient.layer.pipe(
+            Layer.provide(Layer.succeed(FetchHttpClient.Fetch, session.fetch))
+          )
+        )
+      );
       const context = yield* Effect.context();
-      const pending = fetch(
-        `${server.url}/api/diagnostics/slow?durationMs=60000&operationId=http-dispose`
-      )
+      const pending = session
+        .fetch(
+          `${server.url}/api/diagnostics/slow?durationMs=60000&operationId=http-dispose`,
+          { method: "POST" }
+        )
         .then(() => "completed")
         .catch(() => "closed");
       yield* Effect.promise(async () => {
@@ -277,23 +296,17 @@ describe("example HTTP API", () => {
     })
   );
 
-  it.live("reports no activity for an unused diagnostic operation", () =>
+  it.live("returns missing for an unused diagnostic operation", () =>
     Effect.gen(function* unusedDiagnosticOperation() {
       const server = yield* startExampleRpcServer();
+      const session = yield* Effect.promise(
+        async () => await openOperationSession(server.url)
+      );
       const response = yield* Effect.promise(
         async () =>
-          await fetch(`${server.url}/api/diagnostics/operations/unused`)
+          await session.fetch(`${server.url}/api/diagnostics/operations/unused`)
       );
-      const json: unknown = yield* Effect.promise(async () => {
-        const value: unknown = await response.json();
-        return value;
-      });
-      expect(
-        yield* Schema.decodeUnknownEffect(DiagnosticStatus)(json)
-      ).toStrictEqual({
-        started: 0,
-        interrupted: 0,
-      });
+      expect(response.status).toBe(404);
     })
   );
 
@@ -302,12 +315,15 @@ describe("example HTTP API", () => {
     () =>
       Effect.gen(function* cancelIndependentDiagnostics() {
         const { server, reset } = yield* startExampleServerFixture();
-        const rpc = yield* makeExampleRpcClient(server.rpcUrl);
+        const session = yield* Effect.promise(
+          async () => await openOperationSession(server.url)
+        );
+        const rpc = yield* makeExampleRpcClient(server.rpcUrl, session.fetch);
         const readStatus = async (
           id: string,
           signal: AbortSignal | null = null
         ) => {
-          const response = await fetch(
+          const response = await session.fetch(
             `${server.url}/api/diagnostics/operations/${id}`,
             { signal }
           );
@@ -320,12 +336,14 @@ describe("example HTTP API", () => {
         }).pipe(Effect.forkChild);
         // @effect-diagnostics-next-line abortControllerInEffect:off
         const controller = new AbortController();
-        const httpSlow = fetch(
-          `${server.url}/api/diagnostics/slow?durationMs=60000&operationId=http-panel`,
-          {
-            signal: controller.signal,
-          }
-        )
+        const httpSlow = session
+          .fetch(
+            `${server.url}/api/diagnostics/slow?durationMs=60000&operationId=http-panel`,
+            {
+              method: "POST",
+              signal: controller.signal,
+            }
+          )
           .then(() => "completed")
           .catch(() => "aborted");
         yield* Effect.promise(async () => {
@@ -367,9 +385,8 @@ describe("example HTTP API", () => {
         yield* reset;
         expect({
           beforeReset,
-          afterReset: yield* Effect.promise(
-            async () => await readStatus("rpc-panel")
-          ),
+          // oxlint-disable-next-line unicorn/no-useless-undefined
+          afterReset: yield* rpc["diagnostics.status"](undefined),
         }).toStrictEqual({
           beforeReset: { started: 2, interrupted: 2 },
           afterReset: { started: 0, interrupted: 0 },

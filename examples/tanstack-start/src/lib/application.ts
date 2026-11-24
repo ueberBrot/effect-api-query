@@ -1,5 +1,8 @@
 import { exampleHttpApi, exampleRpcGroup } from "@effect-api-query/contracts";
-import { startExampleRpcClient } from "@effect-api-query/contracts/client";
+import {
+  makeExampleFetchLayer,
+  startExampleRpcClient,
+} from "@effect-api-query/contracts/client";
 import type {
   ExampleRpcClient,
   StartedExampleRpcClient,
@@ -11,8 +14,7 @@ import {
   fetchStreamSnapshot,
 } from "@ueberbrot/effect-api-query";
 import type { RunPromiseExit } from "@ueberbrot/effect-api-query";
-import { Effect, Layer, ManagedRuntime } from "effect";
-import { FetchHttpClient } from "effect/http";
+import { Effect, ManagedRuntime } from "effect";
 import { HttpApiClient } from "effect/http-api";
 
 type StartKeyPrefix = readonly ["tanstack-start", string];
@@ -67,13 +69,10 @@ export const startTanStackStartApplication = async ({
   identity = "example",
   httpBaseUrl = new URL(rpcUrl, globalThis.location?.href).origin,
 }: StartTanStackStartApplicationOptions): Promise<TanStackStartApplication> => {
-  const rpcClient = readyRpcClient ?? (await startExampleRpcClient(rpcUrl));
+  const rpcClient =
+    readyRpcClient ?? (await startExampleRpcClient(rpcUrl, applicationFetch));
   const httpRuntime = ManagedRuntime.make(
-    applicationFetch === undefined
-      ? FetchHttpClient.layer
-      : FetchHttpClient.layer.pipe(
-          Layer.provide(Layer.succeed(FetchHttpClient.Fetch, applicationFetch))
-        )
+    makeExampleFetchLayer(applicationFetch)
   );
   const keyPrefix: StartKeyPrefix = ["tanstack-start", identity];
   const abort = new AbortController();

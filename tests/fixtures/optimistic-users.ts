@@ -61,10 +61,10 @@ export const makeControlledUserWrites = Effect.fnUntraced(
   function* makeControlledUserWrites(
     cacheConfig?: QueryClientConfig,
     commandHandlers?: {
-      readonly start: (input: CommandPayload) => Effect.Effect<CommandStatus>;
+      readonly start?: (input: CommandPayload) => Effect.Effect<CommandStatus>;
       readonly status: (input: {
         readonly operationId: string;
-      }) => Effect.Effect<CommandStatus | null>;
+      }) => Effect.Effect<CommandStatus | null, "operation-not-found">;
     }
   ): Effect.fn.Return<ControlledUserWrites> {
     const lifecycle = yield* Effect.promise(
@@ -176,6 +176,7 @@ export const makeControlledUserWrites = Effect.fnUntraced(
           "diagnostics.stream": () => Stream.empty,
           "diagnostics.fail": () => Effect.die("unused diagnostic"),
           "diagnostics.cancel": () => Effect.void,
+          "diagnostics.ping": () => Effect.void,
           "diagnostics.slow": () => Effect.succeed("done"),
           "diagnostics.status": () =>
             Effect.succeed({ started: 0, interrupted: 0 }),
@@ -194,6 +195,7 @@ export const makeControlledUserWrites = Effect.fnUntraced(
               )),
           "commands.status":
             commandHandlers?.status ?? (() => Effect.succeed(null)),
+          "commands.reserve": () => Effect.void,
           "commands.cancel": ({ operationId }) =>
             Effect.succeed(
               new CommandStatus({

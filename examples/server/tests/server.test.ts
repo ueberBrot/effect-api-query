@@ -26,8 +26,10 @@ import {
 import { FetchHttpClient } from "effect/http";
 import { RpcClient } from "effect/rpc";
 
+import { VerifiedCaller } from "../src/caller.ts";
 import { makeDiagnosticOperations } from "../src/diagnostic-operations.ts";
 import { startExampleServerFixture } from "./fixtures/example-server.ts";
+import { openOperationSession } from "./fixtures/operation-session.ts";
 
 const waitForStatus = Effect.fn("TestExampleRpc.waitForStatus")(
   function* waitForStatus(
@@ -59,8 +61,8 @@ describe("example RPC server", () => {
     "keeps captured diagnostic statuses intact across later operations and reset",
     () =>
       Effect.gen(function* retainDiagnosticSnapshots() {
-        const diagnostics = yield* makeDiagnosticOperations();
-        const unused = yield* diagnostics.operationStatus("first");
+        const diagnostics = yield* makeDiagnosticOperations;
+        const unused = yield* Effect.flip(diagnostics.operationStatus("first"));
         yield* diagnostics.slow({ operationId: "first", durationMs: 0 });
         const first = yield* diagnostics.operationStatus("first");
         const total = yield* diagnostics.status;
@@ -77,18 +79,23 @@ describe("example RPC server", () => {
         });
         yield* diagnostics.reset;
         expect({
-          first: yield* diagnostics.operationStatus("first"),
+          first: yield* Effect.flip(diagnostics.operationStatus("first")),
           total: yield* diagnostics.status,
         }).toStrictEqual({
-          first: { started: 0, interrupted: 0 },
+          first: "operation-not-found",
           total: { started: 0, interrupted: 0 },
         });
         expect({ unused, first, total }).toStrictEqual({
-          unused: { started: 0, interrupted: 0 },
+          unused: "operation-not-found",
           first: { started: 1, interrupted: 0 },
           total: { started: 1, interrupted: 0 },
         });
-      })
+      }).pipe(
+        Effect.provideService(VerifiedCaller, {
+          writerId: null,
+          operationOwner: "test",
+        })
+      )
   );
 
   it.live(
@@ -404,7 +411,10 @@ describe("example RPC server", () => {
   it.live("reports slow-operation interruption through the RPC interface", () =>
     Effect.gen(function* reportSlowInterruption() {
       const server = yield* startExampleRpcServer();
-      const client = yield* makeExampleRpcClient(server.rpcUrl);
+      const session = yield* Effect.promise(
+        async () => await openOperationSession(server.url)
+      );
+      const client = yield* makeExampleRpcClient(server.rpcUrl, session.fetch);
 
       const slow = yield* client["diagnostics.slow"]({
         durationMs: 60_000,
@@ -429,14 +439,22 @@ describe("example RPC server", () => {
   it.live("finishes active client fibers before closing their RPC scope", () =>
     Effect.gen(function* disposeActiveClient() {
       const server = yield* startExampleRpcServer();
+      const session = yield* Effect.promise(
+        async () => await openOperationSession(server.url)
+      );
       const subject = yield* Effect.acquireRelease(
-        Effect.promise(async () => await startExampleRpcClient(server.rpcUrl)),
+        Effect.promise(
+          async () => await startExampleRpcClient(server.rpcUrl, session.fetch)
+        ),
         (client) =>
           Effect.promise(async () => {
             await client.dispose();
           }).pipe(Effect.orDie)
       );
-      const observer = yield* makeExampleRpcClient(server.rpcUrl);
+      const observer = yield* makeExampleRpcClient(
+        server.rpcUrl,
+        session.fetch
+      );
 
       const running = subject.runtime(
         subject.client["diagnostics.slow"]({
@@ -470,8 +488,17 @@ describe("example RPC server", () => {
   it.live("tracks interruptions from independently created clients", () =>
     Effect.gen(function* interruptIndependentClients() {
       const server = yield* startExampleRpcServer();
-      const firstClient = yield* makeExampleRpcClient(server.rpcUrl);
-      const secondClient = yield* makeExampleRpcClient(server.rpcUrl);
+      const session = yield* Effect.promise(
+        async () => await openOperationSession(server.url)
+      );
+      const firstClient = yield* makeExampleRpcClient(
+        server.rpcUrl,
+        session.fetch
+      );
+      const secondClient = yield* makeExampleRpcClient(
+        server.rpcUrl,
+        session.fetch
+      );
 
       const firstSlow = yield* firstClient["diagnostics.slow"]({
         durationMs: 60_000,

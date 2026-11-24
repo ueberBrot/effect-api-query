@@ -1,5 +1,8 @@
 import { exampleHttpApi, exampleRpcGroup } from "@effect-api-query/contracts";
-import { startExampleRpcClient } from "@effect-api-query/contracts/client";
+import {
+  makeExampleFetchLayer,
+  startExampleRpcClient,
+} from "@effect-api-query/contracts/client";
 import type { ExampleRpcClient } from "@effect-api-query/contracts/client";
 import type { QueryClient } from "@tanstack/react-query";
 import {
@@ -9,7 +12,6 @@ import {
 } from "@ueberbrot/effect-api-query";
 import type { RuntimeInput } from "@ueberbrot/effect-api-query";
 import { ManagedRuntime } from "effect";
-import { FetchHttpClient } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
 
 import { makeOwnerCache, ownerKeyPrefix } from "./owner-cache.ts";
@@ -58,6 +60,7 @@ export interface ViteReactApplication {
 export interface StartViteReactApplicationOptions {
   readonly rpcUrl: string;
   readonly httpBaseUrl?: string;
+  readonly fetch?: typeof globalThis.fetch;
   readonly identity?: ApplicationOwnerIdentity;
   readonly directoryStorage?: DirectoryStorage;
 }
@@ -72,6 +75,7 @@ export const startViteReactApplication = async ({
     permissionGeneration: 1,
   },
   directoryStorage,
+  fetch: applicationFetch,
 }: StartViteReactApplicationOptions): Promise<ViteReactApplication> => {
   const keyPrefix = ownerKeyPrefix(identity);
   const capturedIdentity = Object.freeze({
@@ -83,11 +87,11 @@ export const startViteReactApplication = async ({
   const lifecycle = await acquireQueryOwner(
     async (setup) => {
       const rpcClient = await setup.acquire(
-        async () => startExampleRpcClient(rpcUrl),
+        async () => startExampleRpcClient(rpcUrl, applicationFetch),
         async (acquired) => acquired.dispose()
       );
       const httpRuntime = await setup.acquire(
-        () => ManagedRuntime.make(FetchHttpClient.layer),
+        () => ManagedRuntime.make(makeExampleFetchLayer(applicationFetch)),
         async (acquired) => acquired.dispose()
       );
       const httpClient = await httpRuntime.runPromise(

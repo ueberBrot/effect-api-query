@@ -170,6 +170,13 @@ skills:
         source: examples/server/src/web-handler.ts
         priority: CRITICAL
         status: active
+      - mistake: Use an operation ID as proof of ownership
+        mechanism: Callers can choose the same command or diagnostic ID.
+        wrong_pattern: Look up a command or cancel diagnostics by ID alone.
+        correct_pattern: Scope records and pre-start reservations to the verified caller carried by the request.
+        source: examples/server/src/commands.ts
+        priority: HIGH
+        status: active
       - mistake: Dispose resources after native cancellation alone
         mechanism: Query settlement can precede local finalization. Accepted writes and preparation can still need the runtime.
         wrong_pattern: await queryClient.cancelQueries(); await runtime.dispose()

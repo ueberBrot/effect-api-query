@@ -56,6 +56,17 @@ export class ExampleAuthorization extends RpcMiddleware.Service<ExampleAuthoriza
   { error: ExampleAuthorizationError }
 ) {}
 
+export const operationSessionPath = "/api/demo-operations";
+
+export const OperationNotFound = Schema.Literal("operation-not-found");
+
+const operationLookupError = Schema.Union([
+  ExampleAuthorizationError,
+  OperationNotFound,
+]);
+
+const OperationId = { operationId: Schema.String };
+
 export class CommandStatus extends Schema.Class<
   CommandStatus,
   { readonly brand: unique symbol }
@@ -74,16 +85,25 @@ const CommandsStart = Rpc.make("commands.start", {
     ).pipe(Schema.withConstructorDefault(Effect.succeed(40))),
   },
   success: CommandStatus,
+  error: ExampleAuthorizationError,
+});
+
+const CommandsReserve = Rpc.make("commands.reserve", {
+  payload: OperationId,
+  success: Schema.Void,
+  error: ExampleAuthorizationError,
 });
 
 const CommandsStatus = Rpc.make("commands.status", {
-  payload: { operationId: Schema.String },
+  payload: OperationId,
   success: Schema.NullOr(CommandStatus),
+  error: operationLookupError,
 });
 
 const CommandsCancel = Rpc.make("commands.cancel", {
-  payload: { operationId: Schema.String },
+  payload: OperationId,
   success: CommandStatus,
+  error: operationLookupError,
 });
 
 export type CommandPayload = Rpc.Payload<typeof CommandsStart>;
@@ -129,12 +149,10 @@ const DiagnosticsSlow = Rpc.make("diagnostics.slow", {
       Schema.optionalKey,
       Schema.withConstructorDefault(Effect.succeed(60_000))
     ),
-    operationId: Schema.String.pipe(
-      Schema.optionalKey,
-      Schema.withConstructorDefault(Effect.succeed("anonymous"))
-    ),
+    operationId: Schema.optionalKey(Schema.String),
   },
   success: Schema.String,
+  error: ExampleAuthorizationError,
 });
 
 export type SlowDiagnosticInput = Rpc.PayloadConstructor<
@@ -142,9 +160,12 @@ export type SlowDiagnosticInput = Rpc.PayloadConstructor<
 >;
 
 const DiagnosticsCancel = Rpc.make("diagnostics.cancel", {
-  payload: { operationId: Schema.String },
+  payload: OperationId,
   success: Schema.Void,
+  error: operationLookupError,
 });
+
+const DiagnosticsPing = Rpc.make("diagnostics.ping", { success: Schema.Void });
 
 // oxlint-disable-next-line eslint/no-redeclare
 export const DiagnosticStatus = Schema.Struct({
@@ -156,11 +177,13 @@ export type DiagnosticStatus = typeof DiagnosticStatus.Type;
 
 const DiagnosticsStatusRpc = Rpc.make("diagnostics.status", {
   success: DiagnosticStatus,
+  error: ExampleAuthorizationError,
 });
 
 const DiagnosticsOperationStatus = Rpc.make("diagnostics.operationStatus", {
-  payload: { operationId: Schema.String },
+  payload: OperationId,
   success: DiagnosticStatus,
+  error: operationLookupError,
 });
 
 const DiagnosticsFail = Rpc.make("diagnostics.fail", {
@@ -175,6 +198,7 @@ const DiagnosticsStream = Rpc.make("diagnostics.stream", {
 
 export const exampleRpcGroup = RpcGroup.make(
   CommandsStart,
+  CommandsReserve,
   CommandsStatus,
   CommandsCancel,
   UsersGet,
@@ -186,6 +210,7 @@ export const exampleRpcGroup = RpcGroup.make(
   DiagnosticsCancel,
   DiagnosticsStatusRpc,
   DiagnosticsOperationStatus,
+  DiagnosticsPing,
   DiagnosticsFail,
   DiagnosticsStream
 );

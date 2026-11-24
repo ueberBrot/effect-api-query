@@ -1,3 +1,4 @@
+import { isOperationNotFound } from "@effect-api-query/shared/operation-errors.ts";
 import { ActionButton } from "@effect-api-query/shared/ui/action-button.tsx";
 import { EffectErrorDetails } from "@effect-api-query/shared/ui/effect-error-details.tsx";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -14,6 +15,7 @@ const Command = ({
 }) => {
   // oxlint-disable-next-line react/hook-use-state
   const [operationId] = useState(() => globalThis.crypto.randomUUID());
+  const [reserved, setReserved] = useState(false);
   const { rpcQuery, queryClient, trackMutationOptions } = application;
   const input = { operationId };
   const reconcile = async () => {
@@ -30,7 +32,13 @@ const Command = ({
   };
   const start = useMutation(
     trackMutationOptions(
-      rpcQuery.commands.start.mutationOptions({ onSettled: reconcile })
+      rpcQuery.commands.start.mutationOptions({
+        onMutate: async () => {
+          await rpcQuery.commands.reserve.call({ input });
+          setReserved(true);
+        },
+        onSettled: reconcile,
+      })
     )
   );
   const cancel = useMutation(
@@ -41,12 +49,13 @@ const Command = ({
   const status = useQuery(
     rpcQuery.commands.status.queryOptions({
       input,
-      enabled: start.status !== "idle",
+      enabled: reserved,
       refetchInterval: (query) =>
-        query.state.data?.state === "running" ||
-        query.state.status === "error" ||
-        query.state.data === undefined ||
-        (query.state.data === null && start.isPending)
+        !isOperationNotFound(query.state.error) &&
+        (query.state.data?.state === "running" ||
+          query.state.status === "error" ||
+          query.state.data === undefined ||
+          (query.state.data === null && start.isPending))
           ? 100
           : false,
     })
@@ -77,7 +86,7 @@ const Command = ({
           type="button"
           variant="secondary"
           disabled={
-            start.status === "idle" ||
+            !reserved ||
             cancel.isPending ||
             command?.state === "completed" ||
             command?.state === "cancelled"

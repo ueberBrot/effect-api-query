@@ -3,6 +3,7 @@ import {
   WorkflowPage,
 } from "@effect-api-query/shared/http-workflows/app.tsx";
 import { startHttpWorkflows } from "@effect-api-query/shared/http-workflows/application.ts";
+import { startOperationSession } from "@effect-api-query/shared/operation-session.ts";
 import { Result, Schema } from "effect";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
@@ -34,8 +35,10 @@ const startSelectedExample = async () => {
       dispose: application.dispose,
     };
   }
+  const sessionFetch = await startOperationSession(rpcUrl);
   const application = await startViteReactApplication({
     rpcUrl,
+    fetch: sessionFetch,
     httpBaseUrl,
     directoryStorage: globalThis.sessionStorage,
   });

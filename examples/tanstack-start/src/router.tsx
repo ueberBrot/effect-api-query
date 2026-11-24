@@ -1,3 +1,4 @@
+import { startOperationSession } from "@effect-api-query/shared/operation-session.ts";
 import { createRouter } from "@tanstack/react-router";
 import type { RouterHistory } from "@tanstack/react-router";
 import { createIsomorphicFn } from "@tanstack/react-start";
@@ -98,7 +99,13 @@ export const createTanStackStartRouter = async (
 
 const startApplication = createIsomorphicFn()
   .server(async () => await startRequestApplication(getRequest()))
-  .client(async () => await startTanStackStartApplication({ rpcUrl: "/rpc" }));
+  .client(async () => {
+    const sessionFetch = await startOperationSession("/rpc");
+    return await startTanStackStartApplication({
+      rpcUrl: "/rpc",
+      fetch: sessionFetch,
+    });
+  });
 
 export const getRouter = async () =>
   await createTanStackStartRouter({ application: await startApplication() });

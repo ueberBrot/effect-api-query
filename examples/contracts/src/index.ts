@@ -5,6 +5,8 @@ export {
   exampleRpcGroup,
   ExampleAuthorization,
   ExampleAuthorizationError,
+  OperationNotFound,
+  operationSessionPath,
   SeedUser,
   User,
   UserPage,

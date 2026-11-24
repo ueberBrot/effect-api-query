@@ -1,9 +1,9 @@
-import { Effect, Exit, Layer, ManagedRuntime, Predicate, Scope } from "effect";
+import { Effect, Exit, Layer, ManagedRuntime, Scope } from "effect";
 import { FetchHttpClient } from "effect/http";
 import type { RpcClientError, RpcGroup } from "effect/rpc";
 import { RpcClient, RpcSerialization } from "effect/rpc";
 
-import { exampleRpcGroup } from "./contracts.ts";
+import { exampleRpcGroup, OperationNotFound } from "./contracts.ts";
 
 export type ExampleRpcClient = RpcClient.RpcClient<
   RpcGroup.Rpcs<typeof exampleRpcGroup>,
@@ -19,27 +19,26 @@ export interface StartedExampleRpcClient {
   ) => Promise<Exit.Exit<A, E>>;
 }
 
+export const makeExampleFetchLayer = (fetch?: typeof globalThis.fetch) =>
+  fetch === undefined
+    ? FetchHttpClient.layer
+    : FetchHttpClient.layer.pipe(
+        Layer.provide(Layer.succeed(FetchHttpClient.Fetch, fetch))
+      );
+
 export const makeExampleRpcClient = Effect.fn(
   "ExampleRpc.makeExampleRpcClient"
-)(function* (rpcUrl: string) {
+)(function* (rpcUrl: string, fetch?: typeof globalThis.fetch) {
   const protocolLayer = RpcClient.layerProtocolHttp({ url: rpcUrl }).pipe(
     Layer.provide(RpcSerialization.layerJson),
-    Layer.provide(FetchHttpClient.layer)
+    Layer.provide(makeExampleFetchLayer(fetch))
   );
 
   const client = yield* RpcClient.make(exampleRpcGroup).pipe(
     Effect.provide(protocolLayer)
   );
-  let nextSlowOperation = 1;
   const slow: ExampleRpcClient["diagnostics.slow"] = (payload, options) => {
-    const suppliedOperationId = payload.operationId;
-    const operationId =
-      suppliedOperationId ??
-      `${globalThis.crypto.randomUUID()}-${String(nextSlowOperation)}`;
-
-    if (Predicate.isNullish(suppliedOperationId)) {
-      nextSlowOperation += 1;
-    }
+    const operationId = payload.operationId ?? globalThis.crypto.randomUUID();
 
     return client["diagnostics.slow"](
       { ...payload, operationId },
@@ -47,6 +46,10 @@ export const makeExampleRpcClient = Effect.fn(
     ).pipe(
       Effect.onInterrupt(() =>
         client["diagnostics.cancel"]({ operationId }).pipe(
+          Effect.catchIf(
+            (error) => error === OperationNotFound.literal,
+            () => Effect.void
+          ),
           Effect.ignoreCause({
             log: true,
             message: "Failed to cancel example slow operation",
@@ -60,7 +63,8 @@ export const makeExampleRpcClient = Effect.fn(
 });
 
 export const startExampleRpcClient = async (
-  rpcUrl: string
+  rpcUrl: string,
+  fetch?: typeof globalThis.fetch
 ): Promise<StartedExampleRpcClient> => {
   const clientScope = await Effect.runPromise(Scope.make());
   const runtime = ManagedRuntime.make(Layer.empty);
@@ -90,7 +94,7 @@ export const startExampleRpcClient = async (
 
   try {
     const client = await runtime.runPromise(
-      makeExampleRpcClient(rpcUrl).pipe(Scope.provide(clientScope))
+      makeExampleRpcClient(rpcUrl, fetch).pipe(Scope.provide(clientScope))
     );
     return {
       client,

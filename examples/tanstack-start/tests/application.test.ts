@@ -16,6 +16,7 @@ import {
 } from "vite-plus/test";
 
 import { makeExampleHost } from "../../server/src/web-handler.ts";
+import { openOperationSession } from "../../server/tests/fixtures/operation-session.ts";
 import { startTanStackStartApplication } from "../src/lib/application.ts";
 import type { TanStackStartApplication } from "../src/lib/application.ts";
 import { startServerApplication } from "../src/lib/server-application.ts";
@@ -29,8 +30,10 @@ describe("TanStack Start application ownership", () => {
     const server = await Effect.runPromise(
       startExampleRpcServer().pipe(Scope.provide(serverScope))
     );
+    const session = await openOperationSession(server.url);
     application = await startTanStackStartApplication({
       rpcUrl: server.rpcUrl,
+      fetch: session.fetch,
     });
   });
 
