@@ -211,7 +211,11 @@ test.describe("Vite React HTTP API example", () => {
     statusUrl.search = "";
     const status = await page.request.get(statusUrl.toString());
     expect(status.ok()).toBe(true);
-    expect(await status.json()).toEqual({ started: 1, interrupted: 0 });
+    expect(await status.json()).toEqual({
+      started: 1,
+      interrupted: 0,
+      completed: 0,
+    });
     await expect(
       http.getByRole("button", { name: "Cancel HTTP query" })
     ).toBeEnabled();

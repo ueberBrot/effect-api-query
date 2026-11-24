@@ -168,4 +168,45 @@ test.describe("plain Vite React application", () => {
     await expect(second.getByText("Progress: 40 / 40")).toBeVisible();
     await expect(first.getByText(/^Progress:/u)).toHaveText(stoppedProgress);
   });
+
+  test("backs off command status requests and recovers on manual refresh", async ({
+    page,
+  }) => {
+    const attempts: number[] = [];
+    let statusAvailable = false;
+    await page.route("**/rpc/", async (route) => {
+      if (!recordsRpc(route.request().postData(), "commands.status")) {
+        await route.continue();
+        return;
+      }
+      attempts.push(performance.now());
+      await (statusAvailable
+        ? route.continue()
+        : route.fulfill({ status: 503 }));
+    });
+
+    const command = page.getByRole("region", {
+      name: "Command 1",
+      exact: true,
+    });
+    await command.getByRole("button", { name: "Start command" }).click();
+    const refresh = command.getByRole("button", { name: "Refresh status" });
+    await expect(refresh).toBeEnabled();
+    expect(attempts).toHaveLength(4);
+    const intervals = attempts
+      .slice(1)
+      .map((time, index) => time - (attempts[index] ?? time));
+    expect(intervals[0]).toBeGreaterThanOrEqual(200);
+    expect(intervals[1]).toBeGreaterThanOrEqual(450);
+    expect(intervals[2]).toBeGreaterThanOrEqual(900);
+
+    await expect(command.getByText("Start mutation: success")).toBeVisible();
+    expect(attempts).toHaveLength(4);
+
+    statusAvailable = true;
+    await refresh.click();
+    await expect(command.getByText("Server state: completed")).toBeVisible();
+    await expect(refresh).toHaveCount(0);
+    expect(attempts).toHaveLength(5);
+  });
 });

@@ -17,6 +17,7 @@ sources:
   - "e2e/example-host.ts"
   - "e2e/tanstack-start-http.spec.ts"
   - "e2e/vite-http.spec.ts"
+  - "e2e/vite-react.spec.ts"
   - "src/**/*.ts"
   - "src/react/index.tsx"
   - "tsconfig.declarations.json"

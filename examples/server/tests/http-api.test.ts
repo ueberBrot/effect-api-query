@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 
 import {
+  DiagnosticOperationStatus,
   DiagnosticStatus,
   exampleHttpApi,
   User,
@@ -397,7 +398,7 @@ describe("example HTTP API", () => {
             { signal }
           );
           const json: unknown = await response.json();
-          return Schema.decodeUnknownSync(DiagnosticStatus)(json);
+          return Schema.decodeUnknownSync(DiagnosticOperationStatus)(json);
         };
         const rpcSlow = yield* rpc["diagnostics.slow"]({
           durationMs: 60_000,
@@ -422,8 +423,8 @@ describe("example HTTP API", () => {
               http: await readStatus("http-panel", signal),
             }))
             .toStrictEqual({
-              rpc: { started: 1, interrupted: 0 },
-              http: { started: 1, interrupted: 0 },
+              rpc: { started: 1, interrupted: 0, completed: 0 },
+              http: { started: 1, interrupted: 0, completed: 0 },
             });
         });
         yield* rpc["diagnostics.cancel"]({ operationId: "rpc-panel" });
@@ -437,8 +438,8 @@ describe("example HTTP API", () => {
           ),
         }).toStrictEqual({
           rpcFailed: true,
-          rpc: { started: 1, interrupted: 1 },
-          http: { started: 1, interrupted: 0 },
+          rpc: { started: 1, interrupted: 1, completed: 0 },
+          http: { started: 1, interrupted: 0, completed: 0 },
         });
         controller.abort();
         expect(yield* Effect.promise(async () => await httpSlow)).toBe(
@@ -447,7 +448,7 @@ describe("example HTTP API", () => {
         yield* Effect.promise(async () => {
           await expect
             .poll(async ({ signal }) => await readStatus("http-panel", signal))
-            .toStrictEqual({ started: 1, interrupted: 1 });
+            .toStrictEqual({ started: 1, interrupted: 1, completed: 0 });
         });
         // oxlint-disable-next-line unicorn/no-useless-undefined
         const beforeReset = yield* rpc["diagnostics.status"](undefined);

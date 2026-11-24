@@ -1,4 +1,7 @@
-import { operationSessionPath } from "@effect-api-query/contracts";
+import {
+  DiagnosticOperationStatus,
+  operationSessionPath,
+} from "@effect-api-query/contracts";
 import { makeExampleRpcClient } from "@effect-api-query/contracts/client";
 import { expect } from "@playwright/test";
 import { Effect, Schema } from "effect";
@@ -400,14 +403,11 @@ test.describe("TanStack Start HTTP API example", () => {
         .poll(async () => {
           const response = await page.request.get(statusUrl);
           expect(response.ok()).toBe(true);
-          return Schema.decodeUnknownSync(
-            Schema.Struct({
-              interrupted: Schema.Int,
-              started: Schema.Int,
-            })
-          )(await response.json());
+          return Schema.decodeUnknownSync(DiagnosticOperationStatus)(
+            await response.json()
+          );
         })
-        .toEqual({ started: 1, interrupted: 1 });
+        .toEqual({ started: 1, interrupted: 1, completed: 0 });
       expect(statusRequests).toBe(requestsAfterNavigation);
     });
   }

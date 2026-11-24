@@ -6,6 +6,8 @@ import { useState } from "react";
 
 import type { ViteReactApplication } from "../../lib/application.ts";
 
+const statusRetryLimit = 3;
+
 const Command = ({
   application,
   number,
@@ -18,17 +20,27 @@ const Command = ({
   const [reserved, setReserved] = useState(false);
   const { rpcQuery, queryClient, trackMutationOptions } = application;
   const input = { operationId };
+  const statusKey = rpcQuery.commands.status.queryKey({ input });
   const reconcile = async () => {
-    if (!application.isActive()) {
+    const previous = queryClient.getQueryState(statusKey);
+    if (!application.isActive() || previous?.status === "error") {
       return;
     }
-    await queryClient.invalidateQueries(
-      rpcQuery.commands.status.queryFilter({
-        view: "query",
-        input,
-        exact: true,
-      })
-    );
+    const filter = { queryKey: statusKey, exact: true } as const;
+    await queryClient.invalidateQueries(filter, { cancelRefetch: false });
+    const latest = queryClient.getQueryState(statusKey);
+    if (
+      previous?.fetchStatus === "fetching" &&
+      latest?.fetchStatus === "idle" &&
+      latest.status === "success" &&
+      latest.data === null &&
+      application.isActive()
+    ) {
+      await queryClient.refetchQueries(
+        { ...filter, type: "active" },
+        { cancelRefetch: false }
+      );
+    }
   };
   const start = useMutation(
     trackMutationOptions(
@@ -50,10 +62,15 @@ const Command = ({
     rpcQuery.commands.status.queryOptions({
       input,
       enabled: reserved,
+      retry: (failureCount, error) =>
+        failureCount < statusRetryLimit && !isOperationNotFound(error),
+      retryDelay: (attempt) => 250 * 2 ** attempt,
+      refetchOnWindowFocus: (query) => query.state.status !== "error",
+      refetchOnReconnect: (query) => query.state.status !== "error",
       refetchInterval: (query) =>
-        !isOperationNotFound(query.state.error) &&
+        query.state.status !== "error" &&
+        query.state.fetchStatus === "idle" &&
         (query.state.data?.state === "running" ||
-          query.state.status === "error" ||
           query.state.data === undefined ||
           (query.state.data === null && start.isPending))
           ? 100
@@ -97,6 +114,18 @@ const Command = ({
         >
           Cancel command
         </ActionButton>
+        {status.isError && !isOperationNotFound(status.error) && (
+          <ActionButton
+            type="button"
+            variant="secondary"
+            disabled={status.fetchStatus !== "idle"}
+            onClick={() => {
+              void status.refetch();
+            }}
+          >
+            Refresh status
+          </ActionButton>
+        )}
       </div>
       <p>Start mutation: {start.status}</p>
       <p>Cancel mutation: {cancel.status}</p>

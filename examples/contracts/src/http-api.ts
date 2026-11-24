@@ -9,6 +9,7 @@ import {
 
 import {
   DiagnosticFailure,
+  DiagnosticOperationStatus,
   DiagnosticStatus,
   ExampleAuthorizationError,
   OperationNotFound,
@@ -78,7 +79,7 @@ const diagnostics = HttpApiGroup.make("diagnostics").add(
     "/diagnostics/operations/:operationId",
     {
       params: { operationId: Schema.String },
-      success: DiagnosticStatus,
+      success: DiagnosticOperationStatus,
       error: [unauthorized, OperationNotFound.pipe(HttpApiSchema.status(404))],
     }
   ),

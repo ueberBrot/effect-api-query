@@ -122,7 +122,7 @@ describe("example operation ownership", () => {
                 const status: unknown = await response.json();
                 return status;
               })
-              .toStrictEqual({ started: 1, interrupted: 0 });
+              .toStrictEqual({ started: 1, interrupted: 0, completed: 0 });
           });
         yield* waitForStart(first.fetch);
         const missing = yield* Effect.promise(
@@ -156,7 +156,7 @@ describe("example operation ownership", () => {
             otherStatus: yield* b["diagnostics.operationStatus"](input),
           }).toStrictEqual({
             interrupted: true,
-            otherStatus: { started: 1, interrupted: 0 },
+            otherStatus: { started: 1, interrupted: 0, completed: 0 },
           });
         } finally {
           controller.abort();
