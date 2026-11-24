@@ -6,7 +6,11 @@ import {
   timingSafeEqual,
 } from "node:crypto";
 
-import { ExampleAuthorizationError } from "@effect-api-query/contracts";
+import {
+  ExampleAuthorizationError,
+  InvalidOperationInput,
+  OperationId,
+} from "@effect-api-query/contracts";
 import { Context, Effect, Option, Schema } from "effect";
 import type { Clock } from "effect";
 import { Cookies } from "effect/http";
@@ -40,6 +44,18 @@ export const requireOperationOwner = Effect.gen(function* () {
     return yield* missingAuthorization();
   }
   return caller.operationOwner;
+});
+
+const validOperationId = Schema.is(OperationId);
+
+export const requireOperationOwnerFor = Effect.fnUntraced(function* (
+  operationId: string
+) {
+  const owner = yield* requireOperationOwner;
+  if (!validOperationId(operationId)) {
+    return yield* Effect.fail(InvalidOperationInput.literal);
+  }
+  return owner;
 });
 
 const writeCookie = "example-write-session";

@@ -57,6 +57,7 @@ export type SlowQueryCancellationState =
   | { readonly _tag: "Ready" }
   | { readonly _tag: "Cancelling" }
   | { readonly _tag: "Completed" }
+  | { readonly _tag: "OutcomeUnavailable" }
   | { readonly _tag: "Cancelled"; readonly interruptions: number }
   | { readonly _tag: "Failed"; readonly error: unknown };
 
@@ -78,6 +79,9 @@ export const describeSlowQueryCancellation = (
     }
     case "Completed": {
       return "Slow query completed";
+    }
+    case "OutcomeUnavailable": {
+      return "Server outcome is no longer available";
     }
     case "Cancelled": {
       return `Server interruptions: ${String(state.interruptions)}`;
@@ -291,7 +295,12 @@ export const useSlowQueryCancellation = (
           : { _tag: "Completed" }
       );
     } catch (error) {
-      finish(run, { _tag: "Failed", error });
+      finish(
+        run,
+        isOperationNotFound(error)
+          ? { _tag: "OutcomeUnavailable" }
+          : { _tag: "Failed", error }
+      );
     }
   };
 

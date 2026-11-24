@@ -8,10 +8,14 @@ import {
 } from "effect/http-api";
 
 import {
+  DiagnosticDuration,
   DiagnosticFailure,
   DiagnosticOperationStatus,
   DiagnosticStatus,
   ExampleAuthorizationError,
+  InvalidOperationInput,
+  OperationCapacityExceeded,
+  OperationId,
   OperationNotFound,
   User,
   UserIdentity,
@@ -61,6 +65,8 @@ const users = HttpApiGroup.make("users").add(
   })
 );
 
+const invalidOperation = InvalidOperationInput.pipe(HttpApiSchema.status(400));
+
 const diagnostics = HttpApiGroup.make("diagnostics").add(
   HttpApiEndpoint.get("fail", "/diagnostics/fail", {
     success: Schema.Never,
@@ -68,21 +74,27 @@ const diagnostics = HttpApiGroup.make("diagnostics").add(
   }),
   HttpApiEndpoint.post("slow", "/diagnostics/slow", {
     query: {
-      durationMs: Schema.Int.check(
-        Schema.isBetween({ minimum: 0, maximum: 60_000 })
-      ),
-      operationId: Schema.String,
+      durationMs: DiagnosticDuration,
+      operationId: OperationId,
     },
     success: Schema.String,
-    error: unauthorized,
+    error: [
+      unauthorized,
+      invalidOperation,
+      OperationCapacityExceeded.pipe(HttpApiSchema.status(503)),
+    ],
   }),
   HttpApiEndpoint.get(
     "operationStatus",
     "/diagnostics/operations/:operationId",
     {
-      params: { operationId: Schema.String },
+      params: { operationId: OperationId },
       success: DiagnosticOperationStatus,
-      error: [unauthorized, OperationNotFound.pipe(HttpApiSchema.status(404))],
+      error: [
+        unauthorized,
+        invalidOperation,
+        OperationNotFound.pipe(HttpApiSchema.status(404)),
+      ],
     }
   ),
   HttpApiEndpoint.get("status", "/diagnostics/status", {

@@ -1,11 +1,16 @@
 // @vitest-environment jsdom
 
+import { OperationNotFound } from "@effect-api-query/contracts";
 import type { DiagnosticOperationStatus } from "@effect-api-query/contracts";
 import { useSlowQueryCancellation } from "@effect-api-query/shared/use-slow-query-cancellation.ts";
 import { QueryClient } from "@tanstack/react-query";
 import type { QueryFunctionContext } from "@tanstack/react-query";
 import { act, cleanup, renderHook, waitFor } from "@testing-library/react";
-import { Deferred, Effect } from "effect";
+import {
+  EffectHttpApiQueryError,
+  EffectRpcQueryError,
+} from "@ueberbrot/effect-api-query";
+import { Cause, Deferred, Effect } from "effect";
 import { afterEach, describe, expect, it } from "vite-plus/test";
 
 interface SlowInput {
@@ -24,7 +29,7 @@ const makeApplication = ({
 }: {
   readonly readStatus?: (
     status: DiagnosticOperationStatus
-  ) => Effect.Effect<DiagnosticOperationStatus>;
+  ) => Effect.Effect<DiagnosticOperationStatus, Error>;
   readonly isActive?: () => boolean;
   readonly slowResult?: Effect.Effect<string, Error>;
 } = {}) => {
@@ -193,6 +198,53 @@ describe("shared slow-query cancellation lifetime", () => {
           await hook.result.current.cancel();
         });
         expect(hook.result.current.state).toStrictEqual({ _tag: "Completed" });
+        expect(hook.result.current.canStart).toBe(true);
+        expect(hook.result.current.canCancel).toBe(false);
+      } finally {
+        hook.unmount();
+        await application.queryClient.cancelQueries();
+        application.queryClient.clear();
+      }
+    }
+  );
+
+  it.each(["rpc", "http"] as const)(
+    "can start again when the %s cancellation outcome is no longer retained",
+    async (transport) => {
+      let retained = true;
+      const cause = Cause.fail(OperationNotFound.literal);
+      const missing =
+        transport === "rpc"
+          ? new EffectRpcQueryError(
+              "diagnostics.operationStatus",
+              "call",
+              cause
+            )
+          : new EffectHttpApiQueryError(
+              {
+                apiId: "ExampleApi",
+                groupId: "diagnostics",
+                endpoint: "operationStatus",
+                method: "GET",
+              },
+              "call",
+              cause
+            );
+      const { application } = makeApplication({
+        readStatus: (status) =>
+          retained ? Effect.succeed(status) : Effect.fail(missing),
+      });
+      const hook = renderHook(() =>
+        useSlowQueryCancellation(application, transport)
+      );
+      try {
+        await act(hook.result.current.start);
+        expect(hook.result.current.canCancel).toBe(true);
+        retained = false;
+        await act(hook.result.current.cancel);
+        expect(hook.result.current.state).toStrictEqual({
+          _tag: "OutcomeUnavailable",
+        });
         expect(hook.result.current.canStart).toBe(true);
         expect(hook.result.current.canCancel).toBe(false);
       } finally {

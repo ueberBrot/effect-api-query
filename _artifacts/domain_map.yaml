@@ -193,6 +193,13 @@ skills:
         source: examples/server/src/commands.ts
         priority: HIGH
         status: active
+      - mistake: Assume an example operation record survives indefinitely
+        mechanism: The host caps inactive command and diagnostic history while keeping running work addressable and retaining pre-start cancellations with their reservations.
+        wrong_pattern: Retry a missing command with its old ID and assume the original result will be reused.
+        correct_pattern: Treat idempotent starts as a guarantee while the command record is retained. Keep admission and retention in the host's application state.
+        source: examples/server/src/operation-limits.ts
+        priority: HIGH
+        status: active
       - mistake: Keep polling command status at the healthy interval after repeated failures
         mechanism: Each interval starts a new fetch and can reset its retry budget.
         wrong_pattern: Return the healthy polling interval for an errored status query.

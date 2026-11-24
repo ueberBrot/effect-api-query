@@ -65,18 +65,36 @@ export const operationSessionPath = "/api/demo-operations";
 
 export const OperationNotFound = Schema.Literal("operation-not-found");
 
+export const InvalidOperationInput = Schema.Literal("invalid-operation-input");
+export const OperationCapacityExceeded = Schema.Literal(
+  "operation-capacity-exceeded"
+);
+
+const operationInputErrors = [ExampleAuthorizationError, InvalidOperationInput];
 const operationLookupError = Schema.Union([
-  ExampleAuthorizationError,
+  ...operationInputErrors,
   OperationNotFound,
 ]);
+const operationAdmissionError = Schema.Union([
+  ...operationInputErrors,
+  OperationCapacityExceeded,
+]);
 
-const OperationId = { operationId: Schema.String };
+export const OperationId = Schema.String.check(Schema.isMaxLength(100));
+export const CommandSteps = Schema.Int.check(
+  Schema.isBetween({ minimum: 1, maximum: 100 })
+);
+export const maxDiagnosticDurationMs = 60_000;
+export const DiagnosticDuration = Schema.Int.check(
+  Schema.isBetween({ minimum: 0, maximum: maxDiagnosticDurationMs })
+);
+const operationIdPayload = { operationId: OperationId };
 
 export class CommandStatus extends Schema.Class<
   CommandStatus,
   { readonly brand: unique symbol }
 >("CommandStatus")({
-  operationId: Schema.String,
+  operationId: OperationId,
   state: Schema.Literals(["running", "completed", "cancelled"]),
   completedSteps: Schema.Int,
   totalSteps: Schema.Int,
@@ -84,29 +102,27 @@ export class CommandStatus extends Schema.Class<
 
 const CommandsStart = Rpc.make("commands.start", {
   payload: {
-    operationId: Schema.String,
-    steps: Schema.Int.check(
-      Schema.isBetween({ minimum: 1, maximum: 100 })
-    ).pipe(Schema.withConstructorDefault(Effect.succeed(40))),
+    ...operationIdPayload,
+    steps: CommandSteps.pipe(Schema.withConstructorDefault(Effect.succeed(40))),
   },
   success: CommandStatus,
-  error: ExampleAuthorizationError,
+  error: operationAdmissionError,
 });
 
 const CommandsReserve = Rpc.make("commands.reserve", {
-  payload: OperationId,
+  payload: operationIdPayload,
   success: Schema.Void,
-  error: ExampleAuthorizationError,
+  error: operationAdmissionError,
 });
 
 const CommandsStatus = Rpc.make("commands.status", {
-  payload: OperationId,
+  payload: operationIdPayload,
   success: Schema.NullOr(CommandStatus),
   error: operationLookupError,
 });
 
 const CommandsCancel = Rpc.make("commands.cancel", {
-  payload: OperationId,
+  payload: operationIdPayload,
   success: CommandStatus,
   error: operationLookupError,
 });
@@ -150,14 +166,14 @@ const UsersDelete = Rpc.make("users.delete", {
 
 const DiagnosticsSlow = Rpc.make("diagnostics.slow", {
   payload: {
-    durationMs: Schema.Int.pipe(
+    durationMs: DiagnosticDuration.pipe(
       Schema.optionalKey,
-      Schema.withConstructorDefault(Effect.succeed(60_000))
+      Schema.withConstructorDefault(Effect.succeed(maxDiagnosticDurationMs))
     ),
-    operationId: Schema.optionalKey(Schema.String),
+    operationId: Schema.optionalKey(OperationId),
   },
   success: Schema.String,
-  error: ExampleAuthorizationError,
+  error: operationAdmissionError,
 });
 
 export type SlowDiagnosticInput = Rpc.PayloadConstructor<
@@ -165,7 +181,7 @@ export type SlowDiagnosticInput = Rpc.PayloadConstructor<
 >;
 
 const DiagnosticsCancel = Rpc.make("diagnostics.cancel", {
-  payload: OperationId,
+  payload: operationIdPayload,
   success: Schema.Void,
   error: operationLookupError,
 });
@@ -194,7 +210,7 @@ const DiagnosticsStatusRpc = Rpc.make("diagnostics.status", {
 });
 
 const DiagnosticsOperationStatus = Rpc.make("diagnostics.operationStatus", {
-  payload: OperationId,
+  payload: operationIdPayload,
   success: DiagnosticOperationStatus,
   error: operationLookupError,
 });

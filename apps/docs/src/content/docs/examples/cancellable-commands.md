@@ -81,7 +81,7 @@ start.mutate(input);
 cancel.mutate(input);
 ```
 
-Disable Start while it is pending or once the server accepts the command. If Start fails or the response is uncertain, reuse the same ID so a retry cannot create another command. Disable Cancel until `reserved` is true, during cancellation, and after terminal status. See the [complete panel](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/components/sections/commands-section.tsx).
+Disable Start while it is pending or once the server accepts the command. If Start fails or the response is uncertain, reuse the same ID while the server still retains the record. Disable Cancel until `reserved` is true, during cancellation, and after terminal status. See the [complete panel](https://github.com/ueberBrot/effect-api-query/blob/main/examples/vite-react/src/components/sections/commands-section.tsx).
 
 The cancel handler signals the worker and waits for it to stop. Both mutations reconcile the active status query in `onSettled` while automatic status recovery is available. If reconciliation joins an in-flight request and that request only reports the reservation, read status again after the mutation response. Poll while the command runs or status is unresolved. Stop at terminal status, a missing operation, or when Start has settled and only the reservation remains.
 
@@ -100,8 +100,10 @@ Start serves the same handlers at `/rpc`. Use `application.rpcQuery.commands` wi
 | Call `commands.cancel` | Requests cooperative cancellation for a command owned by the verified caller and waits for a terminal state. |
 | Compensate committed work | Requires a separate application operation that reverses or offsets prior effects. |
 
-Transport interruption requires transport support. The slow-query demo explicitly calls `diagnostics.cancel` when its local Effect is interrupted. Define an operation like this if the server needs an explicit cancellation request. The example checks completion and interruption counts for that run so a Cancel click during response delivery can still report that the server finished.
+Transport interruption requires transport support. The slow-query demo explicitly calls `diagnostics.cancel` when its local Effect is interrupted. Define an operation like this if the server needs an explicit cancellation request. The example checks completion and interruption counts for that run so a Cancel click during response delivery can still report that the server finished. If the status record has already been evicted, the panel reports that the server outcome is unavailable and lets the caller start a new run.
 
-The server Scope owns the workers, which can continue after a view unmounts. Cancelling stops future steps and keeps completed steps. If work already finished, cancel returns its completed result. A duplicate Start returns the existing result. After reservation, Cancel can arrive before Start and settle the command as cancelled. Looking up or cancelling an unknown command returns `operation-not-found`.
+The server Scope owns the workers, which can continue after a view unmounts. Cancelling stops future steps and keeps completed steps. If the server still has the record, Cancel returns its terminal result and a duplicate Start reuses the same work. After reservation, Cancel can arrive before Start and settle the command as cancelled. Looking up or cancelling a missing record returns `operation-not-found`.
 
-The demo keeps records in memory until reset or shutdown. If records must survive restarts, add authorization, durable storage, and a retention policy.
+The example admits up to eight running commands per caller and 32 per host. Operation IDs can contain up to 100 characters. Reservations have their own capacity of eight per caller and 256 per host. A cancellation before Start stays in its reservation slot until Start arrives or the reservation expires two hours after creation. A new start or reservation at capacity returns `operation-capacity-exceeded`.
+
+Running commands stay available through settlement. The host retains the 256 newest terminal records. Once a terminal record is evicted, starting its ID again can create a new command. Reset and shutdown clear the in-memory records. If records must survive restarts, add authorization, durable storage, and a retention policy.
