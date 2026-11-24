@@ -1,4 +1,4 @@
-import { QueryClient } from "@tanstack/query-core";
+import { dehydrate, QueryClient } from "@tanstack/query-core";
 import {
   Context,
   Effect,
@@ -9,10 +9,17 @@ import {
   Schema,
   Scope,
 } from "effect";
-import { HttpServer } from "effect/http";
+import {
+  HttpClient,
+  HttpClientRequest,
+  HttpClientResponse,
+  HttpServer,
+  HttpServerRequest,
+} from "effect/http";
 import {
   HttpApi,
   HttpApiBuilder,
+  HttpApiClient,
   HttpApiEndpoint,
   HttpApiGroup,
   HttpApiSchema,
@@ -24,6 +31,10 @@ import { createHttpApiQueryUtils } from "#effect-api-query";
 import type { JsonValue } from "#effect-api-query";
 
 import { makeUnusedHttpClient } from "./fixtures/http-client";
+
+const expectMissingEncoder = (build: () => void) => {
+  expect(build).toThrow(expect.objectContaining({ code: "MissingKeyEncoder" }));
+};
 
 const api = HttpApi.make("keys").add(
   HttpApiGroup.make("requests").add(
@@ -779,6 +790,463 @@ describe("HTTP semantic keys", () => {
         /* oxlint-enable anti-slop/no-unknown-parameters, anti-slop/require-safety-comment-for-type-assertion */
         expect(received).toBe(input);
       }
+    }
+  });
+
+  it("requires custom key encoders for fields annotated with HttpApi.RedactedNames across API, group, and endpoint levels", async () => {
+    const apiHeaderOnly = HttpApi.make("api-header-only")
+      .annotate(HttpApi.RedactedNames, { headers: ["x-api-token"] })
+      .add(
+        HttpApiGroup.make("g").add(
+          HttpApiEndpoint.get("read", "/read", {
+            headers: { "X-Api-Token": Schema.String },
+          })
+        )
+      );
+    const groupQueryOnly = HttpApi.make("group-query-only").add(
+      HttpApiGroup.make("g")
+        .annotate(HttpApi.RedactedNames, { query: ["buildargs"] })
+        .add(
+          HttpApiEndpoint.get("read", "/read", {
+            query: {
+              buildargs: Schema.Struct({ NPM_TOKEN: Schema.String }),
+            },
+          })
+        )
+    );
+    const endpointRegexOnly = HttpApi.make("endpoint-regex-only").add(
+      HttpApiGroup.make("g").add(
+        HttpApiEndpoint.get("read", "/read", {
+          query: { nested: Schema.Struct({ secret_key: Schema.String }) },
+        }).annotate(HttpApi.RedactedNames, { query: [/secret/iu] })
+      )
+    );
+    const combinedLayers = HttpApi.make("combined-layers")
+      .annotate(HttpApi.RedactedNames, { headers: ["x-api-token"] })
+      .add(
+        HttpApiGroup.make("g")
+          .annotate(HttpApi.RedactedNames, { query: ["other"] })
+          .add(
+            HttpApiEndpoint.get("read", "/read", {
+              headers: { "x-api-token": Schema.String },
+            })
+          )
+      );
+    const getPayloadRedacted = HttpApi.make("get-payload-redacted")
+      .annotate(HttpApi.RedactedNames, { query: ["token"] })
+      .add(
+        HttpApiGroup.make("g").add(
+          HttpApiEndpoint.get("read", "/read", {
+            payload: { token: Schema.String },
+          })
+        )
+      );
+    const openRecordRedacted = HttpApi.make("open-record-redacted")
+      .annotate(HttpApi.RedactedNames, { headers: ["x-api-token"] })
+      .add(
+        HttpApiGroup.make("g").add(
+          HttpApiEndpoint.get("read", "/read", {
+            headers: Schema.Record(Schema.String, Schema.String),
+          })
+        )
+      );
+
+    expectMissingEncoder(() => {
+      createHttpApiQueryUtils(apiHeaderOnly, {
+        client: Effect.runSync(makeUnusedHttpClient(apiHeaderOnly)),
+        keyPrefix: ["test"],
+      });
+    });
+    expectMissingEncoder(() => {
+      createHttpApiQueryUtils(groupQueryOnly, {
+        client: Effect.runSync(makeUnusedHttpClient(groupQueryOnly)),
+        keyPrefix: ["test"],
+      });
+    });
+    expectMissingEncoder(() => {
+      createHttpApiQueryUtils(endpointRegexOnly, {
+        client: Effect.runSync(makeUnusedHttpClient(endpointRegexOnly)),
+        keyPrefix: ["test"],
+      });
+    });
+    expectMissingEncoder(() => {
+      createHttpApiQueryUtils(combinedLayers, {
+        client: Effect.runSync(makeUnusedHttpClient(combinedLayers)),
+        keyPrefix: ["test"],
+      });
+    });
+    expectMissingEncoder(() => {
+      createHttpApiQueryUtils(getPayloadRedacted, {
+        client: Effect.runSync(makeUnusedHttpClient(getPayloadRedacted)),
+        keyPrefix: ["test"],
+      });
+    });
+    expectMissingEncoder(() => {
+      createHttpApiQueryUtils(openRecordRedacted, {
+        client: Effect.runSync(makeUnusedHttpClient(openRecordRedacted)),
+        keyPrefix: ["test"],
+      });
+    });
+
+    const apiContract = HttpApi.make("redacted-names")
+      .annotate(HttpApi.RedactedNames, {
+        headers: ["x-api-token"],
+        query: ["token"],
+      })
+      .add(
+        HttpApiGroup.make("scoped")
+          .annotate(HttpApi.RedactedNames, {
+            headers: [/^x-group-secret-/iu],
+            query: ["buildargs"],
+          })
+          .add(
+            HttpApiEndpoint.get("publicList", "/public", {
+              query: { page: Schema.FiniteFromString },
+              success: Schema.String,
+            }),
+            HttpApiEndpoint.get("apiHeader", "/api-header", {
+              headers: { "x-api-token": Schema.String, locale: Schema.String },
+              success: Schema.String,
+            }),
+            HttpApiEndpoint.get("groupQuery", "/group-query", {
+              query: { token: Schema.String, tag: Schema.String },
+              success: Schema.String,
+            }),
+            HttpApiEndpoint.get("endpointQuery", "/endpoint-query", {
+              query: { secret_key: Schema.String },
+              success: Schema.String,
+            }).annotate(HttpApi.RedactedNames, { query: [/secret/iu] }),
+            HttpApiEndpoint.get("getPayload", "/get-payload", {
+              payload: { token: Schema.String, label: Schema.String },
+              success: Schema.String,
+            }),
+            HttpApiEndpoint.get("dynamicHeaders", "/dynamic-headers", {
+              headers: Schema.Record(Schema.String, Schema.String),
+              success: Schema.String,
+            })
+          )
+      );
+
+    let receivedHeaderSecret: string | undefined;
+    let receivedQuerySecret: string | undefined;
+    const handlers = HttpApiBuilder.group(apiContract, "scoped", (group) =>
+      group
+        .handle("publicList", ({ query }) =>
+          Effect.succeed(`page:${query.page}`)
+        )
+        .handle("apiHeader", ({ headers }) => {
+          receivedHeaderSecret = headers["x-api-token"];
+          return Effect.succeed(`${headers.locale}:ok`);
+        })
+        .handle("groupQuery", ({ query }) => {
+          receivedQuerySecret = query.token;
+          return Effect.succeed(`${query.tag}:ok`);
+        })
+        .handle("endpointQuery", ({ query }) =>
+          Effect.succeed(query.secret_key)
+        )
+        .handle("getPayload", ({ payload }) =>
+          Effect.succeed(`${payload.label}:${payload.token}`)
+        )
+        .handle("dynamicHeaders", ({ headers }) =>
+          Effect.succeed(headers["x-group-secret-key"] ?? "none")
+        )
+    );
+    const scope = Scope.makeUnsafe();
+    const client = await Effect.runPromise(
+      HttpApiTest.groups(apiContract, ["scoped"]).pipe(
+        Effect.provide(Layer.mergeAll(handlers, HttpServer.layerServices)),
+        Effect.provideService(Scope.Scope, scope)
+      )
+    );
+    let receivedTransportSecret: string | undefined;
+    const transportApi = HttpApi.make("transport-auth")
+      .annotate(HttpApi.RedactedNames, { headers: ["x-api-token"] })
+      .add(
+        HttpApiGroup.make("scoped").add(
+          HttpApiEndpoint.get("publicList", "/public", {
+            query: { page: Schema.FiniteFromString },
+            success: Schema.String,
+          })
+        )
+      );
+    const transportClient = await Effect.runPromise(
+      HttpApiClient.makeWith(transportApi, {
+        baseUrl: "https://example.test",
+        httpClient: HttpClient.make((request) =>
+          Effect.sync(() => {
+            receivedTransportSecret = request.headers["x-api-token"];
+            return HttpClientResponse.fromWeb(request, Response.json("page:2"));
+          })
+        ).pipe(
+          HttpClient.mapRequest((request) =>
+            HttpClientRequest.setHeader(
+              request,
+              "x-api-token",
+              "transport-injected-secret"
+            )
+          )
+        ),
+      })
+    );
+    const transportHttp = createHttpApiQueryUtils(transportApi, {
+      client: transportClient,
+      keyPrefix: ["transport"],
+    });
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { staleTime: Infinity, retry: false } },
+    });
+    try {
+      const http = createHttpApiQueryUtils(apiContract, {
+        client,
+        keyPrefix: ["redacted"],
+        keyEncoders: {
+          scoped: {
+            apiHeader: ({ headers }) => ({ locale: headers.locale }),
+            groupQuery: ({ query }) => ({ tag: query.tag }),
+            endpointQuery: () => ({ scope: "redacted" }),
+            getPayload: ({ payload }) => ({ label: payload.label }),
+            dynamicHeaders: () => ({ scope: "dynamic" }),
+          },
+        },
+      });
+
+      const publicResult = await queryClient.query(
+        http.scoped.publicList.queryOptions({ input: { query: { page: 2 } } })
+      );
+      await queryClient.query(
+        transportHttp.scoped.publicList.queryOptions({
+          input: { query: { page: 2 } },
+        })
+      );
+      const headerResult = await queryClient.query(
+        http.scoped.apiHeader.queryOptions({
+          input: {
+            headers: { "x-api-token": "super-secret-header", locale: "en" },
+          },
+        })
+      );
+      const queryResult = await queryClient.query(
+        http.scoped.groupQuery.queryOptions({
+          input: {
+            query: { token: "super-secret-query", tag: "v1" },
+          },
+        })
+      );
+
+      const snapshotJson = JSON.stringify(dehydrate(queryClient));
+      expect({
+        publicResult,
+        headerResult,
+        queryResult,
+        receivedHeaderSecret,
+        receivedQuerySecret,
+        receivedTransportSecret,
+        leakedHeader: snapshotJson.includes("super-secret-header"),
+        leakedQuery: snapshotJson.includes("super-secret-query"),
+        leakedTransport: snapshotJson.includes("transport-injected-secret"),
+      }).toStrictEqual({
+        publicResult: "page:2",
+        headerResult: "en:ok",
+        queryResult: "v1:ok",
+        receivedHeaderSecret: "super-secret-header",
+        receivedQuerySecret: "super-secret-query",
+        receivedTransportSecret: "transport-injected-secret",
+        leakedHeader: false,
+        leakedQuery: false,
+        leakedTransport: false,
+      });
+    } finally {
+      queryClient.clear();
+      await Effect.runPromise(Scope.close(scope, Exit.void));
+    }
+  });
+
+  it("preserves repeated wire-parameter ordering for colliding URL-encoded request parts", async () => {
+    const wireValue = Schema.Union([
+      Schema.String,
+      Schema.Array(Schema.String),
+      Schema.Record(
+        Schema.String,
+        Schema.Union([
+          Schema.String,
+          Schema.Array(Schema.String),
+          Schema.Record(Schema.String, Schema.String),
+        ])
+      ),
+    ]);
+    const dynamicRecord = Schema.Record(Schema.String, wireValue);
+    const contract = HttpApi.make("wire-order").add(
+      HttpApiGroup.make("search", { topLevel: true }).add(
+        HttpApiEndpoint.get("query", "/query", {
+          query: dynamicRecord,
+          success: Schema.String,
+        }),
+        HttpApiEndpoint.get("getPayload", "/get-payload", {
+          payload: { filter: Schema.optional(dynamicRecord) },
+          success: Schema.String,
+        }),
+        HttpApiEndpoint.post("formPayload", "/form-payload", {
+          payload: dynamicRecord.pipe(HttpApiSchema.asFormUrlEncoded()),
+          success: Schema.String,
+        }),
+        HttpApiEndpoint.get("fixed", "/fixed", {
+          query: { first: Schema.String, second: Schema.String },
+          success: Schema.String,
+        })
+      )
+    );
+
+    let queryCalls = 0;
+    const handlers = HttpApiBuilder.group(contract, "search", (group) =>
+      group
+        .handle("query", () =>
+          Effect.gen(function* readRawQuery() {
+            queryCalls += 1;
+            const request = yield* HttpServerRequest.HttpServerRequest;
+            return request.url;
+          })
+        )
+        .handle("getPayload", () =>
+          Effect.gen(function* readRawGetPayload() {
+            const request = yield* HttpServerRequest.HttpServerRequest;
+            return request.url;
+          })
+        )
+        .handle("formPayload", () =>
+          Effect.gen(function* readRawFormPayload() {
+            const request = yield* HttpServerRequest.HttpServerRequest;
+            return yield* Effect.orDie(request.text);
+          })
+        )
+        .handle("fixed", ({ query }) =>
+          Effect.succeed(`${query.first}:${query.second}`)
+        )
+    );
+    const scope = Scope.makeUnsafe();
+    const client = await Effect.runPromise(
+      HttpApiTest.groups(contract, ["search"]).pipe(
+        Effect.provide(Layer.mergeAll(handlers, HttpServer.layerServices)),
+        Effect.provideService(Scope.Scope, scope)
+      )
+    );
+    const http = createHttpApiQueryUtils(contract, {
+      client,
+      keyPrefix: ["wire-order"],
+    });
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { staleTime: Infinity, retry: false } },
+    });
+    try {
+      const literalFirst = { "a[b]": "1", a: { b: "2" } };
+      const nestedFirst = { a: { b: "2" }, "a[b]": "1" };
+
+      expect({
+        reorderedDistinct:
+          JSON.stringify(
+            http.query.queryKey({ input: { query: literalFirst } })
+          ) !==
+          JSON.stringify(
+            http.query.queryKey({ input: { query: nestedFirst } })
+          ),
+        nestedDistinct:
+          JSON.stringify(
+            http.query.queryKey({
+              input: { query: { x: { "a][b": "1", a: { b: "2" } } } },
+            })
+          ) !==
+          JSON.stringify(
+            http.query.queryKey({
+              input: { query: { x: { a: { b: "2" }, "a][b": "1" } } },
+            })
+          ),
+        arrayDistinct:
+          JSON.stringify(
+            http.query.queryKey({
+              input: { query: { "a[b]": "1", a: { b: ["2", "3"] } } },
+            })
+          ) !==
+          JSON.stringify(
+            http.query.queryKey({
+              input: { query: { a: { b: ["2", "3"] }, "a[b]": "1" } },
+            })
+          ),
+        unrelatedKeyReused:
+          JSON.stringify(
+            http.query.queryKey({
+              input: { query: { c: "3", "a[b]": "1", a: { b: "2" } } },
+            })
+          ) ===
+          JSON.stringify(
+            http.query.queryKey({
+              input: { query: { "a[b]": "1", a: { b: "2" }, c: "3" } },
+            })
+          ),
+      }).toStrictEqual({
+        reorderedDistinct: true,
+        nestedDistinct: true,
+        arrayDistinct: true,
+        unrelatedKeyReused: true,
+      });
+
+      const [
+        firstUrl,
+        secondUrl,
+        getPayloadFirst,
+        getPayloadSecond,
+        formFirst,
+        formSecond,
+      ] = await Promise.all([
+        queryClient.query(
+          http.query.queryOptions({ input: { query: literalFirst } })
+        ),
+        queryClient.query(
+          http.query.queryOptions({ input: { query: nestedFirst } })
+        ),
+        queryClient.query(
+          http.getPayload.queryOptions({
+            input: { payload: { filter: { "b][c": "1", b: { c: "2" } } } },
+          })
+        ),
+        queryClient.query(
+          http.getPayload.queryOptions({
+            input: { payload: { filter: { b: { c: "2" }, "b][c": "1" } } },
+          })
+        ),
+        queryClient.query(
+          http.formPayload.queryOptions({ input: { payload: literalFirst } })
+        ),
+        queryClient.query(
+          http.formPayload.queryOptions({ input: { payload: nestedFirst } })
+        ),
+      ]);
+
+      expect({
+        firstUrl,
+        secondUrl,
+        queryCalls,
+        getPayloadFirst,
+        getPayloadSecond,
+        formFirst,
+        formSecond,
+        fixedKey: http.fixed
+          .queryKey({ input: { query: { second: "2", first: "1" } } })
+          .at(-1),
+      }).toStrictEqual({
+        firstUrl: "/query?a%5Bb%5D=1&a%5Bb%5D=2",
+        secondUrl: "/query?a%5Bb%5D=2&a%5Bb%5D=1",
+        queryCalls: 2,
+        getPayloadFirst:
+          "/get-payload?filter%5Bb%5D%5Bc%5D=1&filter%5Bb%5D%5Bc%5D=2",
+        getPayloadSecond:
+          "/get-payload?filter%5Bb%5D%5Bc%5D=2&filter%5Bb%5D%5Bc%5D=1",
+        formFirst: "a%5Bb%5D=1&a%5Bb%5D=2",
+        formSecond: "a%5Bb%5D=2&a%5Bb%5D=1",
+        fixedKey: { query: { first: "1", second: "2" } },
+      });
+    } finally {
+      queryClient.clear();
+      await Effect.runPromise(Scope.close(scope, Exit.void));
     }
   });
 });

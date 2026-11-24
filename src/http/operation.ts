@@ -83,7 +83,8 @@ const describeHttpEndpoints = (
       const request = createHttpRequest(
         endpoint,
         identity,
-        Context.merge(groupAnnotations, endpoint.annotations)
+        Context.merge(groupAnnotations, endpoint.annotations),
+        [api.annotations, group.annotations, endpoint.annotations]
       );
       if (request === undefined) {
         continue;
