@@ -95,11 +95,17 @@ export type QueryableHttpEndpoint =
   | {
       readonly kind: "Unary";
       readonly payloads: readonly Schema.Top[];
+      readonly payloadEncoding:
+        | HttpApiSchema.PayloadEncoding["_tag"]
+        | undefined;
       readonly successes: readonly Schema.Top[];
     }
   | {
       readonly kind: "Streaming";
       readonly payloads: readonly Schema.Top[];
+      readonly payloadEncoding:
+        | HttpApiSchema.PayloadEncoding["_tag"]
+        | undefined;
       readonly stream: Extract<
         HttpApiSchema.StreamSchema,
         { readonly _tag: "StreamSse" | "StreamNdjson" }
@@ -115,12 +121,14 @@ export const classifyHttpEndpoint = (
   | { readonly kind: "ContradictoryMultipart" }
   | undefined => {
   const payloads: Schema.Top[] = [];
+  let payloadEncoding: HttpApiSchema.PayloadEncoding["_tag"] | undefined;
   let multipart = false;
   let multipartStream = false;
   for (const { encoding, schemas } of endpoint.payload.values()) {
     if (encoding._tag === "Stream") {
       return undefined;
     }
+    payloadEncoding ??= encoding._tag;
     const mode = encoding._tag === "Multipart" ? encoding.mode : undefined;
     const expectedBuffered = mode === "buffered";
     const expectedStreamed = mode === "stream";
@@ -156,10 +164,16 @@ export const classifyHttpEndpoint = (
         stream: body,
         headers,
         payloads,
+        payloadEncoding,
       };
     }
   }
   return multipart
     ? { kind: "Mutation" }
-    : { kind: "Unary", payloads, successes: [...successes] };
+    : {
+        kind: "Unary",
+        payloads,
+        payloadEncoding,
+        successes: [...successes],
+      };
 };

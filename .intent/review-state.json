@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "36a213c3bab93f60e563b9f766f7be7c4b280b9737fcb95655d2308406492709",
+      "fingerprint": "6522523a4e5d12e5f855438ea12b8836806f4fc4fe0cb306bfea29bcb27061fd",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -209,7 +209,7 @@
         "skills/effect-api-query/SKILL.md": "112b039108201d3aecc3b2e9c6dbd665ddaa01f37e0a16997814ea9b533c95a1",
         "skills/effect-api-query/references/cache-workflows.md": "9f370822c4f1ec986ef27afc7fd7647ad24b701f671f33d1fb86e8478d73769f",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "03e8c84d889b7dd478edebe96262bd09d2a5f90edac6e8705cae44a7ecc91a62",
-        "skills/effect-api-query/references/http.md": "8365345e9e1ee86f0e34d3612fb7324ca32789b725b891605888fd0ad0bdc709",
+        "skills/effect-api-query/references/http.md": "e61055cdee73224724f4bcd56b5d4061a53b344d9bc0b601672b50c98555cfca",
         "skills/effect-api-query/references/hydration-and-ssr.md": "860a09c3df2883a2a8cf9a3902291ff109aa6a6751e58d150d9cb42013207120",
         "skills/effect-api-query/references/query-patterns.md": "983066711ed321e7ce37ae230ab97379d30e010cfa11c74211053c982bcea6a1",
         "skills/effect-api-query/references/rpc.md": "d5bc0d199249ef185f1cd532e282d95788807def0e18bc5f175730534aa2ed68",
@@ -250,10 +250,10 @@
         "src/core/utility-tree.ts": "9142dc67c4f924ae4a38ad8268f0b4810c11d01a33ef66ac845028913e0b2e3d",
         "src/core/view-prefix.ts": "dfc0d74a07c8afe3f63952d59c29088ba4afb45e11a402ef8b72c5e2282cb063",
         "src/http/create-utils.ts": "3d1e9ad3edd8b1dd6d614dea1c3fa4783ba150acf7ef7f8af6282ba024fd250e",
-        "src/http/endpoint.ts": "d387c79f06dea3ced82668109aaacd514f3ef3b9bf6c485cf07339a9daee26a8",
+        "src/http/endpoint.ts": "06670d2d3f13f14c0faa0aaa8774a133baa99c63819e97f2b5501ef2ee175900",
         "src/http/errors.ts": "bcda0ae353816a1f31001839ee7c7d51270c307be7380a0263b06c1b98276f36",
-        "src/http/operation.ts": "efeaa7c4209c83fbbcdeb9dcec288634ebe3ff64aa283213d649335d4ea9add7",
-        "src/http/request.ts": "2e8adca548c85969492fe1ff491be41998129dcf68fa1a2ba1c6e81c881fcd19",
+        "src/http/operation.ts": "c84ab791816693d965d155114b2f5d69adf2808fc892a6fa05f9b7b49b5f4dda",
+        "src/http/request.ts": "c6ae7ef094fd00cb4c7537cc2599fe7a4400b77100d4feeeb870d71898e5698d",
         "src/http/streamed-query.ts": "fac8ba0fd1ff7059295d9fab0237ac86f5b75673bb6d5776ada5f44c6e9d0c44",
         "src/http/types.ts": "ca84b5df8e86a16169ba953983055744d058218835cc748020a0310e801494c8",
         "src/index.ts": "dc946f4279705804c786467ce7aefdd72d141de3cf6cfa2f8b2acfa34d66a524",
@@ -309,7 +309,7 @@
         "tests/http-multipart.test.ts": "1e9aabe7401e6e0baac20c58d86b87c371dde43dd2049ec5f343968ad5254005",
         "tests/http-ndjson-query.test.ts": "5f722d8bcaaff9a6f4b5413ec393d14dfce6d282646f20377eec504cdd4663f8",
         "tests/http-query-options.test.ts": "aac64adf89e7dc9e281e65d7cdd9256e99dba785d934fafc14b2b02c6476ae3b",
-        "tests/http-semantic-keys.test.ts": "81f9d285fd9f5265953fdd2ea77dd53341ea90626bb64622fbd191f0519f2e90",
+        "tests/http-semantic-keys.test.ts": "2d6d9f1a675e42f15a2a26c3616a911a37bbef90b6e516cda3a81bff45e1f9bf",
         "tests/http-structural-sharing.test.ts": "7cb0dbe6359b567a9ab3eeb550ecfa45855845d93be53baa1d4a1caf20ee8977",
         "tests/http-transport-cancellation.test.ts": "b3dc08d09bfad3c33d257369ae087311b53a341e7031cf5213915b69404774d3",
         "tests/hydration-codecs.test.ts": "89a6f85260421b6d8fa4de578df2df16c6b357c8f4c8c467db02d3a6d9531f69",
@@ -410,20 +410,20 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "a25fda942277bbd607bb9895af7ffbed6981df07",
+      "head": "187580d8adc95c1886c5a0e68c6e202c10b01470",
       "outcome": "no-change",
-      "reason": "Hardens internal GitHub Pages manual deployment resolver, workflow input description, and tests for #243; no change to published library API, runtime behavior, or shipped skill guidance.",
+      "reason": "Refined static query redaction AST matching to check only leaf paths that emit wire values; guidance in skills/effect-api-query/references/http.md and _artifacts/skill_spec.md already accurately covers #238",
       "evidence": [
-        "Changed: scripts/resolve-docs-release.mts, tests/docs-release.test.ts at a25fda942277bbd607bb9895af7ffbed6981df07"
+        "Changed: src/http/request.ts, tests/http-semantic-keys.test.ts at 187580d8adc95c1886c5a0e68c6e202c10b01470"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "86b04f93b4060559cc7e18c6768077e3d3884c231d462ebb729934e77ea79d63",
+      "fingerprint": "1be646198d8b0c4867982d3de35dd133769f7e70a7d5a52da6b2b9298804500a",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
         "_artifacts/domain_map.yaml": "a1ee71cd9573f65d8897f71b8e37023d90e7ccf7eb2b1055645f39911dd324f9",
-        "_artifacts/skill_spec.md": "ccf112a114e86a99a34374f0691aea871ce289a01b1ffb8aedc9be54becf48b3",
+        "_artifacts/skill_spec.md": "8c1be3eb4b045c7fa2f3dd596d906469bab3360d8be64317a22a952882321917",
         "_artifacts/skill_tree.yaml": "16f542e7682b84596d15b066716f06a2657fdffd14bab445279b409e7e1baa32",
         "apps/docs/astro.config.mts": "90c54a40605dc0f553b9f62831c88a3e012fe6da44a1e216e4f981bcf1af2272",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "a826348cf7b3fd34b0677280daa75a08ce99138cb68fbd79d4ef52936190eeb6",
@@ -627,7 +627,7 @@
         "skills/effect-api-query/SKILL.md": "112b039108201d3aecc3b2e9c6dbd665ddaa01f37e0a16997814ea9b533c95a1",
         "skills/effect-api-query/references/cache-workflows.md": "9f370822c4f1ec986ef27afc7fd7647ad24b701f671f33d1fb86e8478d73769f",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "03e8c84d889b7dd478edebe96262bd09d2a5f90edac6e8705cae44a7ecc91a62",
-        "skills/effect-api-query/references/http.md": "8365345e9e1ee86f0e34d3612fb7324ca32789b725b891605888fd0ad0bdc709",
+        "skills/effect-api-query/references/http.md": "e61055cdee73224724f4bcd56b5d4061a53b344d9bc0b601672b50c98555cfca",
         "skills/effect-api-query/references/hydration-and-ssr.md": "860a09c3df2883a2a8cf9a3902291ff109aa6a6751e58d150d9cb42013207120",
         "skills/effect-api-query/references/query-patterns.md": "983066711ed321e7ce37ae230ab97379d30e010cfa11c74211053c982bcea6a1",
         "skills/effect-api-query/references/rpc.md": "d5bc0d199249ef185f1cd532e282d95788807def0e18bc5f175730534aa2ed68",
@@ -668,10 +668,10 @@
         "src/core/utility-tree.ts": "9142dc67c4f924ae4a38ad8268f0b4810c11d01a33ef66ac845028913e0b2e3d",
         "src/core/view-prefix.ts": "dfc0d74a07c8afe3f63952d59c29088ba4afb45e11a402ef8b72c5e2282cb063",
         "src/http/create-utils.ts": "3d1e9ad3edd8b1dd6d614dea1c3fa4783ba150acf7ef7f8af6282ba024fd250e",
-        "src/http/endpoint.ts": "d387c79f06dea3ced82668109aaacd514f3ef3b9bf6c485cf07339a9daee26a8",
+        "src/http/endpoint.ts": "06670d2d3f13f14c0faa0aaa8774a133baa99c63819e97f2b5501ef2ee175900",
         "src/http/errors.ts": "bcda0ae353816a1f31001839ee7c7d51270c307be7380a0263b06c1b98276f36",
-        "src/http/operation.ts": "efeaa7c4209c83fbbcdeb9dcec288634ebe3ff64aa283213d649335d4ea9add7",
-        "src/http/request.ts": "2e8adca548c85969492fe1ff491be41998129dcf68fa1a2ba1c6e81c881fcd19",
+        "src/http/operation.ts": "c84ab791816693d965d155114b2f5d69adf2808fc892a6fa05f9b7b49b5f4dda",
+        "src/http/request.ts": "c6ae7ef094fd00cb4c7537cc2599fe7a4400b77100d4feeeb870d71898e5698d",
         "src/http/streamed-query.ts": "fac8ba0fd1ff7059295d9fab0237ac86f5b75673bb6d5776ada5f44c6e9d0c44",
         "src/http/types.ts": "ca84b5df8e86a16169ba953983055744d058218835cc748020a0310e801494c8",
         "src/index.ts": "dc946f4279705804c786467ce7aefdd72d141de3cf6cfa2f8b2acfa34d66a524",
@@ -727,7 +727,7 @@
         "tests/http-multipart.test.ts": "1e9aabe7401e6e0baac20c58d86b87c371dde43dd2049ec5f343968ad5254005",
         "tests/http-ndjson-query.test.ts": "5f722d8bcaaff9a6f4b5413ec393d14dfce6d282646f20377eec504cdd4663f8",
         "tests/http-query-options.test.ts": "aac64adf89e7dc9e281e65d7cdd9256e99dba785d934fafc14b2b02c6476ae3b",
-        "tests/http-semantic-keys.test.ts": "81f9d285fd9f5265953fdd2ea77dd53341ea90626bb64622fbd191f0519f2e90",
+        "tests/http-semantic-keys.test.ts": "2d6d9f1a675e42f15a2a26c3616a911a37bbef90b6e516cda3a81bff45e1f9bf",
         "tests/http-structural-sharing.test.ts": "7cb0dbe6359b567a9ab3eeb550ecfa45855845d93be53baa1d4a1caf20ee8977",
         "tests/http-transport-cancellation.test.ts": "b3dc08d09bfad3c33d257369ae087311b53a341e7031cf5213915b69404774d3",
         "tests/hydration-codecs.test.ts": "89a6f85260421b6d8fa4de578df2df16c6b357c8f4c8c467db02d3a6d9531f69",
@@ -828,11 +828,11 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "a25fda942277bbd607bb9895af7ffbed6981df07",
+      "head": "187580d8adc95c1886c5a0e68c6e202c10b01470",
       "outcome": "no-change",
-      "reason": "Hardens internal GitHub Pages manual deployment resolver, workflow input description, and tests for #243; no change to published library API, runtime behavior, or shipped skill guidance.",
+      "reason": "Refined static query redaction AST matching to check only leaf paths that emit wire values; guidance in skills/effect-api-query/references/http.md and _artifacts/skill_spec.md already accurately covers #238",
       "evidence": [
-        "Changed: scripts/resolve-docs-release.mts, tests/docs-release.test.ts at a25fda942277bbd607bb9895af7ffbed6981df07"
+        "Changed: src/http/request.ts, tests/http-semantic-keys.test.ts at 187580d8adc95c1886c5a0e68c6e202c10b01470"
       ]
     },
     "source:vite.config.ts": {
@@ -4599,6 +4599,30 @@
         "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
         "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
         "Scoped generated changes: .changeset/yield-query-client-operation-errors.md."
+      ]
+    },
+    "source:.changeset/preserve-repeated-http-wire-parameter-order.md": {
+      "fingerprint": "9ca45718be476d5d63c5f5e8bcf51ca3e61d54cf7f1c5a6cb52b5178552f5b46",
+      "snapshot": {
+        ".changeset/preserve-repeated-http-wire-parameter-order.md": "129ecfe2f7f1049cdb2c814555c340abb3afd75669da7303e996433d6575ef67"
+      },
+      "head": "9ed6190ffc3cc7236ec506b216443afaf288437e",
+      "outcome": "no-change",
+      "reason": "Added focused release changesets for #238; shipped skill guidance in skills/effect-api-query/references/http.md and _artifacts/skill_spec.md is already updated",
+      "evidence": [
+        "Changed: .changeset/preserve-repeated-http-wire-parameter-order.md at 9ed6190ffc3cc7236ec506b216443afaf288437e"
+      ]
+    },
+    "source:.changeset/require-key-encoders-for-http-redacted-names.md": {
+      "fingerprint": "0ab056160a5cff85f8d8b15b345d7bf54c0dadfcfa91572a0c2039b427495aa6",
+      "snapshot": {
+        ".changeset/require-key-encoders-for-http-redacted-names.md": "5c9b4ebb39543f494e456fdc2c6a74cafccf1bc4d3709ebeb5068d7a9b637053"
+      },
+      "head": "9ed6190ffc3cc7236ec506b216443afaf288437e",
+      "outcome": "no-change",
+      "reason": "Added focused release changesets for #238; shipped skill guidance in skills/effect-api-query/references/http.md and _artifacts/skill_spec.md is already updated",
+      "evidence": [
+        "Changed: .changeset/require-key-encoders-for-http-redacted-names.md at 9ed6190ffc3cc7236ec506b216443afaf288437e"
       ]
     }
   }
