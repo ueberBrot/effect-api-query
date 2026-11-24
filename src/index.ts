@@ -38,6 +38,7 @@ export { createContractHydrationRegistry } from "./core/contract-hydration";
 export type {
   HttpContractHydrationOptions,
   HttpContractHydrationViews,
+  HttpMetadataHydrationConfig,
   RpcContractHydrationOptions,
   RpcContractHydrationViews,
 } from "./core/contract-hydration-types";

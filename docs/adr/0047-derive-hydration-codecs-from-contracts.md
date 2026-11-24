@@ -1,6 +1,6 @@
 # Derive hydration codecs from Effect contracts and compose registries
 
-Status: Accepted.
+Status: Accepted. Amended by [ADR 0058](0058-require-explicit-header-allowlist-for-metadata-hydration.md).
 
 ## Context
 

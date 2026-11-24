@@ -3,9 +3,11 @@ import { dehydrate, hydrate, QueryClient } from "@tanstack/query-core";
 import {
   Context,
   Effect,
+  Function,
   Layer,
   ManagedRuntime,
   Predicate,
+  Redacted,
   Schema,
   SchemaParser,
   SchemaTransformation,
@@ -411,7 +413,9 @@ describe("createContractHydrationRegistry — HTTP contracts", () => {
       server.setQueryData(queryKey, "42");
       server.setQueryData(metadataKey, { data: 42n, status: 200, headers: {} });
       yield* roundTripJson(
-        createContractHydrationRegistry(api),
+        createContractHydrationRegistry(api, {
+          views: { metadata: { headers: [] } },
+        }),
         server,
         browser
       );
@@ -460,7 +464,9 @@ describe("createContractHydrationRegistry — HTTP contracts", () => {
           async () => await server.query(metadata)
         );
         yield* roundTripJson(
-          createContractHydrationRegistry(api),
+          createContractHydrationRegistry(api, {
+            views: { metadata: { headers: ["content-type"] } },
+          }),
           server,
           browser
         );
@@ -503,7 +509,9 @@ describe("createContractHydrationRegistry — HTTP contracts", () => {
         };
         server.setQueryData(key, metadata);
         yield* roundTripJson(
-          createContractHydrationRegistry(api),
+          createContractHydrationRegistry(api, {
+            views: { metadata: { headers: ["etag"] } },
+          }),
           server,
           browser
         );
@@ -550,7 +558,9 @@ describe("createContractHydrationRegistry — HTTP contracts", () => {
         server.setQueryData(queryKey, 42n);
         server.setQueryData(metadataKey, metadata);
         yield* roundTripJson(
-          createContractHydrationRegistry(api),
+          createContractHydrationRegistry(api, {
+            views: { metadata: { headers: ["content-type"] } },
+          }),
           server,
           browser
         );
@@ -594,7 +604,9 @@ describe("createContractHydrationRegistry — HTTP contracts", () => {
           headers: {},
         });
         yield* roundTripJson(
-          createContractHydrationRegistry(api),
+          createContractHydrationRegistry(api, {
+            views: { metadata: { headers: ["content-type"] } },
+          }),
           server,
           browser
         );
@@ -643,7 +655,9 @@ describe("createContractHydrationRegistry — HTTP contracts", () => {
       server.setQueryData(sseStreamed, [wrapped]);
       server.setQueryData(sseLive, wrapped);
       yield* roundTripJson(
-        createContractHydrationRegistry(api),
+        createContractHydrationRegistry(api, {
+          views: { metadata: { headers: [] } },
+        }),
         server,
         browser
       );
@@ -687,7 +701,9 @@ describe("createContractHydrationRegistry — HTTP contracts", () => {
       server.setQueryData(live, { value: "42" });
       server.setQueryData(streamed, [{ value: 42n }, { value: "42" }]);
       yield* roundTripJson(
-        createContractHydrationRegistry(api),
+        createContractHydrationRegistry(api, {
+          views: { metadata: { headers: [] } },
+        }),
         server,
         browser
       );
@@ -793,7 +809,10 @@ describe("createContractHydrationRegistry — HTTP contracts", () => {
     Object.setPrototypeOf(config, { ...inherited, metadata: false });
     const options = { paths: { read: config } };
     const rpcRegistry = createContractHydrationRegistry(group, options);
-    const httpRegistry = createContractHydrationRegistry(api, options);
+    const httpRegistry = createContractHydrationRegistry(api, {
+      views: { metadata: { headers: [] } },
+      ...options,
+    });
     expect([
       rpcRegistry.matches(["rpc", "read", "query"]),
       httpRegistry.matches(["http", "own-views", "read", "query"]),
@@ -1008,7 +1027,9 @@ describe("createContractHydrationRegistry — HTTP contracts", () => {
         });
 
         const http = createHttpApiQueryUtils(api, { client });
-        const registry = createContractHydrationRegistry(api);
+        const registry = createContractHydrationRegistry(api, {
+          views: { metadata: { headers: ["x-source", "etag"] } },
+        });
 
         const server = new QueryClient();
         const browser = new QueryClient();
@@ -1177,7 +1198,9 @@ describe("createContractHydrationRegistry — HTTP contracts", () => {
           httpClient: dummyHttpClient,
         });
         const http = createHttpApiQueryUtils(api, { client });
-        const registry = createContractHydrationRegistry(api);
+        const registry = createContractHydrationRegistry(api, {
+          views: { metadata: { headers: ["x-source", "etag"] } },
+        });
         const server = new QueryClient();
         const browser = new QueryClient();
         try {
@@ -1280,6 +1303,7 @@ describe("createContractHydrationRegistry — HTTP contracts", () => {
           paths: {
             "items.get": {
               query: Tagged,
+              metadata: { headers: ["etag"] },
               infinite: { pageParam: Schema.Int },
             },
           },
@@ -1510,7 +1534,12 @@ describe("eager validation & HydrationCodecError", () => {
         paths: { "secrets.get": { query: false } },
       }).matches(["rpc", "secrets", "get", "query"]),
       headersOverride: createContractHydrationRegistry(badHttpApi, {
-        paths: { "boxes.get": { query: OpaqueCodec } },
+        paths: {
+          "boxes.get": {
+            query: OpaqueCodec,
+            metadata: { headers: ["etag"] },
+          },
+        },
       }).matches(["http", "bad-http", "boxes", "get", "metadata"]),
     }).toStrictEqual({
       opaque: { code: "UnencodableSchema", path: "opaque.get", view: "query" },
@@ -1783,6 +1812,509 @@ describe("composable createHydrationRegistry", () => {
           yield* Effect.promise(async () => {
             await runtime.dispose();
           });
+        }
+      })
+  );
+
+  it("rejects nested Redacted schemas inside Option, unions, structs, declarations, and suspended schemas", () => {
+    const redactedValue = Schema.RedactedFromValue(Schema.String);
+    const suspendedNested = Schema.suspend(() =>
+      Schema.Struct({ token: Schema.Option(redactedValue) })
+    );
+    const rpcCases = [
+      RpcGroup.make(
+        Rpc.make("opt.get", { success: Schema.Option(redactedValue) })
+      ),
+      RpcGroup.make(
+        Rpc.make("union.get", {
+          success: Schema.Union([Schema.String, redactedValue]),
+        })
+      ),
+      RpcGroup.make(
+        Rpc.make("struct.get", {
+          success: Schema.Struct({
+            nested: Schema.Option(redactedValue),
+          }),
+        })
+      ),
+      RpcGroup.make(
+        Rpc.make("array.get", {
+          success: Schema.Array(redactedValue),
+        })
+      ),
+      RpcGroup.make(
+        Rpc.make("suspend.get", {
+          success: suspendedNested,
+        })
+      ),
+    ];
+    const httpOptionApi = HttpApi.make("nested-redacted-http").add(
+      HttpApiGroup.make("secrets").add(
+        HttpApiEndpoint.get("get", "/secret", {
+          success: Schema.Option(redactedValue),
+        })
+      )
+    );
+
+    const results = [
+      ...rpcCases.map(
+        (group) =>
+          captureHydrationError(() => {
+            createContractHydrationRegistry(group);
+          }).code
+      ),
+      captureHydrationError(() => {
+        createContractHydrationRegistry(httpOptionApi);
+      }).code,
+    ];
+    const optedOut = createContractHydrationRegistry(httpOptionApi, {
+      paths: { "secrets.get": false },
+    }).matches(["http", "nested-redacted-http", "secrets", "get", "query"]);
+    expect({ results, optedOut }).toStrictEqual({
+      results: [
+        "UnencodableSchema",
+        "UnencodableSchema",
+        "UnencodableSchema",
+        "UnencodableSchema",
+        "UnencodableSchema",
+        "UnencodableSchema",
+      ],
+      optedOut: false,
+    });
+  });
+
+  it.effect(
+    "preserves cached HttpApiSchema.asNoContent values across query, metadata, and infinite views without re-invoking the factory",
+    () =>
+      Effect.gen(function* preservesAsNoContentValues() {
+        let stampCalls = 0;
+        let profileCalls = 0;
+        const Synthesized = Schema.Struct({ stamp: Schema.Finite }).pipe(
+          HttpApiSchema.asNoContent({
+            decode: () => {
+              stampCalls += 1;
+              return { stamp: stampCalls };
+            },
+          }),
+          HttpApiSchema.status(204)
+        );
+        const SynthesizedProfile = Profile.pipe(
+          HttpApiSchema.asNoContent({
+            decode: () => {
+              profileCalls += 1;
+              return new Profile({
+                name: `cached-${profileCalls}`,
+                credits: BigInt(profileCalls),
+                avatar: new Uint8Array([profileCalls]),
+              });
+            },
+          }),
+          HttpApiSchema.status(204)
+        );
+        const api = HttpApi.make("no-content-hydration").add(
+          HttpApiGroup.make("items").add(
+            HttpApiEndpoint.get("synthesized", "/synthesized", {
+              success: Synthesized,
+            }),
+            HttpApiEndpoint.get("profile", "/profile", {
+              success: SynthesizedProfile,
+            }),
+            HttpApiEndpoint.get("empty", "/empty", {
+              success: HttpApiSchema.NoContent,
+            })
+          )
+        );
+        const httpClient = HttpClient.make((request) =>
+          Effect.succeed(
+            HttpClientResponse.fromWeb(
+              request,
+              new Response(null, { status: 204 })
+            )
+          )
+        );
+        const client = yield* HttpApiClient.makeWith(api, {
+          baseUrl: "https://example.test",
+          httpClient,
+        });
+        const http = createHttpApiQueryUtils(api, { client });
+        const registry = createContractHydrationRegistry(api, {
+          views: { metadata: { headers: [] } },
+          paths: {
+            "items.synthesized": {
+              infinite: { pageParam: Schema.Int },
+            },
+            "items.empty": {
+              infinite: { pageParam: Schema.Int },
+            },
+          },
+        });
+        const server = new QueryClient();
+        const browser = new QueryClient();
+        try {
+          const queryResult = yield* Effect.promise(
+            async () =>
+              await server.query(http.items.synthesized.queryOptions())
+          );
+          const profileResult = yield* Effect.promise(
+            async () => await server.query(http.items.profile.queryOptions())
+          );
+          const emptyResult = yield* Effect.promise(
+            async () => await server.query(http.items.empty.queryOptions())
+          );
+          server.setQueryData(http.items.synthesized.metadataKey(), {
+            data: queryResult,
+            status: 204,
+            headers: {},
+          });
+          server.setQueryData(http.items.synthesized.infiniteKey(), {
+            pages: [queryResult],
+            pageParams: [1],
+          });
+          server.setQueryData(http.items.empty.metadataKey(), {
+            data: null,
+            status: 204,
+            headers: {},
+          });
+          server.setQueryData(http.items.empty.infiniteKey(), {
+            pages: [null],
+            pageParams: [1],
+          });
+
+          const callsBeforeHydration = { stampCalls, profileCalls };
+          yield* roundTripJson(registry, server, browser);
+
+          const hydratedProfile = browser.getQueryData(
+            http.items.profile.queryKey()
+          );
+          expect({
+            emptyResult,
+            callsBeforeHydration,
+            callsAfterHydration: { stampCalls, profileCalls },
+            hydratedQuery: browser.getQueryData(
+              http.items.synthesized.queryKey()
+            ),
+            hydratedMeta: browser.getQueryData(
+              http.items.synthesized.metadataKey()
+            )?.data,
+            hydratedInfinite: browser.getQueryData(
+              http.items.synthesized.infiniteKey()
+            ),
+            hydratedProfileInstance: hydratedProfile instanceof Profile,
+            hydratedProfileName: hydratedProfile?.name,
+            hydratedEmpty: browser.getQueryData(http.items.empty.queryKey()),
+            hydratedEmptyMeta: browser.getQueryData(
+              http.items.empty.metadataKey()
+            )?.data,
+            hydratedEmptyInfinite: browser.getQueryData(
+              http.items.empty.infiniteKey()
+            ),
+          }).toStrictEqual({
+            emptyResult: null,
+            callsBeforeHydration: { stampCalls: 1, profileCalls: 1 },
+            callsAfterHydration: { stampCalls: 1, profileCalls: 1 },
+            hydratedQuery: { stamp: 1 },
+            hydratedMeta: { stamp: 1 },
+            hydratedInfinite: { pages: [{ stamp: 1 }], pageParams: [1] },
+            hydratedProfileInstance: true,
+            hydratedProfileName: profileResult.name,
+            hydratedEmpty: null,
+            hydratedEmptyMeta: null,
+            hydratedEmptyInfinite: { pages: [null], pageParams: [1] },
+          });
+        } finally {
+          server.clear();
+          browser.clear();
+        }
+      })
+  );
+
+  it.effect(
+    "omits HTTP metadata by default and filters raw headers to the explicit allowlist",
+    () =>
+      Effect.gen(function* enforcesMetadataHeaderAllowlist() {
+        const api = HttpApi.make("meta-headers").add(
+          HttpApiGroup.make("docs").add(
+            HttpApiEndpoint.get("read", "/doc", { success: Schema.String }),
+            HttpApiEndpoint.get("other", "/other", { success: Schema.String })
+          )
+        );
+        const httpClient = HttpClient.make((request) =>
+          Effect.succeed(
+            HttpClientResponse.fromWeb(
+              request,
+              Response.json("doc-body", {
+                headers: {
+                  etag: '"v1"',
+                  "x-public": "visible",
+                  "set-cookie": "session=secret-cookie",
+                  "x-internal-token": "server-only-secret",
+                },
+              })
+            )
+          )
+        );
+        const client = yield* HttpApiClient.makeWith(api, {
+          baseUrl: "https://example.test",
+          httpClient,
+        });
+        const http = createHttpApiQueryUtils(api, { client });
+        const defaultRegistry = createContractHydrationRegistry(api);
+        const allowlistedRegistry = createContractHydrationRegistry(api, {
+          views: { metadata: { headers: ["ETag", "x-public"] } },
+          paths: { "docs.other": { metadata: false } },
+        });
+        const server = new QueryClient();
+        const browser = new QueryClient();
+        try {
+          yield* Effect.promise(
+            async () => await server.query(http.docs.read.metadataOptions())
+          );
+          const snapshot = dehydrate(server);
+          const unknownErr = yield* Effect.flip(
+            defaultRegistry.encodeQueries(snapshot.queries)
+          );
+          const encoded = yield* allowlistedRegistry.encodeQueries(
+            snapshot.queries
+          );
+          const encodedJson = JSON.stringify(encoded);
+          const decoded = yield* allowlistedRegistry.decodeQueries(encoded);
+          hydrate(browser, { ...snapshot, queries: decoded });
+          const hydrated = browser.getQueryData(http.docs.read.metadataKey());
+
+          const invalidMetadataErr = captureHydrationError(() => {
+            // @ts-expect-error runtime rejection for boolean true metadata view
+            createContractHydrationRegistry(api, { views: { metadata: true } });
+          });
+
+          expect({
+            defaultMatches: defaultRegistry.matches(
+              http.docs.read.metadataKey()
+            ),
+            otherDisabledMatches: allowlistedRegistry.matches(
+              http.docs.other.metadataKey()
+            ),
+            unknownCode:
+              unknownErr instanceof HydrationCodecError
+                ? unknownErr.code
+                : undefined,
+            invalidCode: invalidMetadataErr.code,
+            leakedCookie: encodedJson.includes("secret-cookie"),
+            leakedInternal: encodedJson.includes("server-only-secret"),
+            hydrated,
+            frozen: Object.isFrozen(hydrated?.headers),
+          }).toStrictEqual({
+            defaultMatches: false,
+            otherDisabledMatches: false,
+            unknownCode: "UnknownQuery",
+            invalidCode: "InvalidContractPath",
+            leakedCookie: false,
+            leakedInternal: false,
+            hydrated: {
+              data: "doc-body",
+              status: 200,
+              headers: { etag: '"v1"', "x-public": "visible" },
+            },
+            frozen: true,
+          });
+        } finally {
+          server.clear();
+          browser.clear();
+        }
+      })
+  );
+
+  it.effect(
+    "handles union asNoContent, wrapped Void asNoContent, intermediate Void transforms, own metadata views, and encodeToWithHeaders Redacted checks",
+    () =>
+      Effect.gen(function* verifiesReviewEdgeCases() {
+        let unionFactoryCalls = 0;
+        let transformedUnionFactoryCalls = 0;
+        let voidFactoryCalls = 0;
+        const SynthesizedUnion = Schema.Union([
+          Schema.String.pipe(
+            HttpApiSchema.asNoContent({
+              decode: () => {
+                unionFactoryCalls += 1;
+                return "factory";
+              },
+            })
+          ),
+          Schema.Finite,
+        ]);
+        const TransformedUnion = Schema.Union([
+          Schema.String.pipe(
+            HttpApiSchema.asNoContent({
+              decode: () => {
+                transformedUnionFactoryCalls += 1;
+                return `factory-${transformedUnionFactoryCalls}`;
+              },
+            })
+          ),
+          Schema.Finite,
+        ]).pipe(
+          Schema.decodeTo(
+            Schema.Struct({
+              value: Schema.Union([Schema.String, Schema.Finite]),
+            }),
+            SchemaTransformation.transform({
+              decode: (value) => ({ value }),
+              encode: ({ value }) => value,
+            })
+          )
+        );
+        const WrappedVoid = HttpApiSchema.WithHeaders(
+          Schema.Void.pipe(
+            HttpApiSchema.asNoContent({
+              decode: () => {
+                voidFactoryCalls += 1;
+              },
+            })
+          ),
+          { "x-id": Schema.String }
+        );
+        const ThroughVoid = Schema.String.pipe(
+          Schema.decodeTo(
+            Schema.Void,
+            SchemaTransformation.transform({
+              decode: Function.constVoid,
+              encode: () => "wire-string",
+            })
+          ),
+          Schema.decodeTo(
+            Schema.declare(isOpaqueBox),
+            SchemaTransformation.transform({
+              decode: () => makeOpaqueBox("decoded"),
+              encode: Function.constVoid,
+            })
+          )
+        );
+        const api = HttpApi.make("edge-cases").add(
+          HttpApiGroup.make("items").add(
+            HttpApiEndpoint.get("union", "/union", {
+              success: SynthesizedUnion,
+            }),
+            HttpApiEndpoint.get("transformedUnion", "/transformed-union", {
+              success: TransformedUnion,
+            }),
+            HttpApiEndpoint.get("wrappedVoid", "/wrapped-void", {
+              success: WrappedVoid,
+            }),
+            HttpApiEndpoint.get("throughVoid", "/through-void", {
+              success: ThroughVoid,
+            })
+          )
+        );
+        const redactedEncodedHeadersApi = HttpApi.make("encoded-redacted").add(
+          HttpApiGroup.make("items").add(
+            HttpApiEndpoint.get("read", "/read", {
+              success: Schema.String.pipe(
+                HttpApiSchema.encodeToWithHeaders(
+                  {
+                    body: Schema.String,
+                    headers: {
+                      "x-secret": Schema.RedactedFromValue(Schema.String),
+                    },
+                  },
+                  {
+                    decode: ({ body }) => body,
+                    encode: (body) => ({
+                      body,
+                      headers: { "x-secret": Redacted.make("secret") },
+                    }),
+                  }
+                )
+              ),
+            })
+          )
+        );
+
+        const client = yield* HttpApiClient.makeWith(api, {
+          baseUrl: "https://example.test",
+          httpClient: dummyHttpClient,
+        });
+        const http = createHttpApiQueryUtils(api, { client });
+        const registry = createContractHydrationRegistry(api);
+        const server = new QueryClient();
+        const browser = new QueryClient();
+        try {
+          server.setQueryData(http.items.union.queryKey(), "cached");
+          server.setQueryData(http.items.transformedUnion.queryKey(), {
+            value: "factory-1",
+          });
+          server.setQueryData(
+            http.items.wrappedVoid.queryKey(),
+            HttpApiSchema.withHeaders({
+              body: undefined,
+              headers: { "x-id": "1" },
+            })
+          );
+          server.setQueryData(
+            http.items.throughVoid.queryKey(),
+            makeOpaqueBox("live")
+          );
+          yield* roundTripJson(registry, server, browser);
+
+          const inheritedViews = {};
+          Object.setPrototypeOf(inheritedViews, {
+            metadata: { headers: ["etag"] },
+          });
+          const ownGetterViews = {
+            get metadata() {
+              return { headers: ["etag"] } as const;
+            },
+          };
+          const ownNonEnumViews = {};
+          Object.defineProperty(ownNonEnumViews, "metadata", {
+            value: { headers: ["etag"] },
+            enumerable: false,
+          });
+
+          const metaKey = http.items.union.metadataKey();
+          expect({
+            unionRestored: browser.getQueryData(http.items.union.queryKey()),
+            unionFactoryCalls,
+            transformedUnionRestored: browser.getQueryData(
+              http.items.transformedUnion.queryKey()
+            ),
+            transformedUnionFactoryCalls,
+            wrappedVoidRestored: browser.getQueryData(
+              http.items.wrappedVoid.queryKey()
+            ),
+            voidFactoryCalls,
+            throughVoidRestored: browser.getQueryData(
+              http.items.throughVoid.queryKey()
+            )?.secret,
+            inheritedMetaMatches: createContractHydrationRegistry(api, {
+              views: inheritedViews,
+            }).matches(metaKey),
+            ownGetterMetaMatches: createContractHydrationRegistry(api, {
+              views: ownGetterViews,
+            }).matches(metaKey),
+            ownNonEnumMetaMatches: createContractHydrationRegistry(api, {
+              views: ownNonEnumViews,
+            }).matches(metaKey),
+            encodedHeadersRedactedCode: captureHydrationError(() => {
+              createContractHydrationRegistry(redactedEncodedHeadersApi);
+            }).code,
+          }).toStrictEqual({
+            unionRestored: "cached",
+            unionFactoryCalls: 0,
+            transformedUnionRestored: { value: "factory-1" },
+            transformedUnionFactoryCalls: 0,
+            wrappedVoidRestored: HttpApiSchema.withHeaders({
+              body: undefined,
+              headers: { "x-id": "1" },
+            }),
+            voidFactoryCalls: 0,
+            throughVoidRestored: "decoded",
+            inheritedMetaMatches: false,
+            ownGetterMetaMatches: true,
+            ownNonEnumMetaMatches: true,
+            encodedHeadersRedactedCode: "UnencodableSchema",
+          });
+        } finally {
+          server.clear();
+          browser.clear();
         }
       })
   );

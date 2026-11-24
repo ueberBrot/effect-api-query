@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "6522523a4e5d12e5f855438ea12b8836806f4fc4fe0cb306bfea29bcb27061fd",
+      "fingerprint": "ca619a644cde6c04108562e808efb8057ffee6892f50151fa2129054f4275f95",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -32,7 +32,7 @@
         "apps/docs/src/content/docs/guides/handle-failures.md": "56eee50db2863ebf2d197ab8b3305a54530ee85796b9b0e078a5f0b9081b0988",
         "apps/docs/src/content/docs/guides/http-metadata.md": "e07f1aab249005e6c4008c47ee90f0c73590513610cde475348fb5a98deb7147",
         "apps/docs/src/content/docs/guides/http-queries-and-mutations.md": "8a8b390f98a016b1266b8a89d6724be26133834ac5532cc3a354ac6ac81f547d",
-        "apps/docs/src/content/docs/guides/hydrate-query-views.md": "d835bab19600a71a80071efac67832874986b043205c796beb503ff6431dfde8",
+        "apps/docs/src/content/docs/guides/hydrate-query-views.md": "60e639be9ba89aed65382cb022f0aee94c4154cb65b7b6f3e76d1eb7350b8e10",
         "apps/docs/src/content/docs/guides/hydrate-unary-data.md": "73067f82f513173496db61b37849994945d11b34230590a54920c2b0f83081a0",
         "apps/docs/src/content/docs/guides/loader-descriptors.md": "4b65ebb5f430f465844ba05174afedad29a0902a2cae0b639f75f406906870e4",
         "apps/docs/src/content/docs/guides/mutations.md": "46841822ce1b757903a6aa12d3bd4e7e61ec7fd006c95fe08a4f8a0e207caecb",
@@ -105,7 +105,7 @@
         "docs/adr/0044-simplify-factory-setup-and-owner-tracking.md": "1bdeaad6bafab9b01c341fcd59cc450612ede3794e693feb1929b8f1cb51a003",
         "docs/adr/0045-raise-0-8-0-peer-floors.md": "6103c014aff3ca1f0058e8d4a0e5f2bcb289c14e72e9fff6e21ac65271727348",
         "docs/adr/0046-lazy-memoized-frozen-leaves-and-unified-key-inputs.md": "c235cd1a134cb3d7c9bc983723394b22f573188e2f92d8150423aa1c65600653",
-        "docs/adr/0047-derive-hydration-codecs-from-contracts.md": "56720f5282afa2e68c6c3b74aff6ec307ee27f3a1af4ef17607373de030fd935",
+        "docs/adr/0047-derive-hydration-codecs-from-contracts.md": "44ad3fa80dd89d246914b1bf2da2027880f424fabb0333d205a0dd7346cb3ac1",
         "docs/adr/0048-add-optional-react-subpath-wiring.md": "5c88e23a71ff6541e8be81d082a2bc5a4581ffa7186ce10a15dffae753d8b08b",
         "docs/adr/0049-flatten-utility-policy-maps.md": "852f6d4682fb87a94dd118c59091a19b9ed303ebe226a2ec2c1c1cd1238f9e76",
         "docs/adr/0050-direct-leaf-execution-and-shared-error-handling.md": "2715e850d01415355ce83c15ff97bc361df3bbfde8d6ec369d24309fcf3afcb4",
@@ -210,7 +210,7 @@
         "skills/effect-api-query/references/cache-workflows.md": "9f370822c4f1ec986ef27afc7fd7647ad24b701f671f33d1fb86e8478d73769f",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "03e8c84d889b7dd478edebe96262bd09d2a5f90edac6e8705cae44a7ecc91a62",
         "skills/effect-api-query/references/http.md": "e61055cdee73224724f4bcd56b5d4061a53b344d9bc0b601672b50c98555cfca",
-        "skills/effect-api-query/references/hydration-and-ssr.md": "860a09c3df2883a2a8cf9a3902291ff109aa6a6751e58d150d9cb42013207120",
+        "skills/effect-api-query/references/hydration-and-ssr.md": "0265ce970039b2ca41be2165683c135fd9584ea9a3c95b147a73eca8e54bd19f",
         "skills/effect-api-query/references/query-patterns.md": "983066711ed321e7ce37ae230ab97379d30e010cfa11c74211053c982bcea6a1",
         "skills/effect-api-query/references/rpc.md": "d5bc0d199249ef185f1cd532e282d95788807def0e18bc5f175730534aa2ed68",
         "src/core/branch-filter.ts": "da18cded0a176b20e6056b74bd52e70fb8ec588346beabb01fe1f2d4f1a8b1e3",
@@ -218,8 +218,8 @@
         "src/core/configure-utils.ts": "ee45471eb50bc526951b8af08fa605fae0d9a056a143c222ecde9180c7bfcd30",
         "src/core/configure.ts": "5a7e7f8dc1fa13e0d698678e79521bdce79aefcaec4c4235ac20b340f1076925",
         "src/core/consume-events.ts": "648144582c4bdbf4a9cb0d35ddc54327abbefc654f2d37b6154232bcd09a1752",
-        "src/core/contract-hydration-types.ts": "53366364723a34f8948f2b813ad60ec20de98ee878f9398aff38bb15bf12fd45",
-        "src/core/contract-hydration.ts": "6ae4d7633d1bb1c755d0f44c212957f17104027edc361f2e865e5805e52aab71",
+        "src/core/contract-hydration-types.ts": "fb0e5a7e1569301057422e662185a2a11f4007473dca58b1786422d6fed5deac",
+        "src/core/contract-hydration.ts": "c3783bb93a190e45f0b703d05ecbd11ee607f9410046f7c1ce3ca7dbd62ff395",
         "src/core/declared-error.ts": "72146f75dc4f99abb60c143ae4464abf6a512cd5ffe713597bb3fb967f58c7a0",
         "src/core/hydration.ts": "08c812094bb4662cdf118b1825a47a4ec4bc1e4bd248a878726cbd4ff31aaf1e",
         "src/core/inference.ts": "249bc1d59e4ea6ddc7e3a09a63b93c13e3805f9d70ead00f44c710ff95e4df94",
@@ -256,7 +256,7 @@
         "src/http/request.ts": "c6ae7ef094fd00cb4c7537cc2599fe7a4400b77100d4feeeb870d71898e5698d",
         "src/http/streamed-query.ts": "fac8ba0fd1ff7059295d9fab0237ac86f5b75673bb6d5776ada5f44c6e9d0c44",
         "src/http/types.ts": "ca84b5df8e86a16169ba953983055744d058218835cc748020a0310e801494c8",
-        "src/index.ts": "dc946f4279705804c786467ce7aefdd72d141de3cf6cfa2f8b2acfa34d66a524",
+        "src/index.ts": "4313984f8f12065eda67ccb39ef24c3876e636d34cf0d1048d7fa9f309aa1a3e",
         "src/react/index.tsx": "e273f4d61fe05c9143d209b7f10ab001a3418155be33b22855744ea2a7ec9525",
         "src/rpc/create-utils.ts": "00594c143c5aa6e199550259caa320e01c06890a1fb0f36d8d858c6368584b0d",
         "src/rpc/errors.ts": "ece32d573b0a5e7db1104bcf3f902262a94b89a59de82d50042d21016147e50d",
@@ -265,7 +265,7 @@
         "src/rpc/types.ts": "6116aee2a62b26a895caf709c99c5969d6e45358c0919abd40068f9ce2db3f54",
         "tests/cache-recipes.test.ts": "fe686d2434c1604f4b2577e582d3dcae3a183fffced090c5362bd649cbfc2569",
         "tests/configuration-composition.test.ts": "be2ffca6e62965d8b79a311998787f74565d4af86bcaec46c36f5a963b0d16f5",
-        "tests/contract-hydration.test.ts": "97816c0d1874aa2ecc8e59def32bf0d0db770df903bc8cbe116488c5baa1aa1c",
+        "tests/contract-hydration.test.ts": "3fefe763f805641ed372be2560a02467415369663d0b979ad74802e1cc1357d5",
         "tests/contract-reuse.test.ts": "21b97cec6da64d3a42d58e69aaad1754aaec2bb4dd1ac876ef25ec801f970a12",
         "tests/create-http-api-query-utils.test.ts": "a6b89aeb4e7570d6bff9b9fa45723b2a2d3a0180ed7d7807f222cbe2003f93d5",
         "tests/create-rpc-query-utils-configuration.test.ts": "c04f7903c14a2d8be54f1e8c84f0e00dd10e3b9148090c196b8ed7b25dfa8f52",
@@ -339,7 +339,7 @@
         "tests/stream-recovery.test.ts": "41f795edb52eb21601efee459477256ae47408a344a7106d7246e640379e0376",
         "tests/stream-snapshot.test.ts": "497a414206d844608d49cee4db98cc97764b92a36efb5f019255ef8b4a38ee9c",
         "tests/types/application-policy-contract.ts": "e2181da727cd335635d9d27c8b0d6eeaf9468fa052a449584f51345006c737ac",
-        "tests/types/contract-hydration-contract.ts": "7dcf32b74a8ea04dff3327f115ea029d5b35b3dd8e529a831f2537f03656bcaa",
+        "tests/types/contract-hydration-contract.ts": "9a7a9daf5214633cfa16e3d29b7f2d01cbefbf5a03a737bbac9624baa12e43fc",
         "tests/types/docs-functionality.ts": "065ff9eac091e4a25c814e3e49b49d0f6258fffb7c5ed0661a1ec960b41ac0c0",
         "tests/types/docs-http-ndjson.ts": "a86513c1047b700ce27fc49b3d1fb31004cf745096d8403a0bdc780d95a448a3",
         "tests/types/docs-http-quick-start-contract.ts": "e034175f607fc9414e4919c6762a859e03908b0ee7ba77cb5dc6556b746ec26c",
@@ -410,20 +410,20 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "187580d8adc95c1886c5a0e68c6e202c10b01470",
-      "outcome": "no-change",
-      "reason": "Refined static query redaction AST matching to check only leaf paths that emit wire values; guidance in skills/effect-api-query/references/http.md and _artifacts/skill_spec.md already accurately covers #238",
+      "head": "54c9c3d50726ec53ffdad69cd57e90969fa77ea7",
+      "outcome": "updated",
+      "reason": "Recurse stripBodylessTransport through encoding links for transformed-union asNoContent, updated ADR 0058 wording and _artifacts/skill_spec.md base SHA; full test suite, typecheck, format, and fallow passed",
       "evidence": [
-        "Changed: src/http/request.ts, tests/http-semantic-keys.test.ts at 187580d8adc95c1886c5a0e68c6e202c10b01470"
+        "Changed: src/core/contract-hydration.ts, tests/contract-hydration.test.ts at 54c9c3d50726ec53ffdad69cd57e90969fa77ea7"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "1be646198d8b0c4867982d3de35dd133769f7e70a7d5a52da6b2b9298804500a",
+      "fingerprint": "0b85980e978f75ed371c5daf6c79020f8dc5bf328ee94a025c82c37490a22978",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
         "_artifacts/domain_map.yaml": "a1ee71cd9573f65d8897f71b8e37023d90e7ccf7eb2b1055645f39911dd324f9",
-        "_artifacts/skill_spec.md": "8c1be3eb4b045c7fa2f3dd596d906469bab3360d8be64317a22a952882321917",
+        "_artifacts/skill_spec.md": "19d6f14fae5b8c011531833cfad77321985485e1b9b76aa2612b34f9b638d261",
         "_artifacts/skill_tree.yaml": "16f542e7682b84596d15b066716f06a2657fdffd14bab445279b409e7e1baa32",
         "apps/docs/astro.config.mts": "90c54a40605dc0f553b9f62831c88a3e012fe6da44a1e216e4f981bcf1af2272",
         "apps/docs/src/content/docs/concepts/client-lifecycle.md": "a826348cf7b3fd34b0677280daa75a08ce99138cb68fbd79d4ef52936190eeb6",
@@ -450,7 +450,7 @@
         "apps/docs/src/content/docs/guides/handle-failures.md": "56eee50db2863ebf2d197ab8b3305a54530ee85796b9b0e078a5f0b9081b0988",
         "apps/docs/src/content/docs/guides/http-metadata.md": "e07f1aab249005e6c4008c47ee90f0c73590513610cde475348fb5a98deb7147",
         "apps/docs/src/content/docs/guides/http-queries-and-mutations.md": "8a8b390f98a016b1266b8a89d6724be26133834ac5532cc3a354ac6ac81f547d",
-        "apps/docs/src/content/docs/guides/hydrate-query-views.md": "d835bab19600a71a80071efac67832874986b043205c796beb503ff6431dfde8",
+        "apps/docs/src/content/docs/guides/hydrate-query-views.md": "60e639be9ba89aed65382cb022f0aee94c4154cb65b7b6f3e76d1eb7350b8e10",
         "apps/docs/src/content/docs/guides/hydrate-unary-data.md": "73067f82f513173496db61b37849994945d11b34230590a54920c2b0f83081a0",
         "apps/docs/src/content/docs/guides/loader-descriptors.md": "4b65ebb5f430f465844ba05174afedad29a0902a2cae0b639f75f406906870e4",
         "apps/docs/src/content/docs/guides/mutations.md": "46841822ce1b757903a6aa12d3bd4e7e61ec7fd006c95fe08a4f8a0e207caecb",
@@ -523,7 +523,7 @@
         "docs/adr/0044-simplify-factory-setup-and-owner-tracking.md": "1bdeaad6bafab9b01c341fcd59cc450612ede3794e693feb1929b8f1cb51a003",
         "docs/adr/0045-raise-0-8-0-peer-floors.md": "6103c014aff3ca1f0058e8d4a0e5f2bcb289c14e72e9fff6e21ac65271727348",
         "docs/adr/0046-lazy-memoized-frozen-leaves-and-unified-key-inputs.md": "c235cd1a134cb3d7c9bc983723394b22f573188e2f92d8150423aa1c65600653",
-        "docs/adr/0047-derive-hydration-codecs-from-contracts.md": "56720f5282afa2e68c6c3b74aff6ec307ee27f3a1af4ef17607373de030fd935",
+        "docs/adr/0047-derive-hydration-codecs-from-contracts.md": "44ad3fa80dd89d246914b1bf2da2027880f424fabb0333d205a0dd7346cb3ac1",
         "docs/adr/0048-add-optional-react-subpath-wiring.md": "5c88e23a71ff6541e8be81d082a2bc5a4581ffa7186ce10a15dffae753d8b08b",
         "docs/adr/0049-flatten-utility-policy-maps.md": "852f6d4682fb87a94dd118c59091a19b9ed303ebe226a2ec2c1c1cd1238f9e76",
         "docs/adr/0050-direct-leaf-execution-and-shared-error-handling.md": "2715e850d01415355ce83c15ff97bc361df3bbfde8d6ec369d24309fcf3afcb4",
@@ -628,7 +628,7 @@
         "skills/effect-api-query/references/cache-workflows.md": "9f370822c4f1ec986ef27afc7fd7647ad24b701f671f33d1fb86e8478d73769f",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "03e8c84d889b7dd478edebe96262bd09d2a5f90edac6e8705cae44a7ecc91a62",
         "skills/effect-api-query/references/http.md": "e61055cdee73224724f4bcd56b5d4061a53b344d9bc0b601672b50c98555cfca",
-        "skills/effect-api-query/references/hydration-and-ssr.md": "860a09c3df2883a2a8cf9a3902291ff109aa6a6751e58d150d9cb42013207120",
+        "skills/effect-api-query/references/hydration-and-ssr.md": "0265ce970039b2ca41be2165683c135fd9584ea9a3c95b147a73eca8e54bd19f",
         "skills/effect-api-query/references/query-patterns.md": "983066711ed321e7ce37ae230ab97379d30e010cfa11c74211053c982bcea6a1",
         "skills/effect-api-query/references/rpc.md": "d5bc0d199249ef185f1cd532e282d95788807def0e18bc5f175730534aa2ed68",
         "src/core/branch-filter.ts": "da18cded0a176b20e6056b74bd52e70fb8ec588346beabb01fe1f2d4f1a8b1e3",
@@ -636,8 +636,8 @@
         "src/core/configure-utils.ts": "ee45471eb50bc526951b8af08fa605fae0d9a056a143c222ecde9180c7bfcd30",
         "src/core/configure.ts": "5a7e7f8dc1fa13e0d698678e79521bdce79aefcaec4c4235ac20b340f1076925",
         "src/core/consume-events.ts": "648144582c4bdbf4a9cb0d35ddc54327abbefc654f2d37b6154232bcd09a1752",
-        "src/core/contract-hydration-types.ts": "53366364723a34f8948f2b813ad60ec20de98ee878f9398aff38bb15bf12fd45",
-        "src/core/contract-hydration.ts": "6ae4d7633d1bb1c755d0f44c212957f17104027edc361f2e865e5805e52aab71",
+        "src/core/contract-hydration-types.ts": "fb0e5a7e1569301057422e662185a2a11f4007473dca58b1786422d6fed5deac",
+        "src/core/contract-hydration.ts": "c3783bb93a190e45f0b703d05ecbd11ee607f9410046f7c1ce3ca7dbd62ff395",
         "src/core/declared-error.ts": "72146f75dc4f99abb60c143ae4464abf6a512cd5ffe713597bb3fb967f58c7a0",
         "src/core/hydration.ts": "08c812094bb4662cdf118b1825a47a4ec4bc1e4bd248a878726cbd4ff31aaf1e",
         "src/core/inference.ts": "249bc1d59e4ea6ddc7e3a09a63b93c13e3805f9d70ead00f44c710ff95e4df94",
@@ -674,7 +674,7 @@
         "src/http/request.ts": "c6ae7ef094fd00cb4c7537cc2599fe7a4400b77100d4feeeb870d71898e5698d",
         "src/http/streamed-query.ts": "fac8ba0fd1ff7059295d9fab0237ac86f5b75673bb6d5776ada5f44c6e9d0c44",
         "src/http/types.ts": "ca84b5df8e86a16169ba953983055744d058218835cc748020a0310e801494c8",
-        "src/index.ts": "dc946f4279705804c786467ce7aefdd72d141de3cf6cfa2f8b2acfa34d66a524",
+        "src/index.ts": "4313984f8f12065eda67ccb39ef24c3876e636d34cf0d1048d7fa9f309aa1a3e",
         "src/react/index.tsx": "e273f4d61fe05c9143d209b7f10ab001a3418155be33b22855744ea2a7ec9525",
         "src/rpc/create-utils.ts": "00594c143c5aa6e199550259caa320e01c06890a1fb0f36d8d858c6368584b0d",
         "src/rpc/errors.ts": "ece32d573b0a5e7db1104bcf3f902262a94b89a59de82d50042d21016147e50d",
@@ -683,7 +683,7 @@
         "src/rpc/types.ts": "6116aee2a62b26a895caf709c99c5969d6e45358c0919abd40068f9ce2db3f54",
         "tests/cache-recipes.test.ts": "fe686d2434c1604f4b2577e582d3dcae3a183fffced090c5362bd649cbfc2569",
         "tests/configuration-composition.test.ts": "be2ffca6e62965d8b79a311998787f74565d4af86bcaec46c36f5a963b0d16f5",
-        "tests/contract-hydration.test.ts": "97816c0d1874aa2ecc8e59def32bf0d0db770df903bc8cbe116488c5baa1aa1c",
+        "tests/contract-hydration.test.ts": "3fefe763f805641ed372be2560a02467415369663d0b979ad74802e1cc1357d5",
         "tests/contract-reuse.test.ts": "21b97cec6da64d3a42d58e69aaad1754aaec2bb4dd1ac876ef25ec801f970a12",
         "tests/create-http-api-query-utils.test.ts": "a6b89aeb4e7570d6bff9b9fa45723b2a2d3a0180ed7d7807f222cbe2003f93d5",
         "tests/create-rpc-query-utils-configuration.test.ts": "c04f7903c14a2d8be54f1e8c84f0e00dd10e3b9148090c196b8ed7b25dfa8f52",
@@ -757,7 +757,7 @@
         "tests/stream-recovery.test.ts": "41f795edb52eb21601efee459477256ae47408a344a7106d7246e640379e0376",
         "tests/stream-snapshot.test.ts": "497a414206d844608d49cee4db98cc97764b92a36efb5f019255ef8b4a38ee9c",
         "tests/types/application-policy-contract.ts": "e2181da727cd335635d9d27c8b0d6eeaf9468fa052a449584f51345006c737ac",
-        "tests/types/contract-hydration-contract.ts": "7dcf32b74a8ea04dff3327f115ea029d5b35b3dd8e529a831f2537f03656bcaa",
+        "tests/types/contract-hydration-contract.ts": "9a7a9daf5214633cfa16e3d29b7f2d01cbefbf5a03a737bbac9624baa12e43fc",
         "tests/types/docs-functionality.ts": "065ff9eac091e4a25c814e3e49b49d0f6258fffb7c5ed0661a1ec960b41ac0c0",
         "tests/types/docs-http-ndjson.ts": "a86513c1047b700ce27fc49b3d1fb31004cf745096d8403a0bdc780d95a448a3",
         "tests/types/docs-http-quick-start-contract.ts": "e034175f607fc9414e4919c6762a859e03908b0ee7ba77cb5dc6556b746ec26c",
@@ -828,11 +828,11 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "187580d8adc95c1886c5a0e68c6e202c10b01470",
-      "outcome": "no-change",
-      "reason": "Refined static query redaction AST matching to check only leaf paths that emit wire values; guidance in skills/effect-api-query/references/http.md and _artifacts/skill_spec.md already accurately covers #238",
+      "head": "54c9c3d50726ec53ffdad69cd57e90969fa77ea7",
+      "outcome": "updated",
+      "reason": "Recurse stripBodylessTransport through encoding links for transformed-union asNoContent, updated ADR 0058 wording and _artifacts/skill_spec.md base SHA; full test suite, typecheck, format, and fallow passed",
       "evidence": [
-        "Changed: src/http/request.ts, tests/http-semantic-keys.test.ts at 187580d8adc95c1886c5a0e68c6e202c10b01470"
+        "Changed: _artifacts/skill_spec.md, src/core/contract-hydration.ts, tests/contract-hydration.test.ts at 54c9c3d50726ec53ffdad69cd57e90969fa77ea7"
       ]
     },
     "source:vite.config.ts": {
@@ -4623,6 +4623,54 @@
       "reason": "Added focused release changesets for #238; shipped skill guidance in skills/effect-api-query/references/http.md and _artifacts/skill_spec.md is already updated",
       "evidence": [
         "Changed: .changeset/require-key-encoders-for-http-redacted-names.md at 9ed6190ffc3cc7236ec506b216443afaf288437e"
+      ]
+    },
+    "source:.changeset/preserve-as-no-content-values-in-contract-hydration.md": {
+      "fingerprint": "c865b3cee6b65a2bc2489405cd0e23a11d3ce007c66483562b28ce0fad74f018",
+      "snapshot": {
+        ".changeset/preserve-as-no-content-values-in-contract-hydration.md": "a73e0d1fcf005924abdaeb7507563aab3084dd48318bde60c00f9f77c6d15ff6"
+      },
+      "head": "38d7d433661ed701518acda559d9bb1f0031c2cd",
+      "outcome": "updated",
+      "reason": "Updated skills/effect-api-query/references/hydration-and-ssr.md, apps/docs/src/content/docs/guides/hydrate-query-views.md, ADR 0058 (amending ADR 0047), and _artifacts/skill_spec.md for #239 contract-derived hydration hardening (nested Redacted detection, HttpApiSchema.asNoContent preservation, and opt-in explicit header allowlist for HTTP metadata hydration); verified with full vp test, vp run typecheck, vp run format, and vp run fallow",
+      "evidence": [
+        "Changed: .changeset/preserve-as-no-content-values-in-contract-hydration.md at 38d7d433661ed701518acda559d9bb1f0031c2cd"
+      ]
+    },
+    "source:.changeset/reject-nested-redacted-schemas-in-contract-hydration.md": {
+      "fingerprint": "455745093ef7b3e16aa2c4af9161c0cd8bb973c97b0aee4744605fd9cb7c5cbc",
+      "snapshot": {
+        ".changeset/reject-nested-redacted-schemas-in-contract-hydration.md": "6737553ff6dc2e7dfc33268c35d13f8938c890bdc6a9faae9abc628a319d2892"
+      },
+      "head": "38d7d433661ed701518acda559d9bb1f0031c2cd",
+      "outcome": "updated",
+      "reason": "Updated skills/effect-api-query/references/hydration-and-ssr.md, apps/docs/src/content/docs/guides/hydrate-query-views.md, ADR 0058 (amending ADR 0047), and _artifacts/skill_spec.md for #239 contract-derived hydration hardening (nested Redacted detection, HttpApiSchema.asNoContent preservation, and opt-in explicit header allowlist for HTTP metadata hydration); verified with full vp test, vp run typecheck, vp run format, and vp run fallow",
+      "evidence": [
+        "Changed: .changeset/reject-nested-redacted-schemas-in-contract-hydration.md at 38d7d433661ed701518acda559d9bb1f0031c2cd"
+      ]
+    },
+    "source:.changeset/require-header-allowlist-for-http-metadata-hydration.md": {
+      "fingerprint": "dceedb13d9f4635c9a12835caa7c2054304b247a77ae15db0cf4e388574de248",
+      "snapshot": {
+        ".changeset/require-header-allowlist-for-http-metadata-hydration.md": "3b8049e28602906f3b238b45e3004404567d04b031ea7f6b9b08b1ba5aaf3e99"
+      },
+      "head": "38d7d433661ed701518acda559d9bb1f0031c2cd",
+      "outcome": "updated",
+      "reason": "Updated skills/effect-api-query/references/hydration-and-ssr.md, apps/docs/src/content/docs/guides/hydrate-query-views.md, ADR 0058 (amending ADR 0047), and _artifacts/skill_spec.md for #239 contract-derived hydration hardening (nested Redacted detection, HttpApiSchema.asNoContent preservation, and opt-in explicit header allowlist for HTTP metadata hydration); verified with full vp test, vp run typecheck, vp run format, and vp run fallow",
+      "evidence": [
+        "Changed: .changeset/require-header-allowlist-for-http-metadata-hydration.md at 38d7d433661ed701518acda559d9bb1f0031c2cd"
+      ]
+    },
+    "source:docs/adr/0058-require-explicit-header-allowlist-for-metadata-hydration.md": {
+      "fingerprint": "9d8733edc8e3b6234364c1f6d1f7600007903abfdbf94b98cacd9e4ae4e2904b",
+      "snapshot": {
+        "docs/adr/0058-require-explicit-header-allowlist-for-metadata-hydration.md": "ac37974ef7edc08996517abbacdaee2f935ca1128ca7ec2c9092893fd5f10a07"
+      },
+      "head": "54c9c3d50726ec53ffdad69cd57e90969fa77ea7",
+      "outcome": "updated",
+      "reason": "Recurse stripBodylessTransport through encoding links for transformed-union asNoContent, updated ADR 0058 wording and _artifacts/skill_spec.md base SHA; full test suite, typecheck, format, and fallow passed",
+      "evidence": [
+        "Changed: docs/adr/0058-require-explicit-header-allowlist-for-metadata-hydration.md at 54c9c3d50726ec53ffdad69cd57e90969fa77ea7"
       ]
     }
   }
