@@ -43,6 +43,11 @@ export const makeUsersInvalidator =
     ]);
   };
 
+type DeleteTarget = Pick<User, "id" | "revision">;
+
+const deletionKey = ({ id, revision }: DeleteTarget) =>
+  JSON.stringify([id, revision]);
+
 interface DirectorySnapshot {
   readonly rpcList: readonly User[] | undefined;
   readonly httpList: readonly User[] | undefined;
@@ -52,14 +57,17 @@ interface DirectorySnapshot {
 const restoreList = (
   current: readonly User[] | undefined,
   snapshot: readonly User[] | undefined,
-  id: number
+  target: DeleteTarget
 ) => {
-  const index = snapshot?.findIndex((user) => user.id === id) ?? -1;
+  const index =
+    snapshot?.findIndex(
+      (user) => user.id === target.id && user.revision === target.revision
+    ) ?? -1;
   const user = snapshot?.[index];
   if (
     current === undefined ||
     user === undefined ||
-    current.some((existing) => existing.id === id)
+    current.some((existing) => existing.id === target.id)
   ) {
     return current;
   }
@@ -171,19 +179,28 @@ export const makeUserWrites = ({
       writes.delete(write);
     }
     const dataUpdateCount = query.state.dataUpdateCount + 1;
-    queryClient.setQueryData<readonly User[]>(key, (users) =>
-      users === undefined ? undefined : edit(users)
+    queryClient.setQueryData<readonly User[]>(
+      key,
+      (users) => (users === undefined ? undefined : edit(users)),
+      { updatedAt: query.state.dataUpdatedAt }
     );
     listWrites.set(query, { dataUpdateCount, writes });
   };
   const editPages = (
-    edit: (data: InfiniteData<UserPage>) => InfiniteData<UserPage>
+    edit: (
+      data: InfiniteData<UserPage>,
+      users: readonly User[] | undefined
+    ) => InfiniteData<UserPage>
   ) => {
     queryClient.setQueryData(rpcPages, (data) =>
-      data === undefined ? undefined : edit(data)
+      data === undefined
+        ? undefined
+        : edit(data, queryClient.getQueryData(rpcList))
     );
     queryClient.setQueryData(httpPages, (data) =>
-      data === undefined ? undefined : edit(data)
+      data === undefined
+        ? undefined
+        : edit(data, queryClient.getQueryData(httpList))
     );
   };
   const releaseWrite = (write: number) => {
@@ -224,7 +241,7 @@ export const makeUserWrites = ({
   const restorePages = (
     current: InfiniteData<UserPage> | undefined,
     snapshot: InfiniteData<UserPage> | undefined,
-    id: number,
+    target: DeleteTarget,
     write: number
   ) => {
     if (current === undefined || snapshot === undefined) {
@@ -236,8 +253,11 @@ export const makeUserWrites = ({
         pageWrites.get(page)?.has(write) === true
           ? patchPage(
               page,
-              restoreList(page.users, snapshot.pages[pageIndex]?.users, id) ??
+              restoreList(
                 page.users,
+                snapshot.pages[pageIndex]?.users,
+                target
+              ) ?? page.users,
               write,
               1,
               "settled"
@@ -247,23 +267,28 @@ export const makeUserWrites = ({
     };
   };
   const replaceUser = (
-    id: number,
+    {
+      id,
+      revision,
+    }: DeleteTarget | { readonly id: number; readonly revision?: never },
     replacement: User | undefined,
     write: number,
     totalChange: number,
     phase: "optimistic" | "settled"
   ) => {
+    const matches = (user: User) =>
+      user.id === id && (revision === undefined || user.revision === revision);
     for (const key of listKeys) {
       editList(
         key,
         (users) => {
           const retained = users.filter(
-            (user) => user.id !== id && user.id !== replacement?.id
+            (user) => !matches(user) && user.id !== replacement?.id
           );
           if (replacement === undefined) {
             return retained;
           }
-          const index = users.findIndex((user) => user.id === id);
+          const index = users.findIndex(matches);
           return index === -1
             ? [...retained, replacement]
             : [
@@ -276,30 +301,43 @@ export const makeUserWrites = ({
         phase
       );
     }
-    editPages((data) => ({
-      ...data,
-      pages: data.pages.map((page, pageIndex) => {
-        const index = page.users.findIndex((user) => user.id === id);
-        const retained = page.users.filter(
-          (user) => user.id !== id && user.id !== replacement?.id
-        );
-        const append =
-          replacement !== undefined &&
-          pageIndex === data.pages.length - 1 &&
-          page.nextCursor === null;
-        let users = retained;
-        if (replacement !== undefined && index !== -1) {
-          users = [
-            ...retained.slice(0, index),
-            replacement,
-            ...retained.slice(index),
-          ];
-        } else if (append) {
-          users = [...retained, replacement];
+    editPages((data, directory) => {
+      if (revision !== undefined) {
+        const replaced = (user: User) =>
+          user.id === id && user.revision !== revision;
+        if (
+          data.pages.some((page) => page.users.some(replaced)) ||
+          (directory?.some(replaced) === true &&
+            !data.pages.some((page) => page.users.some(matches)))
+        ) {
+          return data;
         }
-        return patchPage(page, users, write, totalChange, phase);
-      }),
-    }));
+      }
+      return {
+        ...data,
+        pages: data.pages.map((page, pageIndex) => {
+          const index = page.users.findIndex(matches);
+          const retained = page.users.filter(
+            (user) => !matches(user) && user.id !== replacement?.id
+          );
+          const append =
+            replacement !== undefined &&
+            pageIndex === data.pages.length - 1 &&
+            page.nextCursor === null;
+          let users = retained;
+          if (replacement !== undefined && index !== -1) {
+            users = [
+              ...retained.slice(0, index),
+              replacement,
+              ...retained.slice(index),
+            ];
+          } else if (append) {
+            users = [...retained, replacement];
+          }
+          return patchPage(page, users, write, totalChange, phase);
+        }),
+      };
+    });
   };
   const created = async (user: User, write: number) => {
     if (!isActive()) {
@@ -309,7 +347,7 @@ export const makeUserWrites = ({
     if (!isActive()) {
       return;
     }
-    replaceUser(-write, user, write, 0, "settled");
+    replaceUser({ id: -write }, user, write, 0, "settled");
     queryClient.setQueryData(
       rpcQuery.users.get.queryKey({
         input: { id: user.id, locale: user.locale },
@@ -328,7 +366,7 @@ export const makeUserWrites = ({
   };
   const createFailed = (write: number | undefined) => {
     if (isActive() && write !== undefined) {
-      replaceUser(-write, undefined, write, -1, "settled");
+      replaceUser({ id: -write }, undefined, write, -1, "settled");
     }
   };
   const startCreate = async (input: {
@@ -342,9 +380,10 @@ export const makeUserWrites = ({
     }
     const temporaryId = -write;
     replaceUser(
-      temporaryId,
+      { id: temporaryId },
       new User({
         id: temporaryId,
+        revision: "optimistic",
         name: input.name,
         locale: input.locale ?? "en",
       }),
@@ -383,7 +422,7 @@ export const makeUserWrites = ({
   };
   let deletionBaseline: DirectorySnapshot | undefined;
   const deletionGroups = new Map<
-    number,
+    string,
     DirectorySnapshot & {
       readonly pending: Set<number>;
       readonly applied: boolean;
@@ -392,14 +431,15 @@ export const makeUserWrites = ({
     }
   >();
   const finishDelete = (
-    id: number,
+    target: DeleteTarget,
     write: number | undefined,
     succeeded: boolean
   ) => {
     if (write === undefined) {
       return;
     }
-    const group = deletionGroups.get(id);
+    const groupKey = deletionKey(target);
+    const group = deletionGroups.get(groupKey);
     if (group === undefined) {
       return;
     }
@@ -408,7 +448,7 @@ export const makeUserWrites = ({
     if (group.pending.size !== 0) {
       return;
     }
-    deletionGroups.delete(id);
+    deletionGroups.delete(groupKey);
     if (deletionGroups.size === 0) {
       deletionBaseline = undefined;
     }
@@ -426,32 +466,35 @@ export const makeUserWrites = ({
       if (ownedList(listQuery(key))?.writes.has(group.write) === true) {
         editList(
           key,
-          (current) => restoreList(current, snapshot, id) ?? current,
+          (current) => restoreList(current, snapshot, target) ?? current,
           group.write,
           "settled"
         );
       }
     }
     queryClient.setQueryData(rpcPages, (current) =>
-      restorePages(current, group.rpcPages, id, group.write)
+      restorePages(current, group.rpcPages, target, group.write)
     );
     queryClient.setQueryData(httpPages, (current) =>
-      restorePages(current, group.httpPages, id, group.write)
+      restorePages(current, group.httpPages, target, group.write)
     );
   };
-  const deleted = async (id: number, write: number) => {
+  const deleted = async (target: DeleteTarget, write: number) => {
     if (isActive()) {
       await cancel();
     }
-    finishDelete(id, write, true);
+    finishDelete(target, write, true);
   };
-  const startDelete = async (id: number) => {
+  const startDelete = async (target: DeleteTarget) => {
+    const matches = (user: User) =>
+      user.id === target.id && user.revision === target.revision;
     const write = await begin();
     if (!isActive()) {
       pending.delete(write);
       throw new Error("The application owner has retired");
     }
-    let group = deletionGroups.get(id);
+    const groupKey = deletionKey(target);
+    let group = deletionGroups.get(groupKey);
     if (group === undefined) {
       const lists = [
         queryClient.getQueryData(rpcList),
@@ -466,11 +509,11 @@ export const makeUserWrites = ({
         current: readonly User[] | undefined,
         owned: boolean
       ) => {
-        const target = current?.find((user) => user.id === id);
-        return owned &&
-          baseline !== undefined &&
-          baseline.some((user) => user.id === id)
-          ? baseline.map((user) => (user.id === id ? (target ?? user) : user))
+        const currentTarget = current?.find(matches);
+        return owned && baseline !== undefined && baseline.some(matches)
+          ? baseline.map((user) =>
+              matches(user) ? (currentTarget ?? user) : user
+            )
           : current;
       };
       const pageSnapshot = (
@@ -511,12 +554,10 @@ export const makeUserWrites = ({
         httpPages: pageSnapshot(deletionBaseline?.httpPages, pages[1]),
       };
       const applied =
-        lists.some((users) => users?.some((user) => user.id === id) ?? false) ||
+        lists.some((users) => users?.some(matches) ?? false) ||
         pages.some(
           (data) =>
-            data?.pages.some((page) =>
-              page.users.some((user) => user.id === id)
-            ) ?? false
+            data?.pages.some((page) => page.users.some(matches)) ?? false
         );
       group = {
         ...deletionBaseline,
@@ -525,18 +566,18 @@ export const makeUserWrites = ({
         applied,
         write,
       };
-      deletionGroups.set(id, group);
+      deletionGroups.set(groupKey, group);
       if (applied) {
-        replaceUser(id, undefined, write, -1, "optimistic");
+        replaceUser(target, undefined, write, -1, "optimistic");
       }
     }
     group.pending.add(write);
     return {
       commit: async () => {
-        await deleted(id, write);
+        await deleted(target, write);
       },
       rollback: () => {
-        finishDelete(id, write, false);
+        finishDelete(target, write, false);
       },
       settle: async () => {
         await settle(write);
@@ -579,14 +620,15 @@ export const makeUserWrites = ({
       trackMutationOptions(
         rpcQuery.users.delete.mutationOptions({
           ...deleteCallbacks,
-          onMutate: async ({ id }) => await startDelete(id),
+          onMutate: startDelete,
         })
       ),
     httpDelete: () =>
       trackMutationOptions(
         httpQuery.users.delete.mutationOptions({
           ...deleteCallbacks,
-          onMutate: async ({ params }) => await startDelete(params.id),
+          onMutate: async ({ params, query }) =>
+            await startDelete({ ...params, ...query }),
         })
       ),
   };

@@ -1,3 +1,4 @@
+import type { User } from "@effect-api-query/contracts";
 import { ActionButton } from "@effect-api-query/shared/ui/action-button.tsx";
 import { EffectErrorDetails } from "@effect-api-query/shared/ui/effect-error-details.tsx";
 import {
@@ -5,7 +6,8 @@ import {
   useQuery,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { Suspense, useState } from "react";
+import { Component, Suspense, useState } from "react";
+import type { ReactNode } from "react";
 
 import type { ViteReactApplication } from "../../lib/application.ts";
 import { ConditionalUserQuery } from "../conditional-user-query.tsx";
@@ -21,18 +23,82 @@ const streamedDiagnosticsOptions = (
     maxChunks: bounded ? 2 : "unbounded",
   });
 
+const FeaturedUserUnavailable = () => (
+  <p className="text-muted-foreground text-sm">Featured user unavailable.</p>
+);
+
+class FeaturedUserBoundary extends Component<
+  { readonly children: ReactNode },
+  { readonly failed: boolean }
+> {
+  constructor(props: { readonly children: ReactNode }) {
+    super(props);
+    this.state = { failed: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  override render(): ReactNode {
+    return this.state.failed ? (
+      <FeaturedUserUnavailable />
+    ) : (
+      this.props.children
+    );
+  }
+}
+
 const FeaturedUser = ({
   application,
+  user,
 }: {
   readonly application: ViteReactApplication;
+  readonly user: User;
 }) => {
   const featured = useSuspenseQuery(
-    application.rpcQuery.users.get.queryOptions({ input: { id: 1 } })
+    application.rpcQuery.users.get.queryOptions({ input: { id: user.id } })
   );
+  if (featured.data.revision !== user.revision) {
+    return <FeaturedUserUnavailable />;
+  }
   return (
     <p className="text-muted-foreground text-sm">
       Featured: {featured.data.name}
     </p>
+  );
+};
+
+const FeaturedUserPanel = ({
+  application,
+  users,
+  isSynced,
+  isFetching,
+}: {
+  readonly application: ViteReactApplication;
+  readonly users: readonly User[] | undefined;
+  readonly isSynced: boolean;
+  readonly isFetching: boolean;
+}) => {
+  const featuredUser = isSynced
+    ? users?.find((user) => user.id > 0)
+    : undefined;
+  return featuredUser === undefined ? (
+    <p className="text-muted-foreground text-sm">
+      {isFetching ? "Loading featured user…" : "No featured user."}
+    </p>
+  ) : (
+    <FeaturedUserBoundary key={featuredUser.revision}>
+      <Suspense
+        fallback={
+          <p className="text-muted-foreground text-sm">
+            Loading featured user…
+          </p>
+        }
+      >
+        <FeaturedUser application={application} user={featuredUser} />
+      </Suspense>
+    </FeaturedUserBoundary>
   );
 };
 
@@ -126,6 +192,7 @@ export const QueriesSection = ({
 }) => {
   const { queryClient, rpcQuery } = application;
   const users = useQuery(rpcQuery.users.list.queryOptions());
+  const isSynced = users.dataUpdatedAt !== 0;
   const [boundedHistory, setBoundedHistory] = useState(false);
   const diagnostics = useQuery(
     streamedDiagnosticsOptions(rpcQuery, boundedHistory)
@@ -192,18 +259,19 @@ export const QueriesSection = ({
             <EffectErrorDetails error={users.error} />
           )}
           <div className="mt-4">
-            <UserList application={application} users={users.data} />
+            <UserList
+              application={application}
+              isSynced={isSynced}
+              users={users.data}
+            />
           </div>
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <Suspense
-              fallback={
-                <p className="text-muted-foreground text-sm">
-                  Loading featured user…
-                </p>
-              }
-            >
-              <FeaturedUser application={application} />
-            </Suspense>
+            <FeaturedUserPanel
+              application={application}
+              users={users.data}
+              isSynced={isSynced}
+              isFetching={users.isFetching}
+            />
             <ActionButton
               onClick={() => {
                 void reuseCachedUsers();

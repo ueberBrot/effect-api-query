@@ -1,21 +1,23 @@
+import { randomUUID } from "node:crypto";
+
 import { User, UserPage } from "@effect-api-query/contracts";
 import type { SeedUser } from "@effect-api-query/contracts";
 import { Effect, Ref } from "effect";
 
 const initialUsers = [
-  new User({ id: 1, locale: "en", name: "Ada Lovelace" }),
-  new User({ id: 2, locale: "nl", name: "Edsger Dijkstra" }),
-  new User({ id: 3, locale: "en", name: "Alan Turing" }),
-  new User({ id: 4, locale: "en", name: "Barbara Liskov" }),
-  new User({ id: 5, locale: "en", name: "Donald Knuth" }),
-  new User({ id: 6, locale: "en", name: "Radia Perlman" }),
-  new User({ id: 7, locale: "de", name: "Hedy Lamarr" }),
-  new User({ id: 8, locale: "en", name: "John Backus" }),
-  new User({ id: 9, locale: "en", name: "Mary Jackson" }),
-  new User({ id: 10, locale: "en", name: "Dennis Ritchie" }),
-  new User({ id: 11, locale: "en", name: "Annie Easley" }),
-  new User({ id: 12, locale: "en", name: "James Gosling" }),
-] as const satisfies readonly User[];
+  { locale: "en", name: "Ada Lovelace" },
+  { locale: "nl", name: "Edsger Dijkstra" },
+  { locale: "en", name: "Alan Turing" },
+  { locale: "en", name: "Barbara Liskov" },
+  { locale: "en", name: "Donald Knuth" },
+  { locale: "en", name: "Radia Perlman" },
+  { locale: "de", name: "Hedy Lamarr" },
+  { locale: "en", name: "John Backus" },
+  { locale: "en", name: "Mary Jackson" },
+  { locale: "en", name: "Dennis Ritchie" },
+  { locale: "en", name: "Annie Easley" },
+  { locale: "en", name: "James Gosling" },
+] as const satisfies readonly Pick<SeedUser, "name" | "locale">[];
 
 interface ServerState {
   readonly nextUserId: number;
@@ -24,16 +26,19 @@ interface ServerState {
 
 const initialState = (): ServerState => ({
   nextUserId: initialUsers.length + 1,
-  users: initialUsers,
+  users: initialUsers.map((user, index) => makeUser(index + 1, user)),
 });
 
-const makeUser = (id: number, { locale, name }: SeedUser): User =>
-  new User({ id, locale: locale ?? "en", name });
+const makeUser = (
+  id: number,
+  { locale, name }: Pick<SeedUser, "name" | "locale">
+): User =>
+  new User({ id, locale: locale ?? "en", name, revision: randomUUID() });
 
 export const makeUsers = Effect.fn("ExampleUsers.make")(function* () {
   const state = yield* Ref.make(initialState());
   return {
-    reset: Ref.set(state, initialState()),
+    reset: Ref.update(state, initialState),
     seed: Effect.fn("ExampleUsers.seed")(
       ({ users }: { readonly users: readonly SeedUser[] }) =>
         Ref.modify(state, (current) => {
@@ -62,9 +67,11 @@ export const makeUsers = Effect.fn("ExampleUsers.make")(function* () {
       })
     ),
     delete: Effect.fn("ExampleUsers.delete")(
-      ({ id }: { readonly id: number }) =>
+      ({ id, revision }: Pick<User, "id" | "revision">) =>
         Ref.modify(state, (current) => {
-          const exists = current.users.some((user) => user.id === id);
+          const exists = current.users.some(
+            (user) => user.id === id && user.revision === revision
+          );
           return [
             exists,
             exists
@@ -90,8 +97,9 @@ export const makeUsers = Effect.fn("ExampleUsers.make")(function* () {
               : Effect.succeed(
                   new User({
                     id: user.id,
-                    locale: locale ?? "en",
+                    revision: user.revision,
                     name: user.name,
+                    locale: locale ?? "en",
                   })
                 );
           })

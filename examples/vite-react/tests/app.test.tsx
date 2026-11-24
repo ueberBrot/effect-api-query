@@ -17,6 +17,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vite-plus/test";
 import { makeControlledUserWrites } from "../../../tests/fixtures/optimistic-users.ts";
 import { ViteReactExample } from "../src/app.tsx";
 import { CommandsSection } from "../src/components/sections/commands-section.tsx";
+import { QueriesSection } from "../src/components/sections/queries-section.tsx";
 import { CreateUserForm } from "../src/components/users/create-user-form.tsx";
 import { UserList } from "../src/components/users/user-list.tsx";
 import { startViteReactApplication } from "../src/lib/application.ts";
@@ -33,7 +34,11 @@ const OptimisticUsers = ({
   return (
     <>
       <CreateUserForm application={application} />
-      <UserList application={application} users={users.data} />
+      <UserList
+        application={application}
+        isSynced={users.dataUpdatedAt !== 0}
+        users={users.data}
+      />
     </>
   );
 };
@@ -139,7 +144,12 @@ describe("plain Vite React integration", () => {
     cleanup();
     const fixture = await Effect.runPromise(makeControlledUserWrites());
     const owned = fixture.application;
-    const ada = new User({ id: 1, name: "Ada", locale: "en" });
+    const ada = new User({
+      id: 1,
+      revision: "user-1",
+      name: "Ada",
+      locale: "en",
+    });
     fixture.seed([ada]);
     owned.queryClient.setQueryData(owned.rpcQuery.users.list.queryKey(), [ada]);
     render(
@@ -165,7 +175,9 @@ describe("plain Vite React integration", () => {
           .getByRole("button", { name: "Delete Grace" })
           .hasAttribute("disabled"),
       }).toStrictEqual({ name: "Grace", disabled: true });
-      await creation.succeed(new User({ id: 2, name: "Grace", locale: "en" }));
+      await creation.succeed(
+        new User({ id: 2, revision: "user-2", name: "Grace", locale: "en" })
+      );
       await expect(screen.findByText("Added Grace")).resolves.toBeDefined();
       await deletion.fail();
       const restoredAda = await screen.findByText("Ada", { exact: true });
@@ -177,6 +189,43 @@ describe("plain Vite React integration", () => {
     } finally {
       cleanup();
       await owned.dispose();
+    }
+  });
+});
+
+describe("featured user", () => {
+  it("isolates a missing featured record and renders an empty directory", async () => {
+    const { application } = await Effect.runPromise(
+      makeControlledUserWrites({
+        defaultOptions: { queries: { staleTime: Infinity, retry: false } },
+      })
+    );
+    const list = application.rpcQuery.users.list.queryKey();
+    application.queryClient.setQueryData(list, [
+      new User({ id: 1, revision: "missing", name: "Missing", locale: "en" }),
+    ]);
+    render(
+      <QueryClientProvider client={application.queryClient}>
+        <QueriesSection application={application} />
+      </QueryClientProvider>
+    );
+    try {
+      await expect(
+        screen.findByText("Featured user unavailable.")
+      ).resolves.toBeDefined();
+      expect(
+        screen.getByRole("heading", { name: "Infinite query" })
+      ).toBeDefined();
+      application.queryClient.setQueryData(list, []);
+      await expect(
+        screen.findByText("No featured user.")
+      ).resolves.toBeDefined();
+      expect(
+        screen.getByRole("button", { name: "Invalidate user queries" })
+      ).toBeDefined();
+    } finally {
+      cleanup();
+      await application.dispose();
     }
   });
 });

@@ -1,6 +1,7 @@
 import {
   DiagnosticOperationStatus,
   operationSessionPath,
+  User,
 } from "@effect-api-query/contracts";
 import { makeExampleRpcClient } from "@effect-api-query/contracts/client";
 import { expect } from "@playwright/test";
@@ -211,6 +212,13 @@ test.describe("TanStack Start HTTP API example", () => {
     writeToken,
   }) => {
     const { origin } = new URL(page.url());
+    const directoryResponse = await page.request.get(`${origin}/api/users`);
+    const [first, second] = Schema.decodeUnknownSync(Schema.Array(User))(
+      await directoryResponse.json()
+    );
+    if (first === undefined || second === undefined) {
+      throw new Error("Expected two users in the directory");
+    }
     const deleteRpcUser = async () => {
       const response = await page.request.post(`${origin}/rpc`, {
         headers: { origin },
@@ -219,7 +227,7 @@ test.describe("TanStack Start HTTP API example", () => {
             _tag: "Request",
             id: "1",
             tag: "users.delete",
-            payload: { id: 2 },
+            payload: { id: second.id, revision: second.revision },
             headers: [],
           },
         ],
@@ -237,7 +245,7 @@ test.describe("TanStack Start HTTP API example", () => {
       { exit: { _tag: "Failure" } },
     ]);
     const unauthorized = await page.request.delete(
-      new URL("/api/users/1", page.url()).href
+      `${origin}/api/users/${String(first.id)}?revision=${first.revision}`
     );
     expect(unauthorized.status()).toBe(401);
     await enableDemoWrites(page, writeToken);

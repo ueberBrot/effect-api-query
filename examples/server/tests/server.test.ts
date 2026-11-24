@@ -1,7 +1,7 @@
 import dns from "node:dns";
 import { request as nodeRequest } from "node:http";
 
-import { exampleRpcGroup, SeedUser, User } from "@effect-api-query/contracts";
+import { exampleRpcGroup, SeedUser } from "@effect-api-query/contracts";
 import type { DiagnosticStatus } from "@effect-api-query/contracts";
 import {
   makeExampleRpcClient,
@@ -382,26 +382,26 @@ describe("example RPC server", () => {
           count: initialDirectory.length,
           first: initialDirectory[0],
           last: initialDirectory[11],
-        }).toStrictEqual({
+        }).toMatchObject({
           count: 12,
-          first: new User({ id: 1, locale: "en", name: "Ada Lovelace" }),
-          last: new User({ id: 12, locale: "en", name: "James Gosling" }),
+          first: { id: 1, locale: "en", name: "Ada Lovelace" },
+          last: { id: 12, locale: "en", name: "James Gosling" },
         });
 
         expect(
           yield* client["users.create"]({ name: "Grace Hopper" })
-        ).toStrictEqual(
-          new User({
-            id: 13,
-            locale: "en",
-            name: "Grace Hopper",
-          })
-        );
+        ).toMatchObject({ id: 13, locale: "en", name: "Grace Hopper" });
 
         yield* reset;
         // oxlint-disable-next-line unicorn/no-useless-undefined
-        expect(yield* client["users.list"](undefined)).toStrictEqual(
-          initialDirectory
+        const resetDirectory = yield* client["users.list"](undefined);
+        expect(
+          resetDirectory.map(({ id, locale, name }) => ({ id, locale, name }))
+        ).toStrictEqual(
+          initialDirectory.map(({ id, locale, name }) => ({ id, locale, name }))
+        );
+        expect(resetDirectory[0]?.revision).not.toBe(
+          initialDirectory[0]?.revision
         );
       })
   );
@@ -411,24 +411,17 @@ describe("example RPC server", () => {
       const { server, seed } = yield* startExampleServerFixture();
       const client = yield* makeExampleRpcClient(server.rpcUrl);
 
-      expect(
-        yield* seed({
-          users: [
-            new SeedUser({ name: "Grace Hopper" }),
-            new SeedUser({ locale: "nl", name: "Dijkstra" }),
-          ],
-        })
-      ).toStrictEqual([
-        new User({ id: 1, locale: "en", name: "Grace Hopper" }),
-        new User({ id: 2, locale: "nl", name: "Dijkstra" }),
+      const seeded = yield* seed({
+        users: [
+          new SeedUser({ name: "Grace Hopper" }),
+          new SeedUser({ locale: "nl", name: "Dijkstra" }),
+        ],
+      });
+      expect(seeded).toMatchObject([
+        { id: 1, locale: "en", name: "Grace Hopper" },
+        { id: 2, locale: "nl", name: "Dijkstra" },
       ]);
-      expect(yield* client["users.get"]({ id: 1 })).toStrictEqual(
-        new User({
-          id: 1,
-          locale: "en",
-          name: "Grace Hopper",
-        })
-      );
+      expect(yield* client["users.get"]({ id: 1 })).toStrictEqual(seeded[0]);
     })
   );
 
@@ -436,38 +429,36 @@ describe("example RPC server", () => {
     Effect.gen(function* authorizeUserDeletion() {
       const { server, seed, writeToken } = yield* startExampleServerFixture();
       const client = yield* makeExampleRpcClient(server.rpcUrl);
-      yield* seed({
+      const seeded = yield* seed({
         users: [
           new SeedUser({ name: "Grace Hopper" }),
           new SeedUser({ locale: "nl", name: "Dijkstra" }),
         ],
       });
 
-      const unauthorized = yield* Effect.flip(
-        client["users.delete"]({ id: 1 })
-      );
+      const { id, revision } = yield* client["users.get"]({ id: 1 });
+      const input = { id, revision };
+      const unauthorized = yield* Effect.flip(client["users.delete"](input));
       expect(unauthorized).toMatchObject({
         _tag: "ExampleAuthorizationError",
         reason: "missing-example-authorization",
       });
       const metadataOnly = yield* Effect.flip(
-        RpcClient.withHeaders(client["users.delete"]({ id: 1 }), {
+        RpcClient.withHeaders(client["users.delete"](input), {
           authorization: `Bearer ${writeToken}`,
         })
       );
       expect(metadataOnly).toMatchObject({ _tag: "ExampleAuthorizationError" });
 
       expect(
-        yield* client["users.delete"]({ id: 1 }).pipe(
+        yield* client["users.delete"](input).pipe(
           Effect.provideService(FetchHttpClient.RequestInit, {
             headers: { authorization: `Bearer ${writeToken}` },
           })
         )
       ).toBeUndefined();
       // oxlint-disable-next-line unicorn/no-useless-undefined
-      expect(yield* client["users.list"](undefined)).toStrictEqual([
-        new User({ id: 2, locale: "nl", name: "Dijkstra" }),
-      ]);
+      expect(yield* client["users.list"](undefined)).toStrictEqual([seeded[1]]);
     })
   );
 

@@ -81,7 +81,7 @@ describe("application private cache owner", () => {
     const { queryClient } = owner;
     queryClient.setQueryData(
       [...ownerKeyPrefix(identity), "rpc", "users", "list", "query"],
-      [{ id: 1, name: "Ada", locale: "en" }]
+      [{ id: 1, revision: "user-1", name: "Ada", locale: "en" }]
     );
     owner.persistDirectory();
     expect(stored.values.size).toBe(1);
@@ -119,7 +119,9 @@ describe("application private cache owner", () => {
     const owner = await makeCache(storage);
     const { queryClient } = owner;
     const key = [...ownerKeyPrefix(identity), "rpc", "users", "list", "query"];
-    queryClient.setQueryData(key, [{ id: 2, name: "Grace", locale: "fr" }]);
+    queryClient.setQueryData(key, [
+      { id: 2, revision: "user-2", name: "Grace", locale: "fr" },
+    ]);
     await owner.retire({ discardPersistence: false });
     expect({
       active: owner.isActive(),
@@ -133,7 +135,7 @@ describe("application private cache owner", () => {
       data: browser.getQueryData(key),
       updatedAt: browser.getQueryState(key)?.dataUpdatedAt,
     }).toStrictEqual({
-      data: [{ id: 2, name: "Grace", locale: "fr" }],
+      data: [{ id: 2, revision: "user-2", name: "Grace", locale: "fr" }],
       updatedAt: 0,
     });
     await resumed.retire();
@@ -148,7 +150,9 @@ describe("application private cache owner", () => {
     const original = await makeCache(storage);
     const { queryClient: server } = original;
     const key = [...ownerKeyPrefix(identity), "rpc", "users", "list", "query"];
-    server.setQueryData(key, [{ id: 1, name: "Ada", locale: "en" }]);
+    server.setQueryData(key, [
+      { id: 1, revision: "user-1", name: "Ada", locale: "en" },
+    ]);
     original.persistDirectory();
     const [saved] = [...storage.values.entries()];
     expect(saved).toBeDefined();
@@ -160,22 +164,25 @@ describe("application private cache owner", () => {
     const { queryClient: browser } = restored;
     expect(restored.restoreDirectory()).toBe(true);
     expect(browser.getQueryData(key)).toStrictEqual([
-      { id: 1, name: "Ada", locale: "en" },
+      { id: 1, revision: "user-1", name: "Ada", locale: "en" },
     ]);
     browser.clear();
     const snapshot = {
       identity,
-      schemaVersion: 1,
+      schemaVersion: 2,
       keyVersion: 1,
       directories: [
-        { adapter: "rpc", data: [{ id: 1, name: "Ada", locale: "en" }] },
+        {
+          adapter: "rpc",
+          data: [{ id: 1, revision: "user-1", name: "Ada", locale: "en" }],
+        },
       ],
     };
     for (const incompatible of [
       { ...snapshot, identity: { ...identity, tenantId: "team-b" } },
       { ...snapshot, identity: { ...identity, permissionGeneration: 8 } },
       { ...snapshot, identity: { ...identity, sessionGeneration: 4 } },
-      { ...snapshot, schemaVersion: 2 },
+      { ...snapshot, schemaVersion: 1 },
       { ...snapshot, keyVersion: 2 },
       {
         ...snapshot,

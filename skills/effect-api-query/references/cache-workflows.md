@@ -240,6 +240,8 @@ Accepted commands can finish during retirement. Scope reservations, progress, an
 
 Persist only approved DTO views. Include safe owner identity and separate schema and key versions in the saved envelope. Validate it before restoring with newly generated keys. Discard incompatible data. Leave out optimistic values, mutations, errors, credentials, and unrelated entries. Use paired codecs for rich values.
 
+Keep restored directory rows read-only until that view refreshes successfully. Preserve the freshness marker through optimistic edits. If IDs can be reused, submit the displayed record's ID and revision and check both atomically on the server before deleting. Match the same pair in optimistic edits and late selection callbacks.
+
 Finish resource cleanup even if storage fails. Handle disposal rejections from explicit shutdown, pagehide, and HMR.
 
 See [cache filters](https://ueberbrot.github.io/effect-api-query/guides/cache-filters/), [optimistic writes](https://ueberbrot.github.io/effect-api-query/guides/optimistic-writes/), [owner replacement](https://ueberbrot.github.io/effect-api-query/guides/switch-cache-owners/), and [event refresh](https://ueberbrot.github.io/effect-api-query/guides/refresh-from-events/) for complete examples.

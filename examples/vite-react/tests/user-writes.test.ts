@@ -27,6 +27,65 @@ const twoPageDirectory = (users: readonly User[]) => ({
 });
 
 describe("User writes in the Vite application", () => {
+  it("preserves a replacement in the opposite adapter and keeps a restored list stale", async () => {
+    const fixture = await Effect.runPromise(makeControlledUserWrites());
+    const { queryClient, rpcQuery, httpQuery, userWrites } =
+      fixture.application;
+    const previous = new User({
+      id: 1,
+      revision: "previous",
+      name: "Ada",
+      locale: "en",
+    });
+    const replacement = new User({
+      id: previous.id,
+      name: previous.name,
+      locale: previous.locale,
+      revision: "replacement",
+    });
+    const rpcList = rpcQuery.users.list.queryKey();
+    const httpList = httpQuery.users.list.queryKey();
+    const rpcPages = rpcQuery.users.page.infiniteKey({
+      input: { cursor: 0, pageSize: 4 },
+    });
+    const httpPages = httpQuery.users.page.infiniteKey({
+      input: { query: { cursor: 0, pageSize: 4 } },
+    });
+    fixture.seed([replacement]);
+    queryClient.setQueryData(rpcList, [previous]);
+    queryClient.setQueryData(httpList, [replacement], { updatedAt: 0 });
+    queryClient.setQueryData(rpcPages, twoPageDirectory([previous]));
+    const replacementPages = twoPageDirectory([replacement]);
+    queryClient.setQueryData(httpPages, replacementPages);
+    try {
+      const deletion = new MutationObserver(
+        queryClient,
+        userWrites.rpcDelete()
+      ).mutate({ id: previous.id, revision: previous.revision });
+      const outcome = Promise.allSettled([deletion]);
+      const request = await fixture.nextDelete();
+      expect({
+        rpc: queryClient.getQueryData(rpcList),
+        rpcPage: queryClient.getQueryData(rpcPages)?.pages[0]?.users,
+        http: queryClient.getQueryData(httpList),
+        httpPages: queryClient.getQueryData(httpPages),
+        httpUpdatedAt: queryClient.getQueryState(httpList)?.dataUpdatedAt,
+      }).toStrictEqual({
+        rpc: [],
+        rpcPage: [],
+        http: [replacement],
+        httpPages: replacementPages,
+        httpUpdatedAt: 0,
+      });
+      await request.fail();
+      await expect(outcome).resolves.toMatchObject([{ status: "rejected" }]);
+      expect(queryClient.getQueryData(httpList)).toStrictEqual([replacement]);
+      expect(queryClient.getQueryState(httpList)?.dataUpdatedAt).toBe(0);
+    } finally {
+      await fixture.application.dispose();
+    }
+  });
+
   it.each(
     (["rpc", "http"] as const).flatMap((adapter) =>
       (["rpc", "http"] as const).flatMap((refreshedAdapter) =>
@@ -43,8 +102,18 @@ describe("User writes in the Vite application", () => {
       const fixture = await Effect.runPromise(makeControlledUserWrites());
       const { queryClient, rpcQuery, httpQuery, userWrites } =
         fixture.application;
-      const ada = new User({ id: 1, name: "Ada", locale: "en" });
-      const alan = new User({ id: 2, name: "Alan", locale: "en" });
+      const ada = new User({
+        id: 1,
+        revision: "user-1",
+        name: "Ada",
+        locale: "en",
+      });
+      const alan = new User({
+        id: 2,
+        revision: "user-2",
+        name: "Alan",
+        locale: "en",
+      });
       const initial = retainOther ? [ada, alan] : [ada];
       fixture.seed(initial);
       const listKeys = {
@@ -59,10 +128,12 @@ describe("User writes in the Vite application", () => {
           adapter === "rpc"
             ? new MutationObserver(queryClient, userWrites.rpcDelete()).mutate({
                 id: 1,
+                revision: "user-1",
               })
             : new MutationObserver(queryClient, userWrites.httpDelete()).mutate(
                 {
                   params: { id: 1 },
+                  query: { revision: "user-1" },
                 }
               );
         const failure = Promise.allSettled([deletion]);
@@ -97,8 +168,18 @@ describe("User writes in the Vite application", () => {
       const fixture = await Effect.runPromise(makeControlledUserWrites());
       const { queryClient, rpcQuery, httpQuery, userWrites } =
         fixture.application;
-      const ada = new User({ id: 1, name: "Ada", locale: "en" });
-      const grace = new User({ id: 2, name: "Grace", locale: "en" });
+      const ada = new User({
+        id: 1,
+        revision: "user-1",
+        name: "Ada",
+        locale: "en",
+      });
+      const grace = new User({
+        id: 2,
+        revision: "user-2",
+        name: "Grace",
+        locale: "en",
+      });
       const listKeys = {
         rpc: rpcQuery.users.list.queryKey(),
         http: httpQuery.users.list.queryKey(),
@@ -111,7 +192,7 @@ describe("User writes in the Vite application", () => {
         const deletion = new MutationObserver(
           queryClient,
           userWrites.rpcDelete()
-        ).mutate({ id: 1 });
+        ).mutate({ id: 1, revision: "user-1" });
         const failure = Promise.allSettled([deletion]);
         const deleteRequest = await fixture.nextDelete();
         fixture.seed([]);
@@ -149,8 +230,18 @@ describe("User writes in the Vite application", () => {
       const fixture = await Effect.runPromise(makeControlledUserWrites());
       const { queryClient, rpcQuery, httpQuery, userWrites } =
         fixture.application;
-      const ada = new User({ id: 1, name: "Ada", locale: "en" });
-      const alan = new User({ id: 2, name: "Alan", locale: "en" });
+      const ada = new User({
+        id: 1,
+        revision: "user-1",
+        name: "Ada",
+        locale: "en",
+      });
+      const alan = new User({
+        id: 2,
+        revision: "user-2",
+        name: "Alan",
+        locale: "en",
+      });
       const key =
         adapter === "rpc"
           ? rpcQuery.users.list.queryKey()
@@ -174,7 +265,7 @@ describe("User writes in the Vite application", () => {
         const deletion = new MutationObserver(
           queryClient,
           userWrites.rpcDelete()
-        ).mutate({ id: 1 });
+        ).mutate({ id: 1, revision: "user-1" });
         const failure = Promise.allSettled([deletion]);
         const request = await fixture.nextDelete();
         await request.fail();
@@ -193,7 +284,12 @@ describe("User writes in the Vite application", () => {
       const fixture = await Effect.runPromise(makeControlledUserWrites());
       const { queryClient, rpcQuery, httpQuery, userWrites } =
         fixture.application;
-      const ada = new User({ id: 1, name: "Ada", locale: "en" });
+      const ada = new User({
+        id: 1,
+        revision: "user-1",
+        name: "Ada",
+        locale: "en",
+      });
       const key =
         adapter === "rpc"
           ? rpcQuery.users.list.queryKey()
@@ -204,7 +300,7 @@ describe("User writes in the Vite application", () => {
         const older = new MutationObserver(
           queryClient,
           userWrites.rpcDelete()
-        ).mutate({ id: 1 });
+        ).mutate({ id: 1, revision: "user-1" });
         const olderFailure = Promise.allSettled([older]);
         const olderRequest = await fixture.nextDelete();
         const newer = new MutationObserver(
@@ -212,6 +308,7 @@ describe("User writes in the Vite application", () => {
           userWrites.httpDelete()
         ).mutate({
           params: { id: 1 },
+          query: { revision: "user-1" },
         });
         const newerFailure = Promise.allSettled([newer]);
         const newerRequest = await fixture.nextDelete();
@@ -238,7 +335,12 @@ describe("User writes in the Vite application", () => {
       const fixture = await Effect.runPromise(makeControlledUserWrites());
       const { queryClient, rpcQuery, httpQuery, userWrites } =
         fixture.application;
-      const ada = new User({ id: 1, name: "Ada", locale: "en" });
+      const ada = new User({
+        id: 1,
+        revision: "user-1",
+        name: "Ada",
+        locale: "en",
+      });
       const key =
         adapter === "rpc"
           ? rpcQuery.users.page.infiniteKey({
@@ -256,7 +358,7 @@ describe("User writes in the Vite application", () => {
         const deletion = new MutationObserver(
           queryClient,
           userWrites.rpcDelete()
-        ).mutate({ id: 1 });
+        ).mutate({ id: 1, revision: "user-1" });
         const failure = Promise.allSettled([deletion]);
         const request = await fixture.nextDelete();
         const optimisticPage = queryClient.getQueryData(key)?.pages[0];
@@ -367,7 +469,12 @@ describe("User writes in the Vite application", () => {
       const fixture = await Effect.runPromise(makeControlledUserWrites());
       const { queryClient, rpcQuery, httpQuery, userWrites } =
         fixture.application;
-      const ada = new User({ id: 1, name: "Ada", locale: "en" });
+      const ada = new User({
+        id: 1,
+        revision: "user-1",
+        name: "Ada",
+        locale: "en",
+      });
       fixture.seed([ada]);
       const rpcPages = rpcQuery.users.page.infiniteKey({
         input: {
@@ -389,10 +496,12 @@ describe("User writes in the Vite application", () => {
           adapter === "rpc"
             ? new MutationObserver(queryClient, userWrites.rpcDelete()).mutate({
                 id: 1,
+                revision: "user-1",
               })
             : new MutationObserver(queryClient, userWrites.httpDelete()).mutate(
                 {
                   params: { id: 1 },
+                  query: { revision: "user-1" },
                 }
               );
         const failure = Promise.allSettled([mutation]);
@@ -439,8 +548,18 @@ describe("User writes in the Vite application", () => {
   it("restores an optimistic page without adjusting a freshly appended page", async () => {
     const fixture = await Effect.runPromise(makeControlledUserWrites());
     const { queryClient, rpcQuery, userWrites } = fixture.application;
-    const ada = new User({ id: 1, name: "Ada", locale: "en" });
-    const alan = new User({ id: 2, name: "Alan", locale: "en" });
+    const ada = new User({
+      id: 1,
+      revision: "user-1",
+      name: "Ada",
+      locale: "en",
+    });
+    const alan = new User({
+      id: 2,
+      revision: "user-2",
+      name: "Alan",
+      locale: "en",
+    });
     fixture.seed([ada, alan]);
     const options = rpcQuery.users.page.infiniteOptions({
       initialPageParam: 0,
@@ -457,7 +576,7 @@ describe("User writes in the Vite application", () => {
       const deletion = new MutationObserver(
         queryClient,
         userWrites.rpcDelete()
-      ).mutate({ id: 1 });
+      ).mutate({ id: 1, revision: "user-1" });
       const failure = Promise.allSettled([deletion]);
       const request = await fixture.nextDelete();
       const observer = new InfiniteQueryObserver(queryClient, options);
@@ -485,7 +604,12 @@ describe("User writes in the Vite application", () => {
     const fixture = await Effect.runPromise(makeControlledUserWrites());
     const { queryClient, rpcQuery, httpQuery, userWrites } =
       fixture.application;
-    const ada = new User({ id: 1, name: "Ada", locale: "en" });
+    const ada = new User({
+      id: 1,
+      revision: "user-1",
+      name: "Ada",
+      locale: "en",
+    });
     queryClient.setQueryData(rpcQuery.users.list.queryKey(), [ada]);
     queryClient.setQueryData(httpQuery.users.list.queryKey(), [ada]);
     try {
@@ -500,7 +624,12 @@ describe("User writes in the Vite application", () => {
           .getQueryData(rpcQuery.users.list.queryKey())
           ?.map((user) => user.name)
       ).toStrictEqual(["Ada", "Grace"]);
-      const grace = new User({ id: 2, name: "Grace", locale: "fr" });
+      const grace = new User({
+        id: 2,
+        revision: "user-2",
+        name: "Grace",
+        locale: "fr",
+      });
       await request.succeed(grace);
       await expect(result).resolves.toStrictEqual(grace);
       expect(
@@ -530,9 +659,24 @@ describe("User writes in the Vite application", () => {
     const fixture = await Effect.runPromise(makeControlledUserWrites());
     const { queryClient, rpcQuery, httpQuery, userWrites } =
       fixture.application;
-    const ada = new User({ id: 1, name: "Ada", locale: "en" });
-    const alan = new User({ id: 2, name: "Alan", locale: "en" });
-    const grace = new User({ id: 3, name: "Grace", locale: "fr" });
+    const ada = new User({
+      id: 1,
+      revision: "user-1",
+      name: "Ada",
+      locale: "en",
+    });
+    const alan = new User({
+      id: 2,
+      revision: "user-2",
+      name: "Alan",
+      locale: "en",
+    });
+    const grace = new User({
+      id: 3,
+      revision: "user-3",
+      name: "Grace",
+      locale: "fr",
+    });
     const rpcPages = rpcQuery.users.page.infiniteKey({
       input: {
         cursor: 0,
@@ -562,7 +706,7 @@ describe("User writes in the Vite application", () => {
       const deletion = new MutationObserver(
         queryClient,
         userWrites.rpcDelete()
-      ).mutate({ id: 1 });
+      ).mutate({ id: 1, revision: "user-1" });
       const failure = Effect.runPromiseExit(
         Effect.promise(async () => {
           await deletion;
@@ -606,7 +750,12 @@ describe("User writes in the Vite application", () => {
   it("keeps a newer successful deletion when an older delete fails", async () => {
     const fixture = await Effect.runPromise(makeControlledUserWrites());
     const { queryClient, rpcQuery, userWrites } = fixture.application;
-    const ada = new User({ id: 1, name: "Ada", locale: "en" });
+    const ada = new User({
+      id: 1,
+      revision: "user-1",
+      name: "Ada",
+      locale: "en",
+    });
     fixture.seed([ada]);
     queryClient.setQueryData(rpcQuery.users.list.queryKey(), [ada]);
     try {
@@ -617,6 +766,7 @@ describe("User writes in the Vite application", () => {
             userWrites.rpcDelete()
           ).mutate({
             id: 1,
+            revision: "user-1",
           });
         })
       );
@@ -624,7 +774,7 @@ describe("User writes in the Vite application", () => {
       const newer = new MutationObserver(
         queryClient,
         userWrites.rpcDelete()
-      ).mutate({ id: 1 });
+      ).mutate({ id: 1, revision: "user-1" });
       const newerRequest = await fixture.nextDelete();
       await newerRequest.succeed();
       await newer;
@@ -641,7 +791,12 @@ describe("User writes in the Vite application", () => {
   it("restores the original entity when both overlapping deletes fail", async () => {
     const fixture = await Effect.runPromise(makeControlledUserWrites());
     const { queryClient, rpcQuery, userWrites } = fixture.application;
-    const ada = new User({ id: 1, name: "Ada", locale: "en" });
+    const ada = new User({
+      id: 1,
+      revision: "user-1",
+      name: "Ada",
+      locale: "en",
+    });
     queryClient.setQueryData(rpcQuery.users.list.queryKey(), [ada]);
     try {
       const older = Effect.runPromiseExit(
@@ -651,6 +806,7 @@ describe("User writes in the Vite application", () => {
             userWrites.rpcDelete()
           ).mutate({
             id: 1,
+            revision: "user-1",
           });
         })
       );
@@ -662,6 +818,7 @@ describe("User writes in the Vite application", () => {
             userWrites.rpcDelete()
           ).mutate({
             id: 1,
+            revision: "user-1",
           });
         })
       );
@@ -687,9 +844,24 @@ describe("User writes in the Vite application", () => {
       const fixture = await Effect.runPromise(makeControlledUserWrites());
       const { queryClient, rpcQuery, httpQuery, userWrites } =
         fixture.application;
-      const ada = new User({ id: 1, name: "Ada", locale: "en" });
-      const alan = new User({ id: 2, name: "Alan", locale: "en" });
-      const grace = new User({ id: 3, name: "Grace", locale: "en" });
+      const ada = new User({
+        id: 1,
+        revision: "user-1",
+        name: "Ada",
+        locale: "en",
+      });
+      const alan = new User({
+        id: 2,
+        revision: "user-2",
+        name: "Alan",
+        locale: "en",
+      });
+      const grace = new User({
+        id: 3,
+        revision: "user-3",
+        name: "Grace",
+        locale: "en",
+      });
       const lists = [
         rpcQuery.users.list.queryKey(),
         httpQuery.users.list.queryKey(),
@@ -719,6 +891,7 @@ describe("User writes in the Vite application", () => {
               userWrites.rpcDelete()
             ).mutate({
               id: 1,
+              revision: "user-1",
             });
           })
         );
@@ -730,6 +903,7 @@ describe("User writes in the Vite application", () => {
               userWrites.httpDelete()
             ).mutate({
               params: { id: 2 },
+              query: { revision: "user-2" },
             });
           })
         );
@@ -795,19 +969,55 @@ describe("User writes in the Vite application", () => {
       const fixture = await Effect.runPromise(makeControlledUserWrites());
       const { queryClient, rpcQuery, httpQuery, userWrites } =
         fixture.application;
-      const ada = new User({ id: 1, name: "Ada", locale: "en" });
-      const alan = new User({ id: 2, name: "Alan", locale: "en" });
-      const grace = new User({ id: 3, name: "Grace", locale: "en" });
-      const hopper = new User({ id: 4, name: "Hopper", locale: "en" });
-      const knuth = new User({ id: 5, name: "Knuth", locale: "en" });
-      const dennis = new User({ id: 6, name: "Dennis", locale: "en" });
+      const ada = new User({
+        id: 1,
+        revision: "user-1",
+        name: "Ada",
+        locale: "en",
+      });
+      const alan = new User({
+        id: 2,
+        revision: "user-2",
+        name: "Alan",
+        locale: "en",
+      });
+      const grace = new User({
+        id: 3,
+        revision: "user-3",
+        name: "Grace",
+        locale: "en",
+      });
+      const hopper = new User({
+        id: 4,
+        revision: "user-4",
+        name: "Hopper",
+        locale: "en",
+      });
+      const knuth = new User({
+        id: 5,
+        revision: "user-5",
+        name: "Knuth",
+        locale: "en",
+      });
+      const dennis = new User({
+        id: 6,
+        revision: "user-6",
+        name: "Dennis",
+        locale: "en",
+      });
       const initial = [ada, alan, grace, hopper, knuth, dennis];
       const updatedAlan = new User({
         id: 2,
+        revision: "user-2",
         name: "Updated Alan",
         locale: "fr",
       });
-      const linus = new User({ id: 7, name: "Linus", locale: "fr" });
+      const linus = new User({
+        id: 7,
+        revision: "user-7",
+        name: "Linus",
+        locale: "fr",
+      });
       const authoritative = [hopper, knuth, grace, dennis, updatedAlan, linus];
       const lists = {
         rpc: rpcQuery.users.list.queryKey(),
@@ -831,7 +1041,7 @@ describe("User writes in the Vite application", () => {
       const older = new MutationObserver(
         queryClient,
         userWrites.rpcDelete()
-      ).mutate({ id: 1 });
+      ).mutate({ id: 1, revision: "user-1" });
       const olderOutcome = Promise.allSettled([older]);
       const first = await fixture.nextDelete();
       try {
@@ -860,10 +1070,12 @@ describe("User writes in the Vite application", () => {
             ? new MutationObserver(queryClient, userWrites.httpDelete()).mutate(
                 {
                   params: { id: target.id },
+                  query: { revision: target.revision },
                 }
               )
             : new MutationObserver(queryClient, userWrites.rpcDelete()).mutate({
                 id: target.id,
+                revision: target.revision,
               });
         const newerOutcome = Promise.allSettled([newer]);
         const second = await fixture.nextDelete();
@@ -871,10 +1083,12 @@ describe("User writes in the Vite application", () => {
           adapter === "rpc"
             ? new MutationObserver(queryClient, userWrites.rpcDelete()).mutate({
                 id: 3,
+                revision: "user-3",
               })
             : new MutationObserver(queryClient, userWrites.httpDelete()).mutate(
                 {
                   params: { id: 3 },
+                  query: { revision: "user-3" },
                 }
               );
         const latestOutcome = Promise.allSettled([latest]);
@@ -946,10 +1160,20 @@ describe("User writes in the Vite application", () => {
         name: "Grace",
       });
       const newerRequest = await fixture.nextCreate();
-      const grace = new User({ id: 2, name: "Grace", locale: "en" });
+      const grace = new User({
+        id: 2,
+        revision: "user-2",
+        name: "Grace",
+        locale: "en",
+      });
       await newerRequest.succeed(grace);
       await newer;
-      const ada = new User({ id: 1, name: "Ada", locale: "en" });
+      const ada = new User({
+        id: 1,
+        revision: "user-1",
+        name: "Ada",
+        locale: "en",
+      });
       await olderRequest.succeed(ada);
       await older;
       expect(
@@ -986,7 +1210,12 @@ describe("User writes in the Vite application", () => {
         name: "Ada",
       });
       const first = await fixture.nextCreate();
-      const ada = new User({ id: 1, name: "Ada", locale: "en" });
+      const ada = new User({
+        id: 1,
+        revision: "user-1",
+        name: "Ada",
+        locale: "en",
+      });
       await first.succeed(ada);
       const stale = await fixture.nextList();
       const newer = new MutationObserver(
@@ -997,7 +1226,12 @@ describe("User writes in the Vite application", () => {
       });
       const second = await fixture.nextCreate();
       await older;
-      const grace = new User({ id: 2, name: "Grace", locale: "en" });
+      const grace = new User({
+        id: 2,
+        revision: "user-2",
+        name: "Grace",
+        locale: "en",
+      });
       await second.succeed(grace);
       const current = await fixture.nextList();
       await stale.succeed([ada]);
@@ -1026,7 +1260,12 @@ describe("User writes in the Vite application", () => {
     const { queryClient, rpcQuery, userWrites } = fixture.application;
     queryClient.setQueryData(rpcQuery.users.list.queryKey(), []);
     const replacement = new QueryClient();
-    const grace = new User({ id: 2, name: "Grace", locale: "en" });
+    const grace = new User({
+      id: 2,
+      revision: "user-2",
+      name: "Grace",
+      locale: "en",
+    });
     replacement.setQueryData(rpcQuery.users.list.queryKey(), [grace]);
     try {
       const mutation = new MutationObserver(
@@ -1038,7 +1277,9 @@ describe("User writes in the Vite application", () => {
       const request = await fixture.nextCreate();
       fixture.retire();
       queryClient.clear();
-      await request.succeed(new User({ id: 1, name: "Ada", locale: "en" }));
+      await request.succeed(
+        new User({ id: 1, revision: "user-1", name: "Ada", locale: "en" })
+      );
       await mutation;
       expect(queryClient.getQueryCache().getAll()).toHaveLength(0);
       expect(
@@ -1058,7 +1299,12 @@ describe("User writes in the Vite application", () => {
     const replacement = await Effect.runPromise(makeControlledUserWrites());
     const first = original.application;
     const second = replacement.application;
-    const grace = new User({ id: 2, name: "Grace", locale: "en" });
+    const grace = new User({
+      id: 2,
+      revision: "user-2",
+      name: "Grace",
+      locale: "en",
+    });
     first.queryClient.setQueryData(first.rpcQuery.users.list.queryKey(), []);
     second.queryClient.setQueryData(second.rpcQuery.users.list.queryKey(), [
       grace,
@@ -1071,7 +1317,12 @@ describe("User writes in the Vite application", () => {
       const mutation = observer.mutate({ name: "Ada" });
       const request = await original.nextCreate();
       observer.setOptions(second.userWrites.rpcCreate());
-      const ada = new User({ id: 1, name: "Ada", locale: "en" });
+      const ada = new User({
+        id: 1,
+        revision: "user-1",
+        name: "Ada",
+        locale: "en",
+      });
       await request.succeed(ada);
       await mutation;
       expect(
@@ -1121,7 +1372,12 @@ describe("User writes in the Vite application", () => {
         name: "Grace",
       });
       const second = await fixture.nextCreate();
-      const grace = new User({ id: 2, name: "Grace", locale: "en" });
+      const grace = new User({
+        id: 2,
+        revision: "user-2",
+        name: "Grace",
+        locale: "en",
+      });
       await second.succeed(grace);
       await newer;
       await first.fail();

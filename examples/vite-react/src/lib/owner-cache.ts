@@ -1,3 +1,4 @@
+import { User } from "@effect-api-query/contracts";
 import type { QueryKey } from "@tanstack/react-query";
 import type { QueryOwner } from "@ueberbrot/effect-api-query";
 import { Schema } from "effect";
@@ -14,14 +15,12 @@ export type DirectoryStorage = Pick<
   Storage,
   "getItem" | "removeItem" | "setItem"
 >;
-const Directory = Schema.Array(
-  Schema.Struct({ id: Schema.Int, name: Schema.String, locale: Schema.String })
-);
+const Directory = Schema.Array(Schema.Struct(User.fields));
 
 const PersistedDirectory = Schema.fromJsonString(
   Schema.Struct({
     identity: OwnerIdentity,
-    schemaVersion: Schema.Literal(1),
+    schemaVersion: Schema.Literal(2),
     keyVersion: Schema.Literal(1),
     directories: Schema.Array(
       Schema.Struct({
@@ -115,7 +114,7 @@ export const makeOwnerCache = ({
       storageKey,
       JSON.stringify({
         identity: owner,
-        schemaVersion: 1,
+        schemaVersion: 2,
         keyVersion: 1,
         directories,
       })

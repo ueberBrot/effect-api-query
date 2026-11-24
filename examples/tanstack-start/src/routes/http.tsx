@@ -76,7 +76,10 @@ const HttpDirectory = ({
               aria-label={`Delete HTTP ${user.name}`}
               disabled={deleteUser.isPending}
               onClick={() => {
-                deleteUser.mutate({ params: { id: user.id } });
+                deleteUser.mutate({
+                  params: { id: user.id },
+                  query: { revision: user.revision },
+                });
               }}
               type="button"
               variant="danger"

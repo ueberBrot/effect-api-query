@@ -14,6 +14,7 @@ import {
   ExampleAuthorizationError,
   OperationNotFound,
   User,
+  UserIdentity,
   UserPage,
 } from "./contracts.ts";
 
@@ -45,6 +46,7 @@ const users = HttpApiGroup.make("users").add(
   }),
   HttpApiEndpoint.delete("delete", "/users/:id", {
     params: { id: Schema.Int },
+    query: { revision: UserIdentity.revision },
     success: HttpApiSchema.NoContent,
     error: missingUser,
   }).middleware(ExampleHttpAuthorization),

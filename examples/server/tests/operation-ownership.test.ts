@@ -187,12 +187,15 @@ describe("example operation ownership", () => {
           .makeRpcClient();
         const input = { operationId: "reserved" };
         yield* client["commands.reserve"](input);
+        const { id, revision } = yield* client["users.get"]({ id: 1 });
         expect(
-          yield* Effect.flip(client["users.delete"]({ id: 1 }))
+          yield* Effect.flip(client["users.delete"]({ id, revision }))
         ).toMatchObject({ _tag: "ExampleAuthorizationError" });
         const deleteStatus = yield* Effect.promise(async () => {
           const response = await host.handleRequest(
-            session.request("/api/users/1", { method: "DELETE" })
+            session.request(`/api/users/1?revision=${revision}`, {
+              method: "DELETE",
+            })
           );
           return response.status;
         });
