@@ -45,24 +45,15 @@ describe("existing Vite application owner handoff", () => {
       application = await starting;
       expect(application.identity).toStrictEqual(identity);
       expect(Object.isFrozen(application.identity)).toBe(true);
-      expect(
-        application.rpcQuery.users.list.queryKey().slice(0, 5)
-      ).toStrictEqual([
+      const expectedNamespace = `effect-api-query:v2:${JSON.stringify([
         "vite-react",
         identity.tenantId,
         identity.userId,
         identity.sessionGeneration,
         identity.permissionGeneration,
-      ]);
-      expect(
-        application.httpQuery.users.list.queryKey().slice(0, 5)
-      ).toStrictEqual([
-        "vite-react",
-        identity.tenantId,
-        identity.userId,
-        identity.sessionGeneration,
-        identity.permissionGeneration,
-      ]);
+      ])}`;
+      expect(application.rpcQuery.key()[0]).toBe(expectedNamespace);
+      expect(application.httpQuery.key()[0]).toBe(expectedNamespace);
     } finally {
       await application?.dispose();
       await Effect.runPromise(Scope.close(serverScope, Exit.void));

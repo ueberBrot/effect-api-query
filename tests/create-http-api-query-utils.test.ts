@@ -90,8 +90,18 @@ describe(createHttpApiQueryUtils, () => {
       new TenantOptions()
     );
     const key = rpc.read.queryKey();
-    expect(key).toStrictEqual(["tenant", "rpc", "read", "query"]);
-    expect(http.key()).toStrictEqual(["tenant", "http", "empty"]);
+    expect(key).toStrictEqual([
+      'effect-api-query:v2:["tenant"]',
+      "rpc",
+      "read",
+      null,
+      "query",
+    ]);
+    expect(http.key()).toStrictEqual([
+      'effect-api-query:v2:["tenant"]',
+      "http",
+      "empty",
+    ]);
     expect(registry.matches(key)).toBe(true);
   });
 
@@ -178,11 +188,12 @@ describe(createHttpApiQueryUtils, () => {
       expect(
         utils.users.get.queryKey({ input: { params: { id: 1 } } })
       ).toStrictEqual([
-        "shared",
+        'effect-api-query:v2:["shared"]',
         "http",
         "test",
         "users",
         "get",
+        null,
         "query",
         { params: { id: "1" } },
       ]);
@@ -263,11 +274,12 @@ describe(createHttpApiQueryUtils, () => {
     ]);
     expect("queryFilter" in utils.uploads.upload).toBe(false);
     expect(utils.uploads.upload.mutationKey()).toStrictEqual([
-      "test",
+      'effect-api-query:v2:["test"]',
       "http",
       "mixed",
       "uploads",
       "upload",
+      null,
       "mutation",
     ]);
     expect(Object.keys(utils.kept)).toStrictEqual([
@@ -445,10 +457,11 @@ describe(createHttpApiQueryUtils, () => {
         [{ responseMode: "decoded-only" }],
       ]);
       expect(utils["health.check"].queryKey()).toStrictEqual([
-        "test",
+        'effect-api-query:v2:["test"]',
         "http",
         "literal.api",
         "health.check",
+        null,
         "query",
       ]);
     } finally {
@@ -673,10 +686,11 @@ describe(createHttpApiQueryUtils, () => {
       keyEncoders: { forms: { submit: ({ payload }) => ({ payload }) } },
     });
     expect(utils.submit.queryKey({ input: { payload: "yes" } })).toStrictEqual([
-      "test",
+      'effect-api-query:v2:["test"]',
       "http",
       "keys",
       "submit",
+      null,
       "query",
       { payload: "yes" },
     ]);
@@ -786,12 +800,14 @@ describe(createHttpApiQueryUtils, () => {
         }),
         fetched,
       }).toStrictEqual({
-        rootKey: ["http", "test"],
+        rootKey: ["effect-api-query:v2:[]", "http", "test"],
         queryKey: [
+          "effect-api-query:v2:[]",
           "http",
           "test",
           "users",
           "get",
+          null,
           "query",
           { params: { id: "5" } },
         ],

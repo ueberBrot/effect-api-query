@@ -180,8 +180,21 @@ describe("unified { input, ... } *Key builders", () => {
           inputlessStreamed: rpc.events.audit.watch.streamedOptions({
             maxChunks: "unbounded",
           }).queryKey,
-          leafKey: ["unified", "rpc", "users", "get"],
-          mutationKey: ["unified", "rpc", "users", "get", "mutation"],
+          leafKey: [
+            'effect-api-query:v2:["unified"]',
+            "rpc",
+            "users",
+            "get",
+            null,
+          ],
+          mutationKey: [
+            'effect-api-query:v2:["unified"]',
+            "rpc",
+            "users",
+            "get",
+            null,
+            "mutation",
+          ],
         });
       })
   );
@@ -458,7 +471,15 @@ describe("lazy-memoized frozen leaves", () => {
             "Utility node is already tracked by another query owner"
           );
 
-          const cachedRead = ["rpc", "users", "get", "query", { id: 9 }];
+          const cachedRead = [
+            "effect-api-query:v2:[]",
+            "rpc",
+            "users",
+            "get",
+            null,
+            "query",
+            { id: 9 },
+          ];
           owner1.queryClient.setQueryData(cachedRead, "user-9");
           const filteredTracked = owner1.queryClient.getQueriesData(
             tracked.queryFilter({ view: "query" })

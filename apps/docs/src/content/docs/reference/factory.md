@@ -12,7 +12,7 @@ Pass an Effect RPC group and its ready client to build a frozen utility tree for
 | Option | Meaning |
 | --- | --- |
 | `client` | Ready tag-keyed client from `RpcClient.make(group)`. A flat client also works. The caller owns the client and its Scope. |
-| `keyPrefix` | Optional non-empty, JSON-safe tuple. Omit it to start keys at `["rpc"]`. |
+| `keyPrefix` | Optional non-empty, JSON-safe tuple. Omit it to use the empty namespace for RPC keys. |
 | `runtime` | Pass a ManagedRuntime with no layer initialization error, or a compatible runner function. Supply it when execution needs services. The default runner handles service-free Effects. |
 | `keyEncoders` | Synchronous encoders keyed by literal RPC tags. Payloads that need encoding services or contain redacted values require them. Runtime inspection also requires them for opaque encoding middleware. |
 

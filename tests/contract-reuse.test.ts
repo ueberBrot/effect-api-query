@@ -189,8 +189,22 @@ it.effect("reuses completed encoder-required RPC analysis", () =>
       first.read.queryKey({ input }),
       second.read.queryKey({ input }),
     ]).toStrictEqual([
-      ["first", "rpc", "read", "query", "first-identity"],
-      ["second", "rpc", "read", "query", "second-identity"],
+      [
+        'effect-api-query:v2:["first"]',
+        "rpc",
+        "read",
+        null,
+        "query",
+        "first-identity",
+      ],
+      [
+        'effect-api-query:v2:["second"]',
+        "rpc",
+        "read",
+        null,
+        "query",
+        "second-identity",
+      ],
     ]);
   })
 );
@@ -318,11 +332,12 @@ it.effect(
       }).toStrictEqual({
         inspections: 3,
         recoveredKey: [
-          "recovered",
+          'effect-api-query:v2:["recovered"]',
           "http",
           "suspended",
           "requests",
           "read",
+          null,
           "query",
           { payload: { id: 1 } },
         ],

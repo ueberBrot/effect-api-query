@@ -28,6 +28,7 @@ import {
   hydrationCallbacks,
   infiniteQueryCodec,
   queryViewCodec,
+  viewPrefix,
 } from "#effect-api-query";
 
 import { makeRpcTestClient } from "./fixtures/effect-rpc.ts";
@@ -51,7 +52,7 @@ describe.each(["short-first", "nested-first"] as const)(
   "hydration registration order %s",
   (order) => {
     it.effect(
-      "selects the most specific registered view with nested application prefixes in %s order",
+      "selects each registered view with different application prefixes",
       () =>
         Effect.gen(function* selectsSpecificRegisteredView() {
           const client = yield* makeRpcTestClient(group, {
@@ -70,7 +71,7 @@ describe.each(["short-first", "nested-first"] as const)(
           });
           const nested = createRpcQueryUtils(nestedGroup, {
             client: nestedClient,
-            keyPrefix: [...rpc.read.key(), "query", "application"],
+            keyPrefix: [...viewPrefix(rpc.read, "query"), "application"],
           });
           const shortCodec = queryViewCodec(rpc.read, "query", Profile);
           const nestedCodec = queryViewCodec(
@@ -85,11 +86,19 @@ describe.each(["short-first", "nested-first"] as const)(
           );
           const queryClient = new QueryClient();
           try {
+            queryClient.setQueryData(
+              rpc.read.queryKey({ input: { id: 1 } }),
+              profile
+            );
             queryClient.setQueryData(nested.read.queryKey(), "nested");
+            expect(shortCodec.matches(nested.read.queryKey())).toBe(false);
             const queries = yield* registry.encodeQueries(
               dehydrate(queryClient).queries
             );
-            expect(queries[0]?.state.data).toBe("nested");
+            expect(queries.map((query) => query.state.data)).toStrictEqual([
+              { avatar: "AID/", credits: "23", name: "Ada" },
+              "nested",
+            ]);
           } finally {
             queryClient.clear();
           }
@@ -510,9 +519,10 @@ it.effect(
         ),
         registryShort: registry.matches(["short"]),
         registryOtherTenant: registry.matches([
-          { tenant: "two" },
+          'effect-api-query:v2:[{"tenant":"two"}]',
           "rpc",
           "read",
+          null,
           "query",
           { id: 1 },
         ]),

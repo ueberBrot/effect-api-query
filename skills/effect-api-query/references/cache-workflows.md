@@ -65,7 +65,7 @@ Use `createQueryFilter` to bind a leaf and view to a projection into the actual 
 
 `everyLocale` matches the encoded string ID for all locales. The concrete key fills in `locale: 'en'`. Match the output of the active encoder. Default HTTP keys keep request labels and lowercase headers. If an encoder returns only a scalar, use a broad prefix or exact key.
 
-Pass generated prefixes to native `invalidateQueries` or `cancelQueries`. Invalidation marks matching entries stale and refetches active matches by default. A view prefix covers every input and policy in that view. It is frozen and has no DataTag. Use exact generated keys for typed reads and writes. Stream keys include policy.
+Use generated filters with native `invalidateQueries` or `cancelQueries`. The complete caller key prefix occupies one versioned segment, so roots and branches match the full namespace even when the original tuple contains objects or arrays. Use each tree’s filter for cross-adapter invalidation. Invalidation marks matching entries stale and refetches active matches by default. A view prefix covers every input and policy in that view. It is frozen and has no DataTag. Use exact generated keys for typed reads and writes. Stream keys include policy.
 
 Hooks, observers, and `queryClient.query` apply selection. The cache retains decoded data. Set hashing through QueryClient global or prefix defaults and keep it stable. Per-call hashes are rejected. Streams fail with `UnsupportedQueryHash` if a default hash or cached identity conflicts. Retire the cache before changing hashing. Mutation keys and defaults are separate.
 

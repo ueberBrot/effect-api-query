@@ -23,13 +23,13 @@ Configure key hashing on QueryClient before adding cache entries. Generated buil
 
 Key objects cannot contain `__proto__` or `constructor` properties at any depth. Prefixes, Schema output, and custom encoder output all follow this restriction.
 
-RPC keys begin with the caller prefix followed by `rpc`. HTTP keys begin with the caller prefix, `http`, and the HttpApi identifier. Omit `keyPrefix` when the adapter and declaration path provide enough separation. Calling `key()` on a factory includes these generated segments.
+Keys begin with one versioned string containing the canonical JSON of the complete caller tuple. The next segment is `rpc` or `http`. HTTP keys add the HttpApi identifier. Omit `keyPrefix` when the adapter and declaration path provide enough separation. Use the generated builders to work with keys.
 
-The operation follows the RPC path. It is `query`, `infinite`, `streamed`, `live`, or `mutation`. Exact query keys also include the encoded payload, if present. The public payload slot is `unknown`. Use builders for exact keys and explicit projections for partial filters. The library validates and freezes each payload. A root, branch, or RPC prefix matches the operations below it.
+A `null` segment marks the end of the leaf path. The next segment identifies the operation as `query`, `infinite`, `streamed`, `live`, `metadata`, or `mutation`. Exact query keys also include the encoded payload, if present. The public payload slot is `unknown`. Use builders for exact keys and explicit projections for partial filters. The library validates and freezes each payload. A root, branch, or RPC prefix matches the operations below it.
 
-An accumulated stream key includes the retention and refetch settings. Use a finite `maxChunks` or `"unbounded"`, either at the call site or through a policy. Unbounded retention with reset refetches uses the original unlimited-history key. Pass the same settings to `streamedKey` and `streamedOptions` for exact cache access. Use the endpoint prefix to match every view. Use builders to produce the suffix.
+An accumulated stream key includes the retention and refetch settings. Use a finite `maxChunks` or `"unbounded"`, either at the call site or through a policy. Pass the same settings to `streamedKey` and `streamedOptions` for exact cache access. Use the endpoint prefix to match every view. Use builders to produce the suffix.
 
-Applications that persist query data choose schema and key-version busters as described in [Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/).
+When upgrading from the original flat prefix format, bump your persisted-cache version or buster and discard old TanStack snapshots before restoring. Deploy matching versions on both sides of SSR. The old tuples can be ambiguous and have no automatic migration. See [Switch Cache Owners](/effect-api-query/guides/switch-cache-owners/).
 
 Unsupported values, failed construction, and failed encoding raise `EffectRpcQueryKeyError` before network execution. Payloads that need encoding services or contain redacted values require a [custom key encoder](/effect-api-query/guides/custom-key-encoders/).
 

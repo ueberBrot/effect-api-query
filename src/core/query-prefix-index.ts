@@ -2,6 +2,8 @@ import { hashKey } from "@tanstack/query-core";
 import type { QueryKey } from "@tanstack/query-core";
 import { Array as EffectArray, Order, Predicate } from "effect";
 
+import { generatedViewKeyLimit } from "./utility-key";
+
 type PrimitiveSegment = string | number | boolean;
 
 const isPrimitiveSegment = (
@@ -11,7 +13,17 @@ const isPrimitiveSegment = (
   Predicate.isBoolean(value) ||
   (Predicate.isNumber(value) && Number.isFinite(value));
 
+export const hasFixedQueryPrefix = (key: QueryKey, prefix: QueryKey): boolean =>
+  key.length >= prefix.length &&
+  prefix.every((segment, index) => key[index] === segment);
+
 export const compileQueryPrefix = (prefix: QueryKey) => {
+  const maxLength = generatedViewKeyLimit(prefix);
+  if (Number.isFinite(maxLength)) {
+    return (key: QueryKey): boolean =>
+      key.length <= maxLength && hasFixedQueryPrefix(key, prefix);
+  }
+
   const hash = hashKey(prefix);
   const { length } = prefix;
   const lastIndex = length - 1;
@@ -61,7 +73,14 @@ export const indexQueryPrefixes = <Value>(
 ) => {
   interface Bucket {
     readonly length: number;
-    readonly values: Map<string, Value>;
+    readonly values: Map<
+      string,
+      {
+        readonly value: Value;
+        readonly prefix: QueryKey;
+        readonly maxLength: number;
+      }
+    >;
     first: Set<PrimitiveSegment> | undefined;
     last: Set<PrimitiveSegment> | undefined;
   }
@@ -85,7 +104,11 @@ export const indexQueryPrefixes = <Value>(
     if (options.duplicateError !== undefined && bucket.values.has(hash)) {
       throw options.duplicateError();
     }
-    bucket.values.set(hash, value);
+    bucket.values.set(hash, {
+      value,
+      prefix,
+      maxLength: generatedViewKeyLimit(prefix),
+    });
     bucket.first = collectSegment(bucket.first, prefix[0]);
     bucket.last = collectSegment(bucket.last, prefix[length - 1]);
   }
@@ -111,9 +134,14 @@ export const indexQueryPrefixes = <Value>(
         canMatchSegment(last, key[length - 1]) &&
         canMatchSegment(first, key[0])
       ) {
-        const value = values.get(hashKey(key.slice(0, length)));
-        if (value !== undefined) {
-          return value;
+        const entry = values.get(hashKey(key.slice(0, length)));
+        if (
+          entry &&
+          (!Number.isFinite(entry.maxLength) ||
+            (key.length <= entry.maxLength &&
+              hasFixedQueryPrefix(key, entry.prefix)))
+        ) {
+          return entry.value;
         }
       }
     }

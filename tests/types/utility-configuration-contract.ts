@@ -293,9 +293,9 @@ const customPolicy = defineRpcPolicy.withClientError<"transport">()(
     paths: {
       "users.read": {
         query: {
-          enabled: (query) => query.queryKey[0].tenant === "test",
+          enabled: (query) => query.queryKey[0] === rpc.key()[0],
           refetchInterval: (query) => {
-            query.queryKey[0].tenant satisfies "test";
+            query.queryKey[0] satisfies `effect-api-query:v2:${string}`;
             return 1000;
           },
           retry: (_count, error) => {
@@ -336,14 +336,18 @@ declare const unionClient: RpcClient.RpcClient.Flat<
 >;
 const unionUtils = createRpcQueryUtils(unionGroup, { client: unionClient });
 unionUtils.dual.left.queryKey() satisfies readonly [
+  "effect-api-query:v2:[]",
   "rpc",
   "dual",
   "left",
+  null,
   "query",
 ];
 unionUtils.dual.right.queryKey() satisfies readonly [
+  "effect-api-query:v2:[]",
   "rpc",
   "dual",
   "right",
+  null,
   "query",
 ];

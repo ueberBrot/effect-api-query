@@ -20,7 +20,7 @@ Select `streamed` for accumulated history, `live` for the latest value, `metadat
 
 Invalidation marks matching queries stale and refetches active matches by default. Choose which reads a write affects.
 
-RPC roots append `rpc` to the caller prefix. HTTP roots append `http` and the HttpApi identifier. The factories keep separate cache entries even when the caller prefix is the same. To match both, use the original caller prefix. To match one utility tree, use its generated root.
+Each generated root or branch matches the complete caller key prefix, including every field of an object and every element of an array. Use the generated filters for both trees when a write affects RPC and HTTP. The original caller tuple is a factory option. Use a generated key for native prefix defaults and filters.
 
 See [optimistic updates](/effect-api-query/guides/optimistic-writes/) to seed results or roll back local changes, and [refresh from events](/effect-api-query/guides/refresh-from-events/) to invalidate from delivered events. Use [cache owners](/effect-api-query/guides/switch-cache-owners/) for identity changes and [defaults and policies](/effect-api-query/guides/query-defaults/) to register defaults by prefix.
 

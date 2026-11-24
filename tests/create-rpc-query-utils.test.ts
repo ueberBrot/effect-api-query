@@ -59,7 +59,14 @@ describe(createRpcQueryUtils, () => {
           meta: supplied.meta,
           retry: false,
           queryFn: queryCoreSkipToken,
-          queryKey: ["app", "rpc", "users", "get", "query"],
+          queryKey: [
+            'effect-api-query:v2:["app"]',
+            "rpc",
+            "users",
+            "get",
+            null,
+            "query",
+          ],
         });
         const queryClient = new QueryClient();
         const observer = new QueryObserver(queryClient, options);
@@ -95,18 +102,53 @@ describe(createRpcQueryUtils, () => {
         stream: utils.events.watch.key(),
         streamed: utils.events.watch
           .streamedKey({ maxChunks: "unbounded" })
-          .slice(0, 5),
+          .slice(0, -1),
         live: utils.events.watch.liveKey(),
       }).toStrictEqual({
-        root: ["app", "rpc"],
-        branch: ["app", "rpc", "users"],
-        leaf: ["app", "rpc", "users", "get"],
-        mutation: ["app", "rpc", "users", "get", "mutation"],
-        query: ["app", "rpc", "users", "get", "query", { id: 1, locale: "en" }],
-        prototypeName: ["app", "rpc", "toString", "child"],
-        stream: ["app", "rpc", "events", "watch"],
-        streamed: ["app", "rpc", "events", "watch", "streamed"],
-        live: ["app", "rpc", "events", "watch", "live"],
+        root: ['effect-api-query:v2:["app"]', "rpc"],
+        branch: ['effect-api-query:v2:["app"]', "rpc", "users"],
+        leaf: ['effect-api-query:v2:["app"]', "rpc", "users", "get", null],
+        mutation: [
+          'effect-api-query:v2:["app"]',
+          "rpc",
+          "users",
+          "get",
+          null,
+          "mutation",
+        ],
+        query: [
+          'effect-api-query:v2:["app"]',
+          "rpc",
+          "users",
+          "get",
+          null,
+          "query",
+          { id: 1, locale: "en" },
+        ],
+        prototypeName: [
+          'effect-api-query:v2:["app"]',
+          "rpc",
+          "toString",
+          "child",
+          null,
+        ],
+        stream: ['effect-api-query:v2:["app"]', "rpc", "events", "watch", null],
+        streamed: [
+          'effect-api-query:v2:["app"]',
+          "rpc",
+          "events",
+          "watch",
+          null,
+          "streamed",
+        ],
+        live: [
+          'effect-api-query:v2:["app"]',
+          "rpc",
+          "events",
+          "watch",
+          null,
+          "live",
+        ],
       });
     })
   );
@@ -196,7 +238,14 @@ describe(createRpcQueryUtils, () => {
       expect(skippedInfinite).toStrictEqual({
         ...infiniteCallerOptions,
         queryFn: queryCoreSkipToken,
-        queryKey: ["app", "rpc", "users", "get", "infinite"],
+        queryKey: [
+          'effect-api-query:v2:["app"]',
+          "rpc",
+          "users",
+          "get",
+          null,
+          "infinite",
+        ],
       });
       expect(skippedInfinite).not.toHaveProperty("queryKeyHashFn");
     })
@@ -226,10 +275,11 @@ describe(createRpcQueryUtils, () => {
         "billing-history",
       ]);
       expect(utils["billing-history"]["list all"].key()).toStrictEqual([
-        "app",
+        'effect-api-query:v2:["app"]',
         "rpc",
         "billing-history",
         "list all",
+        null,
       ]);
       expect(
         yield* Effect.promise(async () => await Promise.resolve(utils))
@@ -344,38 +394,62 @@ describe(createRpcQueryUtils, () => {
           unary: utils.reports.list.key(),
           nestedStreamed: utils.events.audit.watch
             .streamedKey({ maxChunks: "unbounded" })
-            .slice(0, 6),
+            .slice(0, -1),
           nestedLive: utils.events.audit.watch.liveKey(),
           rootStreamed: utils.updates.watch
             .streamedKey({ maxChunks: "unbounded" })
-            .slice(0, 5),
+            .slice(0, -1),
         }).toStrictEqual({
-          unary: ["app", "rpc", "reports", "list"],
+          unary: [
+            'effect-api-query:v2:["app"]',
+            "rpc",
+            "reports",
+            "list",
+            null,
+          ],
           nestedStreamed: [
-            "app",
+            'effect-api-query:v2:["app"]',
             "rpc",
             "events",
             "audit",
             "watch",
+            null,
             "streamed",
           ],
-          nestedLive: ["app", "rpc", "events", "audit", "watch", "live"],
-          rootStreamed: ["app", "rpc", "updates", "watch", "streamed"],
+          nestedLive: [
+            'effect-api-query:v2:["app"]',
+            "rpc",
+            "events",
+            "audit",
+            "watch",
+            null,
+            "live",
+          ],
+          rootStreamed: [
+            'effect-api-query:v2:["app"]',
+            "rpc",
+            "updates",
+            "watch",
+            null,
+            "streamed",
+          ],
         });
       })
   );
 
   it.effect(
-    "omits keyPrefix to produce ['rpc'] roots and rejects empty or explicit undefined keyPrefix",
+    "uses the empty namespace when keyPrefix is omitted and rejects explicitly empty prefixes",
     () =>
       Effect.gen(function* testOptionalKeyPrefix() {
         const client = yield* makeClient();
         const utils = createRpcQueryUtils(group, { client });
-        expect(utils.key()).toStrictEqual(["rpc"]);
+        expect(utils.key()).toStrictEqual(["effect-api-query:v2:[]", "rpc"]);
         expect(utils.users.get.queryKey({ input: { id: 7 } })).toStrictEqual([
+          "effect-api-query:v2:[]",
           "rpc",
           "users",
           "get",
+          null,
           "query",
           { id: 7, locale: "en" },
         ]);

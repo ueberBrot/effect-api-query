@@ -137,19 +137,35 @@ it.effect(
       const serverOptions = createHttpApiQueryUtils(api, {
         client: serverClient,
         keyPrefix: ["hydration-views", "metadata"],
-      }).profiles.read.metadataOptions({ retry: false, staleTime: Infinity });
+      }).profiles.read.metadataOptions({
+        meta: { snapshotView: "metadata" },
+        retry: false,
+        staleTime: Infinity,
+      });
       const browserOptions = createHttpApiQueryUtils(api, {
         client: browserClient,
         keyPrefix: ["hydration-views", "metadata"],
-      }).profiles.read.metadataOptions({ retry: false, staleTime: Infinity });
+      }).profiles.read.metadataOptions({
+        meta: { snapshotView: "metadata" },
+        retry: false,
+        staleTime: Infinity,
+      });
       const serverBuffered = createHttpApiQueryUtils(api, {
         client: serverClient,
         keyPrefix: ["hydration-views", "buffered"],
-      }).profiles.read.queryOptions({ retry: false, staleTime: Infinity });
+      }).profiles.read.queryOptions({
+        meta: { snapshotView: "buffered" },
+        retry: false,
+        staleTime: Infinity,
+      });
       const browserBuffered = createHttpApiQueryUtils(api, {
         client: browserClient,
         keyPrefix: ["hydration-views", "buffered"],
-      }).profiles.read.queryOptions({ retry: false, staleTime: Infinity });
+      }).profiles.read.queryOptions({
+        meta: { snapshotView: "buffered" },
+        retry: false,
+        staleTime: Infinity,
+      });
       const initial = yield* Effect.promise(
         async () => await server.query(serverOptions)
       );
@@ -395,15 +411,22 @@ it.effect(
       const serverOptions = createHttpApiQueryUtils(api, {
         client: serverClient,
         keyPrefix: ["hydration-views", "wrapped-live"],
-      }).profiles.watch.liveOptions({ retry: false });
+      }).profiles.watch.liveOptions({
+        meta: { snapshotView: "wrapped-live" },
+        retry: false,
+      });
       const browserOptions = createHttpApiQueryUtils(api, {
         client: browserClient,
         keyPrefix: ["hydration-views", "wrapped-live"],
-      }).profiles.watch.liveOptions({ retry: false });
+      }).profiles.watch.liveOptions({
+        meta: { snapshotView: "wrapped-live" },
+        retry: false,
+      });
       const serverHistory = createHttpApiQueryUtils(api, {
         client: serverClient,
         keyPrefix: ["hydration-views", "wrapped-history"],
       }).profiles.watch.streamedOptions({
+        meta: { snapshotView: "wrapped-history" },
         maxChunks: "unbounded",
         retry: false,
       });
@@ -411,6 +434,7 @@ it.effect(
         client: browserClient,
         keyPrefix: ["hydration-views", "wrapped-history"],
       }).profiles.watch.streamedOptions({
+        meta: { snapshotView: "wrapped-history" },
         maxChunks: "unbounded",
         retry: false,
       });

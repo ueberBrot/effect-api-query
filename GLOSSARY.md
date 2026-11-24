@@ -30,7 +30,7 @@ These terms describe how the package builds TanStack Query utilities from Effect
 
 **Canonical key payload**: The immutable, JSON-safe representation of a normalized payload that identifies a cache entry. It is independent of the transport encoding for a protocol. _Avoid_: Wire payload, raw input
 
-**Key prefix**: An optional non-empty tuple of JSON-safe values that the caller supplies to namespace a utility tree. Omitting it defaults to `readonly []`. Generated roots append an adapter discriminator. HTTP roots also append the API identifier. _Avoid_: Automatic namespace, client identity
+**Key prefix**: An optional non-empty tuple of JSON-safe values that the caller supplies to namespace a utility tree. Omitting it defaults to `readonly []`. Generated roots encode the complete tuple as one versioned namespace segment followed by an adapter discriminator. HTTP roots add the API identifier. _Avoid_: Automatic namespace, client identity
 
 **Prepared input**: An opaque handle that reuses one utility leaf's normalized execution input and canonical key payload. The caller keeps retained values unchanged. Configured copies share the owner; other leaves and utility trees cannot use the handle. _Avoid_: Input snapshot, global memoization
 

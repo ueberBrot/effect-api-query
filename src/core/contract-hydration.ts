@@ -35,6 +35,7 @@ import type { CompiledHydrationCodec, HydrationRegistry } from "./hydration";
 import type { QueryView } from "./inference";
 import { freezeMetadata } from "./metadata-query";
 import type { JsonValue } from "./types";
+import { utilityOperationKey, utilityRootKey } from "./utility-key";
 import {
   normalizeUtilityKeyPrefix,
   validateUtilityPaths,
@@ -1193,7 +1194,7 @@ const buildRpcContractRegistry = (
   }
 
   const codecs: CompiledHydrationCodec[] = [];
-  const rootPrefix = [...keyPrefix, "rpc"];
+  const rootPrefix = utilityRootKey(keyPrefix, ["rpc"]);
 
   for (const { name: path, path: segments, rpc } of operations) {
     const config = resolvePathConfigObject(path, readOwn(paths, path));
@@ -1202,7 +1203,7 @@ const buildRpcContractRegistry = (
     }
     collectOperationCodecs(
       codecs,
-      [...rootPrefix, ...segments],
+      utilityOperationKey(rootPrefix, segments),
       path,
       config,
       views,
@@ -1304,7 +1305,7 @@ const buildHttpContractRegistry = (
   validateHttpPaths(operations, paths);
 
   const codecs: CompiledHydrationCodec[] = [];
-  const rootPrefix = [...keyPrefix, "http", api.identifier];
+  const rootPrefix = utilityRootKey(keyPrefix, ["http", api.identifier]);
 
   for (const { name: path, path: segments, classified } of operations) {
     const config = resolvePathConfigObject(path, readOwn(paths, path));
@@ -1313,7 +1314,7 @@ const buildHttpContractRegistry = (
     }
     collectOperationCodecs(
       codecs,
-      [...rootPrefix, ...segments],
+      utilityOperationKey(rootPrefix, segments),
       path,
       config,
       views,

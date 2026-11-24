@@ -86,8 +86,8 @@ const cachedHistory = queryClient.getQueryData(
 );
 const historyKey = rpc.watch.streamedKey({ input: { id: 1 } });
 const inputlessHistoryKey = rpc.ticks.streamedKey();
-true satisfies Assert<Equal<(typeof historyKey)["length"], 6>>;
-true satisfies Assert<Equal<(typeof inputlessHistoryKey)["length"], 5>>;
+true satisfies Assert<Equal<(typeof historyKey)["length"], 7>>;
+true satisfies Assert<Equal<(typeof inputlessHistoryKey)["length"], 6>>;
 true satisfies Assert<Equal<typeof cachedUser, User | undefined>>;
 true satisfies Assert<Equal<typeof cachedHistory, readonly User[] | undefined>>;
 

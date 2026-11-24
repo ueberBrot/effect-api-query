@@ -37,6 +37,7 @@ import {
 import type { HydrationRegistry } from "#effect-api-query";
 
 import { makeRpcTestClient } from "./fixtures/effect-rpc.ts";
+import { makeUnusedHttpClient } from "./fixtures/http-client.ts";
 import { Profile } from "./types/docs-hydration-rich.ts";
 import { Cursor } from "./types/docs-hydration-views.ts";
 
@@ -110,7 +111,7 @@ describe("createContractHydrationRegistry — RPC contracts", () => {
         jsonObject: Schema.JsonObject,
       });
       const group = RpcGroup.make(Rpc.make("read", { success: Nested }));
-      const key = ["rpc", "read", "query"];
+      const key = ["effect-api-query:v2:[]", "rpc", "read", null, "query"];
       const value = Nested.make({
         values: ["42", 42n],
         dictionary: { text: "42", bigint: 42n },
@@ -539,17 +540,21 @@ describe("createContractHydrationRegistry — HTTP contracts", () => {
           )
         );
         const queryKey = [
+          "effect-api-query:v2:[]",
           "http",
           "middleware-errors",
           "values",
           "read",
+          null,
           "query",
         ];
         const metadataKey = [
+          "effect-api-query:v2:[]",
           "http",
           "middleware-errors",
           "values",
           "read",
+          null,
           "metadata",
         ];
         const metadata = { data: "42", status: 201, headers: {} };
@@ -737,7 +742,15 @@ describe("createContractHydrationRegistry — HTTP contracts", () => {
         group,
         options
       );
-      expect(registry.matches(["rpc", "read", "query"])).toBe(false);
+      expect(
+        registry.matches([
+          "effect-api-query:v2:[]",
+          "rpc",
+          "read",
+          null,
+          "query",
+        ])
+      ).toBe(false);
     }
   });
 
@@ -770,9 +783,23 @@ describe("createContractHydrationRegistry — HTTP contracts", () => {
       options
     );
     expect([
-      rpc.matches(["rpc", "read", "query"]),
-      http.matches(["http", "getter-paths", "read", "query"]),
-      http.matches(["http", "getter-paths", "read", "metadata"]),
+      rpc.matches(["effect-api-query:v2:[]", "rpc", "read", null, "query"]),
+      http.matches([
+        "effect-api-query:v2:[]",
+        "http",
+        "getter-paths",
+        "read",
+        null,
+        "query",
+      ]),
+      http.matches([
+        "effect-api-query:v2:[]",
+        "http",
+        "getter-paths",
+        "read",
+        null,
+        "metadata",
+      ]),
     ]).toStrictEqual([false, false, false]);
   });
 
@@ -791,7 +818,9 @@ describe("createContractHydrationRegistry — HTTP contracts", () => {
     });
 
     expect(reads).toBe(1);
-    expect(registry.matches(["rpc", "read", "query"])).toBe(false);
+    expect(
+      registry.matches(["effect-api-query:v2:[]", "rpc", "read", null, "query"])
+    ).toBe(false);
   });
 
   it("ignores inherited view overrides on accepted RPC and HTTP paths", () => {
@@ -814,11 +843,44 @@ describe("createContractHydrationRegistry — HTTP contracts", () => {
       ...options,
     });
     expect([
-      rpcRegistry.matches(["rpc", "read", "query"]),
-      httpRegistry.matches(["http", "own-views", "read", "query"]),
-      httpRegistry.matches(["http", "own-views", "read", "metadata"]),
-      rpcRegistry.matches(["rpc", "read", "infinite"]),
-      httpRegistry.matches(["http", "own-views", "read", "infinite"]),
+      rpcRegistry.matches([
+        "effect-api-query:v2:[]",
+        "rpc",
+        "read",
+        null,
+        "query",
+      ]),
+      httpRegistry.matches([
+        "effect-api-query:v2:[]",
+        "http",
+        "own-views",
+        "read",
+        null,
+        "query",
+      ]),
+      httpRegistry.matches([
+        "effect-api-query:v2:[]",
+        "http",
+        "own-views",
+        "read",
+        null,
+        "metadata",
+      ]),
+      rpcRegistry.matches([
+        "effect-api-query:v2:[]",
+        "rpc",
+        "read",
+        null,
+        "infinite",
+      ]),
+      httpRegistry.matches([
+        "effect-api-query:v2:[]",
+        "http",
+        "own-views",
+        "read",
+        null,
+        "infinite",
+      ]),
     ]).toStrictEqual([true, true, true, false, false]);
   });
 
@@ -832,8 +894,15 @@ describe("createContractHydrationRegistry — HTTP contracts", () => {
       )
     );
 
-    const rpcKey = ["rpc", "toString", "query"];
-    const httpKey = ["http", "inherited", "toString", "query"];
+    const rpcKey = ["effect-api-query:v2:[]", "rpc", "toString", null, "query"];
+    const httpKey = [
+      "effect-api-query:v2:[]",
+      "http",
+      "inherited",
+      "toString",
+      null,
+      "query",
+    ];
     expect(createContractHydrationRegistry(group).matches(rpcKey)).toBe(true);
     expect(createContractHydrationRegistry(api).matches(httpKey)).toBe(true);
     expect(
@@ -1402,7 +1471,7 @@ describe("eager validation & HydrationCodecError", () => {
       });
       const group = RpcGroup.make(Rpc.make("read", { success }));
       const registry = createContractHydrationRegistry(group);
-      const key = ["rpc", "read", "query"];
+      const key = ["effect-api-query:v2:[]", "rpc", "read", null, "query"];
       const server = new QueryClient();
       const browser = new QueryClient();
       const value = {
@@ -1448,7 +1517,7 @@ describe("eager validation & HydrationCodecError", () => {
       );
       const group = RpcGroup.make(Rpc.make("read", { success }));
       const registry = createContractHydrationRegistry(group);
-      const key = ["rpc", "read", "query"];
+      const key = ["effect-api-query:v2:[]", "rpc", "read", null, "query"];
       const server = new QueryClient();
       const browser = new QueryClient();
       server.setQueryData(key, { value: 4 });
@@ -1526,13 +1595,34 @@ describe("eager validation & HydrationCodecError", () => {
       },
       opaqueOptOut: createContractHydrationRegistry(opaqueGroup, {
         paths: { "opaque.get": false },
-      }).matches(["rpc", "opaque", "get", "query"]),
+      }).matches([
+        "effect-api-query:v2:[]",
+        "rpc",
+        "opaque",
+        "get",
+        null,
+        "query",
+      ]),
       opaqueOverride: createContractHydrationRegistry(opaqueGroup, {
         paths: { "opaque.get": { query: OpaqueCodec } },
-      }).matches(["rpc", "opaque", "get", "query"]),
+      }).matches([
+        "effect-api-query:v2:[]",
+        "rpc",
+        "opaque",
+        "get",
+        null,
+        "query",
+      ]),
       redactedOptOut: createContractHydrationRegistry(redactedGroup, {
         paths: { "secrets.get": { query: false } },
-      }).matches(["rpc", "secrets", "get", "query"]),
+      }).matches([
+        "effect-api-query:v2:[]",
+        "rpc",
+        "secrets",
+        "get",
+        null,
+        "query",
+      ]),
       headersOverride: createContractHydrationRegistry(badHttpApi, {
         paths: {
           "boxes.get": {
@@ -1540,7 +1630,15 @@ describe("eager validation & HydrationCodecError", () => {
             metadata: { headers: ["etag"] },
           },
         },
-      }).matches(["http", "bad-http", "boxes", "get", "metadata"]),
+      }).matches([
+        "effect-api-query:v2:[]",
+        "http",
+        "bad-http",
+        "boxes",
+        "get",
+        null,
+        "metadata",
+      ]),
     }).toStrictEqual({
       opaque: { code: "UnencodableSchema", path: "opaque.get", view: "query" },
       redacted: {
@@ -1617,10 +1715,12 @@ describe("eager validation & HydrationCodecError", () => {
         path: hiddenAmbiguousErr.path,
       },
       bareAmbiguousOk: createContractHydrationRegistry(ambiguousApi).matches([
+        "effect-api-query:v2:[]",
         "http",
         "ambiguous",
         "a",
         "b.c",
+        null,
         "query",
       ]),
     }).toStrictEqual({
@@ -1664,7 +1764,7 @@ it.effect(
       );
       const group = RpcGroup.make(Rpc.make("read", { success: Transformed }));
       const registry = createContractHydrationRegistry(group);
-      const key = ["rpc", "read", "query"];
+      const key = ["effect-api-query:v2:[]", "rpc", "read", null, "query"];
       const server = new QueryClient();
       server.setQueryData(key, { value: "42" });
       const snapshot = dehydrate(server);
@@ -1869,7 +1969,15 @@ describe("composable createHydrationRegistry", () => {
     ];
     const optedOut = createContractHydrationRegistry(httpOptionApi, {
       paths: { "secrets.get": false },
-    }).matches(["http", "nested-redacted-http", "secrets", "get", "query"]);
+    }).matches([
+      "effect-api-query:v2:[]",
+      "http",
+      "nested-redacted-http",
+      "secrets",
+      "get",
+      null,
+      "query",
+    ]);
     expect({ results, optedOut }).toStrictEqual({
       results: [
         "UnencodableSchema",
@@ -2319,3 +2427,104 @@ describe("composable createHydrationRegistry", () => {
       })
   );
 });
+
+it.effect(
+  "round-trips versioned RPC and HTTP keys without restoring a legacy snapshot",
+  () =>
+    Effect.gen(function* roundTripVersionedKeys() {
+      const group = RpcGroup.make(
+        Rpc.make("directory.read", { success: Schema.String })
+      );
+      const rpcClient = yield* makeRpcTestClient(group, {
+        "directory.read": () => Effect.succeed("rpc"),
+      });
+      const api = HttpApi.make("directory").add(
+        HttpApiGroup.make("entries").add(
+          HttpApiEndpoint.get("read", "/entries", { success: Schema.Finite })
+        )
+      );
+      const httpClient = yield* makeUnusedHttpClient(api);
+      const regional = {
+        keyPrefix: ["region", { id: 7, locale: "en" }],
+      } as const;
+      const local = {
+        keyPrefix: ["region", { locale: "en", id: 7 }, "local"],
+      } as const;
+      const rpc = createRpcQueryUtils(group, {
+        client: rpcClient,
+        ...regional,
+      });
+      const regionHttp = createHttpApiQueryUtils(api, {
+        client: httpClient,
+        ...regional,
+      });
+      const localHttp = createHttpApiQueryUtils(api, {
+        client: httpClient,
+        ...local,
+      });
+      const rpcRegistry = createContractHydrationRegistry(group, {
+        keyPrefix: ["region", { locale: "en", id: 7 }],
+      });
+      const regionRegistry = createContractHydrationRegistry(api, regional);
+      const localRegistry = createContractHydrationRegistry(api, local);
+      const registry = createHydrationRegistry([
+        rpcRegistry,
+        regionRegistry,
+        localRegistry,
+      ]);
+      const rpcKey = rpc.directory.read.queryKey();
+      const regionKey = regionHttp.entries.read.queryKey();
+      const localKey = localHttp.entries.read.queryKey();
+      const legacy = [
+        "region",
+        { id: 7, locale: "en" },
+        "rpc",
+        "directory",
+        "read",
+        "query",
+      ];
+      const server = new QueryClient();
+      const browser = new QueryClient();
+      try {
+        server.setQueryData(rpcKey, "rpc");
+        server.setQueryData(regionKey, 20);
+        server.setQueryData(localKey, 40);
+        server.setQueryData(legacy, "legacy");
+        expect([
+          rpcRegistry.matches(rpcKey),
+          rpcRegistry.matches(regionKey),
+          regionRegistry.matches(localKey),
+          localRegistry.matches(regionKey),
+        ]).toStrictEqual([true, false, false, false]);
+        const codec = queryViewCodec(
+          rpc.directory.read,
+          "query",
+          Schema.String
+        );
+        const incomplete = [...rpcKey.slice(0, -2), undefined, "query"];
+        const extended = [...rpcKey, "local", "detail"];
+        expect({
+          legacy: registry.matches(legacy),
+          incomplete: registry.matches(incomplete),
+          direct: codec.matches(incomplete),
+          extended: registry.matches(extended),
+        }).toStrictEqual({
+          legacy: false,
+          incomplete: false,
+          direct: false,
+          extended: false,
+        });
+
+        yield* roundTripJson(registry, server, browser);
+        expect([
+          browser.getQueryData(rpcKey),
+          browser.getQueryData(regionKey),
+          browser.getQueryData(localKey),
+          browser.getQueryData(legacy),
+        ]).toStrictEqual(["rpc", 20, 40, undefined]);
+      } finally {
+        server.clear();
+        browser.clear();
+      }
+    })
+);

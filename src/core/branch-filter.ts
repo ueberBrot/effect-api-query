@@ -5,7 +5,7 @@ import type {
   BranchQueryFilter,
   BranchQueryFilterOptions,
 } from "./query-filter";
-import { indexQueryPrefixes } from "./query-prefix-index";
+import { hasFixedQueryPrefix, indexQueryPrefixes } from "./query-prefix-index";
 
 export interface FilterPath {
   readonly key: QueryKey;
@@ -17,9 +17,15 @@ export const createBranchFilter = (
   paths: readonly FilterPath[]
 ): BranchQueryFilter => {
   let matchers: Map<QueryView, (key: QueryKey) => true | undefined> | undefined;
-  return ({ view, ...options }: BranchQueryFilterOptions = {}) => {
+  return ({ view, predicate, ...options }: BranchQueryFilterOptions = {}) => {
     if (view === undefined) {
-      return { ...options, queryKey };
+      return {
+        ...options,
+        queryKey,
+        predicate: (query) =>
+          hasFixedQueryPrefix(query.queryKey, queryKey) &&
+          (predicate?.(query) ?? true),
+      };
     }
     matchers ??= new Map();
     let match = matchers.get(view);
@@ -38,8 +44,7 @@ export const createBranchFilter = (
       ...options,
       queryKey,
       predicate: (query) =>
-        matchesView(query.queryKey) === true &&
-        (options.predicate?.(query) ?? true),
+        matchesView(query.queryKey) === true && (predicate?.(query) ?? true),
     };
   };
 };
