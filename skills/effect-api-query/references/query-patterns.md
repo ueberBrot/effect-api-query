@@ -141,7 +141,7 @@ Reuse the options' `queryKey` or call `streamedKey({ input, ...policy })`. For a
 
 Choose a refetch mode for accumulated history.
 
-- `reset` clears data and sets the query to pending. This is the default.
+- `reset` clears cached data, including `initialData`, and sets the query to pending. A failure before the first emission leaves the cache without data. This is the default.
 - `append` adds the new values to the cached sequence.
 - `replace` keeps the old history until the new stream finishes successfully.
 

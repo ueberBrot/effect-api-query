@@ -109,6 +109,13 @@ skills:
         source: src/http/types.ts
         priority: HIGH
         status: active
+      - mistake: Rely on initialData during an accumulated reset refetch
+        mechanism: Reset clears seeded history before the first emission and a failure before publication leaves data absent.
+        wrong_pattern: Expect initialData to remain visible while a reset refetch waits for the first value.
+        correct_pattern: Handle pending and pre-emission errors without cached data, or choose append or replace to retain history during refetch.
+        source: src/core/streamed-query.ts
+        priority: HIGH
+        status: active
       - mistake: Treat an abort before the first live value as empty completion
         mechanism: Empty completion raises the adapter error only while the signal is active.
         wrong_pattern: Suppress empty-stream errors when retiring a query owner.

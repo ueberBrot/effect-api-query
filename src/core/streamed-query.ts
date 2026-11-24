@@ -383,7 +383,13 @@ export const makeStreamQuery = ({
     const isRefetch = query?.isFetched() === true;
     const reset = refetchMode === "reset" && isRefetch;
     if (reset) {
-      query.setState({ ...query.resetState, fetchStatus: "fetching" });
+      query.setState({
+        ...query.resetState,
+        data: undefined,
+        dataUpdatedAt: 0,
+        fetchStatus: "fetching",
+        status: "pending",
+      });
     }
     const batches = await openStream(
       streamPublicationBatches(
