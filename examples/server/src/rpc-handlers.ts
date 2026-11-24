@@ -39,12 +39,6 @@ const handlersLayer = exampleRpcGroup.toLayer(
         () => diagnostics.status
       ),
       "diagnostics.stream": () => diagnosticStream,
-      "testing.reset": Effect.fn("ExampleRpc.testing.reset")(function* () {
-        yield* commands.reset;
-        yield* diagnostics.reset;
-        yield* users.reset;
-      }),
-      "testing.seed": users.seed,
       "users.create": users.create,
       "users.delete": users.delete,
       "users.get": users.get,

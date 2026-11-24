@@ -88,9 +88,6 @@ const UsersPage = () => {
       onSuccess: invalidateUsers,
     })
   );
-  const resetUsers = useMutation(
-    rpcQuery.testing.reset.mutationOptions({ onSuccess: invalidateUsers })
-  );
   const reuseCachedUsers = async () => {
     const cached = await queryClient.query({
       ...rpcQuery.users.list.queryOptions(),
@@ -146,23 +143,12 @@ const UsersPage = () => {
             >
               Add Grace Hopper
             </ActionButton>
-            <ActionButton
-              onClick={() => {
-                resetUsers.mutate();
-              }}
-              variant="secondary"
-            >
-              Reset directory
-            </ActionButton>
           </div>
           {message === undefined ? null : (
             <p className="mt-4 text-sm">{message}</p>
           )}
           {addGrace.isSuccess ? (
             <p className="mt-4 text-sm">Added user {addGrace.data.name}.</p>
-          ) : null}
-          {resetUsers.isSuccess ? (
-            <p className="mt-4 text-sm">Directory reset.</p>
           ) : null}
         </Panel>
 

@@ -1,19 +1,17 @@
-import { expect, test } from "@playwright/test";
+import { expect } from "@playwright/test";
 import { Schema } from "effect";
 
 import {
   isHttpRequest,
   prepareExampleApplication,
+  startExampleTest as test,
   recordsRpc,
-  tanStackStartApplication,
 } from "./example-application.ts";
 
-const httpUrl = `${tanStackStartApplication.url}/http`;
-
 test.describe("TanStack Start HTTP API example", () => {
-  test.beforeEach(async ({ page }) => {
-    await prepareExampleApplication(page, tanStackStartApplication);
-    await page.goto(httpUrl);
+  test.beforeEach(async ({ exampleUrl, page }) => {
+    await prepareExampleApplication(page, exampleUrl);
+    await page.goto(`${exampleUrl}/http`);
     await expect(
       page.getByRole("heading", { name: "HTTP users", exact: true })
     ).toBeVisible();
@@ -21,12 +19,13 @@ test.describe("TanStack Start HTTP API example", () => {
 
   test("server-renders HTTP data and hydrates both query shapes without duplicate requests", async ({
     browser,
+    exampleUrl,
     page,
   }) => {
     const context = await browser.newContext({ javaScriptEnabled: false });
     try {
       const serverPage = await context.newPage();
-      const response = await serverPage.goto(httpUrl);
+      const response = await serverPage.goto(`${exampleUrl}/http`);
       expect(response?.ok()).toBe(true);
       await expect(
         serverPage.getByText("HTTP: Ada Lovelace", { exact: true })
@@ -109,6 +108,7 @@ test.describe("TanStack Start HTTP API example", () => {
   });
 
   test("advances the hydrated HTTP page through the same-origin host", async ({
+    exampleUrl,
     page,
   }) => {
     const nextPage = page.waitForResponse(
@@ -118,7 +118,7 @@ test.describe("TanStack Start HTTP API example", () => {
     await page.getByRole("button", { name: "Load next HTTP page" }).click();
     const response = await nextPage;
     const url = new URL(response.url());
-    expect(url.origin).toBe(new URL(httpUrl).origin);
+    expect(url.origin).toBe(exampleUrl);
     expect(url.searchParams.get("cursor")).toBe("4");
     await expect(page.getByText("HTTP page 1: 4 users")).toBeVisible();
     await expect(page.getByText("HTTP page 2: 4 users")).toBeVisible();
@@ -197,6 +197,7 @@ test.describe("TanStack Start HTTP API example", () => {
 
   for (const transport of ["http", "rpc"] as const) {
     test(`navigation cancels the pending ${transport.toUpperCase()} operation and stops status requests`, async ({
+      exampleUrl,
       page,
     }) => {
       if (transport === "rpc") {
@@ -260,7 +261,7 @@ test.describe("TanStack Start HTTP API example", () => {
       ).toBeVisible();
       await aborted;
       const requestsAfterNavigation = statusRequests;
-      const statusUrl = `${tanStackStartApplication.url}/api/diagnostics/operations/${encodeURIComponent(operationId)}`;
+      const statusUrl = `${exampleUrl}/api/diagnostics/operations/${encodeURIComponent(operationId)}`;
       await expect
         .poll(async () => {
           const response = await page.request.get(statusUrl);
@@ -279,9 +280,10 @@ test.describe("TanStack Start HTTP API example", () => {
 
   test("omits a failed server query and refetches it in the browser", async ({
     browser,
+    exampleUrl,
     page,
   }) => {
-    const url = `${tanStackStartApplication.url}/http-failure`;
+    const url = `${exampleUrl}/http-failure`;
     const context = await browser.newContext({ javaScriptEnabled: false });
     try {
       const serverPage = await context.newPage();

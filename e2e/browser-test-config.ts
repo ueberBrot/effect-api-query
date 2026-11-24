@@ -1,5 +1,4 @@
 import { defineConfig, devices } from "@playwright/test";
-import type { PlaywrightTestConfig } from "@playwright/test";
 import { Config, ConfigProvider, Effect, Option } from "effect";
 
 const ci = Option.getOrUndefined(
@@ -27,19 +26,4 @@ export const browserTestDefaults = defineConfig({
     trace: "retain-on-failure",
   },
   workers: 1,
-});
-
-export const browserTestServer = (
-  command: string,
-  url: string
-): Exclude<
-  NonNullable<PlaywrightTestConfig["webServer"]>,
-  readonly unknown[]
-> => ({
-  command,
-  reuseExistingServer: false,
-  stderr: "pipe",
-  stdout: "pipe",
-  timeout: 120_000,
-  url,
 });

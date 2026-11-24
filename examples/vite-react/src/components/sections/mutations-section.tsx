@@ -1,7 +1,5 @@
-import { SeedUser } from "@effect-api-query/contracts";
 import { ActionButton } from "@effect-api-query/shared/ui/action-button.tsx";
-import { EffectErrorDetails } from "@effect-api-query/shared/ui/effect-error-details.tsx";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import type { ViteReactApplication } from "../../lib/application.ts";
 import { CreateUserForm } from "../users/create-user-form.tsx";
@@ -11,22 +9,12 @@ export const MutationsSection = ({
 }: {
   readonly application: ViteReactApplication;
 }) => {
-  const { invalidateUsers, rpcQuery, trackMutationOptions } = application;
+  const { rpcQuery } = application;
   const voidQuery = useQuery(
     rpcQuery.diagnostics.cancel.queryOptions({
       enabled: false,
       input: { operationId: "no-active-operation" },
     })
-  );
-  const resetUsers = useMutation(
-    trackMutationOptions(
-      rpcQuery.testing.reset.mutationOptions({ onSuccess: invalidateUsers })
-    )
-  );
-  const seedUsers = useMutation(
-    trackMutationOptions(
-      rpcQuery.testing.seed.mutationOptions({ onSuccess: invalidateUsers })
-    )
   );
 
   return (
@@ -38,34 +26,6 @@ export const MutationsSection = ({
       <div className="flex flex-wrap gap-3">
         <ActionButton
           onClick={() => {
-            seedUsers.mutate({
-              users: [
-                { name: "Grace Hopper" },
-                { name: "Margaret Hamilton" },
-                { name: "Katherine Johnson" },
-                { name: "Dorothy Vaughan" },
-                { name: "Frances Allen" },
-                { name: "Jean Bartik" },
-                { name: "Mary Keller" },
-                { name: "Sister Mary Kenneth Keller" },
-              ].map((user) => new SeedUser(user)),
-            });
-          }}
-          type="button"
-        >
-          Replace with eight pioneers
-        </ActionButton>
-        <ActionButton
-          onClick={() => {
-            resetUsers.mutate();
-          }}
-          type="button"
-          variant="secondary"
-        >
-          Reset directory
-        </ActionButton>
-        <ActionButton
-          onClick={() => {
             void voidQuery.refetch();
           }}
           type="button"
@@ -74,10 +34,6 @@ export const MutationsSection = ({
           Run void query
         </ActionButton>
       </div>
-      <EffectErrorDetails error={seedUsers.error ?? resetUsers.error} />
-      {resetUsers.isSuccess ? (
-        <p className="text-sm">Reset result: {String(resetUsers.data)}</p>
-      ) : null}
       {voidQuery.isSuccess ? (
         <p className="text-sm">Void query result: {String(voidQuery.data)}</p>
       ) : null}

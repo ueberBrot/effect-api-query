@@ -1,14 +1,14 @@
-import { expect, test } from "@playwright/test";
+import { expect } from "@playwright/test";
 
 import {
+  exampleTest as test,
   prepareExampleApplication,
   recordsRpc,
-  viteReactApplication,
 } from "./example-application.ts";
 
 test.describe("plain Vite React application", () => {
-  test.beforeEach(async ({ page }) => {
-    await prepareExampleApplication(page, viteReactApplication);
+  test.beforeEach(async ({ exampleUrl, page }) => {
+    await prepareExampleApplication(page, exampleUrl);
   });
 
   test("loads the initial query, reuses its cache, and survives reload", async ({
@@ -119,14 +119,10 @@ test.describe("plain Vite React application", () => {
   test("mutates users and explicitly invalidates through generated keys", async ({
     page,
   }) => {
-    await page
-      .getByRole("button", { name: "Replace with eight pioneers" })
-      .click();
+    await page.getByLabel("Name", { exact: true }).fill("Grace Hopper");
+    await page.getByRole("button", { name: "Add user", exact: true }).click();
     await expect(page.getByText("Grace Hopper", { exact: true })).toBeVisible();
-    await expect(
-      page.getByText("Margaret Hamilton", { exact: true })
-    ).toBeVisible();
-    await expect(page.getByText("8 users in one response")).toBeVisible();
+    await expect(page.getByText("13 users in one response")).toBeVisible();
 
     const listResponse = page.waitForResponse(
       (response) =>

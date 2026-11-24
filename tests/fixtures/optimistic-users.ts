@@ -173,8 +173,6 @@ export const makeControlledUserWrites = Effect.fnUntraced(
           "users.list": list,
           "users.get": get,
           "users.page": page,
-          "testing.reset": () => Effect.void,
-          "testing.seed": () => Effect.succeed(users),
           "diagnostics.stream": () => Stream.empty,
           "diagnostics.fail": () => Effect.die("unused diagnostic"),
           "diagnostics.cancel": () => Effect.void,

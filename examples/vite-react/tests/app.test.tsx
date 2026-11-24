@@ -57,14 +57,10 @@ describe("plain Vite React integration", () => {
     }
   });
 
-  it("normalizes void query data and preserves void mutation data", async () => {
+  it("normalizes void query data", async () => {
     fireEvent.click(screen.getByRole("button", { name: "Run void query" }));
     await expect(
       screen.findByText("Void query result: null")
-    ).resolves.toBeDefined();
-    fireEvent.click(screen.getByRole("button", { name: "Reset directory" }));
-    await expect(
-      screen.findByText("Reset result: undefined")
     ).resolves.toBeDefined();
   });
 
@@ -121,18 +117,19 @@ describe("plain Vite React integration", () => {
     expect(screen.getByText("User 13, locale de")).toBeDefined();
   });
 
-  it("invalidates the HTTP directory after RPC replacement", async () => {
+  it("invalidates the HTTP directory after RPC creation", async () => {
     await expect(
       screen.findByText("HTTP: Ada Lovelace")
     ).resolves.toBeDefined();
-    fireEvent.click(
-      screen.getByRole("button", { name: "Replace with eight pioneers" })
-    );
+    fireEvent.change(screen.getByLabelText("Name"), {
+      target: { value: "Margaret Hamilton" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Add user" }));
     await expect(
       screen.findByText("HTTP: Margaret Hamilton")
     ).resolves.toBeDefined();
     await expect(
-      screen.findByText("HTTP directory: 8 users")
+      screen.findByText("HTTP directory: 13 users")
     ).resolves.toBeDefined();
   });
 
