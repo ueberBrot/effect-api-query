@@ -18,6 +18,7 @@ import { describe, expect, it } from "vitest";
 
 import manifest from "../package.json" with { type: "json" };
 import { currentCompiler } from "../scripts/compiler.mts";
+import { fixtureGitEnvironment } from "./fixtures/git-environment";
 import { readWorkflow, workflowValue } from "./fixtures/workflow";
 
 const script = path.resolve(
@@ -45,7 +46,11 @@ const pullRequestPage = (nodes: readonly unknown[], hasNextPage = false) => ({
 });
 type GitHubResponse = readonly ReturnType<typeof pullRequestPage>[];
 const git = (cwd: string, ...args: string[]) =>
-  execFileSync("git", args, { cwd, encoding: "utf-8" }).trim();
+  execFileSync("git", args, {
+    cwd,
+    encoding: "utf-8",
+    env: fixtureGitEnvironment(),
+  }).trim();
 const write = (cwd: string, file: string, content = "fixture\n") => {
   mkdirSync(path.dirname(path.join(cwd, file)), { recursive: true });
   writeFileSync(path.join(cwd, file), content);
@@ -95,7 +100,7 @@ const check = (
       input,
       encoding: "utf-8",
       env: {
-        ...process.env,
+        ...fixtureGitEnvironment(),
         PATH: `${path.join(cwd, ".git/bin")}${path.delimiter}${process.env["PATH"] ?? ""}`,
         GH_ARGS: path.join(cwd, ".git/gh-args"),
         GH_RESPONSE: JSON.stringify(response),
@@ -202,7 +207,7 @@ describe("repository workflow guards", () => {
           cwd,
           encoding: "utf-8",
           env: {
-            ...process.env,
+            ...fixtureGitEnvironment(),
             PATH: `${path.join(cwd, ".git/bin")}${path.delimiter}${process.env["PATH"] ?? ""}`,
             WORKFLOW_LOG: path.join(cwd, ".git/checks"),
           },

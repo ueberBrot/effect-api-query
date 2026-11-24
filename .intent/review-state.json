@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "3b008240c944a7c55ff79187683aef015340c2a9bd0e7ebcd1121b83e0885933",
+      "fingerprint": "583f4736c0c458fa2c5513ccbc8ff4c1a8c1e4154124fa30f27eb32a8fef710c",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -297,6 +297,7 @@
         "tests/fixtures/decode-utf8.ts": "f0441c8aa2553ce2c1dccff7cac1bbaec2cdc668916278c7a0efff90482ace61",
         "tests/fixtures/docs-websocket-use.ts": "c7496177ecdbdc787e4b6f12bfe6c7bdcb8d90647bb93e902c75fd1c10aab76a",
         "tests/fixtures/effect-rpc.ts": "67e31c41127eecf6230cced992ac890c5ad63e954b9d953b1fbf2dc30ec57d43",
+        "tests/fixtures/git-environment.ts": "b3e88bb127f24c29931f4bd0b70e92408b5b7eb58243ba3bd0ca234367462110",
         "tests/fixtures/http-client.ts": "5ceb5ad5157ba99e85fc83a84d7b2bf8b09bc77a5eec47eaaa456f3251ecfd38",
         "tests/fixtures/optimistic-users.ts": "9fd5d0714ef1c1ce7a242c1296cb8999e096542cc5c2ea913c6a15252fb3e337",
         "tests/fixtures/query-cache.ts": "834a4a442bc681fb3bfa2f2505191a736d5b254f37b6a422f1f23add89931dd6",
@@ -341,7 +342,7 @@
         "tests/reactivity-invalidation.test.ts": "4e4c02e42b62a0e0cdadf058051ac1074f7cc430675569e40c31e4537ed9694d",
         "tests/schema-sharing-prototypes.test.ts": "628a6622656b9b53e686d14b9efbd3abc13c61a13db1546001b0689b491f6022",
         "tests/schema-structural-sharing.test.ts": "e92f9f428804339a99d7ff4c6fc40a9696d953eeccb1176f6b3758a33412eb2d",
-        "tests/skills-maintenance.test.ts": "015e0b882f6a43e0692c9643ad78fe111bcd15edf2adff1b46f5d0deb68b3498",
+        "tests/skills-maintenance.test.ts": "5a5e82797f3dba7cefa6d0d7ffceab8f2bb82c407ff10763c2f95794357527fc",
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
         "tests/skills/query-usability/grade.test.ts": "b4ce4b395a7f38bdc788f3d3268e0236bbe5827b153df9c0592165f0d81817cd",
         "tests/skills/query-usability/solution.ts": "3aa6797a7fb4a45c02ea1a48697c7dc8d055b762e80663ddcf4d761e8b9a0863",
@@ -418,19 +419,18 @@
         "tests/types/utility-configuration-contract.ts": "3a3d4e200e84d04d2e9856bfb4509a4ba948f4a67997d1327e66beef36aa0eb4",
         "tests/utility-configuration.test.ts": "55361de62fbb7e7695c94f940de566c2e35d218539a77b6ab1000877f71ad288",
         "tests/version-packages.test.ts": "c043e1877c54aab8fe2119de324909a3f671e5aea60cdfe6778f63abffc313c1",
-        "tests/workflow-guards.test.ts": "2cc027ece2c43c38f1e0e6f18bb0adc738be854349cd07cba2666d9e78214995",
+        "tests/workflow-guards.test.ts": "563c464dfb45e0873138aff38d323cdfb64b7e6caae84f70fa46db4c65dba410",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "95c0d76197111351575d5e4337823a93f3f238f5",
+      "head": "6cb1f314b47352db02daad26d7a850ee1ac82909",
       "outcome": "no-change",
-      "reason": "The pre-push guard and its local fixture now match pull requests by destination repository and branch. Neither file changes the library runtime, types, consumer guidance, domain map, planning specification, or skill tree.",
+      "reason": "The pre-push tests isolate temporary Git repositories from the invoking hook. The library API, usage guidance, and planning records are outside the fixture subprocesses.",
       "evidence": [
-        "scripts/check-workflow.mts and tests/workflow-guards.test.ts cover the contributor pre-push path.",
-        "vp test -- tests/skills-maintenance.test.ts tests/workflow-guards.test.ts passed 27 tests."
+        "Both guard suites passed all 27 tests with Git context pointing at a disposable outer repository. Its refs, index status, and configuration were preserved."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "0772c3e560ddaa11a2448c5291c41e73745561869546140f67b7b1901017da00",
+      "fingerprint": "a8f2d1cbdbe43fd161e9353f5f8f9e51902d7e9f6dcb0ac3313854f528a89251",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -727,6 +727,7 @@
         "tests/fixtures/decode-utf8.ts": "f0441c8aa2553ce2c1dccff7cac1bbaec2cdc668916278c7a0efff90482ace61",
         "tests/fixtures/docs-websocket-use.ts": "c7496177ecdbdc787e4b6f12bfe6c7bdcb8d90647bb93e902c75fd1c10aab76a",
         "tests/fixtures/effect-rpc.ts": "67e31c41127eecf6230cced992ac890c5ad63e954b9d953b1fbf2dc30ec57d43",
+        "tests/fixtures/git-environment.ts": "b3e88bb127f24c29931f4bd0b70e92408b5b7eb58243ba3bd0ca234367462110",
         "tests/fixtures/http-client.ts": "5ceb5ad5157ba99e85fc83a84d7b2bf8b09bc77a5eec47eaaa456f3251ecfd38",
         "tests/fixtures/optimistic-users.ts": "9fd5d0714ef1c1ce7a242c1296cb8999e096542cc5c2ea913c6a15252fb3e337",
         "tests/fixtures/query-cache.ts": "834a4a442bc681fb3bfa2f2505191a736d5b254f37b6a422f1f23add89931dd6",
@@ -771,7 +772,7 @@
         "tests/reactivity-invalidation.test.ts": "4e4c02e42b62a0e0cdadf058051ac1074f7cc430675569e40c31e4537ed9694d",
         "tests/schema-sharing-prototypes.test.ts": "628a6622656b9b53e686d14b9efbd3abc13c61a13db1546001b0689b491f6022",
         "tests/schema-structural-sharing.test.ts": "e92f9f428804339a99d7ff4c6fc40a9696d953eeccb1176f6b3758a33412eb2d",
-        "tests/skills-maintenance.test.ts": "015e0b882f6a43e0692c9643ad78fe111bcd15edf2adff1b46f5d0deb68b3498",
+        "tests/skills-maintenance.test.ts": "5a5e82797f3dba7cefa6d0d7ffceab8f2bb82c407ff10763c2f95794357527fc",
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
         "tests/skills/query-usability/grade.test.ts": "b4ce4b395a7f38bdc788f3d3268e0236bbe5827b153df9c0592165f0d81817cd",
         "tests/skills/query-usability/solution.ts": "3aa6797a7fb4a45c02ea1a48697c7dc8d055b762e80663ddcf4d761e8b9a0863",
@@ -848,15 +849,14 @@
         "tests/types/utility-configuration-contract.ts": "3a3d4e200e84d04d2e9856bfb4509a4ba948f4a67997d1327e66beef36aa0eb4",
         "tests/utility-configuration.test.ts": "55361de62fbb7e7695c94f940de566c2e35d218539a77b6ab1000877f71ad288",
         "tests/version-packages.test.ts": "c043e1877c54aab8fe2119de324909a3f671e5aea60cdfe6778f63abffc313c1",
-        "tests/workflow-guards.test.ts": "2cc027ece2c43c38f1e0e6f18bb0adc738be854349cd07cba2666d9e78214995",
+        "tests/workflow-guards.test.ts": "563c464dfb45e0873138aff38d323cdfb64b7e6caae84f70fa46db4c65dba410",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "95c0d76197111351575d5e4337823a93f3f238f5",
+      "head": "6cb1f314b47352db02daad26d7a850ee1ac82909",
       "outcome": "no-change",
-      "reason": "The pre-push guard and its local fixture now match pull requests by destination repository and branch. Neither file changes the library runtime, types, consumer guidance, domain map, planning specification, or skill tree.",
+      "reason": "The pre-push tests isolate temporary Git repositories from the invoking hook. The library API, usage guidance, and planning records are outside the fixture subprocesses.",
       "evidence": [
-        "scripts/check-workflow.mts and tests/workflow-guards.test.ts cover the contributor pre-push path.",
-        "vp test -- tests/skills-maintenance.test.ts tests/workflow-guards.test.ts passed 27 tests."
+        "Both guard suites passed all 27 tests with Git context pointing at a disposable outer repository. Its refs, index status, and configuration were preserved."
       ]
     },
     "source:vite.config.ts": {
