@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "875e72a683b37cf517fdc47771aabc4935d784a7ebddb94d911a74f4b28bd1b1",
+      "fingerprint": "36a213c3bab93f60e563b9f766f7be7c4b280b9737fcb95655d2308406492709",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -17,12 +17,14 @@
         "apps/docs/src/content/docs/examples.md": "8a758ee409d1945942b6a1ce483e9833673763ca103aca9d99475ef18f88e47a",
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "e631c96038f44e298ead2ea284eaf1455f4cce315ece1e4050165a3ac3b2fa47",
         "apps/docs/src/content/docs/examples/http-workflows.md": "75270b12e44b9d1210509e110d183f6094a5218c275c063089724ed3d6848309",
+        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": null,
         "apps/docs/src/content/docs/getting-started/feature-support.md": "a4ba730fc86ed8acb65cb6ad20952199b164e9004a959931ca373576e67fa82f",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "8cff47f4df524507c0830f91fd380312a511ff288b81c4dc554aee9808f18304",
         "apps/docs/src/content/docs/getting-started/installation.md": "d9a98e0cf8a0f5d105546866c5e5a5a40ceb8302bb9e04f8ab66df70c6836309",
         "apps/docs/src/content/docs/getting-started/quick-start.md": "0818a1a00890f6dc9d9c1f9d621b1ea89c6ddb5547f2c9a0a28ded12a33fc31f",
         "apps/docs/src/content/docs/guides/angular-query.md": "16afe6996ee8f70b4b77b430c93aeb2a4dc658a0ae8e92b3993d95f065a86b9f",
         "apps/docs/src/content/docs/guides/cache-filters.md": "b5791dc317e5e1acac2b443508d113fd184463143a6f5870a0be6ba65fed1a7d",
+        "apps/docs/src/content/docs/guides/cache-management.md": null,
         "apps/docs/src/content/docs/guides/cancellation.md": "a81bee4250161714fa784d674867395373663969ca53f1a3f8dc7e31a90712b9",
         "apps/docs/src/content/docs/guides/choose-stream-history.md": "0149fc31d768147ff34912c95ac0daf5b407137b1f690b2620b765429b858bc5",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "76cab248df8fbb9b4d29db532c44a98bcbbf18417581e46b78ca0181ecb5f609",
@@ -199,8 +201,10 @@
         "scripts/oxlint-no-comments.mts": "13bc2661cb403d0ded2ad3d08a42296160ee4d7c969580c4438fd8822d096660",
         "scripts/performance/budgets.mts": "a2ace3af9dbc469203a35dd0f3a1359326a58e25b69eac284a3c3dbd2575564a",
         "scripts/performance/common.mts": "6ce0e1c018e08a442fcf787740d7ddd63457069ee932d28b04d8a1b41e136028",
-        "scripts/resolve-docs-release.mts": "d40db299f62659ab3cf57bdbf90aa682700d072c0d82548d78702cfdaa262183",
+        "scripts/resolve-docs-release.mts": "0ed8db1359b317feadf9479fc7dcefc879b4899279b56c672a95499595644c4e",
+        "scripts/verify-docs-examples.mts": null,
         "scripts/verify-docs-version.mts": "58f63de6f871726a5bef8b70d1de7fad591374c52823e3cf60a160a9f37541e8",
+        "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "e514a013a90489d8d0ff5eb0620276f923c85fa765061aa4d3f312ac2ee4c7ad",
         "skills/effect-api-query/SKILL.md": "112b039108201d3aecc3b2e9c6dbd665ddaa01f37e0a16997814ea9b533c95a1",
         "skills/effect-api-query/references/cache-workflows.md": "9f370822c4f1ec986ef27afc7fd7647ad24b701f671f33d1fb86e8478d73769f",
@@ -277,7 +281,7 @@
         "tests/create-rpc-query-utils-structural-sharing.test.ts": "f9bd67aed07f7aed8113fdbfeb31810dbc19e0cb4ec0cbeef64a14e7589002fb",
         "tests/create-rpc-query-utils.test.ts": "1229679c118d267fd0a94ffcb560a9a7f77a8acecd423ed742c036c667b89faf",
         "tests/docs-examples.test.ts": "c5f3f714eebf1a5f418e519fab89411d60eb1d2be128484d4d3cbc858c00354f",
-        "tests/docs-release.test.ts": "8729f2d3451f91741587a52f826d7c3188221bd23496a6fd92acf7c3cffa462f",
+        "tests/docs-release.test.ts": "00de7f85d6050d3308281e4327b6b01f1f84674ab5ff2b1369f1a4ea338298bd",
         "tests/execution-interceptor.test.ts": "2d839cf557cfcb1116787b79eebb397921626876552d5bbdea7429feda389143",
         "tests/fixtures/async.ts": "c72af69141ce4f2dd4e9b63910ed20378e546dcd015a2d7befacd439ba4a006e",
         "tests/fixtures/decode-utf8.ts": "f0441c8aa2553ce2c1dccff7cac1bbaec2cdc668916278c7a0efff90482ace61",
@@ -406,17 +410,15 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "e6a227aaf17b5b39b4653accc6725248ad1e1ce0",
+      "head": "a25fda942277bbd607bb9895af7ffbed6981df07",
       "outcome": "no-change",
-      "reason": "The documentation version check keeps the same runtime behavior and is exercised through its standalone CLI. The shipped skill, domain map, skill spec, and skill tree still describe the same consumer tasks.",
+      "reason": "Hardens internal GitHub Pages manual deployment resolver, workflow input description, and tests for #243; no change to published library API, runtime behavior, or shipped skill guidance.",
       "evidence": [
-        "74 release and workflow tests passed in tests/docs-release.test.ts",
-        "vp run fallow passed all four audits, including production dead code",
-        "scripts/verify-docs-version.mts runs after restoring the workflow artifact"
+        "Changed: scripts/resolve-docs-release.mts, tests/docs-release.test.ts at a25fda942277bbd607bb9895af7ffbed6981df07"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "f4cbe19d79be68a77fd562866b9d24d1ae1b1e82360c6f912f6fa54a50acbd05",
+      "fingerprint": "86b04f93b4060559cc7e18c6768077e3d3884c231d462ebb729934e77ea79d63",
       "snapshot": {
         "GLOSSARY.md": "fa9613e0222fdcbc975aee6a1702a5fce00a600353eade23e124910e4ccf2b27",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -433,12 +435,14 @@
         "apps/docs/src/content/docs/examples.md": "8a758ee409d1945942b6a1ce483e9833673763ca103aca9d99475ef18f88e47a",
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "e631c96038f44e298ead2ea284eaf1455f4cce315ece1e4050165a3ac3b2fa47",
         "apps/docs/src/content/docs/examples/http-workflows.md": "75270b12e44b9d1210509e110d183f6094a5218c275c063089724ed3d6848309",
+        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": null,
         "apps/docs/src/content/docs/getting-started/feature-support.md": "a4ba730fc86ed8acb65cb6ad20952199b164e9004a959931ca373576e67fa82f",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "8cff47f4df524507c0830f91fd380312a511ff288b81c4dc554aee9808f18304",
         "apps/docs/src/content/docs/getting-started/installation.md": "d9a98e0cf8a0f5d105546866c5e5a5a40ceb8302bb9e04f8ab66df70c6836309",
         "apps/docs/src/content/docs/getting-started/quick-start.md": "0818a1a00890f6dc9d9c1f9d621b1ea89c6ddb5547f2c9a0a28ded12a33fc31f",
         "apps/docs/src/content/docs/guides/angular-query.md": "16afe6996ee8f70b4b77b430c93aeb2a4dc658a0ae8e92b3993d95f065a86b9f",
         "apps/docs/src/content/docs/guides/cache-filters.md": "b5791dc317e5e1acac2b443508d113fd184463143a6f5870a0be6ba65fed1a7d",
+        "apps/docs/src/content/docs/guides/cache-management.md": null,
         "apps/docs/src/content/docs/guides/cancellation.md": "a81bee4250161714fa784d674867395373663969ca53f1a3f8dc7e31a90712b9",
         "apps/docs/src/content/docs/guides/choose-stream-history.md": "0149fc31d768147ff34912c95ac0daf5b407137b1f690b2620b765429b858bc5",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "76cab248df8fbb9b4d29db532c44a98bcbbf18417581e46b78ca0181ecb5f609",
@@ -615,8 +619,10 @@
         "scripts/oxlint-no-comments.mts": "13bc2661cb403d0ded2ad3d08a42296160ee4d7c969580c4438fd8822d096660",
         "scripts/performance/budgets.mts": "a2ace3af9dbc469203a35dd0f3a1359326a58e25b69eac284a3c3dbd2575564a",
         "scripts/performance/common.mts": "6ce0e1c018e08a442fcf787740d7ddd63457069ee932d28b04d8a1b41e136028",
-        "scripts/resolve-docs-release.mts": "d40db299f62659ab3cf57bdbf90aa682700d072c0d82548d78702cfdaa262183",
+        "scripts/resolve-docs-release.mts": "0ed8db1359b317feadf9479fc7dcefc879b4899279b56c672a95499595644c4e",
+        "scripts/verify-docs-examples.mts": null,
         "scripts/verify-docs-version.mts": "58f63de6f871726a5bef8b70d1de7fad591374c52823e3cf60a160a9f37541e8",
+        "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "e514a013a90489d8d0ff5eb0620276f923c85fa765061aa4d3f312ac2ee4c7ad",
         "skills/effect-api-query/SKILL.md": "112b039108201d3aecc3b2e9c6dbd665ddaa01f37e0a16997814ea9b533c95a1",
         "skills/effect-api-query/references/cache-workflows.md": "9f370822c4f1ec986ef27afc7fd7647ad24b701f671f33d1fb86e8478d73769f",
@@ -693,7 +699,7 @@
         "tests/create-rpc-query-utils-structural-sharing.test.ts": "f9bd67aed07f7aed8113fdbfeb31810dbc19e0cb4ec0cbeef64a14e7589002fb",
         "tests/create-rpc-query-utils.test.ts": "1229679c118d267fd0a94ffcb560a9a7f77a8acecd423ed742c036c667b89faf",
         "tests/docs-examples.test.ts": "c5f3f714eebf1a5f418e519fab89411d60eb1d2be128484d4d3cbc858c00354f",
-        "tests/docs-release.test.ts": "8729f2d3451f91741587a52f826d7c3188221bd23496a6fd92acf7c3cffa462f",
+        "tests/docs-release.test.ts": "00de7f85d6050d3308281e4327b6b01f1f84674ab5ff2b1369f1a4ea338298bd",
         "tests/execution-interceptor.test.ts": "2d839cf557cfcb1116787b79eebb397921626876552d5bbdea7429feda389143",
         "tests/fixtures/async.ts": "c72af69141ce4f2dd4e9b63910ed20378e546dcd015a2d7befacd439ba4a006e",
         "tests/fixtures/decode-utf8.ts": "f0441c8aa2553ce2c1dccff7cac1bbaec2cdc668916278c7a0efff90482ace61",
@@ -822,13 +828,11 @@
         "tests/workflow-guards.test.ts": "7c7c5805e7d7fab67ae5fdeb1b6712e04f0de87bc1068b047720849ea1a7cb9a",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "e6a227aaf17b5b39b4653accc6725248ad1e1ce0",
+      "head": "a25fda942277bbd607bb9895af7ffbed6981df07",
       "outcome": "no-change",
-      "reason": "The documentation version check keeps the same runtime behavior and is exercised through its standalone CLI. The shipped skill, domain map, skill spec, and skill tree still describe the same consumer tasks.",
+      "reason": "Hardens internal GitHub Pages manual deployment resolver, workflow input description, and tests for #243; no change to published library API, runtime behavior, or shipped skill guidance.",
       "evidence": [
-        "74 release and workflow tests passed in tests/docs-release.test.ts",
-        "vp run fallow passed all four audits, including production dead code",
-        "scripts/verify-docs-version.mts runs after restoring the workflow artifact"
+        "Changed: scripts/resolve-docs-release.mts, tests/docs-release.test.ts at a25fda942277bbd607bb9895af7ffbed6981df07"
       ]
     },
     "source:vite.config.ts": {
@@ -1862,18 +1866,15 @@
       ]
     },
     "source:.github/workflows/deploy-docs.yml": {
-      "fingerprint": "20eaba630f71f7ea5163424dadaf27cdfa2eb192dd5bb7c5569fc9672b524b84",
+      "fingerprint": "a01e731342d8b9ce62d965c9508eb20957ca271f3c38cd704bdecec814de63fc",
       "snapshot": {
-        ".github/workflows/deploy-docs.yml": "33bd152e0f7094cb75a7f8327e295fcf3b7c925f19c8ced941e0273fa92168c9"
+        ".github/workflows/deploy-docs.yml": "9cf021018863ba52634fbcd5744374e52ce4a36d9711cb0edb5b8b5097b21848"
       },
-      "head": "468e21895d1f391a2fc5eff5546b07dd2d4762b3",
+      "head": "a25fda942277bbd607bb9895af7ffbed6981df07",
       "outcome": "no-change",
-      "reason": "The workflow now uploads a standalone verifier and keeps the same package-version gate. Existing consumer guidance still applies.",
+      "reason": "Hardens internal GitHub Pages manual deployment resolver, workflow input description, and tests for #243; no change to published library API, runtime behavior, or shipped skill guidance.",
       "evidence": [
-        "75 tests in tests/docs-release.test.ts passed",
-        "Standalone 0.8.0 verifier passed with only the restored docs and script",
-        "Manual resolution confirmed the 0.8.0 npm record and Git tag",
-        "actionlint and yamllint passed"
+        "Changed: .github/workflows/deploy-docs.yml at a25fda942277bbd607bb9895af7ffbed6981df07"
       ]
     },
     "source:playwright.config.ts": {

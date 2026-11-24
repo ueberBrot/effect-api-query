@@ -1,4 +1,5 @@
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import {
   copyFileSync,
   mkdirSync,
@@ -13,10 +14,9 @@ import { Predicate } from "effect";
 import { describe, expect, it, vi } from "vitest";
 import { isScalar, visit } from "yaml";
 
-import {
-  publishedRootVersion,
-  resolveDocumentationRevision,
-} from "../scripts/resolve-docs-release.mts";
+import { capture } from "../scripts/lib/exec.mts";
+import { resolveDocsRelease } from "../scripts/resolve-docs-release.mts";
+import type { DocsReleaseAdapters } from "../scripts/resolve-docs-release.mts";
 import {
   readWorkflow,
   workflowSteps,
@@ -24,10 +24,20 @@ import {
 } from "./fixtures/workflow";
 
 const name = "@ueberbrot/effect-api-query";
+const encodedName = "@ueberbrot%2feffect-api-query";
+const purlName = "%40ueberbrot/effect-api-query";
 const version = "0.1.0";
 const release = "0ea1465a605c80725da9e0a0a9686c86de5b6b82";
 const docs = "a".repeat(40);
+const tarball = Buffer.from("release-tarball-fixture", "utf-8");
+const expectedSha512 = createHash("sha512").update(tarball).digest("hex");
+const integrityBase64 = Buffer.from(expectedSha512, "hex").toString("base64");
 const manifest = JSON.stringify({ name, version });
+const metadataUrl = `https://registry.npmjs.org/${encodedName}/${version}`;
+const attestationUrl = `https://registry.npmjs.org/-/npm/v1/attestations/${encodedName}@${version}`;
+const tarballUrl = `https://registry.npmjs.org/${name}/-/effect-api-query-${version}.tgz`;
+const slsaPredicateType = "https://slsa.dev/provenance/v1";
+
 const registryMetadata = {
   name,
   version,
@@ -36,81 +46,201 @@ const registryMetadata = {
     url: "git+https://github.com/ueberBrot/effect-api-query.git",
   },
   dist: {
-    integrity: `sha512-${"A".repeat(86)}==`,
-    tarball: `https://registry.npmjs.org/${name}/-/effect-api-query-${version}.tgz`,
+    integrity: `sha512-${integrityBase64}`,
+    tarball: tarballUrl,
+    attestations: {
+      url: attestationUrl,
+      provenance: {
+        predicateType: slsaPredicateType,
+      },
+    },
   },
 };
 const metadata = JSON.stringify(registryMetadata);
+const validBundle = {
+  mediaType: "application/vnd.dev.sigstore.bundle.v0.3+json",
+  verificationMaterial: {},
+  dsseEnvelope: {},
+};
+const validAttestations = JSON.stringify({
+  attestations: [
+    {
+      predicateType:
+        "https://github.com/npm/attestation/tree/main/specs/publish/v0.1",
+      bundle: {},
+    },
+    {
+      predicateType: slsaPredicateType,
+      bundle: validBundle,
+    },
+  ],
+});
 
-const gitFixture = (
-  paths: readonly string[] = [],
-  options: {
-    descendant?: boolean;
-    releaseManifest?: string;
-    docsManifest?: string;
-    tree?: string;
-    releaseRevision?: string;
-  } = {}
+const verifiedOutput = (
+  subjectName = `pkg:npm/${purlName}@${version}`,
+  sha512 = expectedSha512
 ) =>
-  vi.fn<(args: readonly string[]) => string>((args) => {
-    switch (args[0] ?? "") {
-      case "rev-parse": {
-        return args[2]?.startsWith("refs/tags/") === true
-          ? (options.releaseRevision ?? release)
-          : docs;
-      }
-      case "show": {
-        return args[1] === `${release}:package.json`
-          ? (options.releaseManifest ?? manifest)
-          : (options.docsManifest ?? manifest);
-      }
-      case "merge-base": {
-        if (options.descendant === false) {
-          throw new Error("The release is not an ancestor.");
-        }
-        return "";
-      }
-      case "diff": {
-        return paths.map((path) => `${path}\0`).join("");
-      }
-      case "ls-tree": {
-        return (
-          options.tree ??
-          `100644 blob ${docs}\tapps/docs/src/index.mdx\0` +
-            `100644 blob ${docs}\tapps/docs/src/pages/package-version.json.ts\0`
-        );
-      }
-      case "check-ref-format": {
-        return "";
-      }
-      default: {
-        throw new Error("Unexpected Git command.");
-      }
+  JSON.stringify([
+    {
+      verificationResult: {
+        statement: {
+          subject: [{ name: subjectName, digest: { sha512 } }],
+        },
+      },
+    },
+  ]);
+
+interface FixtureOptions {
+  descendant?: boolean;
+  firstParents?: readonly string[];
+  releaseManifest?: string;
+  docsManifest?: string;
+  tree?: string;
+  releaseRevision?: string;
+  metadata?: string;
+  attestations?: string;
+  tarball?: Buffer;
+  ghOutput?: string;
+  ghError?: Error;
+  fetch?: typeof globalThis.fetch;
+}
+
+const requestUrl = (input: Parameters<typeof globalThis.fetch>[0]): string => {
+  if (Predicate.isString(input)) {
+    return input;
+  }
+  return input instanceof URL ? input.href : input.url;
+};
+
+const createFetchFixture = (
+  options: Pick<FixtureOptions, "metadata" | "attestations" | "tarball"> = {}
+): typeof globalThis.fetch =>
+  vi.fn<typeof globalThis.fetch>(async (input, init) => {
+    const url = requestUrl(input);
+    if (init?.redirect !== "error") {
+      throw new Error("Registry fetches must disallow redirects.");
     }
+    if (url === metadataUrl) {
+      return await Promise.resolve(new Response(options.metadata ?? metadata));
+    }
+    if (url === attestationUrl) {
+      return await Promise.resolve(
+        new Response(options.attestations ?? validAttestations)
+      );
+    }
+    if (url === tarballUrl) {
+      return await Promise.resolve(
+        new Response(new Uint8Array(options.tarball ?? tarball))
+      );
+    }
+    return await Promise.resolve(new Response("not found", { status: 404 }));
   });
 
-const resolve = (
+const runGitFixture = (
+  args: readonly string[],
   paths: readonly string[],
-  options: Parameters<typeof gitFixture>[1] = {}
+  options: FixtureOptions
+): string => {
+  switch (args[0] ?? "") {
+    case "rev-parse": {
+      const target = args.at(-1) ?? "";
+      return target.startsWith("refs/tags/")
+        ? (options.releaseRevision ?? release)
+        : docs;
+    }
+    case "rev-list": {
+      return `${(options.firstParents ?? [docs, release]).join("\n")}\n`;
+    }
+    case "show": {
+      return args[1] === `${release}:package.json`
+        ? (options.releaseManifest ?? manifest)
+        : (options.docsManifest ?? manifest);
+    }
+    case "merge-base": {
+      if (options.descendant === false) {
+        throw new Error("The release is not an ancestor.");
+      }
+      return "";
+    }
+    case "diff": {
+      return paths.map((path) => `${path}\0`).join("");
+    }
+    case "ls-tree": {
+      return (
+        options.tree ??
+        `100644 blob ${docs}\tapps/docs/src/index.mdx\0` +
+          `100644 blob ${docs}\tapps/docs/src/pages/package-version.json.ts\0`
+      );
+    }
+    case "check-ref-format": {
+      return "";
+    }
+    default: {
+      throw new Error("Unexpected Git command.");
+    }
+  }
+};
+
+const createCommandFixture = (
+  paths: readonly string[] = [],
+  options: FixtureOptions = {}
 ) =>
-  resolveDocumentationRevision(
-    version,
-    "docs/corrections",
-    metadata,
-    gitFixture(paths, options)
+  vi.fn<(command: "git" | "gh", args: readonly string[]) => string>(
+    (command, args) => {
+      if (command === "gh") {
+        if (options.ghError !== undefined) {
+          throw options.ghError;
+        }
+        return options.ghOutput ?? verifiedOutput();
+      }
+      return runGitFixture(args, paths, options);
+    }
   );
 
-describe("root publication", () => {
-  it("accepts the exact root version among other published packages", () => {
-    expect(
-      publishedRootVersion(
-        manifest,
-        JSON.stringify([
-          { name: "another-package", version },
-          { name, version },
-        ])
+const createAdapters = (
+  paths: readonly string[] = [],
+  options: FixtureOptions = {}
+) => {
+  const runCommand = createCommandFixture(paths, options);
+  const adapters: DocsReleaseAdapters = {
+    fetch: options.fetch ?? createFetchFixture(options),
+    runCommand,
+  };
+  return { adapters, runCommand };
+};
+
+const resolveManual = async (
+  paths: readonly string[],
+  options: FixtureOptions = {},
+  docsRef = "docs/corrections",
+  docsVersion = version
+) =>
+  await resolveDocsRelease(
+    { DOCS_VERSION: docsVersion, DOCS_REF: docsRef },
+    createAdapters(paths, options).adapters
+  );
+
+describe("automatic root publication", () => {
+  const automaticEnv = (publishedPackages: string) => ({
+    BUILD_ARTIFACT: "documentation-build",
+    GITHUB_EVENT_NAME: "push",
+    GITHUB_REF: "refs/heads/main",
+    GITHUB_SHA: release,
+    PUBLISHED_PACKAGES: publishedPackages,
+  });
+
+  it("accepts the exact root version among other published packages", async () => {
+    await expect(
+      resolveDocsRelease(
+        automaticEnv(
+          JSON.stringify([
+            { name: "another-package", version },
+            { name, version },
+          ])
+        ),
+        { readManifest: () => manifest }
       )
-    ).toBe(version);
+    ).resolves.toStrictEqual({ revision: release, version });
   });
 
   it.each([
@@ -126,10 +256,31 @@ describe("root publication", () => {
     "",
   ])(
     "rejects no-op, unrelated, malformed, or mismatched publication: %s",
-    (packages) => {
-      expect(() => publishedRootVersion(manifest, packages)).toThrow(/.+/u);
+    async (packages) => {
+      await expect(
+        resolveDocsRelease(automaticEnv(packages), {
+          readManifest: () => manifest,
+        })
+      ).rejects.toThrow(/.+/u);
     }
   );
+
+  it.each([
+    { BUILD_ARTIFACT: "other-artifact" },
+    { GITHUB_EVENT_NAME: "workflow_dispatch" },
+    { GITHUB_REF: "refs/heads/feature" },
+    { GITHUB_SHA: release.slice(0, 12) },
+  ])("rejects invalid automatic trigger metadata: %j", async (override) => {
+    await expect(
+      resolveDocsRelease(
+        {
+          ...automaticEnv(JSON.stringify([{ name, version }])),
+          ...override,
+        },
+        { readManifest: () => manifest }
+      )
+    ).rejects.toThrow(/.+/u);
+  });
 });
 
 const runVersionVerifier = (json?: string) => {
@@ -156,64 +307,75 @@ const runVersionVerifier = (json?: string) => {
 };
 
 describe("manual documentation revision", () => {
-  it("requires a correction ref for a legacy release and accepts its static version backport", () => {
+  it("requires a correction ref for a legacy release and accepts its static version backport", async () => {
     const tree = `100644 blob ${docs}\tapps/docs/src/index.mdx\0`;
-    expect(() =>
-      resolveDocumentationRevision(
-        version,
-        "",
-        metadata,
-        gitFixture([], { tree })
+    await expect(resolveManual([], { tree }, "")).rejects.toThrow(
+      "Supply docs-ref"
+    );
+    await expect(
+      resolveManual(
+        ["apps/docs/astro.config.mts"],
+        { tree },
+        "docs/version-backport"
       )
-    ).toThrow("Supply docs-ref");
-    expect(
-      resolveDocumentationRevision(
-        version,
-        "docs/version-backport",
-        metadata,
-        gitFixture(["apps/docs/astro.config.mts"], { tree })
-      )
-    ).toStrictEqual({ revision: docs, version });
+    ).resolves.toStrictEqual({ revision: docs, version });
     expect(runVersionVerifier(manifest).status).toBe(0);
   });
 
-  it("pins the conventional release tag when npm omits gitHead", () => {
-    const readGit = gitFixture();
-    expect(
-      resolveDocumentationRevision(version, "", metadata, readGit)
-    ).toStrictEqual({
+  it("binds the release tag via gh attestation verify with strict Sigstore policy when npm omits gitHead", async () => {
+    const { adapters, runCommand } = createAdapters();
+    await expect(
+      resolveDocsRelease({ DOCS_VERSION: version, DOCS_REF: "" }, adapters)
+    ).resolves.toStrictEqual({
       revision: release,
       version,
     });
-    expect(readGit).toHaveBeenCalledWith([
-      "rev-parse",
-      "--verify",
-      `refs/tags/${name}@${version}^{commit}`,
-    ]);
+    const ghCall = runCommand.mock.calls.find(([command]) => command === "gh");
+    expect(ghCall?.[1]).toStrictEqual(
+      expect.arrayContaining([
+        "attestation",
+        "verify",
+        "--digest-alg",
+        "sha512",
+        "--repo",
+        "ueberBrot/effect-api-query",
+        "--signer-workflow",
+        "ueberBrot/effect-api-query/.github/workflows/release.yml",
+        "--source-ref",
+        "refs/heads/main",
+        "--source-digest",
+        release,
+        "--cert-oidc-issuer",
+        "https://token.actions.githubusercontent.com",
+        "--predicate-type",
+        slsaPredicateType,
+        "--deny-self-hosted-runners",
+        "--format",
+        "json",
+      ])
+    );
   });
 
-  it("requires a matching full gitHead when npm supplies it", () => {
-    expect(
-      resolveDocumentationRevision(
-        version,
-        "",
-        JSON.stringify({ ...registryMetadata, gitHead: release }),
-        gitFixture()
+  it("requires a matching full gitHead when npm supplies it alongside provenance", async () => {
+    await expect(
+      resolveManual(
+        [],
+        { metadata: JSON.stringify({ ...registryMetadata, gitHead: release }) },
+        ""
       )
-    ).toStrictEqual({ revision: release, version });
+    ).resolves.toStrictEqual({ revision: release, version });
   });
 
   it.each([docs, release.slice(0, 12), "main", null, `${release}\n`])(
     "rejects an inconsistent or non-immutable npm gitHead: %s",
-    (gitHead) => {
-      expect(() =>
-        resolveDocumentationRevision(
-          version,
-          "",
-          JSON.stringify({ ...registryMetadata, gitHead }),
-          gitFixture()
+    async (gitHead) => {
+      await expect(
+        resolveManual(
+          [],
+          { metadata: JSON.stringify({ ...registryMetadata, gitHead }) },
+          ""
         )
-      ).toThrow(/.+/u);
+      ).rejects.toThrow(/.+/u);
     }
   );
 
@@ -231,15 +393,120 @@ describe("manual documentation revision", () => {
       ...registryMetadata,
       dist: { ...registryMetadata.dist, tarball: "https://evil.invalid/file" },
     },
-  ])("rejects inconsistent registry metadata: %j", (value) => {
-    expect(() =>
-      resolveDocumentationRevision(
-        version,
-        "",
-        JSON.stringify(value),
-        gitFixture()
+    {
+      ...registryMetadata,
+      dist: {
+        integrity: registryMetadata.dist.integrity,
+        tarball: registryMetadata.dist.tarball,
+      },
+    },
+    {
+      ...registryMetadata,
+      dist: {
+        ...registryMetadata.dist,
+        attestations: {
+          ...registryMetadata.dist.attestations,
+          url: "https://evil.invalid/attestations",
+        },
+      },
+    },
+    {
+      ...registryMetadata,
+      dist: {
+        ...registryMetadata.dist,
+        attestations: {
+          ...registryMetadata.dist.attestations,
+          provenance: { predicateType: "https://slsa.dev/provenance/v0.2" },
+        },
+      },
+    },
+  ])(
+    "rejects inconsistent or unattested registry metadata: %j",
+    async (value) => {
+      await expect(
+        resolveManual([], { metadata: JSON.stringify(value) }, "")
+      ).rejects.toThrow(/.+/u);
+    }
+  );
+
+  it.each([
+    ["missing attestations array", JSON.stringify({})],
+    ["missing SLSA provenance entry", JSON.stringify({ attestations: [] })],
+    [
+      "duplicate SLSA provenance entries",
+      JSON.stringify({
+        attestations: [
+          { predicateType: slsaPredicateType, bundle: validBundle },
+          { predicateType: slsaPredicateType, bundle: validBundle },
+        ],
+      }),
+    ],
+    [
+      "missing bundle object",
+      JSON.stringify({
+        attestations: [{ predicateType: slsaPredicateType }],
+      }),
+    ],
+  ])(
+    "rejects malformed provenance envelopes (%s)",
+    async (_label, attestations) => {
+      await expect(resolveManual([], { attestations }, "")).rejects.toThrow(
+        /.+/u
+      );
+    }
+  );
+
+  it("rejects a downloaded tarball whose sha512 disagrees with dist.integrity before calling gh", async () => {
+    const { adapters, runCommand } = createAdapters([], {
+      tarball: Buffer.from("tampered-tarball", "utf-8"),
+    });
+    await expect(
+      resolveDocsRelease({ DOCS_VERSION: version, DOCS_REF: "" }, adapters)
+    ).rejects.toThrow("dist.integrity");
+    expect(runCommand.mock.calls.some(([command]) => command === "gh")).toBe(
+      false
+    );
+  });
+
+  it("rejects when cryptographic provenance verification fails", async () => {
+    await expect(
+      resolveManual(
+        [],
+        { ghError: new Error("Sigstore verification failed.") },
+        ""
       )
-    ).toThrow(/.+/u);
+    ).rejects.toThrow("Sigstore verification failed.");
+  });
+
+  it.each([
+    ["empty result", "[]"],
+    ["mismatched package purl", verifiedOutput("pkg:npm/other@0.1.0")],
+    ["mismatched digest", verifiedOutput(undefined, "f".repeat(128))],
+  ])(
+    "rejects gh attestation output with invalid subject (%s)",
+    async (_label, ghOutput) => {
+      await expect(resolveManual([], { ghOutput }, "")).rejects.toThrow(/.+/u);
+    }
+  );
+
+  it("enforces streaming byte limits without buffering oversized registry responses", async () => {
+    let chunksPulled = 0;
+    const oversizedStream = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        chunksPulled += 1;
+        if (chunksPulled > 10) {
+          controller.close();
+          return;
+        }
+        controller.enqueue(new Uint8Array(600_000));
+      },
+    });
+    const fetchOversized: typeof globalThis.fetch = async () =>
+      await Promise.resolve(new Response(oversizedStream));
+    await expect(
+      resolveManual([], { fetch: fetchOversized }, "")
+    ).rejects.toThrow("oversized");
+    expect(chunksPulled).toBeLessThanOrEqual(3);
   });
 
   it.each([
@@ -252,13 +519,15 @@ describe("manual documentation revision", () => {
     "0.1.0\n",
     "$(touch /tmp/untrusted)",
   ])(
-    "rejects mutable or invalid versions before consulting Git: %s",
-    (input) => {
-      const readGit = gitFixture();
-      expect(() =>
-        resolveDocumentationRevision(input, "", metadata, readGit)
-      ).toThrow(/.+/u);
-      expect(readGit).not.toHaveBeenCalled();
+    "rejects mutable or invalid versions before consulting npm or Git: %s",
+    async (input) => {
+      const fetchSpy = vi.fn<typeof globalThis.fetch>();
+      const { adapters, runCommand } = createAdapters([], { fetch: fetchSpy });
+      await expect(
+        resolveDocsRelease({ DOCS_VERSION: input, DOCS_REF: "" }, adapters)
+      ).rejects.toThrow(/.+/u);
+      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(runCommand).not.toHaveBeenCalled();
     }
   );
 
@@ -268,15 +537,13 @@ describe("manual documentation revision", () => {
     "main^{commit}",
     "$(touch /tmp/untrusted)",
     "main\nother",
-  ])("rejects unsupported documentation refs: %s", (ref) => {
-    expect(() =>
-      resolveDocumentationRevision(version, ref, metadata, gitFixture())
-    ).toThrow(/.+/u);
+  ])("rejects unsupported documentation refs: %s", async (ref) => {
+    await expect(resolveManual([], {}, ref)).rejects.toThrow(/.+/u);
   });
 
-  it("pins a docs branch with only permitted changes to its full commit SHA", () => {
-    expect(
-      resolve([
+  it("pins a reviewed docs branch with only permitted changes to its full commit SHA", async () => {
+    await expect(
+      resolveManual([
         "apps/docs/src/content/docs/index.mdx",
         "apps/docs/src/pages/package-version.json.ts",
         "apps/docs/public/package-version.js",
@@ -285,32 +552,54 @@ describe("manual documentation revision", () => {
         "tests/docs-examples.test.ts",
         "tests/types/docs-quick-start.ts",
       ])
-    ).toStrictEqual({ revision: docs, version });
+    ).resolves.toStrictEqual({ revision: docs, version });
   });
 
-  it("accepts underscore branch names and still asks Git to validate them", () => {
-    const readGit = gitFixture();
-    expect(
-      resolveDocumentationRevision(version, "docs/fix_badge", metadata, readGit)
-    ).toStrictEqual({ revision: docs, version });
-    expect(readGit).toHaveBeenCalledWith([
+  it("rejects an unreviewed docs-ref branch even when changed paths match the allowlist", async () => {
+    await expect(
+      resolveManual(
+        ["apps/docs/astro.config.mts", "tests/docs-examples.test.ts"],
+        { firstParents: [release] }
+      )
+    ).rejects.toThrow("first-parent history");
+  });
+
+  it("rejects an unreviewed docs-ref commit SHA even when changed paths match the allowlist", async () => {
+    await expect(
+      resolveManual(
+        ["apps/docs/src/content/docs/index.mdx"],
+        { firstParents: [release] },
+        docs
+      )
+    ).rejects.toThrow("first-parent history");
+  });
+
+  it("rejects a release commit outside the protected main first-parent history", async () => {
+    await expect(
+      resolveManual([], { firstParents: [docs] }, "")
+    ).rejects.toThrow("first-parent history");
+  });
+
+  it("accepts underscore branch names and validates them through Git", async () => {
+    const { adapters, runCommand } = createAdapters();
+    await expect(
+      resolveDocsRelease(
+        { DOCS_VERSION: version, DOCS_REF: "docs/fix_badge" },
+        adapters
+      )
+    ).resolves.toStrictEqual({ revision: docs, version });
+    expect(runCommand).toHaveBeenCalledWith("git", [
       "check-ref-format",
       "refs/heads/docs/fix_badge",
     ]);
   });
 
-  it("accepts a full docs commit SHA without interpreting it as a branch", () => {
-    const readGit = gitFixture();
-    expect(
-      resolveDocumentationRevision(version, docs, metadata, readGit)
-    ).toStrictEqual({ revision: docs, version });
-    expect(readGit).toHaveBeenCalledWith([
-      "rev-parse",
-      "--verify",
-      "--end-of-options",
-      `${docs}^{commit}`,
-    ]);
-    expect(readGit).not.toHaveBeenCalledWith([
+  it("accepts a reviewed full docs commit SHA without interpreting it as a branch", async () => {
+    const { adapters, runCommand } = createAdapters();
+    await expect(
+      resolveDocsRelease({ DOCS_VERSION: version, DOCS_REF: docs }, adapters)
+    ).resolves.toStrictEqual({ revision: docs, version });
+    expect(runCommand).not.toHaveBeenCalledWith("git", [
       "check-ref-format",
       `refs/heads/${docs}`,
     ]);
@@ -331,30 +620,131 @@ describe("manual documentation revision", () => {
     "apps/docs/src/pnpm-workspace.yaml",
     "scripts/resolve-docs-release.mts",
     "tests/types/public-contract.ts",
-  ])("rejects library, dependency, and control changes: %s", (path) => {
-    expect(() => resolve([path])).toThrow("allowlist");
+  ])("rejects library, dependency, and control changes: %s", async (path) => {
+    await expect(resolveManual([path])).rejects.toThrow("allowlist");
   });
 
-  it("requires the released commit to be an ancestor of the docs revision", () => {
-    expect(() => resolve([], { descendant: false })).toThrow("ancestor");
+  it("requires the released commit to be an ancestor of the docs revision", async () => {
+    await expect(resolveManual([], { descendant: false })).rejects.toThrow(
+      "ancestor"
+    );
   });
 
   it.each([
     { releaseManifest: JSON.stringify({ name, version: "0.2.0" }) },
     { docsManifest: JSON.stringify({ name, version: "0.2.0" }) },
     { releaseRevision: release.slice(0, 12) },
-  ])("rejects inconsistent immutable source data: %j", (options) => {
-    expect(() => resolve([], options)).toThrow(/.+/u);
+  ])("rejects inconsistent immutable source data: %j", async (options) => {
+    await expect(resolveManual([], options)).rejects.toThrow(/.+/u);
   });
 
   it.each(["120000 blob", "160000 commit"])(
     "rejects symlinks and submodules: %s",
-    (mode) => {
-      expect(() =>
-        resolve([], { tree: `${mode} ${docs}\tapps/docs/src/escape\0` })
-      ).toThrow("regular files");
+    async (mode) => {
+      await expect(
+        resolveManual([], { tree: `${mode} ${docs}\tapps/docs/src/escape\0` })
+      ).rejects.toThrow("regular files");
     }
   );
+});
+
+describe("first-parent merge graph enforcement", () => {
+  it("rejects intermediate PR commits and unmerged branches while accepting reviewed merges on main", async () => {
+    const cwd = mkdtempSync(nodePath.join(tmpdir(), "docs-git-graph-"));
+    const runGit = (args: readonly string[]) => capture("git", args, { cwd });
+    const adapters: DocsReleaseAdapters = {
+      fetch: createFetchFixture(),
+      runCommand: (command, args) =>
+        command === "gh" ? verifiedOutput() : runGit(args),
+    };
+    try {
+      runGit(["init", "--initial-branch=main"]);
+      runGit(["config", "user.name", "Test"]);
+      runGit(["config", "user.email", "test@example.com"]);
+      mkdirSync(nodePath.join(cwd, "apps/docs/src/pages"), { recursive: true });
+      writeFileSync(nodePath.join(cwd, "package.json"), manifest);
+      writeFileSync(
+        nodePath.join(cwd, "apps/docs/src/pages/package-version.json.ts"),
+        "export const GET = () => new Response();\n"
+      );
+      writeFileSync(
+        nodePath.join(cwd, "apps/docs/astro.config.mts"),
+        "export default {};\n"
+      );
+      runGit(["add", "."]);
+      runGit(["commit", "-m", "release"]);
+      const releaseSha = runGit(["rev-parse", "HEAD"]).trim();
+      runGit(["tag", `${name}@${version}`, releaseSha]);
+
+      runGit(["checkout", "-b", "pr/docs-fix"]);
+      writeFileSync(
+        nodePath.join(cwd, "apps/docs/astro.config.mts"),
+        "export default { unreviewed: true };\n"
+      );
+      runGit(["commit", "-am", "unreviewed intermediate commit"]);
+      const intermediateSha = runGit(["rev-parse", "HEAD"]).trim();
+      writeFileSync(
+        nodePath.join(cwd, "apps/docs/astro.config.mts"),
+        "export default {};\n"
+      );
+      writeFileSync(
+        nodePath.join(cwd, "apps/docs/src/index.mdx"),
+        "# Reviewed docs\n"
+      );
+      runGit(["add", "."]);
+      runGit(["commit", "-m", "clean reviewed state"]);
+
+      runGit(["checkout", "main"]);
+      runGit(["merge", "--no-ff", "pr/docs-fix", "-m", "Merge PR"]);
+      const mergeSha = runGit(["rev-parse", "HEAD"]).trim();
+      runGit(["update-ref", "refs/remotes/origin/main", mergeSha]);
+
+      runGit(["checkout", "-b", "docs/unreviewed", releaseSha]);
+      writeFileSync(
+        nodePath.join(cwd, "apps/docs/src/index.mdx"),
+        "# Unreviewed branch\n"
+      );
+      runGit(["add", "."]);
+      runGit(["commit", "-m", "unreviewed branch commit"]);
+      const unreviewedSha = runGit(["rev-parse", "HEAD"]).trim();
+      runGit([
+        "update-ref",
+        "refs/remotes/origin/docs/unreviewed",
+        unreviewedSha,
+      ]);
+      runGit(["checkout", "main"]);
+
+      await expect(
+        resolveDocsRelease(
+          { DOCS_VERSION: version, DOCS_REF: intermediateSha },
+          adapters
+        )
+      ).rejects.toThrow("first-parent history");
+
+      await expect(
+        resolveDocsRelease(
+          { DOCS_VERSION: version, DOCS_REF: "docs/unreviewed" },
+          adapters
+        )
+      ).rejects.toThrow("first-parent history");
+
+      await expect(
+        resolveDocsRelease(
+          { DOCS_VERSION: version, DOCS_REF: mergeSha },
+          adapters
+        )
+      ).resolves.toStrictEqual({ revision: mergeSha, version });
+
+      await expect(
+        resolveDocsRelease(
+          { DOCS_VERSION: version, DOCS_REF: "main" },
+          adapters
+        )
+      ).resolves.toStrictEqual({ revision: mergeSha, version });
+    } finally {
+      rmSync(cwd, { recursive: true, force: true });
+    }
+  });
 });
 
 describe("built documentation version", () => {

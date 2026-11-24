@@ -18,7 +18,7 @@ on:
         required: true
         type: string
       docs-ref:
-        description: Optional branch name or full SHA with only docs changes since that release.
+        description: Optional branch or full SHA on main with docs-only changes.
         required: false
         type: string
         default: ""
