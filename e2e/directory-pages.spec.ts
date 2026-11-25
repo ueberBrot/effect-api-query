@@ -38,9 +38,9 @@ for (const exampleHost of ["start", "standalone"] as const) {
           requests.push(request.url());
         }
       });
-      const response = await page.goto(exampleUrl);
+      const document = await page.goto(exampleUrl);
       if (exampleHost === "start") {
-        const html = await response?.text();
+        const html = await document?.text();
         expect(html).toContain("Additional user 1");
         expect(html).not.toContain(lastName);
       }
@@ -100,9 +100,27 @@ for (const exampleHost of ["start", "standalone"] as const) {
         ).toBeVisible();
       }
       /* oxlint-enable eslint/no-await-in-loop */
-      await page
-        .getByRole("button", { name: `Delete HTTP ${lastName}` })
-        .click();
+      const httpDelete = page.getByRole("button", {
+        name: `Delete HTTP ${lastName}`,
+      });
+      await expect(httpDelete).toBeVisible();
+      const deletion = page.waitForResponse((response) =>
+        exampleHost === "start"
+          ? isHttpRequest(response.request(), "DELETE", "/users/17")
+          : recordsRpc(response.request().postData(), "users.delete")
+      );
+      await (
+        exampleHost === "start"
+          ? httpDelete
+          : page.getByRole("button", {
+              name: `Delete ${lastName}`,
+              exact: true,
+            })
+      ).click();
+      const deleted = await deletion;
+      const missing = await page.request.get(`${exampleUrl}/api/users/17`);
+      expect(deleted.ok()).toBe(true);
+      expect(missing.status()).toBe(404);
       await expect(page.getByText("HTTP: 16 of 16 loaded")).toBeVisible();
       await expect(page.getByText(lastName, { exact: false })).toHaveCount(0);
     });

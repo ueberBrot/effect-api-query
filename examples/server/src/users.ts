@@ -12,7 +12,7 @@ import {
 } from "@effect-api-query/contracts";
 import { Clock, Effect, Ref, Result, Schema } from "effect";
 
-export const directoryWriteQuota = { creates: 128, windowMs: 60_000 } as const;
+const directoryWriteQuota = { creates: 128, windowMs: 60_000 } as const;
 
 const initialUsers = [
   { locale: "en", name: "Ada Lovelace" },

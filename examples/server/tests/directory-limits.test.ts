@@ -7,7 +7,7 @@ import { FetchHttpClient } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
 import { TestClock } from "effect/testing";
 
-import { directoryWriteQuota, makeUsers } from "../src/users.ts";
+import { makeUsers } from "../src/users.ts";
 import { startExampleServerFixture } from "./fixtures/example-server.ts";
 
 const longestUser = {
@@ -18,6 +18,8 @@ const invalidUsers = [
   { ...longestUser, name: `${longestUser.name}n` },
   { ...longestUser, locale: `${longestUser.locale}l` },
 ];
+const maxCreatesPerWindow = 128;
+const createWindowMs = 60_000;
 
 describe("example directory limits", () => {
   it.effect("validates writes before changing the shared store", () =>
@@ -56,11 +58,11 @@ describe("example directory limits", () => {
       Effect.gen(function* expireDirectoryWriteQuota() {
         const users = yield* makeUsers();
         const initial = yield* users.list();
-        for (let index = 0; index < directoryWriteQuota.creates; index += 1) {
+        for (let index = 0; index < maxCreatesPerWindow; index += 1) {
           const { id, revision } = yield* users.create(longestUser);
           yield* users.delete({ id, revision });
         }
-        yield* TestClock.adjust(directoryWriteQuota.windowMs - 1);
+        yield* TestClock.adjust(createWindowMs - 1);
         expect(yield* Effect.flip(users.create(longestUser))).toBe(
           "directory-write-quota-exceeded"
         );
@@ -68,7 +70,7 @@ describe("example directory limits", () => {
         yield* TestClock.adjust(1);
         expect(yield* users.create(longestUser)).toMatchObject({
           ...longestUser,
-          id: initial.length + directoryWriteQuota.creates + 1,
+          id: initial.length + maxCreatesPerWindow + 1,
         });
       })
   );

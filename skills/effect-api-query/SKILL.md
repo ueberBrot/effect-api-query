@@ -37,6 +37,7 @@ sources:
   - "**/examples/vite-react/src/components/users/create-user-form.tsx"
   - "**/examples/vite-react/src/components/sections/mutations-section.tsx"
   - "**/examples/shared/ui/effect-error-details.tsx"
+  - "**/examples/shared/ui/paged-user-delete-button.tsx"
   - "**/examples/vite-react/tests/*.ts*"
   - "**/examples/tanstack-start/src/lib/*.ts"
   - "**/examples/tanstack-start/src/router.tsx"

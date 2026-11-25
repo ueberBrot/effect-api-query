@@ -1,6 +1,7 @@
 import type { User } from "@effect-api-query/contracts";
 import { ActionButton } from "@effect-api-query/shared/ui/action-button.tsx";
 import { EffectErrorDetails } from "@effect-api-query/shared/ui/effect-error-details.tsx";
+import { PagedUserDeleteButton } from "@effect-api-query/shared/ui/paged-user-delete-button.tsx";
 import {
   useInfiniteQuery,
   useMutation,
@@ -167,22 +168,15 @@ const InfiniteUserQueries = ({
                   key={user.id}
                 >
                   <strong>{`#${String(pageIndex * PAGE_SIZE + userIndex + 1)} ${user.name}`}</strong>
-                  {!previewIds.has(user.id) && user.id > 0 && (
-                    <ActionButton
-                      aria-label={`Delete ${user.name}`}
-                      disabled={deleteUser.isPending}
-                      onClick={() => {
-                        deleteUser.mutate({
-                          id: user.id,
-                          revision: user.revision,
-                        });
-                      }}
-                      type="button"
-                      variant="danger"
-                    >
-                      Delete
-                    </ActionButton>
-                  )}
+                  <PagedUserDeleteButton
+                    user={user}
+                    previewIds={previewIds}
+                    transport="rpc"
+                    disabled={deleteUser.isPending}
+                    onDelete={({ id, revision }) => {
+                      deleteUser.mutate({ id, revision });
+                    }}
+                  />
                 </li>
               ))}
             </ul>

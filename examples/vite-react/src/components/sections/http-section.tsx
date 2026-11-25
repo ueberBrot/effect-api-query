@@ -2,6 +2,7 @@ import { directoryLimits } from "@effect-api-query/contracts";
 import type { User } from "@effect-api-query/contracts";
 import { ActionButton } from "@effect-api-query/shared/ui/action-button.tsx";
 import { EffectErrorDetails } from "@effect-api-query/shared/ui/effect-error-details.tsx";
+import { PagedUserDeleteButton } from "@effect-api-query/shared/ui/paged-user-delete-button.tsx";
 import {
   describeSlowQueryCancellation,
   useSlowQueryCancellation,
@@ -169,35 +170,37 @@ const HttpPagination = ({
             <p>
               HTTP page {String(index + 1)}: {String(page.users.length)} users
             </p>
-            <p className="text-muted-foreground text-sm">
-              {page.users.map((user) => user.name).join(", ")}
-            </p>
-            {page.users
-              .filter((user) => user.id > 0 && !previewIds.has(user.id))
-              .map((user) => (
-                <ActionButton
-                  aria-label={`Delete HTTP ${user.name}`}
-                  disabled={deleteUser.isPending}
+            <ul className="text-muted-foreground grid gap-1 text-sm">
+              {page.users.map((user) => (
+                <li
+                  className="flex items-center justify-between gap-3"
                   key={user.id}
-                  onClick={() => {
-                    deleteUser.mutate(
-                      {
-                        params: { id: user.id },
-                        query: { revision: user.revision },
-                      },
-                      {
-                        onSuccess: () => {
-                          onDeleted(user);
-                        },
-                      }
-                    );
-                  }}
-                  type="button"
-                  variant="danger"
                 >
-                  Delete
-                </ActionButton>
+                  <span>
+                    User {user.id}: {user.name}
+                  </span>
+                  <PagedUserDeleteButton
+                    user={user}
+                    previewIds={previewIds}
+                    transport="http"
+                    disabled={deleteUser.isPending}
+                    onDelete={({ id, revision }) => {
+                      deleteUser.mutate(
+                        {
+                          params: { id },
+                          query: { revision },
+                        },
+                        {
+                          onSuccess: () => {
+                            onDeleted(user);
+                          },
+                        }
+                      );
+                    }}
+                  />
+                </li>
               ))}
+            </ul>
           </li>
         ))}
       </ol>
